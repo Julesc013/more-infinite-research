@@ -49,6 +49,16 @@ table.insert(settings_data, {
   localised_description = {"mod-setting-description.ips-require-space-gate"}
 })
 
+table.insert(settings_data, {
+  type = "bool-setting",
+  name = "mir-prefer-this-mod-for-competing-techs",
+  setting_type = "startup",
+  default_value = true,
+  order = "a-01",
+  localised_name = {"mod-setting-name.mir-prefer-this-mod-for-competing-techs"},
+  localised_description = {"mod-setting-description.mir-prefer-this-mod-for-competing-techs"}
+})
+
 local stream_order = {
   "research_breeding",
   "research_plastic",

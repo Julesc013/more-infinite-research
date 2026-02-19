@@ -47,9 +47,9 @@ local defaults = {
       base_cost = 115,
       growth_factor = 1.333333333333,
       research_time = 60,
-      science_packs = {
-        "automation-science-pack","logistic-science-pack","chemical-science-pack",
-        "production-science-pack","utility-science-pack","space-science-pack"
+      science_packs = "inherit",
+      add_science_packs = {
+        "space-science-pack"
       }
     },
     ["research-speed"] = {
@@ -58,7 +58,8 @@ local defaults = {
       base_cost = 60,
       growth_factor = 1.5,
       research_time = 120,
-      science_packs = "all"
+      science_packs = "inherit",
+      add_science_packs = "all"
     },
     ["worker-robots-storage"] = {
       enabled = true,
@@ -66,9 +67,9 @@ local defaults = {
       base_cost = 200,
       growth_factor = 1.5,
       research_time = 60,
-      science_packs = {
-        "automation-science-pack","logistic-science-pack","chemical-science-pack",
-        "production-science-pack","agricultural-science-pack"
+      science_packs = "inherit",
+      add_science_packs = {
+        "electromagnetic-science-pack"
       }
     },
     ["inserter-capacity-bonus"] = {
@@ -79,9 +80,9 @@ local defaults = {
       research_time = 60,
       non_bulk_increment = 2,
       bulk_increment = 4,
-      science_packs = {
-        "automation-science-pack","logistic-science-pack","chemical-science-pack",
-        "production-science-pack","agricultural-science-pack"
+      science_packs = "inherit",
+      add_science_packs = {
+        "agricultural-science-pack"
       }
     },
     ["weapon-shooting-speed"] = {
@@ -90,9 +91,10 @@ local defaults = {
       base_cost = 60,
       growth_factor = 1.5,
       research_time = 120,
-      science_packs = {
-        "automation-science-pack","logistic-science-pack","chemical-science-pack",
-        "production-science-pack","military-science-pack","space-science-pack"
+      science_packs = "inherit",
+      add_science_packs = {
+        "military-science-pack",
+        "space-science-pack"
       }
     },
     ["laser-shooting-speed"] = {
@@ -101,9 +103,10 @@ local defaults = {
       base_cost = 60,
       growth_factor = 1.5,
       research_time = 120,
-      science_packs = {
-        "automation-science-pack","logistic-science-pack","chemical-science-pack",
-        "production-science-pack","military-science-pack","space-science-pack"
+      science_packs = "inherit",
+      add_science_packs = {
+        "military-science-pack",
+        "space-science-pack"
       }
     }
   }
