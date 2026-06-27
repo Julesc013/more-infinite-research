@@ -252,7 +252,7 @@ function U.pack_list_for_extension(key, desired)
   local map = {
     ["braking-force"] = { "automation-science-pack","logistic-science-pack","chemical-science-pack","production-science-pack","space-science-pack" },
     ["research-speed"] = PACKS_ALL,
-    ["worker-robots-storage"] = { "automation-science-pack","logistic-science-pack","chemical-science-pack","production-science-pack","agricultural-science-pack" },
+    ["worker-robots-storage"] = { "automation-science-pack","logistic-science-pack","chemical-science-pack","production-science-pack","utility-science-pack","electromagnetic-science-pack" },
     ["inserter-capacity-bonus"] = { "automation-science-pack","logistic-science-pack","chemical-science-pack","production-science-pack","agricultural-science-pack" },
     ["weapon-shooting-speed"] = { "automation-science-pack","logistic-science-pack","chemical-science-pack","production-science-pack","military-science-pack","space-science-pack" },
     ["laser-shooting-speed"] = { "automation-science-pack","logistic-science-pack","chemical-science-pack","production-science-pack","military-science-pack","space-science-pack" },
@@ -265,16 +265,77 @@ function U.pack_list_for_extension(key, desired)
   return deepcopy(list)
 end
 
+local function recipe_outputs_tool(recipe, tool_name)
+  local function matches(result)
+    if not result then return false end
+    local name = result.name or result[1] or result
+    return name == tool_name
+  end
+  local function scan(def)
+    if not def then return false end
+    if def.results then
+      for _, result in pairs(def.results) do
+        if matches(result) then return true end
+      end
+    elseif def.result then
+      return matches(def.result)
+    end
+    return false
+  end
+  if recipe.normal or recipe.expensive then
+    return scan(recipe.normal) or scan(recipe.expensive)
+  end
+  return scan(recipe)
+end
+
+local science_pack_unlock_cache = nil
+
+local function build_science_pack_unlock_cache()
+  if science_pack_unlock_cache then return science_pack_unlock_cache end
+  science_pack_unlock_cache = {}
+  for tech_name, tech in pairs(data.raw.technology or {}) do
+    for _, effect in ipairs(tech.effects or {}) do
+      if effect.type == "unlock-recipe" and effect.recipe then
+        local recipe = (data.raw.recipe or {})[effect.recipe]
+        if recipe then
+          for tool_name, _ in pairs(data.raw.tool or {}) do
+            if recipe_outputs_tool(recipe, tool_name) and not science_pack_unlock_cache[tool_name] then
+              science_pack_unlock_cache[tool_name] = tech_name
+            end
+          end
+        end
+      end
+    end
+  end
+  return science_pack_unlock_cache
+end
+
+function U.prereq_tech_for_science_pack(pack_name)
+  if has_tech(pack_name) then return pack_name end
+  local cache = build_science_pack_unlock_cache()
+  local tech_name = cache[pack_name]
+  if tech_name and has_tech(tech_name) then return tech_name end
+  return nil
+end
+
 function U.build_prereqs_for(key)
   local packs = U.pick_science_for_stream(C.streams[key], key)
   local reqs, seen = {}, {}
   local function add(t) if t and has_tech(t) and not seen[t] then seen[t]=true; table.insert(reqs,t) end end
-  for _,pair in ipairs(packs) do add(pair[1]) end
+  for _,pair in ipairs(packs) do
+    local pack_name = pair[1]
+    local prereq = U.prereq_tech_for_science_pack(pack_name)
+    add(prereq)
+  end
   local gate_on = (settings and settings.startup and settings.startup["ips-require-space-gate"] and settings.startup["ips-require-space-gate"].value) ~= false
   if gate_on then
     local PROM = "promethium-science-pack"
     local SPACE = "space-science-pack"
-    if U.is_space_age() and tool_exists(PROM) and has_tech(PROM) then add(PROM) else if tool_exists(SPACE) and has_tech(SPACE) then add(SPACE) end end
+    if U.is_space_age() and tool_exists(PROM) then
+      add(U.prereq_tech_for_science_pack(PROM))
+    elseif tool_exists(SPACE) then
+      add(U.prereq_tech_for_science_pack(SPACE))
+    end
   end
   return reqs
 end
