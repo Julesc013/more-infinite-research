@@ -40,6 +40,25 @@ For each case, verify:
 - Logs show skipped or reduced streams clearly and do not show stack traces.
 - Vanilla weapon shooting speed effects follow the configured startup setting.
 
+## Local Validation Harness
+
+The repository includes local fixture mods under `dev-fixtures/` and a runner at `scripts/Invoke-MIRValidation.ps1`.
+
+Static checks only:
+
+```powershell
+.\scripts\Invoke-MIRValidation.ps1 -StaticOnly
+```
+
+Runtime load check:
+
+```powershell
+$env:FACTORIO_BIN = "C:\path\to\factorio.exe"
+.\scripts\Invoke-MIRValidation.ps1
+```
+
+The runtime check copies this repo and the fixture mods into a temporary user-data mod directory, writes a fixture `mod-list.json`, and asks Factorio to create a save. It is intentionally a load/prototype validation harness, not a gameplay test.
+
 ## Fixture Designs
 
 ### Item Science Pack Fixture
