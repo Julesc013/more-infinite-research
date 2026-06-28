@@ -1,6 +1,8 @@
-# More Infinite Research v2.0 Compatibility, Overhaul, and Expansion Plan
+# M.I.R. Roadmap
 
-Date: 2026-06-29
+Updated: 2026-06-29
+
+(Below may be out of date)
 
 This document captures the Factorio 2.1 experimental compatibility review and turns it into an execution plan for the mod's v2.0.0 release and follow-on expansion work.
 
