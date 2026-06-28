@@ -16,8 +16,151 @@ local function deepcopy(value)
   return copy(value)
 end
 
-local function has_tool(name) return (data.raw.tool or {})[name] ~= nil end
 local function has_tech(name) return (data.raw.technology or {})[name] ~= nil end
+
+local ITEM_TYPES = {
+  "item",
+  "tool",
+  "module",
+  "ammo",
+  "capsule",
+  "gun",
+  "armor",
+  "repair-tool",
+  "item-with-entity-data",
+  "item-with-inventory",
+  "item-with-label",
+  "item-with-tags",
+  "selection-tool",
+  "blueprint",
+  "blueprint-book",
+  "deconstruction-item",
+  "upgrade-item",
+  "spidertron-remote",
+  "rail-planner",
+  "space-platform-starter-pack"
+}
+
+function U.item_prototype(name)
+  if not name then return nil end
+  for _, type_name in ipairs(ITEM_TYPES) do
+    local bucket = data.raw[type_name]
+    if bucket and bucket[name] then return bucket[name] end
+  end
+  return nil
+end
+
+local function each_item_prototype(callback)
+  for _, type_name in ipairs(ITEM_TYPES) do
+    for name, prototype in pairs(data.raw[type_name] or {}) do
+      callback(name, prototype, type_name)
+    end
+  end
+end
+
+local lab_inputs_cache = nil
+
+function U.all_lab_inputs()
+  if lab_inputs_cache then return deepcopy(lab_inputs_cache) end
+  local out, seen = {}, {}
+  for _, lab in pairs(data.raw.lab or {}) do
+    for _, input in ipairs(lab.inputs or {}) do
+      if not seen[input] and U.item_prototype(input) then
+        seen[input] = true
+        table.insert(out, input)
+      end
+    end
+  end
+  table.sort(out)
+  lab_inputs_cache = out
+  return deepcopy(out)
+end
+
+function U.science_pack_exists(name)
+  if not U.item_prototype(name) then return false end
+  for _, input in ipairs(U.all_lab_inputs()) do
+    if input == name then return true end
+  end
+  return false
+end
+
+local function ingredient_name(ingredient)
+  if not ingredient then return nil end
+  return ingredient.name or ingredient[1]
+end
+
+local function ingredient_amount(ingredient)
+  if not ingredient then return 1 end
+  return ingredient.amount or ingredient[2] or 1
+end
+
+local function lab_accepts_all(lab, packs)
+  local accepted = {}
+  for _, input in ipairs((lab and lab.inputs) or {}) do
+    accepted[input] = true
+  end
+  for _, pack in ipairs(packs or {}) do
+    if not accepted[pack] then return false end
+  end
+  return true
+end
+
+function U.any_lab_accepts_all(packs)
+  if not packs or #packs == 0 then return false end
+  for _, lab in pairs(data.raw.lab or {}) do
+    if lab_accepts_all(lab, packs) then return true end
+  end
+  return false
+end
+
+function U.valid_research_ingredients(ingredients)
+  local packs = {}
+  for _, ingredient in ipairs(ingredients or {}) do
+    local name = ingredient_name(ingredient)
+    if name then table.insert(packs, name) end
+  end
+  return U.any_lab_accepts_all(packs)
+end
+
+function U.best_lab_compatible_ingredients(ingredients, context)
+  local source = deepcopy(ingredients or {})
+  if #source == 0 then return nil, "empty" end
+  if U.valid_research_ingredients(source) then return source, nil end
+
+  local labs = {}
+  for name, lab in pairs(data.raw.lab or {}) do
+    table.insert(labs, {name = name, lab = lab})
+  end
+  table.sort(labs, function(a, b) return a.name < b.name end)
+
+  local best = nil
+  local best_lab = nil
+  for _, entry in ipairs(labs) do
+    local candidate = {}
+    local accepted = {}
+    for _, input in ipairs(entry.lab.inputs or {}) do accepted[input] = true end
+    for _, ingredient in ipairs(source) do
+      local name = ingredient_name(ingredient)
+      if name and accepted[name] then
+        table.insert(candidate, {name, ingredient_amount(ingredient)})
+      end
+    end
+    if #candidate > 0 and U.valid_research_ingredients(candidate) then
+      if not best or #candidate > #best then
+        best = candidate
+        best_lab = entry.name
+      end
+    end
+  end
+
+  if best then
+    log("[more-infinite-research] Reduced science packs for " .. tostring(context or "unknown technology") .. " to a lab-compatible subset accepted by " .. best_lab .. ".")
+    return best, "reduced"
+  end
+
+  log("[more-infinite-research] No lab can research the selected science packs for " .. tostring(context or "unknown technology") .. ".")
+  return nil, "invalid"
+end
 
 function U.is_space_age() return mods and mods["space-age"] ~= nil end
 
@@ -128,7 +271,7 @@ local function icons_from_tech(name)
   return nil
 end
 local function icon_from_item(name)
-  local it = (data.raw.item or {})[name] or (data.raw.ammo or {})[name] or (data.raw.capsule or {})[name] or (data.raw.module or {})[name] or (data.raw.tool or {})[name]
+  local it = U.item_prototype(name)
   if not it then return nil end
   if it.icons then return it.icons end
   if it.icon then return { {icon=it.icon, icon_size=it.icon_size or 64} } end
@@ -152,7 +295,7 @@ function U.icons_for_stream(stream)
   return icon_from_item(src) or { { icon="__base__/graphics/technology/mining-productivity.png", icon_size=256 } }
 end
 
-local PACKS_ALL = {
+local VANILLA_PACK_ORDER = {
   "automation-science-pack","logistic-science-pack","chemical-science-pack","production-science-pack",
   "military-science-pack","utility-science-pack","space-science-pack",
     "agricultural-science-pack","metallurgic-science-pack","electromagnetic-science-pack","cryogenic-science-pack","promethium-science-pack"
@@ -204,8 +347,9 @@ local EXTRA = {
   research_science_pack_productivity = {}
 }
 
-local function tool_exists(n) return (data.raw.tool or {})[n] ~= nil end
-local function add_if_exists(list, name) if tool_exists(name) then table.insert(list, name) end end
+local function add_if_science_pack_exists(list, name)
+  if U.science_pack_exists(name) then table.insert(list, name) end
+end
 local function merge_lists(a, b)
   local out = {}
   if a then for _,v in ipairs(a) do table.insert(out, v) end end
@@ -218,18 +362,18 @@ function U.pick_science_for_stream(spec, key)
   local packs = {}
   local desired = spec and spec.science_packs
   if desired == "all" then
-    for _,p in ipairs(PACKS_ALL) do add_if_exists(packs, p) end
+    for _,p in ipairs(U.pack_list_all()) do add_if_science_pack_exists(packs, p) end
   elseif type(desired) == "table" then
-    for _,p in ipairs(desired) do add_if_exists(packs, p) end
+    for _,p in ipairs(desired) do add_if_science_pack_exists(packs, p) end
   elseif type(desired) == "string" then
     local list = U.pack_list_for_extension(key, desired)
     if not list then list = U.pack_list_for_extension(desired) end
-    if list then for _,p in ipairs(list) do add_if_exists(packs, p) end end
+    if list then for _,p in ipairs(list) do add_if_science_pack_exists(packs, p) end end
   elseif key == "research_science_pack_productivity" then
-    for _,p in ipairs(PACKS_ALL) do add_if_exists(packs, p) end
+    for _,p in ipairs(U.pack_list_all()) do add_if_science_pack_exists(packs, p) end
   else
-    for _,p in ipairs({"automation-science-pack","logistic-science-pack","chemical-science-pack","production-science-pack"}) do add_if_exists(packs, p) end
-    for _,p in ipairs(EXTRA[key] or {}) do add_if_exists(packs, p) end
+    for _,p in ipairs({"automation-science-pack","logistic-science-pack","chemical-science-pack","production-science-pack"}) do add_if_science_pack_exists(packs, p) end
+    for _,p in ipairs(EXTRA[key] or {}) do add_if_science_pack_exists(packs, p) end
   end
   local out, seen = {}, {}
   for _,n in ipairs(packs) do if not seen[n] then seen[n]=true; table.insert(out, {n,1}) end end
@@ -237,7 +381,24 @@ function U.pick_science_for_stream(spec, key)
 end
 
 function U.pack_list_all()
-  return deepcopy(PACKS_ALL)
+  local available = {}
+  for _, pack in ipairs(U.all_lab_inputs()) do
+    available[pack] = true
+  end
+
+  local out = {}
+  for _, pack in ipairs(VANILLA_PACK_ORDER) do
+    if available[pack] then
+      table.insert(out, pack)
+      available[pack] = nil
+    end
+  end
+
+  local extra = {}
+  for pack, _ in pairs(available) do table.insert(extra, pack) end
+  table.sort(extra)
+  for _, pack in ipairs(extra) do table.insert(out, pack) end
+  return out
 end
 
 function U.pack_list_for_extension(key, desired)
@@ -251,7 +412,7 @@ function U.pack_list_for_extension(key, desired)
   end
   local map = {
     ["braking-force"] = { "automation-science-pack","logistic-science-pack","chemical-science-pack","production-science-pack","space-science-pack" },
-    ["research-speed"] = PACKS_ALL,
+    ["research-speed"] = "all",
     ["worker-robots-storage"] = { "automation-science-pack","logistic-science-pack","chemical-science-pack","production-science-pack","utility-science-pack","electromagnetic-science-pack" },
     ["inserter-capacity-bonus"] = { "automation-science-pack","logistic-science-pack","chemical-science-pack","production-science-pack","agricultural-science-pack" },
     ["weapon-shooting-speed"] = { "automation-science-pack","logistic-science-pack","chemical-science-pack","production-science-pack","military-science-pack","space-science-pack" },
@@ -262,14 +423,15 @@ function U.pack_list_for_extension(key, desired)
   }
   local list = map[key]
   if not list then return nil end
+  if list == "all" then return U.pack_list_all() end
   return deepcopy(list)
 end
 
-local function recipe_outputs_tool(recipe, tool_name)
+local function recipe_outputs_item(recipe, item_name)
   local function matches(result)
     if not result then return false end
     local name = result.name or result[1] or result
-    return name == tool_name
+    return name == item_name
   end
   local function scan(def)
     if not def then return false end
@@ -293,14 +455,15 @@ local science_pack_unlock_cache = nil
 local function build_science_pack_unlock_cache()
   if science_pack_unlock_cache then return science_pack_unlock_cache end
   science_pack_unlock_cache = {}
+  local lab_inputs = U.all_lab_inputs()
   for tech_name, tech in pairs(data.raw.technology or {}) do
     for _, effect in ipairs(tech.effects or {}) do
       if effect.type == "unlock-recipe" and effect.recipe then
         local recipe = (data.raw.recipe or {})[effect.recipe]
         if recipe then
-          for tool_name, _ in pairs(data.raw.tool or {}) do
-            if recipe_outputs_tool(recipe, tool_name) and not science_pack_unlock_cache[tool_name] then
-              science_pack_unlock_cache[tool_name] = tech_name
+          for _, pack_name in ipairs(lab_inputs) do
+            if recipe_outputs_item(recipe, pack_name) and not science_pack_unlock_cache[pack_name] then
+              science_pack_unlock_cache[pack_name] = tech_name
             end
           end
         end
@@ -318,11 +481,11 @@ function U.prereq_tech_for_science_pack(pack_name)
   return nil
 end
 
-function U.build_prereqs_for(key)
-  local packs = U.pick_science_for_stream(C.streams[key], key)
+function U.build_prereqs_for(key, ingredients)
+  local packs = ingredients or U.best_lab_compatible_ingredients(U.pick_science_for_stream(C.streams[key], key), key)
   local reqs, seen = {}, {}
   local function add(t) if t and has_tech(t) and not seen[t] then seen[t]=true; table.insert(reqs,t) end end
-  for _,pair in ipairs(packs) do
+  for _,pair in ipairs(packs or {}) do
     local pack_name = pair[1]
     local prereq = U.prereq_tech_for_science_pack(pack_name)
     add(prereq)
@@ -331,9 +494,9 @@ function U.build_prereqs_for(key)
   if gate_on then
     local PROM = "promethium-science-pack"
     local SPACE = "space-science-pack"
-    if U.is_space_age() and tool_exists(PROM) then
+    if U.is_space_age() and U.science_pack_exists(PROM) then
       add(U.prereq_tech_for_science_pack(PROM))
-    elseif tool_exists(SPACE) then
+    elseif U.science_pack_exists(SPACE) then
       add(U.prereq_tech_for_science_pack(SPACE))
     end
   end

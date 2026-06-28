@@ -29,10 +29,6 @@ local function format_number(value)
   return string.format("%.6g", value)
 end
 
-local function tool_exists(name)
-  return (data.raw.tool or {})[name] ~= nil
-end
-
 local function startup_setting(name)
   local s = settings and settings.startup and settings.startup[name]
   if s then return s.value end
@@ -199,7 +195,7 @@ local function resolve_science_packs(spec, fallback_unit, key)
 
   local function append_pack_list(list)
     for _, pack in ipairs(list or {}) do
-      if tool_exists(pack) and not seen_packs[pack] then
+      if U.science_pack_exists and U.science_pack_exists(pack) and not seen_packs[pack] then
         seen_packs[pack] = true
         table.insert(base_ingredients, {pack, 1})
       end
@@ -248,7 +244,7 @@ local function resolve_science_packs(spec, fallback_unit, key)
     local out = {}
     local out_seen = {}
     for _, pack in ipairs(list) do
-      if tool_exists(pack) then
+      if U.science_pack_exists and U.science_pack_exists(pack) then
         out_seen[pack] = true
         table.insert(out, {pack, 1})
       end
@@ -485,7 +481,11 @@ local function extend_chain(key)
     research_time = base_tech.unit.time or 60
   end
 
-  local resolved_ingredients = resolve_science_packs(spec, base_tech.unit, key)
+  local resolved_ingredients = U.best_lab_compatible_ingredients(resolve_science_packs(spec, base_tech.unit, key), key)
+  if not resolved_ingredients or #resolved_ingredients == 0 then
+    log("[more-infinite-research] Skipping extension for " .. key .. ": no lab-compatible science pack set was found.")
+    return
+  end
   new.unit = {
     count_formula = format_number(base_value) .. " * " .. format_number(growth) .. "^(L-1)",
     ingredients = resolved_ingredients,

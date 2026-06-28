@@ -44,7 +44,11 @@ local function make_stream(key, spec)
     direct_effects = deepcopy(spec.direct_effects)
   end
 
-  local ingredients = U.pick_science_for_stream(spec, key)
+  local ingredients = U.best_lab_compatible_ingredients(U.pick_science_for_stream(spec, key), key)
+  if not ingredients or #ingredients == 0 then
+    log("[more-infinite-research] Skipping stream "..key.." because no valid lab-compatible science pack set was found.")
+    return
+  end
   if spec and spec.science_packs then
     local names = {}
     for _, entry in ipairs(ingredients) do table.insert(names, entry[1]) end
@@ -59,7 +63,7 @@ local function make_stream(key, spec)
       localised_description = {""},
       icons = U.icons_for_stream(spec),
       effects = direct_effects,
-      prerequisites = U.build_prereqs_for(key),
+      prerequisites = U.build_prereqs_for(key, ingredients),
       unit = {
         count_formula = count_formula,
         ingredients = ingredients,
@@ -98,7 +102,7 @@ local function make_stream(key, spec)
     localised_description = {""},
     icons = U.icons_for_stream(spec),
     effects = effects,
-    prerequisites = U.build_prereqs_for(key),
+    prerequisites = U.build_prereqs_for(key, ingredients),
     unit = {
       count_formula = count_formula,
       ingredients = ingredients,
