@@ -3,6 +3,7 @@ local defaults = require("defaults")
 local base_defaults = defaults.base_extensions or {}
 
 local U = require("prototypes.util")
+local D = require("prototypes.diagnostics")
 
 local function deepcopy(value)
   if table.deepcopy then return table.deepcopy(value) end
@@ -300,7 +301,10 @@ local SPECIALS = {
 
 local function extend_chain(key)
   local spec = base_defaults[key] or {}
-  if not is_enabled(key, spec) then return end
+  if not is_enabled(key, spec) then
+    D.extension(D.extension_fields(key, "skipped", "disabled"))
+    return
+  end
 
   local pattern = "^" .. escape_pattern(key) .. "%-(%d+)$"
   local levels, by_level = {}, {}
@@ -317,13 +321,17 @@ local function extend_chain(key)
     end
   end
 
-  if has_infinite or #levels == 0 then return end
+  if has_infinite or #levels == 0 then
+    D.extension(D.extension_fields(key, "skipped", has_infinite and "already_infinite" or "no_vanilla_chain"))
+    return
+  end
   table.sort(levels)
 
   local detected_highest = levels[#levels]
   local min_level = spec.min_level or (detected_highest + 1)
   if detected_highest < min_level - 1 then
     -- Vanilla chain does not reach the expected prerequisite tier.
+    D.extension(D.extension_fields(key, "skipped", "vanilla_chain_below_minimum"))
     return
   end
 
@@ -339,12 +347,21 @@ local function extend_chain(key)
   end
 
   local base_tech = by_level[base_level]
-  if not base_tech or not base_tech.unit then return end
-  if base_tech.max_level == "infinite" then return end
+  if not base_tech or not base_tech.unit then
+    D.extension(D.extension_fields(key, "skipped", "missing_base_unit"))
+    return
+  end
+  if base_tech.max_level == "infinite" then
+    D.extension(D.extension_fields(key, "skipped", "base_already_infinite"))
+    return
+  end
   -- Allow anchoring even if vanilla used a formula.
 
   local new_name = key .. "-" .. desired_new_level
-  if data.raw.technology[new_name] then return end
+  if data.raw.technology[new_name] then
+    D.extension(D.extension_fields(key, "skipped", "target_exists"))
+    return
+  end
 
   local max_level_value = coerce_max_level_value(startup_setting("mir-max-level-" .. key))
   if max_level_value == "infinite" then
@@ -459,12 +476,14 @@ local function extend_chain(key)
     local other_choice = find_any_infinite_extension(key .. "-" .. base_level, new_name)
     if other_choice then
       log("[more-infinite-research] Skipping extension for " .. key .. ": competing infinite tech kept from other mod (" .. other_choice .. ").")
+      D.extension(D.extension_fields(key, "skipped", "competing_infinite_kept"))
       return
     end
   end
   local existing = find_equivalent_infinite_extension(key .. "-" .. base_level, desired_effects)
   if existing then
     log("[more-infinite-research] Skipping extension for " .. key .. ": equivalent infinite tech already exists (" .. existing .. ").")
+    D.extension(D.extension_fields(key, "skipped", "equivalent_infinite_exists"))
     return
   end
   new.effects = desired_effects
@@ -481,9 +500,11 @@ local function extend_chain(key)
     research_time = base_tech.unit.time or 60
   end
 
-  local resolved_ingredients = U.best_lab_compatible_ingredients(resolve_science_packs(spec, base_tech.unit, key), key)
+  local resolved_ingredients, lab_status = U.best_lab_compatible_ingredients(resolve_science_packs(spec, base_tech.unit, key), key)
+  lab_status = lab_status or "full"
   if not resolved_ingredients or #resolved_ingredients == 0 then
     log("[more-infinite-research] Skipping extension for " .. key .. ": no lab-compatible science pack set was found.")
+    D.extension(D.extension_fields(key, "skipped", "no_lab_compatible_science", resolved_ingredients, new.prerequisites, desired_effects, lab_status))
     return
   end
   new.unit = {
@@ -498,6 +519,7 @@ local function extend_chain(key)
   end
 
   data:extend({ new })
+  D.extension(D.extension_fields(key, "generated", "base_extension", resolved_ingredients, new.prerequisites, new.effects, lab_status))
 end
 
 for key, _ in pairs(base_defaults) do

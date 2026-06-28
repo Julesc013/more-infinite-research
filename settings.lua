@@ -70,6 +70,16 @@ table.insert(settings_data, {
   localised_description = {"mod-setting-description.mir-adjust-vanilla-weapon-speed-techs"}
 })
 
+table.insert(settings_data, {
+  type = "bool-setting",
+  name = "mir-debug-generation-report",
+  setting_type = "startup",
+  default_value = false,
+  order = "a-03",
+  localised_name = {"mod-setting-name.mir-debug-generation-report"},
+  localised_description = {"mod-setting-description.mir-debug-generation-report"}
+})
+
 local stream_order = {
   "research_breeding",
   "research_plastic",

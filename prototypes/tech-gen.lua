@@ -1,6 +1,7 @@
 
 local C = require("prototypes.config")
 local U = require("prototypes.util")
+local D = require("prototypes.diagnostics")
 
 local function deepcopy(value)
   if table.deepcopy then return table.deepcopy(value) end
@@ -69,12 +70,22 @@ local function available_direct_effects(key, effects)
 end
 
 local function make_stream(key, spec)
-  if not U.enabled_for(key, spec) then return end
-  if spec.hide_in_space_age and U.is_space_age() then return end
-  if spec.requires_space_age and not U.is_space_age() then return end
+  if not U.enabled_for(key, spec) then
+    D.stream(D.stream_fields(key, spec, "skipped", "disabled"))
+    return
+  end
+  if spec.hide_in_space_age and U.is_space_age() then
+    D.stream(D.stream_fields(key, spec, "skipped", "hidden_in_space_age"))
+    return
+  end
+  if spec.requires_space_age and not U.is_space_age() then
+    D.stream(D.stream_fields(key, spec, "skipped", "requires_space_age"))
+    return
+  end
   local missing = missing_requirement(key, spec)
   if missing then
     log("[more-infinite-research] Skipping stream "..key.." because "..missing..".")
+    D.stream(D.stream_fields(key, spec, "skipped", missing))
     return
   end
 
@@ -89,13 +100,16 @@ local function make_stream(key, spec)
     direct_effects = available_direct_effects(key, deepcopy(spec.direct_effects))
     if #direct_effects == 0 then
       log("[more-infinite-research] Skipping stream "..key.." because no available direct effects remain.")
+      D.stream(D.stream_fields(key, spec, "skipped", "no_available_direct_effects"))
       return
     end
   end
 
-  local ingredients = U.best_lab_compatible_ingredients(U.pick_science_for_stream(spec, key), key)
+  local ingredients, lab_status = U.best_lab_compatible_ingredients(U.pick_science_for_stream(spec, key), key)
+  lab_status = lab_status or "full"
   if not ingredients or #ingredients == 0 then
     log("[more-infinite-research] Skipping stream "..key.." because no valid lab-compatible science pack set was found.")
+    D.stream(D.stream_fields(key, spec, "skipped", "no_lab_compatible_science", ingredients, nil, direct_effects, lab_status))
     return
   end
   if spec and spec.science_packs then
@@ -105,6 +119,7 @@ local function make_stream(key, spec)
   end
 
   if direct_effects and #direct_effects > 0 then
+    local prerequisites = U.build_prereqs_for(key, ingredients)
     local t = {
       type = "technology",
       name = "recipe-prod-"..key.."-1",
@@ -112,7 +127,7 @@ local function make_stream(key, spec)
       localised_description = ldesc(spec),
       icons = U.icons_for_stream(spec),
       effects = direct_effects,
-      prerequisites = U.build_prereqs_for(key, ingredients),
+      prerequisites = prerequisites,
       unit = {
         count_formula = count_formula,
         ingredients = ingredients,
@@ -124,6 +139,7 @@ local function make_stream(key, spec)
       level = 1
     }
     data:extend({t})
+    D.stream(D.stream_fields(key, spec, "generated", "direct_effect", ingredients, prerequisites, direct_effects, lab_status))
     return
   end
 
@@ -136,9 +152,11 @@ local function make_stream(key, spec)
   end
   if #effects == 0 then
     log("[more-infinite-research] Skipping stream "..key.." because no matching recipes were found.")
+    D.stream(D.stream_fields(key, spec, "skipped", "no_matching_recipes", ingredients, nil, effects, lab_status))
     return
   end
 
+  local prerequisites = U.build_prereqs_for(key, ingredients)
   local t = {
     type = "technology",
     name = "recipe-prod-"..key.."-1",
@@ -146,7 +164,7 @@ local function make_stream(key, spec)
     localised_description = ldesc(spec),
     icons = U.icons_for_stream(spec),
     effects = effects,
-    prerequisites = U.build_prereqs_for(key, ingredients),
+    prerequisites = prerequisites,
     unit = {
       count_formula = count_formula,
       ingredients = ingredients,
@@ -159,6 +177,7 @@ local function make_stream(key, spec)
   }
   data:extend({t})
   log("[more-infinite-research] Registered technology "..t.name)
+  D.stream(D.stream_fields(key, spec, "generated", "recipe_productivity", ingredients, prerequisites, effects, lab_status))
 end
 
 for key, spec in pairs(require("prototypes.config").streams) do
