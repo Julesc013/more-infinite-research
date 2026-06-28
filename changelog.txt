@@ -1,4 +1,19 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.1.0
+Date: 2026-06-29
+  Features:
+    - Added local fixture mods and a PowerShell validation runner for static checks and optional Factorio runtime load checks.
+    - Added a startup-controlled generation diagnostics report for generated and skipped streams and base extensions.
+  Changes:
+    - Split the prototype utility facade into focused modules for lookup, science-pack validation, recipe matching, icon construction, and deepcopy.
+    - Split stream definitions into productivity and direct-effect domain modules.
+    - Added compatibility profile scaffolding for future mod-specific stream patches.
+  Documentation:
+    - Added architecture documentation for the data-stage pipeline, utility modules, stream config domains, compatibility profiles, diagnostics, and validation harness.
+  Compatibility:
+    - No prototype IDs were renamed. No migration is required.
+
+---------------------------------------------------------------------------------------------------
 Version: 2.0.0
 Date: 2026-06-29
   Major Features:

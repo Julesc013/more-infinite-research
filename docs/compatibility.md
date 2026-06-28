@@ -10,6 +10,8 @@ More Infinite Research v2.0.0 targets Factorio 2.1 and uses a compatibility-firs
 - Recipe matching supports both `recipe.category` and Factorio 2.1 `recipe.categories`.
 - Hidden recipes and recycling recipes are skipped by default. Streams can opt in with `include_hidden` or `include_recycling`.
 - Optional Space Age streams must either set `requires_space_age = true` or declare concrete required prototypes.
+- Mod-specific stream changes should live in `prototypes/compat/profiles.lua` instead of the base stream definitions.
+- `mir-debug-generation-report` can be enabled to capture why each stream or base extension generated or skipped.
 
 ## Known Limits
 
@@ -95,6 +97,7 @@ Expected result: recipe streams can discover late recipes when load order makes 
 
 - Run `rg "data.raw.tool|tool_exists|has_tool|PACKS_ALL" prototypes` and confirm no old science-pack authority remains.
 - Run `rg "icon_mipmaps" prototypes` and confirm generated icons do not add it.
+- Run `.\scripts\Invoke-MIRValidation.ps1 -StaticOnly`.
 - Run `git diff --check`.
 - Parse `info.json` as JSON.
 - Load Factorio with the manual matrix above.
