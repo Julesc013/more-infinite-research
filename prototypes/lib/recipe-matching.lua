@@ -72,7 +72,9 @@ end
 function R.matches_stream_recipe_filter(recipe_name, recipe, stream)
   local match = stream and stream.match
   if not match then return false end
-  return has_category(recipe, match.categories) or name_matches(recipe_name, match.name_patterns)
+  return has_category(recipe, match.categories)
+    or name_matches(recipe_name, match.name_patterns)
+    or name_matches(recipe_name, match.recipe_patterns)
 end
 
 local function recipe_uses_blocked_ingredient(rec, patterns)
@@ -144,6 +146,9 @@ local function gather_by_items(items, patterns, options)
       if not match and options.match_stream and options.match_mode == "by_category_or_match" then
         match = R.matches_stream_recipe_filter(rname, r, options.match_stream)
       end
+      if not match and options.recipe_patterns and name_matches(rname, options.recipe_patterns) then
+        match = true
+      end
       if match and not seen[rname] then
         seen[rname] = true
         table.insert(list, rname)
@@ -156,10 +161,11 @@ end
 
 function R.recipes_for_stream(spec, per_level_default)
   if spec.groups then
-    local buckets = {}
+    local buckets, assigned = {}, {}
     for _, g in ipairs(spec.groups) do
       local list = gather_by_items(g.items, g.item_patterns, {
         extra_outputs = g.extra_outputs,
+        recipe_patterns = merge_lists(spec.recipe_patterns, g.recipe_patterns),
         exclude_recipe_patterns = merge_lists(spec.exclude_recipe_patterns, g.exclude_recipe_patterns),
         exclude_ingredient_patterns = merge_lists(spec.exclude_ingredient_patterns, g.exclude_ingredient_patterns),
         include_hidden = spec.include_hidden or g.include_hidden,
@@ -167,8 +173,17 @@ function R.recipes_for_stream(spec, per_level_default)
         match_mode = g.mode or spec.mode,
         match_stream = g.match and g or spec
       })
-      if #list > 0 then
-        table.insert(buckets, {change = g.change or per_level_default, recipes = list})
+      local filtered = {}
+      for _, recipe_name in ipairs(list) do
+        -- Groups are ordered from broad/common to niche/high tier. If a later
+        -- pattern also sees a recipe, keep the first tier assignment.
+        if not assigned[recipe_name] then
+          assigned[recipe_name] = true
+          table.insert(filtered, recipe_name)
+        end
+      end
+      if #filtered > 0 then
+        table.insert(buckets, {change = g.change or per_level_default, recipes = filtered})
       end
     end
     return buckets
@@ -176,6 +191,7 @@ function R.recipes_for_stream(spec, per_level_default)
 
   local list = gather_by_items(spec.items, spec.item_patterns, {
     extra_outputs = spec.extra_outputs,
+    recipe_patterns = spec.recipe_patterns,
     exclude_recipe_patterns = spec.exclude_recipe_patterns,
     exclude_ingredient_patterns = spec.exclude_ingredient_patterns,
     include_hidden = spec.include_hidden,
