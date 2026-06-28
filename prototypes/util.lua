@@ -84,6 +84,14 @@ function U.science_pack_exists(name)
   return false
 end
 
+function U.technology_exists(name)
+  return name ~= nil and (data.raw.technology or {})[name] ~= nil
+end
+
+function U.ammo_category_exists(name)
+  return name ~= nil and (data.raw["ammo-category"] or {})[name] ~= nil
+end
+
 local function ingredient_name(ingredient)
   if not ingredient then return nil end
   return ingredient.name or ingredient[1]

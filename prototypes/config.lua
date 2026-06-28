@@ -151,7 +151,10 @@ M.streams = {
   },
 
   research_electric_shooting_speed = {
+    requires_space_age = true,
     icon_tech = "tesla-weapons",
+    required_technologies = {"tesla-weapons"},
+    required_ammo_categories = {"electric"},
     science_packs = {
       "automation-science-pack","logistic-science-pack","chemical-science-pack",
       "production-science-pack","military-science-pack","electromagnetic-science-pack"
@@ -196,6 +199,7 @@ M.streams = {
   },
 
   research_character_reach = {
+    requires_space_age = true,
     icon = "__space-age__/graphics/technology/health.png",
     icon_size = 256,
     science_packs = {
