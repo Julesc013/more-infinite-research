@@ -17,6 +17,7 @@ local function deepcopy(value)
 end
 
 local function lname(key, spec)
+  if spec.localised_name then return spec.localised_name end
   local locale_key = "technology-name.more-infinite-research."..key
   local out = {locale_key}
   if spec.icon_item then

@@ -42,6 +42,11 @@ return {
     {change=0.05, items={"gate"}}
   } },
 
+  research_stone_products = { localised_name = {"", "Stone product productivity"}, icon_item = "stone", groups = {
+    { change = 0.10, items = { "stone", "landfill" } },
+    { change = 0.05, items = { "foundation" }, item_patterns = { "^artificial%-.+%-soil$" } }
+  }, exclude_ingredient_patterns={"scrap"} },
+
   research_rails = { icon_item="rail", items = {"rail"} },
 
   research_concrete = { icon_tech = "concrete", groups = {
@@ -64,14 +69,29 @@ return {
   } },
 
   research_electric_energy = { icon_tech="electric-energy-accumulators", groups = {
-    { change=0.10, items={"solar-panel","accumulator"} }
+    { change=0.10, items={"solar-panel","accumulator"} },
+    { change=0.05, items={"advanced-solar","advanced-accumulator"} },
+    { change=0.02, items={"elite-solar","elite-accumulator"} },
+    { change=0.01, items={"ultimate-solar","ultimate-accumulator"} }
   } },
 
   research_bullets = { icon_tech="military", groups = {
     { change=0.10, items={"firearm-magazine","shotgun-shell"} },
     { change=0.05, items={"piercing-rounds-magazine","piercing-shotgun-shell"} },
     { change=0.02, items={"uranium-rounds-magazine","uranium-shotgun-shell"} },
-    { change=0.01, item_patterns={"^plutonium%-.+magazine$","^plutonium%-.+shotgun%-shell$"} }
+    { change=0.01, item_patterns={
+      "^plutonium%-.+magazine$","^plutonium%-.+shotgun%-shell$",
+      "^tungsten%-.+magazine$","^tungsten%-.+shotgun%-shell$"
+    } }
+  }},
+
+  research_heavy_ammo = { localised_name = {"", "Heavy ammunition productivity"}, icon_item="cannon-shell", icon_tech="military", groups = {
+    { change=0.10, items={"cannon-shell"} },
+    { change=0.05, items={"explosive-cannon-shell"} },
+    { change=0.02, items={"uranium-cannon-shell","explosive-uranium-cannon-shell"} },
+    { change=0.01, items={"artillery-shell","railgun-ammo"}, item_patterns={
+      "^.+%-cannon%-shell$","^.+%-artillery%-shell$","^.+%-railgun%-ammo$"
+    } }
   }},
 
   research_rockets = { icon_tech="rocketry", groups = {
@@ -79,6 +99,17 @@ return {
     { change=0.05, items={"explosive-rocket"} },
     { change=0.02, items={"atomic-bomb"} },
     { change=0.01, items={"plutonium-bomb"}, item_patterns={"^plutonium%-bomb$","^plutonium%-.+bomb$"} }
+  }},
+
+  research_armor_components = { localised_name = {"", "Armor component productivity"}, icon_tech="power-armor", groups = {
+    { change=0.05, item_patterns={
+      "^.+%-armor%-plating$","^.+%-armour%-plating$",
+      "^armor%-plating.*$","^armour%-plating.*$"
+    } },
+    { change=0.02, item_patterns={
+      "^.+%-armor%-plate$","^.+%-armour%-plate$",
+      "^armor%-plate.*$","^armour%-plate.*$"
+    } }
   }},
 
   research_modules = { icon_tech="modules", groups = {
@@ -91,8 +122,8 @@ return {
     { change=0.10, items={"transport-belt","underground-belt","splitter"} },
     { change=0.05, items={"fast-transport-belt","fast-underground-belt","fast-splitter"} },
     { change=0.02, items={"express-transport-belt","express-underground-belt","express-splitter"} },
-    { change=0.01, item_patterns={"turbo-transport-belt","turbo-underground-belt","turbo-splitter"} },
-    { change=0.005, item_patterns={"hyper-transport-belt","hyper-underground-belt","hyper-splitter"} }
+    { change=0.01, item_patterns={"^turbo%-transport%-belt$","^turbo%-underground%-belt$","^turbo%-splitter$"} },
+    { change=0.005, item_patterns={"^hyper%-transport%-belt$","^hyper%-underground%-belt$","^hyper%-splitter$"} }
   }},
 
   research_inserters = { icon_tech="fast-inserter", groups = {

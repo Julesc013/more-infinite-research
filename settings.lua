@@ -111,9 +111,12 @@ local stream_order = {
   "research_belts",
   "research_inserters",
   "research_bullets",
+  "research_heavy_ammo",
   "research_rockets",
+  "research_armor_components",
   "research_walls",
   "research_grenades",
+  "research_stone_products",
   "research_rails",
   "research_concrete",
   "research_furnace",
@@ -145,7 +148,7 @@ for _, key in ipairs(extras) do table.insert(stream_order, key) end
 for _, key in ipairs(stream_order) do
   local stream = C.streams[key]
   if stream then
-    local tech_locale = {"technology-name.more-infinite-research."..key}
+    local tech_locale = stream.localised_name or {"technology-name.more-infinite-research."..key}
     table.insert(settings_data, {
       type = "bool-setting",
       name = "ips-enable-"..key,

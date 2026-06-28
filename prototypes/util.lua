@@ -30,6 +30,7 @@ local STREAM_EXTRA_PACKS = {
   research_concrete = {"space-science-pack"},
   research_furnace = {"metallurgic-science-pack"},
   research_mining_drill = {"metallurgic-science-pack"},
+  research_stone_products = {"metallurgic-science-pack", "space-science-pack"},
   research_walls = {"military-science-pack", "space-science-pack"},
   research_grenades = {"military-science-pack", "space-science-pack"},
   research_rails = {"space-science-pack"},
@@ -65,6 +66,8 @@ local STREAM_EXTRA_PACKS = {
   research_belts = {"space-science-pack"},
   research_inserters = {"space-science-pack"},
   research_bullets = {"military-science-pack", "space-science-pack"},
+  research_heavy_ammo = {"military-science-pack", "metallurgic-science-pack", "space-science-pack"},
+  research_armor_components = {"military-science-pack", "metallurgic-science-pack", "space-science-pack"},
 
   research_inventory_capacity = {"agricultural-science-pack"},
   research_character_trash_slots = {"agricultural-science-pack"},
