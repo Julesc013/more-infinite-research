@@ -62,6 +62,8 @@ local lab_inputs_cache = nil
 
 function U.all_lab_inputs()
   if lab_inputs_cache then return deepcopy(lab_inputs_cache) end
+  -- Factorio 2.1 science packs are ordinary items, so labs are the source of
+  -- truth for what can participate in research.
   local out, seen = {}, {}
   for _, lab in pairs(data.raw.lab or {}) do
     for _, input in ipairs(lab.inputs or {}) do
@@ -135,6 +137,8 @@ function U.best_lab_compatible_ingredients(ingredients, context)
   if #source == 0 then return nil, "empty" end
   if U.valid_research_ingredients(source) then return source, nil end
 
+  -- Some mods add separate labs with disjoint inputs. Prefer a deterministic
+  -- subset over creating a technology no available lab can research.
   local labs = {}
   for name, lab in pairs(data.raw.lab or {}) do
     table.insert(labs, {name = name, lab = lab})
@@ -609,6 +613,7 @@ local DEFAULT_SKIP_CATEGORIES = {
 }
 
 local function recipe_categories(recipe)
+  -- Factorio 2.1 can expose multiple categories; older prototypes used one.
   if recipe.categories then return recipe.categories end
   if recipe.category then return {recipe.category} end
   return {"crafting"}
