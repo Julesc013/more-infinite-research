@@ -116,11 +116,6 @@ local function make_stream(key, spec)
       order = "p["..key.."]",
       level = 1
     }
-    if key == "research_rails" then
-      t.icons = nil
-      t.icon = "__base__/graphics/icons/rail.png"
-      t.icon_size = 64
-    end
     data:extend({t})
     return
   end
@@ -155,11 +150,6 @@ local function make_stream(key, spec)
     order = "p["..key.."]",
     level = 1
   }
-  if key == "research_rails" then
-    t.icons = nil
-    t.icon = "__base__/graphics/icons/rail.png"
-    t.icon_size = 64
-  end
   data:extend({t})
   log("[more-infinite-research] Registered technology "..t.name)
 end
