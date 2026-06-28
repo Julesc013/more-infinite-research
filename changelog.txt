@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------------------------------
+Version: 2.0.0
+Date: 2026-06-29
+  Major Features:
+    - Reworked generated research compatibility for Factorio 2.1 by discovering science packs from active lab inputs instead of assuming science packs are tool prototypes.
+    - Moved generated technology creation to data-final-fixes so recipes, labs, items, science packs, and technologies from other mods are visible before scanning.
+    - Added Wube-style layered technology constant icon overlays for generated research technologies.
+  Features:
+    - Added lab-compatible science-pack validation so generated technologies are skipped or reduced instead of becoming unresearchable.
+    - Added support for Factorio 2.1 recipe categories and stream match filters.
+    - Added a startup setting to control whether vanilla weapon shooting speed technologies are adjusted.
+    - Added in-game descriptions that explain the recipe productivity cap and lab-compatible science-pack behavior.
+  Changes:
+    - Space Age-only direct-effect streams now declare explicit optional prototype requirements.
+    - Science-pack productivity can use science pack item icons through item fallback lookup.
+    - Recipe matching now skips hidden recipes and recycling recipes by default unless a stream opts in.
+    - Generated recipe effect order is now deterministic.
+  Compatibility:
+    - Better supports Space Age optional installs and Space Age without Quality.
+    - Better supports mods that add science packs as ordinary items or add lab inputs before this mod's final-fixes phase.
+    - Known limitation: mods that mutate recipes or labs later in data-final-fixes still require load-order compatibility.
