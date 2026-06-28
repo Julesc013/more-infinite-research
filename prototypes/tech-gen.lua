@@ -28,6 +28,13 @@ local function lname(key, spec)
   return out
 end
 
+local function ldesc(spec)
+  if spec.direct_effects then
+    return {"technology-description.more-infinite-research.direct_effect"}
+  end
+  return {"technology-description.more-infinite-research.recipe_productivity"}
+end
+
 local function missing_requirement(key, spec)
   for _, item_name in ipairs(spec.required_items or {}) do
     if not U.item_prototype(item_name) then
@@ -102,7 +109,7 @@ local function make_stream(key, spec)
       type = "technology",
       name = "recipe-prod-"..key.."-1",
       localised_name = lname(key, spec),
-      localised_description = {""},
+      localised_description = ldesc(spec),
       icons = U.icons_for_stream(spec),
       effects = direct_effects,
       prerequisites = U.build_prereqs_for(key, ingredients),
@@ -136,7 +143,7 @@ local function make_stream(key, spec)
     type = "technology",
     name = "recipe-prod-"..key.."-1",
     localised_name = lname(key, spec),
-    localised_description = {""},
+    localised_description = ldesc(spec),
     icons = U.icons_for_stream(spec),
     effects = effects,
     prerequisites = U.build_prereqs_for(key, ingredients),

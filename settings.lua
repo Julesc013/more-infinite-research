@@ -59,6 +59,17 @@ table.insert(settings_data, {
   localised_description = {"mod-setting-description.mir-prefer-this-mod-for-competing-techs"}
 })
 
+table.insert(settings_data, {
+  type = "string-setting",
+  name = "mir-adjust-vanilla-weapon-speed-techs",
+  setting_type = "startup",
+  default_value = "only-when-dedicated-tech-enabled",
+  allowed_values = {"off", "only-when-dedicated-tech-enabled", "always"},
+  order = "a-02",
+  localised_name = {"mod-setting-name.mir-adjust-vanilla-weapon-speed-techs"},
+  localised_description = {"mod-setting-description.mir-adjust-vanilla-weapon-speed-techs"}
+})
+
 local stream_order = {
   "research_breeding",
   "research_plastic",
