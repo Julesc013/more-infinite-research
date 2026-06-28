@@ -1,9 +1,9 @@
 {
   "name": "more-infinite-research",
-  "version": "1.2.10",
+  "version": "2.0.0",
   "title": "More Infinite Research",
   "author": "Julesc013",
-  "description": "Adds infinite productivity research for intermediates and other useful ingredients not covered by existing vanilla, Space Age, or modded productivity researches.\nAdds Space Age productivity techs to the vanilla base game where missing.",
+  "description": "Adds configurable infinite productivity and bonus researches for intermediates, logistics, combat, player bonuses, and Space Age gaps.\nDiscovers science packs from active labs for better Factorio 2.1 and mod compatibility.",
   "factorio_version": "2.1",
   "dependencies": [
     "base >= 2.0",
