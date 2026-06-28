@@ -515,7 +515,67 @@ local function recipe_outputs(rec)
   return out
 end
 
-local function recipe_uses_blocked_ingredient(rec, patterns)
+local DEFAULT_SKIP_CATEGORIES = {
+  recycling = true
+}
+
+local function recipe_categories(recipe)
+  if recipe.categories then return recipe.categories end
+  if recipe.category then return {recipe.category} end
+  return {"crafting"}
+end
+
+local function recipe_is_hidden(recipe)
+  if recipe.hidden then return true end
+  if recipe.normal and recipe.normal.hidden then return true end
+  if recipe.expensive and recipe.expensive.hidden then return true end
+  return false
+end
+
+local function has_category(recipe, categories)
+  if not categories then return false end
+  local wanted = {}
+  for _, category in ipairs(categories) do wanted[category] = true end
+  for _, category in ipairs(recipe_categories(recipe)) do
+    if wanted[category] then return true end
+  end
+  return false
+end
+
+local function name_matches(name, patterns)
+  for _, pattern in ipairs(patterns or {}) do
+    if string.find(name, pattern) then return true end
+  end
+  return false
+end
+
+function U.matches_stream_recipe_filter(recipe_name, recipe, stream)
+  local match = stream and stream.match
+  if not match then return false end
+  return has_category(recipe, match.categories) or name_matches(recipe_name, match.name_patterns)
+end
+
+local recipe_uses_blocked_ingredient
+
+local function should_skip_recipe(recipe_name, recipe, options)
+  if options.exclude_recipe_patterns and name_matches(recipe_name, options.exclude_recipe_patterns) then
+    return true
+  end
+  if recipe_uses_blocked_ingredient(recipe, options.exclude_ingredient_patterns) then
+    return true
+  end
+  if recipe_is_hidden(recipe) and not options.include_hidden then
+    return true
+  end
+  if not options.include_recycling then
+    for _, category in ipairs(recipe_categories(recipe)) do
+      if DEFAULT_SKIP_CATEGORIES[category] then return true end
+    end
+  end
+  return false
+end
+
+recipe_uses_blocked_ingredient = function(rec, patterns)
   if not patterns then return false end
   local function matches(name)
     for _,pat in ipairs(patterns) do
@@ -543,25 +603,19 @@ end
 local function gather_by_items(items, patterns, options)
   local want = {}
   options = options or {}
-  local exclude_recipe_patterns = options.exclude_recipe_patterns
-  local exclude_ingredient_patterns = options.exclude_ingredient_patterns
   if items then for _,n in ipairs(items) do want[n]=true end end
+  if options.extra_outputs then for _,n in ipairs(options.extra_outputs) do want[n]=true end end
   if patterns then
-    if data.raw.item then for iname,_ in pairs(data.raw.item) do for _,pat in ipairs(patterns) do if string.find(iname, pat) then want[iname]=true end end end end
-    if data.raw.ammo then for iname,_ in pairs(data.raw.ammo) do for _,pat in ipairs(patterns) do if string.find(iname, pat) then want[iname]=true end end end end
-    if data.raw.capsule then for iname,_ in pairs(data.raw.capsule) do for _,pat in ipairs(patterns) do if string.find(iname, pat) then want[iname]=true end end end end
-    if data.raw.module then for iname,_ in pairs(data.raw.module) do for _,pat in ipairs(patterns) do if string.find(iname, pat) then want[iname]=true end end end end
+    each_item_prototype(function(iname)
+      for _,pat in ipairs(patterns) do
+        if string.find(iname, pat) then want[iname]=true end
+      end
+    end)
   end
   local strict_rail = want["rail"] == true
   local seen, list = {}, {}
   for rname, r in pairs(data.raw.recipe or {}) do
-    local skip = false
-    if exclude_recipe_patterns then
-      for _,pat in ipairs(exclude_recipe_patterns) do
-        if string.find(rname, pat) then skip = true; break end
-      end
-    end
-    if not skip and recipe_uses_blocked_ingredient(r, exclude_ingredient_patterns) then skip = true end
+    local skip = should_skip_recipe(rname, r, options)
     if not skip then
       local outs = recipe_outputs(r)
       local match = false
@@ -572,9 +626,13 @@ local function gather_by_items(items, patterns, options)
           if outs[it] then match=true; break end
         end
       end
+      if not match and options.match_stream and options.match_mode == "by_category_or_match" then
+        match = U.matches_stream_recipe_filter(rname, r, options.match_stream)
+      end
       if match and not seen[rname] then seen[rname]=true; table.insert(list, rname) end
     end
   end
+  table.sort(list)
   return list
 end
 
@@ -583,16 +641,26 @@ function U.recipes_for_stream(spec)
     local buckets = {}
     for _,g in ipairs(spec.groups) do
       local list = gather_by_items(g.items, g.item_patterns, {
+        extra_outputs = g.extra_outputs,
         exclude_recipe_patterns = merge_lists(spec.exclude_recipe_patterns, g.exclude_recipe_patterns),
-        exclude_ingredient_patterns = merge_lists(spec.exclude_ingredient_patterns, g.exclude_ingredient_patterns)
+        exclude_ingredient_patterns = merge_lists(spec.exclude_ingredient_patterns, g.exclude_ingredient_patterns),
+        include_hidden = spec.include_hidden or g.include_hidden,
+        include_recycling = spec.include_recycling or g.include_recycling,
+        match_mode = g.mode or spec.mode,
+        match_stream = g.match and g or spec
       })
       if #list > 0 then table.insert(buckets, {change=g.change or C.shared.per_level_default, recipes=list}) end
     end
     return buckets
   else
-    local list = gather_by_items(spec.items, spec.item_patterns or spec.extra_outputs, {
+    local list = gather_by_items(spec.items, spec.item_patterns, {
+      extra_outputs = spec.extra_outputs,
       exclude_recipe_patterns = spec.exclude_recipe_patterns,
-      exclude_ingredient_patterns = spec.exclude_ingredient_patterns
+      exclude_ingredient_patterns = spec.exclude_ingredient_patterns,
+      include_hidden = spec.include_hidden,
+      include_recycling = spec.include_recycling,
+      match_mode = spec.mode,
+      match_stream = spec
     })
     return { {change=C.shared.per_level_default, recipes=list} }
   end
