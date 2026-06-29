@@ -380,11 +380,12 @@ local function extend_chain(key)
   end
 
   local growth_setting = sanitize_number(startup_setting("mir-cost-growth-" .. key))
+  local force_vanilla_growth = growth_setting == 0
   local growth = nil
   if growth_setting and growth_setting > 0 then
     growth = growth_setting
   end
-  if not growth then
+  if not growth and not force_vanilla_growth then
     local default_growth = sanitize_number(spec.growth_factor)
     if default_growth and default_growth > 0 then
       growth = default_growth
@@ -401,12 +402,13 @@ local function extend_chain(key)
   end
 
   local base_setting = sanitize_number(startup_setting("mir-cost-base-" .. key))
+  local force_vanilla_base = base_setting == 0
   local base_value = nil
   if base_setting and base_setting > 0 then
     base_value = base_setting
   end
 
-  if not base_value then
+  if not base_value and not force_vanilla_base then
     local spec_base = sanitize_number(spec.base_cost)
     if spec_base and spec_base > 0 then
       base_value = spec_base
@@ -455,8 +457,12 @@ local function extend_chain(key)
   new.upgrade = true
 
   local research_setting = sanitize_number(startup_setting("mir-research-time-" .. key))
-  local research_time = research_setting
-  if not research_time or research_time <= 0 then
+  local force_vanilla_time = research_setting == 0
+  local research_time = nil
+  if research_setting and research_setting > 0 then
+    research_time = research_setting
+  end
+  if not research_time and not force_vanilla_time then
     research_time = sanitize_number(spec.research_time)
   end
   if not research_time or research_time <= 0 then
