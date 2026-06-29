@@ -1,6 +1,6 @@
 # Compatibility and Validation
 
-More Infinite Research v2.1.0 targets Factorio 2.1.8+ and uses a compatibility-first data-stage model.
+More Infinite Research v2.0.0 targets Factorio 2.1 and uses a compatibility-first data-stage model.
 
 ## Compatibility Model
 
@@ -32,7 +32,7 @@ Large mod packs and utility mods such as Alien Biomes, Informatron, Jetpack, AAI
 - No mod can observe another mod's later `data-final-fixes.lua` mutations unless dependency order puts it after that mod.
 - Lab validation prevents impossible research ingredients, but it cannot infer every overhaul mod's intended progression.
 - Recipe productivity technologies remain bounded by Factorio's recipe productivity cap even when research levels are infinite.
-- Existing prototype IDs were kept stable for v2.1.0. No migration is currently required.
+- Existing prototype IDs were kept stable for v2.0.0. No migration is currently required.
 
 ## Required Manual Test Matrix
 
