@@ -78,6 +78,7 @@ Date: 2026-06-30
 
   Documentation:
 
+    - Overhauled the README with a full user and developer technical specification, including research catalogs, settings, defaults, compatibility behavior, validation commands, and troubleshooting notes.
     - Added architecture documentation for the data-stage pipeline, utility modules, stream config domains, compatibility profiles, diagnostics, and validation harness.
     - Added a manual validation matrix item for the disabled-by-default cargo landing pad count research when it is forced enabled.
     - Documented the dependency-free compatibility policy and package validation requirements.

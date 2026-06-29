@@ -456,5 +456,6 @@ Phases 1 through 8 are implemented for v2.0.0:
 - Lab ingredient combinations are validated before technology creation.
 - Generation runs in `data-final-fixes.lua`.
 - Recipe category matching, Space Age guards, icon overlays, player-facing settings, locale warnings, docs, fixtures, and packaging scripts are present.
+- The local static validation suite, package validation, locale validation, and Factorio runtime fixture load check are available and have been used during the release-candidate hardening pass.
 
-The remaining release gate is validation, not planned implementation: static checks, locale checks, package validation, package creation, and the Factorio runtime load matrix should be green before publishing the v2.0.0 package.
+The remaining release gate before publishing is the broader manual mod matrix: base game, Space Age, Space Age without Quality, forced-enabled cargo landing pad count, selected compatibility mods, and an existing-save upgrade from the latest 1.x release.

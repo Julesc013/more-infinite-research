@@ -95,12 +95,12 @@ Static validation requires the committed release zip at `dist/more-infinite-rese
 
 Create a local test mod that:
 
-- Adds `mir-test-science-pack` as an `item`.
-- Adds a recipe that produces `mir-test-science-pack`.
-- Adds `mir-test-science-pack` to the vanilla lab input list.
+- Adds `mir-fixture-science-pack` as an `item`.
+- Adds a recipe that produces `mir-fixture-science-pack`.
+- Adds `mir-fixture-science-pack` to the vanilla lab input list.
 - Unlocks that recipe from a technology.
 
-Expected result: `mir-test-science-pack` can be discovered as a science pack, ordered after known vanilla packs, and mapped to its unlock prerequisite when used.
+Expected result: `mir-fixture-science-pack` can be discovered as a science pack, ordered after known vanilla packs, mapped to its unlock prerequisite when used, and included in science-pack productivity.
 
 ### Custom Lab Fixture
 
