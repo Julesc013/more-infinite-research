@@ -12,12 +12,12 @@ The release goal is graceful compatibility without mod-page dependency clutter: 
 - A generated technology must have at least one lab that accepts its complete science-pack set. If no lab accepts the full set, `mir-lab-incompatibility-policy` controls whether the mod tries the largest deterministic lab-compatible subset (`reduce`, default) or skips the technology (`skip`). If no subset exists, the stream is skipped and logged.
 - Recipe matching supports both `recipe.category` and Factorio 2.1 `recipe.categories`.
 - Hidden recipes and recycling recipes are skipped by default. Streams can opt in with `include_hidden` or `include_recycling`.
-- Optional Space Age streams must either set `requires_space_age = true` or declare concrete required prototypes.
-- Space Age cargo bay unloading distance research uses Factorio 2.1.8's `max-cargo-bay-unloading-distance` technology modifier and is skipped without Space Age or the `landing-pad-unloading-bay` prototypes.
-- Space Age cargo landing pad count research uses `cargo-landing-pad-count`, is disabled by default, and is skipped without Space Age or the `cargo-landing-pad` prototype.
+- Optional DLC-shaped streams declare concrete required prototypes instead of requiring a specific official mod by name.
+- Cargo bay unloading distance research uses Factorio 2.1.8's `max-cargo-bay-unloading-distance` technology modifier and is skipped without the `landing-pad-unloading-bay` prototypes.
+- Cargo landing pad count research uses `cargo-landing-pad-count`, is disabled by default, and is skipped without the `cargo-landing-pad` prototype.
 - Mod-specific stream changes should live in `prototypes/compat/profiles.lua` instead of the base stream definitions.
 - Compatibility cleanup that removes known competing technologies also removes dangling prerequisite references from remaining technologies.
-- Release metadata intentionally avoids compatibility-mod dependencies beyond optional Space Age. Compatibility is opportunistic and based on the prototypes visible when this mod reaches `data-final-fixes.lua`.
+- Release metadata declares optional ordering for official DLC mods and intentionally avoids third-party compatibility-mod dependencies. Third-party compatibility is opportunistic and based on the prototypes visible when this mod reaches `data-final-fixes.lua`.
 - `mir-debug-generation-report` can be enabled to capture why each stream or base extension generated or skipped.
 - `mir-debug-recipe-matches` can be enabled to capture matched recipe names per stream and duplicate recipe matches across streams.
 
@@ -47,22 +47,23 @@ Large mod packs and utility mods such as Alien Biomes, Informatron, Jetpack, AAI
 Run each case from a clean Factorio user data directory or with a controlled mod set:
 
 1. Base game only.
-2. Space Age enabled.
-3. Space Age 2.1.8+ enabled, verifying cargo bay unloading distance research appears after the landing pad unloading bay unlock and cargo landing pad count remains disabled by default.
-4. Space Age 2.1.8+ with `research_cargo_landing_pad_count` forced enabled, verifying the generated technology uses `cargo-landing-pad-count` and remains researchable.
-5. Space Age enabled with Quality disabled.
-6. Better Robots Extended enabled.
-7. A fixture mod that adds a science pack as an ordinary `item` and adds it to a lab.
-8. A fixture mod that adds a custom lab with a different science-pack input set.
-9. A fixture mod that adds recipes in `data-final-fixes.lua`.
-10. An existing save upgraded from the latest 1.x release.
+2. Elevated Rails only.
+3. Recycler only.
+4. Quality enabled with its dependencies.
+5. Space Age 2.1.8+ enabled, verifying cargo bay unloading distance research appears after the landing pad unloading bay unlock and cargo landing pad count remains disabled by default.
+6. Space Age 2.1.8+ with `research_cargo_landing_pad_count` forced enabled, verifying the generated technology uses `cargo-landing-pad-count` and remains researchable.
+7. Better Robots Extended enabled.
+8. A fixture mod that adds a science pack as an ordinary `item` and adds it to a lab.
+9. A fixture mod that adds a custom lab with a different science-pack input set.
+10. A fixture mod that adds recipes in `data-final-fixes.lua`.
+11. An existing save upgraded from the latest 1.x release.
 
 For each case, verify:
 
 - Factorio reaches the main menu without prototype errors.
 - Generated technologies have non-empty science-pack ingredients.
 - At least one lab accepts each generated technology's full science-pack set.
-- Base-only runs do not load direct `__space-age__/...` paths.
+- Base-only runs do not load direct DLC asset paths.
 - Logs show skipped or reduced streams clearly and do not show stack traces.
 - Vanilla weapon shooting speed effects follow the configured startup setting.
 
@@ -141,7 +142,7 @@ Expected result: custom item-based science packs that are active lab inputs and 
 - Run `rg "icon_mipmaps" prototypes` and confirm generated icons do not add it.
 - Run `.\scripts\Invoke-MIRValidation.ps1 -StaticOnly`.
 - Confirm `changelog.txt` uses Factorio's strict changelog format with 99-dash section separators.
-- Confirm `info.json` declares only `base >= 2.1.8` and optional `space-age >= 2.1.8` dependencies.
+- Confirm `info.json` declares `base >= 2.1.8` plus optional official DLC ordering dependencies only.
 - Confirm package validation reports the expected root, matching metadata, included locale/docs, and no forbidden artifacts.
 - Load Factorio with the manual matrix above.
 - Confirm `changelog.txt` has the release version and date.

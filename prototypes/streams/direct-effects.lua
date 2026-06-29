@@ -14,7 +14,6 @@ return {
   } },
 
   research_cargo_bay_unloading_distance = {
-    requires_space_age = true,
     required_items = {"landing-pad-unloading-bay"},
     required_technologies = {"landing-pad-unloading-bay"},
     icon_item = "landing-pad-unloading-bay",
@@ -27,7 +26,6 @@ return {
   },
 
   research_cargo_landing_pad_count = {
-    requires_space_age = true,
     required_items = {"cargo-landing-pad"},
     icon_item = "cargo-landing-pad",
     overlay = "count",
@@ -72,7 +70,6 @@ return {
   },
 
   research_electric_shooting_speed = {
-    requires_space_age = true,
     icon_tech = "tesla-weapons",
     required_technologies = {"tesla-weapons"},
     required_ammo_categories = {"electric"},
@@ -120,9 +117,7 @@ return {
   },
 
   research_character_reach = {
-    requires_space_age = true,
-    icon = "__space-age__/graphics/technology/health.png",
-    icon_size = 256,
+    icon_item = "exoskeleton-equipment",
     science_packs = {
       "utility-science-pack","military-science-pack","agricultural-science-pack",
       "cryogenic-science-pack"

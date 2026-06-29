@@ -7,6 +7,9 @@ More Infinite Research adds configurable infinite productivity and bonus researc
 Version `2.0.0` targets Factorio `2.1` and requires:
 
 - `base >= 2.1.8`
+- optional `elevated-rails >= 2.1.8`
+- optional `recycler >= 2.1.8`
+- optional `quality >= 2.1.8`
 - optional `space-age >= 2.1.8`
 
 The mod is built around graceful compatibility: it discovers recipes, science packs, labs, and optional prototypes from the active mod set, generates technologies late in `data-final-fixes.lua`, and skips unsafe or unavailable streams instead of requiring compatibility mods on the mod portal page.
@@ -19,8 +22,8 @@ The mod is built around graceful compatibility: it discovers recipes, science pa
 - Discovers science packs from active lab inputs, not from the old `tool` prototype type.
 - Validates generated research ingredients against real labs so technologies stay researchable.
 - Supports Factorio 2.1 recipe `categories` as well as legacy single `category`.
-- Keeps Space Age optional and guards Space Age-only research behind prototype checks.
-- Keeps compatibility-mod dependencies out of `info.json` except optional Space Age.
+- Keeps official DLC mods optional and guards DLC-shaped research behind concrete prototype checks.
+- Keeps third-party compatibility-mod dependencies out of `info.json`.
 - Preserves existing generated prototype IDs for v2.0.0. No migration is required.
 
 Recipe productivity researches are infinite, but Factorio's recipe productivity cap still applies. Additional levels can eventually have no practical effect after a recipe reaches its cap.
@@ -123,25 +126,25 @@ These streams generate `change-recipe-productivity` effects for matching recipes
 | `research_copper_cable` | Copper cable productivity | `copper-cable` | `+10%` | Excludes recipes with scrap ingredients. |
 | `research_electronic_circuit` | Electronic circuit productivity | `electronic-circuit` | `+10%` | Adds electromagnetic science when available; excludes scrap inputs. |
 | `research_advanced_circuit` | Advanced circuit productivity | `advanced-circuit` | `+10%` | Adds electromagnetic science when available; excludes scrap inputs. |
-| `research_processing_unit` | Processing unit productivity | `processing-unit` | `+10%` | Hidden in Space Age, where vanilla covers this area. |
-| `research_plastic` | Plastic productivity | `plastic-bar` | `+10%` | Hidden in Space Age; adds agricultural science when available. |
+| `research_processing_unit` | Processing unit productivity | `processing-unit` | `+10%` | Generates when matching visible recipes exist, including without Space Age. |
+| `research_plastic` | Plastic productivity | `plastic-bar` | `+10%` | Adds agricultural science when available. |
 | `research_sulfur` | Sulfur productivity | `sulfur` | `+10%` | Adds metallurgic science when available; excludes asteroid ingredients. |
 | `research_batteries` | Battery productivity | `battery` | `+10%` | Adds electromagnetic science when available; excludes scrap inputs. |
 | `research_explosives` | Explosives productivity | `explosives`, `bio-explosives` | `+10%` | Adds metallurgic science when available. |
 | `research_engine` | Engine unit productivity | `engine-unit` | `+10%` | Adds metallurgic science when available. |
 | `research_electric_engine` | Electric engine unit productivity | `electric-engine-unit` | `+10%` | Adds electromagnetic science when available. |
 | `research_flying_robot_frame` | Flying robot frame productivity | `flying-robot-frame` | `+10%` | Adds electromagnetic science when available. |
-| `research_low_density_structure` | Low density structure productivity | `low-density-structure` | `+10%` | Hidden in Space Age; adds metallurgic science when available. |
-| `research_rocket_fuel` | Rocket fuel productivity | `rocket-fuel` | `+10%` | Hidden in Space Age; adds agricultural science when available. |
+| `research_low_density_structure` | Low density structure productivity | `low-density-structure` | `+10%` | Adds metallurgic science when available. |
+| `research_rocket_fuel` | Rocket fuel productivity | `rocket-fuel` | `+10%` | Adds agricultural science when available. |
 | `research_tungsten` | Tungsten productivity | `tungsten-plate`, `tungsten-carbide` | `+10%` | Adds metallurgic science when available. |
 | `research_lithium` | Lithium productivity | `lithium-plate` | `+10%` | Adds cryogenic science when available. |
-| `research_holmium` | Holmium productivity | `holmium-plate` | `+10%` | Requires Space Age; adds electromagnetic science when available. |
-| `research_supercapacitor` | Supercapacitor productivity | `supercapacitor` | `+10%` | Requires Space Age; adds electromagnetic science when available. |
-| `research_superconductor` | Superconductor productivity | `superconductor` | `+10%` | Requires Space Age; adds electromagnetic science when available. |
-| `research_quantum_processor` | Quantum processor productivity | `quantum-processor` | `+10%` | Requires Space Age; adds cryogenic science when available. |
+| `research_holmium` | Holmium productivity | `holmium-plate` | `+10%` | Generates when matching visible recipes exist; adds electromagnetic science when available. |
+| `research_supercapacitor` | Supercapacitor productivity | `supercapacitor` | `+10%` | Generates when matching visible recipes exist; adds electromagnetic science when available. |
+| `research_superconductor` | Superconductor productivity | `superconductor` | `+10%` | Generates when matching visible recipes exist; adds electromagnetic science when available. |
+| `research_quantum_processor` | Quantum processor productivity | `quantum-processor` | `+10%` | Generates when matching visible recipes exist; adds cryogenic science when available. |
 | `research_carbon_fiber` | Carbon fiber productivity | `carbon-fiber` | `+10%` | Adds agricultural science when available. |
-| `research_bioflux` | Bioflux productivity | `bioflux` | `+10%` | Requires Space Age; adds agricultural science when available. |
-| `research_breeding` | Breeding productivity | `raw-fish`, `biter-egg`, `pentapod-egg`; recipe names matching cultivation, culture, or breeding | `+10%` | Requires Space Age. Category-only biochamber matching is intentionally avoided. |
+| `research_bioflux` | Bioflux productivity | `bioflux` | `+10%` | Generates when matching visible recipes exist; adds agricultural science when available. |
+| `research_breeding` | Breeding productivity | `raw-fish`, `biter-egg`, `pentapod-egg`; recipe names matching cultivation, culture, or breeding | `+10%` | Generates when matching visible recipes exist. Category-only biochamber matching is intentionally avoided. |
 | `research_grenades` | Grenade productivity | `grenade`; `cluster-grenade` | `+10%`; `+5%` | Adds military and space science when available. |
 | `research_walls` | Wall productivity | `stone-wall`; `gate` | `+10%`; `+5%` | Adds military and space science when available. |
 | `research_stone_products` | Stone product productivity | `stone`, `landfill`; `foundation` and artificial soil patterns | `+10%`; `+5%` | Adds metallurgic and space science when available; excludes scrap inputs. |
@@ -165,16 +168,16 @@ These streams generate infinite technologies with direct Factorio technology mod
 
 | Stream key | Research | Effect | Default | Gates and notes |
 | --- | --- | --- | --- | --- |
-| `research_cargo_bay_unloading_distance` | Cargo bay unloading distance | `max-cargo-bay-unloading-distance` | `+10` tiles per level | Requires Space Age, `landing-pad-unloading-bay` item, and `landing-pad-unloading-bay` technology. Uses all active lab science packs. Base cost `100000`, growth `3`. |
-| `research_cargo_landing_pad_count` | Cargo landing pad count | `cargo-landing-pad-count` | `+1` landing pad per surface per level | Requires Space Age and `cargo-landing-pad`. Disabled by default. Uses all active lab science packs. Base cost `1000000`, growth `10`. |
+| `research_cargo_bay_unloading_distance` | Cargo bay unloading distance | `max-cargo-bay-unloading-distance` | `+10` tiles per level | Requires the `landing-pad-unloading-bay` item and technology. Uses all active lab science packs. Base cost `100000`, growth `3`. |
+| `research_cargo_landing_pad_count` | Cargo landing pad count | `cargo-landing-pad-count` | `+1` landing pad per surface per level | Requires the `cargo-landing-pad` item. Disabled by default. Uses all active lab science packs. Base cost `1000000`, growth `10`. |
 | `research_rocket_shooting_speed` | Rocket shooting speed | `gun-speed` for `rocket` ammo category | `+10%` speed per level | Base cost `60`, growth `1.5`. Uses a base-game rocketry icon. |
 | `research_cannon_shooting_speed` | Cannon shooting speed | `gun-speed` for `cannon-shell` ammo category | `+10%` speed per level | Base cost `60`, growth `1.5`. Uses the cannon shell item icon. |
 | `research_flamethrower_shooting_speed` | Flamethrower shooting speed | `gun-speed` for `flamethrower` | `+10%` speed per level | Base cost `60`, growth `1.5`. |
-| `research_electric_shooting_speed` | Electric shooting speed | `gun-speed` for `electric` | `+10%` speed per level | Requires Space Age, `tesla-weapons` technology, and the `electric` ammo category. Base cost `60`, growth `1.5`. |
+| `research_electric_shooting_speed` | Electric shooting speed | `gun-speed` for `electric` | `+10%` speed per level | Requires the `tesla-weapons` technology and the `electric` ammo category. Base cost `60`, growth `1.5`. |
 | `research_character_mining_speed` | Character mining speed | `character-mining-speed` | `+5%` per level | Uses utility, military, agricultural, and electromagnetic science when available. |
 | `research_character_crafting_speed` | Character crafting speed | `character-crafting-speed` | `+5%` per level | Uses utility, military, agricultural, and electromagnetic science when available. |
 | `research_character_walking_speed` | Character walking speed | `character-running-speed` | `+5%` per level | Uses utility, military, agricultural, and electromagnetic science when available. |
-| `research_character_reach` | Character reach bonus | reach, build distance, resource reach, and item drop distance | `+10` each per level | Requires Space Age. Disabled by default. |
+| `research_character_reach` | Character reach bonus | reach, build distance, resource reach, and item drop distance | `+10` each per level | Disabled by default. Uses a base-game-safe icon and available late-game science packs. |
 | `research_character_trash_slots` | Character logistic trash slots | `character-logistic-trash-slots` | `+1` slot per level | Growth factor default `1.10`. |
 | `research_inventory_capacity` | Character inventory slots | `character-inventory-slots-bonus` | `+1` slot per level | Disabled by default. Growth factor default `1.10`. |
 | `research_robot_battery` | Worker robot battery | `worker-robot-battery` | `+10%` per level | Growth factor default `1.2`. |
@@ -334,8 +337,6 @@ Productivity and direct-effect streams are Lua tables keyed by stream ID. Common
 | `direct_effects` | Technology effects for non-recipe infinite research. |
 | `science_packs` | Explicit science-pack list, `"all"`, or omitted for default selection. |
 | `dynamic_items_from_lab_inputs` | Appends active lab inputs to the first recipe-productivity group. Used by science-pack productivity. |
-| `requires_space_age` | Skips the stream unless Space Age is active. |
-| `hide_in_space_age` | Skips the stream when Space Age is active. |
 | `required_items` | Skips the stream unless all items exist. |
 | `required_technologies` | Skips the stream unless all technologies exist and appends them as prerequisites. |
 | `required_ammo_categories` | Skips direct effects unless ammo categories exist. |
@@ -360,7 +361,7 @@ Direct assignment remains available for intentional overrides.
 Enable `mir-debug-generation-report` to log rows like:
 
 ```text
-[more-infinite-research] report kind=stream key=research_science_pack_productivity status=generated reason=recipe_productivity science=... prerequisites=... effects=13 lab_status=reduced icon=tech:automation-science-pack
+[more-infinite-research] report kind=stream key=research_science_pack_productivity status=generated reason=recipe_productivity science=... prerequisites=... effects=13 lab_status=reduced icon=tech:research-productivity
 ```
 
 Use diagnostics when reporting compatibility issues. It tells whether a stream generated, skipped, reduced science packs, or found no matching recipes.
@@ -424,7 +425,7 @@ If a technology is missing:
 1. Enable `mir-debug-generation-report`.
 2. Load the save or start a controlled test map.
 3. Check `factorio-current.log` for the stream key.
-4. Look for `skipped`, `no_matching_recipes`, `requires_space_age`, `missing required item`, `missing required technology`, or `no_lab_compatible_science`.
+4. Look for `skipped`, `no_matching_recipes`, `missing required item`, `missing required technology`, or `no_lab_compatible_science`.
 
 If a recipe did not receive productivity:
 

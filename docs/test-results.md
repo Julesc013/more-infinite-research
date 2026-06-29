@@ -2,6 +2,39 @@
 
 This file records local release-candidate validation runs. It is not a substitute for the manual mod matrix in `docs/compatibility.md`.
 
+## 2026-06-30 Official DLC Split Matrix
+
+Environment:
+
+- Factorio `2.1.8` build `86744`, Windows Steam install.
+- Mod version `2.0.0`.
+- Release archive: `dist/more-infinite-research_2.0.0.zip`.
+
+Commands:
+
+```powershell
+.\scripts\Build-MIRPackage.ps1
+.\scripts\Invoke-MIRValidation.ps1 -StaticOnly
+# For each case, run Factorio with an isolated mod directory and --dump-data.
+```
+
+Matrix cases:
+
+- Base only.
+- Elevated Rails only.
+- Recycler only.
+- Quality with Recycler.
+- Space Age with Elevated Rails and Recycler, Quality disabled.
+- Space Age with Elevated Rails, Recycler, and Quality enabled.
+
+Results:
+
+- Static validation passed after rebuilding the release archive.
+- All official DLC matrix cases completed `--dump-data` without prototype errors or fatal log markers.
+- Base-only, Elevated Rails-only, Recycler-only, and Quality-with-Recycler cases skipped absent DLC-shaped streams through `no_matching_recipes` or explicit missing prototype checks.
+- Space Age without Quality loaded successfully and generated Space Age-backed streams while keeping Quality disabled.
+- Science-pack productivity used `tech:research-productivity` when the Space Age technology was present and falls back to the automation science pack item icon when it is absent.
+
 ## 2026-06-30 v2.0.0 Release-Candidate Hardening
 
 Environment:

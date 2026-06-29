@@ -10,7 +10,7 @@ The critical interpretation is that "2.0" means the mod's v2.0.0 release, not a 
 
 ## Current Repository Baseline
 
-- `info.json` declares mod version `2.0.0`, `factorio_version = "2.1"`, base `>= 2.1.8`, and optional Space Age `>= 2.1.8`; known compatibility mods are handled opportunistically without release metadata dependencies.
+- `info.json` declares mod version `2.0.0`, `factorio_version = "2.1"`, base `>= 2.1.8`, and optional official DLC ordering for Elevated Rails, Recycler, Quality, and Space Age; known third-party compatibility mods are handled opportunistically without release metadata dependencies.
 - `data.lua` loads only stable shared configuration and utility facades.
 - `data-updates.lua` is reserved for pre-final compatibility hooks.
 - `data-final-fixes.lua` runs generated technology creation, competing recipe-productivity cleanup, competing base-extension cleanup, base technology extensions, weapon speed adjustments, max-level enforcement, and diagnostics flushing.
@@ -18,7 +18,7 @@ The critical interpretation is that "2.0" means the mod's v2.0.0 release, not a 
 - Science-pack productivity dynamically adds active lab inputs to the target item list, so custom science packs can receive productivity effects when their recipes are visible.
 - Generated technology ingredients are validated against complete lab input sets and reduced or skipped instead of creating unresearchable technologies.
 - Recipe matching supports Factorio 2.1 `recipe.categories`, legacy `recipe.category`, stream match filters, and default hidden/recycling skips.
-- Space Age-only direct-effect streams are gated by Space Age presence and explicit required prototypes where needed.
+- DLC-shaped direct-effect streams are gated by concrete required prototypes where needed, not by official mod names.
 - Generated technology icons use deep-copied layered icons with Wube-style constant overlays.
 - Vanilla weapon shooting speed mutation is controlled by the `mir-adjust-vanilla-weapon-speed-techs` startup setting.
 - In-game locale warns that infinite recipe productivity remains subject to Factorio's recipe productivity cap.
@@ -124,17 +124,17 @@ Implementation requirements:
 - Add a default skip for known bad categories such as `recycling`, with per-stream opt-in if needed.
 - Do not treat `allow_productivity = false` as a hard filter by default. That can be a future setting, but it should not be an implicit compatibility change.
 
-### 5. Guard Space Age and Quality assumptions
+### 5. Guard DLC and Quality assumptions
 
-Space Age is optional, and in Factorio 2.1.7+ Quality can be disabled while Space Age remains enabled.
+Official DLC mods are optional from MIR's perspective, and in Factorio 2.1.7+ Quality can be disabled while Space Age remains enabled.
 
 Implementation requirements:
 
-- Gate `research_character_reach` with `requires_space_age = true` or give it base-game icon/science fallbacks.
-- Gate `research_electric_shooting_speed` with `requires_space_age = true` or check that the `electric` ammo category and `tesla-weapons` technology exist.
-- Ensure streams that reference Space Age science packs do not generate impossible ingredient sets in base-only runs.
-- Test Space Age with Quality disabled.
-- Avoid direct `__space-age__/...` icon paths unless the stream is gated or the path is guarded.
+- Give `research_character_reach` base-game icon/science fallbacks.
+- Check that `research_electric_shooting_speed` has the `electric` ammo category and `tesla-weapons` technology before generation.
+- Ensure streams that reference DLC science packs do not generate impossible ingredient sets in base-only runs.
+- Test independent official DLC combinations where Factorio permits them, including Space Age with Quality disabled.
+- Avoid direct DLC asset paths unless the stream is gated by concrete required prototypes or the path is guarded.
 
 ## Important But Not Release-Blocking
 
@@ -312,21 +312,21 @@ Acceptance:
 - `research_breeding` can match biochamber/cultivation/culture recipes even when output matching alone is not enough.
 - Existing item-output based streams still produce the same or intentionally improved recipe sets.
 
-### Phase 5: Space Age and Quality hardening
+### Phase 5: DLC and Quality hardening
 
 Purpose: make optional expansion prototypes and Quality assumptions safe.
 
 Tasks:
 
-- Gate or fallback Space Age icon paths.
-- Gate Space Age-only ammo categories, technologies, items, and science packs.
+- Gate or fallback DLC icon paths.
+- Gate DLC-only ammo categories, technologies, items, and science packs through concrete prototype checks.
 - Audit Quality items/modules when Quality is disabled.
 - Ensure missing optional prototypes cause skips, not load failures.
 
 Acceptance:
 
-- Base-only loads without Space Age paths.
-- Space Age loads with Quality disabled.
+- Base-only loads without direct DLC asset paths.
+- Space Age loads with Quality disabled where Factorio permits that combination.
 - Electric shooting speed does not generate unless its prerequisites actually exist.
 
 ### Phase 6: Icon system cleanup
@@ -386,8 +386,11 @@ Acceptance:
 Minimum v2.0 test matrix:
 
 - Base game only.
+- Elevated Rails only.
+- Recycler only.
+- Quality enabled with its dependencies.
 - Space Age enabled.
-- Space Age enabled with Quality disabled.
+- Space Age enabled with Quality disabled where Factorio permits that combination.
 - Better Robots Extended enabled.
 - A test mod adding a science pack as an ordinary `item`.
 - A test mod adding a custom lab with a different input set.

@@ -124,14 +124,6 @@ local function make_stream(key, raw_spec)
     D.stream(D.stream_fields(key, raw_spec, "skipped", "disabled"))
     return
   end
-  if raw_spec.hide_in_space_age and U.is_space_age() then
-    D.stream(D.stream_fields(key, raw_spec, "skipped", "hidden_in_space_age"))
-    return
-  end
-  if raw_spec.requires_space_age and not U.is_space_age() then
-    D.stream(D.stream_fields(key, raw_spec, "skipped", "requires_space_age"))
-    return
-  end
   local missing = missing_requirement(key, raw_spec)
   if missing then
     log("[more-infinite-research] Skipping stream "..key.." because "..missing..".")

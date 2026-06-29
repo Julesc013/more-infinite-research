@@ -7,9 +7,9 @@ return {
 
   research_electronic_circuit = { items={"electronic-circuit"}, icon_tech="electronics", exclude_ingredient_patterns={"scrap"} },
   research_advanced_circuit = { items={"advanced-circuit"}, icon_tech="advanced-circuit", exclude_ingredient_patterns={"scrap"} },
-  research_processing_unit = { hide_in_space_age = true, items={"processing-unit"}, icon_tech="advanced-electronics-2" },
+  research_processing_unit = { items={"processing-unit"}, icon_tech="advanced-electronics-2" },
 
-  research_plastic = { hide_in_space_age = true, items={"plastic-bar"}, icon_tech="plastics" },
+  research_plastic = { items={"plastic-bar"}, icon_tech="plastics" },
   research_sulfur  = { items={"sulfur"}, icon_tech="sulfur-processing", exclude_ingredient_patterns={"asteroid"} },
   research_batteries = { items={"battery"}, icon_tech="battery", exclude_ingredient_patterns={"scrap"} },
   research_explosives = { items={"explosives"}, item_patterns={"^bio%-explosives$"}, icon_tech="explosives" },
@@ -18,19 +18,19 @@ return {
   research_electric_engine = { items={"electric-engine-unit"}, icon_tech="electric-engine" },
   research_flying_robot_frame = { items={"flying-robot-frame"}, icon_tech="robotics" },
 
-  research_low_density_structure = { hide_in_space_age = true, items={"low-density-structure"}, icon_tech="low-density-structure" },
-  research_rocket_fuel = { hide_in_space_age = true, items={"rocket-fuel"} },
+  research_low_density_structure = { items={"low-density-structure"}, icon_tech="low-density-structure" },
+  research_rocket_fuel = { items={"rocket-fuel"} },
 
   research_tungsten = { items={"tungsten-plate","tungsten-carbide"}, icon_item="tungsten-plate", icon_tech="tungsten-processing" },
   research_lithium = { items={"lithium-plate"}, icon_tech="lithium-processing" },
-  research_holmium = { requires_space_age = true, items={"holmium-plate"}, icon_tech="holmium-processing" },
-  research_supercapacitor = { requires_space_age = true, items={"supercapacitor"}, icon_tech="supercapacitor" },
-  research_superconductor = { requires_space_age = true, items={"superconductor"}, icon_tech="superconductor" },
-  research_quantum_processor = { requires_space_age = true, items={"quantum-processor"}, icon_tech="quantum-processor" },
+  research_holmium = { items={"holmium-plate"}, icon_tech="holmium-processing" },
+  research_supercapacitor = { items={"supercapacitor"}, icon_tech="supercapacitor" },
+  research_superconductor = { items={"superconductor"}, icon_tech="superconductor" },
+  research_quantum_processor = { items={"quantum-processor"}, icon_tech="quantum-processor" },
   research_carbon_fiber = { items={"carbon-fiber"}, icon_tech="carbon-fiber" },
 
-  research_bioflux = { requires_space_age = true, items={"bioflux"}, icon_tech="bioflux" },
-  research_breeding = { requires_space_age = true, items = {"raw-fish","biter-egg","pentapod-egg"}, mode = "by_category_or_match", match = { name_patterns={"cultivation","culture","breeding"} }, icon_tech = "fish-breeding" },
+  research_bioflux = { items={"bioflux"}, icon_tech="bioflux" },
+  research_breeding = { items = {"raw-fish","biter-egg","pentapod-egg"}, mode = "by_category_or_match", match = { name_patterns={"cultivation","culture","breeding"} }, icon_tech = "fish-breeding" },
 
   research_grenades = { icon_item="grenade", groups = {
     {change=0.10, items={"grenade"}},
@@ -133,7 +133,7 @@ return {
     { change=0.01, items={"stack-inserter"}, item_patterns={"stack%-inserter"} }
   }},
 
-  research_science_pack_productivity = { icon_tech = "automation-science-pack", dynamic_items_from_lab_inputs = true, groups = {
+  research_science_pack_productivity = { icon_tech = "research-productivity", icon_item = "automation-science-pack", dynamic_items_from_lab_inputs = true, groups = {
     { change=0.10, items={
       "automation-science-pack","logistic-science-pack","chemical-science-pack","production-science-pack",
       "military-science-pack","utility-science-pack","space-science-pack",

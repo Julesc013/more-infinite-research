@@ -25,7 +25,10 @@ Date: 2026-06-30
 
     - Generated stream prerequisites now include declared required technologies, so prototype availability checks and actual technology progression stay aligned.
     - Direct-effect streams can now provide a specific localized description instead of always using the generic direct-effect description.
-    - Space Age-only direct-effect streams now declare explicit optional prototype requirements.
+    - Optional DLC-shaped direct-effect streams now declare explicit prototype requirements instead of hard-requiring Space Age.
+    - Added optional load ordering for Elevated Rails, Recycler, Quality, and Space Age so any installed official DLC combination is visible before MIR generation.
+    - Removed hard Space Age generation gates from MIR streams; unavailable targets now skip through recipe, item, technology, or ammo-category availability checks.
+    - Science-pack productivity now reuses Space Age's research productivity technology art when available while keeping the generated productivity corner badge.
     - Science-pack productivity can use science pack item icons through item fallback lookup.
     - Recipe-productivity streams can now opt into dynamic target items from active lab inputs.
     - Recipe matching now skips hidden recipes and recycling recipes by default unless a stream opts in.
@@ -47,7 +50,7 @@ Date: 2026-06-30
   Compatibility:
 
     - Raised the base dependency to Factorio 2.1.8 or newer because cargo bay unloading distance uses the 2.1.8 technology modifier API.
-    - Added a Space Age dependency floor of 2.1.8 or newer for the same cargo bay technology modifier surface.
+    - Added optional official DLC ordering floors of 2.1.8 or newer for Elevated Rails, Recycler, Quality, and Space Age.
     - Kept compatibility-mod dependencies out of release metadata so the mod page stays clean; known integrations are handled opportunistically from visible prototypes and safe skip checks.
     - Added generic competing base-extension cleanup and used it for Better Robots Extended worker robot storage infinite extensions.
     - Competing base-extension cleanup now runs only when this mod's matching base extension is enabled.
