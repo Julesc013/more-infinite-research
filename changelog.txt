@@ -29,6 +29,7 @@ Date: 2026-06-30
     - Added science-pack prerequisite repair for generated base-tech extensions so added packs also add their unlock prerequisites.
     - Added detection for equivalent existing infinite base-tech extensions so duplicate infinite continuations are skipped instead of generated again.
     - Added logic to keep another mod's competing infinite continuation when the preference setting is disabled.
+    - Kept declared required-technology prerequisite handling centralized in the shared prerequisite builder.
     - Split the prototype utility facade into focused modules for lookup, science-pack validation, recipe matching, icon construction, and deepcopy.
     - Split stream definitions into productivity and direct-effect domain modules.
     - Added compatibility profile scaffolding for future mod-specific stream patches.
@@ -51,6 +52,8 @@ Date: 2026-06-30
 
     - Replaced placeholder localization text in German, Spanish, French, Italian, Polish, Brazilian Portuguese, and Simplified Chinese.
     - Updated Russian localization coverage and terminology to match the current English locale keys, including community-provided improvements from the unreleased pre-2.0 history.
+    - Updated in-game mod descriptions to cover productivity research, direct-effect bonus research, and Space Age cargo logistics research.
+    - Split generated-stream research-time setting text from base-technology extension research-time text so the fallback behavior is described accurately.
     - Moved Spanish localization to Factorio's supported es-ES locale code.
     - Removed empty placeholder locale folders so only complete locale packs are shipped.
     - Added locale validation tooling and maintenance notes to keep translated files synchronized with the English fallback.
@@ -58,6 +61,7 @@ Date: 2026-06-30
   Documentation:
 
     - Added architecture documentation for the data-stage pipeline, utility modules, stream config domains, compatibility profiles, diagnostics, and validation harness.
+    - Added a manual validation matrix item for the disabled-by-default cargo landing pad count research when it is forced enabled.
     - Rebuilt the changelog with historical entries back to the original 1.0.0 release.
 
   Migration:

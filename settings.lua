@@ -200,8 +200,8 @@ for _, key in ipairs(stream_order) do
       minimum_value = 0,
       maximum_value = 2147483647,
       order = "b-"..key.."-4",
-      localised_name = {"mod-setting-name.mir-research-time", tech_locale},
-      localised_description = {"mod-setting-description.mir-research-time", tech_locale}
+      localised_name = {"mod-setting-name.ips-research-time-stream", tech_locale},
+      localised_description = {"mod-setting-description.ips-research-time-stream", tech_locale}
     })
   end
 end

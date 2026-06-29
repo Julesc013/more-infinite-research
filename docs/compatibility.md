@@ -42,12 +42,13 @@ Run each case from a clean Factorio user data directory or with a controlled mod
 1. Base game only.
 2. Space Age enabled.
 3. Space Age 2.1.8+ enabled, verifying cargo bay unloading distance research appears after the landing pad unloading bay unlock and cargo landing pad count remains disabled by default.
-4. Space Age enabled with Quality disabled.
-5. Better Robots Extended enabled.
-6. A fixture mod that adds a science pack as an ordinary `item` and adds it to a lab.
-7. A fixture mod that adds a custom lab with a different science-pack input set.
-8. A fixture mod that adds recipes in `data-final-fixes.lua`.
-9. An existing save upgraded from the latest 1.x release.
+4. Space Age 2.1.8+ with `research_cargo_landing_pad_count` forced enabled, verifying the generated technology uses `cargo-landing-pad-count` and remains researchable.
+5. Space Age enabled with Quality disabled.
+6. Better Robots Extended enabled.
+7. A fixture mod that adds a science pack as an ordinary `item` and adds it to a lab.
+8. A fixture mod that adds a custom lab with a different science-pack input set.
+9. A fixture mod that adds recipes in `data-final-fixes.lua`.
+10. An existing save upgraded from the latest 1.x release.
 
 For each case, verify:
 
