@@ -1,34 +1,19 @@
----------------------------------------------------------------------------------------------------
-Version: 2.1.0
-Date: 2026-06-29
+Version: 2.0.0
+
   Features:
+
     - Added local fixture mods and a PowerShell validation runner for static checks and optional Factorio runtime load checks.
     - Added a startup-controlled generation diagnostics report for generated and skipped streams and base extensions.
-  Changes:
-    - Split the prototype utility facade into focused modules for lookup, science-pack validation, recipe matching, icon construction, and deepcopy.
-    - Split stream definitions into productivity and direct-effect domain modules.
-    - Added compatibility profile scaffolding for future mod-specific stream patches.
-  Documentation:
-    - Added architecture documentation for the data-stage pipeline, utility modules, stream config domains, compatibility profiles, diagnostics, and validation harness.
-  Compatibility:
-    - Added optional load-order dependencies for Advanced Solar HR, OCs Ammo and Armor, OCs Stone Casting, Fluid Quality Imprinting, and Plates n Circuit Productivity so their late recipe or technology changes are visible before this mod generates research.
-    - Added explicit bio-explosives matching for OCs Ammo and Armor's biochamber explosives recipes.
-    - Made Space Age turbo belt, underground belt, and splitter productivity coverage explicit at the 1% tier.
-    - No prototype IDs were renamed. No migration is required.
-
----------------------------------------------------------------------------------------------------
-Version: 2.0.0
-Date: 2026-06-29
-  Major Features:
     - Reworked generated research compatibility for Factorio 2.1 by discovering science packs from active lab inputs instead of assuming science packs are tool prototypes.
     - Moved generated technology creation to data-final-fixes so recipes, labs, items, science packs, and technologies from other mods are visible before scanning.
     - Added Wube-style layered technology constant icon overlays for generated research technologies.
-  Features:
     - Added lab-compatible science-pack validation so generated technologies are skipped or reduced instead of becoming unresearchable.
     - Added support for Factorio 2.1 recipe categories and stream match filters.
     - Added a startup setting to control whether vanilla weapon shooting speed technologies are adjusted.
     - Added in-game descriptions that explain the recipe productivity cap and lab-compatible science-pack behavior.
+
   Changes:
+
     - Space Age-only direct-effect streams now declare explicit optional prototype requirements.
     - Science-pack productivity can use science pack item icons through item fallback lookup.
     - Recipe matching now skips hidden recipes and recycling recipes by default unless a stream opts in.
@@ -38,7 +23,20 @@ Date: 2026-06-29
     - Moved Spanish localization to Factorio's supported es-ES locale code.
     - Removed empty placeholder locale folders so only complete locale packs are shipped.
     - Added locale validation tooling and maintenance notes to keep translated files synchronized with the English fallback.
+    - Split the prototype utility facade into focused modules for lookup, science-pack validation, recipe matching, icon construction, and deepcopy.
+    - Split stream definitions into productivity and direct-effect domain modules.
+    - Added compatibility profile scaffolding for future mod-specific stream patches.
+
   Compatibility:
+
+    - Added optional load-order dependencies for Advanced Solar HR, OCs Ammo and Armor, OCs Stone Casting, Fluid Quality Imprinting, and Plates n Circuit Productivity so their late recipe or technology changes are visible before this mod generates research.
+    - Added explicit bio-explosives matching for OCs Ammo and Armor's biochamber explosives recipes.
+    - Made Space Age turbo belt, underground belt, and splitter productivity coverage explicit at the 1% tier.
+    - No prototype IDs were renamed. No migration is required.
     - Better supports Space Age optional installs and Space Age without Quality.
     - Better supports mods that add science packs as ordinary items or add lab inputs before this mod's final-fixes phase.
     - Known limitation: mods that mutate recipes or labs later in data-final-fixes still require load-order compatibility.
+
+  Documentation:
+
+    - Added architecture documentation for the data-stage pipeline, utility modules, stream config domains, compatibility profiles, diagnostics, and validation harness.
