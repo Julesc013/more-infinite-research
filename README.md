@@ -303,6 +303,8 @@ These are handled when their prototypes are visible:
 | `prototypes/lib/science-packs.lua` | Lab input discovery, science-pack ordering, lab validation, prerequisite lookup. |
 | `prototypes/lib/recipe-matching.lua` | Recipe output matching, pattern matching, category filters, hidden/recycling skips. |
 | `prototypes/lib/technology-icons.lua` | Icon resolution and constant overlay construction. |
+| `prototypes/lib/table-utils.lua` | Small shared table helpers such as deterministic sorted keys. |
+| `prototypes/lib/technology-cleanup.lua` | Removes technologies and cleans prerequisite references from remaining technologies. |
 | `prototypes/compat/profiles.lua` | Mod-specific stream patch scaffolding. |
 | `prototypes/compat/competing-productivity.lua` | Known competing recipe-productivity cleanup. |
 
@@ -387,6 +389,7 @@ The validation script checks:
 - Generated icons do not use `icon_mipmaps`.
 - Locale files match the English fallback.
 - The committed release zip has the expected root, metadata, required files, and no forbidden artifacts.
+- Key packaged source files match the repository copy, so stale release zips with correct metadata are rejected.
 - `git diff --check` passes.
 - Runtime fixture loading reaches save creation when a Factorio binary is supplied.
 - Runtime logs contain the expected generation diagnostics.

@@ -1,4 +1,5 @@
 local C = require("prototypes.config")
+local cleanup = require("prototypes.lib.technology-cleanup")
 
 local M = {}
 
@@ -68,11 +69,15 @@ function M.apply()
   if not known_competing_mod_active() then return end
 
   local owned_recipes = collect_owned_recipes()
+  local to_remove = {}
   for name, tech in pairs(data.raw.technology or {}) do
     if is_external_recipe_productivity_tech(name, tech, owned_recipes) then
-      data.raw.technology[name] = nil
-      log("[more-infinite-research] Removed competing recipe productivity technology: " .. name)
+      table.insert(to_remove, name)
     end
+  end
+  for _, name in ipairs(to_remove) do
+    cleanup.remove_technology_and_prereq_refs(name)
+    log("[more-infinite-research] Removed competing recipe productivity technology: " .. name)
   end
 end
 

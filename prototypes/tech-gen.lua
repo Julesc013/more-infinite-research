@@ -3,15 +3,7 @@ local C = require("prototypes.config")
 local U = require("prototypes.util")
 local D = require("prototypes.diagnostics")
 local deepcopy = require("prototypes.lib.deepcopy")
-
-local function sorted_keys(tbl)
-  local keys = {}
-  for key, _ in pairs(tbl or {}) do
-    table.insert(keys, key)
-  end
-  table.sort(keys)
-  return keys
-end
+local table_utils = require("prototypes.lib.table-utils")
 
 local function lname(key, spec)
   if spec.localised_name then return spec.localised_name end
@@ -241,6 +233,6 @@ local function make_stream(key, raw_spec)
   D.stream(D.stream_fields(key, spec, "generated", "recipe_productivity", ingredients, prerequisites, effects, lab_status))
 end
 
-for _, key in ipairs(sorted_keys(C.streams)) do
+for _, key in ipairs(table_utils.sorted_keys(C.streams)) do
   make_stream(key, C.streams[key])
 end

@@ -181,6 +181,45 @@ Invoke-RepoCheck "release package archive matches metadata" {
     if ($depDiff.Count -gt 0) {
       throw "Package info.json dependencies do not match repository info.json."
     }
+
+    $mustMatchRepo = @(
+      "data.lua",
+      "data-updates.lua",
+      "data-final-fixes.lua",
+      "settings.lua",
+      "defaults.lua",
+      "prototypes/config.lua",
+      "prototypes/util.lua",
+      "prototypes/tech-gen.lua",
+      "prototypes/base-tech-extensions.lua",
+      "prototypes/compat-better-robots.lua",
+      "prototypes/compat/competing-productivity.lua",
+      "prototypes/compat/profiles.lua",
+      "prototypes/streams/init.lua",
+      "prototypes/streams/productivity.lua",
+      "prototypes/streams/direct-effects.lua",
+      "prototypes/lib/deepcopy.lua",
+      "prototypes/lib/prototype-lookup.lua",
+      "prototypes/lib/science-packs.lua",
+      "prototypes/lib/recipe-matching.lua",
+      "prototypes/lib/table-utils.lua",
+      "prototypes/lib/technology-cleanup.lua",
+      "prototypes/lib/technology-icons.lua"
+    )
+
+    foreach ($relative in $mustMatchRepo) {
+      $entryName = "${root}$relative"
+      $entry = $entries | Where-Object { $_.FullName -eq $entryName } | Select-Object -First 1
+      if (-not $entry) {
+        throw "Package is missing expected source file: $entryName"
+      }
+
+      $repoText = Get-Content -Raw -LiteralPath (Join-Path $repo $relative)
+      $zipText = Read-ZipEntryText $entry
+      if ($repoText.TrimEnd() -ne $zipText.TrimEnd()) {
+        throw "Package source file differs from repository source: $relative"
+      }
+    }
   } finally {
     $zip.Dispose()
   }

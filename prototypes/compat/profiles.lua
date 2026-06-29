@@ -4,8 +4,16 @@ local function append_list(dst, field, values)
   if not values then return end
 
   dst[field] = dst[field] or {}
+  local seen = {}
+  for _, existing in ipairs(dst[field]) do
+    seen[existing] = true
+  end
+
   for _, value in ipairs(values) do
-    table.insert(dst[field], value)
+    if not seen[value] then
+      seen[value] = true
+      table.insert(dst[field], value)
+    end
   end
 end
 

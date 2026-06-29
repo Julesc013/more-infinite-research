@@ -5,15 +5,7 @@ local base_defaults = defaults.base_extensions or {}
 local U = require("prototypes.util")
 local D = require("prototypes.diagnostics")
 local deepcopy = require("prototypes.lib.deepcopy")
-
-local function sorted_keys(tbl)
-  local keys = {}
-  for key, _ in pairs(tbl or {}) do
-    table.insert(keys, key)
-  end
-  table.sort(keys)
-  return keys
-end
+local table_utils = require("prototypes.lib.table-utils")
 
 local function escape_pattern(text)
   return text:gsub("([^%w])", "%%%1")
@@ -496,6 +488,6 @@ local function extend_chain(key)
   D.extension(D.extension_fields(key, "generated", "base_extension", resolved_ingredients, new.prerequisites, new.effects, lab_status))
 end
 
-for _, key in ipairs(sorted_keys(base_defaults)) do
+for _, key in ipairs(table_utils.sorted_keys(base_defaults)) do
   extend_chain(key)
 end

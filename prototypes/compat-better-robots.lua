@@ -1,3 +1,5 @@
+local cleanup = require("prototypes.lib.technology-cleanup")
+
 local function has_prereq(tech, prereq_name)
   for _, name in ipairs((tech and tech.prerequisites) or {}) do
     if name == prereq_name then return true end
@@ -33,11 +35,15 @@ end
 
 if mods and mods["Better_Robots_Extended"] then
   if prefer_this_mod_for_competing_techs() then
+    local to_remove = {}
     for name, tech in pairs(data.raw.technology or {}) do
       if should_remove_worker_storage_extension(name, tech) then
-        data.raw.technology[name] = nil
-        log("[more-infinite-research] Removed competing worker robot storage infinite tech: " .. name)
+        table.insert(to_remove, name)
       end
+    end
+    for _, name in ipairs(to_remove) do
+      cleanup.remove_technology_and_prereq_refs(name)
+      log("[more-infinite-research] Removed competing worker robot storage infinite tech: " .. name)
     end
   end
 end

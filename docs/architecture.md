@@ -29,6 +29,8 @@ This order gives the mod the best practical view of recipes, labs, science packs
 - `prototypes/lib/recipe-matching.lua`: item-output matching, item-pattern expansion, recipe category matching, hidden/recycling filtering.
 - `prototypes/lib/technology-icons.lua`: borrowed icon copying, technology/item icon fallback, Wube-style constant overlays.
 - `prototypes/lib/deepcopy.lua`: shared fallback for data-stage deep copies.
+- `prototypes/lib/table-utils.lua`: deterministic table-key ordering helpers.
+- `prototypes/lib/technology-cleanup.lua`: technology removal with prerequisite reference cleanup.
 
 Keep new domain behavior in these modules rather than growing `util.lua`.
 
@@ -78,5 +80,7 @@ Use `scripts/Invoke-MIRValidation.ps1 -StaticOnly` for static checks.
 Use `scripts/Invoke-MIRValidation.ps1 -FactorioBin C:\path\to\factorio.exe` for a runtime fixture load test.
 
 Use `scripts/Build-MIRPackage.ps1` to rebuild the release archive. Static validation checks the committed archive root, metadata, locale files, docs, and forbidden artifact paths.
+
+Static package validation also compares key packaged source files against the repository copy so a stale zip with correct metadata is rejected.
 
 The fixture mods under `fixtures/` test item-based science packs, custom labs, late recipe creation, and the post-MIR science-pack productivity assertion.

@@ -48,6 +48,7 @@ Date: 2026-06-30
     - Kept compatibility-mod dependencies out of release metadata so the mod page stays clean; known integrations are handled opportunistically from visible prototypes and safe skip checks.
     - Added optional Better Robots Extended compatibility and cleanup for competing worker robot storage infinite extensions.
     - Moved known competing recipe-productivity cleanup after MIR stream generation and made it inspect actual generated MIR recipe-productivity effects before removing another mod's competing technology.
+    - Compatibility cleanup now removes dangling prerequisite references when deleting known competing technologies.
     - Changed worker robot storage extension science packs toward utility and electromagnetic science in Space Age contexts.
     - Added opportunistic compatibility coverage for Advanced Solar HR, OCs Ammo and Armor, OCs Stone Casting, Fluid Quality Imprinting, and Plates n Circuit Productivity without declaring those mods as dependencies.
     - Added explicit bio-explosives matching for OCs Ammo and Armor's biochamber explosives recipes.
@@ -75,6 +76,7 @@ Date: 2026-06-30
     - Added a post-MIR runtime fixture assertion that fails loading if the custom item-based science-pack recipe does not receive a science-pack productivity effect.
     - Strengthened runtime validation so a missing expected Factorio log is a failure instead of silently skipping log assertions.
     - Strengthened release package validation so core data-stage files, stream modules, and shared recipe/science-pack helpers must be present in the zip.
+    - Strengthened release package validation so key packaged source files must match the repository copy, catching stale archives with otherwise valid metadata.
 
   Documentation:
 

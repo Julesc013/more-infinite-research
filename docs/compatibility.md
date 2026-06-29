@@ -16,6 +16,7 @@ The release goal is graceful compatibility without mod-page dependency clutter: 
 - Space Age cargo bay unloading distance research uses Factorio 2.1.8's `max-cargo-bay-unloading-distance` technology modifier and is skipped without Space Age or the `landing-pad-unloading-bay` prototypes.
 - Space Age cargo landing pad count research uses `cargo-landing-pad-count`, is disabled by default, and is skipped without Space Age or the `cargo-landing-pad` prototype.
 - Mod-specific stream changes should live in `prototypes/compat/profiles.lua` instead of the base stream definitions.
+- Compatibility cleanup that removes known competing technologies also removes dangling prerequisite references from remaining technologies.
 - Release metadata intentionally avoids compatibility-mod dependencies beyond optional Space Age. Compatibility is opportunistic and based on the prototypes visible when this mod reaches `data-final-fixes.lua`.
 - `mir-debug-generation-report` can be enabled to capture why each stream or base extension generated or skipped.
 
@@ -87,7 +88,7 @@ The runtime check copies this repo and the fixture mods into a temporary user-da
 
 The runtime fixture run also enables the generation diagnostics report in the copied mod and asserts that science-pack productivity generated with the custom item-based fixture science pack included. A post-MIR assertion fixture also checks the generated technology directly and fails loading if the custom science-pack recipe did not receive a `change-recipe-productivity` effect. The expected Factorio log file is part of the validation evidence; if it is missing, runtime validation fails.
 
-Static validation requires the committed release zip at `dist/more-infinite-research_2.0.0.zip`. The package must use the `more-infinite-research_2.0.0/` root, contain matching `info.json` metadata, include locale, documentation, top-level data-stage files, and core prototype modules, and avoid build, fixture, script, Git, and temporary/editor artifacts.
+Static validation requires the committed release zip at `dist/more-infinite-research_2.0.0.zip`. The package must use the `more-infinite-research_2.0.0/` root, contain matching `info.json` metadata, include locale, documentation, top-level data-stage files, and core prototype modules, match the repository contents for key source files, and avoid build, fixture, script, Git, and temporary/editor artifacts.
 
 ## Fixture Designs
 
