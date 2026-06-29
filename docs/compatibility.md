@@ -2,6 +2,8 @@
 
 More Infinite Research v2.0.0 targets Factorio 2.1 and uses a compatibility-first data-stage model.
 
+The release goal is graceful compatibility without mod-page dependency clutter: compatible mods should work when their prototypes are visible, absent mods should be skipped cleanly, and no compatibility mod should be required for this mod to load.
+
 ## Compatibility Model
 
 - Generated technologies are created in `data-final-fixes.lua` so the mod can see most recipes, items, labs, science packs, and technologies created by other mods.
@@ -77,7 +79,11 @@ $env:FACTORIO_BIN = "C:\path\to\factorio.exe"
 .\scripts\Invoke-MIRValidation.ps1
 ```
 
+Set `$env:FACTORIO_LOG` or pass `-FactorioLog` when the Factorio log is not at the default Windows user-data path.
+
 The runtime check copies this repo and the fixture mods into a temporary user-data mod directory, adds test-only dependencies from the copied mod to the fixture mods for deterministic load order, writes a fixture `mod-list.json`, and asks Factorio to create a save. It is intentionally a load/prototype validation harness, not a gameplay test.
+
+Static validation also checks the committed release zip when it exists at `dist/more-infinite-research_2.0.0.zip`. The package must use the `more-infinite-research_2.0.0/` root, contain matching `info.json` metadata, include locale and documentation files, and avoid build, fixture, script, Git, and temporary/editor artifacts.
 
 ## Fixture Designs
 
@@ -113,9 +119,11 @@ Expected result: recipe streams can discover late recipes when load order makes 
 
 ## Release Checklist
 
+- Run `.\scripts\Build-MIRPackage.ps1` to refresh `dist/more-infinite-research_2.0.0.zip`.
 - Run `rg "data.raw.tool|tool_exists|has_tool|PACKS_ALL" prototypes` and confirm no old science-pack authority remains.
 - Run `rg "icon_mipmaps" prototypes` and confirm generated icons do not add it.
 - Run `.\scripts\Invoke-MIRValidation.ps1 -StaticOnly`.
 - Confirm `info.json` declares only `base >= 2.1.8` and optional `space-age >= 2.1.8` dependencies.
+- Confirm package validation reports the expected root, matching metadata, included locale/docs, and no forbidden artifacts.
 - Load Factorio with the manual matrix above.
 - Confirm `changelog.txt` has the release version and date.

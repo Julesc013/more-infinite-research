@@ -1,5 +1,6 @@
 param(
   [string]$FactorioBin = $env:FACTORIO_BIN,
+  [string]$FactorioLog = $env:FACTORIO_LOG,
   [string]$UserDataDir = $env:FACTORIO_USERDATA,
   [switch]$StaticOnly
 )
@@ -21,14 +22,22 @@ Invoke-RepoCheck "release metadata avoids compatibility mod dependencies" {
   $info = Get-Content -Raw (Join-Path $repo "info.json") | ConvertFrom-Json
   $deps = @($info.dependencies)
   $compatDependencyModIds = @(
-    "? Advanced-Electric-Revamped-v16",
-    "? Better_Robots_Extended",
-    "? OCs_ammo_casting",
-    "? OCs_stone_casting",
-    "? fluid-quality-imprinting",
-    "? plates-n-circuit-productivity"
+    "Advanced-Electric-Revamped-v16",
+    "Better_Robots_Extended",
+    "OCs_ammo_casting",
+    "OCs_stone_casting",
+    "fluid-quality-imprinting",
+    "plates-n-circuit-productivity"
   )
-  $present = @($compatDependencyModIds | Where-Object { $_ -in $deps })
+  $present = @(
+    foreach ($dep in $deps) {
+      foreach ($modId in $compatDependencyModIds) {
+        if ($dep -match "^\?\s+$([regex]::Escape($modId))(\s|$)") {
+          $dep
+        }
+      }
+    }
+  )
   if ($present.Count -gt 0) {
     throw "Unexpected compatibility mod dependencies in info.json: $($present -join ', ')"
   }
@@ -78,6 +87,95 @@ Invoke-RepoCheck "locale files match English fallback" {
   & (Join-Path $repo "scripts\Test-MIRLocales.ps1") -AllowMissingSupportedLanguages
 }
 
+Invoke-RepoCheck "release package archive matches metadata" {
+  Add-Type -AssemblyName System.IO.Compression.FileSystem
+
+  function Read-ZipEntryText {
+    param($Entry)
+    $stream = $Entry.Open()
+    try {
+      $reader = [System.IO.StreamReader]::new($stream, [System.Text.Encoding]::UTF8)
+      try {
+        return $reader.ReadToEnd()
+      } finally {
+        $reader.Dispose()
+      }
+    } finally {
+      $stream.Dispose()
+    }
+  }
+
+  $info = Get-Content -Raw (Join-Path $repo "info.json") | ConvertFrom-Json
+  $packageName = "$($info.name)_$($info.version)"
+  $zipPath = Join-Path $repo "dist\$packageName.zip"
+  if (-not (Test-Path -LiteralPath $zipPath)) {
+    throw "Release package not found: $zipPath"
+  }
+
+  $zip = [System.IO.Compression.ZipFile]::OpenRead($zipPath)
+  try {
+    $entries = @($zip.Entries)
+    $entryNames = @($entries | ForEach-Object { $_.FullName })
+    $root = "$packageName/"
+
+    $outsideRoot = @($entryNames | Where-Object { -not $_.StartsWith($root) })
+    if ($outsideRoot.Count -gt 0) {
+      throw "Package entries outside expected root ${root}: $($outsideRoot -join ', ')"
+    }
+
+    $requiredEntries = @(
+      "${root}info.json",
+      "${root}changelog.txt",
+      "${root}README.md",
+      "${root}LICENSE",
+      "${root}thumbnail.png",
+      "${root}locale/en/more-infinite-research.cfg",
+      "${root}docs/architecture.md",
+      "${root}docs/compatibility.md",
+      "${root}prototypes/tech-gen.lua"
+    )
+    $missingEntries = @($requiredEntries | Where-Object { $_ -notin $entryNames })
+    if ($missingEntries.Count -gt 0) {
+      throw "Package is missing expected entries: $($missingEntries -join ', ')"
+    }
+
+    $forbiddenPatterns = @(
+      "^$([regex]::Escape($root))(\.git|build|dist|fixtures|scripts)(/|$)",
+      "(^|/)(\.DS_Store|Thumbs\.db)$",
+      "(^|/)__MACOSX(/|$)",
+      "~$",
+      "\.(tmp|bak|swp)$"
+    )
+    $forbiddenEntries = @(
+      foreach ($entryName in $entryNames) {
+        foreach ($pattern in $forbiddenPatterns) {
+          if ($entryName -match $pattern) {
+            $entryName
+            break
+          }
+        }
+      }
+    )
+    if ($forbiddenEntries.Count -gt 0) {
+      throw "Package contains forbidden entries: $($forbiddenEntries -join ', ')"
+    }
+
+    $innerInfoEntry = $entries | Where-Object { $_.FullName -eq "${root}info.json" } | Select-Object -First 1
+    $innerInfo = Read-ZipEntryText $innerInfoEntry | ConvertFrom-Json
+    if ($innerInfo.name -ne $info.name -or $innerInfo.version -ne $info.version -or $innerInfo.factorio_version -ne $info.factorio_version) {
+      throw "Package info.json metadata does not match repository info.json."
+    }
+    $repoDeps = @($info.dependencies)
+    $packageDeps = @($innerInfo.dependencies)
+    $depDiff = @(Compare-Object -ReferenceObject $repoDeps -DifferenceObject $packageDeps)
+    if ($depDiff.Count -gt 0) {
+      throw "Package info.json dependencies do not match repository info.json."
+    }
+  } finally {
+    $zip.Dispose()
+  }
+}
+
 Invoke-RepoCheck "git whitespace check" {
   git -C $repo diff --check
 }
@@ -92,11 +190,39 @@ if (-not (Test-Path -LiteralPath $FactorioBin)) {
 }
 
 if ([string]::IsNullOrWhiteSpace($UserDataDir)) {
-  $UserDataDir = Join-Path ([System.IO.Path]::GetTempPath()) "mir-factorio-userdata"
+  $UserDataDir = Join-Path ([System.IO.Path]::GetTempPath()) ("mir-factorio-userdata-" + [guid]::NewGuid().ToString("N"))
 }
 
 $modsDir = Join-Path $UserDataDir "mods"
 New-Item -ItemType Directory -Force -Path $modsDir | Out-Null
+
+function Invoke-FactorioProcess {
+  param(
+    [string]$FilePath,
+    [string[]]$Arguments,
+    [int]$TimeoutMs = 300000
+  )
+
+  $processInfo = [System.Diagnostics.ProcessStartInfo]::new()
+  $processInfo.FileName = $FilePath
+  $processInfo.UseShellExecute = $false
+  $processInfo.CreateNoWindow = $true
+  $processInfo.WindowStyle = [System.Diagnostics.ProcessWindowStyle]::Hidden
+  foreach ($arg in $Arguments) {
+    [void]$processInfo.ArgumentList.Add($arg)
+  }
+
+  $process = [System.Diagnostics.Process]::Start($processInfo)
+  if (-not $process.WaitForExit($TimeoutMs)) {
+    try {
+      $process.Kill($true)
+    } catch {
+      $process.Kill()
+    }
+    throw "Factorio runtime validation timed out after $TimeoutMs ms."
+  }
+  return $process.ExitCode
+}
 
 function Copy-ModDirectory {
   param([string]$Source, [string]$Name)
@@ -152,12 +278,11 @@ if (Test-Path -LiteralPath $savePath) {
 Write-Host "[run] Factorio load check with fixture mods"
 $factorioArgs = @(
   "--mod-directory",
-  "`"$modsDir`"",
+  $modsDir,
   "--create",
-  "`"$savePath`""
+  $savePath
 )
-$factorioProcess = Start-Process -FilePath $FactorioBin -ArgumentList $factorioArgs -Wait -PassThru -WindowStyle Hidden
-$factorioExitCode = $factorioProcess.ExitCode
+$factorioExitCode = Invoke-FactorioProcess -FilePath $FactorioBin -Arguments $factorioArgs
 if ($factorioExitCode -ne 0) {
   throw "Factorio runtime validation exited with code $factorioExitCode"
 }
@@ -165,9 +290,12 @@ if (-not (Test-Path -LiteralPath $savePath)) {
   throw "Factorio runtime validation did not create the expected save: $savePath. Factorio exit code: $factorioExitCode"
 }
 
-$factorioLog = Join-Path $env:APPDATA "Factorio\factorio-current.log"
-if (Test-Path -LiteralPath $factorioLog) {
-  $fatalMarkers = Select-String -LiteralPath $factorioLog -Pattern "------------- Error -------------", "Error Util.cpp" -SimpleMatch
+if ([string]::IsNullOrWhiteSpace($FactorioLog)) {
+  $FactorioLog = Join-Path $env:APPDATA "Factorio\factorio-current.log"
+}
+Write-Host "[info] Factorio log path: $FactorioLog"
+if (Test-Path -LiteralPath $FactorioLog) {
+  $fatalMarkers = Select-String -LiteralPath $FactorioLog -Pattern "------------- Error -------------", "Error Util.cpp" -SimpleMatch
   if ($fatalMarkers) {
     $fatalMarkers | Select-Object -First 10 | ForEach-Object { Write-Host $_.Line }
     throw "Factorio runtime validation log contains fatal error markers."

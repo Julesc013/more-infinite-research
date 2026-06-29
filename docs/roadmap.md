@@ -411,6 +411,7 @@ After v2.0.0 is stable, expand in deliberately separated tracks.
 - Keep compatibility metadata dependencies out of release metadata unless a specific future integration proves impossible to handle safely without ordering.
 - Add diagnostics that can log why each stream did or did not generate.
 - Add a debug setting to print recipe matches per stream.
+- Add a recipe metadata cache for large overhaul packs if recipe matching becomes a measurable data-stage cost.
 
 ### v2.2: Balance and progression
 
@@ -454,4 +455,4 @@ Phases 1 through 8 are implemented for v2.0.0:
 - Generation runs in `data-final-fixes.lua`.
 - Recipe category matching, Space Age guards, icon overlays, player-facing settings, locale warnings, docs, fixtures, and packaging scripts are present.
 
-The remaining release gate is validation, not planned implementation: static checks, locale checks, package creation, and the Factorio runtime load matrix should be green before publishing the v2.0.0 package.
+The remaining release gate is validation, not planned implementation: static checks, locale checks, package validation, package creation, and the Factorio runtime load matrix should be green before publishing the v2.0.0 package.

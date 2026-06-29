@@ -140,40 +140,6 @@ local function find_any_infinite_extension(previous_name, new_name)
   return nil
 end
 
-local function compute_growth_from_counts(levels, counts)
-  local ratios = {}
-  for idx = 1, #counts - 1 do
-    local current = counts[idx]
-    local next_value = counts[idx + 1]
-    if current and current > 0 and next_value and next_value > 0 then
-      table.insert(ratios, next_value / current)
-    end
-  end
-  if #ratios == 0 then return nil end
-  local first = ratios[1]
-  local consistent = true
-  for i = 2, #ratios do
-    if math.abs(ratios[i] - first) > 1e-6 then
-      consistent = false
-      break
-    end
-  end
-  if consistent and first >= 1 then return first end
-  return nil
-end
-
-local function compute_growth_from_span(levels, counts)
-  if #levels < 2 then return nil end
-  local first = counts[1]
-  local last = counts[#counts]
-  if not first or first <= 0 or not last or last <= 0 then return nil end
-  local span = levels[#levels] - levels[1]
-  if span <= 0 then return nil end
-  local ratio = last / first
-  if ratio <= 0 then return nil end
-  return ratio ^ (1 / span)
-end
-
 local function compute_growth_from_prev(last_unit, prev_unit)
   if not last_unit or not prev_unit then return nil end
   if not last_unit.count or not prev_unit.count then return nil end

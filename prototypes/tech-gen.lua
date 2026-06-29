@@ -176,7 +176,9 @@ local function make_stream(key, spec)
     level = 1
   }
   data:extend({t})
-  log("[more-infinite-research] Registered technology "..t.name)
+  if D.enabled() then
+    log("[more-infinite-research] Registered technology "..t.name)
+  end
   D.stream(D.stream_fields(key, spec, "generated", "recipe_productivity", ingredients, prerequisites, effects, lab_status))
 end
 

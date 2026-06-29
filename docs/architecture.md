@@ -73,4 +73,6 @@ Use `scripts/Invoke-MIRValidation.ps1 -StaticOnly` for static checks.
 
 Use `scripts/Invoke-MIRValidation.ps1 -FactorioBin C:\path\to\factorio.exe` for a runtime fixture load test.
 
+Use `scripts/Build-MIRPackage.ps1` to rebuild the release archive. Static validation checks the committed archive root, metadata, locale files, docs, and forbidden artifact paths.
+
 The fixture mods under `fixtures/` test item-based science packs, custom labs, and late recipe creation.
