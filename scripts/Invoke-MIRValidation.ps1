@@ -129,10 +129,20 @@ Invoke-RepoCheck "release package archive matches metadata" {
       "${root}README.md",
       "${root}LICENSE",
       "${root}thumbnail.png",
+      "${root}data.lua",
+      "${root}data-updates.lua",
+      "${root}data-final-fixes.lua",
+      "${root}settings.lua",
+      "${root}defaults.lua",
       "${root}locale/en/more-infinite-research.cfg",
       "${root}docs/architecture.md",
       "${root}docs/compatibility.md",
-      "${root}prototypes/tech-gen.lua"
+      "${root}prototypes/tech-gen.lua",
+      "${root}prototypes/base-tech-extensions.lua",
+      "${root}prototypes/streams/productivity.lua",
+      "${root}prototypes/streams/direct-effects.lua",
+      "${root}prototypes/lib/science-packs.lua",
+      "${root}prototypes/lib/recipe-matching.lua"
     )
     $missingEntries = @($requiredEntries | Where-Object { $_ -notin $entryNames })
     if ($missingEntries.Count -gt 0) {
@@ -299,29 +309,31 @@ if ([string]::IsNullOrWhiteSpace($FactorioLog)) {
   $FactorioLog = Join-Path $env:APPDATA "Factorio\factorio-current.log"
 }
 Write-Host "[info] Factorio log path: $FactorioLog"
-if (Test-Path -LiteralPath $FactorioLog) {
-  $fatalMarkers = Select-String -LiteralPath $FactorioLog -Pattern "------------- Error -------------", "Error Util.cpp" -SimpleMatch
-  if ($fatalMarkers) {
-    $fatalMarkers | Select-Object -First 10 | ForEach-Object { Write-Host $_.Line }
-    throw "Factorio runtime validation log contains fatal error markers."
-  }
-  $sciencePackProductivityLine = Select-String -LiteralPath $FactorioLog -Pattern "key=research_science_pack_productivity" -SimpleMatch | Select-Object -Last 1
-  if (-not $sciencePackProductivityLine) {
-    throw "Factorio runtime validation log did not contain diagnostics for research_science_pack_productivity."
-  }
-  if ($sciencePackProductivityLine.Line -notmatch "status=generated") {
-    throw "Science pack productivity stream was not generated during runtime validation: $($sciencePackProductivityLine.Line)"
-  }
-  $effectCountMatch = [regex]::Match($sciencePackProductivityLine.Line, "effects=(\d+)")
-  if (-not $effectCountMatch.Success) {
-    throw "Science pack productivity diagnostics did not include an effect count: $($sciencePackProductivityLine.Line)"
-  }
-  $sciencePackEffectCount = [int]$effectCountMatch.Groups[1].Value
-  $spaceAgeLoaded = Select-String -LiteralPath $FactorioLog -Pattern "Loading mod space-age" -SimpleMatch
-  $minimumSciencePackEffects = if ($spaceAgeLoaded) { 13 } else { 8 }
-  if ($sciencePackEffectCount -lt $minimumSciencePackEffects) {
-    throw "Science pack productivity stream did not include the fixture science-pack effect. Expected at least $minimumSciencePackEffects effects, got $sciencePackEffectCount`: $($sciencePackProductivityLine.Line)"
-  }
+if (-not (Test-Path -LiteralPath $FactorioLog)) {
+  throw "Factorio log not found: $FactorioLog"
+}
+
+$fatalMarkers = Select-String -LiteralPath $FactorioLog -Pattern "------------- Error -------------", "Error Util.cpp" -SimpleMatch
+if ($fatalMarkers) {
+  $fatalMarkers | Select-Object -First 10 | ForEach-Object { Write-Host $_.Line }
+  throw "Factorio runtime validation log contains fatal error markers."
+}
+$sciencePackProductivityLine = Select-String -LiteralPath $FactorioLog -Pattern "key=research_science_pack_productivity" -SimpleMatch | Select-Object -Last 1
+if (-not $sciencePackProductivityLine) {
+  throw "Factorio runtime validation log did not contain diagnostics for research_science_pack_productivity."
+}
+if ($sciencePackProductivityLine.Line -notmatch "status=generated") {
+  throw "Science pack productivity stream was not generated during runtime validation: $($sciencePackProductivityLine.Line)"
+}
+$effectCountMatch = [regex]::Match($sciencePackProductivityLine.Line, "effects=(\d+)")
+if (-not $effectCountMatch.Success) {
+  throw "Science pack productivity diagnostics did not include an effect count: $($sciencePackProductivityLine.Line)"
+}
+$sciencePackEffectCount = [int]$effectCountMatch.Groups[1].Value
+$spaceAgeLoaded = Select-String -LiteralPath $FactorioLog -Pattern "Loading mod space-age" -SimpleMatch
+$minimumSciencePackEffects = if ($spaceAgeLoaded) { 13 } else { 8 }
+if ($sciencePackEffectCount -lt $minimumSciencePackEffects) {
+  throw "Science pack productivity stream did not include the fixture science-pack effect. Expected at least $minimumSciencePackEffects effects, got $sciencePackEffectCount`: $($sciencePackProductivityLine.Line)"
 }
 
 Write-Host "[ok] Validation completed."

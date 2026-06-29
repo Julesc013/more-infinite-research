@@ -33,6 +33,7 @@ Date: 2026-06-30
     - Added detection for equivalent existing infinite base-tech extensions so duplicate infinite continuations are skipped instead of generated again.
     - Added logic to keep another mod's competing infinite continuation when the preference setting is disabled.
     - Fixed base-technology extension settings so entering 0 for base cost, growth factor, or research time now derives that value from the vanilla technology chain instead of falling back to this mod's configured defaults.
+    - Base-technology extensions now skip generation when a positive max-level setting is below the first generated continuation level.
     - Kept declared required-technology prerequisite handling centralized in the shared prerequisite builder.
     - Split the prototype utility facade into focused modules for lookup, science-pack validation, recipe matching, icon construction, and deepcopy.
     - Split stream definitions into productivity and direct-effect domain modules.
@@ -67,6 +68,8 @@ Date: 2026-06-30
     - Added validation checks for the no-compatibility-mod-dependencies release policy, locale synchronization, and Factorio runtime exit codes.
     - Strengthened validation so versioned compatibility-mod dependencies are rejected, the release zip is checked for the expected root and metadata, and the runtime log path can be overridden.
     - Strengthened runtime fixture validation so the custom item-based science pack must be present in the generated science-pack productivity diagnostics.
+    - Strengthened runtime validation so a missing expected Factorio log is a failure instead of silently skipping log assertions.
+    - Strengthened release package validation so core data-stage files, stream modules, and shared recipe/science-pack helpers must be present in the zip.
 
   Documentation:
 

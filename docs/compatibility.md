@@ -85,9 +85,9 @@ Set `$env:FACTORIO_LOG` or pass `-FactorioLog` when the Factorio log is not at t
 
 The runtime check copies this repo and the fixture mods into a temporary user-data mod directory, adds test-only dependencies from the copied mod to the fixture mods for deterministic load order, writes a fixture `mod-list.json`, and asks Factorio to create a save. It is intentionally a load/prototype validation harness, not a gameplay test.
 
-The runtime fixture run also enables the generation diagnostics report in the copied mod and asserts that science-pack productivity generated with the custom item-based fixture science pack included.
+The runtime fixture run also enables the generation diagnostics report in the copied mod and asserts that science-pack productivity generated with the custom item-based fixture science pack included. The expected Factorio log file is part of the validation evidence; if it is missing, runtime validation fails.
 
-Static validation requires the committed release zip at `dist/more-infinite-research_2.0.0.zip`. The package must use the `more-infinite-research_2.0.0/` root, contain matching `info.json` metadata, include locale and documentation files, and avoid build, fixture, script, Git, and temporary/editor artifacts.
+Static validation requires the committed release zip at `dist/more-infinite-research_2.0.0.zip`. The package must use the `more-infinite-research_2.0.0/` root, contain matching `info.json` metadata, include locale, documentation, top-level data-stage files, and core prototype modules, and avoid build, fixture, script, Git, and temporary/editor artifacts.
 
 ## Fixture Designs
 

@@ -66,19 +66,35 @@ local function expand_dynamic_items(spec)
   if not (spec and spec.dynamic_items_from_lab_inputs) then return spec end
 
   local out = deepcopy(spec)
-  out.groups = out.groups or {
-    {
-      change = C.shared.per_level_default,
-      items = {}
+
+  local base_group_items = {}
+  for _, item_name in ipairs(out.items or {}) do
+    table.insert(base_group_items, item_name)
+  end
+
+  if not out.groups then
+    out.groups = {
+      {
+        change = C.shared.per_level_default,
+        items = base_group_items
+      }
     }
-  }
+  end
   if not out.groups[1] then
     out.groups[1] = {
       change = C.shared.per_level_default,
-      items = {}
+      items = base_group_items
     }
   end
   out.groups[1].items = out.groups[1].items or {}
+
+  local first_group_seen = {}
+  for _, item_name in ipairs(out.groups[1].items) do
+    first_group_seen[item_name] = true
+  end
+  for _, item_name in ipairs(base_group_items) do
+    append_unique_item(out.groups[1].items, first_group_seen, item_name)
+  end
 
   local seen = {}
   for _, item_name in ipairs(out.items or {}) do

@@ -318,7 +318,8 @@ local function extend_chain(key)
     D.extension(D.extension_fields(key, "skipped", "base_already_infinite"))
     return
   end
-  -- Allow anchoring even if vanilla used a formula.
+  -- Allow anchoring when the base tech exists; vanilla-derived cost inference
+  -- still requires numeric unit.count values.
 
   local new_name = key .. "-" .. desired_new_level
   if data.raw.technology[new_name] then
@@ -329,6 +330,10 @@ local function extend_chain(key)
   local max_level_value = coerce_max_level_value(startup_setting("mir-max-level-" .. key))
   if max_level_value == "infinite" then
     max_level_value = coerce_max_level_value(spec.max_level)
+  end
+  if max_level_value ~= "infinite" and max_level_value < desired_new_level then
+    D.extension(D.extension_fields(key, "skipped", "max_level_below_first_extension"))
+    return
   end
 
   local last_count = base_tech.unit.count
