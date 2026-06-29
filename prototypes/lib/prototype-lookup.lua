@@ -14,6 +14,7 @@ local ITEM_TYPES = {
   "item-with-label",
   "item-with-tags",
   "selection-tool",
+  "copy-paste-tool",
   "blueprint",
   "blueprint-book",
   "deconstruction-item",

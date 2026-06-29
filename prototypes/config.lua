@@ -7,7 +7,7 @@ M.shared = {
   research_time = 60
 }
 
-M.streams = require("prototypes.streams")
+M.streams = require("prototypes.streams.init")
 
 require("prototypes.compat.profiles").apply(M)
 

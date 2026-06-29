@@ -57,7 +57,7 @@ For each case, verify:
 
 ## Local Validation Harness
 
-The repository includes local fixture mods under `dev-fixtures/` and a runner at `scripts/Invoke-MIRValidation.ps1`.
+The repository includes local fixture mods under `fixtures/` and a runner at `scripts/Invoke-MIRValidation.ps1`.
 
 Static checks only:
 
@@ -72,7 +72,7 @@ $env:FACTORIO_BIN = "C:\path\to\factorio.exe"
 .\scripts\Invoke-MIRValidation.ps1
 ```
 
-The runtime check copies this repo and the fixture mods into a temporary user-data mod directory, writes a fixture `mod-list.json`, and asks Factorio to create a save. It is intentionally a load/prototype validation harness, not a gameplay test.
+The runtime check copies this repo and the fixture mods into a temporary user-data mod directory, adds temporary optional dependencies from the copied mod to the fixture mods for deterministic load order, writes a fixture `mod-list.json`, and asks Factorio to create a save. It is intentionally a load/prototype validation harness, not a gameplay test.
 
 ## Fixture Designs
 

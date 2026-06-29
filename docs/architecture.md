@@ -72,4 +72,4 @@ Use `scripts/Invoke-MIRValidation.ps1 -StaticOnly` for static checks.
 
 Use `scripts/Invoke-MIRValidation.ps1 -FactorioBin C:\path\to\factorio.exe` for a runtime fixture load test.
 
-The fixture mods under `dev-fixtures/` test item-based science packs, custom labs, and late recipe creation.
+The fixture mods under `fixtures/` test item-based science packs, custom labs, and late recipe creation.

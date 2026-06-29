@@ -2,7 +2,7 @@
 
 Updated: 2026-06-29
 
-(Below may be out of date)
+This document is the v2.0.0 release checklist and follow-on roadmap. The baseline below reflects the current implementation state.
 
 This document captures the Factorio 2.1 experimental compatibility review and turns it into an execution plan for the mod's v2.0.0 release and follow-on expansion work.
 
@@ -10,17 +10,18 @@ The critical interpretation is that "2.0" means the mod's v2.0.0 release, not a 
 
 ## Current Repository Baseline
 
-- `info.json` currently declares mod version `2.0.0`, `factorio_version = "2.1"`, and optional dependencies on `space-age` and `Better_Robots_Extended`.
-- `data.lua` loads `prototypes.config`, `prototypes.util`, and `prototypes.tech-gen`, so generated technologies are currently created in the first data stage.
-- `data-updates.lua` currently runs Better Robots compatibility, base technology extensions, weapon speed adjustments, and max-level enforcement.
-- `prototypes/util.lua` still has `data.raw.tool` based science-pack checks, a closed `PACKS_ALL` list, and science-pack unlock discovery that loops tools.
-- `prototypes/base-tech-extensions.lua` has its own local `tool_exists` helper based on `data.raw.tool`.
-- `prototypes/config.lua` contains `mode = "by_category_or_match"` and `match = { categories = ..., name_patterns = ... }`, but recipe selection currently does not honor that filter.
-- `prototypes/config.lua` includes Space Age dependent streams and paths that need stricter gating, especially `research_character_reach` and `research_electric_shooting_speed`.
-- `prototypes/util.lua` can return borrowed `icons` tables from other prototypes and does not yet append Factorio-style technology constant overlays.
-- `prototypes/weapon-speed-adjustments.lua` always removes selected rocket and cannon-shell effects from vanilla weapon shooting speed technologies.
-- English locale does not yet warn in-game about the engine productivity cap.
-- The repo does not yet have a `changelog.txt`, `migrations/`, or a compatibility/testing document.
+- `info.json` declares mod version `2.0.0`, `factorio_version = "2.1"`, and optional dependencies for Space Age and known compatibility targets.
+- `data.lua` loads only stable shared configuration and utility facades.
+- `data-updates.lua` is reserved for pre-final compatibility hooks.
+- `data-final-fixes.lua` runs compatibility cleanup, generated technology creation, base technology extensions, weapon speed adjustments, max-level enforcement, and diagnostics flushing.
+- Science-pack handling is based on item prototype lookup plus active lab inputs, not `data.raw.tool`.
+- Generated technology ingredients are validated against complete lab input sets and reduced or skipped instead of creating unresearchable technologies.
+- Recipe matching supports Factorio 2.1 `recipe.categories`, legacy `recipe.category`, stream match filters, and default hidden/recycling skips.
+- Space Age-only direct-effect streams are gated by Space Age presence and explicit required prototypes where needed.
+- Generated technology icons use deep-copied layered icons with Wube-style constant overlays.
+- Vanilla weapon shooting speed mutation is controlled by the `mir-adjust-vanilla-weapon-speed-techs` startup setting.
+- In-game locale warns that infinite recipe productivity remains subject to Factorio's recipe productivity cap.
+- The repo has `changelog.txt`, compatibility/architecture docs, local fixture mods under `fixtures/`, and static/runtime validation scripts.
 
 ## Release Goal
 
@@ -442,12 +443,13 @@ After v2.0.0 is stable, expand in deliberately separated tracks.
 - Recipe productivity remains bounded by Factorio's maximum productivity cap even when the technology is infinite.
 - Prototype renames require migrations and should not be mixed casually with compatibility fixes.
 
-## Immediate Recommendation
+## Current v2.0.0 Release Status
 
-Start implementation with phases 1 through 3 only:
+Phases 1 through 8 are implemented for v2.0.0:
 
-1. Replace science-pack detection with item/lab-input detection.
-2. Validate lab ingredient combinations.
-3. Move generation to `data-final-fixes.lua`.
+- Science-pack detection uses item/lab-input discovery.
+- Lab ingredient combinations are validated before technology creation.
+- Generation runs in `data-final-fixes.lua`.
+- Recipe category matching, Space Age guards, icon overlays, player-facing settings, locale warnings, docs, fixtures, and packaging scripts are present.
 
-Those three changes remove the release blocker and create the foundation for every later improvement. Icons, settings, locale polish, and expansion content should follow after the generated technology set is correct and researchable.
+The remaining release gate is validation, not planned implementation: static checks, locale checks, package creation, and the Factorio runtime load matrix should be green before publishing the v2.0.0 package.

@@ -198,7 +198,13 @@ local function build_science_pack_unlock_cache()
   if science_pack_unlock_cache then return science_pack_unlock_cache end
   science_pack_unlock_cache = {}
   local lab_inputs = S.all_lab_inputs()
-  for tech_name, tech in pairs(data.raw.technology or {}) do
+  local technology_names = {}
+  for tech_name, _ in pairs(data.raw.technology or {}) do
+    table.insert(technology_names, tech_name)
+  end
+  table.sort(technology_names)
+  for _, tech_name in ipairs(technology_names) do
+    local tech = data.raw.technology[tech_name]
     for _, effect in ipairs(tech.effects or {}) do
       if effect.type == "unlock-recipe" and effect.recipe then
         local recipe = (data.raw.recipe or {})[effect.recipe]

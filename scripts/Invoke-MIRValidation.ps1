@@ -65,10 +65,29 @@ function Copy-ModDirectory {
 }
 
 Copy-ModDirectory -Source $repo -Name "more-infinite-research"
-foreach ($fixture in Get-ChildItem -LiteralPath (Join-Path $repo "dev-fixtures") -Directory) {
+$fixtureRoot = Join-Path $repo "fixtures"
+if (-not (Test-Path -LiteralPath $fixtureRoot)) {
+  throw "Fixture directory not found: $fixtureRoot"
+}
+
+$fixtureNames = @()
+foreach ($fixture in Get-ChildItem -LiteralPath $fixtureRoot -Directory) {
   $info = Get-Content -Raw (Join-Path $fixture.FullName "info.json") | ConvertFrom-Json
+  $fixtureNames += $info.name
   Copy-ModDirectory -Source $fixture.FullName -Name $info.name
 }
+
+$copiedInfoPath = Join-Path $modsDir "more-infinite-research\info.json"
+$copiedInfo = Get-Content -Raw -LiteralPath $copiedInfoPath | ConvertFrom-Json
+$dependencies = @($copiedInfo.dependencies)
+foreach ($fixtureName in $fixtureNames) {
+  $dependency = "? $fixtureName"
+  if ($dependencies -notcontains $dependency) {
+    $dependencies += $dependency
+  }
+}
+$copiedInfo.dependencies = $dependencies
+$copiedInfo | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $copiedInfoPath -Encoding UTF8
 
 $modList = @{
   mods = @(
@@ -82,10 +101,32 @@ $modList = @{
 
 Set-Content -LiteralPath (Join-Path $modsDir "mod-list.json") -Value $modList -Encoding UTF8
 
+$savePath = Join-Path $UserDataDir "mir-validation.zip"
+if (Test-Path -LiteralPath $savePath) {
+  Remove-Item -LiteralPath $savePath -Force
+}
+
 Write-Host "[run] Factorio load check with fixture mods"
-& $FactorioBin --mod-directory $modsDir --create (Join-Path $UserDataDir "mir-validation.zip")
-if ($LASTEXITCODE -ne 0) {
-  throw "Factorio runtime validation failed with exit code $LASTEXITCODE."
+$factorioArgs = @(
+  "--mod-directory",
+  "`"$modsDir`"",
+  "--create",
+  "`"$savePath`""
+)
+$factorioProcess = Start-Process -FilePath $FactorioBin -ArgumentList $factorioArgs -Wait -PassThru -WindowStyle Hidden
+$factorioExitCode = $factorioProcess.ExitCode
+if (-not (Test-Path -LiteralPath $savePath)) {
+  throw "Factorio runtime validation did not create the expected save: $savePath. Factorio exit code: $factorioExitCode"
+}
+
+$factorioLog = Join-Path $env:APPDATA "Factorio\factorio-current.log"
+if (Test-Path -LiteralPath $factorioLog) {
+  $fatalMarkers = Select-String -LiteralPath $factorioLog -Pattern "------------- Error -------------", "Error Util.cpp" -SimpleMatch
+  if ($fatalMarkers) {
+    $fatalMarkers | Select-Object -First 10 | ForEach-Object { Write-Host $_.Line }
+    throw "Factorio runtime validation log contains fatal error markers."
+  }
 }
 
 Write-Host "[ok] Validation completed."
+$global:LASTEXITCODE = 0

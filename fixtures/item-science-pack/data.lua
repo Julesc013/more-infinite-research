@@ -13,7 +13,7 @@ local recipe = {
   name = "mir-fixture-science-pack",
   enabled = false,
   ingredients = {
-    {"automation-science-pack", 1}
+    {type = "item", name = "automation-science-pack", amount = 1}
   },
   results = {
     {type = "item", name = "mir-fixture-science-pack", amount = 1}
