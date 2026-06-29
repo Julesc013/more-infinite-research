@@ -11,6 +11,9 @@ Date: 2026-06-29
   Documentation:
     - Added architecture documentation for the data-stage pipeline, utility modules, stream config domains, compatibility profiles, diagnostics, and validation harness.
   Compatibility:
+    - Added optional load-order dependencies for Advanced Solar HR, OCs Ammo and Armor, OCs Stone Casting, Fluid Quality Imprinting, and Plates n Circuit Productivity so their late recipe or technology changes are visible before this mod generates research.
+    - Added explicit bio-explosives matching for OCs Ammo and Armor's biochamber explosives recipes.
+    - Made Space Age turbo belt, underground belt, and splitter productivity coverage explicit at the 1% tier.
     - No prototype IDs were renamed. No migration is required.
 
 ---------------------------------------------------------------------------------------------------

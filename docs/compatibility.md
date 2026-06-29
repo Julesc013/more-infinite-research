@@ -13,6 +13,19 @@ More Infinite Research v2.0.0 targets Factorio 2.1 and uses a compatibility-firs
 - Mod-specific stream changes should live in `prototypes/compat/profiles.lua` instead of the base stream definitions.
 - `mir-debug-generation-report` can be enabled to capture why each stream or base extension generated or skipped.
 
+## Explicit Optional Integrations
+
+These mods are declared as optional dependencies so More Infinite Research runs after their prototype stages and can see their recipes or competing technologies:
+
+- Advanced Solar HR (`Advanced-Electric-Revamped-v16`): advanced, elite, and ultimate solar panel/accumulator recipes are covered by the electric energy productivity tiers.
+- Better Robots Extended (`Better_Robots_Extended`): competing infinite worker robot storage research is removed when `mir-prefer-this-mod-for-competing-techs` is enabled.
+- OCs Ammo and Armor (`OCs_ammo_casting`): foundry, biochamber, and electromagnetic plant recipes that output covered ammunition, explosive, or armor component items are picked up by the existing output-based streams.
+- OCs Stone Casting (`OCs_stone_casting`): foundry recipes that output covered stone, landfill, brick, wall, concrete, refined concrete, foundation, rail, gate, or furnace items are picked up by the existing output-based streams.
+- Fluid Quality Imprinting (`fluid-quality-imprinting`): quality-imprinting recipes that output covered plate and intermediate items are picked up by the existing output-based streams.
+- Plates n Circuit Productivity (`plates-n-circuit-productivity`): competing plate and circuit productivity technologies are removed when `mir-prefer-this-mod-for-competing-techs` is enabled.
+
+Large mod packs and utility mods such as Alien Biomes, Informatron, Jetpack, AAI, and Helmod usually do not need explicit recipe productivity support unless they add recipes for items covered by one of this mod's streams. When they do, output-based matching should pick up visible recipes automatically.
+
 ## Known Limits
 
 - No mod can observe another mod's later `data-final-fixes.lua` mutations unless dependency order puts it after that mod.

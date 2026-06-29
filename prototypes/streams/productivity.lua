@@ -12,7 +12,7 @@ return {
   research_plastic = { hide_in_space_age = true, items={"plastic-bar"}, icon_tech="plastics" },
   research_sulfur  = { items={"sulfur"}, icon_tech="sulfur-processing", exclude_ingredient_patterns={"asteroid"} },
   research_batteries = { items={"battery"}, icon_tech="battery", exclude_ingredient_patterns={"scrap"} },
-  research_explosives = { items={"explosives"}, icon_tech="explosives" },
+  research_explosives = { items={"explosives"}, item_patterns={"^bio%-explosives$"}, icon_tech="explosives" },
 
   research_engine = { items={"engine-unit"}, icon_tech="engine" },
   research_electric_engine = { items={"electric-engine-unit"}, icon_tech="electric-engine" },
@@ -122,8 +122,8 @@ return {
     { change=0.10, items={"transport-belt","underground-belt","splitter"} },
     { change=0.05, items={"fast-transport-belt","fast-underground-belt","fast-splitter"} },
     { change=0.02, items={"express-transport-belt","express-underground-belt","express-splitter"} },
-    { change=0.01, item_patterns={"^turbo%-transport%-belt$","^turbo%-underground%-belt$","^turbo%-splitter$"} },
-    { change=0.005, item_patterns={"^hyper%-transport%-belt$","^hyper%-underground%-belt$","^hyper%-splitter$"} }
+    { change=0.01, items={"turbo-transport-belt","turbo-underground-belt","turbo-splitter"}, item_patterns={"^turbo%-transport%-belt$","^turbo%-underground%-belt$","^turbo%-splitter$"} },
+    { change=0.005, items={"hyper-transport-belt","hyper-underground-belt","hyper-splitter"}, item_patterns={"^hyper%-transport%-belt$","^hyper%-underground%-belt$","^hyper%-splitter$"} }
   }},
 
   research_inserters = { icon_tech="fast-inserter", groups = {

@@ -8,6 +8,11 @@
   "dependencies": [
     "base >= 2.0",
     "? space-age",
-    "? Better_Robots_Extended"
+    "? Advanced-Electric-Revamped-v16",
+    "? Better_Robots_Extended",
+    "? OCs_ammo_casting",
+    "? OCs_stone_casting",
+    "? fluid-quality-imprinting",
+    "? plates-n-circuit-productivity"
   ]
 }
