@@ -17,6 +17,7 @@ The release goal is graceful compatibility without mod-page dependency clutter: 
 - Cargo landing pad count research uses `cargo-landing-pad-count`, is disabled by default, and is skipped without the `cargo-landing-pad` prototype.
 - Mod-specific stream changes should live in `prototypes/compat/profiles.lua` instead of the base stream definitions.
 - Compatibility cleanup that removes known competing technologies also removes dangling prerequisite references from remaining technologies.
+- Generic competing recipe-productivity cleanup removes only known infinite technologies whose recipe-productivity effects are all covered by generated MIR effects. Finite upgrade chains from other mods are left alone unless a future integration models them explicitly.
 - Release metadata declares optional ordering for official DLC mods and intentionally avoids third-party compatibility-mod dependencies. Third-party compatibility is opportunistic and based on the prototypes visible when this mod reaches `data-final-fixes.lua`.
 - `mir-debug-generation-report` can be enabled to capture why each stream or base extension generated or skipped.
 - `mir-debug-recipe-matches` can be enabled to capture matched recipe names per stream and duplicate recipe matches across streams.
@@ -86,11 +87,11 @@ $env:FACTORIO_BIN = "C:\path\to\factorio.exe"
 
 Set `$env:FACTORIO_LOG` or pass `-FactorioLog` when the Factorio log is not at the default Windows user-data path.
 
-The runtime check copies this repo and the fixture mods into a temporary user-data mod directory, adds test-only dependencies from the copied mod to the fixture mods for deterministic load order, writes a fixture `mod-list.json`, and asks Factorio to create a save. It is intentionally a load/prototype validation harness, not a gameplay test.
+The runtime check copies this repo and the fixture mods into isolated temporary user-data mod directories, adds test-only dependencies from the copied mod to the fixture mods for deterministic load order, writes fixture `mod-list.json` files, and asks Factorio to create saves. It is intentionally a load/prototype validation harness, not a gameplay test.
 
-The runtime fixture run also enables the generation diagnostics report in the copied mod and asserts that science-pack productivity generated with the custom item-based fixture science pack included. A post-MIR assertion fixture also checks the generated technology directly and fails loading if the custom science-pack recipe did not receive a `change-recipe-productivity` effect. The expected Factorio log file is part of the validation evidence; if it is missing, runtime validation fails.
+The runtime fixture run enables the generation diagnostics report in the copied mod and covers both lab incompatibility policies. The default `reduce` scenario asserts that science-pack productivity generated with the custom item-based fixture science pack included. The `skip` scenario forces the copied setting default to `skip` and asserts that the intentionally incompatible science-pack productivity stream is skipped instead of reduced. The expected Factorio log file is part of the validation evidence; if it is missing, runtime validation fails.
 
-Static validation requires the committed release zip at `dist/more-infinite-research_2.0.0.zip`. The package must use the `more-infinite-research_2.0.0/` root, contain matching `info.json` metadata, include locale, documentation, top-level data-stage files, and core prototype modules, match the repository contents for key source files, and avoid build, fixture, script, Git, and temporary/editor artifacts.
+Static validation requires the committed release zip at `dist/more-infinite-research_2.0.0.zip`. The package must use the `more-infinite-research_2.0.0/` root, contain matching `info.json` metadata, include locale, documentation, top-level data-stage files, and core prototype modules, match the repository contents for key source, documentation, and locale files, and avoid build, fixture, script, Git, and temporary/editor artifacts.
 
 ## Fixture Designs
 
@@ -135,6 +136,17 @@ Create a local test mod that:
 
 Expected result: custom item-based science packs that are active lab inputs and have visible recipes receive science-pack productivity effects.
 
+### Lab Skip Policy Assertion Fixture
+
+Create a local test mod that:
+
+- Depends on More Infinite Research, the custom lab fixture, and the item science-pack fixture.
+- Runs after MIR in `data-final-fixes.lua`.
+- Expects `mir-lab-incompatibility-policy = skip`.
+- Fails loading if `recipe-prod-research_science_pack_productivity-1` still exists after MIR sees the deliberately incompatible full lab-input set.
+
+Expected result: when the skip policy is active, MIR skips the incompatible science-pack productivity stream instead of reducing it.
+
 ## Release Checklist
 
 - Run `.\scripts\Build-MIRPackage.ps1` to refresh `dist/more-infinite-research_2.0.0.zip`.
@@ -144,5 +156,7 @@ Expected result: custom item-based science packs that are active lab inputs and 
 - Confirm `changelog.txt` uses Factorio's strict changelog format with 99-dash section separators.
 - Confirm `info.json` declares `base >= 2.1.8` plus optional official DLC ordering dependencies only.
 - Confirm package validation reports the expected root, matching metadata, included locale/docs, and no forbidden artifacts.
+- Confirm package validation reports source, documentation, and locale parity with the repository.
+- Confirm runtime fixture validation covers both the default `reduce` lab policy and forced `skip` lab policy.
 - Load Factorio with the manual matrix above.
 - Confirm `changelog.txt` has the release version and date.

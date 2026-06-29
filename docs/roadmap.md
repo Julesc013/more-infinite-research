@@ -436,12 +436,14 @@ After v2.0.0 is stable, expand in deliberately separated tracks.
 - Polish icons and localized descriptions across all supported languages.
 - Add generated documentation of stream keys, default costs, effects, and dependencies.
 - Refactor config into smaller files once behavior is stable.
+- Consider `mir-*` aliases or migration for legacy `ips-*` stream setting names only in a future major release with compatibility handling.
 
 ### v2.5: Automated validation
 
 - Build local scripted fixtures for data-stage validation.
 - Add a small packaging script.
 - Add a release checklist that confirms no stale generated artifacts or accidental local-only changes are included.
+- Keep expanding runtime fixture scenarios for startup setting behavior that materially affects generation, such as lab incompatibility policy selection.
 
 ## Known Limitations
 
@@ -460,6 +462,8 @@ Phases 1 through 8 are implemented for v2.0.0:
 - Lab incompatibility handling is configurable between `reduce` and `skip`.
 - Generation runs in `data-final-fixes.lua`.
 - Recipe category matching, recipe-match diagnostics, duplicate recipe match warnings, Space Age guards, icon overlays, player-facing settings, locale warnings, docs, fixtures, CI static validation, and packaging scripts are present.
-- The local static validation suite, package validation, locale validation, and Factorio runtime fixture load check are available and have been used during the release-candidate hardening pass.
+- Competing recipe-productivity cleanup is limited to known infinite technologies whose effects are covered by generated MIR replacement effects.
+- Package validation compares key source, documentation, and locale files against the rebuilt release zip.
+- The local static validation suite, package validation, locale validation, and Factorio runtime fixture load checks for both `reduce` and `skip` lab incompatibility policies are available and have been used during the release-candidate hardening pass.
 
 The remaining release gate before publishing is the broader manual mod matrix: base game, Space Age, Space Age without Quality, forced-enabled cargo landing pad count, selected compatibility mods, and an existing-save upgrade from the latest 1.x release.

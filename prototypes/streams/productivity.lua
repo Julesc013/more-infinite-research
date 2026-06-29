@@ -42,7 +42,7 @@ return {
     {change=0.05, items={"gate"}}
   } },
 
-  research_stone_products = { localised_name = {"", "Stone product productivity"}, icon_item = "stone", groups = {
+  research_stone_products = { icon_item = "stone", groups = {
     { change = 0.10, items = { "stone", "landfill" } },
     { change = 0.05, items = { "foundation" }, item_patterns = { "^artificial%-.+%-soil$" } }
   }, exclude_ingredient_patterns={"scrap"} },
@@ -85,7 +85,7 @@ return {
     } }
   }},
 
-  research_heavy_ammo = { localised_name = {"", "Heavy ammunition productivity"}, icon_item="cannon-shell", icon_tech="military", groups = {
+  research_heavy_ammo = { icon_item="cannon-shell", icon_tech="military", groups = {
     { change=0.10, items={"cannon-shell"} },
     { change=0.05, items={"explosive-cannon-shell"} },
     { change=0.02, items={"uranium-cannon-shell","explosive-uranium-cannon-shell"} },
@@ -101,7 +101,7 @@ return {
     { change=0.01, items={"plutonium-bomb"}, item_patterns={"^plutonium%-bomb$","^plutonium%-.+bomb$"} }
   }},
 
-  research_armor_components = { localised_name = {"", "Armor component productivity"}, icon_tech="power-armor", groups = {
+  research_armor_components = { icon_tech="power-armor", groups = {
     { change=0.05, item_patterns={
       "^.+%-armor%-plating$","^.+%-armour%-plating$",
       "^armor%-plating.*$","^armour%-plating.*$"

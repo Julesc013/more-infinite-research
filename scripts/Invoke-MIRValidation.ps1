@@ -240,6 +240,8 @@ Invoke-RepoCheck "release package archive matches metadata" {
     }
 
     $mustMatchRepo = @(
+      "README.md",
+      "changelog.txt",
       "data.lua",
       "data-updates.lua",
       "data-final-fixes.lua",
@@ -263,6 +265,16 @@ Invoke-RepoCheck "release package archive matches metadata" {
       "prototypes/lib/technology-cleanup.lua",
       "prototypes/lib/technology-icons.lua"
     )
+    $repoPath = $repo.Path
+    $mustMatchRepo += @(
+      Get-ChildItem -LiteralPath (Join-Path $repo "docs") -File |
+        ForEach-Object { [System.IO.Path]::GetRelativePath($repoPath, $_.FullName).Replace("\", "/") }
+    )
+    $mustMatchRepo += @(
+      Get-ChildItem -LiteralPath (Join-Path $repo "locale") -Recurse -File -Filter "more-infinite-research.cfg" |
+        ForEach-Object { [System.IO.Path]::GetRelativePath($repoPath, $_.FullName).Replace("\", "/") }
+    )
+    $mustMatchRepo = @($mustMatchRepo | Sort-Object -Unique)
 
     foreach ($relative in $mustMatchRepo) {
       $entryName = "${root}$relative"
@@ -298,9 +310,8 @@ if (-not (Test-Path -LiteralPath $FactorioBin)) {
 if ([string]::IsNullOrWhiteSpace($UserDataDir)) {
   $UserDataDir = Join-Path ([System.IO.Path]::GetTempPath()) ("mir-factorio-userdata-" + [guid]::NewGuid().ToString("N"))
 }
-
-$modsDir = Join-Path $UserDataDir "mods"
-New-Item -ItemType Directory -Force -Path $modsDir | Out-Null
+$validationRoot = (New-Item -ItemType Directory -Force -Path $UserDataDir).FullName
+$validationRootWithSeparator = $validationRoot.TrimEnd("\") + "\"
 
 function Invoke-FactorioProcess {
   param(
@@ -331,93 +342,184 @@ function Invoke-FactorioProcess {
 }
 
 function Copy-ModDirectory {
-  param([string]$Source, [string]$Name)
+  param([string]$Source, [string]$Name, [string]$ModsDir)
+  $modsRootWithSeparator = (Resolve-Path -LiteralPath $ModsDir).Path.TrimEnd("\") + "\"
   $target = Join-Path $modsDir $Name
   if (Test-Path -LiteralPath $target) {
-    Remove-Item -LiteralPath $target -Recurse -Force
+    $resolvedTarget = (Resolve-Path -LiteralPath $target).Path
+    if (-not $resolvedTarget.StartsWith($modsRootWithSeparator, [System.StringComparison]::OrdinalIgnoreCase)) {
+      throw "Refusing to remove mod directory outside scenario mods root: $resolvedTarget"
+    }
+    Remove-Item -LiteralPath $resolvedTarget -Recurse -Force
   }
   Copy-Item -LiteralPath $Source -Destination $target -Recurse
 }
 
-Copy-ModDirectory -Source $repo -Name "more-infinite-research"
 $fixtureRoot = Join-Path $repo "fixtures"
 if (-not (Test-Path -LiteralPath $fixtureRoot)) {
   throw "Fixture directory not found: $fixtureRoot"
 }
 
-$fixtureNames = @()
-foreach ($fixture in Get-ChildItem -LiteralPath $fixtureRoot -Directory) {
-  $info = Get-Content -Raw (Join-Path $fixture.FullName "info.json") | ConvertFrom-Json
-  $fixtureNames += $info.name
-  Copy-ModDirectory -Source $fixture.FullName -Name $info.name
-}
 $postMirAssertionFixtures = @(
-  "mir-fixture-assert-science-pack-productivity"
+  "mir-fixture-assert-science-pack-productivity",
+  "mir-fixture-assert-lab-skip-policy"
 )
 
-$copiedInfoPath = Join-Path $modsDir "more-infinite-research\info.json"
-$copiedInfo = Get-Content -Raw -LiteralPath $copiedInfoPath | ConvertFrom-Json
-$dependencies = @($copiedInfo.dependencies)
-foreach ($fixtureName in @($fixtureNames | Where-Object { $_ -notin $postMirAssertionFixtures })) {
-  $dependency = "? $fixtureName"
-  if ($dependencies -notcontains $dependency) {
-    $dependencies += $dependency
+function Get-FixtureInfos {
+  $infos = @()
+  foreach ($fixture in Get-ChildItem -LiteralPath $fixtureRoot -Directory) {
+    $info = Get-Content -Raw (Join-Path $fixture.FullName "info.json") | ConvertFrom-Json
+    $infos += [pscustomobject]@{
+      Name = $info.name
+      Path = $fixture.FullName
+    }
   }
+  return $infos
 }
-$copiedInfo.dependencies = $dependencies
-$copiedInfo | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $copiedInfoPath -Encoding UTF8
 
-$copiedDiagnosticsPath = Join-Path $modsDir "more-infinite-research\prototypes\diagnostics.lua"
-$copiedDiagnostics = Get-Content -Raw -LiteralPath $copiedDiagnosticsPath
-$copiedDiagnostics = $copiedDiagnostics -replace 'return startup_setting\("mir-debug-generation-report"\) == true', 'return true'
-Set-Content -LiteralPath $copiedDiagnosticsPath -Value $copiedDiagnostics -Encoding UTF8
+function Enable-CopiedDiagnostics {
+  param([string]$ModsDir)
+  $copiedDiagnosticsPath = Join-Path $ModsDir "more-infinite-research\prototypes\diagnostics.lua"
+  $copiedDiagnostics = Get-Content -Raw -LiteralPath $copiedDiagnosticsPath
+  $copiedDiagnostics = $copiedDiagnostics -replace 'return startup_setting\("mir-debug-generation-report"\) == true', 'return true'
+  Set-Content -LiteralPath $copiedDiagnosticsPath -Value $copiedDiagnostics -Encoding UTF8
+}
 
-$modList = @{
-  mods = @(
-    @{ name = "base"; enabled = $true },
-    @{ name = "more-infinite-research"; enabled = $true },
-    @{ name = "mir-fixture-item-science-pack"; enabled = $true },
-    @{ name = "mir-fixture-custom-lab"; enabled = $true },
-    @{ name = "mir-fixture-late-recipe"; enabled = $true },
-    @{ name = "mir-fixture-assert-science-pack-productivity"; enabled = $true }
+function Set-CopiedLabPolicySkip {
+  param([string]$ModsDir)
+  $copiedSettingsPath = Join-Path $ModsDir "more-infinite-research\settings.lua"
+  $copiedSettings = Get-Content -Raw -LiteralPath $copiedSettingsPath
+  if (-not $copiedSettings.Contains('default_value = "reduce",')) {
+    throw "Unable to force lab incompatibility policy to skip in copied settings.lua."
+  }
+  $copiedSettings = $copiedSettings.Replace('default_value = "reduce",', 'default_value = "skip",')
+  Set-Content -LiteralPath $copiedSettingsPath -Value $copiedSettings -Encoding UTF8
+}
+
+function Initialize-RuntimeScenario {
+  param(
+    [string]$ScenarioName,
+    [string[]]$EnabledFixtureNames,
+    [switch]$LabPolicySkip
   )
-} | ConvertTo-Json -Depth 5
 
-Set-Content -LiteralPath (Join-Path $modsDir "mod-list.json") -Value $modList -Encoding UTF8
+  $scenarioRoot = Join-Path $validationRoot $ScenarioName
+  if (Test-Path -LiteralPath $scenarioRoot) {
+    $resolvedScenarioRoot = (Resolve-Path -LiteralPath $scenarioRoot).Path
+    if (-not $resolvedScenarioRoot.StartsWith($validationRootWithSeparator, [System.StringComparison]::OrdinalIgnoreCase)) {
+      throw "Refusing to remove scenario directory outside validation root: $resolvedScenarioRoot"
+    }
+    Remove-Item -LiteralPath $resolvedScenarioRoot -Recurse -Force
+  }
 
-$savePath = Join-Path $UserDataDir "mir-validation.zip"
-if (Test-Path -LiteralPath $savePath) {
-  Remove-Item -LiteralPath $savePath -Force
-}
+  $modsDir = Join-Path $scenarioRoot "mods"
+  New-Item -ItemType Directory -Force -Path $modsDir | Out-Null
 
-Write-Host "[run] Factorio load check with fixture mods"
-$factorioArgs = @(
-  "--mod-directory",
-  $modsDir,
-  "--create",
-  $savePath
-)
-$factorioExitCode = Invoke-FactorioProcess -FilePath $FactorioBin -Arguments $factorioArgs
-if ($factorioExitCode -ne 0) {
-  throw "Factorio runtime validation exited with code $factorioExitCode"
-}
-if (-not (Test-Path -LiteralPath $savePath)) {
-  throw "Factorio runtime validation did not create the expected save: $savePath. Factorio exit code: $factorioExitCode"
+  Copy-ModDirectory -Source $repo -Name "more-infinite-research" -ModsDir $modsDir
+
+  $fixtureInfos = Get-FixtureInfos
+  foreach ($fixtureInfo in $fixtureInfos) {
+    Copy-ModDirectory -Source $fixtureInfo.Path -Name $fixtureInfo.Name -ModsDir $modsDir
+  }
+
+  $fixtureNames = @($fixtureInfos | Select-Object -ExpandProperty Name)
+  $copiedInfoPath = Join-Path $modsDir "more-infinite-research\info.json"
+  $copiedInfo = Get-Content -Raw -LiteralPath $copiedInfoPath | ConvertFrom-Json
+  $dependencies = @($copiedInfo.dependencies)
+  foreach ($fixtureName in @($fixtureNames | Where-Object { $_ -notin $postMirAssertionFixtures })) {
+    $dependency = "? $fixtureName"
+    if ($dependencies -notcontains $dependency) {
+      $dependencies += $dependency
+    }
+  }
+  $copiedInfo.dependencies = $dependencies
+  $copiedInfo | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $copiedInfoPath -Encoding UTF8
+
+  Enable-CopiedDiagnostics -ModsDir $modsDir
+  if ($LabPolicySkip) {
+    Set-CopiedLabPolicySkip -ModsDir $modsDir
+  }
+
+  $mods = @(
+    @{ name = "base"; enabled = $true },
+    @{ name = "more-infinite-research"; enabled = $true }
+  )
+  $enabledFixtures = @{}
+  foreach ($fixtureName in $EnabledFixtureNames) {
+    $enabledFixtures[$fixtureName] = $true
+  }
+  foreach ($fixtureName in @($fixtureNames | Sort-Object)) {
+    $mods += @{
+      name = $fixtureName
+      enabled = $enabledFixtures.ContainsKey($fixtureName)
+    }
+  }
+
+  $modList = @{ mods = $mods } | ConvertTo-Json -Depth 5
+  Set-Content -LiteralPath (Join-Path $modsDir "mod-list.json") -Value $modList -Encoding UTF8
+
+  return [pscustomobject]@{
+    Name = $ScenarioName
+    ModsDir = $modsDir
+    SavePath = Join-Path $scenarioRoot "mir-validation.zip"
+  }
 }
 
 if ([string]::IsNullOrWhiteSpace($FactorioLog)) {
   $FactorioLog = Join-Path $env:APPDATA "Factorio\factorio-current.log"
 }
-Write-Host "[info] Factorio log path: $FactorioLog"
-if (-not (Test-Path -LiteralPath $FactorioLog)) {
-  throw "Factorio log not found: $FactorioLog"
+
+function Assert-RuntimeLogHealthy {
+  param([string]$ScenarioName)
+  Write-Host "[info] Factorio log path: $FactorioLog"
+  if (-not (Test-Path -LiteralPath $FactorioLog)) {
+    throw "Factorio log not found after $ScenarioName runtime validation: $FactorioLog"
+  }
+
+  $fatalMarkers = Select-String -LiteralPath $FactorioLog -Pattern "------------- Error -------------", "Error Util.cpp" -SimpleMatch
+  if ($fatalMarkers) {
+    $fatalMarkers | Select-Object -First 10 | ForEach-Object { Write-Host $_.Line }
+    throw "Factorio runtime validation log contains fatal error markers after $ScenarioName."
+  }
 }
 
-$fatalMarkers = Select-String -LiteralPath $FactorioLog -Pattern "------------- Error -------------", "Error Util.cpp" -SimpleMatch
-if ($fatalMarkers) {
-  $fatalMarkers | Select-Object -First 10 | ForEach-Object { Write-Host $_.Line }
-  throw "Factorio runtime validation log contains fatal error markers."
+function Invoke-RuntimeScenario {
+  param(
+    [string]$ScenarioName,
+    [string[]]$EnabledFixtureNames,
+    [switch]$LabPolicySkip
+  )
+
+  $scenario = Initialize-RuntimeScenario -ScenarioName $ScenarioName -EnabledFixtureNames $EnabledFixtureNames -LabPolicySkip:$LabPolicySkip
+  if (Test-Path -LiteralPath $scenario.SavePath) {
+    Remove-Item -LiteralPath $scenario.SavePath -Force
+  }
+
+  Write-Host "[run] Factorio load check with fixture mods ($ScenarioName)"
+  $factorioArgs = @(
+    "--mod-directory",
+    $scenario.ModsDir,
+    "--create",
+    $scenario.SavePath
+  )
+  $factorioExitCode = Invoke-FactorioProcess -FilePath $FactorioBin -Arguments $factorioArgs
+  if ($factorioExitCode -ne 0) {
+    throw "Factorio runtime validation scenario $ScenarioName exited with code $factorioExitCode"
+  }
+  if (-not (Test-Path -LiteralPath $scenario.SavePath)) {
+    throw "Factorio runtime validation scenario $ScenarioName did not create the expected save: $($scenario.SavePath). Factorio exit code: $factorioExitCode"
+  }
+
+  Assert-RuntimeLogHealthy -ScenarioName $ScenarioName
 }
+
+Invoke-RuntimeScenario -ScenarioName "reduce-policy" -EnabledFixtureNames @(
+  "mir-fixture-item-science-pack",
+  "mir-fixture-custom-lab",
+  "mir-fixture-late-recipe",
+  "mir-fixture-assert-science-pack-productivity"
+)
+
 $sciencePackProductivityLine = Select-String -LiteralPath $FactorioLog -Pattern "key=research_science_pack_productivity" -SimpleMatch | Select-Object -Last 1
 if (-not $sciencePackProductivityLine) {
   throw "Factorio runtime validation log did not contain diagnostics for research_science_pack_productivity."
@@ -434,6 +536,21 @@ $spaceAgeLoaded = Select-String -LiteralPath $FactorioLog -Pattern "Loading mod 
 $minimumSciencePackEffects = if ($spaceAgeLoaded) { 13 } else { 8 }
 if ($sciencePackEffectCount -lt $minimumSciencePackEffects) {
   throw "Science pack productivity stream did not include the fixture science-pack effect. Expected at least $minimumSciencePackEffects effects, got $sciencePackEffectCount`: $($sciencePackProductivityLine.Line)"
+}
+
+Invoke-RuntimeScenario -ScenarioName "skip-policy" -EnabledFixtureNames @(
+  "mir-fixture-item-science-pack",
+  "mir-fixture-custom-lab",
+  "mir-fixture-late-recipe",
+  "mir-fixture-assert-lab-skip-policy"
+) -LabPolicySkip
+
+$skipPolicyLine = Select-String -LiteralPath $FactorioLog -Pattern "key=research_science_pack_productivity" -SimpleMatch | Select-Object -Last 1
+if (-not $skipPolicyLine) {
+  throw "Skip-policy runtime validation log did not contain diagnostics for research_science_pack_productivity."
+}
+if ($skipPolicyLine.Line -notmatch "status=skipped" -or $skipPolicyLine.Line -notmatch "lab_status=invalid") {
+  throw "Skip-policy runtime validation did not skip incompatible science-pack productivity as expected: $($skipPolicyLine.Line)"
 }
 
 Write-Host "[ok] Validation completed."

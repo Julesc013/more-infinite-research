@@ -55,6 +55,7 @@ Date: 2026-06-30
     - Added generic competing base-extension cleanup and used it for Better Robots Extended worker robot storage infinite extensions.
     - Competing base-extension cleanup now runs only when this mod's matching base extension is enabled.
     - Moved known competing recipe-productivity cleanup after MIR stream generation and made it inspect actual generated MIR recipe-productivity effects before removing another mod's competing technology.
+    - Narrowed known competing recipe-productivity cleanup to infinite technologies only so finite upgrade chains from other mods are not removed by the generic cleanup path.
     - Compatibility cleanup now removes dangling prerequisite references when deleting known competing technologies.
     - Changed worker robot storage extension science packs toward utility and electromagnetic science in Space Age contexts.
     - Added opportunistic compatibility coverage for Advanced Solar HR, OCs Ammo and Armor, OCs Stone Casting, Fluid Quality Imprinting, and Plates n Circuit Productivity without declaring those mods as dependencies.
@@ -78,6 +79,8 @@ Date: 2026-06-30
     - Clarified base-technology extension research-time setting text so only an explicit 0 promises vanilla research-time reuse.
     - Moved Spanish localization to Factorio's supported es-ES locale code.
     - Removed empty placeholder locale folders so only complete locale packs are shipped.
+    - Moved heavy ammunition, armor component, and stone product research names from inline English strings into synchronized locale keys.
+    - Replaced leftover English cannon shooting speed text in translated locale files.
     - Added locale validation tooling and maintenance notes to keep translated files synchronized with the English fallback.
     - Added validation checks for the no-compatibility-mod-dependencies release policy, locale synchronization, and Factorio runtime exit codes.
     - Added validation for Factorio's strict changelog section format.
@@ -87,6 +90,8 @@ Date: 2026-06-30
     - Strengthened runtime validation so a missing expected Factorio log is a failure instead of silently skipping log assertions.
     - Strengthened release package validation so core data-stage files, stream modules, and shared recipe/science-pack helpers must be present in the zip.
     - Strengthened release package validation so key packaged source files must match the repository copy, catching stale archives with otherwise valid metadata.
+    - Strengthened release package validation so README, changelog, documentation, and locale files must match the repository copy.
+    - Added runtime fixture validation for the `skip` lab incompatibility policy.
 
   Documentation:
 

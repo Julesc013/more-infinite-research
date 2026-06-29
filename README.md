@@ -280,6 +280,8 @@ These are handled when their prototypes are visible:
 | Plates n Circuit Productivity (`plates-n-circuit-productivity`) | Selected competing infinite productivity technologies are removed only after MIR has generated replacement recipe effects. |
 | Castra and PlanetLib-style science packs | Custom science packs can be discovered as lab inputs and receive science-pack productivity when their recipes are visible. |
 
+Generic competing recipe-productivity cleanup is intentionally limited to known infinite technologies whose recipe-productivity effects are all covered by generated MIR effects. Finite upgrade chains from other mods are not removed by the generic cleanup path.
+
 ### Known Limits
 
 - MIR cannot see recipes or labs mutated by another mod later in `data-final-fixes.lua` unless load order puts MIR after that mod.
@@ -404,11 +406,13 @@ The validation script checks:
 - Locale files match the English fallback.
 - `changelog.txt` uses Factorio's 99-dash changelog section format.
 - The committed release zip has the expected root, metadata, required files, and no forbidden artifacts.
-- Key packaged source files match the repository copy, so stale release zips with correct metadata are rejected.
+- Key packaged source, documentation, and locale files match the repository copy, so stale release zips with correct metadata are rejected.
 - `git diff --check` passes.
 - Runtime fixture loading reaches save creation when a Factorio binary is supplied.
 - Runtime logs contain the expected generation diagnostics.
-- A post-MIR assertion fixture proves a custom item-based science pack received science-pack productivity.
+- The default `reduce` lab incompatibility policy keeps science-pack productivity generated with a custom item-based science pack included.
+- The `skip` lab incompatibility policy skips an intentionally incompatible science-pack set.
+- Post-MIR assertion fixtures prove both runtime lab-policy outcomes.
 
 ## Documentation Map
 

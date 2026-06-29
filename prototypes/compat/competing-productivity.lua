@@ -53,7 +53,7 @@ end
 local function is_external_recipe_productivity_tech(name, tech, owned_recipes)
   if string.find(name, "^recipe%-prod%-") then return false end
   if not known_competing_tech_name(name) then return false end
-  if tech.max_level ~= "infinite" and tech.upgrade ~= true then return false end
+  if tech.max_level ~= "infinite" then return false end
 
   local effects = tech.effects or {}
   if #effects == 0 then return false end
