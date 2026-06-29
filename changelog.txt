@@ -1,4 +1,4 @@
----------------------------------------------------------------------------------------------------
+---
 Version: 2.0.0
 Date: 2026-06-30
 
@@ -64,6 +64,7 @@ Date: 2026-06-30
 
     - No existing prototype IDs were renamed. No migration is required.
 
+---
 Version: 1.2.9
 Date: 2025-10-30
 
@@ -74,7 +75,7 @@ Date: 2025-10-30
     - Removed the character item pickup distance effect from character reach research, leaving reach, build distance, resource reach distance, and item drop distance bonuses.
     - Increased the default inserter capacity extension curve to make the optional infinite continuation more expensive.
 
----------------------------------------------------------------------------------------------------
+---
 Version: 1.2.5
 Date: 2025-10-29
 
@@ -96,7 +97,7 @@ Date: 2025-10-29
     - Base-tech extension research time settings now allow 0 to reuse the configured default.
     - Removed the old TODO file from the shipped source.
 
----------------------------------------------------------------------------------------------------
+---
 Version: 1.2.0
 Date: 2025-10-28
 
@@ -117,7 +118,7 @@ Date: 2025-10-28
     - Corrected the promethium science pack spelling in English locale text.
     - Added version metadata for the 1.2.0 release.
 
----------------------------------------------------------------------------------------------------
+---
 Version: 1.1.5
 Date: 2025-10-27
 
@@ -151,7 +152,7 @@ Date: 2025-10-27
     - Added a stricter rail recipe match so rail productivity does not accidentally catch unrelated rail-like outputs.
     - Added a startup gate setting so generated technologies can be held behind space science in vanilla or promethium science in Space Age.
 
----------------------------------------------------------------------------------------------------
+---
 Version: 1.1.0
 Date: 2025-10-25
 
@@ -170,7 +171,7 @@ Date: 2025-10-25
     - Expanded item lookup so generated icons and recipe matching could use ammo, capsules, modules, and science pack tool prototypes where appropriate.
     - Added Space Age-aware science-pack selection with optional promethium or space-science gating.
 
----------------------------------------------------------------------------------------------------
+---
 Version: 1.0.0
 Date: 2025-10-25
 
