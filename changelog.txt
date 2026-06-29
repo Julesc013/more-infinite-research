@@ -4,7 +4,7 @@ Date: 2026-06-30
 
   Features:
 
-    - Updated the mod for Factorio 2.1 while keeping the mod release version at 2.0.0.
+    - Updated the mod for Factorio 2.1.
     - Added Space Age cargo bay unloading distance infinite research for the Factorio 2.1 landing pad unloading bay. Each level adds 10 tiles by default, requires the vanilla unloading bay unlock, uses all available science packs, and has configurable enable, cost, growth, max-level, and research-time startup settings.
     - Added local fixture mods and a PowerShell validation runner for static checks and optional Factorio runtime load checks.
     - Added a startup-controlled generation diagnostics report for generated and skipped streams and base extensions.
