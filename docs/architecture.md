@@ -10,9 +10,9 @@ More Infinite Research is organized around a compatibility-first data-stage pipe
 
 `data-final-fixes.lua` runs the actual generation pipeline:
 
-1. Better Robots competing-tech cleanup.
-2. Generated stream technology creation.
-3. Known competing recipe-productivity cleanup based on actual generated MIR effects.
+1. Generated stream technology creation.
+2. Known competing recipe-productivity cleanup based on actual generated MIR effects.
+3. Known competing base-extension cleanup when MIR's matching base extension is enabled.
 4. Base technology infinite extensions.
 5. Vanilla weapon speed adjustment.
 6. Max-level enforcement.
@@ -58,6 +58,8 @@ Use profiles when a compatibility rule is tied to a known mod being active. Use 
 
 Profile patches should use append fields such as `append_items`, `append_item_patterns`, `append_recipe_patterns`, `append_exclude_recipe_patterns`, `append_exclude_ingredient_patterns`, and `append_groups` when extending existing stream arrays. Direct field assignment remains available for intentional overrides.
 
+Profiles are applied from `settings.lua` as well as the data stage, so profile entries must stay declarative. Do not inspect `data.raw` from profiles; prototype-dependent compatibility belongs in `data-updates.lua` or `data-final-fixes.lua`.
+
 ## Diagnostics
 
 `mir-debug-generation-report` enables a structured log report. The report records generated and skipped streams/extensions with:
@@ -73,6 +75,8 @@ Profile patches should use append fields such as `append_items`, `append_item_pa
 
 Use this setting when triaging user reports. It is off by default to avoid noisy logs.
 
+`mir-debug-recipe-matches` logs matched recipe names per generated productivity stream. When either diagnostics setting is enabled, duplicate recipe matches across streams are also reported as non-blocking warnings.
+
 ## Validation
 
 Use `scripts/Invoke-MIRValidation.ps1 -StaticOnly` for static checks.
@@ -82,5 +86,7 @@ Use `scripts/Invoke-MIRValidation.ps1 -FactorioBin C:\path\to\factorio.exe` for 
 Use `scripts/Build-MIRPackage.ps1` to rebuild the release archive. Static validation checks the committed archive root, metadata, locale files, docs, and forbidden artifact paths.
 
 Static package validation also compares key packaged source files against the repository copy so a stale zip with correct metadata is rejected.
+
+Static validation also checks Factorio changelog formatting, including the required 99-dash section separators.
 
 The fixture mods under `fixtures/` test item-based science packs, custom labs, late recipe creation, and the post-MIR science-pack productivity assertion.

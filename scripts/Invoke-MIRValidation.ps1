@@ -87,6 +87,62 @@ Invoke-RepoCheck "locale files match English fallback" {
   & (Join-Path $repo "scripts\Test-MIRLocales.ps1") -AllowMissingSupportedLanguages
 }
 
+Invoke-RepoCheck "changelog uses Factorio changelog format" {
+  $separator = "-" * 99
+  $path = Join-Path $repo "changelog.txt"
+  $lines = @(Get-Content -LiteralPath $path -Encoding UTF8)
+  if ($lines.Count -eq 0) {
+    throw "changelog.txt is empty."
+  }
+  if ($lines[0] -ne $separator) {
+    throw "changelog.txt must start with exactly 99 dashes."
+  }
+
+  $sectionStart = $true
+  $expectVersion = $false
+  $seenCategory = $false
+  $lineNo = 0
+  foreach ($line in $lines) {
+    $lineNo++
+    if ($line -eq $separator) {
+      $sectionStart = $false
+      $expectVersion = $true
+      $seenCategory = $false
+      continue
+    }
+    if ($line -match '^\s*$') {
+      continue
+    }
+    if ($expectVersion) {
+      if ($line -notmatch '^Version: .+$') {
+        throw "changelog.txt:$lineNo expected a Version line after the separator."
+      }
+      $expectVersion = $false
+      $sectionStart = $true
+      continue
+    }
+    if ($sectionStart -and $line -match '^Date: \d{4}-\d{2}-\d{2}$') {
+      continue
+    }
+    if ($line -match '^  [^ ].+:$') {
+      $seenCategory = $true
+      $sectionStart = $false
+      continue
+    }
+    if ($line -match '^    - .+$') {
+      if (-not $seenCategory) {
+        throw "changelog.txt:$lineNo has an entry before any category."
+      }
+      continue
+    }
+    throw "changelog.txt:$lineNo is not valid Factorio changelog syntax: $line"
+  }
+
+  if ($expectVersion) {
+    throw "changelog.txt ended immediately after a separator."
+  }
+}
+
 Invoke-RepoCheck "release package archive matches metadata" {
   Add-Type -AssemblyName System.IO.Compression.FileSystem
 
@@ -139,6 +195,7 @@ Invoke-RepoCheck "release package archive matches metadata" {
       "${root}docs/compatibility.md",
       "${root}prototypes/tech-gen.lua",
       "${root}prototypes/base-tech-extensions.lua",
+      "${root}prototypes/compat/competing-base-extensions.lua",
       "${root}prototypes/streams/productivity.lua",
       "${root}prototypes/streams/direct-effects.lua",
       "${root}prototypes/lib/science-packs.lua",
@@ -192,7 +249,7 @@ Invoke-RepoCheck "release package archive matches metadata" {
       "prototypes/util.lua",
       "prototypes/tech-gen.lua",
       "prototypes/base-tech-extensions.lua",
-      "prototypes/compat-better-robots.lua",
+      "prototypes/compat/competing-base-extensions.lua",
       "prototypes/compat/competing-productivity.lua",
       "prototypes/compat/profiles.lua",
       "prototypes/streams/init.lua",

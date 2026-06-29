@@ -1,6 +1,6 @@
 # M.I.R. Roadmap
 
-Updated: 2026-06-29
+Updated: 2026-06-30
 
 This document is the v2.0.0 release checklist and follow-on roadmap. The baseline below reflects the current implementation state.
 
@@ -13,7 +13,7 @@ The critical interpretation is that "2.0" means the mod's v2.0.0 release, not a 
 - `info.json` declares mod version `2.0.0`, `factorio_version = "2.1"`, base `>= 2.1.8`, and optional Space Age `>= 2.1.8`; known compatibility mods are handled opportunistically without release metadata dependencies.
 - `data.lua` loads only stable shared configuration and utility facades.
 - `data-updates.lua` is reserved for pre-final compatibility hooks.
-- `data-final-fixes.lua` runs compatibility cleanup, generated technology creation, base technology extensions, weapon speed adjustments, max-level enforcement, and diagnostics flushing.
+- `data-final-fixes.lua` runs generated technology creation, competing recipe-productivity cleanup, competing base-extension cleanup, base technology extensions, weapon speed adjustments, max-level enforcement, and diagnostics flushing.
 - Science-pack handling is based on item prototype lookup plus active lab inputs, not `data.raw.tool`.
 - Science-pack productivity dynamically adds active lab inputs to the target item list, so custom science packs can receive productivity effects when their recipes are visible.
 - Generated technology ingredients are validated against complete lab input sets and reduced or skipped instead of creating unresearchable technologies.
@@ -95,9 +95,9 @@ require("prototypes.util")
 
 ```lua
 -- data-final-fixes.lua
-require("prototypes.compat-better-robots")
-require("prototypes.compat.competing-productivity").apply()
 require("prototypes.tech-gen")
+require("prototypes.compat.competing-productivity").apply()
+require("prototypes.compat.competing-base-extensions").apply()
 require("prototypes.base-tech-extensions")
 require("prototypes.weapon-speed-adjustments")
 require("prototypes.max-level-control")
@@ -410,8 +410,8 @@ After v2.0.0 is stable, expand in deliberately separated tracks.
 
 - Add compatibility profiles for major overhaul mods.
 - Keep compatibility metadata dependencies out of release metadata unless a specific future integration proves impossible to handle safely without ordering.
-- Add diagnostics that can log why each stream did or did not generate.
-- Add a debug setting to print recipe matches per stream.
+- Keep expanding diagnostics that log why each stream did or did not generate.
+- Use the recipe-match debug setting when triaging modded recipe coverage.
 - Add a recipe metadata cache for large overhaul packs if recipe matching becomes a measurable data-stage cost.
 
 ### v2.2: Balance and progression
@@ -454,8 +454,9 @@ Phases 1 through 8 are implemented for v2.0.0:
 - Science-pack detection uses item/lab-input discovery.
 - Science-pack productivity expands from active lab inputs instead of only the hard-coded vanilla and Space Age pack list.
 - Lab ingredient combinations are validated before technology creation.
+- Lab incompatibility handling is configurable between `reduce` and `skip`.
 - Generation runs in `data-final-fixes.lua`.
-- Recipe category matching, Space Age guards, icon overlays, player-facing settings, locale warnings, docs, fixtures, and packaging scripts are present.
+- Recipe category matching, recipe-match diagnostics, duplicate recipe match warnings, Space Age guards, icon overlays, player-facing settings, locale warnings, docs, fixtures, CI static validation, and packaging scripts are present.
 - The local static validation suite, package validation, locale validation, and Factorio runtime fixture load check are available and have been used during the release-candidate hardening pass.
 
 The remaining release gate before publishing is the broader manual mod matrix: base game, Space Age, Space Age without Quality, forced-enabled cargo landing pad count, selected compatibility mods, and an existing-save upgrade from the latest 1.x release.

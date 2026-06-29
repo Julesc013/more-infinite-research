@@ -45,7 +45,17 @@ return {
       "production-science-pack","military-science-pack","agricultural-science-pack"
     },
     direct_effects = {
-      { type = "gun-speed", ammo_category = "rocket", modifier = 0.1 },
+      { type = "gun-speed", ammo_category = "rocket", modifier = 0.1 }
+    }
+  },
+
+  research_cannon_shooting_speed = {
+    icon_item = "cannon-shell",
+    science_packs = {
+      "automation-science-pack","logistic-science-pack","chemical-science-pack",
+      "production-science-pack","military-science-pack","agricultural-science-pack"
+    },
+    direct_effects = {
       { type = "gun-speed", ammo_category = "cannon-shell", modifier = 0.1 }
     }
   },

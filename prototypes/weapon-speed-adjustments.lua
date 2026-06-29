@@ -5,7 +5,7 @@ local function startup_setting(name)
 end
 
 local function strip_categories_for_mode()
-  local mode = startup_setting("mir-adjust-vanilla-weapon-speed-techs") or "only-when-dedicated-tech-enabled"
+  local mode = startup_setting("mir-adjust-vanilla-weapon-speed-techs") or "off"
   if mode == "off" then return {} end
 
   if mode == "always" then
@@ -16,10 +16,16 @@ local function strip_categories_for_mode()
   end
 
   local out = {}
-  local tech = (data.raw.technology or {})["recipe-prod-research_rocket_shooting_speed-1"]
-  for _, effect in ipairs((tech and tech.effects) or {}) do
-    if effect.type == "gun-speed" and effect.ammo_category then
-      out[effect.ammo_category] = true
+  local tech_names = {
+    "recipe-prod-research_rocket_shooting_speed-1",
+    "recipe-prod-research_cannon_shooting_speed-1"
+  }
+  for _, tech_name in ipairs(tech_names) do
+    local tech = (data.raw.technology or {})[tech_name]
+    for _, effect in ipairs((tech and tech.effects) or {}) do
+      if effect.type == "gun-speed" and effect.ammo_category then
+        out[effect.ammo_category] = true
+      end
     end
   end
   return out

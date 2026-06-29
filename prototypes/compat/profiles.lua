@@ -54,6 +54,10 @@ local PROFILES = {
   -- This table is intentionally small for now. It gives future compatibility
   -- work a stable place for mod-specific stream patches without bloating the
   -- base stream definitions.
+  --
+  -- Profiles are applied from settings.lua as well as data stage. Keep profile
+  -- patches declarative and do not inspect data.raw here. Prototype-dependent
+  -- compatibility belongs in data-updates.lua or data-final-fixes.lua.
 }
 
 function P.apply(config)

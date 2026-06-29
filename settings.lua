@@ -63,7 +63,7 @@ table.insert(settings_data, {
   type = "string-setting",
   name = "mir-adjust-vanilla-weapon-speed-techs",
   setting_type = "startup",
-  default_value = "only-when-dedicated-tech-enabled",
+  default_value = "off",
   allowed_values = {"off", "only-when-dedicated-tech-enabled", "always"},
   order = "a-02",
   localised_name = {"mod-setting-name.mir-adjust-vanilla-weapon-speed-techs"},
@@ -78,6 +78,27 @@ table.insert(settings_data, {
   order = "a-03",
   localised_name = {"mod-setting-name.mir-debug-generation-report"},
   localised_description = {"mod-setting-description.mir-debug-generation-report"}
+})
+
+table.insert(settings_data, {
+  type = "bool-setting",
+  name = "mir-debug-recipe-matches",
+  setting_type = "startup",
+  default_value = false,
+  order = "a-04",
+  localised_name = {"mod-setting-name.mir-debug-recipe-matches"},
+  localised_description = {"mod-setting-description.mir-debug-recipe-matches"}
+})
+
+table.insert(settings_data, {
+  type = "string-setting",
+  name = "mir-lab-incompatibility-policy",
+  setting_type = "startup",
+  default_value = "reduce",
+  allowed_values = {"reduce", "skip"},
+  order = "a-05",
+  localised_name = {"mod-setting-name.mir-lab-incompatibility-policy"},
+  localised_description = {"mod-setting-description.mir-lab-incompatibility-policy"}
 })
 
 local stream_order = {
@@ -124,6 +145,7 @@ local stream_order = {
   "research_electric_energy",
   "research_science_pack_productivity",
   "research_rocket_shooting_speed",
+  "research_cannon_shooting_speed",
   "research_flamethrower_shooting_speed",
   "research_electric_shooting_speed",
   "research_character_mining_speed",

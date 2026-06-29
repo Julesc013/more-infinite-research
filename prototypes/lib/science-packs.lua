@@ -27,7 +27,8 @@ local EXTENSION_PACKS = {
   ["laser-shooting-speed"] = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack", "military-science-pack", "space-science-pack"},
   research_electric_shooting_speed = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack", "military-science-pack", "electromagnetic-science-pack"},
   research_flamethrower_shooting_speed = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack", "military-science-pack", "space-science-pack"},
-  research_rocket_shooting_speed = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack", "military-science-pack", "agricultural-science-pack"}
+  research_rocket_shooting_speed = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack", "military-science-pack", "agricultural-science-pack"},
+  research_cannon_shooting_speed = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack", "military-science-pack", "agricultural-science-pack"}
 }
 
 local lab_inputs_cache = nil
@@ -42,6 +43,18 @@ end
 local function ingredient_amount(ingredient)
   if not ingredient or type(ingredient) == "string" then return 1 end
   return ingredient.amount or ingredient[2] or 1
+end
+
+local function startup_setting(name)
+  local s = settings and settings.startup and settings.startup[name]
+  if s then return s.value end
+  return nil
+end
+
+local function lab_incompatibility_policy()
+  local value = startup_setting("mir-lab-incompatibility-policy")
+  if value == "skip" then return "skip" end
+  return "reduce"
 end
 
 function S.all_lab_inputs()
@@ -102,6 +115,10 @@ function S.best_lab_compatible_ingredients(ingredients, context)
   local source = deepcopy(ingredients or {})
   if #source == 0 then return nil, "empty" end
   if S.valid_research_ingredients(source) then return source, "full" end
+  if lab_incompatibility_policy() == "skip" then
+    log("[more-infinite-research] Skipping " .. tostring(context or "unknown technology") .. " because no lab accepts the full selected science-pack set and the lab incompatibility policy is skip.")
+    return nil, "invalid"
+  end
 
   -- Some mods add separate labs with disjoint inputs. Prefer a deterministic
   -- subset over creating a technology no available lab can research.

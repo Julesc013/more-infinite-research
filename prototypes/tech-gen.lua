@@ -120,25 +120,26 @@ local function available_direct_effects(key, effects)
 end
 
 local function make_stream(key, raw_spec)
-  local spec = expand_dynamic_items(raw_spec)
-  if not U.enabled_for(key, spec) then
-    D.stream(D.stream_fields(key, spec, "skipped", "disabled"))
+  if not U.enabled_for(key, raw_spec) then
+    D.stream(D.stream_fields(key, raw_spec, "skipped", "disabled"))
     return
   end
-  if spec.hide_in_space_age and U.is_space_age() then
-    D.stream(D.stream_fields(key, spec, "skipped", "hidden_in_space_age"))
+  if raw_spec.hide_in_space_age and U.is_space_age() then
+    D.stream(D.stream_fields(key, raw_spec, "skipped", "hidden_in_space_age"))
     return
   end
-  if spec.requires_space_age and not U.is_space_age() then
-    D.stream(D.stream_fields(key, spec, "skipped", "requires_space_age"))
+  if raw_spec.requires_space_age and not U.is_space_age() then
+    D.stream(D.stream_fields(key, raw_spec, "skipped", "requires_space_age"))
     return
   end
-  local missing = missing_requirement(key, spec)
+  local missing = missing_requirement(key, raw_spec)
   if missing then
     log("[more-infinite-research] Skipping stream "..key.." because "..missing..".")
-    D.stream(D.stream_fields(key, spec, "skipped", missing))
+    D.stream(D.stream_fields(key, raw_spec, "skipped", missing))
     return
   end
+
+  local spec = expand_dynamic_items(raw_spec)
 
   local base_cost = U.base_cost_for(key, spec)
   local growth_factor = U.growth_factor_for(key, spec)
@@ -195,10 +196,12 @@ local function make_stream(key, raw_spec)
   end
 
   local buckets = U.recipes_for_stream(spec)
+  D.recipe_matches(key, buckets)
   local effects = {}
   for _,b in ipairs(buckets) do
     for _,r in ipairs(b.recipes) do
       table.insert(effects, { type="change-recipe-productivity", recipe=r, change=b.change or C.shared.per_level_default })
+      D.record_recipe_match(key, r)
     end
   end
   if #effects == 0 then

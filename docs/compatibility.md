@@ -9,7 +9,7 @@ The release goal is graceful compatibility without mod-page dependency clutter: 
 - Generated technologies are created in `data-final-fixes.lua` so the mod can see most recipes, items, labs, science packs, and technologies created by other mods.
 - Science packs are discovered from `data.raw.lab[*].inputs` and resolved through generic item prototype lookup.
 - Science-pack productivity starts with the vanilla and Space Age target list, then appends active lab inputs so custom science packs can receive productivity effects when their recipes are visible.
-- A generated technology must have at least one lab that accepts its complete science-pack set. If no lab accepts the full set, the mod tries the largest deterministic lab-compatible subset. If no subset exists, the stream is skipped and logged.
+- A generated technology must have at least one lab that accepts its complete science-pack set. If no lab accepts the full set, `mir-lab-incompatibility-policy` controls whether the mod tries the largest deterministic lab-compatible subset (`reduce`, default) or skips the technology (`skip`). If no subset exists, the stream is skipped and logged.
 - Recipe matching supports both `recipe.category` and Factorio 2.1 `recipe.categories`.
 - Hidden recipes and recycling recipes are skipped by default. Streams can opt in with `include_hidden` or `include_recycling`.
 - Optional Space Age streams must either set `requires_space_age = true` or declare concrete required prototypes.
@@ -19,13 +19,14 @@ The release goal is graceful compatibility without mod-page dependency clutter: 
 - Compatibility cleanup that removes known competing technologies also removes dangling prerequisite references from remaining technologies.
 - Release metadata intentionally avoids compatibility-mod dependencies beyond optional Space Age. Compatibility is opportunistic and based on the prototypes visible when this mod reaches `data-final-fixes.lua`.
 - `mir-debug-generation-report` can be enabled to capture why each stream or base extension generated or skipped.
+- `mir-debug-recipe-matches` can be enabled to capture matched recipe names per stream and duplicate recipe matches across streams.
 
 ## Opportunistic Integrations
 
 These integrations do not add mod-page dependencies. More Infinite Research handles them when their prototypes are already visible, and skips safely when they are absent:
 
 - Advanced Solar HR (`Advanced-Electric-Revamped-v16`): advanced, elite, and ultimate solar panel/accumulator recipes are covered by the electric energy productivity tiers.
-- Better Robots Extended (`Better_Robots_Extended`): competing infinite worker robot storage research is removed when `mir-prefer-this-mod-for-competing-techs` is enabled.
+- Better Robots Extended (`Better_Robots_Extended`): competing infinite worker robot storage research is removed when `mir-prefer-this-mod-for-competing-techs` is enabled and MIR's `worker-robots-storage` base extension is enabled.
 - OCs Ammo and Armor (`OCs_ammo_casting`): foundry, biochamber, and electromagnetic plant recipes that output covered ammunition, explosive, or armor component items are picked up by the existing output-based streams.
 - OCs Stone Casting (`OCs_stone_casting`): foundry recipes that output covered stone, landfill, brick, wall, concrete, refined concrete, foundation, rail, gate, or furnace items are picked up by the existing output-based streams.
 - Fluid Quality Imprinting (`fluid-quality-imprinting`): quality-imprinting recipes that output covered plate and intermediate items are picked up by the existing output-based streams.
@@ -139,6 +140,7 @@ Expected result: custom item-based science packs that are active lab inputs and 
 - Run `rg "data.raw.tool|tool_exists|has_tool|PACKS_ALL" prototypes` and confirm no old science-pack authority remains.
 - Run `rg "icon_mipmaps" prototypes` and confirm generated icons do not add it.
 - Run `.\scripts\Invoke-MIRValidation.ps1 -StaticOnly`.
+- Confirm `changelog.txt` uses Factorio's strict changelog format with 99-dash section separators.
 - Confirm `info.json` declares only `base >= 2.1.8` and optional `space-age >= 2.1.8` dependencies.
 - Confirm package validation reports the expected root, matching metadata, included locale/docs, and no forbidden artifacts.
 - Load Factorio with the manual matrix above.

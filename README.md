@@ -39,9 +39,9 @@ dist/more-infinite-research_2.0.0.zip
 
 More Infinite Research generates prototypes in `data-final-fixes.lua`:
 
-1. Better Robots competing-tech cleanup.
-2. Generated stream technology creation.
-3. Known competing recipe-productivity cleanup based on actual generated MIR effects.
+1. Generated stream technology creation.
+2. Known competing recipe-productivity cleanup based on actual generated MIR effects.
+3. Known competing base-extension cleanup when MIR's matching base extension is enabled.
 4. Base technology infinite extensions.
 5. Optional vanilla weapon shooting speed adjustment.
 6. Max-level enforcement.
@@ -85,7 +85,7 @@ Factorio 2.1 changed science packs to ordinary item prototypes. MIR therefore tr
 - It appends modded lab inputs alphabetically.
 - It validates the final ingredient set against real lab input sets.
 
-If no lab accepts the full selected science-pack set, MIR chooses the largest deterministic lab-compatible subset. If no valid subset exists, it skips the generated technology and logs the reason.
+If no lab accepts the full selected science-pack set, MIR follows `mir-lab-incompatibility-policy`. The default `reduce` mode chooses the largest deterministic lab-compatible subset. The `skip` mode skips the technology instead. If no valid subset exists, it skips the generated technology and logs the reason.
 
 The `ips-require-space-gate` setting also adds progression prerequisites:
 
@@ -167,7 +167,8 @@ These streams generate infinite technologies with direct Factorio technology mod
 | --- | --- | --- | --- | --- |
 | `research_cargo_bay_unloading_distance` | Cargo bay unloading distance | `max-cargo-bay-unloading-distance` | `+10` tiles per level | Requires Space Age, `landing-pad-unloading-bay` item, and `landing-pad-unloading-bay` technology. Uses all active lab science packs. Base cost `100000`, growth `3`. |
 | `research_cargo_landing_pad_count` | Cargo landing pad count | `cargo-landing-pad-count` | `+1` landing pad per surface per level | Requires Space Age and `cargo-landing-pad`. Disabled by default. Uses all active lab science packs. Base cost `1000000`, growth `10`. |
-| `research_rocket_shooting_speed` | Rocket shooting speed | `gun-speed` for `rocket` and `cannon-shell` ammo categories | `+10%` speed per level | Base cost `60`, growth `1.5`. Uses a base-game rocketry icon. |
+| `research_rocket_shooting_speed` | Rocket shooting speed | `gun-speed` for `rocket` ammo category | `+10%` speed per level | Base cost `60`, growth `1.5`. Uses a base-game rocketry icon. |
+| `research_cannon_shooting_speed` | Cannon shooting speed | `gun-speed` for `cannon-shell` ammo category | `+10%` speed per level | Base cost `60`, growth `1.5`. Uses the cannon shell item icon. |
 | `research_flamethrower_shooting_speed` | Flamethrower shooting speed | `gun-speed` for `flamethrower` | `+10%` speed per level | Base cost `60`, growth `1.5`. |
 | `research_electric_shooting_speed` | Electric shooting speed | `gun-speed` for `electric` | `+10%` speed per level | Requires Space Age, `tesla-weapons` technology, and the `electric` ammo category. Base cost `60`, growth `1.5`. |
 | `research_character_mining_speed` | Character mining speed | `character-mining-speed` | `+5%` per level | Uses utility, military, agricultural, and electromagnetic science when available. |
@@ -200,9 +201,11 @@ All settings are startup settings.
 | Setting | Type | Default | Description |
 | --- | --- | --- | --- |
 | `ips-require-space-gate` | bool | `true` | Adds a late-game prerequisite gate using promethium science in Space Age or space science in base game when available. |
-| `mir-prefer-this-mod-for-competing-techs` | bool | `true` | Lets MIR remove selected competing infinite technologies when MIR has generated actual replacement effects. Disable to keep competing technologies from other mods. |
-| `mir-adjust-vanilla-weapon-speed-techs` | string | `only-when-dedicated-tech-enabled` | Controls whether MIR removes rocket and cannon-shell speed bonuses from vanilla weapon shooting speed technologies. Allowed values: `off`, `only-when-dedicated-tech-enabled`, `always`. |
+| `mir-prefer-this-mod-for-competing-techs` | bool | `true` | Lets MIR remove selected competing infinite technologies when MIR has generated or will generate matching replacement behavior. Disable to keep competing technologies from other mods. |
+| `mir-adjust-vanilla-weapon-speed-techs` | string | `off` | Controls whether MIR removes rocket and cannon-shell speed bonuses from vanilla weapon shooting speed technologies. Allowed values: `off`, `only-when-dedicated-tech-enabled`, `always`. |
 | `mir-debug-generation-report` | bool | `false` | Writes structured generated/skipped rows to the Factorio log, including science packs, prerequisites, effect counts, lab compatibility, and icon source. |
+| `mir-debug-recipe-matches` | bool | `false` | Writes matched recipe names for each generated productivity stream. Useful for mod compatibility reports, but noisy in large mod packs. |
+| `mir-lab-incompatibility-policy` | string | `reduce` | Controls incompatible science-pack selections. `reduce` uses the largest lab-compatible subset; `skip` skips the technology. |
 
 ### Per-Stream Settings
 
@@ -229,6 +232,7 @@ Per-stream default exceptions:
 | `research_science_pack_productivity` | Yes | shared | shared | `120` | Infinite |
 | `research_character_reach` | No | shared | shared | shared | Infinite |
 | `research_rocket_shooting_speed` | Yes | `60` | `1.5` | shared | Infinite |
+| `research_cannon_shooting_speed` | Yes | `60` | `1.5` | shared | Infinite |
 | `research_flamethrower_shooting_speed` | Yes | `60` | `1.5` | shared | Infinite |
 | `research_electric_shooting_speed` | Yes | `60` | `1.5` | shared | Infinite |
 
@@ -266,7 +270,7 @@ These are handled when their prototypes are visible:
 | Mod | Integration |
 | --- | --- |
 | Advanced Solar HR (`Advanced-Electric-Revamped-v16`) | Advanced, elite, and ultimate solar/accumulator recipes are covered by electric energy productivity tiers. |
-| Better Robots Extended (`Better_Robots_Extended`) | Competing worker robot storage infinite research is removed when MIR preference is enabled. |
+| Better Robots Extended (`Better_Robots_Extended`) | Competing worker robot storage infinite research is removed when MIR preference is enabled and MIR's `worker-robots-storage` base extension is enabled. |
 | OCs Ammo and Armor (`OCs_ammo_casting`) | Covered ammunition, explosive, and armor component outputs are picked up by output and pattern matching. |
 | OCs Stone Casting (`OCs_stone_casting`) | Covered stone, brick, wall, concrete, landfill, foundation, rail, gate, and furnace outputs are picked up by output matching. |
 | Fluid Quality Imprinting (`fluid-quality-imprinting`) | Covered plate and intermediate outputs are picked up when the recipes output standard items. |
@@ -307,6 +311,7 @@ These are handled when their prototypes are visible:
 | `prototypes/lib/technology-cleanup.lua` | Removes technologies and cleans prerequisite references from remaining technologies. |
 | `prototypes/compat/profiles.lua` | Mod-specific stream patch scaffolding. |
 | `prototypes/compat/competing-productivity.lua` | Known competing recipe-productivity cleanup. |
+| `prototypes/compat/competing-base-extensions.lua` | Known competing base-extension cleanup. |
 
 ### Stream Schema
 
@@ -360,6 +365,14 @@ Enable `mir-debug-generation-report` to log rows like:
 
 Use diagnostics when reporting compatibility issues. It tells whether a stream generated, skipped, reduced science packs, or found no matching recipes.
 
+Enable `mir-debug-recipe-matches` to log matched recipe rows like:
+
+```text
+[more-infinite-research] matches key=research_belts change=0.01 recipes=turbo-transport-belt,turbo-underground-belt,turbo-splitter
+```
+
+When either diagnostics setting is enabled, MIR also reports duplicate recipe matches across streams as warnings in the log. These reports do not block generation; they are for compatibility triage.
+
 ## Validation and Release Workflow
 
 Static validation:
@@ -388,6 +401,7 @@ The validation script checks:
 - No old `data.raw.tool` science-pack authority remains.
 - Generated icons do not use `icon_mipmaps`.
 - Locale files match the English fallback.
+- `changelog.txt` uses Factorio's 99-dash changelog section format.
 - The committed release zip has the expected root, metadata, required files, and no forbidden artifacts.
 - Key packaged source files match the repository copy, so stale release zips with correct metadata are rejected.
 - `git diff --check` passes.
@@ -400,6 +414,7 @@ The validation script checks:
 - `docs/architecture.md`: data-stage flow, utility modules, stream config, compatibility profiles, diagnostics, and validation.
 - `docs/compatibility.md`: compatibility model, known integrations, manual test matrix, fixture designs, and release checklist.
 - `docs/roadmap.md`: v2.0.0 implementation baseline and longer-term v2.x roadmap.
+- `docs/test-results.md`: local release-candidate validation evidence.
 - `changelog.txt`: release history and user-facing changes.
 
 ## Troubleshooting
@@ -413,10 +428,11 @@ If a technology is missing:
 
 If a recipe did not receive productivity:
 
-1. Confirm the recipe outputs one of the stream's exact items or matches one of its patterns.
-2. Confirm the recipe is not hidden or recycling unless the stream opts in.
-3. Confirm the recipe exists before MIR reaches `data-final-fixes.lua`.
-4. Confirm another mod did not mutate the recipe after MIR scanned.
+1. Enable `mir-debug-recipe-matches` and inspect the stream's matched recipe list.
+2. Confirm the recipe outputs one of the stream's exact items or matches one of its patterns.
+3. Confirm the recipe is not hidden or recycling unless the stream opts in.
+4. Confirm the recipe exists before MIR reaches `data-final-fixes.lua`.
+5. Confirm another mod did not mutate the recipe after MIR scanned.
 
 If a generated technology is unresearchable:
 
