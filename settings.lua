@@ -133,7 +133,8 @@ local stream_order = {
   "research_character_trash_slots",
   "research_inventory_capacity",
   "research_robot_battery",
-  "research_cargo_bay_unloading_distance"
+  "research_cargo_bay_unloading_distance",
+  "research_cargo_landing_pad_count"
 }
 
 local known = {}

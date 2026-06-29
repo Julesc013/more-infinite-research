@@ -11,6 +11,7 @@ More Infinite Research v2.0.0 targets Factorio 2.1 and uses a compatibility-firs
 - Hidden recipes and recycling recipes are skipped by default. Streams can opt in with `include_hidden` or `include_recycling`.
 - Optional Space Age streams must either set `requires_space_age = true` or declare concrete required prototypes.
 - Space Age cargo bay unloading distance research uses Factorio 2.1.8's `max-cargo-bay-unloading-distance` technology modifier and is skipped without Space Age or the `landing-pad-unloading-bay` prototypes.
+- Space Age cargo landing pad count research uses `cargo-landing-pad-count`, is disabled by default, and is skipped without Space Age or the `cargo-landing-pad` prototype.
 - Mod-specific stream changes should live in `prototypes/compat/profiles.lua` instead of the base stream definitions.
 - `mir-debug-generation-report` can be enabled to capture why each stream or base extension generated or skipped.
 
@@ -40,7 +41,7 @@ Run each case from a clean Factorio user data directory or with a controlled mod
 
 1. Base game only.
 2. Space Age enabled.
-3. Space Age 2.1.8+ enabled, verifying cargo bay unloading distance research appears after the landing pad unloading bay unlock.
+3. Space Age 2.1.8+ enabled, verifying cargo bay unloading distance research appears after the landing pad unloading bay unlock and cargo landing pad count remains disabled by default.
 4. Space Age enabled with Quality disabled.
 5. Better Robots Extended enabled.
 6. A fixture mod that adds a science pack as an ordinary `item` and adds it to a lab.

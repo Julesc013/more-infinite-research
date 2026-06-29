@@ -32,10 +32,26 @@ end
 
 local function ldesc(spec)
   if spec.localised_description then return spec.localised_description end
+  if spec.description_locale_key then return { spec.description_locale_key } end
   if spec.direct_effects then
     return {"technology-description.more-infinite-research.direct_effect"}
   end
   return {"technology-description.more-infinite-research.recipe_productivity"}
+end
+
+local function append_prereq_unique(prerequisites, tech_name)
+  if not tech_name then return end
+  if not U.technology_exists(tech_name) then return end
+  for _, existing in ipairs(prerequisites or {}) do
+    if existing == tech_name then return end
+  end
+  table.insert(prerequisites, tech_name)
+end
+
+local function append_spec_prereqs(prerequisites, spec)
+  for _, tech_name in ipairs((spec and spec.required_technologies) or {}) do
+    append_prereq_unique(prerequisites, tech_name)
+  end
 end
 
 local function missing_requirement(key, spec)
@@ -122,6 +138,7 @@ local function make_stream(key, spec)
 
   if direct_effects and #direct_effects > 0 then
     local prerequisites = U.build_prereqs_for(key, ingredients)
+    append_spec_prereqs(prerequisites, spec)
     local t = {
       type = "technology",
       name = "recipe-prod-"..key.."-1",
@@ -159,6 +176,7 @@ local function make_stream(key, spec)
   end
 
   local prerequisites = U.build_prereqs_for(key, ingredients)
+  append_spec_prereqs(prerequisites, spec)
   local t = {
     type = "technology",
     name = "recipe-prod-"..key.."-1",

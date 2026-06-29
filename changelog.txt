@@ -6,6 +6,7 @@ Date: 2026-06-30
 
     - Updated the mod for Factorio 2.1.
     - Added Space Age cargo bay unloading distance infinite research for the Factorio 2.1 landing pad unloading bay. Each level adds 10 tiles by default, requires the vanilla unloading bay unlock, uses all available science packs, and has configurable enable, cost, growth, max-level, and research-time startup settings.
+    - Added Space Age cargo landing pad count infinite research as a disabled-by-default sandbox option. Each level adds one additional cargo landing pad per surface by default, uses all available science packs, and starts at a deliberately expensive 1,000,000 research units with 10x growth.
     - Added local fixture mods and a PowerShell validation runner for static checks and optional Factorio runtime load checks.
     - Added a startup-controlled generation diagnostics report for generated and skipped streams and base extensions.
     - Reworked generated research compatibility for Factorio 2.1 by discovering science packs from active lab inputs instead of assuming science packs are tool prototypes.
@@ -24,6 +25,10 @@ Date: 2026-06-30
     - Science-pack productivity can use science pack item icons through item fallback lookup.
     - Recipe matching now skips hidden recipes and recycling recipes by default unless a stream opts in.
     - Generated recipe effect order is now deterministic.
+    - Reworked base-tech extension science packs to inherit from the last vanilla level by default and then add only the intended extra packs.
+    - Added science-pack prerequisite repair for generated base-tech extensions so added packs also add their unlock prerequisites.
+    - Added detection for equivalent existing infinite base-tech extensions so duplicate infinite continuations are skipped instead of generated again.
+    - Added logic to keep another mod's competing infinite continuation when the preference setting is disabled.
     - Split the prototype utility facade into focused modules for lookup, science-pack validation, recipe matching, icon construction, and deepcopy.
     - Split stream definitions into productivity and direct-effect domain modules.
     - Added compatibility profile scaffolding for future mod-specific stream patches.
@@ -31,6 +36,9 @@ Date: 2026-06-30
   Compatibility:
 
     - Raised the base dependency to Factorio 2.1.8 or newer because cargo bay unloading distance uses the 2.1.8 technology modifier API.
+    - Added a Space Age dependency floor of 2.1.8 or newer for the same cargo bay technology modifier surface.
+    - Added optional Better Robots Extended compatibility and cleanup for competing worker robot storage infinite extensions.
+    - Changed worker robot storage extension science packs toward utility and electromagnetic science in Space Age contexts.
     - Added optional load-order dependencies for Advanced Solar HR, OCs Ammo and Armor, OCs Stone Casting, Fluid Quality Imprinting, and Plates n Circuit Productivity so their late recipe or technology changes are visible before this mod generates research.
     - Added explicit bio-explosives matching for OCs Ammo and Armor's biochamber explosives recipes.
     - Made Space Age turbo belt, underground belt, and splitter productivity coverage explicit at the 1% tier.
@@ -42,7 +50,7 @@ Date: 2026-06-30
   Localization:
 
     - Replaced placeholder localization text in German, Spanish, French, Italian, Polish, Brazilian Portuguese, and Simplified Chinese.
-    - Updated Russian localization coverage and terminology to match the current English locale keys.
+    - Updated Russian localization coverage and terminology to match the current English locale keys, including community-provided improvements from the unreleased pre-2.0 history.
     - Moved Spanish localization to Factorio's supported es-ES locale code.
     - Removed empty placeholder locale folders so only complete locale packs are shipped.
     - Added locale validation tooling and maintenance notes to keep translated files synchronized with the English fallback.
@@ -56,31 +64,6 @@ Date: 2026-06-30
 
     - No existing prototype IDs were renamed. No migration is required.
 
----------------------------------------------------------------------------------------------------
-Version: 1.2.10
-Date: 2026-06-28
-
-  Features:
-
-    - Updated metadata for Factorio 2.1 compatibility before the larger 2.0.0 rework.
-    - Added optional Better Robots Extended compatibility.
-    - Added `mir-prefer-this-mod-for-competing-techs`, allowing players to choose whether More Infinite Research removes selected competing infinite technologies from other mods.
-
-  Compatibility:
-
-    - Added an optional dependency on Better Robots Extended.
-    - Added compatibility cleanup that removes competing Better Robots Extended worker robot storage infinite extensions when this mod is preferred.
-    - Added detection for equivalent existing infinite base-tech extensions so duplicate infinite continuations are skipped instead of generated again.
-    - Added logic to keep another mod's competing infinite continuation when the preference setting is disabled.
-
-  Changes:
-
-    - Reworked base-tech extension science packs to inherit from the last vanilla level by default and then add only the intended extra packs.
-    - Added science-pack prerequisite repair for generated base-tech extensions so added packs also add their unlock prerequisites.
-    - Changed worker robot storage extension science packs toward utility and electromagnetic science in Space Age contexts.
-    - Updated Russian localization through community contribution.
-
----------------------------------------------------------------------------------------------------
 Version: 1.2.9
 Date: 2025-10-30
 

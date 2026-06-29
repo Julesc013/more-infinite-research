@@ -65,6 +65,7 @@ local function overlay_for_stream(stream)
       or t == "character-logistic-trash-slots"
       or t == "worker-robot-battery" then return "capacity" end
     if t == "max-cargo-bay-unloading-distance" then return "range" end
+    if t == "cargo-landing-pad-count" then return "count" end
     if t == "gun-speed" or t == "character-crafting-speed" then return "speed" end
     if t == "braking-force" then return "braking-force" end
     if t == "ammo-damage" or t == "turret-attack" then return "damage" end

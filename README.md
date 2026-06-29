@@ -8,6 +8,8 @@ Recipe productivity researches are intentionally infinite, but Factorio's maximu
 
 Each generated technology can be individually disabled, cost curves can be tuned per stream, and some technologies have been disabled by default.
 
+Space Age bonus streams include cargo bay unloading distance, enabled by default, and extra cargo landing pad count, disabled by default as a sandbox-style option.
+
 This mod was created to make megabasing easier on lower-end hardware while staying compatible with broad modded playthroughs.
 
 Unknown mods that mutate recipes or labs later than this mod in `data-final-fixes.lua` may still need explicit load-order compatibility.

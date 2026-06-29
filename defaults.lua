@@ -18,6 +18,13 @@ local defaults = {
       research_time = 60,
       max_level = 0
     },
+    research_cargo_landing_pad_count = {
+      enabled = false,
+      base_cost = 1000000,
+      growth_factor = 10,
+      research_time = 60,
+      max_level = 0
+    },
     research_science_pack_productivity = { research_time = 120 },
     research_character_reach = { enabled = false },
     research_rocket_shooting_speed = {

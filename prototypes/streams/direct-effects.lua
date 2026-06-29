@@ -26,6 +26,18 @@ return {
     }
   },
 
+  research_cargo_landing_pad_count = {
+    requires_space_age = true,
+    required_items = {"cargo-landing-pad"},
+    icon_item = "cargo-landing-pad",
+    overlay = "count",
+    localised_description = {"technology-description.more-infinite-research.cargo_landing_pad_count"},
+    science_packs = "all",
+    direct_effects = {
+      { type = "cargo-landing-pad-count", modifier = 1 }
+    }
+  },
+
   research_rocket_shooting_speed = {
     icon_tech = "rocket-turret",
     science_packs = {
