@@ -38,9 +38,10 @@ Date: 2026-06-30
 
     - Raised the base dependency to Factorio 2.1.8 or newer because cargo bay unloading distance uses the 2.1.8 technology modifier API.
     - Added a Space Age dependency floor of 2.1.8 or newer for the same cargo bay technology modifier surface.
+    - Kept compatibility-mod dependencies out of release metadata so the mod page stays clean; known integrations are handled opportunistically from visible prototypes and safe skip checks.
     - Added optional Better Robots Extended compatibility and cleanup for competing worker robot storage infinite extensions.
     - Changed worker robot storage extension science packs toward utility and electromagnetic science in Space Age contexts.
-    - Added optional load-order dependencies for Advanced Solar HR, OCs Ammo and Armor, OCs Stone Casting, Fluid Quality Imprinting, and Plates n Circuit Productivity so their late recipe or technology changes are visible before this mod generates research.
+    - Added opportunistic compatibility coverage for Advanced Solar HR, OCs Ammo and Armor, OCs Stone Casting, Fluid Quality Imprinting, and Plates n Circuit Productivity without declaring those mods as dependencies.
     - Added explicit bio-explosives matching for OCs Ammo and Armor's biochamber explosives recipes.
     - Made Space Age turbo belt, underground belt, and splitter productivity coverage explicit at the 1% tier.
     - Removed selected competing productivity technologies when this mod is configured to prefer its own generated versions.
@@ -57,6 +58,7 @@ Date: 2026-06-30
     - Moved Spanish localization to Factorio's supported es-ES locale code.
     - Removed empty placeholder locale folders so only complete locale packs are shipped.
     - Added locale validation tooling and maintenance notes to keep translated files synchronized with the English fallback.
+    - Added validation checks for the no-compatibility-mod-dependencies release policy, locale synchronization, and Factorio runtime exit codes.
 
   Documentation:
 

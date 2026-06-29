@@ -10,7 +10,7 @@ The critical interpretation is that "2.0" means the mod's v2.0.0 release, not a 
 
 ## Current Repository Baseline
 
-- `info.json` declares mod version `2.0.0`, `factorio_version = "2.1"`, and optional dependencies for Space Age and known compatibility targets.
+- `info.json` declares mod version `2.0.0`, `factorio_version = "2.1"`, base `>= 2.1.8`, and optional Space Age `>= 2.1.8`; known compatibility mods are handled opportunistically without release metadata dependencies.
 - `data.lua` loads only stable shared configuration and utility facades.
 - `data-updates.lua` is reserved for pre-final compatibility hooks.
 - `data-final-fixes.lua` runs compatibility cleanup, generated technology creation, base technology extensions, weapon speed adjustments, max-level enforcement, and diagnostics flushing.
@@ -95,17 +95,19 @@ require("prototypes.util")
 ```lua
 -- data-final-fixes.lua
 require("prototypes.compat-better-robots")
+require("prototypes.compat.competing-productivity").apply()
 require("prototypes.tech-gen")
 require("prototypes.base-tech-extensions")
 require("prototypes.weapon-speed-adjustments")
 require("prototypes.max-level-control")
+require("prototypes.diagnostics").flush()
 ```
 
 Rationale:
 
 - `data-final-fixes.lua` gives this mod the best view of final recipes, items, labs, science packs, and technologies.
 - The cost is that other mods have less opportunity to react after generated technologies exist.
-- For known large overhaul mods, add optional or hidden optional dependencies to force this mod to load after them without making them hard requirements.
+- To keep the mod page clean, prefer opportunistic compatibility and safe skipping over compatibility metadata dependencies. Add explicit ordering only if a future integration cannot be made safe without it.
 
 ### 4. Implement 2.1 recipe matching
 
@@ -311,7 +313,7 @@ Acceptance:
 
 ### Phase 5: Space Age and Quality hardening
 
-Purpose: make optional dependencies truly optional.
+Purpose: make optional expansion prototypes and Quality assumptions safe.
 
 Tasks:
 
@@ -406,7 +408,7 @@ After v2.0.0 is stable, expand in deliberately separated tracks.
 ### v2.1: Compatibility and discovery
 
 - Add compatibility profiles for major overhaul mods.
-- Add hidden optional dependencies for known late-mutating mods where load order matters.
+- Keep compatibility metadata dependencies out of release metadata unless a specific future integration proves impossible to handle safely without ordering.
 - Add diagnostics that can log why each stream did or did not generate.
 - Add a debug setting to print recipe matches per stream.
 
@@ -438,7 +440,7 @@ After v2.0.0 is stable, expand in deliberately separated tracks.
 
 ## Known Limitations
 
-- No mod can see another mod's later `data-final-fixes.lua` mutations unless dependency ordering puts this mod after that mod.
+- No mod can see another mod's later `data-final-fixes.lua` mutations unless a user, modpack, or future targeted integration imposes a later load order.
 - Lab validation prevents impossible ingredient sets, but it cannot infer a player's desired progression in every overhaul.
 - Recipe productivity remains bounded by Factorio's maximum productivity cap even when the technology is infinite.
 - Prototype renames require migrations and should not be mixed casually with compatibility fixes.

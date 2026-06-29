@@ -129,15 +129,14 @@ local function gather_by_items(items, patterns, options)
       end
     end)
   end
-  local strict_rail = want.rail == true
   local seen, list = {}, {}
   for rname, r in pairs(data.raw.recipe or {}) do
     if not should_skip_recipe(rname, r, options) then
       local outs = recipe_outputs(r)
       local match = false
       for it, _ in pairs(want) do
-        if strict_rail then
-          if it == "rail" and outs.rail then match = true; break end
+        if it == "rail" then
+          if outs.rail then match = true; break end
         elseif outs[it] then
           match = true
           break

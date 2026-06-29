@@ -197,7 +197,7 @@ function U.build_prereqs_for(key, ingredients)
     end
   end
   for _, pair in ipairs(packs or {}) do
-    local pack_name = pair[1]
+    local pack_name = pair.name or pair[1]
     add(U.prereq_tech_for_science_pack(pack_name))
   end
   for _, tech_name in ipairs(spec.required_technologies or {}) do

@@ -11,11 +11,12 @@ More Infinite Research is organized around a compatibility-first data-stage pipe
 `data-final-fixes.lua` runs the actual generation pipeline:
 
 1. Better Robots competing-tech cleanup.
-2. Generated stream technology creation.
-3. Base technology infinite extensions.
-4. Vanilla weapon speed adjustment.
-5. Max-level enforcement.
-6. Optional diagnostics report flush.
+2. Known competing recipe-productivity cleanup.
+3. Generated stream technology creation.
+4. Base technology infinite extensions.
+5. Vanilla weapon speed adjustment.
+6. Max-level enforcement.
+7. Optional diagnostics report flush.
 
 This order gives the mod the best practical view of recipes, labs, science packs, and technologies created by other mods while still keeping this mod's final cleanup deterministic.
 

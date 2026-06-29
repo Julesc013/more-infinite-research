@@ -4,18 +4,15 @@ local base_defaults = defaults.base_extensions or {}
 
 local U = require("prototypes.util")
 local D = require("prototypes.diagnostics")
+local deepcopy = require("prototypes.lib.deepcopy")
 
-local function deepcopy(value)
-  if table.deepcopy then return table.deepcopy(value) end
-  local function copy(v)
-    if type(v) ~= "table" then return v end
-    local out = {}
-    for k, vv in pairs(v) do
-      out[copy(k)] = copy(vv)
-    end
-    return out
+local function sorted_keys(tbl)
+  local keys = {}
+  for key, _ in pairs(tbl or {}) do
+    table.insert(keys, key)
   end
-  return copy(value)
+  table.sort(keys)
+  return keys
 end
 
 local function escape_pattern(text)
@@ -522,6 +519,6 @@ local function extend_chain(key)
   D.extension(D.extension_fields(key, "generated", "base_extension", resolved_ingredients, new.prerequisites, new.effects, lab_status))
 end
 
-for key, _ in pairs(base_defaults) do
+for _, key in ipairs(sorted_keys(base_defaults)) do
   extend_chain(key)
 end

@@ -2,18 +2,15 @@
 local C = require("prototypes.config")
 local U = require("prototypes.util")
 local D = require("prototypes.diagnostics")
+local deepcopy = require("prototypes.lib.deepcopy")
 
-local function deepcopy(value)
-  if table.deepcopy then return table.deepcopy(value) end
-  local function copy(v)
-    if type(v) ~= "table" then return v end
-    local out = {}
-    for k, vv in pairs(v) do
-      out[copy(k)] = copy(vv)
-    end
-    return out
+local function sorted_keys(tbl)
+  local keys = {}
+  for key, _ in pairs(tbl or {}) do
+    table.insert(keys, key)
   end
-  return copy(value)
+  table.sort(keys)
+  return keys
 end
 
 local function lname(key, spec)
@@ -115,9 +112,9 @@ local function make_stream(key, spec)
     D.stream(D.stream_fields(key, spec, "skipped", "no_lab_compatible_science", ingredients, nil, direct_effects, lab_status))
     return
   end
-  if spec and spec.science_packs then
+  if D.enabled() and spec and spec.science_packs then
     local names = {}
-    for _, entry in ipairs(ingredients) do table.insert(names, entry[1]) end
+    for _, entry in ipairs(ingredients) do table.insert(names, entry.name or entry[1]) end
     log("[more-infinite-research] Science packs for "..key..": "..table.concat(names, ", "))
   end
 
@@ -183,6 +180,6 @@ local function make_stream(key, spec)
   D.stream(D.stream_fields(key, spec, "generated", "recipe_productivity", ingredients, prerequisites, effects, lab_status))
 end
 
-for key, spec in pairs(require("prototypes.config").streams) do
-  make_stream(key, spec)
+for _, key in ipairs(sorted_keys(C.streams)) do
+  make_stream(key, C.streams[key])
 end

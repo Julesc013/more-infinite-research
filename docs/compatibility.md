@@ -13,11 +13,12 @@ More Infinite Research v2.0.0 targets Factorio 2.1 and uses a compatibility-firs
 - Space Age cargo bay unloading distance research uses Factorio 2.1.8's `max-cargo-bay-unloading-distance` technology modifier and is skipped without Space Age or the `landing-pad-unloading-bay` prototypes.
 - Space Age cargo landing pad count research uses `cargo-landing-pad-count`, is disabled by default, and is skipped without Space Age or the `cargo-landing-pad` prototype.
 - Mod-specific stream changes should live in `prototypes/compat/profiles.lua` instead of the base stream definitions.
+- Release metadata intentionally avoids compatibility-mod dependencies beyond optional Space Age. Compatibility is opportunistic and based on the prototypes visible when this mod reaches `data-final-fixes.lua`.
 - `mir-debug-generation-report` can be enabled to capture why each stream or base extension generated or skipped.
 
-## Explicit Optional Integrations
+## Opportunistic Integrations
 
-These mods are declared as optional dependencies so More Infinite Research runs after their prototype stages and can see their recipes or competing technologies:
+These integrations do not add mod-page dependencies. More Infinite Research handles them when their prototypes are already visible, and skips safely when they are absent:
 
 - Advanced Solar HR (`Advanced-Electric-Revamped-v16`): advanced, elite, and ultimate solar panel/accumulator recipes are covered by the electric energy productivity tiers.
 - Better Robots Extended (`Better_Robots_Extended`): competing infinite worker robot storage research is removed when `mir-prefer-this-mod-for-competing-techs` is enabled.
@@ -30,7 +31,7 @@ Large mod packs and utility mods such as Alien Biomes, Informatron, Jetpack, AAI
 
 ## Known Limits
 
-- No mod can observe another mod's later `data-final-fixes.lua` mutations unless dependency order puts it after that mod.
+- No mod can observe another mod's later `data-final-fixes.lua` mutations unless a user, modpack, or future targeted integration imposes a later load order.
 - Lab validation prevents impossible research ingredients, but it cannot infer every overhaul mod's intended progression.
 - Recipe productivity technologies remain bounded by Factorio's recipe productivity cap even when research levels are infinite.
 - Existing prototype IDs were kept stable for v2.0.0. No migration is currently required.
@@ -76,7 +77,7 @@ $env:FACTORIO_BIN = "C:\path\to\factorio.exe"
 .\scripts\Invoke-MIRValidation.ps1
 ```
 
-The runtime check copies this repo and the fixture mods into a temporary user-data mod directory, adds temporary optional dependencies from the copied mod to the fixture mods for deterministic load order, writes a fixture `mod-list.json`, and asks Factorio to create a save. It is intentionally a load/prototype validation harness, not a gameplay test.
+The runtime check copies this repo and the fixture mods into a temporary user-data mod directory, adds test-only dependencies from the copied mod to the fixture mods for deterministic load order, writes a fixture `mod-list.json`, and asks Factorio to create a save. It is intentionally a load/prototype validation harness, not a gameplay test.
 
 ## Fixture Designs
 
@@ -115,7 +116,6 @@ Expected result: recipe streams can discover late recipes when load order makes 
 - Run `rg "data.raw.tool|tool_exists|has_tool|PACKS_ALL" prototypes` and confirm no old science-pack authority remains.
 - Run `rg "icon_mipmaps" prototypes` and confirm generated icons do not add it.
 - Run `.\scripts\Invoke-MIRValidation.ps1 -StaticOnly`.
-- Run `git diff --check`.
-- Parse `info.json` as JSON.
+- Confirm `info.json` declares only `base >= 2.1.8` and optional `space-age >= 2.1.8` dependencies.
 - Load Factorio with the manual matrix above.
 - Confirm `changelog.txt` has the release version and date.
