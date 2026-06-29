@@ -132,7 +132,8 @@ local stream_order = {
   "research_character_reach",
   "research_character_trash_slots",
   "research_inventory_capacity",
-  "research_robot_battery"
+  "research_robot_battery",
+  "research_cargo_bay_unloading_distance"
 }
 
 local known = {}

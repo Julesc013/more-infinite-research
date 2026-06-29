@@ -1,4 +1,25 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.1.0
+Date: 2026-06-30
+
+  Features:
+
+    - Added Space Age cargo bay unloading distance infinite research for the Factorio 2.1 landing pad unloading bay. Each level adds 10 tiles by default, requires the vanilla unloading bay unlock, uses all available science packs, and has configurable enable, cost, growth, max-level, and research-time startup settings.
+
+  Changes:
+
+    - Generated stream prerequisites now include declared required technologies, so prototype availability checks and actual technology progression stay aligned.
+    - Direct-effect streams can now provide a specific localized description instead of always using the generic direct-effect description.
+
+  Compatibility:
+
+    - Raised the base dependency to Factorio 2.1.8 or newer because cargo bay unloading distance uses the 2.1.8 technology modifier API.
+
+  Documentation:
+
+    - Documented the cargo bay unloading distance research defaults, gating, and validation expectations.
+
+---------------------------------------------------------------------------------------------------
 Version: 2.0.0
 Date: 2026-06-30
 

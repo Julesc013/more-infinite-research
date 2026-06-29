@@ -12,6 +12,12 @@ local defaults = {
     research_inventory_capacity = { growth_factor = 1.10, enabled = false },
     research_character_trash_slots = { growth_factor = 1.10 },
     research_robot_battery = { growth_factor = 1.2 },
+    research_cargo_bay_unloading_distance = {
+      base_cost = 100000,
+      growth_factor = 3,
+      research_time = 60,
+      max_level = 0
+    },
     research_science_pack_productivity = { research_time = 120 },
     research_character_reach = { enabled = false },
     research_rocket_shooting_speed = {

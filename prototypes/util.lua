@@ -187,6 +187,7 @@ function U.pick_science_for_stream(spec, key)
 end
 
 function U.build_prereqs_for(key, ingredients)
+  local spec = C.streams[key] or {}
   local packs = ingredients or U.best_lab_compatible_ingredients(U.pick_science_for_stream(C.streams[key], key), key)
   local reqs, seen = {}, {}
   local function add(t)
@@ -198,6 +199,9 @@ function U.build_prereqs_for(key, ingredients)
   for _, pair in ipairs(packs or {}) do
     local pack_name = pair[1]
     add(U.prereq_tech_for_science_pack(pack_name))
+  end
+  for _, tech_name in ipairs(spec.required_technologies or {}) do
+    add(tech_name)
   end
 
   local gate_on = (settings and settings.startup and settings.startup["ips-require-space-gate"] and settings.startup["ips-require-space-gate"].value) ~= false

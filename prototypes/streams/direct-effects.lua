@@ -13,6 +13,19 @@ return {
     { type="worker-robot-battery", modifier=0.10 }
   } },
 
+  research_cargo_bay_unloading_distance = {
+    requires_space_age = true,
+    required_items = {"landing-pad-unloading-bay"},
+    required_technologies = {"landing-pad-unloading-bay"},
+    icon_item = "landing-pad-unloading-bay",
+    overlay = "range",
+    localised_description = {"technology-description.more-infinite-research.cargo_bay_unloading_distance"},
+    science_packs = "all",
+    direct_effects = {
+      { type = "max-cargo-bay-unloading-distance", modifier = 10 }
+    }
+  },
+
   research_rocket_shooting_speed = {
     icon_tech = "rocket-turret",
     science_packs = {

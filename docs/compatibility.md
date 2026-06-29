@@ -1,6 +1,6 @@
 # Compatibility and Validation
 
-More Infinite Research v2.0.0 targets Factorio 2.1 and uses a compatibility-first data-stage model.
+More Infinite Research v2.1.0 targets Factorio 2.1.8+ and uses a compatibility-first data-stage model.
 
 ## Compatibility Model
 
@@ -10,6 +10,7 @@ More Infinite Research v2.0.0 targets Factorio 2.1 and uses a compatibility-firs
 - Recipe matching supports both `recipe.category` and Factorio 2.1 `recipe.categories`.
 - Hidden recipes and recycling recipes are skipped by default. Streams can opt in with `include_hidden` or `include_recycling`.
 - Optional Space Age streams must either set `requires_space_age = true` or declare concrete required prototypes.
+- Space Age cargo bay unloading distance research uses Factorio 2.1.8's `max-cargo-bay-unloading-distance` technology modifier and is skipped without Space Age or the `landing-pad-unloading-bay` prototypes.
 - Mod-specific stream changes should live in `prototypes/compat/profiles.lua` instead of the base stream definitions.
 - `mir-debug-generation-report` can be enabled to capture why each stream or base extension generated or skipped.
 
@@ -31,7 +32,7 @@ Large mod packs and utility mods such as Alien Biomes, Informatron, Jetpack, AAI
 - No mod can observe another mod's later `data-final-fixes.lua` mutations unless dependency order puts it after that mod.
 - Lab validation prevents impossible research ingredients, but it cannot infer every overhaul mod's intended progression.
 - Recipe productivity technologies remain bounded by Factorio's recipe productivity cap even when research levels are infinite.
-- Prototype IDs were kept stable for v2.0.0. No migration is currently required.
+- Existing prototype IDs were kept stable for v2.1.0. No migration is currently required.
 
 ## Required Manual Test Matrix
 
@@ -39,12 +40,13 @@ Run each case from a clean Factorio user data directory or with a controlled mod
 
 1. Base game only.
 2. Space Age enabled.
-3. Space Age enabled with Quality disabled.
-4. Better Robots Extended enabled.
-5. A fixture mod that adds a science pack as an ordinary `item` and adds it to a lab.
-6. A fixture mod that adds a custom lab with a different science-pack input set.
-7. A fixture mod that adds recipes in `data-final-fixes.lua`.
-8. An existing save upgraded from the latest 1.x release.
+3. Space Age 2.1.8+ enabled, verifying cargo bay unloading distance research appears after the landing pad unloading bay unlock.
+4. Space Age enabled with Quality disabled.
+5. Better Robots Extended enabled.
+6. A fixture mod that adds a science pack as an ordinary `item` and adds it to a lab.
+7. A fixture mod that adds a custom lab with a different science-pack input set.
+8. A fixture mod that adds recipes in `data-final-fixes.lua`.
+9. An existing save upgraded from the latest 1.x release.
 
 For each case, verify:
 

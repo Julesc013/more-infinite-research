@@ -31,6 +31,7 @@ local function lname(key, spec)
 end
 
 local function ldesc(spec)
+  if spec.localised_description then return spec.localised_description end
   if spec.direct_effects then
     return {"technology-description.more-infinite-research.direct_effect"}
   end
