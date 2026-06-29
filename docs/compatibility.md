@@ -85,7 +85,7 @@ Set `$env:FACTORIO_LOG` or pass `-FactorioLog` when the Factorio log is not at t
 
 The runtime check copies this repo and the fixture mods into a temporary user-data mod directory, adds test-only dependencies from the copied mod to the fixture mods for deterministic load order, writes a fixture `mod-list.json`, and asks Factorio to create a save. It is intentionally a load/prototype validation harness, not a gameplay test.
 
-The runtime fixture run also enables the generation diagnostics report in the copied mod and asserts that science-pack productivity generated with the custom item-based fixture science pack included. The expected Factorio log file is part of the validation evidence; if it is missing, runtime validation fails.
+The runtime fixture run also enables the generation diagnostics report in the copied mod and asserts that science-pack productivity generated with the custom item-based fixture science pack included. A post-MIR assertion fixture also checks the generated technology directly and fails loading if the custom science-pack recipe did not receive a `change-recipe-productivity` effect. The expected Factorio log file is part of the validation evidence; if it is missing, runtime validation fails.
 
 Static validation requires the committed release zip at `dist/more-infinite-research_2.0.0.zip`. The package must use the `more-infinite-research_2.0.0/` root, contain matching `info.json` metadata, include locale, documentation, top-level data-stage files, and core prototype modules, and avoid build, fixture, script, Git, and temporary/editor artifacts.
 
@@ -120,6 +120,17 @@ Create a local test mod that:
 - Declares dependency ordering so More Infinite Research loads after it when testing positive capture.
 
 Expected result: recipe streams can discover late recipes when load order makes those recipes visible, and the documented load-order limitation is visible when order is reversed.
+
+### Science-Pack Productivity Assertion Fixture
+
+Create a local test mod that:
+
+- Depends on More Infinite Research and the item science-pack fixture.
+- Runs after MIR in `data-final-fixes.lua`.
+- Reads `recipe-prod-research_science_pack_productivity-1`.
+- Fails loading if the fixture science-pack recipe is not present as a `change-recipe-productivity` effect.
+
+Expected result: custom item-based science packs that are active lab inputs and have visible recipes receive science-pack productivity effects.
 
 ## Release Checklist
 

@@ -26,6 +26,7 @@ Date: 2026-06-30
     - Science-pack productivity can use science pack item icons through item fallback lookup.
     - Recipe-productivity streams can now opt into dynamic target items from active lab inputs.
     - Recipe matching now skips hidden recipes and recycling recipes by default unless a stream opts in.
+    - Narrowed breeding productivity matching so biochamber category membership alone no longer pulls every biochamber recipe into breeding productivity.
     - Generated recipe effect order is now deterministic.
     - Removed unused base-extension growth inference helpers and kept generation diagnostics behind the debug report setting.
     - Reworked base-tech extension science packs to inherit from the last vanilla level by default and then add only the intended extra packs.
@@ -38,6 +39,7 @@ Date: 2026-06-30
     - Split the prototype utility facade into focused modules for lookup, science-pack validation, recipe matching, icon construction, and deepcopy.
     - Split stream definitions into productivity and direct-effect domain modules.
     - Added compatibility profile scaffolding for future mod-specific stream patches.
+    - Compatibility profile patches now support append-style fields for extending stream item, pattern, exclusion, and group arrays without replacing the base stream data.
 
   Compatibility:
 
@@ -45,10 +47,12 @@ Date: 2026-06-30
     - Added a Space Age dependency floor of 2.1.8 or newer for the same cargo bay technology modifier surface.
     - Kept compatibility-mod dependencies out of release metadata so the mod page stays clean; known integrations are handled opportunistically from visible prototypes and safe skip checks.
     - Added optional Better Robots Extended compatibility and cleanup for competing worker robot storage infinite extensions.
+    - Moved known competing recipe-productivity cleanup after MIR stream generation and made it inspect actual generated MIR recipe-productivity effects before removing another mod's competing technology.
     - Changed worker robot storage extension science packs toward utility and electromagnetic science in Space Age contexts.
     - Added opportunistic compatibility coverage for Advanced Solar HR, OCs Ammo and Armor, OCs Stone Casting, Fluid Quality Imprinting, and Plates n Circuit Productivity without declaring those mods as dependencies.
     - Added explicit bio-explosives matching for OCs Ammo and Armor's biochamber explosives recipes.
     - Made Space Age turbo belt, underground belt, and splitter productivity coverage explicit at the 1% tier.
+    - Changed rocket shooting speed research to use the base-game rocketry technology icon instead of a Space Age rocket turret icon.
     - Removed selected competing productivity technologies when this mod is configured to prefer its own generated versions.
     - Better supports Space Age optional installs and Space Age without Quality.
     - Better supports mods that add science packs as ordinary items or add lab inputs before this mod's final-fixes phase.
@@ -68,6 +72,7 @@ Date: 2026-06-30
     - Added validation checks for the no-compatibility-mod-dependencies release policy, locale synchronization, and Factorio runtime exit codes.
     - Strengthened validation so versioned compatibility-mod dependencies are rejected, the release zip is checked for the expected root and metadata, and the runtime log path can be overridden.
     - Strengthened runtime fixture validation so the custom item-based science pack must be present in the generated science-pack productivity diagnostics.
+    - Added a post-MIR runtime fixture assertion that fails loading if the custom item-based science-pack recipe does not receive a science-pack productivity effect.
     - Strengthened runtime validation so a missing expected Factorio log is a failure instead of silently skipping log assertions.
     - Strengthened release package validation so core data-stage files, stream modules, and shared recipe/science-pack helpers must be present in the zip.
 

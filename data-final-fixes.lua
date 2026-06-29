@@ -1,6 +1,6 @@
 require("prototypes.compat-better-robots")
-require("prototypes.compat.competing-productivity").apply()
 require("prototypes.tech-gen")
+require("prototypes.compat.competing-productivity").apply()
 require("prototypes.base-tech-extensions")
 require("prototypes.weapon-speed-adjustments")
 require("prototypes.max-level-control")

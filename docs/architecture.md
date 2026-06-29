@@ -11,8 +11,8 @@ More Infinite Research is organized around a compatibility-first data-stage pipe
 `data-final-fixes.lua` runs the actual generation pipeline:
 
 1. Better Robots competing-tech cleanup.
-2. Known competing recipe-productivity cleanup.
-3. Generated stream technology creation.
+2. Generated stream technology creation.
+3. Known competing recipe-productivity cleanup based on actual generated MIR effects.
 4. Base technology infinite extensions.
 5. Vanilla weapon speed adjustment.
 6. Max-level enforcement.
@@ -53,6 +53,8 @@ Generated recipe-productivity streams can set `dynamic_items_from_lab_inputs = t
 `prototypes/compat/profiles.lua` is the dedicated home for mod-specific stream patches.
 
 Use profiles when a compatibility rule is tied to a known mod being active. Use general stream config only for behavior that should apply to every mod set.
+
+Profile patches should use append fields such as `append_items`, `append_item_patterns`, `append_recipe_patterns`, `append_exclude_recipe_patterns`, `append_exclude_ingredient_patterns`, and `append_groups` when extending existing stream arrays. Direct field assignment remains available for intentional overrides.
 
 ## Diagnostics
 

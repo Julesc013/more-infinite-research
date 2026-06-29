@@ -255,11 +255,14 @@ foreach ($fixture in Get-ChildItem -LiteralPath $fixtureRoot -Directory) {
   $fixtureNames += $info.name
   Copy-ModDirectory -Source $fixture.FullName -Name $info.name
 }
+$postMirAssertionFixtures = @(
+  "mir-fixture-assert-science-pack-productivity"
+)
 
 $copiedInfoPath = Join-Path $modsDir "more-infinite-research\info.json"
 $copiedInfo = Get-Content -Raw -LiteralPath $copiedInfoPath | ConvertFrom-Json
 $dependencies = @($copiedInfo.dependencies)
-foreach ($fixtureName in $fixtureNames) {
+foreach ($fixtureName in @($fixtureNames | Where-Object { $_ -notin $postMirAssertionFixtures })) {
   $dependency = "? $fixtureName"
   if ($dependencies -notcontains $dependency) {
     $dependencies += $dependency
@@ -279,7 +282,8 @@ $modList = @{
     @{ name = "more-infinite-research"; enabled = $true },
     @{ name = "mir-fixture-item-science-pack"; enabled = $true },
     @{ name = "mir-fixture-custom-lab"; enabled = $true },
-    @{ name = "mir-fixture-late-recipe"; enabled = $true }
+    @{ name = "mir-fixture-late-recipe"; enabled = $true },
+    @{ name = "mir-fixture-assert-science-pack-productivity"; enabled = $true }
   )
 } | ConvertTo-Json -Depth 5
 

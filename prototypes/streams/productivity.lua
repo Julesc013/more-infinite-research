@@ -30,7 +30,7 @@ return {
   research_carbon_fiber = { items={"carbon-fiber"}, icon_tech="carbon-fiber" },
 
   research_bioflux = { requires_space_age = true, items={"bioflux"}, icon_tech="bioflux" },
-  research_breeding = { requires_space_age = true, items = {"raw-fish","biter-egg","pentapod-egg"}, mode = "by_category_or_match", match = { categories={"biochamber"}, name_patterns={"cultivation","culture"} }, icon_tech = "fish-breeding" },
+  research_breeding = { requires_space_age = true, items = {"raw-fish","biter-egg","pentapod-egg"}, mode = "by_category_or_match", match = { name_patterns={"cultivation","culture","breeding"} }, icon_tech = "fish-breeding" },
 
   research_grenades = { icon_item="grenade", groups = {
     {change=0.10, items={"grenade"}},

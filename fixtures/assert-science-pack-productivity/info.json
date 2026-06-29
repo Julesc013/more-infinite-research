@@ -1,0 +1,13 @@
+{
+  "name": "mir-fixture-assert-science-pack-productivity",
+  "version": "0.1.0",
+  "title": "MIR Fixture - Assert Science Pack Productivity",
+  "author": "Julesc013",
+  "description": "Validation fixture that asserts a custom item science pack receives MIR science-pack productivity.",
+  "factorio_version": "2.1",
+  "dependencies": [
+    "base >= 2.1.8",
+    "more-infinite-research",
+    "mir-fixture-item-science-pack"
+  ]
+}

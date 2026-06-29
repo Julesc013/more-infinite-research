@@ -1,5 +1,4 @@
 local C = require("prototypes.config")
-local U = require("prototypes.util")
 
 local M = {}
 
@@ -36,31 +35,14 @@ local function known_competing_tech_name(name)
   return false
 end
 
-local function stream_available(key, spec)
-  if spec.direct_effects then return false end
-  if not U.enabled_for(key, spec) then return false end
-  if spec.hide_in_space_age and U.is_space_age() then return false end
-  if spec.requires_space_age and not U.is_space_age() then return false end
-  for _, item_name in ipairs(spec.required_items or {}) do
-    if not U.item_prototype(item_name) then return false end
-  end
-  for _, tech_name in ipairs(spec.required_technologies or {}) do
-    if not U.technology_exists(tech_name) then return false end
-  end
-  for _, category in ipairs(spec.required_ammo_categories or {}) do
-    if not U.ammo_category_exists(category) then return false end
-  end
-  return true
-end
-
 local function collect_owned_recipes()
   local owned = {}
-  for key, spec in pairs(C.streams) do
-    if stream_available(key, spec) then
-      for _, bucket in ipairs(U.recipes_for_stream(spec) or {}) do
-        for _, recipe_name in ipairs(bucket.recipes or {}) do
-          owned[recipe_name] = key
-        end
+  for key, _ in pairs(C.streams or {}) do
+    local tech_name = "recipe-prod-" .. key .. "-1"
+    local tech = data.raw.technology and data.raw.technology[tech_name]
+    for _, effect in ipairs((tech and tech.effects) or {}) do
+      if effect.type == "change-recipe-productivity" and effect.recipe then
+        owned[effect.recipe] = tech_name
       end
     end
   end

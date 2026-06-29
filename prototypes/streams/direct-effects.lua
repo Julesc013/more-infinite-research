@@ -39,7 +39,7 @@ return {
   },
 
   research_rocket_shooting_speed = {
-    icon_tech = "rocket-turret",
+    icon_tech = "rocketry",
     science_packs = {
       "automation-science-pack","logistic-science-pack","chemical-science-pack",
       "production-science-pack","military-science-pack","agricultural-science-pack"
