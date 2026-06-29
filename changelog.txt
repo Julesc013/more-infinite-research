@@ -30,6 +30,11 @@ Date: 2026-06-29
     - Science-pack productivity can use science pack item icons through item fallback lookup.
     - Recipe matching now skips hidden recipes and recycling recipes by default unless a stream opts in.
     - Generated recipe effect order is now deterministic.
+    - Replaced placeholder localization text in German, Spanish, French, Italian, Polish, Brazilian Portuguese, and Simplified Chinese.
+    - Updated Russian localization coverage and terminology to match the current English locale keys.
+    - Moved Spanish localization to Factorio's supported es-ES locale code.
+    - Removed empty placeholder locale folders so only complete locale packs are shipped.
+    - Added locale validation tooling and maintenance notes to keep translated files synchronized with the English fallback.
   Compatibility:
     - Better supports Space Age optional installs and Space Age without Quality.
     - Better supports mods that add science packs as ordinary items or add lab inputs before this mod's final-fixes phase.
