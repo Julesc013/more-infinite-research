@@ -133,7 +133,7 @@ return {
     { change=0.01, items={"stack-inserter"}, item_patterns={"stack%-inserter"} }
   }},
 
-  research_science_pack_productivity = { icon_tech = "automation-science-pack", groups = {
+  research_science_pack_productivity = { icon_tech = "automation-science-pack", dynamic_items_from_lab_inputs = true, groups = {
     { change=0.10, items={
       "automation-science-pack","logistic-science-pack","chemical-science-pack","production-science-pack",
       "military-science-pack","utility-science-pack","space-science-pack",

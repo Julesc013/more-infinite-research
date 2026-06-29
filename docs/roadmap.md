@@ -15,6 +15,7 @@ The critical interpretation is that "2.0" means the mod's v2.0.0 release, not a 
 - `data-updates.lua` is reserved for pre-final compatibility hooks.
 - `data-final-fixes.lua` runs compatibility cleanup, generated technology creation, base technology extensions, weapon speed adjustments, max-level enforcement, and diagnostics flushing.
 - Science-pack handling is based on item prototype lookup plus active lab inputs, not `data.raw.tool`.
+- Science-pack productivity dynamically adds active lab inputs to the target item list, so custom science packs can receive productivity effects when their recipes are visible.
 - Generated technology ingredients are validated against complete lab input sets and reduced or skipped instead of creating unresearchable technologies.
 - Recipe matching supports Factorio 2.1 `recipe.categories`, legacy `recipe.category`, stream match filters, and default hidden/recycling skips.
 - Space Age-only direct-effect streams are gated by Space Age presence and explicit required prototypes where needed.
@@ -451,6 +452,7 @@ After v2.0.0 is stable, expand in deliberately separated tracks.
 Phases 1 through 8 are implemented for v2.0.0:
 
 - Science-pack detection uses item/lab-input discovery.
+- Science-pack productivity expands from active lab inputs instead of only the hard-coded vanilla and Space Age pack list.
 - Lab ingredient combinations are validated before technology creation.
 - Generation runs in `data-final-fixes.lua`.
 - Recipe category matching, Space Age guards, icon overlays, player-facing settings, locale warnings, docs, fixtures, and packaging scripts are present.

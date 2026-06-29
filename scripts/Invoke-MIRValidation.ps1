@@ -258,6 +258,11 @@ foreach ($fixtureName in $fixtureNames) {
 $copiedInfo.dependencies = $dependencies
 $copiedInfo | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $copiedInfoPath -Encoding UTF8
 
+$copiedDiagnosticsPath = Join-Path $modsDir "more-infinite-research\prototypes\diagnostics.lua"
+$copiedDiagnostics = Get-Content -Raw -LiteralPath $copiedDiagnosticsPath
+$copiedDiagnostics = $copiedDiagnostics -replace 'return startup_setting\("mir-debug-generation-report"\) == true', 'return true'
+Set-Content -LiteralPath $copiedDiagnosticsPath -Value $copiedDiagnostics -Encoding UTF8
+
 $modList = @{
   mods = @(
     @{ name = "base"; enabled = $true },
@@ -299,6 +304,23 @@ if (Test-Path -LiteralPath $FactorioLog) {
   if ($fatalMarkers) {
     $fatalMarkers | Select-Object -First 10 | ForEach-Object { Write-Host $_.Line }
     throw "Factorio runtime validation log contains fatal error markers."
+  }
+  $sciencePackProductivityLine = Select-String -LiteralPath $FactorioLog -Pattern "key=research_science_pack_productivity" -SimpleMatch | Select-Object -Last 1
+  if (-not $sciencePackProductivityLine) {
+    throw "Factorio runtime validation log did not contain diagnostics for research_science_pack_productivity."
+  }
+  if ($sciencePackProductivityLine.Line -notmatch "status=generated") {
+    throw "Science pack productivity stream was not generated during runtime validation: $($sciencePackProductivityLine.Line)"
+  }
+  $effectCountMatch = [regex]::Match($sciencePackProductivityLine.Line, "effects=(\d+)")
+  if (-not $effectCountMatch.Success) {
+    throw "Science pack productivity diagnostics did not include an effect count: $($sciencePackProductivityLine.Line)"
+  }
+  $sciencePackEffectCount = [int]$effectCountMatch.Groups[1].Value
+  $spaceAgeLoaded = Select-String -LiteralPath $FactorioLog -Pattern "Loading mod space-age" -SimpleMatch
+  $minimumSciencePackEffects = if ($spaceAgeLoaded) { 13 } else { 8 }
+  if ($sciencePackEffectCount -lt $minimumSciencePackEffects) {
+    throw "Science pack productivity stream did not include the fixture science-pack effect. Expected at least $minimumSciencePackEffects effects, got $sciencePackEffectCount`: $($sciencePackProductivityLine.Line)"
   }
 }
 

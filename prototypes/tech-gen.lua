@@ -55,6 +55,48 @@ local function missing_requirement(key, spec)
   return nil
 end
 
+local function append_unique_item(items, seen, item_name)
+  if item_name and not seen[item_name] then
+    seen[item_name] = true
+    table.insert(items, item_name)
+  end
+end
+
+local function expand_dynamic_items(spec)
+  if not (spec and spec.dynamic_items_from_lab_inputs) then return spec end
+
+  local out = deepcopy(spec)
+  out.groups = out.groups or {
+    {
+      change = C.shared.per_level_default,
+      items = {}
+    }
+  }
+  if not out.groups[1] then
+    out.groups[1] = {
+      change = C.shared.per_level_default,
+      items = {}
+    }
+  end
+  out.groups[1].items = out.groups[1].items or {}
+
+  local seen = {}
+  for _, item_name in ipairs(out.items or {}) do
+    seen[item_name] = true
+  end
+  for _, group in ipairs(out.groups or {}) do
+    for _, item_name in ipairs(group.items or {}) do
+      seen[item_name] = true
+    end
+  end
+
+  for _, item_name in ipairs(U.pack_list_all()) do
+    append_unique_item(out.groups[1].items, seen, item_name)
+  end
+
+  return out
+end
+
 -- Direct-effect streams can outlive the prototype families they target when
 -- optional mods are disabled, so filter effect rows before creating a tech.
 local function available_direct_effects(key, effects)
@@ -69,7 +111,8 @@ local function available_direct_effects(key, effects)
   return out
 end
 
-local function make_stream(key, spec)
+local function make_stream(key, raw_spec)
+  local spec = expand_dynamic_items(raw_spec)
   if not U.enabled_for(key, spec) then
     D.stream(D.stream_fields(key, spec, "skipped", "disabled"))
     return

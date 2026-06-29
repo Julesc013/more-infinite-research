@@ -8,6 +8,7 @@ The release goal is graceful compatibility without mod-page dependency clutter: 
 
 - Generated technologies are created in `data-final-fixes.lua` so the mod can see most recipes, items, labs, science packs, and technologies created by other mods.
 - Science packs are discovered from `data.raw.lab[*].inputs` and resolved through generic item prototype lookup.
+- Science-pack productivity starts with the vanilla and Space Age target list, then appends active lab inputs so custom science packs can receive productivity effects when their recipes are visible.
 - A generated technology must have at least one lab that accepts its complete science-pack set. If no lab accepts the full set, the mod tries the largest deterministic lab-compatible subset. If no subset exists, the stream is skipped and logged.
 - Recipe matching supports both `recipe.category` and Factorio 2.1 `recipe.categories`.
 - Hidden recipes and recycling recipes are skipped by default. Streams can opt in with `include_hidden` or `include_recycling`.
@@ -28,6 +29,7 @@ These integrations do not add mod-page dependencies. More Infinite Research hand
 - OCs Stone Casting (`OCs_stone_casting`): foundry recipes that output covered stone, landfill, brick, wall, concrete, refined concrete, foundation, rail, gate, or furnace items are picked up by the existing output-based streams.
 - Fluid Quality Imprinting (`fluid-quality-imprinting`): quality-imprinting recipes that output covered plate and intermediate items are picked up by the existing output-based streams.
 - Plates n Circuit Productivity (`plates-n-circuit-productivity`): competing plate and circuit productivity technologies are removed when `mir-prefer-this-mod-for-competing-techs` is enabled.
+- Custom science packs from mods such as Castra or PlanetLib-based planets are picked up opportunistically when they are active lab inputs and have visible recipes that output the pack item.
 
 Large mod packs and utility mods such as Alien Biomes, Informatron, Jetpack, AAI, and Helmod usually do not need explicit recipe productivity support unless they add recipes for items covered by one of this mod's streams. When they do, output-based matching should pick up visible recipes automatically.
 
@@ -82,6 +84,8 @@ $env:FACTORIO_BIN = "C:\path\to\factorio.exe"
 Set `$env:FACTORIO_LOG` or pass `-FactorioLog` when the Factorio log is not at the default Windows user-data path.
 
 The runtime check copies this repo and the fixture mods into a temporary user-data mod directory, adds test-only dependencies from the copied mod to the fixture mods for deterministic load order, writes a fixture `mod-list.json`, and asks Factorio to create a save. It is intentionally a load/prototype validation harness, not a gameplay test.
+
+The runtime fixture run also enables the generation diagnostics report in the copied mod and asserts that science-pack productivity generated with the custom item-based fixture science pack included.
 
 Static validation requires the committed release zip at `dist/more-infinite-research_2.0.0.zip`. The package must use the `more-infinite-research_2.0.0/` root, contain matching `info.json` metadata, include locale and documentation files, and avoid build, fixture, script, Git, and temporary/editor artifacts.
 

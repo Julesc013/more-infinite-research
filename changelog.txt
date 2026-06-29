@@ -10,6 +10,7 @@ Date: 2026-06-30
     - Added local fixture mods and a PowerShell validation runner for static checks and optional Factorio runtime load checks.
     - Added a startup-controlled generation diagnostics report for generated and skipped streams and base extensions.
     - Reworked generated research compatibility for Factorio 2.1 by discovering science packs from active lab inputs instead of assuming science packs are tool prototypes.
+    - Expanded science-pack productivity from active lab inputs so custom item-based science packs can receive productivity effects when their recipes are visible.
     - Moved generated technology creation to data-final-fixes so recipes, labs, items, science packs, and technologies from other mods are visible before scanning.
     - Added Wube-style layered technology constant icon overlays for generated research technologies.
     - Added lab-compatible science-pack validation so generated technologies are skipped or reduced instead of becoming unresearchable.
@@ -23,6 +24,7 @@ Date: 2026-06-30
     - Direct-effect streams can now provide a specific localized description instead of always using the generic direct-effect description.
     - Space Age-only direct-effect streams now declare explicit optional prototype requirements.
     - Science-pack productivity can use science pack item icons through item fallback lookup.
+    - Recipe-productivity streams can now opt into dynamic target items from active lab inputs.
     - Recipe matching now skips hidden recipes and recycling recipes by default unless a stream opts in.
     - Generated recipe effect order is now deterministic.
     - Removed unused base-extension growth inference helpers and kept generation diagnostics behind the debug report setting.
@@ -49,6 +51,7 @@ Date: 2026-06-30
     - Removed selected competing productivity technologies when this mod is configured to prefer its own generated versions.
     - Better supports Space Age optional installs and Space Age without Quality.
     - Better supports mods that add science packs as ordinary items or add lab inputs before this mod's final-fixes phase.
+    - Better supports Castra, PlanetLib-style planet mods, and other custom science-pack mods through lab-input discovery, lab-compatible ingredient validation, and dynamic science-pack productivity targets.
     - Known limitation: mods that mutate recipes or labs later in data-final-fixes still require load-order compatibility.
 
   Localization:
@@ -63,6 +66,7 @@ Date: 2026-06-30
     - Added locale validation tooling and maintenance notes to keep translated files synchronized with the English fallback.
     - Added validation checks for the no-compatibility-mod-dependencies release policy, locale synchronization, and Factorio runtime exit codes.
     - Strengthened validation so versioned compatibility-mod dependencies are rejected, the release zip is checked for the expected root and metadata, and the runtime log path can be overridden.
+    - Strengthened runtime fixture validation so the custom item-based science pack must be present in the generated science-pack productivity diagnostics.
 
   Documentation:
 

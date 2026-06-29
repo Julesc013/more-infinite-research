@@ -46,6 +46,8 @@ The stream table is assembled by `prototypes/streams/init.lua` from:
 
 Future expansion should add more stream domain modules rather than returning to one large config file.
 
+Generated recipe-productivity streams can set `dynamic_items_from_lab_inputs = true` when their target item set should include every active lab input discovered during `data-final-fixes.lua`. The science-pack productivity stream uses this so custom science packs can receive productivity effects without hard-coded mod dependencies.
+
 ## Compatibility Profiles
 
 `prototypes/compat/profiles.lua` is the dedicated home for mod-specific stream patches.
