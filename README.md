@@ -1,5 +1,14 @@
 # More Infinite Research
 
+[![Factorio Mod Portal downloads](https://img.shields.io/factorio-mod-portal/dt/more-infinite-research?style=flat-square&label=downloads)](https://mods.factorio.com/mod/more-infinite-research)
+[![Factorio Mod Portal version](https://img.shields.io/factorio-mod-portal/v/more-infinite-research?style=flat-square&label=mod%20version)](https://mods.factorio.com/mod/more-infinite-research)
+[![Factorio version](https://img.shields.io/factorio-mod-portal/factorio-version/more-infinite-research?style=flat-square&label=Factorio)](https://mods.factorio.com/mod/more-infinite-research)
+[![Last updated](https://img.shields.io/factorio-mod-portal/last-updated/more-infinite-research?style=flat-square)](https://mods.factorio.com/mod/more-infinite-research)
+[![License](https://img.shields.io/github/license/Julesc013/more-infinite-research?style=flat-square)](https://github.com/Julesc013/more-infinite-research/blob/main/LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/Julesc013/more-infinite-research?style=flat-square)](https://github.com/Julesc013/more-infinite-research/stargazers)
+[![Issues](https://img.shields.io/github/issues/Julesc013/more-infinite-research?style=flat-square)](https://github.com/Julesc013/more-infinite-research/issues)
+[![Validate](https://img.shields.io/github/actions/workflow/status/Julesc013/more-infinite-research/validate.yml?branch=main&style=flat-square&label=validate)](https://github.com/Julesc013/more-infinite-research/actions/workflows/validate.yml)
+
 *Trickle down economics bring productivity gains to all industries.*
 
 More Infinite Research adds **configurable infinite productivity** and **bonus research** for intermediate items,
