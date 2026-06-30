@@ -2,6 +2,27 @@
 
 This file records local release-candidate validation runs. It is not a substitute for the manual mod matrix in `docs/compatibility.md`.
 
+## 2026-06-30 Final 2.0.0 Mod-Page Release Prep
+
+Environment:
+
+- Mod version `2.0.0`.
+- Release archive: `dist/more-infinite-research_2.0.0.zip`.
+
+Commands:
+
+```powershell
+.\scripts\Build-MIRPackage.ps1
+.\scripts\Invoke-MIRValidation.ps1 -StaticOnly
+```
+
+Results:
+
+- Rebuilt the `2.0.0` release archive after the final documentation and mod-page summary pass.
+- Static validation passed, including release metadata policy, docs policy scan, old science-pack authority scan, icon scan, locale parity, progression-setting wiring, changelog syntax, package metadata, package source/docs/locale parity, and `git diff --check`.
+- Manually confirmed the rebuilt release archive contains no `graphics/` entries.
+- Confirmed repo release docs and generated mod-page Markdown do not advertise the deferred science-pack productivity custom art.
+
 ## 2026-06-30 Progression Settings and Space Age Cargo Gate Validation
 
 Environment:
