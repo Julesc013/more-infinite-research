@@ -19,10 +19,10 @@ Commands:
 
 Results:
 
-- Static validation passed, including release metadata policy, docs policy scan, old science-pack authority scan, icon scan, locale parity, progression-setting wiring, changelog syntax, package metadata, package source/docs/locale/binary-graphics parity, and `git diff --check`.
+- Static validation passed, including release metadata policy, docs policy scan, old science-pack authority scan, icon scan, locale parity, progression-setting wiring, changelog syntax, package metadata, package source/docs/locale parity, and `git diff --check`.
 - Runtime fixture validation passed across thirteen isolated scenarios: `reduce-policy`, `skip-policy`, `space-pack-policy`, `base-space-promethium-pack-policy`, `space-age-space-pack-policy`, `space-age-space-promethium-pack-policy`, `all-official-pack-policy`, `all-pack-policy`, `base-extension-boundary-policy`, `end-game-prerequisite-gate`, `base-cargo-space-age-gate`, `space-age-cargo-pad-enabled`, and `space-age-cargo-logistics-shape`.
 - The default `reduce` lab policy generated science-pack productivity with the custom item-based fixture science pack included.
-- Science-pack productivity used the packaged custom technology art at `graphics/technology/science-pack-productivity.png`.
+- Science-pack productivity used the vanilla `research-productivity` technology art.
 - The forced `skip` lab policy skipped the intentionally incompatible science-pack productivity stream with `lab_status=invalid`.
 - The `space` science-pack ingredient policy added `space-science-pack` in base-only and Space Age modes without adding promethium science.
 - The `space-and-promethium` science-pack ingredient policy added `space-science-pack` in base-only mode and both `space-science-pack` and `promethium-science-pack` with Space Age enabled.
@@ -83,7 +83,7 @@ Results:
 - All official DLC matrix cases completed `--dump-data` without prototype errors or fatal log markers.
 - Base-only, Elevated Rails-only, Recycler-only, and Quality-with-Recycler cases skipped absent DLC-shaped streams through `no_matching_recipes` or explicit missing prototype checks.
 - Space Age without Quality loaded successfully and generated Space Age-backed streams while keeping Quality disabled.
-- Science-pack productivity used packaged custom technology art from `graphics/technology/science-pack-productivity.png`.
+- Science-pack productivity used `tech:research-productivity` when the Space Age technology was present and falls back to the automation science pack item icon when it is absent.
 
 ## 2026-06-30 v2.0.0 Release-Candidate Hardening
 

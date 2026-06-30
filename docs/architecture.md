@@ -94,7 +94,7 @@ Use `scripts/Invoke-MIRValidation.ps1 -FactorioBin C:\path\to\factorio.exe` for 
 
 Use `scripts/Build-MIRPackage.ps1` to rebuild the release archive. Static validation checks the committed archive root, metadata, locale files, docs, and forbidden artifact paths.
 
-Static package validation also compares key packaged source, documentation, locale files, and binary graphics assets against the repository copy so a stale zip with correct metadata is rejected.
+Static package validation also compares key packaged source, documentation, and locale files against the repository copy so a stale zip with correct metadata is rejected.
 
 Static validation also checks Factorio changelog formatting, including the required 99-dash section separators.
 

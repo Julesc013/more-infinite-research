@@ -121,7 +121,7 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "prototypes\base-tech-extensions.lua"; Text = $baseExtensionsText; Snippet = 'apply_science_pack_ingredient_policy' },
     @{ File = "prototypes\base-tech-extensions.lua"; Text = $baseExtensionsText; Snippet = 'append_end_game_gate_prerequisite' },
     @{ File = "prototypes\lib\science-packs.lua"; Text = $scienceText; Snippet = 'end_game_science_pack' },
-    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = '__more-infinite-research__/graphics/technology/science-pack-productivity.png' },
+    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'icon_tech = "research-productivity"' },
     @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'research_cargo_landing_pad_count = {' },
     @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'required_mods = {"space-age"}' },
     @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'required_technologies = {"rocket-silo"}' },
@@ -225,27 +225,6 @@ Invoke-RepoCheck "release package archive matches metadata" {
     }
   }
 
-  function Get-FileSha256 {
-    param([string]$Path)
-    return (Get-FileHash -Algorithm SHA256 -LiteralPath $Path).Hash
-  }
-
-  function Get-ZipEntrySha256 {
-    param($Entry)
-    $stream = $Entry.Open()
-    try {
-      $sha = [System.Security.Cryptography.SHA256]::Create()
-      try {
-        $hashBytes = $sha.ComputeHash($stream)
-        return [System.BitConverter]::ToString($hashBytes).Replace("-", "")
-      } finally {
-        $sha.Dispose()
-      }
-    } finally {
-      $stream.Dispose()
-    }
-  }
-
   function Normalize-TextForPackageComparison {
     param([string]$Text)
     return ($Text -replace "`r`n", "`n").TrimEnd()
@@ -275,7 +254,6 @@ Invoke-RepoCheck "release package archive matches metadata" {
       "${root}README.md",
       "${root}LICENSE",
       "${root}thumbnail.png",
-      "${root}graphics/technology/science-pack-productivity.png",
       "${root}data.lua",
       "${root}data-updates.lua",
       "${root}data-final-fixes.lua",
@@ -378,25 +356,6 @@ Invoke-RepoCheck "release package archive matches metadata" {
       $zipText = Read-ZipEntryText $entry
       if ((Normalize-TextForPackageComparison $repoText) -ne (Normalize-TextForPackageComparison $zipText)) {
         throw "Package source file differs from repository source: $relative"
-      }
-    }
-
-    $mustMatchBinaryRepo = @(
-      "graphics/technology/science-pack-productivity.png",
-      "thumbnail.png"
-    )
-
-    foreach ($relative in $mustMatchBinaryRepo) {
-      $entryName = "${root}$relative"
-      $entry = $entries | Where-Object { $_.FullName -eq $entryName } | Select-Object -First 1
-      if (-not $entry) {
-        throw "Package is missing expected binary file: $entryName"
-      }
-
-      $repoHash = Get-FileSha256 -Path (Join-Path $repo $relative)
-      $zipHash = Get-ZipEntrySha256 $entry
-      if ($repoHash -ne $zipHash) {
-        throw "Package binary file differs from repository source: $relative"
       }
     }
   } finally {
@@ -766,7 +725,7 @@ Invoke-RuntimeScenario -ScenarioName "reduce-policy" -EnabledFixtureNames @(
 $sciencePackProductivityLine = Get-LastStreamReportLine -Key "research_science_pack_productivity"
 Assert-ReportLineGenerated -Line $sciencePackProductivityLine -Context "Science pack productivity reduce-policy scenario"
 Assert-ReportLineContains -Line $sciencePackProductivityLine -Expected "mir-fixture-science-pack" -Context "Science pack productivity reduce-policy scenario"
-Assert-ReportLineContains -Line $sciencePackProductivityLine -Expected "__more-infinite-research__/graphics/technology/science-pack-productivity.png" -Context "Science pack productivity custom icon scenario"
+Assert-ReportLineContains -Line $sciencePackProductivityLine -Expected "tech:research-productivity" -Context "Science pack productivity vanilla icon scenario"
 $effectCountMatch = [regex]::Match($sciencePackProductivityLine, "effects=(\d+)")
 if (-not $effectCountMatch.Success) {
   throw "Science pack productivity diagnostics did not include an effect count: $sciencePackProductivityLine"

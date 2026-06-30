@@ -133,7 +133,9 @@ return {
     { change=0.01, items={"stack-inserter"}, item_patterns={"stack%-inserter"} }
   }},
 
-  research_science_pack_productivity = { icon = "__more-infinite-research__/graphics/technology/science-pack-productivity.png", icon_size = 256, icon_item = "automation-science-pack", dynamic_items_from_lab_inputs = true, groups = {
+  -- Custom science-pack productivity art is deferred until after v2.0.0.
+  -- icon = "__more-infinite-research__/graphics/technology/science-pack-productivity.png", icon_size = 256,
+  research_science_pack_productivity = { icon_tech = "research-productivity", icon_item = "automation-science-pack", dynamic_items_from_lab_inputs = true, groups = {
     { change=0.10, items={
       "automation-science-pack","logistic-science-pack","chemical-science-pack","production-science-pack",
       "military-science-pack","utility-science-pack","space-science-pack",

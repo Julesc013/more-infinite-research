@@ -158,7 +158,7 @@ Expected result: when the skip policy is active, MIR skips the incompatible scie
 - Confirm `changelog.txt` uses Factorio's strict changelog format with 99-dash section separators.
 - Confirm `info.json` declares `base >= 2.1.8` plus optional official DLC ordering dependencies only.
 - Confirm package validation reports the expected root, matching metadata, included locale/docs, and no forbidden artifacts.
-- Confirm package validation reports source, documentation, locale, and binary graphics parity with the repository.
+- Confirm package validation reports source, documentation, and locale parity with the repository.
 - Confirm runtime fixture validation covers both the default `reduce` lab policy and forced `skip` lab policy.
 - Confirm runtime fixture validation covers `configured`, `space`, `space-and-promethium`, `all-official`, and `all` science-pack ingredient policies, the end-game prerequisite gate, and the base-only cargo landing pad count skip.
 - Confirm runtime fixture validation covers Space Age cargo logistics effect types, modifiers, costs, research times, prerequisites, and official science-pack ingredients.
