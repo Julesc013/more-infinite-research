@@ -2,6 +2,42 @@
 
 This file records local release-candidate validation runs. It is not a substitute for the manual mod matrix in `docs/compatibility.md`.
 
+## 2026-07-01 Legacy Backport Planning and Branch-Aware Validation
+
+Environment:
+
+- Factorio `2.1.8` build `86744`, Windows Steam, Space Age install.
+- Mod version `2.0.5`.
+- Release archive: `dist/more-infinite-research_2.0.5.zip`.
+
+Commands:
+
+```powershell
+.\scripts\Build-MIRPackage.ps1
+.\scripts\Invoke-MIRValidation.ps1 -FactorioBin "C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe"
+git diff --check
+```
+
+Results:
+
+- Rebuilt the `2.0.5` release archive after README/docs updates for the future `v2.1.0 -> v1.9.0` legacy backport strategy.
+- Static validation passed with the new branch-aware metadata check.
+- Static validation now reads `info.json` to distinguish the normal Factorio `2.1` line from future Factorio `2.0` legacy metadata.
+- On the Factorio `2.1` line, validation still requires the Space Age cargo streams and cargo modifier strings.
+- For future Factorio `2.0` legacy metadata, validation rejects Factorio `2.1` dependency floors and rejects `max-cargo-bay-unloading-distance` / `cargo-landing-pad-count` direct-effect stream definitions.
+- Runtime fixture validation passed on the current Factorio `2.1` line, including the existing cargo scenarios.
+- Actual Factorio `2.0.x` runtime validation remains future work for the `legacy` branch port.
+
+Representative validation harness evidence:
+
+```text
+[check] release metadata matches Factorio line
+[run] Factorio load check with fixture mods (base-cargo-space-age-gate)
+[run] Factorio load check with fixture mods (space-age-cargo-pad-enabled)
+[run] Factorio load check with fixture mods (space-age-cargo-logistics-shape)
+[ok] Validation completed.
+```
+
 ## 2026-07-01 v2.0.5 Scripted-Tech Slice
 
 Environment:

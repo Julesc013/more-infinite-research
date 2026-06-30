@@ -160,7 +160,12 @@ v2.1.0 is the right place for features that are clean but broader than the v2.0.
 
 ## Legacy v1.9.0 Backport Target
 
-The next Factorio `2.0` legacy release should backport the finished v2.1.0 codebase, not reconstruct v2.0.0 or v2.0.5 commit-by-commit.
+The next Factorio `2.0` legacy release should backport the finished More Infinite Research v2.1.0 codebase, not reconstruct v2.0.0 or v2.0.5 commit-by-commit.
+
+| MIR release | Factorio line | Branch | Role |
+| --- | --- | --- | --- |
+| `2.1.0` | `2.1.x` | `dev` / `main` | Source release snapshot |
+| `1.9.0` | `2.0.x` | `legacy` | Compatibility port of the source snapshot |
 
 Backport rule:
 
@@ -171,10 +176,26 @@ legacy = current MIR code, minus Factorio 2.1-only surface area, with Factorio 2
 The legacy target version is:
 
 ```text
-v2.1.0 on Factorio 2.1.x -> v1.9.0 on Factorio 2.0.x
+More Infinite Research v2.1.0 on Factorio 2.1.x -> More Infinite Research v1.9.0 on Factorio 2.0.x
 ```
 
 The source of truth for the backport should be one exact v2.1.0 release commit, tag, or release branch. Do not begin the legacy port until v2.1.0 is stable enough that the snapshot is worth supporting.
+
+Recommended setup:
+
+```powershell
+git fetch origin
+git checkout -b backport/legacy-1.9.0 origin/legacy
+git merge --no-ff --no-commit v2.1.0
+```
+
+If the release is identified by commit instead of tag:
+
+```powershell
+git merge --no-ff --no-commit <v2.1.0-release-commit>
+```
+
+Do not cherry-pick a guessed subset unless the merge strategy fails and the fallback plan is documented.
 
 Expected legacy-port shape:
 
@@ -185,16 +206,52 @@ Expected legacy-port shape:
 - Remove or guard Factorio `2.1`-only features.
 - Validate against a Factorio `2.0.x` binary before publishing.
 
+Legacy `info.json` target:
+
+```json
+{
+  "version": "1.9.0",
+  "factorio_version": "2.0",
+  "dependencies": [
+    "base >= 2.0",
+    "? space-age"
+  ]
+}
+```
+
+Legacy must not carry these Factorio `2.1` dependency floors unless later Factorio `2.0` validation proves a specific ordering need:
+
+- `base >= 2.1.x`
+- `? elevated-rails >= 2.1.x`
+- `? recycler >= 2.1.x`
+- `? quality >= 2.1.x`
+- `? space-age >= 2.1.x`
+
 Known or likely legacy-specific removals/guards:
 
 | Surface | Legacy rule |
 | --- | --- |
-| `max-cargo-bay-unloading-distance` | Remove from legacy unless Factorio 2.0 validation proves support |
-| `cargo-landing-pad-count` | Remove from legacy unless Factorio 2.0 validation proves support |
+| `research_cargo_bay_unloading_distance` | Remove from legacy unless Factorio 2.0 validation proves support |
+| `research_cargo_landing_pad_count` | Remove from legacy unless Factorio 2.0 validation proves support |
+| `max-cargo-bay-unloading-distance` | Must not appear in legacy direct-effect stream definitions unless support is proven |
+| `cargo-landing-pad-count` | Must not appear in legacy direct-effect stream definitions unless support is proven |
 | Agricultural tower scripted events | Keep only if Factorio 2.0 exposes the required events and entity fields |
 | Pipeline extent setting | Keep only if the same prototype fields exist and validation passes |
 | High-throughput pump | Keep only if the pump prototype path validates under Factorio 2.0 |
 | New v2.1.0 recipe-productivity streams | Keep if exact recipes exist and no duplicate infinite technology owns them |
+
+Keep from the v2.1.0 source snapshot unless Factorio `2.0` validation proves a specific incompatibility:
+
+- `data-final-fixes.lua` generation.
+- lab-input science-pack discovery.
+- lab incompatibility policy.
+- science-pack ingredient policy.
+- recipe matching refactor.
+- diagnostics and recipe-match diagnostics.
+- base-tech extension safety.
+- opportunistic compatibility cleanup.
+- validation and package parity tooling.
+- docs and locale structure.
 
 Expected legacy-specific files:
 
@@ -209,6 +266,8 @@ Expected legacy-specific files:
 - `dist/more-infinite-research_1.9.0.zip`
 
 The success criterion is that the diff from v2.1.0 to legacy is mostly metadata, docs, validation branching, and explicit removal of Factorio `2.1`-only technology surfaces.
+
+Static validation is already branch-aware from `info.json`: Factorio `2.0` metadata rejects Factorio `2.1` dependency floors and fails if legacy direct-effect stream definitions still contain `max-cargo-bay-unloading-distance` or `cargo-landing-pad-count`.
 
 ## Companion Mod Backlog
 

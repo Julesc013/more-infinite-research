@@ -39,18 +39,37 @@ This is especially relevant for cargo landing pad count, cargo bay unloading dis
 
 ## Legacy Backport Model
 
-The planned Factorio `2.0` legacy release is `v1.9.0`, backported from the finished v2.1.0 Factorio `2.1` codebase.
+The planned Factorio `2.0` legacy release is More Infinite Research `v1.9.0`, backported from the finished More Infinite Research `v2.1.0` Factorio `2.1` codebase.
 
 Legacy should not be rebuilt commit-by-commit from v2.0.0 or v2.0.5. It should be the current MIR generator, diagnostics, recipe matching, science-pack handling, compatibility cleanup, docs structure, locale, and validation infrastructure with Factorio `2.1`-only surface area removed or guarded.
 
+Legacy `info.json` must use Factorio `2.0` metadata:
+
+```json
+{
+  "version": "1.9.0",
+  "factorio_version": "2.0",
+  "dependencies": [
+    "base >= 2.0",
+    "? space-age"
+  ]
+}
+```
+
+Do not carry the Factorio `2.1.x` base or optional official DLC dependency floors into legacy unless a later Factorio `2.0` validation run proves a specific ordering requirement.
+
 Known legacy exclusions until Factorio `2.0` validation proves otherwise:
 
+- `research_cargo_bay_unloading_distance`
+- `research_cargo_landing_pad_count`
 - `max-cargo-bay-unloading-distance`
 - `cargo-landing-pad-count`
 - any scripted agriculture path that depends on unavailable agricultural tower events or entity fields
 - any pump, pipeline, or Space Age logistics prototype field added after the Factorio `2.0` target
 
-Legacy validation should be branch-aware from `info.json`: Factorio `2.1` checks require cargo streams and the `2.1.8` dependency floor, while Factorio `2.0` checks require those cargo modifier strings to be absent and the package to build as `more-infinite-research_1.9.0.zip`.
+Keep these architecture pieces from the v2.1.0 source snapshot unless Factorio `2.0` validation proves a specific incompatibility: `data-final-fixes.lua` generation, lab-input science-pack discovery, lab incompatibility policy, science-pack ingredient policy, recipe matching, diagnostics, base-tech extension safety, opportunistic compatibility cleanup, validation/package parity tooling, docs structure, and locale structure.
+
+Validation is branch-aware from `info.json`: Factorio `2.1` checks require cargo streams and the `2.1.8` dependency floor, while Factorio `2.0` checks reject Factorio `2.1` dependency floors, require those cargo modifier strings to be absent from direct-effect stream definitions, skip Factorio `2.1` cargo runtime fixtures, and expect the package to build as `more-infinite-research_1.9.0.zip`.
 
 ## Opportunistic Integrations
 

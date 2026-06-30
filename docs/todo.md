@@ -160,26 +160,29 @@ v2.1.0 should be the first broader post-agriculture release.
 
 ## Legacy v1.9.0 Backport After v2.1.0
 
-Do not reconstruct v2.0.0 or v2.0.5 commit-by-commit for `legacy`. The planned legacy release is a Factorio `2.0` compatibility port of the finished v2.1.0 codebase.
+Do not reconstruct v2.0.0 or v2.0.5 commit-by-commit for `legacy`. The planned legacy release is More Infinite Research v1.9.0 for Factorio `2.0.x`, ported from the finished More Infinite Research v2.1.0 release commit for Factorio `2.1.x`.
 
 ### Backport Setup
 
 - [ ] Finish and validate v2.1.0 on the Factorio `2.1` line.
-- [ ] Tag or branch the exact v2.1.0 source point.
-- [ ] Check out `legacy` from `origin/legacy`.
-- [ ] Create a temporary branch such as `backport/legacy-1.9.0-from-2.1.0`.
-- [ ] Merge or snapshot the v2.1.0 source point into the temporary branch.
+- [ ] Tag or branch the exact v2.1.0 source point, or record the exact release commit hash.
+- [ ] Run `git fetch origin`.
+- [ ] Run `git checkout -b backport/legacy-1.9.0 origin/legacy`.
+- [ ] Run `git merge --no-ff --no-commit v2.1.0`, or `git merge --no-ff --no-commit <v2.1.0-release-commit>` if using a commit hash.
+- [ ] Do not cherry-pick a guessed subset unless the full snapshot merge fails and the fallback is documented.
 - [ ] Prefer v2.1.0 source for shared generator, diagnostics, science-pack handling, recipe matching, compatibility cleanup, validation scripts, docs structure, and localization.
+- [ ] Keep `data-final-fixes.lua` generation, lab-input science-pack discovery, lab incompatibility policy, science-pack ingredient policy, recipe matching, diagnostics, base-tech extension safety, opportunistic compatibility cleanup, validation/package parity tooling, docs structure, and locale structure unless Factorio `2.0` validation proves a specific incompatibility.
 
 ### Legacy Compatibility Patch
 
 - [ ] Set `info.json` version to `1.9.0`.
 - [ ] Set `info.json` `factorio_version` to `2.0`.
-- [ ] Set base dependency to the Factorio `2.0` floor.
-- [ ] Remove the Factorio `2.1.8` dependency floor from legacy.
+- [ ] Set `info.json` dependencies to the legacy target: `base >= 2.0` and `? space-age`.
+- [ ] Remove `base >= 2.1.x` from legacy.
+- [ ] Remove `? elevated-rails >= 2.1.x`, `? recycler >= 2.1.x`, `? quality >= 2.1.x`, and `? space-age >= 2.1.x` from legacy unless a specific Factorio `2.0` ordering need is proven.
 - [ ] Remove or guard `research_cargo_bay_unloading_distance`.
 - [ ] Remove or guard `research_cargo_landing_pad_count`.
-- [ ] Add a validation check that legacy does not ship `max-cargo-bay-unloading-distance` or `cargo-landing-pad-count` unless Factorio `2.0` support is proven.
+- [ ] Confirm static validation fails if legacy direct-effect stream definitions still contain `max-cargo-bay-unloading-distance` or `cargo-landing-pad-count`.
 - [ ] Verify whether agricultural tower events and `tick_grown` are available in the target Factorio `2.0.x` build before keeping scripted agriculture.
 - [ ] Verify whether any v2.1.0 pump or pipeline prototype fields exist in Factorio `2.0.x` before keeping them.
 - [ ] Rewrite `changelog.txt` as a `1.9.0` legacy backport entry, not a copied v2.1.0 entry.
@@ -195,7 +198,8 @@ Do not reconstruct v2.0.0 or v2.0.5 commit-by-commit for `legacy`. The planned l
 - [ ] Static validation skips 2.1-only cargo runtime fixture expectations on legacy.
 - [ ] Run `.\scripts\Build-MIRPackage.ps1` on legacy.
 - [ ] Run `.\scripts\Invoke-MIRValidation.ps1 -StaticOnly` on legacy.
-- [ ] Run `.\scripts\Invoke-MIRValidation.ps1 -FactorioBin "<Factorio-2.0.exe>"` on legacy.
+- [ ] Run `.\scripts\Invoke-MIRValidation.ps1 -FactorioBin "C:\Path\To\Factorio-2.0.x\bin\x64\factorio.exe"` on legacy.
+- [ ] Do not validate the legacy port with the Steam-updated Factorio `2.1.x` binary.
 - [ ] Fix failures in this order: load-time prototype errors, invalid modifiers/effects, metadata, unresearchable science packs, docs/package validation, locale synchronization.
 - [ ] Keep the legacy diff small: metadata, docs, validation branching, package name, and explicit removal of Factorio `2.1`-only surfaces.
 

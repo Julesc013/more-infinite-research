@@ -7,6 +7,9 @@ param(
 
 $ErrorActionPreference = "Stop"
 $repo = Resolve-Path (Join-Path $PSScriptRoot "..")
+$repoInfo = Get-Content -Raw (Join-Path $repo "info.json") | ConvertFrom-Json
+$isLegacyFactorio20 = $repoInfo.factorio_version -eq "2.0"
+$isFactorio21Line = $repoInfo.factorio_version -eq "2.1"
 
 function Invoke-RepoCheck {
   param([string]$Description, [scriptblock]$Script)
@@ -26,12 +29,32 @@ function Find-RepositoryText {
 }
 
 Invoke-RepoCheck "info.json parses" {
-  $null = Get-Content -Raw (Join-Path $repo "info.json") | ConvertFrom-Json
+  $null = $repoInfo
+}
+
+Invoke-RepoCheck "release metadata matches Factorio line" {
+  $deps = @($repoInfo.dependencies)
+
+  if ($isLegacyFactorio20) {
+    if ($deps -notcontains "base >= 2.0") {
+      throw "Factorio 2.0 legacy metadata must declare base >= 2.0."
+    }
+
+    $factorio21Deps = @($deps | Where-Object { $_ -match ">=\s*2\.1" })
+    if ($factorio21Deps.Count -gt 0) {
+      throw "Factorio 2.0 legacy metadata must not carry Factorio 2.1 dependency floors: $($factorio21Deps -join ', ')"
+    }
+  } elseif ($isFactorio21Line) {
+    if ($deps -notcontains "base >= 2.1.8") {
+      throw "Factorio 2.1 metadata must declare base >= 2.1.8."
+    }
+  } else {
+    throw "Unsupported factorio_version in info.json: $($repoInfo.factorio_version)"
+  }
 }
 
 Invoke-RepoCheck "release metadata avoids compatibility mod dependencies" {
-  $info = Get-Content -Raw (Join-Path $repo "info.json") | ConvertFrom-Json
-  $deps = @($info.dependencies)
+  $deps = @($repoInfo.dependencies)
   $compatDependencyModIds = @(
     "Advanced-Electric-Revamped-v16",
     "Better_Robots_Extended",
@@ -122,12 +145,6 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "prototypes\base-tech-extensions.lua"; Text = $baseExtensionsText; Snippet = 'append_end_game_gate_prerequisite' },
     @{ File = "prototypes\lib\science-packs.lua"; Text = $scienceText; Snippet = 'end_game_science_pack' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'icon_tech = "research-productivity"' },
-    @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'research_cargo_landing_pad_count = {' },
-    @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'required_mods = {"space-age"}' },
-    @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'required_technologies = {"rocket-silo"}' },
-    @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'science_packs = "all-official"' },
-    @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'type = "max-cargo-bay-unloading-distance", modifier = 10' },
-    @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'type = "cargo-landing-pad-count", modifier = 1' },
     @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'required_ammo_categories = {"tesla"}' },
     @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'ammo_category = "tesla", modifier = 0.1' },
     @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'ammo_category = "electric", modifier = 0.1' },
@@ -140,17 +157,40 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-science-pack-ingredient-policy-all=Use all lab science packs' }
   )
 
+  if ($isLegacyFactorio20) {
+    $legacyForbiddenCargoSnippets = @(
+      'type = "max-cargo-bay-unloading-distance"',
+      'type = "cargo-landing-pad-count"'
+    )
+    foreach ($snippet in $legacyForbiddenCargoSnippets) {
+      if ($directEffectsText.Contains($snippet)) {
+        throw "Factorio 2.0 legacy must not include Factorio 2.1-only cargo technology modifier in prototypes\streams\direct-effects.lua: $snippet"
+      }
+    }
+  } else {
+    $requiredSnippets += @(
+      @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'research_cargo_landing_pad_count = {' },
+      @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'required_mods = {"space-age"}' },
+      @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'required_technologies = {"rocket-silo"}' },
+      @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'science_packs = "all-official"' },
+      @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'type = "max-cargo-bay-unloading-distance", modifier = 10' },
+      @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'type = "cargo-landing-pad-count", modifier = 1' }
+    )
+  }
+
   foreach ($check in $requiredSnippets) {
     if (-not $check.Text.Contains($check.Snippet)) {
       throw "Missing science-pack progression setting wiring in $($check.File): $($check.Snippet)"
     }
   }
 
-  if ($defaultsText -notmatch '(?s)research_cargo_bay_unloading_distance\s*=\s*\{.*?research_time\s*=\s*120') {
-    throw "Cargo bay unloading distance default research time must be 120 seconds."
-  }
-  if ($defaultsText -notmatch '(?s)research_cargo_landing_pad_count\s*=\s*\{.*?research_time\s*=\s*240') {
-    throw "Cargo landing pad count default research time must be 240 seconds."
+  if (-not $isLegacyFactorio20) {
+    if ($defaultsText -notmatch '(?s)research_cargo_bay_unloading_distance\s*=\s*\{.*?research_time\s*=\s*120') {
+      throw "Cargo bay unloading distance default research time must be 120 seconds."
+    }
+    if ($defaultsText -notmatch '(?s)research_cargo_landing_pad_count\s*=\s*\{.*?research_time\s*=\s*240') {
+      throw "Cargo landing pad count default research time must be 240 seconds."
+    }
   }
 }
 
@@ -834,31 +874,35 @@ Assert-ReportLineGenerated -Line $gateLine -Context "End-game prerequisite gate 
 Assert-ReportLineContains -Line $gateLine -Expected "prerequisites=automation-science-pack,logistic-science-pack,chemical-science-pack,production-science-pack,space-science-pack" -Context "End-game prerequisite gate scenario"
 Assert-ReportLineDoesNotContain -Line $gateLine -Unexpected "science=automation-science-pack,logistic-science-pack,chemical-science-pack,production-science-pack,space-science-pack" -Context "End-game prerequisite gate scenario"
 
-Invoke-RuntimeScenario -ScenarioName "base-cargo-space-age-gate" -EnabledFixtureNames @() -EnabledStreamKeys @(
-  "research_cargo_landing_pad_count"
-)
-$cargoPadLine = Get-LastStreamReportLine -Key "research_cargo_landing_pad_count"
-if ($cargoPadLine -notmatch "status=skipped" -or $cargoPadLine -notmatch "missing required mod space-age") {
-  throw "Cargo landing pad count generated or skipped for the wrong reason without Space Age: $cargoPadLine"
+if ($isLegacyFactorio20) {
+  Write-Host "[skip] Factorio 2.1 cargo runtime fixture scenarios skipped for Factorio 2.0 legacy metadata."
+} else {
+  Invoke-RuntimeScenario -ScenarioName "base-cargo-space-age-gate" -EnabledFixtureNames @() -EnabledStreamKeys @(
+    "research_cargo_landing_pad_count"
+  )
+  $cargoPadLine = Get-LastStreamReportLine -Key "research_cargo_landing_pad_count"
+  if ($cargoPadLine -notmatch "status=skipped" -or $cargoPadLine -notmatch "missing required mod space-age") {
+    throw "Cargo landing pad count generated or skipped for the wrong reason without Space Age: $cargoPadLine"
+  }
+
+  Invoke-RuntimeScenario -ScenarioName "space-age-cargo-pad-enabled" -EnabledFixtureNames @() -EnabledStreamKeys @(
+    "research_cargo_landing_pad_count"
+  ) -EnableSpaceAge
+  $spaceAgeCargoPadLine = Get-LastStreamReportLine -Key "research_cargo_landing_pad_count"
+  Assert-ReportLineGenerated -Line $spaceAgeCargoPadLine -Context "Space Age cargo landing pad count scenario"
+  $spaceAgeCargoDistanceLine = Get-LastStreamReportLine -Key "research_cargo_bay_unloading_distance"
+  Assert-ReportLineGenerated -Line $spaceAgeCargoDistanceLine -Context "Space Age cargo bay unloading distance scenario"
+
+  Invoke-RuntimeScenario -ScenarioName "space-age-cargo-logistics-shape" -EnabledFixtureNames @(
+    "mir-fixture-assert-cargo-logistics"
+  ) -EnabledStreamKeys @(
+    "research_cargo_landing_pad_count"
+  ) -EnableSpaceAge
+  $spaceAgeCargoShapePadLine = Get-LastStreamReportLine -Key "research_cargo_landing_pad_count"
+  Assert-ReportLineGenerated -Line $spaceAgeCargoShapePadLine -Context "Space Age cargo logistics shape scenario"
+  $spaceAgeCargoShapeDistanceLine = Get-LastStreamReportLine -Key "research_cargo_bay_unloading_distance"
+  Assert-ReportLineGenerated -Line $spaceAgeCargoShapeDistanceLine -Context "Space Age cargo logistics shape scenario"
 }
-
-Invoke-RuntimeScenario -ScenarioName "space-age-cargo-pad-enabled" -EnabledFixtureNames @() -EnabledStreamKeys @(
-  "research_cargo_landing_pad_count"
-) -EnableSpaceAge
-$spaceAgeCargoPadLine = Get-LastStreamReportLine -Key "research_cargo_landing_pad_count"
-Assert-ReportLineGenerated -Line $spaceAgeCargoPadLine -Context "Space Age cargo landing pad count scenario"
-$spaceAgeCargoDistanceLine = Get-LastStreamReportLine -Key "research_cargo_bay_unloading_distance"
-Assert-ReportLineGenerated -Line $spaceAgeCargoDistanceLine -Context "Space Age cargo bay unloading distance scenario"
-
-Invoke-RuntimeScenario -ScenarioName "space-age-cargo-logistics-shape" -EnabledFixtureNames @(
-  "mir-fixture-assert-cargo-logistics"
-) -EnabledStreamKeys @(
-  "research_cargo_landing_pad_count"
-) -EnableSpaceAge
-$spaceAgeCargoShapePadLine = Get-LastStreamReportLine -Key "research_cargo_landing_pad_count"
-Assert-ReportLineGenerated -Line $spaceAgeCargoShapePadLine -Context "Space Age cargo logistics shape scenario"
-$spaceAgeCargoShapeDistanceLine = Get-LastStreamReportLine -Key "research_cargo_bay_unloading_distance"
-Assert-ReportLineGenerated -Line $spaceAgeCargoShapeDistanceLine -Context "Space Age cargo logistics shape scenario"
 
 Write-Host "[ok] Validation completed."
 $global:LASTEXITCODE = 0

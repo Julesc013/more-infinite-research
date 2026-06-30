@@ -780,7 +780,7 @@ Required named test saves/scenarios:
 
 ## Factorio 2.0 Backport Reality
 
-The better backport target is the finished v2.1.0 codebase, not v2.0.0 or v2.0.5 reconstructed commit-by-commit.
+The better backport target is the finished More Infinite Research v2.1.0 codebase for Factorio `2.1.x`, not v2.0.0 or v2.0.5 reconstructed commit-by-commit.
 
 Backport rule:
 
@@ -791,7 +791,7 @@ legacy should be current MIR code, minus Factorio 2.1-only surface area, with Fa
 The planned mapping is:
 
 ```text
-v2.1.0 on Factorio 2.1.x -> v1.9.0 on Factorio 2.0.x
+More Infinite Research v2.1.0 on Factorio 2.1.x -> More Infinite Research v1.9.0 on Factorio 2.0.x
 ```
 
 Be careful with the backport promise. The current 2.1 path can use clean agricultural tower events, cargo landing pad APIs, and any new v2.1.0 prototype unlocks. The 2.0 line may not have those APIs.
@@ -816,6 +816,21 @@ Best backport plan:
 - Remove or guard cargo landing pad count/unloading distance.
 - Keep scripted agriculture, pump/pipeline features, and new recipe-productivity streams only when Factorio 2.0 validation proves support.
 ```
+
+Legacy metadata should be explicit:
+
+```json
+{
+  "version": "1.9.0",
+  "factorio_version": "2.0",
+  "dependencies": [
+    "base >= 2.0",
+    "? space-age"
+  ]
+}
+```
+
+Do not carry Factorio `2.1.x` dependency floors into legacy. Validation should fail if legacy direct-effect stream definitions still contain `max-cargo-bay-unloading-distance` or `cargo-landing-pad-count`.
 
 A Factorio 2.0 backport should be a best-compatible subset on `legacy`, not a promise of full feature parity. The success criterion is that the diff from v2.1.0 to legacy is mostly metadata, docs, validation branching, and explicit removal of Factorio 2.1-only technology surfaces.
 
