@@ -5,8 +5,8 @@ Date: 2026-06-30
   Features:
 
     - Updated the mod for Factorio 2.1.
-    - Added Space Age cargo bay unloading distance infinite research for the Factorio 2.1 landing pad unloading bay. Each level adds 10 tiles by default, requires the vanilla unloading bay unlock, uses all available science packs, and has configurable enable, cost, growth, max-level, and research-time startup settings.
-    - Added Space Age cargo landing pad count infinite research as a disabled-by-default sandbox option. Each level adds one additional cargo landing pad per surface by default, uses all available science packs, and starts at a deliberately expensive 1,000,000 research units with 10x growth.
+    - Added Space Age cargo bay unloading distance infinite research for the Factorio 2.1 landing pad unloading bay. Each level adds 10 tiles by default, requires the vanilla unloading bay unlock, uses official base and Space Age science packs, and has configurable enable, cost, growth, max-level, and research-time startup settings.
+    - Added Space Age cargo landing pad count infinite research as a disabled-by-default sandbox option. Each level adds one additional cargo landing pad per surface by default, requires the cargo landing pad unlock, uses official base and Space Age science packs, and starts at a deliberately expensive 1,000,000 research units with 10x growth.
     - Added local fixture mods and a PowerShell validation runner for static checks and optional Factorio runtime load checks.
     - Added a startup-controlled generation diagnostics report for generated and skipped streams and base extensions.
     - Added a startup-controlled recipe match diagnostics report for troubleshooting which recipes each productivity stream captured.
@@ -23,6 +23,7 @@ Date: 2026-06-30
     - Added a science-pack ingredient policy setting so users can keep configured packs, add space science, add space and promethium science, use all official science packs, or require every active lab science pack including compatible modded packs.
     - Changed Space Age cargo logistics research to use official base and Space Age science packs only. Cargo bay unloading distance now takes 120 seconds per unit, and cargo landing pad count now takes 240 seconds per unit.
     - Fixed Space Age cargo logistics research so cargo landing pad count and cargo bay unloading distance are skipped when Space Age is disabled.
+    - Added a missing cargo landing pad count modifier description so the technology effect displays normally instead of showing an unknown locale key.
     - Added in-game descriptions that explain the recipe productivity cap and lab-compatible science-pack behavior.
 
   Generator changes:
@@ -48,6 +49,7 @@ Date: 2026-06-30
     - Fixed base-technology extension settings so entering 0 for base cost, growth factor, or research time now derives that value from the vanilla technology chain instead of falling back to this mod's configured defaults.
     - Base-technology extensions now skip generation when a positive max-level setting is below the first generated continuation level.
     - Kept declared required-technology prerequisite handling centralized in the shared prerequisite builder.
+    - Added an explicit rocket silo prerequisite to cargo landing pad count research so the generated technology is tied to the vanilla cargo landing pad unlock.
     - Split the prototype utility facade into focused modules for lookup, science-pack validation, recipe matching, icon construction, and deepcopy.
     - Split stream definitions into productivity and direct-effect domain modules.
     - Added compatibility profile scaffolding for future mod-specific stream patches.
@@ -98,6 +100,7 @@ Date: 2026-06-30
     - Strengthened release package validation so key packaged source files must match the repository copy, catching stale archives with otherwise valid metadata.
     - Strengthened release package validation so README, changelog, documentation, and locale files must match the repository copy.
     - Added runtime fixture validation for the `skip` lab incompatibility policy.
+    - Added runtime fixture validation for Space Age cargo logistics technology shape, including effect types, modifiers, costs, research times, prerequisites, and official science-pack ingredients.
 
   Documentation:
 

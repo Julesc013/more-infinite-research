@@ -10,6 +10,7 @@ Factorio locale rules that matter for this mod:
 - Do not add spaces around `=`. Factorio treats whitespace around keys and values as literal text.
 - Preserve placeholders such as `__1__` exactly.
 - Do not keep empty locale folders as placeholders. A locale folder should contain a complete `more-infinite-research.cfg`.
+- Generated technology effects can require `[modifier-description]` keys when Factorio does not provide one for a valid modifier type.
 
 Run this after any locale or English string change:
 

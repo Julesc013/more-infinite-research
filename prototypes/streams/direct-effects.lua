@@ -33,6 +33,7 @@ return {
     -- mod set, but generation must still skip without Space Age.
     required_mods = {"space-age"},
     required_items = {"cargo-landing-pad"},
+    required_technologies = {"rocket-silo"},
     icon_item = "cargo-landing-pad",
     overlay = "count",
     localised_description = {"technology-description.more-infinite-research.cargo_landing_pad_count"},

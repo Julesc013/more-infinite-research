@@ -98,4 +98,4 @@ Static package validation also compares key packaged source, documentation, and 
 
 Static validation also checks Factorio changelog formatting, including the required 99-dash section separators.
 
-The fixture mods under `fixtures/` test item-based science packs, custom labs, late recipe creation, the default `reduce` lab incompatibility behavior, the `skip` lab incompatibility behavior, science-pack ingredient policy modes, the end-game prerequisite gate, base-only cargo skip behavior, and post-MIR assertions for both runtime lab-policy outcomes.
+The fixture mods under `fixtures/` test item-based science packs, custom labs, late recipe creation, the default `reduce` lab incompatibility behavior, the `skip` lab incompatibility behavior, science-pack ingredient policy modes, the end-game prerequisite gate, base-only cargo skip behavior, Space Age cargo logistics effect shape, finite vanilla-chain preservation, and post-MIR assertions for runtime-sensitive generated technologies.
