@@ -2,7 +2,7 @@
 
 Updated: 2026-07-01
 
-This document is the v2.0.0 release checklist and follow-on roadmap. The baseline below reflects the current implementation state.
+This document started as the v2.0.0 release checklist and now tracks follow-on roadmap state. The baseline below reflects the current implementation state.
 
 This document captures the Factorio 2.1 experimental compatibility review and turns it into an execution plan for the mod's v2.0.0 release and follow-on expansion work.
 
@@ -12,10 +12,11 @@ For post-v2.0.0 feature triage from public feedback, see `docs/post-2.0-feature-
 
 ## Current Repository Baseline
 
-- `info.json` declares mod version `2.0.0`, `factorio_version = "2.1"`, base `>= 2.1.8`, and optional official DLC ordering for Elevated Rails, Recycler, Quality, and Space Age; known third-party compatibility mods are handled opportunistically without release metadata dependencies.
+- `info.json` declares mod version `2.0.5`, `factorio_version = "2.1"`, base `>= 2.1.8`, and optional official DLC ordering for Elevated Rails, Recycler, Quality, and Space Age; known third-party compatibility mods are handled opportunistically without release metadata dependencies.
 - `data.lua` loads only stable shared configuration and utility facades.
 - `data-updates.lua` is reserved for pre-final compatibility hooks.
 - `data-final-fixes.lua` runs generated technology creation, competing recipe-productivity cleanup, competing base-extension cleanup, base technology extensions, weapon speed adjustments, max-level enforcement, and diagnostics flushing.
+- `control.lua` loads the first bounded scripted technology manager for spoilage preservation and agricultural growth speed.
 - Science-pack handling is based on item prototype lookup plus active lab inputs, not `data.raw.tool`.
 - Science-pack productivity dynamically adds active lab inputs to the target item list, so custom science packs can receive productivity effects when their recipes are visible.
 - Generated technology ingredients are validated against complete lab input sets and reduced or skipped instead of creating unresearchable technologies.
@@ -133,7 +134,7 @@ Official DLC mods are optional from MIR's perspective, and in Factorio 2.1.7+ Qu
 Implementation requirements:
 
 - Give `research_character_reach` base-game icon/science fallbacks.
-- Check that `research_electric_shooting_speed` has the `electric` ammo category and `tesla-weapons` technology before generation.
+- Check that `research_electric_shooting_speed` has the `tesla` ammo category and `tesla-weapons` technology before generation, then include the older `electric` category effect when available for discharge-defense equipment.
 - Ensure streams that reference DLC science packs do not generate impossible ingredient sets in base-only runs.
 - Test independent official DLC combinations where Factorio permits them, including Space Age with Quality disabled.
 - Avoid direct DLC asset paths unless the stream is gated by concrete required prototypes or the path is guarded.

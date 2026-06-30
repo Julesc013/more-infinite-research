@@ -128,6 +128,9 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'science_packs = "all-official"' },
     @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'type = "max-cargo-bay-unloading-distance", modifier = 10' },
     @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'type = "cargo-landing-pad-count", modifier = 1' },
+    @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'required_ammo_categories = {"tesla"}' },
+    @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'ammo_category = "tesla", modifier = 0.1' },
+    @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'ammo_category = "electric", modifier = 0.1' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = '[modifier-description]' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'cargo-landing-pad-count=Cargo landing pads per surface: +__1__' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-science-pack-ingredient-policy-configured=Configured per technology' },
@@ -256,6 +259,7 @@ Invoke-RepoCheck "release package archive matches metadata" {
       "${root}LICENSE",
       "${root}thumbnail.png",
       "${root}data.lua",
+      "${root}control.lua",
       "${root}data-updates.lua",
       "${root}data-final-fixes.lua",
       "${root}settings.lua",
@@ -268,6 +272,9 @@ Invoke-RepoCheck "release package archive matches metadata" {
       "${root}prototypes/compat/competing-base-extensions.lua",
       "${root}prototypes/streams/productivity.lua",
       "${root}prototypes/streams/direct-effects.lua",
+      "${root}control/scripted-techs.lua",
+      "${root}control/effects/spoilage-preservation.lua",
+      "${root}control/effects/agricultural-growth-speed.lua",
       "${root}prototypes/lib/science-packs.lua",
       "${root}prototypes/lib/recipe-matching.lua"
     )
@@ -309,10 +316,12 @@ Invoke-RepoCheck "release package archive matches metadata" {
       throw "Package info.json dependencies do not match repository info.json."
     }
 
+    $repoPath = $repo.Path
     $mustMatchRepo = @(
       "README.md",
       "changelog.txt",
       "CONTRIBUTING.md",
+      "control.lua",
       "data.lua",
       "data-updates.lua",
       "data-final-fixes.lua",
@@ -336,7 +345,10 @@ Invoke-RepoCheck "release package archive matches metadata" {
       "prototypes/lib/technology-cleanup.lua",
       "prototypes/lib/technology-icons.lua"
     )
-    $repoPath = $repo.Path
+    $mustMatchRepo += @(
+      Get-ChildItem -LiteralPath (Join-Path $repo "control") -Recurse -File -Filter "*.lua" |
+        ForEach-Object { [System.IO.Path]::GetRelativePath($repoPath, $_.FullName).Replace("\", "/") }
+    )
     $mustMatchRepo += @(
       Get-ChildItem -LiteralPath (Join-Path $repo "docs") -File |
         ForEach-Object { [System.IO.Path]::GetRelativePath($repoPath, $_.FullName).Replace("\", "/") }
@@ -765,6 +777,18 @@ $spaceAgeSpacePackLine = Get-LastStreamReportLine -Key "research_gears"
 Assert-ReportLineGenerated -Line $spaceAgeSpacePackLine -Context "Space Age space-only science-pack ingredient policy scenario"
 Assert-ReportLineContains -Line $spaceAgeSpacePackLine -Expected "space-science-pack" -Context "Space Age space-only science-pack ingredient policy scenario"
 Assert-ReportLineDoesNotContain -Line $spaceAgeSpacePackLine -Unexpected "promethium-science-pack" -Context "Space Age space-only science-pack ingredient policy scenario"
+
+foreach ($vanillaOwnedStream in @(
+  "research_low_density_structure",
+  "research_plastic",
+  "research_processing_unit",
+  "research_rocket_fuel"
+)) {
+  $vanillaOwnedLine = Get-LastStreamReportLine -Key $vanillaOwnedStream
+  if ($vanillaOwnedLine -notmatch "status=skipped" -or $vanillaOwnedLine -notmatch "covered_by_existing_infinite_recipe_productivity") {
+    throw "Space Age vanilla-owned productivity stream should skip instead of generating a parallel MIR technology: $vanillaOwnedLine"
+  }
+}
 
 Invoke-RuntimeScenario -ScenarioName "space-age-space-promethium-pack-policy" -EnabledFixtureNames @() -SciencePackIngredientPolicy "space-and-promethium" -EnableSpaceAge
 $spaceAgeSpacePromethiumPackLine = Get-LastStreamReportLine -Key "research_gears"

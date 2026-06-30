@@ -99,7 +99,7 @@ These should come before or alongside new content.
 
 | Feature | Add? | Notes |
 | --- | ---: | --- |
-| Scripted-tech framework | Yes | Required for spoilage/growth and future non-native effects. |
+| Scripted-tech framework | Started in v2.0.5 | Required for spoilage/growth and future non-native effects. |
 | Settings presets | Yes | The thread shows users want "add more infinite research like vanilla" as well as sandbox behavior. |
 | Feature categories in settings | Yes | Group by Productivity, Character, Logistics, Cargo, Agriculture, Scripted, Sandbox. |
 | Compatibility matrix | Yes | Users asked about Maraxis and Krastorio 2 Spaced Out. |
@@ -223,13 +223,13 @@ Advanced Quality Research
 | Feature | Add to MIR? | Method | Priority |
 | --- | ---: | --- | ---: |
 | Settings presets | Yes | Startup setting plus derived defaults | P0 |
-| Scripted-tech framework | Yes | `control/scripted-techs.lua` | P0 |
+| Scripted-tech framework | Started | `control/scripted-techs.lua` | P0/P1 |
 | Duplicate-effect detection | Yes | Data-stage effect overlap scan | P0 |
 | Maraxis compatibility | Yes | Detect duplicate cargo techs | P0/P1 |
 | K2 Spaced Out compatibility | Yes | Test matrix | P0/P1 |
 | Factorio 2.0 backport | Yes, gated | Separate branch/release | P0 |
-| Spoilage preservation | Yes | `spoil_time_modifier` | P1 |
-| Agricultural growth speed | Yes | `on_tower_planted_seed` plus `tick_grown` | P1 |
+| Spoilage preservation | Started | `spoil_time_modifier` | P1 |
+| Agricultural growth speed | Started | `on_tower_planted_seed` plus `tick_grown` | P1 |
 | Engine unit productivity | Already yes | Generated recipe productivity | Existing |
 | Electric engine productivity | Already yes | Generated recipe productivity | Existing |
 | Flying robot frame productivity | Already yes | Generated recipe productivity | Existing |
@@ -337,7 +337,7 @@ The scripted manager should handle:
 - `on_technology_effects_reset`
 - `on_runtime_mod_setting_changed`, only if runtime toggles are added
 
-When `control.lua` is introduced, update `docs/architecture.md` with a control-stage architecture section and update validation for existing-save loads.
+`control.lua` was introduced in the first v2.0.5 implementation slice. Keep `docs/architecture.md`, package validation, and existing-save validation aligned as the scripted manager grows.
 
 ## Scripted Feature Lifecycle Requirements
 

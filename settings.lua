@@ -112,8 +112,20 @@ table.insert(settings_data, {
   localised_description = {"mod-setting-description.mir-debug-recipe-matches"}
 })
 
+table.insert(settings_data, {
+  type = "bool-setting",
+  name = "mir-debug-scripted-effects",
+  setting_type = "startup",
+  default_value = false,
+  order = "a-92",
+  localised_name = {"mod-setting-name.mir-debug-scripted-effects"},
+  localised_description = {"mod-setting-description.mir-debug-scripted-effects"}
+})
+
 local stream_order = {
   "research_breeding",
+  "research_spoilage_preservation",
+  "research_agricultural_growth_speed",
   "research_plastic",
   "research_sulfur",
   "research_batteries",

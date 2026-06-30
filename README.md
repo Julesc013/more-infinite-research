@@ -5,7 +5,7 @@
 More Infinite Research adds **configurable infinite productivity** and **bonus research** for intermediate items,
 logistics chains, combat bonuses, player bonuses, and Space Age gaps that vanilla Factorio does not cover.
 
-Version **`2.0.0`** targets **Factorio `2.1`** and requires:
+Version **`2.0.5`** targets **Factorio `2.1`** and requires:
 
 - `base >= 2.1.8`
 - optional `elevated-rails >= 2.1.8`
@@ -24,8 +24,9 @@ The mod is built around **graceful compatibility**: it discovers recipes, scienc
 - **Lab validation:** checks generated research ingredients against real labs so technologies stay researchable.
 - **Factorio 2.1 recipes:** supports recipe `categories` as well as legacy single `category`.
 - **Optional DLC:** keeps official DLC mods optional and gates DLC-shaped research behind concrete prototype checks.
+- **Scripted Space Age scaling:** adds bounded event-driven research for spoilage preservation and agricultural growth speed.
 - **Clean mod portal metadata:** keeps third-party compatibility-mod dependencies out of `info.json`.
-- **Save compatibility:** preserves existing generated prototype IDs for v2.0.0. **No migration is required.**
+- **Save compatibility:** preserves existing generated prototype IDs. v2.0.5 adds namespaced runtime storage for scripted effects.
 
 Recipe productivity researches are infinite, but **Factorio's recipe productivity cap still applies**.
 *Additional levels can eventually have no practical effect after a recipe reaches its cap.*
@@ -37,7 +38,7 @@ Install the mod through the **Factorio mod portal** or place the **release zip**
 The packaged release archive is:
 
 ```text
-dist/more-infinite-research_2.0.0.zip
+dist/more-infinite-research_2.0.5.zip
 ```
 
 ## Branch Policy
@@ -149,16 +150,16 @@ These streams generate `change-recipe-productivity` effects for matching recipes
 | `research_copper_cable` | Copper cable productivity | `copper-cable` | `+10%` | Excludes recipes with scrap ingredients. |
 | `research_electronic_circuit` | Electronic circuit productivity | `electronic-circuit` | `+10%` | Adds electromagnetic science when available; excludes scrap inputs. |
 | `research_advanced_circuit` | Advanced circuit productivity | `advanced-circuit` | `+10%` | Adds electromagnetic science when available; excludes scrap inputs. |
-| `research_processing_unit` | Processing unit productivity | `processing-unit` | `+10%` | Generates when matching visible recipes exist, including without Space Age. |
-| `research_plastic` | Plastic productivity | `plastic-bar` | `+10%` | Adds agricultural science when available. |
+| `research_processing_unit` | Processing unit productivity | `processing-unit` | `+10%` | Generates when matching visible recipes exist, including without Space Age. Skips in Space Age when vanilla `processing-unit-productivity` owns the recipe. |
+| `research_plastic` | Plastic productivity | `plastic-bar` | `+10%` | Adds agricultural science when available. Skips covered recipes in Space Age when vanilla `plastic-bar-productivity` owns them. |
 | `research_sulfur` | Sulfur productivity | `sulfur` | `+10%` | Adds metallurgic science when available; excludes asteroid ingredients. |
 | `research_batteries` | Battery productivity | `battery` | `+10%` | Adds electromagnetic science when available; excludes scrap inputs. |
 | `research_explosives` | Explosives productivity | `explosives`, `bio-explosives` | `+10%` | Adds metallurgic science when available. |
 | `research_engine` | Engine unit productivity | `engine-unit` | `+10%` | Adds metallurgic science when available. |
 | `research_electric_engine` | Electric engine unit productivity | `electric-engine-unit` | `+10%` | Adds electromagnetic science when available. |
 | `research_flying_robot_frame` | Flying robot frame productivity | `flying-robot-frame` | `+10%` | Adds electromagnetic science when available. |
-| `research_low_density_structure` | Low density structure productivity | `low-density-structure` | `+10%` | Adds metallurgic science when available. |
-| `research_rocket_fuel` | Rocket fuel productivity | `rocket-fuel` | `+10%` | Adds agricultural science when available. |
+| `research_low_density_structure` | Low density structure productivity | `low-density-structure` | `+10%` | Adds metallurgic science when available. Skips covered recipes in Space Age when vanilla `low-density-structure-productivity` owns them. |
+| `research_rocket_fuel` | Rocket fuel productivity | `rocket-fuel` | `+10%` | Adds agricultural science when available. Skips covered recipes in Space Age when vanilla `rocket-fuel-productivity` owns them. |
 | `research_tungsten` | Tungsten productivity | `tungsten-plate`, `tungsten-carbide` | `+10%` | Adds metallurgic science when available. |
 | `research_lithium` | Lithium productivity | `lithium-plate` | `+10%` | Adds cryogenic science when available. |
 | `research_holmium` | Holmium productivity | `holmium-plate` | `+10%` | Generates when matching visible recipes exist; adds electromagnetic science when available. |
@@ -185,18 +186,20 @@ These streams generate `change-recipe-productivity` effects for matching recipes
 | `research_inserters` | Inserter productivity | basic/burner; fast/long-handed; bulk; stack inserters | `+10%`; `+5%`; `+2%`; `+1%` | Adds space science when available. |
 | `research_science_pack_productivity` | Science pack productivity | vanilla and Space Age science packs, plus active modded lab inputs | `+10%` | Uses dynamic lab-input targets. Research time default is `120` seconds. |
 
-### Direct-Effect Streams
+### Direct-Effect And Scripted Streams
 
-These streams generate infinite technologies with direct Factorio technology modifiers.
+These streams generate infinite technologies with direct Factorio technology modifiers or visible scripted-effect placeholders. Scripted effects are handled in `control.lua` and remain event-driven.
 
 | Stream key | Research | Effect | Default | Gates and notes |
 | --- | --- | --- | --- | --- |
+| `research_spoilage_preservation` | Spoilage preservation | Scripted global spoil time modifier through a `nothing` technology effect | `+1%` spoil time per completed level, capped by Factorio's global spoil-time range | Requires Space Age, spoilage, and agricultural science. Uses the highest completed level across non-enemy/non-neutral forces. No inventory or item-stack scan. |
+| `research_agricultural_growth_speed` | Agricultural growth speed | Scripted `on_tower_planted_seed` adjustment of plant `tick_grown` through a `nothing` technology effect | `+1%` growth speed per completed level, capped at `10x` | Requires Space Age and agricultural science. Applies to newly planted agricultural tower plants in this first slice; existing farms are not globally rescanned. |
 | `research_cargo_bay_unloading_distance` | Cargo bay unloading distance | `max-cargo-bay-unloading-distance` | `+10` tiles per level | Requires Space Age plus the `landing-pad-unloading-bay` item and technology. Uses all official base and Space Age science packs, not modded science packs. Base cost `100000`, growth `3`, time `120`. |
 | `research_cargo_landing_pad_count` | Cargo landing pad count | `cargo-landing-pad-count` | `+1` landing pad per surface per level | Requires Space Age plus the `cargo-landing-pad` item and `rocket-silo` technology. Disabled by default. Uses all official base and Space Age science packs, not modded science packs. Base cost `1000000`, growth `10`, time `240`. |
 | `research_rocket_shooting_speed` | Rocket shooting speed | `gun-speed` for `rocket` ammo category | `+10%` speed per level | Base cost `60`, growth `1.5`. Uses a base-game rocketry icon. |
 | `research_cannon_shooting_speed` | Cannon shooting speed | `gun-speed` for `cannon-shell` ammo category | `+10%` speed per level | Base cost `60`, growth `1.5`. Uses the cannon shell item icon. |
 | `research_flamethrower_shooting_speed` | Flamethrower shooting speed | `gun-speed` for `flamethrower` | `+10%` speed per level | Base cost `60`, growth `1.5`. |
-| `research_electric_shooting_speed` | Electric shooting speed | `gun-speed` for `electric` | `+10%` speed per level | Requires the `tesla-weapons` technology and the `electric` ammo category. Base cost `60`, growth `1.5`. |
+| `research_electric_shooting_speed` | Electric shooting speed | `gun-speed` for `tesla` and `electric` | `+10%` speed per level | Requires the `tesla-weapons` technology and the `tesla` ammo category. Covers Tesla guns, Tesla turrets, and discharge-defense equipment where the matching ammo categories exist. Base cost `60`, growth `1.5`. |
 | `research_character_mining_speed` | Character mining speed | `character-mining-speed` | `+5%` per level | Uses utility, military, agricultural, and electromagnetic science when available. |
 | `research_character_crafting_speed` | Character crafting speed | `character-crafting-speed` | `+5%` per level | Uses utility, military, agricultural, and electromagnetic science when available. |
 | `research_character_walking_speed` | Character walking speed | `character-running-speed` | `+5%` per level | Uses utility, military, agricultural, and electromagnetic science when available. |
@@ -232,6 +235,7 @@ All settings are **startup settings**.
 | `mir-adjust-vanilla-weapon-speed-techs` | string | `off` | Controls whether MIR removes rocket and cannon-shell speed bonuses from vanilla weapon shooting speed technologies. Allowed values: `off`, `only-when-dedicated-tech-enabled`, `always`. |
 | `mir-debug-generation-report` | bool | `false` | Writes structured generated/skipped rows to the Factorio log, including science packs, prerequisites, effect counts, lab compatibility, and icon source. |
 | `mir-debug-recipe-matches` | bool | `false` | Writes matched recipe names for each generated productivity stream. Useful for mod compatibility reports, but noisy in large mod packs. |
+| `mir-debug-scripted-effects` | bool | `false` | Writes runtime log entries when scripted technologies recompute global or event-driven effects. |
 | `mir-lab-incompatibility-policy` | string | `reduce` | Controls incompatible science-pack selections. `reduce` uses the largest lab-compatible subset; `skip` skips the technology. |
 
 ### Per-Stream Settings
@@ -251,6 +255,8 @@ Per-stream default exceptions:
 | Stream | Enabled | Base cost | Growth | Time | Max |
 | --- | --- | --- | --- | --- | --- |
 | Shared stream default | Yes | `8000` | `2` | `60` | Infinite |
+| `research_spoilage_preservation` | Yes | `50000` | `1.5` | `120` | Infinite |
+| `research_agricultural_growth_speed` | Yes | `40000` | `1.5` | `90` | Infinite |
 | `research_inventory_capacity` | No | shared | `1.10` | shared | Infinite |
 | `research_character_trash_slots` | Yes | shared | `1.10` | shared | Infinite |
 | `research_robot_battery` | Yes | shared | `1.2` | shared | Infinite |
@@ -312,7 +318,9 @@ Generic competing recipe-productivity cleanup is intentionally limited to **know
 - **Progression intent:** lab-compatible reduction prevents unresearchable technologies, but it cannot infer every overhaul's intended progression.
 - **Unknown overhauls:** broad support is opportunistic, not a guarantee.
 - **Productivity cap:** recipe productivity remains capped by Factorio's recipe productivity limit.
-- **Stable IDs:** generated stream prototype IDs were intentionally kept stable for v2.0.0.
+- **Vanilla Space Age productivity:** MIR skips recipe-productivity effects already owned by another infinite recipe-productivity technology, so vanilla Space Age productivity techs are not duplicated in parallel.
+- **Stable IDs:** generated stream prototype IDs were intentionally kept stable across v2.0.0 and v2.0.5.
+- **Scripted agriculture scope:** v2.0.5 applies agricultural growth speed to newly planted tower crops. Existing farm rescaling remains a manual test/spike item to avoid broad scans.
 
 ## Developer Specification
 
@@ -320,6 +328,10 @@ Generic competing recipe-productivity cleanup is intentionally limited to **know
 
 | File | Purpose |
 | --- | --- |
+| `control.lua` | Loads the scripted technology manager for bounded runtime effects. |
+| `control/scripted-techs.lua` | Registers scripted technology lifecycle and event handlers. |
+| `control/effects/spoilage-preservation.lua` | Applies and restores the global spoilage preservation multiplier. |
+| `control/effects/agricultural-growth-speed.lua` | Adjusts newly planted agricultural tower crops from researched growth speed. |
 | `data.lua` | Loads stable shared config and utility facades only. |
 | `data-updates.lua` | Reserved for future pre-final compatibility hooks. |
 | `data-final-fixes.lua` | Runs generation, cleanup, extensions, adjustments, max-level control, and diagnostics. |

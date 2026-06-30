@@ -1,4 +1,47 @@
 return {
+  research_spoilage_preservation = {
+    required_mods = {"space-age"},
+    required_items = {"spoilage", "agricultural-science-pack"},
+    icon_item = "spoilage",
+    overlay = "speed",
+    localised_description = {"technology-description.more-infinite-research.spoilage_preservation"},
+    science_packs = {
+      "automation-science-pack",
+      "logistic-science-pack",
+      "chemical-science-pack",
+      "production-science-pack",
+      "agricultural-science-pack",
+      "cryogenic-science-pack"
+    },
+    direct_effects = {
+      {
+        type = "nothing",
+        effect_description = {"modifier-description.more-infinite-research.spoilage_preservation"}
+      }
+    }
+  },
+
+  research_agricultural_growth_speed = {
+    required_mods = {"space-age"},
+    required_items = {"agricultural-science-pack"},
+    icon_item = "agricultural-science-pack",
+    overlay = "speed",
+    localised_description = {"technology-description.more-infinite-research.agricultural_growth_speed"},
+    science_packs = {
+      "automation-science-pack",
+      "logistic-science-pack",
+      "chemical-science-pack",
+      "production-science-pack",
+      "agricultural-science-pack"
+    },
+    direct_effects = {
+      {
+        type = "nothing",
+        effect_description = {"modifier-description.more-infinite-research.agricultural_growth_speed"}
+      }
+    }
+  },
+
   research_inventory_capacity = {
     icon_tech = "toolbelt",
     science_packs = {
@@ -79,12 +122,15 @@ return {
   research_electric_shooting_speed = {
     icon_tech = "tesla-weapons",
     required_technologies = {"tesla-weapons"},
-    required_ammo_categories = {"electric"},
+    required_ammo_categories = {"tesla"},
     science_packs = {
       "automation-science-pack","logistic-science-pack","chemical-science-pack",
       "production-science-pack","military-science-pack","electromagnetic-science-pack"
     },
     direct_effects = {
+      -- Space Age Tesla guns and Tesla turrets use the tesla ammo category.
+      -- The older electric category covers discharge-defense equipment.
+      { type = "gun-speed", ammo_category = "tesla", modifier = 0.1 },
       { type = "gun-speed", ammo_category = "electric", modifier = 0.1 }
     }
   },

@@ -9,6 +9,18 @@ local defaults = {
   },
   -- Per-stream overrides. Add, remove, or modify entries as needed.
   streams = {
+    research_spoilage_preservation = {
+      base_cost = 50000,
+      growth_factor = 1.5,
+      research_time = 120,
+      max_level = 0
+    },
+    research_agricultural_growth_speed = {
+      base_cost = 40000,
+      growth_factor = 1.5,
+      research_time = 90,
+      max_level = 0
+    },
     research_inventory_capacity = { growth_factor = 1.10, enabled = false },
     research_character_trash_slots = { growth_factor = 1.10 },
     research_robot_battery = { growth_factor = 1.2 },

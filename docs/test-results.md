@@ -2,6 +2,42 @@
 
 This file records local release-candidate validation runs. It is not a substitute for the manual mod matrix in `docs/compatibility.md`.
 
+## 2026-07-01 v2.0.5 Scripted-Tech Slice
+
+Environment:
+
+- Factorio `2.1.8` build `86744`, Windows Steam, Space Age install.
+- Mod version `2.0.5`.
+- Release archive: `dist/more-infinite-research_2.0.5.zip`.
+
+Commands:
+
+```powershell
+.\scripts\Build-MIRPackage.ps1
+.\scripts\Invoke-MIRValidation.ps1 -FactorioBin "C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe"
+```
+
+Results:
+
+- Rebuilt the `2.0.5` release archive with `control.lua` and `control/` included.
+- Static validation passed, including release metadata policy, docs policy scan, old science-pack authority scan, icon scan, locale parity, progression-setting wiring, changelog syntax, package metadata, package source/docs/locale/control parity, and `git diff --check`.
+- Runtime fixture validation passed across the existing thirteen isolated scenarios: `reduce-policy`, `skip-policy`, `space-pack-policy`, `base-space-promethium-pack-policy`, `space-age-space-pack-policy`, `space-age-space-promethium-pack-policy`, `all-official-pack-policy`, `all-pack-policy`, `base-extension-boundary-policy`, `end-game-prerequisite-gate`, `base-cargo-space-age-gate`, `space-age-cargo-pad-enabled`, and `space-age-cargo-logistics-shape`.
+- The existing Space Age fixture scenarios loaded with the new scripted technology manager present.
+- Space Age fixture validation now asserts that MIR skips parallel productivity streams for vanilla-owned `processing-unit-productivity`, `low-density-structure-productivity`, `plastic-bar-productivity`, and `rocket-fuel-productivity`.
+- Static validation now asserts that electric shooting speed includes both the Space Age `tesla` ammo category and the older `electric` ammo category.
+- Manual gameplay validation is still required for spoilage deadline behavior, research reversal/configuration changes in a live save, multiple-force behavior, and agricultural tower planting on a large Gleba farm.
+
+Representative validation harness evidence:
+
+```text
+Factorio 2.1.8 (build 86744, win64, steam, space-age)
+[run] Factorio load check with fixture mods (space-age-space-pack-policy)
+[run] Factorio load check with fixture mods (space-age-space-promethium-pack-policy)
+[run] Factorio load check with fixture mods (space-age-cargo-pad-enabled)
+[run] Factorio load check with fixture mods (space-age-cargo-logistics-shape)
+[ok] Validation completed.
+```
+
 ## 2026-06-30 Final 2.0.0 Mod-Page Release Prep
 
 Environment:

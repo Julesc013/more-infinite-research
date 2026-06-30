@@ -1,4 +1,42 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.0.5
+Date: 2026-07-01
+
+  Features:
+
+    - Added the first scripted technology framework for bounded runtime research effects.
+    - Added Space Age spoilage preservation research.
+    - Spoilage preservation uses a visible scripted-effect technology entry and increases the global spoil time modifier by 1% per completed level.
+    - Spoilage preservation clamps the applied global spoil time modifier to Factorio's supported range.
+    - Spoilage preservation recomputes on init, configuration changes, research completion, research reversal, and technology effect resets.
+    - Added Space Age agricultural growth speed research.
+    - Agricultural growth speed uses a visible scripted-effect technology entry and shortens remaining growth time for newly planted agricultural tower plants by 1% per completed level.
+    - Agricultural growth speed is event-driven from agricultural tower planting and does not use an on-tick scan.
+    - Added startup settings for the new scripted technology streams through the existing generated-stream setting model.
+    - Added an optional scripted-effect debug log setting for runtime recomputation and event handling.
+    - Electric shooting speed now covers the Space Age `tesla` ammo category as well as the older `electric` ammo category.
+    - Electric shooting speed now applies to Tesla guns and Tesla turrets instead of only discharge-defense-style electric weapons.
+    - Recipe productivity generation now skips recipes already owned by another infinite recipe-productivity technology.
+    - Space Age vanilla productivity technologies for processing units, low density structures, plastic, and rocket fuel now stay authoritative instead of receiving parallel MIR duplicates.
+
+  Compatibility:
+
+    - Scripted v2.0.5 features skip cleanly when their generated technology is unavailable.
+    - The first agriculture runtime slice avoids broad inventory, belt, container, item-stack, surface, and entity scanning.
+    - Existing planted crops are not globally rescanned in this first slice; growth speed applies to newly planted tower crops.
+    - Package validation now includes control.lua and the control module directory.
+
+  Localization:
+
+    - Added locale keys for spoilage preservation, agricultural growth speed, scripted-effect descriptions, and scripted-effect diagnostics.
+    - Non-English locale files currently use English fallback text for the new 2.0.5 keys.
+
+  Migration:
+
+    - Added control-stage storage under the More Infinite Research namespace.
+    - No existing generated technology IDs were renamed.
+
+---------------------------------------------------------------------------------------------------
 Version: 2.0.0
 Date: 2026-06-30
 

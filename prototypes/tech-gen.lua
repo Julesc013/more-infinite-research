@@ -124,6 +124,57 @@ local function available_direct_effects(key, effects)
   return out
 end
 
+local function existing_infinite_recipe_productivity_techs(recipe_name)
+  local owners = {}
+  for tech_name, tech in pairs(data.raw.technology or {}) do
+    if tech.max_level == "infinite" and not string.find(tech_name, "^recipe%-prod%-") then
+      for _, effect in ipairs(tech.effects or {}) do
+        if effect.type == "change-recipe-productivity" and effect.recipe == recipe_name then
+          table.insert(owners, tech_name)
+          break
+        end
+      end
+    end
+  end
+  table.sort(owners)
+  return owners
+end
+
+local function filter_existing_recipe_productivity(key, buckets)
+  local filtered_buckets = {}
+  local skipped = {}
+
+  for _, bucket in ipairs(buckets or {}) do
+    local recipes = {}
+    for _, recipe_name in ipairs(bucket.recipes or {}) do
+      local owners = existing_infinite_recipe_productivity_techs(recipe_name)
+      if #owners > 0 then
+        table.insert(skipped, {
+          recipe = recipe_name,
+          owners = owners
+        })
+      else
+        table.insert(recipes, recipe_name)
+      end
+    end
+    if #recipes > 0 then
+      table.insert(filtered_buckets, {
+        change = bucket.change,
+        recipes = recipes
+      })
+    end
+  end
+
+  for _, entry in ipairs(skipped) do
+    log("[more-infinite-research] Skipping recipe productivity effect for "
+      .. key .. " recipe=" .. entry.recipe
+      .. " because existing infinite technology already owns it: "
+      .. table.concat(entry.owners, ","))
+  end
+
+  return filtered_buckets, skipped
+end
+
 local function make_stream(key, raw_spec)
   if not U.enabled_for(key, raw_spec) then
     D.stream(D.stream_fields(key, raw_spec, "skipped", "disabled"))
@@ -151,6 +202,11 @@ local function make_stream(key, raw_spec)
       log("[more-infinite-research] Skipping stream "..key.." because no available direct effects remain.")
       D.stream(D.stream_fields(key, spec, "skipped", "no_available_direct_effects"))
       return
+    end
+    for _, effect in ipairs(direct_effects) do
+      if effect.type == "nothing" and not effect.icon and not effect.icons then
+        effect.icons = U.icons_for_stream(spec)
+      end
     end
   end
 
@@ -194,6 +250,8 @@ local function make_stream(key, raw_spec)
 
   local buckets = U.recipes_for_stream(spec)
   D.recipe_matches(key, buckets)
+  local covered_by_existing
+  buckets, covered_by_existing = filter_existing_recipe_productivity(key, buckets)
   local effects = {}
   for _,b in ipairs(buckets) do
     for _,r in ipairs(b.recipes) do
@@ -202,8 +260,12 @@ local function make_stream(key, raw_spec)
     end
   end
   if #effects == 0 then
-    log("[more-infinite-research] Skipping stream "..key.." because no matching recipes were found.")
-    D.stream(D.stream_fields(key, spec, "skipped", "no_matching_recipes", ingredients, nil, effects, lab_status))
+    local reason = "no_matching_recipes"
+    if covered_by_existing and #covered_by_existing > 0 then
+      reason = "covered_by_existing_infinite_recipe_productivity"
+    end
+    log("[more-infinite-research] Skipping stream "..key.." because "..reason..".")
+    D.stream(D.stream_fields(key, spec, "skipped", reason, ingredients, nil, effects, lab_status))
     return
   end
 
