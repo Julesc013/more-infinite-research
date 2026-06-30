@@ -218,6 +218,11 @@ Invoke-RepoCheck "release package archive matches metadata" {
     }
   }
 
+  function Normalize-TextForPackageComparison {
+    param([string]$Text)
+    return ($Text -replace "`r`n", "`n").TrimEnd()
+  }
+
   $info = Get-Content -Raw (Join-Path $repo "info.json") | ConvertFrom-Json
   $packageName = "$($info.name)_$($info.version)"
   $zipPath = Join-Path $repo "dist\$packageName.zip"
@@ -342,7 +347,7 @@ Invoke-RepoCheck "release package archive matches metadata" {
 
       $repoText = Get-Content -Raw -LiteralPath (Join-Path $repo $relative)
       $zipText = Read-ZipEntryText $entry
-      if ($repoText.TrimEnd() -ne $zipText.TrimEnd()) {
+      if ((Normalize-TextForPackageComparison $repoText) -ne (Normalize-TextForPackageComparison $zipText)) {
         throw "Package source file differs from repository source: $relative"
       }
     }
