@@ -190,10 +190,10 @@ These extend selected finite vanilla chains into infinite continuations.
 
 | Base technology | Enabled by default | Base cost | Growth | Time | Science behavior | Notes |
 | --- | --- | --- | --- | --- | --- | --- |
-| `braking-force` | Yes | `115` | `1.333333333333` | `60` | Inherit vanilla chain and add space science when available. | Copies vanilla braking effects. |
+| `braking-force` | Yes | `115` | `1.333` | `60` | Inherit vanilla chain and add space science when available. | Copies vanilla braking effects. |
 | `research-speed` | Yes | `60` | `1.5` | `120` | Inherit vanilla chain and add all active lab science packs. | Extends lab research speed. |
 | `worker-robots-storage` | Yes | `200` | `1.5` | `60` | Inherit vanilla chain and add electromagnetic science when available. | Skips if an equivalent infinite extension already exists. |
-| `inserter-capacity-bonus` | No | `200` | `3.333333333333` | `60` | Inherit vanilla chain and add agricultural science when available. | Uses `+2` non-bulk and `+4` bulk/stack increments by default. |
+| `inserter-capacity-bonus` | No | `200` | `3.333` | `60` | Inherit vanilla chain and add agricultural science when available. | Uses `+2` non-bulk and `+4` bulk/stack increments by default. |
 | `weapon-shooting-speed` | Yes | `60` | `1.5` | `120` | Inherit vanilla chain and add military and space science when available. | Vanilla rocket/cannon-shell bonuses can be removed when MIR owns them. |
 | `laser-shooting-speed` | Yes | `60` | `1.5` | `120` | Inherit vanilla chain and add military and space science when available. | Copies vanilla laser speed effects. |
 
@@ -451,4 +451,4 @@ If a generated technology is unresearchable:
 
 ## Save Compatibility
 
-No generated prototype IDs were renamed for v2.0.0. No migration is currently required.
+No generated prototype IDs were renamed for `v2.0.0`. No migration is required from `v1.2.9` (latest for Factorio 2.0).
