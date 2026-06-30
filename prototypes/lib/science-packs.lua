@@ -178,6 +178,19 @@ function S.pack_list_all()
   return out
 end
 
+function S.pack_list_official()
+  local available = {}
+  for _, pack in ipairs(S.all_lab_inputs()) do
+    available[pack] = true
+  end
+
+  local out = {}
+  for _, pack in ipairs(VANILLA_PACK_ORDER) do
+    if available[pack] then table.insert(out, pack) end
+  end
+  return out
+end
+
 function S.end_game_science_pack()
   if lookup.is_space_age() and S.science_pack_exists("promethium-science-pack") then
     return "promethium-science-pack"

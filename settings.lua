@@ -54,7 +54,7 @@ table.insert(settings_data, {
   name = "mir-science-pack-ingredient-policy",
   setting_type = "startup",
   default_value = "configured",
-  allowed_values = {"configured", "end-game", "all"},
+  allowed_values = {"configured", "space", "space-and-promethium", "all-official", "all"},
   order = "a-01",
   localised_name = {"mod-setting-name.mir-science-pack-ingredient-policy"},
   localised_description = {"mod-setting-description.mir-science-pack-ingredient-policy"}

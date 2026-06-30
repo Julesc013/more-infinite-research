@@ -108,16 +108,19 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'name = "ips-require-space-gate"' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'default_value = false' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'name = "mir-science-pack-ingredient-policy"' },
-    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'allowed_values = {"configured", "end-game", "all"}' },
+    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'allowed_values = {"configured", "space", "space-and-promethium", "all-official", "all"}' },
     @{ File = "prototypes\util.lua"; Text = $utilText; Snippet = 'apply_science_pack_ingredient_policy' },
     @{ File = "prototypes\util.lua"; Text = $utilText; Snippet = 'append_end_game_gate_prerequisite' },
+    @{ File = "prototypes\lib\science-packs.lua"; Text = $scienceText; Snippet = 'pack_list_official' },
     @{ File = "prototypes\base-tech-extensions.lua"; Text = $baseExtensionsText; Snippet = 'apply_science_pack_ingredient_policy' },
     @{ File = "prototypes\base-tech-extensions.lua"; Text = $baseExtensionsText; Snippet = 'append_end_game_gate_prerequisite' },
     @{ File = "prototypes\lib\science-packs.lua"; Text = $scienceText; Snippet = 'end_game_science_pack' },
     @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'research_cargo_landing_pad_count = {' },
     @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'required_mods = {"space-age"}' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-science-pack-ingredient-policy-configured=Configured per technology' },
-    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-science-pack-ingredient-policy-end-game=Add end-game science pack' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-science-pack-ingredient-policy-space=Add space science' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-science-pack-ingredient-policy-space-and-promethium=Add space and promethium science' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-science-pack-ingredient-policy-all-official=Use all official science packs' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-science-pack-ingredient-policy-all=Use all lab science packs' }
   )
 
@@ -337,6 +340,9 @@ Invoke-RepoCheck "release package archive matches metadata" {
 
 Invoke-RepoCheck "git whitespace check" {
   git -C $repo diff --check
+  if ($LASTEXITCODE -ne 0) {
+    throw "git diff --check failed."
+  }
 }
 
 if ($StaticOnly -or [string]::IsNullOrWhiteSpace($FactorioBin)) {
@@ -457,7 +463,7 @@ function Set-CopiedLabPolicySkip {
 function Set-CopiedSciencePackIngredientPolicy {
   param(
     [string]$ModsDir,
-    [ValidateSet("configured", "end-game", "all")]
+    [ValidateSet("configured", "space", "space-and-promethium", "all-official", "all")]
     [string]$Policy
   )
   Set-CopiedStartupSettingDefault -ModsDir $ModsDir -Name "mir-science-pack-ingredient-policy" -ValueLiteral "`"$Policy`""
@@ -501,7 +507,7 @@ function Initialize-RuntimeScenario {
     [string[]]$EnabledFixtureNames,
     [string[]]$EnabledStreamKeys = @(),
     [switch]$LabPolicySkip,
-    [ValidateSet("configured", "end-game", "all")]
+    [ValidateSet("configured", "space", "space-and-promethium", "all-official", "all")]
     [string]$SciencePackIngredientPolicy = "configured",
     [switch]$RequireSpaceGate,
     [switch]$EnableSpaceAge
@@ -606,7 +612,7 @@ function Invoke-RuntimeScenario {
     [string[]]$EnabledFixtureNames,
     [string[]]$EnabledStreamKeys = @(),
     [switch]$LabPolicySkip,
-    [ValidateSet("configured", "end-game", "all")]
+    [ValidateSet("configured", "space", "space-and-promethium", "all-official", "all")]
     [string]$SciencePackIngredientPolicy = "configured",
     [switch]$RequireSpaceGate,
     [switch]$EnableSpaceAge
@@ -704,15 +710,36 @@ if ($skipPolicyLine -notmatch "status=skipped" -or $skipPolicyLine -notmatch "la
   throw "Skip-policy runtime validation did not skip incompatible science-pack productivity as expected: $skipPolicyLine"
 }
 
-Invoke-RuntimeScenario -ScenarioName "end-game-pack-policy" -EnabledFixtureNames @() -SciencePackIngredientPolicy "end-game"
-$endGamePackLine = Get-LastStreamReportLine -Key "research_gears"
-Assert-ReportLineGenerated -Line $endGamePackLine -Context "End-game science-pack ingredient policy scenario"
-Assert-ReportLineContains -Line $endGamePackLine -Expected "space-science-pack" -Context "End-game science-pack ingredient policy scenario"
+Invoke-RuntimeScenario -ScenarioName "space-pack-policy" -EnabledFixtureNames @() -SciencePackIngredientPolicy "space"
+$spacePackLine = Get-LastStreamReportLine -Key "research_gears"
+Assert-ReportLineGenerated -Line $spacePackLine -Context "Space science-pack ingredient policy scenario"
+Assert-ReportLineContains -Line $spacePackLine -Expected "space-science-pack" -Context "Space science-pack ingredient policy scenario"
 
-Invoke-RuntimeScenario -ScenarioName "space-age-end-game-pack-policy" -EnabledFixtureNames @() -SciencePackIngredientPolicy "end-game" -EnableSpaceAge
-$spaceAgeEndGamePackLine = Get-LastStreamReportLine -Key "research_gears"
-Assert-ReportLineGenerated -Line $spaceAgeEndGamePackLine -Context "Space Age end-game science-pack ingredient policy scenario"
-Assert-ReportLineContains -Line $spaceAgeEndGamePackLine -Expected "promethium-science-pack" -Context "Space Age end-game science-pack ingredient policy scenario"
+Invoke-RuntimeScenario -ScenarioName "base-space-promethium-pack-policy" -EnabledFixtureNames @() -SciencePackIngredientPolicy "space-and-promethium"
+$baseSpacePromethiumPackLine = Get-LastStreamReportLine -Key "research_gears"
+Assert-ReportLineGenerated -Line $baseSpacePromethiumPackLine -Context "Base space and promethium science-pack ingredient policy scenario"
+Assert-ReportLineContains -Line $baseSpacePromethiumPackLine -Expected "space-science-pack" -Context "Base space and promethium science-pack ingredient policy scenario"
+Assert-ReportLineDoesNotContain -Line $baseSpacePromethiumPackLine -Unexpected "promethium-science-pack" -Context "Base space and promethium science-pack ingredient policy scenario"
+
+Invoke-RuntimeScenario -ScenarioName "space-age-space-pack-policy" -EnabledFixtureNames @() -SciencePackIngredientPolicy "space" -EnableSpaceAge
+$spaceAgeSpacePackLine = Get-LastStreamReportLine -Key "research_gears"
+Assert-ReportLineGenerated -Line $spaceAgeSpacePackLine -Context "Space Age space-only science-pack ingredient policy scenario"
+Assert-ReportLineContains -Line $spaceAgeSpacePackLine -Expected "space-science-pack" -Context "Space Age space-only science-pack ingredient policy scenario"
+Assert-ReportLineDoesNotContain -Line $spaceAgeSpacePackLine -Unexpected "promethium-science-pack" -Context "Space Age space-only science-pack ingredient policy scenario"
+
+Invoke-RuntimeScenario -ScenarioName "space-age-space-promethium-pack-policy" -EnabledFixtureNames @() -SciencePackIngredientPolicy "space-and-promethium" -EnableSpaceAge
+$spaceAgeSpacePromethiumPackLine = Get-LastStreamReportLine -Key "research_gears"
+Assert-ReportLineGenerated -Line $spaceAgeSpacePromethiumPackLine -Context "Space Age space and promethium science-pack ingredient policy scenario"
+Assert-ReportLineContains -Line $spaceAgeSpacePromethiumPackLine -Expected "space-science-pack" -Context "Space Age space and promethium science-pack ingredient policy scenario"
+Assert-ReportLineContains -Line $spaceAgeSpacePromethiumPackLine -Expected "promethium-science-pack" -Context "Space Age space and promethium science-pack ingredient policy scenario"
+
+Invoke-RuntimeScenario -ScenarioName "all-official-pack-policy" -EnabledFixtureNames @(
+  "mir-fixture-item-science-pack"
+) -SciencePackIngredientPolicy "all-official"
+$allOfficialPackLine = Get-LastStreamReportLine -Key "research_gears"
+Assert-ReportLineGenerated -Line $allOfficialPackLine -Context "All official science-pack ingredient policy scenario"
+Assert-ReportLineContains -Line $allOfficialPackLine -Expected "space-science-pack" -Context "All official science-pack ingredient policy scenario"
+Assert-ReportLineDoesNotContain -Line $allOfficialPackLine -Unexpected "mir-fixture-science-pack" -Context "All official science-pack ingredient policy scenario"
 
 Invoke-RuntimeScenario -ScenarioName "all-pack-policy" -EnabledFixtureNames @(
   "mir-fixture-item-science-pack"

@@ -82,7 +82,7 @@ Use this setting when triaging user reports. It is off by default to avoid noisy
 `ips-require-space-gate` and `mir-science-pack-ingredient-policy` deliberately control different parts of generated technologies.
 
 - `ips-require-space-gate` adds the end-game science unlock as a prerequisite only. It does not change research ingredients.
-- `mir-science-pack-ingredient-policy` changes research ingredients only. `configured` keeps each stream or extension's selected packs, `end-game` appends space science or Space Age promethium science when available, and `all` appends every active lab science pack including compatible modded packs.
+- `mir-science-pack-ingredient-policy` changes research ingredients only. `configured` keeps each stream or extension's selected packs, `space` appends space science, `space-and-promethium` appends both high-end packs when available, `all-official` appends official base and Space Age packs without modded packs, and `all` appends every active lab science pack including compatible modded packs.
 
 Both generated streams and base-technology extensions run through the same ingredient policy and end-game prerequisite helper so the settings apply consistently to all added infinite research.
 

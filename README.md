@@ -93,7 +93,7 @@ If no lab accepts the full selected science-pack set, MIR follows `mir-lab-incom
 Two startup settings control late-game progression and global science-pack pressure:
 
 - `ips-require-space-gate` is disabled by default. When enabled, generated technologies require the end-game science unlock as a prerequisite, but their science-pack ingredients are not changed.
-- `mir-science-pack-ingredient-policy` is `configured` by default. It can instead add the end-game science pack to every generated technology, or add every active lab science pack, including compatible modded science packs.
+- `mir-science-pack-ingredient-policy` is `configured` by default. It can instead add space science, add both space and promethium science, add every official base and Space Age science pack, or add every active lab science pack including compatible modded science packs.
 
 For the end-game science gate, MIR uses promethium science in Space Age when available. Otherwise it uses space science when available.
 
@@ -206,7 +206,7 @@ All settings are startup settings.
 | Setting | Type | Default | Description |
 | --- | --- | --- | --- |
 | `ips-require-space-gate` | bool | `false` | Adds the end-game science unlock as a prerequisite without changing science-pack ingredients. Uses promethium science in Space Age when available, otherwise space science. |
-| `mir-science-pack-ingredient-policy` | string | `configured` | Controls extra science packs added to every generated technology. Allowed values: `configured`, `end-game`, `all`. |
+| `mir-science-pack-ingredient-policy` | string | `configured` | Controls extra science packs added to every generated technology. Allowed values: `configured`, `space`, `space-and-promethium`, `all-official`, `all`. |
 | `mir-prefer-this-mod-for-competing-techs` | bool | `true` | Lets MIR remove selected competing infinite technologies when MIR has generated or will generate matching replacement behavior. Disable to keep competing technologies from other mods. |
 | `mir-adjust-vanilla-weapon-speed-techs` | string | `off` | Controls whether MIR removes rocket and cannon-shell speed bonuses from vanilla weapon shooting speed technologies. Allowed values: `off`, `only-when-dedicated-tech-enabled`, `always`. |
 | `mir-debug-generation-report` | bool | `false` | Writes structured generated/skipped rows to the Factorio log, including science packs, prerequisites, effect counts, lab compatibility, and icon source. |

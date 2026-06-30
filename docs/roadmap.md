@@ -460,7 +460,7 @@ Phases 1 through 8 are implemented for v2.0.0:
 - Science-pack productivity expands from active lab inputs instead of only the hard-coded vanilla and Space Age pack list.
 - Lab ingredient combinations are validated before technology creation.
 - Lab incompatibility handling is configurable between `reduce` and `skip`.
-- Late-game progression is split between an optional end-game prerequisite gate and a separate science-pack ingredient policy that can keep configured packs, add the end-game pack, or require every active lab science pack.
+- Late-game progression is split between an optional end-game prerequisite gate and a separate science-pack ingredient policy that can keep configured packs, add space science, add space and promethium science, add all official packs, or require every active lab science pack.
 - Generation runs in `data-final-fixes.lua`.
 - Recipe category matching, recipe-match diagnostics, duplicate recipe match warnings, Space Age guards, icon overlays, player-facing settings, locale warnings, docs, fixtures, CI static validation, and packaging scripts are present.
 - Competing recipe-productivity cleanup is limited to known infinite technologies whose effects are covered by generated MIR replacement effects.

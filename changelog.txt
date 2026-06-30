@@ -20,7 +20,7 @@ Date: 2026-06-30
     - Added support for Factorio 2.1 recipe categories and stream match filters.
     - Added a startup setting to control whether vanilla weapon shooting speed technologies are adjusted.
     - Changed the late-game science gate setting to be disabled by default, so generated technologies are not hidden until space science or promethium science unless users opt in.
-    - Added a science-pack ingredient policy setting so users can keep configured packs, add the end-game science pack to every generated technology, or require every active lab science pack including compatible modded packs.
+    - Added a science-pack ingredient policy setting so users can keep configured packs, add space science, add space and promethium science, use all official science packs, or require every active lab science pack including compatible modded packs.
     - Fixed Space Age cargo logistics research so cargo landing pad count and cargo bay unloading distance are skipped when Space Age is disabled.
     - Added in-game descriptions that explain the recipe productivity cap and lab-compatible science-pack behavior.
 
