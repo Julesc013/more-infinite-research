@@ -251,6 +251,7 @@ Invoke-RepoCheck "release package archive matches metadata" {
     $requiredEntries = @(
       "${root}info.json",
       "${root}changelog.txt",
+      "${root}CONTRIBUTING.md",
       "${root}README.md",
       "${root}LICENSE",
       "${root}thumbnail.png",
@@ -311,6 +312,7 @@ Invoke-RepoCheck "release package archive matches metadata" {
     $mustMatchRepo = @(
       "README.md",
       "changelog.txt",
+      "CONTRIBUTING.md",
       "data.lua",
       "data-updates.lua",
       "data-final-fixes.lua",

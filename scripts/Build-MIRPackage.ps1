@@ -24,6 +24,7 @@ New-Item -ItemType Directory -Force -Path $outputRoot | Out-Null
 
 $files = @(
   "changelog.txt",
+  "CONTRIBUTING.md",
   "data-final-fixes.lua",
   "data-updates.lua",
   "data.lua",

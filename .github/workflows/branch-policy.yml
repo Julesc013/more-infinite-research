@@ -1,0 +1,25 @@
+name: Branch Policy
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+      - legacy
+  pull_request:
+    branches:
+      - main
+      - dev
+      - legacy
+  workflow_dispatch:
+
+jobs:
+  branch-policy:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Validate permanent branch policy
+        shell: pwsh
+        run: .\scripts\Test-MIRBranchPolicy.ps1

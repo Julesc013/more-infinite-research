@@ -20,6 +20,7 @@ Results:
 
 - Rebuilt the `2.0.0` release archive after the final documentation and mod-page summary pass.
 - Reformatted the repo README and changelog for clearer mod-page ingestion.
+- Added branch-policy and contribution guidance for the permanent `main`, `dev`, and `legacy` origin branches.
 - Static validation passed, including release metadata policy, docs policy scan, old science-pack authority scan, icon scan, locale parity, progression-setting wiring, changelog syntax, package metadata, package source/docs/locale parity, and `git diff --check`.
 - Manually confirmed the rebuilt release archive contains no `graphics/` entries.
 - Confirmed repo release docs and generated mod-page Markdown do not advertise the deferred science-pack productivity custom art.

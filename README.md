@@ -40,6 +40,19 @@ The packaged release archive is:
 dist/more-infinite-research_2.0.0.zip
 ```
 
+## Branch Policy
+
+The repository has **three permanent branches** on `origin`:
+
+- **`main`**: latest stable release line for **Factorio `2.1.x`**.
+- **`dev`**: experimental and development branch for the **Factorio `2.1.x` main line**.
+- **`legacy`**: backport branch for **Factorio `2.0.x`** players.
+
+Normal development should target **`dev`** first. Release-ready hotfixes can target **`main`**.
+Backports that must remain compatible with Factorio `2.0.x` belong on **`legacy`**.
+
+See **`CONTRIBUTING.md`** for pull request expectations, branch routing, and validation commands.
+
 ## How Generation Works
 
 More Infinite Research generates prototypes in **`data-final-fixes.lua`**:
@@ -431,6 +444,7 @@ The validation script checks:
 - **`docs/compatibility.md`:** compatibility model, known integrations, manual test matrix, fixture designs, and release checklist.
 - **`docs/roadmap.md`:** v2.0.0 implementation baseline and longer-term v2.x roadmap.
 - **`docs/test-results.md`:** local release-candidate validation evidence.
+- **`CONTRIBUTING.md`:** branch policy, pull request expectations, validation commands, and mod portal changelog rules.
 - **`changelog.txt`:** release history and user-facing changes.
 
 ## Troubleshooting
