@@ -14,6 +14,7 @@ Date: 2026-06-30
     - Added a lab incompatibility policy setting so users can choose between reducing incompatible science-pack sets to a lab-compatible subset or skipping the affected technology.
     - Reworked generated research compatibility for Factorio 2.1 by discovering science packs from active lab inputs instead of assuming science packs are tool prototypes.
     - Expanded science-pack productivity from active lab inputs so custom item-based science packs can receive productivity effects when their recipes are visible.
+    - Added custom technology art for science pack productivity research.
     - Moved generated technology creation to data-final-fixes so recipes, labs, items, science packs, and technologies from other mods are visible before scanning.
     - Added Wube-style layered technology constant icon overlays for generated research technologies.
     - Added lab-compatible science-pack validation so generated technologies are skipped or reduced instead of becoming unresearchable.
@@ -99,6 +100,7 @@ Date: 2026-06-30
     - Strengthened release package validation so core data-stage files, stream modules, and shared recipe/science-pack helpers must be present in the zip.
     - Strengthened release package validation so key packaged source files must match the repository copy, catching stale archives with otherwise valid metadata.
     - Strengthened release package validation so README, changelog, documentation, and locale files must match the repository copy.
+    - Strengthened release package validation so shipped binary graphics assets must match the repository copy.
     - Added runtime fixture validation for the `skip` lab incompatibility policy.
     - Added runtime fixture validation for Space Age cargo logistics technology shape, including effect types, modifiers, costs, research times, prerequisites, and official science-pack ingredients.
 

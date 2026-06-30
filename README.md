@@ -367,7 +367,7 @@ Direct assignment remains available for intentional overrides.
 Enable `mir-debug-generation-report` to log rows like:
 
 ```text
-[more-infinite-research] report kind=stream key=research_science_pack_productivity status=generated reason=recipe_productivity science=... prerequisites=... effects=13 lab_status=reduced icon=tech:research-productivity
+[more-infinite-research] report kind=stream key=research_science_pack_productivity status=generated reason=recipe_productivity science=... prerequisites=... effects=13 lab_status=reduced icon=__more-infinite-research__/graphics/technology/science-pack-productivity.png
 ```
 
 Use diagnostics when reporting compatibility issues. It tells whether a stream generated, skipped, reduced science packs, or found no matching recipes.

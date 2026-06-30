@@ -37,6 +37,7 @@ $files = @(
 
 $directories = @(
   "docs",
+  "graphics",
   "locale",
   "prototypes"
 )
