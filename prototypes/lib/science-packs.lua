@@ -191,6 +191,13 @@ function S.pack_list_official()
   return out
 end
 
+function S.is_official_science_pack(name)
+  for _, pack in ipairs(VANILLA_PACK_ORDER) do
+    if pack == name then return true end
+  end
+  return false
+end
+
 function S.end_game_science_pack()
   if lookup.is_space_age() and S.science_pack_exists("promethium-science-pack") then
     return "promethium-science-pack"

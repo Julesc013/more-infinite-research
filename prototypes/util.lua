@@ -22,6 +22,7 @@ U.valid_research_ingredients = science.valid_research_ingredients
 U.best_lab_compatible_ingredients = science.best_lab_compatible_ingredients
 U.pack_list_all = science.pack_list_all
 U.pack_list_official = science.pack_list_official
+U.is_official_science_pack = science.is_official_science_pack
 U.pack_list_for_extension = science.pack_list_for_extension
 U.prereq_tech_for_science_pack = science.prereq_tech_for_science_pack
 U.end_game_science_pack = science.end_game_science_pack
@@ -180,13 +181,16 @@ end
 
 function U.apply_science_pack_ingredient_policy(ingredients)
   local out, seen = {}, {}
+  local policy = startup_setting("mir-science-pack-ingredient-policy") or "configured"
   for _, ingredient in ipairs(ingredients or {}) do
-    append_ingredient(out, seen, ingredient_name(ingredient), ingredient_amount(ingredient))
+    local name = ingredient_name(ingredient)
+    if policy ~= "all-official" or U.is_official_science_pack(name) then
+      append_ingredient(out, seen, name, ingredient_amount(ingredient))
+    end
   end
 
   -- This setting intentionally changes only research ingredients. The
   -- finish-game prerequisite gate is handled separately in prerequisites.
-  local policy = startup_setting("mir-science-pack-ingredient-policy") or "configured"
   if policy == "space" then
     append_ingredient(out, seen, "space-science-pack", 1)
   elseif policy == "space-and-promethium" then

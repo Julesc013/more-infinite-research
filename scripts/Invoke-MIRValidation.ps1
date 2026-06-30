@@ -112,6 +112,7 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "prototypes\util.lua"; Text = $utilText; Snippet = 'apply_science_pack_ingredient_policy' },
     @{ File = "prototypes\util.lua"; Text = $utilText; Snippet = 'append_end_game_gate_prerequisite' },
     @{ File = "prototypes\lib\science-packs.lua"; Text = $scienceText; Snippet = 'pack_list_official' },
+    @{ File = "prototypes\lib\science-packs.lua"; Text = $scienceText; Snippet = 'is_official_science_pack' },
     @{ File = "prototypes\base-tech-extensions.lua"; Text = $baseExtensionsText; Snippet = 'apply_science_pack_ingredient_policy' },
     @{ File = "prototypes\base-tech-extensions.lua"; Text = $baseExtensionsText; Snippet = 'append_end_game_gate_prerequisite' },
     @{ File = "prototypes\lib\science-packs.lua"; Text = $scienceText; Snippet = 'end_game_science_pack' },
@@ -651,9 +652,18 @@ function Invoke-RuntimeScenario {
 
 function Get-LastStreamReportLine {
   param([string]$Key)
-  $line = Select-String -LiteralPath $FactorioLog -Pattern "key=$Key" -SimpleMatch | Select-Object -Last 1
+  $line = Select-String -LiteralPath $FactorioLog -Pattern "kind=stream key=$Key" -SimpleMatch | Select-Object -Last 1
   if (-not $line) {
     throw "Runtime validation log did not contain diagnostics for $Key."
+  }
+  return $line.Line
+}
+
+function Get-LastExtensionReportLine {
+  param([string]$Key)
+  $line = Select-String -LiteralPath $FactorioLog -Pattern "kind=extension key=$Key" -SimpleMatch | Select-Object -Last 1
+  if (-not $line) {
+    throw "Runtime validation log did not contain extension diagnostics for $Key."
   }
   return $line.Line
 }
@@ -740,6 +750,10 @@ $allOfficialPackLine = Get-LastStreamReportLine -Key "research_gears"
 Assert-ReportLineGenerated -Line $allOfficialPackLine -Context "All official science-pack ingredient policy scenario"
 Assert-ReportLineContains -Line $allOfficialPackLine -Expected "space-science-pack" -Context "All official science-pack ingredient policy scenario"
 Assert-ReportLineDoesNotContain -Line $allOfficialPackLine -Unexpected "mir-fixture-science-pack" -Context "All official science-pack ingredient policy scenario"
+$allOfficialExtensionLine = Get-LastExtensionReportLine -Key "research-speed"
+Assert-ReportLineGenerated -Line $allOfficialExtensionLine -Context "All official base-extension science-pack ingredient policy scenario"
+Assert-ReportLineContains -Line $allOfficialExtensionLine -Expected "space-science-pack" -Context "All official base-extension science-pack ingredient policy scenario"
+Assert-ReportLineDoesNotContain -Line $allOfficialExtensionLine -Unexpected "mir-fixture-science-pack" -Context "All official base-extension science-pack ingredient policy scenario"
 
 Invoke-RuntimeScenario -ScenarioName "all-pack-policy" -EnabledFixtureNames @(
   "mir-fixture-item-science-pack"
@@ -747,6 +761,9 @@ Invoke-RuntimeScenario -ScenarioName "all-pack-policy" -EnabledFixtureNames @(
 $allPackLine = Get-LastStreamReportLine -Key "research_gears"
 Assert-ReportLineGenerated -Line $allPackLine -Context "All lab science-pack ingredient policy scenario"
 Assert-ReportLineContains -Line $allPackLine -Expected "mir-fixture-science-pack" -Context "All lab science-pack ingredient policy scenario"
+$allPackExtensionLine = Get-LastExtensionReportLine -Key "braking-force"
+Assert-ReportLineGenerated -Line $allPackExtensionLine -Context "All lab base-extension science-pack ingredient policy scenario"
+Assert-ReportLineContains -Line $allPackExtensionLine -Expected "mir-fixture-science-pack" -Context "All lab base-extension science-pack ingredient policy scenario"
 
 Invoke-RuntimeScenario -ScenarioName "end-game-prerequisite-gate" -EnabledFixtureNames @() -RequireSpaceGate
 $gateLine = Get-LastStreamReportLine -Key "research_gears"

@@ -39,6 +39,7 @@ Date: 2026-06-30
     - Generated recipe effect order is now deterministic.
     - Removed unused base-extension growth inference helpers and kept generation diagnostics behind the debug report setting.
     - Reworked base-tech extension science packs to inherit from the last vanilla level by default and then add only the intended extra packs.
+    - Fixed science-pack ingredient policy handling for generated base-tech extensions so MIR-created continuation levels receive the selected extra packs while existing vanilla and other-mod technologies are left unchanged.
     - Added science-pack prerequisite repair for generated base-tech extensions so added packs also add their unlock prerequisites.
     - Added detection for equivalent existing infinite base-tech extensions so duplicate infinite continuations are skipped instead of generated again.
     - Added logic to keep another mod's competing infinite continuation when the preference setting is disabled.

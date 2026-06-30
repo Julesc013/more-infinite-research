@@ -25,8 +25,8 @@ Results:
 - The forced `skip` lab policy skipped the intentionally incompatible science-pack productivity stream with `lab_status=invalid`.
 - The `space` science-pack ingredient policy added `space-science-pack` in base-only and Space Age modes without adding promethium science.
 - The `space-and-promethium` science-pack ingredient policy added `space-science-pack` in base-only mode and both `space-science-pack` and `promethium-science-pack` with Space Age enabled.
-- The `all-official` science-pack ingredient policy added official base and Space Age packs while excluding the custom fixture science pack.
-- The `all` science-pack ingredient policy added the custom fixture science pack discovered from the active lab inputs.
+- The `all-official` science-pack ingredient policy added official base and Space Age packs while excluding the custom fixture science pack from both synthetic streams and MIR-created vanilla-chain extensions.
+- The `all` science-pack ingredient policy added the custom fixture science pack discovered from active lab inputs to synthetic streams and MIR-created vanilla-chain extensions.
 - The late-game prerequisite gate added `space-science-pack` as a prerequisite without adding it to the generated technology science ingredients.
 - Forced cargo landing pad count research skipped in base-only mode with `missing required mod space-age` and generated successfully when Space Age was enabled.
 
