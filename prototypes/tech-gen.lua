@@ -29,6 +29,11 @@ local function ldesc(spec)
 end
 
 local function missing_requirement(key, spec)
+  for _, mod_name in ipairs(spec.required_mods or {}) do
+    if not U.mod_exists(mod_name) then
+      return "missing required mod " .. mod_name
+    end
+  end
   for _, item_name in ipairs(spec.required_items or {}) do
     if not U.item_prototype(item_name) then
       return "missing required item " .. item_name

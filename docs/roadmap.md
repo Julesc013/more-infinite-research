@@ -460,10 +460,11 @@ Phases 1 through 8 are implemented for v2.0.0:
 - Science-pack productivity expands from active lab inputs instead of only the hard-coded vanilla and Space Age pack list.
 - Lab ingredient combinations are validated before technology creation.
 - Lab incompatibility handling is configurable between `reduce` and `skip`.
+- Late-game progression is split between an optional end-game prerequisite gate and a separate science-pack ingredient policy that can keep configured packs, add the end-game pack, or require every active lab science pack.
 - Generation runs in `data-final-fixes.lua`.
 - Recipe category matching, recipe-match diagnostics, duplicate recipe match warnings, Space Age guards, icon overlays, player-facing settings, locale warnings, docs, fixtures, CI static validation, and packaging scripts are present.
 - Competing recipe-productivity cleanup is limited to known infinite technologies whose effects are covered by generated MIR replacement effects.
 - Package validation compares key source, documentation, and locale files against the rebuilt release zip.
-- The local static validation suite, package validation, locale validation, and Factorio runtime fixture load checks for both `reduce` and `skip` lab incompatibility policies are available and have been used during the release-candidate hardening pass.
+- The local static validation suite, package validation, locale validation, and Factorio runtime fixture load checks for both `reduce` and `skip` lab incompatibility policies, science-pack ingredient policy modes, the end-game prerequisite gate, and base-only cargo skip behavior are available.
 
-The remaining release gate before publishing is the broader manual mod matrix: base game, Space Age, Space Age without Quality, forced-enabled cargo landing pad count, selected compatibility mods, and an existing-save upgrade from the latest 1.x release.
+The 2026-06-30 release-candidate evidence in `docs/test-results.md` records static validation, package validation, runtime fixture checks, and the official DLC split matrix. Future risky compatibility changes should repeat the broader manual mod matrix: base game, Space Age, Space Age without Quality, forced-enabled cargo landing pad count, selected compatibility mods, and an existing-save upgrade from the latest 1.x release.

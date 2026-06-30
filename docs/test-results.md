@@ -2,7 +2,7 @@
 
 This file records local release-candidate validation runs. It is not a substitute for the manual mod matrix in `docs/compatibility.md`.
 
-## 2026-06-30 Final RC Cleanup and Lab Policy Validation
+## 2026-06-30 Progression Settings and Space Age Cargo Gate Validation
 
 Environment:
 
@@ -19,20 +19,26 @@ Commands:
 
 Results:
 
-- Static validation passed, including release metadata policy, docs policy scan, old science-pack authority scan, icon scan, locale parity, changelog syntax, package metadata, package source/docs/locale parity, and `git diff --check`.
-- Runtime fixture validation passed with two isolated scenarios: default `reduce` lab incompatibility policy and forced `skip` lab incompatibility policy.
-- The `reduce` scenario generated science-pack productivity with the custom item-based fixture science pack included and loaded the post-MIR productivity assertion fixture.
-- The `skip` scenario skipped the intentionally incompatible science-pack productivity stream and loaded the post-MIR skip-policy assertion fixture.
-- Known competing recipe-productivity cleanup was narrowed to infinite technologies only; finite external upgrade chains are no longer removed by the generic cleanup path.
+- Static validation passed, including release metadata policy, docs policy scan, old science-pack authority scan, icon scan, locale parity, progression-setting wiring, changelog syntax, package metadata, package source/docs/locale parity, and `git diff --check`.
+- Runtime fixture validation passed across eight isolated scenarios: `reduce-policy`, `skip-policy`, `end-game-pack-policy`, `space-age-end-game-pack-policy`, `all-pack-policy`, `end-game-prerequisite-gate`, `base-cargo-space-age-gate`, and `space-age-cargo-pad-enabled`.
+- The default `reduce` lab policy generated science-pack productivity with the custom item-based fixture science pack included.
+- The forced `skip` lab policy skipped the intentionally incompatible science-pack productivity stream with `lab_status=invalid`.
+- The `end-game` science-pack ingredient policy added `space-science-pack` in base-only mode and `promethium-science-pack` with Space Age enabled.
+- The `all` science-pack ingredient policy added the custom fixture science pack discovered from the active lab inputs.
+- The late-game prerequisite gate added `space-science-pack` as a prerequisite without adding it to the generated technology science ingredients.
+- Forced cargo landing pad count research skipped in base-only mode with `missing required mod space-age` and generated successfully when Space Age was enabled.
 
-Representative skip-policy runtime log evidence:
+Representative validation harness evidence:
 
 ```text
 Factorio 2.1.8 (build 86744, win64, steam, space-age)
-Loading mod more-infinite-research 2.0.0 (data-final-fixes.lua)
-report kind=stream key=research_science_pack_productivity status=skipped reason=no_lab_compatible_science ... effects=0 lab_status=invalid ...
-Loading mod mir-fixture-assert-lab-skip-policy 0.1.0 (data-final-fixes.lua)
-Factorio initialised
+[run] Factorio load check with fixture mods (end-game-pack-policy)
+[run] Factorio load check with fixture mods (space-age-end-game-pack-policy)
+[run] Factorio load check with fixture mods (all-pack-policy)
+[run] Factorio load check with fixture mods (end-game-prerequisite-gate)
+[run] Factorio load check with fixture mods (base-cargo-space-age-gate)
+[run] Factorio load check with fixture mods (space-age-cargo-pad-enabled)
+[ok] Validation completed.
 ```
 
 ## 2026-06-30 Official DLC Split Matrix

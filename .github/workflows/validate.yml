@@ -10,6 +10,6 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Static validation
+      - name: Static validation and package checks
         shell: pwsh
         run: .\scripts\Invoke-MIRValidation.ps1 -StaticOnly

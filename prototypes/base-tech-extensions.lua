@@ -466,7 +466,8 @@ local function extend_chain(key)
     research_time = base_tech.unit.time or 60
   end
 
-  local resolved_ingredients, lab_status = U.best_lab_compatible_ingredients(resolve_science_packs(spec, base_tech.unit, key), key)
+  local selected_ingredients = U.apply_science_pack_ingredient_policy(resolve_science_packs(spec, base_tech.unit, key))
+  local resolved_ingredients, lab_status = U.best_lab_compatible_ingredients(selected_ingredients, key)
   lab_status = lab_status or "full"
   if not resolved_ingredients or #resolved_ingredients == 0 then
     log("[more-infinite-research] Skipping extension for " .. key .. ": no lab-compatible science pack set was found.")
@@ -478,7 +479,7 @@ local function extend_chain(key)
     ingredients = resolved_ingredients,
     time = research_time
   }
-  new.prerequisites = append_pack_prerequisites(new.prerequisites, resolved_ingredients)
+  new.prerequisites = U.append_end_game_gate_prerequisite(append_pack_prerequisites(new.prerequisites, resolved_ingredients))
 
   if special and special.on_extend then
     special.on_extend(new, base_tech, spec)

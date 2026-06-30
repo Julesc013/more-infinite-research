@@ -178,6 +178,16 @@ function S.pack_list_all()
   return out
 end
 
+function S.end_game_science_pack()
+  if lookup.is_space_age() and S.science_pack_exists("promethium-science-pack") then
+    return "promethium-science-pack"
+  end
+  if S.science_pack_exists("space-science-pack") then
+    return "space-science-pack"
+  end
+  return nil
+end
+
 function S.pack_list_for_extension(key, desired)
   if desired == "all" then return S.pack_list_all() end
   if type(desired) == "table" then return deepcopy(desired) end

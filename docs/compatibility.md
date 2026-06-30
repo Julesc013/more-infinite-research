@@ -10,11 +10,12 @@ The release goal is graceful compatibility without mod-page dependency clutter: 
 - Science packs are discovered from `data.raw.lab[*].inputs` and resolved through generic item prototype lookup.
 - Science-pack productivity starts with the vanilla and Space Age target list, then appends active lab inputs so custom science packs can receive productivity effects when their recipes are visible.
 - A generated technology must have at least one lab that accepts its complete science-pack set. If no lab accepts the full set, `mir-lab-incompatibility-policy` controls whether the mod tries the largest deterministic lab-compatible subset (`reduce`, default) or skips the technology (`skip`). If no subset exists, the stream is skipped and logged.
+- `ips-require-space-gate` adds an end-game science unlock prerequisite only. `mir-science-pack-ingredient-policy` controls whether generated technologies keep their configured ingredients, add the end-game science pack, or add every active lab science pack including compatible modded packs.
 - Recipe matching supports both `recipe.category` and Factorio 2.1 `recipe.categories`.
 - Hidden recipes and recycling recipes are skipped by default. Streams can opt in with `include_hidden` or `include_recycling`.
 - Optional DLC-shaped streams declare concrete required prototypes instead of requiring a specific official mod by name.
-- Cargo bay unloading distance research uses Factorio 2.1.8's `max-cargo-bay-unloading-distance` technology modifier and is skipped without the `landing-pad-unloading-bay` prototypes.
-- Cargo landing pad count research uses `cargo-landing-pad-count`, is disabled by default, and is skipped without the `cargo-landing-pad` prototype.
+- Cargo bay unloading distance research uses Factorio 2.1.8's `max-cargo-bay-unloading-distance` technology modifier and is skipped unless Space Age is active and the `landing-pad-unloading-bay` prototypes exist.
+- Cargo landing pad count research uses `cargo-landing-pad-count`, is disabled by default, and is skipped unless Space Age is active and the `cargo-landing-pad` prototype exists.
 - Mod-specific stream changes should live in `prototypes/compat/profiles.lua` instead of the base stream definitions.
 - Compatibility cleanup that removes known competing technologies also removes dangling prerequisite references from remaining technologies.
 - Generic competing recipe-productivity cleanup removes only known infinite technologies whose recipe-productivity effects are all covered by generated MIR effects. Finite upgrade chains from other mods are left alone unless a future integration models them explicitly.
@@ -51,13 +52,14 @@ Run each case from a clean Factorio user data directory or with a controlled mod
 2. Elevated Rails only.
 3. Recycler only.
 4. Quality enabled with its dependencies.
-5. Space Age 2.1.8+ enabled, verifying cargo bay unloading distance research appears after the landing pad unloading bay unlock and cargo landing pad count remains disabled by default.
-6. Space Age 2.1.8+ with `research_cargo_landing_pad_count` forced enabled, verifying the generated technology uses `cargo-landing-pad-count` and remains researchable.
-7. Better Robots Extended enabled.
-8. A fixture mod that adds a science pack as an ordinary `item` and adds it to a lab.
-9. A fixture mod that adds a custom lab with a different science-pack input set.
-10. A fixture mod that adds recipes in `data-final-fixes.lua`.
-11. An existing save upgraded from the latest 1.x release.
+5. Base-only with `research_cargo_landing_pad_count` forced enabled, verifying the generated technology is skipped because Space Age is absent.
+6. Space Age 2.1.8+ enabled, verifying cargo bay unloading distance research appears after the landing pad unloading bay unlock and cargo landing pad count remains disabled by default.
+7. Space Age 2.1.8+ with `research_cargo_landing_pad_count` forced enabled, verifying the generated technology uses `cargo-landing-pad-count` and remains researchable.
+8. Better Robots Extended enabled.
+9. A fixture mod that adds a science pack as an ordinary `item` and adds it to a lab.
+10. A fixture mod that adds a custom lab with a different science-pack input set.
+11. A fixture mod that adds recipes in `data-final-fixes.lua`.
+12. Existing save upgraded from the latest 1.x release.
 
 For each case, verify:
 
@@ -89,7 +91,7 @@ Set `$env:FACTORIO_LOG` or pass `-FactorioLog` when the Factorio log is not at t
 
 The runtime check copies this repo and the fixture mods into isolated temporary user-data mod directories, adds test-only dependencies from the copied mod to the fixture mods for deterministic load order, writes fixture `mod-list.json` files, and asks Factorio to create saves. It is intentionally a load/prototype validation harness, not a gameplay test.
 
-The runtime fixture run enables the generation diagnostics report in the copied mod and covers both lab incompatibility policies. The default `reduce` scenario asserts that science-pack productivity generated with the custom item-based fixture science pack included. The `skip` scenario forces the copied setting default to `skip` and asserts that the intentionally incompatible science-pack productivity stream is skipped instead of reduced. The expected Factorio log file is part of the validation evidence; if it is missing, runtime validation fails.
+The runtime fixture run enables the generation diagnostics report in the copied mod and covers both lab incompatibility policies. The default `reduce` scenario asserts that science-pack productivity generated with the custom item-based fixture science pack included. The `skip` scenario forces the copied setting default to `skip` and asserts that the intentionally incompatible science-pack productivity stream is skipped instead of reduced. Additional runtime scenarios force the new science-pack ingredient policies, require the end-game prerequisite gate, and force-enable cargo landing pad count without Space Age to prove the stream skips on the Space Age mod gate. The expected Factorio log file is part of the validation evidence; if it is missing, runtime validation fails.
 
 Static validation requires the committed release zip at `dist/more-infinite-research_2.0.0.zip`. The package must use the `more-infinite-research_2.0.0/` root, contain matching `info.json` metadata, include locale, documentation, top-level data-stage files, and core prototype modules, match the repository contents for key source, documentation, and locale files, and avoid build, fixture, script, Git, and temporary/editor artifacts.
 
@@ -158,5 +160,6 @@ Expected result: when the skip policy is active, MIR skips the incompatible scie
 - Confirm package validation reports the expected root, matching metadata, included locale/docs, and no forbidden artifacts.
 - Confirm package validation reports source, documentation, and locale parity with the repository.
 - Confirm runtime fixture validation covers both the default `reduce` lab policy and forced `skip` lab policy.
+- Confirm runtime fixture validation covers `configured`, `end-game`, and `all` science-pack ingredient policies, the end-game prerequisite gate, and the base-only cargo landing pad count skip.
 - Load Factorio with the manual matrix above.
 - Confirm `changelog.txt` has the release version and date.

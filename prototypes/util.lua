@@ -13,6 +13,7 @@ U.item_prototype = lookup.item_prototype
 U.technology_exists = lookup.technology_exists
 U.ammo_category_exists = lookup.ammo_category_exists
 U.is_space_age = lookup.is_space_age
+U.mod_exists = lookup.mod_exists
 
 U.all_lab_inputs = science.all_lab_inputs
 U.science_pack_exists = science.science_pack_exists
@@ -22,6 +23,7 @@ U.best_lab_compatible_ingredients = science.best_lab_compatible_ingredients
 U.pack_list_all = science.pack_list_all
 U.pack_list_for_extension = science.pack_list_for_extension
 U.prereq_tech_for_science_pack = science.prereq_tech_for_science_pack
+U.end_game_science_pack = science.end_game_science_pack
 
 U.icons_for_stream = icons.icons_for_stream
 U.matches_stream_recipe_filter = recipes.matches_stream_recipe_filter
@@ -157,6 +159,44 @@ local function add_if_science_pack_exists(list, name)
   if U.science_pack_exists(name) then table.insert(list, name) end
 end
 
+local function ingredient_name(ingredient)
+  if not ingredient then return nil end
+  if type(ingredient) == "string" then return ingredient end
+  return ingredient.name or ingredient[1]
+end
+
+local function ingredient_amount(ingredient)
+  if not ingredient or type(ingredient) == "string" then return 1 end
+  return ingredient.amount or ingredient[2] or 1
+end
+
+local function append_ingredient(out, seen, name, amount)
+  if name and U.science_pack_exists(name) and not seen[name] then
+    seen[name] = true
+    table.insert(out, {name, amount or 1})
+  end
+end
+
+function U.apply_science_pack_ingredient_policy(ingredients)
+  local out, seen = {}, {}
+  for _, ingredient in ipairs(ingredients or {}) do
+    append_ingredient(out, seen, ingredient_name(ingredient), ingredient_amount(ingredient))
+  end
+
+  -- This setting intentionally changes only research ingredients. The
+  -- finish-game prerequisite gate is handled separately in prerequisites.
+  local policy = startup_setting("mir-science-pack-ingredient-policy") or "configured"
+  if policy == "end-game" then
+    append_ingredient(out, seen, U.end_game_science_pack(), 1)
+  elseif policy == "all" then
+    for _, pack in ipairs(U.pack_list_all()) do
+      append_ingredient(out, seen, pack, 1)
+    end
+  end
+
+  return out
+end
+
 function U.pick_science_for_stream(spec, key)
   local packs = {}
   local desired = spec and spec.science_packs
@@ -183,7 +223,7 @@ function U.pick_science_for_stream(spec, key)
       table.insert(out, {name, 1})
     end
   end
-  return out
+  return U.apply_science_pack_ingredient_policy(out)
 end
 
 function U.build_prereqs_for(key, ingredients)
@@ -204,17 +244,23 @@ function U.build_prereqs_for(key, ingredients)
     add(tech_name)
   end
 
-  local gate_on = (settings and settings.startup and settings.startup["ips-require-space-gate"] and settings.startup["ips-require-space-gate"].value) ~= false
+  return U.append_end_game_gate_prerequisite(reqs)
+end
+
+function U.append_end_game_gate_prerequisite(prereqs)
+  local out = prereqs or {}
+  local seen = {}
+  for _, name in ipairs(out) do seen[name] = true end
+
+  local gate_on = startup_setting("ips-require-space-gate") == true
   if gate_on then
-    local promethium = "promethium-science-pack"
-    local space = "space-science-pack"
-    if U.is_space_age() and U.science_pack_exists(promethium) then
-      add(U.prereq_tech_for_science_pack(promethium))
-    elseif U.science_pack_exists(space) then
-      add(U.prereq_tech_for_science_pack(space))
+    local prereq = U.prereq_tech_for_science_pack(U.end_game_science_pack())
+    if prereq and U.technology_exists(prereq) and not seen[prereq] then
+      table.insert(out, prereq)
     end
   end
-  return reqs
+
+  return out
 end
 
 function U.recipes_for_stream(spec)

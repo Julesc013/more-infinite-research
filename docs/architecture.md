@@ -25,7 +25,7 @@ This order gives the mod the best practical view of recipes, labs, science packs
 `prototypes/util.lua` is a facade kept for compatibility with existing call sites. Domain logic lives in focused modules:
 
 - `prototypes/lib/prototype-lookup.lua`: item-like prototype lookup, technology existence, ammo-category existence, Space Age detection.
-- `prototypes/lib/science-packs.lua`: lab-input discovery, science-pack existence, lab-compatible ingredient validation, science-pack unlock prerequisites, ordered pack lists.
+- `prototypes/lib/science-packs.lua`: lab-input discovery, science-pack existence, end-game science-pack selection, lab-compatible ingredient validation, science-pack unlock prerequisites, ordered pack lists.
 - `prototypes/lib/recipe-matching.lua`: item-output matching, item-pattern expansion, recipe category matching, hidden/recycling filtering.
 - `prototypes/lib/technology-icons.lua`: borrowed icon copying, technology/item icon fallback, Wube-style constant overlays.
 - `prototypes/lib/deepcopy.lua`: shared fallback for data-stage deep copies.
@@ -77,6 +77,15 @@ Use this setting when triaging user reports. It is off by default to avoid noisy
 
 `mir-debug-recipe-matches` logs matched recipe names per generated productivity stream. When either diagnostics setting is enabled, duplicate recipe matches across streams are also reported as non-blocking warnings.
 
+## Progression Settings
+
+`ips-require-space-gate` and `mir-science-pack-ingredient-policy` deliberately control different parts of generated technologies.
+
+- `ips-require-space-gate` adds the end-game science unlock as a prerequisite only. It does not change research ingredients.
+- `mir-science-pack-ingredient-policy` changes research ingredients only. `configured` keeps each stream or extension's selected packs, `end-game` appends space science or Space Age promethium science when available, and `all` appends every active lab science pack including compatible modded packs.
+
+Both generated streams and base-technology extensions run through the same ingredient policy and end-game prerequisite helper so the settings apply consistently to all added infinite research.
+
 ## Validation
 
 Use `scripts/Invoke-MIRValidation.ps1 -StaticOnly` for static checks.
@@ -89,4 +98,4 @@ Static package validation also compares key packaged source, documentation, and 
 
 Static validation also checks Factorio changelog formatting, including the required 99-dash section separators.
 
-The fixture mods under `fixtures/` test item-based science packs, custom labs, late recipe creation, the default `reduce` lab incompatibility behavior, the `skip` lab incompatibility behavior, and post-MIR assertions for both runtime lab-policy outcomes.
+The fixture mods under `fixtures/` test item-based science packs, custom labs, late recipe creation, the default `reduce` lab incompatibility behavior, the `skip` lab incompatibility behavior, science-pack ingredient policy modes, the end-game prerequisite gate, base-only cargo skip behavior, and post-MIR assertions for both runtime lab-policy outcomes.

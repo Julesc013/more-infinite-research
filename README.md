@@ -90,10 +90,12 @@ Factorio 2.1 changed science packs to ordinary item prototypes. MIR therefore tr
 
 If no lab accepts the full selected science-pack set, MIR follows `mir-lab-incompatibility-policy`. The default `reduce` mode chooses the largest deterministic lab-compatible subset. The `skip` mode skips the technology instead. If no valid subset exists, it skips the generated technology and logs the reason.
 
-The `ips-require-space-gate` setting also adds progression prerequisites:
+Two startup settings control late-game progression and global science-pack pressure:
 
-- In Space Age, promethium science is used as the final gate when available.
-- In base game, space science is used when available.
+- `ips-require-space-gate` is disabled by default. When enabled, generated technologies require the end-game science unlock as a prerequisite, but their science-pack ingredients are not changed.
+- `mir-science-pack-ingredient-policy` is `configured` by default. It can instead add the end-game science pack to every generated technology, or add every active lab science pack, including compatible modded science packs.
+
+For the end-game science gate, MIR uses promethium science in Space Age when available. Otherwise it uses space science when available.
 
 ## Generated Prototype Names
 
@@ -168,8 +170,8 @@ These streams generate infinite technologies with direct Factorio technology mod
 
 | Stream key | Research | Effect | Default | Gates and notes |
 | --- | --- | --- | --- | --- |
-| `research_cargo_bay_unloading_distance` | Cargo bay unloading distance | `max-cargo-bay-unloading-distance` | `+10` tiles per level | Requires the `landing-pad-unloading-bay` item and technology. Uses all active lab science packs. Base cost `100000`, growth `3`. |
-| `research_cargo_landing_pad_count` | Cargo landing pad count | `cargo-landing-pad-count` | `+1` landing pad per surface per level | Requires the `cargo-landing-pad` item. Disabled by default. Uses all active lab science packs. Base cost `1000000`, growth `10`. |
+| `research_cargo_bay_unloading_distance` | Cargo bay unloading distance | `max-cargo-bay-unloading-distance` | `+10` tiles per level | Requires Space Age plus the `landing-pad-unloading-bay` item and technology. Uses all active lab science packs. Base cost `100000`, growth `3`. |
+| `research_cargo_landing_pad_count` | Cargo landing pad count | `cargo-landing-pad-count` | `+1` landing pad per surface per level | Requires Space Age plus the `cargo-landing-pad` item. Disabled by default. Uses all active lab science packs. Base cost `1000000`, growth `10`. |
 | `research_rocket_shooting_speed` | Rocket shooting speed | `gun-speed` for `rocket` ammo category | `+10%` speed per level | Base cost `60`, growth `1.5`. Uses a base-game rocketry icon. |
 | `research_cannon_shooting_speed` | Cannon shooting speed | `gun-speed` for `cannon-shell` ammo category | `+10%` speed per level | Base cost `60`, growth `1.5`. Uses the cannon shell item icon. |
 | `research_flamethrower_shooting_speed` | Flamethrower shooting speed | `gun-speed` for `flamethrower` | `+10%` speed per level | Base cost `60`, growth `1.5`. |
@@ -203,7 +205,8 @@ All settings are startup settings.
 
 | Setting | Type | Default | Description |
 | --- | --- | --- | --- |
-| `ips-require-space-gate` | bool | `true` | Adds a late-game prerequisite gate using promethium science in Space Age or space science in base game when available. |
+| `ips-require-space-gate` | bool | `false` | Adds the end-game science unlock as a prerequisite without changing science-pack ingredients. Uses promethium science in Space Age when available, otherwise space science. |
+| `mir-science-pack-ingredient-policy` | string | `configured` | Controls extra science packs added to every generated technology. Allowed values: `configured`, `end-game`, `all`. |
 | `mir-prefer-this-mod-for-competing-techs` | bool | `true` | Lets MIR remove selected competing infinite technologies when MIR has generated or will generate matching replacement behavior. Disable to keep competing technologies from other mods. |
 | `mir-adjust-vanilla-weapon-speed-techs` | string | `off` | Controls whether MIR removes rocket and cannon-shell speed bonuses from vanilla weapon shooting speed technologies. Allowed values: `off`, `only-when-dedicated-tech-enabled`, `always`. |
 | `mir-debug-generation-report` | bool | `false` | Writes structured generated/skipped rows to the Factorio log, including science packs, prerequisites, effect counts, lab compatibility, and icon source. |
@@ -324,6 +327,7 @@ Productivity and direct-effect streams are Lua tables keyed by stream ID. Common
 
 | Field | Meaning |
 | --- | --- |
+| `required_mods` | Skips the stream unless all listed mods are active. |
 | `items` | Exact output item names to match. |
 | `item_patterns` | Lua patterns for output item names. |
 | `groups` | Tiered recipe-productivity buckets with their own `change`, `items`, and patterns. |

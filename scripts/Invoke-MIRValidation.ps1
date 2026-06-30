@@ -87,6 +87,38 @@ Invoke-RepoCheck "locale files match English fallback" {
   & (Join-Path $repo "scripts\Test-MIRLocales.ps1") -AllowMissingSupportedLanguages
 }
 
+Invoke-RepoCheck "science-pack progression settings are wired" {
+  $settingsText = Get-Content -Raw -LiteralPath (Join-Path $repo "settings.lua")
+  $utilText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\util.lua")
+  $baseExtensionsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\base-tech-extensions.lua")
+  $scienceText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\lib\science-packs.lua")
+  $directEffectsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\streams\direct-effects.lua")
+  $localeText = Get-Content -Raw -LiteralPath (Join-Path $repo "locale\en\more-infinite-research.cfg")
+
+  $requiredSnippets = @(
+    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'name = "ips-require-space-gate"' },
+    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'default_value = false' },
+    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'name = "mir-science-pack-ingredient-policy"' },
+    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'allowed_values = {"configured", "end-game", "all"}' },
+    @{ File = "prototypes\util.lua"; Text = $utilText; Snippet = 'apply_science_pack_ingredient_policy' },
+    @{ File = "prototypes\util.lua"; Text = $utilText; Snippet = 'append_end_game_gate_prerequisite' },
+    @{ File = "prototypes\base-tech-extensions.lua"; Text = $baseExtensionsText; Snippet = 'apply_science_pack_ingredient_policy' },
+    @{ File = "prototypes\base-tech-extensions.lua"; Text = $baseExtensionsText; Snippet = 'append_end_game_gate_prerequisite' },
+    @{ File = "prototypes\lib\science-packs.lua"; Text = $scienceText; Snippet = 'end_game_science_pack' },
+    @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'research_cargo_landing_pad_count = {' },
+    @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'required_mods = {"space-age"}' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-science-pack-ingredient-policy-configured=Configured per technology' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-science-pack-ingredient-policy-end-game=Add end-game science pack' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-science-pack-ingredient-policy-all=Use all lab science packs' }
+  )
+
+  foreach ($check in $requiredSnippets) {
+    if (-not $check.Text.Contains($check.Snippet)) {
+      throw "Missing science-pack progression setting wiring in $($check.File): $($check.Snippet)"
+    }
+  }
+}
+
 Invoke-RepoCheck "changelog uses Factorio changelog format" {
   $separator = "-" * 99
   $path = Join-Path $repo "changelog.txt"
@@ -385,22 +417,85 @@ function Enable-CopiedDiagnostics {
   Set-Content -LiteralPath $copiedDiagnosticsPath -Value $copiedDiagnostics -Encoding UTF8
 }
 
-function Set-CopiedLabPolicySkip {
-  param([string]$ModsDir)
+function Set-CopiedStartupSettingDefault {
+  param(
+    [string]$ModsDir,
+    [string]$Name,
+    [string]$ValueLiteral
+  )
+
   $copiedSettingsPath = Join-Path $ModsDir "more-infinite-research\settings.lua"
   $copiedSettings = Get-Content -Raw -LiteralPath $copiedSettingsPath
-  if (-not $copiedSettings.Contains('default_value = "reduce",')) {
-    throw "Unable to force lab incompatibility policy to skip in copied settings.lua."
+  $escapedName = [regex]::Escape($Name)
+  $pattern = "(?s)(name\s*=\s*`"$escapedName`".*?default_value\s*=\s*)([^,\r\n]+)"
+  $match = [regex]::Match($copiedSettings, $pattern)
+  if (-not $match.Success) {
+    throw "Unable to find startup setting default for $Name in copied settings.lua."
   }
-  $copiedSettings = $copiedSettings.Replace('default_value = "reduce",', 'default_value = "skip",')
+
+  $valueGroup = $match.Groups[2]
+  $copiedSettings = $copiedSettings.Substring(0, $valueGroup.Index) +
+    $ValueLiteral +
+    $copiedSettings.Substring($valueGroup.Index + $valueGroup.Length)
   Set-Content -LiteralPath $copiedSettingsPath -Value $copiedSettings -Encoding UTF8
+}
+
+function Set-CopiedLabPolicySkip {
+  param([string]$ModsDir)
+  Set-CopiedStartupSettingDefault -ModsDir $ModsDir -Name "mir-lab-incompatibility-policy" -ValueLiteral '"skip"'
+}
+
+function Set-CopiedSciencePackIngredientPolicy {
+  param(
+    [string]$ModsDir,
+    [ValidateSet("configured", "end-game", "all")]
+    [string]$Policy
+  )
+  Set-CopiedStartupSettingDefault -ModsDir $ModsDir -Name "mir-science-pack-ingredient-policy" -ValueLiteral "`"$Policy`""
+}
+
+function Set-CopiedRequireSpaceGate {
+  param([string]$ModsDir)
+  Set-CopiedStartupSettingDefault -ModsDir $ModsDir -Name "ips-require-space-gate" -ValueLiteral "true"
+}
+
+function Set-CopiedStreamEnabled {
+  param(
+    [string]$ModsDir,
+    [string]$StreamKey
+  )
+  try {
+    Set-CopiedStartupSettingDefault -ModsDir $ModsDir -Name "ips-enable-$StreamKey" -ValueLiteral "true"
+    return
+  } catch {
+    $copiedDefaultsPath = Join-Path $ModsDir "more-infinite-research\defaults.lua"
+    $copiedDefaults = Get-Content -Raw -LiteralPath $copiedDefaultsPath
+    $escapedStreamKey = [regex]::Escape($StreamKey)
+    $pattern = "(?s)($escapedStreamKey\s*=\s*\{[^{}]*?enabled\s*=\s*)false"
+    $match = [regex]::Match($copiedDefaults, $pattern)
+    if (-not $match.Success) {
+      throw "Unable to enable stream $StreamKey in copied settings.lua or defaults.lua."
+    }
+
+    $valueGroup = $match.Groups[1]
+    $copiedDefaults = $copiedDefaults.Substring(0, $valueGroup.Index) +
+      $valueGroup.Value +
+      "true" +
+      $copiedDefaults.Substring($valueGroup.Index + $valueGroup.Length + "false".Length)
+    Set-Content -LiteralPath $copiedDefaultsPath -Value $copiedDefaults -Encoding UTF8
+  }
 }
 
 function Initialize-RuntimeScenario {
   param(
     [string]$ScenarioName,
     [string[]]$EnabledFixtureNames,
-    [switch]$LabPolicySkip
+    [string[]]$EnabledStreamKeys = @(),
+    [switch]$LabPolicySkip,
+    [ValidateSet("configured", "end-game", "all")]
+    [string]$SciencePackIngredientPolicy = "configured",
+    [switch]$RequireSpaceGate,
+    [switch]$EnableSpaceAge
   )
 
   $scenarioRoot = Join-Path $validationRoot $ScenarioName
@@ -439,9 +534,22 @@ function Initialize-RuntimeScenario {
   if ($LabPolicySkip) {
     Set-CopiedLabPolicySkip -ModsDir $modsDir
   }
+  if ($SciencePackIngredientPolicy -ne "configured") {
+    Set-CopiedSciencePackIngredientPolicy -ModsDir $modsDir -Policy $SciencePackIngredientPolicy
+  }
+  if ($RequireSpaceGate) {
+    Set-CopiedRequireSpaceGate -ModsDir $modsDir
+  }
+  foreach ($streamKey in $EnabledStreamKeys) {
+    Set-CopiedStreamEnabled -ModsDir $modsDir -StreamKey $streamKey
+  }
 
   $mods = @(
     @{ name = "base"; enabled = $true },
+    @{ name = "elevated-rails"; enabled = [bool]$EnableSpaceAge },
+    @{ name = "recycler"; enabled = [bool]$EnableSpaceAge },
+    @{ name = "quality"; enabled = [bool]$EnableSpaceAge },
+    @{ name = "space-age"; enabled = [bool]$EnableSpaceAge },
     @{ name = "more-infinite-research"; enabled = $true }
   )
   $enabledFixtures = @{}
@@ -487,16 +595,29 @@ function Invoke-RuntimeScenario {
   param(
     [string]$ScenarioName,
     [string[]]$EnabledFixtureNames,
-    [switch]$LabPolicySkip
+    [string[]]$EnabledStreamKeys = @(),
+    [switch]$LabPolicySkip,
+    [ValidateSet("configured", "end-game", "all")]
+    [string]$SciencePackIngredientPolicy = "configured",
+    [switch]$RequireSpaceGate,
+    [switch]$EnableSpaceAge
   )
 
-  $scenario = Initialize-RuntimeScenario -ScenarioName $ScenarioName -EnabledFixtureNames $EnabledFixtureNames -LabPolicySkip:$LabPolicySkip
+  $scenario = Initialize-RuntimeScenario `
+    -ScenarioName $ScenarioName `
+    -EnabledFixtureNames $EnabledFixtureNames `
+    -EnabledStreamKeys $EnabledStreamKeys `
+    -LabPolicySkip:$LabPolicySkip `
+    -SciencePackIngredientPolicy $SciencePackIngredientPolicy `
+    -RequireSpaceGate:$RequireSpaceGate `
+    -EnableSpaceAge:$EnableSpaceAge
   if (Test-Path -LiteralPath $scenario.SavePath) {
     Remove-Item -LiteralPath $scenario.SavePath -Force
   }
 
   Write-Host "[run] Factorio load check with fixture mods ($ScenarioName)"
   $factorioArgs = @(
+    "--disable-audio",
     "--mod-directory",
     $scenario.ModsDir,
     "--create",
@@ -513,6 +634,36 @@ function Invoke-RuntimeScenario {
   Assert-RuntimeLogHealthy -ScenarioName $ScenarioName
 }
 
+function Get-LastStreamReportLine {
+  param([string]$Key)
+  $line = Select-String -LiteralPath $FactorioLog -Pattern "key=$Key" -SimpleMatch | Select-Object -Last 1
+  if (-not $line) {
+    throw "Runtime validation log did not contain diagnostics for $Key."
+  }
+  return $line.Line
+}
+
+function Assert-ReportLineGenerated {
+  param([string]$Line, [string]$Context)
+  if ($Line -notmatch "status=generated") {
+    throw "$Context did not generate as expected: $Line"
+  }
+}
+
+function Assert-ReportLineContains {
+  param([string]$Line, [string]$Expected, [string]$Context)
+  if (-not $Line.Contains($Expected)) {
+    throw "$Context did not include expected text '$Expected': $Line"
+  }
+}
+
+function Assert-ReportLineDoesNotContain {
+  param([string]$Line, [string]$Unexpected, [string]$Context)
+  if ($Line.Contains($Unexpected)) {
+    throw "$Context unexpectedly included '$Unexpected': $Line"
+  }
+}
+
 Invoke-RuntimeScenario -ScenarioName "reduce-policy" -EnabledFixtureNames @(
   "mir-fixture-item-science-pack",
   "mir-fixture-custom-lab",
@@ -520,22 +671,16 @@ Invoke-RuntimeScenario -ScenarioName "reduce-policy" -EnabledFixtureNames @(
   "mir-fixture-assert-science-pack-productivity"
 )
 
-$sciencePackProductivityLine = Select-String -LiteralPath $FactorioLog -Pattern "key=research_science_pack_productivity" -SimpleMatch | Select-Object -Last 1
-if (-not $sciencePackProductivityLine) {
-  throw "Factorio runtime validation log did not contain diagnostics for research_science_pack_productivity."
-}
-if ($sciencePackProductivityLine.Line -notmatch "status=generated") {
-  throw "Science pack productivity stream was not generated during runtime validation: $($sciencePackProductivityLine.Line)"
-}
-$effectCountMatch = [regex]::Match($sciencePackProductivityLine.Line, "effects=(\d+)")
+$sciencePackProductivityLine = Get-LastStreamReportLine -Key "research_science_pack_productivity"
+Assert-ReportLineGenerated -Line $sciencePackProductivityLine -Context "Science pack productivity reduce-policy scenario"
+Assert-ReportLineContains -Line $sciencePackProductivityLine -Expected "mir-fixture-science-pack" -Context "Science pack productivity reduce-policy scenario"
+$effectCountMatch = [regex]::Match($sciencePackProductivityLine, "effects=(\d+)")
 if (-not $effectCountMatch.Success) {
-  throw "Science pack productivity diagnostics did not include an effect count: $($sciencePackProductivityLine.Line)"
+  throw "Science pack productivity diagnostics did not include an effect count: $sciencePackProductivityLine"
 }
 $sciencePackEffectCount = [int]$effectCountMatch.Groups[1].Value
-$spaceAgeLoaded = Select-String -LiteralPath $FactorioLog -Pattern "Loading mod space-age" -SimpleMatch
-$minimumSciencePackEffects = if ($spaceAgeLoaded) { 13 } else { 8 }
-if ($sciencePackEffectCount -lt $minimumSciencePackEffects) {
-  throw "Science pack productivity stream did not include the fixture science-pack effect. Expected at least $minimumSciencePackEffects effects, got $sciencePackEffectCount`: $($sciencePackProductivityLine.Line)"
+if ($sciencePackEffectCount -lt 1) {
+  throw "Science pack productivity stream did not include any recipe productivity effects: $sciencePackProductivityLine"
 }
 
 Invoke-RuntimeScenario -ScenarioName "skip-policy" -EnabledFixtureNames @(
@@ -545,13 +690,47 @@ Invoke-RuntimeScenario -ScenarioName "skip-policy" -EnabledFixtureNames @(
   "mir-fixture-assert-lab-skip-policy"
 ) -LabPolicySkip
 
-$skipPolicyLine = Select-String -LiteralPath $FactorioLog -Pattern "key=research_science_pack_productivity" -SimpleMatch | Select-Object -Last 1
-if (-not $skipPolicyLine) {
-  throw "Skip-policy runtime validation log did not contain diagnostics for research_science_pack_productivity."
+$skipPolicyLine = Get-LastStreamReportLine -Key "research_science_pack_productivity"
+if ($skipPolicyLine -notmatch "status=skipped" -or $skipPolicyLine -notmatch "lab_status=invalid") {
+  throw "Skip-policy runtime validation did not skip incompatible science-pack productivity as expected: $skipPolicyLine"
 }
-if ($skipPolicyLine.Line -notmatch "status=skipped" -or $skipPolicyLine.Line -notmatch "lab_status=invalid") {
-  throw "Skip-policy runtime validation did not skip incompatible science-pack productivity as expected: $($skipPolicyLine.Line)"
+
+Invoke-RuntimeScenario -ScenarioName "end-game-pack-policy" -EnabledFixtureNames @() -SciencePackIngredientPolicy "end-game"
+$endGamePackLine = Get-LastStreamReportLine -Key "research_gears"
+Assert-ReportLineGenerated -Line $endGamePackLine -Context "End-game science-pack ingredient policy scenario"
+Assert-ReportLineContains -Line $endGamePackLine -Expected "space-science-pack" -Context "End-game science-pack ingredient policy scenario"
+
+Invoke-RuntimeScenario -ScenarioName "space-age-end-game-pack-policy" -EnabledFixtureNames @() -SciencePackIngredientPolicy "end-game" -EnableSpaceAge
+$spaceAgeEndGamePackLine = Get-LastStreamReportLine -Key "research_gears"
+Assert-ReportLineGenerated -Line $spaceAgeEndGamePackLine -Context "Space Age end-game science-pack ingredient policy scenario"
+Assert-ReportLineContains -Line $spaceAgeEndGamePackLine -Expected "promethium-science-pack" -Context "Space Age end-game science-pack ingredient policy scenario"
+
+Invoke-RuntimeScenario -ScenarioName "all-pack-policy" -EnabledFixtureNames @(
+  "mir-fixture-item-science-pack"
+) -SciencePackIngredientPolicy "all"
+$allPackLine = Get-LastStreamReportLine -Key "research_gears"
+Assert-ReportLineGenerated -Line $allPackLine -Context "All lab science-pack ingredient policy scenario"
+Assert-ReportLineContains -Line $allPackLine -Expected "mir-fixture-science-pack" -Context "All lab science-pack ingredient policy scenario"
+
+Invoke-RuntimeScenario -ScenarioName "end-game-prerequisite-gate" -EnabledFixtureNames @() -RequireSpaceGate
+$gateLine = Get-LastStreamReportLine -Key "research_gears"
+Assert-ReportLineGenerated -Line $gateLine -Context "End-game prerequisite gate scenario"
+Assert-ReportLineContains -Line $gateLine -Expected "prerequisites=automation-science-pack,logistic-science-pack,chemical-science-pack,production-science-pack,space-science-pack" -Context "End-game prerequisite gate scenario"
+Assert-ReportLineDoesNotContain -Line $gateLine -Unexpected "science=automation-science-pack,logistic-science-pack,chemical-science-pack,production-science-pack,space-science-pack" -Context "End-game prerequisite gate scenario"
+
+Invoke-RuntimeScenario -ScenarioName "base-cargo-space-age-gate" -EnabledFixtureNames @() -EnabledStreamKeys @(
+  "research_cargo_landing_pad_count"
+)
+$cargoPadLine = Get-LastStreamReportLine -Key "research_cargo_landing_pad_count"
+if ($cargoPadLine -notmatch "status=skipped" -or $cargoPadLine -notmatch "missing required mod space-age") {
+  throw "Cargo landing pad count generated or skipped for the wrong reason without Space Age: $cargoPadLine"
 }
+
+Invoke-RuntimeScenario -ScenarioName "space-age-cargo-pad-enabled" -EnabledFixtureNames @() -EnabledStreamKeys @(
+  "research_cargo_landing_pad_count"
+) -EnableSpaceAge
+$spaceAgeCargoPadLine = Get-LastStreamReportLine -Key "research_cargo_landing_pad_count"
+Assert-ReportLineGenerated -Line $spaceAgeCargoPadLine -Context "Space Age cargo landing pad count scenario"
 
 Write-Host "[ok] Validation completed."
 $global:LASTEXITCODE = 0

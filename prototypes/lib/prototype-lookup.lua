@@ -53,4 +53,8 @@ function L.is_space_age()
   return mods and mods["space-age"] ~= nil
 end
 
+function L.mod_exists(name)
+  return name ~= nil and mods and mods[name] ~= nil
+end
+
 return L

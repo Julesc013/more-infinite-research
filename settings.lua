@@ -43,10 +43,32 @@ table.insert(settings_data, {
   type = "bool-setting",
   name = "ips-require-space-gate",
   setting_type = "startup",
-  default_value = true,
+  default_value = false,
   order = "a-00",
   localised_name = {"mod-setting-name.ips-require-space-gate"},
   localised_description = {"mod-setting-description.ips-require-space-gate"}
+})
+
+table.insert(settings_data, {
+  type = "string-setting",
+  name = "mir-science-pack-ingredient-policy",
+  setting_type = "startup",
+  default_value = "configured",
+  allowed_values = {"configured", "end-game", "all"},
+  order = "a-01",
+  localised_name = {"mod-setting-name.mir-science-pack-ingredient-policy"},
+  localised_description = {"mod-setting-description.mir-science-pack-ingredient-policy"}
+})
+
+table.insert(settings_data, {
+  type = "string-setting",
+  name = "mir-lab-incompatibility-policy",
+  setting_type = "startup",
+  default_value = "reduce",
+  allowed_values = {"reduce", "skip"},
+  order = "a-02",
+  localised_name = {"mod-setting-name.mir-lab-incompatibility-policy"},
+  localised_description = {"mod-setting-description.mir-lab-incompatibility-policy"}
 })
 
 table.insert(settings_data, {
@@ -54,7 +76,7 @@ table.insert(settings_data, {
   name = "mir-prefer-this-mod-for-competing-techs",
   setting_type = "startup",
   default_value = true,
-  order = "a-01",
+  order = "a-03",
   localised_name = {"mod-setting-name.mir-prefer-this-mod-for-competing-techs"},
   localised_description = {"mod-setting-description.mir-prefer-this-mod-for-competing-techs"}
 })
@@ -65,7 +87,7 @@ table.insert(settings_data, {
   setting_type = "startup",
   default_value = "off",
   allowed_values = {"off", "only-when-dedicated-tech-enabled", "always"},
-  order = "a-02",
+  order = "a-04",
   localised_name = {"mod-setting-name.mir-adjust-vanilla-weapon-speed-techs"},
   localised_description = {"mod-setting-description.mir-adjust-vanilla-weapon-speed-techs"}
 })
@@ -75,7 +97,7 @@ table.insert(settings_data, {
   name = "mir-debug-generation-report",
   setting_type = "startup",
   default_value = false,
-  order = "a-03",
+  order = "a-90",
   localised_name = {"mod-setting-name.mir-debug-generation-report"},
   localised_description = {"mod-setting-description.mir-debug-generation-report"}
 })
@@ -85,20 +107,9 @@ table.insert(settings_data, {
   name = "mir-debug-recipe-matches",
   setting_type = "startup",
   default_value = false,
-  order = "a-04",
+  order = "a-91",
   localised_name = {"mod-setting-name.mir-debug-recipe-matches"},
   localised_description = {"mod-setting-description.mir-debug-recipe-matches"}
-})
-
-table.insert(settings_data, {
-  type = "string-setting",
-  name = "mir-lab-incompatibility-policy",
-  setting_type = "startup",
-  default_value = "reduce",
-  allowed_values = {"reduce", "skip"},
-  order = "a-05",
-  localised_name = {"mod-setting-name.mir-lab-incompatibility-policy"},
-  localised_description = {"mod-setting-description.mir-lab-incompatibility-policy"}
 })
 
 local stream_order = {
