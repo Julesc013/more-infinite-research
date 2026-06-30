@@ -23,6 +23,16 @@ The release goal is graceful compatibility without mod-page dependency clutter: 
 - `mir-debug-generation-report` can be enabled to capture why each stream or base extension generated or skipped.
 - `mir-debug-recipe-matches` can be enabled to capture matched recipe names per stream and duplicate recipe matches across streams.
 
+## Future Overlap Policy
+
+Future MIR features should treat overlapping native modifiers as compatibility-sensitive. If another mod already adds an infinite technology that modifies the same force statistic, MIR should prefer one of these behaviors:
+
+- Skip or disable MIR's duplicate by default.
+- Keep both only when an explicit setting allows overlapping infinite technologies.
+- Report the overlap through diagnostics.
+
+This is especially relevant for cargo landing pad count, cargo bay unloading distance, and any future native modifier or scripted-effect technology that other mods may also provide.
+
 ## Opportunistic Integrations
 
 These integrations do not add mod-page dependencies. More Infinite Research handles them when their prototypes are already visible, and skips safely when they are absent:
@@ -43,6 +53,7 @@ Large mod packs and utility mods such as Alien Biomes, Informatron, Jetpack, AAI
 - Lab validation prevents impossible research ingredients, but it cannot infer every overhaul mod's intended progression.
 - Recipe productivity technologies remain bounded by Factorio's recipe productivity cap even when research levels are infinite.
 - Existing prototype IDs were kept stable for v2.0.0. No migration is currently required.
+- Runtime scripted features should avoid per-tick scanning by default. If a future feature needs active scanning, it should be disabled by default, clearly labeled experimental, or split into a companion mod.
 
 ## Required Manual Test Matrix
 

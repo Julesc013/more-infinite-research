@@ -20,6 +20,20 @@ More Infinite Research is organized around a compatibility-first data-stage pipe
 
 This order gives the mod the best practical view of recipes, labs, science packs, and technologies created by other mods while still keeping this mod's final cleanup deterministic.
 
+## Future Control Stage Boundary
+
+The post-v2.0 feature plan allows a small `control.lua` surface for scripted technologies such as spoilage preservation and agricultural growth speed.
+
+Keep that runtime layer narrow:
+
+- Prefer native technology modifiers and recipe productivity whenever the engine exposes them.
+- Use scripted effects only when they can be event-driven.
+- Avoid per-tick inventory, belt, lab, container, surface, or broad entity scanning.
+- Keep runtime handlers grouped under a small scripted-tech manager such as `control/scripted-techs.lua`.
+- Label scripted/global/sandbox features clearly in settings and player-facing docs.
+
+Do not use runtime code to fake fluid physics, platform speed, module effects, or machine behavior when the requested feature is really a prototype/entity unlock or companion-mod feature.
+
 ## Utility Modules
 
 `prototypes/util.lua` is a facade kept for compatibility with existing call sites. Domain logic lives in focused modules:
@@ -99,3 +113,5 @@ Static package validation also compares key packaged source, documentation, and 
 Static validation also checks Factorio changelog formatting, including the required 99-dash section separators.
 
 The fixture mods under `fixtures/` test item-based science packs, custom labs, late recipe creation, the default `reduce` lab incompatibility behavior, the `skip` lab incompatibility behavior, science-pack ingredient policy modes, the end-game prerequisite gate, base-only cargo skip behavior, Space Age cargo logistics effect shape, finite vanilla-chain preservation, and post-MIR assertions for runtime-sensitive generated technologies.
+
+Future validation for scripted technologies should add existing-save load tests, research-finish/reversal tests, and checks that the new effects remain event-driven rather than tick-scanned.

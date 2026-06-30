@@ -1,12 +1,14 @@
 # M.I.R. Roadmap
 
-Updated: 2026-06-30
+Updated: 2026-07-01
 
 This document is the v2.0.0 release checklist and follow-on roadmap. The baseline below reflects the current implementation state.
 
 This document captures the Factorio 2.1 experimental compatibility review and turns it into an execution plan for the mod's v2.0.0 release and follow-on expansion work.
 
 The critical interpretation is that "2.0" means the mod's v2.0.0 release, not a return to Factorio 2.0. The current target remains Factorio 2.1.
+
+For post-v2.0.0 feature triage from public feedback, see `docs/post-2.0-feature-plan.md`. That document separates features that fit MIR from ideas better suited to companion mods.
 
 ## Current Repository Baseline
 
