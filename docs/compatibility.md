@@ -54,6 +54,7 @@ Large mod packs and utility mods such as Alien Biomes, Informatron, Jetpack, AAI
 - Recipe productivity technologies remain bounded by Factorio's recipe productivity cap even when research levels are infinite.
 - Existing prototype IDs were kept stable for v2.0.0. No migration is currently required.
 - Runtime scripted features should avoid per-tick scanning by default. If a future feature needs active scanning, it should be disabled by default, clearly labeled experimental, or split into a companion mod.
+- Future scripted technologies must document storage keys, recomputation triggers, reversal behavior, disabling behavior, and multi-force behavior before implementation.
 
 ## Required Manual Test Matrix
 
@@ -71,6 +72,19 @@ Run each case from a clean Factorio user data directory or with a controlled mod
 10. A fixture mod that adds a custom lab with a different science-pack input set.
 11. A fixture mod that adds recipes in `data-final-fixes.lua`.
 12. Existing save upgraded from the latest 1.x release.
+
+Post-v2.0 scripted feature releases also require these named saves/scenarios:
+
+1. Fresh Space Age save with no other mods.
+2. Existing v2.0.0 More Infinite Research save upgraded to the candidate release.
+3. Save with spoilable items already on belts, in chests, in labs, in rockets, and on platforms.
+4. Save with multiple player forces.
+5. Large Gleba farm with thousands of tower-owned plants.
+6. Save with a scripted feature enabled, researched, then disabled.
+7. Save with Maraxis-like duplicate cargo landing pad technology.
+8. Save with custom science packs and custom labs.
+9. Save without Space Age.
+10. Factorio 2.0 legacy-branch subset save.
 
 For each case, verify:
 

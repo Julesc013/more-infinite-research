@@ -30,6 +30,8 @@ Keep that runtime layer narrow:
 - Use scripted effects only when they can be event-driven.
 - Avoid per-tick inventory, belt, lab, container, surface, or broad entity scanning.
 - Keep runtime handlers grouped under a small scripted-tech manager such as `control/scripted-techs.lua`.
+- Route init, configuration change, research finish, research reversal, and technology-effects reset through one recomputation path.
+- Require each scripted feature to document storage keys, disable behavior, multiple-force behavior, and interaction with other mods touching the same state.
 - Label scripted/global/sandbox features clearly in settings and player-facing docs.
 
 Do not use runtime code to fake fluid physics, platform speed, module effects, or machine behavior when the requested feature is really a prototype/entity unlock or companion-mod feature.

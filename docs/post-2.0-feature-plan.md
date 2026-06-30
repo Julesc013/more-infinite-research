@@ -33,6 +33,17 @@ Use this table as the product boundary.
 | Greenhouses / off-world Gleba farming | Separate mod | This is an agriculture overhaul. |
 | Super-bacteria / new ore biology | Separate mod | Content expansion, not research extension. |
 
+## Hard Feature Gate
+
+A feature belongs in More Infinite Research only if at least one of these is true:
+
+1. It is a native Factorio technology modifier.
+2. It is generated recipe productivity.
+3. It is a bounded, event-driven scripted research effect.
+4. It is a small optional unlock that directly supports megabase scaling and does not introduce a new gameplay loop.
+
+Otherwise, classify it as `Document only`, `Companion mod`, or `Reject for now`.
+
 The mod should not become "Everything Infinite and Also Every Cool New Building." It should become the research-sink framework that other late-game scaling ideas can plug into.
 
 ## Performance Policy
@@ -45,6 +56,17 @@ Scripted technologies are event-based where possible.
 Experimental features that require active scanning are disabled by default or moved to companion mods.
 ```
 
+The implementation plan must identify every runtime event handler and prove it does not scan:
+
+- all inventories;
+- all belts;
+- all containers;
+- all item stacks;
+- all surfaces per tick;
+- all entities per tick.
+
+Any feature requiring this kind of broad scan is not eligible for v2.0.5.
+
 Feature descriptions should label implementation risk:
 
 - Native.
@@ -56,6 +78,18 @@ Feature descriptions should label implementation risk:
 - May affect existing builds.
 
 This matters most for spoilage. Slower spoilage can help megabases, but it can also break factories that intentionally consume spoilage or depend on spoilage timing.
+
+## Release Candidate Ladder
+
+Use these buckets for every idea from the thread. Avoid "maybe" unless it is attached to a concrete spike.
+
+| Bucket | Meaning | v2.0.5 rule |
+| --- | --- | --- |
+| Ship | Implement now | API path known, bounded, testable, and in scope. |
+| Spike | Investigate with a throwaway test mod or save | API or balance is uncertain. |
+| Document only | Capture for future discussion | Useful idea, wrong release. |
+| Companion mod | Separate gameplay loop or content expansion | Not MIR core. |
+| Reject for now | Too hacky, UPS-heavy, or scope-breaking | Do not revisit without new API support or a specific proof. |
 
 ## Priority Roadmap
 
@@ -104,22 +138,34 @@ Ship:
 - Spoilage preservation.
 - Agricultural growth speed.
 - Settings presets, if small enough to land safely.
-- Better feature descriptions.
-- Compatibility diagnostics for scripted effects.
+- Better feature descriptions and setting labels.
+- Compatibility diagnostics for scripted/global effects.
+- Documentation of global/per-force behavior, caps, and removal behavior.
 
-Maybe ship:
+Spike only:
 
 - Agricultural yield, disabled by default.
 - Thruster fuel and oxidizer productivity if validation is clean and the scope stays small.
+- Oil/fluid recipe productivity.
+- Quality module odds.
+- Roboport range.
+- High-throughput pump prototype feasibility.
 
-Do not ship:
+Document only, defer, or split:
 
 - Refrigeration.
 - Greenhouses.
-- Quality module odds.
+- Super-bacteria.
 - Thruster variants.
 - Biter egg chaos.
-- High-throughput pumps.
+- Full fluid logistics expansion.
+
+This release should be treated as:
+
+```text
+v2.0.5 theme:
+Scripted research foundation + Space Age agriculture scaling.
+```
 
 ### P2: v2.0.6 Logistics QoL
 
@@ -213,6 +259,34 @@ Advanced Quality Research
 | Super-bacteria ores | Separate | Agriculture/resource overhaul | Separate |
 | Biter egg accelerator | Separate/disabled | Experimental/challenge mod | Separate |
 
+## Feature Ownership Table
+
+Use this table as the product boundary when converting feedback into work.
+
+| User idea | MIR core | MIR optional | Companion mod | Reject for now |
+| --- | ---: | ---: | ---: | ---: |
+| Spoilage preservation | Yes |  |  |  |
+| Agricultural growth speed | Yes |  |  |  |
+| Agricultural yield / fruit yield |  | Spike |  |  |
+| Settings presets | Yes |  |  |  |
+| Diagnostics for scripted/global effects | Yes |  |  |  |
+| Engine/electric-engine productivity verification | Yes |  |  |  |
+| Thruster fuel/oxidizer productivity |  | Spike |  |  |
+| Oil processing productivity |  | Spike |  |  |
+| High-throughput pump / Der Pump |  | Yes | Maybe |  |
+| Pipeline extent setting |  | Yes | Maybe |  |
+| Quality module odds |  | Spike | Maybe |  |
+| Innate assembler productivity |  | Spike | Maybe |  |
+| Robot battery/carrying capacity | Yes |  |  |  |
+| Roboport range |  | Spike | Maybe |  |
+| True thruster thrust research |  |  | Maybe | Likely |
+| Efficient/high-thrust thruster entities |  |  | Yes |  |
+| Refrigeration / CryoPants / cold chain |  |  | Yes |  |
+| Greenhouse anywhere / off-world farming |  |  | Yes |  |
+| Super-bacteria ores |  |  | Yes |  |
+| Foundry/EM plant engine recipes |  |  | Yes |  |
+| Biter egg production chaos |  |  | Maybe | Likely |
+
 ## Implementation Architecture
 
 Add a feature registry so every new idea has a clear implementation kind.
@@ -264,6 +338,34 @@ The scripted manager should handle:
 - `on_runtime_mod_setting_changed`, only if runtime toggles are added
 
 When `control.lua` is introduced, update `docs/architecture.md` with a control-stage architecture section and update validation for existing-save loads.
+
+## Scripted Feature Lifecycle Requirements
+
+Every scripted technology must specify:
+
+- technology name strategy;
+- visible `nothing` effect text;
+- events used;
+- storage keys;
+- `on_init` behavior;
+- `on_configuration_changed` behavior;
+- `on_research_finished` behavior;
+- `on_research_reversed` behavior;
+- `on_technology_effects_reset` behavior;
+- how disabling the setting behaves;
+- how multiple forces behave;
+- how other mods changing the same global state are handled;
+- why no per-tick broad scan is required.
+
+Initial lifecycle table:
+
+| Feature | State touched | Events | Disable/reversal behavior | Other-mod interaction |
+| --- | --- | --- | --- | --- |
+| Spoilage preservation | `storage.mir.spoilage.baseline`, applied multiplier, per-force levels if needed | Init, configuration changed, research finished/reversed, technology effects reset | Recompute from baseline; disabled setting restores or stops applying MIR multiplier | Must not blindly overwrite unrelated global `spoil_time_modifier` changes; document baseline limitations. |
+| Agricultural growth speed | Per-force effective multiplier; optional rescale bookkeeping | Init, configuration changed, tower planted seed, research finished/reversed, technology effects reset | New plants use current multiplier; bounded rescale only if proved safe | Must not mutate non-agricultural plants or scan all surfaces per tick. |
+| Agricultural yield | Per-force effective yield multiplier if spiked | Tower mined plant, research finished/reversed | Disabled by default until balance/UPS proof exists | Must avoid duplicating results from other harvest-changing mods unless explicitly compatible. |
+
+For scripted global effects, prefer recomputation over incremental mutation. The code should be able to rebuild applied values after load, configuration change, and research reversal without depending on event history.
 
 ## Feature Notes
 
@@ -575,6 +677,50 @@ Avoid a scripted "multiply platform speed" hack.
 
 This is a separate chaos mod or disabled experiment. The idea could be funny, but the UPS and balance risk are too high for MIR core.
 
+## Acceptance Criteria For v2.0.5
+
+### Scripted-Tech Framework
+
+- `control.lua` loads on fresh and existing saves without migration errors.
+- Scripted features are registered through one manager instead of scattered handlers.
+- Research finish, reversal, technology effects reset, init, and configuration changed all route through the same recomputation path.
+- Each scripted feature declares settings, required prototypes/mods, event handlers, and diagnostics.
+- No `on_tick` handler is added for v2.0.5 features.
+
+### Spoilage Preservation
+
+- Technology appears only when Space Age spoilage support is available.
+- The technology uses a visible `nothing` effect with localized description.
+- Research completion, reversal, and configuration changes recompute the effective modifier.
+- Existing saves load cleanly from v2.0.0 to v2.0.5.
+- Multiple-force behavior is documented and manually tested.
+- The feature can be disabled via startup setting or preset-derived default.
+- Disabling the feature restores or stops applying MIR's own multiplier as far as the stored baseline allows.
+- Existing spoilable item behavior is tested before release notes make a stronger claim.
+
+### Agricultural Growth Speed
+
+- Technology appears only when agricultural tower planting support is available.
+- New tower-planted seeds receive the current researched growth multiplier through event-driven handling.
+- Research completion and reversal either safely rescale known tower-owned plants or explicitly document that only future planting is affected.
+- Duplicate plant references from multiple towers are deduplicated during any bounded rescale.
+- No surface-wide plant scan or per-tick growth scan is used.
+- Cap and per-level formula are visible in settings/docs.
+
+### Settings Presets
+
+- Presets map to explicit setting keys and default values.
+- `Vanilla-respectful`, `Megabase-balanced`, and `Unlimited sandbox` are documented.
+- Advanced toggles still exist for users who do not want presets.
+- Preset behavior is stable across fresh install and existing-save configuration changes.
+
+### Diagnostics And Docs
+
+- Scripted/global effects report enabled/skipped/unsupported states in diagnostics.
+- Docs distinguish `Ship`, `Spike`, `Document only`, `Companion mod`, and `Reject for now`.
+- Changelog separates player-facing features from compatibility notes and experimental caveats.
+- Stable generated technology IDs are preserved unless a migration is documented.
+
 ## Duplicate-Tech Policy
 
 For mods such as Maraxis that may add cargo landing pad research, use one of these behaviors:
@@ -619,6 +765,19 @@ New v2.0.5 validation should add:
 - Maraxis or other cargo-pad mods when updated to Factorio 2.1.
 - Krastorio 2 Spaced Out or equivalent large overhaul once compatible with the target Factorio version.
 
+Required named test saves/scenarios:
+
+- Fresh Space Age save, no other mods.
+- Existing v2.0.0 MIR save upgraded to v2.0.5.
+- Save with spoilable items already on belts, in chests, in labs, in rockets, and on platforms.
+- Save with multiple player forces.
+- Large Gleba farm with thousands of tower-owned plants.
+- Save with MIR scripted feature enabled, researched, then disabled.
+- Save with Maraxis-like duplicate cargo landing pad technology.
+- Save with custom science packs and custom labs.
+- Save without Space Age.
+- Factorio 2.0 legacy-branch subset save.
+
 ## Factorio 2.0 Backport Reality
 
 Be careful with the backport promise. The current 2.1 path can use clean agricultural tower events and cargo landing pad APIs. The 2.0 line may not have those APIs.
@@ -658,6 +817,199 @@ Before writing feature code:
 7. Add release notes that clearly distinguish MIR features from companion-mod ideas.
 8. Add duplicate-tech detection for overlapping native modifiers.
 9. Add performance labels to docs and setting descriptions for scripted/global/sandbox features.
+10. Produce a no-code proof for each v2.0.5 scripted feature before implementation.
+11. Identify exact setting keys and preset-derived defaults.
+12. Preserve stable generated technology names/IDs or document a migration.
+13. Split the work into reviewable task chunks or GitHub issues before coding.
+14. Draft public update wording for Reddit and the mod portal.
+
+## Browser Planning Prompt
+
+Use this prompt when asking a browser-capable planning model to turn the roadmap into an implementation plan. The expected output is a release-gated plan, not code.
+
+````text
+You are helping plan the next implementation phase for the Factorio mod More Infinite Research.
+
+Read the repository documentation first. If you cannot access local files directly, ask me to upload or paste these files before planning:
+- README.md
+- docs/post-2.0-feature-plan.md
+- docs/roadmap.md
+- docs/architecture.md
+- docs/compatibility.md
+- docs/test-results.md
+- changelog.txt
+
+Primary source of truth:
+- docs/post-2.0-feature-plan.md
+
+Repository state:
+- Work should be on local branch `dev`.
+- Refresh this block before planning:
+  - `git rev-parse HEAD`
+  - `git status --short --branch`
+  - `git rev-list --left-right --count origin/dev...HEAD`
+- Baseline roadmap commit when this prompt was added: 6c12075eb7f23562b96178fa6c26dfc41f82ed4a (`docs: capture post-2.0 feature roadmap`).
+- Do not assume anything has been pushed unless git status proves it.
+
+Goal:
+Create a release-gated implementation plan for the next post-v2.0.0 work, especially v2.0.5. Do not write code yet.
+
+Hard product boundaries:
+- More Infinite Research must remain focused on research-driven scaling.
+- Do not turn the main mod into a refrigeration mod, greenhouse mod, Gleba overhaul, space-platform overhaul, fluid overhaul, quality overhaul, or broad content expansion.
+- Prefer native Factorio technology modifiers and generated recipe productivity.
+- Allow scripted technologies only when event-driven, bounded, reversible, and save-safe.
+- Avoid per-tick inventory, belt, lab, container, surface, item-stack, or broad entity scanning.
+- Any feature needing active scanning must be classified as `defer`, `disabled-by-default experiment`, or `companion mod`.
+- Preserve compatibility-first behavior.
+- Avoid optional third-party dependencies unless truly required.
+- Preserve stable generated technology names/IDs unless there is a documented migration.
+- Factorio 2.1 is the main target.
+- Factorio 2.0 backport work is a best-compatible subset on the legacy branch and must not block v2.0.5.
+
+Feature eligibility rule:
+A feature belongs in More Infinite Research only if at least one is true:
+1. It uses a native Factorio technology modifier.
+2. It is generated recipe productivity.
+3. It is a bounded, event-driven scripted research effect.
+4. It is a small optional unlock that directly supports megabase scaling and does not introduce a new gameplay loop.
+Otherwise classify it as a companion mod or defer it.
+
+Use browser research only for current official Factorio API documentation and official wiki pages when verifying API claims. Cite sources. Do not rely on Reddit, search snippets, or memory for API behavior.
+
+Plan specifically around these candidate ideas:
+- Spoilage preservation
+- Agricultural growth speed
+- Agricultural yield / fruit yield
+- High-throughput pump / Der Pump
+- Pipeline extent setting
+- Thruster fuel/oxidizer productivity
+- True thruster thrust or fuel-efficiency research
+- Engine/electric-engine productivity
+- Oil processing productivity
+- Quality module odds research
+- Robot battery/carrying capacity
+- Roboport range
+- Innate assembler productivity
+- Refrigeration / CryoPants / cold chain
+- Greenhouses / off-world Gleba farming
+- Super-bacteria
+- Biter egg production chaos
+- Settings presets
+- Maraxis compatibility
+- Krastorio 2 Spaced Out compatibility
+- Factorio 2.0 legacy branch compatibility
+
+Produce the following, in order:
+
+1. Executive decision
+   - What should v2.0.5 actually ship?
+   - What should be spiked?
+   - What should be deferred?
+   - What should become companion mods?
+
+2. Feature classification table
+   Columns:
+   - Feature
+   - Ship/Spike/Defer/Companion/Reject
+   - MIR fit reason
+   - Implementation type: native modifier / recipe productivity / scripted event / prototype unlock / startup setting / companion content
+   - API confidence
+   - UPS risk
+   - Save-compat risk
+   - Mod-compat risk
+   - Default enabled?
+   - Target release
+
+3. v2.0.5 implementation ladder
+   - Step-by-step order.
+   - Each step must leave the mod loadable.
+   - Separate infrastructure from content.
+   - Identify rollback points.
+
+4. File-by-file change plan
+   Include expected changes to:
+   - control.lua
+   - any new control/ files
+   - prototypes/streams/direct-effects.lua
+   - prototypes/tech-gen.lua
+   - settings files
+   - locale files
+   - diagnostics files
+   - README.md
+   - docs/post-2.0-feature-plan.md
+   - docs/roadmap.md
+   - docs/architecture.md
+   - docs/compatibility.md
+   - docs/test-results.md
+   - changelog.txt
+
+5. Scripted-tech architecture
+   For each scripted tech, specify:
+   - technology name strategy
+   - UI `nothing` effect text
+   - events used
+   - storage keys
+   - init/configuration/research-finished/research-reversed/technology-effects-reset behavior
+   - how disabling the setting behaves
+   - how multiple forces behave
+   - how other mods changing the same global state are handled
+   - why no per-tick scan is required
+
+6. Acceptance criteria
+   For each v2.0.5 feature, define measurable done criteria.
+
+7. Validation and test matrix
+   Include:
+   - fresh Space Age save
+   - existing v2.0.0 MIR save upgraded to v2.0.5
+   - save with existing spoilable items in belts/chests/labs/rockets/platforms
+   - save with many agricultural towers and plants
+   - multi-force save
+   - feature disabled after being enabled
+   - no Space Age
+   - custom science packs
+   - custom labs
+   - Maraxis-like duplicate cargo landing pad tech
+   - Krastorio 2 Spaced Out, if available
+   - Factorio 2.0 legacy branch subset
+
+8. Open technical questions requiring in-game verification
+   Do not answer these by guessing. For each question, specify:
+   - minimal test setup
+   - expected observation
+   - what implementation decision depends on it
+
+9. Performance policy
+   - List every event handler.
+   - List any scan.
+   - State when scans happen.
+   - State worst-case expected scan size.
+   - Identify any batching needed.
+
+10. Save and mod compatibility risks
+    Include migration/reversal behavior and interaction with other mods.
+
+11. Release-note/changelog outline
+    Separate:
+    - player-facing features
+    - compatibility notes
+    - experimental caveats
+    - known limitations
+    - disabled-by-default features
+
+12. Public update plan
+    Draft a short Reddit/mod-portal update paragraph explaining:
+    - what is coming next;
+    - what is being investigated;
+    - what is intentionally out of scope;
+    - why refrigeration/greenhouses may become separate mods.
+
+Do not write code.
+Do not broaden the mod scope.
+Do not recommend features that require per-tick broad scanning.
+Where API support is uncertain, classify as Spike, not Ship.
+````
 
 ## API References
 
