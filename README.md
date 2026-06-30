@@ -71,7 +71,7 @@ Shared stream defaults are:
 | Enabled | `true` |
 | Base cost | `8000` |
 | Growth factor | `2` |
-| Max level | `0`, meaning infinite |
+| Max level | `0` (infinite) |
 | Research time | `60` seconds |
 
 Base-technology extensions use the same formula, but their first generated level starts after the vanilla chain. A setting value of `0` for base cost, growth factor, or research time means "derive this from the vanilla chain" for base extensions.
