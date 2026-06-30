@@ -14,7 +14,9 @@
 More Infinite Research adds **configurable infinite productivity** and **bonus research** for intermediate items,
 logistics chains, combat bonuses, player bonuses, and Space Age gaps that vanilla Factorio does not cover.
 
-Version **`2.0.0`** targets **Factorio `2.1`** and requires:
+Version **`1.x.x`** targets **Factorio `2.0`** and requires `base >= 2.0`.
+
+Version **`2.x.x`** targets **Factorio `2.1`** and requires:
 
 - `base >= 2.1.8`
 - optional `elevated-rails >= 2.1.8`
