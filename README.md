@@ -1,10 +1,11 @@
 # More Infinite Research
 
-Trickle down economics bring productivity gains to all industries.
+*Trickle down economics bring productivity gains to all industries.*
 
-More Infinite Research adds configurable infinite productivity and bonus researches for intermediate items, logistics chains, combat bonuses, player bonuses, and Space Age gaps that vanilla Factorio does not cover.
+More Infinite Research adds **configurable infinite productivity** and **bonus research** for intermediate items,
+logistics chains, combat bonuses, player bonuses, and Space Age gaps that vanilla Factorio does not cover.
 
-Version `2.0.0` targets Factorio `2.1` and requires:
+Version **`2.0.0`** targets **Factorio `2.1`** and requires:
 
 - `base >= 2.1.8`
 - optional `elevated-rails >= 2.1.8`
@@ -12,25 +13,26 @@ Version `2.0.0` targets Factorio `2.1` and requires:
 - optional `quality >= 2.1.8`
 - optional `space-age >= 2.1.8`
 
-The mod is built around graceful compatibility: it discovers recipes, science packs, labs, and optional prototypes from the active mod set, generates technologies late in `data-final-fixes.lua`, and skips unsafe or unavailable streams instead of requiring compatibility mods on the mod portal page.
+The mod is built around **graceful compatibility**: it discovers recipes, science packs, labs, and optional prototypes from the active mod set, generates technologies late in **`data-final-fixes.lua`**, and *skips unsafe or unavailable streams* instead of requiring compatibility mods on the mod portal page.
 
 ## Quick Summary
 
-- Adds infinite recipe-productivity researches for many intermediate, logistics, combat, infrastructure, science-pack, and Space Age production chains.
-- Adds direct-effect infinite researches for cargo landing logistics, weapon shooting speed, character bonuses, inventory, trash slots, and worker robot battery.
-- Extends selected vanilla finite technology chains into infinite continuations.
-- Discovers science packs from active lab inputs, not from the old `tool` prototype type.
-- Validates generated research ingredients against real labs so technologies stay researchable.
-- Supports Factorio 2.1 recipe `categories` as well as legacy single `category`.
-- Keeps official DLC mods optional and guards DLC-shaped research behind concrete prototype checks.
-- Keeps third-party compatibility-mod dependencies out of `info.json`.
-- Preserves existing generated prototype IDs for v2.0.0. No migration is required.
+- **Recipe productivity:** adds infinite research for intermediate, logistics, combat, infrastructure, science-pack, and Space Age production chains.
+- **Direct-effect bonuses:** adds infinite research for cargo logistics, weapon speed, character bonuses, inventory, trash slots, and worker robot battery.
+- **Vanilla continuations:** extends selected finite vanilla technology chains into infinite continuations.
+- **Science-pack discovery:** reads active lab inputs, not the old `tool` prototype type.
+- **Lab validation:** checks generated research ingredients against real labs so technologies stay researchable.
+- **Factorio 2.1 recipes:** supports recipe `categories` as well as legacy single `category`.
+- **Optional DLC:** keeps official DLC mods optional and gates DLC-shaped research behind concrete prototype checks.
+- **Clean mod portal metadata:** keeps third-party compatibility-mod dependencies out of `info.json`.
+- **Save compatibility:** preserves existing generated prototype IDs for v2.0.0. **No migration is required.**
 
-Recipe productivity researches are infinite, but Factorio's recipe productivity cap still applies. Additional levels can eventually have no practical effect after a recipe reaches its cap.
+Recipe productivity researches are infinite, but **Factorio's recipe productivity cap still applies**.
+*Additional levels can eventually have no practical effect after a recipe reaches its cap.*
 
 ## Installation
 
-Install the mod through the Factorio mod portal or place the release zip in your Factorio mods directory.
+Install the mod through the **Factorio mod portal** or place the **release zip** in your Factorio mods directory.
 
 The packaged release archive is:
 
@@ -40,19 +42,20 @@ dist/more-infinite-research_2.0.0.zip
 
 ## How Generation Works
 
-More Infinite Research generates prototypes in `data-final-fixes.lua`:
+More Infinite Research generates prototypes in **`data-final-fixes.lua`**:
 
-1. Generated stream technology creation.
-2. Known competing recipe-productivity cleanup based on actual generated MIR effects.
-3. Known competing base-extension cleanup when MIR's matching base extension is enabled.
-4. Base technology infinite extensions.
-5. Optional vanilla weapon shooting speed adjustment.
-6. Max-level enforcement.
-7. Optional diagnostics report flush.
+1. **Generated stream technology creation.**
+2. **Known competing recipe-productivity cleanup** based on actual generated MIR effects.
+3. **Known competing base-extension cleanup** when MIR's matching base extension is enabled.
+4. **Base technology infinite extensions.**
+5. **Optional vanilla weapon shooting speed adjustment.**
+6. **Max-level enforcement.**
+7. **Optional diagnostics report flush.**
 
-This gives the mod a late view of recipes, items, labs, science packs, ammo categories, and technologies created by other mods.
+This gives the mod a **late view** of recipes, items, labs, science packs, ammo categories, and technologies created by other mods.
 
-No mod can see another mod's later `data-final-fixes.lua` mutations unless load order makes that possible. If a mod creates or mutates relevant recipes after MIR has already scanned, explicit load-order compatibility may still be needed.
+*No mod can see another mod's later `data-final-fixes.lua` mutations unless load order makes that possible.*
+If a mod creates or mutates relevant recipes after MIR has already scanned, explicit load-order compatibility may still be needed.
 
 ## Cost Model
 
@@ -64,7 +67,7 @@ base_cost * growth_factor^(L-1)
 
 where `L` is the research level.
 
-Shared stream defaults are:
+**Shared stream defaults** are:
 
 | Field | Default |
 | --- | --- |
@@ -74,40 +77,45 @@ Shared stream defaults are:
 | Max level | `0` (infinite) |
 | Research time | `60` seconds |
 
-Base-technology extensions use the same formula, but their first generated level starts after the vanilla chain. A setting value of `0` for base cost, growth factor, or research time means "derive this from the vanilla chain" for base extensions.
+**Base-technology extensions** use the same formula, but their first generated level starts after the vanilla chain.
+A setting value of **`0`** for base cost, growth factor, or research time means *derive this from the vanilla chain*.
 
-If a positive base-extension max level is below the first generated continuation level, MIR skips that extension instead of creating an impossible capped technology.
+If a positive base-extension max level is below the first generated continuation level, MIR **skips that extension** instead of creating an impossible capped technology.
 
 ## Science Packs and Labs
 
-Factorio 2.1 changed science packs to ordinary item prototypes. MIR therefore treats labs as the source of truth:
+Factorio 2.1 changed science packs to ordinary item prototypes. MIR therefore treats **labs as the source of truth**:
 
-- It reads `data.raw.lab[*].inputs`.
-- It resolves each input through generic item prototype lookup.
-- It orders known vanilla and Space Age packs first.
-- It appends modded lab inputs alphabetically.
-- It validates the final ingredient set against real lab input sets.
+- **Lab inputs:** reads `data.raw.lab[*].inputs`.
+- **Item lookup:** resolves each input through generic item prototype lookup.
+- **Official ordering:** orders known vanilla and Space Age packs first.
+- **Modded inputs:** appends modded lab inputs alphabetically.
+- **Researchability:** validates the final ingredient set against real lab input sets.
 
-If no lab accepts the full selected science-pack set, MIR follows `mir-lab-incompatibility-policy`. The default `reduce` mode chooses the largest deterministic lab-compatible subset. The `skip` mode skips the technology instead. If no valid subset exists, it skips the generated technology and logs the reason.
+If no lab accepts the full selected science-pack set, MIR follows **`mir-lab-incompatibility-policy`**.
+The default **`reduce`** mode chooses the largest deterministic lab-compatible subset.
+The **`skip`** mode skips the technology instead.
+If no valid subset exists, MIR skips the generated technology and logs the reason.
 
 Two startup settings control late-game progression and global science-pack pressure:
 
-- `ips-require-space-gate` is disabled by default. When enabled, generated technologies require the end-game science unlock as a prerequisite, but their science-pack ingredients are not changed.
-- `mir-science-pack-ingredient-policy` is `configured` by default. It can instead add space science, add both space and promethium science, add every official base and Space Age science pack, or add every active lab science pack including compatible modded science packs.
+- **`ips-require-space-gate`** is **disabled by default**. When enabled, generated technologies require the end-game science unlock as a prerequisite, but their science-pack ingredients are not changed.
+- **`mir-science-pack-ingredient-policy`** is **`configured` by default**. It can instead add space science, add both space and promethium science, add every official base and Space Age science pack, or add every active lab science pack including compatible modded science packs.
 
-For the end-game science gate, MIR uses promethium science in Space Age when available. Otherwise it uses space science when available.
+For the end-game science gate, MIR uses **promethium science** in Space Age when available.
+Otherwise it uses **space science** when available.
 
 ## Generated Prototype Names
 
-Generated stream technologies use stable prototype names:
+Generated stream technologies use **stable prototype names**:
 
 ```text
 recipe-prod-<stream-key>-1
 ```
 
-This naming is preserved for v2.0.0 even for non-recipe direct-effect streams to avoid migrations.
+This naming is preserved for **v2.0.0** even for non-recipe direct-effect streams to avoid migrations.
 
-Generated base-technology extensions use the vanilla technology chain name and next level:
+Generated base-technology extensions use the **vanilla technology chain name** and **next level**:
 
 ```text
 <vanilla-technology-name>-<next-level>
@@ -199,7 +207,7 @@ These extend selected finite vanilla chains into infinite continuations.
 
 ## Startup Settings
 
-All settings are startup settings.
+All settings are **startup settings**.
 
 ### Global Settings
 
@@ -258,20 +266,20 @@ Every base extension receives:
 
 ### General Compatibility Model
 
-MIR tries to support unknown mods without declaring them as dependencies:
+MIR tries to support unknown mods **without declaring them as dependencies**:
 
-- It generates in `data-final-fixes.lua`.
-- It scans actual visible prototypes.
-- It uses optional prototype gates instead of hard dependencies.
-- It validates lab compatibility.
-- It skips unavailable streams.
-- It keeps known integration cleanup opportunistic.
+- **Late generation:** generates in `data-final-fixes.lua`.
+- **Visible prototypes:** scans actual visible prototypes.
+- **Optional gates:** uses prototype gates instead of hard dependencies.
+- **Lab safety:** validates lab compatibility.
+- **Safe skips:** skips unavailable streams.
+- **Opportunistic cleanup:** keeps known integration cleanup opportunistic.
 
 This keeps the mod page clean and avoids requiring optional compatibility mods to load MIR.
 
 ### Known Opportunistic Integrations
 
-These are handled when their prototypes are visible:
+These are handled when their **prototypes are visible**:
 
 | Mod | Integration |
 | --- | --- |
@@ -283,15 +291,15 @@ These are handled when their prototypes are visible:
 | Plates n Circuit Productivity (`plates-n-circuit-productivity`) | Selected competing infinite productivity technologies are removed only after MIR has generated replacement recipe effects. |
 | Castra and PlanetLib-style science packs | Custom science packs can be discovered as lab inputs and receive science-pack productivity when their recipes are visible. |
 
-Generic competing recipe-productivity cleanup is intentionally limited to known infinite technologies whose recipe-productivity effects are all covered by generated MIR effects. Finite upgrade chains from other mods are not removed by the generic cleanup path.
+Generic competing recipe-productivity cleanup is intentionally limited to **known infinite technologies** whose recipe-productivity effects are all covered by generated MIR effects. **Finite upgrade chains** from other mods are not removed by the generic cleanup path.
 
 ### Known Limits
 
-- MIR cannot see recipes or labs mutated by another mod later in `data-final-fixes.lua` unless load order puts MIR after that mod.
-- Lab-compatible reduction prevents unresearchable technologies, but it cannot infer every overhaul's intended progression.
-- Broad support for unknown overhaul mods is opportunistic, not a guarantee.
-- Recipe productivity remains capped by Factorio's recipe productivity limit.
-- Generated stream prototype IDs were intentionally kept stable for v2.0.0.
+- **Late mutations:** MIR cannot see recipes or labs changed later in `data-final-fixes.lua` unless load order puts MIR after that mod.
+- **Progression intent:** lab-compatible reduction prevents unresearchable technologies, but it cannot infer every overhaul's intended progression.
+- **Unknown overhauls:** broad support is opportunistic, not a guarantee.
+- **Productivity cap:** recipe productivity remains capped by Factorio's recipe productivity limit.
+- **Stable IDs:** generated stream prototype IDs were intentionally kept stable for v2.0.0.
 
 ## Developer Specification
 
@@ -382,19 +390,19 @@ When either diagnostics setting is enabled, MIR also reports duplicate recipe ma
 
 ## Validation and Release Workflow
 
-Static validation:
+**Static validation:**
 
 ```powershell
 .\scripts\Invoke-MIRValidation.ps1 -StaticOnly
 ```
 
-Runtime fixture validation:
+**Runtime fixture validation:**
 
 ```powershell
 .\scripts\Invoke-MIRValidation.ps1 -FactorioBin "C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe"
 ```
 
-Build the package:
+**Build the package:**
 
 ```powershell
 .\scripts\Build-MIRPackage.ps1
@@ -402,42 +410,41 @@ Build the package:
 
 The validation script checks:
 
-- `info.json` parses.
-- Release metadata avoids compatibility-mod dependencies.
-- Docs match the opportunistic compatibility policy.
-- No old `data.raw.tool` science-pack authority remains.
-- Generated icons do not use `icon_mipmaps`.
-- Locale files match the English fallback.
-- `changelog.txt` uses Factorio's 99-dash changelog section format.
-- The committed release zip has the expected root, metadata, required files, and no forbidden artifacts.
-- Key packaged source, documentation, and locale files match the repository copy, so stale release zips with correct metadata are rejected.
-- `git diff --check` passes.
-- Runtime fixture loading reaches save creation when a Factorio binary is supplied.
-- Runtime logs contain the expected generation diagnostics.
-- The default `reduce` lab incompatibility policy keeps science-pack productivity generated with a custom item-based science pack included.
-- The `skip` lab incompatibility policy skips an intentionally incompatible science-pack set.
-- Post-MIR assertion fixtures prove both runtime lab-policy outcomes.
+- **Metadata:** `info.json` parses and release metadata avoids compatibility-mod dependencies.
+- **Docs policy:** docs match the opportunistic compatibility policy.
+- **Science-pack authority:** no old `data.raw.tool` science-pack authority remains.
+- **Icons:** generated icons do not use `icon_mipmaps`.
+- **Locale:** locale files match the English fallback.
+- **Changelog:** `changelog.txt` uses Factorio's 99-dash changelog section format.
+- **Release zip:** the committed archive has the expected root, metadata, required files, and no forbidden artifacts.
+- **Package parity:** key packaged source, documentation, and locale files match the repository copy.
+- **Whitespace:** `git diff --check` passes.
+- **Runtime load:** fixture loading reaches save creation when a Factorio binary is supplied.
+- **Runtime diagnostics:** logs contain the expected generation diagnostics.
+- **Reduce policy:** science-pack productivity stays generated with a custom item-based science pack included.
+- **Skip policy:** an intentionally incompatible science-pack set is skipped.
+- **Post-MIR assertions:** fixtures prove both runtime lab-policy outcomes.
 
 ## Documentation Map
 
-- `docs/architecture.md`: data-stage flow, utility modules, stream config, compatibility profiles, diagnostics, and validation.
-- `docs/compatibility.md`: compatibility model, known integrations, manual test matrix, fixture designs, and release checklist.
-- `docs/roadmap.md`: v2.0.0 implementation baseline and longer-term v2.x roadmap.
-- `docs/test-results.md`: local release-candidate validation evidence.
-- `changelog.txt`: release history and user-facing changes.
+- **`docs/architecture.md`:** data-stage flow, utility modules, stream config, compatibility profiles, diagnostics, and validation.
+- **`docs/compatibility.md`:** compatibility model, known integrations, manual test matrix, fixture designs, and release checklist.
+- **`docs/roadmap.md`:** v2.0.0 implementation baseline and longer-term v2.x roadmap.
+- **`docs/test-results.md`:** local release-candidate validation evidence.
+- **`changelog.txt`:** release history and user-facing changes.
 
 ## Troubleshooting
 
 If a technology is missing:
 
-1. Enable `mir-debug-generation-report`.
+1. Enable **`mir-debug-generation-report`**.
 2. Load the save or start a controlled test map.
-3. Check `factorio-current.log` for the stream key.
-4. Look for `skipped`, `no_matching_recipes`, `missing required item`, `missing required technology`, or `no_lab_compatible_science`.
+3. Check **`factorio-current.log`** for the stream key.
+4. Look for **`skipped`**, **`no_matching_recipes`**, **`missing required item`**, **`missing required technology`**, or **`no_lab_compatible_science`**.
 
 If a recipe did not receive productivity:
 
-1. Enable `mir-debug-recipe-matches` and inspect the stream's matched recipe list.
+1. Enable **`mir-debug-recipe-matches`** and inspect the stream's matched recipe list.
 2. Confirm the recipe outputs one of the stream's exact items or matches one of its patterns.
 3. Confirm the recipe is not hidden or recycling unless the stream opts in.
 4. Confirm the recipe exists before MIR reaches `data-final-fixes.lua`.
@@ -445,10 +452,11 @@ If a recipe did not receive productivity:
 
 If a generated technology is unresearchable:
 
-1. Check that at least one active lab accepts the full ingredient set.
-2. Check the diagnostics row for `lab_status=reduced` or `no_lab_compatible_science`.
-3. Verify custom science packs are real item prototypes and are present in at least one lab's `inputs`.
+1. Check that at least one **active lab** accepts the full ingredient set.
+2. Check the diagnostics row for **`lab_status=reduced`** or **`no_lab_compatible_science`**.
+3. Verify custom science packs are real item prototypes and are present in at least one lab's **`inputs`**.
 
 ## Save Compatibility
 
-No generated prototype IDs were renamed for `v2.0.0`. No migration is required from `v1.2.9` (latest for Factorio 2.0).
+No generated prototype IDs were renamed for **`v2.0.0`**.
+**No migration is required** from `v1.2.9` (latest for Factorio 2.0).
