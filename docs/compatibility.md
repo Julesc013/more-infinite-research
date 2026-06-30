@@ -1,6 +1,14 @@
 # Compatibility and Validation
 
-More Infinite Research v2.0.5 targets Factorio 2.1 and uses a compatibility-first data-stage plus narrow control-stage model.
+More Infinite Research's current main line targets Factorio `2.1.x` and uses a compatibility-first data-stage plus narrow control-stage model.
+
+Release-line summary:
+
+| MIR release | Factorio line | Scope |
+| --- | --- | --- |
+| `2.0.5` | `2.1.x` | stabilization, docs, package parity, validation hardening |
+| `2.1.0` | `2.1.x` | settings presets and validated scripted agriculture/spoilage runtime features |
+| `1.9.0` | `2.0.x` | compatible subset backported from the tested `2.1.0` snapshot |
 
 The release goal is graceful compatibility without mod-page dependency clutter: compatible mods should work when their prototypes are visible, absent mods should be skipped cleanly, and no compatibility mod should be required for this mod to load.
 
@@ -17,7 +25,8 @@ The release goal is graceful compatibility without mod-page dependency clutter: 
 - Optional DLC-shaped streams declare concrete required prototypes instead of requiring a specific official mod by name.
 - Cargo bay unloading distance research uses Factorio 2.1.8's `max-cargo-bay-unloading-distance` technology modifier, uses official base and Space Age science packs only, and is skipped unless Space Age is active and the `landing-pad-unloading-bay` prototypes exist.
 - Cargo landing pad count research uses `cargo-landing-pad-count`, uses official base and Space Age science packs only, is disabled by default, requires the vanilla `rocket-silo` cargo landing pad unlock, and is skipped unless Space Age is active and the `cargo-landing-pad` prototype exists.
-- Spoilage preservation and agricultural growth speed use visible `nothing` technology effects in generated technologies, then apply bounded runtime behavior through the control-stage scripted technology manager.
+- Spoilage preservation and agricultural growth speed are implemented in `dev` as visible `nothing` technology effects plus bounded runtime behavior through the control-stage scripted technology manager.
+- The release plan treats those scripted runtime features as `v2.1.0`-bound until manual save validation proves existing-stack behavior, research reversal, disabling, and multi-force behavior.
 - Spoilage preservation changes the global spoil time modifier and recomputes on init, configuration change, research finish/reversal, and technology effects reset.
 - Agricultural growth speed adjusts newly planted agricultural tower plants from the tower planting event and does not rescan existing farms in this first implementation slice.
 - Mod-specific stream changes should live in `prototypes/compat/profiles.lua` instead of the base stream definitions.
@@ -91,7 +100,7 @@ Large mod packs and utility mods such as Alien Biomes, Informatron, Jetpack, AAI
 - Lab validation prevents impossible research ingredients, but it cannot infer every overhaul mod's intended progression.
 - Recipe productivity technologies remain bounded by Factorio's recipe productivity cap even when research levels are infinite.
 - Vanilla Space Age productivity technologies remain authoritative for processing units, low density structures, plastic, and rocket fuel where they already own all matching recipes.
-- Existing prototype IDs were kept stable through v2.0.5. v2.0.5 adds control-stage storage under the More Infinite Research namespace.
+- Existing prototype IDs are kept stable unless a tested migration is provided. The v2.1.0-bound scripted runtime implementation adds control-stage storage under the More Infinite Research namespace.
 - Runtime scripted features avoid per-tick scanning by default. If a future feature needs active scanning, it should be disabled by default, clearly labeled experimental, or split into a companion mod.
 - Scripted technologies must document storage keys, recomputation triggers, reversal behavior, disabling behavior, and multi-force behavior before implementation.
 
@@ -133,6 +142,8 @@ For each case, verify:
 - Base-only runs do not load direct DLC asset paths.
 - Logs show skipped or reduced streams clearly and do not show stack traces.
 - Vanilla weapon shooting speed effects follow the configured startup setting.
+
+For named manual save scenarios and release-specific manual tests, see `docs/manual-test-plan.md`.
 
 ## Local Validation Harness
 

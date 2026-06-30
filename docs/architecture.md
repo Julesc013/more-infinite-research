@@ -22,7 +22,7 @@ This order gives the mod the best practical view of recipes, labs, science packs
 
 ## Control Stage Boundary
 
-v2.0.5 introduces a small `control.lua` surface for scripted technologies such as spoilage preservation and agricultural growth speed.
+The current `dev` branch includes a small `control.lua` surface for scripted technologies such as spoilage preservation and agricultural growth speed. The release plan treats these runtime features as `v2.1.0`-bound until manual save validation is complete.
 
 The runtime layer is intentionally narrow:
 
@@ -31,8 +31,10 @@ The runtime layer is intentionally narrow:
 - Avoid per-tick inventory, belt, lab, container, surface, or broad entity scanning.
 - Keep runtime handlers grouped under a small scripted-tech manager such as `control/scripted-techs.lua`.
 - Route init, configuration change, research finish, research reversal, and technology-effects reset through one recomputation path.
+- Handle runtime setting changes if runtime settings are introduced.
 - Require each scripted feature to document storage keys, disable behavior, multiple-force behavior, and interaction with other mods touching the same state.
 - Label scripted/global/sandbox features clearly in settings and player-facing docs.
+- Static validation fails if `control.lua` or `control/**/*.lua` registers `defines.events.on_tick` or `script.on_nth_tick` without a future explicit allowlist.
 
 Do not use runtime code to fake fluid physics, platform speed, module effects, or machine behavior when the requested feature is really a prototype/entity unlock or companion-mod feature.
 
@@ -119,8 +121,14 @@ Use `scripts/Build-MIRPackage.ps1` to rebuild the release archive. Static valida
 
 Static package validation also compares key packaged source, documentation, and locale files against the repository copy so a stale zip with correct metadata is rejected.
 
-Static validation also checks Factorio changelog formatting, including the required 99-dash section separators.
+Static validation also checks Factorio changelog formatting, including the required 99-dash section separators and an entry for the current `info.json` version.
+
+Static validation rejects runtime tick handlers in `control.lua` and `control/**/*.lua`.
 
 The fixture mods under `fixtures/` test item-based science packs, custom labs, late recipe creation, the default `reduce` lab incompatibility behavior, the `skip` lab incompatibility behavior, science-pack ingredient policy modes, the end-game prerequisite gate, base-only cargo skip behavior, Space Age cargo logistics effect shape, finite vanilla-chain preservation, and post-MIR assertions for runtime-sensitive generated technologies.
 
-Scripted technology validation should add existing-save load tests, research-finish/reversal tests, and checks that the new effects remain event-driven rather than tick-scanned.
+Scripted technology validation must add existing-save load tests, research-finish/reversal tests, existing spoilable-stack tests, multi-force tests, and checks that the new effects remain event-driven rather than tick-scanned.
+
+For API proof status and unresolved API questions, see `docs/api-proof-points.md`.
+
+For named manual save scenarios, see `docs/manual-test-plan.md`.

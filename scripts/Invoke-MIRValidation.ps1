@@ -115,6 +115,30 @@ Invoke-RepoCheck "generated icons do not use icon_mipmaps" {
   }
 }
 
+Invoke-RepoCheck "control runtime avoids tick handlers" {
+  $luaFiles = @()
+  $controlLua = Join-Path $repo "control.lua"
+  $controlDir = Join-Path $repo "control"
+
+  if (Test-Path -LiteralPath $controlLua) {
+    $luaFiles += Get-Item -LiteralPath $controlLua
+  }
+  if (Test-Path -LiteralPath $controlDir) {
+    $luaFiles += @(Get-ChildItem -LiteralPath $controlDir -Recurse -File -Filter "*.lua")
+  }
+
+  $matches = @(
+    foreach ($file in $luaFiles) {
+      Select-String -LiteralPath $file.FullName -Pattern "defines\.events\.on_tick|script\.on_nth_tick"
+    }
+  )
+
+  if ($matches.Count -gt 0) {
+    $matches | Write-Host
+    throw "Runtime tick handlers are not allowed without an explicit documented allowlist and disabled-by-default feature gate."
+  }
+}
+
 Invoke-RepoCheck "locale files match English fallback" {
   & (Join-Path $repo "scripts\Test-MIRLocales.ps1") -AllowMissingSupportedLanguages
 }
@@ -203,6 +227,9 @@ Invoke-RepoCheck "changelog uses Factorio changelog format" {
   }
   if ($lines[0] -ne $separator) {
     throw "changelog.txt must start with exactly 99 dashes."
+  }
+  if ($lines -notcontains "Version: $($repoInfo.version)") {
+    throw "changelog.txt must contain an entry for the current info.json version $($repoInfo.version)."
   }
 
   $sectionStart = $true
@@ -306,7 +333,9 @@ Invoke-RepoCheck "release package archive matches metadata" {
       "${root}defaults.lua",
       "${root}locale/en/more-infinite-research.cfg",
       "${root}docs/architecture.md",
+      "${root}docs/api-proof-points.md",
       "${root}docs/compatibility.md",
+      "${root}docs/manual-test-plan.md",
       "${root}docs/todo.md",
       "${root}prototypes/tech-gen.lua",
       "${root}prototypes/base-tech-extensions.lua",

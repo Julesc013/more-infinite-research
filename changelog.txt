@@ -4,27 +4,28 @@ Date: 2026-07-01
 
   Features:
 
-    - Added the first scripted technology framework for bounded runtime research effects.
-    - Added Space Age spoilage preservation research.
-    - Spoilage preservation uses a visible scripted-effect technology entry and increases the global spoil time modifier by 1% per completed level.
-    - Spoilage preservation clamps the applied global spoil time modifier to Factorio's supported range.
-    - Spoilage preservation recomputes on init, configuration changes, research completion, research reversal, and technology effect resets.
-    - Added Space Age agricultural growth speed research.
-    - Agricultural growth speed uses a visible scripted-effect technology entry and shortens remaining growth time for newly planted agricultural tower plants by 1% per completed level.
-    - Agricultural growth speed is event-driven from agricultural tower planting and does not use an on-tick scan.
-    - Added startup settings for the new scripted technology streams through the existing generated-stream setting model.
-    - Added an optional scripted-effect debug log setting for runtime recomputation and event handling.
+    - Added stabilization planning for the next Factorio 2.1 release line.
+    - Added documentation that separates the v2.0.5 stabilization/package-parity release from the v2.1.0 scripted runtime feature release.
+    - Added an API proof ledger for current Factorio API claims and unknowns that require in-game verification.
+    - Added a named manual test plan for v2.0.5 stabilization, v2.1.0 scripted runtime validation, v2.1.x spikes, and the later v1.9.0 Factorio 2.0 legacy backport.
+    - Added branch-aware validation guardrails for the planned v1.9.0 legacy backport.
+    - Added static validation that rejects runtime tick handlers in control-stage Lua files.
+    - Added validation that the changelog contains an entry for the current info.json version.
     - Electric shooting speed now covers the Space Age `tesla` ammo category as well as the older `electric` ammo category.
     - Electric shooting speed now applies to Tesla guns and Tesla turrets instead of only discharge-defense-style electric weapons.
     - Recipe productivity generation now skips recipes already owned by another infinite recipe-productivity technology.
     - Space Age vanilla productivity technologies for processing units, low density structures, plastic, and rocket fuel now stay authoritative instead of receiving parallel MIR duplicates.
+    - Added a development implementation of the scripted technology framework, spoilage preservation, and agricultural growth speed; public feature claims are deferred to v2.1.0 pending manual save validation.
 
   Compatibility:
 
-    - Scripted v2.0.5 features skip cleanly when their generated technology is unavailable.
-    - The first agriculture runtime slice avoids broad inventory, belt, container, item-stack, surface, and entity scanning.
-    - Existing planted crops are not globally rescanned in this first slice; growth speed applies to newly planted tower crops.
+    - The v2.0.5 release plan is now stabilization, documentation, package parity, validation hardening, and compatibility wording.
+    - Scripted runtime behavior is treated as v2.1.0-bound until existing-stack behavior, research reversal, disabling, multi-force behavior, and large Gleba farms are manually validated.
+    - The first agriculture runtime development slice avoids broad inventory, belt, container, item-stack, surface, and entity scanning.
+    - Existing planted crops are not globally rescanned in the first development slice; growth speed applies to newly planted tower crops.
     - Package validation now includes control.lua and the control module directory.
+    - Package validation now requires the TODO, API proof, and manual test documentation.
+    - Factorio 2.0 legacy validation now rejects Factorio 2.1 dependency floors and Factorio 2.1-only cargo modifier strings when info.json targets Factorio 2.0.
 
   Localization:
 

@@ -20,8 +20,10 @@ git diff --check
 
 Results:
 
-- Rebuilt the `2.0.5` release archive after README/docs updates for the future `v2.1.0 -> v1.9.0` legacy backport strategy.
+- Rebuilt the `2.0.5` release archive after README/docs updates for the future `v2.1.0 -> v1.9.0` legacy backport strategy and the v2.0.5/v2.1.0 release split.
 - Static validation passed with the new branch-aware metadata check.
+- Static validation passed with the new no-`on_tick` control-stage guard.
+- Package validation now requires `docs/api-proof-points.md` and `docs/manual-test-plan.md`.
 - Static validation now reads `info.json` to distinguish the normal Factorio `2.1` line from future Factorio `2.0` legacy metadata.
 - On the Factorio `2.1` line, validation still requires the Space Age cargo streams and cargo modifier strings.
 - For future Factorio `2.0` legacy metadata, validation rejects Factorio `2.1` dependency floors and rejects `max-cargo-bay-unloading-distance` / `cargo-landing-pad-count` direct-effect stream definitions.
@@ -32,18 +34,19 @@ Representative validation harness evidence:
 
 ```text
 [check] release metadata matches Factorio line
+[check] control runtime avoids tick handlers
 [run] Factorio load check with fixture mods (base-cargo-space-age-gate)
 [run] Factorio load check with fixture mods (space-age-cargo-pad-enabled)
 [run] Factorio load check with fixture mods (space-age-cargo-logistics-shape)
 [ok] Validation completed.
 ```
 
-## 2026-07-01 v2.0.5 Scripted-Tech Slice
+## 2026-07-01 v2.1.0-Bound Scripted-Tech Slice
 
 Environment:
 
 - Factorio `2.1.8` build `86744`, Windows Steam, Space Age install.
-- Mod version `2.0.5`.
+- Mod version metadata `2.0.5`; scripted runtime work is now treated as v2.1.0-bound until manual save validation is complete.
 - Release archive: `dist/more-infinite-research_2.0.5.zip`.
 
 Commands:
@@ -55,13 +58,13 @@ Commands:
 
 Results:
 
-- Rebuilt the `2.0.5` release archive with `control.lua` and `control/` included.
+- Rebuilt the development archive with `control.lua` and `control/` included.
 - Static validation passed, including release metadata policy, docs policy scan, old science-pack authority scan, icon scan, locale parity, progression-setting wiring, changelog syntax, package metadata, package source/docs/locale/control parity, and `git diff --check`.
 - Runtime fixture validation passed across the existing thirteen isolated scenarios: `reduce-policy`, `skip-policy`, `space-pack-policy`, `base-space-promethium-pack-policy`, `space-age-space-pack-policy`, `space-age-space-promethium-pack-policy`, `all-official-pack-policy`, `all-pack-policy`, `base-extension-boundary-policy`, `end-game-prerequisite-gate`, `base-cargo-space-age-gate`, `space-age-cargo-pad-enabled`, and `space-age-cargo-logistics-shape`.
 - The existing Space Age fixture scenarios loaded with the new scripted technology manager present.
 - Space Age fixture validation now asserts that MIR skips parallel productivity streams for vanilla-owned `processing-unit-productivity`, `low-density-structure-productivity`, `plastic-bar-productivity`, and `rocket-fuel-productivity`.
 - Static validation now asserts that electric shooting speed includes both the Space Age `tesla` ammo category and the older `electric` ammo category.
-- Manual gameplay validation is still required for spoilage deadline behavior, research reversal/configuration changes in a live save, multiple-force behavior, and agricultural tower planting on a large Gleba farm.
+- Manual gameplay validation is still required before public runtime feature release claims: spoilage deadline behavior, research reversal/configuration changes in a live save, multiple-force behavior, existing spoilable stacks, and agricultural tower planting on a large Gleba farm.
 
 Representative validation harness evidence:
 

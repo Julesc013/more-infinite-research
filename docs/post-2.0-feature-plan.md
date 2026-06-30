@@ -8,6 +8,16 @@ The core conclusion is:
 
 > More Infinite Research should stay focused on research-driven scaling, but add a small scripted-tech framework and a few carefully scoped optional prototype/entity unlocks. It should not become a full Gleba overhaul, refrigeration mod, greenhouse mod, or space-platform overhaul.
 
+Release discipline update:
+
+```text
+v2.0.5 = stabilization, docs, package parity, validation hardening.
+v2.1.0 = settings presets, scripted-tech framework, spoilage preservation, agricultural growth speed.
+v1.9.0 = Factorio 2.0 compatible subset backported from the tested v2.1.0 snapshot.
+```
+
+The scripted technology implementation exists in `dev`, but public release claims should be treated as `v2.1.0`-bound until the manual save matrix proves the behavior.
+
 The Reddit thread was not one feature request. It was a roadmap dump. The useful split is:
 
 1. Core More Infinite Research features: infinite or configurable research sinks.
@@ -65,7 +75,7 @@ The implementation plan must identify every runtime event handler and prove it d
 - all surfaces per tick;
 - all entities per tick.
 
-Any feature requiring this kind of broad scan is not eligible for v2.0.5.
+Any feature requiring this kind of broad scan is not eligible for a normal enabled-by-default MIR release.
 
 Feature descriptions should label implementation risk:
 
@@ -83,7 +93,7 @@ This matters most for spoilage. Slower spoilage can help megabases, but it can a
 
 Use these buckets for every idea from the thread. Avoid "maybe" unless it is attached to a concrete spike.
 
-| Bucket | Meaning | v2.0.5 rule |
+| Bucket | Meaning | Release rule |
 | --- | --- | --- |
 | Ship | Implement now | API path known, bounded, testable, and in scope. |
 | Spike | Investigate with a throwaway test mod or save | API or balance is uncertain. |
@@ -99,7 +109,7 @@ These should come before or alongside new content.
 
 | Feature | Add? | Notes |
 | --- | ---: | --- |
-| Scripted-tech framework | Started in v2.0.5 | Required for spoilage/growth and future non-native effects. |
+| Scripted-tech framework | Started in `dev`; v2.1.0-bound | Required for spoilage/growth and future non-native effects. |
 | Settings presets | Yes | The thread shows users want "add more infinite research like vanilla" as well as sandbox behavior. |
 | Feature categories in settings | Yes | Group by Productivity, Character, Logistics, Cargo, Agriculture, Scripted, Sandbox. |
 | Compatibility matrix | Yes | Users asked about Maraxis and Krastorio 2 Spaced Out. |
@@ -130,7 +140,7 @@ Preset: Unlimited sandbox
 
 Preset first, advanced toggles second.
 
-### P1: v2.0.5 Agriculture And Preservation
+### P1: v2.1.0 Agriculture And Preservation
 
 Ship:
 
@@ -163,7 +173,7 @@ Document only, defer, or split:
 This release should be treated as:
 
 ```text
-v2.0.5 theme:
+v2.1.0 theme:
 Scripted research foundation + Space Age agriculture scaling.
 ```
 
@@ -174,7 +184,7 @@ Ship:
 - High-throughput pump, optional.
 - Pipeline extent startup setting, disabled by default.
 - Fluid train unloading notes/docs.
-- Thruster fuel/oxidizer productivity coverage if not already included in v2.0.5.
+- Thruster fuel/oxidizer productivity coverage if recipe-productivity tests pass in a later v2.1.x spike.
 
 Maybe ship:
 
@@ -337,7 +347,7 @@ The scripted manager should handle:
 - `on_technology_effects_reset`
 - `on_runtime_mod_setting_changed`, only if runtime toggles are added
 
-`control.lua` was introduced in the first v2.0.5 implementation slice. Keep `docs/architecture.md`, package validation, and existing-save validation aligned as the scripted manager grows.
+`control.lua` was introduced in the first scripted runtime implementation slice on `dev`. The public release plan treats it as v2.1.0-bound until manual save validation is complete. Keep `docs/architecture.md`, package validation, and existing-save validation aligned as the scripted manager grows.
 
 ## Scripted Feature Lifecycle Requirements
 
@@ -551,7 +561,7 @@ Better options:
 | Infinite tech that changes module behavior at runtime | Avoid |
 | Infinite tech that unlocks finite module tiers every N levels | Awkward; finite prototypes only |
 
-Do not add this to v2.0.5. Consider a later optional Advanced Quality Research add-on.
+Do not add this to v2.1.0. Consider a later optional Advanced Quality Research add-on.
 
 ### Quality-Based Spoilage Preservation
 
@@ -677,7 +687,7 @@ Avoid a scripted "multiply platform speed" hack.
 
 This is a separate chaos mod or disabled experiment. The idea could be funny, but the UPS and balance risk are too high for MIR core.
 
-## Acceptance Criteria For v2.0.5
+## Acceptance Criteria For v2.1.0 Scripted Runtime
 
 ### Scripted-Tech Framework
 
@@ -685,14 +695,14 @@ This is a separate chaos mod or disabled experiment. The idea could be funny, bu
 - Scripted features are registered through one manager instead of scattered handlers.
 - Research finish, reversal, technology effects reset, init, and configuration changed all route through the same recomputation path.
 - Each scripted feature declares settings, required prototypes/mods, event handlers, and diagnostics.
-- No `on_tick` handler is added for v2.0.5 features.
+- No `on_tick` handler is added for v2.1.0 features.
 
 ### Spoilage Preservation
 
 - Technology appears only when Space Age spoilage support is available.
 - The technology uses a visible `nothing` effect with localized description.
 - Research completion, reversal, and configuration changes recompute the effective modifier.
-- Existing saves load cleanly from v2.0.0 to v2.0.5.
+- Existing saves load cleanly from earlier v2.0.x releases to v2.1.0.
 - Multiple-force behavior is documented and manually tested.
 - The feature can be disabled via startup setting or preset-derived default.
 - Disabling the feature restores or stops applying MIR's own multiplier as far as the stored baseline allows.
@@ -752,7 +762,7 @@ Popular quality/module mods
 Popular refrigeration/spoilage mods
 ```
 
-New v2.0.5 validation should add:
+New v2.1.0 validation should add:
 
 - Space Age with spoilage preservation enabled.
 - Space Age with agricultural growth speed enabled.
@@ -768,7 +778,7 @@ New v2.0.5 validation should add:
 Required named test saves/scenarios:
 
 - Fresh Space Age save, no other mods.
-- Existing v2.0.0 MIR save upgraded to v2.0.5.
+- Existing v2.0.0 MIR save upgraded to v2.1.0.
 - Save with spoilable items already on belts, in chests, in labs, in rockets, and on platforms.
 - Save with multiple player forces.
 - Large Gleba farm with thousands of tower-owned plants.
@@ -847,7 +857,7 @@ Before writing feature code:
 7. Add release notes that clearly distinguish MIR features from companion-mod ideas.
 8. Add duplicate-tech detection for overlapping native modifiers.
 9. Add performance labels to docs and setting descriptions for scripted/global/sandbox features.
-10. Produce a no-code proof for each v2.0.5 scripted feature before implementation.
+10. Produce a no-code proof for each v2.1.0 scripted feature before implementation.
 11. Identify exact setting keys and preset-derived defaults.
 12. Preserve stable generated technology names/IDs or document a migration.
 13. Split the work into reviewable task chunks or GitHub issues before coding.
@@ -882,7 +892,7 @@ Repository state:
 - Do not assume anything has been pushed unless git status proves it.
 
 Goal:
-Create a release-gated implementation plan for the next post-v2.0.0 work, especially v2.0.5. Do not write code yet.
+Create a release-gated implementation plan for the next post-v2.0.0 work, especially v2.1.0. Do not write code yet.
 
 Hard product boundaries:
 - More Infinite Research must remain focused on research-driven scaling.
@@ -895,7 +905,7 @@ Hard product boundaries:
 - Avoid optional third-party dependencies unless truly required.
 - Preserve stable generated technology names/IDs unless there is a documented migration.
 - Factorio 2.1 is the main target.
-- Factorio 2.0 backport work is a best-compatible subset on the legacy branch and must not block v2.0.5.
+- Factorio 2.0 backport work is a best-compatible subset on the legacy branch and must not block v2.1.0.
 
 Feature eligibility rule:
 A feature belongs in More Infinite Research only if at least one is true:
@@ -933,7 +943,7 @@ Plan specifically around these candidate ideas:
 Produce the following, in order:
 
 1. Executive decision
-   - What should v2.0.5 actually ship?
+   - What should v2.1.0 actually ship?
    - What should be spiked?
    - What should be deferred?
    - What should become companion mods?
@@ -951,7 +961,7 @@ Produce the following, in order:
    - Default enabled?
    - Target release
 
-3. v2.0.5 implementation ladder
+3. v2.1.0 implementation ladder
    - Step-by-step order.
    - Each step must leave the mod loadable.
    - Separate infrastructure from content.
@@ -987,12 +997,12 @@ Produce the following, in order:
    - why no per-tick scan is required
 
 6. Acceptance criteria
-   For each v2.0.5 feature, define measurable done criteria.
+   For each v2.1.0 feature, define measurable done criteria.
 
 7. Validation and test matrix
    Include:
    - fresh Space Age save
-   - existing v2.0.0 MIR save upgraded to v2.0.5
+   - existing v2.0.0 MIR save upgraded to v2.1.0
    - save with existing spoilable items in belts/chests/labs/rockets/platforms
    - save with many agricultural towers and plants
    - multi-force save
