@@ -14,6 +14,17 @@ function Invoke-RepoCheck {
   & $Script
 }
 
+function Find-RepositoryText {
+  param(
+    [string]$Path,
+    [string]$Pattern
+  )
+
+  $files = Get-ChildItem -LiteralPath $Path -Recurse -File
+  if (-not $files) { return @() }
+  return @($files | Select-String -Pattern $Pattern)
+}
+
 Invoke-RepoCheck "info.json parses" {
   $null = Get-Content -Raw (Join-Path $repo "info.json") | ConvertFrom-Json
 }
@@ -66,21 +77,19 @@ Invoke-RepoCheck "docs match opportunistic compatibility policy" {
 }
 
 Invoke-RepoCheck "no old tool-based science pack authority remains" {
-  $matches = & rg --line-number "data.raw.tool|tool_exists|has_tool|PACKS_ALL" (Join-Path $repo "prototypes")
-  if ($LASTEXITCODE -eq 0) {
+  $matches = Find-RepositoryText -Path (Join-Path $repo "prototypes") -Pattern "data.raw.tool|tool_exists|has_tool|PACKS_ALL"
+  if ($matches.Count -gt 0) {
     $matches | Write-Host
     throw "Old science-pack authority references remain."
   }
-  if ($LASTEXITCODE -ne 1) { throw "rg failed while scanning science-pack authority." }
 }
 
 Invoke-RepoCheck "generated icons do not use icon_mipmaps" {
-  $matches = & rg --line-number "icon_mipmaps" (Join-Path $repo "prototypes")
-  if ($LASTEXITCODE -eq 0) {
+  $matches = Find-RepositoryText -Path (Join-Path $repo "prototypes") -Pattern "icon_mipmaps"
+  if ($matches.Count -gt 0) {
     $matches | Write-Host
     throw "icon_mipmaps references remain in prototypes."
   }
-  if ($LASTEXITCODE -ne 1) { throw "rg failed while scanning icon_mipmaps." }
 }
 
 Invoke-RepoCheck "locale files match English fallback" {
