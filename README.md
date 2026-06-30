@@ -454,7 +454,8 @@ The validation script checks:
 
 - **`docs/architecture.md`:** data-stage flow, utility modules, stream config, compatibility profiles, diagnostics, and validation.
 - **`docs/compatibility.md`:** compatibility model, known integrations, manual test matrix, fixture designs, and release checklist.
-- **`docs/roadmap.md`:** v2.0.0 implementation baseline and longer-term v2.x roadmap.
+- **`docs/roadmap.md`:** current v2.0.5 and v2.1.0 release roadmap, scope gates, and release criteria.
+- **`docs/todo.md`:** executable v2.0.5 and v2.1.0 task checklist.
 - **`docs/post-2.0-feature-plan.md`:** post-v2.0.0 feature triage, MIR scope boundaries, Reddit feedback, and staged implementation plan.
 - **`docs/test-results.md`:** local release-candidate validation evidence.
 - **`CONTRIBUTING.md`:** branch policy, pull request expectations, validation commands, and mod portal changelog rules.

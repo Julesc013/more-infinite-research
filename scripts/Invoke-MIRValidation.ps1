@@ -267,6 +267,7 @@ Invoke-RepoCheck "release package archive matches metadata" {
       "${root}locale/en/more-infinite-research.cfg",
       "${root}docs/architecture.md",
       "${root}docs/compatibility.md",
+      "${root}docs/todo.md",
       "${root}prototypes/tech-gen.lua",
       "${root}prototypes/base-tech-extensions.lua",
       "${root}prototypes/compat/competing-base-extensions.lua",
