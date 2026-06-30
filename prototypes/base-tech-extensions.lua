@@ -314,6 +314,7 @@ local function extend_chain(key)
   -- still requires numeric unit.count values.
 
   local new_name = key .. "-" .. desired_new_level
+  -- Never replace an existing vanilla or modded continuation level.
   if data.raw.technology[new_name] then
     D.extension(D.extension_fields(key, "skipped", "target_exists"))
     return

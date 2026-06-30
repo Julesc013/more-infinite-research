@@ -20,15 +20,17 @@ Commands:
 Results:
 
 - Static validation passed, including release metadata policy, docs policy scan, old science-pack authority scan, icon scan, locale parity, progression-setting wiring, changelog syntax, package metadata, package source/docs/locale parity, and `git diff --check`.
-- Runtime fixture validation passed across eleven isolated scenarios: `reduce-policy`, `skip-policy`, `space-pack-policy`, `base-space-promethium-pack-policy`, `space-age-space-pack-policy`, `space-age-space-promethium-pack-policy`, `all-official-pack-policy`, `all-pack-policy`, `end-game-prerequisite-gate`, `base-cargo-space-age-gate`, and `space-age-cargo-pad-enabled`.
+- Runtime fixture validation passed across twelve isolated scenarios: `reduce-policy`, `skip-policy`, `space-pack-policy`, `base-space-promethium-pack-policy`, `space-age-space-pack-policy`, `space-age-space-promethium-pack-policy`, `all-official-pack-policy`, `all-pack-policy`, `base-extension-boundary-policy`, `end-game-prerequisite-gate`, `base-cargo-space-age-gate`, and `space-age-cargo-pad-enabled`.
 - The default `reduce` lab policy generated science-pack productivity with the custom item-based fixture science pack included.
 - The forced `skip` lab policy skipped the intentionally incompatible science-pack productivity stream with `lab_status=invalid`.
 - The `space` science-pack ingredient policy added `space-science-pack` in base-only and Space Age modes without adding promethium science.
 - The `space-and-promethium` science-pack ingredient policy added `space-science-pack` in base-only mode and both `space-science-pack` and `promethium-science-pack` with Space Age enabled.
 - The `all-official` science-pack ingredient policy added official base and Space Age packs while excluding the custom fixture science pack from both synthetic streams and MIR-created vanilla-chain extensions.
 - The `all` science-pack ingredient policy added the custom fixture science pack discovered from active lab inputs to synthetic streams and MIR-created vanilla-chain extensions.
+- The base-extension boundary scenario preserved an existing finite `research-speed-7` level from a fixture mod and generated MIR's infinite continuation at `research-speed-8`.
 - The late-game prerequisite gate added `space-science-pack` as a prerequisite without adding it to the generated technology science ingredients.
 - Forced cargo landing pad count research skipped in base-only mode with `missing required mod space-age` and generated successfully when Space Age was enabled.
+- Static validation checked that cargo bay unloading distance defaults to `120` seconds, cargo landing pad count defaults to `240` seconds, and both cargo streams use official science packs only.
 
 Representative validation harness evidence:
 
@@ -40,6 +42,7 @@ Factorio 2.1.8 (build 86744, win64, steam, space-age)
 [run] Factorio load check with fixture mods (space-age-space-promethium-pack-policy)
 [run] Factorio load check with fixture mods (all-official-pack-policy)
 [run] Factorio load check with fixture mods (all-pack-policy)
+[run] Factorio load check with fixture mods (base-extension-boundary-policy)
 [run] Factorio load check with fixture mods (end-game-prerequisite-gate)
 [run] Factorio load check with fixture mods (base-cargo-space-age-gate)
 [run] Factorio load check with fixture mods (space-age-cargo-pad-enabled)

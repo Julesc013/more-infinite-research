@@ -14,8 +14,8 @@ The release goal is graceful compatibility without mod-page dependency clutter: 
 - Recipe matching supports both `recipe.category` and Factorio 2.1 `recipe.categories`.
 - Hidden recipes and recycling recipes are skipped by default. Streams can opt in with `include_hidden` or `include_recycling`.
 - Optional DLC-shaped streams declare concrete required prototypes instead of requiring a specific official mod by name.
-- Cargo bay unloading distance research uses Factorio 2.1.8's `max-cargo-bay-unloading-distance` technology modifier and is skipped unless Space Age is active and the `landing-pad-unloading-bay` prototypes exist.
-- Cargo landing pad count research uses `cargo-landing-pad-count`, is disabled by default, and is skipped unless Space Age is active and the `cargo-landing-pad` prototype exists.
+- Cargo bay unloading distance research uses Factorio 2.1.8's `max-cargo-bay-unloading-distance` technology modifier, uses official base and Space Age science packs only, and is skipped unless Space Age is active and the `landing-pad-unloading-bay` prototypes exist.
+- Cargo landing pad count research uses `cargo-landing-pad-count`, uses official base and Space Age science packs only, is disabled by default, and is skipped unless Space Age is active and the `cargo-landing-pad` prototype exists.
 - Mod-specific stream changes should live in `prototypes/compat/profiles.lua` instead of the base stream definitions.
 - Compatibility cleanup that removes known competing technologies also removes dangling prerequisite references from remaining technologies.
 - Generic competing recipe-productivity cleanup removes only known infinite technologies whose recipe-productivity effects are all covered by generated MIR effects. Finite upgrade chains from other mods are left alone unless a future integration models them explicitly.
@@ -91,7 +91,7 @@ Set `$env:FACTORIO_LOG` or pass `-FactorioLog` when the Factorio log is not at t
 
 The runtime check copies this repo and the fixture mods into isolated temporary user-data mod directories, adds test-only dependencies from the copied mod to the fixture mods for deterministic load order, writes fixture `mod-list.json` files, and asks Factorio to create saves. It is intentionally a load/prototype validation harness, not a gameplay test.
 
-The runtime fixture run enables the generation diagnostics report in the copied mod and covers both lab incompatibility policies. The default `reduce` scenario asserts that science-pack productivity generated with the custom item-based fixture science pack included. The `skip` scenario forces the copied setting default to `skip` and asserts that the intentionally incompatible science-pack productivity stream is skipped instead of reduced. Additional runtime scenarios force the science-pack ingredient policies, require the end-game prerequisite gate, and force-enable cargo landing pad count without Space Age to prove the stream skips on the Space Age mod gate. The expected Factorio log file is part of the validation evidence; if it is missing, runtime validation fails.
+The runtime fixture run enables the generation diagnostics report in the copied mod and covers both lab incompatibility policies. The default `reduce` scenario asserts that science-pack productivity generated with the custom item-based fixture science pack included. The `skip` scenario forces the copied setting default to `skip` and asserts that the intentionally incompatible science-pack productivity stream is skipped instead of reduced. Additional runtime scenarios force the science-pack ingredient policies, require the end-game prerequisite gate, force-enable cargo landing pad count without Space Age to prove the stream skips on the Space Age mod gate, and add a fixture finite vanilla-chain level before MIR to prove existing levels are preserved while MIR extends after them. The expected Factorio log file is part of the validation evidence; if it is missing, runtime validation fails.
 
 Static validation requires the committed release zip at `dist/more-infinite-research_2.0.0.zip`. The package must use the `more-infinite-research_2.0.0/` root, contain matching `info.json` metadata, include locale, documentation, top-level data-stage files, and core prototype modules, match the repository contents for key source, documentation, and locale files, and avoid build, fixture, script, Git, and temporary/editor artifacts.
 
@@ -161,5 +161,6 @@ Expected result: when the skip policy is active, MIR skips the incompatible scie
 - Confirm package validation reports source, documentation, and locale parity with the repository.
 - Confirm runtime fixture validation covers both the default `reduce` lab policy and forced `skip` lab policy.
 - Confirm runtime fixture validation covers `configured`, `space`, `space-and-promethium`, `all-official`, and `all` science-pack ingredient policies, the end-game prerequisite gate, and the base-only cargo landing pad count skip.
+- Confirm runtime fixture validation covers preserving an existing finite vanilla-chain level before adding MIR's generated infinite continuation.
 - Load Factorio with the manual matrix above.
 - Confirm `changelog.txt` has the release version and date.

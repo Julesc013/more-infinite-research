@@ -210,6 +210,7 @@ end
 
 function S.pack_list_for_extension(key, desired)
   if desired == "all" then return S.pack_list_all() end
+  if desired == "all-official" then return S.pack_list_official() end
   if type(desired) == "table" then return deepcopy(desired) end
 
   local list = EXTENSION_PACKS[key]

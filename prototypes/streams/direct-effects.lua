@@ -22,7 +22,7 @@ return {
     icon_item = "landing-pad-unloading-bay",
     overlay = "range",
     localised_description = {"technology-description.more-infinite-research.cargo_bay_unloading_distance"},
-    science_packs = "all",
+    science_packs = "all-official",
     direct_effects = {
       { type = "max-cargo-bay-unloading-distance", modifier = 10 }
     }
@@ -36,7 +36,7 @@ return {
     icon_item = "cargo-landing-pad",
     overlay = "count",
     localised_description = {"technology-description.more-infinite-research.cargo_landing_pad_count"},
-    science_packs = "all",
+    science_packs = "all-official",
     direct_effects = {
       { type = "cargo-landing-pad-count", modifier = 1 }
     }

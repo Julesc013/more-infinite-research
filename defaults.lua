@@ -15,14 +15,14 @@ local defaults = {
     research_cargo_bay_unloading_distance = {
       base_cost = 100000,
       growth_factor = 3,
-      research_time = 60,
+      research_time = 120,
       max_level = 0
     },
     research_cargo_landing_pad_count = {
       enabled = false,
       base_cost = 1000000,
       growth_factor = 10,
-      research_time = 60,
+      research_time = 240,
       max_level = 0
     },
     research_science_pack_productivity = { research_time = 120 },

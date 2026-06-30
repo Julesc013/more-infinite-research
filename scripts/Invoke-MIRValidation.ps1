@@ -102,6 +102,7 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
   $baseExtensionsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\base-tech-extensions.lua")
   $scienceText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\lib\science-packs.lua")
   $directEffectsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\streams\direct-effects.lua")
+  $defaultsText = Get-Content -Raw -LiteralPath (Join-Path $repo "defaults.lua")
   $localeText = Get-Content -Raw -LiteralPath (Join-Path $repo "locale\en\more-infinite-research.cfg")
 
   $requiredSnippets = @(
@@ -113,11 +114,15 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "prototypes\util.lua"; Text = $utilText; Snippet = 'append_end_game_gate_prerequisite' },
     @{ File = "prototypes\lib\science-packs.lua"; Text = $scienceText; Snippet = 'pack_list_official' },
     @{ File = "prototypes\lib\science-packs.lua"; Text = $scienceText; Snippet = 'is_official_science_pack' },
+    @{ File = "prototypes\lib\science-packs.lua"; Text = $scienceText; Snippet = 'desired == "all-official"' },
+    @{ File = "prototypes\base-tech-extensions.lua"; Text = $baseExtensionsText; Snippet = 'if data.raw.technology[new_name] then' },
+    @{ File = "prototypes\base-tech-extensions.lua"; Text = $baseExtensionsText; Snippet = '"target_exists"' },
     @{ File = "prototypes\base-tech-extensions.lua"; Text = $baseExtensionsText; Snippet = 'apply_science_pack_ingredient_policy' },
     @{ File = "prototypes\base-tech-extensions.lua"; Text = $baseExtensionsText; Snippet = 'append_end_game_gate_prerequisite' },
     @{ File = "prototypes\lib\science-packs.lua"; Text = $scienceText; Snippet = 'end_game_science_pack' },
     @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'research_cargo_landing_pad_count = {' },
     @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'required_mods = {"space-age"}' },
+    @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'science_packs = "all-official"' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-science-pack-ingredient-policy-configured=Configured per technology' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-science-pack-ingredient-policy-space=Add space science' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-science-pack-ingredient-policy-space-and-promethium=Add space and promethium science' },
@@ -129,6 +134,13 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     if (-not $check.Text.Contains($check.Snippet)) {
       throw "Missing science-pack progression setting wiring in $($check.File): $($check.Snippet)"
     }
+  }
+
+  if ($defaultsText -notmatch '(?s)research_cargo_bay_unloading_distance\s*=\s*\{.*?research_time\s*=\s*120') {
+    throw "Cargo bay unloading distance default research time must be 120 seconds."
+  }
+  if ($defaultsText -notmatch '(?s)research_cargo_landing_pad_count\s*=\s*\{.*?research_time\s*=\s*240') {
+    throw "Cargo landing pad count default research time must be 240 seconds."
   }
 }
 
@@ -410,7 +422,8 @@ if (-not (Test-Path -LiteralPath $fixtureRoot)) {
 
 $postMirAssertionFixtures = @(
   "mir-fixture-assert-science-pack-productivity",
-  "mir-fixture-assert-lab-skip-policy"
+  "mir-fixture-assert-lab-skip-policy",
+  "mir-fixture-assert-base-extension-boundary"
 )
 
 function Get-FixtureInfos {
@@ -764,6 +777,15 @@ Assert-ReportLineContains -Line $allPackLine -Expected "mir-fixture-science-pack
 $allPackExtensionLine = Get-LastExtensionReportLine -Key "braking-force"
 Assert-ReportLineGenerated -Line $allPackExtensionLine -Context "All lab base-extension science-pack ingredient policy scenario"
 Assert-ReportLineContains -Line $allPackExtensionLine -Expected "mir-fixture-science-pack" -Context "All lab base-extension science-pack ingredient policy scenario"
+
+Invoke-RuntimeScenario -ScenarioName "base-extension-boundary-policy" -EnabledFixtureNames @(
+  "mir-fixture-item-science-pack",
+  "mir-fixture-finite-base-extension-level",
+  "mir-fixture-assert-base-extension-boundary"
+) -SciencePackIngredientPolicy "all"
+$baseExtensionBoundaryLine = Get-LastExtensionReportLine -Key "research-speed"
+Assert-ReportLineGenerated -Line $baseExtensionBoundaryLine -Context "Base extension boundary scenario"
+Assert-ReportLineContains -Line $baseExtensionBoundaryLine -Expected "mir-fixture-science-pack" -Context "Base extension boundary scenario"
 
 Invoke-RuntimeScenario -ScenarioName "end-game-prerequisite-gate" -EnabledFixtureNames @() -RequireSpaceGate
 $gateLine = Get-LastStreamReportLine -Key "research_gears"

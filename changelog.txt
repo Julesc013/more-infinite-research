@@ -21,6 +21,7 @@ Date: 2026-06-30
     - Added a startup setting to control whether vanilla weapon shooting speed technologies are adjusted.
     - Changed the late-game science gate setting to be disabled by default, so generated technologies are not hidden until space science or promethium science unless users opt in.
     - Added a science-pack ingredient policy setting so users can keep configured packs, add space science, add space and promethium science, use all official science packs, or require every active lab science pack including compatible modded packs.
+    - Changed Space Age cargo logistics research to use official base and Space Age science packs only. Cargo bay unloading distance now takes 120 seconds per unit, and cargo landing pad count now takes 240 seconds per unit.
     - Fixed Space Age cargo logistics research so cargo landing pad count and cargo bay unloading distance are skipped when Space Age is disabled.
     - Added in-game descriptions that explain the recipe productivity cap and lab-compatible science-pack behavior.
 
@@ -40,6 +41,7 @@ Date: 2026-06-30
     - Removed unused base-extension growth inference helpers and kept generation diagnostics behind the debug report setting.
     - Reworked base-tech extension science packs to inherit from the last vanilla level by default and then add only the intended extra packs.
     - Fixed science-pack ingredient policy handling for generated base-tech extensions so MIR-created continuation levels receive the selected extra packs while existing vanilla and other-mod technologies are left unchanged.
+    - Added validation coverage to ensure MIR extends after existing finite vanilla-chain levels instead of overwriting them.
     - Added science-pack prerequisite repair for generated base-tech extensions so added packs also add their unlock prerequisites.
     - Added detection for equivalent existing infinite base-tech extensions so duplicate infinite continuations are skipped instead of generated again.
     - Added logic to keep another mod's competing infinite continuation when the preference setting is disabled.
