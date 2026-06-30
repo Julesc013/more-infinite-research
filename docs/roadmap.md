@@ -158,6 +158,58 @@ v2.1.0 is the right place for features that are clean but broader than the v2.0.
 - No scripted platform-speed/thruster hack.
 - No per-tick broad scans.
 
+## Legacy v1.9.0 Backport Target
+
+The next Factorio `2.0` legacy release should backport the finished v2.1.0 codebase, not reconstruct v2.0.0 or v2.0.5 commit-by-commit.
+
+Backport rule:
+
+```text
+legacy = current MIR code, minus Factorio 2.1-only surface area, with Factorio 2.0 metadata and validation.
+```
+
+The legacy target version is:
+
+```text
+v2.1.0 on Factorio 2.1.x -> v1.9.0 on Factorio 2.0.x
+```
+
+The source of truth for the backport should be one exact v2.1.0 release commit, tag, or release branch. Do not begin the legacy port until v2.1.0 is stable enough that the snapshot is worth supporting.
+
+Expected legacy-port shape:
+
+- Start from `legacy`.
+- Merge or snapshot the v2.1.0 source point into a temporary backport branch.
+- Prefer v2.1.0 source code for shared generator, diagnostics, recipe matching, science-pack handling, compatibility cleanup, locale, docs structure, and validation infrastructure.
+- Restore Factorio `2.0` release metadata.
+- Remove or guard Factorio `2.1`-only features.
+- Validate against a Factorio `2.0.x` binary before publishing.
+
+Known or likely legacy-specific removals/guards:
+
+| Surface | Legacy rule |
+| --- | --- |
+| `max-cargo-bay-unloading-distance` | Remove from legacy unless Factorio 2.0 validation proves support |
+| `cargo-landing-pad-count` | Remove from legacy unless Factorio 2.0 validation proves support |
+| Agricultural tower scripted events | Keep only if Factorio 2.0 exposes the required events and entity fields |
+| Pipeline extent setting | Keep only if the same prototype fields exist and validation passes |
+| High-throughput pump | Keep only if the pump prototype path validates under Factorio 2.0 |
+| New v2.1.0 recipe-productivity streams | Keep if exact recipes exist and no duplicate infinite technology owns them |
+
+Expected legacy-specific files:
+
+- `info.json`
+- `changelog.txt`
+- `README.md`
+- `docs/compatibility.md`
+- `docs/roadmap.md`
+- `docs/todo.md`
+- `scripts/Invoke-MIRValidation.ps1`
+- `prototypes/streams/direct-effects.lua`
+- `dist/more-infinite-research_1.9.0.zip`
+
+The success criterion is that the diff from v2.1.0 to legacy is mostly metadata, docs, validation branching, and explicit removal of Factorio `2.1`-only technology surfaces.
+
 ## Companion Mod Backlog
 
 These ideas are worth keeping, but not as core MIR features.
@@ -220,3 +272,4 @@ Recommended order from here:
 3. Cut v2.0.5 as the focused agriculture/scripted-tech release.
 4. Create v2.1.0 spikes for pump, pipeline extent, thruster fuel/oxidizer productivity, oil productivity, presets, and overlap detection.
 5. Ship v2.1.0 with only the spikes that prove clean, bounded, and compatible.
+6. Backport v2.1.0 to Factorio 2.0 as v1.9.0.

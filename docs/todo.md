@@ -158,6 +158,47 @@ v2.1.0 should be the first broader post-agriculture release.
 - [ ] Compatibility tests include no Space Age, Space Age, Space Age without Quality where supported, custom science/lab fixtures, and at least one large overhaul if available.
 - [ ] README, roadmap, compatibility docs, test results, and changelog are updated before release.
 
+## Legacy v1.9.0 Backport After v2.1.0
+
+Do not reconstruct v2.0.0 or v2.0.5 commit-by-commit for `legacy`. The planned legacy release is a Factorio `2.0` compatibility port of the finished v2.1.0 codebase.
+
+### Backport Setup
+
+- [ ] Finish and validate v2.1.0 on the Factorio `2.1` line.
+- [ ] Tag or branch the exact v2.1.0 source point.
+- [ ] Check out `legacy` from `origin/legacy`.
+- [ ] Create a temporary branch such as `backport/legacy-1.9.0-from-2.1.0`.
+- [ ] Merge or snapshot the v2.1.0 source point into the temporary branch.
+- [ ] Prefer v2.1.0 source for shared generator, diagnostics, science-pack handling, recipe matching, compatibility cleanup, validation scripts, docs structure, and localization.
+
+### Legacy Compatibility Patch
+
+- [ ] Set `info.json` version to `1.9.0`.
+- [ ] Set `info.json` `factorio_version` to `2.0`.
+- [ ] Set base dependency to the Factorio `2.0` floor.
+- [ ] Remove the Factorio `2.1.8` dependency floor from legacy.
+- [ ] Remove or guard `research_cargo_bay_unloading_distance`.
+- [ ] Remove or guard `research_cargo_landing_pad_count`.
+- [ ] Add a validation check that legacy does not ship `max-cargo-bay-unloading-distance` or `cargo-landing-pad-count` unless Factorio `2.0` support is proven.
+- [ ] Verify whether agricultural tower events and `tick_grown` are available in the target Factorio `2.0.x` build before keeping scripted agriculture.
+- [ ] Verify whether any v2.1.0 pump or pipeline prototype fields exist in Factorio `2.0.x` before keeping them.
+- [ ] Rewrite `changelog.txt` as a `1.9.0` legacy backport entry, not a copied v2.1.0 entry.
+- [ ] Update README and compatibility docs to state what is excluded from legacy.
+- [ ] Build `dist/more-infinite-research_1.9.0.zip`.
+
+### Legacy Validation
+
+- [ ] Make `scripts/Invoke-MIRValidation.ps1` branch-aware from `info.json`.
+- [ ] Static validation checks `factorio_version = "2.0"` on legacy.
+- [ ] Static validation checks `base >= 2.0` style metadata on legacy.
+- [ ] Static validation checks 2.1-only cargo modifiers are absent on legacy.
+- [ ] Static validation skips 2.1-only cargo runtime fixture expectations on legacy.
+- [ ] Run `.\scripts\Build-MIRPackage.ps1` on legacy.
+- [ ] Run `.\scripts\Invoke-MIRValidation.ps1 -StaticOnly` on legacy.
+- [ ] Run `.\scripts\Invoke-MIRValidation.ps1 -FactorioBin "<Factorio-2.0.exe>"` on legacy.
+- [ ] Fix failures in this order: load-time prototype errors, invalid modifiers/effects, metadata, unresearchable science packs, docs/package validation, locale synchronization.
+- [ ] Keep the legacy diff small: metadata, docs, validation branching, package name, and explicit removal of Factorio `2.1`-only surfaces.
+
 ## Companion Mod Backlog
 
 These are intentionally not v2.0.5 or v2.1.0 MIR core work.

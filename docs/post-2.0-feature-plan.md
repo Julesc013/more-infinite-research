@@ -780,29 +780,44 @@ Required named test saves/scenarios:
 
 ## Factorio 2.0 Backport Reality
 
-Be careful with the backport promise. The current 2.1 path can use clean agricultural tower events and cargo landing pad APIs. The 2.0 line may not have those APIs.
+The better backport target is the finished v2.1.0 codebase, not v2.0.0 or v2.0.5 reconstructed commit-by-commit.
+
+Backport rule:
+
+```text
+legacy should be current MIR code, minus Factorio 2.1-only surface area, with Factorio 2.0 metadata and validation.
+```
+
+The planned mapping is:
+
+```text
+v2.1.0 on Factorio 2.1.x -> v1.9.0 on Factorio 2.0.x
+```
+
+Be careful with the backport promise. The current 2.1 path can use clean agricultural tower events, cargo landing pad APIs, and any new v2.1.0 prototype unlocks. The 2.0 line may not have those APIs.
 
 Do not assume in Factorio 2.0:
 
 - Cargo landing pad modifiers exist.
 - Agricultural tower events exist.
 - Newer quality prototype fields exist.
+- Future v2.1.0 pump, pipeline, or logistics prototype fields exist.
 
 Best backport plan:
 
 ```text
-2.1 main branch:
-- Full feature set.
+2.1 dev/main branch:
+- Full v2.1.0 feature set after validation.
 
 2.0 legacy branch:
-- Generated productivity techs.
-- Older native modifiers.
-- No cargo landing pad count/unloading distance unless supported.
-- No agricultural growth speed unless the event exists.
-- No scripted agriculture if it needs polling.
+- Merge/snapshot the exact v2.1.0 source point.
+- Keep shared generator, diagnostics, recipe matching, science-pack handling, compatibility cleanup, docs, locale, and validation infrastructure.
+- Restore Factorio 2.0 metadata and build as v1.9.0.
+- Remove or guard cargo landing pad count/unloading distance.
+- Keep scripted agriculture, pump/pipeline features, and new recipe-productivity streams only when Factorio 2.0 validation proves support.
 ```
 
-A Factorio 2.0 backport should be a best-compatible subset on `legacy`, not a promise of full feature parity.
+A Factorio 2.0 backport should be a best-compatible subset on `legacy`, not a promise of full feature parity. The success criterion is that the diff from v2.1.0 to legacy is mostly metadata, docs, validation branching, and explicit removal of Factorio 2.1-only technology surfaces.
 
 ## Missing Work Before Implementation
 

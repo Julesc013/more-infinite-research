@@ -52,6 +52,8 @@ The repository has **three permanent branches** on `origin`:
 Normal development should target **`dev`** first. Release-ready hotfixes can target **`main`**.
 Backports that must remain compatible with Factorio `2.0.x` belong on **`legacy`**.
 
+The next planned legacy release is **`v1.9.0`**, intended as a Factorio `2.0` compatibility port of the finished **`v2.1.0`** codebase rather than a commit-by-commit rebuild of earlier releases.
+
 See **`CONTRIBUTING.md`** for pull request expectations, branch routing, and validation commands.
 
 ## How Generation Works

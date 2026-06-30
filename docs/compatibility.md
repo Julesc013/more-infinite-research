@@ -37,6 +37,21 @@ Future MIR features should treat overlapping native modifiers as compatibility-s
 
 This is especially relevant for cargo landing pad count, cargo bay unloading distance, and any future native modifier or scripted-effect technology that other mods may also provide.
 
+## Legacy Backport Model
+
+The planned Factorio `2.0` legacy release is `v1.9.0`, backported from the finished v2.1.0 Factorio `2.1` codebase.
+
+Legacy should not be rebuilt commit-by-commit from v2.0.0 or v2.0.5. It should be the current MIR generator, diagnostics, recipe matching, science-pack handling, compatibility cleanup, docs structure, locale, and validation infrastructure with Factorio `2.1`-only surface area removed or guarded.
+
+Known legacy exclusions until Factorio `2.0` validation proves otherwise:
+
+- `max-cargo-bay-unloading-distance`
+- `cargo-landing-pad-count`
+- any scripted agriculture path that depends on unavailable agricultural tower events or entity fields
+- any pump, pipeline, or Space Age logistics prototype field added after the Factorio `2.0` target
+
+Legacy validation should be branch-aware from `info.json`: Factorio `2.1` checks require cargo streams and the `2.1.8` dependency floor, while Factorio `2.0` checks require those cargo modifier strings to be absent and the package to build as `more-infinite-research_1.9.0.zip`.
+
 ## Opportunistic Integrations
 
 These integrations do not add mod-page dependencies. More Infinite Research handles them when their prototypes are already visible, and skips safely when they are absent:
