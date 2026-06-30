@@ -4,28 +4,29 @@ Date: 2026-07-01
 
   Features:
 
-    - Added stabilization planning for the next Factorio 2.1 release line.
-    - Added documentation that separates the v2.0.5 stabilization/package-parity release from the v2.1.0 scripted runtime feature release.
+    - Added release-cadence planning for the next Factorio 2.1 release line.
+    - Documented v2.0.5 as the quick feedback patch for small/easy changes and v2.1.0 as the next larger feature wave.
     - Added an API proof ledger for current Factorio API claims and unknowns that require in-game verification.
-    - Added a named manual test plan for v2.0.5 stabilization, v2.1.0 scripted runtime validation, v2.1.x spikes, and the later v1.9.0 Factorio 2.0 legacy backport.
-    - Added branch-aware validation guardrails for the planned v1.9.0 legacy backport.
+    - Added a named manual test plan for v2.0.5 quick-patch validation, v2.1.0 larger feature validation, v2.1.x spikes, and the later Factorio 2.0 legacy backports.
+    - Added branch-aware validation guardrails for the planned v1.9.x legacy backports.
     - Added static validation that rejects runtime tick handlers in control-stage Lua files.
     - Added validation that the changelog contains an entry for the current info.json version.
     - Electric shooting speed now covers the Space Age `tesla` ammo category as well as the older `electric` ammo category.
     - Electric shooting speed now applies to Tesla guns and Tesla turrets instead of only discharge-defense-style electric weapons.
     - Recipe productivity generation now skips recipes already owned by another infinite recipe-productivity technology.
     - Space Age vanilla productivity technologies for processing units, low density structures, plastic, and rocket fuel now stay authoritative instead of receiving parallel MIR duplicates.
-    - Added a development implementation of the scripted technology framework, spoilage preservation, and agricultural growth speed; public feature claims are deferred to v2.1.0 pending manual save validation.
+    - Added the v2.0.5 candidate implementation of the scripted technology framework, spoilage preservation, and agricultural growth speed; final release claims depend on manual save validation.
 
   Compatibility:
 
-    - The v2.0.5 release plan is now stabilization, documentation, package parity, validation hardening, and compatibility wording.
-    - Scripted runtime behavior is treated as v2.1.0-bound until existing-stack behavior, research reversal, disabling, multi-force behavior, and large Gleba farms are manually validated.
-    - The first agriculture runtime development slice avoids broad inventory, belt, container, item-stack, surface, and entity scanning.
-    - Existing planted crops are not globally rescanned in the first development slice; growth speed applies to newly planted tower crops.
+    - The v2.0.5 release plan is now a quick feedback patch: ship the small features that pass proof and defer only the specific behavior that fails proof.
+    - Scripted runtime behavior requires manual validation for existing-stack behavior, research reversal, disabling, multi-force behavior, and large Gleba farms before final v2.0.5 publication.
+    - The first agriculture runtime slice avoids broad inventory, belt, container, item-stack, surface, and entity scanning.
+    - Existing planted crops are not globally rescanned in the v2.0.5 candidate slice; growth speed applies to newly planted tower crops.
     - Package validation now includes control.lua and the control module directory.
     - Package validation now requires the TODO, API proof, and manual test documentation.
     - Factorio 2.0 legacy validation now rejects Factorio 2.1 dependency floors and Factorio 2.1-only cargo modifier strings when info.json targets Factorio 2.0.
+    - Planned legacy cadence is v2.1.0 to v1.9.0, v2.1.5 to v1.9.5, and a final v1.9.9 from the latest tested v2.x.x source snapshot at the Factorio 2.1 stable cutoff.
 
   Localization:
 

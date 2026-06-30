@@ -9,8 +9,10 @@ Use `docs/roadmap.md` for release scope and product boundaries. Use `docs/post-2
 ## Working Rules
 
 - Target `dev` for active Factorio `2.1` development.
-- Keep v2.0.5 narrow: stabilization, docs, package parity, validation hardening, and compatibility wording.
-- Treat scripted-tech framework, spoilage preservation, agricultural growth speed, and settings presets as v2.1.0-bound unless a separate release decision promotes them after manual validation.
+- Treat `.5` releases as quick feedback patches for small, bounded, tested changes.
+- Treat `.0` releases as larger feature waves.
+- Backport tested current-line snapshots to `legacy` as Factorio `2.0` compatible `1.9.x` releases.
+- Do not rebuild `legacy` commit-by-commit from older releases.
 - Keep generated technology names stable unless a tested migration exists.
 - Prefer native modifiers and recipe productivity.
 - Scripted effects must be event-driven, bounded, reversible where practical, and documented.
@@ -38,28 +40,44 @@ Done in the current development branch:
 - [x] Add branch-aware legacy validation guardrails.
 - [x] Add static no-`on_tick` validation guard.
 
-Important release note: the scripted runtime work above is implemented in `dev`, but the public release plan now treats it as **v2.1.0-bound** until the manual runtime validation matrix is complete.
+Important release note: the scripted runtime work above is a **v2.0.5 ship candidate**, not automatically deferred to `v2.1.0`. Ship the parts that pass manual proof. Defer only the specific feature or behavior that fails proof or becomes too large for a quick patch.
 
-## v2.0.5 Stabilization Release
+## v2.0.5 Quick Feedback Patch
 
-These must be complete before publishing v2.0.5 as a stabilization/docs/package-parity release.
+`v2.0.5` should ship the easy and quick changes that are already implemented or simple to validate.
+
+### v2.0.5 Ship Candidates
+
+- [x] Electric Shooting Speed covers `tesla`.
+- [x] Electric Shooting Speed still covers `electric`.
+- [x] Vanilla Space Age `processing-unit-productivity` remains authoritative.
+- [x] Vanilla Space Age `low-density-structure-productivity` remains authoritative.
+- [x] Vanilla Space Age `plastic-bar-productivity` remains authoritative.
+- [x] Vanilla Space Age `rocket-fuel-productivity` remains authoritative.
+- [x] Recipe productivity skips effects already owned by another infinite recipe-productivity technology.
+- [x] Package includes `control.lua` and `control/`.
+- [x] Package includes `docs/todo.md`, `docs/api-proof-points.md`, and `docs/manual-test-plan.md`.
+- [ ] Spoilage preservation passes the manual blockers below.
+- [ ] Agricultural growth speed for newly planted tower crops passes the manual blockers below.
+- [ ] README/changelog state the exact measured behavior, especially for existing spoilable stacks and existing plants.
 
 ### v2.0.5 Acceptance Criteria
 
 - [ ] Static validation passes.
 - [ ] Package validation passes.
+- [ ] Runtime fixture validation passes on the supported Factorio `2.1.x` binary.
 - [ ] `docs/todo.md` is included in the package.
 - [ ] `docs/api-proof-points.md` is included in the package.
 - [ ] `docs/manual-test-plan.md` is included in the package.
 - [ ] README, docs, changelog, and package agree on release scope.
-- [ ] No runtime feature claims are made without runtime/manual validation.
+- [ ] Runtime feature claims are backed by manual/runtime validation.
 - [ ] `dist/more-infinite-research_2.0.5.zip` is rebuilt from committed source.
 - [ ] Changelog has an entry matching `info.json` version.
 - [ ] Zip filename and internal `info.json` version match `info.json`.
 - [ ] Zip excludes dev-only files and includes required docs/source/locale/control files.
 - [ ] Git tree is clean after build.
 
-### API And ID Verification
+### v2.0.5 API And ID Verification
 
 - [x] Confirm Tesla gun, Tesla ammo, and Tesla turret use `ammo_category = "tesla"` in installed Space Age prototypes.
 - [x] Confirm discharge defense uses `ammo_category = "electric"` in base prototypes.
@@ -70,35 +88,21 @@ These must be complete before publishing v2.0.5 as a stabilization/docs/package-
 - [x] Confirm vanilla Space Age `rocket-fuel-productivity` owns `rocket-fuel`, `rocket-fuel-from-jelly`, and `ammonia-rocket-fuel`.
 - [ ] Re-check official API docs before release if Factorio updates past the local validation version.
 
-### Branch-State Check Before Push/Tag
-
-- [ ] Run `git status --short --branch`.
-- [ ] Run `git log --oneline --decorate --graph --max-count=8`.
-- [ ] Run `git branch -vv`.
-- [ ] Confirm the intended commits are reachable from `dev`.
-- [ ] Confirm whether `dev` is ahead of `origin/dev` before pushing or tagging.
-
-## v2.1.0 Runtime Release
-
-These must be complete before publishing scripted-tech features.
-
-### Scripted-Tech Framework
+### v2.0.5 Scripted-Tech Framework
 
 - [ ] Review `storage` layout for long-term stability and document every key in `docs/architecture.md`.
 - [ ] Confirm spoilage baseline capture cannot compound MIR's own multiplier across load/configuration cycles.
 - [ ] Decide whether research reversal should restore baseline immediately when no forces have levels.
 - [ ] Confirm behavior when another mod also writes `game.difficulty_settings.spoil_time_modifier`.
 - [ ] Store only MIR's own applied spoilage multiplier and remove/divide it out before recalculating when possible.
-- [ ] Store last applied agricultural multiplier per force if existing plant rescale is implemented.
 - [ ] Handle `on_init`.
 - [ ] Handle `on_configuration_changed`.
 - [ ] Handle `on_research_finished`.
 - [ ] Handle `on_research_reversed`.
 - [ ] Handle `on_technology_effects_reset`.
-- [ ] Handle `on_runtime_mod_setting_changed` if runtime settings are introduced.
 - [ ] Confirm static validation fails on accidental `on_tick` or `script.on_nth_tick`.
 
-### Spoilage Preservation Manual Blockers
+### v2.0.5 Spoilage Preservation Manual Blockers
 
 - [ ] Fresh Space Age save: confirm `research_spoilage_preservation` appears, researches, and displays the scripted effect text.
 - [ ] Newly created spoilable items: confirm effect after `game.difficulty_settings.spoil_time_modifier` changes.
@@ -112,115 +116,117 @@ These must be complete before publishing scripted-tech features.
 - [ ] Spoilage preservation multi-force behavior: confirm highest non-enemy/non-neutral force level behavior.
 - [ ] Changelog wording states the measured existing-stack behavior plainly.
 
-### Agricultural Growth Speed Manual Blockers
+### v2.0.5 Agricultural Growth Speed Manual Blockers
 
 - [ ] Fresh Space Age save: confirm `research_agricultural_growth_speed` appears, researches, and displays the scripted effect text.
 - [ ] Agricultural tower event path: confirm a newly planted crop has its remaining growth time shortened.
 - [ ] Agricultural growth cap: confirm extreme researched levels clamp to the documented `10x` cap.
-- [ ] Existing tower-owned plants: decide whether they remain out of scope or are rescaled.
-- [ ] If existing plant rescale is added, prove it is bounded and deduplicated.
-- [ ] Large Gleba farm: test thousands of tower-owned plants and confirm no visible performance issue.
+- [ ] Existing tower-owned plants remain out of scope for `v2.0.5`, unless a bounded/deduplicated rescale is proven small.
+- [ ] Large Gleba farm: test many newly planted crops and confirm no visible performance issue.
 - [ ] No Space Age save: confirm scripted streams skip cleanly.
 
-### Compatibility Validation
+### Branch-State Check Before Push/Tag
 
-- [ ] Base game only.
-- [ ] Elevated Rails only.
-- [ ] Recycler only.
-- [ ] Quality enabled with dependencies.
-- [ ] Space Age enabled.
-- [ ] Space Age with Quality disabled where Factorio permits it.
-- [ ] Custom science pack fixture.
-- [ ] Custom lab fixture.
-- [ ] Late recipe fixture.
-- [ ] Maraxis-like duplicate cargo landing pad technology fixture or manual test.
-- [ ] Krastorio 2 Spaced Out test if compatible with the active Factorio line.
-- [ ] Better Robots Extended smoke test.
+- [ ] Run `git status --short --branch`.
+- [ ] Run `git log --oneline --decorate --graph --max-count=8`.
+- [ ] Run `git branch -vv`.
+- [ ] Confirm the intended commits are reachable from `dev`.
+- [ ] Confirm whether `dev` is ahead of `origin/dev` before pushing or tagging.
 
-### Documentation And Release Text
-
-- [ ] Update `docs/test-results.md` with manual gameplay validation results.
-- [ ] Update `docs/compatibility.md` with confirmed scripted-tech behavior.
-- [ ] Update `docs/architecture.md` with final storage keys and event handlers.
-- [ ] Update `README.md` for v2.1.0 behavior after testing.
-- [ ] Finalize `changelog.txt` with measured caveats, not guesses.
-- [ ] Add a mod portal/reddit release note that clearly says what is out of scope.
-- [ ] Stable generated technology IDs are preserved or migrations are documented.
-- [ ] Generate or record base + Space Age generated technology names and compare against the previous snapshot before release.
-
-### Packaging
+### v2.0.5 Packaging
 
 - [ ] Run `.\scripts\Build-MIRPackage.ps1`.
 - [ ] Run `.\scripts\Invoke-MIRValidation.ps1 -StaticOnly`.
 - [ ] Run `.\scripts\Invoke-MIRValidation.ps1 -FactorioBin "C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe"`.
 - [ ] Run `git diff --check`.
-- [ ] Confirm `dist/<mod-name>_<version>.zip` has matching source/docs/locale parity.
-- [ ] Confirm git tree is clean after final release commit.
+- [ ] Copy the zip to a normal Factorio mods folder and confirm Factorio sees it.
+- [ ] Record validation results in `docs/test-results.md`.
+- [ ] Commit docs, code, changelog, and package together for the tested candidate.
 
-## v2.1.0 Nice-To-Have, Do Not Block Release
+## v2.1.0 Larger Feature Wave
 
-- [ ] Add a small in-game diagnostics command or clearer debug log for current scripted multipliers.
-- [ ] Add a one-page manual testing recipe for spoilage preservation and growth speed.
-- [ ] Create a tiny test save specifically for scripted agriculture validation.
-
-## v2.1.x Spike Queue
-
-Do these only as bounded investigations. Do not merge into a feature release unless the result is clean, tested, and small.
-
-| Spike | Question | Expected outcome |
-| --- | --- | --- |
-| Thruster fuel productivity | Does recipe productivity apply cleanly to `thruster-fuel` recipes? | Ship in v2.1.x if clean |
-| Thruster oxidizer productivity | Does recipe productivity apply cleanly to `thruster-oxidizer` recipes? | Same as fuel |
-| Oil processing productivity | Do fluid-only and mixed fluid recipes behave correctly with recipe productivity? | Ship later only with proof |
-| Agricultural yield | Can harvest yield be changed with an event-only no-scan design? | Defer unless balance and event behavior are clean |
-| High-throughput pump | Can a prototype unlock safely replace five parallel pumps? | v2.1.x candidate |
-| Pipeline extent | Which fluidboxes need mutation and what compatibility risk exists? | v2.1.x candidate, disabled by default |
-| Duplicate native modifiers | Can MIR detect overlapping infinite cargo/logistics technologies generically? | v2.1.x compatibility feature |
-| Settings presets | Can presets be implemented without surprising existing configs? | v2.1.0 ship candidate |
-
-## v2.1.0 Planned Work
-
-v2.1.0 should be the first post-v2.0 runtime feature release.
+`v2.1.0` should take the harder work after `v2.0.5` feedback. It can also absorb any `v2.0.5` feature that fails proof.
 
 ### v2.1.0 Ship Candidates
 
 - [ ] Settings presets: Vanilla-respectful, Megabase-balanced, Unlimited sandbox.
-- [ ] Scripted-tech framework.
-- [ ] Spoilage preservation after manual validation.
-- [ ] Agricultural growth speed after manual validation.
-- [ ] Scripted-tech diagnostics.
-- [ ] Engine/electric-engine productivity verification.
+- [ ] Existing agricultural plant rescale if bounded and deduplicated.
+- [ ] Scripted-tech diagnostics improvements after `v2.0.5` feedback.
+- [ ] High-throughput pump / Der Pump if prototype proof is clean.
+- [ ] Pipeline extent startup setting if compatibility proof is clean.
+- [ ] Thruster fuel productivity if recipe-productivity proof is clean.
+- [ ] Thruster oxidizer productivity if recipe-productivity proof is clean.
+- [ ] Oil/fluid recipe productivity if in-game proof is clean.
+- [ ] Duplicate native modifier detection for cargo/logistics overlap.
+- [ ] Maraxis-like duplicate cargo landing pad fixture or manual test.
+- [ ] Krastorio 2 Spaced Out test if compatible with the active Factorio line.
+- [ ] Better Robots Extended smoke test.
 - [ ] Compatibility docs and manual runtime test results.
 
 ### v2.1.0 Acceptance Criteria
 
-- [ ] Every shipped v2.1.0 feature has a clear implementation type: native modifier, recipe productivity, scripted event, prototype unlock, or startup setting.
-- [ ] No shipped v2.1.0 feature uses broad `on_tick` scanning.
-- [ ] Existing spoilable-stack behavior is tested and documented.
+- [ ] Every shipped feature has a clear implementation type: native modifier, recipe productivity, scripted event, prototype unlock, or startup setting.
+- [ ] No shipped feature uses broad `on_tick` scanning.
+- [ ] Any deferred `v2.0.5` scripted feature has its blocker closed or remains disabled/deferred.
 - [ ] Every scripted feature documents storage keys, recomputation events, disable behavior, reversal behavior, and multi-force behavior.
 - [ ] Any new recipe-productivity stream proves exact recipe IDs and no vanilla/other-mod infinite duplicate.
 - [ ] Every startup prototype setting documents when it is applied and why it cannot be runtime research.
 - [ ] Compatibility tests include no Space Age, Space Age, Space Age without Quality where supported, custom science/lab fixtures, and at least one large overhaul if available.
 - [ ] README, roadmap, compatibility docs, test results, and changelog are updated before release.
 
-## Legacy v1.9.0 Backport After v2.1.0
+## v2.1.5 Quick Feedback Patch
 
-Do not reconstruct v2.0.0 or v2.0.5 commit-by-commit for `legacy`. The planned legacy release is More Infinite Research v1.9.0 for Factorio `2.0.x`, ported from the finished More Infinite Research v2.1.0 release commit for Factorio `2.1.x`.
+Use `v2.1.5` for small fixes after `v2.1.0`.
 
-### Backport Setup
+- [ ] Fix bugs reported against `v2.1.0`.
+- [ ] Add small compatibility profiles only when the missing recipes/prototypes are concrete.
+- [ ] Add proven recipe IDs to existing streams when no new architecture is needed.
+- [ ] Add locale/docs/validation updates.
+- [ ] Rebalance costs or defaults for features already shipped in `v2.1.0`.
+- [ ] Backport the tested snapshot as `v1.9.5` after validation.
 
-- [ ] Finish and validate v2.1.0 on the Factorio `2.1` line.
-- [ ] Tag or branch the exact v2.1.0 source point, or record the exact release commit hash.
+## v2.2.0 Larger Feature Wave
+
+Use `v2.2.0` for the next larger batch after the `v2.1.x` feedback cycle.
+
+- [ ] Revisit pump/fluid/logistics work that was too large for `v2.1.0`.
+- [ ] Revisit advanced settings UX if presets are not enough.
+- [ ] Revisit bounded scripted research ideas after the framework has proven stable.
+- [ ] Decide which growing ideas should split to companion mods.
+
+## Legacy Backports
+
+Do not reconstruct old releases commit-by-commit for `legacy`. A legacy release is a compatibility port of a tested current-line snapshot.
+
+### v1.9.0 Backport After v2.1.0
+
+- [ ] Finish and validate `v2.1.0` on the Factorio `2.1` line.
+- [ ] Tag or branch the exact `v2.1.0` source point, or record the exact release commit hash.
 - [ ] Run `git fetch origin`.
 - [ ] Run `git checkout -b backport/legacy-1.9.0 origin/legacy`.
 - [ ] Run `git merge --no-ff --no-commit v2.1.0`, or `git merge --no-ff --no-commit <v2.1.0-release-commit>` if using a commit hash.
 - [ ] Do not cherry-pick a guessed subset unless the full snapshot merge fails and the fallback is documented.
-- [ ] Prefer v2.1.0 source for shared generator, diagnostics, science-pack handling, recipe matching, compatibility cleanup, validation scripts, docs structure, and localization.
-- [ ] Keep `data-final-fixes.lua` generation, lab-input science-pack discovery, lab incompatibility policy, science-pack ingredient policy, recipe matching, diagnostics, base-tech extension safety, opportunistic compatibility cleanup, validation/package parity tooling, docs structure, and locale structure unless Factorio `2.0` validation proves a specific incompatibility.
+- [ ] Prefer current-line source for shared generator, diagnostics, science-pack handling, recipe matching, compatibility cleanup, validation scripts, docs structure, and localization.
+
+### v1.9.5 Backport After v2.1.5
+
+- [ ] Finish and validate `v2.1.5`.
+- [ ] Snapshot or merge the tested `v2.1.5` source point into a temporary legacy backport branch.
+- [ ] Apply the same Factorio `2.0` compatibility patch rules as `v1.9.0`.
+- [ ] Build `dist/more-infinite-research_1.9.5.zip`.
+- [ ] Validate with a Factorio `2.0.x` binary.
+
+### v1.9.9 Final Factorio 2.0 Backport
+
+- [ ] At the Factorio `2.1` stable cutoff target around the end of March, identify the latest tested MIR `2.x.x` release.
+- [ ] Backport that latest tested source snapshot to `legacy`.
+- [ ] Set the legacy mod version to `1.9.9`.
+- [ ] Treat `1.9.9` as the final planned Factorio `2.0` release.
+- [ ] Verify the actual Factorio `2.1` stable status before making final-support claims.
 
 ### Legacy Compatibility Patch
 
-- [ ] Set `info.json` version to `1.9.0`.
+- [ ] Set `info.json` version to the target `1.9.x` version.
 - [ ] Set `info.json` `factorio_version` to `2.0`.
 - [ ] Set `info.json` dependencies to the legacy target: `base >= 2.0` and `? space-age`.
 - [ ] Remove `base >= 2.1.x` from legacy.
@@ -229,10 +235,9 @@ Do not reconstruct v2.0.0 or v2.0.5 commit-by-commit for `legacy`. The planned l
 - [ ] Remove or guard `research_cargo_landing_pad_count`.
 - [ ] Confirm static validation fails if legacy direct-effect stream definitions still contain `max-cargo-bay-unloading-distance` or `cargo-landing-pad-count`.
 - [ ] Verify whether agricultural tower events and `tick_grown` are available in the target Factorio `2.0.x` build before keeping scripted agriculture.
-- [ ] Verify whether any v2.1.0 pump or pipeline prototype fields exist in Factorio `2.0.x` before keeping them.
-- [ ] Rewrite `changelog.txt` as a `1.9.0` legacy backport entry, not a copied v2.1.0 entry.
+- [ ] Verify whether any pump or pipeline prototype fields exist in Factorio `2.0.x` before keeping them.
+- [ ] Rewrite `changelog.txt` as a legacy backport entry, not a copied current-line entry.
 - [ ] Update README and compatibility docs to state what is excluded from legacy.
-- [ ] Build `dist/more-infinite-research_1.9.0.zip`.
 
 ### Legacy Validation
 
@@ -250,7 +255,7 @@ Do not reconstruct v2.0.0 or v2.0.5 commit-by-commit for `legacy`. The planned l
 
 ## Companion Mod Backlog
 
-These are intentionally not v2.0.5 or v2.1.0 MIR core work.
+These are intentionally not `v2.0.5` or `v2.1.0` MIR core work.
 
 - [ ] Cold Chain / CryoPants: freezer chest, freeze/thaw recipes, refrigerated transport, freshness penalty.
 - [ ] Advanced Agriculture: greenhouse, off-world fruit, heating constraints, artificial soil loops.

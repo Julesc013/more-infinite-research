@@ -2,7 +2,30 @@
 
 This file records local release-candidate validation runs. It is not a substitute for the manual mod matrix in `docs/compatibility.md`.
 
-## 2026-07-01 Legacy Backport Planning and Branch-Aware Validation
+## 2026-07-01 Release Cadence Correction
+
+Environment:
+
+- Mod version `2.0.5`.
+- Release archive: `dist/more-infinite-research_2.0.5.zip`.
+
+Commands:
+
+```powershell
+.\scripts\Build-MIRPackage.ps1
+.\scripts\Invoke-MIRValidation.ps1 -StaticOnly
+git diff --check
+```
+
+Results:
+
+- Updated the docs back to the intended cadence: `v2.0.5` is the quick feedback patch for easy validated changes, `v2.1.0` is the larger feature wave, `v1.9.0` is backported from `v2.1.0`, `v2.1.5` can backport to `v1.9.5`, and `v1.9.9` is reserved as the final planned Factorio `2.0` port from the latest tested `2.x.x` snapshot at the Factorio `2.1` stable cutoff target.
+- Rebuilt the `2.0.5` release archive after README, roadmap, TODO, compatibility, API proof, manual-test, post-2.0 planning, changelog, and test-results updates.
+- Static validation passed with package/source/docs parity.
+- `git diff --check` passed.
+- Runtime validation was not rerun for this correction because the changes were documentation, changelog, and rebuilt-package parity only.
+
+## 2026-07-01 Release Cadence and Branch-Aware Validation
 
 Environment:
 
@@ -20,7 +43,7 @@ git diff --check
 
 Results:
 
-- Rebuilt the `2.0.5` release archive after README/docs updates for the future `v2.1.0 -> v1.9.0` legacy backport strategy and the v2.0.5/v2.1.0 release split.
+- Rebuilt the `2.0.5` release archive after README/docs updates for the release cadence: `v2.0.5` quick feedback patch, `v2.1.0` larger feature wave, `v2.1.0 -> v1.9.0` first legacy port, later `v2.1.5 -> v1.9.5`, and final `v1.9.9` legacy port from the latest tested `2.x.x` snapshot.
 - Static validation passed with the new branch-aware metadata check.
 - Static validation passed with the new no-`on_tick` control-stage guard.
 - Package validation now requires `docs/api-proof-points.md` and `docs/manual-test-plan.md`.
@@ -41,12 +64,12 @@ Representative validation harness evidence:
 [ok] Validation completed.
 ```
 
-## 2026-07-01 v2.1.0-Bound Scripted-Tech Slice
+## 2026-07-01 v2.0.5 Candidate Scripted-Tech Slice
 
 Environment:
 
 - Factorio `2.1.8` build `86744`, Windows Steam, Space Age install.
-- Mod version metadata `2.0.5`; scripted runtime work is now treated as v2.1.0-bound until manual save validation is complete.
+- Mod version metadata `2.0.5`; scripted runtime work is a `v2.0.5` ship candidate and requires manual save validation before final release claims.
 - Release archive: `dist/more-infinite-research_2.0.5.zip`.
 
 Commands:
@@ -64,7 +87,7 @@ Results:
 - The existing Space Age fixture scenarios loaded with the new scripted technology manager present.
 - Space Age fixture validation now asserts that MIR skips parallel productivity streams for vanilla-owned `processing-unit-productivity`, `low-density-structure-productivity`, `plastic-bar-productivity`, and `rocket-fuel-productivity`.
 - Static validation now asserts that electric shooting speed includes both the Space Age `tesla` ammo category and the older `electric` ammo category.
-- Manual gameplay validation is still required before public runtime feature release claims: spoilage deadline behavior, research reversal/configuration changes in a live save, multiple-force behavior, existing spoilable stacks, and agricultural tower planting on a large Gleba farm.
+- Manual gameplay validation is still required before final `v2.0.5` runtime feature claims: spoilage deadline behavior, research reversal/configuration changes in a live save, multiple-force behavior, existing spoilable stacks, and agricultural tower planting on a large Gleba farm.
 
 Representative validation harness evidence:
 

@@ -6,9 +6,12 @@ Release-line summary:
 
 | MIR release | Factorio line | Scope |
 | --- | --- | --- |
-| `2.0.5` | `2.1.x` | stabilization, docs, package parity, validation hardening |
-| `2.1.0` | `2.1.x` | settings presets and validated scripted agriculture/spoilage runtime features |
+| `2.0.5` | `2.1.x` | quick feedback patch: small fixes, validated scripted agriculture/spoilage slice, docs, validation, package parity |
+| `2.1.0` | `2.1.x` | larger feature wave: presets, broader scripted refinements, logistics/fluid/productivity features that pass proof |
 | `1.9.0` | `2.0.x` | compatible subset backported from the tested `2.1.0` snapshot |
+| `2.1.5` | `2.1.x` | quick feedback patch after `2.1.0` |
+| `1.9.5` | `2.0.x` | compatible subset backported from the tested `2.1.5` snapshot |
+| `1.9.9` | `2.0.x` | final planned Factorio 2.0 port from the latest tested `2.x.x` snapshot at the Factorio 2.1 stable cutoff target around the end of March |
 
 The release goal is graceful compatibility without mod-page dependency clutter: compatible mods should work when their prototypes are visible, absent mods should be skipped cleanly, and no compatibility mod should be required for this mod to load.
 
@@ -26,7 +29,7 @@ The release goal is graceful compatibility without mod-page dependency clutter: 
 - Cargo bay unloading distance research uses Factorio 2.1.8's `max-cargo-bay-unloading-distance` technology modifier, uses official base and Space Age science packs only, and is skipped unless Space Age is active and the `landing-pad-unloading-bay` prototypes exist.
 - Cargo landing pad count research uses `cargo-landing-pad-count`, uses official base and Space Age science packs only, is disabled by default, requires the vanilla `rocket-silo` cargo landing pad unlock, and is skipped unless Space Age is active and the `cargo-landing-pad` prototype exists.
 - Spoilage preservation and agricultural growth speed are implemented in `dev` as visible `nothing` technology effects plus bounded runtime behavior through the control-stage scripted technology manager.
-- The release plan treats those scripted runtime features as `v2.1.0`-bound until manual save validation proves existing-stack behavior, research reversal, disabling, and multi-force behavior.
+- The release plan treats those scripted runtime features as `v2.0.5` ship candidates. They can ship in `v2.0.5` when manual save validation proves existing-stack behavior, research reversal, disabling, multi-force behavior, and the agricultural tower event path. Any unsafe or unclear behavior is deferred to `v2.1.0`.
 - Spoilage preservation changes the global spoil time modifier and recomputes on init, configuration change, research finish/reversal, and technology effects reset.
 - Agricultural growth speed adjusts newly planted agricultural tower plants from the tower planting event and does not rescan existing farms in this first implementation slice.
 - Mod-specific stream changes should live in `prototypes/compat/profiles.lua` instead of the base stream definitions.
@@ -48,7 +51,7 @@ This is especially relevant for cargo landing pad count, cargo bay unloading dis
 
 ## Legacy Backport Model
 
-The planned Factorio `2.0` legacy release is More Infinite Research `v1.9.0`, backported from the finished More Infinite Research `v2.1.0` Factorio `2.1` codebase.
+The planned Factorio `2.0` legacy release is More Infinite Research `v1.9.0`, backported from the finished More Infinite Research `v2.1.0` Factorio `2.1` codebase. Later quick patch backports can follow the same model, such as `v2.1.5 -> v1.9.5`, with `v1.9.9` reserved as the final planned Factorio `2.0` build from the latest tested `2.x.x` snapshot at the Factorio `2.1` stable cutoff target around the end of March. Verify the actual Factorio stable status before publishing final-support wording.
 
 Legacy should not be rebuilt commit-by-commit from v2.0.0 or v2.0.5. It should be the current MIR generator, diagnostics, recipe matching, science-pack handling, compatibility cleanup, docs structure, locale, and validation infrastructure with Factorio `2.1`-only surface area removed or guarded.
 
@@ -100,7 +103,7 @@ Large mod packs and utility mods such as Alien Biomes, Informatron, Jetpack, AAI
 - Lab validation prevents impossible research ingredients, but it cannot infer every overhaul mod's intended progression.
 - Recipe productivity technologies remain bounded by Factorio's recipe productivity cap even when research levels are infinite.
 - Vanilla Space Age productivity technologies remain authoritative for processing units, low density structures, plastic, and rocket fuel where they already own all matching recipes.
-- Existing prototype IDs are kept stable unless a tested migration is provided. The v2.1.0-bound scripted runtime implementation adds control-stage storage under the More Infinite Research namespace.
+- Existing prototype IDs are kept stable unless a tested migration is provided. The `v2.0.5` scripted runtime candidate adds control-stage storage under the More Infinite Research namespace.
 - Runtime scripted features avoid per-tick scanning by default. If a future feature needs active scanning, it should be disabled by default, clearly labeled experimental, or split into a companion mod.
 - Scripted technologies must document storage keys, recomputation triggers, reversal behavior, disabling behavior, and multi-force behavior before implementation.
 

@@ -22,7 +22,7 @@ This order gives the mod the best practical view of recipes, labs, science packs
 
 ## Control Stage Boundary
 
-The current `dev` branch includes a small `control.lua` surface for scripted technologies such as spoilage preservation and agricultural growth speed. The release plan treats these runtime features as `v2.1.0`-bound until manual save validation is complete.
+The current `dev` branch includes a small `control.lua` surface for scripted technologies such as spoilage preservation and agricultural growth speed. These runtime features are `v2.0.5` ship candidates because they are bounded and event-driven, but each claimed behavior must pass the named manual save validation before release. Any behavior that fails proof moves to `v2.1.0`.
 
 The runtime layer is intentionally narrow:
 

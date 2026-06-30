@@ -33,10 +33,11 @@ Official Factorio API references should be rechecked before a release if the loc
 
 | Claim | Required test | Target |
 | --- | --- | --- |
-| Changing `spoil_time_modifier` affects newly created spoilable items exactly as expected | Create spoilable items before and after research; compare spoil deadlines | v2.1.0 |
-| Changing `spoil_time_modifier` affects existing belts/chests/labs/rockets/platform inventories | Use named manual save with existing stacks in each location | v2.1.0 |
-| Existing partially spoiled stacks recalculate or keep fixed spoil deadlines | Save with partially spoiled stacks before research | v2.1.0 |
-| Existing agricultural tower plants can be rescaled safely | Research/reverse growth tech in a large farm and dedupe owned plants | v2.1.x unless proven small |
+| Changing `spoil_time_modifier` affects newly created spoilable items exactly as expected | Create spoilable items before and after research; compare spoil deadlines | v2.0.5 |
+| Changing `spoil_time_modifier` affects existing belts/chests/labs/rockets/platform inventories | Use named manual save with existing stacks in each location | v2.0.5 if claiming existing-stack behavior; otherwise document limitation |
+| Existing partially spoiled stacks recalculate or keep fixed spoil deadlines | Save with partially spoiled stacks before research | v2.0.5 if claiming existing-stack behavior; otherwise document limitation |
+| Newly planted agricultural tower crops receive the growth-speed adjustment | Plant tower crops after research and compare `tick_grown` / observed growth time | v2.0.5 |
+| Existing agricultural tower plants can be rescaled safely | Research/reverse growth tech in a large farm and dedupe owned plants | v2.1.0 unless proven small |
 | `change-recipe-productivity` works cleanly for thruster fuel/oxidizer fluid recipes | Throwaway recipe-productivity test and runtime fixture | v2.1.x spike |
 | `change-recipe-productivity` works cleanly for oil/fluid-output recipes | Throwaway oil productivity test and runtime fixture | v2.1.x spike |
 | Factorio `2.0.x` exposes the agricultural tower events and fields needed by scripted agriculture | Validate on a Factorio `2.0.x` binary during legacy port | v1.9.0 |

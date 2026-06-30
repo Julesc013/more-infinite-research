@@ -11,12 +11,16 @@ The core conclusion is:
 Release discipline update:
 
 ```text
-v2.0.5 = stabilization, docs, package parity, validation hardening.
-v2.1.0 = settings presets, scripted-tech framework, spoilage preservation, agricultural growth speed.
+v2.0.5 = quick feedback patch: small/easy fixes, scripted agriculture/spoilage if manual proof passes, docs, validation, package parity.
+v2.1.0 = larger feature wave: presets, broader scripted refinements, pump/fluid/logistics/productivity work that passes proof.
 v1.9.0 = Factorio 2.0 compatible subset backported from the tested v2.1.0 snapshot.
+v2.1.5 = quick feedback patch after v2.1.0.
+v1.9.5 = Factorio 2.0 compatible subset backported from the tested v2.1.5 snapshot.
+v2.2.0 = next larger feature wave.
+v1.9.9 = final planned Factorio 2.0 backport from the latest tested v2.x.x snapshot at the Factorio 2.1 stable cutoff target around the end of March.
 ```
 
-The scripted technology implementation exists in `dev`, but public release claims should be treated as `v2.1.0`-bound until the manual save matrix proves the behavior.
+The scripted technology implementation exists in `dev` as a `v2.0.5` ship candidate. Public release claims should be made only for the specific behaviors proven by the manual save matrix. Anything that fails proof moves to `v2.1.0`.
 
 The Reddit thread was not one feature request. It was a roadmap dump. The useful split is:
 
@@ -109,7 +113,7 @@ These should come before or alongside new content.
 
 | Feature | Add? | Notes |
 | --- | ---: | --- |
-| Scripted-tech framework | Started in `dev`; v2.1.0-bound | Required for spoilage/growth and future non-native effects. |
+| Scripted-tech framework | Started in `dev`; v2.0.5 ship candidate | Required for spoilage/growth and future non-native effects. |
 | Settings presets | Yes | The thread shows users want "add more infinite research like vanilla" as well as sandbox behavior. |
 | Feature categories in settings | Yes | Group by Productivity, Character, Logistics, Cargo, Agriculture, Scripted, Sandbox. |
 | Compatibility matrix | Yes | Users asked about Maraxis and Krastorio 2 Spaced Out. |
@@ -140,20 +144,22 @@ Preset: Unlimited sandbox
 
 Preset first, advanced toggles second.
 
-### P1: v2.1.0 Agriculture And Preservation
+### P1: v2.0.5 Quick Agriculture And Preservation
 
 Ship:
 
 - Scripted-tech framework.
-- Spoilage preservation.
-- Agricultural growth speed.
-- Settings presets, if small enough to land safely.
+- Spoilage preservation if manual proof passes.
+- Agricultural growth speed for newly planted tower crops if manual proof passes.
+- Electric Shooting Speed `tesla` ammo-category correction.
+- Duplicate recipe-productivity skipping so vanilla Space Age productivity techs stay authoritative.
 - Better feature descriptions and setting labels.
 - Compatibility diagnostics for scripted/global effects.
 - Documentation of global/per-force behavior, caps, and removal behavior.
 
 Spike only:
 
+- Existing agricultural plant rescale.
 - Agricultural yield, disabled by default.
 - Thruster fuel and oxidizer productivity if validation is clean and the scope stays small.
 - Oil/fluid recipe productivity.
@@ -173,34 +179,38 @@ Document only, defer, or split:
 This release should be treated as:
 
 ```text
-v2.1.0 theme:
-Scripted research foundation + Space Age agriculture scaling.
+v2.0.5 theme:
+Quick feedback patch for easy, bounded, validated improvements.
 ```
 
-### P2: v2.0.6 Logistics QoL
+### P2: v2.1.0 Larger Feature Wave
 
 Ship:
 
+- Settings presets.
 - High-throughput pump, optional.
 - Pipeline extent startup setting, disabled by default.
 - Fluid train unloading notes/docs.
 - Thruster fuel/oxidizer productivity coverage if recipe-productivity tests pass in a later v2.1.x spike.
+- Existing agricultural plant rescale if bounded and deduplicated.
+- Duplicate native modifier detection.
 
 Maybe ship:
 
 - "Der Pump" as a large late-game pump variant if it does not dilute MIR's identity.
 
-### P3: v2.0.7 Productivity Coverage And Compatibility
+### P3: v2.1.5 Quick Feedback Patch
 
 Ship:
 
+- Bug fixes and compatibility feedback from v2.1.0.
 - Engine/electric engine productivity verification.
 - Oil processing productivity test result.
 - Biochamber recipe productivity support where valid.
 - Modded recipe diagnostics.
 - Maraxis and Krastorio 2 Spaced Out compatibility testing when those targets are available for the active Factorio line.
 
-### P4: v2.1.0 Or Companion Mods
+### P4: v2.2.0 Or Companion Mods
 
 Split out if needed:
 
@@ -347,7 +357,7 @@ The scripted manager should handle:
 - `on_technology_effects_reset`
 - `on_runtime_mod_setting_changed`, only if runtime toggles are added
 
-`control.lua` was introduced in the first scripted runtime implementation slice on `dev`. The public release plan treats it as v2.1.0-bound until manual save validation is complete. Keep `docs/architecture.md`, package validation, and existing-save validation aligned as the scripted manager grows.
+`control.lua` was introduced in the first scripted runtime implementation slice on `dev`. The public release plan treats it as a v2.0.5 ship candidate, with each claimed behavior gated by manual save validation. Keep `docs/architecture.md`, package validation, and existing-save validation aligned as the scripted manager grows.
 
 ## Scripted Feature Lifecycle Requirements
 
@@ -687,7 +697,7 @@ Avoid a scripted "multiply platform speed" hack.
 
 This is a separate chaos mod or disabled experiment. The idea could be funny, but the UPS and balance risk are too high for MIR core.
 
-## Acceptance Criteria For v2.1.0 Scripted Runtime
+## Acceptance Criteria For v2.0.5 Scripted Runtime Candidates
 
 ### Scripted-Tech Framework
 
@@ -695,14 +705,14 @@ This is a separate chaos mod or disabled experiment. The idea could be funny, bu
 - Scripted features are registered through one manager instead of scattered handlers.
 - Research finish, reversal, technology effects reset, init, and configuration changed all route through the same recomputation path.
 - Each scripted feature declares settings, required prototypes/mods, event handlers, and diagnostics.
-- No `on_tick` handler is added for v2.1.0 features.
+- No `on_tick` handler is added for v2.0.5 scripted features.
 
 ### Spoilage Preservation
 
 - Technology appears only when Space Age spoilage support is available.
 - The technology uses a visible `nothing` effect with localized description.
 - Research completion, reversal, and configuration changes recompute the effective modifier.
-- Existing saves load cleanly from earlier v2.0.x releases to v2.1.0.
+- Existing saves load cleanly from earlier MIR releases to v2.0.5.
 - Multiple-force behavior is documented and manually tested.
 - The feature can be disabled via startup setting or preset-derived default.
 - Disabling the feature restores or stops applying MIR's own multiplier as far as the stored baseline allows.
@@ -762,7 +772,7 @@ Popular quality/module mods
 Popular refrigeration/spoilage mods
 ```
 
-New v2.1.0 validation should add:
+New v2.0.5 validation should add for the quick scripted candidates:
 
 - Space Age with spoilage preservation enabled.
 - Space Age with agricultural growth speed enabled.
@@ -770,15 +780,18 @@ New v2.1.0 validation should add:
 - Research-level-change test for tower-planted growth adjustment.
 - Existing-save load with new `control.lua`.
 - Disable/remove mod behavior for spoilage baseline restoration.
-- Runtime fixture or manual test for `thruster-fuel` and `thruster-oxidizer` productivity.
 - Space Age without Quality where Factorio permits it.
+
+New v2.1.0 validation should add for larger features:
+
+- Runtime fixture or manual test for `thruster-fuel` and `thruster-oxidizer` productivity.
 - Maraxis or other cargo-pad mods when updated to Factorio 2.1.
 - Krastorio 2 Spaced Out or equivalent large overhaul once compatible with the target Factorio version.
 
 Required named test saves/scenarios:
 
 - Fresh Space Age save, no other mods.
-- Existing v2.0.0 MIR save upgraded to v2.1.0.
+- Existing v2.0.0 MIR save upgraded to v2.0.5.
 - Save with spoilable items already on belts, in chests, in labs, in rockets, and on platforms.
 - Save with multiple player forces.
 - Large Gleba farm with thousands of tower-owned plants.
@@ -790,7 +803,7 @@ Required named test saves/scenarios:
 
 ## Factorio 2.0 Backport Reality
 
-The better backport target is the finished More Infinite Research v2.1.0 codebase for Factorio `2.1.x`, not v2.0.0 or v2.0.5 reconstructed commit-by-commit.
+The first backport target is the finished More Infinite Research v2.1.0 codebase for Factorio `2.1.x`, not v2.0.0 or v2.0.5 reconstructed commit-by-commit. Later backports should repeat the same snapshot-port model.
 
 Backport rule:
 
@@ -802,6 +815,8 @@ The planned mapping is:
 
 ```text
 More Infinite Research v2.1.0 on Factorio 2.1.x -> More Infinite Research v1.9.0 on Factorio 2.0.x
+More Infinite Research v2.1.5 on Factorio 2.1.x -> More Infinite Research v1.9.5 on Factorio 2.0.x
+Latest tested MIR v2.x.x at the Factorio 2.1 stable cutoff target around the end of March -> final MIR v1.9.9 on Factorio 2.0.x
 ```
 
 Be careful with the backport promise. The current 2.1 path can use clean agricultural tower events, cargo landing pad APIs, and any new v2.1.0 prototype unlocks. The 2.0 line may not have those APIs.
@@ -817,12 +832,12 @@ Best backport plan:
 
 ```text
 2.1 dev/main branch:
-- Full v2.1.0 feature set after validation.
+- Full current-line feature set after validation.
 
 2.0 legacy branch:
-- Merge/snapshot the exact v2.1.0 source point.
+- Merge/snapshot the exact tested current-line source point.
 - Keep shared generator, diagnostics, recipe matching, science-pack handling, compatibility cleanup, docs, locale, and validation infrastructure.
-- Restore Factorio 2.0 metadata and build as v1.9.0.
+- Restore Factorio 2.0 metadata and build as the matching v1.9.x legacy release.
 - Remove or guard cargo landing pad count/unloading distance.
 - Keep scripted agriculture, pump/pipeline features, and new recipe-productivity streams only when Factorio 2.0 validation proves support.
 ```
@@ -857,7 +872,7 @@ Before writing feature code:
 7. Add release notes that clearly distinguish MIR features from companion-mod ideas.
 8. Add duplicate-tech detection for overlapping native modifiers.
 9. Add performance labels to docs and setting descriptions for scripted/global/sandbox features.
-10. Produce a no-code proof for each v2.1.0 scripted feature before implementation.
+10. Produce a no-code proof for each scripted feature before claiming it in v2.0.5 or carrying it into v2.1.0.
 11. Identify exact setting keys and preset-derived defaults.
 12. Preserve stable generated technology names/IDs or document a migration.
 13. Split the work into reviewable task chunks or GitHub issues before coding.
@@ -892,7 +907,7 @@ Repository state:
 - Do not assume anything has been pushed unless git status proves it.
 
 Goal:
-Create a release-gated implementation plan for the next post-v2.0.0 work, especially v2.1.0. Do not write code yet.
+Create a release-gated implementation plan for the next post-v2.0.0 work, especially v2.0.5 quick-patch completion and v2.1.0 larger feature planning. Do not write code yet.
 
 Hard product boundaries:
 - More Infinite Research must remain focused on research-driven scaling.
@@ -905,7 +920,7 @@ Hard product boundaries:
 - Avoid optional third-party dependencies unless truly required.
 - Preserve stable generated technology names/IDs unless there is a documented migration.
 - Factorio 2.1 is the main target.
-- Factorio 2.0 backport work is a best-compatible subset on the legacy branch and must not block v2.1.0.
+- Factorio 2.0 backport work is a best-compatible subset on the legacy branch and must not block the current Factorio 2.1 release line.
 
 Feature eligibility rule:
 A feature belongs in More Infinite Research only if at least one is true:
@@ -943,7 +958,8 @@ Plan specifically around these candidate ideas:
 Produce the following, in order:
 
 1. Executive decision
-   - What should v2.1.0 actually ship?
+   - What should v2.0.5 actually ship?
+   - What should move to v2.1.0?
    - What should be spiked?
    - What should be deferred?
    - What should become companion mods?
@@ -961,7 +977,7 @@ Produce the following, in order:
    - Default enabled?
    - Target release
 
-3. v2.1.0 implementation ladder
+3. v2.0.5 completion ladder and v2.1.0 implementation ladder
    - Step-by-step order.
    - Each step must leave the mod loadable.
    - Separate infrastructure from content.
@@ -997,12 +1013,12 @@ Produce the following, in order:
    - why no per-tick scan is required
 
 6. Acceptance criteria
-   For each v2.1.0 feature, define measurable done criteria.
+   For each v2.0.5 and v2.1.0 feature, define measurable done criteria.
 
 7. Validation and test matrix
    Include:
    - fresh Space Age save
-   - existing v2.0.0 MIR save upgraded to v2.1.0
+   - existing v2.0.0 MIR save upgraded to v2.0.5 and then v2.1.0 where relevant
    - save with existing spoilable items in belts/chests/labs/rockets/platforms
    - save with many agricultural towers and plants
    - multi-force save
