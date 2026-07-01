@@ -26,7 +26,7 @@ Compatibility note:
 ## Quick Summary
 
 - **Recipe productivity:** adds infinite research for intermediate, logistics, combat, infrastructure, science-pack, and Space Age production chains.
-- **Direct-effect bonuses:** adds infinite research for cargo logistics, weapon speed, character bonuses, inventory, trash slots, and worker robot battery.
+- **Direct-effect bonuses:** adds infinite research for cargo logistics, weapon speed, character bonuses, combined character inventory/trash slots, and worker robot battery.
 - **Vanilla continuations:** extends selected finite vanilla technology chains into infinite continuations.
 - **Science-pack discovery:** reads active lab inputs, not the old `tool` prototype type.
 - **Lab validation:** checks generated research ingredients against real labs so technologies stay researchable.
@@ -137,7 +137,7 @@ Generated stream technologies use **stable prototype names**:
 recipe-prod-<stream-key>-1
 ```
 
-This naming is preserved for **v2.0.0** even for non-recipe direct-effect streams to avoid migrations.
+This naming was preserved for **v2.0.0** even for non-recipe direct-effect streams to avoid migrations. `v2.0.5` intentionally consolidates the old character logistic trash slot stream into character inventory slots and ships a tested JSON migration for that one generated technology ID.
 
 Generated base-technology extensions use the **vanilla technology chain name** and **next level**:
 
@@ -216,8 +216,7 @@ The scripted streams remain disabled by default in `v2.0.5`. Basic opt-in smoke 
 | `research_character_crafting_speed` | Character crafting speed | `character-crafting-speed` | `+5%` per level | Uses utility, military, agricultural, and electromagnetic science when available. |
 | `research_character_walking_speed` | Character walking speed | `character-running-speed` | `+5%` per level | Uses utility, military, agricultural, and electromagnetic science when available. |
 | `research_character_reach` | Character reach bonus | reach, build distance, resource reach, and item drop distance | `+10` each per level | Disabled by default. Uses a base-game-safe icon and available late-game science packs. |
-| `research_character_trash_slots` | Character logistic trash slots | `character-logistic-trash-slots` | `+1` slot per level | Growth factor default `1.10`. |
-| `research_inventory_capacity` | Character inventory slots | `character-inventory-slots-bonus` | `+1` slot per level | Disabled by default. Growth factor default `1.10`. |
+| `research_inventory_capacity` | Character inventory slots | `character-inventory-slots-bonus`; `character-logistic-trash-slots` | `+1` inventory slot and `+1` logistic trash slot per level | Growth factor default `1.10`. |
 | `research_robot_battery` | Worker robot battery | `worker-robot-battery` | `+10%` per level | Growth factor default `1.2`. |
 
 ### Vanilla Base-Technology Extensions
@@ -269,8 +268,7 @@ Per-stream default exceptions:
 | Shared stream default | Yes | `8000` | `2` | `60` | Infinite |
 | `research_spoilage_preservation` | No | `50000` | `1.5` | `120` | Infinite |
 | `research_agricultural_growth_speed` | No | `40000` | `1.5` | `90` | Infinite |
-| `research_inventory_capacity` | No | shared | `1.10` | shared | Infinite |
-| `research_character_trash_slots` | Yes | shared | `1.10` | shared | Infinite |
+| `research_inventory_capacity` | Yes | shared | `1.10` | shared | Infinite |
 | `research_robot_battery` | Yes | shared | `1.2` | shared | Infinite |
 | `research_cargo_bay_unloading_distance` | Yes | `100000` | `3` | `120` | Infinite |
 | `research_cargo_landing_pad_count` | No | `1000000` | `10` | `240` | Infinite |
@@ -345,6 +343,7 @@ Generic competing recipe-productivity cleanup is intentionally limited to **know
 | `control/scripted-techs.lua` | Registers scripted technology lifecycle and event handlers. |
 | `control/effects/spoilage-preservation.lua` | Applies and restores the global spoilage preservation multiplier. |
 | `control/effects/agricultural-growth-speed.lua` | Adjusts newly planted agricultural tower crops from researched growth speed. |
+| `migrations/more-infinite-research_2.0.5.json` | Maps the removed generated trash-slot technology ID into the combined inventory/trash technology ID. |
 | `data.lua` | Loads stable shared config and utility facades only. |
 | `data-updates.lua` | Reserved for future pre-final compatibility hooks. |
 | `data-final-fixes.lua` | Runs generation, cleanup, extensions, adjustments, max-level control, and diagnostics. |
@@ -504,4 +503,5 @@ If a generated technology is unresearchable:
 ## Save Compatibility
 
 No generated prototype IDs were renamed for **`v2.0.0`**.
+`v2.0.5` includes a JSON migration from `recipe-prod-research_character_trash_slots-1` to `recipe-prod-research_inventory_capacity-1` so old trash-slot progress moves into the combined inventory/trash research.
 **No migration is required** from `v1.2.9` (latest for Factorio 2.0).

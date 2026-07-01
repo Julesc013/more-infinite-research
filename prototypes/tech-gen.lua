@@ -276,7 +276,7 @@ local function make_stream(key, raw_spec)
     end
     for _, effect in ipairs(direct_effects) do
       if effect.type == "nothing" and not effect.icon and not effect.icons then
-        effect.icons = U.icons_for_stream(spec)
+        effect.icons = U.effect_icons_for_stream(spec)
       end
     end
   end

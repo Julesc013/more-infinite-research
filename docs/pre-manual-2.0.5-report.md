@@ -17,7 +17,11 @@ The non-scripted quick-patch work is automated-test ready. The scripted spoilage
 - Runtime validation now includes force-enabled scripted-candidate scenarios:
   - base-only: both scripted streams must skip because Space Age is missing;
   - Space Age: both scripted streams must generate with one visible `nothing` effect.
+- Scripted `nothing` effect icons now use compact base icons so the technology UI effect row does not inherit the floating technology constant overlay.
+- Character inventory slot research now also grants character logistic trash slots, and the separate trash-slot stream is removed.
+- Existing saves with the old generated trash-slot technology ID are covered by `migrations/more-infinite-research_2.0.5.json`, which maps it into the combined inventory/trash technology ID.
 - Runtime validation no longer copies the whole repository into every Factorio temp mod folder. It copies only mod source/package files, avoiding `.git`, `build`, `dist`, `fixtures`, and `scripts`.
+- Runtime validation now uses an isolated Factorio config and write-data/log directory instead of the live GUI profile log.
 - Successful runtime validation runs now clean their generated temp user-data directory.
 - Old MIR temp validation directories were removed from `%TEMP%` after the previous harness behavior filled the temp drive.
 
@@ -34,6 +38,7 @@ The current implementation follows the API boundary:
 - Agricultural growth speed uses `on_tower_planted_seed` and guarded `LuaEntity.tick_grown` access.
 - Existing plants, inventories, belts, labs, containers, rockets, platforms, surfaces, and item stacks are not broadly scanned.
 - Visible scripted technologies use `NothingModifier` effects for player-facing UI text.
+- JSON migrations are used for the intentional old trash-slot technology ID consolidation before any Lua migration or configuration-change handler runs.
 - Space Age-only scripted streams have Space Age gates and are tested to skip in base-only mode.
 
 ## Automated Validation Completed
@@ -50,12 +55,13 @@ git diff --check
 Validation status:
 
 - Static validation passed.
-- Runtime fixture validation passed across 22 isolated scenarios.
+- Runtime fixture validation passed across 23 isolated scenarios.
 - Package/source parity passed.
 - Locale parity passed across 9 locale files.
 - Changelog format passed.
 - No-runtime-tick guard passed.
 - Scripted default-off guard passed.
+- Trash-slot-to-inventory technology migration guard passed.
 - The rebuilt release archive is `dist/more-infinite-research_2.0.5.zip`.
 
 ## What You Need To Manually Test
@@ -67,11 +73,12 @@ These are still worth doing before publishing the default-off `2.0.5` package:
 - `normal-mod-folder-load`: load `dist/more-infinite-research_2.0.5.zip` from a normal Factorio mods folder and confirm the game sees version `2.0.5`.
 - `vanilla-locale-icons`: base game without Space Age; confirm Electric Shooting Speed uses discharge defense art/description and flamethrower/electric descriptions display.
 - `fresh-space-age`: fresh Space Age save; confirm Electric Shooting Speed has both `electric` and `tesla` effects.
+- `merged-inventory-trash-ui`: confirm Character inventory slots shows both inventory-slot and logistic-trash-slot effects, and there is no separate Character logistic trash slots generated research.
 - `circuit-productivity-ownership`: base-only green/red/blue circuits are MIR-owned; Space Age green/red stay MIR-owned while processing unit stays vanilla-owned.
 - `quality-module-productivity`: with real Quality enabled, confirm module productivity includes quality module recipes.
 - `omega-drill-productivity`: with real Omega Drill or representative mod installed, confirm mining drill productivity includes its drill recipes.
 - `tank-uranium-shell-speed`: confirm tank cannon fire rate with uranium shells is not reduced after finite vanilla weapon speed techs.
-- `existing-mir-2.0-save`: load an existing MIR save and confirm no migration/runtime error.
+- `existing-mir-2.0-save`: load an existing MIR save and confirm no migration/runtime error; if the old trash-slot technology was researched, confirm the combined inventory/trash technology carries that progress.
 
 ### Required Before Enabling Scripted Streams By Default
 

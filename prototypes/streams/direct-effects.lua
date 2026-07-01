@@ -48,7 +48,8 @@ return {
       "utility-science-pack","military-science-pack","agricultural-science-pack"
     },
     direct_effects = {
-      { type="character-inventory-slots-bonus", modifier=1 }
+      { type = "character-inventory-slots-bonus", modifier = 1 },
+      { type = "character-logistic-trash-slots", modifier = 1 }
     }
   },
 
@@ -184,13 +185,4 @@ return {
     }
   },
 
-  research_character_trash_slots = {
-    icon_tech = "toolbelt",
-    science_packs = {
-      "utility-science-pack","military-science-pack","agricultural-science-pack"
-    },
-    direct_effects = {
-      { type = "character-logistic-trash-slots", modifier = 1 }
-    }
-  }
 }

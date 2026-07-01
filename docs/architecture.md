@@ -45,6 +45,10 @@ Current control files:
 - `control/effects/spoilage-preservation.lua`: applies the global spoil-time multiplier from the highest completed MIR spoilage preservation level.
 - `control/effects/agricultural-growth-speed.lua`: shortens remaining growth time for newly planted agricultural tower plants.
 
+Current migrations:
+
+- `migrations/more-infinite-research_2.0.5.json`: maps the removed generated character trash-slot technology ID into the combined inventory/trash technology ID.
+
 ### Scripted Runtime Storage
 
 All runtime storage is namespaced below `storage.mir`.

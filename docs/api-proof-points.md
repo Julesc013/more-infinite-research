@@ -27,6 +27,7 @@ Latest official API docs checked on 2026-07-01: `2.1.9`. Local runtime validatio
 | Vanilla Space Age has infinite `plastic-bar-productivity` | Local Factorio `2.1.8` Space Age prototypes | Verified | MIR skips covered plastic recipes in Space Age |
 | Vanilla Space Age has infinite `rocket-fuel-productivity` | Local Factorio `2.1.8` Space Age prototypes | Verified | MIR skips covered rocket fuel recipes in Space Age |
 | `NothingModifier` can display custom scripted effects in technology UI | Factorio `NothingModifier` docs | Verified | Scripted technologies should use visible `nothing` effects |
+| JSON migrations can rename technology prototypes before Lua migrations run | Factorio migrations and data lifecycle docs | Verified | Removed generated technology IDs need explicit migration coverage |
 | `DifficultySettings.spoil_time_modifier` is writable and bounded | Factorio `DifficultySettings` docs | Verified | Spoilage preservation can be global, bounded, and event-driven |
 | `on_research_finished`, `on_research_reversed`, and `on_technology_effects_reset` exist | Factorio events docs | Verified | Scripted techs can recompute on research lifecycle changes |
 | `on_tower_planted_seed` exists | Factorio events docs | Verified for Factorio `2.1.x` | Agricultural growth speed can be event-driven on the main line |
@@ -55,6 +56,8 @@ Latest official API docs checked on 2026-07-01: `2.1.9`. Local runtime validatio
 - Mod structure: <https://lua-api.factorio.com/latest/auxiliary/mod-structure.html>
 - Modifier list: <https://lua-api.factorio.com/latest/types/Modifier.html>
 - `NothingModifier`: <https://lua-api.factorio.com/latest/types/NothingModifier.html>
+- Migrations: <https://lua-api.factorio.com/latest/auxiliary/migrations.html>
+- Data lifecycle: <https://lua-api.factorio.com/latest/auxiliary/data-lifecycle.html>
 - Events: <https://lua-api.factorio.com/latest/events.html>
 - `LuaEntity`: <https://lua-api.factorio.com/latest/classes/LuaEntity.html>
 - `LuaItemStack`: <https://lua-api.factorio.com/latest/classes/LuaItemStack.html>

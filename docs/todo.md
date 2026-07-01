@@ -57,6 +57,11 @@ Done in the current development branch:
 - [x] Add a Maraxis-like duplicate cargo fixture proving cargo overlaps are reported without changing MIR generation.
 - [x] Fix runtime validation temp-copy behavior so fixture scenarios copy package source instead of the whole Git repository.
 - [x] Add `docs/pre-manual-2.0.5-report.md`.
+- [x] Fix scripted `NothingModifier` effect icons so spoilage/agriculture effect rows do not inherit floating technology constant overlays.
+- [x] Merge character logistic trash slots into character inventory slot research and remove the separate current generated trash-slot stream.
+- [x] Add a JSON migration from the old generated trash-slot technology ID into the combined inventory/trash technology ID.
+- [x] Add runtime validation for the merged inventory/trash effects and absence of the old stream diagnostics.
+- [x] Isolate runtime validation with its own Factorio config, write-data directory, and log path.
 
 Important release note: the scripted runtime work above is a **default-off v2.0.5 ship candidate**, not automatically deferred to `v2.1.0`. Ship the opt-in implementation with conservative wording after the minimum smoke checks pass. Defer default enablement, presets, or stronger behavior claims until manual proof exists.
 
@@ -83,7 +88,12 @@ Important release note: the scripted runtime work above is a **default-off v2.0.
 - [x] Space Age green and red circuit productivity stay MIR-owned while processing-unit productivity stays vanilla-owned.
 - [x] Runtime fixtures validate all default-enabled vanilla numbered extension chains in base-only and Space Age.
 - [x] Runtime fixtures force-enable and validate the normally disabled inserter-capacity continuation in base-only and Space Age.
+- [x] Scripted `nothing` effect icons use compact effect-row icon stacks without floating technology constant overlays.
+- [x] Character inventory slot research also grants character logistic trash slots.
+- [x] Standalone character logistic trash slot research is removed from current generation.
+- [x] Existing old trash-slot technology progress has a JSON migration into the combined inventory/trash technology.
 - [x] Package includes `control.lua` and `control/`.
+- [x] Package includes `migrations/`.
 - [x] Package includes `docs/todo.md`, `docs/api-proof-points.md`, and `docs/manual-test-plan.md`.
 - [ ] Spoilage preservation passes the manual blockers below.
 - [ ] Agricultural growth speed for newly planted tower crops passes the manual blockers below.
@@ -91,20 +101,20 @@ Important release note: the scripted runtime work above is a **default-off v2.0.
 
 ### v2.0.5 Acceptance Criteria
 
-- [ ] Static validation passes.
-- [ ] Package validation passes.
-- [ ] Runtime fixture validation passes on the supported Factorio `2.1.x` binary.
-- [ ] `docs/todo.md` is included in the package.
-- [ ] `docs/api-proof-points.md` is included in the package.
-- [ ] `docs/manual-test-plan.md` is included in the package.
-- [ ] `docs/pre-manual-2.0.5-report.md` is included in the package.
-- [ ] README, docs, changelog, and package agree on release scope.
+- [x] Static validation passes.
+- [x] Package validation passes.
+- [x] Runtime fixture validation passes on the supported Factorio `2.1.x` binary.
+- [x] `docs/todo.md` is included in the package.
+- [x] `docs/api-proof-points.md` is included in the package.
+- [x] `docs/manual-test-plan.md` is included in the package.
+- [x] `docs/pre-manual-2.0.5-report.md` is included in the package.
+- [x] README, docs, changelog, and package agree on release scope.
 - [ ] Runtime feature claims are backed by manual/runtime validation.
-- [ ] `dist/more-infinite-research_2.0.5.zip` is rebuilt from committed source.
-- [ ] Changelog has an entry matching `info.json` version.
-- [ ] Zip filename and internal `info.json` version match `info.json`.
-- [ ] Zip excludes dev-only files and includes required docs/source/locale/control files.
-- [ ] Git tree is clean after build.
+- [x] `dist/more-infinite-research_2.0.5.zip` is rebuilt from current source.
+- [x] Changelog has an entry matching `info.json` version.
+- [x] Zip filename and internal `info.json` version match `info.json`.
+- [x] Zip excludes dev-only files and includes required docs/source/locale/control/migration files.
+- [x] Git tree is clean after build.
 
 ### v2.0.5 API And ID Verification
 
@@ -113,6 +123,7 @@ Important release note: the scripted runtime work above is a **default-off v2.0.
 - [x] Confirm `gun-speed` modifier is keyed by ammo category.
 - [x] Confirm current base/Space Age locale files do not provide all generated shooting-speed modifier descriptions MIR needs.
 - [x] Confirm Factorio supports hidden optional dependencies through the `(?)` dependency prefix.
+- [x] Confirm Factorio supports JSON migrations for technology prototype ID consolidation.
 - [x] Confirm vanilla Space Age `processing-unit-productivity` owns `processing-unit`.
 - [x] Confirm vanilla Space Age `low-density-structure-productivity` owns `low-density-structure` and `casting-low-density-structure`.
 - [x] Confirm vanilla Space Age `plastic-bar-productivity` owns `plastic-bar` and `bioplastic`.

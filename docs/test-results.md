@@ -2,6 +2,35 @@
 
 This file records local release-candidate validation runs. It is not a substitute for the manual mod matrix in `docs/compatibility.md`.
 
+## 2026-07-01 Spoilage Icon And Character Slot Merge
+
+Environment:
+
+- Factorio `2.1.8` build `86744`, Windows Steam, Space Age install.
+- Official Factorio migration and command-line docs checked on 2026-07-01.
+- Mod version `2.0.5`.
+- Release archive: `dist/more-infinite-research_2.0.5.zip`.
+
+Commands:
+
+```powershell
+.\scripts\Build-MIRPackage.ps1
+.\scripts\Invoke-MIRValidation.ps1 -StaticOnly
+.\scripts\Invoke-MIRValidation.ps1 -FactorioBin "C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe"
+```
+
+Results:
+
+- Scripted `nothing` effects now use compact base stream icons, not full technology icon stacks with floating constant overlays.
+- Character inventory slot research now grants both `character-inventory-slots-bonus` and `character-logistic-trash-slots`.
+- Removed the separate generated `research_character_trash_slots` stream, setting, and current locale key.
+- Added `migrations/more-infinite-research_2.0.5.json` to map `recipe-prod-research_character_trash_slots-1` into `recipe-prod-research_inventory_capacity-1` for existing saves.
+- Package/build/runtime-copy validation now includes `migrations/`.
+- Runtime validation now uses an isolated Factorio config and write-data/log directory, so the fixture matrix does not read the live GUI profile log.
+- Added runtime scenario `character-inventory-merged-effects`, verifying `research_inventory_capacity` generates with `effects=2` and no old `research_character_trash_slots` stream diagnostics.
+- Static validation passed.
+- Runtime fixture validation passed across twenty-three isolated scenarios.
+
 ## 2026-07-01 Legacy Cadence Reorder
 
 Environment:

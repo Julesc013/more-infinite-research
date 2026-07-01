@@ -41,6 +41,7 @@ $directories = @(
   "docs",
   "control",
   "locale",
+  "migrations",
   "prototypes"
 )
 

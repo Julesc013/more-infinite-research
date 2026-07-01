@@ -49,6 +49,25 @@ local function icon_from_item(name)
   return nil
 end
 
+local function base_icons_for_stream(stream)
+  local base = nil
+  if stream.icons then
+    base = stream.icons
+  elseif stream.icon then
+    local entry = {icon = stream.icon, icon_size = stream.icon_size or 64}
+    if stream.icon_tint then entry.tint = stream.icon_tint end
+    base = {entry}
+  elseif stream.icon_tech then
+    base = icons_from_tech(stream.icon_tech) or icon_from_item(stream.icon_tech)
+  end
+  if not base then
+    local src = stream.icon_item or ((stream.items or {})[1])
+    base = icon_from_item(src)
+  end
+  if base then return copy_icons(base) end
+  return nil
+end
+
 local function overlay_for_stream(stream)
   if stream.overlay ~= nil then return stream.overlay end
 
@@ -100,21 +119,17 @@ local function add_constant_overlay(base_icons, overlay)
 end
 
 function I.icons_for_stream(stream)
-  local base = nil
-  if stream.icons then
-    base = stream.icons
-  elseif stream.icon then
-    local entry = {icon = stream.icon, icon_size = stream.icon_size or 64}
-    if stream.icon_tint then entry.tint = stream.icon_tint end
-    base = {entry}
-  elseif stream.icon_tech then
-    base = icons_from_tech(stream.icon_tech) or icon_from_item(stream.icon_tech)
-  end
-  if not base then
-    local src = stream.icon_item or ((stream.items or {})[1])
-    base = icon_from_item(src)
-  end
+  local base = base_icons_for_stream(stream)
   return add_constant_overlay(base, overlay_for_stream(stream))
+end
+
+function I.effect_icons_for_stream(stream)
+  local base = base_icons_for_stream(stream)
+  if base and #base > 0 then return base end
+  return {{
+    icon = "__base__/graphics/technology/mining-productivity.png",
+    icon_size = 256
+  }}
 end
 
 return I
