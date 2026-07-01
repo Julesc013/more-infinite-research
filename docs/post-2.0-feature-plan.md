@@ -11,7 +11,7 @@ The core conclusion is:
 Release discipline update:
 
 ```text
-v2.0.5 = quick feedback patch: small/easy fixes, scripted agriculture/spoilage if manual proof passes, docs, validation, package parity.
+v2.0.5 = quick feedback patch: small/easy fixes, default-off scripted agriculture/spoilage candidates, docs, validation, package parity.
 v2.1.0 = larger feature wave: presets, broader scripted refinements, pump/fluid/logistics/productivity work that passes proof.
 v1.9.0 = Factorio 2.0 compatible subset backported from the tested v2.1.0 snapshot.
 v2.1.5 = quick feedback patch after v2.1.0.
@@ -20,7 +20,7 @@ v2.2.0 = next larger feature wave.
 v1.9.9 = final planned Factorio 2.0 backport from the latest tested v2.x.x snapshot when Factorio 2.1 becomes stable or another verified upstream cutoff is chosen.
 ```
 
-The scripted technology implementation exists in `dev` as a `v2.0.5` ship candidate. Public release claims should be made only for the specific behaviors proven by the manual save matrix. Anything that fails proof moves to `v2.1.0`.
+The scripted technology implementation exists in `dev` as a default-off `v2.0.5` ship candidate. Public release claims should be made only for the specific behaviors proven by the manual save matrix. Default enablement or anything that fails proof moves to `v2.1.0`.
 
 The Reddit thread was not one feature request. It was a roadmap dump. The useful split is:
 

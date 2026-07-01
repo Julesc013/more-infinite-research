@@ -40,7 +40,7 @@ Required before publishing `v2.0.5`:
 | `duplicate-cargo-tech` | Maraxis-like duplicate cargo landing pad or unloading technology |
 | `popular-overhaul-pack` | Large overhaul pack compatible with the current Factorio line |
 
-Scripted agriculture/spoilage can ship in `v2.0.5` only after the relevant scenarios above are recorded. If a scripted scenario fails or produces unclear behavior, defer that specific feature or behavior to `v2.1.0`.
+Default-off scripted agriculture/spoilage candidates can be included in `v2.0.5` after the minimum release smoke checks pass. Default enablement or strong public behavior claims require the relevant scenarios above to be recorded. If a scripted scenario fails or produces unclear behavior, defer that specific feature, default, or claim to `v2.1.0`.
 
 ## v2.1.0 Larger Feature Wave
 

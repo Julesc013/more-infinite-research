@@ -18,11 +18,11 @@ legacy 1.9.x releases = Factorio 2.0 compatibility ports of tested current-line 
 
 `v2.0.5` is **not** docs-only. It is the first quick feedback release after `v2.0.0` and should include the easy, bounded, already-understood changes that are practical to drop into a mods folder and test now.
 
-The manual test matrix gates individual features. If a `v2.0.5` candidate fails its manual proof or grows beyond the quick-patch scope, that feature moves to `v2.1.0`; the whole release does not become docs-only.
+The minimum manual smoke checks gate the `v2.0.5` quick patch. The full scripted manual matrix gates default enablement and stronger public behavior claims for scripted candidates. If a candidate fails proof or grows beyond the quick-patch scope, that default, claim, or feature moves to `v2.1.0`; the whole release does not become docs-only.
 
 | MIR release | Factorio line | Release kind | Scope |
 | --- | --- | --- | --- |
-| `2.0.5` | `2.1.x` | Quick feedback patch | small/easy fixes, bounded scripted agriculture/spoilage slice if validated, docs, validation, package parity |
+| `2.0.5` | `2.1.x` | Quick feedback patch | small/easy fixes, default-off scripted agriculture/spoilage candidates, docs, validation, package parity |
 | `2.1.0` | `2.1.x` | Larger feature wave | settings presets, harder compatibility work, pump/fluid/logistics spikes that graduate, broader scripted refinements |
 | `1.9.0` | `2.0.x` | Legacy port | compatible subset of the tested `2.1.0` snapshot |
 | `2.1.5` | `2.1.x` | Quick feedback patch | small fixes and feedback from `2.1.0` |
@@ -99,9 +99,9 @@ This table is the canonical current synthesis from the Reddit discussion and fol
 | Omega Drill style mining drill productivity matching | Ship | `v2.0.5` |
 | Weapon shooting speed finite vanilla bonus preservation | Ship | `v2.0.5` |
 | Vanilla Space Age productivity duplicate skip | Ship | `v2.0.5` |
-| Scripted-tech framework | Ship if manual proof passes | `v2.0.5` |
-| Spoilage preservation | Ship if manual proof passes | `v2.0.5` |
-| Agricultural growth speed for newly planted tower crops | Ship if manual proof passes | `v2.0.5` |
+| Scripted-tech framework | Ship default-off candidate | `v2.0.5` |
+| Spoilage preservation | Ship default-off experimental candidate; default-on later if proved | `v2.0.5` / `v2.1.x` |
+| Agricultural growth speed for newly planted tower crops | Ship default-off experimental candidate; default-on later if proved | `v2.0.5` / `v2.1.x` |
 | Scripted diagnostics/docs/package validation | Ship | `v2.0.5` |
 | Engine/electric-engine productivity verification | Ship/verify | `v2.0.5` |
 | Settings presets | Ship | `v2.1.0` |
@@ -381,7 +381,7 @@ The detailed proof ledger and unknowns are maintained in `docs/api-proof-points.
 Recommended order from here:
 
 1. Keep `dev` state unambiguous with `git status`, `git log --oneline --decorate --graph --max-count=8`, and `git branch -vv` before pushing or tagging.
-2. Finish `v2.0.5` as the quick/easy implementation patch: Tesla fix, duplicate-productivity prevention, small scripted agriculture/spoilage if manual proof passes, docs, validation, and package parity.
+2. Finish `v2.0.5` as the quick/easy implementation patch: Tesla fix, duplicate-productivity prevention, default-off scripted agriculture/spoilage candidates, docs, validation, and package parity.
 3. Move only failed or too-large `v2.0.5` candidates to `v2.1.0`.
 4. Ship `v2.1.0` as the larger feature wave.
 5. Backport the tested `v2.1.0` snapshot to Factorio 2.0 as `v1.9.0`.

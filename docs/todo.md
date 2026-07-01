@@ -30,7 +30,7 @@ Done in the current development branch:
 - [x] Add agricultural growth speed scripted effect.
 - [x] Add visible `nothing` effects for scripted technologies.
 - [x] Add settings/defaults for the two scripted streams.
-- [x] Keep scripted spoilage and agriculture streams disabled by default until manual proof supports final release claims.
+- [x] Keep scripted spoilage and agriculture streams disabled by default for `v2.0.5`; use manual proof to decide future graduation, presets, or stronger release claims.
 - [x] Add runtime scripted-effect debug setting.
 - [x] Fix Electric Shooting Speed to include `tesla` ammo category.
 - [x] Keep `electric` ammo category coverage for discharge defense.
@@ -56,7 +56,7 @@ Done in the current development branch:
 - [x] Fix runtime validation temp-copy behavior so fixture scenarios copy package source instead of the whole Git repository.
 - [x] Add `docs/pre-manual-2.0.5-report.md`.
 
-Important release note: the scripted runtime work above is a **v2.0.5 ship candidate**, not automatically deferred to `v2.1.0`. Ship the parts that pass manual proof. Defer only the specific feature or behavior that fails proof or becomes too large for a quick patch.
+Important release note: the scripted runtime work above is a **default-off v2.0.5 ship candidate**, not automatically deferred to `v2.1.0`. Ship the opt-in implementation with conservative wording after the minimum smoke checks pass. Defer default enablement, presets, or stronger behavior claims until manual proof exists.
 
 ## v2.0.5 Quick Feedback Patch
 

@@ -6,7 +6,7 @@ Release-line summary:
 
 | MIR release | Factorio line | Scope |
 | --- | --- | --- |
-| `2.0.5` | `2.1.x` | quick feedback patch: small fixes, validated scripted agriculture/spoilage slice, docs, validation, package parity |
+| `2.0.5` | `2.1.x` | quick feedback patch: small fixes, default-off scripted agriculture/spoilage candidates, docs, validation, package parity |
 | `2.1.0` | `2.1.x` | larger feature wave: presets, broader scripted refinements, logistics/fluid/productivity features that pass proof |
 | `1.9.0` | `2.0.x` | compatible subset backported from the tested `2.1.0` snapshot |
 | `2.1.5` | `2.1.x` | quick feedback patch after `2.1.0` |
@@ -30,7 +30,7 @@ The release goal is graceful compatibility without mod-page dependency clutter: 
 - Cargo bay unloading distance research uses Factorio 2.1.8's `max-cargo-bay-unloading-distance` technology modifier, uses official base and Space Age science packs only, and is skipped unless Space Age is active and the `landing-pad-unloading-bay` prototypes exist.
 - Cargo landing pad count research uses `cargo-landing-pad-count`, uses official base and Space Age science packs only, is disabled by default, requires the vanilla `rocket-silo` cargo landing pad unlock, and is skipped unless Space Age is active and the `cargo-landing-pad` prototype exists.
 - Spoilage preservation and agricultural growth speed are implemented in `dev` as visible `nothing` technology effects plus bounded runtime behavior through the control-stage scripted technology manager.
-- The release plan treats those scripted runtime features as `v2.0.5` ship candidates. They can ship in `v2.0.5` when manual save validation proves existing-stack behavior, research reversal, disabling, multi-force behavior, and the agricultural tower event path. Any unsafe or unclear behavior is deferred to `v2.1.0`.
+- The release plan keeps those scripted runtime features default-off in `v2.0.5` as opt-in experimental candidates. Default enablement or stronger public behavior claims require manual save validation for existing-stack behavior, research reversal, disabling, multi-force behavior, and the agricultural tower event path. Any unsafe or unclear behavior is deferred to `v2.1.0`.
 - Spoilage preservation changes the global spoil time modifier and recomputes on init, configuration change, research finish/reversal, and technology effects reset.
 - Agricultural growth speed adjusts newly planted agricultural tower plants from the tower planting event and does not rescan existing farms in this first implementation slice.
 - Mod-specific stream changes should live in `prototypes/compat/profiles.lua` instead of the base stream definitions.

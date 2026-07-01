@@ -20,13 +20,13 @@ Date: 2026-07-01
     - Recipe productivity generation now skips recipes already owned by another infinite recipe-productivity technology.
     - Space Age vanilla productivity technologies for processing units, low density structures, plastic, and rocket fuel now stay authoritative instead of receiving parallel MIR duplicates.
     - Added broad runtime fixture checks for generated chain integrity, single-owner recipe productivity, base-only and Space Age circuit recipe ownership, and vanilla numbered technology continuations.
-    - Added the v2.0.5 candidate implementation of the scripted technology framework, spoilage preservation, and agricultural growth speed; both streams are disabled by default until manual save validation supports final release claims.
+    - Added disabled-by-default scripted candidate technologies for Spoilage Preservation and Agricultural Growth Speed. These are opt-in in v2.0.5 while save behavior and balance are being tested.
 
   Compatibility:
 
     - Quality is now a hidden optional load-order dependency so module productivity generation can see quality module recipes when the Quality mod is active without advertising Quality as a visible dependency.
     - The v2.0.5 release plan is now a quick feedback patch: ship the small features that pass proof and defer only the specific behavior that fails proof.
-    - Scripted runtime behavior is default-off and requires manual validation for existing-stack behavior, research reversal, disabling, multi-force behavior, and large Gleba farms before final v2.0.5 publication.
+    - Scripted runtime behavior remains default-off in v2.0.5. Existing-stack behavior, research reversal, disabling, multi-force behavior, and large Gleba farms require manual validation before default enablement or stronger public release claims.
     - The first agriculture runtime slice avoids broad inventory, belt, container, item-stack, surface, and entity scanning.
     - Existing planted crops are not globally rescanned in the v2.0.5 candidate slice; growth speed applies to newly planted tower crops.
     - Package validation now includes control.lua and the control module directory.

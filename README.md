@@ -18,7 +18,7 @@ The mod is built around **graceful compatibility**: it discovers recipes, scienc
 Compatibility note:
 
 - The current main line targets Factorio `2.1.x`.
-- `v2.0.5` is the first quick feedback patch after `v2.0.0`: small/easy fixes, bounded scripted agriculture/spoilage if validation passes, docs, validation, and package parity.
+- `v2.0.5` is the first quick feedback patch after `v2.0.0`: small/easy fixes, default-off scripted agriculture/spoilage candidates, docs, validation, and package parity.
 - `v2.1.0` is the next larger feature wave.
 - The first Factorio `2.0.x` legacy build will be More Infinite Research `v1.9.0`, a compatible subset backported from the tested `v2.1.0` snapshot.
 - Future cadence follows the same pattern: quick current-line patch, legacy backport where useful, then the next larger current-line wave.
@@ -32,9 +32,9 @@ Compatibility note:
 - **Lab validation:** checks generated research ingredients against real labs so technologies stay researchable.
 - **Factorio 2.1 recipes:** supports recipe `categories` as well as legacy single `category`.
 - **Optional DLC:** keeps official DLC mods optional and gates DLC-shaped research behind concrete prototype checks.
-- **Scripted Space Age scaling:** bounded event-driven spoilage preservation and agricultural growth speed are disabled-by-default `v2.0.5` ship candidates; public release claims require the named manual save matrix.
+- **Scripted Space Age scaling:** bounded event-driven spoilage preservation and agricultural growth speed are disabled-by-default experimental `v2.0.5` candidates; default enablement or measured behavior claims require the named manual save matrix.
 - **Clean mod portal metadata:** keeps third-party compatibility-mod dependencies out of `info.json`.
-- **Save compatibility:** preserves existing generated prototype IDs. Scripted runtime storage is namespaced and must be validated before the scripted features are claimed as shipped.
+- **Save compatibility:** preserves existing generated prototype IDs. Scripted runtime storage is namespaced and must be validated before the scripted features are enabled by default or described with measured runtime behavior.
 
 Recipe productivity researches are infinite, but **Factorio's recipe productivity cap still applies**.
 *Additional levels can eventually have no practical effect after a recipe reaches its cap.*
@@ -200,7 +200,7 @@ These streams generate `change-recipe-productivity` effects for matching recipes
 
 These streams generate infinite technologies with direct Factorio technology modifiers or visible scripted-effect placeholders. Scripted effects are handled in `control.lua` and remain event-driven.
 
-The scripted streams are disabled by default while they remain `v2.0.5` ship candidates. They should be enabled by default in `v2.0.5` only after manual save validation confirms existing-stack behavior, reversal, disabling, multi-force behavior, and the agricultural tower event path. Any part that fails proof moves to `v2.1.0` instead of blocking the quick patch.
+The scripted streams remain disabled by default in `v2.0.5`. Basic opt-in smoke tests can document their experimental behavior, but default enablement or stronger runtime claims require manual save validation for existing-stack behavior, reversal, disabling, multi-force behavior, and the agricultural tower event path. Graduation belongs in `v2.1.0` or `v2.1.5` after player testing.
 
 | Stream key | Research | Effect | Default | Gates and notes |
 | --- | --- | --- | --- | --- |

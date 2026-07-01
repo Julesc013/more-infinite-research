@@ -58,7 +58,7 @@ git diff --check
 Results:
 
 - Rebuilt the release archive after code and documentation changes.
-- Scripted spoilage preservation and agricultural growth speed are now disabled by default until manual save validation supports final release claims.
+- Scripted spoilage preservation and agricultural growth speed are now disabled by default for `v2.0.5`; manual save validation is required before default enablement or stronger behavior claims.
 - Spoilage preservation now stores MIR's actual applied multiplier after the clamped spoil-time value is written, so baseline rebase/restore logic is based on the effective multiplier rather than the requested multiplier.
 - Documented scripted runtime storage keys in `docs/architecture.md`.
 - Rechecked official latest API docs and filled the API proof ledger links. Local runtime fixture validation remains on Factorio `2.1.8`.
@@ -216,7 +216,7 @@ Representative validation harness evidence:
 Environment:
 
 - Factorio `2.1.8` build `86744`, Windows Steam, Space Age install.
-- Mod version metadata `2.0.5`; scripted runtime work is a `v2.0.5` ship candidate and requires manual save validation before final release claims.
+- Mod version metadata `2.0.5`; scripted runtime work is a default-off `v2.0.5` ship candidate and requires manual save validation before default enablement or stronger behavior claims.
 - Release archive: `dist/more-infinite-research_2.0.5.zip`.
 
 Commands:
