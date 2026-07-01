@@ -133,6 +133,120 @@ local function recipe_productivity_owners(recipe_name)
   return owners
 end
 
+local constant_overlay_by_kind = {
+  ["recipe-productivity"] = "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+  speed = "__core__/graphics/icons/technology/constants/constant-speed.png",
+  ["movement-speed"] = "__core__/graphics/icons/technology/constants/constant-movement-speed.png",
+  mining = "__core__/graphics/icons/technology/constants/constant-mining.png",
+  capacity = "__core__/graphics/icons/technology/constants/constant-capacity.png",
+  damage = "__core__/graphics/icons/technology/constants/constant-damage.png",
+  range = "__core__/graphics/icons/technology/constants/constant-range.png",
+  ["braking-force"] = "__core__/graphics/icons/technology/constants/constant-braking-force.png",
+  equipment = "__core__/graphics/icons/technology/constants/constant-equipment.png",
+  count = "__core__/graphics/icons/technology/constants/constant-count.png"
+}
+
+local function expected_icon_badge(tech)
+  local saw_recipe_productivity = false
+  for _, effect in ipairs((tech and tech.effects) or {}) do
+    local effect_type = effect.type
+    if effect_type == "change-recipe-productivity" then
+      saw_recipe_productivity = true
+    elseif effect_type == "gun-speed" or effect_type == "character-crafting-speed" then
+      return "speed"
+    elseif effect_type == "character-running-speed" then
+      return "movement-speed"
+    elseif effect_type == "character-mining-speed" then
+      return "mining"
+    elseif effect_type == "character-reach-distance"
+      or effect_type == "character-build-distance"
+      or effect_type == "character-resource-reach-distance"
+      or effect_type == "character-item-drop-distance" then
+      return "range"
+    elseif effect_type == "character-inventory-slots-bonus"
+      or effect_type == "character-logistic-trash-slots"
+      or effect_type == "worker-robot-battery" then
+      return "capacity"
+    elseif effect_type == "max-cargo-bay-unloading-distance" then
+      return "range"
+    elseif effect_type == "cargo-landing-pad-count" then
+      return "count"
+    elseif effect_type == "braking-force" then
+      return "braking-force"
+    elseif effect_type == "ammo-damage" or effect_type == "turret-attack" then
+      return "damage"
+    end
+  end
+
+  if saw_recipe_productivity then return "recipe-productivity" end
+  return nil
+end
+
+local function icon_constant_kinds(tech)
+  local kinds = {}
+  for _, layer in ipairs((tech and tech.icons) or {}) do
+    for kind, icon_path in pairs(constant_overlay_by_kind) do
+      if layer.icon == icon_path then
+        kinds[kind] = true
+      end
+    end
+  end
+  return kinds
+end
+
+local function assert_generated_icon_badge(tech_name, tech)
+  local expected = expected_icon_badge(tech)
+  if not expected then return end
+
+  if not tech.icons or #tech.icons == 0 then
+    fail("generated technology " .. tech_name .. " has no icon layers.")
+  end
+
+  local kinds = icon_constant_kinds(tech)
+  if not kinds[expected] then
+    fail("generated technology " .. tech_name .. " is missing expected " .. expected .. " icon badge.")
+  end
+
+  for kind, _ in pairs(kinds) do
+    if kind ~= expected then
+      fail("generated technology " .. tech_name .. " has unexpected " .. kind
+        .. " icon badge; expected only " .. expected .. ".")
+    end
+  end
+end
+
+local function prototype_icon_paths(prototype)
+  local paths = {}
+  if not prototype then return paths end
+  if prototype.icons then
+    for _, layer in ipairs(prototype.icons) do
+      if layer.icon then paths[layer.icon] = true end
+    end
+  elseif prototype.icon then
+    paths[prototype.icon] = true
+  end
+  return paths
+end
+
+local function assert_tech_uses_item_icon(tech_name, item_name)
+  local tech = techs[tech_name]
+  if not tech then
+    fail("missing generated technology " .. tech_name .. " for icon assertion.")
+  end
+
+  local item = (data.raw.item or {})[item_name] or (data.raw.ammo or {})[item_name]
+  local expected_paths = prototype_icon_paths(item)
+  if not next(expected_paths) then
+    fail("missing item icon source for " .. item_name .. ".")
+  end
+
+  for _, layer in ipairs(tech.icons or {}) do
+    if expected_paths[layer.icon] then return end
+  end
+
+  fail("generated technology " .. tech_name .. " does not use " .. item_name .. " item art.")
+end
+
 local owners_by_recipe = {}
 for tech_name, tech in pairs(techs) do
   if string.match(tech_name, "^recipe%-prod%-") then
@@ -148,6 +262,7 @@ for tech_name, tech in pairs(techs) do
     if not tech.effects or #tech.effects == 0 then
       fail("generated stream technology " .. tech_name .. " has no effects.")
     end
+    assert_generated_icon_badge(tech_name, tech)
   end
 
   if tech.max_level == "infinite" then
@@ -163,6 +278,9 @@ for tech_name, tech in pairs(techs) do
     end
   end
 end
+
+assert_tech_uses_item_icon("recipe-prod-research_heavy_ammo-1", "cannon-shell")
+assert_tech_uses_item_icon("recipe-prod-research_cannon_shooting_speed-1", "cannon-shell")
 
 for recipe_name, owners in pairs(owners_by_recipe) do
   table.sort(owners)

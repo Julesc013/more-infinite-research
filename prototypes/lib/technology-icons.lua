@@ -24,13 +24,20 @@ local function copy_icons(icons)
   return out
 end
 
-local function has_constant_overlay(icons)
+local function is_constant_overlay(layer)
+  return layer
+    and layer.icon
+    and string.find(layer.icon, "__core__/graphics/icons/technology/constants/", 1, true) ~= nil
+end
+
+local function strip_constant_overlays(icons)
+  local out = {}
   for _, layer in ipairs(icons or {}) do
-    if layer.icon and string.find(layer.icon, "__core__/graphics/icons/technology/constants/", 1, true) then
-      return true
+    if not is_constant_overlay(layer) then
+      table.insert(out, deepcopy(layer))
     end
   end
-  return false
+  return out
 end
 
 local function icons_from_tech(name)
@@ -104,14 +111,14 @@ local function overlay_for_stream(stream)
 end
 
 local function add_constant_overlay(base_icons, overlay)
-  local out = copy_icons(base_icons)
+  local out = strip_constant_overlays(base_icons)
   if #out == 0 then
     out = {{
       icon = "__base__/graphics/technology/mining-productivity.png",
       icon_size = 256
     }}
   end
-  if overlay == false or has_constant_overlay(out) then return out end
+  if overlay == false then return out end
 
   local path = CONSTANT_OVERLAYS[overlay or "recipe-productivity"] or overlay
   if type(path) ~= "string" then return out end

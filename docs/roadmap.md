@@ -44,6 +44,8 @@ Current `dev` already has the intended `v2.0.5` quick-patch candidate work:
 - Electric Shooting Speed uses the Space Age electric-weapons-damage texture when that technology exists, with a discharge defense fallback for vanilla/no-Space-Age games.
 - Recipe-productivity duplicate prevention for recipes already owned by another infinite recipe-productivity technology.
 - Space Age vanilla productivity technologies remain authoritative for processing units, low density structures, plastic, and rocket fuel instead of receiving parallel MIR technologies.
+- Heavy ammunition productivity is presented as Cannon shell productivity while keeping the existing generated technology ID stable.
+- Generated stream icons replace inherited vanilla constant badges with badges matching MIR's actual effect type.
 - Package and validation script coverage for `control.lua`, the control module tree, Tesla speed assertions, broad generated-chain integrity, vanilla Space Age productivity skip assertions, branch-aware legacy checks, and the no-`on_tick` runtime guard.
 
 The public release rule is:
@@ -106,6 +108,7 @@ This table is the canonical current synthesis from the Reddit discussion and fol
 | Duplicate native modifier diagnostics for cargo/logistics overlap | Ship diagnostic-only | `v2.0.5` |
 | Scripted diagnostics/docs/package validation | Ship | `v2.0.5` |
 | Settings confidence pass: clearer labels, ordering, warnings, dropdown help, and docs | Ship | `v2.0.5` |
+| Cannon shell productivity rename/icon and generated badge audit | Ship | `v2.0.5` |
 | Engine/electric-engine productivity verification | Ship/verify | `v2.0.5` |
 | Settings presets with real mode/override behavior | Ship | `v2.1.0` |
 | Existing agricultural plant rescale | Spike/ship if bounded | `v2.1.0` |
@@ -144,6 +147,9 @@ Quick, easy feedback patch for tested low-risk improvements.
 - Weapon shooting speed overlap handling narrowed so finite vanilla rocket and cannon-shell speed bonuses remain intact.
 - Recipe-productivity duplicate skipping so vanilla Space Age productivity chains stay authoritative.
 - Processing unit, low density structure, plastic, and rocket fuel checks so MIR does not create parallel Space Age productivity techs for recipes already owned by vanilla infinite techs.
+- Heavy ammunition productivity renamed to Cannon shell productivity without renaming the existing generated technology ID.
+- Cannon shell productivity uses cannon shell item art and keeps shell/ammo coverage limited to ammo recipes, including artillery shell and railgun ammo.
+- Generated MIR stream icon badges match effect type, including speed for Electric Shooting Speed even when it borrows electric-weapons-damage art.
 - Scripted-tech framework if the manual save matrix passes.
 - Spoilage preservation if newly created and existing-stack behavior is tested and documented.
 - Agricultural growth speed for newly planted agricultural tower crops if the event path is manually verified.

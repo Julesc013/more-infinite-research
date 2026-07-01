@@ -2,6 +2,32 @@
 
 This file records local release-candidate validation runs. It is not a substitute for the manual mod matrix in `docs/compatibility.md`.
 
+## 2026-07-02 Cannon Shell Productivity And Icon Badge Pass
+
+Environment:
+
+- Factorio `2.1.8` build `86744`, Windows Steam, Space Age install.
+- Mod version `2.0.5`.
+- Release archive: `dist/more-infinite-research_2.0.5.zip`.
+
+Commands:
+
+```powershell
+.\scripts\Build-MIRPackage.ps1
+.\scripts\Invoke-MIRValidation.ps1 -StaticOnly
+.\scripts\Invoke-MIRValidation.ps1 -FactorioBin "C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe"
+```
+
+Results:
+
+- Renamed the player-facing `research_heavy_ammo` line to Cannon shell productivity while preserving the generated technology ID `recipe-prod-research_heavy_ammo-1`.
+- Changed Cannon shell productivity to use cannon shell item art, matching the Cannon Shooting Speed base icon family.
+- Kept Cannon shell productivity scoped to ammo recipes: cannon shells, artillery shell, railgun ammo, and compatible modded shell/ammo patterns.
+- Left artillery turrets, artillery wagons, railgun turrets, and other machines out of this ammo tech for `v2.0.5`; those belong in a future systems/productivity decision if added.
+- Updated generated stream icon construction so inherited vanilla technology constant badges are stripped before MIR applies the badge matching its actual effect.
+- Added runtime fixture assertions that generated MIR stream icons have the expected effect badge and no wrong inherited constant badge.
+- Runtime fixture validation passed across twenty-three isolated scenarios.
+
 ## 2026-07-01 Settings Confidence Pass
 
 Environment:

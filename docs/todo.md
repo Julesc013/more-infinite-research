@@ -71,6 +71,11 @@ Done in the current development branch:
 - [x] Add dropdown option descriptions for string startup settings.
 - [x] Add README settings setup guidance and document exactly what `0` means.
 - [x] Add static validation for settings confidence coverage.
+- [x] Rename Heavy ammunition productivity to Cannon shell productivity.
+- [x] Make Cannon shell productivity use cannon shell item art while keeping cannon shell, artillery shell, railgun ammo, and modded shell/ammo recipe coverage.
+- [x] Keep artillery turrets, artillery wagons, railgun turrets, and other buildings out of Cannon shell productivity for `v2.0.5`; revisit as a separate systems/productivity feature if needed.
+- [x] Strip inherited vanilla constant badges from generated MIR stream icons before applying MIR's own effect badge.
+- [x] Add runtime fixture checks that generated MIR stream icons use the expected effect badge.
 
 Important release note: the scripted runtime work above is a **default-off v2.0.5 ship candidate**, not automatically deferred to `v2.1.0`. Ship the opt-in implementation with conservative wording after the minimum smoke checks pass. Defer default enablement, presets, or stronger behavior claims until manual proof exists.
 
@@ -107,6 +112,8 @@ Important release note: the scripted runtime work above is a **default-off v2.0.
 - [x] Package includes `docs/todo.md`, `docs/api-proof-points.md`, and `docs/manual-test-plan.md`.
 - [x] Startup setting labels, descriptions, ordering, dropdown help, and experimental warnings are refreshed without changing generated technology names or defaults.
 - [x] README documents recommended default, vanilla-respectful, megabase, modpack compatibility, and debug/reporting settings patterns.
+- [x] Cannon shell productivity naming and icon art are aligned with the Cannon Shooting Speed cannon-shell icon family.
+- [x] Runtime fixtures assert generated MIR icon badges match effect types, including Electric Shooting Speed using speed instead of inherited damage.
 - [ ] Spoilage preservation passes the manual blockers below.
 - [ ] Agricultural growth speed for newly planted tower crops passes the manual blockers below.
 - [ ] README/changelog state the exact measured behavior, especially for existing spoilable stacks and existing plants.

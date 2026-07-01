@@ -91,7 +91,7 @@ return {
     } }
   }},
 
-  research_heavy_ammo = { icon_item="cannon-shell", icon_tech="military", groups = {
+  research_heavy_ammo = { icon_item="cannon-shell", groups = {
     { change=0.10, items={"cannon-shell"} },
     { change=0.05, items={"explosive-cannon-shell"} },
     { change=0.02, items={"uranium-cannon-shell","explosive-uranium-cannon-shell"} },
