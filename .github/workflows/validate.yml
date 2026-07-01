@@ -1,0 +1,15 @@
+name: Validate
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  static:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Static validation and package checks
+        shell: pwsh
+        run: .\scripts\Invoke-MIRValidation.ps1 -StaticOnly

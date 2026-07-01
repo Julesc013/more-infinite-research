@@ -1,3 +1,1 @@
-require("prototypes.base-tech-extensions")
-require("prototypes.weapon-speed-adjustments")
-require("prototypes.max-level-control")
+-- Reserved for compatibility hooks that must run before final recipe and lab scanning.

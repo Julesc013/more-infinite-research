@@ -1,0 +1,11 @@
+{
+  "name": "mir-fixture-item-science-pack",
+  "version": "0.1.0",
+  "title": "MIR Fixture - Item Science Pack",
+  "author": "Julesc013",
+  "description": "Test fixture that adds a science pack as a plain item and inserts it into labs.",
+  "factorio_version": "2.1",
+  "dependencies": [
+    "base >= 2.0"
+  ]
+}

@@ -3,19 +3,9 @@ local defaults = require("defaults")
 local base_defaults = defaults.base_extensions or {}
 
 local U = require("prototypes.util")
-
-local function deepcopy(value)
-  if table.deepcopy then return table.deepcopy(value) end
-  local function copy(v)
-    if type(v) ~= "table" then return v end
-    local out = {}
-    for k, vv in pairs(v) do
-      out[copy(k)] = copy(vv)
-    end
-    return out
-  end
-  return copy(value)
-end
+local D = require("prototypes.diagnostics")
+local deepcopy = require("prototypes.lib.deepcopy")
+local table_utils = require("prototypes.lib.table-utils")
 
 local function escape_pattern(text)
   return text:gsub("([^%w])", "%%%1")
@@ -29,14 +19,16 @@ local function format_number(value)
   return string.format("%.6g", value)
 end
 
-local function tool_exists(name)
-  return (data.raw.tool or {})[name] ~= nil
-end
-
 local function startup_setting(name)
   local s = settings and settings.startup and settings.startup[name]
   if s then return s.value end
   return nil
+end
+
+local function prefer_this_mod_for_competing_techs()
+  local value = startup_setting("mir-prefer-this-mod-for-competing-techs")
+  if value == nil then return true end
+  return value ~= false
 end
 
 local function is_enabled(key, spec)
@@ -81,38 +73,63 @@ local function build_prerequisites(previous_name, last_prereqs)
   return out
 end
 
-local function compute_growth_from_counts(levels, counts)
-  local ratios = {}
-  for idx = 1, #counts - 1 do
-    local current = counts[idx]
-    local next_value = counts[idx + 1]
-    if current and current > 0 and next_value and next_value > 0 then
-      table.insert(ratios, next_value / current)
+local function effect_value_to_string(value)
+  local kind = type(value)
+  if kind == "string" then return value end
+  if kind == "number" or kind == "boolean" then return tostring(value) end
+  if kind == "table" then
+    local parts = {}
+    for k, v in pairs(value) do
+      table.insert(parts, tostring(k) .. "=" .. effect_value_to_string(v))
+    end
+    table.sort(parts)
+    return "{" .. table.concat(parts, ",") .. "}"
+  end
+  return tostring(value)
+end
+
+local function effects_signature(effects)
+  local rows = {}
+  for _, effect in ipairs(effects or {}) do
+    local cols = {}
+    for k, v in pairs(effect) do
+      table.insert(cols, tostring(k) .. "=" .. effect_value_to_string(v))
+    end
+    table.sort(cols)
+    table.insert(rows, table.concat(cols, ";"))
+  end
+  table.sort(rows)
+  return table.concat(rows, "|")
+end
+
+local function has_prereq(tech, prereq_name)
+  for _, name in ipairs((tech and tech.prerequisites) or {}) do
+    if name == prereq_name then return true end
+  end
+  return false
+end
+
+local function find_equivalent_infinite_extension(previous_name, expected_effects)
+  local expected_signature = effects_signature(expected_effects)
+  for tech_name, tech in pairs(data.raw.technology or {}) do
+    if tech.max_level == "infinite" and tech_name ~= previous_name then
+      if has_prereq(tech, previous_name) and effects_signature(tech.effects) == expected_signature then
+        return tech_name
+      end
     end
   end
-  if #ratios == 0 then return nil end
-  local first = ratios[1]
-  local consistent = true
-  for i = 2, #ratios do
-    if math.abs(ratios[i] - first) > 1e-6 then
-      consistent = false
-      break
-    end
-  end
-  if consistent and first >= 1 then return first end
   return nil
 end
 
-local function compute_growth_from_span(levels, counts)
-  if #levels < 2 then return nil end
-  local first = counts[1]
-  local last = counts[#counts]
-  if not first or first <= 0 or not last or last <= 0 then return nil end
-  local span = levels[#levels] - levels[1]
-  if span <= 0 then return nil end
-  local ratio = last / first
-  if ratio <= 0 then return nil end
-  return ratio ^ (1 / span)
+local function find_any_infinite_extension(previous_name, new_name)
+  for tech_name, tech in pairs(data.raw.technology or {}) do
+    if tech.max_level == "infinite" and tech_name ~= new_name then
+      if has_prereq(tech, previous_name) then
+        return tech_name
+      end
+    end
+  end
+  return nil
 end
 
 local function compute_growth_from_prev(last_unit, prev_unit)
@@ -125,7 +142,49 @@ local function compute_growth_from_prev(last_unit, prev_unit)
 end
 
 local function resolve_science_packs(spec, fallback_unit, key)
+  local base_ingredients = deepcopy((fallback_unit or {}).ingredients or {})
+  local seen_packs = {}
+  for _, pair in ipairs(base_ingredients) do
+    local pack_name = pair.name or pair[1]
+    if pack_name then seen_packs[pack_name] = true end
+  end
+
+  local function append_pack_list(list)
+    for _, pack in ipairs(list or {}) do
+      if U.science_pack_exists and U.science_pack_exists(pack) and not seen_packs[pack] then
+        seen_packs[pack] = true
+        table.insert(base_ingredients, {pack, 1})
+      end
+    end
+  end
+
   local desired = spec and spec.science_packs or nil
+  local add_list = spec and spec.add_science_packs or nil
+  if add_list == nil and not (spec and spec.override_science_packs == true) then
+    -- For continuation techs, default behavior is inherit + relevant extras.
+    if desired ~= nil and desired ~= "inherit" then
+      add_list = desired
+    else
+      add_list = U.pack_list_for_extension and U.pack_list_for_extension(key)
+    end
+  end
+  if type(add_list) == "string" then
+    add_list = (U.pack_list_for_extension and U.pack_list_for_extension(key, add_list))
+      or (U.pack_list_for_extension and U.pack_list_for_extension(add_list))
+  end
+  if type(add_list) == "table" then
+    append_pack_list(add_list)
+  end
+
+  if desired == nil or desired == "inherit" then
+    -- Keep extension levels aligned with the last vanilla level by default.
+    return base_ingredients
+  end
+  if not (spec and spec.override_science_packs == true) then
+    -- Explicit pack lists in defaults are treated as documentation unless
+    -- override_science_packs is enabled for this extension.
+    return base_ingredients
+  end
   local list = nil
   if desired == "all" then
     list = U.pack_list_all and U.pack_list_all()
@@ -136,19 +195,40 @@ local function resolve_science_packs(spec, fallback_unit, key)
     else
       list = U.pack_list_for_extension and U.pack_list_for_extension(desired)
     end
-  else
-    list = U.pack_list_for_extension and U.pack_list_for_extension(key)
   end
   if list and #list > 0 then
     local out = {}
+    local out_seen = {}
     for _, pack in ipairs(list) do
-      if tool_exists(pack) then
+      if U.science_pack_exists and U.science_pack_exists(pack) then
+        out_seen[pack] = true
         table.insert(out, {pack, 1})
+      end
+    end
+    for _, pair in ipairs(base_ingredients) do
+      local pack_name = pair.name or pair[1]
+      if pack_name and not out_seen[pack_name] then
+        out_seen[pack_name] = true
+        table.insert(out, {pack_name, 1})
       end
     end
     if #out > 0 then return out end
   end
-  return deepcopy((fallback_unit or {}).ingredients or {})
+  return base_ingredients
+end
+
+local function append_pack_prerequisites(prereqs, ingredients)
+  local seen = {}
+  for _, name in ipairs(prereqs or {}) do seen[name] = true end
+  for _, pair in ipairs(ingredients or {}) do
+    local pack_name = pair.name or pair[1]
+    local prereq = U.prereq_tech_for_science_pack and U.prereq_tech_for_science_pack(pack_name)
+    if prereq and not seen[prereq] then
+      seen[prereq] = true
+      table.insert(prereqs, prereq)
+    end
+  end
+  return prereqs
 end
 
 local function build_inserter_effects(last, spec)
@@ -176,7 +256,10 @@ local SPECIALS = {
 
 local function extend_chain(key)
   local spec = base_defaults[key] or {}
-  if not is_enabled(key, spec) then return end
+  if not is_enabled(key, spec) then
+    D.extension(D.extension_fields(key, "skipped", "disabled"))
+    return
+  end
 
   local pattern = "^" .. escape_pattern(key) .. "%-(%d+)$"
   local levels, by_level = {}, {}
@@ -193,13 +276,17 @@ local function extend_chain(key)
     end
   end
 
-  if has_infinite or #levels == 0 then return end
+  if has_infinite or #levels == 0 then
+    D.extension(D.extension_fields(key, "skipped", has_infinite and "already_infinite" or "no_vanilla_chain"))
+    return
+  end
   table.sort(levels)
 
   local detected_highest = levels[#levels]
   local min_level = spec.min_level or (detected_highest + 1)
   if detected_highest < min_level - 1 then
     -- Vanilla chain does not reach the expected prerequisite tier.
+    D.extension(D.extension_fields(key, "skipped", "vanilla_chain_below_minimum"))
     return
   end
 
@@ -215,16 +302,31 @@ local function extend_chain(key)
   end
 
   local base_tech = by_level[base_level]
-  if not base_tech or not base_tech.unit then return end
-  if base_tech.max_level == "infinite" then return end
-  -- Allow anchoring even if vanilla used a formula.
+  if not base_tech or not base_tech.unit then
+    D.extension(D.extension_fields(key, "skipped", "missing_base_unit"))
+    return
+  end
+  if base_tech.max_level == "infinite" then
+    D.extension(D.extension_fields(key, "skipped", "base_already_infinite"))
+    return
+  end
+  -- Allow anchoring when the base tech exists; vanilla-derived cost inference
+  -- still requires numeric unit.count values.
 
   local new_name = key .. "-" .. desired_new_level
-  if data.raw.technology[new_name] then return end
+  -- Never replace an existing vanilla or modded continuation level.
+  if data.raw.technology[new_name] then
+    D.extension(D.extension_fields(key, "skipped", "target_exists"))
+    return
+  end
 
   local max_level_value = coerce_max_level_value(startup_setting("mir-max-level-" .. key))
   if max_level_value == "infinite" then
     max_level_value = coerce_max_level_value(spec.max_level)
+  end
+  if max_level_value ~= "infinite" and max_level_value < desired_new_level then
+    D.extension(D.extension_fields(key, "skipped", "max_level_below_first_extension"))
+    return
   end
 
   local last_count = base_tech.unit.count
@@ -276,11 +378,12 @@ local function extend_chain(key)
   end
 
   local growth_setting = sanitize_number(startup_setting("mir-cost-growth-" .. key))
+  local force_vanilla_growth = growth_setting == 0
   local growth = nil
   if growth_setting and growth_setting > 0 then
     growth = growth_setting
   end
-  if not growth then
+  if not growth and not force_vanilla_growth then
     local default_growth = sanitize_number(spec.growth_factor)
     if default_growth and default_growth > 0 then
       growth = default_growth
@@ -297,12 +400,13 @@ local function extend_chain(key)
   end
 
   local base_setting = sanitize_number(startup_setting("mir-cost-base-" .. key))
+  local force_vanilla_base = base_setting == 0
   local base_value = nil
   if base_setting and base_setting > 0 then
     base_value = base_setting
   end
 
-  if not base_value then
+  if not base_value and not force_vanilla_base then
     local spec_base = sanitize_number(spec.base_cost)
     if spec_base and spec_base > 0 then
       base_value = spec_base
@@ -325,37 +429,67 @@ local function extend_chain(key)
   new.level = desired_new_level
 
   local special = SPECIALS[key]
+  local desired_effects = nil
   if special and special.effect_builder then
-    new.effects = special.effect_builder(base_tech, spec)
+    desired_effects = special.effect_builder(base_tech, spec)
   else
-    new.effects = deepcopy(base_tech.effects or {})
+    desired_effects = deepcopy(base_tech.effects or {})
   end
+  if not prefer_this_mod_for_competing_techs() then
+    local other_choice = find_any_infinite_extension(key .. "-" .. base_level, new_name)
+    if other_choice then
+      log("[more-infinite-research] Skipping extension for " .. key .. ": competing infinite tech kept from other mod (" .. other_choice .. ").")
+      D.extension(D.extension_fields(key, "skipped", "competing_infinite_kept"))
+      return
+    end
+  end
+  local existing = find_equivalent_infinite_extension(key .. "-" .. base_level, desired_effects)
+  if existing then
+    log("[more-infinite-research] Skipping extension for " .. key .. ": equivalent infinite tech already exists (" .. existing .. ").")
+    D.extension(D.extension_fields(key, "skipped", "equivalent_infinite_exists"))
+    return
+  end
+  new.effects = desired_effects
 
   new.max_level = max_level_value
   new.upgrade = true
 
   local research_setting = sanitize_number(startup_setting("mir-research-time-" .. key))
-  local research_time = research_setting
-  if not research_time or research_time <= 0 then
+  local force_vanilla_time = research_setting == 0
+  local research_time = nil
+  if research_setting and research_setting > 0 then
+    research_time = research_setting
+  end
+  if not research_time and not force_vanilla_time then
     research_time = sanitize_number(spec.research_time)
   end
   if not research_time or research_time <= 0 then
     research_time = base_tech.unit.time or 60
   end
 
+  local selected_ingredients = U.apply_science_pack_ingredient_policy(resolve_science_packs(spec, base_tech.unit, key))
+  local resolved_ingredients, lab_status = U.best_lab_compatible_ingredients(selected_ingredients, key)
+  lab_status = lab_status or "full"
+  if not resolved_ingredients or #resolved_ingredients == 0 then
+    log("[more-infinite-research] Skipping extension for " .. key .. ": no lab-compatible science pack set was found.")
+    D.extension(D.extension_fields(key, "skipped", "no_lab_compatible_science", resolved_ingredients, new.prerequisites, desired_effects, lab_status))
+    return
+  end
   new.unit = {
     count_formula = format_number(base_value) .. " * " .. format_number(growth) .. "^(L-1)",
-    ingredients = resolve_science_packs(spec, base_tech.unit, key),
+    ingredients = resolved_ingredients,
     time = research_time
   }
+  new.prerequisites = U.append_end_game_gate_prerequisite(append_pack_prerequisites(new.prerequisites, resolved_ingredients))
 
   if special and special.on_extend then
     special.on_extend(new, base_tech, spec)
   end
 
   data:extend({ new })
+  D.extension(D.extension_fields(key, "generated", "base_extension", resolved_ingredients, new.prerequisites, new.effects, lab_status))
 end
 
-for key, _ in pairs(base_defaults) do
+for _, key in ipairs(table_utils.sorted_keys(base_defaults)) do
   extend_chain(key)
 end

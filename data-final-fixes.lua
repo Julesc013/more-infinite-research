@@ -1,0 +1,7 @@
+require("prototypes.tech-gen")
+require("prototypes.compat.competing-productivity").apply()
+require("prototypes.compat.competing-base-extensions").apply()
+require("prototypes.base-tech-extensions")
+require("prototypes.weapon-speed-adjustments")
+require("prototypes.max-level-control")
+require("prototypes.diagnostics").flush()
