@@ -174,6 +174,20 @@ Important release note: the scripted runtime work above is a **default-off v2.0.
 - [ ] Record validation results in `docs/test-results.md`.
 - [ ] Commit docs, code, changelog, and package together for the tested candidate.
 
+## v1.9.0 Legacy Backport After v2.0.5
+
+Do this after the `v2.0.5` minimum manual smoke checks pass and the tested source point is tagged or otherwise recorded.
+
+- [ ] Finish and validate `v2.0.5` on the Factorio `2.1` line.
+- [ ] Tag or branch the exact `v2.0.5` source point, or record the exact release commit hash.
+- [ ] Run `git fetch origin`.
+- [ ] Run `git checkout -b backport/legacy-1.9.0 origin/legacy`.
+- [ ] Run `git merge --no-ff --no-commit v2.0.5`, or `git merge --no-ff --no-commit <v2.0.5-release-commit>` if using a commit hash.
+- [ ] Do not cherry-pick a guessed subset unless the full snapshot merge fails and the fallback is documented.
+- [ ] Prefer current-line source for shared generator, diagnostics, science-pack handling, recipe matching, compatibility cleanup, validation scripts, docs structure, and localization.
+- [ ] Apply the legacy compatibility patch below before building or publishing.
+- [ ] Validate with a real Factorio `2.0.x` binary, not the Steam-updated Factorio `2.1.x` binary.
+
 ## v2.1.0 Larger Feature Wave
 
 `v2.1.0` should take the harder work after `v2.0.5` feedback. It can also absorb any `v2.0.5` feature that fails proof.
@@ -228,16 +242,6 @@ Use `v2.2.0` for the next larger batch after the `v2.1.x` feedback cycle.
 ## Legacy Backports
 
 Do not reconstruct old releases commit-by-commit for `legacy`. A legacy release is a compatibility port of a tested current-line snapshot.
-
-### v1.9.0 Backport After v2.1.0
-
-- [ ] Finish and validate `v2.1.0` on the Factorio `2.1` line.
-- [ ] Tag or branch the exact `v2.1.0` source point, or record the exact release commit hash.
-- [ ] Run `git fetch origin`.
-- [ ] Run `git checkout -b backport/legacy-1.9.0 origin/legacy`.
-- [ ] Run `git merge --no-ff --no-commit v2.1.0`, or `git merge --no-ff --no-commit <v2.1.0-release-commit>` if using a commit hash.
-- [ ] Do not cherry-pick a guessed subset unless the full snapshot merge fails and the fallback is documented.
-- [ ] Prefer current-line source for shared generator, diagnostics, science-pack handling, recipe matching, compatibility cleanup, validation scripts, docs structure, and localization.
 
 ### v1.9.5 Backport After v2.1.5
 

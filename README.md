@@ -20,8 +20,8 @@ Compatibility note:
 - The current main line targets Factorio `2.1.x`.
 - `v2.0.5` is the first quick feedback patch after `v2.0.0`: small/easy fixes, default-off scripted agriculture/spoilage candidates, docs, validation, and package parity.
 - `v2.1.0` is the next larger feature wave.
-- The first Factorio `2.0.x` legacy build will be More Infinite Research `v1.9.0`, a compatible subset backported from the tested `v2.1.0` snapshot.
-- Future cadence follows the same pattern: quick current-line patch, legacy backport where useful, then the next larger current-line wave.
+- The first Factorio `2.0.x` legacy build will be More Infinite Research `v1.9.0`, a compatible subset backported from the tested `v2.0.5` quick-patch snapshot.
+- Future cadence keeps legacy close to proven current-line work: quick current-line patch, legacy backport where useful, then the next larger current-line wave.
 
 ## Quick Summary
 
@@ -60,7 +60,7 @@ The repository has **three permanent branches** on `origin`:
 Normal development should target **`dev`** first. Release-ready hotfixes can target **`main`**.
 Backports that must remain compatible with Factorio `2.0.x` belong on **`legacy`**.
 
-The next planned legacy release is **More Infinite Research `v1.9.0` for Factorio `2.0.x`**, intended as a compatibility port of the finished **More Infinite Research `v2.1.0` for Factorio `2.1.x`** codebase rather than a commit-by-commit rebuild of earlier releases. After that, quick feedback patches can follow the same pattern, for example **`v2.1.5 -> v1.9.5`**, with **`v1.9.9`** reserved as the final planned Factorio `2.0` port from the latest tested `2.x.x` current-line release when Factorio `2.1` becomes stable or when another verified upstream cutoff is chosen.
+The next planned legacy release is **More Infinite Research `v1.9.0` for Factorio `2.0.x`**, intended as a compatibility port of the tested **More Infinite Research `v2.0.5` for Factorio `2.1.x`** quick-patch codebase rather than a commit-by-commit rebuild of earlier releases. After that, quick feedback patches can follow the same pattern, for example **`v2.1.5 -> v1.9.5`**, with **`v1.9.9`** reserved as the final planned Factorio `2.0` port from the latest tested `2.x.x` current-line release when Factorio `2.1` becomes stable or when another verified upstream cutoff is chosen.
 
 See **`CONTRIBUTING.md`** for pull request expectations, branch routing, and validation commands.
 

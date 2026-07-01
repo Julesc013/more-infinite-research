@@ -13,7 +13,7 @@ Release discipline update:
 ```text
 v2.0.5 = quick feedback patch: small/easy fixes, default-off scripted agriculture/spoilage candidates, docs, validation, package parity.
 v2.1.0 = larger feature wave: presets, broader scripted refinements, pump/fluid/logistics/productivity work that passes proof.
-v1.9.0 = Factorio 2.0 compatible subset backported from the tested v2.1.0 snapshot.
+v1.9.0 = Factorio 2.0 compatible subset backported from the tested v2.0.5 quick-patch snapshot.
 v2.1.5 = quick feedback patch after v2.1.0.
 v1.9.5 = Factorio 2.0 compatible subset backported from the tested v2.1.5 snapshot.
 v2.2.0 = next larger feature wave.
@@ -808,7 +808,7 @@ Required named test saves/scenarios:
 
 ## Factorio 2.0 Backport Reality
 
-The first backport target is the finished More Infinite Research v2.1.0 codebase for Factorio `2.1.x`, not v2.0.0 or v2.0.5 reconstructed commit-by-commit. Later backports should repeat the same snapshot-port model.
+The first backport target is the finished More Infinite Research v2.0.5 quick-patch codebase for Factorio `2.1.x`, not v2.0.0 reconstructed commit-by-commit. Later backports should repeat the same snapshot-port model.
 
 Backport rule:
 
@@ -819,12 +819,12 @@ legacy should be current MIR code, minus Factorio 2.1-only surface area, with Fa
 The planned mapping is:
 
 ```text
-More Infinite Research v2.1.0 on Factorio 2.1.x -> More Infinite Research v1.9.0 on Factorio 2.0.x
+More Infinite Research v2.0.5 on Factorio 2.1.x -> More Infinite Research v1.9.0 on Factorio 2.0.x
 More Infinite Research v2.1.5 on Factorio 2.1.x -> More Infinite Research v1.9.5 on Factorio 2.0.x
 Latest tested MIR v2.x.x when Factorio 2.1 becomes stable or another verified upstream cutoff is chosen -> final MIR v1.9.9 on Factorio 2.0.x
 ```
 
-Be careful with the backport promise. The current 2.1 path can use clean agricultural tower events, cargo landing pad APIs, and any new v2.1.0 prototype unlocks. The 2.0 line may not have those APIs.
+Be careful with the backport promise. The current 2.1 path can use clean agricultural tower events and cargo landing pad APIs. The 2.0 line may not have those APIs, so the `1.9.0` port must explicitly remove or guard unsupported `2.0.5` current-line surfaces.
 
 Do not assume in Factorio 2.0:
 
@@ -862,7 +862,7 @@ Legacy metadata should be explicit:
 
 Do not carry Factorio `2.1.x` dependency floors into legacy. Validation should fail if legacy direct-effect stream definitions still contain `max-cargo-bay-unloading-distance` or `cargo-landing-pad-count`.
 
-A Factorio 2.0 backport should be a best-compatible subset on `legacy`, not a promise of full feature parity. The success criterion is that the diff from v2.1.0 to legacy is mostly metadata, docs, validation branching, and explicit removal of Factorio 2.1-only technology surfaces.
+A Factorio 2.0 backport should be a best-compatible subset on `legacy`, not a promise of full feature parity. The success criterion is that the diff from v2.0.5 to legacy is mostly metadata, docs, validation branching, and explicit removal of Factorio 2.1-only technology surfaces.
 
 ## Missing Work Before Implementation
 

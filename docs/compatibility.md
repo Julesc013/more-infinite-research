@@ -7,8 +7,8 @@ Release-line summary:
 | MIR release | Factorio line | Scope |
 | --- | --- | --- |
 | `2.0.5` | `2.1.x` | quick feedback patch: small fixes, default-off scripted agriculture/spoilage candidates, docs, validation, package parity |
+| `1.9.0` | `2.0.x` | compatible subset backported from the tested `2.0.5` quick-patch snapshot |
 | `2.1.0` | `2.1.x` | larger feature wave: presets, broader scripted refinements, logistics/fluid/productivity features that pass proof |
-| `1.9.0` | `2.0.x` | compatible subset backported from the tested `2.1.0` snapshot |
 | `2.1.5` | `2.1.x` | quick feedback patch after `2.1.0` |
 | `1.9.5` | `2.0.x` | compatible subset backported from the tested `2.1.5` snapshot |
 | `1.9.9` | `2.0.x` | final planned Factorio 2.0 port from the latest tested `2.x.x` snapshot when Factorio 2.1 becomes stable or another verified upstream cutoff is chosen |
@@ -54,9 +54,9 @@ This is especially relevant for cargo landing pad count, cargo bay unloading dis
 
 ## Legacy Backport Model
 
-The planned Factorio `2.0` legacy release is More Infinite Research `v1.9.0`, backported from the finished More Infinite Research `v2.1.0` Factorio `2.1` codebase. Later quick patch backports can follow the same model, such as `v2.1.5 -> v1.9.5`, with `v1.9.9` reserved as the final planned Factorio `2.0` build from the latest tested `2.x.x` snapshot when Factorio `2.1` becomes stable or another verified upstream cutoff is chosen.
+The planned Factorio `2.0` legacy release is More Infinite Research `v1.9.0`, backported from the tested More Infinite Research `v2.0.5` Factorio `2.1` quick-patch codebase. Later quick patch backports can follow the same model, such as `v2.1.5 -> v1.9.5`, with `v1.9.9` reserved as the final planned Factorio `2.0` build from the latest tested `2.x.x` snapshot when Factorio `2.1` becomes stable or another verified upstream cutoff is chosen.
 
-Legacy should not be rebuilt commit-by-commit from v2.0.0 or v2.0.5. It should be the current MIR generator, diagnostics, recipe matching, science-pack handling, compatibility cleanup, docs structure, locale, and validation infrastructure with Factorio `2.1`-only surface area removed or guarded.
+Legacy should not be reconstructed commit-by-commit from older release history. `v1.9.0` should port the tested `v2.0.5` snapshot: current MIR generator, diagnostics, recipe matching, science-pack handling, compatibility cleanup, docs structure, locale, and validation infrastructure with Factorio `2.1`-only surface area removed or guarded.
 
 Legacy `info.json` must use Factorio `2.0` metadata:
 

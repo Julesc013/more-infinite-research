@@ -106,7 +106,7 @@ Agricultural growth speed:
 - Scripted agricultural growth speed is not ready to enable by default until the tower planting behavior and large-farm behavior are recorded.
 - Changelog/README must not claim measured spoilage existing-stack behavior yet.
 - Existing agricultural plant rescale is intentionally not implemented for `2.0.5`.
-- Factorio `2.0.x` legacy backport is not started and should wait for the tested `2.1.0` snapshot.
+- Factorio `2.0.x` legacy backport is not started; the next plan is to backport the tested `2.0.5` quick-patch snapshot as `1.9.0` after the minimum `2.0.5` manual smoke checks pass.
 - Factorio `2.1.9` runtime validation has not been run locally; only official API docs were rechecked at `2.1.9`.
 - Real-mod manual checks for Quality and Omega Drill remain separate from fixture proof.
 

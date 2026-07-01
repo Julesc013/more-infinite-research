@@ -2,6 +2,20 @@
 
 This file records local release-candidate validation runs. It is not a substitute for the manual mod matrix in `docs/compatibility.md`.
 
+## 2026-07-01 Legacy Cadence Reorder
+
+Environment:
+
+- Mod version `2.0.5`.
+- Planning/docs-only change.
+
+Results:
+
+- Reordered the planned Factorio `2.0.x` legacy cadence so `v1.9.0` is now a compatibility backport of the tested `v2.0.5` quick-patch snapshot.
+- Kept `v2.1.0` as the next larger Factorio `2.1.x` feature wave after `v2.0.5` and `v1.9.0`.
+- Kept later backport cadence as `v2.1.5 -> v1.9.5` and final `v1.9.9` from the latest tested `2.x.x` source snapshot at the verified upstream cutoff.
+- Preserved the requirement that `v1.9.0` remove or guard Factorio `2.1`-only cargo modifier surfaces unless Factorio `2.0.x` validation proves support.
+
 ## 2026-07-01 Diagnostic Cargo Overlap Pull-Forward
 
 Environment:

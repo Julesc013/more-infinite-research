@@ -23,8 +23,8 @@ The minimum manual smoke checks gate the `v2.0.5` quick patch. The full scripted
 | MIR release | Factorio line | Release kind | Scope |
 | --- | --- | --- | --- |
 | `2.0.5` | `2.1.x` | Quick feedback patch | small/easy fixes, default-off scripted agriculture/spoilage candidates, docs, validation, package parity |
+| `1.9.0` | `2.0.x` | Legacy port | compatible subset of the tested `2.0.5` quick-patch snapshot |
 | `2.1.0` | `2.1.x` | Larger feature wave | settings presets, harder compatibility work, pump/fluid/logistics spikes that graduate, broader scripted refinements |
-| `1.9.0` | `2.0.x` | Legacy port | compatible subset of the tested `2.1.0` snapshot |
 | `2.1.5` | `2.1.x` | Quick feedback patch | small fixes and feedback from `2.1.0` |
 | `1.9.5` | `2.0.x` | Legacy port | compatible subset of the tested `2.1.5` snapshot |
 | `2.2.0` | `2.1.x` | Larger feature wave | next larger batch after the `2.1.x` feedback cycle |
@@ -169,6 +169,20 @@ Only defer the specific feature that fails proof:
 - Existing plant rescale is not required for `v2.0.5`; keep it for `v2.1.0` unless it is clearly bounded and safe.
 - Settings presets can wait for `v2.1.0` because they affect defaults and user expectations.
 
+## v1.9.0 Legacy Backport Target
+
+Theme:
+
+```text
+Factorio 2.0 compatibility port of the tested v2.0.5 quick patch.
+```
+
+Move `v1.9.0` directly after `v2.0.5` instead of waiting for `v2.1.0`. This gives Factorio `2.0.x` players the Tesla/electric fixes, duplicate-productivity safety, validation hardening, and default-off scripted candidate framework where the Factorio `2.0` API supports it.
+
+`v1.9.0` is still a compatibility subset, not full parity. The port must remove or guard Factorio `2.1`-only surfaces, especially cargo landing pad count and cargo bay unloading distance modifiers, unless a real Factorio `2.0.x` validation run proves support.
+
+Use the detailed rules in the Legacy Backport Strategy section below, but use the tested `v2.0.5` source point as the first snapshot.
+
 ## v2.1.0 Target
 
 Theme:
@@ -247,7 +261,7 @@ Backport mappings:
 
 | Current MIR release | Factorio line | Legacy MIR release | Factorio line |
 | --- | --- | --- | --- |
-| `2.1.0` | `2.1.x` | `1.9.0` | `2.0.x` |
+| `2.0.5` | `2.1.x` | `1.9.0` | `2.0.x` |
 | `2.1.5` | `2.1.x` | `1.9.5` | `2.0.x` |
 | latest tested `2.x.x` at the stable cutoff | `2.1.x` | `1.9.9` | `2.0.x` |
 
@@ -263,13 +277,13 @@ Recommended setup for the first legacy port:
 ```powershell
 git fetch origin
 git checkout -b backport/legacy-1.9.0 origin/legacy
-git merge --no-ff --no-commit v2.1.0
+git merge --no-ff --no-commit v2.0.5
 ```
 
 If the source is identified by commit instead of tag:
 
 ```powershell
-git merge --no-ff --no-commit <v2.1.0-release-commit>
+git merge --no-ff --no-commit <v2.0.5-release-commit>
 ```
 
 Expected legacy-port shape:
@@ -383,9 +397,9 @@ Recommended order from here:
 
 1. Keep `dev` state unambiguous with `git status`, `git log --oneline --decorate --graph --max-count=8`, and `git branch -vv` before pushing or tagging.
 2. Finish `v2.0.5` as the quick/easy implementation patch: Tesla fix, duplicate-productivity prevention, default-off scripted agriculture/spoilage candidates, docs, validation, and package parity.
-3. Move only failed or too-large `v2.0.5` candidates to `v2.1.0`.
-4. Ship `v2.1.0` as the larger feature wave.
-5. Backport the tested `v2.1.0` snapshot to Factorio 2.0 as `v1.9.0`.
+3. Backport the tested `v2.0.5` snapshot to Factorio 2.0 as `v1.9.0`.
+4. Move only failed or too-large `v2.0.5` candidates to `v2.1.0`.
+5. Ship `v2.1.0` as the larger feature wave.
 6. Ship quick `v2.1.5` feedback fixes.
 7. Backport the tested `v2.1.5` snapshot as `v1.9.5`.
 8. Ship the next larger wave as `v2.2.0`.

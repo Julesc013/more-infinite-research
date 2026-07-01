@@ -48,7 +48,7 @@ Latest official API docs checked on 2026-07-01: `2.1.9`. Local runtime validatio
 | `change-recipe-productivity` works cleanly for thruster fuel/oxidizer fluid recipes | Throwaway recipe-productivity test and runtime fixture | v2.1.x spike |
 | `change-recipe-productivity` works cleanly for oil/fluid-output recipes | Throwaway oil productivity test and runtime fixture | v2.1.x spike |
 | Factorio `2.0.x` exposes the agricultural tower events and fields needed by scripted agriculture | Validate on a Factorio `2.0.x` binary during legacy port | v1.9.0 |
-| Factorio `2.0.x` supports any v2.1.0 pump/pipeline prototype fields | Validate on a Factorio `2.0.x` binary during legacy port | v1.9.0 |
+| Factorio `2.0.x` supports any later current-line pump/pipeline prototype fields | Validate on a Factorio `2.0.x` binary during the matching legacy port | v1.9.x after the feature ships |
 
 ## API Links
 
