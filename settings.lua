@@ -39,12 +39,17 @@ local function default_enabled(key, stream)
   return not not value
 end
 
+local function append_note(description, note)
+  if not note then return description end
+  return {"", description, "\n\n", note}
+end
+
 table.insert(settings_data, {
   type = "bool-setting",
   name = "ips-require-space-gate",
   setting_type = "startup",
   default_value = false,
-  order = "a-00",
+  order = "a-010",
   localised_name = {"mod-setting-name.ips-require-space-gate"},
   localised_description = {"mod-setting-description.ips-require-space-gate"}
 })
@@ -55,7 +60,7 @@ table.insert(settings_data, {
   setting_type = "startup",
   default_value = "configured",
   allowed_values = {"configured", "space", "space-and-promethium", "all-official", "all"},
-  order = "a-01",
+  order = "a-020",
   localised_name = {"mod-setting-name.mir-science-pack-ingredient-policy"},
   localised_description = {"mod-setting-description.mir-science-pack-ingredient-policy"}
 })
@@ -66,7 +71,7 @@ table.insert(settings_data, {
   setting_type = "startup",
   default_value = "reduce",
   allowed_values = {"reduce", "skip"},
-  order = "a-02",
+  order = "a-030",
   localised_name = {"mod-setting-name.mir-lab-incompatibility-policy"},
   localised_description = {"mod-setting-description.mir-lab-incompatibility-policy"}
 })
@@ -76,7 +81,7 @@ table.insert(settings_data, {
   name = "mir-prefer-this-mod-for-competing-techs",
   setting_type = "startup",
   default_value = true,
-  order = "a-03",
+  order = "a-100",
   localised_name = {"mod-setting-name.mir-prefer-this-mod-for-competing-techs"},
   localised_description = {"mod-setting-description.mir-prefer-this-mod-for-competing-techs"}
 })
@@ -87,7 +92,7 @@ table.insert(settings_data, {
   setting_type = "startup",
   default_value = "off",
   allowed_values = {"off", "only-when-dedicated-tech-enabled", "always"},
-  order = "a-04",
+  order = "a-110",
   localised_name = {"mod-setting-name.mir-adjust-vanilla-weapon-speed-techs"},
   localised_description = {"mod-setting-description.mir-adjust-vanilla-weapon-speed-techs"}
 })
@@ -97,7 +102,7 @@ table.insert(settings_data, {
   name = "mir-debug-generation-report",
   setting_type = "startup",
   default_value = false,
-  order = "a-90",
+  order = "z-900",
   localised_name = {"mod-setting-name.mir-debug-generation-report"},
   localised_description = {"mod-setting-description.mir-debug-generation-report"}
 })
@@ -107,7 +112,7 @@ table.insert(settings_data, {
   name = "mir-debug-recipe-matches",
   setting_type = "startup",
   default_value = false,
-  order = "a-91",
+  order = "z-910",
   localised_name = {"mod-setting-name.mir-debug-recipe-matches"},
   localised_description = {"mod-setting-description.mir-debug-recipe-matches"}
 })
@@ -117,7 +122,7 @@ table.insert(settings_data, {
   name = "mir-debug-scripted-effects",
   setting_type = "startup",
   default_value = false,
-  order = "a-92",
+  order = "z-920",
   localised_name = {"mod-setting-name.mir-debug-scripted-effects"},
   localised_description = {"mod-setting-description.mir-debug-scripted-effects"}
 })
@@ -191,18 +196,35 @@ end
 table.sort(extras)
 for _, key in ipairs(extras) do table.insert(stream_order, key) end
 
+local stream_order_index = {}
+for i, key in ipairs(stream_order) do
+  stream_order_index[key] = string.format("%03d", i)
+end
+
+local stream_order_overrides = {
+  research_spoilage_preservation = "d-900-research_spoilage_preservation",
+  research_agricultural_growth_speed = "d-910-research_agricultural_growth_speed",
+  research_cargo_landing_pad_count = "d-920-research_cargo_landing_pad_count"
+}
+
+local function stream_order_prefix(key)
+  return stream_order_overrides[key] or ("b-" .. (stream_order_index[key] or "999") .. "-" .. key)
+end
+
 for _, key in ipairs(stream_order) do
   local stream = C.streams[key]
   if stream then
     local tech_locale = stream.localised_name or {"technology-name.more-infinite-research."..key}
+    local order_prefix = stream_order_prefix(key)
+    local settings_note = lookup_default(key, "settings_note", stream, nil)
     table.insert(settings_data, {
       type = "bool-setting",
       name = "ips-enable-"..key,
       setting_type = "startup",
       default_value = default_enabled(key, stream),
-      order = "b-"..key.."-0",
+      order = order_prefix.."-0",
       localised_name = {"mod-setting-name.ips-enable-stream", tech_locale},
-      localised_description = {"mod-setting-description.ips-enable-stream", tech_locale}
+      localised_description = append_note({"mod-setting-description.ips-enable-stream", tech_locale}, settings_note)
     })
     table.insert(settings_data, {
       type = "int-setting",
@@ -211,7 +233,7 @@ for _, key in ipairs(stream_order) do
       default_value = default_base_cost(key, stream),
       minimum_value = 1,
       maximum_value = 2147483647,
-      order = "b-"..key.."-1",
+      order = order_prefix.."-1",
       localised_name = {"mod-setting-name.ips-cost-base-stream", tech_locale},
       localised_description = {"mod-setting-description.ips-cost-base-stream", tech_locale}
     })
@@ -221,7 +243,7 @@ for _, key in ipairs(stream_order) do
       setting_type = "startup",
       default_value = default_growth_factor(key, stream),
       minimum_value = 1,
-      order = "b-"..key.."-2",
+      order = order_prefix.."-2",
       localised_name = {"mod-setting-name.ips-cost-growth-stream", tech_locale},
       localised_description = {"mod-setting-description.ips-cost-growth-stream", tech_locale}
     })
@@ -232,7 +254,7 @@ for _, key in ipairs(stream_order) do
       default_value = default_max_level_setting(key, stream),
       minimum_value = 0,
       maximum_value = 2147483647,
-      order = "b-"..key.."-3",
+      order = order_prefix.."-3",
       localised_name = {"mod-setting-name.ips-max-level-stream", tech_locale},
       localised_description = {"mod-setting-description.ips-max-level-stream", tech_locale}
     })
@@ -243,7 +265,7 @@ for _, key in ipairs(stream_order) do
       default_value = default_research_time_setting(key, stream),
       minimum_value = 0,
       maximum_value = 2147483647,
-      order = "b-"..key.."-4",
+      order = order_prefix.."-4",
       localised_name = {"mod-setting-name.ips-research-time-stream", tech_locale},
       localised_description = {"mod-setting-description.ips-research-time-stream", tech_locale}
     })
@@ -289,7 +311,7 @@ for _, spec in ipairs(base_extensions) do
     default_value = enabled_default,
     order = base_order.."",
     localised_name = {"mod-setting-name.mir-enable-base-tech", locale},
-    localised_description = {"mod-setting-description.mir-enable-base-tech", locale}
+    localised_description = append_note({"mod-setting-description.mir-enable-base-tech", locale}, defaults_spec.settings_note)
   })
   table.insert(settings_data, {
     type = "int-setting",
@@ -320,8 +342,8 @@ for _, spec in ipairs(base_extensions) do
     minimum_value = 0,
     maximum_value = 2147483647,
     order = base_order.."-3",
-    localised_name = {"mod-setting-name.ips-max-level-stream", locale},
-    localised_description = {"mod-setting-description.ips-max-level-stream", locale}
+    localised_name = {"mod-setting-name.mir-max-level", locale},
+    localised_description = {"mod-setting-description.mir-max-level", locale}
   })
   table.insert(settings_data, {
     type = "int-setting",

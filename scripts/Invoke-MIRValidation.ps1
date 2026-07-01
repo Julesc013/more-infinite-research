@@ -232,6 +232,15 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'default_value = false' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'name = "mir-science-pack-ingredient-policy"' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'allowed_values = {"configured", "space", "space-and-promethium", "all-official", "all"}' },
+    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'local function append_note(description, note)' },
+    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'local stream_order_index = {}' },
+    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'local stream_order_overrides = {' },
+    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'research_spoilage_preservation = "d-900-research_spoilage_preservation"' },
+    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'research_agricultural_growth_speed = "d-910-research_agricultural_growth_speed"' },
+    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'research_cargo_landing_pad_count = "d-920-research_cargo_landing_pad_count"' },
+    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'order = "z-900"' },
+    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'localised_description = append_note({"mod-setting-description.ips-enable-stream", tech_locale}, settings_note)' },
+    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'localised_name = {"mod-setting-name.mir-max-level", locale}' },
     @{ File = "prototypes\util.lua"; Text = $utilText; Snippet = 'apply_science_pack_ingredient_policy' },
     @{ File = "prototypes\util.lua"; Text = $utilText; Snippet = 'append_end_game_gate_prerequisite' },
     @{ File = "prototypes\lib\science-packs.lua"; Text = $scienceText; Snippet = 'pack_list_official' },
@@ -262,7 +271,20 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-science-pack-ingredient-policy-space=Add space science' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-science-pack-ingredient-policy-space-and-promethium=Add space and promethium science' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-science-pack-ingredient-policy-all-official=Use all official science packs' },
-    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-science-pack-ingredient-policy-all=Use all lab science packs' }
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-science-pack-ingredient-policy-all=Use all lab science packs' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = '[string-mod-setting-description]' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-science-pack-ingredient-policy-configured=Use the science packs configured for each generated technology. Safest default.' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-lab-incompatibility-policy-reduce=Keep the technology by reducing its science packs to the largest compatible set accepted by an active lab. Safest default for mod packs.' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-max-level=__1__ continuation: max level (0 = infinite)' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'ips-research-time-stream=__1__: research unit time' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-note-experimental-spoilage=Experimental and disabled by default in v2.0.5.' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-note-experimental-agriculture=Experimental and disabled by default in v2.0.5.' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-note-sandbox-cargo-pad-count=Sandbox-style and disabled by default.' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-note-inserter-capacity=Disabled by default.' },
+    @{ File = "defaults.lua"; Text = $defaultsText; Snippet = 'settings_note = {"mod-setting-description.mir-note-experimental-spoilage"}' },
+    @{ File = "defaults.lua"; Text = $defaultsText; Snippet = 'settings_note = {"mod-setting-description.mir-note-experimental-agriculture"}' },
+    @{ File = "defaults.lua"; Text = $defaultsText; Snippet = 'settings_note = {"mod-setting-description.mir-note-sandbox-cargo-pad-count"}' },
+    @{ File = "defaults.lua"; Text = $defaultsText; Snippet = 'settings_note = {"mod-setting-description.mir-note-inserter-capacity"}' }
   )
 
   if ($isLegacyFactorio20) {
@@ -303,10 +325,18 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
 }
 
 Invoke-RepoCheck "release documentation lists final manual and API checks" {
+  $readmeText = Get-Content -Raw -LiteralPath (Join-Path $repo "README.md")
+  $roadmapText = Get-Content -Raw -LiteralPath (Join-Path $repo "docs\roadmap.md")
+  $todoText = Get-Content -Raw -LiteralPath (Join-Path $repo "docs\todo.md")
   $apiProofText = Get-Content -Raw -LiteralPath (Join-Path $repo "docs\api-proof-points.md")
   $manualPlanText = Get-Content -Raw -LiteralPath (Join-Path $repo "docs\manual-test-plan.md")
 
   $requiredDocSnippets = @(
+    @{ File = "README.md"; Text = $readmeText; Snippet = '### Settings Guide' },
+    @{ File = "README.md"; Text = $readmeText; Snippet = '### What `0` Means' },
+    @{ File = "README.md"; Text = $readmeText; Snippet = '`Research unit time` is Factorio''s seconds-per-research-unit value.' },
+    @{ File = "docs\roadmap.md"; Text = $roadmapText; Snippet = 'Settings confidence pass: clearer labels, ordering, warnings, dropdown help, and docs' },
+    @{ File = "docs\todo.md"; Text = $todoText; Snippet = 'Complete a v2.0.5 settings confidence pass without adding real preset behavior.' },
     @{ File = "docs\manual-test-plan.md"; Text = $manualPlanText; Snippet = '`character-reach-icon`' },
     @{ File = "docs\manual-test-plan.md"; Text = $manualPlanText; Snippet = '`merged-inventory-trash-ui`' },
     @{ File = "docs\api-proof-points.md"; Text = $apiProofText; Snippet = 'Mod structure: <https://lua-api.factorio.com/latest/auxiliary/mod-structure.html>' },

@@ -27,6 +27,13 @@ Date: 2026-07-01
     - Added diagnostic-only native modifier overlap reporting for generated direct-effect technologies, so cargo/logistics modifier conflicts can be identified without changing generation behavior.
     - Character inventory slot research now also grants character logistic trash slots, replacing the separate trash slot generated technology while keeping the combined progression enabled by default.
     - Character reach bonus now uses the character mining speed picaxe icon instead of the exoskeleton equipment icon.
+    - Startup setting names and descriptions were rewritten for clearer scanning, safer defaults, and explicit research unit time wording.
+    - Generated stream startup settings now follow the curated stream order instead of sorting primarily by raw stream key.
+    - Diagnostics startup settings now appear after normal gameplay settings.
+    - Added dropdown option descriptions for science-pack policy, lab incompatibility policy, and weapon speed overlap cleanup settings.
+    - Added opt-in warning text to default-off experimental and sandbox settings, including Spoilage Preservation, Agricultural Growth Speed, Cargo landing pad count, and Inserter capacity continuation.
+    - Added a README settings guide for recommended default, vanilla-respectful, megabase, modpack compatibility, and debug/reporting setups.
+    - Documented the exact meaning of setting value `0` for generated research lines and vanilla continuations.
 
   Compatibility:
 
@@ -40,13 +47,15 @@ Date: 2026-07-01
     - Package validation now requires the TODO, API proof, and manual test documentation.
     - Static validation now rejects incomplete local fixture directories before runtime fixture validation starts.
     - Added a Maraxis-like duplicate cargo fixture that proves cargo landing pad count and cargo bay unloading distance overlaps are reported while MIR's generated cargo technologies still load unchanged when force-enabled.
+    - Added static validation coverage for settings confidence work, including setting warning notes, dropdown option descriptions, diagnostics ordering, and the new base-extension max-level locale key.
+    - Real settings presets remain deferred to v2.1.0 because preset override behavior needs a deliberate design and tests.
     - Factorio 2.0 legacy validation now rejects Factorio 2.1 dependency floors and Factorio 2.1-only cargo modifier strings when info.json targets Factorio 2.0.
     - Planned legacy cadence now starts with v2.0.5 to v1.9.0, followed by v2.1.5 to v1.9.5, and a final v1.9.9 from the latest tested v2.x.x source snapshot at the Factorio 2.1 stable cutoff.
 
   Localization:
 
     - Added locale keys for spoilage preservation, agricultural growth speed, scripted-effect descriptions, and scripted-effect diagnostics.
-    - Non-English locale files currently use English fallback text for the new 2.0.5 keys.
+    - Non-English locale files currently use English fallback text for the new 2.0.5 keys and refreshed settings UI text.
 
   Migration:
 

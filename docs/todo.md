@@ -64,6 +64,13 @@ Done in the current development branch:
 - [x] Add runtime validation for the merged inventory/trash effects and absence of the old stream diagnostics.
 - [x] Isolate runtime validation with its own Factorio config, write-data directory, and log path.
 - [x] Make Character reach bonus use the character mining speed picaxe icon.
+- [x] Complete a v2.0.5 settings confidence pass without adding real preset behavior.
+- [x] Make generated stream ordering control startup-setting order instead of alphabetical stream keys.
+- [x] Move diagnostics settings to the end of the startup settings page.
+- [x] Add startup-setting warning notes for default-off experimental/sandbox candidates.
+- [x] Add dropdown option descriptions for string startup settings.
+- [x] Add README settings setup guidance and document exactly what `0` means.
+- [x] Add static validation for settings confidence coverage.
 
 Important release note: the scripted runtime work above is a **default-off v2.0.5 ship candidate**, not automatically deferred to `v2.1.0`. Ship the opt-in implementation with conservative wording after the minimum smoke checks pass. Defer default enablement, presets, or stronger behavior claims until manual proof exists.
 
@@ -98,6 +105,8 @@ Important release note: the scripted runtime work above is a **default-off v2.0.
 - [x] Package includes `control.lua` and `control/`.
 - [x] Package includes `migrations/`.
 - [x] Package includes `docs/todo.md`, `docs/api-proof-points.md`, and `docs/manual-test-plan.md`.
+- [x] Startup setting labels, descriptions, ordering, dropdown help, and experimental warnings are refreshed without changing generated technology names or defaults.
+- [x] README documents recommended default, vanilla-respectful, megabase, modpack compatibility, and debug/reporting settings patterns.
 - [ ] Spoilage preservation passes the manual blockers below.
 - [ ] Agricultural growth speed for newly planted tower crops passes the manual blockers below.
 - [ ] README/changelog state the exact measured behavior, especially for existing spoilable stacks and existing plants.
@@ -118,6 +127,7 @@ Important release note: the scripted runtime work above is a **default-off v2.0.
 - [x] Zip filename and internal `info.json` version match `info.json`.
 - [x] Zip excludes dev-only files and includes required docs/source/locale/control/migration files.
 - [x] Git tree is clean after build.
+- [x] Static validation requires setting note keys, dropdown option descriptions, diagnostics order, and default-off scripted setting coverage.
 
 ### v2.0.5 API And ID Verification
 

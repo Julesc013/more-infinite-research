@@ -2,6 +2,31 @@
 
 This file records local release-candidate validation runs. It is not a substitute for the manual mod matrix in `docs/compatibility.md`.
 
+## 2026-07-01 Settings Confidence Pass
+
+Environment:
+
+- Factorio `2.1.8` build `86744`, Windows Steam, Space Age install.
+- Mod version `2.0.5`.
+- Release archive: `dist/more-infinite-research_2.0.5.zip`.
+
+Commands:
+
+```powershell
+.\scripts\Build-MIRPackage.ps1
+.\scripts\Invoke-MIRValidation.ps1 -StaticOnly
+.\scripts\Invoke-MIRValidation.ps1 -FactorioBin "C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe"
+```
+
+Results:
+
+- Rebuilt the release archive after settings UI and locale changes.
+- Static/package validation passed.
+- Runtime fixture validation passed across twenty-three isolated scenarios.
+- Locale parity validation passed across nine locale files after normalizing settings UI text to English fallback where translations are not yet refreshed.
+- Added validation coverage for stream setting order, diagnostics ordering, dropdown option descriptions, default-off warning notes, base-extension max-level locale wiring, and README settings guidance.
+- No real settings presets were added; preset mode and override behavior remain planned for `v2.1.0`.
+
 ## 2026-07-01 Final Smoke Plan Guard
 
 Environment:

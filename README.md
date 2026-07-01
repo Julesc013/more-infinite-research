@@ -99,10 +99,10 @@ where `L` is the research level.
 | Base cost | `8000` |
 | Growth factor | `2` |
 | Max level | `0` (infinite) |
-| Research time | `60` seconds |
+| Research unit time | `60` seconds |
 
 **Base-technology extensions** use the same formula, but their first generated level starts after the vanilla chain.
-A setting value of **`0`** for base cost, growth factor, or research time means *derive this from the vanilla chain*.
+A setting value of **`0`** for base cost, growth factor, or research unit time means *derive this from the vanilla chain*.
 
 If a positive base-extension max level is below the first generated continuation level, MIR **skips that extension** instead of creating an impossible capped technology.
 
@@ -194,7 +194,7 @@ These streams generate `change-recipe-productivity` effects for matching recipes
 | `research_modules` | Module productivity | tier 1 modules; tier 2 modules; tier 3 modules, including quality modules when present | `+10%`; `+5%`; `+2%` | Adds cryogenic science when available. |
 | `research_belts` | Transport belt productivity | yellow, red, blue, turbo, and hyper belt/underground/splitter families | `+10%`; `+5%`; `+2%`; `+1%`; `+0.5%` | Adds space science when available. |
 | `research_inserters` | Inserter productivity | basic/burner; fast/long-handed; bulk; stack inserters | `+10%`; `+5%`; `+2%`; `+1%` | Adds space science when available. |
-| `research_science_pack_productivity` | Science pack productivity | vanilla and Space Age science packs, plus active modded lab inputs | `+10%` | Uses dynamic lab-input targets. Research time default is `120` seconds. |
+| `research_science_pack_productivity` | Science pack productivity | vanilla and Space Age science packs, plus active modded lab inputs | `+10%` | Uses dynamic lab-input targets. Research unit time default is `120` seconds. |
 
 ### Direct-Effect And Scripted Streams
 
@@ -235,6 +235,61 @@ These extend selected finite vanilla chains into infinite continuations.
 ## Startup Settings
 
 All settings are **startup settings**.
+Changing them requires a restart and affects all players in multiplayer.
+
+### Settings Guide
+
+Recommended default:
+
+- Leave settings as shipped.
+- Stable generated research lines are enabled.
+- Experimental/scripted candidates stay disabled by default in `v2.0.5`.
+- Diagnostics stay disabled unless you are troubleshooting a report.
+
+Vanilla-respectful setup:
+
+- Disable vanilla continuations you do not want MIR to uncap.
+- Leave generated productivity streams enabled.
+- Keep Cargo landing pad count disabled unless you want sandbox-style Space Age logistics.
+- Keep Spoilage preservation and Agricultural growth speed disabled unless testing them.
+- Use science pack policy `configured`.
+
+Megabase setup:
+
+- Keep most generated streams enabled.
+- Keep max level at `0` for infinite progression.
+- Consider science pack policy `space`, `space-and-promethium`, or `all-official` if you want higher-end science sinks.
+- Use lab incompatibility policy `reduce` for broad modpack compatibility.
+
+Modpack compatibility setup:
+
+- Start with science pack policy `configured`.
+- Use lab incompatibility policy `reduce`.
+- Enable `Diagnostics: generation summary` only while troubleshooting.
+- Enable `Diagnostics: recipe matches` only when reporting missing or duplicate productivity chains.
+
+Debug/reporting setup:
+
+- Enable `Diagnostics: generation summary`, load once, then attach the Factorio log.
+- Enable `Diagnostics: recipe matches` for recipe-productivity matching issues.
+- Enable `Diagnostics: scripted effects` only for scripted spoilage/agriculture issues.
+
+### What `0` Means
+
+Generated research lines:
+
+- Max level `0` means infinite.
+- Research unit time `0` means use the stream/default value.
+- First-level cost and cost multiplier must be positive.
+
+Vanilla continuations:
+
+- First-level cost `0` means inherit from the vanilla chain when possible.
+- Cost multiplier `0` means inherit from the vanilla chain when possible.
+- Research unit time `0` means inherit from the vanilla chain when possible.
+- Max level `0` means infinite.
+
+`Research unit time` is Factorio's seconds-per-research-unit value. It is not total completion time; total time also depends on research units, labs, lab speed, and modules.
 
 ### Global Settings
 
@@ -289,7 +344,7 @@ Every base extension receives:
 | `mir-cost-base-<technology>` | int, min `0` | `0` derives the level 1 base term from the vanilla chain; positive values override it. |
 | `mir-cost-growth-<technology>` | double, min `0` | `0` derives growth from the vanilla chain; positive values override it. |
 | `mir-max-level-<technology>` | int, min `0` | `0` means infinite; positive values cap the generated continuation. |
-| `mir-research-time-<technology>` | int, min `0` | `0` reuses vanilla research time; positive values override seconds per unit. |
+| `mir-research-time-<technology>` | int, min `0` | `0` reuses vanilla research unit time; positive values override seconds per unit. |
 
 ## Compatibility Specification
 
