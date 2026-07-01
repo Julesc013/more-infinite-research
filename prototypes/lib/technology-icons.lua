@@ -24,13 +24,20 @@ local function copy_icons(icons)
   return out
 end
 
-local function has_constant_overlay(icons)
+local function is_constant_overlay(layer)
+  return layer
+    and layer.icon
+    and string.find(layer.icon, "__core__/graphics/icons/technology/constants/", 1, true) ~= nil
+end
+
+local function strip_constant_overlays(icons)
+  local out = {}
   for _, layer in ipairs(icons or {}) do
-    if layer.icon and string.find(layer.icon, "__core__/graphics/icons/technology/constants/", 1, true) then
-      return true
+    if not is_constant_overlay(layer) then
+      table.insert(out, deepcopy(layer))
     end
   end
-  return false
+  return out
 end
 
 local function icons_from_tech(name)
@@ -49,6 +56,35 @@ local function icon_from_item(name)
   return nil
 end
 
+local function icons_from_tech_candidates(names)
+  for _, name in ipairs(names or {}) do
+    local icons = icons_from_tech(name) or icon_from_item(name)
+    if icons then return icons end
+  end
+  return nil
+end
+
+local function base_icons_for_stream(stream)
+  local base = nil
+  if stream.icons then
+    base = stream.icons
+  elseif stream.icon then
+    local entry = {icon = stream.icon, icon_size = stream.icon_size or 64}
+    if stream.icon_tint then entry.tint = stream.icon_tint end
+    base = {entry}
+  elseif stream.icon_techs then
+    base = icons_from_tech_candidates(stream.icon_techs)
+  elseif stream.icon_tech then
+    base = icons_from_tech(stream.icon_tech) or icon_from_item(stream.icon_tech)
+  end
+  if not base then
+    local src = stream.icon_item or ((stream.items or {})[1])
+    base = icon_from_item(src)
+  end
+  if base then return copy_icons(base) end
+  return nil
+end
+
 local function overlay_for_stream(stream)
   if stream.overlay ~= nil then return stream.overlay end
 
@@ -57,6 +93,7 @@ local function overlay_for_stream(stream)
     local t = effect.type
     if t == "character-running-speed" then return "movement-speed" end
     if t == "character-mining-speed" then return "mining" end
+    if t == "laboratory-productivity" then return "recipe-productivity" end
     if t == "character-reach-distance"
       or t == "character-build-distance"
       or t == "character-resource-reach-distance"
@@ -75,14 +112,14 @@ local function overlay_for_stream(stream)
 end
 
 local function add_constant_overlay(base_icons, overlay)
-  local out = copy_icons(base_icons)
+  local out = strip_constant_overlays(base_icons)
   if #out == 0 then
     out = {{
       icon = "__base__/graphics/technology/mining-productivity.png",
       icon_size = 256
     }}
   end
-  if overlay == false or has_constant_overlay(out) then return out end
+  if overlay == false then return out end
 
   local path = CONSTANT_OVERLAYS[overlay or "recipe-productivity"] or overlay
   if type(path) ~= "string" then return out end
@@ -100,21 +137,17 @@ local function add_constant_overlay(base_icons, overlay)
 end
 
 function I.icons_for_stream(stream)
-  local base = nil
-  if stream.icons then
-    base = stream.icons
-  elseif stream.icon then
-    local entry = {icon = stream.icon, icon_size = stream.icon_size or 64}
-    if stream.icon_tint then entry.tint = stream.icon_tint end
-    base = {entry}
-  elseif stream.icon_tech then
-    base = icons_from_tech(stream.icon_tech) or icon_from_item(stream.icon_tech)
-  end
-  if not base then
-    local src = stream.icon_item or ((stream.items or {})[1])
-    base = icon_from_item(src)
-  end
+  local base = base_icons_for_stream(stream)
   return add_constant_overlay(base, overlay_for_stream(stream))
+end
+
+function I.effect_icons_for_stream(stream)
+  local base = base_icons_for_stream(stream)
+  if base and #base > 0 then return base end
+  return {{
+    icon = "__base__/graphics/technology/mining-productivity.png",
+    icon_size = 256
+  }}
 end
 
 return I

@@ -28,6 +28,7 @@ U.prereq_tech_for_science_pack = science.prereq_tech_for_science_pack
 U.end_game_science_pack = science.end_game_science_pack
 
 U.icons_for_stream = icons.icons_for_stream
+U.effect_icons_for_stream = icons.effect_icons_for_stream
 U.matches_stream_recipe_filter = recipes.matches_stream_recipe_filter
 
 local STREAM_EXTRA_PACKS = {
@@ -74,7 +75,6 @@ local STREAM_EXTRA_PACKS = {
   research_armor_components = {"military-science-pack", "metallurgic-science-pack", "space-science-pack"},
 
   research_inventory_capacity = {"agricultural-science-pack"},
-  research_character_trash_slots = {"agricultural-science-pack"},
   research_robot_battery = {"space-science-pack"},
   research_science_pack_productivity = {}
 }

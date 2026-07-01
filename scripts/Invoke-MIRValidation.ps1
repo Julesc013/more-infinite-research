@@ -7,6 +7,9 @@ param(
 
 $ErrorActionPreference = "Stop"
 $repo = Resolve-Path (Join-Path $PSScriptRoot "..")
+$repoInfo = Get-Content -Raw (Join-Path $repo "info.json") | ConvertFrom-Json
+$isLegacyFactorio20 = $repoInfo.factorio_version -eq "2.0"
+$isFactorio21Line = $repoInfo.factorio_version -eq "2.1"
 
 function Invoke-RepoCheck {
   param([string]$Description, [scriptblock]$Script)
@@ -26,12 +29,38 @@ function Find-RepositoryText {
 }
 
 Invoke-RepoCheck "info.json parses" {
-  $null = Get-Content -Raw (Join-Path $repo "info.json") | ConvertFrom-Json
+  $null = $repoInfo
+}
+
+Invoke-RepoCheck "release metadata matches Factorio line" {
+  $deps = @($repoInfo.dependencies)
+
+  if ($isLegacyFactorio20) {
+    if ($deps -notcontains "base >= 2.0") {
+      throw "Factorio 2.0 legacy metadata must declare base >= 2.0."
+    }
+
+    $factorio21Deps = @($deps | Where-Object { $_ -match ">=\s*2\.1" })
+    if ($factorio21Deps.Count -gt 0) {
+      throw "Factorio 2.0 legacy metadata must not carry Factorio 2.1 dependency floors: $($factorio21Deps -join ', ')"
+    }
+  } elseif ($isFactorio21Line) {
+    if ($deps -notcontains "base >= 2.1.8") {
+      throw "Factorio 2.1 metadata must declare base >= 2.1.8."
+    }
+    if ($deps -notcontains "(?) quality >= 2.1.8") {
+      throw "Factorio 2.1 metadata must declare hidden optional Quality load ordering with (?) quality >= 2.1.8."
+    }
+    if ($deps -contains "? quality >= 2.1.8") {
+      throw "Quality must be a hidden optional dependency so module productivity can see quality module recipes without advertising a visible dependency."
+    }
+  } else {
+    throw "Unsupported factorio_version in info.json: $($repoInfo.factorio_version)"
+  }
 }
 
 Invoke-RepoCheck "release metadata avoids compatibility mod dependencies" {
-  $info = Get-Content -Raw (Join-Path $repo "info.json") | ConvertFrom-Json
-  $deps = @($info.dependencies)
+  $deps = @($repoInfo.dependencies)
   $compatDependencyModIds = @(
     "Advanced-Electric-Revamped-v16",
     "Better_Robots_Extended",
@@ -92,8 +121,99 @@ Invoke-RepoCheck "generated icons do not use icon_mipmaps" {
   }
 }
 
+Invoke-RepoCheck "control runtime avoids tick handlers" {
+  $luaFiles = @()
+  $controlLua = Join-Path $repo "control.lua"
+  $controlDir = Join-Path $repo "control"
+
+  if (Test-Path -LiteralPath $controlLua) {
+    $luaFiles += Get-Item -LiteralPath $controlLua
+  }
+  if (Test-Path -LiteralPath $controlDir) {
+    $luaFiles += @(Get-ChildItem -LiteralPath $controlDir -Recurse -File -Filter "*.lua")
+  }
+
+  $matches = @(
+    foreach ($file in $luaFiles) {
+      Select-String -LiteralPath $file.FullName -Pattern "defines\.events\.on_tick|script\.on_nth_tick"
+    }
+  )
+
+  if ($matches.Count -gt 0) {
+    $matches | Write-Host
+    throw "Runtime tick handlers are not allowed without an explicit documented allowlist and disabled-by-default feature gate."
+  }
+}
+
+Invoke-RepoCheck "scripted candidate streams remain default-off before manual proof" {
+  $defaultsText = Get-Content -Raw -LiteralPath (Join-Path $repo "defaults.lua")
+  foreach ($streamKey in @("research_spoilage_preservation", "research_agricultural_growth_speed")) {
+    if ($defaultsText -notmatch "(?s)$streamKey\s*=\s*\{.*?enabled\s*=\s*false") {
+      throw "Scripted candidate stream $streamKey must remain disabled by default until manual save validation supports release claims."
+    }
+  }
+}
+
+Invoke-RepoCheck "merged trash-slot technology has save migration" {
+  $migrationPath = Join-Path $repo "migrations\more-infinite-research_2.0.5.json"
+  if (-not (Test-Path -LiteralPath $migrationPath)) {
+    throw "Missing migration for removed character trash-slot technology: $migrationPath"
+  }
+
+  $migration = Get-Content -Raw -LiteralPath $migrationPath | ConvertFrom-Json
+  $found = $false
+  foreach ($mapping in @($migration.technology)) {
+    $values = @($mapping)
+    if ($values.Count -eq 2 `
+        -and $values[0] -eq "recipe-prod-research_character_trash_slots-1" `
+        -and $values[1] -eq "recipe-prod-research_inventory_capacity-1") {
+      $found = $true
+      break
+    }
+  }
+
+  if (-not $found) {
+    throw "Migration must map recipe-prod-research_character_trash_slots-1 to recipe-prod-research_inventory_capacity-1."
+  }
+}
+
 Invoke-RepoCheck "locale files match English fallback" {
   & (Join-Path $repo "scripts\Test-MIRLocales.ps1") -AllowMissingSupportedLanguages
+}
+
+Invoke-RepoCheck "fixture mods have metadata and data entrypoints" {
+  $fixtureRootForStatic = Join-Path $repo "fixtures"
+  if (-not (Test-Path -LiteralPath $fixtureRootForStatic)) {
+    throw "Fixture directory not found: $fixtureRootForStatic"
+  }
+
+  foreach ($fixture in Get-ChildItem -LiteralPath $fixtureRootForStatic -Directory) {
+    $infoPath = Join-Path $fixture.FullName "info.json"
+    if (-not (Test-Path -LiteralPath $infoPath)) {
+      throw "Fixture directory is missing info.json: $($fixture.FullName)"
+    }
+
+    $info = Get-Content -Raw -LiteralPath $infoPath | ConvertFrom-Json
+    if ([string]::IsNullOrWhiteSpace($info.name) -or $info.name -notmatch "^mir-fixture-") {
+      throw "Fixture info.json must declare a mir-fixture-* name: $infoPath"
+    }
+
+    $entryFiles = @(
+      "data.lua",
+      "data-updates.lua",
+      "data-final-fixes.lua"
+    )
+    $hasEntry = $false
+    foreach ($entryFile in $entryFiles) {
+      if (Test-Path -LiteralPath (Join-Path $fixture.FullName $entryFile)) {
+        $hasEntry = $true
+        break
+      }
+    }
+    if (-not $hasEntry) {
+      throw "Fixture $($info.name) has no data-stage entry file."
+    }
+  }
 }
 
 Invoke-RepoCheck "science-pack progression settings are wired" {
@@ -103,6 +223,9 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
   $scienceText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\lib\science-packs.lua")
   $directEffectsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\streams\direct-effects.lua")
   $productivityText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\streams\productivity.lua")
+  $technologyIconsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\lib\technology-icons.lua")
+  $weaponSpeedText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\weapon-speed-adjustments.lua")
+  $generationIntegrityFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-generation-integrity\data-final-fixes.lua")
   $defaultsText = Get-Content -Raw -LiteralPath (Join-Path $repo "defaults.lua")
   $localeText = Get-Content -Raw -LiteralPath (Join-Path $repo "locale\en\more-infinite-research.cfg")
 
@@ -111,6 +234,20 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'default_value = false' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'name = "mir-science-pack-ingredient-policy"' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'allowed_values = {"configured", "space", "space-and-promethium", "all-official", "all"}' },
+    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'local function append_note(description, note)' },
+    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'local stream_sort_names = {' },
+    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'research_agricultural_growth_speed = "Agricultural growth speed"' },
+    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'research_cargo_landing_pad_count = "Cargo landing pad count"' },
+    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'research_character_reach = "Character reach bonus"' },
+    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'research_spoilage_preservation = "Spoilage preservation"' },
+    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'local function group_order_prefix(group)' },
+    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'local technology_setting_groups = {}' },
+    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'kind = "stream"' },
+    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'kind = "base"' },
+    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'local bucket = group.enabled and "100" or "000"' },
+    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'order = "a-900"' },
+    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'localised_description = append_note({"mod-setting-description.ips-enable-stream", tech_locale}, settings_note)' },
+    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'localised_name = {"mod-setting-name.mir-max-level", locale}' },
     @{ File = "prototypes\util.lua"; Text = $utilText; Snippet = 'apply_science_pack_ingredient_policy' },
     @{ File = "prototypes\util.lua"; Text = $utilText; Snippet = 'append_end_game_gate_prerequisite' },
     @{ File = "prototypes\lib\science-packs.lua"; Text = $scienceText; Snippet = 'pack_list_official' },
@@ -121,21 +258,89 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "prototypes\base-tech-extensions.lua"; Text = $baseExtensionsText; Snippet = 'apply_science_pack_ingredient_policy' },
     @{ File = "prototypes\base-tech-extensions.lua"; Text = $baseExtensionsText; Snippet = 'append_end_game_gate_prerequisite' },
     @{ File = "prototypes\lib\science-packs.lua"; Text = $scienceText; Snippet = 'end_game_science_pack' },
-    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'icon_tech = "research-productivity"' },
-    @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'research_cargo_landing_pad_count = {' },
-    @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'required_mods = {"space-age"}' },
-    @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'required_technologies = {"rocket-silo"}' },
-    @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'science_packs = "all-official"' },
-    @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'type = "max-cargo-bay-unloading-distance", modifier = 10' },
-    @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'type = "cargo-landing-pad-count", modifier = 1' },
+    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'icon_techs = {"research-productivity", "space-science-pack"}' },
+    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'icon_techs={"processing-unit", "advanced-electronics-2"}' },
+    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'research_rocket_fuel = { items={"rocket-fuel"}, icon_tech="rocket-fuel" }' },
+    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'research_walls = { icon_tech="gate", icon_item="stone-wall", groups = {' },
+    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'research_heavy_ammo = { icon_item="cannon-shell", groups = {' },
+    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'items={"artillery-shell","railgun-ammo"}' },
+    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = '^omega%-drill$' },
+    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = '^omega%-tau$' },
+    @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'icon_techs = {"electric-weapons-damage-1", "discharge-defense-equipment"}' },
+    @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'technology-description.more-infinite-research.electric_shooting_speed' },
+    @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'technology-description.more-infinite-research.flamethrower_shooting_speed' },
+    @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'type = "laboratory-productivity", modifier = 0.10' },
+    @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'skip_if_technologies = {"research-productivity"}' },
+    @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'icon_techs = {"research-productivity", "military-science-pack"}' },
+    @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'ammo_category = "tesla", modifier = 0.1' },
+    @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'ammo_category = "electric", modifier = 0.1' },
+    @{ File = "prototypes\lib\technology-icons.lua"; Text = $technologyIconsText; Snippet = 'local function strip_constant_overlays(icons)' },
+    @{ File = "prototypes\lib\technology-icons.lua"; Text = $technologyIconsText; Snippet = 'local out = strip_constant_overlays(base_icons)' },
+    @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'assert_generated_icon_badge(tech_name, tech)' },
+    @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'assert_tech_uses_item_icon("recipe-prod-research_heavy_ammo-1", "cannon-shell")' },
+    @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'assert_tech_uses_technology_icon("recipe-prod-research_walls-1", "gate")' },
+    @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'assert_tech_uses_technology_icon("recipe-prod-research_lab_productivity-1", "military-science-pack")' },
+    @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'assert_tech_uses_technology_icon("recipe-prod-research_rocket_fuel-1", "rocket-fuel")' },
+    @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'effect_type == "laboratory-productivity"' },
+    @{ File = "prototypes\weapon-speed-adjustments.lua"; Text = $weaponSpeedText; Snippet = 'tech.unit and tech.unit.count_formula' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = '[modifier-description]' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'cargo-landing-pad-count=Cargo landing pads per surface: +__1__' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'more-infinite-research.electric_shooting_speed=' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'more-infinite-research.flamethrower_shooting_speed=' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'more-infinite-research.research_heavy_ammo=Cannon shell productivity' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'more-infinite-research.research_lab_productivity=Research productivity' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'more-infinite-research.lab_productivity=Increases research progress gained from each consumed science pack' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'flamethrower-shooting-speed-bonus=Flamethrower shooting speed: +__1__' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'electric-shooting-speed-bonus=Electric shooting speed: +__1__' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'tesla-shooting-speed-bonus=Tesla shooting speed: +__1__' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-science-pack-ingredient-policy-configured=Configured per technology' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-science-pack-ingredient-policy-space=Add space science' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-science-pack-ingredient-policy-space-and-promethium=Add space and promethium science' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-science-pack-ingredient-policy-all-official=Use all official science packs' },
-    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-science-pack-ingredient-policy-all=Use all lab science packs' }
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-science-pack-ingredient-policy-all=Use all lab science packs' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = '[string-mod-setting-description]' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-science-pack-ingredient-policy-configured=Use the science packs configured for each generated technology. Safest default.' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-lab-incompatibility-policy-reduce=Keep the technology by reducing its science packs to the largest compatible set accepted by an active lab. Safest default for mod packs.' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'ips-enable-stream=Enable __1__ technology' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-max-level=Maximum level for infinite __1__' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'ips-research-time-stream=Research unit time for __1__' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'ips-require-space-gate=Require finishing the game before generated technologies' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-science-pack-ingredient-policy=Extra science packs for generated technologies' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-lab-incompatibility-policy=What to do when no lab can research a technology' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-prefer-this-mod-for-competing-techs=Use MIR when another mod adds the same infinite research' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-adjust-vanilla-weapon-speed-techs=Remove duplicate rocket/cannon speed from general weapon speed' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-debug-generation-report=Log generated and skipped technologies' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-note-experimental-spoilage=Experimental and disabled by default in v2.0.5.' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-note-experimental-agriculture=Experimental and disabled by default in v2.0.5.' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-note-sandbox-cargo-pad-count=Sandbox-style and disabled by default.' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-note-inserter-capacity=Disabled by default.' },
+    @{ File = "defaults.lua"; Text = $defaultsText; Snippet = 'settings_note = {"mod-setting-description.mir-note-experimental-spoilage"}' },
+    @{ File = "defaults.lua"; Text = $defaultsText; Snippet = 'settings_note = {"mod-setting-description.mir-note-experimental-agriculture"}' },
+    @{ File = "defaults.lua"; Text = $defaultsText; Snippet = 'settings_note = {"mod-setting-description.mir-note-sandbox-cargo-pad-count"}' },
+    @{ File = "defaults.lua"; Text = $defaultsText; Snippet = 'settings_note = {"mod-setting-description.mir-note-inserter-capacity"}' },
+    @{ File = "defaults.lua"; Text = $defaultsText; Snippet = 'research_lab_productivity = {' }
   )
+
+  if ($isLegacyFactorio20) {
+    $legacyForbiddenCargoSnippets = @(
+      'type = "max-cargo-bay-unloading-distance"',
+      'type = "cargo-landing-pad-count"'
+    )
+    foreach ($snippet in $legacyForbiddenCargoSnippets) {
+      if ($directEffectsText.Contains($snippet)) {
+        throw "Factorio 2.0 legacy must not include Factorio 2.1-only cargo technology modifier in prototypes\streams\direct-effects.lua: $snippet"
+      }
+    }
+  } else {
+    $requiredSnippets += @(
+      @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'research_cargo_landing_pad_count = {' },
+      @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'required_mods = {"space-age"}' },
+      @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'required_technologies = {"rocket-silo"}' },
+      @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'science_packs = "all-official"' },
+      @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'type = "max-cargo-bay-unloading-distance", modifier = 10' },
+      @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'type = "cargo-landing-pad-count", modifier = 1' }
+    )
+  }
 
   foreach ($check in $requiredSnippets) {
     if (-not $check.Text.Contains($check.Snippet)) {
@@ -143,11 +348,48 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     }
   }
 
-  if ($defaultsText -notmatch '(?s)research_cargo_bay_unloading_distance\s*=\s*\{.*?research_time\s*=\s*120') {
-    throw "Cargo bay unloading distance default research time must be 120 seconds."
+  if (-not $isLegacyFactorio20) {
+    if ($defaultsText -notmatch '(?s)research_cargo_bay_unloading_distance\s*=\s*\{.*?research_time\s*=\s*120') {
+      throw "Cargo bay unloading distance default research time must be 120 seconds."
+    }
+    if ($defaultsText -notmatch '(?s)research_cargo_landing_pad_count\s*=\s*\{.*?research_time\s*=\s*240') {
+      throw "Cargo landing pad count default research time must be 240 seconds."
+    }
   }
-  if ($defaultsText -notmatch '(?s)research_cargo_landing_pad_count\s*=\s*\{.*?research_time\s*=\s*240') {
-    throw "Cargo landing pad count default research time must be 240 seconds."
+}
+
+Invoke-RepoCheck "release documentation lists final manual and API checks" {
+  $readmeText = Get-Content -Raw -LiteralPath (Join-Path $repo "README.md")
+  $roadmapText = Get-Content -Raw -LiteralPath (Join-Path $repo "docs\roadmap.md")
+  $todoText = Get-Content -Raw -LiteralPath (Join-Path $repo "docs\todo.md")
+  $apiProofText = Get-Content -Raw -LiteralPath (Join-Path $repo "docs\api-proof-points.md")
+  $manualPlanText = Get-Content -Raw -LiteralPath (Join-Path $repo "docs\manual-test-plan.md")
+
+  $requiredDocSnippets = @(
+    @{ File = "README.md"; Text = $readmeText; Snippet = '### Settings Guide' },
+    @{ File = "README.md"; Text = $readmeText; Snippet = '### What `0` Means' },
+    @{ File = "README.md"; Text = $readmeText; Snippet = '`Research unit time` is Factorio''s seconds-per-research-unit value.' },
+    @{ File = "docs\roadmap.md"; Text = $roadmapText; Snippet = 'Settings confidence pass: clearer labels, ordering, warnings, dropdown help, and docs' },
+    @{ File = "docs\todo.md"; Text = $todoText; Snippet = 'Complete a v2.0.5 settings confidence pass without adding real preset behavior.' },
+    @{ File = "docs\manual-test-plan.md"; Text = $manualPlanText; Snippet = '`character-reach-icon`' },
+    @{ File = "docs\manual-test-plan.md"; Text = $manualPlanText; Snippet = '`merged-inventory-trash-ui`' },
+    @{ File = "docs\api-proof-points.md"; Text = $apiProofText; Snippet = 'Mod structure: <https://lua-api.factorio.com/latest/auxiliary/mod-structure.html>' },
+    @{ File = "docs\api-proof-points.md"; Text = $apiProofText; Snippet = 'Modifier list: <https://lua-api.factorio.com/latest/types/Modifier.html>' },
+    @{ File = "docs\api-proof-points.md"; Text = $apiProofText; Snippet = '`NothingModifier`: <https://lua-api.factorio.com/latest/types/NothingModifier.html>' },
+    @{ File = "docs\api-proof-points.md"; Text = $apiProofText; Snippet = '`DifficultySettings`: <https://lua-api.factorio.com/latest/concepts/DifficultySettings.html>' },
+    @{ File = "docs\api-proof-points.md"; Text = $apiProofText; Snippet = '`LuaEntity`: <https://lua-api.factorio.com/latest/classes/LuaEntity.html>' }
+  )
+
+  foreach ($check in $requiredDocSnippets) {
+    if (-not $check.Text.Contains($check.Snippet)) {
+      throw "Missing required release documentation entry in $($check.File): $($check.Snippet)"
+    }
+  }
+
+  foreach ($line in ($apiProofText -split "`r?`n")) {
+    if ($line -match '^- .+:\s*$') {
+      throw "docs\api-proof-points.md contains an empty API link entry: $line"
+    }
   }
 }
 
@@ -160,6 +402,9 @@ Invoke-RepoCheck "changelog uses Factorio changelog format" {
   }
   if ($lines[0] -ne $separator) {
     throw "changelog.txt must start with exactly 99 dashes."
+  }
+  if ($lines -notcontains "Version: $($repoInfo.version)") {
+    throw "changelog.txt must contain an entry for the current info.json version $($repoInfo.version)."
   }
 
   $sectionStart = $true
@@ -256,18 +501,27 @@ Invoke-RepoCheck "release package archive matches metadata" {
       "${root}LICENSE",
       "${root}thumbnail.png",
       "${root}data.lua",
+      "${root}control.lua",
       "${root}data-updates.lua",
       "${root}data-final-fixes.lua",
       "${root}settings.lua",
       "${root}defaults.lua",
       "${root}locale/en/more-infinite-research.cfg",
       "${root}docs/architecture.md",
+      "${root}docs/api-proof-points.md",
       "${root}docs/compatibility.md",
+      "${root}docs/manual-test-plan.md",
+      "${root}docs/pre-manual-2.0.5-report.md",
+      "${root}docs/todo.md",
+      "${root}migrations/more-infinite-research_2.0.5.json",
       "${root}prototypes/tech-gen.lua",
       "${root}prototypes/base-tech-extensions.lua",
       "${root}prototypes/compat/competing-base-extensions.lua",
       "${root}prototypes/streams/productivity.lua",
       "${root}prototypes/streams/direct-effects.lua",
+      "${root}control/scripted-techs.lua",
+      "${root}control/effects/spoilage-preservation.lua",
+      "${root}control/effects/agricultural-growth-speed.lua",
       "${root}prototypes/lib/science-packs.lua",
       "${root}prototypes/lib/recipe-matching.lua"
     )
@@ -309,10 +563,12 @@ Invoke-RepoCheck "release package archive matches metadata" {
       throw "Package info.json dependencies do not match repository info.json."
     }
 
+    $repoPath = $repo.Path
     $mustMatchRepo = @(
       "README.md",
       "changelog.txt",
       "CONTRIBUTING.md",
+      "control.lua",
       "data.lua",
       "data-updates.lua",
       "data-final-fixes.lua",
@@ -336,7 +592,10 @@ Invoke-RepoCheck "release package archive matches metadata" {
       "prototypes/lib/technology-cleanup.lua",
       "prototypes/lib/technology-icons.lua"
     )
-    $repoPath = $repo.Path
+    $mustMatchRepo += @(
+      Get-ChildItem -LiteralPath (Join-Path $repo "control") -Recurse -File -Filter "*.lua" |
+        ForEach-Object { [System.IO.Path]::GetRelativePath($repoPath, $_.FullName).Replace("\", "/") }
+    )
     $mustMatchRepo += @(
       Get-ChildItem -LiteralPath (Join-Path $repo "docs") -File |
         ForEach-Object { [System.IO.Path]::GetRelativePath($repoPath, $_.FullName).Replace("\", "/") }
@@ -345,6 +604,12 @@ Invoke-RepoCheck "release package archive matches metadata" {
       Get-ChildItem -LiteralPath (Join-Path $repo "locale") -Recurse -File -Filter "more-infinite-research.cfg" |
         ForEach-Object { [System.IO.Path]::GetRelativePath($repoPath, $_.FullName).Replace("\", "/") }
     )
+    if (Test-Path -LiteralPath (Join-Path $repo "migrations")) {
+      $mustMatchRepo += @(
+        Get-ChildItem -LiteralPath (Join-Path $repo "migrations") -File |
+          ForEach-Object { [System.IO.Path]::GetRelativePath($repoPath, $_.FullName).Replace("\", "/") }
+      )
+    }
     $mustMatchRepo = @($mustMatchRepo | Sort-Object -Unique)
 
     foreach ($relative in $mustMatchRepo) {
@@ -381,11 +646,33 @@ if (-not (Test-Path -LiteralPath $FactorioBin)) {
   throw "Factorio binary not found: $FactorioBin"
 }
 
-if ([string]::IsNullOrWhiteSpace($UserDataDir)) {
+$usesGeneratedUserDataDir = [string]::IsNullOrWhiteSpace($UserDataDir)
+if ($usesGeneratedUserDataDir) {
   $UserDataDir = Join-Path ([System.IO.Path]::GetTempPath()) ("mir-factorio-userdata-" + [guid]::NewGuid().ToString("N"))
 }
 $validationRoot = (New-Item -ItemType Directory -Force -Path $UserDataDir).FullName
 $validationRootWithSeparator = $validationRoot.TrimEnd("\") + "\"
+$factorioBinResolved = (Resolve-Path -LiteralPath $FactorioBin).Path
+$factorioRoot = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $factorioBinResolved))
+$factorioReadData = Join-Path $factorioRoot "data"
+if (-not (Test-Path -LiteralPath $factorioReadData)) {
+  throw "Unable to find Factorio read-data directory for validation config: $factorioReadData"
+}
+$factorioConfigPath = Join-Path $validationRoot "mir-validation-config.ini"
+$factorioConfigText = @"
+; Generated by More Infinite Research validation.
+[path]
+read-data=$factorioReadData
+write-data=$validationRoot
+
+[general]
+locale=auto
+
+[other]
+enable-steam-networking=false
+disable-blueprint-storage=true
+"@
+Set-Content -LiteralPath $factorioConfigPath -Value $factorioConfigText -Encoding UTF8
 
 function Invoke-FactorioProcess {
   param(
@@ -415,8 +702,8 @@ function Invoke-FactorioProcess {
   return $process.ExitCode
 }
 
-function Copy-ModDirectory {
-  param([string]$Source, [string]$Name, [string]$ModsDir)
+function Remove-CopiedModDirectory {
+  param([string]$Name, [string]$ModsDir)
   $modsRootWithSeparator = (Resolve-Path -LiteralPath $ModsDir).Path.TrimEnd("\") + "\"
   $target = Join-Path $modsDir $Name
   if (Test-Path -LiteralPath $target) {
@@ -426,7 +713,56 @@ function Copy-ModDirectory {
     }
     Remove-Item -LiteralPath $resolvedTarget -Recurse -Force
   }
+  return $target
+}
+
+function Copy-ModDirectory {
+  param([string]$Source, [string]$Name, [string]$ModsDir)
+  $target = Remove-CopiedModDirectory -Name $Name -ModsDir $ModsDir
   Copy-Item -LiteralPath $Source -Destination $target -Recurse
+}
+
+function Copy-RepositoryModDirectory {
+  param([string]$ModsDir)
+
+  $target = Remove-CopiedModDirectory -Name "more-infinite-research" -ModsDir $ModsDir
+  New-Item -ItemType Directory -Force -Path $target | Out-Null
+
+  $files = @(
+    "changelog.txt",
+    "CONTRIBUTING.md",
+    "control.lua",
+    "data-final-fixes.lua",
+    "data-updates.lua",
+    "data.lua",
+    "defaults.lua",
+    "info.json",
+    "LICENSE",
+    "README.md",
+    "settings.lua",
+    "thumbnail.png"
+  )
+  $directories = @(
+    "control",
+    "docs",
+    "migrations",
+    "locale",
+    "prototypes"
+  )
+
+  foreach ($file in $files) {
+    $source = Join-Path $repo $file
+    if (Test-Path -LiteralPath $source) {
+      Copy-Item -LiteralPath $source -Destination (Join-Path $target $file)
+    }
+  }
+
+  foreach ($directory in $directories) {
+    $source = Join-Path $repo $directory
+    if (Test-Path -LiteralPath $source) {
+      Copy-Item -LiteralPath $source -Destination (Join-Path $target $directory) -Recurse
+    }
+  }
 }
 
 $fixtureRoot = Join-Path $repo "fixtures"
@@ -435,10 +771,13 @@ if (-not (Test-Path -LiteralPath $fixtureRoot)) {
 }
 
 $postMirAssertionFixtures = @(
+  "mir-fixture-assert-generation-integrity",
   "mir-fixture-assert-science-pack-productivity",
   "mir-fixture-assert-lab-skip-policy",
   "mir-fixture-assert-base-extension-boundary",
-  "mir-fixture-assert-cargo-logistics"
+  "mir-fixture-assert-cargo-logistics",
+  "mir-fixture-assert-omega-drill-productivity",
+  "mir-fixture-assert-weapon-speed-safety"
 )
 
 function Get-FixtureInfos {
@@ -530,14 +869,34 @@ function Set-CopiedStreamEnabled {
   }
 }
 
+function Set-CopiedBaseExtensionEnabled {
+  param(
+    [string]$ModsDir,
+    [string]$BaseExtensionKey
+  )
+  $copiedDefaultsPath = Join-Path $ModsDir "more-infinite-research\defaults.lua"
+  $copiedDefaults = Get-Content -Raw -LiteralPath $copiedDefaultsPath
+  if ($copiedDefaults -notmatch "return\s+defaults") {
+    throw "Unable to find return defaults in copied defaults.lua while enabling base extension $BaseExtensionKey."
+  }
+
+  $escapedBaseExtensionKey = $BaseExtensionKey.Replace("\", "\\").Replace('"', '\"')
+  $override = "defaults.base_extensions[`"$escapedBaseExtensionKey`"].enabled = true`r`n"
+  $copiedDefaults = $copiedDefaults -replace "return\s+defaults", ($override + "return defaults")
+  Set-Content -LiteralPath $copiedDefaultsPath -Value $copiedDefaults -Encoding UTF8
+}
+
 function Initialize-RuntimeScenario {
   param(
     [string]$ScenarioName,
     [string[]]$EnabledFixtureNames,
     [string[]]$EnabledStreamKeys = @(),
+    [string[]]$EnabledBaseExtensionKeys = @(),
     [switch]$LabPolicySkip,
     [ValidateSet("configured", "space", "space-and-promethium", "all-official", "all")]
     [string]$SciencePackIngredientPolicy = "configured",
+    [ValidateSet("", "off", "only-when-dedicated-tech-enabled", "always")]
+    [string]$WeaponSpeedAdjustmentMode = "",
     [switch]$RequireSpaceGate,
     [switch]$EnableSpaceAge
   )
@@ -554,7 +913,7 @@ function Initialize-RuntimeScenario {
   $modsDir = Join-Path $scenarioRoot "mods"
   New-Item -ItemType Directory -Force -Path $modsDir | Out-Null
 
-  Copy-ModDirectory -Source $repo -Name "more-infinite-research" -ModsDir $modsDir
+  Copy-RepositoryModDirectory -ModsDir $modsDir
 
   $fixtureInfos = Get-FixtureInfos
   foreach ($fixtureInfo in $fixtureInfos) {
@@ -581,11 +940,17 @@ function Initialize-RuntimeScenario {
   if ($SciencePackIngredientPolicy -ne "configured") {
     Set-CopiedSciencePackIngredientPolicy -ModsDir $modsDir -Policy $SciencePackIngredientPolicy
   }
+  if (-not [string]::IsNullOrWhiteSpace($WeaponSpeedAdjustmentMode)) {
+    Set-CopiedStartupSettingDefault -ModsDir $modsDir -Name "mir-adjust-vanilla-weapon-speed-techs" -ValueLiteral "`"$WeaponSpeedAdjustmentMode`""
+  }
   if ($RequireSpaceGate) {
     Set-CopiedRequireSpaceGate -ModsDir $modsDir
   }
   foreach ($streamKey in $EnabledStreamKeys) {
     Set-CopiedStreamEnabled -ModsDir $modsDir -StreamKey $streamKey
+  }
+  foreach ($baseExtensionKey in $EnabledBaseExtensionKeys) {
+    Set-CopiedBaseExtensionEnabled -ModsDir $modsDir -BaseExtensionKey $baseExtensionKey
   }
 
   $mods = @(
@@ -618,7 +983,7 @@ function Initialize-RuntimeScenario {
 }
 
 if ([string]::IsNullOrWhiteSpace($FactorioLog)) {
-  $FactorioLog = Join-Path $env:APPDATA "Factorio\factorio-current.log"
+  $FactorioLog = Join-Path $validationRoot "factorio-current.log"
 }
 
 function Assert-RuntimeLogHealthy {
@@ -640,9 +1005,12 @@ function Invoke-RuntimeScenario {
     [string]$ScenarioName,
     [string[]]$EnabledFixtureNames,
     [string[]]$EnabledStreamKeys = @(),
+    [string[]]$EnabledBaseExtensionKeys = @(),
     [switch]$LabPolicySkip,
     [ValidateSet("configured", "space", "space-and-promethium", "all-official", "all")]
     [string]$SciencePackIngredientPolicy = "configured",
+    [ValidateSet("", "off", "only-when-dedicated-tech-enabled", "always")]
+    [string]$WeaponSpeedAdjustmentMode = "",
     [switch]$RequireSpaceGate,
     [switch]$EnableSpaceAge
   )
@@ -651,8 +1019,10 @@ function Invoke-RuntimeScenario {
     -ScenarioName $ScenarioName `
     -EnabledFixtureNames $EnabledFixtureNames `
     -EnabledStreamKeys $EnabledStreamKeys `
+    -EnabledBaseExtensionKeys $EnabledBaseExtensionKeys `
     -LabPolicySkip:$LabPolicySkip `
     -SciencePackIngredientPolicy $SciencePackIngredientPolicy `
+    -WeaponSpeedAdjustmentMode $WeaponSpeedAdjustmentMode `
     -RequireSpaceGate:$RequireSpaceGate `
     -EnableSpaceAge:$EnableSpaceAge
   if (Test-Path -LiteralPath $scenario.SavePath) {
@@ -661,6 +1031,9 @@ function Invoke-RuntimeScenario {
 
   Write-Host "[run] Factorio load check with fixture mods ($ScenarioName)"
   $factorioArgs = @(
+    "--config",
+    $factorioConfigPath,
+    "--no-log-rotation",
     "--disable-audio",
     "--mod-directory",
     $scenario.ModsDir,
@@ -696,6 +1069,15 @@ function Get-LastExtensionReportLine {
   return $line.Line
 }
 
+function Get-LastNativeModifierOverlapLine {
+  param([string]$Key)
+  $line = Select-String -LiteralPath $FactorioLog -Pattern "kind=native_modifier_overlap key=$Key" -SimpleMatch | Select-Object -Last 1
+  if (-not $line) {
+    throw "Runtime validation log did not contain native modifier overlap diagnostics for $Key."
+  }
+  return $line.Line
+}
+
 function Assert-ReportLineGenerated {
   param([string]$Line, [string]$Context)
   if ($Line -notmatch "status=generated") {
@@ -717,6 +1099,80 @@ function Assert-ReportLineDoesNotContain {
   }
 }
 
+function Assert-NoStreamReportLine {
+  param([string]$Key, [string]$Context)
+  $line = Select-String -LiteralPath $FactorioLog -Pattern "kind=stream key=$Key" -SimpleMatch | Select-Object -Last 1
+  if ($line) {
+    throw "$Context unexpectedly found stream diagnostics for ${Key}: $($line.Line)"
+  }
+}
+
+$defaultEnabledBaseExtensionKeys = @(
+  "braking-force",
+  "research-speed",
+  "worker-robots-storage",
+  "weapon-shooting-speed",
+  "laser-shooting-speed"
+)
+
+$spaceAgeVanillaOwnedProductivityStreams = @(
+  "research_low_density_structure",
+  "research_plastic",
+  "research_processing_unit",
+  "research_rocket_fuel"
+)
+
+function Assert-DefaultBaseExtensionDiagnostics {
+  param(
+    [string]$Context,
+    [switch]$InserterCapacityEnabled
+  )
+
+  $expectedGenerated = @($defaultEnabledBaseExtensionKeys)
+  if ($InserterCapacityEnabled) {
+    $expectedGenerated += "inserter-capacity-bonus"
+  }
+
+  foreach ($key in $expectedGenerated) {
+    $line = Get-LastExtensionReportLine -Key $key
+    Assert-ReportLineGenerated -Line $line -Context "$Context base extension $key"
+  }
+
+  if (-not $InserterCapacityEnabled) {
+    $inserterLine = Get-LastExtensionReportLine -Key "inserter-capacity-bonus"
+    if ($inserterLine -notmatch "status=skipped" -or $inserterLine -notmatch "disabled") {
+      throw "$Context expected disabled inserter-capacity-bonus extension to skip cleanly: $inserterLine"
+    }
+  }
+}
+
+function Assert-SpaceAgeVanillaOwnedProductivityStreamsSkipped {
+  param([string]$Context)
+
+  foreach ($vanillaOwnedStream in $spaceAgeVanillaOwnedProductivityStreams) {
+    $vanillaOwnedLine = Get-LastStreamReportLine -Key $vanillaOwnedStream
+    if ($vanillaOwnedLine -notmatch "status=skipped" -or $vanillaOwnedLine -notmatch "covered_by_existing_infinite_recipe_productivity") {
+      throw "$Context should skip vanilla-owned productivity instead of generating a parallel MIR technology: $vanillaOwnedLine"
+    }
+  }
+}
+
+function Assert-BaseCoreProductivityStreamsGenerated {
+  param([string]$Context)
+
+  foreach ($stream in @(
+    "research_electronic_circuit",
+    "research_advanced_circuit",
+    "research_processing_unit",
+    "research_low_density_structure",
+    "research_plastic",
+    "research_rocket_fuel"
+  )) {
+    $line = Get-LastStreamReportLine -Key $stream
+    Assert-ReportLineGenerated -Line $line -Context "$Context stream $stream"
+  }
+}
+
 Invoke-RuntimeScenario -ScenarioName "reduce-policy" -EnabledFixtureNames @(
   "mir-fixture-item-science-pack",
   "mir-fixture-custom-lab",
@@ -727,7 +1183,7 @@ Invoke-RuntimeScenario -ScenarioName "reduce-policy" -EnabledFixtureNames @(
 $sciencePackProductivityLine = Get-LastStreamReportLine -Key "research_science_pack_productivity"
 Assert-ReportLineGenerated -Line $sciencePackProductivityLine -Context "Science pack productivity reduce-policy scenario"
 Assert-ReportLineContains -Line $sciencePackProductivityLine -Expected "mir-fixture-science-pack" -Context "Science pack productivity reduce-policy scenario"
-Assert-ReportLineContains -Line $sciencePackProductivityLine -Expected "tech:research-productivity" -Context "Science pack productivity vanilla icon scenario"
+Assert-ReportLineContains -Line $sciencePackProductivityLine -Expected "tech:space-science-pack" -Context "Base science pack productivity fallback icon scenario"
 $effectCountMatch = [regex]::Match($sciencePackProductivityLine, "effects=(\d+)")
 if (-not $effectCountMatch.Success) {
   throw "Science pack productivity diagnostics did not include an effect count: $sciencePackProductivityLine"
@@ -736,6 +1192,10 @@ $sciencePackEffectCount = [int]$effectCountMatch.Groups[1].Value
 if ($sciencePackEffectCount -lt 1) {
   throw "Science pack productivity stream did not include any recipe productivity effects: $sciencePackProductivityLine"
 }
+$baseLabProductivityLine = Get-LastStreamReportLine -Key "research_lab_productivity"
+Assert-ReportLineGenerated -Line $baseLabProductivityLine -Context "Base research productivity scenario"
+Assert-ReportLineContains -Line $baseLabProductivityLine -Expected "effects=1" -Context "Base research productivity scenario"
+Assert-ReportLineContains -Line $baseLabProductivityLine -Expected "icon=tech:military-science-pack" -Context "Base research productivity icon scenario"
 
 Invoke-RuntimeScenario -ScenarioName "skip-policy" -EnabledFixtureNames @(
   "mir-fixture-item-science-pack",
@@ -753,6 +1213,32 @@ Invoke-RuntimeScenario -ScenarioName "space-pack-policy" -EnabledFixtureNames @(
 $spacePackLine = Get-LastStreamReportLine -Key "research_gears"
 Assert-ReportLineGenerated -Line $spacePackLine -Context "Space science-pack ingredient policy scenario"
 Assert-ReportLineContains -Line $spacePackLine -Expected "space-science-pack" -Context "Space science-pack ingredient policy scenario"
+$baseElectricShootingLine = Get-LastStreamReportLine -Key "research_electric_shooting_speed"
+Assert-ReportLineGenerated -Line $baseElectricShootingLine -Context "Base electric shooting speed scenario"
+Assert-ReportLineContains -Line $baseElectricShootingLine -Expected "effects=1" -Context "Base electric shooting speed scenario"
+Assert-ReportLineContains -Line $baseElectricShootingLine -Expected "icon=tech:discharge-defense-equipment" -Context "Base electric shooting speed scenario"
+$baseFlamethrowerShootingLine = Get-LastStreamReportLine -Key "research_flamethrower_shooting_speed"
+Assert-ReportLineGenerated -Line $baseFlamethrowerShootingLine -Context "Base flamethrower shooting speed scenario"
+
+Invoke-RuntimeScenario -ScenarioName "character-inventory-merged-effects" -EnabledFixtureNames @()
+$inventoryCapacityLine = Get-LastStreamReportLine -Key "research_inventory_capacity"
+Assert-ReportLineGenerated -Line $inventoryCapacityLine -Context "Merged character inventory/trash slot scenario"
+Assert-ReportLineContains -Line $inventoryCapacityLine -Expected "effects=2" -Context "Merged character inventory/trash slot scenario"
+Assert-NoStreamReportLine -Key "research_character_trash_slots" -Context "Merged character inventory/trash slot scenario"
+
+Invoke-RuntimeScenario -ScenarioName "base-generation-integrity" -EnabledFixtureNames @(
+  "mir-fixture-assert-generation-integrity"
+)
+Assert-BaseCoreProductivityStreamsGenerated -Context "Base generation integrity scenario"
+Assert-DefaultBaseExtensionDiagnostics -Context "Base generation integrity scenario"
+
+Invoke-RuntimeScenario -ScenarioName "base-generation-integrity-inserter-enabled" -EnabledFixtureNames @(
+  "mir-fixture-assert-generation-integrity"
+) -EnabledBaseExtensionKeys @(
+  "inserter-capacity-bonus"
+)
+Assert-BaseCoreProductivityStreamsGenerated -Context "Base generation integrity with inserter enabled scenario"
+Assert-DefaultBaseExtensionDiagnostics -Context "Base generation integrity with inserter enabled scenario" -InserterCapacityEnabled
 
 Invoke-RuntimeScenario -ScenarioName "base-space-promethium-pack-policy" -EnabledFixtureNames @() -SciencePackIngredientPolicy "space-and-promethium"
 $baseSpacePromethiumPackLine = Get-LastStreamReportLine -Key "research_gears"
@@ -765,6 +1251,56 @@ $spaceAgeSpacePackLine = Get-LastStreamReportLine -Key "research_gears"
 Assert-ReportLineGenerated -Line $spaceAgeSpacePackLine -Context "Space Age space-only science-pack ingredient policy scenario"
 Assert-ReportLineContains -Line $spaceAgeSpacePackLine -Expected "space-science-pack" -Context "Space Age space-only science-pack ingredient policy scenario"
 Assert-ReportLineDoesNotContain -Line $spaceAgeSpacePackLine -Unexpected "promethium-science-pack" -Context "Space Age space-only science-pack ingredient policy scenario"
+$spaceAgeElectricShootingLine = Get-LastStreamReportLine -Key "research_electric_shooting_speed"
+Assert-ReportLineGenerated -Line $spaceAgeElectricShootingLine -Context "Space Age electric and Tesla shooting speed scenario"
+Assert-ReportLineContains -Line $spaceAgeElectricShootingLine -Expected "effects=2" -Context "Space Age electric and Tesla shooting speed scenario"
+Assert-ReportLineContains -Line $spaceAgeElectricShootingLine -Expected "icon=tech:electric-weapons-damage-1" -Context "Space Age electric and Tesla shooting speed icon scenario"
+$spaceAgeLabProductivityLine = Get-LastStreamReportLine -Key "research_lab_productivity"
+if ($spaceAgeLabProductivityLine -notmatch "status=skipped" -or $spaceAgeLabProductivityLine -notmatch "existing technology research-productivity") {
+  throw "Space Age should skip MIR research productivity because vanilla research-productivity already exists: $spaceAgeLabProductivityLine"
+}
+
+if ($isFactorio21Line) {
+  Invoke-RuntimeScenario -ScenarioName "base-scripted-candidates-enabled" -EnabledFixtureNames @() -EnabledStreamKeys @(
+    "research_spoilage_preservation",
+    "research_agricultural_growth_speed"
+  )
+  foreach ($scriptedStream in @("research_spoilage_preservation", "research_agricultural_growth_speed")) {
+    $baseScriptedLine = Get-LastStreamReportLine -Key $scriptedStream
+    if ($baseScriptedLine -notmatch "status=skipped" -or $baseScriptedLine -notmatch "missing required mod space-age") {
+      throw "Base-only scripted candidate stream $scriptedStream should skip for missing Space Age when force-enabled: $baseScriptedLine"
+    }
+  }
+
+  Invoke-RuntimeScenario -ScenarioName "space-age-scripted-candidates-enabled" -EnabledFixtureNames @(
+    "mir-fixture-assert-generation-integrity"
+  ) -EnabledStreamKeys @(
+    "research_spoilage_preservation",
+    "research_agricultural_growth_speed"
+  ) -EnableSpaceAge
+  foreach ($scriptedStream in @("research_spoilage_preservation", "research_agricultural_growth_speed")) {
+    $spaceAgeScriptedLine = Get-LastStreamReportLine -Key $scriptedStream
+    Assert-ReportLineGenerated -Line $spaceAgeScriptedLine -Context "Space Age scripted candidate stream $scriptedStream"
+    Assert-ReportLineContains -Line $spaceAgeScriptedLine -Expected "effects=1" -Context "Space Age scripted candidate stream $scriptedStream"
+    if ($scriptedStream -eq "research_agricultural_growth_speed") {
+      Assert-ReportLineContains -Line $spaceAgeScriptedLine -Expected "icon=tech:agriculture" -Context "Space Age agricultural growth speed icon scenario"
+    }
+  }
+}
+
+Invoke-RuntimeScenario -ScenarioName "space-age-generation-integrity" -EnabledFixtureNames @(
+  "mir-fixture-assert-generation-integrity"
+) -EnableSpaceAge
+Assert-SpaceAgeVanillaOwnedProductivityStreamsSkipped -Context "Space Age generation integrity scenario"
+Assert-DefaultBaseExtensionDiagnostics -Context "Space Age generation integrity scenario"
+
+Invoke-RuntimeScenario -ScenarioName "space-age-generation-integrity-inserter-enabled" -EnabledFixtureNames @(
+  "mir-fixture-assert-generation-integrity"
+) -EnabledBaseExtensionKeys @(
+  "inserter-capacity-bonus"
+) -EnableSpaceAge
+Assert-SpaceAgeVanillaOwnedProductivityStreamsSkipped -Context "Space Age generation integrity with inserter enabled scenario"
+Assert-DefaultBaseExtensionDiagnostics -Context "Space Age generation integrity with inserter enabled scenario" -InserterCapacityEnabled
 
 Invoke-RuntimeScenario -ScenarioName "space-age-space-promethium-pack-policy" -EnabledFixtureNames @() -SciencePackIngredientPolicy "space-and-promethium" -EnableSpaceAge
 $spaceAgeSpacePromethiumPackLine = Get-LastStreamReportLine -Key "research_gears"
@@ -803,37 +1339,80 @@ $baseExtensionBoundaryLine = Get-LastExtensionReportLine -Key "research-speed"
 Assert-ReportLineGenerated -Line $baseExtensionBoundaryLine -Context "Base extension boundary scenario"
 Assert-ReportLineContains -Line $baseExtensionBoundaryLine -Expected "mir-fixture-science-pack" -Context "Base extension boundary scenario"
 
+Invoke-RuntimeScenario -ScenarioName "weapon-speed-overlap-safety" -EnabledFixtureNames @(
+  "mir-fixture-assert-weapon-speed-safety"
+) -WeaponSpeedAdjustmentMode "only-when-dedicated-tech-enabled"
+$weaponSpeedLine = Get-LastExtensionReportLine -Key "weapon-shooting-speed"
+Assert-ReportLineGenerated -Line $weaponSpeedLine -Context "Weapon shooting speed overlap safety scenario"
+
+Invoke-RuntimeScenario -ScenarioName "omega-drill-productivity" -EnabledFixtureNames @(
+  "mir-fixture-omega-drill",
+  "mir-fixture-assert-omega-drill-productivity"
+)
+$omegaDrillLine = Get-LastStreamReportLine -Key "research_mining_drill"
+Assert-ReportLineGenerated -Line $omegaDrillLine -Context "Omega-style drill productivity scenario"
+$omegaEffectCountMatch = [regex]::Match($omegaDrillLine, "effects=(\d+)")
+if (-not $omegaEffectCountMatch.Success -or [int]$omegaEffectCountMatch.Groups[1].Value -lt 4) {
+  throw "Omega-style drill productivity scenario did not include the expected mining drill effect count: $omegaDrillLine"
+}
+
 Invoke-RuntimeScenario -ScenarioName "end-game-prerequisite-gate" -EnabledFixtureNames @() -RequireSpaceGate
 $gateLine = Get-LastStreamReportLine -Key "research_gears"
 Assert-ReportLineGenerated -Line $gateLine -Context "End-game prerequisite gate scenario"
 Assert-ReportLineContains -Line $gateLine -Expected "prerequisites=automation-science-pack,logistic-science-pack,chemical-science-pack,production-science-pack,space-science-pack" -Context "End-game prerequisite gate scenario"
 Assert-ReportLineDoesNotContain -Line $gateLine -Unexpected "science=automation-science-pack,logistic-science-pack,chemical-science-pack,production-science-pack,space-science-pack" -Context "End-game prerequisite gate scenario"
 
-Invoke-RuntimeScenario -ScenarioName "base-cargo-space-age-gate" -EnabledFixtureNames @() -EnabledStreamKeys @(
-  "research_cargo_landing_pad_count"
-)
-$cargoPadLine = Get-LastStreamReportLine -Key "research_cargo_landing_pad_count"
-if ($cargoPadLine -notmatch "status=skipped" -or $cargoPadLine -notmatch "missing required mod space-age") {
-  throw "Cargo landing pad count generated or skipped for the wrong reason without Space Age: $cargoPadLine"
+if ($isLegacyFactorio20) {
+  Write-Host "[skip] Factorio 2.1 cargo runtime fixture scenarios skipped for Factorio 2.0 legacy metadata."
+} else {
+  Invoke-RuntimeScenario -ScenarioName "base-cargo-space-age-gate" -EnabledFixtureNames @() -EnabledStreamKeys @(
+    "research_cargo_landing_pad_count"
+  )
+  $cargoPadLine = Get-LastStreamReportLine -Key "research_cargo_landing_pad_count"
+  if ($cargoPadLine -notmatch "status=skipped" -or $cargoPadLine -notmatch "missing required mod space-age") {
+    throw "Cargo landing pad count generated or skipped for the wrong reason without Space Age: $cargoPadLine"
+  }
+
+  Invoke-RuntimeScenario -ScenarioName "space-age-cargo-pad-enabled" -EnabledFixtureNames @() -EnabledStreamKeys @(
+    "research_cargo_landing_pad_count"
+  ) -EnableSpaceAge
+  $spaceAgeCargoPadLine = Get-LastStreamReportLine -Key "research_cargo_landing_pad_count"
+  Assert-ReportLineGenerated -Line $spaceAgeCargoPadLine -Context "Space Age cargo landing pad count scenario"
+  $spaceAgeCargoDistanceLine = Get-LastStreamReportLine -Key "research_cargo_bay_unloading_distance"
+  Assert-ReportLineGenerated -Line $spaceAgeCargoDistanceLine -Context "Space Age cargo bay unloading distance scenario"
+
+  Invoke-RuntimeScenario -ScenarioName "space-age-cargo-logistics-shape" -EnabledFixtureNames @(
+    "mir-fixture-assert-cargo-logistics"
+  ) -EnabledStreamKeys @(
+    "research_cargo_landing_pad_count"
+  ) -EnableSpaceAge
+  $spaceAgeCargoShapePadLine = Get-LastStreamReportLine -Key "research_cargo_landing_pad_count"
+  Assert-ReportLineGenerated -Line $spaceAgeCargoShapePadLine -Context "Space Age cargo logistics shape scenario"
+  $spaceAgeCargoShapeDistanceLine = Get-LastStreamReportLine -Key "research_cargo_bay_unloading_distance"
+  Assert-ReportLineGenerated -Line $spaceAgeCargoShapeDistanceLine -Context "Space Age cargo logistics shape scenario"
+
+  Invoke-RuntimeScenario -ScenarioName "space-age-duplicate-cargo-diagnostics" -EnabledFixtureNames @(
+    "mir-fixture-duplicate-cargo-tech",
+    "mir-fixture-assert-cargo-logistics"
+  ) -EnabledStreamKeys @(
+    "research_cargo_landing_pad_count"
+  ) -EnableSpaceAge
+  $duplicateCargoPadLine = Get-LastStreamReportLine -Key "research_cargo_landing_pad_count"
+  Assert-ReportLineGenerated -Line $duplicateCargoPadLine -Context "Duplicate cargo landing pad diagnostics scenario"
+  $duplicateCargoPadOverlapLine = Get-LastNativeModifierOverlapLine -Key "research_cargo_landing_pad_count"
+  Assert-ReportLineContains -Line $duplicateCargoPadOverlapLine -Expected "effect=cargo-landing-pad-count" -Context "Duplicate cargo landing pad diagnostics scenario"
+  Assert-ReportLineContains -Line $duplicateCargoPadOverlapLine -Expected "owners=mir-fixture-duplicate-cargo-landing-pad-count" -Context "Duplicate cargo landing pad diagnostics scenario"
+
+  $duplicateCargoDistanceLine = Get-LastStreamReportLine -Key "research_cargo_bay_unloading_distance"
+  Assert-ReportLineGenerated -Line $duplicateCargoDistanceLine -Context "Duplicate cargo bay diagnostics scenario"
+  $duplicateCargoDistanceOverlapLine = Get-LastNativeModifierOverlapLine -Key "research_cargo_bay_unloading_distance"
+  Assert-ReportLineContains -Line $duplicateCargoDistanceOverlapLine -Expected "effect=max-cargo-bay-unloading-distance" -Context "Duplicate cargo bay diagnostics scenario"
+  Assert-ReportLineContains -Line $duplicateCargoDistanceOverlapLine -Expected "owners=mir-fixture-duplicate-cargo-bay-unloading-distance" -Context "Duplicate cargo bay diagnostics scenario"
 }
 
-Invoke-RuntimeScenario -ScenarioName "space-age-cargo-pad-enabled" -EnabledFixtureNames @() -EnabledStreamKeys @(
-  "research_cargo_landing_pad_count"
-) -EnableSpaceAge
-$spaceAgeCargoPadLine = Get-LastStreamReportLine -Key "research_cargo_landing_pad_count"
-Assert-ReportLineGenerated -Line $spaceAgeCargoPadLine -Context "Space Age cargo landing pad count scenario"
-$spaceAgeCargoDistanceLine = Get-LastStreamReportLine -Key "research_cargo_bay_unloading_distance"
-Assert-ReportLineGenerated -Line $spaceAgeCargoDistanceLine -Context "Space Age cargo bay unloading distance scenario"
-
-Invoke-RuntimeScenario -ScenarioName "space-age-cargo-logistics-shape" -EnabledFixtureNames @(
-  "mir-fixture-assert-cargo-logistics"
-) -EnabledStreamKeys @(
-  "research_cargo_landing_pad_count"
-) -EnableSpaceAge
-$spaceAgeCargoShapePadLine = Get-LastStreamReportLine -Key "research_cargo_landing_pad_count"
-Assert-ReportLineGenerated -Line $spaceAgeCargoShapePadLine -Context "Space Age cargo logistics shape scenario"
-$spaceAgeCargoShapeDistanceLine = Get-LastStreamReportLine -Key "research_cargo_bay_unloading_distance"
-Assert-ReportLineGenerated -Line $spaceAgeCargoShapeDistanceLine -Context "Space Age cargo logistics shape scenario"
+if ($usesGeneratedUserDataDir -and (Test-Path -LiteralPath $validationRoot)) {
+  Remove-Item -LiteralPath $validationRoot -Recurse -Force
+}
 
 Write-Host "[ok] Validation completed."
 $global:LASTEXITCODE = 0

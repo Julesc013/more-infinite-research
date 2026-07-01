@@ -1,4 +1,5 @@
 local D = {}
+local lookup = require("prototypes.lib.prototype-lookup")
 
 local rows = {}
 local match_rows = {}
@@ -36,6 +37,13 @@ end
 local function icon_hint(spec)
   if spec.icons then return "custom-icons" end
   if spec.icon then return spec.icon end
+  if spec.icon_techs then
+    for _, name in ipairs(spec.icon_techs) do
+      if (data.raw.technology or {})[name] then return "tech:" .. name end
+      if lookup.item_prototype(name) then return "item:" .. name end
+    end
+    return "tech:" .. tostring(spec.icon_techs[1])
+  end
   if spec.icon_tech then return "tech:" .. spec.icon_tech end
   if spec.icon_item then return "item:" .. spec.icon_item end
   if spec.items and spec.items[1] then return "item:" .. spec.items[1] end
@@ -54,6 +62,10 @@ end
 
 function D.extension(row)
   append("extension", row)
+end
+
+function D.native_modifier_overlap(row)
+  append("native_modifier_overlap", row)
 end
 
 function D.recipe_matches(key, buckets)
@@ -121,7 +133,10 @@ function D.flush()
         .. " prerequisites=" .. tostring(row.prerequisites or "")
         .. " effects=" .. tostring(row.effects or "")
         .. " lab_status=" .. tostring(row.lab_status or "")
-        .. " icon=" .. tostring(row.icon or ""))
+        .. " icon=" .. tostring(row.icon or "")
+        .. " effect=" .. tostring(row.effect or "")
+        .. " target=" .. tostring(row.target or "")
+        .. " owners=" .. tostring(row.owners or ""))
     end
     log("[more-infinite-research] Generation report end")
   end

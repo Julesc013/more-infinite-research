@@ -14,11 +14,62 @@ More Infinite Research is organized around a compatibility-first data-stage pipe
 2. Known competing recipe-productivity cleanup based on actual generated MIR effects.
 3. Known competing base-extension cleanup when MIR's matching base extension is enabled.
 4. Base technology infinite extensions.
-5. Vanilla weapon speed adjustment.
+5. Weapon speed overlap adjustment for generated continuations.
 6. Max-level enforcement.
 7. Optional diagnostics report flush.
 
 This order gives the mod the best practical view of recipes, labs, science packs, and technologies created by other mods while still keeping this mod's final cleanup deterministic.
+
+## Control Stage Boundary
+
+The current `dev` branch includes a small `control.lua` surface for scripted technologies such as spoilage preservation and agricultural growth speed. These runtime features are `v2.0.5` ship candidates because they are bounded and event-driven, but each claimed behavior must pass the named manual save validation before release. Any behavior that fails proof moves to `v2.1.0`.
+
+The runtime layer is intentionally narrow:
+
+- Prefer native technology modifiers and recipe productivity whenever the engine exposes them.
+- Use scripted effects only when they can be event-driven.
+- Avoid per-tick inventory, belt, lab, container, surface, or broad entity scanning.
+- Keep runtime handlers grouped under a small scripted-tech manager such as `control/scripted-techs.lua`.
+- Route init, configuration change, research finish, research reversal, and technology-effects reset through one recomputation path.
+- Handle runtime setting changes if runtime settings are introduced.
+- Require each scripted feature to document storage keys, disable behavior, multiple-force behavior, and interaction with other mods touching the same state.
+- Label scripted/global/sandbox features clearly in settings and player-facing docs.
+- Static validation fails if `control.lua` or `control/**/*.lua` registers `defines.events.on_tick` or `script.on_nth_tick` without a future explicit allowlist.
+
+Do not use runtime code to fake fluid physics, platform speed, module effects, or machine behavior when the requested feature is really a prototype/entity unlock or companion-mod feature.
+
+Current control files:
+
+- `control.lua`: loads the scripted technology manager.
+- `control/scripted-techs.lua`: registers init, configuration change, research finish/reversal, technology-effect reset, and agricultural tower planting handlers.
+- `control/effects/spoilage-preservation.lua`: applies the global spoil-time multiplier from the highest completed MIR spoilage preservation level.
+- `control/effects/agricultural-growth-speed.lua`: shortens remaining growth time for newly planted agricultural tower plants.
+
+Current migrations:
+
+- `migrations/more-infinite-research_2.0.5.json`: maps the removed generated character trash-slot technology ID into the combined inventory/trash technology ID.
+
+### Scripted Runtime Storage
+
+All runtime storage is namespaced below `storage.mir`.
+
+`storage.mir.scripted_techs` is reserved for manager-level state. It is currently initialized so future manager metadata has a stable namespace, but it does not store behavior state yet.
+
+`storage.mir.spoilage_preservation` stores:
+
+- `baseline`: the spoil-time modifier after removing MIR's last applied multiplier where possible.
+- `effective_level`: the highest completed spoilage preservation level across non-enemy/non-neutral forces.
+- `applied_multiplier`: MIR's actual multiplier after the final spoil-time value is clamped to Factorio's global range.
+- `last_applied_value`: the spoil-time modifier value MIR last wrote.
+
+Spoilage preservation recomputes from the stored baseline on init, configuration changes, research finish, research reversal, and technology-effect resets. If no non-enemy/non-neutral force has completed levels, the recomputed target is the baseline. If the stream is disabled or the technology disappears, MIR restores the baseline only when the current game value still matches the last value MIR wrote; otherwise it treats the current value as externally owned and records it as the new baseline.
+
+`storage.mir.agricultural_growth_speed.force_multipliers` stores one entry per non-enemy/non-neutral force:
+
+- `level`: completed agricultural growth speed levels for that force.
+- `multiplier`: the force's clamped growth multiplier.
+
+Agricultural growth speed refreshes this force state on init, configuration changes, research finish, research reversal, and technology-effect resets. The current `v2.0.5` candidate only applies the multiplier at `on_tower_planted_seed`; it does not rescan existing plants.
 
 ## Utility Modules
 
@@ -60,6 +111,8 @@ Profile patches should use append fields such as `append_items`, `append_item_pa
 
 Profiles are applied from `settings.lua` as well as the data stage, so profile entries must stay declarative. Do not inspect `data.raw` from profiles; prototype-dependent compatibility belongs in `data-updates.lua` or `data-final-fixes.lua`.
 
+Weapon-speed overlap handling is intentionally narrower than general compatibility cleanup. MIR may remove rocket and cannon-shell speed effects from its own generated `weapon-shooting-speed` continuation when dedicated replacement speed techs are active, but it must not remove those effects from finite vanilla `weapon-shooting-speed-*` technologies. Those finite vanilla levels contain tank cannon fire-rate bonuses.
+
 ## Diagnostics
 
 `mir-debug-generation-report` enables a structured log report. The report records generated and skipped streams/extensions with:
@@ -72,10 +125,13 @@ Profiles are applied from `settings.lua` as well as the data stage, so profile e
 - effect count
 - lab compatibility status
 - icon source hint
+- native direct-effect overlap rows, including effect type, target, and existing infinite non-MIR technology owners
 
 Use this setting when triaging user reports. It is off by default to avoid noisy logs.
 
 `mir-debug-recipe-matches` logs matched recipe names per generated productivity stream. When either diagnostics setting is enabled, duplicate recipe matches across streams are also reported as non-blocking warnings.
+
+Native modifier overlap diagnostics are also non-blocking. They report that another infinite non-MIR technology already has the same native direct-effect identity, such as `cargo-landing-pad-count` or `max-cargo-bay-unloading-distance`, but they do not skip, merge, or mutate either technology in `v2.0.5`.
 
 ## Progression Settings
 
@@ -96,6 +152,25 @@ Use `scripts/Build-MIRPackage.ps1` to rebuild the release archive. Static valida
 
 Static package validation also compares key packaged source, documentation, and locale files against the repository copy so a stale zip with correct metadata is rejected.
 
-Static validation also checks Factorio changelog formatting, including the required 99-dash section separators.
+Static validation also checks Factorio changelog formatting, including the required 99-dash section separators and an entry for the current `info.json` version.
 
-The fixture mods under `fixtures/` test item-based science packs, custom labs, late recipe creation, the default `reduce` lab incompatibility behavior, the `skip` lab incompatibility behavior, science-pack ingredient policy modes, the end-game prerequisite gate, base-only cargo skip behavior, Space Age cargo logistics effect shape, finite vanilla-chain preservation, and post-MIR assertions for runtime-sensitive generated technologies.
+Static validation checks every local fixture directory has `info.json`, a `mir-fixture-*` mod name, and at least one data-stage entry file.
+
+Static validation rejects runtime tick handlers in `control.lua` and `control/**/*.lua`.
+
+The fixture mods under `fixtures/` test item-based science packs, custom labs, late recipe creation, the default `reduce` lab incompatibility behavior, the `skip` lab incompatibility behavior, science-pack ingredient policy modes, the end-game prerequisite gate, base-only cargo skip behavior, Space Age cargo logistics effect shape, Maraxis-like duplicate cargo modifier diagnostics, finite vanilla-chain preservation, broad generation integrity, weapon-speed overlap safety, Omega-style drill productivity matching, and post-MIR assertions for runtime-sensitive generated technologies.
+
+`mir-fixture-assert-generation-integrity` is the broad guardrail fixture. It runs after MIR in both base-only and Space Age runtime scenarios and verifies:
+
+- generated `recipe-prod-*` stream technologies are infinite upgrades with effects and count formulas;
+- every enabled vanilla numbered extension chain has exactly one infinite serial continuation after the highest finite level;
+- disabled vanilla extension chains do not generate unless the validation harness explicitly force-enables them;
+- every recipe has at most one infinite recipe-productivity owner;
+- vanilla Space Age productivity technologies remain authoritative for LDS, plastic, processing units, and rocket fuel;
+- circuit productivity ownership stays recipe-specific instead of relying on icon similarity.
+
+Scripted technology validation must add existing-save load tests, research-finish/reversal tests, existing spoilable-stack tests, multi-force tests, and checks that the new effects remain event-driven rather than tick-scanned.
+
+For API proof status and unresolved API questions, see `docs/api-proof-points.md`.
+
+For named manual save scenarios, see `docs/manual-test-plan.md`.

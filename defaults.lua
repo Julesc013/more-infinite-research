@@ -9,8 +9,23 @@ local defaults = {
   },
   -- Per-stream overrides. Add, remove, or modify entries as needed.
   streams = {
-    research_inventory_capacity = { growth_factor = 1.10, enabled = false },
-    research_character_trash_slots = { growth_factor = 1.10 },
+    research_spoilage_preservation = {
+      enabled = false,
+      base_cost = 50000,
+      growth_factor = 1.5,
+      research_time = 120,
+      max_level = 0,
+      settings_note = {"mod-setting-description.mir-note-experimental-spoilage"}
+    },
+    research_agricultural_growth_speed = {
+      enabled = false,
+      base_cost = 40000,
+      growth_factor = 1.5,
+      research_time = 90,
+      max_level = 0,
+      settings_note = {"mod-setting-description.mir-note-experimental-agriculture"}
+    },
+    research_inventory_capacity = { growth_factor = 1.10 },
     research_robot_battery = { growth_factor = 1.2 },
     research_cargo_bay_unloading_distance = {
       base_cost = 100000,
@@ -23,6 +38,13 @@ local defaults = {
       base_cost = 1000000,
       growth_factor = 10,
       research_time = 240,
+      max_level = 0,
+      settings_note = {"mod-setting-description.mir-note-sandbox-cargo-pad-count"}
+    },
+    research_lab_productivity = {
+      base_cost = 1000,
+      growth_factor = 1.2,
+      research_time = 120,
       max_level = 0
     },
     research_science_pack_productivity = { research_time = 120 },
@@ -101,6 +123,7 @@ local defaults = {
       research_time = 60,
       non_bulk_increment = 2,
       bulk_increment = 4,
+      settings_note = {"mod-setting-description.mir-note-inserter-capacity"},
       science_packs = "inherit",
       add_science_packs = {
         "agricultural-science-pack"
