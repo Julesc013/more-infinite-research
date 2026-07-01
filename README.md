@@ -15,6 +15,7 @@ More Infinite Research adds **configurable infinite productivity** and **bonus r
 logistics chains, combat bonuses, player bonuses, and Space Age gaps that vanilla Factorio does not cover.
 
 Version **`1.x.x`** targets **Factorio `2.0`** and requires `base >= 2.0`.
+The `legacy` branch is preparing More Infinite Research **`1.9.0`** as a Factorio `2.0` compatibility port of the tested **`2.0.5`** source snapshot. Known Factorio `2.1`-only cargo technology modifier streams are excluded from this branch.
 
 Version **`2.x.x`** targets **Factorio `2.1`**. The current **`2.0.5`** release requires:
 
@@ -29,7 +30,7 @@ The mod is built around **graceful compatibility**: it discovers recipes, scienc
 ## Quick Summary
 
 - **Recipe productivity:** adds infinite research for intermediate, logistics, combat, infrastructure, science-pack, and Space Age production chains.
-- **Direct-effect bonuses:** adds infinite research for cargo logistics, weapon speed, character bonuses, combined character inventory/trash slots, and worker robot battery.
+- **Direct-effect bonuses:** adds infinite research for weapon speed, character bonuses, combined character inventory/trash slots, worker robot battery, and Factorio `2.1` cargo logistics on the current main line.
 - **Vanilla continuations:** extends selected finite vanilla technology chains into infinite continuations.
 - **Science-pack discovery:** reads active lab inputs, not the old `tool` prototype type.
 - **Lab validation:** checks generated research ingredients against real labs so technologies stay researchable.
@@ -46,10 +47,10 @@ Recipe productivity researches are infinite, but **Factorio's recipe productivit
 
 Install the mod through the **Factorio mod portal** or place the **release zip** in your Factorio mods directory.
 
-The packaged release archive is:
+The packaged release archive name follows `info.json`:
 
 ```text
-dist/more-infinite-research_2.0.5.zip
+dist/more-infinite-research_<version>.zip
 ```
 
 ## Branch Policy

@@ -1,4 +1,17 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.9.0
+Date: 2026-07-02
+
+  Compatibility:
+
+    - Started the Factorio 2.0 legacy backport from the tested More Infinite Research 2.0.5 source snapshot.
+    - Updated legacy metadata to target Factorio 2.0 with `base >= 2.0`.
+    - Kept Quality as a hidden optional dependency, without a 2.1 version floor, so quality module recipes can still be discovered when the Quality mod is active.
+    - Removed the known Factorio 2.1-only cargo landing pad count and cargo bay unloading distance modifier streams from the legacy source.
+    - Kept the current generator, diagnostics, locale, documentation, package validation, and fixture infrastructure as the starting point for the Factorio 2.0 compatibility port.
+    - Runtime validation with a real Factorio 2.0.x binary is still required before publishing the legacy package.
+
+---------------------------------------------------------------------------------------------------
 Version: 2.0.5
 Date: 2026-07-01
 

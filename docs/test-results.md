@@ -2,6 +2,30 @@
 
 This file records local release-candidate validation runs. It is not a substitute for the manual mod matrix in `docs/compatibility.md`.
 
+## 2026-07-02 Legacy Backport Preparation Pass
+
+Environment:
+
+- Branch: `legacy`.
+- Mod version `1.9.0`.
+- Factorio target in `info.json`: `2.0`.
+- Validation archive: `build/validation-dist/more-infinite-research_1.9.0.zip`.
+
+Commands:
+
+```powershell
+.\scripts\Invoke-MIRValidation.ps1 -StaticOnly
+```
+
+Results:
+
+- Merged the tested `main`/`2.0.5` source snapshot into `legacy` as the starting point for the Factorio `2.0` backport.
+- Updated `info.json` to `version = 1.9.0`, `factorio_version = 2.0`, `base >= 2.0`, hidden optional `quality`, and optional `space-age`.
+- Removed the known Factorio `2.1`-only cargo landing pad count and cargo bay unloading distance modifier streams from the legacy direct-effect stream table.
+- Added a `1.9.0` changelog entry that describes the compatibility-port preparation and keeps Factorio `2.0.x` runtime validation as an open release requirement.
+- Static/package validation passed and generated `build/validation-dist/more-infinite-research_1.9.0.zip`.
+- Runtime validation with a real Factorio `2.0.x` binary is still required before publishing `1.9.0`.
+
 ## 2026-07-02 Generated Package Validation Pass
 
 Environment:

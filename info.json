@@ -1,15 +1,13 @@
 {
   "name": "more-infinite-research",
-  "version": "2.0.5",
+  "version": "1.9.0",
   "title": "More Infinite Research",
   "author": "Julesc013",
   "description": "Adds configurable infinite productivity and bonus researches for intermediates, logistics, combat, player bonuses, and Space Age gaps.",
-  "factorio_version": "2.1",
+  "factorio_version": "2.0",
   "dependencies": [
-    "base >= 2.1.8",
-    "? elevated-rails >= 2.1.8",
-    "? recycler >= 2.1.8",
-    "(?) quality >= 2.1.8",
-    "? space-age >= 2.1.8"
+    "base >= 2.0",
+    "(?) quality",
+    "? space-age"
   ]
 }

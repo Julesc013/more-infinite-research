@@ -77,36 +77,6 @@ return {
     }
   },
 
-  research_cargo_bay_unloading_distance = {
-    -- Cargo logistics modifiers are Space Age behavior even if another mod
-    -- exposes similarly named cargo prototypes in a base-only run.
-    required_mods = {"space-age"},
-    required_items = {"landing-pad-unloading-bay"},
-    required_technologies = {"landing-pad-unloading-bay"},
-    icon_item = "landing-pad-unloading-bay",
-    overlay = "range",
-    localised_description = {"technology-description.more-infinite-research.cargo_bay_unloading_distance"},
-    science_packs = "all-official",
-    direct_effects = {
-      { type = "max-cargo-bay-unloading-distance", modifier = 10 }
-    }
-  },
-
-  research_cargo_landing_pad_count = {
-    -- Keep this Space Age-only; the startup setting can be enabled in any
-    -- mod set, but generation must still skip without Space Age.
-    required_mods = {"space-age"},
-    required_items = {"cargo-landing-pad"},
-    required_technologies = {"rocket-silo"},
-    icon_item = "cargo-landing-pad",
-    overlay = "count",
-    localised_description = {"technology-description.more-infinite-research.cargo_landing_pad_count"},
-    science_packs = "all-official",
-    direct_effects = {
-      { type = "cargo-landing-pad-count", modifier = 1 }
-    }
-  },
-
   research_rocket_shooting_speed = {
     icon_tech = "rocketry",
     science_packs = {

@@ -303,28 +303,28 @@ Do not reconstruct old releases commit-by-commit for `legacy`. A legacy release 
 
 ### Legacy Compatibility Patch
 
-- [ ] Set `info.json` version to the target `1.9.x` version.
-- [ ] Set `info.json` `factorio_version` to `2.0`.
-- [ ] Set `info.json` dependencies to the legacy target: `base >= 2.0` and `? space-age`.
-- [ ] Remove `base >= 2.1.x` from legacy.
-- [ ] Remove `? elevated-rails >= 2.1.x`, `? recycler >= 2.1.x`, `(?) quality >= 2.1.x`, and `? space-age >= 2.1.x` from legacy unless a specific Factorio `2.0` ordering need is proven.
-- [ ] Remove or guard `research_cargo_bay_unloading_distance`.
-- [ ] Remove or guard `research_cargo_landing_pad_count`.
-- [ ] Confirm static validation fails if legacy direct-effect stream definitions still contain `max-cargo-bay-unloading-distance` or `cargo-landing-pad-count`.
+- [x] Set `info.json` version to the target `1.9.x` version.
+- [x] Set `info.json` `factorio_version` to `2.0`.
+- [x] Set `info.json` dependencies to the legacy target: `base >= 2.0`, hidden optional `quality`, and `? space-age`.
+- [x] Remove `base >= 2.1.x` from legacy.
+- [x] Remove `? elevated-rails >= 2.1.x`, `? recycler >= 2.1.x`, `(?) quality >= 2.1.x`, and `? space-age >= 2.1.x` from legacy unless a specific Factorio `2.0` ordering need is proven.
+- [x] Remove or guard `research_cargo_bay_unloading_distance`.
+- [x] Remove or guard `research_cargo_landing_pad_count`.
+- [x] Confirm static validation fails if legacy direct-effect stream definitions still contain `max-cargo-bay-unloading-distance` or `cargo-landing-pad-count`.
 - [ ] Verify whether agricultural tower events and `tick_grown` are available in the target Factorio `2.0.x` build before keeping scripted agriculture.
 - [ ] Verify whether any pump or pipeline prototype fields exist in Factorio `2.0.x` before keeping them.
-- [ ] Rewrite `changelog.txt` as a legacy backport entry, not a copied current-line entry.
-- [ ] Update README and compatibility docs to state what is excluded from legacy.
+- [x] Rewrite `changelog.txt` as a legacy backport entry, not a copied current-line entry.
+- [x] Update README and compatibility docs to state what is excluded from legacy.
 
 ### Legacy Validation
 
-- [ ] Make `scripts/Invoke-MIRValidation.ps1` branch-aware from `info.json`.
-- [ ] Static validation checks `factorio_version = "2.0"` on legacy.
-- [ ] Static validation checks `base >= 2.0` style metadata on legacy.
-- [ ] Static validation checks 2.1-only cargo modifiers are absent on legacy.
-- [ ] Static validation skips 2.1-only cargo runtime fixture expectations on legacy.
+- [x] Make `scripts/Invoke-MIRValidation.ps1` branch-aware from `info.json`.
+- [x] Static validation checks `factorio_version = "2.0"` on legacy.
+- [x] Static validation checks `base >= 2.0` style metadata on legacy.
+- [x] Static validation checks 2.1-only cargo modifiers are absent on legacy.
+- [x] Static validation skips 2.1-only cargo runtime fixture expectations on legacy.
 - [ ] Run `.\scripts\Build-MIRPackage.ps1` on legacy.
-- [ ] Run `.\scripts\Invoke-MIRValidation.ps1 -StaticOnly` on legacy.
+- [x] Run `.\scripts\Invoke-MIRValidation.ps1 -StaticOnly` on legacy.
 - [ ] Run `.\scripts\Invoke-MIRValidation.ps1 -FactorioBin "C:\Path\To\Factorio-2.0.x\bin\x64\factorio.exe"` on legacy.
 - [ ] Do not validate the legacy port with the Steam-updated Factorio `2.1.x` binary.
 - [ ] Fix failures in this order: load-time prototype errors, invalid modifiers/effects, metadata, unresearchable science packs, docs/package validation, locale synchronization.
