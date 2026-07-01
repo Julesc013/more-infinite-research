@@ -44,6 +44,11 @@ local function missing_requirement(key, spec)
       return "missing required technology " .. tech_name
     end
   end
+  for _, tech_name in ipairs(spec.skip_if_technologies or {}) do
+    if U.technology_exists(tech_name) then
+      return "existing technology " .. tech_name
+    end
+  end
   for _, category in ipairs(spec.required_ammo_categories or {}) do
     if not U.ammo_category_exists(category) then
       return "missing required ammo category " .. category

@@ -41,6 +41,12 @@ local defaults = {
       max_level = 0,
       settings_note = {"mod-setting-description.mir-note-sandbox-cargo-pad-count"}
     },
+    research_lab_productivity = {
+      base_cost = 1000,
+      growth_factor = 1.2,
+      research_time = 120,
+      max_level = 0
+    },
     research_science_pack_productivity = { research_time = 120 },
     research_character_reach = { enabled = false },
     research_rocket_shooting_speed = {

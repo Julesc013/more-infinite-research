@@ -93,6 +93,7 @@ local function overlay_for_stream(stream)
     local t = effect.type
     if t == "character-running-speed" then return "movement-speed" end
     if t == "character-mining-speed" then return "mining" end
+    if t == "laboratory-productivity" then return "recipe-productivity" end
     if t == "character-reach-distance"
       or t == "character-build-distance"
       or t == "character-resource-reach-distance"

@@ -152,6 +152,8 @@ local function expected_icon_badge(tech)
     local effect_type = effect.type
     if effect_type == "change-recipe-productivity" then
       saw_recipe_productivity = true
+    elseif effect_type == "laboratory-productivity" then
+      return "recipe-productivity"
     elseif effect_type == "gun-speed" or effect_type == "character-crafting-speed" then
       return "speed"
     elseif effect_type == "character-running-speed" then
@@ -300,6 +302,21 @@ end
 
 assert_tech_uses_item_icon("recipe-prod-research_heavy_ammo-1", "cannon-shell")
 assert_tech_uses_item_icon("recipe-prod-research_cannon_shooting_speed-1", "cannon-shell")
+if techs["recipe-prod-research_processing_unit-1"] then
+  assert_tech_uses_technology_icon("recipe-prod-research_processing_unit-1", "processing-unit")
+end
+if techs["research-productivity"] then
+  assert_tech_uses_technology_icon("recipe-prod-research_science_pack_productivity-1", "research-productivity")
+else
+  assert_tech_uses_technology_icon("recipe-prod-research_science_pack_productivity-1", "space-science-pack")
+end
+assert_tech_uses_technology_icon("recipe-prod-research_walls-1", "gate")
+if techs["recipe-prod-research_lab_productivity-1"] then
+  assert_tech_uses_technology_icon("recipe-prod-research_lab_productivity-1", "military-science-pack")
+end
+if techs["recipe-prod-research_rocket_fuel-1"] then
+  assert_tech_uses_technology_icon("recipe-prod-research_rocket_fuel-1", "rocket-fuel")
+end
 
 for recipe_name, owners in pairs(owners_by_recipe) do
   table.sort(owners)
@@ -339,6 +356,7 @@ if is_space_age then
   end
 
   for _, tech_name in ipairs({
+    "recipe-prod-research_lab_productivity-1",
     "recipe-prod-research_processing_unit-1",
     "recipe-prod-research_low_density_structure-1",
     "recipe-prod-research_plastic-1",

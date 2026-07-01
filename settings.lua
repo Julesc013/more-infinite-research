@@ -164,6 +164,7 @@ local stream_sort_names = {
   research_inventory_capacity = "Character inventory slots",
   research_iron = "Iron plate productivity",
   research_iron_sticks = "Iron stick productivity",
+  research_lab_productivity = "Research productivity",
   research_lithium = "Lithium productivity",
   research_low_density_structure = "Low density structure productivity",
   research_mining_drill = "Mining drill productivity",

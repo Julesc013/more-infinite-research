@@ -2,6 +2,34 @@
 
 This file records local release-candidate validation runs. It is not a substitute for the manual mod matrix in `docs/compatibility.md`.
 
+## 2026-07-02 Base-Game Research Productivity And Icon Source Pass
+
+Environment:
+
+- Factorio `2.1.8` build `86744`, Windows Steam, Space Age install.
+- Mod version `2.0.5`.
+- Release archive: `dist/more-infinite-research_2.0.5.zip`.
+
+Commands:
+
+```powershell
+.\scripts\Build-MIRPackage.ps1
+.\scripts\Invoke-MIRValidation.ps1 -StaticOnly
+.\scripts\Invoke-MIRValidation.ps1 -FactorioBin "C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe"
+.\scripts\Test-MIRBranchPolicy.ps1
+```
+
+Results:
+
+- Processing Unit productivity now borrows the `processing-unit` unlock technology art, with the old `advanced-electronics-2` ID retained as an icon fallback for compatibility.
+- Wall productivity now borrows the vanilla `gate` technology art.
+- Rocket Fuel productivity now borrows the vanilla `rocket-fuel` unlock technology art.
+- Science pack productivity now uses Space Age `research-productivity` art when available and base-game `space-science-pack` technology art otherwise.
+- Added base-game Research productivity as a direct-effect stream using Factorio's native `laboratory-productivity` modifier.
+- Space Age skips MIR's Research productivity stream because vanilla `research-productivity` already exists.
+- Base-game Research productivity uses Military science pack technology art with MIR's productivity badge.
+- Runtime fixtures assert the new icon sources, base-game Research productivity generation, Space Age duplicate prevention, and the productivity badge for the native lab-productivity stream.
+
 ## 2026-07-02 Agricultural Growth Icon And Pre-Manual Regression Pass
 
 Environment:
@@ -565,7 +593,7 @@ Results:
 - All official DLC matrix cases completed `--dump-data` without prototype errors or fatal log markers.
 - Base-only, Elevated Rails-only, Recycler-only, and Quality-with-Recycler cases skipped absent DLC-shaped streams through `no_matching_recipes` or explicit missing prototype checks.
 - Space Age without Quality loaded successfully and generated Space Age-backed streams while keeping Quality disabled.
-- Science-pack productivity used `tech:research-productivity` when the Space Age technology was present and falls back to the automation science pack item icon when it is absent.
+- At the time, Science-pack productivity used `tech:research-productivity` when the Space Age technology was present and fell back to the automation science pack item icon when it was absent. This fallback was later replaced with the base-game `space-science-pack` technology art in the 2026-07-02 Base-Game Research Productivity And Icon Source Pass above.
 
 ## 2026-06-30 v2.0.0 Release-Candidate Hardening
 

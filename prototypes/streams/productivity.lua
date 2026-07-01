@@ -7,7 +7,7 @@ return {
 
   research_electronic_circuit = { items={"electronic-circuit"}, icon_tech="electronics", exclude_ingredient_patterns={"scrap"} },
   research_advanced_circuit = { items={"advanced-circuit"}, icon_tech="advanced-circuit", exclude_ingredient_patterns={"scrap"} },
-  research_processing_unit = { items={"processing-unit"}, icon_tech="advanced-electronics-2" },
+  research_processing_unit = { items={"processing-unit"}, icon_techs={"processing-unit", "advanced-electronics-2"} },
 
   research_plastic = { items={"plastic-bar"}, icon_tech="plastics" },
   research_sulfur  = { items={"sulfur"}, icon_tech="sulfur-processing", exclude_ingredient_patterns={"asteroid"} },
@@ -19,7 +19,7 @@ return {
   research_flying_robot_frame = { items={"flying-robot-frame"}, icon_tech="robotics" },
 
   research_low_density_structure = { items={"low-density-structure"}, icon_tech="low-density-structure" },
-  research_rocket_fuel = { items={"rocket-fuel"} },
+  research_rocket_fuel = { items={"rocket-fuel"}, icon_tech="rocket-fuel" },
 
   research_tungsten = { items={"tungsten-plate","tungsten-carbide"}, icon_item="tungsten-plate", icon_tech="tungsten-processing" },
   research_lithium = { items={"lithium-plate"}, icon_tech="lithium-processing" },
@@ -37,7 +37,7 @@ return {
     {change=0.05, items={"cluster-grenade"}}
   } },
 
-  research_walls = { icon_item="stone-wall", groups = {
+  research_walls = { icon_tech="gate", icon_item="stone-wall", groups = {
     {change=0.10, items={"stone-wall"}},
     {change=0.05, items={"gate"}}
   } },
@@ -139,9 +139,7 @@ return {
     { change=0.01, items={"stack-inserter"}, item_patterns={"stack%-inserter"} }
   }},
 
-  -- Custom science-pack productivity art is deferred until after v2.0.0.
-  -- icon = "__more-infinite-research__/graphics/technology/science-pack-productivity.png", icon_size = 256,
-  research_science_pack_productivity = { icon_tech = "research-productivity", icon_item = "automation-science-pack", dynamic_items_from_lab_inputs = true, groups = {
+  research_science_pack_productivity = { icon_techs = {"research-productivity", "space-science-pack"}, icon_item = "automation-science-pack", dynamic_items_from_lab_inputs = true, groups = {
     { change=0.10, items={
       "automation-science-pack","logistic-science-pack","chemical-science-pack","production-science-pack",
       "military-science-pack","utility-science-pack","space-science-pack",

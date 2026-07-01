@@ -78,6 +78,12 @@ Done in the current development branch:
 - [x] Add runtime fixture checks that generated MIR stream icons use the expected effect badge.
 - [x] Make Agricultural Growth Speed borrow the vanilla Space Age `agriculture` technology art instead of the agricultural science pack item icon.
 - [x] Add runtime fixture coverage for Agricultural Growth Speed's vanilla agriculture technology art.
+- [x] Make Processing Unit productivity borrow the processing unit unlock technology art, with the old advanced-electronics ID as an icon fallback.
+- [x] Make Wall productivity borrow the Gate technology art.
+- [x] Make Rocket Fuel productivity borrow the rocket fuel unlock technology art.
+- [x] Make Science pack productivity fall back to base-game Space science pack technology art instead of the automation science pack item icon.
+- [x] Add base-game Research productivity with the native `laboratory-productivity` modifier and Military science pack technology art, while skipping it in Space Age where vanilla `research-productivity` exists.
+- [x] Add runtime fixture coverage for the new icon sources and base/Space Age Research productivity behavior.
 
 Important release note: the scripted runtime work above is a **default-off v2.0.5 ship candidate**, not automatically deferred to `v2.1.0`. Ship the opt-in implementation with conservative wording after the minimum smoke checks pass. Defer default enablement, presets, or stronger behavior claims until manual proof exists.
 

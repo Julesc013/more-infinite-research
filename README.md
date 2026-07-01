@@ -160,7 +160,7 @@ These streams generate `change-recipe-productivity` effects for matching recipes
 | `research_copper_cable` | Copper cable productivity | `copper-cable` | `+10%` | Excludes recipes with scrap ingredients. |
 | `research_electronic_circuit` | Electronic circuit productivity | `electronic-circuit` | `+10%` | Adds electromagnetic science when available; excludes scrap inputs. |
 | `research_advanced_circuit` | Advanced circuit productivity | `advanced-circuit` | `+10%` | Adds electromagnetic science when available; excludes scrap inputs. |
-| `research_processing_unit` | Processing unit productivity | `processing-unit` | `+10%` | Generates when matching visible recipes exist, including without Space Age. Skips in Space Age when vanilla `processing-unit-productivity` owns the recipe. |
+| `research_processing_unit` | Processing unit productivity | `processing-unit` | `+10%` | Generates when matching visible recipes exist, including without Space Age. Uses the processing unit unlock technology art when available. Skips in Space Age when vanilla `processing-unit-productivity` owns the recipe. |
 | `research_plastic` | Plastic productivity | `plastic-bar` | `+10%` | Adds agricultural science when available. Skips covered recipes in Space Age when vanilla `plastic-bar-productivity` owns them. |
 | `research_sulfur` | Sulfur productivity | `sulfur` | `+10%` | Adds metallurgic science when available; excludes asteroid ingredients. |
 | `research_batteries` | Battery productivity | `battery` | `+10%` | Adds electromagnetic science when available; excludes scrap inputs. |
@@ -169,7 +169,7 @@ These streams generate `change-recipe-productivity` effects for matching recipes
 | `research_electric_engine` | Electric engine unit productivity | `electric-engine-unit` | `+10%` | Adds electromagnetic science when available. |
 | `research_flying_robot_frame` | Flying robot frame productivity | `flying-robot-frame` | `+10%` | Adds electromagnetic science when available. |
 | `research_low_density_structure` | Low density structure productivity | `low-density-structure` | `+10%` | Adds metallurgic science when available. Skips covered recipes in Space Age when vanilla `low-density-structure-productivity` owns them. |
-| `research_rocket_fuel` | Rocket fuel productivity | `rocket-fuel` | `+10%` | Adds agricultural science when available. Skips covered recipes in Space Age when vanilla `rocket-fuel-productivity` owns them. |
+| `research_rocket_fuel` | Rocket fuel productivity | `rocket-fuel` | `+10%` | Uses the rocket fuel unlock technology art. Adds agricultural science when available. Skips covered recipes in Space Age when vanilla `rocket-fuel-productivity` owns them. |
 | `research_tungsten` | Tungsten productivity | `tungsten-plate`, `tungsten-carbide` | `+10%` | Adds metallurgic science when available. |
 | `research_lithium` | Lithium productivity | `lithium-plate` | `+10%` | Adds cryogenic science when available. |
 | `research_holmium` | Holmium productivity | `holmium-plate` | `+10%` | Generates when matching visible recipes exist; adds electromagnetic science when available. |
@@ -180,7 +180,7 @@ These streams generate `change-recipe-productivity` effects for matching recipes
 | `research_bioflux` | Bioflux productivity | `bioflux` | `+10%` | Generates when matching visible recipes exist; adds agricultural science when available. |
 | `research_breeding` | Breeding productivity | `raw-fish`, `biter-egg`, `pentapod-egg`; recipe names matching cultivation, culture, or breeding | `+10%` | Generates when matching visible recipes exist. Category-only biochamber matching is intentionally avoided. |
 | `research_grenades` | Grenade productivity | `grenade`; `cluster-grenade` | `+10%`; `+5%` | Adds military and space science when available. |
-| `research_walls` | Wall productivity | `stone-wall`; `gate` | `+10%`; `+5%` | Adds military and space science when available. |
+| `research_walls` | Wall productivity | `stone-wall`; `gate` | `+10%`; `+5%` | Uses the gate technology art. Adds military and space science when available. |
 | `research_stone_products` | Stone product productivity | `stone`, `landfill`; `foundation` and artificial soil patterns | `+10%`; `+5%` | Adds metallurgic and space science when available; excludes scrap inputs. |
 | `research_rails` | Rail productivity | `rail` | `+10%` | Rail matching is strict so rail-like unrelated outputs are not caught. |
 | `research_concrete` | Concrete productivity | `stone-brick`; concrete/hazard concrete; refined concrete/refined hazard concrete | `+10%`; `+5%`; `+2%` | Adds space science when available; excludes scrap inputs. |
@@ -194,7 +194,7 @@ These streams generate `change-recipe-productivity` effects for matching recipes
 | `research_modules` | Module productivity | tier 1 modules; tier 2 modules; tier 3 modules, including quality modules when present | `+10%`; `+5%`; `+2%` | Adds cryogenic science when available. |
 | `research_belts` | Transport belt productivity | yellow, red, blue, turbo, and hyper belt/underground/splitter families | `+10%`; `+5%`; `+2%`; `+1%`; `+0.5%` | Adds space science when available. |
 | `research_inserters` | Inserter productivity | basic/burner; fast/long-handed; bulk; stack inserters | `+10%`; `+5%`; `+2%`; `+1%` | Adds space science when available. |
-| `research_science_pack_productivity` | Science pack productivity | vanilla and Space Age science packs, plus active modded lab inputs | `+10%` | Uses dynamic lab-input targets. Research unit time default is `120` seconds. |
+| `research_science_pack_productivity` | Science pack productivity | vanilla and Space Age science packs, plus active modded lab inputs | `+10%` | Recipe productivity for producing science packs. Uses dynamic lab-input targets. Uses vanilla `research-productivity` art when present and the white space-science technology art as the base-game fallback. Research unit time default is `120` seconds. |
 
 ### Direct-Effect And Scripted Streams
 
@@ -206,6 +206,7 @@ The scripted streams remain disabled by default in `v2.0.5`. Basic opt-in smoke 
 | --- | --- | --- | --- | --- |
 | `research_spoilage_preservation` | Spoilage preservation | Scripted global spoil time modifier through a `nothing` technology effect | `+1%` spoil time per completed level, capped by Factorio's global spoil-time range | Disabled by default until manual validation is recorded. Requires Space Age, spoilage, and agricultural science. Uses the highest completed level across non-enemy/non-neutral forces. No inventory or item-stack scan. |
 | `research_agricultural_growth_speed` | Agricultural growth speed | Scripted `on_tower_planted_seed` adjustment of plant `tick_grown` through a `nothing` technology effect | `+1%` growth speed per completed level, capped at `10x` | Disabled by default until manual validation is recorded. Requires Space Age and agricultural science. Applies to newly planted agricultural tower plants in this first slice; existing farms are not globally rescanned. |
+| `research_lab_productivity` | Research productivity | `laboratory-productivity` | `+10%` lab research productivity per level | Base-game equivalent of Space Age's native `research-productivity` chain. Generates only when the vanilla `research-productivity` technology is absent, so Space Age keeps Wube's original infinite chain. Uses Military science pack technology art as the base-game icon. |
 | `research_cargo_bay_unloading_distance` | Cargo bay unloading distance | `max-cargo-bay-unloading-distance` | `+10` tiles per level | Requires Space Age plus the `landing-pad-unloading-bay` item and technology. Uses all official base and Space Age science packs, not modded science packs. Base cost `100000`, growth `3`, time `120`. |
 | `research_cargo_landing_pad_count` | Cargo landing pad count | `cargo-landing-pad-count` | `+1` landing pad per surface per level | Requires Space Age plus the `cargo-landing-pad` item and `rocket-silo` technology. Disabled by default. Uses all official base and Space Age science packs, not modded science packs. Base cost `1000000`, growth `10`, time `240`. |
 | `research_rocket_shooting_speed` | Rocket shooting speed | `gun-speed` for `rocket` ammo category | `+10%` speed per level | Base cost `60`, growth `1.5`. Uses a base-game rocketry icon. |
@@ -327,6 +328,7 @@ Per-stream default exceptions:
 | `research_robot_battery` | Yes | shared | `1.2` | shared | Infinite |
 | `research_cargo_bay_unloading_distance` | Yes | `100000` | `3` | `120` | Infinite |
 | `research_cargo_landing_pad_count` | No | `1000000` | `10` | `240` | Infinite |
+| `research_lab_productivity` | Yes | `1000` | `1.2` | `120` | Infinite |
 | `research_science_pack_productivity` | Yes | shared | shared | `120` | Infinite |
 | `research_character_reach` | No | shared | shared | shared | Infinite |
 | `research_rocket_shooting_speed` | Yes | `60` | `1.5` | shared | Infinite |
@@ -467,7 +469,7 @@ Direct assignment remains available for intentional overrides.
 Enable `mir-debug-generation-report` to log rows like:
 
 ```text
-[more-infinite-research] report kind=stream key=research_science_pack_productivity status=generated reason=recipe_productivity science=... prerequisites=... effects=13 lab_status=reduced icon=tech:research-productivity
+[more-infinite-research] report kind=stream key=research_science_pack_productivity status=generated reason=recipe_productivity science=... prerequisites=... effects=13 lab_status=reduced icon=tech:space-science-pack
 ```
 
 Use diagnostics when reporting compatibility issues. It tells whether a stream generated, skipped, reduced science packs, or found no matching recipes. For direct-effect technologies, the report also includes non-blocking `native_modifier_overlap` rows when another infinite non-MIR technology already has the same native modifier target.

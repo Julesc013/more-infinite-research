@@ -57,6 +57,26 @@ return {
     { type="worker-robot-battery", modifier=0.10 }
   } },
 
+  research_lab_productivity = {
+    -- Space Age already owns the native infinite research-productivity chain.
+    skip_if_technologies = {"research-productivity"},
+    icon_techs = {"research-productivity", "military-science-pack"},
+    overlay = "recipe-productivity",
+    localised_description = {"technology-description.more-infinite-research.lab_productivity"},
+    science_packs = {
+      "automation-science-pack",
+      "logistic-science-pack",
+      "military-science-pack",
+      "chemical-science-pack",
+      "production-science-pack",
+      "utility-science-pack",
+      "space-science-pack"
+    },
+    direct_effects = {
+      { type = "laboratory-productivity", modifier = 0.10 }
+    }
+  },
+
   research_cargo_bay_unloading_distance = {
     -- Cargo logistics modifiers are Space Age behavior even if another mod
     -- exposes similarly named cargo prototypes in a base-only run.
