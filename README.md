@@ -531,6 +531,7 @@ The validation script checks:
 - **`docs/manual-test-plan.md`:** named manual saves/scenarios for release validation.
 - **`docs/mod-portal-page.md`:** mod-portal-ready public description, technology catalog, settings summary, compatibility notes, and troubleshooting text.
 - **`docs/pre-manual-2.0.5-report.md`:** current automated readiness, API-practice check, manual test instructions, and not-ready list for `v2.0.5`.
+- **`docs/release-notes-1.9.0.md`:** simplified player-facing `1.9.0` legacy release-note summary derived from the detailed changelog.
 - **`docs/release-notes-2.0.5.md`:** simplified player-facing `2.0.5` release-note summary derived from the detailed changelog.
 - **`docs/roadmap.md`:** current v2.0.5 and v2.1.0 release roadmap, scope gates, and release criteria.
 - **`docs/todo.md`:** executable v2.0.5 and v2.1.0 task checklist.

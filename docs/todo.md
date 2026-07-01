@@ -87,6 +87,7 @@ Done in the current development branch:
 - [x] Run final automated `v2.0.5` release-candidate validation and record it in `docs/test-results.md`.
 - [x] Add mod-portal-ready public copy with a complete generated technology catalog.
 - [x] Add simplified player-facing `v2.0.5` release notes derived from `changelog.txt`.
+- [x] Add simplified player-facing `v1.9.0` legacy release notes derived from `changelog.txt`.
 
 Important release note: the scripted runtime work above is a **default-off v2.0.5 ship candidate**, not automatically deferred to `v2.1.0`. Ship the opt-in implementation with conservative wording after the minimum smoke checks pass. Defer default enablement, presets, or stronger behavior claims until manual proof exists.
 
