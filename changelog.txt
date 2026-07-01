@@ -26,10 +26,10 @@ Date: 2026-07-01
     - Added disabled-by-default scripted candidate technologies for Spoilage Preservation and Agricultural Growth Speed. These are opt-in in v2.0.5 while save behavior and balance are being tested.
     - Added diagnostic-only native modifier overlap reporting for generated direct-effect technologies, so cargo/logistics modifier conflicts can be identified without changing generation behavior.
     - Character inventory slot research now also grants character logistic trash slots, replacing the separate trash slot generated technology while keeping the combined progression enabled by default.
-    - Character reach bonus now uses the character mining speed picaxe icon instead of the exoskeleton equipment icon.
-    - Startup setting names and descriptions were rewritten for clearer scanning, safer defaults, and explicit research unit time wording.
+    - Character reach bonus now uses the character mining speed pickaxe icon instead of the exoskeleton equipment icon.
+    - Startup setting names and descriptions were rewritten with Factorio-style labels, clearer scanning, safer defaults, and explicit research unit time wording.
     - Generated stream startup settings now follow the curated stream order instead of sorting primarily by raw stream key.
-    - Diagnostics startup settings now appear after normal gameplay settings.
+    - Diagnostics startup settings now appear with the other one-off controls before the generated technology tunables.
     - Added dropdown option descriptions for science-pack policy, lab incompatibility policy, and weapon speed overlap cleanup settings.
     - Added opt-in warning text to default-off experimental and sandbox settings, including Spoilage Preservation, Agricultural Growth Speed, Cargo landing pad count, and Inserter capacity continuation.
     - Added a README settings guide for recommended default, vanilla-respectful, megabase, modpack compatibility, and debug/reporting setups.

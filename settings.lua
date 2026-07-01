@@ -102,7 +102,7 @@ table.insert(settings_data, {
   name = "mir-debug-generation-report",
   setting_type = "startup",
   default_value = false,
-  order = "z-900",
+  order = "a-900",
   localised_name = {"mod-setting-name.mir-debug-generation-report"},
   localised_description = {"mod-setting-description.mir-debug-generation-report"}
 })
@@ -112,7 +112,7 @@ table.insert(settings_data, {
   name = "mir-debug-recipe-matches",
   setting_type = "startup",
   default_value = false,
-  order = "z-910",
+  order = "a-910",
   localised_name = {"mod-setting-name.mir-debug-recipe-matches"},
   localised_description = {"mod-setting-description.mir-debug-recipe-matches"}
 })
@@ -122,7 +122,7 @@ table.insert(settings_data, {
   name = "mir-debug-scripted-effects",
   setting_type = "startup",
   default_value = false,
-  order = "z-920",
+  order = "a-920",
   localised_name = {"mod-setting-name.mir-debug-scripted-effects"},
   localised_description = {"mod-setting-description.mir-debug-scripted-effects"}
 })

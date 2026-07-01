@@ -265,21 +265,21 @@ Modpack compatibility setup:
 
 - Start with science pack policy `configured`.
 - Use lab incompatibility policy `reduce`.
-- Enable `Diagnostics: generation summary` only while troubleshooting.
-- Enable `Diagnostics: recipe matches` only when reporting missing or duplicate productivity chains.
+- Enable `Show generation diagnostics` only while troubleshooting.
+- Enable `Show recipe match diagnostics` only when reporting missing or duplicate productivity chains.
 
 Debug/reporting setup:
 
-- Enable `Diagnostics: generation summary`, load once, then attach the Factorio log.
-- Enable `Diagnostics: recipe matches` for recipe-productivity matching issues.
-- Enable `Diagnostics: scripted effects` only for scripted spoilage/agriculture issues.
+- Enable `Show generation diagnostics`, load once, then attach the Factorio log.
+- Enable `Show recipe match diagnostics` for recipe-productivity matching issues.
+- Enable `Show scripted effect diagnostics` only for scripted spoilage/agriculture issues.
 
 ### What `0` Means
 
 Generated research lines:
 
 - Max level `0` means infinite.
-- Research unit time `0` means use the stream/default value.
+- Research unit time `0` means use MIR's default for that generated technology.
 - First-level cost and cost multiplier must be positive.
 
 Vanilla continuations:
