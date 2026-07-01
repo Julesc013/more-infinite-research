@@ -6,6 +6,6 @@
   "description": "Test fixture that adds a recipe in data-final-fixes to exercise load-order visibility.",
   "factorio_version": "2.1",
   "dependencies": [
-    "base >= 2.0"
+    "base >= 2.1.8"
   ]
 }

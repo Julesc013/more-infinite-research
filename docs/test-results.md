@@ -2,6 +2,36 @@
 
 This file records local release-candidate validation runs. It is not a substitute for the manual mod matrix in `docs/compatibility.md`.
 
+## 2026-07-02 Dev Post-Legacy Reconciliation Pass
+
+Environment:
+
+- Branch: `dev`.
+- Mod version `2.0.5`.
+- Current-line Factorio target in `info.json`: `2.1`.
+- Installed local Factorio binary during this pass: `2.0.77`, so dev runtime validation was not run.
+- Validation archive: `build/validation-dist/more-infinite-research_2.0.5.zip`.
+
+Commands:
+
+```powershell
+.\scripts\Invoke-MIRValidation.ps1 -StaticOnly
+.\scripts\Test-MIRBranchPolicy.ps1
+git diff --check
+```
+
+Results:
+
+- Reconciled current-line docs after the published `1.9.0` legacy release.
+- Added `docs/release-notes-1.9.0.md` to keep the legacy release notes visible from the current development line.
+- Updated README, compatibility, roadmap, and TODO language so `1.9.0` is recorded as released from `legacy`, not still planned.
+- Ported the legacy-proven fixture metadata guard into `dev`: fixture `factorio_version` and `base >=` dependency floors must match the active branch line.
+- Normalized dev fixture metadata so every local fixture targets Factorio `2.1` with `base >= 2.1.8`.
+- Static/package validation passed and generated `build/validation-dist/more-infinite-research_2.0.5.zip`.
+- Branch policy validation passed for `origin/main`, `origin/dev`, and `origin/legacy`.
+- `git diff --check` passed; Git reported line-ending normalization warnings only.
+- Runtime validation should be rerun after the local Factorio install is back on a Factorio `2.1.x` build.
+
 ## 2026-07-02 Generated Package Validation Pass
 
 Environment:

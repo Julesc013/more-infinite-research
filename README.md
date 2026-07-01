@@ -63,7 +63,7 @@ The repository has **three permanent branches** on `origin`:
 Normal development should target **`dev`** first. Release-ready hotfixes can target **`main`**.
 Backports that must remain compatible with Factorio `2.0.x` belong on **`legacy`**.
 
-The next planned legacy release is **More Infinite Research `v1.9.0` for Factorio `2.0.x`**, intended as a compatibility port of the tested **More Infinite Research `v2.0.5` for Factorio `2.1.x`** quick-patch codebase rather than a commit-by-commit rebuild of earlier releases. After that, quick feedback patches can follow the same pattern, for example **`v2.1.5 -> v1.9.5`**, with **`v1.9.9`** reserved as the final planned Factorio `2.0` port from the latest tested `2.x.x` current-line release when Factorio `2.1` becomes stable or when another verified upstream cutoff is chosen.
+The latest legacy release is **More Infinite Research `v1.9.0` for Factorio `2.0.x`**, released from the `legacy` branch as a compatibility port of the tested **More Infinite Research `v2.0.5` for Factorio `2.1.x`** quick-patch codebase rather than a commit-by-commit rebuild of earlier releases. Future quick feedback patches can follow the same pattern, for example **`v2.1.5 -> v1.9.5`**, with **`v1.9.9`** reserved as the final planned Factorio `2.0` port from the latest tested `2.x.x` current-line release when Factorio `2.1` becomes stable or when another verified upstream cutoff is chosen.
 
 See **`CONTRIBUTING.md`** for pull request expectations, branch routing, and validation commands.
 
@@ -531,6 +531,7 @@ The validation script checks:
 - **`docs/manual-test-plan.md`:** named manual saves/scenarios for release validation.
 - **`docs/mod-portal-page.md`:** mod-portal-ready public description, technology catalog, settings summary, compatibility notes, and troubleshooting text.
 - **`docs/pre-manual-2.0.5-report.md`:** current automated readiness, API-practice check, manual test instructions, and not-ready list for `v2.0.5`.
+- **`docs/release-notes-1.9.0.md`:** simplified player-facing `1.9.0` legacy release-note summary derived from the detailed changelog.
 - **`docs/release-notes-2.0.5.md`:** simplified player-facing `2.0.5` release-note summary derived from the detailed changelog.
 - **`docs/roadmap.md`:** current v2.0.5 and v2.1.0 release roadmap, scope gates, and release criteria.
 - **`docs/todo.md`:** executable v2.0.5 and v2.1.0 task checklist.

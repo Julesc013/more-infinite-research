@@ -87,6 +87,8 @@ Done in the current development branch:
 - [x] Run final automated `v2.0.5` release-candidate validation and record it in `docs/test-results.md`.
 - [x] Add mod-portal-ready public copy with a complete generated technology catalog.
 - [x] Add simplified player-facing `v2.0.5` release notes derived from `changelog.txt`.
+- [x] Add simplified player-facing `v1.9.0` legacy release notes derived from `changelog.txt`.
+- [x] Release `v1.9.0` from the `legacy` branch as the Factorio `2.0` compatibility port of the tested `v2.0.5` snapshot.
 
 Important release note: the scripted runtime work above is a **default-off v2.0.5 ship candidate**, not automatically deferred to `v2.1.0`. Ship the opt-in implementation with conservative wording after the minimum smoke checks pass. Defer default enablement, presets, or stronger behavior claims until manual proof exists.
 
@@ -218,17 +220,16 @@ Important release note: the scripted runtime work above is a **default-off v2.0.
 
 ## v1.9.0 Legacy Backport After v2.0.5
 
-Do this after the `v2.0.5` minimum manual smoke checks pass and the tested source point is tagged or otherwise recorded.
+Status: released from the `legacy` branch. Keep this section as historical process evidence for the first legacy backport.
 
-- [ ] Finish and validate `v2.0.5` on the Factorio `2.1` line.
-- [ ] Tag or branch the exact `v2.0.5` source point, or record the exact release commit hash.
-- [ ] Run `git fetch origin`.
-- [ ] Run `git checkout -b backport/legacy-1.9.0 origin/legacy`.
-- [ ] Run `git merge --no-ff --no-commit v2.0.5`, or `git merge --no-ff --no-commit <v2.0.5-release-commit>` if using a commit hash.
-- [ ] Do not cherry-pick a guessed subset unless the full snapshot merge fails and the fallback is documented.
-- [ ] Prefer current-line source for shared generator, diagnostics, science-pack handling, recipe matching, compatibility cleanup, validation scripts, docs structure, and localization.
-- [ ] Apply the legacy compatibility patch below before building or publishing.
-- [ ] Validate with a real Factorio `2.0.x` binary, not the Steam-updated Factorio `2.1.x` binary.
+- [x] Finish and validate `v2.0.5` on the Factorio `2.1` line.
+- [x] Tag or branch the exact `v2.0.5` source point, or record the exact release commit hash.
+- [x] Run `git fetch origin`.
+- [x] Merge the tested `v2.0.5` snapshot into `legacy`.
+- [x] Do not cherry-pick a guessed subset unless the full snapshot merge fails and the fallback is documented.
+- [x] Prefer current-line source for shared generator, diagnostics, science-pack handling, recipe matching, compatibility cleanup, validation scripts, docs structure, and localization.
+- [x] Apply the legacy compatibility patch below before building or publishing.
+- [x] Validate with a real Factorio `2.0.x` binary, not the Steam-updated Factorio `2.1.x` binary.
 
 ## v2.1.0 Larger Feature Wave
 
@@ -303,32 +304,35 @@ Do not reconstruct old releases commit-by-commit for `legacy`. A legacy release 
 
 ### Legacy Compatibility Patch
 
-- [ ] Set `info.json` version to the target `1.9.x` version.
-- [ ] Set `info.json` `factorio_version` to `2.0`.
-- [ ] Set `info.json` dependencies to the legacy target: `base >= 2.0` and `? space-age`.
-- [ ] Remove `base >= 2.1.x` from legacy.
-- [ ] Remove `? elevated-rails >= 2.1.x`, `? recycler >= 2.1.x`, `(?) quality >= 2.1.x`, and `? space-age >= 2.1.x` from legacy unless a specific Factorio `2.0` ordering need is proven.
-- [ ] Remove or guard `research_cargo_bay_unloading_distance`.
-- [ ] Remove or guard `research_cargo_landing_pad_count`.
-- [ ] Confirm static validation fails if legacy direct-effect stream definitions still contain `max-cargo-bay-unloading-distance` or `cargo-landing-pad-count`.
-- [ ] Verify whether agricultural tower events and `tick_grown` are available in the target Factorio `2.0.x` build before keeping scripted agriculture.
-- [ ] Verify whether any pump or pipeline prototype fields exist in Factorio `2.0.x` before keeping them.
-- [ ] Rewrite `changelog.txt` as a legacy backport entry, not a copied current-line entry.
-- [ ] Update README and compatibility docs to state what is excluded from legacy.
+- [x] Set `info.json` version to the target `1.9.x` version.
+- [x] Set `info.json` `factorio_version` to `2.0`.
+- [x] Set `info.json` dependencies to the legacy target: `base >= 2.0`, hidden optional `quality`, and `? space-age`.
+- [x] Remove `base >= 2.1.x` from legacy.
+- [x] Remove `? elevated-rails >= 2.1.x`, `? recycler >= 2.1.x`, `(?) quality >= 2.1.x`, and `? space-age >= 2.1.x` from legacy unless a specific Factorio `2.0` ordering need is proven.
+- [x] Remove or guard `research_cargo_bay_unloading_distance`.
+- [x] Remove or guard `research_cargo_landing_pad_count`.
+- [x] Confirm static validation fails if legacy direct-effect stream definitions still contain `max-cargo-bay-unloading-distance` or `cargo-landing-pad-count`.
+- [x] Treat scripted agriculture as non-blocking for `1.9.0`: the stream remains disabled by default and no measured behavior claim is made.
+- [x] Treat pump and pipeline prototype fields as not applicable for `1.9.0`: no pump or pipeline feature ships in this release.
+- [x] Rewrite `changelog.txt` as a legacy backport entry, not a copied current-line entry.
+- [x] Update README and compatibility docs to state what is excluded from legacy.
 
 ### Legacy Validation
 
-- [ ] Make `scripts/Invoke-MIRValidation.ps1` branch-aware from `info.json`.
-- [ ] Static validation checks `factorio_version = "2.0"` on legacy.
-- [ ] Static validation checks `base >= 2.0` style metadata on legacy.
-- [ ] Static validation checks 2.1-only cargo modifiers are absent on legacy.
-- [ ] Static validation skips 2.1-only cargo runtime fixture expectations on legacy.
-- [ ] Run `.\scripts\Build-MIRPackage.ps1` on legacy.
-- [ ] Run `.\scripts\Invoke-MIRValidation.ps1 -StaticOnly` on legacy.
-- [ ] Run `.\scripts\Invoke-MIRValidation.ps1 -FactorioBin "C:\Path\To\Factorio-2.0.x\bin\x64\factorio.exe"` on legacy.
-- [ ] Do not validate the legacy port with the Steam-updated Factorio `2.1.x` binary.
-- [ ] Fix failures in this order: load-time prototype errors, invalid modifiers/effects, metadata, unresearchable science packs, docs/package validation, locale synchronization.
-- [ ] Keep the legacy diff small: metadata, docs, validation branching, package name, and explicit removal of Factorio `2.1`-only surfaces.
+- [x] Make `scripts/Invoke-MIRValidation.ps1` branch-aware from `info.json`.
+- [x] Static validation checks `factorio_version = "2.0"` on legacy.
+- [x] Static validation checks `base >= 2.0` style metadata on legacy.
+- [x] Static validation checks 2.1-only cargo modifiers are absent on legacy.
+- [x] Static validation skips 2.1-only cargo runtime fixture expectations on legacy.
+- [x] Run `.\scripts\Build-MIRPackage.ps1` on legacy.
+- [x] Run `.\scripts\Invoke-MIRValidation.ps1 -StaticOnly` on legacy.
+- [x] Run `.\scripts\Invoke-MIRValidation.ps1 -FactorioBin "C:\Path\To\Factorio-2.0.x\bin\x64\factorio.exe"` on legacy.
+- [x] Do not validate the legacy port with the Steam-updated Factorio `2.1.x` binary.
+- [x] Fix initial Factorio `2.0.77` failures in this order: fixture metadata, unresearchable science-pack fixture shape, docs/package evidence.
+- [x] Keep the legacy diff small: metadata, docs, validation branching, package name, fixture metadata, and explicit removal of Factorio `2.1`-only surfaces.
+- [x] Load the rebuilt `1.9.0` release zip from isolated normal mod directories in base-only and Space Age modes.
+- [x] Create a base-only `1.2.9` save and benchmark-load it under `1.9.0` as a basic old-save compatibility smoke.
+- [ ] If available, manually load a real legacy save with progress in the old standalone trash-slot technology and confirm the JSON migration moves progress into the combined inventory/trash technology.
 
 ## Companion Mod Backlog
 

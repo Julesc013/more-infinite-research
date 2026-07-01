@@ -54,9 +54,9 @@ This is especially relevant for cargo landing pad count, cargo bay unloading dis
 
 ## Legacy Backport Model
 
-The planned Factorio `2.0` legacy release is More Infinite Research `v1.9.0`, backported from the tested More Infinite Research `v2.0.5` Factorio `2.1` quick-patch codebase. Later quick patch backports can follow the same model, such as `v2.1.5 -> v1.9.5`, with `v1.9.9` reserved as the final planned Factorio `2.0` build from the latest tested `2.x.x` snapshot when Factorio `2.1` becomes stable or another verified upstream cutoff is chosen.
+The Factorio `2.0` legacy release More Infinite Research `v1.9.0` has been released from the `legacy` branch, backported from the tested More Infinite Research `v2.0.5` Factorio `2.1` quick-patch codebase. Later quick patch backports can follow the same model, such as `v2.1.5 -> v1.9.5`, with `v1.9.9` reserved as the final planned Factorio `2.0` build from the latest tested `2.x.x` snapshot when Factorio `2.1` becomes stable or another verified upstream cutoff is chosen.
 
-Legacy should not be reconstructed commit-by-commit from older release history. `v1.9.0` should port the tested `v2.0.5` snapshot: current MIR generator, diagnostics, recipe matching, science-pack handling, compatibility cleanup, docs structure, locale, and validation infrastructure with Factorio `2.1`-only surface area removed or guarded.
+Legacy should not be reconstructed commit-by-commit from older release history. `v1.9.0` ported the tested `v2.0.5` snapshot: current MIR generator, diagnostics, recipe matching, science-pack handling, compatibility cleanup, docs structure, locale, and validation infrastructure with Factorio `2.1`-only surface area removed or guarded.
 
 Legacy `info.json` must use Factorio `2.0` metadata:
 
@@ -66,6 +66,7 @@ Legacy `info.json` must use Factorio `2.0` metadata:
   "factorio_version": "2.0",
   "dependencies": [
     "base >= 2.0",
+    "(?) quality",
     "? space-age"
   ]
 }
@@ -73,14 +74,14 @@ Legacy `info.json` must use Factorio `2.0` metadata:
 
 Do not carry the Factorio `2.1.x` base or optional official DLC dependency floors into legacy unless a later Factorio `2.0` validation run proves a specific ordering requirement.
 
-Known legacy exclusions until Factorio `2.0` validation proves otherwise:
+Known legacy `1.9.0` exclusions:
 
 - `research_cargo_bay_unloading_distance`
 - `research_cargo_landing_pad_count`
 - `max-cargo-bay-unloading-distance`
 - `cargo-landing-pad-count`
-- any scripted agriculture path that depends on unavailable agricultural tower events or entity fields
-- any pump, pipeline, or Space Age logistics prototype field added after the Factorio `2.0` target
+- any scripted agriculture path that depends on unavailable agricultural tower events or entity fields, if a future default-on claim depends on it
+- any pump, pipeline, or Space Age logistics prototype field added after the Factorio `2.0` target; no pump or pipeline feature ships in `1.9.0`
 
 Keep these architecture pieces from the tested current-line source snapshot unless Factorio `2.0` validation proves a specific incompatibility: `data-final-fixes.lua` generation, lab-input science-pack discovery, lab incompatibility policy, science-pack ingredient policy, recipe matching, diagnostics, base-tech extension safety, opportunistic compatibility cleanup, validation/package parity tooling, docs structure, and locale structure.
 

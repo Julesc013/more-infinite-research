@@ -228,6 +228,19 @@ Invoke-RepoCheck "fixture mods have metadata and data entrypoints" {
     if ([string]::IsNullOrWhiteSpace($info.name) -or $info.name -notmatch "^mir-fixture-") {
       throw "Fixture info.json must declare a mir-fixture-* name: $infoPath"
     }
+    if ($info.factorio_version -ne $repoInfo.factorio_version) {
+      throw "Fixture $($info.name) must target Factorio $($repoInfo.factorio_version) on this branch; found $($info.factorio_version)."
+    }
+    $fixtureBaseDependency = @($info.dependencies) | Where-Object { $_ -match "^base\s+>=" } | Select-Object -First 1
+    if ($isLegacyFactorio20) {
+      if ($fixtureBaseDependency -notmatch "^base\s+>=\s+2\.0(\.|$)") {
+        throw "Fixture $($info.name) must use a Factorio 2.0 base dependency on legacy; found '$fixtureBaseDependency'."
+      }
+    } elseif ($isFactorio21Line) {
+      if ($fixtureBaseDependency -notmatch "^base\s+>=\s+2\.1(\.|$)") {
+        throw "Fixture $($info.name) must use a Factorio 2.1 base dependency on the main line; found '$fixtureBaseDependency'."
+      }
+    }
 
     $entryFiles = @(
       "data.lua",

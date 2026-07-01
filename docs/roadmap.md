@@ -179,7 +179,7 @@ Only defer the specific feature that fails proof:
 - Settings presets can wait for `v2.1.0` because they affect defaults and user expectations.
 - Do not add real settings presets to `v2.0.5`; the quick patch only improves confidence in the existing settings.
 
-## v1.9.0 Legacy Backport Target
+## v1.9.0 Legacy Backport Released
 
 Theme:
 
@@ -187,11 +187,11 @@ Theme:
 Factorio 2.0 compatibility port of the tested v2.0.5 quick patch.
 ```
 
-Move `v1.9.0` directly after `v2.0.5` instead of waiting for `v2.1.0`. This gives Factorio `2.0.x` players the Tesla/electric fixes, duplicate-productivity safety, validation hardening, and default-off scripted candidate framework where the Factorio `2.0` API supports it.
+`v1.9.0` was released directly after `v2.0.5` instead of waiting for `v2.1.0`. This gives Factorio `2.0.x` players the Tesla/electric fixes, duplicate-productivity safety, validation hardening, and default-off scripted candidate framework where the Factorio `2.0` API supports it.
 
-`v1.9.0` is still a compatibility subset, not full parity. The port must remove or guard Factorio `2.1`-only surfaces, especially cargo landing pad count and cargo bay unloading distance modifiers, unless a real Factorio `2.0.x` validation run proves support.
+`v1.9.0` is still a compatibility subset, not full parity. The port removed the Factorio `2.1`-only cargo landing pad count and cargo bay unloading distance modifier streams.
 
-Use the detailed rules in the Legacy Backport Strategy section below, but use the tested `v2.0.5` source point as the first snapshot.
+Use the detailed rules in the Legacy Backport Strategy section below for future `v1.9.x` ports, but use the latest tested current-line source point for each future snapshot.
 
 ## v2.1.0 Target
 
@@ -407,7 +407,7 @@ Recommended order from here:
 
 1. Keep `dev` state unambiguous with `git status`, `git log --oneline --decorate --graph --max-count=8`, and `git branch -vv` before pushing or tagging.
 2. Finish `v2.0.5` as the quick/easy implementation patch: Tesla fix, duplicate-productivity prevention, default-off scripted agriculture/spoilage candidates, docs, validation, and package parity.
-3. Backport the tested `v2.0.5` snapshot to Factorio 2.0 as `v1.9.0`.
+3. `v1.9.0` has been released from `legacy` as the tested `v2.0.5` snapshot backport to Factorio 2.0.
 4. Move only failed or too-large `v2.0.5` candidates to `v2.1.0`.
 5. Ship `v2.1.0` as the larger feature wave.
 6. Ship quick `v2.1.5` feedback fixes.

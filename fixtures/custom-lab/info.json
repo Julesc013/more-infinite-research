@@ -6,6 +6,6 @@
   "description": "Test fixture that adds a custom lab with a deliberately narrow input set.",
   "factorio_version": "2.1",
   "dependencies": [
-    "base >= 2.0"
+    "base >= 2.1.8"
   ]
 }
