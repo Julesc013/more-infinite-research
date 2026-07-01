@@ -2,6 +2,31 @@
 
 This file records local release-candidate validation runs. It is not a substitute for the manual mod matrix in `docs/compatibility.md`.
 
+## 2026-07-02 Agricultural Growth Icon And Pre-Manual Regression Pass
+
+Environment:
+
+- Factorio `2.1.8` build `86744`, Windows Steam, Space Age install.
+- Mod version `2.0.5`.
+- Release archive: `dist/more-infinite-research_2.0.5.zip`.
+
+Commands:
+
+```powershell
+.\scripts\Build-MIRPackage.ps1
+.\scripts\Invoke-MIRValidation.ps1 -StaticOnly
+.\scripts\Invoke-MIRValidation.ps1 -FactorioBin "C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe"
+.\scripts\Test-MIRBranchPolicy.ps1
+```
+
+Results:
+
+- Agricultural Growth Speed now borrows the vanilla Space Age `agriculture` technology art instead of the agricultural science pack item icon.
+- The generated technology still receives MIR's speed badge after inherited constant badges are stripped.
+- Added runtime fixture coverage that fails if Agricultural Growth Speed stops using the vanilla `agriculture` technology art.
+- Static/package validation, runtime fixture validation, branch policy validation, locale parity, package parity, no-`on_tick` guard, scripted default-off guard, and generated icon badge checks passed.
+- Manual gameplay validation is still required before enabling scripted streams by default or making stronger measured spoilage/agriculture behavior claims.
+
 ## 2026-07-02 Cannon Shell Productivity And Icon Badge Pass
 
 Environment:

@@ -24,7 +24,7 @@ return {
   research_agricultural_growth_speed = {
     required_mods = {"space-age"},
     required_items = {"agricultural-science-pack"},
-    icon_item = "agricultural-science-pack",
+    icon_tech = "agriculture",
     overlay = "speed",
     localised_description = {"technology-description.more-infinite-research.agricultural_growth_speed"},
     science_packs = {

@@ -1251,7 +1251,9 @@ if ($isFactorio21Line) {
     }
   }
 
-  Invoke-RuntimeScenario -ScenarioName "space-age-scripted-candidates-enabled" -EnabledFixtureNames @() -EnabledStreamKeys @(
+  Invoke-RuntimeScenario -ScenarioName "space-age-scripted-candidates-enabled" -EnabledFixtureNames @(
+    "mir-fixture-assert-generation-integrity"
+  ) -EnabledStreamKeys @(
     "research_spoilage_preservation",
     "research_agricultural_growth_speed"
   ) -EnableSpaceAge
@@ -1259,6 +1261,9 @@ if ($isFactorio21Line) {
     $spaceAgeScriptedLine = Get-LastStreamReportLine -Key $scriptedStream
     Assert-ReportLineGenerated -Line $spaceAgeScriptedLine -Context "Space Age scripted candidate stream $scriptedStream"
     Assert-ReportLineContains -Line $spaceAgeScriptedLine -Expected "effects=1" -Context "Space Age scripted candidate stream $scriptedStream"
+    if ($scriptedStream -eq "research_agricultural_growth_speed") {
+      Assert-ReportLineContains -Line $spaceAgeScriptedLine -Expected "icon=tech:agriculture" -Context "Space Age agricultural growth speed icon scenario"
+    }
   }
 }
 

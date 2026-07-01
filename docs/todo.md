@@ -1,6 +1,6 @@
 # M.I.R. TODO
 
-Updated: 2026-07-01
+Updated: 2026-07-02
 
 This is the executable task list for the next More Infinite Research releases.
 
@@ -76,6 +76,8 @@ Done in the current development branch:
 - [x] Keep artillery turrets, artillery wagons, railgun turrets, and other buildings out of Cannon shell productivity for `v2.0.5`; revisit as a separate systems/productivity feature if needed.
 - [x] Strip inherited vanilla constant badges from generated MIR stream icons before applying MIR's own effect badge.
 - [x] Add runtime fixture checks that generated MIR stream icons use the expected effect badge.
+- [x] Make Agricultural Growth Speed borrow the vanilla Space Age `agriculture` technology art instead of the agricultural science pack item icon.
+- [x] Add runtime fixture coverage for Agricultural Growth Speed's vanilla agriculture technology art.
 
 Important release note: the scripted runtime work above is a **default-off v2.0.5 ship candidate**, not automatically deferred to `v2.1.0`. Ship the opt-in implementation with conservative wording after the minimum smoke checks pass. Defer default enablement, presets, or stronger behavior claims until manual proof exists.
 

@@ -247,6 +247,25 @@ local function assert_tech_uses_item_icon(tech_name, item_name)
   fail("generated technology " .. tech_name .. " does not use " .. item_name .. " item art.")
 end
 
+local function assert_tech_uses_technology_icon(tech_name, source_tech_name)
+  local tech = techs[tech_name]
+  if not tech then
+    fail("missing generated technology " .. tech_name .. " for icon assertion.")
+  end
+
+  local source = techs[source_tech_name]
+  local expected_paths = prototype_icon_paths(source)
+  if not next(expected_paths) then
+    fail("missing technology icon source for " .. source_tech_name .. ".")
+  end
+
+  for _, layer in ipairs(tech.icons or {}) do
+    if expected_paths[layer.icon] then return end
+  end
+
+  fail("generated technology " .. tech_name .. " does not use " .. source_tech_name .. " technology art.")
+end
+
 local owners_by_recipe = {}
 for tech_name, tech in pairs(techs) do
   if string.match(tech_name, "^recipe%-prod%-") then
@@ -315,6 +334,10 @@ for _, expectation in ipairs({
 end
 
 if is_space_age then
+  if techs["recipe-prod-research_agricultural_growth_speed-1"] then
+    assert_tech_uses_technology_icon("recipe-prod-research_agricultural_growth_speed-1", "agriculture")
+  end
+
   for _, tech_name in ipairs({
     "recipe-prod-research_processing_unit-1",
     "recipe-prod-research_low_density_structure-1",
