@@ -2,6 +2,36 @@
 
 This file records local release-candidate validation runs. It is not a substitute for the manual mod matrix in `docs/compatibility.md`.
 
+## 2026-07-02 Mod Portal Documentation And Release Notes Pass
+
+Environment:
+
+- Factorio `2.1.8` build `86744`, Windows Steam, Space Age install.
+- Mod version `2.0.5`.
+- Release archive: `dist/more-infinite-research_2.0.5.zip`.
+
+Commands:
+
+```powershell
+.\scripts\Build-MIRPackage.ps1
+.\scripts\Invoke-MIRValidation.ps1 -StaticOnly
+.\scripts\Invoke-MIRValidation.ps1 -FactorioBin "C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe"
+.\scripts\Test-MIRBranchPolicy.ps1
+git diff --check
+```
+
+Results:
+
+- Added `docs/mod-portal-page.md` as the mod-portal-ready public description.
+- Added a complete player-facing technology catalog covering recipe-productivity streams, direct/scripted bonus streams, and vanilla technology continuations.
+- Added `docs/release-notes-2.0.5.md` as a simplified player-facing release-note summary derived from `changelog.txt`.
+- Updated the README documentation map and TODO checklist for the new public release docs.
+- Rebuilt the `2.0.5` archive with the public release docs included.
+- Static/package validation passed.
+- Runtime fixture validation passed against Factorio `2.1.8`.
+- Branch policy validation passed for `origin/main`, `origin/dev`, and `origin/legacy`.
+- The remaining release gate is still manual in-game smoke testing from a normal Factorio mods folder before tagging and publishing.
+
 ## 2026-07-02 Final v2.0.5 Release-Candidate Validation
 
 Environment:
