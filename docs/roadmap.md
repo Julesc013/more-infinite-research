@@ -4,7 +4,7 @@ Updated: 2026-07-01
 
 This is the current release roadmap for More Infinite Research after the v2.0.0 Factorio 2.1 compatibility release.
 
-Use this document for release intent and scope. Use `docs/todo.md` for the executable checklist. Use `docs/post-2.0-feature-plan.md` for the long-form feedback archive and API notes behind these decisions.
+Use this document for release intent and scope. Use `docs/todo.md` for the executable checklist, `docs/release-plan-2.1.0.md` for the next release-gated implementation plan, and `docs/post-2.0-feature-plan.md` for the long-form feedback archive and API notes behind these decisions.
 
 ## Release Cadence
 
@@ -198,23 +198,26 @@ Use the detailed rules in the Legacy Backport Strategy section below for future 
 Theme:
 
 ```text
-Larger feature wave after v2.0.5 feedback.
+User-facing control + compatibility discipline + proof-gated expansion.
 ```
 
-`v2.1.0` is where bigger or more ambiguous work should go. It can absorb any `v2.0.5` candidate that fails proof, and it can take on larger UX, logistics, and compatibility work.
+`v2.1.0` is the next controlled feature wave. It should not absorb every good idea. The release must ship settings control, compatibility policy, and only the scripted/logistics/productivity work that passes proof.
+
+The executable release gate lives in `docs/release-plan-2.1.0.md`.
 
 ### v2.1.0 Ship Candidates
 
 | Feature | Bucket | Implementation type | Notes |
 | --- | --- | --- | --- |
 | Settings presets | Ship | Startup setting/default derivation | Vanilla-respectful, Megabase-balanced, Unlimited sandbox, with explicit override rules |
+| Preset override model | Ship | Startup setting/default derivation | User-visible precedence; no silent contradiction between preset and explicit setting |
+| Duplicate native modifier policy | Ship | Data-stage overlap scan plus explicit policy | Promote `v2.0.5` diagnostic-only reporting to skip/warn/prefer/allow behavior |
 | Scripted-tech refinements | Ship if needed | Event-driven runtime manager | Improve storage/reversal/diagnostics after `v2.0.5` feedback |
 | Existing agricultural plant rescale | Ship if bounded | Research-change bounded scan | Deduplicate tower-owned plants and avoid surface-wide scans |
 | High-throughput pump / Der Pump | Ship if prototype proof passes | Prototype unlock | Good megabase QoL candidate |
 | Pipeline extent setting | Ship if compatibility proof passes | Startup prototype setting | Disabled by default unless proven safe |
 | Thruster fuel/oxidizer productivity | Ship if recipe proof passes | Recipe productivity | Do not add true thrust research |
 | Oil/fluid recipe productivity | Spike/ship if proof passes | Recipe productivity | Needs in-game proof on fluid outputs |
-| Duplicate native modifier policy | Ship if small | Data-stage overlap scan plus explicit policy | `v2.0.5` has diagnostic-only reporting; `v2.1.0` decides skip/allow/cleanup behavior |
 | Compatibility docs and test results | Ship | Docs/evidence | Maraxis/Krastorio-style validation when available |
 
 ### v2.1.0 Acceptance Criteria

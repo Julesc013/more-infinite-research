@@ -32,6 +32,34 @@ Results:
 - `git diff --check` passed; Git reported line-ending normalization warnings only.
 - Runtime validation should be rerun after the local Factorio install is back on a Factorio `2.1.x` build.
 
+## 2026-07-02 v2.1.0 Release-Gate Planning Pass
+
+Environment:
+
+- Branch: `dev`.
+- Mod version `2.0.5`.
+- Planning/docs-only change for the next Factorio `2.1` feature wave.
+- Local Factorio binary remained `2.0.77`, so runtime validation was not run for this `dev` documentation pass.
+
+Commands:
+
+```powershell
+.\scripts\Invoke-MIRValidation.ps1 -StaticOnly
+.\scripts\Test-MIRBranchPolicy.ps1
+git diff --check
+```
+
+Results:
+
+- Added `docs/release-plan-2.1.0.md` as the canonical release-gated implementation plan for `v2.1.0`.
+- Tightened `v2.1.0` around settings presets, preset override behavior, native modifier overlap policy, scripted spoilage/agriculture hardening, compatibility matrix work, and proof-gated spikes.
+- Added a GitHub milestone/issue checklist for the `v2.1.0` gates.
+- Updated roadmap, TODO, manual test plan, compatibility docs, and README documentation map to point at the release-gated plan.
+- Kept true thruster thrust research, runtime platform speed mutation, runtime quality odds mutation, refrigeration, greenhouses, super-bacteria, and broad fluid systems out of core `v2.1.0` scope.
+- Static/package validation passed and generated `build/validation-dist/more-infinite-research_2.0.5.zip`.
+- Branch policy validation passed for `origin/main`, `origin/dev`, and `origin/legacy`.
+- `git diff --check` passed; Git reported line-ending normalization warnings only.
+
 ## 2026-07-02 Generated Package Validation Pass
 
 Environment:

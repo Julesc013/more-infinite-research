@@ -233,23 +233,63 @@ Status: released from the `legacy` branch. Keep this section as historical proce
 
 ## v2.1.0 Larger Feature Wave
 
-`v2.1.0` should take the harder work after `v2.0.5` feedback. It can also absorb any `v2.0.5` feature that fails proof.
+`v2.1.0` should take the harder work after `v2.0.5` feedback, but it should stay selective. Use `docs/release-plan-2.1.0.md` as the release-gated implementation plan.
+
+Theme:
+
+```text
+user-facing control + compatibility discipline + proof-gated expansion
+```
+
+Do not turn `v2.1.0` into a bucket for every plausible feature idea.
+
+### v2.1.0 Milestone / Issue Setup
+
+- [ ] Create a GitHub `v2.1.0` milestone.
+- [ ] Create issue: `v2.1.0: settings presets and override model`.
+- [ ] Create issue: `v2.1.0: native modifier overlap policy`.
+- [ ] Create issue: `v2.1.0: spoilage preservation manual validation`.
+- [ ] Create issue: `v2.1.0: agricultural growth manual validation`.
+- [ ] Create issue: `v2.1.0: existing agricultural plant rescale spike`.
+- [ ] Create issue: `v2.1.0: high-throughput pump prototype unlock`.
+- [ ] Create issue: `v2.1.0: pipeline extent startup setting spike`.
+- [ ] Create issue: `v2.1.0: thruster fuel and oxidizer productivity spike`.
+- [ ] Create issue: `v2.1.0: oil/fluid recipe productivity spike`.
+- [ ] Create issue: `v2.1.0: compatibility matrix`.
+- [ ] Create issue: `v2.1.0: release packaging and docs`.
+- [ ] Each issue includes goal, scope, out-of-scope, acceptance criteria, validation, and release-note wording.
 
 ### v2.1.0 Ship Candidates
 
-- [ ] Settings presets: Vanilla-respectful, Megabase-balanced, Unlimited sandbox.
-- [ ] Existing agricultural plant rescale if bounded and deduplicated.
+- [ ] Settings presets: `Custom/manual`, `Vanilla-respectful`, `Megabase-balanced`, `Unlimited sandbox`.
+- [ ] Preset override model: explicit per-feature choice must not be silently contradicted by preset behavior.
+- [ ] Native modifier overlap policy: prefer existing owner, warn only, prefer MIR, or allow duplicates.
+- [ ] Scripted spoilage hardening: manual results for existing/new stacks, reversal, disable, baseline, and multi-force behavior.
+- [ ] Scripted agriculture hardening: newly planted crops verified; existing-plant rescale only if bounded and deduplicated.
+- [ ] Existing agricultural plant rescale if bounded, tower-scoped, deduplicated, reversible, and large-farm tested.
 - [ ] Scripted-tech diagnostics improvements after `v2.0.5` feedback.
-- [ ] Technology to increase throughput of pumps if possible.
-- [ ] Pipeline extent startup setting if compatibility proof is clean.
-- [ ] Thruster fuel productivity if recipe-productivity proof is clean.
-- [ ] Thruster oxidizer productivity if recipe-productivity proof is clean.
-- [ ] Oil/fluid recipe productivity if in-game proof is clean.
-- [ ] Decide post-diagnostic native modifier policy for cargo/logistics overlap: skip, explicitly allow, cleanup, or user setting.
+- [ ] High-throughput pump prototype unlock if the scope remains one optional pump entity with no runtime fluid scripting.
+- [ ] Pipeline extent startup setting only if compatibility proof is clean; otherwise keep as spike.
+- [ ] Thruster fuel productivity only if recipe-productivity proof is clean.
+- [ ] Thruster oxidizer productivity only if recipe-productivity proof is clean.
+- [ ] Oil/fluid recipe productivity only if in-game proof is clean for fluid-only and mixed-output recipes.
 - [ ] Real Maraxis-like duplicate cargo landing pad manual test when a compatible target is available.
 - [ ] Krastorio 2 Spaced Out test if compatible with the active Factorio line.
 - [ ] Better Robots Extended smoke test.
 - [ ] Compatibility docs and manual runtime test results.
+
+### v2.1.0 Spike / Defer Decisions
+
+- [ ] Pipeline extent multiplier is classified as startup-setting spike unless tests prove safe.
+- [ ] Thruster fuel/oxidizer productivity is classified as recipe-productivity spike unless exact recipes prove clean.
+- [ ] Oil/fluid productivity is classified as recipe-productivity spike unless exact recipes prove clean.
+- [ ] Agricultural yield / fruit yield is spike-only unless a clean bounded path exists.
+- [ ] Quality module enrichment is spike/defer or add-on; do not implement runtime module mutation in core MIR.
+- [ ] Roboport range is spike/defer unless a clean native modifier or small prototype-tier path exists.
+- [ ] True thruster thrust research remains rejected/deferred unless Factorio exposes a native modifier.
+- [ ] Runtime platform speed mutation remains rejected.
+- [ ] Runtime quality odds mutation remains rejected.
+- [ ] Refrigeration, greenhouses, super-bacteria, and broad fluid systems remain companion/defer scope.
 
 ### v2.1.0 Acceptance Criteria
 
@@ -260,6 +300,11 @@ Status: released from the `legacy` branch. Keep this section as historical proce
 - [ ] Any new recipe-productivity stream proves exact recipe IDs and no vanilla/other-mod infinite duplicate.
 - [ ] Every startup prototype setting documents when it is applied and why it cannot be runtime research.
 - [ ] Compatibility tests include no Space Age, Space Age, Space Age without Quality where supported, custom science/lab fixtures, and at least one large overhaul if available.
+- [ ] Presets have validation for expected generated stream decisions.
+- [ ] Native modifier overlap policy has validation for duplicate cargo/native modifier scenarios.
+- [ ] Conditional spikes are either promoted with proof or explicitly moved out of `v2.1.0`.
+- [ ] `info.json` version is bumped to `2.1.0`.
+- [ ] `changelog.txt` has a dated `2.1.0` entry.
 - [ ] README, roadmap, compatibility docs, test results, and changelog are updated before release.
 
 ## v2.1.5 Quick Feedback Patch

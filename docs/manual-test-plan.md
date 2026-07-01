@@ -51,9 +51,10 @@ Required before claiming larger `v2.1.0` features:
 
 | Scenario | Purpose |
 | --- | --- |
-| `settings-presets` | Verify preset defaults and advanced setting override behavior |
+| `settings-presets` | Verify `Custom/manual`, `Vanilla-respectful`, `Megabase-balanced`, and `Unlimited sandbox` preset defaults |
+| `settings-preset-overrides` | Verify explicit per-feature choices override presets and the UI does not contradict generation behavior |
 | `agri-existing-plant-rescale` | Verify any existing plant rescale is bounded, deduplicated, and reversible |
-| `duplicate-native-modifiers` | Verify overlapping cargo/logistics modifiers are skipped, warned, or explicitly allowed beyond the diagnostic-only `v2.0.5` fixture coverage |
+| `native-modifier-overlap-policy` | Verify overlapping cargo/logistics/native modifiers follow the selected skip/warn/prefer/allow policy beyond diagnostic-only `v2.0.5` coverage |
 | `high-throughput-pump` | Validate prototype, recipe, power draw, balance, and throughput if promoted |
 | `pipeline-extent` | Validate startup prototype mutation and compatibility risk if promoted |
 | `thruster-fuel-productivity` | Verify recipe productivity on thruster fuel recipes if promoted |

@@ -46,11 +46,14 @@ The release goal is graceful compatibility without mod-page dependency clutter: 
 
 Future MIR features should treat overlapping native modifiers as compatibility-sensitive. If another mod already adds an infinite technology that modifies the same force statistic, MIR should prefer one of these behaviors:
 
-- Skip or disable MIR's duplicate by default.
-- Keep both only when an explicit setting allows overlapping infinite technologies.
-- Report the overlap through diagnostics.
+- Prefer the existing owner by default.
+- Warn only when the user intentionally chooses diagnostic behavior.
+- Prefer MIR only when the user explicitly chooses that policy.
+- Allow duplicates only when the user explicitly chooses that policy.
 
 This is especially relevant for cargo landing pad count, cargo bay unloading distance, and any future native modifier or scripted-effect technology that other mods may also provide.
+
+`v2.1.0` should promote `v2.0.5`'s diagnostic-only overlap reporting into an explicit setting-backed policy.
 
 ## Legacy Backport Model
 
