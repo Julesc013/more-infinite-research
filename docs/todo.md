@@ -311,8 +311,8 @@ Do not reconstruct old releases commit-by-commit for `legacy`. A legacy release 
 - [x] Remove or guard `research_cargo_bay_unloading_distance`.
 - [x] Remove or guard `research_cargo_landing_pad_count`.
 - [x] Confirm static validation fails if legacy direct-effect stream definitions still contain `max-cargo-bay-unloading-distance` or `cargo-landing-pad-count`.
-- [ ] Verify whether agricultural tower events and `tick_grown` are available in the target Factorio `2.0.x` build before keeping scripted agriculture.
-- [ ] Verify whether any pump or pipeline prototype fields exist in Factorio `2.0.x` before keeping them.
+- [x] Treat scripted agriculture as non-blocking for `1.9.0`: the stream remains disabled by default and no measured behavior claim is made.
+- [x] Treat pump and pipeline prototype fields as not applicable for `1.9.0`: no pump or pipeline feature ships in this release.
 - [x] Rewrite `changelog.txt` as a legacy backport entry, not a copied current-line entry.
 - [x] Update README and compatibility docs to state what is excluded from legacy.
 
@@ -327,8 +327,11 @@ Do not reconstruct old releases commit-by-commit for `legacy`. A legacy release 
 - [x] Run `.\scripts\Invoke-MIRValidation.ps1 -StaticOnly` on legacy.
 - [x] Run `.\scripts\Invoke-MIRValidation.ps1 -FactorioBin "C:\Path\To\Factorio-2.0.x\bin\x64\factorio.exe"` on legacy.
 - [x] Do not validate the legacy port with the Steam-updated Factorio `2.1.x` binary.
-- [ ] Fix failures in this order: load-time prototype errors, invalid modifiers/effects, metadata, unresearchable science packs, docs/package validation, locale synchronization.
-- [ ] Keep the legacy diff small: metadata, docs, validation branching, package name, and explicit removal of Factorio `2.1`-only surfaces.
+- [x] Fix initial Factorio `2.0.77` failures in this order: fixture metadata, unresearchable science-pack fixture shape, docs/package evidence.
+- [x] Keep the legacy diff small: metadata, docs, validation branching, package name, fixture metadata, and explicit removal of Factorio `2.1`-only surfaces.
+- [x] Load the rebuilt `1.9.0` release zip from isolated normal mod directories in base-only and Space Age modes.
+- [x] Create a base-only `1.2.9` save and benchmark-load it under `1.9.0` as a basic old-save compatibility smoke.
+- [ ] If available, manually load a real legacy save with progress in the old standalone trash-slot technology and confirm the JSON migration moves progress into the combined inventory/trash technology.
 
 ## Companion Mod Backlog
 
@@ -363,6 +366,6 @@ Run this before every release candidate:
 - [x] `.\scripts\Invoke-MIRValidation.ps1 -FactorioBin "C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe"`
 - [x] `.\scripts\Test-MIRBranchPolicy.ps1`
 - [x] `git diff --check`
-- [ ] Load the release zip from a normal Factorio mods folder.
+- [x] Load the release zip from an isolated normal Factorio mods folder.
 - [x] Record validation results in `docs/test-results.md`.
 - [x] Commit docs, code, changelog, and package together for the tested candidate.

@@ -22,7 +22,7 @@ This order gives the mod the best practical view of recipes, labs, science packs
 
 ## Control Stage Boundary
 
-The current `dev` branch includes a small `control.lua` surface for scripted technologies such as spoilage preservation and agricultural growth speed. These runtime features are `v2.0.5` ship candidates because they are bounded and event-driven, but each claimed behavior must pass the named manual save validation before release. Any behavior that fails proof moves to `v2.1.0`.
+The current source includes a small `control.lua` surface for scripted technologies such as spoilage preservation and agricultural growth speed. These runtime features remain default-off candidates because they are bounded and event-driven, but each claimed behavior must pass the named manual save validation before default enablement. Any behavior that fails proof moves to later current-line work.
 
 The runtime layer is intentionally narrow:
 
@@ -158,7 +158,7 @@ Static validation checks every local fixture directory has `info.json`, a `mir-f
 
 Static validation rejects runtime tick handlers in `control.lua` and `control/**/*.lua`.
 
-The fixture mods under `fixtures/` test item-based science packs, custom labs, late recipe creation, the default `reduce` lab incompatibility behavior, the `skip` lab incompatibility behavior, science-pack ingredient policy modes, the end-game prerequisite gate, base-only cargo skip behavior, Space Age cargo logistics effect shape, Maraxis-like duplicate cargo modifier diagnostics, finite vanilla-chain preservation, broad generation integrity, weapon-speed overlap safety, Omega-style drill productivity matching, and post-MIR assertions for runtime-sensitive generated technologies.
+The fixture mods under `fixtures/` test custom science packs, custom labs, late recipe creation, the default `reduce` lab incompatibility behavior, the `skip` lab incompatibility behavior, science-pack ingredient policy modes, the end-game prerequisite gate, branch-gated cargo scenarios, finite vanilla-chain preservation, broad generation integrity, weapon-speed overlap safety, Omega-style drill productivity matching, and post-MIR assertions for runtime-sensitive generated technologies.
 
 `mir-fixture-assert-generation-integrity` is the broad guardrail fixture. It runs after MIR in both base-only and Space Age runtime scenarios and verifies:
 

@@ -211,8 +211,6 @@ The scripted streams remain disabled by default in `v2.0.5`. Basic opt-in smoke 
 | `research_spoilage_preservation` | Spoilage preservation | Scripted global spoil time modifier through a `nothing` technology effect | `+1%` spoil time per completed level, capped by Factorio's global spoil-time range | Disabled by default until manual validation is recorded. Requires Space Age, spoilage, and agricultural science. Uses the highest completed level across non-enemy/non-neutral forces. No inventory or item-stack scan. |
 | `research_agricultural_growth_speed` | Agricultural growth speed | Scripted `on_tower_planted_seed` adjustment of plant `tick_grown` through a `nothing` technology effect | `+1%` growth speed per completed level, capped at `10x` | Disabled by default until manual validation is recorded. Requires Space Age and agricultural science. Applies to newly planted agricultural tower plants in this first slice; existing farms are not globally rescanned. |
 | `research_lab_productivity` | Research productivity | `laboratory-productivity` | `+10%` lab research productivity per level | Base-game equivalent of Space Age's native `research-productivity` chain. Generates only when the vanilla `research-productivity` technology is absent, so Space Age keeps Wube's original infinite chain. Uses Military science pack technology art as the base-game icon. |
-| `research_cargo_bay_unloading_distance` | Cargo bay unloading distance | `max-cargo-bay-unloading-distance` | `+10` tiles per level | Requires Space Age plus the `landing-pad-unloading-bay` item and technology. Uses all official base and Space Age science packs, not modded science packs. Base cost `100000`, growth `3`, time `120`. |
-| `research_cargo_landing_pad_count` | Cargo landing pad count | `cargo-landing-pad-count` | `+1` landing pad per surface per level | Requires Space Age plus the `cargo-landing-pad` item and `rocket-silo` technology. Disabled by default. Uses all official base and Space Age science packs, not modded science packs. Base cost `1000000`, growth `10`, time `240`. |
 | `research_rocket_shooting_speed` | Rocket shooting speed | `gun-speed` for `rocket` ammo category | `+10%` speed per level | Base cost `60`, growth `1.5`. Uses a base-game rocketry icon. |
 | `research_cannon_shooting_speed` | Cannon shooting speed | `gun-speed` for `cannon-shell` ammo category | `+10%` speed per level | Base cost `60`, growth `1.5`. Uses the cannon shell item icon. |
 | `research_flamethrower_shooting_speed` | Flamethrower shooting speed | `gun-speed` for `flamethrower` | `+10%` speed per level | Base cost `60`, growth `1.5`. |
@@ -223,6 +221,10 @@ The scripted streams remain disabled by default in `v2.0.5`. Basic opt-in smoke 
 | `research_character_reach` | Character reach bonus | reach, build distance, resource reach, and item drop distance | `+10` each per level | Disabled by default. Uses the character mining speed pickaxe icon and available late-game science packs. |
 | `research_inventory_capacity` | Character inventory slots | `character-inventory-slots-bonus`; `character-logistic-trash-slots` | `+1` inventory slot and `+1` logistic trash slot per level | Growth factor default `1.10`. |
 | `research_robot_battery` | Worker robot battery | `worker-robot-battery` | `+10%` per level | Growth factor default `1.2`. |
+
+Legacy `1.9.0` excludes the Factorio `2.1` cargo logistics modifier streams:
+`research_cargo_bay_unloading_distance` and `research_cargo_landing_pad_count`.
+They remain current-line `2.x` features only.
 
 ### Vanilla Base-Technology Extensions
 
@@ -255,7 +257,6 @@ Vanilla-respectful setup:
 
 - Disable vanilla continuations you do not want MIR to uncap.
 - Leave generated productivity streams enabled.
-- Keep Cargo landing pad count disabled unless you want sandbox-style Space Age logistics.
 - Keep Spoilage preservation and Agricultural growth speed disabled unless testing them.
 - Use science pack policy `configured`.
 
@@ -330,8 +331,6 @@ Per-stream default exceptions:
 | `research_agricultural_growth_speed` | No | `40000` | `1.5` | `90` | Infinite |
 | `research_inventory_capacity` | Yes | shared | `1.10` | shared | Infinite |
 | `research_robot_battery` | Yes | shared | `1.2` | shared | Infinite |
-| `research_cargo_bay_unloading_distance` | Yes | `100000` | `3` | `120` | Infinite |
-| `research_cargo_landing_pad_count` | No | `1000000` | `10` | `240` | Infinite |
 | `research_lab_productivity` | Yes | `1000` | `1.2` | `120` | Infinite |
 | `research_science_pack_productivity` | Yes | shared | shared | `120` | Infinite |
 | `research_character_reach` | No | shared | shared | shared | Infinite |
@@ -519,7 +518,7 @@ The validation script checks:
 - **Whitespace:** `git diff --check` passes.
 - **Runtime load:** fixture loading reaches save creation when a Factorio binary is supplied.
 - **Runtime diagnostics:** logs contain the expected generation diagnostics.
-- **Reduce policy:** science-pack productivity stays generated with a custom item-based science pack included.
+- **Reduce policy:** science-pack productivity stays generated with a custom science pack included.
 - **Skip policy:** an intentionally incompatible science-pack set is skipped.
 - **Post-MIR assertions:** fixtures prove both runtime lab-policy outcomes.
 - **Native modifier overlap diagnostics:** a Maraxis-like duplicate cargo fixture proves cargo modifier overlaps are reported without changing MIR generation.

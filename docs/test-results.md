@@ -33,6 +33,7 @@ Environment:
 - Branch: `legacy`.
 - Mod version `1.9.0`.
 - Factorio `2.0.77` build `84539`, Windows Steam, Space Age install.
+- Official Factorio homepage checked during release prep: stable `2.0.77`, experimental `2.1.9`.
 - Release archive built locally: `dist/more-infinite-research_1.9.0.zip`.
 
 Commands:
@@ -62,6 +63,58 @@ Results:
 - Runtime fixture validation passed on Factorio `2.0.77`.
 - Factorio `2.1` cargo runtime fixture scenarios were correctly skipped for Factorio `2.0` legacy metadata.
 - Branch policy validation passed for `origin/main`, `origin/dev`, and `origin/legacy`.
+
+## 2026-07-02 Legacy 1.9.0 Publication Prep Pass
+
+Environment:
+
+- Branch: `legacy`.
+- Mod version `1.9.0`.
+- Factorio `2.0.77` build `84539`, Windows Steam, Space Age install.
+- Release archive: `dist/more-infinite-research_1.9.0.zip`.
+
+Commands:
+
+```powershell
+.\scripts\Build-MIRPackage.ps1
+.\scripts\Invoke-MIRValidation.ps1 -StaticOnly
+.\scripts\Invoke-MIRValidation.ps1 -FactorioBin "C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe"
+.\scripts\Test-MIRBranchPolicy.ps1
+git diff --check
+```
+
+Additional package smoke checks:
+
+- Created a fresh base-only save from the actual rebuilt `dist/more-infinite-research_1.9.0.zip`
+  in an isolated normal Factorio mod directory.
+- Created a fresh Space Age save from the actual rebuilt `dist/more-infinite-research_1.9.0.zip`
+  in an isolated normal Factorio mod directory.
+- Created a base-only save with `dist/more-infinite-research_1.2.9.zip`, then benchmark-loaded it
+  for one tick with `dist/more-infinite-research_1.9.0.zip`.
+
+Results:
+
+- Rebuilt the legacy upload archive after final README, compatibility, mod-portal, changelog,
+  TODO, architecture, and fixture-description polish.
+- Static/package validation passed.
+- Runtime fixture validation passed on Factorio `2.0.77`.
+- Branch policy validation passed.
+- `git diff --check` passed; Git reported line-ending normalization warnings only.
+- The release zip loaded from isolated normal mod directories in base-only and Space Age modes.
+- Basic old-save compatibility smoke passed for a base-only `1.2.9` save loaded under `1.9.0`.
+- The old-save smoke does not prove researched-progress migration for the merged trash-slot technology;
+  a real user save with old trash-slot progress is still the best manual migration check.
+- Legacy README and mod-portal copy no longer list the removed Factorio `2.1` cargo streams as shipped
+  `1.9.0` technologies.
+- Compatibility docs now show the actual legacy dependency set: `base >= 2.0`, hidden optional `quality`,
+  and optional `space-age`.
+- The custom science-pack fixture description now matches the Factorio `2.0` tool-based fixture shape.
+- The top `1.9.0` changelog entry was shortened and split for cleaner publication.
+
+Remaining publication checks:
+
+- Optional GUI/manual smoke from the real player mods folder.
+- Optional real old-save migration check if a save exists with progress in the old standalone trash-slot technology.
 
 ## 2026-07-02 Generated Package Validation Pass
 
