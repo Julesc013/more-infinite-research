@@ -323,10 +323,10 @@ Do not reconstruct old releases commit-by-commit for `legacy`. A legacy release 
 - [x] Static validation checks `base >= 2.0` style metadata on legacy.
 - [x] Static validation checks 2.1-only cargo modifiers are absent on legacy.
 - [x] Static validation skips 2.1-only cargo runtime fixture expectations on legacy.
-- [ ] Run `.\scripts\Build-MIRPackage.ps1` on legacy.
+- [x] Run `.\scripts\Build-MIRPackage.ps1` on legacy.
 - [x] Run `.\scripts\Invoke-MIRValidation.ps1 -StaticOnly` on legacy.
-- [ ] Run `.\scripts\Invoke-MIRValidation.ps1 -FactorioBin "C:\Path\To\Factorio-2.0.x\bin\x64\factorio.exe"` on legacy.
-- [ ] Do not validate the legacy port with the Steam-updated Factorio `2.1.x` binary.
+- [x] Run `.\scripts\Invoke-MIRValidation.ps1 -FactorioBin "C:\Path\To\Factorio-2.0.x\bin\x64\factorio.exe"` on legacy.
+- [x] Do not validate the legacy port with the Steam-updated Factorio `2.1.x` binary.
 - [ ] Fix failures in this order: load-time prototype errors, invalid modifiers/effects, metadata, unresearchable science packs, docs/package validation, locale synchronization.
 - [ ] Keep the legacy diff small: metadata, docs, validation branching, package name, and explicit removal of Factorio `2.1`-only surfaces.
 

@@ -1,10 +1,11 @@
 local pack = {
-  type = "item",
+  type = "tool",
   name = "mir-fixture-science-pack",
   icon = "__base__/graphics/icons/automation-science-pack.png",
   icon_size = 64,
   subgroup = "science-pack",
   order = "z[mir-fixture-science-pack]",
+  durability = 1,
   stack_size = 200
 }
 

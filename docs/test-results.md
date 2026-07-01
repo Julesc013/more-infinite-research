@@ -26,6 +26,43 @@ Results:
 - Static/package validation passed and generated `build/validation-dist/more-infinite-research_1.9.0.zip`.
 - Runtime validation with a real Factorio `2.0.x` binary is still required before publishing `1.9.0`.
 
+## 2026-07-02 Legacy Factorio 2.0.77 Runtime Pass
+
+Environment:
+
+- Branch: `legacy`.
+- Mod version `1.9.0`.
+- Factorio `2.0.77` build `84539`, Windows Steam, Space Age install.
+- Release archive built locally: `dist/more-infinite-research_1.9.0.zip`.
+
+Commands:
+
+```powershell
+.\scripts\Build-MIRPackage.ps1
+.\scripts\Invoke-MIRValidation.ps1 -StaticOnly
+.\scripts\Invoke-MIRValidation.ps1 -FactorioBin "C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe"
+.\scripts\Test-MIRBranchPolicy.ps1
+git diff --check
+```
+
+Initial failures:
+
+- Factorio rejected several fixture mods because their `info.json` files still targeted Factorio `2.1` and `base >= 2.1.8`.
+- After fixture metadata was corrected for legacy, Factorio rejected the custom science-pack fixture because it used a normal `item` prototype in a technology unit. Factorio `2.0` requires science-pack research units to be tool-type items.
+
+Fixes:
+
+- Updated fixture `info.json` files on `legacy` to target Factorio `2.0` with `base >= 2.0`.
+- Changed the custom science-pack fixture from `type = "item"` to `type = "tool"` on `legacy`.
+- Added static validation that fixture metadata matches the branch Factorio line and that the legacy custom science-pack fixture remains a tool prototype.
+
+Results:
+
+- Static/package validation passed and generated `build/validation-dist/more-infinite-research_1.9.0.zip`.
+- Runtime fixture validation passed on Factorio `2.0.77`.
+- Factorio `2.1` cargo runtime fixture scenarios were correctly skipped for Factorio `2.0` legacy metadata.
+- Branch policy validation passed for `origin/main`, `origin/dev`, and `origin/legacy`.
+
 ## 2026-07-02 Generated Package Validation Pass
 
 Environment:
