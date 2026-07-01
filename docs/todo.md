@@ -53,6 +53,8 @@ Done in the current development branch:
 - [x] Add static no-`on_tick` validation guard.
 - [x] Add static default-off validation for scripted `v2.0.5` candidates.
 - [x] Add runtime fixture checks for force-enabled scripted candidate generation and base-only skip behavior.
+- [x] Add diagnostic-only native modifier overlap reporting for direct-effect streams.
+- [x] Add a Maraxis-like duplicate cargo fixture proving cargo overlaps are reported without changing MIR generation.
 - [x] Fix runtime validation temp-copy behavior so fixture scenarios copy package source instead of the whole Git repository.
 - [x] Add `docs/pre-manual-2.0.5-report.md`.
 
@@ -186,8 +188,8 @@ Important release note: the scripted runtime work above is a **default-off v2.0.
 - [ ] Thruster fuel productivity if recipe-productivity proof is clean.
 - [ ] Thruster oxidizer productivity if recipe-productivity proof is clean.
 - [ ] Oil/fluid recipe productivity if in-game proof is clean.
-- [ ] Duplicate native modifier detection for cargo/logistics overlap.
-- [ ] Maraxis-like duplicate cargo landing pad fixture or manual test.
+- [ ] Decide post-diagnostic native modifier policy for cargo/logistics overlap: skip, explicitly allow, cleanup, or user setting.
+- [ ] Real Maraxis-like duplicate cargo landing pad manual test when a compatible target is available.
 - [ ] Krastorio 2 Spaced Out test if compatible with the active Factorio line.
 - [ ] Better Robots Extended smoke test.
 - [ ] Compatibility docs and manual runtime test results.

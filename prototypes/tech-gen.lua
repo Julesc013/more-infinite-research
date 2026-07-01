@@ -124,6 +124,77 @@ local function available_direct_effects(key, effects)
   return out
 end
 
+local native_modifier_ignored_fields = {
+  change = true,
+  effect_description = true,
+  icon = true,
+  icons = true,
+  modifier = true,
+  type = true
+}
+
+local function native_modifier_identity(effect)
+  if not effect or not effect.type then return nil end
+  if effect.type == "nothing" or effect.type == "change-recipe-productivity" then return nil end
+
+  local fields = {}
+  for _, field in ipairs(table_utils.sorted_keys(effect)) do
+    if not native_modifier_ignored_fields[field] then
+      local value = effect[field]
+      local value_type = type(value)
+      if value_type == "string" or value_type == "number" or value_type == "boolean" then
+        table.insert(fields, field .. "=" .. tostring(value))
+      end
+    end
+  end
+
+  local target = "global"
+  if #fields > 0 then target = table.concat(fields, ",") end
+  return effect.type .. "|" .. target, target
+end
+
+local function existing_infinite_native_modifier_techs(identity)
+  local owners = {}
+  if not identity then return owners end
+
+  for tech_name, tech in pairs(data.raw.technology or {}) do
+    if tech.max_level == "infinite" and not string.find(tech_name, "^recipe%-prod%-") then
+      for _, effect in ipairs(tech.effects or {}) do
+        local existing_identity = native_modifier_identity(effect)
+        if existing_identity == identity then
+          table.insert(owners, tech_name)
+          break
+        end
+      end
+    end
+  end
+
+  table.sort(owners)
+  return owners
+end
+
+local function record_native_modifier_overlaps(key, effects)
+  local seen = {}
+
+  for _, effect in ipairs(effects or {}) do
+    local identity, target = native_modifier_identity(effect)
+    if identity and not seen[identity] then
+      seen[identity] = true
+      local owners = existing_infinite_native_modifier_techs(identity)
+      if #owners > 0 then
+        D.native_modifier_overlap({
+          key = key,
+          status = "diagnostic",
+          reason = "existing_infinite_native_modifier",
+          effect = effect.type,
+          target = target,
+          owners = table.concat(owners, ",")
+        })
+      end
+    end
+  end
+end
+
 local function existing_infinite_recipe_productivity_techs(recipe_name)
   local owners = {}
   for tech_name, tech in pairs(data.raw.technology or {}) do
@@ -224,6 +295,7 @@ local function make_stream(key, raw_spec)
   end
 
   if direct_effects and #direct_effects > 0 then
+    record_native_modifier_overlaps(key, direct_effects)
     local prerequisites = U.build_prereqs_for(key, ingredients)
     local t = {
       type = "technology",

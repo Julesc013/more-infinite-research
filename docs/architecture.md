@@ -121,10 +121,13 @@ Weapon-speed overlap handling is intentionally narrower than general compatibili
 - effect count
 - lab compatibility status
 - icon source hint
+- native direct-effect overlap rows, including effect type, target, and existing infinite non-MIR technology owners
 
 Use this setting when triaging user reports. It is off by default to avoid noisy logs.
 
 `mir-debug-recipe-matches` logs matched recipe names per generated productivity stream. When either diagnostics setting is enabled, duplicate recipe matches across streams are also reported as non-blocking warnings.
+
+Native modifier overlap diagnostics are also non-blocking. They report that another infinite non-MIR technology already has the same native direct-effect identity, such as `cargo-landing-pad-count` or `max-cargo-bay-unloading-distance`, but they do not skip, merge, or mutate either technology in `v2.0.5`.
 
 ## Progression Settings
 
@@ -151,7 +154,7 @@ Static validation checks every local fixture directory has `info.json`, a `mir-f
 
 Static validation rejects runtime tick handlers in `control.lua` and `control/**/*.lua`.
 
-The fixture mods under `fixtures/` test item-based science packs, custom labs, late recipe creation, the default `reduce` lab incompatibility behavior, the `skip` lab incompatibility behavior, science-pack ingredient policy modes, the end-game prerequisite gate, base-only cargo skip behavior, Space Age cargo logistics effect shape, finite vanilla-chain preservation, broad generation integrity, weapon-speed overlap safety, Omega-style drill productivity matching, and post-MIR assertions for runtime-sensitive generated technologies.
+The fixture mods under `fixtures/` test item-based science packs, custom labs, late recipe creation, the default `reduce` lab incompatibility behavior, the `skip` lab incompatibility behavior, science-pack ingredient policy modes, the end-game prerequisite gate, base-only cargo skip behavior, Space Age cargo logistics effect shape, Maraxis-like duplicate cargo modifier diagnostics, finite vanilla-chain preservation, broad generation integrity, weapon-speed overlap safety, Omega-style drill productivity matching, and post-MIR assertions for runtime-sensitive generated technologies.
 
 `mir-fixture-assert-generation-integrity` is the broad guardrail fixture. It runs after MIR in both base-only and Space Age runtime scenarios and verifies:
 

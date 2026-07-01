@@ -56,6 +56,10 @@ function D.extension(row)
   append("extension", row)
 end
 
+function D.native_modifier_overlap(row)
+  append("native_modifier_overlap", row)
+end
+
 function D.recipe_matches(key, buckets)
   if not D.recipe_matches_enabled() then return end
   for _, bucket in ipairs(buckets or {}) do
@@ -121,7 +125,10 @@ function D.flush()
         .. " prerequisites=" .. tostring(row.prerequisites or "")
         .. " effects=" .. tostring(row.effects or "")
         .. " lab_status=" .. tostring(row.lab_status or "")
-        .. " icon=" .. tostring(row.icon or ""))
+        .. " icon=" .. tostring(row.icon or "")
+        .. " effect=" .. tostring(row.effect or "")
+        .. " target=" .. tostring(row.target or "")
+        .. " owners=" .. tostring(row.owners or ""))
     end
     log("[more-infinite-research] Generation report end")
   end

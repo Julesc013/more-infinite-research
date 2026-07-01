@@ -923,6 +923,15 @@ function Get-LastExtensionReportLine {
   return $line.Line
 }
 
+function Get-LastNativeModifierOverlapLine {
+  param([string]$Key)
+  $line = Select-String -LiteralPath $FactorioLog -Pattern "kind=native_modifier_overlap key=$Key" -SimpleMatch | Select-Object -Last 1
+  if (-not $line) {
+    throw "Runtime validation log did not contain native modifier overlap diagnostics for $Key."
+  }
+  return $line.Line
+}
+
 function Assert-ReportLineGenerated {
   param([string]$Line, [string]$Context)
   if ($Line -notmatch "status=generated") {
@@ -1207,6 +1216,24 @@ if ($isLegacyFactorio20) {
   Assert-ReportLineGenerated -Line $spaceAgeCargoShapePadLine -Context "Space Age cargo logistics shape scenario"
   $spaceAgeCargoShapeDistanceLine = Get-LastStreamReportLine -Key "research_cargo_bay_unloading_distance"
   Assert-ReportLineGenerated -Line $spaceAgeCargoShapeDistanceLine -Context "Space Age cargo logistics shape scenario"
+
+  Invoke-RuntimeScenario -ScenarioName "space-age-duplicate-cargo-diagnostics" -EnabledFixtureNames @(
+    "mir-fixture-duplicate-cargo-tech",
+    "mir-fixture-assert-cargo-logistics"
+  ) -EnabledStreamKeys @(
+    "research_cargo_landing_pad_count"
+  ) -EnableSpaceAge
+  $duplicateCargoPadLine = Get-LastStreamReportLine -Key "research_cargo_landing_pad_count"
+  Assert-ReportLineGenerated -Line $duplicateCargoPadLine -Context "Duplicate cargo landing pad diagnostics scenario"
+  $duplicateCargoPadOverlapLine = Get-LastNativeModifierOverlapLine -Key "research_cargo_landing_pad_count"
+  Assert-ReportLineContains -Line $duplicateCargoPadOverlapLine -Expected "effect=cargo-landing-pad-count" -Context "Duplicate cargo landing pad diagnostics scenario"
+  Assert-ReportLineContains -Line $duplicateCargoPadOverlapLine -Expected "owners=mir-fixture-duplicate-cargo-landing-pad-count" -Context "Duplicate cargo landing pad diagnostics scenario"
+
+  $duplicateCargoDistanceLine = Get-LastStreamReportLine -Key "research_cargo_bay_unloading_distance"
+  Assert-ReportLineGenerated -Line $duplicateCargoDistanceLine -Context "Duplicate cargo bay diagnostics scenario"
+  $duplicateCargoDistanceOverlapLine = Get-LastNativeModifierOverlapLine -Key "research_cargo_bay_unloading_distance"
+  Assert-ReportLineContains -Line $duplicateCargoDistanceOverlapLine -Expected "effect=max-cargo-bay-unloading-distance" -Context "Duplicate cargo bay diagnostics scenario"
+  Assert-ReportLineContains -Line $duplicateCargoDistanceOverlapLine -Expected "owners=mir-fixture-duplicate-cargo-bay-unloading-distance" -Context "Duplicate cargo bay diagnostics scenario"
 }
 
 if ($usesGeneratedUserDataDir -and (Test-Path -LiteralPath $validationRoot)) {

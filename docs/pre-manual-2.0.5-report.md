@@ -50,7 +50,7 @@ git diff --check
 Validation status:
 
 - Static validation passed.
-- Runtime fixture validation passed across 21 isolated scenarios.
+- Runtime fixture validation passed across 22 isolated scenarios.
 - Package/source parity passed.
 - Locale parity passed across 9 locale files.
 - Changelog format passed.

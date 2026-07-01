@@ -2,6 +2,32 @@
 
 This file records local release-candidate validation runs. It is not a substitute for the manual mod matrix in `docs/compatibility.md`.
 
+## 2026-07-01 Diagnostic Cargo Overlap Pull-Forward
+
+Environment:
+
+- Factorio `2.1.8` build `86744`, Windows Steam, Space Age install.
+- Mod version `2.0.5`.
+- Release archive: `dist/more-infinite-research_2.0.5.zip`.
+
+Commands:
+
+```powershell
+.\scripts\Build-MIRPackage.ps1
+.\scripts\Invoke-MIRValidation.ps1 -StaticOnly
+.\scripts\Invoke-MIRValidation.ps1 -FactorioBin "C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe"
+```
+
+Results:
+
+- Added diagnostic-only native modifier overlap reporting for direct-effect streams.
+- Added `mir-fixture-duplicate-cargo-tech`, a Maraxis-like Space Age fixture with infinite `cargo-landing-pad-count` and `max-cargo-bay-unloading-distance` technologies.
+- Runtime fixture validation now includes `space-age-duplicate-cargo-diagnostics`.
+- The duplicate cargo scenario force-enables MIR cargo landing pad count, keeps cargo bay unloading distance enabled, and verifies both generated MIR cargo technologies still load.
+- The duplicate cargo scenario verifies non-blocking `native_modifier_overlap` diagnostics for both cargo native modifiers and their fixture owners.
+- Static validation passed.
+- Runtime fixture validation passed across twenty-two isolated scenarios.
+
 ## 2026-07-01 Pre-Manual Hardening And Harness Repair
 
 Environment:

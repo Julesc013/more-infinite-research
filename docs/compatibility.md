@@ -29,6 +29,7 @@ The release goal is graceful compatibility without mod-page dependency clutter: 
 - Optional DLC-shaped streams declare concrete required prototypes instead of requiring a specific official mod by name.
 - Cargo bay unloading distance research uses Factorio 2.1.8's `max-cargo-bay-unloading-distance` technology modifier, uses official base and Space Age science packs only, and is skipped unless Space Age is active and the `landing-pad-unloading-bay` prototypes exist.
 - Cargo landing pad count research uses `cargo-landing-pad-count`, uses official base and Space Age science packs only, is disabled by default, requires the vanilla `rocket-silo` cargo landing pad unlock, and is skipped unless Space Age is active and the `cargo-landing-pad` prototype exists.
+- Direct-effect diagnostics report overlapping infinite non-MIR native modifier owners, including cargo/logistics modifiers. In `v2.0.5` this is diagnostic-only: MIR does not skip, merge, or remove either technology based on the overlap report.
 - Spoilage preservation and agricultural growth speed are implemented in `dev` as visible `nothing` technology effects plus bounded runtime behavior through the control-stage scripted technology manager.
 - The release plan keeps those scripted runtime features default-off in `v2.0.5` as opt-in experimental candidates. Default enablement or stronger public behavior claims require manual save validation for existing-stack behavior, research reversal, disabling, multi-force behavior, and the agricultural tower event path. Any unsafe or unclear behavior is deferred to `v2.1.0`.
 - Spoilage preservation changes the global spoil time modifier and recomputes on init, configuration change, research finish/reversal, and technology effects reset.
@@ -122,11 +123,12 @@ Run each case from a clean Factorio user data directory or with a controlled mod
 5. Base-only with `research_cargo_landing_pad_count` forced enabled, verifying the generated technology is skipped because Space Age is absent.
 6. Space Age 2.1.8+ enabled, verifying cargo bay unloading distance research appears after the landing pad unloading bay unlock and cargo landing pad count remains disabled by default.
 7. Space Age 2.1.8+ with `research_cargo_landing_pad_count` forced enabled, verifying the generated technology uses `cargo-landing-pad-count` and remains researchable.
-8. Better Robots Extended enabled.
-9. A fixture mod that adds a science pack as an ordinary `item` and adds it to a lab.
-10. A fixture mod that adds a custom lab with a different science-pack input set.
-11. A fixture mod that adds recipes in `data-final-fixes.lua`.
-12. Existing save upgraded from the latest 1.x release.
+8. Space Age 2.1.8+ with a Maraxis-like duplicate cargo fixture, verifying overlapping cargo modifiers are reported diagnostically while MIR's cargo technologies still load.
+9. Better Robots Extended enabled.
+10. A fixture mod that adds a science pack as an ordinary `item` and adds it to a lab.
+11. A fixture mod that adds a custom lab with a different science-pack input set.
+12. A fixture mod that adds recipes in `data-final-fixes.lua`.
+13. Existing save upgraded from the latest 1.x release.
 
 Post-v2.0 scripted feature releases also require these named saves/scenarios:
 

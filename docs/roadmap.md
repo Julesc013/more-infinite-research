@@ -102,6 +102,7 @@ This table is the canonical current synthesis from the Reddit discussion and fol
 | Scripted-tech framework | Ship default-off candidate | `v2.0.5` |
 | Spoilage preservation | Ship default-off experimental candidate; default-on later if proved | `v2.0.5` / `v2.1.x` |
 | Agricultural growth speed for newly planted tower crops | Ship default-off experimental candidate; default-on later if proved | `v2.0.5` / `v2.1.x` |
+| Duplicate native modifier diagnostics for cargo/logistics overlap | Ship diagnostic-only | `v2.0.5` |
 | Scripted diagnostics/docs/package validation | Ship | `v2.0.5` |
 | Engine/electric-engine productivity verification | Ship/verify | `v2.0.5` |
 | Settings presets | Ship | `v2.1.0` |
@@ -189,7 +190,7 @@ Larger feature wave after v2.0.5 feedback.
 | Pipeline extent setting | Ship if compatibility proof passes | Startup prototype setting | Disabled by default unless proven safe |
 | Thruster fuel/oxidizer productivity | Ship if recipe proof passes | Recipe productivity | Do not add true thrust research |
 | Oil/fluid recipe productivity | Spike/ship if proof passes | Recipe productivity | Needs in-game proof on fluid outputs |
-| Duplicate native modifier detection | Ship if small | Data-stage overlap scan | Useful for cargo and mod overlap |
+| Duplicate native modifier policy | Ship if small | Data-stage overlap scan plus explicit policy | `v2.0.5` has diagnostic-only reporting; `v2.1.0` decides skip/allow/cleanup behavior |
 | Compatibility docs and test results | Ship | Docs/evidence | Maraxis/Krastorio-style validation when available |
 
 ### v2.1.0 Acceptance Criteria

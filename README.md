@@ -416,7 +416,7 @@ Enable `mir-debug-generation-report` to log rows like:
 [more-infinite-research] report kind=stream key=research_science_pack_productivity status=generated reason=recipe_productivity science=... prerequisites=... effects=13 lab_status=reduced icon=tech:research-productivity
 ```
 
-Use diagnostics when reporting compatibility issues. It tells whether a stream generated, skipped, reduced science packs, or found no matching recipes.
+Use diagnostics when reporting compatibility issues. It tells whether a stream generated, skipped, reduced science packs, or found no matching recipes. For direct-effect technologies, the report also includes non-blocking `native_modifier_overlap` rows when another infinite non-MIR technology already has the same native modifier target.
 
 Enable `mir-debug-recipe-matches` to log matched recipe rows like:
 
@@ -462,6 +462,7 @@ The validation script checks:
 - **Reduce policy:** science-pack productivity stays generated with a custom item-based science pack included.
 - **Skip policy:** an intentionally incompatible science-pack set is skipped.
 - **Post-MIR assertions:** fixtures prove both runtime lab-policy outcomes.
+- **Native modifier overlap diagnostics:** a Maraxis-like duplicate cargo fixture proves cargo modifier overlaps are reported without changing MIR generation.
 
 ## Documentation Map
 
