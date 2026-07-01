@@ -26,14 +26,6 @@ Version **`2.x.x`** targets **Factorio `2.1`**. The current **`2.0.5`** release 
 
 The mod is built around **graceful compatibility**: it discovers recipes, science packs, labs, and optional prototypes from the active mod set, generates technologies late in **`data-final-fixes.lua`**, and *skips unsafe or unavailable streams* instead of requiring compatibility mods on the mod portal page.
 
-Compatibility note:
-
-- The current main line targets Factorio `2.1.x`.
-- `v2.0.5` is the first quick feedback patch after `v2.0.0`: small/easy fixes, default-off scripted agriculture/spoilage candidates, docs, validation, and package parity.
-- `v2.1.0` is the next larger feature wave.
-- The first Factorio `2.0.x` legacy build will be More Infinite Research `v1.9.0`, a compatible subset backported from the tested `v2.0.5` quick-patch snapshot.
-- Future cadence keeps legacy close to proven current-line work: quick current-line patch, legacy backport where useful, then the next larger current-line wave.
-
 ## Quick Summary
 
 - **Recipe productivity:** adds infinite research for intermediate, logistics, combat, infrastructure, science-pack, and Space Age production chains.
