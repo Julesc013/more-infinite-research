@@ -43,7 +43,7 @@ Current `dev` already has the intended `v2.0.5` quick-patch candidate work:
 - Electric shooting speed coverage for both `tesla` and `electric` ammo categories, so Tesla guns, Tesla turrets, and discharge-defense-style equipment are all covered where the categories exist.
 - Recipe-productivity duplicate prevention for recipes already owned by another infinite recipe-productivity technology.
 - Space Age vanilla productivity technologies remain authoritative for processing units, low density structures, plastic, and rocket fuel instead of receiving parallel MIR technologies.
-- Package and validation script coverage for `control.lua`, the control module tree, Tesla speed assertions, vanilla Space Age productivity skip assertions, branch-aware legacy checks, and the no-`on_tick` runtime guard.
+- Package and validation script coverage for `control.lua`, the control module tree, Tesla speed assertions, broad generated-chain integrity, vanilla Space Age productivity skip assertions, branch-aware legacy checks, and the no-`on_tick` runtime guard.
 
 The public release rule is:
 
@@ -366,7 +366,7 @@ Any feature that needs active broad scanning must be disabled by default, marked
 When changing these features, re-check official Factorio docs and local prototype IDs:
 
 - `gun-speed` uses `ammo_category`; Tesla weapons use `tesla`, discharge defense uses `electric`.
-- `change-recipe-productivity` uses exact recipe IDs; vanilla Space Age already owns LDS, plastic, processing unit, and rocket fuel productivity chains.
+- `change-recipe-productivity` uses exact recipe IDs; vanilla Space Age already owns LDS, plastic, processing unit, and rocket fuel productivity chains, and MIR validation must prove there is only one infinite owner per recipe.
 - `nothing` technology effects are the UI carrier for scripted technologies.
 - `DifficultySettings.spoil_time_modifier` is global, writable, and bounded.
 - Agricultural tower planting and `LuaEntity.tick_grown` are the event-driven basis for growth speed.

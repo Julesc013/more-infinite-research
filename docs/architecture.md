@@ -125,9 +125,20 @@ Static package validation also compares key packaged source, documentation, and 
 
 Static validation also checks Factorio changelog formatting, including the required 99-dash section separators and an entry for the current `info.json` version.
 
+Static validation checks every local fixture directory has `info.json`, a `mir-fixture-*` mod name, and at least one data-stage entry file.
+
 Static validation rejects runtime tick handlers in `control.lua` and `control/**/*.lua`.
 
-The fixture mods under `fixtures/` test item-based science packs, custom labs, late recipe creation, the default `reduce` lab incompatibility behavior, the `skip` lab incompatibility behavior, science-pack ingredient policy modes, the end-game prerequisite gate, base-only cargo skip behavior, Space Age cargo logistics effect shape, finite vanilla-chain preservation, weapon-speed overlap safety, Omega-style drill productivity matching, and post-MIR assertions for runtime-sensitive generated technologies.
+The fixture mods under `fixtures/` test item-based science packs, custom labs, late recipe creation, the default `reduce` lab incompatibility behavior, the `skip` lab incompatibility behavior, science-pack ingredient policy modes, the end-game prerequisite gate, base-only cargo skip behavior, Space Age cargo logistics effect shape, finite vanilla-chain preservation, broad generation integrity, weapon-speed overlap safety, Omega-style drill productivity matching, and post-MIR assertions for runtime-sensitive generated technologies.
+
+`mir-fixture-assert-generation-integrity` is the broad guardrail fixture. It runs after MIR in both base-only and Space Age runtime scenarios and verifies:
+
+- generated `recipe-prod-*` stream technologies are infinite upgrades with effects and count formulas;
+- every enabled vanilla numbered extension chain has exactly one infinite serial continuation after the highest finite level;
+- disabled vanilla extension chains do not generate unless the validation harness explicitly force-enables them;
+- every recipe has at most one infinite recipe-productivity owner;
+- vanilla Space Age productivity technologies remain authoritative for LDS, plastic, processing units, and rocket fuel;
+- circuit productivity ownership stays recipe-specific instead of relying on icon similarity.
 
 Scripted technology validation must add existing-save load tests, research-finish/reversal tests, existing spoilable-stack tests, multi-force tests, and checks that the new effects remain event-driven rather than tick-scanned.
 

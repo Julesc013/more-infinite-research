@@ -40,6 +40,12 @@ Done in the current development branch:
 - [x] Preserve finite vanilla rocket and cannon-shell weapon shooting speed bonuses when MIR overlap handling is enabled.
 - [x] Detect and skip recipe productivity already owned by another infinite recipe-productivity technology.
 - [x] Confirm Space Age vanilla owns processing unit, low density structure, plastic, and rocket fuel infinite productivity chains.
+- [x] Add broad generation-integrity fixture coverage for base-only and Space Age runs.
+- [x] Confirm generated `recipe-prod-*` technologies are infinite upgrade chains with effects and count formulas.
+- [x] Confirm every enabled vanilla numbered base extension has exactly one serial infinite continuation in base-only and Space Age runs.
+- [x] Confirm disabled vanilla numbered base extensions stay absent until force-enabled by validation.
+- [x] Confirm every recipe has at most one infinite recipe-productivity owner.
+- [x] Confirm circuit productivity ownership by recipe ID, not by similar-looking technology icons.
 - [x] Rebuild `dist/more-infinite-research_2.0.5.zip`.
 - [x] Run static/package/runtime fixture validation on Factorio 2.1.8.
 - [x] Add branch-aware legacy validation guardrails.
@@ -66,6 +72,10 @@ Important release note: the scripted runtime work above is a **v2.0.5 ship candi
 - [x] Vanilla Space Age `plastic-bar-productivity` remains authoritative.
 - [x] Vanilla Space Age `rocket-fuel-productivity` remains authoritative.
 - [x] Recipe productivity skips effects already owned by another infinite recipe-productivity technology.
+- [x] Base-only green, red, and blue circuit productivity owners are validated by recipe ID.
+- [x] Space Age green and red circuit productivity stay MIR-owned while processing-unit productivity stays vanilla-owned.
+- [x] Runtime fixtures validate all default-enabled vanilla numbered extension chains in base-only and Space Age.
+- [x] Runtime fixtures force-enable and validate the normally disabled inserter-capacity continuation in base-only and Space Age.
 - [x] Package includes `control.lua` and `control/`.
 - [x] Package includes `docs/todo.md`, `docs/api-proof-points.md`, and `docs/manual-test-plan.md`.
 - [ ] Spoilage preservation passes the manual blockers below.

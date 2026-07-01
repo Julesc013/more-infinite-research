@@ -149,6 +149,41 @@ Invoke-RepoCheck "locale files match English fallback" {
   & (Join-Path $repo "scripts\Test-MIRLocales.ps1") -AllowMissingSupportedLanguages
 }
 
+Invoke-RepoCheck "fixture mods have metadata and data entrypoints" {
+  $fixtureRootForStatic = Join-Path $repo "fixtures"
+  if (-not (Test-Path -LiteralPath $fixtureRootForStatic)) {
+    throw "Fixture directory not found: $fixtureRootForStatic"
+  }
+
+  foreach ($fixture in Get-ChildItem -LiteralPath $fixtureRootForStatic -Directory) {
+    $infoPath = Join-Path $fixture.FullName "info.json"
+    if (-not (Test-Path -LiteralPath $infoPath)) {
+      throw "Fixture directory is missing info.json: $($fixture.FullName)"
+    }
+
+    $info = Get-Content -Raw -LiteralPath $infoPath | ConvertFrom-Json
+    if ([string]::IsNullOrWhiteSpace($info.name) -or $info.name -notmatch "^mir-fixture-") {
+      throw "Fixture info.json must declare a mir-fixture-* name: $infoPath"
+    }
+
+    $entryFiles = @(
+      "data.lua",
+      "data-updates.lua",
+      "data-final-fixes.lua"
+    )
+    $hasEntry = $false
+    foreach ($entryFile in $entryFiles) {
+      if (Test-Path -LiteralPath (Join-Path $fixture.FullName $entryFile)) {
+        $hasEntry = $true
+        break
+      }
+    }
+    if (-not $hasEntry) {
+      throw "Fixture $($info.name) has no data-stage entry file."
+    }
+  }
+}
+
 Invoke-RepoCheck "science-pack progression settings are wired" {
   $settingsText = Get-Content -Raw -LiteralPath (Join-Path $repo "settings.lua")
   $utilText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\util.lua")
@@ -534,6 +569,7 @@ if (-not (Test-Path -LiteralPath $fixtureRoot)) {
 }
 
 $postMirAssertionFixtures = @(
+  "mir-fixture-assert-generation-integrity",
   "mir-fixture-assert-science-pack-productivity",
   "mir-fixture-assert-lab-skip-policy",
   "mir-fixture-assert-base-extension-boundary",
@@ -631,11 +667,29 @@ function Set-CopiedStreamEnabled {
   }
 }
 
+function Set-CopiedBaseExtensionEnabled {
+  param(
+    [string]$ModsDir,
+    [string]$BaseExtensionKey
+  )
+  $copiedDefaultsPath = Join-Path $ModsDir "more-infinite-research\defaults.lua"
+  $copiedDefaults = Get-Content -Raw -LiteralPath $copiedDefaultsPath
+  if ($copiedDefaults -notmatch "return\s+defaults") {
+    throw "Unable to find return defaults in copied defaults.lua while enabling base extension $BaseExtensionKey."
+  }
+
+  $escapedBaseExtensionKey = $BaseExtensionKey.Replace("\", "\\").Replace('"', '\"')
+  $override = "defaults.base_extensions[`"$escapedBaseExtensionKey`"].enabled = true`r`n"
+  $copiedDefaults = $copiedDefaults -replace "return\s+defaults", ($override + "return defaults")
+  Set-Content -LiteralPath $copiedDefaultsPath -Value $copiedDefaults -Encoding UTF8
+}
+
 function Initialize-RuntimeScenario {
   param(
     [string]$ScenarioName,
     [string[]]$EnabledFixtureNames,
     [string[]]$EnabledStreamKeys = @(),
+    [string[]]$EnabledBaseExtensionKeys = @(),
     [switch]$LabPolicySkip,
     [ValidateSet("configured", "space", "space-and-promethium", "all-official", "all")]
     [string]$SciencePackIngredientPolicy = "configured",
@@ -693,6 +747,9 @@ function Initialize-RuntimeScenario {
   foreach ($streamKey in $EnabledStreamKeys) {
     Set-CopiedStreamEnabled -ModsDir $modsDir -StreamKey $streamKey
   }
+  foreach ($baseExtensionKey in $EnabledBaseExtensionKeys) {
+    Set-CopiedBaseExtensionEnabled -ModsDir $modsDir -BaseExtensionKey $baseExtensionKey
+  }
 
   $mods = @(
     @{ name = "base"; enabled = $true },
@@ -746,6 +803,7 @@ function Invoke-RuntimeScenario {
     [string]$ScenarioName,
     [string[]]$EnabledFixtureNames,
     [string[]]$EnabledStreamKeys = @(),
+    [string[]]$EnabledBaseExtensionKeys = @(),
     [switch]$LabPolicySkip,
     [ValidateSet("configured", "space", "space-and-promethium", "all-official", "all")]
     [string]$SciencePackIngredientPolicy = "configured",
@@ -759,6 +817,7 @@ function Invoke-RuntimeScenario {
     -ScenarioName $ScenarioName `
     -EnabledFixtureNames $EnabledFixtureNames `
     -EnabledStreamKeys $EnabledStreamKeys `
+    -EnabledBaseExtensionKeys $EnabledBaseExtensionKeys `
     -LabPolicySkip:$LabPolicySkip `
     -SciencePackIngredientPolicy $SciencePackIngredientPolicy `
     -WeaponSpeedAdjustmentMode $WeaponSpeedAdjustmentMode `
@@ -826,6 +885,72 @@ function Assert-ReportLineDoesNotContain {
   }
 }
 
+$defaultEnabledBaseExtensionKeys = @(
+  "braking-force",
+  "research-speed",
+  "worker-robots-storage",
+  "weapon-shooting-speed",
+  "laser-shooting-speed"
+)
+
+$spaceAgeVanillaOwnedProductivityStreams = @(
+  "research_low_density_structure",
+  "research_plastic",
+  "research_processing_unit",
+  "research_rocket_fuel"
+)
+
+function Assert-DefaultBaseExtensionDiagnostics {
+  param(
+    [string]$Context,
+    [switch]$InserterCapacityEnabled
+  )
+
+  $expectedGenerated = @($defaultEnabledBaseExtensionKeys)
+  if ($InserterCapacityEnabled) {
+    $expectedGenerated += "inserter-capacity-bonus"
+  }
+
+  foreach ($key in $expectedGenerated) {
+    $line = Get-LastExtensionReportLine -Key $key
+    Assert-ReportLineGenerated -Line $line -Context "$Context base extension $key"
+  }
+
+  if (-not $InserterCapacityEnabled) {
+    $inserterLine = Get-LastExtensionReportLine -Key "inserter-capacity-bonus"
+    if ($inserterLine -notmatch "status=skipped" -or $inserterLine -notmatch "disabled") {
+      throw "$Context expected disabled inserter-capacity-bonus extension to skip cleanly: $inserterLine"
+    }
+  }
+}
+
+function Assert-SpaceAgeVanillaOwnedProductivityStreamsSkipped {
+  param([string]$Context)
+
+  foreach ($vanillaOwnedStream in $spaceAgeVanillaOwnedProductivityStreams) {
+    $vanillaOwnedLine = Get-LastStreamReportLine -Key $vanillaOwnedStream
+    if ($vanillaOwnedLine -notmatch "status=skipped" -or $vanillaOwnedLine -notmatch "covered_by_existing_infinite_recipe_productivity") {
+      throw "$Context should skip vanilla-owned productivity instead of generating a parallel MIR technology: $vanillaOwnedLine"
+    }
+  }
+}
+
+function Assert-BaseCoreProductivityStreamsGenerated {
+  param([string]$Context)
+
+  foreach ($stream in @(
+    "research_electronic_circuit",
+    "research_advanced_circuit",
+    "research_processing_unit",
+    "research_low_density_structure",
+    "research_plastic",
+    "research_rocket_fuel"
+  )) {
+    $line = Get-LastStreamReportLine -Key $stream
+    Assert-ReportLineGenerated -Line $line -Context "$Context stream $stream"
+  }
+}
+
 Invoke-RuntimeScenario -ScenarioName "reduce-policy" -EnabledFixtureNames @(
   "mir-fixture-item-science-pack",
   "mir-fixture-custom-lab",
@@ -869,6 +994,20 @@ Assert-ReportLineContains -Line $baseElectricShootingLine -Expected "icon=tech:d
 $baseFlamethrowerShootingLine = Get-LastStreamReportLine -Key "research_flamethrower_shooting_speed"
 Assert-ReportLineGenerated -Line $baseFlamethrowerShootingLine -Context "Base flamethrower shooting speed scenario"
 
+Invoke-RuntimeScenario -ScenarioName "base-generation-integrity" -EnabledFixtureNames @(
+  "mir-fixture-assert-generation-integrity"
+)
+Assert-BaseCoreProductivityStreamsGenerated -Context "Base generation integrity scenario"
+Assert-DefaultBaseExtensionDiagnostics -Context "Base generation integrity scenario"
+
+Invoke-RuntimeScenario -ScenarioName "base-generation-integrity-inserter-enabled" -EnabledFixtureNames @(
+  "mir-fixture-assert-generation-integrity"
+) -EnabledBaseExtensionKeys @(
+  "inserter-capacity-bonus"
+)
+Assert-BaseCoreProductivityStreamsGenerated -Context "Base generation integrity with inserter enabled scenario"
+Assert-DefaultBaseExtensionDiagnostics -Context "Base generation integrity with inserter enabled scenario" -InserterCapacityEnabled
+
 Invoke-RuntimeScenario -ScenarioName "base-space-promethium-pack-policy" -EnabledFixtureNames @() -SciencePackIngredientPolicy "space-and-promethium"
 $baseSpacePromethiumPackLine = Get-LastStreamReportLine -Key "research_gears"
 Assert-ReportLineGenerated -Line $baseSpacePromethiumPackLine -Context "Base space and promethium science-pack ingredient policy scenario"
@@ -884,17 +1023,19 @@ $spaceAgeElectricShootingLine = Get-LastStreamReportLine -Key "research_electric
 Assert-ReportLineGenerated -Line $spaceAgeElectricShootingLine -Context "Space Age electric and Tesla shooting speed scenario"
 Assert-ReportLineContains -Line $spaceAgeElectricShootingLine -Expected "effects=2" -Context "Space Age electric and Tesla shooting speed scenario"
 
-foreach ($vanillaOwnedStream in @(
-  "research_low_density_structure",
-  "research_plastic",
-  "research_processing_unit",
-  "research_rocket_fuel"
-)) {
-  $vanillaOwnedLine = Get-LastStreamReportLine -Key $vanillaOwnedStream
-  if ($vanillaOwnedLine -notmatch "status=skipped" -or $vanillaOwnedLine -notmatch "covered_by_existing_infinite_recipe_productivity") {
-    throw "Space Age vanilla-owned productivity stream should skip instead of generating a parallel MIR technology: $vanillaOwnedLine"
-  }
-}
+Invoke-RuntimeScenario -ScenarioName "space-age-generation-integrity" -EnabledFixtureNames @(
+  "mir-fixture-assert-generation-integrity"
+) -EnableSpaceAge
+Assert-SpaceAgeVanillaOwnedProductivityStreamsSkipped -Context "Space Age generation integrity scenario"
+Assert-DefaultBaseExtensionDiagnostics -Context "Space Age generation integrity scenario"
+
+Invoke-RuntimeScenario -ScenarioName "space-age-generation-integrity-inserter-enabled" -EnabledFixtureNames @(
+  "mir-fixture-assert-generation-integrity"
+) -EnabledBaseExtensionKeys @(
+  "inserter-capacity-bonus"
+) -EnableSpaceAge
+Assert-SpaceAgeVanillaOwnedProductivityStreamsSkipped -Context "Space Age generation integrity with inserter enabled scenario"
+Assert-DefaultBaseExtensionDiagnostics -Context "Space Age generation integrity with inserter enabled scenario" -InserterCapacityEnabled
 
 Invoke-RuntimeScenario -ScenarioName "space-age-space-promethium-pack-policy" -EnabledFixtureNames @() -SciencePackIngredientPolicy "space-and-promethium" -EnableSpaceAge
 $spaceAgeSpacePromethiumPackLine = Get-LastStreamReportLine -Key "research_gears"

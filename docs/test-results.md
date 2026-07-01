@@ -2,6 +2,34 @@
 
 This file records local release-candidate validation runs. It is not a substitute for the manual mod matrix in `docs/compatibility.md`.
 
+## 2026-07-01 Generated Chain Integrity
+
+Environment:
+
+- Factorio `2.1.8` build `86744`, Windows Steam, Space Age install.
+- Mod version `2.0.5`.
+- Release archive: `dist/more-infinite-research_2.0.5.zip`.
+
+Commands:
+
+```powershell
+.\scripts\Build-MIRPackage.ps1
+.\scripts\Invoke-MIRValidation.ps1 -StaticOnly
+.\scripts\Invoke-MIRValidation.ps1 -FactorioBin "C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe"
+```
+
+Results:
+
+- Replaced narrow processing-unit-only assertions with `mir-fixture-assert-generation-integrity`.
+- Runtime fixture validation passed across nineteen isolated scenarios, including `base-generation-integrity`, `base-generation-integrity-inserter-enabled`, `space-age-generation-integrity`, and `space-age-generation-integrity-inserter-enabled`.
+- The broad fixture verified every generated `recipe-prod-*` technology is an infinite upgrade with effects and a count formula.
+- The broad fixture verified default-enabled vanilla numbered extension chains have exactly one infinite serial continuation in both base-only and Space Age runs.
+- The broad fixture verified the normally disabled `inserter-capacity-bonus` chain stays absent by default and generates exactly one serial continuation when force-enabled in both base-only and Space Age runs.
+- The broad fixture verified every recipe has at most one infinite recipe-productivity owner.
+- Circuit productivity ownership is now checked by recipe ID: base-only green/red/blue circuit recipes are MIR-owned, while Space Age green/red circuits remain MIR-owned and processing-unit productivity remains vanilla-owned.
+- Space Age vanilla productivity ownership remained authoritative for processing units, low density structures, plastic, and rocket fuel recipes.
+- Static validation now rejects incomplete local fixture directories before runtime fixture validation starts.
+
 ## 2026-07-01 Weapon Speed Safety And Quality Enrichment Triage
 
 Environment:
