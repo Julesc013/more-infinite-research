@@ -125,7 +125,7 @@ Static validation also checks Factorio changelog formatting, including the requi
 
 Static validation rejects runtime tick handlers in `control.lua` and `control/**/*.lua`.
 
-The fixture mods under `fixtures/` test item-based science packs, custom labs, late recipe creation, the default `reduce` lab incompatibility behavior, the `skip` lab incompatibility behavior, science-pack ingredient policy modes, the end-game prerequisite gate, base-only cargo skip behavior, Space Age cargo logistics effect shape, finite vanilla-chain preservation, and post-MIR assertions for runtime-sensitive generated technologies.
+The fixture mods under `fixtures/` test item-based science packs, custom labs, late recipe creation, the default `reduce` lab incompatibility behavior, the `skip` lab incompatibility behavior, science-pack ingredient policy modes, the end-game prerequisite gate, base-only cargo skip behavior, Space Age cargo logistics effect shape, finite vanilla-chain preservation, Omega-style drill productivity matching, and post-MIR assertions for runtime-sensitive generated technologies.
 
 Scripted technology validation must add existing-save load tests, research-finish/reversal tests, existing spoilable-stack tests, multi-force tests, and checks that the new effects remain event-driven rather than tick-scanned.
 

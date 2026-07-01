@@ -151,7 +151,10 @@ Ship:
 - Scripted-tech framework.
 - Spoilage preservation if manual proof passes.
 - Agricultural growth speed for newly planted tower crops if manual proof passes.
-- Electric Shooting Speed `tesla` ammo-category correction.
+- Electric Shooting Speed vanilla/no-Space-Age icon and description fix plus `tesla` ammo-category correction.
+- Flamethrower, electric, and Tesla shooting-speed locale coverage.
+- Hidden optional Quality load ordering for quality module productivity.
+- Omega Drill style mining drill productivity matching.
 - Duplicate recipe-productivity skipping so vanilla Space Age productivity techs stay authoritative.
 - Better feature descriptions and setting labels.
 - Compatibility diagnostics for scripted/global effects.

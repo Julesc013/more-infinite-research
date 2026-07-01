@@ -9,7 +9,7 @@
     "base >= 2.1.8",
     "? elevated-rails >= 2.1.8",
     "? recycler >= 2.1.8",
-    "? quality >= 2.1.8",
+    "(?) quality >= 2.1.8",
     "? space-age >= 2.1.8"
   ]
 }

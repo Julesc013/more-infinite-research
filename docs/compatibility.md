@@ -35,7 +35,7 @@ The release goal is graceful compatibility without mod-page dependency clutter: 
 - Mod-specific stream changes should live in `prototypes/compat/profiles.lua` instead of the base stream definitions.
 - Compatibility cleanup that removes known competing technologies also removes dangling prerequisite references from remaining technologies.
 - Generic competing recipe-productivity cleanup removes only known infinite technologies whose recipe-productivity effects are all covered by generated MIR effects. Finite upgrade chains from other mods are left alone unless a future integration models them explicitly.
-- Release metadata declares optional ordering for official DLC mods and intentionally avoids third-party compatibility-mod dependencies. Third-party compatibility is opportunistic and based on the prototypes visible when this mod reaches `data-final-fixes.lua`.
+- Release metadata declares optional ordering for official DLC mods and a hidden optional ordering dependency on Quality so quality module recipes are visible before module productivity is generated. Third-party compatibility remains opportunistic and avoids compatibility-mod dependencies.
 - `mir-debug-generation-report` can be enabled to capture why each stream or base extension generated or skipped.
 - `mir-debug-recipe-matches` can be enabled to capture matched recipe names per stream and duplicate recipe matches across streams.
 
@@ -93,6 +93,7 @@ These integrations do not add mod-page dependencies. More Infinite Research hand
 - OCs Stone Casting (`OCs_stone_casting`): foundry recipes that output covered stone, landfill, brick, wall, concrete, refined concrete, foundation, rail, gate, or furnace items are picked up by the existing output-based streams.
 - Fluid Quality Imprinting (`fluid-quality-imprinting`): quality-imprinting recipes that output covered plate and intermediate items are picked up by the existing output-based streams.
 - Plates n Circuit Productivity (`plates-n-circuit-productivity`): competing plate and circuit productivity technologies are removed when `mir-prefer-this-mod-for-competing-techs` is enabled.
+- Omega Drill style drill mods: `omega-drill`, `omega-tau`, and broader modded `*-mining-drill` / `*-drill` outputs are picked up by mining drill productivity when their recipes are visible.
 - Custom science packs from mods such as Castra or PlanetLib-based planets are picked up opportunistically when they are active lab inputs and have visible recipes that output the pack item.
 
 Large mod packs and utility mods such as Alien Biomes, Informatron, Jetpack, AAI, and Helmod usually do not need explicit recipe productivity support unless they add recipes for items covered by one of this mod's streams. When they do, output-based matching should pick up visible recipes automatically.
@@ -103,6 +104,7 @@ Large mod packs and utility mods such as Alien Biomes, Informatron, Jetpack, AAI
 - Lab validation prevents impossible research ingredients, but it cannot infer every overhaul mod's intended progression.
 - Recipe productivity technologies remain bounded by Factorio's recipe productivity cap even when research levels are infinite.
 - Vanilla Space Age productivity technologies remain authoritative for processing units, low density structures, plastic, and rocket fuel where they already own all matching recipes.
+- Module productivity can include Quality modules because the current Factorio `2.1` line uses a hidden optional Quality dependency for load order. The dependency is hidden to avoid presenting Quality as a required or recommended mod-page dependency.
 - Existing prototype IDs are kept stable unless a tested migration is provided. The `v2.0.5` scripted runtime candidate adds control-stage storage under the More Infinite Research namespace.
 - Runtime scripted features avoid per-tick scanning by default. If a future feature needs active scanning, it should be disabled by default, clearly labeled experimental, or split into a companion mod.
 - Scripted technologies must document storage keys, recomputation triggers, reversal behavior, disabling behavior, and multi-force behavior before implementation.
@@ -169,7 +171,7 @@ Set `$env:FACTORIO_LOG` or pass `-FactorioLog` when the Factorio log is not at t
 
 The runtime check copies this repo and the fixture mods into isolated temporary user-data mod directories, adds test-only dependencies from the copied mod to the fixture mods for deterministic load order, writes fixture `mod-list.json` files, and asks Factorio to create saves. It is intentionally a load/prototype validation harness, not a gameplay test.
 
-The runtime fixture run enables the generation diagnostics report in the copied mod and covers both lab incompatibility policies. The default `reduce` scenario asserts that science-pack productivity generated with the custom item-based fixture science pack included. The `skip` scenario forces the copied setting default to `skip` and asserts that the intentionally incompatible science-pack productivity stream is skipped instead of reduced. Additional runtime scenarios force the science-pack ingredient policies, require the end-game prerequisite gate, force-enable cargo landing pad count without Space Age to prove the stream skips on the Space Age mod gate, assert Space Age cargo logistics effect shape when cargo landing pad count is enabled, and add a fixture finite vanilla-chain level before MIR to prove existing levels are preserved while MIR extends after them. The expected Factorio log file is part of the validation evidence; if it is missing, runtime validation fails.
+The runtime fixture run enables the generation diagnostics report in the copied mod and covers both lab incompatibility policies. The default `reduce` scenario asserts that science-pack productivity generated with the custom item-based fixture science pack included. The `skip` scenario forces the copied setting default to `skip` and asserts that the intentionally incompatible science-pack productivity stream is skipped instead of reduced. Additional runtime scenarios force the science-pack ingredient policies, require the end-game prerequisite gate, force-enable cargo landing pad count without Space Age to prove the stream skips on the Space Age mod gate, assert Space Age cargo logistics effect shape when cargo landing pad count is enabled, add a fixture finite vanilla-chain level before MIR to prove existing levels are preserved while MIR extends after them, and assert Omega-style drill recipes receive mining drill productivity. The expected Factorio log file is part of the validation evidence; if it is missing, runtime validation fails.
 
 Static validation requires the committed release zip at `dist/<name>_<version>.zip` based on `info.json`. The package must use the matching `<name>_<version>/` root, contain matching `info.json` metadata, include locale, documentation, top-level data-stage and control-stage files, core prototype modules, match the repository contents for key source, documentation, and locale files, and avoid build, fixture, script, Git, and temporary/editor artifacts.
 
@@ -227,6 +229,17 @@ Create a local test mod that:
 
 Expected result: when the skip policy is active, MIR skips the incompatible science-pack productivity stream instead of reducing it.
 
+### Omega Drill Productivity Fixture
+
+Create a local test mod pair that:
+
+- Adds visible `omega-drill` and `omega-tau` item recipes.
+- Runs a post-MIR assertion in `data-final-fixes.lua`.
+- Reads `recipe-prod-research_mining_drill-1`.
+- Fails loading if either Omega-style recipe is missing from the mining drill productivity effects.
+
+Expected result: Omega Drill style recipes and broader visible modded `*-drill` / `*-mining-drill` outputs are covered by mining drill productivity.
+
 ## Release Checklist
 
 - Run `.\scripts\Build-MIRPackage.ps1` to refresh the versioned zip in `dist/`.
@@ -234,12 +247,13 @@ Expected result: when the skip policy is active, MIR skips the incompatible scie
 - Run `rg "icon_mipmaps" prototypes` and confirm generated icons do not add it.
 - Run `.\scripts\Invoke-MIRValidation.ps1 -StaticOnly`.
 - Confirm `changelog.txt` uses Factorio's strict changelog format with 99-dash section separators.
-- Confirm `info.json` declares `base >= 2.1.8` plus optional official DLC ordering dependencies only.
+- Confirm `info.json` declares `base >= 2.1.8`, hidden optional Quality ordering, and optional official DLC ordering dependencies only.
 - Confirm package validation reports the expected root, matching metadata, included locale/docs, and no forbidden artifacts.
 - Confirm package validation reports source, documentation, and locale parity with the repository.
 - Confirm runtime fixture validation covers both the default `reduce` lab policy and forced `skip` lab policy.
 - Confirm runtime fixture validation covers `configured`, `space`, `space-and-promethium`, `all-official`, and `all` science-pack ingredient policies, the end-game prerequisite gate, and the base-only cargo landing pad count skip.
 - Confirm runtime fixture validation covers Space Age cargo logistics effect types, modifiers, costs, research times, prerequisites, and official science-pack ingredients.
 - Confirm runtime fixture validation covers preserving an existing finite vanilla-chain level before adding MIR's generated infinite continuation.
+- Confirm runtime fixture validation covers Omega-style drill recipe productivity.
 - Load Factorio with the manual matrix above.
 - Confirm `changelog.txt` has the release version and date.

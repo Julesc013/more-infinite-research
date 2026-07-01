@@ -18,6 +18,9 @@ Required before publishing `v2.0.5`:
 | `package-parity` | Rebuild zip and confirm package validation passes |
 | `docs-in-package` | Confirm README, roadmap, TODO, API proof, manual tests, compatibility docs, test results, changelog, locale, and source parity |
 | `normal-mod-folder-load` | Copy the release zip into a normal Factorio mods folder and confirm Factorio can see it |
+| `vanilla-locale-icons` | Base game without Space Age; confirm electric shooting speed uses discharge defense art/description and flamethrower/electric modifier descriptions are present |
+| `quality-module-productivity` | Quality enabled; confirm module productivity includes quality module recipes after hidden Quality load ordering |
+| `omega-drill-productivity` | Omega Drill or Omega-style fixture enabled; confirm mining drill productivity includes Omega-style drill recipes |
 | `fresh-space-age` | Fresh Space Age save with no other mods except MIR |
 | `existing-mir-2.0-save` | Existing MIR save upgraded to the release candidate |
 | `spoilage-existing-stacks` | Spoilable items already on belts, in chests, in labs, in rockets/platform inventories, and partially spoiled stacks |

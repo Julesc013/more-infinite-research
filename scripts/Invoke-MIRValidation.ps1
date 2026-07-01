@@ -48,6 +48,12 @@ Invoke-RepoCheck "release metadata matches Factorio line" {
     if ($deps -notcontains "base >= 2.1.8") {
       throw "Factorio 2.1 metadata must declare base >= 2.1.8."
     }
+    if ($deps -notcontains "(?) quality >= 2.1.8") {
+      throw "Factorio 2.1 metadata must declare hidden optional Quality load ordering with (?) quality >= 2.1.8."
+    }
+    if ($deps -contains "? quality >= 2.1.8") {
+      throw "Quality must be a hidden optional dependency so module productivity can see quality module recipes without advertising a visible dependency."
+    }
   } else {
     throw "Unsupported factorio_version in info.json: $($repoInfo.factorio_version)"
   }
@@ -169,11 +175,20 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "prototypes\base-tech-extensions.lua"; Text = $baseExtensionsText; Snippet = 'append_end_game_gate_prerequisite' },
     @{ File = "prototypes\lib\science-packs.lua"; Text = $scienceText; Snippet = 'end_game_science_pack' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'icon_tech = "research-productivity"' },
-    @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'required_ammo_categories = {"tesla"}' },
+    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = '^omega%-drill$' },
+    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = '^omega%-tau$' },
+    @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'icon_tech = "discharge-defense-equipment"' },
+    @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'technology-description.more-infinite-research.electric_shooting_speed' },
+    @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'technology-description.more-infinite-research.flamethrower_shooting_speed' },
     @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'ammo_category = "tesla", modifier = 0.1' },
     @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'ammo_category = "electric", modifier = 0.1' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = '[modifier-description]' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'cargo-landing-pad-count=Cargo landing pads per surface: +__1__' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'more-infinite-research.electric_shooting_speed=' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'more-infinite-research.flamethrower_shooting_speed=' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'flamethrower-shooting-speed-bonus=Flamethrower shooting speed: +__1__' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'electric-shooting-speed-bonus=Electric shooting speed: +__1__' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'tesla-shooting-speed-bonus=Tesla shooting speed: +__1__' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-science-pack-ingredient-policy-configured=Configured per technology' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-science-pack-ingredient-policy-space=Add space science' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-science-pack-ingredient-policy-space-and-promethium=Add space and promethium science' },
@@ -520,7 +535,8 @@ $postMirAssertionFixtures = @(
   "mir-fixture-assert-science-pack-productivity",
   "mir-fixture-assert-lab-skip-policy",
   "mir-fixture-assert-base-extension-boundary",
-  "mir-fixture-assert-cargo-logistics"
+  "mir-fixture-assert-cargo-logistics",
+  "mir-fixture-assert-omega-drill-productivity"
 )
 
 function Get-FixtureInfos {
@@ -835,6 +851,12 @@ Invoke-RuntimeScenario -ScenarioName "space-pack-policy" -EnabledFixtureNames @(
 $spacePackLine = Get-LastStreamReportLine -Key "research_gears"
 Assert-ReportLineGenerated -Line $spacePackLine -Context "Space science-pack ingredient policy scenario"
 Assert-ReportLineContains -Line $spacePackLine -Expected "space-science-pack" -Context "Space science-pack ingredient policy scenario"
+$baseElectricShootingLine = Get-LastStreamReportLine -Key "research_electric_shooting_speed"
+Assert-ReportLineGenerated -Line $baseElectricShootingLine -Context "Base electric shooting speed scenario"
+Assert-ReportLineContains -Line $baseElectricShootingLine -Expected "effects=1" -Context "Base electric shooting speed scenario"
+Assert-ReportLineContains -Line $baseElectricShootingLine -Expected "icon=tech:discharge-defense-equipment" -Context "Base electric shooting speed scenario"
+$baseFlamethrowerShootingLine = Get-LastStreamReportLine -Key "research_flamethrower_shooting_speed"
+Assert-ReportLineGenerated -Line $baseFlamethrowerShootingLine -Context "Base flamethrower shooting speed scenario"
 
 Invoke-RuntimeScenario -ScenarioName "base-space-promethium-pack-policy" -EnabledFixtureNames @() -SciencePackIngredientPolicy "space-and-promethium"
 $baseSpacePromethiumPackLine = Get-LastStreamReportLine -Key "research_gears"
@@ -847,6 +869,9 @@ $spaceAgeSpacePackLine = Get-LastStreamReportLine -Key "research_gears"
 Assert-ReportLineGenerated -Line $spaceAgeSpacePackLine -Context "Space Age space-only science-pack ingredient policy scenario"
 Assert-ReportLineContains -Line $spaceAgeSpacePackLine -Expected "space-science-pack" -Context "Space Age space-only science-pack ingredient policy scenario"
 Assert-ReportLineDoesNotContain -Line $spaceAgeSpacePackLine -Unexpected "promethium-science-pack" -Context "Space Age space-only science-pack ingredient policy scenario"
+$spaceAgeElectricShootingLine = Get-LastStreamReportLine -Key "research_electric_shooting_speed"
+Assert-ReportLineGenerated -Line $spaceAgeElectricShootingLine -Context "Space Age electric and Tesla shooting speed scenario"
+Assert-ReportLineContains -Line $spaceAgeElectricShootingLine -Expected "effects=2" -Context "Space Age electric and Tesla shooting speed scenario"
 
 foreach ($vanillaOwnedStream in @(
   "research_low_density_structure",
@@ -896,6 +921,17 @@ Invoke-RuntimeScenario -ScenarioName "base-extension-boundary-policy" -EnabledFi
 $baseExtensionBoundaryLine = Get-LastExtensionReportLine -Key "research-speed"
 Assert-ReportLineGenerated -Line $baseExtensionBoundaryLine -Context "Base extension boundary scenario"
 Assert-ReportLineContains -Line $baseExtensionBoundaryLine -Expected "mir-fixture-science-pack" -Context "Base extension boundary scenario"
+
+Invoke-RuntimeScenario -ScenarioName "omega-drill-productivity" -EnabledFixtureNames @(
+  "mir-fixture-omega-drill",
+  "mir-fixture-assert-omega-drill-productivity"
+)
+$omegaDrillLine = Get-LastStreamReportLine -Key "research_mining_drill"
+Assert-ReportLineGenerated -Line $omegaDrillLine -Context "Omega-style drill productivity scenario"
+$omegaEffectCountMatch = [regex]::Match($omegaDrillLine, "effects=(\d+)")
+if (-not $omegaEffectCountMatch.Success -or [int]$omegaEffectCountMatch.Groups[1].Value -lt 4) {
+  throw "Omega-style drill productivity scenario did not include the expected mining drill effect count: $omegaDrillLine"
+}
 
 Invoke-RuntimeScenario -ScenarioName "end-game-prerequisite-gate" -EnabledFixtureNames @() -RequireSpaceGate
 $gateLine = Get-LastStreamReportLine -Key "research_gears"

@@ -110,6 +110,7 @@ return {
 
   research_flamethrower_shooting_speed = {
     icon_tech = "flamethrower",
+    localised_description = {"technology-description.more-infinite-research.flamethrower_shooting_speed"},
     science_packs = {
       "automation-science-pack","logistic-science-pack","chemical-science-pack",
       "production-science-pack","military-science-pack","space-science-pack"
@@ -120,9 +121,9 @@ return {
   },
 
   research_electric_shooting_speed = {
-    icon_tech = "tesla-weapons",
-    required_technologies = {"tesla-weapons"},
-    required_ammo_categories = {"tesla"},
+    icon_tech = "discharge-defense-equipment",
+    required_technologies = {"discharge-defense-equipment"},
+    localised_description = {"technology-description.more-infinite-research.electric_shooting_speed"},
     science_packs = {
       "automation-science-pack","logistic-science-pack","chemical-science-pack",
       "production-science-pack","military-science-pack","electromagnetic-science-pack"

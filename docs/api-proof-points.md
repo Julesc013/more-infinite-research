@@ -15,6 +15,9 @@ Official Factorio API references should be rechecked before a release if the loc
 | `gun-speed` modifiers use `ammo_category` | Factorio modifier docs plus local prototype files | Verified | Electric shooting speed must include `tesla` for Tesla weapons |
 | Space Age Tesla gun/ammo/turret use `ammo_category = "tesla"` | Local Factorio `2.1.8` Space Age prototypes | Verified | Tesla turret speed is covered by `tesla`, not `electric` |
 | Base discharge defense uses `ammo_category = "electric"` | Local Factorio `2.1.8` base prototypes | Verified | Keep `electric` effect for discharge-defense-style equipment |
+| Base game locale does not provide every generated shooting-speed modifier string MIR needs | Local Factorio `2.1.8` base and Space Age locale files | Verified | MIR ships `flamethrower`, `electric`, and `tesla` shooting speed modifier descriptions |
+| Hidden optional dependencies use the `(?)` prefix and affect load order | Factorio mod structure docs | Verified | The main line declares `(?) quality >= 2.1.8` so module productivity can see Quality module recipes |
+| Omega Drill style content adds the Omega Drill and Space Age Omega-Tau | Factorio mod portal page plus validation fixture | Locally covered by fixture | Mining drill productivity covers `omega-drill`, `omega-tau`, and broader visible modded drill recipe outputs |
 | Vanilla Space Age has infinite `processing-unit-productivity` | Local Factorio `2.1.8` Space Age prototypes | Verified | MIR skips parallel processing unit productivity in Space Age |
 | Vanilla Space Age has infinite `low-density-structure-productivity` | Local Factorio `2.1.8` Space Age prototypes | Verified | MIR skips covered LDS recipes in Space Age |
 | Vanilla Space Age has infinite `plastic-bar-productivity` | Local Factorio `2.1.8` Space Age prototypes | Verified | MIR skips covered plastic recipes in Space Age |

@@ -10,7 +10,7 @@ Version **`2.0.5`** targets **Factorio `2.1`** and requires:
 - `base >= 2.1.8`
 - optional `elevated-rails >= 2.1.8`
 - optional `recycler >= 2.1.8`
-- optional `quality >= 2.1.8`
+- hidden optional `quality >= 2.1.8`
 - optional `space-age >= 2.1.8`
 
 The mod is built around **graceful compatibility**: it discovers recipes, science packs, labs, and optional prototypes from the active mod set, generates technologies late in **`data-final-fixes.lua`**, and *skips unsafe or unavailable streams* instead of requiring compatibility mods on the mod portal page.
@@ -185,7 +185,7 @@ These streams generate `change-recipe-productivity` effects for matching recipes
 | `research_rails` | Rail productivity | `rail` | `+10%` | Rail matching is strict so rail-like unrelated outputs are not caught. |
 | `research_concrete` | Concrete productivity | `stone-brick`; concrete/hazard concrete; refined concrete/refined hazard concrete | `+10%`; `+5%`; `+2%` | Adds space science when available; excludes scrap inputs. |
 | `research_furnace` | Furnace productivity | stone furnace; steel furnace; electric furnace; foundry | `+20%`; `+10%`; `+5%`; `+2%` | Adds metallurgic science when available. |
-| `research_mining_drill` | Mining drill productivity | burner mining drill; electric mining drill; big mining drill | `+20%`; `+10%`; `+5%` | Adds metallurgic science when available. |
+| `research_mining_drill` | Mining drill productivity | burner mining drill; electric mining drill; big mining drill; Omega-style and broader modded `*-mining-drill` / `*-drill` outputs | `+20%`; `+10%`; `+5%` | Adds metallurgic science when available. Modded drill outputs fall into the high-tier `+5%` bucket unless matched by an earlier exact tier. |
 | `research_electric_energy` | Electric energy productivity | solar panel/accumulator; Advanced Solar HR advanced, elite, and ultimate tiers | `+10%`; `+5%`; `+2%`; `+1%` | Adds electromagnetic science when available. |
 | `research_bullets` | Bullet productivity | firearm magazine/shotgun shell; piercing ammo; uranium ammo; plutonium/tungsten patterns | `+10%`; `+5%`; `+2%`; `+1%` | Adds military and space science when available. |
 | `research_heavy_ammo` | Heavy ammunition productivity | cannon shell; explosive cannon shell; uranium shells; artillery, railgun, and modded shell patterns | `+10%`; `+5%`; `+2%`; `+1%` | Adds military, metallurgic, and space science when available. |
@@ -211,7 +211,7 @@ The scripted streams are `v2.0.5` ship candidates. They should ship in `v2.0.5` 
 | `research_rocket_shooting_speed` | Rocket shooting speed | `gun-speed` for `rocket` ammo category | `+10%` speed per level | Base cost `60`, growth `1.5`. Uses a base-game rocketry icon. |
 | `research_cannon_shooting_speed` | Cannon shooting speed | `gun-speed` for `cannon-shell` ammo category | `+10%` speed per level | Base cost `60`, growth `1.5`. Uses the cannon shell item icon. |
 | `research_flamethrower_shooting_speed` | Flamethrower shooting speed | `gun-speed` for `flamethrower` | `+10%` speed per level | Base cost `60`, growth `1.5`. |
-| `research_electric_shooting_speed` | Electric shooting speed | `gun-speed` for `tesla` and `electric` | `+10%` speed per level | Requires the `tesla-weapons` technology and the `tesla` ammo category. Covers Tesla guns, Tesla turrets, and discharge-defense equipment where the matching ammo categories exist. Base cost `60`, growth `1.5`. |
+| `research_electric_shooting_speed` | Electric shooting speed | `gun-speed` for `electric` and, when Space Age is active, `tesla` | `+10%` speed per level | Anchored to discharge defense in vanilla so it has a valid icon and description without Space Age. The generator filters unavailable ammo categories, so vanilla keeps discharge-defense-style `electric` coverage and Space Age also covers Tesla guns and Tesla turrets through `tesla`. Base cost `60`, growth `1.5`. |
 | `research_character_mining_speed` | Character mining speed | `character-mining-speed` | `+5%` per level | Uses utility, military, agricultural, and electromagnetic science when available. |
 | `research_character_crafting_speed` | Character crafting speed | `character-crafting-speed` | `+5%` per level | Uses utility, military, agricultural, and electromagnetic science when available. |
 | `research_character_walking_speed` | Character walking speed | `character-running-speed` | `+5%` per level | Uses utility, military, agricultural, and electromagnetic science when available. |
@@ -321,6 +321,7 @@ These are handled when their **prototypes are visible**:
 | Fluid Quality Imprinting (`fluid-quality-imprinting`) | Covered plate and intermediate outputs are picked up when the recipes output standard items. |
 | Plates n Circuit Productivity (`plates-n-circuit-productivity`) | Selected competing infinite productivity technologies are removed only after MIR has generated replacement recipe effects. |
 | Castra and PlanetLib-style science packs | Custom science packs can be discovered as lab inputs and receive science-pack productivity when their recipes are visible. |
+| Omega Drill style drill mods | Recipes outputting `omega-drill`, `omega-tau`, or broader modded `*-mining-drill` / `*-drill` items are covered by mining drill productivity. |
 
 Generic competing recipe-productivity cleanup is intentionally limited to **known infinite technologies** whose recipe-productivity effects are all covered by generated MIR effects. **Finite upgrade chains** from other mods are not removed by the generic cleanup path.
 

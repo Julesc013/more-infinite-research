@@ -65,7 +65,13 @@ return {
   research_mining_drill = { icon_tech = "electric-mining", icon_item = "electric-mining-drill", groups = {
     { change = 0.20, items = { "burner-mining-drill" } },
     { change = 0.10, items = { "electric-mining-drill" } },
-    { change = 0.05, items = { "big-mining-drill" }, item_patterns = { "^big%-mining%-drill$" } }
+    { change = 0.05, items = { "big-mining-drill" }, item_patterns = {
+      "^big%-mining%-drill$",
+      "^omega%-drill$",
+      "^omega%-tau$",
+      "^.+%-mining%-drill$",
+      "^.+%-drill$"
+    } }
   } },
 
   research_electric_energy = { icon_tech="electric-energy-accumulators", groups = {

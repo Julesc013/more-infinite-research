@@ -2,6 +2,34 @@
 
 This file records local release-candidate validation runs. It is not a substitute for the manual mod matrix in `docs/compatibility.md`.
 
+## 2026-07-01 GitHub Issue Fix Pass
+
+Environment:
+
+- Factorio `2.1.8` build `86744`, Windows Steam, Space Age install.
+- Mod version `2.0.5`.
+- Release archive: `dist/more-infinite-research_2.0.5.zip`.
+
+Commands:
+
+```powershell
+.\scripts\Build-MIRPackage.ps1
+.\scripts\Invoke-MIRValidation.ps1 -StaticOnly
+.\scripts\Invoke-MIRValidation.ps1 -FactorioBin "C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe"
+git diff --check
+```
+
+Results:
+
+- Fixed GitHub issue #3 coverage: electric shooting speed now uses the vanilla discharge defense technology as its icon/prerequisite anchor when Space Age is absent, and MIR supplies missing flamethrower/electric/Tesla shooting-speed descriptions.
+- Fixed GitHub issue #4 coverage: mining drill productivity now matches Omega Drill style `omega-drill` and `omega-tau` recipes plus broader visible modded `*-mining-drill` / `*-drill` outputs in the high-tier bucket.
+- Fixed GitHub issue #5 coverage: `info.json` now declares Quality as a hidden optional dependency, so module productivity generation sees quality module recipes when Quality is active.
+- Static/package validation passed, including hidden Quality dependency policy, locale parity across 9 locale files, science-pack wiring, package metadata, and `git diff --check`.
+- Runtime fixture validation passed across fourteen isolated scenarios, including the new `omega-drill-productivity` scenario.
+- Runtime assertions verified base/no-Space-Age electric shooting speed generates with one `electric` effect and the discharge defense icon, base flamethrower shooting speed generates, and Space Age electric shooting speed generates with both `electric` and `tesla` effects.
+- The Omega Drill assertion fixture verified `omega-drill` and `omega-tau` recipe productivity effects after MIR generation; the diagnostics row for `research_mining_drill` reported the expanded effect count.
+- Manual UI validation is still recommended for the base-only `vanilla-locale-icons`, real `quality-module-productivity`, and real Omega Drill `omega-drill-productivity` scenarios before publishing the final mod-portal build.
+
 ## 2026-07-01 Release Cadence Correction
 
 Environment:

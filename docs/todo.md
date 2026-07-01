@@ -33,6 +33,10 @@ Done in the current development branch:
 - [x] Add runtime scripted-effect debug setting.
 - [x] Fix Electric Shooting Speed to include `tesla` ammo category.
 - [x] Keep `electric` ammo category coverage for discharge defense.
+- [x] Anchor Electric Shooting Speed to discharge defense for vanilla/no-Space-Age icon and prerequisite safety.
+- [x] Add missing shooting-speed descriptions for flamethrower, electric, and Tesla modifiers.
+- [x] Add hidden optional Quality load ordering for module productivity.
+- [x] Add Omega Drill style mining drill productivity matching.
 - [x] Detect and skip recipe productivity already owned by another infinite recipe-productivity technology.
 - [x] Confirm Space Age vanilla owns processing unit, low density structure, plastic, and rocket fuel infinite productivity chains.
 - [x] Rebuild `dist/more-infinite-research_2.0.5.zip`.
@@ -50,6 +54,11 @@ Important release note: the scripted runtime work above is a **v2.0.5 ship candi
 
 - [x] Electric Shooting Speed covers `tesla`.
 - [x] Electric Shooting Speed still covers `electric`.
+- [x] Electric Shooting Speed uses the vanilla discharge defense icon/prerequisite anchor when Space Age is absent.
+- [x] Flamethrower and electric/Tesla shooting speed modifier descriptions are localized.
+- [x] Quality is a hidden optional load-order dependency so module productivity can see quality module recipes.
+- [x] Mining drill productivity covers Omega Drill style `omega-drill` and `omega-tau` recipes through validation fixtures.
+- [x] Mining drill productivity covers broader visible modded `*-mining-drill` / `*-drill` outputs in the high-tier bucket.
 - [x] Vanilla Space Age `processing-unit-productivity` remains authoritative.
 - [x] Vanilla Space Age `low-density-structure-productivity` remains authoritative.
 - [x] Vanilla Space Age `plastic-bar-productivity` remains authoritative.
@@ -82,6 +91,8 @@ Important release note: the scripted runtime work above is a **v2.0.5 ship candi
 - [x] Confirm Tesla gun, Tesla ammo, and Tesla turret use `ammo_category = "tesla"` in installed Space Age prototypes.
 - [x] Confirm discharge defense uses `ammo_category = "electric"` in base prototypes.
 - [x] Confirm `gun-speed` modifier is keyed by ammo category.
+- [x] Confirm current base/Space Age locale files do not provide all generated shooting-speed modifier descriptions MIR needs.
+- [x] Confirm Factorio supports hidden optional dependencies through the `(?)` dependency prefix.
 - [x] Confirm vanilla Space Age `processing-unit-productivity` owns `processing-unit`.
 - [x] Confirm vanilla Space Age `low-density-structure-productivity` owns `low-density-structure` and `casting-low-density-structure`.
 - [x] Confirm vanilla Space Age `plastic-bar-productivity` owns `plastic-bar` and `bioplastic`.
@@ -230,7 +241,7 @@ Do not reconstruct old releases commit-by-commit for `legacy`. A legacy release 
 - [ ] Set `info.json` `factorio_version` to `2.0`.
 - [ ] Set `info.json` dependencies to the legacy target: `base >= 2.0` and `? space-age`.
 - [ ] Remove `base >= 2.1.x` from legacy.
-- [ ] Remove `? elevated-rails >= 2.1.x`, `? recycler >= 2.1.x`, `? quality >= 2.1.x`, and `? space-age >= 2.1.x` from legacy unless a specific Factorio `2.0` ordering need is proven.
+- [ ] Remove `? elevated-rails >= 2.1.x`, `? recycler >= 2.1.x`, `(?) quality >= 2.1.x`, and `? space-age >= 2.1.x` from legacy unless a specific Factorio `2.0` ordering need is proven.
 - [ ] Remove or guard `research_cargo_bay_unloading_distance`.
 - [ ] Remove or guard `research_cargo_landing_pad_count`.
 - [ ] Confirm static validation fails if legacy direct-effect stream definitions still contain `max-cargo-bay-unloading-distance` or `cargo-landing-pad-count`.

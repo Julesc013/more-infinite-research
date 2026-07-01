@@ -93,7 +93,10 @@ This table is the canonical current synthesis from the Reddit discussion and fol
 
 | Feature | State | Target |
 | --- | --- | --- |
-| Electric shooting speed Tesla coverage | Ship | `v2.0.5` |
+| Electric shooting speed vanilla icon, descriptions, and Tesla coverage | Ship | `v2.0.5` |
+| Flamethrower/electric/Tesla shooting-speed locale fixes | Ship | `v2.0.5` |
+| Hidden Quality load ordering for module productivity | Ship | `v2.0.5` |
+| Omega Drill style mining drill productivity matching | Ship | `v2.0.5` |
 | Vanilla Space Age productivity duplicate skip | Ship | `v2.0.5` |
 | Scripted-tech framework | Ship if manual proof passes | `v2.0.5` |
 | Spoilage preservation | Ship if manual proof passes | `v2.0.5` |
@@ -130,6 +133,10 @@ Quick, easy feedback patch for tested low-risk improvements.
 
 - Electric Shooting Speed corrected to cover `tesla` as well as `electric`.
 - Discharge-defense-style `electric` category coverage retained.
+- Electric Shooting Speed anchored to discharge defense for vanilla/no-Space-Age icon and prerequisite safety.
+- Flamethrower, electric, and Tesla shooting-speed modifier descriptions supplied by MIR locale.
+- Quality declared as a hidden optional load-order dependency so Quality module recipes are visible before module productivity generation.
+- Mining drill productivity expanded to cover Omega Drill style and broader visible modded drill outputs.
 - Recipe-productivity duplicate skipping so vanilla Space Age productivity chains stay authoritative.
 - Processing unit, low density structure, plastic, and rocket fuel checks so MIR does not create parallel Space Age productivity techs for recipes already owned by vanilla infinite techs.
 - Scripted-tech framework if the manual save matrix passes.
