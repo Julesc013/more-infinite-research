@@ -82,7 +82,7 @@ Known legacy exclusions until Factorio `2.0` validation proves otherwise:
 - any scripted agriculture path that depends on unavailable agricultural tower events or entity fields
 - any pump, pipeline, or Space Age logistics prototype field added after the Factorio `2.0` target
 
-Keep these architecture pieces from the v2.1.0 source snapshot unless Factorio `2.0` validation proves a specific incompatibility: `data-final-fixes.lua` generation, lab-input science-pack discovery, lab incompatibility policy, science-pack ingredient policy, recipe matching, diagnostics, base-tech extension safety, opportunistic compatibility cleanup, validation/package parity tooling, docs structure, and locale structure.
+Keep these architecture pieces from the tested current-line source snapshot unless Factorio `2.0` validation proves a specific incompatibility: `data-final-fixes.lua` generation, lab-input science-pack discovery, lab incompatibility policy, science-pack ingredient policy, recipe matching, diagnostics, base-tech extension safety, opportunistic compatibility cleanup, validation/package parity tooling, docs structure, and locale structure.
 
 Validation is branch-aware from `info.json`: Factorio `2.1` checks require cargo streams and the `2.1.8` dependency floor, while Factorio `2.0` checks reject Factorio `2.1` dependency floors, require those cargo modifier strings to be absent from direct-effect stream definitions, skip Factorio `2.1` cargo runtime fixtures, and expect the package to build as `more-infinite-research_1.9.0.zip`.
 

@@ -2,6 +2,51 @@
 
 This file records local release-candidate validation runs. It is not a substitute for the manual mod matrix in `docs/compatibility.md`.
 
+## 2026-07-02 Final v2.0.5 Release-Candidate Validation
+
+Environment:
+
+- Factorio `2.1.8` build `86744`, Windows Steam, Space Age install.
+- Mod version `2.0.5`.
+- Release archive: `dist/more-infinite-research_2.0.5.zip`.
+- Branch before docs/package commit: `dev` at `4ec2ed6`, synced with `origin/dev`.
+
+Commands:
+
+```powershell
+.\scripts\Build-MIRPackage.ps1
+.\scripts\Invoke-MIRValidation.ps1 -StaticOnly
+.\scripts\Invoke-MIRValidation.ps1 -FactorioBin "C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe"
+.\scripts\Test-MIRBranchPolicy.ps1
+git diff --check
+git status --short --branch
+git log --oneline --decorate --graph --max-count=8
+git branch -vv
+rg "data.raw.tool|tool_exists|has_tool|PACKS_ALL" prototypes
+rg "on_tick" control prototypes
+rg "icon_mipmaps" prototypes
+```
+
+Results:
+
+- Rebuilt `dist/more-infinite-research_2.0.5.zip` from the current source tree.
+- Static/package validation passed.
+- Runtime fixture validation passed against Factorio `2.1.8`.
+- Branch policy validation passed for `origin/main`, `origin/dev`, and `origin/legacy`.
+- Locale parity validation passed across 9 locale files.
+- Package/source parity validation passed, including required `control/`, `migrations/`, `locale/`, and release documentation files.
+- No-runtime-tick validation passed for `control.lua` and `control/`.
+- Scripted Space Age candidate validation passed: Spoilage preservation and Agricultural growth speed remain default-off in `v2.0.5`.
+- Settings confidence validation passed: generated setting names/descriptions, dropdown option descriptions, setting notes, diagnostics order, default bounds, and reader coverage are present.
+- Runtime fixture coverage passed for 23 isolated scenarios: base-only generation, Space Age generation, science-pack policies, lab compatibility policies, base extension boundaries, weapon speed overlap safety, Omega Drill style recipe matching, cargo gates, cargo duplicate diagnostics, scripted candidate force-enable generation, icon source checks, icon badge checks, Space Age duplicate productivity skips, and base-game Research productivity.
+- Direct release-candidate grep checks found no stale `data.raw.tool`/old science-pack authority patterns, no tick handlers, and no deprecated prototype `icon_mipmaps` usage.
+- Release scan found no active `TODO`, `FIXME`, `TBD`, `BROKEN`, or stale player-facing blocker outside documented manual-validation items and historical changelog/roadmap notes.
+
+Remaining release gate:
+
+- Manual in-game smoke testing from a normal Factorio mods folder is still required before tagging and publishing.
+- Scripted spoilage/agriculture behavior remains default-off and should not be described with stronger gameplay claims until the manual matrix records measured results.
+
 ## 2026-07-02 Base-Game Research Productivity And Icon Source Pass
 
 Environment:

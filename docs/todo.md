@@ -84,6 +84,7 @@ Done in the current development branch:
 - [x] Make Science pack productivity fall back to base-game Space science pack technology art instead of the automation science pack item icon.
 - [x] Add base-game Research productivity with the native `laboratory-productivity` modifier and Military science pack technology art, while skipping it in Space Age where vanilla `research-productivity` exists.
 - [x] Add runtime fixture coverage for the new icon sources and base/Space Age Research productivity behavior.
+- [x] Run final automated `v2.0.5` release-candidate validation and record it in `docs/test-results.md`.
 
 Important release note: the scripted runtime work above is a **default-off v2.0.5 ship candidate**, not automatically deferred to `v2.1.0`. Ship the opt-in implementation with conservative wording after the minimum smoke checks pass. Defer default enablement, presets, or stronger behavior claims until manual proof exists.
 
@@ -198,21 +199,22 @@ Important release note: the scripted runtime work above is a **default-off v2.0.
 
 ### Branch-State Check Before Push/Tag
 
-- [ ] Run `git status --short --branch`.
-- [ ] Run `git log --oneline --decorate --graph --max-count=8`.
-- [ ] Run `git branch -vv`.
-- [ ] Confirm the intended commits are reachable from `dev`.
-- [ ] Confirm whether `dev` is ahead of `origin/dev` before pushing or tagging.
+- [x] Run `git status --short --branch`.
+- [x] Run `git log --oneline --decorate --graph --max-count=8`.
+- [x] Run `git branch -vv`.
+- [x] Confirm the intended commits are reachable from `dev`.
+- [x] Confirm whether `dev` is ahead of `origin/dev` before pushing or tagging.
 
 ### v2.0.5 Packaging
 
-- [ ] Run `.\scripts\Build-MIRPackage.ps1`.
-- [ ] Run `.\scripts\Invoke-MIRValidation.ps1 -StaticOnly`.
-- [ ] Run `.\scripts\Invoke-MIRValidation.ps1 -FactorioBin "C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe"`.
-- [ ] Run `git diff --check`.
+- [x] Run `.\scripts\Build-MIRPackage.ps1`.
+- [x] Run `.\scripts\Invoke-MIRValidation.ps1 -StaticOnly`.
+- [x] Run `.\scripts\Invoke-MIRValidation.ps1 -FactorioBin "C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe"`.
+- [x] Run `.\scripts\Test-MIRBranchPolicy.ps1`.
+- [x] Run `git diff --check`.
 - [ ] Copy the zip to a normal Factorio mods folder and confirm Factorio sees it.
-- [ ] Record validation results in `docs/test-results.md`.
-- [ ] Commit docs, code, changelog, and package together for the tested candidate.
+- [x] Record validation results in `docs/test-results.md`.
+- [x] Commit docs, code, changelog, and package together for the tested candidate.
 
 ## v1.9.0 Legacy Backport After v2.0.5
 
@@ -237,7 +239,7 @@ Do this after the `v2.0.5` minimum manual smoke checks pass and the tested sourc
 - [ ] Settings presets: Vanilla-respectful, Megabase-balanced, Unlimited sandbox.
 - [ ] Existing agricultural plant rescale if bounded and deduplicated.
 - [ ] Scripted-tech diagnostics improvements after `v2.0.5` feedback.
-- [ ] Technologt to increase throughput of pumps if possible.
+- [ ] Technology to increase throughput of pumps if possible.
 - [ ] Pipeline extent startup setting if compatibility proof is clean.
 - [ ] Thruster fuel productivity if recipe-productivity proof is clean.
 - [ ] Thruster oxidizer productivity if recipe-productivity proof is clean.
@@ -352,14 +354,15 @@ These are intentionally not `v2.0.5` or `v2.1.0` MIR core work.
 
 Run this before every release candidate:
 
-- [ ] `git status --short --branch`
-- [ ] `rg "data.raw.tool|tool_exists|has_tool|PACKS_ALL" prototypes`
-- [ ] `rg "on_tick" control prototypes`
-- [ ] `rg "icon_mipmaps" prototypes`
-- [ ] `.\scripts\Build-MIRPackage.ps1`
-- [ ] `.\scripts\Invoke-MIRValidation.ps1 -StaticOnly`
-- [ ] `.\scripts\Invoke-MIRValidation.ps1 -FactorioBin "C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe"`
-- [ ] `git diff --check`
+- [x] `git status --short --branch`
+- [x] `rg "data.raw.tool|tool_exists|has_tool|PACKS_ALL" prototypes`
+- [x] `rg "on_tick" control prototypes`
+- [x] `rg "icon_mipmaps" prototypes`
+- [x] `.\scripts\Build-MIRPackage.ps1`
+- [x] `.\scripts\Invoke-MIRValidation.ps1 -StaticOnly`
+- [x] `.\scripts\Invoke-MIRValidation.ps1 -FactorioBin "C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe"`
+- [x] `.\scripts\Test-MIRBranchPolicy.ps1`
+- [x] `git diff --check`
 - [ ] Load the release zip from a normal Factorio mods folder.
-- [ ] Record validation results in `docs/test-results.md`.
-- [ ] Commit docs, code, changelog, and package together for the tested candidate.
+- [x] Record validation results in `docs/test-results.md`.
+- [x] Commit docs, code, changelog, and package together for the tested candidate.
