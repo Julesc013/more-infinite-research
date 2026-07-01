@@ -186,6 +186,15 @@ local stream_sort_names = {
   research_walls = "Wall productivity"
 }
 
+local base_extension_specs = {
+  { key = "braking-force", sort_name = "Braking force" },
+  { key = "inserter-capacity-bonus", sort_name = "Inserter capacity bonus" },
+  { key = "laser-shooting-speed", sort_name = "Laser shooting speed" },
+  { key = "research-speed", sort_name = "Lab research speed" },
+  { key = "weapon-shooting-speed", sort_name = "Weapon shooting speed" },
+  { key = "worker-robots-storage", sort_name = "Worker robot cargo size" }
+}
+
 local function order_slug(value)
   local out = tostring(value or ""):lower():gsub("[^%w]+", "-"):gsub("^%-+", ""):gsub("%-+$", "")
   if out == "" then return "zzz" end
@@ -196,40 +205,67 @@ local function fallback_stream_sort_name(key)
   return (key:gsub("^research_", ""):gsub("_", " "))
 end
 
-local function stream_sort_key(key)
-  return order_slug(stream_sort_names[key] or fallback_stream_sort_name(key))
+local function stream_sort_name(key)
+  return stream_sort_names[key] or fallback_stream_sort_name(key)
 end
 
-local stream_order = {}
-for key, _ in pairs(C.streams) do table.insert(stream_order, key) end
-table.sort(stream_order, function(a, b)
-  local stream_a = C.streams[a]
-  local stream_b = C.streams[b]
-  local disabled_a = not default_enabled(a, stream_a)
-  local disabled_b = not default_enabled(b, stream_b)
+local function group_order_prefix(group)
+  local bucket = group.enabled and "100" or "000"
+  return "b-" .. bucket .. "-" .. order_slug(group.sort_name) .. "-" .. group.kind .. "-" .. group.key
+end
+
+local technology_setting_groups = {}
+
+for key, stream in pairs(C.streams) do
+  table.insert(technology_setting_groups, {
+    kind = "stream",
+    key = key,
+    stream = stream,
+    sort_name = stream_sort_name(key),
+    enabled = default_enabled(key, stream)
+  })
+end
+
+for _, spec in ipairs(base_extension_specs) do
+  local defaults_spec = base_defaults[spec.key] or {}
+  local enabled = defaults_spec.enabled
+  if enabled == nil then enabled = true end
+  table.insert(technology_setting_groups, {
+    kind = "base",
+    key = spec.key,
+    spec = spec,
+    defaults_spec = defaults_spec,
+    sort_name = spec.sort_name or spec.key,
+    enabled = enabled
+  })
+end
+
+table.sort(technology_setting_groups, function(a, b)
+  local disabled_a = not a.enabled
+  local disabled_b = not b.enabled
   if disabled_a ~= disabled_b then return disabled_a end
-  local sort_a = stream_sort_key(a)
-  local sort_b = stream_sort_key(b)
-  if sort_a == sort_b then return a < b end
+  local sort_a = order_slug(a.sort_name)
+  local sort_b = order_slug(b.sort_name)
+  if sort_a == sort_b then
+    if a.kind == b.kind then return a.key < b.key end
+    return a.kind < b.kind
+  end
   return sort_a < sort_b
 end)
 
-local function stream_order_prefix(key, stream)
-  local bucket = default_enabled(key, stream) and "100" or "000"
-  return "b-" .. bucket .. "-" .. stream_sort_key(key) .. "-" .. key
-end
+for _, group in ipairs(technology_setting_groups) do
+  local order_prefix = group_order_prefix(group)
 
-for _, key in ipairs(stream_order) do
-  local stream = C.streams[key]
-  if stream then
+  if group.kind == "stream" then
+    local key = group.key
+    local stream = group.stream
     local tech_locale = stream.localised_name or {"technology-name.more-infinite-research."..key}
-    local order_prefix = stream_order_prefix(key, stream)
     local settings_note = lookup_default(key, "settings_note", stream, nil)
     table.insert(settings_data, {
       type = "bool-setting",
       name = "ips-enable-"..key,
       setting_type = "startup",
-      default_value = default_enabled(key, stream),
+      default_value = group.enabled,
       order = order_prefix.."-0",
       localised_name = {"mod-setting-name.ips-enable-stream", tech_locale},
       localised_description = append_note({"mod-setting-description.ips-enable-stream", tech_locale}, settings_note)
@@ -277,110 +313,81 @@ for _, key in ipairs(stream_order) do
       localised_name = {"mod-setting-name.ips-research-time-stream", tech_locale},
       localised_description = {"mod-setting-description.ips-research-time-stream", tech_locale}
     })
-  end
-end
-
-local base_extensions = {
-  { key = "braking-force", sort_name = "Braking force" },
-  { key = "inserter-capacity-bonus", sort_name = "Inserter capacity bonus" },
-  { key = "laser-shooting-speed", sort_name = "Laser shooting speed" },
-  { key = "research-speed", sort_name = "Lab research speed" },
-  { key = "weapon-shooting-speed", sort_name = "Weapon shooting speed" },
-  { key = "worker-robots-storage", sort_name = "Worker robot cargo size" }
-}
-
-table.sort(base_extensions, function(a, b)
-  local defaults_a = base_defaults[a.key] or {}
-  local defaults_b = base_defaults[b.key] or {}
-  local disabled_a = defaults_a.enabled == false
-  local disabled_b = defaults_b.enabled == false
-  if disabled_a ~= disabled_b then return disabled_a end
-  local sort_a = order_slug(a.sort_name or a.key)
-  local sort_b = order_slug(b.sort_name or b.key)
-  if sort_a == sort_b then return a.key < b.key end
-  return sort_a < sort_b
-end)
-
-local function base_order_prefix(spec, defaults_spec)
-  local bucket = defaults_spec.enabled == false and "000" or "100"
-  return "b-" .. bucket .. "-" .. order_slug(spec.sort_name or spec.key) .. "-base-" .. spec.key
-end
-
-for _, spec in ipairs(base_extensions) do
-  local defaults_spec = base_defaults[spec.key] or {}
-  local enabled_default = defaults_spec.enabled
-  if enabled_default == nil then enabled_default = true end
-  local base_default = tonumber(defaults_spec.base_cost) or 0
-  if base_default < 0 then base_default = 0 end
-  local growth_default = tonumber(defaults_spec.growth_factor) or 0
-  if growth_default < 0 then growth_default = 0 end
-  local research_time_default = tonumber(defaults_spec.research_time) or 60
-  if research_time_default < 1 then research_time_default = 60 end
-  local max_level_default = defaults_spec.max_level
-  if max_level_default == nil or max_level_default == "infinite" then
-    max_level_default = 0
   else
-    local num = tonumber(max_level_default)
-    if not num or num <= 0 then
+    local spec = group.spec
+    local defaults_spec = group.defaults_spec
+    local enabled_default = group.enabled
+    local base_default = tonumber(defaults_spec.base_cost) or 0
+    if base_default < 0 then base_default = 0 end
+    local growth_default = tonumber(defaults_spec.growth_factor) or 0
+    if growth_default < 0 then growth_default = 0 end
+    local research_time_default = tonumber(defaults_spec.research_time) or 60
+    if research_time_default < 1 then research_time_default = 60 end
+    local max_level_default = defaults_spec.max_level
+    if max_level_default == nil or max_level_default == "infinite" then
       max_level_default = 0
     else
-      max_level_default = math.floor(num + 0.5)
+      local num = tonumber(max_level_default)
+      if not num or num <= 0 then
+        max_level_default = 0
+      else
+        max_level_default = math.floor(num + 0.5)
+      end
     end
+    local locale = {"technology-name."..spec.key}
+    table.insert(settings_data, {
+      type = "bool-setting",
+      name = "mir-enable-"..spec.key,
+      setting_type = "startup",
+      default_value = enabled_default,
+      order = order_prefix.."",
+      localised_name = {"mod-setting-name.mir-enable-base-tech", locale},
+      localised_description = append_note({"mod-setting-description.mir-enable-base-tech", locale}, defaults_spec.settings_note)
+    })
+    table.insert(settings_data, {
+      type = "int-setting",
+      name = "mir-cost-base-"..spec.key,
+      setting_type = "startup",
+      default_value = math.floor(base_default + 0.5),
+      minimum_value = 0,
+      maximum_value = 2147483647,
+      order = order_prefix.."-1",
+      localised_name = {"mod-setting-name.mir-cost-base", locale},
+      localised_description = {"mod-setting-description.mir-cost-base", locale}
+    })
+    table.insert(settings_data, {
+      type = "double-setting",
+      name = "mir-cost-growth-"..spec.key,
+      setting_type = "startup",
+      default_value = growth_default,
+      minimum_value = 0,
+      order = order_prefix.."-2",
+      localised_name = {"mod-setting-name.mir-cost-growth", locale},
+      localised_description = {"mod-setting-description.mir-cost-growth", locale}
+    })
+    table.insert(settings_data, {
+      type = "int-setting",
+      name = "mir-max-level-"..spec.key,
+      setting_type = "startup",
+      default_value = max_level_default,
+      minimum_value = 0,
+      maximum_value = 2147483647,
+      order = order_prefix.."-3",
+      localised_name = {"mod-setting-name.mir-max-level", locale},
+      localised_description = {"mod-setting-description.mir-max-level", locale}
+    })
+    table.insert(settings_data, {
+      type = "int-setting",
+      name = "mir-research-time-"..spec.key,
+      setting_type = "startup",
+      default_value = math.floor(research_time_default + 0.5),
+      minimum_value = 0,
+      maximum_value = 2147483647,
+      order = order_prefix.."-4",
+      localised_name = {"mod-setting-name.mir-research-time", locale},
+      localised_description = {"mod-setting-description.mir-research-time", locale}
+    })
   end
-  local locale = {"technology-name."..spec.key}
-  local base_order = base_order_prefix(spec, defaults_spec)
-  table.insert(settings_data, {
-    type = "bool-setting",
-    name = "mir-enable-"..spec.key,
-    setting_type = "startup",
-    default_value = enabled_default,
-    order = base_order.."",
-    localised_name = {"mod-setting-name.mir-enable-base-tech", locale},
-    localised_description = append_note({"mod-setting-description.mir-enable-base-tech", locale}, defaults_spec.settings_note)
-  })
-  table.insert(settings_data, {
-    type = "int-setting",
-    name = "mir-cost-base-"..spec.key,
-    setting_type = "startup",
-    default_value = math.floor(base_default + 0.5),
-    minimum_value = 0,
-    maximum_value = 2147483647,
-    order = base_order.."-1",
-    localised_name = {"mod-setting-name.mir-cost-base", locale},
-    localised_description = {"mod-setting-description.mir-cost-base", locale}
-  })
-  table.insert(settings_data, {
-    type = "double-setting",
-    name = "mir-cost-growth-"..spec.key,
-    setting_type = "startup",
-    default_value = growth_default,
-    minimum_value = 0,
-    order = base_order.."-2",
-    localised_name = {"mod-setting-name.mir-cost-growth", locale},
-    localised_description = {"mod-setting-description.mir-cost-growth", locale}
-  })
-  table.insert(settings_data, {
-    type = "int-setting",
-    name = "mir-max-level-"..spec.key,
-    setting_type = "startup",
-    default_value = max_level_default,
-    minimum_value = 0,
-    maximum_value = 2147483647,
-    order = base_order.."-3",
-    localised_name = {"mod-setting-name.mir-max-level", locale},
-    localised_description = {"mod-setting-description.mir-max-level", locale}
-  })
-  table.insert(settings_data, {
-    type = "int-setting",
-    name = "mir-research-time-"..spec.key,
-    setting_type = "startup",
-    default_value = math.floor(research_time_default + 0.5),
-    minimum_value = 0,
-    maximum_value = 2147483647,
-    order = base_order.."-4",
-    localised_name = {"mod-setting-name.mir-research-time", locale},
-    localised_description = {"mod-setting-description.mir-research-time", locale}
-  })
 end
 
 data:extend(settings_data)

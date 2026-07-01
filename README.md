@@ -258,21 +258,21 @@ Megabase setup:
 
 - Keep most generated streams enabled.
 - Keep max level at `0` for infinite progression.
-- Consider science pack policy `space`, `space-and-promethium`, or `all-official` if you want higher-end science sinks.
-- Use lab incompatibility policy `reduce` for broad modpack compatibility.
+- Consider `Extra science packs for generated technologies` values `space`, `space-and-promethium`, or `all-official` if you want higher-end science sinks.
+- Use `What to do when no lab can research a technology` value `reduce` for broad modpack compatibility.
 
 Modpack compatibility setup:
 
-- Start with science pack policy `configured`.
-- Use lab incompatibility policy `reduce`.
-- Enable `Show generation diagnostics` only while troubleshooting.
-- Enable `Show recipe match diagnostics` only when reporting missing or duplicate productivity chains.
+- Start with `Extra science packs for generated technologies` value `configured`.
+- Use `What to do when no lab can research a technology` value `reduce`.
+- Enable `Log generated and skipped technologies` only while troubleshooting.
+- Enable `Log recipes matched by productivity technologies` only when reporting missing or duplicate productivity chains.
 
 Debug/reporting setup:
 
-- Enable `Show generation diagnostics`, load once, then attach the Factorio log.
-- Enable `Show recipe match diagnostics` for recipe-productivity matching issues.
-- Enable `Show scripted effect diagnostics` only for scripted spoilage/agriculture issues.
+- Enable `Log generated and skipped technologies`, load once, then attach the Factorio log.
+- Enable `Log recipes matched by productivity technologies` for recipe-productivity matching issues.
+- Enable `Log scripted spoilage and agriculture effects` only for scripted spoilage/agriculture issues.
 
 ### What `0` Means
 
