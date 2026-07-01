@@ -517,7 +517,7 @@ Invoke-RepoCheck "changelog uses Factorio changelog format" {
   }
 }
 
-Invoke-RepoCheck "release package archive matches metadata" {
+Invoke-RepoCheck "generated package archive matches metadata" {
   Add-Type -AssemblyName System.IO.Compression.FileSystem
 
   function Read-ZipEntryText {
@@ -583,9 +583,12 @@ Invoke-RepoCheck "release package archive matches metadata" {
 
   $info = Get-Content -Raw (Join-Path $repo "info.json") | ConvertFrom-Json
   $packageName = "$($info.name)_$($info.version)"
-  $zipPath = Join-Path $repo "dist\$packageName.zip"
+  $validationOutputDir = "build/validation-dist"
+  & (Join-Path $repo "scripts\Build-MIRPackage.ps1") -OutputDir $validationOutputDir -CompressionLevel "Fastest" | Out-Host
+
+  $zipPath = Join-Path $repo "$validationOutputDir\$packageName.zip"
   if (-not (Test-Path -LiteralPath $zipPath)) {
-    throw "Release package not found: $zipPath"
+    throw "Validation package not found after build: $zipPath"
   }
 
   $zip = [System.IO.Compression.ZipFile]::OpenRead($zipPath)

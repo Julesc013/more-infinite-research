@@ -148,7 +148,7 @@ Use `scripts/Invoke-MIRValidation.ps1 -StaticOnly` for static checks.
 
 Use `scripts/Invoke-MIRValidation.ps1 -FactorioBin C:\path\to\factorio.exe` for a runtime fixture load test.
 
-Use `scripts/Build-MIRPackage.ps1` to rebuild the release archive. Static validation checks the committed archive root, metadata, load-critical entry files, locale files, migrations, and forbidden artifact paths.
+Use `scripts/Build-MIRPackage.ps1` to rebuild the release archive when preparing an upload. Static validation builds an ignored validation archive from the current source tree and checks the archive root, metadata, load-critical entry files, locale files, migrations, and forbidden artifact paths.
 
 Static package validation also recursively compares packaged files from the current source tree against the repository copy for the packaged source directories. Documentation and helper modules may be moved or nested inside their packaged trees without changing validation; the test follows the current tree instead of a fixed old layout. Text files are compared with normalized line endings so CI checkout settings do not create false failures; binary files are still compared by SHA-256.
 

@@ -513,8 +513,8 @@ The validation script checks:
 - **Icons:** generated icons do not use `icon_mipmaps`.
 - **Locale:** locale files match the English fallback.
 - **Changelog:** `changelog.txt` uses Factorio's 99-dash changelog section format.
-- **Release zip:** the committed archive has the expected root, metadata, load-critical files, and no forbidden artifacts.
-- **Package parity:** packaged source directories, documentation, locale, migrations, and root mod files match the repository copy while allowing docs and helper modules to be rearranged inside their packaged trees.
+- **Generated package:** validation builds an ignored archive from the current source tree and checks its root, metadata, load-critical files, and forbidden artifacts.
+- **Package parity:** the generated archive's source directories, documentation, locale, migrations, and root mod files match the repository copy while allowing docs and helper modules to be rearranged inside their packaged trees.
 - **Whitespace:** `git diff --check` passes.
 - **Runtime load:** fixture loading reaches save creation when a Factorio binary is supplied.
 - **Runtime diagnostics:** logs contain the expected generation diagnostics.

@@ -2,6 +2,30 @@
 
 This file records local release-candidate validation runs. It is not a substitute for the manual mod matrix in `docs/compatibility.md`.
 
+## 2026-07-02 Generated Package Validation Pass
+
+Environment:
+
+- Mod version `2.0.5`.
+- Validation archive: `build/validation-dist/more-infinite-research_2.0.5.zip`.
+
+Commands:
+
+```powershell
+.\scripts\Invoke-MIRValidation.ps1 -StaticOnly
+.\scripts\Test-MIRBranchPolicy.ps1
+git diff --check
+```
+
+Results:
+
+- Fixed the CI failure where README-only changes failed static validation because the committed `dist/` zip was intentionally not rebuilt.
+- Static validation now builds an ignored validation archive from the current source tree before package metadata and package parity checks.
+- The committed `dist/` zip remains the manual upload artifact, but normal CI no longer treats it as the live source-parity fixture for every documentation-only commit.
+- Package validation still checks archive root shape, metadata, load-critical files, migrations, locale baseline, forbidden artifacts, and current source/package parity.
+- Static/package validation passed.
+- Branch policy validation passed for `origin/main`, `origin/dev`, and `origin/legacy`.
+
 ## 2026-07-02 Flexible Package Layout Validation Pass
 
 Environment:
