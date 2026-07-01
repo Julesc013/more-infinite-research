@@ -175,7 +175,7 @@ Important release note: the scripted runtime work above is a **v2.0.5 ship candi
 - [ ] Settings presets: Vanilla-respectful, Megabase-balanced, Unlimited sandbox.
 - [ ] Existing agricultural plant rescale if bounded and deduplicated.
 - [ ] Scripted-tech diagnostics improvements after `v2.0.5` feedback.
-- [ ] High-throughput pump / Der Pump if prototype proof is clean.
+- [ ] Technologt to increase throughput of pumps if possible.
 - [ ] Pipeline extent startup setting if compatibility proof is clean.
 - [ ] Thruster fuel productivity if recipe-productivity proof is clean.
 - [ ] Thruster oxidizer productivity if recipe-productivity proof is clean.
