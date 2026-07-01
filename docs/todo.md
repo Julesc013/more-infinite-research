@@ -120,7 +120,7 @@ Important release note: the scripted runtime work above is a **default-off v2.0.
 - [x] Existing old trash-slot technology progress has a JSON migration into the combined inventory/trash technology.
 - [x] Package includes `control.lua` and `control/`.
 - [x] Package includes `migrations/`.
-- [x] Package includes `docs/todo.md`, `docs/api-proof-points.md`, and `docs/manual-test-plan.md`.
+- [x] Package includes and mirrors the current `docs/` tree without requiring release docs to stay at fixed root paths.
 - [x] Startup setting labels, descriptions, ordering, dropdown help, and experimental warnings are refreshed without changing generated technology names or defaults.
 - [x] README documents recommended default, vanilla-respectful, megabase, modpack compatibility, and debug/reporting settings patterns.
 - [x] Cannon shell productivity naming and icon art are aligned with the Cannon Shooting Speed cannon-shell icon family.
@@ -134,10 +134,8 @@ Important release note: the scripted runtime work above is a **default-off v2.0.
 - [x] Static validation passes.
 - [x] Package validation passes.
 - [x] Runtime fixture validation passes on the supported Factorio `2.1.x` binary.
-- [x] `docs/todo.md` is included in the package.
-- [x] `docs/api-proof-points.md` is included in the package.
-- [x] `docs/manual-test-plan.md` is included in the package.
-- [x] `docs/pre-manual-2.0.5-report.md` is included in the package.
+- [x] The current `docs/` tree is included in the package.
+- [x] Package validation follows the current documentation layout instead of hard-coding release doc paths.
 - [x] README, docs, changelog, and package agree on release scope.
 - [ ] Runtime feature claims are backed by manual/runtime validation.
 - [x] `dist/more-infinite-research_2.0.5.zip` is rebuilt from current source.

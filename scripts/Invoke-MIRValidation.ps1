@@ -28,6 +28,42 @@ function Find-RepositoryText {
   return @($files | Select-String -Pattern $Pattern)
 }
 
+function Get-RepoRelativePath {
+  param([string]$Path)
+  $resolved = (Resolve-Path -LiteralPath $Path).Path
+  return [System.IO.Path]::GetRelativePath($repo.Path, $resolved).Replace("\", "/")
+}
+
+function Get-DocumentationFiles {
+  $files = @()
+  $readmePath = Join-Path $repo "README.md"
+  if (Test-Path -LiteralPath $readmePath) {
+    $files += Get-Item -LiteralPath $readmePath
+  }
+
+  $docsPath = Join-Path $repo "docs"
+  if (Test-Path -LiteralPath $docsPath) {
+    $files += @(
+      Get-ChildItem -LiteralPath $docsPath -Recurse -File |
+        Where-Object { $_.Extension -in @(".md", ".txt") }
+    )
+  }
+
+  return @($files | Sort-Object FullName -Unique)
+}
+
+function Get-PolicyTextFiles {
+  $files = @()
+  foreach ($relative in @("README.md", "changelog.txt")) {
+    $path = Join-Path $repo $relative
+    if (Test-Path -LiteralPath $path) {
+      $files += Get-Item -LiteralPath $path
+    }
+  }
+  $files += Get-DocumentationFiles
+  return @($files | Sort-Object FullName -Unique)
+}
+
 Invoke-RepoCheck "info.json parses" {
   $null = $repoInfo
 }
@@ -90,16 +126,11 @@ Invoke-RepoCheck "docs match opportunistic compatibility policy" {
     "optional dependencies for Space Age and known compatibility targets",
     "add optional or hidden optional dependencies"
   )
-  $files = @(
-    (Join-Path $repo "changelog.txt"),
-    (Join-Path $repo "docs\compatibility.md"),
-    (Join-Path $repo "docs\roadmap.md")
-  )
-  foreach ($file in $files) {
-    $text = Get-Content -Raw -LiteralPath $file
+  foreach ($file in Get-PolicyTextFiles) {
+    $text = Get-Content -Raw -LiteralPath $file.FullName
     foreach ($phrase in $forbiddenPhrases) {
       if ($text.Contains($phrase)) {
-        throw "Forbidden optional dependency policy phrase found in $file`: $phrase"
+        throw "Forbidden optional dependency policy phrase found in $(Get-RepoRelativePath $file.FullName): $phrase"
       }
     }
   }
@@ -359,36 +390,70 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
 }
 
 Invoke-RepoCheck "release documentation lists final manual and API checks" {
-  $readmeText = Get-Content -Raw -LiteralPath (Join-Path $repo "README.md")
-  $roadmapText = Get-Content -Raw -LiteralPath (Join-Path $repo "docs\roadmap.md")
-  $todoText = Get-Content -Raw -LiteralPath (Join-Path $repo "docs\todo.md")
-  $apiProofText = Get-Content -Raw -LiteralPath (Join-Path $repo "docs\api-proof-points.md")
-  $manualPlanText = Get-Content -Raw -LiteralPath (Join-Path $repo "docs\manual-test-plan.md")
-
-  $requiredDocSnippets = @(
-    @{ File = "README.md"; Text = $readmeText; Snippet = '### Settings Guide' },
-    @{ File = "README.md"; Text = $readmeText; Snippet = '### What `0` Means' },
-    @{ File = "README.md"; Text = $readmeText; Snippet = '`Research unit time` is Factorio''s seconds-per-research-unit value.' },
-    @{ File = "docs\roadmap.md"; Text = $roadmapText; Snippet = 'Settings confidence pass: clearer labels, ordering, warnings, dropdown help, and docs' },
-    @{ File = "docs\todo.md"; Text = $todoText; Snippet = 'Complete a v2.0.5 settings confidence pass without adding real preset behavior.' },
-    @{ File = "docs\manual-test-plan.md"; Text = $manualPlanText; Snippet = '`character-reach-icon`' },
-    @{ File = "docs\manual-test-plan.md"; Text = $manualPlanText; Snippet = '`merged-inventory-trash-ui`' },
-    @{ File = "docs\api-proof-points.md"; Text = $apiProofText; Snippet = 'Mod structure: <https://lua-api.factorio.com/latest/auxiliary/mod-structure.html>' },
-    @{ File = "docs\api-proof-points.md"; Text = $apiProofText; Snippet = 'Modifier list: <https://lua-api.factorio.com/latest/types/Modifier.html>' },
-    @{ File = "docs\api-proof-points.md"; Text = $apiProofText; Snippet = '`NothingModifier`: <https://lua-api.factorio.com/latest/types/NothingModifier.html>' },
-    @{ File = "docs\api-proof-points.md"; Text = $apiProofText; Snippet = '`DifficultySettings`: <https://lua-api.factorio.com/latest/concepts/DifficultySettings.html>' },
-    @{ File = "docs\api-proof-points.md"; Text = $apiProofText; Snippet = '`LuaEntity`: <https://lua-api.factorio.com/latest/classes/LuaEntity.html>' }
+  $documentation = @(
+    foreach ($file in Get-DocumentationFiles) {
+      [pscustomobject]@{
+        Path = $file.FullName
+        RelativePath = Get-RepoRelativePath $file.FullName
+        Text = Get-Content -Raw -LiteralPath $file.FullName
+      }
+    }
   )
 
-  foreach ($check in $requiredDocSnippets) {
-    if (-not $check.Text.Contains($check.Snippet)) {
-      throw "Missing required release documentation entry in $($check.File): $($check.Snippet)"
+  function Assert-DocumentationSnippet {
+    param(
+      [string]$Snippet,
+      [string]$Label
+    )
+
+    $matches = @($documentation | Where-Object { $_.Text.Contains($Snippet) })
+    if ($matches.Count -eq 0) {
+      throw "Missing required release documentation entry for ${Label}: $Snippet"
     }
   }
 
-  foreach ($line in ($apiProofText -split "`r?`n")) {
-    if ($line -match '^- .+:\s*$') {
-      throw "docs\api-proof-points.md contains an empty API link entry: $line"
+  $requiredDocSnippets = @(
+    @{ Label = "settings guide"; Snippet = '### Settings Guide' },
+    @{ Label = "zero setting semantics"; Snippet = '### What `0` Means' },
+    @{ Label = "research unit time wording"; Snippet = '`Research unit time` is Factorio''s seconds-per-research-unit value.' },
+    @{ Label = "settings confidence scope"; Snippet = 'Settings confidence pass: clearer labels, ordering, warnings, dropdown help, and docs' },
+    @{ Label = "settings confidence TODO"; Snippet = 'Complete a v2.0.5 settings confidence pass without adding real preset behavior.' },
+    @{ Label = "character reach manual scenario"; Snippet = '`character-reach-icon`' },
+    @{ Label = "merged inventory/trash manual scenario"; Snippet = '`merged-inventory-trash-ui`' },
+    @{ Label = "mod structure API proof"; Snippet = 'Mod structure: <https://lua-api.factorio.com/latest/auxiliary/mod-structure.html>' },
+    @{ Label = "modifier list API proof"; Snippet = 'Modifier list: <https://lua-api.factorio.com/latest/types/Modifier.html>' },
+    @{ Label = "NothingModifier API proof"; Snippet = '`NothingModifier`: <https://lua-api.factorio.com/latest/types/NothingModifier.html>' },
+    @{ Label = "DifficultySettings API proof"; Snippet = '`DifficultySettings`: <https://lua-api.factorio.com/latest/concepts/DifficultySettings.html>' },
+    @{ Label = "LuaEntity API proof"; Snippet = '`LuaEntity`: <https://lua-api.factorio.com/latest/classes/LuaEntity.html>' }
+  )
+
+  foreach ($check in $requiredDocSnippets) {
+    Assert-DocumentationSnippet -Snippet $check.Snippet -Label $check.Label
+  }
+
+  $apiLinkLabels = @(
+    "Mod structure",
+    "Modifier list",
+    '`NothingModifier`',
+    "Migrations",
+    "Data lifecycle",
+    "Events",
+    '`LuaEntity`',
+    '`LuaItemStack`',
+    '`DifficultySettings`',
+    '`PumpPrototype`',
+    '`FluidBox`',
+    '`LuaTechnology`',
+    '`ModulePrototype`',
+    '`Effect`'
+  )
+  foreach ($doc in $documentation) {
+    foreach ($line in ($doc.Text -split "`r?`n")) {
+      foreach ($label in $apiLinkLabels) {
+        if ($line -match "^- $([regex]::Escape($label)):\s*$") {
+          throw "$($doc.RelativePath) contains an empty API proof link entry: $line"
+        }
+      }
     }
   }
 }
@@ -470,9 +535,34 @@ Invoke-RepoCheck "release package archive matches metadata" {
     }
   }
 
-  function Normalize-TextForPackageComparison {
-    param([string]$Text)
-    return ($Text -replace "`r`n", "`n").TrimEnd()
+  function Get-StreamSha256 {
+    param([System.IO.Stream]$Stream)
+    $sha = [System.Security.Cryptography.SHA256]::Create()
+    try {
+      return -join ($sha.ComputeHash($Stream) | ForEach-Object { $_.ToString("x2") })
+    } finally {
+      $sha.Dispose()
+    }
+  }
+
+  function Get-FileSha256 {
+    param([string]$Path)
+    $stream = [System.IO.File]::OpenRead($Path)
+    try {
+      return Get-StreamSha256 -Stream $stream
+    } finally {
+      $stream.Dispose()
+    }
+  }
+
+  function Get-ZipEntrySha256 {
+    param($Entry)
+    $stream = $Entry.Open()
+    try {
+      return Get-StreamSha256 -Stream $stream
+    } finally {
+      $stream.Dispose()
+    }
   }
 
   $info = Get-Content -Raw (Join-Path $repo "info.json") | ConvertFrom-Json
@@ -507,23 +597,7 @@ Invoke-RepoCheck "release package archive matches metadata" {
       "${root}settings.lua",
       "${root}defaults.lua",
       "${root}locale/en/more-infinite-research.cfg",
-      "${root}docs/architecture.md",
-      "${root}docs/api-proof-points.md",
-      "${root}docs/compatibility.md",
-      "${root}docs/manual-test-plan.md",
-      "${root}docs/pre-manual-2.0.5-report.md",
-      "${root}docs/todo.md",
-      "${root}migrations/more-infinite-research_2.0.5.json",
-      "${root}prototypes/tech-gen.lua",
-      "${root}prototypes/base-tech-extensions.lua",
-      "${root}prototypes/compat/competing-base-extensions.lua",
-      "${root}prototypes/streams/productivity.lua",
-      "${root}prototypes/streams/direct-effects.lua",
-      "${root}control/scripted-techs.lua",
-      "${root}control/effects/spoilage-preservation.lua",
-      "${root}control/effects/agricultural-growth-speed.lua",
-      "${root}prototypes/lib/science-packs.lua",
-      "${root}prototypes/lib/recipe-matching.lua"
+      "${root}migrations/more-infinite-research_2.0.5.json"
     )
     $missingEntries = @($requiredEntries | Where-Object { $_ -notin $entryNames })
     if ($missingEntries.Count -gt 0) {
@@ -574,42 +648,19 @@ Invoke-RepoCheck "release package archive matches metadata" {
       "data-final-fixes.lua",
       "settings.lua",
       "defaults.lua",
-      "prototypes/config.lua",
-      "prototypes/util.lua",
-      "prototypes/tech-gen.lua",
-      "prototypes/base-tech-extensions.lua",
-      "prototypes/compat/competing-base-extensions.lua",
-      "prototypes/compat/competing-productivity.lua",
-      "prototypes/compat/profiles.lua",
-      "prototypes/streams/init.lua",
-      "prototypes/streams/productivity.lua",
-      "prototypes/streams/direct-effects.lua",
-      "prototypes/lib/deepcopy.lua",
-      "prototypes/lib/prototype-lookup.lua",
-      "prototypes/lib/science-packs.lua",
-      "prototypes/lib/recipe-matching.lua",
-      "prototypes/lib/table-utils.lua",
-      "prototypes/lib/technology-cleanup.lua",
-      "prototypes/lib/technology-icons.lua"
+      "thumbnail.png"
     )
-    $mustMatchRepo += @(
-      Get-ChildItem -LiteralPath (Join-Path $repo "control") -Recurse -File -Filter "*.lua" |
-        ForEach-Object { [System.IO.Path]::GetRelativePath($repoPath, $_.FullName).Replace("\", "/") }
-    )
-    $mustMatchRepo += @(
-      Get-ChildItem -LiteralPath (Join-Path $repo "docs") -File |
-        ForEach-Object { [System.IO.Path]::GetRelativePath($repoPath, $_.FullName).Replace("\", "/") }
-    )
-    $mustMatchRepo += @(
-      Get-ChildItem -LiteralPath (Join-Path $repo "locale") -Recurse -File -Filter "more-infinite-research.cfg" |
-        ForEach-Object { [System.IO.Path]::GetRelativePath($repoPath, $_.FullName).Replace("\", "/") }
-    )
-    if (Test-Path -LiteralPath (Join-Path $repo "migrations")) {
-      $mustMatchRepo += @(
-        Get-ChildItem -LiteralPath (Join-Path $repo "migrations") -File |
+
+    foreach ($directory in @("control", "docs", "locale", "migrations", "prototypes")) {
+      $directoryPath = Join-Path $repo $directory
+      if (Test-Path -LiteralPath $directoryPath) {
+        $mustMatchRepo += @(
+          Get-ChildItem -LiteralPath $directoryPath -Recurse -File |
           ForEach-Object { [System.IO.Path]::GetRelativePath($repoPath, $_.FullName).Replace("\", "/") }
-      )
+        )
+      }
     }
+
     $mustMatchRepo = @($mustMatchRepo | Sort-Object -Unique)
 
     foreach ($relative in $mustMatchRepo) {
@@ -619,9 +670,9 @@ Invoke-RepoCheck "release package archive matches metadata" {
         throw "Package is missing expected source file: $entryName"
       }
 
-      $repoText = Get-Content -Raw -LiteralPath (Join-Path $repo $relative)
-      $zipText = Read-ZipEntryText $entry
-      if ((Normalize-TextForPackageComparison $repoText) -ne (Normalize-TextForPackageComparison $zipText)) {
+      $repoHash = Get-FileSha256 -Path (Join-Path $repo $relative)
+      $zipHash = Get-ZipEntrySha256 -Entry $entry
+      if ($repoHash -ne $zipHash) {
         throw "Package source file differs from repository source: $relative"
       }
     }

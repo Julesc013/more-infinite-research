@@ -161,7 +161,7 @@ Quick, easy feedback patch for tested low-risk improvements.
 - Static validation passes.
 - Runtime fixture validation passes on the supported Factorio `2.1.x` binary.
 - Package validation passes.
-- `docs/todo.md`, `docs/api-proof-points.md`, and `docs/manual-test-plan.md` are included in the package.
+- The current `docs/` tree is included in the package and package parity follows the current documentation layout.
 - README, docs, changelog, and packaged zip agree on the actual shipped features.
 - Manual results exist for the scripted features that are claimed as shipped.
 - If spoilage preservation only affects new stacks, the changelog says that plainly.

@@ -2,6 +2,38 @@
 
 This file records local release-candidate validation runs. It is not a substitute for the manual mod matrix in `docs/compatibility.md`.
 
+## 2026-07-02 Flexible Package Layout Validation Pass
+
+Environment:
+
+- Factorio `2.1.8` build `86744`, Windows Steam, Space Age install.
+- Mod version `2.0.5`.
+- Release archive: `dist/more-infinite-research_2.0.5.zip`.
+
+Commands:
+
+```powershell
+.\scripts\Build-MIRPackage.ps1
+.\scripts\Invoke-MIRValidation.ps1 -StaticOnly
+.\scripts\Invoke-MIRValidation.ps1 -FactorioBin "C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe"
+.\scripts\Test-MIRBranchPolicy.ps1
+git diff --check
+```
+
+Results:
+
+- Removed the root `preview.png` asset from the repository.
+- Relaxed package validation so documentation and helper modules are not tied to fixed historical paths.
+- Package validation now keeps exact checks for load-critical Factorio entry files, locale baseline, metadata, migrations, forbidden artifacts, and archive root shape.
+- Package parity now recursively follows the current source tree for packaged directories: `docs/`, `control/`, `locale/`, `migrations/`, and `prototypes/`.
+- Package/source parity now compares file hashes, so text and binary files can both be validated without special cases.
+- Release documentation checks now search documentation content recursively instead of requiring specific release docs at fixed root paths.
+- Temporarily moved `docs/pre-manual-2.0.5-report.md` into a nested validation-test folder, rebuilt the package, and confirmed static validation still passed while the doc was nested.
+- Restored the documentation layout after the temporary move test and rebuilt the final archive.
+- Static/package validation passed.
+- Runtime fixture validation passed against Factorio `2.1.8`.
+- Branch policy validation passed for `origin/main`, `origin/dev`, and `origin/legacy`.
+
 ## 2026-07-02 Mod Portal Documentation And Release Notes Pass
 
 Environment:
