@@ -50,7 +50,7 @@ Results:
 - Static/package validation passed.
 - Runtime fixture validation passed across twenty-three isolated scenarios.
 - Locale parity validation passed across nine locale files after normalizing settings UI text to English fallback where translations are not yet refreshed.
-- Added validation coverage for stream setting order, diagnostics ordering, dropdown option descriptions, default-off warning notes, base-extension max-level locale wiring, and README settings guidance.
+- Added validation coverage for default-disabled-first technology setting order, diagnostics ordering, dropdown option descriptions, default-off warning notes, base-extension max-level locale wiring, and README settings guidance.
 - No real settings presets were added; preset mode and override behavior remain planned for `v2.1.0`.
 
 ## 2026-07-01 Final Smoke Plan Guard
@@ -118,7 +118,7 @@ Commands:
 
 Results:
 
-- Character reach bonus now uses the same base picaxe technology icon texture as character mining speed.
+- Character reach bonus now uses the same base pickaxe technology icon texture as character mining speed.
 - Static/package validation passed after rebuilding the release archive.
 - Runtime fixture validation passed across twenty-three isolated scenarios.
 

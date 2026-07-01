@@ -63,10 +63,10 @@ Done in the current development branch:
 - [x] Add a JSON migration from the old generated trash-slot technology ID into the combined inventory/trash technology ID.
 - [x] Add runtime validation for the merged inventory/trash effects and absence of the old stream diagnostics.
 - [x] Isolate runtime validation with its own Factorio config, write-data directory, and log path.
-- [x] Make Character reach bonus use the character mining speed picaxe icon.
+- [x] Make Character reach bonus use the character mining speed pickaxe icon.
 - [x] Complete a v2.0.5 settings confidence pass without adding real preset behavior.
-- [x] Make generated stream ordering control startup-setting order instead of alphabetical stream keys.
-- [x] Move diagnostics settings to the end of the startup settings page.
+- [x] Make technology tunable settings sort by player-facing name, with default-disabled technology groups surfaced before the enabled alphabetical list.
+- [x] Keep diagnostics settings with the one-off startup controls before the technology tunables.
 - [x] Add startup-setting warning notes for default-off experimental/sandbox candidates.
 - [x] Add dropdown option descriptions for string startup settings.
 - [x] Add README settings setup guidance and document exactly what `0` means.

@@ -27,7 +27,7 @@ Required before publishing `v2.0.5`:
 | `quality-module-productivity` | Quality enabled; confirm module productivity includes quality module recipes after hidden Quality load ordering |
 | `omega-drill-productivity` | Omega Drill or Omega-style fixture enabled; confirm mining drill productivity includes Omega-style drill recipes |
 | `tank-uranium-shell-speed` | Confirm tank cannon fire rate with uranium shells is not lower than vanilla after finite vanilla `weapon-shooting-speed-5/6` research |
-| `character-reach-icon` | With Character reach bonus enabled, confirm it uses the character mining speed picaxe icon, not the exoskeleton equipment icon |
+| `character-reach-icon` | With Character reach bonus enabled, confirm it uses the character mining speed pickaxe icon, not the exoskeleton equipment icon |
 | `merged-inventory-trash-ui` | Confirm Character inventory slots shows both inventory-slot and logistic-trash-slot effects, and no separate Character logistic trash slots research appears |
 | `fresh-space-age` | Fresh Space Age save with no other mods except MIR |
 | `existing-mir-2.0-save` | Existing MIR save upgraded to the release candidate |

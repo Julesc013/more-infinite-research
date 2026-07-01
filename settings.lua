@@ -127,95 +127,103 @@ table.insert(settings_data, {
   localised_description = {"mod-setting-description.mir-debug-scripted-effects"}
 })
 
-local stream_order = {
-  "research_breeding",
-  "research_spoilage_preservation",
-  "research_agricultural_growth_speed",
-  "research_plastic",
-  "research_sulfur",
-  "research_batteries",
-  "research_explosives",
-  "research_gears",
-  "research_iron_sticks",
-  "research_copper_cable",
-  "research_electronic_circuit",
-  "research_advanced_circuit",
-  "research_processing_unit",
-  "research_low_density_structure",
-  "research_rocket_fuel",
-  "research_copper",
-  "research_iron",
-  "research_engine",
-  "research_electric_engine",
-  "research_flying_robot_frame",
-  "research_tungsten",
-  "research_holmium",
-  "research_supercapacitor",
-  "research_superconductor",
-  "research_bioflux",
-  "research_carbon_fiber",
-  "research_lithium",
-  "research_quantum_processor",
-  "research_modules",
-  "research_belts",
-  "research_inserters",
-  "research_bullets",
-  "research_heavy_ammo",
-  "research_rockets",
-  "research_armor_components",
-  "research_walls",
-  "research_grenades",
-  "research_stone_products",
-  "research_rails",
-  "research_concrete",
-  "research_furnace",
-  "research_mining_drill",
-  "research_electric_energy",
-  "research_science_pack_productivity",
-  "research_rocket_shooting_speed",
-  "research_cannon_shooting_speed",
-  "research_flamethrower_shooting_speed",
-  "research_electric_shooting_speed",
-  "research_character_mining_speed",
-  "research_character_crafting_speed",
-  "research_character_walking_speed",
-  "research_character_reach",
-  "research_inventory_capacity",
-  "research_robot_battery",
-  "research_cargo_bay_unloading_distance",
-  "research_cargo_landing_pad_count"
+local stream_sort_names = {
+  research_advanced_circuit = "Advanced circuit productivity",
+  research_agricultural_growth_speed = "Agricultural growth speed",
+  research_armor_components = "Armor component productivity",
+  research_batteries = "Battery productivity",
+  research_belts = "Transport belt productivity",
+  research_bioflux = "Bioflux productivity",
+  research_breeding = "Breeding productivity",
+  research_bullets = "Bullet productivity",
+  research_cannon_shooting_speed = "Cannon shooting speed",
+  research_cargo_bay_unloading_distance = "Cargo bay unloading distance",
+  research_cargo_landing_pad_count = "Cargo landing pad count",
+  research_carbon_fiber = "Carbon fiber productivity",
+  research_character_crafting_speed = "Character crafting speed",
+  research_character_mining_speed = "Character mining speed",
+  research_character_reach = "Character reach bonus",
+  research_character_walking_speed = "Character walking speed",
+  research_concrete = "Concrete productivity",
+  research_copper = "Copper plate productivity",
+  research_copper_cable = "Copper cable productivity",
+  research_electric_energy = "Electric energy productivity",
+  research_electric_engine = "Electric engine unit productivity",
+  research_electric_shooting_speed = "Electric shooting speed",
+  research_electronic_circuit = "Electronic circuit productivity",
+  research_engine = "Engine unit productivity",
+  research_explosives = "Explosives productivity",
+  research_flamethrower_shooting_speed = "Flamethrower shooting speed",
+  research_flying_robot_frame = "Flying robot frame productivity",
+  research_furnace = "Furnace productivity",
+  research_gears = "Iron gear wheel productivity",
+  research_grenades = "Grenade productivity",
+  research_heavy_ammo = "Cannon shell productivity",
+  research_holmium = "Holmium productivity",
+  research_inserters = "Inserter productivity",
+  research_inventory_capacity = "Character inventory slots",
+  research_iron = "Iron plate productivity",
+  research_iron_sticks = "Iron stick productivity",
+  research_lithium = "Lithium productivity",
+  research_low_density_structure = "Low density structure productivity",
+  research_mining_drill = "Mining drill productivity",
+  research_modules = "Module productivity",
+  research_plastic = "Plastic productivity",
+  research_processing_unit = "Processing unit productivity",
+  research_quantum_processor = "Quantum processor productivity",
+  research_rails = "Rail productivity",
+  research_robot_battery = "Worker robot battery",
+  research_rocket_fuel = "Rocket fuel productivity",
+  research_rocket_shooting_speed = "Rocket shooting speed",
+  research_rockets = "Rocket productivity",
+  research_science_pack_productivity = "Science pack productivity",
+  research_spoilage_preservation = "Spoilage preservation",
+  research_stone_products = "Stone product productivity",
+  research_sulfur = "Sulfur productivity",
+  research_supercapacitor = "Supercapacitor productivity",
+  research_superconductor = "Superconductor productivity",
+  research_tungsten = "Tungsten productivity",
+  research_walls = "Wall productivity"
 }
 
-local known = {}
-for _, key in ipairs(stream_order) do known[key] = true end
-
-local extras = {}
-for key, _ in pairs(C.streams) do
-  if not known[key] then table.insert(extras, key) end
-end
-table.sort(extras)
-for _, key in ipairs(extras) do table.insert(stream_order, key) end
-
-local stream_order_index = {}
-for i, key in ipairs(stream_order) do
-  stream_order_index[key] = string.format("%03d", i)
+local function order_slug(value)
+  local out = tostring(value or ""):lower():gsub("[^%w]+", "-"):gsub("^%-+", ""):gsub("%-+$", "")
+  if out == "" then return "zzz" end
+  return out
 end
 
-local stream_order_overrides = {
-  research_spoilage_preservation = "d-900-research_spoilage_preservation",
-  research_agricultural_growth_speed = "d-910-research_agricultural_growth_speed",
-  research_cargo_landing_pad_count = "d-920-research_cargo_landing_pad_count"
-}
+local function fallback_stream_sort_name(key)
+  return (key:gsub("^research_", ""):gsub("_", " "))
+end
 
-local function stream_order_prefix(key)
-  return stream_order_overrides[key] or ("b-" .. (stream_order_index[key] or "999") .. "-" .. key)
+local function stream_sort_key(key)
+  return order_slug(stream_sort_names[key] or fallback_stream_sort_name(key))
+end
+
+local stream_order = {}
+for key, _ in pairs(C.streams) do table.insert(stream_order, key) end
+table.sort(stream_order, function(a, b)
+  local stream_a = C.streams[a]
+  local stream_b = C.streams[b]
+  local disabled_a = not default_enabled(a, stream_a)
+  local disabled_b = not default_enabled(b, stream_b)
+  if disabled_a ~= disabled_b then return disabled_a end
+  local sort_a = stream_sort_key(a)
+  local sort_b = stream_sort_key(b)
+  if sort_a == sort_b then return a < b end
+  return sort_a < sort_b
+end)
+
+local function stream_order_prefix(key, stream)
+  local bucket = default_enabled(key, stream) and "100" or "000"
+  return "b-" .. bucket .. "-" .. stream_sort_key(key) .. "-" .. key
 end
 
 for _, key in ipairs(stream_order) do
   local stream = C.streams[key]
   if stream then
     local tech_locale = stream.localised_name or {"technology-name.more-infinite-research."..key}
-    local order_prefix = stream_order_prefix(key)
+    local order_prefix = stream_order_prefix(key, stream)
     local settings_note = lookup_default(key, "settings_note", stream, nil)
     table.insert(settings_data, {
       type = "bool-setting",
@@ -273,13 +281,30 @@ for _, key in ipairs(stream_order) do
 end
 
 local base_extensions = {
-  { key = "braking-force", order = "c-01" },
-  { key = "research-speed", order = "c-02" },
-  { key = "worker-robots-storage", order = "c-03" },
-  { key = "inserter-capacity-bonus", order = "c-04" },
-  { key = "weapon-shooting-speed", order = "c-05" },
-  { key = "laser-shooting-speed", order = "c-06" }
+  { key = "braking-force", sort_name = "Braking force" },
+  { key = "inserter-capacity-bonus", sort_name = "Inserter capacity bonus" },
+  { key = "laser-shooting-speed", sort_name = "Laser shooting speed" },
+  { key = "research-speed", sort_name = "Lab research speed" },
+  { key = "weapon-shooting-speed", sort_name = "Weapon shooting speed" },
+  { key = "worker-robots-storage", sort_name = "Worker robot cargo size" }
 }
+
+table.sort(base_extensions, function(a, b)
+  local defaults_a = base_defaults[a.key] or {}
+  local defaults_b = base_defaults[b.key] or {}
+  local disabled_a = defaults_a.enabled == false
+  local disabled_b = defaults_b.enabled == false
+  if disabled_a ~= disabled_b then return disabled_a end
+  local sort_a = order_slug(a.sort_name or a.key)
+  local sort_b = order_slug(b.sort_name or b.key)
+  if sort_a == sort_b then return a.key < b.key end
+  return sort_a < sort_b
+end)
+
+local function base_order_prefix(spec, defaults_spec)
+  local bucket = defaults_spec.enabled == false and "000" or "100"
+  return "b-" .. bucket .. "-" .. order_slug(spec.sort_name or spec.key) .. "-base-" .. spec.key
+end
 
 for _, spec in ipairs(base_extensions) do
   local defaults_spec = base_defaults[spec.key] or {}
@@ -303,7 +328,7 @@ for _, spec in ipairs(base_extensions) do
     end
   end
   local locale = {"technology-name."..spec.key}
-  local base_order = spec.order .. "-a"
+  local base_order = base_order_prefix(spec, defaults_spec)
   table.insert(settings_data, {
     type = "bool-setting",
     name = "mir-enable-"..spec.key,

@@ -28,8 +28,9 @@ Date: 2026-07-01
     - Character inventory slot research now also grants character logistic trash slots, replacing the separate trash slot generated technology while keeping the combined progression enabled by default.
     - Character reach bonus now uses the character mining speed pickaxe icon instead of the exoskeleton equipment icon.
     - Startup setting names and descriptions were rewritten with Factorio-style labels, clearer scanning, safer defaults, and explicit research unit time wording.
-    - Generated stream startup settings now follow the curated stream order instead of sorting primarily by raw stream key.
-    - Diagnostics startup settings now appear with the other one-off controls before the generated technology tunables.
+    - Technology tunable startup settings now sort by player-facing technology name instead of raw internal stream key.
+    - Default-disabled technology tunables now appear immediately after the one-off settings and before the enabled alphabetical technology list.
+    - Diagnostics startup settings now appear with the other one-off controls before the technology tunables.
     - Added dropdown option descriptions for science-pack policy, lab incompatibility policy, and weapon speed overlap cleanup settings.
     - Added opt-in warning text to default-off experimental and sandbox settings, including Spoilage Preservation, Agricultural Growth Speed, Cargo landing pad count, and Inserter capacity continuation.
     - Added a README settings guide for recommended default, vanilla-respectful, megabase, modpack compatibility, and debug/reporting setups.
