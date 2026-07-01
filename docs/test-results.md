@@ -26,7 +26,7 @@ Results:
 - Relaxed package validation so documentation and helper modules are not tied to fixed historical paths.
 - Package validation now keeps exact checks for load-critical Factorio entry files, locale baseline, metadata, migrations, forbidden artifacts, and archive root shape.
 - Package parity now recursively follows the current source tree for packaged directories: `docs/`, `control/`, `locale/`, `migrations/`, and `prototypes/`.
-- Package/source parity now compares file hashes, so text and binary files can both be validated without special cases.
+- Package/source parity now compares normalized text content for text files and SHA-256 hashes for binary files, so checkout line-ending policy does not create false CI failures.
 - Release documentation checks now search documentation content recursively instead of requiring specific release docs at fixed root paths.
 - Temporarily moved `docs/pre-manual-2.0.5-report.md` into a nested validation-test folder, rebuilt the package, and confirmed static validation still passed while the doc was nested.
 - Restored the documentation layout after the temporary move test and rebuilt the final archive.

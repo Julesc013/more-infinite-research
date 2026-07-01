@@ -565,6 +565,22 @@ Invoke-RepoCheck "release package archive matches metadata" {
     }
   }
 
+  function Normalize-TextForPackageComparison {
+    param([string]$Text)
+    return ($Text -replace "`r`n", "`n").TrimEnd()
+  }
+
+  function Test-PackageTextPath {
+    param([string]$RelativePath)
+    $extension = [System.IO.Path]::GetExtension($RelativePath).ToLowerInvariant()
+    if ($extension -in @(".cfg", ".json", ".lua", ".md", ".txt")) {
+      return $true
+    }
+
+    $fileName = [System.IO.Path]::GetFileName($RelativePath)
+    return $fileName -in @("LICENSE")
+  }
+
   $info = Get-Content -Raw (Join-Path $repo "info.json") | ConvertFrom-Json
   $packageName = "$($info.name)_$($info.version)"
   $zipPath = Join-Path $repo "dist\$packageName.zip"
@@ -670,10 +686,18 @@ Invoke-RepoCheck "release package archive matches metadata" {
         throw "Package is missing expected source file: $entryName"
       }
 
-      $repoHash = Get-FileSha256 -Path (Join-Path $repo $relative)
-      $zipHash = Get-ZipEntrySha256 -Entry $entry
-      if ($repoHash -ne $zipHash) {
-        throw "Package source file differs from repository source: $relative"
+      if (Test-PackageTextPath -RelativePath $relative) {
+        $repoText = Get-Content -Raw -LiteralPath (Join-Path $repo $relative)
+        $zipText = Read-ZipEntryText $entry
+        if ((Normalize-TextForPackageComparison $repoText) -ne (Normalize-TextForPackageComparison $zipText)) {
+          throw "Package source file differs from repository source: $relative"
+        }
+      } else {
+        $repoHash = Get-FileSha256 -Path (Join-Path $repo $relative)
+        $zipHash = Get-ZipEntrySha256 -Entry $entry
+        if ($repoHash -ne $zipHash) {
+          throw "Package source file differs from repository source: $relative"
+        }
       }
     }
   } finally {
