@@ -2,6 +2,26 @@
 
 This file records local release-candidate validation runs. It is not a substitute for the manual mod matrix in `docs/compatibility.md`.
 
+## 2026-07-01 Character Reach Icon
+
+Environment:
+
+- Mod version `2.0.5`.
+- Release archive: `dist/more-infinite-research_2.0.5.zip`.
+
+Commands:
+
+```powershell
+.\scripts\Build-MIRPackage.ps1
+.\scripts\Invoke-MIRValidation.ps1 -FactorioBin "C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe"
+```
+
+Results:
+
+- Character reach bonus now uses the same base picaxe technology icon texture as character mining speed.
+- Static/package validation passed after rebuilding the release archive.
+- Runtime fixture validation passed across twenty-three isolated scenarios.
+
 ## 2026-07-01 Spoilage Icon And Character Slot Merge
 
 Environment:

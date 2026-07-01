@@ -172,7 +172,8 @@ return {
   },
 
   research_character_reach = {
-    icon_item = "exoskeleton-equipment",
+    icon = "__base__/graphics/technology/steel-axe.png",
+    icon_size = 256,
     science_packs = {
       "utility-science-pack","military-science-pack","agricultural-science-pack",
       "cryogenic-science-pack"

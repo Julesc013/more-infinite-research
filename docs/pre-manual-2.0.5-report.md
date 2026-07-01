@@ -73,6 +73,7 @@ These are still worth doing before publishing the default-off `2.0.5` package:
 - `normal-mod-folder-load`: load `dist/more-infinite-research_2.0.5.zip` from a normal Factorio mods folder and confirm the game sees version `2.0.5`.
 - `vanilla-locale-icons`: base game without Space Age; confirm Electric Shooting Speed uses discharge defense art/description and flamethrower/electric descriptions display.
 - `fresh-space-age`: fresh Space Age save; confirm Electric Shooting Speed has both `electric` and `tesla` effects.
+- `character-reach-icon`: with Character reach bonus enabled, confirm it uses the character mining speed picaxe icon, not the exoskeleton equipment icon.
 - `merged-inventory-trash-ui`: confirm Character inventory slots shows both inventory-slot and logistic-trash-slot effects, and there is no separate Character logistic trash slots generated research.
 - `circuit-productivity-ownership`: base-only green/red/blue circuits are MIR-owned; Space Age green/red stay MIR-owned while processing unit stays vanilla-owned.
 - `quality-module-productivity`: with real Quality enabled, confirm module productivity includes quality module recipes.

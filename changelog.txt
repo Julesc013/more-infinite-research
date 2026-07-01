@@ -23,6 +23,7 @@ Date: 2026-07-01
     - Added disabled-by-default scripted candidate technologies for Spoilage Preservation and Agricultural Growth Speed. These are opt-in in v2.0.5 while save behavior and balance are being tested.
     - Added diagnostic-only native modifier overlap reporting for generated direct-effect technologies, so cargo/logistics modifier conflicts can be identified without changing generation behavior.
     - Character inventory slot research now also grants character logistic trash slots, replacing the separate trash slot generated technology while keeping the combined progression enabled by default.
+    - Character reach bonus now uses the character mining speed picaxe icon instead of the exoskeleton equipment icon.
 
   Compatibility:
 

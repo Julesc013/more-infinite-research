@@ -62,6 +62,7 @@ Done in the current development branch:
 - [x] Add a JSON migration from the old generated trash-slot technology ID into the combined inventory/trash technology ID.
 - [x] Add runtime validation for the merged inventory/trash effects and absence of the old stream diagnostics.
 - [x] Isolate runtime validation with its own Factorio config, write-data directory, and log path.
+- [x] Make Character reach bonus use the character mining speed picaxe icon.
 
 Important release note: the scripted runtime work above is a **default-off v2.0.5 ship candidate**, not automatically deferred to `v2.1.0`. Ship the opt-in implementation with conservative wording after the minimum smoke checks pass. Defer default enablement, presets, or stronger behavior claims until manual proof exists.
 
