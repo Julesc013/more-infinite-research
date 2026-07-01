@@ -45,6 +45,28 @@ Current control files:
 - `control/effects/spoilage-preservation.lua`: applies the global spoil-time multiplier from the highest completed MIR spoilage preservation level.
 - `control/effects/agricultural-growth-speed.lua`: shortens remaining growth time for newly planted agricultural tower plants.
 
+### Scripted Runtime Storage
+
+All runtime storage is namespaced below `storage.mir`.
+
+`storage.mir.scripted_techs` is reserved for manager-level state. It is currently initialized so future manager metadata has a stable namespace, but it does not store behavior state yet.
+
+`storage.mir.spoilage_preservation` stores:
+
+- `baseline`: the spoil-time modifier after removing MIR's last applied multiplier where possible.
+- `effective_level`: the highest completed spoilage preservation level across non-enemy/non-neutral forces.
+- `applied_multiplier`: MIR's actual multiplier after the final spoil-time value is clamped to Factorio's global range.
+- `last_applied_value`: the spoil-time modifier value MIR last wrote.
+
+Spoilage preservation recomputes from the stored baseline on init, configuration changes, research finish, research reversal, and technology-effect resets. If no non-enemy/non-neutral force has completed levels, the recomputed target is the baseline. If the stream is disabled or the technology disappears, MIR restores the baseline only when the current game value still matches the last value MIR wrote; otherwise it treats the current value as externally owned and records it as the new baseline.
+
+`storage.mir.agricultural_growth_speed.force_multipliers` stores one entry per non-enemy/non-neutral force:
+
+- `level`: completed agricultural growth speed levels for that force.
+- `multiplier`: the force's clamped growth multiplier.
+
+Agricultural growth speed refreshes this force state on init, configuration changes, research finish, research reversal, and technology-effect resets. The current `v2.0.5` candidate only applies the multiplier at `on_tower_planted_seed`; it does not rescan existing plants.
+
 ## Utility Modules
 
 `prototypes/util.lua` is a facade kept for compatibility with existing call sites. Domain logic lives in focused modules:

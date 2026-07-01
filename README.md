@@ -32,7 +32,7 @@ Compatibility note:
 - **Lab validation:** checks generated research ingredients against real labs so technologies stay researchable.
 - **Factorio 2.1 recipes:** supports recipe `categories` as well as legacy single `category`.
 - **Optional DLC:** keeps official DLC mods optional and gates DLC-shaped research behind concrete prototype checks.
-- **Scripted Space Age scaling:** bounded event-driven spoilage preservation and agricultural growth speed are `v2.0.5` ship candidates; public release claims require the named manual save matrix.
+- **Scripted Space Age scaling:** bounded event-driven spoilage preservation and agricultural growth speed are disabled-by-default `v2.0.5` ship candidates; public release claims require the named manual save matrix.
 - **Clean mod portal metadata:** keeps third-party compatibility-mod dependencies out of `info.json`.
 - **Save compatibility:** preserves existing generated prototype IDs. Scripted runtime storage is namespaced and must be validated before the scripted features are claimed as shipped.
 
@@ -60,7 +60,7 @@ The repository has **three permanent branches** on `origin`:
 Normal development should target **`dev`** first. Release-ready hotfixes can target **`main`**.
 Backports that must remain compatible with Factorio `2.0.x` belong on **`legacy`**.
 
-The next planned legacy release is **More Infinite Research `v1.9.0` for Factorio `2.0.x`**, intended as a compatibility port of the finished **More Infinite Research `v2.1.0` for Factorio `2.1.x`** codebase rather than a commit-by-commit rebuild of earlier releases. After that, quick feedback patches can follow the same pattern, for example **`v2.1.5 -> v1.9.5`**, with **`v1.9.9`** reserved as the final planned Factorio `2.0` port from the latest tested `2.x.x` current-line release at the Factorio `2.1` stable cutoff target around the end of March. Verify the actual Factorio stable status before publishing final-support wording.
+The next planned legacy release is **More Infinite Research `v1.9.0` for Factorio `2.0.x`**, intended as a compatibility port of the finished **More Infinite Research `v2.1.0` for Factorio `2.1.x`** codebase rather than a commit-by-commit rebuild of earlier releases. After that, quick feedback patches can follow the same pattern, for example **`v2.1.5 -> v1.9.5`**, with **`v1.9.9`** reserved as the final planned Factorio `2.0` port from the latest tested `2.x.x` current-line release when Factorio `2.1` becomes stable or when another verified upstream cutoff is chosen.
 
 See **`CONTRIBUTING.md`** for pull request expectations, branch routing, and validation commands.
 
@@ -200,12 +200,12 @@ These streams generate `change-recipe-productivity` effects for matching recipes
 
 These streams generate infinite technologies with direct Factorio technology modifiers or visible scripted-effect placeholders. Scripted effects are handled in `control.lua` and remain event-driven.
 
-The scripted streams are `v2.0.5` ship candidates. They should ship in `v2.0.5` only after manual save validation confirms existing-stack behavior, reversal, disabling, multi-force behavior, and the agricultural tower event path. Any part that fails proof moves to `v2.1.0` instead of blocking the quick patch.
+The scripted streams are disabled by default while they remain `v2.0.5` ship candidates. They should be enabled by default in `v2.0.5` only after manual save validation confirms existing-stack behavior, reversal, disabling, multi-force behavior, and the agricultural tower event path. Any part that fails proof moves to `v2.1.0` instead of blocking the quick patch.
 
 | Stream key | Research | Effect | Default | Gates and notes |
 | --- | --- | --- | --- | --- |
-| `research_spoilage_preservation` | Spoilage preservation | Scripted global spoil time modifier through a `nothing` technology effect | `+1%` spoil time per completed level, capped by Factorio's global spoil-time range | Requires Space Age, spoilage, and agricultural science. Uses the highest completed level across non-enemy/non-neutral forces. No inventory or item-stack scan. |
-| `research_agricultural_growth_speed` | Agricultural growth speed | Scripted `on_tower_planted_seed` adjustment of plant `tick_grown` through a `nothing` technology effect | `+1%` growth speed per completed level, capped at `10x` | Requires Space Age and agricultural science. Applies to newly planted agricultural tower plants in this first slice; existing farms are not globally rescanned. |
+| `research_spoilage_preservation` | Spoilage preservation | Scripted global spoil time modifier through a `nothing` technology effect | `+1%` spoil time per completed level, capped by Factorio's global spoil-time range | Disabled by default until manual validation is recorded. Requires Space Age, spoilage, and agricultural science. Uses the highest completed level across non-enemy/non-neutral forces. No inventory or item-stack scan. |
+| `research_agricultural_growth_speed` | Agricultural growth speed | Scripted `on_tower_planted_seed` adjustment of plant `tick_grown` through a `nothing` technology effect | `+1%` growth speed per completed level, capped at `10x` | Disabled by default until manual validation is recorded. Requires Space Age and agricultural science. Applies to newly planted agricultural tower plants in this first slice; existing farms are not globally rescanned. |
 | `research_cargo_bay_unloading_distance` | Cargo bay unloading distance | `max-cargo-bay-unloading-distance` | `+10` tiles per level | Requires Space Age plus the `landing-pad-unloading-bay` item and technology. Uses all official base and Space Age science packs, not modded science packs. Base cost `100000`, growth `3`, time `120`. |
 | `research_cargo_landing_pad_count` | Cargo landing pad count | `cargo-landing-pad-count` | `+1` landing pad per surface per level | Requires Space Age plus the `cargo-landing-pad` item and `rocket-silo` technology. Disabled by default. Uses all official base and Space Age science packs, not modded science packs. Base cost `1000000`, growth `10`, time `240`. |
 | `research_rocket_shooting_speed` | Rocket shooting speed | `gun-speed` for `rocket` ammo category | `+10%` speed per level | Base cost `60`, growth `1.5`. Uses a base-game rocketry icon. |
@@ -267,8 +267,8 @@ Per-stream default exceptions:
 | Stream | Enabled | Base cost | Growth | Time | Max |
 | --- | --- | --- | --- | --- | --- |
 | Shared stream default | Yes | `8000` | `2` | `60` | Infinite |
-| `research_spoilage_preservation` | Yes | `50000` | `1.5` | `120` | Infinite |
-| `research_agricultural_growth_speed` | Yes | `40000` | `1.5` | `90` | Infinite |
+| `research_spoilage_preservation` | No | `50000` | `1.5` | `120` | Infinite |
+| `research_agricultural_growth_speed` | No | `40000` | `1.5` | `90` | Infinite |
 | `research_inventory_capacity` | No | shared | `1.10` | shared | Infinite |
 | `research_character_trash_slots` | Yes | shared | `1.10` | shared | Infinite |
 | `research_robot_battery` | Yes | shared | `1.2` | shared | Infinite |

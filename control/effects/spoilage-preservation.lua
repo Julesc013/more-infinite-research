@@ -95,17 +95,20 @@ local function apply(log_debug)
   capture_or_rebase_baseline(data)
 
   local level = effective_level()
-  local multiplier = math.min(MAX_MODIFIER, PER_LEVEL ^ level)
-  local target = clamp((data.baseline or 1) * multiplier)
+  local baseline = data.baseline or 1
+  local requested_multiplier = PER_LEVEL ^ level
+  local target = clamp(baseline * requested_multiplier)
+  local applied_multiplier = baseline > 0 and (target / baseline) or 1
   game.difficulty_settings.spoil_time_modifier = target
 
   data.effective_level = level
-  data.applied_multiplier = multiplier
+  data.applied_multiplier = applied_multiplier
   data.last_applied_value = target
 
   if log_debug then
     log_debug("spoilage preservation applied level=" .. tostring(level)
-      .. " multiplier=" .. tostring(multiplier)
+      .. " requested_multiplier=" .. tostring(requested_multiplier)
+      .. " applied_multiplier=" .. tostring(applied_multiplier)
       .. " value=" .. tostring(target))
   end
 end

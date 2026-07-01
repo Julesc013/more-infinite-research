@@ -30,6 +30,7 @@ Done in the current development branch:
 - [x] Add agricultural growth speed scripted effect.
 - [x] Add visible `nothing` effects for scripted technologies.
 - [x] Add settings/defaults for the two scripted streams.
+- [x] Keep scripted spoilage and agriculture streams disabled by default until manual proof supports final release claims.
 - [x] Add runtime scripted-effect debug setting.
 - [x] Fix Electric Shooting Speed to include `tesla` ammo category.
 - [x] Keep `electric` ammo category coverage for discharge defense.
@@ -113,17 +114,17 @@ Important release note: the scripted runtime work above is a **v2.0.5 ship candi
 
 ### v2.0.5 Scripted-Tech Framework
 
-- [ ] Review `storage` layout for long-term stability and document every key in `docs/architecture.md`.
+- [x] Review `storage` layout for long-term stability and document every key in `docs/architecture.md`.
 - [ ] Confirm spoilage baseline capture cannot compound MIR's own multiplier across load/configuration cycles.
-- [ ] Decide whether research reversal should restore baseline immediately when no forces have levels.
+- [x] Decide whether research reversal should restore baseline immediately when no forces have levels.
 - [ ] Confirm behavior when another mod also writes `game.difficulty_settings.spoil_time_modifier`.
-- [ ] Store only MIR's own applied spoilage multiplier and remove/divide it out before recalculating when possible.
-- [ ] Handle `on_init`.
-- [ ] Handle `on_configuration_changed`.
-- [ ] Handle `on_research_finished`.
-- [ ] Handle `on_research_reversed`.
-- [ ] Handle `on_technology_effects_reset`.
-- [ ] Confirm static validation fails on accidental `on_tick` or `script.on_nth_tick`.
+- [x] Store only MIR's own applied spoilage multiplier and remove/divide it out before recalculating when possible.
+- [x] Handle `on_init`.
+- [x] Handle `on_configuration_changed`.
+- [x] Handle `on_research_finished`.
+- [x] Handle `on_research_reversed`.
+- [x] Handle `on_technology_effects_reset`.
+- [x] Confirm static validation fails on accidental `on_tick` or `script.on_nth_tick`.
 
 ### v2.0.5 Spoilage Preservation Manual Blockers
 
@@ -241,7 +242,7 @@ Do not reconstruct old releases commit-by-commit for `legacy`. A legacy release 
 
 ### v1.9.9 Final Factorio 2.0 Backport
 
-- [ ] At the Factorio `2.1` stable cutoff target around the end of March, identify the latest tested MIR `2.x.x` release.
+- [ ] When Factorio `2.1` becomes stable or another verified upstream cutoff is chosen, identify the latest tested MIR `2.x.x` release.
 - [ ] Backport that latest tested source snapshot to `legacy`.
 - [ ] Set the legacy mod version to `1.9.9`.
 - [ ] Treat `1.9.9` as the final planned Factorio `2.0` release.

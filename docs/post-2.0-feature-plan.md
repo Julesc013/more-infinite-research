@@ -17,7 +17,7 @@ v1.9.0 = Factorio 2.0 compatible subset backported from the tested v2.1.0 snapsh
 v2.1.5 = quick feedback patch after v2.1.0.
 v1.9.5 = Factorio 2.0 compatible subset backported from the tested v2.1.5 snapshot.
 v2.2.0 = next larger feature wave.
-v1.9.9 = final planned Factorio 2.0 backport from the latest tested v2.x.x snapshot at the Factorio 2.1 stable cutoff target around the end of March.
+v1.9.9 = final planned Factorio 2.0 backport from the latest tested v2.x.x snapshot when Factorio 2.1 becomes stable or another verified upstream cutoff is chosen.
 ```
 
 The scripted technology implementation exists in `dev` as a `v2.0.5` ship candidate. Public release claims should be made only for the specific behaviors proven by the manual save matrix. Anything that fails proof moves to `v2.1.0`.
@@ -821,7 +821,7 @@ The planned mapping is:
 ```text
 More Infinite Research v2.1.0 on Factorio 2.1.x -> More Infinite Research v1.9.0 on Factorio 2.0.x
 More Infinite Research v2.1.5 on Factorio 2.1.x -> More Infinite Research v1.9.5 on Factorio 2.0.x
-Latest tested MIR v2.x.x at the Factorio 2.1 stable cutoff target around the end of March -> final MIR v1.9.9 on Factorio 2.0.x
+Latest tested MIR v2.x.x when Factorio 2.1 becomes stable or another verified upstream cutoff is chosen -> final MIR v1.9.9 on Factorio 2.0.x
 ```
 
 Be careful with the backport promise. The current 2.1 path can use clean agricultural tower events, cargo landing pad APIs, and any new v2.1.0 prototype unlocks. The 2.0 line may not have those APIs.

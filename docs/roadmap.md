@@ -28,9 +28,9 @@ The manual test matrix gates individual features. If a `v2.0.5` candidate fails 
 | `2.1.5` | `2.1.x` | Quick feedback patch | small fixes and feedback from `2.1.0` |
 | `1.9.5` | `2.0.x` | Legacy port | compatible subset of the tested `2.1.5` snapshot |
 | `2.2.0` | `2.1.x` | Larger feature wave | next larger batch after the `2.1.x` feedback cycle |
-| `1.9.9` | `2.0.x` | Final legacy port | final Factorio 2.0 port from the latest tested `2.x.x` current-line release at the Factorio 2.1 stable cutoff target around the end of March |
+| `1.9.9` | `2.0.x` | Final legacy port | final Factorio 2.0 port from the latest tested `2.x.x` current-line release when Factorio 2.1 becomes stable or another verified upstream cutoff is chosen |
 
-The `1.9.9` date should be treated as a release cutoff target, not an API assumption. When planning the final legacy port, verify the actual Factorio 2.1 stable status and the exact latest MIR `2.x.x` source point.
+The `1.9.9` cutoff should be treated as a release trigger, not an API assumption. When planning the final legacy port, verify the actual Factorio 2.1 stable status and the exact latest MIR `2.x.x` source point.
 
 ## Current Baseline
 
@@ -388,4 +388,4 @@ Recommended order from here:
 6. Ship quick `v2.1.5` feedback fixes.
 7. Backport the tested `v2.1.5` snapshot as `v1.9.5`.
 8. Ship the next larger wave as `v2.2.0`.
-9. At the Factorio 2.1 stable cutoff, backport the latest tested MIR `2.x.x` release as final Factorio 2.0 build `v1.9.9`.
+9. When Factorio 2.1 becomes stable or another verified upstream cutoff is chosen, backport the latest tested MIR `2.x.x` release as final Factorio 2.0 build `v1.9.9`.

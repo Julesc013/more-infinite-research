@@ -6,6 +6,8 @@ This ledger records API claims that affect release planning. Use it to avoid tur
 
 Official Factorio API references should be rechecked before a release if the local Factorio version changes.
 
+Latest official API docs checked on 2026-07-01: `2.1.9`. Local runtime validation evidence in `docs/test-results.md` is still from Factorio `2.1.8`.
+
 ## Verified Or Locally Proven
 
 | Claim | Proof source | Status | Release impact |
@@ -59,3 +61,6 @@ Official Factorio API references should be rechecked before a release if the loc
 - `DifficultySettings`: <https://lua-api.factorio.com/latest/concepts/DifficultySettings.html>
 - `PumpPrototype`: <https://lua-api.factorio.com/latest/prototypes/PumpPrototype.html>
 - `FluidBox`: <https://lua-api.factorio.com/latest/types/FluidBox.html>
+- `LuaTechnology`: <https://lua-api.factorio.com/latest/classes/LuaTechnology.html>
+- `ModulePrototype`: <https://lua-api.factorio.com/latest/prototypes/ModulePrototype.html>
+- `Effect`: <https://lua-api.factorio.com/latest/types/Effect.html>

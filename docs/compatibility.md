@@ -11,7 +11,7 @@ Release-line summary:
 | `1.9.0` | `2.0.x` | compatible subset backported from the tested `2.1.0` snapshot |
 | `2.1.5` | `2.1.x` | quick feedback patch after `2.1.0` |
 | `1.9.5` | `2.0.x` | compatible subset backported from the tested `2.1.5` snapshot |
-| `1.9.9` | `2.0.x` | final planned Factorio 2.0 port from the latest tested `2.x.x` snapshot at the Factorio 2.1 stable cutoff target around the end of March |
+| `1.9.9` | `2.0.x` | final planned Factorio 2.0 port from the latest tested `2.x.x` snapshot when Factorio 2.1 becomes stable or another verified upstream cutoff is chosen |
 
 The release goal is graceful compatibility without mod-page dependency clutter: compatible mods should work when their prototypes are visible, absent mods should be skipped cleanly, and no compatibility mod should be required for this mod to load.
 
@@ -53,7 +53,7 @@ This is especially relevant for cargo landing pad count, cargo bay unloading dis
 
 ## Legacy Backport Model
 
-The planned Factorio `2.0` legacy release is More Infinite Research `v1.9.0`, backported from the finished More Infinite Research `v2.1.0` Factorio `2.1` codebase. Later quick patch backports can follow the same model, such as `v2.1.5 -> v1.9.5`, with `v1.9.9` reserved as the final planned Factorio `2.0` build from the latest tested `2.x.x` snapshot at the Factorio `2.1` stable cutoff target around the end of March. Verify the actual Factorio stable status before publishing final-support wording.
+The planned Factorio `2.0` legacy release is More Infinite Research `v1.9.0`, backported from the finished More Infinite Research `v2.1.0` Factorio `2.1` codebase. Later quick patch backports can follow the same model, such as `v2.1.5 -> v1.9.5`, with `v1.9.9` reserved as the final planned Factorio `2.0` build from the latest tested `2.x.x` snapshot when Factorio `2.1` becomes stable or another verified upstream cutoff is chosen.
 
 Legacy should not be rebuilt commit-by-commit from v2.0.0 or v2.0.5. It should be the current MIR generator, diagnostics, recipe matching, science-pack handling, compatibility cleanup, docs structure, locale, and validation infrastructure with Factorio `2.1`-only surface area removed or guarded.
 

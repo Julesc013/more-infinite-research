@@ -2,6 +2,39 @@
 
 This file records local release-candidate validation runs. It is not a substitute for the manual mod matrix in `docs/compatibility.md`.
 
+## 2026-07-01 Scripted Defaults And API Recheck
+
+Environment:
+
+- Factorio `2.1.8` build `86744`, Windows Steam, Space Age install.
+- Official latest API docs checked on 2026-07-01: `2.1.9`.
+- Mod version `2.0.5`.
+- Release archive: `dist/more-infinite-research_2.0.5.zip`.
+
+Commands:
+
+```powershell
+.\scripts\Build-MIRPackage.ps1
+.\scripts\Invoke-MIRValidation.ps1 -StaticOnly
+.\scripts\Invoke-MIRValidation.ps1 -FactorioBin "C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe"
+git diff --check
+# Separately: copy dist/more-infinite-research_2.0.5.zip into isolated temp mod folders and run
+# Factorio --create once with base only and once with Space Age/official DLC enabled.
+```
+
+Results:
+
+- Rebuilt the release archive after code and documentation changes.
+- Scripted spoilage preservation and agricultural growth speed are now disabled by default until manual save validation supports final release claims.
+- Spoilage preservation now stores MIR's actual applied multiplier after the clamped spoil-time value is written, so baseline rebase/restore logic is based on the effective multiplier rather than the requested multiplier.
+- Documented scripted runtime storage keys in `docs/architecture.md`.
+- Rechecked official latest API docs and filled the API proof ledger links. Local runtime fixture validation remains on Factorio `2.1.8`.
+- Static validation passed, including release metadata, hidden Quality ordering, locale parity, changelog format, package parity, required docs/control files, and the no-runtime-tick guard.
+- Runtime fixture validation passed across nineteen isolated scenarios.
+- The release zip loaded from isolated normal mod folders in both base-only and Space Age modes and created fresh saves.
+- `git diff --check` passed. Git reported line-ending normalization warnings only.
+- Manual gameplay validation is still not complete for spoilage existing stacks, spoilage reversal/disable behavior, multi-force behavior, normal UI save checks, and large Gleba farms.
+
 ## 2026-07-01 Generated Chain Integrity
 
 Environment:
