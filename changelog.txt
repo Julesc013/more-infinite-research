@@ -16,6 +16,7 @@ Date: 2026-07-01
     - Electric shooting speed now uses the vanilla discharge defense technology as its icon and prerequisite anchor so it does not fall back to a mining drill icon when Space Age is absent.
     - Added missing descriptions and modifier strings for flamethrower, electric, and Tesla shooting speed bonuses.
     - Mining drill productivity now covers Omega Drill style `omega-drill` and `omega-tau` recipes and broader modded `*-mining-drill` / `*-drill` outputs.
+    - Weapon shooting speed overlap adjustment now preserves finite vanilla rocket and cannon-shell shooting speed bonuses, including tank cannon fire rate from `weapon-shooting-speed-5` and `weapon-shooting-speed-6`.
     - Recipe productivity generation now skips recipes already owned by another infinite recipe-productivity technology.
     - Space Age vanilla productivity technologies for processing units, low density structures, plastic, and rocket fuel now stay authoritative instead of receiving parallel MIR duplicates.
     - Added the v2.0.5 candidate implementation of the scripted technology framework, spoilage preservation, and agricultural growth speed; final release claims depend on manual save validation.

@@ -35,7 +35,8 @@ local function strip_weapon_speed_effects()
   local strip_categories = strip_categories_for_mode()
   local techs = data.raw.technology or {}
   for name, tech in pairs(techs) do
-    if string.match(name, "^weapon%-shooting%-speed%-%d+$") and tech.effects then
+    local is_generated_continuation = tech.unit and tech.unit.count_formula
+    if string.match(name, "^weapon%-shooting%-speed%-%d+$") and tech.effects and is_generated_continuation then
       local filtered = {}
       for _, effect in ipairs(tech.effects) do
         if effect.type == "gun-speed" then

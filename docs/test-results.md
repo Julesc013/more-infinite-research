@@ -2,6 +2,31 @@
 
 This file records local release-candidate validation runs. It is not a substitute for the manual mod matrix in `docs/compatibility.md`.
 
+## 2026-07-01 Weapon Speed Safety And Quality Enrichment Triage
+
+Environment:
+
+- Factorio `2.1.8` build `86744`, Windows Steam, Space Age install.
+- Mod version `2.0.5`.
+- Release archive: `dist/more-infinite-research_2.0.5.zip`.
+
+Commands:
+
+```powershell
+.\scripts\Build-MIRPackage.ps1
+.\scripts\Invoke-MIRValidation.ps1 -StaticOnly
+.\scripts\Invoke-MIRValidation.ps1 -FactorioBin "C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe"
+git diff --check
+```
+
+Results:
+
+- Narrowed weapon shooting speed overlap adjustment so it only strips `rocket` and `cannon-shell` from MIR's generated `weapon-shooting-speed` continuation, not finite vanilla weapon shooting speed technologies.
+- Added `mir-fixture-assert-weapon-speed-safety`, which failed the load if finite vanilla `weapon-shooting-speed-5` or `weapon-shooting-speed-6` lost `cannon-shell` effects under the overlap setting.
+- Runtime fixture validation passed across fifteen isolated scenarios, including the new `weapon-speed-overlap-safety` scenario.
+- Documented quality module enrichment as a future spike/add-on candidate, not a `v2.0.5` quick patch. The local Quality prototypes store module quality chance in `effect.quality`, and the official modifier list does not expose a native technology modifier for increasing module quality chance.
+- Rebuilt the release archive after code, fixture, locale, and docs updates.
+
 ## 2026-07-01 GitHub Issue Fix Pass
 
 Environment:

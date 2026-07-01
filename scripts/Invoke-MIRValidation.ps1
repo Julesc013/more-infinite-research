@@ -156,6 +156,7 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
   $scienceText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\lib\science-packs.lua")
   $directEffectsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\streams\direct-effects.lua")
   $productivityText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\streams\productivity.lua")
+  $weaponSpeedText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\weapon-speed-adjustments.lua")
   $defaultsText = Get-Content -Raw -LiteralPath (Join-Path $repo "defaults.lua")
   $localeText = Get-Content -Raw -LiteralPath (Join-Path $repo "locale\en\more-infinite-research.cfg")
 
@@ -182,6 +183,7 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'technology-description.more-infinite-research.flamethrower_shooting_speed' },
     @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'ammo_category = "tesla", modifier = 0.1' },
     @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'ammo_category = "electric", modifier = 0.1' },
+    @{ File = "prototypes\weapon-speed-adjustments.lua"; Text = $weaponSpeedText; Snippet = 'tech.unit and tech.unit.count_formula' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = '[modifier-description]' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'cargo-landing-pad-count=Cargo landing pads per surface: +__1__' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'more-infinite-research.electric_shooting_speed=' },
@@ -536,7 +538,8 @@ $postMirAssertionFixtures = @(
   "mir-fixture-assert-lab-skip-policy",
   "mir-fixture-assert-base-extension-boundary",
   "mir-fixture-assert-cargo-logistics",
-  "mir-fixture-assert-omega-drill-productivity"
+  "mir-fixture-assert-omega-drill-productivity",
+  "mir-fixture-assert-weapon-speed-safety"
 )
 
 function Get-FixtureInfos {
@@ -636,6 +639,8 @@ function Initialize-RuntimeScenario {
     [switch]$LabPolicySkip,
     [ValidateSet("configured", "space", "space-and-promethium", "all-official", "all")]
     [string]$SciencePackIngredientPolicy = "configured",
+    [ValidateSet("", "off", "only-when-dedicated-tech-enabled", "always")]
+    [string]$WeaponSpeedAdjustmentMode = "",
     [switch]$RequireSpaceGate,
     [switch]$EnableSpaceAge
   )
@@ -678,6 +683,9 @@ function Initialize-RuntimeScenario {
   }
   if ($SciencePackIngredientPolicy -ne "configured") {
     Set-CopiedSciencePackIngredientPolicy -ModsDir $modsDir -Policy $SciencePackIngredientPolicy
+  }
+  if (-not [string]::IsNullOrWhiteSpace($WeaponSpeedAdjustmentMode)) {
+    Set-CopiedStartupSettingDefault -ModsDir $modsDir -Name "mir-adjust-vanilla-weapon-speed-techs" -ValueLiteral "`"$WeaponSpeedAdjustmentMode`""
   }
   if ($RequireSpaceGate) {
     Set-CopiedRequireSpaceGate -ModsDir $modsDir
@@ -741,6 +749,8 @@ function Invoke-RuntimeScenario {
     [switch]$LabPolicySkip,
     [ValidateSet("configured", "space", "space-and-promethium", "all-official", "all")]
     [string]$SciencePackIngredientPolicy = "configured",
+    [ValidateSet("", "off", "only-when-dedicated-tech-enabled", "always")]
+    [string]$WeaponSpeedAdjustmentMode = "",
     [switch]$RequireSpaceGate,
     [switch]$EnableSpaceAge
   )
@@ -751,6 +761,7 @@ function Invoke-RuntimeScenario {
     -EnabledStreamKeys $EnabledStreamKeys `
     -LabPolicySkip:$LabPolicySkip `
     -SciencePackIngredientPolicy $SciencePackIngredientPolicy `
+    -WeaponSpeedAdjustmentMode $WeaponSpeedAdjustmentMode `
     -RequireSpaceGate:$RequireSpaceGate `
     -EnableSpaceAge:$EnableSpaceAge
   if (Test-Path -LiteralPath $scenario.SavePath) {
@@ -921,6 +932,12 @@ Invoke-RuntimeScenario -ScenarioName "base-extension-boundary-policy" -EnabledFi
 $baseExtensionBoundaryLine = Get-LastExtensionReportLine -Key "research-speed"
 Assert-ReportLineGenerated -Line $baseExtensionBoundaryLine -Context "Base extension boundary scenario"
 Assert-ReportLineContains -Line $baseExtensionBoundaryLine -Expected "mir-fixture-science-pack" -Context "Base extension boundary scenario"
+
+Invoke-RuntimeScenario -ScenarioName "weapon-speed-overlap-safety" -EnabledFixtureNames @(
+  "mir-fixture-assert-weapon-speed-safety"
+) -WeaponSpeedAdjustmentMode "only-when-dedicated-tech-enabled"
+$weaponSpeedLine = Get-LastExtensionReportLine -Key "weapon-shooting-speed"
+Assert-ReportLineGenerated -Line $weaponSpeedLine -Context "Weapon shooting speed overlap safety scenario"
 
 Invoke-RuntimeScenario -ScenarioName "omega-drill-productivity" -EnabledFixtureNames @(
   "mir-fixture-omega-drill",

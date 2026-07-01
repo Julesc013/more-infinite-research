@@ -36,6 +36,7 @@ The release goal is graceful compatibility without mod-page dependency clutter: 
 - Compatibility cleanup that removes known competing technologies also removes dangling prerequisite references from remaining technologies.
 - Generic competing recipe-productivity cleanup removes only known infinite technologies whose recipe-productivity effects are all covered by generated MIR effects. Finite upgrade chains from other mods are left alone unless a future integration models them explicitly.
 - Release metadata declares optional ordering for official DLC mods and a hidden optional ordering dependency on Quality so quality module recipes are visible before module productivity is generated. Third-party compatibility remains opportunistic and avoids compatibility-mod dependencies.
+- Weapon shooting speed overlap handling only removes rocket and cannon-shell speed effects from MIR's generated weapon shooting speed continuation. Finite vanilla weapon shooting speed technologies keep their original rocket and cannon-shell bonuses so tank cannon fire rate is not reduced.
 - `mir-debug-generation-report` can be enabled to capture why each stream or base extension generated or skipped.
 - `mir-debug-recipe-matches` can be enabled to capture matched recipe names per stream and duplicate recipe matches across streams.
 
@@ -146,7 +147,7 @@ For each case, verify:
 - At least one lab accepts each generated technology's full science-pack set.
 - Base-only runs do not load direct DLC asset paths.
 - Logs show skipped or reduced streams clearly and do not show stack traces.
-- Vanilla weapon shooting speed effects follow the configured startup setting.
+- Finite vanilla weapon shooting speed effects are preserved even when the overlap adjustment setting is enabled. The setting only affects MIR's generated continuation.
 
 For named manual save scenarios and release-specific manual tests, see `docs/manual-test-plan.md`.
 
@@ -171,7 +172,7 @@ Set `$env:FACTORIO_LOG` or pass `-FactorioLog` when the Factorio log is not at t
 
 The runtime check copies this repo and the fixture mods into isolated temporary user-data mod directories, adds test-only dependencies from the copied mod to the fixture mods for deterministic load order, writes fixture `mod-list.json` files, and asks Factorio to create saves. It is intentionally a load/prototype validation harness, not a gameplay test.
 
-The runtime fixture run enables the generation diagnostics report in the copied mod and covers both lab incompatibility policies. The default `reduce` scenario asserts that science-pack productivity generated with the custom item-based fixture science pack included. The `skip` scenario forces the copied setting default to `skip` and asserts that the intentionally incompatible science-pack productivity stream is skipped instead of reduced. Additional runtime scenarios force the science-pack ingredient policies, require the end-game prerequisite gate, force-enable cargo landing pad count without Space Age to prove the stream skips on the Space Age mod gate, assert Space Age cargo logistics effect shape when cargo landing pad count is enabled, add a fixture finite vanilla-chain level before MIR to prove existing levels are preserved while MIR extends after them, and assert Omega-style drill recipes receive mining drill productivity. The expected Factorio log file is part of the validation evidence; if it is missing, runtime validation fails.
+The runtime fixture run enables the generation diagnostics report in the copied mod and covers both lab incompatibility policies. The default `reduce` scenario asserts that science-pack productivity generated with the custom item-based fixture science pack included. The `skip` scenario forces the copied setting default to `skip` and asserts that the intentionally incompatible science-pack productivity stream is skipped instead of reduced. Additional runtime scenarios force the science-pack ingredient policies, require the end-game prerequisite gate, force-enable cargo landing pad count without Space Age to prove the stream skips on the Space Age mod gate, assert Space Age cargo logistics effect shape when cargo landing pad count is enabled, add a fixture finite vanilla-chain level before MIR to prove existing levels are preserved while MIR extends after them, assert weapon shooting speed overlap handling preserves finite vanilla tank cannon speed, and assert Omega-style drill recipes receive mining drill productivity. The expected Factorio log file is part of the validation evidence; if it is missing, runtime validation fails.
 
 Static validation requires the committed release zip at `dist/<name>_<version>.zip` based on `info.json`. The package must use the matching `<name>_<version>/` root, contain matching `info.json` metadata, include locale, documentation, top-level data-stage and control-stage files, core prototype modules, match the repository contents for key source, documentation, and locale files, and avoid build, fixture, script, Git, and temporary/editor artifacts.
 
@@ -240,6 +241,17 @@ Create a local test mod pair that:
 
 Expected result: Omega Drill style recipes and broader visible modded `*-drill` / `*-mining-drill` outputs are covered by mining drill productivity.
 
+### Weapon Speed Safety Fixture
+
+Create a local test mod that:
+
+- Runs after More Infinite Research.
+- Enables the weapon-speed overlap adjustment scenario.
+- Fails loading if finite vanilla `weapon-shooting-speed-5` or `weapon-shooting-speed-6` loses `cannon-shell` speed effects.
+- Fails loading if MIR's generated weapon shooting speed continuation keeps `rocket` or `cannon-shell` overlap effects when the dedicated replacement techs are active.
+
+Expected result: vanilla tank cannon fire rate is preserved while MIR avoids duplicate infinite rocket/cannon-shell speed scaling in its generated continuation.
+
 ## Release Checklist
 
 - Run `.\scripts\Build-MIRPackage.ps1` to refresh the versioned zip in `dist/`.
@@ -254,6 +266,7 @@ Expected result: Omega Drill style recipes and broader visible modded `*-drill` 
 - Confirm runtime fixture validation covers `configured`, `space`, `space-and-promethium`, `all-official`, and `all` science-pack ingredient policies, the end-game prerequisite gate, and the base-only cargo landing pad count skip.
 - Confirm runtime fixture validation covers Space Age cargo logistics effect types, modifiers, costs, research times, prerequisites, and official science-pack ingredients.
 - Confirm runtime fixture validation covers preserving an existing finite vanilla-chain level before adding MIR's generated infinite continuation.
+- Confirm runtime fixture validation covers preserving finite vanilla weapon shooting speed cannon-shell effects under MIR's overlap setting.
 - Confirm runtime fixture validation covers Omega-style drill recipe productivity.
 - Load Factorio with the manual matrix above.
 - Confirm `changelog.txt` has the release version and date.

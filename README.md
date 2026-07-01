@@ -72,7 +72,7 @@ More Infinite Research generates prototypes in **`data-final-fixes.lua`**:
 2. **Known competing recipe-productivity cleanup** based on actual generated MIR effects.
 3. **Known competing base-extension cleanup** when MIR's matching base extension is enabled.
 4. **Base technology infinite extensions.**
-5. **Optional vanilla weapon shooting speed adjustment.**
+5. **Optional weapon shooting speed overlap adjustment.**
 6. **Max-level enforcement.**
 7. **Optional diagnostics report flush.**
 
@@ -244,7 +244,7 @@ All settings are **startup settings**.
 | `ips-require-space-gate` | bool | `false` | Adds the end-game science unlock as a prerequisite without changing science-pack ingredients. Uses promethium science in Space Age when available, otherwise space science. |
 | `mir-science-pack-ingredient-policy` | string | `configured` | Controls extra science packs added to every generated technology. Allowed values: `configured`, `space`, `space-and-promethium`, `all-official`, `all`. |
 | `mir-prefer-this-mod-for-competing-techs` | bool | `true` | Lets MIR remove selected competing infinite technologies when MIR has generated or will generate matching replacement behavior. Disable to keep competing technologies from other mods. |
-| `mir-adjust-vanilla-weapon-speed-techs` | string | `off` | Controls whether MIR removes rocket and cannon-shell speed bonuses from vanilla weapon shooting speed technologies. Allowed values: `off`, `only-when-dedicated-tech-enabled`, `always`. |
+| `mir-adjust-vanilla-weapon-speed-techs` | string | `off` | Controls whether MIR removes rocket and cannon-shell speed bonuses from MIR's generated weapon shooting speed continuation. Finite vanilla weapon shooting speed technologies keep their original tank cannon and rocket bonuses. Allowed values: `off`, `only-when-dedicated-tech-enabled`, `always`. |
 | `mir-debug-generation-report` | bool | `false` | Writes structured generated/skipped rows to the Factorio log, including science packs, prerequisites, effect counts, lab compatibility, and icon source. |
 | `mir-debug-recipe-matches` | bool | `false` | Writes matched recipe names for each generated productivity stream. Useful for mod compatibility reports, but noisy in large mod packs. |
 | `mir-debug-scripted-effects` | bool | `false` | Writes runtime log entries when scripted technologies recompute global or event-driven effects. |
@@ -353,7 +353,7 @@ Generic competing recipe-productivity cleanup is intentionally limited to **know
 | `prototypes/config.lua` | Assembles shared config and stream table. |
 | `prototypes/tech-gen.lua` | Generates stream technologies. |
 | `prototypes/base-tech-extensions.lua` | Extends finite vanilla technology chains. |
-| `prototypes/weapon-speed-adjustments.lua` | Optionally removes vanilla rocket/cannon-shell speed bonuses. |
+| `prototypes/weapon-speed-adjustments.lua` | Optionally removes rocket/cannon-shell overlap from MIR's generated weapon speed continuation while preserving finite vanilla bonuses. |
 | `prototypes/max-level-control.lua` | Applies stream max levels after generation. |
 | `prototypes/diagnostics.lua` | Structured generation report logging. |
 | `prototypes/streams/productivity.lua` | Recipe-productivity stream definitions. |

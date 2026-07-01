@@ -14,7 +14,7 @@ More Infinite Research is organized around a compatibility-first data-stage pipe
 2. Known competing recipe-productivity cleanup based on actual generated MIR effects.
 3. Known competing base-extension cleanup when MIR's matching base extension is enabled.
 4. Base technology infinite extensions.
-5. Vanilla weapon speed adjustment.
+5. Weapon speed overlap adjustment for generated continuations.
 6. Max-level enforcement.
 7. Optional diagnostics report flush.
 
@@ -85,6 +85,8 @@ Profile patches should use append fields such as `append_items`, `append_item_pa
 
 Profiles are applied from `settings.lua` as well as the data stage, so profile entries must stay declarative. Do not inspect `data.raw` from profiles; prototype-dependent compatibility belongs in `data-updates.lua` or `data-final-fixes.lua`.
 
+Weapon-speed overlap handling is intentionally narrower than general compatibility cleanup. MIR may remove rocket and cannon-shell speed effects from its own generated `weapon-shooting-speed` continuation when dedicated replacement speed techs are active, but it must not remove those effects from finite vanilla `weapon-shooting-speed-*` technologies. Those finite vanilla levels contain tank cannon fire-rate bonuses.
+
 ## Diagnostics
 
 `mir-debug-generation-report` enables a structured log report. The report records generated and skipped streams/extensions with:
@@ -125,7 +127,7 @@ Static validation also checks Factorio changelog formatting, including the requi
 
 Static validation rejects runtime tick handlers in `control.lua` and `control/**/*.lua`.
 
-The fixture mods under `fixtures/` test item-based science packs, custom labs, late recipe creation, the default `reduce` lab incompatibility behavior, the `skip` lab incompatibility behavior, science-pack ingredient policy modes, the end-game prerequisite gate, base-only cargo skip behavior, Space Age cargo logistics effect shape, finite vanilla-chain preservation, Omega-style drill productivity matching, and post-MIR assertions for runtime-sensitive generated technologies.
+The fixture mods under `fixtures/` test item-based science packs, custom labs, late recipe creation, the default `reduce` lab incompatibility behavior, the `skip` lab incompatibility behavior, science-pack ingredient policy modes, the end-game prerequisite gate, base-only cargo skip behavior, Space Age cargo logistics effect shape, finite vanilla-chain preservation, weapon-speed overlap safety, Omega-style drill productivity matching, and post-MIR assertions for runtime-sensitive generated technologies.
 
 Scripted technology validation must add existing-save load tests, research-finish/reversal tests, existing spoilable-stack tests, multi-force tests, and checks that the new effects remain event-driven rather than tick-scanned.
 

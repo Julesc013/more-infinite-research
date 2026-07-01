@@ -565,6 +565,8 @@ If `change-recipe-productivity` applies cleanly to fluid-output recipes, add str
 
 This is interesting but not clean as true infinite runtime research. Quality is mostly prototype-defined through module effects and quality prototype fields.
 
+Recent request: "quality module enrichment" where each research level adds about `+0.1%`, `+0.2%`, and `+0.25%` quality chance to quality module tiers 1/2/3, doubling vanilla modules around level 10.
+
 Better options:
 
 | Option | Fit |
@@ -574,7 +576,7 @@ Better options:
 | Infinite tech that changes module behavior at runtime | Avoid |
 | Infinite tech that unlocks finite module tiers every N levels | Awkward; finite prototypes only |
 
-Do not add this to v2.1.0. Consider a later optional Advanced Quality Research add-on.
+Do not add this to v2.0.5. Treat it as a v2.1.x spike or later optional Advanced Quality Research add-on unless Factorio adds a native module-effect technology modifier. A prototype-stage startup setting could boost quality module effects, but that would not be research and should not be presented as More Infinite Research core behavior.
 
 ### Quality-Based Spoilage Preservation
 

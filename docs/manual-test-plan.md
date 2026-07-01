@@ -21,6 +21,7 @@ Required before publishing `v2.0.5`:
 | `vanilla-locale-icons` | Base game without Space Age; confirm electric shooting speed uses discharge defense art/description and flamethrower/electric modifier descriptions are present |
 | `quality-module-productivity` | Quality enabled; confirm module productivity includes quality module recipes after hidden Quality load ordering |
 | `omega-drill-productivity` | Omega Drill or Omega-style fixture enabled; confirm mining drill productivity includes Omega-style drill recipes |
+| `tank-uranium-shell-speed` | Confirm tank cannon fire rate with uranium shells is not lower than vanilla after finite vanilla `weapon-shooting-speed-5/6` research |
 | `fresh-space-age` | Fresh Space Age save with no other mods except MIR |
 | `existing-mir-2.0-save` | Existing MIR save upgraded to the release candidate |
 | `spoilage-existing-stacks` | Spoilable items already on belts, in chests, in labs, in rockets/platform inventories, and partially spoiled stacks |
@@ -64,6 +65,7 @@ Use throwaway saves or fixtures. Do not promote to release features until the re
 | `high-throughput-pump` | Validate prototype, recipe, power draw, balance, and throughput |
 | `pipeline-extent` | Validate startup prototype mutation and compatibility risk |
 | `quality-odds` | Determine whether any clean non-runtime-hack path exists |
+| `quality-module-enrichment` | Determine whether quality module effect boosts belong as finite prototype tiers, a startup setting, or a companion add-on |
 | `roboport-range` | Determine whether a native modifier exists or a prototype tier is required |
 
 ## Legacy Backports

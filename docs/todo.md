@@ -37,6 +37,7 @@ Done in the current development branch:
 - [x] Add missing shooting-speed descriptions for flamethrower, electric, and Tesla modifiers.
 - [x] Add hidden optional Quality load ordering for module productivity.
 - [x] Add Omega Drill style mining drill productivity matching.
+- [x] Preserve finite vanilla rocket and cannon-shell weapon shooting speed bonuses when MIR overlap handling is enabled.
 - [x] Detect and skip recipe productivity already owned by another infinite recipe-productivity technology.
 - [x] Confirm Space Age vanilla owns processing unit, low density structure, plastic, and rocket fuel infinite productivity chains.
 - [x] Rebuild `dist/more-infinite-research_2.0.5.zip`.
@@ -59,6 +60,7 @@ Important release note: the scripted runtime work above is a **v2.0.5 ship candi
 - [x] Quality is a hidden optional load-order dependency so module productivity can see quality module recipes.
 - [x] Mining drill productivity covers Omega Drill style `omega-drill` and `omega-tau` recipes through validation fixtures.
 - [x] Mining drill productivity covers broader visible modded `*-mining-drill` / `*-drill` outputs in the high-tier bucket.
+- [x] Weapon shooting speed overlap handling preserves finite vanilla tank cannon speed bonuses.
 - [x] Vanilla Space Age `processing-unit-productivity` remains authoritative.
 - [x] Vanilla Space Age `low-density-structure-productivity` remains authoritative.
 - [x] Vanilla Space Age `plastic-bar-productivity` remains authoritative.
@@ -271,6 +273,7 @@ These are intentionally not `v2.0.5` or `v2.1.0` MIR core work.
 - [ ] Cold Chain / CryoPants: freezer chest, freeze/thaw recipes, refrigerated transport, freshness penalty.
 - [ ] Advanced Agriculture: greenhouse, off-world fruit, heating constraints, artificial soil loops.
 - [ ] Advanced Quality Research: higher quality module tiers, quality odds tuning, quality-based spoilage.
+- [ ] Quality module enrichment research: prototype/module-tier spike only; do not implement as runtime module mutation in core MIR.
 - [ ] Space Platform Engines: efficient thruster, high-thrust thruster, related platform entities.
 - [ ] Bio Resource Experiments: super-bacteria, biter egg accelerator, reverse spoilage challenges.
 - [ ] More Infinite Logistics companion decision: split if pump/pipeline/entity unlocks grow beyond MIR's research-scaling identity.
