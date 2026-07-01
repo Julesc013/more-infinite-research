@@ -2,6 +2,31 @@
 
 This file records local release-candidate validation runs. It is not a substitute for the manual mod matrix in `docs/compatibility.md`.
 
+## 2026-07-01 Final Smoke Plan Guard
+
+Environment:
+
+- Factorio `2.1.8` build `86744`, Windows Steam, Space Age install.
+- Mod version `2.0.5`.
+- Release archive: `dist/more-infinite-research_2.0.5.zip`.
+
+Commands:
+
+```powershell
+.\scripts\Build-MIRPackage.ps1
+.\scripts\Invoke-MIRValidation.ps1 -StaticOnly
+.\scripts\Invoke-MIRValidation.ps1 -FactorioBin "C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe"
+```
+
+Results:
+
+- Added `character-reach-icon` and `merged-inventory-trash-ui` to the canonical manual `v2.0.5` smoke plan.
+- Added static validation that required final manual scenario names stay present in `docs/manual-test-plan.md`.
+- Added static validation that required API proof links stay present in `docs/api-proof-points.md`, and that the API link list does not contain empty link entries.
+- GitHub issue #5 was rechecked through the GitHub API and was already closed as completed.
+- Static/package validation passed after rebuilding the release archive.
+- Runtime fixture validation passed across twenty-three isolated scenarios.
+
 ## 2026-07-01 Electric Shooting Speed Space Age Icon
 
 Environment:

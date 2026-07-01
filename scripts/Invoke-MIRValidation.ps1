@@ -302,6 +302,33 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
   }
 }
 
+Invoke-RepoCheck "release documentation lists final manual and API checks" {
+  $apiProofText = Get-Content -Raw -LiteralPath (Join-Path $repo "docs\api-proof-points.md")
+  $manualPlanText = Get-Content -Raw -LiteralPath (Join-Path $repo "docs\manual-test-plan.md")
+
+  $requiredDocSnippets = @(
+    @{ File = "docs\manual-test-plan.md"; Text = $manualPlanText; Snippet = '`character-reach-icon`' },
+    @{ File = "docs\manual-test-plan.md"; Text = $manualPlanText; Snippet = '`merged-inventory-trash-ui`' },
+    @{ File = "docs\api-proof-points.md"; Text = $apiProofText; Snippet = 'Mod structure: <https://lua-api.factorio.com/latest/auxiliary/mod-structure.html>' },
+    @{ File = "docs\api-proof-points.md"; Text = $apiProofText; Snippet = 'Modifier list: <https://lua-api.factorio.com/latest/types/Modifier.html>' },
+    @{ File = "docs\api-proof-points.md"; Text = $apiProofText; Snippet = '`NothingModifier`: <https://lua-api.factorio.com/latest/types/NothingModifier.html>' },
+    @{ File = "docs\api-proof-points.md"; Text = $apiProofText; Snippet = '`DifficultySettings`: <https://lua-api.factorio.com/latest/concepts/DifficultySettings.html>' },
+    @{ File = "docs\api-proof-points.md"; Text = $apiProofText; Snippet = '`LuaEntity`: <https://lua-api.factorio.com/latest/classes/LuaEntity.html>' }
+  )
+
+  foreach ($check in $requiredDocSnippets) {
+    if (-not $check.Text.Contains($check.Snippet)) {
+      throw "Missing required release documentation entry in $($check.File): $($check.Snippet)"
+    }
+  }
+
+  foreach ($line in ($apiProofText -split "`r?`n")) {
+    if ($line -match '^- .+:\s*$') {
+      throw "docs\api-proof-points.md contains an empty API link entry: $line"
+    }
+  }
+}
+
 Invoke-RepoCheck "changelog uses Factorio changelog format" {
   $separator = "-" * 99
   $path = Join-Path $repo "changelog.txt"

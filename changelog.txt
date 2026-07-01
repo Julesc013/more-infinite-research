@@ -8,6 +8,8 @@ Date: 2026-07-01
     - Documented v2.0.5 as the quick feedback patch for small/easy changes and v2.1.0 as the next larger feature wave.
     - Added an API proof ledger for current Factorio API claims and unknowns that require in-game verification.
     - Added a named manual test plan for v2.0.5 quick-patch validation, v2.1.0 larger feature validation, v2.1.x spikes, and the later Factorio 2.0 legacy backports.
+    - Added final manual smoke checks for Character reach icon art and the merged character inventory/trash-slot technology UI.
+    - Added release validation coverage so required API proof links and final manual smoke-check scenario names stay present in the packaged docs.
     - Added branch-aware validation guardrails for the planned v1.9.x legacy backports.
     - Added static validation that rejects runtime tick handlers in control-stage Lua files.
     - Added validation that the changelog contains an entry for the current info.json version.
