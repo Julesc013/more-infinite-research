@@ -51,6 +51,10 @@ Done in the current development branch:
 - [x] Run static/package/runtime fixture validation on Factorio 2.1.8.
 - [x] Add branch-aware legacy validation guardrails.
 - [x] Add static no-`on_tick` validation guard.
+- [x] Add static default-off validation for scripted `v2.0.5` candidates.
+- [x] Add runtime fixture checks for force-enabled scripted candidate generation and base-only skip behavior.
+- [x] Fix runtime validation temp-copy behavior so fixture scenarios copy package source instead of the whole Git repository.
+- [x] Add `docs/pre-manual-2.0.5-report.md`.
 
 Important release note: the scripted runtime work above is a **v2.0.5 ship candidate**, not automatically deferred to `v2.1.0`. Ship the parts that pass manual proof. Defer only the specific feature or behavior that fails proof or becomes too large for a quick patch.
 
@@ -91,6 +95,7 @@ Important release note: the scripted runtime work above is a **v2.0.5 ship candi
 - [ ] `docs/todo.md` is included in the package.
 - [ ] `docs/api-proof-points.md` is included in the package.
 - [ ] `docs/manual-test-plan.md` is included in the package.
+- [ ] `docs/pre-manual-2.0.5-report.md` is included in the package.
 - [ ] README, docs, changelog, and package agree on release scope.
 - [ ] Runtime feature claims are backed by manual/runtime validation.
 - [ ] `dist/more-infinite-research_2.0.5.zip` is rebuilt from committed source.

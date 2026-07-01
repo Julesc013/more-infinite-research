@@ -8,6 +8,8 @@ This document defines named manual saves and scenarios. Runtime fixture validati
 
 Use these scenario names in `docs/test-results.md` so release evidence is comparable across runs.
 
+For the current `v2.0.5` pre-manual status, see `docs/pre-manual-2.0.5-report.md`.
+
 ## v2.0.5 Quick Feedback Patch
 
 Required before publishing `v2.0.5`:

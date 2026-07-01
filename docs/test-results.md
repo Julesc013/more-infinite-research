@@ -2,6 +2,39 @@
 
 This file records local release-candidate validation runs. It is not a substitute for the manual mod matrix in `docs/compatibility.md`.
 
+## 2026-07-01 Pre-Manual Hardening And Harness Repair
+
+Environment:
+
+- Factorio `2.1.8` build `86744`, Windows Steam, Space Age install.
+- Official latest API docs checked on 2026-07-01: `2.1.9`.
+- Mod version `2.0.5`.
+- Release archive: `dist/more-infinite-research_2.0.5.zip`.
+
+Commands:
+
+```powershell
+.\scripts\Build-MIRPackage.ps1
+.\scripts\Invoke-MIRValidation.ps1 -StaticOnly
+.\scripts\Invoke-MIRValidation.ps1 -FactorioBin "C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe"
+git diff --check
+# Separately: load dist/more-infinite-research_2.0.5.zip from isolated base-only and Space Age mod folders.
+```
+
+Results:
+
+- Added `docs/pre-manual-2.0.5-report.md` with the manual test checklist, not-ready list, and Lua API practice check.
+- Static validation now requires scripted spoilage preservation and agricultural growth speed to remain default-off until manual proof is recorded.
+- Runtime fixture validation now force-enables both scripted candidate streams in base-only and Space Age scenarios. Base-only must skip them for missing Space Age; Space Age must generate each with one visible `nothing` effect.
+- Fixed the runtime validation harness so it copies only package/source files into isolated Factorio mod folders instead of recursively copying the entire Git repository.
+- Successful runtime validation runs now clean the generated temp user-data directory.
+- Spoilage preservation now resets stored `effective_level` when MIR restores or stops applying its multiplier.
+- Static validation passed.
+- Runtime fixture validation passed across twenty-one isolated scenarios.
+- The release zip loaded from isolated base-only and Space Age mod folders and created fresh saves.
+- `git diff --check` passed. Git reported line-ending normalization warnings only.
+- Manual gameplay validation remains required before enabling scripted streams by default or making measured spoilage/agriculture release claims.
+
 ## 2026-07-01 Scripted Defaults And API Recheck
 
 Environment:

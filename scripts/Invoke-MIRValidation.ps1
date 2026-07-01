@@ -145,6 +145,15 @@ Invoke-RepoCheck "control runtime avoids tick handlers" {
   }
 }
 
+Invoke-RepoCheck "scripted candidate streams remain default-off before manual proof" {
+  $defaultsText = Get-Content -Raw -LiteralPath (Join-Path $repo "defaults.lua")
+  foreach ($streamKey in @("research_spoilage_preservation", "research_agricultural_growth_speed")) {
+    if ($defaultsText -notmatch "(?s)$streamKey\s*=\s*\{.*?enabled\s*=\s*false") {
+      throw "Scripted candidate stream $streamKey must remain disabled by default until manual save validation supports release claims."
+    }
+  }
+}
+
 Invoke-RepoCheck "locale files match English fallback" {
   & (Join-Path $repo "scripts\Test-MIRLocales.ps1") -AllowMissingSupportedLanguages
 }
@@ -388,6 +397,7 @@ Invoke-RepoCheck "release package archive matches metadata" {
       "${root}docs/api-proof-points.md",
       "${root}docs/compatibility.md",
       "${root}docs/manual-test-plan.md",
+      "${root}docs/pre-manual-2.0.5-report.md",
       "${root}docs/todo.md",
       "${root}prototypes/tech-gen.lua",
       "${root}prototypes/base-tech-extensions.lua",
@@ -515,7 +525,8 @@ if (-not (Test-Path -LiteralPath $FactorioBin)) {
   throw "Factorio binary not found: $FactorioBin"
 }
 
-if ([string]::IsNullOrWhiteSpace($UserDataDir)) {
+$usesGeneratedUserDataDir = [string]::IsNullOrWhiteSpace($UserDataDir)
+if ($usesGeneratedUserDataDir) {
   $UserDataDir = Join-Path ([System.IO.Path]::GetTempPath()) ("mir-factorio-userdata-" + [guid]::NewGuid().ToString("N"))
 }
 $validationRoot = (New-Item -ItemType Directory -Force -Path $UserDataDir).FullName
@@ -549,8 +560,8 @@ function Invoke-FactorioProcess {
   return $process.ExitCode
 }
 
-function Copy-ModDirectory {
-  param([string]$Source, [string]$Name, [string]$ModsDir)
+function Remove-CopiedModDirectory {
+  param([string]$Name, [string]$ModsDir)
   $modsRootWithSeparator = (Resolve-Path -LiteralPath $ModsDir).Path.TrimEnd("\") + "\"
   $target = Join-Path $modsDir $Name
   if (Test-Path -LiteralPath $target) {
@@ -560,7 +571,55 @@ function Copy-ModDirectory {
     }
     Remove-Item -LiteralPath $resolvedTarget -Recurse -Force
   }
+  return $target
+}
+
+function Copy-ModDirectory {
+  param([string]$Source, [string]$Name, [string]$ModsDir)
+  $target = Remove-CopiedModDirectory -Name $Name -ModsDir $ModsDir
   Copy-Item -LiteralPath $Source -Destination $target -Recurse
+}
+
+function Copy-RepositoryModDirectory {
+  param([string]$ModsDir)
+
+  $target = Remove-CopiedModDirectory -Name "more-infinite-research" -ModsDir $ModsDir
+  New-Item -ItemType Directory -Force -Path $target | Out-Null
+
+  $files = @(
+    "changelog.txt",
+    "CONTRIBUTING.md",
+    "control.lua",
+    "data-final-fixes.lua",
+    "data-updates.lua",
+    "data.lua",
+    "defaults.lua",
+    "info.json",
+    "LICENSE",
+    "README.md",
+    "settings.lua",
+    "thumbnail.png"
+  )
+  $directories = @(
+    "control",
+    "docs",
+    "locale",
+    "prototypes"
+  )
+
+  foreach ($file in $files) {
+    $source = Join-Path $repo $file
+    if (Test-Path -LiteralPath $source) {
+      Copy-Item -LiteralPath $source -Destination (Join-Path $target $file)
+    }
+  }
+
+  foreach ($directory in $directories) {
+    $source = Join-Path $repo $directory
+    if (Test-Path -LiteralPath $source) {
+      Copy-Item -LiteralPath $source -Destination (Join-Path $target $directory) -Recurse
+    }
+  }
 }
 
 $fixtureRoot = Join-Path $repo "fixtures"
@@ -711,7 +770,7 @@ function Initialize-RuntimeScenario {
   $modsDir = Join-Path $scenarioRoot "mods"
   New-Item -ItemType Directory -Force -Path $modsDir | Out-Null
 
-  Copy-ModDirectory -Source $repo -Name "more-infinite-research" -ModsDir $modsDir
+  Copy-RepositoryModDirectory -ModsDir $modsDir
 
   $fixtureInfos = Get-FixtureInfos
   foreach ($fixtureInfo in $fixtureInfos) {
@@ -1023,6 +1082,29 @@ $spaceAgeElectricShootingLine = Get-LastStreamReportLine -Key "research_electric
 Assert-ReportLineGenerated -Line $spaceAgeElectricShootingLine -Context "Space Age electric and Tesla shooting speed scenario"
 Assert-ReportLineContains -Line $spaceAgeElectricShootingLine -Expected "effects=2" -Context "Space Age electric and Tesla shooting speed scenario"
 
+if ($isFactorio21Line) {
+  Invoke-RuntimeScenario -ScenarioName "base-scripted-candidates-enabled" -EnabledFixtureNames @() -EnabledStreamKeys @(
+    "research_spoilage_preservation",
+    "research_agricultural_growth_speed"
+  )
+  foreach ($scriptedStream in @("research_spoilage_preservation", "research_agricultural_growth_speed")) {
+    $baseScriptedLine = Get-LastStreamReportLine -Key $scriptedStream
+    if ($baseScriptedLine -notmatch "status=skipped" -or $baseScriptedLine -notmatch "missing required mod space-age") {
+      throw "Base-only scripted candidate stream $scriptedStream should skip for missing Space Age when force-enabled: $baseScriptedLine"
+    }
+  }
+
+  Invoke-RuntimeScenario -ScenarioName "space-age-scripted-candidates-enabled" -EnabledFixtureNames @() -EnabledStreamKeys @(
+    "research_spoilage_preservation",
+    "research_agricultural_growth_speed"
+  ) -EnableSpaceAge
+  foreach ($scriptedStream in @("research_spoilage_preservation", "research_agricultural_growth_speed")) {
+    $spaceAgeScriptedLine = Get-LastStreamReportLine -Key $scriptedStream
+    Assert-ReportLineGenerated -Line $spaceAgeScriptedLine -Context "Space Age scripted candidate stream $scriptedStream"
+    Assert-ReportLineContains -Line $spaceAgeScriptedLine -Expected "effects=1" -Context "Space Age scripted candidate stream $scriptedStream"
+  }
+}
+
 Invoke-RuntimeScenario -ScenarioName "space-age-generation-integrity" -EnabledFixtureNames @(
   "mir-fixture-assert-generation-integrity"
 ) -EnableSpaceAge
@@ -1125,6 +1207,10 @@ if ($isLegacyFactorio20) {
   Assert-ReportLineGenerated -Line $spaceAgeCargoShapePadLine -Context "Space Age cargo logistics shape scenario"
   $spaceAgeCargoShapeDistanceLine = Get-LastStreamReportLine -Key "research_cargo_bay_unloading_distance"
   Assert-ReportLineGenerated -Line $spaceAgeCargoShapeDistanceLine -Context "Space Age cargo logistics shape scenario"
+}
+
+if ($usesGeneratedUserDataDir -and (Test-Path -LiteralPath $validationRoot)) {
+  Remove-Item -LiteralPath $validationRoot -Recurse -Force
 }
 
 Write-Host "[ok] Validation completed."

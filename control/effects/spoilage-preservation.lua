@@ -80,6 +80,7 @@ local function restore(data, log_debug, reason)
     data.baseline = current
   end
 
+  data.effective_level = 0
   data.applied_multiplier = 1
   data.last_applied_value = current
   if log_debug then log_debug("spoilage preservation restored or stopped applying: " .. tostring(reason or "unknown")) end
