@@ -35,6 +35,7 @@ Done in the current development branch:
 - [x] Fix Electric Shooting Speed to include `tesla` ammo category.
 - [x] Keep `electric` ammo category coverage for discharge defense.
 - [x] Anchor Electric Shooting Speed to discharge defense for vanilla/no-Space-Age icon and prerequisite safety.
+- [x] Prefer the Space Age electric-weapons-damage texture for Electric Shooting Speed when that technology exists.
 - [x] Add missing shooting-speed descriptions for flamethrower, electric, and Tesla modifiers.
 - [x] Add hidden optional Quality load ordering for module productivity.
 - [x] Add Omega Drill style mining drill productivity matching.
@@ -75,6 +76,7 @@ Important release note: the scripted runtime work above is a **default-off v2.0.
 - [x] Electric Shooting Speed covers `tesla`.
 - [x] Electric Shooting Speed still covers `electric`.
 - [x] Electric Shooting Speed uses the vanilla discharge defense icon/prerequisite anchor when Space Age is absent.
+- [x] Electric Shooting Speed uses the Space Age electric-weapons-damage texture when Space Age is active.
 - [x] Flamethrower and electric/Tesla shooting speed modifier descriptions are localized.
 - [x] Quality is a hidden optional load-order dependency so module productivity can see quality module recipes.
 - [x] Mining drill productivity covers Omega Drill style `omega-drill` and `omega-tau` recipes through validation fixtures.
@@ -121,6 +123,7 @@ Important release note: the scripted runtime work above is a **default-off v2.0.
 
 - [x] Confirm Tesla gun, Tesla ammo, and Tesla turret use `ammo_category = "tesla"` in installed Space Age prototypes.
 - [x] Confirm discharge defense uses `ammo_category = "electric"` in base prototypes.
+- [x] Confirm Space Age `electric-weapons-damage-1` provides the intended electric weapon technology texture.
 - [x] Confirm `gun-speed` modifier is keyed by ammo category.
 - [x] Confirm current base/Space Age locale files do not provide all generated shooting-speed modifier descriptions MIR needs.
 - [x] Confirm Factorio supports hidden optional dependencies through the `(?)` dependency prefix.

@@ -2,6 +2,30 @@
 
 This file records local release-candidate validation runs. It is not a substitute for the manual mod matrix in `docs/compatibility.md`.
 
+## 2026-07-01 Electric Shooting Speed Space Age Icon
+
+Environment:
+
+- Factorio `2.1.8` build `86744`, Windows Steam, Space Age install.
+- Mod version `2.0.5`.
+- Release archive: `dist/more-infinite-research_2.0.5.zip`.
+
+Commands:
+
+```powershell
+.\scripts\Build-MIRPackage.ps1
+.\scripts\Invoke-MIRValidation.ps1 -StaticOnly
+.\scripts\Invoke-MIRValidation.ps1 -FactorioBin "C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe"
+```
+
+Results:
+
+- Electric Shooting Speed now prefers the Space Age `electric-weapons-damage-1` technology icon when Space Age is active.
+- Electric Shooting Speed still falls back to the base discharge defense technology icon when Space Age is absent.
+- Runtime diagnostics now assert the Space Age scenario resolves `icon=tech:electric-weapons-damage-1`; the existing base/no-Space-Age scenario still asserts `icon=tech:discharge-defense-equipment`.
+- Static/package validation passed after rebuilding the release archive.
+- Runtime fixture validation passed across twenty-three isolated scenarios.
+
 ## 2026-07-01 Character Reach Icon
 
 Environment:

@@ -20,7 +20,8 @@ Required before publishing `v2.0.5`:
 | `package-parity` | Rebuild zip and confirm package validation passes |
 | `docs-in-package` | Confirm README, roadmap, TODO, API proof, manual tests, compatibility docs, test results, changelog, locale, and source parity |
 | `normal-mod-folder-load` | Copy the release zip into a normal Factorio mods folder and confirm Factorio can see it |
-| `vanilla-locale-icons` | Base game without Space Age; confirm electric shooting speed uses discharge defense art/description and flamethrower/electric modifier descriptions are present |
+| `vanilla-locale-icons` | Base game without Space Age; confirm Electric Shooting Speed falls back to discharge defense art/description and flamethrower/electric modifier descriptions are present |
+| `space-age-electric-icon` | Space Age enabled; confirm Electric Shooting Speed uses the electric-weapons-damage texture while still showing electric and Tesla speed effects |
 | `generated-chain-integrity` | Run fixture validation in base-only and Space Age; confirm every generated chain has exactly one owner/continuation and no Space Age vanilla productivity duplicate |
 | `circuit-productivity-ownership` | Base-only: green/red/blue circuit recipes are MIR-owned by their recipe IDs. Space Age: green/red stay MIR-owned and processing unit stays vanilla-owned |
 | `quality-module-productivity` | Quality enabled; confirm module productivity includes quality module recipes after hidden Quality load ordering |

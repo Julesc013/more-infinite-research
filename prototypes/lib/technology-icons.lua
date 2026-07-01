@@ -49,6 +49,14 @@ local function icon_from_item(name)
   return nil
 end
 
+local function icons_from_tech_candidates(names)
+  for _, name in ipairs(names or {}) do
+    local icons = icons_from_tech(name) or icon_from_item(name)
+    if icons then return icons end
+  end
+  return nil
+end
+
 local function base_icons_for_stream(stream)
   local base = nil
   if stream.icons then
@@ -57,6 +65,8 @@ local function base_icons_for_stream(stream)
     local entry = {icon = stream.icon, icon_size = stream.icon_size or 64}
     if stream.icon_tint then entry.tint = stream.icon_tint end
     base = {entry}
+  elseif stream.icon_techs then
+    base = icons_from_tech_candidates(stream.icon_techs)
   elseif stream.icon_tech then
     base = icons_from_tech(stream.icon_tech) or icon_from_item(stream.icon_tech)
   end

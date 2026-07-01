@@ -122,7 +122,7 @@ return {
   },
 
   research_electric_shooting_speed = {
-    icon_tech = "discharge-defense-equipment",
+    icon_techs = {"electric-weapons-damage-1", "discharge-defense-equipment"},
     required_technologies = {"discharge-defense-equipment"},
     localised_description = {"technology-description.more-infinite-research.electric_shooting_speed"},
     science_packs = {

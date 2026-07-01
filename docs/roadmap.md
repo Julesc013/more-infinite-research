@@ -41,6 +41,7 @@ Current `dev` already has the intended `v2.0.5` quick-patch candidate work:
 - Scripted spoilage preservation research using a visible `nothing` effect and the global spoil time modifier.
 - Scripted agricultural growth speed research using agricultural tower planting events and plant `tick_grown`.
 - Electric shooting speed coverage for both `tesla` and `electric` ammo categories, so Tesla guns, Tesla turrets, and discharge-defense-style equipment are all covered where the categories exist.
+- Electric Shooting Speed uses the Space Age electric-weapons-damage texture when that technology exists, with a discharge defense fallback for vanilla/no-Space-Age games.
 - Recipe-productivity duplicate prevention for recipes already owned by another infinite recipe-productivity technology.
 - Space Age vanilla productivity technologies remain authoritative for processing units, low density structures, plastic, and rocket fuel instead of receiving parallel MIR technologies.
 - Package and validation script coverage for `control.lua`, the control module tree, Tesla speed assertions, broad generated-chain integrity, vanilla Space Age productivity skip assertions, branch-aware legacy checks, and the no-`on_tick` runtime guard.
@@ -93,7 +94,7 @@ This table is the canonical current synthesis from the Reddit discussion and fol
 
 | Feature | State | Target |
 | --- | --- | --- |
-| Electric shooting speed vanilla icon, descriptions, and Tesla coverage | Ship | `v2.0.5` |
+| Electric shooting speed Space Age icon, vanilla fallback, descriptions, and Tesla coverage | Ship | `v2.0.5` |
 | Flamethrower/electric/Tesla shooting-speed locale fixes | Ship | `v2.0.5` |
 | Hidden Quality load ordering for module productivity | Ship | `v2.0.5` |
 | Omega Drill style mining drill productivity matching | Ship | `v2.0.5` |
@@ -135,7 +136,7 @@ Quick, easy feedback patch for tested low-risk improvements.
 
 - Electric Shooting Speed corrected to cover `tesla` as well as `electric`.
 - Discharge-defense-style `electric` category coverage retained.
-- Electric Shooting Speed anchored to discharge defense for vanilla/no-Space-Age icon and prerequisite safety.
+- Electric Shooting Speed uses the Space Age electric-weapons-damage texture when available, while discharge defense remains the vanilla/no-Space-Age fallback and prerequisite anchor.
 - Flamethrower, electric, and Tesla shooting-speed modifier descriptions supplied by MIR locale.
 - Quality declared as a hidden optional load-order dependency so Quality module recipes are visible before module productivity generation.
 - Mining drill productivity expanded to cover Omega Drill style and broader visible modded drill outputs.
