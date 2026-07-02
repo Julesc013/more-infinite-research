@@ -62,6 +62,7 @@ return {
     skip_if_technologies = {"research-productivity"},
     icon_candidates = {
       {technology = "research-productivity", required_mod = "space-age"},
+      {icon = "__space-age__/graphics/technology/research-productivity.png", icon_size = 256, inactive_mod_asset = "space-age"},
       {technology = "military-science-pack"}
     },
     overlay = "recipe-productivity",
@@ -147,6 +148,7 @@ return {
   research_electric_shooting_speed = {
     icon_candidates = {
       {technology = "electric-weapons-damage-1", required_mod = "space-age"},
+      {icon = "__space-age__/graphics/technology/electric-weapons-damage.png", icon_size = 256, inactive_mod_asset = "space-age"},
       {technology = "discharge-defense-equipment"}
     },
     required_technologies = {"discharge-defense-equipment"},

@@ -2,6 +2,60 @@
 
 This file records local release-candidate validation runs. It is not a substitute for the manual mod matrix in `docs/compatibility.md`.
 
+## 2026-07-02 Dev Installed Space Age Icon Opt-In Pass
+
+Environment:
+
+- Branch: `dev`.
+- Mod version `2.0.5` source line, preparing `v2.1.0` changes.
+- Installed local Factorio binary: `2.1.9` build `86829`, Windows Steam.
+- Space Age files were installed locally.
+- Release archive rebuilt: `dist/more-infinite-research_2.0.5.zip`.
+- Validation archive rebuilt: `build/validation-dist/more-infinite-research_2.0.5.zip`.
+
+Probe:
+
+- A temporary probe mod outside the repository loaded a technology icon from
+  `__space-age__/graphics/technology/electric-weapons-damage.png` while
+  `space-age` was installed but disabled in the test mod list.
+- The probe reached save creation successfully with only `base` and the probe
+  mod active.
+- This proves direct asset paths can resolve on this local install, but it does
+  not provide a safe data-stage way to detect that another player's Space Age
+  files are installed.
+
+Commands:
+
+```powershell
+.\scripts\Build-MIRPackage.ps1
+.\scripts\Invoke-MIRValidation.ps1 -FactorioBin "C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe"
+.\scripts\Test-MIRBranchPolicy.ps1
+git diff --check
+```
+
+Results:
+
+- Added `mir-use-installed-space-age-icons`, a default-off startup setting for
+  base-game runs where Space Age is installed locally but disabled.
+- Added `inactive_mod_asset = "space-age"` icon candidates for selected streams
+  so the resolver can reference direct `__space-age__` icon paths only when
+  Space Age is loaded or the new opt-in setting is enabled.
+- Default base-only runtime fixtures still reject generated icon layers that
+  resolve to `__space-age__` paths.
+- The new `base-installed-space-age-icon-assets` runtime fixture enables the
+  opt-in setting while Space Age is disabled and asserts Electric Shooting Speed
+  and Research productivity resolve to the expected direct Space Age icon paths.
+- Space Age runtime fixtures still prefer loaded Space Age prototype art.
+- Static/package validation, runtime fixture validation, branch policy
+  validation, and `git diff --check` passed.
+
+Limitations:
+
+- The setting must stay disabled by default. If a player enables it without
+  Space Age files installed, Factorio can fail during prototype loading before
+  MIR can recover.
+- MIR still does not package or redistribute Space Age PNG assets.
+
 ## 2026-07-02 Dev Icon Candidate Resolver Pass
 
 Environment:

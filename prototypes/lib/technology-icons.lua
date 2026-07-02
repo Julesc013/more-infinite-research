@@ -56,6 +56,20 @@ local function icon_from_item(name)
   return nil
 end
 
+local function startup_setting(name)
+  local setting = settings and settings.startup and settings.startup[name]
+  if setting then return setting.value end
+  return nil
+end
+
+local function inactive_asset_mod_allowed(mod_name)
+  if not mod_name then return true end
+  if lookup.mod_exists(mod_name) then return true end
+
+  return mod_name == "space-age"
+    and startup_setting("mir-use-installed-space-age-icons") == true
+end
+
 local function required_mods_loaded(candidate)
   if not candidate then return true end
 
@@ -70,6 +84,9 @@ local function required_mods_loaded(candidate)
   for _, mod_name in ipairs(candidate.required_mods or {}) do
     if not lookup.mod_exists(mod_name) then return false end
   end
+
+  local asset_mod = candidate.inactive_mod_asset or candidate.asset_mod
+  if not inactive_asset_mod_allowed(asset_mod) then return false end
 
   return true
 end

@@ -10,12 +10,19 @@ return {
   research_processing_unit = {
     items={"processing-unit"},
     icon_candidates={
+      {icon="__space-age__/graphics/technology/processing-unit-productivity.png", icon_size=256, inactive_mod_asset="space-age"},
       {technology="processing-unit"},
       {technology="advanced-electronics-2"}
     }
   },
 
-  research_plastic = { items={"plastic-bar"}, icon_tech="plastics" },
+  research_plastic = {
+    items={"plastic-bar"},
+    icon_candidates={
+      {icon="__space-age__/graphics/technology/plastics-productivity.png", icon_size=256, inactive_mod_asset="space-age"},
+      {technology="plastics"}
+    }
+  },
   research_sulfur  = { items={"sulfur"}, icon_tech="sulfur-processing", exclude_ingredient_patterns={"asteroid"} },
   research_batteries = { items={"battery"}, icon_tech="battery", exclude_ingredient_patterns={"scrap"} },
   research_explosives = { items={"explosives"}, item_patterns={"^bio%-explosives$"}, icon_tech="explosives" },
@@ -24,8 +31,20 @@ return {
   research_electric_engine = { items={"electric-engine-unit"}, icon_tech="electric-engine" },
   research_flying_robot_frame = { items={"flying-robot-frame"}, icon_tech="robotics" },
 
-  research_low_density_structure = { items={"low-density-structure"}, icon_tech="low-density-structure" },
-  research_rocket_fuel = { items={"rocket-fuel"}, icon_tech="rocket-fuel" },
+  research_low_density_structure = {
+    items={"low-density-structure"},
+    icon_candidates={
+      {icon="__space-age__/graphics/technology/low-density-structure-productivity.png", icon_size=256, inactive_mod_asset="space-age"},
+      {technology="low-density-structure"}
+    }
+  },
+  research_rocket_fuel = {
+    items={"rocket-fuel"},
+    icon_candidates={
+      {icon="__space-age__/graphics/technology/rocket-fuel-productivity.png", icon_size=256, inactive_mod_asset="space-age"},
+      {technology="rocket-fuel"}
+    }
+  },
 
   research_tungsten = { items={"tungsten-plate","tungsten-carbide"}, icon_item="tungsten-plate", icon_tech="tungsten-processing" },
   research_lithium = { items={"lithium-plate"}, icon_tech="lithium-processing" },
@@ -148,6 +167,7 @@ return {
   research_science_pack_productivity = {
     icon_candidates={
       {technology="research-productivity", required_mod="space-age"},
+      {icon="__space-age__/graphics/technology/research-productivity.png", icon_size=256, inactive_mod_asset="space-age"},
       {technology="space-science-pack"},
       {item="automation-science-pack"}
     },

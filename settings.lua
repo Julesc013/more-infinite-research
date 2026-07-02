@@ -99,6 +99,16 @@ table.insert(settings_data, {
 
 table.insert(settings_data, {
   type = "bool-setting",
+  name = "mir-use-installed-space-age-icons",
+  setting_type = "startup",
+  default_value = false,
+  order = "a-120",
+  localised_name = {"mod-setting-name.mir-use-installed-space-age-icons"},
+  localised_description = {"mod-setting-description.mir-use-installed-space-age-icons"}
+})
+
+table.insert(settings_data, {
+  type = "bool-setting",
   name = "mir-debug-generation-report",
   setting_type = "startup",
   default_value = false,

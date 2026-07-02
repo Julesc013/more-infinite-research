@@ -91,10 +91,12 @@ Generated technologies may borrow icon layers from active prototypes and then ad
 MIR's own effect-type badge. The `dev` line supports explicit `icon_candidates`
 for ordered technology/item/icon fallback, but keeps the package boundary strict:
 
-- use Space Age technology or item art only when `space-age` is loaded and the
+- use Space Age technology or item art when `space-age` is loaded and the
   active prototype provides that icon;
-- fall back to base-game technology or item art, MIR-owned local art, or another
-  clearly redistributable asset when Space Age is not loaded;
+- optionally use direct `__space-age__` icon paths in base-only games only when
+  the user enables `mir-use-installed-space-age-icons`;
+- otherwise fall back to base-game technology or item art, MIR-owned local art,
+  or another clearly redistributable asset when Space Age is not loaded;
 - do not copy original Space Age PNGs or other DLC assets into MIR as base-only
   fallbacks;
 - require any MIR-packaged local art to have an explicit source/license note and

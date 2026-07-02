@@ -12,5 +12,7 @@ Policy:
 
 - Do not copy original Space Age PNGs or other DLC asset files into this mod as
   base-only fallbacks.
+- Direct `__space-age__` icon references are allowed only as prototype paths
+  gated by `mir-use-installed-space-age-icons`; they are not packaged assets.
 - Any future MIR-owned or third-party local art must be added to this table with
   an explicit source and redistribution note before package validation can pass.

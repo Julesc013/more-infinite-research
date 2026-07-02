@@ -152,6 +152,9 @@ Allowed:
 - Prefer loaded Space Age technology icons when `space-age` is active.
 - Fall back to loaded base-game technology or item icons when Space Age is not
   active.
+- Optionally use direct `__space-age__` icon paths when
+  `mir-use-installed-space-age-icons` is enabled for a base game where the Space
+  Age files are installed but the Space Age mod is disabled.
 - Add an explicit icon-candidate registry so streams can say "prefer this Space
   Age technology, then this base technology, then this item" without duplicating
   lookup logic.
@@ -166,33 +169,38 @@ Not allowed in the main mod:
 - Do not copy original Space Age PNGs or other DLC asset files into MIR so
   base-only games can display them.
 - Do not make the base-only package behave as a Space Age art pack.
-- Do not reference `__space-age__` paths in generated prototypes unless the
-  active mod set has loaded Space Age and the path is reachable.
+- Do not reference `__space-age__` paths in generated prototypes unless Space
+  Age is loaded or the user explicitly enabled installed Space Age icon paths.
 - Do not replace Wube's package ownership boundary with a local cache of their
   DLC assets.
 
 Rationale: base-only games can have polished icons, but they should be base
-icons, MIR-owned icons, or generated composites. Space Age art should be used
-by reference when Space Age is actually loaded.
+icons, MIR-owned icons, generated composites, or explicit references to locally
+installed Space Age files when the user opts in. MIR should not redistribute
+Space Age art.
 
 Implementation shape:
 
 ```lua
 icon_candidates = {
   { technology = "electric-weapons-damage-1", required_mod = "space-age" },
+  { icon = "__space-age__/graphics/technology/electric-weapons-damage.png", icon_size = 256, inactive_mod_asset = "space-age" },
   { technology = "discharge-defense-equipment" },
   { item = "tesla-gun", required_mod = "space-age" }
 }
 ```
 
 The resolver should evaluate candidates in order, skip candidates whose required
-mod is not loaded, copy the active prototype icon layers, strip inherited Wube
-constant overlays, and then apply MIR's own effect badge.
+mod is not loaded, skip inactive asset candidates unless the user enabled them,
+copy the active prototype icon layers, strip inherited Wube constant overlays,
+and then apply MIR's own effect badge.
 
 Acceptance criteria:
 
-- Base-only runtime fixtures never resolve generated technology icons to
+- Default base-only runtime fixtures never resolve generated technology icons to
   `__space-age__` paths.
+- Opt-in base-only runtime fixtures with `mir-use-installed-space-age-icons`
+  enabled resolve selected candidates to direct `__space-age__` icon paths.
 - Space Age runtime fixtures still prefer the intended Space Age technology art
   when it is loaded.
 - Package validation fails if MIR adds copied Space Age asset files under its
