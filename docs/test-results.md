@@ -2,6 +2,60 @@
 
 This file records local release-candidate validation runs. It is not a substitute for the manual mod matrix in `docs/compatibility.md`.
 
+## 2026-07-02 Dev Scripted Preset Runtime Resolver Pass
+
+Environment:
+
+- Branch: `dev`.
+- Mod version `2.0.5` source line, preparing `v2.1.0` scripted/preset changes.
+- Installed local Factorio binary: `2.1.9` build `86829`, Windows Steam.
+- Release archive rebuilt: `dist/more-infinite-research_2.0.5.zip`.
+- Validation archive rebuilt: `build/validation-dist/more-infinite-research_2.0.5.zip`.
+
+Scope:
+
+- Added `control/settings-resolver.lua` so control-stage scripted effects use
+  the same effective stream enablement as data-stage technology generation.
+- Spoilage preservation and agricultural growth speed now honor
+  `mir-settings-mode`, `mir-enable-policy-<stream>`, `Force enabled`,
+  `Force disabled`, and the `Custom/manual` legacy `ips-enable-<stream>`
+  checkbox path.
+- Added scripted diagnostic log lines that expose effective runtime enablement
+  without adding tick handlers, broad entity scans, or inventory/item-stack
+  scans.
+
+Commands:
+
+```powershell
+.\scripts\Build-MIRPackage.ps1
+.\scripts\Invoke-MIRValidation.ps1 -StaticOnly
+.\scripts\Invoke-MIRValidation.ps1 -FactorioBin "C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe"
+```
+
+Results:
+
+- Static validation passed, including control resolver snippets, control effect
+  wiring, locale parity, no-runtime-tick guard, package metadata, and changelog
+  format checks.
+- Runtime fixture validation passed on Factorio `2.1.9`.
+- `space-age-scripted-candidates-enabled` proved force-enabled scripted streams
+  both generate and log enabled runtime recomputation.
+- `space-age-unlimited-sandbox-preset` proved the sandbox preset enables
+  scripted technology generation and the matching runtime effect path.
+- `space-age-force-disabled-scripted-effects` proved `Force disabled` skips
+  scripted generation and logs disabled runtime recomputation even under the
+  sandbox preset.
+- `space-age-custom-manual-scripted-effects` proved `Custom/manual` mode still
+  honors the old visible enable checkbox path for scripted runtime effects.
+
+Limitations:
+
+- These fixtures prove preset and policy routing, not measured gameplay
+  behavior in real saves.
+- Existing spoilable stack behavior, research reversal, disabling after use,
+  multi-force spoilage behavior, and real agricultural tower planting remain
+  manual proof gates before default enablement or stronger public claims.
+
 ## 2026-07-02 Dev Settings Preset Enablement Pass
 
 Environment:

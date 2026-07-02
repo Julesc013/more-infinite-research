@@ -212,6 +212,7 @@ The executable release gate lives in `docs/release-plan-2.1.0.md`.
 | --- | --- | --- | --- |
 | Settings presets | Started | Startup setting/default derivation | Enablement presets implemented first; numeric preset defaults remain out of scope until explicitly designed |
 | Preset override model | Started | Startup setting/default derivation | Per-technology enable policy supports Use settings mode, Force enabled, and Force disabled |
+| Scripted preset runtime resolver | Started | Control-stage startup setting resolver | Spoilage/agriculture runtime effects mirror data-stage preset and force-enable/force-disable decisions |
 | Duplicate native modifier policy | Ship | Data-stage overlap scan plus explicit policy | Promote `v2.0.5` diagnostic-only reporting to skip/warn/prefer/allow behavior |
 | Icon source resolver and asset policy | Ship | Data-stage icon candidate resolver plus package validation guard | Prefer loaded Space Age/Wube art when available; do not redistribute original Space Age files in MIR |
 | Scripted-tech refinements | Ship if needed | Event-driven runtime manager | Improve storage/reversal/diagnostics after `v2.0.5` feedback |

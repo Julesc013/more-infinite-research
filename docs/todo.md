@@ -127,6 +127,7 @@ Important release note: the scripted runtime work above is a **default-off v2.0.
 - [x] README documents recommended default, vanilla-respectful, megabase, modpack compatibility, and debug/reporting settings patterns.
 - [x] Cannon shell productivity naming and icon art are aligned with the Cannon Shooting Speed cannon-shell icon family.
 - [x] Runtime fixtures assert generated MIR icon badges match effect types, including Electric Shooting Speed using speed instead of inherited damage.
+- [x] Scripted spoilage/agriculture runtime effects honor settings presets, `Force enabled`, `Force disabled`, and `Custom/manual` legacy enable checkboxes.
 - [ ] Spoilage preservation passes the manual blockers below.
 - [ ] Agricultural growth speed for newly planted tower crops passes the manual blockers below.
 - [ ] README/changelog state the exact measured behavior, especially for existing spoilable stacks and existing plants.

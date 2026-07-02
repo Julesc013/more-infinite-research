@@ -1,7 +1,8 @@
 local M = {}
+local settings_resolver = require("control.settings-resolver")
 
 M.technology_name = "recipe-prod-research_spoilage_preservation-1"
-M.setting_name = "ips-enable-research_spoilage_preservation"
+M.stream_key = "research_spoilage_preservation"
 
 local MIN_MODIFIER = 0.01
 local MAX_MODIFIER = 100
@@ -9,8 +10,7 @@ local PER_LEVEL = 1.01
 local EPSILON = 0.000001
 
 local function feature_enabled()
-  local setting = settings.startup[M.setting_name]
-  return setting and setting.value == true
+  return settings_resolver.stream_enabled(M.stream_key)
 end
 
 local function state()
@@ -88,8 +88,14 @@ end
 
 local function apply(log_debug)
   local data = state()
-  if not feature_enabled() or not technology_exists_for_any_force() then
-    restore(data, log_debug, "disabled_or_missing_technology")
+  if not feature_enabled() then
+    if log_debug then log_debug("spoilage preservation skipped: disabled") end
+    restore(data, log_debug, "disabled")
+    return
+  end
+  if not technology_exists_for_any_force() then
+    if log_debug then log_debug("spoilage preservation skipped: missing technology") end
+    restore(data, log_debug, "missing_technology")
     return
   end
 

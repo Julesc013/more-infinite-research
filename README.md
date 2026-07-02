@@ -301,6 +301,8 @@ Each technology group also has an enable policy:
 
 The older `Enable ...` checkboxes are still present for `Custom/manual` compatibility. In preset modes, use the enable policy dropdown when you want an explicit per-technology override.
 
+For scripted technologies, the same effective enablement decision is used in both places: data-stage technology generation and control-stage runtime effects. A scripted stream that is enabled by `Unlimited sandbox`, `Force enabled`, or the old `Custom/manual` checkbox can apply its runtime effect; a scripted stream that is `Force disabled` stays skipped even if the selected preset would otherwise enable it.
+
 ### What `0` Means
 
 Generated research lines:

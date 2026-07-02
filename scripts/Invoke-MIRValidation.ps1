@@ -296,6 +296,9 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
   $utilText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\util.lua")
   $baseExtensionsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\base-tech-extensions.lua")
   $settingsResolverText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\settings-resolver.lua")
+  $controlSettingsResolverText = Get-Content -Raw -LiteralPath (Join-Path $repo "control\settings-resolver.lua")
+  $spoilageText = Get-Content -Raw -LiteralPath (Join-Path $repo "control\effects\spoilage-preservation.lua")
+  $agriculturalGrowthText = Get-Content -Raw -LiteralPath (Join-Path $repo "control\effects\agricultural-growth-speed.lua")
   $settingsPresetsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\settings-presets.lua")
   $scienceText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\lib\science-packs.lua")
   $directEffectsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\streams\direct-effects.lua")
@@ -338,6 +341,13 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "prototypes\settings-resolver.lua"; Text = $settingsResolverText; Snippet = 'function R.stream_enabled(key, spec)' },
     @{ File = "prototypes\settings-resolver.lua"; Text = $settingsResolverText; Snippet = 'function R.base_enabled(key, spec)' },
     @{ File = "prototypes\settings-resolver.lua"; Text = $settingsResolverText; Snippet = 'Force enabled' },
+    @{ File = "control\settings-resolver.lua"; Text = $controlSettingsResolverText; Snippet = 'function R.stream_enabled(key)' },
+    @{ File = "control\settings-resolver.lua"; Text = $controlSettingsResolverText; Snippet = 'mir-settings-mode' },
+    @{ File = "control\settings-resolver.lua"; Text = $controlSettingsResolverText; Snippet = 'mir-enable-policy-' },
+    @{ File = "control\effects\spoilage-preservation.lua"; Text = $spoilageText; Snippet = 'settings_resolver.stream_enabled(M.stream_key)' },
+    @{ File = "control\effects\spoilage-preservation.lua"; Text = $spoilageText; Snippet = 'spoilage preservation skipped: disabled' },
+    @{ File = "control\effects\agricultural-growth-speed.lua"; Text = $agriculturalGrowthText; Snippet = 'settings_resolver.stream_enabled(M.stream_key)' },
+    @{ File = "control\effects\agricultural-growth-speed.lua"; Text = $agriculturalGrowthText; Snippet = 'agricultural growth speed force state refreshed enabled=' },
     @{ File = "prototypes\util.lua"; Text = $utilText; Snippet = 'apply_science_pack_ingredient_policy' },
     @{ File = "prototypes\util.lua"; Text = $utilText; Snippet = 'settings_resolver.stream_enabled(key, spec)' },
     @{ File = "prototypes\base-tech-extensions.lua"; Text = $baseExtensionsText; Snippet = 'settings_resolver.base_enabled(key, spec)' },
@@ -963,6 +973,11 @@ function Enable-CopiedDiagnostics {
   Set-Content -LiteralPath $copiedDiagnosticsPath -Value $copiedDiagnostics -Encoding UTF8
 }
 
+function Enable-CopiedScriptedDiagnostics {
+  param([string]$ModsDir)
+  Set-CopiedStartupSettingDefault -ModsDir $ModsDir -Name "mir-debug-scripted-effects" -ValueLiteral "true"
+}
+
 function Set-CopiedStartupSettingDefault {
   param(
     [string]$ModsDir,
@@ -1087,6 +1102,33 @@ function Set-CopiedStreamEnabled {
   }
 }
 
+function Set-CopiedStreamCheckboxEnabled {
+  param(
+    [string]$ModsDir,
+    [string]$StreamKey
+  )
+  try {
+    Set-CopiedStartupSettingDefault -ModsDir $ModsDir -Name "ips-enable-$StreamKey" -ValueLiteral "true"
+    return
+  } catch {
+    $copiedDefaultsPath = Join-Path $ModsDir "more-infinite-research\defaults.lua"
+    $copiedDefaults = Get-Content -Raw -LiteralPath $copiedDefaultsPath
+    $escapedStreamKey = [regex]::Escape($StreamKey)
+    $pattern = "(?s)($escapedStreamKey\s*=\s*\{[^{}]*?enabled\s*=\s*)false"
+    $match = [regex]::Match($copiedDefaults, $pattern)
+    if (-not $match.Success) {
+      throw "Unable to enable legacy stream checkbox/default for $StreamKey."
+    }
+
+    $valueGroup = $match.Groups[1]
+    $copiedDefaults = $copiedDefaults.Substring(0, $valueGroup.Index) +
+      $valueGroup.Value +
+      "true" +
+      $copiedDefaults.Substring($valueGroup.Index + $valueGroup.Length + "false".Length)
+    Set-Content -LiteralPath $copiedDefaultsPath -Value $copiedDefaults -Encoding UTF8
+  }
+}
+
 function Set-CopiedBaseExtensionEnabled {
   param(
     [string]$ModsDir,
@@ -1115,6 +1157,7 @@ function Initialize-RuntimeScenario {
     [string]$ScenarioName,
     [string[]]$EnabledFixtureNames,
     [string[]]$EnabledStreamKeys = @(),
+    [string[]]$LegacyEnabledStreamKeys = @(),
     [string[]]$EnabledBaseExtensionKeys = @(),
     [string[]]$DisabledStreamKeys = @(),
     [string[]]$DisabledBaseExtensionKeys = @(),
@@ -1127,6 +1170,7 @@ function Initialize-RuntimeScenario {
     [string]$WeaponSpeedAdjustmentMode = "",
     [switch]$RequireSpaceGate,
     [switch]$UseInstalledSpaceAgeIcons,
+    [switch]$ScriptedDiagnostics,
     [switch]$EnableSpaceAge
   )
 
@@ -1163,6 +1207,9 @@ function Initialize-RuntimeScenario {
   $copiedInfo | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $copiedInfoPath -Encoding UTF8
 
   Enable-CopiedDiagnostics -ModsDir $modsDir
+  if ($ScriptedDiagnostics) {
+    Enable-CopiedScriptedDiagnostics -ModsDir $modsDir
+  }
   if (-not [string]::IsNullOrWhiteSpace($SettingsMode)) {
     Set-CopiedSettingsMode -ModsDir $modsDir -Mode $SettingsMode
   }
@@ -1183,6 +1230,9 @@ function Initialize-RuntimeScenario {
   }
   foreach ($streamKey in $EnabledStreamKeys) {
     Set-CopiedStreamEnabled -ModsDir $modsDir -StreamKey $streamKey
+  }
+  foreach ($streamKey in $LegacyEnabledStreamKeys) {
+    Set-CopiedStreamCheckboxEnabled -ModsDir $modsDir -StreamKey $streamKey
   }
   foreach ($baseExtensionKey in $EnabledBaseExtensionKeys) {
     Set-CopiedBaseExtensionEnabled -ModsDir $modsDir -BaseExtensionKey $baseExtensionKey
@@ -1246,6 +1296,7 @@ function Invoke-RuntimeScenario {
     [string]$ScenarioName,
     [string[]]$EnabledFixtureNames,
     [string[]]$EnabledStreamKeys = @(),
+    [string[]]$LegacyEnabledStreamKeys = @(),
     [string[]]$EnabledBaseExtensionKeys = @(),
     [string[]]$DisabledStreamKeys = @(),
     [string[]]$DisabledBaseExtensionKeys = @(),
@@ -1258,6 +1309,7 @@ function Invoke-RuntimeScenario {
     [string]$WeaponSpeedAdjustmentMode = "",
     [switch]$RequireSpaceGate,
     [switch]$UseInstalledSpaceAgeIcons,
+    [switch]$ScriptedDiagnostics,
     [switch]$EnableSpaceAge
   )
 
@@ -1265,6 +1317,7 @@ function Invoke-RuntimeScenario {
     -ScenarioName $ScenarioName `
     -EnabledFixtureNames $EnabledFixtureNames `
     -EnabledStreamKeys $EnabledStreamKeys `
+    -LegacyEnabledStreamKeys $LegacyEnabledStreamKeys `
     -EnabledBaseExtensionKeys $EnabledBaseExtensionKeys `
     -DisabledStreamKeys $DisabledStreamKeys `
     -DisabledBaseExtensionKeys $DisabledBaseExtensionKeys `
@@ -1274,6 +1327,7 @@ function Invoke-RuntimeScenario {
     -WeaponSpeedAdjustmentMode $WeaponSpeedAdjustmentMode `
     -RequireSpaceGate:$RequireSpaceGate `
     -UseInstalledSpaceAgeIcons:$UseInstalledSpaceAgeIcons `
+    -ScriptedDiagnostics:$ScriptedDiagnostics `
     -EnableSpaceAge:$EnableSpaceAge
   if (Test-Path -LiteralPath $scenario.SavePath) {
     Remove-Item -LiteralPath $scenario.SavePath -Force
@@ -1347,6 +1401,15 @@ function Assert-ReportLineDoesNotContain {
   if ($Line.Contains($Unexpected)) {
     throw "$Context unexpectedly included '$Unexpected': $Line"
   }
+}
+
+function Assert-LogContains {
+  param([string]$Expected, [string]$Context)
+  $line = Select-String -LiteralPath $FactorioLog -Pattern $Expected -SimpleMatch | Select-Object -Last 1
+  if (-not $line) {
+    throw "$Context missing expected runtime log text '$Expected'."
+  }
+  return $line.Line
 }
 
 function Assert-NoStreamReportLine {
@@ -1572,7 +1635,7 @@ if ($isFactorio21Line) {
   ) -EnabledStreamKeys @(
     "research_spoilage_preservation",
     "research_agricultural_growth_speed"
-  ) -EnableSpaceAge
+  ) -ScriptedDiagnostics -EnableSpaceAge
   foreach ($scriptedStream in @("research_spoilage_preservation", "research_agricultural_growth_speed")) {
     $spaceAgeScriptedLine = Get-LastStreamReportLine -Key $scriptedStream
     Assert-ReportLineGenerated -Line $spaceAgeScriptedLine -Context "Space Age scripted candidate stream $scriptedStream"
@@ -1581,9 +1644,12 @@ if ($isFactorio21Line) {
       Assert-ReportLineContains -Line $spaceAgeScriptedLine -Expected "icon=tech:agriculture" -Context "Space Age agricultural growth speed icon scenario"
     }
   }
+  Assert-LogContains -Expected "spoilage preservation applied level=0" -Context "Force-enabled scripted spoilage runtime scenario"
+  Assert-LogContains -Expected "agricultural growth speed force state refreshed enabled=true" -Context "Force-enabled scripted agricultural runtime scenario"
 
   Invoke-RuntimeScenario -ScenarioName "space-age-unlimited-sandbox-preset" -EnabledFixtureNames @() `
     -SettingsMode "unlimited-sandbox" `
+    -ScriptedDiagnostics `
     -EnableSpaceAge
   foreach ($sandboxStream in @("research_spoilage_preservation", "research_agricultural_growth_speed", "research_cargo_landing_pad_count")) {
     $sandboxLine = Get-LastStreamReportLine -Key $sandboxStream
@@ -1591,6 +1657,34 @@ if ($isFactorio21Line) {
   }
   $sandboxInserterLine = Get-LastExtensionReportLine -Key "inserter-capacity-bonus"
   Assert-ReportLineGenerated -Line $sandboxInserterLine -Context "Space Age unlimited sandbox preset inserter extension"
+  Assert-LogContains -Expected "spoilage preservation applied level=0" -Context "Unlimited sandbox scripted spoilage runtime scenario"
+  Assert-LogContains -Expected "agricultural growth speed force state refreshed enabled=true" -Context "Unlimited sandbox scripted agricultural runtime scenario"
+
+  Invoke-RuntimeScenario -ScenarioName "space-age-force-disabled-scripted-effects" -EnabledFixtureNames @() `
+    -SettingsMode "unlimited-sandbox" `
+    -DisabledStreamKeys @("research_spoilage_preservation", "research_agricultural_growth_speed") `
+    -ScriptedDiagnostics `
+    -EnableSpaceAge
+  foreach ($disabledScriptedStream in @("research_spoilage_preservation", "research_agricultural_growth_speed")) {
+    $disabledScriptedLine = Get-LastStreamReportLine -Key $disabledScriptedStream
+    if ($disabledScriptedLine -notmatch "status=skipped" -or $disabledScriptedLine -notmatch "disabled") {
+      throw "Force-disabled scripted stream should skip even under sandbox preset: $disabledScriptedLine"
+    }
+  }
+  Assert-LogContains -Expected "spoilage preservation skipped: disabled" -Context "Force-disabled scripted spoilage runtime scenario"
+  Assert-LogContains -Expected "agricultural growth speed force state refreshed enabled=false" -Context "Force-disabled scripted agricultural runtime scenario"
+
+  Invoke-RuntimeScenario -ScenarioName "space-age-custom-manual-scripted-effects" -EnabledFixtureNames @() `
+    -SettingsMode "custom" `
+    -LegacyEnabledStreamKeys @("research_spoilage_preservation", "research_agricultural_growth_speed") `
+    -ScriptedDiagnostics `
+    -EnableSpaceAge
+  foreach ($customScriptedStream in @("research_spoilage_preservation", "research_agricultural_growth_speed")) {
+    $customScriptedLine = Get-LastStreamReportLine -Key $customScriptedStream
+    Assert-ReportLineGenerated -Line $customScriptedLine -Context "Custom/manual scripted stream $customScriptedStream"
+  }
+  Assert-LogContains -Expected "spoilage preservation applied level=0" -Context "Custom/manual scripted spoilage runtime scenario"
+  Assert-LogContains -Expected "agricultural growth speed force state refreshed enabled=true" -Context "Custom/manual scripted agricultural runtime scenario"
 }
 
 Invoke-RuntimeScenario -ScenarioName "space-age-generation-integrity" -EnabledFixtureNames @(

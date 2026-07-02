@@ -53,6 +53,7 @@ Required before claiming larger `v2.1.0` features:
 | --- | --- |
 | `settings-presets` | Verify `Custom/manual`, `Vanilla-respectful`, `Megabase-balanced`, and `Unlimited sandbox` enablement decisions |
 | `settings-preset-overrides` | Verify `Force enabled` and `Force disabled` per-feature choices override presets and the UI does not contradict generation behavior |
+| `scripted-preset-runtime` | Verify scripted spoilage/agriculture runtime effects follow `Settings mode`, `Force enabled`, `Force disabled`, and `Custom/manual` checkbox decisions |
 | `agri-existing-plant-rescale` | Verify any existing plant rescale is bounded, deduplicated, and reversible |
 | `native-modifier-overlap-policy` | Verify overlapping cargo/logistics/native modifiers follow the selected skip/warn/prefer/allow policy beyond diagnostic-only `v2.0.5` coverage |
 | `high-throughput-pump` | Validate prototype, recipe, power draw, balance, and throughput if promoted |

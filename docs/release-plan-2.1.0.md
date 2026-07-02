@@ -104,6 +104,7 @@ enables it.
 Acceptance criteria:
 
 - Preset runtime fixtures validate expected stream and base-extension decisions.
+- Scripted runtime fixtures prove spoilage/agriculture effects use the same effective enablement as data-stage generation.
 - Existing `Custom/manual` behavior remains backward-compatible.
 - README contains a preset comparison table.
 - Setting tooltips explain precedence.
