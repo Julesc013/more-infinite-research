@@ -217,6 +217,16 @@ local function assert_generated_icon_badge(tech_name, tech)
   end
 end
 
+local function assert_no_space_age_icon_path_in_base(tech_name, tech)
+  if is_space_age then return end
+
+  for _, layer in ipairs((tech and tech.icons) or {}) do
+    if type(layer.icon) == "string" and string.find(layer.icon, "__space-age__", 1, true) then
+      fail("base-only generated technology " .. tech_name .. " resolved Space Age icon path " .. layer.icon .. ".")
+    end
+  end
+end
+
 local function prototype_icon_paths(prototype)
   local paths = {}
   if not prototype then return paths end
@@ -284,6 +294,7 @@ for tech_name, tech in pairs(techs) do
       fail("generated stream technology " .. tech_name .. " has no effects.")
     end
     assert_generated_icon_badge(tech_name, tech)
+    assert_no_space_age_icon_path_in_base(tech_name, tech)
   end
 
   if tech.max_level == "infinite" then
@@ -302,6 +313,11 @@ end
 
 assert_tech_uses_item_icon("recipe-prod-research_heavy_ammo-1", "cannon-shell")
 assert_tech_uses_item_icon("recipe-prod-research_cannon_shooting_speed-1", "cannon-shell")
+if is_space_age then
+  assert_tech_uses_technology_icon("recipe-prod-research_electric_shooting_speed-1", "electric-weapons-damage-1")
+else
+  assert_tech_uses_technology_icon("recipe-prod-research_electric_shooting_speed-1", "discharge-defense-equipment")
+end
 if techs["recipe-prod-research_processing_unit-1"] then
   assert_tech_uses_technology_icon("recipe-prod-research_processing_unit-1", "processing-unit")
 end

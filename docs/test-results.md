@@ -2,6 +2,37 @@
 
 This file records local release-candidate validation runs. It is not a substitute for the manual mod matrix in `docs/compatibility.md`.
 
+## 2026-07-02 Dev Icon Candidate Resolver Pass
+
+Environment:
+
+- Branch: `dev`.
+- Mod version `2.0.5` source line, preparing `v2.1.0` changes.
+- Installed local Factorio binary: `2.1.9` build `86829`, Windows Steam.
+- Release archive rebuilt: `dist/more-infinite-research_2.0.5.zip`.
+- Validation archive rebuilt: `build/validation-dist/more-infinite-research_2.0.5.zip`.
+
+Commands:
+
+```powershell
+.\scripts\Build-MIRPackage.ps1
+.\scripts\Invoke-MIRValidation.ps1 -StaticOnly
+.\scripts\Invoke-MIRValidation.ps1 -FactorioBin "C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe"
+.\scripts\Test-MIRBranchPolicy.ps1
+git diff --check
+```
+
+Results:
+
+- Added explicit ordered `icon_candidates` support to the shared technology icon resolver.
+- Kept legacy `icon_tech`, `icon_techs`, `icon_item`, explicit `icon`, and explicit `icons` behavior working as fallback paths.
+- Generation diagnostics now report the selected icon source through the shared resolver.
+- Electric Shooting Speed, Research productivity, Processing Unit productivity, and Science pack productivity now use explicit candidate chains for Space Age/base fallback art.
+- Base-only runtime fixtures assert generated technologies do not resolve icon layers to `__space-age__` paths.
+- Space Age runtime fixtures assert Electric Shooting Speed still borrows `electric-weapons-damage-1` art when Space Age is loaded.
+- Added `docs/asset-sources.md` and static validation requiring local image assets to have source notes while rejecting Space Age-looking local image paths.
+- Static/package validation, runtime fixture validation, branch policy validation, and `git diff --check` passed.
+
 ## 2026-07-02 Dev Factorio 2.1.9 Runtime Fixture Pass
 
 Environment:

@@ -60,7 +60,10 @@ return {
   research_lab_productivity = {
     -- Space Age already owns the native infinite research-productivity chain.
     skip_if_technologies = {"research-productivity"},
-    icon_techs = {"research-productivity", "military-science-pack"},
+    icon_candidates = {
+      {technology = "research-productivity", required_mod = "space-age"},
+      {technology = "military-science-pack"}
+    },
     overlay = "recipe-productivity",
     localised_description = {"technology-description.more-infinite-research.lab_productivity"},
     science_packs = {
@@ -142,7 +145,10 @@ return {
   },
 
   research_electric_shooting_speed = {
-    icon_techs = {"electric-weapons-damage-1", "discharge-defense-equipment"},
+    icon_candidates = {
+      {technology = "electric-weapons-damage-1", required_mod = "space-age"},
+      {technology = "discharge-defense-equipment"}
+    },
     required_technologies = {"discharge-defense-equipment"},
     localised_description = {"technology-description.more-infinite-research.electric_shooting_speed"},
     science_packs = {

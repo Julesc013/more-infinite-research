@@ -152,6 +152,37 @@ Invoke-RepoCheck "generated icons do not use icon_mipmaps" {
   }
 }
 
+Invoke-RepoCheck "local image assets have source notes and do not bundle Space Age art" {
+  $assetSourcePath = Join-Path $repo "docs\asset-sources.md"
+  if (-not (Test-Path -LiteralPath $assetSourcePath)) {
+    throw "Missing local asset source manifest: docs/asset-sources.md"
+  }
+
+  $assetSourceText = Get-Content -Raw -LiteralPath $assetSourcePath
+  $imageExtensions = @(".png", ".jpg", ".jpeg", ".webp", ".gif")
+  $imageFiles = @(
+    Get-ChildItem -LiteralPath $repo -Recurse -File |
+      Where-Object {
+        $relative = [System.IO.Path]::GetRelativePath($repo.Path, $_.FullName).Replace("\", "/")
+        $extension = $_.Extension.ToLowerInvariant()
+        $imageExtensions -contains $extension `
+          -and -not $relative.StartsWith(".git/") `
+          -and -not $relative.StartsWith("build/") `
+          -and -not $relative.StartsWith("dist/")
+      }
+  )
+
+  foreach ($imageFile in $imageFiles) {
+    $relative = [System.IO.Path]::GetRelativePath($repo.Path, $imageFile.FullName).Replace("\", "/")
+    if ($relative -match "(^|/|[-_.])space[-_]?age($|/|[-_.])" -or $relative -match "__space-age__") {
+      throw "Local image asset appears to bundle Space Age art by path/name and is not allowed in MIR: $relative"
+    }
+    if (-not $assetSourceText.Contains($relative)) {
+      throw "Local image asset is missing an explicit source/license note in docs/asset-sources.md: $relative"
+    }
+  }
+}
+
 Invoke-RepoCheck "control runtime avoids tick handlers" {
   $luaFiles = @()
   $controlLua = Join-Path $repo "control.lua"
@@ -302,26 +333,34 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "prototypes\base-tech-extensions.lua"; Text = $baseExtensionsText; Snippet = 'apply_science_pack_ingredient_policy' },
     @{ File = "prototypes\base-tech-extensions.lua"; Text = $baseExtensionsText; Snippet = 'append_end_game_gate_prerequisite' },
     @{ File = "prototypes\lib\science-packs.lua"; Text = $scienceText; Snippet = 'end_game_science_pack' },
-    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'icon_techs = {"research-productivity", "space-science-pack"}' },
-    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'icon_techs={"processing-unit", "advanced-electronics-2"}' },
+    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'icon_candidates={' },
+    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = '{technology="research-productivity", required_mod="space-age"}' },
+    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = '{technology="space-science-pack"}' },
+    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = '{technology="processing-unit"}' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'research_rocket_fuel = { items={"rocket-fuel"}, icon_tech="rocket-fuel" }' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'research_walls = { icon_tech="gate", icon_item="stone-wall", groups = {' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'research_heavy_ammo = { icon_item="cannon-shell", groups = {' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'items={"artillery-shell","railgun-ammo"}' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = '^omega%-drill$' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = '^omega%-tau$' },
-    @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'icon_techs = {"electric-weapons-damage-1", "discharge-defense-equipment"}' },
+    @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = '{technology = "electric-weapons-damage-1", required_mod = "space-age"}' },
+    @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = '{technology = "discharge-defense-equipment"}' },
     @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'technology-description.more-infinite-research.electric_shooting_speed' },
     @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'technology-description.more-infinite-research.flamethrower_shooting_speed' },
     @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'type = "laboratory-productivity", modifier = 0.10' },
     @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'skip_if_technologies = {"research-productivity"}' },
-    @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'icon_techs = {"research-productivity", "military-science-pack"}' },
+    @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = '{technology = "research-productivity", required_mod = "space-age"}' },
+    @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = '{technology = "military-science-pack"}' },
     @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'ammo_category = "tesla", modifier = 0.1' },
     @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'ammo_category = "electric", modifier = 0.1' },
     @{ File = "prototypes\lib\technology-icons.lua"; Text = $technologyIconsText; Snippet = 'local function strip_constant_overlays(icons)' },
+    @{ File = "prototypes\lib\technology-icons.lua"; Text = $technologyIconsText; Snippet = 'local function resolve_icon_candidate(candidate)' },
+    @{ File = "prototypes\lib\technology-icons.lua"; Text = $technologyIconsText; Snippet = 'function I.icon_source_for_stream(stream)' },
     @{ File = "prototypes\lib\technology-icons.lua"; Text = $technologyIconsText; Snippet = 'local out = strip_constant_overlays(base_icons)' },
     @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'assert_generated_icon_badge(tech_name, tech)' },
+    @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'assert_no_space_age_icon_path_in_base(tech_name, tech)' },
     @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'assert_tech_uses_item_icon("recipe-prod-research_heavy_ammo-1", "cannon-shell")' },
+    @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'assert_tech_uses_technology_icon("recipe-prod-research_electric_shooting_speed-1", "electric-weapons-damage-1")' },
     @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'assert_tech_uses_technology_icon("recipe-prod-research_walls-1", "gate")' },
     @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'assert_tech_uses_technology_icon("recipe-prod-research_lab_productivity-1", "military-science-pack")' },
     @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'assert_tech_uses_technology_icon("recipe-prod-research_rocket_fuel-1", "rocket-fuel")' },

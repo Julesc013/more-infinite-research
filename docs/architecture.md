@@ -78,7 +78,7 @@ Agricultural growth speed refreshes this force state on init, configuration chan
 - `prototypes/lib/prototype-lookup.lua`: item-like prototype lookup, technology existence, ammo-category existence, Space Age detection.
 - `prototypes/lib/science-packs.lua`: lab-input discovery, science-pack existence, end-game science-pack selection, lab-compatible ingredient validation, science-pack unlock prerequisites, ordered pack lists.
 - `prototypes/lib/recipe-matching.lua`: item-output matching, item-pattern expansion, recipe category matching, hidden/recycling filtering.
-- `prototypes/lib/technology-icons.lua`: borrowed icon copying, technology/item icon fallback, Wube-style constant overlays.
+- `prototypes/lib/technology-icons.lua`: borrowed icon copying, explicit `icon_candidates` resolution, legacy technology/item icon fallback, Wube-style constant overlays.
 - `prototypes/lib/deepcopy.lua`: shared fallback for data-stage deep copies.
 - `prototypes/lib/table-utils.lua`: deterministic table-key ordering helpers.
 - `prototypes/lib/technology-cleanup.lua`: technology removal with prerequisite reference cleanup.
@@ -88,8 +88,8 @@ Keep new domain behavior in these modules rather than growing `util.lua`.
 ## Icon Asset Boundary
 
 Generated technologies may borrow icon layers from active prototypes and then add
-MIR's own effect-type badge. For `v2.1.0`, improve this into an explicit
-candidate resolver, but keep the package boundary strict:
+MIR's own effect-type badge. The `dev` line supports explicit `icon_candidates`
+for ordered technology/item/icon fallback, but keeps the package boundary strict:
 
 - use Space Age technology or item art only when `space-age` is loaded and the
   active prototype provides that icon;

@@ -143,8 +143,9 @@ Acceptance criteria:
 ## Icon Source And Asset Policy
 
 Keep MIR's current icon strategy: borrow the best active prototype icon, then add
-MIR's own effect-type badge. Improve the resolver, not the asset ownership
-boundary.
+MIR's own effect-type badge. The `dev` line now has an explicit ordered
+`icon_candidates` resolver; keep improving that resolver instead of broadening
+the asset ownership boundary.
 
 Allowed:
 
@@ -178,9 +179,9 @@ Implementation shape:
 
 ```lua
 icon_candidates = {
-  { technology = "electric-weapons-damage-1", mod = "space-age" },
+  { technology = "electric-weapons-damage-1", required_mod = "space-age" },
   { technology = "discharge-defense-equipment" },
-  { item = "tesla-gun", mod = "space-age" }
+  { item = "tesla-gun", required_mod = "space-age" }
 }
 ```
 

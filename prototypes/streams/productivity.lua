@@ -7,7 +7,13 @@ return {
 
   research_electronic_circuit = { items={"electronic-circuit"}, icon_tech="electronics", exclude_ingredient_patterns={"scrap"} },
   research_advanced_circuit = { items={"advanced-circuit"}, icon_tech="advanced-circuit", exclude_ingredient_patterns={"scrap"} },
-  research_processing_unit = { items={"processing-unit"}, icon_techs={"processing-unit", "advanced-electronics-2"} },
+  research_processing_unit = {
+    items={"processing-unit"},
+    icon_candidates={
+      {technology="processing-unit"},
+      {technology="advanced-electronics-2"}
+    }
+  },
 
   research_plastic = { items={"plastic-bar"}, icon_tech="plastics" },
   research_sulfur  = { items={"sulfur"}, icon_tech="sulfur-processing", exclude_ingredient_patterns={"asteroid"} },
@@ -139,7 +145,14 @@ return {
     { change=0.01, items={"stack-inserter"}, item_patterns={"stack%-inserter"} }
   }},
 
-  research_science_pack_productivity = { icon_techs = {"research-productivity", "space-science-pack"}, icon_item = "automation-science-pack", dynamic_items_from_lab_inputs = true, groups = {
+  research_science_pack_productivity = {
+    icon_candidates={
+      {technology="research-productivity", required_mod="space-age"},
+      {technology="space-science-pack"},
+      {item="automation-science-pack"}
+    },
+    dynamic_items_from_lab_inputs = true,
+    groups = {
     { change=0.10, items={
       "automation-science-pack","logistic-science-pack","chemical-science-pack","production-science-pack",
       "military-science-pack","utility-science-pack","space-science-pack",

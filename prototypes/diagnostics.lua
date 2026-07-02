@@ -1,5 +1,5 @@
 local D = {}
-local lookup = require("prototypes.lib.prototype-lookup")
+local icons = require("prototypes.lib.technology-icons")
 
 local rows = {}
 local match_rows = {}
@@ -35,19 +35,7 @@ local function effect_count(effects)
 end
 
 local function icon_hint(spec)
-  if spec.icons then return "custom-icons" end
-  if spec.icon then return spec.icon end
-  if spec.icon_techs then
-    for _, name in ipairs(spec.icon_techs) do
-      if (data.raw.technology or {})[name] then return "tech:" .. name end
-      if lookup.item_prototype(name) then return "item:" .. name end
-    end
-    return "tech:" .. tostring(spec.icon_techs[1])
-  end
-  if spec.icon_tech then return "tech:" .. spec.icon_tech end
-  if spec.icon_item then return "item:" .. spec.icon_item end
-  if spec.items and spec.items[1] then return "item:" .. spec.items[1] end
-  return "fallback"
+  return icons.icon_source_for_stream(spec or {})
 end
 
 local function append(kind, row)
