@@ -91,7 +91,7 @@ Done in the current development branch:
 - [x] Release `v1.9.0` from the `legacy` branch as the Factorio `2.0` compatibility port of the tested `v2.0.5` snapshot.
 - [x] Implement `v2.1.0` fluid-output recipe productivity streams for oil processing, oil cracking, lubricant, sulfuric acid, and Space Age thruster propellants.
 - [x] Implement fluid-output recipe matching, fluid icon fallback, and required-fluid stream gates.
-- [x] Implement the opt-in startup-only pipeline extent multiplier with default `1x` unchanged behavior.
+- [x] Implement the strictly opt-in startup-only pipeline extent multiplier with default `1x` unchanged behavior and no fluidbox scan when disabled.
 - [x] Add runtime fixtures for fluid-output productivity ownership and startup pipeline extent scaling.
 
 Important release note: the scripted runtime work above is a **default-off v2.0.5 ship candidate**, not automatically deferred to `v2.1.0`. The implementation is complete for the default-off release posture. Defer default enablement, presets, or stronger behavior claims until long-running manual proof exists.

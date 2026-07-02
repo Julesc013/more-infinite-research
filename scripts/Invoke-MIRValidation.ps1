@@ -414,7 +414,9 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "prototypes\lib\recipe-matching.lua"; Text = $recipeMatchingText; Snippet = 'add_pattern_outputs(want, options.fluid_patterns, lookup.each_fluid_prototype)' },
     @{ File = "prototypes\lib\prototype-lookup.lua"; Text = $prototypeLookupText; Snippet = 'function L.fluid_prototype(name)' },
     @{ File = "prototypes\tech-gen.lua"; Text = $techGenText; Snippet = 'required_fluids' },
-    @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'require("prototypes.pipeline-extent").apply()' },
+    @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'local pipeline_extent_multiplier = pipeline_extent_setting and tonumber(pipeline_extent_setting.value) or 1' },
+    @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'if pipeline_extent_multiplier > 1 then' },
+    @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'require("prototypes.pipeline-extent").apply(pipeline_extent_multiplier)' },
     @{ File = "prototypes\pipeline-extent.lua"; Text = $pipelineExtentText; Snippet = 'DEFAULT_PIPELINE_EXTENT = 320' },
     @{ File = "prototypes\pipeline-extent.lua"; Text = $pipelineExtentText; Snippet = 'mir-pipeline-extent-multiplier' },
     @{ File = "prototypes\diagnostics.lua"; Text = $diagnosticsText; Snippet = 'icons.icon_source_for_stream(spec or {})' },
@@ -1460,6 +1462,14 @@ function Assert-LogContains {
   return $line.Line
 }
 
+function Assert-LogDoesNotContain {
+  param([string]$Unexpected, [string]$Context)
+  $line = Select-String -LiteralPath $FactorioLog -Pattern $Unexpected -SimpleMatch | Select-Object -Last 1
+  if ($line) {
+    throw "$Context unexpectedly found runtime log text '$Unexpected': $($line.Line)"
+  }
+}
+
 function Assert-NoStreamReportLine {
   param([string]$Key, [string]$Context)
   $line = Select-String -LiteralPath $FactorioLog -Pattern "kind=stream key=$Key" -SimpleMatch | Select-Object -Last 1
@@ -1616,6 +1626,7 @@ Assert-NoStreamReportLine -Key "research_character_trash_slots" -Context "Merged
 Invoke-RuntimeScenario -ScenarioName "base-generation-integrity" -EnabledFixtureNames @(
   "mir-fixture-assert-generation-integrity"
 )
+Assert-LogDoesNotContain -Unexpected "Applied pipeline extent multiplier" -Context "Default pipeline extent scenario"
 Assert-BaseCoreProductivityStreamsGenerated -Context "Base generation integrity scenario"
 Assert-DefaultBaseExtensionDiagnostics -Context "Base generation integrity scenario"
 

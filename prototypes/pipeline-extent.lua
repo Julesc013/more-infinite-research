@@ -67,8 +67,8 @@ local function scan_table(value, multiplier, seen_nodes, seen_boxes)
   return count
 end
 
-function P.apply()
-  local multiplier = pipeline_extent_multiplier()
+function P.apply(multiplier_override)
+  local multiplier = tonumber(multiplier_override) or pipeline_extent_multiplier()
   if multiplier <= 1 then return end
 
   local count = 0

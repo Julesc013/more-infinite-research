@@ -15,7 +15,7 @@ Scope:
 
 - Added fluid-output recipe-productivity streams for oil processing, oil cracking, lubricant, sulfuric acid, Space Age thruster fuel, and Space Age thruster oxidizer.
 - Added fluid prototype lookup, fluid-output recipe matching, fluid icon fallback, and required-fluid stream gates.
-- Added `mir-pipeline-extent-multiplier`, a startup-only setting whose default `1x` leaves fluid boxes unchanged.
+- Added `mir-pipeline-extent-multiplier`, a startup-only setting whose default `1x` leaves fluid boxes unchanged and does not load the pipeline prototype pass.
 - Added post-MIR assertion fixtures for fluid-productivity ownership and explicit pipeline extent scaling.
 
 Commands:
@@ -30,6 +30,7 @@ Results:
 
 - Static validation passed, including locale parity, snippet coverage, package metadata/parity, and whitespace checks.
 - Runtime fixture validation passed on Factorio `2.1.9`.
+- `base-generation-integrity` proved the default `1x` pipeline setting does not log or run the pipeline extent pass.
 - `base-fluid-productivity` proved base oil processing, oil cracking, lubricant, and sulfuric acid streams generate and that thruster streams skip cleanly without Space Age fluids.
 - `space-age-fluid-productivity` proved Space Age thruster fuel and thruster oxidizer streams generate with two recipe effects each, alongside the base fluid-output streams.
 - `pipeline-extent-multiplier` proved `mir-pipeline-extent-multiplier = 2` applies during startup prototype load and mutates representative pipe, pipe-to-ground, and storage-tank fluid boxes.
