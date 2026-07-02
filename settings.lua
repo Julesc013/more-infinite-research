@@ -56,6 +56,17 @@ table.insert(settings_data, {
 
 table.insert(settings_data, {
   type = "string-setting",
+  name = "mir-settings-mode",
+  setting_type = "startup",
+  default_value = "custom",
+  allowed_values = {"custom", "vanilla-respectful", "megabase-balanced", "unlimited-sandbox"},
+  order = "a-015",
+  localised_name = {"mod-setting-name.mir-settings-mode"},
+  localised_description = {"mod-setting-description.mir-settings-mode"}
+})
+
+table.insert(settings_data, {
+  type = "string-setting",
   name = "mir-science-pack-ingredient-policy",
   setting_type = "startup",
   default_value = "configured",
@@ -273,11 +284,21 @@ for _, group in ipairs(technology_setting_groups) do
     local tech_locale = stream.localised_name or {"technology-name.more-infinite-research."..key}
     local settings_note = lookup_default(key, "settings_note", stream, nil)
     table.insert(settings_data, {
+      type = "string-setting",
+      name = "mir-enable-policy-"..key,
+      setting_type = "startup",
+      default_value = "Use settings mode",
+      allowed_values = {"Use settings mode", "Force enabled", "Force disabled"},
+      order = order_prefix.."-0",
+      localised_name = {"mod-setting-name.mir-enable-policy-stream", tech_locale},
+      localised_description = append_note({"mod-setting-description.mir-enable-policy-stream", tech_locale}, settings_note)
+    })
+    table.insert(settings_data, {
       type = "bool-setting",
       name = "ips-enable-"..key,
       setting_type = "startup",
       default_value = group.enabled,
-      order = order_prefix.."-0",
+      order = order_prefix.."-1",
       localised_name = {"mod-setting-name.ips-enable-stream", tech_locale},
       localised_description = append_note({"mod-setting-description.ips-enable-stream", tech_locale}, settings_note)
     })
@@ -288,7 +309,7 @@ for _, group in ipairs(technology_setting_groups) do
       default_value = default_base_cost(key, stream),
       minimum_value = 1,
       maximum_value = 2147483647,
-      order = order_prefix.."-1",
+      order = order_prefix.."-2",
       localised_name = {"mod-setting-name.ips-cost-base-stream", tech_locale},
       localised_description = {"mod-setting-description.ips-cost-base-stream", tech_locale}
     })
@@ -298,7 +319,7 @@ for _, group in ipairs(technology_setting_groups) do
       setting_type = "startup",
       default_value = default_growth_factor(key, stream),
       minimum_value = 1,
-      order = order_prefix.."-2",
+      order = order_prefix.."-3",
       localised_name = {"mod-setting-name.ips-cost-growth-stream", tech_locale},
       localised_description = {"mod-setting-description.ips-cost-growth-stream", tech_locale}
     })
@@ -309,7 +330,7 @@ for _, group in ipairs(technology_setting_groups) do
       default_value = default_max_level_setting(key, stream),
       minimum_value = 0,
       maximum_value = 2147483647,
-      order = order_prefix.."-3",
+      order = order_prefix.."-4",
       localised_name = {"mod-setting-name.ips-max-level-stream", tech_locale},
       localised_description = {"mod-setting-description.ips-max-level-stream", tech_locale}
     })
@@ -320,7 +341,7 @@ for _, group in ipairs(technology_setting_groups) do
       default_value = default_research_time_setting(key, stream),
       minimum_value = 0,
       maximum_value = 2147483647,
-      order = order_prefix.."-4",
+      order = order_prefix.."-5",
       localised_name = {"mod-setting-name.ips-research-time-stream", tech_locale},
       localised_description = {"mod-setting-description.ips-research-time-stream", tech_locale}
     })
@@ -347,11 +368,21 @@ for _, group in ipairs(technology_setting_groups) do
     end
     local locale = {"technology-name."..spec.key}
     table.insert(settings_data, {
+      type = "string-setting",
+      name = "mir-enable-policy-"..spec.key,
+      setting_type = "startup",
+      default_value = "Use settings mode",
+      allowed_values = {"Use settings mode", "Force enabled", "Force disabled"},
+      order = order_prefix.."-0",
+      localised_name = {"mod-setting-name.mir-enable-policy-base-tech", locale},
+      localised_description = append_note({"mod-setting-description.mir-enable-policy-base-tech", locale}, defaults_spec.settings_note)
+    })
+    table.insert(settings_data, {
       type = "bool-setting",
       name = "mir-enable-"..spec.key,
       setting_type = "startup",
       default_value = enabled_default,
-      order = order_prefix.."",
+      order = order_prefix.."-1",
       localised_name = {"mod-setting-name.mir-enable-base-tech", locale},
       localised_description = append_note({"mod-setting-description.mir-enable-base-tech", locale}, defaults_spec.settings_note)
     })
@@ -362,7 +393,7 @@ for _, group in ipairs(technology_setting_groups) do
       default_value = math.floor(base_default + 0.5),
       minimum_value = 0,
       maximum_value = 2147483647,
-      order = order_prefix.."-1",
+      order = order_prefix.."-2",
       localised_name = {"mod-setting-name.mir-cost-base", locale},
       localised_description = {"mod-setting-description.mir-cost-base", locale}
     })
@@ -372,7 +403,7 @@ for _, group in ipairs(technology_setting_groups) do
       setting_type = "startup",
       default_value = growth_default,
       minimum_value = 0,
-      order = order_prefix.."-2",
+      order = order_prefix.."-3",
       localised_name = {"mod-setting-name.mir-cost-growth", locale},
       localised_description = {"mod-setting-description.mir-cost-growth", locale}
     })
@@ -383,7 +414,7 @@ for _, group in ipairs(technology_setting_groups) do
       default_value = max_level_default,
       minimum_value = 0,
       maximum_value = 2147483647,
-      order = order_prefix.."-3",
+      order = order_prefix.."-4",
       localised_name = {"mod-setting-name.mir-max-level", locale},
       localised_description = {"mod-setting-description.mir-max-level", locale}
     })
@@ -394,7 +425,7 @@ for _, group in ipairs(technology_setting_groups) do
       default_value = math.floor(research_time_default + 0.5),
       minimum_value = 0,
       maximum_value = 2147483647,
-      order = order_prefix.."-4",
+      order = order_prefix.."-5",
       localised_name = {"mod-setting-name.mir-research-time", locale},
       localised_description = {"mod-setting-description.mir-research-time", locale}
     })

@@ -31,8 +31,8 @@ decision for each one.
 
 | Gate | Required outcome | Release blocker? |
 | --- | --- | ---: |
-| Settings presets | `Custom/manual`, `Vanilla-respectful`, `Megabase-balanced`, and `Unlimited sandbox` are implemented or explicitly deferred with rationale | Yes |
-| Preset override model | User-visible precedence is documented and tested; presets do not silently contradict explicit per-feature choices | Yes |
+| Settings presets | `Custom/manual`, `Vanilla-respectful`, `Megabase-balanced`, and `Unlimited sandbox` enablement presets are implemented; numeric preset defaults remain out of scope for this first slice | Yes |
+| Preset override model | Per-technology enable policy is documented and tested; presets do not silently contradict explicit force-enabled/force-disabled choices | Yes |
 | Native modifier overlap policy | Existing diagnostics become a policy: skip/prefer existing, warn only, prefer MIR, or allow duplicates | Yes |
 | Icon source and asset policy | Fallback resolver can prefer loaded Space Age/Wube technology art, but the package does not redistribute original Space Age files | Yes |
 | Scripted spoilage hardening | Existing-stack, reversal, disable, baseline, and multi-force behavior is measured or remains default-off with caveats | Yes |
@@ -84,25 +84,26 @@ Preset intent:
 | `Megabase-balanced` | Most reasonable late-game sinks enabled; risky scripted behavior still conservative |
 | `Unlimited sandbox` | High-power options enabled or recommended with explicit warnings |
 
-Avoid ambiguous precedence. Preferred model:
+Avoid ambiguous precedence. Implemented model:
 
 ```text
 Per-feature state:
-- Use preset
+- Use settings mode
 - Force enabled
 - Force disabled
 
 Numeric setting state:
-- Use preset/default
-- Manual value
+- Existing manual value
 ```
 
-Do not make the UI say a feature is disabled while a preset silently enables it.
+This first preset slice controls enablement only. Cost, growth, maximum level,
+and research unit time settings remain the existing manual tunables in every
+mode. Do not make the UI say a feature is force-disabled while a preset silently
+enables it.
 
 Acceptance criteria:
 
-- Each preset has fixture or scripted validation for expected generated stream
-  decisions.
+- Preset runtime fixtures validate expected stream and base-extension decisions.
 - Existing `Custom/manual` behavior remains backward-compatible.
 - README contains a preset comparison table.
 - Setting tooltips explain precedence.

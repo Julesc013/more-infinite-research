@@ -1,5 +1,6 @@
 local C = require("prototypes.config")
 local defaults = require("defaults")
+local settings_resolver = require("prototypes.settings-resolver")
 
 local deepcopy = require("prototypes.lib.deepcopy")
 local lookup = require("prototypes.lib.prototype-lookup")
@@ -117,9 +118,7 @@ local function coerce_max_level(value)
 end
 
 function U.enabled_for(key, spec)
-  local s = settings and settings.startup and settings.startup["ips-enable-" .. key]
-  if s ~= nil then return s.value end
-  return lookup_default(key, "enabled", spec, true)
+  return settings_resolver.stream_enabled(key, spec)
 end
 
 function U.base_cost_for(key, spec)

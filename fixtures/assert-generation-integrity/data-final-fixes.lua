@@ -28,6 +28,43 @@ local function startup_setting_bool(name, fallback)
   return fallback == true
 end
 
+local function startup_setting_string(name, fallback)
+  local setting = settings and settings.startup and settings.startup[name]
+  if setting and setting.value ~= nil then return setting.value end
+  return fallback
+end
+
+local function enable_policy(key)
+  local policy = startup_setting_string("mir-enable-policy-" .. key, "Use settings mode")
+  if policy == "Force enabled" or policy == "force-enabled" then return "force-enabled" end
+  if policy == "Force disabled" or policy == "force-disabled" then return "force-disabled" end
+  return "use-settings-mode"
+end
+
+local function preset_mode()
+  local mode = startup_setting_string("mir-settings-mode", "custom")
+  if mode == "vanilla-respectful" or mode == "megabase-balanced" or mode == "unlimited-sandbox" then
+    return mode
+  end
+  return "custom"
+end
+
+local function preset_base_extension_enabled(key, default_enabled)
+  local mode = preset_mode()
+  if mode == "custom" then return startup_setting_bool("mir-enable-" .. key, default_enabled) end
+  if mode == "unlimited-sandbox" then return true end
+  if mode == "vanilla-respectful" then return false end
+  if mode == "megabase-balanced" and key == "inserter-capacity-bonus" then return false end
+  return default_enabled == true
+end
+
+local function effective_base_extension_enabled(key, default_enabled)
+  local policy = enable_policy(key)
+  if policy == "force-enabled" then return true end
+  if policy == "force-disabled" then return false end
+  return preset_base_extension_enabled(key, default_enabled)
+end
+
 local function sorted_csv(values)
   table.sort(values)
   return table.concat(values, ", ")
@@ -111,7 +148,7 @@ local base_extension_defaults = {
 }
 
 for key, default_enabled in pairs(base_extension_defaults) do
-  if startup_setting_bool("mir-enable-" .. key, default_enabled) then
+  if effective_base_extension_enabled(key, default_enabled) then
     assert_chain_extended_once(key)
   else
     assert_chain_not_extended(key)

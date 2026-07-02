@@ -110,7 +110,7 @@ This table is the canonical current synthesis from the Reddit discussion and fol
 | Settings confidence pass: clearer labels, ordering, warnings, dropdown help, and docs | Ship | `v2.0.5` |
 | Cannon shell productivity rename/icon and generated badge audit | Ship | `v2.0.5` |
 | Engine/electric-engine productivity verification | Ship/verify | `v2.0.5` |
-| Settings presets with real mode/override behavior | Ship | `v2.1.0` |
+| Settings presets with real mode/override behavior | Started | `v2.1.0` |
 | Existing agricultural plant rescale | Spike/ship if bounded | `v2.1.0` |
 | Agricultural yield / fruit yield | Spike | `v2.1.0` or later |
 | High-throughput pump / Der Pump | Spike or optional prototype unlock | `v2.1.0` |
@@ -176,7 +176,8 @@ Only defer the specific feature that fails proof:
 - Spoilage preservation moves to `v2.1.0` if existing-stack behavior, reversal, disabling, or multi-force behavior is unsafe or unclear.
 - Agricultural growth speed moves to `v2.1.0` if the tower event path or `tick_grown` behavior is not stable in real saves.
 - Existing plant rescale is not required for `v2.0.5`; keep it for `v2.1.0` unless it is clearly bounded and safe.
-- Settings presets can wait for `v2.1.0` because they affect defaults and user expectations.
+- Settings presets started on `dev` after `v2.0.5`: the first slice controls technology enablement through `Custom/manual`, `Vanilla-respectful`, `Megabase-balanced`, and `Unlimited sandbox`.
+- Numeric preset defaults are intentionally not part of the first slice; cost, growth, max-level, and research-unit-time settings remain manual.
 - Do not add real settings presets to `v2.0.5`; the quick patch only improves confidence in the existing settings.
 
 ## v1.9.0 Legacy Backport Released
@@ -209,8 +210,8 @@ The executable release gate lives in `docs/release-plan-2.1.0.md`.
 
 | Feature | Bucket | Implementation type | Notes |
 | --- | --- | --- | --- |
-| Settings presets | Ship | Startup setting/default derivation | Vanilla-respectful, Megabase-balanced, Unlimited sandbox, with explicit override rules |
-| Preset override model | Ship | Startup setting/default derivation | User-visible precedence; no silent contradiction between preset and explicit setting |
+| Settings presets | Started | Startup setting/default derivation | Enablement presets implemented first; numeric preset defaults remain out of scope until explicitly designed |
+| Preset override model | Started | Startup setting/default derivation | Per-technology enable policy supports Use settings mode, Force enabled, and Force disabled |
 | Duplicate native modifier policy | Ship | Data-stage overlap scan plus explicit policy | Promote `v2.0.5` diagnostic-only reporting to skip/warn/prefer/allow behavior |
 | Icon source resolver and asset policy | Ship | Data-stage icon candidate resolver plus package validation guard | Prefer loaded Space Age/Wube art when available; do not redistribute original Space Age files in MIR |
 | Scripted-tech refinements | Ship if needed | Event-driven runtime manager | Improve storage/reversal/diagnostics after `v2.0.5` feedback |

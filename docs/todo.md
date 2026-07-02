@@ -262,8 +262,8 @@ Do not turn `v2.1.0` into a bucket for every plausible feature idea.
 
 ### v2.1.0 Ship Candidates
 
-- [ ] Settings presets: `Custom/manual`, `Vanilla-respectful`, `Megabase-balanced`, `Unlimited sandbox`.
-- [ ] Preset override model: explicit per-feature choice must not be silently contradicted by preset behavior.
+- [x] Settings presets: `Custom/manual`, `Vanilla-respectful`, `Megabase-balanced`, `Unlimited sandbox` implemented for technology enablement.
+- [x] Preset override model: per-technology `Use settings mode`, `Force enabled`, and `Force disabled` policy prevents preset modes from silently contradicting explicit enablement choices.
 - [ ] Native modifier overlap policy: prefer existing owner, warn only, prefer MIR, or allow duplicates.
 - [x] Icon source resolver: prefer loaded Space Age technology art when available, optionally reference installed-but-disabled Space Age icon files behind `mir-use-installed-space-age-icons`, keep default base-only fallbacks safe, and do not redistribute original Space Age asset files inside MIR.
 - [ ] Scripted spoilage hardening: manual results for existing/new stacks, reversal, disable, baseline, and multi-force behavior.
@@ -302,7 +302,7 @@ Do not turn `v2.1.0` into a bucket for every plausible feature idea.
 - [ ] Any new recipe-productivity stream proves exact recipe IDs and no vanilla/other-mod infinite duplicate.
 - [ ] Every startup prototype setting documents when it is applied and why it cannot be runtime research.
 - [ ] Compatibility tests include no Space Age, Space Age, Space Age without Quality where supported, custom science/lab fixtures, and at least one large overhaul if available.
-- [ ] Presets have validation for expected generated stream decisions.
+- [x] Presets have validation for expected generated stream and base-extension decisions.
 - [ ] Native modifier overlap policy has validation for duplicate cargo/native modifier scenarios.
 - [x] Icon resolver validation proves default base-only runs do not resolve generated icons to `__space-age__` paths, opt-in base-only runs can use installed Space Age icon paths, and Space Age runs still prefer intended Space Age art.
 - [x] Package validation fails copied Space Age asset files unless an explicit source/license allowlist entry exists.

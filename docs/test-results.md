@@ -2,6 +2,67 @@
 
 This file records local release-candidate validation runs. It is not a substitute for the manual mod matrix in `docs/compatibility.md`.
 
+## 2026-07-02 Dev Settings Preset Enablement Pass
+
+Environment:
+
+- Branch: `dev`.
+- Mod version `2.0.5` source line, preparing `v2.1.0` settings changes.
+- Installed local Factorio binary: `2.1.9` build `86829`, Windows Steam.
+- Release archive rebuilt: `dist/more-infinite-research_2.0.5.zip`.
+- Validation archive rebuilt: `build/validation-dist/more-infinite-research_2.0.5.zip`.
+
+Scope:
+
+- Added `mir-settings-mode` with `custom`, `vanilla-respectful`,
+  `megabase-balanced`, and `unlimited-sandbox` modes.
+- Added generated per-technology enable policy settings:
+  `Use settings mode`, `Force enabled`, and `Force disabled`.
+- Presets intentionally control technology enablement only. Cost, growth,
+  maximum level, and research unit time remain the existing manual tunables.
+- Routed generated streams, base-technology continuations, and competing
+  base-extension cleanup through the shared settings resolver.
+
+Commands:
+
+```powershell
+.\scripts\Build-MIRPackage.ps1
+.\scripts\Invoke-MIRValidation.ps1 -StaticOnly
+.\scripts\Invoke-MIRValidation.ps1 -FactorioBin "C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe"
+.\scripts\Test-MIRBranchPolicy.ps1
+git diff --check
+```
+
+Results:
+
+- Static validation passed, including settings-mode snippets, generated enable
+  policy wiring, locale parity, no-runtime-tick guard, package metadata, and
+  changelog format checks.
+- Runtime fixture validation passed on Factorio `2.1.9`.
+- `preset-vanilla-respectful` proved normal recipe-productivity streams still
+  generate while conservative vanilla-chain continuations are skipped by the
+  selected preset.
+- `preset-force-enabled-overrides` proved `Force enabled` overrides a
+  conservative preset for both a generated stream and a vanilla-chain
+  continuation.
+- `preset-force-disabled-overrides` proved `Force disabled` overrides the
+  sandbox preset for both a generated stream and a vanilla-chain continuation.
+- `space-age-unlimited-sandbox-preset` proved Space Age scripted/cargo
+  candidates and the normally disabled inserter-capacity continuation generate
+  when the sandbox preset is selected and their prototype gates are valid.
+- The generation-integrity fixture was updated to assert effective base
+  continuation enablement through the new policy and preset model instead of
+  checking only the legacy boolean checkbox.
+- Branch policy validation and `git diff --check` passed.
+
+Limitations:
+
+- The first `v2.1.0` preset slice does not apply numeric cost/growth/timing
+  profiles.
+- `Custom/manual` preserves the visible `v2.0.5` checkbox behavior.
+- Scripted spoilage/agriculture behavior still needs the manual save matrix
+  before default enablement or stronger measured gameplay claims.
+
 ## 2026-07-02 Dev Installed Space Age Icon Opt-In Pass
 
 Environment:

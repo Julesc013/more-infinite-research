@@ -4,6 +4,7 @@ local base_defaults = defaults.base_extensions or {}
 
 local U = require("prototypes.util")
 local D = require("prototypes.diagnostics")
+local settings_resolver = require("prototypes.settings-resolver")
 local deepcopy = require("prototypes.lib.deepcopy")
 local table_utils = require("prototypes.lib.table-utils")
 
@@ -32,10 +33,7 @@ local function prefer_this_mod_for_competing_techs()
 end
 
 local function is_enabled(key, spec)
-  local value = startup_setting("mir-enable-" .. key)
-  if value ~= nil then return value end
-  if spec and spec.enabled ~= nil then return spec.enabled end
-  return true
+  return settings_resolver.base_enabled(key, spec)
 end
 
 local function sanitize_number(value)
