@@ -2,6 +2,38 @@
 
 This file records local release-candidate validation runs. It is not a substitute for the manual mod matrix in `docs/compatibility.md`.
 
+## 2026-07-02 Dev Factorio 2.1.9 Runtime Fixture Pass
+
+Environment:
+
+- Branch: `dev`.
+- Mod version `2.0.5`.
+- Current-line Factorio target in `info.json`: `2.1`.
+- Installed local Factorio binary: `2.1.9` build `86829`, Windows Steam.
+- Release archive rebuilt: `dist/more-infinite-research_2.0.5.zip`.
+- Validation archive rebuilt: `build/validation-dist/more-infinite-research_2.0.5.zip`.
+
+Commands:
+
+```powershell
+& "C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe" --version
+.\scripts\Build-MIRPackage.ps1
+.\scripts\Invoke-MIRValidation.ps1 -StaticOnly
+.\scripts\Invoke-MIRValidation.ps1 -FactorioBin "C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe"
+.\scripts\Test-MIRBranchPolicy.ps1
+git diff --check
+```
+
+Results:
+
+- Factorio reported `Version: 2.1.9 (build 86829, win64, steam)`.
+- Static/package validation passed.
+- Runtime fixture validation passed against Factorio `2.1.9`.
+- The current-line Factorio `2.1` cargo fixture scenarios ran instead of being skipped.
+- Branch policy validation passed for `origin/main`, `origin/dev`, and `origin/legacy`.
+- `git diff --check` passed; Git reported line-ending normalization warnings only.
+- This pass resolves the earlier `dev` note that runtime validation still needed to be rerun after the local install returned to Factorio `2.1.x`.
+
 ## 2026-07-02 Dev Post-Legacy Reconciliation Pass
 
 Environment:
