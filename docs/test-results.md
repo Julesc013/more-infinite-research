@@ -60,6 +60,33 @@ Results:
 - Branch policy validation passed for `origin/main`, `origin/dev`, and `origin/legacy`.
 - `git diff --check` passed; Git reported line-ending normalization warnings only.
 
+## 2026-07-02 Main Branch Legacy Artifact Synthesis Pass
+
+Environment:
+
+- Branch: `main`.
+- Current-line mod version `2.0.5`.
+- Added historical/canonical artifacts from the released Factorio `2.0` legacy line.
+- Local Factorio binary remained `2.0.77`, so current-line runtime validation was not run.
+
+Commands:
+
+```powershell
+.\scripts\Invoke-MIRValidation.ps1 -StaticOnly
+.\scripts\Test-MIRBranchPolicy.ps1
+git diff --check
+```
+
+Results:
+
+- Fast-forwarded `main` to the current `dev` documentation and validation-hardening state.
+- Added `dist/more-infinite-research_1.9.0.zip` from the released `legacy` branch.
+- Added a `1.9.0` changelog entry to the canonical current-line changelog so future current-line packages retain the legacy release history.
+- Kept legacy-only Factorio `2.0` source changes out of `main`: `info.json` remains Factorio `2.1`, cargo logistics streams remain current-line features, and local fixtures remain Factorio `2.1` fixtures.
+- Static/package validation passed and generated `build/validation-dist/more-infinite-research_2.0.5.zip`.
+- Branch policy validation passed for `origin/main`, `origin/dev`, and `origin/legacy`.
+- `git diff --check` passed; Git reported line-ending normalization warnings only.
+
 ## 2026-07-02 Generated Package Validation Pass
 
 Environment:
