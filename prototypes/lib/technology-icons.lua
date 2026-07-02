@@ -70,11 +70,16 @@ local function startup_setting(name)
   return nil
 end
 
+local INSTALLED_ASSET_OPT_IN_MODS = {
+  ["elevated-rails"] = true,
+  ["space-age"] = true
+}
+
 local function inactive_asset_mod_allowed(mod_name)
   if not mod_name then return true end
   if lookup.mod_exists(mod_name) then return true end
 
-  return mod_name == "space-age"
+  return INSTALLED_ASSET_OPT_IN_MODS[mod_name] == true
     and startup_setting("mir-use-installed-space-age-icons") == true
 end
 

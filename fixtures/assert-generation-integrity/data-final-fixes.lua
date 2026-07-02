@@ -272,7 +272,9 @@ local function assert_tech_uses_item_icon(tech_name, item_name)
     fail("missing generated technology " .. tech_name .. " for icon assertion.")
   end
 
-  local item = (data.raw.item or {})[item_name] or (data.raw.ammo or {})[item_name]
+  local item = (data.raw.item or {})[item_name]
+    or (data.raw.ammo or {})[item_name]
+    or (data.raw["rail-planner"] or {})[item_name]
   local expected_paths = prototype_icon_paths(item)
   if not next(expected_paths) then
     fail("missing item icon source for " .. item_name .. ".")
@@ -373,6 +375,13 @@ elseif use_installed_space_age_icons then
 else
   assert_tech_uses_technology_icon("recipe-prod-research_science_pack_productivity-1", "space-science-pack")
 end
+if mods and mods["elevated-rails"] then
+  assert_tech_uses_technology_icon("recipe-prod-research_rails-1", "elevated-rail")
+elseif use_installed_space_age_icons then
+  assert_tech_uses_icon_path("recipe-prod-research_rails-1", "__elevated-rails__/graphics/technology/elevated-rail.png")
+else
+  assert_tech_uses_item_icon("recipe-prod-research_rails-1", "rail")
+end
 assert_tech_uses_technology_icon("recipe-prod-research_walls-1", "gate")
 if techs["recipe-prod-research_lab_productivity-1"] then
   if use_installed_space_age_icons then
@@ -420,7 +429,10 @@ end
 
 for _, expectation in ipairs({
   { recipe = "electronic-circuit", owner = "recipe-prod-research_electronic_circuit-1" },
-  { recipe = "advanced-circuit", owner = "recipe-prod-research_advanced_circuit-1" }
+  { recipe = "advanced-circuit", owner = "recipe-prod-research_advanced_circuit-1" },
+  { recipe = "rail", owner = "recipe-prod-research_rails-1" },
+  { recipe = "rail-support", owner = "recipe-prod-research_rails-1" },
+  { recipe = "rail-ramp", owner = "recipe-prod-research_rails-1" }
 }) do
   assert_recipe_owner(expectation.recipe, expectation.owner)
 end

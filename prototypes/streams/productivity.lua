@@ -150,7 +150,14 @@ return {
     { change = 0.05, items = { "foundation" }, item_patterns = { "^artificial%-.+%-soil$" } }
   }, exclude_ingredient_patterns={"scrap"} },
 
-  research_rails = { icon_item="rail", items = {"rail"} },
+  research_rails = { icon_item = "rail", icon_candidates = {
+    { technology = "elevated-rail", required_mod = "elevated-rails" },
+    { icon = "__elevated-rails__/graphics/technology/elevated-rail.png", icon_size = 256, inactive_mod_asset = "elevated-rails" }
+  }, groups = {
+    { change = 0.10, items = { "rail" } },
+    { change = 0.05, items = { "rail-support" } },
+    { change = 0.02, items = { "rail-ramp" } }
+  } },
 
   research_concrete = { icon_tech = "concrete", groups = {
     { change = 0.10, items = { "stone-brick" } },

@@ -81,14 +81,27 @@ Invoke-RepoCheck "release metadata matches Factorio line" {
       throw "Factorio 2.0 legacy metadata must not carry Factorio 2.1 dependency floors: $($factorio21Deps -join ', ')"
     }
   } elseif ($isFactorio21Line) {
-    if ($deps -notcontains "base >= 2.1.8") {
-      throw "Factorio 2.1 metadata must declare base >= 2.1.8."
+    $requiredDeps = @(
+      "base >= 2.1.8",
+      "(?) elevated-rails",
+      "? recycler >= 2.1.8",
+      "(?) quality",
+      "? space-age >= 2.1.8"
+    )
+    foreach ($requiredDep in $requiredDeps) {
+      if ($deps -notcontains $requiredDep) {
+        throw "Factorio 2.1 metadata must declare dependency '$requiredDep'."
+      }
     }
-    if ($deps -notcontains "(?) quality >= 2.1.8") {
-      throw "Factorio 2.1 metadata must declare hidden optional Quality load ordering with (?) quality >= 2.1.8."
+    if ($deps | Where-Object { $_ -match "^\?\s+elevated-rails(\s|$)" }) {
+      throw "Elevated Rails must be a hidden optional dependency because MIR's Rail productivity support for it is opportunistic."
     }
-    if ($deps -contains "? quality >= 2.1.8") {
+    if ($deps | Where-Object { $_ -match "^\?\s+quality(\s|$)" }) {
       throw "Quality must be a hidden optional dependency so module productivity can see quality module recipes without advertising a visible dependency."
+    }
+    $hiddenVersionFloors = @($deps | Where-Object { $_ -match "^\(\?\)\s+(elevated-rails|quality)\s+>=\s*2\.1" })
+    if ($hiddenVersionFloors.Count -gt 0) {
+      throw "Hidden optional dependency version floors should not gate graceful degradation: $($hiddenVersionFloors -join ', ')"
     }
   } else {
     throw "Unsupported factorio_version in info.json: $($repoInfo.factorio_version)"
@@ -439,6 +452,10 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'fluids = {"thruster-fuel"}' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = '"^simple%-coal%-liquefaction$"' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'research_walls = { icon_tech="gate", icon_item="stone-wall", groups = {' },
+    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'technology = "elevated-rail", required_mod = "elevated-rails"' },
+    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'inactive_mod_asset = "elevated-rails"' },
+    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'change = 0.05, items = { "rail-support" }' },
+    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'change = 0.02, items = { "rail-ramp" }' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'research_heavy_ammo = { icon_item="cannon-shell", groups = {' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'items={"artillery-shell","railgun-ammo"}' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = '^omega%-drill$' },
@@ -496,7 +513,7 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'more-infinite-research.research_oil_processing_productivity=Oil processing productivity' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'more-infinite-research.research_thruster_fuel_productivity=Thruster fuel productivity' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'more-infinite-research.lab_productivity=Increases research progress gained from each consumed science pack' },
-    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-use-installed-space-age-icons=Use installed Space Age icons in base games' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-use-installed-space-age-icons=Use installed official DLC icons in base games' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-pipeline-extent-multiplier=Pipeline extent multiplier' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'Factorio cannot recover gracefully from missing icon files during prototype loading.' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'flamethrower-shooting-speed-bonus=Flamethrower shooting speed: +__1__' },
@@ -1666,6 +1683,9 @@ Invoke-RuntimeScenario -ScenarioName "base-generation-integrity" -EnabledFixture
 Assert-LogDoesNotContain -Unexpected "Applied pipeline extent multiplier" -Context "Default pipeline extent scenario"
 Assert-BaseCoreProductivityStreamsGenerated -Context "Base generation integrity scenario"
 Assert-DefaultBaseExtensionDiagnostics -Context "Base generation integrity scenario"
+$baseRailsLine = Get-LastStreamReportLine -Key "research_rails"
+Assert-ReportLineContains -Line $baseRailsLine -Expected "effects=1" -Context "Base rail productivity scenario"
+Assert-ReportLineContains -Line $baseRailsLine -Expected "icon=item:rail" -Context "Base rail productivity icon scenario"
 
 Invoke-RuntimeScenario -ScenarioName "base-fluid-productivity" -EnabledFixtureNames @(
   "mir-fixture-assert-fluid-productivity"
@@ -1710,6 +1730,9 @@ Assert-ReportLineContains -Line $baseInstalledElectricIconLine -Expected "icon=_
 $baseInstalledScienceIconLine = Get-LastStreamReportLine -Key "research_science_pack_productivity"
 Assert-ReportLineGenerated -Line $baseInstalledScienceIconLine -Context "Base installed Space Age science productivity icon scenario"
 Assert-ReportLineContains -Line $baseInstalledScienceIconLine -Expected "icon=__space-age__/graphics/technology/research-productivity.png" -Context "Base installed Space Age science productivity icon scenario"
+$baseInstalledRailsIconLine = Get-LastStreamReportLine -Key "research_rails"
+Assert-ReportLineGenerated -Line $baseInstalledRailsIconLine -Context "Base installed official DLC rail productivity icon scenario"
+Assert-ReportLineContains -Line $baseInstalledRailsIconLine -Expected "icon=__elevated-rails__/graphics/technology/elevated-rail.png" -Context "Base installed official DLC rail productivity icon scenario"
 
 Invoke-RuntimeScenario -ScenarioName "checkbox-enabled-default-off-features" -EnabledFixtureNames @() `
   -EnabledStreamKeys @("research_character_reach") `
@@ -1798,6 +1821,9 @@ Invoke-RuntimeScenario -ScenarioName "space-age-generation-integrity" -EnabledFi
 ) -EnableSpaceAge
 Assert-SpaceAgeVanillaOwnedProductivityStreamsSkipped -Context "Space Age generation integrity scenario"
 Assert-DefaultBaseExtensionDiagnostics -Context "Space Age generation integrity scenario"
+$spaceAgeRailsLine = Get-LastStreamReportLine -Key "research_rails"
+Assert-ReportLineContains -Line $spaceAgeRailsLine -Expected "effects=3" -Context "Space Age Elevated Rails productivity scenario"
+Assert-ReportLineContains -Line $spaceAgeRailsLine -Expected "icon=tech:elevated-rail" -Context "Space Age Elevated Rails productivity icon scenario"
 
 Invoke-RuntimeScenario -ScenarioName "space-age-fluid-productivity" -EnabledFixtureNames @(
   "mir-fixture-assert-fluid-productivity"

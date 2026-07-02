@@ -94,7 +94,7 @@ Technologies are generated only when their recipes, items, technologies, ammo ca
 | Grenade productivity | `+10%` for grenades; `+5%` for cluster grenades | On | Adds military and space science when available. |
 | Wall productivity | `+10%` for stone walls; `+5%` for gates | On | Uses the Gate technology art. |
 | Stone product productivity | `+10%` for stone and landfill; `+5%` for foundation and artificial soil patterns | On | Adds metallurgic and space science when available. |
-| Rail productivity | `+10%` productivity for rail recipes | On | Uses strict rail matching to avoid unrelated rail-like outputs. |
+| Rail productivity | `+10%` productivity for rail recipes; `+5%` for Elevated Rails supports; `+2%` for Elevated Rails ramps when present | On | Uses strict rail matching and prefers Elevated Rails technology art when available. |
 | Concrete productivity | `+10%` for stone brick; `+5%` for concrete; `+2%` for refined concrete | On | Includes hazard concrete variants. |
 | Furnace productivity | `+20%` for stone furnaces; `+10%` for steel furnaces; `+5%` for electric furnaces; `+2%` for foundries | On | Adds metallurgic science when available. |
 | Mining drill productivity | `+20%` for burner drills; `+10%` for electric drills; `+5%` for big, Omega-style, and broader modded drill outputs | On | Covers Omega Drill style `omega-drill` and `omega-tau` recipes. |

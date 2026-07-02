@@ -40,7 +40,7 @@ The release goal is graceful compatibility without mod-page dependency clutter: 
 - Mod-specific stream changes should live in `prototypes/compat/profiles.lua` instead of the base stream definitions.
 - Compatibility cleanup that removes known competing technologies also removes dangling prerequisite references from remaining technologies.
 - Generic competing recipe-productivity cleanup removes only known infinite technologies whose recipe-productivity effects are all covered by generated MIR effects. Finite upgrade chains from other mods are left alone unless a future integration models them explicitly.
-- Release metadata declares optional ordering for official DLC mods and a hidden optional ordering dependency on Quality so quality module recipes are visible before module productivity is generated. Third-party compatibility remains opportunistic and avoids compatibility-mod dependencies.
+- Release metadata declares optional ordering for official DLC mods, with hidden optional ordering for Elevated Rails and Quality. Elevated Rails is hidden because its Rail productivity coverage is opportunistic and should not present Elevated Rails as required or recommended; Quality is hidden so quality module recipes are visible before module productivity is generated without presenting Quality as a required or recommended dependency. Third-party compatibility remains opportunistic and avoids compatibility-mod dependencies.
 - Weapon shooting speed overlap handling only removes rocket and cannon-shell speed effects from MIR's generated weapon shooting speed continuation. Finite vanilla weapon shooting speed technologies keep their original rocket and cannon-shell bonuses so tank cannon fire rate is not reduced.
 - `mir-debug-generation-report` can be enabled to capture why each stream or base extension generated or skipped.
 - `mir-debug-recipe-matches` can be enabled to capture matched recipe names per stream and duplicate recipe matches across streams.
@@ -159,8 +159,8 @@ For each case, verify:
 - At least one lab accepts each generated technology's full science-pack set.
 - Default base-only runs do not load direct DLC asset paths. The
   `mir-use-installed-space-age-icons` startup setting is an explicit opt-in for
-  players who have Space Age installed but disabled and want MIR to reference
-  those local icon files.
+  players who have official DLC icon files installed but disabled and want MIR
+  to reference those local icon files.
 - Logs show skipped or reduced streams clearly and do not show stack traces.
 - Finite vanilla weapon shooting speed effects are preserved even when the overlap adjustment setting is enabled. The setting only affects MIR's generated continuation.
 
@@ -310,7 +310,7 @@ Expected result: vanilla tank cannon fire rate is preserved while MIR avoids dup
 - Run `rg "icon_mipmaps" prototypes` and confirm generated icons do not add it.
 - Run `.\scripts\Invoke-MIRValidation.ps1 -StaticOnly`.
 - Confirm `changelog.txt` uses Factorio's strict changelog format with 99-dash section separators.
-- Confirm `info.json` declares `base >= 2.1.8`, hidden optional Quality ordering, and optional official DLC ordering dependencies only.
+- Confirm `info.json` declares `base >= 2.1.8`, hidden optional Elevated Rails and Quality ordering, and visible optional Recycler and Space Age ordering dependencies only.
 - Confirm package validation reports the expected root, matching metadata, included locale/docs, and no forbidden artifacts for the archive built from the current source tree.
 - Confirm package validation reports source, documentation, and locale parity with the repository.
 - Confirm runtime fixture validation covers both the default `reduce` lab policy and forced `skip` lab policy.

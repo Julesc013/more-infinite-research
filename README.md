@@ -19,9 +19,9 @@ Version **`1.x.x`** targets **Factorio `2.0`** and requires `base >= 2.0`.
 Version **`2.x.x`** targets **Factorio `2.1`**. The current **`2.1.0`** release requires:
 
 - `base >= 2.1.8`
-- optional `elevated-rails >= 2.1.8`
+- hidden optional `elevated-rails`
 - optional `recycler >= 2.1.8`
-- hidden optional `quality >= 2.1.8`
+- hidden optional `quality`
 - optional `space-age >= 2.1.8`
 
 The mod is built around **graceful compatibility**: it discovers recipes, science packs, labs, and optional prototypes from the active mod set, generates technologies late in **`data-final-fixes.lua`**, and *skips unsafe or unavailable streams* instead of requiring compatibility mods on the mod portal page.
@@ -195,7 +195,7 @@ These streams generate `change-recipe-productivity` effects for matching recipes
 | `research_grenades` | Grenade productivity | `grenade`; `cluster-grenade` | `+10%`; `+5%` | Adds military and space science when available. |
 | `research_walls` | Wall productivity | `stone-wall`; `gate` | `+10%`; `+5%` | Uses the gate technology art. Adds military and space science when available. |
 | `research_stone_products` | Stone product productivity | `stone`, `landfill`; `foundation` and artificial soil patterns | `+10%`; `+5%` | Adds metallurgic and space science when available; excludes scrap inputs. |
-| `research_rails` | Rail productivity | `rail` | `+10%` | Rail matching is strict so rail-like unrelated outputs are not caught. |
+| `research_rails` | Rail productivity | `rail`; Elevated Rails `rail-support`; Elevated Rails `rail-ramp` when present | `+10%`; `+5%`; `+2%` | Rail matching is strict so rail-like unrelated outputs are not caught. Prefers Elevated Rails technology art when available, with the rail item as fallback. |
 | `research_concrete` | Concrete productivity | `stone-brick`; concrete/hazard concrete; refined concrete/refined hazard concrete | `+10%`; `+5%`; `+2%` | Adds space science when available; excludes scrap inputs. |
 | `research_furnace` | Furnace productivity | stone furnace; steel furnace; electric furnace; foundry | `+20%`; `+10%`; `+5%`; `+2%` | Adds metallurgic science when available. |
 | `research_mining_drill` | Mining drill productivity | burner mining drill; electric mining drill; big mining drill; Omega-style and broader modded `*-mining-drill` / `*-drill` outputs | `+20%`; `+10%`; `+5%` | Adds metallurgic science when available. Modded drill outputs fall into the high-tier `+5%` bucket unless matched by an earlier exact tier. |
