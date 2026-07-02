@@ -59,7 +59,7 @@ Required before claiming larger `v2.1.0` features:
 | `pipeline-extent` | Manual soak the implemented startup prototype multiplier with large and modded fluid networks after fixture validation passes |
 | `thruster-fuel-productivity` | Manual verify the implemented thruster fuel productivity streams in a Space Age save after fixture validation passes |
 | `thruster-oxidizer-productivity` | Manual verify the implemented thruster oxidizer productivity streams in a Space Age save after fixture validation passes |
-| `oil-fluid-productivity` | Manual verify the implemented oil processing, oil cracking, lubricant, and sulfuric acid productivity split after fixture validation passes |
+| `oil-fluid-productivity` | Manual verify the implemented oil processing, oil cracking, lubricant, sulfuric acid, and acid neutralization productivity split after fixture validation passes |
 
 ## v2.1.x Spikes
 

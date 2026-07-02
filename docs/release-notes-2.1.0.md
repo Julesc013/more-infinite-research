@@ -11,7 +11,8 @@ This is the short, player-facing release summary for the `2.1.0` mod portal rele
 - Removed the planned settings modes and per-technology enable policy dropdowns before release. Per-technology enable checkboxes are the single enablement path.
 - Scripted Spoilage Preservation and Agricultural Growth Speed now follow the same enable checkbox rules as data-stage generated technologies.
 - Added better icon source resolution. MIR can prefer loaded Space Age art, use base-game fallbacks, or opt into installed-but-disabled Space Age icon files when the user explicitly enables that option.
-- Added fluid-output productivity research for oil processing, oil cracking, lubricant, sulfuric acid, thruster fuel, and thruster oxidizer recipes where those recipes exist.
+- Added fluid-output productivity research for oil processing, oil cracking, lubricant, sulfuric acid, acid neutralization, thruster fuel, and thruster oxidizer recipes where those recipes exist.
+- Oil cracking productivity uses oil processing technology art. Sulfuric acid productivity uses sulfuric acid fluid art and also covers acid neutralization when that recipe exists.
 - Added an opt-in startup-only pipeline extent multiplier. The default `1x` setting leaves prototypes unchanged.
 
 ## Compatibility And Validation

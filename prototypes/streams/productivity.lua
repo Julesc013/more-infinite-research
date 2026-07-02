@@ -92,6 +92,7 @@ return {
       "^light%-oil%-cracking$"
     },
     icon_candidates = {
+      {technology = "oil-processing"},
       {technology = "advanced-oil-processing"},
       {icon = "__base__/graphics/icons/fluid/heavy-oil-cracking.png", icon_size = 64}
     }
@@ -112,10 +113,13 @@ return {
     localised_name = {"technology-name.more-infinite-research.research_sulfuric_acid_productivity"},
     required_fluids = {"sulfuric-acid"},
     fluids = {"sulfuric-acid"},
+    recipe_patterns = {
+      "^acid%-neutralization$"
+    },
     exclude_recipe_patterns = {"^empty%-.*%-barrel$"},
     icon_candidates = {
-      {technology = "sulfur-processing"},
-      {fluid = "sulfuric-acid"}
+      {fluid = "sulfuric-acid"},
+      {technology = "sulfur-processing"}
     }
   },
 

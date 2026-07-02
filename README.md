@@ -29,7 +29,7 @@ The mod is built around **graceful compatibility**: it discovers recipes, scienc
 ## Quick Summary
 
 - **Recipe productivity:** adds infinite research for intermediate, logistics, combat, infrastructure, science-pack, and Space Age production chains.
-- **Fluid-output productivity:** adds process-family recipe productivity for oil processing, oil cracking, lubricant, sulfuric acid, and Space Age thruster propellant fluids where those recipes exist.
+- **Fluid-output productivity:** adds process-family recipe productivity for oil processing, oil cracking, lubricant, sulfuric acid, acid neutralization, and Space Age thruster propellant fluids where those recipes exist.
 - **Direct-effect bonuses:** adds infinite research for cargo logistics, weapon speed, character bonuses, combined character inventory/trash slots, and worker robot battery.
 - **Fluid prototype tuning:** includes an opt-in startup-only pipeline extent multiplier, default `1x`/unchanged.
 - **Vanilla continuations:** extends selected finite vanilla technology chains into infinite continuations.
@@ -179,9 +179,9 @@ These streams generate `change-recipe-productivity` effects for matching recipes
 | `research_thruster_fuel_productivity` | Thruster fuel productivity | Recipes outputting `thruster-fuel`, including Space Age basic and advanced thruster fuel | `+10%` | Requires the `thruster-fuel` fluid. Excludes barrel-emptying recipes. Adds space and agricultural science when available. |
 | `research_thruster_oxidizer_productivity` | Thruster oxidizer productivity | Recipes outputting `thruster-oxidizer`, including Space Age basic and advanced thruster oxidizer | `+10%` | Requires the `thruster-oxidizer` fluid. Excludes barrel-emptying recipes. Adds space and agricultural science when available. |
 | `research_oil_processing_productivity` | Oil processing productivity | `basic-oil-processing`, `advanced-oil-processing`, `coal-liquefaction`, `simple-coal-liquefaction` | `+10%` | Owns multi-output oil-processing recipes as a single process family so heavy oil, light oil, and petroleum gas are not split into competing owners. |
-| `research_oil_cracking_productivity` | Oil cracking productivity | `heavy-oil-cracking`, `light-oil-cracking` | `+10%` | Separate from oil processing because cracking recipes are single conversion steps. |
+| `research_oil_cracking_productivity` | Oil cracking productivity | `heavy-oil-cracking`, `light-oil-cracking` | `+10%` | Separate from oil processing because cracking recipes are single conversion steps. Uses the oil processing unlock technology art. |
 | `research_lubricant_productivity` | Lubricant productivity | Recipes outputting `lubricant`, including Space Age `biolubricant` when present | `+10%` | Requires the `lubricant` fluid and excludes barrel-emptying recipes. |
-| `research_sulfuric_acid_productivity` | Sulfuric acid productivity | Recipes outputting `sulfuric-acid` | `+10%` | Requires the `sulfuric-acid` fluid and excludes barrel-emptying recipes. |
+| `research_sulfuric_acid_productivity` | Sulfuric acid productivity | Recipes outputting `sulfuric-acid`, plus `acid-neutralization` when present | `+10%` | Requires the `sulfuric-acid` fluid, uses sulfuric acid fluid art, and excludes barrel-emptying recipes. |
 | `research_tungsten` | Tungsten productivity | `tungsten-plate`, `tungsten-carbide` | `+10%` | Adds metallurgic science when available. |
 | `research_lithium` | Lithium productivity | `lithium-plate` | `+10%` | Adds cryogenic science when available. |
 | `research_holmium` | Holmium productivity | `holmium-plate` | `+10%` | Generates when matching visible recipes exist; adds electromagnetic science when available. |
@@ -543,7 +543,7 @@ The validation script checks:
 - **Skip policy:** an intentionally incompatible science-pack set is skipped.
 - **Post-MIR assertions:** fixtures prove both runtime lab-policy outcomes.
 - **Native modifier overlap diagnostics:** a Maraxis-like duplicate cargo fixture proves cargo modifier overlaps are reported without changing MIR generation.
-- **Fluid productivity:** post-MIR fixtures prove oil, lubricant, sulfuric acid, and Space Age thruster propellant recipes have exactly one infinite productivity owner.
+- **Fluid productivity:** post-MIR fixtures prove oil, lubricant, sulfuric acid, acid neutralization, and Space Age thruster propellant recipes have exactly one infinite productivity owner where those recipes exist.
 - **Pipeline extent:** a post-MIR fixture proves the opt-in startup multiplier mutates common fluid boxes when enabled.
 
 ## Documentation Map

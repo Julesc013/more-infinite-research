@@ -74,7 +74,12 @@ for _, recipe_name in ipairs({
   assert_recipe_owner(recipe_name, "recipe-prod-research_lubricant_productivity-1")
 end
 
-assert_recipe_owner("sulfuric-acid", "recipe-prod-research_sulfuric_acid_productivity-1")
+for _, recipe_name in ipairs({
+  "sulfuric-acid",
+  "acid-neutralization"
+}) do
+  assert_recipe_owner(recipe_name, "recipe-prod-research_sulfuric_acid_productivity-1")
+end
 
 for _, recipe_name in ipairs({
   "thruster-fuel",

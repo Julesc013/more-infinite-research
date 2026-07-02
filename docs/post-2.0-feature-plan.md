@@ -175,7 +175,7 @@ Ship:
 - Pipeline extent startup setting, implemented with default `1x` unchanged behavior.
 - Fluid train unloading notes/docs.
 - Thruster fuel/oxidizer productivity coverage if recipe-productivity validation stays clean.
-- Oil/fluid productivity split for oil processing, oil cracking, lubricant, and sulfuric acid if validation stays clean.
+- Oil/fluid productivity split for oil processing, oil cracking, lubricant, sulfuric acid, and acid neutralization if validation stays clean.
 - Existing agricultural plant rescale if bounded and deduplicated.
 - Duplicate native modifier detection.
 

@@ -76,6 +76,12 @@ Technologies are generated only when their recipes, items, technologies, ammo ca
 | Flying robot frame productivity | `+10%` productivity for flying robot frame recipes | On | Adds electromagnetic science when available. |
 | Low density structure productivity | `+10%` productivity for low density structure recipes | On, skipped when vanilla owns covered recipes | Space Age's vanilla low density structure productivity stays authoritative. |
 | Rocket fuel productivity | `+10%` productivity for rocket fuel recipes | On, skipped when vanilla owns covered recipes | Uses rocket fuel unlock technology art. Space Age's vanilla rocket fuel productivity stays authoritative. |
+| Oil processing productivity | `+10%` productivity for basic oil processing, advanced oil processing, and coal liquefaction recipe families | On | Owns multi-output oil-processing recipes as one process family. |
+| Oil cracking productivity | `+10%` productivity for heavy oil cracking and light oil cracking | On | Uses oil processing technology art and stays separate from multi-output oil processing. |
+| Lubricant productivity | `+10%` productivity for lubricant recipes | On | Excludes barrel-emptying recipes. Includes Space Age biolubricant when present. |
+| Sulfuric acid productivity | `+10%` productivity for sulfuric acid and acid neutralization recipes | On | Uses sulfuric acid fluid art and excludes barrel-emptying recipes. |
+| Thruster fuel productivity | `+10%` productivity for Space Age thruster fuel recipes | On when fluid exists | Covers basic and advanced thruster fuel recipes when present. |
+| Thruster oxidizer productivity | `+10%` productivity for Space Age thruster oxidizer recipes | On when fluid exists | Covers basic and advanced thruster oxidizer recipes when present. |
 | Tungsten productivity | `+10%` productivity for tungsten plate and tungsten carbide recipes | On when recipes exist | Adds metallurgic science when available. |
 | Lithium productivity | `+10%` productivity for lithium plate recipes | On when recipes exist | Adds cryogenic science when available. |
 | Holmium productivity | `+10%` productivity for holmium plate recipes | On when recipes exist | Adds electromagnetic science when available. |

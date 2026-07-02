@@ -7,7 +7,8 @@ Date: 2026-07-02
     - Removed the planned settings preset mode and per-technology enable policy dropdowns before release; per-technology enable checkboxes are the single enablement path again.
     - Scripted spoilage preservation and agricultural growth speed now use the same checkbox enablement model as data-stage technology generation.
     - Added an ordered icon source resolver that can prefer loaded Space Age technology art, use safe base-game fallbacks, or opt into installed-but-disabled Space Age icon files when explicitly enabled.
-    - Added fluid-output recipe productivity streams for oil processing, oil cracking, lubricant, sulfuric acid, Space Age thruster fuel, and Space Age thruster oxidizer recipes.
+    - Added fluid-output recipe productivity streams for oil processing, oil cracking, lubricant, sulfuric acid, acid neutralization, Space Age thruster fuel, and Space Age thruster oxidizer recipes.
+    - Oil cracking productivity now uses the oil processing unlock technology art, and Sulfuric acid productivity now uses sulfuric acid fluid art and includes acid neutralization when that recipe exists.
     - Added fluid prototype lookup, fluid-output recipe matching, fluid icon fallback, and required-fluid gates for fluid-output productivity streams.
     - Added a strictly opt-in startup-only pipeline extent multiplier. The default value is 1x and leaves fluid box prototypes unchanged.
 
@@ -16,7 +17,7 @@ Date: 2026-07-02
     - Added runtime fixture coverage for checkbox enablement behavior, scripted runtime routing, icon source selection, fluid-output productivity ownership, and pipeline extent scaling.
     - Base-only icon validation now proves generated technology icons do not resolve to Space Age asset paths unless the installed Space Age icon opt-in is enabled.
     - Space Age validation proves loaded Space Age technology art is still preferred where intended.
-    - Fluid-output recipe-productivity validation proves exact recipe ownership and no duplicate infinite owner for the implemented oil, lubricant, sulfuric acid, and thruster propellant streams.
+    - Fluid-output recipe-productivity validation proves exact recipe ownership and no duplicate infinite owner for the implemented oil, lubricant, sulfuric acid, acid neutralization, and thruster propellant streams.
     - Pipeline extent validation proves the default setting does not run the prototype pass and that an explicit non-default multiplier mutates representative pipe, pipe-to-ground, and storage-tank fluid boxes.
     - Scripted spoilage preservation and agricultural growth speed remain disabled by default until broader save-level manual evidence supports stronger claims or default enablement.
     - Native modifier overlap policy, existing agricultural plant rescale, and high-throughput pump work remain deferred from this release unless separately implemented and validated.
