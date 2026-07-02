@@ -299,7 +299,6 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
   $controlSettingsResolverText = Get-Content -Raw -LiteralPath (Join-Path $repo "control\settings-resolver.lua")
   $spoilageText = Get-Content -Raw -LiteralPath (Join-Path $repo "control\effects\spoilage-preservation.lua")
   $agriculturalGrowthText = Get-Content -Raw -LiteralPath (Join-Path $repo "control\effects\agricultural-growth-speed.lua")
-  $settingsPresetsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\settings-presets.lua")
   $scienceText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\lib\science-packs.lua")
   $directEffectsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\streams\direct-effects.lua")
   $productivityText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\streams\productivity.lua")
@@ -320,10 +319,6 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
   $requiredSnippets = @(
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'name = "ips-require-space-gate"' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'default_value = false' },
-    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'name = "mir-settings-mode"' },
-    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'allowed_values = {"custom", "vanilla-respectful", "megabase-balanced", "unlimited-sandbox"}' },
-    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'name = "mir-enable-policy-"' },
-    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'allowed_values = {"Use settings mode", "Force enabled", "Force disabled"}' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'name = "mir-science-pack-ingredient-policy"' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'allowed_values = {"configured", "space", "space-and-promethium", "all-official", "all"}' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'name = "mir-use-installed-space-age-icons"' },
@@ -344,17 +339,15 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'kind = "base"' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'local bucket = group.enabled and "100" or "000"' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'order = "a-900"' },
-    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'localised_description = append_note({"mod-setting-description.mir-enable-policy-stream", tech_locale}, settings_note)' },
+    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'name = "ips-enable-"..key' },
+    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'localised_description = append_note({"mod-setting-description.ips-enable-stream", tech_locale}, settings_note)' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'localised_name = {"mod-setting-name.mir-max-level", locale}' },
-    @{ File = "prototypes\settings-presets.lua"; Text = $settingsPresetsText; Snippet = '["vanilla-respectful"]' },
-    @{ File = "prototypes\settings-presets.lua"; Text = $settingsPresetsText; Snippet = '["megabase-balanced"]' },
-    @{ File = "prototypes\settings-presets.lua"; Text = $settingsPresetsText; Snippet = '["unlimited-sandbox"]' },
     @{ File = "prototypes\settings-resolver.lua"; Text = $settingsResolverText; Snippet = 'function R.stream_enabled(key, spec)' },
     @{ File = "prototypes\settings-resolver.lua"; Text = $settingsResolverText; Snippet = 'function R.base_enabled(key, spec)' },
-    @{ File = "prototypes\settings-resolver.lua"; Text = $settingsResolverText; Snippet = 'Force enabled' },
+    @{ File = "prototypes\settings-resolver.lua"; Text = $settingsResolverText; Snippet = 'startup_setting("ips-enable-" .. key)' },
+    @{ File = "prototypes\settings-resolver.lua"; Text = $settingsResolverText; Snippet = 'startup_setting("mir-enable-" .. key)' },
     @{ File = "control\settings-resolver.lua"; Text = $controlSettingsResolverText; Snippet = 'function R.stream_enabled(key)' },
-    @{ File = "control\settings-resolver.lua"; Text = $controlSettingsResolverText; Snippet = 'mir-settings-mode' },
-    @{ File = "control\settings-resolver.lua"; Text = $controlSettingsResolverText; Snippet = 'mir-enable-policy-' },
+    @{ File = "control\settings-resolver.lua"; Text = $controlSettingsResolverText; Snippet = 'startup_setting("ips-enable-" .. key)' },
     @{ File = "control\effects\spoilage-preservation.lua"; Text = $spoilageText; Snippet = 'settings_resolver.stream_enabled(M.stream_key)' },
     @{ File = "control\effects\spoilage-preservation.lua"; Text = $spoilageText; Snippet = 'spoilage preservation skipped: disabled' },
     @{ File = "control\effects\agricultural-growth-speed.lua"; Text = $agriculturalGrowthText; Snippet = 'settings_resolver.stream_enabled(M.stream_key)' },
@@ -446,9 +439,6 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'more-infinite-research.lab_productivity=Increases research progress gained from each consumed science pack' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-use-installed-space-age-icons=Use installed Space Age icons in base games' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-pipeline-extent-multiplier=Pipeline extent multiplier' },
-    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-settings-mode=Settings mode' },
-    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-enable-policy-stream=__1__ enable policy' },
-    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-settings-mode-unlimited-sandbox=Unlimited sandbox' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'Factorio cannot recover gracefully from missing icon files during prototype loading.' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'flamethrower-shooting-speed-bonus=Flamethrower shooting speed: +__1__' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'electric-shooting-speed-bonus=Electric shooting speed: +__1__' },
@@ -505,6 +495,28 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
   foreach ($check in $requiredSnippets) {
     if (-not $check.Text.Contains($check.Snippet)) {
       throw "Missing science-pack progression setting wiring in $($check.File): $($check.Snippet)"
+    }
+  }
+
+  $settingsPresetsPath = Join-Path $repo "prototypes\settings-presets.lua"
+  if (Test-Path -LiteralPath $settingsPresetsPath) {
+    throw "Removed settings preset module should not exist: prototypes\settings-presets.lua"
+  }
+
+  $forbiddenSnippets = @(
+    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'mir-settings-mode' },
+    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'mir-enable-policy-' },
+    @{ File = "prototypes\settings-resolver.lua"; Text = $settingsResolverText; Snippet = 'settings-presets' },
+    @{ File = "prototypes\settings-resolver.lua"; Text = $settingsResolverText; Snippet = 'Force enabled' },
+    @{ File = "control\settings-resolver.lua"; Text = $controlSettingsResolverText; Snippet = 'settings-presets' },
+    @{ File = "control\settings-resolver.lua"; Text = $controlSettingsResolverText; Snippet = 'mir-enable-policy-' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-settings-mode=' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-enable-policy-stream=' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-enable-policy-base-tech=' }
+  )
+  foreach ($check in $forbiddenSnippets) {
+    if ($check.Text.Contains($check.Snippet)) {
+      throw "Removed preset/enable-policy wiring remains in $($check.File): $($check.Snippet)"
     }
   }
 
@@ -1090,26 +1102,28 @@ function Set-CopiedPipelineExtentMultiplier {
   Set-CopiedStartupSettingDefault -ModsDir $ModsDir -Name "mir-pipeline-extent-multiplier" -ValueLiteral ([string]::Format([Globalization.CultureInfo]::InvariantCulture, "{0}", $Multiplier))
 }
 
-function Set-CopiedSettingsMode {
+function Set-CopiedStreamCheckboxDefault {
   param(
     [string]$ModsDir,
-    [ValidateSet("custom", "vanilla-respectful", "megabase-balanced", "unlimited-sandbox")]
-    [string]$Mode
+    [string]$StreamKey,
+    [bool]$Enabled
   )
-  Set-CopiedStartupSettingDefault -ModsDir $ModsDir -Name "mir-settings-mode" -ValueLiteral "`"$Mode`""
-}
 
-function Set-CopiedEnablePolicy {
-  param(
-    [string]$ModsDir,
-    [string]$Key,
-    [ValidateSet("Use settings mode", "Force enabled", "Force disabled")]
-    [string]$Policy
-  )
+  $valueLiteral = if ($Enabled) { "true" } else { "false" }
   try {
-    Set-CopiedStartupSettingDefault -ModsDir $ModsDir -Name "mir-enable-policy-$Key" -ValueLiteral "`"$Policy`""
+    Set-CopiedGeneratedStartupSettingDefault -ModsDir $ModsDir -Name "ips-enable-$StreamKey" -ValueLiteral $valueLiteral
+    return
   } catch {
-    Set-CopiedGeneratedStartupSettingDefault -ModsDir $ModsDir -Name "mir-enable-policy-$Key" -ValueLiteral "`"$Policy`""
+    $copiedDefaultsPath = Join-Path $ModsDir "more-infinite-research\defaults.lua"
+    $copiedDefaults = Get-Content -Raw -LiteralPath $copiedDefaultsPath
+    if ($copiedDefaults -notmatch "return\s+defaults") {
+      throw "Unable to find return defaults in copied defaults.lua while setting stream $StreamKey."
+    }
+
+    $escapedStreamKey = $StreamKey.Replace("\", "\\").Replace('"', '\"')
+    $override = "defaults.streams[`"$escapedStreamKey`"] = defaults.streams[`"$escapedStreamKey`"] or {}`r`ndefaults.streams[`"$escapedStreamKey`"].enabled = $valueLiteral`r`n"
+    $copiedDefaults = $copiedDefaults -replace "return\s+defaults", ($override + "return defaults")
+    Set-Content -LiteralPath $copiedDefaultsPath -Value $copiedDefaults -Encoding UTF8
   }
 }
 
@@ -1118,57 +1132,37 @@ function Set-CopiedStreamEnabled {
     [string]$ModsDir,
     [string]$StreamKey
   )
-  try {
-    Set-CopiedEnablePolicy -ModsDir $ModsDir -Key $StreamKey -Policy "Force enabled"
-    return
-  } catch {
-  }
-
-  try {
-    Set-CopiedStartupSettingDefault -ModsDir $ModsDir -Name "ips-enable-$StreamKey" -ValueLiteral "true"
-    return
-  } catch {
-    $copiedDefaultsPath = Join-Path $ModsDir "more-infinite-research\defaults.lua"
-    $copiedDefaults = Get-Content -Raw -LiteralPath $copiedDefaultsPath
-    $escapedStreamKey = [regex]::Escape($StreamKey)
-    $pattern = "(?s)($escapedStreamKey\s*=\s*\{[^{}]*?enabled\s*=\s*)false"
-    $match = [regex]::Match($copiedDefaults, $pattern)
-    if (-not $match.Success) {
-      throw "Unable to enable stream $StreamKey in copied settings.lua or defaults.lua."
-    }
-
-    $valueGroup = $match.Groups[1]
-    $copiedDefaults = $copiedDefaults.Substring(0, $valueGroup.Index) +
-      $valueGroup.Value +
-      "true" +
-      $copiedDefaults.Substring($valueGroup.Index + $valueGroup.Length + "false".Length)
-    Set-Content -LiteralPath $copiedDefaultsPath -Value $copiedDefaults -Encoding UTF8
-  }
+  Set-CopiedStreamCheckboxDefault -ModsDir $ModsDir -StreamKey $StreamKey -Enabled $true
 }
 
-function Set-CopiedStreamCheckboxEnabled {
+function Set-CopiedStreamDisabled {
   param(
     [string]$ModsDir,
     [string]$StreamKey
   )
+  Set-CopiedStreamCheckboxDefault -ModsDir $ModsDir -StreamKey $StreamKey -Enabled $false
+}
+
+function Set-CopiedBaseExtensionDefault {
+  param(
+    [string]$ModsDir,
+    [string]$BaseExtensionKey,
+    [bool]$Enabled
+  )
+  $valueLiteral = if ($Enabled) { "true" } else { "false" }
   try {
-    Set-CopiedStartupSettingDefault -ModsDir $ModsDir -Name "ips-enable-$StreamKey" -ValueLiteral "true"
+    Set-CopiedGeneratedStartupSettingDefault -ModsDir $ModsDir -Name "mir-enable-$BaseExtensionKey" -ValueLiteral $valueLiteral
     return
   } catch {
     $copiedDefaultsPath = Join-Path $ModsDir "more-infinite-research\defaults.lua"
     $copiedDefaults = Get-Content -Raw -LiteralPath $copiedDefaultsPath
-    $escapedStreamKey = [regex]::Escape($StreamKey)
-    $pattern = "(?s)($escapedStreamKey\s*=\s*\{[^{}]*?enabled\s*=\s*)false"
-    $match = [regex]::Match($copiedDefaults, $pattern)
-    if (-not $match.Success) {
-      throw "Unable to enable legacy stream checkbox/default for $StreamKey."
+    if ($copiedDefaults -notmatch "return\s+defaults") {
+      throw "Unable to find return defaults in copied defaults.lua while setting base extension $BaseExtensionKey."
     }
 
-    $valueGroup = $match.Groups[1]
-    $copiedDefaults = $copiedDefaults.Substring(0, $valueGroup.Index) +
-      $valueGroup.Value +
-      "true" +
-      $copiedDefaults.Substring($valueGroup.Index + $valueGroup.Length + "false".Length)
+    $escapedBaseExtensionKey = $BaseExtensionKey.Replace("\", "\\").Replace('"', '\"')
+    $override = "defaults.base_extensions[`"$escapedBaseExtensionKey`"] = defaults.base_extensions[`"$escapedBaseExtensionKey`"] or {}`r`ndefaults.base_extensions[`"$escapedBaseExtensionKey`"].enabled = $valueLiteral`r`n"
+    $copiedDefaults = $copiedDefaults -replace "return\s+defaults", ($override + "return defaults")
     Set-Content -LiteralPath $copiedDefaultsPath -Value $copiedDefaults -Encoding UTF8
   }
 }
@@ -1178,22 +1172,15 @@ function Set-CopiedBaseExtensionEnabled {
     [string]$ModsDir,
     [string]$BaseExtensionKey
   )
-  try {
-    Set-CopiedEnablePolicy -ModsDir $ModsDir -Key $BaseExtensionKey -Policy "Force enabled"
-    return
-  } catch {
-  }
+  Set-CopiedBaseExtensionDefault -ModsDir $ModsDir -BaseExtensionKey $BaseExtensionKey -Enabled $true
+}
 
-  $copiedDefaultsPath = Join-Path $ModsDir "more-infinite-research\defaults.lua"
-  $copiedDefaults = Get-Content -Raw -LiteralPath $copiedDefaultsPath
-  if ($copiedDefaults -notmatch "return\s+defaults") {
-    throw "Unable to find return defaults in copied defaults.lua while enabling base extension $BaseExtensionKey."
-  }
-
-  $escapedBaseExtensionKey = $BaseExtensionKey.Replace("\", "\\").Replace('"', '\"')
-  $override = "defaults.base_extensions[`"$escapedBaseExtensionKey`"].enabled = true`r`n"
-  $copiedDefaults = $copiedDefaults -replace "return\s+defaults", ($override + "return defaults")
-  Set-Content -LiteralPath $copiedDefaultsPath -Value $copiedDefaults -Encoding UTF8
+function Set-CopiedBaseExtensionDisabled {
+  param(
+    [string]$ModsDir,
+    [string]$BaseExtensionKey
+  )
+  Set-CopiedBaseExtensionDefault -ModsDir $ModsDir -BaseExtensionKey $BaseExtensionKey -Enabled $false
 }
 
 function Initialize-RuntimeScenario {
@@ -1201,12 +1188,9 @@ function Initialize-RuntimeScenario {
     [string]$ScenarioName,
     [string[]]$EnabledFixtureNames,
     [string[]]$EnabledStreamKeys = @(),
-    [string[]]$LegacyEnabledStreamKeys = @(),
     [string[]]$EnabledBaseExtensionKeys = @(),
     [string[]]$DisabledStreamKeys = @(),
     [string[]]$DisabledBaseExtensionKeys = @(),
-    [ValidateSet("", "custom", "vanilla-respectful", "megabase-balanced", "unlimited-sandbox")]
-    [string]$SettingsMode = "",
     [switch]$LabPolicySkip,
     [ValidateSet("configured", "space", "space-and-promethium", "all-official", "all")]
     [string]$SciencePackIngredientPolicy = "configured",
@@ -1255,9 +1239,6 @@ function Initialize-RuntimeScenario {
   if ($ScriptedDiagnostics) {
     Enable-CopiedScriptedDiagnostics -ModsDir $modsDir
   }
-  if (-not [string]::IsNullOrWhiteSpace($SettingsMode)) {
-    Set-CopiedSettingsMode -ModsDir $modsDir -Mode $SettingsMode
-  }
   if ($LabPolicySkip) {
     Set-CopiedLabPolicySkip -ModsDir $modsDir
   }
@@ -1279,17 +1260,14 @@ function Initialize-RuntimeScenario {
   foreach ($streamKey in $EnabledStreamKeys) {
     Set-CopiedStreamEnabled -ModsDir $modsDir -StreamKey $streamKey
   }
-  foreach ($streamKey in $LegacyEnabledStreamKeys) {
-    Set-CopiedStreamCheckboxEnabled -ModsDir $modsDir -StreamKey $streamKey
-  }
   foreach ($baseExtensionKey in $EnabledBaseExtensionKeys) {
     Set-CopiedBaseExtensionEnabled -ModsDir $modsDir -BaseExtensionKey $baseExtensionKey
   }
   foreach ($streamKey in $DisabledStreamKeys) {
-    Set-CopiedEnablePolicy -ModsDir $modsDir -Key $streamKey -Policy "Force disabled"
+    Set-CopiedStreamDisabled -ModsDir $modsDir -StreamKey $streamKey
   }
   foreach ($baseExtensionKey in $DisabledBaseExtensionKeys) {
-    Set-CopiedEnablePolicy -ModsDir $modsDir -Key $baseExtensionKey -Policy "Force disabled"
+    Set-CopiedBaseExtensionDisabled -ModsDir $modsDir -BaseExtensionKey $baseExtensionKey
   }
 
   $mods = @(
@@ -1344,12 +1322,9 @@ function Invoke-RuntimeScenario {
     [string]$ScenarioName,
     [string[]]$EnabledFixtureNames,
     [string[]]$EnabledStreamKeys = @(),
-    [string[]]$LegacyEnabledStreamKeys = @(),
     [string[]]$EnabledBaseExtensionKeys = @(),
     [string[]]$DisabledStreamKeys = @(),
     [string[]]$DisabledBaseExtensionKeys = @(),
-    [ValidateSet("", "custom", "vanilla-respectful", "megabase-balanced", "unlimited-sandbox")]
-    [string]$SettingsMode = "",
     [switch]$LabPolicySkip,
     [ValidateSet("configured", "space", "space-and-promethium", "all-official", "all")]
     [string]$SciencePackIngredientPolicy = "configured",
@@ -1366,11 +1341,9 @@ function Invoke-RuntimeScenario {
     -ScenarioName $ScenarioName `
     -EnabledFixtureNames $EnabledFixtureNames `
     -EnabledStreamKeys $EnabledStreamKeys `
-    -LegacyEnabledStreamKeys $LegacyEnabledStreamKeys `
     -EnabledBaseExtensionKeys $EnabledBaseExtensionKeys `
     -DisabledStreamKeys $DisabledStreamKeys `
     -DisabledBaseExtensionKeys $DisabledBaseExtensionKeys `
-    -SettingsMode $SettingsMode `
     -LabPolicySkip:$LabPolicySkip `
     -SciencePackIngredientPolicy $SciencePackIngredientPolicy `
     -WeaponSpeedAdjustmentMode $WeaponSpeedAdjustmentMode `
@@ -1665,38 +1638,24 @@ $baseInstalledScienceIconLine = Get-LastStreamReportLine -Key "research_science_
 Assert-ReportLineGenerated -Line $baseInstalledScienceIconLine -Context "Base installed Space Age science productivity icon scenario"
 Assert-ReportLineContains -Line $baseInstalledScienceIconLine -Expected "icon=__space-age__/graphics/technology/research-productivity.png" -Context "Base installed Space Age science productivity icon scenario"
 
-Invoke-RuntimeScenario -ScenarioName "preset-vanilla-respectful" -EnabledFixtureNames @() -SettingsMode "vanilla-respectful"
-$vanillaRespectfulGearsLine = Get-LastStreamReportLine -Key "research_gears"
-Assert-ReportLineGenerated -Line $vanillaRespectfulGearsLine -Context "Vanilla-respectful preset core productivity scenario"
-$vanillaRespectfulResearchSpeedLine = Get-LastExtensionReportLine -Key "research-speed"
-if ($vanillaRespectfulResearchSpeedLine -notmatch "status=skipped" -or $vanillaRespectfulResearchSpeedLine -notmatch "disabled") {
-  throw "Vanilla-respectful preset should disable MIR vanilla-chain continuations by default: $vanillaRespectfulResearchSpeedLine"
-}
-$vanillaRespectfulBrakingLine = Get-LastExtensionReportLine -Key "braking-force"
-if ($vanillaRespectfulBrakingLine -notmatch "status=skipped" -or $vanillaRespectfulBrakingLine -notmatch "disabled") {
-  throw "Vanilla-respectful preset should disable braking force continuation by default: $vanillaRespectfulBrakingLine"
-}
-
-Invoke-RuntimeScenario -ScenarioName "preset-force-enabled-overrides" -EnabledFixtureNames @() `
-  -SettingsMode "vanilla-respectful" `
+Invoke-RuntimeScenario -ScenarioName "checkbox-enabled-default-off-features" -EnabledFixtureNames @() `
   -EnabledStreamKeys @("research_character_reach") `
-  -EnabledBaseExtensionKeys @("research-speed")
-$forceEnabledReachLine = Get-LastStreamReportLine -Key "research_character_reach"
-Assert-ReportLineGenerated -Line $forceEnabledReachLine -Context "Preset force-enabled stream override scenario"
-$forceEnabledResearchSpeedLine = Get-LastExtensionReportLine -Key "research-speed"
-Assert-ReportLineGenerated -Line $forceEnabledResearchSpeedLine -Context "Preset force-enabled base extension override scenario"
+  -EnabledBaseExtensionKeys @("inserter-capacity-bonus")
+$checkboxEnabledReachLine = Get-LastStreamReportLine -Key "research_character_reach"
+Assert-ReportLineGenerated -Line $checkboxEnabledReachLine -Context "Checkbox-enabled stream scenario"
+$checkboxEnabledInserterLine = Get-LastExtensionReportLine -Key "inserter-capacity-bonus"
+Assert-ReportLineGenerated -Line $checkboxEnabledInserterLine -Context "Checkbox-enabled base extension scenario"
 
-Invoke-RuntimeScenario -ScenarioName "preset-force-disabled-overrides" -EnabledFixtureNames @() `
-  -SettingsMode "unlimited-sandbox" `
-  -DisabledStreamKeys @("research_character_reach") `
+Invoke-RuntimeScenario -ScenarioName "checkbox-disabled-default-on-features" -EnabledFixtureNames @() `
+  -DisabledStreamKeys @("research_gears") `
   -DisabledBaseExtensionKeys @("research-speed")
-$forceDisabledReachLine = Get-LastStreamReportLine -Key "research_character_reach"
-if ($forceDisabledReachLine -notmatch "status=skipped" -or $forceDisabledReachLine -notmatch "disabled") {
-  throw "Force disabled should override sandbox preset for character reach: $forceDisabledReachLine"
+$checkboxDisabledGearsLine = Get-LastStreamReportLine -Key "research_gears"
+if ($checkboxDisabledGearsLine -notmatch "status=skipped" -or $checkboxDisabledGearsLine -notmatch "disabled") {
+  throw "Disabled stream checkbox should skip generated research: $checkboxDisabledGearsLine"
 }
-$forceDisabledResearchSpeedLine = Get-LastExtensionReportLine -Key "research-speed"
-if ($forceDisabledResearchSpeedLine -notmatch "status=skipped" -or $forceDisabledResearchSpeedLine -notmatch "disabled") {
-  throw "Force disabled should override sandbox preset for research speed continuation: $forceDisabledResearchSpeedLine"
+$checkboxDisabledResearchSpeedLine = Get-LastExtensionReportLine -Key "research-speed"
+if ($checkboxDisabledResearchSpeedLine -notmatch "status=skipped" -or $checkboxDisabledResearchSpeedLine -notmatch "disabled") {
+  throw "Disabled base extension checkbox should skip generated continuation: $checkboxDisabledResearchSpeedLine"
 }
 
 Invoke-RuntimeScenario -ScenarioName "base-space-promethium-pack-policy" -EnabledFixtureNames @() -SciencePackIngredientPolicy "space-and-promethium"
@@ -1745,47 +1704,20 @@ if ($isFactorio21Line) {
       Assert-ReportLineContains -Line $spaceAgeScriptedLine -Expected "icon=tech:agriculture" -Context "Space Age agricultural growth speed icon scenario"
     }
   }
-  Assert-LogContains -Expected "spoilage preservation applied level=0" -Context "Force-enabled scripted spoilage runtime scenario"
-  Assert-LogContains -Expected "agricultural growth speed force state refreshed enabled=true" -Context "Force-enabled scripted agricultural runtime scenario"
+  Assert-LogContains -Expected "spoilage preservation applied level=0" -Context "Checkbox-enabled scripted spoilage runtime scenario"
+  Assert-LogContains -Expected "agricultural growth speed force state refreshed enabled=true" -Context "Checkbox-enabled scripted agricultural runtime scenario"
 
-  Invoke-RuntimeScenario -ScenarioName "space-age-unlimited-sandbox-preset" -EnabledFixtureNames @() `
-    -SettingsMode "unlimited-sandbox" `
-    -ScriptedDiagnostics `
-    -EnableSpaceAge
-  foreach ($sandboxStream in @("research_spoilage_preservation", "research_agricultural_growth_speed", "research_cargo_landing_pad_count")) {
-    $sandboxLine = Get-LastStreamReportLine -Key $sandboxStream
-    Assert-ReportLineGenerated -Line $sandboxLine -Context "Space Age unlimited sandbox preset stream $sandboxStream"
-  }
-  $sandboxInserterLine = Get-LastExtensionReportLine -Key "inserter-capacity-bonus"
-  Assert-ReportLineGenerated -Line $sandboxInserterLine -Context "Space Age unlimited sandbox preset inserter extension"
-  Assert-LogContains -Expected "spoilage preservation applied level=0" -Context "Unlimited sandbox scripted spoilage runtime scenario"
-  Assert-LogContains -Expected "agricultural growth speed force state refreshed enabled=true" -Context "Unlimited sandbox scripted agricultural runtime scenario"
-
-  Invoke-RuntimeScenario -ScenarioName "space-age-force-disabled-scripted-effects" -EnabledFixtureNames @() `
-    -SettingsMode "unlimited-sandbox" `
-    -DisabledStreamKeys @("research_spoilage_preservation", "research_agricultural_growth_speed") `
+  Invoke-RuntimeScenario -ScenarioName "space-age-scripted-candidates-disabled" -EnabledFixtureNames @() `
     -ScriptedDiagnostics `
     -EnableSpaceAge
   foreach ($disabledScriptedStream in @("research_spoilage_preservation", "research_agricultural_growth_speed")) {
     $disabledScriptedLine = Get-LastStreamReportLine -Key $disabledScriptedStream
     if ($disabledScriptedLine -notmatch "status=skipped" -or $disabledScriptedLine -notmatch "disabled") {
-      throw "Force-disabled scripted stream should skip even under sandbox preset: $disabledScriptedLine"
+      throw "Default-disabled scripted stream should skip when its checkbox is off: $disabledScriptedLine"
     }
   }
-  Assert-LogContains -Expected "spoilage preservation skipped: disabled" -Context "Force-disabled scripted spoilage runtime scenario"
-  Assert-LogContains -Expected "agricultural growth speed force state refreshed enabled=false" -Context "Force-disabled scripted agricultural runtime scenario"
-
-  Invoke-RuntimeScenario -ScenarioName "space-age-custom-manual-scripted-effects" -EnabledFixtureNames @() `
-    -SettingsMode "custom" `
-    -LegacyEnabledStreamKeys @("research_spoilage_preservation", "research_agricultural_growth_speed") `
-    -ScriptedDiagnostics `
-    -EnableSpaceAge
-  foreach ($customScriptedStream in @("research_spoilage_preservation", "research_agricultural_growth_speed")) {
-    $customScriptedLine = Get-LastStreamReportLine -Key $customScriptedStream
-    Assert-ReportLineGenerated -Line $customScriptedLine -Context "Custom/manual scripted stream $customScriptedStream"
-  }
-  Assert-LogContains -Expected "spoilage preservation applied level=0" -Context "Custom/manual scripted spoilage runtime scenario"
-  Assert-LogContains -Expected "agricultural growth speed force state refreshed enabled=true" -Context "Custom/manual scripted agricultural runtime scenario"
+  Assert-LogContains -Expected "spoilage preservation skipped: disabled" -Context "Default-disabled scripted spoilage runtime scenario"
+  Assert-LogContains -Expected "agricultural growth speed force state refreshed enabled=false" -Context "Default-disabled scripted agricultural runtime scenario"
 }
 
 Invoke-RuntimeScenario -ScenarioName "space-age-generation-integrity" -EnabledFixtureNames @(

@@ -2,6 +2,40 @@
 
 This file records local release-candidate validation runs. It is not a substitute for the manual mod matrix in `docs/compatibility.md`.
 
+## 2026-07-03 Settings Enablement Simplification
+
+Environment:
+
+- Branch: `dev`.
+- Mod version `2.1.0`.
+- Installed local Factorio binary: `C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe`.
+- Validation archive rebuilt: `build/validation-dist/more-infinite-research_2.1.0.zip`.
+
+Scope:
+
+- Removed the planned settings mode startup setting, per-technology enable-policy settings, and preset resolver module.
+- Kept per-technology enable checkboxes as the single source of truth for generated streams, base continuations, and scripted runtime effects.
+- Updated locale, README, release docs, validation fixtures, and runtime scenarios to cover checkbox-enabled and checkbox-disabled behavior.
+
+Commands:
+
+```powershell
+.\scripts\Test-MIRLocales.ps1
+.\scripts\Invoke-MIRValidation.ps1 -StaticOnly
+.\scripts\Invoke-MIRValidation.ps1 -FactorioBin "C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe"
+git diff --check
+```
+
+Results:
+
+- Locale validation passed across nine locale files.
+- Static/package validation passed and rebuilt the validation archive.
+- Runtime fixture validation passed across the full Factorio load-test matrix.
+- `checkbox-enabled-default-off-features` proved disabled-by-default stream and base-extension features generate when their checkboxes are enabled.
+- `checkbox-disabled-default-on-features` proved default-enabled stream and base-extension features skip when their checkboxes are disabled.
+- Scripted Space Age candidates generated and applied runtime effects when their checkboxes were enabled, and skipped with disabled runtime logs when left off.
+- `git diff --check` passed.
+
 ## 2026-07-02 v2.1.0 Metadata And Package Build
 
 Environment:
@@ -73,12 +107,12 @@ Limitations:
 - Automated fixtures prove prototype load safety and exact infinite owner shape. They do not replace manual balance/soak testing in large saves or mod packs.
 - The pipeline extent multiplier remains a startup setting, not research, and should stay default `1x`.
 
-## 2026-07-02 Dev Scripted Preset Runtime Resolver Pass
+## 2026-07-02 Dev Scripted Checkbox Runtime Resolver Pass
 
 Environment:
 
 - Branch: `dev`.
-- Mod version `2.0.5` source line, preparing `v2.1.0` scripted/preset changes.
+- Mod version `2.0.5` source line, preparing `v2.1.0` scripted setting changes.
 - Installed local Factorio binary: `2.1.9` build `86829`, Windows Steam.
 - Release archive rebuilt: `dist/more-infinite-research_2.0.5.zip`.
 - Validation archive rebuilt: `build/validation-dist/more-infinite-research_2.0.5.zip`.
@@ -87,10 +121,8 @@ Scope:
 
 - Added `control/settings-resolver.lua` so control-stage scripted effects use
   the same effective stream enablement as data-stage technology generation.
-- Spoilage preservation and agricultural growth speed now honor
-  `mir-settings-mode`, `mir-enable-policy-<stream>`, `Force enabled`,
-  `Force disabled`, and the `Custom/manual` legacy `ips-enable-<stream>`
-  checkbox path.
+- Spoilage preservation and agricultural growth speed now honor the same
+  `ips-enable-<stream>` checkbox path used by data-stage stream generation.
 - Added scripted diagnostic log lines that expose effective runtime enablement
   without adding tick handlers, broad entity scans, or inventory/item-stack
   scans.
@@ -109,25 +141,20 @@ Results:
   wiring, locale parity, no-runtime-tick guard, package metadata, and changelog
   format checks.
 - Runtime fixture validation passed on Factorio `2.1.9`.
-- `space-age-scripted-candidates-enabled` proved force-enabled scripted streams
-  both generate and log enabled runtime recomputation.
-- `space-age-unlimited-sandbox-preset` proved the sandbox preset enables
-  scripted technology generation and the matching runtime effect path.
-- `space-age-force-disabled-scripted-effects` proved `Force disabled` skips
-  scripted generation and logs disabled runtime recomputation even under the
-  sandbox preset.
-- `space-age-custom-manual-scripted-effects` proved `Custom/manual` mode still
-  honors the old visible enable checkbox path for scripted runtime effects.
+- `space-age-scripted-candidates-enabled` proved checkbox-enabled scripted
+  streams both generate and log enabled runtime recomputation.
+- `space-age-scripted-candidates-disabled` proved default-disabled scripted
+  streams skip generation and log disabled runtime recomputation.
 
 Limitations:
 
-- These fixtures prove preset and policy routing, not measured gameplay
+- These fixtures prove setting routing, not measured gameplay
   behavior in real saves.
 - Existing spoilable stack behavior, research reversal, disabling after use,
   multi-force spoilage behavior, and real agricultural tower planting remain
   manual proof gates before default enablement or stronger public claims.
 
-## 2026-07-02 Dev Settings Preset Enablement Pass
+## 2026-07-02 Dev Settings Enablement Experiment
 
 Environment:
 
@@ -139,12 +166,11 @@ Environment:
 
 Scope:
 
-- Added `mir-settings-mode` with `custom`, `vanilla-respectful`,
-  `megabase-balanced`, and `unlimited-sandbox` modes.
-- Added generated per-technology enable policy settings:
-  `Use settings mode`, `Force enabled`, and `Force disabled`.
-- Presets intentionally control technology enablement only. Cost, growth,
-  maximum level, and research unit time remain the existing manual tunables.
+- Tried a startup settings-mode experiment for technology enablement.
+- The experiment was removed before release because it added per-technology
+  override UI without solving settings sharing.
+- Cost, growth, maximum level, and research unit time remain the existing
+  manual tunables.
 - Routed generated streams, base-technology continuations, and competing
   base-extension cleanup through the shared settings resolver.
 
@@ -160,31 +186,21 @@ git diff --check
 
 Results:
 
-- Static validation passed, including settings-mode snippets, generated enable
-  policy wiring, locale parity, no-runtime-tick guard, package metadata, and
-  changelog format checks.
+- Static validation passed, including setting resolver snippets, locale parity,
+  no-runtime-tick guard, package metadata, and changelog format checks.
 - Runtime fixture validation passed on Factorio `2.1.9`.
-- `preset-vanilla-respectful` proved normal recipe-productivity streams still
-  generate while conservative vanilla-chain continuations are skipped by the
-  selected preset.
-- `preset-force-enabled-overrides` proved `Force enabled` overrides a
-  conservative preset for both a generated stream and a vanilla-chain
-  continuation.
-- `preset-force-disabled-overrides` proved `Force disabled` overrides the
-  sandbox preset for both a generated stream and a vanilla-chain continuation.
-- `space-age-unlimited-sandbox-preset` proved Space Age scripted/cargo
-  candidates and the normally disabled inserter-capacity continuation generate
-  when the sandbox preset is selected and their prototype gates are valid.
+- `checkbox-enabled-default-off-features` proved disabled-by-default streams and
+  continuations generate when their checkboxes are enabled.
+- `checkbox-disabled-default-on-features` proved default-enabled streams and
+  continuations skip when their checkboxes are disabled.
 - The generation-integrity fixture was updated to assert effective base
-  continuation enablement through the new policy and preset model instead of
-  checking only the legacy boolean checkbox.
+  continuation enablement through the shared resolver.
 - Branch policy validation and `git diff --check` passed.
 
 Limitations:
 
-- The first `v2.1.0` preset slice does not apply numeric cost/growth/timing
-  profiles.
-- `Custom/manual` preserves the visible `v2.0.5` checkbox behavior.
+- No shareable settings-profile flow is implemented in this release.
+- The visible checkbox behavior is the source of truth.
 - Scripted spoilage/agriculture behavior still needs the manual save matrix
   before default enablement or stronger measured gameplay claims.
 
@@ -623,7 +639,7 @@ Results:
 - Runtime fixture validation passed across twenty-three isolated scenarios.
 - Locale parity validation passed across nine locale files after normalizing settings UI text to English fallback where translations are not yet refreshed.
 - Added validation coverage for default-disabled-first technology setting order, diagnostics ordering, dropdown option descriptions, default-off warning notes, base-extension max-level locale wiring, and README settings guidance.
-- No real settings presets were added; preset mode and override behavior remain planned for `v2.1.0`.
+- No real settings presets were added; shareable settings profiles remain future work.
 
 ## 2026-07-01 Final Smoke Plan Guard
 

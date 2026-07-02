@@ -33,7 +33,7 @@ The release goal is graceful compatibility without mod-page dependency clutter: 
 - Cargo landing pad count research uses `cargo-landing-pad-count`, uses official base and Space Age science packs only, is disabled by default, requires the vanilla `rocket-silo` cargo landing pad unlock, and is skipped unless Space Age is active and the `cargo-landing-pad` prototype exists.
 - Direct-effect diagnostics report overlapping infinite non-MIR native modifier owners, including cargo/logistics modifiers. In `v2.0.5` this is diagnostic-only: MIR does not skip, merge, or remove either technology based on the overlap report.
 - Spoilage preservation and agricultural growth speed are implemented in `dev` as visible `nothing` technology effects plus bounded runtime behavior through the control-stage scripted technology manager.
-- Scripted runtime effects use the same effective enablement model as data-stage technology generation: `mir-settings-mode`, per-technology `mir-enable-policy-*`, `Force enabled`, `Force disabled`, and the `Custom/manual` legacy `ips-enable-*` checkbox path.
+- Scripted runtime effects use the same effective enablement model as data-stage technology generation: the stream's `ips-enable-*` checkbox controls both generated technology creation and runtime effect activation.
 - The release plan keeps those scripted runtime features default-off in `v2.0.5` as opt-in experimental candidates. Default enablement or stronger public behavior claims require manual save validation for existing-stack behavior, research reversal, disabling, multi-force behavior, and the agricultural tower event path. Any unsafe or unclear behavior is deferred to `v2.1.0`.
 - Spoilage preservation changes the global spoil time modifier and recomputes on init, configuration change, research finish/reversal, and technology effects reset.
 - Agricultural growth speed adjusts newly planted agricultural tower plants from the tower planting event and does not rescan existing farms in this first implementation slice.
@@ -315,12 +315,12 @@ Expected result: vanilla tank cannon fire rate is preserved while MIR avoids dup
 - Confirm package validation reports source, documentation, and locale parity with the repository.
 - Confirm runtime fixture validation covers both the default `reduce` lab policy and forced `skip` lab policy.
 - Confirm runtime fixture validation covers `configured`, `space`, `space-and-promethium`, `all-official`, and `all` science-pack ingredient policies, the end-game prerequisite gate, and the base-only cargo landing pad count skip.
-- Confirm runtime fixture validation covers settings mode presets and force-enabled/force-disabled preset overrides for streams and base extensions.
+- Confirm runtime fixture validation covers checkbox-enabled and checkbox-disabled behavior for streams and base extensions.
 - Confirm runtime fixture validation covers Space Age cargo logistics effect types, modifiers, costs, research times, prerequisites, and official science-pack ingredients.
 - Confirm runtime fixture validation covers fluid-output productivity ownership in base-only and Space Age scenarios.
 - Confirm runtime fixture validation covers startup pipeline extent scaling when the multiplier is enabled.
 - Confirm runtime fixture validation covers preserving an existing finite vanilla-chain level before adding MIR's generated infinite continuation.
-- Confirm runtime fixture validation covers broad generation integrity in base-only and Space Age runs, including all enabled vanilla numbered extension chains, the force-enabled inserter-capacity continuation, generated `recipe-prod-*` technology shape, and single-owner recipe productivity.
+- Confirm runtime fixture validation covers broad generation integrity in base-only and Space Age runs, including all enabled vanilla numbered extension chains, the checkbox-enabled inserter-capacity continuation, generated `recipe-prod-*` technology shape, and single-owner recipe productivity.
 - Confirm runtime fixture validation covers preserving finite vanilla weapon shooting speed cannon-shell effects under MIR's overlap setting.
 - Confirm runtime fixture validation covers Omega-style drill recipe productivity.
 - Load Factorio with the manual matrix above.

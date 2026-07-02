@@ -17,7 +17,7 @@ code work starts.
 
 Ship the features that make MIR easier to control and safer in modded saves:
 
-- settings presets with explicit override behavior;
+- simple per-technology checkbox enablement, with shareable presets deferred until there is an import/export design;
 - a real native modifier overlap policy instead of diagnostics only;
 - stricter icon source policy and fallback resolution;
 - scripted spoilage/agriculture hardening with manual evidence;
@@ -31,8 +31,8 @@ decision for each one.
 
 | Gate | Required outcome | Release blocker? |
 | --- | --- | ---: |
-| Settings presets | `Custom/manual`, `Vanilla-respectful`, `Megabase-balanced`, and `Unlimited sandbox` enablement presets are implemented; numeric preset defaults remain out of scope for this first slice | Yes |
-| Preset override model | Per-technology enable policy is documented and tested; presets do not silently contradict explicit force-enabled/force-disabled choices | Yes |
+| Checkbox enablement | Per-technology enable checkboxes are the single source of truth for stream generation, base continuations, and scripted runtime effects | Yes |
+| Shareable presets | Preset import/export remains deferred until it can be designed without adding per-technology override dropdowns | No |
 | Native modifier overlap policy | Existing diagnostics become a policy: skip/prefer existing, warn only, prefer MIR, or allow duplicates | Yes |
 | Icon source and asset policy | Fallback resolver can prefer loaded Space Age/Wube technology art, but the package does not redistribute original Space Age files | Yes |
 | Scripted spoilage hardening | Existing-stack, reversal, disable, baseline, and multi-force behavior is measured or remains default-off with caveats | Yes |
@@ -44,7 +44,8 @@ decision for each one.
 
 | Feature | Classification | Implementation type | Default target |
 | --- | --- | --- | --- |
-| Settings presets | Ship | Startup setting plus preset/default resolver | `v2.1.0` |
+| Checkbox enablement cleanup | Ship | Startup checkbox defaults plus shared resolver | `v2.1.0` |
+| Shareable presets | Defer | Import/export or copyable settings profile design | Later |
 | Native modifier overlap policy | Ship | Data-stage diagnostics plus generation policy | `v2.1.0` |
 | Icon source resolver and asset policy | Ship | Data-stage icon candidate resolver plus package validation guard | `v2.1.0` |
 | Spoilage preservation hardening | Ship evidence/policy; maybe preset inclusion | Event-driven control-stage scripted tech | `v2.1.0` |
@@ -63,51 +64,29 @@ decision for each one.
 | Super-bacteria | Companion | New content loop | Separate mod |
 | Broad fluid overhaul | Defer/companion | Too broad | Separate or later |
 
-## Settings Presets
+## Settings Enablement
 
-Recommended startup setting:
-
-```text
-MIR settings mode:
-- Custom/manual
-- Vanilla-respectful
-- Megabase-balanced
-- Unlimited sandbox
-```
-
-Preset intent:
-
-| Preset | Intent |
-| --- | --- |
-| `Custom/manual` | Current behavior; individual settings control generation exactly |
-| `Vanilla-respectful` | Conservative additions; no experimental/scripted/sandbox defaults; avoid aggressive uncapping |
-| `Megabase-balanced` | Most reasonable late-game sinks enabled; risky scripted behavior still conservative |
-| `Unlimited sandbox` | High-power options enabled or recommended with explicit warnings |
-
-Avoid ambiguous precedence. Implemented model:
+The shipped `v2.1.0` settings model keeps one enable path:
 
 ```text
 Per-feature state:
-- Use settings mode
-- Force enabled
-- Force disabled
-
-Numeric setting state:
-- Existing manual value
+- Enable checkbox on
+- Enable checkbox off
 ```
 
-This first preset slice controls enablement only. Cost, growth, maximum level,
-and research unit time settings remain the existing manual tunables in every
-mode. Do not make the UI say a feature is force-disabled while a preset silently
-enables it.
+Cost, growth, maximum level, and research unit time settings remain the existing
+manual tunables. Preset modes and per-feature enable-policy dropdowns are
+deferred because they added startup-setting noise without solving preset
+sharing.
+
+Future preset work should be designed as an import/export or shareable settings
+profile flow, not as another override control beside every technology.
 
 Acceptance criteria:
 
-- Preset runtime fixtures validate expected stream and base-extension decisions.
-- Scripted runtime fixtures prove spoilage/agriculture effects use the same effective enablement as data-stage generation.
-- Existing `Custom/manual` behavior remains backward-compatible.
-- README contains a preset comparison table.
-- Setting tooltips explain precedence.
+- Runtime fixtures validate checkbox-enabled and checkbox-disabled stream and base-extension decisions.
+- Scripted runtime fixtures prove spoilage/agriculture effects use the same checkbox enablement as data-stage generation.
+- README documents the single enablement path and the deferred shareable-preset direction.
 - No generated technology IDs change without migration.
 
 ## Native Modifier Overlap Policy
@@ -230,14 +209,7 @@ Required manual results before stronger claims:
 - multi-force behavior;
 - interaction notes for other mods that mutate the same global setting.
 
-Preset recommendation until proven:
-
-| Preset | Spoilage preservation |
-| --- | --- |
-| `Vanilla-respectful` | Off |
-| `Megabase-balanced` | Off unless manual evidence is strong |
-| `Unlimited sandbox` | On or recommended |
-| `Custom/manual` | User-controlled |
+Default recommendation until proven: keep Spoilage preservation off unless intentionally testing the scripted effect.
 
 ## Scripted Agriculture Gate
 

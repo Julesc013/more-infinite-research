@@ -254,23 +254,21 @@ Changing them requires a restart and affects all players in multiplayer.
 
 Recommended default:
 
-- Use `Settings mode: Custom/manual` or leave settings as shipped.
+- Leave technology enable checkboxes as shipped.
 - Stable generated research lines are enabled.
 - Experimental/scripted candidates stay disabled by default in `v2.1.0`.
 - Diagnostics stay disabled unless you are troubleshooting a report.
 
-Vanilla-respectful setup:
+Conservative setup:
 
-- Use `Settings mode: Vanilla-respectful`.
 - Generated productivity streams stay enabled where their recipes and labs are valid.
-- MIR vanilla-chain continuations are disabled unless you force them on.
+- Disable MIR vanilla-chain continuations you do not want to extend.
 - Keep Cargo landing pad count disabled unless you want sandbox-style Space Age logistics.
 - Keep Spoilage preservation and Agricultural growth speed disabled unless testing them.
 - Use science pack policy `configured`.
 
 Megabase setup:
 
-- Use `Settings mode: Megabase-balanced`.
 - Keep most generated streams enabled.
 - Keep max level at `0` for infinite progression.
 - Consider `Extra science packs for generated technologies` values `space`, `space-and-promethium`, or `all-official` if you want higher-end science sinks.
@@ -289,28 +287,11 @@ Debug/reporting setup:
 - Enable `Log recipes matched by productivity technologies` for recipe-productivity matching issues.
 - Enable `Log scripted spoilage and agriculture effects` only for scripted spoilage/agriculture issues.
 
-### Settings Modes
+### Technology Enablement
 
-`Settings mode` controls technology enablement only. Cost, growth, maximum level, and research unit time remain the normal manual tunables in every mode.
+Each generated stream or base-game continuation has one enable checkbox. That checkbox is the source of truth for both data-stage technology generation and control-stage scripted effects.
 
-| Mode | Behavior |
-| --- | --- |
-| `Custom/manual` | Uses each individual enable checkbox exactly as shown. This preserves the `v2.0.5` behavior. |
-| `Vanilla-respectful` | Keeps conservative generated productivity additions, but disables experimental/scripted/sandbox streams and MIR vanilla-chain continuations unless forced. |
-| `Megabase-balanced` | Uses MIR's balanced late-game profile. This is close to the shipped defaults: normal proven sinks stay enabled, while experimental/scripted/sandbox candidates stay off. |
-| `Unlimited sandbox` | Enables high-power and experimental/sandbox candidates where their prerequisites exist. Use for test worlds or intentionally overpowered late-game saves. |
-
-Each technology group also has an enable policy:
-
-| Policy | Behavior |
-| --- | --- |
-| `Use settings mode` | In `Custom/manual`, use the enable checkbox. In preset modes, use the preset decision. |
-| `Force enabled` | Generate the technology or continuation whenever its recipes, effects, prerequisites, science packs, and mod gates are valid. |
-| `Force disabled` | Do not generate the technology or continuation, even if the selected mode would enable it. |
-
-The older `Enable ...` checkboxes are still present for `Custom/manual` compatibility. In preset modes, use the enable policy dropdown when you want an explicit per-technology override.
-
-For scripted technologies, the same effective enablement decision is used in both places: data-stage technology generation and control-stage runtime effects. A scripted stream that is enabled by `Unlimited sandbox`, `Force enabled`, or the old `Custom/manual` checkbox can apply its runtime effect; a scripted stream that is `Force disabled` stays skipped even if the selected preset would otherwise enable it.
+Preset modes and per-technology enable-policy dropdowns are intentionally not shipped in `v2.1.0`; they added UI noise without solving preset sharing. Future preset work should use an import/export or shareable configuration flow instead of adding another override setting beside every technology.
 
 ### What `0` Means
 
@@ -334,7 +315,6 @@ Vanilla continuations:
 | Setting | Type | Default | Description |
 | --- | --- | --- | --- |
 | `ips-require-space-gate` | bool | `false` | Adds the end-game science unlock as a prerequisite without changing science-pack ingredients. Uses promethium science in Space Age when available, otherwise space science. |
-| `mir-settings-mode` | string | `custom` | Controls technology enablement presets. Allowed values: `custom`, `vanilla-respectful`, `megabase-balanced`, `unlimited-sandbox`. |
 | `mir-science-pack-ingredient-policy` | string | `configured` | Controls extra science packs added to every generated technology. Allowed values: `configured`, `space`, `space-and-promethium`, `all-official`, `all`. |
 | `mir-prefer-this-mod-for-competing-techs` | bool | `true` | Lets MIR remove selected competing infinite technologies when MIR has generated or will generate matching replacement behavior. Disable to keep competing technologies from other mods. |
 | `mir-adjust-vanilla-weapon-speed-techs` | string | `off` | Controls whether MIR removes rocket and cannon-shell speed bonuses from MIR's generated weapon shooting speed continuation. Finite vanilla weapon shooting speed technologies keep their original tank cannon and rocket bonuses. Allowed values: `off`, `only-when-dedicated-tech-enabled`, `always`. |
@@ -350,8 +330,7 @@ Every generated stream receives:
 
 | Setting pattern | Type | Default source | Meaning |
 | --- | --- | --- | --- |
-| `mir-enable-policy-<stream-key>` | string | `Use settings mode` | Follows the selected settings mode, or explicitly forces the stream enabled/disabled. |
-| `ips-enable-<stream-key>` | bool | stream/defaults/shared | Custom/manual enable checkbox for the stream. Preset modes use the enable policy instead. |
+| `ips-enable-<stream-key>` | bool | stream/defaults/shared | Enables or disables generation for the stream. Scripted streams use the same checkbox for their runtime effect. |
 | `ips-cost-base-<stream-key>` | int, min `1` | stream/defaults/shared | First-level research unit base cost. |
 | `ips-cost-growth-<stream-key>` | double, min `1` | stream/defaults/shared | Multiplier between levels. `1` means flat cost. |
 | `ips-max-level-<stream-key>` | int, min `0` | stream/defaults/shared | `0` means infinite; positive values cap the stream. |
@@ -382,8 +361,7 @@ Every base extension receives:
 
 | Setting pattern | Type | Meaning |
 | --- | --- | --- |
-| `mir-enable-policy-<technology>` | string | Follows the selected settings mode, or explicitly forces the infinite continuation enabled/disabled. |
-| `mir-enable-<technology>` | bool | Custom/manual enable checkbox for the infinite continuation. Preset modes use the enable policy instead. |
+| `mir-enable-<technology>` | bool | Enables or disables the infinite continuation. |
 | `mir-cost-base-<technology>` | int, min `0` | `0` derives the level 1 base term from the vanilla chain; positive values override it. |
 | `mir-cost-growth-<technology>` | double, min `0` | `0` derives growth from the vanilla chain; positive values override it. |
 | `mir-max-level-<technology>` | int, min `0` | `0` means infinite; positive values cap the generated continuation. |

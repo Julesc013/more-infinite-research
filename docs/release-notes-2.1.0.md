@@ -4,20 +4,19 @@ This is the short, player-facing release summary for the `2.1.0` mod portal rele
 
 ## Headline
 
-`2.1.0` is the first larger Factorio `2.1` feature wave after the `2.0.5` quick patch. It focuses on better settings control, safer icon selection, fluid-output productivity, and an opt-in pipeline extent setting.
+`2.1.0` is the first larger Factorio `2.1` feature wave after the `2.0.5` quick patch. It focuses on simpler settings control, safer icon selection, fluid-output productivity, and an opt-in pipeline extent setting.
 
 ## What Changed
 
-- Added settings modes: Custom/manual, Vanilla-respectful, Megabase-balanced, and Unlimited sandbox.
-- Added per-technology enable policies so generated research can use the selected settings mode, be force-enabled, or be force-disabled.
-- Scripted Spoilage Preservation and Agricultural Growth Speed now follow the same effective enablement rules as data-stage generated technologies.
+- Removed the planned settings modes and per-technology enable policy dropdowns before release. Per-technology enable checkboxes are the single enablement path.
+- Scripted Spoilage Preservation and Agricultural Growth Speed now follow the same enable checkbox rules as data-stage generated technologies.
 - Added better icon source resolution. MIR can prefer loaded Space Age art, use base-game fallbacks, or opt into installed-but-disabled Space Age icon files when the user explicitly enables that option.
 - Added fluid-output productivity research for oil processing, oil cracking, lubricant, sulfuric acid, thruster fuel, and thruster oxidizer recipes where those recipes exist.
 - Added an opt-in startup-only pipeline extent multiplier. The default `1x` setting leaves prototypes unchanged.
 
 ## Compatibility And Validation
 
-- Added fixture validation for settings presets, forced enable/disable overrides, scripted runtime routing, icon source selection, fluid-output recipe ownership, and pipeline extent scaling.
+- Added fixture validation for checkbox enablement, scripted runtime routing, icon source selection, fluid-output recipe ownership, and pipeline extent scaling.
 - Base-only validation confirms generated icons do not use Space Age asset paths unless the installed Space Age icon opt-in is enabled.
 - Fluid productivity validation confirms the implemented fluid recipe streams have exact recipe ownership and avoid duplicate infinite owners.
 - Pipeline validation confirms the default `1x` setting does not run the prototype pass, and that explicit non-default values mutate representative fluid boxes.

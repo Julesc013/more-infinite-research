@@ -176,8 +176,8 @@ Only defer the specific feature that fails proof:
 - Spoilage preservation moves to `v2.1.0` if existing-stack behavior, reversal, disabling, or multi-force behavior is unsafe or unclear.
 - Agricultural growth speed moves to `v2.1.0` if the tower event path or `tick_grown` behavior is not stable in real saves.
 - Existing plant rescale is not required for `v2.0.5`; keep it for `v2.1.0` unless it is clearly bounded and safe.
-- Settings presets started on `dev` after `v2.0.5`: the first slice controls technology enablement through `Custom/manual`, `Vanilla-respectful`, `Megabase-balanced`, and `Unlimited sandbox`.
-- Numeric preset defaults are intentionally not part of the first slice; cost, growth, max-level, and research-unit-time settings remain manual.
+- The settings preset slice was removed before release because it added override UI without solving preset sharing.
+- Future preset work should use an import/export or shareable profile flow; cost, growth, max-level, and research-unit-time settings remain manual until explicitly designed otherwise.
 - Do not add real settings presets to `v2.0.5`; the quick patch only improves confidence in the existing settings.
 
 ## v1.9.0 Legacy Backport Released
@@ -210,9 +210,9 @@ The executable release gate lives in `docs/release-plan-2.1.0.md`.
 
 | Feature | Bucket | Implementation type | Notes |
 | --- | --- | --- | --- |
-| Settings presets | Started | Startup setting/default derivation | Enablement presets implemented first; numeric preset defaults remain out of scope until explicitly designed |
-| Preset override model | Started | Startup setting/default derivation | Per-technology enable policy supports Use settings mode, Force enabled, and Force disabled |
-| Scripted preset runtime resolver | Started | Control-stage startup setting resolver | Spoilage/agriculture runtime effects mirror data-stage preset and force-enable/force-disable decisions |
+| Checkbox enablement cleanup | Implemented | Startup setting/default resolver | Individual enable checkboxes are the single enablement path |
+| Shareable presets | Deferred | Import/export or profile design | Do not add per-technology override dropdowns back without a sharing model |
+| Scripted runtime resolver | Implemented | Control-stage startup setting resolver | Spoilage/agriculture runtime effects mirror data-stage checkbox decisions |
 | Duplicate native modifier policy | Ship | Data-stage overlap scan plus explicit policy | Promote `v2.0.5` diagnostic-only reporting to skip/warn/prefer/allow behavior |
 | Icon source resolver and asset policy | Ship | Data-stage icon candidate resolver plus package validation guard | Prefer loaded Space Age/Wube art when available; do not redistribute original Space Age files in MIR |
 | Scripted-tech refinements | Ship if needed | Event-driven runtime manager | Improve storage/reversal/diagnostics after `v2.0.5` feedback |

@@ -131,7 +131,7 @@ Important release note: the scripted runtime work above is a **default-off v2.0.
 - [x] README documents recommended default, vanilla-respectful, megabase, modpack compatibility, and debug/reporting settings patterns.
 - [x] Cannon shell productivity naming and icon art are aligned with the Cannon Shooting Speed cannon-shell icon family.
 - [x] Runtime fixtures assert generated MIR icon badges match effect types, including Electric Shooting Speed using speed instead of inherited damage.
-- [x] Scripted spoilage/agriculture runtime effects honor settings presets, `Force enabled`, `Force disabled`, and `Custom/manual` legacy enable checkboxes.
+- [x] Scripted spoilage/agriculture runtime effects honor the same enable checkboxes used by data-stage technology generation.
 - [x] Spoilage preservation is release-complete as a default-off experimental candidate with conservative claims.
 - [x] Agricultural growth speed for newly planted tower crops is release-complete as a default-off experimental candidate with conservative claims.
 - [x] README/changelog avoid exact measured claims for existing spoilable stacks and existing plants until manual evidence exists.
@@ -271,8 +271,8 @@ Do not turn `v2.1.0` into a bucket for every plausible feature idea.
 
 ### v2.1.0 Ship Candidates
 
-- [x] Settings presets: `Custom/manual`, `Vanilla-respectful`, `Megabase-balanced`, `Unlimited sandbox` implemented for technology enablement.
-- [x] Preset override model: per-technology `Use settings mode`, `Force enabled`, and `Force disabled` policy prevents preset modes from silently contradicting explicit enablement choices.
+- [x] Settings preset mode and per-technology enable-policy dropdowns removed before release; individual enable checkboxes are the single enablement path.
+- [ ] Shareable presets/import-export design for a later release, without adding per-technology override dropdowns.
 - [ ] Native modifier overlap policy: prefer existing owner, warn only, prefer MIR, or allow duplicates.
 - [x] Icon source resolver: prefer loaded Space Age technology art when available, optionally reference installed-but-disabled Space Age icon files behind `mir-use-installed-space-age-icons`, keep default base-only fallbacks safe, and do not redistribute original Space Age asset files inside MIR.
 - [ ] Scripted spoilage hardening: manual results for existing/new stacks, reversal, disable, baseline, and multi-force behavior.

@@ -120,29 +120,11 @@ These should come before or alongside new content.
 | Duplicate-effect detection | Yes | Especially for cargo landing pad techs if other mods add similar modifiers. |
 | Factorio 2.0 backport branch | Yes, gated | Do not assume 2.1 APIs exist in 2.0. |
 
-### Settings Presets
+### Shareable Presets
 
-Presets are the most important UX improvement because the mod already has many raw settings.
+The mod has many raw settings, but the first preset-mode attempt added too much startup-setting noise. Future preset work should focus on import/export or shareable profiles instead of adding a second override control beside every technology.
 
-Recommended presets:
-
-```text
-Preset: Vanilla-respectful
-- Add new infinite researches.
-- Do not uncap vanilla capped techs by default.
-- Disable heavily game-changing scripted techs by default.
-
-Preset: Megabase-balanced
-- Enable most generated productivity techs.
-- Enable cargo/logistics/agriculture techs.
-- Keep strong sandbox features capped or expensive.
-
-Preset: Unlimited sandbox
-- Current philosophy.
-- Everything configurable and mostly infinite.
-```
-
-Preset first, advanced toggles second.
+Preset design must define how users can copy, share, and audit a profile before preset UI is added back.
 
 ### P1: v2.0.5 Quick Agriculture And Preservation
 
@@ -316,7 +298,7 @@ Add a feature registry so every new idea has a clear implementation kind.
 {
   name = "spoilage-preservation",
   kind = "scripted-effect",
-  default_enabled = "preset-dependent",
+  default_enabled = false,
   required_mods = {"space-age"},
   min_factorio_version = "2.1.0",
   science_pack_policy = "space-age-late",
@@ -419,8 +401,7 @@ Adds scripted spoilage preservation research that increases the global spoil tim
 
 Recommended default:
 
-- Enabled in Megabase-balanced or Unlimited sandbox.
-- Disabled or very expensive in Vanilla-respectful.
+- Disabled unless intentionally testing.
 - Effective cap at `100x` spoil time.
 
 ### Agricultural Growth Speed
@@ -717,7 +698,7 @@ This is a separate chaos mod or disabled experiment. The idea could be funny, bu
 - Research completion, reversal, and configuration changes recompute the effective modifier.
 - Existing saves load cleanly from earlier MIR releases to v2.0.5.
 - Multiple-force behavior is documented and manually tested.
-- The feature can be disabled via startup setting or preset-derived default.
+- The feature can be disabled via its startup enable setting.
 - Disabling the feature restores or stops applying MIR's own multiplier as far as the stored baseline allows.
 - Existing spoilable item behavior is tested before release notes make a stronger claim.
 
@@ -730,10 +711,10 @@ This is a separate chaos mod or disabled experiment. The idea could be funny, bu
 - No surface-wide plant scan or per-tick growth scan is used.
 - Cap and per-level formula are visible in settings/docs.
 
-### Settings Presets
+### Shareable Presets
 
-- Presets map to explicit setting keys and default values.
-- `Vanilla-respectful`, `Megabase-balanced`, and `Unlimited sandbox` are documented.
+- Preset import/export maps to explicit setting keys and default values.
+- The design avoids a second override control beside every technology.
 - Advanced toggles still exist for users who do not want presets.
 - Preset behavior is stable across fresh install and existing-save configuration changes.
 
@@ -866,7 +847,7 @@ A Factorio 2.0 backport should be a best-compatible subset on `legacy`, not a pr
 
 Before writing feature code:
 
-1. Decide defaults for spoilage preservation and agricultural growth speed in each preset.
+1. Decide default-on criteria for spoilage preservation and agricultural growth speed without relying on preset modes.
 2. Verify `NothingModifier` display shape in Factorio 2.1.8+.
 3. Confirm event payloads for agricultural tower planting and harvesting.
 4. Confirm whether `change-recipe-productivity` works as expected for thruster fluid recipes.
@@ -876,7 +857,7 @@ Before writing feature code:
 8. Add duplicate-tech detection for overlapping native modifiers.
 9. Add performance labels to docs and setting descriptions for scripted/global/sandbox features.
 10. Produce a no-code proof for each scripted feature before claiming it in v2.0.5 or carrying it into v2.1.0.
-11. Identify exact setting keys and preset-derived defaults.
+11. Identify exact setting keys and any future shareable-profile defaults.
 12. Preserve stable generated technology names/IDs or document a migration.
 13. Split the work into reviewable task chunks or GitHub issues before coding.
 14. Draft public update wording for Reddit and the mod portal.
