@@ -303,10 +303,17 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
   $scienceText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\lib\science-packs.lua")
   $directEffectsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\streams\direct-effects.lua")
   $productivityText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\streams\productivity.lua")
+  $recipeMatchingText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\lib\recipe-matching.lua")
+  $prototypeLookupText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\lib\prototype-lookup.lua")
   $technologyIconsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\lib\technology-icons.lua")
+  $techGenText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\tech-gen.lua")
+  $dataFinalFixesText = Get-Content -Raw -LiteralPath (Join-Path $repo "data-final-fixes.lua")
+  $pipelineExtentText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\pipeline-extent.lua")
   $diagnosticsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\diagnostics.lua")
   $weaponSpeedText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\weapon-speed-adjustments.lua")
   $generationIntegrityFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-generation-integrity\data-final-fixes.lua")
+  $fluidProductivityFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-fluid-productivity\data-final-fixes.lua")
+  $pipelineExtentFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-pipeline-extent\data-final-fixes.lua")
   $defaultsText = Get-Content -Raw -LiteralPath (Join-Path $repo "defaults.lua")
   $localeText = Get-Content -Raw -LiteralPath (Join-Path $repo "locale\en\more-infinite-research.cfg")
 
@@ -321,12 +328,16 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'allowed_values = {"configured", "space", "space-and-promethium", "all-official", "all"}' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'name = "mir-use-installed-space-age-icons"' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'order = "a-120"' },
+    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'name = "mir-pipeline-extent-multiplier"' },
+    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'order = "a-130"' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'local function append_note(description, note)' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'local stream_sort_names = {' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'research_agricultural_growth_speed = "Agricultural growth speed"' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'research_cargo_landing_pad_count = "Cargo landing pad count"' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'research_character_reach = "Character reach bonus"' },
+    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'research_oil_processing_productivity = "Oil processing productivity"' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'research_spoilage_preservation = "Spoilage preservation"' },
+    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'research_thruster_fuel_productivity = "Thruster fuel productivity"' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'local function group_order_prefix(group)' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'local technology_setting_groups = {}' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'kind = "stream"' },
@@ -371,6 +382,14 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = '{technology="space-science-pack"}' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = '{technology="processing-unit"}' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'research_rocket_fuel = {' },
+    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'research_thruster_fuel_productivity = {' },
+    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'research_thruster_oxidizer_productivity = {' },
+    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'research_oil_processing_productivity = {' },
+    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'research_oil_cracking_productivity = {' },
+    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'research_lubricant_productivity = {' },
+    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'research_sulfuric_acid_productivity = {' },
+    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'fluids = {"thruster-fuel"}' },
+    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = '"^simple%-coal%-liquefaction$"' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'research_walls = { icon_tech="gate", icon_item="stone-wall", groups = {' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'research_heavy_ammo = { icon_item="cannon-shell", groups = {' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'items={"artillery-shell","railgun-ammo"}' },
@@ -391,6 +410,13 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "prototypes\lib\technology-icons.lua"; Text = $technologyIconsText; Snippet = 'local function resolve_icon_candidate(candidate)' },
     @{ File = "prototypes\lib\technology-icons.lua"; Text = $technologyIconsText; Snippet = 'function I.icon_source_for_stream(stream)' },
     @{ File = "prototypes\lib\technology-icons.lua"; Text = $technologyIconsText; Snippet = 'mir-use-installed-space-age-icons' },
+    @{ File = "prototypes\lib\technology-icons.lua"; Text = $technologyIconsText; Snippet = 'local function icon_from_fluid(name)' },
+    @{ File = "prototypes\lib\recipe-matching.lua"; Text = $recipeMatchingText; Snippet = 'add_pattern_outputs(want, options.fluid_patterns, lookup.each_fluid_prototype)' },
+    @{ File = "prototypes\lib\prototype-lookup.lua"; Text = $prototypeLookupText; Snippet = 'function L.fluid_prototype(name)' },
+    @{ File = "prototypes\tech-gen.lua"; Text = $techGenText; Snippet = 'required_fluids' },
+    @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'require("prototypes.pipeline-extent").apply()' },
+    @{ File = "prototypes\pipeline-extent.lua"; Text = $pipelineExtentText; Snippet = 'DEFAULT_PIPELINE_EXTENT = 320' },
+    @{ File = "prototypes\pipeline-extent.lua"; Text = $pipelineExtentText; Snippet = 'mir-pipeline-extent-multiplier' },
     @{ File = "prototypes\diagnostics.lua"; Text = $diagnosticsText; Snippet = 'icons.icon_source_for_stream(spec or {})' },
     @{ File = "prototypes\lib\technology-icons.lua"; Text = $technologyIconsText; Snippet = 'local out = strip_constant_overlays(base_icons)' },
     @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'assert_generated_icon_badge(tech_name, tech)' },
@@ -403,6 +429,9 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'assert_tech_uses_technology_icon("recipe-prod-research_lab_productivity-1", "military-science-pack")' },
     @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'assert_tech_uses_technology_icon("recipe-prod-research_rocket_fuel-1", "rocket-fuel")' },
     @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'effect_type == "laboratory-productivity"' },
+    @{ File = "fixtures\assert-fluid-productivity\data-final-fixes.lua"; Text = $fluidProductivityFixtureText; Snippet = 'recipe-prod-research_oil_processing_productivity-1' },
+    @{ File = "fixtures\assert-fluid-productivity\data-final-fixes.lua"; Text = $fluidProductivityFixtureText; Snippet = 'recipe-prod-research_thruster_fuel_productivity-1' },
+    @{ File = "fixtures\assert-pipeline-extent\data-final-fixes.lua"; Text = $pipelineExtentFixtureText; Snippet = 'DEFAULT_PIPELINE_EXTENT = 320' },
     @{ File = "prototypes\weapon-speed-adjustments.lua"; Text = $weaponSpeedText; Snippet = 'tech.unit and tech.unit.count_formula' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = '[modifier-description]' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'cargo-landing-pad-count=Cargo landing pads per surface: +__1__' },
@@ -410,8 +439,11 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'more-infinite-research.flamethrower_shooting_speed=' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'more-infinite-research.research_heavy_ammo=Cannon shell productivity' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'more-infinite-research.research_lab_productivity=Research productivity' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'more-infinite-research.research_oil_processing_productivity=Oil processing productivity' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'more-infinite-research.research_thruster_fuel_productivity=Thruster fuel productivity' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'more-infinite-research.lab_productivity=Increases research progress gained from each consumed science pack' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-use-installed-space-age-icons=Use installed Space Age icons in base games' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-pipeline-extent-multiplier=Pipeline extent multiplier' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-settings-mode=Settings mode' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-enable-policy-stream=__1__ enable policy' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-settings-mode-unlimited-sandbox=Unlimited sandbox' },
@@ -949,7 +981,9 @@ $postMirAssertionFixtures = @(
   "mir-fixture-assert-lab-skip-policy",
   "mir-fixture-assert-base-extension-boundary",
   "mir-fixture-assert-cargo-logistics",
+  "mir-fixture-assert-fluid-productivity",
   "mir-fixture-assert-omega-drill-productivity",
+  "mir-fixture-assert-pipeline-extent",
   "mir-fixture-assert-weapon-speed-safety"
 )
 
@@ -1044,6 +1078,14 @@ function Set-CopiedSciencePackIngredientPolicy {
 function Set-CopiedRequireSpaceGate {
   param([string]$ModsDir)
   Set-CopiedStartupSettingDefault -ModsDir $ModsDir -Name "ips-require-space-gate" -ValueLiteral "true"
+}
+
+function Set-CopiedPipelineExtentMultiplier {
+  param(
+    [string]$ModsDir,
+    [double]$Multiplier
+  )
+  Set-CopiedStartupSettingDefault -ModsDir $ModsDir -Name "mir-pipeline-extent-multiplier" -ValueLiteral ([string]::Format([Globalization.CultureInfo]::InvariantCulture, "{0}", $Multiplier))
 }
 
 function Set-CopiedSettingsMode {
@@ -1168,6 +1210,7 @@ function Initialize-RuntimeScenario {
     [string]$SciencePackIngredientPolicy = "configured",
     [ValidateSet("", "off", "only-when-dedicated-tech-enabled", "always")]
     [string]$WeaponSpeedAdjustmentMode = "",
+    [double]$PipelineExtentMultiplier = 1,
     [switch]$RequireSpaceGate,
     [switch]$UseInstalledSpaceAgeIcons,
     [switch]$ScriptedDiagnostics,
@@ -1224,6 +1267,9 @@ function Initialize-RuntimeScenario {
   }
   if ($RequireSpaceGate) {
     Set-CopiedRequireSpaceGate -ModsDir $modsDir
+  }
+  if ($PipelineExtentMultiplier -gt 1) {
+    Set-CopiedPipelineExtentMultiplier -ModsDir $modsDir -Multiplier $PipelineExtentMultiplier
   }
   if ($UseInstalledSpaceAgeIcons) {
     Set-CopiedStartupSettingDefault -ModsDir $modsDir -Name "mir-use-installed-space-age-icons" -ValueLiteral "true"
@@ -1307,6 +1353,7 @@ function Invoke-RuntimeScenario {
     [string]$SciencePackIngredientPolicy = "configured",
     [ValidateSet("", "off", "only-when-dedicated-tech-enabled", "always")]
     [string]$WeaponSpeedAdjustmentMode = "",
+    [double]$PipelineExtentMultiplier = 1,
     [switch]$RequireSpaceGate,
     [switch]$UseInstalledSpaceAgeIcons,
     [switch]$ScriptedDiagnostics,
@@ -1325,6 +1372,7 @@ function Invoke-RuntimeScenario {
     -LabPolicySkip:$LabPolicySkip `
     -SciencePackIngredientPolicy $SciencePackIngredientPolicy `
     -WeaponSpeedAdjustmentMode $WeaponSpeedAdjustmentMode `
+    -PipelineExtentMultiplier $PipelineExtentMultiplier `
     -RequireSpaceGate:$RequireSpaceGate `
     -UseInstalledSpaceAgeIcons:$UseInstalledSpaceAgeIcons `
     -ScriptedDiagnostics:$ScriptedDiagnostics `
@@ -1486,6 +1534,32 @@ function Assert-BaseCoreProductivityStreamsGenerated {
   }
 }
 
+function Assert-FluidProductivityStreamsGenerated {
+  param(
+    [string]$Context,
+    [switch]$IncludeThruster
+  )
+
+  $streams = @(
+    "research_oil_processing_productivity",
+    "research_oil_cracking_productivity",
+    "research_lubricant_productivity",
+    "research_sulfuric_acid_productivity"
+  )
+
+  if ($IncludeThruster) {
+    $streams += @(
+      "research_thruster_fuel_productivity",
+      "research_thruster_oxidizer_productivity"
+    )
+  }
+
+  foreach ($stream in $streams) {
+    $line = Get-LastStreamReportLine -Key $stream
+    Assert-ReportLineGenerated -Line $line -Context "$Context stream $stream"
+  }
+}
+
 Invoke-RuntimeScenario -ScenarioName "reduce-policy" -EnabledFixtureNames @(
   "mir-fixture-item-science-pack",
   "mir-fixture-custom-lab",
@@ -1544,6 +1618,22 @@ Invoke-RuntimeScenario -ScenarioName "base-generation-integrity" -EnabledFixture
 )
 Assert-BaseCoreProductivityStreamsGenerated -Context "Base generation integrity scenario"
 Assert-DefaultBaseExtensionDiagnostics -Context "Base generation integrity scenario"
+
+Invoke-RuntimeScenario -ScenarioName "base-fluid-productivity" -EnabledFixtureNames @(
+  "mir-fixture-assert-fluid-productivity"
+)
+Assert-FluidProductivityStreamsGenerated -Context "Base fluid productivity scenario"
+foreach ($baseThrusterStream in @("research_thruster_fuel_productivity", "research_thruster_oxidizer_productivity")) {
+  $baseThrusterLine = Get-LastStreamReportLine -Key $baseThrusterStream
+  if ($baseThrusterLine -notmatch "status=skipped" -or $baseThrusterLine -notmatch "missing required fluid") {
+    throw "Base-only thruster fluid stream $baseThrusterStream should skip for missing fluid: $baseThrusterLine"
+  }
+}
+
+Invoke-RuntimeScenario -ScenarioName "pipeline-extent-multiplier" -EnabledFixtureNames @(
+  "mir-fixture-assert-pipeline-extent"
+) -PipelineExtentMultiplier 2
+Assert-LogContains -Expected "Applied pipeline extent multiplier 2" -Context "Pipeline extent multiplier scenario"
 
 Invoke-RuntimeScenario -ScenarioName "base-generation-integrity-inserter-enabled" -EnabledFixtureNames @(
   "mir-fixture-assert-generation-integrity"
@@ -1692,6 +1782,15 @@ Invoke-RuntimeScenario -ScenarioName "space-age-generation-integrity" -EnabledFi
 ) -EnableSpaceAge
 Assert-SpaceAgeVanillaOwnedProductivityStreamsSkipped -Context "Space Age generation integrity scenario"
 Assert-DefaultBaseExtensionDiagnostics -Context "Space Age generation integrity scenario"
+
+Invoke-RuntimeScenario -ScenarioName "space-age-fluid-productivity" -EnabledFixtureNames @(
+  "mir-fixture-assert-fluid-productivity"
+) -EnableSpaceAge
+Assert-FluidProductivityStreamsGenerated -Context "Space Age fluid productivity scenario" -IncludeThruster
+$spaceAgeThrusterFuelLine = Get-LastStreamReportLine -Key "research_thruster_fuel_productivity"
+Assert-ReportLineContains -Line $spaceAgeThrusterFuelLine -Expected "effects=2" -Context "Space Age thruster fuel productivity scenario"
+$spaceAgeThrusterOxidizerLine = Get-LastStreamReportLine -Key "research_thruster_oxidizer_productivity"
+Assert-ReportLineContains -Line $spaceAgeThrusterOxidizerLine -Expected "effects=2" -Context "Space Age thruster oxidizer productivity scenario"
 
 Invoke-RuntimeScenario -ScenarioName "space-age-generation-integrity-inserter-enabled" -EnabledFixtureNames @(
   "mir-fixture-assert-generation-integrity"

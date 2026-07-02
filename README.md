@@ -29,7 +29,9 @@ The mod is built around **graceful compatibility**: it discovers recipes, scienc
 ## Quick Summary
 
 - **Recipe productivity:** adds infinite research for intermediate, logistics, combat, infrastructure, science-pack, and Space Age production chains.
+- **Fluid-output productivity:** adds process-family recipe productivity for oil processing, oil cracking, lubricant, sulfuric acid, and Space Age thruster propellant fluids where those recipes exist.
 - **Direct-effect bonuses:** adds infinite research for cargo logistics, weapon speed, character bonuses, combined character inventory/trash slots, and worker robot battery.
+- **Fluid prototype tuning:** includes an opt-in startup-only pipeline extent multiplier, default `1x`/unchanged.
 - **Vanilla continuations:** extends selected finite vanilla technology chains into infinite continuations.
 - **Science-pack discovery:** reads active lab inputs, not the old `tool` prototype type.
 - **Lab validation:** checks generated research ingredients against real labs so technologies stay researchable.
@@ -173,6 +175,12 @@ These streams generate `change-recipe-productivity` effects for matching recipes
 | `research_flying_robot_frame` | Flying robot frame productivity | `flying-robot-frame` | `+10%` | Adds electromagnetic science when available. |
 | `research_low_density_structure` | Low density structure productivity | `low-density-structure` | `+10%` | Adds metallurgic science when available. Skips covered recipes in Space Age when vanilla `low-density-structure-productivity` owns them. |
 | `research_rocket_fuel` | Rocket fuel productivity | `rocket-fuel` | `+10%` | Uses the rocket fuel unlock technology art. Adds agricultural science when available. Skips covered recipes in Space Age when vanilla `rocket-fuel-productivity` owns them. |
+| `research_thruster_fuel_productivity` | Thruster fuel productivity | Recipes outputting `thruster-fuel`, including Space Age basic and advanced thruster fuel | `+10%` | Requires the `thruster-fuel` fluid. Excludes barrel-emptying recipes. Adds space and agricultural science when available. |
+| `research_thruster_oxidizer_productivity` | Thruster oxidizer productivity | Recipes outputting `thruster-oxidizer`, including Space Age basic and advanced thruster oxidizer | `+10%` | Requires the `thruster-oxidizer` fluid. Excludes barrel-emptying recipes. Adds space and agricultural science when available. |
+| `research_oil_processing_productivity` | Oil processing productivity | `basic-oil-processing`, `advanced-oil-processing`, `coal-liquefaction`, `simple-coal-liquefaction` | `+10%` | Owns multi-output oil-processing recipes as a single process family so heavy oil, light oil, and petroleum gas are not split into competing owners. |
+| `research_oil_cracking_productivity` | Oil cracking productivity | `heavy-oil-cracking`, `light-oil-cracking` | `+10%` | Separate from oil processing because cracking recipes are single conversion steps. |
+| `research_lubricant_productivity` | Lubricant productivity | Recipes outputting `lubricant`, including Space Age `biolubricant` when present | `+10%` | Requires the `lubricant` fluid and excludes barrel-emptying recipes. |
+| `research_sulfuric_acid_productivity` | Sulfuric acid productivity | Recipes outputting `sulfuric-acid` | `+10%` | Requires the `sulfuric-acid` fluid and excludes barrel-emptying recipes. |
 | `research_tungsten` | Tungsten productivity | `tungsten-plate`, `tungsten-carbide` | `+10%` | Adds metallurgic science when available. |
 | `research_lithium` | Lithium productivity | `lithium-plate` | `+10%` | Adds cryogenic science when available. |
 | `research_holmium` | Holmium productivity | `holmium-plate` | `+10%` | Generates when matching visible recipes exist; adds electromagnetic science when available. |
@@ -329,6 +337,7 @@ Vanilla continuations:
 | `mir-science-pack-ingredient-policy` | string | `configured` | Controls extra science packs added to every generated technology. Allowed values: `configured`, `space`, `space-and-promethium`, `all-official`, `all`. |
 | `mir-prefer-this-mod-for-competing-techs` | bool | `true` | Lets MIR remove selected competing infinite technologies when MIR has generated or will generate matching replacement behavior. Disable to keep competing technologies from other mods. |
 | `mir-adjust-vanilla-weapon-speed-techs` | string | `off` | Controls whether MIR removes rocket and cannon-shell speed bonuses from MIR's generated weapon shooting speed continuation. Finite vanilla weapon shooting speed technologies keep their original tank cannon and rocket bonuses. Allowed values: `off`, `only-when-dedicated-tech-enabled`, `always`. |
+| `mir-pipeline-extent-multiplier` | double | `1` | Startup-only multiplier for fluid box pipeline extent. `1` leaves vanilla and modded fluid boxes unchanged; higher values increase allowed pipe length before pump separation is required. |
 | `mir-debug-generation-report` | bool | `false` | Writes structured generated/skipped rows to the Factorio log, including science packs, prerequisites, effect counts, lab compatibility, and icon source. |
 | `mir-debug-recipe-matches` | bool | `false` | Writes matched recipe names for each generated productivity stream. Useful for mod compatibility reports, but noisy in large mod packs. |
 | `mir-debug-scripted-effects` | bool | `false` | Writes runtime log entries when scripted technologies recompute global or event-driven effects. |
@@ -437,6 +446,7 @@ Generic competing recipe-productivity cleanup is intentionally limited to **know
 | `data-final-fixes.lua` | Runs generation, cleanup, extensions, adjustments, max-level control, and diagnostics. |
 | `defaults.lua` | Shared stream defaults, per-stream overrides, and base-extension defaults. |
 | `settings.lua` | Startup settings generated from streams and base-extension defaults. |
+| `prototypes/pipeline-extent.lua` | Applies the opt-in startup-only pipeline extent multiplier to fluid boxes. |
 | `prototypes/config.lua` | Assembles shared config and stream table. |
 | `prototypes/tech-gen.lua` | Generates stream technologies. |
 | `prototypes/base-tech-extensions.lua` | Extends finite vanilla technology chains. |
@@ -463,6 +473,8 @@ Productivity and direct-effect streams are Lua tables keyed by stream ID. Common
 | `required_mods` | Skips the stream unless all listed mods are active. |
 | `items` | Exact output item names to match. |
 | `item_patterns` | Lua patterns for output item names. |
+| `fluids` | Exact output fluid names to match. |
+| `fluid_patterns` | Lua patterns for output fluid names. |
 | `groups` | Tiered recipe-productivity buckets with their own `change`, `items`, and patterns. |
 | `change` | Per-level recipe productivity amount for a bucket. |
 | `extra_outputs` | Additional output names accepted by recipe matching. |
@@ -477,9 +489,10 @@ Productivity and direct-effect streams are Lua tables keyed by stream ID. Common
 | `science_packs` | Explicit science-pack list, `"all"`, or omitted for default selection. |
 | `dynamic_items_from_lab_inputs` | Appends active lab inputs to the first recipe-productivity group. Used by science-pack productivity. |
 | `required_items` | Skips the stream unless all items exist. |
+| `required_fluids` | Skips the stream unless all fluids exist. |
 | `required_technologies` | Skips the stream unless all technologies exist and appends them as prerequisites. |
 | `required_ammo_categories` | Skips direct effects unless ammo categories exist. |
-| `icon`, `icon_size`, `icon_tech`, `icon_item`, `overlay` | Technology icon resolution hints. |
+| `icon`, `icon_size`, `icon_tech`, `icon_item`, `icon_fluid`, `overlay` | Technology icon resolution hints. |
 | `localised_name`, `localised_description`, `description_locale_key` | Locale overrides. |
 
 ### Compatibility Profiles
@@ -550,6 +563,8 @@ The validation script checks:
 - **Skip policy:** an intentionally incompatible science-pack set is skipped.
 - **Post-MIR assertions:** fixtures prove both runtime lab-policy outcomes.
 - **Native modifier overlap diagnostics:** a Maraxis-like duplicate cargo fixture proves cargo modifier overlaps are reported without changing MIR generation.
+- **Fluid productivity:** post-MIR fixtures prove oil, lubricant, sulfuric acid, and Space Age thruster propellant recipes have exactly one infinite productivity owner.
+- **Pipeline extent:** a post-MIR fixture proves the opt-in startup multiplier mutates common fluid boxes when enabled.
 
 ## Documentation Map
 

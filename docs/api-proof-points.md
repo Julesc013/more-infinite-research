@@ -47,8 +47,8 @@ Latest official API docs checked on 2026-07-01: `2.1.9`. Local runtime validatio
 | Existing partially spoiled stacks recalculate or keep fixed spoil deadlines | Save with partially spoiled stacks before research | v2.0.5 if claiming existing-stack behavior; otherwise document limitation |
 | Newly planted agricultural tower crops receive the growth-speed adjustment | Plant tower crops after research and compare `tick_grown` / observed growth time | v2.0.5 |
 | Existing agricultural tower plants can be rescaled safely | Research/reverse growth tech in a large farm and dedupe owned plants | v2.1.0 unless proven small |
-| `change-recipe-productivity` works cleanly for thruster fuel/oxidizer fluid recipes | Throwaway recipe-productivity test and runtime fixture | v2.1.x spike |
-| `change-recipe-productivity` works cleanly for oil/fluid-output recipes | Throwaway oil productivity test and runtime fixture | v2.1.x spike |
+| `change-recipe-productivity` works cleanly for thruster fuel/oxidizer fluid recipes | Runtime fixture asserts exact recipe ownership and no duplicate infinite owner | v2.1.0 implemented; release gated by validation |
+| `change-recipe-productivity` works cleanly for oil/fluid-output recipes | Runtime fixture asserts oil-processing, cracking, lubricant, and sulfuric-acid ownership | v2.1.0 implemented; release gated by validation |
 | Factorio `2.0.x` exposes the agricultural tower events and fields needed by scripted agriculture | Validate on a Factorio `2.0.x` binary during legacy port | v1.9.0 |
 | Factorio `2.0.x` supports any later current-line pump/pipeline prototype fields | Validate on a Factorio `2.0.x` binary during the matching legacy port | v1.9.x after the feature ships |
 

@@ -56,6 +56,14 @@ local function icon_from_item(name)
   return nil
 end
 
+local function icon_from_fluid(name)
+  local fluid = lookup.fluid_prototype(name)
+  if not fluid then return nil end
+  if fluid.icons then return copy_icons(fluid.icons) end
+  if fluid.icon then return {{icon = fluid.icon, icon_size = fluid.icon_size or 64}} end
+  return nil
+end
+
 local function startup_setting(name)
   local setting = settings and settings.startup and settings.startup[name]
   if setting then return setting.value end
@@ -94,6 +102,7 @@ end
 local function source_label(kind, name)
   if kind == "technology" then return "tech:" .. tostring(name) end
   if kind == "item" then return "item:" .. tostring(name) end
+  if kind == "fluid" then return "fluid:" .. tostring(name) end
   if kind == "icon" then return tostring(name) end
   return tostring(kind or "fallback")
 end
@@ -133,6 +142,11 @@ local function resolve_icon_candidate(candidate)
     if icons then return icons, source_label("item", candidate.item) end
   end
 
+  if candidate.fluid then
+    local icons = icon_from_fluid(candidate.fluid)
+    if icons then return icons, source_label("fluid", candidate.fluid) end
+  end
+
   return nil, nil
 end
 
@@ -161,8 +175,16 @@ local function append_legacy_candidates(out, stream)
     table.insert(out, {item = stream.icon_item})
   end
 
+  if stream.icon_fluid then
+    table.insert(out, {fluid = stream.icon_fluid})
+  end
+
   if stream.items and stream.items[1] then
     table.insert(out, {item = stream.items[1]})
+  end
+
+  if stream.fluids and stream.fluids[1] then
+    table.insert(out, {fluid = stream.fluids[1]})
   end
 end
 

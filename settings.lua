@@ -119,6 +119,18 @@ table.insert(settings_data, {
 })
 
 table.insert(settings_data, {
+  type = "double-setting",
+  name = "mir-pipeline-extent-multiplier",
+  setting_type = "startup",
+  default_value = 1,
+  minimum_value = 1,
+  maximum_value = 100,
+  order = "a-130",
+  localised_name = {"mod-setting-name.mir-pipeline-extent-multiplier"},
+  localised_description = {"mod-setting-description.mir-pipeline-extent-multiplier"}
+})
+
+table.insert(settings_data, {
   type = "bool-setting",
   name = "mir-debug-generation-report",
   setting_type = "startup",
@@ -190,6 +202,9 @@ local stream_sort_names = {
   research_low_density_structure = "Low density structure productivity",
   research_mining_drill = "Mining drill productivity",
   research_modules = "Module productivity",
+  research_lubricant_productivity = "Lubricant productivity",
+  research_oil_cracking_productivity = "Oil cracking productivity",
+  research_oil_processing_productivity = "Oil processing productivity",
   research_plastic = "Plastic productivity",
   research_processing_unit = "Processing unit productivity",
   research_quantum_processor = "Quantum processor productivity",
@@ -202,8 +217,11 @@ local stream_sort_names = {
   research_spoilage_preservation = "Spoilage preservation",
   research_stone_products = "Stone product productivity",
   research_sulfur = "Sulfur productivity",
+  research_sulfuric_acid_productivity = "Sulfuric acid productivity",
   research_supercapacitor = "Supercapacitor productivity",
   research_superconductor = "Superconductor productivity",
+  research_thruster_fuel_productivity = "Thruster fuel productivity",
+  research_thruster_oxidizer_productivity = "Thruster oxidizer productivity",
   research_tungsten = "Tungsten productivity",
   research_walls = "Wall productivity"
 }

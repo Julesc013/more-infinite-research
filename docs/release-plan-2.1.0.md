@@ -22,7 +22,7 @@ Ship the features that make MIR easier to control and safer in modded saves:
 - stricter icon source policy and fallback resolution;
 - scripted spoilage/agriculture hardening with manual evidence;
 - compatibility matrix updates;
-- only the spikes that prove cleanly.
+- implemented fluid, thruster, and pipeline expansion gated by validation and manual balance evidence.
 
 ## Required Ship Gates
 
@@ -51,10 +51,10 @@ decision for each one.
 | Agricultural growth hardening | Ship evidence/policy; existing-plant rescale conditional | Event-driven control-stage scripted tech | `v2.1.0` |
 | Existing agricultural plant rescale | Conditional | Research/configuration bounded tower scan with plant dedupe | `v2.1.0` if proven |
 | High-throughput pump | Likely ship if kept small | Prototype unlock, no runtime loop | `v2.1.0` candidate |
-| Pipeline extent multiplier | Spike only | Startup prototype setting | `v2.1.x` |
-| Thruster fuel productivity | Spike only | Recipe productivity | `v2.1.x` |
-| Thruster oxidizer productivity | Spike only | Recipe productivity | `v2.1.x` |
-| Oil/fluid recipe productivity | Spike only | Recipe productivity | `v2.1.x` |
+| Pipeline extent multiplier | Implemented; ship if proof stays clean | Startup prototype setting, default 1x/off | `v2.1.0` |
+| Thruster fuel productivity | Implemented; ship if proof stays clean | Recipe productivity | `v2.1.0` |
+| Thruster oxidizer productivity | Implemented; ship if proof stays clean | Recipe productivity | `v2.1.0` |
+| Oil/fluid recipe productivity | Implemented; ship if proof stays clean | Recipe productivity | `v2.1.0` |
 | True thruster thrust research | Reject/defer | No clean native modifier lane | Not core MIR |
 | Runtime platform speed mutation | Reject | Runtime hack | Not core MIR |
 | Runtime quality odds mutation | Reject | Runtime hack/prototype mismatch | Not core MIR |
@@ -276,11 +276,12 @@ Out of scope for `v2.1.0`:
 - platform fluid overhaul;
 - runtime fluid scripting.
 
-## Spike Gates
+## Implemented Expansion Gates
 
-Spikes must produce an evidence note before promotion.
+These features now have `v2.1.0` implementation coverage, but they still need
+evidence before final release claims or non-conservative defaults.
 
-| Spike | Required proof |
+| Feature | Required proof |
 | --- | --- |
 | Pipeline extent multiplier | Startup prototype mutation works and does not break machine/tank/modded pipe fluidboxes |
 | Thruster fuel productivity | Exact recipes accept recipe productivity and no duplicate owner exists |
@@ -303,9 +304,9 @@ Suggested issue titles:
 - `v2.1.0: agricultural growth manual validation`
 - `v2.1.0: existing agricultural plant rescale spike`
 - `v2.1.0: high-throughput pump prototype unlock`
-- `v2.1.0: pipeline extent startup setting spike`
-- `v2.1.0: thruster fuel and oxidizer productivity spike`
-- `v2.1.0: oil/fluid recipe productivity spike`
+- `v2.1.0: pipeline extent startup setting`
+- `v2.1.0: thruster fuel and oxidizer productivity`
+- `v2.1.0: oil/fluid recipe productivity`
 - `v2.1.0: compatibility matrix`
 - `v2.1.0: release packaging and docs`
 
@@ -334,7 +335,7 @@ Minimum issue template:
 - settings presets and override behavior are implemented or explicitly deferred;
 - native modifier overlap policy is implemented or explicitly deferred;
 - scripted spoilage/agriculture claims are backed by manual evidence;
-- conditional spikes are either promoted with proof or moved out of the release;
+- implemented expansion features are either shipped with proof or moved out of the release;
 - no broad `on_tick` or `on_nth_tick` scanning is introduced;
 - any generated technology ID changes have migrations;
 - static/package validation passes;

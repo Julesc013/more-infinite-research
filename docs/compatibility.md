@@ -22,9 +22,11 @@ The release goal is graceful compatibility without mod-page dependency clutter: 
 - Science-pack productivity starts with the vanilla and Space Age target list, then appends active lab inputs so custom science packs can receive productivity effects when their recipes are visible.
 - A generated technology must have at least one lab that accepts its complete science-pack set. If no lab accepts the full set, `mir-lab-incompatibility-policy` controls whether the mod tries the largest deterministic lab-compatible subset (`reduce`, default) or skips the technology (`skip`). If no subset exists, the stream is skipped and logged.
 - `ips-require-space-gate` adds an end-game science unlock prerequisite only. `mir-science-pack-ingredient-policy` controls whether generated technologies keep their configured ingredients, add space science, add space and promethium science, add all official base and Space Age science packs, or add every active lab science pack including compatible modded packs.
-- Recipe matching supports both `recipe.category` and Factorio 2.1 `recipe.categories`.
+- Recipe matching supports both `recipe.category` and Factorio 2.1 `recipe.categories`, and can match visible item or fluid recipe outputs.
 - Recipe-productivity generation skips recipe effects already owned by another infinite recipe-productivity technology. In Space Age this prevents parallel MIR technologies for vanilla `processing-unit-productivity`, `low-density-structure-productivity`, `plastic-bar-productivity`, and `rocket-fuel-productivity`.
 - Recipe-productivity ownership is validated by exact recipe ID, not by similar technology icons. Base-only green, red, and blue circuit recipes are MIR-owned; with Space Age enabled, green and red circuits remain MIR-owned while vanilla `processing-unit-productivity` is the single infinite owner for the `processing-unit` recipe.
+- Fluid-output productivity is split by process family, not by every possible fluid name. Multi-output oil-processing recipes are owned by one oil-processing stream; cracking, lubricant, sulfuric acid, and thruster propellant streams stay separate because they cover narrower conversion families.
+- The pipeline extent multiplier is a startup-only prototype setting. Its default `1x` value leaves vanilla and modded fluid boxes unchanged.
 - Hidden recipes and recycling recipes are skipped by default. Streams can opt in with `include_hidden` or `include_recycling`.
 - Optional DLC-shaped streams declare concrete required prototypes instead of requiring a specific official mod by name.
 - Cargo bay unloading distance research uses Factorio 2.1.8's `max-cargo-bay-unloading-distance` technology modifier, uses official base and Space Age science packs only, and is skipped unless Space Age is active and the `landing-pad-unloading-bay` prototypes exist.
@@ -104,7 +106,7 @@ These integrations do not add mod-page dependencies. More Infinite Research hand
 - Omega Drill style drill mods: `omega-drill`, `omega-tau`, and broader modded `*-mining-drill` / `*-drill` outputs are picked up by mining drill productivity when their recipes are visible.
 - Custom science packs from mods such as Castra or PlanetLib-based planets are picked up opportunistically when they are active lab inputs and have visible recipes that output the pack item.
 
-Large mod packs and utility mods such as Alien Biomes, Informatron, Jetpack, AAI, and Helmod usually do not need explicit recipe productivity support unless they add recipes for items covered by one of this mod's streams. When they do, output-based matching should pick up visible recipes automatically.
+Large mod packs and utility mods such as Alien Biomes, Informatron, Jetpack, AAI, and Helmod usually do not need explicit recipe productivity support unless they add recipes for items or fluids covered by one of this mod's streams. When they do, output-based matching should pick up visible recipes automatically.
 
 ## Known Limits
 
@@ -129,11 +131,13 @@ Run each case from a clean Factorio user data directory or with a controlled mod
 6. Space Age 2.1.8+ enabled, verifying cargo bay unloading distance research appears after the landing pad unloading bay unlock and cargo landing pad count remains disabled by default.
 7. Space Age 2.1.8+ with `research_cargo_landing_pad_count` forced enabled, verifying the generated technology uses `cargo-landing-pad-count` and remains researchable.
 8. Space Age 2.1.8+ with a Maraxis-like duplicate cargo fixture, verifying overlapping cargo modifiers are reported diagnostically while MIR's cargo technologies still load.
-9. Better Robots Extended enabled.
-10. A fixture mod that adds a science pack as an ordinary `item` and adds it to a lab.
-11. A fixture mod that adds a custom lab with a different science-pack input set.
-12. A fixture mod that adds recipes in `data-final-fixes.lua`.
-13. Existing save upgraded from the latest 1.x release.
+9. Base-only and Space Age fluid-productivity fixture runs, verifying oil, lubricant, sulfuric acid, and thruster propellant recipe ownership.
+10. A startup pipeline extent fixture run with a non-default multiplier, verifying common fluid boxes are mutated only when enabled.
+11. Better Robots Extended enabled.
+12. A fixture mod that adds a science pack as an ordinary `item` and adds it to a lab.
+13. A fixture mod that adds a custom lab with a different science-pack input set.
+14. A fixture mod that adds recipes in `data-final-fixes.lua`.
+15. Existing save upgraded from the latest 1.x release.
 
 Post-v2.0 scripted feature releases also require these named saves/scenarios:
 
@@ -267,6 +271,27 @@ Create a local test mod pair that:
 
 Expected result: Omega Drill style recipes and broader visible modded `*-drill` / `*-mining-drill` outputs are covered by mining drill productivity.
 
+### Fluid Productivity Fixture
+
+Create a local test mod that:
+
+- Runs after More Infinite Research in base-only and Space Age scenarios.
+- Reads each generated fluid-output productivity technology.
+- Fails loading if oil processing, oil cracking, lubricant, sulfuric acid, thruster fuel, or thruster oxidizer recipes have zero or multiple infinite productivity owners.
+- Fails loading if barrel-emptying recipes are covered by the lubricant or sulfuric acid streams.
+
+Expected result: fluid-output recipe productivity is owned by exactly one MIR stream per recipe, with Space Age thruster propellant streams appearing only when their fluid prototypes exist.
+
+### Pipeline Extent Fixture
+
+Create a local test mod that:
+
+- Runs after More Infinite Research with `mir-pipeline-extent-multiplier` set above `1`.
+- Reads representative pipe, pipe-to-ground, and storage-tank fluid boxes.
+- Fails loading if their `max_pipeline_extent` values do not reflect the startup multiplier.
+
+Expected result: the startup-only pipeline multiplier mutates common fluid boxes when explicitly enabled and is inert at the default `1x`.
+
 ### Weapon Speed Safety Fixture
 
 Create a local test mod that:
@@ -292,6 +317,8 @@ Expected result: vanilla tank cannon fire rate is preserved while MIR avoids dup
 - Confirm runtime fixture validation covers `configured`, `space`, `space-and-promethium`, `all-official`, and `all` science-pack ingredient policies, the end-game prerequisite gate, and the base-only cargo landing pad count skip.
 - Confirm runtime fixture validation covers settings mode presets and force-enabled/force-disabled preset overrides for streams and base extensions.
 - Confirm runtime fixture validation covers Space Age cargo logistics effect types, modifiers, costs, research times, prerequisites, and official science-pack ingredients.
+- Confirm runtime fixture validation covers fluid-output productivity ownership in base-only and Space Age scenarios.
+- Confirm runtime fixture validation covers startup pipeline extent scaling when the multiplier is enabled.
 - Confirm runtime fixture validation covers preserving an existing finite vanilla-chain level before adding MIR's generated infinite continuation.
 - Confirm runtime fixture validation covers broad generation integrity in base-only and Space Age runs, including all enabled vanilla numbered extension chains, the force-enabled inserter-capacity continuation, generated `recipe-prod-*` technology shape, and single-owner recipe productivity.
 - Confirm runtime fixture validation covers preserving finite vanilla weapon shooting speed cannon-shell effects under MIR's overlap setting.

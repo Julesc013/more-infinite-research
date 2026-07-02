@@ -2,6 +2,44 @@
 
 This file records local release-candidate validation runs. It is not a substitute for the manual mod matrix in `docs/compatibility.md`.
 
+## 2026-07-02 Dev Fluid Productivity And Pipeline Extent Pass
+
+Environment:
+
+- Branch: `dev`.
+- Mod version `2.0.5` source line, preparing `v2.1.0` fluid and prototype-setting changes.
+- Installed local Factorio binary: `2.1.9` build `86829`, Windows Steam.
+- Validation archive rebuilt: `build/validation-dist/more-infinite-research_2.0.5.zip`.
+
+Scope:
+
+- Added fluid-output recipe-productivity streams for oil processing, oil cracking, lubricant, sulfuric acid, Space Age thruster fuel, and Space Age thruster oxidizer.
+- Added fluid prototype lookup, fluid-output recipe matching, fluid icon fallback, and required-fluid stream gates.
+- Added `mir-pipeline-extent-multiplier`, a startup-only setting whose default `1x` leaves fluid boxes unchanged.
+- Added post-MIR assertion fixtures for fluid-productivity ownership and explicit pipeline extent scaling.
+
+Commands:
+
+```powershell
+.\scripts\Invoke-MIRValidation.ps1 -StaticOnly
+.\scripts\Invoke-MIRValidation.ps1 -FactorioBin "C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe"
+git diff --check
+```
+
+Results:
+
+- Static validation passed, including locale parity, snippet coverage, package metadata/parity, and whitespace checks.
+- Runtime fixture validation passed on Factorio `2.1.9`.
+- `base-fluid-productivity` proved base oil processing, oil cracking, lubricant, and sulfuric acid streams generate and that thruster streams skip cleanly without Space Age fluids.
+- `space-age-fluid-productivity` proved Space Age thruster fuel and thruster oxidizer streams generate with two recipe effects each, alongside the base fluid-output streams.
+- `pipeline-extent-multiplier` proved `mir-pipeline-extent-multiplier = 2` applies during startup prototype load and mutates representative pipe, pipe-to-ground, and storage-tank fluid boxes.
+- The pipeline scenario logged: `Applied pipeline extent multiplier 2 to 31 fluid boxes.`
+
+Limitations:
+
+- Automated fixtures prove prototype load safety and exact infinite owner shape. They do not replace manual balance/soak testing in large saves or mod packs.
+- The pipeline extent multiplier remains a startup setting, not research, and should stay default `1x`.
+
 ## 2026-07-02 Dev Scripted Preset Runtime Resolver Pass
 
 Environment:

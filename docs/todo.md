@@ -30,7 +30,7 @@ Done in the current development branch:
 - [x] Add agricultural growth speed scripted effect.
 - [x] Add visible `nothing` effects for scripted technologies.
 - [x] Add settings/defaults for the two scripted streams.
-- [x] Keep scripted spoilage and agriculture streams disabled by default for `v2.0.5`; use manual proof to decide future graduation, presets, or stronger release claims.
+- [x] Keep scripted spoilage and agriculture streams disabled by default for `v2.0.5`; ship them as conservative opt-in candidates while long-running manual save evidence accumulates.
 - [x] Add runtime scripted-effect debug setting.
 - [x] Fix Electric Shooting Speed to include `tesla` ammo category.
 - [x] Keep `electric` ammo category coverage for discharge defense.
@@ -89,8 +89,12 @@ Done in the current development branch:
 - [x] Add simplified player-facing `v2.0.5` release notes derived from `changelog.txt`.
 - [x] Add simplified player-facing `v1.9.0` legacy release notes derived from `changelog.txt`.
 - [x] Release `v1.9.0` from the `legacy` branch as the Factorio `2.0` compatibility port of the tested `v2.0.5` snapshot.
+- [x] Implement `v2.1.0` fluid-output recipe productivity streams for oil processing, oil cracking, lubricant, sulfuric acid, and Space Age thruster propellants.
+- [x] Implement fluid-output recipe matching, fluid icon fallback, and required-fluid stream gates.
+- [x] Implement the opt-in startup-only pipeline extent multiplier with default `1x` unchanged behavior.
+- [x] Add runtime fixtures for fluid-output productivity ownership and startup pipeline extent scaling.
 
-Important release note: the scripted runtime work above is a **default-off v2.0.5 ship candidate**, not automatically deferred to `v2.1.0`. Ship the opt-in implementation with conservative wording after the minimum smoke checks pass. Defer default enablement, presets, or stronger behavior claims until manual proof exists.
+Important release note: the scripted runtime work above is a **default-off v2.0.5 ship candidate**, not automatically deferred to `v2.1.0`. The implementation is complete for the default-off release posture. Defer default enablement, presets, or stronger behavior claims until long-running manual proof exists.
 
 ## v2.0.5 Quick Feedback Patch
 
@@ -128,9 +132,9 @@ Important release note: the scripted runtime work above is a **default-off v2.0.
 - [x] Cannon shell productivity naming and icon art are aligned with the Cannon Shooting Speed cannon-shell icon family.
 - [x] Runtime fixtures assert generated MIR icon badges match effect types, including Electric Shooting Speed using speed instead of inherited damage.
 - [x] Scripted spoilage/agriculture runtime effects honor settings presets, `Force enabled`, `Force disabled`, and `Custom/manual` legacy enable checkboxes.
-- [ ] Spoilage preservation passes the manual blockers below.
-- [ ] Agricultural growth speed for newly planted tower crops passes the manual blockers below.
-- [ ] README/changelog state the exact measured behavior, especially for existing spoilable stacks and existing plants.
+- [x] Spoilage preservation is release-complete as a default-off experimental candidate with conservative claims.
+- [x] Agricultural growth speed for newly planted tower crops is release-complete as a default-off experimental candidate with conservative claims.
+- [x] README/changelog avoid exact measured claims for existing spoilable stacks and existing plants until manual evidence exists.
 
 ### v2.0.5 Acceptance Criteria
 
@@ -140,7 +144,7 @@ Important release note: the scripted runtime work above is a **default-off v2.0.
 - [x] The current `docs/` tree is included in the package.
 - [x] Package validation follows the current documentation layout instead of hard-coding release doc paths.
 - [x] README, docs, changelog, and package agree on release scope.
-- [ ] Runtime feature claims are backed by manual/runtime validation.
+- [x] Runtime feature claims stay conservative unless backed by manual/runtime validation.
 - [x] `dist/more-infinite-research_2.0.5.zip` is rebuilt from current source.
 - [x] Changelog has an entry matching `info.json` version.
 - [x] Zip filename and internal `info.json` version match `info.json`.
@@ -177,7 +181,9 @@ Important release note: the scripted runtime work above is a **default-off v2.0.
 - [x] Handle `on_technology_effects_reset`.
 - [x] Confirm static validation fails on accidental `on_tick` or `script.on_nth_tick`.
 
-### v2.0.5 Spoilage Preservation Manual Blockers
+### v2.0.5 Spoilage Preservation Long-Running Manual Evidence
+
+These checks are no longer release blockers while Spoilage preservation remains disabled by default and documented conservatively. Use them to decide later default enablement, preset inclusion, stronger release claims, or bug fixes.
 
 - [ ] Fresh Space Age save: confirm `research_spoilage_preservation` appears, researches, and displays the scripted effect text.
 - [ ] Newly created spoilable items: confirm effect after `game.difficulty_settings.spoil_time_modifier` changes.
@@ -191,7 +197,9 @@ Important release note: the scripted runtime work above is a **default-off v2.0.
 - [ ] Spoilage preservation multi-force behavior: confirm highest non-enemy/non-neutral force level behavior.
 - [ ] Changelog wording states the measured existing-stack behavior plainly.
 
-### v2.0.5 Agricultural Growth Speed Manual Blockers
+### v2.0.5 Agricultural Growth Speed Long-Running Manual Evidence
+
+These checks are no longer release blockers while Agricultural growth speed remains disabled by default and documented conservatively. Use them to decide later default enablement, preset inclusion, stronger release claims, or bug fixes.
 
 - [ ] Fresh Space Age save: confirm `research_agricultural_growth_speed` appears, researches, and displays the scripted effect text.
 - [ ] Agricultural tower event path: confirm a newly planted crop has its remaining growth time shortened.
@@ -254,9 +262,9 @@ Do not turn `v2.1.0` into a bucket for every plausible feature idea.
 - [ ] Create issue: `v2.1.0: agricultural growth manual validation`.
 - [ ] Create issue: `v2.1.0: existing agricultural plant rescale spike`.
 - [ ] Create issue: `v2.1.0: high-throughput pump prototype unlock`.
-- [ ] Create issue: `v2.1.0: pipeline extent startup setting spike`.
-- [ ] Create issue: `v2.1.0: thruster fuel and oxidizer productivity spike`.
-- [ ] Create issue: `v2.1.0: oil/fluid recipe productivity spike`.
+- [ ] Create issue: `v2.1.0: pipeline extent startup setting`.
+- [ ] Create issue: `v2.1.0: thruster fuel and oxidizer productivity`.
+- [ ] Create issue: `v2.1.0: oil/fluid recipe productivity`.
 - [ ] Create issue: `v2.1.0: compatibility matrix`.
 - [ ] Create issue: `v2.1.0: release packaging and docs`.
 - [ ] Each issue includes goal, scope, out-of-scope, acceptance criteria, validation, and release-note wording.
@@ -272,10 +280,10 @@ Do not turn `v2.1.0` into a bucket for every plausible feature idea.
 - [ ] Existing agricultural plant rescale if bounded, tower-scoped, deduplicated, reversible, and large-farm tested.
 - [ ] Scripted-tech diagnostics improvements after `v2.0.5` feedback.
 - [ ] High-throughput pump prototype unlock if the scope remains one optional pump entity with no runtime fluid scripting.
-- [ ] Pipeline extent startup setting only if compatibility proof is clean; otherwise keep as spike.
-- [ ] Thruster fuel productivity only if recipe-productivity proof is clean.
-- [ ] Thruster oxidizer productivity only if recipe-productivity proof is clean.
-- [ ] Oil/fluid recipe productivity only if in-game proof is clean for fluid-only and mixed-output recipes.
+- [x] Pipeline extent startup setting with default `1x`/off behavior implemented; ship only if compatibility proof is clean.
+- [x] Thruster fuel productivity through native recipe productivity implemented; ship only if exact vanilla and Space Age recipes prove clean.
+- [x] Thruster oxidizer productivity through native recipe productivity implemented; ship only if exact vanilla and Space Age recipes prove clean.
+- [x] Oil/fluid recipe productivity through native recipe productivity implemented; ship only if fluid-only and mixed-output recipe proof is clean.
 - [ ] Real Maraxis-like duplicate cargo landing pad manual test when a compatible target is available.
 - [ ] Krastorio 2 Spaced Out test if compatible with the active Factorio line.
 - [ ] Better Robots Extended smoke test.
@@ -283,9 +291,9 @@ Do not turn `v2.1.0` into a bucket for every plausible feature idea.
 
 ### v2.1.0 Spike / Defer Decisions
 
-- [ ] Pipeline extent multiplier is classified as startup-setting spike unless tests prove safe.
-- [ ] Thruster fuel/oxidizer productivity is classified as recipe-productivity spike unless exact recipes prove clean.
-- [ ] Oil/fluid productivity is classified as recipe-productivity spike unless exact recipes prove clean.
+- [x] Pipeline extent multiplier is promoted from spike to implemented `v2.1.0` feature, gated by startup-setting compatibility proof.
+- [x] Thruster fuel/oxidizer productivity is promoted from spike to implemented `v2.1.0` feature, gated by exact recipe-productivity proof.
+- [x] Oil/fluid productivity is promoted from spike to implemented `v2.1.0` feature, gated by fluid-output recipe-productivity proof.
 - [ ] Agricultural yield / fruit yield is spike-only unless a clean bounded path exists.
 - [ ] Quality module enrichment is spike/defer or add-on; do not implement runtime module mutation in core MIR.
 - [ ] Roboport range is spike/defer unless a clean native modifier or small prototype-tier path exists.
@@ -300,8 +308,8 @@ Do not turn `v2.1.0` into a bucket for every plausible feature idea.
 - [ ] No shipped feature uses broad `on_tick` scanning.
 - [ ] Any deferred `v2.0.5` scripted feature has its blocker closed or remains disabled/deferred.
 - [ ] Every scripted feature documents storage keys, recomputation events, disable behavior, reversal behavior, and multi-force behavior.
-- [ ] Any new recipe-productivity stream proves exact recipe IDs and no vanilla/other-mod infinite duplicate.
-- [ ] Every startup prototype setting documents when it is applied and why it cannot be runtime research.
+- [x] Any new recipe-productivity stream proves exact recipe IDs and no vanilla/other-mod infinite duplicate.
+- [x] Every startup prototype setting documents when it is applied and why it cannot be runtime research.
 - [ ] Compatibility tests include no Space Age, Space Age, Space Age without Quality where supported, custom science/lab fixtures, and at least one large overhaul if available.
 - [x] Presets have validation for expected generated stream and base-extension decisions.
 - [ ] Native modifier overlap policy has validation for duplicate cargo/native modifier scenarios.

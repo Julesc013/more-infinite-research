@@ -1,3 +1,4 @@
+require("prototypes.pipeline-extent").apply()
 require("prototypes.tech-gen")
 require("prototypes.compat.competing-productivity").apply()
 require("prototypes.compat.competing-base-extensions").apply()

@@ -33,11 +33,22 @@ function L.item_prototype(name)
   return nil
 end
 
+function L.fluid_prototype(name)
+  if not name then return nil end
+  return data.raw.fluid and data.raw.fluid[name] or nil
+end
+
 function L.each_item_prototype(callback)
   for _, type_name in ipairs(ITEM_TYPES) do
     for name, prototype in pairs(data.raw[type_name] or {}) do
       callback(name, prototype, type_name)
     end
+  end
+end
+
+function L.each_fluid_prototype(callback)
+  for name, prototype in pairs(data.raw.fluid or {}) do
+    callback(name, prototype, "fluid")
   end
 end
 

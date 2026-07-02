@@ -11,8 +11,12 @@ local function lname(key, spec)
   local out = {locale_key}
   if spec.icon_item then
     table.insert(out, {"item-name."..spec.icon_item})
+  elseif spec.icon_fluid then
+    table.insert(out, {"fluid-name."..spec.icon_fluid})
   elseif spec.items and #spec.items == 1 then
     table.insert(out, {"item-name."..spec.items[1]})
+  elseif spec.fluids and #spec.fluids == 1 then
+    table.insert(out, {"fluid-name."..spec.fluids[1]})
   elseif spec.icon_tech then
     table.insert(out, {"technology-name."..spec.icon_tech})
   end
@@ -37,6 +41,11 @@ local function missing_requirement(key, spec)
   for _, item_name in ipairs(spec.required_items or {}) do
     if not U.item_prototype(item_name) then
       return "missing required item " .. item_name
+    end
+  end
+  for _, fluid_name in ipairs(spec.required_fluids or {}) do
+    if not U.fluid_prototype(fluid_name) then
+      return "missing required fluid " .. fluid_name
     end
   end
   for _, tech_name in ipairs(spec.required_technologies or {}) do

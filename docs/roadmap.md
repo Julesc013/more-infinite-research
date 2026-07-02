@@ -65,7 +65,7 @@ More Infinite Research belongs in one of these lanes:
 | Generated recipe productivity | Yes | engines, circuits, science packs, modded visible recipes |
 | Event-driven scripted research | Yes, carefully | spoilage preservation, agricultural growth speed |
 | Small megabase unlocks | Maybe | high-throughput pump, only if optional and tightly scoped |
-| Startup prototype settings | Maybe, disabled by default | pipeline extent multiplier |
+| Startup prototype settings | Yes, conservative default | pipeline extent multiplier |
 | New production chains | Usually no | greenhouses, refrigeration, super-bacteria |
 | Broad gameplay overhauls | No | cold chain, quality overhaul, space-platform overhaul |
 
@@ -114,10 +114,10 @@ This table is the canonical current synthesis from the Reddit discussion and fol
 | Existing agricultural plant rescale | Spike/ship if bounded | `v2.1.0` |
 | Agricultural yield / fruit yield | Spike | `v2.1.0` or later |
 | High-throughput pump / Der Pump | Spike or optional prototype unlock | `v2.1.0` |
-| Pipeline extent setting | Spike; startup setting only | `v2.1.0` |
-| Thruster fuel/oxidizer productivity | Spike recipe productivity | `v2.1.0` or `v2.1.5` |
+| Pipeline extent setting | Implemented; startup setting only; release gated by validation | `v2.1.0` |
+| Thruster fuel/oxidizer productivity | Implemented recipe-productivity streams; release gated by validation | `v2.1.0` |
 | True thruster thrust research | Reject for core MIR unless API changes | Later / companion |
-| Oil processing productivity | Spike | `v2.1.x` |
+| Oil processing productivity | Implemented recipe-productivity split; release gated by validation | `v2.1.0` |
 | Quality module enrichment / quality odds research | Spike/defer; likely add-on or prototype-tier feature | Later |
 | Robot battery/carrying capacity | Existing core | Existing |
 | Roboport range | Spike/defer | Later |
@@ -218,9 +218,9 @@ The executable release gate lives in `docs/release-plan-2.1.0.md`.
 | Scripted-tech refinements | Ship if needed | Event-driven runtime manager | Improve storage/reversal/diagnostics after `v2.0.5` feedback |
 | Existing agricultural plant rescale | Ship if bounded | Research-change bounded scan | Deduplicate tower-owned plants and avoid surface-wide scans |
 | High-throughput pump / Der Pump | Ship if prototype proof passes | Prototype unlock | Good megabase QoL candidate |
-| Pipeline extent setting | Ship if compatibility proof passes | Startup prototype setting | Disabled by default unless proven safe |
-| Thruster fuel/oxidizer productivity | Ship if recipe proof passes | Recipe productivity | Do not add true thrust research |
-| Oil/fluid recipe productivity | Spike/ship if proof passes | Recipe productivity | Needs in-game proof on fluid outputs |
+| Pipeline extent setting | Implemented; ship if compatibility proof passes | Startup prototype setting | Default `1x` leaves prototypes unchanged |
+| Thruster fuel/oxidizer productivity | Implemented; ship if recipe proof passes | Recipe productivity | Do not add true thrust research |
+| Oil/fluid recipe productivity | Implemented; ship if proof passes | Recipe productivity | Needs manual balance proof on fluid outputs |
 | Compatibility docs and test results | Ship | Docs/evidence | Maraxis/Krastorio-style validation when available |
 
 ### v2.1.0 Acceptance Criteria

@@ -164,8 +164,6 @@ Spike only:
 
 - Existing agricultural plant rescale.
 - Agricultural yield, disabled by default.
-- Thruster fuel and oxidizer productivity if validation is clean and the scope stays small.
-- Oil/fluid recipe productivity.
 - Quality module odds.
 - Roboport range.
 - High-throughput pump prototype feasibility.
@@ -192,9 +190,10 @@ Ship:
 
 - Settings presets.
 - High-throughput pump, optional.
-- Pipeline extent startup setting, disabled by default.
+- Pipeline extent startup setting, implemented with default `1x` unchanged behavior.
 - Fluid train unloading notes/docs.
-- Thruster fuel/oxidizer productivity coverage if recipe-productivity tests pass in a later v2.1.x spike.
+- Thruster fuel/oxidizer productivity coverage if recipe-productivity validation stays clean.
+- Oil/fluid productivity split for oil processing, oil cracking, lubricant, and sulfuric acid if validation stays clean.
 - Existing agricultural plant rescale if bounded and deduplicated.
 - Duplicate native modifier detection.
 
@@ -208,7 +207,6 @@ Ship:
 
 - Bug fixes and compatibility feedback from v2.1.0.
 - Engine/electric engine productivity verification.
-- Oil processing productivity test result.
 - Biochamber recipe productivity support where valid.
 - Modded recipe diagnostics.
 - Maraxis and Krastorio 2 Spaced Out compatibility testing when those targets are available for the active Factorio line.
@@ -262,10 +260,10 @@ Advanced Quality Research
 | Harvest/plant crane speed | No for now | Prototype/runtime unclear | Later |
 | Thruster fuel productivity | Yes | Generated recipe productivity | P2 |
 | Thruster oxidizer productivity | Yes | Generated recipe productivity | P2 |
-| Oil processing productivity | Investigate | Test recipe productivity on fluid outputs | P2 |
+| Oil processing productivity | Yes | Generated recipe productivity on tested fluid-output recipe families | P2 |
 | Biochamber oil/productivity incentives | Investigate | Prefer recipe streams over new MIR recipes | P2 |
 | High-throughput pump | Optional/core-adjacent | New pump prototype | P2 |
-| Pipeline extent multiplier | Optional | Startup prototype setting | P2 |
+| Pipeline extent multiplier | Yes | Startup prototype setting, default `1x` | P2 |
 | Fluid train unloading | Mostly covered | Stronger pump plus docs | P2 |
 | More thrust research | No | No clean native modifier | Later/separate |
 | Efficient thruster | Separate/addon | New thruster prototype | Later |
@@ -294,8 +292,8 @@ Use this table as the product boundary when converting feedback into work.
 | Settings presets | Yes |  |  |  |
 | Diagnostics for scripted/global effects | Yes |  |  |  |
 | Engine/electric-engine productivity verification | Yes |  |  |  |
-| Thruster fuel/oxidizer productivity |  | Spike |  |  |
-| Oil processing productivity |  | Spike |  |  |
+| Thruster fuel/oxidizer productivity | Yes |  |  |  |
+| Oil processing productivity | Yes |  |  |  |
 | High-throughput pump / Der Pump |  | Yes | Maybe |  |
 | Pipeline extent setting |  | Yes | Maybe |  |
 | Quality module odds |  | Spike | Maybe |  |
@@ -937,7 +935,7 @@ Otherwise classify it as a companion mod or defer it.
 
 Use browser research only for current official Factorio API documentation and official wiki pages when verifying API claims. Cite sources. Do not rely on Reddit, search snippets, or memory for API behavior.
 
-Plan specifically around these candidate ideas:
+Plan specifically around these implemented and candidate ideas:
 - Spoilage preservation
 - Agricultural growth speed
 - Agricultural yield / fruit yield

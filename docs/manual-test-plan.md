@@ -43,7 +43,7 @@ Required before publishing `v2.0.5`:
 | `duplicate-cargo-tech` | Maraxis-like duplicate cargo landing pad or unloading technology |
 | `popular-overhaul-pack` | Large overhaul pack compatible with the current Factorio line |
 
-Default-off scripted agriculture/spoilage candidates can be included in `v2.0.5` after the minimum release smoke checks pass. Default enablement or strong public behavior claims require the relevant scenarios above to be recorded. If a scripted scenario fails or produces unclear behavior, defer that specific feature, default, or claim to `v2.1.0`.
+Default-off scripted agriculture/spoilage candidates can be included in `v2.0.5` with conservative wording. Default enablement, preset inclusion, or strong public behavior claims require the relevant scenarios above to be recorded. If a scripted scenario fails or produces unclear behavior, defer that specific feature, default, or claim to `v2.1.0` or later.
 
 ## v2.1.0 Larger Feature Wave
 
@@ -57,10 +57,10 @@ Required before claiming larger `v2.1.0` features:
 | `agri-existing-plant-rescale` | Verify any existing plant rescale is bounded, deduplicated, and reversible |
 | `native-modifier-overlap-policy` | Verify overlapping cargo/logistics/native modifiers follow the selected skip/warn/prefer/allow policy beyond diagnostic-only `v2.0.5` coverage |
 | `high-throughput-pump` | Validate prototype, recipe, power draw, balance, and throughput if promoted |
-| `pipeline-extent` | Validate startup prototype mutation and compatibility risk if promoted |
-| `thruster-fuel-productivity` | Verify recipe productivity on thruster fuel recipes if promoted |
-| `thruster-oxidizer-productivity` | Verify recipe productivity on thruster oxidizer recipes if promoted |
-| `oil-fluid-productivity` | Verify recipe productivity on fluid-only and mixed-output oil recipes if promoted |
+| `pipeline-extent` | Manual soak the implemented startup prototype multiplier with large and modded fluid networks after fixture validation passes |
+| `thruster-fuel-productivity` | Manual verify the implemented thruster fuel productivity streams in a Space Age save after fixture validation passes |
+| `thruster-oxidizer-productivity` | Manual verify the implemented thruster oxidizer productivity streams in a Space Age save after fixture validation passes |
+| `oil-fluid-productivity` | Manual verify the implemented oil processing, oil cracking, lubricant, and sulfuric acid productivity split after fixture validation passes |
 
 ## v2.1.x Spikes
 

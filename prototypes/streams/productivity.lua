@@ -46,6 +46,79 @@ return {
     }
   },
 
+  research_thruster_fuel_productivity = {
+    localised_name = {"technology-name.more-infinite-research.research_thruster_fuel_productivity"},
+    required_fluids = {"thruster-fuel"},
+    fluids = {"thruster-fuel"},
+    exclude_recipe_patterns = {"^empty%-.*%-barrel$"},
+    icon_candidates = {
+      {fluid = "thruster-fuel"},
+      {technology = "space-platform-thruster", required_mod = "space-age"},
+      {icon = "__space-age__/graphics/icons/fluid/thruster-fuel.png", icon_size = 64, inactive_mod_asset = "space-age"}
+    }
+  },
+
+  research_thruster_oxidizer_productivity = {
+    localised_name = {"technology-name.more-infinite-research.research_thruster_oxidizer_productivity"},
+    required_fluids = {"thruster-oxidizer"},
+    fluids = {"thruster-oxidizer"},
+    exclude_recipe_patterns = {"^empty%-.*%-barrel$"},
+    icon_candidates = {
+      {fluid = "thruster-oxidizer"},
+      {technology = "space-platform-thruster", required_mod = "space-age"},
+      {icon = "__space-age__/graphics/icons/fluid/thruster-oxidizer.png", icon_size = 64, inactive_mod_asset = "space-age"}
+    }
+  },
+
+  research_oil_processing_productivity = {
+    localised_name = {"technology-name.more-infinite-research.research_oil_processing_productivity"},
+    recipe_patterns = {
+      "^basic%-oil%-processing$",
+      "^advanced%-oil%-processing$",
+      "^coal%-liquefaction$",
+      "^simple%-coal%-liquefaction$"
+    },
+    icon_candidates = {
+      {technology = "advanced-oil-processing"},
+      {technology = "oil-processing"},
+      {icon = "__base__/graphics/icons/fluid/advanced-oil-processing.png", icon_size = 64}
+    }
+  },
+
+  research_oil_cracking_productivity = {
+    localised_name = {"technology-name.more-infinite-research.research_oil_cracking_productivity"},
+    recipe_patterns = {
+      "^heavy%-oil%-cracking$",
+      "^light%-oil%-cracking$"
+    },
+    icon_candidates = {
+      {technology = "advanced-oil-processing"},
+      {icon = "__base__/graphics/icons/fluid/heavy-oil-cracking.png", icon_size = 64}
+    }
+  },
+
+  research_lubricant_productivity = {
+    localised_name = {"technology-name.more-infinite-research.research_lubricant_productivity"},
+    required_fluids = {"lubricant"},
+    fluids = {"lubricant"},
+    exclude_recipe_patterns = {"^empty%-.*%-barrel$"},
+    icon_candidates = {
+      {technology = "lubricant"},
+      {fluid = "lubricant"}
+    }
+  },
+
+  research_sulfuric_acid_productivity = {
+    localised_name = {"technology-name.more-infinite-research.research_sulfuric_acid_productivity"},
+    required_fluids = {"sulfuric-acid"},
+    fluids = {"sulfuric-acid"},
+    exclude_recipe_patterns = {"^empty%-.*%-barrel$"},
+    icon_candidates = {
+      {technology = "sulfur-processing"},
+      {fluid = "sulfuric-acid"}
+    }
+  },
+
   research_tungsten = { items={"tungsten-plate","tungsten-carbide"}, icon_item="tungsten-plate", icon_tech="tungsten-processing" },
   research_lithium = { items={"lithium-plate"}, icon_tech="lithium-processing" },
   research_holmium = { items={"holmium-plate"}, icon_tech="holmium-processing" },

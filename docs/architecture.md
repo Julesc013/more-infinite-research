@@ -10,13 +10,14 @@ More Infinite Research is organized around a compatibility-first data-stage pipe
 
 `data-final-fixes.lua` runs the actual generation pipeline:
 
-1. Generated stream technology creation.
-2. Known competing recipe-productivity cleanup based on actual generated MIR effects.
-3. Known competing base-extension cleanup when MIR's matching base extension is enabled.
-4. Base technology infinite extensions.
-5. Weapon speed overlap adjustment for generated continuations.
-6. Max-level enforcement.
-7. Optional diagnostics report flush.
+1. Startup-only prototype passes such as the opt-in pipeline extent multiplier.
+2. Generated stream technology creation.
+3. Known competing recipe-productivity cleanup based on actual generated MIR effects.
+4. Known competing base-extension cleanup when MIR's matching base extension is enabled.
+5. Base technology infinite extensions.
+6. Weapon speed overlap adjustment for generated continuations.
+7. Max-level enforcement.
+8. Optional diagnostics report flush.
 
 This order gives the mod the best practical view of recipes, labs, science packs, and technologies created by other mods while still keeping this mod's final cleanup deterministic.
 
@@ -75,10 +76,10 @@ Agricultural growth speed refreshes this force state on init, configuration chan
 
 `prototypes/util.lua` is a facade kept for compatibility with existing call sites. Domain logic lives in focused modules:
 
-- `prototypes/lib/prototype-lookup.lua`: item-like prototype lookup, technology existence, ammo-category existence, Space Age detection.
+- `prototypes/lib/prototype-lookup.lua`: item-like and fluid prototype lookup, technology existence, ammo-category existence, Space Age detection.
 - `prototypes/lib/science-packs.lua`: lab-input discovery, science-pack existence, end-game science-pack selection, lab-compatible ingredient validation, science-pack unlock prerequisites, ordered pack lists.
-- `prototypes/lib/recipe-matching.lua`: item-output matching, item-pattern expansion, recipe category matching, hidden/recycling filtering.
-- `prototypes/lib/technology-icons.lua`: borrowed icon copying, explicit `icon_candidates` resolution, legacy technology/item icon fallback, Wube-style constant overlays.
+- `prototypes/lib/recipe-matching.lua`: item/fluid-output matching, output-pattern expansion, recipe category matching, hidden/recycling filtering.
+- `prototypes/lib/technology-icons.lua`: borrowed icon copying, explicit `icon_candidates` resolution, legacy technology/item/fluid icon fallback, Wube-style constant overlays.
 - `prototypes/lib/deepcopy.lua`: shared fallback for data-stage deep copies.
 - `prototypes/lib/table-utils.lua`: deterministic table-key ordering helpers.
 - `prototypes/lib/technology-cleanup.lua`: technology removal with prerequisite reference cleanup.
@@ -120,6 +121,10 @@ The stream table is assembled by `prototypes/streams/init.lua` from:
 Future expansion should add more stream domain modules rather than returning to one large config file.
 
 Generated recipe-productivity streams can set `dynamic_items_from_lab_inputs = true` when their target item set should include every active lab input discovered during `data-final-fixes.lua`. The science-pack productivity stream uses this so custom science packs can receive productivity effects without hard-coded mod dependencies. If a future dynamic stream uses top-level `items` without `groups`, those items are copied into the generated group before lab inputs are appended.
+
+Fluid-output productivity streams use the same recipe-productivity generator as item streams. They should be split by recipe ownership/process family, not by every output fluid name. Multi-output recipes such as oil processing belong to one owner stream; single-output conversion families such as oil cracking, lubricant, sulfuric acid, and thruster fuel/oxidizer can be separate streams when their recipes do not overlap.
+
+`mir-pipeline-extent-multiplier` is deliberately not research. It is a startup-only prototype pass in `prototypes/pipeline-extent.lua` because `FluidBox.max_pipeline_extent` is resolved from prototypes during load.
 
 ## Compatibility Profiles
 
@@ -178,7 +183,7 @@ Static validation checks every local fixture directory has `info.json`, a `mir-f
 
 Static validation rejects runtime tick handlers in `control.lua` and `control/**/*.lua`.
 
-The fixture mods under `fixtures/` test item-based science packs, custom labs, late recipe creation, the default `reduce` lab incompatibility behavior, the `skip` lab incompatibility behavior, science-pack ingredient policy modes, the end-game prerequisite gate, base-only cargo skip behavior, Space Age cargo logistics effect shape, Maraxis-like duplicate cargo modifier diagnostics, finite vanilla-chain preservation, broad generation integrity, weapon-speed overlap safety, Omega-style drill productivity matching, and post-MIR assertions for runtime-sensitive generated technologies.
+The fixture mods under `fixtures/` test item-based science packs, custom labs, late recipe creation, the default `reduce` lab incompatibility behavior, the `skip` lab incompatibility behavior, science-pack ingredient policy modes, the end-game prerequisite gate, base-only cargo skip behavior, Space Age cargo logistics effect shape, Maraxis-like duplicate cargo modifier diagnostics, finite vanilla-chain preservation, broad generation integrity, weapon-speed overlap safety, Omega-style drill productivity matching, fluid-output productivity ownership, pipeline extent startup scaling, and post-MIR assertions for runtime-sensitive generated technologies.
 
 `mir-fixture-assert-generation-integrity` is the broad guardrail fixture. It runs after MIR in both base-only and Space Age runtime scenarios and verifies:
 
