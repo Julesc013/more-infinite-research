@@ -2,6 +2,38 @@
 
 This file records local release-candidate validation runs. It is not a substitute for the manual mod matrix in `docs/compatibility.md`.
 
+## 2026-07-02 v2.1.0 Metadata And Package Build
+
+Environment:
+
+- Branch: `dev`.
+- Mod version `2.1.0`.
+- Release archive rebuilt: `dist/more-infinite-research_2.1.0.zip`.
+- Validation archive rebuilt: `build/validation-dist/more-infinite-research_2.1.0.zip`.
+
+Scope:
+
+- Bumped `info.json` to `2.1.0`.
+- Added the `2.1.0` changelog entry and player-facing release notes.
+- Refreshed current-release README, mod portal copy, and in-game experimental setting notes.
+- Built the new release archive from the current source tree.
+
+Commands:
+
+```powershell
+.\scripts\Build-MIRPackage.ps1
+.\scripts\Invoke-MIRValidation.ps1 -StaticOnly
+git diff --check
+```
+
+Results:
+
+- Static validation passed, including metadata, locale parity, package parity, changelog format, package source/docs/locale/control/migration checks, and whitespace checks.
+- Package validation built `build/validation-dist/more-infinite-research_2.1.0.zip`.
+- The release zip root is `more-infinite-research_2.1.0/`.
+- The packaged `info.json` reports version `2.1.0` and Factorio line `2.1`.
+- Runtime validation was not run in this pass.
+
 ## 2026-07-02 Dev Fluid Productivity And Pipeline Extent Pass
 
 Environment:

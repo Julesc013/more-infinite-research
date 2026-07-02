@@ -16,7 +16,7 @@ logistics chains, combat bonuses, player bonuses, and Space Age gaps that vanill
 
 Version **`1.x.x`** targets **Factorio `2.0`** and requires `base >= 2.0`.
 
-Version **`2.x.x`** targets **Factorio `2.1`**. The current **`2.0.5`** release requires:
+Version **`2.x.x`** targets **Factorio `2.1`**. The current **`2.1.0`** release requires:
 
 - `base >= 2.1.8`
 - optional `elevated-rails >= 2.1.8`
@@ -37,7 +37,7 @@ The mod is built around **graceful compatibility**: it discovers recipes, scienc
 - **Lab validation:** checks generated research ingredients against real labs so technologies stay researchable.
 - **Factorio 2.1 recipes:** supports recipe `categories` as well as legacy single `category`.
 - **Optional DLC:** keeps official DLC mods optional and gates DLC-shaped research behind concrete prototype checks.
-- **Scripted Space Age scaling:** bounded event-driven spoilage preservation and agricultural growth speed are disabled-by-default experimental `v2.0.5` candidates; default enablement or measured behavior claims require the named manual save matrix.
+- **Scripted Space Age scaling:** bounded event-driven spoilage preservation and agricultural growth speed are disabled-by-default experimental candidates; default enablement or measured behavior claims require the named manual save matrix.
 - **Clean mod portal metadata:** keeps third-party compatibility-mod dependencies out of `info.json`.
 - **Save compatibility:** preserves existing generated prototype IDs. Scripted runtime storage is namespaced and must be validated before the scripted features are enabled by default or described with measured runtime behavior.
 
@@ -51,7 +51,7 @@ Install the mod through the **Factorio mod portal** or place the **release zip**
 The packaged release archive is:
 
 ```text
-dist/more-infinite-research_2.0.5.zip
+dist/more-infinite-research_2.1.0.zip
 ```
 
 ## Branch Policy
@@ -212,7 +212,7 @@ These streams generate `change-recipe-productivity` effects for matching recipes
 
 These streams generate infinite technologies with direct Factorio technology modifiers or visible scripted-effect placeholders. Scripted effects are handled in `control.lua` and remain event-driven.
 
-The scripted streams remain disabled by default in `v2.0.5`. Basic opt-in smoke tests can document their experimental behavior, but default enablement or stronger runtime claims require manual save validation for existing-stack behavior, reversal, disabling, multi-force behavior, and the agricultural tower event path. Graduation belongs in `v2.1.0` or `v2.1.5` after player testing.
+The scripted streams remain disabled by default in `v2.1.0`. Basic opt-in smoke tests can document their experimental behavior, but default enablement or stronger runtime claims require manual save validation for existing-stack behavior, reversal, disabling, multi-force behavior, and the agricultural tower event path. Graduation belongs in a later release after player testing.
 
 | Stream key | Research | Effect | Default | Gates and notes |
 | --- | --- | --- | --- | --- |
@@ -256,7 +256,7 @@ Recommended default:
 
 - Use `Settings mode: Custom/manual` or leave settings as shipped.
 - Stable generated research lines are enabled.
-- Experimental/scripted candidates stay disabled by default in `v2.0.5`.
+- Experimental/scripted candidates stay disabled by default in `v2.1.0`.
 - Diagnostics stay disabled unless you are troubleshooting a report.
 
 Vanilla-respectful setup:
@@ -429,7 +429,7 @@ Generic competing recipe-productivity cleanup is intentionally limited to **know
 - **Productivity cap:** recipe productivity remains capped by Factorio's recipe productivity limit.
 - **Vanilla Space Age productivity:** MIR skips recipe-productivity effects already owned by another infinite recipe-productivity technology, so vanilla Space Age productivity techs are not duplicated in parallel.
 - **Stable IDs:** generated stream prototype IDs are intentionally kept stable unless a tested migration is provided.
-- **Scripted agriculture scope:** the current `v2.0.5` candidate applies agricultural growth speed to newly planted tower crops. Existing farm rescaling remains a `v2.1.0` manual test/spike item to avoid broad scans.
+- **Scripted agriculture scope:** the current implementation applies agricultural growth speed to newly planted tower crops. Existing farm rescaling remains a later manual test/spike item to avoid broad scans.
 
 ## Developer Specification
 
@@ -578,6 +578,7 @@ The validation script checks:
 - **`docs/pre-manual-2.0.5-report.md`:** current automated readiness, API-practice check, manual test instructions, and not-ready list for `v2.0.5`.
 - **`docs/release-notes-1.9.0.md`:** simplified player-facing `1.9.0` legacy release-note summary derived from the detailed changelog.
 - **`docs/release-notes-2.0.5.md`:** simplified player-facing `2.0.5` release-note summary derived from the detailed changelog.
+- **`docs/release-notes-2.1.0.md`:** simplified player-facing `2.1.0` release-note summary derived from the detailed changelog.
 - **`docs/release-plan-2.1.0.md`:** release-gated implementation plan for the next larger Factorio `2.1` feature wave.
 - **`docs/roadmap.md`:** current v2.0.5 and v2.1.0 release roadmap, scope gates, and release criteria.
 - **`docs/todo.md`:** executable v2.0.5 and v2.1.0 task checklist.
