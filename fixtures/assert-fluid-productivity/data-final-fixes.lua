@@ -76,6 +76,7 @@ end
 
 for _, recipe_name in ipairs({
   "sulfuric-acid",
+  "acid-neutralisation",
   "acid-neutralization"
 }) do
   assert_recipe_owner(recipe_name, "recipe-prod-research_sulfuric_acid_productivity-1")

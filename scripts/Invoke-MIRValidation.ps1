@@ -433,6 +433,7 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'research_lubricant_productivity = {' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'research_sulfuric_acid_productivity = {' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = '{technology = "oil-processing"}' },
+    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = '"^acid%-neutralisation$"' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = '"^acid%-neutralization$"' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = '{fluid = "sulfuric-acid"}' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'fluids = {"thruster-fuel"}' },

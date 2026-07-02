@@ -82,7 +82,7 @@ Scope:
 
 - Changed Oil cracking productivity to prefer the oil processing unlock technology art instead of advanced oil processing art.
 - Changed Sulfuric acid productivity to prefer sulfuric acid fluid art instead of sulfur processing technology art.
-- Added exact `acid-neutralization` recipe matching to Sulfuric acid productivity when that recipe exists.
+- Added exact `acid-neutralisation` recipe matching to Sulfuric acid productivity when that recipe exists, while keeping `acid-neutralization` as a compatible fallback.
 - Extended fluid-productivity fixture assertions so acid neutralization must have exactly one infinite productivity owner when present.
 - Added runtime diagnostics assertions for the selected oil cracking and sulfuric acid icon sources in both base-only and Space Age fluid-productivity scenarios.
 
@@ -100,7 +100,7 @@ Results:
 - Runtime fixture validation passed across the full Factorio load-test matrix.
 - `base-fluid-productivity` and `space-age-fluid-productivity` proved Oil cracking productivity reports `icon=tech:oil-processing`.
 - `base-fluid-productivity` and `space-age-fluid-productivity` proved Sulfuric acid productivity reports `icon=fluid:sulfuric-acid`.
-- The fluid-productivity fixture proved `acid-neutralization` is covered by Sulfuric acid productivity when the recipe exists, with no duplicate infinite productivity owner.
+- The fluid-productivity fixture proved Space Age `acid-neutralisation` is covered by Sulfuric acid productivity when the recipe exists, with no duplicate infinite productivity owner.
 - `git diff --check` passed.
 
 ## 2026-07-03 Settings Enablement Simplification

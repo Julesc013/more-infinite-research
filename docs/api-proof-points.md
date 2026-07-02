@@ -44,7 +44,7 @@ Latest official API docs checked on 2026-07-02: `2.1.9`. Local runtime validatio
 | Thrusters expose `fuel_fluid_box` and `oxidizer_fluid_box` as `FluidBox` prototype fields | Factorio `ThrusterPrototype` docs | Verified | Pipeline extent scanning can reach thruster fluid boxes; thruster productivity remains recipe-output productivity, not thrust mutation |
 | Fluid prototypes expose `icon`/`icons` fields | Factorio `FluidPrototype` docs | Verified | Fluid-output productivity streams can use fluid prototypes as icon candidates |
 | `change-recipe-productivity` works cleanly for thruster fuel/oxidizer fluid-output recipes | Runtime fixture asserts exact recipe ownership and no duplicate infinite owner on Factorio `2.1.9` | Locally proven | `v2.1.0` implementation can ship if release balance/soak evidence stays clean |
-| `change-recipe-productivity` works cleanly for oil/fluid-output recipes | Runtime fixture asserts oil-processing, cracking, lubricant, sulfuric-acid, and acid-neutralization ownership on Factorio `2.1.9` | Locally proven | `v2.1.0` implementation can ship if release balance/soak evidence stays clean |
+| `change-recipe-productivity` works cleanly for oil/fluid-output recipes | Runtime fixture asserts oil-processing, cracking, lubricant, sulfuric-acid, and Space Age acid-neutralisation ownership on Factorio `2.1.9` | Locally proven | `v2.1.0` implementation can ship if release balance/soak evidence stays clean |
 
 ## Unknown Or Requires In-Game Test
 

@@ -114,6 +114,7 @@ return {
     required_fluids = {"sulfuric-acid"},
     fluids = {"sulfuric-acid"},
     recipe_patterns = {
+      "^acid%-neutralisation$",
       "^acid%-neutralization$"
     },
     exclude_recipe_patterns = {"^empty%-.*%-barrel$"},
