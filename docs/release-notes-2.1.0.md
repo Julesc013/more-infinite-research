@@ -13,14 +13,14 @@ This is the short, player-facing release summary for the `2.1.0` mod portal rele
 - Added better icon source resolution. MIR can prefer loaded Space Age art, use base-game fallbacks, or opt into installed-but-disabled Space Age icon files when the user explicitly enables that option.
 - Added fluid-output productivity research for oil processing, oil cracking, lubricant, sulfuric acid, acid neutralization, thruster fuel, and thruster oxidizer recipes where those recipes exist.
 - Oil cracking productivity uses oil processing technology art. Sulfuric acid productivity uses sulfuric acid fluid art and also covers acid neutralization when that recipe exists.
-- Added an opt-in startup-only pipeline extent multiplier. The default `1x` setting leaves prototypes unchanged.
+- Added an opt-in startup-only pipeline extent multiplier dropdown. The default `100%` setting leaves prototypes unchanged.
 
 ## Compatibility And Validation
 
 - Added fixture validation for checkbox enablement, scripted runtime routing, icon source selection, fluid-output recipe ownership, and pipeline extent scaling.
 - Base-only validation confirms generated icons do not use Space Age asset paths unless the installed Space Age icon opt-in is enabled.
 - Fluid productivity validation confirms the implemented fluid recipe streams have exact recipe ownership and avoid duplicate infinite owners.
-- Pipeline validation confirms the default `1x` setting does not run the prototype pass, and that explicit non-default values mutate representative fluid boxes.
+- Pipeline validation confirms the default `100%` setting does not run the prototype pass, and that explicit non-default dropdown values mutate representative fluid boxes.
 
 ## Known Notes
 

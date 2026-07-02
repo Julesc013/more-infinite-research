@@ -52,7 +52,7 @@ decision for each one.
 | Agricultural growth hardening | Ship evidence/policy; existing-plant rescale conditional | Event-driven control-stage scripted tech | `v2.1.0` |
 | Existing agricultural plant rescale | Conditional | Research/configuration bounded tower scan with plant dedupe | `v2.1.0` if proven |
 | High-throughput pump | Likely ship if kept small | Prototype unlock, no runtime loop | `v2.1.0` candidate |
-| Pipeline extent multiplier | Implemented; ship if proof stays clean | Startup prototype setting, default 1x/off | `v2.1.0` |
+| Pipeline extent multiplier | Implemented; ship if proof stays clean | Startup prototype setting, default 100%/unchanged | `v2.1.0` |
 | Thruster fuel productivity | Implemented; ship if proof stays clean | Recipe productivity | `v2.1.0` |
 | Thruster oxidizer productivity | Implemented; ship if proof stays clean | Recipe productivity | `v2.1.0` |
 | Oil/fluid recipe productivity | Implemented; ship if proof stays clean | Recipe productivity | `v2.1.0` |
@@ -270,7 +270,7 @@ is available.
 
 Suggested issue titles:
 
-- `v2.1.0: settings presets and override model`
+- `v2.1.0: shareable settings profile design`
 - `v2.1.0: native modifier overlap policy`
 - `v2.1.0: spoilage preservation manual validation`
 - `v2.1.0: agricultural growth manual validation`
@@ -304,7 +304,7 @@ Minimum issue template:
 
 - `info.json` is bumped to `2.1.0`;
 - `changelog.txt` has a dated `2.1.0` entry;
-- settings presets and override behavior are implemented or explicitly deferred;
+- shareable settings profiles are explicitly deferred without shipping per-technology override dropdowns;
 - native modifier overlap policy is implemented or explicitly deferred;
 - scripted spoilage/agriculture claims are backed by manual evidence;
 - implemented expansion features are either shipped with proof or moved out of the release;

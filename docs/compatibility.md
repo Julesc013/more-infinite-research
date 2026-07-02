@@ -26,7 +26,7 @@ The release goal is graceful compatibility without mod-page dependency clutter: 
 - Recipe-productivity generation skips recipe effects already owned by another infinite recipe-productivity technology. In Space Age this prevents parallel MIR technologies for vanilla `processing-unit-productivity`, `low-density-structure-productivity`, `plastic-bar-productivity`, and `rocket-fuel-productivity`.
 - Recipe-productivity ownership is validated by exact recipe ID, not by similar technology icons. Base-only green, red, and blue circuit recipes are MIR-owned; with Space Age enabled, green and red circuits remain MIR-owned while vanilla `processing-unit-productivity` is the single infinite owner for the `processing-unit` recipe.
 - Fluid-output productivity is split by process family, not by every possible fluid name. Multi-output oil-processing recipes are owned by one oil-processing stream; cracking, lubricant, sulfuric acid and acid neutralization, and thruster propellant streams stay separate because they cover narrower conversion families.
-- The pipeline extent multiplier is a strictly opt-in startup-only prototype setting. At its default `1x` value, MIR does not load the pipeline pass, scan fluid boxes, log pipeline work, or change any fluid box prototypes. When enabled above `1x`, the current implementation scales recognized fluid box fields across prototypes, not only pipe entities, so higher values are experimental for machines, tanks, thrusters, and modded prototypes that define their own fluid boxes.
+- The pipeline extent multiplier is a strictly opt-in startup-only prototype setting. At its default `100%` value, MIR does not load the pipeline pass, scan fluid boxes, log pipeline work, or change any fluid box prototypes. Non-`100%` dropdown values scale recognized fluid box fields across prototypes, not only pipe entities, so lower or higher values are experimental for machines, tanks, thrusters, and modded prototypes that define their own fluid boxes.
 - Hidden recipes and recycling recipes are skipped by default. Streams can opt in with `include_hidden` or `include_recycling`.
 - Optional DLC-shaped streams declare concrete required prototypes instead of requiring a specific official mod by name.
 - Cargo bay unloading distance research uses Factorio 2.1.8's `max-cargo-bay-unloading-distance` technology modifier, uses official base and Space Age science packs only, and is skipped unless Space Age is active and the `landing-pad-unloading-bay` prototypes exist.
@@ -132,7 +132,7 @@ Run each case from a clean Factorio user data directory or with a controlled mod
 7. Space Age 2.1.8+ with `research_cargo_landing_pad_count` forced enabled, verifying the generated technology uses `cargo-landing-pad-count` and remains researchable.
 8. Space Age 2.1.8+ with a Maraxis-like duplicate cargo fixture, verifying overlapping cargo modifiers are reported diagnostically while MIR's cargo technologies still load.
 9. Base-only and Space Age fluid-productivity fixture runs, verifying oil, lubricant, sulfuric acid, acid neutralization, and thruster propellant recipe ownership.
-10. A startup pipeline extent fixture run with a non-default multiplier, verifying common fluid boxes are mutated only when enabled.
+10. Startup pipeline extent fixture runs with non-default dropdown multipliers, verifying common fluid boxes are mutated only when enabled.
 11. Better Robots Extended enabled.
 12. A fixture mod that adds a science pack as an ordinary `item` and adds it to a lab.
 13. A fixture mod that adds a custom lab with a different science-pack input set.
@@ -286,11 +286,11 @@ Expected result: fluid-output recipe productivity is owned by exactly one MIR st
 
 Create a local test mod that:
 
-- Runs after More Infinite Research with `mir-pipeline-extent-multiplier` set above `1`.
+- Runs after More Infinite Research with `mir-pipeline-extent-multiplier` set to a non-`100%` dropdown value.
 - Reads representative pipe, pipe-to-ground, and storage-tank fluid boxes.
 - Fails loading if their `max_pipeline_extent` values do not reflect the startup multiplier.
 
-Expected result: the startup-only pipeline multiplier mutates common fluid boxes when explicitly enabled and is inert at the default `1x`.
+Expected result: the startup-only pipeline multiplier mutates common fluid boxes when explicitly enabled and is inert at the default `100%`.
 
 ### Weapon Speed Safety Fixture
 

@@ -24,7 +24,7 @@ The minimum manual smoke checks gate the `v2.0.5` quick patch. The full scripted
 | --- | --- | --- | --- |
 | `2.0.5` | `2.1.x` | Quick feedback patch | small/easy fixes, default-off scripted agriculture/spoilage candidates, docs, validation, package parity |
 | `1.9.0` | `2.0.x` | Legacy port | compatible subset of the tested `2.0.5` quick-patch snapshot |
-| `2.1.0` | `2.1.x` | Larger feature wave | settings presets, harder compatibility work, pump/fluid/logistics spikes that graduate, broader scripted refinements |
+| `2.1.0` | `2.1.x` | Larger feature wave | simpler settings, harder compatibility work, pump/fluid/logistics spikes that graduate, broader scripted refinements |
 | `2.1.5` | `2.1.x` | Quick feedback patch | small fixes and feedback from `2.1.0` |
 | `1.9.5` | `2.0.x` | Legacy port | compatible subset of the tested `2.1.5` snapshot |
 | `2.2.0` | `2.1.x` | Larger feature wave | next larger batch after the `2.1.x` feedback cycle |
@@ -110,7 +110,7 @@ This table is the canonical current synthesis from the Reddit discussion and fol
 | Settings confidence pass: clearer labels, ordering, warnings, dropdown help, and docs | Ship | `v2.0.5` |
 | Cannon shell productivity rename/icon and generated badge audit | Ship | `v2.0.5` |
 | Engine/electric-engine productivity verification | Ship/verify | `v2.0.5` |
-| Settings presets with real mode/override behavior | Started | `v2.1.0` |
+| Shareable presets without per-technology override dropdowns | Deferred | Later |
 | Existing agricultural plant rescale | Spike/ship if bounded | `v2.1.0` |
 | Agricultural yield / fruit yield | Spike | `v2.1.0` or later |
 | High-throughput pump / Der Pump | Spike or optional prototype unlock | `v2.1.0` |
@@ -218,7 +218,7 @@ The executable release gate lives in `docs/release-plan-2.1.0.md`.
 | Scripted-tech refinements | Ship if needed | Event-driven runtime manager | Improve storage/reversal/diagnostics after `v2.0.5` feedback |
 | Existing agricultural plant rescale | Ship if bounded | Research-change bounded scan | Deduplicate tower-owned plants and avoid surface-wide scans |
 | High-throughput pump / Der Pump | Ship if prototype proof passes | Prototype unlock | Good megabase QoL candidate |
-| Pipeline extent setting | Implemented; ship if compatibility proof passes | Startup prototype setting | Default `1x` leaves prototypes unchanged |
+| Pipeline extent setting | Implemented; ship if compatibility proof passes | Startup prototype setting | Default `100%` leaves prototypes unchanged |
 | Thruster fuel/oxidizer productivity | Implemented; ship if recipe proof passes | Recipe productivity | Do not add true thrust research |
 | Oil/fluid recipe productivity | Implemented; ship if proof passes | Recipe productivity | Needs manual balance proof on fluid outputs |
 | Compatibility docs and test results | Ship | Docs/evidence | Maraxis/Krastorio-style validation when available |

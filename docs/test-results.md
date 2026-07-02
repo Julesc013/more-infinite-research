@@ -2,6 +2,73 @@
 
 This file records local release-candidate validation runs. It is not a substitute for the manual mod matrix in `docs/compatibility.md`.
 
+## 2026-07-03 Pipeline Extent Dropdown Pass
+
+Environment:
+
+- Branch: `dev`.
+- Mod version `2.1.0`.
+- Installed local Factorio binary: `C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe`.
+- Validation archive rebuilt: `build/validation-dist/more-infinite-research_2.1.0.zip`.
+
+Scope:
+
+- Changed `mir-pipeline-extent-multiplier` from a freeform numeric startup setting to a fixed dropdown with `50%`, `75%`, `100%`, `125%`, `150%`, `200%`, `250%`, `300%`, `400%`, and `500%`.
+- Kept the default at `100%`, which leaves fluid box prototypes unchanged and avoids loading the pipeline extent pass.
+- Added shared parsing for the dropdown value so sub-`100%` choices such as `50%` are valid and still use the same prototype scaling path.
+- Updated locale labels, README, changelog, release notes, compatibility docs, and validation coverage for the dropdown model.
+
+Commands:
+
+```powershell
+.\scripts\Test-MIRLocales.ps1
+git diff --check
+.\scripts\Invoke-MIRValidation.ps1 -StaticOnly
+.\scripts\Invoke-MIRValidation.ps1 -FactorioBin "C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe"
+```
+
+Results:
+
+- Locale validation passed across nine locale files.
+- Static/package validation passed and rebuilt the validation archive.
+- Runtime fixture validation passed across the full Factorio load-test matrix.
+- The default `100%` pipeline setting remained inert during `base-generation-integrity`.
+- `pipeline-extent-multiplier` proved the dropdown value `200%` parses to multiplier `2` and mutates representative pipe, pipe-to-ground, and storage-tank fluid boxes.
+- `pipeline-extent-multiplier-50` proved the dropdown value `50%` parses to multiplier `0.5` and mutates the same representative fluid boxes.
+- The pipeline scenarios logged `Applied pipeline extent multiplier 2 to 31 fluid boxes.` and `Applied pipeline extent multiplier 0.5 to 31 fluid boxes.`
+- `git diff --check` passed.
+
+## 2026-07-03 Unsafe Pickup Reach Guard
+
+Environment:
+
+- Branch: `dev`.
+- Mod version `2.1.0`.
+- Installed local Factorio binary: `C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe`.
+- Validation archive rebuilt: `build/validation-dist/more-infinite-research_2.1.0.zip`.
+
+Scope:
+
+- Added a generated-technology safety guard blocking `character-item-pickup-distance` and `character-loot-pickup-distance` effects.
+- Wired the guard into generated stream technologies, copied vanilla-chain continuations, and the final registered-technology assertion pass.
+- Added static validation requiring the safety guard and rejecting those effect names outside the guard module.
+- Added generation-integrity fixture coverage proving loaded technologies do not carry the blocked pickup reach effects.
+- Fixed the runtime validation harness so non-default pipeline extent multipliers below `100%`, such as `50%`, are actually written into copied scenario settings.
+
+Commands:
+
+```powershell
+.\scripts\Invoke-MIRValidation.ps1 -StaticOnly
+.\scripts\Invoke-MIRValidation.ps1 -FactorioBin "C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe"
+```
+
+Results:
+
+- Static/package validation passed and rebuilt the validation archive.
+- Runtime fixture validation passed across the full Factorio load-test matrix.
+- `base-generation-integrity` and `space-age-generation-integrity` loaded with the unsafe pickup reach exclusion fixture assertions active.
+- The runtime pipeline scenarios proved both `200%` and `50%` pipeline extent multipliers are applied when explicitly set.
+
 ## 2026-07-03 Fluid Productivity Icon And Acid Neutralization Pass
 
 Environment:

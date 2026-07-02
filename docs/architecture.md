@@ -17,7 +17,8 @@ More Infinite Research is organized around a compatibility-first data-stage pipe
 5. Base technology infinite extensions.
 6. Weapon speed overlap adjustment for generated continuations.
 7. Max-level enforcement.
-8. Optional diagnostics report flush.
+8. Generated-technology effect safety validation.
+9. Optional diagnostics report flush.
 
 This order gives the mod the best practical view of recipes, labs, science packs, and technologies created by other mods while still keeping this mod's final cleanup deterministic.
 
@@ -83,6 +84,7 @@ Agricultural growth speed refreshes this force state on init, configuration chan
 - `prototypes/lib/deepcopy.lua`: shared fallback for data-stage deep copies.
 - `prototypes/lib/table-utils.lua`: deterministic table-key ordering helpers.
 - `prototypes/lib/technology-cleanup.lua`: technology removal with prerequisite reference cleanup.
+- `prototypes/technology-effect-safety.lua`: blocks unsafe native effect types from MIR-generated technologies.
 
 Keep new domain behavior in these modules rather than growing `util.lua`.
 
@@ -124,7 +126,9 @@ Generated recipe-productivity streams can set `dynamic_items_from_lab_inputs = t
 
 Fluid-output productivity streams use the same recipe-productivity generator as item streams. They should be split by recipe ownership/process family, not by every output fluid name. Multi-output recipes such as oil processing belong to one owner stream; conversion families such as oil cracking, lubricant, sulfuric acid and acid neutralization, and thruster fuel/oxidizer can be separate streams when their recipes do not overlap.
 
-`mir-pipeline-extent-multiplier` is deliberately not research. It is a startup-only prototype pass in `prototypes/pipeline-extent.lua` because `FluidBox.max_pipeline_extent` is resolved from prototypes during load. The pass is loaded only when the startup setting is greater than `1`; at the default `1x`, MIR reads the setting gate and does not load the pipeline module, scan `data.raw`, log pipeline work, or mutate fluid boxes.
+Direct-effect stream and base-extension generation must pass through `prototypes/technology-effect-safety.lua`. MIR must not add `character-item-pickup-distance` or `character-loot-pickup-distance` effects to any generated technology; large pickup radii can vacuum belt items into the player inventory and cause severe lag.
+
+`mir-pipeline-extent-multiplier` is deliberately not research. It is a startup-only prototype pass in `prototypes/pipeline-extent.lua` because `FluidBox.max_pipeline_extent` is resolved from prototypes during load. The dropdown values and parser live in `prototypes/pipeline-extent-settings.lua`. The pass is loaded only when the parsed startup setting is not `100%`; at the default `100%`, MIR reads the setting gate and does not load the pipeline module, scan `data.raw`, log pipeline work, or mutate fluid boxes.
 
 ## Compatibility Profiles
 
@@ -183,7 +187,9 @@ Static validation checks every local fixture directory has `info.json`, a `mir-f
 
 Static validation rejects runtime tick handlers in `control.lua` and `control/**/*.lua`.
 
-The fixture mods under `fixtures/` test item-based science packs, custom labs, late recipe creation, the default `reduce` lab incompatibility behavior, the `skip` lab incompatibility behavior, science-pack ingredient policy modes, the end-game prerequisite gate, base-only cargo skip behavior, Space Age cargo logistics effect shape, Maraxis-like duplicate cargo modifier diagnostics, finite vanilla-chain preservation, broad generation integrity, weapon-speed overlap safety, Omega-style drill productivity matching, fluid-output productivity ownership, pipeline extent startup scaling, and post-MIR assertions for runtime-sensitive generated technologies.
+Static validation also rejects unsafe pickup reach effect types outside the dedicated safety guard.
+
+The fixture mods under `fixtures/` test item-based science packs, custom labs, late recipe creation, the default `reduce` lab incompatibility behavior, the `skip` lab incompatibility behavior, science-pack ingredient policy modes, the end-game prerequisite gate, base-only cargo skip behavior, Space Age cargo logistics effect shape, Maraxis-like duplicate cargo modifier diagnostics, finite vanilla-chain preservation, broad generation integrity, unsafe pickup reach exclusion, weapon-speed overlap safety, Omega-style drill productivity matching, fluid-output productivity ownership, pipeline extent startup scaling, and post-MIR assertions for runtime-sensitive generated technologies.
 
 `mir-fixture-assert-generation-integrity` is the broad guardrail fixture. It runs after MIR in both base-only and Space Age runtime scenarios and verifies:
 
@@ -193,6 +199,7 @@ The fixture mods under `fixtures/` test item-based science packs, custom labs, l
 - every recipe has at most one infinite recipe-productivity owner;
 - vanilla Space Age productivity technologies remain authoritative for LDS, plastic, processing units, and rocket fuel;
 - circuit productivity ownership stays recipe-specific instead of relying on icon similarity.
+- no technology in the fixture environment carries the blocked character item-pickup or loot-pickup reach effects.
 
 Scripted technology validation must add existing-save load tests, research-finish/reversal tests, existing spoilable-stack tests, multi-force tests, and checks that the new effects remain event-driven rather than tick-scanned.
 

@@ -114,7 +114,7 @@ These should come before or alongside new content.
 | Feature | Add? | Notes |
 | --- | ---: | --- |
 | Scripted-tech framework | Started in `dev`; v2.0.5 ship candidate | Required for spoilage/growth and future non-native effects. |
-| Settings presets | Yes | The thread shows users want "add more infinite research like vanilla" as well as sandbox behavior. |
+| Shareable settings profiles | Later | The thread shows users want "add more infinite research like vanilla" as well as sandbox behavior, but built-in preset modes added too much override UI before a sharing model existed. |
 | Feature categories in settings | Yes | Group by Productivity, Character, Logistics, Cargo, Agriculture, Scripted, Sandbox. |
 | Compatibility matrix | Yes | Users asked about Maraxis and Krastorio 2 Spaced Out. |
 | Duplicate-effect detection | Yes | Especially for cargo landing pad techs if other mods add similar modifiers. |
@@ -170,9 +170,9 @@ Quick feedback patch for easy, bounded, validated improvements.
 
 Ship:
 
-- Settings presets.
+- Shareable preset import/export remains deferred outside the `v2.1.0` release scope.
 - High-throughput pump, optional.
-- Pipeline extent startup setting, implemented with default `1x` unchanged behavior.
+- Pipeline extent startup setting, implemented with default `100%` unchanged behavior.
 - Fluid train unloading notes/docs.
 - Thruster fuel/oxidizer productivity coverage if recipe-productivity validation stays clean.
 - Oil/fluid productivity split for oil processing, oil cracking, lubricant, sulfuric acid, and acid neutralization if validation stays clean.
@@ -225,7 +225,7 @@ Advanced Quality Research
 
 | Feature | Add to MIR? | Method | Priority |
 | --- | ---: | --- | ---: |
-| Settings presets | Yes | Startup setting plus derived defaults | P0 |
+| Shareable settings profiles | Later | Import/export or copyable profile design, no per-technology override dropdowns | Later |
 | Scripted-tech framework | Started | `control/scripted-techs.lua` | P0/P1 |
 | Duplicate-effect detection | Yes | Data-stage effect overlap scan | P0 |
 | Maraxis compatibility | Yes | Detect duplicate cargo techs | P0/P1 |
@@ -245,7 +245,7 @@ Advanced Quality Research
 | Oil processing productivity | Yes | Generated recipe productivity on tested fluid-output recipe families | P2 |
 | Biochamber oil/productivity incentives | Investigate | Prefer recipe streams over new MIR recipes | P2 |
 | High-throughput pump | Optional/core-adjacent | New pump prototype | P2 |
-| Pipeline extent multiplier | Yes | Startup prototype setting, default `1x` | P2 |
+| Pipeline extent multiplier | Yes | Startup prototype setting, default `100%` | P2 |
 | Fluid train unloading | Mostly covered | Stronger pump plus docs | P2 |
 | More thrust research | No | No clean native modifier | Later/separate |
 | Efficient thruster | Separate/addon | New thruster prototype | Later |
@@ -271,7 +271,7 @@ Use this table as the product boundary when converting feedback into work.
 | Spoilage preservation | Yes |  |  |  |
 | Agricultural growth speed | Yes |  |  |  |
 | Agricultural yield / fruit yield |  | Spike |  |  |
-| Settings presets | Yes |  |  |  |
+| Shareable settings profiles |  |  | Maybe |  |
 | Diagnostics for scripted/global effects | Yes |  |  |  |
 | Engine/electric-engine productivity verification | Yes |  |  |  |
 | Thruster fuel/oxidizer productivity | Yes |  |  |  |
@@ -515,8 +515,8 @@ Recommended setting:
 
 ```text
 Startup setting: pipeline extent multiplier
-Values: 1x, 2x, 5x, 10x
-Default: 1x
+Values: 50%, 75%, 100%, 125%, 150%, 200%, 250%, 300%, 400%, 500%
+Default: 100%
 ```
 
 Do not make this infinite research.
@@ -934,7 +934,7 @@ Plan specifically around these implemented and candidate ideas:
 - Greenhouses / off-world Gleba farming
 - Super-bacteria
 - Biter egg production chaos
-- Settings presets
+- Shareable settings profiles
 - Maraxis compatibility
 - Krastorio 2 Spaced Out compatibility
 - Factorio 2.0 legacy branch compatibility

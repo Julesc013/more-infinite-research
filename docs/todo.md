@@ -17,6 +17,7 @@ Use `docs/roadmap.md` for release scope and product boundaries. Use `docs/post-2
 - Prefer native modifiers and recipe productivity.
 - Scripted effects must be event-driven, bounded, reversible where practical, and documented.
 - Do not add broad `on_tick` scans for inventories, belts, containers, item stacks, surfaces, or all entities.
+- Never add `character-item-pickup-distance` or `character-loot-pickup-distance` technology effects; large pickup radii can vacuum belt items into inventories and cause severe lag.
 - Commit documentation and implementation changes at the end of each completed work turn.
 
 ## Immediate Status
@@ -91,8 +92,9 @@ Done in the current development branch:
 - [x] Release `v1.9.0` from the `legacy` branch as the Factorio `2.0` compatibility port of the tested `v2.0.5` snapshot.
 - [x] Implement `v2.1.0` fluid-output recipe productivity streams for oil processing, oil cracking, lubricant, sulfuric acid, acid neutralization, and Space Age thruster propellants.
 - [x] Implement fluid-output recipe matching, fluid icon fallback, and required-fluid stream gates.
-- [x] Implement the strictly opt-in startup-only pipeline extent multiplier with default `1x` unchanged behavior and no fluidbox scan when disabled.
+- [x] Implement the strictly opt-in startup-only pipeline extent multiplier dropdown with default `100%` unchanged behavior and no fluidbox scan when disabled.
 - [x] Add runtime fixtures for fluid-output productivity ownership and startup pipeline extent scaling.
+- [x] Add a hard safety guard and validation coverage preventing character item-pickup and loot-pickup reach effects from MIR-generated technologies.
 
 Important release note: the scripted runtime work above is a **default-off v2.0.5 ship candidate**, not automatically deferred to `v2.1.0`. The implementation is complete for the default-off release posture. Defer default enablement, presets, or stronger behavior claims until long-running manual proof exists.
 
@@ -255,7 +257,7 @@ Do not turn `v2.1.0` into a bucket for every plausible feature idea.
 ### v2.1.0 Milestone / Issue Setup
 
 - [ ] Create a GitHub `v2.1.0` milestone.
-- [ ] Create issue: `v2.1.0: settings presets and override model`.
+- [ ] Create issue: `later: shareable settings profile import/export`.
 - [ ] Create issue: `v2.1.0: native modifier overlap policy`.
 - [ ] Create issue: `v2.1.0: icon source resolver and asset policy`.
 - [ ] Create issue: `v2.1.0: spoilage preservation manual validation`.
@@ -280,7 +282,7 @@ Do not turn `v2.1.0` into a bucket for every plausible feature idea.
 - [ ] Existing agricultural plant rescale if bounded, tower-scoped, deduplicated, reversible, and large-farm tested.
 - [ ] Scripted-tech diagnostics improvements after `v2.0.5` feedback.
 - [ ] High-throughput pump prototype unlock if the scope remains one optional pump entity with no runtime fluid scripting.
-- [x] Pipeline extent startup setting with default `1x`/off behavior implemented; ship only if compatibility proof is clean.
+- [x] Pipeline extent startup setting with default `100%`/off behavior implemented; ship only if compatibility proof is clean.
 - [x] Thruster fuel productivity through native recipe productivity implemented; ship only if exact vanilla and Space Age recipes prove clean.
 - [x] Thruster oxidizer productivity through native recipe productivity implemented; ship only if exact vanilla and Space Age recipes prove clean.
 - [x] Oil/fluid recipe productivity through native recipe productivity implemented; ship only if fluid-only and mixed-output recipe proof is clean.

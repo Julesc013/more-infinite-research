@@ -216,6 +216,53 @@ Invoke-RepoCheck "scripted candidate streams remain default-off before manual pr
   }
 }
 
+Invoke-RepoCheck "unsafe pickup reach technology effects are blocked" {
+  $safetyPath = Join-Path $repo "prototypes\technology-effect-safety.lua"
+  if (-not (Test-Path -LiteralPath $safetyPath)) {
+    throw "Missing technology effect safety guard: prototypes/technology-effect-safety.lua"
+  }
+
+  $safetyText = Get-Content -Raw -LiteralPath $safetyPath
+  $techGenText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\tech-gen.lua")
+  $baseExtensionsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\base-tech-extensions.lua")
+  $dataFinalFixesText = Get-Content -Raw -LiteralPath (Join-Path $repo "data-final-fixes.lua")
+  $generationIntegrityFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-generation-integrity\data-final-fixes.lua")
+
+  foreach ($effectType in @("character-item-pickup-distance", "character-loot-pickup-distance")) {
+    if (-not $safetyText.Contains($effectType)) {
+      throw "Technology effect safety guard must block unsafe effect type: $effectType"
+    }
+  }
+
+  $requiredGuardSnippets = @(
+    @{ File = "prototypes\tech-gen.lua"; Text = $techGenText; Snippet = 'effect_safety.assert_effect_allowed(effect, "direct-effect stream " .. key)' },
+    @{ File = "prototypes\tech-gen.lua"; Text = $techGenText; Snippet = 'effect_safety.register_generated_technology(t.name)' },
+    @{ File = "prototypes\base-tech-extensions.lua"; Text = $baseExtensionsText; Snippet = 'effect_safety.assert_effects_allowed(desired_effects, "base extension " .. key)' },
+    @{ File = "prototypes\base-tech-extensions.lua"; Text = $baseExtensionsText; Snippet = 'effect_safety.register_generated_technology(new.name)' },
+    @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'require("prototypes.technology-effect-safety").assert_registered_technology_effects()' },
+    @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'assert_no_blocked_pickup_effects()' }
+  )
+
+  foreach ($check in $requiredGuardSnippets) {
+    if (-not $check.Text.Contains($check.Snippet)) {
+      throw "Missing unsafe pickup reach guard in $($check.File): $($check.Snippet)"
+    }
+  }
+
+  $safetyRelative = "prototypes/technology-effect-safety.lua"
+  $prototypeLuaFiles = Get-ChildItem -LiteralPath (Join-Path $repo "prototypes") -Recurse -File -Filter "*.lua"
+  foreach ($file in $prototypeLuaFiles) {
+    $relative = Get-RepoRelativePath $file.FullName
+    if ($relative -eq $safetyRelative) { continue }
+    $text = Get-Content -Raw -LiteralPath $file.FullName
+    foreach ($effectType in @("character-item-pickup-distance", "character-loot-pickup-distance")) {
+      if ($text.Contains($effectType)) {
+        throw "Unsafe pickup reach effect type appears outside the safety guard in ${relative}: $effectType"
+      }
+    }
+  }
+}
+
 Invoke-RepoCheck "merged trash-slot technology has save migration" {
   $migrationPath = Join-Path $repo "migrations\more-infinite-research_2.0.5.json"
   if (-not (Test-Path -LiteralPath $migrationPath)) {
@@ -308,6 +355,7 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
   $techGenText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\tech-gen.lua")
   $dataFinalFixesText = Get-Content -Raw -LiteralPath (Join-Path $repo "data-final-fixes.lua")
   $pipelineExtentText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\pipeline-extent.lua")
+  $pipelineExtentSettingsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\pipeline-extent-settings.lua")
   $diagnosticsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\diagnostics.lua")
   $weaponSpeedText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\weapon-speed-adjustments.lua")
   $generationIntegrityFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-generation-integrity\data-final-fixes.lua")
@@ -323,7 +371,10 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'allowed_values = {"configured", "space", "space-and-promethium", "all-official", "all"}' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'name = "mir-use-installed-space-age-icons"' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'order = "a-120"' },
+    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'local pipeline_extent_settings = require("prototypes.pipeline-extent-settings")' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'name = "mir-pipeline-extent-multiplier"' },
+    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'type = "string-setting"' },
+    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'allowed_values = pipeline_extent_settings.allowed_values' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'order = "a-130"' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'local function append_note(description, note)' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'local stream_sort_names = {' },
@@ -410,11 +461,15 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "prototypes\lib\recipe-matching.lua"; Text = $recipeMatchingText; Snippet = 'add_pattern_outputs(want, options.fluid_patterns, lookup.each_fluid_prototype)' },
     @{ File = "prototypes\lib\prototype-lookup.lua"; Text = $prototypeLookupText; Snippet = 'function L.fluid_prototype(name)' },
     @{ File = "prototypes\tech-gen.lua"; Text = $techGenText; Snippet = 'required_fluids' },
-    @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'local pipeline_extent_multiplier = pipeline_extent_setting and tonumber(pipeline_extent_setting.value) or 1' },
-    @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'if pipeline_extent_multiplier > 1 then' },
+    @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'require("prototypes.pipeline-extent-settings").multiplier()' },
+    @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'if pipeline_extent_multiplier ~= 1 then' },
     @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'require("prototypes.pipeline-extent").apply(pipeline_extent_multiplier)' },
+    @{ File = "prototypes\pipeline-extent-settings.lua"; Text = $pipelineExtentSettingsText; Snippet = 'S.default_value = "100"' },
+    @{ File = "prototypes\pipeline-extent-settings.lua"; Text = $pipelineExtentSettingsText; Snippet = 'S.allowed_values = {"50", "75", "100", "125", "150", "200", "250", "300", "400", "500"}' },
+    @{ File = "prototypes\pipeline-extent-settings.lua"; Text = $pipelineExtentSettingsText; Snippet = 'function S.parse(value)' },
+    @{ File = "prototypes\pipeline-extent-settings.lua"; Text = $pipelineExtentSettingsText; Snippet = 'if numeric > 10 then return numeric / 100 end' },
     @{ File = "prototypes\pipeline-extent.lua"; Text = $pipelineExtentText; Snippet = 'DEFAULT_PIPELINE_EXTENT = 320' },
-    @{ File = "prototypes\pipeline-extent.lua"; Text = $pipelineExtentText; Snippet = 'mir-pipeline-extent-multiplier' },
+    @{ File = "prototypes\pipeline-extent.lua"; Text = $pipelineExtentText; Snippet = 'if multiplier == 1 then return end' },
     @{ File = "prototypes\diagnostics.lua"; Text = $diagnosticsText; Snippet = 'icons.icon_source_for_stream(spec or {})' },
     @{ File = "prototypes\lib\technology-icons.lua"; Text = $technologyIconsText; Snippet = 'local out = strip_constant_overlays(base_icons)' },
     @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'assert_generated_icon_badge(tech_name, tech)' },
@@ -1102,7 +1157,12 @@ function Set-CopiedPipelineExtentMultiplier {
     [string]$ModsDir,
     [double]$Multiplier
   )
-  Set-CopiedStartupSettingDefault -ModsDir $ModsDir -Name "mir-pipeline-extent-multiplier" -ValueLiteral ([string]::Format([Globalization.CultureInfo]::InvariantCulture, "{0}", $Multiplier))
+  $percent = [int][Math]::Round($Multiplier * 100)
+  $allowedPercents = @(50, 75, 100, 125, 150, 200, 250, 300, 400, 500)
+  if ($allowedPercents -notcontains $percent) {
+    throw "Unsupported pipeline extent multiplier for dropdown validation: $Multiplier ($percent%)."
+  }
+  Set-CopiedStartupSettingDefault -ModsDir $ModsDir -Name "mir-pipeline-extent-multiplier" -ValueLiteral "`"$percent`""
 }
 
 function Set-CopiedStreamCheckboxDefault {
@@ -1254,7 +1314,7 @@ function Initialize-RuntimeScenario {
   if ($RequireSpaceGate) {
     Set-CopiedRequireSpaceGate -ModsDir $modsDir
   }
-  if ($PipelineExtentMultiplier -gt 1) {
+  if ($PipelineExtentMultiplier -ne 1) {
     Set-CopiedPipelineExtentMultiplier -ModsDir $modsDir -Multiplier $PipelineExtentMultiplier
   }
   if ($UseInstalledSpaceAgeIcons) {
@@ -1625,6 +1685,11 @@ Invoke-RuntimeScenario -ScenarioName "pipeline-extent-multiplier" -EnabledFixtur
   "mir-fixture-assert-pipeline-extent"
 ) -PipelineExtentMultiplier 2
 Assert-LogContains -Expected "Applied pipeline extent multiplier 2" -Context "Pipeline extent multiplier scenario"
+
+Invoke-RuntimeScenario -ScenarioName "pipeline-extent-multiplier-50" -EnabledFixtureNames @(
+  "mir-fixture-assert-pipeline-extent"
+) -PipelineExtentMultiplier 0.5
+Assert-LogContains -Expected "Applied pipeline extent multiplier 0.5" -Context "Pipeline extent multiplier 50 percent scenario"
 
 Invoke-RuntimeScenario -ScenarioName "base-generation-integrity-inserter-enabled" -EnabledFixtureNames @(
   "mir-fixture-assert-generation-integrity"

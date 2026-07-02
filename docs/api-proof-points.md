@@ -55,7 +55,7 @@ Latest official API docs checked on 2026-07-02: `2.1.9`. Local runtime validatio
 | Existing partially spoiled stacks recalculate or keep fixed spoil deadlines | Save with partially spoiled stacks before research | v2.0.5 if claiming existing-stack behavior; otherwise document limitation |
 | Newly planted agricultural tower crops receive the growth-speed adjustment | Plant tower crops after research and compare `tick_grown` / observed growth time | v2.0.5 |
 | Existing agricultural tower plants can be rescaled safely | Research/reverse growth tech in a large farm and dedupe owned plants | v2.1.0 unless proven small |
-| Pipeline extent multiplier has acceptable balance and compatibility impact in large/modded fluid networks | Long-running saves and modpack soak with non-default multiplier values | v2.1.0 if making stronger recommendation than default `1x` |
+| Pipeline extent multiplier has acceptable balance and compatibility impact in large/modded fluid networks | Long-running saves and modpack soak with non-default multiplier values | v2.1.0 if making stronger recommendation than default `100%` |
 | Factorio `2.0.x` exposes the agricultural tower events and fields needed by scripted agriculture | Validate on a Factorio `2.0.x` binary during legacy port | v1.9.0 |
 | Factorio `2.0.x` supports any later current-line pump/pipeline prototype fields | Validate on a Factorio `2.0.x` binary during the matching legacy port | v1.9.x after the feature ships |
 

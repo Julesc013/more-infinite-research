@@ -10,7 +10,7 @@ Date: 2026-07-02
     - Added fluid-output recipe productivity streams for oil processing, oil cracking, lubricant, sulfuric acid, acid neutralization, Space Age thruster fuel, and Space Age thruster oxidizer recipes.
     - Oil cracking productivity now uses the oil processing unlock technology art, and Sulfuric acid productivity now uses sulfuric acid fluid art and includes acid neutralization when that recipe exists.
     - Added fluid prototype lookup, fluid-output recipe matching, fluid icon fallback, and required-fluid gates for fluid-output productivity streams.
-    - Added a strictly opt-in startup-only pipeline extent multiplier. The default value is 1x and leaves fluid box prototypes unchanged.
+    - Added a strictly opt-in startup-only pipeline extent multiplier dropdown. The default value is 100% and leaves fluid box prototypes unchanged.
 
   Compatibility:
 
@@ -107,7 +107,7 @@ Date: 2026-07-01
     - Added runtime fixture validation for Processing Unit, Wall, Science pack, and Research productivity icon ownership.
     - Added runtime fixture validation for Rocket Fuel productivity icon ownership.
     - Added runtime fixture validation that base-game Research productivity generates with `laboratory-productivity`, and that Space Age skips it because vanilla `research-productivity` already exists.
-    - Real settings presets remain deferred to v2.1.0 because preset override behavior needs a deliberate design and tests.
+    - Real shareable settings profiles remain deferred to a later release because import/export behavior needs a deliberate design and tests.
     - Factorio 2.0 legacy validation now rejects Factorio 2.1 dependency floors and Factorio 2.1-only cargo modifier strings when info.json targets Factorio 2.0.
     - Planned legacy cadence now starts with v2.0.5 to v1.9.0, followed by v2.1.5 to v1.9.5, and a final v1.9.9 from the latest tested v2.x.x source snapshot at the Factorio 2.1 stable cutoff.
 

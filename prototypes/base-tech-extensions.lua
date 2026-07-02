@@ -7,6 +7,7 @@ local D = require("prototypes.diagnostics")
 local settings_resolver = require("prototypes.settings-resolver")
 local deepcopy = require("prototypes.lib.deepcopy")
 local table_utils = require("prototypes.lib.table-utils")
+local effect_safety = require("prototypes.technology-effect-safety")
 
 local function escape_pattern(text)
   return text:gsub("([^%w])", "%%%1")
@@ -433,6 +434,7 @@ local function extend_chain(key)
   else
     desired_effects = deepcopy(base_tech.effects or {})
   end
+  effect_safety.assert_effects_allowed(desired_effects, "base extension " .. key)
   if not prefer_this_mod_for_competing_techs() then
     local other_choice = find_any_infinite_extension(key .. "-" .. base_level, new_name)
     if other_choice then
@@ -485,6 +487,7 @@ local function extend_chain(key)
   end
 
   data:extend({ new })
+  effect_safety.register_generated_technology(new.name)
   D.extension(D.extension_fields(key, "generated", "base_extension", resolved_ingredients, new.prerequisites, new.effects, lab_status))
 end
 

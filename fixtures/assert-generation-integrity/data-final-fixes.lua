@@ -11,6 +11,21 @@ local function fail(message)
   error("MIR validation failed: " .. message)
 end
 
+local blocked_pickup_effect_types = {
+  ["character-item-pickup-distance"] = true,
+  ["character-loot-pickup-distance"] = true
+}
+
+local function assert_no_blocked_pickup_effects()
+  for tech_name, tech in pairs(techs) do
+    for _, effect in ipairs((tech and tech.effects) or {}) do
+      if blocked_pickup_effect_types[effect.type] then
+        fail("technology " .. tech_name .. " uses blocked pickup reach effect " .. effect.type .. ".")
+      end
+    end
+  end
+end
+
 local function escape_pattern(text)
   return text:gsub("([^%w])", "%%%1")
 end
@@ -113,6 +128,8 @@ local base_extension_defaults = {
   ["weapon-shooting-speed"] = true,
   ["laser-shooting-speed"] = true
 }
+
+assert_no_blocked_pickup_effects()
 
 for key, default_enabled in pairs(base_extension_defaults) do
   if effective_base_extension_enabled(key, default_enabled) then

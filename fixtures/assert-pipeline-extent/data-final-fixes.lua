@@ -10,8 +10,15 @@ local function startup_setting(name)
   return nil
 end
 
-local multiplier = tonumber(startup_setting("mir-pipeline-extent-multiplier")) or 1
-if multiplier <= 1 then return end
+local function parse_multiplier(value)
+  local numeric = tonumber(value)
+  if not numeric or numeric <= 0 then return 1 end
+  if numeric > 10 then return numeric / 100 end
+  return numeric
+end
+
+local multiplier = parse_multiplier(startup_setting("mir-pipeline-extent-multiplier"))
+if multiplier == 1 then return end
 
 local expected = math.floor((DEFAULT_PIPELINE_EXTENT * multiplier) + 0.5)
 

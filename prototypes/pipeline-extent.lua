@@ -10,18 +10,6 @@ local FLUID_BOX_FIELDS = {
   oxidizer_fluid_box = true
 }
 
-local function startup_setting(name)
-  local setting = settings and settings.startup and settings.startup[name]
-  if setting then return setting.value end
-  return nil
-end
-
-local function pipeline_extent_multiplier()
-  local value = tonumber(startup_setting("mir-pipeline-extent-multiplier")) or 1
-  if value < 1 then return 1 end
-  return value
-end
-
 local function scaled_extent(current, multiplier)
   local base = tonumber(current) or DEFAULT_PIPELINE_EXTENT
   local scaled = math.floor((base * multiplier) + 0.5)
@@ -68,8 +56,8 @@ local function scan_table(value, multiplier, seen_nodes, seen_boxes)
 end
 
 function P.apply(multiplier_override)
-  local multiplier = tonumber(multiplier_override) or pipeline_extent_multiplier()
-  if multiplier <= 1 then return end
+  local multiplier = tonumber(multiplier_override) or 1
+  if multiplier == 1 then return end
 
   local count = 0
   local seen_nodes = {}

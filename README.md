@@ -31,7 +31,7 @@ The mod is built around **graceful compatibility**: it discovers recipes, scienc
 - **Recipe productivity:** adds infinite research for intermediate, logistics, combat, infrastructure, science-pack, and Space Age production chains.
 - **Fluid-output productivity:** adds process-family recipe productivity for oil processing, oil cracking, lubricant, sulfuric acid, acid neutralization, and Space Age thruster propellant fluids where those recipes exist.
 - **Direct-effect bonuses:** adds infinite research for cargo logistics, weapon speed, character bonuses, combined character inventory/trash slots, and worker robot battery.
-- **Fluid prototype tuning:** includes an opt-in startup-only pipeline extent multiplier, default `1x`/unchanged.
+- **Fluid prototype tuning:** includes an opt-in startup-only pipeline extent multiplier dropdown, default `100%`/unchanged.
 - **Vanilla continuations:** extends selected finite vanilla technology chains into infinite continuations.
 - **Science-pack discovery:** reads active lab inputs, not the old `tool` prototype type.
 - **Lab validation:** checks generated research ingredients against real labs so technologies stay researchable.
@@ -80,7 +80,8 @@ More Infinite Research mutates and generates prototypes in **`data-final-fixes.l
 5. **Base technology infinite extensions.**
 6. **Optional weapon shooting speed overlap adjustment.**
 7. **Max-level enforcement.**
-8. **Optional diagnostics report flush.**
+8. **Generated-technology effect safety validation.**
+9. **Optional diagnostics report flush.**
 
 This gives the mod a **late view** of recipes, items, labs, science packs, ammo categories, and technologies created by other mods.
 
@@ -318,7 +319,7 @@ Vanilla continuations:
 | `mir-science-pack-ingredient-policy` | string | `configured` | Controls extra science packs added to every generated technology. Allowed values: `configured`, `space`, `space-and-promethium`, `all-official`, `all`. |
 | `mir-prefer-this-mod-for-competing-techs` | bool | `true` | Lets MIR remove selected competing infinite technologies when MIR has generated or will generate matching replacement behavior. Disable to keep competing technologies from other mods. |
 | `mir-adjust-vanilla-weapon-speed-techs` | string | `off` | Controls whether MIR removes rocket and cannon-shell speed bonuses from MIR's generated weapon shooting speed continuation. Finite vanilla weapon shooting speed technologies keep their original tank cannon and rocket bonuses. Allowed values: `off`, `only-when-dedicated-tech-enabled`, `always`. |
-| `mir-pipeline-extent-multiplier` | double | `1` | Strictly opt-in startup-only multiplier for recognized fluid box pipeline extent fields across prototypes, not only pipe entities. At `1`, MIR does not load the pipeline pass, scan fluid boxes, or change prototypes. Higher values are experimental and can affect machines, tanks, thrusters, and modded prototypes that define fluid boxes. |
+| `mir-pipeline-extent-multiplier` | string/dropdown | `100%` | Strictly opt-in startup-only multiplier for recognized fluid box pipeline extent fields across prototypes, not only pipe entities. At `100%`, MIR does not load the pipeline pass, scan fluid boxes, or change prototypes. Allowed values: `50%`, `75%`, `100%`, `125%`, `150%`, `200%`, `250%`, `300%`, `400%`, `500%`. Non-`100%` values are experimental and can affect machines, tanks, thrusters, and modded prototypes that define fluid boxes. |
 | `mir-debug-generation-report` | bool | `false` | Writes structured generated/skipped rows to the Factorio log, including science packs, prerequisites, effect counts, lab compatibility, and icon source. |
 | `mir-debug-recipe-matches` | bool | `false` | Writes matched recipe names for each generated productivity stream. Useful for mod compatibility reports, but noisy in large mod packs. |
 | `mir-debug-scripted-effects` | bool | `false` | Writes runtime log entries when scripted technologies recompute global or event-driven effects. |
@@ -425,10 +426,12 @@ Generic competing recipe-productivity cleanup is intentionally limited to **know
 | `data-final-fixes.lua` | Runs startup-only prototype extensions, generation, cleanup, extensions, adjustments, max-level control, and diagnostics. |
 | `defaults.lua` | Shared stream defaults, per-stream overrides, and base-extension defaults. |
 | `settings.lua` | Startup settings generated from streams and base-extension defaults. |
+| `prototypes/pipeline-extent-settings.lua` | Owns pipeline extent dropdown values and parsing. |
 | `prototypes/pipeline-extent.lua` | Applies the opt-in startup-only pipeline extent multiplier to fluid boxes. |
 | `prototypes/config.lua` | Assembles shared config and stream table. |
 | `prototypes/tech-gen.lua` | Generates stream technologies. |
 | `prototypes/base-tech-extensions.lua` | Extends finite vanilla technology chains. |
+| `prototypes/technology-effect-safety.lua` | Blocks unsafe native effect types from MIR-generated technologies. |
 | `prototypes/weapon-speed-adjustments.lua` | Optionally removes rocket/cannon-shell overlap from MIR's generated weapon speed continuation while preserving finite vanilla bonuses. |
 | `prototypes/max-level-control.lua` | Applies stream max levels after generation. |
 | `prototypes/diagnostics.lua` | Structured generation report logging. |
@@ -544,7 +547,7 @@ The validation script checks:
 - **Post-MIR assertions:** fixtures prove both runtime lab-policy outcomes.
 - **Native modifier overlap diagnostics:** a Maraxis-like duplicate cargo fixture proves cargo modifier overlaps are reported without changing MIR generation.
 - **Fluid productivity:** post-MIR fixtures prove oil, lubricant, sulfuric acid, acid neutralization, and Space Age thruster propellant recipes have exactly one infinite productivity owner where those recipes exist.
-- **Pipeline extent:** a post-MIR fixture proves the opt-in startup multiplier mutates common fluid boxes when enabled.
+- **Pipeline extent:** a post-MIR fixture proves the opt-in startup multiplier dropdown mutates common fluid boxes when enabled.
 
 ## Documentation Map
 

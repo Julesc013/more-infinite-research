@@ -4,6 +4,7 @@ local U = require("prototypes.util")
 local D = require("prototypes.diagnostics")
 local deepcopy = require("prototypes.lib.deepcopy")
 local table_utils = require("prototypes.lib.table-utils")
+local effect_safety = require("prototypes.technology-effect-safety")
 
 local function lname(key, spec)
   if spec.localised_name then return spec.localised_name end
@@ -129,6 +130,7 @@ end
 local function available_direct_effects(key, effects)
   local out = {}
   for _, effect in ipairs(effects or {}) do
+    effect_safety.assert_effect_allowed(effect, "direct-effect stream " .. key)
     if effect.type == "gun-speed" and effect.ammo_category and not U.ammo_category_exists(effect.ammo_category) then
       log("[more-infinite-research] Skipping unavailable gun-speed effect for "..key..": missing ammo category "..effect.ammo_category)
     else
@@ -330,6 +332,7 @@ local function make_stream(key, raw_spec)
       level = 1
     }
     data:extend({t})
+    effect_safety.register_generated_technology(t.name)
     D.stream(D.stream_fields(key, spec, "generated", "direct_effect", ingredients, prerequisites, direct_effects, lab_status))
     return
   end
@@ -375,6 +378,7 @@ local function make_stream(key, raw_spec)
     level = 1
   }
   data:extend({t})
+  effect_safety.register_generated_technology(t.name)
   if D.enabled() then
     log("[more-infinite-research] Registered technology "..t.name)
   end

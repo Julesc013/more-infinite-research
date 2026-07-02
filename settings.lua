@@ -1,5 +1,6 @@
 local C = require("prototypes.config")
 local defaults = require("defaults")
+local pipeline_extent_settings = require("prototypes.pipeline-extent-settings")
 
 local settings_data = {}
 local base_defaults = defaults.base_extensions or {}
@@ -108,12 +109,11 @@ table.insert(settings_data, {
 })
 
 table.insert(settings_data, {
-  type = "double-setting",
+  type = "string-setting",
   name = "mir-pipeline-extent-multiplier",
   setting_type = "startup",
-  default_value = 1,
-  minimum_value = 1,
-  maximum_value = 100,
+  default_value = pipeline_extent_settings.default_value,
+  allowed_values = pipeline_extent_settings.allowed_values,
   order = "a-130",
   localised_name = {"mod-setting-name.mir-pipeline-extent-multiplier"},
   localised_description = {"mod-setting-description.mir-pipeline-extent-multiplier"}
