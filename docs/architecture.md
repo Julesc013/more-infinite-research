@@ -85,6 +85,24 @@ Agricultural growth speed refreshes this force state on init, configuration chan
 
 Keep new domain behavior in these modules rather than growing `util.lua`.
 
+## Icon Asset Boundary
+
+Generated technologies may borrow icon layers from active prototypes and then add
+MIR's own effect-type badge. For `v2.1.0`, improve this into an explicit
+candidate resolver, but keep the package boundary strict:
+
+- use Space Age technology or item art only when `space-age` is loaded and the
+  active prototype provides that icon;
+- fall back to base-game technology or item art, MIR-owned local art, or another
+  clearly redistributable asset when Space Age is not loaded;
+- do not copy original Space Age PNGs or other DLC assets into MIR as base-only
+  fallbacks;
+- require any MIR-packaged local art to have an explicit source/license note and
+  package-validation coverage.
+
+This keeps the OEM-plus look when the relevant Wube content is present without
+turning MIR into a redistributable Space Age art cache.
+
 ## Stream Configuration
 
 `prototypes/config.lua` exposes:

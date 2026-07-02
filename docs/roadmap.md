@@ -212,6 +212,7 @@ The executable release gate lives in `docs/release-plan-2.1.0.md`.
 | Settings presets | Ship | Startup setting/default derivation | Vanilla-respectful, Megabase-balanced, Unlimited sandbox, with explicit override rules |
 | Preset override model | Ship | Startup setting/default derivation | User-visible precedence; no silent contradiction between preset and explicit setting |
 | Duplicate native modifier policy | Ship | Data-stage overlap scan plus explicit policy | Promote `v2.0.5` diagnostic-only reporting to skip/warn/prefer/allow behavior |
+| Icon source resolver and asset policy | Ship | Data-stage icon candidate resolver plus package validation guard | Prefer loaded Space Age/Wube art when available; do not redistribute original Space Age files in MIR |
 | Scripted-tech refinements | Ship if needed | Event-driven runtime manager | Improve storage/reversal/diagnostics after `v2.0.5` feedback |
 | Existing agricultural plant rescale | Ship if bounded | Research-change bounded scan | Deduplicate tower-owned plants and avoid surface-wide scans |
 | High-throughput pump / Der Pump | Ship if prototype proof passes | Prototype unlock | Good megabase QoL candidate |
@@ -224,6 +225,7 @@ The executable release gate lives in `docs/release-plan-2.1.0.md`.
 
 - Every shipped feature has a clear implementation type: native modifier, recipe productivity, scripted event, prototype unlock, or startup setting.
 - No shipped feature uses broad `on_tick` scanning.
+- Space Age technology art is referenced only when Space Age is loaded; base-only fallback icons use base, MIR-owned, or otherwise redistributable assets.
 - Any deferred `v2.0.5` scripted feature has its unresolved blocker closed before being claimed.
 - New prototype unlocks have recipe, power, balance, localization, and package tests.
 - Startup prototype settings document why they cannot be runtime research.

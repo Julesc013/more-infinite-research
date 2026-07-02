@@ -248,6 +248,7 @@ Do not turn `v2.1.0` into a bucket for every plausible feature idea.
 - [ ] Create a GitHub `v2.1.0` milestone.
 - [ ] Create issue: `v2.1.0: settings presets and override model`.
 - [ ] Create issue: `v2.1.0: native modifier overlap policy`.
+- [ ] Create issue: `v2.1.0: icon source resolver and asset policy`.
 - [ ] Create issue: `v2.1.0: spoilage preservation manual validation`.
 - [ ] Create issue: `v2.1.0: agricultural growth manual validation`.
 - [ ] Create issue: `v2.1.0: existing agricultural plant rescale spike`.
@@ -264,6 +265,7 @@ Do not turn `v2.1.0` into a bucket for every plausible feature idea.
 - [ ] Settings presets: `Custom/manual`, `Vanilla-respectful`, `Megabase-balanced`, `Unlimited sandbox`.
 - [ ] Preset override model: explicit per-feature choice must not be silently contradicted by preset behavior.
 - [ ] Native modifier overlap policy: prefer existing owner, warn only, prefer MIR, or allow duplicates.
+- [ ] Icon source resolver: prefer loaded Space Age technology art when available, keep base-only fallbacks polished, and do not redistribute original Space Age asset files inside MIR.
 - [ ] Scripted spoilage hardening: manual results for existing/new stacks, reversal, disable, baseline, and multi-force behavior.
 - [ ] Scripted agriculture hardening: newly planted crops verified; existing-plant rescale only if bounded and deduplicated.
 - [ ] Existing agricultural plant rescale if bounded, tower-scoped, deduplicated, reversible, and large-farm tested.
@@ -302,6 +304,8 @@ Do not turn `v2.1.0` into a bucket for every plausible feature idea.
 - [ ] Compatibility tests include no Space Age, Space Age, Space Age without Quality where supported, custom science/lab fixtures, and at least one large overhaul if available.
 - [ ] Presets have validation for expected generated stream decisions.
 - [ ] Native modifier overlap policy has validation for duplicate cargo/native modifier scenarios.
+- [ ] Icon resolver validation proves base-only runs do not resolve generated icons to `__space-age__` paths and Space Age runs still prefer intended Space Age art.
+- [ ] Package validation fails copied Space Age asset files unless an explicit source/license allowlist entry exists.
 - [ ] Conditional spikes are either promoted with proof or explicitly moved out of `v2.1.0`.
 - [ ] `info.json` version is bumped to `2.1.0`.
 - [ ] `changelog.txt` has a dated `2.1.0` entry.

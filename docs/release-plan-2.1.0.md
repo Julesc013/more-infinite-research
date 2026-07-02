@@ -19,6 +19,7 @@ Ship the features that make MIR easier to control and safer in modded saves:
 
 - settings presets with explicit override behavior;
 - a real native modifier overlap policy instead of diagnostics only;
+- stricter icon source policy and fallback resolution;
 - scripted spoilage/agriculture hardening with manual evidence;
 - compatibility matrix updates;
 - only the spikes that prove cleanly.
@@ -33,6 +34,7 @@ decision for each one.
 | Settings presets | `Custom/manual`, `Vanilla-respectful`, `Megabase-balanced`, and `Unlimited sandbox` are implemented or explicitly deferred with rationale | Yes |
 | Preset override model | User-visible precedence is documented and tested; presets do not silently contradict explicit per-feature choices | Yes |
 | Native modifier overlap policy | Existing diagnostics become a policy: skip/prefer existing, warn only, prefer MIR, or allow duplicates | Yes |
+| Icon source and asset policy | Fallback resolver can prefer loaded Space Age/Wube technology art, but the package does not redistribute original Space Age files | Yes |
 | Scripted spoilage hardening | Existing-stack, reversal, disable, baseline, and multi-force behavior is measured or remains default-off with caveats | Yes |
 | Scripted agriculture hardening | Newly planted crops are verified; existing-plant rescale either proves bounded or remains out of scope | Yes |
 | Compatibility matrix | Base, Space Age, Quality, custom science/lab, duplicate cargo/native modifier, and existing-save scenarios are recorded | Yes |
@@ -44,6 +46,7 @@ decision for each one.
 | --- | --- | --- | --- |
 | Settings presets | Ship | Startup setting plus preset/default resolver | `v2.1.0` |
 | Native modifier overlap policy | Ship | Data-stage diagnostics plus generation policy | `v2.1.0` |
+| Icon source resolver and asset policy | Ship | Data-stage icon candidate resolver plus package validation guard | `v2.1.0` |
 | Spoilage preservation hardening | Ship evidence/policy; maybe preset inclusion | Event-driven control-stage scripted tech | `v2.1.0` |
 | Agricultural growth hardening | Ship evidence/policy; existing-plant rescale conditional | Event-driven control-stage scripted tech | `v2.1.0` |
 | Existing agricultural plant rescale | Conditional | Research/configuration bounded tower scan with plant dedupe | `v2.1.0` if proven |
@@ -136,6 +139,67 @@ Acceptance criteria:
 - Users can opt into duplicate behavior deliberately.
 - Cargo landing pad and cargo unloading overlap fixtures pass.
 - README and compatibility docs explain the policy plainly.
+
+## Icon Source And Asset Policy
+
+Keep MIR's current icon strategy: borrow the best active prototype icon, then add
+MIR's own effect-type badge. Improve the resolver, not the asset ownership
+boundary.
+
+Allowed:
+
+- Prefer loaded Space Age technology icons when `space-age` is active.
+- Fall back to loaded base-game technology or item icons when Space Age is not
+  active.
+- Add an explicit icon-candidate registry so streams can say "prefer this Space
+  Age technology, then this base technology, then this item" without duplicating
+  lookup logic.
+- Add MIR-owned fallback art only when the asset is original to MIR, generated
+  for MIR, or otherwise clearly licensed for redistribution.
+- Keep effect badges sourced from Factorio's technology constant icons when
+  available, because those are already used as small modifier markers by MIR's
+  generated technologies.
+
+Not allowed in the main mod:
+
+- Do not copy original Space Age PNGs or other DLC asset files into MIR so
+  base-only games can display them.
+- Do not make the base-only package behave as a Space Age art pack.
+- Do not reference `__space-age__` paths in generated prototypes unless the
+  active mod set has loaded Space Age and the path is reachable.
+- Do not replace Wube's package ownership boundary with a local cache of their
+  DLC assets.
+
+Rationale: base-only games can have polished icons, but they should be base
+icons, MIR-owned icons, or generated composites. Space Age art should be used
+by reference when Space Age is actually loaded.
+
+Implementation shape:
+
+```lua
+icon_candidates = {
+  { technology = "electric-weapons-damage-1", mod = "space-age" },
+  { technology = "discharge-defense-equipment" },
+  { item = "tesla-gun", mod = "space-age" }
+}
+```
+
+The resolver should evaluate candidates in order, skip candidates whose required
+mod is not loaded, copy the active prototype icon layers, strip inherited Wube
+constant overlays, and then apply MIR's own effect badge.
+
+Acceptance criteria:
+
+- Base-only runtime fixtures never resolve generated technology icons to
+  `__space-age__` paths.
+- Space Age runtime fixtures still prefer the intended Space Age technology art
+  when it is loaded.
+- Package validation fails if MIR adds copied Space Age asset files under its
+  own package paths without an explicit allowlisted source/license note.
+- Diagnostics report the selected icon source as technology, item, explicit
+  path, or MIR-owned local asset.
+- README or compatibility docs explain that MIR references Space Age art only
+  when Space Age is loaded.
 
 ## Scripted Spoilage Gate
 
