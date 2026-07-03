@@ -31,9 +31,9 @@ Date: 2026-07-03
   Compatibility:
 
     - Refactored recipe-productivity owner classification, productivity-family adoption, and known competitor replacement into focused compatibility modules.
-    - Compatibility profiles can now declare known competing recipe-productivity technology patterns; MIR still proves full recipe coverage before ignoring or removing a competitor.
+    - Compatibility profiles can now declare known competing recipe-productivity technology patterns; MIR still proves full recipe coverage, matching productivity change values, lab-compatible replacement stream science, and no other blocking external owner before ignoring or removing a competitor.
     - Generation diagnostics now emit parser-friendly audit rows for stream decisions, native modifier overlaps, and recipe-owner skips when the generation report is enabled.
-    - Added a local mod-portal compatibility audit harness with catalog filtering, dependency closure, lockfile/report generation, curated scenarios, and optional credential-gated downloads/load checks.
+    - Added a local mod-portal compatibility audit harness with catalog filtering, dependency closure, lockfile/report generation, curated scenarios, optional credential-gated downloads/load checks, official built-in mod handling, scenario-specific dependency enablement, SHA1 cache verification, and parsed audit rows.
     - Reorganized planning documentation so root `todo.md` is the durable future-work ledger, `changelog.txt` remains the durable past-change ledger, `docs/roadmap.md` carries high-level rationale, and derivative plans/release notes live under `docs/notes/`.
     - Packaged root `todo.md` with the mod archive and added validation coverage so the release package keeps the future-work ledger alongside README and changelog.
     - Added conservative Space Age productivity-family adoption: residual processing unit, plastic bar, low density structure, and rocket fuel recipes can be appended to the matching vanilla infinite productivity technology when the owner is safe and the recipe allows productivity.
@@ -41,6 +41,7 @@ Date: 2026-07-03
     - Added runtime fixture coverage for vanilla productivity-family adoption, exact-owner skips, prepatched owner skips, mixed owner fallback, and non-productivity recipe rejection.
     - Fixed Plates n Circuit Productivity replacement so known competing plate, green circuit, and red circuit productivity technologies are prepared before MIR generation, allowing MIR to generate its replacement effects and then remove the competing technologies.
     - Plates n Circuit Productivity cleanup now leaves a combined competing technology in place when disabled MIR streams mean MIR cannot replace every recipe effect on that technology.
+    - Plates n Circuit Productivity replacement now also leaves competitors in place when the competing effect uses a different productivity amount or another external technology blocks one of the recipes.
     - Added runtime fixture coverage for checkbox enablement behavior, scripted runtime routing, icon source selection, fluid-output productivity ownership, and pipeline extent scaling.
     - Base-only icon validation now proves generated technology icons do not resolve to direct official DLC asset paths unless the installed official DLC icon opt-in is enabled.
     - Space Age validation proves loaded Space Age technology art is still preferred where intended.

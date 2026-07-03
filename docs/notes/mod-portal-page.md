@@ -181,7 +181,7 @@ This helps it work with:
 - OCs Ammo and Armor.
 - OCs Stone Casting.
 - Fluid Quality Imprinting.
-- Plates n Circuit Productivity.
+- Plates n Circuit Productivity, with replacement limited to exact known infinite technologies that MIR can fully replace with matching recipe productivity values and no other blocking owner.
 - Panglia-style planet mods that add alternate rocket fuel or low density structure recipes.
 - Omega Drill style drill mods.
 

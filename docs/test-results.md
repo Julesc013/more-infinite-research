@@ -2,6 +2,41 @@
 
 This file records local release-candidate validation runs. It is not a substitute for the manual mod matrix in `docs/compatibility.md`.
 
+## 2026-07-03 Competitor Replacement And Audit Harness Hardening
+
+Environment:
+
+- Branch: `dev`.
+- Mod version `2.1.0`.
+- Factorio runtime binary: `C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe`.
+
+Scope:
+
+- Anchored the Plates n Circuit known-competitor technology patterns to exact technology names.
+- Changed known competitor replacement coverage from recipe-name-only to recipe plus productivity `change`.
+- Required competitor preparation to skip candidates when another external infinite productivity owner blocks one of the candidate recipes.
+- Required competitor preparation to count only streams that can produce a lab-compatible MIR replacement technology.
+- Changed cleanup so a known competitor is removed only when generated MIR effects prove the same recipe and the same productivity `change`.
+- Passed configured vanilla-family adoption targets into owner classification so diagnostics identify configured adoption owners instead of classifying those exact owners as unknown external techs.
+- Updated the Mod Portal audit harness to exclude official built-in mods from download dependency resolution, enable required dependency closure mods in load-test `mod-list.json`, enable official built-ins when required or when `-IncludeSpaceAge` is set, copy only scenario-specific cached zips, verify cached/downloaded zip SHA1 values, force MIR generation diagnostics in copied audit runs, and return parsed audit rows in load results.
+
+Commands:
+
+```powershell
+.\scripts\Invoke-MIRValidation.ps1 -StaticOnly
+.\scripts\Invoke-MIRValidation.ps1 -FactorioBin 'C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe'
+```
+
+Results:
+
+- Static validation passed.
+- Full runtime validation passed.
+- The existing full-replacement Plates n Circuit fixture still prepared and removed the fully covered competing plate/circuit technologies.
+- The existing partial-coverage fixture still kept the combined plate competitor when an enabled MIR stream could not cover every effect.
+- Added and passed a productivity-change mismatch fixture proving MIR keeps `electric-circuit-productivity` when the competitor effect is `0.05` and MIR would generate `0.10`.
+- Added and passed a blocked-owner fixture proving MIR does not prepare a combined plate competitor when another external owner also owns copper plate, preventing a duplicate MIR iron owner while the combined competitor remains.
+- Git reported line-ending normalization warnings only.
+
 ## 2026-07-03 Release Candidate Science Pack Rebalance
 
 Environment:

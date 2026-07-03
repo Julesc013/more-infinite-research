@@ -40,7 +40,7 @@ The release goal is graceful compatibility without mod-page dependency clutter: 
 - Mod-specific stream changes should live in `prototypes/compat/profiles.lua` instead of the base stream definitions.
 - Recipe-productivity ownership is classified through `prototypes/compat/productivity-owners.lua`, so generation, adoption, diagnostics, and known-competitor cleanup use the same owner vocabulary.
 - Compatibility cleanup that removes known competing technologies also removes dangling prerequisite references from remaining technologies.
-- Generic competing recipe-productivity cleanup prepares only known infinite technologies declared by active compatibility profiles whose recipe-productivity effects are all covered by enabled MIR streams, ignores only those prepared owners during exact-owner filtering, and removes them only after generated MIR effects prove the replacement. Finite upgrade chains from other mods are left alone unless a future integration models them explicitly.
+- Generic competing recipe-productivity cleanup prepares only known infinite technologies declared by active compatibility profiles whose recipe-productivity effects are all covered by enabled MIR streams with matching productivity `change` values, lab-compatible replacement science, and no other blocking external owner. MIR ignores only those prepared owners during exact-owner filtering and removes them only after generated MIR effects prove the same recipe and `change` replacement. Finite upgrade chains from other mods are left alone unless a future integration models them explicitly.
 - Release metadata declares optional ordering for official DLC mods, with hidden optional ordering for Elevated Rails and Quality. Elevated Rails is hidden because its Rail productivity coverage is opportunistic and should not present Elevated Rails as required or recommended; Quality is hidden so quality module recipes are visible before module productivity is generated without presenting Quality as a required or recommended dependency. Third-party compatibility remains opportunistic and avoids compatibility-mod dependencies.
 - Weapon shooting speed overlap handling only removes rocket and cannon-shell speed effects from MIR's generated weapon shooting speed continuation. Finite vanilla weapon shooting speed technologies keep their original rocket and cannon-shell bonuses so tank cannon fire rate is not reduced.
 - `mir-debug-generation-report` can be enabled to capture why each stream or base extension generated or skipped.
@@ -91,6 +91,8 @@ Download and load-test mode requires credentials and a local binary:
 
 Generated lockfiles and reports belong under ignored output directories such as `artifacts/compat-audit/` or `build/compat-audit-*`. Do not commit downloaded mod zips or one-off portal reports. Commit only scenario fixtures, known exclusions, code changes, and small compatibility profiles that are justified by repeatable audit evidence.
 
+Load-test mode enables the root candidate, its required Mod Portal dependency closure, and required official built-in mods such as Space Age, Quality, Elevated Rails, or Recycler without trying to download official built-ins from the portal. `-IncludeSpaceAge` enables the official Space Age bundle explicitly. Downloaded archives are checked against their Mod Portal SHA1 before reuse, and load-test results include parsed MIR audit rows when generation diagnostics are forced on in the copied test mod.
+
 ## Compatibility Planning Target
 
 The current implementation has the right compatibility seams, but the long-term system should make a complete plan object the central artifact before any prototype mutation happens:
@@ -109,7 +111,7 @@ The planning object should include stream-level and recipe-level decisions such 
 Profile changes should remain conservative:
 
 - Unknown external infinite recipe-productivity owners suppress MIR by default.
-- Known competitor replacement requires an explicit profile and full replacement coverage.
+- Known competitor replacement requires an explicit profile, anchored technology matching by default, full recipe coverage, matching productivity `change` values, lab-compatible replacement science, and no other blocking external owner.
 - Vanilla-family adoption requires an explicit configured family and safe owner behavior.
 - Finite progression chains from other mods are not removed unless a future profile explicitly models that chain and validates the migration/safety story.
 
