@@ -54,6 +54,36 @@ Results:
 - Combined extended wrapper gate passed for `Static` and `AuditSmoke`.
 - Runtime validation and credentialed top-25/manual/full Mod Portal load audits were not rerun in this documentation-only gate-hardening pass.
 
+## 2026-07-04 Overnight Progress Output
+
+Environment:
+
+- Branch: `dev`.
+- Mod version `2.1.0`.
+
+Scope:
+
+- Added per-scenario start/result progress lines to `Invoke-MIRCompatAudit.ps1` load-test runs so unattended terminal sessions show scenario index, type, roots, dependency-failure count, pass/skip/timeout status, exit code, parsed audit-row count, and elapsed seconds.
+- Updated README, compatibility docs, and changelog to describe the verbose overnight progress behavior and `Tee-Object` logging recommendation.
+
+Commands:
+
+```powershell
+$errors=$null
+[System.Management.Automation.Language.Parser]::ParseFile((Resolve-Path 'scripts\Invoke-MIRCompatAudit.ps1'), [ref]$null, [ref]$errors) | Out-Null
+if ($errors) { throw ($errors | Out-String) }
+.\scripts\Invoke-MIRValidation.ps1 -StaticOnly
+.\scripts\Invoke-MIRCompatAudit.ps1 -CandidateNames definitely-no-such-mod-mir-test -MaxCandidates 0 -CatalogPages 0 -FactorioVersions 2.1 -RunLoadTests -FactorioBin C:\Windows\System32\cmd.exe -OutputDir .\build\compat-progress-smoke
+.\scripts\Convert-MIRCompatAuditResults.ps1 -AuditDir .\build\compat-progress-smoke
+```
+
+Results:
+
+- Parser check passed for the changed compatibility-audit script.
+- Static validation passed.
+- Synthetic dependency-failure load-test smoke printed the new per-scenario start/result progress lines without launching Factorio, because the scenario was skipped before startup.
+- Grouped result conversion passed for the synthetic progress smoke.
+
 ## 2026-07-04 Release Documentation Synchronization
 
 Environment:

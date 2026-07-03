@@ -659,9 +659,20 @@ if ($RunLoadTests) {
 
   $runRoot = New-MIRDirectory -Path (Join-Path $resolvedOutputDir "runs")
   $results = @()
-  foreach ($scenario in $selectedScenarios) {
+  $scenarioList = @($selectedScenarios)
+  for ($scenarioIndex = 0; $scenarioIndex -lt $scenarioList.Count; $scenarioIndex++) {
+    $scenario = $scenarioList[$scenarioIndex]
+    $displayIndex = $scenarioIndex + 1
+    $rootMods = @($scenario.root_mods) -join ","
+    $resolvedCount = @($scenario.resolved_mods).Count
+    $officialMods = @($scenario.official_mods) -join ","
+    $dependencyFailureCount = @($scenario.dependency_failures).Count
+    Write-Host ("[compat-audit] load {0}/{1} starting scenario={2} type={3} roots={4} resolved={5} official={6} dependency_failures={7}" -f $displayIndex, $scenarioList.Count, $scenario.name, $scenario.type, $rootMods, $resolvedCount, $officialMods, $dependencyFailureCount)
+    $scenarioStarted = Get-Date
     $result = Invoke-MIRScenarioLoad -Scenario $scenario
     $results += $result
+    $scenarioSeconds = [math]::Round(((Get-Date) - $scenarioStarted).TotalSeconds, 2)
+    Write-Host ("[compat-audit] load {0}/{1} result scenario={2} passed={3} skipped={4} timed_out={5} exit_code={6} audit_rows={7} seconds={8}" -f $displayIndex, $scenarioList.Count, $scenario.name, $result.passed, $result.skipped, $result.timed_out, $result.exit_code, @($result.audit_rows).Count, $scenarioSeconds)
     if ($FailFast -and $result.passed -ne $true) { throw "Load test failed for $($scenario.name)." }
   }
   $results | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath (Join-Path $resolvedOutputDir "load-results.json") -Encoding UTF8

@@ -551,6 +551,8 @@ Set `FACTORIO_BIN`, `FACTORIO_USERNAME`, and `FACTORIO_TOKEN` before running dow
 
 Use `-CollectAll` for overnight exploration so one failing modset does not stop the run. Use `-FailFast -FailOnAuditFailures` for strict CI-style gates; that mode fails when grouped unexpected audit failures remain after the converter runs.
 
+Load-test tiers print per-scenario start/result lines with scenario index, type, root mods, dependency-failure count, pass/skip/timeout status, exit code, parsed audit-row count, and elapsed seconds. Pipe all streams through `Tee-Object` when you want a live VS Code terminal view and a durable overnight log.
+
 `AuditSmoke` uses the committed `space-age-baseline` manual scenario metadata path so strict release gates are deterministic. It proves the audit wrapper and grouped-result converter are wired, but broad external-mod confidence still comes from the credentialed top-25/manual/full audit tiers.
 
 The validation script checks:

@@ -159,6 +159,8 @@ Load-test mode enables the root candidate, its required Mod Portal dependency cl
 
 Scenarios with unresolved required dependencies are skipped before Factorio startup by default and grouped as dependency failures. Pass `-ContinueOnDependencyFailure` only when intentionally testing a partial modset. Each Factorio load check has a timeout controlled by `-ScenarioTimeoutSeconds`; timed-out processes are killed and grouped as `timeout` failures rather than blocking the entire run.
 
+Load-test runs print per-scenario start/result progress lines with the scenario index, type, root mods, dependency-failure count, pass/skip/timeout status, exit code, parsed audit-row count, and elapsed seconds. For unattended local runs, pipe all streams through `Tee-Object` so progress stays visible in the terminal and is also written to an overnight log.
+
 Expected failures should be added only after review to `fixtures/compat-matrix/expected-failures.json`. The converter still reports them, but separates `expected_count` from `unexpected_count`; strict wrapper gates fail on unexpected groups.
 
 The GitHub workflow `.github/workflows/extended-compat-audit.yml` runs the same wrapper on self-hosted runners. It is intentionally not a normal hosted CI job because it needs a local Factorio binary, credentials, and enough disk for third-party archives and run artifacts.
