@@ -62,6 +62,8 @@ Automated fixture validation now covers the release-candidate claims for the lar
 | `oil-fluid-productivity` | Manual verify the implemented oil processing, oil cracking, lubricant, sulfuric acid, and acid neutralization productivity split after fixture validation passes |
 | `panglia-family-adoption` | Verify Panglia or a Panglia-like planet mod adopts extra rocket fuel and low density structure recipes into vanilla Space Age productivity technologies |
 | `plates-n-circuit-replacement` | Verify Plates n Circuit Productivity fully covered competing technologies are removed only after MIR replacement effects exist |
+| `extended-compat-manual-scenarios` | Run `Invoke-MIRCompatAudit.ps1 -RunManualScenarios` or `Invoke-MIRExtendedTests.ps1 -Tier ManualScenarios` against the executable curated scenario fixture |
+| `extended-compat-top25-base-space-age` | Run the top-25 base and Space Age audit tiers with credentials, parse grouped failures, and only promote repeatable MIR-owned issues into profile work |
 
 ## v2.1.x Spikes
 

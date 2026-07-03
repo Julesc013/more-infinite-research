@@ -537,6 +537,20 @@ When either diagnostics setting is enabled, MIR also reports duplicate recipe ma
 .\scripts\Build-MIRPackage.ps1
 ```
 
+**Extended local release gate:**
+
+```powershell
+.\scripts\Invoke-MIRExtendedTests.ps1 -Tier Runtime,AuditSmoke
+```
+
+**Credentialed compatibility audits:**
+
+```powershell
+.\scripts\Invoke-MIRExtendedTests.ps1 -Tier Top25Base,Top25SpaceAge,ManualScenarios
+```
+
+Set `FACTORIO_BIN`, `FACTORIO_USERNAME`, and `FACTORIO_TOKEN` before running download/load tiers. Full `downloads_count >= 10000` audits are intentionally opt-in through `-IncludeFullAudit` and can be sharded with `-StartIndex` and `-ShardSize`.
+
 The validation script checks:
 
 - **Metadata:** `info.json` parses and release metadata avoids compatibility-mod dependencies.
@@ -547,6 +561,7 @@ The validation script checks:
 - **Changelog:** `changelog.txt` uses Factorio's 99-dash changelog section format.
 - **Generated package:** validation builds an ignored archive from the current source tree and checks its root, metadata, load-critical files, and forbidden artifacts.
 - **Package parity:** the generated archive's source directories, documentation, locale, migrations, and root mod files match the repository copy while allowing docs and helper modules to be rearranged inside their packaged trees.
+- **Compatibility automation:** the Mod Portal audit runner, manual scenario execution, sharding, grouped failure converter, profile-stub generator, and self-hosted extended workflow stay wired.
 - **Whitespace:** `git diff --check` passes.
 - **Runtime load:** fixture loading reaches save creation when a Factorio binary is supplied.
 - **Runtime diagnostics:** logs contain the expected generation diagnostics.

@@ -29,6 +29,17 @@ function Write-MIRModList {
   } | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath (Join-Path $ModsDir "mod-list.json") -Encoding UTF8
 }
 
+function Get-MIRSafeScenarioFileName {
+  param([Parameter(Mandatory)][string]$Name)
+
+  $safe = $Name
+  foreach ($ch in [System.IO.Path]::GetInvalidFileNameChars()) {
+    $safe = $safe.Replace([string]$ch, "-")
+  }
+  if ([string]::IsNullOrWhiteSpace($safe)) { return "scenario" }
+  return $safe
+}
+
 function Copy-MIRModUnderTest {
   param(
     [Parameter(Mandatory)][string]$RepoRoot,
@@ -40,7 +51,7 @@ function Copy-MIRModUnderTest {
     Remove-Item -LiteralPath $target -Recurse -Force
   }
 
-  $exclude = @(".git", "build", "dist")
+  $exclude = @(".git", "artifacts", "build", "dist")
   New-Item -ItemType Directory -Path $target | Out-Null
   Get-ChildItem -LiteralPath $RepoRoot -Force | Where-Object {
     $exclude -notcontains $_.Name
@@ -85,8 +96,9 @@ function Invoke-MIRFactorioLoadCheck {
     [Parameter(Mandatory)][string]$ScenarioName
   )
 
-  $savePath = Join-Path $UserDataDir "saves\$ScenarioName.zip"
-  $logPath = Join-Path $UserDataDir "$ScenarioName.log"
+  $safeScenarioName = Get-MIRSafeScenarioFileName -Name $ScenarioName
+  $savePath = Join-Path $UserDataDir "saves\$safeScenarioName.zip"
+  $logPath = Join-Path $UserDataDir "$safeScenarioName.log"
   $args = @(
     "--create", $savePath,
     "--mod-directory", (Join-Path $UserDataDir "mods"),

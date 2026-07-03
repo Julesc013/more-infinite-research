@@ -2,6 +2,50 @@
 
 This file records local release-candidate validation runs. It is not a substitute for the manual mod matrix in `docs/compatibility.md`.
 
+## 2026-07-04 Extended Compatibility Automation
+
+Environment:
+
+- Branch: `dev`.
+- Mod version `2.1.0`.
+- Factorio runtime binary: `C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe`.
+
+Scope:
+
+- Added executable manual-scenario support to the compatibility audit harness.
+- Added sharded and resumed audit support with `-FromLockfile`, `-StartIndex`, `-Count`, and `-CandidateNames`.
+- Added grouped audit result conversion that writes `compat-summary.md`, `compat-failures.grouped.json`, and `profile-candidates.json`.
+- Added review-only profile-stub generation from grouped failures.
+- Added `Invoke-MIRExtendedTests.ps1` as the tiered wrapper for static, runtime, smoke, top-25, manual-scenario, full-audit, and save-compat tiers.
+- Added a self-hosted GitHub workflow for unattended extended audits.
+- Updated README, architecture, compatibility, roadmap, manual-test, release-plan, TODO, and changelog docs.
+
+Commands:
+
+```powershell
+.\scripts\Invoke-MIRExtendedTests.ps1 -Tier Static,Runtime,AuditSmoke -FactorioBin 'C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe' -OutputRoot .\build\extended-final -FailFast
+.\scripts\Invoke-MIRCompatAudit.ps1 -MaxCandidates 0 -CatalogPages 0 -RunManualScenarios -ScenarioNames space-age-baseline -OutputDir .\build\compat-manual-smoke
+.\scripts\Convert-MIRCompatAuditResults.ps1 -AuditDir .\build\compat-manual-smoke
+.\scripts\Invoke-MIRExtendedTests.ps1 -Tier AuditSmoke -OutputRoot .\build\extended-smoke -FailFast
+.\scripts\Invoke-MIRValidation.ps1 -StaticOnly
+.\scripts\Invoke-MIRCompatAudit.ps1 -FromLockfile .\build\extended-smoke\audit-smoke\compat-candidates.lock.json -StartIndex 0 -Count 1 -OutputDir .\build\compat-lockfile-smoke
+.\scripts\Convert-MIRCompatAuditResults.ps1 -AuditDir .\build\compat-lockfile-smoke
+.\scripts\Invoke-MIRCompatAudit.ps1 -CandidateNames definitely-no-such-mod-mir-test -MaxCandidates 0 -CatalogPages 0 -OutputDir .\build\compat-stub-smoke
+.\scripts\Convert-MIRCompatAuditResults.ps1 -AuditDir .\build\compat-stub-smoke
+.\scripts\New-MIRCompatProfileStub.ps1 -GroupedFailures .\build\compat-stub-smoke\compat-failures.grouped.json -GroupId FG0001
+```
+
+Results:
+
+- Extended final wrapper gate passed for `Static`, `Runtime`, and `AuditSmoke`.
+- Runtime fixture validation passed with the local Factorio binary after the automation/doc updates.
+- Manual-scenario metadata smoke passed and wrote stable report, lockfile, grouped-failure, and profile-candidate artifacts.
+- Extended `AuditSmoke` passed through the new wrapper and grouped converter.
+- Static validation passed, including the new compatibility automation wiring check.
+- Lockfile resume/sharding smoke passed from the generated audit-smoke lockfile.
+- Profile-stub smoke passed and generated a review-required Lua stub under ignored build output.
+- Full credentialed top-25, manual modpack load tests, and full `>=10K` audits remain future local/self-hosted runs because they require Mod Portal credentials and a Factorio binary.
+
 ## 2026-07-03 Final 2.1.0 Release Candidate Documentation Pass
 
 Environment:

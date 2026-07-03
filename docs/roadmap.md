@@ -51,7 +51,7 @@ Current `dev` is the `v2.1.0` release-candidate line. It builds on the tested
 - the Space Age material productivity split from Stone product productivity into Landfill, Artificial soil, and Molten metals, plus Lithium from brine, Carbon, Ice, and Bacteria cultivation productivity;
 - conservative vanilla Space Age productivity-family adoption for safe residual recipes;
 - hardened known Plates n Circuit Productivity replacement that requires full coverage, matching productivity values, lab-compatible replacement science, and no other blocking owner;
-- a local Mod Portal compatibility audit harness with dependency closure, official built-in handling, SHA1 cache verification, and parsed MIR audit rows.
+- a local Mod Portal compatibility audit harness with dependency closure, official built-in handling, SHA1 cache verification, parsed MIR audit rows, executable manual scenarios, sharding, grouped failure summaries, review-only profile stubs, and a self-hosted extended-test workflow.
 
 The public release rule is:
 
@@ -129,7 +129,7 @@ This table is the canonical current synthesis from the Reddit discussion and fol
 | Mod-portal compatibility audit harness | Ship as local tooling | `v2.1.0` |
 | Explicit compatibility planning object | Next architecture step | `v2.1.x` / `v2.2.0` |
 | Strict compatibility profile schema validation | Next architecture step | `v2.1.x` / `v2.2.0` |
-| Profile-stub generation from grouped audit failures | Tooling spike | `v2.1.x` / `v2.2.0` |
+| Profile-stub generation from grouped audit failures | Implemented review-only tooling; real profile additions still require audit evidence | `v2.1.0` / follow-up profiles |
 | Quality module enrichment / quality odds research | Spike/defer; likely add-on or prototype-tier feature | Later |
 | Robot battery/carrying capacity | Existing core | Existing |
 | Roboport range | Spike/defer | Later |

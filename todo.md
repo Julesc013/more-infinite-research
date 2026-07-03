@@ -305,6 +305,7 @@ Do not turn `v2.1.0` into a bucket for every plausible feature idea.
 - [x] Vanilla productivity-family adoption moved into a dedicated compatibility module.
 - [x] Parser-friendly generation audit rows added for stream/native-overlap/recipe-owner diagnostics.
 - [x] Local mod-portal compatibility audit harness added with committed matrix inputs and ignored generated reports.
+- [x] Extended compatibility automation added: executable manual scenarios, sharded/resumable audits, grouped failure reports, review-only profile stubs, tiered extended-test wrapper, and self-hosted workflow.
 - [x] Documentation hierarchy reorganized: root `todo.md` is future-work authority, `changelog.txt` is past-change authority, `docs/roadmap.md` is high-level rationale, and `docs/notes/` contains derivative plans/release notes/archive material.
 - [ ] Run full mod-portal compatibility audit with credentials and a local Factorio binary.
 - [ ] Convert recurring audit failures into small declarative compatibility profiles only when the report shows concrete, repeatable patterns.
@@ -361,19 +362,23 @@ discover facts
 ### Compatibility Testing And Audit Expansion
 
 - [x] Configure `FACTORIO_BIN` and rerun full runtime validation after the compatibility refactor, competitor hardening, science-pack rebalance, and Space Age productivity split.
+- [x] Add executable manual-scenario automation for curated modpacks and high-risk compatibility surfaces.
+- [x] Add sharding and lockfile resume support for long compatibility audits.
+- [x] Add grouped audit result conversion for load failures, duplicate owners, known competitors, unknown external owners, invalid science, missing prerequisites, productivity-disallowed recipes, and missing audit rows.
 - [ ] Run a top-25 Mod Portal audit for Factorio `2.1` with real downloads, credentials, and a local Factorio binary.
 - [ ] Run a full `downloads_count >= 10000` Mod Portal audit for Factorio `2.0` and `2.1`.
-- [ ] Group audit failures by duplicate owner, known competitor remains, split vanilla family, unknown external owner, invalid science pack, missing prerequisite, `allow_productivity=false`, and load-order issue.
+- [ ] Run the grouped audit converter on real top-25 and full-audit outputs and triage the resulting failure buckets.
 - [ ] Convert recurring verified failures into declarative compatibility profiles only after grouped audit evidence exists.
 - [ ] Add existing-save validation for profile-driven adoption and replacement, including signature-change refresh behavior.
 
 ### Profile Stub Tooling
 
-- [ ] Add `scripts/New-MIRCompatProfileStub.ps1`.
-- [ ] Let the stub generator read `compat-report.json` and a grouped failure ID.
-- [ ] Generate review-required Lua profile stubs with audit-run evidence, candidate tech patterns, affected streams, duplicate recipes, and external owners.
-- [ ] Keep generated stubs disabled or review-required until manually refined.
-- [ ] Never let profile-stub generation automatically enable a compatibility profile.
+- [x] Add `scripts/New-MIRCompatProfileStub.ps1`.
+- [x] Let the stub generator read `compat-failures.grouped.json` and a grouped failure ID.
+- [x] Generate review-required Lua profile stubs with audit-run evidence, candidate tech patterns, affected streams, duplicate recipes, and external owners where the grouped evidence contains them.
+- [x] Keep generated stubs disabled or review-required until manually refined.
+- [x] Never let profile-stub generation automatically enable a compatibility profile.
+- [ ] Refine stub generation after the explicit planner emits richer replacement/adoption/suppression evidence.
 
 ### v2.1.0 Spike / Defer Decisions
 

@@ -1,0 +1,61 @@
+name: Extended Factorio Compatibility Audit
+
+on:
+  workflow_dispatch:
+    inputs:
+      tier:
+        description: "Comma-separated Invoke-MIRExtendedTests tiers"
+        required: true
+        default: "Top25SpaceAge"
+      include_full_audit:
+        description: "Allow Full10K tiers to run"
+        required: true
+        type: boolean
+        default: false
+      start_index:
+        description: "Shard start index for Full10K tiers"
+        required: true
+        default: "0"
+      shard_size:
+        description: "Shard size for Full10K tiers"
+        required: true
+        default: "25"
+  schedule:
+    - cron: "0 3 * * *"
+
+jobs:
+  extended:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run extended tests
+        shell: pwsh
+        env:
+          FACTORIO_BIN: ${{ secrets.FACTORIO_BIN }}
+          FACTORIO_USERNAME: ${{ secrets.FACTORIO_USERNAME }}
+          FACTORIO_TOKEN: ${{ secrets.FACTORIO_TOKEN }}
+          EXTENDED_TIER: ${{ github.event.inputs.tier || 'Top25SpaceAge' }}
+          EXTENDED_INCLUDE_FULL_AUDIT: ${{ github.event.inputs.include_full_audit || 'false' }}
+          EXTENDED_START_INDEX: ${{ github.event.inputs.start_index || '0' }}
+          EXTENDED_SHARD_SIZE: ${{ github.event.inputs.shard_size || '25' }}
+        run: |
+          $tiers = $env:EXTENDED_TIER -split "," | ForEach-Object { $_.Trim() } | Where-Object { $_ }
+          $args = @(
+            "-Tier", $tiers,
+            "-StartIndex", $env:EXTENDED_START_INDEX,
+            "-ShardSize", $env:EXTENDED_SHARD_SIZE,
+            "-FailFast"
+          )
+          if ($env:EXTENDED_INCLUDE_FULL_AUDIT -eq "true") {
+            $args += "-IncludeFullAudit"
+          }
+          ./scripts/Invoke-MIRExtendedTests.ps1 @args
+
+      - name: Upload extended test artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: extended-compat-audit
+          path: artifacts/extended-tests
+          if-no-files-found: ignore

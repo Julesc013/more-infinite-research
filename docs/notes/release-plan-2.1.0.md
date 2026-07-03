@@ -36,7 +36,7 @@ decision for each one.
 | Shareable presets | Preset import/export remains deferred until it can be designed without adding per-technology override dropdowns | No |
 | Native modifier overlap policy | Broad skip/prefer/warn/allow behavior is explicitly deferred; `v2.1.0` ships exact recipe-owner filtering, vanilla family adoption, and known fully covered recipe-productivity competitor replacement | Yes |
 | Compatibility architecture | Recipe-productivity ownership, family adoption, and known competitor replacement are modular and profile-driven rather than embedded in the generator | Yes |
-| External compatibility audit | Mod-portal cataloging, dependency closure, lockfile/report generation, and curated scenario fixtures exist; full downloads/load checks remain local/manual with credentials | Yes |
+| External compatibility audit | Mod-portal cataloging, dependency closure, executable manual scenarios, sharded lockfile runs, grouped summaries, review-only profile stubs, and self-hosted workflow exist; full downloads/load checks remain local/manual with credentials | Yes |
 | Icon source and asset policy | Fallback resolver can prefer loaded Space Age/Wube technology art, but the package does not redistribute original Space Age files | Yes |
 | Scripted spoilage hardening | Existing-stack, reversal, disable, baseline, and multi-force behavior remains default-off with caveats until manual evidence exists | Yes |
 | Scripted agriculture hardening | Newly planted crops stay in the default-off experimental path; existing-plant rescale remains out of scope | Yes |
@@ -52,7 +52,7 @@ decision for each one.
 | Broad native modifier overlap policy | Defer | Data-stage diagnostics plus future generation policy | Later |
 | Known recipe-productivity competitor replacement | Ship | Prepare known competitors, generate MIR replacement effects, then remove only fully covered competing techs | `v2.1.0` |
 | Vanilla Space Age productivity-family adoption | Ship | Add safe residual recipe effects into configured existing vanilla infinite technologies | `v2.1.0` |
-| Compatibility audit harness | Ship as local tooling | Mod portal metadata, dependency lockfile, report generation, optional download/load test | `v2.1.0` |
+| Compatibility audit harness | Ship as local tooling | Mod portal metadata, dependency lockfile, executable manual scenarios, optional download/load test, grouped reports, sharding, and self-hosted wrapper | `v2.1.0` |
 | Generated audit rows | Ship | Parser-friendly diagnostics emitted with debug generation report | `v2.1.0` |
 | Icon source resolver and asset policy | Ship | Data-stage icon candidate resolver plus package validation guard | `v2.1.0` |
 | Spoilage preservation hardening | Defer stronger claims | Event-driven control-stage scripted tech | Later |
