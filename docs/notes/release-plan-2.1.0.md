@@ -59,10 +59,10 @@ decision for each one.
 | Agricultural growth hardening | Defer stronger claims | Event-driven control-stage scripted tech | Later |
 | Existing agricultural plant rescale | Defer | Research/configuration bounded tower scan with plant dedupe | Later if proven |
 | High-throughput pump | Defer | Prototype unlock, no runtime loop | Later candidate |
-| Pipeline extent multiplier | Implemented; ship if proof stays clean | Startup prototype setting, default 100%/unchanged | `v2.1.0` |
-| Thruster fuel productivity | Implemented; ship if proof stays clean | Recipe productivity | `v2.1.0` |
-| Thruster oxidizer productivity | Implemented; ship if proof stays clean | Recipe productivity | `v2.1.0` |
-| Oil/fluid recipe productivity | Implemented; ship if proof stays clean | Recipe productivity | `v2.1.0` |
+| Pipeline extent multiplier | Implemented and validated for the conservative default and fixture coverage | Startup prototype setting, default 100%/unchanged | `v2.1.0` |
+| Thruster fuel productivity | Implemented and validated | Recipe productivity | `v2.1.0` |
+| Thruster oxidizer productivity | Implemented and validated | Recipe productivity | `v2.1.0` |
+| Oil/fluid recipe productivity | Implemented and validated | Recipe productivity | `v2.1.0` |
 | True thruster thrust research | Reject/defer | No clean native modifier lane | Not core MIR |
 | Runtime platform speed mutation | Reject | Runtime hack | Not core MIR |
 | Runtime quality odds mutation | Reject | Runtime hack/prototype mismatch | Not core MIR |
@@ -259,17 +259,16 @@ Out of scope for `v2.1.0`:
 
 ## Implemented Expansion Gates
 
-These features now have `v2.1.0` implementation coverage, but they still need
-evidence before final release claims or non-conservative defaults.
+These features now have `v2.1.0` implementation coverage and automated fixture proof for the release-candidate claims. Non-conservative defaults, stronger balance recommendations, or broader manual compatibility claims still need save-level soak.
 
-| Feature | Required proof |
+| Feature | Release proof status |
 | --- | --- |
-| Pipeline extent multiplier | Startup prototype mutation works and does not break machine/tank/modded pipe fluidboxes |
-| Thruster fuel productivity | Exact recipes accept recipe productivity and no duplicate owner exists |
-| Thruster oxidizer productivity | Exact recipes accept recipe productivity and no duplicate owner exists |
-| Oil/fluid productivity | Fluid-only and mixed-output recipes behave correctly under recipe productivity |
-| Vanilla Space Age productivity-family adoption | Panglia-style residual recipes adopt into existing vanilla family technologies and existing saves refresh effects on signature changes |
-| Plates n Circuit Productivity replacement | Fully covered competing technologies are removed only after MIR generated replacement recipe effects exist |
+| Pipeline extent multiplier | Fixture validation proves the default `100%` path is inert and explicit non-default values mutate representative fluid boxes; large modded networks still need manual soak before recommending non-default values broadly |
+| Thruster fuel productivity | Runtime fixtures prove exact recipe ownership and no duplicate infinite owner where the recipes exist |
+| Thruster oxidizer productivity | Runtime fixtures prove exact recipe ownership and no duplicate infinite owner where the recipes exist |
+| Oil/fluid productivity | Runtime fixtures prove oil-processing, cracking, lubricant, sulfuric-acid, acid-neutralisation, and Space Age propellant ownership behavior |
+| Vanilla Space Age productivity-family adoption | Runtime fixtures prove safe adoption, conflict fallback, productivity-disallowed rejection, and existing-save effect refresh on signature changes |
+| Plates n Circuit Productivity replacement | Runtime fixtures prove full replacement, partial coverage preservation, productivity-change mismatch preservation, and externally blocked combined-owner preservation |
 | Agricultural yield | Clean event/prototype path exists without broad scans |
 | Quality module enrichment | Clean prototype-tier/add-on path exists; no runtime module mutation |
 | Roboport range | Native modifier exists or prototype-tier scope is clearly a companion feature |
@@ -317,7 +316,7 @@ Minimum issue template:
 - `changelog.txt` has a dated `2.1.0` entry;
 - shareable settings profiles are explicitly deferred without shipping per-technology override dropdowns;
 - native modifier overlap policy is implemented or explicitly deferred;
-- scripted spoilage/agriculture claims are backed by manual evidence;
+- scripted spoilage/agriculture stronger/default-on claims remain default-off unless backed by manual evidence;
 - implemented expansion features are either shipped with proof or moved out of the release;
 - no broad `on_tick` or `on_nth_tick` scanning is introduced;
 - any generated technology ID changes have migrations;

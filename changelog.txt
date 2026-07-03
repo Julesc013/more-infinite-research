@@ -10,6 +10,7 @@ Date: 2026-07-03
     - Agricultural growth speed now includes electromagnetic and cryogenic science in its research cost alongside agricultural science.
     - Rocket shooting speed and Cannon shooting speed now use electromagnetic science instead of agricultural science.
     - Added an ordered icon source resolver that can prefer loaded official DLC technology art, use safe base-game fallbacks, or opt into installed-but-disabled official DLC icon files when explicitly enabled.
+    - Cargo bay unloading distance now uses the landing pad unloading bay unlock technology art, and Cargo landing pad count now uses the Space platform technology art.
     - Added fluid-output recipe productivity streams for oil processing, oil cracking, lubricant, sulfuric acid, acid neutralization, Space Age thruster fuel, and Space Age thruster oxidizer recipes.
     - Oil processing, Oil cracking, Lubricant, and Sulfuric acid productivity now use cryogenic, agricultural, electromagnetic, and metallurgic science respectively instead of using space science as their shared extra pack.
     - Rail productivity now covers Elevated Rails support and ramp recipes when Elevated Rails is active, with supports below rails and ramps one tier lower again.

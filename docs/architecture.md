@@ -25,7 +25,7 @@ This order gives the mod the best practical view of recipes, labs, science packs
 
 ## Control Stage Boundary
 
-The current `dev` branch includes a small `control.lua` surface for scripted technologies such as spoilage preservation and agricultural growth speed. These runtime features are `v2.0.5` ship candidates because they are bounded and event-driven, but each claimed behavior must pass the named manual save validation before release. Any behavior that fails proof moves to `v2.1.0`.
+The current `dev` branch includes a small `control.lua` surface for scripted technologies such as spoilage preservation and agricultural growth speed. These runtime features ship as disabled-by-default experimental candidates because they are bounded and event-driven. Stronger behavior claims, default enablement, or broad existing-save guarantees still require the named manual save validation.
 
 The runtime layer is intentionally narrow:
 
@@ -51,6 +51,7 @@ Current control files:
 Current migrations:
 
 - `migrations/more-infinite-research_2.0.5.json`: maps the removed generated character trash-slot technology ID into the combined inventory/trash technology ID.
+- `migrations/more-infinite-research_2.1.0.json`: maps the retired generated stone-product productivity technology ID into the new landfill productivity technology ID.
 
 ### Scripted Runtime Storage
 
@@ -72,7 +73,7 @@ Spoilage preservation recomputes from the stored baseline on init, configuration
 - `level`: completed agricultural growth speed levels for that force.
 - `multiplier`: the force's clamped growth multiplier.
 
-Agricultural growth speed refreshes this force state on init, configuration changes, research finish, research reversal, and technology-effect resets. The current `v2.0.5` candidate only applies the multiplier at `on_tower_planted_seed`; it does not rescan existing plants.
+Agricultural growth speed refreshes this force state on init, configuration changes, research finish, research reversal, and technology-effect resets. The current candidate only applies the multiplier at `on_tower_planted_seed`; it does not rescan existing plants.
 
 ## Utility Modules
 
@@ -169,7 +170,7 @@ When `mir-debug-generation-report` is enabled, MIR also emits an `Audit report` 
 
 `mir-debug-recipe-matches` logs matched recipe names per generated productivity stream. When either diagnostics setting is enabled, duplicate recipe matches across streams are also reported as non-blocking warnings.
 
-Native modifier overlap diagnostics are also non-blocking. They report that another infinite non-MIR technology already has the same native direct-effect identity, such as `cargo-landing-pad-count` or `max-cargo-bay-unloading-distance`, but they do not skip, merge, or mutate either technology in `v2.0.5`.
+Native modifier overlap diagnostics are also non-blocking. They report that another infinite non-MIR technology already has the same native direct-effect identity, such as `cargo-landing-pad-count` or `max-cargo-bay-unloading-distance`, but they do not skip, merge, or mutate either technology in the `v2.1.0` release candidate.
 
 ## Progression Settings
 

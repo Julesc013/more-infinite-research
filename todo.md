@@ -308,7 +308,7 @@ Do not turn `v2.1.0` into a bucket for every plausible feature idea.
 - [x] Documentation hierarchy reorganized: root `todo.md` is future-work authority, `changelog.txt` is past-change authority, `docs/roadmap.md` is high-level rationale, and `docs/notes/` contains derivative plans/release notes/archive material.
 - [ ] Run full mod-portal compatibility audit with credentials and a local Factorio binary.
 - [ ] Convert recurring audit failures into small declarative compatibility profiles only when the report shows concrete, repeatable patterns.
-- [ ] Runtime-test the refactored recipe-productivity owner/adoption modules with `FACTORIO_BIN` configured.
+- [x] Runtime-test the refactored recipe-productivity owner/adoption modules with `FACTORIO_BIN` configured.
 
 ### Compatibility Architecture Next Steps
 
@@ -360,7 +360,7 @@ discover facts
 
 ### Compatibility Testing And Audit Expansion
 
-- [ ] Configure `FACTORIO_BIN` and rerun full runtime validation after the compatibility refactor and Space Age productivity split.
+- [x] Configure `FACTORIO_BIN` and rerun full runtime validation after the compatibility refactor, competitor hardening, science-pack rebalance, and Space Age productivity split.
 - [ ] Run a top-25 Mod Portal audit for Factorio `2.1` with real downloads, credentials, and a local Factorio binary.
 - [ ] Run a full `downloads_count >= 10000` Mod Portal audit for Factorio `2.0` and `2.1`.
 - [ ] Group audit failures by duplicate owner, known competitor remains, split vanilla family, unknown external owner, invalid science pack, missing prerequisite, `allow_productivity=false`, and load-order issue.

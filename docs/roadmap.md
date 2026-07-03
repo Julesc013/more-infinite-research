@@ -41,19 +41,17 @@ The `1.9.9` cutoff should be treated as a release trigger, not an API assumption
 
 ## Current Baseline
 
-Current `dev` already has the intended `v2.0.5` quick-patch candidate work:
+Current `dev` is the `v2.1.0` release-candidate line. It builds on the tested
+`v2.0.5` quick-patch baseline and adds the larger Factorio `2.1` feature wave:
 
-- A narrow `control.lua` runtime surface for bounded scripted technologies.
-- `control/scripted-techs.lua` for init, configuration change, research finish, research reversal, technology-effects reset, and agricultural tower planting handlers.
-- Scripted spoilage preservation research using a visible `nothing` effect and the global spoil time modifier.
-- Scripted agricultural growth speed research using agricultural tower planting events and plant `tick_grown`.
-- Electric shooting speed coverage for both `tesla` and `electric` ammo categories, so Tesla guns, Tesla turrets, and discharge-defense-style equipment are all covered where the categories exist.
-- Electric Shooting Speed uses the Space Age electric-weapons-damage texture when that technology exists, with a discharge defense fallback for vanilla/no-Space-Age games.
-- Recipe-productivity duplicate prevention for recipes already owned by another infinite recipe-productivity technology.
-- Space Age vanilla productivity technologies remain authoritative for processing units, low density structures, plastic, and rocket fuel instead of receiving parallel MIR technologies.
-- Heavy ammunition productivity is presented as Cannon shell productivity while keeping the existing generated technology ID stable.
-- Generated stream icons replace inherited vanilla constant badges with badges matching MIR's actual effect type.
-- Package and validation script coverage for `control.lua`, the control module tree, Tesla speed assertions, broad generated-chain integrity, vanilla Space Age productivity skip assertions, branch-aware legacy checks, and the no-`on_tick` runtime guard.
+- simpler per-technology checkbox enablement, with shareable presets deferred;
+- strict icon source resolution and package validation around official DLC assets;
+- fluid-output productivity streams for oil, cracking, lubricant, sulfuric acid, acid neutralization, and Space Age thruster propellants;
+- the startup-only pipeline extent multiplier with the default `100%` path inert;
+- the Space Age material productivity split from Stone product productivity into Landfill, Artificial soil, and Molten metals, plus Lithium from brine, Carbon, Ice, and Bacteria cultivation productivity;
+- conservative vanilla Space Age productivity-family adoption for safe residual recipes;
+- hardened known Plates n Circuit Productivity replacement that requires full coverage, matching productivity values, lab-compatible replacement science, and no other blocking owner;
+- a local Mod Portal compatibility audit harness with dependency closure, official built-in handling, SHA1 cache verification, and parsed MIR audit rows.
 
 The public release rule is:
 
@@ -121,10 +119,10 @@ This table is the canonical current synthesis from the Reddit discussion and fol
 | Existing agricultural plant rescale | Spike/ship if bounded | `v2.1.0` |
 | Agricultural yield / fruit yield | Spike | `v2.1.0` or later |
 | High-throughput pump / Der Pump | Spike or optional prototype unlock | `v2.1.0` |
-| Pipeline extent setting | Implemented; startup setting only; release gated by validation | `v2.1.0` |
-| Thruster fuel/oxidizer productivity | Implemented recipe-productivity streams; release gated by validation | `v2.1.0` |
+| Pipeline extent setting | Implemented and validated; startup setting only | `v2.1.0` |
+| Thruster fuel/oxidizer productivity | Implemented and validated recipe-productivity streams | `v2.1.0` |
 | True thruster thrust research | Reject for core MIR unless API changes | Later / companion |
-| Oil processing productivity | Implemented recipe-productivity split; release gated by validation | `v2.1.0` |
+| Oil processing productivity | Implemented and validated recipe-productivity split | `v2.1.0` |
 | Vanilla Space Age productivity-family adoption | Ship | `v2.1.0` |
 | Plates n Circuit Productivity replacement | Ship | `v2.1.0` |
 | Profile-driven recipe-productivity owner classification | Ship | `v2.1.0` |
@@ -232,9 +230,9 @@ The detailed release gate lives in `docs/notes/release-plan-2.1.0.md`, but the d
 | Scripted-tech refinements | Deferred beyond checkbox routing | Event-driven runtime manager | Keep default-off claims until save-level evidence exists |
 | Existing agricultural plant rescale | Deferred | Research-change bounded scan | Needs bounded save-level proof |
 | High-throughput pump / Der Pump | Deferred | Prototype unlock | Good megabase QoL candidate, not in this candidate |
-| Pipeline extent setting | Implemented; ship if compatibility proof passes | Startup prototype setting | Default `100%` leaves prototypes unchanged |
-| Thruster fuel/oxidizer productivity | Implemented; ship if recipe proof passes | Recipe productivity | Do not add true thrust research |
-| Oil/fluid recipe productivity | Implemented; ship if proof passes | Recipe productivity | Needs manual balance proof on fluid outputs |
+| Pipeline extent setting | Implemented and validated | Startup prototype setting | Default `100%` leaves prototypes unchanged; non-default values still deserve manual soak in large modded fluid networks |
+| Thruster fuel/oxidizer productivity | Implemented and validated | Recipe productivity | Do not add true thrust research |
+| Oil/fluid recipe productivity | Implemented and validated | Recipe productivity | Automated ownership proof is complete; manual balance proof remains useful for long saves |
 | Vanilla Space Age productivity-family adoption | Implemented | Existing technology recipe effects | Panglia-style alternate rocket fuel/LDS recipes adopt into vanilla family techs where safe |
 | Plates n Circuit Productivity replacement | Implemented | Known competitor preparation and cleanup | Fully covered competing recipe-productivity techs are removed only after MIR replacement exists |
 | Compatibility docs and test results | Ship | Docs/evidence | Maraxis/Krastorio-style validation when available |
@@ -248,6 +246,7 @@ The detailed release gate lives in `docs/notes/release-plan-2.1.0.md`, but the d
 - New prototype unlocks have recipe, power, balance, localization, and package tests.
 - Startup prototype settings document why they cannot be runtime research.
 - Recipe-productivity additions prove exact recipe IDs and no vanilla/other-mod infinite duplicate.
+- Static validation, runtime fixture validation, package build, compatibility audit smoke, and `git diff --check` pass on the final release-candidate tree.
 - README, roadmap, compatibility docs, test results, and changelog are updated before release.
 
 ## v2.1.5 Feedback Patch

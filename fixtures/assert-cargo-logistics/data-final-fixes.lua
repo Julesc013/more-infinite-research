@@ -45,6 +45,33 @@ local function assert_has_prerequisite(tech, prerequisite)
   error("MIR cargo validation failed: " .. tech.name .. " missing prerequisite " .. prerequisite .. ".")
 end
 
+local function prototype_icon_paths(prototype)
+  local paths = {}
+  if not prototype then return paths end
+  if prototype.icons then
+    for _, layer in ipairs(prototype.icons) do
+      if layer.icon then paths[layer.icon] = true end
+    end
+  elseif prototype.icon then
+    paths[prototype.icon] = true
+  end
+  return paths
+end
+
+local function assert_uses_technology_icon(tech, source_tech_name)
+  local source = data.raw.technology and data.raw.technology[source_tech_name]
+  local expected_paths = prototype_icon_paths(source)
+  if not next(expected_paths) then
+    error("MIR cargo validation failed: missing technology icon source for " .. source_tech_name .. ".")
+  end
+
+  for _, layer in ipairs(tech.icons or {}) do
+    if expected_paths[layer.icon] then return end
+  end
+
+  error("MIR cargo validation failed: " .. tech.name .. " does not use " .. source_tech_name .. " technology art.")
+end
+
 local function assert_unit(tech, expected_formula, expected_time)
   if not tech.unit then
     error("MIR cargo validation failed: " .. tech.name .. " has no research unit.")
@@ -123,8 +150,10 @@ local distance = technology("recipe-prod-research_cargo_bay_unloading_distance-1
 assert_common(distance, "100000 * 3^(L-1)", 120)
 assert_has_effect(distance, "max-cargo-bay-unloading-distance", 10)
 assert_has_prerequisite(distance, "landing-pad-unloading-bay")
+assert_uses_technology_icon(distance, "landing-pad-unloading-bay")
 
 local count = technology("recipe-prod-research_cargo_landing_pad_count-1")
 assert_common(count, "1000000 * 10^(L-1)", 240)
 assert_has_effect(count, "cargo-landing-pad-count", 1)
 assert_has_prerequisite(count, "rocket-silo")
+assert_uses_technology_icon(count, "space-platform")

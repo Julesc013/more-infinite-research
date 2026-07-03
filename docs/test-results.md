@@ -2,6 +2,40 @@
 
 This file records local release-candidate validation runs. It is not a substitute for the manual mod matrix in `docs/compatibility.md`.
 
+## 2026-07-03 Final 2.1.0 Release Candidate Documentation Pass
+
+Environment:
+
+- Branch: `dev`.
+- Mod version `2.1.0`.
+- Factorio runtime binary: `C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe`.
+
+Scope:
+
+- Audited release-candidate docs for stale publish-blocker wording after the final compatibility hardening and science-pack balance pass.
+- Swapped Cargo bay unloading distance to the `landing-pad-unloading-bay` technology icon and Cargo landing pad count to the `space-platform` technology icon.
+- Marked the completed runtime validation gates in root `todo.md` while keeping the top-25 real Mod Portal audit and manual save soak as future work.
+- Updated `docs/roadmap.md`, `docs/notes/release-plan-2.1.0.md`, `docs/architecture.md`, `docs/api-proof-points.md`, and `docs/notes/manual-test-plan.md` so the release-candidate narrative matches the current implementation and validation state.
+- Rebuilt `dist/more-infinite-research_2.1.0.zip` from the final documentation tree.
+
+Commands:
+
+```powershell
+.\scripts\Build-MIRPackage.ps1
+.\scripts\Invoke-MIRValidation.ps1 -FactorioBin 'C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe'
+.\scripts\Invoke-MIRCompatAudit.ps1 -CatalogPages 1 -MaxCandidates 1 -MinDownloads 10000 -FactorioVersions '2.1' -OutputDir .\build\compat-audit-smoke
+git diff --check
+```
+
+Results:
+
+- Package build passed and refreshed `dist/more-infinite-research_2.1.0.zip`.
+- Full runtime validation passed with the local Factorio binary.
+- Runtime validation covered the base and Space Age fixture matrix, including generation integrity, science-pack ingredient policies, scripted enable/disable routing, fluid-output productivity, pipeline extent scaling, Plates n Circuit replacement safety, vanilla productivity-family adoption and signature refresh, weapon-speed overlap safety, Omega drill productivity, cargo logistics shape/diagnostics/icon sources, and end-game prerequisite gating.
+- Compatibility audit smoke passed and wrote ignored sample output under `build/compat-audit-smoke`.
+- `git diff --check` passed.
+- Git reported line-ending normalization warnings only.
+
 ## 2026-07-03 Rocket/Cannon Defaults Science Pack Alignment
 
 Environment:

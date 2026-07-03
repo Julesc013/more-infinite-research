@@ -14,6 +14,7 @@ This is the short, player-facing release summary for the `2.1.0` mod portal rele
 - Agricultural Growth Speed now includes electromagnetic and cryogenic science alongside agricultural science.
 - Rocket Shooting Speed and Cannon Shooting Speed now use electromagnetic science instead of agricultural science.
 - Added better icon source resolution. MIR can prefer loaded official DLC art, use base-game fallbacks, or opt into installed-but-disabled official DLC icon files when the user explicitly enables that option.
+- Cargo Bay Unloading Distance now uses the unloading bay unlock technology art, and Cargo Landing Pad Count now uses Space platform technology art.
 - Added fluid-output productivity research for oil processing, oil cracking, lubricant, sulfuric acid, acid neutralization, thruster fuel, and thruster oxidizer recipes where those recipes exist.
 - Oil processing, Oil cracking, Lubricant, and Sulfuric acid productivity now use cryogenic, agricultural, electromagnetic, and metallurgic science respectively instead of sharing Space science as the extra pack.
 - Oil cracking productivity uses oil processing technology art. Sulfuric acid productivity uses sulfuric acid fluid art and also covers acid neutralization when that recipe exists.

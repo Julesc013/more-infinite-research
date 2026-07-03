@@ -47,14 +47,14 @@ Default-off scripted agriculture/spoilage candidates can be included in `v2.0.5`
 
 ## v2.1.0 Larger Feature Wave
 
-Required before claiming larger `v2.1.0` features:
+Automated fixture validation now covers the release-candidate claims for the larger `v2.1.0` features. These scenarios remain the manual save-level follow-up matrix for balance, long-running saves, and stronger public claims:
 
 | Scenario | Purpose |
 | --- | --- |
 | `settings-checkbox-enablements` | Verify per-technology enable checkboxes control generated streams, base continuations, and scripted runtime effects consistently |
 | `shareable-presets-design` | Design and validate any future import/export or shareable preset flow before adding preset UI back to startup settings |
 | `agri-existing-plant-rescale` | Verify any existing plant rescale is bounded, deduplicated, and reversible |
-| `native-modifier-overlap-policy` | Verify overlapping cargo/logistics/native modifiers follow the selected skip/warn/prefer/allow policy beyond diagnostic-only `v2.0.5` coverage |
+| `native-modifier-overlap-policy` | Verify overlapping cargo/logistics/native modifiers follow any future selected skip/warn/prefer/allow policy beyond the current diagnostic-only coverage |
 | `high-throughput-pump` | Validate prototype, recipe, power draw, balance, and throughput if promoted |
 | `pipeline-extent` | Manual soak the implemented startup prototype multiplier with large and modded fluid networks after fixture validation passes |
 | `thruster-fuel-productivity` | Manual verify the implemented thruster fuel productivity streams in a Space Age save after fixture validation passes |
