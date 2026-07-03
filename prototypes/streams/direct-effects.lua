@@ -10,6 +10,7 @@ return {
       "logistic-science-pack",
       "chemical-science-pack",
       "production-science-pack",
+      "space-science-pack",
       "agricultural-science-pack",
       "cryogenic-science-pack"
     },
@@ -32,7 +33,9 @@ return {
       "logistic-science-pack",
       "chemical-science-pack",
       "production-science-pack",
-      "agricultural-science-pack"
+      "agricultural-science-pack",
+      "electromagnetic-science-pack",
+      "cryogenic-science-pack"
     },
     direct_effects = {
       {
@@ -115,7 +118,7 @@ return {
     icon_tech = "rocketry",
     science_packs = {
       "automation-science-pack","logistic-science-pack","chemical-science-pack",
-      "production-science-pack","military-science-pack","agricultural-science-pack"
+      "production-science-pack","military-science-pack","electromagnetic-science-pack"
     },
     direct_effects = {
       { type = "gun-speed", ammo_category = "rocket", modifier = 0.1 }
@@ -126,7 +129,7 @@ return {
     icon_item = "cannon-shell",
     science_packs = {
       "automation-science-pack","logistic-science-pack","chemical-science-pack",
-      "production-science-pack","military-science-pack","agricultural-science-pack"
+      "production-science-pack","military-science-pack","electromagnetic-science-pack"
     },
     direct_effects = {
       { type = "gun-speed", ammo_category = "cannon-shell", modifier = 0.1 }

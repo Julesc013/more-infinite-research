@@ -77,10 +77,10 @@ Technologies are generated only when their recipes, items, technologies, ammo ca
 | Flying robot frame productivity | `+10%` productivity for flying robot frame recipes | On | Adds electromagnetic science when available. |
 | Low density structure productivity | `+10%` productivity for low density structure recipes | On, skipped when vanilla owns covered recipes | Space Age's vanilla low density structure productivity stays authoritative. |
 | Rocket fuel productivity | `+10%` productivity for rocket fuel recipes | On, skipped when vanilla owns covered recipes | Uses rocket fuel unlock technology art. Space Age's vanilla rocket fuel productivity stays authoritative. |
-| Oil processing productivity | `+10%` productivity for basic oil processing, advanced oil processing, and coal liquefaction recipe families | On | Owns multi-output oil-processing recipes as one process family. |
-| Oil cracking productivity | `+10%` productivity for heavy oil cracking and light oil cracking | On | Uses oil processing technology art and stays separate from multi-output oil processing. |
-| Lubricant productivity | `+10%` productivity for lubricant recipes | On | Excludes barrel-emptying recipes. Includes Space Age biolubricant when present. |
-| Sulfuric acid productivity | `+10%` productivity for sulfuric acid and acid neutralization recipes | On | Uses sulfuric acid fluid art and excludes barrel-emptying recipes. |
+| Oil processing productivity | `+10%` productivity for basic oil processing, advanced oil processing, and coal liquefaction recipe families | On | Owns multi-output oil-processing recipes as one process family. Adds cryogenic science when available. |
+| Oil cracking productivity | `+10%` productivity for heavy oil cracking and light oil cracking | On | Uses oil processing technology art and stays separate from multi-output oil processing. Adds agricultural science when available. |
+| Lubricant productivity | `+10%` productivity for lubricant recipes | On | Excludes barrel-emptying recipes. Includes Space Age biolubricant when present. Adds electromagnetic science when available. |
+| Sulfuric acid productivity | `+10%` productivity for sulfuric acid and acid neutralization recipes | On | Uses sulfuric acid fluid art and excludes barrel-emptying recipes. Adds metallurgic science when available. |
 | Thruster fuel productivity | `+10%` productivity for Space Age thruster fuel recipes | On when fluid exists | Covers basic and advanced thruster fuel recipes when present. |
 | Thruster oxidizer productivity | `+10%` productivity for Space Age thruster oxidizer recipes | On when fluid exists | Covers basic and advanced thruster oxidizer recipes when present. |
 | Tungsten productivity | `+10%` productivity for tungsten plate and tungsten carbide recipes | On when recipes exist | Adds metallurgic science when available. |
@@ -93,12 +93,12 @@ Technologies are generated only when their recipes, items, technologies, ammo ca
 | Carbon fiber productivity | `+10%` productivity for carbon fiber recipes | On when recipes exist | Adds agricultural science when available. |
 | Ice productivity | `+10%` productivity for oxide asteroid crushing and compatible ice recipes | On when recipes exist | Adds space science when available. |
 | Bioflux productivity | `+10%` productivity for bioflux recipes | On when recipes exist | Adds agricultural science when available. |
-| Bacteria cultivation productivity | `+10%` productivity for iron and copper bacteria cultivation recipes | On when recipes exist | Uses bacteria cultivation technology art. Adds agricultural science when available. |
-| Breeding productivity | `+10%` productivity for raw fish, biter egg, pentapod egg, and cultivation/culture/breeding recipes except dedicated bacteria cultivation recipes | On when recipes exist | Avoids broad biochamber category matching so unrelated biochamber recipes are not swept in. |
+| Bacteria cultivation productivity | `+10%` productivity for iron and copper bacteria cultivation recipes | On when recipes exist | Uses bacteria cultivation technology art. Adds agricultural and cryogenic science when available. |
+| Breeding productivity | `+10%` productivity for raw fish, biter egg, pentapod egg, and cultivation/culture/breeding recipes except dedicated bacteria cultivation recipes | On when recipes exist | Adds agricultural and cryogenic science when available; avoids broad biochamber category matching so unrelated biochamber recipes are not swept in. |
 | Grenade productivity | `+10%` for grenades; `+5%` for cluster grenades | On | Adds military and space science when available. |
 | Wall productivity | `+10%` for stone walls; `+5%` for gates | On | Uses the Gate technology art. |
 | Landfill productivity | `+10%` for landfill; `+5%` for foundation | On when recipes exist | Uses landfill technology art. Adds metallurgic and space science when available. |
-| Artificial soil productivity | `+10%` for artificial soils; `+5%` for overgrowth soils | On when recipes exist | Uses artificial soil technology art. Adds agricultural science when available. |
+| Artificial soil productivity | `+10%` for artificial soils; `+5%` for overgrowth soils | On when recipes exist | Uses artificial soil technology art. Adds agricultural and space science when available. |
 | Molten metals productivity | `+10%` for iron and copper from lava; `+5%` for iron and copper ore melting | On when recipes exist | Uses foundry technology art. Adds metallurgic science when available. |
 | Rail productivity | `+10%` productivity for rail recipes; `+5%` for Elevated Rails supports; `+2%` for Elevated Rails ramps when present | On | Uses strict rail matching and prefers Elevated Rails technology art when available. |
 | Concrete productivity | `+10%` for stone brick; `+5%` for concrete; `+2%` for refined concrete | On | Includes hazard concrete variants. |
@@ -120,13 +120,13 @@ Technologies are generated only when their recipes, items, technologies, ammo ca
 | --- | --- | --- | --- |
 | Research productivity | `+10%` lab research productivity | On without Space Age; skipped with Space Age | Base-game equivalent of Space Age's vanilla research productivity. Uses the native `laboratory-productivity` modifier. |
 | Spoilage preservation | `+1%` global spoil time per level | Off | Experimental Space Age scripted technology. Global/map-wide effect; existing item-stack behavior still needs manual validation before stronger claims. |
-| Agricultural growth speed | `+1%` agricultural growth speed per level, capped at `10x` | Off | Experimental Space Age scripted technology. Applies to newly planted agricultural tower crops; existing planted crops are not globally rescanned. |
+| Agricultural growth speed | `+1%` agricultural growth speed per level, capped at `10x` | Off | Experimental Space Age scripted technology. Adds agricultural, electromagnetic, and cryogenic science when available. Applies to newly planted agricultural tower crops; existing planted crops are not globally rescanned. |
 | Character inventory slots | `+1` inventory slot and `+1` logistic trash slot | On | Merges the old separate trash-slot research into one combined technology. A migration preserves old trash-slot progress. |
 | Worker robot battery | `+10%` worker robot battery capacity | On | Uses a gentler default cost growth than shared productivity streams. |
 | Cargo bay unloading distance | `+10` maximum unloading distance tiles | On with Space Age | Requires Space Age unloading bay content. Uses official base and Space Age science packs. |
 | Cargo landing pad count | `+1` landing pad per surface | Off | Sandbox-style Space Age logistics option. Very expensive by default. |
-| Rocket shooting speed | `+10%` shooting speed for rocket ammo category | On | Separate dedicated speed research. |
-| Cannon shooting speed | `+10%` shooting speed for cannon-shell ammo category | On | Separate dedicated speed research. |
+| Rocket shooting speed | `+10%` shooting speed for rocket ammo category | On | Separate dedicated speed research using electromagnetic science when available. |
+| Cannon shooting speed | `+10%` shooting speed for cannon-shell ammo category | On | Separate dedicated speed research using electromagnetic science when available. |
 | Flamethrower shooting speed | `+10%` flamethrower shooting speed | On | Includes flamethrower turret-style weapons. |
 | Electric shooting speed | `+10%` shooting speed for electric and Tesla ammo categories | On when prerequisites exist | Affects discharge defense in vanilla and Tesla guns/turrets in Space Age. Uses speed badge, not damage badge. |
 | Character mining speed | `+5%` mining speed | On | Uses late-game utility/military/agricultural/electromagnetic science when available. |

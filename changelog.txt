@@ -6,20 +6,25 @@ Date: 2026-07-03
 
     - Removed the planned settings preset mode and per-technology enable policy dropdowns before release; per-technology enable checkboxes are the single enablement path again.
     - Scripted spoilage preservation and agricultural growth speed now use the same checkbox enablement model as data-stage technology generation.
+    - Spoilage preservation now includes space science in its research cost alongside agricultural and cryogenic science.
+    - Agricultural growth speed now includes electromagnetic and cryogenic science in its research cost alongside agricultural science.
+    - Rocket shooting speed and Cannon shooting speed now use electromagnetic science instead of agricultural science.
     - Added an ordered icon source resolver that can prefer loaded official DLC technology art, use safe base-game fallbacks, or opt into installed-but-disabled official DLC icon files when explicitly enabled.
     - Added fluid-output recipe productivity streams for oil processing, oil cracking, lubricant, sulfuric acid, acid neutralization, Space Age thruster fuel, and Space Age thruster oxidizer recipes.
+    - Oil processing, Oil cracking, Lubricant, and Sulfuric acid productivity now use cryogenic, agricultural, electromagnetic, and metallurgic science respectively instead of using space science as their shared extra pack.
     - Rail productivity now covers Elevated Rails support and ramp recipes when Elevated Rails is active, with supports below rails and ramps one tier lower again.
     - Rail productivity now prefers Elevated Rails technology art when Elevated Rails is active, or when installed official DLC icon paths are explicitly enabled, before falling back to rail item art.
     - Oil cracking productivity now uses the oil processing unlock technology art, and Sulfuric acid productivity now uses sulfuric acid fluid art and includes acid neutralization when that recipe exists.
     - Split Stone product productivity into separate Landfill productivity, Artificial soil productivity, and Molten metals productivity research lines.
     - Landfill productivity now gives +10% for landfill recipes and +5% for foundation recipes, using the landfill technology icon.
-    - Artificial soil productivity now gives +10% for artificial soil recipes and +5% for overgrowth soil recipes, using the artificial soil technology icon.
+    - Artificial soil productivity now gives +10% for artificial soil recipes and +5% for overgrowth soil recipes, using the artificial soil technology icon and including space science in its research cost.
     - Molten metals productivity now gives +10% for molten iron and molten copper from lava, and +5% for iron ore melting and copper ore melting, using the foundry technology icon.
     - Lithium productivity now also gives +5% productivity for the Space Age lithium-from-brine recipe.
     - Added Carbon productivity for carbonic asteroid crushing, advanced carbonic asteroid crushing, and compatible carbon-output recipes.
     - Carbon productivity now gives +5% for burnt spoilage and +2% for coal synthesis.
     - Added Ice productivity for oxide asteroid crushing, advanced oxide asteroid crushing, and compatible ice-output recipes.
     - Added Bacteria cultivation productivity for iron bacteria cultivation and copper bacteria cultivation recipes.
+    - Bacteria cultivation productivity and Breeding productivity now include cryogenic science in their research costs alongside agricultural science.
     - Added fluid prototype lookup, fluid-output recipe matching, fluid icon fallback, and required-fluid gates for fluid-output productivity streams.
     - Added a strictly opt-in startup-only pipeline extent multiplier dropdown. The default value is 100% and leaves fluid box prototypes unchanged.
 

@@ -27,8 +27,8 @@ local EXTENSION_PACKS = {
   ["laser-shooting-speed"] = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack", "military-science-pack", "space-science-pack"},
   research_electric_shooting_speed = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack", "military-science-pack", "electromagnetic-science-pack"},
   research_flamethrower_shooting_speed = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack", "military-science-pack", "space-science-pack"},
-  research_rocket_shooting_speed = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack", "military-science-pack", "agricultural-science-pack"},
-  research_cannon_shooting_speed = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack", "military-science-pack", "agricultural-science-pack"}
+  research_rocket_shooting_speed = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack", "military-science-pack", "electromagnetic-science-pack"},
+  research_cannon_shooting_speed = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack", "military-science-pack", "electromagnetic-science-pack"}
 }
 
 local lab_inputs_cache = nil

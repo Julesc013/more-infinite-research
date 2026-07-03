@@ -10,13 +10,18 @@ This is the short, player-facing release summary for the `2.1.0` mod portal rele
 
 - Removed the planned settings modes and per-technology enable policy dropdowns before release. Per-technology enable checkboxes are the single enablement path.
 - Scripted Spoilage Preservation and Agricultural Growth Speed now follow the same enable checkbox rules as data-stage generated technologies.
+- Spoilage Preservation now includes Space science in its research cost alongside agricultural and cryogenic science.
+- Agricultural Growth Speed now includes electromagnetic and cryogenic science alongside agricultural science.
+- Rocket Shooting Speed and Cannon Shooting Speed now use electromagnetic science instead of agricultural science.
 - Added better icon source resolution. MIR can prefer loaded official DLC art, use base-game fallbacks, or opt into installed-but-disabled official DLC icon files when the user explicitly enables that option.
 - Added fluid-output productivity research for oil processing, oil cracking, lubricant, sulfuric acid, acid neutralization, thruster fuel, and thruster oxidizer recipes where those recipes exist.
+- Oil processing, Oil cracking, Lubricant, and Sulfuric acid productivity now use cryogenic, agricultural, electromagnetic, and metallurgic science respectively instead of sharing Space science as the extra pack.
 - Oil cracking productivity uses oil processing technology art. Sulfuric acid productivity uses sulfuric acid fluid art and also covers acid neutralization when that recipe exists.
-- Split the old Stone product productivity line into Landfill productivity, Artificial soil productivity, and Molten metals productivity.
+- Split the old Stone product productivity line into Landfill productivity, Artificial soil productivity, and Molten metals productivity. Artificial soil productivity now includes Space science in its research cost.
 - Lithium productivity now also covers lithium from brine at a lower per-level rate.
 - Added Carbon productivity and Ice productivity for Space Age asteroid-crushing and compatible output recipes. Carbon productivity also covers burnt spoilage at `+5%` and coal synthesis at `+2%`.
 - Added Bacteria cultivation productivity for Space Age iron and copper bacteria cultivation recipes.
+- Bacteria cultivation productivity and Breeding productivity now include cryogenic science alongside agricultural science.
 - Added an opt-in startup-only pipeline extent multiplier dropdown. The default `100%` setting leaves prototypes unchanged.
 - Added conservative adoption of mod-added recipes into existing vanilla Space Age productivity families for processing units, plastic bars, low density structures, and rocket fuel.
 - Improved replacement of known Plates n Circuit Productivity technologies so MIR can generate the covered replacement effects before removing the competing technologies.

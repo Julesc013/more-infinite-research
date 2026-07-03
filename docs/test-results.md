@@ -2,6 +2,38 @@
 
 This file records local release-candidate validation runs. It is not a substitute for the manual mod matrix in `docs/compatibility.md`.
 
+## 2026-07-03 Release Candidate Science Pack Rebalance
+
+Environment:
+
+- Branch: `dev`.
+- Mod version `2.1.0`.
+- Factorio runtime binary: `C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe`.
+
+Scope:
+
+- Added space science to Spoilage preservation.
+- Added space science to Artificial soil productivity alongside agricultural science.
+- Replaced agricultural science with electromagnetic science for Rocket shooting speed and Cannon shooting speed.
+- Changed fluid productivity extra packs: Oil processing uses cryogenic science, Oil cracking uses agricultural science, Lubricant uses electromagnetic science, and Sulfuric acid uses metallurgic science.
+- Added electromagnetic and cryogenic science to Agricultural growth speed alongside agricultural science.
+- Added cryogenic science to Bacteria cultivation productivity and Breeding productivity alongside agricultural science.
+- Added validation helpers that inspect only the generated report `science=` field so science-pack replacement assertions are not confused by prerequisite fields.
+
+Commands:
+
+```powershell
+.\scripts\Invoke-MIRValidation.ps1 -FactorioBin 'C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe'
+```
+
+Results:
+
+- Full runtime validation passed.
+- The Space Age scripted-candidate scenario now asserts Spoilage preservation includes `space-science-pack`, and Agricultural growth speed includes `agricultural-science-pack`, `electromagnetic-science-pack`, and `cryogenic-science-pack`.
+- The Space Age generation-integrity scenario now asserts Artificial soil productivity includes agricultural and space science, Bacteria cultivation and Breeding include agricultural and cryogenic science, and Rocket/Cannon shooting speed include electromagnetic science without agricultural science.
+- The Space Age fluid-productivity scenario now asserts Oil processing, Oil cracking, Lubricant, and Sulfuric acid productivity use cryogenic, agricultural, electromagnetic, and metallurgic science respectively, without retaining `space-science-pack` in their `science=` fields.
+- Git reported line-ending normalization warnings only.
+
 ## 2026-07-03 Runtime Validation After Compatibility Refactor
 
 Environment:

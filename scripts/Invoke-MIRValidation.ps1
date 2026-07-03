@@ -1610,6 +1610,35 @@ function Assert-ReportLineDoesNotContain {
   }
 }
 
+function Get-ReportScienceField {
+  param([string]$Line)
+  $match = [regex]::Match($Line, " science=([^ ]*) ")
+  if (-not $match.Success) {
+    throw "Generation report line did not include a parseable science field: $Line"
+  }
+  return $match.Groups[1].Value
+}
+
+function Assert-ReportScienceContains {
+  param([string]$Line, [string]$Expected, [string]$Context)
+  $science = Get-ReportScienceField -Line $Line
+  $packs = @()
+  if ($science.Length -gt 0) { $packs = $science -split "," }
+  if ($packs -notcontains $Expected) {
+    throw "$Context science field did not include expected pack '$Expected': $Line"
+  }
+}
+
+function Assert-ReportScienceDoesNotContain {
+  param([string]$Line, [string]$Unexpected, [string]$Context)
+  $science = Get-ReportScienceField -Line $Line
+  $packs = @()
+  if ($science.Length -gt 0) { $packs = $science -split "," }
+  if ($packs -contains $Unexpected) {
+    throw "$Context science field unexpectedly included pack '$Unexpected': $Line"
+  }
+}
+
 function Assert-LogContains {
   param([string]$Expected, [string]$Context)
   $line = Select-String -LiteralPath $FactorioLog -Pattern $Expected -SimpleMatch | Select-Object -Last 1
@@ -1900,7 +1929,13 @@ if ($isFactorio21Line) {
     $spaceAgeScriptedLine = Get-LastStreamReportLine -Key $scriptedStream
     Assert-ReportLineGenerated -Line $spaceAgeScriptedLine -Context "Space Age scripted candidate stream $scriptedStream"
     Assert-ReportLineContains -Line $spaceAgeScriptedLine -Expected "effects=1" -Context "Space Age scripted candidate stream $scriptedStream"
+    if ($scriptedStream -eq "research_spoilage_preservation") {
+      Assert-ReportScienceContains -Line $spaceAgeScriptedLine -Expected "space-science-pack" -Context "Space Age spoilage preservation science pack scenario"
+    }
     if ($scriptedStream -eq "research_agricultural_growth_speed") {
+      Assert-ReportScienceContains -Line $spaceAgeScriptedLine -Expected "agricultural-science-pack" -Context "Space Age agricultural growth speed agricultural science scenario"
+      Assert-ReportScienceContains -Line $spaceAgeScriptedLine -Expected "electromagnetic-science-pack" -Context "Space Age agricultural growth speed electromagnetic science scenario"
+      Assert-ReportScienceContains -Line $spaceAgeScriptedLine -Expected "cryogenic-science-pack" -Context "Space Age agricultural growth speed cryogenic science scenario"
       Assert-ReportLineContains -Line $spaceAgeScriptedLine -Expected "icon=tech:agriculture" -Context "Space Age agricultural growth speed icon scenario"
     }
   }
@@ -1928,6 +1963,24 @@ Assert-DefaultBaseExtensionDiagnostics -Context "Space Age generation integrity 
 $spaceAgeRailsLine = Get-LastStreamReportLine -Key "research_rails"
 Assert-ReportLineContains -Line $spaceAgeRailsLine -Expected "effects=3" -Context "Space Age Elevated Rails productivity scenario"
 Assert-ReportLineContains -Line $spaceAgeRailsLine -Expected "icon=tech:elevated-rail" -Context "Space Age Elevated Rails productivity icon scenario"
+$spaceAgeArtificialSoilLine = Get-LastStreamReportLine -Key "research_artificial_soil"
+Assert-ReportLineGenerated -Line $spaceAgeArtificialSoilLine -Context "Space Age artificial soil productivity scenario"
+Assert-ReportScienceContains -Line $spaceAgeArtificialSoilLine -Expected "agricultural-science-pack" -Context "Space Age artificial soil agricultural science scenario"
+Assert-ReportScienceContains -Line $spaceAgeArtificialSoilLine -Expected "space-science-pack" -Context "Space Age artificial soil space science scenario"
+$spaceAgeBacteriaCultivationLine = Get-LastStreamReportLine -Key "research_bacteria_cultivation"
+Assert-ReportLineGenerated -Line $spaceAgeBacteriaCultivationLine -Context "Space Age bacteria cultivation productivity scenario"
+Assert-ReportScienceContains -Line $spaceAgeBacteriaCultivationLine -Expected "agricultural-science-pack" -Context "Space Age bacteria cultivation agricultural science scenario"
+Assert-ReportScienceContains -Line $spaceAgeBacteriaCultivationLine -Expected "cryogenic-science-pack" -Context "Space Age bacteria cultivation cryogenic science scenario"
+$spaceAgeBreedingLine = Get-LastStreamReportLine -Key "research_breeding"
+Assert-ReportLineGenerated -Line $spaceAgeBreedingLine -Context "Space Age breeding productivity scenario"
+Assert-ReportScienceContains -Line $spaceAgeBreedingLine -Expected "agricultural-science-pack" -Context "Space Age breeding agricultural science scenario"
+Assert-ReportScienceContains -Line $spaceAgeBreedingLine -Expected "cryogenic-science-pack" -Context "Space Age breeding cryogenic science scenario"
+foreach ($weaponSpeedStream in @("research_rocket_shooting_speed", "research_cannon_shooting_speed")) {
+  $weaponSpeedLine = Get-LastStreamReportLine -Key $weaponSpeedStream
+  Assert-ReportLineGenerated -Line $weaponSpeedLine -Context "Space Age weapon shooting speed stream $weaponSpeedStream"
+  Assert-ReportScienceContains -Line $weaponSpeedLine -Expected "electromagnetic-science-pack" -Context "Space Age weapon shooting speed electromagnetic science scenario $weaponSpeedStream"
+  Assert-ReportScienceDoesNotContain -Line $weaponSpeedLine -Unexpected "agricultural-science-pack" -Context "Space Age weapon shooting speed agricultural science replacement scenario $weaponSpeedStream"
+}
 
 Invoke-RuntimeScenario -ScenarioName "space-age-plates-n-circuit-productivity-compat" -EnabledFixtureNames @(
   "mir-fixture-plates-n-circuit-productivity",
@@ -2008,10 +2061,20 @@ Invoke-RuntimeScenario -ScenarioName "space-age-fluid-productivity" -EnabledFixt
   "mir-fixture-assert-fluid-productivity"
 ) -EnableSpaceAge
 Assert-FluidProductivityStreamsGenerated -Context "Space Age fluid productivity scenario" -IncludeThruster
+$spaceAgeOilProcessingLine = Get-LastStreamReportLine -Key "research_oil_processing_productivity"
+Assert-ReportScienceContains -Line $spaceAgeOilProcessingLine -Expected "cryogenic-science-pack" -Context "Space Age oil processing cryogenic science scenario"
+Assert-ReportScienceDoesNotContain -Line $spaceAgeOilProcessingLine -Unexpected "space-science-pack" -Context "Space Age oil processing space science replacement scenario"
 $spaceAgeOilCrackingLine = Get-LastStreamReportLine -Key "research_oil_cracking_productivity"
 Assert-ReportLineContains -Line $spaceAgeOilCrackingLine -Expected "icon=tech:oil-processing" -Context "Space Age oil cracking icon scenario"
+Assert-ReportScienceContains -Line $spaceAgeOilCrackingLine -Expected "agricultural-science-pack" -Context "Space Age oil cracking agricultural science scenario"
+Assert-ReportScienceDoesNotContain -Line $spaceAgeOilCrackingLine -Unexpected "space-science-pack" -Context "Space Age oil cracking space science replacement scenario"
+$spaceAgeLubricantLine = Get-LastStreamReportLine -Key "research_lubricant_productivity"
+Assert-ReportScienceContains -Line $spaceAgeLubricantLine -Expected "electromagnetic-science-pack" -Context "Space Age lubricant electromagnetic science scenario"
+Assert-ReportScienceDoesNotContain -Line $spaceAgeLubricantLine -Unexpected "space-science-pack" -Context "Space Age lubricant space science replacement scenario"
 $spaceAgeSulfuricAcidLine = Get-LastStreamReportLine -Key "research_sulfuric_acid_productivity"
 Assert-ReportLineContains -Line $spaceAgeSulfuricAcidLine -Expected "icon=fluid:sulfuric-acid" -Context "Space Age sulfuric acid icon scenario"
+Assert-ReportScienceContains -Line $spaceAgeSulfuricAcidLine -Expected "metallurgic-science-pack" -Context "Space Age sulfuric acid metallurgic science scenario"
+Assert-ReportScienceDoesNotContain -Line $spaceAgeSulfuricAcidLine -Unexpected "space-science-pack" -Context "Space Age sulfuric acid space science replacement scenario"
 $spaceAgeThrusterFuelLine = Get-LastStreamReportLine -Key "research_thruster_fuel_productivity"
 Assert-ReportLineContains -Line $spaceAgeThrusterFuelLine -Expected "effects=2" -Context "Space Age thruster fuel productivity scenario"
 $spaceAgeThrusterOxidizerLine = Get-LastStreamReportLine -Key "research_thruster_oxidizer_productivity"
