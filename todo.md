@@ -374,6 +374,10 @@ discover facts
 - [x] Add reviewed expected-failure fixture support so grouped reports can distinguish expected and unexpected failures.
 - [x] Add local modpack zip support with `LocalModZips`, `-LocalModZipDirs`, local `source_path` lock entries, and recommended-dependency inclusion for pack wrapper mods.
 - [x] Add offline local mod-library support with `-LocalModLibraryDirs`, `-Offline`, curated `LocalLibraryScenarios`, and mega-smash/local-combination fixtures for read-only downloaded archive collections.
+- [x] Add generated local-library scenarios for all-local mega, metadata clusters, and capped pairwise stress runs.
+- [x] Add local-root sharding for `LocalModZips` with `-ShardLocalModZips`, `-StartIndex`, and `-ShardSize`.
+- [x] Checkpoint `load-results.json` after every scenario so interrupted overnight runs still leave partial results.
+- [x] Emit `missing-dependencies.md/json/csv` from grouped compatibility conversion.
 - [ ] Run the overnight local `2.1` library sweep against `C:\Projects\Factorio\testmods_readonly_2.1` using individual roots plus curated local-library scenarios.
 - [ ] Fill missing dependency zips reported by the local `2.1` library sweep, then rerun only the affected scenarios.
 - [ ] Run a top-25 Mod Portal audit for Factorio `2.1` with real downloads, credentials, and a local Factorio binary.

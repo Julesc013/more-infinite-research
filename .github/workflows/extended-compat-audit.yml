@@ -53,6 +53,20 @@ on:
         required: true
         type: boolean
         default: false
+      include_generated_local_pairwise:
+        description: "Include capped generated pairwise local-library scenarios"
+        required: true
+        type: boolean
+        default: false
+      generated_local_pairwise_limit:
+        description: "Maximum generated local pairwise scenarios"
+        required: true
+        default: "40"
+      shard_local_mod_zips:
+        description: "Apply start_index/shard_size to LocalModZips"
+        required: true
+        type: boolean
+        default: false
       scenario_timeout_seconds:
         description: "Timeout per Factorio scenario load"
         required: true
@@ -91,6 +105,9 @@ jobs:
           EXTENDED_LOCAL_MOD_LIBRARY_DIRS: ${{ github.event.inputs.local_mod_library_dirs || '' }}
           EXTENDED_MANUAL_SCENARIOS_PATH: ${{ github.event.inputs.manual_scenarios_path || '' }}
           EXTENDED_OFFLINE: ${{ github.event.inputs.offline || 'false' }}
+          EXTENDED_INCLUDE_GENERATED_LOCAL_PAIRWISE: ${{ github.event.inputs.include_generated_local_pairwise || 'false' }}
+          EXTENDED_GENERATED_LOCAL_PAIRWISE_LIMIT: ${{ github.event.inputs.generated_local_pairwise_limit || '40' }}
+          EXTENDED_SHARD_LOCAL_MOD_ZIPS: ${{ github.event.inputs.shard_local_mod_zips || 'false' }}
           EXTENDED_SCENARIO_TIMEOUT_SECONDS: ${{ github.event.inputs.scenario_timeout_seconds || '900' }}
           EXTENDED_START_INDEX: ${{ github.event.inputs.start_index || '0' }}
           EXTENDED_SHARD_SIZE: ${{ github.event.inputs.shard_size || '25' }}
@@ -99,6 +116,7 @@ jobs:
           $params = @{
             Tier = $tiers
             ScenarioTimeoutSeconds = [int]$env:EXTENDED_SCENARIO_TIMEOUT_SECONDS
+            GeneratedLocalPairwiseLimit = [int]$env:EXTENDED_GENERATED_LOCAL_PAIRWISE_LIMIT
             StartIndex = [int]$env:EXTENDED_START_INDEX
             ShardSize = [int]$env:EXTENDED_SHARD_SIZE
           }
@@ -131,6 +149,12 @@ jobs:
           }
           if ($env:EXTENDED_OFFLINE -eq "true") {
             $params.Offline = $true
+          }
+          if ($env:EXTENDED_INCLUDE_GENERATED_LOCAL_PAIRWISE -eq "true") {
+            $params.IncludeGeneratedLocalPairwise = $true
+          }
+          if ($env:EXTENDED_SHARD_LOCAL_MOD_ZIPS -eq "true") {
+            $params.ShardLocalModZips = $true
           }
           ./scripts/Invoke-MIRExtendedTests.ps1 @params
 

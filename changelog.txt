@@ -40,6 +40,8 @@ Date: 2026-07-03
     - Added local modpack zip audit support so `tmp/` or explicitly supplied mod zips can be used as compatibility roots while missing dependencies are still resolved through the Mod Portal cache.
     - Added offline local mod-library audit support so read-only zip libraries can satisfy dependency closure before any Mod Portal lookup, plus curated local-library scenarios for planet clusters, resource suites, pack wrappers, and mega-smash stress runs.
     - Fixed compatibility-audit lock entries so local and portal dependency closure reports preserve distinct mod `name` and `version` values during sorting and deduplication.
+    - Added generated local-library compatibility scenarios for all-local mega, metadata-derived clusters, and capped pairwise stress runs, plus local-root sharding and checkpointed load-result output for resumable overnight sweeps.
+    - Added missing-dependency summary artifacts so local-library sweeps produce a concise dependency completion list in addition to grouped compatibility failures.
     - Updated the derived release notes, mod portal copy, roadmap, compatibility docs, manual test plan, TODO, and test-results ledger so the extended audit automation is documented consistently before publishing.
     - Reorganized planning documentation so root `todo.md` is the durable future-work ledger, `changelog.txt` remains the durable past-change ledger, `docs/roadmap.md` carries high-level rationale, and derivative plans/release notes live under `docs/notes/`.
     - Packaged root `todo.md` with the mod archive and added validation coverage so the release package keeps the future-work ledger alongside README and changelog.

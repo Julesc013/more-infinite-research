@@ -23,6 +23,11 @@ param(
   [switch]$RunLoadTests,
   [switch]$RunManualScenarios,
   [switch]$RunLocalModZips,
+  [switch]$RunGeneratedLocalScenarios,
+  [switch]$GenerateLocalMegaScenario,
+  [switch]$GenerateLocalClusterScenarios,
+  [switch]$GenerateLocalPairwiseScenarios,
+  [int]$GeneratedLocalPairwiseLimit = 40,
   [switch]$IncludeRecommendedDependencies,
   [switch]$Offline,
   [string[]]$ScenarioNames = @(),
@@ -406,6 +411,163 @@ function Resolve-MIRLockDependencyNames {
   }
 }
 
+function Get-MIRDependencyNamesFromFullMod {
+  param($FullMod)
+
+  $names = @()
+  foreach ($release in @($FullMod.releases)) {
+    foreach ($dependency in @($release.info_json.dependencies)) {
+      if ([string]::IsNullOrWhiteSpace([string]$dependency)) { continue }
+      $parsed = ConvertFrom-MIRDependencyString -Dependency ([string]$dependency)
+      $names += [string]$parsed.name
+    }
+  }
+  @($names | Sort-Object -Unique)
+}
+
+function Test-MIRLocalModHasCompatibleRelease {
+  param([Parameter(Mandatory)]$FullMod)
+
+  $release = Select-MIRCompatibleRelease -FullMod $FullMod -FactorioVersions $FactorioVersions
+  return $null -ne $release
+}
+
+function Get-MIRCompatibleLocalModNames {
+  param([Parameter(Mandatory)]$FullModsByName)
+
+  @(
+    foreach ($name in @($FullModsByName.Keys | Sort-Object)) {
+      if (Test-MIRLocalModHasCompatibleRelease -FullMod $FullModsByName[$name]) {
+        [string]$name
+      }
+    }
+  )
+}
+
+function Test-MIRLocalNameMatches {
+  param(
+    [Parameter(Mandatory)][string]$Name,
+    [Parameter(Mandatory)]$FullMod,
+    [Parameter(Mandatory)][string]$Pattern
+  )
+
+  $title = [string]$FullMod.title
+  $deps = (Get-MIRDependencyNamesFromFullMod -FullMod $FullMod) -join " "
+  return (($Name + " " + $title + " " + $deps) -match $Pattern)
+}
+
+function New-MIRGeneratedLocalScenarioDefinition {
+  param(
+    [Parameter(Mandatory)][string]$Name,
+    [Parameter(Mandatory)][string[]]$Mods,
+    [bool]$IncludeSpaceAge,
+    [Parameter(Mandatory)][string]$Notes
+  )
+
+  $modList = @($Mods | Where-Object { -not [string]::IsNullOrWhiteSpace([string]$_) } | Sort-Object -Unique)
+  if ($modList.Count -eq 0) { return $null }
+  [pscustomobject]@{
+    name = $Name
+    include_space_age = $IncludeSpaceAge
+    mods = $modList
+    notes = $Notes
+  }
+}
+
+function New-MIRGeneratedLocalScenarioDefinitions {
+  param([Parameter(Mandatory)]$FullModsByName)
+
+  $compatibleNames = @(Get-MIRCompatibleLocalModNames -FullModsByName $FullModsByName)
+  $definitions = @()
+
+  if ($GenerateLocalMegaScenario -or (-not $GenerateLocalClusterScenarios -and -not $GenerateLocalPairwiseScenarios)) {
+    $definitions += New-MIRGeneratedLocalScenarioDefinition `
+      -Name "generated-local-2-1-mega-all" `
+      -Mods $compatibleNames `
+      -IncludeSpaceAge $true `
+      -Notes "Generated stress scenario: all locally available compatible mods enabled together with the official Space Age bundle."
+  }
+
+  if ($GenerateLocalClusterScenarios) {
+    $clusterPatterns = @(
+      [pscustomobject]@{
+        name = "generated-local-2-1-cluster-planets"
+        include_space_age = $true
+        pattern = "(?i)(planet|moon|space-age|Cerys|Fulgora|corrundum|cubium|lignumis|Moshine|muluna|rubia|secretas|panglia|Paracelsin|rabbasca|vesta|aquilo|gleba|Muria|carna|linox|foliax|nauv|Small-Space-Age|warptorio)"
+        notes = "Generated cluster scenario for locally available planet and Space Age content mods."
+      },
+      [pscustomobject]@{
+        name = "generated-local-2-1-cluster-bz-resources"
+        include_space_age = $true
+        pattern = "(?i)^(bz|bzt|bzz)|resource|ore|carbon|lead|silicon|tin|titanium|zirconium"
+        notes = "Generated cluster scenario for locally available BZ/resource-chain mods."
+      },
+      [pscustomobject]@{
+        name = "generated-local-2-1-cluster-bob"
+        include_space_age = $false
+        pattern = "(?i)^bob"
+        notes = "Generated cluster scenario for locally available Bob mods."
+      },
+      [pscustomobject]@{
+        name = "generated-local-2-1-cluster-krastorio"
+        include_space_age = $true
+        pattern = "(?i)Krastorio|k2so|K2"
+        notes = "Generated cluster scenario for locally available Krastorio and K2SO mods."
+      },
+      [pscustomobject]@{
+        name = "generated-local-2-1-cluster-production-fluids"
+        include_space_age = $true
+        pattern = "(?i)refin|chem|fluid|casting|foundry|molten|metal|ore|plutonium|carbon|mineral|hot-metals|more-casting"
+        notes = "Generated cluster scenario for locally available production, fluid, casting, and resource-flow mods."
+      },
+      [pscustomobject]@{
+        name = "generated-local-2-1-cluster-logistics-transport"
+        include_space_age = $true
+        pattern = "(?i)train|cargo|ship|loader|inserter|belt|logistic|transport|rail|space-platform"
+        notes = "Generated cluster scenario for locally available logistics, transport, rail, cargo, and inserter mods."
+      }
+    )
+
+    foreach ($cluster in $clusterPatterns) {
+      $mods = @(
+        foreach ($name in $compatibleNames) {
+          if (Test-MIRLocalNameMatches -Name $name -FullMod $FullModsByName[$name] -Pattern $cluster.pattern) {
+            [string]$name
+          }
+        }
+      )
+      $definition = New-MIRGeneratedLocalScenarioDefinition -Name $cluster.name -Mods $mods -IncludeSpaceAge ([bool]$cluster.include_space_age) -Notes ([string]$cluster.notes)
+      if ($null -ne $definition) { $definitions += $definition }
+    }
+  }
+
+  if ($GenerateLocalPairwiseScenarios) {
+    $pairPool = @(
+      foreach ($name in $compatibleNames) {
+        if (Test-MIRLocalNameMatches -Name $name -FullMod $FullModsByName[$name] -Pattern "(?i)planet|moon|space-age|bz|bob|Krastorio|refin|chem|casting|ore|resource|train|cargo|ship|logistic|inserter") {
+          [string]$name
+        }
+      }
+    ) | Sort-Object -Unique
+
+    $pairCount = 0
+    for ($i = 0; $i -lt $pairPool.Count; $i++) {
+      for ($j = $i + 1; $j -lt $pairPool.Count; $j++) {
+        if ($pairCount -ge $GeneratedLocalPairwiseLimit) { break }
+        $pairCount++
+        $definitions += New-MIRGeneratedLocalScenarioDefinition `
+          -Name ("generated-local-2-1-pair-{0:D3}" -f $pairCount) `
+          -Mods @($pairPool[$i], $pairPool[$j]) `
+          -IncludeSpaceAge $true `
+          -Notes ("Generated capped pairwise local-library scenario: {0} + {1}." -f $pairPool[$i], $pairPool[$j])
+      }
+      if ($pairCount -ge $GeneratedLocalPairwiseLimit) { break }
+    }
+  }
+
+  @($definitions | Where-Object { $null -ne $_ })
+}
+
 $exclusions = Read-MIRJsonFile -Path $KnownExclusions -Fallback ([pscustomobject]@{
   mod_names = @()
   categories = @("localizations", "internal")
@@ -692,6 +854,29 @@ if ($RunManualScenarios) {
   }
 }
 
+if ($RunGeneratedLocalScenarios) {
+  if ($localFullModsByName.Count -eq 0) {
+    throw "RunGeneratedLocalScenarios requires -LocalModZipDirs, -LocalModZips, -LocalModLibraryDirs, or -LocalModLibraryZips."
+  }
+
+  $generatedDefinitions = @(New-MIRGeneratedLocalScenarioDefinitions -FullModsByName $localFullModsByName)
+  if ($ScenarioNames.Count -gt 0) {
+    $scenarioLookup = @{}
+    foreach ($name in $ScenarioNames) { $scenarioLookup[[string]$name] = $true }
+    $generatedDefinitions = @($generatedDefinitions | Where-Object { $scenarioLookup.ContainsKey([string]$_.name) })
+  }
+
+  foreach ($scenario in $generatedDefinitions) {
+    Write-Host "[compat-audit] inspecting generated local scenario $($scenario.name)"
+    $selectedScenarios += Resolve-MIRPortalScenario `
+      -Name ([string]$scenario.name) `
+      -Type "generated_local" `
+      -RequestedMods @($scenario.mods | ForEach-Object { [string]$_ }) `
+      -EnableSpaceAgeBundle ([bool]$scenario.include_space_age) `
+      -Notes ([string]$scenario.notes)
+  }
+}
+
 if ($RunLocalModZips) {
   if ($localRootFullModsByName.Count -eq 0) {
     throw "RunLocalModZips requires -LocalModZipDirs or -LocalModZips."
@@ -708,6 +893,8 @@ if ($RunLocalModZips) {
     }
     $localNames = @($localNames | Where-Object { $localLookup.ContainsKey([string]$_) })
   }
+
+  $localNames = @(Select-MIRWindow -Items $localNames)
 
   foreach ($localName in $localNames) {
     Write-Host "[compat-audit] inspecting local zip scenario $localName"
@@ -764,6 +951,7 @@ $lock = [ordered]@{
   local_library_zip_count = $localLibraryZipPaths.Count
   candidates_selected = @($selectedScenarios | Where-Object { $_.type -eq "catalog" } | ForEach-Object { $_.name })
   manual_scenarios_selected = @($selectedScenarios | Where-Object { $_.type -eq "manual" } | ForEach-Object { $_.name })
+  generated_local_scenarios_selected = @($selectedScenarios | Where-Object { $_.type -eq "generated_local" } | ForEach-Object { $_.name })
   local_zip_scenarios_selected = @($selectedScenarios | Where-Object { $_.type -eq "local_zip" } | ForEach-Object { $_.name })
   mods = $lockEntries
 }
@@ -793,6 +981,7 @@ $scenarioSummaries = @($selectedScenarios | ForEach-Object {
   lockfile = $lockPath
   selected_count = @($selectedScenarios | Where-Object { $_.type -eq "catalog" }).Count
   manual_selected_count = @($selectedScenarios | Where-Object { $_.type -eq "manual" }).Count
+  generated_local_selected_count = @($selectedScenarios | Where-Object { $_.type -eq "generated_local" }).Count
   local_zip_selected_count = @($selectedScenarios | Where-Object { $_.type -eq "local_zip" }).Count
   offline = [bool]$Offline
   local_root_zip_count = $localRootZipPaths.Count
@@ -825,6 +1014,7 @@ $report += "- Local library zip inputs: $($localLibraryZipPaths.Count)"
 $report += "- Local zip inputs total: $($localZipPaths.Count)"
 $report += "- Catalog scenarios: $(@($selectedScenarios | Where-Object { $_.type -eq "catalog" }).Count)"
 $report += "- Manual scenarios: $(@($selectedScenarios | Where-Object { $_.type -eq "manual" }).Count)"
+$report += "- Generated local scenarios: $(@($selectedScenarios | Where-Object { $_.type -eq "generated_local" }).Count)"
 $report += "- Local zip scenarios: $(@($selectedScenarios | Where-Object { $_.type -eq "local_zip" }).Count)"
 $report += "- Locked mods including dependencies: $($lockEntries.Count)"
 $report += "- Failures: $($failures.Count)"
@@ -880,6 +1070,8 @@ if ($RunLoadTests) {
 
   $runRoot = New-MIRDirectory -Path (Join-Path $resolvedOutputDir "runs")
   $results = @()
+  $loadResultsPath = Join-Path $resolvedOutputDir "load-results.json"
+  $manualResultsPath = Join-Path $resolvedOutputDir "manual-results.json"
   $scenarioList = @($selectedScenarios)
   for ($scenarioIndex = 0; $scenarioIndex -lt $scenarioList.Count; $scenarioIndex++) {
     $scenario = $scenarioList[$scenarioIndex]
@@ -892,14 +1084,19 @@ if ($RunLoadTests) {
     $scenarioStarted = Get-Date
     $result = Invoke-MIRScenarioLoad -Scenario $scenario
     $results += $result
+    $results | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $loadResultsPath -Encoding UTF8
+    $manualResults = @($results | Where-Object { $_.type -in @("manual", "generated_local") })
+    if ($manualResults.Count -gt 0) {
+      $manualResults | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $manualResultsPath -Encoding UTF8
+    }
     $scenarioSeconds = [math]::Round(((Get-Date) - $scenarioStarted).TotalSeconds, 2)
     Write-Host ("[compat-audit] load {0}/{1} result scenario={2} passed={3} skipped={4} timed_out={5} exit_code={6} audit_rows={7} seconds={8}" -f $displayIndex, $scenarioList.Count, $scenario.name, $result.passed, $result.skipped, $result.timed_out, $result.exit_code, @($result.audit_rows).Count, $scenarioSeconds)
     if ($FailFast -and $result.passed -ne $true) { throw "Load test failed for $($scenario.name)." }
   }
-  $results | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath (Join-Path $resolvedOutputDir "load-results.json") -Encoding UTF8
-  $manualResults = @($results | Where-Object { $_.type -eq "manual" })
+  $results | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $loadResultsPath -Encoding UTF8
+  $manualResults = @($results | Where-Object { $_.type -in @("manual", "generated_local") })
   if ($manualResults.Count -gt 0) {
-    $manualResults | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath (Join-Path $resolvedOutputDir "manual-results.json") -Encoding UTF8
+    $manualResults | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $manualResultsPath -Encoding UTF8
   }
 }
 

@@ -1,6 +1,6 @@
 # Manual Test Plan
 
-Updated: 2026-07-03
+Updated: 2026-07-04
 
 This document defines named manual saves and scenarios. Runtime fixture validation is necessary, but it does not replace save-level gameplay validation.
 
@@ -65,6 +65,10 @@ Automated fixture validation now covers the release-candidate claims for the lar
 | `extended-compat-manual-scenarios` | Run `Invoke-MIRCompatAudit.ps1 -RunManualScenarios` or `Invoke-MIRExtendedTests.ps1 -Tier ManualScenarios -CollectAll` against the executable curated scenario fixture |
 | `extended-compat-top25-base-space-age` | Run the top-25 base and Space Age audit tiers with credentials, parse grouped expected/unexpected failures, and only promote repeatable MIR-owned issues into profile work |
 | `extended-compat-strict-gate` | Run `Invoke-MIRExtendedTests.ps1 -Tier Static,Runtime,AuditSmoke -FailFast -FailOnAuditFailures` before treating wrapper pass/fail as a release gate |
+| `offline-local-library-2-1-curated` | Run `Invoke-MIRExtendedTests.ps1 -Tier LocalLibraryScenarios -LocalModLibraryDirs C:\Projects\Factorio\testmods_readonly_2.1 -Offline -CollectAll` to cover curated local combinations first |
+| `offline-local-library-2-1-generated` | Run `Invoke-MIRExtendedTests.ps1 -Tier GeneratedLocalScenarios -LocalModLibraryDirs C:\Projects\Factorio\testmods_readonly_2.1 -Offline -CollectAll` to cover generated all-local mega and metadata-cluster stress scenarios |
+| `offline-local-library-2-1-individual-roots` | Run `Invoke-MIRExtendedTests.ps1 -Tier LocalModZips -LocalModZipDirs C:\Projects\Factorio\testmods_readonly_2.1 -LocalModLibraryDirs C:\Projects\Factorio\testmods_readonly_2.1 -Offline -CollectAll` to test each downloaded local zip as a root scenario |
+| `offline-local-library-2-1-recovery` | Confirm interrupted local sweeps still leave readable `overnight.log`, checkpointed `load-results.json`, grouped `compat-failures.grouped.json`, and `missing-dependencies.*` outputs |
 
 ## v2.1.x Spikes
 

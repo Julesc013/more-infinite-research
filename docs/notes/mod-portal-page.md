@@ -14,7 +14,7 @@ It is built for players who want more long-term scaling for late-game megabases,
 - Startup settings let you enable, disable, cap, or rebalance almost every generated research.
 - Works with Factorio `2.1`; requires `base >= 2.1.8`. Space Age is optional.
 - Version `2.1.0` keeps generated technology IDs stable except for documented migrations: it retains the migration that merges the old trash-slot research into Character inventory slots, and it migrates retired Stone product productivity progress into Landfill productivity after the stone-product stream is split.
-- Version `2.1.0` also ships local compatibility-audit tooling for release maintainers: curated scenario execution, local modpack zip roots, offline read-only mod-library dependency resolution, sharded Mod Portal audits, per-scenario timeouts, grouped expected/unexpected failure summaries, strict and exploratory wrapper modes, and review-only profile-stub generation.
+- Version `2.1.0` also ships local compatibility-audit tooling for release maintainers: curated scenario execution, generated local-library mega/cluster/pairwise scenarios, local modpack zip roots, offline read-only mod-library dependency resolution, sharded Mod Portal audits, checkpointed load-result output, missing-dependency summaries, per-scenario timeouts, grouped expected/unexpected failure summaries, strict and exploratory wrapper modes, and review-only profile-stub generation.
 
 Recipe productivity researches are infinite, but Factorio's recipe productivity cap still applies. Once a recipe reaches that cap, more levels may no longer improve that recipe.
 
@@ -190,7 +190,7 @@ When this mod is set to prefer its own overlapping research, it only removes kno
 
 Compatibility is broad, but not guaranteed for every overhaul. Mods that change recipes or labs very late in loading may still need load-order compatibility.
 
-For maintainers and pack authors, the repository includes an extended local audit workflow. With a Factorio binary and Mod Portal credentials, it can run top-download audits; with read-only local mod zip libraries, it can also run offline individual-root and curated-combination sweeps. The workflow supports curated overhaul scenarios, local modpack zip roots, parsed MIR diagnostics, grouped expected/unexpected failure reports, and review-only compatibility profile stubs. Exploratory runs collect all scenarios for triage; strict runs can fail on unexpected grouped failures. These tools are for evidence collection; they do not automatically enable new compatibility profiles.
+For maintainers and pack authors, the repository includes an extended local audit workflow. With a Factorio binary and Mod Portal credentials, it can run top-download audits; with read-only local mod zip libraries, it can also run offline individual-root, curated-combination, and generated local-library stress sweeps. The workflow supports curated overhaul scenarios, local modpack zip roots, parsed MIR diagnostics, checkpointed load results, missing-dependency summaries, grouped expected/unexpected failure reports, and review-only compatibility profile stubs. Exploratory runs collect all scenarios for triage; strict runs can fail on unexpected grouped failures. These tools are for evidence collection; they do not automatically enable new compatibility profiles.
 
 ## Troubleshooting
 

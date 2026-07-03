@@ -7,6 +7,7 @@ param(
     "Top25SpaceAge",
     "ManualScenarios",
     "LocalLibraryScenarios",
+    "GeneratedLocalScenarios",
     "LocalModZips",
     "Full10KBase",
     "Full10KSpaceAge",
@@ -29,11 +30,14 @@ param(
   [int]$ShardSize = 25,
   [int]$StartIndex = 0,
   [int]$ScenarioTimeoutSeconds = 900,
+  [int]$GeneratedLocalPairwiseLimit = 40,
   [switch]$FailFast,
   [switch]$FailOnAuditFailures,
   [switch]$CollectAll,
   [switch]$ContinueOnDependencyFailure,
   [switch]$IncludeFullAudit,
+  [switch]$IncludeGeneratedLocalPairwise,
+  [switch]$ShardLocalModZips,
   [switch]$Offline
 )
 
@@ -141,13 +145,14 @@ function Invoke-MIRCompatAuditTier {
     [int]$CatalogPages = 0,
     [switch]$RunManualScenarios,
     [switch]$RunLocalModZips,
+    [switch]$RunGeneratedLocalScenarios,
     [switch]$FullAudit,
     [switch]$IncludeRecommendedDependencies,
     [string]$ManualScenariosPathOverride
   )
 
   Assert-MIRFactorioBin
-  if ($MaxCandidates -ne 0 -or $RunManualScenarios -or $RunLocalModZips) {
+  if ($MaxCandidates -ne 0 -or $RunManualScenarios -or $RunLocalModZips -or $RunGeneratedLocalScenarios) {
     Assert-MIRModPortalCredentials
   }
 
@@ -195,10 +200,24 @@ function Invoke-MIRCompatAuditTier {
     $auditParams.RunLocalModZips = $true
     $auditParams.IncludeRecommendedDependencies = $true
   }
+  if ($RunGeneratedLocalScenarios) {
+    $auditParams.RunGeneratedLocalScenarios = $true
+    $auditParams.GenerateLocalMegaScenario = $true
+    $auditParams.GenerateLocalClusterScenarios = $true
+    $auditParams.IncludeRecommendedDependencies = $true
+    if ($IncludeGeneratedLocalPairwise) {
+      $auditParams.GenerateLocalPairwiseScenarios = $true
+      $auditParams.GeneratedLocalPairwiseLimit = $GeneratedLocalPairwiseLimit
+    }
+  }
   if ($IncludeRecommendedDependencies) {
     $auditParams.IncludeRecommendedDependencies = $true
   }
   if ($FullAudit) {
+    $auditParams.StartIndex = $StartIndex
+    $auditParams.Count = $ShardSize
+  }
+  if ($RunLocalModZips -and $ShardLocalModZips) {
     $auditParams.StartIndex = $StartIndex
     $auditParams.Count = $ShardSize
   }
@@ -281,6 +300,11 @@ foreach ($entry in $expandedTiers) {
         Invoke-MIRCompatAuditTier -Name "local-library-scenarios" -RunManualScenarios -IncludeRecommendedDependencies -MaxCandidates 0 -CatalogPages 0 -ManualScenariosPathOverride $scenarioPath
       }
     }
+    "GeneratedLocalScenarios" {
+      Invoke-MIRStep -Name "GeneratedLocalScenarios" -Action {
+        Invoke-MIRCompatAuditTier -Name "generated-local-scenarios" -RunGeneratedLocalScenarios -MaxCandidates 0 -CatalogPages 0
+      }
+    }
     "LocalModZips" {
       Invoke-MIRStep -Name "LocalModZips" -Action {
         Invoke-MIRCompatAuditTier -Name "local-mod-zips" -RunLocalModZips -MaxCandidates 0 -CatalogPages 0
@@ -335,6 +359,9 @@ $summaryMd = Join-Path $outputRootPath "extended-summary.md"
   local_mod_library_dirs = @($LocalModLibraryDirs)
   local_mod_library_zips = @($LocalModLibraryZips)
   local_mod_names = @($LocalModNames)
+  include_generated_local_pairwise = [bool]$IncludeGeneratedLocalPairwise
+  generated_local_pairwise_limit = $GeneratedLocalPairwiseLimit
+  shard_local_mod_zips = [bool]$ShardLocalModZips
   scenario_timeout_seconds = $ScenarioTimeoutSeconds
   start_index = $StartIndex
   shard_size = $ShardSize
@@ -374,6 +401,9 @@ if ($LocalModLibraryZips.Count -gt 0) {
 if ($LocalModNames.Count -gt 0) {
   $md += ('- Local mod names: `{0}`' -f ($LocalModNames -join ', '))
 }
+$md += ('- Include generated local pairwise: `{0}`' -f ([bool]$IncludeGeneratedLocalPairwise))
+$md += ('- Generated local pairwise limit: `{0}`' -f $GeneratedLocalPairwiseLimit)
+$md += ('- Shard local mod zips: `{0}`' -f ([bool]$ShardLocalModZips))
 $md += ""
 $md += "| Step | Status | Seconds | Message |"
 $md += "| --- | --- | ---: | --- |"

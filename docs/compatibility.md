@@ -151,12 +151,14 @@ The tiered wrapper is the recommended entry point for repeatable local and self-
 .\scripts\Invoke-MIRExtendedTests.ps1 -Tier Static,Runtime,AuditSmoke -FailFast -FailOnAuditFailures
 .\scripts\Invoke-MIRExtendedTests.ps1 -Tier Top25Base,Top25SpaceAge,ManualScenarios -CollectAll
 .\scripts\Invoke-MIRExtendedTests.ps1 -Tier LocalModZips -LocalModZipDirs .\tmp -CollectAll
-.\scripts\Invoke-MIRExtendedTests.ps1 -Tier LocalModZips,LocalLibraryScenarios -LocalModZipDirs C:\Projects\Factorio\testmods_readonly_2.1 -LocalModLibraryDirs C:\Projects\Factorio\testmods_readonly_2.1 -Offline -CollectAll
+.\scripts\Invoke-MIRExtendedTests.ps1 -Tier LocalLibraryScenarios,GeneratedLocalScenarios,LocalModZips -LocalModZipDirs C:\Projects\Factorio\testmods_readonly_2.1 -LocalModLibraryDirs C:\Projects\Factorio\testmods_readonly_2.1 -Offline -CollectAll
 .\scripts\Invoke-MIRExtendedTests.ps1 -Tier Full10KSpaceAge -IncludeFullAudit -StartIndex 0 -ShardSize 25 -CollectAll
 .\scripts\Invoke-MIRExtendedTests.ps1 -Tier Full10KSpaceAge -IncludeFullAudit -FromLockfile .\artifacts\compat-audit-locks\compat-candidates.lock.json -StartIndex 25 -ShardSize 25 -CollectAll
 ```
 
-The offline local-library command is the preferred shape for overnight testing against hand-downloaded archives. It covers each individual local root zip, plus curated combinations from `fixtures/compat-matrix/local-library-scenarios.json`: raw Space Age baseline, planet clusters, BZ/resource suites, Krastorio/Spaced Out, Bob, pack-wrapper mods, and deliberate mega-smash scenarios. Missing dependencies and impossible mod combinations are expected to appear as grouped failures; they are still useful evidence because they distinguish "not testable with this local library" from actual MIR generation regressions.
+The offline local-library command is the preferred shape for overnight testing against hand-downloaded archives. Run the strict release gate separately with `-FailFast -FailOnAuditFailures`, then run the local sweep with `-CollectAll`. The prioritized local sweep covers curated combinations from `fixtures/compat-matrix/local-library-scenarios.json`, generated all-local/cluster stress scenarios, and then each individual local root zip. Missing dependencies and impossible mod combinations are expected to appear as grouped failures; they are still useful evidence because they distinguish "not testable with this local library" from actual MIR generation regressions.
+
+`GeneratedLocalScenarios` creates scenarios from local zip metadata: one all-local mega scenario, cluster scenarios for planet/Space Age content, BZ/resource chains, Bob, Krastorio/K2SO, production/fluid/casting/resource-flow mods, and logistics/transport mods. Add `-IncludeGeneratedLocalPairwise -GeneratedLocalPairwiseLimit 40` to the wrapper when you want a capped pairwise pass inside high-risk local clusters. `LocalModZips` can be sharded with `-ShardLocalModZips -StartIndex N -ShardSize M`; without `-ShardLocalModZips`, it tests every local root.
 
 Do not mix Factorio lines unintentionally. The current `2.1.0` package targets Factorio `2.1`; with a Factorio `2.1.x` binary, use `testmods_readonly_2.1` as the primary local library. `testmods_readonly_2.0` is useful for inventory and future legacy tests, but true `2.0` runtime validation requires a compatible Factorio `2.0` binary and a mod package line that can load there.
 
@@ -170,7 +172,9 @@ Load-test mode enables the root candidate, its required Mod Portal dependency cl
 
 Scenarios with unresolved required dependencies are skipped before Factorio startup by default and grouped as dependency failures. Pass `-ContinueOnDependencyFailure` only when intentionally testing a partial modset. Each Factorio load check has a timeout controlled by `-ScenarioTimeoutSeconds`; timed-out processes are killed and grouped as `timeout` failures rather than blocking the entire run.
 
-Load-test runs print per-scenario start/result progress lines with the scenario index, type, root mods, dependency-failure count, pass/skip/timeout status, exit code, parsed audit-row count, and elapsed seconds. For unattended local runs, pipe all streams through `Tee-Object` so progress stays visible in the terminal and is also written to an overnight log.
+Load-test runs print per-scenario start/result progress lines with the scenario index, type, root mods, dependency-failure count, pass/skip/timeout status, exit code, parsed audit-row count, and elapsed seconds. `load-results.json` is checkpointed after each scenario, so a partially interrupted run can still be inspected and converted. For unattended local runs, pipe all streams through `Tee-Object` so progress stays visible in the terminal and is also written to an overnight log.
+
+The grouped converter writes `missing-dependencies.md`, `missing-dependencies.json`, and `missing-dependencies.csv` next to `compat-summary.md`. Use those files as the local-library completion list before treating dependency failures as MIR compatibility problems.
 
 Expected failures should be added only after review to `fixtures/compat-matrix/expected-failures.json`. The converter still reports them, but separates `expected_count` from `unexpected_count`; strict wrapper gates fail on unexpected groups.
 

@@ -191,6 +191,62 @@ Overnight interpretation:
 - `LocalLibraryScenarios` runs curated local combinations from `fixtures/compat-matrix/local-library-scenarios.json`.
 - Missing dependency archives and impossible mod combinations should be grouped as dependency/load failures and reviewed before being marked expected.
 
+## 2026-07-04 Offline Overnight Sweep Hardening
+
+Environment:
+
+- Branch: `dev`.
+- Mod version `2.1.0`.
+
+Scope:
+
+- Added `RunGeneratedLocalScenarios` to the compatibility audit runner.
+- Added `GeneratedLocalScenarios` to the extended wrapper.
+- Generated local scenarios now include an all-local mega scenario, metadata-derived cluster scenarios, and optional capped pairwise scenarios.
+- Added `-ShardLocalModZips` on the wrapper so `LocalModZips` can use `-StartIndex` and `-ShardSize` without changing the default all-root behavior.
+- Checkpointed `load-results.json` after every scenario so interrupted overnight runs still leave parseable partial results.
+- Added `missing-dependencies.md`, `missing-dependencies.json`, and `missing-dependencies.csv` to the grouped-result converter.
+- Updated README, compatibility docs, changelog, TODO, validation snippets, and self-hosted workflow inputs for generated local scenarios and resumable local sweeps.
+
+Recommended overnight ordering:
+
+```text
+strict release gate:
+  Static -> Runtime -> AuditSmoke
+
+local 2.1 exploratory sweep:
+  LocalLibraryScenarios -> GeneratedLocalScenarios -> LocalModZips
+```
+
+Interpretation:
+
+- The strict gate stops immediately on deterministic MIR failures.
+- The local sweep uses `-CollectAll` so dependency failures, load failures, and timeouts are recorded instead of stopping the night.
+- `LocalLibraryScenarios` gives the highest-value curated combinations first.
+- `GeneratedLocalScenarios` follows with all-local and metadata-derived cluster stress tests.
+- `LocalModZips` then tests every individual local root zip; add `-ShardLocalModZips -StartIndex N -ShardSize M` for chunked reruns.
+- `missing-dependencies.*` is the first morning artifact to inspect when many scenarios skip before Factorio startup.
+
+Commands:
+
+```powershell
+.\scripts\Invoke-MIRCompatAudit.ps1 -RunGeneratedLocalScenarios -GenerateLocalMegaScenario -GenerateLocalClusterScenarios -LocalModLibraryDirs 'C:\Projects\Factorio\testmods_readonly_2.1' -Offline -IncludeRecommendedDependencies -MaxCandidates 0 -CatalogPages 0 -FactorioVersions 2.1 -OutputDir .\build\generated-local-offline-smoke
+.\scripts\Convert-MIRCompatAuditResults.ps1 -AuditDir .\build\generated-local-offline-smoke
+.\scripts\Invoke-MIRCompatAudit.ps1 -RunLocalModZips -LocalModZipDirs 'C:\Projects\Factorio\testmods_readonly_2.1' -LocalModLibraryDirs 'C:\Projects\Factorio\testmods_readonly_2.1' -Offline -IncludeRecommendedDependencies -MaxCandidates 0 -CatalogPages 0 -FactorioVersions 2.1 -StartIndex 0 -Count 3 -OutputDir .\build\local-zips-shard-smoke
+.\scripts\Convert-MIRCompatAuditResults.ps1 -AuditDir .\build\local-zips-shard-smoke
+.\scripts\Invoke-MIRCompatAudit.ps1 -RunManualScenarios -ManualScenariosPath .\fixtures\compat-matrix\local-library-scenarios.json -ScenarioNames local-2-1-bz-suite-space-age -LocalModLibraryDirs 'C:\Projects\Factorio\testmods_readonly_2.1' -Offline -IncludeRecommendedDependencies -MaxCandidates 0 -CatalogPages 0 -FactorioVersions 2.1 -FactorioBin 'C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe' -RunLoadTests -ScenarioTimeoutSeconds 300 -OutputDir .\build\local-library-bz-checkpoint-smoke
+.\scripts\Convert-MIRCompatAuditResults.ps1 -AuditDir .\build\local-library-bz-checkpoint-smoke
+.\scripts\Invoke-MIRExtendedTests.ps1 -Tier Static,Runtime,AuditSmoke -FactorioBin 'C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe' -FailFast -FailOnAuditFailures -OutputRoot .\artifacts\overnight-hardening-preflight-release-gate
+```
+
+Result:
+
+- Parser checks passed for the edited audit, wrapper, converter, and validation scripts.
+- Generated local metadata smoke selected `7` generated scenarios from `150` local `2.1` zips and wrote grouped failure plus `missing-dependencies.*` artifacts.
+- Local root sharding smoke selected exactly `3` `LocalModZips` scenarios from `-StartIndex 0 -Count 3`.
+- BZ Space Age local-library load smoke passed with exit code `0`, no timeout, no skip, and `87` parsed MIR audit rows.
+- Strict release gate passed: `Static`, `Runtime`, and deterministic `AuditSmoke`.
+
 ## 2026-07-04 Release Documentation Synchronization
 
 Environment:

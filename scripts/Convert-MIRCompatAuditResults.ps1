@@ -285,9 +285,44 @@ $profileCandidates = @(
     }
 )
 
+$missingDependencyRows = @(
+  $reportFailures |
+    Where-Object {
+      $phase = [string](Get-MIRObjectProperty -Object $_ -Name "phase")
+      $phase -in @("dependency-resolution", "metadata", "release-selection")
+    } |
+    ForEach-Object {
+      [pscustomobject]@{
+        scenario = [string](Get-MIRObjectProperty -Object $_ -Name "scenario")
+        mod = [string](Get-MIRObjectProperty -Object $_ -Name "name")
+        phase = [string](Get-MIRObjectProperty -Object $_ -Name "phase")
+        error = [string](Get-MIRObjectProperty -Object $_ -Name "error")
+      }
+    }
+)
+
+$missingDependencySummary = @(
+  $missingDependencyRows |
+    Group-Object mod |
+    Sort-Object -Property @{ Expression = "Count"; Descending = $true }, @{ Expression = "Name"; Descending = $false } |
+    ForEach-Object {
+      $rows = @($_.Group)
+      [ordered]@{
+        mod = [string]$_.Name
+        count = [int]$_.Count
+        phases = @($rows | ForEach-Object { $_.phase } | Sort-Object -Unique)
+        scenarios = @($rows | ForEach-Object { $_.scenario } | Sort-Object -Unique)
+        sample_error = [string]$rows[0].error
+      }
+    }
+)
+
 $groupedPath = Join-Path $resolvedOutputDir "compat-failures.grouped.json"
 $summaryPath = Join-Path $resolvedOutputDir "compat-summary.md"
 $profilePath = Join-Path $resolvedOutputDir "profile-candidates.json"
+$missingJsonPath = Join-Path $resolvedOutputDir "missing-dependencies.json"
+$missingCsvPath = Join-Path $resolvedOutputDir "missing-dependencies.csv"
+$missingMdPath = Join-Path $resolvedOutputDir "missing-dependencies.md"
 
 [ordered]@{
   schema = 1
@@ -305,6 +340,39 @@ $profilePath = Join-Path $resolvedOutputDir "profile-candidates.json"
   candidates = $profileCandidates
 } | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $profilePath -Encoding UTF8
 
+[ordered]@{
+  schema = 1
+  generated_at = (Get-Date).ToString("yyyy-MM-ddTHH:mm:ssK")
+  audit_dir = $resolvedAuditDir
+  missing_dependency_count = $missingDependencySummary.Count
+  total_missing_dependency_rows = $missingDependencyRows.Count
+  missing_dependencies = $missingDependencySummary
+} | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $missingJsonPath -Encoding UTF8
+
+if ($missingDependencyRows.Count -gt 0) {
+  $missingDependencyRows | Export-Csv -NoTypeInformation -LiteralPath $missingCsvPath
+} else {
+  "scenario,mod,phase,error" | Set-Content -LiteralPath $missingCsvPath -Encoding UTF8
+}
+
+$missingMd = @()
+$missingMd += "# MIR Missing Dependency Summary"
+$missingMd += ""
+$missingMd += ('- Audit dir: `{0}`' -f $resolvedAuditDir)
+$missingMd += "- Distinct missing/incompatible dependencies: $($missingDependencySummary.Count)"
+$missingMd += "- Total dependency failure rows: $($missingDependencyRows.Count)"
+$missingMd += ""
+if ($missingDependencySummary.Count -eq 0) {
+  $missingMd += "No dependency-resolution, metadata, or release-selection failures detected."
+} else {
+  $missingMd += "| Mod | Count | Phases | Scenarios | Sample error |"
+  $missingMd += "| --- | ---: | --- | --- | --- |"
+  foreach ($entry in $missingDependencySummary | Select-Object -First 100) {
+    $missingMd += "| $($entry.mod) | $($entry.count) | $(@($entry.phases) -join ', ') | $(@($entry.scenarios) -join ', ') | $($entry.sample_error -replace '\|', '/') |"
+  }
+}
+$missingMd -join "`n" | Set-Content -LiteralPath $missingMdPath -Encoding UTF8
+
 $byKind = @($deduped | Group-Object { $_.kind } | Sort-Object Name)
 $summary = @()
 $summary += "# MIR Compatibility Audit Summary"
@@ -316,6 +384,7 @@ $summary += "- Failure groups: $($deduped.Count)"
 $summary += "- Unexpected failure groups: $($unexpected.Count)"
 $summary += "- Expected failure groups: $($expected.Count)"
 $summary += "- Profile candidates: $($profileCandidates.Count)"
+$summary += "- Distinct missing/incompatible dependencies: $($missingDependencySummary.Count)"
 $summary += ""
 $summary += "## Groups By Kind"
 $summary += ""
@@ -340,3 +409,6 @@ $summary -join "`n" | Set-Content -LiteralPath $summaryPath -Encoding UTF8
 Write-Host "[compat-results] wrote $summaryPath"
 Write-Host "[compat-results] wrote $groupedPath"
 Write-Host "[compat-results] wrote $profilePath"
+Write-Host "[compat-results] wrote $missingMdPath"
+Write-Host "[compat-results] wrote $missingJsonPath"
+Write-Host "[compat-results] wrote $missingCsvPath"

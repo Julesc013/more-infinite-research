@@ -555,18 +555,20 @@ Use read-only local mod libraries for large offline sweeps:
 
 ```powershell
 .\scripts\Invoke-MIRExtendedTests.ps1 `
-  -Tier LocalModZips,LocalLibraryScenarios `
+  -Tier LocalLibraryScenarios,GeneratedLocalScenarios,LocalModZips `
   -LocalModZipDirs C:\Projects\Factorio\testmods_readonly_2.1 `
   -LocalModLibraryDirs C:\Projects\Factorio\testmods_readonly_2.1 `
   -Offline `
   -CollectAll
 ```
 
-`LocalModZips` tests each local root zip as an individual scenario. `LocalLibraryScenarios` runs curated local combinations from `fixtures/compat-matrix/local-library-scenarios.json`, including Space Age planet clusters, resource suites, pack wrappers, and deliberate mega-smash scenarios. Factorio `2.0` archives should be tested with a matching Factorio/mod line; with the current `2.1.0` MIR package and a Factorio `2.1.x` binary, `2.0`-only archives are useful as inventory evidence but are not a substitute for a true `2.0` runtime gate.
+Run local-library tiers in priority order: `LocalLibraryScenarios` covers curated high-value combinations, `GeneratedLocalScenarios` creates generated mega and metadata-cluster stress cases, and `LocalModZips` tests each local root zip as an individual scenario. Add `-IncludeGeneratedLocalPairwise -GeneratedLocalPairwiseLimit 40` when you want capped pairwise cluster coverage. Add `-ShardLocalModZips -StartIndex N -ShardSize M` to resume local-root sweeps in chunks.
+
+`LocalLibraryScenarios` runs curated local combinations from `fixtures/compat-matrix/local-library-scenarios.json`, including Space Age planet clusters, resource suites, pack wrappers, and deliberate mega-smash scenarios. `GeneratedLocalScenarios` builds all-local, planet, resource, Bob, Krastorio, production/fluid, and logistics/transport clusters from local zip metadata. Factorio `2.0` archives should be tested with a matching Factorio/mod line; with the current `2.1.0` MIR package and a Factorio `2.1.x` binary, `2.0`-only archives are useful as inventory evidence but are not a substitute for a true `2.0` runtime gate.
 
 Use `-CollectAll` for overnight exploration so one failing modset does not stop the run. Use `-FailFast -FailOnAuditFailures` for strict CI-style gates; that mode fails when grouped unexpected audit failures remain after the converter runs.
 
-Load-test tiers print per-scenario start/result lines with scenario index, type, root mods, dependency-failure count, pass/skip/timeout status, exit code, parsed audit-row count, and elapsed seconds. Pipe all streams through `Tee-Object` when you want a live VS Code terminal view and a durable overnight log.
+Load-test tiers print per-scenario start/result lines with scenario index, type, root mods, dependency-failure count, pass/skip/timeout status, exit code, parsed audit-row count, and elapsed seconds. `load-results.json` is checkpointed after every scenario so partial results remain readable if a long run is interrupted. Pipe all streams through `Tee-Object` when you want a live VS Code terminal view and a durable overnight log. The grouped converter also writes `missing-dependencies.md`, `missing-dependencies.json`, and `missing-dependencies.csv` for local-library completion work.
 
 `AuditSmoke` uses the committed `space-age-baseline` manual scenario metadata path so strict release gates are deterministic. It proves the audit wrapper and grouped-result converter are wired, but broad external-mod confidence still comes from the credentialed top-25/manual/full audit tiers.
 
