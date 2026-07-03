@@ -16,12 +16,15 @@ param(
   [string[]]$CandidateNames = @(),
   [string[]]$LocalModZipDirs = @(),
   [string[]]$LocalModZips = @(),
+  [string[]]$LocalModLibraryDirs = @(),
+  [string[]]$LocalModLibraryZips = @(),
   [string[]]$LocalModNames = @(),
   [switch]$DownloadMods,
   [switch]$RunLoadTests,
   [switch]$RunManualScenarios,
   [switch]$RunLocalModZips,
   [switch]$IncludeRecommendedDependencies,
+  [switch]$Offline,
   [string[]]$ScenarioNames = @(),
   [int]$ScenarioTimeoutSeconds = 900,
   [switch]$ContinueOnDependencyFailure,
@@ -111,7 +114,7 @@ function ConvertTo-MIRLockEntry {
     [Parameter(Mandatory)]$Dependencies
   )
 
-  [ordered]@{
+  [pscustomobject][ordered]@{
     name = [string]$FullMod.name
     title = [string]$FullMod.title
     version = [string]$Release.version
@@ -122,6 +125,8 @@ function ConvertTo-MIRLockEntry {
     file_name = [string]$Release.file_name
     sha1 = [string]$Release.sha1
     download_url = [string]$Release.download_url
+    source = ""
+    source_path = ""
     dependencies = @($Dependencies | ForEach-Object {
       [ordered]@{
         name = $_.name
@@ -249,29 +254,65 @@ function Get-MIRLockEntriesByName {
 
 $resolvedOutputDir = New-MIRDirectory -Path $OutputDir
 $resolvedCacheDir = New-MIRDirectory -Path $ModCacheDir
-$localZipPaths = @()
-foreach ($dir in @($LocalModZipDirs)) {
-  if ([string]::IsNullOrWhiteSpace([string]$dir)) { continue }
-  if (-not (Test-Path -LiteralPath $dir)) {
-    throw "Local mod zip directory does not exist: $dir"
+
+function Resolve-MIRZipInputPaths {
+  param(
+    [string[]]$Dirs = @(),
+    [string[]]$Zips = @(),
+    [Parameter(Mandatory)][string]$Kind
+  )
+
+  $paths = @()
+  foreach ($dir in @($Dirs)) {
+    if ([string]::IsNullOrWhiteSpace([string]$dir)) { continue }
+    if (-not (Test-Path -LiteralPath $dir)) {
+      throw "$Kind directory does not exist: $dir"
+    }
+    $paths += @(Get-ChildItem -LiteralPath $dir -Filter *.zip -File | ForEach-Object { $_.FullName })
   }
-  $localZipPaths += @(Get-ChildItem -LiteralPath $dir -Filter *.zip -File | ForEach-Object { $_.FullName })
-}
-foreach ($zipPath in @($LocalModZips)) {
-  if ([string]::IsNullOrWhiteSpace([string]$zipPath)) { continue }
-  if (-not (Test-Path -LiteralPath $zipPath)) {
-    throw "Local mod zip does not exist: $zipPath"
+
+  foreach ($zipPath in @($Zips)) {
+    if ([string]::IsNullOrWhiteSpace([string]$zipPath)) { continue }
+    if (-not (Test-Path -LiteralPath $zipPath)) {
+      throw "$Kind zip does not exist: $zipPath"
+    }
+    $paths += (Resolve-Path -LiteralPath $zipPath).Path
   }
-  $localZipPaths += (Resolve-Path -LiteralPath $zipPath).Path
+
+  return @($paths | Sort-Object -Unique)
 }
-$localZipPaths = @($localZipPaths | Sort-Object -Unique)
+
+function Add-MIRLocalFullModToIndex {
+  param(
+    [Parameter(Mandatory)]$Index,
+    [Parameter(Mandatory)]$FullMod
+  )
+
+  $name = [string]$FullMod.name
+  if ($Index.ContainsKey($name)) {
+    $existing = $Index[$name]
+    $existing.releases = @($existing.releases) + @($FullMod.releases)
+  } else {
+    $Index[$name] = $FullMod
+  }
+}
+
+$localRootZipPaths = @(Resolve-MIRZipInputPaths -Dirs $LocalModZipDirs -Zips $LocalModZips -Kind "Local mod root")
+$localLibraryZipPaths = @(Resolve-MIRZipInputPaths -Dirs $LocalModLibraryDirs -Zips $LocalModLibraryZips -Kind "Local mod library")
+$localZipPaths = @((@($localRootZipPaths) + @($localLibraryZipPaths)) | Sort-Object -Unique)
+$localRootZipLookup = @{}
+foreach ($path in $localRootZipPaths) { $localRootZipLookup[$path] = $true }
 $localFullModsByName = @{}
+$localRootFullModsByName = @{}
 foreach ($zipPath in $localZipPaths) {
   $localFull = ConvertTo-MIRLocalFullMod -ZipPath $zipPath
   if ([string]::IsNullOrWhiteSpace([string]$localFull.name)) {
     throw "Local mod zip has no mod name: $zipPath"
   }
-  $localFullModsByName[[string]$localFull.name] = $localFull
+  Add-MIRLocalFullModToIndex -Index $localFullModsByName -FullMod $localFull
+  if ($localRootZipLookup.ContainsKey($zipPath)) {
+    Add-MIRLocalFullModToIndex -Index $localRootFullModsByName -FullMod $localFull
+  }
 }
 $officialBuiltinMods = @("space-age", "quality", "elevated-rails", "recycler")
 $specialLocalMods = @("base", "more-infinite-research")
@@ -378,6 +419,9 @@ function Get-FullCached {
   param([Parameter(Mandatory)][string]$Name)
   if ($localFullModsByName.ContainsKey($Name)) {
     return $localFullModsByName[$Name]
+  }
+  if ($Offline) {
+    throw "Offline mode is enabled and mod '$Name' is not present in local mod zip roots or libraries."
   }
   if (-not $fullCache.ContainsKey($Name)) {
     $fullCache[$Name] = Get-MIRModPortalFullMod -Name $Name
@@ -586,6 +630,10 @@ if (-not [string]::IsNullOrWhiteSpace($FromLockfile)) {
       -EnableSpaceAgeBundle ([bool]$IncludeSpaceAge -or [bool]$lock.include_space_age)
   }
 } else {
+  if ($Offline -and ($CandidateNames.Count -gt 0 -or $MaxCandidates -gt 0)) {
+    throw "Offline mode cannot resolve catalog or named catalog candidates. Use -RunLocalModZips, -RunManualScenarios with local libraries, or -FromLockfile with cached/local archives."
+  }
+
   $catalogCandidates = @()
   if ($CandidateNames.Count -gt 0) {
     $catalogCandidates = @($CandidateNames | ForEach-Object {
@@ -645,16 +693,16 @@ if ($RunManualScenarios) {
 }
 
 if ($RunLocalModZips) {
-  if ($localFullModsByName.Count -eq 0) {
+  if ($localRootFullModsByName.Count -eq 0) {
     throw "RunLocalModZips requires -LocalModZipDirs or -LocalModZips."
   }
 
-  $localNames = @($localFullModsByName.Keys | Sort-Object)
+  $localNames = @($localRootFullModsByName.Keys | Sort-Object)
   if ($LocalModNames.Count -gt 0) {
     $localLookup = @{}
     foreach ($name in $LocalModNames) { $localLookup[[string]$name] = $true }
     foreach ($name in $LocalModNames) {
-      if (-not $localFullModsByName.ContainsKey([string]$name)) {
+      if (-not $localRootFullModsByName.ContainsKey([string]$name)) {
         throw "Requested local mod '$name' was not found in local zip inputs."
       }
     }
@@ -707,8 +755,13 @@ $lock = [ordered]@{
   from_lockfile = $FromLockfile
   start_index = $StartIndex
   count = $Count
+  offline = [bool]$Offline
   local_mod_zip_dirs = @($LocalModZipDirs)
   local_mod_zips = @($LocalModZips)
+  local_mod_library_dirs = @($LocalModLibraryDirs)
+  local_mod_library_zips = @($LocalModLibraryZips)
+  local_root_zip_count = $localRootZipPaths.Count
+  local_library_zip_count = $localLibraryZipPaths.Count
   candidates_selected = @($selectedScenarios | Where-Object { $_.type -eq "catalog" } | ForEach-Object { $_.name })
   manual_scenarios_selected = @($selectedScenarios | Where-Object { $_.type -eq "manual" } | ForEach-Object { $_.name })
   local_zip_scenarios_selected = @($selectedScenarios | Where-Object { $_.type -eq "local_zip" } | ForEach-Object { $_.name })
@@ -741,6 +794,9 @@ $scenarioSummaries = @($selectedScenarios | ForEach-Object {
   selected_count = @($selectedScenarios | Where-Object { $_.type -eq "catalog" }).Count
   manual_selected_count = @($selectedScenarios | Where-Object { $_.type -eq "manual" }).Count
   local_zip_selected_count = @($selectedScenarios | Where-Object { $_.type -eq "local_zip" }).Count
+  offline = [bool]$Offline
+  local_root_zip_count = $localRootZipPaths.Count
+  local_library_zip_count = $localLibraryZipPaths.Count
   mod_count = $lockEntries.Count
   failure_count = $failures.Count
   failures = $failures
@@ -763,7 +819,10 @@ $report += "- Factorio versions: $($FactorioVersions -join ', ')"
 $report += "- Scenario timeout seconds: $ScenarioTimeoutSeconds"
 $report += "- Continue on dependency failure: $([bool]$ContinueOnDependencyFailure)"
 $report += "- Include recommended dependencies: $([bool]$IncludeRecommendedDependencies)"
-$report += "- Local zip inputs: $($localZipPaths.Count)"
+$report += "- Offline: $([bool]$Offline)"
+$report += "- Local root zip inputs: $($localRootZipPaths.Count)"
+$report += "- Local library zip inputs: $($localLibraryZipPaths.Count)"
+$report += "- Local zip inputs total: $($localZipPaths.Count)"
 $report += "- Catalog scenarios: $(@($selectedScenarios | Where-Object { $_.type -eq "catalog" }).Count)"
 $report += "- Manual scenarios: $(@($selectedScenarios | Where-Object { $_.type -eq "manual" }).Count)"
 $report += "- Local zip scenarios: $(@($selectedScenarios | Where-Object { $_.type -eq "local_zip" }).Count)"
@@ -802,6 +861,9 @@ $downloadEntries = @($lockEntries | Where-Object {
   -not [string]::IsNullOrWhiteSpace([string]$_.download_url)
 })
 if (($DownloadMods -or ($RunLoadTests -and -not $UseCachedDownloads)) -and $downloadEntries.Count -gt 0) {
+  if ($Offline) {
+    throw "Offline mode cannot download $($downloadEntries.Count) Mod Portal archive(s). Add those zips to local roots/libraries or rerun without -Offline."
+  }
   if ([string]::IsNullOrWhiteSpace($ModPortalUsername) -or [string]::IsNullOrWhiteSpace($ModPortalToken)) {
     throw "Mod downloads require -ModPortalUsername and -ModPortalToken or FACTORIO_USERNAME/FACTORIO_TOKEN."
   }

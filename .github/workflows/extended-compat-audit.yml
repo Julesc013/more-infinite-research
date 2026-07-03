@@ -36,6 +36,23 @@ on:
         description: "Optional existing compat-candidates.lock.json path for resumed/sharded runs"
         required: false
         default: ""
+      local_mod_zip_dirs:
+        description: "Optional semicolon-separated local root zip directories"
+        required: false
+        default: ""
+      local_mod_library_dirs:
+        description: "Optional semicolon-separated local dependency library directories"
+        required: false
+        default: ""
+      manual_scenarios_path:
+        description: "Optional manual scenario fixture path"
+        required: false
+        default: ""
+      offline:
+        description: "Use only local/cache inputs and do not call Mod Portal metadata/downloads"
+        required: true
+        type: boolean
+        default: false
       scenario_timeout_seconds:
         description: "Timeout per Factorio scenario load"
         required: true
@@ -70,6 +87,10 @@ jobs:
           EXTENDED_COLLECT_ALL: ${{ github.event.inputs.collect_all || 'true' }}
           EXTENDED_CONTINUE_ON_DEPENDENCY_FAILURE: ${{ github.event.inputs.continue_on_dependency_failure || 'false' }}
           EXTENDED_FROM_LOCKFILE: ${{ github.event.inputs.from_lockfile || '' }}
+          EXTENDED_LOCAL_MOD_ZIP_DIRS: ${{ github.event.inputs.local_mod_zip_dirs || '' }}
+          EXTENDED_LOCAL_MOD_LIBRARY_DIRS: ${{ github.event.inputs.local_mod_library_dirs || '' }}
+          EXTENDED_MANUAL_SCENARIOS_PATH: ${{ github.event.inputs.manual_scenarios_path || '' }}
+          EXTENDED_OFFLINE: ${{ github.event.inputs.offline || 'false' }}
           EXTENDED_SCENARIO_TIMEOUT_SECONDS: ${{ github.event.inputs.scenario_timeout_seconds || '900' }}
           EXTENDED_START_INDEX: ${{ github.event.inputs.start_index || '0' }}
           EXTENDED_SHARD_SIZE: ${{ github.event.inputs.shard_size || '25' }}
@@ -98,6 +119,18 @@ jobs:
           }
           if (-not [string]::IsNullOrWhiteSpace($env:EXTENDED_FROM_LOCKFILE)) {
             $params.FromLockfile = $env:EXTENDED_FROM_LOCKFILE
+          }
+          if (-not [string]::IsNullOrWhiteSpace($env:EXTENDED_LOCAL_MOD_ZIP_DIRS)) {
+            $params.LocalModZipDirs = @($env:EXTENDED_LOCAL_MOD_ZIP_DIRS -split ";" | ForEach-Object { $_.Trim() } | Where-Object { $_ })
+          }
+          if (-not [string]::IsNullOrWhiteSpace($env:EXTENDED_LOCAL_MOD_LIBRARY_DIRS)) {
+            $params.LocalModLibraryDirs = @($env:EXTENDED_LOCAL_MOD_LIBRARY_DIRS -split ";" | ForEach-Object { $_.Trim() } | Where-Object { $_ })
+          }
+          if (-not [string]::IsNullOrWhiteSpace($env:EXTENDED_MANUAL_SCENARIOS_PATH)) {
+            $params.ManualScenariosPath = $env:EXTENDED_MANUAL_SCENARIOS_PATH
+          }
+          if ($env:EXTENDED_OFFLINE -eq "true") {
+            $params.Offline = $true
           }
           ./scripts/Invoke-MIRExtendedTests.ps1 @params
 

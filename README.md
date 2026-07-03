@@ -549,7 +549,20 @@ When either diagnostics setting is enabled, MIR also reports duplicate recipe ma
 
 Set `FACTORIO_BIN`, `FACTORIO_USERNAME`, and `FACTORIO_TOKEN` before running download/load tiers. Audit scenarios time out after `900` seconds by default; override with `-ScenarioTimeoutSeconds` for unusually slow modsets. Full `downloads_count >= 10000` audits are intentionally opt-in through `-IncludeFullAudit` and can be sharded with `-StartIndex`, `-ShardSize`, and optionally `-FromLockfile`.
 
-Local modpack zips can be included with the `LocalModZips` tier and `-LocalModZipDirs .\tmp`. Local zip roots are copied from disk, while any missing third-party dependencies are still resolved and downloaded through the Mod Portal cache when credentials are supplied. The local zip tier includes `+` recommended dependencies because many modpack wrapper mods use them as the pack contents.
+Local modpack zips can be included with the `LocalModZips` tier and `-LocalModZipDirs .\tmp`. Local zip roots are copied from disk, while any missing third-party dependencies are resolved from `-LocalModLibraryDirs` first and then, unless `-Offline` is set, through the Mod Portal cache when credentials are supplied. The local zip tier includes `+` recommended dependencies because many modpack wrapper mods use them as the pack contents.
+
+Use read-only local mod libraries for large offline sweeps:
+
+```powershell
+.\scripts\Invoke-MIRExtendedTests.ps1 `
+  -Tier LocalModZips,LocalLibraryScenarios `
+  -LocalModZipDirs C:\Projects\Factorio\testmods_readonly_2.1 `
+  -LocalModLibraryDirs C:\Projects\Factorio\testmods_readonly_2.1 `
+  -Offline `
+  -CollectAll
+```
+
+`LocalModZips` tests each local root zip as an individual scenario. `LocalLibraryScenarios` runs curated local combinations from `fixtures/compat-matrix/local-library-scenarios.json`, including Space Age planet clusters, resource suites, pack wrappers, and deliberate mega-smash scenarios. Factorio `2.0` archives should be tested with a matching Factorio/mod line; with the current `2.1.0` MIR package and a Factorio `2.1.x` binary, `2.0`-only archives are useful as inventory evidence but are not a substitute for a true `2.0` runtime gate.
 
 Use `-CollectAll` for overnight exploration so one failing modset does not stop the run. Use `-FailFast -FailOnAuditFailures` for strict CI-style gates; that mode fails when grouped unexpected audit failures remain after the converter runs.
 

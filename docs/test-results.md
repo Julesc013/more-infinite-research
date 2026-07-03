@@ -133,6 +133,64 @@ Results:
 - Grouped result conversion passed for the both-zips smoke and reported those local zip issues as dependency-resolution groups.
 - The smoke reported unresolved/incompatible dependencies as metadata failures; no Factorio load test was attempted in this metadata-only smoke.
 
+## 2026-07-04 Offline Local Mod Library Audit Support
+
+Environment:
+
+- Branch: `dev`.
+- Mod version `2.1.0`.
+- Read-only local libraries discovered:
+  - `C:\Projects\Factorio\testmods_readonly_2.0`
+  - `C:\Projects\Factorio\testmods_readonly_2.1`
+
+Scope:
+
+- Added `-LocalModLibraryDirs` and `-LocalModLibraryZips` to the compatibility audit runner.
+- Added `-Offline` to prevent Mod Portal metadata and download fallback when a run is intended to use only local zip libraries.
+- Made local zip indexing version-aware so multiple local releases for the same mod can be available and the compatible release selector still chooses by Factorio line.
+- Fixed compatibility-audit lock entries to be proper PowerShell objects so sorting/deduplication preserves distinct `name` and `version` values instead of collapsing scenario lock entries.
+- Added `LocalLibraryScenarios` to the extended wrapper.
+- Added `fixtures/compat-matrix/local-library-scenarios.json` for curated local-library combinations, including Space Age planet clusters, BZ/resource suites, Krastorio/Spaced Out, Bob, pack-wrapper mods, and deliberate mega-smash scenarios.
+- Updated README, compatibility docs, changelog, TODO, and the self-hosted workflow for offline local-library sweeps.
+
+Commands:
+
+```powershell
+.\scripts\Invoke-MIRCompatAudit.ps1 -RunManualScenarios -ManualScenariosPath .\fixtures\compat-matrix\local-library-scenarios.json -LocalModLibraryDirs 'C:\Projects\Factorio\testmods_readonly_2.1' -Offline -IncludeRecommendedDependencies -MaxCandidates 0 -CatalogPages 0 -FactorioVersions 2.1 -OutputDir .\build\local-library-offline-smoke
+.\scripts\Convert-MIRCompatAuditResults.ps1 -AuditDir .\build\local-library-offline-smoke
+.\scripts\Invoke-MIRCompatAudit.ps1 -RunManualScenarios -ManualScenariosPath .\fixtures\compat-matrix\local-library-scenarios.json -ScenarioNames local-2-1-bz-suite-space-age -LocalModLibraryDirs 'C:\Projects\Factorio\testmods_readonly_2.1' -Offline -IncludeRecommendedDependencies -MaxCandidates 0 -CatalogPages 0 -FactorioVersions 2.1 -FactorioBin 'C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe' -RunLoadTests -ScenarioTimeoutSeconds 300 -OutputDir .\build\local-library-bz-load-smoke
+.\scripts\Convert-MIRCompatAuditResults.ps1 -AuditDir .\build\local-library-bz-load-smoke
+```
+
+Results:
+
+- Parser checks passed for the changed audit, extended wrapper, and validation scripts.
+- Metadata-only offline local-library smoke inspected all `14` curated local-library scenarios without calling the Mod Portal.
+- The local `2.1` library contained `150` zip inputs for the smoke and produced `80` locked local mods across curated scenarios after fixing lock-entry object typing.
+- The metadata smoke reported dependency-resolution groups for missing local dependencies such as `PlanetsLib`, `boblibrary`, `flib`, `Krastorio2Assets`, and assorted asset packs. These are library-completeness findings, not MIR gameplay failures.
+- Real Factorio load smoke for `local-2-1-bz-suite-space-age` passed with `6` local BZ mods, the official Space Age bundle, exit code `0`, and `87` parsed MIR audit rows.
+- `testmods_readonly_2.0` should not be mixed into the main `2.1.0` runtime gate as proof of compatibility; true Factorio `2.0` runtime validation requires a matching Factorio/mod line.
+
+Recommended overnight command:
+
+```powershell
+.\scripts\Invoke-MIRExtendedTests.ps1 `
+  -Tier Static,Runtime,AuditSmoke,LocalModZips,LocalLibraryScenarios `
+  -LocalModZipDirs C:\Projects\Factorio\testmods_readonly_2.1 `
+  -LocalModLibraryDirs C:\Projects\Factorio\testmods_readonly_2.1 `
+  -Offline `
+  -CollectAll `
+  -ScenarioTimeoutSeconds 900 `
+  -OutputRoot .\artifacts\extended-tests-local-2.1
+```
+
+Overnight interpretation:
+
+- `Static`, `Runtime`, and `AuditSmoke` prove the MIR release gate.
+- `LocalModZips` tests each local `2.1` zip individually as a root scenario.
+- `LocalLibraryScenarios` runs curated local combinations from `fixtures/compat-matrix/local-library-scenarios.json`.
+- Missing dependency archives and impossible mod combinations should be grouped as dependency/load failures and reviewed before being marked expected.
+
 ## 2026-07-04 Release Documentation Synchronization
 
 Environment:

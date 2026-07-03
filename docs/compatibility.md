@@ -70,10 +70,13 @@ The broad mod-portal audit is local/manual because it can require Factorio crede
 - `scripts/Convert-MIRCompatAuditResults.ps1`: groups load/audit results into failure classes and writes profile-candidate evidence.
 - `scripts/New-MIRCompatProfileStub.ps1`: creates review-required Lua stubs from grouped audit failures.
 - `fixtures/compat-matrix/manual-scenarios.json`: curated high-risk scenarios that should not be inferred from downloads alone.
+- `fixtures/compat-matrix/local-library-scenarios.json`: curated scenarios intended for large read-only local zip libraries such as `C:\Projects\Factorio\testmods_readonly_2.1`.
 - `fixtures/compat-matrix/expected-failures.json`: reviewed expected-failure rules used by grouped reports so known external breakage can be separated from unexpected MIR regressions.
 - `fixtures/compat-matrix/known-exclusions.json`: stable exclusions for official DLC, localization, and internal-only portal entries.
 
-Local modpack zips can be supplied with `-LocalModZipDirs` or `-LocalModZips`. The audit runner reads each zip's `info.json`, creates a local lock entry with `source_path`, copies that zip into isolated Factorio runs directly from disk, and resolves missing third-party dependencies through the normal Mod Portal path. The `LocalModZips` extended tier automatically enables `-IncludeRecommendedDependencies` because Factorio modpack wrapper mods often use `+` dependencies to describe the pack contents rather than strict required dependencies.
+Local modpack zips can be supplied with `-LocalModZipDirs` or `-LocalModZips`. Local dependency libraries can be supplied separately with `-LocalModLibraryDirs` or `-LocalModLibraryZips`. The audit runner reads each zip's `info.json`, creates local lock entries with `source_path`, copies local archives into isolated Factorio runs directly from disk, and resolves missing third-party dependencies from the local library before falling back to the normal Mod Portal path. Pass `-Offline` to make missing local metadata or archives fail as dependency-resolution evidence instead of calling the Mod Portal.
+
+The `LocalModZips` extended tier automatically enables `-IncludeRecommendedDependencies` because Factorio modpack wrapper mods often use `+` dependencies to describe the pack contents rather than strict required dependencies. `LocalModZips` treats root zip dirs as the set of individual scenarios to test. `LocalModLibraryDirs` is dependency-library-only; it does not turn every library zip into a root scenario unless the same directory is also passed through `-LocalModZipDirs`.
 
 Catalog and lockfile only:
 
@@ -148,9 +151,14 @@ The tiered wrapper is the recommended entry point for repeatable local and self-
 .\scripts\Invoke-MIRExtendedTests.ps1 -Tier Static,Runtime,AuditSmoke -FailFast -FailOnAuditFailures
 .\scripts\Invoke-MIRExtendedTests.ps1 -Tier Top25Base,Top25SpaceAge,ManualScenarios -CollectAll
 .\scripts\Invoke-MIRExtendedTests.ps1 -Tier LocalModZips -LocalModZipDirs .\tmp -CollectAll
+.\scripts\Invoke-MIRExtendedTests.ps1 -Tier LocalModZips,LocalLibraryScenarios -LocalModZipDirs C:\Projects\Factorio\testmods_readonly_2.1 -LocalModLibraryDirs C:\Projects\Factorio\testmods_readonly_2.1 -Offline -CollectAll
 .\scripts\Invoke-MIRExtendedTests.ps1 -Tier Full10KSpaceAge -IncludeFullAudit -StartIndex 0 -ShardSize 25 -CollectAll
 .\scripts\Invoke-MIRExtendedTests.ps1 -Tier Full10KSpaceAge -IncludeFullAudit -FromLockfile .\artifacts\compat-audit-locks\compat-candidates.lock.json -StartIndex 25 -ShardSize 25 -CollectAll
 ```
+
+The offline local-library command is the preferred shape for overnight testing against hand-downloaded archives. It covers each individual local root zip, plus curated combinations from `fixtures/compat-matrix/local-library-scenarios.json`: raw Space Age baseline, planet clusters, BZ/resource suites, Krastorio/Spaced Out, Bob, pack-wrapper mods, and deliberate mega-smash scenarios. Missing dependencies and impossible mod combinations are expected to appear as grouped failures; they are still useful evidence because they distinguish "not testable with this local library" from actual MIR generation regressions.
+
+Do not mix Factorio lines unintentionally. The current `2.1.0` package targets Factorio `2.1`; with a Factorio `2.1.x` binary, use `testmods_readonly_2.1` as the primary local library. `testmods_readonly_2.0` is useful for inventory and future legacy tests, but true `2.0` runtime validation requires a compatible Factorio `2.0` binary and a mod package line that can load there.
 
 Use `-CollectAll` for exploratory or overnight runs. It prevents the wrapper from forwarding scenario-level `-FailFast` into audit tiers, so all selected scenarios can produce artifacts. Use `-FailFast -FailOnAuditFailures` for strict gates; after conversion, the wrapper reads `compat-failures.grouped.json` and fails the tier when unexpected grouped failures remain.
 

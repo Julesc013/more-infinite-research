@@ -6,6 +6,7 @@ param(
     "Top25Base",
     "Top25SpaceAge",
     "ManualScenarios",
+    "LocalLibraryScenarios",
     "LocalModZips",
     "Full10KBase",
     "Full10KSpaceAge",
@@ -19,8 +20,11 @@ param(
   [string]$ModPortalToken = $env:FACTORIO_TOKEN,
   [string]$OutputRoot = ".\artifacts\extended-tests",
   [string]$FromLockfile,
+  [string]$ManualScenariosPath,
   [string[]]$LocalModZipDirs = @(),
   [string[]]$LocalModZips = @(),
+  [string[]]$LocalModLibraryDirs = @(),
+  [string[]]$LocalModLibraryZips = @(),
   [string[]]$LocalModNames = @(),
   [int]$ShardSize = 25,
   [int]$StartIndex = 0,
@@ -29,7 +33,8 @@ param(
   [switch]$FailOnAuditFailures,
   [switch]$CollectAll,
   [switch]$ContinueOnDependencyFailure,
-  [switch]$IncludeFullAudit
+  [switch]$IncludeFullAudit,
+  [switch]$Offline
 )
 
 $ErrorActionPreference = "Stop"
@@ -60,6 +65,7 @@ function Assert-MIRFactorioBin {
 }
 
 function Assert-MIRModPortalCredentials {
+  if ($Offline) { return }
   if ([string]::IsNullOrWhiteSpace($ModPortalUsername) -or [string]::IsNullOrWhiteSpace($ModPortalToken)) {
     throw "Mod Portal credentials are required for download/load tiers. Set FACTORIO_USERNAME and FACTORIO_TOKEN or pass parameters."
   }
@@ -135,7 +141,9 @@ function Invoke-MIRCompatAuditTier {
     [int]$CatalogPages = 0,
     [switch]$RunManualScenarios,
     [switch]$RunLocalModZips,
-    [switch]$FullAudit
+    [switch]$FullAudit,
+    [switch]$IncludeRecommendedDependencies,
+    [string]$ManualScenariosPathOverride
   )
 
   Assert-MIRFactorioBin
@@ -166,13 +174,28 @@ function Invoke-MIRCompatAuditTier {
   if ($ContinueOnDependencyFailure) { $auditParams.ContinueOnDependencyFailure = $true }
   if ($LocalModZipDirs.Count -gt 0) { $auditParams.LocalModZipDirs = $LocalModZipDirs }
   if ($LocalModZips.Count -gt 0) { $auditParams.LocalModZips = $LocalModZips }
+  if ($LocalModLibraryDirs.Count -gt 0) { $auditParams.LocalModLibraryDirs = $LocalModLibraryDirs }
+  if ($LocalModLibraryZips.Count -gt 0) { $auditParams.LocalModLibraryZips = $LocalModLibraryZips }
   if ($LocalModNames.Count -gt 0) { $auditParams.LocalModNames = $LocalModNames }
+  if ($Offline) {
+    $auditParams.Offline = $true
+    $auditParams.UseCachedDownloads = $true
+  }
   if ($RunManualScenarios) {
     $auditParams.RunManualScenarios = $true
-    $auditParams.ManualScenariosPath = (Join-Path $repo "fixtures\compat-matrix\manual-scenarios.json")
+    if (-not [string]::IsNullOrWhiteSpace($ManualScenariosPathOverride)) {
+      $auditParams.ManualScenariosPath = $ManualScenariosPathOverride
+    } elseif (-not [string]::IsNullOrWhiteSpace($script:ManualScenariosPath)) {
+      $auditParams.ManualScenariosPath = $script:ManualScenariosPath
+    } else {
+      $auditParams.ManualScenariosPath = (Join-Path $repo "fixtures\compat-matrix\manual-scenarios.json")
+    }
   }
   if ($RunLocalModZips) {
     $auditParams.RunLocalModZips = $true
+    $auditParams.IncludeRecommendedDependencies = $true
+  }
+  if ($IncludeRecommendedDependencies) {
     $auditParams.IncludeRecommendedDependencies = $true
   }
   if ($FullAudit) {
@@ -248,6 +271,16 @@ foreach ($entry in $expandedTiers) {
         Invoke-MIRCompatAuditTier -Name "manual-scenarios" -RunManualScenarios -MaxCandidates 0 -CatalogPages 0
       }
     }
+    "LocalLibraryScenarios" {
+      Invoke-MIRStep -Name "LocalLibraryScenarios" -Action {
+        $scenarioPath = if (-not [string]::IsNullOrWhiteSpace($ManualScenariosPath)) {
+          $ManualScenariosPath
+        } else {
+          Join-Path $repo "fixtures\compat-matrix\local-library-scenarios.json"
+        }
+        Invoke-MIRCompatAuditTier -Name "local-library-scenarios" -RunManualScenarios -IncludeRecommendedDependencies -MaxCandidates 0 -CatalogPages 0 -ManualScenariosPathOverride $scenarioPath
+      }
+    }
     "LocalModZips" {
       Invoke-MIRStep -Name "LocalModZips" -Action {
         Invoke-MIRCompatAuditTier -Name "local-mod-zips" -RunLocalModZips -MaxCandidates 0 -CatalogPages 0
@@ -294,9 +327,13 @@ $summaryMd = Join-Path $outputRootPath "extended-summary.md"
   fail_on_audit_failures = [bool]$FailOnAuditFailures
   collect_all = [bool]$CollectAll
   continue_on_dependency_failure = [bool]$ContinueOnDependencyFailure
+  offline = [bool]$Offline
   from_lockfile = $FromLockfile
+  manual_scenarios_path = $ManualScenariosPath
   local_mod_zip_dirs = @($LocalModZipDirs)
   local_mod_zips = @($LocalModZips)
+  local_mod_library_dirs = @($LocalModLibraryDirs)
+  local_mod_library_zips = @($LocalModLibraryZips)
   local_mod_names = @($LocalModNames)
   scenario_timeout_seconds = $ScenarioTimeoutSeconds
   start_index = $StartIndex
@@ -314,7 +351,11 @@ $md += ('- Include full audit: `{0}`' -f ([bool]$IncludeFullAudit))
 $md += ('- Fail on audit failures: `{0}`' -f ([bool]$FailOnAuditFailures))
 $md += ('- Collect all audit scenarios: `{0}`' -f ([bool]$CollectAll))
 $md += ('- Continue on dependency failure: `{0}`' -f ([bool]$ContinueOnDependencyFailure))
+$md += ('- Offline: `{0}`' -f ([bool]$Offline))
 $md += ('- Scenario timeout seconds: `{0}`' -f $ScenarioTimeoutSeconds)
+if (-not [string]::IsNullOrWhiteSpace($ManualScenariosPath)) {
+  $md += ('- Manual scenarios path: `{0}`' -f $ManualScenariosPath)
+}
 if (-not [string]::IsNullOrWhiteSpace($FromLockfile)) {
   $md += ('- From lockfile: `{0}`' -f $FromLockfile)
 }
@@ -323,6 +364,12 @@ if ($LocalModZipDirs.Count -gt 0) {
 }
 if ($LocalModZips.Count -gt 0) {
   $md += ('- Local mod zips: `{0}`' -f ($LocalModZips -join ', '))
+}
+if ($LocalModLibraryDirs.Count -gt 0) {
+  $md += ('- Local mod library dirs: `{0}`' -f ($LocalModLibraryDirs -join ', '))
+}
+if ($LocalModLibraryZips.Count -gt 0) {
+  $md += ('- Local mod library zips: `{0}`' -f ($LocalModLibraryZips -join ', '))
 }
 if ($LocalModNames.Count -gt 0) {
   $md += ('- Local mod names: `{0}`' -f ($LocalModNames -join ', '))

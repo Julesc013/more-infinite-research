@@ -638,6 +638,7 @@ Invoke-RepoCheck "compat audit automation tooling is wired" {
   $stubText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\New-MIRCompatProfileStub.ps1")
   $runnerText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\MIRCompatAudit\FactorioRunner.ps1")
   $manualScenariosText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\compat-matrix\manual-scenarios.json")
+  $localLibraryScenariosText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\compat-matrix\local-library-scenarios.json")
   $expectedFailuresText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\compat-matrix\expected-failures.json")
   $workflowText = Get-Content -Raw -LiteralPath (Join-Path $repo ".github\workflows\extended-compat-audit.yml")
   $compatDocsText = Get-Content -Raw -LiteralPath (Join-Path $repo "docs\compatibility.md")
@@ -651,8 +652,12 @@ Invoke-RepoCheck "compat audit automation tooling is wired" {
     @{ File = "scripts\Invoke-MIRCompatAudit.ps1"; Text = $compatAuditText; Snippet = "[int]`$ScenarioTimeoutSeconds = 900" },
     @{ File = "scripts\Invoke-MIRCompatAudit.ps1"; Text = $compatAuditText; Snippet = "[switch]`$ContinueOnDependencyFailure" },
     @{ File = "scripts\Invoke-MIRCompatAudit.ps1"; Text = $compatAuditText; Snippet = "[string[]]`$LocalModZipDirs = @()" },
+    @{ File = "scripts\Invoke-MIRCompatAudit.ps1"; Text = $compatAuditText; Snippet = "[string[]]`$LocalModLibraryDirs = @()" },
     @{ File = "scripts\Invoke-MIRCompatAudit.ps1"; Text = $compatAuditText; Snippet = "[switch]`$RunLocalModZips" },
+    @{ File = "scripts\Invoke-MIRCompatAudit.ps1"; Text = $compatAuditText; Snippet = "[switch]`$Offline" },
     @{ File = "scripts\Invoke-MIRCompatAudit.ps1"; Text = $compatAuditText; Snippet = "ConvertTo-MIRLocalFullMod" },
+    @{ File = "scripts\Invoke-MIRCompatAudit.ps1"; Text = $compatAuditText; Snippet = "Add-MIRLocalFullModToIndex" },
+    @{ File = "scripts\Invoke-MIRCompatAudit.ps1"; Text = $compatAuditText; Snippet = "local_library_zip_count" },
     @{ File = "scripts\Invoke-MIRCompatAudit.ps1"; Text = $compatAuditText; Snippet = "local_zip_scenarios_selected" },
     @{ File = "scripts\Invoke-MIRCompatAudit.ps1"; Text = $compatAuditText; Snippet = "skip_reason = `"dependency_resolution_failure`"" },
     @{ File = "scripts\Invoke-MIRCompatAudit.ps1"; Text = $compatAuditText; Snippet = "Invoke-MIRScenarioLoad" },
@@ -665,7 +670,10 @@ Invoke-RepoCheck "compat audit automation tooling is wired" {
     @{ File = "scripts\MIRCompatAudit\DependencyResolver.ps1"; Text = $dependencyResolverText; Snippet = "[switch]`$IncludeRecommendedDependencies" },
     @{ File = "scripts\Invoke-MIRExtendedTests.ps1"; Text = $extendedTestsText; Snippet = "[string]`$FromLockfile" },
     @{ File = "scripts\Invoke-MIRExtendedTests.ps1"; Text = $extendedTestsText; Snippet = '"LocalModZips"' },
+    @{ File = "scripts\Invoke-MIRExtendedTests.ps1"; Text = $extendedTestsText; Snippet = '"LocalLibraryScenarios"' },
     @{ File = "scripts\Invoke-MIRExtendedTests.ps1"; Text = $extendedTestsText; Snippet = "[string[]]`$LocalModZipDirs = @()" },
+    @{ File = "scripts\Invoke-MIRExtendedTests.ps1"; Text = $extendedTestsText; Snippet = "[string[]]`$LocalModLibraryDirs = @()" },
+    @{ File = "scripts\Invoke-MIRExtendedTests.ps1"; Text = $extendedTestsText; Snippet = "[switch]`$Offline" },
     @{ File = "scripts\Invoke-MIRExtendedTests.ps1"; Text = $extendedTestsText; Snippet = "[int]`$ScenarioTimeoutSeconds = 900" },
     @{ File = "scripts\Invoke-MIRExtendedTests.ps1"; Text = $extendedTestsText; Snippet = "[switch]`$FailOnAuditFailures" },
     @{ File = "scripts\Invoke-MIRExtendedTests.ps1"; Text = $extendedTestsText; Snippet = "[switch]`$CollectAll" },
@@ -686,14 +694,21 @@ Invoke-RepoCheck "compat audit automation tooling is wired" {
     @{ File = "fixtures\compat-matrix\manual-scenarios.json"; Text = $manualScenariosText; Snippet = '"space-age-planet-cluster"' },
     @{ File = "fixtures\compat-matrix\manual-scenarios.json"; Text = $manualScenariosText; Snippet = '"bob-angels"' },
     @{ File = "fixtures\compat-matrix\manual-scenarios.json"; Text = $manualScenariosText; Snippet = '"include_space_age"' },
+    @{ File = "fixtures\compat-matrix\local-library-scenarios.json"; Text = $localLibraryScenariosText; Snippet = '"local-2-1-space-age-mega-smash"' },
+    @{ File = "fixtures\compat-matrix\local-library-scenarios.json"; Text = $localLibraryScenariosText; Snippet = '"local-2-1-bz-suite-space-age"' },
+    @{ File = "fixtures\compat-matrix\local-library-scenarios.json"; Text = $localLibraryScenariosText; Snippet = '"local-2-1-planet-pack-wrapper-full"' },
     @{ File = "fixtures\compat-matrix\expected-failures.json"; Text = $expectedFailuresText; Snippet = '"expected_failures"' },
     @{ File = ".github\workflows\extended-compat-audit.yml"; Text = $workflowText; Snippet = "runs-on: self-hosted" },
     @{ File = ".github\workflows\extended-compat-audit.yml"; Text = $workflowText; Snippet = "Invoke-MIRExtendedTests.ps1" },
     @{ File = ".github\workflows\extended-compat-audit.yml"; Text = $workflowText; Snippet = '$params = @{' },
     @{ File = ".github\workflows\extended-compat-audit.yml"; Text = $workflowText; Snippet = "fail_on_audit_failures" },
+    @{ File = ".github\workflows\extended-compat-audit.yml"; Text = $workflowText; Snippet = "local_mod_library_dirs" },
+    @{ File = ".github\workflows\extended-compat-audit.yml"; Text = $workflowText; Snippet = "offline" },
     @{ File = ".github\workflows\extended-compat-audit.yml"; Text = $workflowText; Snippet = "scenario_timeout_seconds" },
     @{ File = "docs\compatibility.md"; Text = $compatDocsText; Snippet = 'Manual scenarios can now be executed with `-RunManualScenarios`' },
     @{ File = "docs\compatibility.md"; Text = $compatDocsText; Snippet = 'Local modpack zips can be supplied with `-LocalModZipDirs`' },
+    @{ File = "docs\compatibility.md"; Text = $compatDocsText; Snippet = 'Local dependency libraries can be supplied separately with `-LocalModLibraryDirs`' },
+    @{ File = "docs\compatibility.md"; Text = $compatDocsText; Snippet = 'Do not mix Factorio lines unintentionally.' },
     @{ File = "docs\compatibility.md"; Text = $compatDocsText; Snippet = 'Sharded or resumed audits can use `-FromLockfile`, `-StartIndex`, `-Count`, and `-CandidateNames`' },
     @{ File = "docs\compatibility.md"; Text = $compatDocsText; Snippet = 'Use `-CollectAll` for exploratory or overnight runs.' },
     @{ File = "docs\compatibility.md"; Text = $compatDocsText; Snippet = '`AuditSmoke` is intentionally deterministic.' },
