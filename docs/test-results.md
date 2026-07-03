@@ -64,6 +64,7 @@ Environment:
 Scope:
 
 - Added per-scenario start/result progress lines to `Invoke-MIRCompatAudit.ps1` load-test runs so unattended terminal sessions show scenario index, type, roots, dependency-failure count, pass/skip/timeout status, exit code, parsed audit-row count, and elapsed seconds.
+- Fixed grouped-result conversion for single-root load results so skipped-load groups keep the full root mod name instead of indexing the first character of a scalar string.
 - Updated README, compatibility docs, and changelog to describe the verbose overnight progress behavior and `Tee-Object` logging recommendation.
 
 Commands:
@@ -82,7 +83,7 @@ Results:
 - Parser check passed for the changed compatibility-audit script.
 - Static validation passed.
 - Synthetic dependency-failure load-test smoke printed the new per-scenario start/result progress lines without launching Factorio, because the scenario was skipped before startup.
-- Grouped result conversion passed for the synthetic progress smoke.
+- Grouped result conversion passed for the synthetic progress smoke and reported the full root mod name for both metadata and skipped-load dependency-failure groups.
 
 ## 2026-07-04 Release Documentation Synchronization
 

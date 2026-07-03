@@ -124,7 +124,7 @@ foreach ($failure in $reportFailures) {
 
 foreach ($result in $loadResults) {
   $scenario = [string](Get-MIRObjectProperty -Object $result -Name "scenario")
-  $rootMods = ConvertTo-MIRArray (Get-MIRObjectProperty -Object $result -Name "root_mods" -Default @())
+  $rootMods = @(ConvertTo-MIRArray (Get-MIRObjectProperty -Object $result -Name "root_mods" -Default @()))
   $primaryMod = if ($rootMods.Count -gt 0) { [string]$rootMods[0] } else { $scenario }
   $stdoutPath = [string](Get-MIRObjectProperty -Object $result -Name "stdout")
   $stderrPath = [string](Get-MIRObjectProperty -Object $result -Name "stderr")
