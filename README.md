@@ -553,20 +553,18 @@ The validation script checks:
 
 ## Documentation Map
 
+- **`todo.md`:** root executable future-work ledger. Keep the durable task list, release gates, future plans, recurring checklist, companion backlog, and rejected/deferred work here so the plan survives even if derivative docs are reorganized.
 - **`docs/architecture.md`:** data-stage flow, utility modules, stream config, compatibility profiles, diagnostics, and validation.
 - **`docs/api-proof-points.md`:** API claims, proof status, and open in-game verification questions.
 - **`docs/compatibility.md`:** compatibility model, known integrations, manual test matrix, fixture designs, and release checklist.
-- **`docs/manual-test-plan.md`:** named manual saves/scenarios for release validation.
-- **`docs/mod-portal-page.md`:** mod-portal-ready public description, technology catalog, settings summary, compatibility notes, and troubleshooting text.
-- **`docs/pre-manual-2.0.5-report.md`:** current automated readiness, API-practice check, manual test instructions, and not-ready list for `v2.0.5`.
-- **`docs/release-notes-1.9.0.md`:** simplified player-facing `1.9.0` legacy release-note summary derived from the detailed changelog.
-- **`docs/release-notes-2.0.5.md`:** simplified player-facing `2.0.5` release-note summary derived from the detailed changelog.
-- **`docs/release-notes-2.1.0.md`:** simplified player-facing `2.1.0` release-note summary derived from the detailed changelog.
-- **`docs/release-plan-2.1.0.md`:** release-gated implementation plan for the next larger Factorio `2.1` feature wave.
-- **`docs/roadmap.md`:** current v2.0.5 and v2.1.0 release roadmap, scope gates, and release criteria.
-- **`docs/todo.md`:** executable v2.0.5 and v2.1.0 task checklist.
-- **`docs/post-2.0-feature-plan.md`:** post-v2.0.0 feature triage, MIR scope boundaries, Reddit feedback, and staged implementation plan.
+- **`docs/roadmap.md`:** high-level release narrative, scope rationale, why decisions, and pointers back to `todo.md`, `changelog.txt`, and supporting notes.
 - **`docs/test-results.md`:** local release-candidate validation evidence.
+- **`docs/notes/manual-test-plan.md`:** named manual saves/scenarios for release validation.
+- **`docs/notes/mod-portal-page.md`:** mod-portal-ready public description, technology catalog, settings summary, compatibility notes, and troubleshooting text.
+- **`docs/notes/release-plan-2.1.0.md`:** detailed release-gated implementation plan for the Factorio `2.1` feature wave. Summarize durable future tasks back into `todo.md`.
+- **`docs/notes/post-2.0-feature-plan.md`:** post-v2.0.0 feature triage, MIR scope boundaries, Reddit feedback, and staged implementation archive. Summarize durable future tasks back into `todo.md`.
+- **`docs/notes/release-notes-2.1.0.md`:** simplified player-facing `2.1.0` release-note summary derived from the detailed changelog.
+- **`docs/notes/archive/`:** historical release notes and pre-manual reports. `changelog.txt` remains the authoritative past-change ledger.
 - **`CONTRIBUTING.md`:** branch policy, pull request expectations, validation commands, and mod portal changelog rules.
 - **`changelog.txt`:** release history and user-facing changes.
 

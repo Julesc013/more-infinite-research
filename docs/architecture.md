@@ -11,14 +11,15 @@ More Infinite Research is organized around a compatibility-first data-stage pipe
 `data-final-fixes.lua` runs the actual generation pipeline:
 
 1. Startup-only prototype passes such as the opt-in pipeline extent multiplier.
-2. Generated stream technology creation.
-3. Known competing recipe-productivity cleanup based on actual generated MIR effects.
-4. Known competing base-extension cleanup when MIR's matching base extension is enabled.
-5. Base technology infinite extensions.
-6. Weapon speed overlap adjustment for generated continuations.
-7. Max-level enforcement.
-8. Generated-technology effect safety validation.
-9. Optional diagnostics report flush.
+2. Known competing recipe-productivity preparation from active compatibility profiles.
+3. Generated stream technology creation, with recipe-productivity ownership delegated to compatibility owner and adoption modules.
+4. Known competing recipe-productivity cleanup based on actual generated MIR effects.
+5. Known competing base-extension cleanup when MIR's matching base extension is enabled.
+6. Base technology infinite extensions.
+7. Weapon speed overlap adjustment for generated continuations.
+8. Max-level enforcement.
+9. Generated-technology effect safety validation.
+10. Optional diagnostics and audit report flush.
 
 This order gives the mod the best practical view of recipes, labs, science packs, and technologies created by other mods while still keeping this mod's final cleanup deterministic.
 
@@ -84,6 +85,9 @@ Agricultural growth speed refreshes this force state on init, configuration chan
 - `prototypes/lib/deepcopy.lua`: shared fallback for data-stage deep copies.
 - `prototypes/lib/table-utils.lua`: deterministic table-key ordering helpers.
 - `prototypes/lib/technology-cleanup.lua`: technology removal with prerequisite reference cleanup.
+- `prototypes/compat/productivity-owners.lua`: shared recipe-productivity owner classification, recipe allow-productivity checks, and owner record formatting.
+- `prototypes/compat/productivity-family-adoption.lua`: data-stage adoption of safe residual recipes into configured existing productivity families plus the adoption signature mod-data.
+- `prototypes/compat/competing-productivity.lua`: profile-driven replacement of known fully covered competing infinite recipe-productivity technologies.
 - `prototypes/technology-effect-safety.lua`: blocks unsafe native effect types from MIR-generated technologies.
 
 Keep new domain behavior in these modules rather than growing `util.lua`.
@@ -139,6 +143,8 @@ Use profiles when a compatibility rule is tied to a known mod being active. Use 
 
 Profile patches should use append fields such as `append_items`, `append_item_patterns`, `append_recipe_patterns`, `append_exclude_recipe_patterns`, `append_exclude_ingredient_patterns`, and `append_groups` when extending existing stream arrays. Direct field assignment remains available for intentional overrides.
 
+Profiles can also declare `known_competing_productivity.tech_patterns` for mods whose infinite recipe-productivity technologies are safe to replace only when every effect is covered by enabled MIR streams. The profile declares the known competitor shape; the data-stage replacement module still proves coverage before it ignores or removes anything.
+
 Profiles are applied from `settings.lua` as well as the data stage, so profile entries must stay declarative. Do not inspect `data.raw` from profiles; prototype-dependent compatibility belongs in `data-updates.lua` or `data-final-fixes.lua`.
 
 Weapon-speed overlap handling is intentionally narrower than general compatibility cleanup. MIR may remove rocket and cannon-shell speed effects from its own generated `weapon-shooting-speed` continuation when dedicated replacement speed techs are active, but it must not remove those effects from finite vanilla `weapon-shooting-speed-*` technologies. Those finite vanilla levels contain tank cannon fire-rate bonuses.
@@ -159,6 +165,8 @@ Weapon-speed overlap handling is intentionally narrower than general compatibili
 
 Use this setting when triaging user reports. It is off by default to avoid noisy logs.
 
+When `mir-debug-generation-report` is enabled, MIR also emits an `Audit report` block with stable `audit schema=1 kind=...` rows. These rows mirror stream, extension, native-overlap, and recipe-owner decisions in a parser-friendly key/value format for `scripts/Invoke-MIRCompatAudit.ps1` and future large-mod compatibility sweeps.
+
 `mir-debug-recipe-matches` logs matched recipe names per generated productivity stream. When either diagnostics setting is enabled, duplicate recipe matches across streams are also reported as non-blocking warnings.
 
 Native modifier overlap diagnostics are also non-blocking. They report that another infinite non-MIR technology already has the same native direct-effect identity, such as `cargo-landing-pad-count` or `max-cargo-bay-unloading-distance`, but they do not skip, merge, or mutate either technology in `v2.0.5`.
@@ -178,13 +186,15 @@ Use `scripts/Invoke-MIRValidation.ps1 -StaticOnly` for static checks.
 
 Use `scripts/Invoke-MIRValidation.ps1 -FactorioBin C:\path\to\factorio.exe` for a runtime fixture load test.
 
+Use `scripts/Invoke-MIRCompatAudit.ps1` for mod-portal driven compatibility cataloging. It writes generated lock/report artifacts under an ignored output directory, uses `fixtures/compat-matrix/` for committed scenario intent, and downloads third-party mods only when credentials are provided explicitly.
+
 Use `scripts/Build-MIRPackage.ps1` to rebuild the release archive when preparing an upload. Static validation builds an ignored validation archive from the current source tree and checks the archive root, metadata, load-critical entry files, locale files, migrations, and forbidden artifact paths.
 
 Static package validation also recursively compares packaged files from the current source tree against the repository copy for the packaged source directories. Documentation and helper modules may be moved or nested inside their packaged trees without changing validation; the test follows the current tree instead of a fixed old layout. Text files are compared with normalized line endings so CI checkout settings do not create false failures; binary files are still compared by SHA-256.
 
 Static validation also checks Factorio changelog formatting, including the required 99-dash section separators and an entry for the current `info.json` version.
 
-Static validation checks every local fixture directory has `info.json`, a `mir-fixture-*` mod name, and at least one data-stage entry file.
+Static validation checks every loadable local fixture directory has `info.json`, a `mir-fixture-*` mod name, and at least one data-stage entry file. Non-mod audit inputs under `fixtures/compat-matrix/` are excluded from fixture-mod validation.
 
 Static validation rejects runtime tick handlers in `control.lua` and `control/**/*.lua`.
 
@@ -206,4 +216,4 @@ Scripted technology validation must add existing-save load tests, research-finis
 
 For API proof status and unresolved API questions, see `docs/api-proof-points.md`.
 
-For named manual save scenarios, see `docs/manual-test-plan.md`.
+For named manual save scenarios, see `docs/notes/manual-test-plan.md`.

@@ -34,7 +34,8 @@ $files = @(
   "LICENSE",
   "README.md",
   "settings.lua",
-  "thumbnail.png"
+  "thumbnail.png",
+  "todo.md"
 )
 
 $directories = @(

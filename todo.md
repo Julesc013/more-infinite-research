@@ -2,9 +2,9 @@
 
 Updated: 2026-07-03
 
-This is the executable task list for the next More Infinite Research releases.
+This is the executable task list for the next More Infinite Research releases. Keep durable future work here, not only in derivative planning docs, so the project still has its task and release plan if the `docs/` tree is reorganized or partially lost.
 
-Use `docs/roadmap.md` for release scope and product boundaries. Use `docs/post-2.0-feature-plan.md` for the deeper idea archive.
+Use `docs/roadmap.md` for release scope, product boundaries, rationale, and high-level "why" explanations. Use `docs/notes/post-2.0-feature-plan.md` for the deeper idea archive. Use `changelog.txt` as the authoritative past-change ledger.
 
 ## Working Rules
 
@@ -19,6 +19,9 @@ Use `docs/roadmap.md` for release scope and product boundaries. Use `docs/post-2
 - Do not add broad `on_tick` scans for inventories, belts, containers, item stacks, surfaces, or all entities.
 - Never add `character-item-pickup-distance` or `character-loot-pickup-distance` technology effects; large pickup radii can vacuum belt items into inventories and cause severe lag.
 - Commit documentation and implementation changes at the end of each completed work turn.
+- Keep future work, deferred work, recurring checklists, and issue-creation tasks in this root `todo.md`.
+- Keep past shipped changes in `changelog.txt`; release notes and mod-portal copy are derivative summaries.
+- Keep `docs/roadmap.md` synchronized with this file and `changelog.txt`, but at a higher level with rationale, scope boundaries, and links or placeholders for issues.
 
 ## Immediate Status
 
@@ -58,7 +61,7 @@ Done in the current development branch:
 - [x] Add diagnostic-only native modifier overlap reporting for direct-effect streams.
 - [x] Add a Maraxis-like duplicate cargo fixture proving cargo overlaps are reported without changing MIR generation.
 - [x] Fix runtime validation temp-copy behavior so fixture scenarios copy package source instead of the whole Git repository.
-- [x] Add `docs/pre-manual-2.0.5-report.md`.
+- [x] Add `docs/notes/archive/pre-manual-2.0.5-report.md`.
 - [x] Fix scripted `NothingModifier` effect icons so spoilage/agriculture effect rows do not inherit floating technology constant overlays.
 - [x] Merge character logistic trash slots into character inventory slot research and remove the separate current generated trash-slot stream.
 - [x] Add a JSON migration from the old generated trash-slot technology ID into the combined inventory/trash technology ID.
@@ -247,7 +250,7 @@ Status: released from the `legacy` branch. Keep this section as historical proce
 
 ## v2.1.0 Larger Feature Wave
 
-`v2.1.0` should take the harder work after `v2.0.5` feedback, but it should stay selective. Use `docs/release-plan-2.1.0.md` as the release-gated implementation plan.
+`v2.1.0` should take the harder work after `v2.0.5` feedback, but it should stay selective. Use `docs/notes/release-plan-2.1.0.md` as the detailed release-gated implementation note, and keep the durable release tasks mirrored here.
 
 Theme:
 
@@ -271,6 +274,9 @@ Do not turn `v2.1.0` into a bucket for every plausible feature idea.
 - [ ] Create issue: `v2.1.0: thruster fuel and oxidizer productivity`.
 - [ ] Create issue: `v2.1.0: oil/fluid recipe productivity`.
 - [ ] Create issue: `v2.1.0: compatibility matrix`.
+- [ ] Create issue: `v2.1.0: compatibility audit harness follow-up`.
+- [ ] Create issue: `v2.1.0: profile-driven owner classification follow-up`.
+- [ ] Create issue: `docs: keep root todo, changelog, and roadmap authority synchronized`.
 - [ ] Create issue: `v2.1.0: release packaging and docs`.
 - [ ] Each issue includes goal, scope, out-of-scope, acceptance criteria, validation, and release-note wording.
 
@@ -293,6 +299,14 @@ Do not turn `v2.1.0` into a bucket for every plausible feature idea.
 - [ ] Krastorio 2 Spaced Out test if compatible with the active Factorio line.
 - [ ] Better Robots Extended smoke test.
 - [x] Compatibility docs and automated runtime test results for shipped `v2.1.0` features.
+- [x] Profile-driven recipe-productivity owner classification moved out of the generator.
+- [x] Vanilla productivity-family adoption moved into a dedicated compatibility module.
+- [x] Parser-friendly generation audit rows added for stream/native-overlap/recipe-owner diagnostics.
+- [x] Local mod-portal compatibility audit harness added with committed matrix inputs and ignored generated reports.
+- [x] Documentation hierarchy reorganized: root `todo.md` is future-work authority, `changelog.txt` is past-change authority, `docs/roadmap.md` is high-level rationale, and `docs/notes/` contains derivative plans/release notes/archive material.
+- [ ] Run full mod-portal compatibility audit with credentials and a local Factorio binary.
+- [ ] Convert recurring audit failures into small declarative compatibility profiles only when the report shows concrete, repeatable patterns.
+- [ ] Runtime-test the refactored recipe-productivity owner/adoption modules with `FACTORIO_BIN` configured.
 
 ### v2.1.0 Spike / Defer Decisions
 

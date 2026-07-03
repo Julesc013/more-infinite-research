@@ -40,6 +40,10 @@ function Get-DocumentationFiles {
   if (Test-Path -LiteralPath $readmePath) {
     $files += Get-Item -LiteralPath $readmePath
   }
+  $todoPath = Join-Path $repo "todo.md"
+  if (Test-Path -LiteralPath $todoPath) {
+    $files += Get-Item -LiteralPath $todoPath
+  }
 
   $docsPath = Join-Path $repo "docs"
   if (Test-Path -LiteralPath $docsPath) {
@@ -309,7 +313,10 @@ Invoke-RepoCheck "fixture mods have metadata and data entrypoints" {
     throw "Fixture directory not found: $fixtureRootForStatic"
   }
 
+  $nonModFixtureDirs = @("compat-matrix")
   foreach ($fixture in Get-ChildItem -LiteralPath $fixtureRootForStatic -Directory) {
+    if ($nonModFixtureDirs -contains $fixture.Name) { continue }
+
     $infoPath = Join-Path $fixture.FullName "info.json"
     if (-not (Test-Path -LiteralPath $infoPath)) {
       throw "Fixture directory is missing info.json: $($fixture.FullName)"
@@ -824,6 +831,7 @@ Invoke-RepoCheck "generated package archive matches metadata" {
       "${root}changelog.txt",
       "${root}CONTRIBUTING.md",
       "${root}README.md",
+      "${root}todo.md",
       "${root}LICENSE",
       "${root}thumbnail.png",
       "${root}data.lua",
@@ -876,6 +884,7 @@ Invoke-RepoCheck "generated package archive matches metadata" {
     $repoPath = $repo.Path
     $mustMatchRepo = @(
       "README.md",
+      "todo.md",
       "changelog.txt",
       "CONTRIBUTING.md",
       "control.lua",
@@ -1034,6 +1043,7 @@ function Copy-RepositoryModDirectory {
     "info.json",
     "LICENSE",
     "README.md",
+    "todo.md",
     "settings.lua",
     "thumbnail.png"
   )

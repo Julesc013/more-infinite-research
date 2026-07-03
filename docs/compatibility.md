@@ -38,11 +38,13 @@ The release goal is graceful compatibility without mod-page dependency clutter: 
 - Spoilage preservation changes the global spoil time modifier and recomputes on init, configuration change, research finish/reversal, and technology effects reset.
 - Agricultural growth speed adjusts newly planted agricultural tower plants from the tower planting event and does not rescan existing farms in this first implementation slice.
 - Mod-specific stream changes should live in `prototypes/compat/profiles.lua` instead of the base stream definitions.
+- Recipe-productivity ownership is classified through `prototypes/compat/productivity-owners.lua`, so generation, adoption, diagnostics, and known-competitor cleanup use the same owner vocabulary.
 - Compatibility cleanup that removes known competing technologies also removes dangling prerequisite references from remaining technologies.
-- Generic competing recipe-productivity cleanup prepares only known infinite technologies whose recipe-productivity effects are all covered by enabled MIR streams, ignores only those prepared owners during exact-owner filtering, and removes them only after generated MIR effects prove the replacement. Finite upgrade chains from other mods are left alone unless a future integration models them explicitly.
+- Generic competing recipe-productivity cleanup prepares only known infinite technologies declared by active compatibility profiles whose recipe-productivity effects are all covered by enabled MIR streams, ignores only those prepared owners during exact-owner filtering, and removes them only after generated MIR effects prove the replacement. Finite upgrade chains from other mods are left alone unless a future integration models them explicitly.
 - Release metadata declares optional ordering for official DLC mods, with hidden optional ordering for Elevated Rails and Quality. Elevated Rails is hidden because its Rail productivity coverage is opportunistic and should not present Elevated Rails as required or recommended; Quality is hidden so quality module recipes are visible before module productivity is generated without presenting Quality as a required or recommended dependency. Third-party compatibility remains opportunistic and avoids compatibility-mod dependencies.
 - Weapon shooting speed overlap handling only removes rocket and cannon-shell speed effects from MIR's generated weapon shooting speed continuation. Finite vanilla weapon shooting speed technologies keep their original rocket and cannon-shell bonuses so tank cannon fire rate is not reduced.
 - `mir-debug-generation-report` can be enabled to capture why each stream or base extension generated or skipped.
+- The generation report also emits parser-friendly `audit schema=1` rows for stream decisions, native modifier overlaps, and recipe-owner skips.
 - `mir-debug-recipe-matches` can be enabled to capture matched recipe names per stream and duplicate recipe matches across streams.
 
 ## Future Overlap Policy
@@ -57,6 +59,37 @@ Future MIR features should treat overlapping native modifiers as compatibility-s
 This is especially relevant for cargo landing pad count, cargo bay unloading distance, and any future native modifier or scripted-effect technology that other mods may also provide.
 
 The broad skip/warn/prefer/allow native-modifier policy is deferred from `v2.1.0`. The shipped compatibility work is narrower: exact recipe-productivity owner filtering, configured vanilla productivity-family adoption, and known fully covered recipe-productivity competitor replacement.
+
+## Compatibility Audit Pipeline
+
+The broad mod-portal audit is local/manual because it can require Factorio credentials, large third-party downloads, and a local Factorio binary. The committed surfaces are:
+
+- `scripts/Invoke-MIRCompatAudit.ps1`: mod-portal catalog, dependency, lockfile, optional download, and optional load-test runner.
+- `scripts/MIRCompatAudit/`: portal, dependency, diagnostics-parser, and Factorio runner helper libraries.
+- `fixtures/compat-matrix/manual-scenarios.json`: curated high-risk scenarios that should not be inferred from downloads alone.
+- `fixtures/compat-matrix/known-exclusions.json`: stable exclusions for official DLC, localization, and internal-only portal entries.
+
+Catalog and lockfile only:
+
+```powershell
+.\scripts\Invoke-MIRCompatAudit.ps1 `
+  -MinDownloads 10000 `
+  -FactorioVersions @("2.0", "2.1") `
+  -MaxCandidates 100
+```
+
+Download and load-test mode requires credentials and a local binary:
+
+```powershell
+.\scripts\Invoke-MIRCompatAudit.ps1 `
+  -FactorioBin "C:\path\to\factorio.exe" `
+  -ModPortalUsername $env:FACTORIO_USERNAME `
+  -ModPortalToken $env:FACTORIO_TOKEN `
+  -DownloadMods `
+  -RunLoadTests
+```
+
+Generated lockfiles and reports belong under ignored output directories such as `artifacts/compat-audit/` or `build/compat-audit-*`. Do not commit downloaded mod zips or one-off portal reports. Commit only scenario fixtures, known exclusions, code changes, and small compatibility profiles that are justified by repeatable audit evidence.
 
 ## Legacy Backport Model
 
@@ -168,7 +201,7 @@ For each case, verify:
 - Logs show skipped or reduced streams clearly and do not show stack traces.
 - Finite vanilla weapon shooting speed effects are preserved even when the overlap adjustment setting is enabled. The setting only affects MIR's generated continuation.
 
-For named manual save scenarios and release-specific manual tests, see `docs/manual-test-plan.md`.
+For named manual save scenarios and release-specific manual tests, see `docs/notes/manual-test-plan.md`.
 
 ## Local Validation Harness
 

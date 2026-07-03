@@ -2,6 +2,76 @@
 
 This file records local release-candidate validation runs. It is not a substitute for the manual mod matrix in `docs/compatibility.md`.
 
+## 2026-07-03 Documentation Reorganization And Package Refresh
+
+Environment:
+
+- Branch: `dev`.
+- Mod version `2.1.0`.
+- Factorio runtime binary: not configured in this shell; runtime fixture validation was not run in this pass.
+
+Scope:
+
+- Accepted the documentation hierarchy reorganization.
+- Moved the executable future-work ledger to root `todo.md`.
+- Kept `changelog.txt` as the durable past-change ledger.
+- Kept `docs/roadmap.md` as the high-level rationale and release narrative.
+- Kept derivative/supporting plans, release notes, mod-portal copy, and manual plan under `docs/notes/`.
+- Updated README, roadmap, architecture, compatibility, manual-plan links, changelog, build packaging, and validation to match the new hierarchy.
+- Rebuilt the release archive after the compatibility architecture refactor and documentation reorganization.
+
+Commands:
+
+```powershell
+git fetch origin dev
+.\scripts\Invoke-MIRValidation.ps1 -StaticOnly
+.\scripts\Build-MIRPackage.ps1
+.\scripts\Invoke-MIRValidation.ps1 -StaticOnly
+.\scripts\Invoke-MIRCompatAudit.ps1 -CatalogPages 1 -MaxCandidates 1 -MinDownloads 10000 -FactorioVersions '2.1' -OutputDir .\build\compat-audit-smoke
+git diff --check
+```
+
+Results:
+
+- `origin/dev` fetched successfully before commit prep.
+- Static/package validation passed with root `todo.md` included in the package contract.
+- `dist/more-infinite-research_2.1.0.zip` was rebuilt.
+- The rebuilt release archive contains root `todo.md` and the reorganized `docs/notes/` tree.
+- Compatibility-audit smoke passed and wrote ignored sample output under `build/compat-audit-smoke`.
+- The smoke selected no locked mods because the sampled portal candidate did not have a compatible Factorio `2.1` release; the report correctly recorded the release-selection failure.
+- `git diff --check` passed. Git reported line-ending normalization warnings only.
+
+## 2026-07-03 Compatibility Architecture Refactor
+
+Environment:
+
+- Branch: `dev`.
+- Mod version `2.1.0`.
+- Factorio runtime binary: not configured in this shell; runtime fixture validation was not run in this pass.
+
+Scope:
+
+- Refactored recipe-productivity owner classification into `prototypes/compat/productivity-owners.lua`.
+- Moved data-stage productivity-family adoption into `prototypes/compat/productivity-family-adoption.lua`.
+- Made known competing recipe-productivity technology patterns profile-driven through `prototypes/compat/profiles.lua`.
+- Added parser-friendly audit rows to generation diagnostics.
+- Added the local mod-portal compatibility audit harness and committed compatibility-matrix inputs.
+
+Commands:
+
+```powershell
+.\scripts\Invoke-MIRCompatAudit.ps1 -CatalogPages 1 -MaxCandidates 1 -MinDownloads 10000 -FactorioVersions '2.1' -OutputDir .\build\compat-audit-smoke
+.\scripts\Invoke-MIRValidation.ps1 -StaticOnly
+git diff --check
+```
+
+Results:
+
+- Compatibility-audit smoke passed and wrote ignored sample output under `build/compat-audit-smoke`.
+- The smoke selected no locked mods because the first sampled catalog candidate did not have a compatible Factorio `2.1` release; the report correctly recorded the release-selection failure.
+- Static/package validation passed and rebuilt `build/validation-dist/more-infinite-research_2.1.0.zip`.
+- `git diff --check` passed. Git reported line-ending normalization warnings only.
+
 ## 2026-07-03 2.1.0 Release Candidate Audit
 
 Environment:

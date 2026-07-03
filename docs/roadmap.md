@@ -2,9 +2,16 @@
 
 Updated: 2026-07-03
 
-This is the current release roadmap for More Infinite Research after the v2.0.0 Factorio 2.1 compatibility release.
+This is the high-level release roadmap for More Infinite Research after the v2.0.0 Factorio 2.1 compatibility release. It explains release direction, product boundaries, and why major decisions exist.
 
-Use this document for release intent and scope. Use `docs/todo.md` for the executable checklist, `docs/release-plan-2.1.0.md` for the next release-gated implementation plan, and `docs/post-2.0-feature-plan.md` for the long-form feedback archive and API notes behind these decisions.
+Authority split:
+
+- Use root `todo.md` for the executable future-work ledger, release gates, issue-creation tasks, recurring checklists, deferred work, companion backlog, and rejected work.
+- Use `changelog.txt` for the authoritative past-change ledger.
+- Use this roadmap for narrative scope, rationale, release cadence, and links or placeholders for issue-backed work.
+- Use `docs/notes/release-plan-2.1.0.md` and `docs/notes/post-2.0-feature-plan.md` as supporting notes. Durable future tasks from those files should also be mirrored into root `todo.md`.
+
+Issue links are intentionally not invented in this file. When GitHub issues are created, replace the pending issue labels in `todo.md` and roadmap notes with real issue URLs.
 
 ## Release Cadence
 
@@ -120,6 +127,8 @@ This table is the canonical current synthesis from the Reddit discussion and fol
 | Oil processing productivity | Implemented recipe-productivity split; release gated by validation | `v2.1.0` |
 | Vanilla Space Age productivity-family adoption | Ship | `v2.1.0` |
 | Plates n Circuit Productivity replacement | Ship | `v2.1.0` |
+| Profile-driven recipe-productivity owner classification | Ship | `v2.1.0` |
+| Mod-portal compatibility audit harness | Ship as local tooling | `v2.1.0` |
 | Quality module enrichment / quality odds research | Spike/defer; likely add-on or prototype-tier feature | Later |
 | Robot battery/carrying capacity | Existing core | Existing |
 | Roboport range | Spike/defer | Later |
@@ -206,7 +215,7 @@ User-facing control + compatibility discipline + proof-gated expansion.
 
 `v2.1.0` is the next controlled feature wave. It should not absorb every good idea. The release candidate ships settings control cleanup, targeted compatibility policy, icon policy, and only the logistics/productivity work that passed proof.
 
-The executable release gate lives in `docs/release-plan-2.1.0.md`.
+The detailed release gate lives in `docs/notes/release-plan-2.1.0.md`, but the durable task list lives in root `todo.md`.
 
 ### v2.1.0 Ship Candidates
 
@@ -410,7 +419,7 @@ When changing these features, re-check official Factorio docs and local prototyp
 - `FluidBox.max_pipeline_extent` is prototype-stage behavior, not a runtime research modifier.
 - Thruster performance is prototype-defined, so true infinite thrust research remains a poor fit unless the API changes.
 
-The detailed proof ledger and unknowns are maintained in `docs/api-proof-points.md`. Named manual save scenarios are maintained in `docs/manual-test-plan.md`.
+The detailed proof ledger and unknowns are maintained in `docs/api-proof-points.md`. Named manual save scenarios are maintained in `docs/notes/manual-test-plan.md`.
 
 ## Release Order
 
