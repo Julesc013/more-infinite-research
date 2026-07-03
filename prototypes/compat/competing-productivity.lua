@@ -1,21 +1,10 @@
 local C = require("prototypes.config")
 local U = require("prototypes.util")
+local profiles = require("prototypes.compat.profiles")
+local productivity_owners = require("prototypes.compat.productivity-owners")
 local cleanup = require("prototypes.lib.technology-cleanup")
 
 local M = {}
-
-local KNOWN_COMPETING_MODS = {
-  ["mir-fixture-plates-n-circuit-productivity"] = true,
-  ["plates-n-circuit-productivity"] = true
-}
-
-local KNOWN_TECH_PATTERNS = {
-  "^basic%-plate%-productivity",
-  "^plate%-productivity",
-  "^electric%-circuit%-productivity",
-  "^electronic%-circuit%-productivity",
-  "^advanced%-circuit%-productivity"
-}
 
 local prepared_removable_techs = nil
 
@@ -26,11 +15,7 @@ local function prefer_this_mod_for_competing_techs()
 end
 
 local function known_competing_mod_active()
-  if not mods then return false end
-  for mod_name, _ in pairs(KNOWN_COMPETING_MODS) do
-    if mods[mod_name] then return true end
-  end
-  return false
+  return #profiles.active_known_competing_productivity_profiles() > 0
 end
 
 local function stream_requirement_missing(spec)
@@ -70,22 +55,8 @@ local function collect_enabled_stream_recipe_coverage()
 end
 
 local function known_competing_tech_name(name)
-  for _, pattern in ipairs(KNOWN_TECH_PATTERNS) do
-    if string.find(name, pattern) then return true end
-  end
-  return false
-end
-
-local function recipe_productivity_effects_only(tech)
-  local effects = tech and tech.effects or {}
-  if #effects == 0 then return nil end
-
-  local out = {}
-  for _, effect in ipairs(effects) do
-    if effect.type ~= "change-recipe-productivity" or not effect.recipe then return nil end
-    table.insert(out, effect)
-  end
-  return out
+  local known = profiles.known_competing_productivity_tech_name(name)
+  return known == true
 end
 
 local function collect_owned_recipes()
@@ -103,11 +74,11 @@ local function collect_owned_recipes()
 end
 
 local function is_external_recipe_productivity_tech(name, tech, owned_recipes)
-  if string.find(name, "^recipe%-prod%-") then return false end
+  if productivity_owners.is_mir_recipe_productivity_tech(name) then return false end
   if not known_competing_tech_name(name) then return false end
   if tech.max_level ~= "infinite" then return false end
 
-  local effects = recipe_productivity_effects_only(tech)
+  local effects = productivity_owners.recipe_productivity_effects_only(tech)
   if not effects then return false end
   for _, effect in ipairs(effects) do
     if not owned_recipes[effect.recipe] then return false end
@@ -122,10 +93,10 @@ function M.prepare()
 
   local covered_recipes = collect_enabled_stream_recipe_coverage()
   for name, tech in pairs(data.raw.technology or {}) do
-    if not string.find(name, "^recipe%-prod%-")
+    if not productivity_owners.is_mir_recipe_productivity_tech(name)
       and known_competing_tech_name(name)
       and tech.max_level == "infinite" then
-      local effects = recipe_productivity_effects_only(tech)
+      local effects = productivity_owners.recipe_productivity_effects_only(tech)
       local removable = effects ~= nil
       for _, effect in ipairs(effects or {}) do
         if not covered_recipes[effect.recipe] then

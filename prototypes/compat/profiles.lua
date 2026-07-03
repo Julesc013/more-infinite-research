@@ -1,5 +1,14 @@
 local P = {}
 
+local function sorted_keys(tbl)
+  local keys = {}
+  for key, _ in pairs(tbl or {}) do
+    table.insert(keys, key)
+  end
+  table.sort(keys)
+  return keys
+end
+
 local function append_list(dst, field, values)
   if not values then return end
 
@@ -58,13 +67,71 @@ local PROFILES = {
   -- Profiles are applied from settings.lua as well as data stage. Keep profile
   -- patches declarative and do not inspect data.raw here. Prototype-dependent
   -- compatibility belongs in data-updates.lua or data-final-fixes.lua.
+  ["mir-fixture-plates-n-circuit-productivity"] = {
+    known_competing_productivity = {
+      tech_patterns = {
+        "^basic%-plate%-productivity",
+        "^plate%-productivity",
+        "^electric%-circuit%-productivity",
+        "^electronic%-circuit%-productivity",
+        "^advanced%-circuit%-productivity"
+      }
+    }
+  },
+
+  ["plates-n-circuit-productivity"] = {
+    known_competing_productivity = {
+      tech_patterns = {
+        "^basic%-plate%-productivity",
+        "^plate%-productivity",
+        "^electric%-circuit%-productivity",
+        "^electronic%-circuit%-productivity",
+        "^advanced%-circuit%-productivity"
+      }
+    }
+  }
 }
 
-function P.apply(config)
-  for mod_name, profile in pairs(PROFILES) do
+function P.active_profiles()
+  local active = {}
+  for _, mod_name in ipairs(sorted_keys(PROFILES)) do
     if mods and mods[mod_name] then
-      apply_profile(config, profile)
+      table.insert(active, {
+        mod = mod_name,
+        profile = PROFILES[mod_name]
+      })
     end
+  end
+  return active
+end
+
+function P.active_known_competing_productivity_profiles()
+  local active = {}
+  for _, entry in ipairs(P.active_profiles()) do
+    if entry.profile.known_competing_productivity then
+      table.insert(active, {
+        mod = entry.mod,
+        policy = entry.profile.known_competing_productivity
+      })
+    end
+  end
+  return active
+end
+
+function P.known_competing_productivity_tech_name(name)
+  for _, entry in ipairs(P.active_known_competing_productivity_profiles()) do
+    for _, pattern in ipairs(entry.policy.tech_patterns or {}) do
+      if string.find(name, pattern) then
+        return true, entry.mod
+      end
+    end
+  end
+  return false, nil
+end
+
+function P.apply(config)
+  for _, entry in ipairs(P.active_profiles()) do
+    apply_profile(config, entry.profile)
   end
 end
 

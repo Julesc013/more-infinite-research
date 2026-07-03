@@ -6,10 +6,8 @@ local deepcopy = require("prototypes.lib.deepcopy")
 local table_utils = require("prototypes.lib.table-utils")
 local effect_safety = require("prototypes.technology-effect-safety")
 local competing_productivity = require("prototypes.compat.competing-productivity")
-
-local PRODUCTIVITY_FAMILY_ADOPTION_MOD_DATA_NAME = "more-infinite-research-productivity-family-adoption"
-local PRODUCTIVITY_FAMILY_ADOPTION_VERSION = 1
-local adopted_productivity_family_recipes = {}
+local productivity_owners = require("prototypes.compat.productivity-owners")
+local productivity_family_adoption = require("prototypes.compat.productivity-family-adoption")
 
 local function lname(key, spec)
   if spec.localised_name then return spec.localised_name end
@@ -216,22 +214,10 @@ local function record_native_modifier_overlaps(key, effects)
   end
 end
 
-local function existing_infinite_recipe_productivity_techs(recipe_name)
-  local owners = {}
-  for tech_name, tech in pairs(data.raw.technology or {}) do
-    if tech.max_level == "infinite" and not string.find(tech_name, "^recipe%-prod%-") then
-      for _, effect in ipairs(tech.effects or {}) do
-        if effect.type == "change-recipe-productivity"
-          and effect.recipe == recipe_name
-          and not competing_productivity.ignores_existing_owner(tech_name) then
-          table.insert(owners, tech_name)
-          break
-        end
-      end
-    end
-  end
-  table.sort(owners)
-  return owners
+local function existing_infinite_recipe_productivity_owner_records(recipe_name)
+  return productivity_owners.blocking_recipe_productivity_owner_records(recipe_name, {
+    ignore_owner = competing_productivity.ignores_existing_owner
+  })
 end
 
 local function filter_existing_recipe_productivity(key, buckets)
@@ -241,11 +227,13 @@ local function filter_existing_recipe_productivity(key, buckets)
   for _, bucket in ipairs(buckets or {}) do
     local recipes = {}
     for _, recipe_name in ipairs(bucket.recipes or {}) do
-      local owners = existing_infinite_recipe_productivity_techs(recipe_name)
-      if #owners > 0 then
+      local owner_records = existing_infinite_recipe_productivity_owner_records(recipe_name)
+      if #owner_records > 0 then
         table.insert(skipped, {
           recipe = recipe_name,
-          owners = owners
+          owners = productivity_owners.owner_names(owner_records),
+          owner_kinds = productivity_owners.owner_kinds(owner_records),
+          owner_actions = productivity_owners.owner_actions(owner_records)
         })
       else
         table.insert(recipes, recipe_name)
@@ -260,255 +248,22 @@ local function filter_existing_recipe_productivity(key, buckets)
   end
 
   for _, entry in ipairs(skipped) do
+    D.recipe_owner({
+      key = key,
+      status = "skipped",
+      reason = "covered_by_existing_infinite_recipe_productivity",
+      recipe = entry.recipe,
+      owners = entry.owners,
+      owner_kinds = entry.owner_kinds,
+      owner_actions = entry.owner_actions
+    })
     log("[more-infinite-research] Skipping recipe productivity effect for "
       .. key .. " recipe=" .. entry.recipe
       .. " because existing infinite technology already owns it: "
-      .. table.concat(entry.owners, ","))
+      .. entry.owners)
   end
 
   return filtered_buckets, skipped
-end
-
-local function recipe_productivity_effects(tech)
-  local effects = {}
-  for _, effect in ipairs((tech and tech.effects) or {}) do
-    if effect.type == "change-recipe-productivity" and effect.recipe then
-      table.insert(effects, effect)
-    end
-  end
-  return effects
-end
-
-local function has_recipe_productivity_effect(tech, recipe_name)
-  for _, effect in ipairs((tech and tech.effects) or {}) do
-    if effect.type == "change-recipe-productivity" and effect.recipe == recipe_name then
-      return true
-    end
-  end
-  return false
-end
-
-local function recipe_allows_productivity(recipe_name)
-  local recipe = (data.raw.recipe or {})[recipe_name]
-  if not recipe then return false end
-
-  local function explicit_allow(def)
-    if def and def.allow_productivity ~= nil then
-      return def.allow_productivity == true
-    end
-    return nil
-  end
-
-  local normal = explicit_allow(recipe.normal)
-  local expensive = explicit_allow(recipe.expensive)
-  if normal == true or expensive == true then return true end
-  if normal == false or expensive == false then return false end
-  return recipe.allow_productivity == true
-end
-
-local function recipe_outputs_family_product(recipe_name, products)
-  if not products then return true end
-
-  local wanted = {}
-  for _, product in ipairs(products) do wanted[product] = true end
-  local recipe = (data.raw.recipe or {})[recipe_name]
-  if not recipe then return false end
-
-  local function product_name(product)
-    if not product then return nil end
-    if type(product) == "string" then return product end
-    return product.name or product[1]
-  end
-
-  local function scan(def)
-    if not def then return false end
-    if def.results then
-      for _, product in pairs(def.results) do
-        local name = product_name(product)
-        if name and wanted[name] then return true end
-      end
-    elseif def.result and wanted[def.result] then
-      return true
-    end
-    return false
-  end
-
-  if recipe.normal or recipe.expensive then
-    return scan(recipe.normal) or scan(recipe.expensive)
-  end
-  return scan(recipe)
-end
-
-local function append_recipe_to_bucket(out, bucket, recipe_name)
-  local target = out[#out]
-  if not target or target.change ~= bucket.change then
-    target = {change = bucket.change, recipes = {}}
-    table.insert(out, target)
-  end
-  table.insert(target.recipes, recipe_name)
-end
-
-local function partition_family_adoption_candidates(key, spec, buckets)
-  local adoption = spec and spec.adopt_into_existing_productivity_tech
-  if not adoption then return buckets, {} end
-
-  local eligible_buckets = {}
-  local blocked = {}
-
-  for _, bucket in ipairs(buckets or {}) do
-    for _, recipe_name in ipairs(bucket.recipes or {}) do
-      local reason = nil
-      if not recipe_allows_productivity(recipe_name) then
-        reason = "recipe_productivity_not_allowed"
-      elseif not recipe_outputs_family_product(recipe_name, adoption.products) then
-        reason = "recipe_not_in_configured_family_products"
-      end
-
-      if reason then
-        table.insert(blocked, {
-          recipe = recipe_name,
-          reason = reason
-        })
-      else
-        append_recipe_to_bucket(eligible_buckets, bucket, recipe_name)
-      end
-    end
-  end
-
-  for _, entry in ipairs(blocked) do
-    log("[more-infinite-research] Skipping configured productivity-family candidate for "
-      .. key .. " recipe=" .. entry.recipe .. " because " .. entry.reason .. ".")
-  end
-
-  return eligible_buckets, blocked
-end
-
-local function adoption_owner_for(spec)
-  local adoption = spec and spec.adopt_into_existing_productivity_tech
-  if not (adoption and adoption.tech) then return nil, "no_configured_owner" end
-
-  local owner_name = adoption.tech
-  local owner = data.raw.technology and data.raw.technology[owner_name]
-  if not owner then return nil, "owner_missing" end
-  if adoption.require_infinite ~= false and owner.max_level ~= "infinite" then
-    return nil, "owner_not_infinite"
-  end
-
-  local owner_effects = recipe_productivity_effects(owner)
-  if adoption.require_existing_recipe_productivity_effects ~= false and #owner_effects == 0 then
-    return nil, "owner_has_no_recipe_productivity_effects"
-  end
-
-  local change_policy = adoption.change_policy or "copy-owner"
-  local change = C.shared.per_level_default
-  if change_policy == "copy-owner" then
-    change = nil
-    for _, effect in ipairs(owner_effects) do
-      if effect.change == nil then
-        return nil, "owner_missing_change_value"
-      end
-      if change == nil then
-        change = effect.change
-      elseif effect.change ~= change then
-        return nil, "owner_mixed_change_values"
-      end
-    end
-    if change == nil then return nil, "owner_has_no_recipe_productivity_effects" end
-  end
-
-  return {
-    name = owner_name,
-    tech = owner,
-    change = change
-  }
-end
-
-local function record_productivity_family_adoption(key, owner_name, recipe_name, change)
-  table.insert(adopted_productivity_family_recipes, {
-    key = key,
-    owner = owner_name,
-    recipe = recipe_name,
-    change = change
-  })
-end
-
-local function adopt_productivity_family_recipes(key, spec, buckets)
-  local adoption = spec and spec.adopt_into_existing_productivity_tech
-  if not adoption then return buckets, {}, {} end
-
-  local eligible_buckets, blocked = partition_family_adoption_candidates(key, spec, buckets)
-  local owner, reason = adoption_owner_for(spec)
-  if not owner then
-    if #eligible_buckets > 0 or #blocked > 0 then
-      log("[more-infinite-research] Could not adopt productivity-family recipes for "
-        .. key .. " into "
-        .. tostring(adoption.tech)
-        .. " because "
-        .. tostring(reason)
-        .. "; falling back to MIR generation for eligible recipes.")
-    end
-    return eligible_buckets, {}, blocked
-  end
-
-  local adopted = {}
-  for _, bucket in ipairs(eligible_buckets or {}) do
-    for _, recipe_name in ipairs(bucket.recipes or {}) do
-      if not has_recipe_productivity_effect(owner.tech, recipe_name) then
-        local effect = {
-          type = "change-recipe-productivity",
-          recipe = recipe_name,
-          change = owner.change
-        }
-        owner.tech.effects = owner.tech.effects or {}
-        table.insert(owner.tech.effects, effect)
-        table.insert(adopted, effect)
-        record_productivity_family_adoption(key, owner.name, recipe_name, owner.change)
-        log("[more-infinite-research] Adopted productivity-family recipe for "
-          .. key .. " recipe=" .. recipe_name .. " into " .. owner.name .. ".")
-      end
-    end
-  end
-
-  return {}, adopted, blocked, owner.name
-end
-
-local function recipe_names_from_effects(effects)
-  local names = {}
-  for _, effect in ipairs(effects or {}) do
-    if effect.recipe then table.insert(names, effect.recipe) end
-  end
-  table.sort(names)
-  return table.concat(names, ",")
-end
-
-local function productivity_family_adoption_signature()
-  local entries = {}
-  for _, entry in ipairs(adopted_productivity_family_recipes) do
-    table.insert(entries,
-      "schema=" .. tostring(PRODUCTIVITY_FAMILY_ADOPTION_VERSION)
-      .. "|owner=" .. tostring(entry.owner)
-      .. "|recipe=" .. tostring(entry.recipe)
-      .. "|change=" .. tostring(entry.change))
-  end
-  table.sort(entries)
-  return table.concat(entries, ";")
-end
-
-local function emit_productivity_family_adoption_mod_data()
-  local signature = productivity_family_adoption_signature()
-  data:extend({
-    {
-      type = "mod-data",
-      name = PRODUCTIVITY_FAMILY_ADOPTION_MOD_DATA_NAME,
-      data_type = "more-infinite-research.productivity-family-adoption",
-      data = {
-        version = PRODUCTIVITY_FAMILY_ADOPTION_VERSION,
-        adopted = #adopted_productivity_family_recipes > 0,
-        adopted_count = #adopted_productivity_family_recipes,
-        signature = signature
-      }
-    }
-  })
 end
 
 local function make_stream(key, raw_spec)
@@ -591,11 +346,11 @@ local function make_stream(key, raw_spec)
   local covered_by_existing
   buckets, covered_by_existing = filter_existing_recipe_productivity(key, buckets)
   local adopted_effects, family_blocked, adoption_owner_name
-  buckets, adopted_effects, family_blocked, adoption_owner_name = adopt_productivity_family_recipes(key, spec, buckets)
+  buckets, adopted_effects, family_blocked, adoption_owner_name = productivity_family_adoption.adopt(key, spec, buckets)
   if adopted_effects and #adopted_effects > 0 then
     D.stream(D.stream_fields(key, spec, "adopted", "adopted_into_existing_productivity_family", ingredients, nil, adopted_effects, lab_status, {
       owners = adoption_owner_name,
-      recipes = recipe_names_from_effects(adopted_effects)
+      recipes = productivity_owners.recipe_names_from_effects(adopted_effects)
     }))
   end
   local effects = {}
@@ -651,4 +406,4 @@ for _, key in ipairs(table_utils.sorted_keys(C.streams)) do
   make_stream(key, C.streams[key])
 end
 
-emit_productivity_family_adoption_mod_data()
+productivity_family_adoption.emit_mod_data()

@@ -2,6 +2,7 @@ local D = {}
 local icons = require("prototypes.lib.technology-icons")
 
 local rows = {}
+local audit_rows = {}
 local match_rows = {}
 local recipe_to_streams = {}
 
@@ -42,6 +43,12 @@ local function append(kind, row)
   if not D.enabled() then return end
   row.kind = kind
   table.insert(rows, row)
+
+  local audit_row = {schema = 1, kind = kind}
+  for field, value in pairs(row) do
+    audit_row[field] = value
+  end
+  table.insert(audit_rows, audit_row)
 end
 
 function D.stream(row)
@@ -54,6 +61,10 @@ end
 
 function D.native_modifier_overlap(row)
   append("native_modifier_overlap", row)
+end
+
+function D.recipe_owner(row)
+  append("recipe_owner", row)
 end
 
 function D.recipe_matches(key, buckets)
@@ -109,7 +120,36 @@ end
 
 local function row_sort(a, b)
   if a.kind ~= b.kind then return a.kind < b.kind end
+  if tostring(a.key or "") ~= tostring(b.key or "") then
+    return tostring(a.key or "") < tostring(b.key or "")
+  end
+  if tostring(a.recipe or "") ~= tostring(b.recipe or "") then
+    return tostring(a.recipe or "") < tostring(b.recipe or "")
+  end
   return tostring(a.key or "") < tostring(b.key or "")
+end
+
+local function audit_value(value)
+  local text = tostring(value or "")
+  text = string.gsub(text, "\\", "\\\\")
+  text = string.gsub(text, "\r", "\\r")
+  text = string.gsub(text, "\n", "\\n")
+  text = string.gsub(text, "\t", "\\t")
+  if string.find(text, "%s") then
+    text = '"' .. string.gsub(text, '"', '\\"') .. '"'
+  end
+  return text
+end
+
+local function audit_fields(row)
+  local fields = {}
+  for field, _ in pairs(row or {}) do
+    if field ~= "kind" and field ~= "schema" then
+      table.insert(fields, field)
+    end
+  end
+  table.sort(fields)
+  return fields
 end
 
 function D.flush()
@@ -129,9 +169,28 @@ function D.flush()
         .. " effect=" .. tostring(row.effect or "")
         .. " target=" .. tostring(row.target or "")
         .. " owners=" .. tostring(row.owners or "")
+        .. " recipe=" .. tostring(row.recipe or "")
+        .. " owner_kinds=" .. tostring(row.owner_kinds or "")
+        .. " owner_actions=" .. tostring(row.owner_actions or "")
         .. " recipes=" .. tostring(row.recipes or ""))
     end
     log("[more-infinite-research] Generation report end")
+  end
+
+  if D.enabled() and #audit_rows > 0 then
+    table.sort(audit_rows, row_sort)
+    log("[more-infinite-research] Audit report start (" .. tostring(#audit_rows) .. " rows)")
+    for _, row in ipairs(audit_rows) do
+      local parts = {
+        "schema=" .. audit_value(row.schema),
+        "kind=" .. audit_value(row.kind)
+      }
+      for _, field in ipairs(audit_fields(row)) do
+        table.insert(parts, field .. "=" .. audit_value(row[field]))
+      end
+      log("[more-infinite-research] audit " .. table.concat(parts, " "))
+    end
+    log("[more-infinite-research] Audit report end")
   end
 
   if D.recipe_matches_enabled() and #match_rows > 0 then
