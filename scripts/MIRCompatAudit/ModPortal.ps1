@@ -157,13 +157,36 @@ function Save-MIRModPortalDownload {
     New-Item -ItemType Directory -Path $CacheDir | Out-Null
   }
 
+  function Test-MIRDownloadSha1 {
+    param(
+      [Parameter(Mandatory)][string]$Path,
+      [string]$ExpectedSha1
+    )
+
+    if ([string]::IsNullOrWhiteSpace($ExpectedSha1)) { return $true }
+    $actual = (Get-FileHash -Algorithm SHA1 -LiteralPath $Path).Hash.ToLowerInvariant()
+    return $actual -eq $ExpectedSha1.ToLowerInvariant()
+  }
+
   $fileName = [string]$Release.file_name
   $target = Join-Path $CacheDir $fileName
-  if (Test-Path -LiteralPath $target) { return Get-Item -LiteralPath $target }
+  $expectedSha1 = [string]$Release.sha1
+  if (Test-Path -LiteralPath $target) {
+    if (Test-MIRDownloadSha1 -Path $target -ExpectedSha1 $expectedSha1) {
+      return Get-Item -LiteralPath $target
+    }
+    Remove-Item -LiteralPath $target -Force
+  }
 
   $url = "https://mods.factorio.com$($Release.download_url)?username=$([uri]::EscapeDataString($Username))&token=$([uri]::EscapeDataString($Token))"
   Invoke-WebRequest -Uri $url -OutFile $target -Headers @{
     "User-Agent" = "more-infinite-research-compat-audit"
   }
+
+  if (-not (Test-MIRDownloadSha1 -Path $target -ExpectedSha1 $expectedSha1)) {
+    Remove-Item -LiteralPath $target -Force
+    throw "Downloaded mod archive failed SHA1 verification: $fileName"
+  }
+
   return Get-Item -LiteralPath $target
 }

@@ -51,6 +51,17 @@ function Copy-MIRModUnderTest {
   return $target
 }
 
+function Enable-MIRCopiedGenerationReport {
+  param([Parameter(Mandatory)][string]$ModsDir)
+
+  $diagnosticsPath = Join-Path $ModsDir "more-infinite-research\prototypes\diagnostics.lua"
+  if (-not (Test-Path -LiteralPath $diagnosticsPath)) { return }
+
+  $diagnostics = Get-Content -Raw -LiteralPath $diagnosticsPath
+  $diagnostics = $diagnostics -replace 'return startup_setting\("mir-debug-generation-report"\) == true', 'return true'
+  Set-Content -LiteralPath $diagnosticsPath -Value $diagnostics -Encoding UTF8
+}
+
 function Copy-MIRCachedModZips {
   param(
     [Parameter(Mandatory)][string]$CacheDir,
@@ -83,12 +94,18 @@ function Invoke-MIRFactorioLoadCheck {
   )
 
   $process = Start-Process -FilePath $FactorioBin -ArgumentList $args -Wait -PassThru -NoNewWindow -RedirectStandardOutput $logPath -RedirectStandardError "$logPath.err"
+  $auditRows = @()
+  if ((Test-Path -LiteralPath $logPath) -and (Get-Command Read-MIRAuditLog -ErrorAction SilentlyContinue)) {
+    $auditRows = @(Read-MIRAuditLog -Path $logPath)
+  }
+
   [pscustomobject]@{
     scenario = $ScenarioName
     exit_code = $process.ExitCode
     save = $savePath
     stdout = $logPath
     stderr = "$logPath.err"
+    audit_rows = $auditRows
     passed = $process.ExitCode -eq 0
   }
 }

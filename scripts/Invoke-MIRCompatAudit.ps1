@@ -100,6 +100,49 @@ function ConvertTo-MIRLockEntry {
 
 $resolvedOutputDir = New-MIRDirectory -Path $OutputDir
 $resolvedCacheDir = New-MIRDirectory -Path $ModCacheDir
+$officialBuiltinMods = @("space-age", "quality", "elevated-rails", "recycler")
+$officialBuiltinLookup = @{}
+foreach ($officialMod in $officialBuiltinMods) {
+  $officialBuiltinLookup[$officialMod] = $true
+}
+
+function Get-MIROfficialBuiltinDependencies {
+  param($Entry)
+
+  $enabled = @{}
+  foreach ($dep in @($Entry.dependencies)) {
+    if ($dep.required -and $officialBuiltinLookup.ContainsKey([string]$dep.name)) {
+      $enabled[[string]$dep.name] = $true
+    }
+  }
+  foreach ($closureEntry in @($Entry.dependency_closure)) {
+    foreach ($dep in @($closureEntry.dependencies)) {
+      if ($dep.required -and $officialBuiltinLookup.ContainsKey([string]$dep.name)) {
+        $enabled[[string]$dep.name] = $true
+      }
+    }
+  }
+
+  return @($enabled.Keys | Sort-Object)
+}
+
+function Get-MIREnabledOfficialMods {
+  param(
+    $Entry,
+    [bool]$EnableSpaceAgeBundle
+  )
+
+  $enabled = @{}
+  if ($EnableSpaceAgeBundle) {
+    foreach ($name in $officialBuiltinMods) { $enabled[$name] = $true }
+  }
+  foreach ($name in @(Get-MIROfficialBuiltinDependencies -Entry $Entry)) {
+    $enabled[$name] = $true
+  }
+
+  return @($enabled.Keys | Sort-Object)
+}
+
 $exclusions = Read-MIRJsonFile -Path $KnownExclusions -Fallback ([pscustomobject]@{
   mod_names = @()
   categories = @("localizations", "internal")
@@ -202,6 +245,10 @@ $failureCsvPath = Join-Path $resolvedOutputDir "failures.csv"
 $jsonReportPath = Join-Path $resolvedOutputDir "compat-report.json"
 
 $lock | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $lockPath -Encoding UTF8
+$lockEntriesByName = @{}
+foreach ($lockEntry in $lockEntries) {
+  $lockEntriesByName[[string]$lockEntry.name] = $lockEntry
+}
 [ordered]@{
   schema = 1
   lockfile = $lockPath
@@ -277,8 +324,22 @@ if ($RunLoadTests) {
     $userData = New-MIRCompatUserDataDir -Root $runRoot
     $modsDir = Join-Path $userData "mods"
     $null = Copy-MIRModUnderTest -RepoRoot $repo.Path -ModsDir $modsDir
-    Copy-MIRCachedModZips -CacheDir $resolvedCacheDir -ModsDir $modsDir -LockEntries $lockEntries
-    Write-MIRModList -ModsDir $modsDir -EnabledMods @("more-infinite-research", $entry.full.name)
+    Enable-MIRCopiedGenerationReport -ModsDir $modsDir
+
+    $scenarioModNames = @($entry.full.name) + @($entry.dependency_closure | ForEach-Object { $_.name })
+    $scenarioModNames = @($scenarioModNames | Sort-Object -Unique)
+    $scenarioLockEntries = @(
+      foreach ($name in $scenarioModNames) {
+        if ($lockEntriesByName.ContainsKey([string]$name)) {
+          $lockEntriesByName[[string]$name]
+        }
+      }
+    )
+    Copy-MIRCachedModZips -CacheDir $resolvedCacheDir -ModsDir $modsDir -LockEntries $scenarioLockEntries
+
+    $enabledOfficialMods = @(Get-MIREnabledOfficialMods -Entry $entry -EnableSpaceAgeBundle ([bool]$IncludeSpaceAge))
+    $enabledMods = @("more-infinite-research") + $scenarioModNames + $enabledOfficialMods
+    Write-MIRModList -ModsDir $modsDir -EnabledMods $enabledMods
     $results += Invoke-MIRFactorioLoadCheck -FactorioBin $FactorioBin -UserDataDir $userData -ScenarioName $entry.full.name
     if ($FailFast -and $results[-1].passed -ne $true) { throw "Load test failed for $($entry.full.name)." }
   }

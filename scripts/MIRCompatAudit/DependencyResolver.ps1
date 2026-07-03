@@ -16,7 +16,7 @@ function Resolve-MIRRequiredDependencyClosure {
     [Parameter(Mandatory)][string[]]$RootModNames,
     [Parameter(Mandatory)][scriptblock]$GetFullMod,
     [Parameter(Mandatory)][scriptblock]$SelectRelease,
-    [string[]]$ExcludeModNames = @("base"),
+    [string[]]$ExcludeModNames = @("base", "space-age", "quality", "elevated-rails", "recycler"),
     [switch]$FailFast
   )
 
