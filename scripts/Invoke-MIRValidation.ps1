@@ -1074,6 +1074,10 @@ $postMirAssertionFixtures = @(
   "mir-fixture-assert-fluid-productivity",
   "mir-fixture-assert-omega-drill-productivity",
   "mir-fixture-assert-pipeline-extent",
+  "mir-fixture-assert-vanilla-family-adoption",
+  "mir-fixture-assert-vanilla-family-exact-owner",
+  "mir-fixture-assert-vanilla-family-mixed-owner",
+  "mir-fixture-assert-vanilla-family-owner-prepatched",
   "mir-fixture-assert-weapon-speed-safety"
 )
 
@@ -1459,6 +1463,72 @@ function Invoke-RuntimeScenario {
   Assert-RuntimeLogHealthy -ScenarioName $ScenarioName
 }
 
+function Invoke-RuntimeConfigurationChangeScenario {
+  param(
+    [string]$ScenarioName,
+    [string[]]$InitialFixtureNames = @(),
+    [string[]]$ChangedFixtureNames = @(),
+    [switch]$EnableSpaceAge
+  )
+
+  $initialScenario = Initialize-RuntimeScenario `
+    -ScenarioName "$ScenarioName-initial" `
+    -EnabledFixtureNames $InitialFixtureNames `
+    -EnableSpaceAge:$EnableSpaceAge
+  if (Test-Path -LiteralPath $initialScenario.SavePath) {
+    Remove-Item -LiteralPath $initialScenario.SavePath -Force
+  }
+
+  Write-Host "[run] Factorio initial save for configuration-change check ($ScenarioName)"
+  $createArgs = @(
+    "--config",
+    $factorioConfigPath,
+    "--no-log-rotation",
+    "--disable-audio",
+    "--mod-directory",
+    $initialScenario.ModsDir,
+    "--create",
+    $initialScenario.SavePath
+  )
+  $createExitCode = Invoke-FactorioProcess -FilePath $FactorioBin -Arguments $createArgs
+  if ($createExitCode -ne 0) {
+    throw "Factorio configuration-change initial scenario $ScenarioName exited with code $createExitCode"
+  }
+  if (-not (Test-Path -LiteralPath $initialScenario.SavePath)) {
+    throw "Factorio configuration-change initial scenario $ScenarioName did not create the expected save: $($initialScenario.SavePath)."
+  }
+
+  Assert-RuntimeLogHealthy -ScenarioName "$ScenarioName initial"
+
+  $changedScenario = Initialize-RuntimeScenario `
+    -ScenarioName "$ScenarioName-changed" `
+    -EnabledFixtureNames $ChangedFixtureNames `
+    -EnableSpaceAge:$EnableSpaceAge
+
+  Write-Host "[run] Factorio configuration-change load check with fixture mods ($ScenarioName)"
+  $benchmarkArgs = @(
+    "--config",
+    $factorioConfigPath,
+    "--no-log-rotation",
+    "--disable-audio",
+    "--mod-directory",
+    $changedScenario.ModsDir,
+    "--benchmark",
+    $initialScenario.SavePath,
+    "--benchmark-ticks",
+    "1",
+    "--benchmark-runs",
+    "1",
+    "--benchmark-sanitize"
+  )
+  $benchmarkExitCode = Invoke-FactorioProcess -FilePath $FactorioBin -Arguments $benchmarkArgs
+  if ($benchmarkExitCode -ne 0) {
+    throw "Factorio configuration-change load scenario $ScenarioName exited with code $benchmarkExitCode"
+  }
+
+  Assert-RuntimeLogHealthy -ScenarioName "$ScenarioName changed"
+}
+
 function Get-LastStreamReportLine {
   param([string]$Key)
   $line = Select-String -LiteralPath $FactorioLog -Pattern "kind=stream key=$Key" -SimpleMatch | Select-Object -Last 1
@@ -1490,6 +1560,13 @@ function Assert-ReportLineGenerated {
   param([string]$Line, [string]$Context)
   if ($Line -notmatch "status=generated") {
     throw "$Context did not generate as expected: $Line"
+  }
+}
+
+function Assert-ReportLineAdopted {
+  param([string]$Line, [string]$Context)
+  if ($Line -notmatch "status=adopted") {
+    throw "$Context did not adopt as expected: $Line"
   }
 }
 
@@ -1824,6 +1901,57 @@ Assert-DefaultBaseExtensionDiagnostics -Context "Space Age generation integrity 
 $spaceAgeRailsLine = Get-LastStreamReportLine -Key "research_rails"
 Assert-ReportLineContains -Line $spaceAgeRailsLine -Expected "effects=3" -Context "Space Age Elevated Rails productivity scenario"
 Assert-ReportLineContains -Line $spaceAgeRailsLine -Expected "icon=tech:elevated-rail" -Context "Space Age Elevated Rails productivity icon scenario"
+
+Invoke-RuntimeScenario -ScenarioName "space-age-vanilla-family-adoption" -EnabledFixtureNames @(
+  "mir-fixture-vanilla-family-adoption-recipes",
+  "mir-fixture-assert-vanilla-family-adoption"
+) -EnableSpaceAge
+$adoptedFamilyExpectations = @{
+  research_rocket_fuel = "owners=rocket-fuel-productivity";
+  research_low_density_structure = "owners=low-density-structure-productivity";
+  research_plastic = "owners=plastic-bar-productivity";
+  research_processing_unit = "owners=processing-unit-productivity"
+}
+foreach ($entry in $adoptedFamilyExpectations.GetEnumerator()) {
+  $line = Get-LastStreamReportLine -Key $entry.Key
+  Assert-ReportLineAdopted -Line $line -Context "Space Age vanilla family adoption stream $($entry.Key)"
+  Assert-ReportLineContains -Line $line -Expected $entry.Value -Context "Space Age vanilla family adoption owner $($entry.Key)"
+}
+Assert-LogContains -Expected "recipe=mir-fixture-no-productivity-rocket-fuel because recipe_productivity_not_allowed" -Context "Space Age vanilla family adoption allow_productivity=false scenario"
+
+Invoke-RuntimeConfigurationChangeScenario -ScenarioName "space-age-vanilla-family-adoption-config-change" `
+  -ChangedFixtureNames @(
+    "mir-fixture-vanilla-family-adoption-recipes"
+  ) `
+  -EnableSpaceAge
+Assert-LogContains -Expected "Reset technology effects for productivity family adoption signature change" -Context "Space Age vanilla family adoption configuration-change reset scenario"
+Assert-LogContains -Expected "schema=1|owner=rocket-fuel-productivity|recipe=mir-fixture-adopt-rocket-fuel|change=0.1" -Context "Space Age vanilla family adoption configuration-change signature scenario"
+
+Invoke-RuntimeScenario -ScenarioName "space-age-vanilla-family-owner-prepatched" -EnabledFixtureNames @(
+  "mir-fixture-vanilla-family-owner-prepatched",
+  "mir-fixture-assert-vanilla-family-owner-prepatched"
+) -EnableSpaceAge
+$prepatchedRocketFuelLine = Get-LastStreamReportLine -Key "research_rocket_fuel"
+if ($prepatchedRocketFuelLine -notmatch "status=skipped" -or $prepatchedRocketFuelLine -notmatch "covered_by_existing_infinite_recipe_productivity") {
+  throw "Prepatched family owner should skip residual MIR rocket fuel generation: $prepatchedRocketFuelLine"
+}
+
+Invoke-RuntimeScenario -ScenarioName "space-age-vanilla-family-exact-owner" -EnabledFixtureNames @(
+  "mir-fixture-vanilla-family-exact-owner",
+  "mir-fixture-assert-vanilla-family-exact-owner"
+) -EnableSpaceAge
+$exactOwnerRocketFuelLine = Get-LastStreamReportLine -Key "research_rocket_fuel"
+if ($exactOwnerRocketFuelLine -notmatch "status=skipped" -or $exactOwnerRocketFuelLine -notmatch "covered_by_existing_infinite_recipe_productivity") {
+  throw "External exact family owner should skip residual MIR rocket fuel generation: $exactOwnerRocketFuelLine"
+}
+
+Invoke-RuntimeScenario -ScenarioName "space-age-vanilla-family-mixed-owner" -EnabledFixtureNames @(
+  "mir-fixture-vanilla-family-mixed-owner",
+  "mir-fixture-assert-vanilla-family-mixed-owner"
+) -EnableSpaceAge
+$mixedOwnerRocketFuelLine = Get-LastStreamReportLine -Key "research_rocket_fuel"
+Assert-ReportLineGenerated -Line $mixedOwnerRocketFuelLine -Context "Mixed owner change fallback scenario"
+Assert-LogContains -Expected "owner_mixed_change_values; falling back to MIR generation for eligible recipes" -Context "Mixed owner change fallback scenario"
 
 Invoke-RuntimeScenario -ScenarioName "space-age-fluid-productivity" -EnabledFixtureNames @(
   "mir-fixture-assert-fluid-productivity"

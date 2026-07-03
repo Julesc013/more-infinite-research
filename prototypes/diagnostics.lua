@@ -78,8 +78,8 @@ function D.record_recipe_match(key, recipe_name)
   table.insert(recipe_to_streams[recipe_name], key)
 end
 
-function D.stream_fields(key, spec, status, reason, ingredients, prerequisites, effects, lab_status)
-  return {
+function D.stream_fields(key, spec, status, reason, ingredients, prerequisites, effects, lab_status, extra)
+  local row = {
     key = key,
     status = status,
     reason = reason,
@@ -89,6 +89,10 @@ function D.stream_fields(key, spec, status, reason, ingredients, prerequisites, 
     lab_status = lab_status or "full",
     icon = icon_hint(spec or {})
   }
+  for field, value in pairs(extra or {}) do
+    row[field] = value
+  end
+  return row
 end
 
 function D.extension_fields(key, status, reason, ingredients, prerequisites, effects, lab_status)
@@ -124,7 +128,8 @@ function D.flush()
         .. " icon=" .. tostring(row.icon or "")
         .. " effect=" .. tostring(row.effect or "")
         .. " target=" .. tostring(row.target or "")
-        .. " owners=" .. tostring(row.owners or ""))
+        .. " owners=" .. tostring(row.owners or "")
+        .. " recipes=" .. tostring(row.recipes or ""))
     end
     log("[more-infinite-research] Generation report end")
   end

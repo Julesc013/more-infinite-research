@@ -13,6 +13,13 @@ return {
       {icon="__space-age__/graphics/technology/processing-unit-productivity.png", icon_size=256, inactive_mod_asset="space-age"},
       {technology="processing-unit"},
       {technology="advanced-electronics-2"}
+    },
+    adopt_into_existing_productivity_tech = {
+      tech = "processing-unit-productivity",
+      products = {"processing-unit"},
+      require_infinite = true,
+      require_existing_recipe_productivity_effects = true,
+      change_policy = "copy-owner"
     }
   },
 
@@ -21,6 +28,13 @@ return {
     icon_candidates={
       {icon="__space-age__/graphics/technology/plastics-productivity.png", icon_size=256, inactive_mod_asset="space-age"},
       {technology="plastics"}
+    },
+    adopt_into_existing_productivity_tech = {
+      tech = "plastic-bar-productivity",
+      products = {"plastic-bar"},
+      require_infinite = true,
+      require_existing_recipe_productivity_effects = true,
+      change_policy = "copy-owner"
     }
   },
   research_sulfur  = { items={"sulfur"}, icon_tech="sulfur-processing", exclude_ingredient_patterns={"asteroid"} },
@@ -36,6 +50,13 @@ return {
     icon_candidates={
       {icon="__space-age__/graphics/technology/low-density-structure-productivity.png", icon_size=256, inactive_mod_asset="space-age"},
       {technology="low-density-structure"}
+    },
+    adopt_into_existing_productivity_tech = {
+      tech = "low-density-structure-productivity",
+      products = {"low-density-structure"},
+      require_infinite = true,
+      require_existing_recipe_productivity_effects = true,
+      change_policy = "copy-owner"
     }
   },
   research_rocket_fuel = {
@@ -43,6 +64,13 @@ return {
     icon_candidates={
       {icon="__space-age__/graphics/technology/rocket-fuel-productivity.png", icon_size=256, inactive_mod_asset="space-age"},
       {technology="rocket-fuel"}
+    },
+    adopt_into_existing_productivity_tech = {
+      tech = "rocket-fuel-productivity",
+      products = {"rocket-fuel"},
+      require_infinite = true,
+      require_existing_recipe_productivity_effects = true,
+      change_policy = "copy-owner"
     }
   },
 

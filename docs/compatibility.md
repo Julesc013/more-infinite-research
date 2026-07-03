@@ -113,7 +113,8 @@ Large mod packs and utility mods such as Alien Biomes, Informatron, Jetpack, AAI
 - No mod can observe another mod's later `data-final-fixes.lua` mutations unless a user, modpack, or future targeted integration imposes a later load order.
 - Lab validation prevents impossible research ingredients, but it cannot infer every overhaul mod's intended progression.
 - Recipe productivity technologies remain bounded by Factorio's recipe productivity cap even when research levels are infinite.
-- Vanilla Space Age productivity technologies remain authoritative for processing units, low density structures, plastic, and rocket fuel where they already own all matching recipes.
+- Vanilla Space Age productivity technologies remain authoritative for processing units, low density structures, plastic, and rocket fuel. Where those configured families have additional productivity-allowed recipes that are not exactly owned by another infinite technology, MIR adopts them into the existing vanilla infinite productivity technology instead of generating a parallel MIR technology.
+- The existing-save refresh for configured vanilla productivity-family adoption is keyed by the actual adopted `owner|recipe|change` signature, not only by a fixed feature version. Adding or removing a planet mod that changes the adopted recipe set can therefore trigger one technology-effect reset for the affected save.
 - Module productivity can include Quality modules because the current Factorio `2.1` line uses a hidden optional Quality dependency for load order. The dependency is hidden to avoid presenting Quality as a required or recommended mod-page dependency.
 - Existing prototype IDs are kept stable unless a tested migration is provided. `v2.0.5` provides a JSON migration for the intentional trash-slot-to-inventory technology consolidation and adds control-stage storage under the More Infinite Research namespace.
 - Runtime scripted features avoid per-tick scanning by default. If a future feature needs active scanning, it should be disabled by default, clearly labeled experimental, or split into a companion mod.
@@ -320,7 +321,7 @@ Expected result: vanilla tank cannon fire rate is preserved while MIR avoids dup
 - Confirm runtime fixture validation covers fluid-output productivity ownership in base-only and Space Age scenarios.
 - Confirm runtime fixture validation covers startup pipeline extent scaling when the multiplier is enabled.
 - Confirm runtime fixture validation covers preserving an existing finite vanilla-chain level before adding MIR's generated infinite continuation.
-- Confirm runtime fixture validation covers broad generation integrity in base-only and Space Age runs, including all enabled vanilla numbered extension chains, the checkbox-enabled inserter-capacity continuation, generated `recipe-prod-*` technology shape, and single-owner recipe productivity.
+- Confirm runtime fixture validation covers broad generation integrity in base-only and Space Age runs, including all enabled vanilla numbered extension chains, the checkbox-enabled inserter-capacity continuation, generated `recipe-prod-*` technology shape, single-owner recipe productivity, and configured vanilla productivity-family adoption/conflict cases.
 - Confirm runtime fixture validation covers preserving finite vanilla weapon shooting speed cannon-shell effects under MIR's overlap setting.
 - Confirm runtime fixture validation covers Omega-style drill recipe productivity.
 - Load Factorio with the manual matrix above.
