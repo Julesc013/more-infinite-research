@@ -2,6 +2,59 @@
 
 This file records local release-candidate validation runs. It is not a substitute for the manual mod matrix in `docs/compatibility.md`.
 
+## 2026-07-03 2.1.0 Release Candidate Audit
+
+Environment:
+
+- Branch: `dev`.
+- Mod version `2.1.0`.
+- Installed local Factorio binary: `2.1.9` build `86829`, Windows Steam.
+- Release archive rebuilt: `dist/more-infinite-research_2.1.0.zip`.
+- Validation archive rebuilt: `build/validation-dist/more-infinite-research_2.1.0.zip`.
+
+Scope:
+
+- Reviewed the full delta from tag `2.0.5` through the current `dev` head.
+- Refreshed release docs, TODO, roadmap, compatibility notes, manual test plan, API proof ledger, release notes, and mod portal copy for the actual `2.1.0` release-candidate scope.
+- Confirmed there is no MIR steel-plate productivity stream, so steel-family adoption remains intentionally absent.
+- Confirmed the broad native modifier skip/warn/prefer/allow policy, high-throughput pump, existing agricultural plant rescale, and stronger scripted spoilage/agriculture claims are deferred.
+- Confirmed shipped compatibility scope is targeted: exact recipe-productivity owner filtering, vanilla Space Age family adoption, and known fully covered recipe-productivity competitor replacement.
+- Loaded the rebuilt release zip itself from isolated normal mod directories in base-only and Space Age save-creation smokes.
+
+Commands:
+
+```powershell
+& "C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe" --version
+rg "data.raw.tool|tool_exists|has_tool|PACKS_ALL" prototypes
+rg "on_tick|on_nth_tick" control prototypes
+rg "icon_mipmaps" prototypes
+.\scripts\Build-MIRPackage.ps1
+.\scripts\Test-MIRLocales.ps1
+.\scripts\Invoke-MIRValidation.ps1 -StaticOnly
+.\scripts\Invoke-MIRValidation.ps1 -FactorioBin "C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe"
+.\scripts\Test-MIRBranchPolicy.ps1
+git diff --check
+
+# Release-zip smoke:
+# Copy dist/more-infinite-research_2.1.0.zip into isolated base-only and Space Age temp mod directories,
+# write matching mod-list.json files, and run Factorio --create for each scenario.
+```
+
+Results:
+
+- Factorio reported `Version: 2.1.9 (build 86829, win64, steam)`.
+- Stale release-scope scans found no active contradiction after the docs update.
+- Code hygiene scans found no old science-pack authority, runtime tick handlers, or generated `icon_mipmaps` usage.
+- Locale validation passed across nine locale files, with only the expected missing supported-language directory warning list.
+- Static/package validation passed and rebuilt the validation archive.
+- Runtime fixture validation passed across the full Factorio load-test matrix.
+- Plates n Circuit Productivity compatibility passed both the full replacement scenario and the partial-coverage scenario.
+- Vanilla Space Age productivity-family adoption passed adoption, exact-owner skip, prepatched-owner skip, mixed-owner fallback, productivity-disallowed recipe rejection, and configuration-change technology-effect refresh scenarios.
+- Fluid productivity and pipeline extent fixture coverage passed, including `200%` and `50%` pipeline multiplier scenarios.
+- The rebuilt release zip loaded from isolated base-only and Space Age normal mod folders and created fresh saves in both scenarios.
+- Branch policy validation passed for `origin/main`, `origin/dev`, and `origin/legacy`.
+- `git diff --check` passed. Git reported line-ending normalization warnings only.
+
 ## 2026-07-03 Pipeline Extent Dropdown Pass
 
 Environment:

@@ -10,6 +10,7 @@ It is built for players who want more long-term scaling for late-game megabases,
 - Adds repeatable player, robot, weapon-speed, cargo-logistics, and selected vanilla technology bonuses.
 - Adds a base-game Research productivity chain when Space Age's vanilla `research-productivity` technology is not present.
 - Skips Space Age productivity duplicates when vanilla already owns processing unit, low density structure, plastic, rocket fuel, or research productivity.
+- Adopts safe mod-added recipes into configured vanilla Space Age productivity families instead of creating parallel research.
 - Startup settings let you enable, disable, cap, or rebalance almost every generated research.
 - Works with Factorio `2.1`; requires `base >= 2.1.8`. Space Age is optional.
 - Version `2.1.0` keeps generated technology IDs stable and retains the migration that merges the old trash-slot research into Character inventory slots.
@@ -176,9 +177,10 @@ This helps it work with:
 - OCs Stone Casting.
 - Fluid Quality Imprinting.
 - Plates n Circuit Productivity.
+- Panglia-style planet mods that add alternate rocket fuel or low density structure recipes.
 - Omega Drill style drill mods.
 
-When this mod is set to prefer its own overlapping research, it only removes known competing infinite technologies that are fully covered by generated More Infinite Research effects. Finite upgrade chains from other mods are left alone.
+When this mod is set to prefer its own overlapping research, it only removes known competing infinite technologies that are fully covered by generated More Infinite Research effects. Finite upgrade chains from other mods are left alone. Vanilla Space Age productivity families remain authoritative where safe, so mod-added rocket fuel or low density structure recipes can be appended to the vanilla infinite technology instead of receiving duplicate-looking MIR research.
 
 Compatibility is broad, but not guaranteed for every overhaul. Mods that change recipes or labs very late in loading may still need load-order compatibility.
 

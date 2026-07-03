@@ -1,6 +1,6 @@
 # M.I.R. TODO
 
-Updated: 2026-07-02
+Updated: 2026-07-03
 
 This is the executable task list for the next More Infinite Research releases.
 
@@ -95,6 +95,9 @@ Done in the current development branch:
 - [x] Implement the strictly opt-in startup-only pipeline extent multiplier dropdown with default `100%` unchanged behavior and no fluidbox scan when disabled.
 - [x] Add runtime fixtures for fluid-output productivity ownership and startup pipeline extent scaling.
 - [x] Add a hard safety guard and validation coverage preventing character item-pickup and loot-pickup reach effects from MIR-generated technologies.
+- [x] Add conservative vanilla Space Age productivity-family adoption for processing units, plastic, low density structures, and rocket fuel.
+- [x] Add existing-save technology-effect reset keyed by the actual adopted productivity-family signature.
+- [x] Add known Plates n Circuit Productivity replacement for fully covered competing plate and circuit productivity technologies.
 
 Important release note: the scripted runtime work above is a **default-off v2.0.5 ship candidate**, not automatically deferred to `v2.1.0`. The implementation is complete for the default-off release posture. Defer default enablement, presets, or stronger behavior claims until long-running manual proof exists.
 
@@ -275,7 +278,7 @@ Do not turn `v2.1.0` into a bucket for every plausible feature idea.
 
 - [x] Settings preset mode and per-technology enable-policy dropdowns removed before release; individual enable checkboxes are the single enablement path.
 - [ ] Shareable presets/import-export design for a later release, without adding per-technology override dropdowns.
-- [ ] Native modifier overlap policy: prefer existing owner, warn only, prefer MIR, or allow duplicates.
+- [x] Broad native modifier overlap policy explicitly deferred; targeted recipe-productivity compatibility shipped first.
 - [x] Icon source resolver: prefer loaded Space Age technology art when available, optionally reference installed-but-disabled Space Age icon files behind `mir-use-installed-space-age-icons`, keep default base-only fallbacks safe, and do not redistribute original Space Age asset files inside MIR.
 - [ ] Scripted spoilage hardening: manual results for existing/new stacks, reversal, disable, baseline, and multi-force behavior.
 - [ ] Scripted agriculture hardening: newly planted crops verified; existing-plant rescale only if bounded and deduplicated.
@@ -289,7 +292,7 @@ Do not turn `v2.1.0` into a bucket for every plausible feature idea.
 - [ ] Real Maraxis-like duplicate cargo landing pad manual test when a compatible target is available.
 - [ ] Krastorio 2 Spaced Out test if compatible with the active Factorio line.
 - [ ] Better Robots Extended smoke test.
-- [ ] Compatibility docs and manual runtime test results.
+- [x] Compatibility docs and automated runtime test results for shipped `v2.1.0` features.
 
 ### v2.1.0 Spike / Defer Decisions
 
@@ -306,21 +309,22 @@ Do not turn `v2.1.0` into a bucket for every plausible feature idea.
 
 ### v2.1.0 Acceptance Criteria
 
-- [ ] Every shipped feature has a clear implementation type: native modifier, recipe productivity, scripted event, prototype unlock, or startup setting.
-- [ ] No shipped feature uses broad `on_tick` scanning.
-- [ ] Any deferred `v2.0.5` scripted feature has its blocker closed or remains disabled/deferred.
-- [ ] Every scripted feature documents storage keys, recomputation events, disable behavior, reversal behavior, and multi-force behavior.
+- [x] Every shipped feature has a clear implementation type: native modifier, recipe productivity, scripted event, prototype unlock, or startup setting.
+- [x] No shipped feature uses broad `on_tick` scanning.
+- [x] Any deferred `v2.0.5` scripted feature has its blocker closed or remains disabled/deferred.
+- [x] Every scripted feature documents storage keys, recomputation events, disable behavior, reversal behavior, and multi-force behavior at the conservative default-off claim level.
 - [x] Any new recipe-productivity stream proves exact recipe IDs and no vanilla/other-mod infinite duplicate.
 - [x] Every startup prototype setting documents when it is applied and why it cannot be runtime research.
-- [ ] Compatibility tests include no Space Age, Space Age, Space Age without Quality where supported, custom science/lab fixtures, and at least one large overhaul if available.
-- [x] Presets have validation for expected generated stream and base-extension decisions.
-- [ ] Native modifier overlap policy has validation for duplicate cargo/native modifier scenarios.
+- [x] Compatibility tests include no Space Age, Space Age, Space Age without Quality where supported, custom science/lab fixtures, and targeted duplicate-productivity fixtures.
+- [x] Removed preset/enable-policy behavior has validation for checkbox-only generated stream and base-extension decisions.
+- [x] Targeted recipe-productivity competitor replacement has validation for full replacement and partial-coverage behavior.
+- [ ] Broad native modifier skip/warn/prefer/allow policy remains deferred beyond diagnostic-only duplicate cargo/native modifier scenarios.
 - [x] Icon resolver validation proves default base-only runs do not resolve generated icons to `__space-age__` paths, opt-in base-only runs can use installed Space Age icon paths, and Space Age runs still prefer intended Space Age art.
 - [x] Package validation fails copied Space Age asset files unless an explicit source/license allowlist entry exists.
-- [ ] Conditional spikes are either promoted with proof or explicitly moved out of `v2.1.0`.
-- [ ] `info.json` version is bumped to `2.1.0`.
-- [ ] `changelog.txt` has a dated `2.1.0` entry.
-- [ ] README, roadmap, compatibility docs, test results, and changelog are updated before release.
+- [x] Conditional spikes are either promoted with proof or explicitly moved out of `v2.1.0`.
+- [x] `info.json` version is bumped to `2.1.0`.
+- [x] `changelog.txt` has a dated `2.1.0` entry.
+- [x] README, roadmap, compatibility docs, test results, and changelog are updated before release.
 
 ## v2.1.5 Quick Feedback Patch
 
@@ -427,6 +431,6 @@ Run this before every release candidate:
 - [x] `.\scripts\Invoke-MIRValidation.ps1 -FactorioBin "C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe"`
 - [x] `.\scripts\Test-MIRBranchPolicy.ps1`
 - [x] `git diff --check`
-- [ ] Load the release zip from a normal Factorio mods folder.
+- [x] Load the release zip from a normal Factorio mods folder.
 - [x] Record validation results in `docs/test-results.md`.
 - [x] Commit docs, code, changelog, and package together for the tested candidate.

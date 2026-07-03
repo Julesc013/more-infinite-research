@@ -8,7 +8,7 @@ Release-line summary:
 | --- | --- | --- |
 | `2.0.5` | `2.1.x` | quick feedback patch: small fixes, default-off scripted agriculture/spoilage candidates, docs, validation, package parity |
 | `1.9.0` | `2.0.x` | compatible subset backported from the tested `2.0.5` quick-patch snapshot |
-| `2.1.0` | `2.1.x` | larger feature wave: presets, broader scripted refinements, logistics/fluid/productivity features that pass proof |
+| `2.1.0` | `2.1.x` | larger feature wave: simpler settings, icon policy, fluid productivity, pipeline extent, and targeted duplicate-productivity compatibility |
 | `2.1.5` | `2.1.x` | quick feedback patch after `2.1.0` |
 | `1.9.5` | `2.0.x` | compatible subset backported from the tested `2.1.5` snapshot |
 | `1.9.9` | `2.0.x` | final planned Factorio 2.0 port from the latest tested `2.x.x` snapshot when Factorio 2.1 becomes stable or another verified upstream cutoff is chosen |
@@ -31,10 +31,10 @@ The release goal is graceful compatibility without mod-page dependency clutter: 
 - Optional DLC-shaped streams declare concrete required prototypes instead of requiring a specific official mod by name.
 - Cargo bay unloading distance research uses Factorio 2.1.8's `max-cargo-bay-unloading-distance` technology modifier, uses official base and Space Age science packs only, and is skipped unless Space Age is active and the `landing-pad-unloading-bay` prototypes exist.
 - Cargo landing pad count research uses `cargo-landing-pad-count`, uses official base and Space Age science packs only, is disabled by default, requires the vanilla `rocket-silo` cargo landing pad unlock, and is skipped unless Space Age is active and the `cargo-landing-pad` prototype exists.
-- Direct-effect diagnostics report overlapping infinite non-MIR native modifier owners, including cargo/logistics modifiers. In `v2.0.5` this is diagnostic-only: MIR does not skip, merge, or remove either technology based on the overlap report.
+- Direct-effect diagnostics report overlapping infinite non-MIR native modifier owners, including cargo/logistics modifiers. In `v2.1.0` this broad native-modifier policy remains diagnostic-only: MIR does not skip, merge, or remove those technologies based on the overlap report.
 - Spoilage preservation and agricultural growth speed are implemented in `dev` as visible `nothing` technology effects plus bounded runtime behavior through the control-stage scripted technology manager.
 - Scripted runtime effects use the same effective enablement model as data-stage technology generation: the stream's `ips-enable-*` checkbox controls both generated technology creation and runtime effect activation.
-- The release plan keeps those scripted runtime features default-off in `v2.0.5` as opt-in experimental candidates. Default enablement or stronger public behavior claims require manual save validation for existing-stack behavior, research reversal, disabling, multi-force behavior, and the agricultural tower event path. Any unsafe or unclear behavior is deferred to `v2.1.0`.
+- The release keeps those scripted runtime features default-off as opt-in experimental candidates. Default enablement or stronger public behavior claims require manual save validation for existing-stack behavior, research reversal, disabling, multi-force behavior, and the agricultural tower event path.
 - Spoilage preservation changes the global spoil time modifier and recomputes on init, configuration change, research finish/reversal, and technology effects reset.
 - Agricultural growth speed adjusts newly planted agricultural tower plants from the tower planting event and does not rescan existing farms in this first implementation slice.
 - Mod-specific stream changes should live in `prototypes/compat/profiles.lua` instead of the base stream definitions.
@@ -56,7 +56,7 @@ Future MIR features should treat overlapping native modifiers as compatibility-s
 
 This is especially relevant for cargo landing pad count, cargo bay unloading distance, and any future native modifier or scripted-effect technology that other mods may also provide.
 
-`v2.1.0` should promote `v2.0.5`'s diagnostic-only overlap reporting into an explicit setting-backed policy.
+The broad skip/warn/prefer/allow native-modifier policy is deferred from `v2.1.0`. The shipped compatibility work is narrower: exact recipe-productivity owner filtering, configured vanilla productivity-family adoption, and known fully covered recipe-productivity competitor replacement.
 
 ## Legacy Backport Model
 
@@ -103,6 +103,7 @@ These integrations do not add mod-page dependencies. More Infinite Research hand
 - OCs Stone Casting (`OCs_stone_casting`): foundry recipes that output covered stone, landfill, brick, wall, concrete, refined concrete, foundation, rail, gate, or furnace items are picked up by the existing output-based streams.
 - Fluid Quality Imprinting (`fluid-quality-imprinting`): quality-imprinting recipes that output covered plate and intermediate items are picked up by the existing output-based streams.
 - Plates n Circuit Productivity (`plates-n-circuit-productivity`): competing plate and circuit productivity technologies are replaced when `mir-prefer-this-mod-for-competing-techs` is enabled and all recipe effects on the competing technology are covered by enabled MIR streams.
+- Panglia-style planet mods: additional productivity-allowed rocket fuel and low density structure recipes can be adopted into the existing vanilla Space Age `rocket-fuel-productivity` and `low-density-structure-productivity` technologies when those vanilla owners are safe.
 - Omega Drill style drill mods: `omega-drill`, `omega-tau`, and broader modded `*-mining-drill` / `*-drill` outputs are picked up by mining drill productivity when their recipes are visible.
 - Custom science packs from mods such as Castra or PlanetLib-based planets are picked up opportunistically when they are active lab inputs and have visible recipes that output the pack item.
 
@@ -134,11 +135,13 @@ Run each case from a clean Factorio user data directory or with a controlled mod
 8. Space Age 2.1.8+ with a Maraxis-like duplicate cargo fixture, verifying overlapping cargo modifiers are reported diagnostically while MIR's cargo technologies still load.
 9. Base-only and Space Age fluid-productivity fixture runs, verifying oil, lubricant, sulfuric acid, acid neutralization, and thruster propellant recipe ownership.
 10. Startup pipeline extent fixture runs with non-default dropdown multipliers, verifying common fluid boxes are mutated only when enabled.
-11. Better Robots Extended enabled.
-12. A fixture mod that adds a science pack as an ordinary `item` and adds it to a lab.
-13. A fixture mod that adds a custom lab with a different science-pack input set.
-14. A fixture mod that adds recipes in `data-final-fixes.lua`.
-15. Existing save upgraded from the latest 1.x release.
+11. Space Age with Panglia or a Panglia-like fixture, verifying extra rocket fuel and low density structure recipes adopt into vanilla productivity technologies.
+12. Plates n Circuit Productivity or the local fixture enabled, verifying fully covered competing technologies are removed only after MIR replacement effects exist.
+13. Better Robots Extended enabled.
+14. A fixture mod that adds a science pack as an ordinary `item` and adds it to a lab.
+15. A fixture mod that adds a custom lab with a different science-pack input set.
+16. A fixture mod that adds recipes in `data-final-fixes.lua`.
+17. Existing save upgraded from the latest 1.x release.
 
 Post-v2.0 scripted feature releases also require these named saves/scenarios:
 

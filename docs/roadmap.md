@@ -1,6 +1,6 @@
 # M.I.R. Roadmap
 
-Updated: 2026-07-01
+Updated: 2026-07-03
 
 This is the current release roadmap for More Infinite Research after the v2.0.0 Factorio 2.1 compatibility release.
 
@@ -24,7 +24,7 @@ The minimum manual smoke checks gate the `v2.0.5` quick patch. The full scripted
 | --- | --- | --- | --- |
 | `2.0.5` | `2.1.x` | Quick feedback patch | small/easy fixes, default-off scripted agriculture/spoilage candidates, docs, validation, package parity |
 | `1.9.0` | `2.0.x` | Legacy port | compatible subset of the tested `2.0.5` quick-patch snapshot |
-| `2.1.0` | `2.1.x` | Larger feature wave | simpler settings, harder compatibility work, pump/fluid/logistics spikes that graduate, broader scripted refinements |
+| `2.1.0` | `2.1.x` | Larger feature wave | simpler settings, icon policy, fluid productivity, pipeline extent, and targeted duplicate-productivity compatibility |
 | `2.1.5` | `2.1.x` | Quick feedback patch | small fixes and feedback from `2.1.0` |
 | `1.9.5` | `2.0.x` | Legacy port | compatible subset of the tested `2.1.5` snapshot |
 | `2.2.0` | `2.1.x` | Larger feature wave | next larger batch after the `2.1.x` feedback cycle |
@@ -118,6 +118,8 @@ This table is the canonical current synthesis from the Reddit discussion and fol
 | Thruster fuel/oxidizer productivity | Implemented recipe-productivity streams; release gated by validation | `v2.1.0` |
 | True thruster thrust research | Reject for core MIR unless API changes | Later / companion |
 | Oil processing productivity | Implemented recipe-productivity split; release gated by validation | `v2.1.0` |
+| Vanilla Space Age productivity-family adoption | Ship | `v2.1.0` |
+| Plates n Circuit Productivity replacement | Ship | `v2.1.0` |
 | Quality module enrichment / quality odds research | Spike/defer; likely add-on or prototype-tier feature | Later |
 | Robot battery/carrying capacity | Existing core | Existing |
 | Roboport range | Spike/defer | Later |
@@ -202,7 +204,7 @@ Theme:
 User-facing control + compatibility discipline + proof-gated expansion.
 ```
 
-`v2.1.0` is the next controlled feature wave. It should not absorb every good idea. The release must ship settings control, compatibility policy, and only the scripted/logistics/productivity work that passes proof.
+`v2.1.0` is the next controlled feature wave. It should not absorb every good idea. The release candidate ships settings control cleanup, targeted compatibility policy, icon policy, and only the logistics/productivity work that passed proof.
 
 The executable release gate lives in `docs/release-plan-2.1.0.md`.
 
@@ -213,14 +215,16 @@ The executable release gate lives in `docs/release-plan-2.1.0.md`.
 | Checkbox enablement cleanup | Implemented | Startup setting/default resolver | Individual enable checkboxes are the single enablement path |
 | Shareable presets | Deferred | Import/export or profile design | Do not add per-technology override dropdowns back without a sharing model |
 | Scripted runtime resolver | Implemented | Control-stage startup setting resolver | Spoilage/agriculture runtime effects mirror data-stage checkbox decisions |
-| Duplicate native modifier policy | Ship | Data-stage overlap scan plus explicit policy | Promote `v2.0.5` diagnostic-only reporting to skip/warn/prefer/allow behavior |
+| Broad native modifier policy | Deferred | Data-stage overlap scan plus explicit policy | Keep diagnostics; ship narrower recipe-productivity compatibility first |
 | Icon source resolver and asset policy | Ship | Data-stage icon candidate resolver plus package validation guard | Prefer loaded Space Age/Wube art when available; do not redistribute original Space Age files in MIR |
-| Scripted-tech refinements | Ship if needed | Event-driven runtime manager | Improve storage/reversal/diagnostics after `v2.0.5` feedback |
-| Existing agricultural plant rescale | Ship if bounded | Research-change bounded scan | Deduplicate tower-owned plants and avoid surface-wide scans |
-| High-throughput pump / Der Pump | Ship if prototype proof passes | Prototype unlock | Good megabase QoL candidate |
+| Scripted-tech refinements | Deferred beyond checkbox routing | Event-driven runtime manager | Keep default-off claims until save-level evidence exists |
+| Existing agricultural plant rescale | Deferred | Research-change bounded scan | Needs bounded save-level proof |
+| High-throughput pump / Der Pump | Deferred | Prototype unlock | Good megabase QoL candidate, not in this candidate |
 | Pipeline extent setting | Implemented; ship if compatibility proof passes | Startup prototype setting | Default `100%` leaves prototypes unchanged |
 | Thruster fuel/oxidizer productivity | Implemented; ship if recipe proof passes | Recipe productivity | Do not add true thrust research |
 | Oil/fluid recipe productivity | Implemented; ship if proof passes | Recipe productivity | Needs manual balance proof on fluid outputs |
+| Vanilla Space Age productivity-family adoption | Implemented | Existing technology recipe effects | Panglia-style alternate rocket fuel/LDS recipes adopt into vanilla family techs where safe |
+| Plates n Circuit Productivity replacement | Implemented | Known competitor preparation and cleanup | Fully covered competing recipe-productivity techs are removed only after MIR replacement exists |
 | Compatibility docs and test results | Ship | Docs/evidence | Maraxis/Krastorio-style validation when available |
 
 ### v2.1.0 Acceptance Criteria

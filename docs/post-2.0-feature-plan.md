@@ -1,6 +1,6 @@
 # Post-2.0 Feature Plan
 
-Updated: 2026-07-01
+Updated: 2026-07-03
 
 This document records the feature triage from the first public v2.0.0 discussion and turns it into a bounded plan for More Infinite Research after v2.0.0.
 
@@ -12,7 +12,7 @@ Release discipline update:
 
 ```text
 v2.0.5 = quick feedback patch: small/easy fixes, default-off scripted agriculture/spoilage candidates, docs, validation, package parity.
-v2.1.0 = larger feature wave: presets, broader scripted refinements, pump/fluid/logistics/productivity work that passes proof.
+v2.1.0 = larger feature wave: checkbox control, icon policy, fluid productivity, pipeline extent, and targeted duplicate-productivity compatibility that passes proof.
 v1.9.0 = Factorio 2.0 compatible subset backported from the tested v2.0.5 quick-patch snapshot.
 v2.1.5 = quick feedback patch after v2.1.0.
 v1.9.5 = Factorio 2.0 compatible subset backported from the tested v2.1.5 snapshot.
@@ -20,14 +20,14 @@ v2.2.0 = next larger feature wave.
 v1.9.9 = final planned Factorio 2.0 backport from the latest tested v2.x.x snapshot when Factorio 2.1 becomes stable or another verified upstream cutoff is chosen.
 ```
 
-The scripted technology implementation exists in `dev` as a default-off `v2.0.5` ship candidate. Public release claims should be made only for the specific behaviors proven by the manual save matrix. Default enablement or anything that fails proof moves to `v2.1.0`.
+The scripted technology implementation exists in `dev` as a default-off ship candidate. Public release claims should be made only for the specific behaviors proven by the manual save matrix. Default enablement or anything that fails proof moves to a later release.
 
 The Reddit thread was not one feature request. It was a roadmap dump. The useful split is:
 
 1. Core More Infinite Research features: infinite or configurable research sinks.
 2. Core-adjacent logistics QoL: late-game entities or settings unlocked by research.
 3. Companion mods: refrigeration, greenhouses, new biology loops, unusual quality/spoilage mechanics.
-4. Compatibility and UX work: presets, backports, modpack testing, duplicate-tech detection.
+4. Compatibility and UX work: settings control, backports, modpack testing, duplicate-tech detection.
 
 The major constraint is UPS. Anything requiring per-tick inventory scanning or constant entity mutation should be treated as a separate mod or disabled-by-default experiment. MIR's default policy should be no per-tick scanning for generated research effects.
 

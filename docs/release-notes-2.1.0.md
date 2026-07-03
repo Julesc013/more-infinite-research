@@ -4,7 +4,7 @@ This is the short, player-facing release summary for the `2.1.0` mod portal rele
 
 ## Headline
 
-`2.1.0` is the first larger Factorio `2.1` feature wave after the `2.0.5` quick patch. It focuses on simpler settings control, safer icon selection, fluid-output productivity, and an opt-in pipeline extent setting.
+`2.1.0` is the first larger Factorio `2.1` feature wave after the `2.0.5` quick patch. It focuses on simpler settings control, safer icon selection, fluid-output productivity, an opt-in pipeline extent setting, and more conservative duplicate-productivity compatibility.
 
 ## What Changed
 
@@ -14,6 +14,8 @@ This is the short, player-facing release summary for the `2.1.0` mod portal rele
 - Added fluid-output productivity research for oil processing, oil cracking, lubricant, sulfuric acid, acid neutralization, thruster fuel, and thruster oxidizer recipes where those recipes exist.
 - Oil cracking productivity uses oil processing technology art. Sulfuric acid productivity uses sulfuric acid fluid art and also covers acid neutralization when that recipe exists.
 - Added an opt-in startup-only pipeline extent multiplier dropdown. The default `100%` setting leaves prototypes unchanged.
+- Added conservative adoption of mod-added recipes into existing vanilla Space Age productivity families for processing units, plastic bars, low density structures, and rocket fuel.
+- Improved replacement of known Plates n Circuit Productivity technologies so MIR can generate the covered replacement effects before removing the competing technologies.
 
 ## Compatibility And Validation
 
@@ -21,6 +23,8 @@ This is the short, player-facing release summary for the `2.1.0` mod portal rele
 - Base-only validation confirms generated icons do not use direct official DLC asset paths unless the installed official DLC icon opt-in is enabled.
 - Fluid productivity validation confirms the implemented fluid recipe streams have exact recipe ownership and avoid duplicate infinite owners.
 - Pipeline validation confirms the default `100%` setting does not run the prototype pass, and that explicit non-default dropdown values mutate representative fluid boxes.
+- Vanilla-family adoption validation covers exact owner skips, prepatched owner skips, mixed owner fallback, existing-save effect refresh, and productivity-disallowed recipes.
+- Plates n Circuit Productivity validation covers full replacement and partial-coverage behavior.
 
 ## Known Notes
 
@@ -28,4 +32,4 @@ This is the short, player-facing release summary for the `2.1.0` mod portal rele
 - Spoilage Preservation and Agricultural Growth Speed remain disabled by default and should be treated as experimental.
 - Existing planted crops are not globally rescanned by Agricultural Growth Speed.
 - The pipeline extent multiplier is a startup setting, not research. Non-default values should be tested carefully in large or heavily modded fluid networks.
-- Native modifier overlap policy, existing agricultural plant rescale, and high-throughput pump work remain deferred unless separately implemented and validated.
+- Broad native modifier overlap policy, existing agricultural plant rescale, and high-throughput pump work remain deferred unless separately implemented and validated.

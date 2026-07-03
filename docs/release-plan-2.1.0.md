@@ -18,9 +18,9 @@ code work starts.
 Ship the features that make MIR easier to control and safer in modded saves:
 
 - simple per-technology checkbox enablement, with shareable presets deferred until there is an import/export design;
-- a real native modifier overlap policy instead of diagnostics only;
+- targeted duplicate-productivity compatibility, with the broad native modifier overlap policy explicitly deferred;
 - stricter icon source policy and fallback resolution;
-- scripted spoilage/agriculture hardening with manual evidence;
+- scripted spoilage/agriculture checkbox routing while stronger behavior claims wait for manual evidence;
 - compatibility matrix updates;
 - implemented fluid, thruster, and pipeline expansion gated by validation and manual balance evidence.
 
@@ -33,10 +33,10 @@ decision for each one.
 | --- | --- | ---: |
 | Checkbox enablement | Per-technology enable checkboxes are the single source of truth for stream generation, base continuations, and scripted runtime effects | Yes |
 | Shareable presets | Preset import/export remains deferred until it can be designed without adding per-technology override dropdowns | No |
-| Native modifier overlap policy | Existing diagnostics become a policy: skip/prefer existing, warn only, prefer MIR, or allow duplicates | Yes |
+| Native modifier overlap policy | Broad skip/prefer/warn/allow behavior is explicitly deferred; `v2.1.0` ships exact recipe-owner filtering, vanilla family adoption, and known fully covered recipe-productivity competitor replacement | Yes |
 | Icon source and asset policy | Fallback resolver can prefer loaded Space Age/Wube technology art, but the package does not redistribute original Space Age files | Yes |
-| Scripted spoilage hardening | Existing-stack, reversal, disable, baseline, and multi-force behavior is measured or remains default-off with caveats | Yes |
-| Scripted agriculture hardening | Newly planted crops are verified; existing-plant rescale either proves bounded or remains out of scope | Yes |
+| Scripted spoilage hardening | Existing-stack, reversal, disable, baseline, and multi-force behavior remains default-off with caveats until manual evidence exists | Yes |
+| Scripted agriculture hardening | Newly planted crops stay in the default-off experimental path; existing-plant rescale remains out of scope | Yes |
 | Compatibility matrix | Base, Space Age, Quality, custom science/lab, duplicate cargo/native modifier, and existing-save scenarios are recorded | Yes |
 | Release evidence | README, compatibility docs, test results, changelog, package validation, and release notes agree | Yes |
 
@@ -46,12 +46,14 @@ decision for each one.
 | --- | --- | --- | --- |
 | Checkbox enablement cleanup | Ship | Startup checkbox defaults plus shared resolver | `v2.1.0` |
 | Shareable presets | Defer | Import/export or copyable settings profile design | Later |
-| Native modifier overlap policy | Ship | Data-stage diagnostics plus generation policy | `v2.1.0` |
+| Broad native modifier overlap policy | Defer | Data-stage diagnostics plus future generation policy | Later |
+| Known recipe-productivity competitor replacement | Ship | Prepare known competitors, generate MIR replacement effects, then remove only fully covered competing techs | `v2.1.0` |
+| Vanilla Space Age productivity-family adoption | Ship | Add safe residual recipe effects into configured existing vanilla infinite technologies | `v2.1.0` |
 | Icon source resolver and asset policy | Ship | Data-stage icon candidate resolver plus package validation guard | `v2.1.0` |
-| Spoilage preservation hardening | Ship evidence/policy; maybe preset inclusion | Event-driven control-stage scripted tech | `v2.1.0` |
-| Agricultural growth hardening | Ship evidence/policy; existing-plant rescale conditional | Event-driven control-stage scripted tech | `v2.1.0` |
-| Existing agricultural plant rescale | Conditional | Research/configuration bounded tower scan with plant dedupe | `v2.1.0` if proven |
-| High-throughput pump | Likely ship if kept small | Prototype unlock, no runtime loop | `v2.1.0` candidate |
+| Spoilage preservation hardening | Defer stronger claims | Event-driven control-stage scripted tech | Later |
+| Agricultural growth hardening | Defer stronger claims | Event-driven control-stage scripted tech | Later |
+| Existing agricultural plant rescale | Defer | Research/configuration bounded tower scan with plant dedupe | Later if proven |
+| High-throughput pump | Defer | Prototype unlock, no runtime loop | Later candidate |
 | Pipeline extent multiplier | Implemented; ship if proof stays clean | Startup prototype setting, default 100%/unchanged | `v2.1.0` |
 | Thruster fuel productivity | Implemented; ship if proof stays clean | Recipe productivity | `v2.1.0` |
 | Thruster oxidizer productivity | Implemented; ship if proof stays clean | Recipe productivity | `v2.1.0` |
@@ -91,8 +93,9 @@ Acceptance criteria:
 
 ## Native Modifier Overlap Policy
 
-`v2.0.5` reports native modifier overlaps diagnostically. `v2.1.0` should turn
-that into a user-facing policy.
+`v2.0.5` reports native modifier overlaps diagnostically. `v2.1.0` keeps that
+broad native-modifier behavior diagnostic-only and ships narrower compatibility
+work where recipe ownership can be proven exactly.
 
 Recommended setting:
 
@@ -115,11 +118,12 @@ equivalent cargo/logistics/native modifier research.
 
 Acceptance criteria:
 
-- Overlap diagnostics remain visible.
-- Default behavior avoids duplicate native infinite chains.
-- Users can opt into duplicate behavior deliberately.
-- Cargo landing pad and cargo unloading overlap fixtures pass.
-- README and compatibility docs explain the policy plainly.
+- Overlap diagnostics remain visible for cargo/logistics/native modifier cases.
+- Exact recipe-productivity owners are respected before MIR generates replacement effects.
+- Configured vanilla Space Age productivity families can adopt residual productivity-allowed recipes where the owner tech is safe.
+- Known fully covered recipe-productivity competitor technologies are removed only after MIR replacement effects exist.
+- Cargo landing pad and cargo unloading overlap fixtures remain diagnostic-only.
+- README and compatibility docs explain the shipped narrow policy and the deferred broad policy plainly.
 
 ## Icon Source And Asset Policy
 
@@ -259,6 +263,8 @@ evidence before final release claims or non-conservative defaults.
 | Thruster fuel productivity | Exact recipes accept recipe productivity and no duplicate owner exists |
 | Thruster oxidizer productivity | Exact recipes accept recipe productivity and no duplicate owner exists |
 | Oil/fluid productivity | Fluid-only and mixed-output recipes behave correctly under recipe productivity |
+| Vanilla Space Age productivity-family adoption | Panglia-style residual recipes adopt into existing vanilla family technologies and existing saves refresh effects on signature changes |
+| Plates n Circuit Productivity replacement | Fully covered competing technologies are removed only after MIR generated replacement recipe effects exist |
 | Agricultural yield | Clean event/prototype path exists without broad scans |
 | Quality module enrichment | Clean prototype-tier/add-on path exists; no runtime module mutation |
 | Roboport range | Native modifier exists or prototype-tier scope is clearly a companion feature |

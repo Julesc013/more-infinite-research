@@ -1,6 +1,6 @@
 # Manual Test Plan
 
-Updated: 2026-07-01
+Updated: 2026-07-03
 
 This document defines named manual saves and scenarios. Runtime fixture validation is necessary, but it does not replace save-level gameplay validation.
 
@@ -60,6 +60,8 @@ Required before claiming larger `v2.1.0` features:
 | `thruster-fuel-productivity` | Manual verify the implemented thruster fuel productivity streams in a Space Age save after fixture validation passes |
 | `thruster-oxidizer-productivity` | Manual verify the implemented thruster oxidizer productivity streams in a Space Age save after fixture validation passes |
 | `oil-fluid-productivity` | Manual verify the implemented oil processing, oil cracking, lubricant, sulfuric acid, and acid neutralization productivity split after fixture validation passes |
+| `panglia-family-adoption` | Verify Panglia or a Panglia-like planet mod adopts extra rocket fuel and low density structure recipes into vanilla Space Age productivity technologies |
+| `plates-n-circuit-replacement` | Verify Plates n Circuit Productivity fully covered competing technologies are removed only after MIR replacement effects exist |
 
 ## v2.1.x Spikes
 
