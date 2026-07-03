@@ -1075,6 +1075,8 @@ if (-not (Test-Path -LiteralPath $fixtureRoot)) {
   throw "Fixture directory not found: $fixtureRoot"
 }
 
+$nonModFixtureDirs = @("compat-matrix")
+
 $postMirAssertionFixtures = @(
   "mir-fixture-assert-generation-integrity",
   "mir-fixture-assert-science-pack-productivity",
@@ -1095,6 +1097,7 @@ $postMirAssertionFixtures = @(
 function Get-FixtureInfos {
   $infos = @()
   foreach ($fixture in Get-ChildItem -LiteralPath $fixtureRoot -Directory) {
+    if ($nonModFixtureDirs -contains $fixture.Name) { continue }
     $info = Get-Content -Raw (Join-Path $fixture.FullName "info.json") | ConvertFrom-Json
     $infos += [pscustomobject]@{
       Name = $info.name

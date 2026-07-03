@@ -2,6 +2,74 @@
 
 This file records local release-candidate validation runs. It is not a substitute for the manual mod matrix in `docs/compatibility.md`.
 
+## 2026-07-03 Runtime Validation After Compatibility Refactor
+
+Environment:
+
+- Branch: `dev`.
+- Mod version `2.1.0`.
+- Factorio runtime binary: `C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe`.
+
+Scope:
+
+- Ran the full runtime validation harness after the compatibility architecture refactor, Space Age productivity stream split, bacteria cultivation productivity addition, carbon lower-tier recipe additions, docs planning update, and rebuilt package.
+- Fixed the runtime fixture enumerator so `fixtures/compat-matrix` is treated as audit input data instead of a loadable fixture mod, matching the existing static fixture skip policy.
+
+Commands:
+
+```powershell
+.\scripts\Invoke-MIRValidation.ps1 -FactorioBin 'C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe'
+.\scripts\Build-MIRPackage.ps1
+.\scripts\Invoke-MIRValidation.ps1 -StaticOnly
+.\scripts\Invoke-MIRCompatAudit.ps1 -CatalogPages 1 -MaxCandidates 1 -MinDownloads 10000 -FactorioVersions '2.1' -OutputDir .\build\compat-audit-smoke
+git diff --check
+```
+
+Results:
+
+- First runtime attempt correctly exposed a validation-harness bug: `fixtures/compat-matrix` has no `info.json` because it is audit matrix input data, not a fixture mod.
+- Updated `scripts/Invoke-MIRValidation.ps1` so the runtime fixture collector skips `compat-matrix`.
+- Full runtime validation then passed with the local Factorio binary.
+- Runtime scenarios covered base and Space Age load checks, lab reduce/skip policy, science-pack ingredient policies, scripted candidate enable/disable routing, base/Space Age generation integrity, fluid productivity, pipeline extent scaling, Plates n Circuit replacement/partial coverage, vanilla productivity-family adoption and signature-change refresh, weapon-speed overlap safety, Omega drill productivity, cargo logistics shape/diagnostics, and end-game prerequisite gating.
+- Runtime validation logged the expected productivity-family signature reset during the configuration-change fixture scenario.
+- Runtime validation logged the expected Plates n Circuit competing technology preparation/removal during the full-replacement fixture scenario.
+- Runtime validation logged the expected partial-coverage skip behavior when MIR could not replace every competing technology effect.
+- Git reported line-ending normalization warnings only.
+
+## 2026-07-03 Space Age Productivity Stream Split
+
+Environment:
+
+- Branch: `dev`.
+- Mod version `2.1.0`.
+- Factorio runtime binary: not configured in this shell; runtime fixture validation was not run in this pass.
+
+Scope:
+
+- Replaced the broad Stone product productivity stream with separate Landfill productivity, Artificial soil productivity, and Molten metals productivity streams.
+- Added a lower-tier lithium-from-brine recipe bucket to Lithium productivity.
+- Added Carbon productivity and Ice productivity streams for Space Age asteroid-crushing/output recipes and compatible modded outputs.
+- Added lower-tier Carbon productivity coverage for burnt spoilage and coal synthesis.
+- Added Bacteria cultivation productivity for Space Age iron and copper bacteria cultivation recipes.
+- Added a `2.1.0` JSON migration from the retired Stone product productivity generated technology ID to the new Landfill productivity generated technology ID.
+- Updated locale, README, changelog, mod-portal notes, release notes, and compatibility documentation to match the split.
+- Rebuilt the release archive after the stream split.
+
+Commands:
+
+```powershell
+.\scripts\Invoke-MIRValidation.ps1 -StaticOnly
+.\scripts\Build-MIRPackage.ps1
+```
+
+Results:
+
+- Static/package validation passed.
+- Locale parity passed for all 9 locale files.
+- The rebuilt release archive contains `migrations/more-infinite-research_2.1.0.json`, updated `prototypes/streams/productivity.lua`, and updated `docs/notes/release-notes-2.1.0.md`.
+- Runtime Factorio load validation was skipped because `FACTORIO_BIN` is not configured.
+- Git reported line-ending normalization warnings only.
+
 ## 2026-07-03 Documentation Reorganization And Package Refresh
 
 Environment:
