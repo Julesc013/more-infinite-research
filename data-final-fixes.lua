@@ -2,8 +2,10 @@ local pipeline_extent_multiplier = require("prototypes.pipeline-extent-settings"
 if pipeline_extent_multiplier ~= 1 then
   require("prototypes.pipeline-extent").apply(pipeline_extent_multiplier)
 end
+local competing_productivity = require("prototypes.compat.competing-productivity")
+competing_productivity.prepare()
 require("prototypes.tech-gen")
-require("prototypes.compat.competing-productivity").apply()
+competing_productivity.apply()
 require("prototypes.compat.competing-base-extensions").apply()
 require("prototypes.base-tech-extensions")
 require("prototypes.weapon-speed-adjustments")

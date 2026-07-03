@@ -39,7 +39,7 @@ The release goal is graceful compatibility without mod-page dependency clutter: 
 - Agricultural growth speed adjusts newly planted agricultural tower plants from the tower planting event and does not rescan existing farms in this first implementation slice.
 - Mod-specific stream changes should live in `prototypes/compat/profiles.lua` instead of the base stream definitions.
 - Compatibility cleanup that removes known competing technologies also removes dangling prerequisite references from remaining technologies.
-- Generic competing recipe-productivity cleanup removes only known infinite technologies whose recipe-productivity effects are all covered by generated MIR effects. Finite upgrade chains from other mods are left alone unless a future integration models them explicitly.
+- Generic competing recipe-productivity cleanup prepares only known infinite technologies whose recipe-productivity effects are all covered by enabled MIR streams, ignores only those prepared owners during exact-owner filtering, and removes them only after generated MIR effects prove the replacement. Finite upgrade chains from other mods are left alone unless a future integration models them explicitly.
 - Release metadata declares optional ordering for official DLC mods, with hidden optional ordering for Elevated Rails and Quality. Elevated Rails is hidden because its Rail productivity coverage is opportunistic and should not present Elevated Rails as required or recommended; Quality is hidden so quality module recipes are visible before module productivity is generated without presenting Quality as a required or recommended dependency. Third-party compatibility remains opportunistic and avoids compatibility-mod dependencies.
 - Weapon shooting speed overlap handling only removes rocket and cannon-shell speed effects from MIR's generated weapon shooting speed continuation. Finite vanilla weapon shooting speed technologies keep their original rocket and cannon-shell bonuses so tank cannon fire rate is not reduced.
 - `mir-debug-generation-report` can be enabled to capture why each stream or base extension generated or skipped.
@@ -102,7 +102,7 @@ These integrations do not add mod-page dependencies. More Infinite Research hand
 - OCs Ammo and Armor (`OCs_ammo_casting`): foundry, biochamber, and electromagnetic plant recipes that output covered ammunition, explosive, or armor component items are picked up by the existing output-based streams.
 - OCs Stone Casting (`OCs_stone_casting`): foundry recipes that output covered stone, landfill, brick, wall, concrete, refined concrete, foundation, rail, gate, or furnace items are picked up by the existing output-based streams.
 - Fluid Quality Imprinting (`fluid-quality-imprinting`): quality-imprinting recipes that output covered plate and intermediate items are picked up by the existing output-based streams.
-- Plates n Circuit Productivity (`plates-n-circuit-productivity`): competing plate and circuit productivity technologies are removed when `mir-prefer-this-mod-for-competing-techs` is enabled.
+- Plates n Circuit Productivity (`plates-n-circuit-productivity`): competing plate and circuit productivity technologies are replaced when `mir-prefer-this-mod-for-competing-techs` is enabled and all recipe effects on the competing technology are covered by enabled MIR streams.
 - Omega Drill style drill mods: `omega-drill`, `omega-tau`, and broader modded `*-mining-drill` / `*-drill` outputs are picked up by mining drill productivity when their recipes are visible.
 - Custom science packs from mods such as Castra or PlanetLib-based planets are picked up opportunistically when they are active lab inputs and have visible recipes that output the pack item.
 
@@ -321,7 +321,7 @@ Expected result: vanilla tank cannon fire rate is preserved while MIR avoids dup
 - Confirm runtime fixture validation covers fluid-output productivity ownership in base-only and Space Age scenarios.
 - Confirm runtime fixture validation covers startup pipeline extent scaling when the multiplier is enabled.
 - Confirm runtime fixture validation covers preserving an existing finite vanilla-chain level before adding MIR's generated infinite continuation.
-- Confirm runtime fixture validation covers broad generation integrity in base-only and Space Age runs, including all enabled vanilla numbered extension chains, the checkbox-enabled inserter-capacity continuation, generated `recipe-prod-*` technology shape, single-owner recipe productivity, and configured vanilla productivity-family adoption/conflict cases.
+- Confirm runtime fixture validation covers broad generation integrity in base-only and Space Age runs, including all enabled vanilla numbered extension chains, the checkbox-enabled inserter-capacity continuation, generated `recipe-prod-*` technology shape, single-owner recipe productivity, configured vanilla productivity-family adoption/conflict cases, and Plates n Circuit Productivity replacement/partial-coverage behavior.
 - Confirm runtime fixture validation covers preserving finite vanilla weapon shooting speed cannon-shell effects under MIR's overlap setting.
 - Confirm runtime fixture validation covers Omega-style drill recipe productivity.
 - Load Factorio with the manual matrix above.

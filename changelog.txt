@@ -19,6 +19,8 @@ Date: 2026-07-02
     - Added conservative Space Age productivity-family adoption: residual processing unit, plastic bar, low density structure, and rocket fuel recipes can be appended to the matching vanilla infinite productivity technology when the owner is safe and the recipe allows productivity.
     - Existing saves reset technology effects when the adopted productivity-family recipe signature changes, so adding or removing planet mods after MIR is installed can refresh researched family effects.
     - Added runtime fixture coverage for vanilla productivity-family adoption, exact-owner skips, prepatched owner skips, mixed owner fallback, and non-productivity recipe rejection.
+    - Fixed Plates n Circuit Productivity replacement so known competing plate, green circuit, and red circuit productivity technologies are prepared before MIR generation, allowing MIR to generate its replacement effects and then remove the competing technologies.
+    - Plates n Circuit Productivity cleanup now leaves a combined competing technology in place when disabled MIR streams mean MIR cannot replace every recipe effect on that technology.
     - Added runtime fixture coverage for checkbox enablement behavior, scripted runtime routing, icon source selection, fluid-output productivity ownership, and pipeline extent scaling.
     - Base-only icon validation now proves generated technology icons do not resolve to direct official DLC asset paths unless the installed official DLC icon opt-in is enabled.
     - Space Age validation proves loaded Space Age technology art is still preferred where intended.

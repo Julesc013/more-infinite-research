@@ -74,14 +74,15 @@ See **`CONTRIBUTING.md`** for pull request expectations, branch routing, and val
 More Infinite Research mutates and generates prototypes in **`data-final-fixes.lua`**:
 
 1. **Startup-only prototype extensions** such as the opt-in pipeline extent multiplier.
-2. **Generated stream technology creation.**
-3. **Known competing recipe-productivity cleanup** based on actual generated MIR effects.
-4. **Known competing base-extension cleanup** when MIR's matching base extension is enabled.
-5. **Base technology infinite extensions.**
-6. **Optional weapon shooting speed overlap adjustment.**
-7. **Max-level enforcement.**
-8. **Generated-technology effect safety validation.**
-9. **Optional diagnostics report flush.**
+2. **Known competing recipe-productivity preparation** for removable third-party owners that MIR can fully replace.
+3. **Generated stream technology creation.**
+4. **Known competing recipe-productivity cleanup** after generated MIR effects prove the replacement.
+5. **Known competing base-extension cleanup** when MIR's matching base extension is enabled.
+6. **Base technology infinite extensions.**
+7. **Optional weapon shooting speed overlap adjustment.**
+8. **Max-level enforcement.**
+9. **Generated-technology effect safety validation.**
+10. **Optional diagnostics report flush.**
 
 This gives the mod a **late view** of recipes, items, labs, science packs, ammo categories, and technologies created by other mods.
 
@@ -394,11 +395,11 @@ These are handled when their **prototypes are visible**:
 | OCs Ammo and Armor (`OCs_ammo_casting`) | Covered ammunition, explosive, and armor component outputs are picked up by output and pattern matching. |
 | OCs Stone Casting (`OCs_stone_casting`) | Covered stone, brick, wall, concrete, landfill, foundation, rail, gate, and furnace outputs are picked up by output matching. |
 | Fluid Quality Imprinting (`fluid-quality-imprinting`) | Covered plate and intermediate outputs are picked up when the recipes output standard items. |
-| Plates n Circuit Productivity (`plates-n-circuit-productivity`) | Selected competing infinite productivity technologies are removed only after MIR has generated replacement recipe effects. |
+| Plates n Circuit Productivity (`plates-n-circuit-productivity`) | Selected competing infinite productivity technologies are prepared before MIR generation and removed after MIR has generated replacement recipe effects. |
 | Castra and PlanetLib-style science packs | Custom science packs can be discovered as lab inputs and receive science-pack productivity when their recipes are visible. |
 | Omega Drill style drill mods | Recipes outputting `omega-drill`, `omega-tau`, or broader modded `*-mining-drill` / `*-drill` items are covered by mining drill productivity. |
 
-Generic competing recipe-productivity cleanup is intentionally limited to **known infinite technologies** whose recipe-productivity effects are all covered by generated MIR effects. **Finite upgrade chains** from other mods are not removed by the generic cleanup path.
+Generic competing recipe-productivity cleanup is intentionally limited to **known infinite technologies** whose recipe-productivity effects are all covered by enabled MIR streams and then by generated MIR effects. **Finite upgrade chains** from other mods are not removed by the generic cleanup path.
 
 ### Known Limits
 

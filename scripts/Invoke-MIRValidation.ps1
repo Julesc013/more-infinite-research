@@ -1074,6 +1074,7 @@ $postMirAssertionFixtures = @(
   "mir-fixture-assert-fluid-productivity",
   "mir-fixture-assert-omega-drill-productivity",
   "mir-fixture-assert-pipeline-extent",
+  "mir-fixture-assert-plates-n-circuit-productivity",
   "mir-fixture-assert-vanilla-family-adoption",
   "mir-fixture-assert-vanilla-family-exact-owner",
   "mir-fixture-assert-vanilla-family-mixed-owner",
@@ -1388,6 +1389,12 @@ if ([string]::IsNullOrWhiteSpace($FactorioLog)) {
   $FactorioLog = Join-Path $validationRoot "factorio-current.log"
 }
 
+function Clear-FactorioLog {
+  if (Test-Path -LiteralPath $FactorioLog) {
+    Remove-Item -LiteralPath $FactorioLog -Force
+  }
+}
+
 function Assert-RuntimeLogHealthy {
   param([string]$ScenarioName)
   Write-Host "[info] Factorio log path: $FactorioLog"
@@ -1442,6 +1449,7 @@ function Invoke-RuntimeScenario {
   }
 
   Write-Host "[run] Factorio load check with fixture mods ($ScenarioName)"
+  Clear-FactorioLog
   $factorioArgs = @(
     "--config",
     $factorioConfigPath,
@@ -1480,6 +1488,7 @@ function Invoke-RuntimeConfigurationChangeScenario {
   }
 
   Write-Host "[run] Factorio initial save for configuration-change check ($ScenarioName)"
+  Clear-FactorioLog
   $createArgs = @(
     "--config",
     $factorioConfigPath,
@@ -1506,6 +1515,7 @@ function Invoke-RuntimeConfigurationChangeScenario {
     -EnableSpaceAge:$EnableSpaceAge
 
   Write-Host "[run] Factorio configuration-change load check with fixture mods ($ScenarioName)"
+  Clear-FactorioLog
   $benchmarkArgs = @(
     "--config",
     $factorioConfigPath,
@@ -1531,7 +1541,8 @@ function Invoke-RuntimeConfigurationChangeScenario {
 
 function Get-LastStreamReportLine {
   param([string]$Key)
-  $line = Select-String -LiteralPath $FactorioLog -Pattern "kind=stream key=$Key" -SimpleMatch | Select-Object -Last 1
+  $pattern = "kind=stream key=$([regex]::Escape($Key))(\s|$)"
+  $line = Select-String -LiteralPath $FactorioLog -Pattern $pattern | Select-Object -Last 1
   if (-not $line) {
     throw "Runtime validation log did not contain diagnostics for $Key."
   }
@@ -1540,7 +1551,8 @@ function Get-LastStreamReportLine {
 
 function Get-LastExtensionReportLine {
   param([string]$Key)
-  $line = Select-String -LiteralPath $FactorioLog -Pattern "kind=extension key=$Key" -SimpleMatch | Select-Object -Last 1
+  $pattern = "kind=extension key=$([regex]::Escape($Key))(\s|$)"
+  $line = Select-String -LiteralPath $FactorioLog -Pattern $pattern | Select-Object -Last 1
   if (-not $line) {
     throw "Runtime validation log did not contain extension diagnostics for $Key."
   }
@@ -1549,7 +1561,8 @@ function Get-LastExtensionReportLine {
 
 function Get-LastNativeModifierOverlapLine {
   param([string]$Key)
-  $line = Select-String -LiteralPath $FactorioLog -Pattern "kind=native_modifier_overlap key=$Key" -SimpleMatch | Select-Object -Last 1
+  $pattern = "kind=native_modifier_overlap key=$([regex]::Escape($Key))(\s|$)"
+  $line = Select-String -LiteralPath $FactorioLog -Pattern $pattern | Select-Object -Last 1
   if (-not $line) {
     throw "Runtime validation log did not contain native modifier overlap diagnostics for $Key."
   }
@@ -1603,7 +1616,8 @@ function Assert-LogDoesNotContain {
 
 function Assert-NoStreamReportLine {
   param([string]$Key, [string]$Context)
-  $line = Select-String -LiteralPath $FactorioLog -Pattern "kind=stream key=$Key" -SimpleMatch | Select-Object -Last 1
+  $pattern = "kind=stream key=$([regex]::Escape($Key))(\s|$)"
+  $line = Select-String -LiteralPath $FactorioLog -Pattern $pattern | Select-Object -Last 1
   if ($line) {
     throw "$Context unexpectedly found stream diagnostics for ${Key}: $($line.Line)"
   }
@@ -1901,6 +1915,30 @@ Assert-DefaultBaseExtensionDiagnostics -Context "Space Age generation integrity 
 $spaceAgeRailsLine = Get-LastStreamReportLine -Key "research_rails"
 Assert-ReportLineContains -Line $spaceAgeRailsLine -Expected "effects=3" -Context "Space Age Elevated Rails productivity scenario"
 Assert-ReportLineContains -Line $spaceAgeRailsLine -Expected "icon=tech:elevated-rail" -Context "Space Age Elevated Rails productivity icon scenario"
+
+Invoke-RuntimeScenario -ScenarioName "space-age-plates-n-circuit-productivity-compat" -EnabledFixtureNames @(
+  "mir-fixture-plates-n-circuit-productivity",
+  "mir-fixture-assert-plates-n-circuit-productivity"
+) -EnableSpaceAge
+foreach ($stream in @("research_copper", "research_iron", "research_electronic_circuit", "research_advanced_circuit")) {
+  $line = Get-LastStreamReportLine -Key $stream
+  Assert-ReportLineGenerated -Line $line -Context "Plates n Circuit Productivity replacement stream $stream"
+}
+foreach ($techName in @("basic-plate-productivity", "electric-circuit-productivity", "advanced-circuit-productivity")) {
+  Assert-LogContains -Expected "Prepared competing recipe productivity technology for MIR replacement: $techName" -Context "Plates n Circuit Productivity prepare $techName"
+  Assert-LogContains -Expected "Removed competing recipe productivity technology: $techName" -Context "Plates n Circuit Productivity cleanup $techName"
+}
+
+Invoke-RuntimeScenario -ScenarioName "space-age-plates-n-circuit-productivity-partial-coverage" -EnabledFixtureNames @(
+  "mir-fixture-plates-n-circuit-productivity"
+) -DisabledStreamKeys @(
+  "research_copper"
+) -EnableSpaceAge
+$partialIronLine = Get-LastStreamReportLine -Key "research_iron"
+Assert-ReportLineGenerated -Line $partialIronLine -Context "Partially covered plate competitor can still allow non-owned iron recipes"
+Assert-LogContains -Expected "Skipping recipe productivity effect for research_iron recipe=iron-plate because existing infinite technology already owns it: basic-plate-productivity" -Context "Partial coverage should keep exact iron plate owner"
+Assert-LogDoesNotContain -Unexpected "Prepared competing recipe productivity technology for MIR replacement: basic-plate-productivity" -Context "Partial coverage should not prepare combined plate competitor"
+Assert-LogDoesNotContain -Unexpected "Removed competing recipe productivity technology: basic-plate-productivity" -Context "Partial coverage should not remove combined plate competitor"
 
 Invoke-RuntimeScenario -ScenarioName "space-age-vanilla-family-adoption" -EnabledFixtureNames @(
   "mir-fixture-vanilla-family-adoption-recipes",

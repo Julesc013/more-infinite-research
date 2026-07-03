@@ -5,6 +5,7 @@ local D = require("prototypes.diagnostics")
 local deepcopy = require("prototypes.lib.deepcopy")
 local table_utils = require("prototypes.lib.table-utils")
 local effect_safety = require("prototypes.technology-effect-safety")
+local competing_productivity = require("prototypes.compat.competing-productivity")
 
 local PRODUCTIVITY_FAMILY_ADOPTION_MOD_DATA_NAME = "more-infinite-research-productivity-family-adoption"
 local PRODUCTIVITY_FAMILY_ADOPTION_VERSION = 1
@@ -220,7 +221,9 @@ local function existing_infinite_recipe_productivity_techs(recipe_name)
   for tech_name, tech in pairs(data.raw.technology or {}) do
     if tech.max_level == "infinite" and not string.find(tech_name, "^recipe%-prod%-") then
       for _, effect in ipairs(tech.effects or {}) do
-        if effect.type == "change-recipe-productivity" and effect.recipe == recipe_name then
+        if effect.type == "change-recipe-productivity"
+          and effect.recipe == recipe_name
+          and not competing_productivity.ignores_existing_owner(tech_name) then
           table.insert(owners, tech_name)
           break
         end
