@@ -145,7 +145,7 @@ Generated stream technologies use **stable prototype names**:
 recipe-prod-<stream-key>-1
 ```
 
-This naming was preserved for **v2.0.0** even for non-recipe direct-effect streams to avoid migrations. `v2.0.5` intentionally consolidates the old character logistic trash slot stream into character inventory slots and ships a tested JSON migration for that one generated technology ID.
+This naming was preserved for **v2.0.0** even for non-recipe direct-effect streams to avoid migrations. `v2.0.5` intentionally consolidates the old character logistic trash slot stream into character inventory slots and ships a tested JSON migration for that generated technology ID. `v2.1.0` intentionally splits the old stone-product productivity stream into separate landfill, artificial-soil, and molten-metal streams; the old generated stone-product technology ID migrates to the new landfill productivity technology as the closest successor.
 
 Generated base-technology extensions use the **vanilla technology chain name** and **next level**:
 
@@ -185,17 +185,22 @@ These streams generate `change-recipe-productivity` effects for matching recipes
 | `research_lubricant_productivity` | Lubricant productivity | Recipes outputting `lubricant`, including Space Age `biolubricant` when present | `+10%` | Requires the `lubricant` fluid and excludes barrel-emptying recipes. |
 | `research_sulfuric_acid_productivity` | Sulfuric acid productivity | Recipes outputting `sulfuric-acid`, plus Space Age `acid-neutralisation` and compatible `acid-neutralization` recipes when present | `+10%` | Requires the `sulfuric-acid` fluid, uses sulfuric acid fluid art, and excludes barrel-emptying recipes. |
 | `research_tungsten` | Tungsten productivity | `tungsten-plate`, `tungsten-carbide` | `+10%` | Adds metallurgic science when available. |
-| `research_lithium` | Lithium productivity | `lithium-plate` | `+10%` | Adds cryogenic science when available. |
+| `research_lithium` | Lithium productivity | `lithium-plate`; lithium from brine | `+10%`; `+5%` | Adds cryogenic science when available. |
 | `research_holmium` | Holmium productivity | `holmium-plate` | `+10%` | Generates when matching visible recipes exist; adds electromagnetic science when available. |
 | `research_supercapacitor` | Supercapacitor productivity | `supercapacitor` | `+10%` | Generates when matching visible recipes exist; adds electromagnetic science when available. |
 | `research_superconductor` | Superconductor productivity | `superconductor` | `+10%` | Generates when matching visible recipes exist; adds electromagnetic science when available. |
 | `research_quantum_processor` | Quantum processor productivity | `quantum-processor` | `+10%` | Generates when matching visible recipes exist; adds cryogenic science when available. |
+| `research_carbon` | Carbon productivity | carbonic asteroid crushing, advanced carbonic asteroid crushing, and compatible carbon-output recipes; burnt spoilage; coal synthesis | `+10%`; `+5%`; `+2%` | Generates when matching visible recipes exist; adds space science when available. |
 | `research_carbon_fiber` | Carbon fiber productivity | `carbon-fiber` | `+10%` | Adds agricultural science when available. |
+| `research_ice` | Ice productivity | oxide asteroid crushing, advanced oxide asteroid crushing, and compatible ice-output recipes | `+10%` | Generates when matching visible recipes exist; adds space science when available. |
 | `research_bioflux` | Bioflux productivity | `bioflux` | `+10%` | Generates when matching visible recipes exist; adds agricultural science when available. |
-| `research_breeding` | Breeding productivity | `raw-fish`, `biter-egg`, `pentapod-egg`; recipe names matching cultivation, culture, or breeding | `+10%` | Generates when matching visible recipes exist. Category-only biochamber matching is intentionally avoided. |
+| `research_bacteria_cultivation` | Bacteria cultivation productivity | iron bacteria cultivation; copper bacteria cultivation | `+10%` | Uses bacteria cultivation technology art. Adds agricultural science when available. Excluded from Breeding productivity so it has a dedicated owner. |
+| `research_breeding` | Breeding productivity | `raw-fish`, `biter-egg`, `pentapod-egg`; recipe names matching cultivation, culture, or breeding, except dedicated bacteria cultivation recipes | `+10%` | Generates when matching visible recipes exist. Category-only biochamber matching is intentionally avoided. |
 | `research_grenades` | Grenade productivity | `grenade`; `cluster-grenade` | `+10%`; `+5%` | Adds military and space science when available. |
 | `research_walls` | Wall productivity | `stone-wall`; `gate` | `+10%`; `+5%` | Uses the gate technology art. Adds military and space science when available. |
-| `research_stone_products` | Stone product productivity | `stone`, `landfill`; `foundation` and artificial soil patterns | `+10%`; `+5%` | Adds metallurgic and space science when available; excludes scrap inputs. |
+| `research_landfill` | Landfill productivity | `landfill`; `foundation` | `+10%`; `+5%` | Uses landfill technology art. Adds metallurgic and space science when available; excludes scrap inputs. |
+| `research_artificial_soil` | Artificial soil productivity | artificial yumako/jellynut soil and compatible artificial soil patterns; overgrowth yumako/jellynut soil and compatible overgrowth soil patterns | `+10%`; `+5%` | Uses artificial soil technology art. Adds agricultural science when available. |
+| `research_molten_metals` | Molten metals productivity | molten iron/copper from lava; iron/copper ore melting | `+10%`; `+5%` | Uses foundry technology art. Adds metallurgic science when available; excludes scrap inputs. |
 | `research_rails` | Rail productivity | `rail`; Elevated Rails `rail-support`; Elevated Rails `rail-ramp` when present | `+10%`; `+5%`; `+2%` | Rail matching is strict so rail-like unrelated outputs are not caught. Prefers Elevated Rails technology art when available, with the rail item as fallback. |
 | `research_concrete` | Concrete productivity | `stone-brick`; concrete/hazard concrete; refined concrete/refined hazard concrete | `+10%`; `+5%`; `+2%` | Adds space science when available; excludes scrap inputs. |
 | `research_furnace` | Furnace productivity | stone furnace; steel furnace; electric furnace; foundry | `+20%`; `+10%`; `+5%`; `+2%` | Adds metallurgic science when available. |
@@ -423,6 +428,7 @@ Generic competing recipe-productivity cleanup is intentionally limited to **know
 | `control/effects/spoilage-preservation.lua` | Applies and restores the global spoilage preservation multiplier. |
 | `control/effects/agricultural-growth-speed.lua` | Adjusts newly planted agricultural tower crops from researched growth speed. |
 | `migrations/more-infinite-research_2.0.5.json` | Maps the removed generated trash-slot technology ID into the combined inventory/trash technology ID. |
+| `migrations/more-infinite-research_2.1.0.json` | Maps the retired generated stone-product productivity technology ID into the new landfill productivity technology ID. |
 | `data.lua` | Loads stable shared config and utility facades only. |
 | `data-updates.lua` | Reserved for future pre-final compatibility hooks. |
 | `data-final-fixes.lua` | Runs startup-only prototype extensions, generation, cleanup, extensions, adjustments, max-level control, and diagnostics. |
@@ -595,4 +601,5 @@ If a generated technology is unresearchable:
 
 No generated prototype IDs were renamed for **`v2.0.0`**.
 `v2.0.5` includes a JSON migration from `recipe-prod-research_character_trash_slots-1` to `recipe-prod-research_inventory_capacity-1` so old trash-slot progress moves into the combined inventory/trash research.
+`v2.1.0` includes a JSON migration from `recipe-prod-research_stone_products-1` to `recipe-prod-research_landfill-1` so old stone-product progress moves to the closest successor after landfill, artificial soil, and molten metals become separate research lines.
 **No migration is required** from `v1.2.9` (latest for Factorio 2.0).

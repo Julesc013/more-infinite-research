@@ -91,6 +91,40 @@ Download and load-test mode requires credentials and a local binary:
 
 Generated lockfiles and reports belong under ignored output directories such as `artifacts/compat-audit/` or `build/compat-audit-*`. Do not commit downloaded mod zips or one-off portal reports. Commit only scenario fixtures, known exclusions, code changes, and small compatibility profiles that are justified by repeatable audit evidence.
 
+## Compatibility Planning Target
+
+The current implementation has the right compatibility seams, but the long-term system should make a complete plan object the central artifact before any prototype mutation happens:
+
+```text
+discover facts
+  -> classify owners
+  -> build complete plan
+  -> validate plan
+  -> mutate prototypes
+  -> emit audit rows from the plan
+```
+
+The planning object should include stream-level and recipe-level decisions such as generate, adopt, replace, suppress, and conflict. Diagnostics and audit reports should be emitted from that same plan so the report describes the exact decisions that were applied. This keeps future compatibility support testable before mutation, allows plan comparisons across modsets, and keeps profile additions declarative.
+
+Profile changes should remain conservative:
+
+- Unknown external infinite recipe-productivity owners suppress MIR by default.
+- Known competitor replacement requires an explicit profile and full replacement coverage.
+- Vanilla-family adoption requires an explicit configured family and safe owner behavior.
+- Finite progression chains from other mods are not removed unless a future profile explicitly models that chain and validates the migration/safety story.
+
+Release policy for compatibility-heavy changes:
+
+```text
+static validation passed
+runtime Factorio validation passed
+compat audit smoke passed
+package build passed
+git diff --check passed
+```
+
+Do not publish a compatibility-heavy archive from static validation alone. After generator, owner-classification, profile, adoption, or replacement refactors, run runtime validation with `FACTORIO_BIN` configured before release.
+
 ## Legacy Backport Model
 
 The Factorio `2.0` legacy release More Infinite Research `v1.9.0` has been released from the `legacy` branch, backported from the tested More Infinite Research `v2.0.5` Factorio `2.1` quick-patch codebase. Later quick patch backports can follow the same model, such as `v2.1.5 -> v1.9.5`, with `v1.9.9` reserved as the final planned Factorio `2.0` build from the latest tested `2.x.x` snapshot when Factorio `2.1` becomes stable or another verified upstream cutoff is chosen.
@@ -133,7 +167,7 @@ These integrations do not add mod-page dependencies. More Infinite Research hand
 - Advanced Solar HR (`Advanced-Electric-Revamped-v16`): advanced, elite, and ultimate solar panel/accumulator recipes are covered by the electric energy productivity tiers.
 - Better Robots Extended (`Better_Robots_Extended`): competing infinite worker robot storage research is removed when `mir-prefer-this-mod-for-competing-techs` is enabled and MIR's `worker-robots-storage` base extension is enabled.
 - OCs Ammo and Armor (`OCs_ammo_casting`): foundry, biochamber, and electromagnetic plant recipes that output covered ammunition, explosive, or armor component items are picked up by the existing output-based streams.
-- OCs Stone Casting (`OCs_stone_casting`): foundry recipes that output covered stone, landfill, brick, wall, concrete, refined concrete, foundation, rail, gate, or furnace items are picked up by the existing output-based streams.
+- OCs Stone Casting (`OCs_stone_casting`): foundry recipes that output covered landfill, brick, wall, concrete, refined concrete, foundation, rail, gate, or furnace items are picked up by the existing output-based streams. Stone-only output remains outside the split Space Age landfill/artificial-soil/molten-metal policy unless a dedicated stream is added later.
 - Fluid Quality Imprinting (`fluid-quality-imprinting`): quality-imprinting recipes that output covered plate and intermediate items are picked up by the existing output-based streams.
 - Plates n Circuit Productivity (`plates-n-circuit-productivity`): competing plate and circuit productivity technologies are replaced when `mir-prefer-this-mod-for-competing-techs` is enabled and all recipe effects on the competing technology are covered by enabled MIR streams.
 - Panglia-style planet mods: additional productivity-allowed rocket fuel and low density structure recipes can be adopted into the existing vanilla Space Age `rocket-fuel-productivity` and `low-density-structure-productivity` technologies when those vanilla owners are safe.

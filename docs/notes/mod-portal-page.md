@@ -13,7 +13,7 @@ It is built for players who want more long-term scaling for late-game megabases,
 - Adopts safe mod-added recipes into configured vanilla Space Age productivity families instead of creating parallel research.
 - Startup settings let you enable, disable, cap, or rebalance almost every generated research.
 - Works with Factorio `2.1`; requires `base >= 2.1.8`. Space Age is optional.
-- Version `2.1.0` keeps generated technology IDs stable and retains the migration that merges the old trash-slot research into Character inventory slots.
+- Version `2.1.0` keeps generated technology IDs stable except for documented migrations: it retains the migration that merges the old trash-slot research into Character inventory slots, and it migrates retired Stone product productivity progress into Landfill productivity after the stone-product stream is split.
 
 Recipe productivity researches are infinite, but Factorio's recipe productivity cap still applies. Once a recipe reaches that cap, more levels may no longer improve that recipe.
 
@@ -24,10 +24,10 @@ Recipe productivity researches are infinite, but Factorio's recipe productivity 
 The mod adds repeatable recipe productivity for many things vanilla does not fully cover:
 
 - Plates, gears, sticks, copper cable, circuits, batteries, sulfur, explosives, engines, robot frames, plastic, low density structures, and rocket fuel.
-- Belts, underground belts, splitters, inserters, rails, walls, gates, stone products, concrete, furnaces, mining drills, solar panels, and accumulators.
+- Belts, underground belts, splitters, inserters, rails, walls, gates, landfill, artificial soil, molten metals, concrete, furnaces, mining drills, solar panels, and accumulators.
 - Bullets, shotgun shells, cannon shells, artillery shells, railgun ammo, rockets, grenades, cluster grenades, and armor components.
 - Modules, science packs, and compatible modded science packs found in active labs.
-- Space Age materials such as tungsten, lithium, holmium, supercapacitors, superconductors, quantum processors, carbon fiber, bioflux, and breeding-related recipes.
+- Space Age materials such as tungsten, lithium, carbon, carbon fiber, ice, holmium, supercapacitors, superconductors, quantum processors, bioflux, bacteria cultivation, and breeding-related recipes.
 
 Most simple productivity researches give `+10%` productivity per level. Larger grouped researches use smaller bonuses for stronger or higher-tier items.
 
@@ -84,17 +84,22 @@ Technologies are generated only when their recipes, items, technologies, ammo ca
 | Thruster fuel productivity | `+10%` productivity for Space Age thruster fuel recipes | On when fluid exists | Covers basic and advanced thruster fuel recipes when present. |
 | Thruster oxidizer productivity | `+10%` productivity for Space Age thruster oxidizer recipes | On when fluid exists | Covers basic and advanced thruster oxidizer recipes when present. |
 | Tungsten productivity | `+10%` productivity for tungsten plate and tungsten carbide recipes | On when recipes exist | Adds metallurgic science when available. |
-| Lithium productivity | `+10%` productivity for lithium plate recipes | On when recipes exist | Adds cryogenic science when available. |
+| Lithium productivity | `+10%` productivity for lithium plate recipes; `+5%` for lithium from brine | On when recipes exist | Adds cryogenic science when available. |
 | Holmium productivity | `+10%` productivity for holmium plate recipes | On when recipes exist | Adds electromagnetic science when available. |
 | Supercapacitor productivity | `+10%` productivity for supercapacitor recipes | On when recipes exist | Adds electromagnetic science when available. |
 | Superconductor productivity | `+10%` productivity for superconductor recipes | On when recipes exist | Adds electromagnetic science when available. |
 | Quantum processor productivity | `+10%` productivity for quantum processor recipes | On when recipes exist | Adds cryogenic science when available. |
+| Carbon productivity | `+10%` productivity for carbonic asteroid crushing and compatible carbon-output recipes; `+5%` for burnt spoilage; `+2%` for coal synthesis | On when recipes exist | Adds space science when available. |
 | Carbon fiber productivity | `+10%` productivity for carbon fiber recipes | On when recipes exist | Adds agricultural science when available. |
+| Ice productivity | `+10%` productivity for oxide asteroid crushing and compatible ice recipes | On when recipes exist | Adds space science when available. |
 | Bioflux productivity | `+10%` productivity for bioflux recipes | On when recipes exist | Adds agricultural science when available. |
-| Breeding productivity | `+10%` productivity for raw fish, biter egg, pentapod egg, and cultivation/culture/breeding recipes | On when recipes exist | Avoids broad biochamber category matching so unrelated biochamber recipes are not swept in. |
+| Bacteria cultivation productivity | `+10%` productivity for iron and copper bacteria cultivation recipes | On when recipes exist | Uses bacteria cultivation technology art. Adds agricultural science when available. |
+| Breeding productivity | `+10%` productivity for raw fish, biter egg, pentapod egg, and cultivation/culture/breeding recipes except dedicated bacteria cultivation recipes | On when recipes exist | Avoids broad biochamber category matching so unrelated biochamber recipes are not swept in. |
 | Grenade productivity | `+10%` for grenades; `+5%` for cluster grenades | On | Adds military and space science when available. |
 | Wall productivity | `+10%` for stone walls; `+5%` for gates | On | Uses the Gate technology art. |
-| Stone product productivity | `+10%` for stone and landfill; `+5%` for foundation and artificial soil patterns | On | Adds metallurgic and space science when available. |
+| Landfill productivity | `+10%` for landfill; `+5%` for foundation | On when recipes exist | Uses landfill technology art. Adds metallurgic and space science when available. |
+| Artificial soil productivity | `+10%` for artificial soils; `+5%` for overgrowth soils | On when recipes exist | Uses artificial soil technology art. Adds agricultural science when available. |
+| Molten metals productivity | `+10%` for iron and copper from lava; `+5%` for iron and copper ore melting | On when recipes exist | Uses foundry technology art. Adds metallurgic science when available. |
 | Rail productivity | `+10%` productivity for rail recipes; `+5%` for Elevated Rails supports; `+2%` for Elevated Rails ramps when present | On | Uses strict rail matching and prefers Elevated Rails technology art when available. |
 | Concrete productivity | `+10%` for stone brick; `+5%` for concrete; `+2%` for refined concrete | On | Includes hazard concrete variants. |
 | Furnace productivity | `+20%` for stone furnaces; `+10%` for steel furnaces; `+5%` for electric furnaces; `+2%` for foundries | On | Adds metallurgic science when available. |
@@ -203,10 +208,11 @@ If a recipe did not receive productivity:
 
 ## Save Compatibility
 
-Version `2.1.0` preserves existing generated technology IDs and retains one earlier intentional consolidation:
+Version `2.1.0` preserves generated technology IDs except for documented intentional migrations:
 
 - Old generated trash-slot progress migrates into the combined Character inventory slots technology.
+- Old generated Stone product productivity progress migrates into the new Landfill productivity technology. Artificial soil productivity and Molten metals productivity are new separate research lines.
 
-Existing saves receive the `2.0.5` migration automatically when the mod loads.
+Existing saves receive the `2.0.5` and `2.1.0` JSON migrations automatically when the mod loads.
 
 Scripted spoilage and agriculture effects are disabled by default in `2.1.0`. Enable them only if you want to test the experimental behavior and report results.

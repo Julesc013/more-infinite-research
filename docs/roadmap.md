@@ -129,6 +129,9 @@ This table is the canonical current synthesis from the Reddit discussion and fol
 | Plates n Circuit Productivity replacement | Ship | `v2.1.0` |
 | Profile-driven recipe-productivity owner classification | Ship | `v2.1.0` |
 | Mod-portal compatibility audit harness | Ship as local tooling | `v2.1.0` |
+| Explicit compatibility planning object | Next architecture step | `v2.1.x` / `v2.2.0` |
+| Strict compatibility profile schema validation | Next architecture step | `v2.1.x` / `v2.2.0` |
+| Profile-stub generation from grouped audit failures | Tooling spike | `v2.1.x` / `v2.2.0` |
 | Quality module enrichment / quality odds research | Spike/defer; likely add-on or prototype-tier feature | Later |
 | Robot battery/carrying capacity | Existing core | Existing |
 | Roboport range | Spike/defer | Later |
@@ -386,6 +389,19 @@ These ideas are worth keeping, but not as core MIR features.
 - Do not delete another mod's finite progression chain unless a compatibility profile explicitly models that chain.
 - If another mod already owns an infinite technology for the same recipe productivity or native modifier, MIR should skip, warn, or require an explicit opt-in setting before overlapping.
 - Keep generated technology names stable unless a migration is written and tested.
+
+The current compatibility refactor creates the right seams: owner classification, vanilla-family adoption, known competitor replacement, diagnostics, and the Mod Portal audit harness are separated from the generator. The next architecture step is to make an explicit plan object the contract between discovery/classification and prototype mutation:
+
+```text
+discover facts
+  -> classify owners
+  -> build complete plan
+  -> validate plan
+  -> mutate prototypes
+  -> emit audit rows from the plan
+```
+
+This keeps future support for overhaul mods evidence-backed. Generic detection should safely handle obvious recipe-output cases, unknown external owners should suppress MIR by default, and verified mod-specific support should become declarative profile data rather than new generator control flow.
 
 ## Performance Policy
 

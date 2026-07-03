@@ -11,6 +11,15 @@ Date: 2026-07-03
     - Rail productivity now covers Elevated Rails support and ramp recipes when Elevated Rails is active, with supports below rails and ramps one tier lower again.
     - Rail productivity now prefers Elevated Rails technology art when Elevated Rails is active, or when installed official DLC icon paths are explicitly enabled, before falling back to rail item art.
     - Oil cracking productivity now uses the oil processing unlock technology art, and Sulfuric acid productivity now uses sulfuric acid fluid art and includes acid neutralization when that recipe exists.
+    - Split Stone product productivity into separate Landfill productivity, Artificial soil productivity, and Molten metals productivity research lines.
+    - Landfill productivity now gives +10% for landfill recipes and +5% for foundation recipes, using the landfill technology icon.
+    - Artificial soil productivity now gives +10% for artificial soil recipes and +5% for overgrowth soil recipes, using the artificial soil technology icon.
+    - Molten metals productivity now gives +10% for molten iron and molten copper from lava, and +5% for iron ore melting and copper ore melting, using the foundry technology icon.
+    - Lithium productivity now also gives +5% productivity for the Space Age lithium-from-brine recipe.
+    - Added Carbon productivity for carbonic asteroid crushing, advanced carbonic asteroid crushing, and compatible carbon-output recipes.
+    - Carbon productivity now gives +5% for burnt spoilage and +2% for coal synthesis.
+    - Added Ice productivity for oxide asteroid crushing, advanced oxide asteroid crushing, and compatible ice-output recipes.
+    - Added Bacteria cultivation productivity for iron bacteria cultivation and copper bacteria cultivation recipes.
     - Added fluid prototype lookup, fluid-output recipe matching, fluid icon fallback, and required-fluid gates for fluid-output productivity streams.
     - Added a strictly opt-in startup-only pipeline extent multiplier dropdown. The default value is 100% and leaves fluid box prototypes unchanged.
 
@@ -35,7 +44,7 @@ Date: 2026-07-03
     - Pipeline extent validation proves the default setting does not run the prototype pass and that an explicit non-default multiplier mutates representative pipe, pipe-to-ground, and storage-tank fluid boxes.
     - Scripted spoilage preservation and agricultural growth speed remain disabled by default until broader save-level manual evidence supports stronger claims or default enablement.
     - Native modifier overlap policy, existing agricultural plant rescale, and high-throughput pump work remain deferred from this release unless separately implemented and validated.
-    - No generated technology IDs were renamed in this release.
+    - Added a v2.1.0 JSON migration from the retired Stone product productivity generated technology ID to the new Landfill productivity generated technology ID. Artificial soil productivity and Molten metals productivity are new separate research lines.
 
 ---------------------------------------------------------------------------------------------------
 Version: 1.9.0

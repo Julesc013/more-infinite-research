@@ -13,6 +13,10 @@ This is the short, player-facing release summary for the `2.1.0` mod portal rele
 - Added better icon source resolution. MIR can prefer loaded official DLC art, use base-game fallbacks, or opt into installed-but-disabled official DLC icon files when the user explicitly enables that option.
 - Added fluid-output productivity research for oil processing, oil cracking, lubricant, sulfuric acid, acid neutralization, thruster fuel, and thruster oxidizer recipes where those recipes exist.
 - Oil cracking productivity uses oil processing technology art. Sulfuric acid productivity uses sulfuric acid fluid art and also covers acid neutralization when that recipe exists.
+- Split the old Stone product productivity line into Landfill productivity, Artificial soil productivity, and Molten metals productivity.
+- Lithium productivity now also covers lithium from brine at a lower per-level rate.
+- Added Carbon productivity and Ice productivity for Space Age asteroid-crushing and compatible output recipes. Carbon productivity also covers burnt spoilage at `+5%` and coal synthesis at `+2%`.
+- Added Bacteria cultivation productivity for Space Age iron and copper bacteria cultivation recipes.
 - Added an opt-in startup-only pipeline extent multiplier dropdown. The default `100%` setting leaves prototypes unchanged.
 - Added conservative adoption of mod-added recipes into existing vanilla Space Age productivity families for processing units, plastic bars, low density structures, and rocket fuel.
 - Improved replacement of known Plates n Circuit Productivity technologies so MIR can generate the covered replacement effects before removing the competing technologies.
@@ -25,6 +29,7 @@ This is the short, player-facing release summary for the `2.1.0` mod portal rele
 - Pipeline validation confirms the default `100%` setting does not run the prototype pass, and that explicit non-default dropdown values mutate representative fluid boxes.
 - Vanilla-family adoption validation covers exact owner skips, prepatched owner skips, mixed owner fallback, existing-save effect refresh, and productivity-disallowed recipes.
 - Plates n Circuit Productivity validation covers full replacement and partial-coverage behavior.
+- Existing Stone product productivity progress migrates into the new Landfill productivity line as the closest successor. Artificial soil productivity and Molten metals productivity are new separate lines.
 
 ## Known Notes
 

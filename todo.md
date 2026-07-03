@@ -22,6 +22,8 @@ Use `docs/roadmap.md` for release scope, product boundaries, rationale, and high
 - Keep future work, deferred work, recurring checklists, and issue-creation tasks in this root `todo.md`.
 - Keep past shipped changes in `changelog.txt`; release notes and mod-portal copy are derivative summaries.
 - Keep `docs/roadmap.md` synchronized with this file and `changelog.txt`, but at a higher level with rationale, scope boundaries, and links or placeholders for issues.
+- Treat the compatibility planner as the future contract between prototype discovery, owner classification, validation, mutation, and diagnostics.
+- Do not publish the next compatibility-heavy archive until static validation, runtime Factorio validation, package build, diff check, and audit smoke have all passed after the final refactor.
 
 ## Immediate Status
 
@@ -308,6 +310,71 @@ Do not turn `v2.1.0` into a bucket for every plausible feature idea.
 - [ ] Convert recurring audit failures into small declarative compatibility profiles only when the report shows concrete, repeatable patterns.
 - [ ] Runtime-test the refactored recipe-productivity owner/adoption modules with `FACTORIO_BIN` configured.
 
+### Compatibility Architecture Next Steps
+
+The current refactor is a strong foundation, but the final compatibility system should make a plan object the central artifact:
+
+```text
+discover facts
+  -> classify owners
+  -> build complete plan
+  -> validate plan
+  -> mutate prototypes
+  -> emit audit rows from the plan
+```
+
+- [ ] Make the MIR generation plan an explicit object produced before prototype mutation.
+- [ ] Add `prototypes/planning/discovery.lua` or equivalent fact collection around active mods, recipes, technologies, labs, science packs, existing owners, and configured profiles.
+- [ ] Add `prototypes/planning/planner.lua` or equivalent planning logic that converts facts, streams, and profiles into recipe-level actions.
+- [ ] Add `prototypes/planning/plan-validator.lua` or equivalent validation before any prototype mutation.
+- [ ] Add `prototypes/planning/plan-executor.lua` or equivalent mutation layer so generation/adoption/replacement apply only validated plan rows.
+- [ ] Add `prototypes/planning/plan-diagnostics.lua` or equivalent diagnostics layer so audit rows are emitted from the final plan rather than scattered generation sites.
+- [ ] Fixture-test the plan without relying only on mutated `data.raw` inspection.
+- [ ] Compare generated plans across representative modsets to detect compatibility regressions before prototype application.
+- [ ] Keep `tech-gen.lua` as orchestration glue once planner/executor modules exist.
+
+### Compatibility Profile Schema
+
+- [ ] Add strict schema validation for compatibility profiles before they affect generation.
+- [ ] Reject profiles with missing stream names.
+- [ ] Reject profiles that reference unknown streams.
+- [ ] Reject broad unanchored technology patterns unless a profile explicitly marks them as reviewed.
+- [ ] Reject replacement profiles that do not require full replacement coverage.
+- [ ] Reject adoption profiles that do not define uniform-change or copy-owner behavior explicitly.
+- [ ] Reject product names that cannot be reconciled with the stream's output policy.
+- [ ] Require profile modes to be explicit, such as known-competitor replacement, vanilla-family adoption, suppression-only, or review-required stub.
+
+### Structured Audit Diagnostics
+
+- [ ] Standardize a fixed structured audit prefix, such as `[MIR-AUDIT] schema=1`.
+- [ ] Emit stable `facts` rows for active mods, relevant startup settings, stream count, recipe count, and profile count.
+- [ ] Emit stable `stream` rows for stream-level generated/skipped/adopted/suppressed decisions.
+- [ ] Emit stable `recipe` rows for recipe-level action decisions.
+- [ ] Emit stable `owner` rows for exact recipe-productivity owner classification.
+- [ ] Emit stable `adoption` rows for recipes appended to existing vanilla productivity-family technologies.
+- [ ] Emit stable `replacement` rows for known competitor technologies prepared or removed.
+- [ ] Emit stable `suppression` rows for MIR-suppressed recipes owned by unknown or unsafe external technologies.
+- [ ] Emit stable `conflict` rows for ambiguous or unsafe states.
+- [ ] Emit stable `integrity` rows for duplicate owners, missing prerequisites, invalid science packs, invalid recipes, and package/runtime assertions.
+- [ ] Update the PowerShell diagnostics parser to consume structured fields only, avoiding fuzzy prose parsing.
+
+### Compatibility Testing And Audit Expansion
+
+- [ ] Configure `FACTORIO_BIN` and rerun full runtime validation after the compatibility refactor and Space Age productivity split.
+- [ ] Run a top-25 Mod Portal audit for Factorio `2.1` with real downloads, credentials, and a local Factorio binary.
+- [ ] Run a full `downloads_count >= 10000` Mod Portal audit for Factorio `2.0` and `2.1`.
+- [ ] Group audit failures by duplicate owner, known competitor remains, split vanilla family, unknown external owner, invalid science pack, missing prerequisite, `allow_productivity=false`, and load-order issue.
+- [ ] Convert recurring verified failures into declarative compatibility profiles only after grouped audit evidence exists.
+- [ ] Add existing-save validation for profile-driven adoption and replacement, including signature-change refresh behavior.
+
+### Profile Stub Tooling
+
+- [ ] Add `scripts/New-MIRCompatProfileStub.ps1`.
+- [ ] Let the stub generator read `compat-report.json` and a grouped failure ID.
+- [ ] Generate review-required Lua profile stubs with audit-run evidence, candidate tech patterns, affected streams, duplicate recipes, and external owners.
+- [ ] Keep generated stubs disabled or review-required until manually refined.
+- [ ] Never let profile-stub generation automatically enable a compatibility profile.
+
 ### v2.1.0 Spike / Defer Decisions
 
 - [x] Pipeline extent multiplier is promoted from spike to implemented `v2.1.0` feature, gated by startup-setting compatibility proof.
@@ -339,6 +406,9 @@ Do not turn `v2.1.0` into a bucket for every plausible feature idea.
 - [x] `info.json` version is bumped to `2.1.0`.
 - [x] `changelog.txt` has a dated `2.1.0` entry.
 - [x] README, roadmap, compatibility docs, test results, and changelog are updated before release.
+- [x] Runtime Factorio validation passes after the final compatibility refactor and Space Age productivity-stream split.
+- [x] Compatibility audit smoke passes after the final package rebuild.
+- [x] Do not publish the `2.1.0` archive until runtime validation, static validation, package build, diff check, and audit smoke all pass on the final tree.
 
 ## v2.1.5 Quick Feedback Patch
 
