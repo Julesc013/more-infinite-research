@@ -69,6 +69,8 @@ Automated fixture validation now covers the release-candidate claims for the lar
 | `offline-local-library-2-1-generated` | Run `Invoke-MIRExtendedTests.ps1 -Tier GeneratedLocalScenarios -LocalModLibraryDirs C:\Projects\Factorio\testmods_readonly_2.1 -Offline -CollectAll` to cover generated all-local mega and metadata-cluster stress scenarios |
 | `offline-local-library-2-1-individual-roots` | Run `Invoke-MIRExtendedTests.ps1 -Tier LocalModZips -LocalModZipDirs C:\Projects\Factorio\testmods_readonly_2.1 -LocalModLibraryDirs C:\Projects\Factorio\testmods_readonly_2.1 -Offline -CollectAll` to test each downloaded local zip as a root scenario |
 | `offline-local-library-2-1-recovery` | Confirm interrupted local sweeps still leave readable `overnight.log`, checkpointed `load-results.json`, grouped `compat-failures.grouped.json`, and `missing-dependencies.*` outputs |
+| `offline-local-library-2-1-official-mod-isolation` | Confirm a local root that is incompatible with Space Age can load with Space Age disabled, while a root that requires Space Age gets the full official bundle enabled |
+| `offline-local-library-2-1-blank-log-lines` | Confirm blank Factorio log lines do not abort parsed audit-row conversion |
 
 ## v2.1.x Spikes
 

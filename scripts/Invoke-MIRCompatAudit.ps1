@@ -367,6 +367,10 @@ function Get-MIREnabledOfficialModsFromEntries {
     }
   }
 
+  if ($enabled.ContainsKey("space-age")) {
+    foreach ($name in $officialBuiltinMods) { $enabled[$name] = $true }
+  }
+
   return @($enabled.Keys | Sort-Object)
 }
 

@@ -16,11 +16,29 @@ function Write-MIRModList {
     [Parameter(Mandatory)][string[]]$EnabledMods
   )
 
+  $officialBuiltinMods = @("elevated-rails", "recycler", "quality", "space-age")
+  $enabledLookup = @{ base = $true }
+  foreach ($name in @($EnabledMods)) {
+    if (-not [string]::IsNullOrWhiteSpace([string]$name)) {
+      $enabledLookup[[string]$name] = $true
+    }
+  }
+
+  $additionalModNames = @(
+    $EnabledMods |
+      Where-Object {
+        -not [string]::IsNullOrWhiteSpace([string]$_) -and
+        $_ -ne "base" -and
+        $officialBuiltinMods -notcontains [string]$_
+      } |
+      Sort-Object -Unique
+  )
+
   $mods = @()
-  foreach ($name in @("base") + ($EnabledMods | Sort-Object -Unique)) {
+  foreach ($name in @("base") + $officialBuiltinMods + $additionalModNames) {
     $mods += [ordered]@{
       name = $name
-      enabled = $true
+      enabled = $enabledLookup.ContainsKey([string]$name)
     }
   }
 

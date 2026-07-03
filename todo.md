@@ -1,6 +1,6 @@
 # M.I.R. TODO
 
-Updated: 2026-07-03
+Updated: 2026-07-04
 
 This is the executable task list for the next More Infinite Research releases. Keep durable future work here, not only in derivative planning docs, so the project still has its task and release plan if the `docs/` tree is reorganized or partially lost.
 
@@ -380,6 +380,8 @@ discover facts
 - [x] Emit `missing-dependencies.md/json/csv` from grouped compatibility conversion.
 - [x] Add `Start-MIROvernightLocalSweep.ps1` as the safe bedtime entrypoint for the local `2.1` offline sweep.
 - [x] Add `Show-MIROvernightSummary.ps1` for next-morning grouped failure, missing dependency, and profile-candidate triage.
+- [x] Fix local overnight sweep audit parsing so blank Factorio log lines cannot abort `GeneratedLocalScenarios` or `LocalModZips`.
+- [x] Fix isolated compatibility mod lists so installed official DLC mods are disabled unless requested, and Space Age scenarios enable the complete official bundle.
 - [ ] Run the overnight local `2.1` library sweep against `C:\Projects\Factorio\testmods_readonly_2.1` using individual roots plus curated local-library scenarios.
 - [ ] Fill missing dependency zips reported by the local `2.1` library sweep, then rerun only the affected scenarios.
 - [ ] Run a top-25 Mod Portal audit for Factorio `2.1` with real downloads, credentials, and a local Factorio binary.
@@ -397,6 +399,27 @@ discover facts
 - [x] Keep generated stubs disabled or review-required until manually refined.
 - [x] Never let profile-stub generation automatically enable a compatibility profile.
 - [ ] Refine stub generation after the explicit planner emits richer replacement/adoption/suppression evidence.
+
+### Extended Test Runtime Framework
+
+The current overnight/local-library automation is usable. The next operational slice should centralize shared CLI behavior instead of adding more one-off formatting and recovery logic to each script.
+
+- [ ] Add a shared `scripts/MIRCli/` PowerShell module layer for console formatting, run context, event logging, process supervision, checkpoints, artifact indexing, report helpers, path resolution, local mod indexing, and power-management helpers.
+- [ ] Add timestamped status output with stable textual tokens such as `[RUN]`, `[STEP]`, `[SCEN]`, `[PASS]`, `[SKIP]`, `[TIME]`, and `[FAIL]`, with optional color controlled by `-ColorMode`, `-NoColor`, `-Quiet`, and `-CI`.
+- [ ] Add `events.jsonl` as a structured append-only event log for run start, tier start/result, scenario start/result, process start/result, timeout, dependency skip, and summary events.
+- [ ] Add `run-manifest.json` so each long run records run ID, repo root, git branch/commit, Factorio binary/version, MIR version, selected tiers, offline/local library inputs, timeout, and pairwise settings.
+- [ ] Add canonical scenario statuses such as `pending`, `running`, `passed`, `failed`, `timed_out`, `skipped_dependency`, `skipped_incompatible`, `expected_failure`, `unexpected_failure`, and `cancelled` while preserving existing booleans for compatibility.
+- [ ] Add `scenario-state.json` and first-class resume controls: `-Resume`, `-RerunFailed`, `-RerunTimedOut`, `-RerunSkipped`, `-RerunUnexpected`, and `-RerunScenarioNames`.
+- [ ] Extract Factorio process handling into a reusable process supervisor with timeout, process-tree cleanup, elapsed time, exit-code classification, failure-tail capture, and optional retry policy.
+- [ ] Add retry controls for transient cases only: `-MaxRetries`, `-RetryOnTimeout`, `-RetryOnExitCodes`, and `-RetryDelaySeconds`.
+- [ ] Add `artifact-index.json` so summary tooling can find manifests, transcripts, events, grouped failures, missing dependencies, profile candidates, and reports without path guessing.
+- [ ] Add a static `index.html` report for overnight runs with totals, grouped failures, missing dependencies, profile candidates, slowest scenarios, command/run manifest, scenario links, and next actions.
+- [ ] Add missing-dependency shopping-list artifacts such as `missing-dependencies.todo.md` and `missing-dependencies.download-plan.json`.
+- [ ] Add a cached local mod library index with `-RebuildLocalIndex`, zip SHA1, size/mtime, Factorio version, dependencies, and duplicate/stale-version reporting.
+- [ ] Add optional `-LinkMode Copy|Hardlink|Symlink` for large local libraries, with safe fallback to copy when hardlinks/symlinks are unavailable.
+- [ ] Add conservative `-Parallelism` support for metadata/report work first, keeping Factorio load checks sequential by default.
+- [ ] Add a stable `scripts/mir.ps1` facade and JSON run profiles after the shared modules stabilize.
+- [ ] Add `scripts/Test-MIRPowerShellQuality.ps1` for parsing every script, artifact-ignore checks, duplicate parameter detection, and optional PSScriptAnalyzer when installed.
 
 ### v2.1.0 Spike / Defer Decisions
 

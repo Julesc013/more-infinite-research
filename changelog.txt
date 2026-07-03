@@ -43,6 +43,8 @@ Date: 2026-07-03
     - Added generated local-library compatibility scenarios for all-local mega, metadata-derived clusters, and capped pairwise stress runs, plus local-root sharding and checkpointed load-result output for resumable overnight sweeps.
     - Added missing-dependency summary artifacts so local-library sweeps produce a concise dependency completion list in addition to grouped compatibility failures.
     - Added dedicated `Start-MIROvernightLocalSweep.ps1` and `Show-MIROvernightSummary.ps1` helpers so local Factorio 2.1 overnight sweeps no longer depend on fragile pasted one-liners and morning triage can be summarized from artifacts.
+    - Hardened overnight compatibility sweeps so blank Factorio log lines no longer crash audit-row parsing.
+    - Hardened isolated compatibility load tests so installed official built-in mods are explicitly disabled unless a scenario requests them, and Space Age scenarios enable the complete official Space Age bundle.
     - Updated the derived release notes, mod portal copy, roadmap, compatibility docs, manual test plan, TODO, and test-results ledger so the extended audit automation is documented consistently before publishing.
     - Reorganized planning documentation so root `todo.md` is the durable future-work ledger, `changelog.txt` remains the durable past-change ledger, `docs/roadmap.md` carries high-level rationale, and derivative plans/release notes live under `docs/notes/`.
     - Packaged root `todo.md` with the mod archive and added validation coverage so the release package keeps the future-work ledger alongside README and changelog.

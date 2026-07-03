@@ -2,6 +2,69 @@
 
 This file records local release-candidate validation runs. It is not a substitute for the manual mod matrix in `docs/compatibility.md`.
 
+## 2026-07-04 Overnight Local Sweep Parser And Official Mod Isolation Repair
+
+Environment:
+
+- Branch: `dev`.
+- Mod version `2.1.0`.
+- Factorio runtime binary: `C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe`.
+- Interrupted artifact root: `artifacts\overnight-local-2.1-20260704-034654`.
+- Local `2.1` zip library: `C:\Projects\Factorio\testmods_readonly_2.1`.
+
+Failure observed:
+
+- The strict release gate finished successfully: `Static`, `Runtime`, and deterministic `AuditSmoke` all passed.
+- The local exploratory sweep then checkpointed usable results for `LocalLibraryScenarios`, `GeneratedLocalScenarios`, and `LocalModZips`.
+- `GeneratedLocalScenarios` and `LocalModZips` later aborted with `Cannot bind argument to parameter 'Line' because it is an empty string.` while parsing Factorio logs.
+- A targeted rerun showed a second audit-runner issue: installed official DLC mods could be inherited by isolated load tests unless the generated `mod-list.json` explicitly disabled them. This made a base-only local root such as `big-mining-drill` see Space Age when it should not.
+- Another targeted rerun showed that a scenario requiring `space-age` must enable the full official bundle, including `elevated-rails`, `recycler`, and `quality`.
+
+Fixes:
+
+- `scripts\MIRCompatAudit\DiagnosticsParser.ps1` now accepts and skips blank or whitespace-only log lines before audit-row parsing.
+- `scripts\MIRCompatAudit\FactorioRunner.ps1` now writes explicit official built-in entries and disables those not requested by the scenario.
+- `scripts\Invoke-MIRCompatAudit.ps1` now expands any `space-age` official dependency to the full official Space Age bundle.
+- Static validation now checks those three wiring points so the regressions cannot silently return.
+
+Commands:
+
+```powershell
+$scripts = @(
+  'scripts\Invoke-MIRCompatAudit.ps1',
+  'scripts\MIRCompatAudit\DiagnosticsParser.ps1',
+  'scripts\MIRCompatAudit\FactorioRunner.ps1',
+  'scripts\Invoke-MIRValidation.ps1'
+)
+foreach ($script in $scripts) {
+  $errors = $null
+  [System.Management.Automation.Language.Parser]::ParseFile((Resolve-Path $script), [ref]$null, [ref]$errors) | Out-Null
+  if ($errors) { throw ($errors | Out-String) }
+}
+. .\scripts\MIRCompatAudit\DiagnosticsParser.ps1
+$blank = ConvertFrom-MIRAuditLine -Line ''
+if ($null -ne $blank) { throw 'blank audit log line should parse as null' }
+.\scripts\Invoke-MIRCompatAudit.ps1 -RunLocalModZips -LocalModZipDirs 'C:\Projects\Factorio\testmods_readonly_2.1' -LocalModLibraryDirs 'C:\Projects\Factorio\testmods_readonly_2.1' -Offline -IncludeRecommendedDependencies -LocalModNames big-mining-drill -MaxCandidates 0 -CatalogPages 0 -FactorioVersions 2.1 -FactorioBin 'C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe' -RunLoadTests -ScenarioTimeoutSeconds 300 -OutputDir .\build\local-zips-big-mining-rerun-smoke
+.\scripts\Invoke-MIRExtendedTests.ps1 -Tier LocalModZips -FactorioBin 'C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe' -LocalModZipDirs 'C:\Projects\Factorio\testmods_readonly_2.1' -LocalModLibraryDirs 'C:\Projects\Factorio\testmods_readonly_2.1' -Offline -CollectAll -ShardLocalModZips -StartIndex 12 -ShardSize 3 -ScenarioTimeoutSeconds 300 -OutputRoot .\build\local-zips-resume-12-3-official-closure-smoke
+```
+
+Results:
+
+- PowerShell parser checks passed for the edited audit, parser, runner, and validation scripts.
+- Blank audit log lines now return `$null` and are ignored by `Read-MIRAuditLog`.
+- `big-mining-drill` now loads as a base-only local root with no inherited Space Age official mod, exit code `0`, no skip, no timeout, and `74` parsed MIR audit rows.
+- `biolabs-in-space` now loads with the full official Space Age bundle (`elevated-rails`, `recycler`, `quality`, and `space-age`), exit code `0`, no skip, no timeout, and `86` parsed MIR audit rows.
+- `bobassembly` still skips because the local `2.1` library is missing its required `boblibrary` dependency. That is a library-completeness finding, not a parser or MIR gameplay failure.
+- The rerun shard completed through `Invoke-MIRExtendedTests.ps1` without the previous blank-line parser crash.
+- The original interrupted run remains useful: checkpointed `load-results.json` files preserve already completed scenario results.
+
+Recovered interrupted-run data:
+
+- Release gate: `3` tiers selected, `3` passed, `0` failed.
+- LocalLibraryScenarios: `14` checkpointed results, `4` passed, `10` dependency-skipped, `0` timed out.
+- GeneratedLocalScenarios: `16` checkpointed results before interruption, `7` passed, `9` dependency-skipped, `0` timed out.
+- LocalModZips: `12` checkpointed results before interruption, `10` passed, `2` dependency-skipped, `0` timed out.
+
 ## 2026-07-04 Extended Audit Gate Hardening
 
 Environment:

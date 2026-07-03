@@ -171,9 +171,13 @@ Generated lockfiles and reports belong under ignored output directories such as 
 
 Load-test mode enables the root candidate, its required Mod Portal dependency closure, and required official built-in mods such as Space Age, Quality, Elevated Rails, or Recycler without trying to download official built-ins from the portal. `-IncludeSpaceAge` enables the official Space Age bundle explicitly. Downloaded archives are checked against their Mod Portal SHA1 before reuse, and load-test results include parsed MIR audit rows when generation diagnostics are forced on in the copied test mod.
 
+The isolated load runner writes explicit entries for the official built-ins. Installed official mods that are not requested by the scenario are disabled instead of being inherited from the user's normal Factorio install. When a scenario requires `space-age`, the runner enables the full official bundle (`elevated-rails`, `recycler`, `quality`, and `space-age`) so Space Age dependency closure matches a normal game install.
+
 Scenarios with unresolved required dependencies are skipped before Factorio startup by default and grouped as dependency failures. Pass `-ContinueOnDependencyFailure` only when intentionally testing a partial modset. Each Factorio load check has a timeout controlled by `-ScenarioTimeoutSeconds`; timed-out processes are killed and grouped as `timeout` failures rather than blocking the entire run.
 
 Load-test runs print per-scenario start/result progress lines with the scenario index, type, root mods, dependency-failure count, pass/skip/timeout status, exit code, parsed audit-row count, and elapsed seconds. `load-results.json` is checkpointed after each scenario, so a partially interrupted run can still be inspected and converted. For unattended local runs, pipe all streams through `Tee-Object` so progress stays visible in the terminal and is also written to an overnight log.
+
+The audit-log parser ignores blank Factorio log lines before parsing MIR's structured audit rows. This keeps overnight sweeps resumable and convertible even when a third-party mod or Factorio itself emits empty log lines.
 
 The grouped converter writes `missing-dependencies.md`, `missing-dependencies.json`, and `missing-dependencies.csv` next to `compat-summary.md`. Use those files as the local-library completion list before treating dependency failures as MIR compatibility problems.
 

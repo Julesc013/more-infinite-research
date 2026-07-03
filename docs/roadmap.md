@@ -1,6 +1,6 @@
 # M.I.R. Roadmap
 
-Updated: 2026-07-03
+Updated: 2026-07-04
 
 This is the high-level release roadmap for More Infinite Research after the v2.0.0 Factorio 2.1 compatibility release. It explains release direction, product boundaries, and why major decisions exist.
 
@@ -51,7 +51,9 @@ Current `dev` is the `v2.1.0` release-candidate line. It builds on the tested
 - the Space Age material productivity split from Stone product productivity into Landfill, Artificial soil, and Molten metals, plus Lithium from brine, Carbon, Ice, and Bacteria cultivation productivity;
 - conservative vanilla Space Age productivity-family adoption for safe residual recipes;
 - hardened known Plates n Circuit Productivity replacement that requires full coverage, matching productivity values, lab-compatible replacement science, and no other blocking owner;
-- a local Mod Portal compatibility audit harness with dependency closure, offline read-only mod-library resolution, generated local-library mega/cluster/pairwise scenarios, official built-in handling, SHA1 cache verification, parsed MIR audit rows, executable manual scenarios, sharding/resume, per-scenario result checkpointing, missing-dependency summaries, per-scenario timeouts, dependency-failure skipping, grouped expected/unexpected failure summaries, review-only profile stubs, strict/exploratory wrapper modes, and a self-hosted extended-test workflow.
+- a local Mod Portal compatibility audit harness with dependency closure, offline read-only mod-library resolution, generated local-library mega/cluster/pairwise scenarios, explicit official built-in isolation, Space Age bundle expansion, SHA1 cache verification, blank-log-line-tolerant parsed MIR audit rows, executable manual scenarios, sharding/resume, per-scenario result checkpointing, missing-dependency summaries, per-scenario timeouts, dependency-failure skipping, grouped expected/unexpected failure summaries, review-only profile stubs, strict/exploratory wrapper modes, and a self-hosted extended-test workflow.
+
+The audit scripts are now functional enough for overnight evidence collection. The next operational improvement should be a shared PowerShell CLI/runtime layer rather than more one-off script formatting: timestamped console output, structured `events.jsonl`, run manifests, artifact indexes, scenario-state resume, process supervision, local mod-library indexes, and static HTML reports. Existing script entry points should remain stable while becoming thinner wrappers over shared run context, logging, checkpoint, and reporting primitives.
 
 The public release rule is:
 

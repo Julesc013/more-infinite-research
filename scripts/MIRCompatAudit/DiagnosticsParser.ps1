@@ -54,7 +54,9 @@ function Split-MIRAuditFields {
 }
 
 function ConvertFrom-MIRAuditLine {
-  param([Parameter(Mandatory)][string]$Line)
+  param([AllowEmptyString()][string]$Line)
+
+  if ([string]::IsNullOrWhiteSpace($Line)) { return $null }
 
   $prefix = "[more-infinite-research] audit "
   $idx = $Line.IndexOf($prefix)
@@ -74,6 +76,7 @@ function Read-MIRAuditLog {
 
   $rows = @()
   foreach ($line in Get-Content -LiteralPath $Path) {
+    if ([string]::IsNullOrWhiteSpace($line)) { continue }
     $row = ConvertFrom-MIRAuditLine -Line $line
     if ($row) { $rows += $row }
   }

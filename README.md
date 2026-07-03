@@ -567,6 +567,8 @@ Use `-CollectAll` for overnight exploration so one failing modset does not stop 
 
 Load-test tiers print per-scenario start/result lines with scenario index, type, root mods, dependency-failure count, pass/skip/timeout status, exit code, parsed audit-row count, and elapsed seconds. `load-results.json` is checkpointed after every scenario so partial results remain readable if a long run is interrupted. Pipe all streams through `Tee-Object` when you want a live VS Code terminal view and a durable overnight log. The grouped converter also writes `missing-dependencies.md`, `missing-dependencies.json`, and `missing-dependencies.csv` for local-library completion work.
 
+The audit runner writes an explicit isolated `mod-list.json`: official built-ins are disabled unless required by the scenario, and any scenario that needs `space-age` enables the full official bundle (`elevated-rails`, `recycler`, `quality`, and `space-age`). Blank lines in Factorio logs are ignored by the MIR audit parser, so partial overnight runs remain convertible even when third-party logs contain empty lines.
+
 `AuditSmoke` uses the committed `space-age-baseline` manual scenario metadata path so strict release gates are deterministic. It proves the audit wrapper and grouped-result converter are wired, but broad external-mod confidence still comes from the credentialed top-25/manual/full audit tiers.
 
 The validation script checks:
