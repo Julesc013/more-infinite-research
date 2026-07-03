@@ -2,6 +2,37 @@
 
 This file records local release-candidate validation runs. It is not a substitute for the manual mod matrix in `docs/compatibility.md`.
 
+## 2026-07-04 Release Documentation Synchronization
+
+Environment:
+
+- Branch: `dev`.
+- Mod version `2.1.0`.
+
+Scope:
+
+- Audited README, changelog, root TODO, roadmap, compatibility docs, architecture notes, manual test plan, release plan, release notes, mod portal copy, and test-results ledger after the extended audit automation commit.
+- Updated the derived `2.1.0` release notes and mod portal copy so they mention executable manual scenarios, sharded/resumable Mod Portal audits, grouped failure reports, review-only profile-stub generation, and self-hosted extended-test workflow support.
+- Updated the recurring release checklist in root `todo.md` so the extended `Static,Runtime,AuditSmoke` wrapper gate and compatibility-audit smoke paths are listed beside the lower-level validation commands.
+- Added a changelog line for the final documentation synchronization pass.
+
+Commands:
+
+```powershell
+rg -n "extended audit|compatibility-audit|Invoke-MIRExtendedTests|RunManualScenarios|sharded|profile-stub|profile stub|top-25|downloads_count|self-hosted|compat-failures|profile-candidates" README.md changelog.txt todo.md docs\compatibility.md docs\architecture.md docs\roadmap.md docs\notes\manual-test-plan.md docs\notes\release-plan-2.1.0.md docs\notes\release-notes-2.1.0.md docs\notes\mod-portal-page.md docs\test-results.md
+rg -n "not yet|missing|blocker|do not publish|release blocker|stale|TODO|FIXME|TBD|BROKEN" README.md changelog.txt todo.md docs\compatibility.md docs\architecture.md docs\roadmap.md docs\notes\manual-test-plan.md docs\notes\release-plan-2.1.0.md docs\notes\release-notes-2.1.0.md docs\notes\mod-portal-page.md docs\test-results.md
+.\scripts\Build-MIRPackage.ps1
+.\scripts\Invoke-MIRValidation.ps1 -StaticOnly
+.\scripts\Test-MIRBranchPolicy.ps1
+git diff --check
+```
+
+Results:
+
+- Documentation scan found the extended audit automation described across the authoritative and derivative release docs.
+- Stale-wording scan found only expected historical changelog/test-result entries, durable future-work TODOs, and documented manual-validation items.
+- Package rebuild, static validation, branch-policy validation, and whitespace validation passed.
+
 ## 2026-07-04 Extended Compatibility Automation
 
 Environment:

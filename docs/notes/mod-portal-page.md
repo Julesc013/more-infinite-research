@@ -14,6 +14,7 @@ It is built for players who want more long-term scaling for late-game megabases,
 - Startup settings let you enable, disable, cap, or rebalance almost every generated research.
 - Works with Factorio `2.1`; requires `base >= 2.1.8`. Space Age is optional.
 - Version `2.1.0` keeps generated technology IDs stable except for documented migrations: it retains the migration that merges the old trash-slot research into Character inventory slots, and it migrates retired Stone product productivity progress into Landfill productivity after the stone-product stream is split.
+- Version `2.1.0` also ships local compatibility-audit tooling for release maintainers: curated scenario execution, sharded Mod Portal audits, grouped failure summaries, and review-only profile-stub generation.
 
 Recipe productivity researches are infinite, but Factorio's recipe productivity cap still applies. Once a recipe reaches that cap, more levels may no longer improve that recipe.
 
@@ -188,6 +189,8 @@ This helps it work with:
 When this mod is set to prefer its own overlapping research, it only removes known competing infinite technologies that are fully covered by generated More Infinite Research effects. Finite upgrade chains from other mods are left alone. Vanilla Space Age productivity families remain authoritative where safe, so mod-added rocket fuel or low density structure recipes can be appended to the vanilla infinite technology instead of receiving duplicate-looking MIR research.
 
 Compatibility is broad, but not guaranteed for every overhaul. Mods that change recipes or labs very late in loading may still need load-order compatibility.
+
+For maintainers and pack authors, the repository includes an extended local audit workflow. With a Factorio binary and Mod Portal credentials, it can run top-download audits, curated overhaul scenarios, parsed MIR diagnostics, grouped failure reports, and review-only compatibility profile stubs. These tools are for evidence collection; they do not automatically enable new compatibility profiles.
 
 ## Troubleshooting
 

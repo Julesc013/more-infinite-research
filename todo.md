@@ -518,6 +518,8 @@ Run this before every release candidate:
 - [x] `.\scripts\Build-MIRPackage.ps1`
 - [x] `.\scripts\Invoke-MIRValidation.ps1 -StaticOnly`
 - [x] `.\scripts\Invoke-MIRValidation.ps1 -FactorioBin "C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe"`
+- [x] `.\scripts\Invoke-MIRExtendedTests.ps1 -Tier Static,Runtime,AuditSmoke -FactorioBin "C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe" -FailFast`
+- [x] Manual-scenario, lockfile-resume, and profile-stub smoke paths for the compatibility audit tooling.
 - [x] `.\scripts\Test-MIRBranchPolicy.ps1`
 - [x] `git diff --check`
 - [x] Load the release zip from a normal Factorio mods folder.
