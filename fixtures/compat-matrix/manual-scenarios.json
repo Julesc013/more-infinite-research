@@ -1,0 +1,55 @@
+{
+  "schema": 1,
+  "scenarios": [
+    {
+      "name": "space-age-baseline",
+      "mods": ["quality", "elevated-rails", "space-age", "more-infinite-research"],
+      "notes": "Baseline official DLC surface."
+    },
+    {
+      "name": "space-age-planet-pack",
+      "mods": ["quality", "elevated-rails", "space-age", "more-infinite-research", "kry-all-planet-mods"],
+      "notes": "Broad planet aggregation stress scenario."
+    },
+    {
+      "name": "space-age-circuit-competitor",
+      "mods": ["quality", "elevated-rails", "space-age", "more-infinite-research", "plates-n-circuit-productivity"],
+      "notes": "Known fully replaceable plate and circuit productivity competitor."
+    },
+    {
+      "name": "space-age-krastorio2-spaced-out",
+      "mods": ["quality", "elevated-rails", "space-age", "more-infinite-research", "Krastorio2-spaced-out"],
+      "notes": "High-priority Space Age overhaul scenario."
+    },
+    {
+      "name": "krastorio2-base-line",
+      "mods": ["more-infinite-research", "Krastorio2"],
+      "notes": "Non-Space-Age K2 scenario for recipe and science progression checks."
+    },
+    {
+      "name": "bob-core-suite",
+      "mods": ["more-infinite-research", "bobplates", "bobelectronics", "bobtech"],
+      "notes": "Circuit, plate, and science progression stress scenario."
+    },
+    {
+      "name": "angel-bob-core-suite",
+      "mods": ["more-infinite-research", "bobplates", "bobelectronics", "bobtech", "angelsrefining", "angelssmelting", "angelspetrochem"],
+      "notes": "Classic Angel/Bob compatibility surface."
+    },
+    {
+      "name": "nullius",
+      "mods": ["more-infinite-research", "nullius"],
+      "notes": "Total overhaul; unknown external productivity owners should win by default."
+    },
+    {
+      "name": "ultracube-no-space-age",
+      "mods": ["more-infinite-research", "Ultracube"],
+      "notes": "Run without Space Age or Quality."
+    },
+    {
+      "name": "space-age-bz-resource-suite",
+      "mods": ["quality", "elevated-rails", "space-age", "more-infinite-research", "bztitanium", "bzcarbon", "bztin", "bzzirconium"],
+      "notes": "Resource and intermediate chain coverage."
+    }
+  ]
+}
