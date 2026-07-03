@@ -44,7 +44,11 @@ param(
 $ErrorActionPreference = "Stop"
 
 $repo = Resolve-Path (Join-Path $PSScriptRoot "..")
-$outputRootPath = Join-Path $repo $OutputRoot
+$outputRootPath = if ([System.IO.Path]::IsPathRooted($OutputRoot)) {
+  $OutputRoot
+} else {
+  Join-Path $repo $OutputRoot
+}
 if (-not (Test-Path -LiteralPath $outputRootPath)) {
   New-Item -ItemType Directory -Path $outputRootPath | Out-Null
 }

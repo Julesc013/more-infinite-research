@@ -206,6 +206,8 @@ Scope:
 - Added `-ShardLocalModZips` on the wrapper so `LocalModZips` can use `-StartIndex` and `-ShardSize` without changing the default all-root behavior.
 - Checkpointed `load-results.json` after every scenario so interrupted overnight runs still leave parseable partial results.
 - Added `missing-dependencies.md`, `missing-dependencies.json`, and `missing-dependencies.csv` to the grouped-result converter.
+- Added `Start-MIROvernightLocalSweep.ps1` so the recommended local `2.1` overnight sweep is a short script invocation rather than a fragile pasted one-liner.
+- Added `Show-MIROvernightSummary.ps1` for next-morning triage across grouped failures, missing dependencies, and profile candidates.
 - Updated README, compatibility docs, changelog, TODO, validation snippets, and self-hosted workflow inputs for generated local scenarios and resumable local sweeps.
 
 Recommended overnight ordering:
@@ -237,11 +239,15 @@ Commands:
 .\scripts\Invoke-MIRCompatAudit.ps1 -RunManualScenarios -ManualScenariosPath .\fixtures\compat-matrix\local-library-scenarios.json -ScenarioNames local-2-1-bz-suite-space-age -LocalModLibraryDirs 'C:\Projects\Factorio\testmods_readonly_2.1' -Offline -IncludeRecommendedDependencies -MaxCandidates 0 -CatalogPages 0 -FactorioVersions 2.1 -FactorioBin 'C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe' -RunLoadTests -ScenarioTimeoutSeconds 300 -OutputDir .\build\local-library-bz-checkpoint-smoke
 .\scripts\Convert-MIRCompatAuditResults.ps1 -AuditDir .\build\local-library-bz-checkpoint-smoke
 .\scripts\Invoke-MIRExtendedTests.ps1 -Tier Static,Runtime,AuditSmoke -FactorioBin 'C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe' -FailFast -FailOnAuditFailures -OutputRoot .\artifacts\overnight-hardening-preflight-release-gate
+.\scripts\Start-MIROvernightLocalSweep.ps1 -DryRun
+.\scripts\Show-MIROvernightSummary.ps1 -OutputRoot .\build\generated-local-offline-smoke -Tail 0
 ```
 
 Result:
 
 - Parser checks passed for the edited audit, wrapper, converter, and validation scripts.
+- `Start-MIROvernightLocalSweep.ps1 -DryRun` resolved the Factorio binary and `150` local `2.1` zips without starting tests.
+- `Show-MIROvernightSummary.ps1` summarized existing smoke artifacts, including grouped failure counts, missing-dependency rows grouped by `mod`, and profile-candidate counts.
 - Generated local metadata smoke selected `7` generated scenarios from `150` local `2.1` zips and wrote grouped failure plus `missing-dependencies.*` artifacts.
 - Local root sharding smoke selected exactly `3` `LocalModZips` scenarios from `-StartIndex 0 -Count 3`.
 - BZ Space Age local-library load smoke passed with exit code `0`, no timeout, no skip, and `87` parsed MIR audit rows.

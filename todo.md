@@ -378,6 +378,8 @@ discover facts
 - [x] Add local-root sharding for `LocalModZips` with `-ShardLocalModZips`, `-StartIndex`, and `-ShardSize`.
 - [x] Checkpoint `load-results.json` after every scenario so interrupted overnight runs still leave partial results.
 - [x] Emit `missing-dependencies.md/json/csv` from grouped compatibility conversion.
+- [x] Add `Start-MIROvernightLocalSweep.ps1` as the safe bedtime entrypoint for the local `2.1` offline sweep.
+- [x] Add `Show-MIROvernightSummary.ps1` for next-morning grouped failure, missing dependency, and profile-candidate triage.
 - [ ] Run the overnight local `2.1` library sweep against `C:\Projects\Factorio\testmods_readonly_2.1` using individual roots plus curated local-library scenarios.
 - [ ] Fill missing dependency zips reported by the local `2.1` library sweep, then rerun only the affected scenarios.
 - [ ] Run a top-25 Mod Portal audit for Factorio `2.1` with real downloads, credentials, and a local Factorio binary.

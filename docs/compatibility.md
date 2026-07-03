@@ -151,12 +151,13 @@ The tiered wrapper is the recommended entry point for repeatable local and self-
 .\scripts\Invoke-MIRExtendedTests.ps1 -Tier Static,Runtime,AuditSmoke -FailFast -FailOnAuditFailures
 .\scripts\Invoke-MIRExtendedTests.ps1 -Tier Top25Base,Top25SpaceAge,ManualScenarios -CollectAll
 .\scripts\Invoke-MIRExtendedTests.ps1 -Tier LocalModZips -LocalModZipDirs .\tmp -CollectAll
+.\scripts\Start-MIROvernightLocalSweep.ps1
 .\scripts\Invoke-MIRExtendedTests.ps1 -Tier LocalLibraryScenarios,GeneratedLocalScenarios,LocalModZips -LocalModZipDirs C:\Projects\Factorio\testmods_readonly_2.1 -LocalModLibraryDirs C:\Projects\Factorio\testmods_readonly_2.1 -Offline -CollectAll
 .\scripts\Invoke-MIRExtendedTests.ps1 -Tier Full10KSpaceAge -IncludeFullAudit -StartIndex 0 -ShardSize 25 -CollectAll
 .\scripts\Invoke-MIRExtendedTests.ps1 -Tier Full10KSpaceAge -IncludeFullAudit -FromLockfile .\artifacts\compat-audit-locks\compat-candidates.lock.json -StartIndex 25 -ShardSize 25 -CollectAll
 ```
 
-The offline local-library command is the preferred shape for overnight testing against hand-downloaded archives. Run the strict release gate separately with `-FailFast -FailOnAuditFailures`, then run the local sweep with `-CollectAll`. The prioritized local sweep covers curated combinations from `fixtures/compat-matrix/local-library-scenarios.json`, generated all-local/cluster stress scenarios, and then each individual local root zip. Missing dependencies and impossible mod combinations are expected to appear as grouped failures; they are still useful evidence because they distinguish "not testable with this local library" from actual MIR generation regressions.
+`Start-MIROvernightLocalSweep.ps1` is the preferred bedtime command for the local `2.1` library. It removes one-line paste hazards, starts a transcript log, runs the strict release gate, then runs the local sweep with `-CollectAll`. The underlying prioritized local sweep covers curated combinations from `fixtures/compat-matrix/local-library-scenarios.json`, generated all-local/cluster stress scenarios, and then each individual local root zip. Missing dependencies and impossible mod combinations are expected to appear as grouped failures; they are still useful evidence because they distinguish "not testable with this local library" from actual MIR generation regressions. `Show-MIROvernightSummary.ps1` summarizes the next-morning triage views across the whole output tree.
 
 `GeneratedLocalScenarios` creates scenarios from local zip metadata: one all-local mega scenario, cluster scenarios for planet/Space Age content, BZ/resource chains, Bob, Krastorio/K2SO, production/fluid/casting/resource-flow mods, and logistics/transport mods. Add `-IncludeGeneratedLocalPairwise -GeneratedLocalPairwiseLimit 40` to the wrapper when you want a capped pairwise pass inside high-risk local clusters. `LocalModZips` can be sharded with `-ShardLocalModZips -StartIndex N -ShardSize M`; without `-ShardLocalModZips`, it tests every local root.
 
@@ -175,6 +176,8 @@ Scenarios with unresolved required dependencies are skipped before Factorio star
 Load-test runs print per-scenario start/result progress lines with the scenario index, type, root mods, dependency-failure count, pass/skip/timeout status, exit code, parsed audit-row count, and elapsed seconds. `load-results.json` is checkpointed after each scenario, so a partially interrupted run can still be inspected and converted. For unattended local runs, pipe all streams through `Tee-Object` so progress stays visible in the terminal and is also written to an overnight log.
 
 The grouped converter writes `missing-dependencies.md`, `missing-dependencies.json`, and `missing-dependencies.csv` next to `compat-summary.md`. Use those files as the local-library completion list before treating dependency failures as MIR compatibility problems.
+
+Do not immediately patch code from the first local-library failure. First classify the evidence: missing local zip, known modset incompatibility, benign external owner suppression, repeated split-family pattern, MIR-generated prototype crash, or timeout. Download missing dependencies and rerun affected scenarios before promoting a failure to MIR compatibility work.
 
 Expected failures should be added only after review to `fixtures/compat-matrix/expected-failures.json`. The converter still reports them, but separates `expected_count` from `unexpected_count`; strict wrapper gates fail on unexpected groups.
 

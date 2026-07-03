@@ -554,13 +554,10 @@ Local modpack zips can be included with the `LocalModZips` tier and `-LocalModZi
 Use read-only local mod libraries for large offline sweeps:
 
 ```powershell
-.\scripts\Invoke-MIRExtendedTests.ps1 `
-  -Tier LocalLibraryScenarios,GeneratedLocalScenarios,LocalModZips `
-  -LocalModZipDirs C:\Projects\Factorio\testmods_readonly_2.1 `
-  -LocalModLibraryDirs C:\Projects\Factorio\testmods_readonly_2.1 `
-  -Offline `
-  -CollectAll
+.\scripts\Start-MIROvernightLocalSweep.ps1
 ```
+
+`Start-MIROvernightLocalSweep.ps1` is the safest bedtime entrypoint. It finds or accepts the Factorio binary, verifies `C:\Projects\Factorio\testmods_readonly_2.1`, disables AC sleep/hibernate for the current machine, runs the strict `Static,Runtime,AuditSmoke` release gate first, then runs the prioritized local sweep with a transcript at `artifacts/overnight-local-2.1-*/overnight.log`. Use `-DryRun` to validate paths without starting tests, `-SkipPowerConfig` if you do not want power settings changed, and `-LocalModDir <path>` if your downloaded zip library is elsewhere. In the morning, run `.\scripts\Show-MIROvernightSummary.ps1 -OutputRoot <overnight-output-dir>` to print the log tail, release/local summaries, grouped failures, missing dependencies, and profile-candidate counts.
 
 Run local-library tiers in priority order: `LocalLibraryScenarios` covers curated high-value combinations, `GeneratedLocalScenarios` creates generated mega and metadata-cluster stress cases, and `LocalModZips` tests each local root zip as an individual scenario. Add `-IncludeGeneratedLocalPairwise -GeneratedLocalPairwiseLimit 40` when you want capped pairwise cluster coverage. Add `-ShardLocalModZips -StartIndex N -ShardSize M` to resume local-root sweeps in chunks.
 
