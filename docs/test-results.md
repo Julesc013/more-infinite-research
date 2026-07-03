@@ -85,6 +85,54 @@ Results:
 - Synthetic dependency-failure load-test smoke printed the new per-scenario start/result progress lines without launching Factorio, because the scenario was skipped before startup.
 - Grouped result conversion passed for the synthetic progress smoke and reported the full root mod name for both metadata and skipped-load dependency-failure groups.
 
+## 2026-07-04 Local Modpack Zip Audit Support
+
+Environment:
+
+- Branch: `dev`.
+- Mod version `2.1.0`.
+- Local zip inputs under `tmp/`:
+  - `all-the-overhaul-modpack_2.2.7.zip`
+  - `kry-all-planet-mods_1.1.3.zip`
+
+Scope:
+
+- Added `-LocalModZipDirs`, `-LocalModZips`, `-LocalModNames`, and `-RunLocalModZips` to the compatibility audit runner.
+- Added a `LocalModZips` extended-test tier.
+- Added local zip `info.json` parsing, local `source_path` lock entries, and direct copying of local mod zips into isolated Factorio mod directories.
+- Added `-IncludeRecommendedDependencies` so local modpack wrapper zips can include `+` dependencies as pack contents.
+- Fixed dependency-name parsing for no-whitespace version constraints such as `base>=2.1.7`.
+- Updated README, compatibility docs, changelog, TODO, and static validation snippets for the local modpack zip path.
+
+Commands:
+
+```powershell
+$scripts = @(
+  'scripts\Invoke-MIRCompatAudit.ps1',
+  'scripts\Invoke-MIRExtendedTests.ps1',
+  'scripts\MIRCompatAudit\DependencyResolver.ps1',
+  'scripts\MIRCompatAudit\FactorioRunner.ps1',
+  'scripts\MIRCompatAudit\ModPortal.ps1'
+)
+foreach ($script in $scripts) {
+  $errors=$null
+  [System.Management.Automation.Language.Parser]::ParseFile((Resolve-Path $script), [ref]$null, [ref]$errors) | Out-Null
+  if ($errors) { throw ($errors | Out-String) }
+}
+.\scripts\Invoke-MIRCompatAudit.ps1 -RunLocalModZips -LocalModZipDirs .\tmp -LocalModNames kry-all-planet-mods -IncludeRecommendedDependencies -MaxCandidates 0 -CatalogPages 0 -FactorioVersions 2.1 -OutputDir .\build\local-zip-smoke
+.\scripts\Invoke-MIRCompatAudit.ps1 -RunLocalModZips -LocalModZipDirs .\tmp -IncludeRecommendedDependencies -MaxCandidates 0 -CatalogPages 0 -FactorioVersions 2.1 -OutputDir .\build\local-zips-both-smoke
+.\scripts\Convert-MIRCompatAuditResults.ps1 -AuditDir .\build\local-zips-both-smoke
+```
+
+Results:
+
+- Parser checks passed for the changed audit, extended wrapper, dependency resolver, Factorio runner, and Mod Portal helper scripts.
+- Local zip smoke recognized `kry-all-planet-mods` as a `local_zip` scenario, wrote a local lock entry with `source = local_zip` and `source_path = C:\Projects\Factorio\more-infinite-research\tmp\kry-all-planet-mods_1.1.3.zip`, and recorded `66` dependencies from the zip metadata.
+- The dependency parser no longer misclassifies `base>=2.1.7` as a portal mod name.
+- Both-zips smoke selected two `local_zip` scenarios: `all-the-overhaul-modpack` reported one release-selection failure because it targets Factorio `2.0`, and `kry-all-planet-mods` reported dependency-resolution failures for unavailable or incompatible `2.1` dependency releases.
+- Grouped result conversion passed for the both-zips smoke and reported those local zip issues as dependency-resolution groups.
+- The smoke reported unresolved/incompatible dependencies as metadata failures; no Factorio load test was attempted in this metadata-only smoke.
+
 ## 2026-07-04 Release Documentation Synchronization
 
 Environment:

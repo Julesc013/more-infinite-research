@@ -17,6 +17,7 @@ function Resolve-MIRRequiredDependencyClosure {
     [Parameter(Mandatory)][scriptblock]$GetFullMod,
     [Parameter(Mandatory)][scriptblock]$SelectRelease,
     [string[]]$ExcludeModNames = @("base", "space-age", "quality", "elevated-rails", "recycler"),
+    [switch]$IncludeRecommendedDependencies,
     [switch]$FailFast
   )
 
@@ -51,7 +52,8 @@ function Resolve-MIRRequiredDependencyClosure {
       }
 
       foreach ($dep in $deps) {
-        if ($dep.required -and -not $excluded[$dep.name] -and -not $resolved.ContainsKey($dep.name)) {
+        $includeDependency = $dep.required -or ($IncludeRecommendedDependencies -and $dep.kind -eq "recommended")
+        if ($includeDependency -and -not $excluded[$dep.name] -and -not $resolved.ContainsKey($dep.name)) {
           $queue.Enqueue($dep.name)
         }
       }

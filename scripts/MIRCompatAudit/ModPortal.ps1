@@ -136,7 +136,8 @@ function ConvertFrom-MIRDependencyString {
     $text = $text.Substring(1).Trim()
   }
 
-  $name = ($text -split "\s+")[0]
+  $nameMatch = [regex]::Match($text, "^\s*([^\s<>=]+)")
+  $name = if ($nameMatch.Success) { $nameMatch.Groups[1].Value } else { ($text -split "\s+")[0] }
   [pscustomobject]@{
     raw = $Dependency
     name = $name

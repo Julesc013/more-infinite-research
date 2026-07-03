@@ -73,6 +73,8 @@ The broad mod-portal audit is local/manual because it can require Factorio crede
 - `fixtures/compat-matrix/expected-failures.json`: reviewed expected-failure rules used by grouped reports so known external breakage can be separated from unexpected MIR regressions.
 - `fixtures/compat-matrix/known-exclusions.json`: stable exclusions for official DLC, localization, and internal-only portal entries.
 
+Local modpack zips can be supplied with `-LocalModZipDirs` or `-LocalModZips`. The audit runner reads each zip's `info.json`, creates a local lock entry with `source_path`, copies that zip into isolated Factorio runs directly from disk, and resolves missing third-party dependencies through the normal Mod Portal path. The `LocalModZips` extended tier automatically enables `-IncludeRecommendedDependencies` because Factorio modpack wrapper mods often use `+` dependencies to describe the pack contents rather than strict required dependencies.
+
 Catalog and lockfile only:
 
 ```powershell
@@ -145,6 +147,7 @@ The tiered wrapper is the recommended entry point for repeatable local and self-
 ```powershell
 .\scripts\Invoke-MIRExtendedTests.ps1 -Tier Static,Runtime,AuditSmoke -FailFast -FailOnAuditFailures
 .\scripts\Invoke-MIRExtendedTests.ps1 -Tier Top25Base,Top25SpaceAge,ManualScenarios -CollectAll
+.\scripts\Invoke-MIRExtendedTests.ps1 -Tier LocalModZips -LocalModZipDirs .\tmp -CollectAll
 .\scripts\Invoke-MIRExtendedTests.ps1 -Tier Full10KSpaceAge -IncludeFullAudit -StartIndex 0 -ShardSize 25 -CollectAll
 .\scripts\Invoke-MIRExtendedTests.ps1 -Tier Full10KSpaceAge -IncludeFullAudit -FromLockfile .\artifacts\compat-audit-locks\compat-candidates.lock.json -StartIndex 25 -ShardSize 25 -CollectAll
 ```

@@ -14,9 +14,14 @@ param(
   [int]$StartIndex = 0,
   [int]$Count = 0,
   [string[]]$CandidateNames = @(),
+  [string[]]$LocalModZipDirs = @(),
+  [string[]]$LocalModZips = @(),
+  [string[]]$LocalModNames = @(),
   [switch]$DownloadMods,
   [switch]$RunLoadTests,
   [switch]$RunManualScenarios,
+  [switch]$RunLocalModZips,
+  [switch]$IncludeRecommendedDependencies,
   [string[]]$ScenarioNames = @(),
   [int]$ScenarioTimeoutSeconds = 900,
   [switch]$ContinueOnDependencyFailure,
@@ -128,6 +133,84 @@ function ConvertTo-MIRLockEntry {
   }
 }
 
+function ConvertTo-MIRLocalFullMod {
+  param([Parameter(Mandatory)][string]$ZipPath)
+
+  Add-Type -AssemblyName System.IO.Compression.FileSystem
+  $resolvedZip = (Resolve-Path -LiteralPath $ZipPath).Path
+  $zip = [System.IO.Compression.ZipFile]::OpenRead($resolvedZip)
+  try {
+    $entry = $zip.Entries | Where-Object { $_.FullName -match "^[^/]+/info\.json$" } | Select-Object -First 1
+    if (-not $entry) {
+      throw "Local mod zip does not contain a top-level info.json: $resolvedZip"
+    }
+
+    $reader = [System.IO.StreamReader]::new($entry.Open())
+    try {
+      $info = $reader.ReadToEnd() | ConvertFrom-Json
+    } finally {
+      $reader.Dispose()
+    }
+  } finally {
+    $zip.Dispose()
+  }
+
+  $dependencies = @($info.dependencies | ForEach-Object {
+    if (-not [string]::IsNullOrWhiteSpace([string]$_)) { [string]$_ }
+  })
+  $file = Get-Item -LiteralPath $resolvedZip
+  $sha1 = (Get-FileHash -Algorithm SHA1 -LiteralPath $resolvedZip).Hash.ToLowerInvariant()
+
+  [pscustomobject]@{
+    name = [string]$info.name
+    title = if ([string]::IsNullOrWhiteSpace([string]$info.title)) { [string]$info.name } else { [string]$info.title }
+    owner = "local"
+    downloads_count = 0
+    category = "local"
+    releases = @(
+      [pscustomobject]@{
+        version = [string]$info.version
+        file_name = $file.Name
+        sha1 = $sha1
+        download_url = ""
+        source_path = $resolvedZip
+        source = "local_zip"
+        info_json = [pscustomobject]@{
+          factorio_version = [string]$info.factorio_version
+          dependencies = $dependencies
+        }
+      }
+    )
+  }
+}
+
+function ConvertTo-MIRLocalLockEntry {
+  param(
+    [Parameter(Mandatory)]$FullMod,
+    [Parameter(Mandatory)]$Release,
+    [Parameter(Mandatory)]$Dependencies
+  )
+
+  $entry = ConvertTo-MIRLockEntry -FullMod $FullMod -Release $Release -Dependencies $Dependencies
+  $entry.source = "local_zip"
+  $entry.source_path = [string]$Release.source_path
+  return $entry
+}
+
+function ConvertTo-MIRScenarioLockEntry {
+  param(
+    [Parameter(Mandatory)]$FullMod,
+    [Parameter(Mandatory)]$Release,
+    [Parameter(Mandatory)]$Dependencies
+  )
+
+  if ($Release.PSObject.Properties["source_path"] -and -not [string]::IsNullOrWhiteSpace([string]$Release.source_path)) {
+    return ConvertTo-MIRLocalLockEntry -FullMod $FullMod -Release $Release -Dependencies $Dependencies
+  }
+
+  return ConvertTo-MIRLockEntry -FullMod $FullMod -Release $Release -Dependencies $Dependencies
+}
+
 function New-MIRScenario {
   param(
     [Parameter(Mandatory)][string]$Name,
@@ -166,6 +249,30 @@ function Get-MIRLockEntriesByName {
 
 $resolvedOutputDir = New-MIRDirectory -Path $OutputDir
 $resolvedCacheDir = New-MIRDirectory -Path $ModCacheDir
+$localZipPaths = @()
+foreach ($dir in @($LocalModZipDirs)) {
+  if ([string]::IsNullOrWhiteSpace([string]$dir)) { continue }
+  if (-not (Test-Path -LiteralPath $dir)) {
+    throw "Local mod zip directory does not exist: $dir"
+  }
+  $localZipPaths += @(Get-ChildItem -LiteralPath $dir -Filter *.zip -File | ForEach-Object { $_.FullName })
+}
+foreach ($zipPath in @($LocalModZips)) {
+  if ([string]::IsNullOrWhiteSpace([string]$zipPath)) { continue }
+  if (-not (Test-Path -LiteralPath $zipPath)) {
+    throw "Local mod zip does not exist: $zipPath"
+  }
+  $localZipPaths += (Resolve-Path -LiteralPath $zipPath).Path
+}
+$localZipPaths = @($localZipPaths | Sort-Object -Unique)
+$localFullModsByName = @{}
+foreach ($zipPath in $localZipPaths) {
+  $localFull = ConvertTo-MIRLocalFullMod -ZipPath $zipPath
+  if ([string]::IsNullOrWhiteSpace([string]$localFull.name)) {
+    throw "Local mod zip has no mod name: $zipPath"
+  }
+  $localFullModsByName[[string]$localFull.name] = $localFull
+}
 $officialBuiltinMods = @("space-age", "quality", "elevated-rails", "recycler")
 $specialLocalMods = @("base", "more-infinite-research")
 $officialBuiltinLookup = @{}
@@ -193,7 +300,8 @@ function Get-MIREnabledOfficialModsFromEntries {
   param(
     [object[]]$LockEntries,
     [bool]$EnableSpaceAgeBundle,
-    [string[]]$ExplicitOfficialMods = @()
+    [string[]]$ExplicitOfficialMods = @(),
+    [switch]$IncludeRecommendedDependencies
   )
 
   $enabled = @{}
@@ -206,7 +314,8 @@ function Get-MIREnabledOfficialModsFromEntries {
 
   foreach ($entry in @($LockEntries)) {
     foreach ($dep in @($entry.dependencies)) {
-      if ($dep.required -and $officialBuiltinLookup.ContainsKey([string]$dep.name)) {
+      $includeDependency = $dep.required -or ($IncludeRecommendedDependencies -and $dep.kind -eq "recommended")
+      if ($includeDependency -and $officialBuiltinLookup.ContainsKey([string]$dep.name)) {
         $enabled[[string]$dep.name] = $true
       }
     }
@@ -218,7 +327,8 @@ function Get-MIREnabledOfficialModsFromEntries {
 function Resolve-MIRLockDependencyNames {
   param(
     [Parameter(Mandatory)][string[]]$RootModNames,
-    [Parameter(Mandatory)]$LockEntriesByName
+    [Parameter(Mandatory)]$LockEntriesByName,
+    [switch]$IncludeRecommendedDependencies
   )
 
   $queue = [System.Collections.Generic.Queue[string]]::new()
@@ -242,7 +352,8 @@ function Resolve-MIRLockDependencyNames {
     $entry = $LockEntriesByName[$name]
     $resolved[$name] = $true
     foreach ($dep in @($entry.dependencies)) {
-      if ($dep.required -and -not $localModLookup.ContainsKey([string]$dep.name) -and -not $resolved.ContainsKey([string]$dep.name)) {
+      $includeDependency = $dep.required -or ($IncludeRecommendedDependencies -and $dep.kind -eq "recommended")
+      if ($includeDependency -and -not $localModLookup.ContainsKey([string]$dep.name) -and -not $resolved.ContainsKey([string]$dep.name)) {
         $queue.Enqueue([string]$dep.name)
       }
     }
@@ -265,6 +376,9 @@ $manual = Read-MIRJsonFile -Path $ManualScenariosPath -Fallback ([pscustomobject
 $fullCache = @{}
 function Get-FullCached {
   param([Parameter(Mandatory)][string]$Name)
+  if ($localFullModsByName.ContainsKey($Name)) {
+    return $localFullModsByName[$Name]
+  }
   if (-not $fullCache.ContainsKey($Name)) {
     $fullCache[$Name] = Get-MIRModPortalFullMod -Name $Name
   }
@@ -299,17 +413,18 @@ function Resolve-MIRPortalScenario {
       }
 
       $deps = @(Get-MIRReleaseDependencies -Release $release)
-      $scenarioLockEntries += ConvertTo-MIRLockEntry -FullMod $full -Release $release -Dependencies $deps
+      $scenarioLockEntries += ConvertTo-MIRScenarioLockEntry -FullMod $full -Release $release -Dependencies $deps
 
       $closure = Resolve-MIRRequiredDependencyClosure `
         -RootModNames @($rootName) `
         -GetFullMod { param($name) Get-FullCached -Name $name } `
         -SelectRelease { param($fullMod) Select-MIRCompatibleRelease -FullMod $fullMod -FactorioVersions $FactorioVersions } `
+        -IncludeRecommendedDependencies:$IncludeRecommendedDependencies `
         -FailFast:$FailFast
 
       foreach ($dep in @($closure.resolved)) {
         if ($dep.name -eq $rootName) { continue }
-        $scenarioLockEntries += ConvertTo-MIRLockEntry -FullMod $dep.full -Release $dep.release -Dependencies $dep.dependencies
+        $scenarioLockEntries += ConvertTo-MIRScenarioLockEntry -FullMod $dep.full -Release $dep.release -Dependencies $dep.dependencies
       }
       $scenarioFailures += @($closure.failures | ForEach-Object {
         [pscustomobject]@{
@@ -333,7 +448,8 @@ function Resolve-MIRPortalScenario {
   $officialMods = @(Get-MIREnabledOfficialModsFromEntries `
     -LockEntries $scenarioLockEntries `
     -EnableSpaceAgeBundle $EnableSpaceAgeBundle `
-    -ExplicitOfficialMods $explicitOfficialMods)
+    -ExplicitOfficialMods $explicitOfficialMods `
+    -IncludeRecommendedDependencies:$IncludeRecommendedDependencies)
 
   New-MIRScenario `
     -Name $Name `
@@ -356,7 +472,10 @@ function Resolve-MIRLockScenario {
   )
 
   $rootModNames = @(Get-MIRPortalRootModNames -ModNames $RequestedMods)
-  $closure = Resolve-MIRLockDependencyNames -RootModNames $rootModNames -LockEntriesByName $LockEntriesByName
+  $closure = Resolve-MIRLockDependencyNames `
+    -RootModNames $rootModNames `
+    -LockEntriesByName $LockEntriesByName `
+    -IncludeRecommendedDependencies:$IncludeRecommendedDependencies
   $resolvedNames = @($closure.names)
   $scenarioLockEntries = @(
     foreach ($name in $resolvedNames) {
@@ -366,7 +485,8 @@ function Resolve-MIRLockScenario {
   $officialMods = @(Get-MIREnabledOfficialModsFromEntries `
     -LockEntries $scenarioLockEntries `
     -EnableSpaceAgeBundle $EnableSpaceAgeBundle `
-    -ExplicitOfficialMods (Get-MIRExplicitOfficialMods -ModNames $RequestedMods))
+    -ExplicitOfficialMods (Get-MIRExplicitOfficialMods -ModNames $RequestedMods) `
+    -IncludeRecommendedDependencies:$IncludeRecommendedDependencies)
 
   New-MIRScenario `
     -Name $Name `
@@ -524,6 +644,34 @@ if ($RunManualScenarios) {
   }
 }
 
+if ($RunLocalModZips) {
+  if ($localFullModsByName.Count -eq 0) {
+    throw "RunLocalModZips requires -LocalModZipDirs or -LocalModZips."
+  }
+
+  $localNames = @($localFullModsByName.Keys | Sort-Object)
+  if ($LocalModNames.Count -gt 0) {
+    $localLookup = @{}
+    foreach ($name in $LocalModNames) { $localLookup[[string]$name] = $true }
+    foreach ($name in $LocalModNames) {
+      if (-not $localFullModsByName.ContainsKey([string]$name)) {
+        throw "Requested local mod '$name' was not found in local zip inputs."
+      }
+    }
+    $localNames = @($localNames | Where-Object { $localLookup.ContainsKey([string]$_) })
+  }
+
+  foreach ($localName in $localNames) {
+    Write-Host "[compat-audit] inspecting local zip scenario $localName"
+    $selectedScenarios += Resolve-MIRPortalScenario `
+      -Name $localName `
+      -Type "local_zip" `
+      -RequestedMods @([string]$localName) `
+      -EnableSpaceAgeBundle $false `
+      -Notes "Local mod zip supplied to the compatibility audit."
+  }
+}
+
 $failures = @(
   foreach ($scenario in $selectedScenarios) {
     foreach ($failure in @($scenario.dependency_failures)) {
@@ -553,13 +701,17 @@ $lock = [ordered]@{
   include_space_age = [bool]$IncludeSpaceAge
   scenario_timeout_seconds = $ScenarioTimeoutSeconds
   continue_on_dependency_failure = [bool]$ContinueOnDependencyFailure
+  include_recommended_dependencies = [bool]$IncludeRecommendedDependencies
   max_candidates = $MaxCandidates
   catalog_pages = $CatalogPages
   from_lockfile = $FromLockfile
   start_index = $StartIndex
   count = $Count
+  local_mod_zip_dirs = @($LocalModZipDirs)
+  local_mod_zips = @($LocalModZips)
   candidates_selected = @($selectedScenarios | Where-Object { $_.type -eq "catalog" } | ForEach-Object { $_.name })
   manual_scenarios_selected = @($selectedScenarios | Where-Object { $_.type -eq "manual" } | ForEach-Object { $_.name })
+  local_zip_scenarios_selected = @($selectedScenarios | Where-Object { $_.type -eq "local_zip" } | ForEach-Object { $_.name })
   mods = $lockEntries
 }
 
@@ -588,6 +740,7 @@ $scenarioSummaries = @($selectedScenarios | ForEach-Object {
   lockfile = $lockPath
   selected_count = @($selectedScenarios | Where-Object { $_.type -eq "catalog" }).Count
   manual_selected_count = @($selectedScenarios | Where-Object { $_.type -eq "manual" }).Count
+  local_zip_selected_count = @($selectedScenarios | Where-Object { $_.type -eq "local_zip" }).Count
   mod_count = $lockEntries.Count
   failure_count = $failures.Count
   failures = $failures
@@ -609,8 +762,11 @@ $report += "- Minimum downloads: $MinDownloads"
 $report += "- Factorio versions: $($FactorioVersions -join ', ')"
 $report += "- Scenario timeout seconds: $ScenarioTimeoutSeconds"
 $report += "- Continue on dependency failure: $([bool]$ContinueOnDependencyFailure)"
+$report += "- Include recommended dependencies: $([bool]$IncludeRecommendedDependencies)"
+$report += "- Local zip inputs: $($localZipPaths.Count)"
 $report += "- Catalog scenarios: $(@($selectedScenarios | Where-Object { $_.type -eq "catalog" }).Count)"
 $report += "- Manual scenarios: $(@($selectedScenarios | Where-Object { $_.type -eq "manual" }).Count)"
+$report += "- Local zip scenarios: $(@($selectedScenarios | Where-Object { $_.type -eq "local_zip" }).Count)"
 $report += "- Locked mods including dependencies: $($lockEntries.Count)"
 $report += "- Failures: $($failures.Count)"
 $report += ""
@@ -641,7 +797,10 @@ if ($failures.Count -eq 0) {
 }
 $report -join "`n" | Set-Content -LiteralPath $reportPath -Encoding UTF8
 
-$downloadEntries = @($lockEntries | Where-Object { -not [string]::IsNullOrWhiteSpace([string]$_.file_name) })
+$downloadEntries = @($lockEntries | Where-Object {
+  -not [string]::IsNullOrWhiteSpace([string]$_.file_name) -and
+  -not [string]::IsNullOrWhiteSpace([string]$_.download_url)
+})
 if (($DownloadMods -or ($RunLoadTests -and -not $UseCachedDownloads)) -and $downloadEntries.Count -gt 0) {
   if ([string]::IsNullOrWhiteSpace($ModPortalUsername) -or [string]::IsNullOrWhiteSpace($ModPortalToken)) {
     throw "Mod downloads require -ModPortalUsername and -ModPortalToken or FACTORIO_USERNAME/FACTORIO_TOKEN."

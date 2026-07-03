@@ -82,7 +82,16 @@ function Copy-MIRCachedModZips {
 
   foreach ($entry in $LockEntries) {
     if (-not $entry.file_name) { continue }
-    $source = Join-Path $CacheDir ([string]$entry.file_name)
+    $sourcePath = ""
+    $sourcePathProperty = $entry.PSObject.Properties["source_path"]
+    if ($null -ne $sourcePathProperty) {
+      $sourcePath = [string]$sourcePathProperty.Value
+    }
+    $source = if (-not [string]::IsNullOrWhiteSpace($sourcePath)) {
+      $sourcePath
+    } else {
+      Join-Path $CacheDir ([string]$entry.file_name)
+    }
     if (Test-Path -LiteralPath $source) {
       Copy-Item -LiteralPath $source -Destination (Join-Path $ModsDir ([string]$entry.file_name)) -Force
     }

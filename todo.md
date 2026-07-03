@@ -372,6 +372,7 @@ discover facts
 - [x] Expose `-FromLockfile` on the extended wrapper for reproducible sharded audits.
 - [x] Skip unresolved dependency scenarios before Factorio load checks by default, with `-ContinueOnDependencyFailure` for explicit partial-modset diagnostics.
 - [x] Add reviewed expected-failure fixture support so grouped reports can distinguish expected and unexpected failures.
+- [x] Add local modpack zip support with `LocalModZips`, `-LocalModZipDirs`, local `source_path` lock entries, and recommended-dependency inclusion for pack wrapper mods.
 - [ ] Run a top-25 Mod Portal audit for Factorio `2.1` with real downloads, credentials, and a local Factorio binary.
 - [ ] Run a full `downloads_count >= 10000` Mod Portal audit for Factorio `2.0` and `2.1`.
 - [ ] Run the grouped audit converter on real top-25 and full-audit outputs and triage the resulting failure buckets.

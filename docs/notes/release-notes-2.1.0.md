@@ -26,7 +26,7 @@ This is the short, player-facing release summary for the `2.1.0` mod portal rele
 - Added an opt-in startup-only pipeline extent multiplier dropdown. The default `100%` setting leaves prototypes unchanged.
 - Added conservative adoption of mod-added recipes into existing vanilla Space Age productivity families for processing units, plastic bars, low density structures, and rocket fuel.
 - Improved replacement of known Plates n Circuit Productivity technologies so MIR can generate the covered replacement effects before removing the competing technologies, and only when recipe coverage, productivity amount, and external-owner checks are safe.
-- Added local compatibility-audit automation for release work: executable curated scenarios, sharded/resumable Mod Portal audits, per-scenario timeouts, dependency-failure skipping, grouped expected/unexpected failure summaries, review-only profile-stub generation, strict gate mode, exploratory collect-all mode, and a self-hosted extended-test workflow.
+- Added local compatibility-audit automation for release work: executable curated scenarios, local modpack zip roots, sharded/resumable Mod Portal audits, per-scenario timeouts, dependency-failure skipping, grouped expected/unexpected failure summaries, review-only profile-stub generation, strict gate mode, exploratory collect-all mode, and a self-hosted extended-test workflow.
 
 ## Compatibility And Validation
 

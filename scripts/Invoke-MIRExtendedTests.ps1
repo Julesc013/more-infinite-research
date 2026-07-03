@@ -6,6 +6,7 @@ param(
     "Top25Base",
     "Top25SpaceAge",
     "ManualScenarios",
+    "LocalModZips",
     "Full10KBase",
     "Full10KSpaceAge",
     "SaveCompat",
@@ -18,6 +19,9 @@ param(
   [string]$ModPortalToken = $env:FACTORIO_TOKEN,
   [string]$OutputRoot = ".\artifacts\extended-tests",
   [string]$FromLockfile,
+  [string[]]$LocalModZipDirs = @(),
+  [string[]]$LocalModZips = @(),
+  [string[]]$LocalModNames = @(),
   [int]$ShardSize = 25,
   [int]$StartIndex = 0,
   [int]$ScenarioTimeoutSeconds = 900,
@@ -130,11 +134,12 @@ function Invoke-MIRCompatAuditTier {
     [int]$MaxCandidates = 25,
     [int]$CatalogPages = 0,
     [switch]$RunManualScenarios,
+    [switch]$RunLocalModZips,
     [switch]$FullAudit
   )
 
   Assert-MIRFactorioBin
-  if ($MaxCandidates -ne 0 -or $RunManualScenarios) {
+  if ($MaxCandidates -ne 0 -or $RunManualScenarios -or $RunLocalModZips) {
     Assert-MIRModPortalCredentials
   }
 
@@ -159,9 +164,16 @@ function Invoke-MIRCompatAuditTier {
   if ($IncludeSpaceAge) { $auditParams.IncludeSpaceAge = $true }
   if ($FailFast -and -not $CollectAll) { $auditParams.FailFast = $true }
   if ($ContinueOnDependencyFailure) { $auditParams.ContinueOnDependencyFailure = $true }
+  if ($LocalModZipDirs.Count -gt 0) { $auditParams.LocalModZipDirs = $LocalModZipDirs }
+  if ($LocalModZips.Count -gt 0) { $auditParams.LocalModZips = $LocalModZips }
+  if ($LocalModNames.Count -gt 0) { $auditParams.LocalModNames = $LocalModNames }
   if ($RunManualScenarios) {
     $auditParams.RunManualScenarios = $true
     $auditParams.ManualScenariosPath = (Join-Path $repo "fixtures\compat-matrix\manual-scenarios.json")
+  }
+  if ($RunLocalModZips) {
+    $auditParams.RunLocalModZips = $true
+    $auditParams.IncludeRecommendedDependencies = $true
   }
   if ($FullAudit) {
     $auditParams.StartIndex = $StartIndex
@@ -236,6 +248,11 @@ foreach ($entry in $expandedTiers) {
         Invoke-MIRCompatAuditTier -Name "manual-scenarios" -RunManualScenarios -MaxCandidates 0 -CatalogPages 0
       }
     }
+    "LocalModZips" {
+      Invoke-MIRStep -Name "LocalModZips" -Action {
+        Invoke-MIRCompatAuditTier -Name "local-mod-zips" -RunLocalModZips -MaxCandidates 0 -CatalogPages 0
+      }
+    }
     "Full10KBase" {
       Invoke-MIRStep -Name "Full10KBase" -Action {
         if (-not $IncludeFullAudit) {
@@ -278,6 +295,9 @@ $summaryMd = Join-Path $outputRootPath "extended-summary.md"
   collect_all = [bool]$CollectAll
   continue_on_dependency_failure = [bool]$ContinueOnDependencyFailure
   from_lockfile = $FromLockfile
+  local_mod_zip_dirs = @($LocalModZipDirs)
+  local_mod_zips = @($LocalModZips)
+  local_mod_names = @($LocalModNames)
   scenario_timeout_seconds = $ScenarioTimeoutSeconds
   start_index = $StartIndex
   shard_size = $ShardSize
@@ -297,6 +317,15 @@ $md += ('- Continue on dependency failure: `{0}`' -f ([bool]$ContinueOnDependenc
 $md += ('- Scenario timeout seconds: `{0}`' -f $ScenarioTimeoutSeconds)
 if (-not [string]::IsNullOrWhiteSpace($FromLockfile)) {
   $md += ('- From lockfile: `{0}`' -f $FromLockfile)
+}
+if ($LocalModZipDirs.Count -gt 0) {
+  $md += ('- Local mod zip dirs: `{0}`' -f ($LocalModZipDirs -join ', '))
+}
+if ($LocalModZips.Count -gt 0) {
+  $md += ('- Local mod zips: `{0}`' -f ($LocalModZips -join ', '))
+}
+if ($LocalModNames.Count -gt 0) {
+  $md += ('- Local mod names: `{0}`' -f ($LocalModNames -join ', '))
 }
 $md += ""
 $md += "| Step | Status | Seconds | Message |"
