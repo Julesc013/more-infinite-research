@@ -70,11 +70,35 @@ local PROFILES = {
   ["mir-fixture-plates-n-circuit-productivity"] = {
     known_competing_productivity = {
       tech_patterns = {
-        "^basic%-plate%-productivity",
-        "^plate%-productivity",
-        "^electric%-circuit%-productivity",
-        "^electronic%-circuit%-productivity",
-        "^advanced%-circuit%-productivity"
+        "^basic%-plate%-productivity$",
+        "^plate%-productivity$",
+        "^electric%-circuit%-productivity$",
+        "^electronic%-circuit%-productivity$",
+        "^advanced%-circuit%-productivity$"
+      }
+    }
+  },
+
+  ["mir-fixture-plates-n-circuit-productivity-blocked"] = {
+    known_competing_productivity = {
+      tech_patterns = {
+        "^basic%-plate%-productivity$",
+        "^plate%-productivity$",
+        "^electric%-circuit%-productivity$",
+        "^electronic%-circuit%-productivity$",
+        "^advanced%-circuit%-productivity$"
+      }
+    }
+  },
+
+  ["mir-fixture-plates-n-circuit-productivity-change-mismatch"] = {
+    known_competing_productivity = {
+      tech_patterns = {
+        "^basic%-plate%-productivity$",
+        "^plate%-productivity$",
+        "^electric%-circuit%-productivity$",
+        "^electronic%-circuit%-productivity$",
+        "^advanced%-circuit%-productivity$"
       }
     }
   },
@@ -82,11 +106,11 @@ local PROFILES = {
   ["plates-n-circuit-productivity"] = {
     known_competing_productivity = {
       tech_patterns = {
-        "^basic%-plate%-productivity",
-        "^plate%-productivity",
-        "^electric%-circuit%-productivity",
-        "^electronic%-circuit%-productivity",
-        "^advanced%-circuit%-productivity"
+        "^basic%-plate%-productivity$",
+        "^plate%-productivity$",
+        "^electric%-circuit%-productivity$",
+        "^electronic%-circuit%-productivity$",
+        "^advanced%-circuit%-productivity$"
       }
     }
   }

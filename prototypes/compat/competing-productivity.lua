@@ -8,6 +8,13 @@ local M = {}
 
 local prepared_removable_techs = nil
 
+local function same_change(a, b)
+  local left = tonumber(a)
+  local right = tonumber(b)
+  if not left or not right then return false end
+  return math.abs(left - right) < 0.000000001
+end
+
 local function prefer_this_mod_for_competing_techs()
   local setting = settings and settings.startup and settings.startup["mir-prefer-this-mod-for-competing-techs"]
   if setting == nil then return true end
@@ -44,12 +51,19 @@ local function collect_enabled_stream_recipe_coverage()
   local covered = {}
   for key, spec in pairs(C.streams or {}) do
     if not spec.direct_effects and U.enabled_for(key, spec) and not stream_requirement_missing(spec) then
+      local ingredients = U.best_lab_compatible_ingredients(U.pick_science_for_stream(spec, key), key)
+      if not ingredients or #ingredients == 0 then goto continue end
+
       for _, bucket in ipairs(U.recipes_for_stream(spec) or {}) do
         for _, recipe_name in ipairs(bucket.recipes or {}) do
-          covered[recipe_name] = key
+          covered[recipe_name] = {
+            stream = key,
+            change = bucket.change or C.shared.per_level_default
+          }
         end
       end
     end
+    ::continue::
   end
   return covered
 end
@@ -66,7 +80,10 @@ local function collect_owned_recipes()
     local tech = data.raw.technology and data.raw.technology[tech_name]
     for _, effect in ipairs((tech and tech.effects) or {}) do
       if effect.type == "change-recipe-productivity" and effect.recipe then
-        owned[effect.recipe] = tech_name
+        owned[effect.recipe] = {
+          tech = tech_name,
+          change = effect.change
+        }
       end
     end
   end
@@ -81,7 +98,8 @@ local function is_external_recipe_productivity_tech(name, tech, owned_recipes)
   local effects = productivity_owners.recipe_productivity_effects_only(tech)
   if not effects then return false end
   for _, effect in ipairs(effects) do
-    if not owned_recipes[effect.recipe] then return false end
+    local owned = owned_recipes[effect.recipe]
+    if not owned or not same_change(owned.change, effect.change) then return false end
   end
   return true
 end
@@ -99,7 +117,18 @@ function M.prepare()
       local effects = productivity_owners.recipe_productivity_effects_only(tech)
       local removable = effects ~= nil
       for _, effect in ipairs(effects or {}) do
-        if not covered_recipes[effect.recipe] then
+        local covered = covered_recipes[effect.recipe]
+        if not covered or not same_change(covered.change, effect.change) then
+          removable = false
+          break
+        end
+
+        local blockers = productivity_owners.blocking_recipe_productivity_owner_records(effect.recipe, {
+          ignore_owner = function(owner_name)
+            return owner_name == name
+          end
+        })
+        if #blockers > 0 then
           removable = false
           break
         end

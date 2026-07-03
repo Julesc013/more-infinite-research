@@ -214,20 +214,22 @@ local function record_native_modifier_overlaps(key, effects)
   end
 end
 
-local function existing_infinite_recipe_productivity_owner_records(recipe_name)
+local function existing_infinite_recipe_productivity_owner_records(recipe_name, spec)
+  local adoption = spec and spec.adopt_into_existing_productivity_tech
   return productivity_owners.blocking_recipe_productivity_owner_records(recipe_name, {
-    ignore_owner = competing_productivity.ignores_existing_owner
+    ignore_owner = competing_productivity.ignores_existing_owner,
+    adoption_tech = adoption and adoption.tech
   })
 end
 
-local function filter_existing_recipe_productivity(key, buckets)
+local function filter_existing_recipe_productivity(key, spec, buckets)
   local filtered_buckets = {}
   local skipped = {}
 
   for _, bucket in ipairs(buckets or {}) do
     local recipes = {}
     for _, recipe_name in ipairs(bucket.recipes or {}) do
-      local owner_records = existing_infinite_recipe_productivity_owner_records(recipe_name)
+      local owner_records = existing_infinite_recipe_productivity_owner_records(recipe_name, spec)
       if #owner_records > 0 then
         table.insert(skipped, {
           recipe = recipe_name,
@@ -344,7 +346,7 @@ local function make_stream(key, raw_spec)
   local buckets = U.recipes_for_stream(spec)
   D.recipe_matches(key, buckets)
   local covered_by_existing
-  buckets, covered_by_existing = filter_existing_recipe_productivity(key, buckets)
+  buckets, covered_by_existing = filter_existing_recipe_productivity(key, spec, buckets)
   local adopted_effects, family_blocked, adoption_owner_name
   buckets, adopted_effects, family_blocked, adoption_owner_name = productivity_family_adoption.adopt(key, spec, buckets)
   if adopted_effects and #adopted_effects > 0 then

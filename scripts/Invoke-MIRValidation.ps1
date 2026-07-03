@@ -1087,6 +1087,8 @@ $postMirAssertionFixtures = @(
   "mir-fixture-assert-omega-drill-productivity",
   "mir-fixture-assert-pipeline-extent",
   "mir-fixture-assert-plates-n-circuit-productivity",
+  "mir-fixture-assert-plates-n-circuit-productivity-blocked",
+  "mir-fixture-assert-plates-n-circuit-productivity-change-mismatch",
   "mir-fixture-assert-vanilla-family-adoption",
   "mir-fixture-assert-vanilla-family-exact-owner",
   "mir-fixture-assert-vanilla-family-mixed-owner",
@@ -2005,6 +2007,20 @@ Assert-ReportLineGenerated -Line $partialIronLine -Context "Partially covered pl
 Assert-LogContains -Expected "Skipping recipe productivity effect for research_iron recipe=iron-plate because existing infinite technology already owns it: basic-plate-productivity" -Context "Partial coverage should keep exact iron plate owner"
 Assert-LogDoesNotContain -Unexpected "Prepared competing recipe productivity technology for MIR replacement: basic-plate-productivity" -Context "Partial coverage should not prepare combined plate competitor"
 Assert-LogDoesNotContain -Unexpected "Removed competing recipe productivity technology: basic-plate-productivity" -Context "Partial coverage should not remove combined plate competitor"
+
+Invoke-RuntimeScenario -ScenarioName "space-age-plates-n-circuit-productivity-change-mismatch" -EnabledFixtureNames @(
+  "mir-fixture-plates-n-circuit-productivity-change-mismatch",
+  "mir-fixture-assert-plates-n-circuit-productivity-change-mismatch"
+) -EnableSpaceAge
+Assert-LogDoesNotContain -Unexpected "Prepared competing recipe productivity technology for MIR replacement: electric-circuit-productivity" -Context "Change-mismatched competitor should not be prepared"
+Assert-LogDoesNotContain -Unexpected "Removed competing recipe productivity technology: electric-circuit-productivity" -Context "Change-mismatched competitor should not be removed"
+
+Invoke-RuntimeScenario -ScenarioName "space-age-plates-n-circuit-productivity-blocked-owner" -EnabledFixtureNames @(
+  "mir-fixture-plates-n-circuit-productivity-blocked",
+  "mir-fixture-assert-plates-n-circuit-productivity-blocked"
+) -EnableSpaceAge
+Assert-LogDoesNotContain -Unexpected "Prepared competing recipe productivity technology for MIR replacement: basic-plate-productivity" -Context "Blocked combined competitor should not be prepared"
+Assert-LogDoesNotContain -Unexpected "Removed competing recipe productivity technology: basic-plate-productivity" -Context "Blocked combined competitor should not be removed"
 
 Invoke-RuntimeScenario -ScenarioName "space-age-vanilla-family-adoption" -EnabledFixtureNames @(
   "mir-fixture-vanilla-family-adoption-recipes",
