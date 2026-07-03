@@ -365,9 +365,17 @@ discover facts
 - [x] Add executable manual-scenario automation for curated modpacks and high-risk compatibility surfaces.
 - [x] Add sharding and lockfile resume support for long compatibility audits.
 - [x] Add grouped audit result conversion for load failures, duplicate owners, known competitors, unknown external owners, invalid science, missing prerequisites, productivity-disallowed recipes, and missing audit rows.
+- [x] Add strict `-FailOnAuditFailures` wrapper semantics so unexpected grouped audit failures can fail CI-style gates.
+- [x] Add exploratory `-CollectAll` wrapper behavior so overnight runs can keep collecting after individual scenario failures.
+- [x] Make `AuditSmoke` deterministic by using the committed `space-age-baseline` manual-scenario metadata path rather than a volatile catalog sample.
+- [x] Add per-scenario Factorio load timeouts for unattended compatibility runs.
+- [x] Expose `-FromLockfile` on the extended wrapper for reproducible sharded audits.
+- [x] Skip unresolved dependency scenarios before Factorio load checks by default, with `-ContinueOnDependencyFailure` for explicit partial-modset diagnostics.
+- [x] Add reviewed expected-failure fixture support so grouped reports can distinguish expected and unexpected failures.
 - [ ] Run a top-25 Mod Portal audit for Factorio `2.1` with real downloads, credentials, and a local Factorio binary.
 - [ ] Run a full `downloads_count >= 10000` Mod Portal audit for Factorio `2.0` and `2.1`.
 - [ ] Run the grouped audit converter on real top-25 and full-audit outputs and triage the resulting failure buckets.
+- [ ] Populate `fixtures/compat-matrix/expected-failures.json` only after a real audit finding has been reviewed and accepted as non-MIR external breakage.
 - [ ] Convert recurring verified failures into declarative compatibility profiles only after grouped audit evidence exists.
 - [ ] Add existing-save validation for profile-driven adoption and replacement, including signature-change refresh behavior.
 
@@ -519,6 +527,7 @@ Run this before every release candidate:
 - [x] `.\scripts\Invoke-MIRValidation.ps1 -StaticOnly`
 - [x] `.\scripts\Invoke-MIRValidation.ps1 -FactorioBin "C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe"`
 - [x] `.\scripts\Invoke-MIRExtendedTests.ps1 -Tier Static,Runtime,AuditSmoke -FactorioBin "C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe" -FailFast`
+- [x] `.\scripts\Invoke-MIRExtendedTests.ps1 -Tier Static,Runtime,AuditSmoke -FactorioBin "C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe" -FailFast -FailOnAuditFailures`
 - [x] Manual-scenario, lockfile-resume, and profile-stub smoke paths for the compatibility audit tooling.
 - [x] `.\scripts\Test-MIRBranchPolicy.ps1`
 - [x] `git diff --check`

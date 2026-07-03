@@ -18,6 +18,8 @@ param(
   [switch]$RunLoadTests,
   [switch]$RunManualScenarios,
   [string[]]$ScenarioNames = @(),
+  [int]$ScenarioTimeoutSeconds = 900,
+  [switch]$ContinueOnDependencyFailure,
   [switch]$FailFast,
   [Alias("ManualScenarios")]
   [string]$ManualScenariosPath = (Join-Path $PSScriptRoot "..\fixtures\compat-matrix\manual-scenarios.json"),
@@ -380,6 +382,30 @@ function Resolve-MIRLockScenario {
 function Invoke-MIRScenarioLoad {
   param([Parameter(Mandatory)]$Scenario)
 
+  $dependencyFailures = @($Scenario.dependency_failures)
+  if ($dependencyFailures.Count -gt 0 -and -not $ContinueOnDependencyFailure) {
+    [pscustomobject]@{
+      scenario = $Scenario.name
+      type = $Scenario.type
+      requested_mods = @($Scenario.requested_mods)
+      root_mods = @($Scenario.root_mods)
+      resolved_mods = @($Scenario.resolved_mods)
+      official_mods = @($Scenario.official_mods)
+      dependency_failures = $dependencyFailures
+      exit_code = $null
+      timed_out = $false
+      timeout_seconds = $ScenarioTimeoutSeconds
+      skipped = $true
+      skip_reason = "dependency_resolution_failure"
+      passed = $false
+      save = ""
+      stdout = ""
+      stderr = ""
+      audit_rows = @()
+    }
+    return
+  }
+
   $userData = New-MIRCompatUserDataDir -Root $runRoot
   $modsDir = Join-Path $userData "mods"
   $null = Copy-MIRModUnderTest -RepoRoot $repo.Path -ModsDir $modsDir
@@ -390,7 +416,7 @@ function Invoke-MIRScenarioLoad {
   $enabledMods = @("more-infinite-research") + @($Scenario.resolved_mods) + @($Scenario.official_mods)
   Write-MIRModList -ModsDir $modsDir -EnabledMods $enabledMods
 
-  $result = Invoke-MIRFactorioLoadCheck -FactorioBin $FactorioBin -UserDataDir $userData -ScenarioName $Scenario.name
+  $result = Invoke-MIRFactorioLoadCheck -FactorioBin $FactorioBin -UserDataDir $userData -ScenarioName $Scenario.name -ScenarioTimeoutSeconds $ScenarioTimeoutSeconds
   [pscustomobject]@{
     scenario = $Scenario.name
     type = $Scenario.type
@@ -398,7 +424,12 @@ function Invoke-MIRScenarioLoad {
     root_mods = @($Scenario.root_mods)
     resolved_mods = @($Scenario.resolved_mods)
     official_mods = @($Scenario.official_mods)
+    dependency_failures = $dependencyFailures
     exit_code = $result.exit_code
+    timed_out = $result.timed_out
+    timeout_seconds = $result.timeout_seconds
+    skipped = $false
+    skip_reason = ""
     passed = $result.passed
     save = $result.save
     stdout = $result.stdout
@@ -520,6 +551,8 @@ $lock = [ordered]@{
   min_downloads = $MinDownloads
   factorio_versions = $FactorioVersions
   include_space_age = [bool]$IncludeSpaceAge
+  scenario_timeout_seconds = $ScenarioTimeoutSeconds
+  continue_on_dependency_failure = [bool]$ContinueOnDependencyFailure
   max_candidates = $MaxCandidates
   catalog_pages = $CatalogPages
   from_lockfile = $FromLockfile
@@ -574,6 +607,8 @@ $report += ""
 $report += "- Generated: $((Get-Date).ToString("yyyy-MM-dd HH:mm:ss K"))"
 $report += "- Minimum downloads: $MinDownloads"
 $report += "- Factorio versions: $($FactorioVersions -join ', ')"
+$report += "- Scenario timeout seconds: $ScenarioTimeoutSeconds"
+$report += "- Continue on dependency failure: $([bool]$ContinueOnDependencyFailure)"
 $report += "- Catalog scenarios: $(@($selectedScenarios | Where-Object { $_.type -eq "catalog" }).Count)"
 $report += "- Manual scenarios: $(@($selectedScenarios | Where-Object { $_.type -eq "manual" }).Count)"
 $report += "- Locked mods including dependencies: $($lockEntries.Count)"

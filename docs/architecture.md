@@ -187,13 +187,13 @@ Use `scripts/Invoke-MIRValidation.ps1 -StaticOnly` for static checks.
 
 Use `scripts/Invoke-MIRValidation.ps1 -FactorioBin C:\path\to\factorio.exe` for a runtime fixture load test.
 
-Use `scripts/Invoke-MIRCompatAudit.ps1` for mod-portal driven compatibility cataloging. It writes generated lock/report artifacts under an ignored output directory, uses `fixtures/compat-matrix/` for committed scenario intent, executes manual scenarios with `-RunManualScenarios`, resumes or shards prior locks with `-FromLockfile`, `-StartIndex`, `-Count`, and `-CandidateNames`, and downloads third-party mods only when credentials are provided explicitly.
+Use `scripts/Invoke-MIRCompatAudit.ps1` for mod-portal driven compatibility cataloging. It writes generated lock/report artifacts under an ignored output directory, uses `fixtures/compat-matrix/` for committed scenario intent, executes manual scenarios with `-RunManualScenarios`, resumes or shards prior locks with `-FromLockfile`, `-StartIndex`, `-Count`, and `-CandidateNames`, applies a per-scenario Factorio timeout, skips unresolved dependency scenarios before load testing unless `-ContinueOnDependencyFailure` is set, and downloads third-party mods only when credentials are provided explicitly.
 
-Use `scripts/Convert-MIRCompatAuditResults.ps1` after load-test runs to group failures into actionable buckets and emit `compat-failures.grouped.json`, `compat-summary.md`, and `profile-candidates.json`.
+Use `scripts/Convert-MIRCompatAuditResults.ps1` after load-test runs to group failures into actionable buckets and emit `compat-failures.grouped.json`, `compat-summary.md`, and `profile-candidates.json`. The grouped output records total, expected, and unexpected failure counts. Expected failures come only from reviewed rules in `fixtures/compat-matrix/expected-failures.json`.
 
 Use `scripts/New-MIRCompatProfileStub.ps1` only to generate review-required Lua stubs from grouped audit evidence. Generated stubs are not enabled profiles.
 
-Use `scripts/Invoke-MIRExtendedTests.ps1` as the wrapper for repeatable tiers such as `Static`, `Runtime`, `AuditSmoke`, `Top25Base`, `Top25SpaceAge`, `ManualScenarios`, and opt-in sharded `Full10K*` runs. The self-hosted workflow calls this wrapper rather than duplicating audit logic in YAML.
+Use `scripts/Invoke-MIRExtendedTests.ps1` as the wrapper for repeatable tiers such as `Static`, `Runtime`, `AuditSmoke`, `Top25Base`, `Top25SpaceAge`, `ManualScenarios`, and opt-in sharded `Full10K*` runs. `AuditSmoke` uses the deterministic `space-age-baseline` manual-scenario metadata path so strict gates do not depend on volatile catalog ordering. `-CollectAll` is the exploratory/overnight mode. `-FailFast -FailOnAuditFailures` is the strict gate mode, where grouped unexpected audit failures make the wrapper fail. The self-hosted workflow calls this wrapper rather than duplicating audit logic in YAML.
 
 Use `scripts/Build-MIRPackage.ps1` to rebuild the release archive when preparing an upload. Static validation builds an ignored validation archive from the current source tree and checks the archive root, metadata, load-critical entry files, locale files, migrations, and forbidden artifact paths.
 

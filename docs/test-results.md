@@ -2,6 +2,58 @@
 
 This file records local release-candidate validation runs. It is not a substitute for the manual mod matrix in `docs/compatibility.md`.
 
+## 2026-07-04 Extended Audit Gate Hardening
+
+Environment:
+
+- Branch: `dev`.
+- Mod version `2.1.0`.
+
+Scope:
+
+- Added strict audit pass/fail semantics to `Invoke-MIRExtendedTests.ps1` with `-FailOnAuditFailures`.
+- Added `-CollectAll` as the explicit exploratory mode so overnight audits can collect every selected scenario instead of stopping at the first failure.
+- Added per-scenario Factorio load-test timeouts with timed-out processes killed and grouped as `timeout` failures.
+- Exposed `-FromLockfile` through the extended wrapper for reproducible sharded reruns.
+- Made unresolved required dependencies skip load startup by default and group as dependency failures unless `-ContinueOnDependencyFailure` is passed.
+- Added reviewed expected-failure classification via `fixtures/compat-matrix/expected-failures.json`, with strict gates failing on unexpected groups.
+- Switched `AuditSmoke` to the deterministic committed `space-age-baseline` manual-scenario metadata path so strict release gates do not depend on volatile Mod Portal catalog ordering.
+- Updated README, architecture, compatibility, release notes, roadmap, manual test plan, release plan, changelog, TODO, validation snippets, and the self-hosted workflow to document the strict/exploratory split.
+
+Commands:
+
+```powershell
+$scripts = @(
+  'scripts\Invoke-MIRCompatAudit.ps1',
+  'scripts\MIRCompatAudit\FactorioRunner.ps1',
+  'scripts\Convert-MIRCompatAuditResults.ps1',
+  'scripts\Invoke-MIRExtendedTests.ps1',
+  'scripts\Invoke-MIRValidation.ps1'
+)
+foreach ($script in $scripts) {
+  $errors = $null
+  [System.Management.Automation.Language.Parser]::ParseFile((Resolve-Path $script), [ref]$null, [ref]$errors) | Out-Null
+  if ($errors) { throw ($errors | Out-String) }
+}
+.\scripts\Invoke-MIRCompatAudit.ps1 -CandidateNames definitely-no-such-mod-mir-test -MaxCandidates 0 -CatalogPages 0 -OutputDir .\build\compat-gate-failure-smoke
+.\scripts\Convert-MIRCompatAuditResults.ps1 -AuditDir .\build\compat-gate-failure-smoke
+.\scripts\Convert-MIRCompatAuditResults.ps1 -AuditDir .\build\compat-gate-failure-smoke -OutputDir .\build\compat-gate-expected-smoke -ExpectedFailures .\build\expected-failure-smoke.json
+.\scripts\Invoke-MIRExtendedTests.ps1 -Tier AuditSmoke -OutputRoot .\build\extended-audit-smoke -FailFast -FailOnAuditFailures -ScenarioTimeoutSeconds 60
+.\scripts\Invoke-MIRValidation.ps1 -StaticOnly
+.\scripts\Invoke-MIRExtendedTests.ps1 -Tier Static,AuditSmoke -OutputRoot .\build\extended-gate-hardening -FailFast -FailOnAuditFailures -ScenarioTimeoutSeconds 60
+```
+
+Results:
+
+- PowerShell parser checks passed for the changed audit, converter, wrapper, runner, and validation scripts.
+- Synthetic missing-mod audit produced one grouped `dependency_resolution_failure` with `unexpected_count = 1`, proving strict gates have a machine-readable failure signal.
+- Synthetic expected-failure conversion with a generated rule produced `expected_count = 1` and `unexpected_count = 0`.
+- Grouped compatibility summary now reports the failure kind correctly in the by-kind table.
+- Deterministic strict `AuditSmoke` passed through the wrapper and converter with `-FailFast -FailOnAuditFailures`.
+- Static validation passed, including package parity, changelog format, compatibility automation wiring, and whitespace checks.
+- Combined extended wrapper gate passed for `Static` and `AuditSmoke`.
+- Runtime validation and credentialed top-25/manual/full Mod Portal load audits were not rerun in this documentation-only gate-hardening pass.
+
 ## 2026-07-04 Release Documentation Synchronization
 
 Environment:

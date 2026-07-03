@@ -70,6 +70,7 @@ The broad mod-portal audit is local/manual because it can require Factorio crede
 - `scripts/Convert-MIRCompatAuditResults.ps1`: groups load/audit results into failure classes and writes profile-candidate evidence.
 - `scripts/New-MIRCompatProfileStub.ps1`: creates review-required Lua stubs from grouped audit failures.
 - `fixtures/compat-matrix/manual-scenarios.json`: curated high-risk scenarios that should not be inferred from downloads alone.
+- `fixtures/compat-matrix/expected-failures.json`: reviewed expected-failure rules used by grouped reports so known external breakage can be separated from unexpected MIR regressions.
 - `fixtures/compat-matrix/known-exclusions.json`: stable exclusions for official DLC, localization, and internal-only portal entries.
 
 Catalog and lockfile only:
@@ -88,6 +89,7 @@ Download and load-test mode requires credentials and a local binary:
   -FactorioBin "C:\path\to\factorio.exe" `
   -ModPortalUsername $env:FACTORIO_USERNAME `
   -ModPortalToken $env:FACTORIO_TOKEN `
+  -ScenarioTimeoutSeconds 900 `
   -DownloadMods `
   -RunLoadTests
 ```
@@ -102,6 +104,7 @@ Manual scenarios can now be executed with `-RunManualScenarios`:
   -MaxCandidates 0 `
   -CatalogPages 0 `
   -RunManualScenarios `
+  -ScenarioTimeoutSeconds 900 `
   -DownloadMods `
   -RunLoadTests `
   -OutputDir .\artifacts\compat-audit-manual
@@ -117,6 +120,7 @@ Sharded or resumed audits can use `-FromLockfile`, `-StartIndex`, `-Count`, and 
   -FactorioBin $env:FACTORIO_BIN `
   -ModPortalUsername $env:FACTORIO_USERNAME `
   -ModPortalToken $env:FACTORIO_TOKEN `
+  -ScenarioTimeoutSeconds 900 `
   -DownloadMods `
   -RunLoadTests `
   -OutputDir .\artifacts\compat-audit-2.1-spaceage-all-10k-shard-25
@@ -139,14 +143,23 @@ Review-only profile stubs can be generated from grouped failures:
 The tiered wrapper is the recommended entry point for repeatable local and self-hosted runs:
 
 ```powershell
-.\scripts\Invoke-MIRExtendedTests.ps1 -Tier Runtime,AuditSmoke
-.\scripts\Invoke-MIRExtendedTests.ps1 -Tier Top25Base,Top25SpaceAge,ManualScenarios
-.\scripts\Invoke-MIRExtendedTests.ps1 -Tier Full10KSpaceAge -IncludeFullAudit -StartIndex 0 -ShardSize 25
+.\scripts\Invoke-MIRExtendedTests.ps1 -Tier Static,Runtime,AuditSmoke -FailFast -FailOnAuditFailures
+.\scripts\Invoke-MIRExtendedTests.ps1 -Tier Top25Base,Top25SpaceAge,ManualScenarios -CollectAll
+.\scripts\Invoke-MIRExtendedTests.ps1 -Tier Full10KSpaceAge -IncludeFullAudit -StartIndex 0 -ShardSize 25 -CollectAll
+.\scripts\Invoke-MIRExtendedTests.ps1 -Tier Full10KSpaceAge -IncludeFullAudit -FromLockfile .\artifacts\compat-audit-locks\compat-candidates.lock.json -StartIndex 25 -ShardSize 25 -CollectAll
 ```
+
+Use `-CollectAll` for exploratory or overnight runs. It prevents the wrapper from forwarding scenario-level `-FailFast` into audit tiers, so all selected scenarios can produce artifacts. Use `-FailFast -FailOnAuditFailures` for strict gates; after conversion, the wrapper reads `compat-failures.grouped.json` and fails the tier when unexpected grouped failures remain.
+
+`AuditSmoke` is intentionally deterministic. It runs the committed `space-age-baseline` manual-scenario metadata path and the grouped-result converter, so release gates can prove the audit plumbing without depending on whichever Mod Portal catalog entry happens to sort first. It is not a broad compatibility claim; use `Top25Base`, `Top25SpaceAge`, and `ManualScenarios` for exploratory external-mod coverage.
 
 Generated lockfiles and reports belong under ignored output directories such as `artifacts/compat-audit/` or `build/compat-audit-*`. Do not commit downloaded mod zips or one-off portal reports. Commit only scenario fixtures, known exclusions, code changes, and small compatibility profiles that are justified by repeatable audit evidence.
 
 Load-test mode enables the root candidate, its required Mod Portal dependency closure, and required official built-in mods such as Space Age, Quality, Elevated Rails, or Recycler without trying to download official built-ins from the portal. `-IncludeSpaceAge` enables the official Space Age bundle explicitly. Downloaded archives are checked against their Mod Portal SHA1 before reuse, and load-test results include parsed MIR audit rows when generation diagnostics are forced on in the copied test mod.
+
+Scenarios with unresolved required dependencies are skipped before Factorio startup by default and grouped as dependency failures. Pass `-ContinueOnDependencyFailure` only when intentionally testing a partial modset. Each Factorio load check has a timeout controlled by `-ScenarioTimeoutSeconds`; timed-out processes are killed and grouped as `timeout` failures rather than blocking the entire run.
+
+Expected failures should be added only after review to `fixtures/compat-matrix/expected-failures.json`. The converter still reports them, but separates `expected_count` from `unexpected_count`; strict wrapper gates fail on unexpected groups.
 
 The GitHub workflow `.github/workflows/extended-compat-audit.yml` runs the same wrapper on self-hosted runners. It is intentionally not a normal hosted CI job because it needs a local Factorio binary, credentials, and enough disk for third-party archives and run artifacts.
 

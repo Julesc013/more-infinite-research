@@ -26,7 +26,7 @@ This is the short, player-facing release summary for the `2.1.0` mod portal rele
 - Added an opt-in startup-only pipeline extent multiplier dropdown. The default `100%` setting leaves prototypes unchanged.
 - Added conservative adoption of mod-added recipes into existing vanilla Space Age productivity families for processing units, plastic bars, low density structures, and rocket fuel.
 - Improved replacement of known Plates n Circuit Productivity technologies so MIR can generate the covered replacement effects before removing the competing technologies, and only when recipe coverage, productivity amount, and external-owner checks are safe.
-- Added local compatibility-audit automation for release work: executable curated scenarios, sharded/resumable Mod Portal audits, grouped failure summaries, review-only profile-stub generation, and a self-hosted extended-test workflow.
+- Added local compatibility-audit automation for release work: executable curated scenarios, sharded/resumable Mod Portal audits, per-scenario timeouts, dependency-failure skipping, grouped expected/unexpected failure summaries, review-only profile-stub generation, strict gate mode, exploratory collect-all mode, and a self-hosted extended-test workflow.
 
 ## Compatibility And Validation
 
@@ -36,7 +36,7 @@ This is the short, player-facing release summary for the `2.1.0` mod portal rele
 - Pipeline validation confirms the default `100%` setting does not run the prototype pass, and that explicit non-default dropdown values mutate representative fluid boxes.
 - Vanilla-family adoption validation covers exact owner skips, prepatched owner skips, mixed owner fallback, existing-save effect refresh, and productivity-disallowed recipes.
 - Plates n Circuit Productivity validation covers full replacement, partial coverage, productivity amount mismatch, and externally blocked combined-owner behavior.
-- Extended audit tooling can run static/runtime/smoke gates, top-25 base and Space Age audits, curated manual modpack scenarios, and opt-in sharded `downloads_count >= 10000` audits when a local Factorio binary and Mod Portal credentials are supplied.
+- Extended audit tooling can run static/runtime/smoke gates, top-25 base and Space Age audits, curated manual modpack scenarios, and opt-in sharded `downloads_count >= 10000` audits when a local Factorio binary and Mod Portal credentials are supplied. Strict runs can fail on unexpected grouped audit failures; exploratory runs can collect all results for later triage.
 - Existing Stone product productivity progress migrates into the new Landfill productivity line as the closest successor. Artificial soil productivity and Molten metals productivity are new separate lines.
 
 ## Known Notes

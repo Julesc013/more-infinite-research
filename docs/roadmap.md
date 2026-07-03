@@ -51,7 +51,7 @@ Current `dev` is the `v2.1.0` release-candidate line. It builds on the tested
 - the Space Age material productivity split from Stone product productivity into Landfill, Artificial soil, and Molten metals, plus Lithium from brine, Carbon, Ice, and Bacteria cultivation productivity;
 - conservative vanilla Space Age productivity-family adoption for safe residual recipes;
 - hardened known Plates n Circuit Productivity replacement that requires full coverage, matching productivity values, lab-compatible replacement science, and no other blocking owner;
-- a local Mod Portal compatibility audit harness with dependency closure, official built-in handling, SHA1 cache verification, parsed MIR audit rows, executable manual scenarios, sharding, grouped failure summaries, review-only profile stubs, and a self-hosted extended-test workflow.
+- a local Mod Portal compatibility audit harness with dependency closure, official built-in handling, SHA1 cache verification, parsed MIR audit rows, executable manual scenarios, sharding/resume, per-scenario timeouts, dependency-failure skipping, grouped expected/unexpected failure summaries, review-only profile stubs, strict/exploratory wrapper modes, and a self-hosted extended-test workflow.
 
 The public release rule is:
 

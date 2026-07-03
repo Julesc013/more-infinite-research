@@ -4,8 +4,6 @@
 [![Factorio Mod Portal version](https://img.shields.io/factorio-mod-portal/v/more-infinite-research?style=flat-square&label=mod%20version)](https://mods.factorio.com/mod/more-infinite-research)
 [![Factorio version](https://img.shields.io/factorio-mod-portal/factorio-version/more-infinite-research?style=flat-square&label=Factorio)](https://mods.factorio.com/mod/more-infinite-research)
 [![Last updated](https://img.shields.io/factorio-mod-portal/last-updated/more-infinite-research?style=flat-square)](https://mods.factorio.com/mod/more-infinite-research)
-[![License](https://img.shields.io/github/license/Julesc013/more-infinite-research?style=flat-square)](https://github.com/Julesc013/more-infinite-research/blob/main/LICENSE)
-[![GitHub stars](https://img.shields.io/github/stars/Julesc013/more-infinite-research?style=flat-square)](https://github.com/Julesc013/more-infinite-research/stargazers)
 [![Issues](https://img.shields.io/github/issues/Julesc013/more-infinite-research?style=flat-square)](https://github.com/Julesc013/more-infinite-research/issues)
 [![Validate](https://img.shields.io/github/actions/workflow/status/Julesc013/more-infinite-research/validate.yml?branch=main&style=flat-square&label=validate)](https://github.com/Julesc013/more-infinite-research/actions/workflows/validate.yml)
 
@@ -540,16 +538,20 @@ When either diagnostics setting is enabled, MIR also reports duplicate recipe ma
 **Extended local release gate:**
 
 ```powershell
-.\scripts\Invoke-MIRExtendedTests.ps1 -Tier Runtime,AuditSmoke
+.\scripts\Invoke-MIRExtendedTests.ps1 -Tier Static,Runtime,AuditSmoke -FailFast -FailOnAuditFailures
 ```
 
-**Credentialed compatibility audits:**
+**Credentialed exploratory compatibility audits:**
 
 ```powershell
-.\scripts\Invoke-MIRExtendedTests.ps1 -Tier Top25Base,Top25SpaceAge,ManualScenarios
+.\scripts\Invoke-MIRExtendedTests.ps1 -Tier Top25Base,Top25SpaceAge,ManualScenarios -CollectAll
 ```
 
-Set `FACTORIO_BIN`, `FACTORIO_USERNAME`, and `FACTORIO_TOKEN` before running download/load tiers. Full `downloads_count >= 10000` audits are intentionally opt-in through `-IncludeFullAudit` and can be sharded with `-StartIndex` and `-ShardSize`.
+Set `FACTORIO_BIN`, `FACTORIO_USERNAME`, and `FACTORIO_TOKEN` before running download/load tiers. Audit scenarios time out after `900` seconds by default; override with `-ScenarioTimeoutSeconds` for unusually slow modsets. Full `downloads_count >= 10000` audits are intentionally opt-in through `-IncludeFullAudit` and can be sharded with `-StartIndex`, `-ShardSize`, and optionally `-FromLockfile`.
+
+Use `-CollectAll` for overnight exploration so one failing modset does not stop the run. Use `-FailFast -FailOnAuditFailures` for strict CI-style gates; that mode fails when grouped unexpected audit failures remain after the converter runs.
+
+`AuditSmoke` uses the committed `space-age-baseline` manual scenario metadata path so strict release gates are deterministic. It proves the audit wrapper and grouped-result converter are wired, but broad external-mod confidence still comes from the credentialed top-25/manual/full audit tiers.
 
 The validation script checks:
 
@@ -561,7 +563,7 @@ The validation script checks:
 - **Changelog:** `changelog.txt` uses Factorio's 99-dash changelog section format.
 - **Generated package:** validation builds an ignored archive from the current source tree and checks its root, metadata, load-critical files, and forbidden artifacts.
 - **Package parity:** the generated archive's source directories, documentation, locale, migrations, and root mod files match the repository copy while allowing docs and helper modules to be rearranged inside their packaged trees.
-- **Compatibility automation:** the Mod Portal audit runner, manual scenario execution, sharding, grouped failure converter, profile-stub generator, and self-hosted extended workflow stay wired.
+- **Compatibility automation:** the Mod Portal audit runner, manual scenario execution, sharding/resume, scenario timeout, dependency-failure skipping, grouped failure converter, expected-failure fixture, profile-stub generator, and self-hosted extended workflow stay wired.
 - **Whitespace:** `git diff --check` passes.
 - **Runtime load:** fixture loading reaches save creation when a Factorio binary is supplied.
 - **Runtime diagnostics:** logs contain the expected generation diagnostics.

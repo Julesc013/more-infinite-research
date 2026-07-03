@@ -12,6 +12,34 @@ on:
         required: true
         type: boolean
         default: false
+      fail_fast:
+        description: "Stop the wrapper after the first failed tier"
+        required: true
+        type: boolean
+        default: false
+      fail_on_audit_failures:
+        description: "Fail audit tiers when grouped unexpected failures exist"
+        required: true
+        type: boolean
+        default: false
+      collect_all:
+        description: "Collect all audit scenarios instead of stopping on first scenario failure"
+        required: true
+        type: boolean
+        default: true
+      continue_on_dependency_failure:
+        description: "Run Factorio load checks even when required dependencies failed to resolve"
+        required: true
+        type: boolean
+        default: false
+      from_lockfile:
+        description: "Optional existing compat-candidates.lock.json path for resumed/sharded runs"
+        required: false
+        default: ""
+      scenario_timeout_seconds:
+        description: "Timeout per Factorio scenario load"
+        required: true
+        default: "900"
       start_index:
         description: "Shard start index for Full10K tiers"
         required: true
@@ -37,20 +65,41 @@ jobs:
           FACTORIO_TOKEN: ${{ secrets.FACTORIO_TOKEN }}
           EXTENDED_TIER: ${{ github.event.inputs.tier || 'Top25SpaceAge' }}
           EXTENDED_INCLUDE_FULL_AUDIT: ${{ github.event.inputs.include_full_audit || 'false' }}
+          EXTENDED_FAIL_FAST: ${{ github.event.inputs.fail_fast || 'false' }}
+          EXTENDED_FAIL_ON_AUDIT_FAILURES: ${{ github.event.inputs.fail_on_audit_failures || 'false' }}
+          EXTENDED_COLLECT_ALL: ${{ github.event.inputs.collect_all || 'true' }}
+          EXTENDED_CONTINUE_ON_DEPENDENCY_FAILURE: ${{ github.event.inputs.continue_on_dependency_failure || 'false' }}
+          EXTENDED_FROM_LOCKFILE: ${{ github.event.inputs.from_lockfile || '' }}
+          EXTENDED_SCENARIO_TIMEOUT_SECONDS: ${{ github.event.inputs.scenario_timeout_seconds || '900' }}
           EXTENDED_START_INDEX: ${{ github.event.inputs.start_index || '0' }}
           EXTENDED_SHARD_SIZE: ${{ github.event.inputs.shard_size || '25' }}
         run: |
           $tiers = $env:EXTENDED_TIER -split "," | ForEach-Object { $_.Trim() } | Where-Object { $_ }
-          $args = @(
-            "-Tier", $tiers,
-            "-StartIndex", $env:EXTENDED_START_INDEX,
-            "-ShardSize", $env:EXTENDED_SHARD_SIZE,
-            "-FailFast"
-          )
-          if ($env:EXTENDED_INCLUDE_FULL_AUDIT -eq "true") {
-            $args += "-IncludeFullAudit"
+          $params = @{
+            Tier = $tiers
+            ScenarioTimeoutSeconds = [int]$env:EXTENDED_SCENARIO_TIMEOUT_SECONDS
+            StartIndex = [int]$env:EXTENDED_START_INDEX
+            ShardSize = [int]$env:EXTENDED_SHARD_SIZE
           }
-          ./scripts/Invoke-MIRExtendedTests.ps1 @args
+          if ($env:EXTENDED_INCLUDE_FULL_AUDIT -eq "true") {
+            $params.IncludeFullAudit = $true
+          }
+          if ($env:EXTENDED_FAIL_FAST -eq "true") {
+            $params.FailFast = $true
+          }
+          if ($env:EXTENDED_FAIL_ON_AUDIT_FAILURES -eq "true") {
+            $params.FailOnAuditFailures = $true
+          }
+          if ($env:EXTENDED_COLLECT_ALL -eq "true") {
+            $params.CollectAll = $true
+          }
+          if ($env:EXTENDED_CONTINUE_ON_DEPENDENCY_FAILURE -eq "true") {
+            $params.ContinueOnDependencyFailure = $true
+          }
+          if (-not [string]::IsNullOrWhiteSpace($env:EXTENDED_FROM_LOCKFILE)) {
+            $params.FromLockfile = $env:EXTENDED_FROM_LOCKFILE
+          }
+          ./scripts/Invoke-MIRExtendedTests.ps1 @params
 
       - name: Upload extended test artifacts
         if: always()

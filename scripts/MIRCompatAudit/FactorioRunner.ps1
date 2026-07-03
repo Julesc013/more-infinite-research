@@ -93,7 +93,8 @@ function Invoke-MIRFactorioLoadCheck {
   param(
     [Parameter(Mandatory)][string]$FactorioBin,
     [Parameter(Mandatory)][string]$UserDataDir,
-    [Parameter(Mandatory)][string]$ScenarioName
+    [Parameter(Mandatory)][string]$ScenarioName,
+    [int]$ScenarioTimeoutSeconds = 900
   )
 
   $safeScenarioName = Get-MIRSafeScenarioFileName -Name $ScenarioName
@@ -105,19 +106,34 @@ function Invoke-MIRFactorioLoadCheck {
     "--disable-audio"
   )
 
-  $process = Start-Process -FilePath $FactorioBin -ArgumentList $args -Wait -PassThru -NoNewWindow -RedirectStandardOutput $logPath -RedirectStandardError "$logPath.err"
+  $process = Start-Process -FilePath $FactorioBin -ArgumentList $args -PassThru -NoNewWindow -RedirectStandardOutput $logPath -RedirectStandardError "$logPath.err"
+  $timedOut = $false
+  $waitMilliseconds = [Math]::Max(1, $ScenarioTimeoutSeconds) * 1000
+  if (-not $process.WaitForExit($waitMilliseconds)) {
+    $timedOut = $true
+    try {
+      Stop-Process -Id $process.Id -Force -ErrorAction SilentlyContinue
+      $null = $process.WaitForExit(5000)
+    } catch {
+      # Best effort cleanup; the timed_out result is the important artifact.
+    }
+  }
+
   $auditRows = @()
   if ((Test-Path -LiteralPath $logPath) -and (Get-Command Read-MIRAuditLog -ErrorAction SilentlyContinue)) {
     $auditRows = @(Read-MIRAuditLog -Path $logPath)
   }
 
+  $exitCode = if ($timedOut) { -1 } else { $process.ExitCode }
   [pscustomobject]@{
     scenario = $ScenarioName
-    exit_code = $process.ExitCode
+    exit_code = $exitCode
+    timed_out = $timedOut
+    timeout_seconds = $ScenarioTimeoutSeconds
     save = $savePath
     stdout = $logPath
     stderr = "$logPath.err"
     audit_rows = $auditRows
-    passed = $process.ExitCode -eq 0
+    passed = (-not $timedOut) -and $exitCode -eq 0
   }
 }

@@ -17,9 +17,14 @@ param(
   [string]$ModPortalUsername = $env:FACTORIO_USERNAME,
   [string]$ModPortalToken = $env:FACTORIO_TOKEN,
   [string]$OutputRoot = ".\artifacts\extended-tests",
+  [string]$FromLockfile,
   [int]$ShardSize = 25,
   [int]$StartIndex = 0,
+  [int]$ScenarioTimeoutSeconds = 900,
   [switch]$FailFast,
+  [switch]$FailOnAuditFailures,
+  [switch]$CollectAll,
+  [switch]$ContinueOnDependencyFailure,
   [switch]$IncludeFullAudit
 )
 
@@ -92,6 +97,32 @@ function Invoke-MIRStep {
   Write-Host "[extended] $Name $status"
 }
 
+function Assert-MIRNoAuditFailures {
+  param(
+    [Parameter(Mandatory)][string]$Name,
+    [Parameter(Mandatory)][string]$AuditDir
+  )
+
+  if (-not $FailOnAuditFailures) { return }
+
+  $groupedPath = Join-Path $AuditDir "compat-failures.grouped.json"
+  if (-not (Test-Path -LiteralPath $groupedPath)) {
+    throw "Audit tier $Name did not produce grouped failure output: $groupedPath"
+  }
+
+  $grouped = Get-Content -Raw -LiteralPath $groupedPath | ConvertFrom-Json
+  $unexpectedCount = 0
+  if ($null -ne $grouped.PSObject.Properties["unexpected_count"]) {
+    $unexpectedCount = [int]$grouped.unexpected_count
+  } else {
+    $unexpectedCount = [int]$grouped.group_count
+  }
+
+  if ($unexpectedCount -gt 0) {
+    throw "Audit tier $Name produced $unexpectedCount unexpected grouped failure(s). See $groupedPath"
+  }
+}
+
 function Invoke-MIRCompatAuditTier {
   param(
     [Parameter(Mandatory)][string]$Name,
@@ -108,30 +139,38 @@ function Invoke-MIRCompatAuditTier {
   }
 
   $auditDir = New-MIROutputDirectory -Name $Name
-  $args = @(
-    "-FactorioBin", $FactorioBin,
-    "-ModPortalUsername", $ModPortalUsername,
-    "-ModPortalToken", $ModPortalToken,
-    "-MinDownloads", "10000",
-    "-FactorioVersions", "2.1",
-    "-OutputDir", $auditDir,
-    "-DownloadMods",
-    "-RunLoadTests",
-    "-MaxCandidates", "$MaxCandidates",
-    "-CatalogPages", "$CatalogPages"
-  )
+  $auditParams = @{
+    FactorioBin = $FactorioBin
+    ModPortalUsername = $ModPortalUsername
+    ModPortalToken = $ModPortalToken
+    MinDownloads = 10000
+    FactorioVersions = @("2.1")
+    OutputDir = $auditDir
+    DownloadMods = $true
+    RunLoadTests = $true
+    MaxCandidates = $MaxCandidates
+    CatalogPages = $CatalogPages
+    ScenarioTimeoutSeconds = $ScenarioTimeoutSeconds
+  }
 
-  if ($IncludeSpaceAge) { $args += "-IncludeSpaceAge" }
+  if (-not [string]::IsNullOrWhiteSpace($FromLockfile) -and -not $RunManualScenarios) {
+    $auditParams.FromLockfile = $FromLockfile
+  }
+  if ($IncludeSpaceAge) { $auditParams.IncludeSpaceAge = $true }
+  if ($FailFast -and -not $CollectAll) { $auditParams.FailFast = $true }
+  if ($ContinueOnDependencyFailure) { $auditParams.ContinueOnDependencyFailure = $true }
   if ($RunManualScenarios) {
-    $args += "-RunManualScenarios"
-    $args += @("-ManualScenarios", (Join-Path $repo "fixtures\compat-matrix\manual-scenarios.json"))
+    $auditParams.RunManualScenarios = $true
+    $auditParams.ManualScenariosPath = (Join-Path $repo "fixtures\compat-matrix\manual-scenarios.json")
   }
   if ($FullAudit) {
-    $args += @("-StartIndex", "$StartIndex", "-Count", "$ShardSize")
+    $auditParams.StartIndex = $StartIndex
+    $auditParams.Count = $ShardSize
   }
 
-  & (Join-Path $repo "scripts\Invoke-MIRCompatAudit.ps1") @args
+  & (Join-Path $repo "scripts\Invoke-MIRCompatAudit.ps1") @auditParams
   & (Join-Path $repo "scripts\Convert-MIRCompatAuditResults.ps1") -AuditDir $auditDir
+  Assert-MIRNoAuditFailures -Name $Name -AuditDir $auditDir
 }
 
 $expandedTiers = @()
@@ -165,13 +204,21 @@ foreach ($entry in $expandedTiers) {
     "AuditSmoke" {
       Invoke-MIRStep -Name "AuditSmoke" -Action {
         $auditDir = New-MIROutputDirectory -Name "audit-smoke"
-        & (Join-Path $repo "scripts\Invoke-MIRCompatAudit.ps1") `
-          -CatalogPages 1 `
-          -MaxCandidates 1 `
-          -MinDownloads 10000 `
-          -FactorioVersions "2.1" `
-          -OutputDir $auditDir
+        $auditParams = @{
+          RunManualScenarios = $true
+          ManualScenariosPath = (Join-Path $repo "fixtures\compat-matrix\manual-scenarios.json")
+          ScenarioNames = @("space-age-baseline")
+          CatalogPages = 0
+          MaxCandidates = 0
+          MinDownloads = 10000
+          FactorioVersions = @("2.1")
+          ScenarioTimeoutSeconds = $ScenarioTimeoutSeconds
+          OutputDir = $auditDir
+        }
+        if ($FailFast -and -not $CollectAll) { $auditParams.FailFast = $true }
+        & (Join-Path $repo "scripts\Invoke-MIRCompatAudit.ps1") @auditParams
         & (Join-Path $repo "scripts\Convert-MIRCompatAuditResults.ps1") -AuditDir $auditDir
+        Assert-MIRNoAuditFailures -Name "audit-smoke" -AuditDir $auditDir
       }
     }
     "Top25Base" {
@@ -227,6 +274,11 @@ $summaryMd = Join-Path $outputRootPath "extended-summary.md"
   generated_at = (Get-Date).ToString("yyyy-MM-ddTHH:mm:ssK")
   tiers = $expandedTiers
   include_full_audit = [bool]$IncludeFullAudit
+  fail_on_audit_failures = [bool]$FailOnAuditFailures
+  collect_all = [bool]$CollectAll
+  continue_on_dependency_failure = [bool]$ContinueOnDependencyFailure
+  from_lockfile = $FromLockfile
+  scenario_timeout_seconds = $ScenarioTimeoutSeconds
   start_index = $StartIndex
   shard_size = $ShardSize
   results = $results
@@ -239,6 +291,13 @@ $md += "- Generated: $(Get-Date -Format "yyyy-MM-dd HH:mm:ss zzz")"
 $md += ('- Output root: `{0}`' -f $outputRootPath)
 $md += ('- Tiers: `{0}`' -f ($expandedTiers -join ', '))
 $md += ('- Include full audit: `{0}`' -f ([bool]$IncludeFullAudit))
+$md += ('- Fail on audit failures: `{0}`' -f ([bool]$FailOnAuditFailures))
+$md += ('- Collect all audit scenarios: `{0}`' -f ([bool]$CollectAll))
+$md += ('- Continue on dependency failure: `{0}`' -f ([bool]$ContinueOnDependencyFailure))
+$md += ('- Scenario timeout seconds: `{0}`' -f $ScenarioTimeoutSeconds)
+if (-not [string]::IsNullOrWhiteSpace($FromLockfile)) {
+  $md += ('- From lockfile: `{0}`' -f $FromLockfile)
+}
 $md += ""
 $md += "| Step | Status | Seconds | Message |"
 $md += "| --- | --- | ---: | --- |"
