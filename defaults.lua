@@ -54,7 +54,7 @@ local defaults = {
       growth_factor = 1.5,
       science_packs = {
         "automation-science-pack","logistic-science-pack","chemical-science-pack",
-        "production-science-pack","military-science-pack","agricultural-science-pack"
+        "production-science-pack","military-science-pack","electromagnetic-science-pack"
       }
     },
     research_cannon_shooting_speed = {
@@ -62,7 +62,7 @@ local defaults = {
       growth_factor = 1.5,
       science_packs = {
         "automation-science-pack","logistic-science-pack","chemical-science-pack",
-        "production-science-pack","military-science-pack","agricultural-science-pack"
+        "production-science-pack","military-science-pack","electromagnetic-science-pack"
       }
     },
     research_flamethrower_shooting_speed = {

@@ -603,6 +603,20 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     }
   }
 
+  foreach ($weaponSpeedStream in @("research_rocket_shooting_speed", "research_cannon_shooting_speed")) {
+    $match = [regex]::Match($defaultsText, "(?s)$weaponSpeedStream\s*=\s*\{.*?science_packs\s*=\s*\{(?<packs>.*?)\n\s*\}")
+    if (-not $match.Success) {
+      throw "Missing explicit default science pack list for $weaponSpeedStream in defaults.lua."
+    }
+    $packs = $match.Groups["packs"].Value
+    if (-not $packs.Contains("electromagnetic-science-pack")) {
+      throw "$weaponSpeedStream defaults.lua science packs must include electromagnetic-science-pack."
+    }
+    if ($packs.Contains("agricultural-science-pack")) {
+      throw "$weaponSpeedStream defaults.lua science packs must not include agricultural-science-pack."
+    }
+  }
+
   if (-not $isLegacyFactorio20) {
     if ($defaultsText -notmatch '(?s)research_cargo_bay_unloading_distance\s*=\s*\{.*?research_time\s*=\s*120') {
       throw "Cargo bay unloading distance default research time must be 120 seconds."

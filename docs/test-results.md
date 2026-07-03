@@ -2,6 +2,29 @@
 
 This file records local release-candidate validation runs. It is not a substitute for the manual mod matrix in `docs/compatibility.md`.
 
+## 2026-07-03 Rocket/Cannon Defaults Science Pack Alignment
+
+Environment:
+
+- Branch: `dev`.
+- Mod version `2.1.0`.
+
+Scope:
+
+- Aligned `defaults.lua` fallback science-pack lists for Rocket shooting speed and Cannon shooting speed with the direct-effect stream definitions, using `electromagnetic-science-pack` instead of `agricultural-science-pack`.
+- Added static validation so those two defaults must include electromagnetic science and must not include agricultural science.
+
+Commands:
+
+```powershell
+.\scripts\Invoke-MIRValidation.ps1 -StaticOnly
+```
+
+Results:
+
+- Static validation passed.
+- Git reported line-ending normalization warnings only.
+
 ## 2026-07-03 Competitor Replacement And Audit Harness Hardening
 
 Environment:
