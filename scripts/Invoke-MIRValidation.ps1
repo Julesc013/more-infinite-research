@@ -314,7 +314,7 @@ Invoke-RepoCheck "fixture mods have metadata and data entrypoints" {
     throw "Fixture directory not found: $fixtureRootForStatic"
   }
 
-  $nonModFixtureDirs = @("compat-matrix")
+  $nonModFixtureDirs = @("compat-matrix", "run-profiles")
   foreach ($fixture in Get-ChildItem -LiteralPath $fixtureRootForStatic -Directory) {
     if ($nonModFixtureDirs -contains $fixture.Name) { continue }
 
@@ -640,6 +640,13 @@ Invoke-RepoCheck "compat audit automation tooling is wired" {
   $stubText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\New-MIRCompatProfileStub.ps1")
   $runnerText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\MIRCompatAudit\FactorioRunner.ps1")
   $releaseTargetedGateText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\Invoke-MIRReleaseTargetedGate.ps1")
+  $mirCliText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\mir.ps1")
+  $consoleText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\MIRCli\Console.ps1")
+  $runContextText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\MIRCli\RunContext.ps1")
+  $eventLogText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\MIRCli\EventLog.ps1")
+  $processSupervisorText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\MIRCli\ProcessSupervisor.ps1")
+  $localModIndexText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\MIRCli\LocalModIndex.ps1")
+  $runProfileText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\run-profiles\release-targeted.json")
   $overnightText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\Start-MIROvernightLocalSweep.ps1")
   $overnightSummaryText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\Show-MIROvernightSummary.ps1")
   $manualScenariosText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\compat-matrix\manual-scenarios.json")
@@ -721,6 +728,15 @@ Invoke-RepoCheck "compat audit automation tooling is wired" {
     @{ File = "scripts\Invoke-MIRReleaseTargetedGate.ps1"; Text = $releaseTargetedGateText; Snippet = "big-mining-drill" },
     @{ File = "scripts\Invoke-MIRReleaseTargetedGate.ps1"; Text = $releaseTargetedGateText; Snippet = "biolabs-in-space" },
     @{ File = "scripts\Invoke-MIRReleaseTargetedGate.ps1"; Text = $releaseTargetedGateText; Snippet = "local-2-1-bz-suite-space-age" },
+    @{ File = "scripts\mir.ps1"; Text = $mirCliText; Snippet = ".\scripts\mir.ps1 release gate" },
+    @{ File = "scripts\mir.ps1"; Text = $mirCliText; Snippet = "Invoke-MIRRunProfile" },
+    @{ File = "scripts\mir.ps1"; Text = $mirCliText; Snippet = "local-index" },
+    @{ File = "scripts\MIRCli\Console.ps1"; Text = $consoleText; Snippet = "Write-MIRScenarioResult" },
+    @{ File = "scripts\MIRCli\RunContext.ps1"; Text = $runContextText; Snippet = "run-manifest.json" },
+    @{ File = "scripts\MIRCli\EventLog.ps1"; Text = $eventLogText; Snippet = "events.jsonl" },
+    @{ File = "scripts\MIRCli\ProcessSupervisor.ps1"; Text = $processSupervisorText; Snippet = "Invoke-MIRProcess" },
+    @{ File = "scripts\MIRCli\LocalModIndex.ps1"; Text = $localModIndexText; Snippet = "New-MIRLocalModIndex" },
+    @{ File = "fixtures\run-profiles\release-targeted.json"; Text = $runProfileText; Snippet = '"kind": "release-targeted"' },
     @{ File = "scripts\Start-MIROvernightLocalSweep.ps1"; Text = $overnightText; Snippet = '$ErrorActionPreference = "Stop"' },
     @{ File = "scripts\Start-MIROvernightLocalSweep.ps1"; Text = $overnightText; Snippet = "[switch]`$DryRun" },
     @{ File = "scripts\Start-MIROvernightLocalSweep.ps1"; Text = $overnightText; Snippet = "Start-Transcript" },
@@ -1231,7 +1247,7 @@ if (-not (Test-Path -LiteralPath $fixtureRoot)) {
   throw "Fixture directory not found: $fixtureRoot"
 }
 
-$nonModFixtureDirs = @("compat-matrix")
+$nonModFixtureDirs = @("compat-matrix", "run-profiles")
 
 $postMirAssertionFixtures = @(
   "mir-fixture-assert-generation-integrity",

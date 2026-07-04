@@ -549,6 +549,18 @@ When either diagnostics setting is enabled, MIR also reports duplicate recipe ma
 
 This is the short release-candidate command. It runs the strict current-commit gate, the two harness repair smokes (`big-mining-drill` and `biolabs-in-space`), the representative local BZ Space Age suite, package rebuild, whitespace check, and clean-git-status check. Use the overnight local sweep separately for broader compatibility evidence.
 
+**Developer CLI front door:**
+
+```powershell
+.\scripts\mir.ps1 release gate
+.\scripts\mir.ps1 overnight local
+.\scripts\mir.ps1 report latest
+.\scripts\mir.ps1 local-index build --mods C:\Projects\Factorio\testmods_readonly_2.1
+.\scripts\mir.ps1 run -Profile release-targeted
+```
+
+`mir.ps1` is a thin front door over the existing scripts. It keeps the existing entry points intact while giving maintainers memorable commands for release gates, overnight local sweeps, local audits, reports, package builds, profile stubs, run profiles, and local mod-library indexes.
+
 **Credentialed exploratory compatibility audits:**
 
 ```powershell

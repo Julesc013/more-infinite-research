@@ -1,0 +1,7 @@
+{
+  "schema": 1,
+  "kind": "release-targeted",
+  "factorio_bin": "auto",
+  "local_mod_dir": "C:\\Projects\\Factorio\\testmods_readonly_2.1",
+  "scenario_timeout_seconds": 900
+}

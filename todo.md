@@ -405,21 +405,21 @@ discover facts
 
 The current overnight/local-library automation is usable. The next operational slice should centralize shared CLI behavior instead of adding more one-off formatting and recovery logic to each script.
 
-- [ ] Add a shared `scripts/MIRCli/` PowerShell module layer for console formatting, run context, event logging, process supervision, checkpoints, artifact indexing, report helpers, path resolution, local mod indexing, and power-management helpers.
-- [ ] Add timestamped status output with stable textual tokens such as `[RUN]`, `[STEP]`, `[SCEN]`, `[PASS]`, `[SKIP]`, `[TIME]`, and `[FAIL]`, with optional color controlled by `-ColorMode`, `-NoColor`, `-Quiet`, and `-CI`.
-- [ ] Add `events.jsonl` as a structured append-only event log for run start, tier start/result, scenario start/result, process start/result, timeout, dependency skip, and summary events.
-- [ ] Add `run-manifest.json` so each long run records run ID, repo root, git branch/commit, Factorio binary/version, MIR version, selected tiers, offline/local library inputs, timeout, and pairwise settings.
+- [x] Add a shared `scripts/MIRCli/` PowerShell module layer for console formatting, run context, event logging, process supervision, checkpoints, artifact indexing, report helpers, path resolution, local mod indexing, and power-management helpers.
+- [x] Add timestamped status output with stable textual tokens such as `[RUN]`, `[STEP]`, `[SCEN]`, `[PASS]`, `[SKIP]`, `[TIME]`, and `[FAIL]`, with optional color controlled by `-ColorMode`, `-NoColor`, `-Quiet`, and `-CI`.
+- [x] Add `events.jsonl` helper support as a structured append-only event log for run start, tier start/result, scenario start/result, process start/result, timeout, dependency skip, and summary events.
+- [x] Add `run-manifest.json` helper support so each long run can record run ID, repo root, git branch/commit, Factorio binary/version, MIR version, selected tiers, offline/local library inputs, timeout, and pairwise settings.
 - [ ] Add canonical scenario statuses such as `pending`, `running`, `passed`, `failed`, `timed_out`, `skipped_dependency`, `skipped_incompatible`, `expected_failure`, `unexpected_failure`, and `cancelled` while preserving existing booleans for compatibility.
 - [ ] Add `scenario-state.json` and first-class resume controls: `-Resume`, `-RerunFailed`, `-RerunTimedOut`, `-RerunSkipped`, `-RerunUnexpected`, and `-RerunScenarioNames`.
 - [ ] Extract Factorio process handling into a reusable process supervisor with timeout, process-tree cleanup, elapsed time, exit-code classification, failure-tail capture, and optional retry policy.
 - [ ] Add retry controls for transient cases only: `-MaxRetries`, `-RetryOnTimeout`, `-RetryOnExitCodes`, and `-RetryDelaySeconds`.
-- [ ] Add `artifact-index.json` so summary tooling can find manifests, transcripts, events, grouped failures, missing dependencies, profile candidates, and reports without path guessing.
-- [ ] Add a static `index.html` report for overnight runs with totals, grouped failures, missing dependencies, profile candidates, slowest scenarios, command/run manifest, scenario links, and next actions.
+- [x] Add `artifact-index.json` helper support so summary tooling can find manifests, transcripts, events, grouped failures, missing dependencies, profile candidates, and reports without path guessing.
+- [x] Add initial static `index.html` report generation support for run artifact folders.
 - [ ] Add missing-dependency shopping-list artifacts such as `missing-dependencies.todo.md` and `missing-dependencies.download-plan.json`.
-- [ ] Add a cached local mod library index with `-RebuildLocalIndex`, zip SHA1, size/mtime, Factorio version, dependencies, and duplicate/stale-version reporting.
+- [x] Add initial cached local mod library index generation with zip SHA1, size/mtime, Factorio version, and dependencies.
 - [ ] Add optional `-LinkMode Copy|Hardlink|Symlink` for large local libraries, with safe fallback to copy when hardlinks/symlinks are unavailable.
 - [ ] Add conservative `-Parallelism` support for metadata/report work first, keeping Factorio load checks sequential by default.
-- [ ] Add a stable `scripts/mir.ps1` facade and JSON run profiles after the shared modules stabilize.
+- [x] Add a stable `scripts/mir.ps1` facade and initial JSON run profiles.
 - [ ] Add `scripts/Test-MIRPowerShellQuality.ps1` for parsing every script, artifact-ignore checks, duplicate parameter detection, and optional PSScriptAnalyzer when installed.
 
 ### v2.1.0 Spike / Defer Decisions

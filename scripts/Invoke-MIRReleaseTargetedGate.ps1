@@ -264,6 +264,8 @@ try {
       & (Join-Path $repo "scripts\Invoke-MIRCompatAudit.ps1") `
         -FactorioBin $script:resolvedFactorioBin `
         -FactorioVersions @("2.1") `
+        -MaxCandidates 0 `
+        -CatalogPages 0 `
         -RunManualScenarios `
         -ScenarioNames @("local-2-1-bz-suite-space-age") `
         -ManualScenariosPath (Join-Path $repo "fixtures\compat-matrix\local-library-scenarios.json") `

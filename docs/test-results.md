@@ -2,6 +2,42 @@
 
 This file records local release-candidate validation runs. It is not a substitute for the manual mod matrix in `docs/compatibility.md`.
 
+## 2026-07-04 Developer CLI Framework And Audit Grouping Repair
+
+Environment:
+
+- Branch: `dev`.
+- Mod version `2.1.0`.
+- Local `2.1` zip library: `C:\Projects\Factorio\testmods_readonly_2.1`.
+
+Scope:
+
+- Added the first `scripts\mir.ps1` developer CLI facade so common release, overnight, audit, package, report, profile-stub, run-profile, and local-index commands no longer require long pasted PowerShell invocations.
+- Added shared `scripts\MIRCli\` helper modules for console output, run context, structured event logging, artifact indexes, atomic checkpoints, process supervision, path resolution, optional power handling, local mod-library indexing, and static HTML report scaffolding.
+- Added JSON run profiles under `fixtures\run-profiles\` for release-targeted, overnight local `2.1`, local BZ smoke, and top-25 Space Age audit runs.
+- Updated static validation so non-mod fixture folders such as `fixtures\run-profiles` are not treated as Factorio fixture mods requiring `info.json`.
+- Added scenario-name filtering to the extended wrapper so a run profile can target one curated scenario without running the entire local-library matrix.
+- Removed global strict-mode side effects from the shared `MIRCli` modules so `mir.ps1` can safely delegate to the existing audit scripts.
+- Repaired grouped audit semantics so successful load checks do not fail strict gates merely because a stream intentionally skipped a missing required prototype in a base-only scenario, or because MIR conservatively suppressed itself under an unknown external recipe-productivity owner.
+
+Commands:
+
+```powershell
+.\scripts\mir.ps1 --help
+.\scripts\mir.ps1 local-index build --mods 'C:\Projects\Factorio\testmods_readonly_2.1' --out '.\build\cache\local-mod-index\local-mod-index-smoke.json'
+.\scripts\mir.ps1 run -Profile local-bz-smoke
+.\scripts\Convert-MIRCompatAuditResults.ps1 -AuditDir '.\artifacts\release-targeted-rerun-20260704-190514\repair-smokes\local-mod-zips'
+```
+
+Results:
+
+- `mir.ps1 --help` printed the expected command list.
+- Local mod-library index smoke parsed `150` local zip archives.
+- `mir.ps1 run -Profile local-bz-smoke` passed with one `local-2-1-bz-suite-space-age` scenario, six resolved BZ mods, the full official Space Age bundle, and `87` parsed audit rows.
+- Re-converting the repair-smoke artifact changed the grouped result from `7` unexpected groups to `0` unexpected and `4` expected groups.
+- The remaining expected groups are conservative `unknown_external_owner` observations where MIR correctly suppresses Carbon and Ice productivity recipes that are already covered by `asteroid-productivity`.
+- The base-only `big-mining-drill` repair smoke no longer reports Space Age-only stream skips as failures.
+
 ## 2026-07-04 Targeted Release Gate Entrypoint
 
 Environment:

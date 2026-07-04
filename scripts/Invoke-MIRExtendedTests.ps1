@@ -22,6 +22,7 @@ param(
   [string]$OutputRoot = ".\artifacts\extended-tests",
   [string]$FromLockfile,
   [string]$ManualScenariosPath,
+  [string[]]$ScenarioNames = @(),
   [string[]]$LocalModZipDirs = @(),
   [string[]]$LocalModZips = @(),
   [string[]]$LocalModLibraryDirs = @(),
@@ -185,6 +186,7 @@ function Invoke-MIRCompatAuditTier {
   if ($LocalModZips.Count -gt 0) { $auditParams.LocalModZips = $LocalModZips }
   if ($LocalModLibraryDirs.Count -gt 0) { $auditParams.LocalModLibraryDirs = $LocalModLibraryDirs }
   if ($LocalModLibraryZips.Count -gt 0) { $auditParams.LocalModLibraryZips = $LocalModLibraryZips }
+  if ($ScenarioNames.Count -gt 0) { $auditParams.ScenarioNames = $ScenarioNames }
   if ($LocalModNames.Count -gt 0) { $auditParams.LocalModNames = $LocalModNames }
   if ($Offline) {
     $auditParams.Offline = $true
@@ -362,6 +364,7 @@ $summaryMd = Join-Path $outputRootPath "extended-summary.md"
   local_mod_zips = @($LocalModZips)
   local_mod_library_dirs = @($LocalModLibraryDirs)
   local_mod_library_zips = @($LocalModLibraryZips)
+  scenario_names = @($ScenarioNames)
   local_mod_names = @($LocalModNames)
   include_generated_local_pairwise = [bool]$IncludeGeneratedLocalPairwise
   generated_local_pairwise_limit = $GeneratedLocalPairwiseLimit
@@ -401,6 +404,9 @@ if ($LocalModLibraryDirs.Count -gt 0) {
 }
 if ($LocalModLibraryZips.Count -gt 0) {
   $md += ('- Local mod library zips: `{0}`' -f ($LocalModLibraryZips -join ', '))
+}
+if ($ScenarioNames.Count -gt 0) {
+  $md += ('- Scenario names: `{0}`' -f ($ScenarioNames -join ', '))
 }
 if ($LocalModNames.Count -gt 0) {
   $md += ('- Local mod names: `{0}`' -f ($LocalModNames -join ', '))

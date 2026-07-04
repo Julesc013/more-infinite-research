@@ -180,6 +180,7 @@ foreach ($result in $loadResults) {
   foreach ($row in $auditRows) {
     $kind = [string](Get-MIRObjectProperty -Object $row -Name "kind")
     $stream = [string](Get-MIRObjectProperty -Object $row -Name "key")
+    $status = [string](Get-MIRObjectProperty -Object $row -Name "status")
     $reason = [string](Get-MIRObjectProperty -Object $row -Name "reason")
     $recipe = [string](Get-MIRObjectProperty -Object $row -Name "recipe")
     $ownerKinds = [string](Get-MIRObjectProperty -Object $row -Name "owner_kinds")
@@ -194,7 +195,9 @@ foreach ($result in $loadResults) {
         -Recipe $recipe `
         -Reason $reason `
         -Evidence $owners `
-        -LikelyRemediation "Keep MIR suppressed unless repeated audit evidence supports a declarative compatibility profile."
+        -LikelyRemediation "Keep MIR suppressed unless repeated audit evidence supports a declarative compatibility profile." `
+        -Expected $true `
+        -Expectation "Conservative suppression under an unknown external productivity owner is an expected audit observation."
     } elseif ($kind -eq "recipe_owner" -and $ownerKinds -match "known_competitor") {
       $groups += New-MIRFailureGroup `
         -Kind "known_competitor_not_replaced" `
@@ -214,6 +217,8 @@ foreach ($result in $loadResults) {
         -Reason $reason `
         -Evidence ([string](Get-MIRObjectProperty -Object $row -Name "science")) `
         -LikelyRemediation "Review science-pack selection and lab compatibility for this modset."
+    } elseif ($kind -eq "stream" -and $status -eq "skipped" -and $reason -match "^missing required ") {
+      continue
     } elseif ($kind -eq "stream" -and $reason -match "missing|required") {
       $groups += New-MIRFailureGroup `
         -Kind "missing_prerequisite" `
@@ -232,7 +237,9 @@ foreach ($result in $loadResults) {
         -Recipe $recipe `
         -Reason $reason `
         -Evidence $owners `
-        -LikelyRemediation "Do not force productivity onto recipes whose prototypes disallow it."
+        -LikelyRemediation "Do not force productivity onto recipes whose prototypes disallow it." `
+        -Expected $true `
+        -Expectation "MIR correctly rejected a recipe whose prototype disallows productivity."
     }
   }
 }
@@ -269,7 +276,7 @@ $unexpected = @($deduped | Where-Object { $_.expected -ne $true })
 $expected = @($deduped | Where-Object { $_.expected -eq $true })
 
 $profileCandidates = @(
-  $unexpected |
+  $deduped |
     Where-Object { $_.kind -in @("known_competitor_not_replaced", "unknown_external_owner", "duplicate_exact_owner", "split_productivity_family") } |
     ForEach-Object {
       [ordered]@{

@@ -148,6 +148,9 @@ Review-only profile stubs can be generated from grouped failures:
 The tiered wrapper is the recommended entry point for repeatable local and self-hosted runs:
 
 ```powershell
+.\scripts\mir.ps1 release gate
+.\scripts\mir.ps1 overnight local
+.\scripts\mir.ps1 report latest
 .\scripts\Invoke-MIRReleaseTargetedGate.ps1
 .\scripts\Invoke-MIRExtendedTests.ps1 -Tier Static,Runtime,AuditSmoke -FailFast -FailOnAuditFailures
 .\scripts\Invoke-MIRExtendedTests.ps1 -Tier Top25Base,Top25SpaceAge,ManualScenarios -CollectAll
@@ -159,6 +162,8 @@ The tiered wrapper is the recommended entry point for repeatable local and self-
 ```
 
 `Invoke-MIRReleaseTargetedGate.ps1` is the narrow release-candidate command. It resolves the Factorio binary and local `2.1` zip library, optionally pulls `origin/dev`, runs the strict `Static,Runtime,AuditSmoke` gate, runs the targeted harness repair zips (`big-mining-drill` for base-only official-DLC isolation and `biolabs-in-space` for full Space Age bundle expansion), runs the representative local BZ Space Age suite, converts grouped failures, rebuilds the package, runs `git diff --check`, and fails if git status is not clean. It writes `release-targeted-summary.md/json` under `artifacts/release-targeted-*`.
+
+`mir.ps1` is the stable front door for humans. It delegates to the existing scripts rather than replacing them, supports JSON run profiles from `fixtures/run-profiles/`, and exposes common commands such as `release gate`, `overnight local`, `audit local`, `audit top25 --space-age`, `package build`, `report latest`, `report missing-deps`, `profile stub`, and `local-index build`.
 
 `Start-MIROvernightLocalSweep.ps1` is the preferred bedtime command for the local `2.1` library. It removes one-line paste hazards, starts a transcript log, runs the strict release gate, then runs the local sweep with `-CollectAll`. The underlying prioritized local sweep covers curated combinations from `fixtures/compat-matrix/local-library-scenarios.json`, generated all-local/cluster stress scenarios, and then each individual local root zip. Missing dependencies and impossible mod combinations are expected to appear as grouped failures; they are still useful evidence because they distinguish "not testable with this local library" from actual MIR generation regressions. `Show-MIROvernightSummary.ps1` summarizes the next-morning triage views across the whole output tree.
 
@@ -187,6 +192,8 @@ The grouped converter writes `missing-dependencies.md`, `missing-dependencies.js
 Do not immediately patch code from the first local-library failure. First classify the evidence: missing local zip, known modset incompatibility, benign external owner suppression, repeated split-family pattern, MIR-generated prototype crash, or timeout. Download missing dependencies and rerun affected scenarios before promoting a failure to MIR compatibility work.
 
 Expected failures should be added only after review to `fixtures/compat-matrix/expected-failures.json`. The converter still reports them, but separates `expected_count` from `unexpected_count`; strict wrapper gates fail on unexpected groups.
+
+Some audit observations are expected by policy even without a scenario-specific expected-failure rule. In particular, a successful load test where MIR skips a stream because a required prototype is absent is a normal compatibility gate, and a successful load test where MIR suppresses recipe productivity under an unknown external infinite owner is conservative behavior rather than a release-blocking failure. Those rows stay visible in `compat-failures.grouped.json` and can still produce review-only profile candidates, but they do not increment `unexpected_count`.
 
 The GitHub workflow `.github/workflows/extended-compat-audit.yml` runs the same wrapper on self-hosted runners. It is intentionally not a normal hosted CI job because it needs a local Factorio binary, credentials, and enough disk for third-party archives and run artifacts.
 
