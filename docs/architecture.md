@@ -203,7 +203,7 @@ Use `scripts/Build-MIRPackage.ps1` to rebuild the release archive when preparing
 
 Static package validation also recursively compares packaged files from the current source tree against the repository copy for the packaged source directories. Documentation and helper modules may be moved or nested inside their packaged trees without changing validation; the test follows the current tree instead of a fixed old layout. Text files are compared with normalized line endings so CI checkout settings do not create false failures; binary files are still compared by SHA-256.
 
-Static validation also checks Factorio changelog formatting, including the required 99-dash section separators, the current `info.json` version, and the changelog-only 132-character line cap.
+Static validation also checks Factorio changelog formatting, including the required 99-dash section separators, the current `info.json` version, the changelog-only 132-character line cap, and blocked internal-process wording.
 
 Static validation checks every loadable local fixture directory has `info.json`, a `mir-fixture-*` mod name, and at least one data-stage entry file. Non-mod audit inputs under `fixtures/compat-matrix/` and `fixtures/run-profiles/` are excluded from fixture-mod validation.
 

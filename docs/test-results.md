@@ -11,9 +11,10 @@ Environment:
 
 Scope:
 
-- Rewrote overlong `changelog.txt` bullets into concise single-line Factorio changelog entries.
-- Replaced internal shorthand such as old task-file references with concrete packaged-file behavior.
-- Added static validation for the changelog-only 132-character line cap.
+- Rewrote `changelog.txt` across all versions as shipped behavior, migrations, compatibility policy, and player-visible fixes.
+- Removed abandoned experiment notes, release-candidate churn, validation fixture entries, smoke checks, and package mechanics.
+- Consolidated fake split bullets back into single changelog entries where they described one shipped change.
+- Added static validation for the changelog-only 132-character line cap and blocked internal-process phrases.
 - Clarified that the 132-character cap applies to `changelog.txt`, not normal Markdown documentation.
 
 Commands:
@@ -26,10 +27,10 @@ git diff --check
 
 Results:
 
-- `changelog.txt` contains `565` lines and `445` bullets.
-- No `changelog.txt` line exceeds `132` characters; the longest line is `131` characters.
-- The noisy-term scan found no `Reverted`, `proposed`, `TODO`, `FIXME`, `TBD`, `BROKEN`, or similar filler terms.
-- Static validation passed, including the new changelog-only line-length check.
+- `changelog.txt` contains `304` lines and `187` bullets.
+- No `changelog.txt` line exceeds `132` characters; the longest line is `129` characters.
+- The blocked-phrase scan found no pre-release, validation, fixture, smoke, proof, TODO, or revert/proposed wording.
+- Static validation passed, including the changelog-only line-length check and internal-process phrase guard.
 - `dist\more-infinite-research_2.1.0.zip` rebuilt after packaged changelog and documentation edits.
 - `git diff --check` passed.
 

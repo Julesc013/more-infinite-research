@@ -4,42 +4,40 @@ This is the short, player-facing release summary for the `2.1.0` mod portal rele
 
 ## Headline
 
-`2.1.0` is the first larger Factorio `2.1` feature wave after the `2.0.5` quick patch. It focuses on simpler settings control, safer icon selection, fluid-output productivity, an opt-in pipeline extent setting, and more conservative duplicate-productivity compatibility.
+`2.1.0` is the first larger Factorio `2.1` feature wave after the `2.0.5` quick patch. It focuses on Space Age productivity coverage, safer icons, fluid-output productivity, a startup pipeline-extent option, and more conservative duplicate-productivity compatibility.
 
 ## What Changed
 
-- Removed the planned settings modes and per-technology enable policy dropdowns before release. Per-technology enable checkboxes are the single enablement path.
-- Scripted Spoilage Preservation and Agricultural Growth Speed now follow the same enable checkbox rules as data-stage generated technologies.
-- Spoilage Preservation now includes Space science in its research cost alongside agricultural and cryogenic science.
-- Agricultural Growth Speed now includes electromagnetic and cryogenic science alongside agricultural science.
-- Rocket Shooting Speed and Cannon Shooting Speed now use electromagnetic science instead of agricultural science.
-- Added better icon source resolution. MIR can prefer loaded official DLC art, use base-game fallbacks, or opt into installed-but-disabled official DLC icon files when the user explicitly enables that option.
-- Cargo Bay Unloading Distance now uses the unloading bay unlock technology art, and Cargo Landing Pad Count now uses Space platform technology art.
-- Added fluid-output productivity research for oil processing, oil cracking, lubricant, sulfuric acid, acid neutralization, thruster fuel, and thruster oxidizer recipes where those recipes exist.
-- Oil processing, Oil cracking, Lubricant, and Sulfuric acid productivity now use cryogenic, agricultural, electromagnetic, and metallurgic science respectively instead of sharing Space science as the extra pack.
-- Oil cracking productivity uses oil processing technology art. Sulfuric acid productivity uses sulfuric acid fluid art and also covers acid neutralization when that recipe exists.
-- Split the old Stone product productivity line into Landfill productivity, Artificial soil productivity, and Molten metals productivity. Artificial soil productivity now includes Space science in its research cost.
-- Lithium productivity now also covers lithium from brine at a lower per-level rate.
-- Added Carbon productivity and Ice productivity for Space Age asteroid-crushing and compatible output recipes. Carbon productivity also covers burnt spoilage at `+5%` and coal synthesis at `+2%`.
-- Added Bacteria cultivation productivity for Space Age iron and copper bacteria cultivation recipes.
-- Bacteria cultivation productivity and Breeding productivity now include cryogenic science alongside agricultural science.
-- Added an opt-in startup-only pipeline extent multiplier dropdown. The default `100%` setting leaves prototypes unchanged.
-- Added conservative adoption of mod-added recipes into existing vanilla Space Age productivity families for processing units, plastic bars, low density structures, and rocket fuel.
-- Improved replacement of known Plates n Circuit Productivity technologies so MIR can generate the covered replacement effects before removing the competing technologies, and only when recipe coverage, productivity amount, and external-owner checks are safe.
-- Added local compatibility-audit automation for release work: executable curated scenarios, generated local-library mega/cluster/pairwise scenarios, local modpack zip roots, offline read-only mod-library dependency resolution, safe local overnight sweep and summary helpers, sharded/resumable Mod Portal audits, checkpointed load-result output, missing-dependency summaries, per-scenario timeouts, dependency-failure skipping, grouped expected/unexpected failure summaries, review-only profile-stub generation, strict gate mode, exploratory collect-all mode, and a self-hosted extended-test workflow.
-- Hardened the compatibility-audit runner so blank Factorio log lines do not abort parsed audit output, isolated load tests do not inherit unrelated installed official DLC mods, and Space Age scenarios enable the full official bundle.
+- Spoilage Preservation now uses agricultural, cryogenic, and Space science.
+- Agricultural Growth Speed now uses agricultural, electromagnetic, and cryogenic science.
+- Rocket Shooting Speed and Cannon Shooting Speed now use electromagnetic science.
+- Cargo Bay Unloading Distance now uses the unloading bay technology art.
+- Cargo Landing Pad Count now uses Space platform technology art.
+- Added fluid-output productivity for oil processing, oil cracking, lubricant, sulfuric acid, acid neutralization, and thruster recipes where those recipes exist.
+- Fluid-output productivity now uses more specific science packs: cryogenic for oil processing, agricultural for cracking, electromagnetic for lubricant, and metallurgic for sulfuric acid.
+- Split the old Stone Product Productivity line into Landfill Productivity, Artificial Soil Productivity, and Molten Metals Productivity.
+- Landfill Productivity gives `+10%` landfill and `+5%` foundation productivity.
+- Artificial Soil Productivity gives `+10%` artificial soil and `+5%` overgrowth soil productivity, with Space science.
+- Molten Metals Productivity gives `+10%` lava metal and `+5%` ore melting productivity.
+- Lithium Productivity now also covers lithium from brine at a lower per-level rate.
+- Added Carbon Productivity and Ice Productivity for Space Age asteroid-crushing and compatible output recipes.
+- Carbon Productivity also covers burnt spoilage at `+5%` and coal synthesis at `+2%`.
+- Added Bacteria Cultivation Productivity for Space Age iron and copper bacteria cultivation recipes.
+- Bacteria Cultivation Productivity and Breeding Productivity now include cryogenic science.
+- Added an opt-in startup-only pipeline extent multiplier. The default `100%` setting leaves prototypes unchanged.
 
-## Compatibility And Validation
+## Compatibility
 
-- Added fixture validation for checkbox enablement, scripted runtime routing, icon source selection, fluid-output recipe ownership, and pipeline extent scaling.
-- Base-only validation confirms generated icons do not use direct official DLC asset paths unless the installed official DLC icon opt-in is enabled.
-- Fluid productivity validation confirms the implemented fluid recipe streams have exact recipe ownership and avoid duplicate infinite owners.
-- Pipeline validation confirms the default `100%` setting does not run the prototype pass, and that explicit non-default dropdown values mutate representative fluid boxes.
-- Vanilla-family adoption validation covers exact owner skips, prepatched owner skips, mixed owner fallback, existing-save effect refresh, and productivity-disallowed recipes.
-- Plates n Circuit Productivity validation covers full replacement, partial coverage, productivity amount mismatch, and externally blocked combined-owner behavior.
-- Extended audit tooling can run static/runtime/smoke gates, top-25 base and Space Age audits, curated manual modpack scenarios, and opt-in sharded `downloads_count >= 10000` audits when a local Factorio binary and Mod Portal credentials are supplied. Strict runs can fail on unexpected grouped audit failures; exploratory runs can collect all results for later triage.
-- Offline local-library sweep artifacts are checkpointed after every scenario, so interrupted runs can still be inspected and resumed.
-- Existing Stone product productivity progress migrates into the new Landfill productivity line as the closest successor. Artificial soil productivity and Molten metals productivity are new separate lines.
+- MIR can adopt safe mod-added recipes into existing vanilla Space Age productivity families for processing units, plastic bars, low density structures, and rocket fuel.
+- Known Plates n Circuit Productivity technologies are replaced only when MIR fully matches the covered recipes and productivity values.
+- Partial, mismatched, or externally blocked competing productivity technologies are left in place.
+- Unknown external recipe-productivity owners make MIR suppress the matching effect instead of creating duplicate ownership.
+- Elevated Rails and Quality remain hidden load-order dependencies without separate visible requirements.
+
+## Migration
+
+- Existing Stone Product Productivity progress migrates into the new Landfill Productivity line.
+- Artificial Soil Productivity and Molten Metals Productivity are new separate research lines.
 
 ## Known Notes
 
@@ -47,4 +45,3 @@ This is the short, player-facing release summary for the `2.1.0` mod portal rele
 - Spoilage Preservation and Agricultural Growth Speed remain disabled by default and should be treated as experimental.
 - Existing planted crops are not globally rescanned by Agricultural Growth Speed.
 - The pipeline extent multiplier is a startup setting, not research. Non-default values should be tested carefully in large or heavily modded fluid networks.
-- Broad native modifier overlap policy, existing agricultural plant rescale, and high-throughput pump work remain deferred unless separately implemented and validated.

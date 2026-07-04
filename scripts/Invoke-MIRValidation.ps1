@@ -857,6 +857,24 @@ Invoke-RepoCheck "release documentation lists final manual and API checks" {
 Invoke-RepoCheck "changelog uses Factorio changelog format" {
   $separator = "-" * 99
   $maxChangelogLineLength = 132
+  $blockedChangelogPhrases = @(
+    "before release",
+    "release-candidate",
+    "planned",
+    "proposed",
+    "reverted",
+    "temporary",
+    "validation",
+    "fixture",
+    "smoke",
+    "proof",
+    "TODO",
+    "FIXME",
+    "TBD",
+    "BROKEN",
+    "dirtying git",
+    "scaffolding"
+  )
   $path = Join-Path $repo "changelog.txt"
   $lines = @(Get-Content -LiteralPath $path -Encoding UTF8)
   if ($lines.Count -eq 0) {
@@ -877,6 +895,11 @@ Invoke-RepoCheck "changelog uses Factorio changelog format" {
     $lineNo++
     if ($line.Length -gt $maxChangelogLineLength) {
       throw "changelog.txt:$lineNo exceeds $maxChangelogLineLength characters."
+    }
+    foreach ($phrase in $blockedChangelogPhrases) {
+      if ($line.IndexOf($phrase, [System.StringComparison]::OrdinalIgnoreCase) -ge 0) {
+        throw "changelog.txt:$lineNo contains non-shipped or internal-process wording: $phrase"
+      }
     }
     if ($line -eq $separator) {
       $sectionStart = $false

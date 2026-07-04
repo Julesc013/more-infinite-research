@@ -294,9 +294,7 @@ Debug/reporting setup:
 
 ### Technology Enablement
 
-Each generated stream or base-game continuation has one enable checkbox. That checkbox is the source of truth for both data-stage technology generation and control-stage scripted effects.
-
-Preset modes and per-technology enable-policy dropdowns are intentionally not shipped in `v2.1.0`; they added UI noise without solving preset sharing. Future preset work should use an import/export or shareable configuration flow instead of adding another override setting beside every technology.
+Each generated stream or base-game continuation has one enable checkbox. That checkbox is the source of truth for both data-stage technology generation and control-stage scripted effects. Future preset work should use an import/export or shareable configuration flow rather than adding another override setting beside every technology.
 
 ### What `0` Means
 

@@ -74,6 +74,8 @@ The Factorio mod portal ingests the packaged README and changelog, so write them
 - This 132-character line cap applies only to `changelog.txt`; Markdown docs use normal prose.
 - Split genuinely combined changes into separate bullets.
 - Do not split a single change into fake continuation bullets.
+- Describe shipped behavior, migrations, compatibility policy, settings, and player-visible fixes.
+- Do not log abandoned experiments, release-candidate churn, validation fixtures, smoke checks, or package mechanics.
 - Avoid vague process notes such as "reverted proposed changes"; name the shipped behavior instead.
 - Mention settings defaults, migrations, compatibility risks, and save-safety clearly.
 
