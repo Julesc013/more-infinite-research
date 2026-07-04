@@ -31,6 +31,8 @@ param(
   [switch]$GenerateLocalPairwiseScenarios,
   [int]$GeneratedLocalPairwiseLimit = 40,
   [switch]$IncludeRecommendedDependencies,
+  [ValidateSet("Copy", "Hardlink", "Symlink")]
+  [string]$LinkMode = "Copy",
   [switch]$Offline,
   [string[]]$ScenarioNames = @(),
   [int]$ScenarioTimeoutSeconds = 900,
@@ -881,7 +883,7 @@ function Invoke-MIRScenarioLoad {
   $null = Copy-MIRModUnderTest -RepoRoot $repo.Path -ModsDir $modsDir
   Enable-MIRCopiedGenerationReport -ModsDir $modsDir
 
-  Copy-MIRCachedModZips -CacheDir $resolvedCacheDir -ModsDir $modsDir -LockEntries $Scenario.lock_entries
+  Copy-MIRCachedModZips -CacheDir $resolvedCacheDir -ModsDir $modsDir -LockEntries $Scenario.lock_entries -LinkMode $LinkMode
 
   $enabledMods = @("more-infinite-research") + @($Scenario.resolved_mods) + @($Scenario.official_mods)
   Write-MIRModList -ModsDir $modsDir -EnabledMods $enabledMods -OfficialBuiltinMods $officialBuiltinMods
@@ -999,11 +1001,11 @@ if ($RunManualScenarios) {
 }
 
 if ($RunGeneratedLocalScenarios) {
-  if ($localFullModsByName.Count -eq 0) {
-    throw "RunGeneratedLocalScenarios requires -LocalModZipDirs, -LocalModZips, -LocalModLibraryDirs, or -LocalModLibraryZips."
+  if ($localRootFullModsByName.Count -eq 0) {
+    throw "RunGeneratedLocalScenarios requires -LocalModZipDirs or -LocalModZips for generated scenario roots."
   }
 
-  $generatedDefinitions = @(New-MIRGeneratedLocalScenarioDefinitions -FullModsByName $localFullModsByName)
+  $generatedDefinitions = @(New-MIRGeneratedLocalScenarioDefinitions -FullModsByName $localRootFullModsByName)
   if ($ScenarioNames.Count -gt 0) {
     $scenarioLookup = @{}
     foreach ($name in $ScenarioNames) { $scenarioLookup[[string]$name] = $true }
@@ -1092,6 +1094,7 @@ $lock = [ordered]@{
   local_mod_zips = @($LocalModZips)
   local_mod_library_dirs = @($LocalModLibraryDirs)
   local_mod_library_zips = @($LocalModLibraryZips)
+  link_mode = $LinkMode
   local_root_zip_count = $localRootZipPaths.Count
   local_library_zip_count = $localLibraryZipPaths.Count
   candidates_selected = @($selectedScenarios | Where-Object { $_.type -eq "catalog" } | ForEach-Object { $_.name })

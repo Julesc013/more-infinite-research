@@ -5,6 +5,11 @@ Date: 2026-07-05
   Internal:
 
     - Fixed local audits so official built-ins include required official dependencies such as Recycler for Quality.
+    - Fixed offline dependency closure for Factorio `~` dependencies such as Mini Machines' shared settings mod.
+    - Kept generated local scenarios rooted in configured root zips instead of dependency-only library zips.
+    - Added optional hardlink and symlink staging for local compatibility audit mod zips.
+    - Added reviewed expected-failure rules for external 2.1 local-library stress failures.
+    - Added downloaded dependency-cache support to local 2.1 audit profiles.
     - Tightened load-failure grouping to classify Factorio error excerpts instead of MIR audit-row text.
     - Made mir.ps1 profile-driven for release, overnight, and local-audit commands with simple path overrides.
     - Added PowerShell script checks for parsing, duplicate parameters, ignored outputs, and secret-output guards.

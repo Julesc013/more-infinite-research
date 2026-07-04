@@ -142,7 +142,7 @@ function ConvertFrom-MIRDependencyString {
     raw = $Dependency
     name = $name
     kind = $kind
-    required = $kind -eq "required"
+    required = @("required", "no_order") -contains $kind
   }
 }
 

@@ -543,7 +543,7 @@ When either diagnostics setting is enabled, MIR also reports duplicate recipe ma
 .\scripts\mir.ps1 local-index build --mods C:\Projects\Factorio\testmods_readonly_2.1
 ```
 
-`mir.ps1` is the normal human front door. It delegates to the existing scripts, loads JSON run profiles from `fixtures/run-profiles/`, and accepts common overrides such as `--factorio`, `--factorio-line`, `--mods`, `--output`, and `--timeout`. Use `docs/dev-tools.md` for the command map and script roles.
+`mir.ps1` is the normal human front door. It delegates to the existing scripts, loads JSON run profiles from `fixtures/run-profiles/`, and accepts common overrides such as `--factorio`, `--factorio-line`, `--mods`, `--output`, `--timeout`, and `--link-mode`. Use `docs/dev-tools.md` for the command map and script roles.
 
 **Release gate with local smoke scenarios:**
 
@@ -575,6 +575,8 @@ Stable direct script equivalent:
 Set `FACTORIO_BIN`, `FACTORIO_USERNAME`, and `FACTORIO_TOKEN` before running download/load tiers. Audit scenarios time out after `900` seconds by default; override with `-ScenarioTimeoutSeconds` for unusually slow modsets. Full `downloads_count >= 10000` audits are intentionally opt-in through `-IncludeFullAudit` and can be sharded with `-StartIndex`, `-ShardSize`, and optionally `-FromLockfile`.
 
 Local modpack zips can be included with the `LocalModZips` tier and `-LocalModZipDirs .\tmp`. Local zip roots are copied from disk, while any missing third-party dependencies are resolved from `-LocalModLibraryDirs` first and then, unless `-Offline` is set, through the Mod Portal cache when credentials are supplied. The local zip tier includes `+` recommended dependencies because many modpack wrapper mods use them as the pack contents.
+
+For offline local testing, keep root candidates and dependency libraries separate. `LocalModZipDirs` is the set of mods that may become one-mod, curated, or generated scenarios. `LocalModLibraryDirs` is dependency inventory only, so generated scenarios do not accidentally become rooted in support libraries. Use a writable dependency-cache directory for downloaded prerequisites and keep read-only mod collections unchanged. Broad local runs can use `--link-mode Hardlink` on same-drive inputs to reduce copy overhead, or `--link-mode Copy` for the safest cross-drive behavior.
 
 Use read-only local mod libraries for large offline sweeps:
 

@@ -50,6 +50,20 @@ Prefer adding or editing a profile over hardcoding paths in `mir.ps1`. Local mac
 
 `FactorioLine` is a selector for the existing tools, not a separate harness. It controls Mod Portal release matching, local scenario defaults, output naming, and which local library path is chosen when no path is passed. A Factorio `2.0` profile still requires a real Factorio `2.0.x` binary and a source tree whose `info.json` targets Factorio `2.0`.
 
+Local audit profiles distinguish roots from libraries:
+
+- `local_mod_zip_dirs` lists root mods that may become one-mod, curated, or generated local scenarios.
+- `local_mod_library_dirs` lists dependency libraries used to close those scenarios offline.
+- Generated local scenarios are built only from root zips, not dependency-only library zips.
+
+Use a writable dependency-cache library for downloaded prerequisites instead of changing the read-only mod collection. For large local audits, prefer an output path on a roomy drive and choose a staging mode explicitly:
+
+```powershell
+.\scripts\mir.ps1 run -Profile local-audit-2.1 --output F:\Factorio\mir-artifacts\local-audit-2.1 --link-mode Copy
+```
+
+`--link-mode Hardlink` can reduce copy time and disk usage when source zips and scenario folders are on the same drive. `Copy` is the safest cross-drive mode.
+
 ## Script Roles
 
 Preferred public front door:

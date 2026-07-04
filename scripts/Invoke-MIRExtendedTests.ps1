@@ -41,6 +41,8 @@ param(
   [switch]$IncludeFullAudit,
   [switch]$IncludeGeneratedLocalPairwise,
   [switch]$ShardLocalModZips,
+  [ValidateSet("Copy", "Hardlink", "Symlink")]
+  [string]$LinkMode = "Copy",
   [switch]$Offline
 )
 
@@ -209,6 +211,7 @@ function Invoke-MIRCompatAuditTier {
   if ($LocalModZips.Count -gt 0) { $auditParams.LocalModZips = $LocalModZips }
   if ($LocalModLibraryDirs.Count -gt 0) { $auditParams.LocalModLibraryDirs = $LocalModLibraryDirs }
   if ($LocalModLibraryZips.Count -gt 0) { $auditParams.LocalModLibraryZips = $LocalModLibraryZips }
+  if ($LinkMode) { $auditParams.LinkMode = $LinkMode }
   if ($ScenarioNames.Count -gt 0) { $auditParams.ScenarioNames = $ScenarioNames }
   if ($LocalModNames.Count -gt 0) { $auditParams.LocalModNames = $LocalModNames }
   if ($Offline) {
@@ -414,6 +417,7 @@ $summaryMd = Join-Path $outputRootPath "extended-summary.md"
   include_generated_local_pairwise = [bool]$IncludeGeneratedLocalPairwise
   generated_local_pairwise_limit = $GeneratedLocalPairwiseLimit
   shard_local_mod_zips = [bool]$ShardLocalModZips
+  link_mode = $LinkMode
   scenario_timeout_seconds = $ScenarioTimeoutSeconds
   start_index = $StartIndex
   shard_size = $ShardSize

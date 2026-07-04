@@ -2,6 +2,84 @@
 
 This file records local release-candidate validation runs. It is not a substitute for the manual mod matrix in `docs/compatibility.md`.
 
+## 2026-07-05 2.1.5 Local Dependency Cache Follow-Up
+
+Environment:
+
+- Branch: `dev`.
+- Mod version `2.1.5`.
+- Factorio binary: Steam Factorio `2.1.9`.
+- Local root library: `C:\Projects\Factorio\testmods_readonly_2.1`.
+- Writable dependency cache: `C:\Projects\Factorio\testmods_downloaded_2.1`.
+
+Scope:
+
+- Filled a local writable dependency cache from the missing-dependency report produced by the overnight 2.1 sweep.
+- Kept downloaded dependency zips separate from the read-only local root library.
+- Fixed generated local scenarios so dependency-only library zips are not treated as generated scenario roots.
+- Added local audit zip staging modes (`Copy`, `Hardlink`, `Symlink`) for large local-library runs.
+- Fixed offline dependency closure for Factorio `~` dependencies, which are required but do not affect load order.
+- Added reviewed expected-failure rules for external local-library stress failures.
+
+Dependency-cache result:
+
+- Missing dependencies considered: `97`.
+- Already present or downloaded into the writable cache: `70`.
+- Additional targeted dependency added after the report: `mini-micro-settings`.
+- No compatible Factorio `2.1` release found: `27`.
+- Download failures: `0`.
+- Writable cache zip count after follow-up: `71`.
+
+Completed artifact inputs:
+
+- Local curated scenarios and local root zips: `F:\Factorio\mir-artifacts\local-audit-2.1-with-downloaded-deps-20260705-043918`.
+- Root-only generated scenarios: `F:\Factorio\mir-artifacts\generated-local-2.1-root-only-with-downloaded-deps`.
+- Targeted repaired smoke: `build\local-zips-mini-machines-dependency-smoke-3`.
+
+Results:
+
+| Scope | Scenarios | Passed | Skipped | Failed | Timeouts | MIR audit rows |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Local curated scenarios | 14 | 9 | 4 | 1 | 0 | 746 |
+| Generated local scenarios | 47 | 34 | 7 | 6 | 0 | 3,113 |
+| Local root zips | 150 | 139 | 8 | 3 | 0 | 11,148 |
+| `mini-machines` repaired smoke | 1 | 1 | 0 | 0 | 0 | 74 |
+
+Adjusted known state after the targeted `mini-machines` fix:
+
+- Effective scenario evidence: `211` local scenarios plus one targeted repair smoke.
+- Effective local scenario outcomes: `183` passed, `19` skipped, `9` failed, `0` timed out.
+- Effective MIR audit rows: at least `15,081`.
+- No proven MIR generation bug was found in these runs.
+
+Reviewed remaining load failures:
+
+- `local-2-1-space-age-mega-smash-with-resource-overhauls`: `xander-mod-shemp` declares incompatibility with Space Age.
+- `generated-local-2-1-cluster-logistics-transport`: generated stress cluster hits external circular dependencies.
+- `generated-local-2-1-pair-010`: `big-mining-drill` declares incompatibility with Space Age and AAI Industry.
+- `generated-local-2-1-pair-012`: tested `bobassembly` zip requires `space-age >= 3.0.0`.
+- `generated-local-2-1-pair-018`: tested `bobmodules` zip errors before MIR data changes run.
+- `generated-local-2-1-pair-027`: external AAI/bzsilicon recipe uses obsolete Factorio recipe fields.
+- `generated-local-2-1-pair-039`: generated stress pair creates an external technology prerequisite cycle.
+- `infinite-belt-stacking`: external mod has an undeclared stack inserter support requirement.
+- `snouz_long_electric_gun_turret`: external recipe uses obsolete Factorio recipe fields.
+
+Commands:
+
+```powershell
+.\scripts\mir.ps1 run -Profile local-audit-2.1 --output F:\Factorio\mir-artifacts\local-audit-2.1-with-downloaded-deps-20260705-043918 --link-mode Copy
+
+.\scripts\Invoke-MIRExtendedTests.ps1 -Tier GeneratedLocalScenarios -FactorioLine 2.1 -FactorioBin 'C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe' -LocalModZipDirs 'C:\Projects\Factorio\testmods_readonly_2.1' -LocalModLibraryDirs 'C:\Projects\Factorio\testmods_readonly_2.1','C:\Projects\Factorio\testmods_downloaded_2.1' -Offline -CollectAll -IncludeGeneratedLocalPairwise -GeneratedLocalPairwiseLimit 40 -ScenarioTimeoutSeconds 900 -LinkMode Copy -OutputRoot 'F:\Factorio\mir-artifacts\generated-local-2.1-root-only-with-downloaded-deps'
+
+.\scripts\Invoke-MIRCompatAudit.ps1 -RunLocalModZips -LocalModZipDirs 'C:\Projects\Factorio\testmods_readonly_2.1' -LocalModLibraryDirs 'C:\Projects\Factorio\testmods_readonly_2.1','C:\Projects\Factorio\testmods_downloaded_2.1' -Offline -IncludeRecommendedDependencies -LocalModNames mini-machines -MaxCandidates 0 -CatalogPages 0 -FactorioLine 2.1 -FactorioVersions 2.1 -FactorioBin 'C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe' -RunLoadTests -ScenarioTimeoutSeconds 300 -LinkMode Copy -OutputDir .\build\local-zips-mini-machines-dependency-smoke-3
+```
+
+Follow-up:
+
+- Keep the local audit output on `F:` or another roomy drive when running broad sweeps.
+- Continue filling the `27` dependencies with no compatible `2.1` release only if a compatible source is found manually.
+- Use the reviewed expected-failure rules for external stress failures, not as MIR compatibility profiles.
+
 ## 2026-07-05 Official Built-In Dependency Closure Smoke
 
 Environment:
