@@ -533,16 +533,22 @@ When either diagnostics setting is enabled, MIR also reports duplicate recipe ma
 .\scripts\Build-MIRPackage.ps1
 ```
 
-**Strict release gate:**
+**Preferred developer CLI:**
 
 ```powershell
-.\scripts\Invoke-MIRExtendedTests.ps1 -Tier Static,Runtime,AuditSmoke -FailFast -FailOnAuditFailures
+.\scripts\mir.ps1 release gate
+.\scripts\mir.ps1 overnight local
+.\scripts\mir.ps1 audit local
+.\scripts\mir.ps1 report latest
+.\scripts\mir.ps1 local-index build --mods C:\Projects\Factorio\testmods_readonly_2.1
 ```
+
+`mir.ps1` is the normal human front door. It delegates to the existing scripts, loads JSON run profiles from `fixtures/run-profiles/`, and accepts common overrides such as `--factorio`, `--mods`, `--output`, and `--timeout`. Use `docs/dev-tools.md` for the command map and script roles.
 
 **Release gate with local smoke scenarios:**
 
 ```powershell
-.\scripts\Invoke-MIRReleaseTargetedGate.ps1
+.\scripts\mir.ps1 release gate
 ```
 
 This is the short release command. It runs:
@@ -552,19 +558,13 @@ This is the short release command. It runs:
 - one representative local scenario;
 - package rebuild, whitespace check, and clean-git-status check.
 
-Defaults live in `fixtures/run-profiles/release-targeted.json`. Override `-LocalModDir`, `-RepairSmokeModNames`, `-RepresentativeScenarioName`, or `-AuditFactorioVersions` for a different release line. Use the overnight local sweep separately for broad compatibility evidence.
+Defaults live in `fixtures/run-profiles/release-targeted.json`. Use `--profile`, `--factorio`, `--mods`, `--output`, or `--timeout` for a different local setup. Use the overnight local sweep separately for broad compatibility evidence.
 
-**Developer CLI front door:**
+Stable direct script equivalent:
 
 ```powershell
-.\scripts\mir.ps1 release gate
-.\scripts\mir.ps1 overnight local
-.\scripts\mir.ps1 report latest
-.\scripts\mir.ps1 local-index build --mods C:\Projects\Factorio\testmods_readonly_2.1
-.\scripts\mir.ps1 run -Profile release-targeted
+.\scripts\Invoke-MIRReleaseTargetedGate.ps1
 ```
-
-`mir.ps1` is a thin front door over the existing scripts. It keeps the existing entry points intact while giving maintainers memorable commands for release gates, overnight local sweeps, local audits, reports, package builds, profile stubs, run profiles, and local mod-library indexes.
 
 **Credentialed exploratory compatibility audits:**
 
@@ -579,10 +579,10 @@ Local modpack zips can be included with the `LocalModZips` tier and `-LocalModZi
 Use read-only local mod libraries for large offline sweeps:
 
 ```powershell
-.\scripts\Start-MIROvernightLocalSweep.ps1
+.\scripts\mir.ps1 overnight local
 ```
 
-`Start-MIROvernightLocalSweep.ps1` is the safest bedtime entrypoint. It finds or accepts the Factorio binary, verifies `C:\Projects\Factorio\testmods_readonly_2.1`, disables AC sleep/hibernate for the current machine, runs the strict `Static,Runtime,AuditSmoke` release gate first, then runs the prioritized local sweep with a transcript at `artifacts/overnight-local-2.1-*/overnight.log`. Each run also writes `run-manifest.json`, `events.jsonl`, `artifact-index.json`, and `index.html`. Use `-DryRun` to validate paths without starting tests, `-SkipPowerConfig` if you do not want power settings changed, and `-LocalModDir <path>` if your downloaded zip library is elsewhere. In the morning, run `.\scripts\Show-MIROvernightSummary.ps1 -OutputRoot <overnight-output-dir>` to print the log tail, artifact paths, release/local summaries, grouped failures, missing dependencies, and profile-candidate counts.
+`mir.ps1 overnight local` uses `fixtures/run-profiles/overnight-local-2.1.json` and delegates to `Start-MIROvernightLocalSweep.ps1`. The bedtime script finds or accepts the Factorio binary, verifies the configured local library, disables AC sleep/hibernate for the current machine, runs the strict `Static,Runtime,AuditSmoke` release gate first, then runs the prioritized local sweep with a transcript at `artifacts/overnight-local-2.1-*/overnight.log`. Each run also writes `run-manifest.json`, `events.jsonl`, `artifact-index.json`, and `index.html`. Use `--mods <path>` when your downloaded zip library is elsewhere. In the morning, run `.\scripts\mir.ps1 report latest` or `.\scripts\Show-MIROvernightSummary.ps1 -OutputRoot <overnight-output-dir>` to print the log tail, artifact paths, release/local summaries, grouped failures, missing dependencies, and profile-candidate counts.
 
 Run local-library tiers in priority order: `LocalLibraryScenarios` covers curated high-value combinations, `GeneratedLocalScenarios` creates generated mega and metadata-cluster stress cases, and `LocalModZips` tests each local root zip as an individual scenario. Add `-IncludeGeneratedLocalPairwise -GeneratedLocalPairwiseLimit 40` when you want capped pairwise cluster coverage. Add `-ShardLocalModZips -StartIndex N -ShardSize M` to resume local-root sweeps in chunks.
 
@@ -603,6 +603,7 @@ The validation script checks:
 - **Science-pack authority:** no old `data.raw.tool` science-pack authority remains.
 - **Icons:** generated icons do not use `icon_mipmaps`.
 - **Locale:** locale files match the English fallback.
+- **PowerShell tooling:** scripts parse, duplicate parameters are rejected, generated output paths stay ignored, and obvious secret output is blocked.
 - **Changelog:** `changelog.txt` uses Factorio's 99-dash format with one-line bullets capped at 132 characters.
 - **Generated package:** validation builds an ignored archive from the current source tree and checks its root, metadata, load-critical files, and forbidden artifacts.
 - **Package parity:** the generated archive's source directories, documentation, locale, migrations, and root mod files match the repository copy while allowing docs and helper modules to be rearranged inside their packaged trees.
@@ -623,6 +624,7 @@ The validation script checks:
 - **`docs/architecture.md`:** data-stage flow, utility modules, stream config, compatibility profiles, diagnostics, and validation.
 - **`docs/api-proof-points.md`:** API claims, proof status, and open in-game verification questions.
 - **`docs/compatibility.md`:** compatibility model, known integrations, manual test matrix, fixture designs, and release checklist.
+- **`docs/dev-tools.md`:** preferred developer commands, run profiles, script roles, and PowerShell tooling checks.
 - **`docs/roadmap.md`:** high-level release narrative, scope rationale, why decisions, and pointers back to `todo.md`, `changelog.txt`, and supporting notes.
 - **`docs/test-results.md`:** local release validation evidence.
 - **`docs/notes/manual-test-plan.md`:** named manual saves/scenarios for release validation.

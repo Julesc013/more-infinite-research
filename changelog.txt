@@ -2,6 +2,11 @@
 Version: 2.1.5
 Date: 2026-07-05
 
+  Internal:
+
+    - Made mir.ps1 profile-driven for release, overnight, and local-audit commands with simple path overrides.
+    - Added PowerShell script checks for parsing, duplicate parameters, ignored outputs, and secret-output guards.
+
 ---------------------------------------------------------------------------------------------------
 Version: 1.9.5
 Date: 2026-07-05

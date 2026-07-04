@@ -308,6 +308,10 @@ Invoke-RepoCheck "locale files match English fallback" {
   & (Join-Path $repo "scripts\Test-MIRLocales.ps1") -AllowMissingSupportedLanguages
 }
 
+Invoke-RepoCheck "PowerShell scripts parse and avoid duplicate parameters" {
+  & (Join-Path $repo "scripts\Test-MIRPowerShellQuality.ps1") -RepoRoot $repo
+}
+
 Invoke-RepoCheck "fixture mods have metadata and data entrypoints" {
   $fixtureRootForStatic = Join-Path $repo "fixtures"
   if (-not (Test-Path -LiteralPath $fixtureRootForStatic)) {
@@ -646,7 +650,9 @@ Invoke-RepoCheck "compat audit automation tooling is wired" {
   $eventLogText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\MIRCli\EventLog.ps1")
   $processSupervisorText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\MIRCli\ProcessSupervisor.ps1")
   $localModIndexText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\MIRCli\LocalModIndex.ps1")
+  $powershellQualityText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\Test-MIRPowerShellQuality.ps1")
   $runProfileText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\run-profiles\release-targeted.json")
+  $localAuditProfileText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\run-profiles\local-audit-2.1.json")
   $overnightText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\Start-MIROvernightLocalSweep.ps1")
   $overnightSummaryText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\Show-MIROvernightSummary.ps1")
   $manualScenariosText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\compat-matrix\manual-scenarios.json")
@@ -654,6 +660,7 @@ Invoke-RepoCheck "compat audit automation tooling is wired" {
   $expectedFailuresText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\compat-matrix\expected-failures.json")
   $workflowText = Get-Content -Raw -LiteralPath (Join-Path $repo ".github\workflows\extended-compat-audit.yml")
   $compatDocsText = Get-Content -Raw -LiteralPath (Join-Path $repo "docs\compatibility.md")
+  $devToolsText = Get-Content -Raw -LiteralPath (Join-Path $repo "docs\dev-tools.md")
   $readmeText = Get-Content -Raw -LiteralPath (Join-Path $repo "README.md")
 
   $requiredSnippets = @(
@@ -730,13 +737,20 @@ Invoke-RepoCheck "compat audit automation tooling is wired" {
     @{ File = "scripts\Invoke-MIRReleaseTargetedGate.ps1"; Text = $releaseTargetedGateText; Snippet = 'AuditFactorioVersions' },
     @{ File = "scripts\mir.ps1"; Text = $mirCliText; Snippet = ".\scripts\mir.ps1 release gate" },
     @{ File = "scripts\mir.ps1"; Text = $mirCliText; Snippet = "Invoke-MIRRunProfile" },
+    @{ File = "scripts\mir.ps1"; Text = $mirCliText; Snippet = "local-audit-2.1" },
+    @{ File = "scripts\mir.ps1"; Text = $mirCliText; Snippet = "New-MIRProfileOverrides" },
     @{ File = "scripts\mir.ps1"; Text = $mirCliText; Snippet = "local-index" },
+    @{ File = "scripts\Test-MIRPowerShellQuality.ps1"; Text = $powershellQualityText; Snippet = "duplicate parameter" },
+    @{ File = "scripts\Test-MIRPowerShellQuality.ps1"; Text = $powershellQualityText; Snippet = "possible secret output" },
+    @{ File = "scripts\Invoke-MIRValidation.ps1"; Text = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\Invoke-MIRValidation.ps1"); Snippet = "Test-MIRPowerShellQuality.ps1" },
     @{ File = "scripts\MIRCli\Console.ps1"; Text = $consoleText; Snippet = "Write-MIRScenarioResult" },
     @{ File = "scripts\MIRCli\RunContext.ps1"; Text = $runContextText; Snippet = "run-manifest.json" },
     @{ File = "scripts\MIRCli\EventLog.ps1"; Text = $eventLogText; Snippet = "events.jsonl" },
     @{ File = "scripts\MIRCli\ProcessSupervisor.ps1"; Text = $processSupervisorText; Snippet = "Invoke-MIRProcess" },
     @{ File = "scripts\MIRCli\LocalModIndex.ps1"; Text = $localModIndexText; Snippet = "New-MIRLocalModIndex" },
     @{ File = "fixtures\run-profiles\release-targeted.json"; Text = $runProfileText; Snippet = '"kind": "release-targeted"' },
+    @{ File = "fixtures\run-profiles\local-audit-2.1.json"; Text = $localAuditProfileText; Snippet = '"LocalModZips"' },
+    @{ File = "fixtures\run-profiles\local-audit-2.1.json"; Text = $localAuditProfileText; Snippet = '"local_mod_library_dirs"' },
     @{ File = "scripts\Start-MIROvernightLocalSweep.ps1"; Text = $overnightText; Snippet = '$ErrorActionPreference = "Stop"' },
     @{ File = "scripts\Start-MIROvernightLocalSweep.ps1"; Text = $overnightText; Snippet = "[switch]`$DryRun" },
     @{ File = "scripts\Start-MIROvernightLocalSweep.ps1"; Text = $overnightText; Snippet = "Start-Transcript" },
@@ -775,7 +789,11 @@ Invoke-RepoCheck "compat audit automation tooling is wired" {
     @{ File = "docs\compatibility.md"; Text = $compatDocsText; Snippet = 'Use `-CollectAll` for exploratory or overnight runs.' },
     @{ File = "docs\compatibility.md"; Text = $compatDocsText; Snippet = '`AuditSmoke` is intentionally deterministic.' },
     @{ File = "README.md"; Text = $readmeText; Snippet = ".\scripts\Invoke-MIRReleaseTargetedGate.ps1" },
-    @{ File = "README.md"; Text = $readmeText; Snippet = ".\scripts\Invoke-MIRExtendedTests.ps1 -Tier Static,Runtime,AuditSmoke -FailFast -FailOnAuditFailures" }
+    @{ File = "README.md"; Text = $readmeText; Snippet = ".\scripts\mir.ps1 audit local" },
+    @{ File = "README.md"; Text = $readmeText; Snippet = "docs/dev-tools.md" },
+    @{ File = "docs\dev-tools.md"; Text = $devToolsText; Snippet = "Preferred Commands" },
+    @{ File = "docs\dev-tools.md"; Text = $devToolsText; Snippet = "scripts/MIRCli/*.ps1" },
+    @{ File = "docs\dev-tools.md"; Text = $devToolsText; Snippet = "Test-MIRPowerShellQuality.ps1" }
   )
 
   foreach ($check in $requiredSnippets) {

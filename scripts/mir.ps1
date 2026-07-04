@@ -17,9 +17,9 @@ function Show-MIRHelp {
 MIR developer CLI
 
 Usage:
-  .\scripts\mir.ps1 release gate [--no-git-pull]
-  .\scripts\mir.ps1 overnight local
-  .\scripts\mir.ps1 audit local
+  .\scripts\mir.ps1 release gate [--profile <name>] [--no-git-pull]
+  .\scripts\mir.ps1 overnight local [--profile <name>]
+  .\scripts\mir.ps1 audit local [--profile <name>]
   .\scripts\mir.ps1 audit top25 --space-age
   .\scripts\mir.ps1 package build
   .\scripts\mir.ps1 report latest
@@ -27,6 +27,12 @@ Usage:
   .\scripts\mir.ps1 profile stub <group-id> --grouped-failures <path>
   .\scripts\mir.ps1 run -Profile <profile-name-or-path>
   .\scripts\mir.ps1 local-index build --mods <path>
+
+Common overrides:
+  --factorio <path>   Factorio binary path
+  --mods <path>       Local mod zip/library directory
+  --output <path>     Output artifact directory
+  --timeout <seconds> Per-scenario timeout
 "@
 }
 
@@ -45,6 +51,49 @@ function Get-MIRArgValue {
 function Test-MIRArgSwitch {
   param([string[]]$Items, [string]$Name)
   return $Items -contains $Name
+}
+
+function Get-MIRCommandProfile {
+  param(
+    [string[]]$Items,
+    [string]$Default
+  )
+  $profile = Get-MIRArgValue -Items $Items -Name "--profile"
+  if ([string]::IsNullOrWhiteSpace($profile)) {
+    $profile = Get-MIRArgValue -Items $Items -Name "-Profile"
+  }
+  if ([string]::IsNullOrWhiteSpace($profile)) { return $Default }
+  return $profile
+}
+
+function New-MIRProfileOverrides {
+  param([string[]]$Items)
+
+  $overrides = @{}
+  $factorio = Get-MIRArgValue -Items $Items -Name "--factorio"
+  $mods = Get-MIRArgValue -Items $Items -Name "--mods"
+  $output = Get-MIRArgValue -Items $Items -Name "--output"
+  $timeout = Get-MIRArgValue -Items $Items -Name "--timeout"
+
+  if (-not [string]::IsNullOrWhiteSpace($factorio)) {
+    $overrides.factorio_bin = $factorio
+  }
+  if (-not [string]::IsNullOrWhiteSpace($mods)) {
+    $overrides.local_mod_dir = $mods
+    $overrides.local_mod_zip_dirs = @($mods)
+    $overrides.local_mod_library_dirs = @($mods)
+  }
+  if (-not [string]::IsNullOrWhiteSpace($output)) {
+    $overrides.output_root = $output
+  }
+  if (-not [string]::IsNullOrWhiteSpace($timeout)) {
+    $overrides.scenario_timeout_seconds = [int]$timeout
+  }
+  if (Test-MIRArgSwitch -Items $Items -Name "--no-git-pull") {
+    $overrides.no_git_pull = $true
+  }
+
+  return $overrides
 }
 
 function Get-MIRLatestRunRoot {
@@ -76,14 +125,47 @@ function Get-MIRProfileProperty {
   return $property.Value
 }
 
+function Get-MIRDefaultLocalModDir {
+  $profilePath = Resolve-MIRProfilePath -Profile "local-audit-2.1"
+  $profileData = Get-Content -Raw -LiteralPath $profilePath | ConvertFrom-Json
+  $dirs = Get-MIRProfileProperty -Object $profileData -Name "local_mod_zip_dirs" -Default @()
+  $first = @($dirs | ForEach-Object { [string]$_ } | Where-Object { -not [string]::IsNullOrWhiteSpace($_) } | Select-Object -First 1)
+  if ($first.Count -gt 0) { return $first[0] }
+  return ".\tmp"
+}
+
 function Test-MIRProfileFlag {
   param($Object, [string]$Name)
   $value = Get-MIRProfileProperty -Object $Object -Name $Name -Default $false
   return [bool]$value
 }
 
+function Get-MIRProfileOrOverride {
+  param(
+    $Object,
+    [hashtable]$Overrides,
+    [string]$Name,
+    $Default = $null
+  )
+  if ($Overrides -and $Overrides.ContainsKey($Name)) { return $Overrides[$Name] }
+  return Get-MIRProfileProperty -Object $Object -Name $Name -Default $Default
+}
+
+function Test-MIRProfileOrOverrideFlag {
+  param(
+    $Object,
+    [hashtable]$Overrides,
+    [string]$Name
+  )
+  if ($Overrides -and $Overrides.ContainsKey($Name)) { return [bool]$Overrides[$Name] }
+  return Test-MIRProfileFlag -Object $Object -Name $Name
+}
+
 function Invoke-MIRRunProfile {
-  param([string]$Profile)
+  param(
+    [string]$Profile,
+    [hashtable]$Overrides = @{}
+  )
 
   $profilePath = Resolve-MIRProfilePath -Profile $Profile
   $profileData = Get-Content -Raw -LiteralPath $profilePath | ConvertFrom-Json
@@ -93,47 +175,52 @@ function Invoke-MIRRunProfile {
   switch ($kind) {
     "release-targeted" {
       $params = @{}
-      $factorioBin = Get-MIRProfileProperty -Object $profileData -Name "factorio_bin"
-      $localModDir = Get-MIRProfileProperty -Object $profileData -Name "local_mod_dir"
-      $repairSmokeModNames = Get-MIRProfileProperty -Object $profileData -Name "repair_smoke_mod_names"
-      $representativeScenarioName = Get-MIRProfileProperty -Object $profileData -Name "representative_scenario_name"
-      $manualScenariosPath = Get-MIRProfileProperty -Object $profileData -Name "manual_scenarios_path"
-      $auditFactorioVersions = Get-MIRProfileProperty -Object $profileData -Name "audit_factorio_versions"
-      $timeout = Get-MIRProfileProperty -Object $profileData -Name "scenario_timeout_seconds"
+      $factorioBin = Get-MIRProfileOrOverride -Object $profileData -Overrides $Overrides -Name "factorio_bin"
+      $localModDir = Get-MIRProfileOrOverride -Object $profileData -Overrides $Overrides -Name "local_mod_dir"
+      $outputRoot = Get-MIRProfileOrOverride -Object $profileData -Overrides $Overrides -Name "output_root"
+      $repairSmokeModNames = Get-MIRProfileOrOverride -Object $profileData -Overrides $Overrides -Name "repair_smoke_mod_names"
+      $representativeScenarioName = Get-MIRProfileOrOverride -Object $profileData -Overrides $Overrides -Name "representative_scenario_name"
+      $manualScenariosPath = Get-MIRProfileOrOverride -Object $profileData -Overrides $Overrides -Name "manual_scenarios_path"
+      $auditFactorioVersions = Get-MIRProfileOrOverride -Object $profileData -Overrides $Overrides -Name "audit_factorio_versions"
+      $timeout = Get-MIRProfileOrOverride -Object $profileData -Overrides $Overrides -Name "scenario_timeout_seconds"
       if ($factorioBin) { $params.FactorioBin = Resolve-MIRFactorioBin -Path ([string]$factorioBin) }
       if ($localModDir) { $params.LocalModDir = [string]$localModDir }
+      if ($outputRoot) { $params.OutputRoot = [string]$outputRoot }
       if ($repairSmokeModNames) { $params.RepairSmokeModNames = @($repairSmokeModNames | ForEach-Object { [string]$_ }) }
       if ($representativeScenarioName) { $params.RepresentativeScenarioName = [string]$representativeScenarioName }
       if ($manualScenariosPath) { $params.ManualScenariosPath = [string]$manualScenariosPath }
       if ($auditFactorioVersions) { $params.AuditFactorioVersions = @($auditFactorioVersions | ForEach-Object { [string]$_ }) }
       if ($timeout) { $params.ScenarioTimeoutSeconds = [int]$timeout }
+      if (Test-MIRProfileOrOverrideFlag -Object $profileData -Overrides $Overrides -Name "no_git_pull") { $params.NoGitPull = $true }
       & (Join-Path $scriptRoot "Invoke-MIRReleaseTargetedGate.ps1") @params
     }
     "overnight-local" {
       $params = @{}
-      $factorioBin = Get-MIRProfileProperty -Object $profileData -Name "factorio_bin"
-      $localModDir = Get-MIRProfileProperty -Object $profileData -Name "local_mod_dir"
-      $timeout = Get-MIRProfileProperty -Object $profileData -Name "scenario_timeout_seconds"
-      $pairwiseLimit = Get-MIRProfileProperty -Object $profileData -Name "generated_local_pairwise_limit"
+      $factorioBin = Get-MIRProfileOrOverride -Object $profileData -Overrides $Overrides -Name "factorio_bin"
+      $localModDir = Get-MIRProfileOrOverride -Object $profileData -Overrides $Overrides -Name "local_mod_dir"
+      $outputRoot = Get-MIRProfileOrOverride -Object $profileData -Overrides $Overrides -Name "output_root"
+      $timeout = Get-MIRProfileOrOverride -Object $profileData -Overrides $Overrides -Name "scenario_timeout_seconds"
+      $pairwiseLimit = Get-MIRProfileOrOverride -Object $profileData -Overrides $Overrides -Name "generated_local_pairwise_limit"
       if ($factorioBin) { $params.FactorioBin = Resolve-MIRFactorioBin -Path ([string]$factorioBin) }
       if ($localModDir) { $params.LocalModDir = [string]$localModDir }
+      if ($outputRoot) { $params.OutputRoot = [string]$outputRoot }
       if ($timeout) { $params.ScenarioTimeoutSeconds = [int]$timeout }
       if ($pairwiseLimit) { $params.GeneratedLocalPairwiseLimit = [int]$pairwiseLimit }
       & (Join-Path $scriptRoot "Start-MIROvernightLocalSweep.ps1") @params
     }
     default {
-      $tiers = Get-MIRProfileProperty -Object $profileData -Name "tiers" -Default @("Static")
+      $tiers = Get-MIRProfileOrOverride -Object $profileData -Overrides $Overrides -Name "tiers" -Default @("Static")
       $params = @{
         Tier = @($tiers | ForEach-Object { [string]$_ })
       }
-      $factorioBin = Get-MIRProfileProperty -Object $profileData -Name "factorio_bin"
-      $outputRoot = Get-MIRProfileProperty -Object $profileData -Name "output_root"
-      $localModZipDirs = Get-MIRProfileProperty -Object $profileData -Name "local_mod_zip_dirs"
-      $localModLibraryDirs = Get-MIRProfileProperty -Object $profileData -Name "local_mod_library_dirs"
-      $scenarioNames = Get-MIRProfileProperty -Object $profileData -Name "scenario_names"
-      $localModNames = Get-MIRProfileProperty -Object $profileData -Name "local_mod_names"
-      $timeout = Get-MIRProfileProperty -Object $profileData -Name "scenario_timeout_seconds"
-      $pairwiseLimit = Get-MIRProfileProperty -Object $profileData -Name "generated_local_pairwise_limit"
+      $factorioBin = Get-MIRProfileOrOverride -Object $profileData -Overrides $Overrides -Name "factorio_bin"
+      $outputRoot = Get-MIRProfileOrOverride -Object $profileData -Overrides $Overrides -Name "output_root"
+      $localModZipDirs = Get-MIRProfileOrOverride -Object $profileData -Overrides $Overrides -Name "local_mod_zip_dirs"
+      $localModLibraryDirs = Get-MIRProfileOrOverride -Object $profileData -Overrides $Overrides -Name "local_mod_library_dirs"
+      $scenarioNames = Get-MIRProfileOrOverride -Object $profileData -Overrides $Overrides -Name "scenario_names"
+      $localModNames = Get-MIRProfileOrOverride -Object $profileData -Overrides $Overrides -Name "local_mod_names"
+      $timeout = Get-MIRProfileOrOverride -Object $profileData -Overrides $Overrides -Name "scenario_timeout_seconds"
+      $pairwiseLimit = Get-MIRProfileOrOverride -Object $profileData -Overrides $Overrides -Name "generated_local_pairwise_limit"
       if ($factorioBin) { $params.FactorioBin = Resolve-MIRFactorioBin -Path ([string]$factorioBin) }
       if ($outputRoot) { $params.OutputRoot = [string]$outputRoot }
       if ($localModZipDirs) { $params.LocalModZipDirs = @($localModZipDirs | ForEach-Object { [string]$_ }) }
@@ -141,18 +228,18 @@ function Invoke-MIRRunProfile {
       if ($scenarioNames) { $params.ScenarioNames = @($scenarioNames | ForEach-Object { [string]$_ }) }
       if ($localModNames) { $params.LocalModNames = @($localModNames | ForEach-Object { [string]$_ }) }
       if ($timeout) { $params.ScenarioTimeoutSeconds = [int]$timeout }
-      if (Test-MIRProfileFlag -Object $profileData -Name "collect_all") { $params.CollectAll = $true }
-      if (Test-MIRProfileFlag -Object $profileData -Name "offline") { $params.Offline = $true }
-      if (Test-MIRProfileFlag -Object $profileData -Name "fail_fast") { $params.FailFast = $true }
-      if (Test-MIRProfileFlag -Object $profileData -Name "fail_on_audit_failures") { $params.FailOnAuditFailures = $true }
-      if (Test-MIRProfileFlag -Object $profileData -Name "include_generated_local_pairwise") { $params.IncludeGeneratedLocalPairwise = $true }
+      if (Test-MIRProfileOrOverrideFlag -Object $profileData -Overrides $Overrides -Name "collect_all") { $params.CollectAll = $true }
+      if (Test-MIRProfileOrOverrideFlag -Object $profileData -Overrides $Overrides -Name "offline") { $params.Offline = $true }
+      if (Test-MIRProfileOrOverrideFlag -Object $profileData -Overrides $Overrides -Name "fail_fast") { $params.FailFast = $true }
+      if (Test-MIRProfileOrOverrideFlag -Object $profileData -Overrides $Overrides -Name "fail_on_audit_failures") { $params.FailOnAuditFailures = $true }
+      if (Test-MIRProfileOrOverrideFlag -Object $profileData -Overrides $Overrides -Name "include_generated_local_pairwise") { $params.IncludeGeneratedLocalPairwise = $true }
       if ($pairwiseLimit) { $params.GeneratedLocalPairwiseLimit = [int]$pairwiseLimit }
       & (Join-Path $scriptRoot "Invoke-MIRExtendedTests.ps1") @params
     }
   }
 }
 
-if ($Args.Count -eq 0 -or $Args[0] -in @("-h", "--help", "help")) {
+if ($Args.Count -eq 0 -or $Args[0] -eq "help" -or $Args -contains "-h" -or $Args -contains "--help") {
   Show-MIRHelp
   exit 0
 }
@@ -163,24 +250,19 @@ $verb = if ($Args.Count -gt 1) { $Args[1] } else { "" }
 switch ($area) {
   "release" {
     if ($verb -ne "gate") { throw "Unknown release command: $verb" }
-    $params = @{}
-    if (Test-MIRArgSwitch -Items $Args -Name "--no-git-pull") { $params.NoGitPull = $true }
-    & (Join-Path $scriptRoot "Invoke-MIRReleaseTargetedGate.ps1") @params
+    $profile = Get-MIRCommandProfile -Items $Args -Default "release-targeted"
+    Invoke-MIRRunProfile -Profile $profile -Overrides (New-MIRProfileOverrides -Items $Args)
   }
   "overnight" {
     if ($verb -ne "local") { throw "Unknown overnight command: $verb" }
-    & (Join-Path $scriptRoot "Start-MIROvernightLocalSweep.ps1")
+    $profile = Get-MIRCommandProfile -Items $Args -Default "overnight-local-2.1"
+    Invoke-MIRRunProfile -Profile $profile -Overrides (New-MIRProfileOverrides -Items $Args)
   }
   "audit" {
     switch ($verb) {
       "local" {
-        & (Join-Path $scriptRoot "Invoke-MIRExtendedTests.ps1") `
-          -Tier LocalLibraryScenarios,GeneratedLocalScenarios,LocalModZips `
-          -LocalModZipDirs "C:\Projects\Factorio\testmods_readonly_2.1" `
-          -LocalModLibraryDirs "C:\Projects\Factorio\testmods_readonly_2.1" `
-          -Offline `
-          -CollectAll `
-          -IncludeGeneratedLocalPairwise
+        $profile = Get-MIRCommandProfile -Items $Args -Default "local-audit-2.1"
+        Invoke-MIRRunProfile -Profile $profile -Overrides (New-MIRProfileOverrides -Items $Args)
       }
       "top25" {
         $includeSpaceAge = Test-MIRArgSwitch -Items $Args -Name "--space-age"
@@ -226,7 +308,7 @@ switch ($area) {
   }
   "local-index" {
     if ($verb -ne "build") { throw "Unknown local-index command: $verb" }
-    $mods = Get-MIRArgValue -Items $Args -Name "--mods" -Default "C:\Projects\Factorio\testmods_readonly_2.1"
+    $mods = Get-MIRArgValue -Items $Args -Name "--mods" -Default (Get-MIRDefaultLocalModDir)
     $out = Get-MIRArgValue -Items $Args -Name "--out" -Default (Join-Path $repo "build\cache\local-mod-index\local-mod-index.2.1.json")
     New-MIRLocalModIndex -Dirs @($mods) -OutputPath $out | Out-Null
     Write-MIRSuccess "wrote $out"

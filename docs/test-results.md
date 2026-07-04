@@ -2,6 +2,36 @@
 
 This file records local release-candidate validation runs. It is not a substitute for the manual mod matrix in `docs/compatibility.md`.
 
+## 2026-07-05 Dev Tooling Front Door Cleanup
+
+Environment:
+
+- Branch: `dev`.
+- Mod version `2.1.5`.
+
+Scope:
+
+- Kept `mir.ps1` as the preferred developer front door instead of expanding a larger CLI framework.
+- Moved the local audit defaults into `fixtures/run-profiles/local-audit-2.1.json`.
+- Added `--factorio`, `--mods`, `--output`, and `--timeout` profile overrides to `mir.ps1`.
+- Added `scripts/Test-MIRPowerShellQuality.ps1` for PowerShell parser, duplicate-parameter, ignore-path, and secret-output checks.
+- Added `docs/dev-tools.md` to document preferred commands, stable direct scripts, advanced engines, private helpers, and run profiles.
+
+Commands:
+
+```powershell
+.\scripts\mir.ps1 --help
+.\scripts\mir.ps1 run -Profile local-audit-2.1 --help
+.\scripts\Test-MIRPowerShellQuality.ps1
+.\scripts\Invoke-MIRValidation.ps1 -StaticOnly
+```
+
+Results:
+
+- `mir.ps1 --help` and profile help guard printed the command list without starting a long run.
+- PowerShell quality checks passed across `27` scripts.
+- Static validation passed and built `build\validation-dist\more-infinite-research_2.1.5.zip`.
+
 ## 2026-07-05 Dev Changelog Intake For 2.1.5
 
 Environment:
