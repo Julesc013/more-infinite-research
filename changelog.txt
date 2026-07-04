@@ -82,7 +82,7 @@ Date: 2026-06-30
 
   Generator changes:
 
-    - Improved prerequisite, prototype availability, max-level, and existing-continuation checks.
+    - Improved science-pack inheritance, prerequisites, max-level, availability, and continuation checks.
     - Improved recipe matching for hidden, recycling, lab-input, biochamber, and modded science-pack recipes.
     - Improved base-technology extension generation so vanilla and other-mod technologies remain unchanged.
     - Added compatibility profile support for stream items, patterns, exclusions, and groups.
@@ -92,6 +92,8 @@ Date: 2026-06-30
     - Raised the base dependency to Factorio 2.1.8 or newer.
     - Added optional official DLC ordering floors for Elevated Rails, Recycler, Quality, and Space Age.
     - Added cleanup for compatible competing base extensions and recipe-productivity technologies.
+    - Added Better Robots Extended compatibility for competing worker robot storage research.
+    - Added a startup setting to prefer MIR over selected competing infinite technologies.
     - Added opportunistic compatibility for several popular productivity and recipe mods.
     - Improved optional Space Age behavior, including Space Age installs without Quality.
 
@@ -106,22 +108,6 @@ Date: 2026-06-30
   Migration:
 
     - No existing prototype IDs were renamed. No migration is required.
-
----------------------------------------------------------------------------------------------------
-Version: 1.2.10
-Date: 2026-02-20
-
-  Compatibility:
-
-    - Added Better Robots Extended compatibility for competing worker robot storage research.
-    - Added a startup setting to prefer MIR over selected competing infinite technologies.
-    - Generated base-tech extensions now skip equivalent existing infinite continuations.
-
-  Changes:
-
-    - Base-tech extensions now inherit vanilla science packs and add only configured extra packs.
-    - Generated base-tech extensions now add missing science-pack unlock prerequisites.
-    - Updated Russian localization.
 
 ---------------------------------------------------------------------------------------------------
 Version: 1.2.9

@@ -32,7 +32,7 @@ Results:
 - The `2.1.0` changelog now advertises shipped feature families rather than development-time icon/source choices.
 - Acid neutralization, Elevated Rails rail productivity, and vanilla-family save refresh behavior are explicitly represented.
 - The `2.0.5` entry retains user-facing Omega Drill and agricultural-growth behavior that the history audit confirmed.
-- Added the missing `1.2.10` entry from the 2026-02-20 version bump and Better Robots Extended compatibility commit.
+- Removed the private/fork `1.2.10` section and folded its public-line behavior into the `2.0.0` entry.
 - No `changelog.txt` line exceeds the 132-character cap after the targeted corrections.
 
 ## 2026-07-04 CLI Artifact Polish
