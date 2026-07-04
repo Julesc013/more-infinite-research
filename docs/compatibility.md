@@ -148,6 +148,7 @@ Review-only profile stubs can be generated from grouped failures:
 The tiered wrapper is the recommended entry point for repeatable local and self-hosted runs:
 
 ```powershell
+.\scripts\Invoke-MIRReleaseTargetedGate.ps1
 .\scripts\Invoke-MIRExtendedTests.ps1 -Tier Static,Runtime,AuditSmoke -FailFast -FailOnAuditFailures
 .\scripts\Invoke-MIRExtendedTests.ps1 -Tier Top25Base,Top25SpaceAge,ManualScenarios -CollectAll
 .\scripts\Invoke-MIRExtendedTests.ps1 -Tier LocalModZips -LocalModZipDirs .\tmp -CollectAll
@@ -156,6 +157,8 @@ The tiered wrapper is the recommended entry point for repeatable local and self-
 .\scripts\Invoke-MIRExtendedTests.ps1 -Tier Full10KSpaceAge -IncludeFullAudit -StartIndex 0 -ShardSize 25 -CollectAll
 .\scripts\Invoke-MIRExtendedTests.ps1 -Tier Full10KSpaceAge -IncludeFullAudit -FromLockfile .\artifacts\compat-audit-locks\compat-candidates.lock.json -StartIndex 25 -ShardSize 25 -CollectAll
 ```
+
+`Invoke-MIRReleaseTargetedGate.ps1` is the narrow release-candidate command. It resolves the Factorio binary and local `2.1` zip library, optionally pulls `origin/dev`, runs the strict `Static,Runtime,AuditSmoke` gate, runs the targeted harness repair zips (`big-mining-drill` for base-only official-DLC isolation and `biolabs-in-space` for full Space Age bundle expansion), runs the representative local BZ Space Age suite, converts grouped failures, rebuilds the package, runs `git diff --check`, and fails if git status is not clean. It writes `release-targeted-summary.md/json` under `artifacts/release-targeted-*`.
 
 `Start-MIROvernightLocalSweep.ps1` is the preferred bedtime command for the local `2.1` library. It removes one-line paste hazards, starts a transcript log, runs the strict release gate, then runs the local sweep with `-CollectAll`. The underlying prioritized local sweep covers curated combinations from `fixtures/compat-matrix/local-library-scenarios.json`, generated all-local/cluster stress scenarios, and then each individual local root zip. Missing dependencies and impossible mod combinations are expected to appear as grouped failures; they are still useful evidence because they distinguish "not testable with this local library" from actual MIR generation regressions. `Show-MIROvernightSummary.ps1` summarizes the next-morning triage views across the whole output tree.
 

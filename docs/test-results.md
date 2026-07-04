@@ -2,6 +2,34 @@
 
 This file records local release-candidate validation runs. It is not a substitute for the manual mod matrix in `docs/compatibility.md`.
 
+## 2026-07-04 Targeted Release Gate Entrypoint
+
+Environment:
+
+- Branch: `dev`.
+- Mod version `2.1.0`.
+
+Scope:
+
+- Added `scripts\Invoke-MIRReleaseTargetedGate.ps1` as the short release-candidate command for the current `2.1.0` tree.
+- The script resolves the repo root, Factorio binary, local `2.1` zip library, and timestamped output root.
+- The release gate runs the strict `Static,Runtime,AuditSmoke` wrapper gate, targeted local repair smokes for `big-mining-drill` and `biolabs-in-space`, the representative `local-2-1-bz-suite-space-age` local-library scenario, grouped failure conversion, package rebuild, whitespace validation, and a clean-git-status check.
+- The script writes `release-targeted-summary.md`, `release-targeted-summary.json`, and a transcript under `artifacts\release-targeted-*` or the supplied `-OutputRoot`.
+
+Commands:
+
+```powershell
+$errors=$null
+[System.Management.Automation.Language.Parser]::ParseFile((Resolve-Path '.\scripts\Invoke-MIRReleaseTargetedGate.ps1'), [ref]$null, [ref]$errors) | Out-Null
+if ($errors) { throw ($errors | Out-String) }
+.\scripts\Invoke-MIRReleaseTargetedGate.ps1 -DryRun -NoGitPull -OutputRoot .\build\release-targeted-dry-run
+```
+
+Results:
+
+- PowerShell parser check passed for the new release-targeted gate script.
+- Dry run resolved the Steam Factorio binary, found `150` local `2.1` zip archives in `C:\Projects\Factorio\testmods_readonly_2.1`, created `build\release-targeted-dry-run`, and wrote summary artifacts without starting validation or load tests.
+
 ## 2026-07-04 Overnight Local Sweep Parser And Official Mod Isolation Repair
 
 Environment:

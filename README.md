@@ -541,6 +541,14 @@ When either diagnostics setting is enabled, MIR also reports duplicate recipe ma
 .\scripts\Invoke-MIRExtendedTests.ps1 -Tier Static,Runtime,AuditSmoke -FailFast -FailOnAuditFailures
 ```
 
+**Targeted 2.1.0 release gate:**
+
+```powershell
+.\scripts\Invoke-MIRReleaseTargetedGate.ps1
+```
+
+This is the short release-candidate command. It runs the strict current-commit gate, the two harness repair smokes (`big-mining-drill` and `biolabs-in-space`), the representative local BZ Space Age suite, package rebuild, whitespace check, and clean-git-status check. Use the overnight local sweep separately for broader compatibility evidence.
+
 **Credentialed exploratory compatibility audits:**
 
 ```powershell
