@@ -45,6 +45,7 @@ Date: 2026-07-03
     - Added dedicated `Start-MIROvernightLocalSweep.ps1` and `Show-MIROvernightSummary.ps1` helpers so local Factorio 2.1 overnight sweeps no longer depend on fragile pasted one-liners and morning triage can be summarized from artifacts.
     - Added `Invoke-MIRReleaseTargetedGate.ps1` as a short release-candidate command for the strict current-commit gate, targeted harness repair smokes, representative BZ Space Age suite, package rebuild, and clean-git-status check.
     - Added the first `mir.ps1` developer CLI facade, shared `scripts/MIRCli/` helper modules, run profile fixtures, and local mod-library index scaffolding for the next compatibility-lab UX layer.
+    - Hardened package building so identical archive contents preserve the existing release zip instead of dirtying git with ZIP metadata churn during release gates.
     - Hardened overnight compatibility sweeps so blank Factorio log lines no longer crash audit-row parsing.
     - Hardened isolated compatibility load tests so installed official built-in mods are explicitly disabled unless a scenario requests them, and Space Age scenarios enable the complete official Space Age bundle.
     - Refined grouped audit failure semantics so successful load tests do not fail strict gates for normal missing-prototype stream skips or conservative unknown external recipe-productivity owner suppression.

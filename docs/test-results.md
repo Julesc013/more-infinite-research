@@ -19,6 +19,7 @@ Scope:
 - Added scenario-name filtering to the extended wrapper so a run profile can target one curated scenario without running the entire local-library matrix.
 - Removed global strict-mode side effects from the shared `MIRCli` modules so `mir.ps1` can safely delegate to the existing audit scripts.
 - Repaired grouped audit semantics so successful load checks do not fail strict gates merely because a stream intentionally skipped a missing required prototype in a base-only scenario, or because MIR conservatively suppressed itself under an unknown external recipe-productivity owner.
+- Hardened `Build-MIRPackage.ps1` so rebuilding an archive with identical entry contents preserves the existing zip instead of dirtying git through archive metadata churn.
 
 Commands:
 
@@ -27,6 +28,7 @@ Commands:
 .\scripts\mir.ps1 local-index build --mods 'C:\Projects\Factorio\testmods_readonly_2.1' --out '.\build\cache\local-mod-index\local-mod-index-smoke.json'
 .\scripts\mir.ps1 run -Profile local-bz-smoke
 .\scripts\Convert-MIRCompatAuditResults.ps1 -AuditDir '.\artifacts\release-targeted-rerun-20260704-190514\repair-smokes\local-mod-zips'
+.\scripts\Build-MIRPackage.ps1
 ```
 
 Results:
@@ -37,6 +39,7 @@ Results:
 - Re-converting the repair-smoke artifact changed the grouped result from `7` unexpected groups to `0` unexpected and `4` expected groups.
 - The remaining expected groups are conservative `unknown_external_owner` observations where MIR correctly suppresses Carbon and Ice productivity recipes that are already covered by `asteroid-productivity`.
 - The base-only `big-mining-drill` repair smoke no longer reports Space Age-only stream skips as failures.
+- Rebuilding `dist\more-infinite-research_2.1.0.zip` after the package-script fix reported `(unchanged)` and left the tracked archive clean.
 
 ## 2026-07-04 Targeted Release Gate Entrypoint
 
