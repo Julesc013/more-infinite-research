@@ -45,6 +45,11 @@ param(
 $ErrorActionPreference = "Stop"
 
 $repo = Resolve-Path (Join-Path $PSScriptRoot "..")
+. (Join-Path $PSScriptRoot "MIRCli\RunContext.ps1")
+. (Join-Path $PSScriptRoot "MIRCli\EventLog.ps1")
+. (Join-Path $PSScriptRoot "MIRCli\Artifacts.ps1")
+. (Join-Path $PSScriptRoot "MIRCli\Reports.ps1")
+
 $outputRootPath = if ([System.IO.Path]::IsPathRooted($OutputRoot)) {
   $OutputRoot
 } else {
@@ -57,6 +62,7 @@ $outputRootPath = (Resolve-Path -LiteralPath $outputRootPath).Path
 
 $results = @()
 $runtimeValidationRan = $false
+$runContext = $null
 
 function New-MIROutputDirectory {
   param([Parameter(Mandatory)][string]$Name)
@@ -90,28 +96,42 @@ function Invoke-MIRStep {
   $started = Get-Date
   $status = "passed"
   $message = ""
+  if ($null -ne $script:runContext) {
+    Write-MIREvent -Path $script:runContext.events_path -RunId $script:runContext.run_id -Kind "step_start" -Data @{
+      tier = $Name
+    }
+  }
   try {
     & $Action
   } catch {
     $status = "failed"
     $message = $_.Exception.Message
     if ($FailFast) {
-      $script:results += [ordered]@{
+      $failedResult = [ordered]@{
         name = $Name
         status = $status
         message = $message
         seconds = [math]::Round(((Get-Date) - $started).TotalSeconds, 2)
+      }
+      $script:results += $failedResult
+      if ($null -ne $script:runContext) {
+        Write-MIREvent -Path $script:runContext.events_path -RunId $script:runContext.run_id -Kind "step_result" -Level "error" -Data $failedResult
       }
       throw
     }
     Write-Warning "[extended] $Name failed: $message"
   }
 
-  $script:results += [ordered]@{
+  $result = [ordered]@{
     name = $Name
     status = $status
     message = $message
     seconds = [math]::Round(((Get-Date) - $started).TotalSeconds, 2)
+  }
+  $script:results += $result
+  if ($null -ne $script:runContext) {
+    $level = if ($status -eq "passed") { "info" } else { "error" }
+    Write-MIREvent -Path $script:runContext.events_path -RunId $script:runContext.run_id -Kind "step_result" -Level $level -Data $result
   }
   Write-Host "[extended] $Name $status"
 }
@@ -245,6 +265,22 @@ foreach ($entry in $Tier) {
   }
 }
 $expandedTiers = @($expandedTiers | Select-Object -Unique)
+
+$runContext = New-MIRRunContext `
+  -RepoRoot $repo.Path `
+  -RunKind "extended-tests" `
+  -OutputRoot $outputRootPath `
+  -FactorioBin $FactorioBin `
+  -Tiers $expandedTiers `
+  -LocalModDirs (@($LocalModZipDirs) + @($LocalModLibraryDirs)) `
+  -ScenarioTimeoutSeconds $ScenarioTimeoutSeconds `
+  -Offline ([bool]$Offline)
+Write-MIREvent -Path $runContext.events_path -RunId $runContext.run_id -Kind "run_start" -Data @{
+  tiers = @($expandedTiers)
+  output_root = $outputRootPath
+  collect_all = [bool]$CollectAll
+  fail_on_audit_failures = [bool]$FailOnAuditFailures
+}
 
 foreach ($entry in $expandedTiers) {
   switch ($entry) {
@@ -423,9 +459,28 @@ foreach ($result in $results) {
 $md -join "`n" | Set-Content -LiteralPath $summaryMd -Encoding UTF8
 
 $failed = @($results | Where-Object { $_.status -ne "passed" })
+Write-MIRArtifactIndex -Path $runContext.artifact_index_path -RunId $runContext.run_id -Files @{
+  manifest = "run-manifest.json"
+  events = "events.jsonl"
+  summary_md = "extended-summary.md"
+  summary_json = "extended-summary.json"
+  html = "index.html"
+} -Tiers @($expandedTiers | ForEach-Object {
+  [ordered]@{
+    name = $_
+    directory = ($_ -replace "([a-z])([A-Z])", '$1-$2').ToLowerInvariant()
+  }
+})
+$htmlPath = New-MIRHtmlReport -OutputRoot $outputRootPath -Title "MIR Extended Test Report"
+Write-MIREvent -Path $runContext.events_path -RunId $runContext.run_id -Kind "run_result" -Data @{
+  failed_steps = $failed.Count
+  summary = $summaryMd
+  html = $htmlPath
+}
 if ($failed.Count -gt 0) {
   throw "Extended tests completed with $($failed.Count) failed step(s). See $summaryMd"
 }
 
 Write-Host "[extended] wrote $summaryMd"
 Write-Host "[extended] wrote $summaryJson"
+Write-Host "[extended] wrote $htmlPath"

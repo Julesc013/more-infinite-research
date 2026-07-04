@@ -14,6 +14,16 @@ $logPath = Join-Path $resolvedOutputRoot "overnight.log"
 
 Write-Host "[summary] output root: $resolvedOutputRoot"
 
+$manifestPath = Join-Path $resolvedOutputRoot "run-manifest.json"
+$artifactIndexPath = Join-Path $resolvedOutputRoot "artifact-index.json"
+$htmlPath = Join-Path $resolvedOutputRoot "index.html"
+
+foreach ($path in @($manifestPath, $artifactIndexPath, $htmlPath)) {
+  if (Test-Path -LiteralPath $path) {
+    Write-Host "[summary] artifact: $path"
+  }
+}
+
 if (Test-Path -LiteralPath $logPath) {
   Write-Host ""
   Write-Host "## Overnight Log Tail"

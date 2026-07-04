@@ -409,12 +409,14 @@ The current overnight/local-library automation is usable. The next operational s
 - [x] Add timestamped status output with stable textual tokens such as `[RUN]`, `[STEP]`, `[SCEN]`, `[PASS]`, `[SKIP]`, `[TIME]`, and `[FAIL]`, with optional color controlled by `-ColorMode`, `-NoColor`, `-Quiet`, and `-CI`.
 - [x] Add `events.jsonl` helper support as a structured append-only event log for run start, tier start/result, scenario start/result, process start/result, timeout, dependency skip, and summary events.
 - [x] Add `run-manifest.json` helper support so each long run can record run ID, repo root, git branch/commit, Factorio binary/version, MIR version, selected tiers, offline/local library inputs, timeout, and pairwise settings.
+- [x] Wire `run-manifest.json` and `events.jsonl` into `Invoke-MIRExtendedTests.ps1` and `Start-MIROvernightLocalSweep.ps1`.
 - [ ] Add canonical scenario statuses such as `pending`, `running`, `passed`, `failed`, `timed_out`, `skipped_dependency`, `skipped_incompatible`, `expected_failure`, `unexpected_failure`, and `cancelled` while preserving existing booleans for compatibility.
 - [ ] Add `scenario-state.json` and first-class resume controls: `-Resume`, `-RerunFailed`, `-RerunTimedOut`, `-RerunSkipped`, `-RerunUnexpected`, and `-RerunScenarioNames`.
 - [ ] Extract Factorio process handling into a reusable process supervisor with timeout, process-tree cleanup, elapsed time, exit-code classification, failure-tail capture, and optional retry policy.
 - [ ] Add retry controls for transient cases only: `-MaxRetries`, `-RetryOnTimeout`, `-RetryOnExitCodes`, and `-RetryDelaySeconds`.
 - [x] Add `artifact-index.json` helper support so summary tooling can find manifests, transcripts, events, grouped failures, missing dependencies, profile candidates, and reports without path guessing.
 - [x] Add initial static `index.html` report generation support for run artifact folders.
+- [x] Wire `artifact-index.json` and `index.html` into extended-test and overnight-local output roots.
 - [ ] Add missing-dependency shopping-list artifacts such as `missing-dependencies.todo.md` and `missing-dependencies.download-plan.json`.
 - [x] Add initial cached local mod library index generation with zip SHA1, size/mtime, Factorio version, and dependencies.
 - [ ] Add optional `-LinkMode Copy|Hardlink|Symlink` for large local libraries, with safe fallback to copy when hardlinks/symlinks are unavailable.

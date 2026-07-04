@@ -6,7 +6,7 @@ function Write-MIREvent {
     [Parameter(Mandatory)][string]$RunId,
     [Parameter(Mandatory)][string]$Kind,
     [string]$Level = "info",
-    [hashtable]$Data = @{}
+    [System.Collections.IDictionary]$Data = @{}
   )
 
   $directory = Split-Path -Parent $Path

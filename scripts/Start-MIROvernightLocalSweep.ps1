@@ -14,6 +14,11 @@ param(
 $ErrorActionPreference = "Stop"
 
 $repo = Resolve-Path (Join-Path $PSScriptRoot "..")
+. (Join-Path $PSScriptRoot "MIRCli\RunContext.ps1")
+. (Join-Path $PSScriptRoot "MIRCli\EventLog.ps1")
+. (Join-Path $PSScriptRoot "MIRCli\Artifacts.ps1")
+. (Join-Path $PSScriptRoot "MIRCli\Reports.ps1")
+
 Set-Location -LiteralPath $repo
 
 function Resolve-MIROvernightPath {
@@ -60,6 +65,25 @@ $resolvedOutputRoot = Resolve-MIROvernightPath -Path $OutputRoot
 New-Item -ItemType Directory -Force -Path $resolvedOutputRoot | Out-Null
 $resolvedOutputRoot = (Resolve-Path -LiteralPath $resolvedOutputRoot).Path
 $logPath = Join-Path $resolvedOutputRoot "overnight.log"
+$plannedTiers = @()
+if (-not $SkipStrictGate) { $plannedTiers += "StrictGate" }
+if (-not $SkipLocalSweep) { $plannedTiers += @("LocalLibraryScenarios", "GeneratedLocalScenarios", "LocalModZips") }
+$runContext = New-MIRRunContext `
+  -RepoRoot $repo.Path `
+  -RunKind "overnight-local-2.1" `
+  -OutputRoot $resolvedOutputRoot `
+  -FactorioBin $resolvedFactorioBin `
+  -Tiers $plannedTiers `
+  -LocalModDirs @($resolvedLocalModDir) `
+  -ScenarioTimeoutSeconds $ScenarioTimeoutSeconds `
+  -Offline $true
+Write-MIREvent -Path $runContext.events_path -RunId $runContext.run_id -Kind "run_start" -Data @{
+  local_mod_dir = $resolvedLocalModDir
+  local_zip_count = $localZipCount
+  strict_gate = -not [bool]$SkipStrictGate
+  local_sweep = -not [bool]$SkipLocalSweep
+}
+$runStatus = "failed"
 
 Write-Host "[overnight] repo: $($repo.Path)"
 Write-Host "[overnight] Factorio: $resolvedFactorioBin"
@@ -69,6 +93,17 @@ Write-Host "[overnight] log: $logPath"
 
 if ($DryRun) {
   Write-Host "[overnight] dry run only; no validation or load tests will be started."
+  Write-MIREvent -Path $runContext.events_path -RunId $runContext.run_id -Kind "run_result" -Data @{
+    status = "dry_run"
+    output_root = $resolvedOutputRoot
+  }
+  Write-MIRArtifactIndex -Path $runContext.artifact_index_path -RunId $runContext.run_id -Files @{
+    manifest = "run-manifest.json"
+    events = "events.jsonl"
+    transcript = "overnight.log"
+    html = "index.html"
+  } -Tiers @()
+  New-MIRHtmlReport -OutputRoot $resolvedOutputRoot -Title "MIR Overnight Local Sweep" | Out-Null
   exit 0
 }
 
@@ -131,7 +166,30 @@ try {
   Write-Host ('  Get-ChildItem "{0}" -Recurse -Filter compat-summary.md' -f $resolvedOutputRoot)
   Write-Host ('  Get-ChildItem "{0}" -Recurse -Filter missing-dependencies.md' -f $resolvedOutputRoot)
   Write-Host ('  Get-ChildItem "{0}" -Recurse -Filter compat-failures.grouped.json' -f $resolvedOutputRoot)
+  $runStatus = "passed"
 } finally {
+  Write-MIRArtifactIndex -Path $runContext.artifact_index_path -RunId $runContext.run_id -Files @{
+    manifest = "run-manifest.json"
+    events = "events.jsonl"
+    transcript = "overnight.log"
+    html = "index.html"
+  } -Tiers @(
+    [ordered]@{
+      name = "release-gate"
+      summary = "release-gate\extended-summary.md"
+      grouped_failures = "release-gate\audit-smoke\compat-failures.grouped.json"
+    },
+    [ordered]@{
+      name = "local-sweep"
+      summary = "local-sweep\extended-summary.md"
+    }
+  )
+  $htmlPath = New-MIRHtmlReport -OutputRoot $resolvedOutputRoot -Title "MIR Overnight Local Sweep"
+  Write-MIREvent -Path $runContext.events_path -RunId $runContext.run_id -Kind "run_result" -Data @{
+    status = $runStatus
+    output_root = $resolvedOutputRoot
+    html = $htmlPath
+  }
   if ($transcriptStarted) {
     Stop-Transcript | Out-Null
   }

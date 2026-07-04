@@ -25,6 +25,23 @@ function New-MIRRunContext {
 
   $gitBranch = (& git -C $RepoRoot rev-parse --abbrev-ref HEAD 2>$null | Select-Object -First 1)
   $gitCommit = (& git -C $RepoRoot rev-parse HEAD 2>$null | Select-Object -First 1)
+  $mirVersion = ""
+  $infoPath = Join-Path $RepoRoot "info.json"
+  if (Test-Path -LiteralPath $infoPath) {
+    try {
+      $mirVersion = [string]((Get-Content -Raw -LiteralPath $infoPath | ConvertFrom-Json).version)
+    } catch {
+      $mirVersion = ""
+    }
+  }
+  $factorioVersion = ""
+  if (-not [string]::IsNullOrWhiteSpace($FactorioBin) -and (Test-Path -LiteralPath $FactorioBin)) {
+    try {
+      $factorioVersion = [string](& $FactorioBin --version 2>$null | Select-Object -First 1)
+    } catch {
+      $factorioVersion = ""
+    }
+  }
 
   $context = [ordered]@{
     schema = 1
@@ -36,6 +53,8 @@ function New-MIRRunContext {
     git_branch = [string]$gitBranch
     git_commit = [string]$gitCommit
     factorio_bin = $FactorioBin
+    factorio_version = $factorioVersion
+    mir_version = $mirVersion
     tiers = @($Tiers)
     local_mod_dirs = @($LocalModDirs)
     scenario_timeout_seconds = $ScenarioTimeoutSeconds

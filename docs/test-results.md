@@ -2,6 +2,45 @@
 
 This file records local release-candidate validation runs. It is not a substitute for the manual mod matrix in `docs/compatibility.md`.
 
+## 2026-07-04 CLI Artifact Polish
+
+Environment:
+
+- Branch: `dev`.
+- Mod version `2.1.0`.
+
+Scope:
+
+- Wired `run-manifest.json`, `events.jsonl`, `artifact-index.json`, and `index.html` into extended-test runs.
+- Wired the same artifact set into overnight local sweep runs, including dry runs.
+- Updated the overnight summary helper to print the manifest, artifact-index, and HTML report paths when present.
+- Updated README, architecture, compatibility docs, and TODO to describe the now-wired artifact outputs.
+
+Commands:
+
+```powershell
+.\scripts\mir.ps1 --help
+.\scripts\Invoke-MIRReleaseTargetedGate.ps1 -DryRun -NoGitPull -OutputRoot .\build\release-targeted-final-dry-run
+.\scripts\Start-MIROvernightLocalSweep.ps1 -DryRun -OutputRoot .\build\overnight-local-final-dry-run
+.\scripts\Invoke-MIRExtendedTests.ps1 -Tier Static -OutputRoot .\build\extended-static-final
+.\scripts\Invoke-MIRValidation.ps1 -StaticOnly
+.\scripts\Build-MIRPackage.ps1
+git diff --check
+```
+
+Results:
+
+- PowerShell parser checks passed for all scripts under `scripts/`.
+- `mir.ps1 --help` printed the expected command list.
+- `Invoke-MIRReleaseTargetedGate.ps1 -DryRun` resolved Factorio and the local `2.1` library with `150` zips.
+- `Start-MIROvernightLocalSweep.ps1 -DryRun` wrote `run-manifest.json`, `events.jsonl`, `artifact-index.json`, and `index.html`.
+- The overnight dry-run manifest recorded `dev`, MIR `2.1.0`, Factorio `2.1.9`, and the selected local sweep tiers.
+- `Invoke-MIRExtendedTests.ps1 -Tier Static` passed and wrote extended summary, manifest, events, artifact index, and HTML.
+- `Show-MIROvernightSummary.ps1` printed the new artifact paths for the dry-run output root.
+- `Invoke-MIRValidation.ps1 -StaticOnly` passed.
+- `Build-MIRPackage.ps1` rebuilt `dist\more-infinite-research_2.1.0.zip` after packaged docs and script changes.
+- `git diff --check` passed.
+
 ## 2026-07-04 Changelog Formatting Guardrail
 
 Environment:
