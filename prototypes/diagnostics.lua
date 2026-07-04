@@ -1,7 +1,8 @@
 local D = {}
-local lookup = require("prototypes.lib.prototype-lookup")
+local icons = require("prototypes.lib.technology-icons")
 
 local rows = {}
+local audit_rows = {}
 local match_rows = {}
 local recipe_to_streams = {}
 
@@ -35,25 +36,19 @@ local function effect_count(effects)
 end
 
 local function icon_hint(spec)
-  if spec.icons then return "custom-icons" end
-  if spec.icon then return spec.icon end
-  if spec.icon_techs then
-    for _, name in ipairs(spec.icon_techs) do
-      if (data.raw.technology or {})[name] then return "tech:" .. name end
-      if lookup.item_prototype(name) then return "item:" .. name end
-    end
-    return "tech:" .. tostring(spec.icon_techs[1])
-  end
-  if spec.icon_tech then return "tech:" .. spec.icon_tech end
-  if spec.icon_item then return "item:" .. spec.icon_item end
-  if spec.items and spec.items[1] then return "item:" .. spec.items[1] end
-  return "fallback"
+  return icons.icon_source_for_stream(spec or {})
 end
 
 local function append(kind, row)
   if not D.enabled() then return end
   row.kind = kind
   table.insert(rows, row)
+
+  local audit_row = {schema = 1, kind = kind}
+  for field, value in pairs(row) do
+    audit_row[field] = value
+  end
+  table.insert(audit_rows, audit_row)
 end
 
 function D.stream(row)
@@ -66,6 +61,10 @@ end
 
 function D.native_modifier_overlap(row)
   append("native_modifier_overlap", row)
+end
+
+function D.recipe_owner(row)
+  append("recipe_owner", row)
 end
 
 function D.recipe_matches(key, buckets)
@@ -90,8 +89,8 @@ function D.record_recipe_match(key, recipe_name)
   table.insert(recipe_to_streams[recipe_name], key)
 end
 
-function D.stream_fields(key, spec, status, reason, ingredients, prerequisites, effects, lab_status)
-  return {
+function D.stream_fields(key, spec, status, reason, ingredients, prerequisites, effects, lab_status, extra)
+  local row = {
     key = key,
     status = status,
     reason = reason,
@@ -101,6 +100,10 @@ function D.stream_fields(key, spec, status, reason, ingredients, prerequisites, 
     lab_status = lab_status or "full",
     icon = icon_hint(spec or {})
   }
+  for field, value in pairs(extra or {}) do
+    row[field] = value
+  end
+  return row
 end
 
 function D.extension_fields(key, status, reason, ingredients, prerequisites, effects, lab_status)
@@ -117,7 +120,36 @@ end
 
 local function row_sort(a, b)
   if a.kind ~= b.kind then return a.kind < b.kind end
+  if tostring(a.key or "") ~= tostring(b.key or "") then
+    return tostring(a.key or "") < tostring(b.key or "")
+  end
+  if tostring(a.recipe or "") ~= tostring(b.recipe or "") then
+    return tostring(a.recipe or "") < tostring(b.recipe or "")
+  end
   return tostring(a.key or "") < tostring(b.key or "")
+end
+
+local function audit_value(value)
+  local text = tostring(value or "")
+  text = string.gsub(text, "\\", "\\\\")
+  text = string.gsub(text, "\r", "\\r")
+  text = string.gsub(text, "\n", "\\n")
+  text = string.gsub(text, "\t", "\\t")
+  if string.find(text, "%s") then
+    text = '"' .. string.gsub(text, '"', '\\"') .. '"'
+  end
+  return text
+end
+
+local function audit_fields(row)
+  local fields = {}
+  for field, _ in pairs(row or {}) do
+    if field ~= "kind" and field ~= "schema" then
+      table.insert(fields, field)
+    end
+  end
+  table.sort(fields)
+  return fields
 end
 
 function D.flush()
@@ -136,9 +168,29 @@ function D.flush()
         .. " icon=" .. tostring(row.icon or "")
         .. " effect=" .. tostring(row.effect or "")
         .. " target=" .. tostring(row.target or "")
-        .. " owners=" .. tostring(row.owners or ""))
+        .. " owners=" .. tostring(row.owners or "")
+        .. " recipe=" .. tostring(row.recipe or "")
+        .. " owner_kinds=" .. tostring(row.owner_kinds or "")
+        .. " owner_actions=" .. tostring(row.owner_actions or "")
+        .. " recipes=" .. tostring(row.recipes or ""))
     end
     log("[more-infinite-research] Generation report end")
+  end
+
+  if D.enabled() and #audit_rows > 0 then
+    table.sort(audit_rows, row_sort)
+    log("[more-infinite-research] Audit report start (" .. tostring(#audit_rows) .. " rows)")
+    for _, row in ipairs(audit_rows) do
+      local parts = {
+        "schema=" .. audit_value(row.schema),
+        "kind=" .. audit_value(row.kind)
+      }
+      for _, field in ipairs(audit_fields(row)) do
+        table.insert(parts, field .. "=" .. audit_value(row[field]))
+      end
+      log("[more-infinite-research] audit " .. table.concat(parts, " "))
+    end
+    log("[more-infinite-research] Audit report end")
   end
 
   if D.recipe_matches_enabled() and #match_rows > 0 then

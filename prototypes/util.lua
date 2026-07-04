@@ -1,5 +1,6 @@
 local C = require("prototypes.config")
 local defaults = require("defaults")
+local settings_resolver = require("prototypes.settings-resolver")
 
 local deepcopy = require("prototypes.lib.deepcopy")
 local lookup = require("prototypes.lib.prototype-lookup")
@@ -10,6 +11,7 @@ local recipes = require("prototypes.lib.recipe-matching")
 local U = {}
 
 U.item_prototype = lookup.item_prototype
+U.fluid_prototype = lookup.fluid_prototype
 U.technology_exists = lookup.technology_exists
 U.ammo_category_exists = lookup.ammo_category_exists
 U.is_space_age = lookup.is_space_age
@@ -34,18 +36,29 @@ U.matches_stream_recipe_filter = recipes.matches_stream_recipe_filter
 local STREAM_EXTRA_PACKS = {
   research_concrete = {"space-science-pack"},
   research_furnace = {"metallurgic-science-pack"},
+  research_landfill = {"metallurgic-science-pack", "space-science-pack"},
+  research_artificial_soil = {"agricultural-science-pack", "space-science-pack"},
+  research_molten_metals = {"metallurgic-science-pack"},
   research_mining_drill = {"metallurgic-science-pack"},
-  research_stone_products = {"metallurgic-science-pack", "space-science-pack"},
   research_walls = {"military-science-pack", "space-science-pack"},
   research_grenades = {"military-science-pack", "space-science-pack"},
   research_rails = {"space-science-pack"},
   research_electric_energy = {"electromagnetic-science-pack"},
 
-  research_breeding = {"agricultural-science-pack"},
+  research_breeding = {"agricultural-science-pack", "cryogenic-science-pack"},
   research_plastic = {"agricultural-science-pack"},
   research_rocket_fuel = {"agricultural-science-pack"},
+  research_thruster_fuel_productivity = {"space-science-pack", "agricultural-science-pack"},
+  research_thruster_oxidizer_productivity = {"space-science-pack", "agricultural-science-pack"},
+  research_oil_processing_productivity = {"cryogenic-science-pack"},
+  research_oil_cracking_productivity = {"agricultural-science-pack"},
+  research_lubricant_productivity = {"electromagnetic-science-pack"},
+  research_sulfuric_acid_productivity = {"metallurgic-science-pack"},
+  research_bacteria_cultivation = {"agricultural-science-pack", "cryogenic-science-pack"},
   research_bioflux = {"agricultural-science-pack"},
+  research_carbon = {"space-science-pack"},
   research_carbon_fiber = {"agricultural-science-pack"},
+  research_ice = {"space-science-pack"},
   research_rockets = {"agricultural-science-pack", "military-science-pack"},
 
   research_sulfur = {"metallurgic-science-pack"},
@@ -117,9 +130,7 @@ local function coerce_max_level(value)
 end
 
 function U.enabled_for(key, spec)
-  local s = settings and settings.startup and settings.startup["ips-enable-" .. key]
-  if s ~= nil then return s.value end
-  return lookup_default(key, "enabled", spec, true)
+  return settings_resolver.stream_enabled(key, spec)
 end
 
 function U.base_cost_for(key, spec)

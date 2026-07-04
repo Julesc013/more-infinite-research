@@ -1,14 +1,14 @@
 local M = {}
+local settings_resolver = require("control.settings-resolver")
 
 M.technology_name = "recipe-prod-research_agricultural_growth_speed-1"
-M.setting_name = "ips-enable-research_agricultural_growth_speed"
+M.stream_key = "research_agricultural_growth_speed"
 
 local PER_LEVEL = 1.01
 local MAX_MULTIPLIER = 10
 
 local function feature_enabled()
-  local setting = settings.startup[M.setting_name]
-  return setting and setting.value == true
+  return settings_resolver.stream_enabled(M.stream_key)
 end
 
 local function state()
@@ -33,6 +33,7 @@ end
 
 local function refresh_force_state(log_debug)
   local data = state()
+  local enabled = feature_enabled()
   data.force_multipliers = {}
   for force_name, force in pairs(game.forces) do
     if force_name ~= "enemy" and force_name ~= "neutral" then
@@ -44,7 +45,9 @@ local function refresh_force_state(log_debug)
     end
   end
 
-  if log_debug then log_debug("agricultural growth speed force state refreshed") end
+  if log_debug then
+    log_debug("agricultural growth speed force state refreshed enabled=" .. tostring(enabled))
+  end
 end
 
 local function read_tick_grown(plant)

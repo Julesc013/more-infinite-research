@@ -10,19 +10,22 @@ More Infinite Research is organized around a compatibility-first data-stage pipe
 
 `data-final-fixes.lua` runs the actual generation pipeline:
 
-1. Generated stream technology creation.
-2. Known competing recipe-productivity cleanup based on actual generated MIR effects.
-3. Known competing base-extension cleanup when MIR's matching base extension is enabled.
-4. Base technology infinite extensions.
-5. Weapon speed overlap adjustment for generated continuations.
-6. Max-level enforcement.
-7. Optional diagnostics report flush.
+1. Startup-only prototype passes such as the opt-in pipeline extent multiplier.
+2. Known competing recipe-productivity preparation from active compatibility profiles.
+3. Generated stream technology creation, with recipe-productivity ownership delegated to compatibility owner and adoption modules.
+4. Known competing recipe-productivity cleanup based on actual generated MIR effects.
+5. Known competing base-extension cleanup when MIR's matching base extension is enabled.
+6. Base technology infinite extensions.
+7. Weapon speed overlap adjustment for generated continuations.
+8. Max-level enforcement.
+9. Generated-technology effect safety validation.
+10. Optional diagnostics and audit report flush.
 
 This order gives the mod the best practical view of recipes, labs, science packs, and technologies created by other mods while still keeping this mod's final cleanup deterministic.
 
 ## Control Stage Boundary
 
-The current source includes a small `control.lua` surface for scripted technologies such as spoilage preservation and agricultural growth speed. These runtime features remain default-off candidates because they are bounded and event-driven, but each claimed behavior must pass the named manual save validation before default enablement. Any behavior that fails proof moves to later current-line work.
+The current `dev` branch includes a small `control.lua` surface for scripted technologies such as spoilage preservation and agricultural growth speed. These runtime features ship as disabled-by-default experimental candidates because they are bounded and event-driven. Stronger behavior claims, default enablement, or broad existing-save guarantees still require the named manual save validation.
 
 The runtime layer is intentionally narrow:
 
@@ -48,6 +51,7 @@ Current control files:
 Current migrations:
 
 - `migrations/more-infinite-research_2.0.5.json`: maps the removed generated character trash-slot technology ID into the combined inventory/trash technology ID.
+- `migrations/more-infinite-research_2.1.0.json`: maps the retired generated stone-product productivity technology ID into the new landfill productivity technology ID.
 
 ### Scripted Runtime Storage
 
@@ -69,21 +73,46 @@ Spoilage preservation recomputes from the stored baseline on init, configuration
 - `level`: completed agricultural growth speed levels for that force.
 - `multiplier`: the force's clamped growth multiplier.
 
-Agricultural growth speed refreshes this force state on init, configuration changes, research finish, research reversal, and technology-effect resets. The current `v2.0.5` candidate only applies the multiplier at `on_tower_planted_seed`; it does not rescan existing plants.
+Agricultural growth speed refreshes this force state on init, configuration changes, research finish, research reversal, and technology-effect resets. The current candidate only applies the multiplier at `on_tower_planted_seed`; it does not rescan existing plants.
 
 ## Utility Modules
 
 `prototypes/util.lua` is a facade kept for compatibility with existing call sites. Domain logic lives in focused modules:
 
-- `prototypes/lib/prototype-lookup.lua`: item-like prototype lookup, technology existence, ammo-category existence, Space Age detection.
+- `prototypes/lib/prototype-lookup.lua`: item-like and fluid prototype lookup, technology existence, ammo-category existence, Space Age detection.
 - `prototypes/lib/science-packs.lua`: lab-input discovery, science-pack existence, end-game science-pack selection, lab-compatible ingredient validation, science-pack unlock prerequisites, ordered pack lists.
-- `prototypes/lib/recipe-matching.lua`: item-output matching, item-pattern expansion, recipe category matching, hidden/recycling filtering.
-- `prototypes/lib/technology-icons.lua`: borrowed icon copying, technology/item icon fallback, Wube-style constant overlays.
+- `prototypes/lib/recipe-matching.lua`: item/fluid-output matching, output-pattern expansion, recipe category matching, hidden/recycling filtering.
+- `prototypes/lib/technology-icons.lua`: borrowed icon copying, explicit `icon_candidates` resolution, legacy technology/item/fluid icon fallback, Wube-style constant overlays.
 - `prototypes/lib/deepcopy.lua`: shared fallback for data-stage deep copies.
 - `prototypes/lib/table-utils.lua`: deterministic table-key ordering helpers.
 - `prototypes/lib/technology-cleanup.lua`: technology removal with prerequisite reference cleanup.
+- `prototypes/compat/productivity-owners.lua`: shared recipe-productivity owner classification, recipe allow-productivity checks, and owner record formatting.
+- `prototypes/compat/productivity-family-adoption.lua`: data-stage adoption of safe residual recipes into configured existing productivity families plus the adoption signature mod-data.
+- `prototypes/compat/competing-productivity.lua`: profile-driven replacement of known fully covered competing infinite recipe-productivity technologies.
+- `prototypes/technology-effect-safety.lua`: blocks unsafe native effect types from MIR-generated technologies.
 
 Keep new domain behavior in these modules rather than growing `util.lua`.
+
+## Icon Asset Boundary
+
+Generated technologies may borrow icon layers from active prototypes and then add
+MIR's own effect-type badge. The `dev` line supports explicit `icon_candidates`
+for ordered technology/item/icon fallback, but keeps the package boundary strict:
+
+- use official DLC technology or item art when the relevant DLC mod is loaded
+  and the active prototype provides that icon;
+- optionally use direct official DLC icon paths such as `__space-age__` or
+  `__elevated-rails__` in base-only games only when the user enables
+  `mir-use-installed-space-age-icons`;
+- otherwise fall back to base-game technology or item art, MIR-owned local art,
+  or another clearly redistributable asset when Space Age is not loaded;
+- do not copy original Space Age PNGs or other DLC assets into MIR as base-only
+  fallbacks;
+- require any MIR-packaged local art to have an explicit source/license note and
+  package-validation coverage.
+
+This keeps the OEM-plus look when the relevant Wube content is present without
+turning MIR into a redistributable Space Age art cache.
 
 ## Stream Configuration
 
@@ -101,6 +130,12 @@ Future expansion should add more stream domain modules rather than returning to 
 
 Generated recipe-productivity streams can set `dynamic_items_from_lab_inputs = true` when their target item set should include every active lab input discovered during `data-final-fixes.lua`. The science-pack productivity stream uses this so custom science packs can receive productivity effects without hard-coded mod dependencies. If a future dynamic stream uses top-level `items` without `groups`, those items are copied into the generated group before lab inputs are appended.
 
+Fluid-output productivity streams use the same recipe-productivity generator as item streams. They should be split by recipe ownership/process family, not by every output fluid name. Multi-output recipes such as oil processing belong to one owner stream; conversion families such as oil cracking, lubricant, sulfuric acid and acid neutralization, and thruster fuel/oxidizer can be separate streams when their recipes do not overlap.
+
+Direct-effect stream and base-extension generation must pass through `prototypes/technology-effect-safety.lua`. MIR must not add `character-item-pickup-distance` or `character-loot-pickup-distance` effects to any generated technology; large pickup radii can vacuum belt items into the player inventory and cause severe lag.
+
+`mir-pipeline-extent-multiplier` is deliberately not research. It is a startup-only prototype pass in `prototypes/pipeline-extent.lua` because `FluidBox.max_pipeline_extent` is resolved from prototypes during load. The dropdown values and parser live in `prototypes/pipeline-extent-settings.lua`. The pass is loaded only when the parsed startup setting is not `100%`; at the default `100%`, MIR reads the setting gate and does not load the pipeline module, scan `data.raw`, log pipeline work, or mutate fluid boxes.
+
 ## Compatibility Profiles
 
 `prototypes/compat/profiles.lua` is the dedicated home for mod-specific stream patches.
@@ -108,6 +143,8 @@ Generated recipe-productivity streams can set `dynamic_items_from_lab_inputs = t
 Use profiles when a compatibility rule is tied to a known mod being active. Use general stream config only for behavior that should apply to every mod set.
 
 Profile patches should use append fields such as `append_items`, `append_item_patterns`, `append_recipe_patterns`, `append_exclude_recipe_patterns`, `append_exclude_ingredient_patterns`, and `append_groups` when extending existing stream arrays. Direct field assignment remains available for intentional overrides.
+
+Profiles can also declare `known_competing_productivity.tech_patterns` for mods whose infinite recipe-productivity technologies are safe to replace only when every effect is covered by enabled MIR streams. The profile declares the known competitor shape; the data-stage replacement module still proves coverage before it ignores or removes anything.
 
 Profiles are applied from `settings.lua` as well as the data stage, so profile entries must stay declarative. Do not inspect `data.raw` from profiles; prototype-dependent compatibility belongs in `data-updates.lua` or `data-final-fixes.lua`.
 
@@ -129,9 +166,11 @@ Weapon-speed overlap handling is intentionally narrower than general compatibili
 
 Use this setting when triaging user reports. It is off by default to avoid noisy logs.
 
+When `mir-debug-generation-report` is enabled, MIR also emits an `Audit report` block with stable `audit schema=1 kind=...` rows. These rows mirror stream, extension, native-overlap, and recipe-owner decisions in a parser-friendly key/value format for `scripts/Invoke-MIRCompatAudit.ps1` and future large-mod compatibility sweeps.
+
 `mir-debug-recipe-matches` logs matched recipe names per generated productivity stream. When either diagnostics setting is enabled, duplicate recipe matches across streams are also reported as non-blocking warnings.
 
-Native modifier overlap diagnostics are also non-blocking. They report that another infinite non-MIR technology already has the same native direct-effect identity, such as `cargo-landing-pad-count` or `max-cargo-bay-unloading-distance`, but they do not skip, merge, or mutate either technology in `v2.0.5`.
+Native modifier overlap diagnostics are also non-blocking. They report that another infinite non-MIR technology already has the same native direct-effect identity, such as `cargo-landing-pad-count` or `max-cargo-bay-unloading-distance`, but they do not skip, merge, or mutate either technology in `v2.1.0`.
 
 ## Progression Settings
 
@@ -148,17 +187,31 @@ Use `scripts/Invoke-MIRValidation.ps1 -StaticOnly` for static checks.
 
 Use `scripts/Invoke-MIRValidation.ps1 -FactorioBin C:\path\to\factorio.exe` for a runtime fixture load test.
 
+Use `scripts/Invoke-MIRCompatAudit.ps1` for mod-portal driven compatibility cataloging. It writes generated lock/report artifacts under an ignored output directory, uses `fixtures/compat-matrix/` for committed scenario intent, executes manual scenarios with `-RunManualScenarios`, generates local-library stress scenarios with `-RunGeneratedLocalScenarios`, resumes or shards prior locks with `-FromLockfile`, `-StartIndex`, `-Count`, and `-CandidateNames`, resolves supplied local root/library zips before Mod Portal metadata, supports `-Offline` for read-only local library sweeps, applies a per-scenario Factorio timeout, skips unresolved dependency scenarios before load testing unless `-ContinueOnDependencyFailure` is set, checkpoints load results after each scenario, and downloads third-party mods only when credentials are provided explicitly.
+
+The compatibility runner writes isolated mod lists rather than inheriting the user's normal Factorio enabled-mod state. Official built-ins are listed explicitly and disabled unless the scenario needs them; requiring `space-age` expands to the full official bundle. Parsed audit rows are tolerant of blank log lines so checkpointed overnight results can still be converted after interrupted runs.
+
+Use `scripts/Convert-MIRCompatAuditResults.ps1` after load-test runs to group failures into actionable buckets and emit `compat-failures.grouped.json`, `compat-summary.md`, `profile-candidates.json`, and `missing-dependencies.*`. The grouped output records total, expected, and unexpected failure counts. Expected failures mostly come from reviewed rules in `fixtures/compat-matrix/expected-failures.json`; successful-load audit observations that represent MIR's intentional conservative behavior, such as missing-prototype stream skips and unknown-external-owner suppression, are also kept non-blocking by default.
+
+Use `scripts/New-MIRCompatProfileStub.ps1` only to generate review-required Lua stubs from grouped audit evidence. Generated stubs are not enabled profiles.
+
+Use `scripts/Invoke-MIRExtendedTests.ps1` as the wrapper for repeatable tiers such as `Static`, `Runtime`, `AuditSmoke`, `Top25Base`, `Top25SpaceAge`, `ManualScenarios`, `LocalModZips`, `LocalLibraryScenarios`, `GeneratedLocalScenarios`, and opt-in sharded `Full10K*` runs. `scripts/Start-MIROvernightLocalSweep.ps1` is the safer human-facing entrypoint for the local Factorio `2.1` offline zip-library sweep; it validates paths, starts a transcript, runs the strict release gate, then delegates to the extended wrapper for the prioritized local tiers. Both wrappers now emit self-describing run artifacts: `run-manifest.json`, `events.jsonl`, `artifact-index.json`, and `index.html`. `scripts/Show-MIROvernightSummary.ps1` is the matching morning triage helper for grouped failures, missing dependencies, profile-candidate counts, and artifact paths. `AuditSmoke` uses the deterministic `space-age-baseline` manual-scenario metadata path so strict gates do not depend on volatile catalog ordering. `-CollectAll` is the exploratory/overnight mode. `-FailFast -FailOnAuditFailures` is the strict gate mode, where grouped unexpected audit failures make the wrapper fail. The self-hosted workflow calls this wrapper rather than duplicating audit logic in YAML.
+
+Use `scripts/mir.ps1` as the stable developer-facing command facade. It keeps existing scripts as implementation details and adds memorable verbs for release gates, overnight local sweeps, local/top-25 audits, reports, package builds, profile stubs, run profiles, and local mod-library indexing. Shared operational helpers live under `scripts/MIRCli/`; they are the beginning of a reusable console, run-context, event-log, process, checkpoint, artifact, report, path, power, and local-index layer.
+
 Use `scripts/Build-MIRPackage.ps1` to rebuild the release archive when preparing an upload. Static validation builds an ignored validation archive from the current source tree and checks the archive root, metadata, load-critical entry files, locale files, migrations, and forbidden artifact paths.
 
 Static package validation also recursively compares packaged files from the current source tree against the repository copy for the packaged source directories. Documentation and helper modules may be moved or nested inside their packaged trees without changing validation; the test follows the current tree instead of a fixed old layout. Text files are compared with normalized line endings so CI checkout settings do not create false failures; binary files are still compared by SHA-256.
 
-Static validation also checks Factorio changelog formatting, including the required 99-dash section separators and an entry for the current `info.json` version.
+Static validation also checks Factorio changelog formatting, including the required 99-dash section separators, the current `info.json` version, the changelog-only 132-character line cap, and blocked internal-process wording.
 
-Static validation checks every local fixture directory has `info.json`, a `mir-fixture-*` mod name, and at least one data-stage entry file.
+Static validation checks every loadable local fixture directory has `info.json`, a `mir-fixture-*` mod name, and at least one data-stage entry file. Non-mod audit inputs under `fixtures/compat-matrix/` and `fixtures/run-profiles/` are excluded from fixture-mod validation.
 
 Static validation rejects runtime tick handlers in `control.lua` and `control/**/*.lua`.
 
-The fixture mods under `fixtures/` test custom science packs, custom labs, late recipe creation, the default `reduce` lab incompatibility behavior, the `skip` lab incompatibility behavior, science-pack ingredient policy modes, the end-game prerequisite gate, branch-gated cargo scenarios, finite vanilla-chain preservation, broad generation integrity, weapon-speed overlap safety, Omega-style drill productivity matching, and post-MIR assertions for runtime-sensitive generated technologies.
+Static validation also rejects unsafe pickup reach effect types outside the dedicated safety guard.
+
+The fixture mods under `fixtures/` test item-based science packs, custom labs, late recipe creation, the default `reduce` lab incompatibility behavior, the `skip` lab incompatibility behavior, science-pack ingredient policy modes, the end-game prerequisite gate, base-only cargo skip behavior, Space Age cargo logistics effect shape, Maraxis-like duplicate cargo modifier diagnostics, finite vanilla-chain preservation, broad generation integrity, unsafe pickup reach exclusion, weapon-speed overlap safety, Omega-style drill productivity matching, fluid-output productivity ownership, pipeline extent startup scaling, and post-MIR assertions for runtime-sensitive generated technologies.
 
 `mir-fixture-assert-generation-integrity` is the broad guardrail fixture. It runs after MIR in both base-only and Space Age runtime scenarios and verifies:
 
@@ -168,9 +221,10 @@ The fixture mods under `fixtures/` test custom science packs, custom labs, late 
 - every recipe has at most one infinite recipe-productivity owner;
 - vanilla Space Age productivity technologies remain authoritative for LDS, plastic, processing units, and rocket fuel;
 - circuit productivity ownership stays recipe-specific instead of relying on icon similarity.
+- no technology in the fixture environment carries the blocked character item-pickup or loot-pickup reach effects.
 
 Scripted technology validation must add existing-save load tests, research-finish/reversal tests, existing spoilable-stack tests, multi-force tests, and checks that the new effects remain event-driven rather than tick-scanned.
 
 For API proof status and unresolved API questions, see `docs/api-proof-points.md`.
 
-For named manual save scenarios, see `docs/manual-test-plan.md`.
+For named manual save scenarios, see `docs/notes/manual-test-plan.md`.

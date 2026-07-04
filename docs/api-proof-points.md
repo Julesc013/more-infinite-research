@@ -1,12 +1,12 @@
 # API Proof Points
 
-Updated: 2026-07-01
+Updated: 2026-07-03
 
 This ledger records API claims that affect release planning. Use it to avoid turning Reddit ideas or memory into implementation assumptions.
 
 Official Factorio API references should be rechecked before a release if the local Factorio version changes.
 
-Latest official API docs checked on 2026-07-01: `2.1.9`. Local runtime validation evidence in `docs/test-results.md` is still from Factorio `2.1.8`.
+Latest official API docs checked on 2026-07-03: `2.1.9`. Local runtime validation evidence in `docs/test-results.md` now includes Factorio `2.1.9`.
 
 ## Verified Or Locally Proven
 
@@ -20,7 +20,8 @@ Latest official API docs checked on 2026-07-01: `2.1.9`. Local runtime validatio
 | Base discharge defense uses `ammo_category = "electric"` | Local Factorio `2.1.8` base prototypes | Verified | Keep `electric` effect for discharge-defense-style equipment |
 | Vanilla tank cannon fire-rate bonuses are `gun-speed` effects for `cannon-shell` on finite `weapon-shooting-speed` technologies | Local Factorio `2.1.8` base prototypes | Verified | MIR overlap handling must preserve finite vanilla `cannon-shell` speed effects |
 | Base game locale does not provide every generated shooting-speed modifier string MIR needs | Local Factorio `2.1.8` base and Space Age locale files | Verified | MIR ships `flamethrower`, `electric`, and `tesla` shooting speed modifier descriptions |
-| Hidden optional dependencies use the `(?)` prefix and affect load order | Factorio mod structure docs | Verified | The main line declares `(?) quality >= 2.1.8` so module productivity can see Quality module recipes |
+| Hidden optional dependencies use the `(?)` prefix and affect load order | Factorio mod structure docs | Verified | The main line declares `(?) quality` so module productivity can see Quality module recipes when Quality is active without adding a separate version gate |
+| Hidden optional official DLC dependencies can stay out of the user-facing optional list when support is opportunistic | Factorio mod structure docs plus local metadata validation | Verified | The main line declares `(?) elevated-rails` without a separate version gate; Rail productivity covers Elevated Rails support/ramp recipes when those prototypes are active |
 | Quality module quality chance is stored on `ModulePrototype.effect.quality` | Factorio `ModulePrototype` and `Effect` docs plus local Quality prototypes | Verified | Quality module enrichment is prototype-stage, not a native infinite technology modifier |
 | Omega Drill style content adds the Omega Drill and Space Age Omega-Tau | Factorio mod portal page plus validation fixture | Locally covered by fixture | Mining drill productivity covers `omega-drill`, `omega-tau`, and broader visible modded drill recipe outputs |
 | Vanilla Space Age has infinite `processing-unit-productivity` | Local Factorio `2.1.8` Space Age prototypes | Verified | MIR skips parallel processing unit productivity in Space Age |
@@ -36,7 +37,19 @@ Latest official API docs checked on 2026-07-01: `2.1.9`. Local runtime validatio
 | Agricultural tower `owned_plants` can contain the same plant through multiple towers | Factorio `LuaEntity` docs | Verified | Existing plant rescale must dedupe plants |
 | `PumpPrototype.pumping_speed` controls pump throughput per tick | Factorio `PumpPrototype` docs | Verified | High-throughput pump is a clean prototype unlock candidate |
 | `FluidBox.max_pipeline_extent` is prototype-stage behavior | Factorio `FluidBox` docs | Verified | Pipeline extent belongs as a startup setting, not runtime research |
+| `FluidBox.max_pipeline_extent` applies to a pipeline through the minimum extent of all fluid boxes in that pipeline | Factorio `FluidBox` docs plus runtime pipeline fixture | Verified | MIR's current pipeline multiplier is a global fluidbox prototype extension, not only a pipe-entity extension |
+| `FluidBox` is used by many prototype classes, including pipes, pipe-to-ground, pumps, storage tanks, crafting machines, mining drills, generators, thrusters, and valves | Factorio `FluidBox` docs | Verified | Pipeline extent docs must warn that non-default values can affect machine/tank/thruster/modded fluid boxes |
 | Technology modifier list includes cargo landing pad count, cargo bay unloading distance, and recipe productivity | Factorio modifier docs | Verified | These are native modifier candidates where supported |
+| `change-recipe-productivity` is an official technology modifier type | Factorio modifier docs plus runtime fluid-productivity fixtures | Verified | Fluid-output productivity should stay native recipe productivity instead of runtime fluid scripting |
+| `change-recipe-productivity` is scoped by explicit recipe ID and `change`, not by output item family | Factorio `ChangeRecipeProductivityModifier` docs | Verified | Vanilla family adoption must append exact recipe effects to an existing owner technology |
+| `mod-data` prototypes can carry arbitrary prototype-stage data and are readable at runtime through `prototypes.mod_data` | Factorio `ModData` docs | Verified | The data stage can publish the productivity-family adoption signature for runtime migration handling |
+| `LuaForce.reset_technology_effects()` reapplies research effects while preserving technology research state | Factorio `LuaForce` docs | Verified | Existing saves can refresh newly adopted recipe effects, but the reset must be signature-guarded because custom force-state changes are lost |
+| `script.on_configuration_changed` runs when mod versions, mod lists, startup settings, prototypes, or migrations change | Factorio `LuaBootstrap` docs | Verified | Adding or removing a planet mod can trigger the adoption-signature refresh path |
+| Recipe results can be item or fluid product prototypes | Factorio `ProductPrototype` docs plus runtime fluid-productivity fixtures | Verified | Shared recipe matching can safely inspect fluid outputs as first-class recipe products |
+| Thrusters expose `fuel_fluid_box` and `oxidizer_fluid_box` as `FluidBox` prototype fields | Factorio `ThrusterPrototype` docs | Verified | Pipeline extent scanning can reach thruster fluid boxes; thruster productivity remains recipe-output productivity, not thrust mutation |
+| Fluid prototypes expose `icon`/`icons` fields | Factorio `FluidPrototype` docs | Verified | Fluid-output productivity streams can use fluid prototypes as icon candidates |
+| `change-recipe-productivity` works cleanly for thruster fuel/oxidizer fluid-output recipes | Runtime fixture asserts exact recipe ownership and no duplicate infinite owner on Factorio `2.1.9` | Locally proven | `v2.1.0` has automated release proof for the native recipe-productivity claim; non-default balance recommendations still need save-level soak |
+| `change-recipe-productivity` works cleanly for oil/fluid-output recipes | Runtime fixture asserts oil-processing, cracking, lubricant, sulfuric-acid, and Space Age acid-neutralisation ownership on Factorio `2.1.9` | Locally proven | `v2.1.0` has automated release proof for the native recipe-productivity claim; non-default balance recommendations still need save-level soak |
 
 ## Unknown Or Requires In-Game Test
 
@@ -47,8 +60,7 @@ Latest official API docs checked on 2026-07-01: `2.1.9`. Local runtime validatio
 | Existing partially spoiled stacks recalculate or keep fixed spoil deadlines | Save with partially spoiled stacks before research | v2.0.5 if claiming existing-stack behavior; otherwise document limitation |
 | Newly planted agricultural tower crops receive the growth-speed adjustment | Plant tower crops after research and compare `tick_grown` / observed growth time | v2.0.5 |
 | Existing agricultural tower plants can be rescaled safely | Research/reverse growth tech in a large farm and dedupe owned plants | v2.1.0 unless proven small |
-| `change-recipe-productivity` works cleanly for thruster fuel/oxidizer fluid recipes | Throwaway recipe-productivity test and runtime fixture | v2.1.x spike |
-| `change-recipe-productivity` works cleanly for oil/fluid-output recipes | Throwaway oil productivity test and runtime fixture | v2.1.x spike |
+| Pipeline extent multiplier has acceptable balance and compatibility impact in large/modded fluid networks | Long-running saves and modpack soak with non-default multiplier values | v2.1.0 if making stronger recommendation than default `100%` |
 | Factorio `2.0.x` exposes the agricultural tower events and fields needed by scripted agriculture | Validate on a Factorio `2.0.x` binary during legacy port | v1.9.0 |
 | Factorio `2.0.x` supports any later current-line pump/pipeline prototype fields | Validate on a Factorio `2.0.x` binary during the matching legacy port | v1.9.x after the feature ships |
 
@@ -56,15 +68,22 @@ Latest official API docs checked on 2026-07-01: `2.1.9`. Local runtime validatio
 
 - Mod structure: <https://lua-api.factorio.com/latest/auxiliary/mod-structure.html>
 - Modifier list: <https://lua-api.factorio.com/latest/types/Modifier.html>
+- `ChangeRecipeProductivityModifier`: <https://lua-api.factorio.com/latest/types/ChangeRecipeProductivityModifier.html>
+- `ModData`: <https://lua-api.factorio.com/latest/prototypes/ModData.html>
 - `NothingModifier`: <https://lua-api.factorio.com/latest/types/NothingModifier.html>
 - Migrations: <https://lua-api.factorio.com/latest/auxiliary/migrations.html>
 - Data lifecycle: <https://lua-api.factorio.com/latest/auxiliary/data-lifecycle.html>
 - Events: <https://lua-api.factorio.com/latest/events.html>
 - `LuaEntity`: <https://lua-api.factorio.com/latest/classes/LuaEntity.html>
 - `LuaItemStack`: <https://lua-api.factorio.com/latest/classes/LuaItemStack.html>
+- `LuaForce`: <https://lua-api.factorio.com/latest/classes/LuaForce.html>
+- `LuaBootstrap`: <https://lua-api.factorio.com/latest/classes/LuaBootstrap.html>
 - `DifficultySettings`: <https://lua-api.factorio.com/latest/concepts/DifficultySettings.html>
 - `PumpPrototype`: <https://lua-api.factorio.com/latest/prototypes/PumpPrototype.html>
 - `FluidBox`: <https://lua-api.factorio.com/latest/types/FluidBox.html>
+- `ThrusterPrototype`: <https://lua-api.factorio.com/latest/prototypes/ThrusterPrototype.html>
+- `ProductPrototype`: <https://lua-api.factorio.com/latest/types/ProductPrototype.html>
+- `FluidPrototype`: <https://lua-api.factorio.com/latest/prototypes/FluidPrototype.html>
 - `LuaTechnology`: <https://lua-api.factorio.com/latest/classes/LuaTechnology.html>
 - `ModulePrototype`: <https://lua-api.factorio.com/latest/prototypes/ModulePrototype.html>
 - `Effect`: <https://lua-api.factorio.com/latest/types/Effect.html>

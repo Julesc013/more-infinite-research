@@ -1,5 +1,6 @@
 local defaults = require("defaults")
 local cleanup = require("prototypes.lib.technology-cleanup")
+local settings_resolver = require("prototypes.settings-resolver")
 
 local M = {}
 
@@ -33,12 +34,8 @@ local function prefer_this_mod_for_competing_techs()
 end
 
 local function base_extension_enabled(key)
-  local value = startup_setting("mir-enable-" .. key)
-  if value ~= nil then return value ~= false end
-
   local spec = defaults.base_extensions and defaults.base_extensions[key] or {}
-  if spec.enabled ~= nil then return spec.enabled ~= false end
-  return true
+  return settings_resolver.base_enabled(key, spec)
 end
 
 local function has_prereq_candidate(tech, candidates)

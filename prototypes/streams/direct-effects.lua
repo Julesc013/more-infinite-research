@@ -10,6 +10,7 @@ return {
       "logistic-science-pack",
       "chemical-science-pack",
       "production-science-pack",
+      "space-science-pack",
       "agricultural-science-pack",
       "cryogenic-science-pack"
     },
@@ -32,7 +33,9 @@ return {
       "logistic-science-pack",
       "chemical-science-pack",
       "production-science-pack",
-      "agricultural-science-pack"
+      "agricultural-science-pack",
+      "electromagnetic-science-pack",
+      "cryogenic-science-pack"
     },
     direct_effects = {
       {
@@ -60,7 +63,11 @@ return {
   research_lab_productivity = {
     -- Space Age already owns the native infinite research-productivity chain.
     skip_if_technologies = {"research-productivity"},
-    icon_techs = {"research-productivity", "military-science-pack"},
+    icon_candidates = {
+      {technology = "research-productivity", required_mod = "space-age"},
+      {icon = "__space-age__/graphics/technology/research-productivity.png", icon_size = 256, inactive_mod_asset = "space-age"},
+      {technology = "military-science-pack"}
+    },
     overlay = "recipe-productivity",
     localised_description = {"technology-description.more-infinite-research.lab_productivity"},
     science_packs = {
@@ -81,7 +88,7 @@ return {
     icon_tech = "rocketry",
     science_packs = {
       "automation-science-pack","logistic-science-pack","chemical-science-pack",
-      "production-science-pack","military-science-pack","agricultural-science-pack"
+      "production-science-pack","military-science-pack","electromagnetic-science-pack"
     },
     direct_effects = {
       { type = "gun-speed", ammo_category = "rocket", modifier = 0.1 }
@@ -92,7 +99,7 @@ return {
     icon_item = "cannon-shell",
     science_packs = {
       "automation-science-pack","logistic-science-pack","chemical-science-pack",
-      "production-science-pack","military-science-pack","agricultural-science-pack"
+      "production-science-pack","military-science-pack","electromagnetic-science-pack"
     },
     direct_effects = {
       { type = "gun-speed", ammo_category = "cannon-shell", modifier = 0.1 }
@@ -112,7 +119,11 @@ return {
   },
 
   research_electric_shooting_speed = {
-    icon_techs = {"electric-weapons-damage-1", "discharge-defense-equipment"},
+    icon_candidates = {
+      {technology = "electric-weapons-damage-1", required_mod = "space-age"},
+      {icon = "__space-age__/graphics/technology/electric-weapons-damage.png", icon_size = 256, inactive_mod_asset = "space-age"},
+      {technology = "discharge-defense-equipment"}
+    },
     required_technologies = {"discharge-defense-equipment"},
     localised_description = {"technology-description.more-infinite-research.electric_shooting_speed"},
     science_packs = {

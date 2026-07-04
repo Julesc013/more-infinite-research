@@ -1,0 +1,14 @@
+{
+  "name": "mir-fixture-assert-vanilla-family-mixed-owner",
+  "version": "0.1.0",
+  "title": "MIR Fixture - Assert Vanilla Family Mixed Owner",
+  "author": "Julesc013",
+  "description": "Validation fixture that asserts mixed family owner changes fall back to MIR generation.",
+  "factorio_version": "2.0",
+  "dependencies": [
+    "base >= 2.0",
+    "space-age >= 2.1.8",
+    "mir-fixture-vanilla-family-mixed-owner",
+    "more-infinite-research"
+  ]
+}

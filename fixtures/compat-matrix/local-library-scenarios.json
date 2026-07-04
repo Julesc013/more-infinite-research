@@ -1,0 +1,180 @@
+{
+  "schema": 1,
+  "scenarios": [
+    {
+      "name": "local-2-1-space-age-planet-cluster",
+      "include_space_age": true,
+      "mods": [
+        "Cerys-Moon-of-Fulgora",
+        "corrundum",
+        "cubium",
+        "lignumis",
+        "Moshine",
+        "panglia_planet",
+        "Paracelsin",
+        "planet-muluna",
+        "rubia",
+        "secretas"
+      ],
+      "notes": "Locally available Factorio 2.1 Space Age planet cluster. Missing asset/library dependencies are reported as dependency-resolution failures until the local library is filled."
+    },
+    {
+      "name": "local-2-1-space-age-mega-smash",
+      "include_space_age": true,
+      "mods": [
+        "aai-industry",
+        "aai-loaders",
+        "big-mining-drill",
+        "biolabs-in-space",
+        "cargo-ships",
+        "Cerys-Moon-of-Fulgora",
+        "corrundum",
+        "cubium",
+        "factorioplus",
+        "FluidMustFlow",
+        "gleba-reborn",
+        "Krastorio2-spaced-out",
+        "kry-inserters",
+        "lignumis",
+        "Moshine",
+        "panglia_planet",
+        "Paracelsin",
+        "planet-muluna",
+        "planet-rabbasca",
+        "PlutoniumEnergy",
+        "rubia",
+        "secretas",
+        "SimpleSeablock",
+        "Small-Space-Age"
+      ],
+      "notes": "Deliberately aggressive Space Age smash test from locally collected 2.1 archives. It is expected to expose incompatibilities or missing dependency zips; grouped reports decide what is MIR-relevant."
+    },
+    {
+      "name": "local-2-1-space-age-mega-smash-with-resource-overhauls",
+      "include_space_age": true,
+      "mods": [
+        "bzcarbon",
+        "bzlead",
+        "bzsilicon",
+        "bztin",
+        "bztitanium",
+        "bzzirconium",
+        "ev-refining",
+        "mineral-chemistry",
+        "more-casting",
+        "RealisticOres",
+        "solar-productivity",
+        "xander-mod-shemp"
+      ],
+      "notes": "Aggressive recipe/resource ownership stress scenario. Some listed mods may intentionally conflict with Space Age and should be classified rather than hand-waived."
+    },
+    {
+      "name": "local-2-1-bz-suite-space-age",
+      "include_space_age": true,
+      "mods": [
+        "bzcarbon",
+        "bzlead",
+        "bzsilicon",
+        "bztin",
+        "bztitanium",
+        "bzzirconium"
+      ],
+      "notes": "Locally available BZ resource suite against the official Space Age bundle."
+    },
+    {
+      "name": "local-2-1-krastorio-spaced-out",
+      "include_space_age": true,
+      "mods": [
+        "Krastorio2-spaced-out",
+        "xy-k2so-enhancements-nulls-fork"
+      ],
+      "notes": "Local Krastorio 2 Spaced Out stack. The local library must include Krastorio2 assets and any required companion dependencies for this to load."
+    },
+    {
+      "name": "local-2-1-krastorio-base",
+      "include_space_age": false,
+      "mods": [
+        "Krastorio2",
+        "Krastorio2RFAC",
+        "krastorio2_extended_endgame"
+      ],
+      "notes": "Local Krastorio 2 base stack without Space Age."
+    },
+    {
+      "name": "local-2-1-bob-suite",
+      "include_space_age": false,
+      "mods": [
+        "bobassembly",
+        "bobelectronics",
+        "bobenemies",
+        "bobequipment",
+        "boblogistics",
+        "bobmining",
+        "bobmodules",
+        "bobores",
+        "bobplates",
+        "bobpower",
+        "bobrevamp",
+        "bobtech",
+        "bobwarfare"
+      ],
+      "notes": "Local Bob 3.0 suite. Requires boblibrary in the local library or online resolution."
+    },
+    {
+      "name": "local-2-1-planet-pack-wrapper-full",
+      "include_space_age": true,
+      "mods": [
+        "kry-all-planet-mods"
+      ],
+      "notes": "Local planet-pack wrapper. Recommended dependencies are included by the extended LocalLibraryScenarios tier."
+    },
+    {
+      "name": "local-2-1-planet-pack-wrapper-lite",
+      "include_space_age": true,
+      "mods": [
+        "kry-planet-mods-lite"
+      ],
+      "notes": "Local lite planet-pack wrapper. Recommended dependencies are included by the extended LocalLibraryScenarios tier."
+    },
+    {
+      "name": "local-2-1-factorioplus-space-age",
+      "include_space_age": true,
+      "mods": [
+        "factorioplus"
+      ],
+      "notes": "Large locally available content overhaul against the official Space Age bundle."
+    },
+    {
+      "name": "local-2-1-ev-refining-space-age",
+      "include_space_age": true,
+      "mods": [
+        "ev-refining"
+      ],
+      "notes": "Local refining/content scenario with Space Age enabled."
+    },
+    {
+      "name": "local-2-1-mineral-chemistry-space-age",
+      "include_space_age": true,
+      "mods": [
+        "mineral-chemistry"
+      ],
+      "notes": "Local mineral chemistry scenario for recipe and productivity ownership checks."
+    },
+    {
+      "name": "local-2-1-simple-seablock-space-age",
+      "include_space_age": true,
+      "mods": [
+        "SimpleSeablock"
+      ],
+      "notes": "Local SimpleSeablock scenario with Space Age enabled."
+    },
+    {
+      "name": "local-2-1-xander-base",
+      "include_space_age": false,
+      "mods": [
+        "xander-mod-shemp"
+      ],
+      "notes": "Local Xander scenario without Space Age because the mod declares a Space Age incompatibility."
+    }
+  ]
+}

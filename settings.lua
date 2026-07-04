@@ -1,5 +1,6 @@
 local C = require("prototypes.config")
 local defaults = require("defaults")
+local pipeline_extent_settings = require("prototypes.pipeline-extent-settings")
 
 local settings_data = {}
 local base_defaults = defaults.base_extensions or {}
@@ -99,6 +100,27 @@ table.insert(settings_data, {
 
 table.insert(settings_data, {
   type = "bool-setting",
+  name = "mir-use-installed-space-age-icons",
+  setting_type = "startup",
+  default_value = false,
+  order = "a-120",
+  localised_name = {"mod-setting-name.mir-use-installed-space-age-icons"},
+  localised_description = {"mod-setting-description.mir-use-installed-space-age-icons"}
+})
+
+table.insert(settings_data, {
+  type = "string-setting",
+  name = "mir-pipeline-extent-multiplier",
+  setting_type = "startup",
+  default_value = pipeline_extent_settings.default_value,
+  allowed_values = pipeline_extent_settings.allowed_values,
+  order = "a-130",
+  localised_name = {"mod-setting-name.mir-pipeline-extent-multiplier"},
+  localised_description = {"mod-setting-description.mir-pipeline-extent-multiplier"}
+})
+
+table.insert(settings_data, {
+  type = "bool-setting",
   name = "mir-debug-generation-report",
   setting_type = "startup",
   default_value = false,
@@ -131,14 +153,15 @@ local stream_sort_names = {
   research_advanced_circuit = "Advanced circuit productivity",
   research_agricultural_growth_speed = "Agricultural growth speed",
   research_armor_components = "Armor component productivity",
+  research_bacteria_cultivation = "Bacteria cultivation productivity",
   research_batteries = "Battery productivity",
   research_belts = "Transport belt productivity",
   research_bioflux = "Bioflux productivity",
   research_breeding = "Breeding productivity",
   research_bullets = "Bullet productivity",
   research_cannon_shooting_speed = "Cannon shooting speed",
-  research_cargo_bay_unloading_distance = "Cargo bay unloading distance",
-  research_cargo_landing_pad_count = "Cargo landing pad count",
+  research_artificial_soil = "Artificial soil productivity",
+  research_carbon = "Carbon productivity",
   research_carbon_fiber = "Carbon fiber productivity",
   research_character_crafting_speed = "Character crafting speed",
   research_character_mining_speed = "Character mining speed",
@@ -160,15 +183,21 @@ local stream_sort_names = {
   research_grenades = "Grenade productivity",
   research_heavy_ammo = "Cannon shell productivity",
   research_holmium = "Holmium productivity",
+  research_ice = "Ice productivity",
   research_inserters = "Inserter productivity",
   research_inventory_capacity = "Character inventory slots",
   research_iron = "Iron plate productivity",
   research_iron_sticks = "Iron stick productivity",
   research_lab_productivity = "Research productivity",
+  research_landfill = "Landfill productivity",
   research_lithium = "Lithium productivity",
   research_low_density_structure = "Low density structure productivity",
   research_mining_drill = "Mining drill productivity",
   research_modules = "Module productivity",
+  research_molten_metals = "Molten metals productivity",
+  research_lubricant_productivity = "Lubricant productivity",
+  research_oil_cracking_productivity = "Oil cracking productivity",
+  research_oil_processing_productivity = "Oil processing productivity",
   research_plastic = "Plastic productivity",
   research_processing_unit = "Processing unit productivity",
   research_quantum_processor = "Quantum processor productivity",
@@ -179,10 +208,12 @@ local stream_sort_names = {
   research_rockets = "Rocket productivity",
   research_science_pack_productivity = "Science pack productivity",
   research_spoilage_preservation = "Spoilage preservation",
-  research_stone_products = "Stone product productivity",
   research_sulfur = "Sulfur productivity",
+  research_sulfuric_acid_productivity = "Sulfuric acid productivity",
   research_supercapacitor = "Supercapacitor productivity",
   research_superconductor = "Superconductor productivity",
+  research_thruster_fuel_productivity = "Thruster fuel productivity",
+  research_thruster_oxidizer_productivity = "Thruster oxidizer productivity",
   research_tungsten = "Tungsten productivity",
   research_walls = "Wall productivity"
 }
@@ -341,7 +372,7 @@ for _, group in ipairs(technology_setting_groups) do
       name = "mir-enable-"..spec.key,
       setting_type = "startup",
       default_value = enabled_default,
-      order = order_prefix.."",
+      order = order_prefix.."-0",
       localised_name = {"mod-setting-name.mir-enable-base-tech", locale},
       localised_description = append_note({"mod-setting-description.mir-enable-base-tech", locale}, defaults_spec.settings_note)
     })

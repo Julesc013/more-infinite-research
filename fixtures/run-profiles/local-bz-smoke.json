@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "kind": "extended",
+  "tiers": ["LocalLibraryScenarios"],
+  "factorio_bin": "auto",
+  "local_mod_zip_dirs": ["C:\\Projects\\Factorio\\testmods_readonly_2.1"],
+  "local_mod_library_dirs": ["C:\\Projects\\Factorio\\testmods_readonly_2.1"],
+  "scenario_names": ["local-2-1-bz-suite-space-age"],
+  "local_mod_names": [],
+  "offline": true,
+  "collect_all": true,
+  "fail_on_audit_failures": true,
+  "scenario_timeout_seconds": 900
+}

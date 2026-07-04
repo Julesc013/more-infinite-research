@@ -7,9 +7,36 @@ return {
 
   research_electronic_circuit = { items={"electronic-circuit"}, icon_tech="electronics", exclude_ingredient_patterns={"scrap"} },
   research_advanced_circuit = { items={"advanced-circuit"}, icon_tech="advanced-circuit", exclude_ingredient_patterns={"scrap"} },
-  research_processing_unit = { items={"processing-unit"}, icon_techs={"processing-unit", "advanced-electronics-2"} },
+  research_processing_unit = {
+    items={"processing-unit"},
+    icon_candidates={
+      {icon="__space-age__/graphics/technology/processing-unit-productivity.png", icon_size=256, inactive_mod_asset="space-age"},
+      {technology="processing-unit"},
+      {technology="advanced-electronics-2"}
+    },
+    adopt_into_existing_productivity_tech = {
+      tech = "processing-unit-productivity",
+      products = {"processing-unit"},
+      require_infinite = true,
+      require_existing_recipe_productivity_effects = true,
+      change_policy = "copy-owner"
+    }
+  },
 
-  research_plastic = { items={"plastic-bar"}, icon_tech="plastics" },
+  research_plastic = {
+    items={"plastic-bar"},
+    icon_candidates={
+      {icon="__space-age__/graphics/technology/plastics-productivity.png", icon_size=256, inactive_mod_asset="space-age"},
+      {technology="plastics"}
+    },
+    adopt_into_existing_productivity_tech = {
+      tech = "plastic-bar-productivity",
+      products = {"plastic-bar"},
+      require_infinite = true,
+      require_existing_recipe_productivity_effects = true,
+      change_policy = "copy-owner"
+    }
+  },
   research_sulfur  = { items={"sulfur"}, icon_tech="sulfur-processing", exclude_ingredient_patterns={"asteroid"} },
   research_batteries = { items={"battery"}, icon_tech="battery", exclude_ingredient_patterns={"scrap"} },
   research_explosives = { items={"explosives"}, item_patterns={"^bio%-explosives$"}, icon_tech="explosives" },
@@ -18,19 +45,149 @@ return {
   research_electric_engine = { items={"electric-engine-unit"}, icon_tech="electric-engine" },
   research_flying_robot_frame = { items={"flying-robot-frame"}, icon_tech="robotics" },
 
-  research_low_density_structure = { items={"low-density-structure"}, icon_tech="low-density-structure" },
-  research_rocket_fuel = { items={"rocket-fuel"}, icon_tech="rocket-fuel" },
+  research_low_density_structure = {
+    items={"low-density-structure"},
+    icon_candidates={
+      {icon="__space-age__/graphics/technology/low-density-structure-productivity.png", icon_size=256, inactive_mod_asset="space-age"},
+      {technology="low-density-structure"}
+    },
+    adopt_into_existing_productivity_tech = {
+      tech = "low-density-structure-productivity",
+      products = {"low-density-structure"},
+      require_infinite = true,
+      require_existing_recipe_productivity_effects = true,
+      change_policy = "copy-owner"
+    }
+  },
+  research_rocket_fuel = {
+    items={"rocket-fuel"},
+    icon_candidates={
+      {icon="__space-age__/graphics/technology/rocket-fuel-productivity.png", icon_size=256, inactive_mod_asset="space-age"},
+      {technology="rocket-fuel"}
+    },
+    adopt_into_existing_productivity_tech = {
+      tech = "rocket-fuel-productivity",
+      products = {"rocket-fuel"},
+      require_infinite = true,
+      require_existing_recipe_productivity_effects = true,
+      change_policy = "copy-owner"
+    }
+  },
+
+  research_thruster_fuel_productivity = {
+    localised_name = {"technology-name.more-infinite-research.research_thruster_fuel_productivity"},
+    required_fluids = {"thruster-fuel"},
+    fluids = {"thruster-fuel"},
+    exclude_recipe_patterns = {"^empty%-.*%-barrel$"},
+    icon_candidates = {
+      {fluid = "thruster-fuel"},
+      {technology = "space-platform-thruster", required_mod = "space-age"},
+      {icon = "__space-age__/graphics/icons/fluid/thruster-fuel.png", icon_size = 64, inactive_mod_asset = "space-age"}
+    }
+  },
+
+  research_thruster_oxidizer_productivity = {
+    localised_name = {"technology-name.more-infinite-research.research_thruster_oxidizer_productivity"},
+    required_fluids = {"thruster-oxidizer"},
+    fluids = {"thruster-oxidizer"},
+    exclude_recipe_patterns = {"^empty%-.*%-barrel$"},
+    icon_candidates = {
+      {fluid = "thruster-oxidizer"},
+      {technology = "space-platform-thruster", required_mod = "space-age"},
+      {icon = "__space-age__/graphics/icons/fluid/thruster-oxidizer.png", icon_size = 64, inactive_mod_asset = "space-age"}
+    }
+  },
+
+  research_oil_processing_productivity = {
+    localised_name = {"technology-name.more-infinite-research.research_oil_processing_productivity"},
+    recipe_patterns = {
+      "^basic%-oil%-processing$",
+      "^advanced%-oil%-processing$",
+      "^coal%-liquefaction$",
+      "^simple%-coal%-liquefaction$"
+    },
+    icon_candidates = {
+      {technology = "advanced-oil-processing"},
+      {technology = "oil-processing"},
+      {icon = "__base__/graphics/icons/fluid/advanced-oil-processing.png", icon_size = 64}
+    }
+  },
+
+  research_oil_cracking_productivity = {
+    localised_name = {"technology-name.more-infinite-research.research_oil_cracking_productivity"},
+    recipe_patterns = {
+      "^heavy%-oil%-cracking$",
+      "^light%-oil%-cracking$"
+    },
+    icon_candidates = {
+      {technology = "oil-processing"},
+      {technology = "advanced-oil-processing"},
+      {icon = "__base__/graphics/icons/fluid/heavy-oil-cracking.png", icon_size = 64}
+    }
+  },
+
+  research_lubricant_productivity = {
+    localised_name = {"technology-name.more-infinite-research.research_lubricant_productivity"},
+    required_fluids = {"lubricant"},
+    fluids = {"lubricant"},
+    exclude_recipe_patterns = {"^empty%-.*%-barrel$"},
+    icon_candidates = {
+      {technology = "lubricant"},
+      {fluid = "lubricant"}
+    }
+  },
+
+  research_sulfuric_acid_productivity = {
+    localised_name = {"technology-name.more-infinite-research.research_sulfuric_acid_productivity"},
+    required_fluids = {"sulfuric-acid"},
+    fluids = {"sulfuric-acid"},
+    recipe_patterns = {
+      "^acid%-neutralisation$",
+      "^acid%-neutralization$"
+    },
+    exclude_recipe_patterns = {"^empty%-.*%-barrel$"},
+    icon_candidates = {
+      {fluid = "sulfuric-acid"},
+      {technology = "sulfur-processing"}
+    }
+  },
 
   research_tungsten = { items={"tungsten-plate","tungsten-carbide"}, icon_item="tungsten-plate", icon_tech="tungsten-processing" },
-  research_lithium = { items={"lithium-plate"}, icon_tech="lithium-processing" },
+  research_lithium = { icon_tech="lithium-processing", groups = {
+    { change = 0.10, items = { "lithium-plate" } },
+    { change = 0.05, items = { "lithium" }, recipe_patterns = { "^lithium$" } }
+  } },
   research_holmium = { items={"holmium-plate"}, icon_tech="holmium-processing" },
   research_supercapacitor = { items={"supercapacitor"}, icon_tech="supercapacitor" },
   research_superconductor = { items={"superconductor"}, icon_tech="superconductor" },
   research_quantum_processor = { items={"quantum-processor"}, icon_tech="quantum-processor" },
+  research_carbon = { icon_item="carbon", groups = {
+    { change = 0.10, items = { "carbon" }, recipe_patterns = {
+      "^carbonic%-asteroid%-crushing$",
+      "^advanced%-carbonic%-asteroid%-crushing$",
+      "^carbon$"
+    }, exclude_recipe_patterns = { "^burnt%-spoilage$" } },
+    { change = 0.05, recipe_patterns = { "^burnt%-spoilage$" } },
+    { change = 0.02, recipe_patterns = { "^coal%-synthesis$" } }
+  } },
   research_carbon_fiber = { items={"carbon-fiber"}, icon_tech="carbon-fiber" },
+  research_ice = { items={"ice"}, icon_item="ice", recipe_patterns = {
+    "^oxide%-asteroid%-crushing$",
+    "^advanced%-oxide%-asteroid%-crushing$"
+  } },
 
   research_bioflux = { items={"bioflux"}, icon_tech="bioflux" },
-  research_breeding = { items = {"raw-fish","biter-egg","pentapod-egg"}, mode = "by_category_or_match", match = { name_patterns={"cultivation","culture","breeding"} }, icon_tech = "fish-breeding" },
+  research_bacteria_cultivation = { icon_tech = "bacteria-cultivation", recipe_patterns = {
+    "^iron%-bacteria%-cultivation$",
+    "^copper%-bacteria%-cultivation$"
+  } },
+  research_breeding = {
+    items = {"raw-fish","biter-egg","pentapod-egg"},
+    mode = "by_category_or_match",
+    match = { name_patterns={"cultivation","culture","breeding"} },
+    exclude_recipe_patterns = {"^iron%-bacteria%-cultivation$", "^copper%-bacteria%-cultivation$"},
+    icon_tech = "fish-breeding"
+  },
 
   research_grenades = { icon_item="grenade", groups = {
     {change=0.10, items={"grenade"}},
@@ -42,12 +199,29 @@ return {
     {change=0.05, items={"gate"}}
   } },
 
-  research_stone_products = { icon_item = "stone", groups = {
-    { change = 0.10, items = { "stone", "landfill" } },
-    { change = 0.05, items = { "foundation" }, item_patterns = { "^artificial%-.+%-soil$" } }
+  research_landfill = { icon_tech = "landfill", groups = {
+    { change = 0.10, items = { "landfill" } },
+    { change = 0.05, items = { "foundation" } }
   }, exclude_ingredient_patterns={"scrap"} },
 
-  research_rails = { icon_item="rail", items = {"rail"} },
+  research_artificial_soil = { icon_tech = "artificial-soil", groups = {
+    { change = 0.10, item_patterns = { "^artificial%-.+%-soil$" } },
+    { change = 0.05, item_patterns = { "^overgrowth%-.+%-soil$" } }
+  } },
+
+  research_molten_metals = { icon_tech = "foundry", groups = {
+    { change = 0.10, recipe_patterns = { "^molten%-iron%-from%-lava$", "^molten%-copper%-from%-lava$" } },
+    { change = 0.05, recipe_patterns = { "^iron%-ore%-melting$", "^copper%-ore%-melting$" } }
+  }, exclude_ingredient_patterns={"scrap"} },
+
+  research_rails = { icon_item = "rail", icon_candidates = {
+    { technology = "elevated-rail", required_mod = "elevated-rails" },
+    { icon = "__elevated-rails__/graphics/technology/elevated-rail.png", icon_size = 256, inactive_mod_asset = "elevated-rails" }
+  }, groups = {
+    { change = 0.10, items = { "rail" } },
+    { change = 0.05, items = { "rail-support" } },
+    { change = 0.02, items = { "rail-ramp" } }
+  } },
 
   research_concrete = { icon_tech = "concrete", groups = {
     { change = 0.10, items = { "stone-brick" } },
@@ -139,7 +313,15 @@ return {
     { change=0.01, items={"stack-inserter"}, item_patterns={"stack%-inserter"} }
   }},
 
-  research_science_pack_productivity = { icon_techs = {"research-productivity", "space-science-pack"}, icon_item = "automation-science-pack", dynamic_items_from_lab_inputs = true, groups = {
+  research_science_pack_productivity = {
+    icon_candidates={
+      {technology="research-productivity", required_mod="space-age"},
+      {icon="__space-age__/graphics/technology/research-productivity.png", icon_size=256, inactive_mod_asset="space-age"},
+      {technology="space-science-pack"},
+      {item="automation-science-pack"}
+    },
+    dynamic_items_from_lab_inputs = true,
+    groups = {
     { change=0.10, items={
       "automation-science-pack","logistic-science-pack","chemical-science-pack","production-science-pack",
       "military-science-pack","utility-science-pack","space-science-pack",

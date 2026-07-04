@@ -1,6 +1,6 @@
 # Manual Test Plan
 
-Updated: 2026-07-01
+Updated: 2026-07-04
 
 This document defines named manual saves and scenarios. Runtime fixture validation is necessary, but it does not replace save-level gameplay validation.
 
@@ -8,7 +8,7 @@ This document defines named manual saves and scenarios. Runtime fixture validati
 
 Use these scenario names in `docs/test-results.md` so release evidence is comparable across runs.
 
-For the current `v2.0.5` pre-manual status, see `docs/pre-manual-2.0.5-report.md`.
+For the archived `v2.0.5` pre-manual status, see `docs/notes/archive/pre-manual-2.0.5-report.md`.
 
 ## v2.0.5 Quick Feedback Patch
 
@@ -43,22 +43,34 @@ Required before publishing `v2.0.5`:
 | `duplicate-cargo-tech` | Maraxis-like duplicate cargo landing pad or unloading technology |
 | `popular-overhaul-pack` | Large overhaul pack compatible with the current Factorio line |
 
-Default-off scripted agriculture/spoilage candidates can be included in `v2.0.5` after the minimum release smoke checks pass. Default enablement or strong public behavior claims require the relevant scenarios above to be recorded. If a scripted scenario fails or produces unclear behavior, defer that specific feature, default, or claim to `v2.1.0`.
+Default-off scripted agriculture/spoilage candidates can be included in `v2.0.5` with conservative wording. Default enablement, preset inclusion, or strong public behavior claims require the relevant scenarios above to be recorded. If a scripted scenario fails or produces unclear behavior, defer that specific feature, default, or claim to `v2.1.0` or later.
 
 ## v2.1.0 Larger Feature Wave
 
-Required before claiming larger `v2.1.0` features:
+Automated fixture validation now covers the release-candidate claims for the larger `v2.1.0` features. These scenarios remain the manual save-level follow-up matrix for balance, long-running saves, and stronger public claims:
 
 | Scenario | Purpose |
 | --- | --- |
-| `settings-presets` | Verify preset defaults and advanced setting override behavior |
+| `settings-checkbox-enablements` | Verify per-technology enable checkboxes control generated streams, base continuations, and scripted runtime effects consistently |
+| `shareable-presets-design` | Design and validate any future import/export or shareable preset flow before adding preset UI back to startup settings |
 | `agri-existing-plant-rescale` | Verify any existing plant rescale is bounded, deduplicated, and reversible |
-| `duplicate-native-modifiers` | Verify overlapping cargo/logistics modifiers are skipped, warned, or explicitly allowed beyond the diagnostic-only `v2.0.5` fixture coverage |
+| `native-modifier-overlap-policy` | Verify overlapping cargo/logistics/native modifiers follow any future selected skip/warn/prefer/allow policy beyond the current diagnostic-only coverage |
 | `high-throughput-pump` | Validate prototype, recipe, power draw, balance, and throughput if promoted |
-| `pipeline-extent` | Validate startup prototype mutation and compatibility risk if promoted |
-| `thruster-fuel-productivity` | Verify recipe productivity on thruster fuel recipes if promoted |
-| `thruster-oxidizer-productivity` | Verify recipe productivity on thruster oxidizer recipes if promoted |
-| `oil-fluid-productivity` | Verify recipe productivity on fluid-only and mixed-output oil recipes if promoted |
+| `pipeline-extent` | Manual soak the implemented startup prototype multiplier with large and modded fluid networks after fixture validation passes |
+| `thruster-fuel-productivity` | Manual verify the implemented thruster fuel productivity streams in a Space Age save after fixture validation passes |
+| `thruster-oxidizer-productivity` | Manual verify the implemented thruster oxidizer productivity streams in a Space Age save after fixture validation passes |
+| `oil-fluid-productivity` | Manual verify the implemented oil processing, oil cracking, lubricant, sulfuric acid, and acid neutralization productivity split after fixture validation passes |
+| `panglia-family-adoption` | Verify Panglia or a Panglia-like planet mod adopts extra rocket fuel and low density structure recipes into vanilla Space Age productivity technologies |
+| `plates-n-circuit-replacement` | Verify Plates n Circuit Productivity fully covered competing technologies are removed only after MIR replacement effects exist |
+| `extended-compat-manual-scenarios` | Run `Invoke-MIRCompatAudit.ps1 -RunManualScenarios` or `Invoke-MIRExtendedTests.ps1 -Tier ManualScenarios -CollectAll` against the executable curated scenario fixture |
+| `extended-compat-top25-base-space-age` | Run the top-25 base and Space Age audit tiers with credentials, parse grouped expected/unexpected failures, and only promote repeatable MIR-owned issues into profile work |
+| `extended-compat-strict-gate` | Run `Invoke-MIRExtendedTests.ps1 -Tier Static,Runtime,AuditSmoke -FailFast -FailOnAuditFailures` before treating wrapper pass/fail as a release gate |
+| `offline-local-library-2-1-curated` | Run `Invoke-MIRExtendedTests.ps1 -Tier LocalLibraryScenarios -LocalModLibraryDirs C:\Projects\Factorio\testmods_readonly_2.1 -Offline -CollectAll` to cover curated local combinations first |
+| `offline-local-library-2-1-generated` | Run `Invoke-MIRExtendedTests.ps1 -Tier GeneratedLocalScenarios -LocalModLibraryDirs C:\Projects\Factorio\testmods_readonly_2.1 -Offline -CollectAll` to cover generated all-local mega and metadata-cluster stress scenarios |
+| `offline-local-library-2-1-individual-roots` | Run `Invoke-MIRExtendedTests.ps1 -Tier LocalModZips -LocalModZipDirs C:\Projects\Factorio\testmods_readonly_2.1 -LocalModLibraryDirs C:\Projects\Factorio\testmods_readonly_2.1 -Offline -CollectAll` to test each downloaded local zip as a root scenario |
+| `offline-local-library-2-1-recovery` | Confirm interrupted local sweeps still leave readable `overnight.log`, checkpointed `load-results.json`, grouped `compat-failures.grouped.json`, and `missing-dependencies.*` outputs |
+| `offline-local-library-2-1-official-mod-isolation` | Confirm a local root that is incompatible with Space Age can load with Space Age disabled, while a root that requires Space Age gets the full official bundle enabled |
+| `offline-local-library-2-1-blank-log-lines` | Confirm blank Factorio log lines do not abort parsed audit-row conversion |
 
 ## v2.1.x Spikes
 
@@ -84,7 +96,7 @@ Required on the `legacy` branch with a Factorio `2.0.x` binary:
 | `legacy-1.9.0-static` | Static validation with `factorio_version = "2.0"` and `base >= 2.0` for the `v2.0.5 -> v1.9.0` port |
 | `legacy-1.9.0-no-2.1-cargo` | Confirm 2.1-only cargo modifier strings are absent in `v1.9.0` |
 | `legacy-1.9.0-runtime-2.0` | Run `Invoke-MIRValidation.ps1` with a Factorio `2.0.x` binary for `v1.9.0` |
-| `legacy-1.9.5-runtime-2.0` | Repeat the same validation for the `v2.1.5 -> v1.9.5` port |
+| `legacy-1.9.5-runtime-2.0` | Repeat the same validation for the next tested `v2.1.x -> v1.9.5` port |
 | `legacy-1.9.9-final` | Validate the final Factorio `2.0` port from the latest tested `2.x.x` snapshot |
 | `legacy-space-age` | Confirm any optional Space Age subset supported by Factorio `2.0.x` |
 | `legacy-generated-tech-ids` | Compare generated technology names against expected legacy snapshot |

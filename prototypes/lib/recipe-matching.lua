@@ -117,18 +117,29 @@ local function should_skip_recipe(recipe_name, recipe, options)
   return false
 end
 
+local function add_wanted_outputs(want, names)
+  for _, name in ipairs(names or {}) do
+    want[name] = true
+  end
+end
+
+local function add_pattern_outputs(want, patterns, iterator)
+  if not patterns then return end
+  iterator(function(name)
+    for _, pat in ipairs(patterns) do
+      if string.find(name, pat) then want[name] = true end
+    end
+  end)
+end
+
 local function gather_by_items(items, patterns, options)
   local want = {}
   options = options or {}
-  if items then for _, n in ipairs(items) do want[n] = true end end
-  if options.extra_outputs then for _, n in ipairs(options.extra_outputs) do want[n] = true end end
-  if patterns then
-    lookup.each_item_prototype(function(iname)
-      for _, pat in ipairs(patterns) do
-        if string.find(iname, pat) then want[iname] = true end
-      end
-    end)
-  end
+  add_wanted_outputs(want, items)
+  add_wanted_outputs(want, options.fluids)
+  add_wanted_outputs(want, options.extra_outputs)
+  add_pattern_outputs(want, patterns, lookup.each_item_prototype)
+  add_pattern_outputs(want, options.fluid_patterns, lookup.each_fluid_prototype)
   local seen, list = {}, {}
   for rname, r in pairs(data.raw.recipe or {}) do
     if not should_skip_recipe(rname, r, options) then
@@ -163,6 +174,8 @@ function R.recipes_for_stream(spec, per_level_default)
     local buckets, assigned = {}, {}
     for _, g in ipairs(spec.groups) do
       local list = gather_by_items(g.items, g.item_patterns, {
+        fluids = g.fluids,
+        fluid_patterns = merge_lists(spec.fluid_patterns, g.fluid_patterns),
         extra_outputs = g.extra_outputs,
         recipe_patterns = merge_lists(spec.recipe_patterns, g.recipe_patterns),
         exclude_recipe_patterns = merge_lists(spec.exclude_recipe_patterns, g.exclude_recipe_patterns),
@@ -189,6 +202,8 @@ function R.recipes_for_stream(spec, per_level_default)
   end
 
   local list = gather_by_items(spec.items, spec.item_patterns, {
+    fluids = spec.fluids,
+    fluid_patterns = spec.fluid_patterns,
     extra_outputs = spec.extra_outputs,
     recipe_patterns = spec.recipe_patterns,
     exclude_recipe_patterns = spec.exclude_recipe_patterns,

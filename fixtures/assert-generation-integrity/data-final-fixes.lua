@@ -1,9 +1,29 @@
 local techs = data.raw.technology or {}
 local recipes = data.raw.recipe or {}
 local is_space_age = mods and mods["space-age"] ~= nil
+local use_installed_space_age_icons =
+  settings
+  and settings.startup
+  and settings.startup["mir-use-installed-space-age-icons"]
+  and settings.startup["mir-use-installed-space-age-icons"].value == true
 
 local function fail(message)
   error("MIR validation failed: " .. message)
+end
+
+local blocked_pickup_effect_types = {
+  ["character-item-pickup-distance"] = true,
+  ["character-loot-pickup-distance"] = true
+}
+
+local function assert_no_blocked_pickup_effects()
+  for tech_name, tech in pairs(techs) do
+    for _, effect in ipairs((tech and tech.effects) or {}) do
+      if blocked_pickup_effect_types[effect.type] then
+        fail("technology " .. tech_name .. " uses blocked pickup reach effect " .. effect.type .. ".")
+      end
+    end
+  end
 end
 
 local function escape_pattern(text)
@@ -21,6 +41,10 @@ local function startup_setting_bool(name, fallback)
   local setting = settings and settings.startup and settings.startup[name]
   if setting and setting.value ~= nil then return setting.value == true end
   return fallback == true
+end
+
+local function effective_base_extension_enabled(key, default_enabled)
+  return startup_setting_bool("mir-enable-" .. key, default_enabled)
 end
 
 local function sorted_csv(values)
@@ -105,8 +129,10 @@ local base_extension_defaults = {
   ["laser-shooting-speed"] = true
 }
 
+assert_no_blocked_pickup_effects()
+
 for key, default_enabled in pairs(base_extension_defaults) do
-  if startup_setting_bool("mir-enable-" .. key, default_enabled) then
+  if effective_base_extension_enabled(key, default_enabled) then
     assert_chain_extended_once(key)
   else
     assert_chain_not_extended(key)
@@ -217,6 +243,16 @@ local function assert_generated_icon_badge(tech_name, tech)
   end
 end
 
+local function assert_no_space_age_icon_path_in_base(tech_name, tech)
+  if is_space_age or use_installed_space_age_icons then return end
+
+  for _, layer in ipairs((tech and tech.icons) or {}) do
+    if type(layer.icon) == "string" and string.find(layer.icon, "__space-age__", 1, true) then
+      fail("base-only generated technology " .. tech_name .. " resolved Space Age icon path " .. layer.icon .. ".")
+    end
+  end
+end
+
 local function prototype_icon_paths(prototype)
   local paths = {}
   if not prototype then return paths end
@@ -236,7 +272,9 @@ local function assert_tech_uses_item_icon(tech_name, item_name)
     fail("missing generated technology " .. tech_name .. " for icon assertion.")
   end
 
-  local item = (data.raw.item or {})[item_name] or (data.raw.ammo or {})[item_name]
+  local item = (data.raw.item or {})[item_name]
+    or (data.raw.ammo or {})[item_name]
+    or (data.raw["rail-planner"] or {})[item_name]
   local expected_paths = prototype_icon_paths(item)
   if not next(expected_paths) then
     fail("missing item icon source for " .. item_name .. ".")
@@ -268,6 +306,19 @@ local function assert_tech_uses_technology_icon(tech_name, source_tech_name)
   fail("generated technology " .. tech_name .. " does not use " .. source_tech_name .. " technology art.")
 end
 
+local function assert_tech_uses_icon_path(tech_name, icon_path)
+  local tech = techs[tech_name]
+  if not tech then
+    fail("missing generated technology " .. tech_name .. " for icon path assertion.")
+  end
+
+  for _, layer in ipairs(tech.icons or {}) do
+    if layer.icon == icon_path then return end
+  end
+
+  fail("generated technology " .. tech_name .. " does not use expected icon path " .. icon_path .. ".")
+end
+
 local owners_by_recipe = {}
 for tech_name, tech in pairs(techs) do
   if string.match(tech_name, "^recipe%-prod%-") then
@@ -284,6 +335,7 @@ for tech_name, tech in pairs(techs) do
       fail("generated stream technology " .. tech_name .. " has no effects.")
     end
     assert_generated_icon_badge(tech_name, tech)
+    assert_no_space_age_icon_path_in_base(tech_name, tech)
   end
 
   if tech.max_level == "infinite" then
@@ -302,20 +354,52 @@ end
 
 assert_tech_uses_item_icon("recipe-prod-research_heavy_ammo-1", "cannon-shell")
 assert_tech_uses_item_icon("recipe-prod-research_cannon_shooting_speed-1", "cannon-shell")
+if is_space_age then
+  assert_tech_uses_technology_icon("recipe-prod-research_electric_shooting_speed-1", "electric-weapons-damage-1")
+elseif use_installed_space_age_icons then
+  assert_tech_uses_icon_path("recipe-prod-research_electric_shooting_speed-1", "__space-age__/graphics/technology/electric-weapons-damage.png")
+else
+  assert_tech_uses_technology_icon("recipe-prod-research_electric_shooting_speed-1", "discharge-defense-equipment")
+end
 if techs["recipe-prod-research_processing_unit-1"] then
-  assert_tech_uses_technology_icon("recipe-prod-research_processing_unit-1", "processing-unit")
+  if use_installed_space_age_icons then
+    assert_tech_uses_icon_path("recipe-prod-research_processing_unit-1", "__space-age__/graphics/technology/processing-unit-productivity.png")
+  else
+    assert_tech_uses_technology_icon("recipe-prod-research_processing_unit-1", "processing-unit")
+  end
 end
 if techs["research-productivity"] then
   assert_tech_uses_technology_icon("recipe-prod-research_science_pack_productivity-1", "research-productivity")
+elseif use_installed_space_age_icons then
+  assert_tech_uses_icon_path("recipe-prod-research_science_pack_productivity-1", "__space-age__/graphics/technology/research-productivity.png")
 else
   assert_tech_uses_technology_icon("recipe-prod-research_science_pack_productivity-1", "space-science-pack")
 end
+if mods and mods["elevated-rails"] then
+  assert_tech_uses_technology_icon("recipe-prod-research_rails-1", "elevated-rail")
+elseif use_installed_space_age_icons then
+  assert_tech_uses_icon_path("recipe-prod-research_rails-1", "__elevated-rails__/graphics/technology/elevated-rail.png")
+else
+  assert_tech_uses_item_icon("recipe-prod-research_rails-1", "rail")
+end
 assert_tech_uses_technology_icon("recipe-prod-research_walls-1", "gate")
 if techs["recipe-prod-research_lab_productivity-1"] then
-  assert_tech_uses_technology_icon("recipe-prod-research_lab_productivity-1", "military-science-pack")
+  if use_installed_space_age_icons then
+    assert_tech_uses_icon_path("recipe-prod-research_lab_productivity-1", "__space-age__/graphics/technology/research-productivity.png")
+  else
+    assert_tech_uses_technology_icon("recipe-prod-research_lab_productivity-1", "military-science-pack")
+  end
 end
 if techs["recipe-prod-research_rocket_fuel-1"] then
-  assert_tech_uses_technology_icon("recipe-prod-research_rocket_fuel-1", "rocket-fuel")
+  if use_installed_space_age_icons then
+    assert_tech_uses_icon_path("recipe-prod-research_rocket_fuel-1", "__space-age__/graphics/technology/rocket-fuel-productivity.png")
+  else
+    assert_tech_uses_technology_icon("recipe-prod-research_rocket_fuel-1", "rocket-fuel")
+  end
+end
+if use_installed_space_age_icons then
+  assert_tech_uses_icon_path("recipe-prod-research_low_density_structure-1", "__space-age__/graphics/technology/low-density-structure-productivity.png")
+  assert_tech_uses_icon_path("recipe-prod-research_plastic-1", "__space-age__/graphics/technology/plastics-productivity.png")
 end
 
 for recipe_name, owners in pairs(owners_by_recipe) do
@@ -345,7 +429,10 @@ end
 
 for _, expectation in ipairs({
   { recipe = "electronic-circuit", owner = "recipe-prod-research_electronic_circuit-1" },
-  { recipe = "advanced-circuit", owner = "recipe-prod-research_advanced_circuit-1" }
+  { recipe = "advanced-circuit", owner = "recipe-prod-research_advanced_circuit-1" },
+  { recipe = "rail", owner = "recipe-prod-research_rails-1" },
+  { recipe = "rail-support", owner = "recipe-prod-research_rails-1" },
+  { recipe = "rail-ramp", owner = "recipe-prod-research_rails-1" }
 }) do
   assert_recipe_owner(expectation.recipe, expectation.owner)
 end

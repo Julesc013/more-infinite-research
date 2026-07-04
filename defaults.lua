@@ -27,20 +27,6 @@ local defaults = {
     },
     research_inventory_capacity = { growth_factor = 1.10 },
     research_robot_battery = { growth_factor = 1.2 },
-    research_cargo_bay_unloading_distance = {
-      base_cost = 100000,
-      growth_factor = 3,
-      research_time = 120,
-      max_level = 0
-    },
-    research_cargo_landing_pad_count = {
-      enabled = false,
-      base_cost = 1000000,
-      growth_factor = 10,
-      research_time = 240,
-      max_level = 0,
-      settings_note = {"mod-setting-description.mir-note-sandbox-cargo-pad-count"}
-    },
     research_lab_productivity = {
       base_cost = 1000,
       growth_factor = 1.2,
@@ -54,7 +40,7 @@ local defaults = {
       growth_factor = 1.5,
       science_packs = {
         "automation-science-pack","logistic-science-pack","chemical-science-pack",
-        "production-science-pack","military-science-pack","agricultural-science-pack"
+        "production-science-pack","military-science-pack","electromagnetic-science-pack"
       }
     },
     research_cannon_shooting_speed = {
@@ -62,7 +48,7 @@ local defaults = {
       growth_factor = 1.5,
       science_packs = {
         "automation-science-pack","logistic-science-pack","chemical-science-pack",
-        "production-science-pack","military-science-pack","agricultural-science-pack"
+        "production-science-pack","military-science-pack","electromagnetic-science-pack"
       }
     },
     research_flamethrower_shooting_speed = {

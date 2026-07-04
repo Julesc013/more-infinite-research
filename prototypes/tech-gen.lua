@@ -4,6 +4,10 @@ local U = require("prototypes.util")
 local D = require("prototypes.diagnostics")
 local deepcopy = require("prototypes.lib.deepcopy")
 local table_utils = require("prototypes.lib.table-utils")
+local effect_safety = require("prototypes.technology-effect-safety")
+local competing_productivity = require("prototypes.compat.competing-productivity")
+local productivity_owners = require("prototypes.compat.productivity-owners")
+local productivity_family_adoption = require("prototypes.compat.productivity-family-adoption")
 
 local function lname(key, spec)
   if spec.localised_name then return spec.localised_name end
@@ -11,8 +15,12 @@ local function lname(key, spec)
   local out = {locale_key}
   if spec.icon_item then
     table.insert(out, {"item-name."..spec.icon_item})
+  elseif spec.icon_fluid then
+    table.insert(out, {"fluid-name."..spec.icon_fluid})
   elseif spec.items and #spec.items == 1 then
     table.insert(out, {"item-name."..spec.items[1]})
+  elseif spec.fluids and #spec.fluids == 1 then
+    table.insert(out, {"fluid-name."..spec.fluids[1]})
   elseif spec.icon_tech then
     table.insert(out, {"technology-name."..spec.icon_tech})
   end
@@ -37,6 +45,11 @@ local function missing_requirement(key, spec)
   for _, item_name in ipairs(spec.required_items or {}) do
     if not U.item_prototype(item_name) then
       return "missing required item " .. item_name
+    end
+  end
+  for _, fluid_name in ipairs(spec.required_fluids or {}) do
+    if not U.fluid_prototype(fluid_name) then
+      return "missing required fluid " .. fluid_name
     end
   end
   for _, tech_name in ipairs(spec.required_technologies or {}) do
@@ -120,6 +133,7 @@ end
 local function available_direct_effects(key, effects)
   local out = {}
   for _, effect in ipairs(effects or {}) do
+    effect_safety.assert_effect_allowed(effect, "direct-effect stream " .. key)
     if effect.type == "gun-speed" and effect.ammo_category and not U.ammo_category_exists(effect.ammo_category) then
       log("[more-infinite-research] Skipping unavailable gun-speed effect for "..key..": missing ammo category "..effect.ammo_category)
     else
@@ -200,34 +214,28 @@ local function record_native_modifier_overlaps(key, effects)
   end
 end
 
-local function existing_infinite_recipe_productivity_techs(recipe_name)
-  local owners = {}
-  for tech_name, tech in pairs(data.raw.technology or {}) do
-    if tech.max_level == "infinite" and not string.find(tech_name, "^recipe%-prod%-") then
-      for _, effect in ipairs(tech.effects or {}) do
-        if effect.type == "change-recipe-productivity" and effect.recipe == recipe_name then
-          table.insert(owners, tech_name)
-          break
-        end
-      end
-    end
-  end
-  table.sort(owners)
-  return owners
+local function existing_infinite_recipe_productivity_owner_records(recipe_name, spec)
+  local adoption = spec and spec.adopt_into_existing_productivity_tech
+  return productivity_owners.blocking_recipe_productivity_owner_records(recipe_name, {
+    ignore_owner = competing_productivity.ignores_existing_owner,
+    adoption_tech = adoption and adoption.tech
+  })
 end
 
-local function filter_existing_recipe_productivity(key, buckets)
+local function filter_existing_recipe_productivity(key, spec, buckets)
   local filtered_buckets = {}
   local skipped = {}
 
   for _, bucket in ipairs(buckets or {}) do
     local recipes = {}
     for _, recipe_name in ipairs(bucket.recipes or {}) do
-      local owners = existing_infinite_recipe_productivity_techs(recipe_name)
-      if #owners > 0 then
+      local owner_records = existing_infinite_recipe_productivity_owner_records(recipe_name, spec)
+      if #owner_records > 0 then
         table.insert(skipped, {
           recipe = recipe_name,
-          owners = owners
+          owners = productivity_owners.owner_names(owner_records),
+          owner_kinds = productivity_owners.owner_kinds(owner_records),
+          owner_actions = productivity_owners.owner_actions(owner_records)
         })
       else
         table.insert(recipes, recipe_name)
@@ -242,10 +250,19 @@ local function filter_existing_recipe_productivity(key, buckets)
   end
 
   for _, entry in ipairs(skipped) do
+    D.recipe_owner({
+      key = key,
+      status = "skipped",
+      reason = "covered_by_existing_infinite_recipe_productivity",
+      recipe = entry.recipe,
+      owners = entry.owners,
+      owner_kinds = entry.owner_kinds,
+      owner_actions = entry.owner_actions
+    })
     log("[more-infinite-research] Skipping recipe productivity effect for "
       .. key .. " recipe=" .. entry.recipe
       .. " because existing infinite technology already owns it: "
-      .. table.concat(entry.owners, ","))
+      .. entry.owners)
   end
 
   return filtered_buckets, skipped
@@ -321,6 +338,7 @@ local function make_stream(key, raw_spec)
       level = 1
     }
     data:extend({t})
+    effect_safety.register_generated_technology(t.name)
     D.stream(D.stream_fields(key, spec, "generated", "direct_effect", ingredients, prerequisites, direct_effects, lab_status))
     return
   end
@@ -328,7 +346,15 @@ local function make_stream(key, raw_spec)
   local buckets = U.recipes_for_stream(spec)
   D.recipe_matches(key, buckets)
   local covered_by_existing
-  buckets, covered_by_existing = filter_existing_recipe_productivity(key, buckets)
+  buckets, covered_by_existing = filter_existing_recipe_productivity(key, spec, buckets)
+  local adopted_effects, family_blocked, adoption_owner_name
+  buckets, adopted_effects, family_blocked, adoption_owner_name = productivity_family_adoption.adopt(key, spec, buckets)
+  if adopted_effects and #adopted_effects > 0 then
+    D.stream(D.stream_fields(key, spec, "adopted", "adopted_into_existing_productivity_family", ingredients, nil, adopted_effects, lab_status, {
+      owners = adoption_owner_name,
+      recipes = productivity_owners.recipe_names_from_effects(adopted_effects)
+    }))
+  end
   local effects = {}
   for _,b in ipairs(buckets) do
     for _,r in ipairs(b.recipes) do
@@ -337,9 +363,14 @@ local function make_stream(key, raw_spec)
     end
   end
   if #effects == 0 then
+    if adopted_effects and #adopted_effects > 0 then
+      return
+    end
     local reason = "no_matching_recipes"
     if covered_by_existing and #covered_by_existing > 0 then
       reason = "covered_by_existing_infinite_recipe_productivity"
+    elseif family_blocked and #family_blocked > 0 then
+      reason = family_blocked[1].reason
     end
     log("[more-infinite-research] Skipping stream "..key.." because "..reason..".")
     D.stream(D.stream_fields(key, spec, "skipped", reason, ingredients, nil, effects, lab_status))
@@ -366,6 +397,7 @@ local function make_stream(key, raw_spec)
     level = 1
   }
   data:extend({t})
+  effect_safety.register_generated_technology(t.name)
   if D.enabled() then
     log("[more-infinite-research] Registered technology "..t.name)
   end
@@ -375,3 +407,5 @@ end
 for _, key in ipairs(table_utils.sorted_keys(C.streams)) do
   make_stream(key, C.streams[key])
 end
+
+productivity_family_adoption.emit_mod_data()

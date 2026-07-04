@@ -1,0 +1,109 @@
+{
+  "schema": 1,
+  "scenarios": [
+    {
+      "name": "space-age-baseline",
+      "include_space_age": true,
+      "mods": ["more-infinite-research"],
+      "notes": "Baseline official Space Age bundle surface."
+    },
+    {
+      "name": "space-age-circuit-competitor",
+      "include_space_age": true,
+      "mods": ["plates-n-circuit-productivity"],
+      "notes": "Known fully replaceable plate and circuit productivity competitor."
+    },
+    {
+      "name": "space-age-planet-cluster",
+      "include_space_age": true,
+      "mods": [
+        "maraxsis",
+        "Cerys-Moon-of-Fulgora",
+        "corrundum",
+        "Moshine",
+        "planet-muluna",
+        "castra",
+        "rubia",
+        "lignumis",
+        "cubium",
+        "tenebris-prime"
+      ],
+      "notes": "High-risk Space Age planet-pack cluster for productivity-family adoption and residual recipe ownership."
+    },
+    {
+      "name": "bz-suite-space-age",
+      "include_space_age": true,
+      "mods": ["bztitanium", "bzcarbon", "bztin", "bzzirconium"],
+      "notes": "Resource and intermediate-chain coverage with the official Space Age bundle."
+    },
+    {
+      "name": "krastorio2-spaced-out",
+      "include_space_age": true,
+      "mods": ["Krastorio2-spaced-out"],
+      "notes": "High-priority Space Age overhaul scenario."
+    },
+    {
+      "name": "exotic-space-industries",
+      "include_space_age": true,
+      "mods": ["exotic-space-industries-remembrance"],
+      "notes": "Large Space Age overhaul-style scenario."
+    },
+    {
+      "name": "bob-core-suite",
+      "include_space_age": false,
+      "mods": ["boblibrary", "bobplates", "bobelectronics", "bobtech"],
+      "notes": "Circuit, plate, and science progression stress scenario."
+    },
+    {
+      "name": "angels-core-suite",
+      "include_space_age": false,
+      "mods": ["angelsrefining", "angelssmelting", "angelspetrochem", "angelsindustries"],
+      "notes": "Angel core chain compatibility surface."
+    },
+    {
+      "name": "bob-angels",
+      "include_space_age": false,
+      "mods": [
+        "boblibrary",
+        "bobplates",
+        "bobelectronics",
+        "bobtech",
+        "angelsrefining",
+        "angelssmelting",
+        "angelspetrochem",
+        "angelsindustries"
+      ],
+      "notes": "Classic Angel/Bob combined overhaul surface."
+    },
+    {
+      "name": "krastorio2",
+      "include_space_age": false,
+      "mods": ["Krastorio2"],
+      "notes": "Non-Space-Age K2 scenario for recipe and science progression checks."
+    },
+    {
+      "name": "space-exploration",
+      "include_space_age": false,
+      "mods": ["space-exploration"],
+      "notes": "Large pre-Space-Age overhaul scenario."
+    },
+    {
+      "name": "pymodpack",
+      "include_space_age": false,
+      "mods": ["pymodpack"],
+      "notes": "pY modpack entry point; expected to surface dependency and overhaul policy issues."
+    },
+    {
+      "name": "nullius",
+      "include_space_age": false,
+      "mods": ["nullius"],
+      "notes": "Total overhaul; unknown external productivity owners should win by default."
+    },
+    {
+      "name": "ultracube",
+      "include_space_age": false,
+      "mods": ["Ultracube"],
+      "notes": "Run without Space Age or Quality."
+    }
+  ]
+}

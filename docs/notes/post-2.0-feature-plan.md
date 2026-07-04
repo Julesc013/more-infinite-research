@@ -1,6 +1,6 @@
 # Post-2.0 Feature Plan
 
-Updated: 2026-07-01
+Updated: 2026-07-03
 
 This document records the feature triage from the first public v2.0.0 discussion and turns it into a bounded plan for More Infinite Research after v2.0.0.
 
@@ -12,22 +12,22 @@ Release discipline update:
 
 ```text
 v2.0.5 = quick feedback patch: small/easy fixes, default-off scripted agriculture/spoilage candidates, docs, validation, package parity.
-v2.1.0 = larger feature wave: presets, broader scripted refinements, pump/fluid/logistics/productivity work that passes proof.
+v2.1.0 = larger feature wave: checkbox control, icon policy, fluid productivity, pipeline extent, and targeted duplicate-productivity compatibility that passes proof.
 v1.9.0 = Factorio 2.0 compatible subset backported from the tested v2.0.5 quick-patch snapshot.
 v2.1.5 = quick feedback patch after v2.1.0.
-v1.9.5 = Factorio 2.0 compatible subset backported from the tested v2.1.5 snapshot.
+v1.9.5 = Factorio 2.0 compatible subset backported from the next tested v2.1.x snapshot.
 v2.2.0 = next larger feature wave.
 v1.9.9 = final planned Factorio 2.0 backport from the latest tested v2.x.x snapshot when Factorio 2.1 becomes stable or another verified upstream cutoff is chosen.
 ```
 
-The scripted technology implementation exists in `dev` as a default-off `v2.0.5` ship candidate. Public release claims should be made only for the specific behaviors proven by the manual save matrix. Default enablement or anything that fails proof moves to `v2.1.0`.
+The scripted technology implementation exists in `dev` as a default-off ship candidate. Public release claims should be made only for the specific behaviors proven by the manual save matrix. Default enablement or anything that fails proof moves to a later release.
 
 The Reddit thread was not one feature request. It was a roadmap dump. The useful split is:
 
 1. Core More Infinite Research features: infinite or configurable research sinks.
 2. Core-adjacent logistics QoL: late-game entities or settings unlocked by research.
 3. Companion mods: refrigeration, greenhouses, new biology loops, unusual quality/spoilage mechanics.
-4. Compatibility and UX work: presets, backports, modpack testing, duplicate-tech detection.
+4. Compatibility and UX work: settings control, backports, modpack testing, duplicate-tech detection.
 
 The major constraint is UPS. Anything requiring per-tick inventory scanning or constant entity mutation should be treated as a separate mod or disabled-by-default experiment. MIR's default policy should be no per-tick scanning for generated research effects.
 
@@ -114,35 +114,17 @@ These should come before or alongside new content.
 | Feature | Add? | Notes |
 | --- | ---: | --- |
 | Scripted-tech framework | Started in `dev`; v2.0.5 ship candidate | Required for spoilage/growth and future non-native effects. |
-| Settings presets | Yes | The thread shows users want "add more infinite research like vanilla" as well as sandbox behavior. |
+| Shareable settings profiles | Later | The thread shows users want "add more infinite research like vanilla" as well as sandbox behavior, but built-in preset modes added too much override UI before a sharing model existed. |
 | Feature categories in settings | Yes | Group by Productivity, Character, Logistics, Cargo, Agriculture, Scripted, Sandbox. |
 | Compatibility matrix | Yes | Users asked about Maraxis and Krastorio 2 Spaced Out. |
 | Duplicate-effect detection | Yes | Especially for cargo landing pad techs if other mods add similar modifiers. |
 | Factorio 2.0 backport branch | Yes, gated | Do not assume 2.1 APIs exist in 2.0. |
 
-### Settings Presets
+### Shareable Presets
 
-Presets are the most important UX improvement because the mod already has many raw settings.
+The mod has many raw settings, but the first preset-mode attempt added too much startup-setting noise. Future preset work should focus on import/export or shareable profiles instead of adding a second override control beside every technology.
 
-Recommended presets:
-
-```text
-Preset: Vanilla-respectful
-- Add new infinite researches.
-- Do not uncap vanilla capped techs by default.
-- Disable heavily game-changing scripted techs by default.
-
-Preset: Megabase-balanced
-- Enable most generated productivity techs.
-- Enable cargo/logistics/agriculture techs.
-- Keep strong sandbox features capped or expensive.
-
-Preset: Unlimited sandbox
-- Current philosophy.
-- Everything configurable and mostly infinite.
-```
-
-Preset first, advanced toggles second.
+Preset design must define how users can copy, share, and audit a profile before preset UI is added back.
 
 ### P1: v2.0.5 Quick Agriculture And Preservation
 
@@ -164,8 +146,6 @@ Spike only:
 
 - Existing agricultural plant rescale.
 - Agricultural yield, disabled by default.
-- Thruster fuel and oxidizer productivity if validation is clean and the scope stays small.
-- Oil/fluid recipe productivity.
 - Quality module odds.
 - Roboport range.
 - High-throughput pump prototype feasibility.
@@ -190,11 +170,12 @@ Quick feedback patch for easy, bounded, validated improvements.
 
 Ship:
 
-- Settings presets.
+- Shareable preset import/export remains deferred outside the `v2.1.0` release scope.
 - High-throughput pump, optional.
-- Pipeline extent startup setting, disabled by default.
+- Pipeline extent startup setting, implemented with default `100%` unchanged behavior.
 - Fluid train unloading notes/docs.
-- Thruster fuel/oxidizer productivity coverage if recipe-productivity tests pass in a later v2.1.x spike.
+- Thruster fuel/oxidizer productivity coverage if recipe-productivity validation stays clean.
+- Oil/fluid productivity split for oil processing, oil cracking, lubricant, sulfuric acid, and acid neutralization if validation stays clean.
 - Existing agricultural plant rescale if bounded and deduplicated.
 - Duplicate native modifier detection.
 
@@ -208,7 +189,6 @@ Ship:
 
 - Bug fixes and compatibility feedback from v2.1.0.
 - Engine/electric engine productivity verification.
-- Oil processing productivity test result.
 - Biochamber recipe productivity support where valid.
 - Modded recipe diagnostics.
 - Maraxis and Krastorio 2 Spaced Out compatibility testing when those targets are available for the active Factorio line.
@@ -245,7 +225,7 @@ Advanced Quality Research
 
 | Feature | Add to MIR? | Method | Priority |
 | --- | ---: | --- | ---: |
-| Settings presets | Yes | Startup setting plus derived defaults | P0 |
+| Shareable settings profiles | Later | Import/export or copyable profile design, no per-technology override dropdowns | Later |
 | Scripted-tech framework | Started | `control/scripted-techs.lua` | P0/P1 |
 | Duplicate-effect detection | Yes | Data-stage effect overlap scan | P0 |
 | Maraxis compatibility | Yes | Detect duplicate cargo techs | P0/P1 |
@@ -262,10 +242,10 @@ Advanced Quality Research
 | Harvest/plant crane speed | No for now | Prototype/runtime unclear | Later |
 | Thruster fuel productivity | Yes | Generated recipe productivity | P2 |
 | Thruster oxidizer productivity | Yes | Generated recipe productivity | P2 |
-| Oil processing productivity | Investigate | Test recipe productivity on fluid outputs | P2 |
+| Oil processing productivity | Yes | Generated recipe productivity on tested fluid-output recipe families | P2 |
 | Biochamber oil/productivity incentives | Investigate | Prefer recipe streams over new MIR recipes | P2 |
 | High-throughput pump | Optional/core-adjacent | New pump prototype | P2 |
-| Pipeline extent multiplier | Optional | Startup prototype setting | P2 |
+| Pipeline extent multiplier | Yes | Startup prototype setting, default `100%` | P2 |
 | Fluid train unloading | Mostly covered | Stronger pump plus docs | P2 |
 | More thrust research | No | No clean native modifier | Later/separate |
 | Efficient thruster | Separate/addon | New thruster prototype | Later |
@@ -291,11 +271,11 @@ Use this table as the product boundary when converting feedback into work.
 | Spoilage preservation | Yes |  |  |  |
 | Agricultural growth speed | Yes |  |  |  |
 | Agricultural yield / fruit yield |  | Spike |  |  |
-| Settings presets | Yes |  |  |  |
+| Shareable settings profiles |  |  | Maybe |  |
 | Diagnostics for scripted/global effects | Yes |  |  |  |
 | Engine/electric-engine productivity verification | Yes |  |  |  |
-| Thruster fuel/oxidizer productivity |  | Spike |  |  |
-| Oil processing productivity |  | Spike |  |  |
+| Thruster fuel/oxidizer productivity | Yes |  |  |  |
+| Oil processing productivity | Yes |  |  |  |
 | High-throughput pump / Der Pump |  | Yes | Maybe |  |
 | Pipeline extent setting |  | Yes | Maybe |  |
 | Quality module odds |  | Spike | Maybe |  |
@@ -318,7 +298,7 @@ Add a feature registry so every new idea has a clear implementation kind.
 {
   name = "spoilage-preservation",
   kind = "scripted-effect",
-  default_enabled = "preset-dependent",
+  default_enabled = false,
   required_mods = {"space-age"},
   min_factorio_version = "2.1.0",
   science_pack_policy = "space-age-late",
@@ -421,8 +401,7 @@ Adds scripted spoilage preservation research that increases the global spoil tim
 
 Recommended default:
 
-- Enabled in Megabase-balanced or Unlimited sandbox.
-- Disabled or very expensive in Vanilla-respectful.
+- Disabled unless intentionally testing.
 - Effective cap at `100x` spoil time.
 
 ### Agricultural Growth Speed
@@ -536,8 +515,8 @@ Recommended setting:
 
 ```text
 Startup setting: pipeline extent multiplier
-Values: 1x, 2x, 5x, 10x
-Default: 1x
+Values: 50%, 75%, 100%, 125%, 150%, 200%, 250%, 300%, 400%, 500%
+Default: 100%
 ```
 
 Do not make this infinite research.
@@ -719,7 +698,7 @@ This is a separate chaos mod or disabled experiment. The idea could be funny, bu
 - Research completion, reversal, and configuration changes recompute the effective modifier.
 - Existing saves load cleanly from earlier MIR releases to v2.0.5.
 - Multiple-force behavior is documented and manually tested.
-- The feature can be disabled via startup setting or preset-derived default.
+- The feature can be disabled via its startup enable setting.
 - Disabling the feature restores or stops applying MIR's own multiplier as far as the stored baseline allows.
 - Existing spoilable item behavior is tested before release notes make a stronger claim.
 
@@ -732,10 +711,10 @@ This is a separate chaos mod or disabled experiment. The idea could be funny, bu
 - No surface-wide plant scan or per-tick growth scan is used.
 - Cap and per-level formula are visible in settings/docs.
 
-### Settings Presets
+### Shareable Presets
 
-- Presets map to explicit setting keys and default values.
-- `Vanilla-respectful`, `Megabase-balanced`, and `Unlimited sandbox` are documented.
+- Preset import/export maps to explicit setting keys and default values.
+- The design avoids a second override control beside every technology.
 - Advanced toggles still exist for users who do not want presets.
 - Preset behavior is stable across fresh install and existing-save configuration changes.
 
@@ -820,7 +799,7 @@ The planned mapping is:
 
 ```text
 More Infinite Research v2.0.5 on Factorio 2.1.x -> More Infinite Research v1.9.0 on Factorio 2.0.x
-More Infinite Research v2.1.5 on Factorio 2.1.x -> More Infinite Research v1.9.5 on Factorio 2.0.x
+Next tested More Infinite Research v2.1.x snapshot -> More Infinite Research v1.9.5 on Factorio 2.0.x
 Latest tested MIR v2.x.x when Factorio 2.1 becomes stable or another verified upstream cutoff is chosen -> final MIR v1.9.9 on Factorio 2.0.x
 ```
 
@@ -868,7 +847,7 @@ A Factorio 2.0 backport should be a best-compatible subset on `legacy`, not a pr
 
 Before writing feature code:
 
-1. Decide defaults for spoilage preservation and agricultural growth speed in each preset.
+1. Decide default-on criteria for spoilage preservation and agricultural growth speed without relying on preset modes.
 2. Verify `NothingModifier` display shape in Factorio 2.1.8+.
 3. Confirm event payloads for agricultural tower planting and harvesting.
 4. Confirm whether `change-recipe-productivity` works as expected for thruster fluid recipes.
@@ -878,7 +857,7 @@ Before writing feature code:
 8. Add duplicate-tech detection for overlapping native modifiers.
 9. Add performance labels to docs and setting descriptions for scripted/global/sandbox features.
 10. Produce a no-code proof for each scripted feature before claiming it in v2.0.5 or carrying it into v2.1.0.
-11. Identify exact setting keys and preset-derived defaults.
+11. Identify exact setting keys and any future shareable-profile defaults.
 12. Preserve stable generated technology names/IDs or document a migration.
 13. Split the work into reviewable task chunks or GitHub issues before coding.
 14. Draft public update wording for Reddit and the mod portal.
@@ -937,7 +916,7 @@ Otherwise classify it as a companion mod or defer it.
 
 Use browser research only for current official Factorio API documentation and official wiki pages when verifying API claims. Cite sources. Do not rely on Reddit, search snippets, or memory for API behavior.
 
-Plan specifically around these candidate ideas:
+Plan specifically around these implemented and candidate ideas:
 - Spoilage preservation
 - Agricultural growth speed
 - Agricultural yield / fruit yield
@@ -955,7 +934,7 @@ Plan specifically around these candidate ideas:
 - Greenhouses / off-world Gleba farming
 - Super-bacteria
 - Biter egg production chaos
-- Settings presets
+- Shareable settings profiles
 - Maraxis compatibility
 - Krastorio 2 Spaced Out compatibility
 - Factorio 2.0 legacy branch compatibility

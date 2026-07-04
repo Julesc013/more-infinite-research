@@ -56,33 +56,166 @@ local function icon_from_item(name)
   return nil
 end
 
-local function icons_from_tech_candidates(names)
-  for _, name in ipairs(names or {}) do
-    local icons = icons_from_tech(name) or icon_from_item(name)
-    if icons then return icons end
-  end
+local function icon_from_fluid(name)
+  local fluid = lookup.fluid_prototype(name)
+  if not fluid then return nil end
+  if fluid.icons then return copy_icons(fluid.icons) end
+  if fluid.icon then return {{icon = fluid.icon, icon_size = fluid.icon_size or 64}} end
   return nil
 end
 
-local function base_icons_for_stream(stream)
+local function startup_setting(name)
+  local setting = settings and settings.startup and settings.startup[name]
+  if setting then return setting.value end
+  return nil
+end
+
+local INSTALLED_ASSET_OPT_IN_MODS = {
+  ["elevated-rails"] = true,
+  ["space-age"] = true
+}
+
+local function inactive_asset_mod_allowed(mod_name)
+  if not mod_name then return true end
+  if lookup.mod_exists(mod_name) then return true end
+
+  return INSTALLED_ASSET_OPT_IN_MODS[mod_name] == true
+    and startup_setting("mir-use-installed-space-age-icons") == true
+end
+
+local function required_mods_loaded(candidate)
+  if not candidate then return true end
+
+  if candidate.required_mod and not lookup.mod_exists(candidate.required_mod) then
+    return false
+  end
+
+  if candidate.mod and not lookup.mod_exists(candidate.mod) then
+    return false
+  end
+
+  for _, mod_name in ipairs(candidate.required_mods or {}) do
+    if not lookup.mod_exists(mod_name) then return false end
+  end
+
+  local asset_mod = candidate.inactive_mod_asset or candidate.asset_mod
+  if not inactive_asset_mod_allowed(asset_mod) then return false end
+
+  return true
+end
+
+local function source_label(kind, name)
+  if kind == "technology" then return "tech:" .. tostring(name) end
+  if kind == "item" then return "item:" .. tostring(name) end
+  if kind == "fluid" then return "fluid:" .. tostring(name) end
+  if kind == "icon" then return tostring(name) end
+  return tostring(kind or "fallback")
+end
+
+local function resolve_icon_candidate(candidate)
+  if type(candidate) == "string" then
+    local icons = icons_from_tech(candidate)
+    if icons then return icons, source_label("technology", candidate) end
+
+    icons = icon_from_item(candidate)
+    if icons then return icons, source_label("item", candidate) end
+
+    return nil, source_label("technology", candidate)
+  end
+
+  if type(candidate) ~= "table" or not required_mods_loaded(candidate) then
+    return nil, nil
+  end
+
+  if candidate.icons then
+    return copy_icons(candidate.icons), "custom-icons"
+  end
+
+  if candidate.icon then
+    local entry = {icon = candidate.icon, icon_size = candidate.icon_size or 64}
+    if candidate.icon_tint then entry.tint = candidate.icon_tint end
+    return {entry}, source_label("icon", candidate.icon)
+  end
+
+  if candidate.technology then
+    local icons = icons_from_tech(candidate.technology)
+    if icons then return icons, source_label("technology", candidate.technology) end
+  end
+
+  if candidate.item then
+    local icons = icon_from_item(candidate.item)
+    if icons then return icons, source_label("item", candidate.item) end
+  end
+
+  if candidate.fluid then
+    local icons = icon_from_fluid(candidate.fluid)
+    if icons then return icons, source_label("fluid", candidate.fluid) end
+  end
+
+  return nil, nil
+end
+
+local function resolve_icon_candidates(candidates)
+  local fallback_source = nil
+  for _, candidate in ipairs(candidates or {}) do
+    local icons, source = resolve_icon_candidate(candidate)
+    fallback_source = fallback_source or source
+    if icons then return icons, source end
+  end
+  return nil, fallback_source
+end
+
+local function append_legacy_candidates(out, stream)
+  for _, name in ipairs(stream.icon_techs or {}) do
+    table.insert(out, {technology = name})
+    table.insert(out, {item = name})
+  end
+
+  if stream.icon_tech then
+    table.insert(out, {technology = stream.icon_tech})
+    table.insert(out, {item = stream.icon_tech})
+  end
+
+  if stream.icon_item then
+    table.insert(out, {item = stream.icon_item})
+  end
+
+  if stream.icon_fluid then
+    table.insert(out, {fluid = stream.icon_fluid})
+  end
+
+  if stream.items and stream.items[1] then
+    table.insert(out, {item = stream.items[1]})
+  end
+
+  if stream.fluids and stream.fluids[1] then
+    table.insert(out, {fluid = stream.fluids[1]})
+  end
+end
+
+local function resolve_base_icons_for_stream(stream)
+  stream = stream or {}
+
   local base = nil
   if stream.icons then
-    base = stream.icons
+    base = copy_icons(stream.icons)
+    return base, "custom-icons"
   elseif stream.icon then
     local entry = {icon = stream.icon, icon_size = stream.icon_size or 64}
     if stream.icon_tint then entry.tint = stream.icon_tint end
     base = {entry}
-  elseif stream.icon_techs then
-    base = icons_from_tech_candidates(stream.icon_techs)
-  elseif stream.icon_tech then
-    base = icons_from_tech(stream.icon_tech) or icon_from_item(stream.icon_tech)
+    return base, source_label("icon", stream.icon)
   end
-  if not base then
-    local src = stream.icon_item or ((stream.items or {})[1])
-    base = icon_from_item(src)
+
+  local candidates = {}
+  for _, candidate in ipairs(stream.icon_candidates or {}) do
+    table.insert(candidates, candidate)
   end
-  if base then return copy_icons(base) end
-  return nil
+  append_legacy_candidates(candidates, stream)
+
+  local icons, source = resolve_icon_candidates(candidates)
+  if icons then return copy_icons(icons), source end
+  return nil, source or "fallback"
 end
 
 local function overlay_for_stream(stream)
@@ -137,17 +270,22 @@ local function add_constant_overlay(base_icons, overlay)
 end
 
 function I.icons_for_stream(stream)
-  local base = base_icons_for_stream(stream)
+  local base = resolve_base_icons_for_stream(stream)
   return add_constant_overlay(base, overlay_for_stream(stream))
 end
 
 function I.effect_icons_for_stream(stream)
-  local base = base_icons_for_stream(stream)
+  local base = resolve_base_icons_for_stream(stream)
   if base and #base > 0 then return base end
   return {{
     icon = "__base__/graphics/technology/mining-productivity.png",
     icon_size = 256
   }}
+end
+
+function I.icon_source_for_stream(stream)
+  local _, source = resolve_base_icons_for_stream(stream)
+  return source or "fallback"
 end
 
 return I
