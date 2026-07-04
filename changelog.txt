@@ -11,6 +11,11 @@ Date: 2026-07-05
     - Kept compatible 2.1.0 recipe-productivity ownership safeguards.
     - Kept compatible vanilla productivity-family adoption and fluid-output productivity streams.
 
+  Internal:
+
+    - Fixed local audits so official built-ins include required official dependencies such as Recycler for Quality.
+    - Tightened load-failure grouping to classify Factorio error excerpts instead of MIR audit-row text.
+
 ---------------------------------------------------------------------------------------------------
 Version: 2.1.0
 Date: 2026-07-03

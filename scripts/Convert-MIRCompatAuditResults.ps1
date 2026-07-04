@@ -41,6 +41,28 @@ function Read-MIRTextIfExists {
   return Get-Content -Raw -LiteralPath $Path
 }
 
+function Get-MIRFactorioErrorText {
+  param([string]$Text)
+
+  if ([string]::IsNullOrWhiteSpace($Text)) { return "" }
+
+  $marker = "------------- Error -------------"
+  $markerIndex = $Text.LastIndexOf($marker, [System.StringComparison]::Ordinal)
+  if ($markerIndex -ge 0) {
+    return $Text.Substring($markerIndex)
+  }
+
+  $lines = @($Text -split "`r?`n")
+  $errorLines = @($lines | Where-Object {
+    $_ -match "Error Util\.cpp|Failed to load mod|Error while loading|Exception"
+  })
+  if ($errorLines.Count -gt 0) {
+    return ($errorLines -join "`n")
+  }
+
+  return (($lines | Select-Object -Last 80) -join "`n")
+}
+
 function New-MIRFailureGroup {
   param(
     [Parameter(Mandatory)][string]$Kind,
@@ -129,6 +151,7 @@ foreach ($result in $loadResults) {
   $stdoutPath = [string](Get-MIRObjectProperty -Object $result -Name "stdout")
   $stderrPath = [string](Get-MIRObjectProperty -Object $result -Name "stderr")
   $logText = (Read-MIRTextIfExists -Path $stdoutPath) + "`n" + (Read-MIRTextIfExists -Path $stderrPath)
+  $errorText = Get-MIRFactorioErrorText -Text $logText
   $passed = [bool](Get-MIRObjectProperty -Object $result -Name "passed" -Default $false)
   $skipped = [bool](Get-MIRObjectProperty -Object $result -Name "skipped" -Default $false)
   $skipReason = [string](Get-MIRObjectProperty -Object $result -Name "skip_reason")
@@ -150,11 +173,11 @@ foreach ($result in $loadResults) {
     $kind = "load_failure"
     if ($timedOut) {
       $kind = "timeout"
-    } elseif ($logText -match "multiple infinite productivity owners|multiple infinite recipe-productivity owners") {
+    } elseif ($errorText -match "multiple infinite productivity owners|multiple infinite recipe-productivity owners") {
       $kind = "duplicate_exact_owner"
-    } elseif ($logText -match "missing prerequisite|Unknown technology|Technology prerequisite") {
+    } elseif ($errorText -match "missing prerequisite|Unknown technology|Technology prerequisite") {
       $kind = "missing_prerequisite"
-    } elseif ($logText -match "No lab|science pack|ingredients") {
+    } elseif ($errorText -match "No lab|science pack|ingredients") {
       $kind = "invalid_science_pack"
     }
 

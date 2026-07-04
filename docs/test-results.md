@@ -18,6 +18,8 @@ Scope:
 - Added `fixtures/compat-matrix/local-library-scenarios-2.0.json` for legacy-line local-library audits.
 - Made `AuditSmoke` use `space-age-baseline` on Factorio `2.1` and `base-baseline` on Factorio `2.0`.
 - Made official built-in mod-list generation depend on the selected Factorio binary.
+- Closed required official built-in dependencies before writing scenario `mod-list.json`.
+- Tightened load-failure grouping so Factorio prototype errors are classified from the error excerpt, not MIR audit rows.
 - Added `docs/dev-tools.md` for preferred commands, stable direct scripts, advanced engines, private helpers, and run profiles.
 
 Commands:
