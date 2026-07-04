@@ -70,7 +70,8 @@ The broad mod-portal audit is local/manual because it can require Factorio crede
 - `scripts/Convert-MIRCompatAuditResults.ps1`: groups load/audit results into failure classes and writes profile-candidate evidence.
 - `scripts/New-MIRCompatProfileStub.ps1`: creates review-required Lua stubs from grouped audit failures.
 - `fixtures/compat-matrix/manual-scenarios.json`: curated high-risk scenarios that should not be inferred from downloads alone.
-- `fixtures/compat-matrix/local-library-scenarios.json`: curated scenarios intended for large read-only local zip libraries such as `C:\Projects\Factorio\testmods_readonly_2.1`.
+- `fixtures/compat-matrix/local-library-scenarios.json`: curated Factorio `2.1` scenarios intended for large read-only local zip libraries such as `C:\Projects\Factorio\testmods_readonly_2.1`.
+- `fixtures/compat-matrix/local-library-scenarios-2.0.json`: curated Factorio `2.0` scenarios for legacy-line local libraries such as `C:\Projects\Factorio\testmods_readonly_2.0`.
 - `fixtures/compat-matrix/expected-failures.json`: reviewed expected-failure rules used by grouped reports so known external breakage can be separated from unexpected MIR regressions.
 - `fixtures/compat-matrix/known-exclusions.json`: stable exclusions for official DLC, localization, and internal-only portal entries.
 
@@ -78,11 +79,14 @@ Local modpack zips can be supplied with `-LocalModZipDirs` or `-LocalModZips`. L
 
 The `LocalModZips` extended tier automatically enables `-IncludeRecommendedDependencies` because Factorio modpack wrapper mods often use `+` dependencies to describe the pack contents rather than strict required dependencies. `LocalModZips` treats root zip dirs as the set of individual scenarios to test. `LocalModLibraryDirs` is dependency-library-only; it does not turn every library zip into a root scenario unless the same directory is also passed through `-LocalModZipDirs`.
 
+Use `-FactorioLine 2.1` or `-FactorioLine 2.0` to keep one audit toolchain pointed at the correct Factorio line. The line selects Mod Portal release matching, output metadata, generated local scenario names, and the default curated local scenario file. A `2.0` run still requires a Factorio `2.0.x` binary and a source tree whose metadata targets Factorio `2.0`; do not validate a legacy package with a Steam-updated `2.1.x` binary.
+
 Catalog and lockfile only:
 
 ```powershell
 .\scripts\Invoke-MIRCompatAudit.ps1 `
   -MinDownloads 10000 `
+  -FactorioLine 2.1 `
   -FactorioVersions @("2.0", "2.1") `
   -MaxCandidates 100
 ```
@@ -92,6 +96,7 @@ Download and load-test mode requires credentials and a local binary:
 ```powershell
 .\scripts\Invoke-MIRCompatAudit.ps1 `
   -FactorioBin "C:\path\to\factorio.exe" `
+  -FactorioLine 2.1 `
   -ModPortalUsername $env:FACTORIO_USERNAME `
   -ModPortalToken $env:FACTORIO_TOKEN `
   -ScenarioTimeoutSeconds 900 `
@@ -104,6 +109,7 @@ Manual scenarios can now be executed with `-RunManualScenarios`:
 ```powershell
 .\scripts\Invoke-MIRCompatAudit.ps1 `
   -FactorioBin $env:FACTORIO_BIN `
+  -FactorioLine 2.1 `
   -ModPortalUsername $env:FACTORIO_USERNAME `
   -ModPortalToken $env:FACTORIO_TOKEN `
   -MaxCandidates 0 `
@@ -120,6 +126,7 @@ Sharded or resumed audits can use `-FromLockfile`, `-StartIndex`, `-Count`, and 
 ```powershell
 .\scripts\Invoke-MIRCompatAudit.ps1 `
   -FromLockfile .\artifacts\compat-audit-2.1-spaceage-all-10k\compat-candidates.lock.json `
+  -FactorioLine 2.1 `
   -StartIndex 25 `
   -Count 25 `
   -FactorioBin $env:FACTORIO_BIN `
@@ -156,7 +163,10 @@ Use `mir.ps1` as the preferred human entry point for repeatable local and self-h
 .\scripts\mir.ps1 report missing-deps --run <path>
 .\scripts\mir.ps1 package build
 .\scripts\mir.ps1 run -Profile local-audit-2.1
+.\scripts\mir.ps1 run -Profile local-audit-2.0
 ```
+
+`--factorio-line <2.0|2.1>` can override a profile when you need the same command shape on a different Factorio line. For local overnight work, `overnight-local-2.1` uses the 2.1 library/scenario defaults and `overnight-local-2.0` uses the 2.0 defaults.
 
 Use the underlying scripts directly only when debugging or composing a narrower custom run:
 
@@ -190,13 +200,13 @@ Do not mix Factorio lines unintentionally. The current `2.1.0` package targets F
 
 Use `-CollectAll` for exploratory or overnight runs. It prevents the wrapper from forwarding scenario-level `-FailFast` into audit tiers, so all selected scenarios can produce artifacts. Use `-FailFast -FailOnAuditFailures` for strict gates; after conversion, the wrapper reads `compat-failures.grouped.json` and fails the tier when unexpected grouped failures remain.
 
-`AuditSmoke` is intentionally deterministic. It runs the committed `space-age-baseline` manual-scenario metadata path and the grouped-result converter, so release gates can prove the audit plumbing without depending on whichever Mod Portal catalog entry happens to sort first. It is not a broad compatibility claim; use `Top25Base`, `Top25SpaceAge`, and `ManualScenarios` for exploratory external-mod coverage.
+`AuditSmoke` is intentionally deterministic. On Factorio `2.1` it runs the committed `space-age-baseline` manual-scenario metadata path; on Factorio `2.0` it runs the base-only `base-baseline` scenario. It is not a broad compatibility claim; use `Top25Base`, `Top25SpaceAge`, and `ManualScenarios` for exploratory external-mod coverage.
 
 Generated lockfiles and reports belong under ignored output directories such as `artifacts/compat-audit/` or `build/compat-audit-*`. Do not commit downloaded mod zips or one-off portal reports. Commit only scenario fixtures, known exclusions, code changes, and small compatibility profiles that are justified by repeatable audit evidence.
 
-Load-test mode enables the root candidate, its required Mod Portal dependency closure, and required official built-in mods such as Space Age, Quality, Elevated Rails, or Recycler without trying to download official built-ins from the portal. `-IncludeSpaceAge` enables the official Space Age bundle explicitly. Downloaded archives are checked against their Mod Portal SHA1 before reuse, and load-test results include parsed MIR audit rows when generation diagnostics are forced on in the copied test mod.
+Load-test mode enables the root candidate, its required Mod Portal dependency closure, and required official built-in mods such as Space Age, Quality, Elevated Rails, or Recycler without trying to download official built-ins from the portal. `-IncludeSpaceAge` requires `space-age` and then enables only the official companion mods that actually exist beside the selected Factorio binary. Downloaded archives are checked against their Mod Portal SHA1 before reuse, and load-test results include parsed MIR audit rows when generation diagnostics are forced on in the copied test mod.
 
-The isolated load runner writes explicit entries for the official built-ins. Installed official mods that are not requested by the scenario are disabled instead of being inherited from the user's normal Factorio install. When a scenario requires `space-age`, the runner enables the full official bundle (`elevated-rails`, `recycler`, `quality`, and `space-age`) so Space Age dependency closure matches a normal game install.
+The isolated load runner writes explicit entries for the official built-ins. Installed official mods that are not requested by the scenario are disabled instead of being inherited from the user's normal Factorio install. When a scenario requires `space-age`, the runner requires `space-age` and enables whichever official companion mods are present beside the selected Factorio binary, so Factorio `2.0` and `2.1` runs do not share a hardcoded bundle assumption.
 
 Scenarios with unresolved required dependencies are skipped before Factorio startup by default and grouped as dependency failures. Pass `-ContinueOnDependencyFailure` only when intentionally testing a partial modset. Each Factorio load check has a timeout controlled by `-ScenarioTimeoutSeconds`; timed-out processes are killed and grouped as `timeout` failures rather than blocking the entire run.
 

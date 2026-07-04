@@ -2,7 +2,7 @@
 
 This file records local release-candidate validation runs. It is not a substitute for the manual mod matrix in `docs/compatibility.md`.
 
-## 2026-07-05 Legacy Developer Tooling Front Door Import
+## 2026-07-05 Legacy Factorio-Line Test Tooling Import
 
 Environment:
 
@@ -11,24 +11,32 @@ Environment:
 
 Scope:
 
-- Imported the reusable `mir.ps1` front door and run-profile tooling from the current development line.
+- Imported reusable `mir.ps1`, run-profile, PowerShell quality, and Factorio-line audit tooling from the current line.
 - Kept the tooling as a thin wrapper over the existing validation, audit, package, and report scripts.
-- Added PowerShell quality checks for parsing, duplicate parameters, ignored outputs, and obvious secret output.
+- Added `FactorioLine` to the existing release gate, extended runner, compatibility audit, and overnight local sweep.
+- Added `release-targeted-2.0`, `overnight-local-2.0`, and `local-audit-2.0` profiles.
+- Added `fixtures/compat-matrix/local-library-scenarios-2.0.json` for legacy-line local-library audits.
+- Made `AuditSmoke` use `space-age-baseline` on Factorio `2.1` and `base-baseline` on Factorio `2.0`.
+- Made official built-in mod-list generation depend on the selected Factorio binary.
 - Added `docs/dev-tools.md` for preferred commands, stable direct scripts, advanced engines, private helpers, and run profiles.
 
 Commands:
 
 ```powershell
-.\scripts\mir.ps1 --help
-.\scripts\mir.ps1 run -Profile local-audit-2.1 --help
 .\scripts\Test-MIRPowerShellQuality.ps1
+.\scripts\mir.ps1 --help
+.\scripts\mir.ps1 run -Profile local-audit-2.0 --help
 .\scripts\Invoke-MIRValidation.ps1 -StaticOnly
+git diff --check
 ```
 
 Results:
 
-- Imported from the current line for legacy test-harness reuse before Factorio `2.0` runtime validation.
-- Validation must be rerun on `legacy` after the full tooling import is applied.
+- `mir.ps1 --help` and the `local-audit-2.0` profile-help guard printed help without starting a long run.
+- PowerShell quality checks passed across `27` scripts.
+- Static validation passed and built `build\validation-dist\more-infinite-research_1.9.5.zip`.
+- `git diff --check` passed.
+- Factorio `2.0` runtime validation still requires a real Factorio `2.0.x` binary.
 
 ## 2026-07-04 Legacy 1.9.5 Backport Static And Package Gate
 

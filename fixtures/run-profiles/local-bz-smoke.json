@@ -2,6 +2,7 @@
   "schema": 1,
   "kind": "extended",
   "tiers": ["LocalLibraryScenarios"],
+  "factorio_line": "2.1",
   "factorio_bin": "auto",
   "local_mod_zip_dirs": ["C:\\Projects\\Factorio\\testmods_readonly_2.1"],
   "local_mod_library_dirs": ["C:\\Projects\\Factorio\\testmods_readonly_2.1"],

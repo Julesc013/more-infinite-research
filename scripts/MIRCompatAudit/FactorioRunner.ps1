@@ -13,10 +13,10 @@ function New-MIRCompatUserDataDir {
 function Write-MIRModList {
   param(
     [Parameter(Mandatory)][string]$ModsDir,
-    [Parameter(Mandatory)][string[]]$EnabledMods
+    [Parameter(Mandatory)][string[]]$EnabledMods,
+    [string[]]$OfficialBuiltinMods = @("elevated-rails", "recycler", "quality", "space-age")
   )
 
-  $officialBuiltinMods = @("elevated-rails", "recycler", "quality", "space-age")
   $enabledLookup = @{ base = $true }
   foreach ($name in @($EnabledMods)) {
     if (-not [string]::IsNullOrWhiteSpace([string]$name)) {
@@ -29,13 +29,13 @@ function Write-MIRModList {
       Where-Object {
         -not [string]::IsNullOrWhiteSpace([string]$_) -and
         $_ -ne "base" -and
-        $officialBuiltinMods -notcontains [string]$_
+        $OfficialBuiltinMods -notcontains [string]$_
       } |
       Sort-Object -Unique
   )
 
   $mods = @()
-  foreach ($name in @("base") + $officialBuiltinMods + $additionalModNames) {
+  foreach ($name in @("base") + $OfficialBuiltinMods + $additionalModNames) {
     $mods += [ordered]@{
       name = $name
       enabled = $enabledLookup.ContainsKey([string]$name)

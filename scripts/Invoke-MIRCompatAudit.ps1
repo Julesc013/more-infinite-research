@@ -1,5 +1,7 @@
 param(
   [string]$FactorioBin = $env:FACTORIO_BIN,
+  [ValidateSet("2.0", "2.1")]
+  [string]$FactorioLine = "",
   [string]$ModPortalUsername = $env:FACTORIO_USERNAME,
   [string]$ModPortalToken = $env:FACTORIO_TOKEN,
   [int]$MinDownloads = 10000,
@@ -47,6 +49,15 @@ $moduleRoot = Join-Path $PSScriptRoot "MIRCompatAudit"
 . (Join-Path $moduleRoot "DependencyResolver.ps1")
 . (Join-Path $moduleRoot "DiagnosticsParser.ps1")
 . (Join-Path $moduleRoot "FactorioRunner.ps1")
+
+if ([string]::IsNullOrWhiteSpace($FactorioLine)) {
+  $lineCandidates = @($FactorioVersions | Where-Object { $_ -in @("2.0", "2.1") } | Select-Object -Unique)
+  if ($lineCandidates.Count -eq 1) {
+    $FactorioLine = [string]$lineCandidates[0]
+  } else {
+    $FactorioLine = "2.1"
+  }
+}
 
 function New-MIRDirectory {
   param([Parameter(Mandatory)][string]$Path)
@@ -319,14 +330,41 @@ foreach ($zipPath in $localZipPaths) {
     Add-MIRLocalFullModToIndex -Index $localRootFullModsByName -FullMod $localFull
   }
 }
-$officialBuiltinMods = @("space-age", "quality", "elevated-rails", "recycler")
+$knownOfficialBuiltinMods = @("space-age", "quality", "elevated-rails", "recycler")
+function Get-MIRAvailableOfficialBuiltinMods {
+  param(
+    [string]$FactorioBinary,
+    [string]$Line,
+    [string[]]$Candidates
+  )
+
+  if (-not [string]::IsNullOrWhiteSpace($FactorioBinary) -and (Test-Path -LiteralPath $FactorioBinary)) {
+    $factorioExe = (Resolve-Path -LiteralPath $FactorioBinary).Path
+    $factorioRoot = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $factorioExe))
+    $dataRoot = Join-Path $factorioRoot "data"
+    if (Test-Path -LiteralPath $dataRoot) {
+      return @($Candidates | Where-Object {
+        Test-Path -LiteralPath (Join-Path $dataRoot ("{0}\info.json" -f $_))
+      } | Sort-Object)
+    }
+  }
+
+  if ($Line -eq "2.1") { return @($Candidates | Sort-Object) }
+  return @($Candidates | Sort-Object)
+}
+
+$officialBuiltinMods = @(Get-MIRAvailableOfficialBuiltinMods -FactorioBinary $FactorioBin -Line $FactorioLine -Candidates $knownOfficialBuiltinMods)
 $specialLocalMods = @("base", "more-infinite-research")
 $officialBuiltinLookup = @{}
-foreach ($officialMod in $officialBuiltinMods) {
+foreach ($officialMod in $knownOfficialBuiltinMods) {
   $officialBuiltinLookup[$officialMod] = $true
 }
+$availableOfficialBuiltinLookup = @{}
+foreach ($officialMod in $officialBuiltinMods) {
+  $availableOfficialBuiltinLookup[$officialMod] = $true
+}
 $localModLookup = @{}
-foreach ($name in @($officialBuiltinMods + $specialLocalMods)) {
+foreach ($name in @($knownOfficialBuiltinMods + $specialLocalMods)) {
   $localModLookup[$name] = $true
 }
 
@@ -372,6 +410,32 @@ function Get-MIREnabledOfficialModsFromEntries {
   }
 
   return @($enabled.Keys | Sort-Object)
+}
+
+function Get-MIRUnavailableOfficialMods {
+  param(
+    [object[]]$LockEntries,
+    [bool]$EnableSpaceAgeBundle,
+    [string[]]$ExplicitOfficialMods = @(),
+    [switch]$IncludeRecommendedDependencies
+  )
+
+  $required = @{}
+  if ($EnableSpaceAgeBundle) {
+    $required["space-age"] = $true
+  }
+  foreach ($name in @($ExplicitOfficialMods)) {
+    if ($officialBuiltinLookup.ContainsKey([string]$name)) { $required[[string]$name] = $true }
+  }
+  foreach ($entry in @($LockEntries)) {
+    foreach ($dep in @($entry.dependencies)) {
+      $includeDependency = $dep.required -or ($IncludeRecommendedDependencies -and $dep.kind -eq "recommended")
+      if ($includeDependency -and $officialBuiltinLookup.ContainsKey([string]$dep.name)) {
+        $required[[string]$dep.name] = $true
+      }
+    }
+  }
+  @($required.Keys | Where-Object { -not $availableOfficialBuiltinLookup.ContainsKey([string]$_) } | Sort-Object)
 }
 
 function Resolve-MIRLockDependencyNames {
@@ -483,10 +547,11 @@ function New-MIRGeneratedLocalScenarioDefinitions {
 
   $compatibleNames = @(Get-MIRCompatibleLocalModNames -FullModsByName $FullModsByName)
   $definitions = @()
+  $scenarioLineSlug = $FactorioLine.Replace(".", "-")
 
   if ($GenerateLocalMegaScenario -or (-not $GenerateLocalClusterScenarios -and -not $GenerateLocalPairwiseScenarios)) {
     $definitions += New-MIRGeneratedLocalScenarioDefinition `
-      -Name "generated-local-2-1-mega-all" `
+      -Name "generated-local-$scenarioLineSlug-mega-all" `
       -Mods $compatibleNames `
       -IncludeSpaceAge $true `
       -Notes "Generated stress scenario: all locally available compatible mods enabled together with the official Space Age bundle."
@@ -495,37 +560,37 @@ function New-MIRGeneratedLocalScenarioDefinitions {
   if ($GenerateLocalClusterScenarios) {
     $clusterPatterns = @(
       [pscustomobject]@{
-        name = "generated-local-2-1-cluster-planets"
+        name = "generated-local-$scenarioLineSlug-cluster-planets"
         include_space_age = $true
         pattern = "(?i)(planet|moon|space-age|Cerys|Fulgora|corrundum|cubium|lignumis|Moshine|muluna|rubia|secretas|panglia|Paracelsin|rabbasca|vesta|aquilo|gleba|Muria|carna|linox|foliax|nauv|Small-Space-Age|warptorio)"
         notes = "Generated cluster scenario for locally available planet and Space Age content mods."
       },
       [pscustomobject]@{
-        name = "generated-local-2-1-cluster-bz-resources"
+        name = "generated-local-$scenarioLineSlug-cluster-bz-resources"
         include_space_age = $true
         pattern = "(?i)^(bz|bzt|bzz)|resource|ore|carbon|lead|silicon|tin|titanium|zirconium"
         notes = "Generated cluster scenario for locally available BZ/resource-chain mods."
       },
       [pscustomobject]@{
-        name = "generated-local-2-1-cluster-bob"
+        name = "generated-local-$scenarioLineSlug-cluster-bob"
         include_space_age = $false
         pattern = "(?i)^bob"
         notes = "Generated cluster scenario for locally available Bob mods."
       },
       [pscustomobject]@{
-        name = "generated-local-2-1-cluster-krastorio"
+        name = "generated-local-$scenarioLineSlug-cluster-krastorio"
         include_space_age = $true
         pattern = "(?i)Krastorio|k2so|K2"
         notes = "Generated cluster scenario for locally available Krastorio and K2SO mods."
       },
       [pscustomobject]@{
-        name = "generated-local-2-1-cluster-production-fluids"
+        name = "generated-local-$scenarioLineSlug-cluster-production-fluids"
         include_space_age = $true
         pattern = "(?i)refin|chem|fluid|casting|foundry|molten|metal|ore|plutonium|carbon|mineral|hot-metals|more-casting"
         notes = "Generated cluster scenario for locally available production, fluid, casting, and resource-flow mods."
       },
       [pscustomobject]@{
-        name = "generated-local-2-1-cluster-logistics-transport"
+        name = "generated-local-$scenarioLineSlug-cluster-logistics-transport"
         include_space_age = $true
         pattern = "(?i)train|cargo|ship|loader|inserter|belt|logistic|transport|rail|space-platform"
         notes = "Generated cluster scenario for locally available logistics, transport, rail, cargo, and inserter mods."
@@ -560,7 +625,7 @@ function New-MIRGeneratedLocalScenarioDefinitions {
         if ($pairCount -ge $GeneratedLocalPairwiseLimit) { break }
         $pairCount++
         $definitions += New-MIRGeneratedLocalScenarioDefinition `
-          -Name ("generated-local-2-1-pair-{0:D3}" -f $pairCount) `
+          -Name ("generated-local-$scenarioLineSlug-pair-{0:D3}" -f $pairCount) `
           -Mods @($pairPool[$i], $pairPool[$j]) `
           -IncludeSpaceAge $true `
           -Notes ("Generated capped pairwise local-library scenario: {0} + {1}." -f $pairPool[$i], $pairPool[$j])
@@ -660,6 +725,17 @@ function Resolve-MIRPortalScenario {
     -EnableSpaceAgeBundle $EnableSpaceAgeBundle `
     -ExplicitOfficialMods $explicitOfficialMods `
     -IncludeRecommendedDependencies:$IncludeRecommendedDependencies)
+  foreach ($missingOfficial in @(Get-MIRUnavailableOfficialMods `
+      -LockEntries $scenarioLockEntries `
+      -EnableSpaceAgeBundle $EnableSpaceAgeBundle `
+      -ExplicitOfficialMods $explicitOfficialMods `
+      -IncludeRecommendedDependencies:$IncludeRecommendedDependencies)) {
+    $scenarioFailures += [pscustomobject]@{
+      name = $missingOfficial
+      phase = "official-mod"
+      error = "Official built-in mod '$missingOfficial' is not present for Factorio line $FactorioLine at the selected Factorio binary."
+    }
+  }
 
   New-MIRScenario `
     -Name $Name `
@@ -697,6 +773,18 @@ function Resolve-MIRLockScenario {
     -EnableSpaceAgeBundle $EnableSpaceAgeBundle `
     -ExplicitOfficialMods (Get-MIRExplicitOfficialMods -ModNames $RequestedMods) `
     -IncludeRecommendedDependencies:$IncludeRecommendedDependencies)
+  $scenarioFailures = @($closure.failures)
+  foreach ($missingOfficial in @(Get-MIRUnavailableOfficialMods `
+      -LockEntries $scenarioLockEntries `
+      -EnableSpaceAgeBundle $EnableSpaceAgeBundle `
+      -ExplicitOfficialMods (Get-MIRExplicitOfficialMods -ModNames $RequestedMods) `
+      -IncludeRecommendedDependencies:$IncludeRecommendedDependencies)) {
+    $scenarioFailures += [pscustomobject]@{
+      name = $missingOfficial
+      phase = "official-mod"
+      error = "Official built-in mod '$missingOfficial' is not present for Factorio line $FactorioLine at the selected Factorio binary."
+    }
+  }
 
   New-MIRScenario `
     -Name $Name `
@@ -706,7 +794,7 @@ function Resolve-MIRLockScenario {
     -ResolvedMods $resolvedNames `
     -OfficialMods $officialMods `
     -LockEntries $scenarioLockEntries `
-    -Failures $closure.failures
+    -Failures $scenarioFailures
 }
 
 function Invoke-MIRScenarioLoad {
@@ -744,7 +832,7 @@ function Invoke-MIRScenarioLoad {
   Copy-MIRCachedModZips -CacheDir $resolvedCacheDir -ModsDir $modsDir -LockEntries $Scenario.lock_entries
 
   $enabledMods = @("more-infinite-research") + @($Scenario.resolved_mods) + @($Scenario.official_mods)
-  Write-MIRModList -ModsDir $modsDir -EnabledMods $enabledMods
+  Write-MIRModList -ModsDir $modsDir -EnabledMods $enabledMods -OfficialBuiltinMods $officialBuiltinMods
 
   $result = Invoke-MIRFactorioLoadCheck -FactorioBin $FactorioBin -UserDataDir $userData -ScenarioName $Scenario.name -ScenarioTimeoutSeconds $ScenarioTimeoutSeconds
   [pscustomobject]@{
@@ -936,6 +1024,7 @@ $lock = [ordered]@{
   schema = 1
   generated_at = (Get-Date).ToString("yyyy-MM-ddTHH:mm:ssK")
   min_downloads = $MinDownloads
+  factorio_line = $FactorioLine
   factorio_versions = $FactorioVersions
   include_space_age = [bool]$IncludeSpaceAge
   scenario_timeout_seconds = $ScenarioTimeoutSeconds
@@ -983,6 +1072,7 @@ $scenarioSummaries = @($selectedScenarios | ForEach-Object {
 [ordered]@{
   schema = 1
   lockfile = $lockPath
+  factorio_line = $FactorioLine
   selected_count = @($selectedScenarios | Where-Object { $_.type -eq "catalog" }).Count
   manual_selected_count = @($selectedScenarios | Where-Object { $_.type -eq "manual" }).Count
   generated_local_selected_count = @($selectedScenarios | Where-Object { $_.type -eq "generated_local" }).Count
@@ -1007,6 +1097,7 @@ $report = @()
 $report += "# MIR Compatibility Audit"
 $report += ""
 $report += "- Generated: $((Get-Date).ToString("yyyy-MM-dd HH:mm:ss K"))"
+$report += "- Factorio line: $FactorioLine"
 $report += "- Minimum downloads: $MinDownloads"
 $report += "- Factorio versions: $($FactorioVersions -join ', ')"
 $report += "- Scenario timeout seconds: $ScenarioTimeoutSeconds"

@@ -17,6 +17,8 @@ param(
   [string[]]$Tier = @("Static"),
 
   [string]$FactorioBin = $env:FACTORIO_BIN,
+  [ValidateSet("2.0", "2.1")]
+  [string]$FactorioLine = "2.1",
   [string]$ModPortalUsername = $env:FACTORIO_USERNAME,
   [string]$ModPortalToken = $env:FACTORIO_TOKEN,
   [string]$OutputRoot = ".\artifacts\extended-tests",
@@ -184,10 +186,11 @@ function Invoke-MIRCompatAuditTier {
   $auditDir = New-MIROutputDirectory -Name $Name
   $auditParams = @{
     FactorioBin = $FactorioBin
+    FactorioLine = $FactorioLine
     ModPortalUsername = $ModPortalUsername
     ModPortalToken = $ModPortalToken
     MinDownloads = 10000
-    FactorioVersions = @("2.1")
+    FactorioVersions = @($FactorioLine)
     OutputDir = $auditDir
     DownloadMods = $true
     RunLoadTests = $true
@@ -278,6 +281,7 @@ $runContext = New-MIRRunContext `
 Write-MIREvent -Path $runContext.events_path -RunId $runContext.run_id -Kind "run_start" -Data @{
   tiers = @($expandedTiers)
   output_root = $outputRootPath
+  factorio_line = $FactorioLine
   collect_all = [bool]$CollectAll
   fail_on_audit_failures = [bool]$FailOnAuditFailures
 }
@@ -300,14 +304,16 @@ foreach ($entry in $expandedTiers) {
     "AuditSmoke" {
       Invoke-MIRStep -Name "AuditSmoke" -Action {
         $auditDir = New-MIROutputDirectory -Name "audit-smoke"
+        $auditSmokeScenario = if ($FactorioLine -eq "2.0") { "base-baseline" } else { "space-age-baseline" }
         $auditParams = @{
           RunManualScenarios = $true
           ManualScenariosPath = (Join-Path $repo "fixtures\compat-matrix\manual-scenarios.json")
-          ScenarioNames = @("space-age-baseline")
+          ScenarioNames = @($auditSmokeScenario)
           CatalogPages = 0
           MaxCandidates = 0
           MinDownloads = 10000
-          FactorioVersions = @("2.1")
+          FactorioLine = $FactorioLine
+          FactorioVersions = @($FactorioLine)
           ScenarioTimeoutSeconds = $ScenarioTimeoutSeconds
           OutputDir = $auditDir
         }
@@ -336,6 +342,8 @@ foreach ($entry in $expandedTiers) {
       Invoke-MIRStep -Name "LocalLibraryScenarios" -Action {
         $scenarioPath = if (-not [string]::IsNullOrWhiteSpace($ManualScenariosPath)) {
           $ManualScenariosPath
+        } elseif ($FactorioLine -eq "2.0") {
+          Join-Path $repo "fixtures\compat-matrix\local-library-scenarios-2.0.json"
         } else {
           Join-Path $repo "fixtures\compat-matrix\local-library-scenarios.json"
         }
@@ -388,6 +396,7 @@ $summaryMd = Join-Path $outputRootPath "extended-summary.md"
 [ordered]@{
   schema = 1
   generated_at = (Get-Date).ToString("yyyy-MM-ddTHH:mm:ssK")
+  factorio_line = $FactorioLine
   tiers = $expandedTiers
   include_full_audit = [bool]$IncludeFullAudit
   fail_on_audit_failures = [bool]$FailOnAuditFailures
@@ -416,6 +425,7 @@ $md += "# MIR Extended Test Summary"
 $md += ""
 $md += "- Generated: $(Get-Date -Format "yyyy-MM-dd HH:mm:ss zzz")"
 $md += ('- Output root: `{0}`' -f $outputRootPath)
+$md += ('- Factorio line: `{0}`' -f $FactorioLine)
 $md += ('- Tiers: `{0}`' -f ($expandedTiers -join ', '))
 $md += ('- Include full audit: `{0}`' -f ([bool]$IncludeFullAudit))
 $md += ('- Fail on audit failures: `{0}`' -f ([bool]$FailOnAuditFailures))

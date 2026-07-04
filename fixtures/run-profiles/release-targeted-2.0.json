@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "kind": "release-targeted",
+  "factorio_line": "2.0",
+  "factorio_bin": "auto",
+  "local_mod_dir": "C:\\Projects\\Factorio\\testmods_readonly_2.0",
+  "repair_smoke_mod_names": [],
+  "skip_repair_smokes": true,
+  "representative_scenario_name": "local-2-0-base-baseline",
+  "manual_scenarios_path": "fixtures\\compat-matrix\\local-library-scenarios-2.0.json",
+  "audit_factorio_versions": ["2.0"],
+  "scenario_timeout_seconds": 900
+}
