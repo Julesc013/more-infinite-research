@@ -469,7 +469,6 @@ Use `v2.1.5` for small fixes after `v2.1.0`.
 - [ ] Add proven recipe IDs to existing streams when no new architecture is needed.
 - [ ] Add locale/docs/validation updates.
 - [ ] Rebalance costs or defaults for features already shipped in `v2.1.0`.
-- [ ] Backport the tested snapshot as `v1.9.5` after validation.
 
 ## v2.2.0 Larger Feature Wave
 
@@ -484,10 +483,10 @@ Use `v2.2.0` for the next larger batch after the `v2.1.x` feedback cycle.
 
 Do not reconstruct old releases commit-by-commit for `legacy`. A legacy release is a compatibility port of a tested current-line snapshot.
 
-### v1.9.5 Backport After v2.1.5
+### v1.9.5 Backport From The Next Tested v2.1.x Snapshot
 
-- [ ] Finish and validate `v2.1.5`.
-- [ ] Snapshot or merge the tested `v2.1.5` source point into a temporary legacy backport branch.
+- [ ] Finish and validate the selected `v2.1.x` source point.
+- [ ] Snapshot or merge that tested source point into a temporary legacy backport branch.
 - [ ] Apply the same Factorio `2.0` compatibility patch rules as `v1.9.0`.
 - [ ] Build `dist/more-infinite-research_1.9.5.zip`.
 - [ ] Validate with a Factorio `2.0.x` binary.

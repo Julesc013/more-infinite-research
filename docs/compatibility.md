@@ -10,7 +10,7 @@ Release-line summary:
 | `1.9.0` | `2.0.x` | compatible subset backported from the tested `2.0.5` quick-patch snapshot |
 | `2.1.0` | `2.1.x` | larger feature wave: simpler settings, icon policy, fluid productivity, pipeline extent, and targeted duplicate-productivity compatibility |
 | `2.1.5` | `2.1.x` | quick feedback patch after `2.1.0` |
-| `1.9.5` | `2.0.x` | compatible subset backported from the tested `2.1.5` snapshot |
+| `1.9.5` | `2.0.x` | compatible subset backported from the next tested `2.1.x` snapshot |
 | `1.9.9` | `2.0.x` | final planned Factorio 2.0 port from the latest tested `2.x.x` snapshot when Factorio 2.1 becomes stable or another verified upstream cutoff is chosen |
 
 The release goal is graceful compatibility without mod-page dependency clutter: compatible mods should work when their prototypes are visible, absent mods should be skipped cleanly, and no compatibility mod should be required for this mod to load.
@@ -161,7 +161,15 @@ The tiered wrapper is the recommended entry point for repeatable local and self-
 .\scripts\Invoke-MIRExtendedTests.ps1 -Tier Full10KSpaceAge -IncludeFullAudit -FromLockfile .\artifacts\compat-audit-locks\compat-candidates.lock.json -StartIndex 25 -ShardSize 25 -CollectAll
 ```
 
-`Invoke-MIRReleaseTargetedGate.ps1` is the narrow release command. It resolves the Factorio binary and local `2.1` zip library, optionally pulls `origin/dev`, runs the strict `Static,Runtime,AuditSmoke` gate, runs the targeted harness repair zips (`big-mining-drill` for base-only official-DLC isolation and `biolabs-in-space` for full Space Age bundle expansion), runs the representative local BZ Space Age suite, converts grouped failures, rebuilds the package, runs `git diff --check`, and fails if git status is not clean. It writes `release-targeted-summary.md/json` under `artifacts/release-targeted-*`.
+`Invoke-MIRReleaseTargetedGate.ps1` is the narrow release command. It resolves the Factorio binary, picks a local mod library for the current Factorio line unless one is passed, optionally pulls the current branch, and then runs:
+
+- the strict `Static,Runtime,AuditSmoke` gate;
+- configured local smoke mods;
+- one configured representative local scenario;
+- grouped failure conversion;
+- package rebuild, `git diff --check`, and a clean-git-status check.
+
+The default smoke mods and representative scenario are ordinary parameters, so future release lines can reuse the same command without changing script code. It writes `release-targeted-summary.md/json` under `artifacts/release-targeted-*`.
 
 `mir.ps1` is the stable front door for humans. It delegates to the existing scripts rather than replacing them, supports JSON run profiles from `fixtures/run-profiles/`, and exposes common commands such as `release gate`, `overnight local`, `audit local`, `audit top25 --space-age`, `package build`, `report latest`, `report missing-deps`, `profile stub`, and `local-index build`.
 
@@ -233,7 +241,7 @@ Do not publish a compatibility-heavy archive from static validation alone. After
 
 ## Legacy Backport Model
 
-The Factorio `2.0` legacy release More Infinite Research `v1.9.0` has been released from the `legacy` branch, backported from the tested More Infinite Research `v2.0.5` Factorio `2.1` quick-patch codebase. Later quick patch backports can follow the same model, such as `v2.1.5 -> v1.9.5`, with `v1.9.9` reserved as the final planned Factorio `2.0` build from the latest tested `2.x.x` snapshot when Factorio `2.1` becomes stable or another verified upstream cutoff is chosen.
+The Factorio `2.0` legacy release More Infinite Research `v1.9.0` has been released from the `legacy` branch, backported from the tested More Infinite Research `v2.0.5` Factorio `2.1` quick-patch codebase. Later legacy ports should follow the same snapshot-port model. `v1.9.5` is reserved for the next tested `2.1.x` snapshot that is worth porting, and `v1.9.9` is reserved as the final planned Factorio `2.0` build from the latest tested `2.x.x` snapshot when Factorio `2.1` becomes stable or another verified upstream cutoff is chosen.
 
 Legacy should not be reconstructed commit-by-commit from older release history. `v1.9.0` ported the tested `v2.0.5` snapshot: current MIR generator, diagnostics, recipe matching, science-pack handling, compatibility cleanup, docs structure, locale, and validation infrastructure with Factorio `2.1`-only surface area removed or guarded.
 

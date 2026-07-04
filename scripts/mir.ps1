@@ -95,9 +95,17 @@ function Invoke-MIRRunProfile {
       $params = @{}
       $factorioBin = Get-MIRProfileProperty -Object $profileData -Name "factorio_bin"
       $localModDir = Get-MIRProfileProperty -Object $profileData -Name "local_mod_dir"
+      $repairSmokeModNames = Get-MIRProfileProperty -Object $profileData -Name "repair_smoke_mod_names"
+      $representativeScenarioName = Get-MIRProfileProperty -Object $profileData -Name "representative_scenario_name"
+      $manualScenariosPath = Get-MIRProfileProperty -Object $profileData -Name "manual_scenarios_path"
+      $auditFactorioVersions = Get-MIRProfileProperty -Object $profileData -Name "audit_factorio_versions"
       $timeout = Get-MIRProfileProperty -Object $profileData -Name "scenario_timeout_seconds"
       if ($factorioBin) { $params.FactorioBin = Resolve-MIRFactorioBin -Path ([string]$factorioBin) }
       if ($localModDir) { $params.LocalModDir = [string]$localModDir }
+      if ($repairSmokeModNames) { $params.RepairSmokeModNames = @($repairSmokeModNames | ForEach-Object { [string]$_ }) }
+      if ($representativeScenarioName) { $params.RepresentativeScenarioName = [string]$representativeScenarioName }
+      if ($manualScenariosPath) { $params.ManualScenariosPath = [string]$manualScenariosPath }
+      if ($auditFactorioVersions) { $params.AuditFactorioVersions = @($auditFactorioVersions | ForEach-Object { [string]$_ }) }
       if ($timeout) { $params.ScenarioTimeoutSeconds = [int]$timeout }
       & (Join-Path $scriptRoot "Invoke-MIRReleaseTargetedGate.ps1") @params
     }

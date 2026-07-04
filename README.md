@@ -62,8 +62,8 @@ The repository has **three permanent branches** on `origin`:
 
 Normal development should target **`dev`** first. Release-ready hotfixes can target **`main`**.
 Backports that must remain compatible with Factorio `2.0.x` belong on **`legacy`**.
-
-The latest legacy release is **More Infinite Research `v1.9.0` for Factorio `2.0.x`**, released from the `legacy` branch as a compatibility port of the tested **More Infinite Research `v2.0.5` for Factorio `2.1.x`** quick-patch codebase rather than a commit-by-commit rebuild of earlier releases. Future quick feedback patches can follow the same pattern, for example **`v2.1.5 -> v1.9.5`**, with **`v1.9.9`** reserved as the final planned Factorio `2.0` port from the latest tested `2.x.x` current-line release when Factorio `2.1` becomes stable or when another verified upstream cutoff is chosen.
+Legacy releases are snapshot ports of tested current-line releases with unsupported newer Factorio surfaces removed, not commit-by-commit rebuilds of old development history.
+Current legacy status: `v1.9.0` is the Factorio `2.0` port of tested `v2.0.5`; `v1.9.5` is reserved for the next tested `2.1.x` snapshot port.
 
 See **`CONTRIBUTING.md`** for pull request expectations, branch routing, and validation commands.
 
@@ -533,19 +533,26 @@ When either diagnostics setting is enabled, MIR also reports duplicate recipe ma
 .\scripts\Build-MIRPackage.ps1
 ```
 
-**Extended local release gate:**
+**Strict release gate:**
 
 ```powershell
 .\scripts\Invoke-MIRExtendedTests.ps1 -Tier Static,Runtime,AuditSmoke -FailFast -FailOnAuditFailures
 ```
 
-**Targeted 2.1.0 release gate:**
+**Release gate with local smoke scenarios:**
 
 ```powershell
 .\scripts\Invoke-MIRReleaseTargetedGate.ps1
 ```
 
-This is the short release command. It runs the strict current-commit gate, the two harness repair smokes (`big-mining-drill` and `biolabs-in-space`), the representative local BZ Space Age suite, package rebuild, whitespace check, and clean-git-status check. Use the overnight local sweep separately for broader compatibility evidence.
+This is the short release command. It runs:
+
+- the strict `Static,Runtime,AuditSmoke` gate;
+- optional local smoke mods;
+- one representative local scenario;
+- package rebuild, whitespace check, and clean-git-status check.
+
+Defaults live in `fixtures/run-profiles/release-targeted.json`. Override `-LocalModDir`, `-RepairSmokeModNames`, `-RepresentativeScenarioName`, or `-AuditFactorioVersions` for a different release line. Use the overnight local sweep separately for broad compatibility evidence.
 
 **Developer CLI front door:**
 

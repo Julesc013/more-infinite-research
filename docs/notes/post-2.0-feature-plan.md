@@ -15,7 +15,7 @@ v2.0.5 = quick feedback patch: small/easy fixes, default-off scripted agricultur
 v2.1.0 = larger feature wave: checkbox control, icon policy, fluid productivity, pipeline extent, and targeted duplicate-productivity compatibility that passes proof.
 v1.9.0 = Factorio 2.0 compatible subset backported from the tested v2.0.5 quick-patch snapshot.
 v2.1.5 = quick feedback patch after v2.1.0.
-v1.9.5 = Factorio 2.0 compatible subset backported from the tested v2.1.5 snapshot.
+v1.9.5 = Factorio 2.0 compatible subset backported from the next tested v2.1.x snapshot.
 v2.2.0 = next larger feature wave.
 v1.9.9 = final planned Factorio 2.0 backport from the latest tested v2.x.x snapshot when Factorio 2.1 becomes stable or another verified upstream cutoff is chosen.
 ```
@@ -799,7 +799,7 @@ The planned mapping is:
 
 ```text
 More Infinite Research v2.0.5 on Factorio 2.1.x -> More Infinite Research v1.9.0 on Factorio 2.0.x
-More Infinite Research v2.1.5 on Factorio 2.1.x -> More Infinite Research v1.9.5 on Factorio 2.0.x
+Next tested More Infinite Research v2.1.x snapshot -> More Infinite Research v1.9.5 on Factorio 2.0.x
 Latest tested MIR v2.x.x when Factorio 2.1 becomes stable or another verified upstream cutoff is chosen -> final MIR v1.9.9 on Factorio 2.0.x
 ```
 

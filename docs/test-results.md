@@ -2,6 +2,37 @@
 
 This file records local release-candidate validation runs. It is not a substitute for the manual mod matrix in `docs/compatibility.md`.
 
+## 2026-07-04 Release Gate Reuse And README Cleanup
+
+Environment:
+
+- Branch: `main`.
+- Mod version `2.1.0`.
+
+Scope:
+
+- Made `Invoke-MIRReleaseTargetedGate.ps1` reusable across release lines instead of documenting it as a `2.1.0`-specific command.
+- Parameterized release smoke mod names, representative scenario name, manual scenario file, audit Factorio versions, and pull branch.
+- Wired the new release-gate parameters through `mir.ps1 run -Profile release-targeted`.
+- Simplified README branch/backport and release-gate wording so release-specific defaults no longer dominate the main docs.
+- Updated current roadmap, compatibility, TODO, and manual-test docs so `v1.9.5` is the next tested `2.1.x` snapshot port.
+
+Commands:
+
+```powershell
+.\scripts\Invoke-MIRReleaseTargetedGate.ps1 -DryRun -NoGitPull -OutputRoot .\build\release-gate-reusable-dry-run
+.\scripts\Invoke-MIRValidation.ps1 -StaticOnly
+.\scripts\Build-MIRPackage.ps1
+git diff --check
+```
+
+Results:
+
+- Release-gate dry run resolved MIR `2.1.0`, Factorio `2.1`, the default local `2.1` library, smoke mods, and representative scenario.
+- Static validation passed.
+- Package rebuild completed with unchanged `dist\more-infinite-research_2.1.0.zip` SHA256.
+- `git diff --check` passed.
+
 ## 2026-07-04 Changelog History Audit
 
 Environment:

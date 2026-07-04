@@ -1,10 +1,17 @@
 param(
   [string]$FactorioBin = $env:FACTORIO_BIN,
-  [string]$LocalModDir = "C:\Projects\Factorio\testmods_readonly_2.1",
+  [string]$LocalModDir = $env:MIR_LOCAL_MOD_DIR,
+  [string[]]$RepairSmokeModNames = @("big-mining-drill", "biolabs-in-space"),
+  [string]$RepresentativeScenarioName = "local-2-1-bz-suite-space-age",
+  [string]$ManualScenariosPath = "fixtures\compat-matrix\local-library-scenarios.json",
+  [string[]]$AuditFactorioVersions = @(),
+  [string]$PullRemote = "origin",
+  [string]$PullBranch = "",
   [string]$OutputRoot = "",
   [int]$ScenarioTimeoutSeconds = 900,
   [switch]$SkipBuild,
   [switch]$SkipRepairSmokes,
+  [Alias("SkipRepresentativeScenario")]
   [switch]$SkipBZSuite,
   [switch]$NoGitPull,
   [switch]$DryRun
@@ -14,6 +21,23 @@ $ErrorActionPreference = "Stop"
 
 $repo = Resolve-Path (Join-Path $PSScriptRoot "..")
 Set-Location -LiteralPath $repo
+
+$modInfo = Get-Content -Raw -LiteralPath (Join-Path $repo "info.json") | ConvertFrom-Json
+$modName = [string]$modInfo.name
+$modVersion = [string]$modInfo.version
+$targetFactorioVersion = [string]$modInfo.factorio_version
+if (-not $AuditFactorioVersions -or $AuditFactorioVersions.Count -eq 0) {
+  $AuditFactorioVersions = @($targetFactorioVersion)
+}
+if ([string]::IsNullOrWhiteSpace($LocalModDir)) {
+  $LocalModDir = "C:\Projects\Factorio\testmods_readonly_$targetFactorioVersion"
+}
+if (-not $SkipRepairSmokes -and @($RepairSmokeModNames).Count -eq 0) {
+  throw "RepairSmokeModNames is empty. Pass -SkipRepairSmokes or provide at least one local mod name."
+}
+if (-not $SkipBZSuite -and [string]::IsNullOrWhiteSpace($RepresentativeScenarioName)) {
+  throw "RepresentativeScenarioName is empty. Pass -SkipRepresentativeScenario or provide a scenario name."
+}
 
 function Resolve-MIRReleaseGatePath {
   param([Parameter(Mandatory)][string]$Path)
@@ -120,10 +144,14 @@ function Write-MIRReleaseGateSummary {
     output_root = $script:resolvedOutputRoot
     factorio_bin = $script:resolvedFactorioBin
     local_mod_dir = $script:resolvedLocalModDir
+    repair_smoke_mod_names = @($RepairSmokeModNames)
+    representative_scenario_name = $RepresentativeScenarioName
+    manual_scenarios_path = $script:resolvedManualScenariosPath
+    audit_factorio_versions = @($AuditFactorioVersions)
     scenario_timeout_seconds = $ScenarioTimeoutSeconds
     skip_build = [bool]$SkipBuild
     skip_repair_smokes = [bool]$SkipRepairSmokes
-    skip_bz_suite = [bool]$SkipBZSuite
+    skip_representative_scenario = [bool]$SkipBZSuite
     no_git_pull = [bool]$NoGitPull
     dry_run = [bool]$DryRun
     git_branch = Get-MIRReleaseGateGitValue -Arguments @("rev-parse", "--abbrev-ref", "HEAD")
@@ -141,6 +169,8 @@ function Write-MIRReleaseGateSummary {
   $md += ('- Output root: `{0}`' -f $script:resolvedOutputRoot)
   $md += ('- Factorio: `{0}`' -f $script:resolvedFactorioBin)
   $md += ('- Local mod dir: `{0}`' -f $script:resolvedLocalModDir)
+  $md += ('- Repair smoke mods: `{0}`' -f (($RepairSmokeModNames | ForEach-Object { [string]$_ }) -join ", "))
+  $md += ('- Representative scenario: `{0}`' -f $RepresentativeScenarioName)
   $md += ('- Scenario timeout seconds: `{0}`' -f $ScenarioTimeoutSeconds)
   $md += ('- Git branch: `{0}`' -f (Get-MIRReleaseGateGitValue -Arguments @("rev-parse", "--abbrev-ref", "HEAD")))
   $md += ('- Git commit: `{0}`' -f (Get-MIRReleaseGateGitValue -Arguments @("rev-parse", "--short", "HEAD")))
@@ -180,6 +210,10 @@ function Write-MIRReleaseGateSummary {
 $script:releaseGateResults = @()
 $script:resolvedFactorioBin = Resolve-MIRReleaseGateFactorioBinary -Path $FactorioBin
 $script:resolvedLocalModDir = ""
+$script:resolvedManualScenariosPath = Resolve-MIRReleaseGatePath -Path $ManualScenariosPath
+if (-not (Test-Path -LiteralPath $script:resolvedManualScenariosPath)) {
+  throw "Manual scenarios file does not exist: $script:resolvedManualScenariosPath"
+}
 
 $needsLocalModDir = -not ($SkipRepairSmokes -and $SkipBZSuite)
 if ($needsLocalModDir) {
@@ -206,8 +240,11 @@ $script:resolvedOutputRoot = (Resolve-Path -LiteralPath $script:resolvedOutputRo
 $logPath = Join-Path $script:resolvedOutputRoot "release-targeted.log"
 
 Write-Host "[release] repo: $($repo.Path)"
+Write-Host "[release] mod: $modName $modVersion (Factorio $targetFactorioVersion)"
 Write-Host "[release] Factorio: $script:resolvedFactorioBin"
 Write-Host "[release] local mod dir: $script:resolvedLocalModDir ($localZipCount zips)"
+Write-Host "[release] repair smoke mods: $($RepairSmokeModNames -join ', ')"
+Write-Host "[release] representative scenario: $RepresentativeScenarioName"
 Write-Host "[release] output root: $script:resolvedOutputRoot"
 Write-Host "[release] log: $logPath"
 
@@ -229,7 +266,11 @@ try {
 try {
   if (-not $NoGitPull) {
     Invoke-MIRReleaseGateStep -Name "git-pull" -Action {
-      & git -C $repo pull origin dev
+      $branch = $PullBranch
+      if ([string]::IsNullOrWhiteSpace($branch)) {
+        $branch = Get-MIRReleaseGateGitValue -Arguments @("rev-parse", "--abbrev-ref", "HEAD")
+      }
+      & git -C $repo pull $PullRemote $branch
     }
   }
 
@@ -249,7 +290,7 @@ try {
         -FactorioBin $script:resolvedFactorioBin `
         -LocalModZipDirs @($script:resolvedLocalModDir) `
         -LocalModLibraryDirs @($script:resolvedLocalModDir) `
-        -LocalModNames @("big-mining-drill", "biolabs-in-space") `
+        -LocalModNames @($RepairSmokeModNames) `
         -Offline `
         -CollectAll `
         -FailOnAuditFailures `
@@ -259,25 +300,25 @@ try {
   }
 
   if (-not $SkipBZSuite) {
-    Invoke-MIRReleaseGateStep -Name "bz-suite-space-age" -Action {
-      $bzDir = Join-Path $script:resolvedOutputRoot "bz-suite"
+    Invoke-MIRReleaseGateStep -Name "representative-local-scenario" -Action {
+      $representativeDir = Join-Path $script:resolvedOutputRoot "representative-local-scenario"
       & (Join-Path $repo "scripts\Invoke-MIRCompatAudit.ps1") `
         -FactorioBin $script:resolvedFactorioBin `
-        -FactorioVersions @("2.1") `
+        -FactorioVersions @($AuditFactorioVersions) `
         -MaxCandidates 0 `
         -CatalogPages 0 `
         -RunManualScenarios `
-        -ScenarioNames @("local-2-1-bz-suite-space-age") `
-        -ManualScenariosPath (Join-Path $repo "fixtures\compat-matrix\local-library-scenarios.json") `
+        -ScenarioNames @($RepresentativeScenarioName) `
+        -ManualScenariosPath $script:resolvedManualScenariosPath `
         -LocalModZipDirs @($script:resolvedLocalModDir) `
         -LocalModLibraryDirs @($script:resolvedLocalModDir) `
         -Offline `
         -RunLoadTests `
         -ScenarioTimeoutSeconds $ScenarioTimeoutSeconds `
-        -OutputDir $bzDir
+        -OutputDir $representativeDir
 
-      & (Join-Path $repo "scripts\Convert-MIRCompatAuditResults.ps1") -AuditDir $bzDir
-      Assert-MIRReleaseGateNoUnexpectedFailures -Name "BZ suite" -AuditDir $bzDir
+      & (Join-Path $repo "scripts\Convert-MIRCompatAuditResults.ps1") -AuditDir $representativeDir
+      Assert-MIRReleaseGateNoUnexpectedFailures -Name $RepresentativeScenarioName -AuditDir $representativeDir
     }
   }
 
@@ -305,4 +346,5 @@ try {
 }
 
 Write-Host "[release] targeted release checks passed: $script:resolvedOutputRoot"
-Write-Host "[release] publish candidate: dist\more-infinite-research_2.1.0.zip"
+$publishCandidate = Join-Path "dist" ("{0}_{1}.zip" -f $modName, $modVersion)
+Write-Host "[release] publish candidate: $publishCandidate"
