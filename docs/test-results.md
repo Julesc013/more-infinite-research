@@ -2,6 +2,33 @@
 
 This file records local release-candidate validation runs. It is not a substitute for the manual mod matrix in `docs/compatibility.md`.
 
+## 2026-07-05 Dev Changelog Intake For 2.1.5
+
+Environment:
+
+- Branch: `dev`.
+- Mod version `2.1.5`.
+
+Scope:
+
+- Accepted the legacy `1.9.5` changelog entry from `origin/legacy` into the current dev changelog.
+- Added a dated empty `2.1.5` changelog header for the new feedback-patch line without inventing fake release bullets.
+- Bumped `info.json` to `2.1.5`.
+- Kept README and compatibility docs generic for the active `2.x` Factorio `2.1` line.
+
+Commands:
+
+```powershell
+git show origin/legacy:changelog.txt
+.\scripts\Invoke-MIRValidation.ps1 -StaticOnly
+git diff --check
+```
+
+Results:
+
+- The imported `1.9.5` changelog entry records the tested `2.1.0` snapshot backport to Factorio `2.0`.
+- The top `2.1.5` changelog section is intentionally empty until there are shipped changes to list.
+
 ## 2026-07-04 Release Gate Reuse And README Cleanup
 
 Environment:

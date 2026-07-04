@@ -14,7 +14,7 @@ logistics chains, combat bonuses, player bonuses, and Space Age gaps that vanill
 
 Version **`1.x.x`** targets **Factorio `2.0`** and requires `base >= 2.0`.
 
-Version **`2.x.x`** targets **Factorio `2.1`**. The current **`2.1.0`** release requires:
+Version **`2.x.x`** targets **Factorio `2.1`**. The latest released **`2.1.0`** build requires:
 
 - `base >= 2.1.8`
 - hidden optional `elevated-rails`
@@ -46,10 +46,10 @@ Recipe productivity researches are infinite, but **Factorio's recipe productivit
 
 Install the mod through the **Factorio mod portal** or place the **release zip** in your Factorio mods directory.
 
-The packaged release archive is:
+Packaged release archives are named:
 
 ```text
-dist/more-infinite-research_2.1.0.zip
+dist/more-infinite-research_<version>.zip
 ```
 
 ## Branch Policy
@@ -586,7 +586,7 @@ Use read-only local mod libraries for large offline sweeps:
 
 Run local-library tiers in priority order: `LocalLibraryScenarios` covers curated high-value combinations, `GeneratedLocalScenarios` creates generated mega and metadata-cluster stress cases, and `LocalModZips` tests each local root zip as an individual scenario. Add `-IncludeGeneratedLocalPairwise -GeneratedLocalPairwiseLimit 40` when you want capped pairwise cluster coverage. Add `-ShardLocalModZips -StartIndex N -ShardSize M` to resume local-root sweeps in chunks.
 
-`LocalLibraryScenarios` runs curated local combinations from `fixtures/compat-matrix/local-library-scenarios.json`, including Space Age planet clusters, resource suites, pack wrappers, and deliberate mega-smash scenarios. `GeneratedLocalScenarios` builds all-local, planet, resource, Bob, Krastorio, production/fluid, and logistics/transport clusters from local zip metadata. Factorio `2.0` archives should be tested with a matching Factorio/mod line; with the current `2.1.0` MIR package and a Factorio `2.1.x` binary, `2.0`-only archives are useful as inventory evidence but are not a substitute for a true `2.0` runtime gate.
+`LocalLibraryScenarios` runs curated local combinations from `fixtures/compat-matrix/local-library-scenarios.json`, including Space Age planet clusters, resource suites, pack wrappers, and deliberate mega-smash scenarios. `GeneratedLocalScenarios` builds all-local, planet, resource, Bob, Krastorio, production/fluid, and logistics/transport clusters from local zip metadata. Factorio `2.0` archives should be tested with a matching Factorio/mod line; with a Factorio `2.1.x` MIR package and binary, `2.0`-only archives are useful as inventory evidence but are not a substitute for a true `2.0` runtime gate.
 
 Use `-CollectAll` for overnight exploration so one failing modset does not stop the run. Use `-FailFast -FailOnAuditFailures` for strict CI-style gates; that mode fails when grouped unexpected audit failures remain after the converter runs.
 

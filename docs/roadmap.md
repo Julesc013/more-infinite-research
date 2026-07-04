@@ -41,8 +41,8 @@ The `1.9.9` cutoff should be treated as a release trigger, not an API assumption
 
 ## Current Baseline
 
-Current `dev` is the `v2.1.0` release line. It builds on the tested
-`v2.0.5` quick-patch baseline and adds the larger Factorio `2.1` feature wave:
+Current `dev` is the `v2.1.5` feedback-patch line. It builds on the tested
+`v2.1.0` release baseline:
 
 - simpler per-technology checkbox enablement, with shareable presets deferred;
 - strict icon source resolution and package validation around official DLC assets;
