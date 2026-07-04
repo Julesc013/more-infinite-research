@@ -856,6 +856,7 @@ Invoke-RepoCheck "release documentation lists final manual and API checks" {
 
 Invoke-RepoCheck "changelog uses Factorio changelog format" {
   $separator = "-" * 99
+  $maxChangelogLineLength = 132
   $path = Join-Path $repo "changelog.txt"
   $lines = @(Get-Content -LiteralPath $path -Encoding UTF8)
   if ($lines.Count -eq 0) {
@@ -874,6 +875,9 @@ Invoke-RepoCheck "changelog uses Factorio changelog format" {
   $lineNo = 0
   foreach ($line in $lines) {
     $lineNo++
+    if ($line.Length -gt $maxChangelogLineLength) {
+      throw "changelog.txt:$lineNo exceeds $maxChangelogLineLength characters."
+    }
     if ($line -eq $separator) {
       $sectionStart = $false
       $expectVersion = $true

@@ -598,7 +598,7 @@ The validation script checks:
 - **Science-pack authority:** no old `data.raw.tool` science-pack authority remains.
 - **Icons:** generated icons do not use `icon_mipmaps`.
 - **Locale:** locale files match the English fallback.
-- **Changelog:** `changelog.txt` uses Factorio's 99-dash changelog section format.
+- **Changelog:** `changelog.txt` uses Factorio's 99-dash format with one-line bullets capped at 132 characters.
 - **Generated package:** validation builds an ignored archive from the current source tree and checks its root, metadata, load-critical files, and forbidden artifacts.
 - **Package parity:** the generated archive's source directories, documentation, locale, migrations, and root mod files match the repository copy while allowing docs and helper modules to be rearranged inside their packaged trees.
 - **Compatibility automation:** the Mod Portal audit runner, manual scenario execution, sharding/resume, scenario timeout, dependency-failure skipping, grouped failure converter, expected-failure fixture, profile-stub generator, and self-hosted extended workflow stay wired.

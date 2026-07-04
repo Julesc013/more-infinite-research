@@ -4,69 +4,103 @@ Date: 2026-07-03
 
   Features:
 
-    - Removed the planned settings preset mode and per-technology enable policy dropdowns before release; per-technology enable checkboxes are the single enablement path again.
-    - Scripted spoilage preservation and agricultural growth speed now use the same checkbox enablement model as data-stage technology generation.
+    - Removed planned preset and enable-policy dropdowns before release.
+    - Per-technology enable checkboxes are the only technology enablement path again.
+    - Scripted spoilage and agriculture research now use the same enable checkboxes as generated techs.
     - Spoilage preservation now includes space science in its research cost alongside agricultural and cryogenic science.
-    - Agricultural growth speed now includes electromagnetic and cryogenic science in its research cost alongside agricultural science.
+    - Agricultural growth speed now adds electromagnetic and cryogenic science to agricultural science.
     - Rocket shooting speed and Cannon shooting speed now use electromagnetic science instead of agricultural science.
-    - Added an ordered icon source resolver that can prefer loaded official DLC technology art, use safe base-game fallbacks, or opt into installed-but-disabled official DLC icon files when explicitly enabled.
-    - Cargo bay unloading distance now uses the landing pad unloading bay unlock technology art, and Cargo landing pad count now uses the Space platform technology art.
-    - Added fluid-output recipe productivity streams for oil processing, oil cracking, lubricant, sulfuric acid, acid neutralization, Space Age thruster fuel, and Space Age thruster oxidizer recipes.
-    - Oil processing, Oil cracking, Lubricant, and Sulfuric acid productivity now use cryogenic, agricultural, electromagnetic, and metallurgic science respectively instead of using space science as their shared extra pack.
-    - Rail productivity now covers Elevated Rails support and ramp recipes when Elevated Rails is active, with supports below rails and ramps one tier lower again.
-    - Rail productivity now prefers Elevated Rails technology art when Elevated Rails is active, or when installed official DLC icon paths are explicitly enabled, before falling back to rail item art.
-    - Oil cracking productivity now uses the oil processing unlock technology art, and Sulfuric acid productivity now uses sulfuric acid fluid art and includes acid neutralization when that recipe exists.
-    - Split Stone product productivity into separate Landfill productivity, Artificial soil productivity, and Molten metals productivity research lines.
+    - Added ordered icon resolution for loaded DLC art, safe base fallbacks, and opted-in installed DLC icons.
+    - Cargo bay unloading distance now uses the landing pad unloading bay unlock technology art.
+    - Cargo landing pad count now uses the Space platform technology art.
+    - Added fluid-output productivity for oil processing, cracking, lubricant, and sulfuric acid recipes.
+    - Added fluid-output productivity for acid neutralization and Space Age thruster propellant recipes.
+    - Oil processing productivity now uses cryogenic science.
+    - Oil cracking productivity now uses agricultural science and oil processing technology art.
+    - Lubricant productivity now uses electromagnetic science.
+    - Sulfuric acid productivity now uses metallurgic science and sulfuric acid fluid art.
+    - Sulfuric acid productivity now includes acid neutralization when that recipe exists.
+    - Rail productivity now covers Elevated Rails supports and ramps when Elevated Rails is active.
+    - Rail productivity now prefers Elevated Rails technology art when available.
+    - Split Stone product productivity into Landfill, Artificial soil, and Molten metals productivity.
     - Landfill productivity now gives +10% for landfill recipes and +5% for foundation recipes, using the landfill technology icon.
-    - Artificial soil productivity now gives +10% for artificial soil recipes and +5% for overgrowth soil recipes, using the artificial soil technology icon and including space science in its research cost.
-    - Molten metals productivity now gives +10% for molten iron and molten copper from lava, and +5% for iron ore melting and copper ore melting, using the foundry technology icon.
+    - Artificial soil productivity now gives +10% for artificial soils and +5% for overgrowth soils.
+    - Artificial soil productivity now uses artificial soil technology art and includes space science.
+    - Molten metals productivity now gives +10% for lava metals and +5% for iron or copper ore melting.
+    - Molten metals productivity now uses Foundry technology art.
     - Lithium productivity now also gives +5% productivity for the Space Age lithium-from-brine recipe.
-    - Added Carbon productivity for carbonic asteroid crushing, advanced carbonic asteroid crushing, and compatible carbon-output recipes.
+    - Added Carbon productivity for carbonic asteroid crushing and compatible carbon-output recipes.
     - Carbon productivity now gives +5% for burnt spoilage and +2% for coal synthesis.
     - Added Ice productivity for oxide asteroid crushing, advanced oxide asteroid crushing, and compatible ice-output recipes.
     - Added Bacteria cultivation productivity for iron bacteria cultivation and copper bacteria cultivation recipes.
-    - Bacteria cultivation productivity and Breeding productivity now include cryogenic science in their research costs alongside agricultural science.
-    - Added fluid prototype lookup, fluid-output recipe matching, fluid icon fallback, and required-fluid gates for fluid-output productivity streams.
-    - Added a strictly opt-in startup-only pipeline extent multiplier dropdown. The default value is 100% and leaves fluid box prototypes unchanged.
+    - Bacteria cultivation productivity and Breeding productivity now include cryogenic science.
+    - Added fluid prototype lookup, fluid-output recipe matching, fluid icons, and required-fluid gates.
+    - Added an opt-in startup-only pipeline extent multiplier dropdown.
+    - The pipeline extent multiplier defaults to 100% and leaves fluid boxes unchanged.
 
   Compatibility:
 
-    - Refactored recipe-productivity owner classification, productivity-family adoption, and known competitor replacement into focused compatibility modules.
-    - Compatibility profiles can now declare known competing recipe-productivity technology patterns; MIR still proves full recipe coverage, matching productivity change values, lab-compatible replacement stream science, and no other blocking external owner before ignoring or removing a competitor.
-    - Generation diagnostics now emit parser-friendly audit rows for stream decisions, native modifier overlaps, and recipe-owner skips when the generation report is enabled.
-    - Added a local mod-portal compatibility audit harness with catalog filtering, dependency closure, lockfile/report generation, curated scenarios, optional credential-gated downloads/load checks, official built-in mod handling, scenario-specific dependency enablement, SHA1 cache verification, and parsed audit rows.
-    - Extended the compatibility audit tooling with executable manual scenarios, sharded/resumable lockfile runs, grouped failure summaries, review-only profile-stub generation, and a self-hosted extended-test workflow.
-    - Hardened extended audit orchestration with strict `-FailOnAuditFailures` pass/fail semantics, exploratory `-CollectAll` behavior, deterministic `AuditSmoke` plumbing checks, per-scenario Factorio load timeouts and progress output, lockfile resume support in the wrapper, default dependency-failure skipping before load tests, and reviewed expected-failure classification.
-    - Added local modpack zip audit support so `tmp/` or explicitly supplied mod zips can be used as compatibility roots while missing dependencies are still resolved through the Mod Portal cache.
-    - Added offline local mod-library audit support so read-only zip libraries can satisfy dependency closure before any Mod Portal lookup, plus curated local-library scenarios for planet clusters, resource suites, pack wrappers, and mega-smash stress runs.
-    - Fixed compatibility-audit lock entries so local and portal dependency closure reports preserve distinct mod `name` and `version` values during sorting and deduplication.
-    - Added generated local-library compatibility scenarios for all-local mega, metadata-derived clusters, and capped pairwise stress runs, plus local-root sharding and checkpointed load-result output for resumable overnight sweeps.
-    - Added missing-dependency summary artifacts so local-library sweeps produce a concise dependency completion list in addition to grouped compatibility failures.
-    - Added dedicated `Start-MIROvernightLocalSweep.ps1` and `Show-MIROvernightSummary.ps1` helpers so local Factorio 2.1 overnight sweeps no longer depend on fragile pasted one-liners and morning triage can be summarized from artifacts.
-    - Added `Invoke-MIRReleaseTargetedGate.ps1` as a short release-candidate command for the strict current-commit gate, targeted harness repair smokes, representative BZ Space Age suite, package rebuild, and clean-git-status check.
-    - Added the first `mir.ps1` developer CLI facade, shared `scripts/MIRCli/` helper modules, run profile fixtures, and local mod-library index scaffolding for the next compatibility-lab UX layer.
-    - Hardened package building so identical archive contents preserve the existing release zip instead of dirtying git with ZIP metadata churn during release gates.
+    - Moved recipe-productivity owner classification into focused compatibility modules.
+    - Moved productivity-family adoption and known competitor replacement into compatibility modules.
+    - Profiles can declare known competing recipe-productivity technologies.
+    - Competitor replacement requires full coverage and matching productivity change values.
+    - Competitor replacement requires lab-compatible replacement science and no other blocking owner.
+    - Diagnostics now emit parser-friendly audit rows for stream decisions.
+    - Diagnostics now emit parser-friendly audit rows for native modifier overlaps and recipe-owner skips.
+    - Added a compatibility audit harness with catalog filtering, dependency closure, and lockfiles.
+    - Audit runs can use curated scenarios, credentialed downloads, SHA1 cache checks, and parsed audit rows.
+    - Audit tooling now supports executable manual scenarios and sharded lockfile runs.
+    - Audit tooling now writes grouped failure summaries and review-only profile stubs.
+    - Added a self-hosted extended-test workflow for long compatibility sweeps.
+    - Extended tests now support strict `-FailOnAuditFailures` gates and exploratory `-CollectAll` runs.
+    - `AuditSmoke` now uses deterministic plumbing checks instead of volatile catalog ordering.
+    - Factorio audit load tests now have per-scenario timeouts and progress output.
+    - Dependency-failed audit scenarios now skip before load tests by default.
+    - Added local modpack zip audit roots for supplied archives and `tmp/` zips.
+    - Added offline local-library resolution for read-only zip libraries before Mod Portal lookup.
+    - Added curated local-library scenarios for planet clusters, resource suites, and pack wrappers.
+    - Added generated all-local, cluster, and capped pairwise local-library scenarios.
+    - Added local-root sharding and checkpointed load results for resumable overnight sweeps.
+    - Local and portal lock entries now preserve distinct mod names and versions during dedupe.
+    - Added missing-dependency summary artifacts for local-library sweeps.
+    - Added `Start-MIROvernightLocalSweep.ps1` for safe local Factorio 2.1 overnight sweeps.
+    - Added `Show-MIROvernightSummary.ps1` for next-morning local sweep triage.
+    - Added `Invoke-MIRReleaseTargetedGate.ps1` for strict release-candidate checks.
+    - Added `mir.ps1` as a short developer CLI for release gates, audits, reports, and packaging.
+    - Added shared `scripts/MIRCli/` helper modules and JSON run profiles.
+    - Added local mod-library index scaffolding for the compatibility lab.
+    - Package builds now preserve unchanged release archives instead of dirtying git.
     - Hardened overnight compatibility sweeps so blank Factorio log lines no longer crash audit-row parsing.
-    - Hardened isolated compatibility load tests so installed official built-in mods are explicitly disabled unless a scenario requests them, and Space Age scenarios enable the complete official Space Age bundle.
-    - Refined grouped audit failure semantics so successful load tests do not fail strict gates for normal missing-prototype stream skips or conservative unknown external recipe-productivity owner suppression.
-    - Updated the derived release notes, mod portal copy, roadmap, compatibility docs, manual test plan, TODO, and test-results ledger so the extended audit automation is documented consistently before publishing.
-    - Reorganized planning documentation so root `todo.md` is the durable future-work ledger, `changelog.txt` remains the durable past-change ledger, `docs/roadmap.md` carries high-level rationale, and derivative plans/release notes live under `docs/notes/`.
-    - Packaged root `todo.md` with the mod archive and added validation coverage so the release package keeps the future-work ledger alongside README and changelog.
-    - Added conservative Space Age productivity-family adoption: residual processing unit, plastic bar, low density structure, and rocket fuel recipes can be appended to the matching vanilla infinite productivity technology when the owner is safe and the recipe allows productivity.
-    - Existing saves reset technology effects when the adopted productivity-family recipe signature changes, so adding or removing planet mods after MIR is installed can refresh researched family effects.
-    - Added runtime fixture coverage for vanilla productivity-family adoption, exact-owner skips, prepatched owner skips, mixed owner fallback, and non-productivity recipe rejection.
-    - Fixed Plates n Circuit Productivity replacement so known competing plate, green circuit, and red circuit productivity technologies are prepared before MIR generation, allowing MIR to generate its replacement effects and then remove the competing technologies.
-    - Plates n Circuit Productivity cleanup now leaves a combined competing technology in place when disabled MIR streams mean MIR cannot replace every recipe effect on that technology.
-    - Plates n Circuit Productivity replacement now also leaves competitors in place when the competing effect uses a different productivity amount or another external technology blocks one of the recipes.
-    - Added runtime fixture coverage for checkbox enablement behavior, scripted runtime routing, icon source selection, fluid-output productivity ownership, and pipeline extent scaling.
-    - Base-only icon validation now proves generated technology icons do not resolve to direct official DLC asset paths unless the installed official DLC icon opt-in is enabled.
+    - Isolated load tests now disable installed official built-ins unless the scenario requests them.
+    - Space Age load tests now enable the complete official Space Age bundle.
+    - Audit grouping no longer fails strict gates for normal missing-prototype stream skips.
+    - Audit grouping treats unknown external productivity owners as expected conservative suppression.
+    - Packaged root `todo.md` with README and changelog.
+    - Adopted safe residual recipes into vanilla Space Age productivity families.
+    - Adoption covers processing units, plastic, low density structures, and rocket fuel.
+    - Existing saves reset technology effects when adopted family recipe signatures change.
+    - Added runtime coverage for vanilla productivity-family adoption and exact-owner skips.
+    - Added runtime coverage for prepatched owners, mixed-owner fallback, and non-productivity recipes.
+    - Plates n Circuit Productivity replacement now prepares known competitors before MIR generation.
+    - Plates n Circuit Productivity cleanup leaves partial combined competitors in place.
+    - Plates n Circuit Productivity cleanup rejects different productivity values.
+    - Plates n Circuit Productivity cleanup rejects competitors blocked by another external owner.
+    - Added runtime coverage for checkbox enablement and scripted runtime routing.
+    - Added runtime coverage for icon selection, fluid productivity ownership, and pipeline extent scaling.
+    - Base-only icon validation rejects direct official DLC asset paths unless explicitly opted in.
     - Space Age validation proves loaded Space Age technology art is still preferred where intended.
-    - Elevated Rails and Quality remain hidden ordering entries without separate version floors; the base Factorio 2.1.8 floor still defines the release line.
-    - Fluid-output recipe-productivity validation proves exact recipe ownership and no duplicate infinite owner for the implemented oil, lubricant, sulfuric acid, acid neutralization, and thruster propellant streams.
-    - Pipeline extent validation proves the default setting does not run the prototype pass and that an explicit non-default multiplier mutates representative pipe, pipe-to-ground, and storage-tank fluid boxes.
-    - Scripted spoilage preservation and agricultural growth speed remain disabled by default until broader save-level manual evidence supports stronger claims or default enablement.
-    - Native modifier overlap policy, existing agricultural plant rescale, and high-throughput pump work remain deferred from this release unless separately implemented and validated.
-    - Added a v2.1.0 JSON migration from the retired Stone product productivity generated technology ID to the new Landfill productivity generated technology ID. Artificial soil productivity and Molten metals productivity are new separate research lines.
+    - Elevated Rails and Quality remain hidden ordering entries without separate version floors.
+    - Fluid-output validation proves exact recipe ownership and no duplicate infinite owner.
+    - Pipeline validation proves the default setting does not run the prototype pass.
+    - Pipeline validation covers non-default mutation of pipes, pipe-to-ground, and storage tanks.
+    - Spoilage preservation and agricultural growth speed remain disabled by default.
+    - Native modifier overlap policy remains diagnostic-only in this release.
+    - Existing agricultural plant rescale and high-throughput pump work remain deferred.
+
+  Migration:
+
+    - Migrated retired Stone product productivity progress into Landfill productivity.
+    - Artificial soil productivity and Molten metals productivity start as new separate research lines.
 
 ---------------------------------------------------------------------------------------------------
 Version: 1.9.0
@@ -95,76 +129,103 @@ Date: 2026-07-01
     - Added release-cadence planning for the next Factorio 2.1 release line.
     - Documented v2.0.5 as the quick feedback patch for small/easy changes and v2.1.0 as the next larger feature wave.
     - Added an API proof ledger for current Factorio API claims and unknowns that require in-game verification.
-    - Added a named manual test plan for v2.0.5 quick-patch validation, v2.1.0 larger feature validation, v2.1.x spikes, and the later Factorio 2.0 legacy backports.
+    - Added a named manual test plan for v2.0.5, v2.1.0, v2.1.x spikes, and Factorio 2.0 backports.
     - Added final manual smoke checks for Character reach icon art and the merged character inventory/trash-slot technology UI.
-    - Added release validation coverage so required API proof links and final manual smoke-check scenario names stay present in the packaged docs.
+    - Added release validation for API proof links and final manual smoke-check scenario names.
     - Added branch-aware validation guardrails for the planned v1.9.x legacy backports.
     - Added static validation that rejects runtime tick handlers in control-stage Lua files.
     - Added validation that the changelog contains an entry for the current info.json version.
     - Electric shooting speed now covers the Space Age `tesla` ammo category as well as the older `electric` ammo category.
     - Electric shooting speed now applies to Tesla guns and Tesla turrets instead of only discharge-defense-style electric weapons.
-    - Electric shooting speed now uses the vanilla discharge defense technology as its icon and prerequisite anchor so it does not fall back to a mining drill icon when Space Age is absent.
-    - Electric shooting speed now uses the Space Age electric-weapons-damage texture when available, while keeping the discharge defense fallback for base-only games.
+    - Electric shooting speed now uses vanilla discharge defense as its base-game icon and prerequisite anchor.
+    - Electric shooting speed now uses Space Age electric-weapons-damage art when available.
+    - Electric shooting speed keeps the discharge defense fallback for base-only games.
     - Added missing descriptions and modifier strings for flamethrower, electric, and Tesla shooting speed bonuses.
-    - Mining drill productivity now covers Omega Drill style `omega-drill` and `omega-tau` recipes and broader modded `*-mining-drill` / `*-drill` outputs.
-    - Weapon shooting speed overlap adjustment now preserves finite vanilla rocket and cannon-shell shooting speed bonuses, including tank cannon fire rate from `weapon-shooting-speed-5` and `weapon-shooting-speed-6`.
+    - Mining drill productivity now covers Omega Drill style `omega-drill` and `omega-tau` recipes.
+    - Mining drill productivity now covers broader modded `*-mining-drill` and `*-drill` outputs.
+    - Weapon shooting speed overlap cleanup now preserves finite vanilla rocket shooting speed bonuses.
+    - Weapon shooting speed overlap cleanup now preserves finite vanilla cannon-shell shooting speed bonuses.
+    - Tank cannon fire rate from `weapon-shooting-speed-5` and `weapon-shooting-speed-6` is preserved.
     - Recipe productivity generation now skips recipes already owned by another infinite recipe-productivity technology.
-    - Space Age vanilla productivity technologies for processing units, low density structures, plastic, and rocket fuel now stay authoritative instead of receiving parallel MIR duplicates.
-    - Added broad runtime fixture checks for generated chain integrity, single-owner recipe productivity, base-only and Space Age circuit recipe ownership, and vanilla numbered technology continuations.
-    - Added disabled-by-default scripted candidate technologies for Spoilage Preservation and Agricultural Growth Speed. These are opt-in in v2.0.5 while save behavior and balance are being tested.
-    - Added diagnostic-only native modifier overlap reporting for generated direct-effect technologies, so cargo/logistics modifier conflicts can be identified without changing generation behavior.
-    - Character inventory slot research now also grants character logistic trash slots, replacing the separate trash slot generated technology while keeping the combined progression enabled by default.
+    - Space Age processing unit, low density structure, plastic, and rocket fuel productivity stay vanilla-owned.
+    - Added runtime checks for generated chain integrity and single-owner recipe productivity.
+    - Added runtime checks for circuit recipe ownership and vanilla numbered technology continuations.
+    - Added default-off scripted candidate technologies for Spoilage Preservation and Agricultural Growth Speed.
+    - Added diagnostic-only native modifier overlap reporting for generated direct-effect technologies.
+    - Cargo and logistics modifier overlaps can be identified without changing generation behavior.
+    - Character inventory slot research now also grants character logistic trash slots.
+    - The separate trash slot generated technology is replaced by the combined inventory/trash technology.
     - Character reach bonus now uses the character mining speed pickaxe icon instead of the exoskeleton equipment icon.
-    - Startup setting names and descriptions were rewritten with Factorio-style labels, clearer scanning, safer defaults, and explicit research unit time wording.
+    - Startup setting names and descriptions now use clearer Factorio-style labels.
+    - Startup setting text now uses safer default wording and explicit research unit time wording.
     - Technology tunable startup settings now sort by player-facing technology name instead of raw internal stream key.
-    - Default-disabled technology tunables now appear immediately after the one-off settings and before the enabled alphabetical technology list.
+    - Default-disabled technology tunables now appear before the enabled alphabetical technology list.
     - Diagnostics startup settings now appear with the other one-off controls before the technology tunables.
-    - Added dropdown option descriptions for science-pack policy, lab incompatibility policy, and weapon speed overlap cleanup settings.
-    - Added opt-in warning text to default-off experimental and sandbox settings, including Spoilage Preservation, Agricultural Growth Speed, Cargo landing pad count, and Inserter capacity continuation.
-    - Added a README settings guide for recommended default, vanilla-respectful, megabase, modpack compatibility, and debug/reporting setups.
+    - Added dropdown option descriptions for science-pack, lab, and weapon-speed cleanup settings.
+    - Added opt-in warning text to default-off experimental and sandbox settings.
+    - Spoilage, agriculture, cargo pad count, and inserter capacity settings now warn when opt-in.
+    - Added a README settings guide for default, vanilla-respectful, megabase, and modpack setups.
+    - README settings docs now cover debug and reporting setups.
     - Documented the exact meaning of setting value `0` for generated research lines and vanilla continuations.
     - Renamed Heavy ammunition productivity to Cannon shell productivity for clearer player-facing scope.
     - Cannon shell productivity now uses cannon shell item art, matching Cannon Shooting Speed's base icon.
-    - Cannon shell productivity continues to cover cannon shells, artillery shell, railgun ammo, and compatible modded shell/ammo recipes, but does not include artillery or railgun buildings.
-    - Generated MIR technology icons now replace inherited vanilla constant badges with the badge matching MIR's actual effect, so Electric Shooting Speed uses a speed badge instead of inheriting the electric damage badge.
-    - Agricultural Growth Speed now uses the vanilla Space Age agriculture technology art instead of the agricultural science pack item icon.
-    - Processing Unit productivity now uses the base-game processing unit unlock technology art instead of falling back to the processing unit item icon.
+    - Cannon shell productivity covers cannon shells, artillery shells, railgun ammo, and modded shell recipes.
+    - Cannon shell productivity does not include artillery or railgun buildings.
+    - Generated MIR technology icons now replace inherited vanilla constant badges.
+    - Electric Shooting Speed now uses a speed badge instead of inheriting the electric damage badge.
+    - Agricultural Growth Speed now uses vanilla Space Age agriculture technology art.
+    - Processing Unit productivity now uses the base-game processing unit unlock technology art.
     - Wall productivity now uses the Gate technology art instead of the stone wall item icon.
-    - Science pack productivity now falls back to the base-game Space science pack technology art when Space Age's Research productivity technology art is unavailable.
+    - Science pack productivity now falls back to base-game Space science pack technology art.
     - Rocket Fuel productivity now uses the base-game rocket fuel unlock technology art instead of the rocket fuel item icon.
-    - Added a base-game Research productivity generated technology using the native laboratory productivity modifier and Military science pack technology art. Space Age keeps the vanilla `research-productivity` chain and MIR skips its duplicate.
+    - Added base-game Research productivity with the native laboratory productivity modifier.
+    - Base-game Research productivity uses Military science pack technology art.
+    - Space Age keeps vanilla `research-productivity`, and MIR skips its duplicate.
 
   Compatibility:
 
-    - Quality is now a hidden optional load-order dependency so module productivity generation can see quality module recipes when the Quality mod is active without advertising Quality as a visible dependency.
-    - The v2.0.5 release plan is now a quick feedback patch: ship the small features that pass proof and defer only the specific behavior that fails proof.
-    - Scripted runtime behavior remains default-off in v2.0.5. Existing-stack behavior, research reversal, disabling, multi-force behavior, and large Gleba farms require manual validation before default enablement or stronger public release claims.
+    - Quality is now a hidden optional load-order dependency for module productivity generation.
+    - Quality module recipes are visible when Quality is active without advertising Quality as required.
+    - v2.0.5 is a quick feedback patch for small features that pass proof.
+    - Scripted runtime behavior remains default-off in v2.0.5.
+    - Existing-stack scripted behavior needs manual validation before stronger release claims.
+    - Scripted research reversal, disabling, multi-force behavior, and large Gleba farms need manual validation.
     - The first agriculture runtime slice avoids broad inventory, belt, container, item-stack, surface, and entity scanning.
-    - Existing planted crops are not globally rescanned in the v2.0.5 candidate slice; growth speed applies to newly planted tower crops.
-    - Scripted `nothing` effect icons now use compact base icons instead of full technology icon stacks, preventing floating constant overlays from covering the effect description text.
+    - Existing planted crops are not globally rescanned in the v2.0.5 candidate slice.
+    - Agricultural growth speed applies to newly planted tower crops.
+    - Scripted `nothing` effect icons now use compact base icons.
+    - Scripted effect icons no longer use full technology icon stacks that cover effect text.
     - Package validation now includes control.lua and the control module directory.
-    - Package validation now requires the TODO, API proof, and manual test documentation.
+    - Package validation now requires the root task ledger, API proof, and manual test documentation.
     - Static validation now rejects incomplete local fixture directories before runtime fixture validation starts.
-    - Added a Maraxis-like duplicate cargo fixture that proves cargo landing pad count and cargo bay unloading distance overlaps are reported while MIR's generated cargo technologies still load unchanged when force-enabled.
-    - Added static validation coverage for settings confidence work, including setting warning notes, dropdown option descriptions, diagnostics ordering, and the new base-extension max-level locale key.
-    - Added runtime fixture validation that generated MIR technology icons use the expected constant badge and that cannon shell productivity uses cannon shell item art.
+    - Added a Maraxis-like duplicate cargo fixture for cargo overlap diagnostics.
+    - Duplicate cargo overlaps are reported while force-enabled MIR cargo technologies still load.
+    - Added static validation for setting warning notes and dropdown option descriptions.
+    - Added static validation for diagnostics ordering and the base-extension max-level locale key.
+    - Added runtime validation that generated MIR technology icons use the expected constant badge.
+    - Added runtime validation that cannon shell productivity uses cannon shell item art.
     - Added runtime fixture validation that Agricultural Growth Speed uses the vanilla agriculture technology art.
     - Added runtime fixture validation for Processing Unit, Wall, Science pack, and Research productivity icon ownership.
     - Added runtime fixture validation for Rocket Fuel productivity icon ownership.
-    - Added runtime fixture validation that base-game Research productivity generates with `laboratory-productivity`, and that Space Age skips it because vanilla `research-productivity` already exists.
-    - Real shareable settings profiles remain deferred to a later release because import/export behavior needs a deliberate design and tests.
-    - Factorio 2.0 legacy validation now rejects Factorio 2.1 dependency floors and Factorio 2.1-only cargo modifier strings when info.json targets Factorio 2.0.
-    - Planned legacy cadence now starts with v2.0.5 to v1.9.0, followed by v2.1.5 to v1.9.5, and a final v1.9.9 from the latest tested v2.x.x source snapshot at the Factorio 2.1 stable cutoff.
+    - Added runtime validation for base-game Research productivity using `laboratory-productivity`.
+    - Added runtime validation that Space Age skips MIR Research productivity when vanilla owns it.
+    - Real shareable settings profiles remain deferred for deliberate import/export design.
+    - Factorio 2.0 legacy validation rejects Factorio 2.1 dependency floors.
+    - Factorio 2.0 legacy validation rejects Factorio 2.1-only cargo modifiers.
+    - Planned legacy cadence starts with v2.0.5 to v1.9.0 and v2.1.5 to v1.9.5.
+    - Planned v1.9.9 will use the latest tested v2.x.x snapshot at the Factorio 2.1 stable cutoff.
 
   Localization:
 
-    - Added locale keys for spoilage preservation, agricultural growth speed, scripted-effect descriptions, and scripted-effect diagnostics.
+    - Added locale keys for spoilage preservation and agricultural growth speed.
+    - Added locale keys for scripted-effect descriptions and diagnostics.
     - Non-English locale files currently use English fallback text for the new 2.0.5 keys and refreshed settings UI text.
 
   Migration:
 
     - Added control-stage storage under the More Infinite Research namespace.
-    - Added a JSON migration from `recipe-prod-research_character_trash_slots-1` to `recipe-prod-research_inventory_capacity-1` so existing trash-slot progress moves into the combined inventory/trash technology.
+    - Added a JSON migration from old trash-slot research to combined inventory/trash research.
+    - Existing trash-slot progress now moves into the combined inventory/trash technology.
     - No other existing generated technology IDs were renamed.
 
 ---------------------------------------------------------------------------------------------------
@@ -390,7 +451,7 @@ Date: 2025-10-29
     - Character inventory slot research now uses explicit utility, military, and agricultural science packs.
     - Character logistic trash slot research was introduced disabled by default.
     - Base-tech extension research time settings now allow 0 to reuse the configured default.
-    - Removed the old TODO file from the shipped source.
+    - Removed the obsolete root task file from the shipped source.
 
 ---------------------------------------------------------------------------------------------------
 Version: 1.2.0

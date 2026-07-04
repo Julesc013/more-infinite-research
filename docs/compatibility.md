@@ -486,7 +486,7 @@ Expected result: vanilla tank cannon fire rate is preserved while MIR avoids dup
 - Run `rg "data.raw.tool|tool_exists|has_tool|PACKS_ALL" prototypes` and confirm no old science-pack authority remains.
 - Run `rg "icon_mipmaps" prototypes` and confirm generated icons do not add it.
 - Run `.\scripts\Invoke-MIRValidation.ps1 -StaticOnly`.
-- Confirm `changelog.txt` uses Factorio's strict changelog format with 99-dash section separators.
+- Confirm `changelog.txt` uses Factorio's 99-dash format and one-line bullets at or below 132 characters.
 - Confirm `info.json` declares `base >= 2.1.8`, hidden optional Elevated Rails and Quality ordering, and visible optional Recycler and Space Age ordering dependencies only.
 - Confirm package validation reports the expected root, matching metadata, included locale/docs, and no forbidden artifacts for the archive built from the current source tree.
 - Confirm package validation reports source, documentation, and locale parity with the repository.

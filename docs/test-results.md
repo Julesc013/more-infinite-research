@@ -2,6 +2,37 @@
 
 This file records local release-candidate validation runs. It is not a substitute for the manual mod matrix in `docs/compatibility.md`.
 
+## 2026-07-04 Changelog Formatting Guardrail
+
+Environment:
+
+- Branch: `dev`.
+- Mod version `2.1.0`.
+
+Scope:
+
+- Rewrote overlong `changelog.txt` bullets into concise single-line Factorio changelog entries.
+- Replaced internal shorthand such as old task-file references with concrete packaged-file behavior.
+- Added static validation for the changelog-only 132-character line cap.
+- Clarified that the 132-character cap applies to `changelog.txt`, not normal Markdown documentation.
+
+Commands:
+
+```powershell
+.\scripts\Invoke-MIRValidation.ps1 -StaticOnly
+.\scripts\Build-MIRPackage.ps1
+git diff --check
+```
+
+Results:
+
+- `changelog.txt` contains `565` lines and `445` bullets.
+- No `changelog.txt` line exceeds `132` characters; the longest line is `131` characters.
+- The noisy-term scan found no `Reverted`, `proposed`, `TODO`, `FIXME`, `TBD`, `BROKEN`, or similar filler terms.
+- Static validation passed, including the new changelog-only line-length check.
+- `dist\more-infinite-research_2.1.0.zip` rebuilt after packaged changelog and documentation edits.
+- `git diff --check` passed.
+
 ## 2026-07-04 Developer CLI Framework And Audit Grouping Repair
 
 Environment:

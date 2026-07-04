@@ -452,6 +452,7 @@ The current overnight/local-library automation is usable. The next operational s
 - [x] Conditional spikes are either promoted with proof or explicitly moved out of `v2.1.0`.
 - [x] `info.json` version is bumped to `2.1.0`.
 - [x] `changelog.txt` has a dated `2.1.0` entry.
+- [x] Static validation enforces Factorio changelog syntax and the changelog-only 132-character line cap.
 - [x] README, roadmap, compatibility docs, test results, and changelog are updated before release.
 - [x] Runtime Factorio validation passes after the final compatibility refactor and Space Age productivity-stream split.
 - [x] Compatibility audit smoke passes after the final package rebuild.
