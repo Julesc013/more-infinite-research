@@ -4,9 +4,10 @@ Date: 2026-07-03
 
   Features:
 
-    - Added fluid productivity research for oil processing, oil cracking, lubricant, sulfuric acid, and thruster recipes.
+    - Added fluid productivity research for oil processing, cracking, lubricant, sulfuric acid, acid neutralization, and thrusters.
     - Added Space Age material productivity research for landfill, artificial soil, molten metals, carbon, ice, and bacteria.
     - Added lithium-from-brine productivity coverage to Lithium Productivity.
+    - Rail Productivity now covers Elevated Rails supports and ramps when Elevated Rails is active.
     - Split Stone Product Productivity into Landfill, Artificial Soil, and Molten Metals research lines.
     - Updated Space Age science-pack requirements for fluid, agriculture, bacteria, breeding, and shooting-speed research.
     - Updated cargo logistics technology icons to better match their Space Age unlocks.
@@ -15,6 +16,7 @@ Date: 2026-07-03
   Compatibility:
 
     - Vanilla Space Age productivity technologies can adopt safe residual recipes from compatible planet-style mods.
+    - Existing saves refresh technology effects when adopted vanilla-family recipe signatures change.
     - Known competing productivity technologies are replaced only when MIR fully matches their recipes and effect values.
     - Unknown external recipe-productivity owners make MIR suppress matching effects instead of duplicating ownership.
     - Elevated Rails and Quality remain hidden load-order dependencies without separate visible requirements.
@@ -42,7 +44,9 @@ Date: 2026-07-01
   Features:
 
     - Expanded Electric Shooting Speed to cover base electric weapons and Space Age Tesla weapons.
+    - Mining Drill Productivity now covers Omega Drill-style and broader modded mining-drill recipes.
     - Added optional Spoilage Preservation and Agricultural Growth Speed research, disabled by default.
+    - Agricultural Growth Speed affects newly planted tower crops and does not rescan existing crops.
     - Combined Character Logistic Trash Slot bonuses into Character Inventory Slot research.
     - Renamed Heavy Ammunition Productivity to Cannon Shell Productivity and broadened shell/ammo coverage.
     - Added base-game Research Productivity using the native laboratory productivity modifier.
@@ -102,6 +106,22 @@ Date: 2026-06-30
   Migration:
 
     - No existing prototype IDs were renamed. No migration is required.
+
+---------------------------------------------------------------------------------------------------
+Version: 1.2.10
+Date: 2026-02-20
+
+  Compatibility:
+
+    - Added Better Robots Extended compatibility for competing worker robot storage research.
+    - Added a startup setting to prefer MIR over selected competing infinite technologies.
+    - Generated base-tech extensions now skip equivalent existing infinite continuations.
+
+  Changes:
+
+    - Base-tech extensions now inherit vanilla science packs and add only configured extra packs.
+    - Generated base-tech extensions now add missing science-pack unlock prerequisites.
+    - Updated Russian localization.
 
 ---------------------------------------------------------------------------------------------------
 Version: 1.2.9

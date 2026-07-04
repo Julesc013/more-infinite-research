@@ -2,6 +2,39 @@
 
 This file records local release-candidate validation runs. It is not a substitute for the manual mod matrix in `docs/compatibility.md`.
 
+## 2026-07-04 Changelog History Audit
+
+Environment:
+
+- Branch: `dev`.
+- Mod version `2.1.0`.
+
+Scope:
+
+- Reviewed release tags from `1.0.0` through `2.0.5`, the `1.9.0` legacy tag, and the current `2.1.0` candidate range.
+- Reviewed full commit order, changelog-touch history, tag-to-tag commit ranges, and tag-to-tag touched file areas.
+- Cross-checked the `2.1.0` feature bullets against current stream definitions, locale keys, settings, and control effects.
+- Kept the existing changelog structure as the base and made targeted corrections for missing or misleading bullets.
+
+Commands:
+
+```powershell
+git log --reverse --date=short --pretty=format:'%h`t%ad`t%s' main
+git log --reverse --date=short --pretty=format:'%h`t%ad`t%s' -- changelog.txt
+git show-ref --tags
+git log --oneline --no-merges 2.0.5..main
+git diff --name-only 2.0.5..main
+rg -n "research_(oil|lubricant|sulfuric|thruster|landfill|artificial|molten|carbon|ice|bacteria|lithium)" prototypes settings.lua locale/en/more-infinite-research.cfg
+```
+
+Results:
+
+- The `2.1.0` changelog now advertises shipped feature families rather than development-time icon/source choices.
+- Acid neutralization, Elevated Rails rail productivity, and vanilla-family save refresh behavior are explicitly represented.
+- The `2.0.5` entry retains user-facing Omega Drill and agricultural-growth behavior that the history audit confirmed.
+- Added the missing `1.2.10` entry from the 2026-02-20 version bump and Better Robots Extended compatibility commit.
+- No `changelog.txt` line exceeds the 132-character cap after the targeted corrections.
+
 ## 2026-07-04 CLI Artifact Polish
 
 Environment:

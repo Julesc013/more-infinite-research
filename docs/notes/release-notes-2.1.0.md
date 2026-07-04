@@ -8,9 +8,10 @@ This is the short, player-facing release summary for the `2.1.0` mod portal rele
 
 ## What Changed
 
-- Added fluid productivity research for oil processing, oil cracking, lubricant, sulfuric acid, and thruster recipes.
+- Added fluid productivity research for oil processing, cracking, lubricant, sulfuric acid, acid neutralization, and thrusters.
 - Added Space Age material productivity research for landfill, artificial soil, molten metals, carbon, ice, and bacteria.
 - Added lithium-from-brine productivity coverage to Lithium Productivity.
+- Rail Productivity now covers Elevated Rails supports and ramps when Elevated Rails is active.
 - Split the old Stone Product Productivity line into Landfill, Artificial Soil, and Molten Metals research lines.
 - Updated Space Age science-pack requirements for fluid, agriculture, bacteria, breeding, and shooting-speed research.
 - Updated cargo logistics technology icons to better match their Space Age unlocks.
@@ -19,6 +20,7 @@ This is the short, player-facing release summary for the `2.1.0` mod portal rele
 ## Compatibility
 
 - MIR can adopt safe mod-added recipes into existing vanilla Space Age productivity families for processing units, plastic bars, low density structures, and rocket fuel.
+- Existing saves refresh technology effects when adopted vanilla-family recipe signatures change.
 - Known Plates n Circuit Productivity technologies are replaced only when MIR fully matches the covered recipes and productivity values.
 - Partial, mismatched, or externally blocked competing productivity technologies are left in place.
 - Unknown external recipe-productivity owners make MIR suppress the matching effect instead of creating duplicate ownership.
