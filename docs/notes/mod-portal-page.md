@@ -4,7 +4,7 @@ More Infinite Research adds repeatable late-game research for production, logist
 
 It is built for players who want more long-term scaling for late-game megabases, long-running Space Age saves, and modded or overhaul-style playthroughs without turning the mod into a full content overhaul.
 
-## At A Glance
+## At a Glance
 
 - Adds many configurable infinite productivity researches for vanilla, Space Age, and compatible modded production chains.
 - Adds repeatable player, robot, weapon-speed, cargo-logistics, and selected vanilla technology bonuses.
@@ -18,8 +18,6 @@ It is built for players who want more long-term scaling for late-game megabases,
 Recipe productivity researches are infinite, but Factorio's recipe productivity cap still applies. Once a recipe reaches that cap, more levels may no longer improve that recipe.
 
 ## Main Features
-
-### More Productivity Research
 
 The mod adds repeatable recipe productivity for many things vanilla does not fully cover:
 
@@ -217,4 +215,4 @@ Version `2.1.0` preserves generated technology IDs except for documented intenti
 
 Existing saves receive the `2.0.5` and `2.1.0` JSON migrations automatically when the mod loads.
 
-Scripted spoilage and agriculture effects are disabled by default in `2.1.0`. Enable them only if you want to test the experimental behavior and report results.
+Scripted spoilage and agriculture effects are disabled by default in `2.1.0`.
