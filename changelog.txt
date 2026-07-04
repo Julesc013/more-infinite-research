@@ -4,32 +4,18 @@ Date: 2026-07-03
 
   Features:
 
-    - Spoilage Preservation now uses agricultural, cryogenic, and space science.
-    - Agricultural Growth Speed now uses agricultural, electromagnetic, and cryogenic science.
-    - Rocket Shooting Speed and Cannon Shooting Speed now use electromagnetic science.
-    - Cargo Bay Unloading Distance now uses the landing pad unloading bay technology icon.
-    - Cargo Landing Pad Count now uses the Space platform technology icon.
-    - Added fluid-output productivity for oil processing, cracking, lubricant, sulfuric acid, acid neutralization, and thrusters.
-    - Fluid productivity now uses cryogenic oil, agricultural cracking, electromagnetic lubricant, and metallurgic acid science.
-    - Oil Cracking productivity uses Oil processing art, and Sulfuric Acid productivity uses sulfuric acid fluid art.
-    - Rail Productivity covers Elevated Rails supports and ramps, using Elevated Rails technology art when active.
-    - Split Stone Product Productivity into Landfill, Artificial Soil, and Molten Metals productivity.
-    - Landfill Productivity gives +10% landfill and +5% foundation productivity, using landfill technology art.
-    - Artificial Soil Productivity gives +10% artificial soil and +5% overgrowth soil productivity, with space science.
-    - Molten Metals Productivity gives +10% lava metals and +5% ore melting productivity, using Foundry art.
-    - Lithium Productivity gives +5% productivity to lithium from brine when the Space Age recipe exists.
-    - Added Carbon Productivity for asteroid carbon recipes, burnt spoilage at +5%, and coal synthesis at +2%.
-    - Added Ice Productivity for oxide asteroid crushing and compatible ice-output recipes.
-    - Added Bacteria Cultivation Productivity for iron and copper bacteria cultivation recipes.
-    - Bacteria Cultivation and Breeding Productivity now include cryogenic science.
-    - Added an opt-in pipeline extent startup multiplier; the default 100% leaves prototypes unchanged.
+    - Added fluid productivity research for oil processing, oil cracking, lubricant, sulfuric acid, and thruster recipes.
+    - Added Space Age material productivity research for landfill, artificial soil, molten metals, carbon, ice, and bacteria.
+    - Added lithium-from-brine productivity coverage to Lithium Productivity.
+    - Split Stone Product Productivity into Landfill, Artificial Soil, and Molten Metals research lines.
+    - Updated Space Age science-pack requirements for fluid, agriculture, bacteria, breeding, and shooting-speed research.
+    - Updated cargo logistics technology icons to better match their Space Age unlocks.
+    - Added an opt-in pipeline extent startup multiplier; default 100% leaves prototypes unchanged.
 
   Compatibility:
 
-    - Vanilla Space Age productivity techs can adopt safe residual recipes for processing units, plastic, LDS, and rocket fuel.
-    - Existing saves reset technology effects when adopted vanilla-family recipe signatures change.
-    - Known Plates n Circuit Productivity techs are replaced only when MIR fully matches recipes and effect values.
-    - Known competitor cleanup leaves partial, mismatched, or externally blocked technologies in place.
+    - Vanilla Space Age productivity technologies can adopt safe residual recipes from compatible planet-style mods.
+    - Known competing productivity technologies are replaced only when MIR fully matches their recipes and effect values.
     - Unknown external recipe-productivity owners make MIR suppress matching effects instead of duplicating ownership.
     - Elevated Rails and Quality remain hidden load-order dependencies without separate visible requirements.
 
@@ -47,7 +33,7 @@ Date: 2026-07-02
     - Published the Factorio 2.0 legacy backport from the tested More Infinite Research 2.0.5 source snapshot.
     - Legacy metadata targets Factorio 2.0 with `base >= 2.0`.
     - Quality remains a hidden optional dependency, and Quality module recipes can still be discovered when active.
-    - Removed the Factorio 2.1-only cargo landing pad count and cargo bay unloading distance streams from legacy.
+    - Removed Factorio 2.1-only cargo logistics research from legacy.
 
 ---------------------------------------------------------------------------------------------------
 Version: 2.0.5
@@ -55,36 +41,20 @@ Date: 2026-07-01
 
   Features:
 
-    - Electric Shooting Speed now covers the `electric` and Space Age `tesla` ammo categories.
-    - Electric Shooting Speed now applies to Tesla guns and Tesla turrets.
-    - Electric Shooting Speed uses discharge-defense art in base games and Space Age electric-weapons art when available.
-    - Added descriptions and modifier strings for flamethrower, electric, and Tesla shooting speed bonuses.
-    - Mining Drill Productivity now covers Omega Drill style recipes and broader modded mining-drill outputs.
-    - Weapon speed cleanup preserves finite vanilla rocket, cannon-shell, and tank cannon bonuses.
-    - Recipe productivity generation now skips recipes already owned by another infinite productivity technology.
-    - Space Age processing unit, low density structure, plastic, and rocket fuel productivity stay vanilla-owned.
-    - Added optional Spoilage Preservation and Agricultural Growth Speed technologies, disabled by default.
-    - Agricultural Growth Speed applies to newly planted tower crops and does not rescan existing planted crops.
-    - Added diagnostic-only native modifier overlap reporting for generated direct-effect technologies.
-    - Character Inventory Slot research now also grants character logistic trash slots.
-    - Character Reach Bonus now uses character mining speed pickaxe art.
-    - Renamed Heavy Ammunition Productivity to Cannon Shell Productivity.
-    - Cannon Shell Productivity covers cannon shells, artillery shells, railgun ammo, and modded shell recipes.
-    - Refreshed MIR technology icons for cannon shells, electric speed, agriculture, circuits, walls, science, and fuel.
+    - Expanded Electric Shooting Speed to cover base electric weapons and Space Age Tesla weapons.
+    - Added optional Spoilage Preservation and Agricultural Growth Speed research, disabled by default.
+    - Combined Character Logistic Trash Slot bonuses into Character Inventory Slot research.
+    - Renamed Heavy Ammunition Productivity to Cannon Shell Productivity and broadened shell/ammo coverage.
     - Added base-game Research Productivity using the native laboratory productivity modifier.
-    - Space Age keeps vanilla Research Productivity, and MIR skips its duplicate.
+    - Refreshed generated technology icons, effect badges, settings labels, and localized descriptions.
+    - Added diagnostic overlap reporting for generated direct-effect technologies.
 
-  Changes:
+  Compatibility:
 
-    - Settings now use clearer labels, option descriptions, opt-in warnings, and player-facing technology sorting.
-    - Technology settings value 0 is documented as the configured fallback for generated research lines and continuations.
-    - Scripted `nothing` effect icons now use compact base icons instead of full technology icon stacks.
-    - Quality module recipes are visible when Quality is active without advertising Quality as a visible requirement.
-
-  Locale:
-
-    - Added locale keys for spoilage preservation, agricultural growth speed, scripted effects, and diagnostics.
-    - Non-English locales use English fallback text for the new 2.0.5 keys and refreshed settings UI text.
+    - Improved generated weapon-speed ownership so vanilla finite rocket, cannon, and tank bonuses stay intact.
+    - Improved recipe-productivity ownership detection so MIR does not duplicate other infinite productivity techs.
+    - Space Age keeps vanilla productivity ownership for processing units, low-density structures, plastic, and rocket fuel.
+    - Quality module productivity recipes can be discovered when Quality is active without a visible dependency.
 
   Migration:
 
@@ -97,83 +67,37 @@ Date: 2026-06-30
 
   Features:
 
-    - Updated the mod for Factorio 2.1.
-    - Added Cargo Bay Unloading Distance research for the Space Age landing pad unloading bay.
-    - Cargo Bay Unloading Distance gives +10 tiles per level and requires the unloading bay unlock.
-    - Added disabled-by-default Cargo Landing Pad Count sandbox research.
-    - Cargo Landing Pad Count gives +1 cargo landing pad per surface per level and requires the landing pad unlock.
-    - Cargo Landing Pad Count starts at 1,000,000 research units with 10x growth by default.
-    - Added startup diagnostics for generated and skipped streams, base extensions, and recipe matches.
-    - Added a lab incompatibility policy for generated technology science packs.
-    - The lab incompatibility policy can reduce packs to a lab-compatible subset or skip the technology.
-    - Reworked science-pack discovery for Factorio 2.1 item-based science packs and modded lab inputs.
-    - Custom item-based science pack recipes can receive productivity effects when visible.
-    - Generated technology creation now runs in data-final-fixes after late recipes, labs, and technologies are visible.
-    - Added layered technology constant icon overlays for generated research technologies.
-    - Added support for Factorio 2.1 recipe categories and stream match filters.
-    - Added a startup setting for vanilla weapon shooting speed adjustment.
-    - The late-game science gate is now disabled by default instead of forcing space or promethium science.
-    - Added science-pack ingredient policies for configured, space, promethium, official, or active lab packs.
-    - Space Age cargo logistics research now uses official base and Space Age science packs only.
-    - Space Age cargo logistics streams now skip cleanly when Space Age is disabled.
-    - Cargo Landing Pad Count now shows a normal technology effect description.
-    - Added in-game descriptions for the recipe productivity cap and lab-compatible science-pack behavior.
+    - Updated More Infinite Research for Factorio 2.1.
+    - Added Space Age cargo logistics research for unloading distance and optional landing pad count.
+    - Added lab-compatible science-pack selection for generated technologies.
+    - Added flexible science-pack policies for configured, space, promethium, official, and active lab packs.
+    - Added startup diagnostics for generated and skipped streams, recipe matches, and base extensions.
+    - Added Factorio 2.1 recipe-category support and late data-final-fixes generation.
+    - Added layered icons, effect badges, localized descriptions, and normal effect text for generated research.
+    - Added startup settings for optional vanilla weapon shooting speed cleanup.
 
   Generator changes:
 
-    - Generated stream prerequisites now include declared required technologies.
-    - Prototype availability checks and generated technology progression now stay aligned.
-    - Direct-effect streams can provide specific localized descriptions and explicit prototype requirements.
-    - Optional DLC-shaped streams no longer hard-require Space Age.
-    - Added optional load ordering for Elevated Rails, Recycler, Quality, and Space Age.
-    - Science Pack Productivity can use Space Age research art, generated badges, or science pack item fallback icons.
-    - Recipe-productivity streams can target dynamic items from active lab inputs.
-    - Recipe matching skips hidden and recycling recipes unless a stream opts in.
-    - Breeding Productivity matching no longer catches every biochamber recipe.
-    - Base-tech extensions inherit science packs from the last vanilla level and add only the intended extra packs.
-    - Existing vanilla and other-mod technologies are left unchanged by base-tech extension generation.
-    - Added unlock-prerequisite repair when generated base-tech extensions add science packs.
-    - Equivalent existing infinite base-tech continuations are skipped instead of duplicated.
-    - Competing infinite continuations stay in place when the preference setting is disabled.
-    - Base-extension zero values now derive from the vanilla chain instead of MIR defaults.
-    - Positive max-level settings below the first generated continuation now skip that base extension.
-    - Cargo Landing Pad Count is tied to the vanilla cargo landing pad unlock.
-    - Compatibility profiles can append stream items, patterns, exclusions, and groups without replacing arrays.
+    - Improved prerequisite, prototype availability, max-level, and existing-continuation checks.
+    - Improved recipe matching for hidden, recycling, lab-input, biochamber, and modded science-pack recipes.
+    - Improved base-technology extension generation so vanilla and other-mod technologies remain unchanged.
+    - Added compatibility profile support for stream items, patterns, exclusions, and groups.
 
   Compatibility:
 
     - Raised the base dependency to Factorio 2.1.8 or newer.
-    - Cargo Bay Unloading Distance uses the Factorio 2.1.8 technology modifier API.
     - Added optional official DLC ordering floors for Elevated Rails, Recycler, Quality, and Space Age.
-    - No compatibility-mod dependencies are declared; integrations use visible prototypes and safe skip checks.
-    - Added competing base-extension cleanup for compatible infinite continuations.
-    - Better Robots Extended worker robot storage research can be replaced by MIR when the matching extension is enabled.
-    - Known recipe-productivity cleanup removes infinite competitors only after replacement MIR effects exist.
-    - Finite upgrade chains from other mods are not removed by the generic cleanup path.
-    - Compatibility cleanup removes dangling prerequisite references when deleting known competing technologies.
-    - Worker Robot Storage research now leans toward utility and electromagnetic science in Space Age.
-    - Added opportunistic compatibility for Advanced Solar HR, OCs Ammo and Armor, OCs Stone Casting, and Plates n Circuit.
-    - Added opportunistic compatibility for Fluid Quality Imprinting.
-    - OCs Ammo and Armor biochamber explosives recipes are matched explicitly.
-    - Turbo belt, underground belt, and splitter productivity are covered explicitly at the 1% tier in Space Age.
-    - Rocket Shooting Speed now uses base-game rocketry art instead of Space Age rocket turret art.
-    - Cannon-shell shooting speed now has dedicated Cannon Shooting Speed research.
-    - Vanilla weapon shooting speed adjustment defaults to off, with startup settings for optional cleanup modes.
-    - MIR can remove selected competing productivity technologies when configured to prefer its versions.
-    - Custom science-pack support uses lab-input discovery, lab compatibility checks, and dynamic productivity targets.
-    - Supports Space Age optional installs, Space Age without Quality, Castra-style mods, and PlanetLib-style mods.
+    - Added cleanup for compatible competing base extensions and recipe-productivity technologies.
+    - Added opportunistic compatibility for several popular productivity and recipe mods.
+    - Improved optional Space Age behavior, including Space Age installs without Quality.
 
   Locale:
 
     - Replaced placeholder text in German, Spanish, French, Italian, Polish, Brazilian Portuguese, and Simplified Chinese.
     - Updated Russian localization coverage and terminology to match current English locale keys.
     - Updated in-game descriptions for productivity, direct-effect, and Space Age cargo logistics research.
-    - Split generated-stream research-time text from base-technology extension research-time text.
-    - Base-extension research-time text now states that only explicit 0 reuses vanilla research time.
     - Moved Spanish localization to Factorio's supported es-ES locale code.
     - Removed empty placeholder locale folders so only complete locale packs are shipped.
-    - Synchronized localized names for Heavy Ammunition, Armor Component, and Stone Product research.
-    - Replaced leftover English Cannon Shooting Speed text in translated locale files.
 
   Migration:
 
@@ -238,13 +162,9 @@ Date: 2025-10-27
     - Added per-stream base cost, growth factor, and max-level defaults and startup settings.
     - Added English locale support for mod name, mod description, technology names, and setting text.
     - Added locale files for German, Spanish, French, Italian, Polish, Brazilian Portuguese, Russian, and Simplified Chinese.
-
-  Research additions:
-
-    - Added direct-effect Character Inventory Slot research, disabled by default.
-    - Added direct-effect Worker Robot Battery research.
-    - Added Science Pack Productivity covering vanilla and Space Age science packs.
-    - Added Wall, Gate, Grenade, Cluster Grenade, Rail, Electric Energy, Concrete, Furnace, and Drill productivity.
+    - Added direct-effect Character Inventory Slot and Worker Robot Battery research.
+    - Added broad productivity coverage for science packs, infrastructure, weapons, intermediates, and Space Age materials.
+    - Added grouped productivity streams for modules, belts, inserters, bullets, and rockets.
 
   Changes:
 
@@ -289,11 +209,8 @@ Date: 2025-10-25
 
   Initial research coverage:
 
-    - Added productivity streams for breeding, plastic, sulfur, batteries, explosives, and gears.
-    - Added productivity streams for iron sticks, copper cable, circuits, processing units, and low density structures.
-    - Added productivity streams for rocket fuel, plates, engine units, electric engines, and flying robot frames.
-    - Added Space Age and overhaul-oriented streams for tungsten, holmium, supercapacitors, and superconductors.
-    - Added Space Age and overhaul-oriented streams for bioflux, carbon fiber, lithium, and quantum processors.
+    - Added productivity streams for vanilla intermediates, infrastructure, ammunition, and science packs.
+    - Added Space Age and overhaul-oriented productivity streams for advanced materials.
     - Added grouped productivity streams for modules, belts, inserters, bullets, and rockets.
     - Grouped productivity streams use lower per-level gains for higher-tier items inside those groups.
 

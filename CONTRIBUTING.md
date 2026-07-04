@@ -69,15 +69,13 @@ For branch policy changes:
 
 The Factorio mod portal ingests the packaged README and changelog, so write them for players first:
 
-- Keep changelog bullets concise and useful to players or compatibility maintainers.
+- Keep changelog bullets concise and useful to players, server admins, or compatibility maintainers.
 - Keep each `changelog.txt` line at or below **132 characters**.
 - This 132-character line cap applies only to `changelog.txt`; Markdown docs use normal prose.
-- Split genuinely combined changes into separate bullets.
-- Do not split a single change into fake continuation bullets.
-- Describe shipped behavior, migrations, compatibility policy, settings, and player-visible fixes.
+- Lead with shipped behavior: added research, changed balance, fixed compatibility, changed settings, or migration.
+- Keep related details together when they are one user-facing change; do not create fake continuation bullets.
+- Mention implementation details only when they affect compatibility, settings, migrations, or save behavior.
 - Do not log abandoned experiments, release-candidate churn, validation fixtures, smoke checks, or package mechanics.
-- Avoid vague process notes such as "reverted proposed changes"; name the shipped behavior instead.
-- Mention settings defaults, migrations, compatibility risks, and save-safety clearly.
 
 ## Release Notes
 
