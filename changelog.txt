@@ -4,6 +4,8 @@ Date: 2026-07-05
 
   Internal:
 
+    - Fixed local audits so official built-ins include required official dependencies such as Recycler for Quality.
+    - Tightened load-failure grouping to classify Factorio error excerpts instead of MIR audit-row text.
     - Made mir.ps1 profile-driven for release, overnight, and local-audit commands with simple path overrides.
     - Added PowerShell script checks for parsing, duplicate parameters, ignored outputs, and secret-output guards.
     - Added Factorio 2.0 and 2.1 run profiles for release gates, overnight sweeps, and local audits.

@@ -2,6 +2,35 @@
 
 This file records local release-candidate validation runs. It is not a substitute for the manual mod matrix in `docs/compatibility.md`.
 
+## 2026-07-05 Official Built-In Dependency Closure Smoke
+
+Environment:
+
+- Branch: `dev`.
+- Mod version `2.1.5`.
+- Factorio binary: Steam Factorio `2.1.9`.
+
+Scope:
+
+- Fixed local compatibility audits to read bundled official mod metadata from the selected Factorio install.
+- Closed required official built-in dependencies before writing scenario `mod-list.json`.
+- Verified a local mod that requests `quality` now enables both `quality` and its required `recycler` dependency.
+- Tightened load-failure grouping so Factorio prototype errors are classified from the error excerpt, not MIR audit rows.
+
+Commands:
+
+```powershell
+.\scripts\Invoke-MIRCompatAudit.ps1 -RunLocalModZips -LocalModZipDirs 'C:\Projects\Factorio\testmods_readonly_2.1' -LocalModLibraryDirs 'C:\Projects\Factorio\testmods_readonly_2.1' -Offline -IncludeRecommendedDependencies -LocalModNames alien-module -MaxCandidates 0 -CatalogPages 0 -FactorioLine 2.1 -FactorioVersions 2.1 -FactorioBin 'C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe' -RunLoadTests -ScenarioTimeoutSeconds 300 -OutputDir .\build\local-zips-alien-module-official-closure-smoke
+```
+
+Results:
+
+- `alien-module` local zip smoke passed.
+- The scenario enabled official built-ins `quality,recycler`.
+- Factorio exited with code `0`.
+- The load test produced `74` MIR audit rows.
+- The scenario did not skip and did not time out.
+
 ## 2026-07-05 Factorio-Line Test Tool Parameterization
 
 Environment:

@@ -331,29 +331,54 @@ foreach ($zipPath in $localZipPaths) {
   }
 }
 $knownOfficialBuiltinMods = @("space-age", "quality", "elevated-rails", "recycler")
-function Get-MIRAvailableOfficialBuiltinMods {
+function Get-MIROfficialBuiltinFullMods {
   param(
     [string]$FactorioBinary,
-    [string]$Line,
     [string[]]$Candidates
   )
 
+  $index = @{}
   if (-not [string]::IsNullOrWhiteSpace($FactorioBinary) -and (Test-Path -LiteralPath $FactorioBinary)) {
     $factorioExe = (Resolve-Path -LiteralPath $FactorioBinary).Path
     $factorioRoot = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $factorioExe))
     $dataRoot = Join-Path $factorioRoot "data"
     if (Test-Path -LiteralPath $dataRoot) {
-      return @($Candidates | Where-Object {
-        Test-Path -LiteralPath (Join-Path $dataRoot ("{0}\info.json" -f $_))
-      } | Sort-Object)
+      foreach ($candidate in @($Candidates)) {
+        $infoPath = Join-Path $dataRoot ("{0}\info.json" -f $candidate)
+        if (-not (Test-Path -LiteralPath $infoPath)) { continue }
+        $info = Read-MIRJsonFile -Path $infoPath
+        $index[[string]$candidate] = [pscustomobject]@{
+          name = [string]$candidate
+          title = if ([string]::IsNullOrWhiteSpace([string]$info.title)) { [string]$candidate } else { [string]$info.title }
+          releases = @([pscustomobject]@{
+            version = [string]$info.version
+            info_json = $info
+          })
+        }
+      }
+      return $index
     }
   }
 
-  if ($Line -eq "2.1") { return @($Candidates | Sort-Object) }
-  return @($Candidates | Sort-Object)
+  foreach ($candidate in @($Candidates)) {
+    $index[[string]$candidate] = [pscustomobject]@{
+      name = [string]$candidate
+      title = [string]$candidate
+      releases = @([pscustomobject]@{
+        version = ""
+        info_json = [pscustomobject]@{
+          name = [string]$candidate
+          version = ""
+          dependencies = @()
+        }
+      })
+    }
+  }
+  return $index
 }
 
-$officialBuiltinMods = @(Get-MIRAvailableOfficialBuiltinMods -FactorioBinary $FactorioBin -Line $FactorioLine -Candidates $knownOfficialBuiltinMods)
+$officialBuiltinFullModsByName = Get-MIROfficialBuiltinFullMods -FactorioBinary $FactorioBin -Candidates $knownOfficialBuiltinMods
+$officialBuiltinMods = @($officialBuiltinFullModsByName.Keys | Sort-Object)
 $specialLocalMods = @("base", "more-infinite-research")
 $officialBuiltinLookup = @{}
 foreach ($officialMod in $knownOfficialBuiltinMods) {
@@ -366,6 +391,31 @@ foreach ($officialMod in $officialBuiltinMods) {
 $localModLookup = @{}
 foreach ($name in @($knownOfficialBuiltinMods + $specialLocalMods)) {
   $localModLookup[$name] = $true
+}
+
+function Add-MIROfficialBuiltinDependencyClosure {
+  param(
+    [Parameter(Mandatory)][hashtable]$Enabled,
+    [switch]$IncludeRecommendedDependencies
+  )
+
+  $queue = [System.Collections.Generic.Queue[string]]::new()
+  foreach ($name in @($Enabled.Keys)) { $queue.Enqueue([string]$name) }
+
+  while ($queue.Count -gt 0) {
+    $name = $queue.Dequeue()
+    if (-not $officialBuiltinFullModsByName.ContainsKey($name)) { continue }
+    $full = $officialBuiltinFullModsByName[$name]
+    $release = @($full.releases)[0]
+    foreach ($dep in @(Get-MIRReleaseDependencies -Release $release)) {
+      $includeDependency = $dep.required -or ($IncludeRecommendedDependencies -and $dep.kind -eq "recommended")
+      if (-not $includeDependency -or -not $officialBuiltinLookup.ContainsKey([string]$dep.name)) { continue }
+      if (-not $Enabled.ContainsKey([string]$dep.name)) {
+        $Enabled[[string]$dep.name] = $true
+        $queue.Enqueue([string]$dep.name)
+      }
+    }
+  }
 }
 
 function Get-MIRPortalRootModNames {
@@ -408,6 +458,7 @@ function Get-MIREnabledOfficialModsFromEntries {
   if ($enabled.ContainsKey("space-age")) {
     foreach ($name in $officialBuiltinMods) { $enabled[$name] = $true }
   }
+  Add-MIROfficialBuiltinDependencyClosure -Enabled $enabled -IncludeRecommendedDependencies:$IncludeRecommendedDependencies
 
   return @($enabled.Keys | Sort-Object)
 }
@@ -435,6 +486,7 @@ function Get-MIRUnavailableOfficialMods {
       }
     }
   }
+  Add-MIROfficialBuiltinDependencyClosure -Enabled $required -IncludeRecommendedDependencies:$IncludeRecommendedDependencies
   @($required.Keys | Where-Object { -not $availableOfficialBuiltinLookup.ContainsKey([string]$_) } | Sort-Object)
 }
 
