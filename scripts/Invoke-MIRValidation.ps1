@@ -335,6 +335,10 @@ Invoke-RepoCheck "fixture mods have metadata and data entrypoints" {
       if ($fixtureBaseDependency -notmatch "^base\s+>=\s+2\.0(\.|$)") {
         throw "Fixture $($info.name) must use a Factorio 2.0 base dependency on legacy; found '$fixtureBaseDependency'."
       }
+      $fixtureFactorio21Deps = @($info.dependencies) | Where-Object { $_ -match ">=\s*2\.1" }
+      if ($fixtureFactorio21Deps.Count -gt 0) {
+        throw "Fixture $($info.name) must not carry Factorio 2.1 dependency floors on legacy: $($fixtureFactorio21Deps -join ', ')"
+      }
     } elseif ($isFactorio21Line) {
       if ($fixtureBaseDependency -notmatch "^base\s+>=\s+2\.1(\.|$)") {
         throw "Fixture $($info.name) must use a Factorio 2.1 base dependency on the main line; found '$fixtureBaseDependency'."

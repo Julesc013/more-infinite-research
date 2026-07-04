@@ -33,6 +33,11 @@ Results:
 - `git diff --check` passed.
 - No local Factorio `2.0.x` executable was found under `C:\Projects\Factorio`; the installed Steam binary reported `2.1.9`, so Factorio `2.0` runtime validation remains pending.
 
+Post-audit correction:
+
+- Normalized newly merged fixture Space Age dependency floors from `space-age >= 2.1.8` to legacy-safe `space-age`.
+- Hardened static validation so Factorio `2.0` legacy fixture metadata rejects any dependency floor `>= 2.1`.
+
 ## 2026-07-04 Release Gate Reuse And README Cleanup
 
 Environment:
