@@ -259,7 +259,7 @@ Out of scope for `v2.1.0`:
 
 ## Implemented Expansion Gates
 
-These features now have `v2.1.0` implementation coverage and automated fixture proof for the release-candidate claims. Non-conservative defaults, stronger balance recommendations, or broader manual compatibility claims still need save-level soak.
+These features now have `v2.1.0` implementation coverage and automated fixture proof for the release claims. Non-conservative defaults, stronger balance recommendations, or broader manual compatibility claims still need save-level soak.
 
 | Feature | Release proof status |
 | --- | --- |

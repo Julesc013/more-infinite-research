@@ -41,7 +41,7 @@ The `1.9.9` cutoff should be treated as a release trigger, not an API assumption
 
 ## Current Baseline
 
-Current `dev` is the `v2.1.0` release-candidate line. It builds on the tested
+Current `dev` is the `v2.1.0` release line. It builds on the tested
 `v2.0.5` quick-patch baseline and adds the larger Factorio `2.1` feature wave:
 
 - simpler per-technology checkbox enablement, with shareable presets deferred;
@@ -216,7 +216,7 @@ Theme:
 User-facing control + compatibility discipline + proof-gated expansion.
 ```
 
-`v2.1.0` is the next controlled feature wave. It should not absorb every good idea. The release candidate ships settings control cleanup, targeted compatibility policy, icon policy, and only the logistics/productivity work that passed proof.
+`v2.1.0` is the controlled Factorio `2.1` feature wave. It ships settings control cleanup, targeted compatibility policy, icon policy, and only the logistics/productivity work that passed proof.
 
 The detailed release gate lives in `docs/notes/release-plan-2.1.0.md`, but the durable task list lives in root `todo.md`.
 
@@ -248,7 +248,7 @@ The detailed release gate lives in `docs/notes/release-plan-2.1.0.md`, but the d
 - New prototype unlocks have recipe, power, balance, localization, and package tests.
 - Startup prototype settings document why they cannot be runtime research.
 - Recipe-productivity additions prove exact recipe IDs and no vanilla/other-mod infinite duplicate.
-- Static validation, runtime fixture validation, package build, compatibility audit smoke, and `git diff --check` pass on the final release-candidate tree.
+- Static validation, runtime fixture validation, package build, compatibility audit smoke, and `git diff --check` pass on the final release tree.
 - README, roadmap, compatibility docs, test results, and changelog are updated before release.
 
 ## v2.1.5 Feedback Patch

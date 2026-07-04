@@ -545,7 +545,7 @@ When either diagnostics setting is enabled, MIR also reports duplicate recipe ma
 .\scripts\Invoke-MIRReleaseTargetedGate.ps1
 ```
 
-This is the short release-candidate command. It runs the strict current-commit gate, the two harness repair smokes (`big-mining-drill` and `biolabs-in-space`), the representative local BZ Space Age suite, package rebuild, whitespace check, and clean-git-status check. Use the overnight local sweep separately for broader compatibility evidence.
+This is the short release command. It runs the strict current-commit gate, the two harness repair smokes (`big-mining-drill` and `biolabs-in-space`), the representative local BZ Space Age suite, package rebuild, whitespace check, and clean-git-status check. Use the overnight local sweep separately for broader compatibility evidence.
 
 **Developer CLI front door:**
 
@@ -617,7 +617,7 @@ The validation script checks:
 - **`docs/api-proof-points.md`:** API claims, proof status, and open in-game verification questions.
 - **`docs/compatibility.md`:** compatibility model, known integrations, manual test matrix, fixture designs, and release checklist.
 - **`docs/roadmap.md`:** high-level release narrative, scope rationale, why decisions, and pointers back to `todo.md`, `changelog.txt`, and supporting notes.
-- **`docs/test-results.md`:** local release-candidate validation evidence.
+- **`docs/test-results.md`:** local release validation evidence.
 - **`docs/notes/manual-test-plan.md`:** named manual saves/scenarios for release validation.
 - **`docs/notes/mod-portal-page.md`:** mod-portal-ready public description, technology catalog, settings summary, compatibility notes, and troubleshooting text.
 - **`docs/notes/release-plan-2.1.0.md`:** detailed release-gated implementation plan for the Factorio `2.1` feature wave. Summarize durable future tasks back into `todo.md`.
