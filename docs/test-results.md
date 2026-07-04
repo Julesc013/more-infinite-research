@@ -2,6 +2,34 @@
 
 This file records local release-candidate validation runs. It is not a substitute for the manual mod matrix in `docs/compatibility.md`.
 
+## 2026-07-05 Legacy Developer Tooling Front Door Import
+
+Environment:
+
+- Branch: `legacy`.
+- Mod version `1.9.5`.
+
+Scope:
+
+- Imported the reusable `mir.ps1` front door and run-profile tooling from the current development line.
+- Kept the tooling as a thin wrapper over the existing validation, audit, package, and report scripts.
+- Added PowerShell quality checks for parsing, duplicate parameters, ignored outputs, and obvious secret output.
+- Added `docs/dev-tools.md` for preferred commands, stable direct scripts, advanced engines, private helpers, and run profiles.
+
+Commands:
+
+```powershell
+.\scripts\mir.ps1 --help
+.\scripts\mir.ps1 run -Profile local-audit-2.1 --help
+.\scripts\Test-MIRPowerShellQuality.ps1
+.\scripts\Invoke-MIRValidation.ps1 -StaticOnly
+```
+
+Results:
+
+- Imported from the current line for legacy test-harness reuse before Factorio `2.0` runtime validation.
+- Validation must be rerun on `legacy` after the full tooling import is applied.
+
 ## 2026-07-04 Legacy 1.9.5 Backport Static And Package Gate
 
 Environment:

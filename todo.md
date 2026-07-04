@@ -401,9 +401,9 @@ discover facts
 - [x] Never let profile-stub generation automatically enable a compatibility profile.
 - [ ] Refine stub generation after the explicit planner emits richer replacement/adoption/suppression evidence.
 
-### Extended Test Runtime Framework
+### Extended Test Tooling
 
-The current overnight/local-library automation is usable. The next operational slice should centralize shared CLI behavior instead of adding more one-off formatting and recovery logic to each script.
+The current overnight/local-library automation is usable. Keep `scripts/mir.ps1` as the preferred human front door, use JSON run profiles for defaults, and treat `scripts/MIRCli/` as a small private helper folder. Do not expand it into a framework unless repeated script-level pain proves the need.
 
 - [x] Add a shared `scripts/MIRCli/` PowerShell module layer for console formatting, run context, event logging, process supervision, checkpoints, artifact indexing, report helpers, path resolution, local mod indexing, and power-management helpers.
 - [x] Add timestamped status output with stable textual tokens such as `[RUN]`, `[STEP]`, `[SCEN]`, `[PASS]`, `[SKIP]`, `[TIME]`, and `[FAIL]`, with optional color controlled by `-ColorMode`, `-NoColor`, `-Quiet`, and `-CI`.
@@ -422,7 +422,8 @@ The current overnight/local-library automation is usable. The next operational s
 - [ ] Add optional `-LinkMode Copy|Hardlink|Symlink` for large local libraries, with safe fallback to copy when hardlinks/symlinks are unavailable.
 - [ ] Add conservative `-Parallelism` support for metadata/report work first, keeping Factorio load checks sequential by default.
 - [x] Add a stable `scripts/mir.ps1` facade and initial JSON run profiles.
-- [ ] Add `scripts/Test-MIRPowerShellQuality.ps1` for parsing every script, artifact-ignore checks, duplicate parameter detection, and optional PSScriptAnalyzer when installed.
+- [x] Move the default local audit command behind `fixtures/run-profiles/local-audit-2.1.json` instead of hardcoding it in `mir.ps1`.
+- [x] Add `scripts/Test-MIRPowerShellQuality.ps1` for parsing every script, artifact-ignore checks, duplicate parameter detection, and optional PSScriptAnalyzer when installed.
 
 ### v2.1.0 Spike / Defer Decisions
 

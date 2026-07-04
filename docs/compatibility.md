@@ -145,18 +145,27 @@ Review-only profile stubs can be generated from grouped failures:
   -GroupId FG0001
 ```
 
-The tiered wrapper is the recommended entry point for repeatable local and self-hosted runs:
+Use `mir.ps1` as the preferred human entry point for repeatable local and self-hosted runs:
 
 ```powershell
 .\scripts\mir.ps1 release gate
 .\scripts\mir.ps1 overnight local
+.\scripts\mir.ps1 audit local
+.\scripts\mir.ps1 audit top25 --space-age
 .\scripts\mir.ps1 report latest
+.\scripts\mir.ps1 report missing-deps --run <path>
+.\scripts\mir.ps1 package build
+.\scripts\mir.ps1 run -Profile local-audit-2.1
+```
+
+Use the underlying scripts directly only when debugging or composing a narrower custom run:
+
+```powershell
 .\scripts\Invoke-MIRReleaseTargetedGate.ps1
 .\scripts\Invoke-MIRExtendedTests.ps1 -Tier Static,Runtime,AuditSmoke -FailFast -FailOnAuditFailures
 .\scripts\Invoke-MIRExtendedTests.ps1 -Tier Top25Base,Top25SpaceAge,ManualScenarios -CollectAll
 .\scripts\Invoke-MIRExtendedTests.ps1 -Tier LocalModZips -LocalModZipDirs .\tmp -CollectAll
 .\scripts\Start-MIROvernightLocalSweep.ps1
-.\scripts\Invoke-MIRExtendedTests.ps1 -Tier LocalLibraryScenarios,GeneratedLocalScenarios,LocalModZips -LocalModZipDirs C:\Projects\Factorio\testmods_readonly_2.1 -LocalModLibraryDirs C:\Projects\Factorio\testmods_readonly_2.1 -Offline -CollectAll
 .\scripts\Invoke-MIRExtendedTests.ps1 -Tier Full10KSpaceAge -IncludeFullAudit -StartIndex 0 -ShardSize 25 -CollectAll
 .\scripts\Invoke-MIRExtendedTests.ps1 -Tier Full10KSpaceAge -IncludeFullAudit -FromLockfile .\artifacts\compat-audit-locks\compat-candidates.lock.json -StartIndex 25 -ShardSize 25 -CollectAll
 ```
@@ -171,7 +180,7 @@ The tiered wrapper is the recommended entry point for repeatable local and self-
 
 The default smoke mods and representative scenario are ordinary parameters, so future release lines can reuse the same command without changing script code. It writes `release-targeted-summary.md/json` under `artifacts/release-targeted-*`.
 
-`mir.ps1` is the stable front door for humans. It delegates to the existing scripts rather than replacing them, supports JSON run profiles from `fixtures/run-profiles/`, and exposes common commands such as `release gate`, `overnight local`, `audit local`, `audit top25 --space-age`, `package build`, `report latest`, `report missing-deps`, `profile stub`, and `local-index build`.
+`mir.ps1` is the stable front door for humans. It delegates to the existing scripts rather than replacing them, supports JSON run profiles from `fixtures/run-profiles/`, and exposes common commands such as `release gate`, `overnight local`, `audit local`, `audit top25 --space-age`, `package build`, `report latest`, `report missing-deps`, `profile stub`, and `local-index build`. Use `--factorio`, `--mods`, `--output`, `--timeout`, and `--profile` for common overrides instead of editing scripts.
 
 `Start-MIROvernightLocalSweep.ps1` is the preferred bedtime command for the local `2.1` library. It removes one-line paste hazards, starts a transcript log, writes `run-manifest.json`, `events.jsonl`, `artifact-index.json`, and `index.html`, runs the strict release gate, then runs the local sweep with `-CollectAll`. The underlying prioritized local sweep covers curated combinations from `fixtures/compat-matrix/local-library-scenarios.json`, generated all-local/cluster stress scenarios, and then each individual local root zip. Missing dependencies and impossible mod combinations are expected to appear as grouped failures; they are still useful evidence because they distinguish "not testable with this local library" from actual MIR generation regressions. `Show-MIROvernightSummary.ps1` summarizes the next-morning triage views across the whole output tree.
 

@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "kind": "extended",
+  "tiers": [
+    "LocalLibraryScenarios",
+    "GeneratedLocalScenarios",
+    "LocalModZips"
+  ],
+  "factorio_bin": "auto",
+  "local_mod_zip_dirs": [
+    "C:\\Projects\\Factorio\\testmods_readonly_2.1"
+  ],
+  "local_mod_library_dirs": [
+    "C:\\Projects\\Factorio\\testmods_readonly_2.1"
+  ],
+  "offline": true,
+  "collect_all": true,
+  "include_generated_local_pairwise": true,
+  "generated_local_pairwise_limit": 40,
+  "scenario_timeout_seconds": 900
+}
