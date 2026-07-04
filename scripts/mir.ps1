@@ -30,6 +30,7 @@ Usage:
 
 Common overrides:
   --factorio <path>   Factorio binary path
+  --factorio-line <2.0|2.1>
   --mods <path>       Local mod zip/library directory
   --output <path>     Output artifact directory
   --timeout <seconds> Per-scenario timeout
@@ -71,12 +72,17 @@ function New-MIRProfileOverrides {
 
   $overrides = @{}
   $factorio = Get-MIRArgValue -Items $Items -Name "--factorio"
+  $factorioLine = Get-MIRArgValue -Items $Items -Name "--factorio-line"
   $mods = Get-MIRArgValue -Items $Items -Name "--mods"
   $output = Get-MIRArgValue -Items $Items -Name "--output"
   $timeout = Get-MIRArgValue -Items $Items -Name "--timeout"
 
   if (-not [string]::IsNullOrWhiteSpace($factorio)) {
     $overrides.factorio_bin = $factorio
+  }
+  if (-not [string]::IsNullOrWhiteSpace($factorioLine)) {
+    if ($factorioLine -notin @("2.0", "2.1")) { throw "--factorio-line must be 2.0 or 2.1." }
+    $overrides.factorio_line = $factorioLine
   }
   if (-not [string]::IsNullOrWhiteSpace($mods)) {
     $overrides.local_mod_dir = $mods
@@ -176,6 +182,7 @@ function Invoke-MIRRunProfile {
     "release-targeted" {
       $params = @{}
       $factorioBin = Get-MIRProfileOrOverride -Object $profileData -Overrides $Overrides -Name "factorio_bin"
+      $factorioLine = Get-MIRProfileOrOverride -Object $profileData -Overrides $Overrides -Name "factorio_line"
       $localModDir = Get-MIRProfileOrOverride -Object $profileData -Overrides $Overrides -Name "local_mod_dir"
       $outputRoot = Get-MIRProfileOrOverride -Object $profileData -Overrides $Overrides -Name "output_root"
       $repairSmokeModNames = Get-MIRProfileOrOverride -Object $profileData -Overrides $Overrides -Name "repair_smoke_mod_names"
@@ -184,6 +191,7 @@ function Invoke-MIRRunProfile {
       $auditFactorioVersions = Get-MIRProfileOrOverride -Object $profileData -Overrides $Overrides -Name "audit_factorio_versions"
       $timeout = Get-MIRProfileOrOverride -Object $profileData -Overrides $Overrides -Name "scenario_timeout_seconds"
       if ($factorioBin) { $params.FactorioBin = Resolve-MIRFactorioBin -Path ([string]$factorioBin) }
+      if ($factorioLine) { $params.FactorioLine = [string]$factorioLine }
       if ($localModDir) { $params.LocalModDir = [string]$localModDir }
       if ($outputRoot) { $params.OutputRoot = [string]$outputRoot }
       if ($repairSmokeModNames) { $params.RepairSmokeModNames = @($repairSmokeModNames | ForEach-Object { [string]$_ }) }
@@ -192,16 +200,21 @@ function Invoke-MIRRunProfile {
       if ($auditFactorioVersions) { $params.AuditFactorioVersions = @($auditFactorioVersions | ForEach-Object { [string]$_ }) }
       if ($timeout) { $params.ScenarioTimeoutSeconds = [int]$timeout }
       if (Test-MIRProfileOrOverrideFlag -Object $profileData -Overrides $Overrides -Name "no_git_pull") { $params.NoGitPull = $true }
+      if (Test-MIRProfileOrOverrideFlag -Object $profileData -Overrides $Overrides -Name "skip_repair_smokes") { $params.SkipRepairSmokes = $true }
+      if (Test-MIRProfileOrOverrideFlag -Object $profileData -Overrides $Overrides -Name "skip_representative_scenario") { $params.SkipRepresentativeScenario = $true }
+      if (Test-MIRProfileOrOverrideFlag -Object $profileData -Overrides $Overrides -Name "skip_build") { $params.SkipBuild = $true }
       & (Join-Path $scriptRoot "Invoke-MIRReleaseTargetedGate.ps1") @params
     }
     "overnight-local" {
       $params = @{}
       $factorioBin = Get-MIRProfileOrOverride -Object $profileData -Overrides $Overrides -Name "factorio_bin"
+      $factorioLine = Get-MIRProfileOrOverride -Object $profileData -Overrides $Overrides -Name "factorio_line"
       $localModDir = Get-MIRProfileOrOverride -Object $profileData -Overrides $Overrides -Name "local_mod_dir"
       $outputRoot = Get-MIRProfileOrOverride -Object $profileData -Overrides $Overrides -Name "output_root"
       $timeout = Get-MIRProfileOrOverride -Object $profileData -Overrides $Overrides -Name "scenario_timeout_seconds"
       $pairwiseLimit = Get-MIRProfileOrOverride -Object $profileData -Overrides $Overrides -Name "generated_local_pairwise_limit"
       if ($factorioBin) { $params.FactorioBin = Resolve-MIRFactorioBin -Path ([string]$factorioBin) }
+      if ($factorioLine) { $params.FactorioLine = [string]$factorioLine }
       if ($localModDir) { $params.LocalModDir = [string]$localModDir }
       if ($outputRoot) { $params.OutputRoot = [string]$outputRoot }
       if ($timeout) { $params.ScenarioTimeoutSeconds = [int]$timeout }
@@ -214,7 +227,9 @@ function Invoke-MIRRunProfile {
         Tier = @($tiers | ForEach-Object { [string]$_ })
       }
       $factorioBin = Get-MIRProfileOrOverride -Object $profileData -Overrides $Overrides -Name "factorio_bin"
+      $factorioLine = Get-MIRProfileOrOverride -Object $profileData -Overrides $Overrides -Name "factorio_line"
       $outputRoot = Get-MIRProfileOrOverride -Object $profileData -Overrides $Overrides -Name "output_root"
+      $manualScenariosPath = Get-MIRProfileOrOverride -Object $profileData -Overrides $Overrides -Name "manual_scenarios_path"
       $localModZipDirs = Get-MIRProfileOrOverride -Object $profileData -Overrides $Overrides -Name "local_mod_zip_dirs"
       $localModLibraryDirs = Get-MIRProfileOrOverride -Object $profileData -Overrides $Overrides -Name "local_mod_library_dirs"
       $scenarioNames = Get-MIRProfileOrOverride -Object $profileData -Overrides $Overrides -Name "scenario_names"
@@ -222,7 +237,9 @@ function Invoke-MIRRunProfile {
       $timeout = Get-MIRProfileOrOverride -Object $profileData -Overrides $Overrides -Name "scenario_timeout_seconds"
       $pairwiseLimit = Get-MIRProfileOrOverride -Object $profileData -Overrides $Overrides -Name "generated_local_pairwise_limit"
       if ($factorioBin) { $params.FactorioBin = Resolve-MIRFactorioBin -Path ([string]$factorioBin) }
+      if ($factorioLine) { $params.FactorioLine = [string]$factorioLine }
       if ($outputRoot) { $params.OutputRoot = [string]$outputRoot }
+      if ($manualScenariosPath) { $params.ManualScenariosPath = [string]$manualScenariosPath }
       if ($localModZipDirs) { $params.LocalModZipDirs = @($localModZipDirs | ForEach-Object { [string]$_ }) }
       if ($localModLibraryDirs) { $params.LocalModLibraryDirs = @($localModLibraryDirs | ForEach-Object { [string]$_ }) }
       if ($scenarioNames) { $params.ScenarioNames = @($scenarioNames | ForEach-Object { [string]$_ }) }

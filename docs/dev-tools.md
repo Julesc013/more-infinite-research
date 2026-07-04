@@ -21,6 +21,7 @@ Common overrides:
 
 ```powershell
 --factorio <path>
+--factorio-line <2.0|2.1>
 --mods <path>
 --output <path>
 --timeout <seconds>
@@ -36,12 +37,18 @@ Reusable defaults live in `fixtures/run-profiles/`.
 | Profile | Purpose |
 | --- | --- |
 | `release-targeted` | Strict release gate plus targeted local smokes and package checks. |
+| `release-targeted-2.1` | Explicit Factorio 2.1 release-gate profile. |
+| `release-targeted-2.0` | Legacy-line release-gate profile for a backported source tree. |
 | `overnight-local-2.1` | Bedtime offline local-library sweep for the Factorio 2.1 line. |
+| `overnight-local-2.0` | Bedtime offline local-library sweep for the Factorio 2.0 line. |
 | `local-audit-2.1` | Offline local-library audit tiers without the strict release gate. |
+| `local-audit-2.0` | Offline local-library audit tiers for a Factorio 2.0 local library. |
 | `local-bz-smoke` | Narrow BZ Space Age local smoke. |
 | `top25-space-age` | Credentialed top-25 Space Age compatibility audit. |
 
 Prefer adding or editing a profile over hardcoding paths in `mir.ps1`. Local machine paths are acceptable in profiles because they are explicit operator defaults and easy to override.
+
+`FactorioLine` is a selector for the existing tools, not a separate harness. It controls Mod Portal release matching, local scenario defaults, output naming, and which local library path is chosen when no path is passed. A Factorio `2.0` profile still requires a real Factorio `2.0.x` binary and a source tree whose `info.json` targets Factorio `2.0`.
 
 ## Script Roles
 

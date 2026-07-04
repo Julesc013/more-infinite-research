@@ -6,6 +6,8 @@ Date: 2026-07-05
 
     - Made mir.ps1 profile-driven for release, overnight, and local-audit commands with simple path overrides.
     - Added PowerShell script checks for parsing, duplicate parameters, ignored outputs, and secret-output guards.
+    - Added Factorio 2.0 and 2.1 run profiles for release gates, overnight sweeps, and local audits.
+    - Made compatibility audits select Factorio line, local scenario defaults, and available official built-ins.
 
 ---------------------------------------------------------------------------------------------------
 Version: 1.9.5

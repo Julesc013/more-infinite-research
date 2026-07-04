@@ -2,6 +2,39 @@
 
 This file records local release-candidate validation runs. It is not a substitute for the manual mod matrix in `docs/compatibility.md`.
 
+## 2026-07-05 Factorio-Line Test Tool Parameterization
+
+Environment:
+
+- Branch: `dev`.
+- Mod version `2.1.5`.
+
+Scope:
+
+- Added `FactorioLine` to the existing release gate, extended runner, compatibility audit, and overnight local sweep.
+- Added `release-targeted-2.0`, `overnight-local-2.0`, and `local-audit-2.0` profiles.
+- Added `fixtures/compat-matrix/local-library-scenarios-2.0.json` for legacy-line local-library audits.
+- Made `AuditSmoke` use `space-age-baseline` on Factorio `2.1` and `base-baseline` on Factorio `2.0`.
+- Made official built-in mod-list generation depend on the selected Factorio binary.
+
+Commands:
+
+```powershell
+.\scripts\Test-MIRPowerShellQuality.ps1
+.\scripts\mir.ps1 --help
+.\scripts\Invoke-MIRValidation.ps1 -StaticOnly
+git diff --check
+```
+
+Results:
+
+- JSON run profiles and local scenario fixtures parsed successfully.
+- PowerShell quality checks passed across `27` scripts.
+- `mir.ps1 --help` and the `local-audit-2.0` profile-help guard printed help without starting a long run.
+- Static validation passed and built `build\validation-dist\more-infinite-research_2.1.5.zip`.
+- `git diff --check` passed.
+- `changelog.txt` has no lines over the changelog-only `132` character cap.
+
 ## 2026-07-05 Dev Tooling Front Door Cleanup
 
 Environment:

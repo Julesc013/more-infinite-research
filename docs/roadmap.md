@@ -51,7 +51,7 @@ Current `dev` is the `v2.1.5` feedback-patch line. It builds on the tested
 - the Space Age material productivity split from Stone product productivity into Landfill, Artificial soil, and Molten metals, plus Lithium from brine, Carbon, Ice, and Bacteria cultivation productivity;
 - conservative vanilla Space Age productivity-family adoption for safe residual recipes;
 - hardened known Plates n Circuit Productivity replacement that requires full coverage, matching productivity values, lab-compatible replacement science, and no other blocking owner;
-- a local Mod Portal compatibility audit harness with dependency closure, offline read-only mod-library resolution, generated local-library mega/cluster/pairwise scenarios, explicit official built-in isolation, Space Age bundle expansion, SHA1 cache verification, blank-log-line-tolerant parsed MIR audit rows, executable manual scenarios, sharding/resume, per-scenario result checkpointing, missing-dependency summaries, per-scenario timeouts, dependency-failure skipping, grouped expected/unexpected failure summaries, review-only profile stubs, strict/exploratory wrapper modes, and a self-hosted extended-test workflow.
+- a local Mod Portal compatibility audit harness with dependency closure, offline read-only mod-library resolution, Factorio-line run profiles, generated local-library mega/cluster/pairwise scenarios, explicit official built-in isolation, binary-aware Space Age bundle expansion, SHA1 cache verification, blank-log-line-tolerant parsed MIR audit rows, executable manual scenarios, sharding/resume, per-scenario result checkpointing, missing-dependency summaries, per-scenario timeouts, dependency-failure skipping, grouped expected/unexpected failure summaries, review-only profile stubs, strict/exploratory wrapper modes, and a self-hosted extended-test workflow.
 
 The audit scripts are now functional enough for overnight evidence collection. The next operational improvement is small consolidation around `scripts/mir.ps1`, run profiles, and targeted quality checks rather than a broad new CLI framework. Existing script entry points remain stable, `scripts/MIRCli/` stays a private helper folder, and new helper infrastructure should be added only when repeated use across scripts proves the need.
 
@@ -305,6 +305,8 @@ Backport rule:
 legacy = tested current MIR code, minus Factorio 2.1-only surface area,
 with Factorio 2.0 metadata and validation.
 ```
+
+Use the same test tools for both lines. Select `FactorioLine = 2.0` through `mir.ps1` profiles such as `release-targeted-2.0`, `overnight-local-2.0`, and `local-audit-2.0`; do not create a separate legacy harness. Those profiles must run against a real Factorio `2.0.x` binary and a matching local library such as `C:\Projects\Factorio\testmods_readonly_2.0`.
 
 Recommended setup for the first legacy port:
 

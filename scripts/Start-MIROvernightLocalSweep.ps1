@@ -1,6 +1,8 @@
 param(
   [string]$FactorioBin = $env:FACTORIO_BIN,
-  [string]$LocalModDir = "C:\Projects\Factorio\testmods_readonly_2.1",
+  [ValidateSet("2.0", "2.1")]
+  [string]$FactorioLine = "2.1",
+  [string]$LocalModDir = "",
   [string]$OutputRoot = "",
   [int]$ScenarioTimeoutSeconds = 900,
   [int]$GeneratedLocalPairwiseLimit = 40,
@@ -48,6 +50,9 @@ function Resolve-MIRFactorioBinary {
 }
 
 $resolvedFactorioBin = Resolve-MIRFactorioBinary -Path $FactorioBin
+if ([string]::IsNullOrWhiteSpace($LocalModDir)) {
+  $LocalModDir = "C:\Projects\Factorio\testmods_readonly_$FactorioLine"
+}
 if (-not (Test-Path -LiteralPath $LocalModDir)) {
   throw "Local mod directory does not exist: $LocalModDir"
 }
@@ -59,7 +64,7 @@ if ($localZipCount -eq 0) {
 
 $stamp = Get-Date -Format "yyyyMMdd-HHmmss"
 if ([string]::IsNullOrWhiteSpace($OutputRoot)) {
-  $OutputRoot = ".\artifacts\overnight-local-2.1-$stamp"
+  $OutputRoot = ".\artifacts\overnight-local-$FactorioLine-$stamp"
 }
 $resolvedOutputRoot = Resolve-MIROvernightPath -Path $OutputRoot
 New-Item -ItemType Directory -Force -Path $resolvedOutputRoot | Out-Null
@@ -70,7 +75,7 @@ if (-not $SkipStrictGate) { $plannedTiers += "StrictGate" }
 if (-not $SkipLocalSweep) { $plannedTiers += @("LocalLibraryScenarios", "GeneratedLocalScenarios", "LocalModZips") }
 $runContext = New-MIRRunContext `
   -RepoRoot $repo.Path `
-  -RunKind "overnight-local-2.1" `
+  -RunKind "overnight-local-$FactorioLine" `
   -OutputRoot $resolvedOutputRoot `
   -FactorioBin $resolvedFactorioBin `
   -Tiers $plannedTiers `
@@ -78,6 +83,7 @@ $runContext = New-MIRRunContext `
   -ScenarioTimeoutSeconds $ScenarioTimeoutSeconds `
   -Offline $true
 Write-MIREvent -Path $runContext.events_path -RunId $runContext.run_id -Kind "run_start" -Data @{
+  factorio_line = $FactorioLine
   local_mod_dir = $resolvedLocalModDir
   local_zip_count = $localZipCount
   strict_gate = -not [bool]$SkipStrictGate
@@ -87,6 +93,7 @@ $runStatus = "failed"
 
 Write-Host "[overnight] repo: $($repo.Path)"
 Write-Host "[overnight] Factorio: $resolvedFactorioBin"
+Write-Host "[overnight] Factorio line: $FactorioLine"
 Write-Host "[overnight] local mod dir: $resolvedLocalModDir ($localZipCount zips)"
 Write-Host "[overnight] output root: $resolvedOutputRoot"
 Write-Host "[overnight] log: $logPath"
@@ -132,6 +139,7 @@ try {
     & (Join-Path $repo "scripts\Invoke-MIRExtendedTests.ps1") `
       -Tier Static,Runtime,AuditSmoke `
       -FactorioBin $resolvedFactorioBin `
+      -FactorioLine $FactorioLine `
       -FailFast `
       -FailOnAuditFailures `
       -OutputRoot (Join-Path $resolvedOutputRoot "release-gate")
@@ -141,6 +149,7 @@ try {
     $sweepParams = @{
       Tier = @("LocalLibraryScenarios", "GeneratedLocalScenarios", "LocalModZips")
       FactorioBin = $resolvedFactorioBin
+      FactorioLine = $FactorioLine
       LocalModZipDirs = @($resolvedLocalModDir)
       LocalModLibraryDirs = @($resolvedLocalModDir)
       Offline = $true
@@ -153,7 +162,7 @@ try {
       $sweepParams.GeneratedLocalPairwiseLimit = $GeneratedLocalPairwiseLimit
     }
 
-    Write-Host "[overnight] prioritized local 2.1 sweep"
+    Write-Host "[overnight] prioritized local $FactorioLine sweep"
     & (Join-Path $repo "scripts\Invoke-MIRExtendedTests.ps1") @sweepParams
   }
 

@@ -1,6 +1,6 @@
 # M.I.R. TODO
 
-Updated: 2026-07-04
+Updated: 2026-07-05
 
 This is the executable task list for the next More Infinite Research releases. Keep durable future work here, not only in derivative planning docs, so the project still has its task and release plan if the `docs/` tree is reorganized or partially lost.
 
@@ -424,6 +424,9 @@ The current overnight/local-library automation is usable. Keep `scripts/mir.ps1`
 - [x] Add a stable `scripts/mir.ps1` facade and initial JSON run profiles.
 - [x] Move the default local audit command behind `fixtures/run-profiles/local-audit-2.1.json` instead of hardcoding it in `mir.ps1`.
 - [x] Add `scripts/Test-MIRPowerShellQuality.ps1` for parsing every script, artifact-ignore checks, duplicate parameter detection, and optional PSScriptAnalyzer when installed.
+- [x] Add `FactorioLine` support to the existing release gate, extended runner, compatibility audit, overnight sweep, and `mir.ps1` profile dispatch.
+- [x] Add Factorio `2.0` run profiles and `fixtures/compat-matrix/local-library-scenarios-2.0.json`.
+- [x] Make official built-in mod-list handling discover the built-ins available beside the selected Factorio binary.
 
 ### v2.1.0 Spike / Defer Decisions
 
@@ -487,6 +490,7 @@ Do not reconstruct old releases commit-by-commit for `legacy`. A legacy release 
 ### v1.9.5 Backport From The Next Tested v2.1.x Snapshot
 
 - [ ] Finish and validate the selected `v2.1.x` source point.
+- [ ] Configure a real Factorio `2.0.x` binary for `release-targeted-2.0` and `overnight-local-2.0` profiles.
 - [ ] Snapshot or merge that tested source point into a temporary legacy backport branch.
 - [ ] Apply the same Factorio `2.0` compatibility patch rules as `v1.9.0`.
 - [ ] Build `dist/more-infinite-research_1.9.5.zip`.

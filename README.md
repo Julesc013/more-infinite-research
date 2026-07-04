@@ -543,7 +543,7 @@ When either diagnostics setting is enabled, MIR also reports duplicate recipe ma
 .\scripts\mir.ps1 local-index build --mods C:\Projects\Factorio\testmods_readonly_2.1
 ```
 
-`mir.ps1` is the normal human front door. It delegates to the existing scripts, loads JSON run profiles from `fixtures/run-profiles/`, and accepts common overrides such as `--factorio`, `--mods`, `--output`, and `--timeout`. Use `docs/dev-tools.md` for the command map and script roles.
+`mir.ps1` is the normal human front door. It delegates to the existing scripts, loads JSON run profiles from `fixtures/run-profiles/`, and accepts common overrides such as `--factorio`, `--factorio-line`, `--mods`, `--output`, and `--timeout`. Use `docs/dev-tools.md` for the command map and script roles.
 
 **Release gate with local smoke scenarios:**
 
@@ -558,7 +558,7 @@ This is the short release command. It runs:
 - one representative local scenario;
 - package rebuild, whitespace check, and clean-git-status check.
 
-Defaults live in `fixtures/run-profiles/release-targeted.json`. Use `--profile`, `--factorio`, `--mods`, `--output`, or `--timeout` for a different local setup. Use the overnight local sweep separately for broad compatibility evidence.
+Defaults live in `fixtures/run-profiles/release-targeted.json`. Use `--profile`, `--factorio-line`, `--factorio`, `--mods`, `--output`, or `--timeout` for a different local setup. Use the overnight local sweep separately for broad compatibility evidence.
 
 Stable direct script equivalent:
 
@@ -582,19 +582,19 @@ Use read-only local mod libraries for large offline sweeps:
 .\scripts\mir.ps1 overnight local
 ```
 
-`mir.ps1 overnight local` uses `fixtures/run-profiles/overnight-local-2.1.json` and delegates to `Start-MIROvernightLocalSweep.ps1`. The bedtime script finds or accepts the Factorio binary, verifies the configured local library, disables AC sleep/hibernate for the current machine, runs the strict `Static,Runtime,AuditSmoke` release gate first, then runs the prioritized local sweep with a transcript at `artifacts/overnight-local-2.1-*/overnight.log`. Each run also writes `run-manifest.json`, `events.jsonl`, `artifact-index.json`, and `index.html`. Use `--mods <path>` when your downloaded zip library is elsewhere. In the morning, run `.\scripts\mir.ps1 report latest` or `.\scripts\Show-MIROvernightSummary.ps1 -OutputRoot <overnight-output-dir>` to print the log tail, artifact paths, release/local summaries, grouped failures, missing dependencies, and profile-candidate counts.
+`mir.ps1 overnight local` uses a line-specific run profile and delegates to `Start-MIROvernightLocalSweep.ps1`. The default profile targets Factorio `2.1`; use `--factorio-line 2.0` or `--profile overnight-local-2.0` for a legacy-line sweep after selecting a real Factorio `2.0.x` binary and a matching local zip library. The bedtime script verifies the configured local library, disables AC sleep/hibernate for the current machine, runs the strict `Static,Runtime,AuditSmoke` gate first, then runs the prioritized local sweep with a transcript at `artifacts/overnight-local-<line>-*/overnight.log`. Each run also writes `run-manifest.json`, `events.jsonl`, `artifact-index.json`, and `index.html`. Use `--mods <path>` when your downloaded zip library is elsewhere. In the morning, run `.\scripts\mir.ps1 report latest` or `.\scripts\Show-MIROvernightSummary.ps1 -OutputRoot <overnight-output-dir>` to print the log tail, artifact paths, release/local summaries, grouped failures, missing dependencies, and profile-candidate counts.
 
 Run local-library tiers in priority order: `LocalLibraryScenarios` covers curated high-value combinations, `GeneratedLocalScenarios` creates generated mega and metadata-cluster stress cases, and `LocalModZips` tests each local root zip as an individual scenario. Add `-IncludeGeneratedLocalPairwise -GeneratedLocalPairwiseLimit 40` when you want capped pairwise cluster coverage. Add `-ShardLocalModZips -StartIndex N -ShardSize M` to resume local-root sweeps in chunks.
 
-`LocalLibraryScenarios` runs curated local combinations from `fixtures/compat-matrix/local-library-scenarios.json`, including Space Age planet clusters, resource suites, pack wrappers, and deliberate mega-smash scenarios. `GeneratedLocalScenarios` builds all-local, planet, resource, Bob, Krastorio, production/fluid, and logistics/transport clusters from local zip metadata. Factorio `2.0` archives should be tested with a matching Factorio/mod line; with a Factorio `2.1.x` MIR package and binary, `2.0`-only archives are useful as inventory evidence but are not a substitute for a true `2.0` runtime gate.
+`LocalLibraryScenarios` runs curated local combinations from `fixtures/compat-matrix/local-library-scenarios.json` for Factorio `2.1` or `fixtures/compat-matrix/local-library-scenarios-2.0.json` for Factorio `2.0`. `GeneratedLocalScenarios` builds all-local, planet, resource, Bob, Krastorio, production/fluid, and logistics/transport clusters from local zip metadata. Factorio `2.0` archives should be tested with a matching Factorio/mod line; with a Factorio `2.1.x` MIR package and binary, `2.0`-only archives are useful as inventory evidence but are not a substitute for a true `2.0` runtime gate.
 
 Use `-CollectAll` for overnight exploration so one failing modset does not stop the run. Use `-FailFast -FailOnAuditFailures` for strict CI-style gates; that mode fails when grouped unexpected audit failures remain after the converter runs.
 
 Load-test tiers print per-scenario start/result lines with scenario index, type, root mods, dependency-failure count, pass/skip/timeout status, exit code, parsed audit-row count, and elapsed seconds. `load-results.json` is checkpointed after every scenario so partial results remain readable if a long run is interrupted. Extended-wrapper runs write their own manifest, event log, artifact index, and static HTML report under the selected output root. Pipe all streams through `Tee-Object` when you want a live VS Code terminal view and a durable overnight log. The grouped converter also writes `missing-dependencies.md`, `missing-dependencies.json`, and `missing-dependencies.csv` for local-library completion work.
 
-The audit runner writes an explicit isolated `mod-list.json`: official built-ins are disabled unless required by the scenario, and any scenario that needs `space-age` enables the full official bundle (`elevated-rails`, `recycler`, `quality`, and `space-age`). Blank lines in Factorio logs are ignored by the MIR audit parser, so partial overnight runs remain convertible even when third-party logs contain empty lines.
+The audit runner writes an explicit isolated `mod-list.json`: official built-ins are disabled unless required by the scenario. If a scenario requests `space-age`, the runner enables `space-age` plus the official companion mods that actually exist beside the selected Factorio binary. Blank lines in Factorio logs are ignored by the MIR audit parser, so partial overnight runs remain convertible even when third-party logs contain empty lines.
 
-`AuditSmoke` uses the committed `space-age-baseline` manual scenario metadata path so strict release gates are deterministic. It proves the audit wrapper and grouped-result converter are wired, but broad external-mod confidence still comes from the credentialed top-25/manual/full audit tiers.
+`AuditSmoke` is line-aware and deterministic: Factorio `2.1` uses the committed `space-age-baseline` scenario, while Factorio `2.0` uses the base-only `base-baseline` scenario. It proves the audit wrapper and grouped-result converter are wired, but broad external-mod confidence still comes from the credentialed top-25/manual/full audit tiers.
 
 The validation script checks:
 

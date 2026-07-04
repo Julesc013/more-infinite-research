@@ -2,6 +2,7 @@
   "schema": 1,
   "kind": "extended",
   "tiers": ["Top25SpaceAge"],
+  "factorio_line": "2.1",
   "factorio_bin": "auto",
   "collect_all": true,
   "scenario_timeout_seconds": 900

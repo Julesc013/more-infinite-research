@@ -1,5 +1,8 @@
 param(
   [string]$FactorioBin = $env:FACTORIO_BIN,
+  [AllowEmptyString()]
+  [ValidateSet("", "2.0", "2.1")]
+  [string]$FactorioLine = "",
   [string]$LocalModDir = $env:MIR_LOCAL_MOD_DIR,
   [string[]]$RepairSmokeModNames = @("big-mining-drill", "biolabs-in-space"),
   [string]$RepresentativeScenarioName = "local-2-1-bz-suite-space-age",
@@ -26,11 +29,17 @@ $modInfo = Get-Content -Raw -LiteralPath (Join-Path $repo "info.json") | Convert
 $modName = [string]$modInfo.name
 $modVersion = [string]$modInfo.version
 $targetFactorioVersion = [string]$modInfo.factorio_version
+if ([string]::IsNullOrWhiteSpace($FactorioLine)) {
+  $FactorioLine = $targetFactorioVersion
+}
+if ($FactorioLine -ne $targetFactorioVersion) {
+  throw "Requested FactorioLine '$FactorioLine' does not match info.json factorio_version '$targetFactorioVersion'. Switch to the matching source branch before running this release gate."
+}
 if (-not $AuditFactorioVersions -or $AuditFactorioVersions.Count -eq 0) {
-  $AuditFactorioVersions = @($targetFactorioVersion)
+  $AuditFactorioVersions = @($FactorioLine)
 }
 if ([string]::IsNullOrWhiteSpace($LocalModDir)) {
-  $LocalModDir = "C:\Projects\Factorio\testmods_readonly_$targetFactorioVersion"
+  $LocalModDir = "C:\Projects\Factorio\testmods_readonly_$FactorioLine"
 }
 if (-not $SkipRepairSmokes -and @($RepairSmokeModNames).Count -eq 0) {
   throw "RepairSmokeModNames is empty. Pass -SkipRepairSmokes or provide at least one local mod name."
@@ -148,6 +157,7 @@ function Write-MIRReleaseGateSummary {
     representative_scenario_name = $RepresentativeScenarioName
     manual_scenarios_path = $script:resolvedManualScenariosPath
     audit_factorio_versions = @($AuditFactorioVersions)
+    factorio_line = $FactorioLine
     scenario_timeout_seconds = $ScenarioTimeoutSeconds
     skip_build = [bool]$SkipBuild
     skip_repair_smokes = [bool]$SkipRepairSmokes
@@ -167,8 +177,9 @@ function Write-MIRReleaseGateSummary {
   $md += ('- Generated: {0}' -f (Get-Date -Format 'yyyy-MM-dd HH:mm:ss zzz'))
   $md += ('- Repo: `{0}`' -f $repo.Path)
   $md += ('- Output root: `{0}`' -f $script:resolvedOutputRoot)
-  $md += ('- Factorio: `{0}`' -f $script:resolvedFactorioBin)
-  $md += ('- Local mod dir: `{0}`' -f $script:resolvedLocalModDir)
+$md += ('- Factorio: `{0}`' -f $script:resolvedFactorioBin)
+$md += ('- Factorio line: `{0}`' -f $FactorioLine)
+$md += ('- Local mod dir: `{0}`' -f $script:resolvedLocalModDir)
   $md += ('- Repair smoke mods: `{0}`' -f (($RepairSmokeModNames | ForEach-Object { [string]$_ }) -join ", "))
   $md += ('- Representative scenario: `{0}`' -f $RepresentativeScenarioName)
   $md += ('- Scenario timeout seconds: `{0}`' -f $ScenarioTimeoutSeconds)
@@ -242,6 +253,7 @@ $logPath = Join-Path $script:resolvedOutputRoot "release-targeted.log"
 Write-Host "[release] repo: $($repo.Path)"
 Write-Host "[release] mod: $modName $modVersion (Factorio $targetFactorioVersion)"
 Write-Host "[release] Factorio: $script:resolvedFactorioBin"
+Write-Host "[release] Factorio line: $FactorioLine"
 Write-Host "[release] local mod dir: $script:resolvedLocalModDir ($localZipCount zips)"
 Write-Host "[release] repair smoke mods: $($RepairSmokeModNames -join ', ')"
 Write-Host "[release] representative scenario: $RepresentativeScenarioName"
@@ -278,6 +290,7 @@ try {
     & (Join-Path $repo "scripts\Invoke-MIRExtendedTests.ps1") `
       -Tier Static,Runtime,AuditSmoke `
       -FactorioBin $script:resolvedFactorioBin `
+      -FactorioLine $FactorioLine `
       -FailFast `
       -FailOnAuditFailures `
       -OutputRoot (Join-Path $script:resolvedOutputRoot "strict-gate")
@@ -288,6 +301,7 @@ try {
       & (Join-Path $repo "scripts\Invoke-MIRExtendedTests.ps1") `
         -Tier LocalModZips `
         -FactorioBin $script:resolvedFactorioBin `
+        -FactorioLine $FactorioLine `
         -LocalModZipDirs @($script:resolvedLocalModDir) `
         -LocalModLibraryDirs @($script:resolvedLocalModDir) `
         -LocalModNames @($RepairSmokeModNames) `
@@ -304,6 +318,7 @@ try {
       $representativeDir = Join-Path $script:resolvedOutputRoot "representative-local-scenario"
       & (Join-Path $repo "scripts\Invoke-MIRCompatAudit.ps1") `
         -FactorioBin $script:resolvedFactorioBin `
+        -FactorioLine $FactorioLine `
         -FactorioVersions @($AuditFactorioVersions) `
         -MaxCandidates 0 `
         -CatalogPages 0 `

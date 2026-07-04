@@ -2,6 +2,12 @@
   "schema": 1,
   "scenarios": [
     {
+      "name": "base-baseline",
+      "include_space_age": false,
+      "mods": ["more-infinite-research"],
+      "notes": "Base-only audit smoke scenario for line-aware release gates."
+    },
+    {
       "name": "space-age-baseline",
       "include_space_age": true,
       "mods": ["more-infinite-research"],
