@@ -3,9 +3,12 @@ param(
   [ValidateSet("2.0", "2.1")]
   [string]$FactorioLine = "2.1",
   [string]$LocalModDir = "",
+  [string[]]$LocalModLibraryDirs = @(),
   [string]$OutputRoot = "",
   [int]$ScenarioTimeoutSeconds = 900,
   [int]$GeneratedLocalPairwiseLimit = 40,
+  [ValidateSet("Copy", "Hardlink", "Symlink")]
+  [string]$LinkMode = "Copy",
   [switch]$SkipStrictGate,
   [switch]$SkipLocalSweep,
   [switch]$SkipGeneratedLocalPairwise,
@@ -61,6 +64,15 @@ $localZipCount = @(Get-ChildItem -LiteralPath $resolvedLocalModDir -Filter *.zip
 if ($localZipCount -eq 0) {
   throw "Local mod directory contains no zip files: $resolvedLocalModDir"
 }
+$resolvedLocalLibraryDirs = @($resolvedLocalModDir)
+foreach ($libraryDir in @($LocalModLibraryDirs)) {
+  if ([string]::IsNullOrWhiteSpace([string]$libraryDir)) { continue }
+  if (-not (Test-Path -LiteralPath $libraryDir)) {
+    throw "Local mod library directory does not exist: $libraryDir"
+  }
+  $resolvedLocalLibraryDirs += (Resolve-Path -LiteralPath $libraryDir).Path
+}
+$resolvedLocalLibraryDirs = @($resolvedLocalLibraryDirs | Sort-Object -Unique)
 
 $stamp = Get-Date -Format "yyyyMMdd-HHmmss"
 if ([string]::IsNullOrWhiteSpace($OutputRoot)) {
@@ -79,13 +91,15 @@ $runContext = New-MIRRunContext `
   -OutputRoot $resolvedOutputRoot `
   -FactorioBin $resolvedFactorioBin `
   -Tiers $plannedTiers `
-  -LocalModDirs @($resolvedLocalModDir) `
+  -LocalModDirs @($resolvedLocalLibraryDirs) `
   -ScenarioTimeoutSeconds $ScenarioTimeoutSeconds `
   -Offline $true
 Write-MIREvent -Path $runContext.events_path -RunId $runContext.run_id -Kind "run_start" -Data @{
   factorio_line = $FactorioLine
   local_mod_dir = $resolvedLocalModDir
+  local_mod_library_dirs = @($resolvedLocalLibraryDirs)
   local_zip_count = $localZipCount
+  link_mode = $LinkMode
   strict_gate = -not [bool]$SkipStrictGate
   local_sweep = -not [bool]$SkipLocalSweep
 }
@@ -95,6 +109,8 @@ Write-Host "[overnight] repo: $($repo.Path)"
 Write-Host "[overnight] Factorio: $resolvedFactorioBin"
 Write-Host "[overnight] Factorio line: $FactorioLine"
 Write-Host "[overnight] local mod dir: $resolvedLocalModDir ($localZipCount zips)"
+Write-Host "[overnight] local library dirs: $($resolvedLocalLibraryDirs -join ', ')"
+Write-Host "[overnight] link mode: $LinkMode"
 Write-Host "[overnight] output root: $resolvedOutputRoot"
 Write-Host "[overnight] log: $logPath"
 
@@ -151,10 +167,11 @@ try {
       FactorioBin = $resolvedFactorioBin
       FactorioLine = $FactorioLine
       LocalModZipDirs = @($resolvedLocalModDir)
-      LocalModLibraryDirs = @($resolvedLocalModDir)
+      LocalModLibraryDirs = @($resolvedLocalLibraryDirs)
       Offline = $true
       CollectAll = $true
       ScenarioTimeoutSeconds = $ScenarioTimeoutSeconds
+      LinkMode = $LinkMode
       OutputRoot = (Join-Path $resolvedOutputRoot "local-sweep")
     }
     if (-not $SkipGeneratedLocalPairwise) {

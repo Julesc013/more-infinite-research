@@ -34,6 +34,7 @@ Common overrides:
   --mods <path>       Local mod zip/library directory
   --output <path>     Output artifact directory
   --timeout <seconds> Per-scenario timeout
+  --link-mode <mode>  Copy, Hardlink, or Symlink local zips into scenario mod dirs
 "@
 }
 
@@ -76,6 +77,7 @@ function New-MIRProfileOverrides {
   $mods = Get-MIRArgValue -Items $Items -Name "--mods"
   $output = Get-MIRArgValue -Items $Items -Name "--output"
   $timeout = Get-MIRArgValue -Items $Items -Name "--timeout"
+  $linkMode = Get-MIRArgValue -Items $Items -Name "--link-mode"
 
   if (-not [string]::IsNullOrWhiteSpace($factorio)) {
     $overrides.factorio_bin = $factorio
@@ -94,6 +96,10 @@ function New-MIRProfileOverrides {
   }
   if (-not [string]::IsNullOrWhiteSpace($timeout)) {
     $overrides.scenario_timeout_seconds = [int]$timeout
+  }
+  if (-not [string]::IsNullOrWhiteSpace($linkMode)) {
+    if ($linkMode -notin @("Copy", "Hardlink", "Symlink")) { throw "--link-mode must be Copy, Hardlink, or Symlink." }
+    $overrides.link_mode = $linkMode
   }
   if (Test-MIRArgSwitch -Items $Items -Name "--no-git-pull") {
     $overrides.no_git_pull = $true
@@ -210,15 +216,19 @@ function Invoke-MIRRunProfile {
       $factorioBin = Get-MIRProfileOrOverride -Object $profileData -Overrides $Overrides -Name "factorio_bin"
       $factorioLine = Get-MIRProfileOrOverride -Object $profileData -Overrides $Overrides -Name "factorio_line"
       $localModDir = Get-MIRProfileOrOverride -Object $profileData -Overrides $Overrides -Name "local_mod_dir"
+      $localModLibraryDirs = Get-MIRProfileOrOverride -Object $profileData -Overrides $Overrides -Name "local_mod_library_dirs"
       $outputRoot = Get-MIRProfileOrOverride -Object $profileData -Overrides $Overrides -Name "output_root"
       $timeout = Get-MIRProfileOrOverride -Object $profileData -Overrides $Overrides -Name "scenario_timeout_seconds"
       $pairwiseLimit = Get-MIRProfileOrOverride -Object $profileData -Overrides $Overrides -Name "generated_local_pairwise_limit"
+      $linkMode = Get-MIRProfileOrOverride -Object $profileData -Overrides $Overrides -Name "link_mode"
       if ($factorioBin) { $params.FactorioBin = Resolve-MIRFactorioBin -Path ([string]$factorioBin) }
       if ($factorioLine) { $params.FactorioLine = [string]$factorioLine }
       if ($localModDir) { $params.LocalModDir = [string]$localModDir }
+      if ($localModLibraryDirs) { $params.LocalModLibraryDirs = @($localModLibraryDirs | ForEach-Object { [string]$_ }) }
       if ($outputRoot) { $params.OutputRoot = [string]$outputRoot }
       if ($timeout) { $params.ScenarioTimeoutSeconds = [int]$timeout }
       if ($pairwiseLimit) { $params.GeneratedLocalPairwiseLimit = [int]$pairwiseLimit }
+      if ($linkMode) { $params.LinkMode = [string]$linkMode }
       & (Join-Path $scriptRoot "Start-MIROvernightLocalSweep.ps1") @params
     }
     default {
@@ -236,6 +246,7 @@ function Invoke-MIRRunProfile {
       $localModNames = Get-MIRProfileOrOverride -Object $profileData -Overrides $Overrides -Name "local_mod_names"
       $timeout = Get-MIRProfileOrOverride -Object $profileData -Overrides $Overrides -Name "scenario_timeout_seconds"
       $pairwiseLimit = Get-MIRProfileOrOverride -Object $profileData -Overrides $Overrides -Name "generated_local_pairwise_limit"
+      $linkMode = Get-MIRProfileOrOverride -Object $profileData -Overrides $Overrides -Name "link_mode"
       if ($factorioBin) { $params.FactorioBin = Resolve-MIRFactorioBin -Path ([string]$factorioBin) }
       if ($factorioLine) { $params.FactorioLine = [string]$factorioLine }
       if ($outputRoot) { $params.OutputRoot = [string]$outputRoot }
@@ -245,6 +256,7 @@ function Invoke-MIRRunProfile {
       if ($scenarioNames) { $params.ScenarioNames = @($scenarioNames | ForEach-Object { [string]$_ }) }
       if ($localModNames) { $params.LocalModNames = @($localModNames | ForEach-Object { [string]$_ }) }
       if ($timeout) { $params.ScenarioTimeoutSeconds = [int]$timeout }
+      if ($linkMode) { $params.LinkMode = [string]$linkMode }
       if (Test-MIRProfileOrOverrideFlag -Object $profileData -Overrides $Overrides -Name "collect_all") { $params.CollectAll = $true }
       if (Test-MIRProfileOrOverrideFlag -Object $profileData -Overrides $Overrides -Name "offline") { $params.Offline = $true }
       if (Test-MIRProfileOrOverrideFlag -Object $profileData -Overrides $Overrides -Name "fail_fast") { $params.FailFast = $true }
@@ -321,7 +333,7 @@ switch ($area) {
   "run" {
     $profile = Get-MIRArgValue -Items $Args -Name "-Profile"
     if ([string]::IsNullOrWhiteSpace($profile)) { $profile = Get-MIRArgValue -Items $Args -Name "--profile" }
-    Invoke-MIRRunProfile -Profile $profile
+    Invoke-MIRRunProfile -Profile $profile -Overrides (New-MIRProfileOverrides -Items $Args)
   }
   "local-index" {
     if ($verb -ne "build") { throw "Unknown local-index command: $verb" }

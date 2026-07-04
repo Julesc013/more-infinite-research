@@ -95,8 +95,43 @@ function Copy-MIRCachedModZips {
   param(
     [Parameter(Mandatory)][string]$CacheDir,
     [Parameter(Mandatory)][string]$ModsDir,
-    [Parameter(Mandatory)][object[]]$LockEntries
+    [Parameter(Mandatory)][object[]]$LockEntries,
+    [ValidateSet("Copy", "Hardlink", "Symlink")]
+    [string]$LinkMode = "Copy"
   )
+
+  function Copy-MIRZipIntoScenario {
+    param(
+      [Parameter(Mandatory)][string]$Source,
+      [Parameter(Mandatory)][string]$Target,
+      [ValidateSet("Copy", "Hardlink", "Symlink")]
+      [string]$Mode
+    )
+
+    if (Test-Path -LiteralPath $Target) { return }
+
+    if ($Mode -eq "Hardlink") {
+      $sourceRoot = [System.IO.Path]::GetPathRoot((Resolve-Path -LiteralPath $Source).Path)
+      $targetRoot = [System.IO.Path]::GetPathRoot([System.IO.Path]::GetFullPath($Target))
+      if ($sourceRoot -eq $targetRoot) {
+        try {
+          New-Item -ItemType HardLink -Path $Target -Target $Source -ErrorAction Stop | Out-Null
+          return
+        } catch {
+          # Fall back to copy when the filesystem refuses a hardlink.
+        }
+      }
+    } elseif ($Mode -eq "Symlink") {
+      try {
+        New-Item -ItemType SymbolicLink -Path $Target -Target $Source -ErrorAction Stop | Out-Null
+        return
+      } catch {
+        # Fall back to copy when symlink creation is unavailable.
+      }
+    }
+
+    Copy-Item -LiteralPath $Source -Destination $Target -Force
+  }
 
   foreach ($entry in $LockEntries) {
     if (-not $entry.file_name) { continue }
@@ -111,7 +146,7 @@ function Copy-MIRCachedModZips {
       Join-Path $CacheDir ([string]$entry.file_name)
     }
     if (Test-Path -LiteralPath $source) {
-      Copy-Item -LiteralPath $source -Destination (Join-Path $ModsDir ([string]$entry.file_name)) -Force
+      Copy-MIRZipIntoScenario -Source $source -Target (Join-Path $ModsDir ([string]$entry.file_name)) -Mode $LinkMode
     }
   }
 }
