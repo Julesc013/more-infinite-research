@@ -56,9 +56,17 @@ return {
     }
   },
 
-  research_robot_battery = { icon_tech = "logistic-robotics", direct_effects = {
-    { type="worker-robot-battery", modifier=0.10 }
-  } },
+  research_robot_battery = {
+    -- Better Bot Battery owns an infinite native worker-robot-battery chain
+    -- with a different per-level value, so MIR cooperates instead of stacking.
+    skip_if_technology_effects = {
+      { technology = "worker-robots-battery-6", type = "worker-robot-battery", modifier = 0.70, max_level = "infinite" }
+    },
+    icon_tech = "logistic-robotics",
+    direct_effects = {
+      { type="worker-robot-battery", modifier=0.10 }
+    }
+  },
 
   research_lab_productivity = {
     -- Space Age and Research_Productivity already own native lab productivity.

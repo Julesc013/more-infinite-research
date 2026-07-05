@@ -27,6 +27,16 @@ local defaults = {
     },
     research_inventory_capacity = { growth_factor = 1.10 },
     research_robot_battery = { growth_factor = 1.2 },
+    research_pollution_filter_productivity = {
+      base_cost = 6000,
+      growth_factor = 2,
+      research_time = 60
+    },
+    research_spore_filter_productivity = {
+      base_cost = 8000,
+      growth_factor = 2,
+      research_time = 60
+    },
     research_cargo_bay_unloading_distance = {
       base_cost = 100000,
       growth_factor = 3,

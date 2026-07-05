@@ -16,8 +16,8 @@ Most ideamods in this folder are compatibility signals, not planned MIR features
 
 | Lane | Decision | Why |
 | --- | --- | --- |
-| `2.1.5` | Keep the compatibility commit. | It only adds guarded known-competitor profiles and one precise native lab-productivity skip. |
-| `2.1.5` | Do not add new streams from this audit. | The remaining overlaps need balance, progression, runtime, or product-scope decisions. |
+| `2.1.5` | Keep the compatibility posture narrow. | It adds guarded known-competitor profiles, effect-proven native duplicate skips, and one requested Air Scrubbing clean-filter stream pair. |
+| `2.1.5` | Do not add broad streams from this audit. | The remaining overlaps need balance, progression, runtime, or product-scope decisions. |
 | `2.1.5` | Preserve finite lead-ins from other mods. | MIR's current cleanup model is for exact infinite owners, not finite upgrade chains. |
 | `2.2.0` | Plan new feature work from grouped demand signals. | Cap-aware UX, ore crushing, tile productivity, overhaul materials, and native overlap policy need design. |
 | Companion/modpack scope | Keep rule mutators adjacent unless explicitly adopted. | Beacon/module/productivity-rule mods change factory rules, not just research ownership. |
@@ -61,7 +61,7 @@ The shipped `2.1.5` profiles are not deletion rules. They only mark external tec
 | Replacement science is lab-compatible. | Avoid replacing with unresearchable MIR techs. |
 | No other blocking external owner remains. | Avoid creating duplicate or ambiguous productivity ownership. |
 
-The `Research_Productivity` change is separate: MIR skips its own base-game lab-productivity stream when an infinite `laboratory-productivity-4` has the native `laboratory-productivity` effect. The same effect-proven guard is used for Space Age's vanilla `research-productivity` owner.
+The native duplicate-avoidance changes are separate: MIR skips its own base-game lab-productivity stream when an infinite `laboratory-productivity-4` has the native `laboratory-productivity` effect, and skips worker robot battery when an infinite `worker-robots-battery-6` has the expected native `worker-robot-battery` effect. The same effect-proven guard is used for Space Age's vanilla `research-productivity` owner.
 
 ## 2.1.5 Ship Table
 
@@ -78,6 +78,8 @@ These are release-appropriate because they are exact duplicate-avoidance or exac
 | `ExpandedProductivityResearch` | Broad configurable `epr_<item>-productivity-<level>` generator. | Add guarded known-competitor pattern. | Cleanup still rejects changed values or uncovered recipes. |
 | `crafting-efficiency-2` | Staged generated `ce-<name>-<level>` productivity chains. | Add guarded known-competitor pattern. | Cleanup still rejects changed values or uncovered recipes. |
 | `Research_Productivity` | Native infinite `laboratory-productivity-4` chain. | Skip MIR lab productivity when the expected native effect is present. | Effect-proven exact technology guard only. |
+| `atan-air-scrubbing` | Requested pollution/spore filter support. | Add MIR-owned productivity for clean pollution and spore filter crafting recipes only. | Scrubbing and used-filter cleaning recipes are explicitly excluded; no scrubber efficiency mutation. |
+| `better-bot-battery2` | Requested robot battery support. | Skip MIR worker robot battery when infinite `worker-robots-battery-6` has the expected native effect. | Values differ, so this is cooperation rather than exact replacement. |
 
 ## 2.1.5 Explicit Non-Goals
 
@@ -92,7 +94,7 @@ These were intentionally not absorbed into `2.1.5`.
 | Rule mutators | `UnlimitedProductivityFork`, `prodforce`, `Productivity`, `productivity_fix`, `Productivity-config`, `rosnok-productivity-quality-beacon`, `SchallModules`, `Prod-Beacon`, `space-exploration-spaceproductivity-2` | They change allowed effects, recipe productivity eligibility, beacons, modules, or machine rules. |
 | Runtime productivity systems | `progressive-productivity`, `productivity-through-science`, `solar-productivity` | They rely on runtime force/entity/stat behavior rather than MIR's current recipe-productivity model. |
 | Research cost, lab mutators, and automation tools | `ConfigurableResearchCost`, `customresearchspeed`, `research-cost-curve`, `research-multipliers`, `zz-long-science`, `research-control-tower`, `research-skip`, `combatresearchtech`, `show-missing-bottles-for-current-research`, `player-count-based-research-speed` | They are compatible utilities, lab mutators, or progression tools, not MIR stream ownership work. |
-| Broad direct-effect and native-owner bundles | `all_around_research`, `epic_mining_and_crafting_speed_research`, `better-bot-battery2` | They are useful native-modifier signals, but not recipe-productivity cleanup work. |
+| Broad direct-effect and native-owner bundles | `all_around_research`, `epic_mining_and_crafting_speed_research` | They are useful native-modifier signals, but not recipe-productivity cleanup work. Better Bot Battery is handled narrowly by an effect-proven skip. |
 | Content and lab prototype mods | `big-brother`, `gleba-lab`, `mach-speed-logistics` | They should be load-tested or fixture-tested only where they intersect MIR science/lab compatibility. |
 
 ## 2.2.0 Planning Table
@@ -113,16 +115,17 @@ These were intentionally not absorbed into `2.1.5`.
 | Group | Mods | Current disposition |
 | --- | --- | --- |
 | Shipped exact overlap cleanup | `bioflux-productivity`, `fish-productivity`, `Science_packs_productivity`, `ProductivityResearch`, `ProductivityResearchForEveryone`, `ProductivityResearchForEveryoneFG`, `ExpandedProductivityResearch`, `crafting-efficiency-2` | `2.1.5` known-competitor profiles with exact-coverage guards. |
-| Shipped native duplicate avoidance | `Research_Productivity` | `2.1.5` effect-proven lab-productivity skip for `laboratory-productivity-4`. |
+| Shipped native duplicate avoidance | `Research_Productivity`, `better-bot-battery2` | `2.1.5` effect-proven skips for `laboratory-productivity-4` and `worker-robots-battery-6`. |
+| Shipped narrow requested stream | `atan-air-scrubbing` | `2.1.5` clean pollution/spore filter productivity only; no scrubbing or cleaning productivity. |
 | Preserve as finite or balance-distinct chains | `more-productivity-research`, `concrete-productivity`, `landfill-productivity`, `foundation-productivity`, `productivity_tech_modules` | Compatible, but not replaced by MIR in `2.1.5`. |
 | New stream candidates | `asphalt-productivity`, `crushing-industry-productivity-research`, `py_productivity`, selected `crafting-efficiency-2` and `ExpandedProductivityResearch` families | Candidate `2.2.0` work after recipe-ID proof and balance decisions. |
 | Rule mutators | `base-prod`, `prodforce`, `Productivity`, `productivity_fix`, `Productivity-config`, `remove-productivity-cap`, `modified-productivity-cap`, `UnlimitedProductivityFork`, `rosnok-productivity-quality-beacon`, `SchallModules`, `Prod-Beacon`, `space-exploration-spaceproductivity-2` | Compatible/adjacent. Prefer companion boundary over MIR core absorption. |
 | Research utilities and cost tools | `research-control-tower`, `research-cost-curve`, `research-fixer`, `research-multipliers`, `research-skip`, `zz-long-science`, `combatresearchtech`, `show-missing-bottles-for-current-research` | Compatible utilities. Document and test if conflicts appear. |
-| Native/progression tweaks | `better-bot-battery2`, `miner-start`, `mining-prod-0`, `ResearchProductivity_Rebalance`, `productivity-module-3-aquilo` | Compatible. Feed future native-overlap policy only if needed. |
+| Native/progression tweaks | `miner-start`, `mining-prod-0`, `ResearchProductivity_Rebalance`, `productivity-module-3-aquilo` | Compatible. Feed future native-overlap policy only if needed. Better Bot Battery now has a specific native-owner skip. |
 | Runtime productivity systems | `progressive-productivity`, `productivity-through-science`, `solar-productivity` | Defer or reject for core unless bounded runtime design is proven. |
 | Broad content mods | `5dim_mining` | Compatible content source; MIR may pick up visible matching recipes opportunistically. |
 | Suite compatibility layers | `omniab-space-age-compat` | Future compatibility-campaign input for Bob/Angel/Omni Space Age combinations. |
-| New broad direct-effect idea signals | `all_around_research`, `better-bot-battery2`, `epic_mining_and_crafting_speed_research`, `player-count-based-research-speed` | Feed future native-overlap policy and diagnostics only. |
+| New broad direct-effect idea signals | `all_around_research`, `epic_mining_and_crafting_speed_research`, `player-count-based-research-speed` | Feed future native-overlap policy and diagnostics only. |
 | New content/lab/cost idea signals | `big-brother`, `ConfigurableResearchCost`, `customresearchspeed`, `gleba-lab`, `mach-speed-logistics` | Compatibility/load-test signals, not MIR-owned streams. |
 
 ## Per-Mod Appendix
@@ -132,7 +135,7 @@ These were intentionally not absorbed into `2.1.5`.
 | `5dim_mining_2.0.3` | `MIR_DOCS_ONLY` | Adds high-tier mining drills, pumpjacks, water pumpjacks, and offshore pumps. | Compatible. MIR may pick up visible drill recipes through Mining Drill Productivity; add explicit support only from recipe-ID evidence. |
 | `asphalt-productivity_1.0.1` | `MIR_STREAM_CANDIDATE` | Adds infinite `Arci-asphalt` recipe productivity at `+0.50`. | `2.2.0` tile/surface productivity candidate after balance policy. |
 | `base-prod_0.0.2` | `MIR_COMPANION_SCOPE` | Mutates base productivity/prototype productivity behavior. | Adjacent rule mutation; no MIR core change. |
-| `better-bot-battery2_1.2.0` | `MIR_COMPAT_ADAPTER` | Adds finite `worker-robots-battery-1` through `-5` and infinite `worker-robots-battery-6` native `worker-robot-battery` bonuses. | MIR already has worker robot battery research, but values differ; prefer external/skip MIR duplicate when the infinite owner exists. |
+| `better-bot-battery2_1.2.0` | `MIR_COMPAT_ADAPTER` | Adds finite `worker-robots-battery-1` through `-5` and infinite `worker-robots-battery-6` native `worker-robot-battery` bonuses. | `2.1.5` skips MIR worker robot battery when the infinite owner exists with the expected effect; finite external levels are preserved. |
 | `bioflux-productivity_0.1.0` | `MIR_REPLACE_EXACT` | Adds one infinite Bioflux recipe-productivity technology. | Shipped exact known-competitor profile. |
 | `combatresearchtech_0.1.0` | `MIR_DOCS_ONLY` | Grants research progress from enemy kills. | Compatible runtime utility; no MIR code needed. |
 | `concrete-productivity_1.2.1` | `MIR_STREAM_CANDIDATE` | Adds concrete/refined-concrete productivity chain, infinite level uses `+0.25`. | Defer. Balance differs from MIR concrete coverage. |

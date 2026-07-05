@@ -41,6 +41,38 @@ return {
   research_batteries = { items={"battery"}, icon_tech="battery", exclude_ingredient_patterns={"scrap"} },
   research_explosives = { items={"explosives"}, item_patterns={"^bio%-explosives$"}, icon_tech="explosives" },
 
+  research_pollution_filter_productivity = {
+    localised_name = {"technology-name.more-infinite-research.research_pollution_filter_productivity"},
+    required_items = {"atan-pollution-filter"},
+    required_technologies = {"atan-pollution-scrubbing"},
+    items = {"atan-pollution-filter"},
+    recipe_patterns = {"^atan%-pollution%-filter$"},
+    exclude_recipe_patterns = {
+      "^atan%-pollution%-filter%-cleaning$",
+      "^atan%-pollution%-scrubbing$"
+    },
+    icon_candidates = {
+      {item = "atan-pollution-filter"},
+      {technology = "atan-pollution-scrubbing"}
+    }
+  },
+
+  research_spore_filter_productivity = {
+    localised_name = {"technology-name.more-infinite-research.research_spore_filter_productivity"},
+    required_items = {"atan-spore-filter"},
+    required_technologies = {"atan-spore-scrubbing"},
+    items = {"atan-spore-filter"},
+    recipe_patterns = {"^atan%-spore%-filter$"},
+    exclude_recipe_patterns = {
+      "^atan%-spore%-filter%-cleaning$",
+      "^atan%-spore%-scrubbing$"
+    },
+    icon_candidates = {
+      {item = "atan-spore-filter"},
+      {technology = "atan-spore-scrubbing"}
+    }
+  },
+
   research_engine = { items={"engine-unit"}, icon_tech="engine" },
   research_electric_engine = { items={"electric-engine-unit"}, icon_tech="electric-engine" },
   research_flying_robot_frame = { items={"flying-robot-frame"}, icon_tech="robotics" },

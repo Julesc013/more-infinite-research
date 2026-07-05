@@ -32,8 +32,10 @@ absorb every mod. Most entries are compatibility signals.
 
 ## Executive Cut
 
-Keep `2.1.5` narrow. The current release should remain guarded duplicate cleanup
-plus effect-backed lab-productivity skip.
+Keep `2.1.5` narrow. The current release should remain guarded duplicate cleanup,
+effect-backed native-owner skips, and the two requested fixture-backed additions:
+Air Scrubbing clean-filter productivity and Better Bot Battery duplicate
+avoidance.
 
 Use `2.2.0` for designed, fixture-backed work:
 
@@ -55,7 +57,7 @@ is also copied into `ideamods_mix`.
 
 ### `atan-air-scrubbing`
 
-- Primary role: `MIR_STREAM_CANDIDATE`.
+- Primary role: `MIR_STREAM_CANDIDATE`, implemented narrowly in `2.1.5`.
 - Source checked: Mod Portal `atan-air-scrubbing` 0.2.8 and GitHub source on 2026-07-05.
 - What it does: Adds an air scrubber building, pollution filters, used pollution filters, filter cleaning, and Space Age spore filters.
 - Technologies and bonuses:
@@ -69,7 +71,7 @@ is also copied into `ideamods_mix`.
   - `atan-spore-scrubbing`: consumes one clean spore filter, removes spores, and produces one used spore filter. It explicitly disables productivity and quality.
   - `atan-spore-filter-cleaning`: cleans used spore filters with water, recovers most filters, and can produce spoilage.
 - How it works: The scrubber is a furnace-like machine in category `atmospheric-filtration`; its electric energy source has negative `emissions_per_minute` for pollution and, with Space Age, spores. Surface conditions restrict recipes to planets with air and the matching emission type.
-- MIR action: Recreate only the safe consumable-filter productivity slice: candidate streams for `atan-pollution-filter` and, with Space Age, `atan-spore-filter`. Do not add productivity to the scrubbing recipes or cleaning recipes, because those recipes encode pollution/spore removal and filter recovery loops. Do not attempt "scrubber efficiency" in MIR core; increasing negative emissions would require prototype/runtime mutation outside the current stream model.
+- MIR action: Recreate only the safe consumable-filter productivity slice in `2.1.5`: `research_pollution_filter_productivity` targets `atan-pollution-filter`, and `research_spore_filter_productivity` targets Space Age `atan-spore-filter`. Do not add productivity to the scrubbing recipes or cleaning recipes, because those recipes encode pollution/spore removal and filter recovery loops. Do not attempt "scrubber efficiency" in MIR core; increasing negative emissions would require prototype/runtime mutation outside the current stream model.
 
 ## Per-Mod Decisions
 
@@ -123,7 +125,7 @@ is also copied into `ideamods_mix`.
   - `worker-robots-battery-5`: native `worker-robot-battery`, `+0.45`, finite.
   - `worker-robots-battery-6`: native `worker-robot-battery`, `+0.70`, infinite, with `count_formula = "2^(L-6)*1000"`.
 - How it works: Adds a finite lead-in chain and one infinite native modifier owner. A migration resets force technology effects after changes.
-- MIR action: MIR already has `research_robot_battery` at `+0.10` per level, so MIR can provide a maintained alternative for the category, but it is not an exact replacement for Better Bot Battery's values. Support should be cooperative: when `worker-robots-battery-6` is present and infinite, MIR should prefer the external owner or skip its own worker robot battery stream to avoid duplicate stacking. Preserve finite levels 1-5.
+- MIR action: MIR already has `research_robot_battery` at `+0.10` per level, so MIR can provide a maintained alternative for the category, but it is not an exact replacement for Better Bot Battery's values. `2.1.5` support is cooperative: when `worker-robots-battery-6` is present, infinite, and has the expected `worker-robot-battery = +0.70` effect, MIR skips its own worker robot battery stream to avoid duplicate stacking. Finite levels 1-5 are preserved.
 
 ### `big-brother_2.0.1.zip`
 
@@ -574,7 +576,7 @@ These are candidates for MIR-owned implementation, not cloning:
 | --- | --- | --- |
 | Ore-crushing productivity | `crushing-industry-productivity-research` | Exact visible recipe IDs, value decision, and no output-scaling copy. |
 | Tile/surface productivity | `asphalt-productivity`, `concrete-productivity`, `landfill-productivity`, `foundation-productivity` | Per-material values, finite lead-in preservation, exact cleanup rules. |
-| Air Scrubbing filter productivity | `atan-air-scrubbing` | Exact filter recipe IDs, local zip/load fixture, and explicit exclusion of scrubbing and cleaning recipes. |
+| Air Scrubbing filter productivity | `atan-air-scrubbing` | Implemented in `2.1.5` for exact clean filter recipe IDs, with fixtures proving scrubbing and cleaning recipes are excluded. |
 | Cap-aware diagnostics | `finite_prod_techs`, `productivity-technology-limit`, `modified-productivity-cap`, `remove-productivity-cap`, `Productivity-config`, `base-prod` | Warn/report first; no silent cap mutation. |
 | Native direct-effect policy | `Research_Productivity`, `better-bot-battery2`, `all_around_research`, `epic_mining_and_crafting_speed_research`, `miner-start`, `mining-prod-0`, `player-count-based-research-speed` | Explicit skip/prefer/coexist/warn rules by modifier type. |
 | One overhaul material family | `py_productivity`, selected `ExpandedProductivityResearch` and `crafting-efficiency-2` families | Exact recipe family fixture and public claim limited to that family. |
@@ -625,10 +627,10 @@ identity:
 
 ## Immediate Planning Notes
 
-1. `2.1.5` should not expand from this audit.
+1. `2.1.5` should not expand beyond the shipped exact cleanup, Air Scrubbing clean-filter productivity, and native-owner duplicate skips.
 2. The newly added idea mods strengthen the case for a compatibility planner, not for broader cleanup.
-3. Air Scrubbing support should start as filter recipe productivity only; scrubber pollution/spore removal efficiency is outside MIR core unless runtime/prototype mutation is explicitly accepted.
-4. Better Bot Battery support should be native-owner cooperation: avoid duplicate worker robot battery infinite technologies when `worker-robots-battery-6` is present.
-5. The next implementation decision should be a `2.2.0` planner/diagnostics layer, the ore-crushing stream fixture, or a small native-owner skip fixture for Better Bot Battery.
+3. Air Scrubbing support starts as filter recipe productivity only; scrubber pollution/spore removal efficiency is outside MIR core unless runtime/prototype mutation is explicitly accepted.
+4. Better Bot Battery support is native-owner cooperation: avoid duplicate worker robot battery infinite technologies when effect-proven `worker-robots-battery-6` is present.
+5. The next implementation decision should be a `2.2.0` planner/diagnostics layer, the ore-crushing stream fixture, or cap-aware diagnostics.
 6. Public wording should say "MIR cooperates with or avoids duplicates from these mods" unless a fixture proves exact replacement.
 7. Any future "replacement" claim must say which portion is replaced. For many mods here, MIR can at most replace the recipe-productivity portion.

@@ -70,6 +70,8 @@ Technologies are generated only when their recipes, items, technologies, ammo ca
 | Sulfur productivity | `+10%` productivity for sulfur recipes | On | Adds metallurgic science when available; avoids asteroid-input recipes. |
 | Battery productivity | `+10%` productivity for battery recipes | On | Adds electromagnetic science when available. |
 | Explosives productivity | `+10%` productivity for explosives and bio-explosives recipes | On | Adds metallurgic science when available. |
+| Pollution filter productivity | `+10%` productivity for Air Scrubbing clean pollution filter recipes | On when prototypes exist | Targets only `atan-pollution-filter`; does not affect pollution scrubbing or used-filter cleaning recipes. |
+| Spore filter productivity | `+10%` productivity for Air Scrubbing clean spore filter recipes | On when prototypes exist | Targets only `atan-spore-filter`; does not affect spore scrubbing or used-filter cleaning recipes. |
 | Engine unit productivity | `+10%` productivity for engine unit recipes | On | Adds metallurgic science when available. |
 | Electric engine unit productivity | `+10%` productivity for electric engine unit recipes | On | Adds electromagnetic science when available. |
 | Flying robot frame productivity | `+10%` productivity for flying robot frame recipes | On | Adds electromagnetic science when available. |
@@ -120,7 +122,7 @@ Technologies are generated only when their recipes, items, technologies, ammo ca
 | Spoilage preservation | `+1%` global spoil time per level | Off | Experimental Space Age scripted technology. Global/map-wide effect; existing item-stack behavior still needs manual validation before stronger claims. |
 | Agricultural growth speed | `+1%` agricultural growth speed per level, capped at `10x` | Off | Experimental Space Age scripted technology. Adds agricultural, electromagnetic, and cryogenic science when available. Applies to newly planted agricultural tower crops; existing planted crops are not globally rescanned. |
 | Character inventory slots | `+1` inventory slot and `+1` logistic trash slot | On | Merges the old separate trash-slot research into one combined technology. A migration preserves old trash-slot progress. |
-| Worker robot battery | `+10%` worker robot battery capacity | On | Uses a gentler default cost growth than shared productivity streams. |
+| Worker robot battery | `+10%` worker robot battery capacity | On | Uses a gentler default cost growth than shared productivity streams. Skips when Better Bot Battery-style `worker-robots-battery-6` already owns the infinite native robot battery effect. |
 | Cargo bay unloading distance | `+10` maximum unloading distance tiles | On with Space Age | Requires Space Age unloading bay content. Uses the unloading bay unlock technology art and official base and Space Age science packs. |
 | Cargo landing pad count | `+1` landing pad per surface | Off | Sandbox-style Space Age logistics option. Uses Space platform technology art. Very expensive by default. |
 | Rocket shooting speed | `+10%` shooting speed for rocket ammo category | On | Separate dedicated speed research using electromagnetic science when available. |

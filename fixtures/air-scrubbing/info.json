@@ -1,0 +1,12 @@
+{
+  "name": "mir-fixture-air-scrubbing",
+  "version": "0.1.0",
+  "title": "MIR Fixture - Air Scrubbing",
+  "author": "Julesc013",
+  "description": "Validation fixture that exposes Air Scrubbing-style pollution and spore filter recipes.",
+  "factorio_version": "2.1",
+  "dependencies": [
+    "base >= 2.1.8",
+    "? space-age >= 2.1.8"
+  ]
+}
