@@ -718,7 +718,7 @@ function Resolve-MIRPortalScenario {
   param(
     [Parameter(Mandatory)][string]$Name,
     [Parameter(Mandatory)][string]$Type,
-    [Parameter(Mandatory)][string[]]$RequestedMods,
+    [string[]]$RequestedMods = @(),
     [bool]$EnableSpaceAgeBundle,
     [string]$Notes = ""
   )
@@ -807,7 +807,7 @@ function Resolve-MIRLockScenario {
   param(
     [Parameter(Mandatory)][string]$Name,
     [Parameter(Mandatory)]$LockEntriesByName,
-    [Parameter(Mandatory)][string[]]$RequestedMods,
+    [string[]]$RequestedMods = @(),
     [bool]$EnableSpaceAgeBundle
   )
 
