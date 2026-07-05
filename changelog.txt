@@ -6,8 +6,6 @@ Date: 2026-07-05
 
     - Added known-competitor profiles for exact recipe-productivity overlaps found in the local idea-mod audit.
     - Skipped MIR lab productivity when a matching infinite native laboratory-productivity owner is active.
-    - Added Air Scrubbing productivity for clean pollution and spore filters only.
-    - Excluded Air Scrubbing pollution/spore scrubbing and filter-cleaning recipes.
     - Skipped MIR worker robot battery when Better Bot Battery-style infinite native robot battery owner is active.
 
   Internal:

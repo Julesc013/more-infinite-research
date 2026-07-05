@@ -170,8 +170,6 @@ These streams generate `change-recipe-productivity` effects for matching recipes
 | `research_sulfur` | Sulfur productivity | `sulfur` | `+10%` | Adds metallurgic science when available; excludes asteroid ingredients. |
 | `research_batteries` | Battery productivity | `battery` | `+10%` | Adds electromagnetic science when available; excludes scrap inputs. |
 | `research_explosives` | Explosives productivity | `explosives`, `bio-explosives` | `+10%` | Adds metallurgic science when available. |
-| `research_pollution_filter_productivity` | Pollution filter productivity | Air Scrubbing `atan-pollution-filter` | `+10%` | Requires Air Scrubbing-style filter prototypes and `atan-pollution-scrubbing`. Excludes pollution scrubbing and used-filter cleaning recipes. |
-| `research_spore_filter_productivity` | Spore filter productivity | Air Scrubbing Space Age `atan-spore-filter` | `+10%` | Requires the spore filter prototypes and `atan-spore-scrubbing`. Excludes spore scrubbing and used-filter cleaning recipes. |
 | `research_engine` | Engine unit productivity | `engine-unit` | `+10%` | Adds metallurgic science when available. |
 | `research_electric_engine` | Electric engine unit productivity | `electric-engine-unit` | `+10%` | Adds electromagnetic science when available. |
 | `research_flying_robot_frame` | Flying robot frame productivity | `flying-robot-frame` | `+10%` | Adds electromagnetic science when available. |
@@ -349,8 +347,6 @@ Per-stream default exceptions:
 | `research_agricultural_growth_speed` | No | `40000` | `1.5` | `90` | Infinite |
 | `research_inventory_capacity` | Yes | shared | `1.10` | shared | Infinite |
 | `research_robot_battery` | Yes | shared | `1.2` | shared | Infinite |
-| `research_pollution_filter_productivity` | Yes | `6000` | `2` | `60` | Infinite |
-| `research_spore_filter_productivity` | Yes | `8000` | `2` | `60` | Infinite |
 | `research_cargo_bay_unloading_distance` | Yes | `100000` | `3` | `120` | Infinite |
 | `research_cargo_landing_pad_count` | No | `1000000` | `10` | `240` | Infinite |
 | `research_lab_productivity` | Yes | `1000` | `1.2` | `120` | Infinite |

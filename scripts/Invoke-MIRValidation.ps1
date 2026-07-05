@@ -386,7 +386,6 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
   $generationIntegrityFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-generation-integrity\data-final-fixes.lua")
   $fluidProductivityFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-fluid-productivity\data-final-fixes.lua")
   $pipelineExtentFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-pipeline-extent\data-final-fixes.lua")
-  $airScrubbingFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-air-scrubbing\data-final-fixes.lua")
   $betterBotBatteryFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-better-bot-battery-skip\data-final-fixes.lua")
   $defaultsText = Get-Content -Raw -LiteralPath (Join-Path $repo "defaults.lua")
   $localeText = Get-Content -Raw -LiteralPath (Join-Path $repo "locale\en\more-infinite-research.cfg")
@@ -459,12 +458,6 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'research_oil_cracking_productivity = {' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'research_lubricant_productivity = {' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'research_sulfuric_acid_productivity = {' },
-    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'research_pollution_filter_productivity = {' },
-    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'required_items = {"atan-pollution-filter"}' },
-    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = '"^atan%-pollution%-filter%-cleaning$"' },
-    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'research_spore_filter_productivity = {' },
-    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'required_items = {"atan-spore-filter"}' },
-    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = '"^atan%-spore%-filter%-cleaning$"' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = '{technology = "oil-processing"}' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = '"^acid%-neutralisation$"' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = '"^acid%-neutralization$"' },
@@ -526,8 +519,6 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "fixtures\assert-fluid-productivity\data-final-fixes.lua"; Text = $fluidProductivityFixtureText; Snippet = 'recipe-prod-research_oil_processing_productivity-1' },
     @{ File = "fixtures\assert-fluid-productivity\data-final-fixes.lua"; Text = $fluidProductivityFixtureText; Snippet = 'recipe-prod-research_thruster_fuel_productivity-1' },
     @{ File = "fixtures\assert-pipeline-extent\data-final-fixes.lua"; Text = $pipelineExtentFixtureText; Snippet = 'DEFAULT_PIPELINE_EXTENT = 320' },
-    @{ File = "fixtures\assert-air-scrubbing\data-final-fixes.lua"; Text = $airScrubbingFixtureText; Snippet = 'assert_single_recipe_effect("recipe-prod-research_pollution_filter_productivity-1", "atan-pollution-filter")' },
-    @{ File = "fixtures\assert-air-scrubbing\data-final-fixes.lua"; Text = $airScrubbingFixtureText; Snippet = 'assert_single_recipe_effect("recipe-prod-research_spore_filter_productivity-1", "atan-spore-filter")' },
     @{ File = "fixtures\assert-better-bot-battery-skip\data-final-fixes.lua"; Text = $betterBotBatteryFixtureText; Snippet = 'recipe-prod-research_robot_battery-1' },
     @{ File = "fixtures\assert-better-bot-battery-skip\data-final-fixes.lua"; Text = $betterBotBatteryFixtureText; Snippet = 'worker-robots-battery-6' },
     @{ File = "prototypes\weapon-speed-adjustments.lua"; Text = $weaponSpeedText; Snippet = 'tech.unit and tech.unit.count_formula' },
@@ -538,8 +529,6 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'more-infinite-research.research_heavy_ammo=Cannon shell productivity' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'more-infinite-research.research_lab_productivity=Research productivity' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'more-infinite-research.research_oil_processing_productivity=Oil processing productivity' },
-    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'more-infinite-research.research_pollution_filter_productivity=Pollution filter productivity' },
-    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'more-infinite-research.research_spore_filter_productivity=Spore filter productivity' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'more-infinite-research.research_thruster_fuel_productivity=Thruster fuel productivity' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'more-infinite-research.lab_productivity=Increases research progress gained from each consumed science pack' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-use-installed-space-age-icons=Use installed official DLC icons in base games' },
@@ -1334,7 +1323,6 @@ if (-not (Test-Path -LiteralPath $fixtureRoot)) {
 $nonModFixtureDirs = @("compat-matrix", "run-profiles")
 
 $postMirAssertionFixtures = @(
-  "mir-fixture-assert-air-scrubbing",
   "mir-fixture-assert-better-bot-battery-skip",
   "mir-fixture-assert-generation-integrity",
   "mir-fixture-assert-science-pack-productivity",
@@ -2059,15 +2047,6 @@ $betterBotBatterySkipLine = Get-LastStreamReportLine -Key "research_robot_batter
 if ($betterBotBatterySkipLine -notmatch "status=skipped" -or $betterBotBatterySkipLine -notmatch "existing technology effect worker-robots-battery-6 worker-robot-battery") {
   throw "MIR robot battery should skip when worker-robots-battery-6 has the expected native effect: $betterBotBatterySkipLine"
 }
-
-Invoke-RuntimeScenario -ScenarioName "air-scrubbing-filter-productivity" -EnabledFixtureNames @(
-  "mir-fixture-air-scrubbing",
-  "mir-fixture-assert-air-scrubbing"
-) -EnableSpaceAge
-$pollutionFilterLine = Get-LastStreamReportLine -Key "research_pollution_filter_productivity"
-Assert-ReportLineGenerated -Line $pollutionFilterLine -Context "Air Scrubbing pollution filter productivity scenario"
-$sporeFilterLine = Get-LastStreamReportLine -Key "research_spore_filter_productivity"
-Assert-ReportLineGenerated -Line $sporeFilterLine -Context "Air Scrubbing spore filter productivity scenario"
 
 Invoke-RuntimeScenario -ScenarioName "skip-policy" -EnabledFixtureNames @(
   "mir-fixture-item-science-pack",

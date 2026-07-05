@@ -63,8 +63,6 @@ local STREAM_EXTRA_PACKS = {
 
   research_sulfur = {"metallurgic-science-pack"},
   research_explosives = {"metallurgic-science-pack"},
-  research_pollution_filter_productivity = {"chemical-science-pack"},
-  research_spore_filter_productivity = {"agricultural-science-pack"},
   research_low_density_structure = {"metallurgic-science-pack"},
   research_engine = {"metallurgic-science-pack"},
   research_tungsten = {"metallurgic-science-pack"},

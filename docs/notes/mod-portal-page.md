@@ -70,8 +70,6 @@ Technologies are generated only when their recipes, items, technologies, ammo ca
 | Sulfur productivity | `+10%` productivity for sulfur recipes | On | Adds metallurgic science when available; avoids asteroid-input recipes. |
 | Battery productivity | `+10%` productivity for battery recipes | On | Adds electromagnetic science when available. |
 | Explosives productivity | `+10%` productivity for explosives and bio-explosives recipes | On | Adds metallurgic science when available. |
-| Pollution filter productivity | `+10%` productivity for Air Scrubbing clean pollution filter recipes | On when prototypes exist | Targets only `atan-pollution-filter`; does not affect pollution scrubbing or used-filter cleaning recipes. |
-| Spore filter productivity | `+10%` productivity for Air Scrubbing clean spore filter recipes | On when prototypes exist | Targets only `atan-spore-filter`; does not affect spore scrubbing or used-filter cleaning recipes. |
 | Engine unit productivity | `+10%` productivity for engine unit recipes | On | Adds metallurgic science when available. |
 | Electric engine unit productivity | `+10%` productivity for electric engine unit recipes | On | Adds electromagnetic science when available. |
 | Flying robot frame productivity | `+10%` productivity for flying robot frame recipes | On | Adds electromagnetic science when available. |

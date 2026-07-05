@@ -16,7 +16,7 @@ Most ideamods in this folder are compatibility signals, not planned MIR features
 
 | Lane | Decision | Why |
 | --- | --- | --- |
-| `2.1.5` | Keep the compatibility posture narrow. | It adds guarded known-competitor profiles, effect-proven native duplicate skips, and one requested Air Scrubbing clean-filter stream pair. |
+| `2.1.5` | Keep the compatibility posture narrow. | It adds guarded known-competitor profiles and effect-proven native duplicate skips only. |
 | `2.1.5` | Do not add broad streams from this audit. | The remaining overlaps need balance, progression, runtime, or product-scope decisions. |
 | `2.1.5` | Preserve finite lead-ins from other mods. | MIR's current cleanup model is for exact infinite owners, not finite upgrade chains. |
 | `2.2.0` | Plan new feature work from grouped demand signals. | Cap-aware UX, ore crushing, tile productivity, overhaul materials, and native overlap policy need design. |
@@ -78,7 +78,6 @@ These are release-appropriate because they are exact duplicate-avoidance or exac
 | `ExpandedProductivityResearch` | Broad configurable `epr_<item>-productivity-<level>` generator. | Add guarded known-competitor pattern. | Cleanup still rejects changed values or uncovered recipes. |
 | `crafting-efficiency-2` | Staged generated `ce-<name>-<level>` productivity chains. | Add guarded known-competitor pattern. | Cleanup still rejects changed values or uncovered recipes. |
 | `Research_Productivity` | Native infinite `laboratory-productivity-4` chain. | Skip MIR lab productivity when the expected native effect is present. | Effect-proven exact technology guard only. |
-| `atan-air-scrubbing` | Requested pollution/spore filter support. | Add MIR-owned productivity for clean pollution and spore filter crafting recipes only. | Scrubbing and used-filter cleaning recipes are explicitly excluded; no scrubber efficiency mutation. |
 | `better-bot-battery2` | Requested robot battery support. | Skip MIR worker robot battery when infinite `worker-robots-battery-6` has the expected native effect. | Values differ, so this is cooperation rather than exact replacement. |
 
 ## 2.1.5 Explicit Non-Goals
@@ -116,7 +115,7 @@ These were intentionally not absorbed into `2.1.5`.
 | --- | --- | --- |
 | Shipped exact overlap cleanup | `bioflux-productivity`, `fish-productivity`, `Science_packs_productivity`, `ProductivityResearch`, `ProductivityResearchForEveryone`, `ProductivityResearchForEveryoneFG`, `ExpandedProductivityResearch`, `crafting-efficiency-2` | `2.1.5` known-competitor profiles with exact-coverage guards. |
 | Shipped native duplicate avoidance | `Research_Productivity`, `better-bot-battery2` | `2.1.5` effect-proven skips for `laboratory-productivity-4` and `worker-robots-battery-6`. |
-| Shipped narrow requested stream | `atan-air-scrubbing` | `2.1.5` clean pollution/spore filter productivity only; no scrubbing or cleaning productivity. |
+| Planned narrow requested stream | `atan-air-scrubbing` | `2.2.0` candidate for clean pollution/spore filter productivity only; no scrubbing or cleaning productivity. |
 | Preserve as finite or balance-distinct chains | `more-productivity-research`, `concrete-productivity`, `landfill-productivity`, `foundation-productivity`, `productivity_tech_modules` | Compatible, but not replaced by MIR in `2.1.5`. |
 | New stream candidates | `asphalt-productivity`, `crushing-industry-productivity-research`, `py_productivity`, selected `crafting-efficiency-2` and `ExpandedProductivityResearch` families | Candidate `2.2.0` work after recipe-ID proof and balance decisions. |
 | Rule mutators | `base-prod`, `prodforce`, `Productivity`, `productivity_fix`, `Productivity-config`, `remove-productivity-cap`, `modified-productivity-cap`, `UnlimitedProductivityFork`, `rosnok-productivity-quality-beacon`, `SchallModules`, `Prod-Beacon`, `space-exploration-spaceproductivity-2` | Compatible/adjacent. Prefer companion boundary over MIR core absorption. |
