@@ -39,7 +39,7 @@ if (-not $AuditFactorioVersions -or $AuditFactorioVersions.Count -eq 0) {
   $AuditFactorioVersions = @($FactorioLine)
 }
 if ([string]::IsNullOrWhiteSpace($LocalModDir)) {
-  $LocalModDir = "C:\Projects\Factorio\testmods_readonly_$FactorioLine"
+  $LocalModDir = "C:\Projects\Factorio\testmods_$FactorioLine"
 }
 if (-not $SkipRepairSmokes -and @($RepairSmokeModNames).Count -eq 0) {
   throw "RepairSmokeModNames is empty. Pass -SkipRepairSmokes or provide at least one local mod name."

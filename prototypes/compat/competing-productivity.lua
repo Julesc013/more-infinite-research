@@ -3,6 +3,7 @@ local U = require("prototypes.util")
 local profiles = require("prototypes.compat.profiles")
 local productivity_owners = require("prototypes.compat.productivity-owners")
 local cleanup = require("prototypes.lib.technology-cleanup")
+local technology_requirements = require("prototypes.lib.technology-requirements")
 
 local M = {}
 
@@ -38,9 +39,7 @@ local function stream_requirement_missing(spec)
   for _, tech_name in ipairs(spec.required_technologies or {}) do
     if not U.technology_exists(tech_name) then return true end
   end
-  for _, tech_name in ipairs(spec.skip_if_technologies or {}) do
-    if U.technology_exists(tech_name) then return true end
-  end
+  if technology_requirements.skip_reason(spec) then return true end
   for _, category in ipairs(spec.required_ammo_categories or {}) do
     if not U.ammo_category_exists(category) then return true end
   end

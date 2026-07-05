@@ -4,10 +4,9 @@
   "tiers": ["LocalLibraryScenarios"],
   "factorio_line": "2.1",
   "factorio_bin": "auto",
-  "local_mod_zip_dirs": ["C:\\Projects\\Factorio\\testmods_readonly_2.1"],
+  "local_mod_zip_dirs": ["C:\\Projects\\Factorio\\testmods_2.1"],
   "local_mod_library_dirs": [
-    "C:\\Projects\\Factorio\\testmods_readonly_2.1",
-    "C:\\Projects\\Factorio\\testmods_downloaded_2.1"
+    "C:\\Projects\\Factorio\\testmods_2.1"
   ],
   "scenario_names": ["local-2-1-bz-suite-space-age"],
   "local_mod_names": [],

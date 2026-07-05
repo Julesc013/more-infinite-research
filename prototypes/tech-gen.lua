@@ -5,6 +5,7 @@ local D = require("prototypes.diagnostics")
 local deepcopy = require("prototypes.lib.deepcopy")
 local table_utils = require("prototypes.lib.table-utils")
 local effect_safety = require("prototypes.technology-effect-safety")
+local technology_requirements = require("prototypes.lib.technology-requirements")
 local competing_productivity = require("prototypes.compat.competing-productivity")
 local productivity_owners = require("prototypes.compat.productivity-owners")
 local productivity_family_adoption = require("prototypes.compat.productivity-family-adoption")
@@ -57,11 +58,8 @@ local function missing_requirement(key, spec)
       return "missing required technology " .. tech_name
     end
   end
-  for _, tech_name in ipairs(spec.skip_if_technologies or {}) do
-    if U.technology_exists(tech_name) then
-      return "existing technology " .. tech_name
-    end
-  end
+  local skip_reason = technology_requirements.skip_reason(spec)
+  if skip_reason then return skip_reason end
   for _, category in ipairs(spec.required_ammo_categories or {}) do
     if not U.ammo_category_exists(category) then
       return "missing required ammo category " .. category

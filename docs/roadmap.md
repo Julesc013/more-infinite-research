@@ -1,6 +1,6 @@
 # M.I.R. Roadmap
 
-Updated: 2026-07-04
+Updated: 2026-07-05
 
 This is the high-level release roadmap for More Infinite Research after the v2.0.0 Factorio 2.1 compatibility release. It explains release direction, product boundaries, and why major decisions exist.
 
@@ -35,7 +35,7 @@ The minimum manual smoke checks gate the `v2.0.5` quick patch. The full scripted
 | `1.9.1` | `2.0.x` | Legacy port | compatible subset of the tested `2.1.0` larger feature snapshot |
 | `2.1.5` | `2.1.x` | Quick feedback patch | small fixes and feedback from `2.1.0` |
 | `1.9.6` / `1.9.7` | `2.0.x` | Optional legacy patch | selected compatible feedback fixes from `2.1.5` if they are worth porting |
-| `2.2.0` | `2.1.x` | Larger feature wave | next larger batch after the `2.1.x` feedback cycle |
+| `2.2.0` | `2.1.x` | Larger feature wave | compatibility planner foundations plus the first fixture-proven new MIR-owned behavior |
 | `1.9.9` | `2.0.x` | Final legacy port | final Factorio 2.0 port from the latest tested `2.x.x` current-line release when Factorio 2.1 becomes stable or another verified upstream cutoff is chosen |
 
 The `1.9.9` cutoff should be treated as a release trigger, not an API assumption. When planning the final legacy port, verify the actual Factorio 2.1 stable status and the exact latest MIR `2.x.x` source point.
@@ -277,16 +277,31 @@ Do not use `v2.1.5` for new broad gameplay systems.
 Theme:
 
 ```text
-Next larger feature wave after the v2.1.x feedback cycle.
+Compatibility planner foundations plus first evidence-backed stream families.
 ```
 
-Candidate work:
+`v2.2.0` is not the release that absorbs every useful idea-mod behavior. Most ideamods are compatibility signals, not planned MIR features. The release's job is to turn a small number of remaining audit signals into designed MIR-owned behavior, with fixtures proving recipe IDs, ownership, value matching, lab compatibility, and non-replacement of balance-distinct chains.
 
-- Any pump/fluid/logistics work that was too large for `v2.1.0`.
-- More advanced compatibility automation.
-- Larger settings UX reorganization.
-- Additional bounded scripted research if the framework has proven stable.
-- Companion-mod split decisions for ideas that keep growing beyond MIR.
+Preferred order:
+
+1. Cap-aware diagnostics, because they improve user understanding without silently changing balance.
+2. Ore-crushing productivity, if Crushing Industry recipe IDs and ownership rules fixture cleanly.
+3. Tile and surface productivity policy, only after deciding the stream split and default values.
+4. One overhaul material-family prototype, limited to a concrete recipe family with visible IDs.
+5. Native modifier overlap policy, kept small enough to avoid a framework detour.
+
+Tile and surface productivity should default to conservative MIR-owned values, replace external owners only on exact value matches, and move any high-value tile profile behind an explicit setting or later design decision.
+
+Non-goals for `v2.2.0`:
+
+- Beacon, module, and productivity-rule mutation in MIR core.
+- Runtime production-based productivity systems.
+- Broad overhaul compatibility claims without a matrix and load evidence.
+- Generic productivity generation from names alone.
+
+The compatibility matrix in `docs/compatibility-matrix.md` is the claim ledger for these decisions. A row may be planned or future, but public compatibility claims require an explicit tested profile, validation artifact, and notes about what MIR refuses to own.
+
+Future overhaul work should be staged as campaigns after `v2.2.0`, not folded into this release. Keep Krastorio 2, AAI Industry, Bob's focused subsets, Space Exploration, K2 plus Space Exploration, and K2 Spaced Out / Space Age as separate matrices because their Factorio lines, dependency shapes, progression rules, and productivity restrictions differ.
 
 ## Legacy Backport Strategy
 
@@ -307,7 +322,7 @@ legacy = tested current MIR code, minus Factorio 2.1-only surface area,
 with Factorio 2.0 metadata and validation.
 ```
 
-Use the same test tools for both lines. Select `FactorioLine = 2.0` through `mir.ps1` profiles such as `release-targeted-2.0`, `overnight-local-2.0`, and `local-audit-2.0`; do not create a separate legacy harness. Those profiles must run against a real Factorio `2.0.x` binary and a matching local library such as `C:\Projects\Factorio\testmods_readonly_2.0`.
+Use the same test tools for both lines. Select `FactorioLine = 2.0` through `mir.ps1` profiles such as `release-targeted-2.0`, `overnight-local-2.0`, and `local-audit-2.0`; do not create a separate legacy harness. Those profiles must run against a real Factorio `2.0.x` binary and a matching local library such as `C:\Projects\Factorio\testmods_2.0`.
 
 Recommended setup for the first legacy port:
 

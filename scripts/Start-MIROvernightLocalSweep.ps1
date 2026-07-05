@@ -54,7 +54,7 @@ function Resolve-MIRFactorioBinary {
 
 $resolvedFactorioBin = Resolve-MIRFactorioBinary -Path $FactorioBin
 if ([string]::IsNullOrWhiteSpace($LocalModDir)) {
-  $LocalModDir = "C:\Projects\Factorio\testmods_readonly_$FactorioLine"
+  $LocalModDir = "C:\Projects\Factorio\testmods_$FactorioLine"
 }
 if (-not (Test-Path -LiteralPath $LocalModDir)) {
   throw "Local mod directory does not exist: $LocalModDir"

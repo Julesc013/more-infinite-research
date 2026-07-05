@@ -70,8 +70,8 @@ The broad mod-portal audit is local/manual because it can require Factorio crede
 - `scripts/Convert-MIRCompatAuditResults.ps1`: groups load/audit results into failure classes and writes profile-candidate evidence.
 - `scripts/New-MIRCompatProfileStub.ps1`: creates review-required Lua stubs from grouped audit failures.
 - `fixtures/compat-matrix/manual-scenarios.json`: curated high-risk scenarios that should not be inferred from downloads alone.
-- `fixtures/compat-matrix/local-library-scenarios.json`: curated Factorio `2.1` scenarios intended for large read-only local zip libraries such as `C:\Projects\Factorio\testmods_readonly_2.1`.
-- `fixtures/compat-matrix/local-library-scenarios-2.0.json`: curated Factorio `2.0` scenarios for legacy-line local libraries such as `C:\Projects\Factorio\testmods_readonly_2.0`.
+- `fixtures/compat-matrix/local-library-scenarios.json`: curated Factorio `2.1` scenarios intended for large local zip libraries such as `C:\Projects\Factorio\testmods_2.1`.
+- `fixtures/compat-matrix/local-library-scenarios-2.0.json`: curated Factorio `2.0` scenarios for legacy-line local libraries such as `C:\Projects\Factorio\testmods_2.0`.
 - `fixtures/compat-matrix/expected-failures.json`: reviewed expected-failure rules used by grouped reports so known external breakage can be separated from unexpected MIR regressions.
 - `fixtures/compat-matrix/known-exclusions.json`: stable exclusions for official DLC, localization, and internal-only portal entries.
 
@@ -196,7 +196,7 @@ The default smoke mods and representative scenario are ordinary parameters, so f
 
 `GeneratedLocalScenarios` creates scenarios from local zip metadata: one all-local mega scenario, cluster scenarios for planet/Space Age content, BZ/resource chains, Bob, Krastorio/K2SO, production/fluid/casting/resource-flow mods, and logistics/transport mods. Add `-IncludeGeneratedLocalPairwise -GeneratedLocalPairwiseLimit 40` to the wrapper when you want a capped pairwise pass inside high-risk local clusters. `LocalModZips` can be sharded with `-ShardLocalModZips -StartIndex N -ShardSize M`; without `-ShardLocalModZips`, it tests every local root.
 
-Do not mix Factorio lines unintentionally. The current `2.x` package line targets Factorio `2.1`; with a Factorio `2.1.x` binary, use `testmods_readonly_2.1` as the primary local library. `testmods_readonly_2.0` is useful for inventory and future legacy tests, but true `2.0` runtime validation requires a compatible Factorio `2.0` binary and a mod package line that can load there.
+Do not mix Factorio lines unintentionally. The current `2.x` package line targets Factorio `2.1`; with a Factorio `2.1.x` binary, use `testmods_2.1` as the primary local library. `testmods_2.0` is useful for inventory and future legacy tests, but true `2.0` runtime validation requires a compatible Factorio `2.0` binary and a mod package line that can load there.
 
 Use `-CollectAll` for exploratory or overnight runs. It prevents the wrapper from forwarding scenario-level `-FailFast` into audit tiers, so all selected scenarios can produce artifacts. Use `-FailFast -FailOnAuditFailures` for strict gates; after conversion, the wrapper reads `compat-failures.grouped.json` and fails the tier when unexpected grouped failures remain.
 
@@ -307,7 +307,7 @@ These integrations do not add mod-page dependencies. More Infinite Research hand
 - Science Packs Productivity (`Science_packs_productivity`): infinite level-4 official science-pack productivity technologies can be replaced when the active MIR science-pack stream covers the same recipe and effect value.
 - Productivity Research (`ProductivityResearch`) and Productivity Research for Everyone variants (`ProductivityResearchForEveryone`, `ProductivityResearchForEveryoneFG`): generated infinite recipe-productivity technologies can be replaced on exact coverage and value match.
 - Expanded Productivity Research (`ExpandedProductivityResearch`) and Crafting Efficiency (`crafting-efficiency-2`): generated infinite recipe-productivity technologies can be replaced only when MIR's enabled streams prove exact recipe and value coverage.
-- Research Productivity (`Research_Productivity`): MIR's base-game lab productivity stream is skipped when that mod's native infinite `laboratory-productivity-4` chain is present.
+- Research Productivity (`Research_Productivity`): MIR's base-game lab productivity stream is skipped when an infinite `laboratory-productivity-4` has the native `laboratory-productivity` effect.
 - Panglia-style planet mods: additional productivity-allowed rocket fuel and low density structure recipes can be adopted into the existing vanilla Space Age `rocket-fuel-productivity` and `low-density-structure-productivity` technologies when those vanilla owners are safe.
 - Omega Drill style drill mods: `omega-drill`, `omega-tau`, and broader modded `*-mining-drill` / `*-drill` outputs are picked up by mining drill productivity when their recipes are visible.
 - Custom science packs from mods such as Castra or PlanetLib-based planets are picked up opportunistically when they are active lab inputs and have visible recipes that output the pack item.

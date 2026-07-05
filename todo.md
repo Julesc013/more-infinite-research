@@ -383,7 +383,7 @@ discover facts
 - [x] Add `Invoke-MIRReleaseTargetedGate.ps1` as the narrow current-commit release gate for `2.1.0`.
 - [x] Fix local overnight sweep audit parsing so blank Factorio log lines cannot abort `GeneratedLocalScenarios` or `LocalModZips`.
 - [x] Fix isolated compatibility mod lists so installed official DLC mods are disabled unless requested, and Space Age scenarios enable the complete official bundle.
-- [ ] Run the overnight local `2.1` library sweep against `C:\Projects\Factorio\testmods_readonly_2.1` using individual roots plus curated local-library scenarios.
+- [ ] Run the overnight local `2.1` library sweep against `C:\Projects\Factorio\testmods_2.1` using individual roots plus curated local-library scenarios.
 - [ ] Fill missing dependency zips reported by the local `2.1` library sweep, then rerun only the affected scenarios.
 - [ ] Run a top-25 Mod Portal audit for Factorio `2.1` with real downloads, credentials, and a local Factorio binary.
 - [ ] Run a full `downloads_count >= 10000` Mod Portal audit for Factorio `2.0` and `2.1`.
@@ -468,7 +468,7 @@ The current overnight/local-library automation is usable. Keep `scripts/mir.ps1`
 
 Use `v2.1.5` for small fixes after `v2.1.0`.
 
-Idea-mod audit planning lives in `docs/notes/ideamods-readonly-mix-audit-2026-07-05.md`.
+Idea-mod audit planning lives in `docs/notes/mod-ideas-audit.md`.
 
 | Audit lane | `v2.1.5` decision |
 | --- | --- |
@@ -479,27 +479,35 @@ Idea-mod audit planning lives in `docs/notes/ideamods-readonly-mix-audit-2026-07
 
 - [ ] Fix bugs reported against `v2.1.0`.
 - [x] Add small compatibility profiles only when the missing recipes/prototypes are concrete.
-- [x] Add exact known-competitor profiles from the `ideamods_readonly_mix` audit.
-- [x] Skip MIR lab productivity when Research Productivity's native infinite lab-productivity chain is active.
+- [x] Add exact known-competitor profiles from the `ideamods_mix` audit.
+- [x] Skip MIR lab productivity when infinite `research-productivity` or `laboratory-productivity-4` has the native lab-productivity effect.
+- [x] Add a small effect fixture for `laboratory-productivity-4` before calling the skip effect-equivalent.
+- [ ] Run the targeted external idea-mod load pass before tagging `v2.1.5`.
 - [x] Add locale/docs/validation updates.
 - [ ] Add proven recipe IDs to existing streams when no new architecture is needed.
 - [ ] Rebalance costs or defaults for features already shipped in `v2.1.0`.
 
 ## v2.2.0 Larger Feature Wave
 
-Use `v2.2.0` for the next larger batch after the `v2.1.x` feedback cycle.
+Use `v2.2.0` for the next larger batch after the `v2.1.x` feedback cycle. Most ideamods are compatibility signals, not planned MIR features. Keep this release to compatibility planner foundations plus the first new MIR-owned behavior proven by fixtures; do not turn it into every interesting idea-mod signal.
 
 Idea-mod audit candidates should be promoted only after recipe-ID proof, balance decisions, and validation fixtures.
 
 | Candidate | Source signal | First useful slice |
 | --- | --- | --- |
-| Tile/surface productivity | Asphalt, concrete, landfill, foundation productivity mods | Decide stream split and default values before implementation. |
-| Ore crushing productivity | Crushing Industry productivity research | Recipe-ID driven Crushing Industry stream or compatibility profile. |
-| Overhaul material families | Pyanodon, Expanded Productivity Research, Crafting Efficiency | Pick one concrete family first; avoid a generic generator. |
 | Cap-aware UX | Productivity cap and finite-limit helper mods | Diagnostics or explicit setting; never silent cap mutation. |
+| Ore crushing productivity | Crushing Industry productivity research | Recipe-ID driven Crushing Industry stream or compatibility profile. |
+| Tile/surface productivity | Asphalt, concrete, landfill, foundation productivity mods | Decide conservative defaults, exact cleanup rules, and optional high-value profile policy before implementation. |
+| Overhaul material families | Pyanodon, Expanded Productivity Research, Crafting Efficiency | Pick one concrete family first; avoid a generic generator. |
 | Native overlap policy | Lab, mining, solar, and other native productivity mods | General skip/warn/prefer/allow behavior with fixtures. |
 | Companion boundary | Beacon/module/productivity-rule mutator mods | Decide whether this belongs outside MIR core. |
 
+- [ ] Keep `docs/compatibility-matrix.md` current before making new compatibility claims.
+- [ ] Build cap-aware diagnostics before adding balance-heavy productivity families.
+- [ ] Treat ore-crushing productivity as the first clean new stream candidate only if recipe-ID fixtures pass.
+- [ ] Require an explicit balance policy before shipping tile/surface productivity changes.
+- [ ] Limit any overhaul material-family slice to one concrete family with fixture-proven recipe IDs.
+- [ ] Keep Space Exploration, Krastorio 2, AAI, Bob's, and combination support as separate future matrices instead of one broad compatibility promise.
 - [ ] Revisit pump/fluid/logistics work that was too large for `v2.1.0`.
 - [ ] Revisit advanced settings UX if presets are not enough.
 - [ ] Revisit bounded scripted research ideas after the framework has proven stable.

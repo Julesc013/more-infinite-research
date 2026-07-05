@@ -62,7 +62,10 @@ return {
 
   research_lab_productivity = {
     -- Space Age and Research_Productivity already own native lab productivity.
-    skip_if_technologies = {"research-productivity", "laboratory-productivity-4"},
+    skip_if_technology_effects = {
+      { technology = "research-productivity", type = "laboratory-productivity", max_level = "infinite" },
+      { technology = "laboratory-productivity-4", type = "laboratory-productivity", modifier = 0.10, max_level = "infinite" }
+    },
     icon_candidates = {
       {technology = "research-productivity", required_mod = "space-age"},
       {icon = "__space-age__/graphics/technology/research-productivity.png", icon_size = 256, inactive_mod_asset = "space-age"},
