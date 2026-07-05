@@ -1,4 +1,4 @@
-# Legacy RC Synthesis
+# Legacy Backport Plan
 
 Updated: 2026-07-06
 Branch: `legacy`
@@ -8,6 +8,15 @@ This is a docs-only synthesis of the temporary RC planning sweep. It is a planni
 artifact, not a release-candidate approval. Every target still needs actual
 target-line implementation work, metadata changes, package construction, and a
 matching Factorio binary load test before it can be called stable.
+
+## Read-Only Audit Follow-Up
+
+The attached read-only branch audit is materialized as
+`docs/notes/legacy-backport-capabilities.md`. Treat that matrix
+as the next planning layer after this plan: it records the branch-by-branch
+capability gates, sharpens the `0.15` native-infinite boundary, and uses the
+stricter wording that `0.14` and older targets are archive/museum
+reconstructions unless matching old binaries prove stronger support.
 
 ## What Was Done
 
