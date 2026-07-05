@@ -13,7 +13,19 @@ function Read-MIRZipInfoJson {
     try {
       $reader = New-Object System.IO.StreamReader($stream)
       try {
-        return ($reader.ReadToEnd() | ConvertFrom-Json)
+        $infoJson = $reader.ReadToEnd()
+        try {
+          return ($infoJson | ConvertFrom-Json -ErrorAction Stop)
+        } catch {
+          $infoTable = $infoJson | ConvertFrom-Json -AsHashTable -ErrorAction Stop
+          return [pscustomobject]@{
+            name = [string]$infoTable["name"]
+            title = [string]$infoTable["title"]
+            version = [string]$infoTable["version"]
+            factorio_version = [string]$infoTable["factorio_version"]
+            dependencies = @($infoTable["dependencies"])
+          }
+        }
       } finally {
         $reader.Dispose()
       }

@@ -170,7 +170,19 @@ function ConvertTo-MIRLocalFullMod {
 
     $reader = [System.IO.StreamReader]::new($entry.Open())
     try {
-      $info = $reader.ReadToEnd() | ConvertFrom-Json
+      $infoJson = $reader.ReadToEnd()
+      try {
+        $info = $infoJson | ConvertFrom-Json -ErrorAction Stop
+      } catch {
+        $infoTable = $infoJson | ConvertFrom-Json -AsHashTable -ErrorAction Stop
+        $info = [pscustomobject]@{
+          name = [string]$infoTable["name"]
+          title = [string]$infoTable["title"]
+          version = [string]$infoTable["version"]
+          factorio_version = [string]$infoTable["factorio_version"]
+          dependencies = @($infoTable["dependencies"])
+        }
+      }
     } finally {
       $reader.Dispose()
     }
