@@ -2,6 +2,71 @@
 
 This file records local release-candidate validation runs. It is not a substitute for the manual mod matrix in `docs/compatibility.md`.
 
+## 2026-07-05 1.9.5 Factorio 2.0.77 Release Gate
+
+Environment:
+
+- Branch: `legacy`.
+- Mod version `1.9.5`.
+- Factorio binary: Steam Factorio `2.0.77`.
+- Local 2.0 mod library: `C:\Projects\Factorio\testmods_readonly_2.0`.
+
+Scope:
+
+- Validated the legacy Factorio `2.0` package with a real Factorio `2.0.x` executable.
+- Fixed base-only compatibility-audit scenarios so empty local roots are valid.
+- Shortened audit run directory names to avoid Windows path-length false negatives.
+- Built the release package `dist\more-infinite-research_1.9.5.zip`.
+
+Release-targeted result:
+
+- Static validation: passed.
+- Runtime Factorio `2.0.77` fixture validation: passed.
+- Deterministic audit smoke: passed.
+- Representative `local-2-0-base-baseline`: passed with `72` MIR audit rows.
+- Package build: passed.
+- Clean git state: passed.
+
+Artifact:
+
+```text
+artifacts\release-targeted-1.9.5-factorio-2.0.77-clean
+```
+
+## 2026-07-05 1.9.5 Local 2.0 Library Sweep
+
+Environment:
+
+- Branch: `legacy`.
+- Mod version `1.9.5`.
+- Factorio binary: Steam Factorio `2.0.77`.
+- Local 2.0 mod library: `C:\Projects\Factorio\testmods_readonly_2.0`.
+
+Results:
+
+| Scope | Scenarios | Passed | Skipped | Failed | Timeouts | MIR audit rows |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Local curated scenarios | 11 | 2 | 9 | 0 | 0 | 159 |
+| Generated local scenarios | 46 | 36 | 9 | 1 | 0 | 3,162 |
+| Local root zips | 239 | 209 | 25 | 5 | 0 | 16,062 |
+| Total | 296 | 247 | 43 | 6 | 0 | 19,383 |
+
+Reviewed load failures:
+
+- `Accumulator-V2`: external prototype error in its recipe definition.
+- `generated-local-2-0-pair-002`: same external `Accumulator-V2` prototype error.
+- `everything-fish`: external map creation produced corrupted chunks.
+- `more-quality-scaling`: external mod passed an empty prototype array to `data:extend`.
+- `no-minimap-on-platforms`: external mod expects the Space Age `empty-space` tile.
+- `rubia-assets`: asset/support mod expects the Space Age `empty-space` tile.
+
+Artifacts:
+
+```text
+F:\Factorio\mir-artifacts\local-audit-1.9.5-factorio-2.0.77-20260705-174732
+F:\Factorio\mir-artifacts\generated-local-1.9.5-factorio-2.0.77-empty-safe
+```
+
 ## 2026-07-05 Legacy Factorio-Line Test Tooling Import
 
 Environment:

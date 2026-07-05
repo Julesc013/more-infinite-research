@@ -581,7 +581,7 @@ function Test-MIRLocalNameMatches {
 function New-MIRGeneratedLocalScenarioDefinition {
   param(
     [Parameter(Mandatory)][string]$Name,
-    [Parameter(Mandatory)][string[]]$Mods,
+    [string[]]$Mods = @(),
     [bool]$IncludeSpaceAge,
     [Parameter(Mandatory)][string]$Notes
   )
