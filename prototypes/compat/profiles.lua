@@ -59,6 +59,33 @@ local function apply_profile(config, profile)
   end
 end
 
+local function known_competing_productivity_profile(patterns)
+  return {
+    known_competing_productivity = {
+      tech_patterns = patterns
+    }
+  }
+end
+
+local SCIENCE_PACK_PRODUCTIVITY_TECH_PATTERNS = {
+  "^automation%-science%-productivity%-4$",
+  "^logistic%-science%-productivity%-4$",
+  "^military%-science%-productivity%-4$",
+  "^chemical%-science%-productivity%-4$",
+  "^production%-science%-productivity%-4$",
+  "^utility%-science%-productivity%-4$",
+  "^space%-science%-productivity%-4$",
+  "^metallurgic%-science%-productivity%-4$",
+  "^electromagnetic%-science%-productivity%-4$",
+  "^agricultural%-science%-productivity%-4$",
+  "^cryogenic%-science%-productivity%-4$",
+  "^promethium%-science%-productivity%-4$"
+}
+
+local SEM_PRFE_PRODUCTIVITY_TECH_PATTERNS = {
+  "^sem%-prfe_.+%-productivity%-1$"
+}
+
 local PROFILES = {
   -- This table is intentionally small for now. It gives future compatibility
   -- work a stable place for mod-specific stream patches without bloating the
@@ -67,6 +94,22 @@ local PROFILES = {
   -- Profiles are applied from settings.lua as well as data stage. Keep profile
   -- patches declarative and do not inspect data.raw here. Prototype-dependent
   -- compatibility belongs in data-updates.lua or data-final-fixes.lua.
+  ["bioflux-productivity"] = known_competing_productivity_profile({
+    "^bioflux%-productivity$"
+  }),
+
+  ["crafting-efficiency-2"] = known_competing_productivity_profile({
+    "^ce%-.+%-%d+$"
+  }),
+
+  ["ExpandedProductivityResearch"] = known_competing_productivity_profile({
+    "^epr_.+%-productivity%-%d+$"
+  }),
+
+  ["fish-productivity"] = known_competing_productivity_profile({
+    "^fish%-breeding%-productivity$"
+  }),
+
   ["mir-fixture-plates-n-circuit-productivity"] = {
     known_competing_productivity = {
       tech_patterns = {
@@ -102,6 +145,14 @@ local PROFILES = {
       }
     }
   },
+
+  ["ProductivityResearch"] = known_competing_productivity_profile(SEM_PRFE_PRODUCTIVITY_TECH_PATTERNS),
+
+  ["ProductivityResearchForEveryone"] = known_competing_productivity_profile(SEM_PRFE_PRODUCTIVITY_TECH_PATTERNS),
+
+  ["ProductivityResearchForEveryoneFG"] = known_competing_productivity_profile(SEM_PRFE_PRODUCTIVITY_TECH_PATTERNS),
+
+  ["Science_packs_productivity"] = known_competing_productivity_profile(SCIENCE_PACK_PRODUCTIVITY_TECH_PATTERNS),
 
   ["plates-n-circuit-productivity"] = {
     known_competing_productivity = {

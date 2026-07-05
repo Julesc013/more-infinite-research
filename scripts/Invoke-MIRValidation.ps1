@@ -478,7 +478,7 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'technology-description.more-infinite-research.electric_shooting_speed' },
     @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'technology-description.more-infinite-research.flamethrower_shooting_speed' },
     @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'type = "laboratory-productivity", modifier = 0.10' },
-    @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'skip_if_technologies = {"research-productivity"}' },
+    @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'skip_if_technologies = {"research-productivity", "laboratory-productivity-4"}' },
     @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = '{technology = "research-productivity", required_mod = "space-age"}' },
     @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = '{technology = "military-science-pack"}' },
     @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'ammo_category = "tesla", modifier = 0.1' },

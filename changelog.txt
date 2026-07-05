@@ -2,6 +2,11 @@
 Version: 2.1.5
 Date: 2026-07-05
 
+  Compatibility:
+
+    - Added known-competitor profiles for exact recipe-productivity overlaps found in the local idea-mod audit.
+    - Skipped MIR lab productivity when Research Productivity's native laboratory-productivity chain is active.
+
   Internal:
 
     - Fixed local audits so official built-ins include required official dependencies such as Recycler for Quality.

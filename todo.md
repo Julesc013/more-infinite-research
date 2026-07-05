@@ -469,7 +469,9 @@ The current overnight/local-library automation is usable. Keep `scripts/mir.ps1`
 Use `v2.1.5` for small fixes after `v2.1.0`.
 
 - [ ] Fix bugs reported against `v2.1.0`.
-- [ ] Add small compatibility profiles only when the missing recipes/prototypes are concrete.
+- [x] Add small compatibility profiles only when the missing recipes/prototypes are concrete.
+- [x] Add exact known-competitor profiles from the `ideamods_readonly_mix` audit.
+- [x] Skip MIR lab productivity when Research Productivity's native infinite lab-productivity chain is active.
 - [ ] Add proven recipe IDs to existing streams when no new architecture is needed.
 - [ ] Add locale/docs/validation updates.
 - [ ] Rebalance costs or defaults for features already shipped in `v2.1.0`.
@@ -481,6 +483,11 @@ Use `v2.2.0` for the next larger batch after the `v2.1.x` feedback cycle.
 - [ ] Revisit pump/fluid/logistics work that was too large for `v2.1.0`.
 - [ ] Revisit advanced settings UX if presets are not enough.
 - [ ] Revisit bounded scripted research ideas after the framework has proven stable.
+- [ ] Decide whether tile/surface productivity variants such as asphalt, concrete, landfill, and foundation need per-stream balance presets.
+- [ ] Evaluate an ore-crushing productivity stream for Crushing Industry and overhaul mods.
+- [ ] Evaluate broader Pyanodon/Bob/EV material-family streams only from concrete recipe families, not generic name overlap.
+- [ ] Decide whether cap-aware finite conversion or warning UX belongs in MIR after reviewing productivity-cap helper mods.
+- [ ] Decide whether module/beacon/productivity-rule mutation belongs in a companion mod rather than MIR core.
 - [ ] Decide which growing ideas should split to companion mods.
 
 ## Legacy Backports

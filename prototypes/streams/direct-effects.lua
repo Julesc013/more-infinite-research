@@ -61,8 +61,8 @@ return {
   } },
 
   research_lab_productivity = {
-    -- Space Age already owns the native infinite research-productivity chain.
-    skip_if_technologies = {"research-productivity"},
+    -- Space Age and Research_Productivity already own native lab productivity.
+    skip_if_technologies = {"research-productivity", "laboratory-productivity-4"},
     icon_candidates = {
       {technology = "research-productivity", required_mod = "space-age"},
       {icon = "__space-age__/graphics/technology/research-productivity.png", icon_size = 256, inactive_mod_asset = "space-age"},
