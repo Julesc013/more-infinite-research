@@ -491,10 +491,11 @@ Idea-mod audit planning lives in `docs/notes/mod-ideas-audit.md`.
 
 Use `v2.2.0` for the next larger batch after the `v2.1.x` feedback cycle. Most ideamods are compatibility signals, not planned MIR features. Keep this release to compatibility planner foundations plus the first new MIR-owned behavior proven by fixtures; do not turn it into every interesting idea-mod signal.
 
-Idea-mod audit candidates should be promoted only after recipe-ID proof, balance decisions, and validation fixtures.
+Idea-mod audit candidates should be promoted only after recipe-ID proof, balance decisions, licensing review, save-compatibility policy, and validation fixtures. Use `docs/compatibility-program.md` for the role taxonomy and one-archive audit template.
 
 | Candidate | Source signal | First useful slice |
 | --- | --- | --- |
+| Compatibility planner/registry | All 50 idea-mod archives | Assign role enums, actions, non-actions, validation status, and public-claim boundaries before implementing broad features. |
 | Cap-aware UX | Productivity cap and finite-limit helper mods | Diagnostics or explicit setting; never silent cap mutation. |
 | Ore crushing productivity | Crushing Industry productivity research | Recipe-ID driven Crushing Industry stream or compatibility profile. |
 | Tile/surface productivity | Asphalt, concrete, landfill, foundation productivity mods | Decide conservative defaults, exact cleanup rules, and optional high-value profile policy before implementation. |
@@ -502,7 +503,12 @@ Idea-mod audit candidates should be promoted only after recipe-ID proof, balance
 | Native overlap policy | Lab, mining, solar, and other native productivity mods | General skip/warn/prefer/allow behavior with fixtures. |
 | Companion boundary | Beacon/module/productivity-rule mutator mods | Decide whether this belongs outside MIR core. |
 
-- [ ] Keep `docs/compatibility-matrix.md` current before making new compatibility claims.
+- [ ] Keep `docs/compatibility-program.md` and `docs/compatibility-matrix.md` current before making new compatibility claims.
+- [ ] Add one structured audit row for each archive in `C:\Projects\Factorio\ideamods_mix` using the role enum and one-archive template.
+- [ ] Add audited-zip checksum records for local compatibility campaigns so future Mod Portal updates do not silently change what was proved.
+- [ ] Build the compatibility planner/registry before broad new stream work, with detected mods, actions, non-actions, warnings, and public-claim boundaries.
+- [ ] Keep "replace exactly" separate from "cooperate/skip/prefer external" in code, docs, changelog, and release notes.
+- [ ] Add save-compatibility notes before any feature removes, hides, or replaces external technologies that may already be researched.
 - [ ] Build cap-aware diagnostics before adding balance-heavy productivity families.
 - [ ] Treat ore-crushing productivity as the first clean new stream candidate only if recipe-ID fixtures pass.
 - [ ] Require an explicit balance policy before shipping tile/surface productivity changes.

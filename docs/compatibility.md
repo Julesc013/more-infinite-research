@@ -2,6 +2,8 @@
 
 More Infinite Research's current main line targets Factorio `2.1.x` and uses a compatibility-first data-stage plus narrow control-stage model.
 
+For compatibility planning policy, use `docs/compatibility-program.md`. It defines the role taxonomy, one-archive audit template, licensing rule, save-compatibility questions, test matrix model, and planner architecture. For tested claims and future campaign rows, use `docs/compatibility-matrix.md`.
+
 Release-line summary:
 
 | MIR release | Factorio line | Scope |
@@ -195,6 +197,8 @@ The default smoke mods and representative scenario are ordinary parameters, so f
 `Start-MIROvernightLocalSweep.ps1` is the preferred bedtime command for the local `2.1` library. It removes one-line paste hazards, starts a transcript log, writes `run-manifest.json`, `events.jsonl`, `artifact-index.json`, and `index.html`, runs the strict release gate, then runs the local sweep with `-CollectAll`. The underlying prioritized local sweep covers curated combinations from `fixtures/compat-matrix/local-library-scenarios.json`, generated all-local/cluster stress scenarios, and then each individual local root zip. Missing dependencies and impossible mod combinations are expected to appear as grouped failures; they are still useful evidence because they distinguish "not testable with this local library" from actual MIR generation regressions. `Show-MIROvernightSummary.ps1` summarizes the next-morning triage views across the whole output tree.
 
 `GeneratedLocalScenarios` creates scenarios from local zip metadata: one all-local mega scenario, cluster scenarios for planet/Space Age content, BZ/resource chains, Bob, Krastorio/K2SO, production/fluid/casting/resource-flow mods, and logistics/transport mods. Add `-IncludeGeneratedLocalPairwise -GeneratedLocalPairwiseLimit 40` to the wrapper when you want a capped pairwise pass inside high-risk local clusters. `LocalModZips` can be sharded with `-ShardLocalModZips -StartIndex N -ShardSize M`; without `-ShardLocalModZips`, it tests every local root.
+
+For idea-mod and overhaul campaigns, do not treat a full-folder load as the main proof. Run `MIR + one mod`, `MIR + one family`, `MIR + known conflict pair`, `MIR + representative overhaul stack`, and only then a full chaos-folder smoke as non-blocking evidence. Public compatibility claims require exact mod versions, role enums, validation artifacts, save-compatibility notes, and clear non-ownership notes for behavior MIR deliberately leaves external.
 
 Do not mix Factorio lines unintentionally. The current `2.x` package line targets Factorio `2.1`; with a Factorio `2.1.x` binary, use `testmods_2.1` as the primary local library. `testmods_2.0` is useful for inventory and future legacy tests, but true `2.0` runtime validation requires a compatible Factorio `2.0` binary and a mod package line that can load there.
 

@@ -150,6 +150,24 @@ Profiles are applied from `settings.lua` as well as the data stage, so profile e
 
 Weapon-speed overlap handling is intentionally narrower than general compatibility cleanup. MIR may remove rocket and cannon-shell speed effects from its own generated `weapon-shooting-speed` continuation when dedicated replacement speed techs are active, but it must not remove those effects from finite vanilla `weapon-shooting-speed-*` technologies. Those finite vanilla levels contain tank cannon fire-rate bonuses.
 
+## Compatibility Planner Direction
+
+The next compatibility-heavy architecture step is a planner layer, not a broad
+new generator. The durable policy is in `docs/compatibility-program.md`.
+
+Keep the responsibilities separate:
+
+- Stream definitions describe MIR-owned effects.
+- Recipe resolvers decide which visible recipes a stream may own.
+- Competitor profiles identify possible external owners but do not decide removal.
+- Native modifier overlap policy decides skip, warn, prefer, coexist, or off behavior for non-recipe effects.
+- Diagnostics explain generated actions and deliberate non-actions.
+- Fixtures prove exact duplicates, wrong values, mixed effects, cap changes, native overlaps, and loaded rule mutators.
+
+Compatibility adapters should register facts about known external mods. They
+should not generate MIR content directly. Streams generate content; adapters
+classify external owners and constraints; diagnostics explain the resulting plan.
+
 ## Diagnostics
 
 `mir-debug-generation-report` enables a structured log report. The report records generated and skipped streams/extensions with:

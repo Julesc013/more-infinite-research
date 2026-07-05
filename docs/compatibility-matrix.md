@@ -2,6 +2,8 @@
 
 This matrix records compatibility claims and planned compatibility campaigns. It is intentionally stricter than the idea backlog: most idea-mod observations are compatibility signals, not planned MIR features. A mod can be interesting without becoming MIR-owned behavior.
 
+Use `docs/compatibility-program.md` for the role taxonomy, one-archive audit template, licensing rule, save-compatibility questions, compatibility-mode policy, and planner architecture direction. This matrix is the claim ledger; the compatibility program document is the decision framework.
+
 Status vocabulary:
 
 | Status | Meaning |
@@ -10,6 +12,18 @@ Status vocabulary:
 | Planned | Candidate work, but not a public compatibility claim yet. |
 | Future campaign | Dedicated post-`2.2.0` compatibility work, not a casual stream batch. |
 | Adjacent | Compatible or useful, but outside MIR core unless a separate design accepts it. |
+
+Role vocabulary:
+
+| Role | Decision enum |
+| --- | --- |
+| Replace exactly | `MIR_REPLACE_EXACT` |
+| Integrate as MIR-owned stream | `MIR_STREAM_CANDIDATE` |
+| Cooperate, skip, or prefer external | `MIR_COMPAT_ADAPTER` |
+| Diagnose only | `MIR_DIAGNOSTIC_ONLY` |
+| Companion territory | `MIR_COMPANION_SCOPE` |
+| Docs/load-test only | `MIR_DOCS_ONLY` |
+| Reject from core | `MIR_REJECT_CORE` |
 
 ## Current And Near-Term Matrix
 
@@ -23,6 +37,7 @@ Status vocabulary:
 | `ProductivityResearch*` | Supported in `2.1.5` after final gate | Guarded known competitor patterns | Targeted external load pass | Cleanup only fires for exact covered effects. |
 | `ExpandedProductivityResearch` | Supported in `2.1.5` after final gate | Guarded known competitor pattern | Targeted external load pass | Broader generator behavior remains out of scope. |
 | `crafting-efficiency-2` | Supported in `2.1.5` after final gate | Guarded known competitor pattern | Targeted external load pass | Broader staged families remain candidates only. |
+| Compatibility planner/registry | Planned for `2.2.0` | Structured facts, roles, actions, non-actions, and diagnostics | Static schema checks plus fixture-backed planner rows | Foundation before broad feature absorption. |
 | Cap-aware diagnostics | Planned for `2.2.0` | Diagnostics or explicit setting | Fixture with default, raised, removed, and lowered recipe caps | No silent cap mutation. |
 | Crushing Industry ore crushing | Planned for `2.2.0` | New stream candidate or guarded profile | Recipe-ID fixture with Crushing Industry | First clean new stream candidate if fixtures pass. |
 | Tile/surface productivity mods | Planned for `2.2.0` | Policy before implementation | Balance fixture proving mismatch preservation and exact-match replacement | Values differ across source mods, so this is not a cleanup-only change. |
@@ -54,6 +69,9 @@ Before a future campaign moves from planned to supported, add:
 - the MIR package version and commit;
 - the load result and whether the profile is new-game-only or save-migration-tested;
 - validation artifacts or test-result rows;
+- the assigned MIR role and decision enum;
+- the license summary used for reimplementation or attribution decisions;
+- save-compatibility notes for already researched, removed, or co-enabled external technologies;
 - the recipes, technologies, or native modifiers MIR owns;
 - external streams MIR skipped or deferred to another owner;
 - duplicate owners MIR removed or deliberately preserved;

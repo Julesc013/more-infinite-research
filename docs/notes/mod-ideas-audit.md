@@ -4,6 +4,8 @@ Source library: `C:\Projects\Factorio\ideamods_mix`
 
 Text-only working copy used for code reading: `tmp/ideamods-text-audit-20260705/`
 
+Audited zip checksum ledger: `docs/audited-zips-2026-07-05.json`
+
 Scope: 50 downloaded archives, 50 unique mod/version pairs. The set mixes Factorio `2.0` and `2.1` targets. `research-cost-curve` has an unusual `info.json` shape but its source was readable. `omniab-space-age-compat` was added after the first audit draft and is treated as a future suite-compatibility signal, not a `2.1.5` feature.
 
 Most ideamods in this folder are compatibility signals, not planned MIR features. A signal can become MIR-owned behavior only after recipe IDs, effect values, ownership boundaries, lab compatibility, and fixtures prove that MIR can own the behavior without copying another mod's balance model or rule mutations.
@@ -17,6 +19,32 @@ Most ideamods in this folder are compatibility signals, not planned MIR features
 | `2.1.5` | Preserve finite lead-ins from other mods. | MIR's current cleanup model is for exact infinite owners, not finite upgrade chains. |
 | `2.2.0` | Plan new feature work from grouped demand signals. | Cap-aware UX, ore crushing, tile productivity, overhaul materials, and native overlap policy need design. |
 | Companion/modpack scope | Keep rule mutators adjacent unless explicitly adopted. | Beacon/module/productivity-rule mods change factory rules, not just research ownership. |
+
+## Compatibility Role Model
+
+For each archive, the planning question is:
+
+```text
+What role should MIR take for this mod?
+```
+
+It is not:
+
+```text
+Can MIR replace this mod?
+```
+
+Use these decision enums from `docs/compatibility-program.md`:
+
+| Role | Decision enum |
+| --- | --- |
+| Replace exactly | `MIR_REPLACE_EXACT` |
+| Integrate as MIR-owned stream | `MIR_STREAM_CANDIDATE` |
+| Cooperate, skip, or prefer external | `MIR_COMPAT_ADAPTER` |
+| Diagnose only | `MIR_DIAGNOSTIC_ONLY` |
+| Companion territory | `MIR_COMPANION_SCOPE` |
+| Docs/load-test only | `MIR_DOCS_ONLY` |
+| Reject from core | `MIR_REJECT_CORE` |
 
 ## Safety Model
 
@@ -93,58 +121,58 @@ These were intentionally not absorbed into `2.1.5`.
 
 ## Per-Mod Appendix
 
-| Archive | What it does | MIR plan |
-| --- | --- | --- |
-| `5dim_mining_2.0.3` | Adds high-tier mining drills, pumpjacks, water pumpjacks, and offshore pumps. | Compatible. MIR may pick up visible drill recipes through Mining Drill Productivity. |
-| `asphalt-productivity_1.0.1` | Adds infinite `Arci-asphalt` recipe productivity at `+0.50`. | `2.2.0` tile/surface productivity candidate. |
-| `base-prod_0.0.2` | Mutates base productivity/prototype productivity behavior. | Adjacent rule mutation; no MIR core change. |
-| `bioflux-productivity_0.1.0` | Adds one infinite Bioflux recipe-productivity technology. | Shipped exact known-competitor profile. |
-| `combatresearchtech_0.1.0` | Grants research progress from enemy kills. | Compatible runtime utility; no MIR code needed. |
-| `concrete-productivity_1.2.1` | Adds concrete/refined-concrete productivity chain, infinite level uses `+0.25`. | Defer. Balance differs from MIR concrete coverage. |
-| `crafting-efficiency-2_0.3.0` | Generates staged recipe productivity for selected recipe groups and expansions. | Shipped guarded known-competitor profile; broader families are `2.2.0` candidates. |
-| `crushing-industry-productivity-research_1.0.6` | Adds ore/crushing productivity for Crushing Industry and forces ore crushing on. | `2.2.0` ore-crushing stream candidate. |
-| `ExpandedProductivityResearch_1.3.8` | Broad configurable generator for productivity techs, including science packs and many recipe categories. | Shipped guarded known-competitor profile; broader absorption needs planner work. |
-| `finite_prod_techs_0.1.0` | Converts infinite productivity techs to finite levels based on recipe productivity caps. | Compatible but order-sensitive; cap-aware UX candidate. |
-| `fish-productivity_1.0.0` | Adds infinite fish-breeding recipe productivity. | Shipped exact known-competitor profile. |
-| `foundation-productivity_1.1.1` | Adds infinite foundation recipe productivity at `+0.25`. | Defer due balance mismatch. |
-| `landfill-productivity_1.0.2` | Adds landfill productivity chain, final infinite level at `+0.50`. | Defer due balance mismatch. |
-| `miner-start_1.0.0` | Adds starter mining productivity bonus. | Compatible native/progression tweak. |
-| `mining-prod-0_1.0.2` | Inserts early `mining-productivity-0` before vanilla mining productivity. | Compatible native/progression tweak. |
-| `modified-productivity-cap_1.2.2` | Lets startup settings change recipe `maximum_productivity`. | Compatible cap mutator; cap-aware UX candidate. |
-| `more-productivity-research_1.0.1` | Adds finite science-pack productivity chains. | Compatible; preserve finite lead-ins. |
-| `omniab-space-age-compat_1.3.7` | Suite-aware Space Age compatibility layer for Bob's, Angel's, and Omnimatter; touches research triggers, resource yields, tile fluids, minable results, and suite unification. | Future Bob/Angel/Omni compatibility-campaign signal; no `2.1.5` stream or cleanup change. |
-| `Prod-Beacon_1.0.3` | Adds a productivity beacon prototype. | Companion/rule-mutation territory. |
-| `prodforce_0.0.8` | Forces productivity/quality allowed effects onto machines and recipes. | Companion/rule-mutation territory. |
-| `Productivity_2.0.5` | Broadly enables productivity for recipes. | Compatible as a producer of more productivity-allowed recipes. |
-| `productivity_fix_2.0.0` | Allows productivity in beacons/recycler and broad recipe productivity. | Companion/rule-mutation territory. |
-| `productivity_tech_modules_0.0.3` | Adds module recipe-productivity technology at `+0.10` for all tiers. | Defer; MIR uses tiered lower module values. |
-| `productivity_weight_fix_0.0.2` | Adjusts productivity-related weight behavior. | Compatible utility; no MIR action. |
-| `Productivity-config_0.1.1` | Configurable productivity allowances. | Companion/rule-mutation territory. |
-| `productivity-indicator_1.0.0` | UI/indicator for productivity. | Compatible UI utility. |
-| `productivity-module-3-aquilo_1.0.4` | Moves or enables productivity module 3 access on Aquilo. | Compatible progression tweak. |
-| `productivity-technology-limit_0.0.2` | Limits productivity technologies by recipe cap and prior productivity. | Compatible but order-sensitive; cap-aware UX candidate. |
-| `productivity-through-science_1.1.0` | Runtime recipe productivity bonus per researched technology. | Runtime system; not MIR core for `2.1.5`. |
-| `ProductivityResearch_2.1.0` | Broad recipe-productivity generator with `sem-prfe_` technology IDs. | Shipped guarded known-competitor profile. |
-| `ProductivityResearchForEveryone_1.0.9` | Earlier `sem-prfe_` broad recipe-productivity generator. | Shipped guarded known-competitor profile. |
-| `ProductivityResearchForEveryoneFG_1.2.0` | Fork with staged science-pack settings for `sem-prfe_` generator. | Shipped guarded known-competitor profile. |
-| `progressive-productivity_1.1.5` | Runtime productivity improves as production statistics rise. | Runtime system; defer or companion only with performance proof. |
-| `py_productivity_1.3.0` | Hand-authored Pyanodon productivity families for alloys, biomass, casting, glasswork, smelting, and more. | `2.2.0` overhaul-family candidate with recipe-ID proof. |
-| `remove-productivity-cap_1.1.1` | Sets recipe `maximum_productivity` extremely high. | Compatible cap mutator; cap-aware UX candidate. |
-| `Research_Productivity_1.1.3` | Adds native laboratory-productivity finite levels and infinite `laboratory-productivity-4`. | Shipped effect-proven lab-productivity skip. |
-| `research-control-tower_1.3.1` | Circuit-controlled automation for choosing infinite research. | Compatible with MIR infinite techs. |
-| `research-cost-curve_0.1.4` | Runtime science-cost multiplier curve after research completion, plus fixed startup cost option. | Compatible cost tool; outside MIR core. |
-| `research-fixer_1.0.6` | Adds missing science prerequisite links inferred from science ingredients. | Generally compatible; monitor if it touches MIR techs. |
-| `research-multipliers_0.2.0` | Startup research cost multipliers by pack, infinite status, planet, and individual tech. | Compatible cost mutator; order-sensitive. |
-| `research-skip_1.0.1` | Unlocks early/midgame technologies at game start or by command. | Compatible progression utility. |
-| `ResearchProductivity_Rebalance_1.0.0` | Rebalances Space Age `research-productivity` cost/time. | Compatible; MIR already skips vanilla `research-productivity`. |
-| `rosnok-productivity-quality-beacon_1.1.2` | Allows productivity and quality in beacons. | Companion/rule-mutation territory. |
-| `SchallModules_2.0.0` | Adds module tiers/options and mutates allowed beacon effects. | Adjacent module ecosystem; no MIR absorption. |
-| `Science_packs_productivity_0.0.1` | Adds finite plus infinite official science-pack productivity chains. | Shipped guarded profile for infinite level-4 owners only. |
-| `show-missing-bottles-for-current-research_2.0.2` | UI overlay for missing current research ingredients. | Compatible UI utility. |
-| `solar-productivity_3.0.0` | Adds finite solar/accumulator efficiency research via runtime entity upgrades. | Defer/reject for MIR core unless bounded native/prototype model exists. |
-| `space-exploration-spaceproductivity-2_0.1.2` | Allows productivity in Space Exploration space machines, recipes, and beacons. | Companion/rule-mutation territory. |
-| `UnlimitedProductivityFork_2.1.0` | Removes productivity restrictions, allows productivity/quality in beacons, tunes beacon settings. | Companion/rule-mutation territory. |
-| `zz-long-science_2.0.0` | Progressively increases technology cost multipliers as research is completed. | Compatible cost mutator; outside MIR core. |
+| Archive | Role | What it does | MIR plan |
+| --- | --- | --- | --- |
+| `5dim_mining_2.0.3` | `MIR_DOCS_ONLY` | Adds high-tier mining drills, pumpjacks, water pumpjacks, and offshore pumps. | Compatible. MIR may pick up visible drill recipes through Mining Drill Productivity; add explicit support only from recipe-ID evidence. |
+| `asphalt-productivity_1.0.1` | `MIR_STREAM_CANDIDATE` | Adds infinite `Arci-asphalt` recipe productivity at `+0.50`. | `2.2.0` tile/surface productivity candidate after balance policy. |
+| `base-prod_0.0.2` | `MIR_COMPANION_SCOPE` | Mutates base productivity/prototype productivity behavior. | Adjacent rule mutation; no MIR core change. |
+| `bioflux-productivity_0.1.0` | `MIR_REPLACE_EXACT` | Adds one infinite Bioflux recipe-productivity technology. | Shipped exact known-competitor profile. |
+| `combatresearchtech_0.1.0` | `MIR_DOCS_ONLY` | Grants research progress from enemy kills. | Compatible runtime utility; no MIR code needed. |
+| `concrete-productivity_1.2.1` | `MIR_STREAM_CANDIDATE` | Adds concrete/refined-concrete productivity chain, infinite level uses `+0.25`. | Defer. Balance differs from MIR concrete coverage. |
+| `crafting-efficiency-2_0.3.0` | `MIR_REPLACE_EXACT` | Generates staged recipe productivity for selected recipe groups and expansions. | Shipped guarded known-competitor profile; broader families are `2.2.0` candidates. |
+| `crushing-industry-productivity-research_1.0.6` | `MIR_STREAM_CANDIDATE` | Adds ore/crushing productivity for Crushing Industry and forces ore crushing on. | `2.2.0` ore-crushing stream candidate. |
+| `ExpandedProductivityResearch_1.3.8` | `MIR_REPLACE_EXACT` | Broad configurable generator for productivity techs, including science packs and many recipe categories. | Shipped guarded known-competitor profile; broader absorption needs planner work. |
+| `finite_prod_techs_0.1.0` | `MIR_DIAGNOSTIC_ONLY` | Converts infinite productivity techs to finite levels based on recipe productivity caps. | Compatible but order-sensitive; cap-aware UX candidate. |
+| `fish-productivity_1.0.0` | `MIR_REPLACE_EXACT` | Adds infinite fish-breeding recipe productivity. | Shipped exact known-competitor profile. |
+| `foundation-productivity_1.1.1` | `MIR_STREAM_CANDIDATE` | Adds infinite foundation recipe productivity at `+0.25`. | Defer due balance mismatch. |
+| `landfill-productivity_1.0.2` | `MIR_STREAM_CANDIDATE` | Adds landfill productivity chain, final infinite level at `+0.50`. | Defer due balance mismatch. |
+| `miner-start_1.0.0` | `MIR_DIAGNOSTIC_ONLY` | Adds starter mining productivity bonus. | Compatible native/progression tweak; feed future native-overlap policy only if needed. |
+| `mining-prod-0_1.0.2` | `MIR_DIAGNOSTIC_ONLY` | Inserts early `mining-productivity-0` before vanilla mining productivity. | Compatible native/progression tweak; do not replace finite lead-ins. |
+| `modified-productivity-cap_1.2.2` | `MIR_DIAGNOSTIC_ONLY` | Lets startup settings change recipe `maximum_productivity`. | Compatible cap mutator; cap-aware UX candidate. |
+| `more-productivity-research_1.0.1` | `MIR_DOCS_ONLY` | Adds finite science-pack productivity chains. | Compatible; preserve finite lead-ins. |
+| `omniab-space-age-compat_1.3.7` | `MIR_DOCS_ONLY` | Suite-aware Space Age compatibility layer for Bob's, Angel's, and Omnimatter; touches research triggers, resource yields, tile fluids, minable results, and suite unification. | Future Bob/Angel/Omni compatibility-campaign signal; no `2.1.5` stream or cleanup change. |
+| `Prod-Beacon_1.0.3` | `MIR_COMPANION_SCOPE` | Adds a productivity beacon prototype. | Companion/rule-mutation territory. |
+| `prodforce_0.0.8` | `MIR_COMPANION_SCOPE` | Forces productivity/quality allowed effects onto machines and recipes. | Companion/rule-mutation territory. |
+| `Productivity_2.0.5` | `MIR_COMPANION_SCOPE` | Broadly enables productivity for recipes. | Compatible as a producer of more productivity-allowed recipes, but rule mutation is outside MIR core. |
+| `productivity_fix_2.0.0` | `MIR_COMPANION_SCOPE` | Allows productivity in beacons/recycler and broad recipe productivity. | Companion/rule-mutation territory. |
+| `productivity_tech_modules_0.0.3` | `MIR_COMPAT_ADAPTER` | Adds module recipe-productivity technology at `+0.10` for all tiers. | Defer; MIR uses tiered lower module values and should not silently rebalance this chain. |
+| `productivity_weight_fix_0.0.2` | `MIR_DOCS_ONLY` | Adjusts productivity-related weight behavior. | Compatible utility; no MIR action. |
+| `Productivity-config_0.1.1` | `MIR_COMPANION_SCOPE` | Configurable productivity allowances. | Companion/rule-mutation territory. |
+| `productivity-indicator_1.0.0` | `MIR_DOCS_ONLY` | UI/indicator for productivity. | Compatible UI utility. |
+| `productivity-module-3-aquilo_1.0.4` | `MIR_DOCS_ONLY` | Moves or enables productivity module 3 access on Aquilo. | Compatible progression tweak. |
+| `productivity-technology-limit_0.0.2` | `MIR_DIAGNOSTIC_ONLY` | Limits productivity technologies by recipe cap and prior productivity. | Compatible but order-sensitive; cap-aware UX candidate. |
+| `productivity-through-science_1.1.0` | `MIR_REJECT_CORE` | Runtime recipe productivity bonus per researched technology. | Runtime system; not MIR core for `2.1.5` and rejected from core unless a bounded event-driven design is proven. |
+| `ProductivityResearch_2.1.0` | `MIR_REPLACE_EXACT` | Broad recipe-productivity generator with `sem-prfe_` technology IDs. | Shipped guarded known-competitor profile. |
+| `ProductivityResearchForEveryone_1.0.9` | `MIR_REPLACE_EXACT` | Earlier `sem-prfe_` broad recipe-productivity generator. | Shipped guarded known-competitor profile. |
+| `ProductivityResearchForEveryoneFG_1.2.0` | `MIR_REPLACE_EXACT` | Fork with staged science-pack settings for `sem-prfe_` generator. | Shipped guarded known-competitor profile. |
+| `progressive-productivity_1.1.5` | `MIR_REJECT_CORE` | Runtime productivity improves as production statistics rise. | Runtime system; defer or companion only with performance proof. |
+| `py_productivity_1.3.0` | `MIR_STREAM_CANDIDATE` | Hand-authored Pyanodon productivity families for alloys, biomass, casting, glasswork, smelting, and more. | `2.2.0` overhaul-family candidate with recipe-ID proof. |
+| `remove-productivity-cap_1.1.1` | `MIR_DIAGNOSTIC_ONLY` | Sets recipe `maximum_productivity` extremely high. | Compatible cap mutator; cap-aware UX candidate. |
+| `Research_Productivity_1.1.3` | `MIR_COMPAT_ADAPTER` | Adds native laboratory-productivity finite levels and infinite `laboratory-productivity-4`. | Shipped effect-proven lab-productivity skip. |
+| `research-control-tower_1.3.1` | `MIR_DOCS_ONLY` | Circuit-controlled automation for choosing infinite research. | Compatible with MIR infinite techs. |
+| `research-cost-curve_0.1.4` | `MIR_DOCS_ONLY` | Runtime science-cost multiplier curve after research completion, plus fixed startup cost option. | Compatible cost tool; outside MIR core. |
+| `research-fixer_1.0.6` | `MIR_DOCS_ONLY` | Adds missing science prerequisite links inferred from science ingredients. | Generally compatible; monitor if it touches MIR techs. |
+| `research-multipliers_0.2.0` | `MIR_DOCS_ONLY` | Startup research cost multipliers by pack, infinite status, planet, and individual tech. | Compatible cost mutator; order-sensitive. |
+| `research-skip_1.0.1` | `MIR_DOCS_ONLY` | Unlocks early/midgame technologies at game start or by command. | Compatible progression utility. |
+| `ResearchProductivity_Rebalance_1.0.0` | `MIR_COMPAT_ADAPTER` | Rebalances Space Age `research-productivity` cost/time. | Compatible; MIR already skips vanilla `research-productivity`. |
+| `rosnok-productivity-quality-beacon_1.1.2` | `MIR_COMPANION_SCOPE` | Allows productivity and quality in beacons. | Companion/rule-mutation territory. |
+| `SchallModules_2.0.0` | `MIR_COMPANION_SCOPE` | Adds module tiers/options and mutates allowed beacon effects. | Adjacent module ecosystem; no MIR absorption. |
+| `Science_packs_productivity_0.0.1` | `MIR_REPLACE_EXACT` | Adds finite plus infinite official science-pack productivity chains. | Shipped guarded profile for infinite level-4 owners only. |
+| `show-missing-bottles-for-current-research_2.0.2` | `MIR_DOCS_ONLY` | UI overlay for missing current research ingredients. | Compatible UI utility. |
+| `solar-productivity_3.0.0` | `MIR_REJECT_CORE` | Adds finite solar/accumulator efficiency research via runtime entity upgrades. | Defer/reject for MIR core unless bounded native/prototype model exists. |
+| `space-exploration-spaceproductivity-2_0.1.2` | `MIR_COMPANION_SCOPE` | Allows productivity in Space Exploration space machines, recipes, and beacons. | Companion/rule-mutation territory. |
+| `UnlimitedProductivityFork_2.1.0` | `MIR_COMPANION_SCOPE` | Removes productivity restrictions, allows productivity/quality in beacons, tunes beacon settings. | Companion/rule-mutation territory. |
+| `zz-long-science_2.0.0` | `MIR_DOCS_ONLY` | Progressively increases technology cost multipliers as research is completed. | Compatible cost mutator; outside MIR core. |
 
 ## Release Checklist From This Audit
 

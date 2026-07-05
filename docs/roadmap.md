@@ -282,13 +282,28 @@ Compatibility planner foundations plus first evidence-backed stream families.
 
 `v2.2.0` is not the release that absorbs every useful idea-mod behavior. Most ideamods are compatibility signals, not planned MIR features. The release's job is to turn a small number of remaining audit signals into designed MIR-owned behavior, with fixtures proving recipe IDs, ownership, value matching, lab compatibility, and non-replacement of balance-distinct chains.
 
+The role question for each audited mod is:
+
+```text
+What role should MIR take for this mod?
+```
+
+It is not:
+
+```text
+Can MIR replace this mod?
+```
+
+Use `docs/compatibility-program.md` as the decision framework for roles such as exact replacement, MIR-owned stream candidate, compatibility adapter, diagnostic-only, companion scope, docs-only, or rejected from core.
+
 Preferred order:
 
-1. Cap-aware diagnostics, because they improve user understanding without silently changing balance.
-2. Ore-crushing productivity, if Crushing Industry recipe IDs and ownership rules fixture cleanly.
-3. Tile and surface productivity policy, only after deciding the stream split and default values.
-4. One overhaul material-family prototype, limited to a concrete recipe family with visible IDs.
-5. Native modifier overlap policy, kept small enough to avoid a framework detour.
+1. Compatibility planner/registry, so detected mods, roles, actions, non-actions, and public claims share one control surface.
+2. Cap-aware diagnostics, because they improve user understanding without silently changing balance.
+3. Ore-crushing productivity, if Crushing Industry recipe IDs and ownership rules fixture cleanly.
+4. Tile and surface productivity policy, only after deciding the stream split and default values.
+5. One overhaul material-family prototype, limited to a concrete recipe family with visible IDs.
+6. Native modifier overlap policy, kept small enough to avoid a framework detour.
 
 Tile and surface productivity should default to conservative MIR-owned values, replace external owners only on exact value matches, and move any high-value tile profile behind an explicit setting or later design decision.
 
@@ -298,8 +313,10 @@ Non-goals for `v2.2.0`:
 - Runtime production-based productivity systems.
 - Broad overhaul compatibility claims without a matrix and load evidence.
 - Generic productivity generation from names alone.
+- Copying external mod code without license review and accepted attribution obligations.
+- Claiming full replacement when MIR only owns the research-stream portion of a mod.
 
-The compatibility matrix in `docs/compatibility-matrix.md` is the claim ledger for these decisions. A row may be planned or future, but public compatibility claims require an explicit tested profile, validation artifact, and notes about what MIR refuses to own.
+The compatibility matrix in `docs/compatibility-matrix.md` is the claim ledger for these decisions. A row may be planned or future, but public compatibility claims require an explicit tested profile, validation artifact, role enum, save-compatibility notes, and notes about what MIR refuses to own.
 
 Future overhaul work should be staged as campaigns after `v2.2.0`, not folded into this release. Keep Krastorio 2, AAI Industry, Bob's focused subsets, Space Exploration, K2 plus Space Exploration, and K2 Spaced Out / Space Age as separate matrices because their Factorio lines, dependency shapes, progression rules, and productivity restrictions differ.
 
