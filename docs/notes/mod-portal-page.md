@@ -13,7 +13,7 @@ It is built for players who want more long-term scaling for late-game megabases,
 - Adopts safe mod-added recipes into configured vanilla Space Age productivity families instead of creating parallel research.
 - Startup settings let you enable, disable, cap, or rebalance almost every generated research.
 - Works with Factorio `2.0`; requires `base >= 2.0`. Space Age is optional.
-- Version `1.9.5` is the Factorio `2.0` compatibility port of the tested `2.1.0` source snapshot. Factorio `2.1`-only cargo logistics research is excluded from this legacy build.
+- Version `1.9.1` is the Factorio `2.0` compatibility port of the tested `2.1.0` source snapshot. Factorio `2.1`-only cargo logistics research is excluded from this legacy build.
 
 Recipe productivity researches are infinite, but Factorio's recipe productivity cap still applies. Once a recipe reaches that cap, more levels may no longer improve that recipe.
 
@@ -209,11 +209,11 @@ If a recipe did not receive productivity:
 
 ## Save Compatibility
 
-Version `1.9.5` preserves generated technology IDs except for documented intentional migrations inherited from the tested current-line source:
+Version `1.9.1` preserves generated technology IDs except for documented intentional migrations inherited from the tested current-line source:
 
 - Old generated trash-slot progress migrates into the combined Character inventory slots technology.
 - Old generated Stone product productivity progress migrates into the new Landfill productivity technology. Artificial soil productivity and Molten metals productivity are new separate research lines.
 
 Existing saves receive the `2.0.5` and `2.1.0` JSON migrations automatically when the mod loads.
 
-Scripted spoilage and agriculture effects are disabled by default in `1.9.5`. Enable them only if you want to test the experimental behavior and report results.
+Scripted spoilage and agriculture effects are disabled by default in `1.9.1`. Enable them only if you want to test the experimental behavior and report results.

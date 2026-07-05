@@ -9,7 +9,7 @@ Release-line summary:
 | `2.0.5` | `2.1.x` | quick feedback patch: small fixes, default-off scripted agriculture/spoilage candidates, docs, validation, package parity |
 | `1.9.0` | `2.0.x` | compatible subset backported from the tested `2.0.5` quick-patch snapshot |
 | `2.1.0` | `2.1.x` | larger feature wave: simpler settings, icon policy, fluid productivity, pipeline extent, and targeted duplicate-productivity compatibility |
-| `1.9.5` | `2.0.x` | compatible subset backported from the tested `2.1.0` larger feature snapshot |
+| `1.9.1` | `2.0.x` | compatible subset backported from the tested `2.1.0` larger feature snapshot |
 | `2.1.5` | `2.1.x` | quick feedback patch after `2.1.0` |
 | `1.9.9` | `2.0.x` | final planned Factorio 2.0 port from the latest tested `2.x.x` snapshot when Factorio 2.1 becomes stable or another verified upstream cutoff is chosen |
 
@@ -260,7 +260,7 @@ Do not publish a compatibility-heavy archive from static validation alone. After
 
 ## Legacy Backport Model
 
-The Factorio `2.0` legacy release More Infinite Research `v1.9.0` was released from the `legacy` branch, backported from the tested More Infinite Research `v2.0.5` Factorio `2.1` quick-patch codebase. `v1.9.5` follows the same snapshot-port model from the tested More Infinite Research `v2.1.0` source point. Optional `v2.1.5` feedback fixes can use a later `v1.9.6` or `v1.9.7` legacy patch if they are worth porting, and `v1.9.9` is reserved as the final planned Factorio `2.0` build from the latest tested `2.x.x` snapshot when Factorio `2.1` becomes stable or another verified upstream cutoff is chosen.
+The Factorio `2.0` legacy release More Infinite Research `v1.9.0` was released from the `legacy` branch, backported from the tested More Infinite Research `v2.0.5` Factorio `2.1` quick-patch codebase. `v1.9.1` follows the same snapshot-port model from the tested More Infinite Research `v2.1.0` source point. Optional `v2.1.5` feedback fixes can use a later `v1.9.6` or `v1.9.7` legacy patch if they are worth porting, and `v1.9.9` is reserved as the final planned Factorio `2.0` build from the latest tested `2.x.x` snapshot when Factorio `2.1` becomes stable or another verified upstream cutoff is chosen.
 
 Legacy should not be reconstructed commit-by-commit from older release history. `v1.9.0` ported the tested `v2.0.5` snapshot: current MIR generator, diagnostics, recipe matching, science-pack handling, compatibility cleanup, docs structure, locale, and validation infrastructure with Factorio `2.1`-only surface area removed or guarded.
 
@@ -268,7 +268,7 @@ Legacy `info.json` must use Factorio `2.0` metadata:
 
 ```json
 {
-  "version": "1.9.5",
+  "version": "1.9.1",
   "factorio_version": "2.0",
   "dependencies": [
     "base >= 2.0",

@@ -13,7 +13,7 @@ More Infinite Research adds **configurable infinite productivity** and **bonus r
 logistics chains, combat bonuses, player bonuses, and Space Age gaps that vanilla Factorio does not cover.
 
 Version **`1.x.x`** targets **Factorio `2.0`** and requires `base >= 2.0`.
-The current legacy build is **`1.9.5`**, a Factorio `2.0` compatibility port of the tested **`2.1.0`** source snapshot with Factorio `2.1`-only cargo logistics streams excluded.
+The current legacy build is **`1.9.1`**, ported from tested **`2.1.0`** with Factorio `2.1`-only cargo logistics excluded.
 
 Version **`2.x.x`** targets **Factorio `2.1`**. The current **`2.1.0`** release requires:
 
@@ -50,7 +50,7 @@ Install the mod through the **Factorio mod portal** or place the **release zip**
 The packaged release archive is:
 
 ```text
-dist/more-infinite-research_1.9.5.zip
+dist/more-infinite-research_1.9.1.zip
 ```
 
 ## Branch Policy
@@ -64,7 +64,7 @@ The repository has **three permanent branches** on `origin`:
 Normal development should target **`dev`** first. Release-ready hotfixes can target **`main`**.
 Backports that must remain compatible with Factorio `2.0.x` belong on **`legacy`**.
 Legacy releases are snapshot ports of tested current-line releases with unsupported newer Factorio surfaces removed, not commit-by-commit rebuilds of old development history.
-Current legacy status: `v1.9.5` is the Factorio `2.0` port of tested `v2.1.0`; optional `2.1.5` feedback fixes can use a later `1.9.6` or `1.9.7` legacy patch if they are worth porting.
+Current legacy status: `v1.9.1` ports tested `v2.1.0`; optional `2.1.5` feedback fixes can use a later `1.9.6` or `1.9.7` legacy patch if they are worth porting.
 
 See **`CONTRIBUTING.md`** for pull request expectations, branch routing, and validation commands.
 

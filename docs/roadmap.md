@@ -32,7 +32,7 @@ The minimum manual smoke checks gate the `v2.0.5` quick patch. The full scripted
 | `2.0.5` | `2.1.x` | Quick feedback patch | small/easy fixes, default-off scripted agriculture/spoilage candidates, docs, validation, package parity |
 | `1.9.0` | `2.0.x` | Legacy port | compatible subset of the tested `2.0.5` quick-patch snapshot |
 | `2.1.0` | `2.1.x` | Larger feature wave | simpler settings, icon policy, fluid productivity, pipeline extent, and targeted duplicate-productivity compatibility |
-| `1.9.5` | `2.0.x` | Legacy port | compatible subset of the tested `2.1.0` larger feature snapshot |
+| `1.9.1` | `2.0.x` | Legacy port | compatible subset of the tested `2.1.0` larger feature snapshot |
 | `2.1.5` | `2.1.x` | Quick feedback patch | small fixes and feedback from `2.1.0` |
 | `1.9.6` or `1.9.7` | `2.0.x` | Optional legacy patch | only if bounded `2.1.5` fixes are worth porting |
 | `2.2.0` | `2.1.x` | Larger feature wave | next larger batch after the `2.1.x` feedback cycle |
@@ -297,7 +297,7 @@ Backport mappings:
 | Current MIR release | Factorio line | Legacy MIR release | Factorio line |
 | --- | --- | --- | --- |
 | `2.0.5` | `2.1.x` | `1.9.0` | `2.0.x` |
-| `2.1.0` | `2.1.x` | `1.9.5` | `2.0.x` |
+| `2.1.0` | `2.1.x` | `1.9.1` | `2.0.x` |
 | optional `2.1.5` feedback fixes | `2.1.x` | `1.9.6` or `1.9.7` | `2.0.x` |
 | latest tested `2.x.x` at the stable cutoff | `2.1.x` | `1.9.9` | `2.0.x` |
 
@@ -452,6 +452,6 @@ Recommended order from here:
 4. Move only failed or too-large `v2.0.5` candidates to `v2.1.0`.
 5. Ship `v2.1.0` as the larger feature wave.
 6. Ship quick `v2.1.5` feedback fixes.
-7. Backport the next tested `v2.1.x` snapshot as `v1.9.5`.
+7. Backport the tested `v2.1.0` snapshot as `v1.9.1`.
 8. Ship the next larger wave as `v2.2.0`.
 9. When Factorio 2.1 becomes stable or another verified upstream cutoff is chosen, backport the latest tested MIR `2.x.x` release as final Factorio 2.0 build `v1.9.9`.
