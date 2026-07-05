@@ -468,17 +468,37 @@ The current overnight/local-library automation is usable. Keep `scripts/mir.ps1`
 
 Use `v2.1.5` for small fixes after `v2.1.0`.
 
+Idea-mod audit planning lives in `docs/notes/ideamods-readonly-mix-audit-2026-07-05.md`.
+
+| Audit lane | `v2.1.5` decision |
+| --- | --- |
+| Exact infinite recipe-productivity overlap | Ship only guarded known-competitor profiles. |
+| Native lab-productivity duplicate | Ship the precise `Research_Productivity` skip. |
+| Balance-heavy finite chains | Preserve/defer; do not silently replace. |
+| Rule mutators, cap mutators, runtime productivity, and cost tools | Keep compatible/adjacent; do not absorb in this patch. |
+
 - [ ] Fix bugs reported against `v2.1.0`.
 - [x] Add small compatibility profiles only when the missing recipes/prototypes are concrete.
 - [x] Add exact known-competitor profiles from the `ideamods_readonly_mix` audit.
 - [x] Skip MIR lab productivity when Research Productivity's native infinite lab-productivity chain is active.
+- [x] Add locale/docs/validation updates.
 - [ ] Add proven recipe IDs to existing streams when no new architecture is needed.
-- [ ] Add locale/docs/validation updates.
 - [ ] Rebalance costs or defaults for features already shipped in `v2.1.0`.
 
 ## v2.2.0 Larger Feature Wave
 
 Use `v2.2.0` for the next larger batch after the `v2.1.x` feedback cycle.
+
+Idea-mod audit candidates should be promoted only after recipe-ID proof, balance decisions, and validation fixtures.
+
+| Candidate | Source signal | First useful slice |
+| --- | --- | --- |
+| Tile/surface productivity | Asphalt, concrete, landfill, foundation productivity mods | Decide stream split and default values before implementation. |
+| Ore crushing productivity | Crushing Industry productivity research | Recipe-ID driven Crushing Industry stream or compatibility profile. |
+| Overhaul material families | Pyanodon, Expanded Productivity Research, Crafting Efficiency | Pick one concrete family first; avoid a generic generator. |
+| Cap-aware UX | Productivity cap and finite-limit helper mods | Diagnostics or explicit setting; never silent cap mutation. |
+| Native overlap policy | Lab, mining, solar, and other native productivity mods | General skip/warn/prefer/allow behavior with fixtures. |
+| Companion boundary | Beacon/module/productivity-rule mutator mods | Decide whether this belongs outside MIR core. |
 
 - [ ] Revisit pump/fluid/logistics work that was too large for `v2.1.0`.
 - [ ] Revisit advanced settings UX if presets are not enough.
