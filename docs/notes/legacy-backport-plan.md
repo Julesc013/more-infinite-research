@@ -16,7 +16,7 @@ Each temporary branch now has its own branch-local RC planning report in
 
 | Branch | Target | Planned MIR release slot(s) | Planning commit |
 | --- | --- | --- | --- |
-| `tmp/2.0` | Factorio `2.0.x` | `1.9.7`, `1.9.8`, `1.9.9` | `9f1db40` |
+| `tmp/2.0` | Factorio `2.0.x` | `1.9.0` trhough `1.9.9` | `9f1db40` | Stable `tmp/2.0` pushed to `legacy` 
 | `tmp/1.1` | Factorio `1.1.x` | `1.8.8`, `1.8.9` | `eecfc29` |
 | `tmp/1.0` | Factorio `1.0.x` | `1.8.6`, `1.8.7` | `0692099` |
 | `tmp/0.17` | Factorio `0.17.x` | `1.8.4`, `1.8.5` | `fe65c21` |
