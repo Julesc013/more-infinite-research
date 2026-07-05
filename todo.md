@@ -514,13 +514,13 @@ Idea-mod audit candidates should be promoted only after recipe-ID proof, balance
 
 Do not reconstruct old releases commit-by-commit for `legacy`. A legacy release is a compatibility port of a tested current-line snapshot.
 
-### v1.9.5 Backport From The Tested v2.1.0 Snapshot
+### v1.9.1 Backport From The Tested v2.1.0 Snapshot
 
 - [x] Use the tested `v2.1.0` source point as the legacy snapshot.
 - [x] Configure a real Factorio `2.0.x` binary for `release-targeted-2.0` and local-audit profiles.
 - [x] Snapshot or merge that tested source point into the legacy backport branch.
 - [x] Apply the same Factorio `2.0` compatibility patch rules as `v1.9.0`.
-- [x] Build `dist/more-infinite-research_1.9.5.zip`.
+- [x] Build `dist/more-infinite-research_1.9.1.zip`.
 - [x] Validate with a Factorio `2.0.x` binary.
 
 ### Optional v1.9.6 / v1.9.7 Feedback Backports

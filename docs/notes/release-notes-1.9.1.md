@@ -1,10 +1,10 @@
-# More Infinite Research 1.9.5 Release Notes
+# More Infinite Research 1.9.1 Release Notes
 
-This is the short, player-facing release summary for the `1.9.5` legacy mod portal release notes. It is derived from `changelog.txt`; the changelog remains the detailed source of truth.
+This is the short, player-facing release summary for the `1.9.1` legacy mod portal release notes. It is derived from `changelog.txt`; the changelog remains the detailed source of truth.
 
 ## Headline
 
-`1.9.5` is the Factorio `2.0` compatibility port of the tested More Infinite Research `2.1.0` source snapshot.
+`1.9.1` is the Factorio `2.0` compatibility port of the tested More Infinite Research `2.1.0` source snapshot.
 
 ## What Changed
 

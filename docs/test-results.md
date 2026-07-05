@@ -2,12 +2,12 @@
 
 This file records local release-candidate validation runs. It is not a substitute for the manual mod matrix in `docs/compatibility.md`.
 
-## 2026-07-05 1.9.5 Factorio 2.0.77 Release Gate
+## 2026-07-05 1.9.1 Factorio 2.0.77 Release Gate
 
 Environment:
 
 - Branch: `legacy`.
-- Mod version `1.9.5`.
+- Mod version `1.9.1`.
 - Factorio binary: Steam Factorio `2.0.77`.
 - Local 2.0 mod library: `C:\Projects\Factorio\testmods_readonly_2.0`.
 
@@ -16,7 +16,7 @@ Scope:
 - Validated the legacy Factorio `2.0` package with a real Factorio `2.0.x` executable.
 - Fixed base-only compatibility-audit scenarios so empty local roots are valid.
 - Shortened audit run directory names to avoid Windows path-length false negatives.
-- Built the release package `dist\more-infinite-research_1.9.5.zip`.
+- Built the release package `dist\more-infinite-research_1.9.1.zip`.
 
 Release-targeted result:
 
@@ -30,15 +30,15 @@ Release-targeted result:
 Artifact:
 
 ```text
-artifacts\release-targeted-1.9.5-factorio-2.0.77-clean
+artifacts\release-targeted-1.9.1-factorio-2.0.77-clean
 ```
 
-## 2026-07-05 1.9.5 Local 2.0 Library Sweep
+## 2026-07-05 1.9.1 Local 2.0 Library Sweep
 
 Environment:
 
 - Branch: `legacy`.
-- Mod version `1.9.5`.
+- Mod version `1.9.1`.
 - Factorio binary: Steam Factorio `2.0.77`.
 - Local 2.0 mod library: `C:\Projects\Factorio\testmods_readonly_2.0`.
 
@@ -63,8 +63,8 @@ Reviewed load failures:
 Artifacts:
 
 ```text
-F:\Factorio\mir-artifacts\local-audit-1.9.5-factorio-2.0.77-20260705-174732
-F:\Factorio\mir-artifacts\generated-local-1.9.5-factorio-2.0.77-empty-safe
+F:\Factorio\mir-artifacts\local-audit-1.9.1-factorio-2.0.77-20260705-174732
+F:\Factorio\mir-artifacts\generated-local-1.9.1-factorio-2.0.77-empty-safe
 ```
 
 ## 2026-07-05 2.1.5 Local Dependency Cache Follow-Up
@@ -246,7 +246,7 @@ Environment:
 
 Scope:
 
-- Accepted the legacy `1.9.5` changelog entry from `origin/legacy` into the current dev changelog.
+- Accepted the legacy `1.9.1` changelog entry from `origin/legacy` into the current dev changelog.
 - Added a dated empty `2.1.5` changelog header for the new feedback-patch line without inventing fake release bullets.
 - Bumped `info.json` to `2.1.5`.
 - Kept README and compatibility docs generic for the active `2.x` Factorio `2.1` line.
@@ -261,7 +261,7 @@ git diff --check
 
 Results:
 
-- The imported `1.9.5` changelog entry records the tested `2.1.0` snapshot backport to Factorio `2.0`.
+- The imported `1.9.1` changelog entry records the tested `2.1.0` snapshot backport to Factorio `2.0`.
 - The top `2.1.5` changelog section is intentionally empty until there are shipped changes to list.
 
 ## 2026-07-04 Release Gate Reuse And README Cleanup
@@ -277,7 +277,7 @@ Scope:
 - Parameterized release smoke mod names, representative scenario name, manual scenario file, audit Factorio versions, and pull branch.
 - Wired the new release-gate parameters through `mir.ps1 run -Profile release-targeted`.
 - Simplified README branch/backport and release-gate wording so release-specific defaults no longer dominate the main docs.
-- Updated current roadmap, compatibility, TODO, and manual-test docs so `v1.9.5` is the next tested `2.1.x` snapshot port.
+- Updated current roadmap, compatibility, TODO, and manual-test docs so `v1.9.1` is the tested `2.1.0` snapshot port.
 
 Commands:
 
@@ -2019,7 +2019,7 @@ Results:
 
 - Reordered the planned Factorio `2.0.x` legacy cadence so `v1.9.0` is now a compatibility backport of the tested `v2.0.5` quick-patch snapshot.
 - Kept `v2.1.0` as the next larger Factorio `2.1.x` feature wave after `v2.0.5` and `v1.9.0`.
-- Kept later backport cadence as `v2.1.5 -> v1.9.5` and final `v1.9.9` from the latest tested `2.x.x` source snapshot at the verified upstream cutoff.
+- Kept later backport cadence as optional `v2.1.5 -> v1.9.6` or `v1.9.7` fixes and final `v1.9.9` from the latest tested `2.x.x` source snapshot at the verified upstream cutoff.
 - Preserved the requirement that `v1.9.0` remove or guard Factorio `2.1`-only cargo modifier surfaces unless Factorio `2.0.x` validation proves support.
 
 ## 2026-07-01 Diagnostic Cargo Overlap Pull-Forward
@@ -2212,7 +2212,7 @@ git diff --check
 
 Results:
 
-- Updated the docs back to the intended cadence: `v2.0.5` is the quick feedback patch for easy validated changes, `v2.1.0` is the larger feature wave, `v1.9.0` is backported from `v2.1.0`, `v2.1.5` can backport to `v1.9.5`, and `v1.9.9` is reserved as the final planned Factorio `2.0` port from the latest tested `2.x.x` snapshot at the Factorio `2.1` stable cutoff target.
+- Updated the docs back to the intended cadence: `v2.0.5` is the quick feedback patch for easy validated changes, `v2.1.0` is the larger feature wave, `v1.9.0` is backported from `v2.1.0`, optional `v2.1.5` fixes can backport to `v1.9.6` or `v1.9.7`, and `v1.9.9` is reserved as the final planned Factorio `2.0` port from the latest tested `2.x.x` snapshot at the Factorio `2.1` stable cutoff target.
 - Rebuilt the `2.0.5` release archive after README, roadmap, TODO, compatibility, API proof, manual-test, post-2.0 planning, changelog, and test-results updates.
 - Static validation passed with package/source/docs parity.
 - `git diff --check` passed.
@@ -2236,7 +2236,7 @@ git diff --check
 
 Results:
 
-- Rebuilt the `2.0.5` release archive after README/docs updates for the release cadence: `v2.0.5` quick feedback patch, `v2.1.0` larger feature wave, `v2.1.0 -> v1.9.0` first legacy port, later `v2.1.5 -> v1.9.5`, and final `v1.9.9` legacy port from the latest tested `2.x.x` snapshot.
+- Rebuilt the `2.0.5` release archive after README/docs updates for the release cadence: `v2.0.5` quick feedback patch, `v2.1.0` larger feature wave, `v2.1.0 -> v1.9.0` first legacy port, optional `v2.1.5 -> v1.9.6` or `v1.9.7` fixes, and final `v1.9.9` legacy port from the latest tested `2.x.x` snapshot.
 - Static validation passed with the new branch-aware metadata check.
 - Static validation passed with the new no-`on_tick` control-stage guard.
 - Package validation now requires `docs/api-proof-points.md` and `docs/manual-test-plan.md`.
