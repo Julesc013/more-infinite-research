@@ -32,8 +32,9 @@ The minimum manual smoke checks gate the `v2.0.5` quick patch. The full scripted
 | `2.0.5` | `2.1.x` | Quick feedback patch | small/easy fixes, default-off scripted agriculture/spoilage candidates, docs, validation, package parity |
 | `1.9.0` | `2.0.x` | Legacy port | compatible subset of the tested `2.0.5` quick-patch snapshot |
 | `2.1.0` | `2.1.x` | Larger feature wave | simpler settings, icon policy, fluid productivity, pipeline extent, and targeted duplicate-productivity compatibility |
+| `1.9.5` | `2.0.x` | Legacy port | compatible subset of the tested `2.1.0` larger feature snapshot |
 | `2.1.5` | `2.1.x` | Quick feedback patch | small fixes and feedback from `2.1.0` |
-| `1.9.5` | `2.0.x` | Legacy port | compatible subset of the next tested `2.1.x` snapshot |
+| `1.9.6` / `1.9.7` | `2.0.x` | Optional legacy patch | selected compatible feedback fixes from `2.1.5` if they are worth porting |
 | `2.2.0` | `2.1.x` | Larger feature wave | next larger batch after the `2.1.x` feedback cycle |
 | `1.9.9` | `2.0.x` | Final legacy port | final Factorio 2.0 port from the latest tested `2.x.x` current-line release when Factorio 2.1 becomes stable or another verified upstream cutoff is chosen |
 

@@ -96,7 +96,8 @@ Required on the `legacy` branch with a Factorio `2.0.x` binary:
 | `legacy-1.9.0-static` | Static validation with `factorio_version = "2.0"` and `base >= 2.0` for the `v2.0.5 -> v1.9.0` port |
 | `legacy-1.9.0-no-2.1-cargo` | Confirm 2.1-only cargo modifier strings are absent in `v1.9.0` |
 | `legacy-1.9.0-runtime-2.0` | Run `Invoke-MIRValidation.ps1` with a Factorio `2.0.x` binary for `v1.9.0` |
-| `legacy-1.9.5-runtime-2.0` | Repeat the same validation for the next tested `v2.1.x -> v1.9.5` port |
+| `legacy-1.9.5-runtime-2.0` | Validate the tested `v2.1.0 -> v1.9.5` legacy port |
+| `legacy-1.9.6-feedback-runtime-2.0` | Validate any optional `v2.1.5` feedback fixes selected for a later legacy patch |
 | `legacy-1.9.9-final` | Validate the final Factorio `2.0` port from the latest tested `2.x.x` snapshot |
 | `legacy-space-age` | Confirm any optional Space Age subset supported by Factorio `2.0.x` |
 | `legacy-generated-tech-ids` | Compare generated technology names against expected legacy snapshot |

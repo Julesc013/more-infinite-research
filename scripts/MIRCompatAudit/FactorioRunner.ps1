@@ -3,7 +3,7 @@ $ErrorActionPreference = "Stop"
 function New-MIRCompatUserDataDir {
   param([Parameter(Mandatory)][string]$Root)
 
-  $dir = Join-Path $Root ("user-data-" + [guid]::NewGuid().ToString("N"))
+  $dir = Join-Path $Root ("u-" + [guid]::NewGuid().ToString("N").Substring(0, 12))
   New-Item -ItemType Directory -Path $dir | Out-Null
   New-Item -ItemType Directory -Path (Join-Path $dir "mods") | Out-Null
   New-Item -ItemType Directory -Path (Join-Path $dir "saves") | Out-Null
@@ -95,7 +95,7 @@ function Copy-MIRCachedModZips {
   param(
     [Parameter(Mandatory)][string]$CacheDir,
     [Parameter(Mandatory)][string]$ModsDir,
-    [Parameter(Mandatory)][object[]]$LockEntries,
+    [object[]]$LockEntries = @(),
     [ValidateSet("Copy", "Hardlink", "Symlink")]
     [string]$LinkMode = "Copy"
   )

@@ -487,14 +487,20 @@ Use `v2.2.0` for the next larger batch after the `v2.1.x` feedback cycle.
 
 Do not reconstruct old releases commit-by-commit for `legacy`. A legacy release is a compatibility port of a tested current-line snapshot.
 
-### v1.9.5 Backport From The Next Tested v2.1.x Snapshot
+### v1.9.5 Backport From The Tested v2.1.0 Snapshot
 
-- [ ] Finish and validate the selected `v2.1.x` source point.
-- [ ] Configure a real Factorio `2.0.x` binary for `release-targeted-2.0` and `overnight-local-2.0` profiles.
-- [ ] Snapshot or merge that tested source point into a temporary legacy backport branch.
-- [ ] Apply the same Factorio `2.0` compatibility patch rules as `v1.9.0`.
-- [ ] Build `dist/more-infinite-research_1.9.5.zip`.
-- [ ] Validate with a Factorio `2.0.x` binary.
+- [x] Use the tested `v2.1.0` source point as the legacy snapshot.
+- [x] Configure a real Factorio `2.0.x` binary for `release-targeted-2.0` and local-audit profiles.
+- [x] Snapshot or merge that tested source point into the legacy backport branch.
+- [x] Apply the same Factorio `2.0` compatibility patch rules as `v1.9.0`.
+- [x] Build `dist/more-infinite-research_1.9.5.zip`.
+- [x] Validate with a Factorio `2.0.x` binary.
+
+### Optional v1.9.6 / v1.9.7 Feedback Backports
+
+- [ ] After `v2.1.5`, decide whether any current-line fixes are worth a legacy feedback patch.
+- [ ] Backport only compatible, evidence-backed fixes that do not add Factorio `2.1`-only surface.
+- [ ] Validate any optional legacy feedback patch with a real Factorio `2.0.x` binary.
 
 ### v1.9.9 Final Factorio 2.0 Backport
 

@@ -9,8 +9,8 @@ Release-line summary:
 | `2.0.5` | `2.1.x` | quick feedback patch: small fixes, default-off scripted agriculture/spoilage candidates, docs, validation, package parity |
 | `1.9.0` | `2.0.x` | compatible subset backported from the tested `2.0.5` quick-patch snapshot |
 | `2.1.0` | `2.1.x` | larger feature wave: simpler settings, icon policy, fluid productivity, pipeline extent, and targeted duplicate-productivity compatibility |
+| `1.9.5` | `2.0.x` | compatible subset backported from the tested `2.1.0` larger feature snapshot |
 | `2.1.5` | `2.1.x` | quick feedback patch after `2.1.0` |
-| `1.9.5` | `2.0.x` | compatible subset backported from the next tested `2.1.x` snapshot |
 | `1.9.9` | `2.0.x` | final planned Factorio 2.0 port from the latest tested `2.x.x` snapshot when Factorio 2.1 becomes stable or another verified upstream cutoff is chosen |
 
 The release goal is graceful compatibility without mod-page dependency clutter: compatible mods should work when their prototypes are visible, absent mods should be skipped cleanly, and no compatibility mod should be required for this mod to load.
@@ -260,7 +260,7 @@ Do not publish a compatibility-heavy archive from static validation alone. After
 
 ## Legacy Backport Model
 
-The Factorio `2.0` legacy release More Infinite Research `v1.9.0` has been released from the `legacy` branch, backported from the tested More Infinite Research `v2.0.5` Factorio `2.1` quick-patch codebase. Later legacy ports should follow the same snapshot-port model. `v1.9.5` is reserved for the next tested `2.1.x` snapshot that is worth porting, and `v1.9.9` is reserved as the final planned Factorio `2.0` build from the latest tested `2.x.x` snapshot when Factorio `2.1` becomes stable or another verified upstream cutoff is chosen.
+The Factorio `2.0` legacy release More Infinite Research `v1.9.0` was released from the `legacy` branch, backported from the tested More Infinite Research `v2.0.5` Factorio `2.1` quick-patch codebase. `v1.9.5` follows the same snapshot-port model from the tested More Infinite Research `v2.1.0` source point. Optional `v2.1.5` feedback fixes can use a later `v1.9.6` or `v1.9.7` legacy patch if they are worth porting, and `v1.9.9` is reserved as the final planned Factorio `2.0` build from the latest tested `2.x.x` snapshot when Factorio `2.1` becomes stable or another verified upstream cutoff is chosen.
 
 Legacy should not be reconstructed commit-by-commit from older release history. `v1.9.0` ported the tested `v2.0.5` snapshot: current MIR generator, diagnostics, recipe matching, science-pack handling, compatibility cleanup, docs structure, locale, and validation infrastructure with Factorio `2.1`-only surface area removed or guarded.
 
@@ -268,7 +268,7 @@ Legacy `info.json` must use Factorio `2.0` metadata:
 
 ```json
 {
-  "version": "1.9.0",
+  "version": "1.9.5",
   "factorio_version": "2.0",
   "dependencies": [
     "base >= 2.0",
@@ -280,7 +280,7 @@ Legacy `info.json` must use Factorio `2.0` metadata:
 
 Do not carry the Factorio `2.1.x` base or optional official DLC dependency floors into legacy unless a later Factorio `2.0` validation run proves a specific ordering requirement.
 
-Known legacy `1.9.0` exclusions:
+Known legacy `1.9.x` exclusions:
 
 - `research_cargo_bay_unloading_distance`
 - `research_cargo_landing_pad_count`
@@ -291,7 +291,7 @@ Known legacy `1.9.0` exclusions:
 
 Keep these architecture pieces from the tested current-line source snapshot unless Factorio `2.0` validation proves a specific incompatibility: `data-final-fixes.lua` generation, lab-input science-pack discovery, lab incompatibility policy, science-pack ingredient policy, recipe matching, diagnostics, base-tech extension safety, opportunistic compatibility cleanup, validation/package parity tooling, docs structure, and locale structure.
 
-Validation is branch-aware from `info.json`: Factorio `2.1` checks require cargo streams and the `2.1.8` dependency floor, while Factorio `2.0` checks reject Factorio `2.1` dependency floors, require those cargo modifier strings to be absent from direct-effect stream definitions, skip Factorio `2.1` cargo runtime fixtures, and expect the package to build as `more-infinite-research_1.9.0.zip`.
+Validation is branch-aware from `info.json`: Factorio `2.1` checks require cargo streams and the `2.1.8` dependency floor, while Factorio `2.0` checks reject Factorio `2.1` dependency floors, require those cargo modifier strings to be absent from direct-effect stream definitions, skip Factorio `2.1` cargo runtime fixtures, and expect the package to build from the active `1.9.x` metadata.
 
 ## Opportunistic Integrations
 
