@@ -1,6 +1,6 @@
 # M.I.R. Roadmap
 
-Updated: 2026-07-05
+Updated: 2026-07-06
 
 This is the high-level release roadmap for More Infinite Research after the v2.0.0 Factorio 2.1 compatibility release. It explains release direction, product boundaries, and why major decisions exist.
 
@@ -9,7 +9,7 @@ Authority split:
 - Use root `todo.md` for the executable future-work ledger, release gates, issue-creation tasks, recurring checklists, deferred work, companion backlog, and rejected work.
 - Use `changelog.txt` for the authoritative past-change ledger.
 - Use this roadmap for narrative scope, rationale, release cadence, and links or placeholders for issue-backed work.
-- Use `docs/notes/release-plan-2.1.0.md` and `docs/notes/post-2.0-feature-plan.md` as supporting notes. Durable future tasks from those files should also be mirrored into root `todo.md`.
+- Use `docs/notes/post-2.0-feature-plan.md` and `docs/notes/legacy-backport-cadence.md` as supporting notes. Durable future tasks from those files should also be mirrored into root `todo.md`.
 
 Issue links are intentionally not invented in this file. When GitHub issues are created, replace the pending issue labels in `todo.md` and roadmap notes with real issue URLs.
 
@@ -21,11 +21,18 @@ The release model is:
 patch .5 releases = quick, low-risk implementation and feedback releases
 minor .0 releases = larger feature waves
 legacy 1.9.x releases = Factorio 2.0 compatibility ports of tested current-line snapshots
+expanded legacy releases = older Factorio line backports recorded in docs/notes/legacy-backport-cadence.md
 ```
 
 `v2.0.5` is **not** docs-only. It is the first quick feedback release after `v2.0.0` and should include the easy, bounded, already-understood changes that are practical to drop into a mods folder and test now.
 
 The minimum manual smoke checks gate the `v2.0.5` quick patch. The full scripted manual matrix gates default enablement and stronger public behavior claims for scripted candidates. If a candidate fails proof or grows beyond the quick-patch scope, that default, claim, or feature moves to `v2.1.0`; the whole release does not become docs-only.
+
+Maintainer-authorized cadence plan:
+
+- From 2026-07-06 through December 2026, aim to ship one validated Factorio `2.1` current-line update each week.
+- For the Factorio `2.1` release celebration, aim to ship one older-line backport per day from the week preceding the Factorio `2.1` release through the week following it.
+- This cadence is tentative and subject to change. Validation, target-line support, actual Factorio release timing, and Mod Portal packaging safety outrank the calendar.
 
 | MIR release | Factorio line | Release kind | Scope |
 | --- | --- | --- | --- |
@@ -34,11 +41,13 @@ The minimum manual smoke checks gate the `v2.0.5` quick patch. The full scripted
 | `2.1.0` | `2.1.x` | Larger feature wave | simpler settings, icon policy, fluid productivity, pipeline extent, and targeted duplicate-productivity compatibility |
 | `1.9.1` | `2.0.x` | Legacy port | compatible subset of the tested `2.1.0` larger feature snapshot |
 | `2.1.5` | `2.1.x` | Quick feedback patch | small fixes and feedback from `2.1.0` |
-| `1.9.6` / `1.9.7` | `2.0.x` | Optional legacy patch | selected compatible feedback fixes from `2.1.5` if they are worth porting |
+| `1.9.7` | `2.0.x` | Legacy pre-release snapshot | compatible subset of the latest tested `2.x.x` snapshot one week before Factorio `2.1` release |
+| `1.9.8` | `2.0.x` | Legacy release-point snapshot | compatible subset of the latest tested `2.x.x` snapshot at Factorio `2.1` release |
 | `2.2.0` | `2.1.x` | Larger feature wave | compatibility planner foundations plus the first fixture-proven new MIR-owned behavior |
-| `1.9.9` | `2.0.x` | Final legacy port | final Factorio 2.0 port from the latest tested `2.x.x` current-line release when Factorio 2.1 becomes stable or another verified upstream cutoff is chosen |
+| `1.9.9` | `2.0.x` | Final/end-of-year legacy port | final Factorio 2.0 port from the latest tested `2.x.x` current-line release for the Factorio `2.1` stable/end-of-year support sweep |
+| `1.8.x` / `1.7.x` | `1.1.x` through `0.6.x` | Older-line backport ladder | see `docs/notes/legacy-backport-cadence.md` |
 
-The `1.9.9` cutoff should be treated as a release trigger, not an API assumption. When planning the final legacy port, verify the actual Factorio 2.1 stable status and the exact latest MIR `2.x.x` source point.
+The `1.9.7`, `1.9.8`, and `1.9.9` cutoffs should be treated as release triggers, not API assumptions. When planning each port, verify the actual Factorio `2.1` release or stable status and the exact latest MIR `2.x.x` source point.
 
 ## Current Baseline
 
@@ -330,7 +339,17 @@ Backport mappings:
 | --- | --- | --- | --- |
 | `2.0.5` | `2.1.x` | `1.9.0` | `2.0.x` |
 | `2.1.0` | `2.1.x` | `1.9.1` | `2.0.x` |
-| latest tested `2.x.x` at the stable cutoff | `2.1.x` | `1.9.9` | `2.0.x` |
+| latest tested `2.x.x` one week before Factorio `2.1` release | `2.1.x` | `1.9.7` | `2.0.x` |
+| latest tested `2.x.x` at Factorio `2.1` release | `2.1.x` | `1.9.8` | `2.0.x` |
+| latest tested `2.x.x` for the stable/end-of-year support sweep | `2.1.x` | `1.9.9` | `2.0.x` |
+
+The expanded older-line ladder is recorded in `docs/notes/legacy-backport-cadence.md`.
+Those Factorio `1.1` through `0.6` releases are separate target-line ports and
+must not be treated as full-parity releases until each target line is validated.
+
+The daily backport celebration window should draw from that table and the
+expanded ladder. If a daily slot cannot be validated honestly, skip or reorder
+the slot rather than publishing an archive with unclear support claims.
 
 Backport rule:
 
@@ -485,4 +504,9 @@ Recommended order from here:
 6. Ship quick `v2.1.5` feedback fixes.
 7. Backport the tested `v2.1.0` snapshot as `v1.9.1`.
 8. Ship the next larger wave as `v2.2.0`.
-9. When Factorio 2.1 becomes stable or another verified upstream cutoff is chosen, backport the latest tested MIR `2.x.x` release as final Factorio 2.0 build `v1.9.9`.
+9. One week before Factorio `2.1` release, backport the latest tested MIR `2.x.x` snapshot as `v1.9.7` for Factorio `2.0`.
+10. At Factorio `2.1` release, backport the latest tested MIR `2.x.x` snapshot as `v1.9.8` for Factorio `2.0`.
+11. At the Factorio `2.1` stable/end-of-year support sweep, backport the latest tested MIR `2.x.x` snapshot as final Factorio `2.0` build `v1.9.9`.
+12. Execute the older-line Factorio `1.1` through `0.6` backport ladder from `docs/notes/legacy-backport-cadence.md` as separate validation-gated ports.
+13. Keep a weekly Factorio `2.1` update rhythm through December 2026 where validated release candidates exist.
+14. During the Factorio `2.1` celebration window, publish at most one validated older-line backport per day, with skipped or reordered days documented.

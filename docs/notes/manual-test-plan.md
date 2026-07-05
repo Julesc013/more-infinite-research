@@ -97,9 +97,15 @@ Required on the `legacy` branch with a Factorio `2.0.x` binary:
 | `legacy-1.9.0-no-2.1-cargo` | Confirm 2.1-only cargo modifier strings are absent in `v1.9.0` |
 | `legacy-1.9.0-runtime-2.0` | Run `Invoke-MIRValidation.ps1` with a Factorio `2.0.x` binary for `v1.9.0` |
 | `legacy-1.9.1-runtime-2.0` | Validate the tested `v2.1.0 -> v1.9.1` legacy port |
-| `legacy-1.9.6-feedback-runtime-2.0` | Validate any optional `v2.1.5` feedback fixes selected for a later legacy patch |
-| `legacy-1.9.9-final` | Validate the final Factorio `2.0` port from the latest tested `2.x.x` snapshot |
+| `legacy-1.9.7-runtime-2.0` | Validate the week-before-Factorio-2.1-release snapshot backport |
+| `legacy-1.9.8-runtime-2.0` | Validate the Factorio-2.1-release snapshot backport |
+| `legacy-1.9.9-final` | Validate the Factorio `2.1` stable/end-of-year snapshot backport |
 | `legacy-space-age` | Confirm any optional Space Age subset supported by Factorio `2.0.x` |
 | `legacy-generated-tech-ids` | Compare generated technology names against expected legacy snapshot |
 
 Do not validate the legacy port with the Steam-updated Factorio `2.1.x` binary.
+
+For the expanded Factorio `1.1` through `0.6` backport ladder, use
+`docs/notes/legacy-backport-cadence.md` as the release matrix. Each target line
+needs its own binary smoke check when a compatible binary is available, and
+release notes must identify any target-line validation that could not be run.

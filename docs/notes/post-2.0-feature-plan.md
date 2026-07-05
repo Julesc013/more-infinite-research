@@ -1,6 +1,6 @@
 # Post-2.0 Feature Plan
 
-Updated: 2026-07-03
+Updated: 2026-07-06
 
 This document records the feature triage from the first public v2.0.0 discussion and turns it into a bounded plan for More Infinite Research after v2.0.0.
 
@@ -16,12 +16,22 @@ v2.1.0 = larger feature wave: checkbox control, icon policy, fluid productivity,
 v1.9.0 = Factorio 2.0 compatible subset backported from the tested v2.0.5 quick-patch snapshot.
 v1.9.1 = Factorio 2.0 compatible subset backported from the tested v2.1.0 larger feature snapshot.
 v2.1.5 = quick feedback patch after v2.1.0.
-v1.9.6 or v1.9.7 = optional Factorio 2.0 feedback patch if selected v2.1.5 fixes are worth porting.
+v1.9.7 = Factorio 2.0 backport of the latest tested v2.x.x snapshot one week before Factorio 2.1 release.
+v1.9.8 = Factorio 2.0 backport of the latest tested v2.x.x snapshot at Factorio 2.1 release.
 v2.2.0 = next larger feature wave.
-v1.9.9 = final planned Factorio 2.0 backport from the latest tested v2.x.x snapshot when Factorio 2.1 becomes stable or another verified upstream cutoff is chosen.
+v1.9.9 = final planned Factorio 2.0 backport from the latest tested v2.x.x snapshot for the Factorio 2.1 stable/end-of-year support sweep.
+v1.8.x and v1.7.x = older Factorio line backport ladder recorded in docs/notes/legacy-backport-cadence.md.
 ```
 
 The scripted technology implementation exists in `dev` as a default-off ship candidate. Public release claims should be made only for the specific behaviors proven by the manual save matrix. Default enablement or anything that fails proof moves to a later release.
+
+Cadence note:
+
+```text
+From 2026-07-06 through December 2026, aim for one validated Factorio 2.1 current-line MIR update each week.
+Around the Factorio 2.1 release, aim for one older-line backport per day from the week before release through the week after release.
+This is the maintainer-authorized plan, but it remains tentative and subject to validation, target-line support, and actual Factorio release timing.
+```
 
 The Reddit thread was not one feature request. It was a roadmap dump. The useful split is:
 
@@ -801,8 +811,15 @@ The planned mapping is:
 ```text
 More Infinite Research v2.0.5 on Factorio 2.1.x -> More Infinite Research v1.9.0 on Factorio 2.0.x
 Tested More Infinite Research v2.1.0 snapshot -> More Infinite Research v1.9.1 on Factorio 2.0.x
-Latest tested MIR v2.x.x when Factorio 2.1 becomes stable or another verified upstream cutoff is chosen -> final MIR v1.9.9 on Factorio 2.0.x
+Latest tested MIR v2.x.x one week before Factorio 2.1 release -> MIR v1.9.7 on Factorio 2.0.x
+Latest tested MIR v2.x.x at Factorio 2.1 release -> MIR v1.9.8 on Factorio 2.0.x
+Latest tested MIR v2.x.x for the Factorio 2.1 stable/end-of-year support sweep -> final MIR v1.9.9 on Factorio 2.0.x
 ```
+
+The expanded older-line cadence for Factorio `1.1` through `0.6` is recorded in
+`docs/notes/legacy-backport-cadence.md`. Those releases are higher-risk
+compatibility ports, not parity promises, and should be validated against each
+target Factorio line before public claims are made.
 
 Be careful with the backport promise. The current 2.1 path can use clean agricultural tower events and cargo landing pad APIs. The 2.0 line may not have those APIs, so the `1.9.0` port must explicitly remove or guard unsupported `2.0.5` current-line surfaces.
 

@@ -13,9 +13,18 @@ Release-line summary:
 | `2.1.0` | `2.1.x` | larger feature wave: simpler settings, icon policy, fluid productivity, pipeline extent, and targeted duplicate-productivity compatibility |
 | `1.9.1` | `2.0.x` | compatible subset backported from the tested `2.1.0` larger feature snapshot |
 | `2.1.5` | `2.1.x` | quick feedback patch after `2.1.0` |
-| `1.9.9` | `2.0.x` | final planned Factorio 2.0 port from the latest tested `2.x.x` snapshot when Factorio 2.1 becomes stable or another verified upstream cutoff is chosen |
+| `1.9.7` | `2.0.x` | planned week-before-Factorio-2.1-release backport from the latest tested `2.x.x` snapshot |
+| `1.9.8` | `2.0.x` | planned Factorio-2.1-release backport from the latest tested `2.x.x` snapshot |
+| `1.9.9` | `2.0.x` | final planned Factorio 2.0 port from the latest tested `2.x.x` snapshot for the Factorio `2.1` stable/end-of-year support sweep |
+| `1.8.x` / `1.7.x` | `1.1.x` through `0.6.x` | older-line compatibility ladder recorded in `docs/notes/legacy-backport-cadence.md` |
 
 The release goal is graceful compatibility without mod-page dependency clutter: compatible mods should work when their prototypes are visible, absent mods should be skipped cleanly, and no compatibility mod should be required for this mod to load.
+
+The current maintainer-authorized cadence is tentative but intentional: ship
+validated Factorio `2.1` current-line updates weekly through December 2026 where
+safe candidates exist, then run a daily older-line backport celebration from the
+week before Factorio `2.1` release through the week after it. Validation and
+clear support boundaries outrank the calendar.
 
 ## Compatibility Model
 
@@ -264,7 +273,13 @@ Do not publish a compatibility-heavy archive from static validation alone. After
 
 ## Legacy Backport Model
 
-The Factorio `2.0` legacy release More Infinite Research `v1.9.0` was released from the `legacy` branch, backported from the tested More Infinite Research `v2.0.5` Factorio `2.1` quick-patch codebase. `v1.9.1` follows the same snapshot-port model from the tested More Infinite Research `v2.1.0` source point. Optional `v2.1.5` feedback fixes can use a later `v1.9.6` or `v1.9.7` legacy patch if they are worth porting, and `v1.9.9` is reserved as the final planned Factorio `2.0` build from the latest tested `2.x.x` snapshot when Factorio `2.1` becomes stable or another verified upstream cutoff is chosen.
+The Factorio `2.0` legacy release More Infinite Research `v1.9.0` was released from the `legacy` branch, backported from the tested More Infinite Research `v2.0.5` Factorio `2.1` quick-patch codebase. `v1.9.1` follows the same snapshot-port model from the tested More Infinite Research `v2.1.0` source point. The planned later Factorio `2.0` ladder is `v1.9.7` one week before Factorio `2.1` release, `v1.9.8` at Factorio `2.1` release, and `v1.9.9` for the Factorio `2.1` stable/end-of-year support sweep.
+
+The expanded older-line ladder for Factorio `1.1` through `0.6` lives in `docs/notes/legacy-backport-cadence.md`. Those ports should be treated as separate target-line compatibility releases, not as automatic feature-parity claims.
+
+The daily celebration cadence does not change the compatibility model: each
+archive still needs target-line metadata, unsupported-surface guards, package
+evidence, and target-line validation or an explicit release-note caveat.
 
 Legacy should not be reconstructed commit-by-commit from older release history. `v1.9.0` ported the tested `v2.0.5` snapshot: current MIR generator, diagnostics, recipe matching, science-pack handling, compatibility cleanup, docs structure, locale, and validation infrastructure with Factorio `2.1`-only surface area removed or guarded.
 
