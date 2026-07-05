@@ -7,6 +7,11 @@
       "sha256": "02f1400fca5ed0d84c3059c044c67aebfc598734a293919939fe4df6a3c3a4cf",
       "decision": "MIR_DOCS_ONLY"
     },
+    "all_around_research_0.0.2.zip": {
+      "size": 33358,
+      "sha256": "0f2da21e8c14d37d8537c35469a5cfbb0fa263943e7273567512882baf18b496",
+      "decision": "MIR_COMPAT_ADAPTER"
+    },
     "asphalt-productivity_1.0.1.zip": {
       "size": 44113,
       "sha256": "e46137523f386ed0da1d720b97783b760a65d916cab32fa0825461d0840ba5c8",
@@ -16,6 +21,11 @@
       "size": 63114,
       "sha256": "e423ca5b4aedb9db02b909313402216e58ed64393d8c21586f105cc8bb18f75e",
       "decision": "MIR_COMPANION_SCOPE"
+    },
+    "big-brother_2.0.1.zip": {
+      "size": 6217712,
+      "sha256": "cc806087859495d18a538309853f286ec12977242d5b59117bb551eab87f7058",
+      "decision": "MIR_DOCS_ONLY"
     },
     "bioflux-productivity_0.1.0.zip": {
       "size": 133525,
@@ -32,6 +42,11 @@
       "sha256": "5f9e0a66122b6a025b0e4be805b4a7c59cf207c85c7467734b782722cb918860",
       "decision": "MIR_STREAM_CANDIDATE"
     },
+    "ConfigurableResearchCost_1.1.3.zip": {
+      "size": 405128,
+      "sha256": "677a56c81c0812136f97c76e696d59590a4205a8e50dff3bfc0b45921fccd9d6",
+      "decision": "MIR_DOCS_ONLY"
+    },
     "crafting-efficiency-2_0.3.0.zip": {
       "size": 25640,
       "sha256": "06ab1391722c54f3ad44277aa48c859453a303090005db3695874533e98f16ee",
@@ -41,6 +56,16 @@
       "size": 98009,
       "sha256": "4e0c46117775a2c128e6a8b0ba50f9c500f500d352d2e798fdca045156bc887b",
       "decision": "MIR_STREAM_CANDIDATE"
+    },
+    "customresearchspeed_2.0.0.zip": {
+      "size": 61130,
+      "sha256": "2d5d500d306ea2125aa2af38d83cabbc9d9f8452d4c7c34b9d56c0705c6a444e",
+      "decision": "MIR_DOCS_ONLY"
+    },
+    "epic_mining_and_crafting_speed_research_10.0.0.zip": {
+      "size": 98023,
+      "sha256": "ec442f6cde233fe5015c0b7c365b1719020e7a4052f1862ea2fa9348759f9d0f",
+      "decision": "MIR_COMPAT_ADAPTER"
     },
     "ExpandedProductivityResearch_1.3.8.zip": {
       "size": 37877,
@@ -62,10 +87,25 @@
       "sha256": "c5ab151a77b3ec29b43ddf3b750ea7b433c532abef032f9a374ba8132ee7af26",
       "decision": "MIR_STREAM_CANDIDATE"
     },
+    "gleba-lab_1.0.1.zip": {
+      "size": 16584238,
+      "sha256": "55b5cbf54529aaa5280bc25b3413381b62c2f8c4f82632180747431fb9791051",
+      "decision": "MIR_DOCS_ONLY"
+    },
     "landfill-productivity_1.0.2.zip": {
       "size": 197469,
       "sha256": "22682087c803e8ca99084d26759ca21d3e9444e9836a61ae0bffca9c73f55cd2",
       "decision": "MIR_STREAM_CANDIDATE"
+    },
+    "mach-speed-logistics_1.1.3.zip": {
+      "size": 66584749,
+      "sha256": "0d10bad30f6b267baa52c63ec944183a9c3a201d770b718394d0f7f7a3273030",
+      "decision": "MIR_DOCS_ONLY"
+    },
+    "mach-speed-logistics_1.1.4.zip": {
+      "size": 66584781,
+      "sha256": "66786dc80aa3f8ab8daeb8a6835d64e70da7375dc147415e94f71311d5d2568e",
+      "decision": "MIR_DOCS_ONLY"
     },
     "miner-start_1.0.0.zip": {
       "size": 58609,
@@ -91,6 +131,11 @@
       "size": 218177,
       "sha256": "1afab69c907576410980e51fe5ceaea8b4df34d84fef25f28a7d557f368b8db6",
       "decision": "MIR_DOCS_ONLY"
+    },
+    "player-count-based-research-speed_1.1.3.zip": {
+      "size": 339694,
+      "sha256": "5a132fddd00adf1a21b805321a727177689469f9244ab34e80728ea9dd45bfb4",
+      "decision": "MIR_COMPAT_ADAPTER"
     },
     "Prod-Beacon_1.0.3.zip": {
       "size": 765266,

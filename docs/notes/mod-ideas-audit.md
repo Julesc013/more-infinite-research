@@ -2,11 +2,13 @@
 
 Source library: `C:\Projects\Factorio\ideamods_mix`
 
-Text-only working copy used for code reading: `tmp/ideamods-text-audit-20260705/`
+Text-only working copy used for code reading: local temporary extraction generated from `C:\Projects\Factorio\ideamods_mix`.
 
 Audited zip checksum ledger: `docs/audited-zips-2026-07-05.json`
 
-Scope: 50 downloaded archives, 50 unique mod/version pairs. The set mixes Factorio `2.0` and `2.1` targets. `research-cost-curve` has an unusual `info.json` shape but its source was readable. `omniab-space-age-compat` was added after the first audit draft and is treated as a future suite-compatibility signal, not a `2.1.5` feature.
+Expanded feature inventory: `docs/notes/ideamods-feature-audit-2026-07-05.md`
+
+Scope: 59 downloaded archives, 59 unique mod/version pairs. The set mixes Factorio `2.0` and `2.1` targets. `research-cost-curve` has an unusual `info.json` shape but its source was readable. `omniab-space-age-compat` is treated as a future suite-compatibility signal, not a `2.1.5` feature. The expanded feature inventory is the current per-archive decision surface; this release-plan note keeps the `2.1.5` and `2.2.0` planning summary.
 
 Most ideamods in this folder are compatibility signals, not planned MIR features. A signal can become MIR-owned behavior only after recipe IDs, effect values, ownership boundaries, lab compatibility, and fixtures prove that MIR can own the behavior without copying another mod's balance model or rule mutations.
 
@@ -89,7 +91,9 @@ These were intentionally not absorbed into `2.1.5`.
 | Productivity caps and finite conversion | `finite_prod_techs`, `productivity-technology-limit`, `remove-productivity-cap`, `modified-productivity-cap` | These alter cap semantics or useful max levels, which needs explicit player-facing policy. |
 | Rule mutators | `UnlimitedProductivityFork`, `prodforce`, `Productivity`, `productivity_fix`, `Productivity-config`, `rosnok-productivity-quality-beacon`, `SchallModules`, `Prod-Beacon`, `space-exploration-spaceproductivity-2` | They change allowed effects, recipe productivity eligibility, beacons, modules, or machine rules. |
 | Runtime productivity systems | `progressive-productivity`, `productivity-through-science`, `solar-productivity` | They rely on runtime force/entity/stat behavior rather than MIR's current recipe-productivity model. |
-| Research cost and automation tools | `research-cost-curve`, `research-multipliers`, `zz-long-science`, `research-control-tower`, `research-skip`, `combatresearchtech`, `show-missing-bottles-for-current-research` | They are compatible utilities or progression tools, not MIR stream ownership work. |
+| Research cost, lab mutators, and automation tools | `ConfigurableResearchCost`, `customresearchspeed`, `research-cost-curve`, `research-multipliers`, `zz-long-science`, `research-control-tower`, `research-skip`, `combatresearchtech`, `show-missing-bottles-for-current-research`, `player-count-based-research-speed` | They are compatible utilities, lab mutators, or progression tools, not MIR stream ownership work. |
+| Broad direct-effect bundles | `all_around_research`, `epic_mining_and_crafting_speed_research` | They are useful native-modifier signals, but not recipe-productivity cleanup work. |
+| Content and lab prototype mods | `big-brother`, `gleba-lab`, `mach-speed-logistics` | They should be load-tested or fixture-tested only where they intersect MIR science/lab compatibility. |
 
 ## 2.2.0 Planning Table
 
@@ -118,6 +122,8 @@ These were intentionally not absorbed into `2.1.5`.
 | Runtime productivity systems | `progressive-productivity`, `productivity-through-science`, `solar-productivity` | Defer or reject for core unless bounded runtime design is proven. |
 | Broad content mods | `5dim_mining` | Compatible content source; MIR may pick up visible matching recipes opportunistically. |
 | Suite compatibility layers | `omniab-space-age-compat` | Future compatibility-campaign input for Bob/Angel/Omni Space Age combinations. |
+| New broad direct-effect idea signals | `all_around_research`, `epic_mining_and_crafting_speed_research`, `player-count-based-research-speed` | Feed future native-overlap policy and diagnostics only. |
+| New content/lab/cost idea signals | `big-brother`, `ConfigurableResearchCost`, `customresearchspeed`, `gleba-lab`, `mach-speed-logistics` | Compatibility/load-test signals, not MIR-owned streams. |
 
 ## Per-Mod Appendix
 
