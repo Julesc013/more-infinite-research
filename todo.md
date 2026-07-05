@@ -581,6 +581,21 @@ Do not reconstruct old releases commit-by-commit for `legacy`. A legacy release 
 - [ ] After Factorio `2.1` release, backport the week-before-Factorio-2.1-release snapshot to Factorio `0.14` through `0.6` as `v1.7.8` through `v1.7.0`.
 - [ ] Validate each older-line backport with a matching target Factorio binary when available, and document any missing validation in release notes.
 
+<!-- MIR legacy RC plan start: tmp/0.6 -->
+### `tmp/0.6` Factorio `0.6` RC Planning
+
+This branch-specific section was added during the 2026-07-06 documentation-only RC planning sweep. It is tentative, maintainer-authorized planning for the experimental branch, not an implementation commit and not a release-candidate claim.
+
+- [x] Add `docs/notes/rc-plan-factorio-0.6.md` for the target-line API/code/docs audit.
+- [ ] Read docs/notes/rc-plan-factorio-0.6.md before any implementation change on tmp/0.6.
+- [ ] Keep tmp/0.6 documentation-only until a target implementation pass is explicitly started.
+- [ ] Use factorio-data tag 0.6.4 and the report source links as first compatibility contract.
+- [ ] Close unsupported-surface blockers before creating an RC package.
+- [ ] Validate with a real Factorio 0.6.x binary or document the missing binary before public archive.
+- [ ] After 1.9.9, fold durable findings into permanent legacy and delete tmp/0.6 only when remote refs are no longer needed.
+- [ ] Acquire/configure a 0.6.4 binary before implementation.
+- [ ] Build a one-tech package and confirm mod loader accepts metadata.
+<!-- MIR legacy RC plan end: tmp/0.6 -->
 ### Legacy Compatibility Patch
 
 - [x] Set `info.json` version to the target `1.9.x` version.
