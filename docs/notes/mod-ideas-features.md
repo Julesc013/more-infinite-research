@@ -7,9 +7,9 @@ Test-mod sync targets:
 - `C:\Projects\Factorio\testmods_2.0`
 - `C:\Projects\Factorio\testmods_2.1`
 
-Audited archive count: 59 zip archives.
+Audited archive count: 60 zip archives.
 
-Checksum ledger: `docs/audited-zips-2026-07-05.json`
+Checksum ledger: `docs/notes/archive/audited-zips-2026-07-05.json`
 
 Audit method: text-only extraction of source/config files from each archive, then
 manual review of technology effects, runtime scripts, startup settings, recipe
@@ -46,6 +46,30 @@ Use `2.2.0` for designed, fixture-backed work:
 
 Do not clone rule mutators, runtime productivity systems, research-cost systems,
 beacons, broad module changes, or radar/logistics content into MIR core.
+
+## Requested Mod Portal Signals
+
+These are not necessarily local idea archives. They are current compatibility
+requests that should be kept separate from the audited zip count unless their zip
+is also copied into `ideamods_mix`.
+
+### `atan-air-scrubbing`
+
+- Primary role: `MIR_STREAM_CANDIDATE`.
+- Source checked: Mod Portal `atan-air-scrubbing` 0.2.8 and GitHub source on 2026-07-05.
+- What it does: Adds an air scrubber building, pollution filters, used pollution filters, filter cleaning, and Space Age spore filters.
+- Technologies and bonuses:
+  - `atan-pollution-scrubbing`: unlocks `atan-pollution-scrubbing`, `atan-pollution-filter`, `atan-pollution-filter-cleaning`, and `atan-air-scrubber`.
+  - `atan-spore-scrubbing`: Space Age-only; unlocks `atan-spore-scrubbing`, `atan-spore-filter`, and `atan-spore-filter-cleaning`.
+- Recipes and changes:
+  - `atan-pollution-filter`: crafts a clean pollution filter from coal, steel, and plastic; Space Age changes coal to carbon and category to `organic-or-assembling`.
+  - `atan-pollution-scrubbing`: consumes one clean pollution filter, removes pollution through negative emissions, and produces one used pollution filter. It explicitly disables productivity and quality.
+  - `atan-pollution-filter-cleaning`: cleans used pollution filters with water, recovers most filters, and can produce sulfur or ash if the Ash compatibility mod is present.
+  - `atan-spore-filter`: Space Age clean spore filter recipe.
+  - `atan-spore-scrubbing`: consumes one clean spore filter, removes spores, and produces one used spore filter. It explicitly disables productivity and quality.
+  - `atan-spore-filter-cleaning`: cleans used spore filters with water, recovers most filters, and can produce spoilage.
+- How it works: The scrubber is a furnace-like machine in category `atmospheric-filtration`; its electric energy source has negative `emissions_per_minute` for pollution and, with Space Age, spores. Surface conditions restrict recipes to planets with air and the matching emission type.
+- MIR action: Recreate only the safe consumable-filter productivity slice: candidate streams for `atan-pollution-filter` and, with Space Age, `atan-spore-filter`. Do not add productivity to the scrubbing recipes or cleaning recipes, because those recipes encode pollution/spore removal and filter recovery loops. Do not attempt "scrubber efficiency" in MIR core; increasing negative emissions would require prototype/runtime mutation outside the current stream model.
 
 ## Per-Mod Decisions
 
@@ -86,6 +110,20 @@ beacons, broad module changes, or radar/logistics content into MIR core.
 - Technologies and bonuses: No normal MIR-style research chain. It mutates machine prototype `effect_receiver.base_effect.productivity`.
 - How it works: Startup settings identify machine names and types, then data-final-fixes assigns built-in productivity to those machines.
 - MIR action: Do not recreate in MIR core. At most, diagnostics should report that external base productivity changed the effective value of recipes or machines.
+
+### `better-bot-battery2_1.2.0.zip`
+
+- Primary role: `MIR_COMPAT_ADAPTER`.
+- What it does: Ports the abandoned Better Bot Battery idea to Factorio `2.0+`; it adds a vanilla-style worker robot battery technology chain.
+- Technologies and bonuses:
+  - `worker-robots-battery-1`: native `worker-robot-battery`, `+0.15`, finite.
+  - `worker-robots-battery-2`: native `worker-robot-battery`, `+0.20`, finite.
+  - `worker-robots-battery-3`: native `worker-robot-battery`, `+0.25`, finite.
+  - `worker-robots-battery-4`: native `worker-robot-battery`, `+0.35`, finite.
+  - `worker-robots-battery-5`: native `worker-robot-battery`, `+0.45`, finite.
+  - `worker-robots-battery-6`: native `worker-robot-battery`, `+0.70`, infinite, with `count_formula = "2^(L-6)*1000"`.
+- How it works: Adds a finite lead-in chain and one infinite native modifier owner. A migration resets force technology effects after changes.
+- MIR action: MIR already has `research_robot_battery` at `+0.10` per level, so MIR can provide a maintained alternative for the category, but it is not an exact replacement for Better Bot Battery's values. Support should be cooperative: when `worker-robots-battery-6` is present and infinite, MIR should prefer the external owner or skip its own worker robot battery stream to avoid duplicate stacking. Preserve finite levels 1-5.
 
 ### `big-brother_2.0.1.zip`
 
@@ -536,8 +574,9 @@ These are candidates for MIR-owned implementation, not cloning:
 | --- | --- | --- |
 | Ore-crushing productivity | `crushing-industry-productivity-research` | Exact visible recipe IDs, value decision, and no output-scaling copy. |
 | Tile/surface productivity | `asphalt-productivity`, `concrete-productivity`, `landfill-productivity`, `foundation-productivity` | Per-material values, finite lead-in preservation, exact cleanup rules. |
+| Air Scrubbing filter productivity | `atan-air-scrubbing` | Exact filter recipe IDs, local zip/load fixture, and explicit exclusion of scrubbing and cleaning recipes. |
 | Cap-aware diagnostics | `finite_prod_techs`, `productivity-technology-limit`, `modified-productivity-cap`, `remove-productivity-cap`, `Productivity-config`, `base-prod` | Warn/report first; no silent cap mutation. |
-| Native direct-effect policy | `Research_Productivity`, `all_around_research`, `epic_mining_and_crafting_speed_research`, `miner-start`, `mining-prod-0`, `player-count-based-research-speed` | Explicit skip/prefer/coexist/warn rules by modifier type. |
+| Native direct-effect policy | `Research_Productivity`, `better-bot-battery2`, `all_around_research`, `epic_mining_and_crafting_speed_research`, `miner-start`, `mining-prod-0`, `player-count-based-research-speed` | Explicit skip/prefer/coexist/warn rules by modifier type. |
 | One overhaul material family | `py_productivity`, selected `ExpandedProductivityResearch` and `crafting-efficiency-2` families | Exact recipe family fixture and public claim limited to that family. |
 
 ## Compatibility Only
@@ -588,6 +627,8 @@ identity:
 
 1. `2.1.5` should not expand from this audit.
 2. The newly added idea mods strengthen the case for a compatibility planner, not for broader cleanup.
-3. The next implementation decision should be a `2.2.0` planner/diagnostics layer or the ore-crushing stream fixture.
-4. Public wording should say "MIR cooperates with or avoids duplicates from these mods" unless a fixture proves exact replacement.
-5. Any future "replacement" claim must say which portion is replaced. For many mods here, MIR can at most replace the recipe-productivity portion.
+3. Air Scrubbing support should start as filter recipe productivity only; scrubber pollution/spore removal efficiency is outside MIR core unless runtime/prototype mutation is explicitly accepted.
+4. Better Bot Battery support should be native-owner cooperation: avoid duplicate worker robot battery infinite technologies when `worker-robots-battery-6` is present.
+5. The next implementation decision should be a `2.2.0` planner/diagnostics layer, the ore-crushing stream fixture, or a small native-owner skip fixture for Better Bot Battery.
+6. Public wording should say "MIR cooperates with or avoids duplicates from these mods" unless a fixture proves exact replacement.
+7. Any future "replacement" claim must say which portion is replaced. For many mods here, MIR can at most replace the recipe-productivity portion.

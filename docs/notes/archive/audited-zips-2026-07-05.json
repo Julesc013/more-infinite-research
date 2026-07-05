@@ -22,6 +22,11 @@
       "sha256": "e423ca5b4aedb9db02b909313402216e58ed64393d8c21586f105cc8bb18f75e",
       "decision": "MIR_COMPANION_SCOPE"
     },
+    "better-bot-battery2_1.2.0.zip": {
+      "size": 4351,
+      "sha256": "c53c0dd31c0260cac3119c0a2c787d48a40891fb6b660ffdac20d3353277282e",
+      "decision": "MIR_COMPAT_ADAPTER"
+    },
     "big-brother_2.0.1.zip": {
       "size": 6217712,
       "sha256": "cc806087859495d18a538309853f286ec12977242d5b59117bb551eab87f7058",
