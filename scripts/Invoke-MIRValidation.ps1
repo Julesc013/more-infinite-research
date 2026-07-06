@@ -153,6 +153,10 @@ Invoke-RepoCheck "docs match opportunistic compatibility policy" {
   }
 }
 
+Invoke-RepoCheck "docs and governance manifests are linted" {
+  & (Join-Path $repo "scripts\Test-MIRGovernance.ps1") -RepoRoot $repo
+}
+
 Invoke-RepoCheck "no old tool-based science pack authority remains" {
   $matches = Find-RepositoryText -Path (Join-Path $repo "prototypes") -Pattern "data.raw.tool|tool_exists|has_tool|PACKS_ALL"
   if ($matches.Count -gt 0) {
@@ -170,9 +174,9 @@ Invoke-RepoCheck "generated icons do not use icon_mipmaps" {
 }
 
 Invoke-RepoCheck "local image assets have source notes and do not bundle Space Age art" {
-  $assetSourcePath = Join-Path $repo "docs\asset-sources.md"
+  $assetSourcePath = Join-Path $repo "docs\reference\asset-sources.md"
   if (-not (Test-Path -LiteralPath $assetSourcePath)) {
-    throw "Missing local asset source manifest: docs/asset-sources.md"
+    throw "Missing local asset source manifest: docs/reference/asset-sources.md"
   }
 
   $assetSourceText = Get-Content -Raw -LiteralPath $assetSourcePath
@@ -196,7 +200,7 @@ Invoke-RepoCheck "local image assets have source notes and do not bundle Space A
       throw "Local image asset appears to bundle Space Age art by path/name and is not allowed in MIR: $relative"
     }
     if (-not $assetSourceText.Contains($relative)) {
-      throw "Local image asset is missing an explicit source/license note in docs/asset-sources.md: $relative"
+      throw "Local image asset is missing an explicit source/license note in docs/reference/asset-sources.md: $relative"
     }
   }
 }
@@ -704,8 +708,8 @@ Invoke-RepoCheck "compat audit automation tooling is wired" {
   $localLibraryScenarios20Text = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\compat-matrix\local-library-scenarios-2.0.json")
   $expectedFailuresText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\compat-matrix\expected-failures.json")
   $workflowText = Get-Content -Raw -LiteralPath (Join-Path $repo ".github\workflows\extended-compat-audit.yml")
-  $compatDocsText = Get-Content -Raw -LiteralPath (Join-Path $repo "docs\compatibility.md")
-  $devToolsText = Get-Content -Raw -LiteralPath (Join-Path $repo "docs\dev-tools.md")
+  $compatDocsText = Get-Content -Raw -LiteralPath (Join-Path $repo "docs\compatibility\README.md")
+  $devToolsText = Get-Content -Raw -LiteralPath (Join-Path $repo "docs\maintainer\developer-tools.md")
   $readmeText = Get-Content -Raw -LiteralPath (Join-Path $repo "README.md")
 
   $requiredSnippets = @(
@@ -846,22 +850,22 @@ Invoke-RepoCheck "compat audit automation tooling is wired" {
     @{ File = ".github\workflows\extended-compat-audit.yml"; Text = $workflowText; Snippet = "include_generated_local_pairwise" },
     @{ File = ".github\workflows\extended-compat-audit.yml"; Text = $workflowText; Snippet = "shard_local_mod_zips" },
     @{ File = ".github\workflows\extended-compat-audit.yml"; Text = $workflowText; Snippet = "scenario_timeout_seconds" },
-    @{ File = "docs\compatibility.md"; Text = $compatDocsText; Snippet = 'Manual scenarios can now be executed with `-RunManualScenarios`' },
-    @{ File = "docs\compatibility.md"; Text = $compatDocsText; Snippet = 'Local modpack zips can be supplied with `-LocalModZipDirs`' },
-    @{ File = "docs\compatibility.md"; Text = $compatDocsText; Snippet = 'Local dependency libraries can be supplied separately with `-LocalModLibraryDirs`' },
-    @{ File = "docs\compatibility.md"; Text = $compatDocsText; Snippet = '`Start-MIROvernightLocalSweep.ps1` is the preferred bedtime command' },
-    @{ File = "docs\compatibility.md"; Text = $compatDocsText; Snippet = '`GeneratedLocalScenarios` creates scenarios from local zip metadata' },
-    @{ File = "docs\compatibility.md"; Text = $compatDocsText; Snippet = 'The grouped converter writes `missing-dependencies.md`' },
-    @{ File = "docs\compatibility.md"; Text = $compatDocsText; Snippet = 'Do not mix Factorio lines unintentionally.' },
-    @{ File = "docs\compatibility.md"; Text = $compatDocsText; Snippet = 'Sharded or resumed audits can use `-FromLockfile`, `-StartIndex`, `-Count`, and `-CandidateNames`' },
-    @{ File = "docs\compatibility.md"; Text = $compatDocsText; Snippet = 'Use `-CollectAll` for exploratory or overnight runs.' },
-    @{ File = "docs\compatibility.md"; Text = $compatDocsText; Snippet = '`AuditSmoke` is intentionally deterministic.' },
+    @{ File = "docs\compatibility\README.md"; Text = $compatDocsText; Snippet = 'Manual scenarios can now be executed with `-RunManualScenarios`' },
+    @{ File = "docs\compatibility\README.md"; Text = $compatDocsText; Snippet = 'Local modpack zips can be supplied with `-LocalModZipDirs`' },
+    @{ File = "docs\compatibility\README.md"; Text = $compatDocsText; Snippet = 'Local dependency libraries can be supplied separately with `-LocalModLibraryDirs`' },
+    @{ File = "docs\compatibility\README.md"; Text = $compatDocsText; Snippet = '`Start-MIROvernightLocalSweep.ps1` is the preferred bedtime command' },
+    @{ File = "docs\compatibility\README.md"; Text = $compatDocsText; Snippet = '`GeneratedLocalScenarios` creates scenarios from local zip metadata' },
+    @{ File = "docs\compatibility\README.md"; Text = $compatDocsText; Snippet = 'The grouped converter writes `missing-dependencies.md`' },
+    @{ File = "docs\compatibility\README.md"; Text = $compatDocsText; Snippet = 'Do not mix Factorio lines unintentionally.' },
+    @{ File = "docs\compatibility\README.md"; Text = $compatDocsText; Snippet = 'Sharded or resumed audits can use `-FromLockfile`, `-StartIndex`, `-Count`, and `-CandidateNames`' },
+    @{ File = "docs\compatibility\README.md"; Text = $compatDocsText; Snippet = 'Use `-CollectAll` for exploratory or overnight runs.' },
+    @{ File = "docs\compatibility\README.md"; Text = $compatDocsText; Snippet = '`AuditSmoke` is intentionally deterministic.' },
     @{ File = "README.md"; Text = $readmeText; Snippet = ".\scripts\Invoke-MIRReleaseTargetedGate.ps1" },
     @{ File = "README.md"; Text = $readmeText; Snippet = ".\scripts\mir.ps1 audit local" },
-    @{ File = "README.md"; Text = $readmeText; Snippet = "docs/dev-tools.md" },
-    @{ File = "docs\dev-tools.md"; Text = $devToolsText; Snippet = "Preferred Commands" },
-    @{ File = "docs\dev-tools.md"; Text = $devToolsText; Snippet = "scripts/MIRCli/*.ps1" },
-    @{ File = "docs\dev-tools.md"; Text = $devToolsText; Snippet = "Test-MIRPowerShellQuality.ps1" }
+    @{ File = "README.md"; Text = $readmeText; Snippet = "docs/maintainer/developer-tools.md" },
+    @{ File = "docs\maintainer\developer-tools.md"; Text = $devToolsText; Snippet = "Preferred Commands" },
+    @{ File = "docs\maintainer\developer-tools.md"; Text = $devToolsText; Snippet = "scripts/MIRCli/*.ps1" },
+    @{ File = "docs\maintainer\developer-tools.md"; Text = $devToolsText; Snippet = "Test-MIRPowerShellQuality.ps1" }
   )
 
   foreach ($check in $requiredSnippets) {
@@ -1308,7 +1312,8 @@ Invoke-RepoCheck "generated package archive matches metadata" {
     }
 
     $forbiddenPatterns = @(
-      "^$([regex]::Escape($root))(\.git|build|dist|docs|fixtures|scripts)(/|$)",
+      "^$([regex]::Escape($root))(\.git|\.github|\.mir|\.codex|build|dist|docs|fixtures|scripts|tests|tools)(/|$)",
+      "^$([regex]::Escape($root))(AGENTS\.md|CONTRIBUTING\.md|todo\.md)$",
       "(^|/)(\.DS_Store|Thumbs\.db)$",
       "(^|/)__MACOSX(/|$)",
       "~$",
