@@ -502,17 +502,20 @@ Idea-mod audit planning lives in `docs/notes/mod-ideas-audit.md`.
 
 Use `v2.2.0` for the next larger batch after the `v2.1.x` feedback cycle. Most ideamods are compatibility signals, not planned MIR features. Keep this release to compatibility planner foundations plus the first new MIR-owned behavior proven by fixtures; do not turn it into every interesting idea-mod signal.
 
-Idea-mod audit candidates should be promoted only after recipe-ID proof, balance decisions, licensing review, save-compatibility policy, and validation fixtures. Use `docs/compatibility-program.md` for the role taxonomy and one-archive audit template.
+Idea-mod audit candidates should be promoted only after recipe-ID proof, balance decisions, licensing review, save-compatibility policy, and validation fixtures. Use `docs/compatibility-program.md` for the role taxonomy and one-archive audit template. Use `docs/notes/2.2.0-feature-intake.md` for the July 2026 suggestions-transcript intake; it rejects separate product names and keeps future settings inside one plain MIR settings model.
 
 | Candidate | Source signal | First useful slice |
 | --- | --- | --- |
 | Compatibility planner/registry | All 50 idea-mod archives | First diagnostics-only rows pulled into `v2.1.5`; structured validation status and broader policy remain for `v2.2.0`. |
 | Cap-aware UX | Productivity cap and finite-limit helper mods | Warning diagnostics pulled into `v2.1.5`; settings or mutation policy remains deferred. |
+| External rule-mutator detection | Productivity, beacon, machine, cap, and cost mutator mods | Diagnostics first: detect changed productivity eligibility, beacon effects, base productivity, caps, and research-cost changes without normalizing them. |
+| Loop-risk diagnostics | Recycler, crusher, catalyst, cleaning, scrubbing, spoilage, and voiding loops | Required before any productivity-rule or cap-mutation option. |
 | Ore crushing productivity | Crushing Industry productivity research | Recipe-ID driven Crushing Industry stream or compatibility profile. |
+| Air Scrubbing clean-filter productivity | `atan-air-scrubbing` | Clean pollution/spore filter recipe productivity only; exclude scrubbing and cleaning recipes. |
 | Tile/surface productivity | Asphalt, concrete, landfill, foundation productivity mods | Decide conservative defaults, exact cleanup rules, and optional high-value profile policy before implementation. |
 | Overhaul material families | Pyanodon, Expanded Productivity Research, Crafting Efficiency | Pick one concrete family first; avoid a generic generator. |
 | Native overlap policy | Lab, mining, solar, and other native productivity mods | General skip/warn/prefer/allow behavior with fixtures. |
-| Companion boundary | Beacon/module/productivity-rule mutator mods | Decide whether this belongs outside MIR core. |
+| Out-of-scope content families | Solar/entity replacement, runtime productivity, research-cost systems, radar/lab/logistics/content mods | Keep as diagnostics or compatibility fixtures only unless a future scope decision is made. |
 
 - [ ] Keep `docs/compatibility-program.md` and `docs/compatibility-matrix.md` current before making new compatibility claims.
 - [ ] Add one structured audit row for each archive in `C:\Projects\Factorio\ideamods_mix` using the role enum and one-archive template.
@@ -520,8 +523,15 @@ Idea-mod audit candidates should be promoted only after recipe-ID proof, balance
 - [ ] Build the compatibility planner/registry before broad new stream work, with detected mods, actions, non-actions, warnings, and public-claim boundaries.
 - [ ] Keep "replace exactly" separate from "cooperate/skip/prefer external" in code, docs, changelog, and release notes.
 - [ ] Add save-compatibility notes before any feature removes, hides, or replaces external technologies that may already be researched.
+- [ ] Preserve the one-mod product rule: do not add separate product names, companion branding, or "Extended" labels to docs, release notes, or settings.
+- [ ] Keep settings labels plain and feature-family based; do not add per-mod settings or unimplemented option labels.
+- [ ] Require disabled-by-default prototype features to do no mutation and no broad scan at default values.
+- [ ] Keep prototype mutations behind startup settings; use runtime settings only for real runtime systems with performance and migration proof.
+- [ ] Add external rule-mutator diagnostics before considering recipe-productivity rule changes.
+- [ ] Add loop-risk diagnostics before considering cap removal, recycler productivity, broad productivity eligibility, or beacon productivity.
 - [ ] Build cap-aware diagnostics before adding balance-heavy productivity families.
 - [ ] Treat ore-crushing productivity as the first clean new stream candidate only if recipe-ID fixtures pass.
+- [ ] Treat Air Scrubbing filter productivity as a clean-filter-only stream candidate; prove scrubbing and cleaning recipes are excluded.
 - [ ] Require an explicit balance policy before shipping tile/surface productivity changes.
 - [ ] Limit any overhaul material-family slice to one concrete family with fixture-proven recipe IDs.
 - [ ] Keep Space Exploration, Krastorio 2, AAI, Bob's, and combination support as separate future matrices instead of one broad compatibility promise.
@@ -532,8 +542,8 @@ Idea-mod audit candidates should be promoted only after recipe-ID proof, balance
 - [ ] Evaluate an ore-crushing productivity stream for Crushing Industry and overhaul mods.
 - [ ] Evaluate broader Pyanodon/Bob/EV material-family streams only from concrete recipe families, not generic name overlap.
 - [ ] Decide whether cap-aware finite conversion or warning UX belongs in MIR after reviewing productivity-cap helper mods.
-- [ ] Decide whether module/beacon/productivity-rule mutation belongs in a companion mod rather than MIR core.
-- [ ] Decide which growing ideas should split to companion mods.
+- [ ] Decide whether any module/beacon/productivity-rule mutation belongs in MIR at all; if yes, make it opt-in, fixture-backed, and plainly named.
+- [ ] Keep runtime productivity, solar/entity replacement, broad research-cost mutation, and large content recreation out of `v2.2.0`.
 
 ## Legacy Backports
 

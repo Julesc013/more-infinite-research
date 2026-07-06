@@ -296,6 +296,13 @@ features. The release's job is to turn a small number of remaining audit signals
 into designed MIR-owned behavior, with fixtures proving recipe IDs, ownership,
 value matching, lab compatibility, and non-replacement of balance-distinct chains.
 
+The July 2026 suggestions transcript is tracked in
+`docs/notes/2.2.0-feature-intake.md`. Its useful input is the feature-family risk
+split, the startup-vs-runtime setting boundary, the loop-risk requirement, and
+the reminder that disabled features must do no work. MIR does not adopt the
+transcript's separate product names or "Extended" branding. There is one mod,
+and any future opt-in setting should use plain, Factorio-style wording.
+
 The role question for each audited mod is:
 
 ```text
@@ -313,11 +320,13 @@ Use `docs/compatibility-program.md` as the decision framework for roles such as 
 Preferred order:
 
 1. Extend the diagnostics-only compatibility planner/registry started in `v2.1.5`, so detected mods, roles, actions, non-actions, and public claims share one control surface.
-2. Extend cap-aware diagnostics beyond warnings only if an explicit policy exists; do not silently change balance.
-3. Ore-crushing productivity, if Crushing Industry recipe IDs and ownership rules fixture cleanly.
-4. Tile and surface productivity policy, only after deciding the stream split and default values.
-5. One overhaul material-family prototype, limited to a concrete recipe family with visible IDs.
-6. Native modifier overlap policy, kept small enough to avoid a framework detour.
+2. Add external rule-mutator and loop-risk diagnostics before considering any productivity-rule setting.
+3. Extend cap-aware diagnostics beyond warnings only if an explicit policy exists; do not silently change balance.
+4. Ore-crushing productivity, if Crushing Industry recipe IDs and ownership rules fixture cleanly.
+5. Air Scrubbing clean-filter productivity, with fixtures proving scrubbing and cleaning recipes are excluded.
+6. Tile and surface productivity policy, only after deciding the stream split and default values.
+7. One overhaul material-family prototype, limited to a concrete recipe family with visible IDs.
+8. Native modifier overlap policy, kept small enough to avoid a framework detour.
 
 Tile and surface productivity should default to conservative MIR-owned values, replace external owners only on exact value matches, and move any high-value tile profile behind an explicit setting or later design decision.
 
@@ -325,6 +334,9 @@ Non-goals for `v2.2.0`:
 
 - Beacon, module, and productivity-rule mutation in MIR core.
 - Runtime production-based productivity systems.
+- Solar/accumulator entity replacement.
+- Broad research-cost mutation.
+- Large content recreation: radars, labs, drills, pumps, belts, logistics chains, or surveillance systems.
 - Broad overhaul compatibility claims without a matrix and load evidence.
 - Generic productivity generation from names alone.
 - Copying external mod code without license review and accepted attribution obligations.

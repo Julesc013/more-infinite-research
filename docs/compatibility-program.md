@@ -459,6 +459,18 @@ many per-mod settings:
 
 The default should be `auto-safe`.
 
+Do not turn compatibility modes into separate product names. MIR should remain
+one mod with one settings page. If future settings expose balance-changing
+compatibility behavior, use plain feature-family labels and keep the default
+conservative. Source-mod names belong in audit rows and compatibility docs, not
+as one-off settings.
+
+For prototype mutation features, disabled must mean no mutation and no broad
+scan. Prefer the existing pipeline-extent pattern: default unchanged, the pass
+exits early, and diagnostics explain what happened only when the user asks for
+reports. Runtime settings should be reserved for real runtime logic with
+performance, migration, and uninstall proof.
+
 ## Audited Zip Reproducibility
 
 For each compatibility campaign, create a checksum record such as:

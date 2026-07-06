@@ -19,6 +19,11 @@ This file is the decision surface for choosing what MIR should recreate,
 cooperate with, diagnose, or deliberately leave alone. It is not a promise to
 absorb every mod. Most entries are compatibility signals.
 
+The later July 2026 suggestions transcript is summarized in
+`docs/notes/2.2.0-feature-intake.md`. That intake accepts the useful feature-risk
+analysis but rejects separate product names and "Extended" branding. MIR remains
+one mod with plain, feature-family settings.
+
 ## Decision Vocabulary
 
 | Decision | Meaning |
