@@ -2,6 +2,90 @@
 
 This file records local release-candidate validation runs. It is not a substitute for the manual mod matrix in `docs/compatibility.md`.
 
+## 2026-07-07 1.9.2 Legacy Branch Targeted Gate
+
+Environment:
+
+- Branch: `legacy`.
+- Commit: `4a56169`.
+- Source snapshot: tested More Infinite Research `2.2.0` source point, merged
+  through `tmp/2.0`.
+- Backport mod version: `1.9.2`.
+- Target Factorio line: `2.0`.
+- Factorio binary: `D:\Programs\Factorio\2.0\bin\x64\factorio.exe`.
+- Factorio version: `2.0.77` build `84539`, Windows `full`.
+- Local mod library: `C:\Projects\Factorio\testmods_2.0`.
+- Release artifact: `dist\more-infinite-research_1.9.2.zip`.
+- Release artifact SHA256: `BA15F2402D05B314AF515183A43DAFC53E69FB6978F22B347596D649506E251D`.
+- Release artifact size: `236144` bytes.
+
+Command:
+
+```powershell
+.\scripts\Invoke-MIRReleaseTargetedGate.ps1 `
+  -FactorioBin 'D:\Programs\Factorio\2.0\bin\x64\factorio.exe' `
+  -FactorioLine '2.0' `
+  -LocalModDir 'C:\Projects\Factorio\testmods_2.0' `
+  -SkipRepairSmokes `
+  -RepresentativeScenarioName 'local-2-0-base-baseline' `
+  -ManualScenariosPath 'fixtures\compat-matrix\local-library-scenarios-2.0.json' `
+  -AuditFactorioVersions '2.0' `
+  -NoGitPull `
+  -OutputRoot 'artifacts\release-targeted-1.9.2-legacy'
+```
+
+Results:
+
+- Strict current commit gate passed.
+- Runtime fixture validation passed against Factorio `2.0.77`.
+- Audit smoke passed.
+- Representative local `2.0` baseline scenario passed.
+- Package build passed unchanged.
+- Clean git status passed.
+
+## 2026-07-07 1.9.2 Factorio 2.0 Backport Gate
+
+Environment:
+
+- Branch: `tmp/2.0`.
+- Source snapshot: tested More Infinite Research `2.2.0` source point.
+- Backport mod version: `1.9.2`.
+- Target Factorio line: `2.0`.
+- Factorio binary: `D:\Programs\Factorio\2.0\bin\x64\factorio.exe`.
+- Factorio version: `2.0.77` build `84539`, Windows `full`.
+- Release artifact: `dist\more-infinite-research_1.9.2.zip`.
+- Release artifact SHA256: `BA15F2402D05B314AF515183A43DAFC53E69FB6978F22B347596D649506E251D`.
+- Release artifact size: `236144` bytes.
+
+Scope:
+
+- Merged the released `2.2.0` source point into `tmp/2.0`.
+- Patched legacy metadata to `version = 1.9.2`, `factorio_version = 2.0`, and
+  `base >= 2.0`.
+- Removed Factorio `2.1` cargo logistics technology modifiers from the legacy
+  direct-effect stream definitions.
+- Converted local 2.0 science-pack fixtures to `tool` prototypes and guarded
+  research-ingredient discovery so Factorio `2.0` ignores item-only lab inputs.
+- Confirmed the package excludes developer-only `docs/`, `fixtures/`,
+  `scripts/`, `todo.md`, and `CONTRIBUTING.md`.
+
+Commands:
+
+```powershell
+git diff --check
+.\scripts\Invoke-MIRValidation.ps1 -StaticOnly
+.\scripts\Invoke-MIRValidation.ps1 -FactorioBin 'D:\Programs\Factorio\2.0\bin\x64\factorio.exe'
+.\scripts\Build-MIRPackage.ps1
+```
+
+Results:
+
+- Static validation passed.
+- Full runtime fixture validation passed against Factorio `2.0.77`.
+- Factorio `2.1` cargo runtime fixture scenarios were skipped by legacy
+  metadata, as intended.
+- Package rebuild passed and produced the `1.9.2` release candidate archive.
+
 ## 2026-07-07 2.2.0 Final Package Refresh And Docs Review
 
 Environment:

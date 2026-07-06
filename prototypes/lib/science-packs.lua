@@ -80,14 +80,26 @@ local function lab_incompatibility_policy()
   return "reduce"
 end
 
+local function science_packs_require_tool_prototypes()
+  local automation_pack = lookup.item_prototype("automation-science-pack")
+  return automation_pack and automation_pack.type == "tool"
+end
+
+local function research_pack_prototype(name)
+  local prototype = lookup.item_prototype(name)
+  if not prototype then return nil end
+  if science_packs_require_tool_prototypes() and prototype.type ~= "tool" then return nil end
+  return prototype
+end
+
 function S.all_lab_inputs()
   if lab_inputs_cache then return deepcopy(lab_inputs_cache) end
-  -- Factorio 2.1 science packs are ordinary items, so labs are the source of
-  -- truth for what can participate in research.
+  -- Labs are the source of truth, but older target lines still require science
+  -- packs to be tool prototypes in technology research units.
   local out, seen = {}, {}
   for _, lab in pairs(data.raw.lab or {}) do
     for _, input in ipairs(lab.inputs or {}) do
-      if not seen[input] and lookup.item_prototype(input) then
+      if not seen[input] and research_pack_prototype(input) then
         seen[input] = true
         table.insert(out, input)
       end
@@ -99,7 +111,7 @@ function S.all_lab_inputs()
 end
 
 function S.science_pack_exists(name)
-  if not lookup.item_prototype(name) then return false end
+  if not research_pack_prototype(name) then return false end
   for _, input in ipairs(S.all_lab_inputs()) do
     if input == name then return true end
   end
