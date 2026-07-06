@@ -1,4 +1,38 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.2.0
+Date: 2026-07-07
+
+  Compatibility:
+
+    - Added a typed prototype fact registry for recipes, technologies, machines, labs, owners, and rule surfaces.
+    - Added compiler decision rows for generated technologies, rejected loop risks, and observed rule surfaces.
+    - Added loop-risk reports for recycling, cleaning, voiding, barrel/container, transmutation, and self-return recipes.
+    - Added lab-matrix reports so each generated technology can be checked against labs that accept its science set.
+    - Added useful-level estimates to recipe productivity cap reports.
+    - Added Air Scrubbing clean-filter productivity for exact pollution and spore filter crafting recipes.
+    - Kept Air Scrubbing scrubbing, cleaning, recovery, and environmental-removal recipes diagnostic-only.
+    - Added ATAN Ash separation productivity for the exact ash separation recipe.
+    - Kept ATAN Ash landfill, brick, nutrient, foundation, tile, and recovery-style ash sinks outside MIR streams.
+    - Added AAI-style loader recipe coverage to transport belt productivity.
+    - Added Big Mining Drill coverage through mining drill productivity.
+    - Added ATAN-style Nuclear Science coverage through science-pack productivity.
+    - Added compatibility coverage for Fluid Must Flow, Robot Attrition, Jetpack, and Equipment Gantry.
+    - Added compatibility coverage for AAI Containers and AAI Industry.
+    - Added capability diagnostics for entity-backed loader crafting recipes.
+    - Added capability diagnostics for entity-backed mining-drill crafting recipes.
+    - Added native modifier ownership diagnostics for selected lab, mining, logistics, and robot modifiers.
+    - Added negative capability coverage for loop risks, hidden recipes, cap-zero recipes, and loader/drill structural decoys.
+
+  Internal:
+
+    - Kept the new compiler path report-only so broad unknown mod behavior remains observed before it is emitted.
+    - Added compatibility safeguards for AAI-style loaders, standalone big mining drills, and ATAN-style nuclear science packs.
+    - Added progression-aware science-pack ingredient policies for official and modded science-pack chains.
+    - Extended compatibility observation output with compiler, decision, capability, loop-risk, rule-surface, and lab-matrix rows.
+    - Added schema helpers, a resolver contract, capability policy, and compatibility claims.
+    - Added generated-stream manifest linting and planner report diff tooling.
+
+---------------------------------------------------------------------------------------------------
 Version: 2.1.5
 Date: 2026-07-05
 
@@ -7,6 +41,8 @@ Date: 2026-07-05
     - Added known-competitor profiles for exact recipe-productivity overlaps found in the local idea-mod audit.
     - Skipped MIR lab productivity when a matching infinite native laboratory-productivity owner is active.
     - Skipped MIR worker robot battery when Better Bot Battery-style infinite native robot battery owner is active.
+    - Added diagnostics-only compatibility planner rows for active audit roles and deliberate non-actions.
+    - Added recipe productivity cap diagnostics for non-default recipe maximum productivity values.
 
   Internal:
 
@@ -20,9 +56,12 @@ Date: 2026-07-05
     - Added downloaded dependency-cache support to local 2.1 audit profiles.
     - Tightened load-failure grouping to classify Factorio error excerpts instead of MIR audit-row text.
     - Made mir.ps1 profile-driven for release, overnight, and local-audit commands with simple path overrides.
+    - Added compatibility observation artifacts and a report command for planner and recipe-cap diagnostics.
     - Added PowerShell script checks for parsing, duplicate parameters, ignored outputs, and secret-output guards.
     - Added Factorio 2.0 and 2.1 run profiles for release gates, overnight sweeps, and local audits.
     - Made compatibility audits select Factorio line, local scenario defaults, and available official built-ins.
+    - Added a docs-only release check command for release-note and documentation refreshes after a clean full gate.
+    - Trimmed release archives so extra repository files are not shipped in the mod zip.
 
 ---------------------------------------------------------------------------------------------------
 Version: 1.9.1

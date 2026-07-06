@@ -18,7 +18,7 @@ Required before publishing `v2.0.5`:
 | --- | --- |
 | `branch-state-preflight` | Run `git status --short --branch`, `git log --oneline --decorate --graph --max-count=8`, and `git branch -vv` before push/tag |
 | `package-parity` | Rebuild zip and confirm package validation passes |
-| `docs-in-package` | Confirm README, roadmap, TODO, API proof, manual tests, compatibility docs, test results, changelog, locale, and source parity |
+| `minimal-package` | Confirm the release zip excludes developer docs, fixtures, scripts, and task ledgers while keeping runtime source, locale, migrations, metadata, README, changelog, license, and thumbnail |
 | `normal-mod-folder-load` | Copy the release zip into a normal Factorio mods folder and confirm Factorio can see it |
 | `vanilla-locale-icons` | Base game without Space Age; confirm Electric Shooting Speed falls back to discharge defense art/description and flamethrower/electric modifier descriptions are present |
 | `space-age-electric-icon` | Space Age enabled; confirm Electric Shooting Speed uses the electric-weapons-damage texture while still showing electric and Tesla speed effects |
@@ -97,9 +97,10 @@ Required on the `legacy` branch with a Factorio `2.0.x` binary:
 | `legacy-1.9.0-no-2.1-cargo` | Confirm 2.1-only cargo modifier strings are absent in `v1.9.0` |
 | `legacy-1.9.0-runtime-2.0` | Run `Invoke-MIRValidation.ps1` with a Factorio `2.0.x` binary for `v1.9.0` |
 | `legacy-1.9.1-runtime-2.0` | Validate the tested `v2.1.0 -> v1.9.1` legacy port |
-| `legacy-1.9.7-runtime-2.0` | Validate the week-before-Factorio-2.1-release snapshot backport |
-| `legacy-1.9.8-runtime-2.0` | Validate the Factorio-2.1-release snapshot backport |
-| `legacy-1.9.9-final` | Validate the Factorio `2.1` stable/end-of-year snapshot backport |
+| `legacy-1.9.2-runtime-2.0` | Validate the tested `v2.2.0 -> v1.9.2` transition port |
+| `target-2.3.0-runtime-2.0` | Validate the first Factorio `2.0` port of the MIR 3 architecture |
+| `target-1.9.3-runtime-1.1` | Validate the first Factorio `1.1` compatibility port under the locked mapping |
+| `target-1.8.0-runtime-1.0` | Validate the first Factorio `1.0` compatibility port after the `0.18` bridge policy is recorded |
 | `legacy-space-age` | Confirm any optional Space Age subset supported by Factorio `2.0.x` |
 | `legacy-generated-tech-ids` | Compare generated technology names against expected legacy snapshot |
 

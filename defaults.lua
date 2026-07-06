@@ -47,6 +47,7 @@ local defaults = {
       research_time = 120,
       max_level = 0
     },
+    research_ash_separation = { research_time = 90 },
     research_science_pack_productivity = { research_time = 120 },
     research_character_reach = { enabled = false },
     research_rocket_shooting_speed = {

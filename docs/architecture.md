@@ -168,6 +168,64 @@ Compatibility adapters should register facts about known external mods. They
 should not generate MIR content directly. Streams generate content; adapters
 classify external owners and constraints; diagnostics explain the resulting plan.
 
+The first planner slice in `v2.1.5` is diagnostics-only. It emits active
+compatibility-role rows, a planner summary, and recipe-cap warnings when
+diagnostics are enabled. It does not add streams, change recipe caps, change
+maximum levels, or broaden cleanup beyond the guarded exact-overlap model.
+
+`v2.2.0` adds the compiler spine behind that diagnostics surface. The compiler
+builds typed facts for recipes, technologies, machines, labs, owners, and rule
+surfaces; emits `DecisionRecord`-style rows for generated MIR technologies and
+diagnostic-only blockers; reports obvious loop-risk flags; reports lab matrices;
+and carries useful-level estimates for cap warnings. This path is report-only:
+unknown or risky mod behavior is observed before any new automatic stream emits.
+
+`v2.2.0` also starts the procedural compatibility kernel documented in
+`docs/procedural-compatibility-kernel.md`. The first capability resolvers are
+report-first:
+
+- loader manufacturing classification from item `place_result`, placed loader
+  entity type, and recipe output evidence;
+- mining-drill manufacturing classification from item `place_result`, placed
+  mining-drill entity type, and recipe output evidence;
+- native modifier ownership observation for selected lab, mining, logistics, and
+  robot effect types.
+
+Those rows explain existing MIR behavior; they do not create a general
+productivity generator. Existing streams still own emission. For example, loader
+recipes are covered by belt productivity when visible, mining-drill recipes are
+covered by mining drill productivity when visible, and native mining-yield
+modifiers remain separate from drill manufacturing productivity.
+
+The kernel now has enforceable platform pieces:
+
+- schema versions in `prototypes/lib/mir/schema.lua`;
+- resolver contract validation in `prototypes/lib/capabilities/contract.lua`;
+- capability-specific policy in `prototypes/lib/policy/capabilities.lua`;
+- generated stream manifest metadata in
+  `prototypes/planner/generated-stream-manifest.json`;
+- machine-readable claims in `fixtures/compat-matrix/claims.json`;
+- static linting through `scripts/Test-MIRPolicyLints.ps1`;
+- report drift comparison through `scripts/Compare-MIRPlannerReports.ps1`;
+- negative capability fixtures for loop risks, hidden recipes, cap-zero recipes,
+  and structural loader/drill decoys.
+
+New mod support should add policy and fixtures first. New behavior classes
+should add or extend a capability resolver. New false positives should become
+classifier or policy fixes. New bug reports should become negative fixtures.
+
+The `3.0.0` line promotes this kernel into the public compatibility compiler
+architecture. Use `docs/notes/3.0.0-compatibility-compiler-charter.md` as the
+source of truth for the 3.0 charter, invariants, module boundaries, non-goals,
+release ladder, and acceptance gates. Use `docs/capabilities.md`,
+`docs/policy-overlays.md`, `docs/decision-records.md`,
+`docs/stream-manifest.md`, `docs/compatibility-claims.md`, `docs/testing.md`,
+and `docs/maintainer-guide.md` for the focused 3.0 subsystem guidance.
+Use `docs/notes/3.0.0-repository-structure.md` for the concrete 3.0 repository
+shape: thin Factorio root files, the `prototypes/mir/` compiler namespace,
+Factorio adapters under `platform/`, legacy shims for backporting, and the
+development-only workspace boundary.
+
 ## Diagnostics
 
 `mir-debug-generation-report` enables a structured log report. The report records generated and skipped streams/extensions with:
@@ -184,18 +242,25 @@ classify external owners and constraints; diagnostics explain the resulting plan
 
 Use this setting when triaging user reports. It is off by default to avoid noisy logs.
 
-When `mir-debug-generation-report` is enabled, MIR also emits an `Audit report` block with stable `audit schema=1 kind=...` rows. These rows mirror stream, extension, native-overlap, and recipe-owner decisions in a parser-friendly key/value format for `scripts/Invoke-MIRCompatAudit.ps1` and future large-mod compatibility sweeps.
+When `mir-debug-generation-report` is enabled, MIR also emits an `Audit report` block with stable `audit schema=1 kind=...` rows. These rows mirror stream, extension, native-overlap, recipe-owner, compatibility-role, compatibility-plan, recipe-cap, fact-registry, decision, rule-mutation, loop-risk, lab-matrix, and capability decisions in a parser-friendly key/value format for `scripts/Invoke-MIRCompatAudit.ps1` and future large-mod compatibility sweeps.
+
+Recipe-cap diagnostics compare generated recipe-productivity effects with the
+recipe's `maximum_productivity` value. Default caps stay quiet except for the
+summary row. Lowered, raised, zero, unusual, or effectively uncapped values are
+reported as diagnostics so players and compatibility audits can see when an
+infinite stream may become misleading. `v2.2.0` also reports a useful-level
+estimate for warning rows. MIR does not change recipe caps by default.
 
 `mir-debug-recipe-matches` logs matched recipe names per generated productivity stream. When either diagnostics setting is enabled, duplicate recipe matches across streams are also reported as non-blocking warnings.
 
-Native modifier overlap diagnostics are also non-blocking. They report that another infinite non-MIR technology already has the same native direct-effect identity, such as `cargo-landing-pad-count` or `max-cargo-bay-unloading-distance`, but they do not skip, merge, or mutate either technology in `v2.1.0`.
+Native modifier overlap diagnostics are also non-blocking. They report that another infinite non-MIR technology already has the same native direct-effect identity, such as `cargo-landing-pad-count` or `max-cargo-bay-unloading-distance`, but they do not skip, merge, or mutate either technology unless a narrow effect-proven skip policy exists.
 
 ## Progression Settings
 
 `ips-require-space-gate` and `mir-science-pack-ingredient-policy` deliberately control different parts of generated technologies.
 
 - `ips-require-space-gate` adds the end-game science unlock as a prerequisite only. It does not change research ingredients.
-- `mir-science-pack-ingredient-policy` changes research ingredients only. `configured` keeps each stream or extension's selected packs, `space` appends space science, `space-and-promethium` appends both high-end packs when available, `all-official` appends official base and Space Age packs without modded packs, and `all` appends every active lab science pack including compatible modded packs.
+- `mir-science-pack-ingredient-policy` changes research ingredients only. `configured` keeps each stream or extension's selected packs, `space` appends space science, `space-and-promethium` appends both high-end packs when available, `space-age-progression` adds Space Age gateway packs only when the selected packs already imply Space Age progression, `official-progression` fills missing official prerequisite-style packs implied by the selected official packs, `mod-progression` follows the loaded technology graph to infer missing lab-compatible packs for selected official or modded science packs, `all-official` appends official base and Space Age packs without modded packs, and `all` appends every active lab science pack including compatible modded packs.
 
 Both generated streams and base-technology extensions run through the same ingredient policy and end-game prerequisite helper so the settings apply consistently to all added infinite research.
 
@@ -209,7 +274,7 @@ Use `scripts/Invoke-MIRCompatAudit.ps1` for mod-portal driven compatibility cata
 
 The compatibility runner writes isolated mod lists rather than inheriting the user's normal Factorio enabled-mod state. Official built-ins are listed explicitly and disabled unless the scenario needs them; requiring `space-age` expands to the full official bundle. Parsed audit rows are tolerant of blank log lines so checkpointed overnight results can still be converted after interrupted runs.
 
-Use `scripts/Convert-MIRCompatAuditResults.ps1` after load-test runs to group failures into actionable buckets and emit `compat-failures.grouped.json`, `compat-summary.md`, `profile-candidates.json`, and `missing-dependencies.*`. The grouped output records total, expected, and unexpected failure counts. Expected failures mostly come from reviewed rules in `fixtures/compat-matrix/expected-failures.json`; successful-load audit observations that represent MIR's intentional conservative behavior, such as missing-prototype stream skips and unknown-external-owner suppression, are also kept non-blocking by default.
+Use `scripts/Convert-MIRCompatAuditResults.ps1` after load-test runs to group failures into actionable buckets and emit `compat-failures.grouped.json`, `compat-summary.md`, `profile-candidates.json`, `compat-observations.*`, and `missing-dependencies.*`. The grouped output records total, expected, and unexpected failure counts. Compatibility observations record planner rows, recipe-cap warnings, compiler decisions, rule-surface rows, loop-risk rows, fact summaries, and lab matrices without turning them into failures. Expected failures mostly come from reviewed rules in `fixtures/compat-matrix/expected-failures.json`; successful-load audit observations that represent MIR's intentional conservative behavior, such as missing-prototype stream skips and unknown-external-owner suppression, are also kept non-blocking by default.
 
 Use `scripts/New-MIRCompatProfileStub.ps1` only to generate review-required Lua stubs from grouped audit evidence. Generated stubs are not enabled profiles.
 
@@ -219,7 +284,9 @@ Use `scripts/mir.ps1` as the stable developer-facing command facade. It keeps ex
 
 Use `scripts/Build-MIRPackage.ps1` to rebuild the release archive when preparing an upload. Static validation builds an ignored validation archive from the current source tree and checks the archive root, metadata, load-critical entry files, locale files, migrations, and forbidden artifact paths.
 
-Static package validation also recursively compares packaged files from the current source tree against the repository copy for the packaged source directories. Documentation and helper modules may be moved or nested inside their packaged trees without changing validation; the test follows the current tree instead of a fixed old layout. Text files are compared with normalized line endings so CI checkout settings do not create false failures; binary files are still compared by SHA-256.
+Static package validation also recursively compares packaged files from the current source tree against the repository copy for the packaged source directories. The release zip intentionally excludes developer-only docs, fixtures, scripts, and task ledgers; those remain repository evidence, not shipped mod payload. Text files are compared with normalized line endings so CI checkout settings do not create false failures; binary files are still compared by SHA-256.
+
+Use `scripts/mir.ps1 release docs-only` or `scripts/mir.ps1 release docs-refresh` for documentation-only refreshes after a clean full release gate. The command runs the fast package/static validation path and rejects non-doc/package changes so prototype, script, fixture, locale, or runtime behavior changes still require the full gate.
 
 Static validation also checks Factorio changelog formatting, including the required 99-dash section separators, the current `info.json` version, the changelog-only 132-character line cap, and blocked internal-process wording.
 

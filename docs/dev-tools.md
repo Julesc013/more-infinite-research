@@ -8,13 +8,18 @@ Use `scripts/mir.ps1` first:
 
 ```powershell
 .\scripts\mir.ps1 release gate
+.\scripts\mir.ps1 release docs-only
+.\scripts\mir.ps1 release docs-refresh
 .\scripts\mir.ps1 overnight local
 .\scripts\mir.ps1 audit local
 .\scripts\mir.ps1 audit top25 --space-age
 .\scripts\mir.ps1 report latest
 .\scripts\mir.ps1 report missing-deps --run <path>
+.\scripts\mir.ps1 report observations --run <path>
 .\scripts\mir.ps1 package build
 .\scripts\mir.ps1 local-index build --mods <path>
+.\scripts\Test-MIRPolicyLints.ps1
+.\scripts\Compare-MIRPlannerReports.ps1 -Before <old-run> -After <new-run>
 ```
 
 Common overrides:
@@ -29,6 +34,29 @@ Common overrides:
 ```
 
 `mir.ps1` delegates to the existing scripts. It should stay thin: argument routing, profile loading, and memorable command names. Do not add new compatibility logic directly to it.
+
+`release docs-only` and `release docs-refresh` are aliases for the fast
+post-gate documentation path. Use them only after the current release candidate
+has already passed the full release gate and the remaining edits are docs,
+release notes, changelog text, or the release archive. The command rebuilds the
+package, runs static/package validation, checks whitespace, and rejects
+non-doc/package changes so code, prototype, script, fixture, or locale edits
+still require the full release gate.
+
+`report observations` summarizes `compat-observations.csv` rows produced by the
+audit converter. Use it to see diagnostics-only planner rows and recipe-cap
+warnings without treating them as failures or profile candidates.
+
+`Test-MIRPolicyLints.ps1` is the static policy gate for the procedural
+compatibility kernel. It checks resolver contract wiring, capability policy,
+generated stream manifest fields, support-lane fixtures, compatibility claims,
+and broad public-claim wording.
+
+`Compare-MIRPlannerReports.ps1` compares two runs that contain
+`compat-observations.json`. Use it after changing classifier, policy, or
+compatibility fixture behavior to see new and removed generated streams,
+capability decisions, unknown candidates, loop risks, owner rows,
+science/lab rows, cap diagnostics, and claim-level entries.
 
 ## Run Profiles
 
@@ -89,6 +117,8 @@ scripts/Invoke-MIRExtendedTests.ps1
 scripts/Invoke-MIRCompatAudit.ps1
 scripts/Convert-MIRCompatAuditResults.ps1
 scripts/New-MIRCompatProfileStub.ps1
+scripts/Test-MIRPolicyLints.ps1
+scripts/Compare-MIRPlannerReports.ps1
 ```
 
 Private helpers:

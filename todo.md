@@ -1,10 +1,10 @@
 # M.I.R. TODO
 
-Updated: 2026-07-06
+Updated: 2026-07-07
 
 This is the executable task list for the next More Infinite Research releases. Keep durable future work here, not only in derivative planning docs, so the project still has its task and release plan if the `docs/` tree is reorganized or partially lost.
 
-Use `docs/roadmap.md` for release scope, product boundaries, rationale, and high-level "why" explanations. Use `docs/notes/post-2.0-feature-plan.md` for the deeper idea archive, and `docs/notes/legacy-backport-cadence.md` for the expanded older-line backport ladder. Use `changelog.txt` as the authoritative past-change ledger.
+Use `docs/roadmap.md` for release scope, product boundaries, rationale, and high-level "why" explanations. Use `docs/notes/post-2.0-feature-plan.md` for the deeper idea archive, `docs/notes/legacy-backport-cadence.md` for the expanded older-line backport ladder, and `docs/notes/target-line-versioning-and-backports.md` for the locked post-`2.2.0` target-line policy. Use `changelog.txt` as the authoritative past-change ledger.
 
 ## Working Rules
 
@@ -13,7 +13,8 @@ Use `docs/roadmap.md` for release scope, product boundaries, rationale, and high
 - Treat `.0` releases as larger feature waves.
 - Aim for one validated Factorio `2.1` current-line update per week from 2026-07-06 through December 2026.
 - Aim for one older-line compatibility backport per day during the week-before through week-after Factorio `2.1` release celebration window.
-- Backport tested current-line snapshots to `legacy` as Factorio `2.0` compatible `1.9.x` releases, and treat older Factorio line ports as separate validation-gated target-line branches.
+- Backport tested current-line snapshots to `legacy` as Factorio `2.0` compatible `1.9.0` through `1.9.2` transition releases, and treat older Factorio line ports as separate validation-gated target-line branches.
+- After `1.9.2`, follow the locked target-line versioning policy: `3.x.x` for Factorio `2.1`, `2.x.x` for Factorio `2.0` starting at `2.3.0`, `1.9.3+` for Factorio `1.1`, `1.8.x` for Factorio `1.0`, `1.7.x` through `1.3.x` for Factorio `0.17` through `0.13`, and `0.12.x` through `0.6.x` for Factorio `0.12` through `0.6`.
 - Do not rebuild `legacy` commit-by-commit from older releases.
 - Keep generated technology names stable unless a tested migration exists.
 - Prefer native modifiers and recipe productivity.
@@ -138,7 +139,7 @@ Important release note: the scripted runtime work above is a **default-off v2.0.
 - [x] Existing old trash-slot technology progress has a JSON migration into the combined inventory/trash technology.
 - [x] Package includes `control.lua` and `control/`.
 - [x] Package includes `migrations/`.
-- [x] Package includes and mirrors the current `docs/` tree without requiring release docs to stay at fixed root paths.
+- [x] Package validation keeps runtime source, locale, migrations, metadata, README, changelog, license, and thumbnail in sync without shipping developer docs, fixtures, scripts, or task ledgers.
 - [x] Startup setting labels, descriptions, ordering, dropdown help, and experimental warnings are refreshed without changing generated technology names or defaults.
 - [x] README documents recommended default, vanilla-respectful, megabase, modpack compatibility, and debug/reporting settings patterns.
 - [x] Cannon shell productivity naming and icon art are aligned with the Cannon Shooting Speed cannon-shell icon family.
@@ -153,14 +154,14 @@ Important release note: the scripted runtime work above is a **default-off v2.0.
 - [x] Static validation passes.
 - [x] Package validation passes.
 - [x] Runtime fixture validation passes on the supported Factorio `2.1.x` binary.
-- [x] The current `docs/` tree is included in the package.
+- [x] The release package excludes the developer `docs/` tree to keep the shipped mod zip small.
 - [x] Package validation follows the current documentation layout instead of hard-coding release doc paths.
 - [x] README, docs, changelog, and package agree on release scope.
 - [x] Runtime feature claims stay conservative unless backed by manual/runtime validation.
 - [x] `dist/more-infinite-research_2.0.5.zip` is rebuilt from current source.
 - [x] Changelog has an entry matching `info.json` version.
 - [x] Zip filename and internal `info.json` version match `info.json`.
-- [x] Zip excludes dev-only files and includes required docs/source/locale/control/migration files.
+- [x] Zip excludes dev-only files and includes required runtime source, locale, control, migration, metadata, README, changelog, license, and thumbnail files.
 - [x] Git tree is clean after build.
 - [x] Static validation requires setting note keys, dropdown option descriptions, diagnostics order, and default-off scripted setting coverage.
 
@@ -476,7 +477,7 @@ small bug fixes, compatibility profiles, docs corrections, validation/tooling
 updates, or feature slices that pass the release gate. If a week has no safe
 candidate, record the skip reason instead of publishing an under-tested archive.
 
-Idea-mod audit planning lives in `docs/notes/mod-ideas-audit.md`.
+Idea-mod audit planning lives in `docs/notes/archive/mod-ideas-audit.md`.
 
 | Audit lane | `v2.1.5` decision |
 | --- | --- |
@@ -490,7 +491,10 @@ Idea-mod audit planning lives in `docs/notes/mod-ideas-audit.md`.
 - [x] Add exact known-competitor profiles from the `ideamods_mix` audit.
 - [x] Skip MIR lab productivity when infinite `research-productivity` or `laboratory-productivity-4` has the native lab-productivity effect.
 - [x] Add a small effect fixture for `laboratory-productivity-4` before calling the skip effect-equivalent.
-- [ ] Run the targeted external idea-mod load pass before tagging `v2.1.5`.
+- [x] Pull the low-risk `v2.2.0` planner slice into `v2.1.5` as diagnostics-only audit rows.
+- [x] Add recipe productivity cap diagnostics without changing caps, max levels, or stream generation.
+- [x] Pull non-gameplay `v2.2.0` audit tooling into `v2.1.5`: compatibility observations, report summaries, and CLI access.
+- [x] Run the targeted external idea-mod load pass before tagging `v2.1.5`.
 - [x] Add locale/docs/validation updates.
 - [ ] Add proven recipe IDs to existing streams when no new architecture is needed.
 - [ ] Rebalance costs or defaults for features already shipped in `v2.1.0`.
@@ -499,29 +503,58 @@ Idea-mod audit planning lives in `docs/notes/mod-ideas-audit.md`.
 
 Use `v2.2.0` for the next larger batch after the `v2.1.x` feedback cycle. Most ideamods are compatibility signals, not planned MIR features. Keep this release to compatibility planner foundations plus the first new MIR-owned behavior proven by fixtures; do not turn it into every interesting idea-mod signal.
 
-Idea-mod audit candidates should be promoted only after recipe-ID proof, balance decisions, licensing review, save-compatibility policy, and validation fixtures. Use `docs/compatibility-program.md` for the role taxonomy and one-archive audit template.
+Idea-mod audit candidates should be promoted only after recipe-ID proof, balance decisions, licensing review, save-compatibility policy, and validation fixtures. Use `docs/compatibility-program.md` for the role taxonomy and one-archive audit template. Use `docs/notes/2.2.0-feature-intake.md` for the July 2026 suggestions-transcript intake; it rejects separate product names and keeps future settings inside one plain MIR settings model.
 
 | Candidate | Source signal | First useful slice |
 | --- | --- | --- |
-| Compatibility planner/registry | All 50 idea-mod archives | Assign role enums, actions, non-actions, validation status, and public-claim boundaries before implementing broad features. |
-| Cap-aware UX | Productivity cap and finite-limit helper mods | Diagnostics or explicit setting; never silent cap mutation. |
-| Ore crushing productivity | Crushing Industry productivity research | Recipe-ID driven Crushing Industry stream or compatibility profile. |
+| Compatibility planner/registry | All 50 idea-mod archives | `v2.2.0` adds typed facts, compiler decisions, lab matrices, owner summaries, and report-only policy rows. |
+| Cap-aware UX | Productivity cap and finite-limit helper mods | `v2.2.0` adds useful-level estimates; settings or mutation policy remains deferred. |
+| External rule-mutator detection | Productivity, beacon, machine, cap, and cost mutator mods | `v2.2.0` detects cap, beacon, lab, and machine-rule surfaces without normalizing them. |
+| Loop-risk diagnostics | Recycler, crusher, catalyst, cleaning, scrubbing, spoilage, and voiding loops | `v2.2.0` reports obvious loop-risk flags before any productivity-rule or cap-mutation option. |
+| Air Scrubbing clean-filter productivity | `atan-air-scrubbing` | Clean pollution/spore filter recipe productivity only; exclude scrubbing and cleaning recipes. |
+| ATAN ash-processing productivity | `atan-ash` | Follow Air Scrubbing with exact ash-processing recipe IDs; start from productivity-allowed ash separation. |
+| ATAN nuclear science productivity | `atan-nuclear-science` | Prove exact nuclear science pack productivity through the existing dynamic science-pack stream; keep atom forge crafting outside that stream. |
+| Science-pack ingredient policies | Official, Space Age, and modded science-pack progression | `v2.2.0` adds one global dropdown with progression-aware options instead of one setting per generated technology. |
+| Big Mining Drill proof | `big-mining-drill` | Prove existing `research_mining_drill` matching against the standalone drill content mod. |
+| Fluid Must Flow coexistence | `FluidMustFlow` | Load and pipeline setting coexistence check; no duct behavior recreation. |
+| Robot Attrition coexistence | `robot_attrition` | Load-only adjacent runtime balance check; do not absorb bot crash behavior. |
+| Jetpack coexistence | `jetpack` | Load-only adjacent equipment check; do not absorb player movement or fuel behavior. |
+| Equipment Gantry coexistence | `equipment-gantry` | Load-only equipment-grid automation check; do not absorb item-grid processing behavior. |
+| AAI Containers coexistence | `aai-containers` | Load-only storage content check; do not absorb warehouse/container behavior. |
+| AAI Loaders belt productivity | `aai-loaders` | Prove loader crafting recipes through existing `research_belts`; do not absorb loader operating modes or compatibility hooks. |
+| AAI Industry tuning bridge | `aai-industry` | Mini-overhaul profile for recipe, science, lab, machine, pump, and prerequisite classification before K2. |
+| Ore crushing productivity | Crushing Industry productivity research | Recipe-ID driven Crushing Industry stream or compatibility profile after the ATAN proof slices. |
 | Tile/surface productivity | Asphalt, concrete, landfill, foundation productivity mods | Decide conservative defaults, exact cleanup rules, and optional high-value profile policy before implementation. |
 | Overhaul material families | Pyanodon, Expanded Productivity Research, Crafting Efficiency | Pick one concrete family first; avoid a generic generator. |
 | Native overlap policy | Lab, mining, solar, and other native productivity mods | General skip/warn/prefer/allow behavior with fixtures. |
-| Companion boundary | Beacon/module/productivity-rule mutator mods | Decide whether this belongs outside MIR core. |
+| Out-of-scope content families | Solar/entity replacement, runtime productivity, research-cost systems, radar/lab/logistics/content mods | Keep as diagnostics or compatibility fixtures only unless a future scope decision is made. |
 
-- [ ] Keep `docs/compatibility-program.md` and `docs/compatibility-matrix.md` current before making new compatibility claims.
+- [x] Keep `docs/compatibility-program.md` and `docs/compatibility-matrix.md` current before making new compatibility claims.
 - [ ] Add one structured audit row for each archive in `C:\Projects\Factorio\ideamods_mix` using the role enum and one-archive template.
 - [ ] Add audited-zip checksum records for local compatibility campaigns so future Mod Portal updates do not silently change what was proved.
-- [ ] Build the compatibility planner/registry before broad new stream work, with detected mods, actions, non-actions, warnings, and public-claim boundaries.
-- [ ] Keep "replace exactly" separate from "cooperate/skip/prefer external" in code, docs, changelog, and release notes.
+- [x] Build the compatibility planner/registry before broad new stream work, with typed facts, decisions, lab matrices, and report-only policy rows.
+- [x] Keep "replace exactly" separate from "cooperate/skip/prefer external" in code, docs, changelog, and release notes.
 - [ ] Add save-compatibility notes before any feature removes, hides, or replaces external technologies that may already be researched.
-- [ ] Build cap-aware diagnostics before adding balance-heavy productivity families.
-- [ ] Treat ore-crushing productivity as the first clean new stream candidate only if recipe-ID fixtures pass.
+- [x] Preserve the one-mod product rule: do not add separate product names, companion branding, or "Extended" labels to docs, release notes, or settings.
+- [x] Keep settings labels plain and feature-family based; do not add per-mod settings or unimplemented option labels.
+- [ ] Require disabled-by-default prototype features to do no mutation and no broad scan at default values.
+- [ ] Keep prototype mutations behind startup settings; use runtime settings only for real runtime systems with performance and migration proof.
+- [x] Add external rule-mutator diagnostics before considering recipe-productivity rule changes.
+- [x] Add loop-risk diagnostics before considering cap removal, recycler productivity, broad productivity eligibility, or beacon productivity.
+- [x] Build cap-aware diagnostics before adding balance-heavy productivity families.
+- [x] Treat Air Scrubbing filter productivity as a clean-filter-only stream candidate; prove scrubbing and cleaning recipes are excluded.
+- [x] Keep upstream advertised Factorio versions as claim-lane metadata, not a blocker for fixture-backed support or future `2.0` backports.
+- [x] Add `atan-ash` as the next same-author proof slice after Air Scrubbing and Nuclear Science.
+- [x] Add `atan-nuclear-science` as a same-author proof slice through science-pack productivity.
+- [x] Add `big-mining-drill` as an existing mining-drill stream proof slice.
+- [x] Add `FluidMustFlow`, `robot_attrition`, and `jetpack` as coexistence/load targets, not MIR-owned gameplay.
+- [x] Add `aai-loaders` as an existing belt stream proof slice.
+- [x] Add `equipment-gantry`, `aai-containers`, and `aai-industry` as procedural tuning targets before large overhaul campaigns.
+- [x] Use the requested tuning set to refine discovery, normalization, classification, owner detection, lab/science derivation, rejection, and reporting before moving to K2.
+- [ ] Treat ore-crushing productivity as the first broader family-stream candidate only if recipe-ID fixtures pass.
 - [ ] Require an explicit balance policy before shipping tile/surface productivity changes.
 - [ ] Limit any overhaul material-family slice to one concrete family with fixture-proven recipe IDs.
-- [ ] Keep Space Exploration, Krastorio 2, AAI, Bob's, and combination support as separate future matrices instead of one broad compatibility promise.
+- [ ] Keep Krastorio 2 as the first large overhaul campaign after the proof ladder, with Bob's, Angel's, Space Exploration, Pyanodons, AAI combinations, and suite mixes as separate future matrices.
 - [ ] Revisit pump/fluid/logistics work that was too large for `v2.1.0`.
 - [ ] Revisit advanced settings UX if presets are not enough.
 - [ ] Revisit bounded scripted research ideas after the framework has proven stable.
@@ -529,12 +562,120 @@ Idea-mod audit candidates should be promoted only after recipe-ID proof, balance
 - [ ] Evaluate an ore-crushing productivity stream for Crushing Industry and overhaul mods.
 - [ ] Evaluate broader Pyanodon/Bob/EV material-family streams only from concrete recipe families, not generic name overlap.
 - [ ] Decide whether cap-aware finite conversion or warning UX belongs in MIR after reviewing productivity-cap helper mods.
-- [ ] Decide whether module/beacon/productivity-rule mutation belongs in a companion mod rather than MIR core.
-- [ ] Decide which growing ideas should split to companion mods.
+- [ ] Decide whether any module/beacon/productivity-rule mutation belongs in MIR at all; if yes, make it opt-in, fixture-backed, and plainly named.
+- [x] Keep runtime productivity, solar/entity replacement, broad research-cost mutation, and large content recreation out of `v2.2.0`.
+
+## v3.0.0 Compatibility Compiler
+
+Start this line only after the `1.9.2` Factorio `2.0` transition backport is
+validated or explicitly deferred. Use
+`docs/notes/3.0.0-compatibility-compiler-charter.md` as the scope boundary.
+The goal is architecture, contracts, migrations, fixtures, and maintainability,
+not broad new gameplay generation.
+
+Reference docs:
+
+- `docs/notes/3.0.0-repository-structure.md`
+- `docs/capabilities.md`
+- `docs/policy-overlays.md`
+- `docs/decision-records.md`
+- `docs/stream-manifest.md`
+- `docs/compatibility-claims.md`
+- `docs/testing.md`
+- `docs/migration-guide-2.x-to-3.0.md`
+- `docs/maintainer-guide.md`
+- `docs/adr/`
+
+### v3.0.0 Alpha 1: Skeleton And Contracts
+
+- [ ] Create the Factorio shell plus `prototypes/mir/` compiler namespace from `docs/notes/3.0.0-repository-structure.md`.
+- [ ] Convert root Factorio files into thin stage wrappers without changing behavior.
+- [ ] Add `stage/`, `core/`, `platform/`, `domain/`, and `legacy/` as the first migration shell.
+- [ ] Keep existing public module paths as legacy shims where that reduces target-line backport friction.
+- [ ] Add or formalize schema validators for facts, candidates, decisions, stream specs, manifests, claims, fixtures, and migrations.
+- [ ] Promote the capability resolver contract to the public 3.0 architecture boundary.
+- [ ] Add `DecisionRecord` v1 validation.
+- [ ] Add `StreamSpec` v1 validation.
+- [ ] Add policy overlay schema validation.
+- [ ] Add stable ID helper tests.
+- [ ] Confirm alpha 1 adds no new gameplay behavior.
+
+### v3.0.0 Alpha 2: Current Behavior Through Compiler Phases
+
+- [ ] Move old generator, recipe-matching, compat-profile, and report-row code behind legacy shims before deeper rewrites.
+- [ ] Move existing explicit stream generation behind validated `StreamSpec` records without changing released technology IDs.
+- [ ] Move Air Scrubbing clean-filter support through capability and policy records.
+- [ ] Move owner, cap, lab, and loop diagnostics into report modules.
+- [ ] Make the emission layer the only layer that mutates technology prototypes.
+- [ ] Run report diffs proving no unexpected generated technology changes.
+
+### v3.0.0 Alpha 3: Fact Registry V2
+
+- [ ] Expand facts for items, fluids, entities, technologies, labs, machines, resources, modules, owners, and rule surfaces.
+- [ ] Add entity-backed item and recipe links.
+- [ ] Add loader and mining-drill facts.
+- [ ] Add machine base-productivity facts.
+- [ ] Add rule-surface facts for caps, modules, beacons, recyclers, and labs.
+
+### v3.0.0 Alpha 4: Capability Registry
+
+- [ ] Keep recipe productivity separate from native modifiers.
+- [ ] Add machine manufacturing capability.
+- [ ] Add loader manufacturing capability as report-first unless an existing stream owns the target.
+- [ ] Add mining-drill manufacturing capability as report-first unless an existing stream owns the target.
+- [ ] Add native modifier capability as observe-only by default.
+- [ ] Add science/lab integration capability as a hard researchability gate.
+
+### v3.0.0 Beta 1: Graph And Safety
+
+- [ ] Add or formalize recipe graph, technology graph, science graph, resource-chain graph, and loop-risk graph outputs.
+- [ ] Expand negative fixtures for self-return, barrel/container return, cleaning, catalyst, recycling, voiding, matter/transmutation, hidden recipes, zero caps, external owners, loader decoys, drill decoys, and lab incompatibility.
+- [ ] Require report diff review for broad classifier or policy changes.
+- [ ] Add performance budgets for large modpacks and verbose diagnostics.
+
+### v3.0.0 Beta 2: Compatibility Proof
+
+- [ ] Revalidate Air Scrubbing through the new compiler path.
+- [ ] Revalidate ATAN Nuclear Science as a science/lab fixture.
+- [ ] Revalidate AAI Loaders as a loader manufacturing report or existing belt-stream proof.
+- [ ] Revalidate Big Mining Drill as a drill manufacturing report or existing drill-stream proof.
+- [ ] Add ore-crushing productivity only if exact recipe IDs, owner checks, loop checks, cap checks, lab checks, and manifest rows pass.
+
+### v3.0.0 Beta 3: Docs, Claims, And Migrations
+
+- [ ] Keep compatibility claim manifests synchronized with public docs.
+- [ ] Keep generated stream manifests synchronized with emitted technologies.
+- [ ] Write migration notes for any changed generated technology IDs.
+- [ ] Refresh README for the 3.0 compatibility compiler model.
+- [ ] Keep ADRs current when architectural decisions change.
+
+### v3.0.0 Release Gate
+
+- [ ] Run `.\scripts\Invoke-MIRValidation.ps1 -StaticOnly`.
+- [ ] Run Factorio `2.1` runtime validation.
+- [ ] Run `.\scripts\mir.ps1 release gate --profile release-targeted-2.1 --no-git-pull`.
+- [ ] Run `git diff --check`.
+- [ ] Review final planner report diffs.
+- [ ] Confirm package hygiene excludes docs, fixtures, scripts, task ledgers, and generated artifacts that do not belong in the mod zip.
+- [ ] Confirm public docs do not claim broad K2, Bob's, Angel's, Space Exploration, Pyanodons, AAI, native modifier, cap, beacon, recycler, or runtime productivity support beyond fixture-backed behavior.
 
 ## Legacy Backports
 
 Do not reconstruct old releases commit-by-commit for `legacy`. A legacy release is a compatibility port of a tested current-line snapshot.
+
+### v1.9.2 Backport From The Tested v2.2.0 Snapshot
+
+- [ ] Install or verify a real Factorio `2.0` Space Age-capable binary at `D:\Programs\Factorio`.
+- [ ] Create `tmp/2.0` from the tested `2.2.0` source point.
+- [ ] Set the backport metadata to `version = 1.9.2`, `factorio_version = 2.0`, and `base >= 2.0`.
+- [ ] Remove or guard Factorio `2.1`-only technology modifiers and prototype surfaces in the backport branch.
+- [ ] Run static validation on `tmp/2.0`.
+- [ ] Run runtime validation on `tmp/2.0` with `D:\Programs\Factorio\bin\x64\factorio.exe`.
+- [ ] Run `release-targeted-2.0` against `C:\Projects\Factorio\testmods_2.0`.
+- [ ] Bring portable fixes discovered on `tmp/2.0` back to `dev` without merging target-line metadata downgrades.
+- [ ] Revalidate `dev` with the Steam Factorio `2.1` binary after any portable fixes.
+- [ ] Merge the validated `tmp/2.0` port into `legacy` and release `1.9.2`.
+- [ ] After `1.9.2`, start the `3.0.0` compatibility-compiler line on `dev` under the new versioning scheme.
 
 ### v1.9.1 Backport From The Tested v2.1.0 Snapshot
 
@@ -545,41 +686,32 @@ Do not reconstruct old releases commit-by-commit for `legacy`. A legacy release 
 - [x] Build `dist/more-infinite-research_1.9.1.zip`.
 - [x] Validate with a Factorio `2.0.x` binary.
 
-### Planned v1.9.7 / v1.9.8 / v1.9.9 Factorio 2.0 Backports
+### Superseded v1.9.7 / v1.9.8 / v1.9.9 Factorio 2.0 Backports
 
-- [ ] One week before Factorio `2.1` release, identify the latest tested MIR `2.x.x` source point.
-- [ ] Backport that source point to Factorio `2.0` as `v1.9.7`.
-- [ ] At Factorio `2.1` release, identify the latest tested MIR `2.x.x` source point.
-- [ ] Backport that source point to Factorio `2.0` as `v1.9.8`.
-- [ ] For the Factorio `2.1` stable/end-of-year support sweep, identify the latest tested MIR `2.x.x` source point.
-- [ ] Backport that source point to Factorio `2.0` as final `v1.9.9`.
-- [ ] Validate every `1.9.x` backport with a real Factorio `2.0.x` binary before publishing compatibility claims.
+The older `v1.9.7`, `v1.9.8`, and `v1.9.9` Factorio `2.0` ladder is superseded
+by the `v1.9.2` transition backport and the post-transition target-line
+versioning reset unless the maintainer explicitly revives it.
+
+If revived, restore these only after recording the selected source point,
+Factorio binary, local library, target metadata, and release reason.
 
 ### v1.9.9 Final Factorio 2.0 Backport
 
-- [ ] Treat the `v1.9.9` source point as the Factorio `2.1` stable/end-of-year support sweep snapshot.
-- [ ] Backport that latest tested source snapshot to `legacy`.
-- [ ] Set the legacy mod version to `1.9.9`.
-- [ ] Treat `1.9.9` as the final planned Factorio `2.0` release.
-- [ ] Verify the actual Factorio `2.1` stable status before making final-support claims.
+This section is retained as historical planning context only. It is not active
+unless the maintainer revives the pre-reset final Factorio `2.0` plan.
 
-### Older Factorio Line Backport Ladder
+### Locked Target-Line Backport Ladder
 
-- [ ] Use `docs/notes/legacy-backport-cadence.md` as the source of truth for `1.8.x` and `1.7.x` target-line mapping.
-- [ ] Treat the older-line campaign as tentative but maintainer-authorized planning, subject to validation and actual Factorio `2.1` release timing.
-- [ ] During the Factorio `2.1` celebration window, attempt at most one older-line backport per day from the week before release through the week after release.
-- [ ] Backport the week-before-Factorio-2.1-release snapshot to Factorio `1.1` as `v1.8.8`.
-- [ ] Backport the Factorio `2.1` stable/end-of-year snapshot to Factorio `1.1` as `v1.8.9`.
-- [ ] Backport the week-before-Factorio-2.1-release snapshot to Factorio `1.0` as `v1.8.6`.
-- [ ] Backport the Factorio `2.1` stable/end-of-year snapshot to Factorio `1.0` as `v1.8.7`.
-- [ ] Backport the week-before-Factorio-2.1-release snapshot to Factorio `0.17` as `v1.8.4`.
-- [ ] Backport the Factorio-2.1-release snapshot to Factorio `0.17` as `v1.8.5`.
-- [ ] Backport the week-before-Factorio-2.1-release snapshot to Factorio `0.16` as `v1.8.2`.
-- [ ] Backport the Factorio-2.1-release snapshot to Factorio `0.16` as `v1.8.3`.
-- [ ] Backport the week-before-Factorio-2.1-release snapshot to Factorio `0.15` as `v1.8.0`.
-- [ ] Backport the Factorio-2.1-release snapshot to Factorio `0.15` as `v1.8.1`.
-- [ ] After Factorio `2.1` release, backport the week-before-Factorio-2.1-release snapshot to Factorio `0.14` through `0.6` as `v1.7.8` through `v1.7.0`.
-- [ ] Validate each older-line backport with a matching target Factorio binary when available, and document any missing validation in release notes.
+- [ ] Use `docs/notes/target-line-versioning-and-backports.md` as the source of truth for the locked version-line mapping.
+- [ ] Use `docs/notes/legacy-backport-cadence.md` as the source of truth for target order, support class, and source snapshot language.
+- [ ] Treat every lower line as a separate target-line port, not a wholesale `3.0.0` backport.
+- [ ] Release `v2.3.0` as the first Factorio `2.0` port of the MIR 3 architecture only after `v3.0.0` is stable and a Factorio `2.0` binary loads the exact built package.
+- [ ] Release `v1.9.3` as the first Factorio `1.1` compatibility port only after target-line implementation and binary validation.
+- [ ] Release `v1.8.0` as the first Factorio `1.0` compatibility port only after the Factorio `0.18` bridge policy is recorded.
+- [ ] Release `v1.7.0`, `v1.6.0`, and `v1.5.0` as reduced native-infinite editions for Factorio `0.17`, `0.16`, and `0.15` only after target binary proof.
+- [ ] Release `v1.4.0`, `v1.3.0`, and `v0.12.0` as archive finite-ladder reconstructions only after target binary proof.
+- [ ] Release `v0.11.0` through `v0.6.0` as museum/discovery builds only after target binary and base-file discovery.
+- [ ] Validate each target-line release with a matching target Factorio binary when available, and document any missing validation in release notes.
 
 <!-- MIR legacy RC plan start: tmp/2.0 -->
 ### `tmp/2.0` Factorio `2.0` RC Planning

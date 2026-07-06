@@ -108,8 +108,10 @@ claimed as supported:
 | What if both mods stay enabled? | MIR needs cleanup, skip, warning, or coexist behavior. |
 | What if the external mod has startup settings? | Exact replacement may stop being exact. |
 
-For `2.1.5`, exact cleanup is safe because it is narrow and guarded. For
-`2.2.0+`, save behavior should be a required row in every compatibility campaign.
+For `2.1.5`, exact cleanup is safe because it is narrow and guarded. The
+diagnostics-only planner rows added in the same line do not change save behavior.
+For `2.2.0+`, save behavior should be a required row in every compatibility
+campaign.
 
 ## Test Matrix Model
 
@@ -408,7 +410,8 @@ Every integration should have a fixture or load scenario.
 
 ## Compatibility Planner Output
 
-`2.2.0` should move toward a compatibility planner that can emit a structured
+`2.1.5` starts the compatibility planner as diagnostics-only audit rows. `2.2.0`
+extends that into a report-only compiler spine that can emit a structured
 summary when diagnostics are enabled:
 
 ```text
@@ -429,6 +432,57 @@ Non-actions:
 - Not changing allowed productivity effects.
 - Not changing beacons or modules.
 ```
+
+The `2.2.0` compiler rows are typed around recipe, technology, machine, lab,
+owner, and rule-surface facts. They also emit decision rows, lab-matrix rows,
+loop-risk rows, rule-surface rows, owner summaries, and useful cap estimates.
+These rows are evidence for future policy gates; they are not broad automatic
+support claims.
+
+The procedural compatibility kernel is documented in
+`docs/procedural-compatibility-kernel.md`. Its first capability resolvers are
+report-first:
+
+- `logistics-loader-manufacturing` classifies loader crafting recipes from item,
+  placed entity, and recipe-output evidence, then reports whether the existing
+  belt productivity stream emitted them.
+- `mining-drill-manufacturing` classifies drill crafting recipes from item,
+  placed entity, and recipe-output evidence, then reports whether the existing
+  mining-drill productivity stream emitted them.
+- `native-modifier-ownership` reports owners for selected native modifiers,
+  including lab productivity, mining yield, logistics stack size, and robot
+  bonuses, without stacking or replacing them broadly.
+
+The resolver contract is `discover -> classify -> propose -> validate -> emit
+-> diagnose`. In the current implementation, "emit" means "observe the stream or
+policy that already emitted". A future resolver can create new technologies only
+after it has stable stream IDs, fixture coverage, owner checks, lab checks, cap
+diagnostics, and loop-risk denials.
+
+The compatibility platform now has committed machine-readable policy surfaces:
+
+- `prototypes/lib/policy/capabilities.lua` for capability-specific policy;
+- `prototypes/planner/generated-stream-manifest.json` for stable generated IDs
+  and migration policy;
+- `fixtures/compat-matrix/claims.json` for public claim text, capability status,
+  generated stream references, and backing fixtures;
+- `scripts/Test-MIRPolicyLints.ps1` to reject missing schema fields, generated
+  streams without manifest rows, current fixture-backed claims without fixtures,
+  and broad public wording.
+
+Negative fixtures are mandatory for capability work that introduces a new
+automatic target class. The first negative fixture covers self-return, barrel
+return, cleaning, voiding, transmutation, hidden recipe, zero-cap, loader-like
+non-loader, and drill-like non-drill cases.
+
+The `3.0.0` line promotes this program into the compatibility compiler
+architecture documented in
+`docs/notes/3.0.0-compatibility-compiler-charter.md`. The supporting subsystem
+docs are `docs/capabilities.md`, `docs/policy-overlays.md`,
+`docs/decision-records.md`, `docs/stream-manifest.md`,
+`docs/compatibility-claims.md`, `docs/testing.md`,
+`docs/migration-guide-2.x-to-3.0.md`, `docs/maintainer-guide.md`, and
+`docs/adr/`.
 
 The long-term data-stage shape should be:
 
@@ -455,6 +509,18 @@ many per-mod settings:
 | `diagnostics-only` | MIR reports interactions but does not perform cleanup or skip behavior beyond hard safety guards. |
 
 The default should be `auto-safe`.
+
+Do not turn compatibility modes into separate product names. MIR should remain
+one mod with one settings page. If future settings expose balance-changing
+compatibility behavior, use plain feature-family labels and keep the default
+conservative. Source-mod names belong in audit rows and compatibility docs, not
+as one-off settings.
+
+For prototype mutation features, disabled must mean no mutation and no broad
+scan. Prefer the existing pipeline-extent pattern: default unchanged, the pass
+exits early, and diagnostics explain what happened only when the user asks for
+reports. Runtime settings should be reserved for real runtime logic with
+performance, migration, and uninstall proof.
 
 ## Audited Zip Reproducibility
 

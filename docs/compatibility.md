@@ -2,7 +2,7 @@
 
 More Infinite Research's current main line targets Factorio `2.1.x` and uses a compatibility-first data-stage plus narrow control-stage model.
 
-For compatibility planning policy, use `docs/compatibility-program.md`. It defines the role taxonomy, one-archive audit template, licensing rule, save-compatibility questions, test matrix model, and planner architecture. For tested claims and future campaign rows, use `docs/compatibility-matrix.md`.
+For compatibility planning policy, use `docs/compatibility-program.md`. It defines the role taxonomy, one-archive audit template, licensing rule, save-compatibility questions, test matrix model, and planner architecture. For tested claims and future campaign rows, use `docs/compatibility-matrix.md`. For the post-`2.2.0` target-line versioning and backport workflow, use `docs/notes/target-line-versioning-and-backports.md`. For the `3.0.0` compatibility compiler architecture, use `docs/notes/3.0.0-compatibility-compiler-charter.md` plus the focused capability, policy, decision, manifest, claim, testing, maintainer, and ADR docs.
 
 Release-line summary:
 
@@ -13,10 +13,23 @@ Release-line summary:
 | `2.1.0` | `2.1.x` | larger feature wave: simpler settings, icon policy, fluid productivity, pipeline extent, and targeted duplicate-productivity compatibility |
 | `1.9.1` | `2.0.x` | compatible subset backported from the tested `2.1.0` larger feature snapshot |
 | `2.1.5` | `2.1.x` | quick feedback patch after `2.1.0` |
-| `1.9.7` | `2.0.x` | planned week-before-Factorio-2.1-release backport from the latest tested `2.x.x` snapshot |
-| `1.9.8` | `2.0.x` | planned Factorio-2.1-release backport from the latest tested `2.x.x` snapshot |
-| `1.9.9` | `2.0.x` | final planned Factorio 2.0 port from the latest tested `2.x.x` snapshot for the Factorio `2.1` stable/end-of-year support sweep |
-| `1.8.x` / `1.7.x` | `1.1.x` through `0.6.x` | older-line compatibility ladder recorded in `docs/notes/legacy-backport-cadence.md` |
+| `1.9.7` | `2.0.x` | superseded unless explicitly revived; older week-before-Factorio-2.1-release plan |
+| `1.9.8` | `2.0.x` | superseded unless explicitly revived; older Factorio-2.1-release plan |
+| `2.2.0` | `2.1.x` | compatibility planner, procedural capability diagnostics, and fixture-backed proof slices |
+| `1.9.2` | `2.0.x` | planned transition backport of the tested `2.2.0` source point |
+| `1.9.9` | `2.0.x` | superseded unless explicitly revived; older final Factorio 2.0 plan |
+| `3.x.x` | `2.1.x` | canonical modern line starting at `3.0.0`; MIR compiler architecture |
+| `2.x.x` | `2.0.x` | maintained Factorio `2.0` line starting at `2.3.0`; first post-3.0 architecture port |
+| `1.9.3+` | `1.1.x` | compatibility port; `1.9.0` through `1.9.2` remain transition exceptions for Factorio `2.0` |
+| `1.8.x` | `1.0.x` | compatibility port; Factorio `0.18` bridge policy still needs recording |
+| `1.7.x` / `1.6.x` / `1.5.x` | `0.17.x` / `0.16.x` / `0.15.x` | reduced native-infinite editions |
+| `1.4.x` / `1.3.x` / `0.12.x` | `0.14.x` / `0.13.x` / `0.12.x` | archive finite-ladder reconstructions |
+| `0.11.x` through `0.6.x` | `0.11.x` through `0.6.x` | museum/discovery builds |
+
+Post-transition versioning starts after the `1.9.2` backport. From that point,
+public MIR version lines encode the target Factorio generation. Lower lines do
+not imply feature parity; every target-line archive must load under its matching
+Factorio binary before any release candidate wording is honest.
 
 The release goal is graceful compatibility without mod-page dependency clutter: compatible mods should work when their prototypes are visible, absent mods should be skipped cleanly, and no compatibility mod should be required for this mod to load.
 
@@ -32,7 +45,7 @@ clear support boundaries outrank the calendar.
 - Science packs are discovered from `data.raw.lab[*].inputs` and resolved through generic item prototype lookup.
 - Science-pack productivity starts with the vanilla and Space Age target list, then appends active lab inputs so custom science packs can receive productivity effects when their recipes are visible.
 - A generated technology must have at least one lab that accepts its complete science-pack set. If no lab accepts the full set, `mir-lab-incompatibility-policy` controls whether the mod tries the largest deterministic lab-compatible subset (`reduce`, default) or skips the technology (`skip`). If no subset exists, the stream is skipped and logged.
-- `ips-require-space-gate` adds an end-game science unlock prerequisite only. `mir-science-pack-ingredient-policy` controls whether generated technologies keep their configured ingredients, add space science, add space and promethium science, add all official base and Space Age science packs, or add every active lab science pack including compatible modded packs.
+- `ips-require-space-gate` adds an end-game science unlock prerequisite only. `mir-science-pack-ingredient-policy` controls whether generated technologies keep their configured ingredients, add fixed late-game packs, infer missing official or modded progression packs from selected packs, add all official base and Space Age science packs, or add every active lab science pack including compatible modded packs.
 - Recipe matching supports both `recipe.category` and Factorio 2.1 `recipe.categories`, and can match visible item or fluid recipe outputs.
 - Recipe-productivity generation skips recipe effects already owned by another infinite recipe-productivity technology. In Space Age this prevents parallel MIR technologies for vanilla `processing-unit-productivity`, `low-density-structure-productivity`, `plastic-bar-productivity`, and `rocket-fuel-productivity`.
 - Recipe-productivity ownership is validated by exact recipe ID, not by similar technology icons. Base-only green, red, and blue circuit recipes are MIR-owned; with Space Age enabled, green and red circuits remain MIR-owned while vanilla `processing-unit-productivity` is the single infinite owner for the `processing-unit` recipe.
@@ -55,7 +68,7 @@ clear support boundaries outrank the calendar.
 - Release metadata declares optional ordering for official DLC mods, with hidden optional ordering for Elevated Rails and Quality. Elevated Rails is hidden because its Rail productivity coverage is opportunistic and should not present Elevated Rails as required or recommended; Quality is hidden so quality module recipes are visible before module productivity is generated without presenting Quality as a required or recommended dependency. Third-party compatibility remains opportunistic and avoids compatibility-mod dependencies.
 - Weapon shooting speed overlap handling only removes rocket and cannon-shell speed effects from MIR's generated weapon shooting speed continuation. Finite vanilla weapon shooting speed technologies keep their original rocket and cannon-shell bonuses so tank cannon fire rate is not reduced.
 - `mir-debug-generation-report` can be enabled to capture why each stream or base extension generated or skipped.
-- The generation report also emits parser-friendly `audit schema=1` rows for stream decisions, native modifier overlaps, and recipe-owner skips.
+- The generation report also emits parser-friendly `audit schema=1` rows for stream decisions, native modifier overlaps, recipe-owner skips, compatibility planner observations, and recipe-cap warnings.
 - `mir-debug-recipe-matches` can be enabled to capture matched recipe names per stream and duplicate recipe matches across streams.
 
 ## Future Overlap Policy
@@ -78,7 +91,7 @@ The broad mod-portal audit is local/manual because it can require Factorio crede
 - `scripts/Invoke-MIRCompatAudit.ps1`: mod-portal catalog, dependency, lockfile, optional download, and optional load-test runner.
 - `scripts/MIRCompatAudit/`: portal, dependency, diagnostics-parser, and Factorio runner helper libraries.
 - `scripts/Invoke-MIRExtendedTests.ps1`: tiered wrapper for static, runtime, smoke, top-25, manual-scenario, full-audit, and save-compat runs.
-- `scripts/Convert-MIRCompatAuditResults.ps1`: groups load/audit results into failure classes and writes profile-candidate evidence.
+- `scripts/Convert-MIRCompatAuditResults.ps1`: groups load/audit results into failure classes, writes profile-candidate evidence, and writes diagnostics-only compatibility observations.
 - `scripts/New-MIRCompatProfileStub.ps1`: creates review-required Lua stubs from grouped audit failures.
 - `fixtures/compat-matrix/manual-scenarios.json`: curated high-risk scenarios that should not be inferred from downloads alone.
 - `fixtures/compat-matrix/local-library-scenarios.json`: curated Factorio `2.1` scenarios intended for large local zip libraries such as `C:\Projects\Factorio\testmods_2.1`.
@@ -201,9 +214,9 @@ Use the underlying scripts directly only when debugging or composing a narrower 
 
 The default smoke mods and representative scenario are ordinary parameters, so future release lines can reuse the same command without changing script code. It writes `release-targeted-summary.md/json` under `artifacts/release-targeted-*`.
 
-`mir.ps1` is the stable front door for humans. It delegates to the existing scripts rather than replacing them, supports JSON run profiles from `fixtures/run-profiles/`, and exposes common commands such as `release gate`, `overnight local`, `audit local`, `audit top25 --space-age`, `package build`, `report latest`, `report missing-deps`, `profile stub`, and `local-index build`. Use `--factorio`, `--mods`, `--output`, `--timeout`, and `--profile` for common overrides instead of editing scripts.
+`mir.ps1` is the stable front door for humans. It delegates to the existing scripts rather than replacing them, supports JSON run profiles from `fixtures/run-profiles/`, and exposes common commands such as `release gate`, `overnight local`, `audit local`, `audit top25 --space-age`, `package build`, `report latest`, `report missing-deps`, `report observations`, `profile stub`, and `local-index build`. Use `--factorio`, `--mods`, `--output`, `--timeout`, and `--profile` for common overrides instead of editing scripts.
 
-`Start-MIROvernightLocalSweep.ps1` is the preferred bedtime command for the local `2.1` library. It removes one-line paste hazards, starts a transcript log, writes `run-manifest.json`, `events.jsonl`, `artifact-index.json`, and `index.html`, runs the strict release gate, then runs the local sweep with `-CollectAll`. The underlying prioritized local sweep covers curated combinations from `fixtures/compat-matrix/local-library-scenarios.json`, generated all-local/cluster stress scenarios, and then each individual local root zip. Missing dependencies and impossible mod combinations are expected to appear as grouped failures; they are still useful evidence because they distinguish "not testable with this local library" from actual MIR generation regressions. `Show-MIROvernightSummary.ps1` summarizes the next-morning triage views across the whole output tree.
+`Start-MIROvernightLocalSweep.ps1` is the preferred bedtime command for the local `2.1` library. It removes one-line paste hazards, starts a transcript log, writes `run-manifest.json`, `events.jsonl`, `artifact-index.json`, and `index.html`, runs the strict release gate, then runs the local sweep with `-CollectAll`. The underlying prioritized local sweep covers curated combinations from `fixtures/compat-matrix/local-library-scenarios.json`, generated all-local/cluster stress scenarios, and then each individual local root zip. Missing dependencies and impossible mod combinations are expected to appear as grouped failures; they are still useful evidence because they distinguish "not testable with this local library" from actual MIR generation regressions. `compat-observations.md/json/csv` records diagnostics-only planner rows and cap warnings. `Show-MIROvernightSummary.ps1` summarizes the next-morning triage views across the whole output tree.
 
 `GeneratedLocalScenarios` creates scenarios from local zip metadata: one all-local mega scenario, cluster scenarios for planet/Space Age content, BZ/resource chains, Bob, Krastorio/K2SO, production/fluid/casting/resource-flow mods, and logistics/transport mods. Add `-IncludeGeneratedLocalPairwise -GeneratedLocalPairwiseLimit 40` to the wrapper when you want a capped pairwise pass inside high-risk local clusters. `LocalModZips` can be sharded with `-ShardLocalModZips -StartIndex N -ShardSize M`; without `-ShardLocalModZips`, it tests every local root.
 
@@ -273,9 +286,9 @@ Do not publish a compatibility-heavy archive from static validation alone. After
 
 ## Legacy Backport Model
 
-The Factorio `2.0` legacy release More Infinite Research `v1.9.0` was released from the `legacy` branch, backported from the tested More Infinite Research `v2.0.5` Factorio `2.1` quick-patch codebase. `v1.9.1` follows the same snapshot-port model from the tested More Infinite Research `v2.1.0` source point. The planned later Factorio `2.0` ladder is `v1.9.7` one week before Factorio `2.1` release, `v1.9.8` at Factorio `2.1` release, and `v1.9.9` for the Factorio `2.1` stable/end-of-year support sweep.
+The Factorio `2.0` legacy release More Infinite Research `v1.9.0` was released from the `legacy` branch, backported from the tested More Infinite Research `v2.0.5` Factorio `2.1` quick-patch codebase. `v1.9.1` follows the same snapshot-port model from the tested More Infinite Research `v2.1.0` source point. The next transition port is `v1.9.2` from the tested `v2.2.0` source point. The older planned `v1.9.7`, `v1.9.8`, and `v1.9.9` Factorio `2.0` ladder is superseded by the locked post-`1.9.2` target-line policy unless the maintainer explicitly revives it.
 
-The expanded older-line ladder for Factorio `1.1` through `0.6` lives in `docs/notes/legacy-backport-cadence.md`. Those ports should be treated as separate target-line compatibility releases, not as automatic feature-parity claims.
+The expanded older-line ladder for Factorio `1.1` through `0.6` lives in `docs/notes/legacy-backport-cadence.md`. Those ports should be treated as separate target-line compatibility, archive, or museum releases, not as automatic feature-parity claims.
 
 The daily celebration cadence does not change the compatibility model: each
 archive still needs target-line metadata, unsupported-surface guards, package
@@ -328,10 +341,28 @@ These integrations do not add mod-page dependencies. More Infinite Research hand
 - Expanded Productivity Research (`ExpandedProductivityResearch`) and Crafting Efficiency (`crafting-efficiency-2`): generated infinite recipe-productivity technologies can be replaced only when MIR's enabled streams prove exact recipe and value coverage.
 - Research Productivity (`Research_Productivity`): MIR's base-game lab productivity stream is skipped when an infinite `laboratory-productivity-4` has the native `laboratory-productivity` effect.
 - Panglia-style planet mods: additional productivity-allowed rocket fuel and low density structure recipes can be adopted into the existing vanilla Space Age `rocket-fuel-productivity` and `low-density-structure-productivity` technologies when those vanilla owners are safe.
-- Omega Drill style drill mods: `omega-drill`, `omega-tau`, and broader modded `*-mining-drill` / `*-drill` outputs are picked up by mining drill productivity when their recipes are visible.
-- Custom science packs from mods such as Castra or PlanetLib-based planets are picked up opportunistically when they are active lab inputs and have visible recipes that output the pack item.
+- AAI Loaders style loader mods: AAI-style and tier-named loader outputs are picked up by transport belt productivity when their recipes are visible. `2.2.0` diagnostics also classify entity-backed loader manufacturing from item `place_result`, placed loader entity type, and recipe-output evidence.
+- Big Mining Drill and Omega Drill style drill mods: `big-mining-drill`, `omega-drill`, `omega-tau`, and broader modded `*-mining-drill` / `*-drill` outputs are picked up by mining drill productivity when their recipes are visible. `2.2.0` diagnostics keep drill manufacturing productivity separate from native mining-yield modifiers.
+- Custom science packs from mods such as Castra, PlanetLib-based planets, or ATAN Nuclear Science are picked up opportunistically when they are active lab inputs and have visible recipes that output the pack item.
 
-Large mod packs and utility mods such as Alien Biomes, Informatron, Jetpack, AAI, and Helmod usually do not need explicit recipe productivity support unless they add recipes for items or fluids covered by one of this mod's streams. When they do, output-based matching should pick up visible recipes automatically.
+Large mod packs and utility mods such as Alien Biomes, Informatron, Jetpack, AAI, and Helmod usually do not need explicit recipe productivity support unless they add recipes for items, fluids, or science packs covered by one of this mod's streams. When they do, output-based matching should pick up visible recipes automatically.
+
+### Support Lanes For Older Mods
+
+MIR can add and test support for mods that currently advertise an older Factorio line. Upstream Factorio-version metadata is not a reason to avoid implementing safe output-based or fixture-backed support, because the same support may be useful when the external mod updates and when MIR backports behavior to a Factorio `2.0` branch.
+
+Machine-readable support data lives in `fixtures/compat-matrix/support-lanes.json`
+and `fixtures/compat-matrix/claims.json`. Static validation lints those files so
+current fixture-backed claims list fixtures, generated streams have manifest
+rows, and public text stays narrower than "full support" unless a separate
+external load profile proves that claim.
+
+Claims must stay precise:
+
+- A representative fixture proves MIR's behavior for the recipe family or science-pack shape.
+- A real external load profile proves that a named mod/version loads with a named MIR package and Factorio binary.
+- Public copy should say "loader recipes are covered by belt productivity when visible" rather than "full AAI Loaders support" unless the broader external load profile has passed.
+- Backport candidates should keep the same behavioral boundary and rerun the legacy validation lane instead of weakening current-line support.
 
 ## Known Limits
 
@@ -415,9 +446,9 @@ Set `$env:FACTORIO_LOG` or pass `-FactorioLog` when the Factorio log is not at t
 
 The runtime check copies this repo and the fixture mods into isolated temporary user-data mod directories, adds test-only dependencies from the copied mod to the fixture mods for deterministic load order, writes fixture `mod-list.json` files, and asks Factorio to create saves. It is intentionally a load/prototype validation harness, not a gameplay test.
 
-The runtime fixture run enables the generation diagnostics report in the copied mod and covers both lab incompatibility policies. The default `reduce` scenario asserts that science-pack productivity generated with the custom item-based fixture science pack included. The `skip` scenario forces the copied setting default to `skip` and asserts that the intentionally incompatible science-pack productivity stream is skipped instead of reduced. Additional runtime scenarios force the science-pack ingredient policies, require the end-game prerequisite gate, verify checkbox-enabled and checkbox-disabled stream/base-extension behavior, enable cargo landing pad count without Space Age to prove the stream skips on the Space Age mod gate, assert Space Age cargo logistics effect shape when cargo landing pad count is enabled, add a fixture finite vanilla-chain level before MIR to prove existing levels are preserved while MIR extends after them, assert broad generation integrity in both base-only and Space Age runs, enable the normally disabled inserter-capacity continuation in both base-only and Space Age runs, assert weapon shooting speed overlap handling preserves finite vanilla tank cannon speed, and assert Omega-style drill recipes receive mining drill productivity. The expected Factorio log file is part of the validation evidence; if it is missing, runtime validation fails.
+The runtime fixture run enables the generation diagnostics report in the copied mod and covers both lab incompatibility policies. The default `reduce` scenario asserts that science-pack productivity generated with the custom item-based fixture science pack included. The `skip` scenario forces the copied setting default to `skip` and asserts that the intentionally incompatible science-pack productivity stream is skipped instead of reduced. Additional runtime scenarios force the science-pack ingredient policies, require the end-game prerequisite gate, verify checkbox-enabled and checkbox-disabled stream/base-extension behavior, enable cargo landing pad count without Space Age to prove the stream skips on the Space Age mod gate, assert Space Age cargo logistics effect shape when cargo landing pad count is enabled, add a fixture finite vanilla-chain level before MIR to prove existing levels are preserved while MIR extends after them, assert broad generation integrity in both base-only and Space Age runs, enable the normally disabled inserter-capacity continuation in both base-only and Space Age runs, assert weapon shooting speed overlap handling preserves finite vanilla tank cannon speed, assert AAI-style loader recipes receive belt productivity, assert standalone big-mining-drill recipes receive mining drill productivity, assert ATAN-style Nuclear Science packs receive science-pack productivity with lab-compatible science, and assert Omega-style drill recipes receive mining drill productivity. The diagnostics report also emits compiler rows for typed fact summaries, generated-technology decisions, lab matrices, loop-risk flags, rule surfaces, and useful cap estimates. The expected Factorio log file is part of the validation evidence; if it is missing, runtime validation fails.
 
-Static validation builds an ignored validation archive from the current source tree based on `info.json`. The package must use the matching `<name>_<version>/` root, contain matching `info.json` metadata, include locale, documentation, top-level data-stage and control-stage files, core prototype modules, match the repository contents for packaged source, documentation, and locale files, and avoid build, fixture, script, Git, and temporary/editor artifacts. The committed `dist/` archive is the upload artifact, not the live source-parity fixture for every documentation-only commit.
+Static validation builds an ignored validation archive from the current source tree based on `info.json`. The package must use the matching `<name>_<version>/` root, contain matching `info.json` metadata, include locale, top-level data-stage and control-stage files, core prototype modules, migrations, README, changelog, license, and thumbnail, match the repository contents for packaged source and locale files, and avoid developer docs, build output, fixtures, scripts, Git, and temporary/editor artifacts. The committed `dist/` archive is the upload artifact, not the live source-parity fixture for every documentation-only commit.
 
 ## Fixture Designs
 
@@ -462,6 +493,22 @@ Create a local test mod that:
 
 Expected result: custom item-based science packs that are active lab inputs and have visible recipes receive science-pack productivity effects.
 
+### ATAN Nuclear Science Fixture
+
+Create a local test mod pair that:
+
+- Adds a visible `nuclear-science-pack` item and recipe.
+- Adds `nuclear-science-pack` to active lab inputs.
+- Unlocks the science pack from an ATAN-style nuclear science technology.
+- Adds a non-science `atan-atom-forge` recipe as an adjacent surface.
+- Runs a post-MIR assertion in `data-final-fixes.lua`.
+- Reads `recipe-prod-research_science_pack_productivity-1`.
+- Fails loading if the science pack recipe is missing from the science-pack productivity effects.
+- Fails loading if the atom forge recipe is included in the science-pack productivity effects.
+- Fails loading if the generated technology does not include the nuclear science pack in its lab-compatible science set.
+
+Expected result: visible custom science-pack recipes receive science-pack productivity and unlock-derived prerequisites, while adjacent non-science buildings remain outside the science-pack stream.
+
 ### Generation Integrity Assertion Fixture
 
 Create a local test mod that:
@@ -498,6 +545,30 @@ Create a local test mod pair that:
 - Fails loading if either Omega-style recipe is missing from the mining drill productivity effects.
 
 Expected result: Omega Drill style recipes and broader visible modded `*-drill` / `*-mining-drill` outputs are covered by mining drill productivity.
+
+### Big Mining Drill Productivity Fixture
+
+Create a local test mod pair that:
+
+- Adds a visible `big-mining-drill` item recipe.
+- Runs a post-MIR assertion in `data-final-fixes.lua`.
+- Reads `recipe-prod-research_mining_drill-1`.
+- Fails loading if the `big-mining-drill` recipe is missing from the mining drill productivity effects.
+- Fails loading if the matched effect uses anything other than the high-tier `+0.05` drill bucket.
+
+Expected result: standalone Big Mining Drill style recipes are covered by the existing mining drill productivity stream without creating a separate research line.
+
+### AAI Loader Belt Productivity Fixture
+
+Create a local test mod pair that:
+
+- Adds visible AAI-style loader recipes for basic, fast, express, and turbo loader tiers.
+- Runs a post-MIR assertion in `data-final-fixes.lua`.
+- Reads `recipe-prod-research_belts-1`.
+- Fails loading if any loader recipe is missing from the belt productivity effects.
+- Fails loading if a loader recipe is assigned to the wrong logistics tier value.
+
+Expected result: loader crafting recipes are covered by transport belt productivity by tier, while loader entity behavior, operating modes, fluids, and compatibility hooks remain outside MIR ownership.
 
 ### Fluid Productivity Fixture
 
@@ -539,10 +610,10 @@ Expected result: vanilla tank cannon fire rate is preserved while MIR avoids dup
 - Run `.\scripts\Invoke-MIRValidation.ps1 -StaticOnly`.
 - Confirm `changelog.txt` uses Factorio's 99-dash format and one-line bullets at or below 132 characters.
 - Confirm `info.json` declares `base >= 2.1.8`, hidden optional Elevated Rails and Quality ordering, and visible optional Recycler and Space Age ordering dependencies only.
-- Confirm package validation reports the expected root, matching metadata, included locale/docs, and no forbidden artifacts for the archive built from the current source tree.
-- Confirm package validation reports source, documentation, and locale parity with the repository.
+- Confirm package validation reports the expected root, matching metadata, included runtime source, locale, migrations, README, changelog, license, thumbnail, and no forbidden artifacts for the archive built from the current source tree.
+- Confirm package validation reports packaged source and locale parity with the repository.
 - Confirm runtime fixture validation covers both the default `reduce` lab policy and forced `skip` lab policy.
-- Confirm runtime fixture validation covers `configured`, `space`, `space-and-promethium`, `all-official`, and `all` science-pack ingredient policies, the end-game prerequisite gate, and the base-only cargo landing pad count skip.
+- Confirm runtime fixture validation covers `configured`, `space`, `space-and-promethium`, `space-age-progression`, `official-progression`, `mod-progression`, `all-official`, and `all` science-pack ingredient policies, the end-game prerequisite gate, and the base-only cargo landing pad count skip.
 - Confirm runtime fixture validation covers checkbox-enabled and checkbox-disabled behavior for streams and base extensions.
 - Confirm runtime fixture validation covers Space Age cargo logistics effect types, modifiers, costs, research times, prerequisites, and official science-pack ingredients.
 - Confirm runtime fixture validation covers fluid-output productivity ownership in base-only and Space Age scenarios.
@@ -550,6 +621,9 @@ Expected result: vanilla tank cannon fire rate is preserved while MIR avoids dup
 - Confirm runtime fixture validation covers preserving an existing finite vanilla-chain level before adding MIR's generated infinite continuation.
 - Confirm runtime fixture validation covers broad generation integrity in base-only and Space Age runs, including all enabled vanilla numbered extension chains, the checkbox-enabled inserter-capacity continuation, generated `recipe-prod-*` technology shape, single-owner recipe productivity, configured vanilla productivity-family adoption/conflict cases, and Plates n Circuit Productivity replacement/partial-coverage behavior.
 - Confirm runtime fixture validation covers preserving finite vanilla weapon shooting speed cannon-shell effects under MIR's overlap setting.
+- Confirm runtime fixture validation covers AAI-style loader recipe productivity under the belt stream.
+- Confirm runtime fixture validation covers standalone Big Mining Drill recipe productivity under the mining drill stream.
+- Confirm runtime fixture validation covers ATAN-style Nuclear Science pack productivity under the science-pack stream.
 - Confirm runtime fixture validation covers Omega-style drill recipe productivity.
 - Load Factorio with the manual matrix above.
 - Confirm `changelog.txt` has the release version and date.

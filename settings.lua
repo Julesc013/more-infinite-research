@@ -60,7 +60,7 @@ table.insert(settings_data, {
   name = "mir-science-pack-ingredient-policy",
   setting_type = "startup",
   default_value = "configured",
-  allowed_values = {"configured", "space", "space-and-promethium", "all-official", "all"},
+  allowed_values = {"configured", "space", "space-and-promethium", "space-age-progression", "official-progression", "mod-progression", "all-official", "all"},
   order = "a-020",
   localised_name = {"mod-setting-name.mir-science-pack-ingredient-policy"},
   localised_description = {"mod-setting-description.mir-science-pack-ingredient-policy"}
@@ -152,7 +152,9 @@ table.insert(settings_data, {
 local stream_sort_names = {
   research_advanced_circuit = "Advanced circuit productivity",
   research_agricultural_growth_speed = "Agricultural growth speed",
+  research_air_scrubbing_clean_filter = "Air Scrubbing clean-filter productivity",
   research_armor_components = "Armor component productivity",
+  research_ash_separation = "Ash separation productivity",
   research_bacteria_cultivation = "Bacteria cultivation productivity",
   research_batteries = "Battery productivity",
   research_belts = "Transport belt productivity",

@@ -1,5 +1,6 @@
 local D = {}
 local icons = require("prototypes.lib.technology-icons")
+local schema = require("prototypes.lib.mir.schema")
 
 local rows = {}
 local audit_rows = {}
@@ -65,6 +66,39 @@ end
 
 function D.recipe_owner(row)
   append("recipe_owner", row)
+end
+
+function D.compatibility_role(row)
+  append("compatibility_role", row)
+end
+
+function D.compatibility_plan(row)
+  append("compatibility_plan", row)
+end
+
+function D.recipe_cap(row)
+  append("recipe_cap", row)
+end
+
+function D.fact_registry(row)
+  append("fact_registry", row)
+end
+
+function D.decision(row)
+  schema.decision(row)
+  append("decision", row)
+end
+
+function D.rule_mutation(row)
+  append("rule_mutation", row)
+end
+
+function D.loop_risk(row)
+  append("loop_risk", row)
+end
+
+function D.lab_matrix(row)
+  append("lab_matrix", row)
 end
 
 function D.recipe_matches(key, buckets)
@@ -159,6 +193,7 @@ function D.flush()
     for _, row in ipairs(rows) do
       log("[more-infinite-research] report kind=" .. tostring(row.kind)
         .. " key=" .. tostring(row.key or "")
+        .. " schema=" .. tostring(row.schema or "")
         .. " status=" .. tostring(row.status or "")
         .. " reason=" .. tostring(row.reason or "")
         .. " science=" .. tostring(row.science or "")
@@ -172,7 +207,49 @@ function D.flush()
         .. " recipe=" .. tostring(row.recipe or "")
         .. " owner_kinds=" .. tostring(row.owner_kinds or "")
         .. " owner_actions=" .. tostring(row.owner_actions or "")
-        .. " recipes=" .. tostring(row.recipes or ""))
+        .. " recipes=" .. tostring(row.recipes or "")
+        .. " mod=" .. tostring(row.mod or "")
+        .. " role=" .. tostring(row.role or "")
+        .. " action=" .. tostring(row.action or "")
+        .. " signal=" .. tostring(row.signal or "")
+        .. " warning_class=" .. tostring(row.warning_class or "")
+        .. " cap_state=" .. tostring(row.cap_state or "")
+        .. " maximum_productivity=" .. tostring(row.maximum_productivity or "")
+        .. " per_level=" .. tostring(row.per_level or "")
+        .. " levels_to_cap=" .. tostring(row.levels_to_cap or "")
+        .. " useful_level_estimate=" .. tostring(row.useful_level_estimate or "")
+        .. " total=" .. tostring(row.total or "")
+        .. " warnings=" .. tostring(row.warnings or "")
+        .. " subject_type=" .. tostring(row.subject_type or "")
+        .. " subject=" .. tostring(row.subject or "")
+        .. " capability=" .. tostring(row.capability or "")
+        .. " family=" .. tostring(row.family or "")
+        .. " subfamily=" .. tostring(row.subfamily or "")
+        .. " confidence=" .. tostring(row.confidence or "")
+        .. " source=" .. tostring(row.source or "")
+        .. " policy=" .. tostring(row.policy or "")
+        .. " decision=" .. tostring(row.decision or "")
+        .. " emitted=" .. tostring(row.emitted or "")
+        .. " blockers=" .. tostring(row.blockers or "")
+        .. " risks=" .. tostring(row.risks or "")
+        .. " stable_stream_id=" .. tostring(row.stable_stream_id or "")
+        .. " labs=" .. tostring(row.labs or "")
+        .. " field=" .. tostring(row.field or "")
+        .. " observed_value=" .. tostring(row.observed_value or "")
+        .. " expected_baseline=" .. tostring(row.expected_baseline or "")
+        .. " likely_mutator_mod=" .. tostring(row.likely_mutator_mod or "")
+        .. " technologies=" .. tostring(row.technologies or "")
+        .. " machines=" .. tostring(row.machines or "")
+        .. " rule_mutations=" .. tostring(row.rule_mutations or "")
+        .. " loop_risks=" .. tostring(row.loop_risks or "")
+        .. " generated=" .. tostring(row.generated or "")
+        .. " rejected=" .. tostring(row.rejected or "")
+        .. " unknown=" .. tostring(row.unknown or "")
+        .. " missing=" .. tostring(row.missing or "")
+        .. " module_slots=" .. tostring(row.module_slots or "")
+        .. " allowed_effects=" .. tostring(row.allowed_effects or "")
+        .. " shared_inputs_outputs=" .. tostring(row.shared_inputs_outputs or "")
+        .. " evidence=" .. tostring(row.evidence or ""))
     end
     log("[more-infinite-research] Generation report end")
   end

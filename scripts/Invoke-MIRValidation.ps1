@@ -387,6 +387,14 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
   $fluidProductivityFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-fluid-productivity\data-final-fixes.lua")
   $pipelineExtentFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-pipeline-extent\data-final-fixes.lua")
   $betterBotBatteryFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-better-bot-battery-skip\data-final-fixes.lua")
+  $airScrubbingFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-air-scrubbing-clean-filter\data-final-fixes.lua")
+  $atanAshFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\atan-ash\data.lua")
+  $atanAshAssertText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-atan-ash-separation\data-final-fixes.lua")
+  $aaiLoaderFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-aai-loader-belt-productivity\data-final-fixes.lua")
+  $bigMiningDrillFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-big-mining-drill-productivity\data-final-fixes.lua")
+  $atanNuclearScienceFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-atan-nuclear-science-productivity\data-final-fixes.lua")
+  $capabilityNegativeFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\capability-negative-cases\data.lua")
+  $capabilityNegativeAssertText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-capability-negative-cases\data-final-fixes.lua")
   $defaultsText = Get-Content -Raw -LiteralPath (Join-Path $repo "defaults.lua")
   $localeText = Get-Content -Raw -LiteralPath (Join-Path $repo "locale\en\more-infinite-research.cfg")
 
@@ -394,7 +402,7 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'name = "ips-require-space-gate"' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'default_value = false' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'name = "mir-science-pack-ingredient-policy"' },
-    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'allowed_values = {"configured", "space", "space-and-promethium", "all-official", "all"}' },
+    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'allowed_values = {"configured", "space", "space-and-promethium", "space-age-progression", "official-progression", "mod-progression", "all-official", "all"}' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'name = "mir-use-installed-space-age-icons"' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'order = "a-120"' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'local pipeline_extent_settings = require("prototypes.pipeline-extent-settings")' },
@@ -435,6 +443,9 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "prototypes\util.lua"; Text = $utilText; Snippet = 'append_end_game_gate_prerequisite' },
     @{ File = "prototypes\lib\science-packs.lua"; Text = $scienceText; Snippet = 'pack_list_official' },
     @{ File = "prototypes\lib\science-packs.lua"; Text = $scienceText; Snippet = 'is_official_science_pack' },
+    @{ File = "prototypes\lib\science-packs.lua"; Text = $scienceText; Snippet = 'space_age_progression_packs_for' },
+    @{ File = "prototypes\lib\science-packs.lua"; Text = $scienceText; Snippet = 'official_progression_packs_for' },
+    @{ File = "prototypes\lib\science-packs.lua"; Text = $scienceText; Snippet = 'mod_progression_packs_for' },
     @{ File = "prototypes\lib\science-packs.lua"; Text = $scienceText; Snippet = 'desired == "all-official"' },
     @{ File = "prototypes\base-tech-extensions.lua"; Text = $baseExtensionsText; Snippet = 'if data.raw.technology[new_name] then' },
     @{ File = "prototypes\base-tech-extensions.lua"; Text = $baseExtensionsText; Snippet = '"target_exists"' },
@@ -458,6 +469,14 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'research_oil_cracking_productivity = {' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'research_lubricant_productivity = {' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'research_sulfuric_acid_productivity = {' },
+    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'research_air_scrubbing_clean_filter = {' },
+    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'manifest_id = "mir-prod-air-scrubbing-clean-filter"' },
+    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'research_ash_separation = {' },
+    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'manifest_id = "mir-prod-atan-ash-separation"' },
+    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'research_ash_separation = "Ash separation productivity"' },
+    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = '"aai-turbo-loader"' },
+    @{ File = "prototypes\util.lua"; Text = $utilText; Snippet = 'desired == "derive-from-unlocks"' },
+    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'research_air_scrubbing_clean_filter = "Air Scrubbing clean-filter productivity"' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = '{technology = "oil-processing"}' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = '"^acid%-neutralisation$"' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = '"^acid%-neutralization$"' },
@@ -496,6 +515,7 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "prototypes\tech-gen.lua"; Text = $techGenText; Snippet = 'required_fluids' },
     @{ File = "prototypes\tech-gen.lua"; Text = $techGenText; Snippet = 'technology_requirements.skip_reason(spec)' },
     @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'require("prototypes.pipeline-extent-settings").multiplier()' },
+    @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'require("prototypes.compat.air-scrubbing").emit()' },
     @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'if pipeline_extent_multiplier ~= 1 then' },
     @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'require("prototypes.pipeline-extent").apply(pipeline_extent_multiplier)' },
     @{ File = "prototypes\pipeline-extent-settings.lua"; Text = $pipelineExtentSettingsText; Snippet = 'S.default_value = "100"' },
@@ -519,6 +539,18 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "fixtures\assert-fluid-productivity\data-final-fixes.lua"; Text = $fluidProductivityFixtureText; Snippet = 'recipe-prod-research_oil_processing_productivity-1' },
     @{ File = "fixtures\assert-fluid-productivity\data-final-fixes.lua"; Text = $fluidProductivityFixtureText; Snippet = 'recipe-prod-research_thruster_fuel_productivity-1' },
     @{ File = "fixtures\assert-pipeline-extent\data-final-fixes.lua"; Text = $pipelineExtentFixtureText; Snippet = 'DEFAULT_PIPELINE_EXTENT = 320' },
+    @{ File = "fixtures\assert-air-scrubbing-clean-filter\data-final-fixes.lua"; Text = $airScrubbingFixtureText; Snippet = 'recipe-prod-research_air_scrubbing_clean_filter-1' },
+    @{ File = "fixtures\assert-air-scrubbing-clean-filter\data-final-fixes.lua"; Text = $airScrubbingFixtureText; Snippet = 'atan-pollution-filter-cleaning' },
+    @{ File = "fixtures\atan-ash\data.lua"; Text = $atanAshFixtureText; Snippet = 'atan-ash-seperation' },
+    @{ File = "fixtures\atan-ash\data.lua"; Text = $atanAshFixtureText; Snippet = 'atan-foundation-from-ash' },
+    @{ File = "fixtures\assert-atan-ash-separation\data-final-fixes.lua"; Text = $atanAshAssertText; Snippet = 'recipe-prod-research_ash_separation-1' },
+    @{ File = "fixtures\assert-atan-ash-separation\data-final-fixes.lua"; Text = $atanAshAssertText; Snippet = 'atan-landfill-from-ash' },
+    @{ File = "fixtures\assert-aai-loader-belt-productivity\data-final-fixes.lua"; Text = $aaiLoaderFixtureText; Snippet = 'aai-turbo-loader' },
+    @{ File = "fixtures\assert-big-mining-drill-productivity\data-final-fixes.lua"; Text = $bigMiningDrillFixtureText; Snippet = 'big-mining-drill should use +0.05' },
+    @{ File = "fixtures\assert-atan-nuclear-science-productivity\data-final-fixes.lua"; Text = $atanNuclearScienceFixtureText; Snippet = 'nuclear-science-pack did not receive science-pack productivity' },
+    @{ File = "fixtures\capability-negative-cases\data.lua"; Text = $capabilityNegativeFixtureText; Snippet = 'mir-loader-like-container' },
+    @{ File = "fixtures\capability-negative-cases\data.lua"; Text = $capabilityNegativeFixtureText; Snippet = 'maximum_productivity = 0' },
+    @{ File = "fixtures\assert-capability-negative-cases\data-final-fixes.lua"; Text = $capabilityNegativeAssertText; Snippet = 'denied_recipes' },
     @{ File = "fixtures\assert-better-bot-battery-skip\data-final-fixes.lua"; Text = $betterBotBatteryFixtureText; Snippet = 'recipe-prod-research_robot_battery-1' },
     @{ File = "fixtures\assert-better-bot-battery-skip\data-final-fixes.lua"; Text = $betterBotBatteryFixtureText; Snippet = 'worker-robots-battery-6' },
     @{ File = "prototypes\weapon-speed-adjustments.lua"; Text = $weaponSpeedText; Snippet = 'tech.unit and tech.unit.count_formula' },
@@ -540,6 +572,9 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-science-pack-ingredient-policy-configured=Configured per technology' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-science-pack-ingredient-policy-space=Add space science' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-science-pack-ingredient-policy-space-and-promethium=Add space and promethium science' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-science-pack-ingredient-policy-space-age-progression=Match Space Age progression' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-science-pack-ingredient-policy-official-progression=Fill official progression' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-science-pack-ingredient-policy-mod-progression=Match modded progression' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-science-pack-ingredient-policy-all-official=Use all official science packs' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-science-pack-ingredient-policy-all=Use all lab science packs' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = '[string-mod-setting-description]' },
@@ -736,6 +771,9 @@ Invoke-RepoCheck "compat audit automation tooling is wired" {
     @{ File = "scripts\Invoke-MIRExtendedTests.ps1"; Text = $extendedTestsText; Snippet = "Convert-MIRCompatAuditResults.ps1" },
     @{ File = "scripts\Convert-MIRCompatAuditResults.ps1"; Text = $converterText; Snippet = "compat-failures.grouped.json" },
     @{ File = "scripts\Convert-MIRCompatAuditResults.ps1"; Text = $converterText; Snippet = "profile-candidates.json" },
+    @{ File = "scripts\Convert-MIRCompatAuditResults.ps1"; Text = $converterText; Snippet = "compat-observations.json" },
+    @{ File = "scripts\Convert-MIRCompatAuditResults.ps1"; Text = $converterText; Snippet = "recipe_cap" },
+    @{ File = "scripts\Convert-MIRCompatAuditResults.ps1"; Text = $converterText; Snippet = "compatibility_role" },
     @{ File = "scripts\Convert-MIRCompatAuditResults.ps1"; Text = $converterText; Snippet = "missing-dependencies.md" },
     @{ File = "scripts\Convert-MIRCompatAuditResults.ps1"; Text = $converterText; Snippet = "missing_dependency_count" },
     @{ File = "scripts\Convert-MIRCompatAuditResults.ps1"; Text = $converterText; Snippet = "unexpected_count" },
@@ -758,6 +796,7 @@ Invoke-RepoCheck "compat audit automation tooling is wired" {
     @{ File = "scripts\mir.ps1"; Text = $mirCliText; Snippet = "--factorio-line" },
     @{ File = "scripts\mir.ps1"; Text = $mirCliText; Snippet = "factorio_line" },
     @{ File = "scripts\mir.ps1"; Text = $mirCliText; Snippet = "local-audit-2.1" },
+    @{ File = "scripts\mir.ps1"; Text = $mirCliText; Snippet = "report observations" },
     @{ File = "scripts\mir.ps1"; Text = $mirCliText; Snippet = "New-MIRProfileOverrides" },
     @{ File = "scripts\mir.ps1"; Text = $mirCliText; Snippet = "local-index" },
     @{ File = "scripts\Test-MIRPowerShellQuality.ps1"; Text = $powershellQualityText; Snippet = "duplicate parameter" },
@@ -784,6 +823,7 @@ Invoke-RepoCheck "compat audit automation tooling is wired" {
     @{ File = "scripts\Start-MIROvernightLocalSweep.ps1"; Text = $overnightText; Snippet = "LocalModZips" },
     @{ File = "scripts\Start-MIROvernightLocalSweep.ps1"; Text = $overnightText; Snippet = "Show-MIROvernightSummary.ps1" },
     @{ File = "scripts\Show-MIROvernightSummary.ps1"; Text = $overnightSummaryText; Snippet = "compat-failures.grouped.json" },
+    @{ File = "scripts\Show-MIROvernightSummary.ps1"; Text = $overnightSummaryText; Snippet = "compat-observations.json" },
     @{ File = "scripts\Show-MIROvernightSummary.ps1"; Text = $overnightSummaryText; Snippet = "missing-dependencies.csv" },
     @{ File = "scripts\Show-MIROvernightSummary.ps1"; Text = $overnightSummaryText; Snippet = "profile-candidates.json" },
     @{ File = "scripts\Show-MIROvernightSummary.ps1"; Text = $overnightSummaryText; Snippet = "Group-Object mod" },
@@ -829,6 +869,182 @@ Invoke-RepoCheck "compat audit automation tooling is wired" {
       throw "Missing compatibility audit automation wiring in $($check.File): $($check.Snippet)"
     }
   }
+}
+
+Invoke-RepoCheck "2.2.0 compiler diagnostics are wired" {
+  $dataFinalFixesText = Get-Content -Raw -LiteralPath (Join-Path $repo "data-final-fixes.lua")
+  $diagnosticsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\diagnostics.lua")
+  $factRegistryPath = Join-Path $repo "prototypes\lib\facts\registry.lua"
+  $capabilityRegistryPath = Join-Path $repo "prototypes\lib\capabilities\registry.lua"
+  $capabilityContractPath = Join-Path $repo "prototypes\lib\capabilities\contract.lua"
+  $capabilityPolicyPath = Join-Path $repo "prototypes\lib\policy\capabilities.lua"
+  $schemaPath = Join-Path $repo "prototypes\lib\mir\schema.lua"
+  $compilerPath = Join-Path $repo "prototypes\planner\compiler.lua"
+  $converterText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\Convert-MIRCompatAuditResults.ps1")
+  $overnightSummaryText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\Show-MIROvernightSummary.ps1")
+  $compatPlannerText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\compat\planner.lua")
+  $policyLintText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\Test-MIRPolicyLints.ps1")
+
+  if (-not (Test-Path -LiteralPath $factRegistryPath)) {
+    throw "Missing typed fact registry: prototypes\lib\facts\registry.lua"
+  }
+  if (-not (Test-Path -LiteralPath $compilerPath)) {
+    throw "Missing compiler diagnostics module: prototypes\planner\compiler.lua"
+  }
+  if (-not (Test-Path -LiteralPath $capabilityRegistryPath)) {
+    throw "Missing capability registry: prototypes\lib\capabilities\registry.lua"
+  }
+  foreach ($path in @($capabilityContractPath, $capabilityPolicyPath, $schemaPath)) {
+    if (-not (Test-Path -LiteralPath $path)) {
+      throw "Missing 2.2.0 capability kernel artifact: $path"
+    }
+  }
+
+  $factRegistryText = Get-Content -Raw -LiteralPath $factRegistryPath
+  $capabilityRegistryText = Get-Content -Raw -LiteralPath $capabilityRegistryPath
+  $capabilityContractText = Get-Content -Raw -LiteralPath $capabilityContractPath
+  $capabilityPolicyText = Get-Content -Raw -LiteralPath $capabilityPolicyPath
+  $schemaText = Get-Content -Raw -LiteralPath $schemaPath
+  $compilerText = Get-Content -Raw -LiteralPath $compilerPath
+
+  $requiredSnippets = @(
+    @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'require("prototypes.planner.compiler").emit()' },
+    @{ File = "prototypes\diagnostics.lua"; Text = $diagnosticsText; Snippet = 'function D.decision(row)' },
+    @{ File = "prototypes\diagnostics.lua"; Text = $diagnosticsText; Snippet = 'schema.decision(row)' },
+    @{ File = "prototypes\diagnostics.lua"; Text = $diagnosticsText; Snippet = '.. " capability=" .. tostring(row.capability or "")' },
+    @{ File = "prototypes\diagnostics.lua"; Text = $diagnosticsText; Snippet = '.. " evidence=" .. tostring(row.evidence or "")' },
+    @{ File = "prototypes\diagnostics.lua"; Text = $diagnosticsText; Snippet = 'append("rule_mutation", row)' },
+    @{ File = "prototypes\diagnostics.lua"; Text = $diagnosticsText; Snippet = 'append("loop_risk", row)' },
+    @{ File = "prototypes\diagnostics.lua"; Text = $diagnosticsText; Snippet = 'append("lab_matrix", row)' },
+    @{ File = "prototypes\lib\facts\registry.lua"; Text = $factRegistryText; Snippet = 'RecipeFact' },
+    @{ File = "prototypes\lib\facts\registry.lua"; Text = $factRegistryText; Snippet = 'RuleMutationFact' },
+    @{ File = "prototypes\lib\facts\registry.lua"; Text = $factRegistryText; Snippet = 'schema = schema.fact_registry' },
+    @{ File = "prototypes\lib\facts\registry.lua"; Text = $factRegistryText; Snippet = 'build_loop_risk_facts' },
+    @{ File = "prototypes\lib\mir\schema.lua"; Text = $schemaText; Snippet = 'S.decision_record = 1' },
+    @{ File = "prototypes\lib\capabilities\contract.lua"; Text = $capabilityContractText; Snippet = 'CapabilityResolver' },
+    @{ File = "prototypes\lib\capabilities\contract.lua"; Text = $capabilityContractText; Snippet = '"discover"' },
+    @{ File = "prototypes\lib\policy\capabilities.lua"; Text = $capabilityPolicyText; Snippet = 'P.schema_version = schema.capability_policy' },
+    @{ File = "prototypes\lib\policy\capabilities.lua"; Text = $capabilityPolicyText; Snippet = 'deny_risk_flags' },
+    @{ File = "prototypes\lib\capabilities\registry.lua"; Text = $capabilityRegistryText; Snippet = 'Capability resolvers are report-first' },
+    @{ File = "prototypes\lib\capabilities\registry.lua"; Text = $capabilityRegistryText; Snippet = 'contract.validate_all(RESOLVERS)' },
+    @{ File = "prototypes\lib\capabilities\registry.lua"; Text = $capabilityRegistryText; Snippet = 'schema_version = schema.capability_resolver' },
+    @{ File = "prototypes\lib\capabilities\registry.lua"; Text = $capabilityRegistryText; Snippet = 'id = "logistics-loader-manufacturing"' },
+    @{ File = "prototypes\lib\capabilities\registry.lua"; Text = $capabilityRegistryText; Snippet = 'id = "mining-drill-manufacturing"' },
+    @{ File = "prototypes\lib\capabilities\registry.lua"; Text = $capabilityRegistryText; Snippet = 'id = "native-modifier-ownership"' },
+    @{ File = "prototypes\lib\capabilities\registry.lua"; Text = $capabilityRegistryText; Snippet = 'entity_backed_candidates' },
+    @{ File = "prototypes\lib\capabilities\registry.lua"; Text = $capabilityRegistryText; Snippet = 'discover,classify,propose,validate,emit,diagnose' },
+    @{ File = "prototypes\planner\compiler.lua"; Text = $compilerText; Snippet = 'D.fact_registry({' },
+    @{ File = "prototypes\planner\compiler.lua"; Text = $compilerText; Snippet = 'D.decision({' },
+    @{ File = "prototypes\planner\compiler.lua"; Text = $compilerText; Snippet = 'emit_generated_technology_decisions' },
+    @{ File = "prototypes\planner\compiler.lua"; Text = $compilerText; Snippet = 'capabilities.emit(registry)' },
+    @{ File = "prototypes\compat\planner.lua"; Text = $compatPlannerText; Snippet = 'useful_level_estimate = levels' },
+    @{ File = "prototypes\compat\planner.lua"; Text = $compatPlannerText; Snippet = '["atan-ash"] = {' },
+    @{ File = "prototypes\compat\planner.lua"; Text = $compatPlannerText; Snippet = '["atan-nuclear-science"] = {' },
+    @{ File = "prototypes\compat\planner.lua"; Text = $compatPlannerText; Snippet = '["FluidMustFlow"] = {' },
+    @{ File = "prototypes\compat\planner.lua"; Text = $compatPlannerText; Snippet = '["robot_attrition"] = {' },
+    @{ File = "prototypes\compat\planner.lua"; Text = $compatPlannerText; Snippet = '["jetpack"] = {' },
+    @{ File = "prototypes\compat\planner.lua"; Text = $compatPlannerText; Snippet = '["big-mining-drill"] = {' },
+    @{ File = "prototypes\compat\planner.lua"; Text = $compatPlannerText; Snippet = '["equipment-gantry"] = {' },
+    @{ File = "prototypes\compat\planner.lua"; Text = $compatPlannerText; Snippet = '["aai-industry"] = {' },
+    @{ File = "prototypes\compat\planner.lua"; Text = $compatPlannerText; Snippet = '["aai-containers"] = {' },
+    @{ File = "prototypes\compat\planner.lua"; Text = $compatPlannerText; Snippet = '["aai-loaders"] = {' },
+    @{ File = "prototypes\compat\planner.lua"; Text = $compatPlannerText; Snippet = 'belt_productivity_loader_recipe_candidate' },
+    @{ File = "scripts\Convert-MIRCompatAuditResults.ps1"; Text = $converterText; Snippet = '"fact_registry", "decision", "rule_mutation", "loop_risk", "lab_matrix"' },
+    @{ File = "scripts\Convert-MIRCompatAuditResults.ps1"; Text = $converterText; Snippet = 'capability = [string](Get-MIRObjectProperty -Object $row -Name "capability")' },
+    @{ File = "scripts\Convert-MIRCompatAuditResults.ps1"; Text = $converterText; Snippet = '## Capability Decisions' },
+    @{ File = "scripts\Convert-MIRCompatAuditResults.ps1"; Text = $converterText; Snippet = "Loop Risk Diagnostics" },
+    @{ File = "scripts\Show-MIROvernightSummary.ps1"; Text = $overnightSummaryText; Snippet = "rule_surfaces" },
+    @{ File = "scripts\Test-MIRPolicyLints.ps1"; Text = $policyLintText; Snippet = "Generated stream manifest row" }
+  )
+
+  foreach ($check in $requiredSnippets) {
+    if (-not $check.Text.Contains($check.Snippet)) {
+      throw "Missing 2.2.0 compiler diagnostics wiring in $($check.File): $($check.Snippet)"
+    }
+  }
+}
+
+Invoke-RepoCheck "Air Scrubbing clean-filter policy is wired" {
+  $dataFinalFixesText = Get-Content -Raw -LiteralPath (Join-Path $repo "data-final-fixes.lua")
+  $productivityText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\streams\productivity.lua")
+  $utilText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\util.lua")
+  $diagnosticsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\diagnostics.lua")
+  $converterText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\Convert-MIRCompatAuditResults.ps1")
+  $airScrubbingPolicyPath = Join-Path $repo "prototypes\compat\air-scrubbing.lua"
+  $manifestPath = Join-Path $repo "prototypes\planner\generated-stream-manifest.json"
+  $fixturePath = Join-Path $repo "fixtures\assert-air-scrubbing-clean-filter\data-final-fixes.lua"
+
+  foreach ($path in @($airScrubbingPolicyPath, $manifestPath, $fixturePath)) {
+    if (-not (Test-Path -LiteralPath $path)) {
+      throw "Missing Air Scrubbing policy artifact: $path"
+    }
+  }
+
+  $airScrubbingPolicyText = Get-Content -Raw -LiteralPath $airScrubbingPolicyPath
+  $manifestText = Get-Content -Raw -LiteralPath $manifestPath
+  $fixtureText = Get-Content -Raw -LiteralPath $fixturePath
+
+  $requiredSnippets = @(
+    @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'require("prototypes.compat.air-scrubbing").emit()' },
+    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'research_air_scrubbing_clean_filter = {' },
+    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'science_packs = "derive-from-unlocks"' },
+    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'prerequisites = "derive-from-unlocks"' },
+    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'manifest_id = "mir-prod-air-scrubbing-clean-filter"' },
+    @{ File = "prototypes\util.lua"; Text = $utilText; Snippet = 'local function science_from_unlocks(spec)' },
+    @{ File = "prototypes\util.lua"; Text = $utilText; Snippet = 'if spec.prerequisites == "derive-from-unlocks" then' },
+    @{ File = "prototypes\diagnostics.lua"; Text = $diagnosticsText; Snippet = '.. " rejected=" .. tostring(row.rejected or "")' },
+    @{ File = "scripts\Convert-MIRCompatAuditResults.ps1"; Text = $converterText; Snippet = 'rejected = [string](Get-MIRObjectProperty -Object $row -Name "rejected")' },
+    @{ File = "scripts\Convert-MIRCompatAuditResults.ps1"; Text = $converterText; Snippet = 'generated,rejected,unknown,missing,module_slots' },
+    @{ File = "prototypes\compat\air-scrubbing.lua"; Text = $airScrubbingPolicyText; Snippet = 'local STREAM_ID = "mir-prod-air-scrubbing-clean-filter"' },
+    @{ File = "prototypes\compat\air-scrubbing.lua"; Text = $airScrubbingPolicyText; Snippet = 'decision = emitted and "generate_stream" or "diagnose_only"' },
+    @{ File = "prototypes\compat\air-scrubbing.lua"; Text = $airScrubbingPolicyText; Snippet = '"environmental_removal_loop", "scrubbing_environmental"' },
+    @{ File = "prototypes\compat\air-scrubbing.lua"; Text = $airScrubbingPolicyText; Snippet = '"recovery_loop", "cleaning_recovery"' },
+    @{ File = "prototypes\compat\air-scrubbing.lua"; Text = $airScrubbingPolicyText; Snippet = 'decision = "observe_unknown"' },
+    @{ File = "prototypes\planner\generated-stream-manifest.json"; Text = $manifestText; Snippet = '"mir-prod-air-scrubbing-clean-filter"' },
+    @{ File = "prototypes\planner\generated-stream-manifest.json"; Text = $manifestText; Snippet = '"source": "compat_policy:air-scrubbing"' },
+    @{ File = "prototypes\planner\generated-stream-manifest.json"; Text = $manifestText; Snippet = '"atan-pollution-filter"' },
+    @{ File = "prototypes\planner\generated-stream-manifest.json"; Text = $manifestText; Snippet = '"atan-spore-filter"' },
+    @{ File = "fixtures\assert-air-scrubbing-clean-filter\data-final-fixes.lua"; Text = $fixtureText; Snippet = 'atan-pollution-scrubbing' },
+    @{ File = "fixtures\assert-air-scrubbing-clean-filter\data-final-fixes.lua"; Text = $fixtureText; Snippet = 'atan-filter-resin' }
+  )
+
+  foreach ($check in $requiredSnippets) {
+    if (-not $check.Text.Contains($check.Snippet)) {
+      throw "Missing Air Scrubbing clean-filter wiring in $($check.File): $($check.Snippet)"
+    }
+  }
+}
+
+Invoke-RepoCheck "compatibility support lanes are wired" {
+  $supportLanePath = Join-Path $repo "fixtures\compat-matrix\support-lanes.json"
+  if (-not (Test-Path -LiteralPath $supportLanePath)) {
+    throw "Missing compatibility support-lane ledger: $supportLanePath"
+  }
+
+  $supportLaneText = Get-Content -Raw -LiteralPath $supportLanePath
+  $requiredSnippets = @(
+    '"upstream_factorio_version_is_blocking": false',
+    '"mod": "atan-air-scrubbing"',
+    '"mod": "atan-nuclear-science"',
+    '"mir-fixture-assert-atan-nuclear-science-productivity"',
+    '"mod": "big-mining-drill"',
+    '"capability_lane": "mining-drill-manufacturing"',
+    '"mir-fixture-assert-big-mining-drill-productivity"',
+    '"mod": "aai-loaders"',
+    '"capability_lane": "logistics-loader-manufacturing"',
+    '"mir-fixture-assert-aai-loader-belt-productivity"',
+    '"backport_candidate": true'
+  )
+
+  foreach ($snippet in $requiredSnippets) {
+    if (-not $supportLaneText.Contains($snippet)) {
+      throw "Missing compatibility support-lane entry: $snippet"
+    }
+  }
+}
+
+Invoke-RepoCheck "compatibility policy and claim lints pass" {
+  & (Join-Path $repo "scripts\Test-MIRPolicyLints.ps1") -RepoRoot $repo
 }
 
 Invoke-RepoCheck "release documentation lists final manual and API checks" {
@@ -1074,9 +1290,7 @@ Invoke-RepoCheck "generated package archive matches metadata" {
     $requiredEntries = @(
       "${root}info.json",
       "${root}changelog.txt",
-      "${root}CONTRIBUTING.md",
       "${root}README.md",
-      "${root}todo.md",
       "${root}LICENSE",
       "${root}thumbnail.png",
       "${root}data.lua",
@@ -1094,7 +1308,7 @@ Invoke-RepoCheck "generated package archive matches metadata" {
     }
 
     $forbiddenPatterns = @(
-      "^$([regex]::Escape($root))(\.git|build|dist|fixtures|scripts)(/|$)",
+      "^$([regex]::Escape($root))(\.git|build|dist|docs|fixtures|scripts)(/|$)",
       "(^|/)(\.DS_Store|Thumbs\.db)$",
       "(^|/)__MACOSX(/|$)",
       "~$",
@@ -1129,9 +1343,7 @@ Invoke-RepoCheck "generated package archive matches metadata" {
     $repoPath = $repo.Path
     $mustMatchRepo = @(
       "README.md",
-      "todo.md",
       "changelog.txt",
-      "CONTRIBUTING.md",
       "control.lua",
       "data.lua",
       "data-updates.lua",
@@ -1141,7 +1353,7 @@ Invoke-RepoCheck "generated package archive matches metadata" {
       "thumbnail.png"
     )
 
-    foreach ($directory in @("control", "docs", "locale", "migrations", "prototypes")) {
+    foreach ($directory in @("control", "locale", "migrations", "prototypes")) {
       $directoryPath = Join-Path $repo $directory
       if (Test-Path -LiteralPath $directoryPath) {
         $mustMatchRepo += @(
@@ -1279,7 +1491,6 @@ function Copy-RepositoryModDirectory {
 
   $files = @(
     "changelog.txt",
-    "CONTRIBUTING.md",
     "control.lua",
     "data-final-fixes.lua",
     "data-updates.lua",
@@ -1288,13 +1499,11 @@ function Copy-RepositoryModDirectory {
     "info.json",
     "LICENSE",
     "README.md",
-    "todo.md",
     "settings.lua",
     "thumbnail.png"
   )
   $directories = @(
     "control",
-    "docs",
     "migrations",
     "locale",
     "prototypes"
@@ -1323,7 +1532,13 @@ if (-not (Test-Path -LiteralPath $fixtureRoot)) {
 $nonModFixtureDirs = @("compat-matrix", "run-profiles")
 
 $postMirAssertionFixtures = @(
+  "mir-fixture-assert-aai-loader-belt-productivity",
+  "mir-fixture-assert-air-scrubbing-clean-filter",
+  "mir-fixture-assert-atan-ash-separation",
+  "mir-fixture-assert-atan-nuclear-science-productivity",
   "mir-fixture-assert-better-bot-battery-skip",
+  "mir-fixture-assert-big-mining-drill-productivity",
+  "mir-fixture-assert-capability-negative-cases",
   "mir-fixture-assert-generation-integrity",
   "mir-fixture-assert-science-pack-productivity",
   "mir-fixture-assert-lab-skip-policy",
@@ -1426,7 +1641,7 @@ function Set-CopiedLabPolicySkip {
 function Set-CopiedSciencePackIngredientPolicy {
   param(
     [string]$ModsDir,
-    [ValidateSet("configured", "space", "space-and-promethium", "all-official", "all")]
+    [ValidateSet("configured", "space", "space-and-promethium", "space-age-progression", "official-progression", "mod-progression", "all-official", "all")]
     [string]$Policy
   )
   Set-CopiedStartupSettingDefault -ModsDir $ModsDir -Name "mir-science-pack-ingredient-policy" -ValueLiteral "`"$Policy`""
@@ -1540,7 +1755,7 @@ function Initialize-RuntimeScenario {
     [string[]]$DisabledStreamKeys = @(),
     [string[]]$DisabledBaseExtensionKeys = @(),
     [switch]$LabPolicySkip,
-    [ValidateSet("configured", "space", "space-and-promethium", "all-official", "all")]
+    [ValidateSet("configured", "space", "space-and-promethium", "space-age-progression", "official-progression", "mod-progression", "all-official", "all")]
     [string]$SciencePackIngredientPolicy = "configured",
     [ValidateSet("", "off", "only-when-dedicated-tech-enabled", "always")]
     [string]$WeaponSpeedAdjustmentMode = "",
@@ -1680,7 +1895,7 @@ function Invoke-RuntimeScenario {
     [string[]]$DisabledStreamKeys = @(),
     [string[]]$DisabledBaseExtensionKeys = @(),
     [switch]$LabPolicySkip,
-    [ValidateSet("configured", "space", "space-and-promethium", "all-official", "all")]
+    [ValidateSet("configured", "space", "space-and-promethium", "space-age-progression", "official-progression", "mod-progression", "all-official", "all")]
     [string]$SciencePackIngredientPolicy = "configured",
     [ValidateSet("", "off", "only-when-dedicated-tech-enabled", "always")]
     [string]$WeaponSpeedAdjustmentMode = "",
@@ -1827,6 +2042,59 @@ function Get-LastNativeModifierOverlapLine {
   $line = Select-String -LiteralPath $FactorioLog -Pattern $pattern | Select-Object -Last 1
   if (-not $line) {
     throw "Runtime validation log did not contain native modifier overlap diagnostics for $Key."
+  }
+  return $line.Line
+}
+
+function Get-LastCompatibilityPlanLine {
+  param([string]$Key)
+  $pattern = "kind=compatibility_plan key=$([regex]::Escape($Key))(\s|$)"
+  $line = Select-String -LiteralPath $FactorioLog -Pattern $pattern | Select-Object -Last 1
+  if (-not $line) {
+    throw "Runtime validation log did not contain compatibility plan diagnostics for $Key."
+  }
+  return $line.Line
+}
+
+function Get-LastDiagnosticReportLine {
+  param([string]$Kind, [string]$Key)
+  $pattern = "kind=$([regex]::Escape($Kind)) key=$([regex]::Escape($Key))(\s|$)"
+  $line = Select-String -LiteralPath $FactorioLog -Pattern $pattern | Select-Object -Last 1
+  if (-not $line) {
+    throw "Runtime validation log did not contain $Kind diagnostics for $Key."
+  }
+  return $line.Line
+}
+
+function Get-DiagnosticReportLineContaining {
+  param([string]$Kind, [string]$Key, [string]$Expected)
+  $pattern = "kind=$([regex]::Escape($Kind)) key=$([regex]::Escape($Key))(\s|$)"
+  $line = Select-String -LiteralPath $FactorioLog -Pattern $pattern |
+    Where-Object { $_.Line.Contains($Expected) } |
+    Select-Object -Last 1
+  if (-not $line) {
+    throw "Runtime validation log did not contain $Kind diagnostics for $Key with expected text '$Expected'."
+  }
+  return $line.Line
+}
+
+function Assert-NoDiagnosticReportLineContaining {
+  param([string]$Kind, [string]$Key, [string]$Unexpected, [string]$Context)
+  $pattern = "kind=$([regex]::Escape($Kind)) key=$([regex]::Escape($Key))(\s|$)"
+  $line = Select-String -LiteralPath $FactorioLog -Pattern $pattern |
+    Where-Object { $_.Line.Contains($Unexpected) } |
+    Select-Object -Last 1
+  if ($line) {
+    throw "$Context unexpectedly found $Kind diagnostics for $Key with text '$Unexpected': $($line.Line)"
+  }
+}
+
+function Get-LastRecipeCapReportLine {
+  param([string]$Recipe)
+  $pattern = "kind=recipe_cap .*recipe=$([regex]::Escape($Recipe))(\s|$)"
+  $line = Select-String -LiteralPath $FactorioLog -Pattern $pattern | Select-Object -Last 1
+  if (-not $line) {
+    throw "Runtime validation log did not contain recipe cap diagnostics for $Recipe."
   }
   return $line.Line
 }
@@ -2029,6 +2297,59 @@ $baseLabProductivityLine = Get-LastStreamReportLine -Key "research_lab_productiv
 Assert-ReportLineGenerated -Line $baseLabProductivityLine -Context "Base research productivity scenario"
 Assert-ReportLineContains -Line $baseLabProductivityLine -Expected "effects=1" -Context "Base research productivity scenario"
 Assert-ReportLineContains -Line $baseLabProductivityLine -Expected "icon=tech:military-science-pack" -Context "Base research productivity icon scenario"
+$compatibilityPlanLine = Get-LastCompatibilityPlanLine -Key "compatibility_planner"
+Assert-ReportLineContains -Line $compatibilityPlanLine -Expected "status=diagnostic" -Context "Base compatibility planner diagnostics scenario"
+$compilerPlanLine = Get-LastCompatibilityPlanLine -Key "productivity_compiler"
+Assert-ReportLineContains -Line $compilerPlanLine -Expected "reason=fact_registry_summary" -Context "Base compiler planner summary scenario"
+$ownerRegistryLine = Get-LastCompatibilityPlanLine -Key "owner_registry"
+Assert-ReportLineContains -Line $ownerRegistryLine -Expected "reason=owner_facts_indexed" -Context "Base compiler owner registry scenario"
+$factRegistryLine = Get-LastDiagnosticReportLine -Kind "fact_registry" -Key "prototype_index"
+Assert-ReportLineContains -Line $factRegistryLine -Expected "status=diagnostic" -Context "Base compiler fact registry scenario"
+Assert-ReportLineContains -Line $factRegistryLine -Expected "recipes=" -Context "Base compiler fact registry recipe count scenario"
+$labMatrixLine = Get-LastDiagnosticReportLine -Kind "lab_matrix" -Key "lab"
+Assert-ReportLineContains -Line $labMatrixLine -Expected "reason=lab_inputs_indexed" -Context "Base compiler lab matrix scenario"
+$generatedDecisionLine = Get-LastDiagnosticReportLine -Kind "decision" -Key "recipe-prod-research_lab_productivity-1"
+Assert-ReportLineContains -Line $generatedDecisionLine -Expected "decision=generate_stream" -Context "Base compiler generated decision scenario"
+Assert-ReportLineContains -Line $generatedDecisionLine -Expected "stable_stream_id=recipe-prod-research_lab_productivity-1" -Context "Base compiler stable ID scenario"
+$nativeLabCapabilityLine = Get-DiagnosticReportLineContaining -Kind "decision" -Key "laboratory-productivity" -Expected "capability=native-modifier-ownership"
+Assert-ReportLineContains -Line $nativeLabCapabilityLine -Expected "decision=observe_existing_owner" -Context "Native modifier ownership resolver scenario"
+$nativeMiningCapabilityLine = Get-DiagnosticReportLineContaining -Kind "decision" -Key "mining-drill-productivity-bonus" -Expected "capability=native-modifier-ownership"
+Assert-ReportLineContains -Line $nativeMiningCapabilityLine -Expected "subfamily=native_mining_yield" -Context "Native mining-yield resolver scenario"
+
+Invoke-RuntimeScenario -ScenarioName "recipe-cap-diagnostics" -EnabledFixtureNames @(
+  "mir-fixture-recipe-cap-diagnostics"
+)
+$capPlanLine = Get-LastCompatibilityPlanLine -Key "recipe_productivity_caps"
+Assert-ReportLineContains -Line $capPlanLine -Expected "warnings=" -Context "Recipe cap diagnostics summary scenario"
+$loweredCapLine = Get-LastRecipeCapReportLine -Recipe "iron-gear-wheel"
+Assert-ReportLineContains -Line $loweredCapLine -Expected "cap_state=lowered" -Context "Lowered recipe cap diagnostics scenario"
+Assert-ReportLineContains -Line $loweredCapLine -Expected "useful_level_estimate=2" -Context "Lowered recipe cap useful-level diagnostics scenario"
+$ruleMutationLine = Get-LastDiagnosticReportLine -Kind "rule_mutation" -Key "iron-gear-wheel"
+Assert-ReportLineContains -Line $ruleMutationLine -Expected "field=maximum_productivity" -Context "Recipe cap rule-surface diagnostics scenario"
+Assert-ReportLineContains -Line $ruleMutationLine -Expected "observed_value=0.2" -Context "Recipe cap rule-surface value scenario"
+$raisedCapLine = Get-LastRecipeCapReportLine -Recipe "iron-plate"
+Assert-ReportLineContains -Line $raisedCapLine -Expected "cap_state=raised" -Context "Raised recipe cap diagnostics scenario"
+$extremeCapLine = Get-LastRecipeCapReportLine -Recipe "copper-cable"
+Assert-ReportLineContains -Line $extremeCapLine -Expected "warning_class=uncapped_or_extreme" -Context "Extreme recipe cap diagnostics scenario"
+
+Invoke-RuntimeScenario -ScenarioName "capability-negative-cases" -EnabledFixtureNames @(
+  "mir-fixture-capability-negative-cases",
+  "mir-fixture-assert-capability-negative-cases"
+)
+$selfLoopRiskLine = Get-DiagnosticReportLineContaining -Kind "loop_risk" -Key "mir-self-loop-filter-cleaning" -Expected "catalyst_or_self_return"
+Assert-ReportLineContains -Line $selfLoopRiskLine -Expected "cleaning_or_recovery_loop" -Context "Negative self-loop cleaning risk scenario"
+$barrelRiskLine = Get-DiagnosticReportLineContaining -Kind "loop_risk" -Key "mir-barrel-return-loop" -Expected "barrel_or_container_return"
+Assert-ReportLineContains -Line $barrelRiskLine -Expected "catalyst_or_self_return" -Context "Negative barrel return risk scenario"
+$voidRiskLine = Get-DiagnosticReportLineContaining -Kind "loop_risk" -Key "mir-voiding-sink" -Expected "voiding_or_destruction"
+Assert-ReportLineContains -Line $voidRiskLine -Expected "voiding_or_destruction" -Context "Negative voiding risk scenario"
+$matterRiskLine = Get-DiagnosticReportLineContaining -Kind "loop_risk" -Key "mir-matter-transmutation" -Expected "matter_or_transmutation"
+Assert-ReportLineContains -Line $matterRiskLine -Expected "matter_or_transmutation" -Context "Negative transmutation risk scenario"
+$hiddenRiskLine = Get-DiagnosticReportLineContaining -Kind "loop_risk" -Key "mir-hidden-internal-recipe" -Expected "hidden_internal"
+Assert-ReportLineContains -Line $hiddenRiskLine -Expected "hidden_internal" -Context "Negative hidden recipe risk scenario"
+$zeroCapRuleLine = Get-DiagnosticReportLineContaining -Kind "rule_mutation" -Key "mir-zero-cap-productivity" -Expected "observed_value=0"
+Assert-ReportLineContains -Line $zeroCapRuleLine -Expected "field=maximum_productivity" -Context "Negative zero-cap rule-surface scenario"
+Assert-NoDiagnosticReportLineContaining -Kind "decision" -Key "mir-loader-like-container" -Unexpected "capability=logistics-loader-manufacturing" -Context "Negative loader-like container capability scenario"
+Assert-NoDiagnosticReportLineContaining -Kind "decision" -Key "mir-drill-like-container" -Unexpected "capability=mining-drill-manufacturing" -Context "Negative drill-like container capability scenario"
 
 Invoke-RuntimeScenario -ScenarioName "lab-productivity-owner-skip" -EnabledFixtureNames @(
   "mir-fixture-lab-productivity-owner",
@@ -2102,6 +2423,78 @@ foreach ($baseThrusterStream in @("research_thruster_fuel_productivity", "resear
   }
 }
 
+Invoke-RuntimeScenario -ScenarioName "aai-loader-belt-productivity" -EnabledFixtureNames @(
+  "mir-fixture-aai-loaders",
+  "mir-fixture-assert-aai-loader-belt-productivity"
+)
+$aaiLoaderBeltLine = Get-LastStreamReportLine -Key "research_belts"
+Assert-ReportLineGenerated -Line $aaiLoaderBeltLine -Context "AAI loader belt productivity scenario"
+$aaiLoaderCapabilityLine = Get-DiagnosticReportLineContaining -Kind "decision" -Key "aai-turbo-loader" -Expected "capability=logistics-loader-manufacturing"
+Assert-ReportLineContains -Line $aaiLoaderCapabilityLine -Expected "decision=generate_stream" -Context "AAI loader capability resolver scenario"
+Assert-ReportLineContains -Line $aaiLoaderCapabilityLine -Expected "subfamily=loader" -Context "AAI loader capability subfamily scenario"
+Assert-ReportLineContains -Line $aaiLoaderCapabilityLine -Expected "evidence=item_type:item,item_place_result:aai-turbo-loader,entity_type:loader-1x1,recipe_outputs_item:aai-turbo-loader" -Context "AAI loader entity-backed evidence scenario"
+
+Invoke-RuntimeScenario -ScenarioName "big-mining-drill-productivity" -EnabledFixtureNames @(
+  "mir-fixture-big-mining-drill",
+  "mir-fixture-assert-big-mining-drill-productivity"
+)
+$bigMiningDrillLine = Get-LastStreamReportLine -Key "research_mining_drill"
+Assert-ReportLineGenerated -Line $bigMiningDrillLine -Context "Big Mining Drill productivity scenario"
+$bigMiningCapabilityLine = Get-DiagnosticReportLineContaining -Kind "decision" -Key "big-mining-drill" -Expected "capability=mining-drill-manufacturing"
+Assert-ReportLineContains -Line $bigMiningCapabilityLine -Expected "decision=generate_stream" -Context "Big Mining Drill capability resolver scenario"
+Assert-ReportLineContains -Line $bigMiningCapabilityLine -Expected "subfamily=mining_drill" -Context "Big Mining Drill capability subfamily scenario"
+Assert-ReportLineContains -Line $bigMiningCapabilityLine -Expected "evidence=item_type:item,item_place_result:big-mining-drill,entity_type:mining-drill,recipe_outputs_item:big-mining-drill" -Context "Big Mining Drill entity-backed evidence scenario"
+
+Invoke-RuntimeScenario -ScenarioName "atan-nuclear-science-productivity" -EnabledFixtureNames @(
+  "mir-fixture-atan-nuclear-science",
+  "mir-fixture-assert-atan-nuclear-science-productivity"
+)
+$atanNuclearScienceLine = Get-LastStreamReportLine -Key "research_science_pack_productivity"
+Assert-ReportLineGenerated -Line $atanNuclearScienceLine -Context "ATAN Nuclear Science science-pack productivity scenario"
+Assert-ReportLineContains -Line $atanNuclearScienceLine -Expected "nuclear-science-pack" -Context "ATAN Nuclear Science lab-input science scenario"
+Assert-ReportLineContains -Line $atanNuclearScienceLine -Expected "atan-nuclear-science" -Context "ATAN Nuclear Science unlock prerequisite scenario"
+
+Invoke-RuntimeScenario -ScenarioName "atan-ash-separation" -EnabledFixtureNames @(
+  "mir-fixture-atan-ash",
+  "mir-fixture-assert-atan-ash-separation"
+)
+$atanAshLine = Get-LastStreamReportLine -Key "research_ash_separation"
+Assert-ReportLineGenerated -Line $atanAshLine -Context "ATAN Ash separation productivity scenario"
+Assert-ReportLineContains -Line $atanAshLine -Expected "effects=1" -Context "ATAN Ash separation effect count scenario"
+Assert-ReportLineContains -Line $atanAshLine -Expected "atan-ash-processing" -Context "ATAN Ash unlock prerequisite scenario"
+Assert-NoDiagnosticReportLineContaining -Kind "stream" -Key "research_landfill" -Unexpected "atan-landfill-from-ash" -Context "ATAN Ash landfill sink exclusion scenario"
+Assert-NoDiagnosticReportLineContaining -Kind "stream" -Key "research_concrete" -Unexpected "atan-stone-brick-from-ash" -Context "ATAN Ash brick sink exclusion scenario"
+
+Invoke-RuntimeScenario -ScenarioName "air-scrubbing-clean-filter" -EnabledFixtureNames @(
+  "mir-fixture-air-scrubbing",
+  "mir-fixture-assert-air-scrubbing-clean-filter"
+)
+$airScrubbingLine = Get-LastStreamReportLine -Key "research_air_scrubbing_clean_filter"
+Assert-ReportLineGenerated -Line $airScrubbingLine -Context "Air Scrubbing clean-filter productivity scenario"
+Assert-ReportLineContains -Line $airScrubbingLine -Expected "effects=2" -Context "Air Scrubbing clean-filter effect count scenario"
+Assert-ReportLineContains -Line $airScrubbingLine -Expected "atan-pollution-scrubbing" -Context "Air Scrubbing pollution unlock prerequisite scenario"
+Assert-ReportLineContains -Line $airScrubbingLine -Expected "atan-spore-scrubbing" -Context "Air Scrubbing spore unlock prerequisite scenario"
+$airScrubbingPlanLine = Get-LastCompatibilityPlanLine -Key "research_air_scrubbing_clean_filter"
+Assert-ReportLineContains -Line $airScrubbingPlanLine -Expected "reason=air_scrubbing_policy_summary" -Context "Air Scrubbing policy summary scenario"
+Assert-ReportLineContains -Line $airScrubbingPlanLine -Expected "generated=2" -Context "Air Scrubbing generated target count scenario"
+Assert-ReportLineContains -Line $airScrubbingPlanLine -Expected "rejected=4" -Context "Air Scrubbing rejected target count scenario"
+Assert-ReportLineContains -Line $airScrubbingPlanLine -Expected "unknown=1" -Context "Air Scrubbing unknown target count scenario"
+$airScrubbingAllowedDecision = Get-DiagnosticReportLineContaining -Kind "decision" -Key "atan-pollution-filter" -Expected "stable_stream_id=mir-prod-air-scrubbing-clean-filter"
+Assert-ReportLineContains -Line $airScrubbingAllowedDecision -Expected "decision=generate_stream" -Context "Air Scrubbing allowed decision scenario"
+Assert-ReportLineContains -Line $airScrubbingAllowedDecision -Expected "stable_stream_id=mir-prod-air-scrubbing-clean-filter" -Context "Air Scrubbing stable stream ID scenario"
+$airScrubbingScrubDecision = Get-DiagnosticReportLineContaining -Kind "decision" -Key "atan-pollution-scrubbing" -Expected "risks=scrubbing_environmental"
+Assert-ReportLineContains -Line $airScrubbingScrubDecision -Expected "decision=diagnose_only" -Context "Air Scrubbing scrubbing deny decision scenario"
+Assert-ReportLineContains -Line $airScrubbingScrubDecision -Expected "risks=scrubbing_environmental" -Context "Air Scrubbing scrubbing risk scenario"
+$airScrubbingScrubRisk = Get-DiagnosticReportLineContaining -Kind "loop_risk" -Key "atan-pollution-scrubbing" -Expected "risks=scrubbing_environmental"
+Assert-ReportLineContains -Line $airScrubbingScrubRisk -Expected "risks=scrubbing_environmental" -Context "Air Scrubbing scrubbing loop-risk scenario"
+$airScrubbingCleaningDecision = Get-DiagnosticReportLineContaining -Kind "decision" -Key "atan-pollution-filter-cleaning" -Expected "risks=cleaning_recovery"
+Assert-ReportLineContains -Line $airScrubbingCleaningDecision -Expected "decision=diagnose_only" -Context "Air Scrubbing cleaning deny decision scenario"
+Assert-ReportLineContains -Line $airScrubbingCleaningDecision -Expected "risks=cleaning_recovery" -Context "Air Scrubbing cleaning risk scenario"
+$airScrubbingCleaningRisk = Get-DiagnosticReportLineContaining -Kind "loop_risk" -Key "atan-pollution-filter-cleaning" -Expected "risks=cleaning_recovery"
+Assert-ReportLineContains -Line $airScrubbingCleaningRisk -Expected "risks=cleaning_recovery" -Context "Air Scrubbing cleaning loop-risk scenario"
+$airScrubbingUnknownDecision = Get-DiagnosticReportLineContaining -Kind "decision" -Key "atan-filter-resin" -Expected "decision=observe_unknown"
+Assert-ReportLineContains -Line $airScrubbingUnknownDecision -Expected "decision=observe_unknown" -Context "Air Scrubbing unknown related decision scenario"
+
 Invoke-RuntimeScenario -ScenarioName "pipeline-extent-multiplier" -EnabledFixtureNames @(
   "mir-fixture-assert-pipeline-extent"
 ) -PipelineExtentMultiplier 2
@@ -2173,6 +2566,34 @@ $spaceAgeLabProductivityLine = Get-LastStreamReportLine -Key "research_lab_produ
 if ($spaceAgeLabProductivityLine -notmatch "status=skipped" -or $spaceAgeLabProductivityLine -notmatch "existing technology effect research-productivity laboratory-productivity") {
   throw "Space Age should skip MIR research productivity because vanilla research-productivity already exists: $spaceAgeLabProductivityLine"
 }
+
+Invoke-RuntimeScenario -ScenarioName "space-age-progression-pack-policy" -EnabledFixtureNames @() -SciencePackIngredientPolicy "space-age-progression" -EnableSpaceAge
+$spaceAgeProgressionGearsLine = Get-LastStreamReportLine -Key "research_gears"
+Assert-ReportLineGenerated -Line $spaceAgeProgressionGearsLine -Context "Space Age progression science-pack ingredient policy base stream scenario"
+Assert-ReportScienceDoesNotContain -Line $spaceAgeProgressionGearsLine -Unexpected "space-science-pack" -Context "Space Age progression science-pack ingredient policy base stream scenario"
+$spaceAgeProgressionOilLine = Get-LastStreamReportLine -Key "research_oil_processing_productivity"
+Assert-ReportLineGenerated -Line $spaceAgeProgressionOilLine -Context "Space Age progression science-pack ingredient policy planet stream scenario"
+Assert-ReportScienceContains -Line $spaceAgeProgressionOilLine -Expected "cryogenic-science-pack" -Context "Space Age progression science-pack ingredient policy planet stream scenario"
+Assert-ReportScienceContains -Line $spaceAgeProgressionOilLine -Expected "space-science-pack" -Context "Space Age progression science-pack ingredient policy planet stream scenario"
+Assert-ReportScienceDoesNotContain -Line $spaceAgeProgressionOilLine -Unexpected "promethium-science-pack" -Context "Space Age progression science-pack ingredient policy planet stream scenario"
+
+Invoke-RuntimeScenario -ScenarioName "official-progression-pack-policy" -EnabledFixtureNames @() -SciencePackIngredientPolicy "official-progression" -EnableSpaceAge
+$officialProgressionOilLine = Get-LastStreamReportLine -Key "research_oil_processing_productivity"
+Assert-ReportLineGenerated -Line $officialProgressionOilLine -Context "Official progression science-pack ingredient policy scenario"
+Assert-ReportScienceContains -Line $officialProgressionOilLine -Expected "utility-science-pack" -Context "Official progression science-pack ingredient policy scenario"
+Assert-ReportScienceContains -Line $officialProgressionOilLine -Expected "space-science-pack" -Context "Official progression science-pack ingredient policy scenario"
+Assert-ReportScienceContains -Line $officialProgressionOilLine -Expected "cryogenic-science-pack" -Context "Official progression science-pack ingredient policy scenario"
+Assert-ReportScienceDoesNotContain -Line $officialProgressionOilLine -Unexpected "agricultural-science-pack" -Context "Official progression science-pack ingredient policy should not add unrelated planet packs"
+
+Invoke-RuntimeScenario -ScenarioName "mod-progression-pack-policy" -EnabledFixtureNames @(
+  "mir-fixture-item-science-pack"
+) -SciencePackIngredientPolicy "mod-progression"
+$modProgressionGearsLine = Get-LastStreamReportLine -Key "research_gears"
+Assert-ReportLineGenerated -Line $modProgressionGearsLine -Context "Mod progression science-pack ingredient policy base stream scenario"
+Assert-ReportScienceDoesNotContain -Line $modProgressionGearsLine -Unexpected "mir-fixture-science-pack" -Context "Mod progression science-pack ingredient policy base stream scenario"
+$modProgressionScienceLine = Get-LastStreamReportLine -Key "research_science_pack_productivity"
+Assert-ReportLineGenerated -Line $modProgressionScienceLine -Context "Mod progression science-pack ingredient policy selected mod pack scenario"
+Assert-ReportScienceContains -Line $modProgressionScienceLine -Expected "mir-fixture-science-pack" -Context "Mod progression science-pack ingredient policy selected mod pack scenario"
 
 if ($isFactorio21Line) {
   Invoke-RuntimeScenario -ScenarioName "base-scripted-candidates-enabled" -EnabledFixtureNames @() -EnabledStreamKeys @(
