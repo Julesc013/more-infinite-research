@@ -12,9 +12,9 @@
 More Infinite Research adds **configurable infinite productivity** and **bonus research** for intermediate items,
 logistics chains, combat bonuses, player bonuses, and Space Age gaps that vanilla Factorio does not cover.
 
-Version **`1.x.x`** targets **Factorio `2.0`** and requires `base >= 2.0`.
+Legacy transition releases **`1.9.0`** through **`1.9.2`** target **Factorio `2.0`** and require `base >= 2.0`.
 
-Version **`2.x.x`** targets **Factorio `2.1`** and requires:
+Version **`2.x.x`** through **`2.2.0`** targets **Factorio `2.1`** and requires:
 
 - `base >= 2.1.8`
 - hidden optional `elevated-rails`
@@ -220,7 +220,7 @@ These streams generate `change-recipe-productivity` effects for matching recipes
 
 These streams generate infinite technologies with direct Factorio technology modifiers or visible scripted-effect placeholders. Scripted effects are handled in `control.lua` and remain event-driven.
 
-The scripted streams remain disabled by default in `v2.1.0`. Basic opt-in smoke tests can document their experimental behavior, but default enablement or stronger runtime claims require manual save validation for existing-stack behavior, reversal, disabling, multi-force behavior, and the agricultural tower event path. Graduation belongs in a later release after player testing.
+The scripted streams remain disabled by default in `v2.2.0`. Basic opt-in smoke tests can document their experimental behavior, but default enablement or stronger runtime claims require manual save validation for existing-stack behavior, reversal, disabling, multi-force behavior, and the agricultural tower event path. Graduation belongs in a later release after player testing.
 
 | Stream key | Research | Effect | Default | Gates and notes |
 | --- | --- | --- | --- | --- |
@@ -264,7 +264,7 @@ Recommended default:
 
 - Leave technology enable checkboxes as shipped.
 - Stable generated research lines are enabled.
-- Experimental/scripted candidates stay disabled by default in `v2.1.0`.
+- Experimental/scripted candidates stay disabled by default in `v2.2.0`.
 - Diagnostics stay disabled unless you are troubleshooting a report.
 
 Conservative setup:
@@ -401,6 +401,8 @@ These are handled when their **prototypes are visible**:
 | Fluid Quality Imprinting (`fluid-quality-imprinting`) | Covered plate and intermediate outputs are picked up when the recipes output standard items. |
 | Plates n Circuit Productivity (`plates-n-circuit-productivity`) | Selected competing infinite productivity technologies are prepared before MIR generation and removed only after MIR has generated matching replacement recipe effects with the same productivity value and no other blocking owner. |
 | Castra and PlanetLib-style science packs | Custom science packs can be discovered as lab inputs and receive science-pack productivity when their recipes are visible. |
+| Air Scrubbing (`atan-air-scrubbing`) | Exact clean-filter crafting recipes are covered by Air Scrubbing clean-filter productivity; scrubbing, cleaning, recovery, and environmental-removal recipes are deliberately excluded. |
+| ATAN Ash (`atan-ash`) | Exact ash separation is covered by ash separation productivity; landfill, brick, nutrient, foundation, tile, and recovery-style ash sink recipes are deliberately excluded. |
 | AAI Loaders style loader mods | Recipes outputting AAI-style or tier-named loader items are covered by transport belt productivity when their recipes are visible. |
 | Big Mining Drill and Omega Drill style drill mods | Recipes outputting `big-mining-drill`, `omega-drill`, `omega-tau`, or broader modded `*-mining-drill` / `*-drill` items are covered by mining drill productivity. |
 | ATAN Nuclear Science style science-pack mods | Lab-input science-pack items with visible recipes are covered by science-pack productivity; non-science buildings such as atom-forge recipes are not included in the science-pack stream. |

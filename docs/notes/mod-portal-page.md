@@ -12,8 +12,8 @@ It is built for players who want more *long-term scaling for late-game megabases
 - Adds a base-game Research productivity chain when Space Age's vanilla `research-productivity` technology is not present.
 - Adopts safe mod-added recipes into configured vanilla Space Age productivity families instead of creating parallel research.
 
-- Version **`1.x.x`** targets **Factorio `2.0`** and requires `base >= 2.0`.
-- Version **`2.x.x`** targets **Factorio `2.1`**; requires `base >= 2.1.8`. Space Age is optional.
+- Legacy transition releases **`1.9.0`** through **`1.9.2`** target **Factorio `2.0`** and require `base >= 2.0`.
+- Version **`2.x.x`** through **`2.2.0`** targets **Factorio `2.1`**; requires `base >= 2.1.8`. Space Age is optional.
 
 *Recipe productivity researches are infinite, but Factorio's recipe productivity cap still applies. Once a recipe reaches that cap, more levels may no longer improve that recipe.*
 
@@ -174,6 +174,11 @@ This helps it work with:
 - Space Age installs without Quality.
 - Custom science-pack and custom lab mods.
 - Castra and PlanetLib-style planet or science-pack mods.
+- Air Scrubbing clean-filter recipes, with scrubbing and cleaning recipes deliberately excluded.
+- ATAN Ash separation, with landfill, brick, nutrient, foundation, tile, and recovery-style ash sinks deliberately excluded.
+- ATAN-style Nuclear Science packs through science-pack productivity.
+- AAI-style loader crafting recipes through Transport belt productivity.
+- Standalone big mining drill mods through Mining drill productivity.
 - Advanced Solar HR.
 - Better Robots Extended.
 - OCs Ammo and Armor.

@@ -2,6 +2,46 @@
 
 This file records local release-candidate validation runs. It is not a substitute for the manual mod matrix in `docs/compatibility.md`.
 
+## 2026-07-07 2.2.0 Final Package Refresh And Docs Review
+
+Environment:
+
+- Branch: `dev`, pending sync to `main`.
+- Mod version `2.2.0`.
+- Release artifact: `dist\more-infinite-research_2.2.0.zip`.
+- Release artifact SHA256: `B4E49460734868C3CC56476EF319916BBF2FA929C55E05EAA64CC67EB589691C`.
+- Release artifact size: `236643` bytes.
+- Factorio binary: not available from this Codex shell at the common local install paths for this final refresh.
+
+Scope:
+
+- Reviewed README, changelog, `todo.md`, release notes, mod-portal copy, and
+  planning notes for final `2.2.0` release consistency.
+- Added player-facing `docs/notes/archive/release-notes-2.2.0.md`.
+- Updated the active post-transition Factorio `2.0` target-line start to
+  `2.3.0` across public planning docs and `todo.md`.
+- Updated packaged README/changelog wording, then rebuilt the release archive.
+- Confirmed package hygiene excludes developer-only `docs/`, `fixtures/`,
+  `scripts/`, `todo.md`, and `CONTRIBUTING.md`.
+
+Commands:
+
+```powershell
+.\scripts\Build-MIRPackage.ps1
+git diff --check
+.\scripts\Invoke-MIRValidation.ps1 -StaticOnly
+```
+
+Results:
+
+- Package rebuild passed.
+- Static validation and package validation passed.
+- Runtime validation was not rerun from this shell because no Factorio binary
+  was available. The earlier `2.2.0` final release-targeted gate below remains
+  the last full automated runtime/audit gate, and the final package refresh
+  changed only packaged documentation after the maintainer smoke-tested the
+  rebuilt archive.
+
 ## 2026-07-07 2.2.0 Final Release-Targeted Gate
 
 Environment:
