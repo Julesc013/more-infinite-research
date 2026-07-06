@@ -18,7 +18,7 @@ Required before publishing `v2.0.5`:
 | --- | --- |
 | `branch-state-preflight` | Run `git status --short --branch`, `git log --oneline --decorate --graph --max-count=8`, and `git branch -vv` before push/tag |
 | `package-parity` | Rebuild zip and confirm package validation passes |
-| `docs-in-package` | Confirm README, roadmap, TODO, API proof, manual tests, compatibility docs, test results, changelog, locale, and source parity |
+| `minimal-package` | Confirm the release zip excludes developer docs, fixtures, scripts, and task ledgers while keeping runtime source, locale, migrations, metadata, README, changelog, license, and thumbnail |
 | `normal-mod-folder-load` | Copy the release zip into a normal Factorio mods folder and confirm Factorio can see it |
 | `vanilla-locale-icons` | Base game without Space Age; confirm Electric Shooting Speed falls back to discharge defense art/description and flamethrower/electric modifier descriptions are present |
 | `space-age-electric-icon` | Space Age enabled; confirm Electric Shooting Speed uses the electric-weapons-damage texture while still showing electric and Tesla speed effects |

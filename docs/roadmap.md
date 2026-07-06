@@ -185,7 +185,7 @@ Quick, easy feedback patch for tested low-risk improvements.
 - Static validation passes.
 - Runtime fixture validation passes on the supported Factorio `2.1.x` binary.
 - Package validation passes.
-- The current `docs/` tree is included in the package and package parity follows the current documentation layout.
+- Developer docs stay in the repository, not the shipped package; package parity follows the runtime source, locale, migrations, metadata, README, changelog, license, and thumbnail layout.
 - README, docs, changelog, and packaged zip agree on the actual shipped features.
 - Manual results exist for the scripted features that are claimed as shipped.
 - If spoilage preservation only affects new stacks, the changelog says that plainly.

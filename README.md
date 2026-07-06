@@ -536,6 +536,7 @@ When either diagnostics setting is enabled, MIR also reports duplicate recipe ma
 
 ```powershell
 .\scripts\mir.ps1 release gate
+.\scripts\mir.ps1 release docs-only
 .\scripts\mir.ps1 overnight local
 .\scripts\mir.ps1 audit local
 .\scripts\mir.ps1 report latest
@@ -558,6 +559,14 @@ This is the short release command. It runs:
 - package rebuild, whitespace check, and clean-git-status check.
 
 Defaults live in `fixtures/run-profiles/release-targeted.json`. Use `--profile`, `--factorio-line`, `--factorio`, `--mods`, `--output`, or `--timeout` for a different local setup. Use the overnight local sweep separately for broad compatibility evidence.
+
+**Docs-only release refresh after a clean full gate:**
+
+```powershell
+.\scripts\mir.ps1 release docs-only
+```
+
+Use this only after the same release candidate has already passed the full gate and the remaining edits are documentation, release-note, changelog, or package-refresh changes. It rebuilds the package, runs static/package validation, checks whitespace, and fails if code, prototype, script, fixture, locale, or other non-doc files changed.
 
 Stable direct script equivalent:
 
@@ -607,7 +616,7 @@ The validation script checks:
 - **PowerShell tooling:** scripts parse, duplicate parameters are rejected, generated output paths stay ignored, and obvious secret output is blocked.
 - **Changelog:** `changelog.txt` uses Factorio's 99-dash format with one-line bullets capped at 132 characters.
 - **Generated package:** validation builds an ignored archive from the current source tree and checks its root, metadata, load-critical files, and forbidden artifacts.
-- **Package parity:** the generated archive's source directories, documentation, locale, migrations, and root mod files match the repository copy while allowing docs and helper modules to be rearranged inside their packaged trees.
+- **Package parity:** the generated archive's runtime source directories, locale, migrations, and root mod files match the repository copy. Developer docs, fixtures, scripts, and task ledgers are not shipped in the release zip.
 - **Compatibility automation:** the Mod Portal audit runner, manual scenario execution, sharding/resume, scenario timeout, dependency-failure skipping, grouped failure converter, expected-failure fixture, profile-stub generator, and self-hosted extended workflow stay wired.
 - **Whitespace:** `git diff --check` passes.
 - **Runtime load:** fixture loading reaches save creation when a Factorio binary is supplied.

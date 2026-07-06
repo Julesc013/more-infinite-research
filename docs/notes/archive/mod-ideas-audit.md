@@ -191,7 +191,7 @@ These were intentionally not absorbed into `2.1.5`.
 | Step | Required before publishing `2.1.5` | Status |
 | --- | --- | --- |
 | Keep the narrow compatibility commit. | Yes. | Done. |
-| Rebuild `dist/more-infinite-research_2.1.5.zip` from committed source. | Yes. | Required on the final source tree because package docs are included. |
+| Rebuild `dist/more-infinite-research_2.1.5.zip` from committed source. | Yes. | Required on the final source tree so packaged runtime files match the release source. |
 | Run static validation. | Yes. | Required on the final source tree. |
 | Run Factorio fixture validation. | Yes before publishing. | Done for the compatibility commit with the local Steam Factorio binary. |
 | Run targeted external idea-mod load pass for shipped profiles. | Yes for the local release gate. | Required before claiming tested compatibility with the audited zip set; otherwise release notes must stay at guarded-profile wording. |

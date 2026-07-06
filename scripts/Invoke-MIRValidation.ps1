@@ -1079,9 +1079,7 @@ Invoke-RepoCheck "generated package archive matches metadata" {
     $requiredEntries = @(
       "${root}info.json",
       "${root}changelog.txt",
-      "${root}CONTRIBUTING.md",
       "${root}README.md",
-      "${root}todo.md",
       "${root}LICENSE",
       "${root}thumbnail.png",
       "${root}data.lua",
@@ -1099,7 +1097,7 @@ Invoke-RepoCheck "generated package archive matches metadata" {
     }
 
     $forbiddenPatterns = @(
-      "^$([regex]::Escape($root))(\.git|build|dist|fixtures|scripts)(/|$)",
+      "^$([regex]::Escape($root))(\.git|build|dist|docs|fixtures|scripts)(/|$)",
       "(^|/)(\.DS_Store|Thumbs\.db)$",
       "(^|/)__MACOSX(/|$)",
       "~$",
@@ -1134,9 +1132,7 @@ Invoke-RepoCheck "generated package archive matches metadata" {
     $repoPath = $repo.Path
     $mustMatchRepo = @(
       "README.md",
-      "todo.md",
       "changelog.txt",
-      "CONTRIBUTING.md",
       "control.lua",
       "data.lua",
       "data-updates.lua",
@@ -1146,7 +1142,7 @@ Invoke-RepoCheck "generated package archive matches metadata" {
       "thumbnail.png"
     )
 
-    foreach ($directory in @("control", "docs", "locale", "migrations", "prototypes")) {
+    foreach ($directory in @("control", "locale", "migrations", "prototypes")) {
       $directoryPath = Join-Path $repo $directory
       if (Test-Path -LiteralPath $directoryPath) {
         $mustMatchRepo += @(
@@ -1284,7 +1280,6 @@ function Copy-RepositoryModDirectory {
 
   $files = @(
     "changelog.txt",
-    "CONTRIBUTING.md",
     "control.lua",
     "data-final-fixes.lua",
     "data-updates.lua",
@@ -1293,13 +1288,11 @@ function Copy-RepositoryModDirectory {
     "info.json",
     "LICENSE",
     "README.md",
-    "todo.md",
     "settings.lua",
     "thumbnail.png"
   )
   $directories = @(
     "control",
-    "docs",
     "migrations",
     "locale",
     "prototypes"

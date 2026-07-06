@@ -231,7 +231,9 @@ Use `scripts/mir.ps1` as the stable developer-facing command facade. It keeps ex
 
 Use `scripts/Build-MIRPackage.ps1` to rebuild the release archive when preparing an upload. Static validation builds an ignored validation archive from the current source tree and checks the archive root, metadata, load-critical entry files, locale files, migrations, and forbidden artifact paths.
 
-Static package validation also recursively compares packaged files from the current source tree against the repository copy for the packaged source directories. Documentation and helper modules may be moved or nested inside their packaged trees without changing validation; the test follows the current tree instead of a fixed old layout. Text files are compared with normalized line endings so CI checkout settings do not create false failures; binary files are still compared by SHA-256.
+Static package validation also recursively compares packaged files from the current source tree against the repository copy for the packaged source directories. The release zip intentionally excludes developer-only docs, fixtures, scripts, and task ledgers; those remain repository evidence, not shipped mod payload. Text files are compared with normalized line endings so CI checkout settings do not create false failures; binary files are still compared by SHA-256.
+
+Use `scripts/mir.ps1 release docs-only` or `scripts/mir.ps1 release docs-refresh` for documentation-only refreshes after a clean full release gate. The command runs the fast package/static validation path and rejects non-doc/package changes so prototype, script, fixture, locale, or runtime behavior changes still require the full gate.
 
 Static validation also checks Factorio changelog formatting, including the required 99-dash section separators, the current `info.json` version, the changelog-only 132-character line cap, and blocked internal-process wording.
 

@@ -26,6 +26,8 @@ Date: 2026-07-05
     - Added PowerShell script checks for parsing, duplicate parameters, ignored outputs, and secret-output guards.
     - Added Factorio 2.0 and 2.1 run profiles for release gates, overnight sweeps, and local audits.
     - Made compatibility audits select Factorio line, local scenario defaults, and available official built-ins.
+    - Added a docs-only release check command for release-note and documentation refreshes after a clean full gate.
+    - Trimmed release archives so extra repository files are not shipped in the mod zip.
 
 ---------------------------------------------------------------------------------------------------
 Version: 1.9.1
