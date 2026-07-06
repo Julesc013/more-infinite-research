@@ -212,7 +212,7 @@ foreach ($result in $loadResults) {
     $warningClass = [string](Get-MIRObjectProperty -Object $row -Name "warning_class")
     $capState = [string](Get-MIRObjectProperty -Object $row -Name "cap_state")
 
-    if ($kind -in @("compatibility_role", "compatibility_plan", "recipe_cap")) {
+    if ($kind -in @("compatibility_role", "compatibility_plan", "recipe_cap", "fact_registry", "decision", "rule_mutation", "loop_risk", "lab_matrix")) {
       $observationRows += [pscustomobject]@{
         scenario = $scenario
         mod = $primaryMod
@@ -224,13 +224,41 @@ foreach ($result in $loadResults) {
         action = [string](Get-MIRObjectProperty -Object $row -Name "action")
         signal = [string](Get-MIRObjectProperty -Object $row -Name "signal")
         recipe = $recipe
+        recipes = [string](Get-MIRObjectProperty -Object $row -Name "recipes")
         warning_class = $warningClass
         cap_state = $capState
         maximum_productivity = [string](Get-MIRObjectProperty -Object $row -Name "maximum_productivity")
         per_level = [string](Get-MIRObjectProperty -Object $row -Name "per_level")
         levels_to_cap = [string](Get-MIRObjectProperty -Object $row -Name "levels_to_cap")
+        useful_level_estimate = [string](Get-MIRObjectProperty -Object $row -Name "useful_level_estimate")
         total = [string](Get-MIRObjectProperty -Object $row -Name "total")
         warnings = [string](Get-MIRObjectProperty -Object $row -Name "warnings")
+        subject_type = [string](Get-MIRObjectProperty -Object $row -Name "subject_type")
+        subject = [string](Get-MIRObjectProperty -Object $row -Name "subject")
+        family = [string](Get-MIRObjectProperty -Object $row -Name "family")
+        confidence = [string](Get-MIRObjectProperty -Object $row -Name "confidence")
+        source = [string](Get-MIRObjectProperty -Object $row -Name "source")
+        policy = [string](Get-MIRObjectProperty -Object $row -Name "policy")
+        decision = [string](Get-MIRObjectProperty -Object $row -Name "decision")
+        emitted = [string](Get-MIRObjectProperty -Object $row -Name "emitted")
+        blockers = [string](Get-MIRObjectProperty -Object $row -Name "blockers")
+        risks = [string](Get-MIRObjectProperty -Object $row -Name "risks")
+        stable_stream_id = [string](Get-MIRObjectProperty -Object $row -Name "stable_stream_id")
+        labs = [string](Get-MIRObjectProperty -Object $row -Name "labs")
+        field = [string](Get-MIRObjectProperty -Object $row -Name "field")
+        observed_value = [string](Get-MIRObjectProperty -Object $row -Name "observed_value")
+        expected_baseline = [string](Get-MIRObjectProperty -Object $row -Name "expected_baseline")
+        technologies = [string](Get-MIRObjectProperty -Object $row -Name "technologies")
+        machines = [string](Get-MIRObjectProperty -Object $row -Name "machines")
+        mir_owned = [string](Get-MIRObjectProperty -Object $row -Name "mir_owned")
+        external_owned_exact = [string](Get-MIRObjectProperty -Object $row -Name "external_owned_exact")
+        external_owned_unknown = [string](Get-MIRObjectProperty -Object $row -Name "external_owned_unknown")
+        rule_mutations = [string](Get-MIRObjectProperty -Object $row -Name "rule_mutations")
+        loop_risks = [string](Get-MIRObjectProperty -Object $row -Name "loop_risks")
+        generated = [string](Get-MIRObjectProperty -Object $row -Name "generated")
+        module_slots = [string](Get-MIRObjectProperty -Object $row -Name "module_slots")
+        allowed_effects = [string](Get-MIRObjectProperty -Object $row -Name "allowed_effects")
+        shared_inputs_outputs = [string](Get-MIRObjectProperty -Object $row -Name "shared_inputs_outputs")
       }
     }
 
@@ -424,7 +452,7 @@ $observationSummary = @(
 if ($observationRows.Count -gt 0) {
   $observationRows | Export-Csv -NoTypeInformation -LiteralPath $observationsCsvPath
 } else {
-  "scenario,mod,kind,key,status,reason,role,action,signal,recipe,warning_class,cap_state,maximum_productivity,per_level,levels_to_cap,total,warnings" | Set-Content -LiteralPath $observationsCsvPath -Encoding UTF8
+  "scenario,mod,kind,key,status,reason,role,action,signal,recipe,recipes,warning_class,cap_state,maximum_productivity,per_level,levels_to_cap,useful_level_estimate,total,warnings,subject_type,subject,family,confidence,source,policy,decision,emitted,blockers,risks,stable_stream_id,labs,field,observed_value,expected_baseline,technologies,machines,mir_owned,external_owned_exact,external_owned_unknown,rule_mutations,loop_risks,generated,module_slots,allowed_effects,shared_inputs_outputs" | Set-Content -LiteralPath $observationsCsvPath -Encoding UTF8
 }
 
 $observationsMd = @()
@@ -433,7 +461,7 @@ $observationsMd += ""
 $observationsMd += ('- Audit dir: `{0}`' -f $resolvedAuditDir)
 $observationsMd += "- Observation rows: $($observationRows.Count)"
 $observationsMd += ""
-$observationsMd += "These rows are diagnostics, not failure groups. They describe MIR roles, planner summaries, and recipe-cap warnings."
+$observationsMd += "These rows are diagnostics, not failure groups. They describe MIR roles, planner summaries, recipe-cap warnings, compiler decisions, rule surfaces, loop risks, fact registry summaries, and lab matrices."
 $observationsMd += ""
 $observationsMd += "## Rows By Kind"
 $observationsMd += ""
@@ -455,7 +483,31 @@ if ($recipeCapWarnings.Count -gt 0) {
   $observationsMd += "| Scenario | Stream | Recipe | Warning | Cap state | Maximum | Per level | Levels to cap |"
   $observationsMd += "| --- | --- | --- | --- | --- | ---: | ---: | ---: |"
   foreach ($entry in $recipeCapWarnings | Select-Object -First 100) {
-    $observationsMd += "| $($entry.scenario) | $($entry.key) | $($entry.recipe) | $($entry.warning_class) | $($entry.cap_state) | $($entry.maximum_productivity) | $($entry.per_level) | $($entry.levels_to_cap) |"
+    $observationsMd += "| $($entry.scenario) | $($entry.key) | $($entry.recipe) | $($entry.warning_class) | $($entry.cap_state) | $($entry.maximum_productivity) | $($entry.per_level) | $($entry.useful_level_estimate) |"
+  }
+}
+
+$loopRiskRows = @($observationRows | Where-Object { $_.kind -eq "loop_risk" })
+if ($loopRiskRows.Count -gt 0) {
+  $observationsMd += ""
+  $observationsMd += "## Loop Risk Diagnostics"
+  $observationsMd += ""
+  $observationsMd += "| Scenario | Recipe | Risks | Shared inputs/results |"
+  $observationsMd += "| --- | --- | --- | --- |"
+  foreach ($entry in $loopRiskRows | Select-Object -First 100) {
+    $observationsMd += "| $($entry.scenario) | $($entry.subject) | $($entry.risks) | $($entry.shared_inputs_outputs) |"
+  }
+}
+
+$ruleMutationRows = @($observationRows | Where-Object { $_.kind -eq "rule_mutation" })
+if ($ruleMutationRows.Count -gt 0) {
+  $observationsMd += ""
+  $observationsMd += "## Rule Surface Diagnostics"
+  $observationsMd += ""
+  $observationsMd += "| Scenario | Subject | Field | Observed | Baseline |"
+  $observationsMd += "| --- | --- | --- | --- | --- |"
+  foreach ($entry in $ruleMutationRows | Select-Object -First 100) {
+    $observationsMd += "| $($entry.scenario) | $($entry.subject) | $($entry.field) | $($entry.observed_value) | $($entry.expected_baseline) |"
   }
 }
 $observationsMd -join "`n" | Set-Content -LiteralPath $observationsMdPath -Encoding UTF8

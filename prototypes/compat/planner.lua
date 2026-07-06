@@ -272,7 +272,8 @@ local function emit_cap_diagnostics()
             cap_state = state,
             maximum_productivity = format_number(cap),
             per_level = format_number(per_level),
-            levels_to_cap = levels
+            levels_to_cap = levels,
+            useful_level_estimate = levels
           })
         end
       end

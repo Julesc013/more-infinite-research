@@ -128,6 +128,11 @@ $observationRows = @(
         observations = [int]$json.observation_count
         recipe_cap = @($json.observations | Where-Object { $_.kind -eq "recipe_cap" }).Count
         roles = @($json.observations | Where-Object { $_.kind -eq "compatibility_role" }).Count
+        decisions = @($json.observations | Where-Object { $_.kind -eq "decision" }).Count
+        loop_risks = @($json.observations | Where-Object { $_.kind -eq "loop_risk" }).Count
+        rule_surfaces = @($json.observations | Where-Object { $_.kind -eq "rule_mutation" }).Count
+        fact_registry = @($json.observations | Where-Object { $_.kind -eq "fact_registry" }).Count
+        lab_matrix = @($json.observations | Where-Object { $_.kind -eq "lab_matrix" }).Count
       }
     }
 )

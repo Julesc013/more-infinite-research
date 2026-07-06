@@ -506,10 +506,10 @@ Idea-mod audit candidates should be promoted only after recipe-ID proof, balance
 
 | Candidate | Source signal | First useful slice |
 | --- | --- | --- |
-| Compatibility planner/registry | All 50 idea-mod archives | First diagnostics-only rows pulled into `v2.1.5`; structured validation status and broader policy remain for `v2.2.0`. |
-| Cap-aware UX | Productivity cap and finite-limit helper mods | Warning diagnostics pulled into `v2.1.5`; settings or mutation policy remains deferred. |
-| External rule-mutator detection | Productivity, beacon, machine, cap, and cost mutator mods | Diagnostics first: detect changed productivity eligibility, beacon effects, base productivity, caps, and research-cost changes without normalizing them. |
-| Loop-risk diagnostics | Recycler, crusher, catalyst, cleaning, scrubbing, spoilage, and voiding loops | Required before any productivity-rule or cap-mutation option. |
+| Compatibility planner/registry | All 50 idea-mod archives | `v2.2.0` adds typed facts, compiler decisions, lab matrices, owner summaries, and report-only policy rows. |
+| Cap-aware UX | Productivity cap and finite-limit helper mods | `v2.2.0` adds useful-level estimates; settings or mutation policy remains deferred. |
+| External rule-mutator detection | Productivity, beacon, machine, cap, and cost mutator mods | `v2.2.0` detects cap, beacon, lab, and machine-rule surfaces without normalizing them. |
+| Loop-risk diagnostics | Recycler, crusher, catalyst, cleaning, scrubbing, spoilage, and voiding loops | `v2.2.0` reports obvious loop-risk flags before any productivity-rule or cap-mutation option. |
 | Ore crushing productivity | Crushing Industry productivity research | Recipe-ID driven Crushing Industry stream or compatibility profile. |
 | Air Scrubbing clean-filter productivity | `atan-air-scrubbing` | Clean pollution/spore filter recipe productivity only; exclude scrubbing and cleaning recipes. |
 | Tile/surface productivity | Asphalt, concrete, landfill, foundation productivity mods | Decide conservative defaults, exact cleanup rules, and optional high-value profile policy before implementation. |
@@ -520,16 +520,16 @@ Idea-mod audit candidates should be promoted only after recipe-ID proof, balance
 - [ ] Keep `docs/compatibility-program.md` and `docs/compatibility-matrix.md` current before making new compatibility claims.
 - [ ] Add one structured audit row for each archive in `C:\Projects\Factorio\ideamods_mix` using the role enum and one-archive template.
 - [ ] Add audited-zip checksum records for local compatibility campaigns so future Mod Portal updates do not silently change what was proved.
-- [ ] Build the compatibility planner/registry before broad new stream work, with detected mods, actions, non-actions, warnings, and public-claim boundaries.
+- [x] Build the compatibility planner/registry before broad new stream work, with typed facts, decisions, lab matrices, and report-only policy rows.
 - [ ] Keep "replace exactly" separate from "cooperate/skip/prefer external" in code, docs, changelog, and release notes.
 - [ ] Add save-compatibility notes before any feature removes, hides, or replaces external technologies that may already be researched.
 - [ ] Preserve the one-mod product rule: do not add separate product names, companion branding, or "Extended" labels to docs, release notes, or settings.
 - [ ] Keep settings labels plain and feature-family based; do not add per-mod settings or unimplemented option labels.
 - [ ] Require disabled-by-default prototype features to do no mutation and no broad scan at default values.
 - [ ] Keep prototype mutations behind startup settings; use runtime settings only for real runtime systems with performance and migration proof.
-- [ ] Add external rule-mutator diagnostics before considering recipe-productivity rule changes.
-- [ ] Add loop-risk diagnostics before considering cap removal, recycler productivity, broad productivity eligibility, or beacon productivity.
-- [ ] Build cap-aware diagnostics before adding balance-heavy productivity families.
+- [x] Add external rule-mutator diagnostics before considering recipe-productivity rule changes.
+- [x] Add loop-risk diagnostics before considering cap removal, recycler productivity, broad productivity eligibility, or beacon productivity.
+- [x] Build cap-aware diagnostics before adding balance-heavy productivity families.
 - [ ] Treat ore-crushing productivity as the first clean new stream candidate only if recipe-ID fixtures pass.
 - [ ] Treat Air Scrubbing filter productivity as a clean-filter-only stream candidate; prove scrubbing and cleaning recipes are excluded.
 - [ ] Require an explicit balance policy before shipping tile/surface productivity changes.

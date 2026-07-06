@@ -33,6 +33,7 @@ The mod is built around **graceful compatibility**: it discovers recipes, scienc
 - **Vanilla continuations:** extends selected finite vanilla technology chains into infinite continuations.
 - **Science-pack discovery:** reads active lab inputs, not the old `tool` prototype type.
 - **Lab validation:** checks generated research ingredients against real labs so technologies stay researchable.
+- **Compiler diagnostics:** indexes typed prototype facts, compiler decisions, lab matrices, loop risks, rule surfaces, and cap estimates for audits.
 - **Factorio 2.1 recipes:** supports recipe `categories` as well as legacy single `category`.
 - **Optional DLC:** keeps official DLC mods optional and gates DLC-shaped research behind concrete prototype checks.
 - **Scripted Space Age scaling:** bounded event-driven spoilage preservation and agricultural growth speed are disabled-by-default experimental candidates; default enablement or measured behavior claims require the named manual save matrix.
@@ -78,8 +79,9 @@ More Infinite Research mutates and generates prototypes in **`data-final-fixes.l
 6. **Base technology infinite extensions.**
 7. **Optional weapon shooting speed overlap adjustment.**
 8. **Max-level enforcement.**
-9. **Generated-technology effect safety validation.**
-10. **Optional diagnostics report flush.**
+9. **Compiler diagnostics and compatibility planner reporting.**
+10. **Generated-technology effect safety validation.**
+11. **Optional diagnostics report flush.**
 
 This gives the mod a **late view** of recipes, items, labs, science packs, ammo categories, and technologies created by other mods.
 
@@ -502,7 +504,7 @@ Enable `mir-debug-generation-report` to log rows like:
 [more-infinite-research] report kind=stream key=research_science_pack_productivity status=generated reason=recipe_productivity science=... prerequisites=... effects=13 lab_status=reduced icon=tech:space-science-pack
 ```
 
-Use diagnostics when reporting compatibility issues. It tells whether a stream generated, skipped, reduced science packs, or found no matching recipes. For direct-effect technologies, the report also includes non-blocking `native_modifier_overlap` rows when another infinite non-MIR technology already has the same native modifier target. Compatibility audits also capture diagnostics-only planner and recipe-cap rows in `compat-observations.*`.
+Use diagnostics when reporting compatibility issues. It tells whether a stream generated, skipped, reduced science packs, or found no matching recipes. For direct-effect technologies, the report also includes non-blocking `native_modifier_overlap` rows when another infinite non-MIR technology already has the same native modifier target. Compatibility audits also capture planner rows, recipe-cap rows, typed fact summaries, compiler decisions, lab matrices, loop risks, and rule-surface observations in `compat-observations.*`.
 
 Enable `mir-debug-recipe-matches` to log matched recipe rows like:
 

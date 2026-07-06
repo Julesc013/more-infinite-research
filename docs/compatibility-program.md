@@ -411,7 +411,7 @@ Every integration should have a fixture or load scenario.
 ## Compatibility Planner Output
 
 `2.1.5` starts the compatibility planner as diagnostics-only audit rows. `2.2.0`
-should extend that into a fuller compatibility planner that can emit a structured
+extends that into a report-only compiler spine that can emit a structured
 summary when diagnostics are enabled:
 
 ```text
@@ -432,6 +432,12 @@ Non-actions:
 - Not changing allowed productivity effects.
 - Not changing beacons or modules.
 ```
+
+The `2.2.0` compiler rows are typed around recipe, technology, machine, lab,
+owner, and rule-surface facts. They also emit decision rows, lab-matrix rows,
+loop-risk rows, rule-surface rows, owner summaries, and useful cap estimates.
+These rows are evidence for future policy gates; they are not broad automatic
+support claims.
 
 The long-term data-stage shape should be:
 

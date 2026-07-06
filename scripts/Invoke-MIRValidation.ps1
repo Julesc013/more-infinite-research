@@ -836,6 +836,50 @@ Invoke-RepoCheck "compat audit automation tooling is wired" {
   }
 }
 
+Invoke-RepoCheck "2.2.0 compiler diagnostics are wired" {
+  $dataFinalFixesText = Get-Content -Raw -LiteralPath (Join-Path $repo "data-final-fixes.lua")
+  $diagnosticsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\diagnostics.lua")
+  $factRegistryPath = Join-Path $repo "prototypes\lib\facts\registry.lua"
+  $compilerPath = Join-Path $repo "prototypes\planner\compiler.lua"
+  $converterText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\Convert-MIRCompatAuditResults.ps1")
+  $overnightSummaryText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\Show-MIROvernightSummary.ps1")
+  $compatPlannerText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\compat\planner.lua")
+
+  if (-not (Test-Path -LiteralPath $factRegistryPath)) {
+    throw "Missing typed fact registry: prototypes\lib\facts\registry.lua"
+  }
+  if (-not (Test-Path -LiteralPath $compilerPath)) {
+    throw "Missing compiler diagnostics module: prototypes\planner\compiler.lua"
+  }
+
+  $factRegistryText = Get-Content -Raw -LiteralPath $factRegistryPath
+  $compilerText = Get-Content -Raw -LiteralPath $compilerPath
+
+  $requiredSnippets = @(
+    @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'require("prototypes.planner.compiler").emit()' },
+    @{ File = "prototypes\diagnostics.lua"; Text = $diagnosticsText; Snippet = 'function D.decision(row)' },
+    @{ File = "prototypes\diagnostics.lua"; Text = $diagnosticsText; Snippet = 'append("rule_mutation", row)' },
+    @{ File = "prototypes\diagnostics.lua"; Text = $diagnosticsText; Snippet = 'append("loop_risk", row)' },
+    @{ File = "prototypes\diagnostics.lua"; Text = $diagnosticsText; Snippet = 'append("lab_matrix", row)' },
+    @{ File = "prototypes\lib\facts\registry.lua"; Text = $factRegistryText; Snippet = 'RecipeFact' },
+    @{ File = "prototypes\lib\facts\registry.lua"; Text = $factRegistryText; Snippet = 'RuleMutationFact' },
+    @{ File = "prototypes\lib\facts\registry.lua"; Text = $factRegistryText; Snippet = 'build_loop_risk_facts' },
+    @{ File = "prototypes\planner\compiler.lua"; Text = $compilerText; Snippet = 'D.fact_registry({' },
+    @{ File = "prototypes\planner\compiler.lua"; Text = $compilerText; Snippet = 'D.decision({' },
+    @{ File = "prototypes\planner\compiler.lua"; Text = $compilerText; Snippet = 'emit_generated_technology_decisions' },
+    @{ File = "prototypes\compat\planner.lua"; Text = $compatPlannerText; Snippet = 'useful_level_estimate = levels' },
+    @{ File = "scripts\Convert-MIRCompatAuditResults.ps1"; Text = $converterText; Snippet = '"fact_registry", "decision", "rule_mutation", "loop_risk", "lab_matrix"' },
+    @{ File = "scripts\Convert-MIRCompatAuditResults.ps1"; Text = $converterText; Snippet = "Loop Risk Diagnostics" },
+    @{ File = "scripts\Show-MIROvernightSummary.ps1"; Text = $overnightSummaryText; Snippet = "rule_surfaces" }
+  )
+
+  foreach ($check in $requiredSnippets) {
+    if (-not $check.Text.Contains($check.Snippet)) {
+      throw "Missing 2.2.0 compiler diagnostics wiring in $($check.File): $($check.Snippet)"
+    }
+  }
+}
+
 Invoke-RepoCheck "release documentation lists final manual and API checks" {
   $documentation = @(
     foreach ($file in Get-DocumentationFiles) {
@@ -1839,6 +1883,16 @@ function Get-LastCompatibilityPlanLine {
   return $line.Line
 }
 
+function Get-LastDiagnosticReportLine {
+  param([string]$Kind, [string]$Key)
+  $pattern = "kind=$([regex]::Escape($Kind)) key=$([regex]::Escape($Key))(\s|$)"
+  $line = Select-String -LiteralPath $FactorioLog -Pattern $pattern | Select-Object -Last 1
+  if (-not $line) {
+    throw "Runtime validation log did not contain $Kind diagnostics for $Key."
+  }
+  return $line.Line
+}
+
 function Get-LastRecipeCapReportLine {
   param([string]$Recipe)
   $pattern = "kind=recipe_cap .*recipe=$([regex]::Escape($Recipe))(\s|$)"
@@ -2049,6 +2103,18 @@ Assert-ReportLineContains -Line $baseLabProductivityLine -Expected "effects=1" -
 Assert-ReportLineContains -Line $baseLabProductivityLine -Expected "icon=tech:military-science-pack" -Context "Base research productivity icon scenario"
 $compatibilityPlanLine = Get-LastCompatibilityPlanLine -Key "compatibility_planner"
 Assert-ReportLineContains -Line $compatibilityPlanLine -Expected "status=diagnostic" -Context "Base compatibility planner diagnostics scenario"
+$compilerPlanLine = Get-LastCompatibilityPlanLine -Key "productivity_compiler"
+Assert-ReportLineContains -Line $compilerPlanLine -Expected "reason=fact_registry_summary" -Context "Base compiler planner summary scenario"
+$ownerRegistryLine = Get-LastCompatibilityPlanLine -Key "owner_registry"
+Assert-ReportLineContains -Line $ownerRegistryLine -Expected "reason=owner_facts_indexed" -Context "Base compiler owner registry scenario"
+$factRegistryLine = Get-LastDiagnosticReportLine -Kind "fact_registry" -Key "prototype_index"
+Assert-ReportLineContains -Line $factRegistryLine -Expected "status=diagnostic" -Context "Base compiler fact registry scenario"
+Assert-ReportLineContains -Line $factRegistryLine -Expected "recipes=" -Context "Base compiler fact registry recipe count scenario"
+$labMatrixLine = Get-LastDiagnosticReportLine -Kind "lab_matrix" -Key "lab"
+Assert-ReportLineContains -Line $labMatrixLine -Expected "reason=lab_inputs_indexed" -Context "Base compiler lab matrix scenario"
+$generatedDecisionLine = Get-LastDiagnosticReportLine -Kind "decision" -Key "recipe-prod-research_lab_productivity-1"
+Assert-ReportLineContains -Line $generatedDecisionLine -Expected "decision=generate_stream" -Context "Base compiler generated decision scenario"
+Assert-ReportLineContains -Line $generatedDecisionLine -Expected "stable_stream_id=recipe-prod-research_lab_productivity-1" -Context "Base compiler stable ID scenario"
 
 Invoke-RuntimeScenario -ScenarioName "recipe-cap-diagnostics" -EnabledFixtureNames @(
   "mir-fixture-recipe-cap-diagnostics"
@@ -2057,6 +2123,10 @@ $capPlanLine = Get-LastCompatibilityPlanLine -Key "recipe_productivity_caps"
 Assert-ReportLineContains -Line $capPlanLine -Expected "warnings=" -Context "Recipe cap diagnostics summary scenario"
 $loweredCapLine = Get-LastRecipeCapReportLine -Recipe "iron-gear-wheel"
 Assert-ReportLineContains -Line $loweredCapLine -Expected "cap_state=lowered" -Context "Lowered recipe cap diagnostics scenario"
+Assert-ReportLineContains -Line $loweredCapLine -Expected "useful_level_estimate=2" -Context "Lowered recipe cap useful-level diagnostics scenario"
+$ruleMutationLine = Get-LastDiagnosticReportLine -Kind "rule_mutation" -Key "iron-gear-wheel"
+Assert-ReportLineContains -Line $ruleMutationLine -Expected "field=maximum_productivity" -Context "Recipe cap rule-surface diagnostics scenario"
+Assert-ReportLineContains -Line $ruleMutationLine -Expected "observed_value=0.2" -Context "Recipe cap rule-surface value scenario"
 $raisedCapLine = Get-LastRecipeCapReportLine -Recipe "iron-plate"
 Assert-ReportLineContains -Line $raisedCapLine -Expected "cap_state=raised" -Context "Raised recipe cap diagnostics scenario"
 $extremeCapLine = Get-LastRecipeCapReportLine -Recipe "copper-cable"

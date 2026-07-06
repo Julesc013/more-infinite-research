@@ -1,4 +1,21 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.2.0
+Date: 2026-07-06
+
+  Compatibility:
+
+    - Added a typed prototype fact registry for recipes, technologies, machines, labs, owners, and rule surfaces.
+    - Added compiler decision rows for generated technologies, rejected loop risks, and observed rule surfaces.
+    - Added loop-risk reports for recycling, cleaning, voiding, barrel/container, transmutation, and self-return recipes.
+    - Added lab-matrix reports so each generated technology can be checked against labs that accept its science set.
+    - Added useful-level estimates to recipe productivity cap reports.
+
+  Internal:
+
+    - Kept the new compiler path report-only so broad unknown mod behavior remains observed before it is emitted.
+    - Extended compatibility observation output with compiler, decision, loop-risk, rule-surface, and lab-matrix rows.
+
+---------------------------------------------------------------------------------------------------
 Version: 2.1.5
 Date: 2026-07-05
 
