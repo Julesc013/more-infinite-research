@@ -19,7 +19,7 @@ Release-line summary:
 | `1.9.2` | `2.0.x` | planned transition backport of the tested `2.2.0` source point |
 | `1.9.9` | `2.0.x` | superseded unless explicitly revived; older final Factorio 2.0 plan |
 | `3.x.x` | `2.1.x` | canonical modern line starting at `3.0.0`; MIR compiler architecture |
-| `2.x.x` | `2.0.x` | maintained Factorio `2.0` line starting at `2.5.0`; first post-3.0 architecture port |
+| `2.x.x` | `2.0.x` | maintained Factorio `2.0` line starting at `2.3.0`; first post-3.0 architecture port |
 | `1.9.3+` | `1.1.x` | compatibility port; `1.9.0` through `1.9.2` remain transition exceptions for Factorio `2.0` |
 | `1.8.x` | `1.0.x` | compatibility port; Factorio `0.18` bridge policy still needs recording |
 | `1.7.x` / `1.6.x` / `1.5.x` | `0.17.x` / `0.16.x` / `0.15.x` | reduced native-infinite editions |

@@ -11,7 +11,7 @@ expectations.
 After the transition:
 
 - `3.x.x` targets Factorio `2.1`;
-- `2.x.x` targets Factorio `2.0` starting at `2.5.0`;
+- `2.x.x` targets Factorio `2.0` starting at `2.3.0`;
 - `1.9.3+` targets Factorio `1.1`;
 - `1.8.x` targets Factorio `1.0`;
 - `1.7.x` through `1.3.x` target Factorio `0.17` through `0.13`;

@@ -98,7 +98,7 @@ Required on the `legacy` branch with a Factorio `2.0.x` binary:
 | `legacy-1.9.0-runtime-2.0` | Run `Invoke-MIRValidation.ps1` with a Factorio `2.0.x` binary for `v1.9.0` |
 | `legacy-1.9.1-runtime-2.0` | Validate the tested `v2.1.0 -> v1.9.1` legacy port |
 | `legacy-1.9.2-runtime-2.0` | Validate the tested `v2.2.0 -> v1.9.2` transition port |
-| `target-2.5.0-runtime-2.0` | Validate the first Factorio `2.0` port of the MIR 3 architecture |
+| `target-2.3.0-runtime-2.0` | Validate the first Factorio `2.0` port of the MIR 3 architecture |
 | `target-1.9.3-runtime-1.1` | Validate the first Factorio `1.1` compatibility port under the locked mapping |
 | `target-1.8.0-runtime-1.0` | Validate the first Factorio `1.0` compatibility port after the `0.18` bridge policy is recorded |
 | `legacy-space-age` | Confirm any optional Space Age subset supported by Factorio `2.0.x` |

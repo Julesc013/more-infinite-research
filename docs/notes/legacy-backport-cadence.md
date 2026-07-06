@@ -60,8 +60,8 @@ release notes.
 | MIR release | Target Factorio line | Support class | Timing | Source snapshot |
 | --- | --- | --- | --- | --- |
 | `1.9.2` | `2.0.x` | Transition backport | Immediate | Tested `2.2.0` source point |
-| `2.5.0` | `2.0.x` | Maintained `2.0` backport | After `3.0.0` is stable | 3.0-architecture source point |
-| `1.9.3` | `1.1.x` | Compatibility port | After `2.5.0` or explicit maintainer gate | 3.0-architecture source point, reduced by capability |
+| `2.3.0` | `2.0.x` | Maintained `2.0` backport | After `3.0.0` is stable | 3.0-architecture source point |
+| `1.9.3` | `1.1.x` | Compatibility port | After `2.3.0` or explicit maintainer gate | 3.0-architecture source point, reduced by capability |
 | `1.8.0` | `1.0.x` | Compatibility port | After `1.1` policy and `0.18` bridge decision | 3.0-architecture source point, reduced by capability |
 | `1.7.0` | `0.17.x` | Reduced native-infinite | After target binary proof | Reduced native-infinite source shape |
 | `1.6.0` | `0.16.x` | Old-science native-infinite | After target binary proof | Old-science native-infinite source shape |
@@ -112,6 +112,6 @@ policy.
 After the `1.9.2` Factorio `2.0` transition backport, the target-line scheme is
 locked. `1.9.0` through `1.9.2` remain historical Factorio `2.0` transition
 archives, but `1.9.3+` is reserved for Factorio `1.1`; Factorio `2.0` moves to
-`2.x.x` starting at `2.5.0`; Factorio `2.1` moves to `3.x.x` starting at
+`2.x.x` starting at `2.3.0`; Factorio `2.1` moves to `3.x.x` starting at
 `3.0.0`; and `0.12.x` through `0.6.x` map directly to Factorio `0.12` through
 `0.6` as archive or museum lines.

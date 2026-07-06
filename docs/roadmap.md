@@ -49,7 +49,7 @@ Maintainer-authorized cadence plan:
 | `1.9.2` | `2.0.x` | Legacy transition port | compatible subset of the tested `2.2.0` source point validated with the Factorio `2.0` install |
 | `1.9.9` | `2.0.x` | Superseded legacy plan | older final Factorio 2.0 plan; revive only by explicit maintainer decision |
 | `3.0.0` | `2.1.x` | Architecture release | compatibility compiler release after the `2.2.0` and `1.9.2` transition work |
-| `2.5.0` | `2.0.x` | Maintained backport | first Factorio `2.0` port of the MIR 3 architecture |
+| `2.3.0` | `2.0.x` | Maintained backport | first Factorio `2.0` port of the MIR 3 architecture |
 | `1.9.3` | `1.1.x` | Compatibility port | first Factorio `1.1` release under the locked mapping |
 | `1.8.0` | `1.0.x` | Compatibility port | first Factorio `1.0` release under the locked mapping; record the `0.18` bridge policy first |
 | `1.7.0` / `1.6.0` / `1.5.0` | `0.17.x` / `0.16.x` / `0.15.x` | Reduced native-infinite | old-line native-infinite editions |
@@ -57,7 +57,7 @@ Maintainer-authorized cadence plan:
 | `0.11.0` through `0.6.0` | `0.11.x` through `0.6.x` | Museum/discovery | target-binary and base-file discovery builds |
 
 After `1.9.2`, the versioning model is locked: `3.x.x` becomes the Factorio
-`2.1` line, `2.x.x` becomes the Factorio `2.0` line starting at `2.5.0`,
+`2.1` line, `2.x.x` becomes the Factorio `2.0` line starting at `2.3.0`,
 `1.9.3+` becomes the Factorio `1.1` line, `1.8.x` becomes the Factorio `1.0`
 line, `1.7.x` through `1.3.x` map to Factorio `0.17` through `0.13`, and
 `0.12.x` through `0.6.x` map directly to Factorio `0.12` through `0.6`.
@@ -384,7 +384,7 @@ Backport mappings:
 | `2.0.5` | `2.1.x` | `1.9.0` | `2.0.x` |
 | `2.1.0` | `2.1.x` | `1.9.1` | `2.0.x` |
 | `2.2.0` | `2.1.x` | `1.9.2` | `2.0.x` |
-| post-transition `3.x.x` source point | `2.1.x` | `2.x.x` starting at `2.5.0` | `2.0.x` |
+| post-transition `3.x.x` source point | `2.1.x` | `2.x.x` starting at `2.3.0` | `2.0.x` |
 
 The expanded older-line ladder is recorded in `docs/notes/legacy-backport-cadence.md`.
 Those Factorio `1.1` through `0.6` releases are separate target-line ports and

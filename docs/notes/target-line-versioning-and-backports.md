@@ -20,7 +20,7 @@ generation. They no longer only encode MIR's internal architecture generation.
 | MIR version range | Factorio target line | First planned release in range | Support class | Notes |
 | --- | --- | --- | --- | --- |
 | `3.x.x` | Factorio `2.1` | `3.0.0` | Canonical modern | Current-line compiler architecture release. |
-| `2.x.x` | Factorio `2.0` | `2.5.0` | Maintained `2.0` backport | First post-3.0 port of the compiler architecture. |
+| `2.x.x` | Factorio `2.0` | `2.3.0` | Maintained `2.0` backport | First post-3.0 port of the compiler architecture. |
 | `1.9.x` | Factorio `1.1` | `1.9.3` | Compatibility port | `1.9.0` through `1.9.2` are transition exceptions for Factorio `2.0`. |
 | `1.8.x` | Factorio `1.0` | `1.8.0` | Compatibility port | Factorio `0.18` remains a bridge decision, not a separate locked line. |
 | `1.7.x` | Factorio `0.17` | `1.7.0` | Reduced native-infinite | First old-line native-infinite target. |
@@ -49,7 +49,7 @@ Legacy mapping era:
 
 Target-line mapping era:
   1.9.3 and later target Factorio 1.1.
-  2.x.x targets Factorio 2.0 starting at 2.5.0.
+  2.x.x targets Factorio 2.0 starting at 2.3.0.
   3.x.x targets Factorio 2.1 starting at 3.0.0.
 ```
 
@@ -61,8 +61,8 @@ Use these branch roles during the transition:
 | --- | --- | ---: |
 | `main` | Stable canonical Factorio `2.1` line after gates. | `3.x.x` after `3.0.0` |
 | `dev` | Development canonical Factorio `2.1` line. | `3.x.x` after `3.0.0` |
-| `legacy` | Stable Factorio `2.0` branch. It receives `1.9.0` through `1.9.2` during the transition and `2.x.x` after the 3.0 architecture port. | `2.x.x` starting at `2.5.0` |
-| `tmp/2.0` | Working Factorio `2.0` port branch or worktree. | `2.x.x` starting at `2.5.0` |
+| `legacy` | Stable Factorio `2.0` branch. It receives `1.9.0` through `1.9.2` during the transition and `2.x.x` after the 3.0 architecture port. | `2.x.x` starting at `2.3.0` |
+| `tmp/2.0` | Working Factorio `2.0` port branch or worktree. | `2.x.x` starting at `2.3.0` |
 | `tmp/1.1` | Working Factorio `1.1` port branch or worktree. | `1.9.x` starting at `1.9.3` |
 | `tmp/1.0` | Working Factorio `1.0` port branch or worktree. | `1.8.x` |
 | `tmp/0.17` | Working Factorio `0.17` port branch or worktree. | `1.7.x` |
