@@ -1,6 +1,6 @@
 # M.I.R. Roadmap
 
-Updated: 2026-07-04
+Updated: 2026-07-07
 
 This is the high-level release roadmap for More Infinite Research after the v2.0.0 Factorio 2.1 compatibility release. It explains release direction, product boundaries, and why major decisions exist.
 
@@ -9,7 +9,7 @@ Authority split:
 - Use root `todo.md` for the executable future-work ledger, release gates, issue-creation tasks, recurring checklists, deferred work, companion backlog, and rejected work.
 - Use `changelog.txt` for the authoritative past-change ledger.
 - Use this roadmap for narrative scope, rationale, release cadence, and links or placeholders for issue-backed work.
-- Use `docs/notes/release-plan-2.1.0.md` and `docs/notes/post-2.0-feature-plan.md` as supporting notes. Durable future tasks from those files should also be mirrored into root `todo.md`.
+- Use `docs/notes/post-2.0-feature-plan.md`, `docs/notes/legacy-backport-cadence.md`, and `docs/notes/target-line-versioning-and-backports.md` as supporting notes. Durable future tasks from those files should also be mirrored into root `todo.md`.
 
 Issue links are intentionally not invented in this file. When GitHub issues are created, replace the pending issue labels in `todo.md` and roadmap notes with real issue URLs.
 
@@ -20,12 +20,21 @@ The release model is:
 ```text
 patch .5 releases = quick, low-risk implementation and feedback releases
 minor .0 releases = larger feature waves
-legacy 1.9.x releases = Factorio 2.0 compatibility ports of tested current-line snapshots
+legacy 1.9.0-1.9.2 releases = historical Factorio 2.0 transition ports of tested current-line snapshots
+post-transition releases = target-line version ranges recorded in docs/notes/target-line-versioning-and-backports.md
+expanded legacy releases = older Factorio line backports recorded in docs/notes/legacy-backport-cadence.md
+locked version lines = public MIR versions encode target Factorio generations after 1.9.2
 ```
 
 `v2.0.5` is **not** docs-only. It is the first quick feedback release after `v2.0.0` and should include the easy, bounded, already-understood changes that are practical to drop into a mods folder and test now.
 
 The minimum manual smoke checks gate the `v2.0.5` quick patch. The full scripted manual matrix gates default enablement and stronger public behavior claims for scripted candidates. If a candidate fails proof or grows beyond the quick-patch scope, that default, claim, or feature moves to `v2.1.0`; the whole release does not become docs-only.
+
+Maintainer-authorized cadence plan:
+
+- From 2026-07-06 through December 2026, aim to ship one validated Factorio `2.1` current-line update each week.
+- For the Factorio `2.1` release celebration, aim to ship one older-line backport per day from the week preceding the Factorio `2.1` release through the week following it.
+- This cadence is tentative and subject to change. Validation, target-line support, actual Factorio release timing, and Mod Portal packaging safety outrank the calendar.
 
 | MIR release | Factorio line | Release kind | Scope |
 | --- | --- | --- | --- |
@@ -34,17 +43,41 @@ The minimum manual smoke checks gate the `v2.0.5` quick patch. The full scripted
 | `2.1.0` | `2.1.x` | Larger feature wave | simpler settings, icon policy, fluid productivity, pipeline extent, and targeted duplicate-productivity compatibility |
 | `1.9.1` | `2.0.x` | Legacy port | compatible subset of the tested `2.1.0` larger feature snapshot |
 | `2.1.5` | `2.1.x` | Quick feedback patch | small fixes and feedback from `2.1.0` |
-| `1.9.6` or `1.9.7` | `2.0.x` | Optional legacy patch | only if bounded `2.1.5` fixes are worth porting |
-| `2.2.0` | `2.1.x` | Larger feature wave | next larger batch after the `2.1.x` feedback cycle |
-| `1.9.9` | `2.0.x` | Final legacy port | final Factorio 2.0 port from the latest tested `2.x.x` current-line release when Factorio 2.1 becomes stable or another verified upstream cutoff is chosen |
+| `1.9.7` | `2.0.x` | Superseded legacy plan | older week-before-Factorio-2.1-release plan; revive only by explicit maintainer decision |
+| `1.9.8` | `2.0.x` | Superseded legacy plan | older Factorio-2.1-release plan; revive only by explicit maintainer decision |
+| `2.2.0` | `2.1.x` | Larger feature wave | compatibility planner foundations plus the first fixture-proven new MIR-owned behavior |
+| `1.9.2` | `2.0.x` | Legacy transition port | compatible subset of the tested `2.2.0` source point validated with the Factorio `2.0` install |
+| `1.9.9` | `2.0.x` | Superseded legacy plan | older final Factorio 2.0 plan; revive only by explicit maintainer decision |
+| `3.0.0` | `2.1.x` | Architecture release | compatibility compiler release after the `2.2.0` and `1.9.2` transition work |
+| `2.3.0` | `2.0.x` | Maintained backport | first Factorio `2.0` port of the MIR 3 architecture |
+| `1.9.3` | `1.1.x` | Compatibility port | first Factorio `1.1` release under the locked mapping |
+| `1.8.0` | `1.0.x` | Compatibility port | first Factorio `1.0` release under the locked mapping; record the `0.18` bridge policy first |
+| `1.7.0` / `1.6.0` / `1.5.0` | `0.17.x` / `0.16.x` / `0.15.x` | Reduced native-infinite | old-line native-infinite editions |
+| `1.4.0` / `1.3.0` / `0.12.0` | `0.14.x` / `0.13.x` / `0.12.x` | Archive finite reconstruction | finite-ladder or archive reconstruction only |
+| `0.11.0` through `0.6.0` | `0.11.x` through `0.6.x` | Museum/discovery | target-binary and base-file discovery builds |
 
-The `1.9.9` cutoff should be treated as a release trigger, not an API assumption. When planning the final legacy port, verify the actual Factorio 2.1 stable status and the exact latest MIR `2.x.x` source point.
+After `1.9.2`, the versioning model is locked: `3.x.x` becomes the Factorio
+`2.1` line, `2.x.x` becomes the Factorio `2.0` line starting at `2.3.0`,
+`1.9.3+` becomes the Factorio `1.1` line, `1.8.x` becomes the Factorio `1.0`
+line, `1.7.x` through `1.3.x` map to Factorio `0.17` through `0.13`, and
+`0.12.x` through `0.6.x` map directly to Factorio `0.12` through `0.6`.
+The published `1.9.0` through `1.9.2` archives remain historical transition
+exceptions for Factorio `2.0`.
+
+The `1.9.7`, `1.9.8`, and `1.9.9` cutoffs are superseded by the post-`1.9.2`
+target-line reset unless the maintainer explicitly revives them. If revived,
+they should still be treated as release triggers, not API assumptions.
 
 ## Current Baseline
 
-Current `dev` is the `v2.1.0` release line. It builds on the tested
-`v2.0.5` quick-patch baseline and adds the larger Factorio `2.1` feature wave:
+Current `dev` has completed the `v2.2.0` compatibility-platform line. The next
+transition work is the Factorio `2.0` `v1.9.2` backport from the tested `2.2.0`
+source point, followed by the `v3.0.0` compatibility-compiler architecture
+line. The `2.2.0` baseline includes:
 
+- the compatibility planner, typed fact registry, capability diagnostics,
+  manifest/claim linting, and fixture-backed proof slices for Air Scrubbing,
+  ATAN Ash, ATAN Nuclear Science, AAI Loaders, and Big Mining Drill;
 - simpler per-technology checkbox enablement, with shareable presets deferred;
 - strict icon source resolution and package validation around official DLC assets;
 - fluid-output productivity streams for oil, cracking, lubricant, sulfuric acid, acid neutralization, and Space Age thruster propellants;
@@ -176,7 +209,7 @@ Quick, easy feedback patch for tested low-risk improvements.
 - Static validation passes.
 - Runtime fixture validation passes on the supported Factorio `2.1.x` binary.
 - Package validation passes.
-- The current `docs/` tree is included in the package and package parity follows the current documentation layout.
+- Developer docs stay in the repository, not the shipped package; package parity follows the runtime source, locale, migrations, metadata, README, changelog, license, and thumbnail layout.
 - README, docs, changelog, and packaged zip agree on the actual shipped features.
 - Manual results exist for the scripted features that are claimed as shipped.
 - If spoilage preservation only affects new stacks, the changelog says that plainly.
@@ -277,16 +310,68 @@ Do not use `v2.1.5` for new broad gameplay systems.
 Theme:
 
 ```text
-Next larger feature wave after the v2.1.x feedback cycle.
+Compatibility planner foundations plus first evidence-backed stream families.
 ```
 
-Candidate work:
+`v2.1.5` may pull in low-risk diagnostics-only planner work because it does not
+change generation behavior. `v2.2.0` is not the release that absorbs every useful
+idea-mod behavior. Most ideamods are compatibility signals, not planned MIR
+features. The release's job is to turn a small number of remaining audit signals
+into designed MIR-owned behavior, with fixtures proving recipe IDs, ownership,
+value matching, lab compatibility, and non-replacement of balance-distinct chains.
 
-- Any pump/fluid/logistics work that was too large for `v2.1.0`.
-- More advanced compatibility automation.
-- Larger settings UX reorganization.
-- Additional bounded scripted research if the framework has proven stable.
-- Companion-mod split decisions for ideas that keep growing beyond MIR.
+The July 2026 suggestions transcript is tracked in
+`docs/notes/2.2.0-feature-intake.md`. Its useful input is the feature-family risk
+split, the startup-vs-runtime setting boundary, the loop-risk requirement, and
+the reminder that disabled features must do no work. MIR does not adopt the
+transcript's separate product names or "Extended" branding. There is one mod,
+and any future opt-in setting should use plain, Factorio-style wording.
+
+The role question for each audited mod is:
+
+```text
+What role should MIR take for this mod?
+```
+
+It is not:
+
+```text
+Can MIR replace this mod?
+```
+
+Use `docs/compatibility-program.md` as the decision framework for roles such as exact replacement, MIR-owned stream candidate, compatibility adapter, diagnostic-only, companion scope, docs-only, or rejected from core.
+
+Preferred order:
+
+1. Extend the diagnostics-only compatibility planner/registry started in `v2.1.5`, so detected mods, roles, actions, non-actions, capability evidence, and public claims share one control surface. The `2.2.0` kernel now has schema helpers, resolver contract validation, capability-specific policy, generated-stream manifest linting, compatibility claims, report diff tooling, and negative capability fixtures.
+2. Add external rule-mutator and loop-risk diagnostics before considering any productivity-rule setting.
+3. Extend cap-aware diagnostics beyond warnings only if an explicit policy exists; do not silently change balance.
+4. Air Scrubbing clean-filter productivity, with fixtures proving scrubbing and cleaning recipes are excluded.
+5. Add the next ATAN-family proof slices for `atan-ash` and `atan-nuclear-science`, using exact recipe IDs and conservative non-ownership rows. Nuclear Science should prove the existing dynamic science-pack productivity path before any new science policy is invented.
+6. Add requested compatibility targets: `big-mining-drill` as an existing mining-drill stream proof, `aai-loaders` as an existing belt stream proof, `FluidMustFlow` as a pipeline coexistence check, `robot_attrition` and `jetpack` as runtime/content load profiles, and `equipment-gantry` and `aai-containers` as content/coexistence surfaces.
+7. Use `aai-industry` as the mini-overhaul tuning bridge for recipe, science, lab, machine, pump, and prerequisite classification without claiming broad AAI suite support.
+8. Ore-crushing productivity, if Crushing Industry recipe IDs and ownership rules fixture cleanly.
+9. Tile and surface productivity policy, only after deciding the stream split and default values.
+10. Krastorio 2 as the first large overhaul campaign after the narrow proof slices show the planner can emit, reject, observe, and coexist safely.
+11. Native modifier overlap policy, kept small enough to avoid a framework detour.
+
+Tile and surface productivity should default to conservative MIR-owned values, replace external owners only on exact value matches, and move any high-value tile profile behind an explicit setting or later design decision.
+
+Non-goals for `v2.2.0`:
+
+- Beacon, module, and productivity-rule mutation in MIR core.
+- Runtime production-based productivity systems.
+- Solar/accumulator entity replacement.
+- Broad research-cost mutation.
+- Large content recreation: radars, labs, drills, pumps, belts, logistics chains, or surveillance systems.
+- Broad overhaul compatibility claims without a matrix and load evidence.
+- Generic productivity generation from names alone.
+- Copying external mod code without license review and accepted attribution obligations.
+- Claiming full replacement when MIR only owns the research-stream portion of a mod.
+
+The compatibility matrix in `docs/compatibility-matrix.md` is the claim ledger for these decisions. A row may be planned or future, but public compatibility claims require an explicit tested profile, validation artifact, role enum, save-compatibility notes, and notes about what MIR refuses to own.
+
+Future overhaul work should be staged as campaigns after the narrow `v2.2.0` proof ladder, not folded into a broad stream batch. The proof ladder is Air Scrubbing, the ATAN follow-ups, Big Mining Drill, Fluid Must Flow, Robot Attrition, Jetpack, Equipment Gantry, AAI Containers, AAI Loaders, and AAI Industry. The procedural compatibility kernel in `docs/procedural-compatibility-kernel.md` is the control surface for that ladder: loaders, drills, native modifiers, machine manufacturing, ore processing, science/lab compatibility, and rule surfaces should be capability lanes before they become new streams. Outdated upstream Factorio-version metadata does not block fixture-backed support or planned legacy backports; it only changes the public claim lane until a real external load profile passes on the target Factorio line. Krastorio 2 is the first large overhaul campaign target after that ladder, before Bob's, Angel's, Space Exploration, or Pyanodons suite work. Keep standalone K2, K2 plus Space Exploration, K2 Spaced Out / Space Age, AAI suite combinations, Bob's focused subsets, Space Exploration, and Pyanodons as separate matrices because their Factorio lines, dependency shapes, progression rules, and productivity restrictions differ.
 
 ## Legacy Backport Strategy
 
@@ -298,8 +383,16 @@ Backport mappings:
 | --- | --- | --- | --- |
 | `2.0.5` | `2.1.x` | `1.9.0` | `2.0.x` |
 | `2.1.0` | `2.1.x` | `1.9.1` | `2.0.x` |
-| optional `2.1.5` feedback fixes | `2.1.x` | `1.9.6` or `1.9.7` | `2.0.x` |
-| latest tested `2.x.x` at the stable cutoff | `2.1.x` | `1.9.9` | `2.0.x` |
+| `2.2.0` | `2.1.x` | `1.9.2` | `2.0.x` |
+| post-transition `3.x.x` source point | `2.1.x` | `2.x.x` starting at `2.3.0` | `2.0.x` |
+
+The expanded older-line ladder is recorded in `docs/notes/legacy-backport-cadence.md`.
+Those Factorio `1.1` through `0.6` releases are separate target-line ports and
+must not be treated as full-parity releases until each target line is validated.
+
+The daily backport celebration window should draw from that table and the
+expanded ladder. If a daily slot cannot be validated honestly, skip or reorder
+the slot rather than publishing an archive with unclear support claims.
 
 Backport rule:
 
@@ -308,7 +401,7 @@ legacy = tested current MIR code, minus Factorio 2.1-only surface area,
 with Factorio 2.0 metadata and validation.
 ```
 
-Use the same test tools for both lines. Select `FactorioLine = 2.0` through `mir.ps1` profiles such as `release-targeted-2.0`, `overnight-local-2.0`, and `local-audit-2.0`; do not create a separate legacy harness. Those profiles must run against a real Factorio `2.0.x` binary and a matching local library such as `C:\Projects\Factorio\testmods_readonly_2.0`.
+Use the same test tools for both lines. Select `FactorioLine = 2.0` through `mir.ps1` profiles such as `release-targeted-2.0`, `overnight-local-2.0`, and `local-audit-2.0`; do not create a separate legacy harness. Those profiles must run against a real Factorio `2.0.x` binary and a matching local library such as `C:\Projects\Factorio\testmods_2.0`.
 
 Recommended setup for the first legacy port:
 
@@ -447,11 +540,17 @@ The detailed proof ledger and unknowns are maintained in `docs/api-proof-points.
 Recommended order from here:
 
 1. Keep `dev` state unambiguous with `git status`, `git log --oneline --decorate --graph --max-count=8`, and `git branch -vv` before pushing or tagging.
-2. Finish `v2.0.5` as the quick/easy implementation patch: Tesla fix, duplicate-productivity prevention, default-off scripted agriculture/spoilage candidates, docs, validation, and package parity.
-3. `v1.9.0` has been released from `legacy` as the tested `v2.0.5` snapshot backport to Factorio 2.0.
-4. Move only failed or too-large `v2.0.5` candidates to `v2.1.0`.
-5. Ship `v2.1.0` as the larger feature wave.
-6. Ship quick `v2.1.5` feedback fixes.
-7. Backport the tested `v2.1.0` snapshot as `v1.9.1`.
-8. Ship the next larger wave as `v2.2.0`.
-9. When Factorio 2.1 becomes stable or another verified upstream cutoff is chosen, backport the latest tested MIR `2.x.x` release as final Factorio 2.0 build `v1.9.9`.
+2. `v2.2.0` has been released from the current line.
+3. Backport the tested `v2.2.0` source point through `tmp/2.0` and release it from `legacy` as `v1.9.2`.
+4. Bring portable fixes discovered on `tmp/2.0` back to `dev` and revalidate on Factorio `2.1`.
+5. Start `v3.0.0` on `dev` as the compatibility-compiler architecture release,
+   using `docs/notes/3.0.0-compatibility-compiler-charter.md`,
+   `docs/notes/3.0.0-repository-structure.md`, and the focused capability,
+   policy, decision, manifest, claim, testing, maintainer, and ADR docs as the
+   scope boundary. The first refactor step is the Factorio shell plus
+   `prototypes/mir/` compiler namespace, not new gameplay.
+6. Use the locked post-transition target-line scheme: `3.x.x` for Factorio `2.1`, `2.x.x` for Factorio `2.0`, `1.9.3+` for Factorio `1.1`, `1.8.x` for Factorio `1.0`, `1.7.x` through `1.3.x` for Factorio `0.17` through `0.13`, and `0.12.x` through `0.6.x` for Factorio `0.12` through `0.6`.
+7. Backport tested `3.x.x` source points only through target-line `tmp/*` branches or worktrees with matching Factorio binaries and mod libraries.
+8. Execute older-line backports only as separate validation-gated ports.
+9. Keep a weekly Factorio `2.1` update rhythm through December 2026 where validated release candidates exist.
+10. During the Factorio `2.1` celebration window, publish at most one validated older-line backport per day, with skipped or reordered days documented.

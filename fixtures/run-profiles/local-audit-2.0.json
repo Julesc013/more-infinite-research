@@ -10,10 +10,10 @@
   "factorio_bin": "auto",
   "manual_scenarios_path": "fixtures\\compat-matrix\\local-library-scenarios-2.0.json",
   "local_mod_zip_dirs": [
-    "C:\\Projects\\Factorio\\testmods_readonly_2.0"
+    "C:\\Projects\\Factorio\\testmods_2.0"
   ],
   "local_mod_library_dirs": [
-    "C:\\Projects\\Factorio\\testmods_readonly_2.0"
+    "C:\\Projects\\Factorio\\testmods_2.0"
   ],
   "offline": true,
   "collect_all": true,

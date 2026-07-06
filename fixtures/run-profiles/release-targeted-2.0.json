@@ -3,7 +3,7 @@
   "kind": "release-targeted",
   "factorio_line": "2.0",
   "factorio_bin": "auto",
-  "local_mod_dir": "C:\\Projects\\Factorio\\testmods_readonly_2.0",
+  "local_mod_dir": "C:\\Projects\\Factorio\\testmods_2.0",
   "repair_smoke_mod_names": [],
   "skip_repair_smokes": true,
   "representative_scenario_name": "local-2-0-base-baseline",

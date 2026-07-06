@@ -2,11 +2,11 @@
 
 This is the short, player-facing release summary for the `2.1.0` mod portal release notes. It is derived from `changelog.txt`; the changelog remains the detailed source of truth.
 
-## Headline
+## Summary
 
 `2.1.0` is the first larger Factorio `2.1` feature wave after the `2.0.5` quick patch. It focuses on Space Age productivity coverage, fluid productivity, a startup pipeline-extent option, and more conservative duplicate-productivity compatibility.
 
-## What Changed
+## Changed
 
 - Added fluid productivity research for oil processing, cracking, lubricant, sulfuric acid, acid neutralization, and thrusters.
 - Added Space Age material productivity research for landfill, artificial soil, molten metals, carbon, ice, and bacteria.
@@ -31,7 +31,7 @@ This is the short, player-facing release summary for the `2.1.0` mod portal rele
 - Existing Stone Product Productivity progress migrates into the new Landfill Productivity line.
 - Artificial Soil Productivity and Molten Metals Productivity are new separate research lines.
 
-## Known Notes
+## Notes
 
 - Recipe productivity still respects Factorio's normal productivity cap.
 - Spoilage Preservation and Agricultural Growth Speed remain disabled by default and should be treated as experimental.

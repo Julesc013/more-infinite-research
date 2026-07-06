@@ -1,25 +1,23 @@
 # More Infinite Research
 
-More Infinite Research adds repeatable late-game research for production, logistics, combat, player bonuses, and robots.
+Adds **fully customizable** repeatable late-game research for **productivity, speed, logistics, combat, player bonuses, robots, spoilage, cargo logistics,** and tries to be *compatible with every mod*...
 
-It is built for players who want more long-term scaling for late-game megabases, long-running Space Age saves, and modded or overhaul-style playthroughs without turning the mod into a full content overhaul.
+It is built for players who want more *long-term scaling for late-game megabases*, long-running Space Age saves, and modded or overhaul-style playthroughs without turning the mod into a full content overhaul.
 
-## At A Glance
+## At a Glance
 
-- Adds many configurable infinite productivity researches for vanilla, Space Age, and compatible modded production chains.
-- Adds repeatable player, robot, weapon-speed, and selected vanilla technology bonuses.
+- Adds many **configurable infinite productivity researches** for vanilla, Space Age, and compatible modded production chains.
+- Adds repeatable player, robot, weapon-speed, cargo-logistics, and selected vanilla technology bonuses.
+- Startup **settings let you enable, disable, cap, or rebalance** every generated research.
 - Adds a base-game Research productivity chain when Space Age's vanilla `research-productivity` technology is not present.
-- Skips Space Age productivity duplicates when vanilla already owns processing unit, low density structure, plastic, rocket fuel, or research productivity.
 - Adopts safe mod-added recipes into configured vanilla Space Age productivity families instead of creating parallel research.
-- Startup settings let you enable, disable, cap, or rebalance almost every generated research.
-- Works with Factorio `2.0`; requires `base >= 2.0`. Space Age is optional.
-- Version `1.9.1` is the Factorio `2.0` compatibility port of the tested `2.1.0` source snapshot. Factorio `2.1`-only cargo logistics research is excluded from this legacy build.
 
-Recipe productivity researches are infinite, but Factorio's recipe productivity cap still applies. Once a recipe reaches that cap, more levels may no longer improve that recipe.
+- Legacy transition releases **`1.9.0`** through **`1.9.2`** target **Factorio `2.0`** and require `base >= 2.0`.
+- Version **`2.x.x`** through **`2.2.0`** targets **Factorio `2.1`**; requires `base >= 2.1.8`. Space Age is optional.
+
+*Recipe productivity researches are infinite, but Factorio's recipe productivity cap still applies. Once a recipe reaches that cap, more levels may no longer improve that recipe.*
 
 ## Main Features
-
-### More Productivity Research
 
 The mod adds repeatable recipe productivity for many things vanilla does not fully cover:
 
@@ -38,6 +36,7 @@ The mod can add infinite research for:
 - Character mining speed, crafting speed, walking speed, inventory slots, logistic trash slots, and optional reach/build distance.
 - Worker robot battery capacity.
 - Rocket, cannon, flamethrower, electric, and Space Age Tesla weapon shooting speed.
+- Cargo bay unloading distance and optional cargo landing pad count with Space Age.
 - Scripted Space Age spoilage preservation and agricultural growth speed as disabled-by-default experimental candidates.
 
 ### More Vanilla Tech Continuations
@@ -109,9 +108,9 @@ Technologies are generated only when their recipes, items, technologies, ammo ca
 | Rocket productivity | `+10%` rockets; `+5%` explosive rockets; `+2%` atomic bombs; `+1%` plutonium bomb patterns | On | Adds agricultural and military science when available. |
 | Armor component productivity | `+5%` armor plating patterns; `+2%` armor plate patterns | On when recipes exist | Supports armor/armour spelling variants. |
 | Module productivity | `+10%` tier 1 modules; `+5%` tier 2; `+2%` tier 3 | On | Includes quality modules when the Quality mod is active. Quality is a hidden optional load-order dependency. |
-| Transport belt productivity | `+10%` yellow; `+5%` red; `+2%` blue; `+1%` turbo; `+0.5%` hyper belt families | On | Covers belts, underground belts, and splitters. |
+| Transport belt productivity | `+10%` yellow; `+5%` red; `+2%` blue; `+1%` turbo; `+0.5%` hyper belt families | On | Covers belts, underground belts, splitters, and compatible loader recipes when visible. |
 | Inserter productivity | `+10%` basic/burner; `+5%` fast/long-handed; `+2%` bulk; `+1%` stack inserters | On | Adds space science when available. |
-| Science pack productivity | `+10%` productivity for science pack recipes | On | Targets vanilla, Space Age, and compatible modded lab-input science packs. Uses Space Age research-productivity art when available and white space-science technology art otherwise. |
+| Science pack productivity | `+10%` productivity for science pack recipes | On | Targets vanilla, Space Age, and compatible modded lab-input science packs, including ATAN-style Nuclear Science packs when visible. Uses Space Age research-productivity art when available and white space-science technology art otherwise. |
 
 ### Direct, Scripted, And Bonus Research
 
@@ -121,7 +120,7 @@ Technologies are generated only when their recipes, items, technologies, ammo ca
 | Spoilage preservation | `+1%` global spoil time per level | Off | Experimental Space Age scripted technology. Global/map-wide effect; existing item-stack behavior still needs manual validation before stronger claims. |
 | Agricultural growth speed | `+1%` agricultural growth speed per level, capped at `10x` | Off | Experimental Space Age scripted technology. Adds agricultural, electromagnetic, and cryogenic science when available. Applies to newly planted agricultural tower crops; existing planted crops are not globally rescanned. |
 | Character inventory slots | `+1` inventory slot and `+1` logistic trash slot | On | Merges the old separate trash-slot research into one combined technology. A migration preserves old trash-slot progress. |
-| Worker robot battery | `+10%` worker robot battery capacity | On | Uses a gentler default cost growth than shared productivity streams. |
+| Worker robot battery | `+10%` worker robot battery capacity | On | Uses a gentler default cost growth than shared productivity streams. Skips when Better Bot Battery-style `worker-robots-battery-6` already exists. |
 | Cargo bay unloading distance | `+10` maximum unloading distance tiles | On with Space Age | Requires Space Age unloading bay content. Uses the unloading bay unlock technology art and official base and Space Age science packs. |
 | Cargo landing pad count | `+1` landing pad per surface | Off | Sandbox-style Space Age logistics option. Uses Space platform technology art. Very expensive by default. |
 | Rocket shooting speed | `+10%` shooting speed for rocket ammo category | On | Separate dedicated speed research using electromagnetic science when available. |
@@ -159,7 +158,7 @@ For most generated research you can change:
 Other useful settings:
 
 - Require finishing the game before generated technologies: optional, off by default.
-- Extra science packs for generated technologies: keep configured packs, add space science, add space and promethium science, use all official science packs, or use all active lab science packs.
+- Extra science packs for generated technologies: keep configured packs, add fixed late-game packs, infer missing official or modded progression packs from selected packs, use all official science packs, or use all active lab science packs.
 - What to do when no lab can research a technology: reduce to compatible science packs by default, or skip incompatible technologies.
 - Use MIR when another mod adds the same infinite research: lets this mod remove selected overlapping infinite technologies when MIR generated replacements exist.
 - Remove duplicate rocket/cannon speed from general weapon speed: optional cleanup; off by default.
@@ -175,6 +174,11 @@ This helps it work with:
 - Space Age installs without Quality.
 - Custom science-pack and custom lab mods.
 - Castra and PlanetLib-style planet or science-pack mods.
+- Air Scrubbing clean-filter recipes, with scrubbing and cleaning recipes deliberately excluded.
+- ATAN Ash separation, with landfill, brick, nutrient, foundation, tile, and recovery-style ash sinks deliberately excluded.
+- ATAN-style Nuclear Science packs through science-pack productivity.
+- AAI-style loader crafting recipes through Transport belt productivity.
+- Standalone big mining drill mods through Mining drill productivity.
 - Advanced Solar HR.
 - Better Robots Extended.
 - OCs Ammo and Armor.
@@ -209,11 +213,11 @@ If a recipe did not receive productivity:
 
 ## Save Compatibility
 
-Version `1.9.1` preserves generated technology IDs except for documented intentional migrations inherited from the tested current-line source:
+Version `2.1.0` preserves generated technology IDs except for documented intentional migrations:
 
 - Old generated trash-slot progress migrates into the combined Character inventory slots technology.
 - Old generated Stone product productivity progress migrates into the new Landfill productivity technology. Artificial soil productivity and Molten metals productivity are new separate research lines.
 
 Existing saves receive the `2.0.5` and `2.1.0` JSON migrations automatically when the mod loads.
 
-Scripted spoilage and agriculture effects are disabled by default in `1.9.1`. Enable them only if you want to test the experimental behavior and report results.
+Scripted spoilage and agriculture effects are disabled by default in `2.1.0`.

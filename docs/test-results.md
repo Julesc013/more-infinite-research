@@ -2,6 +2,285 @@
 
 This file records local release-candidate validation runs. It is not a substitute for the manual mod matrix in `docs/compatibility.md`.
 
+## 2026-07-07 1.9.2 Factorio 2.0 Backport Gate
+
+Environment:
+
+- Branch: `tmp/2.0`.
+- Source snapshot: tested More Infinite Research `2.2.0` source point.
+- Backport mod version: `1.9.2`.
+- Target Factorio line: `2.0`.
+- Factorio binary: `D:\Programs\Factorio\2.0\bin\x64\factorio.exe`.
+- Factorio version: `2.0.77` build `84539`, Windows `full`.
+- Release artifact: `dist\more-infinite-research_1.9.2.zip`.
+- Release artifact SHA256: `AD8464761572C07C41DFAB6E826CC70774414248DCC4A7A67AA76A6D21335F17`.
+- Release artifact size: `236530` bytes.
+
+Scope:
+
+- Merged the released `2.2.0` source point into `tmp/2.0`.
+- Patched legacy metadata to `version = 1.9.2`, `factorio_version = 2.0`, and
+  `base >= 2.0`.
+- Removed Factorio `2.1` cargo logistics technology modifiers from the legacy
+  direct-effect stream definitions.
+- Converted local 2.0 science-pack fixtures to `tool` prototypes and guarded
+  research-ingredient discovery so Factorio `2.0` ignores item-only lab inputs.
+- Confirmed the package excludes developer-only `docs/`, `fixtures/`,
+  `scripts/`, `todo.md`, and `CONTRIBUTING.md`.
+
+Commands:
+
+```powershell
+git diff --check
+.\scripts\Invoke-MIRValidation.ps1 -StaticOnly
+.\scripts\Invoke-MIRValidation.ps1 -FactorioBin 'D:\Programs\Factorio\2.0\bin\x64\factorio.exe'
+.\scripts\Build-MIRPackage.ps1
+```
+
+Results:
+
+- Static validation passed.
+- Full runtime fixture validation passed against Factorio `2.0.77`.
+- Factorio `2.1` cargo runtime fixture scenarios were skipped by legacy
+  metadata, as intended.
+- Package rebuild passed and produced the `1.9.2` release candidate archive.
+
+## 2026-07-07 2.2.0 Final Package Refresh And Docs Review
+
+Environment:
+
+- Branch: `dev`, pending sync to `main`.
+- Mod version `2.2.0`.
+- Release artifact: `dist\more-infinite-research_2.2.0.zip`.
+- Release artifact SHA256: `B4E49460734868C3CC56476EF319916BBF2FA929C55E05EAA64CC67EB589691C`.
+- Release artifact size: `236643` bytes.
+- Factorio binary: not available from this Codex shell at the common local install paths for this final refresh.
+
+Scope:
+
+- Reviewed README, changelog, `todo.md`, release notes, mod-portal copy, and
+  planning notes for final `2.2.0` release consistency.
+- Added player-facing `docs/notes/archive/release-notes-2.2.0.md`.
+- Updated the active post-transition Factorio `2.0` target-line start to
+  `2.3.0` across public planning docs and `todo.md`.
+- Updated packaged README/changelog wording, then rebuilt the release archive.
+- Confirmed package hygiene excludes developer-only `docs/`, `fixtures/`,
+  `scripts/`, `todo.md`, and `CONTRIBUTING.md`.
+
+Commands:
+
+```powershell
+.\scripts\Build-MIRPackage.ps1
+git diff --check
+.\scripts\Invoke-MIRValidation.ps1 -StaticOnly
+```
+
+Results:
+
+- Package rebuild passed.
+- Static validation and package validation passed.
+- Runtime validation was not rerun from this shell because no Factorio binary
+  was available. The earlier `2.2.0` final release-targeted gate below remains
+  the last full automated runtime/audit gate, and the final package refresh
+  changed only packaged documentation after the maintainer smoke-tested the
+  rebuilt archive.
+
+## 2026-07-07 2.2.0 Final Release-Targeted Gate
+
+Environment:
+
+- Branch: `dev`.
+- Gate commit: `7a95ed4`.
+- Mod version `2.2.0`.
+- Factorio binary: Steam Factorio `2.1.9`.
+- Local Factorio `2.1` mod library: `C:\Projects\Factorio\testmods_2.1`.
+- Release artifact: `dist\more-infinite-research_2.2.0.zip`.
+- Release artifact SHA256: `BB5822655BA67DC9788EEEB46C067793136BD4C3F0F1C587FCC669833867DF66`.
+- Release-gate artifacts: `artifacts\release-targeted-2.2.0-final`.
+
+Command:
+
+```powershell
+.\scripts\mir.ps1 release gate --profile release-targeted-2.1 --output '.\artifacts\release-targeted-2.2.0-final' --no-git-pull
+```
+
+Results:
+
+- Strict current-commit gate passed: static validation, runtime fixture validation, and deterministic audit coverage.
+- Targeted local load checks passed for `big-mining-drill`, `biolabs-in-space`, `aai-containers`, `aai-industry`, `aai-loaders`, `equipment-gantry`, `FluidMustFlow`, `jetpack`, and `robot_attrition`.
+- Representative local-library scenario `local-2-1-bz-suite-space-age` passed with six BZ mods and the official Space Age bundle.
+- Package build passed with `dist\more-infinite-research_2.2.0.zip` unchanged.
+- Final release-gate git status was clean.
+
+## 2026-07-07 2.2.0 Final Fixture Validation
+
+Environment:
+
+- Branch: `dev`.
+- Mod version `2.2.0`.
+- Factorio binary: Steam Factorio `2.1.9`.
+- Validation artifact: `build\validation-dist\more-infinite-research_2.2.0.zip`.
+- Release artifact: `dist\more-infinite-research_2.2.0.zip`.
+- Release artifact SHA256: `BB5822655BA67DC9788EEEB46C067793136BD4C3F0F1C587FCC669833867DF66`.
+
+Scope:
+
+- Added fixture-backed ATAN Ash separation productivity for exact `atan-ash-seperation`.
+- Proved ATAN Ash landfill, brick, nutrient, foundation, tile, and recovery-style ash sink recipes remain outside MIR-owned streams.
+- Kept Fluid Must Flow, Robot Attrition, Jetpack, Equipment Gantry, AAI Containers, and AAI Industry as targeted coexistence/load claims rather than MIR-owned productivity streams.
+- Kept AAI Loaders and Big Mining Drill routed through the existing belt and mining-drill productivity streams.
+
+Commands:
+
+```powershell
+.\scripts\Invoke-MIRValidation.ps1 -StaticOnly
+.\scripts\Invoke-MIRValidation.ps1 -FactorioBin 'C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe'
+.\scripts\Build-MIRPackage.ps1
+```
+
+Results:
+
+- Static validation passed, including compatibility policy, claim, and generated-stream manifest linting.
+- Runtime fixture validation passed across the full Factorio load-test matrix.
+- Package hygiene validation rebuilt the validation archive and release archive without shipping docs, fixtures, scripts, `todo.md`, or contribution docs.
+
+## 2026-07-07 2.2.0 Compatibility Platform Policy Pass
+
+Environment:
+
+- Branch: `dev`.
+- Mod version `2.2.0`.
+- Factorio binary: Steam Factorio `2.1.9`.
+- Validation artifact: `build\validation-dist\more-infinite-research_2.2.0.zip`.
+
+Scope:
+
+- Added schema helpers for fact registries and DecisionRecord-style diagnostics.
+- Added the capability resolver contract and capability-specific policy defaults.
+- Added generated-stream manifest linting and machine-readable compatibility claims.
+- Added the planner report diff tool for stable before/after compatibility audits.
+- Added negative capability fixtures for self-return, barrel/container return, voiding, matter/transmutation, hidden recipes, zero productivity caps, and structural loader/drill decoys.
+- Kept native mining yield, loader/drill manufacturing productivity, and science/lab integration as separate capability surfaces.
+
+Commands:
+
+```powershell
+.\scripts\Invoke-MIRValidation.ps1 -StaticOnly
+.\scripts\Invoke-MIRValidation.ps1
+```
+
+Results:
+
+- Static validation passed, including policy, manifest, and compatibility-claim linting.
+- Runtime fixture validation passed.
+- Runtime diagnostics asserted the negative loop-risk and rule-surface cases.
+- Runtime diagnostics asserted loader-like and drill-like container recipes were not classified as loader or mining-drill manufacturing capabilities.
+- Package hygiene validation rebuilt `build\validation-dist\more-infinite-research_2.2.0.zip` without introducing docs, fixtures, or scripts into the distributable archive.
+
+## 2026-07-07 2.2.0 Procedural Compatibility Kernel Pass
+
+Environment:
+
+- Branch: `dev`.
+- Mod version `2.2.0`.
+- Factorio binary: Steam Factorio `2.1.9`.
+- Validation artifact: `build\validation-dist\more-infinite-research_2.2.0.zip`.
+
+Scope:
+
+- Added report-first capability diagnostics for entity-backed loader manufacturing, entity-backed mining-drill manufacturing, and selected native modifier owners.
+- Kept loader crafting productivity under the existing belt productivity stream.
+- Kept drill crafting productivity under the existing mining-drill productivity stream.
+- Kept native mining-yield modifiers separate from drill recipe productivity.
+- Added entity-backed fixture surfaces for AAI-style loaders and Big Mining Drill-style drills.
+- Added audit-export fields for `capability`, `subfamily`, and `evidence`.
+
+Commands:
+
+```powershell
+.\scripts\Invoke-MIRValidation.ps1 -StaticOnly
+.\scripts\Invoke-MIRValidation.ps1 -FactorioBin "C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe"
+```
+
+Results:
+
+- Static validation passed and rebuilt `build\validation-dist\more-infinite-research_2.2.0.zip`.
+- Runtime fixture validation passed.
+- Runtime diagnostics asserted native modifier ownership rows for lab productivity and mining-yield productivity.
+- Runtime diagnostics asserted AAI-style loader recipes emit through `research_belts` and carry `capability=logistics-loader-manufacturing`.
+- Runtime diagnostics asserted Big Mining Drill-style recipes emit through `research_mining_drill` and carry `capability=mining-drill-manufacturing`.
+- Air Scrubbing assertions now select the policy-specific DecisionRecord rows when generic compiler loop-risk rows share the same recipe key.
+
+## 2026-07-06 2.1.5 Final Release-Targeted Gate
+
+Environment:
+
+- Branch: `dev`.
+- Mod version `2.1.5`.
+- Factorio binary: Steam Factorio `2.1.9`.
+- Local Factorio `2.1` mod library: `C:\Projects\Factorio\testmods_2.1`.
+- Release artifact: `dist\more-infinite-research_2.1.5.zip`.
+
+Command:
+
+```powershell
+.\scripts\mir.ps1 release gate --profile release-targeted-2.1 --factorio 'C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe' --mods 'C:\Projects\Factorio\testmods_2.1' --output '.\artifacts\release-targeted-2.1.5-final' --timeout 900 --no-git-pull
+```
+
+Gate coverage:
+
+- Strict current-commit gate: `Static`, `Runtime`, and deterministic `AuditSmoke`.
+- Runtime fixture validation included the new `recipe-cap-diagnostics` scenario.
+- Deterministic `AuditSmoke` loaded the Space Age baseline with `88` MIR audit rows.
+- Targeted local repair smokes loaded `big-mining-drill` and `biolabs-in-space`.
+- Representative local scenario loaded `local-2-1-bz-suite-space-age` with `89` MIR audit rows.
+- Package build rebuilt `dist\more-infinite-research_2.1.5.zip`.
+- The first final run failed only at clean-git-status because the tracked release archive was rebuilt by the package step.
+
+Release archive:
+
+- Path: `dist\more-infinite-research_2.1.5.zip`.
+
+Result:
+
+- Functional release gate passed.
+- Rebuilt release archive is committed with this release-prep entry.
+- The same gate is rerun after committing the rebuilt archive so clean-git-status proves the committed archive matches the package builder output.
+
+## 2026-07-06 2.1.5 Planner Diagnostics And Observation Tooling
+
+Environment:
+
+- Branch: `dev`.
+- Mod version `2.1.5`.
+- Factorio binary: Steam Factorio `2.1.9`.
+
+Scope:
+
+- Pulled low-risk planner diagnostics into `2.1.5` as diagnostics-only audit rows.
+- Added recipe productivity cap warnings for non-default recipe `maximum_productivity` values.
+- Added runtime fixture coverage for lowered, raised, and extreme recipe-cap diagnostics.
+- Added `compat-observations.md/json/csv` converter artifacts for planner rows and cap warnings.
+- Added `mir.ps1 report observations --run <path>` and surfaced observations in overnight and HTML reports.
+- Tightened deterministic `AuditSmoke` so it performs the baseline load check and captures audit rows.
+- Fixed audit conversion so effect-proven native owner skips are not misclassified as lab science failures.
+
+Commands:
+
+```powershell
+.\scripts\Invoke-MIRValidation.ps1 -FactorioBin 'C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe'
+.\scripts\Invoke-MIRExtendedTests.ps1 -Tier AuditSmoke -FactorioBin 'C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe' -FailFast -FailOnAuditFailures -OutputRoot .\build\audit-observations-smoke
+.\scripts\mir.ps1 report observations --run .\build\audit-observations-smoke
+.\scripts\Invoke-MIRValidation.ps1 -StaticOnly
+```
+
+Results:
+
+- Static validation passed and rebuilt `build\validation-dist\more-infinite-research_2.1.5.zip`.
+- Runtime fixture validation passed, including the new `recipe-cap-diagnostics` scenario.
+- Deterministic audit smoke passed with one Space Age baseline load, `88` audit rows, and `2` compatibility observation rows.
+- `mir.ps1 report observations` summarized the generated `compat-observations.csv`.
+
 ## 2026-07-05 1.9.1 Factorio 2.0.77 Release Gate
 
 Environment:
@@ -67,79 +346,202 @@ F:\Factorio\mir-artifacts\local-audit-1.9.1-factorio-2.0.77-20260705-174732
 F:\Factorio\mir-artifacts\generated-local-1.9.1-factorio-2.0.77-empty-safe
 ```
 
-## 2026-07-05 Legacy Factorio-Line Test Tooling Import
+## 2026-07-05 2.1.5 Local Dependency Cache Follow-Up
 
 Environment:
 
-- Branch: `legacy`.
-- Mod version `1.9.1`.
+- Branch: `dev`.
+- Mod version `2.1.5`.
+- Factorio binary: Steam Factorio `2.1.9`.
+- Local root library: `C:\Projects\Factorio\testmods_readonly_2.1`.
+- Writable dependency cache: `C:\Projects\Factorio\testmods_downloaded_2.1`.
 
 Scope:
 
-- Imported reusable `mir.ps1`, run-profile, PowerShell quality, and Factorio-line audit tooling from the current line.
-- Kept the tooling as a thin wrapper over the existing validation, audit, package, and report scripts.
+- Filled a local writable dependency cache from the missing-dependency report produced by the overnight 2.1 sweep.
+- Kept downloaded dependency zips separate from the read-only local root library.
+- Fixed generated local scenarios so dependency-only library zips are not treated as generated scenario roots.
+- Added local audit zip staging modes (`Copy`, `Hardlink`, `Symlink`) for large local-library runs.
+- Fixed offline dependency closure for Factorio `~` dependencies, which are required but do not affect load order.
+- Added reviewed expected-failure rules for external local-library stress failures.
+
+Dependency-cache result:
+
+- Missing dependencies considered: `97`.
+- Already present or downloaded into the writable cache: `70`.
+- Additional targeted dependency added after the report: `mini-micro-settings`.
+- No compatible Factorio `2.1` release found: `27`.
+- Download failures: `0`.
+- Writable cache zip count after follow-up: `71`.
+
+Completed artifact inputs:
+
+- Local curated scenarios and local root zips: `F:\Factorio\mir-artifacts\local-audit-2.1-with-downloaded-deps-20260705-043918`.
+- Root-only generated scenarios: `F:\Factorio\mir-artifacts\generated-local-2.1-root-only-with-downloaded-deps`.
+- Targeted repaired smoke: `build\local-zips-mini-machines-dependency-smoke-3`.
+
+Results:
+
+| Scope | Scenarios | Passed | Skipped | Failed | Timeouts | MIR audit rows |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Local curated scenarios | 14 | 9 | 4 | 1 | 0 | 746 |
+| Generated local scenarios | 47 | 34 | 7 | 6 | 0 | 3,113 |
+| Local root zips | 150 | 139 | 8 | 3 | 0 | 11,148 |
+| `mini-machines` repaired smoke | 1 | 1 | 0 | 0 | 0 | 74 |
+
+Adjusted known state after the targeted `mini-machines` fix:
+
+- Effective scenario evidence: `211` local scenarios plus one targeted repair smoke.
+- Effective local scenario outcomes: `183` passed, `19` skipped, `9` failed, `0` timed out.
+- Effective MIR audit rows: at least `15,081`.
+- No proven MIR generation bug was found in these runs.
+
+Reviewed remaining load failures:
+
+- `local-2-1-space-age-mega-smash-with-resource-overhauls`: `xander-mod-shemp` declares incompatibility with Space Age.
+- `generated-local-2-1-cluster-logistics-transport`: generated stress cluster hits external circular dependencies.
+- `generated-local-2-1-pair-010`: `big-mining-drill` declares incompatibility with Space Age and AAI Industry.
+- `generated-local-2-1-pair-012`: tested `bobassembly` zip requires `space-age >= 3.0.0`.
+- `generated-local-2-1-pair-018`: tested `bobmodules` zip errors before MIR data changes run.
+- `generated-local-2-1-pair-027`: external AAI/bzsilicon recipe uses obsolete Factorio recipe fields.
+- `generated-local-2-1-pair-039`: generated stress pair creates an external technology prerequisite cycle.
+- `infinite-belt-stacking`: external mod has an undeclared stack inserter support requirement.
+- `snouz_long_electric_gun_turret`: external recipe uses obsolete Factorio recipe fields.
+
+Commands:
+
+```powershell
+.\scripts\mir.ps1 run -Profile local-audit-2.1 --output F:\Factorio\mir-artifacts\local-audit-2.1-with-downloaded-deps-20260705-043918 --link-mode Copy
+
+.\scripts\Invoke-MIRExtendedTests.ps1 -Tier GeneratedLocalScenarios -FactorioLine 2.1 -FactorioBin 'C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe' -LocalModZipDirs 'C:\Projects\Factorio\testmods_readonly_2.1' -LocalModLibraryDirs 'C:\Projects\Factorio\testmods_readonly_2.1','C:\Projects\Factorio\testmods_downloaded_2.1' -Offline -CollectAll -IncludeGeneratedLocalPairwise -GeneratedLocalPairwiseLimit 40 -ScenarioTimeoutSeconds 900 -LinkMode Copy -OutputRoot 'F:\Factorio\mir-artifacts\generated-local-2.1-root-only-with-downloaded-deps'
+
+.\scripts\Invoke-MIRCompatAudit.ps1 -RunLocalModZips -LocalModZipDirs 'C:\Projects\Factorio\testmods_readonly_2.1' -LocalModLibraryDirs 'C:\Projects\Factorio\testmods_readonly_2.1','C:\Projects\Factorio\testmods_downloaded_2.1' -Offline -IncludeRecommendedDependencies -LocalModNames mini-machines -MaxCandidates 0 -CatalogPages 0 -FactorioLine 2.1 -FactorioVersions 2.1 -FactorioBin 'C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe' -RunLoadTests -ScenarioTimeoutSeconds 300 -LinkMode Copy -OutputDir .\build\local-zips-mini-machines-dependency-smoke-3
+```
+
+Follow-up:
+
+- Keep the local audit output on `F:` or another roomy drive when running broad sweeps.
+- Continue filling the `27` dependencies with no compatible `2.1` release only if a compatible source is found manually.
+- Use the reviewed expected-failure rules for external stress failures, not as MIR compatibility profiles.
+
+## 2026-07-05 Official Built-In Dependency Closure Smoke
+
+Environment:
+
+- Branch: `dev`.
+- Mod version `2.1.5`.
+- Factorio binary: Steam Factorio `2.1.9`.
+
+Scope:
+
+- Fixed local compatibility audits to read bundled official mod metadata from the selected Factorio install.
+- Closed required official built-in dependencies before writing scenario `mod-list.json`.
+- Verified a local mod that requests `quality` now enables both `quality` and its required `recycler` dependency.
+- Tightened load-failure grouping so Factorio prototype errors are classified from the error excerpt, not MIR audit rows.
+
+Commands:
+
+```powershell
+.\scripts\Invoke-MIRCompatAudit.ps1 -RunLocalModZips -LocalModZipDirs 'C:\Projects\Factorio\testmods_readonly_2.1' -LocalModLibraryDirs 'C:\Projects\Factorio\testmods_readonly_2.1' -Offline -IncludeRecommendedDependencies -LocalModNames alien-module -MaxCandidates 0 -CatalogPages 0 -FactorioLine 2.1 -FactorioVersions 2.1 -FactorioBin 'C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe' -RunLoadTests -ScenarioTimeoutSeconds 300 -OutputDir .\build\local-zips-alien-module-official-closure-smoke
+```
+
+Results:
+
+- `alien-module` local zip smoke passed.
+- The scenario enabled official built-ins `quality,recycler`.
+- Factorio exited with code `0`.
+- The load test produced `74` MIR audit rows.
+- The scenario did not skip and did not time out.
+
+## 2026-07-05 Factorio-Line Test Tool Parameterization
+
+Environment:
+
+- Branch: `dev`.
+- Mod version `2.1.5`.
+
+Scope:
+
 - Added `FactorioLine` to the existing release gate, extended runner, compatibility audit, and overnight local sweep.
 - Added `release-targeted-2.0`, `overnight-local-2.0`, and `local-audit-2.0` profiles.
 - Added `fixtures/compat-matrix/local-library-scenarios-2.0.json` for legacy-line local-library audits.
 - Made `AuditSmoke` use `space-age-baseline` on Factorio `2.1` and `base-baseline` on Factorio `2.0`.
 - Made official built-in mod-list generation depend on the selected Factorio binary.
-- Closed required official built-in dependencies before writing scenario `mod-list.json`.
-- Tightened load-failure grouping so Factorio prototype errors are classified from the error excerpt, not MIR audit rows.
-- Added `docs/dev-tools.md` for preferred commands, stable direct scripts, advanced engines, private helpers, and run profiles.
 
 Commands:
 
 ```powershell
 .\scripts\Test-MIRPowerShellQuality.ps1
 .\scripts\mir.ps1 --help
-.\scripts\mir.ps1 run -Profile local-audit-2.0 --help
 .\scripts\Invoke-MIRValidation.ps1 -StaticOnly
 git diff --check
 ```
 
 Results:
 
-- `mir.ps1 --help` and the `local-audit-2.0` profile-help guard printed help without starting a long run.
+- JSON run profiles and local scenario fixtures parsed successfully.
 - PowerShell quality checks passed across `27` scripts.
-- Static validation passed and built `build\validation-dist\more-infinite-research_1.9.1.zip`.
+- `mir.ps1 --help` and the `local-audit-2.0` profile-help guard printed help without starting a long run.
+- Static validation passed and built `build\validation-dist\more-infinite-research_2.1.5.zip`.
 - `git diff --check` passed.
-- Factorio `2.0` runtime validation still requires a real Factorio `2.0.x` binary.
+- `changelog.txt` has no lines over the changelog-only `132` character cap.
 
-## 2026-07-04 Legacy 1.9.1 Backport Static And Package Gate
+## 2026-07-05 Dev Tooling Front Door Cleanup
 
 Environment:
 
-- Branch: `backport/legacy-1.9.1`.
-- Mod version `1.9.1`.
-- Source snapshot: tag `2.1.0`.
-- Local Steam Factorio binary found: `2.1.9`; it was not used as legacy runtime evidence.
+- Branch: `dev`.
+- Mod version `2.1.5`.
 
 Scope:
 
-- Backported the tested `2.1.0` source snapshot to the Factorio `2.0` legacy line.
-- Restored legacy metadata: `factorio_version = "2.0"`, `base >= 2.0`, hidden optional Quality, and optional Space Age without Factorio `2.1` dependency floors.
-- Removed Factorio `2.1` cargo logistics technology modifiers from legacy direct-effect stream definitions.
-- Updated roadmap, TODO, README, compatibility notes, changelog, mod-portal copy, and release notes for the immediate `2.1.0 -> 1.9.1` cadence.
+- Kept `mir.ps1` as the preferred developer front door instead of expanding a larger CLI framework.
+- Moved the local audit defaults into `fixtures/run-profiles/local-audit-2.1.json`.
+- Added `--factorio`, `--mods`, `--output`, and `--timeout` profile overrides to `mir.ps1`.
+- Added `scripts/Test-MIRPowerShellQuality.ps1` for PowerShell parser, duplicate-parameter, ignore-path, and secret-output checks.
+- Added `docs/dev-tools.md` to document preferred commands, stable direct scripts, advanced engines, private helpers, and run profiles.
 
 Commands:
 
 ```powershell
+.\scripts\mir.ps1 --help
+.\scripts\mir.ps1 run -Profile local-audit-2.1 --help
+.\scripts\Test-MIRPowerShellQuality.ps1
 .\scripts\Invoke-MIRValidation.ps1 -StaticOnly
-.\scripts\Build-MIRPackage.ps1
+```
+
+Results:
+
+- `mir.ps1 --help` and profile help guard printed the command list without starting a long run.
+- PowerShell quality checks passed across `27` scripts.
+- Static validation passed and built `build\validation-dist\more-infinite-research_2.1.5.zip`.
+
+## 2026-07-05 Dev Changelog Intake For 2.1.5
+
+Environment:
+
+- Branch: `dev`.
+- Mod version `2.1.5`.
+
+Scope:
+
+- Accepted the legacy `1.9.1` changelog entry from `origin/legacy` into the current dev changelog.
+- Added a dated empty `2.1.5` changelog header for the new feedback-patch line without inventing fake release bullets.
+- Bumped `info.json` to `2.1.5`.
+- Kept README and compatibility docs generic for the active `2.x` Factorio `2.1` line.
+
+Commands:
+
+```powershell
+git show origin/legacy:changelog.txt
+.\scripts\Invoke-MIRValidation.ps1 -StaticOnly
 git diff --check
 ```
 
 Results:
 
-- Static validation passed and built `build/validation-dist/more-infinite-research_1.9.1.zip`.
-- Release archive built: `dist/more-infinite-research_1.9.1.zip`.
-- `git diff --check` passed.
-- No local Factorio `2.0.x` executable was found under `C:\Projects\Factorio`; the installed Steam binary reported `2.1.9`, so Factorio `2.0` runtime validation remains pending.
-
-Post-audit correction:
-
-- Normalized newly merged fixture Space Age dependency floors from `space-age >= 2.1.8` to legacy-safe `space-age`.
-- Hardened static validation so Factorio `2.0` legacy fixture metadata rejects any dependency floor `>= 2.1`.
+- The imported `1.9.1` changelog entry records the tested `2.1.0` snapshot backport to Factorio `2.0`.
+- The top `2.1.5` changelog section is intentionally empty until there are shipped changes to list.
 
 ## 2026-07-04 Release Gate Reuse And README Cleanup
 

@@ -54,7 +54,7 @@ function Resolve-MIRFactorioBinary {
 
 $resolvedFactorioBin = Resolve-MIRFactorioBinary -Path $FactorioBin
 if ([string]::IsNullOrWhiteSpace($LocalModDir)) {
-  $LocalModDir = "C:\Projects\Factorio\testmods_readonly_$FactorioLine"
+  $LocalModDir = "C:\Projects\Factorio\testmods_$FactorioLine"
 }
 if (-not (Test-Path -LiteralPath $LocalModDir)) {
   throw "Local mod directory does not exist: $LocalModDir"
@@ -190,6 +190,7 @@ try {
   Write-Host ('  Get-Content "{0}"' -f (Join-Path $resolvedOutputRoot "release-gate\extended-summary.md"))
   Write-Host ('  Get-Content "{0}"' -f (Join-Path $resolvedOutputRoot "local-sweep\extended-summary.md"))
   Write-Host ('  Get-ChildItem "{0}" -Recurse -Filter compat-summary.md' -f $resolvedOutputRoot)
+  Write-Host ('  Get-ChildItem "{0}" -Recurse -Filter compat-observations.md' -f $resolvedOutputRoot)
   Write-Host ('  Get-ChildItem "{0}" -Recurse -Filter missing-dependencies.md' -f $resolvedOutputRoot)
   Write-Host ('  Get-ChildItem "{0}" -Recurse -Filter compat-failures.grouped.json' -f $resolvedOutputRoot)
   $runStatus = "passed"
@@ -204,6 +205,7 @@ try {
       name = "release-gate"
       summary = "release-gate\extended-summary.md"
       grouped_failures = "release-gate\audit-smoke\compat-failures.grouped.json"
+      observations = "release-gate\audit-smoke\compat-observations.md"
     },
     [ordered]@{
       name = "local-sweep"

@@ -18,6 +18,28 @@ local VANILLA_PACK_ORDER = {
   "promethium-science-pack"
 }
 
+local SPACE_AGE_PLANET_PACKS = {
+  "agricultural-science-pack",
+  "metallurgic-science-pack",
+  "electromagnetic-science-pack",
+  "cryogenic-science-pack"
+}
+
+local OFFICIAL_PROGRESSION_STEPS = {
+  ["automation-science-pack"] = {"automation-science-pack"},
+  ["logistic-science-pack"] = {"automation-science-pack", "logistic-science-pack"},
+  ["chemical-science-pack"] = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack"},
+  ["production-science-pack"] = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack"},
+  ["military-science-pack"] = {"automation-science-pack", "logistic-science-pack", "military-science-pack"},
+  ["utility-science-pack"] = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack", "utility-science-pack"},
+  ["space-science-pack"] = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack", "utility-science-pack", "space-science-pack"},
+  ["agricultural-science-pack"] = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack", "utility-science-pack", "space-science-pack", "agricultural-science-pack"},
+  ["metallurgic-science-pack"] = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack", "utility-science-pack", "space-science-pack", "metallurgic-science-pack"},
+  ["electromagnetic-science-pack"] = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack", "utility-science-pack", "space-science-pack", "electromagnetic-science-pack"},
+  ["cryogenic-science-pack"] = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack", "utility-science-pack", "space-science-pack", "cryogenic-science-pack"},
+  ["promethium-science-pack"] = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack", "military-science-pack", "utility-science-pack", "space-science-pack", "agricultural-science-pack", "metallurgic-science-pack", "electromagnetic-science-pack", "cryogenic-science-pack", "promethium-science-pack"}
+}
+
 local EXTENSION_PACKS = {
   ["braking-force"] = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack", "space-science-pack"},
   ["research-speed"] = "all",
@@ -33,6 +55,7 @@ local EXTENSION_PACKS = {
 
 local lab_inputs_cache = nil
 local science_pack_unlock_cache = nil
+local mod_progression_cache = {}
 
 local function ingredient_name(ingredient)
   if not ingredient then return nil end
@@ -57,14 +80,26 @@ local function lab_incompatibility_policy()
   return "reduce"
 end
 
+local function science_packs_require_tool_prototypes()
+  local automation_pack = lookup.item_prototype("automation-science-pack")
+  return automation_pack and automation_pack.type == "tool"
+end
+
+local function research_pack_prototype(name)
+  local prototype = lookup.item_prototype(name)
+  if not prototype then return nil end
+  if science_packs_require_tool_prototypes() and prototype.type ~= "tool" then return nil end
+  return prototype
+end
+
 function S.all_lab_inputs()
   if lab_inputs_cache then return deepcopy(lab_inputs_cache) end
-  -- Factorio 2.1 science packs are ordinary items, so labs are the source of
-  -- truth for what can participate in research.
+  -- Labs are the source of truth, but older target lines still require science
+  -- packs to be tool prototypes in technology research units.
   local out, seen = {}, {}
   for _, lab in pairs(data.raw.lab or {}) do
     for _, input in ipairs(lab.inputs or {}) do
-      if not seen[input] and lookup.item_prototype(input) then
+      if not seen[input] and research_pack_prototype(input) then
         seen[input] = true
         table.insert(out, input)
       end
@@ -76,7 +111,7 @@ function S.all_lab_inputs()
 end
 
 function S.science_pack_exists(name)
-  if not lookup.item_prototype(name) then return false end
+  if not research_pack_prototype(name) then return false end
   for _, input in ipairs(S.all_lab_inputs()) do
     if input == name then return true end
   end
@@ -196,6 +231,113 @@ function S.is_official_science_pack(name)
     if pack == name then return true end
   end
   return false
+end
+
+local function ordered_pack_list_from_set(set)
+  local remaining = {}
+  for pack, enabled in pairs(set or {}) do
+    if enabled then remaining[pack] = true end
+  end
+
+  local out = {}
+  for _, pack in ipairs(VANILLA_PACK_ORDER) do
+    if remaining[pack] then
+      table.insert(out, pack)
+      remaining[pack] = nil
+    end
+  end
+
+  local extra = {}
+  for pack, _ in pairs(remaining) do table.insert(extra, pack) end
+  table.sort(extra)
+  for _, pack in ipairs(extra) do table.insert(out, pack) end
+  return out
+end
+
+local function selected_pack_cache_key(selected_packs)
+  local names = {}
+  for _, pack in ipairs(selected_packs or {}) do
+    if pack then table.insert(names, pack) end
+  end
+  table.sort(names)
+  return table.concat(names, "\n")
+end
+
+function S.space_age_progression_packs_for(selected_packs)
+  local selected = {}
+  for _, pack in ipairs(selected_packs or {}) do selected[pack] = true end
+
+  local has_space_age_pack = selected["promethium-science-pack"] or false
+  for _, pack in ipairs(SPACE_AGE_PLANET_PACKS) do
+    if selected[pack] then has_space_age_pack = true end
+  end
+
+  local out = {}
+  if has_space_age_pack then table.insert(out, "space-science-pack") end
+  if selected["promethium-science-pack"] then
+    for _, pack in ipairs(SPACE_AGE_PLANET_PACKS) do table.insert(out, pack) end
+    table.insert(out, "promethium-science-pack")
+  end
+  return out
+end
+
+function S.official_progression_packs_for(selected_packs)
+  local out, seen = {}, {}
+  local function add(pack)
+    if not seen[pack] then
+      seen[pack] = true
+      table.insert(out, pack)
+    end
+  end
+
+  for _, pack in ipairs(selected_packs or {}) do
+    local step = OFFICIAL_PROGRESSION_STEPS[pack]
+    if step then
+      for _, implied in ipairs(step) do add(implied) end
+    end
+  end
+
+  return out
+end
+
+function S.mod_progression_packs_for(selected_packs)
+  local key = selected_pack_cache_key(selected_packs)
+  if mod_progression_cache[key] then return deepcopy(mod_progression_cache[key]) end
+
+  local inferred = {}
+  local visited_techs = {}
+
+  local function collect_tech_science(tech)
+    for _, ingredient in ipairs(((tech and tech.unit) and tech.unit.ingredients) or {}) do
+      local name = ingredient_name(ingredient)
+      if name and S.science_pack_exists(name) then inferred[name] = true end
+    end
+  end
+
+  local function walk_tech(tech_name)
+    if not tech_name or visited_techs[tech_name] then return end
+    visited_techs[tech_name] = true
+
+    local tech = (data.raw.technology or {})[tech_name]
+    if not tech then return end
+
+    local prereqs = {}
+    for _, prereq in ipairs(tech.prerequisites or {}) do table.insert(prereqs, prereq) end
+    table.sort(prereqs)
+    for _, prereq in ipairs(prereqs) do walk_tech(prereq) end
+    collect_tech_science(tech)
+  end
+
+  for _, pack in ipairs(selected_packs or {}) do
+    walk_tech(S.prereq_tech_for_science_pack(pack))
+  end
+
+  for _, pack in ipairs(S.official_progression_packs_for(selected_packs)) do
+    inferred[pack] = true
+  end
+
+  mod_progression_cache[key] = ordered_pack_list_from_set(inferred)
+  return deepcopy(mod_progression_cache[key])
 end
 
 function S.end_game_science_pack()
