@@ -662,7 +662,10 @@ If a generated technology is unresearchable:
 
 ## Save Compatibility
 
-No generated prototype IDs were renamed for **`v2.0.0`**.
-`v2.0.5` includes a JSON migration from `recipe-prod-research_character_trash_slots-1` to `recipe-prod-research_inventory_capacity-1` so old trash-slot progress moves into the combined inventory/trash research.
-`v2.1.0` includes a JSON migration from `recipe-prod-research_stone_products-1` to `recipe-prod-research_landfill-1` so old stone-product progress moves to the closest successor after landfill, artificial soil, and molten metals become separate research lines.
-**No migration is required** from `v1.2.9` (latest for Factorio 2.0).
+No generated prototype IDs were renamed for **`v2.0.0`**...
+**No migration is required** from `v1.2.9`.
+
+`v2.0.5` includes a JSON migration from `recipe-prod-research_character_trash_slots-1` to `recipe-prod-research_inventory_capacity-1` so old trash-slot progress moves into the *combined inventory/trash research*.
+
+`v2.1.0` includes a JSON migration from `recipe-prod-research_stone_products-1` to `recipe-prod-research_landfill-1` so old stone-product progress moves to the closest successor after landfill, artificial soil, and molten metals become *separate research lines*.
+
