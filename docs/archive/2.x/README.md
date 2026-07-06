@@ -18,4 +18,7 @@ superseded_by: ["../../releases/README.md"]
 > Current replacement: [Releases](../../releases/README.md)
 
 This folder contains historical release notes, feature intake, backport plans,
-and pre-manual reports from the 1.x and 2.x work streams.
+pre-manual reports, and completed task ledgers from the 1.x and 2.x work
+streams.
+
+- [Completed task ledger](completed-task-ledger.md)
