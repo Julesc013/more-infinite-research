@@ -19,6 +19,7 @@ Most ideamods in this folder are compatibility signals, not planned MIR features
 | `2.1.5` | Keep the compatibility posture narrow. | It adds guarded known-competitor profiles and effect-proven native duplicate skips only. |
 | `2.1.5` | Do not add broad streams from this audit. | The remaining overlaps need balance, progression, runtime, or product-scope decisions. |
 | `2.1.5` | Preserve finite lead-ins from other mods. | MIR's current cleanup model is for exact infinite owners, not finite upgrade chains. |
+| `2.1.5` | Pull in diagnostics-only planner work if it stays non-mutating. | Role rows and cap warnings explain decisions without broadening generated content. |
 | `2.2.0` | Plan new feature work from grouped demand signals. | Cap-aware UX, ore crushing, tile productivity, overhaul materials, and native overlap policy need design. |
 | Companion/modpack scope | Keep rule mutators adjacent unless explicitly adopted. | Beacon/module/productivity-rule mods change factory rules, not just research ownership. |
 
@@ -79,6 +80,8 @@ These are release-appropriate because they are exact duplicate-avoidance or exac
 | `crafting-efficiency-2` | Staged generated `ce-<name>-<level>` productivity chains. | Add guarded known-competitor pattern. | Cleanup still rejects changed values or uncovered recipes. |
 | `Research_Productivity` | Native infinite `laboratory-productivity-4` chain. | Skip MIR lab productivity when the expected native effect is present. | Effect-proven exact technology guard only. |
 | `better-bot-battery2` | Requested robot battery support. | Skip MIR worker robot battery when infinite `worker-robots-battery-6` has the expected native effect. | Values differ, so this is cooperation rather than exact replacement. |
+| Compatibility planner diagnostics | Cross-audit role model and non-actions. | Emit diagnostics-only role and summary audit rows. | Does not change cleanup, generation, caps, or max levels. |
+| Cap-aware diagnostics | Cap helper mods and recipe `maximum_productivity` signals. | Emit warnings for non-default recipe caps. | Warnings only; no silent cap mutation. |
 
 ## 2.1.5 Explicit Non-Goals
 

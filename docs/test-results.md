@@ -2,6 +2,40 @@
 
 This file records local release-candidate validation runs. It is not a substitute for the manual mod matrix in `docs/compatibility.md`.
 
+## 2026-07-06 2.1.5 Planner Diagnostics And Observation Tooling
+
+Environment:
+
+- Branch: `dev`.
+- Mod version `2.1.5`.
+- Factorio binary: Steam Factorio `2.1.9`.
+
+Scope:
+
+- Pulled low-risk planner diagnostics into `2.1.5` as diagnostics-only audit rows.
+- Added recipe productivity cap warnings for non-default recipe `maximum_productivity` values.
+- Added runtime fixture coverage for lowered, raised, and extreme recipe-cap diagnostics.
+- Added `compat-observations.md/json/csv` converter artifacts for planner rows and cap warnings.
+- Added `mir.ps1 report observations --run <path>` and surfaced observations in overnight and HTML reports.
+- Tightened deterministic `AuditSmoke` so it performs the baseline load check and captures audit rows.
+- Fixed audit conversion so effect-proven native owner skips are not misclassified as lab science failures.
+
+Commands:
+
+```powershell
+.\scripts\Invoke-MIRValidation.ps1 -FactorioBin 'C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe'
+.\scripts\Invoke-MIRExtendedTests.ps1 -Tier AuditSmoke -FactorioBin 'C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe' -FailFast -FailOnAuditFailures -OutputRoot .\build\audit-observations-smoke
+.\scripts\mir.ps1 report observations --run .\build\audit-observations-smoke
+.\scripts\Invoke-MIRValidation.ps1 -StaticOnly
+```
+
+Results:
+
+- Static validation passed and rebuilt `build\validation-dist\more-infinite-research_2.1.5.zip`.
+- Runtime fixture validation passed, including the new `recipe-cap-diagnostics` scenario.
+- Deterministic audit smoke passed with one Space Age baseline load, `88` audit rows, and `2` compatibility observation rows.
+- `mir.ps1 report observations` summarized the generated `compat-observations.csv`.
+
 ## 2026-07-05 1.9.1 Factorio 2.0.77 Release Gate
 
 Environment:

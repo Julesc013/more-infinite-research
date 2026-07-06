@@ -129,6 +129,7 @@ $expectedFailureData = Read-MIRJsonFile -Path $ExpectedFailures -Fallback ([pscu
 $expectedFailureRules = ConvertTo-MIRArray (Get-MIRObjectProperty -Object $expectedFailureData -Name "expected_failures" -Default @())
 
 $groups = @()
+$observationRows = @()
 
 foreach ($failure in $reportFailures) {
   $phase = [string](Get-MIRObjectProperty -Object $failure -Name "phase")
@@ -208,6 +209,30 @@ foreach ($result in $loadResults) {
     $recipe = [string](Get-MIRObjectProperty -Object $row -Name "recipe")
     $ownerKinds = [string](Get-MIRObjectProperty -Object $row -Name "owner_kinds")
     $owners = [string](Get-MIRObjectProperty -Object $row -Name "owners")
+    $warningClass = [string](Get-MIRObjectProperty -Object $row -Name "warning_class")
+    $capState = [string](Get-MIRObjectProperty -Object $row -Name "cap_state")
+
+    if ($kind -in @("compatibility_role", "compatibility_plan", "recipe_cap")) {
+      $observationRows += [pscustomobject]@{
+        scenario = $scenario
+        mod = $primaryMod
+        kind = $kind
+        key = $stream
+        status = $status
+        reason = $reason
+        role = [string](Get-MIRObjectProperty -Object $row -Name "role")
+        action = [string](Get-MIRObjectProperty -Object $row -Name "action")
+        signal = [string](Get-MIRObjectProperty -Object $row -Name "signal")
+        recipe = $recipe
+        warning_class = $warningClass
+        cap_state = $capState
+        maximum_productivity = [string](Get-MIRObjectProperty -Object $row -Name "maximum_productivity")
+        per_level = [string](Get-MIRObjectProperty -Object $row -Name "per_level")
+        levels_to_cap = [string](Get-MIRObjectProperty -Object $row -Name "levels_to_cap")
+        total = [string](Get-MIRObjectProperty -Object $row -Name "total")
+        warnings = [string](Get-MIRObjectProperty -Object $row -Name "warnings")
+      }
+    }
 
     if ($kind -eq "recipe_owner" -and $ownerKinds -match "unknown_external") {
       $groups += New-MIRFailureGroup `
@@ -231,7 +256,9 @@ foreach ($result in $loadResults) {
         -Reason $reason `
         -Evidence $owners `
         -LikelyRemediation "Check whether coverage, change value, lab science, or another owner prevented replacement."
-    } elseif ($kind -eq "stream" -and $reason -match "no_lab|lab") {
+    } elseif ($kind -eq "stream" -and $status -eq "skipped" -and $reason -match "^existing technology effect ") {
+      continue
+    } elseif ($kind -eq "stream" -and $reason -match "no_lab|lab-compatible|lab_compatible") {
       $groups += New-MIRFailureGroup `
         -Kind "invalid_science_pack" `
         -Scenario $scenario `
@@ -350,6 +377,9 @@ $missingDependencySummary = @(
 $groupedPath = Join-Path $resolvedOutputDir "compat-failures.grouped.json"
 $summaryPath = Join-Path $resolvedOutputDir "compat-summary.md"
 $profilePath = Join-Path $resolvedOutputDir "profile-candidates.json"
+$observationsJsonPath = Join-Path $resolvedOutputDir "compat-observations.json"
+$observationsCsvPath = Join-Path $resolvedOutputDir "compat-observations.csv"
+$observationsMdPath = Join-Path $resolvedOutputDir "compat-observations.md"
 $missingJsonPath = Join-Path $resolvedOutputDir "missing-dependencies.json"
 $missingCsvPath = Join-Path $resolvedOutputDir "missing-dependencies.csv"
 $missingMdPath = Join-Path $resolvedOutputDir "missing-dependencies.md"
@@ -369,6 +399,66 @@ $missingMdPath = Join-Path $resolvedOutputDir "missing-dependencies.md"
   generated_at = (Get-Date).ToString("yyyy-MM-ddTHH:mm:ssK")
   candidates = $profileCandidates
 } | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $profilePath -Encoding UTF8
+
+$observationSummary = @(
+  $observationRows |
+    Group-Object kind |
+    Sort-Object Name |
+    ForEach-Object {
+      [ordered]@{
+        kind = [string]$_.Name
+        count = [int]$_.Count
+      }
+    }
+)
+
+[ordered]@{
+  schema = 1
+  generated_at = (Get-Date).ToString("yyyy-MM-ddTHH:mm:ssK")
+  audit_dir = $resolvedAuditDir
+  observation_count = $observationRows.Count
+  summary = $observationSummary
+  observations = @($observationRows)
+} | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $observationsJsonPath -Encoding UTF8
+
+if ($observationRows.Count -gt 0) {
+  $observationRows | Export-Csv -NoTypeInformation -LiteralPath $observationsCsvPath
+} else {
+  "scenario,mod,kind,key,status,reason,role,action,signal,recipe,warning_class,cap_state,maximum_productivity,per_level,levels_to_cap,total,warnings" | Set-Content -LiteralPath $observationsCsvPath -Encoding UTF8
+}
+
+$observationsMd = @()
+$observationsMd += "# MIR Compatibility Observations"
+$observationsMd += ""
+$observationsMd += ('- Audit dir: `{0}`' -f $resolvedAuditDir)
+$observationsMd += "- Observation rows: $($observationRows.Count)"
+$observationsMd += ""
+$observationsMd += "These rows are diagnostics, not failure groups. They describe MIR roles, planner summaries, and recipe-cap warnings."
+$observationsMd += ""
+$observationsMd += "## Rows By Kind"
+$observationsMd += ""
+if ($observationSummary.Count -eq 0) {
+  $observationsMd += "No compatibility observation rows detected."
+} else {
+  $observationsMd += "| Kind | Count |"
+  $observationsMd += "| --- | ---: |"
+  foreach ($entry in $observationSummary) {
+    $observationsMd += "| $($entry.kind) | $($entry.count) |"
+  }
+}
+
+$recipeCapWarnings = @($observationRows | Where-Object { $_.kind -eq "recipe_cap" })
+if ($recipeCapWarnings.Count -gt 0) {
+  $observationsMd += ""
+  $observationsMd += "## Recipe Cap Warnings"
+  $observationsMd += ""
+  $observationsMd += "| Scenario | Stream | Recipe | Warning | Cap state | Maximum | Per level | Levels to cap |"
+  $observationsMd += "| --- | --- | --- | --- | --- | ---: | ---: | ---: |"
+  foreach ($entry in $recipeCapWarnings | Select-Object -First 100) {
+    $observationsMd += "| $($entry.scenario) | $($entry.key) | $($entry.recipe) | $($entry.warning_class) | $($entry.cap_state) | $($entry.maximum_productivity) | $($entry.per_level) | $($entry.levels_to_cap) |"
+  }
+}
+$observationsMd -join "`n" | Set-Content -LiteralPath $observationsMdPath -Encoding UTF8
 
 [ordered]@{
   schema = 1
@@ -414,6 +504,7 @@ $summary += "- Failure groups: $($deduped.Count)"
 $summary += "- Unexpected failure groups: $($unexpected.Count)"
 $summary += "- Expected failure groups: $($expected.Count)"
 $summary += "- Profile candidates: $($profileCandidates.Count)"
+$summary += "- Compatibility observations: $($observationRows.Count)"
 $summary += "- Distinct missing/incompatible dependencies: $($missingDependencySummary.Count)"
 $summary += ""
 $summary += "## Groups By Kind"
@@ -439,6 +530,9 @@ $summary -join "`n" | Set-Content -LiteralPath $summaryPath -Encoding UTF8
 Write-Host "[compat-results] wrote $summaryPath"
 Write-Host "[compat-results] wrote $groupedPath"
 Write-Host "[compat-results] wrote $profilePath"
+Write-Host "[compat-results] wrote $observationsMdPath"
+Write-Host "[compat-results] wrote $observationsJsonPath"
+Write-Host "[compat-results] wrote $observationsCsvPath"
 Write-Host "[compat-results] wrote $missingMdPath"
 Write-Host "[compat-results] wrote $missingJsonPath"
 Write-Host "[compat-results] wrote $missingCsvPath"

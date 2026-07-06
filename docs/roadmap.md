@@ -289,7 +289,12 @@ Theme:
 Compatibility planner foundations plus first evidence-backed stream families.
 ```
 
-`v2.2.0` is not the release that absorbs every useful idea-mod behavior. Most ideamods are compatibility signals, not planned MIR features. The release's job is to turn a small number of remaining audit signals into designed MIR-owned behavior, with fixtures proving recipe IDs, ownership, value matching, lab compatibility, and non-replacement of balance-distinct chains.
+`v2.1.5` may pull in low-risk diagnostics-only planner work because it does not
+change generation behavior. `v2.2.0` is not the release that absorbs every useful
+idea-mod behavior. Most ideamods are compatibility signals, not planned MIR
+features. The release's job is to turn a small number of remaining audit signals
+into designed MIR-owned behavior, with fixtures proving recipe IDs, ownership,
+value matching, lab compatibility, and non-replacement of balance-distinct chains.
 
 The role question for each audited mod is:
 
@@ -307,8 +312,8 @@ Use `docs/compatibility-program.md` as the decision framework for roles such as 
 
 Preferred order:
 
-1. Compatibility planner/registry, so detected mods, roles, actions, non-actions, and public claims share one control surface.
-2. Cap-aware diagnostics, because they improve user understanding without silently changing balance.
+1. Extend the diagnostics-only compatibility planner/registry started in `v2.1.5`, so detected mods, roles, actions, non-actions, and public claims share one control surface.
+2. Extend cap-aware diagnostics beyond warnings only if an explicit policy exists; do not silently change balance.
 3. Ore-crushing productivity, if Crushing Industry recipe IDs and ownership rules fixture cleanly.
 4. Tile and surface productivity policy, only after deciding the stream split and default values.
 5. One overhaul material-family prototype, limited to a concrete recipe family with visible IDs.

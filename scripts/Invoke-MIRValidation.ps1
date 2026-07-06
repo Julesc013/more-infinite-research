@@ -736,6 +736,9 @@ Invoke-RepoCheck "compat audit automation tooling is wired" {
     @{ File = "scripts\Invoke-MIRExtendedTests.ps1"; Text = $extendedTestsText; Snippet = "Convert-MIRCompatAuditResults.ps1" },
     @{ File = "scripts\Convert-MIRCompatAuditResults.ps1"; Text = $converterText; Snippet = "compat-failures.grouped.json" },
     @{ File = "scripts\Convert-MIRCompatAuditResults.ps1"; Text = $converterText; Snippet = "profile-candidates.json" },
+    @{ File = "scripts\Convert-MIRCompatAuditResults.ps1"; Text = $converterText; Snippet = "compat-observations.json" },
+    @{ File = "scripts\Convert-MIRCompatAuditResults.ps1"; Text = $converterText; Snippet = "recipe_cap" },
+    @{ File = "scripts\Convert-MIRCompatAuditResults.ps1"; Text = $converterText; Snippet = "compatibility_role" },
     @{ File = "scripts\Convert-MIRCompatAuditResults.ps1"; Text = $converterText; Snippet = "missing-dependencies.md" },
     @{ File = "scripts\Convert-MIRCompatAuditResults.ps1"; Text = $converterText; Snippet = "missing_dependency_count" },
     @{ File = "scripts\Convert-MIRCompatAuditResults.ps1"; Text = $converterText; Snippet = "unexpected_count" },
@@ -758,6 +761,7 @@ Invoke-RepoCheck "compat audit automation tooling is wired" {
     @{ File = "scripts\mir.ps1"; Text = $mirCliText; Snippet = "--factorio-line" },
     @{ File = "scripts\mir.ps1"; Text = $mirCliText; Snippet = "factorio_line" },
     @{ File = "scripts\mir.ps1"; Text = $mirCliText; Snippet = "local-audit-2.1" },
+    @{ File = "scripts\mir.ps1"; Text = $mirCliText; Snippet = "report observations" },
     @{ File = "scripts\mir.ps1"; Text = $mirCliText; Snippet = "New-MIRProfileOverrides" },
     @{ File = "scripts\mir.ps1"; Text = $mirCliText; Snippet = "local-index" },
     @{ File = "scripts\Test-MIRPowerShellQuality.ps1"; Text = $powershellQualityText; Snippet = "duplicate parameter" },
@@ -784,6 +788,7 @@ Invoke-RepoCheck "compat audit automation tooling is wired" {
     @{ File = "scripts\Start-MIROvernightLocalSweep.ps1"; Text = $overnightText; Snippet = "LocalModZips" },
     @{ File = "scripts\Start-MIROvernightLocalSweep.ps1"; Text = $overnightText; Snippet = "Show-MIROvernightSummary.ps1" },
     @{ File = "scripts\Show-MIROvernightSummary.ps1"; Text = $overnightSummaryText; Snippet = "compat-failures.grouped.json" },
+    @{ File = "scripts\Show-MIROvernightSummary.ps1"; Text = $overnightSummaryText; Snippet = "compat-observations.json" },
     @{ File = "scripts\Show-MIROvernightSummary.ps1"; Text = $overnightSummaryText; Snippet = "missing-dependencies.csv" },
     @{ File = "scripts\Show-MIROvernightSummary.ps1"; Text = $overnightSummaryText; Snippet = "profile-candidates.json" },
     @{ File = "scripts\Show-MIROvernightSummary.ps1"; Text = $overnightSummaryText; Snippet = "Group-Object mod" },
@@ -1831,6 +1836,26 @@ function Get-LastNativeModifierOverlapLine {
   return $line.Line
 }
 
+function Get-LastCompatibilityPlanLine {
+  param([string]$Key)
+  $pattern = "kind=compatibility_plan key=$([regex]::Escape($Key))(\s|$)"
+  $line = Select-String -LiteralPath $FactorioLog -Pattern $pattern | Select-Object -Last 1
+  if (-not $line) {
+    throw "Runtime validation log did not contain compatibility plan diagnostics for $Key."
+  }
+  return $line.Line
+}
+
+function Get-LastRecipeCapReportLine {
+  param([string]$Recipe)
+  $pattern = "kind=recipe_cap .*recipe=$([regex]::Escape($Recipe))(\s|$)"
+  $line = Select-String -LiteralPath $FactorioLog -Pattern $pattern | Select-Object -Last 1
+  if (-not $line) {
+    throw "Runtime validation log did not contain recipe cap diagnostics for $Recipe."
+  }
+  return $line.Line
+}
+
 function Assert-ReportLineGenerated {
   param([string]$Line, [string]$Context)
   if ($Line -notmatch "status=generated") {
@@ -2029,6 +2054,20 @@ $baseLabProductivityLine = Get-LastStreamReportLine -Key "research_lab_productiv
 Assert-ReportLineGenerated -Line $baseLabProductivityLine -Context "Base research productivity scenario"
 Assert-ReportLineContains -Line $baseLabProductivityLine -Expected "effects=1" -Context "Base research productivity scenario"
 Assert-ReportLineContains -Line $baseLabProductivityLine -Expected "icon=tech:military-science-pack" -Context "Base research productivity icon scenario"
+$compatibilityPlanLine = Get-LastCompatibilityPlanLine -Key "compatibility_planner"
+Assert-ReportLineContains -Line $compatibilityPlanLine -Expected "status=diagnostic" -Context "Base compatibility planner diagnostics scenario"
+
+Invoke-RuntimeScenario -ScenarioName "recipe-cap-diagnostics" -EnabledFixtureNames @(
+  "mir-fixture-recipe-cap-diagnostics"
+)
+$capPlanLine = Get-LastCompatibilityPlanLine -Key "recipe_productivity_caps"
+Assert-ReportLineContains -Line $capPlanLine -Expected "warnings=" -Context "Recipe cap diagnostics summary scenario"
+$loweredCapLine = Get-LastRecipeCapReportLine -Recipe "iron-gear-wheel"
+Assert-ReportLineContains -Line $loweredCapLine -Expected "cap_state=lowered" -Context "Lowered recipe cap diagnostics scenario"
+$raisedCapLine = Get-LastRecipeCapReportLine -Recipe "iron-plate"
+Assert-ReportLineContains -Line $raisedCapLine -Expected "cap_state=raised" -Context "Raised recipe cap diagnostics scenario"
+$extremeCapLine = Get-LastRecipeCapReportLine -Recipe "copper-cable"
+Assert-ReportLineContains -Line $extremeCapLine -Expected "warning_class=uncapped_or_extreme" -Context "Extreme recipe cap diagnostics scenario"
 
 Invoke-RuntimeScenario -ScenarioName "lab-productivity-owner-skip" -EnabledFixtureNames @(
   "mir-fixture-lab-productivity-owner",

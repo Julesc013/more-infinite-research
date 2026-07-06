@@ -7,6 +7,8 @@ Date: 2026-07-05
     - Added known-competitor profiles for exact recipe-productivity overlaps found in the local idea-mod audit.
     - Skipped MIR lab productivity when a matching infinite native laboratory-productivity owner is active.
     - Skipped MIR worker robot battery when Better Bot Battery-style infinite native robot battery owner is active.
+    - Added diagnostics-only compatibility planner rows for active audit roles and deliberate non-actions.
+    - Added recipe productivity cap diagnostics for non-default recipe maximum productivity values.
 
   Internal:
 
@@ -20,6 +22,7 @@ Date: 2026-07-05
     - Added downloaded dependency-cache support to local 2.1 audit profiles.
     - Tightened load-failure grouping to classify Factorio error excerpts instead of MIR audit-row text.
     - Made mir.ps1 profile-driven for release, overnight, and local-audit commands with simple path overrides.
+    - Added compatibility observation artifacts and a report command for planner and recipe-cap diagnostics.
     - Added PowerShell script checks for parsing, duplicate parameters, ignored outputs, and secret-output guards.
     - Added Factorio 2.0 and 2.1 run profiles for release gates, overnight sweeps, and local audits.
     - Made compatibility audits select Factorio line, local scenario defaults, and available official built-ins.

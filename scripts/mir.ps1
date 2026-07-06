@@ -24,6 +24,7 @@ Usage:
   .\scripts\mir.ps1 package build
   .\scripts\mir.ps1 report latest
   .\scripts\mir.ps1 report missing-deps --run <path>
+  .\scripts\mir.ps1 report observations --run <path>
   .\scripts\mir.ps1 profile stub <group-id> --grouped-failures <path>
   .\scripts\mir.ps1 run -Profile <profile-name-or-path>
   .\scripts\mir.ps1 local-index build --mods <path>
@@ -317,6 +318,15 @@ switch ($area) {
           Group-Object mod |
           Sort-Object Count -Descending |
           Select-Object @{Name='mod';Expression={$_.Name}},Count |
+          Format-Table -AutoSize
+      }
+      "observations" {
+        $run = Get-MIRArgValue -Items $Args -Name "--run" -Default (Get-MIRLatestRunRoot)
+        Get-ChildItem -LiteralPath $run -Recurse -Filter compat-observations.csv -File |
+          ForEach-Object { Import-Csv -LiteralPath $_.FullName } |
+          Group-Object kind |
+          Sort-Object Count -Descending |
+          Select-Object @{Name='kind';Expression={$_.Name}},Count |
           Format-Table -AutoSize
       }
       default { throw "Unknown report command: $verb" }

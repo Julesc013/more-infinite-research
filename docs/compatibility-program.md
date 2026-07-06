@@ -108,8 +108,10 @@ claimed as supported:
 | What if both mods stay enabled? | MIR needs cleanup, skip, warning, or coexist behavior. |
 | What if the external mod has startup settings? | Exact replacement may stop being exact. |
 
-For `2.1.5`, exact cleanup is safe because it is narrow and guarded. For
-`2.2.0+`, save behavior should be a required row in every compatibility campaign.
+For `2.1.5`, exact cleanup is safe because it is narrow and guarded. The
+diagnostics-only planner rows added in the same line do not change save behavior.
+For `2.2.0+`, save behavior should be a required row in every compatibility
+campaign.
 
 ## Test Matrix Model
 
@@ -408,7 +410,8 @@ Every integration should have a fixture or load scenario.
 
 ## Compatibility Planner Output
 
-`2.2.0` should move toward a compatibility planner that can emit a structured
+`2.1.5` starts the compatibility planner as diagnostics-only audit rows. `2.2.0`
+should extend that into a fuller compatibility planner that can emit a structured
 summary when diagnostics are enabled:
 
 ```text

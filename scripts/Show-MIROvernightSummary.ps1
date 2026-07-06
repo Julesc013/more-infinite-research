@@ -118,3 +118,24 @@ if ($profileRows.Count -eq 0) {
 } else {
   $profileRows | Sort-Object candidates -Descending | Format-Table -AutoSize | Out-String | Write-Host
 }
+
+$observationRows = @(
+  Get-ChildItem -LiteralPath $resolvedOutputRoot -Recurse -Filter compat-observations.json -File |
+    ForEach-Object {
+      $json = Get-Content -Raw -LiteralPath $_.FullName | ConvertFrom-Json
+      [pscustomobject]@{
+        file = $_.FullName
+        observations = [int]$json.observation_count
+        recipe_cap = @($json.observations | Where-Object { $_.kind -eq "recipe_cap" }).Count
+        roles = @($json.observations | Where-Object { $_.kind -eq "compatibility_role" }).Count
+      }
+    }
+)
+
+Write-Host ""
+Write-Host "## Compatibility Observations"
+if ($observationRows.Count -eq 0) {
+  Write-Host "No compatibility-observation files found."
+} else {
+  $observationRows | Sort-Object observations -Descending | Format-Table -AutoSize | Out-String | Write-Host
+}

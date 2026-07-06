@@ -490,6 +490,9 @@ Idea-mod audit planning lives in `docs/notes/mod-ideas-audit.md`.
 - [x] Add exact known-competitor profiles from the `ideamods_mix` audit.
 - [x] Skip MIR lab productivity when infinite `research-productivity` or `laboratory-productivity-4` has the native lab-productivity effect.
 - [x] Add a small effect fixture for `laboratory-productivity-4` before calling the skip effect-equivalent.
+- [x] Pull the low-risk `v2.2.0` planner slice into `v2.1.5` as diagnostics-only audit rows.
+- [x] Add recipe productivity cap diagnostics without changing caps, max levels, or stream generation.
+- [x] Pull non-gameplay `v2.2.0` audit tooling into `v2.1.5`: compatibility observations, report summaries, and CLI access.
 - [ ] Run the targeted external idea-mod load pass before tagging `v2.1.5`.
 - [x] Add locale/docs/validation updates.
 - [ ] Add proven recipe IDs to existing streams when no new architecture is needed.
@@ -503,8 +506,8 @@ Idea-mod audit candidates should be promoted only after recipe-ID proof, balance
 
 | Candidate | Source signal | First useful slice |
 | --- | --- | --- |
-| Compatibility planner/registry | All 50 idea-mod archives | Assign role enums, actions, non-actions, validation status, and public-claim boundaries before implementing broad features. |
-| Cap-aware UX | Productivity cap and finite-limit helper mods | Diagnostics or explicit setting; never silent cap mutation. |
+| Compatibility planner/registry | All 50 idea-mod archives | First diagnostics-only rows pulled into `v2.1.5`; structured validation status and broader policy remain for `v2.2.0`. |
+| Cap-aware UX | Productivity cap and finite-limit helper mods | Warning diagnostics pulled into `v2.1.5`; settings or mutation policy remains deferred. |
 | Ore crushing productivity | Crushing Industry productivity research | Recipe-ID driven Crushing Industry stream or compatibility profile. |
 | Tile/surface productivity | Asphalt, concrete, landfill, foundation productivity mods | Decide conservative defaults, exact cleanup rules, and optional high-value profile policy before implementation. |
 | Overhaul material families | Pyanodon, Expanded Productivity Research, Crafting Efficiency | Pick one concrete family first; avoid a generic generator. |

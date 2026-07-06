@@ -32,15 +32,20 @@ absorb every mod. Most entries are compatibility signals.
 
 ## Executive Cut
 
-Keep `2.1.5` narrow. The current release should remain guarded duplicate cleanup
-plus effect-backed native-owner skips. Better Bot Battery duplicate avoidance
-fits this lane when fixture-backed; Air Scrubbing clean-filter productivity is
-a good feature, but it is a new MIR-owned stream and belongs in `2.2.0`.
+Keep `2.1.5` narrow for gameplay behavior. The current release should remain
+guarded duplicate cleanup plus effect-backed native-owner skips, with
+non-mutating diagnostics, scripts, tools, and report surfaces allowed because
+they do not change generated technologies. Better Bot Battery duplicate
+avoidance fits this lane when fixture-backed; Air Scrubbing clean-filter
+productivity is a good feature, but it is a new MIR-owned stream and belongs in
+`2.2.0`.
 
-Use `2.2.0` for designed, fixture-backed work:
+Use `2.2.0` for designed, fixture-backed behavior and broader policy work:
 
-1. Compatibility planner and diagnostics.
-2. Cap-aware productivity diagnostics.
+1. Broader compatibility planner policy beyond the diagnostics-only `2.1.5`
+   rows.
+2. Cap-aware productivity settings or mutation policy beyond the warning-only
+   `2.1.5` diagnostics.
 3. Ore-crushing productivity if exact visible recipe fixtures pass.
 4. Tile/surface productivity policy before any tile stream ships.
 5. One narrow overhaul material-family prototype, not a generic productivity generator.
@@ -627,10 +632,10 @@ identity:
 
 ## Immediate Planning Notes
 
-1. `2.1.5` should not expand beyond the shipped exact cleanup and native-owner duplicate skips.
+1. `2.1.5` should not expand generated gameplay behavior beyond the shipped exact cleanup and native-owner duplicate skips; non-mutating diagnostics, scripts, tools, and report surfaces can ship there.
 2. The newly added idea mods strengthen the case for a compatibility planner, not for broader cleanup.
 3. Air Scrubbing support should start in `2.2.0` as filter recipe productivity only; scrubber pollution/spore removal efficiency is outside MIR core unless runtime/prototype mutation is explicitly accepted.
 4. Better Bot Battery support is native-owner cooperation: avoid duplicate worker robot battery infinite technologies when effect-proven `worker-robots-battery-6` is present.
-5. The next implementation decision should be a `2.2.0` planner/diagnostics layer, the ore-crushing stream fixture, or cap-aware diagnostics.
+5. The next implementation decision should be a `2.2.0` planner-policy extension, the ore-crushing stream fixture, or cap-aware settings/mutation design.
 6. Public wording should say "MIR cooperates with or avoids duplicates from these mods" unless a fixture proves exact replacement.
 7. Any future "replacement" claim must say which portion is replaced. For many mods here, MIR can at most replace the recipe-productivity portion.

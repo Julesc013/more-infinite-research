@@ -67,6 +67,18 @@ function D.recipe_owner(row)
   append("recipe_owner", row)
 end
 
+function D.compatibility_role(row)
+  append("compatibility_role", row)
+end
+
+function D.compatibility_plan(row)
+  append("compatibility_plan", row)
+end
+
+function D.recipe_cap(row)
+  append("recipe_cap", row)
+end
+
 function D.recipe_matches(key, buckets)
   if not D.recipe_matches_enabled() then return end
   for _, bucket in ipairs(buckets or {}) do
@@ -172,7 +184,18 @@ function D.flush()
         .. " recipe=" .. tostring(row.recipe or "")
         .. " owner_kinds=" .. tostring(row.owner_kinds or "")
         .. " owner_actions=" .. tostring(row.owner_actions or "")
-        .. " recipes=" .. tostring(row.recipes or ""))
+        .. " recipes=" .. tostring(row.recipes or "")
+        .. " mod=" .. tostring(row.mod or "")
+        .. " role=" .. tostring(row.role or "")
+        .. " action=" .. tostring(row.action or "")
+        .. " signal=" .. tostring(row.signal or "")
+        .. " warning_class=" .. tostring(row.warning_class or "")
+        .. " cap_state=" .. tostring(row.cap_state or "")
+        .. " maximum_productivity=" .. tostring(row.maximum_productivity or "")
+        .. " per_level=" .. tostring(row.per_level or "")
+        .. " levels_to_cap=" .. tostring(row.levels_to_cap or "")
+        .. " total=" .. tostring(row.total or "")
+        .. " warnings=" .. tostring(row.warnings or ""))
     end
     log("[more-infinite-research] Generation report end")
   end

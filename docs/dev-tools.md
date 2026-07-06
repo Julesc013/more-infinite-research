@@ -13,6 +13,7 @@ Use `scripts/mir.ps1` first:
 .\scripts\mir.ps1 audit top25 --space-age
 .\scripts\mir.ps1 report latest
 .\scripts\mir.ps1 report missing-deps --run <path>
+.\scripts\mir.ps1 report observations --run <path>
 .\scripts\mir.ps1 package build
 .\scripts\mir.ps1 local-index build --mods <path>
 ```
@@ -29,6 +30,10 @@ Common overrides:
 ```
 
 `mir.ps1` delegates to the existing scripts. It should stay thin: argument routing, profile loading, and memorable command names. Do not add new compatibility logic directly to it.
+
+`report observations` summarizes `compat-observations.csv` rows produced by the
+audit converter. Use it to see diagnostics-only planner rows and recipe-cap
+warnings without treating them as failures or profile candidates.
 
 ## Run Profiles
 

@@ -168,6 +168,11 @@ Compatibility adapters should register facts about known external mods. They
 should not generate MIR content directly. Streams generate content; adapters
 classify external owners and constraints; diagnostics explain the resulting plan.
 
+The first planner slice in `v2.1.5` is diagnostics-only. It emits active
+compatibility-role rows, a planner summary, and recipe-cap warnings when
+diagnostics are enabled. It does not add streams, change recipe caps, change
+maximum levels, or broaden cleanup beyond the guarded exact-overlap model.
+
 ## Diagnostics
 
 `mir-debug-generation-report` enables a structured log report. The report records generated and skipped streams/extensions with:
@@ -184,11 +189,18 @@ classify external owners and constraints; diagnostics explain the resulting plan
 
 Use this setting when triaging user reports. It is off by default to avoid noisy logs.
 
-When `mir-debug-generation-report` is enabled, MIR also emits an `Audit report` block with stable `audit schema=1 kind=...` rows. These rows mirror stream, extension, native-overlap, and recipe-owner decisions in a parser-friendly key/value format for `scripts/Invoke-MIRCompatAudit.ps1` and future large-mod compatibility sweeps.
+When `mir-debug-generation-report` is enabled, MIR also emits an `Audit report` block with stable `audit schema=1 kind=...` rows. These rows mirror stream, extension, native-overlap, recipe-owner, compatibility-role, compatibility-plan, and recipe-cap decisions in a parser-friendly key/value format for `scripts/Invoke-MIRCompatAudit.ps1` and future large-mod compatibility sweeps.
+
+Recipe-cap diagnostics compare generated recipe-productivity effects with the
+recipe's `maximum_productivity` value. Default caps stay quiet except for the
+summary row. Lowered, raised, zero, unusual, or effectively uncapped values are
+reported as diagnostics so players and compatibility audits can see when an
+infinite stream may become misleading. MIR does not change recipe caps in
+`v2.1.5`.
 
 `mir-debug-recipe-matches` logs matched recipe names per generated productivity stream. When either diagnostics setting is enabled, duplicate recipe matches across streams are also reported as non-blocking warnings.
 
-Native modifier overlap diagnostics are also non-blocking. They report that another infinite non-MIR technology already has the same native direct-effect identity, such as `cargo-landing-pad-count` or `max-cargo-bay-unloading-distance`, but they do not skip, merge, or mutate either technology in `v2.1.0`.
+Native modifier overlap diagnostics are also non-blocking. They report that another infinite non-MIR technology already has the same native direct-effect identity, such as `cargo-landing-pad-count` or `max-cargo-bay-unloading-distance`, but they do not skip, merge, or mutate either technology unless a narrow effect-proven skip policy exists.
 
 ## Progression Settings
 
@@ -209,7 +221,7 @@ Use `scripts/Invoke-MIRCompatAudit.ps1` for mod-portal driven compatibility cata
 
 The compatibility runner writes isolated mod lists rather than inheriting the user's normal Factorio enabled-mod state. Official built-ins are listed explicitly and disabled unless the scenario needs them; requiring `space-age` expands to the full official bundle. Parsed audit rows are tolerant of blank log lines so checkpointed overnight results can still be converted after interrupted runs.
 
-Use `scripts/Convert-MIRCompatAuditResults.ps1` after load-test runs to group failures into actionable buckets and emit `compat-failures.grouped.json`, `compat-summary.md`, `profile-candidates.json`, and `missing-dependencies.*`. The grouped output records total, expected, and unexpected failure counts. Expected failures mostly come from reviewed rules in `fixtures/compat-matrix/expected-failures.json`; successful-load audit observations that represent MIR's intentional conservative behavior, such as missing-prototype stream skips and unknown-external-owner suppression, are also kept non-blocking by default.
+Use `scripts/Convert-MIRCompatAuditResults.ps1` after load-test runs to group failures into actionable buckets and emit `compat-failures.grouped.json`, `compat-summary.md`, `profile-candidates.json`, `compat-observations.*`, and `missing-dependencies.*`. The grouped output records total, expected, and unexpected failure counts. Compatibility observations record diagnostics-only planner rows and recipe-cap warnings without turning them into failures. Expected failures mostly come from reviewed rules in `fixtures/compat-matrix/expected-failures.json`; successful-load audit observations that represent MIR's intentional conservative behavior, such as missing-prototype stream skips and unknown-external-owner suppression, are also kept non-blocking by default.
 
 Use `scripts/New-MIRCompatProfileStub.ps1` only to generate review-required Lua stubs from grouped audit evidence. Generated stubs are not enabled profiles.
 
