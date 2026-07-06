@@ -117,7 +117,10 @@ $requiredShims = @(
   "prototypes/mir/capabilities/contract.lua",
   "prototypes/mir/capabilities/registry.lua",
   "prototypes/mir/planner/compiler.lua",
-  "prototypes/mir/compatibility/air_scrubbing.lua",
+  "prototypes/mir/compatibility/registry.lua",
+  "prototypes/mir/compatibility/overlay_loader.lua",
+  "prototypes/mir/compatibility/claim_registry.lua",
+  "prototypes/mir/compatibility/overlays/air_scrubbing.lua",
   "prototypes/mir/legacy/tech_gen.lua",
   "prototypes/mir/legacy/recipe_matching.lua",
   "prototypes/mir/legacy/compat_profiles.lua",
@@ -140,7 +143,7 @@ Assert-MIRNoPatternInLuaTree `
   -Message "MIR capability modules must not emit prototypes directly."
 
 Assert-MIRNoPatternInLuaTree `
-  -RelativeRoot "prototypes/mir/compatibility" `
+  -RelativeRoot "prototypes/mir/compatibility/overlays" `
   -Pattern "\bdata\.raw\b|data:extend" `
   -Message "MIR compatibility overlays must stay declarative."
 

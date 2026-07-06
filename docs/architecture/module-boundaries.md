@@ -80,6 +80,11 @@ Current migration state: the Factorio root entrypoints route through
 generation modules still move behind `domain/`, `capabilities/`, `planner/`,
 and `emit/` in later slices.
 
+Compatibility policy uses `prototypes/mir/compatibility/`. Named compatibility
+targets live under `prototypes/mir/compatibility/overlays/`; those overlays
+register selectors, claims, deny rules, and policy overrides only. They must not
+create technologies, call `data:extend`, or mutate `data.raw` directly.
+
 ## Three Workspaces
 
 Use three clear workspaces:
@@ -334,19 +339,22 @@ prototypes/
 
     compatibility/
       registry.lua
-      base.lua
-      space_age.lua
-      air_scrubbing.lua
-      atan_ash.lua
-      atan_nuclear_science.lua
-      aai_industry.lua
-      aai_loaders.lua
-      bob_materials.lua
-      krastorio2.lua
-      krastorio2_spaced_out.lua
-      angels.lua
-      space_exploration.lua
-      pyanodons.lua
+      overlay_loader.lua
+      claim_registry.lua
+      overlays/
+        base.lua
+        space_age.lua
+        air_scrubbing.lua
+        atan_ash.lua
+        atan_nuclear_science.lua
+        aai_industry.lua
+        aai_loaders.lua
+        bob_materials.lua
+        krastorio2.lua
+        krastorio2_spaced_out.lua
+        angels.lua
+        space_exploration.lua
+        pyanodons.lua
 
     legacy/
       tech_gen.lua
@@ -381,7 +389,7 @@ Forbidden dependencies:
 ```text
 domain/ must not require emit/
 classify/ must not require platform/factorio/data_raw.lua
-compatibility/ must not mutate data.raw
+compatibility/overlays/ must not mutate data.raw
 report/ must not mutate data.raw
 capabilities/ must not create technologies directly
 legacy/ must not contain new business logic
@@ -595,7 +603,7 @@ Instrument mode is a development tool, not a shipped MIR package feature.
 
 Static validation should eventually fail when:
 
-- `compatibility/` calls `data:extend`;
+- `compatibility/overlays/` calls `data:extend`;
 - `classify/` requires the Factorio `data_raw` adapter directly;
 - `domain/` requires `emit/`;
 - a capability emits without a `StreamSpec`;

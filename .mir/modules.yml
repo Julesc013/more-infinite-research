@@ -27,7 +27,10 @@ namespace_shims:
   capability_contract: prototypes/mir/capabilities/contract.lua
   capability_registry: prototypes/mir/capabilities/registry.lua
   planner_compiler: prototypes/mir/planner/compiler.lua
-  air_scrubbing_policy: prototypes/mir/compatibility/air_scrubbing.lua
+  compatibility_registry: prototypes/mir/compatibility/registry.lua
+  compatibility_overlay_loader: prototypes/mir/compatibility/overlay_loader.lua
+  compatibility_claim_registry: prototypes/mir/compatibility/claim_registry.lua
+  air_scrubbing_policy_overlay: prototypes/mir/compatibility/overlays/air_scrubbing.lua
 
 target_layers:
   stage:
@@ -128,6 +131,7 @@ target_layers:
       - core
       - policy
     may_mutate_data_raw: false
+    overlay_path: prototypes/mir/compatibility/overlays
 
   legacy:
     path: prototypes/mir/legacy
@@ -156,12 +160,12 @@ forbidden_imports:
     to: prototypes/mir/emit
   - from: prototypes/mir/classify
     to: prototypes/mir/platform/factorio/data_raw.lua
-  - from: prototypes/mir/compatibility
+  - from: prototypes/mir/compatibility/overlays
     to: prototypes/mir/emit
 
 rules:
   - only emission code mutates generated technologies
-  - compatibility packs register policy only
+  - compatibility overlays register policy only
   - domain modules do not read Factorio globals
   - report modules do not mutate prototypes
   - legacy wrappers do not introduce new behavior
