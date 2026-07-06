@@ -2,6 +2,33 @@
 
 This file records local release-candidate validation runs. It is not a substitute for the manual mod matrix in `docs/compatibility.md`.
 
+## 2026-07-07 2.2.0 Final Release-Targeted Gate
+
+Environment:
+
+- Branch: `dev`.
+- Gate commit: `7a95ed4`.
+- Mod version `2.2.0`.
+- Factorio binary: Steam Factorio `2.1.9`.
+- Local Factorio `2.1` mod library: `C:\Projects\Factorio\testmods_2.1`.
+- Release artifact: `dist\more-infinite-research_2.2.0.zip`.
+- Release artifact SHA256: `BB5822655BA67DC9788EEEB46C067793136BD4C3F0F1C587FCC669833867DF66`.
+- Release-gate artifacts: `artifacts\release-targeted-2.2.0-final`.
+
+Command:
+
+```powershell
+.\scripts\mir.ps1 release gate --profile release-targeted-2.1 --output '.\artifacts\release-targeted-2.2.0-final' --no-git-pull
+```
+
+Results:
+
+- Strict current-commit gate passed: static validation, runtime fixture validation, and deterministic audit coverage.
+- Targeted local load checks passed for `big-mining-drill`, `biolabs-in-space`, `aai-containers`, `aai-industry`, `aai-loaders`, `equipment-gantry`, `FluidMustFlow`, `jetpack`, and `robot_attrition`.
+- Representative local-library scenario `local-2-1-bz-suite-space-age` passed with six BZ mods and the official Space Age bundle.
+- Package build passed with `dist\more-infinite-research_2.2.0.zip` unchanged.
+- Final release-gate git status was clean.
+
 ## 2026-07-07 2.2.0 Final Fixture Validation
 
 Environment:
