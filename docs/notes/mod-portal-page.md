@@ -1,21 +1,21 @@
 # More Infinite Research
 
-More Infinite Research adds repeatable late-game research for production, logistics, combat, player bonuses, robots, and Space Age cargo logistics.
+Adds **fully customizable** repeatable late-game research for **productivity, speed, logistics, combat, player bonuses, robots, spoilage, cargo logistics,** and tries to be *compatible with every mod*...
 
-It is built for players who want more long-term scaling for late-game megabases, long-running Space Age saves, and modded or overhaul-style playthroughs without turning the mod into a full content overhaul.
+It is built for players who want more *long-term scaling for late-game megabases*, long-running Space Age saves, and modded or overhaul-style playthroughs without turning the mod into a full content overhaul.
 
 ## At a Glance
 
-- Adds many configurable infinite productivity researches for vanilla, Space Age, and compatible modded production chains.
+- Adds many **configurable infinite productivity researches** for vanilla, Space Age, and compatible modded production chains.
 - Adds repeatable player, robot, weapon-speed, cargo-logistics, and selected vanilla technology bonuses.
+- Startup **settings let you enable, disable, cap, or rebalance** every generated research.
 - Adds a base-game Research productivity chain when Space Age's vanilla `research-productivity` technology is not present.
-- Skips Space Age productivity duplicates when vanilla already owns processing unit, low density structure, plastic, rocket fuel, or research productivity.
 - Adopts safe mod-added recipes into configured vanilla Space Age productivity families instead of creating parallel research.
-- Startup settings let you enable, disable, cap, or rebalance almost every generated research.
-- Works with Factorio `2.1`; requires `base >= 2.1.8`. Space Age is optional.
-- Version `2.1.0` keeps generated technology IDs stable except for documented migrations: it retains the migration that merges the old trash-slot research into Character inventory slots, and it migrates retired Stone product productivity progress into Landfill productivity after the stone-product stream is split.
 
-Recipe productivity researches are infinite, but Factorio's recipe productivity cap still applies. Once a recipe reaches that cap, more levels may no longer improve that recipe.
+- Version **`1.x.x`** targets **Factorio `2.0`** and requires `base >= 2.0`.
+- Version **`2.x.x`** targets **Factorio `2.1`**; requires `base >= 2.1.8`. Space Age is optional.
+
+*Recipe productivity researches are infinite, but Factorio's recipe productivity cap still applies. Once a recipe reaches that cap, more levels may no longer improve that recipe.*
 
 ## Main Features
 
@@ -120,7 +120,7 @@ Technologies are generated only when their recipes, items, technologies, ammo ca
 | Spoilage preservation | `+1%` global spoil time per level | Off | Experimental Space Age scripted technology. Global/map-wide effect; existing item-stack behavior still needs manual validation before stronger claims. |
 | Agricultural growth speed | `+1%` agricultural growth speed per level, capped at `10x` | Off | Experimental Space Age scripted technology. Adds agricultural, electromagnetic, and cryogenic science when available. Applies to newly planted agricultural tower crops; existing planted crops are not globally rescanned. |
 | Character inventory slots | `+1` inventory slot and `+1` logistic trash slot | On | Merges the old separate trash-slot research into one combined technology. A migration preserves old trash-slot progress. |
-| Worker robot battery | `+10%` worker robot battery capacity | On | Uses a gentler default cost growth than shared productivity streams. Skips when Better Bot Battery-style `worker-robots-battery-6` already owns the infinite native robot battery effect. |
+| Worker robot battery | `+10%` worker robot battery capacity | On | Uses a gentler default cost growth than shared productivity streams. Skips when Better Bot Battery-style `worker-robots-battery-6` already exists. |
 | Cargo bay unloading distance | `+10` maximum unloading distance tiles | On with Space Age | Requires Space Age unloading bay content. Uses the unloading bay unlock technology art and official base and Space Age science packs. |
 | Cargo landing pad count | `+1` landing pad per surface | Off | Sandbox-style Space Age logistics option. Uses Space platform technology art. Very expensive by default. |
 | Rocket shooting speed | `+10%` shooting speed for rocket ammo category | On | Separate dedicated speed research using electromagnetic science when available. |
