@@ -1,0 +1,70 @@
+schema: 1
+
+branches:
+  main:
+    purpose: latest stable Factorio 2.1.x release line
+    factorio_version: "2.1"
+    accepts:
+      - release-hotfix
+      - docs-correction
+      - fixture-correction
+      - package-refresh
+    rejects:
+      - broad-new-generation
+      - schema-breaking-report-changes
+      - large-architecture-rewrite
+
+  dev:
+    purpose: active 3.x and main-line 2.1 development
+    factorio_version: "2.1"
+    accepts:
+      - architecture
+      - new-capabilities
+      - docs
+      - fixtures
+      - refactors
+      - validation
+
+  legacy:
+    purpose: Factorio 2.0.x backport branch
+    factorio_version: "2.0"
+    accepts:
+      - safety-fix
+      - compatibility-diagnostic-fix
+      - docs-correction
+      - exact-policy-fix
+    rejects:
+      - 3.0-directory-reorg
+      - schema-breaking-change
+      - generated-id-rename
+      - broad-new-generation
+
+  factorio-2.0-lane:
+    purpose: planned Space Exploration and other 2.0-only campaign lane
+    factorio_version: "2.0"
+    accepts:
+      - platform-compatible-backport
+      - 2.0-fixture
+      - no-2.1-only-prototype-assumption
+
+backport_rules:
+  pure_classifier_fix:
+    from: dev
+    to:
+      - main
+      - legacy
+    requires:
+      - fixture
+      - no-stream-id-change
+
+  generated_stream_change:
+    requires:
+      - stream-manifest-update
+      - migration-review
+      - fixture-update
+      - release-note
+
+  docs_only:
+    requires:
+      - docs-lint
+      - no-package-diff

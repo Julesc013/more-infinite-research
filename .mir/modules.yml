@@ -1,0 +1,152 @@
+schema: 1
+
+current_roots:
+  factorio_shell:
+    root_files:
+      - settings.lua
+      - data.lua
+      - data-updates.lua
+      - data-final-fixes.lua
+      - control.lua
+    runtime_directories:
+      - control
+      - locale
+      - migrations
+      - prototypes
+
+target_layers:
+  stage:
+    path: prototypes/mir/stage
+    may_require:
+      - core
+      - platform
+      - planner
+    may_mutate_data_raw: false
+
+  core:
+    path: prototypes/mir/core
+    may_require: []
+    may_mutate_data_raw: false
+
+  platform:
+    path: prototypes/mir/platform
+    may_require:
+      - core
+    may_read_factorio_globals: true
+    may_mutate_data_raw: false
+
+  domain:
+    path: prototypes/mir/domain
+    may_require:
+      - core
+    may_read_factorio_globals: false
+    may_mutate_data_raw: false
+
+  index:
+    path: prototypes/mir/index
+    may_require:
+      - core
+      - platform
+      - domain
+    may_mutate_data_raw: false
+
+  graph:
+    path: prototypes/mir/graph
+    may_require:
+      - core
+      - domain
+    may_mutate_data_raw: false
+
+  classify:
+    path: prototypes/mir/classify
+    may_require:
+      - core
+      - domain
+      - graph
+    may_mutate_data_raw: false
+
+  policy:
+    path: prototypes/mir/policy
+    may_require:
+      - core
+      - domain
+      - platform
+    may_mutate_data_raw: false
+
+  capabilities:
+    path: prototypes/mir/capabilities
+    may_require:
+      - core
+      - domain
+      - graph
+      - classify
+      - policy
+    may_mutate_data_raw: false
+
+  planner:
+    path: prototypes/mir/planner
+    may_require:
+      - core
+      - domain
+      - capabilities
+      - policy
+    may_mutate_data_raw: false
+
+  emit:
+    path: prototypes/mir/emit
+    may_require:
+      - core
+      - domain
+      - platform
+    may_mutate_data_raw: true
+
+  report:
+    path: prototypes/mir/report
+    may_require:
+      - core
+      - domain
+    may_mutate_data_raw: false
+
+  compatibility:
+    path: prototypes/mir/compatibility
+    may_require:
+      - core
+      - policy
+    may_mutate_data_raw: false
+
+  legacy:
+    path: prototypes/mir/legacy
+    may_require:
+      - core
+      - platform
+      - domain
+      - planner
+      - emit
+    may_mutate_data_raw: false
+
+current_boundary_allowlist:
+  prototype_mutators:
+    - data-final-fixes.lua
+    - prototypes/tech-gen.lua
+    - prototypes/base-tech-extensions.lua
+    - prototypes/pipeline-extent.lua
+    - prototypes/max-level-control.lua
+    - prototypes/weapon-speed-adjustments.lua
+    - prototypes/compat/competing-productivity.lua
+    - prototypes/compat/competing-base-extensions.lua
+    - prototypes/compat/productivity-family-adoption.lua
+
+forbidden_imports:
+  - from: prototypes/mir/domain
+    to: prototypes/mir/emit
+  - from: prototypes/mir/classify
+    to: prototypes/mir/platform/factorio/data_raw.lua
+  - from: prototypes/mir/compatibility
+    to: prototypes/mir/emit
+
+rules:
+  - only emission code mutates generated technologies
+  - compatibility packs register policy only
+  - domain modules do not read Factorio globals
+  - report modules do not mutate prototypes
+  - legacy wrappers do not introduce new behavior

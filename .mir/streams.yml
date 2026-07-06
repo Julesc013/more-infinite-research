@@ -1,0 +1,12 @@
+schema: 1
+
+canonical_machine_record: prototypes/planner/generated-stream-manifest.json
+stream_docs_root: docs/reference/schemas
+generated_id_doc: docs/reference/generated-id-reference.md
+
+rules:
+  - every generated technology has a stable manifest row
+  - released stream IDs are not renamed without migration review
+  - removed stream targets require migration review
+  - release notes mention generated stream changes
+  - stream docs describe contracts, not release-specific plans
