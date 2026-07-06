@@ -527,13 +527,13 @@ Idea-mod audit candidates should be promoted only after recipe-ID proof, balance
 | Native overlap policy | Lab, mining, solar, and other native productivity mods | General skip/warn/prefer/allow behavior with fixtures. |
 | Out-of-scope content families | Solar/entity replacement, runtime productivity, research-cost systems, radar/lab/logistics/content mods | Keep as diagnostics or compatibility fixtures only unless a future scope decision is made. |
 
-- [ ] Keep `docs/compatibility-program.md` and `docs/compatibility-matrix.md` current before making new compatibility claims.
+- [x] Keep `docs/compatibility-program.md` and `docs/compatibility-matrix.md` current before making new compatibility claims.
 - [ ] Add one structured audit row for each archive in `C:\Projects\Factorio\ideamods_mix` using the role enum and one-archive template.
 - [ ] Add audited-zip checksum records for local compatibility campaigns so future Mod Portal updates do not silently change what was proved.
 - [x] Build the compatibility planner/registry before broad new stream work, with typed facts, decisions, lab matrices, and report-only policy rows.
-- [ ] Keep "replace exactly" separate from "cooperate/skip/prefer external" in code, docs, changelog, and release notes.
+- [x] Keep "replace exactly" separate from "cooperate/skip/prefer external" in code, docs, changelog, and release notes.
 - [ ] Add save-compatibility notes before any feature removes, hides, or replaces external technologies that may already be researched.
-- [ ] Preserve the one-mod product rule: do not add separate product names, companion branding, or "Extended" labels to docs, release notes, or settings.
+- [x] Preserve the one-mod product rule: do not add separate product names, companion branding, or "Extended" labels to docs, release notes, or settings.
 - [ ] Keep settings labels plain and feature-family based; do not add per-mod settings or unimplemented option labels.
 - [ ] Require disabled-by-default prototype features to do no mutation and no broad scan at default values.
 - [ ] Keep prototype mutations behind startup settings; use runtime settings only for real runtime systems with performance and migration proof.
@@ -541,14 +541,14 @@ Idea-mod audit candidates should be promoted only after recipe-ID proof, balance
 - [x] Add loop-risk diagnostics before considering cap removal, recycler productivity, broad productivity eligibility, or beacon productivity.
 - [x] Build cap-aware diagnostics before adding balance-heavy productivity families.
 - [x] Treat Air Scrubbing filter productivity as a clean-filter-only stream candidate; prove scrubbing and cleaning recipes are excluded.
-- [ ] Keep upstream advertised Factorio versions as claim-lane metadata, not a blocker for fixture-backed support or future `2.0` backports.
-- [ ] Add `atan-ash` as the next same-author proof slice after Air Scrubbing and Nuclear Science.
+- [x] Keep upstream advertised Factorio versions as claim-lane metadata, not a blocker for fixture-backed support or future `2.0` backports.
+- [x] Add `atan-ash` as the next same-author proof slice after Air Scrubbing and Nuclear Science.
 - [x] Add `atan-nuclear-science` as a same-author proof slice through science-pack productivity.
 - [x] Add `big-mining-drill` as an existing mining-drill stream proof slice.
-- [ ] Add `FluidMustFlow`, `robot_attrition`, and `jetpack` as coexistence/load targets, not MIR-owned gameplay.
+- [x] Add `FluidMustFlow`, `robot_attrition`, and `jetpack` as coexistence/load targets, not MIR-owned gameplay.
 - [x] Add `aai-loaders` as an existing belt stream proof slice.
-- [ ] Add `equipment-gantry`, `aai-containers`, and `aai-industry` as procedural tuning targets before large overhaul campaigns.
-- [ ] Use the requested tuning set to refine discovery, normalization, classification, owner detection, lab/science derivation, rejection, and reporting before moving to K2.
+- [x] Add `equipment-gantry`, `aai-containers`, and `aai-industry` as procedural tuning targets before large overhaul campaigns.
+- [x] Use the requested tuning set to refine discovery, normalization, classification, owner detection, lab/science derivation, rejection, and reporting before moving to K2.
 - [ ] Treat ore-crushing productivity as the first broader family-stream candidate only if recipe-ID fixtures pass.
 - [ ] Require an explicit balance policy before shipping tile/surface productivity changes.
 - [ ] Limit any overhaul material-family slice to one concrete family with fixture-proven recipe IDs.

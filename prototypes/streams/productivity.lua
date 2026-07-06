@@ -177,6 +177,28 @@ return {
     }
   },
 
+  research_ash_separation = {
+    localised_name = {"", "Ash separation productivity"},
+    localised_description = {"technology-description.more-infinite-research.recipe_productivity"},
+    science_packs = "derive-from-unlocks",
+    prerequisites = "derive-from-unlocks",
+    settings_note = {"", "Targets only the exact ATAN Ash separation recipe. Landfill, brick, nutrient, foundation, tile, and recovery-style ash sinks stay outside this stream."},
+    manifest_id = "mir-prod-atan-ash-separation",
+    groups = {
+      {
+        change = 0.05,
+        recipe_patterns = {
+          "^atan%-ash%-seperation$"
+        }
+      }
+    },
+    icon_candidates = {
+      {item = "atan-ash"},
+      {technology = "atan-ash-processing"},
+      {item = "coal"}
+    }
+  },
+
   research_tungsten = { items={"tungsten-plate","tungsten-carbide"}, icon_item="tungsten-plate", icon_tech="tungsten-processing" },
   research_lithium = { icon_tech="lithium-processing", groups = {
     { change = 0.10, items = { "lithium-plate" } },
@@ -227,6 +249,9 @@ return {
   research_landfill = { icon_tech = "landfill", groups = {
     { change = 0.10, items = { "landfill" } },
     { change = 0.05, items = { "foundation" } }
+  }, exclude_recipe_patterns = {
+    "^atan%-landfill%-from%-ash$",
+    "^atan%-foundation%-from%-ash$"
   }, exclude_ingredient_patterns={"scrap"} },
 
   research_artificial_soil = { icon_tech = "artificial-soil", groups = {
@@ -252,6 +277,8 @@ return {
     { change = 0.10, items = { "stone-brick" } },
     { change = 0.05, items = { "concrete", "hazard-concrete" } },
     { change = 0.02, items = { "refined-concrete", "refined-hazard-concrete" } }
+  }, exclude_recipe_patterns = {
+    "^atan%-stone%-brick%-from%-ash$"
   }, exclude_ingredient_patterns={"scrap"} },
 
   research_furnace = { icon_tech = "advanced-material-processing-2", groups = {

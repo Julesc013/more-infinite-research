@@ -54,26 +54,73 @@
     },
     {
       "mod": "atan-ash",
-      "claim_lane": "planned fixture-backed stream family",
-      "claim_level": "ash processing candidate; tile/resource/recovery boundaries pending",
-      "mir_behavior": "planned",
-      "tested_by": [],
+      "claim_lane": "fixture-backed stream family",
+      "claim_level": "ash separation productivity only",
+      "mir_behavior": "research_ash_separation",
+      "tested_by": [
+        "mir-fixture-atan-ash",
+        "mir-fixture-assert-atan-ash-separation"
+      ],
       "backport_candidate": true
     },
     {
       "mod": "FluidMustFlow",
-      "claim_lane": "planned load/coexistence profile",
+      "claim_lane": "targeted local load check",
       "claim_level": "pipeline coexistence only",
       "mir_behavior": "diagnostics/coexistence",
-      "tested_by": [],
+      "tested_by": [
+        "release-targeted local repair check"
+      ],
+      "backport_candidate": true
+    },
+    {
+      "mod": "robot_attrition",
+      "claim_lane": "targeted local load check",
+      "claim_level": "runtime balance coexistence only",
+      "mir_behavior": "diagnostics/coexistence",
+      "tested_by": [
+        "release-targeted local repair check"
+      ],
+      "backport_candidate": true
+    },
+    {
+      "mod": "jetpack",
+      "claim_lane": "targeted local load check",
+      "claim_level": "equipment content coexistence only",
+      "mir_behavior": "diagnostics/coexistence",
+      "tested_by": [
+        "release-targeted local repair check"
+      ],
+      "backport_candidate": true
+    },
+    {
+      "mod": "equipment-gantry",
+      "claim_lane": "targeted local load check",
+      "claim_level": "equipment-grid automation coexistence only",
+      "mir_behavior": "diagnostics/coexistence",
+      "tested_by": [
+        "release-targeted local repair check"
+      ],
+      "backport_candidate": true
+    },
+    {
+      "mod": "aai-containers",
+      "claim_lane": "targeted local load check",
+      "claim_level": "storage content coexistence only",
+      "mir_behavior": "diagnostics/coexistence",
+      "tested_by": [
+        "release-targeted local repair check"
+      ],
       "backport_candidate": true
     },
     {
       "mod": "aai-industry",
-      "claim_lane": "planned mini-overhaul tuning profile",
+      "claim_lane": "targeted local load check",
       "claim_level": "recipe/science/lab/machine classification before suite claims",
-      "mir_behavior": "planned",
-      "tested_by": [],
+      "mir_behavior": "diagnostics/tuning-profile",
+      "tested_by": [
+        "release-targeted local repair check"
+      ],
       "backport_candidate": true
     }
   ]

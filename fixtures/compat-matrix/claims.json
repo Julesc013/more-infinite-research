@@ -38,6 +38,26 @@
       "public_text": "MIR covers visible AAI-style loader crafting recipes through belt productivity; it does not change loader throughput, modes, fluids, or compatibility hooks."
     },
     {
+      "mod": "atan-ash",
+      "claim_level": "ash separation productivity only",
+      "capabilities": {
+        "recipe-productivity": "generated",
+        "tile-surface": "diagnostic-only",
+        "resource-recovery": "diagnostic-only"
+      },
+      "tested_factorio": "2.1.9",
+      "tested_mod_versions": [],
+      "generated_streams": [
+        "mir-prod-atan-ash-separation"
+      ],
+      "fixtures": [
+        "mir-fixture-atan-ash",
+        "mir-fixture-assert-atan-ash-separation"
+      ],
+      "diagnostic_only": false,
+      "public_text": "MIR adds productivity to ATAN Ash separation only; landfill, brick, nutrient, foundation, tile, and recovery-style ash sink recipes remain outside this stream."
+    },
+    {
       "mod": "big-mining-drill",
       "claim_level": "mining drill recipe productivity only",
       "capabilities": {
@@ -70,6 +90,103 @@
       ],
       "diagnostic_only": false,
       "public_text": "MIR covers visible ATAN-style nuclear science pack recipes when the science pack is an active lab input; atom forge crafting remains outside this claim."
+    },
+    {
+      "mod": "FluidMustFlow",
+      "claim_level": "pipeline coexistence only",
+      "capabilities": {
+        "pipeline-extent": "coexistence-check",
+        "recipe-productivity": "diagnostic-only"
+      },
+      "tested_factorio": "2.1.9",
+      "tested_mod_versions": [],
+      "generated_streams": [],
+      "fixtures": [
+        "release-targeted local repair check"
+      ],
+      "diagnostic_only": true,
+      "public_text": "MIR load-checks Fluid Must Flow with the pipeline extent setting surface; MIR does not recreate duct behavior or fluid logistics."
+    },
+    {
+      "mod": "robot_attrition",
+      "claim_level": "runtime balance coexistence only",
+      "capabilities": {
+        "rule-surface": "coexistence-check",
+        "runtime-productivity": "not-owned"
+      },
+      "tested_factorio": "2.1.9",
+      "tested_mod_versions": [],
+      "generated_streams": [],
+      "fixtures": [
+        "release-targeted local repair check"
+      ],
+      "diagnostic_only": true,
+      "public_text": "MIR load-checks Robot Attrition as adjacent runtime balance content; MIR does not absorb robot crash, attrition, or recovery behavior."
+    },
+    {
+      "mod": "jetpack",
+      "claim_level": "equipment content coexistence only",
+      "capabilities": {
+        "equipment-content": "coexistence-check",
+        "runtime-movement": "not-owned"
+      },
+      "tested_factorio": "2.1.9",
+      "tested_mod_versions": [],
+      "generated_streams": [],
+      "fixtures": [
+        "release-targeted local repair check"
+      ],
+      "diagnostic_only": true,
+      "public_text": "MIR load-checks Jetpack as adjacent equipment and movement content; MIR does not absorb jetpack movement, fuel, or equipment behavior."
+    },
+    {
+      "mod": "equipment-gantry",
+      "claim_level": "equipment-grid automation coexistence only",
+      "capabilities": {
+        "equipment-grid-automation": "coexistence-check",
+        "recipe-productivity": "diagnostic-only"
+      },
+      "tested_factorio": "2.1.9",
+      "tested_mod_versions": [],
+      "generated_streams": [],
+      "fixtures": [
+        "release-targeted local repair check"
+      ],
+      "diagnostic_only": true,
+      "public_text": "MIR load-checks Equipment Gantry as adjacent equipment-grid automation content; MIR does not absorb gantry insertion, removal, or item-grid processing behavior."
+    },
+    {
+      "mod": "aai-containers",
+      "claim_level": "storage content coexistence only",
+      "capabilities": {
+        "storage-content": "coexistence-check",
+        "recipe-productivity": "diagnostic-only"
+      },
+      "tested_factorio": "2.1.9",
+      "tested_mod_versions": [],
+      "generated_streams": [],
+      "fixtures": [
+        "release-targeted local repair check"
+      ],
+      "diagnostic_only": true,
+      "public_text": "MIR load-checks AAI Containers as adjacent storage content; MIR does not create warehouse or container productivity streams."
+    },
+    {
+      "mod": "aai-industry",
+      "claim_level": "mini-overhaul tuning profile",
+      "capabilities": {
+        "recipe-classification": "coexistence-check",
+        "science-lab": "coexistence-check",
+        "machine-facts": "coexistence-check"
+      },
+      "tested_factorio": "2.1.9",
+      "tested_mod_versions": [],
+      "generated_streams": [],
+      "fixtures": [
+        "release-targeted local repair check"
+      ],
+      "diagnostic_only": true,
+      "public_text": "MIR load-checks AAI Industry as a mini-overhaul tuning profile; this is not a broad AAI suite support claim."
     }
   ]
 }

@@ -388,6 +388,8 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
   $pipelineExtentFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-pipeline-extent\data-final-fixes.lua")
   $betterBotBatteryFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-better-bot-battery-skip\data-final-fixes.lua")
   $airScrubbingFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-air-scrubbing-clean-filter\data-final-fixes.lua")
+  $atanAshFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\atan-ash\data.lua")
+  $atanAshAssertText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-atan-ash-separation\data-final-fixes.lua")
   $aaiLoaderFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-aai-loader-belt-productivity\data-final-fixes.lua")
   $bigMiningDrillFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-big-mining-drill-productivity\data-final-fixes.lua")
   $atanNuclearScienceFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-atan-nuclear-science-productivity\data-final-fixes.lua")
@@ -466,6 +468,9 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'research_sulfuric_acid_productivity = {' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'research_air_scrubbing_clean_filter = {' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'manifest_id = "mir-prod-air-scrubbing-clean-filter"' },
+    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'research_ash_separation = {' },
+    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'manifest_id = "mir-prod-atan-ash-separation"' },
+    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'research_ash_separation = "Ash separation productivity"' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = '"aai-turbo-loader"' },
     @{ File = "prototypes\util.lua"; Text = $utilText; Snippet = 'desired == "derive-from-unlocks"' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'research_air_scrubbing_clean_filter = "Air Scrubbing clean-filter productivity"' },
@@ -533,6 +538,10 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "fixtures\assert-pipeline-extent\data-final-fixes.lua"; Text = $pipelineExtentFixtureText; Snippet = 'DEFAULT_PIPELINE_EXTENT = 320' },
     @{ File = "fixtures\assert-air-scrubbing-clean-filter\data-final-fixes.lua"; Text = $airScrubbingFixtureText; Snippet = 'recipe-prod-research_air_scrubbing_clean_filter-1' },
     @{ File = "fixtures\assert-air-scrubbing-clean-filter\data-final-fixes.lua"; Text = $airScrubbingFixtureText; Snippet = 'atan-pollution-filter-cleaning' },
+    @{ File = "fixtures\atan-ash\data.lua"; Text = $atanAshFixtureText; Snippet = 'atan-ash-seperation' },
+    @{ File = "fixtures\atan-ash\data.lua"; Text = $atanAshFixtureText; Snippet = 'atan-foundation-from-ash' },
+    @{ File = "fixtures\assert-atan-ash-separation\data-final-fixes.lua"; Text = $atanAshAssertText; Snippet = 'recipe-prod-research_ash_separation-1' },
+    @{ File = "fixtures\assert-atan-ash-separation\data-final-fixes.lua"; Text = $atanAshAssertText; Snippet = 'atan-landfill-from-ash' },
     @{ File = "fixtures\assert-aai-loader-belt-productivity\data-final-fixes.lua"; Text = $aaiLoaderFixtureText; Snippet = 'aai-turbo-loader' },
     @{ File = "fixtures\assert-big-mining-drill-productivity\data-final-fixes.lua"; Text = $bigMiningDrillFixtureText; Snippet = 'big-mining-drill should use +0.05' },
     @{ File = "fixtures\assert-atan-nuclear-science-productivity\data-final-fixes.lua"; Text = $atanNuclearScienceFixtureText; Snippet = 'nuclear-science-pack did not receive science-pack productivity' },
@@ -1519,6 +1528,7 @@ $nonModFixtureDirs = @("compat-matrix", "run-profiles")
 $postMirAssertionFixtures = @(
   "mir-fixture-assert-aai-loader-belt-productivity",
   "mir-fixture-assert-air-scrubbing-clean-filter",
+  "mir-fixture-assert-atan-ash-separation",
   "mir-fixture-assert-atan-nuclear-science-productivity",
   "mir-fixture-assert-better-bot-battery-skip",
   "mir-fixture-assert-big-mining-drill-productivity",
@@ -2437,6 +2447,17 @@ $atanNuclearScienceLine = Get-LastStreamReportLine -Key "research_science_pack_p
 Assert-ReportLineGenerated -Line $atanNuclearScienceLine -Context "ATAN Nuclear Science science-pack productivity scenario"
 Assert-ReportLineContains -Line $atanNuclearScienceLine -Expected "nuclear-science-pack" -Context "ATAN Nuclear Science lab-input science scenario"
 Assert-ReportLineContains -Line $atanNuclearScienceLine -Expected "atan-nuclear-science" -Context "ATAN Nuclear Science unlock prerequisite scenario"
+
+Invoke-RuntimeScenario -ScenarioName "atan-ash-separation" -EnabledFixtureNames @(
+  "mir-fixture-atan-ash",
+  "mir-fixture-assert-atan-ash-separation"
+)
+$atanAshLine = Get-LastStreamReportLine -Key "research_ash_separation"
+Assert-ReportLineGenerated -Line $atanAshLine -Context "ATAN Ash separation productivity scenario"
+Assert-ReportLineContains -Line $atanAshLine -Expected "effects=1" -Context "ATAN Ash separation effect count scenario"
+Assert-ReportLineContains -Line $atanAshLine -Expected "atan-ash-processing" -Context "ATAN Ash unlock prerequisite scenario"
+Assert-NoDiagnosticReportLineContaining -Kind "stream" -Key "research_landfill" -Unexpected "atan-landfill-from-ash" -Context "ATAN Ash landfill sink exclusion scenario"
+Assert-NoDiagnosticReportLineContaining -Kind "stream" -Key "research_concrete" -Unexpected "atan-stone-brick-from-ash" -Context "ATAN Ash brick sink exclusion scenario"
 
 Invoke-RuntimeScenario -ScenarioName "air-scrubbing-clean-filter" -EnabledFixtureNames @(
   "mir-fixture-air-scrubbing",

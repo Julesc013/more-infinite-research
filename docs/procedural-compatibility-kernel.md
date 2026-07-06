@@ -95,6 +95,7 @@ Current lanes:
 | `mining-drill-manufacturing` | Finds item `place_result` mining-drill entities whose item has a visible recipe. | Existing mining-drill productivity stream when matched. |
 | `native-modifier-ownership` | Reports technology owners for selected native modifiers such as lab productivity, mining yield, belt stack size, and robot modifiers. | No new emission; policy remains conservative. |
 | Air Scrubbing clean filters | Exact policy for clean pollution and spore filter crafting recipes. | Dedicated exact stream `mir-prod-air-scrubbing-clean-filter`. |
+| ATAN Ash separation | Exact policy for the ash separation recipe. Ash sink conversions remain outside MIR streams. | Dedicated exact stream `mir-prod-atan-ash-separation`. |
 | Dynamic science packs | Active lab inputs with visible recipes can join science-pack productivity. | Existing science-pack productivity stream. |
 
 Planned lanes stay separate:

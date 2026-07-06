@@ -11,9 +11,13 @@ Date: 2026-07-06
     - Added useful-level estimates to recipe productivity cap reports.
     - Added Air Scrubbing clean-filter productivity for exact pollution and spore filter crafting recipes.
     - Kept Air Scrubbing scrubbing, cleaning, recovery, and environmental-removal recipes diagnostic-only.
+    - Added ATAN Ash separation productivity for the exact ash separation recipe.
+    - Kept ATAN Ash landfill, brick, nutrient, foundation, tile, and recovery-style ash sinks outside MIR streams.
     - Added AAI-style loader recipe coverage to transport belt productivity.
     - Added Big Mining Drill coverage through mining drill productivity.
     - Added ATAN-style Nuclear Science coverage through science-pack productivity.
+    - Added compatibility coverage for Fluid Must Flow, Robot Attrition, Jetpack, and Equipment Gantry.
+    - Added compatibility coverage for AAI Containers and AAI Industry.
     - Added capability diagnostics for entity-backed loader crafting recipes.
     - Added capability diagnostics for entity-backed mining-drill crafting recipes.
     - Added native modifier ownership diagnostics for selected lab, mining, logistics, and robot modifiers.

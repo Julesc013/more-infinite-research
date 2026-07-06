@@ -154,6 +154,7 @@ local stream_sort_names = {
   research_agricultural_growth_speed = "Agricultural growth speed",
   research_air_scrubbing_clean_filter = "Air Scrubbing clean-filter productivity",
   research_armor_components = "Armor component productivity",
+  research_ash_separation = "Ash separation productivity",
   research_bacteria_cultivation = "Bacteria cultivation productivity",
   research_batteries = "Battery productivity",
   research_belts = "Transport belt productivity",

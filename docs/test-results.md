@@ -2,6 +2,38 @@
 
 This file records local release-candidate validation runs. It is not a substitute for the manual mod matrix in `docs/compatibility.md`.
 
+## 2026-07-07 2.2.0 Final Fixture Validation
+
+Environment:
+
+- Branch: `dev`.
+- Mod version `2.2.0`.
+- Factorio binary: Steam Factorio `2.1.9`.
+- Validation artifact: `build\validation-dist\more-infinite-research_2.2.0.zip`.
+- Release artifact: `dist\more-infinite-research_2.2.0.zip`.
+- Release artifact SHA256: `BB5822655BA67DC9788EEEB46C067793136BD4C3F0F1C587FCC669833867DF66`.
+
+Scope:
+
+- Added fixture-backed ATAN Ash separation productivity for exact `atan-ash-seperation`.
+- Proved ATAN Ash landfill, brick, nutrient, foundation, tile, and recovery-style ash sink recipes remain outside MIR-owned streams.
+- Kept Fluid Must Flow, Robot Attrition, Jetpack, Equipment Gantry, AAI Containers, and AAI Industry as targeted coexistence/load claims rather than MIR-owned productivity streams.
+- Kept AAI Loaders and Big Mining Drill routed through the existing belt and mining-drill productivity streams.
+
+Commands:
+
+```powershell
+.\scripts\Invoke-MIRValidation.ps1 -StaticOnly
+.\scripts\Invoke-MIRValidation.ps1 -FactorioBin 'C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe'
+.\scripts\Build-MIRPackage.ps1
+```
+
+Results:
+
+- Static validation passed, including compatibility policy, claim, and generated-stream manifest linting.
+- Runtime fixture validation passed across the full Factorio load-test matrix.
+- Package hygiene validation rebuilt the validation archive and release archive without shipping docs, fixtures, scripts, `todo.md`, or contribution docs.
+
 ## 2026-07-07 2.2.0 Compatibility Platform Policy Pass
 
 Environment:
