@@ -13,6 +13,10 @@ More Infinite Research adds **configurable infinite productivity** and **bonus r
 logistics chains, combat bonuses, player bonuses, and Space Age gaps that vanilla Factorio does not cover.
 
 Legacy transition releases **`1.9.0`** through **`1.9.2`** target **Factorio `2.0`** and require `base >= 2.0`.
+The `1.9.2` legacy package is the Factorio `2.0` port of the tested `2.2.0`
+source snapshot. It keeps compatible `2.2.0` behavior, uses hidden optional
+`quality` and optional `space-age`, and intentionally excludes Factorio `2.1`
+cargo logistics modifiers.
 
 Version **`2.x.x`** through **`2.2.0`** targets **Factorio `2.1`** and requires:
 
@@ -28,7 +32,7 @@ The mod is built around **graceful compatibility**: it discovers recipes, scienc
 
 - **Recipe productivity:** adds infinite research for intermediate, logistics, combat, infrastructure, science-pack, and Space Age production chains.
 - **Fluid-output productivity:** adds process-family recipe productivity for oil processing, oil cracking, lubricant, sulfuric acid, acid neutralization, and Space Age thruster propellant fluids where those recipes exist.
-- **Direct-effect bonuses:** adds infinite research for cargo logistics, weapon speed, character bonuses, combined character inventory/trash slots, and worker robot battery.
+- **Direct-effect bonuses:** adds infinite research for weapon speed, character bonuses, combined character inventory/trash slots, and worker robot battery. Factorio `2.1` cargo logistics bonuses are excluded from legacy `1.9.x` packages.
 - **Fluid prototype tuning:** includes an opt-in startup-only pipeline extent multiplier dropdown, default `100%`/unchanged.
 - **Vanilla continuations:** extends selected finite vanilla technology chains into infinite continuations.
 - **Science-pack discovery:** reads active lab inputs, not the old `tool` prototype type.

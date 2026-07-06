@@ -4,9 +4,9 @@
   "title": "MIR Fixture - Assert Pipeline Extent",
   "author": "Julesc013",
   "description": "Validation fixture that asserts MIR's opt-in pipeline extent multiplier is applied to common fluid boxes.",
-  "factorio_version": "2.1",
+  "factorio_version": "2.0",
   "dependencies": [
-    "base >= 2.1.8",
+    "base >= 2.0",
     "more-infinite-research"
   ]
 }

@@ -665,16 +665,17 @@ Do not reconstruct old releases commit-by-commit for `legacy`. A legacy release 
 
 ### v1.9.2 Backport From The Tested v2.2.0 Snapshot
 
-- [ ] Install or verify a real Factorio `2.0` Space Age-capable binary at `D:\Programs\Factorio`.
-- [ ] Create `tmp/2.0` from the tested `2.2.0` source point.
-- [ ] Set the backport metadata to `version = 1.9.2`, `factorio_version = 2.0`, and `base >= 2.0`.
-- [ ] Remove or guard Factorio `2.1`-only technology modifiers and prototype surfaces in the backport branch.
-- [ ] Run static validation on `tmp/2.0`.
-- [ ] Run runtime validation on `tmp/2.0` with `D:\Programs\Factorio\bin\x64\factorio.exe`.
-- [ ] Run `release-targeted-2.0` against `C:\Projects\Factorio\testmods_2.0`.
+- [x] Install or verify a real Factorio `2.0` Space Age-capable binary at `D:\Programs\Factorio\2.0`.
+- [x] Create `tmp/2.0` from the tested `2.2.0` source point.
+- [x] Set the backport metadata to `version = 1.9.2`, `factorio_version = 2.0`, and `base >= 2.0`.
+- [x] Remove or guard Factorio `2.1`-only technology modifiers and prototype surfaces in the backport branch.
+- [x] Run static validation on `tmp/2.0`.
+- [x] Run runtime validation on `tmp/2.0` with `D:\Programs\Factorio\2.0\bin\x64\factorio.exe`.
+- [x] Run `release-targeted-2.0` against `C:\Projects\Factorio\testmods_2.0`.
 - [ ] Bring portable fixes discovered on `tmp/2.0` back to `dev` without merging target-line metadata downgrades.
 - [ ] Revalidate `dev` with the Steam Factorio `2.1` binary after any portable fixes.
-- [ ] Merge the validated `tmp/2.0` port into `legacy` and release `1.9.2`.
+- [ ] Merge the validated `tmp/2.0` port into `legacy`.
+- [ ] Release `1.9.2` from `legacy` after maintainer review/testing.
 - [ ] After `1.9.2`, start the `3.0.0` compatibility-compiler line on `dev` under the new versioning scheme.
 
 ### v1.9.1 Backport From The Tested v2.1.0 Snapshot

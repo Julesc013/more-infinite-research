@@ -32,13 +32,17 @@ if base_lab then
   }
 
   local pack = {
-    type = "item",
+    type = "tool",
     name = "mir-custom-only-science-pack",
     icon = "__base__/graphics/icons/logistic-science-pack.png",
     icon_size = 64,
     subgroup = "science-pack",
     order = "z[mir-custom-only-science-pack]",
-    stack_size = 200
+    stack_size = 200,
+    durability = 1,
+    durability_description_key = "description.science-pack-remaining-amount-key",
+    factoriopedia_durability_description_key = "description.factoriopedia-science-pack-remaining-amount-key",
+    durability_description_value = "description.science-pack-remaining-amount-value"
   }
 
   data:extend({item, pack, custom})

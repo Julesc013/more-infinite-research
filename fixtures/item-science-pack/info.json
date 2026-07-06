@@ -4,8 +4,8 @@
   "title": "MIR Fixture - Item Science Pack",
   "author": "Julesc013",
   "description": "Test fixture that adds a science pack as a plain item and inserts it into labs.",
-  "factorio_version": "2.1",
+  "factorio_version": "2.0",
   "dependencies": [
-    "base >= 2.1.8"
+    "base >= 2.0"
   ]
 }

@@ -2,6 +2,49 @@
 
 This file records local release-candidate validation runs. It is not a substitute for the manual mod matrix in `docs/compatibility.md`.
 
+## 2026-07-07 1.9.2 Factorio 2.0 Backport Gate
+
+Environment:
+
+- Branch: `tmp/2.0`.
+- Source snapshot: tested More Infinite Research `2.2.0` source point.
+- Backport mod version: `1.9.2`.
+- Target Factorio line: `2.0`.
+- Factorio binary: `D:\Programs\Factorio\2.0\bin\x64\factorio.exe`.
+- Factorio version: `2.0.77` build `84539`, Windows `full`.
+- Release artifact: `dist\more-infinite-research_1.9.2.zip`.
+- Release artifact SHA256: `AD8464761572C07C41DFAB6E826CC70774414248DCC4A7A67AA76A6D21335F17`.
+- Release artifact size: `236530` bytes.
+
+Scope:
+
+- Merged the released `2.2.0` source point into `tmp/2.0`.
+- Patched legacy metadata to `version = 1.9.2`, `factorio_version = 2.0`, and
+  `base >= 2.0`.
+- Removed Factorio `2.1` cargo logistics technology modifiers from the legacy
+  direct-effect stream definitions.
+- Converted local 2.0 science-pack fixtures to `tool` prototypes and guarded
+  research-ingredient discovery so Factorio `2.0` ignores item-only lab inputs.
+- Confirmed the package excludes developer-only `docs/`, `fixtures/`,
+  `scripts/`, `todo.md`, and `CONTRIBUTING.md`.
+
+Commands:
+
+```powershell
+git diff --check
+.\scripts\Invoke-MIRValidation.ps1 -StaticOnly
+.\scripts\Invoke-MIRValidation.ps1 -FactorioBin 'D:\Programs\Factorio\2.0\bin\x64\factorio.exe'
+.\scripts\Build-MIRPackage.ps1
+```
+
+Results:
+
+- Static validation passed.
+- Full runtime fixture validation passed against Factorio `2.0.77`.
+- Factorio `2.1` cargo runtime fixture scenarios were skipped by legacy
+  metadata, as intended.
+- Package rebuild passed and produced the `1.9.2` release candidate archive.
+
 ## 2026-07-07 2.2.0 Final Package Refresh And Docs Review
 
 Environment:
