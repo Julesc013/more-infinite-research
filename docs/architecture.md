@@ -180,6 +180,23 @@ diagnostic-only blockers; reports obvious loop-risk flags; reports lab matrices;
 and carries useful-level estimates for cap warnings. This path is report-only:
 unknown or risky mod behavior is observed before any new automatic stream emits.
 
+`v2.2.0` also starts the procedural compatibility kernel documented in
+`docs/procedural-compatibility-kernel.md`. The first capability resolvers are
+report-first:
+
+- loader manufacturing classification from item `place_result`, placed loader
+  entity type, and recipe output evidence;
+- mining-drill manufacturing classification from item `place_result`, placed
+  mining-drill entity type, and recipe output evidence;
+- native modifier ownership observation for selected lab, mining, logistics, and
+  robot effect types.
+
+Those rows explain existing MIR behavior; they do not create a general
+productivity generator. Existing streams still own emission. For example, loader
+recipes are covered by belt productivity when visible, mining-drill recipes are
+covered by mining drill productivity when visible, and native mining-yield
+modifiers remain separate from drill manufacturing productivity.
+
 ## Diagnostics
 
 `mir-debug-generation-report` enables a structured log report. The report records generated and skipped streams/extensions with:
@@ -196,7 +213,7 @@ unknown or risky mod behavior is observed before any new automatic stream emits.
 
 Use this setting when triaging user reports. It is off by default to avoid noisy logs.
 
-When `mir-debug-generation-report` is enabled, MIR also emits an `Audit report` block with stable `audit schema=1 kind=...` rows. These rows mirror stream, extension, native-overlap, recipe-owner, compatibility-role, compatibility-plan, recipe-cap, fact-registry, decision, rule-mutation, loop-risk, and lab-matrix decisions in a parser-friendly key/value format for `scripts/Invoke-MIRCompatAudit.ps1` and future large-mod compatibility sweeps.
+When `mir-debug-generation-report` is enabled, MIR also emits an `Audit report` block with stable `audit schema=1 kind=...` rows. These rows mirror stream, extension, native-overlap, recipe-owner, compatibility-role, compatibility-plan, recipe-cap, fact-registry, decision, rule-mutation, loop-risk, lab-matrix, and capability decisions in a parser-friendly key/value format for `scripts/Invoke-MIRCompatAudit.ps1` and future large-mod compatibility sweeps.
 
 Recipe-cap diagnostics compare generated recipe-productivity effects with the
 recipe's `maximum_productivity` value. Default caps stay quiet except for the

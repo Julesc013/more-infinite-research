@@ -33,6 +33,7 @@
       "claim_lane": "fixture-backed stream family",
       "claim_level": "mining drill recipe productivity only",
       "mir_behavior": "research_mining_drill",
+      "capability_lane": "mining-drill-manufacturing",
       "tested_by": [
         "mir-fixture-big-mining-drill",
         "mir-fixture-assert-big-mining-drill-productivity"
@@ -44,6 +45,7 @@
       "claim_lane": "fixture-backed stream family",
       "claim_level": "loader crafting productivity only",
       "mir_behavior": "research_belts",
+      "capability_lane": "logistics-loader-manufacturing",
       "tested_by": [
         "mir-fixture-aai-loaders",
         "mir-fixture-assert-aai-loader-belt-productivity"

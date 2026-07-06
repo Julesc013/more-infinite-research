@@ -439,6 +439,26 @@ loop-risk rows, rule-surface rows, owner summaries, and useful cap estimates.
 These rows are evidence for future policy gates; they are not broad automatic
 support claims.
 
+The procedural compatibility kernel is documented in
+`docs/procedural-compatibility-kernel.md`. Its first capability resolvers are
+report-first:
+
+- `logistics-loader-manufacturing` classifies loader crafting recipes from item,
+  placed entity, and recipe-output evidence, then reports whether the existing
+  belt productivity stream emitted them.
+- `mining-drill-manufacturing` classifies drill crafting recipes from item,
+  placed entity, and recipe-output evidence, then reports whether the existing
+  mining-drill productivity stream emitted them.
+- `native-modifier-ownership` reports owners for selected native modifiers,
+  including lab productivity, mining yield, logistics stack size, and robot
+  bonuses, without stacking or replacing them broadly.
+
+The resolver contract is `discover -> classify -> propose -> validate -> emit
+-> diagnose`. In the current implementation, "emit" means "observe the stream or
+policy that already emitted". A future resolver can create new technologies only
+after it has stable stream IDs, fixture coverage, owner checks, lab checks, cap
+diagnostics, and loop-risk denials.
+
 The long-term data-stage shape should be:
 
 ```text

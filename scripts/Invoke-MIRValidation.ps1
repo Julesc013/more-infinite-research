@@ -855,6 +855,7 @@ Invoke-RepoCheck "2.2.0 compiler diagnostics are wired" {
   $dataFinalFixesText = Get-Content -Raw -LiteralPath (Join-Path $repo "data-final-fixes.lua")
   $diagnosticsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\diagnostics.lua")
   $factRegistryPath = Join-Path $repo "prototypes\lib\facts\registry.lua"
+  $capabilityRegistryPath = Join-Path $repo "prototypes\lib\capabilities\registry.lua"
   $compilerPath = Join-Path $repo "prototypes\planner\compiler.lua"
   $converterText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\Convert-MIRCompatAuditResults.ps1")
   $overnightSummaryText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\Show-MIROvernightSummary.ps1")
@@ -866,22 +867,35 @@ Invoke-RepoCheck "2.2.0 compiler diagnostics are wired" {
   if (-not (Test-Path -LiteralPath $compilerPath)) {
     throw "Missing compiler diagnostics module: prototypes\planner\compiler.lua"
   }
+  if (-not (Test-Path -LiteralPath $capabilityRegistryPath)) {
+    throw "Missing capability registry: prototypes\lib\capabilities\registry.lua"
+  }
 
   $factRegistryText = Get-Content -Raw -LiteralPath $factRegistryPath
+  $capabilityRegistryText = Get-Content -Raw -LiteralPath $capabilityRegistryPath
   $compilerText = Get-Content -Raw -LiteralPath $compilerPath
 
   $requiredSnippets = @(
     @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'require("prototypes.planner.compiler").emit()' },
     @{ File = "prototypes\diagnostics.lua"; Text = $diagnosticsText; Snippet = 'function D.decision(row)' },
+    @{ File = "prototypes\diagnostics.lua"; Text = $diagnosticsText; Snippet = '.. " capability=" .. tostring(row.capability or "")' },
+    @{ File = "prototypes\diagnostics.lua"; Text = $diagnosticsText; Snippet = '.. " evidence=" .. tostring(row.evidence or "")' },
     @{ File = "prototypes\diagnostics.lua"; Text = $diagnosticsText; Snippet = 'append("rule_mutation", row)' },
     @{ File = "prototypes\diagnostics.lua"; Text = $diagnosticsText; Snippet = 'append("loop_risk", row)' },
     @{ File = "prototypes\diagnostics.lua"; Text = $diagnosticsText; Snippet = 'append("lab_matrix", row)' },
     @{ File = "prototypes\lib\facts\registry.lua"; Text = $factRegistryText; Snippet = 'RecipeFact' },
     @{ File = "prototypes\lib\facts\registry.lua"; Text = $factRegistryText; Snippet = 'RuleMutationFact' },
     @{ File = "prototypes\lib\facts\registry.lua"; Text = $factRegistryText; Snippet = 'build_loop_risk_facts' },
+    @{ File = "prototypes\lib\capabilities\registry.lua"; Text = $capabilityRegistryText; Snippet = 'Capability resolvers are report-first' },
+    @{ File = "prototypes\lib\capabilities\registry.lua"; Text = $capabilityRegistryText; Snippet = 'id = "logistics-loader-manufacturing"' },
+    @{ File = "prototypes\lib\capabilities\registry.lua"; Text = $capabilityRegistryText; Snippet = 'id = "mining-drill-manufacturing"' },
+    @{ File = "prototypes\lib\capabilities\registry.lua"; Text = $capabilityRegistryText; Snippet = 'id = "native-modifier-ownership"' },
+    @{ File = "prototypes\lib\capabilities\registry.lua"; Text = $capabilityRegistryText; Snippet = 'entity_backed_candidates' },
+    @{ File = "prototypes\lib\capabilities\registry.lua"; Text = $capabilityRegistryText; Snippet = 'discover,classify,propose,validate,emit,diagnose' },
     @{ File = "prototypes\planner\compiler.lua"; Text = $compilerText; Snippet = 'D.fact_registry({' },
     @{ File = "prototypes\planner\compiler.lua"; Text = $compilerText; Snippet = 'D.decision({' },
     @{ File = "prototypes\planner\compiler.lua"; Text = $compilerText; Snippet = 'emit_generated_technology_decisions' },
+    @{ File = "prototypes\planner\compiler.lua"; Text = $compilerText; Snippet = 'capabilities.emit(registry)' },
     @{ File = "prototypes\compat\planner.lua"; Text = $compatPlannerText; Snippet = 'useful_level_estimate = levels' },
     @{ File = "prototypes\compat\planner.lua"; Text = $compatPlannerText; Snippet = '["atan-ash"] = {' },
     @{ File = "prototypes\compat\planner.lua"; Text = $compatPlannerText; Snippet = '["atan-nuclear-science"] = {' },
@@ -895,6 +909,8 @@ Invoke-RepoCheck "2.2.0 compiler diagnostics are wired" {
     @{ File = "prototypes\compat\planner.lua"; Text = $compatPlannerText; Snippet = '["aai-loaders"] = {' },
     @{ File = "prototypes\compat\planner.lua"; Text = $compatPlannerText; Snippet = 'belt_productivity_loader_recipe_candidate' },
     @{ File = "scripts\Convert-MIRCompatAuditResults.ps1"; Text = $converterText; Snippet = '"fact_registry", "decision", "rule_mutation", "loop_risk", "lab_matrix"' },
+    @{ File = "scripts\Convert-MIRCompatAuditResults.ps1"; Text = $converterText; Snippet = 'capability = [string](Get-MIRObjectProperty -Object $row -Name "capability")' },
+    @{ File = "scripts\Convert-MIRCompatAuditResults.ps1"; Text = $converterText; Snippet = '## Capability Decisions' },
     @{ File = "scripts\Convert-MIRCompatAuditResults.ps1"; Text = $converterText; Snippet = "Loop Risk Diagnostics" },
     @{ File = "scripts\Show-MIROvernightSummary.ps1"; Text = $overnightSummaryText; Snippet = "rule_surfaces" }
   )
@@ -970,8 +986,10 @@ Invoke-RepoCheck "compatibility support lanes are wired" {
     '"mod": "atan-nuclear-science"',
     '"mir-fixture-assert-atan-nuclear-science-productivity"',
     '"mod": "big-mining-drill"',
+    '"capability_lane": "mining-drill-manufacturing"',
     '"mir-fixture-assert-big-mining-drill-productivity"',
     '"mod": "aai-loaders"',
+    '"capability_lane": "logistics-loader-manufacturing"',
     '"mir-fixture-assert-aai-loader-belt-productivity"',
     '"backport_candidate": true'
   )
@@ -2234,6 +2252,10 @@ Assert-ReportLineContains -Line $labMatrixLine -Expected "reason=lab_inputs_inde
 $generatedDecisionLine = Get-LastDiagnosticReportLine -Kind "decision" -Key "recipe-prod-research_lab_productivity-1"
 Assert-ReportLineContains -Line $generatedDecisionLine -Expected "decision=generate_stream" -Context "Base compiler generated decision scenario"
 Assert-ReportLineContains -Line $generatedDecisionLine -Expected "stable_stream_id=recipe-prod-research_lab_productivity-1" -Context "Base compiler stable ID scenario"
+$nativeLabCapabilityLine = Get-DiagnosticReportLineContaining -Kind "decision" -Key "laboratory-productivity" -Expected "capability=native-modifier-ownership"
+Assert-ReportLineContains -Line $nativeLabCapabilityLine -Expected "decision=observe_existing_owner" -Context "Native modifier ownership resolver scenario"
+$nativeMiningCapabilityLine = Get-DiagnosticReportLineContaining -Kind "decision" -Key "mining-drill-productivity-bonus" -Expected "capability=native-modifier-ownership"
+Assert-ReportLineContains -Line $nativeMiningCapabilityLine -Expected "subfamily=native_mining_yield" -Context "Native mining-yield resolver scenario"
 
 Invoke-RuntimeScenario -ScenarioName "recipe-cap-diagnostics" -EnabledFixtureNames @(
   "mir-fixture-recipe-cap-diagnostics"
@@ -2329,6 +2351,10 @@ Invoke-RuntimeScenario -ScenarioName "aai-loader-belt-productivity" -EnabledFixt
 )
 $aaiLoaderBeltLine = Get-LastStreamReportLine -Key "research_belts"
 Assert-ReportLineGenerated -Line $aaiLoaderBeltLine -Context "AAI loader belt productivity scenario"
+$aaiLoaderCapabilityLine = Get-DiagnosticReportLineContaining -Kind "decision" -Key "aai-turbo-loader" -Expected "capability=logistics-loader-manufacturing"
+Assert-ReportLineContains -Line $aaiLoaderCapabilityLine -Expected "decision=generate_stream" -Context "AAI loader capability resolver scenario"
+Assert-ReportLineContains -Line $aaiLoaderCapabilityLine -Expected "subfamily=loader" -Context "AAI loader capability subfamily scenario"
+Assert-ReportLineContains -Line $aaiLoaderCapabilityLine -Expected "evidence=item_type:item,item_place_result:aai-turbo-loader,entity_type:loader-1x1,recipe_outputs_item:aai-turbo-loader" -Context "AAI loader entity-backed evidence scenario"
 
 Invoke-RuntimeScenario -ScenarioName "big-mining-drill-productivity" -EnabledFixtureNames @(
   "mir-fixture-big-mining-drill",
@@ -2336,6 +2362,10 @@ Invoke-RuntimeScenario -ScenarioName "big-mining-drill-productivity" -EnabledFix
 )
 $bigMiningDrillLine = Get-LastStreamReportLine -Key "research_mining_drill"
 Assert-ReportLineGenerated -Line $bigMiningDrillLine -Context "Big Mining Drill productivity scenario"
+$bigMiningCapabilityLine = Get-DiagnosticReportLineContaining -Kind "decision" -Key "big-mining-drill" -Expected "capability=mining-drill-manufacturing"
+Assert-ReportLineContains -Line $bigMiningCapabilityLine -Expected "decision=generate_stream" -Context "Big Mining Drill capability resolver scenario"
+Assert-ReportLineContains -Line $bigMiningCapabilityLine -Expected "subfamily=mining_drill" -Context "Big Mining Drill capability subfamily scenario"
+Assert-ReportLineContains -Line $bigMiningCapabilityLine -Expected "evidence=item_type:item,item_place_result:big-mining-drill,entity_type:mining-drill,recipe_outputs_item:big-mining-drill" -Context "Big Mining Drill entity-backed evidence scenario"
 
 Invoke-RuntimeScenario -ScenarioName "atan-nuclear-science-productivity" -EnabledFixtureNames @(
   "mir-fixture-atan-nuclear-science",
@@ -2360,20 +2390,20 @@ Assert-ReportLineContains -Line $airScrubbingPlanLine -Expected "reason=air_scru
 Assert-ReportLineContains -Line $airScrubbingPlanLine -Expected "generated=2" -Context "Air Scrubbing generated target count scenario"
 Assert-ReportLineContains -Line $airScrubbingPlanLine -Expected "rejected=4" -Context "Air Scrubbing rejected target count scenario"
 Assert-ReportLineContains -Line $airScrubbingPlanLine -Expected "unknown=1" -Context "Air Scrubbing unknown target count scenario"
-$airScrubbingAllowedDecision = Get-LastDiagnosticReportLine -Kind "decision" -Key "atan-pollution-filter"
+$airScrubbingAllowedDecision = Get-DiagnosticReportLineContaining -Kind "decision" -Key "atan-pollution-filter" -Expected "stable_stream_id=mir-prod-air-scrubbing-clean-filter"
 Assert-ReportLineContains -Line $airScrubbingAllowedDecision -Expected "decision=generate_stream" -Context "Air Scrubbing allowed decision scenario"
 Assert-ReportLineContains -Line $airScrubbingAllowedDecision -Expected "stable_stream_id=mir-prod-air-scrubbing-clean-filter" -Context "Air Scrubbing stable stream ID scenario"
-$airScrubbingScrubDecision = Get-LastDiagnosticReportLine -Kind "decision" -Key "atan-pollution-scrubbing"
+$airScrubbingScrubDecision = Get-DiagnosticReportLineContaining -Kind "decision" -Key "atan-pollution-scrubbing" -Expected "risks=scrubbing_environmental"
 Assert-ReportLineContains -Line $airScrubbingScrubDecision -Expected "decision=diagnose_only" -Context "Air Scrubbing scrubbing deny decision scenario"
 Assert-ReportLineContains -Line $airScrubbingScrubDecision -Expected "risks=scrubbing_environmental" -Context "Air Scrubbing scrubbing risk scenario"
 $airScrubbingScrubRisk = Get-DiagnosticReportLineContaining -Kind "loop_risk" -Key "atan-pollution-scrubbing" -Expected "risks=scrubbing_environmental"
 Assert-ReportLineContains -Line $airScrubbingScrubRisk -Expected "risks=scrubbing_environmental" -Context "Air Scrubbing scrubbing loop-risk scenario"
-$airScrubbingCleaningDecision = Get-LastDiagnosticReportLine -Kind "decision" -Key "atan-pollution-filter-cleaning"
+$airScrubbingCleaningDecision = Get-DiagnosticReportLineContaining -Kind "decision" -Key "atan-pollution-filter-cleaning" -Expected "risks=cleaning_recovery"
 Assert-ReportLineContains -Line $airScrubbingCleaningDecision -Expected "decision=diagnose_only" -Context "Air Scrubbing cleaning deny decision scenario"
 Assert-ReportLineContains -Line $airScrubbingCleaningDecision -Expected "risks=cleaning_recovery" -Context "Air Scrubbing cleaning risk scenario"
 $airScrubbingCleaningRisk = Get-DiagnosticReportLineContaining -Kind "loop_risk" -Key "atan-pollution-filter-cleaning" -Expected "risks=cleaning_recovery"
 Assert-ReportLineContains -Line $airScrubbingCleaningRisk -Expected "risks=cleaning_recovery" -Context "Air Scrubbing cleaning loop-risk scenario"
-$airScrubbingUnknownDecision = Get-LastDiagnosticReportLine -Kind "decision" -Key "atan-filter-resin"
+$airScrubbingUnknownDecision = Get-DiagnosticReportLineContaining -Kind "decision" -Key "atan-filter-resin" -Expected "decision=observe_unknown"
 Assert-ReportLineContains -Line $airScrubbingUnknownDecision -Expected "decision=observe_unknown" -Context "Air Scrubbing unknown related decision scenario"
 
 Invoke-RuntimeScenario -ScenarioName "pipeline-extent-multiplier" -EnabledFixtureNames @(

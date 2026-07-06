@@ -1,12 +1,12 @@
 # API Proof Points
 
-Updated: 2026-07-03
+Updated: 2026-07-06
 
 This ledger records API claims that affect release planning. Use it to avoid turning Reddit ideas or memory into implementation assumptions.
 
 Official Factorio API references should be rechecked before a release if the local Factorio version changes.
 
-Latest official API docs checked on 2026-07-03: `2.1.9`. Local runtime validation evidence in `docs/test-results.md` now includes Factorio `2.1.9`.
+Latest official API docs checked on 2026-07-06: `2.1.9`. Local runtime validation evidence in `docs/test-results.md` now includes Factorio `2.1.9`.
 
 ## Verified Or Locally Proven
 
@@ -40,6 +40,11 @@ Latest official API docs checked on 2026-07-03: `2.1.9`. Local runtime validatio
 | `FluidBox.max_pipeline_extent` applies to a pipeline through the minimum extent of all fluid boxes in that pipeline | Factorio `FluidBox` docs plus runtime pipeline fixture | Verified | MIR's current pipeline multiplier is a global fluidbox prototype extension, not only a pipe-entity extension |
 | `FluidBox` is used by many prototype classes, including pipes, pipe-to-ground, pumps, storage tanks, crafting machines, mining drills, generators, thrusters, and valves | Factorio `FluidBox` docs | Verified | Pipeline extent docs must warn that non-default values can affect machine/tank/thruster/modded fluid boxes |
 | Technology modifier list includes cargo landing pad count, cargo bay unloading distance, and recipe productivity | Factorio modifier docs | Verified | These are native modifier candidates where supported |
+| Technology modifier list includes mining-drill productivity, belt stack size, lab productivity, lab speed, and worker robot modifiers | Factorio modifier docs | Verified | Native modifier ownership diagnostics must stay separate from recipe-productivity streams |
+| `RecipePrototype` exposes productivity eligibility, productivity caps, results, ingredients, and surface conditions | Factorio `RecipePrototype` docs | Verified | The compatibility kernel can observe recipe-productivity risk without mutating recipe rules |
+| Loader entities are distinct `LoaderPrototype` surfaces, including the `loader` and `loader-1x1` prototype types seen in local base prototypes | Factorio `LoaderPrototype` docs plus local Factorio `2.1.9` base prototypes | Verified | Loader support should mean loader crafting productivity, not loader throughput or operating behavior |
+| Mining drills are distinct `MiningDrillPrototype` entities | Factorio `MiningDrillPrototype` docs plus local Factorio `2.1.9` base prototypes | Verified | Drill manufacturing productivity and native mining-yield productivity are separate lanes |
+| Labs expose accepted science inputs on `LabPrototype` | Factorio `LabPrototype` docs plus runtime custom-lab fixtures | Verified | Added science packs should be validated against labs instead of hard-coded by mod name |
 | `change-recipe-productivity` is an official technology modifier type | Factorio modifier docs plus runtime fluid-productivity fixtures | Verified | Fluid-output productivity should stay native recipe productivity instead of runtime fluid scripting |
 | `change-recipe-productivity` is scoped by explicit recipe ID and `change`, not by output item family | Factorio `ChangeRecipeProductivityModifier` docs | Verified | Vanilla family adoption must append exact recipe effects to an existing owner technology |
 | `mod-data` prototypes can carry arbitrary prototype-stage data and are readable at runtime through `prototypes.mod_data` | Factorio `ModData` docs | Verified | The data stage can publish the productivity-family adoption signature for runtime migration handling |
@@ -69,6 +74,10 @@ Latest official API docs checked on 2026-07-03: `2.1.9`. Local runtime validatio
 - Mod structure: <https://lua-api.factorio.com/latest/auxiliary/mod-structure.html>
 - Modifier list: <https://lua-api.factorio.com/latest/types/Modifier.html>
 - `ChangeRecipeProductivityModifier`: <https://lua-api.factorio.com/latest/types/ChangeRecipeProductivityModifier.html>
+- `RecipePrototype`: <https://lua-api.factorio.com/latest/prototypes/RecipePrototype.html>
+- `LoaderPrototype`: <https://lua-api.factorio.com/latest/prototypes/LoaderPrototype.html>
+- `MiningDrillPrototype`: <https://lua-api.factorio.com/latest/prototypes/MiningDrillPrototype.html>
+- `LabPrototype`: <https://lua-api.factorio.com/latest/prototypes/LabPrototype.html>
 - `ModData`: <https://lua-api.factorio.com/latest/prototypes/ModData.html>
 - `NothingModifier`: <https://lua-api.factorio.com/latest/types/NothingModifier.html>
 - Migrations: <https://lua-api.factorio.com/latest/auxiliary/migrations.html>

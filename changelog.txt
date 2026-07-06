@@ -14,12 +14,15 @@ Date: 2026-07-06
     - Added AAI-style loader recipe coverage to transport belt productivity.
     - Added Big Mining Drill coverage through mining drill productivity.
     - Added ATAN-style Nuclear Science coverage through science-pack productivity.
+    - Added capability diagnostics for entity-backed loader crafting recipes.
+    - Added capability diagnostics for entity-backed mining-drill crafting recipes.
+    - Added native modifier ownership diagnostics for selected lab, mining, logistics, and robot modifiers.
 
   Internal:
 
     - Kept the new compiler path report-only so broad unknown mod behavior remains observed before it is emitted.
     - Added compatibility safeguards for AAI-style loaders, standalone big mining drills, and ATAN-style nuclear science packs.
-    - Extended compatibility observation output with compiler, decision, loop-risk, rule-surface, and lab-matrix rows.
+    - Extended compatibility observation output with compiler, decision, capability, loop-risk, rule-surface, and lab-matrix rows.
 
 ---------------------------------------------------------------------------------------------------
 Version: 2.1.5

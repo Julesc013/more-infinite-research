@@ -2,6 +2,40 @@
 
 This file records local release-candidate validation runs. It is not a substitute for the manual mod matrix in `docs/compatibility.md`.
 
+## 2026-07-07 2.2.0 Procedural Compatibility Kernel Pass
+
+Environment:
+
+- Branch: `dev`.
+- Mod version `2.2.0`.
+- Factorio binary: Steam Factorio `2.1.9`.
+- Validation artifact: `build\validation-dist\more-infinite-research_2.2.0.zip`.
+
+Scope:
+
+- Added report-first capability diagnostics for entity-backed loader manufacturing, entity-backed mining-drill manufacturing, and selected native modifier owners.
+- Kept loader crafting productivity under the existing belt productivity stream.
+- Kept drill crafting productivity under the existing mining-drill productivity stream.
+- Kept native mining-yield modifiers separate from drill recipe productivity.
+- Added entity-backed fixture surfaces for AAI-style loaders and Big Mining Drill-style drills.
+- Added audit-export fields for `capability`, `subfamily`, and `evidence`.
+
+Commands:
+
+```powershell
+.\scripts\Invoke-MIRValidation.ps1 -StaticOnly
+.\scripts\Invoke-MIRValidation.ps1 -FactorioBin "C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe"
+```
+
+Results:
+
+- Static validation passed and rebuilt `build\validation-dist\more-infinite-research_2.2.0.zip`.
+- Runtime fixture validation passed.
+- Runtime diagnostics asserted native modifier ownership rows for lab productivity and mining-yield productivity.
+- Runtime diagnostics asserted AAI-style loader recipes emit through `research_belts` and carry `capability=logistics-loader-manufacturing`.
+- Runtime diagnostics asserted Big Mining Drill-style recipes emit through `research_mining_drill` and carry `capability=mining-drill-manufacturing`.
+- Air Scrubbing assertions now select the policy-specific DecisionRecord rows when generic compiler loop-risk rows share the same recipe key.
+
 ## 2026-07-06 2.1.5 Final Release-Targeted Gate
 
 Environment:

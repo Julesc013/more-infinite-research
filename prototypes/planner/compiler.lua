@@ -1,4 +1,5 @@
 local D = require("prototypes.diagnostics")
+local capabilities = require("prototypes.lib.capabilities.registry")
 local fact_registry = require("prototypes.lib.facts.registry")
 local productivity_owners = require("prototypes.compat.productivity-owners")
 
@@ -209,6 +210,7 @@ function M.emit()
   emit_rule_mutations(registry)
   emit_loop_risks(registry)
   emit_generated_technology_decisions(registry)
+  capabilities.emit(registry)
 end
 
 return M

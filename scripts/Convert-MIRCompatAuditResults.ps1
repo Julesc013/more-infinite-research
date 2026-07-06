@@ -235,7 +235,9 @@ foreach ($result in $loadResults) {
         warnings = [string](Get-MIRObjectProperty -Object $row -Name "warnings")
         subject_type = [string](Get-MIRObjectProperty -Object $row -Name "subject_type")
         subject = [string](Get-MIRObjectProperty -Object $row -Name "subject")
+        capability = [string](Get-MIRObjectProperty -Object $row -Name "capability")
         family = [string](Get-MIRObjectProperty -Object $row -Name "family")
+        subfamily = [string](Get-MIRObjectProperty -Object $row -Name "subfamily")
         confidence = [string](Get-MIRObjectProperty -Object $row -Name "confidence")
         source = [string](Get-MIRObjectProperty -Object $row -Name "source")
         policy = [string](Get-MIRObjectProperty -Object $row -Name "policy")
@@ -262,6 +264,7 @@ foreach ($result in $loadResults) {
         module_slots = [string](Get-MIRObjectProperty -Object $row -Name "module_slots")
         allowed_effects = [string](Get-MIRObjectProperty -Object $row -Name "allowed_effects")
         shared_inputs_outputs = [string](Get-MIRObjectProperty -Object $row -Name "shared_inputs_outputs")
+        evidence = [string](Get-MIRObjectProperty -Object $row -Name "evidence")
       }
     }
 
@@ -455,7 +458,7 @@ $observationSummary = @(
 if ($observationRows.Count -gt 0) {
   $observationRows | Export-Csv -NoTypeInformation -LiteralPath $observationsCsvPath
 } else {
-  "scenario,mod,kind,key,status,reason,role,action,signal,recipe,recipes,warning_class,cap_state,maximum_productivity,per_level,levels_to_cap,useful_level_estimate,total,warnings,subject_type,subject,family,confidence,source,policy,decision,emitted,blockers,risks,stable_stream_id,labs,field,observed_value,expected_baseline,technologies,machines,mir_owned,external_owned_exact,external_owned_unknown,rule_mutations,loop_risks,generated,rejected,unknown,missing,module_slots,allowed_effects,shared_inputs_outputs" | Set-Content -LiteralPath $observationsCsvPath -Encoding UTF8
+  "scenario,mod,kind,key,status,reason,role,action,signal,recipe,recipes,warning_class,cap_state,maximum_productivity,per_level,levels_to_cap,useful_level_estimate,total,warnings,subject_type,subject,capability,family,subfamily,confidence,source,policy,decision,emitted,blockers,risks,stable_stream_id,labs,field,observed_value,expected_baseline,technologies,machines,mir_owned,external_owned_exact,external_owned_unknown,rule_mutations,loop_risks,generated,rejected,unknown,missing,module_slots,allowed_effects,shared_inputs_outputs,evidence" | Set-Content -LiteralPath $observationsCsvPath -Encoding UTF8
 }
 
 $observationsMd = @()
@@ -464,7 +467,7 @@ $observationsMd += ""
 $observationsMd += ('- Audit dir: `{0}`' -f $resolvedAuditDir)
 $observationsMd += "- Observation rows: $($observationRows.Count)"
 $observationsMd += ""
-$observationsMd += "These rows are diagnostics, not failure groups. They describe MIR roles, planner summaries, recipe-cap warnings, compiler decisions, rule surfaces, loop risks, fact registry summaries, and lab matrices."
+$observationsMd += "These rows are diagnostics, not failure groups. They describe MIR roles, planner summaries, recipe-cap warnings, compiler decisions, capability evidence, rule surfaces, loop risks, fact registry summaries, and lab matrices."
 $observationsMd += ""
 $observationsMd += "## Rows By Kind"
 $observationsMd += ""
@@ -475,6 +478,18 @@ if ($observationSummary.Count -eq 0) {
   $observationsMd += "| --- | ---: |"
   foreach ($entry in $observationSummary) {
     $observationsMd += "| $($entry.kind) | $($entry.count) |"
+  }
+}
+
+$capabilityRows = @($observationRows | Where-Object { -not [string]::IsNullOrWhiteSpace($_.capability) })
+if ($capabilityRows.Count -gt 0) {
+  $observationsMd += ""
+  $observationsMd += "## Capability Decisions"
+  $observationsMd += ""
+  $observationsMd += "| Scenario | Capability | Subject | Decision | Emitted | Evidence |"
+  $observationsMd += "| --- | --- | --- | --- | --- | --- |"
+  foreach ($entry in $capabilityRows | Select-Object -First 100) {
+    $observationsMd += "| $($entry.scenario) | $($entry.capability) | $($entry.subject) | $($entry.decision) | $($entry.emitted) | $($entry.evidence) |"
   }
 }
 
