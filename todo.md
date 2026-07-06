@@ -1,10 +1,10 @@
 # M.I.R. TODO
 
-Updated: 2026-07-06
+Updated: 2026-07-07
 
 This is the executable task list for the next More Infinite Research releases. Keep durable future work here, not only in derivative planning docs, so the project still has its task and release plan if the `docs/` tree is reorganized or partially lost.
 
-Use `docs/roadmap.md` for release scope, product boundaries, rationale, and high-level "why" explanations. Use `docs/notes/post-2.0-feature-plan.md` for the deeper idea archive, and `docs/notes/legacy-backport-cadence.md` for the expanded older-line backport ladder. Use `changelog.txt` as the authoritative past-change ledger.
+Use `docs/roadmap.md` for release scope, product boundaries, rationale, and high-level "why" explanations. Use `docs/notes/post-2.0-feature-plan.md` for the deeper idea archive, `docs/notes/legacy-backport-cadence.md` for the expanded older-line backport ladder, and `docs/notes/target-line-versioning-and-backports.md` for the post-`2.2.0` target-line versioning reset. Use `changelog.txt` as the authoritative past-change ledger.
 
 ## Working Rules
 
@@ -13,7 +13,8 @@ Use `docs/roadmap.md` for release scope, product boundaries, rationale, and high
 - Treat `.0` releases as larger feature waves.
 - Aim for one validated Factorio `2.1` current-line update per week from 2026-07-06 through December 2026.
 - Aim for one older-line compatibility backport per day during the week-before through week-after Factorio `2.1` release celebration window.
-- Backport tested current-line snapshots to `legacy` as Factorio `2.0` compatible `1.9.x` releases, and treat older Factorio line ports as separate validation-gated target-line branches.
+- Backport tested current-line snapshots to `legacy` as Factorio `2.0` compatible `1.9.0` through `1.9.2` transition releases, and treat older Factorio line ports as separate validation-gated target-line branches.
+- After `1.9.2`, follow the target-line versioning reset: `3.x.x` for Factorio `2.1`, `2.x.x` for Factorio `2.0`, `1.9.3+` for Factorio `1.1`, and older ranges as documented in the target-line note.
 - Do not rebuild `legacy` commit-by-commit from older releases.
 - Keep generated technology names stable unless a tested migration exists.
 - Prefer native modifiers and recipe productivity.
@@ -567,6 +568,20 @@ Idea-mod audit candidates should be promoted only after recipe-ID proof, balance
 
 Do not reconstruct old releases commit-by-commit for `legacy`. A legacy release is a compatibility port of a tested current-line snapshot.
 
+### v1.9.2 Backport From The Tested v2.2.0 Snapshot
+
+- [ ] Install or verify a real Factorio `2.0` Space Age-capable binary at `D:\Programs\Factorio`.
+- [ ] Create `tmp/2.0` from the tested `2.2.0` source point.
+- [ ] Set the backport metadata to `version = 1.9.2`, `factorio_version = 2.0`, and `base >= 2.0`.
+- [ ] Remove or guard Factorio `2.1`-only technology modifiers and prototype surfaces in the backport branch.
+- [ ] Run static validation on `tmp/2.0`.
+- [ ] Run runtime validation on `tmp/2.0` with `D:\Programs\Factorio\bin\x64\factorio.exe`.
+- [ ] Run `release-targeted-2.0` against `C:\Projects\Factorio\testmods_2.0`.
+- [ ] Bring portable fixes discovered on `tmp/2.0` back to `dev` without merging target-line metadata downgrades.
+- [ ] Revalidate `dev` with the Steam Factorio `2.1` binary after any portable fixes.
+- [ ] Merge the validated `tmp/2.0` port into `legacy` and release `1.9.2`.
+- [ ] After `1.9.2`, start the `3.0.0` compatibility-compiler line on `dev` under the new versioning scheme.
+
 ### v1.9.1 Backport From The Tested v2.1.0 Snapshot
 
 - [x] Use the tested `v2.1.0` source point as the legacy snapshot.
@@ -576,23 +591,19 @@ Do not reconstruct old releases commit-by-commit for `legacy`. A legacy release 
 - [x] Build `dist/more-infinite-research_1.9.1.zip`.
 - [x] Validate with a Factorio `2.0.x` binary.
 
-### Planned v1.9.7 / v1.9.8 / v1.9.9 Factorio 2.0 Backports
+### Superseded v1.9.7 / v1.9.8 / v1.9.9 Factorio 2.0 Backports
 
-- [ ] One week before Factorio `2.1` release, identify the latest tested MIR `2.x.x` source point.
-- [ ] Backport that source point to Factorio `2.0` as `v1.9.7`.
-- [ ] At Factorio `2.1` release, identify the latest tested MIR `2.x.x` source point.
-- [ ] Backport that source point to Factorio `2.0` as `v1.9.8`.
-- [ ] For the Factorio `2.1` stable/end-of-year support sweep, identify the latest tested MIR `2.x.x` source point.
-- [ ] Backport that source point to Factorio `2.0` as final `v1.9.9`.
-- [ ] Validate every `1.9.x` backport with a real Factorio `2.0.x` binary before publishing compatibility claims.
+The older `v1.9.7`, `v1.9.8`, and `v1.9.9` Factorio `2.0` ladder is superseded
+by the `v1.9.2` transition backport and the post-transition target-line
+versioning reset unless the maintainer explicitly revives it.
+
+If revived, restore these only after recording the selected source point,
+Factorio binary, local library, target metadata, and release reason.
 
 ### v1.9.9 Final Factorio 2.0 Backport
 
-- [ ] Treat the `v1.9.9` source point as the Factorio `2.1` stable/end-of-year support sweep snapshot.
-- [ ] Backport that latest tested source snapshot to `legacy`.
-- [ ] Set the legacy mod version to `1.9.9`.
-- [ ] Treat `1.9.9` as the final planned Factorio `2.0` release.
-- [ ] Verify the actual Factorio `2.1` stable status before making final-support claims.
+This section is retained as historical planning context only. It is not active
+unless the maintainer revives the pre-reset final Factorio `2.0` plan.
 
 ### Older Factorio Line Backport Ladder
 

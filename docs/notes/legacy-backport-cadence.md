@@ -1,6 +1,6 @@
 # Legacy Backport Cadence
 
-Updated: 2026-07-06
+Updated: 2026-07-07
 
 This note records the intended compatibility backport ladder for More Infinite
 Research across older Factorio lines. It is a release-planning note, not a
@@ -13,6 +13,8 @@ dates, target ordering, exact source snapshots, and even individual target-line
 releases may move if Factorio `2.1`, the Mod Portal, validation binaries, or MIR
 itself make a different order safer. Changes should be recorded in this note,
 `docs/roadmap.md`, and root `todo.md` instead of being left as chat-only plans.
+The post-`2.2.0` target-line versioning reset and `tmp/2.0` workflow live in
+`docs/notes/target-line-versioning-and-backports.md`.
 
 ## Current-Line Cadence
 
@@ -55,6 +57,7 @@ remove or guard that surface and document the exclusion in the release notes.
 
 | MIR release | Target Factorio line | Timing | Source snapshot |
 | --- | --- | --- | --- |
+| `1.9.2` | `2.0.x` | Immediate transition backport | Tested `2.2.0` source point |
 | `1.9.9` | `2.0.x` | End of year | 2.1-stable end-of-year snapshot |
 | `1.9.8` | `2.0.x` | At Factorio `2.1` release | 2.1-release snapshot |
 | `1.9.7` | `2.0.x` | One week before Factorio `2.1` release | Week-before-2.1-release snapshot |
@@ -103,3 +106,10 @@ remove or guard that surface and document the exclusion in the release notes.
   was not run.
 - Do not claim full feature parity for any older line unless that exact target
   line has been validated with the claimed features enabled.
+
+## Post-Transition Note
+
+After the `1.9.2` Factorio `2.0` transition backport, the target-line scheme
+changes. `1.9.0` through `1.9.2` remain historical Factorio `2.0` archives, but
+`1.9.3+` is reserved for Factorio `1.1`; Factorio `2.0` moves to `2.x.x`
+starting at `2.5.0`; and Factorio `2.1` moves to `3.x.x` starting at `3.0.0`.
