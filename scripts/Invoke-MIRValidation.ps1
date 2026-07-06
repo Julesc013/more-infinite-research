@@ -388,6 +388,9 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
   $pipelineExtentFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-pipeline-extent\data-final-fixes.lua")
   $betterBotBatteryFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-better-bot-battery-skip\data-final-fixes.lua")
   $airScrubbingFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-air-scrubbing-clean-filter\data-final-fixes.lua")
+  $aaiLoaderFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-aai-loader-belt-productivity\data-final-fixes.lua")
+  $bigMiningDrillFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-big-mining-drill-productivity\data-final-fixes.lua")
+  $atanNuclearScienceFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-atan-nuclear-science-productivity\data-final-fixes.lua")
   $defaultsText = Get-Content -Raw -LiteralPath (Join-Path $repo "defaults.lua")
   $localeText = Get-Content -Raw -LiteralPath (Join-Path $repo "locale\en\more-infinite-research.cfg")
 
@@ -461,6 +464,7 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'research_sulfuric_acid_productivity = {' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'research_air_scrubbing_clean_filter = {' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'manifest_id = "mir-prod-air-scrubbing-clean-filter"' },
+    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = '"aai-turbo-loader"' },
     @{ File = "prototypes\util.lua"; Text = $utilText; Snippet = 'desired == "derive-from-unlocks"' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'research_air_scrubbing_clean_filter = "Air Scrubbing clean-filter productivity"' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = '{technology = "oil-processing"}' },
@@ -527,6 +531,9 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "fixtures\assert-pipeline-extent\data-final-fixes.lua"; Text = $pipelineExtentFixtureText; Snippet = 'DEFAULT_PIPELINE_EXTENT = 320' },
     @{ File = "fixtures\assert-air-scrubbing-clean-filter\data-final-fixes.lua"; Text = $airScrubbingFixtureText; Snippet = 'recipe-prod-research_air_scrubbing_clean_filter-1' },
     @{ File = "fixtures\assert-air-scrubbing-clean-filter\data-final-fixes.lua"; Text = $airScrubbingFixtureText; Snippet = 'atan-pollution-filter-cleaning' },
+    @{ File = "fixtures\assert-aai-loader-belt-productivity\data-final-fixes.lua"; Text = $aaiLoaderFixtureText; Snippet = 'aai-turbo-loader' },
+    @{ File = "fixtures\assert-big-mining-drill-productivity\data-final-fixes.lua"; Text = $bigMiningDrillFixtureText; Snippet = 'big-mining-drill should use +0.05' },
+    @{ File = "fixtures\assert-atan-nuclear-science-productivity\data-final-fixes.lua"; Text = $atanNuclearScienceFixtureText; Snippet = 'nuclear-science-pack did not receive science-pack productivity' },
     @{ File = "fixtures\assert-better-bot-battery-skip\data-final-fixes.lua"; Text = $betterBotBatteryFixtureText; Snippet = 'recipe-prod-research_robot_battery-1' },
     @{ File = "fixtures\assert-better-bot-battery-skip\data-final-fixes.lua"; Text = $betterBotBatteryFixtureText; Snippet = 'worker-robots-battery-6' },
     @{ File = "prototypes\weapon-speed-adjustments.lua"; Text = $weaponSpeedText; Snippet = 'tech.unit and tech.unit.count_formula' },
@@ -876,6 +883,8 @@ Invoke-RepoCheck "2.2.0 compiler diagnostics are wired" {
     @{ File = "prototypes\planner\compiler.lua"; Text = $compilerText; Snippet = 'D.decision({' },
     @{ File = "prototypes\planner\compiler.lua"; Text = $compilerText; Snippet = 'emit_generated_technology_decisions' },
     @{ File = "prototypes\compat\planner.lua"; Text = $compatPlannerText; Snippet = 'useful_level_estimate = levels' },
+    @{ File = "prototypes\compat\planner.lua"; Text = $compatPlannerText; Snippet = '["atan-ash"] = {' },
+    @{ File = "prototypes\compat\planner.lua"; Text = $compatPlannerText; Snippet = '["atan-nuclear-science"] = {' },
     @{ File = "prototypes\compat\planner.lua"; Text = $compatPlannerText; Snippet = '["FluidMustFlow"] = {' },
     @{ File = "prototypes\compat\planner.lua"; Text = $compatPlannerText; Snippet = '["robot_attrition"] = {' },
     @{ File = "prototypes\compat\planner.lua"; Text = $compatPlannerText; Snippet = '["jetpack"] = {' },
@@ -884,6 +893,7 @@ Invoke-RepoCheck "2.2.0 compiler diagnostics are wired" {
     @{ File = "prototypes\compat\planner.lua"; Text = $compatPlannerText; Snippet = '["aai-industry"] = {' },
     @{ File = "prototypes\compat\planner.lua"; Text = $compatPlannerText; Snippet = '["aai-containers"] = {' },
     @{ File = "prototypes\compat\planner.lua"; Text = $compatPlannerText; Snippet = '["aai-loaders"] = {' },
+    @{ File = "prototypes\compat\planner.lua"; Text = $compatPlannerText; Snippet = 'belt_productivity_loader_recipe_candidate' },
     @{ File = "scripts\Convert-MIRCompatAuditResults.ps1"; Text = $converterText; Snippet = '"fact_registry", "decision", "rule_mutation", "loop_risk", "lab_matrix"' },
     @{ File = "scripts\Convert-MIRCompatAuditResults.ps1"; Text = $converterText; Snippet = "Loop Risk Diagnostics" },
     @{ File = "scripts\Show-MIROvernightSummary.ps1"; Text = $overnightSummaryText; Snippet = "rule_surfaces" }
@@ -943,6 +953,32 @@ Invoke-RepoCheck "Air Scrubbing clean-filter policy is wired" {
   foreach ($check in $requiredSnippets) {
     if (-not $check.Text.Contains($check.Snippet)) {
       throw "Missing Air Scrubbing clean-filter wiring in $($check.File): $($check.Snippet)"
+    }
+  }
+}
+
+Invoke-RepoCheck "compatibility support lanes are wired" {
+  $supportLanePath = Join-Path $repo "fixtures\compat-matrix\support-lanes.json"
+  if (-not (Test-Path -LiteralPath $supportLanePath)) {
+    throw "Missing compatibility support-lane ledger: $supportLanePath"
+  }
+
+  $supportLaneText = Get-Content -Raw -LiteralPath $supportLanePath
+  $requiredSnippets = @(
+    '"upstream_factorio_version_is_blocking": false',
+    '"mod": "atan-air-scrubbing"',
+    '"mod": "atan-nuclear-science"',
+    '"mir-fixture-assert-atan-nuclear-science-productivity"',
+    '"mod": "big-mining-drill"',
+    '"mir-fixture-assert-big-mining-drill-productivity"',
+    '"mod": "aai-loaders"',
+    '"mir-fixture-assert-aai-loader-belt-productivity"',
+    '"backport_candidate": true'
+  )
+
+  foreach ($snippet in $requiredSnippets) {
+    if (-not $supportLaneText.Contains($snippet)) {
+      throw "Missing compatibility support-lane entry: $snippet"
     }
   }
 }
@@ -1432,8 +1468,11 @@ if (-not (Test-Path -LiteralPath $fixtureRoot)) {
 $nonModFixtureDirs = @("compat-matrix", "run-profiles")
 
 $postMirAssertionFixtures = @(
+  "mir-fixture-assert-aai-loader-belt-productivity",
   "mir-fixture-assert-air-scrubbing-clean-filter",
+  "mir-fixture-assert-atan-nuclear-science-productivity",
   "mir-fixture-assert-better-bot-battery-skip",
+  "mir-fixture-assert-big-mining-drill-productivity",
   "mir-fixture-assert-generation-integrity",
   "mir-fixture-assert-science-pack-productivity",
   "mir-fixture-assert-lab-skip-policy",
@@ -2283,6 +2322,29 @@ foreach ($baseThrusterStream in @("research_thruster_fuel_productivity", "resear
     throw "Base-only thruster fluid stream $baseThrusterStream should skip for missing fluid: $baseThrusterLine"
   }
 }
+
+Invoke-RuntimeScenario -ScenarioName "aai-loader-belt-productivity" -EnabledFixtureNames @(
+  "mir-fixture-aai-loaders",
+  "mir-fixture-assert-aai-loader-belt-productivity"
+)
+$aaiLoaderBeltLine = Get-LastStreamReportLine -Key "research_belts"
+Assert-ReportLineGenerated -Line $aaiLoaderBeltLine -Context "AAI loader belt productivity scenario"
+
+Invoke-RuntimeScenario -ScenarioName "big-mining-drill-productivity" -EnabledFixtureNames @(
+  "mir-fixture-big-mining-drill",
+  "mir-fixture-assert-big-mining-drill-productivity"
+)
+$bigMiningDrillLine = Get-LastStreamReportLine -Key "research_mining_drill"
+Assert-ReportLineGenerated -Line $bigMiningDrillLine -Context "Big Mining Drill productivity scenario"
+
+Invoke-RuntimeScenario -ScenarioName "atan-nuclear-science-productivity" -EnabledFixtureNames @(
+  "mir-fixture-atan-nuclear-science",
+  "mir-fixture-assert-atan-nuclear-science-productivity"
+)
+$atanNuclearScienceLine = Get-LastStreamReportLine -Key "research_science_pack_productivity"
+Assert-ReportLineGenerated -Line $atanNuclearScienceLine -Context "ATAN Nuclear Science science-pack productivity scenario"
+Assert-ReportLineContains -Line $atanNuclearScienceLine -Expected "nuclear-science-pack" -Context "ATAN Nuclear Science lab-input science scenario"
+Assert-ReportLineContains -Line $atanNuclearScienceLine -Expected "atan-nuclear-science" -Context "ATAN Nuclear Science unlock prerequisite scenario"
 
 Invoke-RuntimeScenario -ScenarioName "air-scrubbing-clean-filter" -EnabledFixtureNames @(
   "mir-fixture-air-scrubbing",

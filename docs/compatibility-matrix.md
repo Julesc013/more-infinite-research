@@ -25,6 +25,16 @@ Role vocabulary:
 | Docs/load-test only | `MIR_DOCS_ONLY` |
 | Reject from core | `MIR_REJECT_CORE` |
 
+Support lane policy:
+
+- MIR may add fixture-backed support for mods that currently advertise an older Factorio line.
+- Upstream Factorio-version metadata is a claim-lane field, not a blocker for representative fixtures.
+- Current-line fixtures prove MIR behavior against the active MIR branch; legacy branch backports can reuse the same support logic with Factorio `2.0` metadata and validation.
+- Public claims must distinguish "recipe family supported when visible" from "full external mod support" unless a real external load profile has passed.
+- Compatibility rows should record the Factorio binary and mod versions tested before moving from fixture-backed support to broad public support.
+
+The machine-readable support-lane ledger lives at `fixtures/compat-matrix/support-lanes.json`.
+
 ## Current And Near-Term Matrix
 
 | Mod/profile | Status | MIR action | Validation | Notes |
@@ -42,15 +52,15 @@ Role vocabulary:
 | Loop-risk and rule-surface diagnostics | Supported in `2.2.0` as report-only diagnostics | Observe recycling, cleaning, voiding, container, transmutation, self-return, cap, beacon, lab, and machine-rule surfaces | Static validation and audit rows | False positives are acceptable; behavior remains diagnostic until policy and fixtures exist. |
 | `atan-air-scrubbing` | Supported in `2.2.0` | MIR-owned productivity for exact clean pollution and spore filter recipes only | Static and runtime fixture | Does not touch scrubbing, cleaning, recovery, or environmental-removal recipes. |
 | `atan-ash` | Planned for `2.2.0` | Candidate MIR-owned ash-processing productivity slice | Recipe-ID fixture with Ash-style recipes | Next ATAN-family proof slice after Air Scrubbing; likely starts from productivity-allowed ash separation and excludes non-productivity conversions. |
-| `atan-nuclear-science` | Planned for `2.2.0` | Candidate science-pack productivity and lab/science compatibility slice | Recipe-ID fixture with Nuclear Science-style science pack and atom forge surfaces | Next ATAN-family proof slice after Ash; do not add productivity to non-productivity atom forge crafting. |
+| `atan-nuclear-science` | Supported in `2.2.0` as fixture-backed science-pack behavior | Existing `research_science_pack_productivity` support for visible `nuclear-science-pack` lab-input recipes | Static and runtime fixture with Nuclear Science-style science pack and atom forge surfaces | Adds science-pack productivity to the science pack recipe only. Does not add productivity to non-science atom forge crafting. |
 | Crushing Industry ore crushing | Planned for `2.2.0` | New stream candidate or guarded profile | Recipe-ID fixture with Crushing Industry | Follow-up family-stream candidate after the ATAN proof slices. |
-| `big-mining-drill` | Planned for `2.2.0` | Existing `research_mining_drill` proof slice | Runtime fixture or targeted load profile | Likely validates MIR's current modded drill recipe matching rather than adding a separate stream. |
+| `big-mining-drill` | Supported in `2.2.0` as fixture-backed existing-stream behavior | Existing `research_mining_drill` support for visible `big-mining-drill` recipes | Static and runtime fixture | Uses the high-tier mining-drill productivity bucket; no separate Big Mining Drill research line. |
 | `FluidMustFlow` | Planned for `2.2.0` | Load and pipeline-extent coexistence check | Targeted load profile with MIR pipeline defaults | Large duct content, not a productivity stream. Do not recreate ducts or fluid logistics behavior. |
 | `robot_attrition` | Adjacent | Runtime balance coexistence only | Targeted load profile | Bot crash behavior is runtime balance, not MIR research ownership. Do not absorb. |
 | `jetpack` | Adjacent | Equipment/content coexistence only | Targeted load profile | Player movement equipment and fuel behavior are outside MIR core. Do not absorb. |
 | `equipment-gantry` | Adjacent | Equipment-grid automation coexistence only | Targeted load profile | Gantry item/equipment-grid processing is content/runtime behavior, not MIR research ownership. |
 | `aai-containers` | Adjacent | Storage content coexistence only | Targeted load profile | Warehouses and logistic container variants are content; do not create research streams unless exact recipe evidence later warrants it. |
-| `aai-loaders` | Adjacent | Loader logistics coexistence only | Targeted load profile | Loader operating modes and compatibility hooks are logistics content, not MIR core behavior. |
+| `aai-loaders` | Supported in `2.2.0` as fixture-backed recipe-family behavior | Existing `research_belts` support for visible AAI-style loader recipes | Static and runtime fixture | MIR adds recipe productivity to loader crafting by logistics tier; it does not recreate loader behavior, operating modes, lubricant use, or compatibility hooks. |
 | `aai-industry` | Planned for `2.2.0` | Mini-overhaul tuning profile for recipe, science, and machine classification | Runtime fixture or targeted load profile | Bridge target before large suites because it alters early industry, recipes, labs, pumps, and progression without becoming a Bob/Angel/Py campaign. |
 | Tile/surface productivity mods | Planned for `2.2.0` | Policy before implementation | Balance fixture proving mismatch preservation and exact-match replacement | Values differ across source mods, so this is not a cleanup-only change. |
 | `better-bot-battery2` | Supported in `2.1.5` after final gate | Skip MIR worker robot battery stream when effect-proven `worker-robots-battery-6` is present | Static and runtime fixture proving finite levels survive and MIR duplicate is skipped | MIR already has worker robot battery, but Better Bot Battery uses different finite and infinite values. |

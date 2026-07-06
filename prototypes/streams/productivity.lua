@@ -324,11 +324,11 @@ return {
   }},
 
   research_belts = { icon_tech="logistics", groups = {
-    { change=0.10, items={"transport-belt","underground-belt","splitter"} },
-    { change=0.05, items={"fast-transport-belt","fast-underground-belt","fast-splitter"} },
-    { change=0.02, items={"express-transport-belt","express-underground-belt","express-splitter"} },
-    { change=0.01, items={"turbo-transport-belt","turbo-underground-belt","turbo-splitter"}, item_patterns={"^turbo%-transport%-belt$","^turbo%-underground%-belt$","^turbo%-splitter$"} },
-    { change=0.005, items={"hyper-transport-belt","hyper-underground-belt","hyper-splitter"}, item_patterns={"^hyper%-transport%-belt$","^hyper%-underground%-belt$","^hyper%-splitter$"} }
+    { change=0.10, items={"transport-belt","underground-belt","splitter","loader","aai-loader","basic-loader"}, item_patterns={"^aai%-loader$","^basic%-loader$"} },
+    { change=0.05, items={"fast-transport-belt","fast-underground-belt","fast-splitter","fast-loader","aai-fast-loader"}, item_patterns={"^.+%-fast%-loader$"} },
+    { change=0.02, items={"express-transport-belt","express-underground-belt","express-splitter","express-loader","aai-express-loader"}, item_patterns={"^.+%-express%-loader$"} },
+    { change=0.01, items={"turbo-transport-belt","turbo-underground-belt","turbo-splitter","turbo-loader","aai-turbo-loader"}, item_patterns={"^turbo%-transport%-belt$","^turbo%-underground%-belt$","^turbo%-splitter$","^.+%-turbo%-loader$"} },
+    { change=0.005, items={"hyper-transport-belt","hyper-underground-belt","hyper-splitter","hyper-loader","aai-hyper-loader"}, item_patterns={"^hyper%-transport%-belt$","^hyper%-underground%-belt$","^hyper%-splitter$","^.+%-hyper%-loader$"} }
   }},
 
   research_inserters = { icon_tech="fast-inserter", groups = {

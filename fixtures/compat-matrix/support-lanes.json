@@ -1,0 +1,78 @@
+{
+  "schema": 1,
+  "policy": {
+    "upstream_factorio_version_is_blocking": false,
+    "reason": "Representative fixtures can prove MIR behavior before an upstream mod updates and can be reused by legacy backports.",
+    "public_claim_rule": "Claim the tested recipe family or load profile, not full external mod support, unless a real external load profile passed on the named Factorio line."
+  },
+  "lanes": [
+    {
+      "mod": "atan-air-scrubbing",
+      "claim_lane": "fixture-backed stream family",
+      "claim_level": "clean-filter crafting productivity only",
+      "mir_behavior": "research_air_scrubbing_clean_filter",
+      "tested_by": [
+        "mir-fixture-air-scrubbing",
+        "mir-fixture-assert-air-scrubbing-clean-filter"
+      ],
+      "backport_candidate": true
+    },
+    {
+      "mod": "atan-nuclear-science",
+      "claim_lane": "fixture-backed stream family",
+      "claim_level": "science-pack recipe productivity only",
+      "mir_behavior": "research_science_pack_productivity",
+      "tested_by": [
+        "mir-fixture-atan-nuclear-science",
+        "mir-fixture-assert-atan-nuclear-science-productivity"
+      ],
+      "backport_candidate": true
+    },
+    {
+      "mod": "big-mining-drill",
+      "claim_lane": "fixture-backed stream family",
+      "claim_level": "mining drill recipe productivity only",
+      "mir_behavior": "research_mining_drill",
+      "tested_by": [
+        "mir-fixture-big-mining-drill",
+        "mir-fixture-assert-big-mining-drill-productivity"
+      ],
+      "backport_candidate": true
+    },
+    {
+      "mod": "aai-loaders",
+      "claim_lane": "fixture-backed stream family",
+      "claim_level": "loader crafting productivity only",
+      "mir_behavior": "research_belts",
+      "tested_by": [
+        "mir-fixture-aai-loaders",
+        "mir-fixture-assert-aai-loader-belt-productivity"
+      ],
+      "backport_candidate": true
+    },
+    {
+      "mod": "atan-ash",
+      "claim_lane": "planned fixture-backed stream family",
+      "claim_level": "ash processing candidate; tile/resource/recovery boundaries pending",
+      "mir_behavior": "planned",
+      "tested_by": [],
+      "backport_candidate": true
+    },
+    {
+      "mod": "FluidMustFlow",
+      "claim_lane": "planned load/coexistence profile",
+      "claim_level": "pipeline coexistence only",
+      "mir_behavior": "diagnostics/coexistence",
+      "tested_by": [],
+      "backport_candidate": true
+    },
+    {
+      "mod": "aai-industry",
+      "claim_lane": "planned mini-overhaul tuning profile",
+      "claim_level": "recipe/science/lab/machine classification before suite claims",
+      "mir_behavior": "planned",
+      "tested_by": [],
+      "backport_candidate": true
+    }
+  ]
+}

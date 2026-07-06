@@ -23,6 +23,16 @@ local ROLE_SIGNALS = {
     action = "clean_filter_productivity_only",
     signal = "air_scrubbing_filters"
   },
+  ["atan-ash"] = {
+    role = "MIR_STREAM_CANDIDATE",
+    action = "ash_processing_fixture_candidate",
+    signal = "ash_processing_recipe_surface"
+  },
+  ["atan-nuclear-science"] = {
+    role = "MIR_STREAM_CANDIDATE",
+    action = "dynamic_science_pack_productivity_fixture_candidate",
+    signal = "custom_science_pack_recipe"
+  },
   ["FluidMustFlow"] = {
     role = "MIR_DOCS_ONLY",
     action = "load_and_pipeline_extent_coexistence",
@@ -59,9 +69,9 @@ local ROLE_SIGNALS = {
     signal = "warehouse_container_content"
   },
   ["aai-loaders"] = {
-    role = "MIR_DOCS_ONLY",
-    action = "loader_logistics_content_coexistence_only",
-    signal = "loader_logistics_content"
+    role = "MIR_STREAM_CANDIDATE",
+    action = "belt_productivity_loader_recipe_candidate",
+    signal = "loader_recipe_productivity"
   },
 
   ["finite_prod_techs"] = {

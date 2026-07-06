@@ -211,9 +211,9 @@ These streams generate `change-recipe-productivity` effects for matching recipes
 | `research_rockets` | Rocket productivity | rocket; explosive rocket; atomic bomb; plutonium bomb patterns | `+10%`; `+5%`; `+2%`; `+1%` | Adds agricultural and military science when available. |
 | `research_armor_components` | Armor component productivity | armor/armour plating and plate patterns | `+5%`; `+2%` | Adds military, metallurgic, and space science when available. |
 | `research_modules` | Module productivity | tier 1 modules; tier 2 modules; tier 3 modules, including quality modules when present | `+10%`; `+5%`; `+2%` | Adds cryogenic science when available. |
-| `research_belts` | Transport belt productivity | yellow, red, blue, turbo, and hyper belt/underground/splitter families | `+10%`; `+5%`; `+2%`; `+1%`; `+0.5%` | Adds space science when available. |
+| `research_belts` | Transport belt productivity | yellow, red, blue, turbo, and hyper belt/underground/splitter/loader families, including AAI-style loader recipe IDs when visible | `+10%`; `+5%`; `+2%`; `+1%`; `+0.5%` | Adds space science when available. Loader recipes are treated as logistics crafting productivity, not loader behavior or operating-mode changes. |
 | `research_inserters` | Inserter productivity | basic/burner; fast/long-handed; bulk; stack inserters | `+10%`; `+5%`; `+2%`; `+1%` | Adds space science when available. |
-| `research_science_pack_productivity` | Science pack productivity | vanilla and Space Age science packs, plus active modded lab inputs | `+10%` | Recipe productivity for producing science packs. Uses dynamic lab-input targets. Uses vanilla `research-productivity` art when present and the white space-science technology art as the base-game fallback. Research unit time default is `120` seconds. |
+| `research_science_pack_productivity` | Science pack productivity | vanilla and Space Age science packs, plus active modded lab inputs such as ATAN-style Nuclear Science packs | `+10%` | Recipe productivity for producing science packs. Uses dynamic lab-input targets and unlock-derived prerequisites for modded science-pack recipes. Uses vanilla `research-productivity` art when present and the white space-science technology art as the base-game fallback. Research unit time default is `120` seconds. |
 
 ### Direct-Effect And Scripted Streams
 
@@ -400,7 +400,9 @@ These are handled when their **prototypes are visible**:
 | Fluid Quality Imprinting (`fluid-quality-imprinting`) | Covered plate and intermediate outputs are picked up when the recipes output standard items. |
 | Plates n Circuit Productivity (`plates-n-circuit-productivity`) | Selected competing infinite productivity technologies are prepared before MIR generation and removed only after MIR has generated matching replacement recipe effects with the same productivity value and no other blocking owner. |
 | Castra and PlanetLib-style science packs | Custom science packs can be discovered as lab inputs and receive science-pack productivity when their recipes are visible. |
-| Omega Drill style drill mods | Recipes outputting `omega-drill`, `omega-tau`, or broader modded `*-mining-drill` / `*-drill` items are covered by mining drill productivity. |
+| AAI Loaders style loader mods | Recipes outputting AAI-style or tier-named loader items are covered by transport belt productivity when their recipes are visible. |
+| Big Mining Drill and Omega Drill style drill mods | Recipes outputting `big-mining-drill`, `omega-drill`, `omega-tau`, or broader modded `*-mining-drill` / `*-drill` items are covered by mining drill productivity. |
+| ATAN Nuclear Science style science-pack mods | Lab-input science-pack items with visible recipes are covered by science-pack productivity; non-science buildings such as atom-forge recipes are not included in the science-pack stream. |
 
 Generic competing recipe-productivity cleanup is intentionally limited to **known infinite technologies** whose recipe-productivity effects are all covered by enabled MIR streams and then by generated MIR effects. **Finite upgrade chains** from other mods are not removed by the generic cleanup path.
 

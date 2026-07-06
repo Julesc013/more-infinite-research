@@ -98,13 +98,13 @@ is also copied into `ideamods_mix`.
 
 ### `atan-nuclear-science`
 
-- Primary role: `MIR_STREAM_CANDIDATE` for `2.2.0` after `atan-ash`.
+- Primary role: `MIR_STREAM_CANDIDATE` for `2.2.0` through the existing science-pack stream.
 - Source checked: Mod Portal `atan-nuclear-science` and GitHub source on 2026-07-06.
 - What it does: Adds Nuclear Science as a Nauvis science pack, an Atom forge building, and altered late-game science requirements.
 - Recipes and changes:
   - `nuclear-science-pack`: productivity-allowed science-pack recipe that returns barrels with ignored productivity.
   - `atan-atom-forge`: non-productivity Atom forge crafting recipe.
-- MIR action: Use as the third ATAN-family proof slice. Exercise modded science-pack detection, lab compatibility, and explicit non-ownership of the Atom forge recipe. Do not claim a broad Nuclear Science compatibility campaign from one productivity stream.
+- MIR action: Use as an ATAN-family proof slice through `research_science_pack_productivity`. Exercise modded science-pack detection, lab compatibility, unlock-derived prerequisites, and explicit non-ownership of the Atom forge recipe. Do not claim a broad Nuclear Science compatibility campaign from one productivity stream.
 
 ### `FluidMustFlow`
 
@@ -150,10 +150,10 @@ is also copied into `ideamods_mix`.
 
 ### `aai-loaders`
 
-- Primary role: `MIR_DOCS_ONLY` / adjacent loader logistics.
+- Primary role: `MIR_STREAM_CANDIDATE` for loader crafting recipes through the existing belt stream.
 - Source checked: Mod Portal `aai-loaders` on 2026-07-06.
 - What it does: Adds loader entities with lubricated, expensive, or graphics-only operating modes and built-in compatibility hooks for several larger mod families.
-- MIR action: Add as a load/coexistence target and logistics-content observation case. Do not absorb loader operating modes, fluid consumption, entity behavior, or compatibility hook generation into MIR.
+- MIR action: Add loader crafting recipes to `research_belts` when visible and fixture-safe. Do not absorb loader operating modes, fluid consumption, entity behavior, or compatibility hook generation into MIR.
 
 ### `aai-industry`
 
@@ -666,8 +666,9 @@ These are candidates for MIR-owned implementation, not cloning:
 | Ore-crushing productivity | `crushing-industry-productivity-research` | Exact visible recipe IDs, value decision, and no output-scaling copy. |
 | Tile/surface productivity | `asphalt-productivity`, `concrete-productivity`, `landfill-productivity`, `foundation-productivity` | Per-material values, finite lead-in preservation, exact cleanup rules. |
 | Air Scrubbing filter productivity | `atan-air-scrubbing` | Exact clean filter recipe IDs, with fixtures proving scrubbing and cleaning recipes are excluded. |
-| ATAN follow-up proof slices | `atan-ash`, `atan-nuclear-science` | Exact recipe IDs and explicit non-ownership rows before any public claim. |
+| ATAN follow-up proof slices | `atan-ash`, `atan-nuclear-science` | Ash needs exact recipe IDs and explicit non-ownership rows; Nuclear Science uses science-pack productivity with atom forge excluded. |
 | Mining drill existing-stream proof | `big-mining-drill` | Validate current `research_mining_drill` matching; do not create a separate stream. |
+| Loader existing-stream proof | `aai-loaders` | Validate current `research_belts` matching for loader recipes; do not recreate loader behavior or operating modes. |
 | Mini-overhaul tuning bridge | `aai-industry` | Tune discovery, lab/science, recipe family, machine, pump, and prerequisite facts before large suites. |
 | Cap-aware diagnostics | `finite_prod_techs`, `productivity-technology-limit`, `modified-productivity-cap`, `remove-productivity-cap`, `Productivity-config`, `base-prod` | Warn/report first; no silent cap mutation. |
 | Native direct-effect policy | `Research_Productivity`, `better-bot-battery2`, `all_around_research`, `epic_mining_and_crafting_speed_research`, `miner-start`, `mining-prod-0`, `player-count-based-research-speed` | Explicit skip/prefer/coexist/warn rules by modifier type. |
@@ -680,7 +681,6 @@ than recreated:
 
 - `5dim_mining`
 - `aai-containers`
-- `aai-loaders`
 - `equipment-gantry`
 - `FluidMustFlow`
 - `robot_attrition`

@@ -11,10 +11,14 @@ Date: 2026-07-06
     - Added useful-level estimates to recipe productivity cap reports.
     - Added Air Scrubbing clean-filter productivity for exact pollution and spore filter crafting recipes.
     - Kept Air Scrubbing scrubbing, cleaning, recovery, and environmental-removal recipes diagnostic-only.
+    - Added AAI-style loader recipe coverage to transport belt productivity.
+    - Added Big Mining Drill coverage through mining drill productivity.
+    - Added ATAN-style Nuclear Science coverage through science-pack productivity.
 
   Internal:
 
     - Kept the new compiler path report-only so broad unknown mod behavior remains observed before it is emitted.
+    - Added compatibility safeguards for AAI-style loaders, standalone big mining drills, and ATAN-style nuclear science packs.
     - Extended compatibility observation output with compiler, decision, loop-risk, rule-surface, and lab-matrix rows.
 
 ---------------------------------------------------------------------------------------------------

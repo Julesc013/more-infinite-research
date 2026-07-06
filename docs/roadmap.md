@@ -323,8 +323,8 @@ Preferred order:
 2. Add external rule-mutator and loop-risk diagnostics before considering any productivity-rule setting.
 3. Extend cap-aware diagnostics beyond warnings only if an explicit policy exists; do not silently change balance.
 4. Air Scrubbing clean-filter productivity, with fixtures proving scrubbing and cleaning recipes are excluded.
-5. Add the next ATAN-family proof slices for `atan-ash` and `atan-nuclear-science`, using exact recipe IDs and conservative non-ownership rows.
-6. Add requested coexistence targets: `big-mining-drill` as an existing mining-drill stream proof, `FluidMustFlow` as a pipeline coexistence check, `robot_attrition` and `jetpack` as runtime/content load profiles, and `equipment-gantry`, `aai-containers`, and `aai-loaders` as content/coexistence surfaces.
+5. Add the next ATAN-family proof slices for `atan-ash` and `atan-nuclear-science`, using exact recipe IDs and conservative non-ownership rows. Nuclear Science should prove the existing dynamic science-pack productivity path before any new science policy is invented.
+6. Add requested compatibility targets: `big-mining-drill` as an existing mining-drill stream proof, `aai-loaders` as an existing belt stream proof, `FluidMustFlow` as a pipeline coexistence check, `robot_attrition` and `jetpack` as runtime/content load profiles, and `equipment-gantry` and `aai-containers` as content/coexistence surfaces.
 7. Use `aai-industry` as the mini-overhaul tuning bridge for recipe, science, lab, machine, pump, and prerequisite classification without claiming broad AAI suite support.
 8. Ore-crushing productivity, if Crushing Industry recipe IDs and ownership rules fixture cleanly.
 9. Tile and surface productivity policy, only after deciding the stream split and default values.
@@ -347,7 +347,7 @@ Non-goals for `v2.2.0`:
 
 The compatibility matrix in `docs/compatibility-matrix.md` is the claim ledger for these decisions. A row may be planned or future, but public compatibility claims require an explicit tested profile, validation artifact, role enum, save-compatibility notes, and notes about what MIR refuses to own.
 
-Future overhaul work should be staged as campaigns after the narrow `v2.2.0` proof ladder, not folded into a broad stream batch. The proof ladder is Air Scrubbing, the ATAN follow-ups, Big Mining Drill, Fluid Must Flow, Robot Attrition, Jetpack, Equipment Gantry, AAI Containers, AAI Loaders, and AAI Industry. Krastorio 2 is the first large overhaul campaign target after that ladder, before Bob's, Angel's, Space Exploration, or Pyanodons suite work. Keep standalone K2, K2 plus Space Exploration, K2 Spaced Out / Space Age, AAI suite combinations, Bob's focused subsets, Space Exploration, and Pyanodons as separate matrices because their Factorio lines, dependency shapes, progression rules, and productivity restrictions differ.
+Future overhaul work should be staged as campaigns after the narrow `v2.2.0` proof ladder, not folded into a broad stream batch. The proof ladder is Air Scrubbing, the ATAN follow-ups, Big Mining Drill, Fluid Must Flow, Robot Attrition, Jetpack, Equipment Gantry, AAI Containers, AAI Loaders, and AAI Industry. Outdated upstream Factorio-version metadata does not block fixture-backed support or planned legacy backports; it only changes the public claim lane until a real external load profile passes on the target Factorio line. Krastorio 2 is the first large overhaul campaign target after that ladder, before Bob's, Angel's, Space Exploration, or Pyanodons suite work. Keep standalone K2, K2 plus Space Exploration, K2 Spaced Out / Space Age, AAI suite combinations, Bob's focused subsets, Space Exploration, and Pyanodons as separate matrices because their Factorio lines, dependency shapes, progression rules, and productivity restrictions differ.
 
 ## Legacy Backport Strategy
 

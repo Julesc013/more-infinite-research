@@ -108,9 +108,9 @@ Technologies are generated only when their recipes, items, technologies, ammo ca
 | Rocket productivity | `+10%` rockets; `+5%` explosive rockets; `+2%` atomic bombs; `+1%` plutonium bomb patterns | On | Adds agricultural and military science when available. |
 | Armor component productivity | `+5%` armor plating patterns; `+2%` armor plate patterns | On when recipes exist | Supports armor/armour spelling variants. |
 | Module productivity | `+10%` tier 1 modules; `+5%` tier 2; `+2%` tier 3 | On | Includes quality modules when the Quality mod is active. Quality is a hidden optional load-order dependency. |
-| Transport belt productivity | `+10%` yellow; `+5%` red; `+2%` blue; `+1%` turbo; `+0.5%` hyper belt families | On | Covers belts, underground belts, and splitters. |
+| Transport belt productivity | `+10%` yellow; `+5%` red; `+2%` blue; `+1%` turbo; `+0.5%` hyper belt families | On | Covers belts, underground belts, splitters, and compatible loader recipes when visible. |
 | Inserter productivity | `+10%` basic/burner; `+5%` fast/long-handed; `+2%` bulk; `+1%` stack inserters | On | Adds space science when available. |
-| Science pack productivity | `+10%` productivity for science pack recipes | On | Targets vanilla, Space Age, and compatible modded lab-input science packs. Uses Space Age research-productivity art when available and white space-science technology art otherwise. |
+| Science pack productivity | `+10%` productivity for science pack recipes | On | Targets vanilla, Space Age, and compatible modded lab-input science packs, including ATAN-style Nuclear Science packs when visible. Uses Space Age research-productivity art when available and white space-science technology art otherwise. |
 
 ### Direct, Scripted, And Bonus Research
 

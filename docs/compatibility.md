@@ -328,10 +328,22 @@ These integrations do not add mod-page dependencies. More Infinite Research hand
 - Expanded Productivity Research (`ExpandedProductivityResearch`) and Crafting Efficiency (`crafting-efficiency-2`): generated infinite recipe-productivity technologies can be replaced only when MIR's enabled streams prove exact recipe and value coverage.
 - Research Productivity (`Research_Productivity`): MIR's base-game lab productivity stream is skipped when an infinite `laboratory-productivity-4` has the native `laboratory-productivity` effect.
 - Panglia-style planet mods: additional productivity-allowed rocket fuel and low density structure recipes can be adopted into the existing vanilla Space Age `rocket-fuel-productivity` and `low-density-structure-productivity` technologies when those vanilla owners are safe.
-- Omega Drill style drill mods: `omega-drill`, `omega-tau`, and broader modded `*-mining-drill` / `*-drill` outputs are picked up by mining drill productivity when their recipes are visible.
-- Custom science packs from mods such as Castra or PlanetLib-based planets are picked up opportunistically when they are active lab inputs and have visible recipes that output the pack item.
+- AAI Loaders style loader mods: AAI-style and tier-named loader outputs are picked up by transport belt productivity when their recipes are visible.
+- Big Mining Drill and Omega Drill style drill mods: `big-mining-drill`, `omega-drill`, `omega-tau`, and broader modded `*-mining-drill` / `*-drill` outputs are picked up by mining drill productivity when their recipes are visible.
+- Custom science packs from mods such as Castra, PlanetLib-based planets, or ATAN Nuclear Science are picked up opportunistically when they are active lab inputs and have visible recipes that output the pack item.
 
-Large mod packs and utility mods such as Alien Biomes, Informatron, Jetpack, AAI, and Helmod usually do not need explicit recipe productivity support unless they add recipes for items or fluids covered by one of this mod's streams. When they do, output-based matching should pick up visible recipes automatically.
+Large mod packs and utility mods such as Alien Biomes, Informatron, Jetpack, AAI, and Helmod usually do not need explicit recipe productivity support unless they add recipes for items, fluids, or science packs covered by one of this mod's streams. When they do, output-based matching should pick up visible recipes automatically.
+
+### Support Lanes For Older Mods
+
+MIR can add and test support for mods that currently advertise an older Factorio line. Upstream Factorio-version metadata is not a reason to avoid implementing safe output-based or fixture-backed support, because the same support may be useful when the external mod updates and when MIR backports behavior to a Factorio `2.0` branch.
+
+Claims must stay precise:
+
+- A representative fixture proves MIR's behavior for the recipe family or science-pack shape.
+- A real external load profile proves that a named mod/version loads with a named MIR package and Factorio binary.
+- Public copy should say "loader recipes are covered by belt productivity when visible" rather than "full AAI Loaders support" unless the broader external load profile has passed.
+- Backport candidates should keep the same behavioral boundary and rerun the legacy validation lane instead of weakening current-line support.
 
 ## Known Limits
 
@@ -415,7 +427,7 @@ Set `$env:FACTORIO_LOG` or pass `-FactorioLog` when the Factorio log is not at t
 
 The runtime check copies this repo and the fixture mods into isolated temporary user-data mod directories, adds test-only dependencies from the copied mod to the fixture mods for deterministic load order, writes fixture `mod-list.json` files, and asks Factorio to create saves. It is intentionally a load/prototype validation harness, not a gameplay test.
 
-The runtime fixture run enables the generation diagnostics report in the copied mod and covers both lab incompatibility policies. The default `reduce` scenario asserts that science-pack productivity generated with the custom item-based fixture science pack included. The `skip` scenario forces the copied setting default to `skip` and asserts that the intentionally incompatible science-pack productivity stream is skipped instead of reduced. Additional runtime scenarios force the science-pack ingredient policies, require the end-game prerequisite gate, verify checkbox-enabled and checkbox-disabled stream/base-extension behavior, enable cargo landing pad count without Space Age to prove the stream skips on the Space Age mod gate, assert Space Age cargo logistics effect shape when cargo landing pad count is enabled, add a fixture finite vanilla-chain level before MIR to prove existing levels are preserved while MIR extends after them, assert broad generation integrity in both base-only and Space Age runs, enable the normally disabled inserter-capacity continuation in both base-only and Space Age runs, assert weapon shooting speed overlap handling preserves finite vanilla tank cannon speed, and assert Omega-style drill recipes receive mining drill productivity. The diagnostics report also emits compiler rows for typed fact summaries, generated-technology decisions, lab matrices, loop-risk flags, rule surfaces, and useful cap estimates. The expected Factorio log file is part of the validation evidence; if it is missing, runtime validation fails.
+The runtime fixture run enables the generation diagnostics report in the copied mod and covers both lab incompatibility policies. The default `reduce` scenario asserts that science-pack productivity generated with the custom item-based fixture science pack included. The `skip` scenario forces the copied setting default to `skip` and asserts that the intentionally incompatible science-pack productivity stream is skipped instead of reduced. Additional runtime scenarios force the science-pack ingredient policies, require the end-game prerequisite gate, verify checkbox-enabled and checkbox-disabled stream/base-extension behavior, enable cargo landing pad count without Space Age to prove the stream skips on the Space Age mod gate, assert Space Age cargo logistics effect shape when cargo landing pad count is enabled, add a fixture finite vanilla-chain level before MIR to prove existing levels are preserved while MIR extends after them, assert broad generation integrity in both base-only and Space Age runs, enable the normally disabled inserter-capacity continuation in both base-only and Space Age runs, assert weapon shooting speed overlap handling preserves finite vanilla tank cannon speed, assert AAI-style loader recipes receive belt productivity, assert standalone big-mining-drill recipes receive mining drill productivity, assert ATAN-style Nuclear Science packs receive science-pack productivity with lab-compatible science, and assert Omega-style drill recipes receive mining drill productivity. The diagnostics report also emits compiler rows for typed fact summaries, generated-technology decisions, lab matrices, loop-risk flags, rule surfaces, and useful cap estimates. The expected Factorio log file is part of the validation evidence; if it is missing, runtime validation fails.
 
 Static validation builds an ignored validation archive from the current source tree based on `info.json`. The package must use the matching `<name>_<version>/` root, contain matching `info.json` metadata, include locale, top-level data-stage and control-stage files, core prototype modules, migrations, README, changelog, license, and thumbnail, match the repository contents for packaged source and locale files, and avoid developer docs, build output, fixtures, scripts, Git, and temporary/editor artifacts. The committed `dist/` archive is the upload artifact, not the live source-parity fixture for every documentation-only commit.
 
@@ -462,6 +474,22 @@ Create a local test mod that:
 
 Expected result: custom item-based science packs that are active lab inputs and have visible recipes receive science-pack productivity effects.
 
+### ATAN Nuclear Science Fixture
+
+Create a local test mod pair that:
+
+- Adds a visible `nuclear-science-pack` item and recipe.
+- Adds `nuclear-science-pack` to active lab inputs.
+- Unlocks the science pack from an ATAN-style nuclear science technology.
+- Adds a non-science `atan-atom-forge` recipe as an adjacent surface.
+- Runs a post-MIR assertion in `data-final-fixes.lua`.
+- Reads `recipe-prod-research_science_pack_productivity-1`.
+- Fails loading if the science pack recipe is missing from the science-pack productivity effects.
+- Fails loading if the atom forge recipe is included in the science-pack productivity effects.
+- Fails loading if the generated technology does not include the nuclear science pack in its lab-compatible science set.
+
+Expected result: visible custom science-pack recipes receive science-pack productivity and unlock-derived prerequisites, while adjacent non-science buildings remain outside the science-pack stream.
+
 ### Generation Integrity Assertion Fixture
 
 Create a local test mod that:
@@ -498,6 +526,30 @@ Create a local test mod pair that:
 - Fails loading if either Omega-style recipe is missing from the mining drill productivity effects.
 
 Expected result: Omega Drill style recipes and broader visible modded `*-drill` / `*-mining-drill` outputs are covered by mining drill productivity.
+
+### Big Mining Drill Productivity Fixture
+
+Create a local test mod pair that:
+
+- Adds a visible `big-mining-drill` item recipe.
+- Runs a post-MIR assertion in `data-final-fixes.lua`.
+- Reads `recipe-prod-research_mining_drill-1`.
+- Fails loading if the `big-mining-drill` recipe is missing from the mining drill productivity effects.
+- Fails loading if the matched effect uses anything other than the high-tier `+0.05` drill bucket.
+
+Expected result: standalone Big Mining Drill style recipes are covered by the existing mining drill productivity stream without creating a separate research line.
+
+### AAI Loader Belt Productivity Fixture
+
+Create a local test mod pair that:
+
+- Adds visible AAI-style loader recipes for basic, fast, express, and turbo loader tiers.
+- Runs a post-MIR assertion in `data-final-fixes.lua`.
+- Reads `recipe-prod-research_belts-1`.
+- Fails loading if any loader recipe is missing from the belt productivity effects.
+- Fails loading if a loader recipe is assigned to the wrong logistics tier value.
+
+Expected result: loader crafting recipes are covered by transport belt productivity by tier, while loader entity behavior, operating modes, fluids, and compatibility hooks remain outside MIR ownership.
 
 ### Fluid Productivity Fixture
 
@@ -550,6 +602,9 @@ Expected result: vanilla tank cannon fire rate is preserved while MIR avoids dup
 - Confirm runtime fixture validation covers preserving an existing finite vanilla-chain level before adding MIR's generated infinite continuation.
 - Confirm runtime fixture validation covers broad generation integrity in base-only and Space Age runs, including all enabled vanilla numbered extension chains, the checkbox-enabled inserter-capacity continuation, generated `recipe-prod-*` technology shape, single-owner recipe productivity, configured vanilla productivity-family adoption/conflict cases, and Plates n Circuit Productivity replacement/partial-coverage behavior.
 - Confirm runtime fixture validation covers preserving finite vanilla weapon shooting speed cannon-shell effects under MIR's overlap setting.
+- Confirm runtime fixture validation covers AAI-style loader recipe productivity under the belt stream.
+- Confirm runtime fixture validation covers standalone Big Mining Drill recipe productivity under the mining drill stream.
+- Confirm runtime fixture validation covers ATAN-style Nuclear Science pack productivity under the science-pack stream.
 - Confirm runtime fixture validation covers Omega-style drill recipe productivity.
 - Load Factorio with the manual matrix above.
 - Confirm `changelog.txt` has the release version and date.
