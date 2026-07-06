@@ -476,7 +476,7 @@ small bug fixes, compatibility profiles, docs corrections, validation/tooling
 updates, or feature slices that pass the release gate. If a week has no safe
 candidate, record the skip reason instead of publishing an under-tested archive.
 
-Idea-mod audit planning lives in `docs/notes/mod-ideas-audit.md`.
+Idea-mod audit planning lives in `docs/notes/archive/mod-ideas-audit.md`.
 
 | Audit lane | `v2.1.5` decision |
 | --- | --- |

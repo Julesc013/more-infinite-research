@@ -6,7 +6,7 @@ Text-only working copy used for code reading: local temporary extraction generat
 
 Audited zip checksum ledger: `docs/notes/archive/audited-zips-2026-07-05.json`
 
-Expanded feature inventory: `docs/notes/mod-ideas-features.md`
+Expanded feature inventory: `docs/notes/archive/mod-ideas-features.md`
 
 Scope: 60 downloaded archives, 60 unique mod/version pairs. The set mixes Factorio `2.0` and `2.1` targets. `research-cost-curve` has an unusual `info.json` shape but its source was readable. `omniab-space-age-compat` is treated as a future suite-compatibility signal, not a `2.1.5` feature. `better-bot-battery2` was added after the first expanded feature pass and is treated as native modifier cooperation, not exact cleanup. The expanded feature inventory is the current per-archive decision surface; this release-plan note keeps the `2.1.5` and `2.2.0` planning summary.
 
