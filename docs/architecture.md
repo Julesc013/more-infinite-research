@@ -260,7 +260,7 @@ Native modifier overlap diagnostics are also non-blocking. They report that anot
 `ips-require-space-gate` and `mir-science-pack-ingredient-policy` deliberately control different parts of generated technologies.
 
 - `ips-require-space-gate` adds the end-game science unlock as a prerequisite only. It does not change research ingredients.
-- `mir-science-pack-ingredient-policy` changes research ingredients only. `configured` keeps each stream or extension's selected packs, `space` appends space science, `space-and-promethium` appends both high-end packs when available, `all-official` appends official base and Space Age packs without modded packs, and `all` appends every active lab science pack including compatible modded packs.
+- `mir-science-pack-ingredient-policy` changes research ingredients only. `configured` keeps each stream or extension's selected packs, `space` appends space science, `space-and-promethium` appends both high-end packs when available, `space-age-progression` adds Space Age gateway packs only when the selected packs already imply Space Age progression, `official-progression` fills missing official prerequisite-style packs implied by the selected official packs, `mod-progression` follows the loaded technology graph to infer missing lab-compatible packs for selected official or modded science packs, `all-official` appends official base and Space Age packs without modded packs, and `all` appends every active lab science pack including compatible modded packs.
 
 Both generated streams and base-technology extensions run through the same ingredient policy and end-game prerequisite helper so the settings apply consistently to all added infinite research.
 

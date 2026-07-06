@@ -402,7 +402,7 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'name = "ips-require-space-gate"' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'default_value = false' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'name = "mir-science-pack-ingredient-policy"' },
-    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'allowed_values = {"configured", "space", "space-and-promethium", "all-official", "all"}' },
+    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'allowed_values = {"configured", "space", "space-and-promethium", "space-age-progression", "official-progression", "mod-progression", "all-official", "all"}' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'name = "mir-use-installed-space-age-icons"' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'order = "a-120"' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'local pipeline_extent_settings = require("prototypes.pipeline-extent-settings")' },
@@ -443,6 +443,9 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "prototypes\util.lua"; Text = $utilText; Snippet = 'append_end_game_gate_prerequisite' },
     @{ File = "prototypes\lib\science-packs.lua"; Text = $scienceText; Snippet = 'pack_list_official' },
     @{ File = "prototypes\lib\science-packs.lua"; Text = $scienceText; Snippet = 'is_official_science_pack' },
+    @{ File = "prototypes\lib\science-packs.lua"; Text = $scienceText; Snippet = 'space_age_progression_packs_for' },
+    @{ File = "prototypes\lib\science-packs.lua"; Text = $scienceText; Snippet = 'official_progression_packs_for' },
+    @{ File = "prototypes\lib\science-packs.lua"; Text = $scienceText; Snippet = 'mod_progression_packs_for' },
     @{ File = "prototypes\lib\science-packs.lua"; Text = $scienceText; Snippet = 'desired == "all-official"' },
     @{ File = "prototypes\base-tech-extensions.lua"; Text = $baseExtensionsText; Snippet = 'if data.raw.technology[new_name] then' },
     @{ File = "prototypes\base-tech-extensions.lua"; Text = $baseExtensionsText; Snippet = '"target_exists"' },
@@ -569,6 +572,9 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-science-pack-ingredient-policy-configured=Configured per technology' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-science-pack-ingredient-policy-space=Add space science' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-science-pack-ingredient-policy-space-and-promethium=Add space and promethium science' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-science-pack-ingredient-policy-space-age-progression=Match Space Age progression' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-science-pack-ingredient-policy-official-progression=Fill official progression' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-science-pack-ingredient-policy-mod-progression=Match modded progression' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-science-pack-ingredient-policy-all-official=Use all official science packs' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-science-pack-ingredient-policy-all=Use all lab science packs' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = '[string-mod-setting-description]' },
@@ -1635,7 +1641,7 @@ function Set-CopiedLabPolicySkip {
 function Set-CopiedSciencePackIngredientPolicy {
   param(
     [string]$ModsDir,
-    [ValidateSet("configured", "space", "space-and-promethium", "all-official", "all")]
+    [ValidateSet("configured", "space", "space-and-promethium", "space-age-progression", "official-progression", "mod-progression", "all-official", "all")]
     [string]$Policy
   )
   Set-CopiedStartupSettingDefault -ModsDir $ModsDir -Name "mir-science-pack-ingredient-policy" -ValueLiteral "`"$Policy`""
@@ -1749,7 +1755,7 @@ function Initialize-RuntimeScenario {
     [string[]]$DisabledStreamKeys = @(),
     [string[]]$DisabledBaseExtensionKeys = @(),
     [switch]$LabPolicySkip,
-    [ValidateSet("configured", "space", "space-and-promethium", "all-official", "all")]
+    [ValidateSet("configured", "space", "space-and-promethium", "space-age-progression", "official-progression", "mod-progression", "all-official", "all")]
     [string]$SciencePackIngredientPolicy = "configured",
     [ValidateSet("", "off", "only-when-dedicated-tech-enabled", "always")]
     [string]$WeaponSpeedAdjustmentMode = "",
@@ -1889,7 +1895,7 @@ function Invoke-RuntimeScenario {
     [string[]]$DisabledStreamKeys = @(),
     [string[]]$DisabledBaseExtensionKeys = @(),
     [switch]$LabPolicySkip,
-    [ValidateSet("configured", "space", "space-and-promethium", "all-official", "all")]
+    [ValidateSet("configured", "space", "space-and-promethium", "space-age-progression", "official-progression", "mod-progression", "all-official", "all")]
     [string]$SciencePackIngredientPolicy = "configured",
     [ValidateSet("", "off", "only-when-dedicated-tech-enabled", "always")]
     [string]$WeaponSpeedAdjustmentMode = "",
@@ -2560,6 +2566,34 @@ $spaceAgeLabProductivityLine = Get-LastStreamReportLine -Key "research_lab_produ
 if ($spaceAgeLabProductivityLine -notmatch "status=skipped" -or $spaceAgeLabProductivityLine -notmatch "existing technology effect research-productivity laboratory-productivity") {
   throw "Space Age should skip MIR research productivity because vanilla research-productivity already exists: $spaceAgeLabProductivityLine"
 }
+
+Invoke-RuntimeScenario -ScenarioName "space-age-progression-pack-policy" -EnabledFixtureNames @() -SciencePackIngredientPolicy "space-age-progression" -EnableSpaceAge
+$spaceAgeProgressionGearsLine = Get-LastStreamReportLine -Key "research_gears"
+Assert-ReportLineGenerated -Line $spaceAgeProgressionGearsLine -Context "Space Age progression science-pack ingredient policy base stream scenario"
+Assert-ReportScienceDoesNotContain -Line $spaceAgeProgressionGearsLine -Unexpected "space-science-pack" -Context "Space Age progression science-pack ingredient policy base stream scenario"
+$spaceAgeProgressionOilLine = Get-LastStreamReportLine -Key "research_oil_processing_productivity"
+Assert-ReportLineGenerated -Line $spaceAgeProgressionOilLine -Context "Space Age progression science-pack ingredient policy planet stream scenario"
+Assert-ReportScienceContains -Line $spaceAgeProgressionOilLine -Expected "cryogenic-science-pack" -Context "Space Age progression science-pack ingredient policy planet stream scenario"
+Assert-ReportScienceContains -Line $spaceAgeProgressionOilLine -Expected "space-science-pack" -Context "Space Age progression science-pack ingredient policy planet stream scenario"
+Assert-ReportScienceDoesNotContain -Line $spaceAgeProgressionOilLine -Unexpected "promethium-science-pack" -Context "Space Age progression science-pack ingredient policy planet stream scenario"
+
+Invoke-RuntimeScenario -ScenarioName "official-progression-pack-policy" -EnabledFixtureNames @() -SciencePackIngredientPolicy "official-progression" -EnableSpaceAge
+$officialProgressionOilLine = Get-LastStreamReportLine -Key "research_oil_processing_productivity"
+Assert-ReportLineGenerated -Line $officialProgressionOilLine -Context "Official progression science-pack ingredient policy scenario"
+Assert-ReportScienceContains -Line $officialProgressionOilLine -Expected "utility-science-pack" -Context "Official progression science-pack ingredient policy scenario"
+Assert-ReportScienceContains -Line $officialProgressionOilLine -Expected "space-science-pack" -Context "Official progression science-pack ingredient policy scenario"
+Assert-ReportScienceContains -Line $officialProgressionOilLine -Expected "cryogenic-science-pack" -Context "Official progression science-pack ingredient policy scenario"
+Assert-ReportScienceDoesNotContain -Line $officialProgressionOilLine -Unexpected "agricultural-science-pack" -Context "Official progression science-pack ingredient policy should not add unrelated planet packs"
+
+Invoke-RuntimeScenario -ScenarioName "mod-progression-pack-policy" -EnabledFixtureNames @(
+  "mir-fixture-item-science-pack"
+) -SciencePackIngredientPolicy "mod-progression"
+$modProgressionGearsLine = Get-LastStreamReportLine -Key "research_gears"
+Assert-ReportLineGenerated -Line $modProgressionGearsLine -Context "Mod progression science-pack ingredient policy base stream scenario"
+Assert-ReportScienceDoesNotContain -Line $modProgressionGearsLine -Unexpected "mir-fixture-science-pack" -Context "Mod progression science-pack ingredient policy base stream scenario"
+$modProgressionScienceLine = Get-LastStreamReportLine -Key "research_science_pack_productivity"
+Assert-ReportLineGenerated -Line $modProgressionScienceLine -Context "Mod progression science-pack ingredient policy selected mod pack scenario"
+Assert-ReportScienceContains -Line $modProgressionScienceLine -Expected "mir-fixture-science-pack" -Context "Mod progression science-pack ingredient policy selected mod pack scenario"
 
 if ($isFactorio21Line) {
   Invoke-RuntimeScenario -ScenarioName "base-scripted-candidates-enabled" -EnabledFixtureNames @() -EnabledStreamKeys @(

@@ -25,6 +25,9 @@ U.best_lab_compatible_ingredients = science.best_lab_compatible_ingredients
 U.pack_list_all = science.pack_list_all
 U.pack_list_official = science.pack_list_official
 U.is_official_science_pack = science.is_official_science_pack
+U.space_age_progression_packs_for = science.space_age_progression_packs_for
+U.official_progression_packs_for = science.official_progression_packs_for
+U.mod_progression_packs_for = science.mod_progression_packs_for
 U.pack_list_for_extension = science.pack_list_for_extension
 U.prereq_tech_for_science_pack = science.prereq_tech_for_science_pack
 U.end_game_science_pack = science.end_game_science_pack
@@ -241,9 +244,11 @@ end
 
 function U.apply_science_pack_ingredient_policy(ingredients)
   local out, seen = {}, {}
+  local selected_packs = {}
   local policy = startup_setting("mir-science-pack-ingredient-policy") or "configured"
   for _, ingredient in ipairs(ingredients or {}) do
     local name = ingredient_name(ingredient)
+    if name then table.insert(selected_packs, name) end
     if policy ~= "all-official" or U.is_official_science_pack(name) then
       append_ingredient(out, seen, name, ingredient_amount(ingredient))
     end
@@ -256,6 +261,18 @@ function U.apply_science_pack_ingredient_policy(ingredients)
   elseif policy == "space-and-promethium" then
     append_ingredient(out, seen, "space-science-pack", 1)
     append_ingredient(out, seen, "promethium-science-pack", 1)
+  elseif policy == "space-age-progression" then
+    for _, pack in ipairs(U.space_age_progression_packs_for(selected_packs)) do
+      append_ingredient(out, seen, pack, 1)
+    end
+  elseif policy == "official-progression" then
+    for _, pack in ipairs(U.official_progression_packs_for(selected_packs)) do
+      append_ingredient(out, seen, pack, 1)
+    end
+  elseif policy == "mod-progression" then
+    for _, pack in ipairs(U.mod_progression_packs_for(selected_packs)) do
+      append_ingredient(out, seen, pack, 1)
+    end
   elseif policy == "all-official" then
     for _, pack in ipairs(U.pack_list_official()) do
       append_ingredient(out, seen, pack, 1)

@@ -27,6 +27,7 @@ Date: 2026-07-06
 
     - Kept the new compiler path report-only so broad unknown mod behavior remains observed before it is emitted.
     - Added compatibility safeguards for AAI-style loaders, standalone big mining drills, and ATAN-style nuclear science packs.
+    - Added progression-aware science-pack ingredient policies for official and modded science-pack chains.
     - Extended compatibility observation output with compiler, decision, capability, loop-risk, rule-surface, and lab-matrix rows.
     - Added schema helpers, a resolver contract, capability policy, and compatibility claims.
     - Added generated-stream manifest linting and planner report diff tooling.

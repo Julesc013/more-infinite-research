@@ -158,7 +158,7 @@ For most generated research you can change:
 Other useful settings:
 
 - Require finishing the game before generated technologies: optional, off by default.
-- Extra science packs for generated technologies: keep configured packs, add space science, add space and promethium science, use all official science packs, or use all active lab science packs.
+- Extra science packs for generated technologies: keep configured packs, add fixed late-game packs, infer missing official or modded progression packs from selected packs, use all official science packs, or use all active lab science packs.
 - What to do when no lab can research a technology: reduce to compatible science packs by default, or skip incompatible technologies.
 - Use MIR when another mod adds the same infinite research: lets this mod remove selected overlapping infinite technologies when MIR generated replacements exist.
 - Remove duplicate rocket/cannon speed from general weapon speed: optional cleanup; off by default.
