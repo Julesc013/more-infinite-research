@@ -123,7 +123,7 @@ foreach ($manifest in @(
   ".mir/docs.yml",
   ".mir/modules.yml",
   ".mir/capabilities.yml",
-  ".mir/claims.yml",
+  ".mir/compatibility.yml",
   ".mir/streams.yml",
   ".mir/fixtures.yml",
   ".mir/branches.yml",
@@ -221,7 +221,7 @@ foreach ($dir in $docDirectories) {
   }
 }
 
-foreach ($manifest in @(".mir/claims.yml", ".mir/streams.yml")) {
+foreach ($manifest in @(".mir/compatibility.yml", ".mir/streams.yml")) {
   $text = Read-MIRText -RelativePath $manifest
   foreach ($match in [regex]::Matches($text, "(?m)^canonical_[a-z_]+:\s+(.+?)\s*$")) {
     $relative = $match.Groups[1].Value.Trim()
@@ -253,15 +253,20 @@ foreach ($match in [regex]::Matches($fixturesText, "(?m)^\s+(path|assertion_path
   }
 }
 
-$claimsManifestText = Read-MIRText -RelativePath ".mir/claims.yml"
+$claimsManifestText = Read-MIRText -RelativePath ".mir/compatibility.yml"
 $claimsPathMatch = [regex]::Match($claimsManifestText, "(?m)^canonical_machine_record:\s+(.+?)\s*$")
 if (-not $claimsPathMatch.Success) {
-  throw ".mir/claims.yml must declare canonical_machine_record."
+  throw ".mir/compatibility.yml must declare canonical_machine_record."
 }
+$targetDocsRootMatch = [regex]::Match($claimsManifestText, "(?m)^target_docs_root:\s+(.+?)\s*$")
+if (-not $targetDocsRootMatch.Success) {
+  throw ".mir/compatibility.yml must declare target_docs_root."
+}
+$targetDocsRoot = $targetDocsRootMatch.Groups[1].Value.Trim().TrimEnd("/")
 $claims = Get-Content -Raw -LiteralPath (Join-Path $repo $claimsPathMatch.Groups[1].Value.Trim()) | ConvertFrom-Json
 foreach ($claim in @($claims.claims)) {
   $slug = ConvertTo-MIRClaimPageSlug -Name ([string]$claim.mod)
-  $page = "docs/compatibility/modpacks/$slug.md"
+  $page = "$targetDocsRoot/$slug.md"
   if (-not (Test-MIRRepoPath -RelativePath $page)) {
     throw "Compatibility claim $($claim.mod) has no claim page: $page"
   }
@@ -284,3 +289,4 @@ foreach ($file in $capabilityLuaFiles) {
 }
 
 Write-Host "[ok] MIR docs and governance lint passed."
+

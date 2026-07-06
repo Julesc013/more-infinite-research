@@ -1,5 +1,5 @@
 ---
-title: "Compatibility Modpacks"
+title: "Compatibility Targets"
 status: current
 applies_to: "3.0.0+"
 audience: modpack-author
@@ -10,7 +10,7 @@ supersedes: []
 superseded_by: []
 ---
 
-# Compatibility Modpacks
+# Compatibility Targets
 
 Each page records the public claim, evidence, generated streams, and known
-non-goals for one external mod or load profile.
+non-goals for one external mod, ecosystem, campaign, or load profile.

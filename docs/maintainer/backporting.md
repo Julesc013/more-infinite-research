@@ -171,7 +171,7 @@ The 3.0 line should formalize:
 - negative fixtures for loop-risk, hidden, cap-zero, external-owner, science,
   loader-like, and drill-like decoys;
 - differential planner report tooling;
-- performance budgets for large modpacks;
+- performance budgets for large compatibility targets;
 - public ADRs for architecture, settings, migration, claims, and runtime
   boundaries.
 

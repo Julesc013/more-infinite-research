@@ -308,7 +308,7 @@ Do not collapse these into one vague "productivity" bucket.
 - make report diffing part of normal compatibility review;
 - lint policy overlays;
 - make ordering deterministic;
-- add performance budgets for large modpacks;
+- add performance budgets for large compatibility targets;
 - create public ADRs for decisions we should not rediscover.
 
 ## What 3.0 Should Not Do Automatically

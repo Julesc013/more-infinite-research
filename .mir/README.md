@@ -16,8 +16,9 @@ Current manifests:
 - `docs.yml`: registered documentation pages and source-of-truth ownership.
 - `modules.yml`: prototype/module boundaries and mutation rules.
 - `capabilities.yml`: capability lanes and their canonical docs.
-- `claims.yml`: compatibility claim record locations and public claim rules.
+- `compatibility.yml`: compatibility claim record locations and public claim rules.
 - `streams.yml`: generated stream manifest location and stream policy.
 - `fixtures.yml`: fixture groups and the claims or gates they validate.
 - `branches.yml`: branch purposes, accepted changes, and backport rules.
 - `agents.yml`: required reading and validation routes for Codex-style agents.
+

@@ -23,10 +23,11 @@ Rules:
 - Archived pages are historical only and must name a replacement.
 - Active docs do not link to archive material unless the link is explicitly
   historical context.
-- Compatibility pages must match `.mir/claims.yml` and fixture evidence.
+- Compatibility pages must match `.mir/compatibility.yml` and fixture evidence.
 
 Run docs governance through static validation:
 
 ```powershell
 .\scripts\Invoke-MIRValidation.ps1 -StaticOnly
 ```
+

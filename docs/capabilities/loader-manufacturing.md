@@ -23,4 +23,5 @@ Evidence:
 - a visible recipe produces the item;
 - existing MIR belt productivity or a future validated stream owns the effect.
 
-Known fixture: [AAI Loaders](../compatibility/modpacks/aai-loaders.md).
+Known fixture: [AAI Loaders](../compatibility/targets/aai-loaders.md).
+

@@ -24,5 +24,6 @@ Evidence:
 - existing MIR mining-drill productivity or a future validated stream owns the
   effect.
 
-Known fixtures: [Big Mining Drill](../compatibility/modpacks/big-mining-drill.md)
+Known fixtures: [Big Mining Drill](../compatibility/targets/big-mining-drill.md)
 and `omega-drill`.
+

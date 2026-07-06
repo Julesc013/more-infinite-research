@@ -13,7 +13,7 @@ superseded_by: []
 # Compatibility Claim Schema
 
 The canonical machine record is `fixtures/compat-matrix/claims.json`, routed by
-`.mir/claims.yml`.
+`.mir/compatibility.yml`.
 
 Required fields:
 
@@ -26,3 +26,4 @@ Required fields:
 | `generated_streams` | Manifest stream IDs used by the claim. |
 | `fixtures` | Fixture or named load-check evidence. |
 | `public_text` | Allowed public wording. |
+

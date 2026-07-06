@@ -441,84 +441,84 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - compatibility-matrix
-  - path: docs/compatibility/modpacks/aai-containers.md
+  - path: docs/compatibility/targets/aai-containers.md
     title: "AAI Containers Compatibility"
     status: current
     audience: modpack-author
     doc_type: reference
     owner: mir-maintainers
     source_of_truth_for: []
-  - path: docs/compatibility/modpacks/aai-industry.md
+  - path: docs/compatibility/targets/aai-industry.md
     title: "AAI Industry Compatibility"
     status: current
     audience: modpack-author
     doc_type: reference
     owner: mir-maintainers
     source_of_truth_for: []
-  - path: docs/compatibility/modpacks/aai-loaders.md
+  - path: docs/compatibility/targets/aai-loaders.md
     title: "AAI Loaders Compatibility"
     status: current
     audience: modpack-author
     doc_type: reference
     owner: mir-maintainers
     source_of_truth_for: []
-  - path: docs/compatibility/modpacks/atan-air-scrubbing.md
+  - path: docs/compatibility/targets/atan-air-scrubbing.md
     title: "ATAN Air Scrubbing Compatibility"
     status: current
     audience: modpack-author
     doc_type: reference
     owner: mir-maintainers
     source_of_truth_for: []
-  - path: docs/compatibility/modpacks/atan-ash.md
+  - path: docs/compatibility/targets/atan-ash.md
     title: "ATAN Ash Compatibility"
     status: current
     audience: modpack-author
     doc_type: reference
     owner: mir-maintainers
     source_of_truth_for: []
-  - path: docs/compatibility/modpacks/atan-nuclear-science.md
+  - path: docs/compatibility/targets/atan-nuclear-science.md
     title: "ATAN Nuclear Science Compatibility"
     status: current
     audience: modpack-author
     doc_type: reference
     owner: mir-maintainers
     source_of_truth_for: []
-  - path: docs/compatibility/modpacks/big-mining-drill.md
+  - path: docs/compatibility/targets/big-mining-drill.md
     title: "Big Mining Drill Compatibility"
     status: current
     audience: modpack-author
     doc_type: reference
     owner: mir-maintainers
     source_of_truth_for: []
-  - path: docs/compatibility/modpacks/equipment-gantry.md
+  - path: docs/compatibility/targets/equipment-gantry.md
     title: "Equipment Gantry Compatibility"
     status: current
     audience: modpack-author
     doc_type: reference
     owner: mir-maintainers
     source_of_truth_for: []
-  - path: docs/compatibility/modpacks/fluid-must-flow.md
+  - path: docs/compatibility/targets/fluid-must-flow.md
     title: "Fluid Must Flow Compatibility"
     status: current
     audience: modpack-author
     doc_type: reference
     owner: mir-maintainers
     source_of_truth_for: []
-  - path: docs/compatibility/modpacks/jetpack.md
+  - path: docs/compatibility/targets/jetpack.md
     title: "Jetpack Compatibility"
     status: current
     audience: modpack-author
     doc_type: reference
     owner: mir-maintainers
     source_of_truth_for: []
-  - path: docs/compatibility/modpacks/README.md
-    title: "Compatibility Modpacks"
+  - path: docs/compatibility/targets/README.md
+    title: "Compatibility Targets"
     status: current
     audience: modpack-author
     doc_type: reference
     owner: mir-maintainers
     source_of_truth_for: []
-  - path: docs/compatibility/modpacks/robot-attrition.md
+  - path: docs/compatibility/targets/robot-attrition.md
     title: "Robot Attrition Compatibility"
     status: current
     audience: modpack-author

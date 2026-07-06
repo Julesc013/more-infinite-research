@@ -24,7 +24,7 @@ context_sets:
 
   compatibility-change:
     read_first:
-      - .mir/claims.yml
+      - .mir/compatibility.yml
       - .mir/streams.yml
       - docs/compatibility/claim-levels.md
       - docs/maintainer/adding-a-policy-overlay.md
@@ -45,3 +45,4 @@ context_sets:
       - docs/maintainer/backporting.md
     validate:
       - powershell: .\scripts\Test-MIRBranchPolicy.ps1 -SkipFetch
+

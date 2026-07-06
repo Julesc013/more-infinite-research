@@ -2,16 +2,20 @@ schema: 1
 
 canonical_machine_record: fixtures/compat-matrix/claims.json
 canonical_support_lanes: fixtures/compat-matrix/support-lanes.json
-claim_docs_root: docs/compatibility/modpacks
+target_docs_root: docs/compatibility/targets
 
-allowed_claim_levels:
-  - loads
-  - observed
-  - cooperates
-  - diagnostic-only
-  - partial-support
-  - full-family-support
-  - full-pack-support
+claims:
+  allowed_levels:
+    - loads
+    - observed
+    - cooperates
+    - diagnostic-only
+    - partial-support
+    - full-family-support
+    - full-pack-support
+
+targets:
+  docs_root: docs/compatibility/targets
 
 rules:
   - every public compatibility claim has a compatibility page
