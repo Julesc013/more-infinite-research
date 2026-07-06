@@ -17,12 +17,15 @@ Date: 2026-07-06
     - Added capability diagnostics for entity-backed loader crafting recipes.
     - Added capability diagnostics for entity-backed mining-drill crafting recipes.
     - Added native modifier ownership diagnostics for selected lab, mining, logistics, and robot modifiers.
+    - Added negative capability coverage for loop risks, hidden recipes, cap-zero recipes, and loader/drill structural decoys.
 
   Internal:
 
     - Kept the new compiler path report-only so broad unknown mod behavior remains observed before it is emitted.
     - Added compatibility safeguards for AAI-style loaders, standalone big mining drills, and ATAN-style nuclear science packs.
     - Extended compatibility observation output with compiler, decision, capability, loop-risk, rule-surface, and lab-matrix rows.
+    - Added schema helpers, a resolver contract, capability policy, and compatibility claims.
+    - Added generated-stream manifest linting and planner report diff tooling.
 
 ---------------------------------------------------------------------------------------------------
 Version: 2.1.5

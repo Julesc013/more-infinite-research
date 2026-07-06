@@ -18,6 +18,8 @@ Use `scripts/mir.ps1` first:
 .\scripts\mir.ps1 report observations --run <path>
 .\scripts\mir.ps1 package build
 .\scripts\mir.ps1 local-index build --mods <path>
+.\scripts\Test-MIRPolicyLints.ps1
+.\scripts\Compare-MIRPlannerReports.ps1 -Before <old-run> -After <new-run>
 ```
 
 Common overrides:
@@ -44,6 +46,17 @@ still require the full release gate.
 `report observations` summarizes `compat-observations.csv` rows produced by the
 audit converter. Use it to see diagnostics-only planner rows and recipe-cap
 warnings without treating them as failures or profile candidates.
+
+`Test-MIRPolicyLints.ps1` is the static policy gate for the procedural
+compatibility kernel. It checks resolver contract wiring, capability policy,
+generated stream manifest fields, support-lane fixtures, compatibility claims,
+and broad public-claim wording.
+
+`Compare-MIRPlannerReports.ps1` compares two runs that contain
+`compat-observations.json`. Use it after changing classifier, policy, or
+compatibility fixture behavior to see new and removed generated streams,
+capability decisions, unknown candidates, loop risks, owner rows,
+science/lab rows, cap diagnostics, and claim-level entries.
 
 ## Run Profiles
 
@@ -104,6 +117,8 @@ scripts/Invoke-MIRExtendedTests.ps1
 scripts/Invoke-MIRCompatAudit.ps1
 scripts/Convert-MIRCompatAuditResults.ps1
 scripts/New-MIRCompatProfileStub.ps1
+scripts/Test-MIRPolicyLints.ps1
+scripts/Compare-MIRPlannerReports.ps1
 ```
 
 Private helpers:

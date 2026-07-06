@@ -40,6 +40,7 @@ Latest official API docs checked on 2026-07-06: `2.1.9`. Local runtime validatio
 | `FluidBox.max_pipeline_extent` applies to a pipeline through the minimum extent of all fluid boxes in that pipeline | Factorio `FluidBox` docs plus runtime pipeline fixture | Verified | MIR's current pipeline multiplier is a global fluidbox prototype extension, not only a pipe-entity extension |
 | `FluidBox` is used by many prototype classes, including pipes, pipe-to-ground, pumps, storage tanks, crafting machines, mining drills, generators, thrusters, and valves | Factorio `FluidBox` docs | Verified | Pipeline extent docs must warn that non-default values can affect machine/tank/thruster/modded fluid boxes |
 | Technology modifier list includes cargo landing pad count, cargo bay unloading distance, and recipe productivity | Factorio modifier docs | Verified | These are native modifier candidates where supported |
+| Technology prototypes expose effects and `max_level = "infinite"` | Factorio `TechnologyPrototype` docs | Verified | Generated stream IDs and migration policy are save-compatibility surfaces, not temporary report IDs |
 | Technology modifier list includes mining-drill productivity, belt stack size, lab productivity, lab speed, and worker robot modifiers | Factorio modifier docs | Verified | Native modifier ownership diagnostics must stay separate from recipe-productivity streams |
 | `RecipePrototype` exposes productivity eligibility, productivity caps, results, ingredients, and surface conditions | Factorio `RecipePrototype` docs | Verified | The compatibility kernel can observe recipe-productivity risk without mutating recipe rules |
 | Loader entities are distinct `LoaderPrototype` surfaces, including the `loader` and `loader-1x1` prototype types seen in local base prototypes | Factorio `LoaderPrototype` docs plus local Factorio `2.1.9` base prototypes | Verified | Loader support should mean loader crafting productivity, not loader throughput or operating behavior |
@@ -73,6 +74,7 @@ Latest official API docs checked on 2026-07-06: `2.1.9`. Local runtime validatio
 
 - Mod structure: <https://lua-api.factorio.com/latest/auxiliary/mod-structure.html>
 - Modifier list: <https://lua-api.factorio.com/latest/types/Modifier.html>
+- `TechnologyPrototype`: <https://lua-api.factorio.com/latest/prototypes/TechnologyPrototype.html>
 - `ChangeRecipeProductivityModifier`: <https://lua-api.factorio.com/latest/types/ChangeRecipeProductivityModifier.html>
 - `RecipePrototype`: <https://lua-api.factorio.com/latest/prototypes/RecipePrototype.html>
 - `LoaderPrototype`: <https://lua-api.factorio.com/latest/prototypes/LoaderPrototype.html>

@@ -319,7 +319,7 @@ Use `docs/compatibility-program.md` as the decision framework for roles such as 
 
 Preferred order:
 
-1. Extend the diagnostics-only compatibility planner/registry started in `v2.1.5`, so detected mods, roles, actions, non-actions, capability evidence, and public claims share one control surface.
+1. Extend the diagnostics-only compatibility planner/registry started in `v2.1.5`, so detected mods, roles, actions, non-actions, capability evidence, and public claims share one control surface. The `2.2.0` kernel now has schema helpers, resolver contract validation, capability-specific policy, generated-stream manifest linting, compatibility claims, report diff tooling, and negative capability fixtures.
 2. Add external rule-mutator and loop-risk diagnostics before considering any productivity-rule setting.
 3. Extend cap-aware diagnostics beyond warnings only if an explicit policy exists; do not silently change balance.
 4. Air Scrubbing clean-filter productivity, with fixtures proving scrubbing and cleaning recipes are excluded.

@@ -197,6 +197,23 @@ recipes are covered by belt productivity when visible, mining-drill recipes are
 covered by mining drill productivity when visible, and native mining-yield
 modifiers remain separate from drill manufacturing productivity.
 
+The kernel now has enforceable platform pieces:
+
+- schema versions in `prototypes/lib/mir/schema.lua`;
+- resolver contract validation in `prototypes/lib/capabilities/contract.lua`;
+- capability-specific policy in `prototypes/lib/policy/capabilities.lua`;
+- generated stream manifest metadata in
+  `prototypes/planner/generated-stream-manifest.json`;
+- machine-readable claims in `fixtures/compat-matrix/claims.json`;
+- static linting through `scripts/Test-MIRPolicyLints.ps1`;
+- report drift comparison through `scripts/Compare-MIRPlannerReports.ps1`;
+- negative capability fixtures for loop risks, hidden recipes, cap-zero recipes,
+  and structural loader/drill decoys.
+
+New mod support should add policy and fixtures first. New behavior classes
+should add or extend a capability resolver. New false positives should become
+classifier or policy fixes. New bug reports should become negative fixtures.
+
 ## Diagnostics
 
 `mir-debug-generation-report` enables a structured log report. The report records generated and skipped streams/extensions with:

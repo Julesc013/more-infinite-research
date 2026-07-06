@@ -1,0 +1,75 @@
+{
+  "schema": 1,
+  "claims": [
+    {
+      "mod": "atan-air-scrubbing",
+      "claim_level": "full family support: clean-filter crafting only",
+      "capabilities": {
+        "recipe-productivity": "generated",
+        "loop-risk": "diagnostic-only"
+      },
+      "tested_factorio": "2.1.9",
+      "tested_mod_versions": [],
+      "generated_streams": [
+        "mir-prod-air-scrubbing-clean-filter"
+      ],
+      "fixtures": [
+        "mir-fixture-air-scrubbing",
+        "mir-fixture-assert-air-scrubbing-clean-filter"
+      ],
+      "diagnostic_only": false,
+      "public_text": "MIR adds productivity to Air Scrubbing clean pollution and spore filter crafting recipes only; scrubbing, cleaning, recovery, and environmental-removal recipes remain diagnostic-only."
+    },
+    {
+      "mod": "aai-loaders",
+      "claim_level": "loader crafting productivity only",
+      "capabilities": {
+        "logistics-loader-manufacturing": "generated-through-existing-stream",
+        "native-belt-stack-size": "observed"
+      },
+      "tested_factorio": "2.1.9",
+      "tested_mod_versions": [],
+      "generated_streams": [],
+      "fixtures": [
+        "mir-fixture-aai-loaders",
+        "mir-fixture-assert-aai-loader-belt-productivity"
+      ],
+      "diagnostic_only": false,
+      "public_text": "MIR covers visible AAI-style loader crafting recipes through belt productivity; it does not change loader throughput, modes, fluids, or compatibility hooks."
+    },
+    {
+      "mod": "big-mining-drill",
+      "claim_level": "mining drill recipe productivity only",
+      "capabilities": {
+        "mining-drill-manufacturing": "generated-through-existing-stream",
+        "native-mining-yield-productivity": "observed"
+      },
+      "tested_factorio": "2.1.9",
+      "tested_mod_versions": [],
+      "generated_streams": [],
+      "fixtures": [
+        "mir-fixture-big-mining-drill",
+        "mir-fixture-assert-big-mining-drill-productivity"
+      ],
+      "diagnostic_only": false,
+      "public_text": "MIR covers visible Big Mining Drill-style crafting recipes through mining drill productivity; it does not add native mining-yield productivity."
+    },
+    {
+      "mod": "atan-nuclear-science",
+      "claim_level": "science-pack recipe productivity only",
+      "capabilities": {
+        "science-pack-integration": "generated-through-existing-stream",
+        "lab-compatibility": "validated"
+      },
+      "tested_factorio": "2.1.9",
+      "tested_mod_versions": [],
+      "generated_streams": [],
+      "fixtures": [
+        "mir-fixture-atan-nuclear-science",
+        "mir-fixture-assert-atan-nuclear-science-productivity"
+      ],
+      "diagnostic_only": false,
+      "public_text": "MIR covers visible ATAN-style nuclear science pack recipes when the science pack is an active lab input; atom forge crafting remains outside this claim."
+    }
+  ]
+}

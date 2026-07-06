@@ -1,4 +1,5 @@
 local productivity_owners = require("prototypes.compat.productivity-owners")
+local schema = require("prototypes.lib.mir.schema")
 
 local R = {}
 
@@ -469,6 +470,10 @@ local function build_loop_risk_facts(recipe_facts)
       end
     end
 
+    if recipe.hidden then
+      push_unique(flags, seen, "hidden_internal", nil)
+    end
+
     if #recipe.results > 1 and contains_pattern(name, {"ore", "fragment", "scrap", "core"}) then
       push_unique(flags, seen, "multi_output_resource_loop", nil)
     end
@@ -524,6 +529,7 @@ function R.build()
   end
 
   return {
+    schema = schema.fact_registry,
     recipes = recipes,
     technologies = technologies,
     machines = machines,

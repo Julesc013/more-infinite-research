@@ -2,6 +2,39 @@
 
 This file records local release-candidate validation runs. It is not a substitute for the manual mod matrix in `docs/compatibility.md`.
 
+## 2026-07-07 2.2.0 Compatibility Platform Policy Pass
+
+Environment:
+
+- Branch: `dev`.
+- Mod version `2.2.0`.
+- Factorio binary: Steam Factorio `2.1.9`.
+- Validation artifact: `build\validation-dist\more-infinite-research_2.2.0.zip`.
+
+Scope:
+
+- Added schema helpers for fact registries and DecisionRecord-style diagnostics.
+- Added the capability resolver contract and capability-specific policy defaults.
+- Added generated-stream manifest linting and machine-readable compatibility claims.
+- Added the planner report diff tool for stable before/after compatibility audits.
+- Added negative capability fixtures for self-return, barrel/container return, voiding, matter/transmutation, hidden recipes, zero productivity caps, and structural loader/drill decoys.
+- Kept native mining yield, loader/drill manufacturing productivity, and science/lab integration as separate capability surfaces.
+
+Commands:
+
+```powershell
+.\scripts\Invoke-MIRValidation.ps1 -StaticOnly
+.\scripts\Invoke-MIRValidation.ps1
+```
+
+Results:
+
+- Static validation passed, including policy, manifest, and compatibility-claim linting.
+- Runtime fixture validation passed.
+- Runtime diagnostics asserted the negative loop-risk and rule-surface cases.
+- Runtime diagnostics asserted loader-like and drill-like container recipes were not classified as loader or mining-drill manufacturing capabilities.
+- Package hygiene validation rebuilt `build\validation-dist\more-infinite-research_2.2.0.zip` without introducing docs, fixtures, or scripts into the distributable archive.
+
 ## 2026-07-07 2.2.0 Procedural Compatibility Kernel Pass
 
 Environment:

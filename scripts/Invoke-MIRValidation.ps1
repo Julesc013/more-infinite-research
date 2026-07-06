@@ -391,6 +391,8 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
   $aaiLoaderFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-aai-loader-belt-productivity\data-final-fixes.lua")
   $bigMiningDrillFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-big-mining-drill-productivity\data-final-fixes.lua")
   $atanNuclearScienceFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-atan-nuclear-science-productivity\data-final-fixes.lua")
+  $capabilityNegativeFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\capability-negative-cases\data.lua")
+  $capabilityNegativeAssertText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-capability-negative-cases\data-final-fixes.lua")
   $defaultsText = Get-Content -Raw -LiteralPath (Join-Path $repo "defaults.lua")
   $localeText = Get-Content -Raw -LiteralPath (Join-Path $repo "locale\en\more-infinite-research.cfg")
 
@@ -534,6 +536,9 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "fixtures\assert-aai-loader-belt-productivity\data-final-fixes.lua"; Text = $aaiLoaderFixtureText; Snippet = 'aai-turbo-loader' },
     @{ File = "fixtures\assert-big-mining-drill-productivity\data-final-fixes.lua"; Text = $bigMiningDrillFixtureText; Snippet = 'big-mining-drill should use +0.05' },
     @{ File = "fixtures\assert-atan-nuclear-science-productivity\data-final-fixes.lua"; Text = $atanNuclearScienceFixtureText; Snippet = 'nuclear-science-pack did not receive science-pack productivity' },
+    @{ File = "fixtures\capability-negative-cases\data.lua"; Text = $capabilityNegativeFixtureText; Snippet = 'mir-loader-like-container' },
+    @{ File = "fixtures\capability-negative-cases\data.lua"; Text = $capabilityNegativeFixtureText; Snippet = 'maximum_productivity = 0' },
+    @{ File = "fixtures\assert-capability-negative-cases\data-final-fixes.lua"; Text = $capabilityNegativeAssertText; Snippet = 'denied_recipes' },
     @{ File = "fixtures\assert-better-bot-battery-skip\data-final-fixes.lua"; Text = $betterBotBatteryFixtureText; Snippet = 'recipe-prod-research_robot_battery-1' },
     @{ File = "fixtures\assert-better-bot-battery-skip\data-final-fixes.lua"; Text = $betterBotBatteryFixtureText; Snippet = 'worker-robots-battery-6' },
     @{ File = "prototypes\weapon-speed-adjustments.lua"; Text = $weaponSpeedText; Snippet = 'tech.unit and tech.unit.count_formula' },
@@ -856,10 +861,14 @@ Invoke-RepoCheck "2.2.0 compiler diagnostics are wired" {
   $diagnosticsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\diagnostics.lua")
   $factRegistryPath = Join-Path $repo "prototypes\lib\facts\registry.lua"
   $capabilityRegistryPath = Join-Path $repo "prototypes\lib\capabilities\registry.lua"
+  $capabilityContractPath = Join-Path $repo "prototypes\lib\capabilities\contract.lua"
+  $capabilityPolicyPath = Join-Path $repo "prototypes\lib\policy\capabilities.lua"
+  $schemaPath = Join-Path $repo "prototypes\lib\mir\schema.lua"
   $compilerPath = Join-Path $repo "prototypes\planner\compiler.lua"
   $converterText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\Convert-MIRCompatAuditResults.ps1")
   $overnightSummaryText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\Show-MIROvernightSummary.ps1")
   $compatPlannerText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\compat\planner.lua")
+  $policyLintText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\Test-MIRPolicyLints.ps1")
 
   if (-not (Test-Path -LiteralPath $factRegistryPath)) {
     throw "Missing typed fact registry: prototypes\lib\facts\registry.lua"
@@ -870,14 +879,23 @@ Invoke-RepoCheck "2.2.0 compiler diagnostics are wired" {
   if (-not (Test-Path -LiteralPath $capabilityRegistryPath)) {
     throw "Missing capability registry: prototypes\lib\capabilities\registry.lua"
   }
+  foreach ($path in @($capabilityContractPath, $capabilityPolicyPath, $schemaPath)) {
+    if (-not (Test-Path -LiteralPath $path)) {
+      throw "Missing 2.2.0 capability kernel artifact: $path"
+    }
+  }
 
   $factRegistryText = Get-Content -Raw -LiteralPath $factRegistryPath
   $capabilityRegistryText = Get-Content -Raw -LiteralPath $capabilityRegistryPath
+  $capabilityContractText = Get-Content -Raw -LiteralPath $capabilityContractPath
+  $capabilityPolicyText = Get-Content -Raw -LiteralPath $capabilityPolicyPath
+  $schemaText = Get-Content -Raw -LiteralPath $schemaPath
   $compilerText = Get-Content -Raw -LiteralPath $compilerPath
 
   $requiredSnippets = @(
     @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'require("prototypes.planner.compiler").emit()' },
     @{ File = "prototypes\diagnostics.lua"; Text = $diagnosticsText; Snippet = 'function D.decision(row)' },
+    @{ File = "prototypes\diagnostics.lua"; Text = $diagnosticsText; Snippet = 'schema.decision(row)' },
     @{ File = "prototypes\diagnostics.lua"; Text = $diagnosticsText; Snippet = '.. " capability=" .. tostring(row.capability or "")' },
     @{ File = "prototypes\diagnostics.lua"; Text = $diagnosticsText; Snippet = '.. " evidence=" .. tostring(row.evidence or "")' },
     @{ File = "prototypes\diagnostics.lua"; Text = $diagnosticsText; Snippet = 'append("rule_mutation", row)' },
@@ -885,8 +903,16 @@ Invoke-RepoCheck "2.2.0 compiler diagnostics are wired" {
     @{ File = "prototypes\diagnostics.lua"; Text = $diagnosticsText; Snippet = 'append("lab_matrix", row)' },
     @{ File = "prototypes\lib\facts\registry.lua"; Text = $factRegistryText; Snippet = 'RecipeFact' },
     @{ File = "prototypes\lib\facts\registry.lua"; Text = $factRegistryText; Snippet = 'RuleMutationFact' },
+    @{ File = "prototypes\lib\facts\registry.lua"; Text = $factRegistryText; Snippet = 'schema = schema.fact_registry' },
     @{ File = "prototypes\lib\facts\registry.lua"; Text = $factRegistryText; Snippet = 'build_loop_risk_facts' },
+    @{ File = "prototypes\lib\mir\schema.lua"; Text = $schemaText; Snippet = 'S.decision_record = 1' },
+    @{ File = "prototypes\lib\capabilities\contract.lua"; Text = $capabilityContractText; Snippet = 'CapabilityResolver' },
+    @{ File = "prototypes\lib\capabilities\contract.lua"; Text = $capabilityContractText; Snippet = '"discover"' },
+    @{ File = "prototypes\lib\policy\capabilities.lua"; Text = $capabilityPolicyText; Snippet = 'P.schema_version = schema.capability_policy' },
+    @{ File = "prototypes\lib\policy\capabilities.lua"; Text = $capabilityPolicyText; Snippet = 'deny_risk_flags' },
     @{ File = "prototypes\lib\capabilities\registry.lua"; Text = $capabilityRegistryText; Snippet = 'Capability resolvers are report-first' },
+    @{ File = "prototypes\lib\capabilities\registry.lua"; Text = $capabilityRegistryText; Snippet = 'contract.validate_all(RESOLVERS)' },
+    @{ File = "prototypes\lib\capabilities\registry.lua"; Text = $capabilityRegistryText; Snippet = 'schema_version = schema.capability_resolver' },
     @{ File = "prototypes\lib\capabilities\registry.lua"; Text = $capabilityRegistryText; Snippet = 'id = "logistics-loader-manufacturing"' },
     @{ File = "prototypes\lib\capabilities\registry.lua"; Text = $capabilityRegistryText; Snippet = 'id = "mining-drill-manufacturing"' },
     @{ File = "prototypes\lib\capabilities\registry.lua"; Text = $capabilityRegistryText; Snippet = 'id = "native-modifier-ownership"' },
@@ -912,7 +938,8 @@ Invoke-RepoCheck "2.2.0 compiler diagnostics are wired" {
     @{ File = "scripts\Convert-MIRCompatAuditResults.ps1"; Text = $converterText; Snippet = 'capability = [string](Get-MIRObjectProperty -Object $row -Name "capability")' },
     @{ File = "scripts\Convert-MIRCompatAuditResults.ps1"; Text = $converterText; Snippet = '## Capability Decisions' },
     @{ File = "scripts\Convert-MIRCompatAuditResults.ps1"; Text = $converterText; Snippet = "Loop Risk Diagnostics" },
-    @{ File = "scripts\Show-MIROvernightSummary.ps1"; Text = $overnightSummaryText; Snippet = "rule_surfaces" }
+    @{ File = "scripts\Show-MIROvernightSummary.ps1"; Text = $overnightSummaryText; Snippet = "rule_surfaces" },
+    @{ File = "scripts\Test-MIRPolicyLints.ps1"; Text = $policyLintText; Snippet = "Generated stream manifest row" }
   )
 
   foreach ($check in $requiredSnippets) {
@@ -999,6 +1026,10 @@ Invoke-RepoCheck "compatibility support lanes are wired" {
       throw "Missing compatibility support-lane entry: $snippet"
     }
   }
+}
+
+Invoke-RepoCheck "compatibility policy and claim lints pass" {
+  & (Join-Path $repo "scripts\Test-MIRPolicyLints.ps1") -RepoRoot $repo
 }
 
 Invoke-RepoCheck "release documentation lists final manual and API checks" {
@@ -1491,6 +1522,7 @@ $postMirAssertionFixtures = @(
   "mir-fixture-assert-atan-nuclear-science-productivity",
   "mir-fixture-assert-better-bot-battery-skip",
   "mir-fixture-assert-big-mining-drill-productivity",
+  "mir-fixture-assert-capability-negative-cases",
   "mir-fixture-assert-generation-integrity",
   "mir-fixture-assert-science-pack-productivity",
   "mir-fixture-assert-lab-skip-policy",
@@ -2030,6 +2062,17 @@ function Get-DiagnosticReportLineContaining {
   return $line.Line
 }
 
+function Assert-NoDiagnosticReportLineContaining {
+  param([string]$Kind, [string]$Key, [string]$Unexpected, [string]$Context)
+  $pattern = "kind=$([regex]::Escape($Kind)) key=$([regex]::Escape($Key))(\s|$)"
+  $line = Select-String -LiteralPath $FactorioLog -Pattern $pattern |
+    Where-Object { $_.Line.Contains($Unexpected) } |
+    Select-Object -Last 1
+  if ($line) {
+    throw "$Context unexpectedly found $Kind diagnostics for $Key with text '$Unexpected': $($line.Line)"
+  }
+}
+
 function Get-LastRecipeCapReportLine {
   param([string]$Recipe)
   $pattern = "kind=recipe_cap .*recipe=$([regex]::Escape($Recipe))(\s|$)"
@@ -2272,6 +2315,25 @@ $raisedCapLine = Get-LastRecipeCapReportLine -Recipe "iron-plate"
 Assert-ReportLineContains -Line $raisedCapLine -Expected "cap_state=raised" -Context "Raised recipe cap diagnostics scenario"
 $extremeCapLine = Get-LastRecipeCapReportLine -Recipe "copper-cable"
 Assert-ReportLineContains -Line $extremeCapLine -Expected "warning_class=uncapped_or_extreme" -Context "Extreme recipe cap diagnostics scenario"
+
+Invoke-RuntimeScenario -ScenarioName "capability-negative-cases" -EnabledFixtureNames @(
+  "mir-fixture-capability-negative-cases",
+  "mir-fixture-assert-capability-negative-cases"
+)
+$selfLoopRiskLine = Get-DiagnosticReportLineContaining -Kind "loop_risk" -Key "mir-self-loop-filter-cleaning" -Expected "catalyst_or_self_return"
+Assert-ReportLineContains -Line $selfLoopRiskLine -Expected "cleaning_or_recovery_loop" -Context "Negative self-loop cleaning risk scenario"
+$barrelRiskLine = Get-DiagnosticReportLineContaining -Kind "loop_risk" -Key "mir-barrel-return-loop" -Expected "barrel_or_container_return"
+Assert-ReportLineContains -Line $barrelRiskLine -Expected "catalyst_or_self_return" -Context "Negative barrel return risk scenario"
+$voidRiskLine = Get-DiagnosticReportLineContaining -Kind "loop_risk" -Key "mir-voiding-sink" -Expected "voiding_or_destruction"
+Assert-ReportLineContains -Line $voidRiskLine -Expected "voiding_or_destruction" -Context "Negative voiding risk scenario"
+$matterRiskLine = Get-DiagnosticReportLineContaining -Kind "loop_risk" -Key "mir-matter-transmutation" -Expected "matter_or_transmutation"
+Assert-ReportLineContains -Line $matterRiskLine -Expected "matter_or_transmutation" -Context "Negative transmutation risk scenario"
+$hiddenRiskLine = Get-DiagnosticReportLineContaining -Kind "loop_risk" -Key "mir-hidden-internal-recipe" -Expected "hidden_internal"
+Assert-ReportLineContains -Line $hiddenRiskLine -Expected "hidden_internal" -Context "Negative hidden recipe risk scenario"
+$zeroCapRuleLine = Get-DiagnosticReportLineContaining -Kind "rule_mutation" -Key "mir-zero-cap-productivity" -Expected "observed_value=0"
+Assert-ReportLineContains -Line $zeroCapRuleLine -Expected "field=maximum_productivity" -Context "Negative zero-cap rule-surface scenario"
+Assert-NoDiagnosticReportLineContaining -Kind "decision" -Key "mir-loader-like-container" -Unexpected "capability=logistics-loader-manufacturing" -Context "Negative loader-like container capability scenario"
+Assert-NoDiagnosticReportLineContaining -Kind "decision" -Key "mir-drill-like-container" -Unexpected "capability=mining-drill-manufacturing" -Context "Negative drill-like container capability scenario"
 
 Invoke-RuntimeScenario -ScenarioName "lab-productivity-owner-skip" -EnabledFixtureNames @(
   "mir-fixture-lab-productivity-owner",

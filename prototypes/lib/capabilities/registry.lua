@@ -1,5 +1,8 @@
 local D = require("prototypes.diagnostics")
+local contract = require("prototypes.lib.capabilities.contract")
 local fact_registry = require("prototypes.lib.facts.registry")
+local policies = require("prototypes.lib.policy.capabilities")
+local schema = require("prototypes.lib.mir.schema")
 local lookup = require("prototypes.lib.prototype-lookup")
 
 local C = {}
@@ -53,24 +56,30 @@ local NATIVE_MODIFIERS = {
 local RESOLVERS = {
   {
     id = "logistics-loader-manufacturing",
+    schema_version = schema.capability_resolver,
     family = "logistics_item",
     subfamily = "loader",
     source = "capability:loader-resolver",
-    policy = "existing_stream_or_report"
+    policy = "existing_stream_or_report",
+    policy_config = policies.for_capability("logistics-loader-manufacturing")
   },
   {
     id = "mining-drill-manufacturing",
+    schema_version = schema.capability_resolver,
     family = "machine_manufacturing",
     subfamily = "mining_drill",
     source = "capability:mining-drill-resolver",
-    policy = "existing_stream_or_report"
+    policy = "existing_stream_or_report",
+    policy_config = policies.for_capability("mining-drill-manufacturing")
   },
   {
     id = "native-modifier-ownership",
+    schema_version = schema.capability_resolver,
     family = "native_modifier",
     subfamily = "owner_registry",
     source = "capability:native-modifier-resolver",
-    policy = "diagnose_only"
+    policy = "diagnose_only",
+    policy_config = policies.for_capability("native-modifier-ownership")
   }
 }
 
@@ -327,8 +336,45 @@ local function emit_native_modifier_decisions(registry, resolver)
   return total, 0, 0, warnings
 end
 
+local function lifecycle_passthrough(value)
+  return value
+end
+
+local function configure_resolvers()
+  RESOLVERS[1].discover = function(registry)
+    return entity_backed_candidates(registry, {loader = true, ["loader-1x1"] = true})
+  end
+  RESOLVERS[1].classify = lifecycle_passthrough
+  RESOLVERS[1].propose = lifecycle_passthrough
+  RESOLVERS[1].validate = lifecycle_passthrough
+  RESOLVERS[1].emit = function(registry, resolver)
+    return emit_recipe_capability_decisions(registry, resolver, {loader = true, ["loader-1x1"] = true})
+  end
+  RESOLVERS[1].diagnose = lifecycle_passthrough
+
+  RESOLVERS[2].discover = function(registry)
+    return entity_backed_candidates(registry, {["mining-drill"] = true})
+  end
+  RESOLVERS[2].classify = lifecycle_passthrough
+  RESOLVERS[2].propose = lifecycle_passthrough
+  RESOLVERS[2].validate = lifecycle_passthrough
+  RESOLVERS[2].emit = function(registry, resolver)
+    return emit_recipe_capability_decisions(registry, resolver, {["mining-drill"] = true})
+  end
+  RESOLVERS[2].diagnose = lifecycle_passthrough
+
+  RESOLVERS[3].discover = native_owner_summary
+  RESOLVERS[3].classify = lifecycle_passthrough
+  RESOLVERS[3].propose = lifecycle_passthrough
+  RESOLVERS[3].validate = lifecycle_passthrough
+  RESOLVERS[3].emit = emit_native_modifier_decisions
+  RESOLVERS[3].diagnose = lifecycle_passthrough
+end
+
+configure_resolvers()
+
 function C.resolvers()
-  return RESOLVERS
+  return contract.validate_all(RESOLVERS)
 end
 
 function C.emit(registry)
@@ -339,27 +385,20 @@ function C.emit(registry)
   local proposed = 0
   local warnings = 0
 
-  local count, gen, prop, warn = emit_recipe_capability_decisions(
-    registry,
-    RESOLVERS[1],
-    {loader = true, ["loader-1x1"] = true}
-  )
+  local resolvers = C.resolvers()
+  local count, gen, prop, warn = resolvers[1].emit(registry, resolvers[1])
   total = total + count
   generated = generated + gen
   proposed = proposed + prop
   warnings = warnings + warn
 
-  count, gen, prop, warn = emit_recipe_capability_decisions(
-    registry,
-    RESOLVERS[2],
-    {["mining-drill"] = true}
-  )
+  count, gen, prop, warn = resolvers[2].emit(registry, resolvers[2])
   total = total + count
   generated = generated + gen
   proposed = proposed + prop
   warnings = warnings + warn
 
-  count, gen, prop, warn = emit_native_modifier_decisions(registry, RESOLVERS[3])
+  count, gen, prop, warn = resolvers[3].emit(registry, resolvers[3])
   total = total + count
   generated = generated + gen
   proposed = proposed + prop

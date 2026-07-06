@@ -459,6 +459,22 @@ policy that already emitted". A future resolver can create new technologies only
 after it has stable stream IDs, fixture coverage, owner checks, lab checks, cap
 diagnostics, and loop-risk denials.
 
+The compatibility platform now has committed machine-readable policy surfaces:
+
+- `prototypes/lib/policy/capabilities.lua` for capability-specific policy;
+- `prototypes/planner/generated-stream-manifest.json` for stable generated IDs
+  and migration policy;
+- `fixtures/compat-matrix/claims.json` for public claim text, capability status,
+  generated stream references, and backing fixtures;
+- `scripts/Test-MIRPolicyLints.ps1` to reject missing schema fields, generated
+  streams without manifest rows, current fixture-backed claims without fixtures,
+  and broad public wording.
+
+Negative fixtures are mandatory for capability work that introduces a new
+automatic target class. The first negative fixture covers self-return, barrel
+return, cleaning, voiding, transmutation, hidden recipe, zero-cap, loader-like
+non-loader, and drill-like non-drill cases.
+
 The long-term data-stage shape should be:
 
 ```text

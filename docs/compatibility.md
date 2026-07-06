@@ -338,6 +338,12 @@ Large mod packs and utility mods such as Alien Biomes, Informatron, Jetpack, AAI
 
 MIR can add and test support for mods that currently advertise an older Factorio line. Upstream Factorio-version metadata is not a reason to avoid implementing safe output-based or fixture-backed support, because the same support may be useful when the external mod updates and when MIR backports behavior to a Factorio `2.0` branch.
 
+Machine-readable support data lives in `fixtures/compat-matrix/support-lanes.json`
+and `fixtures/compat-matrix/claims.json`. Static validation lints those files so
+current fixture-backed claims list fixtures, generated streams have manifest
+rows, and public text stays narrower than "full support" unless a separate
+external load profile proves that claim.
+
 Claims must stay precise:
 
 - A representative fixture proves MIR's behavior for the recipe family or science-pack shape.

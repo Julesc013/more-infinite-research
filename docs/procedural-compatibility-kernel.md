@@ -10,6 +10,7 @@ The durable pipeline is:
 ```text
 discover prototypes
 normalize facts
+resolve capabilities
 classify families and risks
 propose candidate ownership
 validate owner, lab, cap, graph, and policy gates
@@ -26,18 +27,63 @@ The implemented report-first pieces are:
 
 - `prototypes/lib/facts/registry.lua` builds typed facts for recipes,
   technologies, machines, labs, owners, rule surfaces, and loop-risk signals.
+- `prototypes/lib/mir/schema.lua` centralizes schema versions for the fact
+  registry, resolver contract, capability policies, DecisionRecords, stream
+  manifest rows, and compatibility claims.
+- `prototypes/lib/capabilities/contract.lua` validates the resolver interface:
+  `discover`, `classify`, `propose`, `validate`, `emit`, and `diagnose`.
 - `prototypes/lib/capabilities/registry.lua` classifies entity-backed loader
   recipes, entity-backed mining-drill recipes, and native modifier owners.
+- `prototypes/lib/policy/capabilities.lua` stores capability-specific policy
+  defaults, including confidence thresholds, owner policy, science policy, and
+  deny-risk flags.
 - `prototypes/planner/compiler.lua` emits fact summaries, lab matrices,
   DecisionRecord-style rows, loop-risk rows, rule-surface rows, capability rows,
   and useful cap estimates when generation diagnostics are enabled.
 - `scripts/Convert-MIRCompatAuditResults.ps1` preserves capability, subfamily,
   and evidence fields in compatibility observation artifacts.
+- `scripts/Test-MIRPolicyLints.ps1` checks the capability policy, generated
+  stream manifest, support lanes, and compatibility claims.
+- `scripts/Compare-MIRPlannerReports.ps1` compares two compatibility observation
+  exports and summarizes stream, decision, risk, owner, lab/science, cap, and
+  claim drift.
 
 The kernel is report-only except where an existing MIR stream or exact policy
 already owns the behavior. It does not add broad automatic stream generation,
 change recipe caps, change recipe productivity eligibility, alter beacons,
 alter modules, mutate external mod balance, or add runtime productivity systems.
+
+## Platform Boundary
+
+The platform shape is:
+
+```text
+facts
+-> capabilities
+-> candidates
+-> policies
+-> decisions
+-> emitted prototypes
+-> reports, fixtures, and migrations
+```
+
+Each layer has a different job:
+
+| Layer | Responsibility |
+| --- | --- |
+| Facts | Snapshot what exists in final prototype state. |
+| Capabilities | Explain what MIR knows how to reason about. |
+| Candidates | Hold possible targets before policy decisions. |
+| Policies | State what MIR is allowed to do. |
+| Decisions | Record what MIR chose and why. |
+| Emitters | Mutate prototypes only after validation. |
+| Reports | Preserve reviewable evidence. |
+| Fixtures | Prove positive and negative behavior. |
+| Migrations | Preserve save compatibility for stable generated IDs. |
+
+`2.2.0` implements the first enforceable form of that split. The current
+capability rows are report-first, while existing stream emitters remain the only
+place technology prototypes are generated.
 
 ## Capability Lanes
 
@@ -65,12 +111,20 @@ Planned lanes stay separate:
 A capability resolver should follow this contract:
 
 ```text
-discover
-classify
-propose
-validate
-emit
-diagnose
+CapabilityResolver = {
+  id,
+  schema_version,
+  family,
+  subfamily,
+  source,
+  policy,
+  discover,
+  classify,
+  propose,
+  validate,
+  emit,
+  diagnose
+}
 ```
 
 For now, `emit` means "report the stream or policy that already emitted", not
@@ -81,6 +135,7 @@ denials.
 Decision rows should include:
 
 ```text
+schema
 capability
 family
 subfamily
@@ -99,6 +154,39 @@ stable_stream_id, when an existing MIR stream owns the subject
 
 The evidence must come from prototype relationships where possible. Name
 signals are weak hints and should not be enough for broad emission.
+
+## Policies And Claims
+
+Capability-specific policy lives in `prototypes/lib/policy/capabilities.lua`.
+It is intentionally not exposed as settings until a behavior needs user control.
+The current policy surface records:
+
+- mode: `safe` or `observe`;
+- minimum confidence dimensions;
+- required entity types;
+- owner policy;
+- science policy;
+- deny-risk flags.
+
+Machine-readable compatibility claims live in
+`fixtures/compat-matrix/claims.json`. A claim must say which capabilities are
+generated, observed, or diagnostic-only; which fixtures back it; whether a
+generated stream exists; and the exact public text. The policy linter rejects
+claims that reference generated streams without a manifest row or use broad
+"full support" wording.
+
+Generated stream IDs are part of save compatibility. The generated stream
+manifest records:
+
+- stable stream ID;
+- introduced version;
+- capability;
+- family;
+- policy;
+- generated technology;
+- stream key;
+- target recipes;
+- migration policy.
 
 ## Loader Boundary
 
@@ -125,6 +213,25 @@ Mining drill support has two separate lanes:
 The current resolver proves the manufacturing lane by entity-backed drill
 recipes. Native mining-yield owners are observed through the native modifier
 lane, but MIR does not stack or replace them broadly.
+
+## Negative Fixtures
+
+`fixtures/capability-negative-cases` and
+`fixtures/assert-capability-negative-cases` prove that the kernel does not
+target unsafe or structurally wrong candidates. The fixture covers:
+
+- self-return and cleaning loops;
+- barrel return loops;
+- voiding sinks;
+- matter/transmutation names;
+- hidden internal recipes;
+- recipe `maximum_productivity = 0`;
+- loader-like items that place containers, not loader entities;
+- drill-like items that place containers, not mining-drill entities.
+
+Runtime validation asserts that these recipes receive no productivity effects,
+that loop and rule-surface diagnostics are emitted, and that loader/drill decoys
+do not produce loader or mining-drill capability rows.
 
 ## Science Boundary
 

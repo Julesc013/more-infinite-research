@@ -1,5 +1,6 @@
 local D = {}
 local icons = require("prototypes.lib.technology-icons")
+local schema = require("prototypes.lib.mir.schema")
 
 local rows = {}
 local audit_rows = {}
@@ -84,6 +85,7 @@ function D.fact_registry(row)
 end
 
 function D.decision(row)
+  schema.decision(row)
   append("decision", row)
 end
 
@@ -191,6 +193,7 @@ function D.flush()
     for _, row in ipairs(rows) do
       log("[more-infinite-research] report kind=" .. tostring(row.kind)
         .. " key=" .. tostring(row.key or "")
+        .. " schema=" .. tostring(row.schema or "")
         .. " status=" .. tostring(row.status or "")
         .. " reason=" .. tostring(row.reason or "")
         .. " science=" .. tostring(row.science or "")
