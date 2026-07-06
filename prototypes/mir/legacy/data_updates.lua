@@ -1,0 +1,1 @@
+-- Reserved for compatibility hooks that must run before final recipe and lab scanning.

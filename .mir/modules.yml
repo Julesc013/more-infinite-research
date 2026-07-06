@@ -14,6 +14,21 @@ current_roots:
       - migrations
       - prototypes
 
+stage_entrypoints:
+  settings.lua: prototypes/mir/stage/settings.lua
+  data.lua: prototypes/mir/stage/data.lua
+  data-updates.lua: prototypes/mir/stage/data_updates.lua
+  data-final-fixes.lua: prototypes/mir/stage/data_final_fixes.lua
+  control.lua: prototypes/mir/stage/control.lua
+
+namespace_shims:
+  schema: prototypes/mir/core/schema.lua
+  fact_registry: prototypes/mir/domain/facts/registry.lua
+  capability_contract: prototypes/mir/capabilities/contract.lua
+  capability_registry: prototypes/mir/capabilities/registry.lua
+  planner_compiler: prototypes/mir/planner/compiler.lua
+  air_scrubbing_policy: prototypes/mir/compatibility/air_scrubbing.lua
+
 target_layers:
   stage:
     path: prototypes/mir/stage
@@ -126,7 +141,7 @@ target_layers:
 
 current_boundary_allowlist:
   prototype_mutators:
-    - data-final-fixes.lua
+    - prototypes/mir/legacy/data_final_fixes.lua
     - prototypes/tech-gen.lua
     - prototypes/base-tech-extensions.lua
     - prototypes/pipeline-extent.lua

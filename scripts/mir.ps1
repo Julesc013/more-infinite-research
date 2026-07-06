@@ -17,6 +17,9 @@ function Show-MIRHelp {
 MIR developer CLI
 
 Usage:
+  .\scripts\mir.ps1 docs check
+  .\scripts\mir.ps1 architecture check
+  .\scripts\mir.ps1 manifests check
   .\scripts\mir.ps1 release gate [--profile <name>] [--no-git-pull]
   .\scripts\mir.ps1 release docs-only
   .\scripts\mir.ps1 release docs-refresh
@@ -350,6 +353,18 @@ $area = $Args[0]
 $verb = if ($Args.Count -gt 1) { $Args[1] } else { "" }
 
 switch ($area) {
+  "docs" {
+    if ($verb -ne "check") { throw "Unknown docs command: $verb" }
+    & (Join-Path $scriptRoot "Invoke-MIRValidation.ps1") -DocsOnly
+  }
+  "architecture" {
+    if ($verb -ne "check") { throw "Unknown architecture command: $verb" }
+    & (Join-Path $scriptRoot "Invoke-MIRValidation.ps1") -ArchitectureOnly
+  }
+  "manifests" {
+    if ($verb -ne "check") { throw "Unknown manifests command: $verb" }
+    & (Join-Path $scriptRoot "Invoke-MIRValidation.ps1") -ManifestsOnly
+  }
   "release" {
     switch ($verb) {
       "gate" {

@@ -74,6 +74,12 @@ data-final-fixes.lua
 control.lua, only if runtime code is genuinely needed
 ```
 
+Current migration state: the Factorio root entrypoints route through
+`prototypes/mir/stage/`, and the previous entrypoint bodies live under
+`prototypes/mir/legacy/`. This is a behavior-preserving shell migration. The
+generation modules still move behind `domain/`, `capabilities/`, `planner/`,
+and `emit/` in later slices.
+
 ## Three Workspaces
 
 Use three clear workspaces:

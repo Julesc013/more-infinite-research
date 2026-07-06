@@ -18,6 +18,9 @@ This repository has a small MIR developer test harness. It is not a separate pro
 Use `scripts/mir.ps1` first:
 
 ```powershell
+.\scripts\mir.ps1 docs check
+.\scripts\mir.ps1 architecture check
+.\scripts\mir.ps1 manifests check
 .\scripts\mir.ps1 release gate
 .\scripts\mir.ps1 release docs-only
 .\scripts\mir.ps1 release docs-refresh
@@ -119,6 +122,7 @@ scripts/Start-MIROvernightLocalSweep.ps1
 scripts/Show-MIROvernightSummary.ps1
 scripts/Build-MIRPackage.ps1
 scripts/Invoke-MIRValidation.ps1
+scripts/Test-MIRArchitecture.ps1
 ```
 
 Advanced engines:

@@ -1,17 +1,1 @@
-local pipeline_extent_multiplier = require("prototypes.pipeline-extent-settings").multiplier()
-if pipeline_extent_multiplier ~= 1 then
-  require("prototypes.pipeline-extent").apply(pipeline_extent_multiplier)
-end
-local competing_productivity = require("prototypes.compat.competing-productivity")
-competing_productivity.prepare()
-require("prototypes.tech-gen")
-competing_productivity.apply()
-require("prototypes.compat.competing-base-extensions").apply()
-require("prototypes.base-tech-extensions")
-require("prototypes.weapon-speed-adjustments")
-require("prototypes.max-level-control")
-require("prototypes.compat.air-scrubbing").emit()
-require("prototypes.planner.compiler").emit()
-require("prototypes.compat.planner").emit()
-require("prototypes.technology-effect-safety").assert_registered_technology_effects()
-require("prototypes.diagnostics").flush()
+require("prototypes.mir.stage.data_final_fixes").run()

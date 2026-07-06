@@ -19,6 +19,7 @@ context_sets:
       - .mir/modules.yml
       - docs/architecture/module-boundaries.md
     validate:
+      - powershell: .\scripts\mir.ps1 architecture check
       - powershell: .\scripts\Invoke-MIRValidation.ps1 -StaticOnly
 
   compatibility-change:

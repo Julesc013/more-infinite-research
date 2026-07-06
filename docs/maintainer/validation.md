@@ -18,6 +18,14 @@ Run static validation:
 .\scripts\Invoke-MIRValidation.ps1 -StaticOnly
 ```
 
+Run narrow governance checks first when the change is scoped:
+
+```powershell
+.\scripts\mir.ps1 docs check
+.\scripts\mir.ps1 manifests check
+.\scripts\mir.ps1 architecture check
+```
+
 Run runtime validation when a Factorio binary is available:
 
 ```powershell

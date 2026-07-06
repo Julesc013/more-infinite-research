@@ -2,6 +2,9 @@ param(
   [string]$FactorioBin = $env:FACTORIO_BIN,
   [string]$FactorioLog = $env:FACTORIO_LOG,
   [string]$UserDataDir = $env:FACTORIO_USERDATA,
+  [switch]$DocsOnly,
+  [switch]$ManifestsOnly,
+  [switch]$ArchitectureOnly,
   [switch]$StaticOnly
 )
 
@@ -32,6 +35,36 @@ function Get-RepoRelativePath {
   param([string]$Path)
   $resolved = (Resolve-Path -LiteralPath $Path).Path
   return [System.IO.Path]::GetRelativePath($repo.Path, $resolved).Replace("\", "/")
+}
+
+function Get-MIRCombinedSourceText {
+  param([Parameter(Mandatory)][string[]]$RelativePaths)
+
+  $chunks = @()
+  foreach ($relative in $RelativePaths) {
+    $path = Join-Path $repo $relative
+    if (Test-Path -LiteralPath $path) {
+      $chunks += Get-Content -Raw -LiteralPath $path
+    }
+  }
+
+  return ($chunks -join "`n")
+}
+
+function Get-MIRSettingsSourceText {
+  return Get-MIRCombinedSourceText -RelativePaths @(
+    "settings.lua",
+    "prototypes/mir/stage/settings.lua",
+    "prototypes/mir/legacy/settings.lua"
+  )
+}
+
+function Get-MIRDataFinalFixesSourceText {
+  return Get-MIRCombinedSourceText -RelativePaths @(
+    "data-final-fixes.lua",
+    "prototypes/mir/stage/data_final_fixes.lua",
+    "prototypes/mir/legacy/data_final_fixes.lua"
+  )
 }
 
 function Get-DocumentationFiles {
@@ -66,6 +99,23 @@ function Get-PolicyTextFiles {
   }
   $files += Get-DocumentationFiles
   return @($files | Sort-Object FullName -Unique)
+}
+
+if ($DocsOnly -or $ManifestsOnly) {
+  Invoke-RepoCheck "docs and governance manifests are linted" {
+    & (Join-Path $repo "scripts\Test-MIRGovernance.ps1") -RepoRoot $repo
+  }
+  exit 0
+}
+
+if ($ArchitectureOnly) {
+  Invoke-RepoCheck "docs and governance manifests are linted" {
+    & (Join-Path $repo "scripts\Test-MIRGovernance.ps1") -RepoRoot $repo
+  }
+  Invoke-RepoCheck "MIR architecture boundaries are linted" {
+    & (Join-Path $repo "scripts\Test-MIRArchitecture.ps1") -RepoRoot $repo
+  }
+  exit 0
 }
 
 Invoke-RepoCheck "info.json parses" {
@@ -155,6 +205,10 @@ Invoke-RepoCheck "docs match opportunistic compatibility policy" {
 
 Invoke-RepoCheck "docs and governance manifests are linted" {
   & (Join-Path $repo "scripts\Test-MIRGovernance.ps1") -RepoRoot $repo
+}
+
+Invoke-RepoCheck "MIR architecture boundaries are linted" {
+  & (Join-Path $repo "scripts\Test-MIRArchitecture.ps1") -RepoRoot $repo
 }
 
 Invoke-RepoCheck "no old tool-based science pack authority remains" {
@@ -247,7 +301,7 @@ Invoke-RepoCheck "unsafe pickup reach technology effects are blocked" {
   $safetyText = Get-Content -Raw -LiteralPath $safetyPath
   $techGenText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\tech-gen.lua")
   $baseExtensionsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\base-tech-extensions.lua")
-  $dataFinalFixesText = Get-Content -Raw -LiteralPath (Join-Path $repo "data-final-fixes.lua")
+  $dataFinalFixesText = Get-MIRDataFinalFixesSourceText
   $generationIntegrityFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-generation-integrity\data-final-fixes.lua")
 
   foreach ($effectType in @("character-item-pickup-distance", "character-loot-pickup-distance")) {
@@ -368,7 +422,7 @@ Invoke-RepoCheck "fixture mods have metadata and data entrypoints" {
 }
 
 Invoke-RepoCheck "science-pack progression settings are wired" {
-  $settingsText = Get-Content -Raw -LiteralPath (Join-Path $repo "settings.lua")
+  $settingsText = Get-MIRSettingsSourceText
   $utilText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\util.lua")
   $baseExtensionsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\base-tech-extensions.lua")
   $settingsResolverText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\settings-resolver.lua")
@@ -382,7 +436,7 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
   $prototypeLookupText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\lib\prototype-lookup.lua")
   $technologyIconsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\lib\technology-icons.lua")
   $techGenText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\tech-gen.lua")
-  $dataFinalFixesText = Get-Content -Raw -LiteralPath (Join-Path $repo "data-final-fixes.lua")
+  $dataFinalFixesText = Get-MIRDataFinalFixesSourceText
   $pipelineExtentText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\pipeline-extent.lua")
   $pipelineExtentSettingsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\pipeline-extent-settings.lua")
   $diagnosticsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\diagnostics.lua")
@@ -876,7 +930,7 @@ Invoke-RepoCheck "compat audit automation tooling is wired" {
 }
 
 Invoke-RepoCheck "2.2.0 compiler diagnostics are wired" {
-  $dataFinalFixesText = Get-Content -Raw -LiteralPath (Join-Path $repo "data-final-fixes.lua")
+  $dataFinalFixesText = Get-MIRDataFinalFixesSourceText
   $diagnosticsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\diagnostics.lua")
   $factRegistryPath = Join-Path $repo "prototypes\lib\facts\registry.lua"
   $capabilityRegistryPath = Join-Path $repo "prototypes\lib\capabilities\registry.lua"
@@ -969,7 +1023,7 @@ Invoke-RepoCheck "2.2.0 compiler diagnostics are wired" {
 }
 
 Invoke-RepoCheck "Air Scrubbing clean-filter policy is wired" {
-  $dataFinalFixesText = Get-Content -Raw -LiteralPath (Join-Path $repo "data-final-fixes.lua")
+  $dataFinalFixesText = Get-MIRDataFinalFixesSourceText
   $productivityText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\streams\productivity.lua")
   $utilText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\util.lua")
   $diagnosticsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\diagnostics.lua")
@@ -1589,6 +1643,24 @@ function Enable-CopiedScriptedDiagnostics {
   Set-CopiedStartupSettingDefault -ModsDir $ModsDir -Name "mir-debug-scripted-effects" -ValueLiteral "true"
 }
 
+function Get-CopiedSettingsImplementationPath {
+  param([string]$ModsDir)
+
+  $candidates = @(
+    "more-infinite-research\prototypes\mir\legacy\settings.lua",
+    "more-infinite-research\settings.lua"
+  )
+
+  foreach ($relative in $candidates) {
+    $path = Join-Path $ModsDir $relative
+    if (Test-Path -LiteralPath $path) {
+      return $path
+    }
+  }
+
+  throw "Unable to find copied settings implementation."
+}
+
 function Set-CopiedStartupSettingDefault {
   param(
     [string]$ModsDir,
@@ -1596,13 +1668,13 @@ function Set-CopiedStartupSettingDefault {
     [string]$ValueLiteral
   )
 
-  $copiedSettingsPath = Join-Path $ModsDir "more-infinite-research\settings.lua"
+  $copiedSettingsPath = Get-CopiedSettingsImplementationPath -ModsDir $ModsDir
   $copiedSettings = Get-Content -Raw -LiteralPath $copiedSettingsPath
   $escapedName = [regex]::Escape($Name)
   $pattern = "(?s)(name\s*=\s*`"$escapedName`".*?default_value\s*=\s*)([^,\r\n]+)"
   $match = [regex]::Match($copiedSettings, $pattern)
   if (-not $match.Success) {
-    throw "Unable to find startup setting default for $Name in copied settings.lua."
+    throw "Unable to find startup setting default for $Name in copied settings implementation."
   }
 
   $valueGroup = $match.Groups[2]
@@ -1619,7 +1691,7 @@ function Set-CopiedGeneratedStartupSettingDefault {
     [string]$ValueLiteral
   )
 
-  $copiedSettingsPath = Join-Path $ModsDir "more-infinite-research\settings.lua"
+  $copiedSettingsPath = Get-CopiedSettingsImplementationPath -ModsDir $ModsDir
   $copiedSettings = Get-Content -Raw -LiteralPath $copiedSettingsPath
   if ($copiedSettings -notmatch "data:extend\(settings_data\)") {
     throw "Unable to find data:extend(settings_data) while setting generated startup default for $Name."
