@@ -18,12 +18,18 @@ Release-line summary:
 | `2.2.0` | `2.1.x` | compatibility planner, procedural capability diagnostics, and fixture-backed proof slices |
 | `1.9.2` | `2.0.x` | planned transition backport of the tested `2.2.0` source point |
 | `1.9.9` | `2.0.x` | superseded unless explicitly revived; older final Factorio 2.0 plan |
-| `1.8.x` / `1.7.x` | `1.1.x` through `0.6.x` | older-line compatibility ladder recorded in `docs/notes/legacy-backport-cadence.md` |
+| `3.x.x` | `2.1.x` | canonical modern line starting at `3.0.0`; MIR compiler architecture |
+| `2.x.x` | `2.0.x` | maintained Factorio `2.0` line starting at `2.5.0`; first post-3.0 architecture port |
+| `1.9.3+` | `1.1.x` | compatibility port; `1.9.0` through `1.9.2` remain transition exceptions for Factorio `2.0` |
+| `1.8.x` | `1.0.x` | compatibility port; Factorio `0.18` bridge policy still needs recording |
+| `1.7.x` / `1.6.x` / `1.5.x` | `0.17.x` / `0.16.x` / `0.15.x` | reduced native-infinite editions |
+| `1.4.x` / `1.3.x` / `0.12.x` | `0.14.x` / `0.13.x` / `0.12.x` | archive finite-ladder reconstructions |
+| `0.11.x` through `0.6.x` | `0.11.x` through `0.6.x` | museum/discovery builds |
 
 Post-transition versioning starts after the `1.9.2` backport. From that point,
-`3.x.x` is the Factorio `2.1` line, `2.x.x` is the Factorio `2.0` line starting
-at `2.5.0`, `1.9.3+` is the Factorio `1.1` line, and older ranges map to the
-target lines in `docs/notes/target-line-versioning-and-backports.md`.
+public MIR version lines encode the target Factorio generation. Lower lines do
+not imply feature parity; every target-line archive must load under its matching
+Factorio binary before any release candidate wording is honest.
 
 The release goal is graceful compatibility without mod-page dependency clutter: compatible mods should work when their prototypes are visible, absent mods should be skipped cleanly, and no compatibility mod should be required for this mod to load.
 
@@ -280,9 +286,9 @@ Do not publish a compatibility-heavy archive from static validation alone. After
 
 ## Legacy Backport Model
 
-The Factorio `2.0` legacy release More Infinite Research `v1.9.0` was released from the `legacy` branch, backported from the tested More Infinite Research `v2.0.5` Factorio `2.1` quick-patch codebase. `v1.9.1` follows the same snapshot-port model from the tested More Infinite Research `v2.1.0` source point. The next transition port is `v1.9.2` from the tested `v2.2.0` source point. The older planned `v1.9.7`, `v1.9.8`, and `v1.9.9` Factorio `2.0` ladder is superseded by the post-`1.9.2` target-line versioning reset unless the maintainer explicitly revives it.
+The Factorio `2.0` legacy release More Infinite Research `v1.9.0` was released from the `legacy` branch, backported from the tested More Infinite Research `v2.0.5` Factorio `2.1` quick-patch codebase. `v1.9.1` follows the same snapshot-port model from the tested More Infinite Research `v2.1.0` source point. The next transition port is `v1.9.2` from the tested `v2.2.0` source point. The older planned `v1.9.7`, `v1.9.8`, and `v1.9.9` Factorio `2.0` ladder is superseded by the locked post-`1.9.2` target-line policy unless the maintainer explicitly revives it.
 
-The expanded older-line ladder for Factorio `1.1` through `0.6` lives in `docs/notes/legacy-backport-cadence.md`. Those ports should be treated as separate target-line compatibility releases, not as automatic feature-parity claims.
+The expanded older-line ladder for Factorio `1.1` through `0.6` lives in `docs/notes/legacy-backport-cadence.md`. Those ports should be treated as separate target-line compatibility, archive, or museum releases, not as automatic feature-parity claims.
 
 The daily celebration cadence does not change the compatibility model: each
 archive still needs target-line metadata, unsupported-surface guards, package

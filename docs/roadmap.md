@@ -23,6 +23,7 @@ minor .0 releases = larger feature waves
 legacy 1.9.0-1.9.2 releases = historical Factorio 2.0 transition ports of tested current-line snapshots
 post-transition releases = target-line version ranges recorded in docs/notes/target-line-versioning-and-backports.md
 expanded legacy releases = older Factorio line backports recorded in docs/notes/legacy-backport-cadence.md
+locked version lines = public MIR versions encode target Factorio generations after 1.9.2
 ```
 
 `v2.0.5` is **not** docs-only. It is the first quick feedback release after `v2.0.0` and should include the easy, bounded, already-understood changes that are practical to drop into a mods folder and test now.
@@ -47,13 +48,19 @@ Maintainer-authorized cadence plan:
 | `2.2.0` | `2.1.x` | Larger feature wave | compatibility planner foundations plus the first fixture-proven new MIR-owned behavior |
 | `1.9.2` | `2.0.x` | Legacy transition port | compatible subset of the tested `2.2.0` source point validated with the Factorio `2.0` install |
 | `1.9.9` | `2.0.x` | Superseded legacy plan | older final Factorio 2.0 plan; revive only by explicit maintainer decision |
-| `1.8.x` / `1.7.x` | `1.1.x` through `0.6.x` | Older-line backport ladder | see `docs/notes/legacy-backport-cadence.md` |
 | `3.0.0` | `2.1.x` | Architecture release | compatibility compiler release after the `2.2.0` and `1.9.2` transition work |
+| `2.5.0` | `2.0.x` | Maintained backport | first Factorio `2.0` port of the MIR 3 architecture |
+| `1.9.3` | `1.1.x` | Compatibility port | first Factorio `1.1` release under the locked mapping |
+| `1.8.0` | `1.0.x` | Compatibility port | first Factorio `1.0` release under the locked mapping; record the `0.18` bridge policy first |
+| `1.7.0` / `1.6.0` / `1.5.0` | `0.17.x` / `0.16.x` / `0.15.x` | Reduced native-infinite | old-line native-infinite editions |
+| `1.4.0` / `1.3.0` / `0.12.0` | `0.14.x` / `0.13.x` / `0.12.x` | Archive finite reconstruction | finite-ladder or archive reconstruction only |
+| `0.11.0` through `0.6.0` | `0.11.x` through `0.6.x` | Museum/discovery | target-binary and base-file discovery builds |
 
-After `1.9.2`, the versioning model changes: `3.x.x` becomes the Factorio
+After `1.9.2`, the versioning model is locked: `3.x.x` becomes the Factorio
 `2.1` line, `2.x.x` becomes the Factorio `2.0` line starting at `2.5.0`,
-`1.9.3+` becomes the Factorio `1.1` line, and older ranges map to their target
-Factorio lines as recorded in `docs/notes/target-line-versioning-and-backports.md`.
+`1.9.3+` becomes the Factorio `1.1` line, `1.8.x` becomes the Factorio `1.0`
+line, `1.7.x` through `1.3.x` map to Factorio `0.17` through `0.13`, and
+`0.12.x` through `0.6.x` map directly to Factorio `0.12` through `0.6`.
 The published `1.9.0` through `1.9.2` archives remain historical transition
 exceptions for Factorio `2.0`.
 
@@ -540,7 +547,7 @@ Recommended order from here:
    using `docs/notes/3.0.0-compatibility-compiler-charter.md` and the focused
    capability, policy, decision, manifest, claim, testing, maintainer, and ADR
    docs as the scope boundary.
-6. Use the post-transition target-line scheme: `3.x.x` for Factorio `2.1`, `2.x.x` for Factorio `2.0`, `1.9.3+` for Factorio `1.1`, and older ranges as documented in `docs/notes/target-line-versioning-and-backports.md`.
+6. Use the locked post-transition target-line scheme: `3.x.x` for Factorio `2.1`, `2.x.x` for Factorio `2.0`, `1.9.3+` for Factorio `1.1`, `1.8.x` for Factorio `1.0`, `1.7.x` through `1.3.x` for Factorio `0.17` through `0.13`, and `0.12.x` through `0.6.x` for Factorio `0.12` through `0.6`.
 7. Backport tested `3.x.x` source points only through target-line `tmp/*` branches or worktrees with matching Factorio binaries and mod libraries.
 8. Execute older-line backports only as separate validation-gated ports.
 9. Keep a weekly Factorio `2.1` update rhythm through December 2026 where validated release candidates exist.

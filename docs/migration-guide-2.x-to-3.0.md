@@ -13,6 +13,10 @@ After the transition:
 - `3.x.x` targets Factorio `2.1`;
 - `2.x.x` targets Factorio `2.0` starting at `2.5.0`;
 - `1.9.3+` targets Factorio `1.1`;
+- `1.8.x` targets Factorio `1.0`;
+- `1.7.x` through `1.3.x` target Factorio `0.17` through `0.13`;
+- `0.12.x` through `0.6.x` target Factorio `0.12` through `0.6` as archive
+  or museum lines;
 - `1.9.0` through `1.9.2` remain historical Factorio `2.0` transition ports.
 
 See `docs/notes/target-line-versioning-and-backports.md`.
@@ -58,4 +62,3 @@ When moving a stream into the 3.0 compiler:
 Released generated IDs are append-only unless a migration handles the change.
 If a stream target list changes, the old generated technology should remain
 stable unless the release notes and manifest explain the migration behavior.
-

@@ -2,48 +2,81 @@
 
 Updated: 2026-07-07
 
-This note records the maintainer plan for separating MIR release numbers by
-Factorio target line after the `2.2.0` compatibility-platform release. It is a
-release-operations note, not a feature-parity promise. Every target line still
-needs its own source branch, metadata, package build, Factorio binary, mod
-library, validation artifacts, and public release notes before it can be
-published.
+This note records the locked maintainer policy for separating MIR release
+numbers by Factorio target line after the `2.2.0` compatibility-platform
+release. It is a release-operations note, not a feature-parity promise. Every
+target line still needs its own source branch, metadata, package build,
+Factorio binary, mod library, validation artifacts, and public release notes
+before it can be published.
 
 ## Current Transition State
 
 The `2.2.0` release was cut under the old numbering scheme, where the active
 `2.x.x` MIR line targeted Factorio `2.1`. After the `2.2.0` release and its
-Factorio `2.0` backport are complete, MIR should move to the new target-line
-numbering scheme:
+Factorio `2.0` backport are complete, MIR moves to a locked target-line
+numbering scheme. Public MIR version numbers now encode the target Factorio
+generation. They no longer only encode MIR's internal architecture generation.
 
-| MIR version range | Factorio target line | First planned release in range | Notes |
-| --- | --- | --- | --- |
-| `1.3.x` | Factorio `0.13` | TBD | Older-line port, validation-gated. |
-| `1.4.x` | Factorio `0.14` | TBD | Older-line port, validation-gated. |
-| `1.5.x` | Factorio `0.15` | TBD | Older-line port, validation-gated. |
-| `1.6.x` | Factorio `0.16` | TBD | Older-line port, validation-gated. |
-| `1.7.x` | Factorio `0.17` | TBD | Older-line port, validation-gated. |
-| `1.8.x` | Factorio `1.0` | `1.8.0` | New post-transition Factorio `1.0` line. |
-| `1.9.x` | Factorio `1.1` | `1.9.3` | `1.9.0` through `1.9.2` remain historical Factorio `2.0` transition releases. |
-| `2.x.x` | Factorio `2.0` | `2.5.0` | New post-transition Factorio `2.0` line. |
-| `3.x.x` | Factorio `2.1` | `3.0.0` | New current line and compatibility-compiler architecture release. |
+| MIR version range | Factorio target line | First planned release in range | Support class | Notes |
+| --- | --- | --- | --- | --- |
+| `3.x.x` | Factorio `2.1` | `3.0.0` | Canonical modern | Current-line compiler architecture release. |
+| `2.x.x` | Factorio `2.0` | `2.5.0` | Maintained `2.0` backport | First post-3.0 port of the compiler architecture. |
+| `1.9.x` | Factorio `1.1` | `1.9.3` | Compatibility port | `1.9.0` through `1.9.2` are transition exceptions for Factorio `2.0`. |
+| `1.8.x` | Factorio `1.0` | `1.8.0` | Compatibility port | Factorio `0.18` remains a bridge decision, not a separate locked line. |
+| `1.7.x` | Factorio `0.17` | `1.7.0` | Reduced native-infinite | First old-line native-infinite target. |
+| `1.6.x` | Factorio `0.16` | `1.6.0` | Old-science native-infinite | Requires old science-pack mapping. |
+| `1.5.x` | Factorio `0.15` | `1.5.0` | Minimal native-infinite | Earliest plausible native-infinite floor. |
+| `1.4.x` | Factorio `0.14` | `1.4.0` | Archive finite reconstruction | Not full MIR parity. |
+| `1.3.x` | Factorio `0.13` | `1.3.0` | Archive finite reconstruction | Not full MIR parity. |
+| `0.12.x` | Factorio `0.12` | `0.12.0` | Archive experiment | Official docs exist, but native infinite support is not assumed. |
+| `0.11.x` | Factorio `0.11` | `0.11.0` | Museum/discovery | Define from old binary and base files. |
+| `0.10.x` | Factorio `0.10` | `0.10.0` | Museum/discovery | Define from old binary and base files. |
+| `0.9.x` | Factorio `0.9` | `0.9.0` | Museum/discovery | Define from old binary and base files. |
+| `0.8.x` | Factorio `0.8` | `0.8.0` | Museum/discovery | Define from old binary and base files. |
+| `0.7.x` | Factorio `0.7` | `0.7.0` | Museum/discovery | Define from old binary and base files. |
+| `0.6.x` | Factorio `0.6` | `0.6.0` | Extreme museum | Minimal commemorative compatibility floor. |
 
 The awkward part is intentional and must be documented in release notes:
 `1.9.0`, `1.9.1`, and `1.9.2` are historical Factorio `2.0` transition
 backports. Starting at `1.9.3`, the `1.9.x` range is reserved for Factorio
 `1.1`.
 
+The transition rule is:
+
+```text
+Legacy mapping era:
+  1.9.0 through 1.9.2 target Factorio 2.0.
+
+Target-line mapping era:
+  1.9.3 and later target Factorio 1.1.
+  2.x.x targets Factorio 2.0 starting at 2.5.0.
+  3.x.x targets Factorio 2.1 starting at 3.0.0.
+```
+
 ## Branch Roles
 
 Use these branch roles during the transition:
 
-| Branch or worktree | Role | Public release source? |
+| Branch or worktree | Role | New release line |
 | --- | --- | ---: |
-| `main` | Published release tip for the active current line. | Yes |
-| `dev` | Active development line; after the transition this is the Factorio `2.1` / MIR `3.x.x` line. | Not directly unless fast-forwarded to `main` after gates |
-| `tmp/2.0` | Temporary Factorio `2.0` staging branch or worktree used to validate backports against a real Factorio `2.0` install. | No |
-| `legacy` | Public historical Factorio `2.0` backport branch for `1.9.0` through `1.9.2`. | Yes |
-| `tmp/<factorio-line>` | Temporary target-line staging branches for older backports. | No |
+| `main` | Stable canonical Factorio `2.1` line after gates. | `3.x.x` after `3.0.0` |
+| `dev` | Development canonical Factorio `2.1` line. | `3.x.x` after `3.0.0` |
+| `legacy` | Stable Factorio `2.0` branch. It receives `1.9.0` through `1.9.2` during the transition and `2.x.x` after the 3.0 architecture port. | `2.x.x` starting at `2.5.0` |
+| `tmp/2.0` | Working Factorio `2.0` port branch or worktree. | `2.x.x` starting at `2.5.0` |
+| `tmp/1.1` | Working Factorio `1.1` port branch or worktree. | `1.9.x` starting at `1.9.3` |
+| `tmp/1.0` | Working Factorio `1.0` port branch or worktree. | `1.8.x` |
+| `tmp/0.17` | Working Factorio `0.17` port branch or worktree. | `1.7.x` |
+| `tmp/0.16` | Working Factorio `0.16` port branch or worktree. | `1.6.x` |
+| `tmp/0.15` | Working Factorio `0.15` port branch or worktree. | `1.5.x` |
+| `tmp/0.14` | Working Factorio `0.14` port branch or worktree. | `1.4.x` |
+| `tmp/0.13` | Working Factorio `0.13` port branch or worktree. | `1.3.x` |
+| `tmp/0.12` | Working Factorio `0.12` port branch or worktree. | `0.12.x` |
+| `tmp/0.11` | Working Factorio `0.11` port branch or worktree. | `0.11.x` |
+| `tmp/0.10` | Working Factorio `0.10` port branch or worktree. | `0.10.x` |
+| `tmp/0.9` | Working Factorio `0.9` port branch or worktree. | `0.9.x` |
+| `tmp/0.8` | Working Factorio `0.8` port branch or worktree. | `0.8.x` |
+| `tmp/0.7` | Working Factorio `0.7` port branch or worktree. | `0.7.x` |
+| `tmp/0.6` | Working Factorio `0.6` port branch or worktree. | `0.6.x` |
 
 `tmp/*` branches should be treated as disposable validation workspaces. They can
 carry target-line metadata, API removals, and diagnostic experiments while the
@@ -148,10 +181,43 @@ Once `3.0.0` is stable on the Factorio `2.1` line:
 4. Bring portable fixes back to `dev`.
 5. Publish only target lines that pass their own validation.
 
-Backports from `3.0.0` should preserve the compiler architecture where the
-target Factorio line can support it. If an older line cannot support a surface,
-the port should remove or disable that surface and document the exclusion
-rather than simulating feature parity.
+Backports from `3.0.0` should preserve the compiler architecture only where the
+target Factorio line can support it. Do not describe this as backporting
+`3.0.0` wholesale to every `tmp/*` branch. The correct policy is:
+
+```text
+Port the MIR 3 architecture downward branch by branch.
+Older Factorio lines receive only the subset their API and binary validation
+can support.
+```
+
+Expected degradation by target line:
+
+| Target | Compiler posture |
+| --- | --- |
+| Factorio `2.1` | Full compiler architecture. |
+| Factorio `2.0` | Most compiler architecture with `2.1`-only surfaces disabled. |
+| Factorio `1.1` / `1.0` | Reduced compiler architecture, direct-effect and science/lab planner only unless more is proven. |
+| Factorio `0.17` / `0.16` / `0.15` | Minimal compiler architecture with old-science native-infinite subset. |
+| Factorio `0.14` / `0.13` / `0.12` | Finite-ladder compiler mode only if binary proof allows. |
+| Factorio `0.11` through `0.6` | Museum compiler mode or hand-authored historical reconstruction. |
+
+If an older line cannot support a surface, the port should remove, disable, or
+report that surface and document the exclusion rather than simulating feature
+parity with unsafe runtime behavior.
+
+## Release Wording Classes
+
+Use these public wording classes:
+
+| Line | Wording |
+| --- | --- |
+| `3.x.x` | Canonical MIR release for Factorio `2.1`. |
+| `2.x.x` | Maintained Factorio `2.0` port of the canonical MIR architecture. |
+| `1.9.x` / `1.8.x` | Compatibility port for Factorio `1.1` / `1.0`; feature parity with `2.x`/`3.x` is not promised. |
+| `1.7.x` / `1.6.x` / `1.5.x` | Reduced native-infinite edition for Factorio `0.17` / `0.16` / `0.15`. |
+| `1.4.x` / `1.3.x` / `0.12.x` | Archive finite-ladder reconstruction. |
+| `0.11.x` through `0.6.x` | Museum/discovery build. |
 
 ## Improvements To Keep The Plan Safe
 
@@ -169,9 +235,8 @@ The plan is sound, but these guardrails would make it safer:
   code fixes instead.
 - Make the `1.9.0` through `1.9.2` historical exception visible in release
   notes because the new scheme reassigns `1.9.3+` to Factorio `1.1`.
-- Decide whether Factorio `0.18` needs its own line or is intentionally
-  unsupported in the new mapping.
-- Decide whether Factorio `0.12` and older lines are retired, since the new
-  scheme starts at Factorio `0.13`.
+- Record the Factorio `0.18` bridge policy before the `1.8.x` Factorio `1.0`
+  line ships. Do not invent a new version line for `0.18` unless the locked
+  scheme is explicitly reopened.
 - Do not start broad 3.0 backports until the 3.0 architecture, migration
   manifest, claim manifest, and negative fixtures are stable on Factorio `2.1`.

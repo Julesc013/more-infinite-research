@@ -19,7 +19,10 @@ v2.1.5 = quick feedback patch after v2.1.0.
 v2.2.0 = compatibility-platform feature wave.
 v1.9.2 = Factorio 2.0 transition backport from the tested v2.2.0 source point.
 v3.0.0 = Factorio 2.1 compatibility-compiler architecture release.
-After v1.9.2, use docs/notes/target-line-versioning-and-backports.md for the target-line versioning reset.
+v2.5.0 = first Factorio 2.0 port of the MIR 3 architecture.
+v1.9.3 = first Factorio 1.1 compatibility port under the locked mapping.
+v1.8.0 and lower = progressively reduced, archive, or museum target-line ports.
+After v1.9.2, use docs/notes/target-line-versioning-and-backports.md for the locked target-line policy.
 ```
 
 The scripted technology implementation exists in `dev` as a default-off ship candidate. Public release claims should be made only for the specific behaviors proven by the manual save matrix. Default enablement or anything that fails proof moves to a later release.
@@ -812,6 +815,8 @@ More Infinite Research v2.0.5 on Factorio 2.1.x -> More Infinite Research v1.9.0
 Tested More Infinite Research v2.1.0 snapshot -> More Infinite Research v1.9.1 on Factorio 2.0.x
 Tested More Infinite Research v2.2.0 snapshot -> More Infinite Research v1.9.2 on Factorio 2.0.x
 Post-transition MIR v3.x.x on Factorio 2.1.x -> MIR v2.x.x on Factorio 2.0.x starting at v2.5.0
+Post-transition MIR v3 architecture -> MIR v1.9.3 on Factorio 1.1.x where the target API can support it
+Post-transition MIR v3 architecture -> MIR v1.8.0 and lower as progressively reduced, archive, or museum target-line ports
 ```
 
 The expanded older-line cadence for Factorio `1.1` through `0.6` is recorded in

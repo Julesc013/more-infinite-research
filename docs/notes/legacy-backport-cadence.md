@@ -13,7 +13,7 @@ dates, target ordering, exact source snapshots, and even individual target-line
 releases may move if Factorio `2.1`, the Mod Portal, validation binaries, or MIR
 itself make a different order safer. Changes should be recorded in this note,
 `docs/roadmap.md`, and root `todo.md` instead of being left as chat-only plans.
-The post-`2.2.0` target-line versioning reset and `tmp/2.0` workflow live in
+The locked post-`2.2.0` target-line policy and `tmp/2.0` workflow live in
 `docs/notes/target-line-versioning-and-backports.md`.
 
 ## Current-Line Cadence
@@ -45,41 +45,41 @@ Use these labels when planning, tagging, release-note writing, and validation:
 
 | Snapshot label | Meaning |
 | --- | --- |
-| Week-before-2.1-release snapshot | Latest tested MIR `2.x.x` source point one week before the Factorio `2.1` release. |
-| 2.1-release snapshot | Latest tested MIR `2.x.x` source point at the Factorio `2.1` release. |
-| 2.1-stable end-of-year snapshot | Latest tested MIR `2.x.x` source point for the Factorio `2.1` stable/end-of-year support sweep. |
+| Week-before-2.1-release snapshot | Latest tested canonical MIR source point one week before the Factorio `2.1` release. |
+| 2.1-release snapshot | Latest tested canonical MIR source point at the Factorio `2.1` release. |
+| 2.1-stable end-of-year snapshot | Latest tested canonical MIR source point for the Factorio `2.1` stable/end-of-year support sweep. |
+| 3.0-architecture source point | Tested MIR `3.x.x` compiler-architecture source point used for post-transition target-line ports. |
 
-For all rows below, "backport" means a best-compatible subset of the selected
-`2.x.x` source snapshot. If the target Factorio line cannot support a feature,
-remove or guard that surface and document the exclusion in the release notes.
+For all rows below, "backport" or "port" means a best-compatible subset of the
+selected source snapshot. If the target Factorio line cannot support a feature,
+remove, guard, or reconstruct that surface and document the exclusion in the
+release notes.
 
 ## Planned Releases
 
-| MIR release | Target Factorio line | Timing | Source snapshot |
-| --- | --- | --- | --- |
-| `1.9.2` | `2.0.x` | Immediate transition backport | Tested `2.2.0` source point |
-| `1.9.9` | `2.0.x` | End of year | 2.1-stable end-of-year snapshot |
-| `1.9.8` | `2.0.x` | At Factorio `2.1` release | 2.1-release snapshot |
-| `1.9.7` | `2.0.x` | One week before Factorio `2.1` release | Week-before-2.1-release snapshot |
-| `1.8.9` | `1.1.x` | End of year | 2.1-stable end-of-year snapshot |
-| `1.8.8` | `1.1.x` | One week before Factorio `2.1` release | Week-before-2.1-release snapshot |
-| `1.8.7` | `1.0.x` | End of year | 2.1-stable end-of-year snapshot |
-| `1.8.6` | `1.0.x` | One week before Factorio `2.1` release | Week-before-2.1-release snapshot |
-| `1.8.5` | `0.17.x` | At Factorio `2.1` release | 2.1-release snapshot |
-| `1.8.4` | `0.17.x` | One week before Factorio `2.1` release | Week-before-2.1-release snapshot |
-| `1.8.3` | `0.16.x` | At Factorio `2.1` release | 2.1-release snapshot |
-| `1.8.2` | `0.16.x` | One week before Factorio `2.1` release | Week-before-2.1-release snapshot |
-| `1.8.1` | `0.15.x` | At Factorio `2.1` release | 2.1-release snapshot |
-| `1.8.0` | `0.15.x` | One week before Factorio `2.1` release | Week-before-2.1-release snapshot |
-| `1.7.8` | `0.14.x` | After Factorio `2.1` release | Week-before-2.1-release snapshot |
-| `1.7.7` | `0.13.x` | After Factorio `2.1` release | Week-before-2.1-release snapshot |
-| `1.7.6` | `0.12.x` | After Factorio `2.1` release | Week-before-2.1-release snapshot |
-| `1.7.5` | `0.11.x` | After Factorio `2.1` release | Week-before-2.1-release snapshot |
-| `1.7.4` | `0.10.x` | After Factorio `2.1` release | Week-before-2.1-release snapshot |
-| `1.7.3` | `0.9.x` | After Factorio `2.1` release | Week-before-2.1-release snapshot |
-| `1.7.2` | `0.8.x` | After Factorio `2.1` release | Week-before-2.1-release snapshot |
-| `1.7.1` | `0.7.x` | After Factorio `2.1` release | Week-before-2.1-release snapshot |
-| `1.7.0` | `0.6.x` | After Factorio `2.1` release | Week-before-2.1-release snapshot |
+| MIR release | Target Factorio line | Support class | Timing | Source snapshot |
+| --- | --- | --- | --- | --- |
+| `1.9.2` | `2.0.x` | Transition backport | Immediate | Tested `2.2.0` source point |
+| `2.5.0` | `2.0.x` | Maintained `2.0` backport | After `3.0.0` is stable | 3.0-architecture source point |
+| `1.9.3` | `1.1.x` | Compatibility port | After `2.5.0` or explicit maintainer gate | 3.0-architecture source point, reduced by capability |
+| `1.8.0` | `1.0.x` | Compatibility port | After `1.1` policy and `0.18` bridge decision | 3.0-architecture source point, reduced by capability |
+| `1.7.0` | `0.17.x` | Reduced native-infinite | After target binary proof | Reduced native-infinite source shape |
+| `1.6.0` | `0.16.x` | Old-science native-infinite | After target binary proof | Old-science native-infinite source shape |
+| `1.5.0` | `0.15.x` | Minimal native-infinite | After target binary proof | Minimal native-infinite source shape |
+| `1.4.0` | `0.14.x` | Archive finite reconstruction | After target binary proof | Finite-ladder reconstruction |
+| `1.3.0` | `0.13.x` | Archive finite reconstruction | After target binary proof | Finite-ladder reconstruction |
+| `0.12.0` | `0.12.x` | Archive experiment | After target binary proof | Archive reconstruction |
+| `0.11.0` | `0.11.x` | Museum/discovery | After target binary and base-file discovery | Museum reconstruction |
+| `0.10.0` | `0.10.x` | Museum/discovery | After target binary and base-file discovery | Museum reconstruction |
+| `0.9.0` | `0.9.x` | Museum/discovery | After target binary and base-file discovery | Museum reconstruction |
+| `0.8.0` | `0.8.x` | Museum/discovery | After target binary and base-file discovery | Museum reconstruction |
+| `0.7.0` | `0.7.x` | Museum/discovery | After target binary and base-file discovery | Museum reconstruction |
+| `0.6.0` | `0.6.x` | Extreme museum | After target binary and base-file discovery | Minimal commemorative reconstruction |
+
+The previous `1.9.7` / `1.9.8` / `1.9.9` Factorio `2.0` ladder and the
+previous `1.8.x` / `1.7.x` compressed older-line ladder are superseded by this
+locked line mapping unless the maintainer explicitly reopens the versioning
+policy.
 
 ## Execution Rules
 
@@ -109,7 +109,9 @@ remove or guard that surface and document the exclusion in the release notes.
 
 ## Post-Transition Note
 
-After the `1.9.2` Factorio `2.0` transition backport, the target-line scheme
-changes. `1.9.0` through `1.9.2` remain historical Factorio `2.0` archives, but
-`1.9.3+` is reserved for Factorio `1.1`; Factorio `2.0` moves to `2.x.x`
-starting at `2.5.0`; and Factorio `2.1` moves to `3.x.x` starting at `3.0.0`.
+After the `1.9.2` Factorio `2.0` transition backport, the target-line scheme is
+locked. `1.9.0` through `1.9.2` remain historical Factorio `2.0` transition
+archives, but `1.9.3+` is reserved for Factorio `1.1`; Factorio `2.0` moves to
+`2.x.x` starting at `2.5.0`; Factorio `2.1` moves to `3.x.x` starting at
+`3.0.0`; and `0.12.x` through `0.6.x` map directly to Factorio `0.12` through
+`0.6` as archive or museum lines.
