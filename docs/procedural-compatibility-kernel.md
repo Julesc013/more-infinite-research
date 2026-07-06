@@ -85,6 +85,11 @@ Each layer has a different job:
 capability rows are report-first, while existing stream emitters remain the only
 place technology prototypes are generated.
 
+`3.0.0` should promote this split from "kernel proof" to architecture contract.
+The detailed 3.0 charter is in
+`docs/notes/3.0.0-compatibility-compiler-charter.md`; this file remains the
+`2.2.0` implementation note for the current report-first kernel.
+
 ## Capability Lanes
 
 Current lanes:

@@ -214,6 +214,14 @@ New mod support should add policy and fixtures first. New behavior classes
 should add or extend a capability resolver. New false positives should become
 classifier or policy fixes. New bug reports should become negative fixtures.
 
+The `3.0.0` line promotes this kernel into the public compatibility compiler
+architecture. Use `docs/notes/3.0.0-compatibility-compiler-charter.md` as the
+source of truth for the 3.0 charter, invariants, module boundaries, non-goals,
+release ladder, and acceptance gates. Use `docs/capabilities.md`,
+`docs/policy-overlays.md`, `docs/decision-records.md`,
+`docs/stream-manifest.md`, `docs/compatibility-claims.md`, `docs/testing.md`,
+and `docs/maintainer-guide.md` for the focused 3.0 subsystem guidance.
+
 ## Diagnostics
 
 `mir-debug-generation-report` enables a structured log report. The report records generated and skipped streams/extensions with:

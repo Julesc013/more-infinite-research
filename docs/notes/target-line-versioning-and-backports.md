@@ -134,6 +134,8 @@ The 3.0 line should formalize:
 `3.0.0` can use existing proof surfaces such as Air Scrubbing, ATAN Ash, ATAN
 Nuclear Science, AAI Loaders, Big Mining Drill, and the requested local load
 checks, but it should not become a broad K2/Bob/Angel/SE/Py generation release.
+The detailed 3.0 architecture charter lives in
+`docs/notes/3.0.0-compatibility-compiler-charter.md`.
 
 ## Backporting `3.0.0`
 

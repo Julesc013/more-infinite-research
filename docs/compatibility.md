@@ -2,7 +2,7 @@
 
 More Infinite Research's current main line targets Factorio `2.1.x` and uses a compatibility-first data-stage plus narrow control-stage model.
 
-For compatibility planning policy, use `docs/compatibility-program.md`. It defines the role taxonomy, one-archive audit template, licensing rule, save-compatibility questions, test matrix model, and planner architecture. For tested claims and future campaign rows, use `docs/compatibility-matrix.md`. For the post-`2.2.0` target-line versioning and backport workflow, use `docs/notes/target-line-versioning-and-backports.md`.
+For compatibility planning policy, use `docs/compatibility-program.md`. It defines the role taxonomy, one-archive audit template, licensing rule, save-compatibility questions, test matrix model, and planner architecture. For tested claims and future campaign rows, use `docs/compatibility-matrix.md`. For the post-`2.2.0` target-line versioning and backport workflow, use `docs/notes/target-line-versioning-and-backports.md`. For the `3.0.0` compatibility compiler architecture, use `docs/notes/3.0.0-compatibility-compiler-charter.md` plus the focused capability, policy, decision, manifest, claim, testing, maintainer, and ADR docs.
 
 Release-line summary:
 

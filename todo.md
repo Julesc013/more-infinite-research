@@ -564,6 +564,95 @@ Idea-mod audit candidates should be promoted only after recipe-ID proof, balance
 - [ ] Decide whether any module/beacon/productivity-rule mutation belongs in MIR at all; if yes, make it opt-in, fixture-backed, and plainly named.
 - [ ] Keep runtime productivity, solar/entity replacement, broad research-cost mutation, and large content recreation out of `v2.2.0`.
 
+## v3.0.0 Compatibility Compiler
+
+Start this line only after the `1.9.2` Factorio `2.0` transition backport is
+validated or explicitly deferred. Use
+`docs/notes/3.0.0-compatibility-compiler-charter.md` as the scope boundary.
+The goal is architecture, contracts, migrations, fixtures, and maintainability,
+not broad new gameplay generation.
+
+Reference docs:
+
+- `docs/capabilities.md`
+- `docs/policy-overlays.md`
+- `docs/decision-records.md`
+- `docs/stream-manifest.md`
+- `docs/compatibility-claims.md`
+- `docs/testing.md`
+- `docs/migration-guide-2.x-to-3.0.md`
+- `docs/maintainer-guide.md`
+- `docs/adr/`
+
+### v3.0.0 Alpha 1: Skeleton And Contracts
+
+- [ ] Create the `prototypes/mir/` module tree or equivalent migration path from the current `prototypes/lib/` layout.
+- [ ] Add or formalize schema validators for facts, candidates, decisions, stream specs, manifests, claims, fixtures, and migrations.
+- [ ] Promote the capability resolver contract to the public 3.0 architecture boundary.
+- [ ] Add `DecisionRecord` v1 validation.
+- [ ] Add `StreamSpec` v1 validation.
+- [ ] Add policy overlay schema validation.
+- [ ] Add stable ID helper tests.
+- [ ] Confirm alpha 1 adds no new gameplay behavior.
+
+### v3.0.0 Alpha 2: Current Behavior Through Compiler Phases
+
+- [ ] Move existing explicit stream generation behind validated `StreamSpec` records without changing released technology IDs.
+- [ ] Move Air Scrubbing clean-filter support through capability and policy records.
+- [ ] Move owner, cap, lab, and loop diagnostics into report modules.
+- [ ] Make the emission layer the only layer that mutates technology prototypes.
+- [ ] Run report diffs proving no unexpected generated technology changes.
+
+### v3.0.0 Alpha 3: Fact Registry V2
+
+- [ ] Expand facts for items, fluids, entities, technologies, labs, machines, resources, modules, owners, and rule surfaces.
+- [ ] Add entity-backed item and recipe links.
+- [ ] Add loader and mining-drill facts.
+- [ ] Add machine base-productivity facts.
+- [ ] Add rule-surface facts for caps, modules, beacons, recyclers, and labs.
+
+### v3.0.0 Alpha 4: Capability Registry
+
+- [ ] Keep recipe productivity separate from native modifiers.
+- [ ] Add machine manufacturing capability.
+- [ ] Add loader manufacturing capability as report-first unless an existing stream owns the target.
+- [ ] Add mining-drill manufacturing capability as report-first unless an existing stream owns the target.
+- [ ] Add native modifier capability as observe-only by default.
+- [ ] Add science/lab integration capability as a hard researchability gate.
+
+### v3.0.0 Beta 1: Graph And Safety
+
+- [ ] Add or formalize recipe graph, technology graph, science graph, resource-chain graph, and loop-risk graph outputs.
+- [ ] Expand negative fixtures for self-return, barrel/container return, cleaning, catalyst, recycling, voiding, matter/transmutation, hidden recipes, zero caps, external owners, loader decoys, drill decoys, and lab incompatibility.
+- [ ] Require report diff review for broad classifier or policy changes.
+- [ ] Add performance budgets for large modpacks and verbose diagnostics.
+
+### v3.0.0 Beta 2: Compatibility Proof
+
+- [ ] Revalidate Air Scrubbing through the new compiler path.
+- [ ] Revalidate ATAN Nuclear Science as a science/lab fixture.
+- [ ] Revalidate AAI Loaders as a loader manufacturing report or existing belt-stream proof.
+- [ ] Revalidate Big Mining Drill as a drill manufacturing report or existing drill-stream proof.
+- [ ] Add ore-crushing productivity only if exact recipe IDs, owner checks, loop checks, cap checks, lab checks, and manifest rows pass.
+
+### v3.0.0 Beta 3: Docs, Claims, And Migrations
+
+- [ ] Keep compatibility claim manifests synchronized with public docs.
+- [ ] Keep generated stream manifests synchronized with emitted technologies.
+- [ ] Write migration notes for any changed generated technology IDs.
+- [ ] Refresh README for the 3.0 compatibility compiler model.
+- [ ] Keep ADRs current when architectural decisions change.
+
+### v3.0.0 Release Gate
+
+- [ ] Run `.\scripts\Invoke-MIRValidation.ps1 -StaticOnly`.
+- [ ] Run Factorio `2.1` runtime validation.
+- [ ] Run `.\scripts\mir.ps1 release gate --profile release-targeted-2.1 --no-git-pull`.
+- [ ] Run `git diff --check`.
+- [ ] Review final planner report diffs.
+- [ ] Confirm package hygiene excludes docs, fixtures, scripts, task ledgers, and generated artifacts that do not belong in the mod zip.
+- [ ] Confirm public docs do not claim broad K2, Bob's, Angel's, Space Exploration, Pyanodons, AAI, native modifier, cap, beacon, recycler, or runtime productivity support beyond fixture-backed behavior.
+
 ## Legacy Backports
 
 Do not reconstruct old releases commit-by-commit for `legacy`. A legacy release is a compatibility port of a tested current-line snapshot.

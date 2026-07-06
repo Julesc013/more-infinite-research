@@ -475,6 +475,15 @@ automatic target class. The first negative fixture covers self-return, barrel
 return, cleaning, voiding, transmutation, hidden recipe, zero-cap, loader-like
 non-loader, and drill-like non-drill cases.
 
+The `3.0.0` line promotes this program into the compatibility compiler
+architecture documented in
+`docs/notes/3.0.0-compatibility-compiler-charter.md`. The supporting subsystem
+docs are `docs/capabilities.md`, `docs/policy-overlays.md`,
+`docs/decision-records.md`, `docs/stream-manifest.md`,
+`docs/compatibility-claims.md`, `docs/testing.md`,
+`docs/migration-guide-2.x-to-3.0.md`, `docs/maintainer-guide.md`, and
+`docs/adr/`.
+
 The long-term data-stage shape should be:
 
 ```text

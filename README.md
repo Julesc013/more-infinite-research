@@ -638,6 +638,15 @@ The validation script checks:
 
 - **`todo.md`:** root executable future-work ledger. Keep the durable task list, release gates, future plans, recurring checklist, companion backlog, and rejected/deferred work here so the plan survives even if derivative docs are reorganized.
 - **`docs/architecture.md`:** data-stage flow, utility modules, stream config, compatibility profiles, diagnostics, and validation.
+- **`docs/notes/3.0.0-compatibility-compiler-charter.md`:** 3.0 architecture charter, compiler pipeline, invariants, release ladder, non-goals, and acceptance gates.
+- **`docs/capabilities.md`:** capability resolver lanes, productivity/native-modifier split, confidence model, and settings posture.
+- **`docs/policy-overlays.md`:** declarative compatibility-policy model, overlay fields, modes, and lint rules.
+- **`docs/decision-records.md`:** planned `DecisionRecord` and `StreamSpec` schemas for explainable generation.
+- **`docs/stream-manifest.md`:** generated technology ID manifest and migration rules.
+- **`docs/compatibility-claims.md`:** claim levels, claim manifest shape, public wording rules, and claim linting.
+- **`docs/testing.md`:** 3.0 fixture, negative-test, report-diff, and release-gate strategy.
+- **`docs/maintainer-guide.md`:** workflow for adding capabilities, policies, fixtures, and bug-report proof cases.
+- **`docs/adr/`:** architecture decision records for the 3.0 compatibility compiler.
 - **`docs/api-proof-points.md`:** API claims, proof status, and open in-game verification questions.
 - **`docs/compatibility.md`:** compatibility model, known integrations, manual test matrix, fixture designs, and release checklist.
 - **`docs/dev-tools.md`:** preferred developer commands, run profiles, script roles, and PowerShell tooling checks.
