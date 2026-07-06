@@ -13,8 +13,8 @@ Environment:
 - Factorio binary: `D:\Programs\Factorio\2.0\bin\x64\factorio.exe`.
 - Factorio version: `2.0.77` build `84539`, Windows `full`.
 - Release artifact: `dist\more-infinite-research_1.9.2.zip`.
-- Release artifact SHA256: `AD8464761572C07C41DFAB6E826CC70774414248DCC4A7A67AA76A6D21335F17`.
-- Release artifact size: `236530` bytes.
+- Release artifact SHA256: `BA15F2402D05B314AF515183A43DAFC53E69FB6978F22B347596D649506E251D`.
+- Release artifact size: `236144` bytes.
 
 Scope:
 

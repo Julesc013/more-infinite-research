@@ -226,13 +226,13 @@ These streams generate infinite technologies with direct Factorio technology mod
 
 The scripted streams remain disabled by default in `v2.2.0`. Basic opt-in smoke tests can document their experimental behavior, but default enablement or stronger runtime claims require manual save validation for existing-stack behavior, reversal, disabling, multi-force behavior, and the agricultural tower event path. Graduation belongs in a later release after player testing.
 
+The Factorio `2.0` legacy `1.9.x` package excludes the Factorio `2.1` cargo logistics streams. Cargo bay unloading distance and cargo landing pad count remain current-line `2.2.0+` features for Factorio `2.1`.
+
 | Stream key | Research | Effect | Default | Gates and notes |
 | --- | --- | --- | --- | --- |
 | `research_spoilage_preservation` | Spoilage preservation | Scripted global spoil time modifier through a `nothing` technology effect | `+1%` spoil time per completed level, capped by Factorio's global spoil-time range | Disabled by default until manual validation is recorded. Requires Space Age and spoilage; its research cost includes space, agricultural, and cryogenic science. Uses the highest completed level across non-enemy/non-neutral forces. No inventory or item-stack scan. |
 | `research_agricultural_growth_speed` | Agricultural growth speed | Scripted `on_tower_planted_seed` adjustment of plant `tick_grown` through a `nothing` technology effect | `+1%` growth speed per completed level, capped at `10x` | Disabled by default until manual validation is recorded. Requires Space Age and agricultural science; its research cost also includes electromagnetic and cryogenic science when available. Applies to newly planted agricultural tower plants in this first slice; existing farms are not globally rescanned. |
 | `research_lab_productivity` | Research productivity | `laboratory-productivity` | `+10%` lab research productivity per level | Base-game equivalent of Space Age's native `research-productivity` chain. Generates only when no effect-proven infinite `research-productivity` or `laboratory-productivity-4` lab-productivity owner is present, so existing native lab-productivity owners keep their chain. Uses Military science pack technology art as the base-game icon. |
-| `research_cargo_bay_unloading_distance` | Cargo bay unloading distance | `max-cargo-bay-unloading-distance` | `+10` tiles per level | Requires Space Age plus the `landing-pad-unloading-bay` item and technology. Uses the unloading bay unlock technology art. Uses all official base and Space Age science packs, not modded science packs. Base cost `100000`, growth `3`, time `120`. |
-| `research_cargo_landing_pad_count` | Cargo landing pad count | `cargo-landing-pad-count` | `+1` landing pad per surface per level | Requires Space Age plus the `cargo-landing-pad` item and `rocket-silo` technology. Disabled by default. Uses Space platform technology art. Uses all official base and Space Age science packs, not modded science packs. Base cost `1000000`, growth `10`, time `240`. |
 | `research_rocket_shooting_speed` | Rocket shooting speed | `gun-speed` for `rocket` ammo category | `+10%` speed per level | Base cost `60`, growth `1.5`. Uses a base-game rocketry icon and electromagnetic science when available. |
 | `research_cannon_shooting_speed` | Cannon shooting speed | `gun-speed` for `cannon-shell` ammo category | `+10%` speed per level | Base cost `60`, growth `1.5`. Uses the cannon shell item icon and electromagnetic science when available. |
 | `research_flamethrower_shooting_speed` | Flamethrower shooting speed | `gun-speed` for `flamethrower` | `+10%` speed per level | Base cost `60`, growth `1.5`. |
@@ -275,7 +275,7 @@ Conservative setup:
 
 - Generated productivity streams stay enabled where their recipes and labs are valid.
 - Disable MIR vanilla-chain continuations you do not want to extend.
-- Keep Cargo landing pad count disabled unless you want sandbox-style Space Age logistics.
+- Cargo landing pad count is not part of legacy `1.9.x`; use the current Factorio `2.1` line for cargo logistics research.
 - Keep Spoilage preservation and Agricultural growth speed disabled unless testing them.
 - Use science pack policy `configured`.
 
@@ -355,8 +355,6 @@ Per-stream default exceptions:
 | `research_agricultural_growth_speed` | No | `40000` | `1.5` | `90` | Infinite |
 | `research_inventory_capacity` | Yes | shared | `1.10` | shared | Infinite |
 | `research_robot_battery` | Yes | shared | `1.2` | shared | Infinite |
-| `research_cargo_bay_unloading_distance` | Yes | `100000` | `3` | `120` | Infinite |
-| `research_cargo_landing_pad_count` | No | `1000000` | `10` | `240` | Infinite |
 | `research_lab_productivity` | Yes | `1000` | `1.2` | `120` | Infinite |
 | `research_science_pack_productivity` | Yes | shared | shared | `120` | Infinite |
 | `research_character_reach` | No | shared | shared | shared | Infinite |

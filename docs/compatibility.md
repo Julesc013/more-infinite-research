@@ -53,8 +53,7 @@ clear support boundaries outrank the calendar.
 - The pipeline extent multiplier is a strictly opt-in startup-only prototype setting. At its default `100%` value, MIR does not load the pipeline pass, scan fluid boxes, log pipeline work, or change any fluid box prototypes. Non-`100%` dropdown values scale recognized fluid box fields across prototypes, not only pipe entities, so lower or higher values are experimental for machines, tanks, thrusters, and modded prototypes that define their own fluid boxes.
 - Hidden recipes and recycling recipes are skipped by default. Streams can opt in with `include_hidden` or `include_recycling`.
 - Optional DLC-shaped streams declare concrete required prototypes instead of requiring a specific official mod by name.
-- Cargo bay unloading distance research uses Factorio 2.1.8's `max-cargo-bay-unloading-distance` technology modifier, uses official base and Space Age science packs only, and is skipped unless Space Age is active and the `landing-pad-unloading-bay` prototypes exist.
-- Cargo landing pad count research uses `cargo-landing-pad-count`, uses official base and Space Age science packs only, is disabled by default, requires the vanilla `rocket-silo` cargo landing pad unlock, and is skipped unless Space Age is active and the `cargo-landing-pad` prototype exists.
+- Cargo bay unloading distance and cargo landing pad count research are current-line Factorio `2.1` features. The Factorio `2.0` legacy `1.9.x` package intentionally excludes those cargo logistics streams.
 - Direct-effect diagnostics report overlapping infinite non-MIR native modifier owners, including cargo/logistics modifiers. In `v2.1.0` this broad native-modifier policy remains diagnostic-only: MIR does not skip, merge, or remove those technologies based on the overlap report.
 - Spoilage preservation and agricultural growth speed are implemented in `dev` as visible `nothing` technology effects plus bounded runtime behavior through the control-stage scripted technology manager.
 - Scripted runtime effects use the same effective enablement model as data-stage technology generation: the stream's `ips-enable-*` checkbox controls both generated technology creation and runtime effect activation.
@@ -384,10 +383,10 @@ Run each case from a clean Factorio user data directory or with a controlled mod
 2. Elevated Rails only.
 3. Recycler only.
 4. Quality enabled with its dependencies.
-5. Base-only with `research_cargo_landing_pad_count` forced enabled, verifying the generated technology is skipped because Space Age is absent.
-6. Space Age 2.1.8+ enabled, verifying cargo bay unloading distance research appears after the landing pad unloading bay unlock and cargo landing pad count remains disabled by default.
-7. Space Age 2.1.8+ with `research_cargo_landing_pad_count` forced enabled, verifying the generated technology uses `cargo-landing-pad-count` and remains researchable.
-8. Space Age 2.1.8+ with a Maraxis-like duplicate cargo fixture, verifying overlapping cargo modifiers are reported diagnostically while MIR's cargo technologies still load.
+5. Legacy Factorio `2.0` with Space Age enabled, verifying cargo logistics streams are absent from the package.
+6. Current Factorio `2.1` Space Age enabled, verifying cargo bay unloading distance research appears after the landing pad unloading bay unlock and cargo landing pad count remains disabled by default.
+7. Current Factorio `2.1` Space Age with `research_cargo_landing_pad_count` forced enabled, verifying the generated technology uses `cargo-landing-pad-count` and remains researchable.
+8. Current Factorio `2.1` Space Age with a Maraxis-like duplicate cargo fixture, verifying overlapping cargo modifiers are reported diagnostically while MIR's cargo technologies still load.
 9. Base-only and Space Age fluid-productivity fixture runs, verifying oil, lubricant, sulfuric acid, acid neutralization, and thruster propellant recipe ownership.
 10. Startup pipeline extent fixture runs with non-default dropdown multipliers, verifying common fluid boxes are mutated only when enabled.
 11. Space Age with Panglia or a Panglia-like fixture, verifying extra rocket fuel and low density structure recipes adopt into vanilla productivity technologies.
