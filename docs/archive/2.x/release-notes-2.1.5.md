@@ -1,3 +1,14 @@
+---
+title: "More Infinite Research 2.1.5 Release Notes"
+status: archived
+applies_to: "1.x-2.x"
+audience: maintainer
+doc_type: archive
+owner: mir-maintainers
+last_reviewed: 2026-07-07
+supersedes: []
+superseded_by: ["../../releases/README.md"]
+---
 # More Infinite Research 2.1.5 Release Notes
 
 This is the short, player-facing release summary for the `2.1.5` GitHub and Mod Portal release notes. It is derived from `changelog.txt`; the changelog remains the detailed source of truth.

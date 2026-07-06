@@ -551,7 +551,7 @@ When either diagnostics setting is enabled, MIR also reports duplicate recipe ma
 .\scripts\mir.ps1 local-index build --mods C:\Projects\Factorio\testmods_2.1
 ```
 
-`mir.ps1` is the normal human front door. It delegates to the existing scripts, loads JSON run profiles from `fixtures/run-profiles/`, and accepts common overrides such as `--factorio`, `--factorio-line`, `--mods`, `--output`, `--timeout`, and `--link-mode`. Use `docs/dev-tools.md` for the command map and script roles.
+`mir.ps1` is the normal human front door. It delegates to the existing scripts, loads JSON run profiles from `fixtures/run-profiles/`, and accepts common overrides such as `--factorio`, `--factorio-line`, `--mods`, `--output`, `--timeout`, and `--link-mode`. Use `docs/maintainer/developer-tools.md` for the command map and script roles.
 
 **Release gate with local smoke scenarios:**
 
@@ -639,28 +639,28 @@ The validation script checks:
 ## Documentation Map
 
 - **`todo.md`:** root executable future-work ledger. Keep the durable task list, release gates, future plans, recurring checklist, companion backlog, and rejected/deferred work here so the plan survives even if derivative docs are reorganized.
-- **`docs/architecture.md`:** data-stage flow, utility modules, stream config, compatibility profiles, diagnostics, and validation.
-- **`docs/notes/3.0.0-compatibility-compiler-charter.md`:** 3.0 architecture charter, compiler pipeline, invariants, release ladder, non-goals, and acceptance gates.
-- **`docs/notes/3.0.0-repository-structure.md`:** 3.0 Factorio shell, `prototypes/mir` compiler namespace, layer rules, legacy shims, package boundary, and architecture lint targets.
-- **`docs/capabilities.md`:** capability resolver lanes, productivity/native-modifier split, confidence model, and settings posture.
-- **`docs/policy-overlays.md`:** declarative compatibility-policy model, overlay fields, modes, and lint rules.
-- **`docs/decision-records.md`:** planned `DecisionRecord` and `StreamSpec` schemas for explainable generation.
-- **`docs/stream-manifest.md`:** generated technology ID manifest and migration rules.
-- **`docs/compatibility-claims.md`:** claim levels, claim manifest shape, public wording rules, and claim linting.
-- **`docs/testing.md`:** 3.0 fixture, negative-test, report-diff, and release-gate strategy.
-- **`docs/maintainer-guide.md`:** workflow for adding capabilities, policies, fixtures, and bug-report proof cases.
+- **`docs/architecture/README.md`:** data-stage flow, utility modules, stream config, compatibility profiles, diagnostics, and validation.
+- **`docs/architecture/compatibility-compiler-charter.md`:** 3.0 architecture charter, compiler pipeline, invariants, release ladder, non-goals, and acceptance gates.
+- **`docs/architecture/module-boundaries.md`:** 3.0 Factorio shell, `prototypes/mir` compiler namespace, layer rules, legacy shims, package boundary, and architecture lint targets.
+- **`docs/capabilities/README.md`:** capability resolver lanes, productivity/native-modifier split, confidence model, and settings posture.
+- **`docs/compatibility/policy-overlays.md`:** declarative compatibility-policy model, overlay fields, modes, and lint rules.
+- **`docs/reference/schemas/decision-record.md`:** planned `DecisionRecord` and `StreamSpec` schemas for explainable generation.
+- **`docs/reference/schemas/stream-manifest.md`:** generated technology ID manifest and migration rules.
+- **`docs/compatibility/claim-levels.md`:** claim levels, claim manifest shape, public wording rules, and claim linting.
+- **`docs/maintainer/testing.md`:** 3.0 fixture, negative-test, report-diff, and release-gate strategy.
+- **`docs/maintainer/README.md`:** workflow for adding capabilities, policies, fixtures, and bug-report proof cases.
 - **`docs/adr/`:** architecture decision records for the 3.0 compatibility compiler.
-- **`docs/api-proof-points.md`:** API claims, proof status, and open in-game verification questions.
-- **`docs/compatibility.md`:** compatibility model, known integrations, manual test matrix, fixture designs, and release checklist.
-- **`docs/dev-tools.md`:** preferred developer commands, run profiles, script roles, and PowerShell tooling checks.
-- **`docs/roadmap.md`:** high-level release narrative, scope rationale, why decisions, and pointers back to `todo.md`, `changelog.txt`, and supporting notes.
-- **`docs/test-results.md`:** local release validation evidence.
-- **`docs/notes/manual-test-plan.md`:** named manual saves/scenarios for release validation.
-- **`docs/notes/mod-portal-page.md`:** mod-portal-ready public description, technology catalog, settings summary, compatibility notes, and troubleshooting text.
-- **`docs/notes/release-plan-2.1.0.md`:** detailed release-gated implementation plan for the Factorio `2.1` feature wave. Summarize durable future tasks back into `todo.md`.
-- **`docs/notes/post-2.0-feature-plan.md`:** post-v2.0.0 feature triage, MIR scope boundaries, Reddit feedback, and staged implementation archive. Summarize durable future tasks back into `todo.md`.
-- **`docs/notes/release-notes-2.1.0.md`:** simplified player-facing `2.1.0` release-note summary derived from the detailed changelog.
-- **`docs/notes/archive/`:** historical release notes and pre-manual reports. `changelog.txt` remains the authoritative past-change ledger.
+- **`docs/reference/factorio-api-proof-points.md`:** API claims, proof status, and open in-game verification questions.
+- **`docs/compatibility/README.md`:** compatibility model, known integrations, manual test matrix, fixture designs, and release checklist.
+- **`docs/maintainer/developer-tools.md`:** preferred developer commands, run profiles, script roles, and PowerShell tooling checks.
+- **`docs/releases/3.0.0-plan.md`:** high-level release narrative, scope rationale, why decisions, and pointers back to `todo.md`, `changelog.txt`, and supporting notes.
+- **`docs/releases/2.2.0-validation-record.md`:** local release validation evidence.
+- **`docs/maintainer/manual-test-plan.md`:** named manual saves/scenarios for release validation.
+- **`docs/releases/mod-portal-page.md`:** mod-portal-ready public description, technology catalog, settings summary, compatibility notes, and troubleshooting text.
+- **`docs/archive/2.x/release-plan-2.1.0.md`:** detailed release-gated implementation plan for the Factorio `2.1` feature wave. Summarize durable future tasks back into `todo.md`.
+- **`docs/archive/2.x/post-2.0-feature-plan.md`:** post-v2.0.0 feature triage, MIR scope boundaries, Reddit feedback, and staged implementation archive. Summarize durable future tasks back into `todo.md`.
+- **`docs/archive/2.x/release-notes-2.1.0.md`:** simplified player-facing `2.1.0` release-note summary derived from the detailed changelog.
+- **`docs/archive/2.x/`:** historical release notes and pre-manual reports. `changelog.txt` remains the authoritative past-change ledger.
 - **`CONTRIBUTING.md`:** branch policy, pull request expectations, validation commands, and mod portal changelog rules.
 - **`changelog.txt`:** release history and user-facing changes.
 

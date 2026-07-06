@@ -1,3 +1,14 @@
+---
+title: "More Infinite Research"
+status: current
+applies_to: "3.0.0+"
+audience: release-manager
+doc_type: release-plan
+owner: mir-maintainers
+last_reviewed: 2026-07-07
+supersedes: []
+superseded_by: []
+---
 # More Infinite Research
 
 Adds **fully customizable** repeatable late-game research for **productivity, speed, logistics, combat, player bonuses, robots, spoilage, cargo logistics,** and tries to be *compatible with every mod*...

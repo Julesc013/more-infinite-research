@@ -1,3 +1,14 @@
+---
+title: "Local Idea Mods Audit And Release Plan - 2026-07-05"
+status: archived
+applies_to: "1.x-2.x"
+audience: maintainer
+doc_type: archive
+owner: mir-maintainers
+last_reviewed: 2026-07-07
+supersedes: []
+superseded_by: ["../../releases/README.md"]
+---
 # Local Idea Mods Audit And Release Plan - 2026-07-05
 
 Source library: `C:\Projects\Factorio\ideamods_mix`

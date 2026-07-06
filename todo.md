@@ -4,7 +4,7 @@ Updated: 2026-07-07
 
 This is the executable task list for the next More Infinite Research releases. Keep durable future work here, not only in derivative planning docs, so the project still has its task and release plan if the `docs/` tree is reorganized or partially lost.
 
-Use `docs/roadmap.md` for release scope, product boundaries, rationale, and high-level "why" explanations. Use `docs/notes/post-2.0-feature-plan.md` for the deeper idea archive, `docs/notes/legacy-backport-cadence.md` for the expanded older-line backport ladder, and `docs/notes/target-line-versioning-and-backports.md` for the locked post-`2.2.0` target-line policy. Use `changelog.txt` as the authoritative past-change ledger.
+Use `docs/releases/3.0.0-plan.md` for release scope, product boundaries, rationale, and high-level "why" explanations. Use `docs/archive/2.x/post-2.0-feature-plan.md` for the deeper idea archive, `docs/archive/2.x/legacy-backport-cadence.md` for the expanded older-line backport ladder, and `docs/maintainer/backporting.md` for the locked post-`2.2.0` target-line policy. Use `changelog.txt` as the authoritative past-change ledger.
 
 ## Working Rules
 
@@ -24,7 +24,7 @@ Use `docs/roadmap.md` for release scope, product boundaries, rationale, and high
 - Commit documentation and implementation changes at the end of each completed work turn.
 - Keep future work, deferred work, recurring checklists, and issue-creation tasks in this root `todo.md`.
 - Keep past shipped changes in `changelog.txt`; release notes and mod-portal copy are derivative summaries.
-- Keep `docs/roadmap.md` synchronized with this file and `changelog.txt`, but at a higher level with rationale, scope boundaries, and links or placeholders for issues.
+- Keep `docs/releases/3.0.0-plan.md` synchronized with this file and `changelog.txt`, but at a higher level with rationale, scope boundaries, and links or placeholders for issues.
 - Treat the compatibility planner as the future contract between prototype discovery, owner classification, validation, mutation, and diagnostics.
 - Do not publish the next compatibility-heavy archive until static validation, runtime Factorio validation, package build, diff check, and audit smoke have all passed after the final refactor.
 
@@ -66,7 +66,7 @@ Done in the current development branch:
 - [x] Add diagnostic-only native modifier overlap reporting for direct-effect streams.
 - [x] Add a Maraxis-like duplicate cargo fixture proving cargo overlaps are reported without changing MIR generation.
 - [x] Fix runtime validation temp-copy behavior so fixture scenarios copy package source instead of the whole Git repository.
-- [x] Add `docs/notes/archive/pre-manual-2.0.5-report.md`.
+- [x] Add `docs/archive/2.x/pre-manual-2.0.5-report.md`.
 - [x] Fix scripted `NothingModifier` effect icons so spoilage/agriculture effect rows do not inherit floating technology constant overlays.
 - [x] Merge character logistic trash slots into character inventory slot research and remove the separate current generated trash-slot stream.
 - [x] Add a JSON migration from the old generated trash-slot technology ID into the combined inventory/trash technology ID.
@@ -93,7 +93,7 @@ Done in the current development branch:
 - [x] Make Science pack productivity fall back to base-game Space science pack technology art instead of the automation science pack item icon.
 - [x] Add base-game Research productivity with the native `laboratory-productivity` modifier and Military science pack technology art, while skipping it in Space Age where vanilla `research-productivity` exists.
 - [x] Add runtime fixture coverage for the new icon sources and base/Space Age Research productivity behavior.
-- [x] Run final automated `v2.0.5` release-candidate validation and record it in `docs/test-results.md`.
+- [x] Run final automated `v2.0.5` release-candidate validation and record it in `docs/releases/2.2.0-validation-record.md`.
 - [x] Add mod-portal-ready public copy with a complete generated technology catalog.
 - [x] Add simplified player-facing `v2.0.5` release notes derived from `changelog.txt`.
 - [x] Add simplified player-facing `v1.9.0` legacy release notes derived from `changelog.txt`.
@@ -182,7 +182,7 @@ Important release note: the scripted runtime work above is a **default-off v2.0.
 
 ### v2.0.5 Scripted-Tech Framework
 
-- [x] Review `storage` layout for long-term stability and document every key in `docs/architecture.md`.
+- [x] Review `storage` layout for long-term stability and document every key in `docs/architecture/README.md`.
 - [ ] Confirm spoilage baseline capture cannot compound MIR's own multiplier across load/configuration cycles.
 - [x] Decide whether research reversal should restore baseline immediately when no forces have levels.
 - [ ] Confirm behavior when another mod also writes `game.difficulty_settings.spoil_time_modifier`.
@@ -237,7 +237,7 @@ These checks are no longer release blockers while Agricultural growth speed rema
 - [x] Run `.\scripts\Test-MIRBranchPolicy.ps1`.
 - [x] Run `git diff --check`.
 - [ ] Copy the zip to a normal Factorio mods folder and confirm Factorio sees it.
-- [x] Record validation results in `docs/test-results.md`.
+- [x] Record validation results in `docs/releases/2.2.0-validation-record.md`.
 - [x] Commit docs, code, changelog, and package together for the tested candidate.
 
 ## v1.9.0 Legacy Backport After v2.0.5
@@ -255,7 +255,7 @@ Status: released from the `legacy` branch. Keep this section as historical proce
 
 ## v2.1.0 Larger Feature Wave
 
-`v2.1.0` should take the harder work after `v2.0.5` feedback, but it should stay selective. Use `docs/notes/release-plan-2.1.0.md` as the detailed release-gated implementation note, and keep the durable release tasks mirrored here.
+`v2.1.0` should take the harder work after `v2.0.5` feedback, but it should stay selective. Use `docs/archive/2.x/release-plan-2.1.0.md` as the detailed release-gated implementation note, and keep the durable release tasks mirrored here.
 
 Theme:
 
@@ -309,7 +309,7 @@ Do not turn `v2.1.0` into a bucket for every plausible feature idea.
 - [x] Parser-friendly generation audit rows added for stream/native-overlap/recipe-owner diagnostics.
 - [x] Local mod-portal compatibility audit harness added with committed matrix inputs and ignored generated reports.
 - [x] Extended compatibility automation added: executable manual scenarios, sharded/resumable audits, grouped failure reports, review-only profile stubs, tiered extended-test wrapper, and self-hosted workflow.
-- [x] Documentation hierarchy reorganized: root `todo.md` is future-work authority, `changelog.txt` is past-change authority, `docs/roadmap.md` is high-level rationale, and `docs/notes/` contains derivative plans/release notes/archive material.
+- [x] Documentation hierarchy reorganized: root `todo.md` is future-work authority, `changelog.txt` is past-change authority, `docs/releases/3.0.0-plan.md` is high-level rationale, and `docs/archive/2.x/` contains historical derivative plans and release-note material.
 - [ ] Run full mod-portal compatibility audit with credentials and a local Factorio binary.
 - [ ] Convert recurring audit failures into small declarative compatibility profiles only when the report shows concrete, repeatable patterns.
 - [x] Runtime-test the refactored recipe-productivity owner/adoption modules with `FACTORIO_BIN` configured.
@@ -477,7 +477,7 @@ small bug fixes, compatibility profiles, docs corrections, validation/tooling
 updates, or feature slices that pass the release gate. If a week has no safe
 candidate, record the skip reason instead of publishing an under-tested archive.
 
-Idea-mod audit planning lives in `docs/notes/archive/mod-ideas-audit.md`.
+Idea-mod audit planning lives in `docs/archive/2.x/mod-ideas-audit.md`.
 
 | Audit lane | `v2.1.5` decision |
 | --- | --- |
@@ -503,7 +503,7 @@ Idea-mod audit planning lives in `docs/notes/archive/mod-ideas-audit.md`.
 
 Use `v2.2.0` for the next larger batch after the `v2.1.x` feedback cycle. Most ideamods are compatibility signals, not planned MIR features. Keep this release to compatibility planner foundations plus the first new MIR-owned behavior proven by fixtures; do not turn it into every interesting idea-mod signal.
 
-Idea-mod audit candidates should be promoted only after recipe-ID proof, balance decisions, licensing review, save-compatibility policy, and validation fixtures. Use `docs/compatibility-program.md` for the role taxonomy and one-archive audit template. Use `docs/notes/2.2.0-feature-intake.md` for the July 2026 suggestions-transcript intake; it rejects separate product names and keeps future settings inside one plain MIR settings model.
+Idea-mod audit candidates should be promoted only after recipe-ID proof, balance decisions, licensing review, save-compatibility policy, and validation fixtures. Use `docs/compatibility/support-lanes.md` for the role taxonomy and one-archive audit template. Use `docs/archive/2.x/2.2.0-feature-intake.md` for the July 2026 suggestions-transcript intake; it rejects separate product names and keeps future settings inside one plain MIR settings model.
 
 | Candidate | Source signal | First useful slice |
 | --- | --- | --- |
@@ -529,7 +529,7 @@ Idea-mod audit candidates should be promoted only after recipe-ID proof, balance
 | Native overlap policy | Lab, mining, solar, and other native productivity mods | General skip/warn/prefer/allow behavior with fixtures. |
 | Out-of-scope content families | Solar/entity replacement, runtime productivity, research-cost systems, radar/lab/logistics/content mods | Keep as diagnostics or compatibility fixtures only unless a future scope decision is made. |
 
-- [x] Keep `docs/compatibility-program.md` and `docs/compatibility-matrix.md` current before making new compatibility claims.
+- [x] Keep `docs/compatibility/support-lanes.md` and `docs/compatibility/compatibility-matrix.md` current before making new compatibility claims.
 - [ ] Add one structured audit row for each archive in `C:\Projects\Factorio\ideamods_mix` using the role enum and one-archive template.
 - [ ] Add audited-zip checksum records for local compatibility campaigns so future Mod Portal updates do not silently change what was proved.
 - [x] Build the compatibility planner/registry before broad new stream work, with typed facts, decisions, lab matrices, and report-only policy rows.
@@ -569,26 +569,26 @@ Idea-mod audit candidates should be promoted only after recipe-ID proof, balance
 
 Start this line only after the `1.9.2` Factorio `2.0` transition backport is
 validated or explicitly deferred. Use
-`docs/notes/3.0.0-compatibility-compiler-charter.md` as the scope boundary.
+`docs/architecture/compatibility-compiler-charter.md` as the scope boundary.
 The goal is architecture, contracts, migrations, fixtures, and maintainability,
 not broad new gameplay generation.
 
 Reference docs:
 
-- `docs/notes/3.0.0-repository-structure.md`
-- `docs/capabilities.md`
-- `docs/policy-overlays.md`
-- `docs/decision-records.md`
-- `docs/stream-manifest.md`
-- `docs/compatibility-claims.md`
-- `docs/testing.md`
-- `docs/migration-guide-2.x-to-3.0.md`
-- `docs/maintainer-guide.md`
+- `docs/architecture/module-boundaries.md`
+- `docs/capabilities/README.md`
+- `docs/compatibility/policy-overlays.md`
+- `docs/reference/schemas/decision-record.md`
+- `docs/reference/schemas/stream-manifest.md`
+- `docs/compatibility/claim-levels.md`
+- `docs/maintainer/testing.md`
+- `docs/releases/3.0.0-migration-guide.md`
+- `docs/maintainer/README.md`
 - `docs/adr/`
 
 ### v3.0.0 Alpha 1: Skeleton And Contracts
 
-- [ ] Create the Factorio shell plus `prototypes/mir/` compiler namespace from `docs/notes/3.0.0-repository-structure.md`.
+- [ ] Create the Factorio shell plus `prototypes/mir/` compiler namespace from `docs/architecture/module-boundaries.md`.
 - [ ] Convert root Factorio files into thin stage wrappers without changing behavior.
 - [ ] Add `stage/`, `core/`, `platform/`, `domain/`, and `legacy/` as the first migration shell.
 - [ ] Keep existing public module paths as legacy shims where that reduces target-line backport friction.
@@ -703,8 +703,8 @@ unless the maintainer revives the pre-reset final Factorio `2.0` plan.
 
 ### Locked Target-Line Backport Ladder
 
-- [ ] Use `docs/notes/target-line-versioning-and-backports.md` as the source of truth for the locked version-line mapping.
-- [ ] Use `docs/notes/legacy-backport-cadence.md` as the source of truth for target order, support class, and source snapshot language.
+- [ ] Use `docs/maintainer/backporting.md` as the source of truth for the locked version-line mapping.
+- [ ] Use `docs/archive/2.x/legacy-backport-cadence.md` as the source of truth for target order, support class, and source snapshot language.
 - [ ] Treat every lower line as a separate target-line port, not a wholesale `3.0.0` backport.
 - [ ] Release `v2.3.0` as the first Factorio `2.0` port of the MIR 3 architecture only after `v3.0.0` is stable and a Factorio `2.0` binary loads the exact built package.
 - [ ] Release `v1.9.3` as the first Factorio `1.1` compatibility port only after target-line implementation and binary validation.
@@ -783,5 +783,5 @@ Run this before every release candidate:
 - [x] `.\scripts\Test-MIRBranchPolicy.ps1`
 - [x] `git diff --check`
 - [x] Load the release zip from a normal Factorio mods folder.
-- [x] Record validation results in `docs/test-results.md`.
+- [x] Record validation results in `docs/releases/2.2.0-validation-record.md`.
 - [x] Commit docs, code, changelog, and package together for the tested candidate.

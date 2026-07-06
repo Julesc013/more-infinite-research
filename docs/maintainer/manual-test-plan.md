@@ -1,3 +1,14 @@
+---
+title: "Manual Test Plan"
+status: current
+applies_to: "3.0.0+"
+audience: maintainer
+doc_type: how-to
+owner: mir-maintainers
+last_reviewed: 2026-07-07
+supersedes: []
+superseded_by: []
+---
 # Manual Test Plan
 
 Updated: 2026-07-04
@@ -6,9 +17,9 @@ This document defines named manual saves and scenarios. Runtime fixture validati
 
 ## Release Use
 
-Use these scenario names in `docs/test-results.md` so release evidence is comparable across runs.
+Use these scenario names in `docs/releases/2.2.0-validation-record.md` so release evidence is comparable across runs.
 
-For the archived `v2.0.5` pre-manual status, see `docs/notes/archive/pre-manual-2.0.5-report.md`.
+For the archived `v2.0.5` pre-manual status, see `docs/archive/2.x/pre-manual-2.0.5-report.md`.
 
 ## v2.0.5 Quick Feedback Patch
 
@@ -107,6 +118,6 @@ Required on the `legacy` branch with a Factorio `2.0.x` binary:
 Do not validate the legacy port with the Steam-updated Factorio `2.1.x` binary.
 
 For the expanded Factorio `1.1` through `0.6` backport ladder, use
-`docs/notes/legacy-backport-cadence.md` as the release matrix. Each target line
+`docs/archive/2.x/legacy-backport-cadence.md` as the release matrix. Each target line
 needs its own binary smoke check when a compatible binary is available, and
 release notes must identify any target-line validation that could not be run.

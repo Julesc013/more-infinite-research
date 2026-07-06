@@ -1,3 +1,14 @@
+---
+title: "Compatibility Claims"
+status: current
+applies_to: "3.0.0+"
+audience: modpack-author
+doc_type: explanation
+owner: mir-maintainers
+last_reviewed: 2026-07-07
+supersedes: []
+superseded_by: []
+---
 # Compatibility Claims
 
 Updated: 2026-07-07
@@ -77,4 +88,3 @@ Full Air Scrubbing support
 Pollution productivity support
 Automatic support for all Air Scrubbing recipes
 ```
-

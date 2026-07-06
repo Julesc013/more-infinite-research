@@ -1,3 +1,14 @@
+---
+title: "Procedural Compatibility Kernel"
+status: current
+applies_to: "3.0.0+"
+audience: maintainer
+doc_type: explanation
+owner: mir-maintainers
+last_reviewed: 2026-07-07
+supersedes: []
+superseded_by: []
+---
 # Procedural Compatibility Kernel
 
 `2.2.0` starts MIR's procedural compatibility kernel. The goal is not broad
@@ -87,7 +98,7 @@ place technology prototypes are generated.
 
 `3.0.0` should promote this split from "kernel proof" to architecture contract.
 The detailed 3.0 charter is in
-`docs/notes/3.0.0-compatibility-compiler-charter.md`; this file remains the
+`docs/architecture/compatibility-compiler-charter.md`; this file remains the
 `2.2.0` implementation note for the current report-first kernel.
 
 ## Capability Lanes

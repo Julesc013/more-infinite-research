@@ -1,3 +1,14 @@
+---
+title: "MIR Compatibility Program"
+status: current
+applies_to: "3.0.0+"
+audience: modpack-author
+doc_type: explanation
+owner: mir-maintainers
+last_reviewed: 2026-07-07
+supersedes: []
+superseded_by: []
+---
 # MIR Compatibility Program
 
 This document defines how More Infinite Research turns external mod signals into
@@ -440,7 +451,7 @@ These rows are evidence for future policy gates; they are not broad automatic
 support claims.
 
 The procedural compatibility kernel is documented in
-`docs/procedural-compatibility-kernel.md`. Its first capability resolvers are
+`docs/architecture/procedural-compatibility-kernel.md`. Its first capability resolvers are
 report-first:
 
 - `logistics-loader-manufacturing` classifies loader crafting recipes from item,
@@ -477,11 +488,11 @@ non-loader, and drill-like non-drill cases.
 
 The `3.0.0` line promotes this program into the compatibility compiler
 architecture documented in
-`docs/notes/3.0.0-compatibility-compiler-charter.md`. The supporting subsystem
-docs are `docs/capabilities.md`, `docs/policy-overlays.md`,
-`docs/decision-records.md`, `docs/stream-manifest.md`,
-`docs/compatibility-claims.md`, `docs/testing.md`,
-`docs/migration-guide-2.x-to-3.0.md`, `docs/maintainer-guide.md`, and
+`docs/architecture/compatibility-compiler-charter.md`. The supporting subsystem
+docs are `docs/capabilities/README.md`, `docs/compatibility/policy-overlays.md`,
+`docs/reference/schemas/decision-record.md`, `docs/reference/schemas/stream-manifest.md`,
+`docs/compatibility/claim-levels.md`, `docs/maintainer/testing.md`,
+`docs/releases/3.0.0-migration-guide.md`, `docs/maintainer/README.md`, and
 `docs/adr/`.
 
 The long-term data-stage shape should be:
@@ -531,7 +542,7 @@ docs/audited-zips-YYYY-MM-DD.json
 ```
 
 The current July 5, 2026 idea-mod ledger is
-`docs/notes/archive/audited-zips-2026-07-05.json`.
+`docs/archive/2.x/audited-zips-2026-07-05.json`.
 
 Recommended fields:
 

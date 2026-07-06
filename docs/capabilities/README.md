@@ -1,3 +1,14 @@
+---
+title: "Capabilities"
+status: current
+applies_to: "3.0.0+"
+audience: developer
+doc_type: explanation
+owner: mir-maintainers
+last_reviewed: 2026-07-07
+supersedes: []
+superseded_by: []
+---
 # Capabilities
 
 Updated: 2026-07-07
@@ -137,4 +148,3 @@ Native belt stack/logistics:
 ```
 
 Per-mod marketing settings are not part of the MIR settings model.
-

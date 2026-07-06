@@ -1,3 +1,14 @@
+---
+title: "ADR 0011: Runtime Code Boundaries"
+status: current
+applies_to: "3.0.0+"
+audience: maintainer
+doc_type: adr
+owner: mir-maintainers
+last_reviewed: 2026-07-07
+supersedes: []
+superseded_by: []
+---
 # ADR 0011: Runtime Code Boundaries
 
 Status: Accepted for 3.0 planning
@@ -14,4 +25,3 @@ scanning remains forbidden without a future explicit exception.
 
 MIR uses native technology modifiers and prototype-stage behavior first.
 Runtime systems remain narrow and conservative.
-

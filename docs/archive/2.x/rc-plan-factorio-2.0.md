@@ -1,3 +1,14 @@
+---
+title: "Factorio 2.0 RC Planning Report"
+status: archived
+applies_to: "1.x-2.x"
+audience: maintainer
+doc_type: archive
+owner: mir-maintainers
+last_reviewed: 2026-07-07
+supersedes: []
+superseded_by: ["../../releases/README.md"]
+---
 # Factorio 2.0 RC Planning Report
 
 Updated: 2026-07-06

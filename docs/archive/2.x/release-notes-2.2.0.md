@@ -1,3 +1,14 @@
+---
+title: "2.2.0 Release Notes"
+status: archived
+applies_to: "1.x-2.x"
+audience: maintainer
+doc_type: archive
+owner: mir-maintainers
+last_reviewed: 2026-07-07
+supersedes: []
+superseded_by: ["../../releases/README.md"]
+---
 # 2.2.0 Release Notes
 
 This is the short, player-facing release summary for the `2.2.0` GitHub and

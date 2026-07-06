@@ -1,3 +1,14 @@
+---
+title: "MIR 3.0.0 Compatibility Compiler Charter"
+status: current
+applies_to: "3.0.0+"
+audience: maintainer
+doc_type: explanation
+owner: mir-maintainers
+last_reviewed: 2026-07-07
+supersedes: []
+superseded_by: []
+---
 # MIR 3.0.0 Compatibility Compiler Charter
 
 Updated: 2026-07-07
@@ -126,7 +137,7 @@ set of special-case compatibility files.
 ## Proposed Module Layout
 
 The concrete repository-structure target is
-`docs/notes/3.0.0-repository-structure.md`. That note is the active source for
+`docs/architecture/module-boundaries.md`. That note is the active source for
 the Factorio shell, `prototypes/mir/` compiler namespace, platform adapter,
 development workspace, legacy shims, and architecture lint rules. The summary
 below is the older high-level shape and should be read as conceptual, not as the
@@ -463,4 +474,4 @@ The compiler design depends on these Factorio prototype concepts:
 - mod loading separates data-stage prototype construction, control-stage
   runtime scripting, and migrations.
 
-Keep `docs/api-proof-points.md` current when any of these assumptions changes.
+Keep `docs/reference/factorio-api-proof-points.md` current when any of these assumptions changes.

@@ -1,3 +1,14 @@
+---
+title: "More Infinite Research 2.1.0 Release-Gated Plan"
+status: archived
+applies_to: "1.x-2.x"
+audience: maintainer
+doc_type: archive
+owner: mir-maintainers
+last_reviewed: 2026-07-07
+supersedes: []
+superseded_by: ["../../releases/README.md"]
+---
 # More Infinite Research 2.1.0 Release-Gated Plan
 
 This document turns the post-`2.0.5` roadmap into an executable release gate for

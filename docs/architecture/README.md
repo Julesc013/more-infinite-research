@@ -1,3 +1,14 @@
+---
+title: "Architecture"
+status: current
+applies_to: "3.0.0+"
+audience: maintainer
+doc_type: explanation
+owner: mir-maintainers
+last_reviewed: 2026-07-07
+supersedes: []
+superseded_by: []
+---
 # Architecture
 
 More Infinite Research is organized around a compatibility-first data-stage pipeline.
@@ -153,7 +164,7 @@ Weapon-speed overlap handling is intentionally narrower than general compatibili
 ## Compatibility Planner Direction
 
 The next compatibility-heavy architecture step is a planner layer, not a broad
-new generator. The durable policy is in `docs/compatibility-program.md`.
+new generator. The durable policy is in `docs/compatibility/support-lanes.md`.
 
 Keep the responsibilities separate:
 
@@ -181,7 +192,7 @@ and carries useful-level estimates for cap warnings. This path is report-only:
 unknown or risky mod behavior is observed before any new automatic stream emits.
 
 `v2.2.0` also starts the procedural compatibility kernel documented in
-`docs/procedural-compatibility-kernel.md`. The first capability resolvers are
+`docs/architecture/procedural-compatibility-kernel.md`. The first capability resolvers are
 report-first:
 
 - loader manufacturing classification from item `place_result`, placed loader
@@ -215,13 +226,13 @@ should add or extend a capability resolver. New false positives should become
 classifier or policy fixes. New bug reports should become negative fixtures.
 
 The `3.0.0` line promotes this kernel into the public compatibility compiler
-architecture. Use `docs/notes/3.0.0-compatibility-compiler-charter.md` as the
+architecture. Use `docs/architecture/compatibility-compiler-charter.md` as the
 source of truth for the 3.0 charter, invariants, module boundaries, non-goals,
-release ladder, and acceptance gates. Use `docs/capabilities.md`,
-`docs/policy-overlays.md`, `docs/decision-records.md`,
-`docs/stream-manifest.md`, `docs/compatibility-claims.md`, `docs/testing.md`,
-and `docs/maintainer-guide.md` for the focused 3.0 subsystem guidance.
-Use `docs/notes/3.0.0-repository-structure.md` for the concrete 3.0 repository
+release ladder, and acceptance gates. Use `docs/capabilities/README.md`,
+`docs/compatibility/policy-overlays.md`, `docs/reference/schemas/decision-record.md`,
+`docs/reference/schemas/stream-manifest.md`, `docs/compatibility/claim-levels.md`, `docs/maintainer/testing.md`,
+and `docs/maintainer/README.md` for the focused 3.0 subsystem guidance.
+Use `docs/architecture/module-boundaries.md` for the concrete 3.0 repository
 shape: thin Factorio root files, the `prototypes/mir/` compiler namespace,
 Factorio adapters under `platform/`, legacy shims for backporting, and the
 development-only workspace boundary.
@@ -310,6 +321,6 @@ The fixture mods under `fixtures/` test item-based science packs, custom labs, l
 
 Scripted technology validation must add existing-save load tests, research-finish/reversal tests, existing spoilable-stack tests, multi-force tests, and checks that the new effects remain event-driven rather than tick-scanned.
 
-For API proof status and unresolved API questions, see `docs/api-proof-points.md`.
+For API proof status and unresolved API questions, see `docs/reference/factorio-api-proof-points.md`.
 
-For named manual save scenarios, see `docs/notes/manual-test-plan.md`.
+For named manual save scenarios, see `docs/maintainer/manual-test-plan.md`.

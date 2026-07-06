@@ -1,3 +1,14 @@
+---
+title: "MIR 3.0.0 Repository Structure"
+status: current
+applies_to: "3.0.0+"
+audience: maintainer
+doc_type: explanation
+owner: mir-maintainers
+last_reviewed: 2026-07-07
+supersedes: []
+superseded_by: []
+---
 # MIR 3.0.0 Repository Structure
 
 Updated: 2026-07-07

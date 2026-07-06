@@ -1,3 +1,14 @@
+---
+title: "Decision Records And Stream Specs"
+status: current
+applies_to: "3.0.0+"
+audience: developer
+doc_type: reference
+owner: mir-maintainers
+last_reviewed: 2026-07-07
+supersedes: []
+superseded_by: []
+---
 # Decision Records And Stream Specs
 
 Updated: 2026-07-07
@@ -115,4 +126,3 @@ Decision output must be stable:
 
 Stable rows make fixture diffs meaningful and save compatibility review
 possible.
-

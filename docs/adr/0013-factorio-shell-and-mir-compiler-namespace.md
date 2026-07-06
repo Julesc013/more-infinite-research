@@ -1,3 +1,14 @@
+---
+title: "ADR 0013: Factorio Shell And MIR Compiler Namespace"
+status: current
+applies_to: "3.0.0+"
+audience: maintainer
+doc_type: adr
+owner: mir-maintainers
+last_reviewed: 2026-07-07
+supersedes: []
+superseded_by: []
+---
 # ADR 0013: Factorio Shell And MIR Compiler Namespace
 
 Status: Accepted for 3.0 planning
@@ -55,4 +66,3 @@ cherry-pick small fixes.
 - Backports can preserve old require paths while `dev` moves forward.
 - Static validation can enforce dependency direction instead of relying on
   convention.
-

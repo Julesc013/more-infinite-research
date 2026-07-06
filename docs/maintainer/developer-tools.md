@@ -1,3 +1,14 @@
+---
+title: "Developer Tools"
+status: current
+applies_to: "3.0.0+"
+audience: maintainer
+doc_type: how-to
+owner: mir-maintainers
+last_reviewed: 2026-07-07
+supersedes: []
+superseded_by: []
+---
 # Developer Tools
 
 This repository has a small MIR developer test harness. It is not a separate product or a second framework. The goal is to keep common release, audit, package, and report tasks behind short commands while preserving the existing scripts as the implementation engines.

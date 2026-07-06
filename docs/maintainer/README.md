@@ -1,3 +1,14 @@
+---
+title: "Maintainer Guide"
+status: current
+applies_to: "3.0.0+"
+audience: maintainer
+doc_type: how-to
+owner: mir-maintainers
+last_reviewed: 2026-07-07
+supersedes: []
+superseded_by: []
+---
 # Maintainer Guide
 
 Updated: 2026-07-07
@@ -5,7 +16,7 @@ Updated: 2026-07-07
 This guide describes the intended 3.0 workflow for adding compatibility without
 copying generator logic into per-mod files.
 
-Use `docs/notes/3.0.0-repository-structure.md` for where new files belong.
+Use `docs/architecture/module-boundaries.md` for where new files belong.
 New shipped Lua should go under `prototypes/mir/` unless it is a thin Factorio
 root entrypoint, locale, migration, graphics asset, or a temporary legacy shim.
 Development-only docs, scripts, fixtures, tests, build output, task ledgers, and

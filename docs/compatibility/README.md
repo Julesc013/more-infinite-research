@@ -1,8 +1,19 @@
+---
+title: "Compatibility and Validation"
+status: current
+applies_to: "3.0.0+"
+audience: modpack-author
+doc_type: explanation
+owner: mir-maintainers
+last_reviewed: 2026-07-07
+supersedes: []
+superseded_by: []
+---
 # Compatibility and Validation
 
 More Infinite Research's current main line targets Factorio `2.1.x` and uses a compatibility-first data-stage plus narrow control-stage model.
 
-For compatibility planning policy, use `docs/compatibility-program.md`. It defines the role taxonomy, one-archive audit template, licensing rule, save-compatibility questions, test matrix model, and planner architecture. For tested claims and future campaign rows, use `docs/compatibility-matrix.md`. For the post-`2.2.0` target-line versioning and backport workflow, use `docs/notes/target-line-versioning-and-backports.md`. For the `3.0.0` compatibility compiler architecture, use `docs/notes/3.0.0-compatibility-compiler-charter.md` plus the focused capability, policy, decision, manifest, claim, testing, maintainer, and ADR docs.
+For compatibility planning policy, use `docs/compatibility/support-lanes.md`. It defines the role taxonomy, one-archive audit template, licensing rule, save-compatibility questions, test matrix model, and planner architecture. For tested claims and future campaign rows, use `docs/compatibility/compatibility-matrix.md`. For the post-`2.2.0` target-line versioning and backport workflow, use `docs/maintainer/backporting.md`. For the `3.0.0` compatibility compiler architecture, use `docs/architecture/compatibility-compiler-charter.md` plus the focused capability, policy, decision, manifest, claim, testing, maintainer, and ADR docs.
 
 Release-line summary:
 
@@ -288,7 +299,7 @@ Do not publish a compatibility-heavy archive from static validation alone. After
 
 The Factorio `2.0` legacy release More Infinite Research `v1.9.0` was released from the `legacy` branch, backported from the tested More Infinite Research `v2.0.5` Factorio `2.1` quick-patch codebase. `v1.9.1` follows the same snapshot-port model from the tested More Infinite Research `v2.1.0` source point. The next transition port is `v1.9.2` from the tested `v2.2.0` source point. The older planned `v1.9.7`, `v1.9.8`, and `v1.9.9` Factorio `2.0` ladder is superseded by the locked post-`1.9.2` target-line policy unless the maintainer explicitly revives it.
 
-The expanded older-line ladder for Factorio `1.1` through `0.6` lives in `docs/notes/legacy-backport-cadence.md`. Those ports should be treated as separate target-line compatibility, archive, or museum releases, not as automatic feature-parity claims.
+The expanded older-line ladder for Factorio `1.1` through `0.6` lives in `docs/archive/2.x/legacy-backport-cadence.md`. Those ports should be treated as separate target-line compatibility, archive, or museum releases, not as automatic feature-parity claims.
 
 The daily celebration cadence does not change the compatibility model: each
 archive still needs target-line metadata, unsupported-surface guards, package
@@ -423,7 +434,7 @@ For each case, verify:
 - Logs show skipped or reduced streams clearly and do not show stack traces.
 - Finite vanilla weapon shooting speed effects are preserved even when the overlap adjustment setting is enabled. The setting only affects MIR's generated continuation.
 
-For named manual save scenarios and release-specific manual tests, see `docs/notes/manual-test-plan.md`.
+For named manual save scenarios and release-specific manual tests, see `docs/maintainer/manual-test-plan.md`.
 
 ## Local Validation Harness
 

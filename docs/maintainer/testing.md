@@ -1,3 +1,14 @@
+---
+title: "Testing And Fixture Strategy"
+status: current
+applies_to: "3.0.0+"
+audience: maintainer
+doc_type: how-to
+owner: mir-maintainers
+last_reviewed: 2026-07-07
+supersedes: []
+superseded_by: []
+---
 # Testing And Fixture Strategy
 
 Updated: 2026-07-07

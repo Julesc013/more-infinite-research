@@ -1,3 +1,14 @@
+---
+title: "Generated Stream Manifest And Migration Policy"
+status: current
+applies_to: "3.0.0+"
+audience: developer
+doc_type: reference
+owner: mir-maintainers
+last_reviewed: 2026-07-07
+supersedes: []
+superseded_by: []
+---
 # Generated Stream Manifest And Migration Policy
 
 Updated: 2026-07-07
@@ -62,4 +73,3 @@ Before release:
 - every rename/removal has a migration or explicit unreleased status;
 - package validation includes migrations when needed;
 - release notes mention user-visible generated technology changes.
-

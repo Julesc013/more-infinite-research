@@ -1,3 +1,14 @@
+---
+title: "API Proof Points"
+status: current
+applies_to: "3.0.0+"
+audience: developer
+doc_type: reference
+owner: mir-maintainers
+last_reviewed: 2026-07-07
+supersedes: []
+superseded_by: []
+---
 # API Proof Points
 
 Updated: 2026-07-06
@@ -6,7 +17,7 @@ This ledger records API claims that affect release planning. Use it to avoid tur
 
 Official Factorio API references should be rechecked before a release if the local Factorio version changes.
 
-Latest official API docs checked on 2026-07-06: `2.1.9`. Local runtime validation evidence in `docs/test-results.md` now includes Factorio `2.1.9`.
+Latest official API docs checked on 2026-07-06: `2.1.9`. Local runtime validation evidence in `docs/releases/2.2.0-validation-record.md` now includes Factorio `2.1.9`.
 
 ## Verified Or Locally Proven
 

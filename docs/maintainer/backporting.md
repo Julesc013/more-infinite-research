@@ -1,3 +1,14 @@
+---
+title: "Target-Line Versioning And Backports"
+status: current
+applies_to: "3.0.0+"
+audience: maintainer
+doc_type: how-to
+owner: mir-maintainers
+last_reviewed: 2026-07-07
+supersedes: []
+superseded_by: []
+---
 # Target-Line Versioning And Backports
 
 Updated: 2026-07-07
@@ -168,7 +179,7 @@ The 3.0 line should formalize:
 Nuclear Science, AAI Loaders, Big Mining Drill, and the requested local load
 checks, but it should not become a broad K2/Bob/Angel/SE/Py generation release.
 The detailed 3.0 architecture charter lives in
-`docs/notes/3.0.0-compatibility-compiler-charter.md`.
+`docs/architecture/compatibility-compiler-charter.md`.
 
 ## Backporting `3.0.0`
 

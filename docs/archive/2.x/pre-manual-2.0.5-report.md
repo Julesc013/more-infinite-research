@@ -1,3 +1,14 @@
+---
+title: "v2.0.5 Pre-Manual Readiness Report"
+status: archived
+applies_to: "1.x-2.x"
+audience: maintainer
+doc_type: archive
+owner: mir-maintainers
+last_reviewed: 2026-07-07
+supersedes: []
+superseded_by: ["../../releases/README.md"]
+---
 # v2.0.5 Pre-Manual Readiness Report
 
 Updated: 2026-07-01

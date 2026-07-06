@@ -1,3 +1,14 @@
+---
+title: "ADR 0001: MIR 3.0 Compatibility Compiler Architecture"
+status: current
+applies_to: "3.0.0+"
+audience: maintainer
+doc_type: adr
+owner: mir-maintainers
+last_reviewed: 2026-07-07
+supersedes: []
+superseded_by: []
+---
 # ADR 0001: MIR 3.0 Compatibility Compiler Architecture
 
 Status: Accepted for 3.0 planning
@@ -25,4 +36,3 @@ validated `StreamSpec` records.
 - Unknowns and low-confidence candidates are reported before they emit.
 - Public compatibility claims must be backed by claim manifests and fixtures.
 - The release is architecture-led, not a broad feature bucket.
-

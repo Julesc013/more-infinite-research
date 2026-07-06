@@ -1,8 +1,19 @@
+---
+title: "MIR Compatibility Matrix"
+status: current
+applies_to: "3.0.0+"
+audience: modpack-author
+doc_type: explanation
+owner: mir-maintainers
+last_reviewed: 2026-07-07
+supersedes: []
+superseded_by: []
+---
 # MIR Compatibility Matrix
 
 This matrix records compatibility claims and planned compatibility campaigns. It is intentionally stricter than the idea backlog: most idea-mod observations are compatibility signals, not planned MIR features. A mod can be interesting without becoming MIR-owned behavior.
 
-Use `docs/compatibility-program.md` for the role taxonomy, one-archive audit template, licensing rule, save-compatibility questions, compatibility-mode policy, and planner architecture direction. This matrix is the claim ledger; the compatibility program document is the decision framework.
+Use `docs/compatibility/support-lanes.md` for the role taxonomy, one-archive audit template, licensing rule, save-compatibility questions, compatibility-mode policy, and planner architecture direction. This matrix is the claim ledger; the compatibility program document is the decision framework.
 
 Status vocabulary:
 

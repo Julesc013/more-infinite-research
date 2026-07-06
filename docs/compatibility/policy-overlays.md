@@ -1,3 +1,14 @@
+---
+title: "Policy Overlays"
+status: current
+applies_to: "3.0.0+"
+audience: modpack-author
+doc_type: explanation
+owner: mir-maintainers
+last_reviewed: 2026-07-07
+supersedes: []
+superseded_by: []
+---
 # Policy Overlays
 
 Updated: 2026-07-07
@@ -114,4 +125,3 @@ Claim the behavior, not a brand label:
 - "Air Scrubbing clean-filter crafting only."
 
 Avoid "full support" unless fixtures prove the full claim.
-
