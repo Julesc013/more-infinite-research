@@ -2,6 +2,42 @@
 
 This file records local release-candidate validation runs. It is not a substitute for the manual mod matrix in `docs/compatibility.md`.
 
+## 2026-07-06 2.1.5 Final Release-Targeted Gate
+
+Environment:
+
+- Branch: `dev`.
+- Mod version `2.1.5`.
+- Factorio binary: Steam Factorio `2.1.9`.
+- Local Factorio `2.1` mod library: `C:\Projects\Factorio\testmods_2.1`.
+- Release artifact: `dist\more-infinite-research_2.1.5.zip`.
+
+Command:
+
+```powershell
+.\scripts\mir.ps1 release gate --profile release-targeted-2.1 --factorio 'C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe' --mods 'C:\Projects\Factorio\testmods_2.1' --output '.\artifacts\release-targeted-2.1.5-final' --timeout 900 --no-git-pull
+```
+
+Gate coverage:
+
+- Strict current-commit gate: `Static`, `Runtime`, and deterministic `AuditSmoke`.
+- Runtime fixture validation included the new `recipe-cap-diagnostics` scenario.
+- Deterministic `AuditSmoke` loaded the Space Age baseline with `88` MIR audit rows.
+- Targeted local repair smokes loaded `big-mining-drill` and `biolabs-in-space`.
+- Representative local scenario loaded `local-2-1-bz-suite-space-age` with `89` MIR audit rows.
+- Package build rebuilt `dist\more-infinite-research_2.1.5.zip`.
+- The first final run failed only at clean-git-status because the tracked release archive was rebuilt by the package step.
+
+Release archive:
+
+- Path: `dist\more-infinite-research_2.1.5.zip`.
+
+Result:
+
+- Functional release gate passed.
+- Rebuilt release archive is committed with this release-prep entry.
+- The same gate is rerun after committing the rebuilt archive so clean-git-status proves the committed archive matches the package builder output.
+
 ## 2026-07-06 2.1.5 Planner Diagnostics And Observation Tooling
 
 Environment:

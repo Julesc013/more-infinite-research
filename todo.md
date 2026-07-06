@@ -493,7 +493,7 @@ Idea-mod audit planning lives in `docs/notes/mod-ideas-audit.md`.
 - [x] Pull the low-risk `v2.2.0` planner slice into `v2.1.5` as diagnostics-only audit rows.
 - [x] Add recipe productivity cap diagnostics without changing caps, max levels, or stream generation.
 - [x] Pull non-gameplay `v2.2.0` audit tooling into `v2.1.5`: compatibility observations, report summaries, and CLI access.
-- [ ] Run the targeted external idea-mod load pass before tagging `v2.1.5`.
+- [x] Run the targeted external idea-mod load pass before tagging `v2.1.5`.
 - [x] Add locale/docs/validation updates.
 - [ ] Add proven recipe IDs to existing streams when no new architecture is needed.
 - [ ] Rebalance costs or defaults for features already shipped in `v2.1.0`.
