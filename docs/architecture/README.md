@@ -36,7 +36,17 @@ This order gives the mod the best practical view of recipes, labs, science packs
 
 ## Control Stage Boundary
 
-The current `dev` branch includes a small `control.lua` surface for scripted technologies such as spoilage preservation and agricultural growth speed. These runtime features ship as disabled-by-default experimental candidates because they are bounded and event-driven. Stronger behavior claims, default enablement, or broad existing-save guarantees still require the named manual save validation.
+`control.lua` is Factorio's runtime entrypoint. It is separate from
+`settings.lua`, `data.lua`, `data-updates.lua`, and `data-final-fixes.lua`, and
+it cannot generate or mutate prototypes after startup finalizes them.
+
+The default MIR 3 policy is to omit `control.lua` unless the mod has runtime
+responsibilities. The current `dev` branch does have a small runtime surface for
+scripted technologies such as spoilage preservation and agricultural growth
+speed, so `control.lua` stays as a thin wrapper into the runtime manager. These
+features ship as disabled-by-default experimental candidates because they are
+bounded and event-driven. Stronger behavior claims, default enablement, or broad
+existing-save guarantees still require the named manual save validation.
 
 The runtime layer is intentionally narrow:
 
@@ -49,6 +59,8 @@ The runtime layer is intentionally narrow:
 - Require each scripted feature to document storage keys, disable behavior, multiple-force behavior, and interaction with other mods touching the same state.
 - Label scripted/global/sandbox features clearly in settings and player-facing docs.
 - Static validation fails if `control.lua` or `control/**/*.lua` registers `defines.events.on_tick` or `script.on_nth_tick` without a future explicit allowlist.
+- Static architecture validation fails if runtime control files use prototype
+  mutation APIs such as `data.raw` or `data:extend`.
 
 Do not use runtime code to fake fluid physics, platform speed, module effects, or machine behavior when the requested feature is really a prototype/entity unlock or companion-mod feature.
 

@@ -61,6 +61,23 @@ function Assert-MIRNoPatternInLuaTree {
   }
 }
 
+function Assert-MIRNoPatternInLuaFile {
+  param(
+    [Parameter(Mandatory)][string]$RelativePath,
+    [Parameter(Mandatory)][string]$Pattern,
+    [Parameter(Mandatory)][string]$Message
+  )
+
+  $path = Get-MIRPath -RelativePath $RelativePath
+  if (-not (Test-Path -LiteralPath $path)) { return }
+
+  $matches = @(Select-String -LiteralPath $path -Pattern $Pattern)
+  if ($matches.Count -gt 0) {
+    $matches | Write-Host
+    throw $Message
+  }
+}
+
 $entrypoints = @(
   @{
     Root = "settings.lua"
@@ -151,5 +168,22 @@ Assert-MIRNoPatternInLuaTree `
   -RelativeRoot "prototypes/mir/report" `
   -Pattern "\bdata\.raw\b|data:extend" `
   -Message "MIR report modules must not mutate prototypes."
+
+$runtimePrototypePattern = "\bdata\.raw\b|data:extend"
+foreach ($relative in @(
+  "control.lua",
+  "prototypes/mir/stage/control.lua",
+  "prototypes/mir/legacy/control.lua"
+)) {
+  Assert-MIRNoPatternInLuaFile `
+    -RelativePath $relative `
+    -Pattern $runtimePrototypePattern `
+    -Message "MIR runtime control entrypoints must not perform prototype-stage work."
+}
+
+Assert-MIRNoPatternInLuaTree `
+  -RelativeRoot "control" `
+  -Pattern $runtimePrototypePattern `
+  -Message "MIR runtime control modules must not perform prototype-stage work."
 
 Write-Host "[ok] MIR architecture boundary lint passed."

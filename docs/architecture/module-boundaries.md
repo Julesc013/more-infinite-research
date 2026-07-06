@@ -74,6 +74,17 @@ data-final-fixes.lua
 control.lua, only if runtime code is genuinely needed
 ```
 
+`control.lua` is not part of the prototype compiler. It is Factorio's runtime
+entrypoint for save/session behavior such as event handlers, commands, remote
+interfaces, GUI, storage, and configuration-change handling. MIR should not add
+or keep `control.lua` for normal generated technology emission. This branch
+keeps it only because scripted technology candidates already have bounded
+runtime handlers under `control/`.
+
+Runtime control files must not inspect `data.raw`, call `data:extend`, or create
+generated technology prototypes. Those responsibilities remain in the data
+stage, primarily behind `data-final-fixes.lua`.
+
 Current migration state: the Factorio root entrypoints route through
 `prototypes/mir/stage/`, and the previous entrypoint bodies live under
 `prototypes/mir/legacy/`. This is a behavior-preserving shell migration. The

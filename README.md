@@ -426,7 +426,7 @@ Generic competing recipe-productivity cleanup is intentionally limited to **know
 
 | File | Purpose |
 | --- | --- |
-| `control.lua` | Loads the scripted technology manager for bounded runtime effects. |
+| `control.lua` | Thin runtime wrapper for bounded scripted effects; not part of prototype generation. |
 | `control/scripted-techs.lua` | Registers scripted technology lifecycle and event handlers. |
 | `control/effects/spoilage-preservation.lua` | Applies and restores the global spoilage preservation multiplier. |
 | `control/effects/agricultural-growth-speed.lua` | Adjusts newly planted agricultural tower crops from researched growth speed. |
