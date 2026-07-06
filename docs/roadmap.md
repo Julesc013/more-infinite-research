@@ -544,9 +544,11 @@ Recommended order from here:
 3. Backport the tested `v2.2.0` source point through `tmp/2.0` and release it from `legacy` as `v1.9.2`.
 4. Bring portable fixes discovered on `tmp/2.0` back to `dev` and revalidate on Factorio `2.1`.
 5. Start `v3.0.0` on `dev` as the compatibility-compiler architecture release,
-   using `docs/notes/3.0.0-compatibility-compiler-charter.md` and the focused
-   capability, policy, decision, manifest, claim, testing, maintainer, and ADR
-   docs as the scope boundary.
+   using `docs/notes/3.0.0-compatibility-compiler-charter.md`,
+   `docs/notes/3.0.0-repository-structure.md`, and the focused capability,
+   policy, decision, manifest, claim, testing, maintainer, and ADR docs as the
+   scope boundary. The first refactor step is the Factorio shell plus
+   `prototypes/mir/` compiler namespace, not new gameplay.
 6. Use the locked post-transition target-line scheme: `3.x.x` for Factorio `2.1`, `2.x.x` for Factorio `2.0`, `1.9.3+` for Factorio `1.1`, `1.8.x` for Factorio `1.0`, `1.7.x` through `1.3.x` for Factorio `0.17` through `0.13`, and `0.12.x` through `0.6.x` for Factorio `0.12` through `0.6`.
 7. Backport tested `3.x.x` source points only through target-line `tmp/*` branches or worktrees with matching Factorio binaries and mod libraries.
 8. Execute older-line backports only as separate validation-gated ports.

@@ -19,4 +19,4 @@ Initial ADR set:
 - `0010`: Settings and customization policy.
 - `0011`: Runtime code boundaries.
 - `0012`: Fixture and report-diff strategy.
-
+- `0013`: Factorio shell and MIR compiler namespace.

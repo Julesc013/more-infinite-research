@@ -221,6 +221,10 @@ release ladder, and acceptance gates. Use `docs/capabilities.md`,
 `docs/policy-overlays.md`, `docs/decision-records.md`,
 `docs/stream-manifest.md`, `docs/compatibility-claims.md`, `docs/testing.md`,
 and `docs/maintainer-guide.md` for the focused 3.0 subsystem guidance.
+Use `docs/notes/3.0.0-repository-structure.md` for the concrete 3.0 repository
+shape: thin Factorio root files, the `prototypes/mir/` compiler namespace,
+Factorio adapters under `platform/`, legacy shims for backporting, and the
+development-only workspace boundary.
 
 ## Diagnostics
 

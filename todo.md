@@ -574,6 +574,7 @@ not broad new gameplay generation.
 
 Reference docs:
 
+- `docs/notes/3.0.0-repository-structure.md`
 - `docs/capabilities.md`
 - `docs/policy-overlays.md`
 - `docs/decision-records.md`
@@ -586,7 +587,10 @@ Reference docs:
 
 ### v3.0.0 Alpha 1: Skeleton And Contracts
 
-- [ ] Create the `prototypes/mir/` module tree or equivalent migration path from the current `prototypes/lib/` layout.
+- [ ] Create the Factorio shell plus `prototypes/mir/` compiler namespace from `docs/notes/3.0.0-repository-structure.md`.
+- [ ] Convert root Factorio files into thin stage wrappers without changing behavior.
+- [ ] Add `stage/`, `core/`, `platform/`, `domain/`, and `legacy/` as the first migration shell.
+- [ ] Keep existing public module paths as legacy shims where that reduces target-line backport friction.
 - [ ] Add or formalize schema validators for facts, candidates, decisions, stream specs, manifests, claims, fixtures, and migrations.
 - [ ] Promote the capability resolver contract to the public 3.0 architecture boundary.
 - [ ] Add `DecisionRecord` v1 validation.
@@ -597,6 +601,7 @@ Reference docs:
 
 ### v3.0.0 Alpha 2: Current Behavior Through Compiler Phases
 
+- [ ] Move old generator, recipe-matching, compat-profile, and report-row code behind legacy shims before deeper rewrites.
 - [ ] Move existing explicit stream generation behind validated `StreamSpec` records without changing released technology IDs.
 - [ ] Move Air Scrubbing clean-filter support through capability and policy records.
 - [ ] Move owner, cap, lab, and loop diagnostics into report modules.

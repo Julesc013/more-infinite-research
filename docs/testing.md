@@ -13,6 +13,7 @@ MIR emits, skips, rejects, and reports exactly what the policy says.
 - schema validation;
 - stable sort helpers;
 - stable ID generation;
+- architecture import-direction linting;
 - policy linter;
 - claim linter;
 - manifest linter;
@@ -118,4 +119,3 @@ git diff --check
 
 Any generated report changes must be explained by source changes or restored if
 they are only local run churn.
-
