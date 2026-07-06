@@ -20,8 +20,48 @@ local ROLE_SIGNALS = {
   },
   ["atan-air-scrubbing"] = {
     role = "MIR_STREAM_CANDIDATE",
-    action = "future_clean_filter_productivity_only",
+    action = "clean_filter_productivity_only",
     signal = "air_scrubbing_filters"
+  },
+  ["FluidMustFlow"] = {
+    role = "MIR_DOCS_ONLY",
+    action = "load_and_pipeline_extent_coexistence",
+    signal = "large_fluid_duct_content"
+  },
+  ["robot_attrition"] = {
+    role = "MIR_DIAGNOSTIC_ONLY",
+    action = "runtime_balance_mod_coexistence_only",
+    signal = "robot_runtime_attrition"
+  },
+  ["jetpack"] = {
+    role = "MIR_DOCS_ONLY",
+    action = "equipment_content_coexistence_only",
+    signal = "player_movement_equipment"
+  },
+  ["big-mining-drill"] = {
+    role = "MIR_STREAM_CANDIDATE",
+    action = "existing_mining_drill_stream_fixture_candidate",
+    signal = "mining_drill_recipe"
+  },
+  ["equipment-gantry"] = {
+    role = "MIR_DOCS_ONLY",
+    action = "equipment_grid_content_coexistence_only",
+    signal = "equipment_grid_automation"
+  },
+  ["aai-industry"] = {
+    role = "MIR_STREAM_CANDIDATE",
+    action = "mini_overhaul_procedural_tuning_profile",
+    signal = "early_industry_recipe_and_science_changes"
+  },
+  ["aai-containers"] = {
+    role = "MIR_DOCS_ONLY",
+    action = "storage_content_coexistence_only",
+    signal = "warehouse_container_content"
+  },
+  ["aai-loaders"] = {
+    role = "MIR_DOCS_ONLY",
+    action = "loader_logistics_content_coexistence_only",
+    signal = "loader_logistics_content"
   },
 
   ["finite_prod_techs"] = {

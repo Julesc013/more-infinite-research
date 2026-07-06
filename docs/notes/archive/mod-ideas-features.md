@@ -83,6 +83,85 @@ is also copied into `ideamods_mix`.
 - How it works: The scrubber is a furnace-like machine in category `atmospheric-filtration`; its electric energy source has negative `emissions_per_minute` for pollution and, with Space Age, spores. Surface conditions restrict recipes to planets with air and the matching emission type.
 - MIR action: Recreate only the safe consumable-filter productivity slice in `2.2.0`: candidate streams should target `atan-pollution-filter` and, with Space Age, `atan-spore-filter`. Do not add productivity to the scrubbing recipes or cleaning recipes, because those recipes encode pollution/spore removal and filter recovery loops. Do not attempt "scrubber efficiency" in MIR core; increasing negative emissions would require prototype/runtime mutation outside the current stream model.
 
+### `atan-ash`
+
+- Primary role: `MIR_STREAM_CANDIDATE` for `2.2.0` after Air Scrubbing.
+- Source checked: Mod Portal `atan-ash` and GitHub source on 2026-07-06.
+- What it does: Adds ash as a byproduct concern and adds ash-processing recipes into landfill, stone brick, coal/ore separation, nutrients, and foundation depending on active official content.
+- Recipes and changes:
+  - `atan-landfill-from-ash`: turns ash into landfill.
+  - `atan-stone-brick-from-ash`: turns ash into stone brick.
+  - `atan-ash-seperation`: productivity-allowed ash separation into coal and a small iron ore chance.
+  - `atan-nutrients-from-ash`: Space Age productivity-allowed nutrients from ash.
+  - `atan-foundation-from-ash`: Space Age foundation from ash.
+- MIR action: Use as the second ATAN-family proof slice after Air Scrubbing. Start from exact recipe IDs and distinguish productivity-allowed conversion from recipes where MIR should only observe or defer. Do not force broad productivity onto every ash sink just because it consumes ash.
+
+### `atan-nuclear-science`
+
+- Primary role: `MIR_STREAM_CANDIDATE` for `2.2.0` after `atan-ash`.
+- Source checked: Mod Portal `atan-nuclear-science` and GitHub source on 2026-07-06.
+- What it does: Adds Nuclear Science as a Nauvis science pack, an Atom forge building, and altered late-game science requirements.
+- Recipes and changes:
+  - `nuclear-science-pack`: productivity-allowed science-pack recipe that returns barrels with ignored productivity.
+  - `atan-atom-forge`: non-productivity Atom forge crafting recipe.
+- MIR action: Use as the third ATAN-family proof slice. Exercise modded science-pack detection, lab compatibility, and explicit non-ownership of the Atom forge recipe. Do not claim a broad Nuclear Science compatibility campaign from one productivity stream.
+
+### `FluidMustFlow`
+
+- Primary role: `MIR_DOCS_ONLY` / targeted coexistence for `2.2.0`.
+- Source checked: Mod Portal `FluidMustFlow` on 2026-07-06.
+- What it does: Adds large duct entities for high-throughput long-distance fluid transport, with duct intake/exhaust entities for pipe transfer and circuit-network control.
+- MIR action: Add as a load and pipeline-extent coexistence target. Do not recreate ducts, fluid logistics behavior, or UPS optimization logic in MIR.
+
+### `robot_attrition`
+
+- Primary role: `MIR_DIAGNOSTIC_ONLY` / adjacent runtime balance.
+- Source checked: Mod Portal `robot_attrition` on 2026-07-06.
+- What it does: Adds configurable logistic robot crash attrition under heavy bot congestion to discourage full bot-based logistics in some late-game cases.
+- MIR action: Add as a load/coexistence target only. Do not absorb bot crash behavior, runtime balance, or item recovery behavior into MIR.
+
+### `jetpack`
+
+- Primary role: `MIR_DOCS_ONLY` / adjacent equipment content.
+- Source checked: Mod Portal `jetpack` on 2026-07-06.
+- What it does: Adds jetpack equipment tiers that consume fuel from inventory and let the player fly over buildings and water.
+- MIR action: Add as a load/coexistence target only. Do not absorb player movement, equipment, fuel consumption, or Space Exploration suit integration behavior into MIR.
+
+### `big-mining-drill`
+
+- Primary role: `MIR_STREAM_CANDIDATE` through the existing mining-drill stream.
+- Source checked: Mod Portal `big-mining-drill` on 2026-07-06.
+- What it does: Adds a larger electric mining drill with increased range, speed, and module slots as a standalone version of the Big mining drill from AAI Industry.
+- MIR action: Use as an existing-stream proof target for `research_mining_drill`, not a new stream. Validate exact recipe visibility and ownership before claiming support.
+
+### `equipment-gantry`
+
+- Primary role: `MIR_DOCS_ONLY` / adjacent equipment-grid automation.
+- Source checked: Mod Portal `equipment-gantry` on 2026-07-06.
+- What it does: Adds equipment gantry and remover gantry machines that insert or remove equipment from items with equipment grids, such as armor, vehicles, and spidertrons.
+- MIR action: Add as a coexistence and classification target. Do not absorb equipment-grid insertion/removal behavior, item-container processing, or runtime limitations into MIR.
+
+### `aai-containers`
+
+- Primary role: `MIR_DOCS_ONLY` / adjacent storage content.
+- Source checked: Mod Portal `aai-containers` on 2026-07-06.
+- What it does: Adds chest, strongbox, storehouse, and warehouse containers, including logistic and non-logistic variants.
+- MIR action: Add as a load/coexistence target and recipe-surface observation case. Do not create container productivity streams without later exact recipe and balance evidence.
+
+### `aai-loaders`
+
+- Primary role: `MIR_DOCS_ONLY` / adjacent loader logistics.
+- Source checked: Mod Portal `aai-loaders` on 2026-07-06.
+- What it does: Adds loader entities with lubricated, expensive, or graphics-only operating modes and built-in compatibility hooks for several larger mod families.
+- MIR action: Add as a load/coexistence target and logistics-content observation case. Do not absorb loader operating modes, fluid consumption, entity behavior, or compatibility hook generation into MIR.
+
+### `aai-industry`
+
+- Primary role: `MIR_STREAM_CANDIDATE` as a mini-overhaul procedural tuning profile.
+- Source checked: Mod Portal `aai-industry` on 2026-07-06.
+- What it does: Adds burner assemblers, burner labs, burner turbines, new intermediates such as single-cylinder engines and electric motors, powered offshore pumps, and recipe/technology progression changes.
+- MIR action: Use as the bridge profile before large overhaul campaigns. Tune discovery, normalization, recipe-family classification, lab/science derivation, machine/pump facts, and owner decisions. Do not claim broad AAI suite support from this standalone profile.
+
 ## Per-Mod Decisions
 
 ### `5dim_mining_2.0.3.zip`
@@ -586,7 +665,10 @@ These are candidates for MIR-owned implementation, not cloning:
 | --- | --- | --- |
 | Ore-crushing productivity | `crushing-industry-productivity-research` | Exact visible recipe IDs, value decision, and no output-scaling copy. |
 | Tile/surface productivity | `asphalt-productivity`, `concrete-productivity`, `landfill-productivity`, `foundation-productivity` | Per-material values, finite lead-in preservation, exact cleanup rules. |
-| Air Scrubbing filter productivity | `atan-air-scrubbing` | `2.2.0` candidate for exact clean filter recipe IDs, with fixtures proving scrubbing and cleaning recipes are excluded. |
+| Air Scrubbing filter productivity | `atan-air-scrubbing` | Exact clean filter recipe IDs, with fixtures proving scrubbing and cleaning recipes are excluded. |
+| ATAN follow-up proof slices | `atan-ash`, `atan-nuclear-science` | Exact recipe IDs and explicit non-ownership rows before any public claim. |
+| Mining drill existing-stream proof | `big-mining-drill` | Validate current `research_mining_drill` matching; do not create a separate stream. |
+| Mini-overhaul tuning bridge | `aai-industry` | Tune discovery, lab/science, recipe family, machine, pump, and prerequisite facts before large suites. |
 | Cap-aware diagnostics | `finite_prod_techs`, `productivity-technology-limit`, `modified-productivity-cap`, `remove-productivity-cap`, `Productivity-config`, `base-prod` | Warn/report first; no silent cap mutation. |
 | Native direct-effect policy | `Research_Productivity`, `better-bot-battery2`, `all_around_research`, `epic_mining_and_crafting_speed_research`, `miner-start`, `mining-prod-0`, `player-count-based-research-speed` | Explicit skip/prefer/coexist/warn rules by modifier type. |
 | One overhaul material family | `py_productivity`, selected `ExpandedProductivityResearch` and `crafting-efficiency-2` families | Exact recipe family fixture and public claim limited to that family. |
@@ -597,6 +679,12 @@ These should be supported through load tests, diagnostics, or non-action rather
 than recreated:
 
 - `5dim_mining`
+- `aai-containers`
+- `aai-loaders`
+- `equipment-gantry`
+- `FluidMustFlow`
+- `robot_attrition`
+- `jetpack`
 - `big-brother`
 - `combatresearchtech`
 - `ConfigurableResearchCost`

@@ -9,6 +9,8 @@ Date: 2026-07-06
     - Added loop-risk reports for recycling, cleaning, voiding, barrel/container, transmutation, and self-return recipes.
     - Added lab-matrix reports so each generated technology can be checked against labs that accept its science set.
     - Added useful-level estimates to recipe productivity cap reports.
+    - Added Air Scrubbing clean-filter productivity for exact pollution and spore filter crafting recipes.
+    - Kept Air Scrubbing scrubbing, cleaning, recovery, and environmental-removal recipes diagnostic-only.
 
   Internal:
 

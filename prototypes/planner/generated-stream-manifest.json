@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "streams": {
+    "mir-prod-air-scrubbing-clean-filter": {
+      "introduced_in": "2.2.0",
+      "source": "compat_policy:air-scrubbing",
+      "family": "clean_filter",
+      "stable": true,
+      "generated_technology": "recipe-prod-research_air_scrubbing_clean_filter-1",
+      "stream_key": "research_air_scrubbing_clean_filter",
+      "targets": [
+        "atan-pollution-filter",
+        "atan-spore-filter"
+      ]
+    }
+  }
+}

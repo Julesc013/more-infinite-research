@@ -510,8 +510,18 @@ Idea-mod audit candidates should be promoted only after recipe-ID proof, balance
 | Cap-aware UX | Productivity cap and finite-limit helper mods | `v2.2.0` adds useful-level estimates; settings or mutation policy remains deferred. |
 | External rule-mutator detection | Productivity, beacon, machine, cap, and cost mutator mods | `v2.2.0` detects cap, beacon, lab, and machine-rule surfaces without normalizing them. |
 | Loop-risk diagnostics | Recycler, crusher, catalyst, cleaning, scrubbing, spoilage, and voiding loops | `v2.2.0` reports obvious loop-risk flags before any productivity-rule or cap-mutation option. |
-| Ore crushing productivity | Crushing Industry productivity research | Recipe-ID driven Crushing Industry stream or compatibility profile. |
 | Air Scrubbing clean-filter productivity | `atan-air-scrubbing` | Clean pollution/spore filter recipe productivity only; exclude scrubbing and cleaning recipes. |
+| ATAN ash-processing productivity | `atan-ash` | Follow Air Scrubbing with exact ash-processing recipe IDs; start from productivity-allowed ash separation. |
+| ATAN nuclear science productivity | `atan-nuclear-science` | Follow Ash with exact nuclear science pack productivity and lab/science compatibility checks. |
+| Big Mining Drill proof | `big-mining-drill` | Prove existing `research_mining_drill` matching against the standalone drill content mod. |
+| Fluid Must Flow coexistence | `FluidMustFlow` | Load and pipeline setting coexistence check; no duct behavior recreation. |
+| Robot Attrition coexistence | `robot_attrition` | Load-only adjacent runtime balance check; do not absorb bot crash behavior. |
+| Jetpack coexistence | `jetpack` | Load-only adjacent equipment check; do not absorb player movement or fuel behavior. |
+| Equipment Gantry coexistence | `equipment-gantry` | Load-only equipment-grid automation check; do not absorb item-grid processing behavior. |
+| AAI Containers coexistence | `aai-containers` | Load-only storage content check; do not absorb warehouse/container behavior. |
+| AAI Loaders coexistence | `aai-loaders` | Load-only loader logistics check; do not absorb loader operating modes or compatibility hooks. |
+| AAI Industry tuning bridge | `aai-industry` | Mini-overhaul profile for recipe, science, lab, machine, pump, and prerequisite classification before K2. |
+| Ore crushing productivity | Crushing Industry productivity research | Recipe-ID driven Crushing Industry stream or compatibility profile after the ATAN proof slices. |
 | Tile/surface productivity | Asphalt, concrete, landfill, foundation productivity mods | Decide conservative defaults, exact cleanup rules, and optional high-value profile policy before implementation. |
 | Overhaul material families | Pyanodon, Expanded Productivity Research, Crafting Efficiency | Pick one concrete family first; avoid a generic generator. |
 | Native overlap policy | Lab, mining, solar, and other native productivity mods | General skip/warn/prefer/allow behavior with fixtures. |
@@ -530,11 +540,16 @@ Idea-mod audit candidates should be promoted only after recipe-ID proof, balance
 - [x] Add external rule-mutator diagnostics before considering recipe-productivity rule changes.
 - [x] Add loop-risk diagnostics before considering cap removal, recycler productivity, broad productivity eligibility, or beacon productivity.
 - [x] Build cap-aware diagnostics before adding balance-heavy productivity families.
-- [ ] Treat ore-crushing productivity as the first clean new stream candidate only if recipe-ID fixtures pass.
-- [ ] Treat Air Scrubbing filter productivity as a clean-filter-only stream candidate; prove scrubbing and cleaning recipes are excluded.
+- [x] Treat Air Scrubbing filter productivity as a clean-filter-only stream candidate; prove scrubbing and cleaning recipes are excluded.
+- [ ] Add `atan-ash` and `atan-nuclear-science` as same-author proof slices after Air Scrubbing.
+- [ ] Add `big-mining-drill` as an existing mining-drill stream proof slice.
+- [ ] Add `FluidMustFlow`, `robot_attrition`, and `jetpack` as coexistence/load targets, not MIR-owned gameplay.
+- [ ] Add `equipment-gantry`, `aai-containers`, `aai-loaders`, and `aai-industry` as procedural tuning targets before large overhaul campaigns.
+- [ ] Use the requested tuning set to refine discovery, normalization, classification, owner detection, lab/science derivation, rejection, and reporting before moving to K2.
+- [ ] Treat ore-crushing productivity as the first broader family-stream candidate only if recipe-ID fixtures pass.
 - [ ] Require an explicit balance policy before shipping tile/surface productivity changes.
 - [ ] Limit any overhaul material-family slice to one concrete family with fixture-proven recipe IDs.
-- [ ] Keep Space Exploration, Krastorio 2, AAI, Bob's, and combination support as separate future matrices instead of one broad compatibility promise.
+- [ ] Keep Krastorio 2 as the first large overhaul campaign after the proof ladder, with Bob's, Angel's, Space Exploration, Pyanodons, AAI combinations, and suite mixes as separate future matrices.
 - [ ] Revisit pump/fluid/logistics work that was too large for `v2.1.0`.
 - [ ] Revisit advanced settings UX if presets are not enough.
 - [ ] Revisit bounded scripted research ideas after the framework has proven stable.

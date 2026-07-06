@@ -190,6 +190,55 @@ local function append_ingredient(out, seen, name, amount)
   end
 end
 
+local function sorted_keys(tbl)
+  local keys = {}
+  for key, _ in pairs(tbl or {}) do table.insert(keys, key) end
+  table.sort(keys)
+  return keys
+end
+
+local function recipe_unlock_techs(recipe_name)
+  local out = {}
+  for _, tech_name in ipairs(sorted_keys(data.raw.technology or {})) do
+    local tech = data.raw.technology[tech_name]
+    for _, effect in ipairs((tech and tech.effects) or {}) do
+      if effect.type == "unlock-recipe" and effect.recipe == recipe_name then
+        table.insert(out, tech_name)
+        break
+      end
+    end
+  end
+  return out
+end
+
+local function stream_recipe_names(spec)
+  local seen = {}
+  local out = {}
+  for _, bucket in ipairs(recipes.recipes_for_stream(spec or {}, C.shared.per_level_default) or {}) do
+    for _, recipe_name in ipairs(bucket.recipes or {}) do
+      if not seen[recipe_name] then
+        seen[recipe_name] = true
+        table.insert(out, recipe_name)
+      end
+    end
+  end
+  table.sort(out)
+  return out
+end
+
+local function science_from_unlocks(spec)
+  local out, seen = {}, {}
+  for _, recipe_name in ipairs(stream_recipe_names(spec)) do
+    for _, tech_name in ipairs(recipe_unlock_techs(recipe_name)) do
+      local tech = (data.raw.technology or {})[tech_name]
+      for _, ingredient in ipairs(((tech and tech.unit) and tech.unit.ingredients) or {}) do
+        append_ingredient(out, seen, ingredient_name(ingredient), ingredient_amount(ingredient))
+      end
+    end
+  end
+  return out
+end
+
 function U.apply_science_pack_ingredient_policy(ingredients)
   local out, seen = {}, {}
   local policy = startup_setting("mir-science-pack-ingredient-policy") or "configured"
@@ -225,6 +274,10 @@ function U.pick_science_for_stream(spec, key)
   local desired = spec and spec.science_packs
   if desired == "all" then
     for _, p in ipairs(U.pack_list_all()) do add_if_science_pack_exists(packs, p) end
+  elseif desired == "derive-from-unlocks" then
+    for _, ingredient in ipairs(science_from_unlocks(spec)) do
+      add_if_science_pack_exists(packs, ingredient_name(ingredient))
+    end
   elseif type(desired) == "table" then
     for _, p in ipairs(desired) do add_if_science_pack_exists(packs, p) end
   elseif type(desired) == "string" then
@@ -237,6 +290,12 @@ function U.pick_science_for_stream(spec, key)
       add_if_science_pack_exists(packs, p)
     end
     for _, p in ipairs(STREAM_EXTRA_PACKS[key] or {}) do add_if_science_pack_exists(packs, p) end
+  end
+
+  if desired == "derive-from-unlocks" and #packs == 0 then
+    for _, p in ipairs({"automation-science-pack", "logistic-science-pack", "chemical-science-pack"}) do
+      add_if_science_pack_exists(packs, p)
+    end
   end
 
   local out, seen = {}, {}
@@ -265,6 +324,13 @@ function U.build_prereqs_for(key, ingredients)
   end
   for _, tech_name in ipairs(spec.required_technologies or {}) do
     add(tech_name)
+  end
+  if spec.prerequisites == "derive-from-unlocks" then
+    for _, recipe_name in ipairs(stream_recipe_names(spec)) do
+      for _, tech_name in ipairs(recipe_unlock_techs(recipe_name)) do
+        add(tech_name)
+      end
+    end
   end
 
   return U.append_end_game_gate_prerequisite(reqs)

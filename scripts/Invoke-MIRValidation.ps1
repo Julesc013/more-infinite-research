@@ -387,6 +387,7 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
   $fluidProductivityFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-fluid-productivity\data-final-fixes.lua")
   $pipelineExtentFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-pipeline-extent\data-final-fixes.lua")
   $betterBotBatteryFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-better-bot-battery-skip\data-final-fixes.lua")
+  $airScrubbingFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-air-scrubbing-clean-filter\data-final-fixes.lua")
   $defaultsText = Get-Content -Raw -LiteralPath (Join-Path $repo "defaults.lua")
   $localeText = Get-Content -Raw -LiteralPath (Join-Path $repo "locale\en\more-infinite-research.cfg")
 
@@ -458,6 +459,10 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'research_oil_cracking_productivity = {' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'research_lubricant_productivity = {' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'research_sulfuric_acid_productivity = {' },
+    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'research_air_scrubbing_clean_filter = {' },
+    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'manifest_id = "mir-prod-air-scrubbing-clean-filter"' },
+    @{ File = "prototypes\util.lua"; Text = $utilText; Snippet = 'desired == "derive-from-unlocks"' },
+    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'research_air_scrubbing_clean_filter = "Air Scrubbing clean-filter productivity"' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = '{technology = "oil-processing"}' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = '"^acid%-neutralisation$"' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = '"^acid%-neutralization$"' },
@@ -496,6 +501,7 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "prototypes\tech-gen.lua"; Text = $techGenText; Snippet = 'required_fluids' },
     @{ File = "prototypes\tech-gen.lua"; Text = $techGenText; Snippet = 'technology_requirements.skip_reason(spec)' },
     @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'require("prototypes.pipeline-extent-settings").multiplier()' },
+    @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'require("prototypes.compat.air-scrubbing").emit()' },
     @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'if pipeline_extent_multiplier ~= 1 then' },
     @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'require("prototypes.pipeline-extent").apply(pipeline_extent_multiplier)' },
     @{ File = "prototypes\pipeline-extent-settings.lua"; Text = $pipelineExtentSettingsText; Snippet = 'S.default_value = "100"' },
@@ -519,6 +525,8 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "fixtures\assert-fluid-productivity\data-final-fixes.lua"; Text = $fluidProductivityFixtureText; Snippet = 'recipe-prod-research_oil_processing_productivity-1' },
     @{ File = "fixtures\assert-fluid-productivity\data-final-fixes.lua"; Text = $fluidProductivityFixtureText; Snippet = 'recipe-prod-research_thruster_fuel_productivity-1' },
     @{ File = "fixtures\assert-pipeline-extent\data-final-fixes.lua"; Text = $pipelineExtentFixtureText; Snippet = 'DEFAULT_PIPELINE_EXTENT = 320' },
+    @{ File = "fixtures\assert-air-scrubbing-clean-filter\data-final-fixes.lua"; Text = $airScrubbingFixtureText; Snippet = 'recipe-prod-research_air_scrubbing_clean_filter-1' },
+    @{ File = "fixtures\assert-air-scrubbing-clean-filter\data-final-fixes.lua"; Text = $airScrubbingFixtureText; Snippet = 'atan-pollution-filter-cleaning' },
     @{ File = "fixtures\assert-better-bot-battery-skip\data-final-fixes.lua"; Text = $betterBotBatteryFixtureText; Snippet = 'recipe-prod-research_robot_battery-1' },
     @{ File = "fixtures\assert-better-bot-battery-skip\data-final-fixes.lua"; Text = $betterBotBatteryFixtureText; Snippet = 'worker-robots-battery-6' },
     @{ File = "prototypes\weapon-speed-adjustments.lua"; Text = $weaponSpeedText; Snippet = 'tech.unit and tech.unit.count_formula' },
@@ -868,6 +876,14 @@ Invoke-RepoCheck "2.2.0 compiler diagnostics are wired" {
     @{ File = "prototypes\planner\compiler.lua"; Text = $compilerText; Snippet = 'D.decision({' },
     @{ File = "prototypes\planner\compiler.lua"; Text = $compilerText; Snippet = 'emit_generated_technology_decisions' },
     @{ File = "prototypes\compat\planner.lua"; Text = $compatPlannerText; Snippet = 'useful_level_estimate = levels' },
+    @{ File = "prototypes\compat\planner.lua"; Text = $compatPlannerText; Snippet = '["FluidMustFlow"] = {' },
+    @{ File = "prototypes\compat\planner.lua"; Text = $compatPlannerText; Snippet = '["robot_attrition"] = {' },
+    @{ File = "prototypes\compat\planner.lua"; Text = $compatPlannerText; Snippet = '["jetpack"] = {' },
+    @{ File = "prototypes\compat\planner.lua"; Text = $compatPlannerText; Snippet = '["big-mining-drill"] = {' },
+    @{ File = "prototypes\compat\planner.lua"; Text = $compatPlannerText; Snippet = '["equipment-gantry"] = {' },
+    @{ File = "prototypes\compat\planner.lua"; Text = $compatPlannerText; Snippet = '["aai-industry"] = {' },
+    @{ File = "prototypes\compat\planner.lua"; Text = $compatPlannerText; Snippet = '["aai-containers"] = {' },
+    @{ File = "prototypes\compat\planner.lua"; Text = $compatPlannerText; Snippet = '["aai-loaders"] = {' },
     @{ File = "scripts\Convert-MIRCompatAuditResults.ps1"; Text = $converterText; Snippet = '"fact_registry", "decision", "rule_mutation", "loop_risk", "lab_matrix"' },
     @{ File = "scripts\Convert-MIRCompatAuditResults.ps1"; Text = $converterText; Snippet = "Loop Risk Diagnostics" },
     @{ File = "scripts\Show-MIROvernightSummary.ps1"; Text = $overnightSummaryText; Snippet = "rule_surfaces" }
@@ -876,6 +892,57 @@ Invoke-RepoCheck "2.2.0 compiler diagnostics are wired" {
   foreach ($check in $requiredSnippets) {
     if (-not $check.Text.Contains($check.Snippet)) {
       throw "Missing 2.2.0 compiler diagnostics wiring in $($check.File): $($check.Snippet)"
+    }
+  }
+}
+
+Invoke-RepoCheck "Air Scrubbing clean-filter policy is wired" {
+  $dataFinalFixesText = Get-Content -Raw -LiteralPath (Join-Path $repo "data-final-fixes.lua")
+  $productivityText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\streams\productivity.lua")
+  $utilText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\util.lua")
+  $diagnosticsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\diagnostics.lua")
+  $converterText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\Convert-MIRCompatAuditResults.ps1")
+  $airScrubbingPolicyPath = Join-Path $repo "prototypes\compat\air-scrubbing.lua"
+  $manifestPath = Join-Path $repo "prototypes\planner\generated-stream-manifest.json"
+  $fixturePath = Join-Path $repo "fixtures\assert-air-scrubbing-clean-filter\data-final-fixes.lua"
+
+  foreach ($path in @($airScrubbingPolicyPath, $manifestPath, $fixturePath)) {
+    if (-not (Test-Path -LiteralPath $path)) {
+      throw "Missing Air Scrubbing policy artifact: $path"
+    }
+  }
+
+  $airScrubbingPolicyText = Get-Content -Raw -LiteralPath $airScrubbingPolicyPath
+  $manifestText = Get-Content -Raw -LiteralPath $manifestPath
+  $fixtureText = Get-Content -Raw -LiteralPath $fixturePath
+
+  $requiredSnippets = @(
+    @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'require("prototypes.compat.air-scrubbing").emit()' },
+    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'research_air_scrubbing_clean_filter = {' },
+    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'science_packs = "derive-from-unlocks"' },
+    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'prerequisites = "derive-from-unlocks"' },
+    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'manifest_id = "mir-prod-air-scrubbing-clean-filter"' },
+    @{ File = "prototypes\util.lua"; Text = $utilText; Snippet = 'local function science_from_unlocks(spec)' },
+    @{ File = "prototypes\util.lua"; Text = $utilText; Snippet = 'if spec.prerequisites == "derive-from-unlocks" then' },
+    @{ File = "prototypes\diagnostics.lua"; Text = $diagnosticsText; Snippet = '.. " rejected=" .. tostring(row.rejected or "")' },
+    @{ File = "scripts\Convert-MIRCompatAuditResults.ps1"; Text = $converterText; Snippet = 'rejected = [string](Get-MIRObjectProperty -Object $row -Name "rejected")' },
+    @{ File = "scripts\Convert-MIRCompatAuditResults.ps1"; Text = $converterText; Snippet = 'generated,rejected,unknown,missing,module_slots' },
+    @{ File = "prototypes\compat\air-scrubbing.lua"; Text = $airScrubbingPolicyText; Snippet = 'local STREAM_ID = "mir-prod-air-scrubbing-clean-filter"' },
+    @{ File = "prototypes\compat\air-scrubbing.lua"; Text = $airScrubbingPolicyText; Snippet = 'decision = emitted and "generate_stream" or "diagnose_only"' },
+    @{ File = "prototypes\compat\air-scrubbing.lua"; Text = $airScrubbingPolicyText; Snippet = '"environmental_removal_loop", "scrubbing_environmental"' },
+    @{ File = "prototypes\compat\air-scrubbing.lua"; Text = $airScrubbingPolicyText; Snippet = '"recovery_loop", "cleaning_recovery"' },
+    @{ File = "prototypes\compat\air-scrubbing.lua"; Text = $airScrubbingPolicyText; Snippet = 'decision = "observe_unknown"' },
+    @{ File = "prototypes\planner\generated-stream-manifest.json"; Text = $manifestText; Snippet = '"mir-prod-air-scrubbing-clean-filter"' },
+    @{ File = "prototypes\planner\generated-stream-manifest.json"; Text = $manifestText; Snippet = '"source": "compat_policy:air-scrubbing"' },
+    @{ File = "prototypes\planner\generated-stream-manifest.json"; Text = $manifestText; Snippet = '"atan-pollution-filter"' },
+    @{ File = "prototypes\planner\generated-stream-manifest.json"; Text = $manifestText; Snippet = '"atan-spore-filter"' },
+    @{ File = "fixtures\assert-air-scrubbing-clean-filter\data-final-fixes.lua"; Text = $fixtureText; Snippet = 'atan-pollution-scrubbing' },
+    @{ File = "fixtures\assert-air-scrubbing-clean-filter\data-final-fixes.lua"; Text = $fixtureText; Snippet = 'atan-filter-resin' }
+  )
+
+  foreach ($check in $requiredSnippets) {
+    if (-not $check.Text.Contains($check.Snippet)) {
+      throw "Missing Air Scrubbing clean-filter wiring in $($check.File): $($check.Snippet)"
     }
   }
 }
@@ -1365,6 +1432,7 @@ if (-not (Test-Path -LiteralPath $fixtureRoot)) {
 $nonModFixtureDirs = @("compat-matrix", "run-profiles")
 
 $postMirAssertionFixtures = @(
+  "mir-fixture-assert-air-scrubbing-clean-filter",
   "mir-fixture-assert-better-bot-battery-skip",
   "mir-fixture-assert-generation-integrity",
   "mir-fixture-assert-science-pack-productivity",
@@ -1893,6 +1961,18 @@ function Get-LastDiagnosticReportLine {
   return $line.Line
 }
 
+function Get-DiagnosticReportLineContaining {
+  param([string]$Kind, [string]$Key, [string]$Expected)
+  $pattern = "kind=$([regex]::Escape($Kind)) key=$([regex]::Escape($Key))(\s|$)"
+  $line = Select-String -LiteralPath $FactorioLog -Pattern $pattern |
+    Where-Object { $_.Line.Contains($Expected) } |
+    Select-Object -Last 1
+  if (-not $line) {
+    throw "Runtime validation log did not contain $Kind diagnostics for $Key with expected text '$Expected'."
+  }
+  return $line.Line
+}
+
 function Get-LastRecipeCapReportLine {
   param([string]$Recipe)
   $pattern = "kind=recipe_cap .*recipe=$([regex]::Escape($Recipe))(\s|$)"
@@ -2203,6 +2283,36 @@ foreach ($baseThrusterStream in @("research_thruster_fuel_productivity", "resear
     throw "Base-only thruster fluid stream $baseThrusterStream should skip for missing fluid: $baseThrusterLine"
   }
 }
+
+Invoke-RuntimeScenario -ScenarioName "air-scrubbing-clean-filter" -EnabledFixtureNames @(
+  "mir-fixture-air-scrubbing",
+  "mir-fixture-assert-air-scrubbing-clean-filter"
+)
+$airScrubbingLine = Get-LastStreamReportLine -Key "research_air_scrubbing_clean_filter"
+Assert-ReportLineGenerated -Line $airScrubbingLine -Context "Air Scrubbing clean-filter productivity scenario"
+Assert-ReportLineContains -Line $airScrubbingLine -Expected "effects=2" -Context "Air Scrubbing clean-filter effect count scenario"
+Assert-ReportLineContains -Line $airScrubbingLine -Expected "atan-pollution-scrubbing" -Context "Air Scrubbing pollution unlock prerequisite scenario"
+Assert-ReportLineContains -Line $airScrubbingLine -Expected "atan-spore-scrubbing" -Context "Air Scrubbing spore unlock prerequisite scenario"
+$airScrubbingPlanLine = Get-LastCompatibilityPlanLine -Key "research_air_scrubbing_clean_filter"
+Assert-ReportLineContains -Line $airScrubbingPlanLine -Expected "reason=air_scrubbing_policy_summary" -Context "Air Scrubbing policy summary scenario"
+Assert-ReportLineContains -Line $airScrubbingPlanLine -Expected "generated=2" -Context "Air Scrubbing generated target count scenario"
+Assert-ReportLineContains -Line $airScrubbingPlanLine -Expected "rejected=4" -Context "Air Scrubbing rejected target count scenario"
+Assert-ReportLineContains -Line $airScrubbingPlanLine -Expected "unknown=1" -Context "Air Scrubbing unknown target count scenario"
+$airScrubbingAllowedDecision = Get-LastDiagnosticReportLine -Kind "decision" -Key "atan-pollution-filter"
+Assert-ReportLineContains -Line $airScrubbingAllowedDecision -Expected "decision=generate_stream" -Context "Air Scrubbing allowed decision scenario"
+Assert-ReportLineContains -Line $airScrubbingAllowedDecision -Expected "stable_stream_id=mir-prod-air-scrubbing-clean-filter" -Context "Air Scrubbing stable stream ID scenario"
+$airScrubbingScrubDecision = Get-LastDiagnosticReportLine -Kind "decision" -Key "atan-pollution-scrubbing"
+Assert-ReportLineContains -Line $airScrubbingScrubDecision -Expected "decision=diagnose_only" -Context "Air Scrubbing scrubbing deny decision scenario"
+Assert-ReportLineContains -Line $airScrubbingScrubDecision -Expected "risks=scrubbing_environmental" -Context "Air Scrubbing scrubbing risk scenario"
+$airScrubbingScrubRisk = Get-DiagnosticReportLineContaining -Kind "loop_risk" -Key "atan-pollution-scrubbing" -Expected "risks=scrubbing_environmental"
+Assert-ReportLineContains -Line $airScrubbingScrubRisk -Expected "risks=scrubbing_environmental" -Context "Air Scrubbing scrubbing loop-risk scenario"
+$airScrubbingCleaningDecision = Get-LastDiagnosticReportLine -Kind "decision" -Key "atan-pollution-filter-cleaning"
+Assert-ReportLineContains -Line $airScrubbingCleaningDecision -Expected "decision=diagnose_only" -Context "Air Scrubbing cleaning deny decision scenario"
+Assert-ReportLineContains -Line $airScrubbingCleaningDecision -Expected "risks=cleaning_recovery" -Context "Air Scrubbing cleaning risk scenario"
+$airScrubbingCleaningRisk = Get-DiagnosticReportLineContaining -Kind "loop_risk" -Key "atan-pollution-filter-cleaning" -Expected "risks=cleaning_recovery"
+Assert-ReportLineContains -Line $airScrubbingCleaningRisk -Expected "risks=cleaning_recovery" -Context "Air Scrubbing cleaning loop-risk scenario"
+$airScrubbingUnknownDecision = Get-LastDiagnosticReportLine -Kind "decision" -Key "atan-filter-resin"
+Assert-ReportLineContains -Line $airScrubbingUnknownDecision -Expected "decision=observe_unknown" -Context "Air Scrubbing unknown related decision scenario"
 
 Invoke-RuntimeScenario -ScenarioName "pipeline-extent-multiplier" -EnabledFixtureNames @(
   "mir-fixture-assert-pipeline-extent"

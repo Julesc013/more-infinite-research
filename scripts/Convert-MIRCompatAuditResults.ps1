@@ -256,6 +256,9 @@ foreach ($result in $loadResults) {
         rule_mutations = [string](Get-MIRObjectProperty -Object $row -Name "rule_mutations")
         loop_risks = [string](Get-MIRObjectProperty -Object $row -Name "loop_risks")
         generated = [string](Get-MIRObjectProperty -Object $row -Name "generated")
+        rejected = [string](Get-MIRObjectProperty -Object $row -Name "rejected")
+        unknown = [string](Get-MIRObjectProperty -Object $row -Name "unknown")
+        missing = [string](Get-MIRObjectProperty -Object $row -Name "missing")
         module_slots = [string](Get-MIRObjectProperty -Object $row -Name "module_slots")
         allowed_effects = [string](Get-MIRObjectProperty -Object $row -Name "allowed_effects")
         shared_inputs_outputs = [string](Get-MIRObjectProperty -Object $row -Name "shared_inputs_outputs")
@@ -452,7 +455,7 @@ $observationSummary = @(
 if ($observationRows.Count -gt 0) {
   $observationRows | Export-Csv -NoTypeInformation -LiteralPath $observationsCsvPath
 } else {
-  "scenario,mod,kind,key,status,reason,role,action,signal,recipe,recipes,warning_class,cap_state,maximum_productivity,per_level,levels_to_cap,useful_level_estimate,total,warnings,subject_type,subject,family,confidence,source,policy,decision,emitted,blockers,risks,stable_stream_id,labs,field,observed_value,expected_baseline,technologies,machines,mir_owned,external_owned_exact,external_owned_unknown,rule_mutations,loop_risks,generated,module_slots,allowed_effects,shared_inputs_outputs" | Set-Content -LiteralPath $observationsCsvPath -Encoding UTF8
+  "scenario,mod,kind,key,status,reason,role,action,signal,recipe,recipes,warning_class,cap_state,maximum_productivity,per_level,levels_to_cap,useful_level_estimate,total,warnings,subject_type,subject,family,confidence,source,policy,decision,emitted,blockers,risks,stable_stream_id,labs,field,observed_value,expected_baseline,technologies,machines,mir_owned,external_owned_exact,external_owned_unknown,rule_mutations,loop_risks,generated,rejected,unknown,missing,module_slots,allowed_effects,shared_inputs_outputs" | Set-Content -LiteralPath $observationsCsvPath -Encoding UTF8
 }
 
 $observationsMd = @()

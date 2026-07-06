@@ -152,6 +152,31 @@ return {
     }
   },
 
+  research_air_scrubbing_clean_filter = {
+    localised_name = {"", "Air Scrubbing clean-filter productivity"},
+    localised_description = {"technology-description.more-infinite-research.recipe_productivity"},
+    science_packs = "derive-from-unlocks",
+    prerequisites = "derive-from-unlocks",
+    settings_note = {"", "Targets only exact clean filter crafting recipes. Scrubbing, cleaning, recovery, recycling, and environmental-removal recipes stay diagnostic-only."},
+    manifest_id = "mir-prod-air-scrubbing-clean-filter",
+    groups = {
+      {
+        change = 0.05,
+        recipe_patterns = {
+          "^atan%-pollution%-filter$",
+          "^atan%-spore%-filter$"
+        }
+      }
+    },
+    icon_candidates = {
+      {item = "atan-pollution-filter"},
+      {item = "atan-spore-filter"},
+      {technology = "atan-pollution-scrubbing"},
+      {technology = "atan-spore-scrubbing"},
+      {item = "coal"}
+    }
+  },
+
   research_tungsten = { items={"tungsten-plate","tungsten-carbide"}, icon_item="tungsten-plate", icon_tech="tungsten-processing" },
   research_lithium = { icon_tech="lithium-processing", groups = {
     { change = 0.10, items = { "lithium-plate" } },
