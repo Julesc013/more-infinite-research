@@ -1,5 +1,5 @@
 local deepcopy = require("prototypes.mir.core.deepcopy")
-local lookup = require("prototypes.lib.prototype-lookup")
+local lookup = require("prototypes.mir.platform.factorio.prototype_lookup")
 
 local I = {}
 

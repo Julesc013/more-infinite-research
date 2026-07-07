@@ -50,6 +50,7 @@ namespace_shims:
   table_utils: prototypes/mir/core/table.lua
   factorio_data_raw: prototypes/mir/platform/factorio/data_raw.lua
   factorio_mods: prototypes/mir/platform/factorio/mods.lua
+  factorio_prototype_lookup: prototypes/mir/platform/factorio/prototype_lookup.lua
   settings_registry: prototypes/mir/settings/registry.lua
   settings_visibility: prototypes/mir/settings/visibility.lua
   settings_builder: prototypes/mir/settings/builder.lua

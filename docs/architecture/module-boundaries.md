@@ -246,6 +246,7 @@ prototypes/
         mods.lua
         settings.lua
         data_raw.lua
+        prototype_lookup.lua
         prototype_history.lua
         locale.lua
         dependency_order.lua

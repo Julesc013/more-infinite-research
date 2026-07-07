@@ -3,7 +3,7 @@ local defaults = require("defaults")
 local settings_resolver = require("prototypes.settings-resolver")
 
 local deepcopy = require("prototypes.mir.core.deepcopy")
-local lookup = require("prototypes.lib.prototype-lookup")
+local lookup = require("prototypes.mir.platform.factorio.prototype_lookup")
 local science = require("prototypes.lib.science-packs")
 local icons = require("prototypes.lib.technology-icons")
 local recipes = require("prototypes.lib.recipe-matching")

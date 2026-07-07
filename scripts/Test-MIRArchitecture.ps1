@@ -170,6 +170,7 @@ $requiredShims = @(
   "prototypes/mir/core/table.lua",
   "prototypes/mir/platform/factorio/data_raw.lua",
   "prototypes/mir/platform/factorio/mods.lua",
+  "prototypes/mir/platform/factorio/prototype_lookup.lua",
   "prototypes/mir/settings/registry.lua",
   "prototypes/mir/settings/visibility.lua",
   "prototypes/mir/settings/builder.lua",
@@ -260,6 +261,10 @@ Assert-MIRContains -RelativePath $legacyCapabilityRegistryPath -Text $legacyCapa
 $legacyCapabilityPolicyPath = "prototypes/lib/policy/capabilities.lua"
 $legacyCapabilityPolicyText = Read-MIRFile -RelativePath $legacyCapabilityPolicyPath
 Assert-MIRContains -RelativePath $legacyCapabilityPolicyPath -Text $legacyCapabilityPolicyText -Needle 'return require("prototypes.mir.policy.capabilities")'
+
+$legacyPrototypeLookupPath = "prototypes/lib/prototype-lookup.lua"
+$legacyPrototypeLookupText = Read-MIRFile -RelativePath $legacyPrototypeLookupPath
+Assert-MIRContains -RelativePath $legacyPrototypeLookupPath -Text $legacyPrototypeLookupText -Needle 'return require("prototypes.mir.platform.factorio.prototype_lookup")'
 
 $streamCompilerPath = "prototypes/mir/planner/stream_compiler.lua"
 $streamCompilerText = Read-MIRFile -RelativePath $streamCompilerPath
