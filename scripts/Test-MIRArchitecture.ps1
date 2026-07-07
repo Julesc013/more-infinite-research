@@ -156,7 +156,9 @@ $requiredShims = @(
   "prototypes/mir/compatibility/registry.lua",
   "prototypes/mir/compatibility/overlay_loader.lua",
   "prototypes/mir/compatibility/claim_registry.lua",
+  "prototypes/mir/compatibility/diagnostics/exact_recipe_policy.lua",
   "prototypes/mir/compatibility/diagnostics/air_scrubbing.lua",
+  "prototypes/mir/compatibility/diagnostics/atan_ash.lua",
   "prototypes/mir/compatibility/overlays/air_scrubbing.lua",
   "prototypes/mir/compatibility/overlays/atan_ash.lua",
   "prototypes/mir/legacy/stream_emitter.lua",
@@ -264,15 +266,30 @@ $legacyAirScrubbingPath = "prototypes/compat/air-scrubbing.lua"
 $legacyAirScrubbingText = Read-MIRFile -RelativePath $legacyAirScrubbingPath
 Assert-MIRContains -RelativePath $legacyAirScrubbingPath -Text $legacyAirScrubbingText -Needle 'return require("prototypes.mir.compatibility.diagnostics.air_scrubbing")'
 
+$exactRecipePolicyPath = "prototypes/mir/compatibility/diagnostics/exact_recipe_policy.lua"
+$exactRecipePolicyText = Read-MIRFile -RelativePath $exactRecipePolicyPath
+Assert-MIRContains -RelativePath $exactRecipePolicyPath -Text $exactRecipePolicyText -Needle 'require("prototypes.mir.platform.factorio.data_raw")'
+Assert-MIRContains -RelativePath $exactRecipePolicyPath -Text $exactRecipePolicyText -Needle 'require("prototypes.mir.compatibility.overlay_loader")'
+Assert-MIRContains -RelativePath $exactRecipePolicyPath -Text $exactRecipePolicyText -Needle 'require("prototypes.mir.report.compatibility_diagnostics")'
+Assert-MIRContains -RelativePath $exactRecipePolicyPath -Text $exactRecipePolicyText -Needle 'data_raw.prototypes("recipe")'
+Assert-MIRContains -RelativePath $exactRecipePolicyPath -Text $exactRecipePolicyText -Needle "report.decision(D, row)"
+Assert-MIRContains -RelativePath $exactRecipePolicyPath -Text $exactRecipePolicyText -Needle "report.compatibility_plan(D, {"
+
 $airScrubbingDiagnosticsPath = "prototypes/mir/compatibility/diagnostics/air_scrubbing.lua"
 $airScrubbingDiagnosticsText = Read-MIRFile -RelativePath $airScrubbingDiagnosticsPath
-Assert-MIRContains -RelativePath $airScrubbingDiagnosticsPath -Text $airScrubbingDiagnosticsText -Needle 'require("prototypes.mir.platform.factorio.data_raw")'
-Assert-MIRContains -RelativePath $airScrubbingDiagnosticsPath -Text $airScrubbingDiagnosticsText -Needle 'require("prototypes.mir.report.compatibility_diagnostics")'
-Assert-MIRContains -RelativePath $airScrubbingDiagnosticsPath -Text $airScrubbingDiagnosticsText -Needle 'overlay_loader.get("air-scrubbing")'
-Assert-MIRContains -RelativePath $airScrubbingDiagnosticsPath -Text $airScrubbingDiagnosticsText -Needle "local STREAM_ID = recipe_productivity.stream.id"
-Assert-MIRContains -RelativePath $airScrubbingDiagnosticsPath -Text $airScrubbingDiagnosticsText -Needle "local ALLOWED_RECIPES = recipe_productivity.exact_recipes"
-Assert-MIRContains -RelativePath $airScrubbingDiagnosticsPath -Text $airScrubbingDiagnosticsText -Needle "report.decision(D, row)"
-Assert-MIRContains -RelativePath $airScrubbingDiagnosticsPath -Text $airScrubbingDiagnosticsText -Needle 'decision = emitted and "generate_stream" or "diagnose_only"'
+Assert-MIRContains -RelativePath $airScrubbingDiagnosticsPath -Text $airScrubbingDiagnosticsText -Needle 'require("prototypes.mir.compatibility.diagnostics.exact_recipe_policy")'
+Assert-MIRContains -RelativePath $airScrubbingDiagnosticsPath -Text $airScrubbingDiagnosticsText -Needle 'overlay_id = "air-scrubbing"'
+Assert-MIRContains -RelativePath $airScrubbingDiagnosticsPath -Text $airScrubbingDiagnosticsText -Needle 'allowed_generated_reason = "clean_filter_stream_emitted"'
+Assert-MIRContains -RelativePath $airScrubbingDiagnosticsPath -Text $airScrubbingDiagnosticsText -Needle 'scrubbing_environmental = {'
+Assert-MIRContains -RelativePath $airScrubbingDiagnosticsPath -Text $airScrubbingDiagnosticsText -Needle 'cleaning_recovery = {'
+
+$atanAshDiagnosticsPath = "prototypes/mir/compatibility/diagnostics/atan_ash.lua"
+$atanAshDiagnosticsText = Read-MIRFile -RelativePath $atanAshDiagnosticsPath
+Assert-MIRContains -RelativePath $atanAshDiagnosticsPath -Text $atanAshDiagnosticsText -Needle 'require("prototypes.mir.compatibility.diagnostics.exact_recipe_policy")'
+Assert-MIRContains -RelativePath $atanAshDiagnosticsPath -Text $atanAshDiagnosticsText -Needle 'overlay_id = "atan-ash"'
+Assert-MIRContains -RelativePath $atanAshDiagnosticsPath -Text $atanAshDiagnosticsText -Needle 'allowed_generated_reason = "ash_separation_stream_emitted"'
+Assert-MIRContains -RelativePath $atanAshDiagnosticsPath -Text $atanAshDiagnosticsText -Needle 'tile_surface = {'
+Assert-MIRContains -RelativePath $atanAshDiagnosticsPath -Text $atanAshDiagnosticsText -Needle 'resource_recovery = {'
 
 $claimRegistryPath = "prototypes/mir/compatibility/claim_registry.lua"
 $claimRegistryText = Read-MIRFile -RelativePath $claimRegistryPath

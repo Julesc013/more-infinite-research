@@ -1090,19 +1090,23 @@ Invoke-RepoCheck "Air Scrubbing clean-filter policy is wired" {
   $diagnosticsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\diagnostics.lua")
   $converterText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\Convert-MIRCompatAuditResults.ps1")
   $airScrubbingPolicyPath = Join-Path $repo "prototypes\compat\air-scrubbing.lua"
+  $exactRecipePolicyPath = Join-Path $repo "prototypes\mir\compatibility\diagnostics\exact_recipe_policy.lua"
   $airScrubbingDiagnosticsPath = Join-Path $repo "prototypes\mir\compatibility\diagnostics\air_scrubbing.lua"
+  $atanAshDiagnosticsPath = Join-Path $repo "prototypes\mir\compatibility\diagnostics\atan_ash.lua"
   $compatibilityDiagnosticsReportPath = Join-Path $repo "prototypes\mir\report\compatibility_diagnostics.lua"
   $manifestPath = Join-Path $repo "prototypes\planner\generated-stream-manifest.json"
   $fixturePath = Join-Path $repo "fixtures\assert-air-scrubbing-clean-filter\data-final-fixes.lua"
 
-  foreach ($path in @($airScrubbingPolicyPath, $airScrubbingDiagnosticsPath, $compatibilityDiagnosticsReportPath, $manifestPath, $fixturePath)) {
+  foreach ($path in @($airScrubbingPolicyPath, $exactRecipePolicyPath, $airScrubbingDiagnosticsPath, $atanAshDiagnosticsPath, $compatibilityDiagnosticsReportPath, $manifestPath, $fixturePath)) {
     if (-not (Test-Path -LiteralPath $path)) {
       throw "Missing Air Scrubbing policy artifact: $path"
     }
   }
 
   $airScrubbingPolicyText = Get-Content -Raw -LiteralPath $airScrubbingPolicyPath
+  $exactRecipePolicyText = Get-Content -Raw -LiteralPath $exactRecipePolicyPath
   $airScrubbingDiagnosticsText = Get-Content -Raw -LiteralPath $airScrubbingDiagnosticsPath
+  $atanAshDiagnosticsText = Get-Content -Raw -LiteralPath $atanAshDiagnosticsPath
   $compatibilityDiagnosticsReportText = Get-Content -Raw -LiteralPath $compatibilityDiagnosticsReportPath
   $manifestText = Get-Content -Raw -LiteralPath $manifestPath
   $fixtureText = Get-Content -Raw -LiteralPath $fixturePath
@@ -1120,15 +1124,25 @@ Invoke-RepoCheck "Air Scrubbing clean-filter policy is wired" {
     @{ File = "scripts\Convert-MIRCompatAuditResults.ps1"; Text = $converterText; Snippet = 'rejected = [string](Get-MIRObjectProperty -Object $row -Name "rejected")' },
     @{ File = "scripts\Convert-MIRCompatAuditResults.ps1"; Text = $converterText; Snippet = 'generated,rejected,unknown,missing,module_slots' },
     @{ File = "prototypes\compat\air-scrubbing.lua"; Text = $airScrubbingPolicyText; Snippet = 'return require("prototypes.mir.compatibility.diagnostics.air_scrubbing")' },
-    @{ File = "prototypes\mir\compatibility\diagnostics\air_scrubbing.lua"; Text = $airScrubbingDiagnosticsText; Snippet = 'require("prototypes.mir.platform.factorio.data_raw")' },
-    @{ File = "prototypes\mir\compatibility\diagnostics\air_scrubbing.lua"; Text = $airScrubbingDiagnosticsText; Snippet = 'require("prototypes.mir.report.compatibility_diagnostics")' },
-    @{ File = "prototypes\mir\compatibility\diagnostics\air_scrubbing.lua"; Text = $airScrubbingDiagnosticsText; Snippet = 'overlay_loader.get("air-scrubbing")' },
-    @{ File = "prototypes\mir\compatibility\diagnostics\air_scrubbing.lua"; Text = $airScrubbingDiagnosticsText; Snippet = 'local STREAM_ID = recipe_productivity.stream.id' },
-    @{ File = "prototypes\mir\compatibility\diagnostics\air_scrubbing.lua"; Text = $airScrubbingDiagnosticsText; Snippet = 'local ALLOWED_RECIPES = recipe_productivity.exact_recipes' },
-    @{ File = "prototypes\mir\compatibility\diagnostics\air_scrubbing.lua"; Text = $airScrubbingDiagnosticsText; Snippet = 'decision = emitted and "generate_stream" or "diagnose_only"' },
-    @{ File = "prototypes\mir\compatibility\diagnostics\air_scrubbing.lua"; Text = $airScrubbingDiagnosticsText; Snippet = '"environmental_removal_loop", "scrubbing_environmental"' },
-    @{ File = "prototypes\mir\compatibility\diagnostics\air_scrubbing.lua"; Text = $airScrubbingDiagnosticsText; Snippet = '"recovery_loop", "cleaning_recovery"' },
+    @{ File = "prototypes\mir\compatibility\diagnostics\exact_recipe_policy.lua"; Text = $exactRecipePolicyText; Snippet = 'require("prototypes.mir.platform.factorio.data_raw")' },
+    @{ File = "prototypes\mir\compatibility\diagnostics\exact_recipe_policy.lua"; Text = $exactRecipePolicyText; Snippet = 'require("prototypes.mir.report.compatibility_diagnostics")' },
+    @{ File = "prototypes\mir\compatibility\diagnostics\exact_recipe_policy.lua"; Text = $exactRecipePolicyText; Snippet = 'overlay_loader.get(config.overlay_id)' },
+    @{ File = "prototypes\mir\compatibility\diagnostics\exact_recipe_policy.lua"; Text = $exactRecipePolicyText; Snippet = 'local stream = capability.stream' },
+    @{ File = "prototypes\mir\compatibility\diagnostics\exact_recipe_policy.lua"; Text = $exactRecipePolicyText; Snippet = 'local allowed_recipes = capability.exact_recipes or {}' },
+    @{ File = "prototypes\mir\compatibility\diagnostics\exact_recipe_policy.lua"; Text = $exactRecipePolicyText; Snippet = 'decision = emitted and "generate_stream" or "diagnose_only"' },
+    @{ File = "prototypes\mir\compatibility\diagnostics\air_scrubbing.lua"; Text = $airScrubbingDiagnosticsText; Snippet = 'overlay_id = "air-scrubbing"' },
+    @{ File = "prototypes\mir\compatibility\diagnostics\air_scrubbing.lua"; Text = $airScrubbingDiagnosticsText; Snippet = 'allowed_generated_reason = "clean_filter_stream_emitted"' },
+    @{ File = "prototypes\mir\compatibility\diagnostics\air_scrubbing.lua"; Text = $airScrubbingDiagnosticsText; Snippet = 'reason = "environmental_removal_loop"' },
+    @{ File = "prototypes\mir\compatibility\diagnostics\air_scrubbing.lua"; Text = $airScrubbingDiagnosticsText; Snippet = 'risk = "scrubbing_environmental"' },
+    @{ File = "prototypes\mir\compatibility\diagnostics\air_scrubbing.lua"; Text = $airScrubbingDiagnosticsText; Snippet = 'reason = "recovery_loop"' },
+    @{ File = "prototypes\mir\compatibility\diagnostics\air_scrubbing.lua"; Text = $airScrubbingDiagnosticsText; Snippet = 'risk = "cleaning_recovery"' },
     @{ File = "prototypes\mir\compatibility\diagnostics\air_scrubbing.lua"; Text = $airScrubbingDiagnosticsText; Snippet = 'decision = "observe_unknown"' },
+    @{ File = "prototypes\mir\compatibility\diagnostics\atan_ash.lua"; Text = $atanAshDiagnosticsText; Snippet = 'overlay_id = "atan-ash"' },
+    @{ File = "prototypes\mir\compatibility\diagnostics\atan_ash.lua"; Text = $atanAshDiagnosticsText; Snippet = 'allowed_generated_reason = "ash_separation_stream_emitted"' },
+    @{ File = "prototypes\mir\compatibility\diagnostics\atan_ash.lua"; Text = $atanAshDiagnosticsText; Snippet = 'reason = "tile_surface_outside_stream"' },
+    @{ File = "prototypes\mir\compatibility\diagnostics\atan_ash.lua"; Text = $atanAshDiagnosticsText; Snippet = 'risk = "tile_surface"' },
+    @{ File = "prototypes\mir\compatibility\diagnostics\atan_ash.lua"; Text = $atanAshDiagnosticsText; Snippet = 'reason = "ash_sink_outside_stream"' },
+    @{ File = "prototypes\mir\compatibility\diagnostics\atan_ash.lua"; Text = $atanAshDiagnosticsText; Snippet = 'risk = "ash_sink"' },
     @{ File = "prototypes\mir\report\compatibility_diagnostics.lua"; Text = $compatibilityDiagnosticsReportText; Snippet = 'decision_export.emit(sink, row)' },
     @{ File = "prototypes\mir\report\compatibility_diagnostics.lua"; Text = $compatibilityDiagnosticsReportText; Snippet = 'sink.compatibility_plan(row)' },
     @{ File = "prototypes\planner\generated-stream-manifest.json"; Text = $manifestText; Snippet = '"mir-prod-air-scrubbing-clean-filter"' },
@@ -2616,6 +2630,20 @@ Assert-ReportLineContains -Line $atanAshLine -Expected "effects=1" -Context "ATA
 Assert-ReportLineContains -Line $atanAshLine -Expected "atan-ash-processing" -Context "ATAN Ash unlock prerequisite scenario"
 Assert-NoDiagnosticReportLineContaining -Kind "stream" -Key "research_landfill" -Unexpected "atan-landfill-from-ash" -Context "ATAN Ash landfill sink exclusion scenario"
 Assert-NoDiagnosticReportLineContaining -Kind "stream" -Key "research_concrete" -Unexpected "atan-stone-brick-from-ash" -Context "ATAN Ash brick sink exclusion scenario"
+$atanAshPlanLine = Get-LastCompatibilityPlanLine -Key "research_ash_separation"
+Assert-ReportLineContains -Line $atanAshPlanLine -Expected "reason=atan_ash_policy_summary" -Context "ATAN Ash policy summary scenario"
+Assert-ReportLineContains -Line $atanAshPlanLine -Expected "generated=1" -Context "ATAN Ash generated target count scenario"
+Assert-ReportLineContains -Line $atanAshPlanLine -Expected "rejected=4" -Context "ATAN Ash rejected sink count scenario"
+$atanAshAllowedDecision = Get-DiagnosticReportLineContaining -Kind "decision" -Key "atan-ash-seperation" -Expected "stable_stream_id=mir-prod-atan-ash-separation"
+Assert-ReportLineContains -Line $atanAshAllowedDecision -Expected "decision=generate_stream" -Context "ATAN Ash allowed decision scenario"
+$atanAshTileDecision = Get-DiagnosticReportLineContaining -Kind "decision" -Key "atan-landfill-from-ash" -Expected "risks=tile_surface"
+Assert-ReportLineContains -Line $atanAshTileDecision -Expected "decision=diagnose_only" -Context "ATAN Ash tile-surface deny decision scenario"
+$atanAshSinkDecision = Get-DiagnosticReportLineContaining -Kind "decision" -Key "atan-stone-brick-from-ash" -Expected "risks=ash_sink"
+Assert-ReportLineContains -Line $atanAshSinkDecision -Expected "decision=diagnose_only" -Context "ATAN Ash sink deny decision scenario"
+$atanAshTileRisk = Get-DiagnosticReportLineContaining -Kind "loop_risk" -Key "atan-landfill-from-ash" -Expected "risks=tile_surface"
+Assert-ReportLineContains -Line $atanAshTileRisk -Expected "risks=tile_surface" -Context "ATAN Ash tile-surface loop-risk scenario"
+$atanAshSinkRisk = Get-DiagnosticReportLineContaining -Kind "loop_risk" -Key "atan-stone-brick-from-ash" -Expected "risks=ash_sink"
+Assert-ReportLineContains -Line $atanAshSinkRisk -Expected "risks=ash_sink" -Context "ATAN Ash sink loop-risk scenario"
 
 Invoke-RuntimeScenario -ScenarioName "air-scrubbing-clean-filter" -EnabledFixtureNames @(
   "mir-fixture-air-scrubbing",

@@ -386,7 +386,9 @@ prototypes/
       overlay_loader.lua
       claim_registry.lua
       diagnostics/
+        exact_recipe_policy.lua
         air_scrubbing.lua
+        atan_ash.lua
       overlays/
         base.lua
         space_age.lua
