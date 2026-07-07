@@ -16,6 +16,155 @@ claims:
 
 targets:
   docs_root: docs/compatibility/targets
+  records:
+    air-scrubbing:
+      mod: atan-air-scrubbing
+      doc: docs/compatibility/targets/atan-air-scrubbing.md
+      claim_level: full-family-support
+      public_claim: clean-filter crafting productivity only
+      fixtures:
+        - fixtures/air-scrubbing
+        - fixtures/assert-air-scrubbing-clean-filter
+      streams:
+        - mir-prod-air-scrubbing-clean-filter
+      generated:
+        - atan-pollution-filter
+        - atan-spore-filter
+      diagnostic_only:
+        - scrubbing-environmental
+        - cleaning-recovery
+
+    atan-ash:
+      mod: atan-ash
+      doc: docs/compatibility/targets/atan-ash.md
+      claim_level: full-family-support
+      public_claim: ash separation productivity only
+      fixtures:
+        - fixtures/atan-ash
+        - fixtures/assert-atan-ash-separation
+      streams:
+        - mir-prod-atan-ash-separation
+      generated:
+        - atan-ash-seperation
+      diagnostic_only:
+        - ash-sinks
+        - tile-surface
+        - resource-recovery
+
+    atan-nuclear-science:
+      mod: atan-nuclear-science
+      doc: docs/compatibility/targets/atan-nuclear-science.md
+      claim_level: partial-support
+      public_claim: science-pack recipe productivity only
+      fixtures:
+        - fixtures/atan-nuclear-science
+        - fixtures/assert-atan-nuclear-science-productivity
+      streams: []
+      generated_through_existing_stream: research_science_pack_productivity
+      diagnostic_only:
+        - atom-forge-crafting
+
+    aai-loaders:
+      mod: aai-loaders
+      doc: docs/compatibility/targets/aai-loaders.md
+      claim_level: partial-support
+      public_claim: loader crafting productivity only
+      fixtures:
+        - fixtures/aai-loaders
+        - fixtures/assert-aai-loader-belt-productivity
+      streams: []
+      generated_through_existing_stream: research_belts
+      diagnostic_only:
+        - loader-throughput
+        - loader-modes
+        - compatibility-hooks
+
+    big-mining-drill:
+      mod: big-mining-drill
+      doc: docs/compatibility/targets/big-mining-drill.md
+      claim_level: partial-support
+      public_claim: mining drill recipe productivity only
+      fixtures:
+        - fixtures/big-mining-drill
+        - fixtures/assert-big-mining-drill-productivity
+      streams: []
+      generated_through_existing_stream: research_mining_drill
+      diagnostic_only:
+        - native-mining-yield-productivity
+
+    fluid-must-flow:
+      mod: FluidMustFlow
+      doc: docs/compatibility/targets/fluid-must-flow.md
+      claim_level: diagnostic-only
+      public_claim: pipeline coexistence only
+      named_load_checks:
+        - release-targeted local repair check
+      streams: []
+      diagnostic_only:
+        - duct-behavior
+        - fluid-logistics
+
+    robot-attrition:
+      mod: robot_attrition
+      doc: docs/compatibility/targets/robot-attrition.md
+      claim_level: diagnostic-only
+      public_claim: runtime balance coexistence only
+      named_load_checks:
+        - release-targeted local repair check
+      streams: []
+      diagnostic_only:
+        - robot-crash-behavior
+        - attrition-behavior
+        - recovery-behavior
+
+    jetpack:
+      mod: jetpack
+      doc: docs/compatibility/targets/jetpack.md
+      claim_level: diagnostic-only
+      public_claim: equipment content coexistence only
+      named_load_checks:
+        - release-targeted local repair check
+      streams: []
+      diagnostic_only:
+        - runtime-movement
+        - fuel-behavior
+        - equipment-behavior
+
+    equipment-gantry:
+      mod: equipment-gantry
+      doc: docs/compatibility/targets/equipment-gantry.md
+      claim_level: diagnostic-only
+      public_claim: equipment-grid automation coexistence only
+      named_load_checks:
+        - release-targeted local repair check
+      streams: []
+      diagnostic_only:
+        - gantry-insertion
+        - gantry-removal
+        - item-grid-processing
+
+    aai-containers:
+      mod: aai-containers
+      doc: docs/compatibility/targets/aai-containers.md
+      claim_level: diagnostic-only
+      public_claim: storage content coexistence only
+      named_load_checks:
+        - release-targeted local repair check
+      streams: []
+      diagnostic_only:
+        - warehouse-productivity
+        - container-productivity
+
+    aai-industry:
+      mod: aai-industry
+      doc: docs/compatibility/targets/aai-industry.md
+      claim_level: observed
+      public_claim: mini-overhaul tuning profile
+      named_load_checks:
+        - release-targeted local repair check
+      streams: []
+      diagnostic_only:
+        - broad-aai-suite-support
 
 rules:
   - every public compatibility claim has a compatibility page

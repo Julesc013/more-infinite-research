@@ -10,3 +10,42 @@ rules:
   - removed stream targets require migration review
   - release notes mention generated stream changes
   - stream docs describe contracts, not release-specific plans
+
+streams:
+  records:
+    mir-prod-air-scrubbing-clean-filter:
+      canonical_row: prototypes/planner/generated-stream-manifest.json#streams.mir-prod-air-scrubbing-clean-filter
+      introduced_in: "2.2.0"
+      source: compat_policy:air-scrubbing
+      capability: recipe-productivity
+      family: clean_filter
+      policy: air-scrubbing.clean-filter
+      generated_technology: recipe-prod-research_air_scrubbing_clean_filter-1
+      stream_key: research_air_scrubbing_clean_filter
+      migration_policy: stable
+      targets:
+        - atan-pollution-filter
+        - atan-spore-filter
+      evidence:
+        claim: atan-air-scrubbing
+        fixtures:
+          - fixtures/air-scrubbing
+          - fixtures/assert-air-scrubbing-clean-filter
+
+    mir-prod-atan-ash-separation:
+      canonical_row: prototypes/planner/generated-stream-manifest.json#streams.mir-prod-atan-ash-separation
+      introduced_in: "2.2.0"
+      source: compat_policy:atan-ash
+      capability: recipe-productivity
+      family: ash_separation
+      policy: atan-ash.ash-separation
+      generated_technology: recipe-prod-research_ash_separation-1
+      stream_key: research_ash_separation
+      migration_policy: stable
+      targets:
+        - atan-ash-seperation
+      evidence:
+        claim: atan-ash
+        fixtures:
+          - fixtures/atan-ash
+          - fixtures/assert-atan-ash-separation
