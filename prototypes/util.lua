@@ -5,7 +5,7 @@ local settings_resolver = require("prototypes.settings-resolver")
 local deepcopy = require("prototypes.mir.core.deepcopy")
 local lookup = require("prototypes.mir.platform.factorio.prototype_lookup")
 local science = require("prototypes.lib.science-packs")
-local icons = require("prototypes.lib.technology-icons")
+local icons = require("prototypes.mir.emit.icon_builder")
 local recipes = require("prototypes.mir.capabilities.recipe_productivity.recipe_matching")
 
 local U = {}

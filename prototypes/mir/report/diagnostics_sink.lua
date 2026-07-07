@@ -1,5 +1,5 @@
 local D = {}
-local icons = require("prototypes.lib.technology-icons")
+local icons = require("prototypes.mir.emit.icon_builder")
 local schema = require("prototypes.mir.core.schema")
 
 local rows = {}

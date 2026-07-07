@@ -163,7 +163,9 @@ through `report/` helpers. The stage layer calls
 individual exact-recipe diagnostic modules directly.
 `prototypes/mir/report/diagnostics_sink.lua` owns the existing log/audit-row
 diagnostic sink; the old `prototypes/diagnostics.lua` path is a compatibility
-shim.
+shim. During the transition it may call `prototypes/mir/emit/icon_builder.lua`
+only to preserve existing icon-source hints in report rows; it must not mutate
+prototypes.
 
 ## Three Workspaces
 
