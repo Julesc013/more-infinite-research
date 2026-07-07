@@ -143,6 +143,10 @@ productivity cleanup, competing base-extension cleanup, family adoption, and
 compatibility planning are compatibility shims. The active implementations live
 under `prototypes/mir/compatibility/`, `prototypes/mir/index/`, and
 `prototypes/mir/policy/`.
+The old `prototypes/lib/capabilities/` and `prototypes/lib/policy/capabilities.lua`
+paths are also compatibility shims; the active capability contract, registry,
+and policy live under `prototypes/mir/capabilities/` and
+`prototypes/mir/policy/capabilities.lua`.
 
 Compatibility policy uses `prototypes/mir/compatibility/`. Named compatibility
 targets live under `prototypes/mir/compatibility/overlays/`; those overlays
@@ -319,7 +323,7 @@ prototypes/
 
     policy/
       defaults.lua
-      capability_policy.lua
+      capabilities.lua
       family_policy.lua
       science_policy.lua
       cap_policy.lua

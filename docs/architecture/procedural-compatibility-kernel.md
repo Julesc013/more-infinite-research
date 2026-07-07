@@ -38,14 +38,14 @@ The implemented report-first pieces are:
 
 - `prototypes/mir/index/registry_builder.lua` builds typed facts for recipes,
   technologies, machines, labs, owners, rule surfaces, and loop-risk signals.
-- `prototypes/lib/mir/schema.lua` centralizes schema versions for the fact
+- `prototypes/mir/core/schema.lua` centralizes schema versions for the fact
   registry, resolver contract, capability policies, DecisionRecords, stream
   manifest rows, and compatibility claims.
-- `prototypes/lib/capabilities/contract.lua` validates the resolver interface:
+- `prototypes/mir/capabilities/contract.lua` validates the resolver interface:
   `discover`, `classify`, `propose`, `validate`, `emit`, and `diagnose`.
-- `prototypes/lib/capabilities/registry.lua` classifies entity-backed loader
+- `prototypes/mir/capabilities/registry.lua` classifies entity-backed loader
   recipes, entity-backed mining-drill recipes, and native modifier owners.
-- `prototypes/lib/policy/capabilities.lua` stores capability-specific policy
+- `prototypes/mir/policy/capabilities.lua` stores capability-specific policy
   defaults, including confidence thresholds, owner policy, science policy, and
   deny-risk flags.
 - `prototypes/mir/planner/compiler.lua` emits fact summaries, lab matrices,
@@ -174,7 +174,7 @@ signals are weak hints and should not be enough for broad emission.
 
 ## Policies And Claims
 
-Capability-specific policy lives in `prototypes/lib/policy/capabilities.lua`.
+Capability-specific policy lives in `prototypes/mir/policy/capabilities.lua`.
 It is intentionally not exposed as settings until a behavior needs user control.
 The current policy surface records:
 

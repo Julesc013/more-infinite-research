@@ -977,9 +977,9 @@ Invoke-RepoCheck "2.2.0 compiler diagnostics are wired" {
   $diagnosticsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\diagnostics.lua")
   $factRegistryPath = Join-Path $repo "prototypes\lib\facts\registry.lua"
   $indexRegistryPath = Join-Path $repo "prototypes\mir\index\registry_builder.lua"
-  $capabilityRegistryPath = Join-Path $repo "prototypes\lib\capabilities\registry.lua"
-  $capabilityContractPath = Join-Path $repo "prototypes\lib\capabilities\contract.lua"
-  $capabilityPolicyPath = Join-Path $repo "prototypes\lib\policy\capabilities.lua"
+  $capabilityRegistryPath = Join-Path $repo "prototypes\mir\capabilities\registry.lua"
+  $capabilityContractPath = Join-Path $repo "prototypes\mir\capabilities\contract.lua"
+  $capabilityPolicyPath = Join-Path $repo "prototypes\mir\policy\capabilities.lua"
   $schemaPath = Join-Path $repo "prototypes\mir\core\schema.lua"
   $compilerPath = Join-Path $repo "prototypes\mir\planner\compiler.lua"
   $compilerShimPath = Join-Path $repo "prototypes\planner\compiler.lua"
@@ -1001,7 +1001,7 @@ Invoke-RepoCheck "2.2.0 compiler diagnostics are wired" {
     throw "Missing legacy compiler diagnostics shim: prototypes\planner\compiler.lua"
   }
   if (-not (Test-Path -LiteralPath $capabilityRegistryPath)) {
-    throw "Missing capability registry: prototypes\lib\capabilities\registry.lua"
+    throw "Missing capability registry: prototypes\mir\capabilities\registry.lua"
   }
   foreach ($path in @($capabilityContractPath, $capabilityPolicyPath, $schemaPath)) {
     if (-not (Test-Path -LiteralPath $path)) {
@@ -1039,18 +1039,18 @@ Invoke-RepoCheck "2.2.0 compiler diagnostics are wired" {
     @{ File = "prototypes\mir\report\decision_export.lua"; Text = $decisionExportText; Snippet = 'function M.emit(sink, record)' },
     @{ File = "prototypes\mir\report\decision_export.lua"; Text = $decisionExportText; Snippet = 'sink.decision(record)' },
     @{ File = "prototypes\mir\core\schema.lua"; Text = $schemaText; Snippet = 'S.decision_record = 1' },
-    @{ File = "prototypes\lib\capabilities\contract.lua"; Text = $capabilityContractText; Snippet = 'CapabilityResolver' },
-    @{ File = "prototypes\lib\capabilities\contract.lua"; Text = $capabilityContractText; Snippet = '"discover"' },
-    @{ File = "prototypes\lib\policy\capabilities.lua"; Text = $capabilityPolicyText; Snippet = 'P.schema_version = schema.capability_policy' },
-    @{ File = "prototypes\lib\policy\capabilities.lua"; Text = $capabilityPolicyText; Snippet = 'deny_risk_flags' },
-    @{ File = "prototypes\lib\capabilities\registry.lua"; Text = $capabilityRegistryText; Snippet = 'Capability resolvers are report-first' },
-    @{ File = "prototypes\lib\capabilities\registry.lua"; Text = $capabilityRegistryText; Snippet = 'contract.validate_all(RESOLVERS)' },
-    @{ File = "prototypes\lib\capabilities\registry.lua"; Text = $capabilityRegistryText; Snippet = 'schema_version = schema.capability_resolver' },
-    @{ File = "prototypes\lib\capabilities\registry.lua"; Text = $capabilityRegistryText; Snippet = 'id = "logistics-loader-manufacturing"' },
-    @{ File = "prototypes\lib\capabilities\registry.lua"; Text = $capabilityRegistryText; Snippet = 'id = "mining-drill-manufacturing"' },
-    @{ File = "prototypes\lib\capabilities\registry.lua"; Text = $capabilityRegistryText; Snippet = 'id = "native-modifier-ownership"' },
-    @{ File = "prototypes\lib\capabilities\registry.lua"; Text = $capabilityRegistryText; Snippet = 'entity_backed_candidates' },
-    @{ File = "prototypes\lib\capabilities\registry.lua"; Text = $capabilityRegistryText; Snippet = 'discover,classify,propose,validate,emit,diagnose' },
+    @{ File = "prototypes\mir\capabilities\contract.lua"; Text = $capabilityContractText; Snippet = 'CapabilityResolver' },
+    @{ File = "prototypes\mir\capabilities\contract.lua"; Text = $capabilityContractText; Snippet = '"discover"' },
+    @{ File = "prototypes\mir\policy\capabilities.lua"; Text = $capabilityPolicyText; Snippet = 'P.schema_version = schema.capability_policy' },
+    @{ File = "prototypes\mir\policy\capabilities.lua"; Text = $capabilityPolicyText; Snippet = 'deny_risk_flags' },
+    @{ File = "prototypes\mir\capabilities\registry.lua"; Text = $capabilityRegistryText; Snippet = 'Capability resolvers are report-first' },
+    @{ File = "prototypes\mir\capabilities\registry.lua"; Text = $capabilityRegistryText; Snippet = 'contract.validate_all(RESOLVERS)' },
+    @{ File = "prototypes\mir\capabilities\registry.lua"; Text = $capabilityRegistryText; Snippet = 'schema_version = schema.capability_resolver' },
+    @{ File = "prototypes\mir\capabilities\registry.lua"; Text = $capabilityRegistryText; Snippet = 'id = "logistics-loader-manufacturing"' },
+    @{ File = "prototypes\mir\capabilities\registry.lua"; Text = $capabilityRegistryText; Snippet = 'id = "mining-drill-manufacturing"' },
+    @{ File = "prototypes\mir\capabilities\registry.lua"; Text = $capabilityRegistryText; Snippet = 'id = "native-modifier-ownership"' },
+    @{ File = "prototypes\mir\capabilities\registry.lua"; Text = $capabilityRegistryText; Snippet = 'entity_backed_candidates' },
+    @{ File = "prototypes\mir\capabilities\registry.lua"; Text = $capabilityRegistryText; Snippet = 'discover,classify,propose,validate,emit,diagnose' },
     @{ File = "prototypes\planner\compiler.lua"; Text = $compilerShimText; Snippet = 'return require("prototypes.mir.planner.compiler")' },
     @{ File = "prototypes\mir\planner\compiler.lua"; Text = $compilerText; Snippet = 'local decision_export = require("prototypes.mir.report.decision_export")' },
     @{ File = "prototypes\mir\planner\compiler.lua"; Text = $compilerText; Snippet = 'require("prototypes.mir.index.registry_builder")' },

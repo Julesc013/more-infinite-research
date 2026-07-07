@@ -15,7 +15,7 @@ capabilities:
       - loop-risk-validation
 
   loader-manufacturing:
-    current_path: prototypes/lib/capabilities/registry.lua
+    current_path: prototypes/mir/capabilities/registry.lua
     target_path: prototypes/mir/capabilities/logistics_manufacturing/loaders.lua
     doc: docs/capabilities/loader-manufacturing.md
     emits:
@@ -25,7 +25,7 @@ capabilities:
       - aai-loaders
 
   mining-drill-manufacturing:
-    current_path: prototypes/lib/capabilities/registry.lua
+    current_path: prototypes/mir/capabilities/registry.lua
     target_path: prototypes/mir/capabilities/machine_manufacturing/mining_drills.lua
     doc: docs/capabilities/mining-drill-manufacturing.md
     emits:
@@ -36,7 +36,7 @@ capabilities:
       - omega-drill
 
   native-modifier-ownership:
-    current_path: prototypes/lib/capabilities/registry.lua
+    current_path: prototypes/mir/capabilities/registry.lua
     target_path: prototypes/mir/capabilities/native_modifiers
     doc: docs/capabilities/native-modifiers.md
     emits: []

@@ -53,9 +53,9 @@ function Get-MIRStreamKeysFromSource {
 }
 
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
-$policyPath = Join-Path $repo "prototypes\lib\policy\capabilities.lua"
-$contractPath = Join-Path $repo "prototypes\lib\capabilities\contract.lua"
-$capabilityRegistryPath = Join-Path $repo "prototypes\lib\capabilities\registry.lua"
+$policyPath = Join-Path $repo "prototypes\mir\policy\capabilities.lua"
+$contractPath = Join-Path $repo "prototypes\mir\capabilities\contract.lua"
+$capabilityRegistryPath = Join-Path $repo "prototypes\mir\capabilities\registry.lua"
 $manifestPath = Join-Path $repo "prototypes\planner\generated-stream-manifest.json"
 $productivityStreamsPath = Join-Path $repo "prototypes\streams\productivity.lua"
 $directEffectStreamsPath = Join-Path $repo "prototypes\streams\direct-effects.lua"

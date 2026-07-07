@@ -110,12 +110,12 @@ Agricultural growth speed refreshes this force state on init, configuration chan
 - `prototypes/lib/science-packs.lua`: lab-input discovery, science-pack existence, end-game science-pack selection, lab-compatible ingredient validation, science-pack unlock prerequisites, ordered pack lists.
 - `prototypes/lib/recipe-matching.lua`: item/fluid-output matching, output-pattern expansion, recipe category matching, hidden/recycling filtering.
 - `prototypes/lib/technology-icons.lua`: borrowed icon copying, explicit `icon_candidates` resolution, legacy technology/item/fluid icon fallback, Wube-style constant overlays.
-- `prototypes/lib/deepcopy.lua`: shared fallback for data-stage deep copies.
-- `prototypes/lib/table-utils.lua`: deterministic table-key ordering helpers.
-- `prototypes/lib/technology-cleanup.lua`: technology removal with prerequisite reference cleanup.
-- `prototypes/compat/productivity-owners.lua`: shared recipe-productivity owner classification, recipe allow-productivity checks, and owner record formatting.
-- `prototypes/compat/productivity-family-adoption.lua`: data-stage adoption of safe residual recipes into configured existing productivity families plus the adoption signature mod-data.
-- `prototypes/compat/competing-productivity.lua`: profile-driven replacement of known fully covered competing infinite recipe-productivity technologies.
+- `prototypes/mir/core/deepcopy.lua`: shared fallback for data-stage deep copies.
+- `prototypes/mir/core/table.lua`: deterministic table-key ordering helpers.
+- `prototypes/mir/policy/technology_cleanup.lua`: technology removal with prerequisite reference cleanup.
+- `prototypes/mir/index/productivity_owners.lua`: shared recipe-productivity owner classification, recipe allow-productivity checks, and owner record formatting.
+- `prototypes/mir/policy/productivity_family_adoption.lua`: data-stage adoption of safe residual recipes into configured existing productivity families plus the adoption signature mod-data.
+- `prototypes/mir/policy/competing_productivity.lua`: profile-driven replacement of known fully covered competing infinite recipe-productivity technologies.
 - `prototypes/technology-effect-safety.lua`: blocks unsafe native effect types from MIR-generated technologies.
 
 Keep new domain behavior in these modules rather than growing `util.lua`.
@@ -165,7 +165,7 @@ Direct-effect stream and base-extension generation must pass through `prototypes
 
 ## Compatibility Profiles
 
-`prototypes/compat/profiles.lua` is the dedicated home for mod-specific stream patches.
+`prototypes/mir/compatibility/profiles.lua` is the dedicated home for mod-specific stream patches.
 
 Use profiles when a compatibility rule is tied to a known mod being active. Use general stream config only for behavior that should apply to every mod set.
 
@@ -226,9 +226,9 @@ modifiers remain separate from drill manufacturing productivity.
 
 The kernel now has enforceable platform pieces:
 
-- schema versions in `prototypes/lib/mir/schema.lua`;
-- resolver contract validation in `prototypes/lib/capabilities/contract.lua`;
-- capability-specific policy in `prototypes/lib/policy/capabilities.lua`;
+- schema versions in `prototypes/mir/core/schema.lua`;
+- resolver contract validation in `prototypes/mir/capabilities/contract.lua`;
+- capability-specific policy in `prototypes/mir/policy/capabilities.lua`;
 - generated stream manifest metadata in
   `prototypes/planner/generated-stream-manifest.json`;
 - machine-readable claims in `fixtures/compat-matrix/claims.json`;

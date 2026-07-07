@@ -472,7 +472,7 @@ diagnostics, and loop-risk denials.
 
 The compatibility platform now has committed machine-readable policy surfaces:
 
-- `prototypes/lib/policy/capabilities.lua` for capability-specific policy;
+- `prototypes/mir/policy/capabilities.lua` for capability-specific policy;
 - `prototypes/planner/generated-stream-manifest.json` for stable generated IDs
   and migration policy;
 - `fixtures/compat-matrix/claims.json` for public claim text, capability status,

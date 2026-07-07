@@ -180,6 +180,7 @@ $requiredShims = @(
   "prototypes/mir/policy/competing_base_extensions.lua",
   "prototypes/mir/policy/productivity_family_adoption.lua",
   "prototypes/mir/policy/technology_cleanup.lua",
+  "prototypes/mir/policy/capabilities.lua",
   "prototypes/mir/index/registry_builder.lua",
   "prototypes/mir/index/productivity_owners.lua",
   "prototypes/mir/index/recipes.lua",
@@ -242,6 +243,18 @@ Assert-MIRContains -RelativePath $legacyStreamEmitterPath -Text $legacyStreamEmi
 $legacyTechGenPath = "prototypes/tech-gen.lua"
 $legacyTechGenText = Read-MIRFile -RelativePath $legacyTechGenPath
 Assert-MIRContains -RelativePath $legacyTechGenPath -Text $legacyTechGenText -Needle 'return require("prototypes.mir.planner.stream_compiler").run()'
+
+$legacyCapabilityContractPath = "prototypes/lib/capabilities/contract.lua"
+$legacyCapabilityContractText = Read-MIRFile -RelativePath $legacyCapabilityContractPath
+Assert-MIRContains -RelativePath $legacyCapabilityContractPath -Text $legacyCapabilityContractText -Needle 'return require("prototypes.mir.capabilities.contract")'
+
+$legacyCapabilityRegistryPath = "prototypes/lib/capabilities/registry.lua"
+$legacyCapabilityRegistryText = Read-MIRFile -RelativePath $legacyCapabilityRegistryPath
+Assert-MIRContains -RelativePath $legacyCapabilityRegistryPath -Text $legacyCapabilityRegistryText -Needle 'return require("prototypes.mir.capabilities.registry")'
+
+$legacyCapabilityPolicyPath = "prototypes/lib/policy/capabilities.lua"
+$legacyCapabilityPolicyText = Read-MIRFile -RelativePath $legacyCapabilityPolicyPath
+Assert-MIRContains -RelativePath $legacyCapabilityPolicyPath -Text $legacyCapabilityPolicyText -Needle 'return require("prototypes.mir.policy.capabilities")'
 
 $streamCompilerPath = "prototypes/mir/planner/stream_compiler.lua"
 $streamCompilerText = Read-MIRFile -RelativePath $streamCompilerPath

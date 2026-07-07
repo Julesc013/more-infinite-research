@@ -273,14 +273,14 @@ foreach ($claim in @($claims.claims)) {
   }
 }
 
-$profilesText = Read-MIRText -RelativePath "prototypes/compat/profiles.lua"
+$profilesText = Read-MIRText -RelativePath "prototypes/mir/compatibility/profiles.lua"
 $profilesCodeLines = @($profilesText -split "\r?\n" | Where-Object { $_ -notmatch "^\s*--" })
 if (($profilesCodeLines -join "`n") -match "data:extend|data\.raw") {
-  throw "prototypes/compat/profiles.lua must stay declarative and must not mutate or inspect data.raw."
+  throw "prototypes/mir/compatibility/profiles.lua must stay declarative and must not mutate or inspect data.raw."
 }
 
 $capabilityLuaFiles = @(
-  Get-ChildItem -LiteralPath (Join-Path $repo "prototypes/lib/capabilities") -Recurse -File -Filter "*.lua" -ErrorAction SilentlyContinue
+  Get-ChildItem -LiteralPath (Join-Path $repo "prototypes/mir/capabilities") -Recurse -File -Filter "*.lua" -ErrorAction SilentlyContinue
 )
 foreach ($file in $capabilityLuaFiles) {
   $text = Get-Content -Raw -LiteralPath $file.FullName

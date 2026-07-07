@@ -60,6 +60,7 @@ namespace_shims:
   competing_base_extensions_policy: prototypes/mir/policy/competing_base_extensions.lua
   productivity_family_adoption_policy: prototypes/mir/policy/productivity_family_adoption.lua
   technology_cleanup_policy: prototypes/mir/policy/technology_cleanup.lua
+  capability_policy: prototypes/mir/policy/capabilities.lua
   fact_registry: prototypes/mir/index/registry_builder.lua
   index_productivity_owners: prototypes/mir/index/productivity_owners.lua
   legacy_fact_registry_shim: prototypes/lib/facts/registry.lua
