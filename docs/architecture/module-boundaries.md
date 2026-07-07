@@ -86,10 +86,13 @@ generated technology prototypes. Those responsibilities remain in the data
 stage, primarily behind `data-final-fixes.lua`.
 
 Current migration state: the Factorio root entrypoints route through
-`prototypes/mir/stage/`, and the previous entrypoint bodies live under
-`prototypes/mir/legacy/`. This is a behavior-preserving shell migration. The
-generation modules still move behind `domain/`, `capabilities/`, `planner/`,
-and `emit/` in later slices.
+`prototypes/mir/stage/`. The runtime entrypoint
+`prototypes/mir/stage/control.lua` owns only runtime registration and delegates
+to the event handlers under `control/`. The old
+`prototypes/mir/legacy/control.lua` path is a compatibility shim back to that
+stage entrypoint. This is a behavior-preserving shell migration. The generation
+modules still move behind `domain/`, `capabilities/`, `planner/`, and `emit/`
+in later slices.
 
 Compatibility policy uses `prototypes/mir/compatibility/`. Named compatibility
 targets live under `prototypes/mir/compatibility/overlays/`; those overlays

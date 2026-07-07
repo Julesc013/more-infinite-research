@@ -1,1 +1,1 @@
-require("control.scripted-techs").register()
+return require("prototypes.mir.stage.control").run()

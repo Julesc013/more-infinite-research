@@ -125,7 +125,12 @@ foreach ($entry in $entrypoints) {
 
   $stageText = Read-MIRFile -RelativePath $entry.StagePath
   Assert-MIRContains -RelativePath $entry.StagePath -Text $stageText -Needle "function M.run()"
-  Assert-MIRContains -RelativePath $entry.StagePath -Text $stageText -Needle ('require("' + $entry.LegacyModule + '")')
+  if ($entry.Root -eq "control.lua") {
+    Assert-MIRContains -RelativePath $entry.StagePath -Text $stageText -Needle "assert_runtime_stage()"
+    Assert-MIRContains -RelativePath $entry.StagePath -Text $stageText -Needle 'require("control.scripted-techs").register()'
+  } else {
+    Assert-MIRContains -RelativePath $entry.StagePath -Text $stageText -Needle ('require("' + $entry.LegacyModule + '")')
+  }
 }
 
 $requiredShims = @(

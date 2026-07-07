@@ -21,6 +21,29 @@ stage_entrypoints:
   data-final-fixes.lua: prototypes/mir/stage/data_final_fixes.lua
   control.lua: prototypes/mir/stage/control.lua
 
+runtime_boundaries:
+  control.lua:
+    stage_entrypoint: prototypes/mir/stage/control.lua
+    runtime_modules:
+      - control/scripted-techs.lua
+      - control/settings-resolver.lua
+      - control/productivity-family-adoption.lua
+      - control/effects/agricultural-growth-speed.lua
+      - control/effects/spoilage-preservation.lua
+    allowed_globals:
+      - script
+      - storage
+      - settings
+      - defines
+      - game
+      - prototypes
+      - log
+    forbidden_globals:
+      - data
+      - data.raw
+      - data:extend
+    rule: runtime registration and event handling only; no prototype generation
+
 namespace_shims:
   schema: prototypes/mir/core/schema.lua
   fact_registry: prototypes/mir/domain/facts/registry.lua
