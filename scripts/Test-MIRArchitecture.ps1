@@ -167,6 +167,7 @@ $requiredShims = @(
   "prototypes/mir/report/decision_export.lua",
   "prototypes/mir/report/compatibility_diagnostics.lua",
   "prototypes/mir/planner/compiler.lua",
+  "prototypes/mir/planner/requirements.lua",
   "prototypes/mir/compatibility/registry.lua",
   "prototypes/mir/compatibility/overlay_loader.lua",
   "prototypes/mir/compatibility/claim_registry.lua",
@@ -205,6 +206,8 @@ Assert-MIRContains -RelativePath $legacyStreamEmitterPath -Text $legacyStreamEmi
 $legacyTechGenPath = "prototypes/tech-gen.lua"
 $legacyTechGenText = Read-MIRFile -RelativePath $legacyTechGenPath
 Assert-MIRContains -RelativePath $legacyTechGenPath -Text $legacyTechGenText -Needle 'require("prototypes.mir.legacy.stream_emitter")'
+Assert-MIRContains -RelativePath $legacyTechGenPath -Text $legacyTechGenText -Needle 'require("prototypes.mir.planner.requirements")'
+Assert-MIRContains -RelativePath $legacyTechGenPath -Text $legacyTechGenText -Needle "planner_requirements.missing_reason(key, raw_spec)"
 Assert-MIRContains -RelativePath $legacyTechGenPath -Text $legacyTechGenText -Needle "stream_emitter.emit(key, spec, fields)"
 
 $indexRegistryPath = "prototypes/mir/index/registry_builder.lua"
@@ -257,6 +260,13 @@ $plannerCompilerText = Read-MIRFile -RelativePath $plannerCompilerPath
 Assert-MIRContains -RelativePath $plannerCompilerPath -Text $plannerCompilerText -Needle 'require("prototypes.mir.index.registry_builder")'
 Assert-MIRContains -RelativePath $plannerCompilerPath -Text $plannerCompilerText -Needle 'require("prototypes.mir.report.decision_export")'
 Assert-MIRContains -RelativePath $plannerCompilerPath -Text $plannerCompilerText -Needle "decision_export.emit(D, decision_record.generated_technology({"
+
+$plannerRequirementsPath = "prototypes/mir/planner/requirements.lua"
+$plannerRequirementsText = Read-MIRFile -RelativePath $plannerRequirementsPath
+Assert-MIRContains -RelativePath $plannerRequirementsPath -Text $plannerRequirementsText -Needle "function M.missing_reason(key, spec)"
+Assert-MIRContains -RelativePath $plannerRequirementsPath -Text $plannerRequirementsText -Needle 'require("prototypes.lib.technology-requirements")'
+Assert-MIRContains -RelativePath $plannerRequirementsPath -Text $plannerRequirementsText -Needle "U.mod_exists(mod_name)"
+Assert-MIRContains -RelativePath $plannerRequirementsPath -Text $plannerRequirementsText -Needle "U.ammo_category_exists(category)"
 
 $airScrubbingOverlayPath = "prototypes/mir/compatibility/overlays/air_scrubbing.lua"
 $airScrubbingOverlayText = Read-MIRFile -RelativePath $airScrubbingOverlayPath

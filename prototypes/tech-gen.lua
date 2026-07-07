@@ -5,10 +5,10 @@ local D = require("prototypes.diagnostics")
 local deepcopy = require("prototypes.lib.deepcopy")
 local table_utils = require("prototypes.lib.table-utils")
 local effect_safety = require("prototypes.technology-effect-safety")
-local technology_requirements = require("prototypes.lib.technology-requirements")
 local competing_productivity = require("prototypes.compat.competing-productivity")
 local productivity_owners = require("prototypes.compat.productivity-owners")
 local productivity_family_adoption = require("prototypes.compat.productivity-family-adoption")
+local planner_requirements = require("prototypes.mir.planner.requirements")
 local stream_emitter = require("prototypes.mir.legacy.stream_emitter")
 
 local function lname(key, spec)
@@ -40,37 +40,6 @@ end
 
 local function emit_stream_technology(key, spec, fields)
   return stream_emitter.emit(key, spec, fields)
-end
-
-local function missing_requirement(key, spec)
-  for _, mod_name in ipairs(spec.required_mods or {}) do
-    if not U.mod_exists(mod_name) then
-      return "missing required mod " .. mod_name
-    end
-  end
-  for _, item_name in ipairs(spec.required_items or {}) do
-    if not U.item_prototype(item_name) then
-      return "missing required item " .. item_name
-    end
-  end
-  for _, fluid_name in ipairs(spec.required_fluids or {}) do
-    if not U.fluid_prototype(fluid_name) then
-      return "missing required fluid " .. fluid_name
-    end
-  end
-  for _, tech_name in ipairs(spec.required_technologies or {}) do
-    if not U.technology_exists(tech_name) then
-      return "missing required technology " .. tech_name
-    end
-  end
-  local skip_reason = technology_requirements.skip_reason(spec)
-  if skip_reason then return skip_reason end
-  for _, category in ipairs(spec.required_ammo_categories or {}) do
-    if not U.ammo_category_exists(category) then
-      return "missing required ammo category " .. category
-    end
-  end
-  return nil
 end
 
 local function append_unique_item(items, seen, item_name)
@@ -276,7 +245,7 @@ local function make_stream(key, raw_spec)
     D.stream(D.stream_fields(key, raw_spec, "skipped", "disabled"))
     return
   end
-  local missing = missing_requirement(key, raw_spec)
+  local missing = planner_requirements.missing_reason(key, raw_spec)
   if missing then
     log("[more-infinite-research] Skipping stream "..key.." because "..missing..".")
     D.stream(D.stream_fields(key, raw_spec, "skipped", missing))

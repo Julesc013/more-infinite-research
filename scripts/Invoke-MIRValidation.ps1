@@ -448,6 +448,7 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
   $prototypeLookupText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\lib\prototype-lookup.lua")
   $technologyIconsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\lib\technology-icons.lua")
   $techGenText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\tech-gen.lua")
+  $plannerRequirementsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\planner\requirements.lua")
   $dataFinalFixesText = Get-MIRDataFinalFixesSourceText
   $pipelineExtentText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\pipeline-extent.lua")
   $pipelineExtentSettingsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\pipeline-extent-settings.lua")
@@ -602,8 +603,8 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "prototypes\lib\technology-icons.lua"; Text = $technologyIconsText; Snippet = 'local function icon_from_fluid(name)' },
     @{ File = "prototypes\lib\recipe-matching.lua"; Text = $recipeMatchingText; Snippet = 'add_pattern_outputs(want, options.fluid_patterns, lookup.each_fluid_prototype)' },
     @{ File = "prototypes\lib\prototype-lookup.lua"; Text = $prototypeLookupText; Snippet = 'function L.fluid_prototype(name)' },
-    @{ File = "prototypes\tech-gen.lua"; Text = $techGenText; Snippet = 'required_fluids' },
-    @{ File = "prototypes\tech-gen.lua"; Text = $techGenText; Snippet = 'technology_requirements.skip_reason(spec)' },
+    @{ File = "prototypes\mir\planner\requirements.lua"; Text = $plannerRequirementsText; Snippet = 'required_fluids' },
+    @{ File = "prototypes\mir\planner\requirements.lua"; Text = $plannerRequirementsText; Snippet = 'technology_requirements.skip_reason(spec)' },
     @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'require("prototypes.pipeline-extent-settings").multiplier()' },
     @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'require("prototypes.compat.air-scrubbing").emit()' },
     @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'if pipeline_extent_multiplier ~= 1 then' },

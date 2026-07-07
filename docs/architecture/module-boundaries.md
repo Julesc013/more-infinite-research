@@ -113,6 +113,12 @@ IDs or forcing values. Settings visibility uses `ui_visibility` metadata and
 active mods only; final recipe, item, fluid, and technology facts remain
 data-stage generation concerns.
 
+The MIR planner namespace owns compiler planning checks as they are migrated out
+of legacy generators. `prototypes/mir/planner/requirements.lua` evaluates
+required mods, prototype families, technology gates, and legacy technology
+requirement skip rules before the legacy recipe-productivity generator attempts
+to build a stream.
+
 Compatibility policy uses `prototypes/mir/compatibility/`. Named compatibility
 targets live under `prototypes/mir/compatibility/overlays/`; those overlays
 register selectors, claims, deny rules, and policy overrides only. They must not
