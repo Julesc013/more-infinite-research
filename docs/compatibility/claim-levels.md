@@ -21,29 +21,28 @@ only proves load compatibility, diagnostic observation, or one narrow family.
 
 | Level | Meaning |
 | --- | --- |
-| `unknown` | No committed evidence. |
-| `load_only` | MIR and the target mod load together. |
+| `loads` | MIR and the target mod load together. |
 | `observed` | MIR reports facts/candidates but emits no behavior. |
-| `coexists` | MIR intentionally avoids conflicts with the target mod. |
-| `diagnostic_only` | MIR recognizes a family and refuses to mutate it. |
-| `partial_support` | Some fixture-backed behavior emits. |
-| `full_family_support` | One named family is fully covered with positive and negative fixtures. |
-| `full_pack_support` | The whole target mod or pack has a locked behavior matrix. Rare. |
+| `cooperates` | MIR intentionally avoids conflicts with the target mod. |
+| `diagnostic-only` | MIR recognizes a family and refuses to mutate it. |
+| `partial-support` | Some fixture-backed behavior emits. |
+| `full-family-support` | One named family is fully covered with positive and negative fixtures. |
+| `full-pack-support` | The whole target mod or pack has a locked behavior matrix. Rare. |
 
 ## Claim Manifest Shape
 
 ```json
 {
   "mod": "atan-air-scrubbing",
-  "claim_level": "full_family_support",
+  "claim_level": "full-family-support",
   "factorio_lines": {
     "upstream_advertised": ["2.0"],
     "tested": ["2.1"]
   },
   "capabilities": {
     "recipe-productivity.clean-filter": "generated",
-    "recipe-productivity.scrubbing-environmental": "diagnostic_only",
-    "recipe-productivity.cleaning-recovery": "diagnostic_only"
+    "recipe-productivity.scrubbing-environmental": "diagnostic-only",
+    "recipe-productivity.cleaning-recovery": "diagnostic-only"
   },
   "generated_streams": [
     "mir-prod-air-scrubbing-clean-filter"
@@ -71,10 +70,10 @@ claim JSON.
 
 The claim linter should fail when:
 
-- docs say "full support" but the manifest is lower than `full_pack_support`;
+- docs say "full support" but the manifest is lower than `full-pack-support`;
 - a compatibility matrix row has no claim manifest entry;
 - a claim references a generated stream with no manifest row;
-- a claim says `full_family_support` without positive and negative fixtures;
+- a claim says `full-family-support` without positive and negative fixtures;
 - a claim implies an upstream Factorio line that has not been tested;
 - public text says MIR changes throughput, mining yield, caps, beacons, module
   rules, pollution removal, recovery loops, or external balance without an

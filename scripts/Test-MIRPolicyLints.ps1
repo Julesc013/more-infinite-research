@@ -46,6 +46,10 @@ $capabilityRegistryPath = Join-Path $repo "prototypes\lib\capabilities\registry.
 $manifestPath = Join-Path $repo "prototypes\planner\generated-stream-manifest.json"
 $claimsPath = Join-Path $repo "fixtures\compat-matrix\claims.json"
 $supportLanePath = Join-Path $repo "fixtures\compat-matrix\support-lanes.json"
+$compatibilityManifestPath = Join-Path $repo ".mir\compatibility.yml"
+$streamsManifestPath = Join-Path $repo ".mir\streams.yml"
+$claimLevelsDocPath = Join-Path $repo "docs\compatibility\claim-levels.md"
+$luaClaimRegistryPath = Join-Path $repo "prototypes\mir\compatibility\claim_registry.lua"
 
 $policyText = Get-Content -Raw -LiteralPath $policyPath
 $contractText = Get-Content -Raw -LiteralPath $contractPath
@@ -53,6 +57,10 @@ $capabilityRegistryText = Get-Content -Raw -LiteralPath $capabilityRegistryPath
 $manifest = Read-MIRJson -Path $manifestPath
 $claims = Read-MIRJson -Path $claimsPath
 $supportLanes = Read-MIRJson -Path $supportLanePath
+$compatibilityManifestText = Get-Content -Raw -LiteralPath $compatibilityManifestPath
+$streamsManifestText = Get-Content -Raw -LiteralPath $streamsManifestPath
+$claimLevelsDocText = Get-Content -Raw -LiteralPath $claimLevelsDocPath
+$luaClaimRegistryText = Get-Content -Raw -LiteralPath $luaClaimRegistryPath
 
 Assert-MIRTextContains -Text $contractText -Snippet "schema_version" -Context "capability contract"
 Assert-MIRTextContains -Text $contractText -Snippet "discover" -Context "capability contract"
@@ -96,6 +104,45 @@ foreach ($streamProperty in @($streams.PSObject.Properties)) {
   $manifestStreamIds[[string]$streamProperty.Name] = $true
 }
 
+$mirStreamIds = @(
+  [regex]::Matches($streamsManifestText, "(?m)^\s{4}([A-Za-z0-9._-]+):\s*$") |
+    ForEach-Object { $_.Groups[1].Value }
+)
+foreach ($streamId in $mirStreamIds) {
+  if (-not $manifestStreamIds[$streamId]) {
+    throw ".mir/streams.yml references generated stream without canonical manifest entry: $streamId"
+  }
+}
+
+$allowedLevelBlock = [regex]::Match($compatibilityManifestText, "(?ms)allowed_levels:\s*(?<body>(?:\s+-\s+[^\r\n]+\r?\n)+)")
+if (-not $allowedLevelBlock.Success) {
+  throw ".mir/compatibility.yml must declare claims.allowed_levels."
+}
+$allowedLevels = @(
+  [regex]::Matches($allowedLevelBlock.Groups["body"].Value, "(?m)^\s+-\s+([A-Za-z0-9._-]+)\s*$") |
+    ForEach-Object { $_.Groups[1].Value }
+)
+foreach ($level in $allowedLevels) {
+  $documentedLevel = '`' + $level + '`'
+  if (-not $claimLevelsDocText.Contains($documentedLevel)) {
+    throw "docs/compatibility/claim-levels.md does not document allowed claim level: $level"
+  }
+}
+
+$compatibilityRecordsBlock = [regex]::Match($compatibilityManifestText, "(?ms)records:\s*(?<body>.*?)(?:\r?\nrules:|$)")
+if (-not $compatibilityRecordsBlock.Success) {
+  throw ".mir/compatibility.yml must declare targets.records."
+}
+$compatibilityRecordIds = @(
+  [regex]::Matches($compatibilityRecordsBlock.Groups["body"].Value, "(?m)^\s{4}([A-Za-z0-9._-]+):\s*$") |
+    ForEach-Object { $_.Groups[1].Value }
+)
+foreach ($recordId in $compatibilityRecordIds) {
+  if (-not $luaClaimRegistryText.Contains('id = "' + $recordId + '"')) {
+    throw "Lua compatibility claim registry missing .mir/compatibility.yml target id: $recordId"
+  }
+}
+
 foreach ($claim in @(ConvertTo-MIRArray (Get-MIRProperty -Object $claims -Name "claims"))) {
   $mod = [string](Get-MIRProperty -Object $claim -Name "mod")
   if ([string]::IsNullOrWhiteSpace($mod)) { throw "Compatibility claim missing mod." }
@@ -103,6 +150,9 @@ foreach ($claim in @(ConvertTo-MIRArray (Get-MIRProperty -Object $claims -Name "
     if (-not (Test-MIRProperty -Object $claim -Name $field)) {
       throw "Compatibility claim $mod missing required field: $field"
     }
+  }
+  if (-not $luaClaimRegistryText.Contains('mod = "' + $mod + '"')) {
+    throw "Lua compatibility claim registry missing fixture claim mod: $mod"
   }
   foreach ($streamId in @(ConvertTo-MIRArray (Get-MIRProperty -Object $claim -Name "generated_streams"))) {
     if (-not $manifestStreamIds[[string]$streamId]) {
