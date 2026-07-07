@@ -137,9 +137,12 @@ $dataFinalFixesStagePath = "prototypes/mir/stage/data_final_fixes.lua"
 $dataFinalFixesStageText = Read-MIRFile -RelativePath $dataFinalFixesStagePath
 Assert-MIRContains -RelativePath $dataFinalFixesStagePath -Text $dataFinalFixesStageText -Needle "legacy.apply_pipeline_extent()"
 Assert-MIRContains -RelativePath $dataFinalFixesStagePath -Text $dataFinalFixesStageText -Needle "legacy.emit_legacy_streams()"
-Assert-MIRContains -RelativePath $dataFinalFixesStagePath -Text $dataFinalFixesStageText -Needle 'require("prototypes.mir.compatibility.diagnostics.atan_ash").emit()'
+Assert-MIRContains -RelativePath $dataFinalFixesStagePath -Text $dataFinalFixesStageText -Needle 'require("prototypes.mir.compatibility.diagnostics.registry").emit_all()'
 Assert-MIRContains -RelativePath $dataFinalFixesStagePath -Text $dataFinalFixesStageText -Needle 'require("prototypes.mir.planner.compiler").emit()'
 Assert-MIRContains -RelativePath $dataFinalFixesStagePath -Text $dataFinalFixesStageText -Needle "legacy.flush_diagnostics()"
+if ($dataFinalFixesStageText.Contains('require("prototypes.mir.compatibility.diagnostics.atan_ash").emit()')) {
+  throw "$dataFinalFixesStagePath must emit exact overlay diagnostics through the diagnostics registry."
+}
 
 $dataFinalFixesLegacyPath = "prototypes/mir/legacy/data_final_fixes.lua"
 $dataFinalFixesLegacyText = Read-MIRFile -RelativePath $dataFinalFixesLegacyPath
@@ -178,6 +181,7 @@ $requiredShims = @(
   "prototypes/mir/compatibility/registry.lua",
   "prototypes/mir/compatibility/overlay_loader.lua",
   "prototypes/mir/compatibility/claim_registry.lua",
+  "prototypes/mir/compatibility/diagnostics/registry.lua",
   "prototypes/mir/compatibility/diagnostics/exact_recipe_policy.lua",
   "prototypes/mir/compatibility/diagnostics/air_scrubbing.lua",
   "prototypes/mir/compatibility/diagnostics/atan_ash.lua",
@@ -376,6 +380,14 @@ Assert-MIRContains -RelativePath $exactRecipePolicyPath -Text $exactRecipePolicy
 Assert-MIRContains -RelativePath $exactRecipePolicyPath -Text $exactRecipePolicyText -Needle 'data_raw.prototypes("recipe")'
 Assert-MIRContains -RelativePath $exactRecipePolicyPath -Text $exactRecipePolicyText -Needle "report.decision(D, row)"
 Assert-MIRContains -RelativePath $exactRecipePolicyPath -Text $exactRecipePolicyText -Needle "report.compatibility_plan(D, {"
+
+$diagnosticsRegistryPath = "prototypes/mir/compatibility/diagnostics/registry.lua"
+$diagnosticsRegistryText = Read-MIRFile -RelativePath $diagnosticsRegistryPath
+Assert-MIRContains -RelativePath $diagnosticsRegistryPath -Text $diagnosticsRegistryText -Needle 'id = "air-scrubbing"'
+Assert-MIRContains -RelativePath $diagnosticsRegistryPath -Text $diagnosticsRegistryText -Needle 'id = "atan-ash"'
+Assert-MIRContains -RelativePath $diagnosticsRegistryPath -Text $diagnosticsRegistryText -Needle 'require("prototypes.mir.compatibility.diagnostics.air_scrubbing")'
+Assert-MIRContains -RelativePath $diagnosticsRegistryPath -Text $diagnosticsRegistryText -Needle 'require("prototypes.mir.compatibility.diagnostics.atan_ash")'
+Assert-MIRContains -RelativePath $diagnosticsRegistryPath -Text $diagnosticsRegistryText -Needle "function M.emit_all()"
 
 $airScrubbingDiagnosticsPath = "prototypes/mir/compatibility/diagnostics/air_scrubbing.lua"
 $airScrubbingDiagnosticsText = Read-MIRFile -RelativePath $airScrubbingDiagnosticsPath

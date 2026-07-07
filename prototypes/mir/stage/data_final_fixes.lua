@@ -11,8 +11,7 @@ function M.run()
   legacy.apply_weapon_speed_adjustments()
   legacy.apply_max_level_control()
 
-  legacy.emit_air_scrubbing_diagnostics()
-  require("prototypes.mir.compatibility.diagnostics.atan_ash").emit()
+  require("prototypes.mir.compatibility.diagnostics.registry").emit_all()
   require("prototypes.mir.planner.compiler").emit()
   legacy.emit_compatibility_planner()
 

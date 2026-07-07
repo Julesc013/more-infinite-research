@@ -144,7 +144,9 @@ create technologies, call `data:extend`, or mutate `data.raw` directly.
 Compatibility diagnostics may live under
 `prototypes/mir/compatibility/diagnostics/` while legacy behavior is being
 migrated, but they must read prototypes through platform adapters and emit rows
-through `report/` helpers.
+through `report/` helpers. The stage layer calls
+`prototypes/mir/compatibility/diagnostics/registry.lua` rather than naming
+individual exact-recipe diagnostic modules directly.
 
 ## Three Workspaces
 
