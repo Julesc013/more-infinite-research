@@ -405,6 +405,7 @@ prototypes/
         pyanodons.lua
 
     legacy/
+      facts_registry.lua
       tech_gen.lua
       stream_emitter.lua
       recipe_matching.lua

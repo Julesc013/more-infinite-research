@@ -986,7 +986,7 @@ Invoke-RepoCheck "2.2.0 compiler diagnostics are wired" {
   $policyLintText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\Test-MIRPolicyLints.ps1")
 
   if (-not (Test-Path -LiteralPath $factRegistryPath)) {
-    throw "Missing typed fact registry: prototypes\lib\facts\registry.lua"
+    throw "Missing legacy typed fact registry shim: prototypes\lib\facts\registry.lua"
   }
   if (-not (Test-Path -LiteralPath $indexRegistryPath)) {
     throw "Missing MIR index registry builder: prototypes\mir\index\registry_builder.lua"
@@ -1026,11 +1026,11 @@ Invoke-RepoCheck "2.2.0 compiler diagnostics are wired" {
     @{ File = "prototypes\diagnostics.lua"; Text = $diagnosticsText; Snippet = 'append("rule_mutation", row)' },
     @{ File = "prototypes\diagnostics.lua"; Text = $diagnosticsText; Snippet = 'append("loop_risk", row)' },
     @{ File = "prototypes\diagnostics.lua"; Text = $diagnosticsText; Snippet = 'append("lab_matrix", row)' },
-    @{ File = "prototypes\lib\facts\registry.lua"; Text = $factRegistryText; Snippet = 'RecipeFact' },
-    @{ File = "prototypes\lib\facts\registry.lua"; Text = $factRegistryText; Snippet = 'RuleMutationFact' },
-    @{ File = "prototypes\lib\facts\registry.lua"; Text = $factRegistryText; Snippet = 'schema = schema.fact_registry' },
-    @{ File = "prototypes\lib\facts\registry.lua"; Text = $factRegistryText; Snippet = 'build_loop_risk_facts' },
-    @{ File = "prototypes\mir\index\registry_builder.lua"; Text = $indexRegistryText; Snippet = 'return require("prototypes.lib.facts.registry")' },
+    @{ File = "prototypes\lib\facts\registry.lua"; Text = $factRegistryText; Snippet = 'return require("prototypes.mir.index.registry_builder")' },
+    @{ File = "prototypes\mir\index\registry_builder.lua"; Text = $indexRegistryText; Snippet = 'RecipeFact' },
+    @{ File = "prototypes\mir\index\registry_builder.lua"; Text = $indexRegistryText; Snippet = 'RuleMutationFact' },
+    @{ File = "prototypes\mir\index\registry_builder.lua"; Text = $indexRegistryText; Snippet = 'schema = schema.fact_registry' },
+    @{ File = "prototypes\mir\index\registry_builder.lua"; Text = $indexRegistryText; Snippet = 'build_loop_risk_facts' },
     @{ File = "prototypes\mir\domain\decisions\decision_record.lua"; Text = $decisionRecordText; Snippet = 'function M.generated_technology(record)' },
     @{ File = "prototypes\mir\domain\decisions\decision_record.lua"; Text = $decisionRecordText; Snippet = 'schema.decision({' },
     @{ File = "prototypes\mir\report\decision_export.lua"; Text = $decisionExportText; Snippet = 'function M.emit(sink, record)' },

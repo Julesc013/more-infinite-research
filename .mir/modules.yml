@@ -53,6 +53,7 @@ namespace_shims:
   settings_builder: prototypes/mir/settings/builder.lua
   settings_legacy_adapter: prototypes/mir/settings/legacy_adapter.lua
   fact_registry: prototypes/mir/index/registry_builder.lua
+  legacy_fact_registry_shim: prototypes/lib/facts/registry.lua
   domain_fact_registry_shim: prototypes/mir/domain/facts/registry.lua
   index_recipes: prototypes/mir/index/recipes.lua
   index_technologies: prototypes/mir/index/technologies.lua

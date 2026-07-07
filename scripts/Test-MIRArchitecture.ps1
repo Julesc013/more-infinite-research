@@ -193,6 +193,16 @@ $legacyTechGenText = Read-MIRFile -RelativePath $legacyTechGenPath
 Assert-MIRContains -RelativePath $legacyTechGenPath -Text $legacyTechGenText -Needle 'require("prototypes.mir.legacy.stream_emitter")'
 Assert-MIRContains -RelativePath $legacyTechGenPath -Text $legacyTechGenText -Needle "stream_emitter.emit(key, spec, fields)"
 
+$indexRegistryPath = "prototypes/mir/index/registry_builder.lua"
+$indexRegistryText = Read-MIRFile -RelativePath $indexRegistryPath
+Assert-MIRContains -RelativePath $indexRegistryPath -Text $indexRegistryText -Needle "RecipeFact"
+Assert-MIRContains -RelativePath $indexRegistryPath -Text $indexRegistryText -Needle "RuleMutationFact"
+Assert-MIRContains -RelativePath $indexRegistryPath -Text $indexRegistryText -Needle "build_loop_risk_facts"
+
+$legacyFactRegistryPath = "prototypes/lib/facts/registry.lua"
+$legacyFactRegistryText = Read-MIRFile -RelativePath $legacyFactRegistryPath
+Assert-MIRContains -RelativePath $legacyFactRegistryPath -Text $legacyFactRegistryText -Needle 'return require("prototypes.mir.index.registry_builder")'
+
 $settingsVisibilityPath = "prototypes/mir/settings/visibility.lua"
 $settingsVisibilityText = Read-MIRFile -RelativePath $settingsVisibilityPath
 Assert-MIRContains -RelativePath $settingsVisibilityPath -Text $settingsVisibilityText -Needle "function M.evaluate(spec, ctx)"
