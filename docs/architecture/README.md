@@ -147,7 +147,7 @@ turning MIR into a redistributable Space Age art cache.
 
 ## Stream Configuration
 
-`prototypes/config.lua` exposes:
+`prototypes/mir/streams/registry.lua` exposes:
 
 - `M.shared`
 - `M.streams`
@@ -157,7 +157,9 @@ The stream table is assembled by `prototypes/streams/init.lua` from:
 - `prototypes/streams/productivity.lua`
 - `prototypes/streams/direct-effects.lua`
 
-Future expansion should add more stream domain modules rather than returning to one large config file.
+The old `prototypes/config.lua` path is a compatibility shim. Future expansion
+should add more stream domain modules rather than returning to one large config
+file.
 
 Generated recipe-productivity streams can set `dynamic_items_from_lab_inputs = true` when their target item set should include every active lab input discovered during `data-final-fixes.lua`. The science-pack productivity stream uses this so custom science packs can receive productivity effects without hard-coded mod dependencies. If a future dynamic stream uses top-level `items` without `groups`, those items are copied into the generated group before lab inputs are appended.
 

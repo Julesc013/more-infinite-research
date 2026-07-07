@@ -1,4 +1,4 @@
-local C = require("prototypes.config")
+local C = require("prototypes.mir.streams.registry")
 local U = require("prototypes.util")
 local profiles = require("prototypes.mir.compatibility.profiles")
 local productivity_owners = require("prototypes.mir.index.productivity_owners")

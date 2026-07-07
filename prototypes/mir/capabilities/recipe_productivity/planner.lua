@@ -1,4 +1,4 @@
-local C = require("prototypes.config")
+local C = require("prototypes.mir.streams.registry")
 local D = require("prototypes.mir.report.diagnostics_sink")
 local U = require("prototypes.util")
 

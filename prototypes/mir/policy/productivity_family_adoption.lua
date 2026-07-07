@@ -1,4 +1,4 @@
-local C = require("prototypes.config")
+local C = require("prototypes.mir.streams.registry")
 local productivity_owners = require("prototypes.mir.index.productivity_owners")
 
 local A = {}

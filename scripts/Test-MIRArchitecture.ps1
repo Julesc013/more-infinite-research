@@ -178,6 +178,7 @@ $requiredShims = @(
   "prototypes/mir/settings/legacy_adapter.lua",
   "prototypes/mir/settings/profile_codec.lua",
   "prototypes/mir/settings/effective.lua",
+  "prototypes/mir/streams/registry.lua",
   "prototypes/mir/policy/adoption_policy.lua",
   "prototypes/mir/policy/owner_policy.lua",
   "prototypes/mir/policy/competing_productivity.lua",
@@ -382,6 +383,15 @@ Assert-MIRContains -RelativePath $settingsLegacyAdapterPath -Text $settingsLegac
 Assert-MIRContains -RelativePath $settingsLegacyAdapterPath -Text $settingsLegacyAdapterText -Needle 'require("prototypes.mir.settings.builder")'
 Assert-MIRContains -RelativePath $settingsLegacyAdapterPath -Text $settingsLegacyAdapterText -Needle "factorio_mods.snapshot()"
 
+$streamRegistryPath = "prototypes/mir/streams/registry.lua"
+$streamRegistryText = Read-MIRFile -RelativePath $streamRegistryPath
+Assert-MIRContains -RelativePath $streamRegistryPath -Text $streamRegistryText -Needle 'M.streams = require("prototypes.streams.init")'
+Assert-MIRContains -RelativePath $streamRegistryPath -Text $streamRegistryText -Needle 'require("prototypes.mir.compatibility.profiles").apply(M)'
+
+$configShimPath = "prototypes/config.lua"
+$configShimText = Read-MIRFile -RelativePath $configShimPath
+Assert-MIRContains -RelativePath $configShimPath -Text $configShimText -Needle 'return require("prototypes.mir.streams.registry")'
+
 $settingsProfileCodecPath = "prototypes/mir/settings/profile_codec.lua"
 $settingsProfileCodecText = Read-MIRFile -RelativePath $settingsProfileCodecPath
 Assert-MIRContains -RelativePath $settingsProfileCodecPath -Text $settingsProfileCodecText -Needle 'M.prefix = "MIRSET1:"'
@@ -567,6 +577,11 @@ Assert-MIRNoPatternInLuaTree `
   -RelativeRoot "prototypes/mir/settings" `
   -Pattern "\bdata\.raw\b|data:extend|forced_value" `
   -Message "MIR settings modules must not inspect finalized prototypes, mutate prototypes, or force hidden values."
+
+Assert-MIRNoPatternInLuaTree `
+  -RelativeRoot "prototypes" `
+  -Pattern 'require\("prototypes\.config"\)' `
+  -Message "MIR modules must require prototypes.mir.streams.registry instead of the old prototypes.config shim."
 
 $runtimePrototypePattern = "\bdata\.raw\b|data:extend"
 foreach ($relative in @(

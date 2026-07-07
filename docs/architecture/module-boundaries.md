@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: maintainer
 doc_type: explanation
 owner: mir-maintainers
-last_reviewed: 2026-07-07
+last_reviewed: 2026-07-08
 supersedes: []
 superseded_by: []
 ---
@@ -194,6 +194,7 @@ MIR compiler namespace
   prototypes/mir/classify/
   prototypes/mir/policy/
   prototypes/mir/settings/
+  prototypes/mir/streams/
   prototypes/mir/capabilities/
   prototypes/mir/planner/
   prototypes/mir/emit/
@@ -262,6 +263,9 @@ prototypes/
       visibility.lua
       builder.lua
       legacy_adapter.lua
+
+    streams/
+      registry.lua
 
     domain/
       facts/
@@ -485,6 +489,7 @@ shape.
 | `classify/` | facts and graphs | classifications | technology creation |
 | `policy/` | settings, overlays, facts | policy decisions | prototype mutation |
 | `settings/` | active-mod context and setting metadata | setting prototypes | `data.raw`, `forced_value` by default |
+| `streams/` | explicit stream registry and compatibility profile overlays | stream config tables | prototype facts or prototype mutation |
 | `capabilities/` | facts, classifications, policies | proposals | direct `data:extend` |
 | `planner/` | analytical records | `DecisionRecord`, `StreamSpec` | direct prototype mutation |
 | `emit/` | validated `StreamSpec` records | prototypes | classification |
@@ -499,6 +504,7 @@ domain/ must not require emit/
 classify/ must not require platform/factorio/data_raw.lua
 compatibility/overlays/ must not mutate data.raw
 settings/ must not inspect data.raw or force hidden values by default
+streams/ must stay declarative
 report/ must not mutate data.raw
 capabilities/ must not create technologies directly
 legacy/ must not contain new business logic

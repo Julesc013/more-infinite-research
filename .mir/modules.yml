@@ -61,6 +61,7 @@ namespace_shims:
   settings_legacy_adapter: prototypes/mir/settings/legacy_adapter.lua
   settings_profile_codec: prototypes/mir/settings/profile_codec.lua
   settings_effective: prototypes/mir/settings/effective.lua
+  stream_registry: prototypes/mir/streams/registry.lua
   adoption_policy: prototypes/mir/policy/adoption_policy.lua
   owner_policy: prototypes/mir/policy/owner_policy.lua
   competing_productivity_policy: prototypes/mir/policy/competing_productivity.lua
@@ -177,6 +178,12 @@ target_layers:
       - core
       - platform
     may_read_factorio_globals: true
+    may_mutate_data_raw: false
+
+  streams:
+    path: prototypes/mir/streams
+    may_require:
+      - compatibility
     may_mutate_data_raw: false
 
   capabilities:

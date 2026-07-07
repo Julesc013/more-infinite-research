@@ -1,4 +1,4 @@
-local C = require("prototypes.config")
+local C = require("prototypes.mir.streams.registry")
 local U = require("prototypes.util")
 
 local function apply_max_level(key, spec)

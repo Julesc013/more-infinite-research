@@ -1,4 +1,4 @@
-local C = require("prototypes.config")
+local C = require("prototypes.mir.streams.registry")
 local defaults = require("defaults")
 local settings_adapter = require("prototypes.mir.settings.legacy_adapter")
 local pipeline_extent_settings = require("prototypes.pipeline-extent-settings")

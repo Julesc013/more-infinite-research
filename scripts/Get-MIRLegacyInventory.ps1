@@ -8,6 +8,10 @@ param(
   [int]$MaxRequiresCompat = 0,
   [int]$MaxLibActiveModules = 0,
   [int]$MaxRequiresLib = 0,
+  [int]$MaxRequiresConfig = 0,
+  [int]$MaxRequiresUtil = 9,
+  [int]$MaxRequiresDiagnostics = 0,
+  [int]$MaxDataRawOutsidePlatform = 42,
   [int]$MaxGeneratedStreamsWithoutManifest = 0
 )
 
@@ -237,6 +241,10 @@ $shipped = [pscustomobject]@{
     max_requires_compat = $MaxRequiresCompat
     max_lib_active_modules = $MaxLibActiveModules
     max_requires_lib = $MaxRequiresLib
+    max_requires_config = $MaxRequiresConfig
+    max_requires_util = $MaxRequiresUtil
+    max_requires_diagnostics = $MaxRequiresDiagnostics
+    max_data_raw_matches_outside_platform = $MaxDataRawOutsidePlatform
     max_generated_streams_without_manifest = $MaxGeneratedStreamsWithoutManifest
   }
   generated_streams_without_manifest = $missingManifestKeys
@@ -249,6 +257,10 @@ if ($CheckThresholds) {
   Assert-MIRLegacyThreshold -Name "requires_compat" -Actual ([int]$shipped.counts.requires_compat) -Maximum $MaxRequiresCompat
   Assert-MIRLegacyThreshold -Name "lib_active_modules" -Actual ([int]$shipped.counts.lib_active_modules) -Maximum $MaxLibActiveModules
   Assert-MIRLegacyThreshold -Name "requires_lib" -Actual ([int]$shipped.counts.requires_lib) -Maximum $MaxRequiresLib
+  Assert-MIRLegacyThreshold -Name "requires_config" -Actual ([int]$shipped.counts.requires_config) -Maximum $MaxRequiresConfig
+  Assert-MIRLegacyThreshold -Name "requires_util" -Actual ([int]$shipped.counts.requires_util) -Maximum $MaxRequiresUtil
+  Assert-MIRLegacyThreshold -Name "requires_diagnostics" -Actual ([int]$shipped.counts.requires_diagnostics) -Maximum $MaxRequiresDiagnostics
+  Assert-MIRLegacyThreshold -Name "data_raw_matches_outside_platform" -Actual ([int]$shipped.counts.data_raw_matches_outside_platform) -Maximum $MaxDataRawOutsidePlatform
   Assert-MIRLegacyThreshold -Name "generated_streams_without_manifest" -Actual ([int]$shipped.counts.generated_streams_without_manifest) -Maximum $MaxGeneratedStreamsWithoutManifest
 }
 

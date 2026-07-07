@@ -1,4 +1,4 @@
-local C = require("prototypes.config")
+local C = require("prototypes.mir.streams.registry")
 local defaults = require("defaults")
 local settings_resolver = require("prototypes.settings-resolver")
 
