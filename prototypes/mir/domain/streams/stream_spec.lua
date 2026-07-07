@@ -6,7 +6,7 @@ local function required(record, field)
   end
 end
 
-function M.from_legacy_stream(record)
+function M.from_stream_record(record)
   required(record, "stream_key")
   required(record, "technology_name")
   required(record, "effects")

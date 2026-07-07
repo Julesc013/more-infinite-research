@@ -5,7 +5,7 @@ local technology_builder = require("prototypes.mir.emit.technology_builder")
 local M = {}
 
 function M.emit(key, spec, fields)
-  local stream = stream_spec.from_legacy_stream({
+  local stream = stream_spec.from_stream_record({
     manifest_id = spec.manifest_id,
     stream_key = key,
     technology_name = "recipe-prod-" .. key .. "-1",

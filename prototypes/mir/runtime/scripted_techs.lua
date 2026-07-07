@@ -1,6 +1,6 @@
-local spoilage = require("control.effects.spoilage-preservation")
-local agricultural_growth = require("control.effects.agricultural-growth-speed")
-local productivity_family_adoption = require("control.productivity-family-adoption")
+local spoilage = require("prototypes.mir.runtime.effects.spoilage_preservation")
+local agricultural_growth = require("prototypes.mir.runtime.effects.agricultural_growth_speed")
+local productivity_family_adoption = require("prototypes.mir.runtime.productivity_family_adoption")
 local effective_settings = require("prototypes.mir.settings.effective")
 
 local M = {}

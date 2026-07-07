@@ -154,21 +154,18 @@ local function signature()
   return table.concat(entries, ";")
 end
 
-function A.emit_mod_data()
+function A.mod_data_payload()
   local adoption_signature = signature()
-  data:extend({
-    {
-      type = "mod-data",
-      name = MOD_DATA_NAME,
-      data_type = "more-infinite-research.productivity-family-adoption",
-      data = {
-        version = VERSION,
-        adopted = #adopted_productivity_family_recipes > 0,
-        adopted_count = #adopted_productivity_family_recipes,
-        signature = adoption_signature
-      }
+  return {
+    name = MOD_DATA_NAME,
+    data_type = "more-infinite-research.productivity-family-adoption",
+    data = {
+      version = VERSION,
+      adopted = #adopted_productivity_family_recipes > 0,
+      adopted_count = #adopted_productivity_family_recipes,
+      signature = adoption_signature
     }
-  })
+  }
 end
 
 return A

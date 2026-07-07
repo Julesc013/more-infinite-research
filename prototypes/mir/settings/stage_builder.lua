@@ -1,6 +1,6 @@
 local C = require("prototypes.mir.streams.registry")
 local defaults = require("prototypes.mir.settings.defaults")
-local settings_adapter = require("prototypes.mir.settings.legacy_adapter")
+local settings_adapter = require("prototypes.mir.settings.stage_adapter")
 local pipeline_extent_settings = require("prototypes.mir.settings.pipeline_extent")
 
 local settings_data = {}

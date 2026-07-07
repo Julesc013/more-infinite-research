@@ -12,8 +12,8 @@ end
 
 function M.run()
   assert_runtime_stage()
-  require("control.scripted-techs").register()
-  require("control.settings-profile").register()
+  require("prototypes.mir.runtime.scripted_techs").register()
+  require("prototypes.mir.runtime.settings_profile").register()
 end
 
 return M

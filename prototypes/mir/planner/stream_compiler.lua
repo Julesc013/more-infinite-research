@@ -13,7 +13,7 @@ local planner_requirements = require("prototypes.mir.planner.requirements")
 local planner_prerequisites = require("prototypes.mir.planner.prerequisites")
 local planner_science = require("prototypes.mir.planner.science")
 local science_packs = require("prototypes.mir.capabilities.science_integration.science_packs")
-local stream_emitter = require("prototypes.mir.emit.legacy_stream_adapter")
+local stream_emitter = require("prototypes.mir.emit.stream_spec_adapter")
 
 local M = {}
 

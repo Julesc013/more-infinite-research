@@ -1,5 +1,5 @@
 local M = {}
-local settings_resolver = require("control.settings-resolver")
+local settings_resolver = require("prototypes.mir.runtime.settings_resolver")
 
 M.technology_name = "recipe-prod-research_agricultural_growth_speed-1"
 M.stream_key = "research_agricultural_growth_speed"
