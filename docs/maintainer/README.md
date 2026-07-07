@@ -22,6 +22,9 @@ root entrypoint, locale, migration, graphics asset, or a temporary legacy shim.
 Development-only docs, scripts, fixtures, tests, build output, task ledgers, and
 release archives stay outside the shipped package.
 
+Use [settings governance](settings-governance.md) for startup setting IDs,
+visibility metadata, hidden unavailable stream settings, and backport behavior.
+
 ## Adding Or Moving Shipped Lua
 
 1. Keep the root Factorio file as a stage wrapper.

@@ -115,6 +115,14 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - module-boundaries
+  - path: docs/architecture/factorio-lifecycle.md
+    title: "Factorio Lifecycle Boundaries"
+    status: current
+    audience: maintainer
+    doc_type: explanation
+    owner: mir-maintainers
+    source_of_truth_for:
+      - factorio-lifecycle-boundaries
   - path: docs/architecture/procedural-compatibility-kernel.md
     title: "Procedural Compatibility Kernel"
     status: current
@@ -641,6 +649,14 @@ docs:
     doc_type: how-to
     owner: mir-maintainers
     source_of_truth_for: []
+  - path: docs/maintainer/settings-governance.md
+    title: "Settings Governance"
+    status: current
+    audience: maintainer
+    doc_type: how-to
+    owner: mir-maintainers
+    source_of_truth_for:
+      - settings-governance
   - path: docs/maintainer/report-diffing.md
     title: "Report Diffing"
     status: current
@@ -841,9 +857,17 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - stream-spec-schema
+  - path: docs/reference/settings.md
+    title: "Settings Reference"
+    status: current
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - settings-reference
   - path: docs/reference/settings-reference.md
     title: "Settings Reference"
-    status: draft
+    status: archived
     audience: developer
     doc_type: reference
     owner: mir-maintainers

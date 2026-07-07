@@ -34,6 +34,10 @@ More Infinite Research is organized around a compatibility-first data-stage pipe
 
 This order gives the mod the best practical view of recipes, labs, science packs, and technologies created by other mods while still keeping this mod's final cleanup deterministic.
 
+Use [Factorio lifecycle boundaries](factorio-lifecycle.md) for the exact
+settings-stage, prototype-stage, and runtime-stage separation behind the MIR 3
+settings and control-file rules.
+
 ## Control Stage Boundary
 
 `control.lua` is Factorio's runtime entrypoint. It is separate from

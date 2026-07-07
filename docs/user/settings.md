@@ -19,9 +19,10 @@ require a restart after changing them.
 
 Some technology settings are hidden when their required mod or DLC is not
 enabled. MIR still defines those setting keys internally so copied settings,
-existing saves, and target-line backports can keep stable values; the settings
-page only hides entries that the current mod set cannot use.
+existing saves, and target-line backports can keep stable values. If the
+relevant mod or expansion is enabled later, the setting can become visible
+again with the saved value still available.
 
 Use the in-game setting descriptions for exact defaults. Use
-[settings reference](../reference/settings-reference.md) for the canonical
+[settings reference](../reference/settings.md) for the canonical
 technical contract once a setting needs maintainer-level detail.

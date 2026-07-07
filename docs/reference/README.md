@@ -16,7 +16,7 @@ Reference docs hold exact contracts, schemas, generated IDs, settings details,
 and report fields.
 
 - [Generated ID reference](generated-id-reference.md)
-- [Settings reference](settings-reference.md)
+- [Settings reference](settings.md)
 - [Factorio integration reference](factorio-integration-reference.md)
 - [Factorio API proof points](factorio-api-proof-points.md)
 - [Glossary](glossary.md)

@@ -123,6 +123,7 @@ foreach ($manifest in @(
   ".mir/docs.yml",
   ".mir/modules.yml",
   ".mir/capabilities.yml",
+  ".mir/settings.yml",
   ".mir/compatibility.yml",
   ".mir/streams.yml",
   ".mir/fixtures.yml",
