@@ -403,6 +403,7 @@ prototypes/
 
     legacy/
       tech_gen.lua
+      stream_emitter.lua
       recipe_matching.lua
       compat_profiles.lua
       report_rows.lua

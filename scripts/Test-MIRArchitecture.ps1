@@ -153,6 +153,7 @@ $requiredShims = @(
   "prototypes/mir/compatibility/diagnostics/air_scrubbing.lua",
   "prototypes/mir/compatibility/overlays/air_scrubbing.lua",
   "prototypes/mir/compatibility/overlays/atan_ash.lua",
+  "prototypes/mir/legacy/stream_emitter.lua",
   "prototypes/mir/legacy/tech_gen.lua",
   "prototypes/mir/legacy/recipe_matching.lua",
   "prototypes/mir/legacy/compat_profiles.lua",
@@ -171,6 +172,18 @@ Assert-MIRContains -RelativePath $technologyBuilderPath -Text $technologyBuilder
 if ($technologyBuilderText -match "data:extend") {
   throw "$technologyBuilderPath must emit through the platform data_raw adapter."
 }
+
+$legacyStreamEmitterPath = "prototypes/mir/legacy/stream_emitter.lua"
+$legacyStreamEmitterText = Read-MIRFile -RelativePath $legacyStreamEmitterPath
+Assert-MIRContains -RelativePath $legacyStreamEmitterPath -Text $legacyStreamEmitterText -Needle 'require("prototypes.mir.domain.streams.stream_spec")'
+Assert-MIRContains -RelativePath $legacyStreamEmitterPath -Text $legacyStreamEmitterText -Needle 'require("prototypes.mir.emit.technology_builder")'
+Assert-MIRContains -RelativePath $legacyStreamEmitterPath -Text $legacyStreamEmitterText -Needle "stream_spec.from_legacy_stream({"
+Assert-MIRContains -RelativePath $legacyStreamEmitterPath -Text $legacyStreamEmitterText -Needle "technology_builder.emit(stream)"
+
+$legacyTechGenPath = "prototypes/tech-gen.lua"
+$legacyTechGenText = Read-MIRFile -RelativePath $legacyTechGenPath
+Assert-MIRContains -RelativePath $legacyTechGenPath -Text $legacyTechGenText -Needle 'require("prototypes.mir.legacy.stream_emitter")'
+Assert-MIRContains -RelativePath $legacyTechGenPath -Text $legacyTechGenText -Needle "stream_emitter.emit(key, spec, fields)"
 
 $settingsVisibilityPath = "prototypes/mir/settings/visibility.lua"
 $settingsVisibilityText = Read-MIRFile -RelativePath $settingsVisibilityPath

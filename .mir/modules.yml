@@ -67,6 +67,7 @@ namespace_shims:
   air_scrubbing_policy_overlay: prototypes/mir/compatibility/overlays/air_scrubbing.lua
   atan_ash_policy_overlay: prototypes/mir/compatibility/overlays/atan_ash.lua
   air_scrubbing_diagnostics: prototypes/mir/compatibility/diagnostics/air_scrubbing.lua
+  legacy_stream_emitter: prototypes/mir/legacy/stream_emitter.lua
 
 target_layers:
   stage:
