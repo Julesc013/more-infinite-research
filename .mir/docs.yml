@@ -910,6 +910,14 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - 3.0.0-transition-checkpoint-2
+  - path: docs/releases/3.0.0-transition-checkpoint-3.md
+    title: "3.0.0 Transition Checkpoint 3"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - 3.0.0-transition-checkpoint-3
   - path: docs/releases/3.0.0-local-library-gate-summary.md
     title: "3.0.0 Local Library Gate Summary"
     status: current
