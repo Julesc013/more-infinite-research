@@ -70,6 +70,7 @@ namespace_shims:
   decision_export: prototypes/mir/report/decision_export.lua
   compatibility_diagnostics_report: prototypes/mir/report/compatibility_diagnostics.lua
   planner_compiler: prototypes/mir/planner/compiler.lua
+  planner_direct_effects: prototypes/mir/planner/direct_effects.lua
   planner_native_modifiers: prototypes/mir/planner/native_modifiers.lua
   planner_requirements: prototypes/mir/planner/requirements.lua
   planner_science: prototypes/mir/planner/science.lua

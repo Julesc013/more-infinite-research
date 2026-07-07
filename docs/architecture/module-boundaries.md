@@ -127,6 +127,9 @@ centralizes recipe-productivity owner filtering and the associated diagnostic
 rows used by migrated stream planning. `prototypes/mir/policy/adoption_policy.lua`
 wraps productivity-family adoption decisions while the underlying adoption
 implementation is migrated out of the legacy compatibility path.
+`prototypes/mir/planner/direct_effects.lua` prepares direct-effect streams by
+asserting effect safety, dropping unavailable optional ammo categories, and
+applying fallback effect icons before emission planning.
 
 Compatibility policy uses `prototypes/mir/compatibility/`. Named compatibility
 targets live under `prototypes/mir/compatibility/overlays/`; those overlays

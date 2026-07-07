@@ -169,6 +169,7 @@ $requiredShims = @(
   "prototypes/mir/report/decision_export.lua",
   "prototypes/mir/report/compatibility_diagnostics.lua",
   "prototypes/mir/planner/compiler.lua",
+  "prototypes/mir/planner/direct_effects.lua",
   "prototypes/mir/planner/native_modifiers.lua",
   "prototypes/mir/planner/requirements.lua",
   "prototypes/mir/planner/science.lua",
@@ -212,6 +213,7 @@ $legacyTechGenText = Read-MIRFile -RelativePath $legacyTechGenPath
 Assert-MIRContains -RelativePath $legacyTechGenPath -Text $legacyTechGenText -Needle 'require("prototypes.mir.legacy.stream_emitter")'
 Assert-MIRContains -RelativePath $legacyTechGenPath -Text $legacyTechGenText -Needle 'require("prototypes.mir.policy.adoption_policy")'
 Assert-MIRContains -RelativePath $legacyTechGenPath -Text $legacyTechGenText -Needle 'require("prototypes.mir.policy.owner_policy")'
+Assert-MIRContains -RelativePath $legacyTechGenPath -Text $legacyTechGenText -Needle 'require("prototypes.mir.planner.direct_effects")'
 Assert-MIRContains -RelativePath $legacyTechGenPath -Text $legacyTechGenText -Needle 'require("prototypes.mir.planner.native_modifiers")'
 Assert-MIRContains -RelativePath $legacyTechGenPath -Text $legacyTechGenText -Needle 'require("prototypes.mir.planner.requirements")'
 Assert-MIRContains -RelativePath $legacyTechGenPath -Text $legacyTechGenText -Needle 'require("prototypes.mir.planner.science")'
@@ -221,6 +223,7 @@ Assert-MIRContains -RelativePath $legacyTechGenPath -Text $legacyTechGenText -Ne
 Assert-MIRContains -RelativePath $legacyTechGenPath -Text $legacyTechGenText -Needle "owner_policy.filter_existing_recipe_productivity(key, spec, buckets)"
 Assert-MIRContains -RelativePath $legacyTechGenPath -Text $legacyTechGenText -Needle "adoption_policy.adopt_recipe_productivity_family(key, spec, buckets)"
 Assert-MIRContains -RelativePath $legacyTechGenPath -Text $legacyTechGenText -Needle "adoption_policy.emit_mod_data()"
+Assert-MIRContains -RelativePath $legacyTechGenPath -Text $legacyTechGenText -Needle "direct_effects_planner.available_for_stream(key, spec)"
 Assert-MIRContains -RelativePath $legacyTechGenPath -Text $legacyTechGenText -Needle "stream_emitter.emit(key, spec, fields)"
 
 $adoptionPolicyPath = "prototypes/mir/policy/adoption_policy.lua"
@@ -300,6 +303,13 @@ Assert-MIRContains -RelativePath $plannerNativeModifiersPath -Text $plannerNativ
 Assert-MIRContains -RelativePath $plannerNativeModifiersPath -Text $plannerNativeModifiersText -Needle "function M.identity(effect)"
 Assert-MIRContains -RelativePath $plannerNativeModifiersPath -Text $plannerNativeModifiersText -Needle 'data_raw.prototypes("technology")'
 Assert-MIRContains -RelativePath $plannerNativeModifiersPath -Text $plannerNativeModifiersText -Needle "function M.record_overlaps(key, effects)"
+
+$plannerDirectEffectsPath = "prototypes/mir/planner/direct_effects.lua"
+$plannerDirectEffectsText = Read-MIRFile -RelativePath $plannerDirectEffectsPath
+Assert-MIRContains -RelativePath $plannerDirectEffectsPath -Text $plannerDirectEffectsText -Needle 'require("prototypes.technology-effect-safety")'
+Assert-MIRContains -RelativePath $plannerDirectEffectsPath -Text $plannerDirectEffectsText -Needle "function M.available_for_stream(key, spec)"
+Assert-MIRContains -RelativePath $plannerDirectEffectsPath -Text $plannerDirectEffectsText -Needle 'effect_safety.assert_effect_allowed(effect, "direct-effect stream " .. key)'
+Assert-MIRContains -RelativePath $plannerDirectEffectsPath -Text $plannerDirectEffectsText -Needle "U.effect_icons_for_stream(spec)"
 
 $plannerSciencePath = "prototypes/mir/planner/science.lua"
 $plannerScienceText = Read-MIRFile -RelativePath $plannerSciencePath

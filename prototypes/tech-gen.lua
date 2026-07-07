@@ -4,9 +4,9 @@ local U = require("prototypes.util")
 local D = require("prototypes.diagnostics")
 local deepcopy = require("prototypes.lib.deepcopy")
 local table_utils = require("prototypes.lib.table-utils")
-local effect_safety = require("prototypes.technology-effect-safety")
 local adoption_policy = require("prototypes.mir.policy.adoption_policy")
 local owner_policy = require("prototypes.mir.policy.owner_policy")
+local direct_effects_planner = require("prototypes.mir.planner.direct_effects")
 local native_modifiers = require("prototypes.mir.planner.native_modifiers")
 local planner_requirements = require("prototypes.mir.planner.requirements")
 local planner_science = require("prototypes.mir.planner.science")
@@ -101,21 +101,6 @@ local function expand_dynamic_items(spec)
   return out
 end
 
--- Direct-effect streams can outlive the prototype families they target when
--- optional mods are disabled, so filter effect rows before creating a tech.
-local function available_direct_effects(key, effects)
-  local out = {}
-  for _, effect in ipairs(effects or {}) do
-    effect_safety.assert_effect_allowed(effect, "direct-effect stream " .. key)
-    if effect.type == "gun-speed" and effect.ammo_category and not U.ammo_category_exists(effect.ammo_category) then
-      log("[more-infinite-research] Skipping unavailable gun-speed effect for "..key..": missing ammo category "..effect.ammo_category)
-    else
-      table.insert(out, effect)
-    end
-  end
-  return out
-end
-
 local function make_stream(key, raw_spec)
   if not U.enabled_for(key, raw_spec) then
     D.stream(D.stream_fields(key, raw_spec, "skipped", "disabled"))
@@ -138,16 +123,11 @@ local function make_stream(key, raw_spec)
 
   local direct_effects = nil
   if spec.direct_effects then
-    direct_effects = available_direct_effects(key, deepcopy(spec.direct_effects))
+    direct_effects = direct_effects_planner.available_for_stream(key, spec)
     if #direct_effects == 0 then
       log("[more-infinite-research] Skipping stream "..key.." because no available direct effects remain.")
       D.stream(D.stream_fields(key, spec, "skipped", "no_available_direct_effects"))
       return
-    end
-    for _, effect in ipairs(direct_effects) do
-      if effect.type == "nothing" and not effect.icon and not effect.icons then
-        effect.icons = U.effect_icons_for_stream(spec)
-      end
     end
   end
 
