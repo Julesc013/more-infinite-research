@@ -1,3 +1,20 @@
+local overlay_loader = require("prototypes.mir.compatibility.overlay_loader")
+
+local air_scrubbing_overlay = overlay_loader.get("air-scrubbing")
+local air_scrubbing_capability = air_scrubbing_overlay.capabilities["recipe-productivity"]
+
+local function lua_pattern_escape(value)
+  return (tostring(value or ""):gsub("([^%w])", "%%%1"))
+end
+
+local function exact_recipe_patterns(recipes)
+  local out = {}
+  for _, recipe_name in ipairs(recipes or {}) do
+    table.insert(out, "^" .. lua_pattern_escape(recipe_name) .. "$")
+  end
+  return out
+end
+
 return {
   research_copper = { items={"copper-plate"}, icon_item="copper-plate" },
   research_iron   = { items={"iron-plate"}, icon_item="iron-plate" },
@@ -158,14 +175,11 @@ return {
     science_packs = "derive-from-unlocks",
     prerequisites = "derive-from-unlocks",
     settings_note = {"", "Targets only exact clean filter crafting recipes. Scrubbing, cleaning, recovery, recycling, and environmental-removal recipes stay diagnostic-only."},
-    manifest_id = "mir-prod-air-scrubbing-clean-filter",
+    manifest_id = air_scrubbing_capability.stream.id,
     groups = {
       {
         change = 0.05,
-        recipe_patterns = {
-          "^atan%-pollution%-filter$",
-          "^atan%-spore%-filter$"
-        }
+        recipe_patterns = exact_recipe_patterns(air_scrubbing_capability.exact_recipes)
       }
     },
     icon_candidates = {

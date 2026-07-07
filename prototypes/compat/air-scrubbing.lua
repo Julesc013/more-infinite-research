@@ -1,15 +1,16 @@
 local D = require("prototypes.diagnostics")
+local overlay_loader = require("prototypes.mir.compatibility.overlay_loader")
 
 local M = {}
 
-local STREAM_KEY = "research_air_scrubbing_clean_filter"
-local STREAM_ID = "mir-prod-air-scrubbing-clean-filter"
-local TECH_NAME = "recipe-prod-research_air_scrubbing_clean_filter-1"
+local overlay = overlay_loader.get("air-scrubbing")
+local recipe_productivity = overlay.capabilities["recipe-productivity"]
 
-local ALLOWED_RECIPES = {
-  "atan-pollution-filter",
-  "atan-spore-filter"
-}
+local STREAM_KEY = recipe_productivity.stream.key
+local STREAM_ID = recipe_productivity.stream.id
+local TECH_NAME = recipe_productivity.stream.technology
+
+local ALLOWED_RECIPES = recipe_productivity.exact_recipes
 
 local ALLOWED = {}
 for _, recipe_name in ipairs(ALLOWED_RECIPES) do

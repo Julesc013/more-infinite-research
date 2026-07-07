@@ -172,6 +172,18 @@ if ($airScrubbingOverlayText -match 'require\("prototypes\.compat\.air-scrubbing
   throw "$airScrubbingOverlayPath must be policy data, not a legacy behavior shim."
 }
 
+$productivityStreamsPath = "prototypes/streams/productivity.lua"
+$productivityStreamsText = Read-MIRFile -RelativePath $productivityStreamsPath
+Assert-MIRContains -RelativePath $productivityStreamsPath -Text $productivityStreamsText -Needle 'overlay_loader.get("air-scrubbing")'
+Assert-MIRContains -RelativePath $productivityStreamsPath -Text $productivityStreamsText -Needle "air_scrubbing_capability.stream.id"
+Assert-MIRContains -RelativePath $productivityStreamsPath -Text $productivityStreamsText -Needle "exact_recipe_patterns(air_scrubbing_capability.exact_recipes)"
+
+$legacyAirScrubbingPath = "prototypes/compat/air-scrubbing.lua"
+$legacyAirScrubbingText = Read-MIRFile -RelativePath $legacyAirScrubbingPath
+Assert-MIRContains -RelativePath $legacyAirScrubbingPath -Text $legacyAirScrubbingText -Needle 'overlay_loader.get("air-scrubbing")'
+Assert-MIRContains -RelativePath $legacyAirScrubbingPath -Text $legacyAirScrubbingText -Needle "recipe_productivity.stream.key"
+Assert-MIRContains -RelativePath $legacyAirScrubbingPath -Text $legacyAirScrubbingText -Needle "recipe_productivity.exact_recipes"
+
 $claimRegistryPath = "prototypes/mir/compatibility/claim_registry.lua"
 $claimRegistryText = Read-MIRFile -RelativePath $claimRegistryPath
 Assert-MIRContains -RelativePath $claimRegistryPath -Text $claimRegistryText -Needle 'governance = ".mir/compatibility.yml"'
