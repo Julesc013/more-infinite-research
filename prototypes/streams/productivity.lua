@@ -93,6 +93,7 @@ return {
 
   research_thruster_fuel_productivity = {
     localised_name = {"technology-name.more-infinite-research.research_thruster_fuel_productivity"},
+    settings_required_mods = {"space-age"},
     required_fluids = {"thruster-fuel"},
     fluids = {"thruster-fuel"},
     exclude_recipe_patterns = {"^empty%-.*%-barrel$"},
@@ -105,6 +106,7 @@ return {
 
   research_thruster_oxidizer_productivity = {
     localised_name = {"technology-name.more-infinite-research.research_thruster_oxidizer_productivity"},
+    settings_required_mods = {"space-age"},
     required_fluids = {"thruster-oxidizer"},
     fluids = {"thruster-oxidizer"},
     exclude_recipe_patterns = {"^empty%-.*%-barrel$"},
@@ -172,6 +174,7 @@ return {
   research_air_scrubbing_clean_filter = {
     localised_name = {"", "Air Scrubbing clean-filter productivity"},
     localised_description = {"technology-description.more-infinite-research.recipe_productivity"},
+    settings_required_mods = air_scrubbing_overlay.applies_when.mods,
     science_packs = "derive-from-unlocks",
     prerequisites = "derive-from-unlocks",
     settings_note = {"", "Targets only exact clean filter crafting recipes. Scrubbing, cleaning, recovery, recycling, and environmental-removal recipes stay diagnostic-only."},
@@ -194,6 +197,7 @@ return {
   research_ash_separation = {
     localised_name = {"", "Ash separation productivity"},
     localised_description = {"technology-description.more-infinite-research.recipe_productivity"},
+    settings_required_mods = {"atan-ash"},
     science_packs = "derive-from-unlocks",
     prerequisites = "derive-from-unlocks",
     settings_note = {"", "Targets only the exact ATAN Ash separation recipe. Landfill, brick, nutrient, foundation, tile, and recovery-style ash sinks stay outside this stream."},
@@ -213,16 +217,16 @@ return {
     }
   },
 
-  research_tungsten = { items={"tungsten-plate","tungsten-carbide"}, icon_item="tungsten-plate", icon_tech="tungsten-processing" },
-  research_lithium = { icon_tech="lithium-processing", groups = {
+  research_tungsten = { settings_required_mods={"space-age"}, items={"tungsten-plate","tungsten-carbide"}, icon_item="tungsten-plate", icon_tech="tungsten-processing" },
+  research_lithium = { settings_required_mods={"space-age"}, icon_tech="lithium-processing", groups = {
     { change = 0.10, items = { "lithium-plate" } },
     { change = 0.05, items = { "lithium" }, recipe_patterns = { "^lithium$" } }
   } },
-  research_holmium = { items={"holmium-plate"}, icon_tech="holmium-processing" },
-  research_supercapacitor = { items={"supercapacitor"}, icon_tech="supercapacitor" },
-  research_superconductor = { items={"superconductor"}, icon_tech="superconductor" },
-  research_quantum_processor = { items={"quantum-processor"}, icon_tech="quantum-processor" },
-  research_carbon = { icon_item="carbon", groups = {
+  research_holmium = { settings_required_mods={"space-age"}, items={"holmium-plate"}, icon_tech="holmium-processing" },
+  research_supercapacitor = { settings_required_mods={"space-age"}, items={"supercapacitor"}, icon_tech="supercapacitor" },
+  research_superconductor = { settings_required_mods={"space-age"}, items={"superconductor"}, icon_tech="superconductor" },
+  research_quantum_processor = { settings_required_mods={"space-age"}, items={"quantum-processor"}, icon_tech="quantum-processor" },
+  research_carbon = { settings_required_mods={"space-age"}, icon_item="carbon", groups = {
     { change = 0.10, items = { "carbon" }, recipe_patterns = {
       "^carbonic%-asteroid%-crushing$",
       "^advanced%-carbonic%-asteroid%-crushing$",
@@ -231,18 +235,19 @@ return {
     { change = 0.05, recipe_patterns = { "^burnt%-spoilage$" } },
     { change = 0.02, recipe_patterns = { "^coal%-synthesis$" } }
   } },
-  research_carbon_fiber = { items={"carbon-fiber"}, icon_tech="carbon-fiber" },
-  research_ice = { items={"ice"}, icon_item="ice", recipe_patterns = {
+  research_carbon_fiber = { settings_required_mods={"space-age"}, items={"carbon-fiber"}, icon_tech="carbon-fiber" },
+  research_ice = { settings_required_mods={"space-age"}, items={"ice"}, icon_item="ice", recipe_patterns = {
     "^oxide%-asteroid%-crushing$",
     "^advanced%-oxide%-asteroid%-crushing$"
   } },
 
-  research_bioflux = { items={"bioflux"}, icon_tech="bioflux" },
-  research_bacteria_cultivation = { icon_tech = "bacteria-cultivation", recipe_patterns = {
+  research_bioflux = { settings_required_mods={"space-age"}, items={"bioflux"}, icon_tech="bioflux" },
+  research_bacteria_cultivation = { settings_required_mods={"space-age"}, icon_tech = "bacteria-cultivation", recipe_patterns = {
     "^iron%-bacteria%-cultivation$",
     "^copper%-bacteria%-cultivation$"
   } },
   research_breeding = {
+    settings_required_mods = {"space-age"},
     items = {"raw-fish","biter-egg","pentapod-egg"},
     mode = "by_category_or_match",
     match = { name_patterns={"cultivation","culture","breeding"} },
@@ -268,12 +273,12 @@ return {
     "^atan%-foundation%-from%-ash$"
   }, exclude_ingredient_patterns={"scrap"} },
 
-  research_artificial_soil = { icon_tech = "artificial-soil", groups = {
+  research_artificial_soil = { settings_required_mods={"space-age"}, icon_tech = "artificial-soil", groups = {
     { change = 0.10, item_patterns = { "^artificial%-.+%-soil$" } },
     { change = 0.05, item_patterns = { "^overgrowth%-.+%-soil$" } }
   } },
 
-  research_molten_metals = { icon_tech = "foundry", groups = {
+  research_molten_metals = { settings_required_mods={"space-age"}, icon_tech = "foundry", groups = {
     { change = 0.10, recipe_patterns = { "^molten%-iron%-from%-lava$", "^molten%-copper%-from%-lava$" } },
     { change = 0.05, recipe_patterns = { "^iron%-ore%-melting$", "^copper%-ore%-melting$" } }
   }, exclude_ingredient_patterns={"scrap"} },

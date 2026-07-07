@@ -1,5 +1,6 @@
 local C = require("prototypes.config")
 local defaults = require("defaults")
+local settings_visibility = require("prototypes.mir.policy.settings_visibility")
 local pipeline_extent_settings = require("prototypes.pipeline-extent-settings")
 
 local settings_data = {}
@@ -43,6 +44,10 @@ end
 local function append_note(description, note)
   if not note then return description end
   return {"", description, "\n\n", note}
+end
+
+local function add_technology_setting(group, setting)
+  table.insert(settings_data, settings_visibility.apply(setting, group and group.hidden))
 end
 
 table.insert(settings_data, {
@@ -258,7 +263,8 @@ for key, stream in pairs(C.streams) do
     key = key,
     stream = stream,
     sort_name = stream_sort_name(key),
-    enabled = default_enabled(key, stream)
+    enabled = default_enabled(key, stream),
+    hidden = settings_visibility.hidden_for_stream(stream)
   })
 end
 
@@ -297,7 +303,7 @@ for _, group in ipairs(technology_setting_groups) do
     local stream = group.stream
     local tech_locale = stream.localised_name or {"technology-name.more-infinite-research."..key}
     local settings_note = lookup_default(key, "settings_note", stream, nil)
-    table.insert(settings_data, {
+    add_technology_setting(group, {
       type = "bool-setting",
       name = "ips-enable-"..key,
       setting_type = "startup",
@@ -306,7 +312,7 @@ for _, group in ipairs(technology_setting_groups) do
       localised_name = {"mod-setting-name.ips-enable-stream", tech_locale},
       localised_description = append_note({"mod-setting-description.ips-enable-stream", tech_locale}, settings_note)
     })
-    table.insert(settings_data, {
+    add_technology_setting(group, {
       type = "int-setting",
       name = "ips-cost-base-"..key,
       setting_type = "startup",
@@ -317,7 +323,7 @@ for _, group in ipairs(technology_setting_groups) do
       localised_name = {"mod-setting-name.ips-cost-base-stream", tech_locale},
       localised_description = {"mod-setting-description.ips-cost-base-stream", tech_locale}
     })
-    table.insert(settings_data, {
+    add_technology_setting(group, {
       type = "double-setting",
       name = "ips-cost-growth-"..key,
       setting_type = "startup",
@@ -327,7 +333,7 @@ for _, group in ipairs(technology_setting_groups) do
       localised_name = {"mod-setting-name.ips-cost-growth-stream", tech_locale},
       localised_description = {"mod-setting-description.ips-cost-growth-stream", tech_locale}
     })
-    table.insert(settings_data, {
+    add_technology_setting(group, {
       type = "int-setting",
       name = "ips-max-level-"..key,
       setting_type = "startup",
@@ -338,7 +344,7 @@ for _, group in ipairs(technology_setting_groups) do
       localised_name = {"mod-setting-name.ips-max-level-stream", tech_locale},
       localised_description = {"mod-setting-description.ips-max-level-stream", tech_locale}
     })
-    table.insert(settings_data, {
+    add_technology_setting(group, {
       type = "int-setting",
       name = "ips-research-time-"..key,
       setting_type = "startup",
@@ -371,7 +377,7 @@ for _, group in ipairs(technology_setting_groups) do
       end
     end
     local locale = {"technology-name."..spec.key}
-    table.insert(settings_data, {
+    add_technology_setting(group, {
       type = "bool-setting",
       name = "mir-enable-"..spec.key,
       setting_type = "startup",
@@ -380,7 +386,7 @@ for _, group in ipairs(technology_setting_groups) do
       localised_name = {"mod-setting-name.mir-enable-base-tech", locale},
       localised_description = append_note({"mod-setting-description.mir-enable-base-tech", locale}, defaults_spec.settings_note)
     })
-    table.insert(settings_data, {
+    add_technology_setting(group, {
       type = "int-setting",
       name = "mir-cost-base-"..spec.key,
       setting_type = "startup",
@@ -391,7 +397,7 @@ for _, group in ipairs(technology_setting_groups) do
       localised_name = {"mod-setting-name.mir-cost-base", locale},
       localised_description = {"mod-setting-description.mir-cost-base", locale}
     })
-    table.insert(settings_data, {
+    add_technology_setting(group, {
       type = "double-setting",
       name = "mir-cost-growth-"..spec.key,
       setting_type = "startup",
@@ -401,7 +407,7 @@ for _, group in ipairs(technology_setting_groups) do
       localised_name = {"mod-setting-name.mir-cost-growth", locale},
       localised_description = {"mod-setting-description.mir-cost-growth", locale}
     })
-    table.insert(settings_data, {
+    add_technology_setting(group, {
       type = "int-setting",
       name = "mir-max-level-"..spec.key,
       setting_type = "startup",
@@ -412,7 +418,7 @@ for _, group in ipairs(technology_setting_groups) do
       localised_name = {"mod-setting-name.mir-max-level", locale},
       localised_description = {"mod-setting-description.mir-max-level", locale}
     })
-    table.insert(settings_data, {
+    add_technology_setting(group, {
       type = "int-setting",
       name = "mir-research-time-"..spec.key,
       setting_type = "startup",

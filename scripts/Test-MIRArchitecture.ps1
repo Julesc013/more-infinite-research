@@ -136,6 +136,8 @@ foreach ($entry in $entrypoints) {
 $requiredShims = @(
   "prototypes/mir/core/schema.lua",
   "prototypes/mir/platform/factorio/data_raw.lua",
+  "prototypes/mir/platform/factorio/mods.lua",
+  "prototypes/mir/policy/settings_visibility.lua",
   "prototypes/mir/domain/facts/registry.lua",
   "prototypes/mir/capabilities/contract.lua",
   "prototypes/mir/capabilities/registry.lua",
@@ -162,6 +164,12 @@ Assert-MIRContains -RelativePath $technologyBuilderPath -Text $technologyBuilder
 if ($technologyBuilderText -match "data:extend") {
   throw "$technologyBuilderPath must emit through the platform data_raw adapter."
 }
+
+$settingsVisibilityPath = "prototypes/mir/policy/settings_visibility.lua"
+$settingsVisibilityText = Read-MIRFile -RelativePath $settingsVisibilityPath
+Assert-MIRContains -RelativePath $settingsVisibilityPath -Text $settingsVisibilityText -Needle 'require("prototypes.mir.platform.factorio.mods")'
+Assert-MIRContains -RelativePath $settingsVisibilityPath -Text $settingsVisibilityText -Needle "function M.hidden_for_stream(stream)"
+Assert-MIRContains -RelativePath $settingsVisibilityPath -Text $settingsVisibilityText -Needle "stream.settings_required_mods"
 
 $airScrubbingOverlayPath = "prototypes/mir/compatibility/overlays/air_scrubbing.lua"
 $airScrubbingOverlayText = Read-MIRFile -RelativePath $airScrubbingOverlayPath

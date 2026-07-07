@@ -99,6 +99,12 @@ The first Factorio platform adapter is
 and `data:extend` so emitters can depend on a narrow Factorio port instead of
 calling global prototype mutation APIs directly.
 
+The settings-stage active-mod adapter is
+`prototypes/mir/platform/factorio/mods.lua`. Startup setting visibility may use
+the active `mods` table because Factorio provides it during settings stage, but
+it must not inspect `data.raw`: item, recipe, fluid, and technology prototypes
+are not finalized until the later prototype stage.
+
 Compatibility policy uses `prototypes/mir/compatibility/`. Named compatibility
 targets live under `prototypes/mir/compatibility/overlays/`; those overlays
 register selectors, claims, deny rules, and policy overrides only. They must not
@@ -260,6 +266,7 @@ prototypes/
     policy/
       defaults.lua
       settings_policy.lua
+      settings_visibility.lua
       capability_policy.lua
       family_policy.lua
       science_policy.lua
@@ -489,9 +496,9 @@ diagnose:
   Rejected Proposal -> DecisionRecord
 ```
 
-## Compatibility Pack Format
+## Compatibility Overlay Format
 
-Compatibility packs should be declarative:
+Compatibility overlays should be declarative:
 
 ```lua
 return {
@@ -536,7 +543,7 @@ return {
 }
 ```
 
-Do not put these calls inside compatibility packs:
+Do not put these calls inside compatibility overlays:
 
 ```lua
 data:extend(...)

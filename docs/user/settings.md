@@ -17,6 +17,11 @@ science-pack policy, diagnostics, and prototype-stage options. Startup settings
 are read during Factorio's prototype loading stages, so most generation choices
 require a restart after changing them.
 
+Some technology settings are hidden when their required mod or DLC is not
+enabled. MIR still defines those setting keys internally so copied settings,
+existing saves, and target-line backports can keep stable values; the settings
+page only hides entries that the current mod set cannot use.
+
 Use the in-game setting descriptions for exact defaults. Use
 [settings reference](../reference/settings-reference.md) for the canonical
 technical contract once a setting needs maintainer-level detail.
