@@ -27,25 +27,38 @@ recipes, and migration policy:
   "streams": {
     "mir-prod-air-scrubbing-clean-filter": {
       "introduced_in": "2.2.0",
-      "status": "stable",
-      "capability": "recipe-productivity.clean-filter",
+      "source": "compat_policy:air-scrubbing",
+      "capability": "recipe-productivity",
       "family": "clean_filter",
       "policy": "air-scrubbing.clean-filter",
-      "technology": "research_air_scrubbing_clean_filter_productivity",
-      "stream_key": "air_scrubbing_clean_filter_productivity",
+      "stable": true,
+      "generated_technology": "recipe-prod-research_air_scrubbing_clean_filter-1",
+      "stream_key": "research_air_scrubbing_clean_filter",
+      "migration_policy": "stable",
       "targets": [
         "atan-pollution-filter",
         "atan-spore-filter"
-      ],
-      "migration_policy": "preserve"
+      ]
     }
   }
 }
 ```
 
+The manifest row key is the stable stream ID used by governance and reporting.
+For generic legacy streams it is usually the generated technology name. For
+policy overlays, such as Air Scrubbing and ATAN Ash, the stable stream ID may be
+a clearer `mir-prod-*` ID while `generated_technology` preserves the actual
+Factorio prototype name.
+
+During the MIR 3 transition, legacy stream rows may use a target marker in the
+form `stream:<stream_key>` until their exact recipe, item, fluid, or modifier
+target sets are materialized in the capability layer.
+
 ## Rules
 
 - Every generated stream has a manifest row before release.
+- Every source stream key has exactly one manifest row.
+- Every generated technology name appears in exactly one manifest row.
 - Stable stream IDs do not change after release without a migration.
 - Removed streams become hidden, migrated, or explicitly documented.
 - Renamed technologies need JSON or Lua migrations where Factorio supports them.

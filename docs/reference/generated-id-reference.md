@@ -31,3 +31,9 @@ changes require migration review and release notes.
 The machine-readable generated stream record remains
 `prototypes/planner/generated-stream-manifest.json`, routed through
 `.mir/streams.yml`.
+
+Every stream key in the current legacy stream tables must have a manifest row.
+Most rows use the emitted `recipe-prod-<stream-key>-1` technology name as the
+manifest key. Compatibility policy streams may use a clearer stable `mir-prod-*`
+manifest key, but they still record the emitted Factorio technology name in
+`generated_technology`.

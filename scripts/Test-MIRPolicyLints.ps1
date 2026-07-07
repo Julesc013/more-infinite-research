@@ -39,11 +39,26 @@ function Assert-MIRTextContains {
   }
 }
 
+function Get-MIRStreamKeysFromSource {
+  param([Parameter(Mandatory)][string]$Path)
+
+  if (-not (Test-Path -LiteralPath $Path)) {
+    throw "Missing stream source for manifest lint: $Path"
+  }
+
+  return @(
+    Select-String -LiteralPath $Path -Pattern "^\s*(research_[A-Za-z0-9_]+)\s*=\s*\{" |
+      ForEach-Object { $_.Matches[0].Groups[1].Value }
+  )
+}
+
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
 $policyPath = Join-Path $repo "prototypes\lib\policy\capabilities.lua"
 $contractPath = Join-Path $repo "prototypes\lib\capabilities\contract.lua"
 $capabilityRegistryPath = Join-Path $repo "prototypes\lib\capabilities\registry.lua"
 $manifestPath = Join-Path $repo "prototypes\planner\generated-stream-manifest.json"
+$productivityStreamsPath = Join-Path $repo "prototypes\streams\productivity.lua"
+$directEffectStreamsPath = Join-Path $repo "prototypes\streams\direct-effects.lua"
 $claimsPath = Join-Path $repo "fixtures\compat-matrix\claims.json"
 $supportLanePath = Join-Path $repo "fixtures\compat-matrix\support-lanes.json"
 $compatibilityManifestPath = Join-Path $repo ".mir\compatibility.yml"
@@ -100,8 +115,43 @@ if ([int](Get-MIRProperty -Object $claims -Name "schema" -Default 0) -ne 1) {
 }
 
 $manifestStreamIds = @{}
+$manifestStreamKeys = @{}
+$manifestGeneratedTechnologies = @{}
 foreach ($streamProperty in @($streams.PSObject.Properties)) {
-  $manifestStreamIds[[string]$streamProperty.Name] = $true
+  $streamId = [string]$streamProperty.Name
+  $stream = $streamProperty.Value
+  $streamKey = [string](Get-MIRProperty -Object $stream -Name "stream_key")
+  $generatedTechnology = [string](Get-MIRProperty -Object $stream -Name "generated_technology")
+
+  if ($manifestStreamIds[$streamId]) {
+    throw "Generated stream manifest has duplicate row id: $streamId"
+  }
+  if ($manifestStreamKeys[$streamKey]) {
+    throw "Generated stream manifest has duplicate stream_key: $streamKey"
+  }
+  if ($manifestGeneratedTechnologies[$generatedTechnology]) {
+    throw "Generated stream manifest has duplicate generated_technology: $generatedTechnology"
+  }
+
+  $manifestStreamIds[$streamId] = $true
+  $manifestStreamKeys[$streamKey] = $true
+  $manifestGeneratedTechnologies[$generatedTechnology] = $true
+}
+
+$sourceStreamKeys = @(
+  Get-MIRStreamKeysFromSource -Path $productivityStreamsPath
+  Get-MIRStreamKeysFromSource -Path $directEffectStreamsPath
+)
+
+foreach ($streamKey in $sourceStreamKeys) {
+  if (-not $manifestStreamKeys[$streamKey]) {
+    throw "Generated stream manifest missing source stream_key: $streamKey"
+  }
+
+  $expectedGeneratedTechnology = "recipe-prod-$streamKey-1"
+  if (-not $manifestGeneratedTechnologies[$expectedGeneratedTechnology]) {
+    throw "Generated stream manifest missing emitted technology id for $streamKey`: $expectedGeneratedTechnology"
+  }
 }
 
 $mirStreamIds = @(

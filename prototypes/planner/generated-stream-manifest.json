@@ -1,6 +1,34 @@
 {
   "schema": 1,
   "streams": {
+    "recipe-prod-research_advanced_circuit-1": {
+      "introduced_in": "pre-2.2.0",
+      "source": "legacy_stream_table:productivity",
+      "capability": "recipe-productivity",
+      "family": "advanced_circuit",
+      "policy": "legacy.recipe-productivity-stream",
+      "stable": true,
+      "generated_technology": "recipe-prod-research_advanced_circuit-1",
+      "stream_key": "research_advanced_circuit",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_advanced_circuit"
+      ]
+    },
+    "recipe-prod-research_agricultural_growth_speed-1": {
+      "introduced_in": "pre-2.2.0",
+      "source": "legacy_stream_table:direct-effects",
+      "capability": "native-modifier",
+      "family": "agricultural_growth_speed",
+      "policy": "legacy.direct-effect-stream",
+      "stable": true,
+      "generated_technology": "recipe-prod-research_agricultural_growth_speed-1",
+      "stream_key": "research_agricultural_growth_speed",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_agricultural_growth_speed"
+      ]
+    },
     "mir-prod-air-scrubbing-clean-filter": {
       "introduced_in": "2.2.0",
       "source": "compat_policy:air-scrubbing",
@@ -16,6 +44,34 @@
         "atan-spore-filter"
       ]
     },
+    "recipe-prod-research_armor_components-1": {
+      "introduced_in": "pre-2.2.0",
+      "source": "legacy_stream_table:productivity",
+      "capability": "recipe-productivity",
+      "family": "armor_components",
+      "policy": "legacy.recipe-productivity-stream",
+      "stable": true,
+      "generated_technology": "recipe-prod-research_armor_components-1",
+      "stream_key": "research_armor_components",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_armor_components"
+      ]
+    },
+    "recipe-prod-research_artificial_soil-1": {
+      "introduced_in": "pre-2.2.0",
+      "source": "legacy_stream_table:productivity",
+      "capability": "recipe-productivity",
+      "family": "artificial_soil",
+      "policy": "legacy.recipe-productivity-stream",
+      "stable": true,
+      "generated_technology": "recipe-prod-research_artificial_soil-1",
+      "stream_key": "research_artificial_soil",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_artificial_soil"
+      ]
+    },
     "mir-prod-atan-ash-separation": {
       "introduced_in": "2.2.0",
       "source": "compat_policy:atan-ash",
@@ -28,6 +84,902 @@
       "migration_policy": "stable",
       "targets": [
         "atan-ash-seperation"
+      ]
+    },
+    "recipe-prod-research_bacteria_cultivation-1": {
+      "introduced_in": "pre-2.2.0",
+      "source": "legacy_stream_table:productivity",
+      "capability": "recipe-productivity",
+      "family": "bacteria_cultivation",
+      "policy": "legacy.recipe-productivity-stream",
+      "stable": true,
+      "generated_technology": "recipe-prod-research_bacteria_cultivation-1",
+      "stream_key": "research_bacteria_cultivation",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_bacteria_cultivation"
+      ]
+    },
+    "recipe-prod-research_batteries-1": {
+      "introduced_in": "pre-2.2.0",
+      "source": "legacy_stream_table:productivity",
+      "capability": "recipe-productivity",
+      "family": "batteries",
+      "policy": "legacy.recipe-productivity-stream",
+      "stable": true,
+      "generated_technology": "recipe-prod-research_batteries-1",
+      "stream_key": "research_batteries",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_batteries"
+      ]
+    },
+    "recipe-prod-research_belts-1": {
+      "introduced_in": "pre-2.2.0",
+      "source": "legacy_stream_table:productivity",
+      "capability": "recipe-productivity",
+      "family": "belts",
+      "policy": "legacy.recipe-productivity-stream",
+      "stable": true,
+      "generated_technology": "recipe-prod-research_belts-1",
+      "stream_key": "research_belts",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_belts"
+      ]
+    },
+    "recipe-prod-research_bioflux-1": {
+      "introduced_in": "pre-2.2.0",
+      "source": "legacy_stream_table:productivity",
+      "capability": "recipe-productivity",
+      "family": "bioflux",
+      "policy": "legacy.recipe-productivity-stream",
+      "stable": true,
+      "generated_technology": "recipe-prod-research_bioflux-1",
+      "stream_key": "research_bioflux",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_bioflux"
+      ]
+    },
+    "recipe-prod-research_breeding-1": {
+      "introduced_in": "pre-2.2.0",
+      "source": "legacy_stream_table:productivity",
+      "capability": "recipe-productivity",
+      "family": "breeding",
+      "policy": "legacy.recipe-productivity-stream",
+      "stable": true,
+      "generated_technology": "recipe-prod-research_breeding-1",
+      "stream_key": "research_breeding",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_breeding"
+      ]
+    },
+    "recipe-prod-research_bullets-1": {
+      "introduced_in": "pre-2.2.0",
+      "source": "legacy_stream_table:productivity",
+      "capability": "recipe-productivity",
+      "family": "bullets",
+      "policy": "legacy.recipe-productivity-stream",
+      "stable": true,
+      "generated_technology": "recipe-prod-research_bullets-1",
+      "stream_key": "research_bullets",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_bullets"
+      ]
+    },
+    "recipe-prod-research_cannon_shooting_speed-1": {
+      "introduced_in": "pre-2.2.0",
+      "source": "legacy_stream_table:direct-effects",
+      "capability": "native-modifier",
+      "family": "cannon_shooting_speed",
+      "policy": "legacy.direct-effect-stream",
+      "stable": true,
+      "generated_technology": "recipe-prod-research_cannon_shooting_speed-1",
+      "stream_key": "research_cannon_shooting_speed",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_cannon_shooting_speed"
+      ]
+    },
+    "recipe-prod-research_carbon-1": {
+      "introduced_in": "pre-2.2.0",
+      "source": "legacy_stream_table:productivity",
+      "capability": "recipe-productivity",
+      "family": "carbon",
+      "policy": "legacy.recipe-productivity-stream",
+      "stable": true,
+      "generated_technology": "recipe-prod-research_carbon-1",
+      "stream_key": "research_carbon",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_carbon"
+      ]
+    },
+    "recipe-prod-research_carbon_fiber-1": {
+      "introduced_in": "pre-2.2.0",
+      "source": "legacy_stream_table:productivity",
+      "capability": "recipe-productivity",
+      "family": "carbon_fiber",
+      "policy": "legacy.recipe-productivity-stream",
+      "stable": true,
+      "generated_technology": "recipe-prod-research_carbon_fiber-1",
+      "stream_key": "research_carbon_fiber",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_carbon_fiber"
+      ]
+    },
+    "recipe-prod-research_cargo_bay_unloading_distance-1": {
+      "introduced_in": "pre-2.2.0",
+      "source": "legacy_stream_table:direct-effects",
+      "capability": "native-modifier",
+      "family": "cargo_bay_unloading_distance",
+      "policy": "legacy.direct-effect-stream",
+      "stable": true,
+      "generated_technology": "recipe-prod-research_cargo_bay_unloading_distance-1",
+      "stream_key": "research_cargo_bay_unloading_distance",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_cargo_bay_unloading_distance"
+      ]
+    },
+    "recipe-prod-research_cargo_landing_pad_count-1": {
+      "introduced_in": "pre-2.2.0",
+      "source": "legacy_stream_table:direct-effects",
+      "capability": "native-modifier",
+      "family": "cargo_landing_pad_count",
+      "policy": "legacy.direct-effect-stream",
+      "stable": true,
+      "generated_technology": "recipe-prod-research_cargo_landing_pad_count-1",
+      "stream_key": "research_cargo_landing_pad_count",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_cargo_landing_pad_count"
+      ]
+    },
+    "recipe-prod-research_character_crafting_speed-1": {
+      "introduced_in": "pre-2.2.0",
+      "source": "legacy_stream_table:direct-effects",
+      "capability": "native-modifier",
+      "family": "character_crafting_speed",
+      "policy": "legacy.direct-effect-stream",
+      "stable": true,
+      "generated_technology": "recipe-prod-research_character_crafting_speed-1",
+      "stream_key": "research_character_crafting_speed",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_character_crafting_speed"
+      ]
+    },
+    "recipe-prod-research_character_mining_speed-1": {
+      "introduced_in": "pre-2.2.0",
+      "source": "legacy_stream_table:direct-effects",
+      "capability": "native-modifier",
+      "family": "character_mining_speed",
+      "policy": "legacy.direct-effect-stream",
+      "stable": true,
+      "generated_technology": "recipe-prod-research_character_mining_speed-1",
+      "stream_key": "research_character_mining_speed",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_character_mining_speed"
+      ]
+    },
+    "recipe-prod-research_character_reach-1": {
+      "introduced_in": "pre-2.2.0",
+      "source": "legacy_stream_table:direct-effects",
+      "capability": "native-modifier",
+      "family": "character_reach",
+      "policy": "legacy.direct-effect-stream",
+      "stable": true,
+      "generated_technology": "recipe-prod-research_character_reach-1",
+      "stream_key": "research_character_reach",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_character_reach"
+      ]
+    },
+    "recipe-prod-research_character_walking_speed-1": {
+      "introduced_in": "pre-2.2.0",
+      "source": "legacy_stream_table:direct-effects",
+      "capability": "native-modifier",
+      "family": "character_walking_speed",
+      "policy": "legacy.direct-effect-stream",
+      "stable": true,
+      "generated_technology": "recipe-prod-research_character_walking_speed-1",
+      "stream_key": "research_character_walking_speed",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_character_walking_speed"
+      ]
+    },
+    "recipe-prod-research_concrete-1": {
+      "introduced_in": "pre-2.2.0",
+      "source": "legacy_stream_table:productivity",
+      "capability": "recipe-productivity",
+      "family": "concrete",
+      "policy": "legacy.recipe-productivity-stream",
+      "stable": true,
+      "generated_technology": "recipe-prod-research_concrete-1",
+      "stream_key": "research_concrete",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_concrete"
+      ]
+    },
+    "recipe-prod-research_copper-1": {
+      "introduced_in": "pre-2.2.0",
+      "source": "legacy_stream_table:productivity",
+      "capability": "recipe-productivity",
+      "family": "copper",
+      "policy": "legacy.recipe-productivity-stream",
+      "stable": true,
+      "generated_technology": "recipe-prod-research_copper-1",
+      "stream_key": "research_copper",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_copper"
+      ]
+    },
+    "recipe-prod-research_copper_cable-1": {
+      "introduced_in": "pre-2.2.0",
+      "source": "legacy_stream_table:productivity",
+      "capability": "recipe-productivity",
+      "family": "copper_cable",
+      "policy": "legacy.recipe-productivity-stream",
+      "stable": true,
+      "generated_technology": "recipe-prod-research_copper_cable-1",
+      "stream_key": "research_copper_cable",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_copper_cable"
+      ]
+    },
+    "recipe-prod-research_electric_energy-1": {
+      "introduced_in": "pre-2.2.0",
+      "source": "legacy_stream_table:productivity",
+      "capability": "recipe-productivity",
+      "family": "electric_energy",
+      "policy": "legacy.recipe-productivity-stream",
+      "stable": true,
+      "generated_technology": "recipe-prod-research_electric_energy-1",
+      "stream_key": "research_electric_energy",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_electric_energy"
+      ]
+    },
+    "recipe-prod-research_electric_engine-1": {
+      "introduced_in": "pre-2.2.0",
+      "source": "legacy_stream_table:productivity",
+      "capability": "recipe-productivity",
+      "family": "electric_engine",
+      "policy": "legacy.recipe-productivity-stream",
+      "stable": true,
+      "generated_technology": "recipe-prod-research_electric_engine-1",
+      "stream_key": "research_electric_engine",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_electric_engine"
+      ]
+    },
+    "recipe-prod-research_electric_shooting_speed-1": {
+      "introduced_in": "pre-2.2.0",
+      "source": "legacy_stream_table:direct-effects",
+      "capability": "native-modifier",
+      "family": "electric_shooting_speed",
+      "policy": "legacy.direct-effect-stream",
+      "stable": true,
+      "generated_technology": "recipe-prod-research_electric_shooting_speed-1",
+      "stream_key": "research_electric_shooting_speed",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_electric_shooting_speed"
+      ]
+    },
+    "recipe-prod-research_electronic_circuit-1": {
+      "introduced_in": "pre-2.2.0",
+      "source": "legacy_stream_table:productivity",
+      "capability": "recipe-productivity",
+      "family": "electronic_circuit",
+      "policy": "legacy.recipe-productivity-stream",
+      "stable": true,
+      "generated_technology": "recipe-prod-research_electronic_circuit-1",
+      "stream_key": "research_electronic_circuit",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_electronic_circuit"
+      ]
+    },
+    "recipe-prod-research_engine-1": {
+      "introduced_in": "pre-2.2.0",
+      "source": "legacy_stream_table:productivity",
+      "capability": "recipe-productivity",
+      "family": "engine",
+      "policy": "legacy.recipe-productivity-stream",
+      "stable": true,
+      "generated_technology": "recipe-prod-research_engine-1",
+      "stream_key": "research_engine",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_engine"
+      ]
+    },
+    "recipe-prod-research_explosives-1": {
+      "introduced_in": "pre-2.2.0",
+      "source": "legacy_stream_table:productivity",
+      "capability": "recipe-productivity",
+      "family": "explosives",
+      "policy": "legacy.recipe-productivity-stream",
+      "stable": true,
+      "generated_technology": "recipe-prod-research_explosives-1",
+      "stream_key": "research_explosives",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_explosives"
+      ]
+    },
+    "recipe-prod-research_flamethrower_shooting_speed-1": {
+      "introduced_in": "pre-2.2.0",
+      "source": "legacy_stream_table:direct-effects",
+      "capability": "native-modifier",
+      "family": "flamethrower_shooting_speed",
+      "policy": "legacy.direct-effect-stream",
+      "stable": true,
+      "generated_technology": "recipe-prod-research_flamethrower_shooting_speed-1",
+      "stream_key": "research_flamethrower_shooting_speed",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_flamethrower_shooting_speed"
+      ]
+    },
+    "recipe-prod-research_flying_robot_frame-1": {
+      "introduced_in": "pre-2.2.0",
+      "source": "legacy_stream_table:productivity",
+      "capability": "recipe-productivity",
+      "family": "flying_robot_frame",
+      "policy": "legacy.recipe-productivity-stream",
+      "stable": true,
+      "generated_technology": "recipe-prod-research_flying_robot_frame-1",
+      "stream_key": "research_flying_robot_frame",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_flying_robot_frame"
+      ]
+    },
+    "recipe-prod-research_furnace-1": {
+      "introduced_in": "pre-2.2.0",
+      "source": "legacy_stream_table:productivity",
+      "capability": "recipe-productivity",
+      "family": "furnace",
+      "policy": "legacy.recipe-productivity-stream",
+      "stable": true,
+      "generated_technology": "recipe-prod-research_furnace-1",
+      "stream_key": "research_furnace",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_furnace"
+      ]
+    },
+    "recipe-prod-research_gears-1": {
+      "introduced_in": "pre-2.2.0",
+      "source": "legacy_stream_table:productivity",
+      "capability": "recipe-productivity",
+      "family": "gears",
+      "policy": "legacy.recipe-productivity-stream",
+      "stable": true,
+      "generated_technology": "recipe-prod-research_gears-1",
+      "stream_key": "research_gears",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_gears"
+      ]
+    },
+    "recipe-prod-research_grenades-1": {
+      "introduced_in": "pre-2.2.0",
+      "source": "legacy_stream_table:productivity",
+      "capability": "recipe-productivity",
+      "family": "grenades",
+      "policy": "legacy.recipe-productivity-stream",
+      "stable": true,
+      "generated_technology": "recipe-prod-research_grenades-1",
+      "stream_key": "research_grenades",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_grenades"
+      ]
+    },
+    "recipe-prod-research_heavy_ammo-1": {
+      "introduced_in": "pre-2.2.0",
+      "source": "legacy_stream_table:productivity",
+      "capability": "recipe-productivity",
+      "family": "heavy_ammo",
+      "policy": "legacy.recipe-productivity-stream",
+      "stable": true,
+      "generated_technology": "recipe-prod-research_heavy_ammo-1",
+      "stream_key": "research_heavy_ammo",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_heavy_ammo"
+      ]
+    },
+    "recipe-prod-research_holmium-1": {
+      "introduced_in": "pre-2.2.0",
+      "source": "legacy_stream_table:productivity",
+      "capability": "recipe-productivity",
+      "family": "holmium",
+      "policy": "legacy.recipe-productivity-stream",
+      "stable": true,
+      "generated_technology": "recipe-prod-research_holmium-1",
+      "stream_key": "research_holmium",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_holmium"
+      ]
+    },
+    "recipe-prod-research_ice-1": {
+      "introduced_in": "pre-2.2.0",
+      "source": "legacy_stream_table:productivity",
+      "capability": "recipe-productivity",
+      "family": "ice",
+      "policy": "legacy.recipe-productivity-stream",
+      "stable": true,
+      "generated_technology": "recipe-prod-research_ice-1",
+      "stream_key": "research_ice",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_ice"
+      ]
+    },
+    "recipe-prod-research_inserters-1": {
+      "introduced_in": "pre-2.2.0",
+      "source": "legacy_stream_table:productivity",
+      "capability": "recipe-productivity",
+      "family": "inserters",
+      "policy": "legacy.recipe-productivity-stream",
+      "stable": true,
+      "generated_technology": "recipe-prod-research_inserters-1",
+      "stream_key": "research_inserters",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_inserters"
+      ]
+    },
+    "recipe-prod-research_inventory_capacity-1": {
+      "introduced_in": "pre-2.2.0",
+      "source": "legacy_stream_table:direct-effects",
+      "capability": "native-modifier",
+      "family": "inventory_capacity",
+      "policy": "legacy.direct-effect-stream",
+      "stable": true,
+      "generated_technology": "recipe-prod-research_inventory_capacity-1",
+      "stream_key": "research_inventory_capacity",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_inventory_capacity"
+      ]
+    },
+    "recipe-prod-research_iron-1": {
+      "introduced_in": "pre-2.2.0",
+      "source": "legacy_stream_table:productivity",
+      "capability": "recipe-productivity",
+      "family": "iron",
+      "policy": "legacy.recipe-productivity-stream",
+      "stable": true,
+      "generated_technology": "recipe-prod-research_iron-1",
+      "stream_key": "research_iron",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_iron"
+      ]
+    },
+    "recipe-prod-research_iron_sticks-1": {
+      "introduced_in": "pre-2.2.0",
+      "source": "legacy_stream_table:productivity",
+      "capability": "recipe-productivity",
+      "family": "iron_sticks",
+      "policy": "legacy.recipe-productivity-stream",
+      "stable": true,
+      "generated_technology": "recipe-prod-research_iron_sticks-1",
+      "stream_key": "research_iron_sticks",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_iron_sticks"
+      ]
+    },
+    "recipe-prod-research_lab_productivity-1": {
+      "introduced_in": "pre-2.2.0",
+      "source": "legacy_stream_table:direct-effects",
+      "capability": "native-modifier",
+      "family": "lab_productivity",
+      "policy": "legacy.direct-effect-stream",
+      "stable": true,
+      "generated_technology": "recipe-prod-research_lab_productivity-1",
+      "stream_key": "research_lab_productivity",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_lab_productivity"
+      ]
+    },
+    "recipe-prod-research_landfill-1": {
+      "introduced_in": "pre-2.2.0",
+      "source": "legacy_stream_table:productivity",
+      "capability": "recipe-productivity",
+      "family": "landfill",
+      "policy": "legacy.recipe-productivity-stream",
+      "stable": true,
+      "generated_technology": "recipe-prod-research_landfill-1",
+      "stream_key": "research_landfill",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_landfill"
+      ]
+    },
+    "recipe-prod-research_lithium-1": {
+      "introduced_in": "pre-2.2.0",
+      "source": "legacy_stream_table:productivity",
+      "capability": "recipe-productivity",
+      "family": "lithium",
+      "policy": "legacy.recipe-productivity-stream",
+      "stable": true,
+      "generated_technology": "recipe-prod-research_lithium-1",
+      "stream_key": "research_lithium",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_lithium"
+      ]
+    },
+    "recipe-prod-research_low_density_structure-1": {
+      "introduced_in": "pre-2.2.0",
+      "source": "legacy_stream_table:productivity",
+      "capability": "recipe-productivity",
+      "family": "low_density_structure",
+      "policy": "legacy.recipe-productivity-stream",
+      "stable": true,
+      "generated_technology": "recipe-prod-research_low_density_structure-1",
+      "stream_key": "research_low_density_structure",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_low_density_structure"
+      ]
+    },
+    "recipe-prod-research_lubricant_productivity-1": {
+      "introduced_in": "pre-2.2.0",
+      "source": "legacy_stream_table:productivity",
+      "capability": "recipe-productivity",
+      "family": "lubricant_productivity",
+      "policy": "legacy.recipe-productivity-stream",
+      "stable": true,
+      "generated_technology": "recipe-prod-research_lubricant_productivity-1",
+      "stream_key": "research_lubricant_productivity",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_lubricant_productivity"
+      ]
+    },
+    "recipe-prod-research_mining_drill-1": {
+      "introduced_in": "pre-2.2.0",
+      "source": "legacy_stream_table:productivity",
+      "capability": "recipe-productivity",
+      "family": "mining_drill",
+      "policy": "legacy.recipe-productivity-stream",
+      "stable": true,
+      "generated_technology": "recipe-prod-research_mining_drill-1",
+      "stream_key": "research_mining_drill",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_mining_drill"
+      ]
+    },
+    "recipe-prod-research_modules-1": {
+      "introduced_in": "pre-2.2.0",
+      "source": "legacy_stream_table:productivity",
+      "capability": "recipe-productivity",
+      "family": "modules",
+      "policy": "legacy.recipe-productivity-stream",
+      "stable": true,
+      "generated_technology": "recipe-prod-research_modules-1",
+      "stream_key": "research_modules",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_modules"
+      ]
+    },
+    "recipe-prod-research_molten_metals-1": {
+      "introduced_in": "pre-2.2.0",
+      "source": "legacy_stream_table:productivity",
+      "capability": "recipe-productivity",
+      "family": "molten_metals",
+      "policy": "legacy.recipe-productivity-stream",
+      "stable": true,
+      "generated_technology": "recipe-prod-research_molten_metals-1",
+      "stream_key": "research_molten_metals",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_molten_metals"
+      ]
+    },
+    "recipe-prod-research_oil_cracking_productivity-1": {
+      "introduced_in": "pre-2.2.0",
+      "source": "legacy_stream_table:productivity",
+      "capability": "recipe-productivity",
+      "family": "oil_cracking_productivity",
+      "policy": "legacy.recipe-productivity-stream",
+      "stable": true,
+      "generated_technology": "recipe-prod-research_oil_cracking_productivity-1",
+      "stream_key": "research_oil_cracking_productivity",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_oil_cracking_productivity"
+      ]
+    },
+    "recipe-prod-research_oil_processing_productivity-1": {
+      "introduced_in": "pre-2.2.0",
+      "source": "legacy_stream_table:productivity",
+      "capability": "recipe-productivity",
+      "family": "oil_processing_productivity",
+      "policy": "legacy.recipe-productivity-stream",
+      "stable": true,
+      "generated_technology": "recipe-prod-research_oil_processing_productivity-1",
+      "stream_key": "research_oil_processing_productivity",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_oil_processing_productivity"
+      ]
+    },
+    "recipe-prod-research_plastic-1": {
+      "introduced_in": "pre-2.2.0",
+      "source": "legacy_stream_table:productivity",
+      "capability": "recipe-productivity",
+      "family": "plastic",
+      "policy": "legacy.recipe-productivity-stream",
+      "stable": true,
+      "generated_technology": "recipe-prod-research_plastic-1",
+      "stream_key": "research_plastic",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_plastic"
+      ]
+    },
+    "recipe-prod-research_processing_unit-1": {
+      "introduced_in": "pre-2.2.0",
+      "source": "legacy_stream_table:productivity",
+      "capability": "recipe-productivity",
+      "family": "processing_unit",
+      "policy": "legacy.recipe-productivity-stream",
+      "stable": true,
+      "generated_technology": "recipe-prod-research_processing_unit-1",
+      "stream_key": "research_processing_unit",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_processing_unit"
+      ]
+    },
+    "recipe-prod-research_quantum_processor-1": {
+      "introduced_in": "pre-2.2.0",
+      "source": "legacy_stream_table:productivity",
+      "capability": "recipe-productivity",
+      "family": "quantum_processor",
+      "policy": "legacy.recipe-productivity-stream",
+      "stable": true,
+      "generated_technology": "recipe-prod-research_quantum_processor-1",
+      "stream_key": "research_quantum_processor",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_quantum_processor"
+      ]
+    },
+    "recipe-prod-research_rails-1": {
+      "introduced_in": "pre-2.2.0",
+      "source": "legacy_stream_table:productivity",
+      "capability": "recipe-productivity",
+      "family": "rails",
+      "policy": "legacy.recipe-productivity-stream",
+      "stable": true,
+      "generated_technology": "recipe-prod-research_rails-1",
+      "stream_key": "research_rails",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_rails"
+      ]
+    },
+    "recipe-prod-research_robot_battery-1": {
+      "introduced_in": "pre-2.2.0",
+      "source": "legacy_stream_table:direct-effects",
+      "capability": "native-modifier",
+      "family": "robot_battery",
+      "policy": "legacy.direct-effect-stream",
+      "stable": true,
+      "generated_technology": "recipe-prod-research_robot_battery-1",
+      "stream_key": "research_robot_battery",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_robot_battery"
+      ]
+    },
+    "recipe-prod-research_rocket_fuel-1": {
+      "introduced_in": "pre-2.2.0",
+      "source": "legacy_stream_table:productivity",
+      "capability": "recipe-productivity",
+      "family": "rocket_fuel",
+      "policy": "legacy.recipe-productivity-stream",
+      "stable": true,
+      "generated_technology": "recipe-prod-research_rocket_fuel-1",
+      "stream_key": "research_rocket_fuel",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_rocket_fuel"
+      ]
+    },
+    "recipe-prod-research_rocket_shooting_speed-1": {
+      "introduced_in": "pre-2.2.0",
+      "source": "legacy_stream_table:direct-effects",
+      "capability": "native-modifier",
+      "family": "rocket_shooting_speed",
+      "policy": "legacy.direct-effect-stream",
+      "stable": true,
+      "generated_technology": "recipe-prod-research_rocket_shooting_speed-1",
+      "stream_key": "research_rocket_shooting_speed",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_rocket_shooting_speed"
+      ]
+    },
+    "recipe-prod-research_rockets-1": {
+      "introduced_in": "pre-2.2.0",
+      "source": "legacy_stream_table:productivity",
+      "capability": "recipe-productivity",
+      "family": "rockets",
+      "policy": "legacy.recipe-productivity-stream",
+      "stable": true,
+      "generated_technology": "recipe-prod-research_rockets-1",
+      "stream_key": "research_rockets",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_rockets"
+      ]
+    },
+    "recipe-prod-research_science_pack_productivity-1": {
+      "introduced_in": "pre-2.2.0",
+      "source": "legacy_stream_table:productivity",
+      "capability": "recipe-productivity",
+      "family": "science_pack_productivity",
+      "policy": "legacy.recipe-productivity-stream",
+      "stable": true,
+      "generated_technology": "recipe-prod-research_science_pack_productivity-1",
+      "stream_key": "research_science_pack_productivity",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_science_pack_productivity"
+      ]
+    },
+    "recipe-prod-research_spoilage_preservation-1": {
+      "introduced_in": "pre-2.2.0",
+      "source": "legacy_stream_table:direct-effects",
+      "capability": "native-modifier",
+      "family": "spoilage_preservation",
+      "policy": "legacy.direct-effect-stream",
+      "stable": true,
+      "generated_technology": "recipe-prod-research_spoilage_preservation-1",
+      "stream_key": "research_spoilage_preservation",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_spoilage_preservation"
+      ]
+    },
+    "recipe-prod-research_sulfur-1": {
+      "introduced_in": "pre-2.2.0",
+      "source": "legacy_stream_table:productivity",
+      "capability": "recipe-productivity",
+      "family": "sulfur",
+      "policy": "legacy.recipe-productivity-stream",
+      "stable": true,
+      "generated_technology": "recipe-prod-research_sulfur-1",
+      "stream_key": "research_sulfur",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_sulfur"
+      ]
+    },
+    "recipe-prod-research_sulfuric_acid_productivity-1": {
+      "introduced_in": "pre-2.2.0",
+      "source": "legacy_stream_table:productivity",
+      "capability": "recipe-productivity",
+      "family": "sulfuric_acid_productivity",
+      "policy": "legacy.recipe-productivity-stream",
+      "stable": true,
+      "generated_technology": "recipe-prod-research_sulfuric_acid_productivity-1",
+      "stream_key": "research_sulfuric_acid_productivity",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_sulfuric_acid_productivity"
+      ]
+    },
+    "recipe-prod-research_supercapacitor-1": {
+      "introduced_in": "pre-2.2.0",
+      "source": "legacy_stream_table:productivity",
+      "capability": "recipe-productivity",
+      "family": "supercapacitor",
+      "policy": "legacy.recipe-productivity-stream",
+      "stable": true,
+      "generated_technology": "recipe-prod-research_supercapacitor-1",
+      "stream_key": "research_supercapacitor",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_supercapacitor"
+      ]
+    },
+    "recipe-prod-research_superconductor-1": {
+      "introduced_in": "pre-2.2.0",
+      "source": "legacy_stream_table:productivity",
+      "capability": "recipe-productivity",
+      "family": "superconductor",
+      "policy": "legacy.recipe-productivity-stream",
+      "stable": true,
+      "generated_technology": "recipe-prod-research_superconductor-1",
+      "stream_key": "research_superconductor",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_superconductor"
+      ]
+    },
+    "recipe-prod-research_thruster_fuel_productivity-1": {
+      "introduced_in": "pre-2.2.0",
+      "source": "legacy_stream_table:productivity",
+      "capability": "recipe-productivity",
+      "family": "thruster_fuel_productivity",
+      "policy": "legacy.recipe-productivity-stream",
+      "stable": true,
+      "generated_technology": "recipe-prod-research_thruster_fuel_productivity-1",
+      "stream_key": "research_thruster_fuel_productivity",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_thruster_fuel_productivity"
+      ]
+    },
+    "recipe-prod-research_thruster_oxidizer_productivity-1": {
+      "introduced_in": "pre-2.2.0",
+      "source": "legacy_stream_table:productivity",
+      "capability": "recipe-productivity",
+      "family": "thruster_oxidizer_productivity",
+      "policy": "legacy.recipe-productivity-stream",
+      "stable": true,
+      "generated_technology": "recipe-prod-research_thruster_oxidizer_productivity-1",
+      "stream_key": "research_thruster_oxidizer_productivity",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_thruster_oxidizer_productivity"
+      ]
+    },
+    "recipe-prod-research_tungsten-1": {
+      "introduced_in": "pre-2.2.0",
+      "source": "legacy_stream_table:productivity",
+      "capability": "recipe-productivity",
+      "family": "tungsten",
+      "policy": "legacy.recipe-productivity-stream",
+      "stable": true,
+      "generated_technology": "recipe-prod-research_tungsten-1",
+      "stream_key": "research_tungsten",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_tungsten"
+      ]
+    },
+    "recipe-prod-research_walls-1": {
+      "introduced_in": "pre-2.2.0",
+      "source": "legacy_stream_table:productivity",
+      "capability": "recipe-productivity",
+      "family": "walls",
+      "policy": "legacy.recipe-productivity-stream",
+      "stable": true,
+      "generated_technology": "recipe-prod-research_walls-1",
+      "stream_key": "research_walls",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_walls"
       ]
     }
   }
