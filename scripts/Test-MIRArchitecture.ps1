@@ -135,6 +135,7 @@ foreach ($entry in $entrypoints) {
 
 $requiredShims = @(
   "prototypes/mir/core/schema.lua",
+  "prototypes/mir/platform/factorio/data_raw.lua",
   "prototypes/mir/domain/facts/registry.lua",
   "prototypes/mir/capabilities/contract.lua",
   "prototypes/mir/capabilities/registry.lua",
@@ -152,6 +153,14 @@ $requiredShims = @(
 
 foreach ($relative in $requiredShims) {
   $null = Read-MIRFile -RelativePath $relative
+}
+
+$technologyBuilderPath = "prototypes/mir/emit/technology_builder.lua"
+$technologyBuilderText = Read-MIRFile -RelativePath $technologyBuilderPath
+Assert-MIRContains -RelativePath $technologyBuilderPath -Text $technologyBuilderText -Needle 'require("prototypes.mir.platform.factorio.data_raw")'
+Assert-MIRContains -RelativePath $technologyBuilderPath -Text $technologyBuilderText -Needle "data_raw.extend({ technology })"
+if ($technologyBuilderText -match "data:extend") {
+  throw "$technologyBuilderPath must emit through the platform data_raw adapter."
 }
 
 $airScrubbingOverlayPath = "prototypes/mir/compatibility/overlays/air_scrubbing.lua"

@@ -94,6 +94,11 @@ stage entrypoint. This is a behavior-preserving shell migration. The generation
 modules still move behind `domain/`, `capabilities/`, `planner/`, and `emit/`
 in later slices.
 
+The first Factorio platform adapter is
+`prototypes/mir/platform/factorio/data_raw.lua`. It wraps access to `data.raw`
+and `data:extend` so emitters can depend on a narrow Factorio port instead of
+calling global prototype mutation APIs directly.
+
 Compatibility policy uses `prototypes/mir/compatibility/`. Named compatibility
 targets live under `prototypes/mir/compatibility/overlays/`; those overlays
 register selectors, claims, deny rules, and policy overrides only. They must not

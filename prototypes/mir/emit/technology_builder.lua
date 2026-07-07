@@ -1,4 +1,5 @@
 local M = {}
+local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 
 local function require_field(spec, field)
   if spec[field] == nil then
@@ -44,7 +45,7 @@ end
 
 function M.emit(spec)
   local technology = M.prototype(spec)
-  data:extend({ technology })
+  data_raw.extend({ technology })
   return technology
 end
 

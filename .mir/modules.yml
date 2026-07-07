@@ -46,6 +46,7 @@ runtime_boundaries:
 
 namespace_shims:
   schema: prototypes/mir/core/schema.lua
+  factorio_data_raw: prototypes/mir/platform/factorio/data_raw.lua
   fact_registry: prototypes/mir/domain/facts/registry.lua
   decision_record: prototypes/mir/domain/decisions/decision_record.lua
   stream_spec: prototypes/mir/domain/streams/stream_spec.lua
