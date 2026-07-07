@@ -547,7 +547,7 @@ Assert-MIRContains -RelativePath $plannerSciencePath -Text $plannerScienceText -
 $plannerCostsPath = "prototypes/mir/planner/costs.lua"
 $plannerCostsText = Read-MIRFile -RelativePath $plannerCostsPath
 Assert-MIRContains -RelativePath $plannerCostsPath -Text $plannerCostsText -Needle 'require("prototypes.mir.streams.registry")'
-Assert-MIRContains -RelativePath $plannerCostsPath -Text $plannerCostsText -Needle 'require("prototypes.settings-resolver")'
+Assert-MIRContains -RelativePath $plannerCostsPath -Text $plannerCostsText -Needle 'require("prototypes.mir.settings.resolver")'
 Assert-MIRContains -RelativePath $plannerCostsPath -Text $plannerCostsText -Needle "function M.enabled_for(key, spec)"
 Assert-MIRContains -RelativePath $plannerCostsPath -Text $plannerCostsText -Needle "function M.max_level_for(key, spec)"
 

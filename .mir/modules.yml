@@ -62,6 +62,8 @@ namespace_shims:
   settings_legacy_adapter: prototypes/mir/settings/legacy_adapter.lua
   settings_profile_codec: prototypes/mir/settings/profile_codec.lua
   settings_effective: prototypes/mir/settings/effective.lua
+  settings_resolver: prototypes/mir/settings/resolver.lua
+  settings_pipeline_extent: prototypes/mir/settings/pipeline_extent.lua
   stream_registry: prototypes/mir/streams/registry.lua
   adoption_policy: prototypes/mir/policy/adoption_policy.lua
   owner_policy: prototypes/mir/policy/owner_policy.lua

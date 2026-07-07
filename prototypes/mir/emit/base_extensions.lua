@@ -4,7 +4,7 @@ local base_defaults = defaults.base_extensions or {}
 
 local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 local D = require("prototypes.mir.report.diagnostics_sink")
-local settings_resolver = require("prototypes.settings-resolver")
+local settings_resolver = require("prototypes.mir.settings.resolver")
 local deepcopy = require("prototypes.mir.core.deepcopy")
 local table_utils = require("prototypes.mir.core.table")
 local effect_safety = require("prototypes.technology-effect-safety")

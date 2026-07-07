@@ -1,6 +1,6 @@
 local defaults = require("defaults")
 local cleanup = require("prototypes.mir.policy.technology_cleanup")
-local settings_resolver = require("prototypes.settings-resolver")
+local settings_resolver = require("prototypes.mir.settings.resolver")
 local effective_settings = require("prototypes.mir.settings.effective")
 
 local M = {}

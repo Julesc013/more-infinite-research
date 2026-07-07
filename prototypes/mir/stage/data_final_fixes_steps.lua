@@ -1,7 +1,7 @@
 local M = {}
 
 function M.apply_pipeline_extent()
-  local pipeline_extent_multiplier = require("prototypes.pipeline-extent-settings").multiplier()
+  local pipeline_extent_multiplier = require("prototypes.mir.settings.pipeline_extent").multiplier()
   if pipeline_extent_multiplier ~= 1 then
     require("prototypes.pipeline-extent").apply(pipeline_extent_multiplier)
   end

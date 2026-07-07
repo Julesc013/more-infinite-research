@@ -116,6 +116,12 @@ metadata and active mods only; final recipe, item, fluid, and technology facts
 remain data-stage generation concerns. The old
 `prototypes/mir/legacy/settings.lua` path is a compatibility shim to
 `prototypes/mir/settings/stage_builder.lua`.
+`prototypes/mir/settings/resolver.lua` owns startup setting enablement checks
+for data-stage stream and base-extension planning; the old
+`prototypes/settings-resolver.lua` root path is a compatibility shim.
+`prototypes/mir/settings/pipeline_extent.lua` owns the pipeline extent setting
+catalog and parser; the old `prototypes/pipeline-extent-settings.lua` root path
+is a compatibility shim.
 
 The MIR planner namespace owns compiler planning checks as they are migrated out
 of legacy generators. `prototypes/mir/planner/requirements.lua` evaluates

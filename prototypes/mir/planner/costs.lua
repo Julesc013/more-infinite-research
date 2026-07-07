@@ -1,6 +1,6 @@
 local C = require("prototypes.mir.streams.registry")
 local defaults = require("defaults")
-local settings_resolver = require("prototypes.settings-resolver")
+local settings_resolver = require("prototypes.mir.settings.resolver")
 local effective_settings = require("prototypes.mir.settings.effective")
 
 local M = {}

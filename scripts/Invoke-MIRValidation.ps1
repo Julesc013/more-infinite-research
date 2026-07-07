@@ -55,7 +55,7 @@ function Get-MIRSettingsSourceText {
   return Get-MIRCombinedSourceText -RelativePaths @(
     "settings.lua",
     "prototypes/mir/stage/settings.lua",
-    "prototypes/mir/legacy/settings.lua"
+    "prototypes/mir/settings/stage_builder.lua"
   )
 }
 
@@ -441,7 +441,7 @@ Invoke-RepoCheck "fixture mods have metadata and data entrypoints" {
 Invoke-RepoCheck "science-pack progression settings are wired" {
   $settingsText = Get-MIRSettingsSourceText
   $baseExtensionsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\emit\base_extensions.lua")
-  $settingsResolverText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\settings-resolver.lua")
+  $settingsResolverText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\settings\resolver.lua")
   $settingsRegistryText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\settings\registry.lua")
   $settingsVisibilityText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\settings\visibility.lua")
   $settingsBuilderText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\settings\builder.lua")
@@ -462,7 +462,7 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
   $plannerRequirementsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\planner\requirements.lua")
   $dataFinalFixesText = Get-MIRDataFinalFixesSourceText
   $pipelineExtentText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\pipeline-extent.lua")
-  $pipelineExtentSettingsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\pipeline-extent-settings.lua")
+  $pipelineExtentSettingsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\settings\pipeline_extent.lua")
   $diagnosticsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\report\diagnostics_sink.lua")
   $weaponSpeedText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\policy\weapon_speed.lua")
   $generationIntegrityFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-generation-integrity\data-final-fixes.lua")
@@ -487,7 +487,7 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'allowed_values = {"configured", "space", "space-and-promethium", "space-age-progression", "official-progression", "mod-progression", "all-official", "all"}' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'name = "mir-use-installed-space-age-icons"' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'order = "a-120"' },
-    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'local pipeline_extent_settings = require("prototypes.pipeline-extent-settings")' },
+    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'local pipeline_extent_settings = require("prototypes.mir.settings.pipeline_extent")' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'local settings_adapter = require("prototypes.mir.settings.legacy_adapter")' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'name = "mir-pipeline-extent-multiplier"' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'type = "string-setting"' },
@@ -512,8 +512,8 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'name = "ips-enable-"..key' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'localised_description = append_note({"mod-setting-description.ips-enable-stream", tech_locale}, settings_note)' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'localised_name = {"mod-setting-name.mir-max-level", locale}' },
-    @{ File = "prototypes\settings-resolver.lua"; Text = $settingsResolverText; Snippet = 'function R.stream_enabled(key, spec)' },
-    @{ File = "prototypes\settings-resolver.lua"; Text = $settingsResolverText; Snippet = 'function R.base_enabled(key, spec)' },
+    @{ File = "prototypes\mir\settings\resolver.lua"; Text = $settingsResolverText; Snippet = 'function R.stream_enabled(key, spec)' },
+    @{ File = "prototypes\mir\settings\resolver.lua"; Text = $settingsResolverText; Snippet = 'function R.base_enabled(key, spec)' },
     @{ File = "prototypes\mir\settings\registry.lua"; Text = $settingsRegistryText; Snippet = 'hidden_means_unavailable_not_deleted = true' },
     @{ File = "prototypes\mir\settings\registry.lua"; Text = $settingsRegistryText; Snippet = 'do_not_force_hidden_values_by_default = true' },
     @{ File = "prototypes\mir\settings\visibility.lua"; Text = $settingsVisibilityText; Snippet = 'function M.evaluate(spec, ctx)' },
@@ -522,8 +522,8 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "prototypes\mir\settings\builder.lua"; Text = $settingsBuilderText; Snippet = 'function M.apply_visibility(setting, result)' },
     @{ File = "prototypes\mir\settings\builder.lua"; Text = $settingsBuilderText; Snippet = 'setting.hidden = true' },
     @{ File = "prototypes\mir\settings\legacy_adapter.lua"; Text = $settingsLegacyAdapterText; Snippet = 'factorio_mods.snapshot()' },
-    @{ File = "prototypes\settings-resolver.lua"; Text = $settingsResolverText; Snippet = 'startup_setting("ips-enable-" .. key)' },
-    @{ File = "prototypes\settings-resolver.lua"; Text = $settingsResolverText; Snippet = 'startup_setting("mir-enable-" .. key)' },
+    @{ File = "prototypes\mir\settings\resolver.lua"; Text = $settingsResolverText; Snippet = 'startup_setting("ips-enable-" .. key)' },
+    @{ File = "prototypes\mir\settings\resolver.lua"; Text = $settingsResolverText; Snippet = 'startup_setting("mir-enable-" .. key)' },
     @{ File = "control\settings-resolver.lua"; Text = $controlSettingsResolverText; Snippet = 'function R.stream_enabled(key)' },
     @{ File = "control\settings-resolver.lua"; Text = $controlSettingsResolverText; Snippet = 'startup_setting("ips-enable-" .. key)' },
     @{ File = "control\effects\spoilage-preservation.lua"; Text = $spoilageText; Snippet = 'settings_resolver.stream_enabled(M.stream_key)' },
@@ -616,14 +616,14 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "prototypes\mir\platform\factorio\prototype_lookup.lua"; Text = $prototypeLookupText; Snippet = 'function L.fluid_prototype(name)' },
     @{ File = "prototypes\mir\planner\requirements.lua"; Text = $plannerRequirementsText; Snippet = 'required_fluids' },
     @{ File = "prototypes\mir\planner\requirements.lua"; Text = $plannerRequirementsText; Snippet = 'technology_requirements.skip_reason(spec)' },
-    @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'require("prototypes.pipeline-extent-settings").multiplier()' },
+    @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'require("prototypes.mir.settings.pipeline_extent").multiplier()' },
     @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'require("prototypes.mir.compatibility.diagnostics.registry").emit_all()' },
     @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'if pipeline_extent_multiplier ~= 1 then' },
     @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'require("prototypes.pipeline-extent").apply(pipeline_extent_multiplier)' },
-    @{ File = "prototypes\pipeline-extent-settings.lua"; Text = $pipelineExtentSettingsText; Snippet = 'S.default_value = "100"' },
-    @{ File = "prototypes\pipeline-extent-settings.lua"; Text = $pipelineExtentSettingsText; Snippet = 'S.allowed_values = {"50", "75", "100", "125", "150", "200", "250", "300", "400", "500"}' },
-    @{ File = "prototypes\pipeline-extent-settings.lua"; Text = $pipelineExtentSettingsText; Snippet = 'function S.parse(value)' },
-    @{ File = "prototypes\pipeline-extent-settings.lua"; Text = $pipelineExtentSettingsText; Snippet = 'if numeric > 10 then return numeric / 100 end' },
+    @{ File = "prototypes\mir\settings\pipeline_extent.lua"; Text = $pipelineExtentSettingsText; Snippet = 'S.default_value = "100"' },
+    @{ File = "prototypes\mir\settings\pipeline_extent.lua"; Text = $pipelineExtentSettingsText; Snippet = 'S.allowed_values = {"50", "75", "100", "125", "150", "200", "250", "300", "400", "500"}' },
+    @{ File = "prototypes\mir\settings\pipeline_extent.lua"; Text = $pipelineExtentSettingsText; Snippet = 'function S.parse(value)' },
+    @{ File = "prototypes\mir\settings\pipeline_extent.lua"; Text = $pipelineExtentSettingsText; Snippet = 'if numeric > 10 then return numeric / 100 end' },
     @{ File = "prototypes\pipeline-extent.lua"; Text = $pipelineExtentText; Snippet = 'DEFAULT_PIPELINE_EXTENT = 320' },
     @{ File = "prototypes\pipeline-extent.lua"; Text = $pipelineExtentText; Snippet = 'if multiplier == 1 then return end' },
     @{ File = "prototypes\mir\report\diagnostics_sink.lua"; Text = $diagnosticsText; Snippet = 'icons.icon_source_for_stream(spec or {})' },
@@ -740,8 +740,8 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
   $forbiddenSnippets = @(
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'mir-settings-mode' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'mir-enable-policy-' },
-    @{ File = "prototypes\settings-resolver.lua"; Text = $settingsResolverText; Snippet = 'settings-presets' },
-    @{ File = "prototypes\settings-resolver.lua"; Text = $settingsResolverText; Snippet = 'Force enabled' },
+    @{ File = "prototypes\mir\settings\resolver.lua"; Text = $settingsResolverText; Snippet = 'settings-presets' },
+    @{ File = "prototypes\mir\settings\resolver.lua"; Text = $settingsResolverText; Snippet = 'Force enabled' },
     @{ File = "control\settings-resolver.lua"; Text = $controlSettingsResolverText; Snippet = 'settings-presets' },
     @{ File = "control\settings-resolver.lua"; Text = $controlSettingsResolverText; Snippet = 'mir-enable-policy-' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-settings-mode=' },
