@@ -5,7 +5,7 @@ local D = require("prototypes.diagnostics")
 local deepcopy = require("prototypes.lib.deepcopy")
 local table_utils = require("prototypes.lib.table-utils")
 local effect_safety = require("prototypes.technology-effect-safety")
-local productivity_family_adoption = require("prototypes.compat.productivity-family-adoption")
+local adoption_policy = require("prototypes.mir.policy.adoption_policy")
 local owner_policy = require("prototypes.mir.policy.owner_policy")
 local native_modifiers = require("prototypes.mir.planner.native_modifiers")
 local planner_requirements = require("prototypes.mir.planner.requirements")
@@ -186,7 +186,7 @@ local function make_stream(key, raw_spec)
   local covered_by_existing
   buckets, covered_by_existing = owner_policy.filter_existing_recipe_productivity(key, spec, buckets)
   local adopted_effects, family_blocked, adoption_owner_name
-  buckets, adopted_effects, family_blocked, adoption_owner_name = productivity_family_adoption.adopt(key, spec, buckets)
+  buckets, adopted_effects, family_blocked, adoption_owner_name = adoption_policy.adopt_recipe_productivity_family(key, spec, buckets)
   if adopted_effects and #adopted_effects > 0 then
     D.stream(D.stream_fields(key, spec, "adopted", "adopted_into_existing_productivity_family", ingredients, nil, adopted_effects, lab_status, {
       owners = adoption_owner_name,
@@ -237,4 +237,4 @@ for _, key in ipairs(table_utils.sorted_keys(C.streams)) do
   make_stream(key, C.streams[key])
 end
 
-productivity_family_adoption.emit_mod_data()
+adoption_policy.emit_mod_data()

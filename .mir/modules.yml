@@ -52,6 +52,7 @@ namespace_shims:
   settings_visibility: prototypes/mir/settings/visibility.lua
   settings_builder: prototypes/mir/settings/builder.lua
   settings_legacy_adapter: prototypes/mir/settings/legacy_adapter.lua
+  adoption_policy: prototypes/mir/policy/adoption_policy.lua
   owner_policy: prototypes/mir/policy/owner_policy.lua
   fact_registry: prototypes/mir/index/registry_builder.lua
   legacy_fact_registry_shim: prototypes/lib/facts/registry.lua

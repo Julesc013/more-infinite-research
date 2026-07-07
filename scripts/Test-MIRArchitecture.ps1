@@ -155,6 +155,7 @@ $requiredShims = @(
   "prototypes/mir/settings/visibility.lua",
   "prototypes/mir/settings/builder.lua",
   "prototypes/mir/settings/legacy_adapter.lua",
+  "prototypes/mir/policy/adoption_policy.lua",
   "prototypes/mir/policy/owner_policy.lua",
   "prototypes/mir/index/registry_builder.lua",
   "prototypes/mir/index/recipes.lua",
@@ -209,6 +210,7 @@ Assert-MIRContains -RelativePath $legacyStreamEmitterPath -Text $legacyStreamEmi
 $legacyTechGenPath = "prototypes/tech-gen.lua"
 $legacyTechGenText = Read-MIRFile -RelativePath $legacyTechGenPath
 Assert-MIRContains -RelativePath $legacyTechGenPath -Text $legacyTechGenText -Needle 'require("prototypes.mir.legacy.stream_emitter")'
+Assert-MIRContains -RelativePath $legacyTechGenPath -Text $legacyTechGenText -Needle 'require("prototypes.mir.policy.adoption_policy")'
 Assert-MIRContains -RelativePath $legacyTechGenPath -Text $legacyTechGenText -Needle 'require("prototypes.mir.policy.owner_policy")'
 Assert-MIRContains -RelativePath $legacyTechGenPath -Text $legacyTechGenText -Needle 'require("prototypes.mir.planner.native_modifiers")'
 Assert-MIRContains -RelativePath $legacyTechGenPath -Text $legacyTechGenText -Needle 'require("prototypes.mir.planner.requirements")'
@@ -217,7 +219,15 @@ Assert-MIRContains -RelativePath $legacyTechGenPath -Text $legacyTechGenText -Ne
 Assert-MIRContains -RelativePath $legacyTechGenPath -Text $legacyTechGenText -Needle "planner_science.ingredients_for_stream(key, spec)"
 Assert-MIRContains -RelativePath $legacyTechGenPath -Text $legacyTechGenText -Needle "native_modifiers.record_overlaps(key, direct_effects)"
 Assert-MIRContains -RelativePath $legacyTechGenPath -Text $legacyTechGenText -Needle "owner_policy.filter_existing_recipe_productivity(key, spec, buckets)"
+Assert-MIRContains -RelativePath $legacyTechGenPath -Text $legacyTechGenText -Needle "adoption_policy.adopt_recipe_productivity_family(key, spec, buckets)"
+Assert-MIRContains -RelativePath $legacyTechGenPath -Text $legacyTechGenText -Needle "adoption_policy.emit_mod_data()"
 Assert-MIRContains -RelativePath $legacyTechGenPath -Text $legacyTechGenText -Needle "stream_emitter.emit(key, spec, fields)"
+
+$adoptionPolicyPath = "prototypes/mir/policy/adoption_policy.lua"
+$adoptionPolicyText = Read-MIRFile -RelativePath $adoptionPolicyPath
+Assert-MIRContains -RelativePath $adoptionPolicyPath -Text $adoptionPolicyText -Needle 'require("prototypes.compat.productivity-family-adoption")'
+Assert-MIRContains -RelativePath $adoptionPolicyPath -Text $adoptionPolicyText -Needle "function M.adopt_recipe_productivity_family(key, spec, buckets)"
+Assert-MIRContains -RelativePath $adoptionPolicyPath -Text $adoptionPolicyText -Needle "function M.emit_mod_data()"
 
 $ownerPolicyPath = "prototypes/mir/policy/owner_policy.lua"
 $ownerPolicyText = Read-MIRFile -RelativePath $ownerPolicyPath
