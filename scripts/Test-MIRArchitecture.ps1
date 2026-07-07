@@ -332,6 +332,20 @@ Assert-MIRContains -RelativePath $settingsLegacyAdapterPath -Text $settingsLegac
 Assert-MIRContains -RelativePath $settingsLegacyAdapterPath -Text $settingsLegacyAdapterText -Needle 'require("prototypes.mir.settings.builder")'
 Assert-MIRContains -RelativePath $settingsLegacyAdapterPath -Text $settingsLegacyAdapterText -Needle "factorio_mods.snapshot()"
 
+$mirCliPath = "scripts/mir.ps1"
+$mirCliText = Read-MIRFile -RelativePath $mirCliPath
+Assert-MIRContains -RelativePath $mirCliPath -Text $mirCliText -Needle '.\scripts\mir.ps1 legacy inventory [--output <path>]'
+Assert-MIRContains -RelativePath $mirCliPath -Text $mirCliText -Needle '"legacy" {'
+Assert-MIRContains -RelativePath $mirCliPath -Text $mirCliText -Needle 'Get-MIRLegacyInventory.ps1'
+
+$legacyInventoryPath = "scripts/Get-MIRLegacyInventory.ps1"
+$legacyInventoryText = Read-MIRFile -RelativePath $legacyInventoryPath
+Assert-MIRContains -RelativePath $legacyInventoryPath -Text $legacyInventoryText -Needle "shipped-mod-legacy.json"
+Assert-MIRContains -RelativePath $legacyInventoryPath -Text $legacyInventoryText -Needle "repo-legacy.json"
+Assert-MIRContains -RelativePath $legacyInventoryPath -Text $legacyInventoryText -Needle "legacy-summary.md"
+Assert-MIRContains -RelativePath $legacyInventoryPath -Text $legacyInventoryText -Needle "generated_streams_without_manifest"
+Assert-MIRContains -RelativePath $legacyInventoryPath -Text $legacyInventoryText -Needle "compat_active_modules"
+
 $decisionExportPath = "prototypes/mir/report/decision_export.lua"
 $decisionExportText = Read-MIRFile -RelativePath $decisionExportPath
 Assert-MIRContains -RelativePath $decisionExportPath -Text $decisionExportText -Needle "function M.emit(sink, record)"

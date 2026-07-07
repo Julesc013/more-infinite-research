@@ -30,6 +30,7 @@ Usage:
   .\scripts\mir.ps1 report latest
   .\scripts\mir.ps1 report missing-deps --run <path>
   .\scripts\mir.ps1 report observations --run <path>
+  .\scripts\mir.ps1 legacy inventory [--output <path>]
   .\scripts\mir.ps1 profile stub <group-id> --grouped-failures <path>
   .\scripts\mir.ps1 run -Profile <profile-name-or-path>
   .\scripts\mir.ps1 local-index build --mods <path>
@@ -428,6 +429,11 @@ switch ($area) {
       }
       default { throw "Unknown report command: $verb" }
     }
+  }
+  "legacy" {
+    if ($verb -ne "inventory") { throw "Unknown legacy command: $verb" }
+    $output = Get-MIRArgValue -Items $Args -Name "--output" -Default (Join-Path $repo "artifacts\legacy-inventory")
+    & (Join-Path $scriptRoot "Get-MIRLegacyInventory.ps1") -OutputRoot $output
   }
   "profile" {
     if ($verb -ne "stub") { throw "Unknown profile command: $verb" }

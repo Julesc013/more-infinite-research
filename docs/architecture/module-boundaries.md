@@ -705,6 +705,18 @@ Static validation should eventually fail when:
 - a native modifier policy lacks `owner_policy`;
 - root Factorio entrypoints contain business logic instead of stage wrappers.
 
+The measurable transition debt report is:
+
+```powershell
+.\scripts\mir.ps1 legacy inventory
+```
+
+It writes `artifacts/legacy-inventory/shipped-mod-legacy.json`,
+`artifacts/legacy-inventory/repo-legacy.json`, and
+`artifacts/legacy-inventory/legacy-summary.md`. The report tracks old-path
+module counts, shim-only status, old import counts, direct prototype access
+matches, and generated stream manifest coverage.
+
 ## Implementation Sequence
 
 1. Create the shell directories: `stage/`, `core/`, `platform/`, `domain/`, and
