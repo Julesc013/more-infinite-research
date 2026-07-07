@@ -3,7 +3,7 @@ local defaults = require("defaults")
 local base_defaults = defaults.base_extensions or {}
 
 local U = require("prototypes.util")
-local D = require("prototypes.diagnostics")
+local D = require("prototypes.mir.report.diagnostics_sink")
 local settings_resolver = require("prototypes.settings-resolver")
 local deepcopy = require("prototypes.mir.core.deepcopy")
 local table_utils = require("prototypes.mir.core.table")

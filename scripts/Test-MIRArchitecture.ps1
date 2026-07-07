@@ -196,6 +196,7 @@ $requiredShims = @(
   "prototypes/mir/emit/legacy_stream_adapter.lua",
   "prototypes/mir/report/decision_export.lua",
   "prototypes/mir/report/compatibility_diagnostics.lua",
+  "prototypes/mir/report/diagnostics_sink.lua",
   "prototypes/mir/planner/compiler.lua",
   "prototypes/mir/planner/direct_effects.lua",
   "prototypes/mir/planner/native_modifiers.lua",
@@ -265,6 +266,10 @@ Assert-MIRContains -RelativePath $legacyCapabilityPolicyPath -Text $legacyCapabi
 $legacyPrototypeLookupPath = "prototypes/lib/prototype-lookup.lua"
 $legacyPrototypeLookupText = Read-MIRFile -RelativePath $legacyPrototypeLookupPath
 Assert-MIRContains -RelativePath $legacyPrototypeLookupPath -Text $legacyPrototypeLookupText -Needle 'return require("prototypes.mir.platform.factorio.prototype_lookup")'
+
+$legacyDiagnosticsPath = "prototypes/diagnostics.lua"
+$legacyDiagnosticsText = Read-MIRFile -RelativePath $legacyDiagnosticsPath
+Assert-MIRContains -RelativePath $legacyDiagnosticsPath -Text $legacyDiagnosticsText -Needle 'return require("prototypes.mir.report.diagnostics_sink")'
 
 $streamCompilerPath = "prototypes/mir/planner/stream_compiler.lua"
 $streamCompilerText = Read-MIRFile -RelativePath $streamCompilerPath

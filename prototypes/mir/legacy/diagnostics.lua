@@ -1,1 +1,1 @@
-return require("prototypes.diagnostics")
+return require("prototypes.mir.report.diagnostics_sink")

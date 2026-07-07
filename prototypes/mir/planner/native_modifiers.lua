@@ -1,4 +1,4 @@
-local D = require("prototypes.diagnostics")
+local D = require("prototypes.mir.report.diagnostics_sink")
 local table_utils = require("prototypes.mir.core.table")
 local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 

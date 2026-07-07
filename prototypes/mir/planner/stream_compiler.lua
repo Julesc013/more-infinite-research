@@ -1,6 +1,6 @@
 local C = require("prototypes.config")
 local U = require("prototypes.util")
-local D = require("prototypes.diagnostics")
+local D = require("prototypes.mir.report.diagnostics_sink")
 local deepcopy = require("prototypes.mir.core.deepcopy")
 local table_utils = require("prototypes.mir.core.table")
 local adoption_policy = require("prototypes.mir.policy.adoption_policy")

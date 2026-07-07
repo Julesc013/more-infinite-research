@@ -44,7 +44,7 @@ function M.assert_registered_technology_effects()
 end
 
 function M.flush_diagnostics()
-  require("prototypes.diagnostics").flush()
+  require("prototypes.mir.report.diagnostics_sink").flush()
 end
 
 return M

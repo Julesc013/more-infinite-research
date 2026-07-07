@@ -80,6 +80,7 @@ namespace_shims:
   legacy_stream_adapter: prototypes/mir/emit/legacy_stream_adapter.lua
   decision_export: prototypes/mir/report/decision_export.lua
   compatibility_diagnostics_report: prototypes/mir/report/compatibility_diagnostics.lua
+  diagnostics_sink: prototypes/mir/report/diagnostics_sink.lua
   planner_compiler: prototypes/mir/planner/compiler.lua
   planner_direct_effects: prototypes/mir/planner/direct_effects.lua
   planner_native_modifiers: prototypes/mir/planner/native_modifiers.lua

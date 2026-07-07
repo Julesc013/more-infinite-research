@@ -454,7 +454,7 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
   $dataFinalFixesText = Get-MIRDataFinalFixesSourceText
   $pipelineExtentText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\pipeline-extent.lua")
   $pipelineExtentSettingsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\pipeline-extent-settings.lua")
-  $diagnosticsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\diagnostics.lua")
+  $diagnosticsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\report\diagnostics_sink.lua")
   $weaponSpeedText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\weapon-speed-adjustments.lua")
   $generationIntegrityFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-generation-integrity\data-final-fixes.lua")
   $fluidProductivityFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-fluid-productivity\data-final-fixes.lua")
@@ -617,7 +617,7 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "prototypes\pipeline-extent-settings.lua"; Text = $pipelineExtentSettingsText; Snippet = 'if numeric > 10 then return numeric / 100 end' },
     @{ File = "prototypes\pipeline-extent.lua"; Text = $pipelineExtentText; Snippet = 'DEFAULT_PIPELINE_EXTENT = 320' },
     @{ File = "prototypes\pipeline-extent.lua"; Text = $pipelineExtentText; Snippet = 'if multiplier == 1 then return end' },
-    @{ File = "prototypes\diagnostics.lua"; Text = $diagnosticsText; Snippet = 'icons.icon_source_for_stream(spec or {})' },
+    @{ File = "prototypes\mir\report\diagnostics_sink.lua"; Text = $diagnosticsText; Snippet = 'icons.icon_source_for_stream(spec or {})' },
     @{ File = "prototypes\lib\technology-icons.lua"; Text = $technologyIconsText; Snippet = 'local out = strip_constant_overlays(base_icons)' },
     @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'assert_generated_icon_badge(tech_name, tech)' },
     @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'assert_no_space_age_icon_path_in_base(tech_name, tech)' },
@@ -974,7 +974,8 @@ Invoke-RepoCheck "compat audit automation tooling is wired" {
 
 Invoke-RepoCheck "2.2.0 compiler diagnostics are wired" {
   $dataFinalFixesText = Get-MIRDataFinalFixesSourceText
-  $diagnosticsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\diagnostics.lua")
+  $diagnosticsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\report\diagnostics_sink.lua")
+  $diagnosticsShimText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\diagnostics.lua")
   $factRegistryPath = Join-Path $repo "prototypes\lib\facts\registry.lua"
   $indexRegistryPath = Join-Path $repo "prototypes\mir\index\registry_builder.lua"
   $capabilityRegistryPath = Join-Path $repo "prototypes\mir\capabilities\registry.lua"
@@ -1022,13 +1023,14 @@ Invoke-RepoCheck "2.2.0 compiler diagnostics are wired" {
 
   $requiredSnippets = @(
     @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'require("prototypes.mir.planner.compiler").emit()' },
-    @{ File = "prototypes\diagnostics.lua"; Text = $diagnosticsText; Snippet = 'function D.decision(row)' },
-    @{ File = "prototypes\diagnostics.lua"; Text = $diagnosticsText; Snippet = 'schema.decision(row)' },
-    @{ File = "prototypes\diagnostics.lua"; Text = $diagnosticsText; Snippet = '.. " capability=" .. tostring(row.capability or "")' },
-    @{ File = "prototypes\diagnostics.lua"; Text = $diagnosticsText; Snippet = '.. " evidence=" .. tostring(row.evidence or "")' },
-    @{ File = "prototypes\diagnostics.lua"; Text = $diagnosticsText; Snippet = 'append("rule_mutation", row)' },
-    @{ File = "prototypes\diagnostics.lua"; Text = $diagnosticsText; Snippet = 'append("loop_risk", row)' },
-    @{ File = "prototypes\diagnostics.lua"; Text = $diagnosticsText; Snippet = 'append("lab_matrix", row)' },
+    @{ File = "prototypes\diagnostics.lua"; Text = $diagnosticsShimText; Snippet = 'return require("prototypes.mir.report.diagnostics_sink")' },
+    @{ File = "prototypes\mir\report\diagnostics_sink.lua"; Text = $diagnosticsText; Snippet = 'function D.decision(row)' },
+    @{ File = "prototypes\mir\report\diagnostics_sink.lua"; Text = $diagnosticsText; Snippet = 'schema.decision(row)' },
+    @{ File = "prototypes\mir\report\diagnostics_sink.lua"; Text = $diagnosticsText; Snippet = '.. " capability=" .. tostring(row.capability or "")' },
+    @{ File = "prototypes\mir\report\diagnostics_sink.lua"; Text = $diagnosticsText; Snippet = '.. " evidence=" .. tostring(row.evidence or "")' },
+    @{ File = "prototypes\mir\report\diagnostics_sink.lua"; Text = $diagnosticsText; Snippet = 'append("rule_mutation", row)' },
+    @{ File = "prototypes\mir\report\diagnostics_sink.lua"; Text = $diagnosticsText; Snippet = 'append("loop_risk", row)' },
+    @{ File = "prototypes\mir\report\diagnostics_sink.lua"; Text = $diagnosticsText; Snippet = 'append("lab_matrix", row)' },
     @{ File = "prototypes\lib\facts\registry.lua"; Text = $factRegistryText; Snippet = 'return require("prototypes.mir.index.registry_builder")' },
     @{ File = "prototypes\mir\index\registry_builder.lua"; Text = $indexRegistryText; Snippet = 'RecipeFact' },
     @{ File = "prototypes\mir\index\registry_builder.lua"; Text = $indexRegistryText; Snippet = 'RuleMutationFact' },
@@ -1090,7 +1092,7 @@ Invoke-RepoCheck "Air Scrubbing clean-filter policy is wired" {
   $dataFinalFixesText = Get-MIRDataFinalFixesSourceText
   $productivityText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\streams\productivity.lua")
   $utilText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\util.lua")
-  $diagnosticsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\diagnostics.lua")
+  $diagnosticsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\report\diagnostics_sink.lua")
   $converterText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\Convert-MIRCompatAuditResults.ps1")
   $airScrubbingPolicyPath = Join-Path $repo "prototypes\compat\air-scrubbing.lua"
   $exactRecipePolicyPath = Join-Path $repo "prototypes\mir\compatibility\diagnostics\exact_recipe_policy.lua"
@@ -1123,7 +1125,7 @@ Invoke-RepoCheck "Air Scrubbing clean-filter policy is wired" {
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'exact_recipe_patterns(air_scrubbing_capability.exact_recipes)' },
     @{ File = "prototypes\util.lua"; Text = $utilText; Snippet = 'local function science_from_unlocks(spec)' },
     @{ File = "prototypes\util.lua"; Text = $utilText; Snippet = 'if spec.prerequisites == "derive-from-unlocks" then' },
-    @{ File = "prototypes\diagnostics.lua"; Text = $diagnosticsText; Snippet = '.. " rejected=" .. tostring(row.rejected or "")' },
+    @{ File = "prototypes\mir\report\diagnostics_sink.lua"; Text = $diagnosticsText; Snippet = '.. " rejected=" .. tostring(row.rejected or "")' },
     @{ File = "scripts\Convert-MIRCompatAuditResults.ps1"; Text = $converterText; Snippet = 'rejected = [string](Get-MIRObjectProperty -Object $row -Name "rejected")' },
     @{ File = "scripts\Convert-MIRCompatAuditResults.ps1"; Text = $converterText; Snippet = 'generated,rejected,unknown,missing,module_slots' },
     @{ File = "prototypes\compat\air-scrubbing.lua"; Text = $airScrubbingPolicyText; Snippet = 'return require("prototypes.mir.compatibility.diagnostics.air_scrubbing")' },

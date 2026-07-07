@@ -161,6 +161,9 @@ migrated, but they must read prototypes through platform adapters and emit rows
 through `report/` helpers. The stage layer calls
 `prototypes/mir/compatibility/diagnostics/registry.lua` rather than naming
 individual exact-recipe diagnostic modules directly.
+`prototypes/mir/report/diagnostics_sink.lua` owns the existing log/audit-row
+diagnostic sink; the old `prototypes/diagnostics.lua` path is a compatibility
+shim.
 
 ## Three Workspaces
 
@@ -426,6 +429,7 @@ prototypes/
       planner_report.lua
       decision_export.lua
       compatibility_diagnostics.lua
+      diagnostics_sink.lua
       observation_export.lua
       claim_export.lua
       fixture_export.lua

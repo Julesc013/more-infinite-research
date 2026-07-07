@@ -1,5 +1,5 @@
 local C = require("prototypes.config")
-local D = require("prototypes.diagnostics")
+local D = require("prototypes.mir.report.diagnostics_sink")
 local U = require("prototypes.util")
 
 local M = {}

@@ -1,4 +1,4 @@
-local D = require("prototypes.diagnostics")
+local D = require("prototypes.mir.report.diagnostics_sink")
 local contract = require("prototypes.mir.capabilities.contract")
 local fact_registry = require("prototypes.mir.index.registry_builder")
 local policies = require("prototypes.mir.policy.capabilities")

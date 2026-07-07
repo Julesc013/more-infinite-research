@@ -1,4 +1,4 @@
-local D = require("prototypes.diagnostics")
+local D = require("prototypes.mir.report.diagnostics_sink")
 local capabilities = require("prototypes.mir.capabilities.registry")
 local decision_record = require("prototypes.mir.domain.decisions.decision_record")
 local decision_export = require("prototypes.mir.report.decision_export")

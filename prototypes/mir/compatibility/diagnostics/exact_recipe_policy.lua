@@ -1,4 +1,4 @@
-local D = require("prototypes.diagnostics")
+local D = require("prototypes.mir.report.diagnostics_sink")
 local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 local overlay_loader = require("prototypes.mir.compatibility.overlay_loader")
 local report = require("prototypes.mir.report.compatibility_diagnostics")

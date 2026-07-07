@@ -1,4 +1,4 @@
-local D = require("prototypes.diagnostics")
+local D = require("prototypes.mir.report.diagnostics_sink")
 local competing_productivity = require("prototypes.mir.policy.competing_productivity")
 local productivity_owners = require("prototypes.mir.index.productivity_owners")
 
