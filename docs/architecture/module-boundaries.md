@@ -122,7 +122,9 @@ native technology modifiers and records overlap diagnostics through platform
 prototype access before direct-effect streams are emitted.
 `prototypes/mir/planner/science.lua` selects stream science ingredients and
 normalizes lab-compatibility status while the rest of science integration moves
-out of legacy utility modules.
+out of legacy utility modules. `prototypes/mir/policy/owner_policy.lua`
+centralizes recipe-productivity owner filtering and the associated diagnostic
+rows used by migrated stream planning.
 
 Compatibility policy uses `prototypes/mir/compatibility/`. Named compatibility
 targets live under `prototypes/mir/compatibility/overlays/`; those overlays

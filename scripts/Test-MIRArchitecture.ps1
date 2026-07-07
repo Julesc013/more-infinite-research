@@ -155,6 +155,7 @@ $requiredShims = @(
   "prototypes/mir/settings/visibility.lua",
   "prototypes/mir/settings/builder.lua",
   "prototypes/mir/settings/legacy_adapter.lua",
+  "prototypes/mir/policy/owner_policy.lua",
   "prototypes/mir/index/registry_builder.lua",
   "prototypes/mir/index/recipes.lua",
   "prototypes/mir/index/technologies.lua",
@@ -208,13 +209,22 @@ Assert-MIRContains -RelativePath $legacyStreamEmitterPath -Text $legacyStreamEmi
 $legacyTechGenPath = "prototypes/tech-gen.lua"
 $legacyTechGenText = Read-MIRFile -RelativePath $legacyTechGenPath
 Assert-MIRContains -RelativePath $legacyTechGenPath -Text $legacyTechGenText -Needle 'require("prototypes.mir.legacy.stream_emitter")'
+Assert-MIRContains -RelativePath $legacyTechGenPath -Text $legacyTechGenText -Needle 'require("prototypes.mir.policy.owner_policy")'
 Assert-MIRContains -RelativePath $legacyTechGenPath -Text $legacyTechGenText -Needle 'require("prototypes.mir.planner.native_modifiers")'
 Assert-MIRContains -RelativePath $legacyTechGenPath -Text $legacyTechGenText -Needle 'require("prototypes.mir.planner.requirements")'
 Assert-MIRContains -RelativePath $legacyTechGenPath -Text $legacyTechGenText -Needle 'require("prototypes.mir.planner.science")'
 Assert-MIRContains -RelativePath $legacyTechGenPath -Text $legacyTechGenText -Needle "planner_requirements.missing_reason(key, raw_spec)"
 Assert-MIRContains -RelativePath $legacyTechGenPath -Text $legacyTechGenText -Needle "planner_science.ingredients_for_stream(key, spec)"
 Assert-MIRContains -RelativePath $legacyTechGenPath -Text $legacyTechGenText -Needle "native_modifiers.record_overlaps(key, direct_effects)"
+Assert-MIRContains -RelativePath $legacyTechGenPath -Text $legacyTechGenText -Needle "owner_policy.filter_existing_recipe_productivity(key, spec, buckets)"
 Assert-MIRContains -RelativePath $legacyTechGenPath -Text $legacyTechGenText -Needle "stream_emitter.emit(key, spec, fields)"
+
+$ownerPolicyPath = "prototypes/mir/policy/owner_policy.lua"
+$ownerPolicyText = Read-MIRFile -RelativePath $ownerPolicyPath
+Assert-MIRContains -RelativePath $ownerPolicyPath -Text $ownerPolicyText -Needle 'require("prototypes.compat.competing-productivity")'
+Assert-MIRContains -RelativePath $ownerPolicyPath -Text $ownerPolicyText -Needle 'require("prototypes.compat.productivity-owners")'
+Assert-MIRContains -RelativePath $ownerPolicyPath -Text $ownerPolicyText -Needle "function M.filter_existing_recipe_productivity(key, spec, buckets)"
+Assert-MIRContains -RelativePath $ownerPolicyPath -Text $ownerPolicyText -Needle "D.recipe_owner({"
 
 $indexRegistryPath = "prototypes/mir/index/registry_builder.lua"
 $indexRegistryText = Read-MIRFile -RelativePath $indexRegistryPath
