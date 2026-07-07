@@ -141,6 +141,12 @@ $requiredShims = @(
   "prototypes/mir/settings/visibility.lua",
   "prototypes/mir/settings/builder.lua",
   "prototypes/mir/settings/legacy_adapter.lua",
+  "prototypes/mir/index/registry_builder.lua",
+  "prototypes/mir/index/recipes.lua",
+  "prototypes/mir/index/technologies.lua",
+  "prototypes/mir/index/labs.lua",
+  "prototypes/mir/index/owners.lua",
+  "prototypes/mir/index/rule_surfaces.lua",
   "prototypes/mir/domain/facts/registry.lua",
   "prototypes/mir/capabilities/contract.lua",
   "prototypes/mir/capabilities/registry.lua",
@@ -216,8 +222,13 @@ Assert-MIRContains -RelativePath $compatibilityDiagnosticsReportPath -Text $comp
 Assert-MIRContains -RelativePath $compatibilityDiagnosticsReportPath -Text $compatibilityDiagnosticsReportText -Needle "function M.compatibility_plan(sink, row)"
 Assert-MIRContains -RelativePath $compatibilityDiagnosticsReportPath -Text $compatibilityDiagnosticsReportText -Needle "sink.loop_risk(row)"
 
-$plannerCompilerPath = "prototypes/planner/compiler.lua"
+$plannerCompilerShimPath = "prototypes/planner/compiler.lua"
+$plannerCompilerShimText = Read-MIRFile -RelativePath $plannerCompilerShimPath
+Assert-MIRContains -RelativePath $plannerCompilerShimPath -Text $plannerCompilerShimText -Needle 'return require("prototypes.mir.planner.compiler")'
+
+$plannerCompilerPath = "prototypes/mir/planner/compiler.lua"
 $plannerCompilerText = Read-MIRFile -RelativePath $plannerCompilerPath
+Assert-MIRContains -RelativePath $plannerCompilerPath -Text $plannerCompilerText -Needle 'require("prototypes.mir.index.registry_builder")'
 Assert-MIRContains -RelativePath $plannerCompilerPath -Text $plannerCompilerText -Needle 'require("prototypes.mir.report.decision_export")'
 Assert-MIRContains -RelativePath $plannerCompilerPath -Text $plannerCompilerText -Needle "decision_export.emit(D, decision_record.generated_technology({"
 

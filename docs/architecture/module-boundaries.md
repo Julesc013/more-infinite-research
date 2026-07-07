@@ -249,6 +249,7 @@ prototypes/
         claim_level.lua
 
     index/
+      registry_builder.lua
       recipes.lua
       items.lua
       fluids.lua

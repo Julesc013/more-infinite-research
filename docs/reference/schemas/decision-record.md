@@ -18,7 +18,7 @@ explain why a candidate generated, skipped, rejected, or remained diagnostic.
 
 Current generated-technology rows are normalized by
 `prototypes/mir/domain/decisions/decision_record.lua` before
-`prototypes/planner/compiler.lua` passes them to diagnostics. This keeps the
+`prototypes/mir/planner/compiler.lua` passes them to diagnostics. This keeps the
 legacy planner output stable while moving row construction behind the MIR 3
 domain boundary.
 

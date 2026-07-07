@@ -1,1 +1,1 @@
-return require("prototypes.lib.facts.registry")
+return require("prototypes.mir.index.registry_builder")

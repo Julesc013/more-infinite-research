@@ -51,7 +51,7 @@ capabilities:
     default_mode: hard-gate
 
   rule-surfaces:
-    current_path: prototypes/planner/compiler.lua
+    current_path: prototypes/mir/planner/compiler.lua
     target_path: prototypes/mir/capabilities/rule_surfaces
     doc: docs/capabilities/rule-surfaces.md
     emits: []

@@ -48,7 +48,7 @@ The implemented report-first pieces are:
 - `prototypes/lib/policy/capabilities.lua` stores capability-specific policy
   defaults, including confidence thresholds, owner policy, science policy, and
   deny-risk flags.
-- `prototypes/planner/compiler.lua` emits fact summaries, lab matrices,
+- `prototypes/mir/planner/compiler.lua` emits fact summaries, lab matrices,
   DecisionRecord-style rows, loop-risk rows, rule-surface rows, capability rows,
   and useful cap estimates when generation diagnostics are enabled.
 - `scripts/Convert-MIRCompatAuditResults.ps1` preserves capability, subfamily,

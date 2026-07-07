@@ -973,11 +973,13 @@ Invoke-RepoCheck "2.2.0 compiler diagnostics are wired" {
   $dataFinalFixesText = Get-MIRDataFinalFixesSourceText
   $diagnosticsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\diagnostics.lua")
   $factRegistryPath = Join-Path $repo "prototypes\lib\facts\registry.lua"
+  $indexRegistryPath = Join-Path $repo "prototypes\mir\index\registry_builder.lua"
   $capabilityRegistryPath = Join-Path $repo "prototypes\lib\capabilities\registry.lua"
   $capabilityContractPath = Join-Path $repo "prototypes\lib\capabilities\contract.lua"
   $capabilityPolicyPath = Join-Path $repo "prototypes\lib\policy\capabilities.lua"
   $schemaPath = Join-Path $repo "prototypes\lib\mir\schema.lua"
-  $compilerPath = Join-Path $repo "prototypes\planner\compiler.lua"
+  $compilerPath = Join-Path $repo "prototypes\mir\planner\compiler.lua"
+  $compilerShimPath = Join-Path $repo "prototypes\planner\compiler.lua"
   $converterText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\Convert-MIRCompatAuditResults.ps1")
   $overnightSummaryText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\Show-MIROvernightSummary.ps1")
   $compatPlannerText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\compat\planner.lua")
@@ -986,8 +988,14 @@ Invoke-RepoCheck "2.2.0 compiler diagnostics are wired" {
   if (-not (Test-Path -LiteralPath $factRegistryPath)) {
     throw "Missing typed fact registry: prototypes\lib\facts\registry.lua"
   }
+  if (-not (Test-Path -LiteralPath $indexRegistryPath)) {
+    throw "Missing MIR index registry builder: prototypes\mir\index\registry_builder.lua"
+  }
   if (-not (Test-Path -LiteralPath $compilerPath)) {
-    throw "Missing compiler diagnostics module: prototypes\planner\compiler.lua"
+    throw "Missing compiler diagnostics module: prototypes\mir\planner\compiler.lua"
+  }
+  if (-not (Test-Path -LiteralPath $compilerShimPath)) {
+    throw "Missing legacy compiler diagnostics shim: prototypes\planner\compiler.lua"
   }
   if (-not (Test-Path -LiteralPath $capabilityRegistryPath)) {
     throw "Missing capability registry: prototypes\lib\capabilities\registry.lua"
@@ -999,6 +1007,7 @@ Invoke-RepoCheck "2.2.0 compiler diagnostics are wired" {
   }
 
   $factRegistryText = Get-Content -Raw -LiteralPath $factRegistryPath
+  $indexRegistryText = Get-Content -Raw -LiteralPath $indexRegistryPath
   $decisionRecordText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\domain\decisions\decision_record.lua")
   $decisionExportText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\report\decision_export.lua")
   $capabilityRegistryText = Get-Content -Raw -LiteralPath $capabilityRegistryPath
@@ -1006,9 +1015,10 @@ Invoke-RepoCheck "2.2.0 compiler diagnostics are wired" {
   $capabilityPolicyText = Get-Content -Raw -LiteralPath $capabilityPolicyPath
   $schemaText = Get-Content -Raw -LiteralPath $schemaPath
   $compilerText = Get-Content -Raw -LiteralPath $compilerPath
+  $compilerShimText = Get-Content -Raw -LiteralPath $compilerShimPath
 
   $requiredSnippets = @(
-    @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'require("prototypes.planner.compiler").emit()' },
+    @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'require("prototypes.mir.planner.compiler").emit()' },
     @{ File = "prototypes\diagnostics.lua"; Text = $diagnosticsText; Snippet = 'function D.decision(row)' },
     @{ File = "prototypes\diagnostics.lua"; Text = $diagnosticsText; Snippet = 'schema.decision(row)' },
     @{ File = "prototypes\diagnostics.lua"; Text = $diagnosticsText; Snippet = '.. " capability=" .. tostring(row.capability or "")' },
@@ -1020,6 +1030,7 @@ Invoke-RepoCheck "2.2.0 compiler diagnostics are wired" {
     @{ File = "prototypes\lib\facts\registry.lua"; Text = $factRegistryText; Snippet = 'RuleMutationFact' },
     @{ File = "prototypes\lib\facts\registry.lua"; Text = $factRegistryText; Snippet = 'schema = schema.fact_registry' },
     @{ File = "prototypes\lib\facts\registry.lua"; Text = $factRegistryText; Snippet = 'build_loop_risk_facts' },
+    @{ File = "prototypes\mir\index\registry_builder.lua"; Text = $indexRegistryText; Snippet = 'return require("prototypes.lib.facts.registry")' },
     @{ File = "prototypes\mir\domain\decisions\decision_record.lua"; Text = $decisionRecordText; Snippet = 'function M.generated_technology(record)' },
     @{ File = "prototypes\mir\domain\decisions\decision_record.lua"; Text = $decisionRecordText; Snippet = 'schema.decision({' },
     @{ File = "prototypes\mir\report\decision_export.lua"; Text = $decisionExportText; Snippet = 'function M.emit(sink, record)' },
@@ -1037,12 +1048,14 @@ Invoke-RepoCheck "2.2.0 compiler diagnostics are wired" {
     @{ File = "prototypes\lib\capabilities\registry.lua"; Text = $capabilityRegistryText; Snippet = 'id = "native-modifier-ownership"' },
     @{ File = "prototypes\lib\capabilities\registry.lua"; Text = $capabilityRegistryText; Snippet = 'entity_backed_candidates' },
     @{ File = "prototypes\lib\capabilities\registry.lua"; Text = $capabilityRegistryText; Snippet = 'discover,classify,propose,validate,emit,diagnose' },
-    @{ File = "prototypes\planner\compiler.lua"; Text = $compilerText; Snippet = 'local decision_export = require("prototypes.mir.report.decision_export")' },
-    @{ File = "prototypes\planner\compiler.lua"; Text = $compilerText; Snippet = 'D.fact_registry({' },
-    @{ File = "prototypes\planner\compiler.lua"; Text = $compilerText; Snippet = 'decision_export.emit(D, {' },
-    @{ File = "prototypes\planner\compiler.lua"; Text = $compilerText; Snippet = 'decision_export.emit(D, decision_record.generated_technology({' },
-    @{ File = "prototypes\planner\compiler.lua"; Text = $compilerText; Snippet = 'emit_generated_technology_decisions' },
-    @{ File = "prototypes\planner\compiler.lua"; Text = $compilerText; Snippet = 'capabilities.emit(registry)' },
+    @{ File = "prototypes\planner\compiler.lua"; Text = $compilerShimText; Snippet = 'return require("prototypes.mir.planner.compiler")' },
+    @{ File = "prototypes\mir\planner\compiler.lua"; Text = $compilerText; Snippet = 'local decision_export = require("prototypes.mir.report.decision_export")' },
+    @{ File = "prototypes\mir\planner\compiler.lua"; Text = $compilerText; Snippet = 'require("prototypes.mir.index.registry_builder")' },
+    @{ File = "prototypes\mir\planner\compiler.lua"; Text = $compilerText; Snippet = 'D.fact_registry({' },
+    @{ File = "prototypes\mir\planner\compiler.lua"; Text = $compilerText; Snippet = 'decision_export.emit(D, {' },
+    @{ File = "prototypes\mir\planner\compiler.lua"; Text = $compilerText; Snippet = 'decision_export.emit(D, decision_record.generated_technology({' },
+    @{ File = "prototypes\mir\planner\compiler.lua"; Text = $compilerText; Snippet = 'emit_generated_technology_decisions' },
+    @{ File = "prototypes\mir\planner\compiler.lua"; Text = $compilerText; Snippet = 'capabilities.emit(registry)' },
     @{ File = "prototypes\compat\planner.lua"; Text = $compatPlannerText; Snippet = 'useful_level_estimate = levels' },
     @{ File = "prototypes\compat\planner.lua"; Text = $compatPlannerText; Snippet = '["atan-ash"] = {' },
     @{ File = "prototypes\compat\planner.lua"; Text = $compatPlannerText; Snippet = '["atan-nuclear-science"] = {' },
