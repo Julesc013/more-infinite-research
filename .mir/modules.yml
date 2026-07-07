@@ -88,6 +88,7 @@ namespace_shims:
   science_integration_selector: prototypes/mir/capabilities/science_integration/science_selector.lua
   technology_builder: prototypes/mir/emit/technology_builder.lua
   legacy_stream_adapter: prototypes/mir/emit/legacy_stream_adapter.lua
+  base_extensions_emitter: prototypes/mir/emit/base_extensions.lua
   icon_builder: prototypes/mir/emit/icon_builder.lua
   decision_export: prototypes/mir/report/decision_export.lua
   compatibility_diagnostics_report: prototypes/mir/report/compatibility_diagnostics.lua
@@ -248,7 +249,7 @@ current_boundary_allowlist:
   prototype_mutators:
     - prototypes/mir/stage/data_final_fixes_steps.lua
     - prototypes/mir/planner/stream_compiler.lua
-    - prototypes/base-tech-extensions.lua
+    - prototypes/mir/emit/base_extensions.lua
     - prototypes/pipeline-extent.lua
     - prototypes/max-level-control.lua
     - prototypes/weapon-speed-adjustments.lua

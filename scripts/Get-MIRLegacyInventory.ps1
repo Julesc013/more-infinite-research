@@ -9,9 +9,9 @@ param(
   [int]$MaxLibActiveModules = 0,
   [int]$MaxRequiresLib = 0,
   [int]$MaxRequiresConfig = 0,
-  [int]$MaxRequiresUtil = 1,
+  [int]$MaxRequiresUtil = 0,
   [int]$MaxRequiresDiagnostics = 0,
-  [int]$MaxDataRawOutsidePlatform = 42,
+  [int]$MaxDataRawOutsidePlatform = 35,
   [int]$MaxGeneratedStreamsWithoutManifest = 0
 )
 

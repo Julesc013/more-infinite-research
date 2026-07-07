@@ -115,6 +115,7 @@ Agricultural growth speed refreshes this force state on init, configuration chan
 - `prototypes/mir/capabilities/science_integration/science_selector.lua`: stream science-pack selection, configured science-pack ingredient policy, unlock-derived science discovery.
 - `prototypes/mir/capabilities/recipe_productivity/recipe_matching.lua`: item/fluid-output matching, output-pattern expansion, recipe category matching, hidden/recycling filtering.
 - `prototypes/mir/emit/icon_builder.lua`: borrowed icon copying, explicit `icon_candidates` resolution, legacy technology/item/fluid icon fallback, Wube-style constant overlays.
+- `prototypes/mir/emit/base_extensions.lua`: generated infinite continuations for finite vanilla base technology chains.
 - `prototypes/mir/planner/costs.lua`: stream enablement, base cost, growth factor, research time, and max-level setting resolution.
 - `prototypes/mir/planner/prerequisites.lua`: stream prerequisite construction, unlock-derived prerequisites, and the optional end-game prerequisite gate.
 - `prototypes/mir/core/deepcopy.lua`: shared fallback for data-stage deep copies.

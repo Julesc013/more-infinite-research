@@ -147,6 +147,9 @@ that immediately delegates to that MIR planner module.
 `prototypes/mir/emit/legacy_stream_adapter.lua` adapts legacy stream records
 into `StreamSpec` records and forwards them to `technology_builder`; the old
 `prototypes/mir/legacy/stream_emitter.lua` path is now a compatibility shim.
+`prototypes/mir/emit/base_extensions.lua` owns base technology continuation
+prototype emission; the old `prototypes/base-tech-extensions.lua` root path is
+now an execution shim for backport compatibility.
 The old `prototypes/compat/` paths for profiles, owner detection, competing
 productivity cleanup, competing base-extension cleanup, family adoption, and
 compatibility planning are compatibility shims. The active implementations live
@@ -433,6 +436,7 @@ prototypes/
     emit/
       technology_builder.lua
       legacy_stream_adapter.lua
+      base_extensions.lua
       effect_builder.lua
       prerequisite_builder.lua
       science_builder.lua
@@ -748,8 +752,9 @@ It writes `artifacts/legacy-inventory/shipped-mod-legacy.json`,
 module counts, shim-only status, old import counts, direct prototype access
 matches, and generated stream manifest coverage. The checked form currently
 requires zero active `prototypes/compat` modules, zero active `prototypes/lib`
-modules, zero compat/lib imports, and zero generated streams missing manifest
-rows.
+modules, zero compat/lib/config/util/diagnostics imports, no more than the
+current direct `data.raw` allowlist count outside the platform adapter, and
+zero generated streams missing manifest rows.
 
 ## Implementation Sequence
 

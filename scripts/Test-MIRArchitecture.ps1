@@ -155,6 +155,7 @@ Assert-MIRContains -RelativePath $dataFinalFixesStepsPath -Text $dataFinalFixesS
 Assert-MIRContains -RelativePath $dataFinalFixesStepsPath -Text $dataFinalFixesStepsText -Needle 'require("prototypes.mir.policy.competing_base_extensions").apply()'
 Assert-MIRContains -RelativePath $dataFinalFixesStepsPath -Text $dataFinalFixesStepsText -Needle "function M.emit_streams()"
 Assert-MIRContains -RelativePath $dataFinalFixesStepsPath -Text $dataFinalFixesStepsText -Needle 'require("prototypes.mir.planner.stream_compiler").run()'
+Assert-MIRContains -RelativePath $dataFinalFixesStepsPath -Text $dataFinalFixesStepsText -Needle 'require("prototypes.mir.emit.base_extensions").emit_all()'
 Assert-MIRContains -RelativePath $dataFinalFixesStepsPath -Text $dataFinalFixesStepsText -Needle 'require("prototypes.mir.compatibility.planner").emit()'
 Assert-MIRContains -RelativePath $dataFinalFixesStepsPath -Text $dataFinalFixesStepsText -Needle "function M.flush_diagnostics()"
 if ($dataFinalFixesStepsText -match 'require\("prototypes\.compat\.') {
@@ -201,6 +202,7 @@ $requiredShims = @(
   "prototypes/mir/capabilities/science_integration/science_packs.lua",
   "prototypes/mir/capabilities/science_integration/science_selector.lua",
   "prototypes/mir/emit/legacy_stream_adapter.lua",
+  "prototypes/mir/emit/base_extensions.lua",
   "prototypes/mir/emit/icon_builder.lua",
   "prototypes/mir/report/decision_export.lua",
   "prototypes/mir/report/compatibility_diagnostics.lua",
@@ -292,6 +294,21 @@ Assert-MIRContains -RelativePath $legacyTechnologyIconsPath -Text $legacyTechnol
 $legacySciencePacksPath = "prototypes/lib/science-packs.lua"
 $legacySciencePacksText = Read-MIRFile -RelativePath $legacySciencePacksPath
 Assert-MIRContains -RelativePath $legacySciencePacksPath -Text $legacySciencePacksText -Needle 'return require("prototypes.mir.capabilities.science_integration.science_packs")'
+
+$baseExtensionsShimPath = "prototypes/base-tech-extensions.lua"
+$baseExtensionsShimText = Read-MIRFile -RelativePath $baseExtensionsShimPath
+Assert-MIRContains -RelativePath $baseExtensionsShimPath -Text $baseExtensionsShimText -Needle 'return require("prototypes.mir.emit.base_extensions").emit_all()'
+
+$baseExtensionsEmitterPath = "prototypes/mir/emit/base_extensions.lua"
+$baseExtensionsEmitterText = Read-MIRFile -RelativePath $baseExtensionsEmitterPath
+Assert-MIRContains -RelativePath $baseExtensionsEmitterPath -Text $baseExtensionsEmitterText -Needle 'require("prototypes.mir.platform.factorio.data_raw")'
+Assert-MIRContains -RelativePath $baseExtensionsEmitterPath -Text $baseExtensionsEmitterText -Needle 'require("prototypes.mir.capabilities.science_integration.science_selector")'
+Assert-MIRContains -RelativePath $baseExtensionsEmitterPath -Text $baseExtensionsEmitterText -Needle "function M.emit_all()"
+Assert-MIRContains -RelativePath $baseExtensionsEmitterPath -Text $baseExtensionsEmitterText -Needle 'data_raw.prototypes("technology")'
+Assert-MIRContains -RelativePath $baseExtensionsEmitterPath -Text $baseExtensionsEmitterText -Needle "data_raw.extend({ new })"
+if ($baseExtensionsEmitterText -match "data:extend") {
+  throw "$baseExtensionsEmitterPath must emit through the platform data_raw adapter."
+}
 
 $streamCompilerPath = "prototypes/mir/planner/stream_compiler.lua"
 $streamCompilerText = Read-MIRFile -RelativePath $streamCompilerPath
@@ -439,7 +456,8 @@ Assert-MIRContains -RelativePath $legacyInventoryPath -Text $legacyInventoryText
 Assert-MIRContains -RelativePath $legacyInventoryPath -Text $legacyInventoryText -Needle "generated_streams_without_manifest"
 Assert-MIRContains -RelativePath $legacyInventoryPath -Text $legacyInventoryText -Needle "compat_active_modules"
 Assert-MIRContains -RelativePath $legacyInventoryPath -Text $legacyInventoryText -Needle "requires_lib"
-Assert-MIRContains -RelativePath $legacyInventoryPath -Text $legacyInventoryText -Needle "MaxRequiresUtil = 1"
+Assert-MIRContains -RelativePath $legacyInventoryPath -Text $legacyInventoryText -Needle "MaxRequiresUtil = 0"
+Assert-MIRContains -RelativePath $legacyInventoryPath -Text $legacyInventoryText -Needle "MaxDataRawOutsidePlatform = 35"
 Assert-MIRContains -RelativePath $legacyInventoryPath -Text $legacyInventoryText -Needle "MaxLibActiveModules = 0"
 Assert-MIRContains -RelativePath $legacyInventoryPath -Text $legacyInventoryText -Needle "MIR legacy inventory thresholds passed"
 

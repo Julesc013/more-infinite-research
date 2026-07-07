@@ -317,7 +317,7 @@ Invoke-RepoCheck "unsafe pickup reach technology effects are blocked" {
   $techGenText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\tech-gen.lua")
   $directEffectsPlannerText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\planner\direct_effects.lua")
   $streamAdapterText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\emit\legacy_stream_adapter.lua")
-  $baseExtensionsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\base-tech-extensions.lua")
+  $baseExtensionsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\emit\base_extensions.lua")
   $dataFinalFixesText = Get-MIRDataFinalFixesSourceText
   $generationIntegrityFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-generation-integrity\data-final-fixes.lua")
 
@@ -330,8 +330,8 @@ Invoke-RepoCheck "unsafe pickup reach technology effects are blocked" {
   $requiredGuardSnippets = @(
     @{ File = "prototypes\mir\planner\direct_effects.lua"; Text = $directEffectsPlannerText; Snippet = 'effect_safety.assert_effect_allowed(effect, "direct-effect stream " .. key)' },
     @{ File = "prototypes\mir\emit\legacy_stream_adapter.lua"; Text = $streamAdapterText; Snippet = 'effect_safety.register_generated_technology(technology.name)' },
-    @{ File = "prototypes\base-tech-extensions.lua"; Text = $baseExtensionsText; Snippet = 'effect_safety.assert_effects_allowed(desired_effects, "base extension " .. key)' },
-    @{ File = "prototypes\base-tech-extensions.lua"; Text = $baseExtensionsText; Snippet = 'effect_safety.register_generated_technology(new.name)' },
+    @{ File = "prototypes\mir\emit\base_extensions.lua"; Text = $baseExtensionsText; Snippet = 'effect_safety.assert_effects_allowed(desired_effects, "base extension " .. key)' },
+    @{ File = "prototypes\mir\emit\base_extensions.lua"; Text = $baseExtensionsText; Snippet = 'effect_safety.register_generated_technology(new.name)' },
     @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'require("prototypes.technology-effect-safety").assert_registered_technology_effects()' },
     @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'assert_no_blocked_pickup_effects()' }
   )
@@ -440,7 +440,7 @@ Invoke-RepoCheck "fixture mods have metadata and data entrypoints" {
 
 Invoke-RepoCheck "science-pack progression settings are wired" {
   $settingsText = Get-MIRSettingsSourceText
-  $baseExtensionsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\base-tech-extensions.lua")
+  $baseExtensionsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\emit\base_extensions.lua")
   $settingsResolverText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\settings-resolver.lua")
   $settingsRegistryText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\settings\registry.lua")
   $settingsVisibilityText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\settings\visibility.lua")
@@ -532,7 +532,7 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "control\effects\agricultural-growth-speed.lua"; Text = $agriculturalGrowthText; Snippet = 'agricultural growth speed force state refreshed enabled=' },
     @{ File = "prototypes\mir\capabilities\science_integration\science_selector.lua"; Text = $scienceSelectorText; Snippet = 'apply_science_pack_ingredient_policy' },
     @{ File = "prototypes\mir\planner\costs.lua"; Text = $plannerCostsText; Snippet = 'settings_resolver.stream_enabled(key, spec)' },
-    @{ File = "prototypes\base-tech-extensions.lua"; Text = $baseExtensionsText; Snippet = 'settings_resolver.base_enabled(key, spec)' },
+    @{ File = "prototypes\mir\emit\base_extensions.lua"; Text = $baseExtensionsText; Snippet = 'settings_resolver.base_enabled(key, spec)' },
     @{ File = "prototypes\mir\planner\prerequisites.lua"; Text = $plannerPrerequisitesText; Snippet = 'append_end_game_gate_prerequisite' },
     @{ File = "prototypes\mir\capabilities\science_integration\science_packs.lua"; Text = $scienceText; Snippet = 'pack_list_official' },
     @{ File = "prototypes\mir\capabilities\science_integration\science_packs.lua"; Text = $scienceText; Snippet = 'is_official_science_pack' },
@@ -540,10 +540,10 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "prototypes\mir\capabilities\science_integration\science_packs.lua"; Text = $scienceText; Snippet = 'official_progression_packs_for' },
     @{ File = "prototypes\mir\capabilities\science_integration\science_packs.lua"; Text = $scienceText; Snippet = 'mod_progression_packs_for' },
     @{ File = "prototypes\mir\capabilities\science_integration\science_packs.lua"; Text = $scienceText; Snippet = 'desired == "all-official"' },
-    @{ File = "prototypes\base-tech-extensions.lua"; Text = $baseExtensionsText; Snippet = 'if data.raw.technology[new_name] then' },
-    @{ File = "prototypes\base-tech-extensions.lua"; Text = $baseExtensionsText; Snippet = '"target_exists"' },
-    @{ File = "prototypes\base-tech-extensions.lua"; Text = $baseExtensionsText; Snippet = 'apply_science_pack_ingredient_policy' },
-    @{ File = "prototypes\base-tech-extensions.lua"; Text = $baseExtensionsText; Snippet = 'append_end_game_gate_prerequisite' },
+    @{ File = "prototypes\mir\emit\base_extensions.lua"; Text = $baseExtensionsText; Snippet = 'if data_raw.technology(new_name) then' },
+    @{ File = "prototypes\mir\emit\base_extensions.lua"; Text = $baseExtensionsText; Snippet = '"target_exists"' },
+    @{ File = "prototypes\mir\emit\base_extensions.lua"; Text = $baseExtensionsText; Snippet = 'apply_science_pack_ingredient_policy' },
+    @{ File = "prototypes\mir\emit\base_extensions.lua"; Text = $baseExtensionsText; Snippet = 'append_end_game_gate_prerequisite' },
     @{ File = "prototypes\mir\capabilities\science_integration\science_packs.lua"; Text = $scienceText; Snippet = 'end_game_science_pack' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'icon_candidates={' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'inactive_mod_asset="space-age"' },

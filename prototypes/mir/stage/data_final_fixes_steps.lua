@@ -24,7 +24,7 @@ function M.apply_competing_base_extensions()
 end
 
 function M.emit_base_extensions()
-  require("prototypes.base-tech-extensions")
+  require("prototypes.mir.emit.base_extensions").emit_all()
 end
 
 function M.apply_weapon_speed_adjustments()
