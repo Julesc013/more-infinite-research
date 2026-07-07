@@ -1,1 +1,1 @@
-return require("prototypes.compat.profiles")
+return require("prototypes.mir.compatibility.profiles")

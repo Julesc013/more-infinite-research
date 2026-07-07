@@ -149,9 +149,16 @@ if ($dataFinalFixesStageText.Contains('require("prototypes.mir.compatibility.dia
 
 $dataFinalFixesStepsText = Read-MIRFile -RelativePath $dataFinalFixesStepsPath
 Assert-MIRContains -RelativePath $dataFinalFixesStepsPath -Text $dataFinalFixesStepsText -Needle "function M.apply_pipeline_extent()"
+Assert-MIRContains -RelativePath $dataFinalFixesStepsPath -Text $dataFinalFixesStepsText -Needle 'require("prototypes.mir.policy.competing_productivity").prepare()'
+Assert-MIRContains -RelativePath $dataFinalFixesStepsPath -Text $dataFinalFixesStepsText -Needle 'require("prototypes.mir.policy.competing_productivity").apply()'
+Assert-MIRContains -RelativePath $dataFinalFixesStepsPath -Text $dataFinalFixesStepsText -Needle 'require("prototypes.mir.policy.competing_base_extensions").apply()'
 Assert-MIRContains -RelativePath $dataFinalFixesStepsPath -Text $dataFinalFixesStepsText -Needle "function M.emit_streams()"
 Assert-MIRContains -RelativePath $dataFinalFixesStepsPath -Text $dataFinalFixesStepsText -Needle 'require("prototypes.mir.planner.stream_compiler").run()'
+Assert-MIRContains -RelativePath $dataFinalFixesStepsPath -Text $dataFinalFixesStepsText -Needle 'require("prototypes.mir.compatibility.planner").emit()'
 Assert-MIRContains -RelativePath $dataFinalFixesStepsPath -Text $dataFinalFixesStepsText -Needle "function M.flush_diagnostics()"
+if ($dataFinalFixesStepsText -match 'require\("prototypes\.compat\.') {
+  throw "$dataFinalFixesStepsPath must call MIR-owned compatibility and policy modules, not prototypes.compat shims."
+}
 
 $dataFinalFixesLegacyPath = "prototypes/mir/legacy/data_final_fixes.lua"
 $dataFinalFixesLegacyText = Read-MIRFile -RelativePath $dataFinalFixesLegacyPath
@@ -167,7 +174,11 @@ $requiredShims = @(
   "prototypes/mir/settings/legacy_adapter.lua",
   "prototypes/mir/policy/adoption_policy.lua",
   "prototypes/mir/policy/owner_policy.lua",
+  "prototypes/mir/policy/competing_productivity.lua",
+  "prototypes/mir/policy/competing_base_extensions.lua",
+  "prototypes/mir/policy/productivity_family_adoption.lua",
   "prototypes/mir/index/registry_builder.lua",
+  "prototypes/mir/index/productivity_owners.lua",
   "prototypes/mir/index/recipes.lua",
   "prototypes/mir/index/technologies.lua",
   "prototypes/mir/index/labs.lua",
@@ -187,6 +198,8 @@ $requiredShims = @(
   "prototypes/mir/planner/stream_compiler.lua",
   "prototypes/mir/stage/data_final_fixes_steps.lua",
   "prototypes/mir/compatibility/registry.lua",
+  "prototypes/mir/compatibility/profiles.lua",
+  "prototypes/mir/compatibility/planner.lua",
   "prototypes/mir/compatibility/overlay_loader.lua",
   "prototypes/mir/compatibility/claim_registry.lua",
   "prototypes/mir/compatibility/diagnostics/registry.lua",
@@ -250,16 +263,36 @@ Assert-MIRContains -RelativePath $streamCompilerPath -Text $streamCompilerText -
 
 $adoptionPolicyPath = "prototypes/mir/policy/adoption_policy.lua"
 $adoptionPolicyText = Read-MIRFile -RelativePath $adoptionPolicyPath
-Assert-MIRContains -RelativePath $adoptionPolicyPath -Text $adoptionPolicyText -Needle 'require("prototypes.compat.productivity-family-adoption")'
+Assert-MIRContains -RelativePath $adoptionPolicyPath -Text $adoptionPolicyText -Needle 'require("prototypes.mir.policy.productivity_family_adoption")'
 Assert-MIRContains -RelativePath $adoptionPolicyPath -Text $adoptionPolicyText -Needle "function M.adopt_recipe_productivity_family(key, spec, buckets)"
 Assert-MIRContains -RelativePath $adoptionPolicyPath -Text $adoptionPolicyText -Needle "function M.emit_mod_data()"
 
 $ownerPolicyPath = "prototypes/mir/policy/owner_policy.lua"
 $ownerPolicyText = Read-MIRFile -RelativePath $ownerPolicyPath
-Assert-MIRContains -RelativePath $ownerPolicyPath -Text $ownerPolicyText -Needle 'require("prototypes.compat.competing-productivity")'
-Assert-MIRContains -RelativePath $ownerPolicyPath -Text $ownerPolicyText -Needle 'require("prototypes.compat.productivity-owners")'
+Assert-MIRContains -RelativePath $ownerPolicyPath -Text $ownerPolicyText -Needle 'require("prototypes.mir.policy.competing_productivity")'
+Assert-MIRContains -RelativePath $ownerPolicyPath -Text $ownerPolicyText -Needle 'require("prototypes.mir.index.productivity_owners")'
 Assert-MIRContains -RelativePath $ownerPolicyPath -Text $ownerPolicyText -Needle "function M.filter_existing_recipe_productivity(key, spec, buckets)"
 Assert-MIRContains -RelativePath $ownerPolicyPath -Text $ownerPolicyText -Needle "D.recipe_owner({"
+
+$compatibilityShimExpectations = @{
+  "prototypes/compat/profiles.lua" = 'return require("prototypes.mir.compatibility.profiles")'
+  "prototypes/compat/planner.lua" = 'return require("prototypes.mir.compatibility.planner")'
+  "prototypes/compat/productivity-owners.lua" = 'return require("prototypes.mir.index.productivity_owners")'
+  "prototypes/compat/competing-productivity.lua" = 'return require("prototypes.mir.policy.competing_productivity")'
+  "prototypes/compat/competing-base-extensions.lua" = 'return require("prototypes.mir.policy.competing_base_extensions")'
+  "prototypes/compat/productivity-family-adoption.lua" = 'return require("prototypes.mir.policy.productivity_family_adoption")'
+}
+
+foreach ($relativePath in $compatibilityShimExpectations.Keys) {
+  $shimText = Read-MIRFile -RelativePath $relativePath
+  $shimCodeLines = @(Get-MIRCodeLines -Text $shimText)
+  if ($shimCodeLines.Count -ne 1) {
+    throw "$relativePath must remain a one-line MIR compatibility shim."
+  }
+  if ($shimCodeLines[0] -ne $compatibilityShimExpectations[$relativePath]) {
+    throw "$relativePath must call $($compatibilityShimExpectations[$relativePath])."
+  }
+}
 
 $recipeProductivityPlannerPath = "prototypes/mir/capabilities/recipe_productivity/planner.lua"
 $recipeProductivityPlannerText = Read-MIRFile -RelativePath $recipeProductivityPlannerPath

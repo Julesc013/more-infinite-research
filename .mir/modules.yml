@@ -54,7 +54,11 @@ namespace_shims:
   settings_legacy_adapter: prototypes/mir/settings/legacy_adapter.lua
   adoption_policy: prototypes/mir/policy/adoption_policy.lua
   owner_policy: prototypes/mir/policy/owner_policy.lua
+  competing_productivity_policy: prototypes/mir/policy/competing_productivity.lua
+  competing_base_extensions_policy: prototypes/mir/policy/competing_base_extensions.lua
+  productivity_family_adoption_policy: prototypes/mir/policy/productivity_family_adoption.lua
   fact_registry: prototypes/mir/index/registry_builder.lua
+  index_productivity_owners: prototypes/mir/index/productivity_owners.lua
   legacy_fact_registry_shim: prototypes/lib/facts/registry.lua
   domain_fact_registry_shim: prototypes/mir/domain/facts/registry.lua
   index_recipes: prototypes/mir/index/recipes.lua
@@ -79,6 +83,8 @@ namespace_shims:
   data_final_fixes_stage: prototypes/mir/stage/data_final_fixes.lua
   data_final_fixes_steps: prototypes/mir/stage/data_final_fixes_steps.lua
   compatibility_registry: prototypes/mir/compatibility/registry.lua
+  compatibility_profiles: prototypes/mir/compatibility/profiles.lua
+  compatibility_planner: prototypes/mir/compatibility/planner.lua
   compatibility_overlay_loader: prototypes/mir/compatibility/overlay_loader.lua
   compatibility_claim_registry: prototypes/mir/compatibility/claim_registry.lua
   air_scrubbing_policy_overlay: prototypes/mir/compatibility/overlays/air_scrubbing.lua
@@ -218,9 +224,9 @@ current_boundary_allowlist:
     - prototypes/pipeline-extent.lua
     - prototypes/max-level-control.lua
     - prototypes/weapon-speed-adjustments.lua
-    - prototypes/compat/competing-productivity.lua
-    - prototypes/compat/competing-base-extensions.lua
-    - prototypes/compat/productivity-family-adoption.lua
+    - prototypes/mir/policy/competing_productivity.lua
+    - prototypes/mir/policy/competing_base_extensions.lua
+    - prototypes/mir/policy/productivity_family_adoption.lua
 
 forbidden_imports:
   - from: prototypes/mir/domain

@@ -1,4 +1,4 @@
-local productivity_family_adoption = require("prototypes.compat.productivity-family-adoption")
+local productivity_family_adoption = require("prototypes.mir.policy.productivity_family_adoption")
 
 local M = {}
 

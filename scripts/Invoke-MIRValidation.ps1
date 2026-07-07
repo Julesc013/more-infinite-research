@@ -985,7 +985,7 @@ Invoke-RepoCheck "2.2.0 compiler diagnostics are wired" {
   $compilerShimPath = Join-Path $repo "prototypes\planner\compiler.lua"
   $converterText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\Convert-MIRCompatAuditResults.ps1")
   $overnightSummaryText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\Show-MIROvernightSummary.ps1")
-  $compatPlannerText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\compat\planner.lua")
+  $compatPlannerText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\compatibility\planner.lua")
   $policyLintText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\Test-MIRPolicyLints.ps1")
 
   if (-not (Test-Path -LiteralPath $factRegistryPath)) {
@@ -1059,18 +1059,18 @@ Invoke-RepoCheck "2.2.0 compiler diagnostics are wired" {
     @{ File = "prototypes\mir\planner\compiler.lua"; Text = $compilerText; Snippet = 'decision_export.emit(D, decision_record.generated_technology({' },
     @{ File = "prototypes\mir\planner\compiler.lua"; Text = $compilerText; Snippet = 'emit_generated_technology_decisions' },
     @{ File = "prototypes\mir\planner\compiler.lua"; Text = $compilerText; Snippet = 'capabilities.emit(registry)' },
-    @{ File = "prototypes\compat\planner.lua"; Text = $compatPlannerText; Snippet = 'useful_level_estimate = levels' },
-    @{ File = "prototypes\compat\planner.lua"; Text = $compatPlannerText; Snippet = '["atan-ash"] = {' },
-    @{ File = "prototypes\compat\planner.lua"; Text = $compatPlannerText; Snippet = '["atan-nuclear-science"] = {' },
-    @{ File = "prototypes\compat\planner.lua"; Text = $compatPlannerText; Snippet = '["FluidMustFlow"] = {' },
-    @{ File = "prototypes\compat\planner.lua"; Text = $compatPlannerText; Snippet = '["robot_attrition"] = {' },
-    @{ File = "prototypes\compat\planner.lua"; Text = $compatPlannerText; Snippet = '["jetpack"] = {' },
-    @{ File = "prototypes\compat\planner.lua"; Text = $compatPlannerText; Snippet = '["big-mining-drill"] = {' },
-    @{ File = "prototypes\compat\planner.lua"; Text = $compatPlannerText; Snippet = '["equipment-gantry"] = {' },
-    @{ File = "prototypes\compat\planner.lua"; Text = $compatPlannerText; Snippet = '["aai-industry"] = {' },
-    @{ File = "prototypes\compat\planner.lua"; Text = $compatPlannerText; Snippet = '["aai-containers"] = {' },
-    @{ File = "prototypes\compat\planner.lua"; Text = $compatPlannerText; Snippet = '["aai-loaders"] = {' },
-    @{ File = "prototypes\compat\planner.lua"; Text = $compatPlannerText; Snippet = 'belt_productivity_loader_recipe_candidate' },
+    @{ File = "prototypes\mir\compatibility\planner.lua"; Text = $compatPlannerText; Snippet = 'useful_level_estimate = levels' },
+    @{ File = "prototypes\mir\compatibility\planner.lua"; Text = $compatPlannerText; Snippet = '["atan-ash"] = {' },
+    @{ File = "prototypes\mir\compatibility\planner.lua"; Text = $compatPlannerText; Snippet = '["atan-nuclear-science"] = {' },
+    @{ File = "prototypes\mir\compatibility\planner.lua"; Text = $compatPlannerText; Snippet = '["FluidMustFlow"] = {' },
+    @{ File = "prototypes\mir\compatibility\planner.lua"; Text = $compatPlannerText; Snippet = '["robot_attrition"] = {' },
+    @{ File = "prototypes\mir\compatibility\planner.lua"; Text = $compatPlannerText; Snippet = '["jetpack"] = {' },
+    @{ File = "prototypes\mir\compatibility\planner.lua"; Text = $compatPlannerText; Snippet = '["big-mining-drill"] = {' },
+    @{ File = "prototypes\mir\compatibility\planner.lua"; Text = $compatPlannerText; Snippet = '["equipment-gantry"] = {' },
+    @{ File = "prototypes\mir\compatibility\planner.lua"; Text = $compatPlannerText; Snippet = '["aai-industry"] = {' },
+    @{ File = "prototypes\mir\compatibility\planner.lua"; Text = $compatPlannerText; Snippet = '["aai-containers"] = {' },
+    @{ File = "prototypes\mir\compatibility\planner.lua"; Text = $compatPlannerText; Snippet = '["aai-loaders"] = {' },
+    @{ File = "prototypes\mir\compatibility\planner.lua"; Text = $compatPlannerText; Snippet = 'belt_productivity_loader_recipe_candidate' },
     @{ File = "scripts\Convert-MIRCompatAuditResults.ps1"; Text = $converterText; Snippet = '"fact_registry", "decision", "rule_mutation", "loop_risk", "lab_matrix"' },
     @{ File = "scripts\Convert-MIRCompatAuditResults.ps1"; Text = $converterText; Snippet = 'capability = [string](Get-MIRObjectProperty -Object $row -Name "capability")' },
     @{ File = "scripts\Convert-MIRCompatAuditResults.ps1"; Text = $converterText; Snippet = '## Capability Decisions' },

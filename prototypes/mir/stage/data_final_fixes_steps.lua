@@ -8,7 +8,7 @@ function M.apply_pipeline_extent()
 end
 
 function M.prepare_competing_productivity()
-  require("prototypes.compat.competing-productivity").prepare()
+  require("prototypes.mir.policy.competing_productivity").prepare()
 end
 
 function M.emit_streams()
@@ -16,11 +16,11 @@ function M.emit_streams()
 end
 
 function M.apply_competing_productivity()
-  require("prototypes.compat.competing-productivity").apply()
+  require("prototypes.mir.policy.competing_productivity").apply()
 end
 
 function M.apply_competing_base_extensions()
-  require("prototypes.compat.competing-base-extensions").apply()
+  require("prototypes.mir.policy.competing_base_extensions").apply()
 end
 
 function M.emit_base_extensions()
@@ -36,7 +36,7 @@ function M.apply_max_level_control()
 end
 
 function M.emit_compatibility_planner()
-  require("prototypes.compat.planner").emit()
+  require("prototypes.mir.compatibility.planner").emit()
 end
 
 function M.assert_registered_technology_effects()

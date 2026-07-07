@@ -3,7 +3,7 @@ local capabilities = require("prototypes.lib.capabilities.registry")
 local decision_record = require("prototypes.mir.domain.decisions.decision_record")
 local decision_export = require("prototypes.mir.report.decision_export")
 local fact_registry = require("prototypes.mir.index.registry_builder")
-local productivity_owners = require("prototypes.compat.productivity-owners")
+local productivity_owners = require("prototypes.mir.index.productivity_owners")
 
 local M = {}
 

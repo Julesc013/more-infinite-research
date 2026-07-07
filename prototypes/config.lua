@@ -9,6 +9,6 @@ M.shared = {
 
 M.streams = require("prototypes.streams.init")
 
-require("prototypes.compat.profiles").apply(M)
+require("prototypes.mir.compatibility.profiles").apply(M)
 
 return M

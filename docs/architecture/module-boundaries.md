@@ -138,6 +138,11 @@ recipe productivity effects after policy filters run.
 `prototypes/mir/planner/stream_compiler.lua` owns the transitional generated
 stream loop. The old `prototypes/tech-gen.lua` path is a compatibility shim
 that immediately delegates to that MIR planner module.
+The old `prototypes/compat/` paths for profiles, owner detection, competing
+productivity cleanup, competing base-extension cleanup, family adoption, and
+compatibility planning are compatibility shims. The active implementations live
+under `prototypes/mir/compatibility/`, `prototypes/mir/index/`, and
+`prototypes/mir/policy/`.
 
 Compatibility policy uses `prototypes/mir/compatibility/`. Named compatibility
 targets live under `prototypes/mir/compatibility/overlays/`; those overlays
@@ -319,6 +324,9 @@ prototypes/
       science_policy.lua
       cap_policy.lua
       owner_policy.lua
+      competing_productivity.lua
+      competing_base_extensions.lua
+      productivity_family_adoption.lua
       denylist.lua
       overrides.lua
 
@@ -413,6 +421,8 @@ prototypes/
 
     compatibility/
       registry.lua
+      profiles.lua
+      planner.lua
       overlay_loader.lua
       claim_registry.lua
       diagnostics/

@@ -1,6 +1,6 @@
 local D = require("prototypes.diagnostics")
-local competing_productivity = require("prototypes.compat.competing-productivity")
-local productivity_owners = require("prototypes.compat.productivity-owners")
+local competing_productivity = require("prototypes.mir.policy.competing_productivity")
+local productivity_owners = require("prototypes.mir.index.productivity_owners")
 
 local M = {}
 
