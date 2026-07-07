@@ -17,6 +17,7 @@ checklists, and validation records.
 
 - [3.0.0 plan](3.0.0-plan.md)
 - [3.0.0 regression baseline](3.0.0-regression-baseline.md)
+- [3.0.0 transition checkpoint 2](3.0.0-transition-checkpoint-2.md)
 - [3.0.0 migration guide](3.0.0-migration-guide.md)
 - [3.0.0 release checklist](3.0.0-release-checklist.md)
 - [3.0.0 risk register](3.0.0-risk-register.md)
