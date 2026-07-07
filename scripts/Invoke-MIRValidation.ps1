@@ -980,6 +980,7 @@ Invoke-RepoCheck "2.2.0 compiler diagnostics are wired" {
 
   $factRegistryText = Get-Content -Raw -LiteralPath $factRegistryPath
   $decisionRecordText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\domain\decisions\decision_record.lua")
+  $decisionExportText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\report\decision_export.lua")
   $capabilityRegistryText = Get-Content -Raw -LiteralPath $capabilityRegistryPath
   $capabilityContractText = Get-Content -Raw -LiteralPath $capabilityContractPath
   $capabilityPolicyText = Get-Content -Raw -LiteralPath $capabilityPolicyPath
@@ -1001,6 +1002,8 @@ Invoke-RepoCheck "2.2.0 compiler diagnostics are wired" {
     @{ File = "prototypes\lib\facts\registry.lua"; Text = $factRegistryText; Snippet = 'build_loop_risk_facts' },
     @{ File = "prototypes\mir\domain\decisions\decision_record.lua"; Text = $decisionRecordText; Snippet = 'function M.generated_technology(record)' },
     @{ File = "prototypes\mir\domain\decisions\decision_record.lua"; Text = $decisionRecordText; Snippet = 'schema.decision({' },
+    @{ File = "prototypes\mir\report\decision_export.lua"; Text = $decisionExportText; Snippet = 'function M.emit(sink, record)' },
+    @{ File = "prototypes\mir\report\decision_export.lua"; Text = $decisionExportText; Snippet = 'sink.decision(record)' },
     @{ File = "prototypes\lib\mir\schema.lua"; Text = $schemaText; Snippet = 'S.decision_record = 1' },
     @{ File = "prototypes\lib\capabilities\contract.lua"; Text = $capabilityContractText; Snippet = 'CapabilityResolver' },
     @{ File = "prototypes\lib\capabilities\contract.lua"; Text = $capabilityContractText; Snippet = '"discover"' },
@@ -1014,8 +1017,10 @@ Invoke-RepoCheck "2.2.0 compiler diagnostics are wired" {
     @{ File = "prototypes\lib\capabilities\registry.lua"; Text = $capabilityRegistryText; Snippet = 'id = "native-modifier-ownership"' },
     @{ File = "prototypes\lib\capabilities\registry.lua"; Text = $capabilityRegistryText; Snippet = 'entity_backed_candidates' },
     @{ File = "prototypes\lib\capabilities\registry.lua"; Text = $capabilityRegistryText; Snippet = 'discover,classify,propose,validate,emit,diagnose' },
+    @{ File = "prototypes\planner\compiler.lua"; Text = $compilerText; Snippet = 'local decision_export = require("prototypes.mir.report.decision_export")' },
     @{ File = "prototypes\planner\compiler.lua"; Text = $compilerText; Snippet = 'D.fact_registry({' },
-    @{ File = "prototypes\planner\compiler.lua"; Text = $compilerText; Snippet = 'D.decision({' },
+    @{ File = "prototypes\planner\compiler.lua"; Text = $compilerText; Snippet = 'decision_export.emit(D, {' },
+    @{ File = "prototypes\planner\compiler.lua"; Text = $compilerText; Snippet = 'decision_export.emit(D, decision_record.generated_technology({' },
     @{ File = "prototypes\planner\compiler.lua"; Text = $compilerText; Snippet = 'emit_generated_technology_decisions' },
     @{ File = "prototypes\planner\compiler.lua"; Text = $compilerText; Snippet = 'capabilities.emit(registry)' },
     @{ File = "prototypes\compat\planner.lua"; Text = $compatPlannerText; Snippet = 'useful_level_estimate = levels' },

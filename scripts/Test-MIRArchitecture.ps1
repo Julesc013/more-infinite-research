@@ -141,6 +141,7 @@ $requiredShims = @(
   "prototypes/mir/domain/facts/registry.lua",
   "prototypes/mir/capabilities/contract.lua",
   "prototypes/mir/capabilities/registry.lua",
+  "prototypes/mir/report/decision_export.lua",
   "prototypes/mir/planner/compiler.lua",
   "prototypes/mir/compatibility/registry.lua",
   "prototypes/mir/compatibility/overlay_loader.lua",
@@ -170,6 +171,16 @@ $settingsVisibilityText = Read-MIRFile -RelativePath $settingsVisibilityPath
 Assert-MIRContains -RelativePath $settingsVisibilityPath -Text $settingsVisibilityText -Needle 'require("prototypes.mir.platform.factorio.mods")'
 Assert-MIRContains -RelativePath $settingsVisibilityPath -Text $settingsVisibilityText -Needle "function M.hidden_for_stream(stream)"
 Assert-MIRContains -RelativePath $settingsVisibilityPath -Text $settingsVisibilityText -Needle "stream.settings_required_mods"
+
+$decisionExportPath = "prototypes/mir/report/decision_export.lua"
+$decisionExportText = Read-MIRFile -RelativePath $decisionExportPath
+Assert-MIRContains -RelativePath $decisionExportPath -Text $decisionExportText -Needle "function M.emit(sink, record)"
+Assert-MIRContains -RelativePath $decisionExportPath -Text $decisionExportText -Needle "sink.decision(record)"
+
+$plannerCompilerPath = "prototypes/planner/compiler.lua"
+$plannerCompilerText = Read-MIRFile -RelativePath $plannerCompilerPath
+Assert-MIRContains -RelativePath $plannerCompilerPath -Text $plannerCompilerText -Needle 'require("prototypes.mir.report.decision_export")'
+Assert-MIRContains -RelativePath $plannerCompilerPath -Text $plannerCompilerText -Needle "decision_export.emit(D, decision_record.generated_technology({"
 
 $airScrubbingOverlayPath = "prototypes/mir/compatibility/overlays/air_scrubbing.lua"
 $airScrubbingOverlayText = Read-MIRFile -RelativePath $airScrubbingOverlayPath

@@ -1,6 +1,7 @@
 local D = require("prototypes.diagnostics")
 local capabilities = require("prototypes.lib.capabilities.registry")
 local decision_record = require("prototypes.mir.domain.decisions.decision_record")
+local decision_export = require("prototypes.mir.report.decision_export")
 local fact_registry = require("prototypes.lib.facts.registry")
 local productivity_owners = require("prototypes.compat.productivity-owners")
 
@@ -106,7 +107,7 @@ local function emit_rule_mutations(registry)
       confidence = tostring(fact.confidence or "")
     })
 
-    D.decision({
+    decision_export.emit(D, {
       key = fact.subject,
       subject_type = fact.subject_type,
       subject = fact.subject,
@@ -137,7 +138,7 @@ local function emit_loop_risks(registry)
       confidence = tostring(fact.confidence or "")
     })
 
-    D.decision({
+    decision_export.emit(D, {
       key = fact.subject,
       subject_type = fact.subject_type,
       subject = fact.subject,
@@ -160,7 +161,7 @@ local function emit_generated_technology_decisions(registry)
       local fact = registry.technologies[tech_name]
       local labs = fact_registry.labs_for_packs(registry.labs, fact.science_packs)
       local lab_compatible = #labs > 0
-      D.decision(decision_record.generated_technology({
+      decision_export.emit(D, decision_record.generated_technology({
         technology_name = tech_name,
         lab_compatible = lab_compatible,
         effect_count = fact.effect_count or 0,

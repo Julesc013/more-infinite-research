@@ -55,6 +55,7 @@ namespace_shims:
   capability_registry: prototypes/mir/capabilities/registry.lua
   settings_visibility: prototypes/mir/policy/settings_visibility.lua
   technology_builder: prototypes/mir/emit/technology_builder.lua
+  decision_export: prototypes/mir/report/decision_export.lua
   planner_compiler: prototypes/mir/planner/compiler.lua
   compatibility_registry: prototypes/mir/compatibility/registry.lua
   compatibility_overlay_loader: prototypes/mir/compatibility/overlay_loader.lua
