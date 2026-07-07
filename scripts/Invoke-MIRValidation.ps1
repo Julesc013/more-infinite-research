@@ -1753,6 +1753,7 @@ function Get-CopiedSettingsImplementationPath {
   param([string]$ModsDir)
 
   $candidates = @(
+    "more-infinite-research\prototypes\mir\settings\stage_builder.lua",
     "more-infinite-research\prototypes\mir\legacy\settings.lua",
     "more-infinite-research\settings.lua"
   )
