@@ -1,7 +1,7 @@
 local M = {}
 
 local function assert_runtime_stage()
-  if type(script) ~= "table" then
+  if script == nil then
     error("MIR control.lua must run in Factorio's runtime Lua state", 2)
   end
 
