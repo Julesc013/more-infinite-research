@@ -133,6 +133,20 @@ foreach ($entry in $entrypoints) {
   }
 }
 
+$dataFinalFixesStagePath = "prototypes/mir/stage/data_final_fixes.lua"
+$dataFinalFixesStageText = Read-MIRFile -RelativePath $dataFinalFixesStagePath
+Assert-MIRContains -RelativePath $dataFinalFixesStagePath -Text $dataFinalFixesStageText -Needle "legacy.apply_pipeline_extent()"
+Assert-MIRContains -RelativePath $dataFinalFixesStagePath -Text $dataFinalFixesStageText -Needle "legacy.emit_legacy_streams()"
+Assert-MIRContains -RelativePath $dataFinalFixesStagePath -Text $dataFinalFixesStageText -Needle 'require("prototypes.mir.compatibility.diagnostics.atan_ash").emit()'
+Assert-MIRContains -RelativePath $dataFinalFixesStagePath -Text $dataFinalFixesStageText -Needle 'require("prototypes.mir.planner.compiler").emit()'
+Assert-MIRContains -RelativePath $dataFinalFixesStagePath -Text $dataFinalFixesStageText -Needle "legacy.flush_diagnostics()"
+
+$dataFinalFixesLegacyPath = "prototypes/mir/legacy/data_final_fixes.lua"
+$dataFinalFixesLegacyText = Read-MIRFile -RelativePath $dataFinalFixesLegacyPath
+Assert-MIRContains -RelativePath $dataFinalFixesLegacyPath -Text $dataFinalFixesLegacyText -Needle "function M.apply_pipeline_extent()"
+Assert-MIRContains -RelativePath $dataFinalFixesLegacyPath -Text $dataFinalFixesLegacyText -Needle "function M.emit_legacy_streams()"
+Assert-MIRContains -RelativePath $dataFinalFixesLegacyPath -Text $dataFinalFixesLegacyText -Needle "function M.flush_diagnostics()"
+
 $requiredShims = @(
   "prototypes/mir/core/schema.lua",
   "prototypes/mir/platform/factorio/data_raw.lua",

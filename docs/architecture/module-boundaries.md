@@ -90,9 +90,10 @@ Current migration state: the Factorio root entrypoints route through
 `prototypes/mir/stage/control.lua` owns only runtime registration and delegates
 to the event handlers under `control/`. The old
 `prototypes/mir/legacy/control.lua` path is a compatibility shim back to that
-stage entrypoint. This is a behavior-preserving shell migration. The generation
-modules still move behind `domain/`, `capabilities/`, `planner/`, and `emit/`
-in later slices.
+stage entrypoint. `prototypes/mir/stage/data_final_fixes.lua` owns the
+transitional data-final-fixes call order and delegates old behavior through
+named legacy adapters. The generation modules still move behind `domain/`,
+`capabilities/`, `planner/`, and `emit/` in later slices.
 
 The first Factorio platform adapter is
 `prototypes/mir/platform/factorio/data_raw.lua`. It wraps access to `data.raw`
