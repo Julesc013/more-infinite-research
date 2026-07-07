@@ -83,8 +83,10 @@ function Copy-MIRModUnderTest {
 function Enable-MIRCopiedGenerationReport {
   param([Parameter(Mandatory)][string]$ModsDir)
 
-  $diagnosticsPath = Join-Path $ModsDir "more-infinite-research\prototypes\diagnostics.lua"
-  if (-not (Test-Path -LiteralPath $diagnosticsPath)) { return }
+  $diagnosticsPath = Join-Path $ModsDir "more-infinite-research\prototypes\mir\report\diagnostics_sink.lua"
+  if (-not (Test-Path -LiteralPath $diagnosticsPath)) {
+    throw "Unable to find copied MIR diagnostics sink: $diagnosticsPath"
+  }
 
   $diagnostics = Get-Content -Raw -LiteralPath $diagnosticsPath
   $diagnostics = $diagnostics -replace 'return startup_setting\("mir-debug-generation-report"\) == true', 'return true'
