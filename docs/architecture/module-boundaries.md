@@ -133,6 +133,9 @@ applying fallback effect icons before emission planning.
 `prototypes/mir/capabilities/recipe_productivity/planner.lua` owns the current
 recipe-productivity bucket matching facade and converts matched buckets into
 recipe productivity effects after policy filters run.
+`prototypes/mir/planner/stream_compiler.lua` owns the transitional generated
+stream loop. The old `prototypes/tech-gen.lua` path is a compatibility shim
+that immediately delegates to that MIR planner module.
 
 Compatibility policy uses `prototypes/mir/compatibility/`. Named compatibility
 targets live under `prototypes/mir/compatibility/overlays/`; those overlays
