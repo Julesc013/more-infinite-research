@@ -180,6 +180,7 @@ $requiredShims = @(
   "prototypes/mir/platform/factorio/prototype_lookup.lua",
   "prototypes/mir/pipeline/extent.lua",
   "prototypes/mir/settings/registry.lua",
+  "prototypes/mir/settings/defaults.lua",
   "prototypes/mir/settings/visibility.lua",
   "prototypes/mir/settings/builder.lua",
   "prototypes/mir/settings/legacy_adapter.lua",

@@ -119,6 +119,8 @@ remain data-stage generation concerns. The old
 `prototypes/mir/settings/resolver.lua` owns startup setting enablement checks
 for data-stage stream and base-extension planning; the old
 `prototypes/settings-resolver.lua` root path is a compatibility shim.
+`prototypes/mir/settings/defaults.lua` owns shared stream and base-extension
+defaults; the root `defaults.lua` path is a compatibility shim.
 `prototypes/mir/settings/pipeline_extent.lua` owns the pipeline extent setting
 catalog and parser; the old `prototypes/pipeline-extent-settings.lua` root path
 is a compatibility shim.

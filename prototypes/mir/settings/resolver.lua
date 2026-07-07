@@ -1,4 +1,4 @@
-local defaults = require("defaults")
+local defaults = require("prototypes.mir.settings.defaults")
 local effective_settings = require("prototypes.mir.settings.effective")
 
 local R = {}

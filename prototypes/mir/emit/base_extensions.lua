@@ -1,4 +1,4 @@
-local defaults = require("defaults")
+local defaults = require("prototypes.mir.settings.defaults")
 
 local base_defaults = defaults.base_extensions or {}
 

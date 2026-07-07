@@ -435,7 +435,7 @@ Generic competing recipe-productivity cleanup is intentionally limited to **know
 | `data.lua` | Loads stable shared config and utility facades only. |
 | `data-updates.lua` | Reserved for future pre-final compatibility hooks. |
 | `data-final-fixes.lua` | Runs startup-only prototype extensions, generation, cleanup, extensions, adjustments, max-level control, and diagnostics. |
-| `defaults.lua` | Shared stream defaults, per-stream overrides, and base-extension defaults. |
+| `prototypes/mir/settings/defaults.lua` | Shared stream defaults, per-stream overrides, and base-extension defaults. The root `defaults.lua` file is a compatibility shim. |
 | `settings.lua` | Startup settings generated from streams and base-extension defaults. |
 | `prototypes/pipeline-extent-settings.lua` | Owns pipeline extent dropdown values and parsing. |
 | `prototypes/pipeline-extent.lua` | Applies the opt-in startup-only pipeline extent multiplier to fluid boxes. |

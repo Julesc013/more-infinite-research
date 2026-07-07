@@ -299,7 +299,7 @@ Invoke-RepoCheck "control runtime avoids tick handlers" {
 }
 
 Invoke-RepoCheck "scripted candidate streams remain default-off before manual proof" {
-  $defaultsText = Get-Content -Raw -LiteralPath (Join-Path $repo "defaults.lua")
+  $defaultsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\settings\defaults.lua")
   foreach ($streamKey in @("research_spoilage_preservation", "research_agricultural_growth_speed")) {
     if ($defaultsText -notmatch "(?s)$streamKey\s*=\s*\{.*?enabled\s*=\s*false") {
       throw "Scripted candidate stream $streamKey must remain disabled by default until manual save validation supports release claims."
@@ -477,7 +477,7 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
   $atanNuclearScienceFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-atan-nuclear-science-productivity\data-final-fixes.lua")
   $capabilityNegativeFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\capability-negative-cases\data.lua")
   $capabilityNegativeAssertText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-capability-negative-cases\data-final-fixes.lua")
-  $defaultsText = Get-Content -Raw -LiteralPath (Join-Path $repo "defaults.lua")
+  $defaultsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\settings\defaults.lua")
   $localeText = Get-Content -Raw -LiteralPath (Join-Path $repo "locale\en\more-infinite-research.cfg")
 
   $requiredSnippets = @(
@@ -693,10 +693,10 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-note-experimental-spoilage=Experimental and disabled by default in v2.1.0.' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-note-experimental-agriculture=Experimental and disabled by default in v2.1.0.' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-note-inserter-capacity=Disabled by default.' },
-    @{ File = "defaults.lua"; Text = $defaultsText; Snippet = 'settings_note = {"mod-setting-description.mir-note-experimental-spoilage"}' },
-    @{ File = "defaults.lua"; Text = $defaultsText; Snippet = 'settings_note = {"mod-setting-description.mir-note-experimental-agriculture"}' },
-    @{ File = "defaults.lua"; Text = $defaultsText; Snippet = 'settings_note = {"mod-setting-description.mir-note-inserter-capacity"}' },
-    @{ File = "defaults.lua"; Text = $defaultsText; Snippet = 'research_lab_productivity = {' }
+    @{ File = "prototypes\mir\settings\defaults.lua"; Text = $defaultsText; Snippet = 'settings_note = {"mod-setting-description.mir-note-experimental-spoilage"}' },
+    @{ File = "prototypes\mir\settings\defaults.lua"; Text = $defaultsText; Snippet = 'settings_note = {"mod-setting-description.mir-note-experimental-agriculture"}' },
+    @{ File = "prototypes\mir\settings\defaults.lua"; Text = $defaultsText; Snippet = 'settings_note = {"mod-setting-description.mir-note-inserter-capacity"}' },
+    @{ File = "prototypes\mir\settings\defaults.lua"; Text = $defaultsText; Snippet = 'research_lab_productivity = {' }
   )
 
   if ($isLegacyFactorio20) {
@@ -714,7 +714,7 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
       @{ File = "settings.lua"; Text = $settingsText; Snippet = 'research_cargo_landing_pad_count = "Cargo landing pad count"' },
       @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'cargo-landing-pad-count=Cargo landing pads per surface: +__1__' },
       @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-note-sandbox-cargo-pad-count=Sandbox-style and disabled by default.' },
-      @{ File = "defaults.lua"; Text = $defaultsText; Snippet = 'settings_note = {"mod-setting-description.mir-note-sandbox-cargo-pad-count"}' },
+      @{ File = "prototypes\mir\settings\defaults.lua"; Text = $defaultsText; Snippet = 'settings_note = {"mod-setting-description.mir-note-sandbox-cargo-pad-count"}' },
       @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'research_cargo_landing_pad_count = {' },
       @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'required_mods = {"space-age"}' },
       @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'required_technologies = {"rocket-silo"}' },
@@ -757,14 +757,14 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
   foreach ($weaponSpeedStream in @("research_rocket_shooting_speed", "research_cannon_shooting_speed")) {
     $match = [regex]::Match($defaultsText, "(?s)$weaponSpeedStream\s*=\s*\{.*?science_packs\s*=\s*\{(?<packs>.*?)\n\s*\}")
     if (-not $match.Success) {
-      throw "Missing explicit default science pack list for $weaponSpeedStream in defaults.lua."
+      throw "Missing explicit default science pack list for $weaponSpeedStream in prototypes/mir/settings/defaults.lua."
     }
     $packs = $match.Groups["packs"].Value
     if (-not $packs.Contains("electromagnetic-science-pack")) {
-      throw "$weaponSpeedStream defaults.lua science packs must include electromagnetic-science-pack."
+      throw "$weaponSpeedStream prototypes/mir/settings/defaults.lua science packs must include electromagnetic-science-pack."
     }
     if ($packs.Contains("agricultural-science-pack")) {
-      throw "$weaponSpeedStream defaults.lua science packs must not include agricultural-science-pack."
+      throw "$weaponSpeedStream prototypes/mir/settings/defaults.lua science packs must not include agricultural-science-pack."
     }
   }
 
@@ -1860,10 +1860,10 @@ function Set-CopiedStreamCheckboxDefault {
     Set-CopiedGeneratedStartupSettingDefault -ModsDir $ModsDir -Name "ips-enable-$StreamKey" -ValueLiteral $valueLiteral
     return
   } catch {
-    $copiedDefaultsPath = Join-Path $ModsDir "more-infinite-research\defaults.lua"
+    $copiedDefaultsPath = Join-Path $ModsDir "more-infinite-research\prototypes\mir\settings\defaults.lua"
     $copiedDefaults = Get-Content -Raw -LiteralPath $copiedDefaultsPath
     if ($copiedDefaults -notmatch "return\s+defaults") {
-      throw "Unable to find return defaults in copied defaults.lua while setting stream $StreamKey."
+      throw "Unable to find return defaults in copied prototypes/mir/settings/defaults.lua while setting stream $StreamKey."
     }
 
     $escapedStreamKey = $StreamKey.Replace("\", "\\").Replace('"', '\"')
@@ -1900,10 +1900,10 @@ function Set-CopiedBaseExtensionDefault {
     Set-CopiedGeneratedStartupSettingDefault -ModsDir $ModsDir -Name "mir-enable-$BaseExtensionKey" -ValueLiteral $valueLiteral
     return
   } catch {
-    $copiedDefaultsPath = Join-Path $ModsDir "more-infinite-research\defaults.lua"
+    $copiedDefaultsPath = Join-Path $ModsDir "more-infinite-research\prototypes\mir\settings\defaults.lua"
     $copiedDefaults = Get-Content -Raw -LiteralPath $copiedDefaultsPath
     if ($copiedDefaults -notmatch "return\s+defaults") {
-      throw "Unable to find return defaults in copied defaults.lua while setting base extension $BaseExtensionKey."
+      throw "Unable to find return defaults in copied prototypes/mir/settings/defaults.lua while setting base extension $BaseExtensionKey."
     }
 
     $escapedBaseExtensionKey = $BaseExtensionKey.Replace("\", "\\").Replace('"', '\"')

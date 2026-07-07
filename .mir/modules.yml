@@ -57,6 +57,7 @@ namespace_shims:
   factorio_prototype_lookup: prototypes/mir/platform/factorio/prototype_lookup.lua
   pipeline_extent: prototypes/mir/pipeline/extent.lua
   settings_registry: prototypes/mir/settings/registry.lua
+  settings_defaults: prototypes/mir/settings/defaults.lua
   settings_visibility: prototypes/mir/settings/visibility.lua
   settings_builder: prototypes/mir/settings/builder.lua
   settings_stage_builder: prototypes/mir/settings/stage_builder.lua

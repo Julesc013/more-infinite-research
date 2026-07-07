@@ -1,4 +1,4 @@
-local defaults = require("defaults")
+local defaults = require("prototypes.mir.settings.defaults")
 local cleanup = require("prototypes.mir.policy.technology_cleanup")
 local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 local settings_resolver = require("prototypes.mir.settings.resolver")
