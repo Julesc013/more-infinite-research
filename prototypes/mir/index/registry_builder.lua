@@ -1,5 +1,6 @@
 local productivity_owners = require("prototypes.mir.index.productivity_owners")
 local schema = require("prototypes.mir.core.schema")
+local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 
 local R = {}
 
@@ -131,8 +132,9 @@ end
 
 local function collect_unlock_techs()
   local unlocks = {}
-  for _, tech_name in ipairs(sorted_keys(data.raw.technology or {})) do
-    local tech = data.raw.technology[tech_name]
+  local technologies = data_raw.prototypes("technology")
+  for _, tech_name in ipairs(sorted_keys(technologies)) do
+    local tech = technologies[tech_name]
     for _, effect in ipairs(tech.effects or {}) do
       if effect.type == "unlock-recipe" and effect.recipe then
         unlocks[effect.recipe] = unlocks[effect.recipe] or {}
@@ -198,8 +200,9 @@ end
 
 local function build_recipe_facts(unlocks)
   local facts = {}
-  for _, name in ipairs(sorted_keys(data.raw.recipe or {})) do
-    local recipe = data.raw.recipe[name]
+  local recipes = data_raw.prototypes("recipe")
+  for _, name in ipairs(sorted_keys(recipes)) do
+    local recipe = recipes[name]
     local ingredients = collect_recipe_io(recipe, "ingredients")
     local results = collect_recipe_io(recipe, "results")
     local owner_records = productivity_owners.external_recipe_productivity_owner_records(name)
@@ -230,8 +233,9 @@ end
 
 local function build_technology_facts()
   local facts = {}
-  for _, name in ipairs(sorted_keys(data.raw.technology or {})) do
-    local tech = data.raw.technology[name]
+  local technologies = data_raw.prototypes("technology")
+  for _, name in ipairs(sorted_keys(technologies)) do
+    local tech = technologies[name]
     facts[name] = {
       name = name,
       effects = collect_effect_types(tech),
@@ -252,8 +256,9 @@ end
 local function build_machine_facts()
   local facts = {}
   for _, prototype_type in ipairs(MACHINE_TYPES) do
-    for _, name in ipairs(sorted_keys(data.raw[prototype_type] or {})) do
-      local machine = data.raw[prototype_type][name]
+    local machines = data_raw.prototypes(prototype_type)
+    for _, name in ipairs(sorted_keys(machines)) do
+      local machine = machines[name]
       facts[prototype_type .. "/" .. name] = {
         name = name,
         prototype_type = prototype_type,
@@ -271,8 +276,9 @@ end
 
 local function build_lab_facts()
   local facts = {}
-  for _, name in ipairs(sorted_keys(data.raw.lab or {})) do
-    local lab = data.raw.lab[name]
+  local labs = data_raw.prototypes("lab")
+  for _, name in ipairs(sorted_keys(labs)) do
+    local lab = labs[name]
     local inputs = {}
     for _, input in ipairs(lab.inputs or {}) do table.insert(inputs, input) end
     table.sort(inputs)
@@ -316,8 +322,9 @@ end
 
 local function build_owner_facts()
   local facts = {}
-  for _, tech_name in ipairs(sorted_keys(data.raw.technology or {})) do
-    local tech = data.raw.technology[tech_name]
+  local technologies = data_raw.prototypes("technology")
+  for _, tech_name in ipairs(sorted_keys(technologies)) do
+    local tech = technologies[tech_name]
     for _, effect in ipairs(tech.effects or {}) do
       if effect.type and effect.type ~= "unlock-recipe" and effect.type ~= "nothing" then
         local subject_type, subject = owner_subject(effect)
@@ -376,8 +383,9 @@ local function build_rule_mutation_facts(recipe_facts, machine_facts, lab_facts)
     end
   end
 
-  for _, key in ipairs(sorted_keys(data.raw.beacon or {})) do
-    local beacon = data.raw.beacon[key]
+  local beacons = data_raw.prototypes("beacon")
+  for _, key in ipairs(sorted_keys(beacons)) do
+    local beacon = beacons[key]
     if has_allowed_effect(beacon, "productivity") then
       table.insert(facts, {
         subject = "beacon/" .. key,

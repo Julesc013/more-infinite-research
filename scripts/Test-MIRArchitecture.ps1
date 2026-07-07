@@ -487,8 +487,10 @@ Assert-MIRContains -RelativePath $legacyInventoryPath -Text $legacyInventoryText
 Assert-MIRContains -RelativePath $legacyInventoryPath -Text $legacyInventoryText -Needle "generated_streams_without_manifest"
 Assert-MIRContains -RelativePath $legacyInventoryPath -Text $legacyInventoryText -Needle "compat_active_modules"
 Assert-MIRContains -RelativePath $legacyInventoryPath -Text $legacyInventoryText -Needle "requires_lib"
+Assert-MIRContains -RelativePath $legacyInventoryPath -Text $legacyInventoryText -Needle "MaxMirLegacyActiveModules = 0"
+Assert-MIRContains -RelativePath $legacyInventoryPath -Text $legacyInventoryText -Needle "MaxRequiresMirLegacy = 0"
 Assert-MIRContains -RelativePath $legacyInventoryPath -Text $legacyInventoryText -Needle "MaxRequiresUtil = 0"
-Assert-MIRContains -RelativePath $legacyInventoryPath -Text $legacyInventoryText -Needle "MaxDataRawOutsidePlatform = 32"
+Assert-MIRContains -RelativePath $legacyInventoryPath -Text $legacyInventoryText -Needle "MaxDataRawOutsidePlatform = 0"
 Assert-MIRContains -RelativePath $legacyInventoryPath -Text $legacyInventoryText -Needle "MaxLibActiveModules = 0"
 Assert-MIRContains -RelativePath $legacyInventoryPath -Text $legacyInventoryText -Needle "MIR legacy inventory thresholds passed"
 

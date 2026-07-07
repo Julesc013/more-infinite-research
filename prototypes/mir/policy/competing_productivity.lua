@@ -3,6 +3,7 @@ local costs = require("prototypes.mir.planner.costs")
 local profiles = require("prototypes.mir.compatibility.profiles")
 local productivity_owners = require("prototypes.mir.index.productivity_owners")
 local cleanup = require("prototypes.mir.policy.technology_cleanup")
+local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 local lookup = require("prototypes.mir.platform.factorio.prototype_lookup")
 local recipe_matching = require("prototypes.mir.capabilities.recipe_productivity.recipe_matching")
 local science_packs = require("prototypes.mir.capabilities.science_integration.science_packs")
@@ -81,7 +82,7 @@ local function collect_owned_recipes()
   local owned = {}
   for key, _ in pairs(C.streams or {}) do
     local tech_name = "recipe-prod-" .. key .. "-1"
-    local tech = data.raw.technology and data.raw.technology[tech_name]
+    local tech = data_raw.technology(tech_name)
     for _, effect in ipairs((tech and tech.effects) or {}) do
       if effect.type == "change-recipe-productivity" and effect.recipe then
         owned[effect.recipe] = {
@@ -114,7 +115,7 @@ function M.prepare()
   if not known_competing_mod_active() then return end
 
   local covered_recipes = collect_enabled_stream_recipe_coverage()
-  for name, tech in pairs(data.raw.technology or {}) do
+  for name, tech in pairs(data_raw.prototypes("technology")) do
     if not productivity_owners.is_mir_recipe_productivity_tech(name)
       and known_competing_tech_name(name)
       and tech.max_level == "infinite" then
@@ -157,13 +158,13 @@ function M.apply()
   local to_remove = {}
   local candidates = prepared_removable_techs or {}
   if not prepared_removable_techs then
-    for name, _ in pairs(data.raw.technology or {}) do
+    for name, _ in pairs(data_raw.prototypes("technology")) do
       candidates[name] = true
     end
   end
 
   for name, _ in pairs(candidates) do
-    local tech = data.raw.technology and data.raw.technology[name]
+    local tech = data_raw.technology(name)
     if is_external_recipe_productivity_tech(name, tech, owned_recipes) then
       table.insert(to_remove, name)
     end

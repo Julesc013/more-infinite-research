@@ -1,9 +1,11 @@
+local data_raw = require("prototypes.mir.platform.factorio.data_raw")
+
 local M = {}
 
 function M.remove_technology_and_prereq_refs(tech_name)
   if not tech_name then return end
 
-  local technologies = data.raw and data.raw.technology or {}
+  local technologies = data_raw.prototypes("technology")
   technologies[tech_name] = nil
 
   for _, tech in pairs(technologies) do

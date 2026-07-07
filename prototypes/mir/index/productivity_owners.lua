@@ -1,4 +1,5 @@
 local profiles = require("prototypes.mir.compatibility.profiles")
+local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 
 local O = {}
 
@@ -38,7 +39,7 @@ function O.has_recipe_productivity_effect(tech, recipe_name)
 end
 
 function O.recipe_allows_productivity(recipe_name)
-  local recipe = (data.raw.recipe or {})[recipe_name]
+  local recipe = data_raw.prototype("recipe", recipe_name)
   if not recipe then return false end
 
   local function explicit_allow(def)
@@ -60,7 +61,7 @@ function O.recipe_outputs_any_product(recipe_name, products)
 
   local wanted = {}
   for _, product in ipairs(products) do wanted[product] = true end
-  local recipe = (data.raw.recipe or {})[recipe_name]
+  local recipe = data_raw.prototype("recipe", recipe_name)
   if not recipe then return false end
 
   local function product_name(product)
@@ -146,7 +147,7 @@ end
 
 function O.external_recipe_productivity_owner_records(recipe_name, options)
   local records = {}
-  for tech_name, tech in pairs(data.raw.technology or {}) do
+  for tech_name, tech in pairs(data_raw.prototypes("technology")) do
     if tech.max_level == "infinite" and not O.is_mir_recipe_productivity_tech(tech_name) then
       for _, effect in ipairs(tech.effects or {}) do
         if effect.type == "change-recipe-productivity" and effect.recipe == recipe_name then

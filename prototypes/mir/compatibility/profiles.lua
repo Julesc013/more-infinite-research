@@ -92,7 +92,7 @@ local PROFILES = {
   -- base stream definitions.
   --
   -- Profiles are applied from settings.lua as well as data stage. Keep profile
-  -- patches declarative and do not inspect data.raw here. Prototype-dependent
+  -- patches declarative and do not inspect finalized prototype tables here. Prototype-dependent
   -- compatibility belongs in data-updates.lua or data-final-fixes.lua.
   ["bioflux-productivity"] = known_competing_productivity_profile({
     "^bioflux%-productivity$"

@@ -1,5 +1,6 @@
 local defaults = require("defaults")
 local cleanup = require("prototypes.mir.policy.technology_cleanup")
+local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 local settings_resolver = require("prototypes.mir.settings.resolver")
 local effective_settings = require("prototypes.mir.settings.effective")
 
@@ -70,7 +71,7 @@ function M.apply()
     if mods[mod_name] then
       for key, spec in pairs(extensions) do
         if base_extension_enabled(key) then
-          for name, tech in pairs(data.raw.technology or {}) do
+          for name, tech in pairs(data_raw.prototypes("technology")) do
             if should_remove_base_extension(name, tech, spec) then
               table.insert(to_remove, {
                 name = name,

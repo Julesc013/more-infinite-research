@@ -3,6 +3,7 @@ local contract = require("prototypes.mir.capabilities.contract")
 local fact_registry = require("prototypes.mir.index.registry_builder")
 local policies = require("prototypes.mir.policy.capabilities")
 local schema = require("prototypes.mir.core.schema")
+local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 local lookup = require("prototypes.mir.platform.factorio.prototype_lookup")
 
 local C = {}
@@ -111,7 +112,7 @@ end
 local function entity_prototype(name)
   if not name then return nil, nil end
   for _, entity_type in ipairs(ENTITY_TYPES) do
-    local bucket = data.raw[entity_type]
+    local bucket = data_raw.prototypes(entity_type)
     if bucket and bucket[name] then return bucket[name], entity_type end
   end
   return nil, nil

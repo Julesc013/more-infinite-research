@@ -776,10 +776,10 @@ It writes `artifacts/legacy-inventory/shipped-mod-legacy.json`,
 `artifacts/legacy-inventory/legacy-summary.md`. The report tracks old-path
 module counts, shim-only status, old import counts, direct prototype access
 matches, and generated stream manifest coverage. The checked form currently
-requires zero active `prototypes/compat` modules, zero active `prototypes/lib`
-modules, zero compat/lib/config/util/diagnostics imports, no more than the
-current direct `data.raw` allowlist count outside the platform adapter, and
-zero generated streams missing manifest rows.
+requires zero active `prototypes/mir/legacy`, `prototypes/compat`, and
+`prototypes/lib` modules, zero MIR-legacy/compat/lib/config/util/diagnostics
+imports, zero direct `data.raw` matches outside the platform adapter, and zero
+generated streams missing manifest rows.
 
 ## Implementation Sequence
 

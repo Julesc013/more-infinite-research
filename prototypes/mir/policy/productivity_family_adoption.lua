@@ -1,5 +1,6 @@
 local C = require("prototypes.mir.streams.registry")
 local productivity_owners = require("prototypes.mir.index.productivity_owners")
+local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 
 local A = {}
 
@@ -56,7 +57,7 @@ local function adoption_owner_for(spec)
   if not (adoption and adoption.tech) then return nil, "no_configured_owner" end
 
   local owner_name = adoption.tech
-  local owner = data.raw.technology and data.raw.technology[owner_name]
+  local owner = data_raw.technology(owner_name)
   if not owner then return nil, "owner_missing" end
   if adoption.require_infinite ~= false and owner.max_level ~= "infinite" then
     return nil, "owner_not_infinite"

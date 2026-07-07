@@ -1,3 +1,5 @@
+local data_raw = require("prototypes.mir.platform.factorio.data_raw")
+
 local R = {}
 
 local function same_number(a, b)
@@ -28,7 +30,7 @@ end
 function R.technology_effect_requirement_matches(requirement)
   if not requirement or not requirement.technology then return false end
 
-  local tech = data.raw.technology and data.raw.technology[requirement.technology]
+  local tech = data_raw.technology(requirement.technology)
   if not tech then return false end
   if requirement.max_level ~= nil and tech.max_level ~= requirement.max_level then return false end
 
@@ -40,7 +42,7 @@ end
 
 function R.skip_reason(spec)
   for _, tech_name in ipairs(spec.skip_if_technologies or {}) do
-    if data.raw.technology and data.raw.technology[tech_name] then
+    if data_raw.technology(tech_name) then
       return "existing technology " .. tech_name
     end
   end

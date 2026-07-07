@@ -1,4 +1,5 @@
 local D = require("prototypes.mir.report.diagnostics_sink")
+local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 local profiles = require("prototypes.mir.compatibility.profiles")
 local productivity_owners = require("prototypes.mir.index.productivity_owners")
 
@@ -274,7 +275,7 @@ end
 
 local function generated_recipe_productivity_techs()
   local techs = {}
-  for tech_name, tech in pairs(data.raw.technology or {}) do
+  for tech_name, tech in pairs(data_raw.prototypes("technology")) do
     if productivity_owners.is_mir_recipe_productivity_tech(tech_name) then
       table.insert(techs, {
         name = tech_name,
@@ -301,7 +302,7 @@ local function emit_cap_diagnostics()
     for _, effect in ipairs(entry.tech.effects or {}) do
       if effect.type == "change-recipe-productivity" and effect.recipe then
         total = total + 1
-        local recipe = data.raw.recipe and data.raw.recipe[effect.recipe]
+        local recipe = data_raw.prototype("recipe", effect.recipe)
         local cap, state = cap_state(recipe)
         states[state] = (states[state] or 0) + 1
 

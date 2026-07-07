@@ -2,8 +2,8 @@ param(
   [string]$RepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "..")).Path,
   [string]$OutputRoot = "",
   [switch]$CheckThresholds,
-  [int]$MaxMirLegacyActiveModules = 3,
-  [int]$MaxRequiresMirLegacy = 3,
+  [int]$MaxMirLegacyActiveModules = 0,
+  [int]$MaxRequiresMirLegacy = 0,
   [int]$MaxCompatActiveModules = 0,
   [int]$MaxRequiresCompat = 0,
   [int]$MaxLibActiveModules = 0,
@@ -11,7 +11,7 @@ param(
   [int]$MaxRequiresConfig = 0,
   [int]$MaxRequiresUtil = 0,
   [int]$MaxRequiresDiagnostics = 0,
-  [int]$MaxDataRawOutsidePlatform = 32,
+  [int]$MaxDataRawOutsidePlatform = 0,
   [int]$MaxGeneratedStreamsWithoutManifest = 0
 )
 
