@@ -115,6 +115,9 @@ if ($ArchitectureOnly) {
   Invoke-RepoCheck "MIR architecture boundaries are linted" {
     & (Join-Path $repo "scripts\Test-MIRArchitecture.ps1") -RepoRoot $repo
   }
+  Invoke-RepoCheck "settings visibility policy is linted" {
+    & (Join-Path $repo "scripts\Test-MIRSettingsVisibility.ps1") -RepoRoot $repo
+  }
   exit 0
 }
 
@@ -209,6 +212,10 @@ Invoke-RepoCheck "docs and governance manifests are linted" {
 
 Invoke-RepoCheck "MIR architecture boundaries are linted" {
   & (Join-Path $repo "scripts\Test-MIRArchitecture.ps1") -RepoRoot $repo
+}
+
+Invoke-RepoCheck "settings visibility policy is linted" {
+  & (Join-Path $repo "scripts\Test-MIRSettingsVisibility.ps1") -RepoRoot $repo
 }
 
 Invoke-RepoCheck "no old tool-based science pack authority remains" {
@@ -1639,6 +1646,7 @@ $postMirAssertionFixtures = @(
   "mir-fixture-assert-big-mining-drill-productivity",
   "mir-fixture-assert-capability-negative-cases",
   "mir-fixture-assert-generation-integrity",
+  "mir-fixture-assert-hidden-setting-readability",
   "mir-fixture-assert-science-pack-productivity",
   "mir-fixture-assert-lab-skip-policy",
   "mir-fixture-assert-lab-productivity-owner-skip",
@@ -2516,7 +2524,8 @@ Assert-ReportLineContains -Line $inventoryCapacityLine -Expected "effects=2" -Co
 Assert-NoStreamReportLine -Key "research_character_trash_slots" -Context "Merged character inventory/trash slot scenario"
 
 Invoke-RuntimeScenario -ScenarioName "base-generation-integrity" -EnabledFixtureNames @(
-  "mir-fixture-assert-generation-integrity"
+  "mir-fixture-assert-generation-integrity",
+  "mir-fixture-assert-hidden-setting-readability"
 )
 Assert-LogDoesNotContain -Unexpected "Applied pipeline extent multiplier" -Context "Default pipeline extent scenario"
 Assert-BaseCoreProductivityStreamsGenerated -Context "Base generation integrity scenario"

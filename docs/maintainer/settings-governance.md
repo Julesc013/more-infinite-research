@@ -80,6 +80,11 @@ Run the static gate after settings changes:
 .\scripts\Invoke-MIRValidation.ps1 -StaticOnly
 ```
 
+The static gate runs `scripts/Test-MIRSettingsVisibility.ps1`. The runtime gate
+also enables `mir-fixture-assert-hidden-setting-readability` in the base
+generation scenario to prove hidden optional-stream settings remain registered
+and readable during `data-final-fixes.lua`.
+
 Run the runtime gate before release:
 
 ```powershell

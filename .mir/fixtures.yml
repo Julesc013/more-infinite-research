@@ -6,6 +6,12 @@ fixture_roots:
   run_profiles: fixtures/run-profiles
 
 fixtures:
+  settings-visibility:
+    assertion_path: fixtures/assert-hidden-setting-readability
+    validates:
+      - hidden-setting-readability
+      - stable-setting-ids
+
   air-scrubbing:
     path: fixtures/air-scrubbing
     assertion_path: fixtures/assert-air-scrubbing-clean-filter
