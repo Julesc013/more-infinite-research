@@ -112,8 +112,11 @@ Agricultural growth speed refreshes this force state on init, configuration chan
 
 - `prototypes/mir/platform/factorio/prototype_lookup.lua`: item-like and fluid prototype lookup, technology existence, ammo-category existence, Space Age detection.
 - `prototypes/mir/capabilities/science_integration/science_packs.lua`: lab-input discovery, science-pack existence, end-game science-pack selection, lab-compatible ingredient validation, science-pack unlock prerequisites, ordered pack lists.
+- `prototypes/mir/capabilities/science_integration/science_selector.lua`: stream science-pack selection, configured science-pack ingredient policy, unlock-derived science discovery.
 - `prototypes/mir/capabilities/recipe_productivity/recipe_matching.lua`: item/fluid-output matching, output-pattern expansion, recipe category matching, hidden/recycling filtering.
 - `prototypes/mir/emit/icon_builder.lua`: borrowed icon copying, explicit `icon_candidates` resolution, legacy technology/item/fluid icon fallback, Wube-style constant overlays.
+- `prototypes/mir/planner/costs.lua`: stream enablement, base cost, growth factor, research time, and max-level setting resolution.
+- `prototypes/mir/planner/prerequisites.lua`: stream prerequisite construction, unlock-derived prerequisites, and the optional end-game prerequisite gate.
 - `prototypes/mir/core/deepcopy.lua`: shared fallback for data-stage deep copies.
 - `prototypes/mir/core/table.lua`: deterministic table-key ordering helpers.
 - `prototypes/mir/policy/technology_cleanup.lua`: technology removal with prerequisite reference cleanup.
@@ -123,6 +126,8 @@ Agricultural growth speed refreshes this force state on init, configuration chan
 - `prototypes/technology-effect-safety.lua`: blocks unsafe native effect types from MIR-generated technologies.
 
 Keep new domain behavior in these modules rather than growing `util.lua`.
+MIR-owned modules should import these focused paths directly; `prototypes/util.lua`
+is a compatibility facade for old root modules and backport surfaces only.
 
 ## Icon Asset Boundary
 

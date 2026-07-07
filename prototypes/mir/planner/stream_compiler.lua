@@ -1,15 +1,18 @@
 local C = require("prototypes.mir.streams.registry")
-local U = require("prototypes.util")
 local D = require("prototypes.mir.report.diagnostics_sink")
 local deepcopy = require("prototypes.mir.core.deepcopy")
 local table_utils = require("prototypes.mir.core.table")
 local adoption_policy = require("prototypes.mir.policy.adoption_policy")
+local costs = require("prototypes.mir.planner.costs")
+local icon_builder = require("prototypes.mir.emit.icon_builder")
 local owner_policy = require("prototypes.mir.policy.owner_policy")
 local recipe_productivity_planner = require("prototypes.mir.capabilities.recipe_productivity.planner")
 local direct_effects_planner = require("prototypes.mir.planner.direct_effects")
 local native_modifiers = require("prototypes.mir.planner.native_modifiers")
 local planner_requirements = require("prototypes.mir.planner.requirements")
+local planner_prerequisites = require("prototypes.mir.planner.prerequisites")
 local planner_science = require("prototypes.mir.planner.science")
+local science_packs = require("prototypes.mir.capabilities.science_integration.science_packs")
 local stream_emitter = require("prototypes.mir.emit.legacy_stream_adapter")
 
 local M = {}
@@ -96,7 +99,7 @@ local function expand_dynamic_items(spec)
     end
   end
 
-  for _, item_name in ipairs(U.pack_list_all()) do
+  for _, item_name in ipairs(science_packs.pack_list_all()) do
     append_unique_item(out.groups[1].items, seen, item_name)
   end
 
@@ -104,7 +107,7 @@ local function expand_dynamic_items(spec)
 end
 
 local function make_stream(key, raw_spec)
-  if not U.enabled_for(key, raw_spec) then
+  if not costs.enabled_for(key, raw_spec) then
     D.stream(D.stream_fields(key, raw_spec, "skipped", "disabled"))
     return
   end
@@ -117,11 +120,11 @@ local function make_stream(key, raw_spec)
 
   local spec = expand_dynamic_items(raw_spec)
 
-  local base_cost = U.base_cost_for(key, spec)
-  local growth_factor = U.growth_factor_for(key, spec)
-  local max_level = U.max_level_for(key, spec)
+  local base_cost = costs.base_cost_for(key, spec)
+  local growth_factor = costs.growth_factor_for(key, spec)
+  local max_level = costs.max_level_for(key, spec)
   local count_formula = tostring(base_cost) .. " * " .. tostring(growth_factor) .. "^(L-1)"
-  local research_time = U.research_time_for(key, spec)
+  local research_time = costs.research_time_for(key, spec)
 
   local direct_effects = nil
   if spec.direct_effects then
@@ -147,11 +150,11 @@ local function make_stream(key, raw_spec)
 
   if direct_effects and #direct_effects > 0 then
     native_modifiers.record_overlaps(key, direct_effects)
-    local prerequisites = U.build_prereqs_for(key, ingredients)
+    local prerequisites = planner_prerequisites.build_for(key, ingredients)
     local t = emit_stream_technology(key, spec, {
       localised_name = lname(key, spec),
       localised_description = ldesc(spec),
-      icons = U.icons_for_stream(spec),
+      icons = icon_builder.icons_for_stream(spec),
       effects = direct_effects,
       prerequisites = prerequisites,
       count_formula = count_formula,
@@ -190,11 +193,11 @@ local function make_stream(key, raw_spec)
     return
   end
 
-  local prerequisites = U.build_prereqs_for(key, ingredients)
+  local prerequisites = planner_prerequisites.build_for(key, ingredients)
   local t = emit_stream_technology(key, spec, {
     localised_name = lname(key, spec),
     localised_description = ldesc(spec),
-    icons = U.icons_for_stream(spec),
+    icons = icon_builder.icons_for_stream(spec),
     effects = effects,
     prerequisites = prerequisites,
     count_formula = count_formula,

@@ -85,6 +85,7 @@ namespace_shims:
   recipe_productivity_planner: prototypes/mir/capabilities/recipe_productivity/planner.lua
   recipe_productivity_matching: prototypes/mir/capabilities/recipe_productivity/recipe_matching.lua
   science_integration_packs: prototypes/mir/capabilities/science_integration/science_packs.lua
+  science_integration_selector: prototypes/mir/capabilities/science_integration/science_selector.lua
   technology_builder: prototypes/mir/emit/technology_builder.lua
   legacy_stream_adapter: prototypes/mir/emit/legacy_stream_adapter.lua
   icon_builder: prototypes/mir/emit/icon_builder.lua
@@ -92,8 +93,10 @@ namespace_shims:
   compatibility_diagnostics_report: prototypes/mir/report/compatibility_diagnostics.lua
   diagnostics_sink: prototypes/mir/report/diagnostics_sink.lua
   planner_compiler: prototypes/mir/planner/compiler.lua
+  planner_costs: prototypes/mir/planner/costs.lua
   planner_direct_effects: prototypes/mir/planner/direct_effects.lua
   planner_native_modifiers: prototypes/mir/planner/native_modifiers.lua
+  planner_prerequisites: prototypes/mir/planner/prerequisites.lua
   planner_requirements: prototypes/mir/planner/requirements.lua
   planner_technology_requirements: prototypes/mir/planner/technology_requirements.lua
   planner_science: prototypes/mir/planner/science.lua

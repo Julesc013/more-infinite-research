@@ -199,14 +199,17 @@ $requiredShims = @(
   "prototypes/mir/capabilities/recipe_productivity/planner.lua",
   "prototypes/mir/capabilities/recipe_productivity/recipe_matching.lua",
   "prototypes/mir/capabilities/science_integration/science_packs.lua",
+  "prototypes/mir/capabilities/science_integration/science_selector.lua",
   "prototypes/mir/emit/legacy_stream_adapter.lua",
   "prototypes/mir/emit/icon_builder.lua",
   "prototypes/mir/report/decision_export.lua",
   "prototypes/mir/report/compatibility_diagnostics.lua",
   "prototypes/mir/report/diagnostics_sink.lua",
   "prototypes/mir/planner/compiler.lua",
+  "prototypes/mir/planner/costs.lua",
   "prototypes/mir/planner/direct_effects.lua",
   "prototypes/mir/planner/native_modifiers.lua",
+  "prototypes/mir/planner/prerequisites.lua",
   "prototypes/mir/planner/requirements.lua",
   "prototypes/mir/planner/technology_requirements.lua",
   "prototypes/mir/planner/science.lua",
@@ -294,12 +297,16 @@ $streamCompilerPath = "prototypes/mir/planner/stream_compiler.lua"
 $streamCompilerText = Read-MIRFile -RelativePath $streamCompilerPath
 Assert-MIRContains -RelativePath $streamCompilerPath -Text $streamCompilerText -Needle 'require("prototypes.mir.emit.legacy_stream_adapter")'
 Assert-MIRContains -RelativePath $streamCompilerPath -Text $streamCompilerText -Needle 'require("prototypes.mir.policy.adoption_policy")'
+Assert-MIRContains -RelativePath $streamCompilerPath -Text $streamCompilerText -Needle 'require("prototypes.mir.planner.costs")'
+Assert-MIRContains -RelativePath $streamCompilerPath -Text $streamCompilerText -Needle 'require("prototypes.mir.emit.icon_builder")'
 Assert-MIRContains -RelativePath $streamCompilerPath -Text $streamCompilerText -Needle 'require("prototypes.mir.policy.owner_policy")'
 Assert-MIRContains -RelativePath $streamCompilerPath -Text $streamCompilerText -Needle 'require("prototypes.mir.capabilities.recipe_productivity.planner")'
 Assert-MIRContains -RelativePath $streamCompilerPath -Text $streamCompilerText -Needle 'require("prototypes.mir.planner.direct_effects")'
 Assert-MIRContains -RelativePath $streamCompilerPath -Text $streamCompilerText -Needle 'require("prototypes.mir.planner.native_modifiers")'
 Assert-MIRContains -RelativePath $streamCompilerPath -Text $streamCompilerText -Needle 'require("prototypes.mir.planner.requirements")'
+Assert-MIRContains -RelativePath $streamCompilerPath -Text $streamCompilerText -Needle 'require("prototypes.mir.planner.prerequisites")'
 Assert-MIRContains -RelativePath $streamCompilerPath -Text $streamCompilerText -Needle 'require("prototypes.mir.planner.science")'
+Assert-MIRContains -RelativePath $streamCompilerPath -Text $streamCompilerText -Needle 'require("prototypes.mir.capabilities.science_integration.science_packs")'
 Assert-MIRContains -RelativePath $streamCompilerPath -Text $streamCompilerText -Needle "planner_requirements.missing_reason(key, raw_spec)"
 Assert-MIRContains -RelativePath $streamCompilerPath -Text $streamCompilerText -Needle "planner_science.ingredients_for_stream(key, spec)"
 Assert-MIRContains -RelativePath $streamCompilerPath -Text $streamCompilerText -Needle "native_modifiers.record_overlaps(key, direct_effects)"
@@ -309,6 +316,9 @@ Assert-MIRContains -RelativePath $streamCompilerPath -Text $streamCompilerText -
 Assert-MIRContains -RelativePath $streamCompilerPath -Text $streamCompilerText -Needle "direct_effects_planner.available_for_stream(key, spec)"
 Assert-MIRContains -RelativePath $streamCompilerPath -Text $streamCompilerText -Needle "recipe_productivity_planner.match_buckets(key, spec)"
 Assert-MIRContains -RelativePath $streamCompilerPath -Text $streamCompilerText -Needle "recipe_productivity_planner.effects_from_buckets(key, buckets)"
+Assert-MIRContains -RelativePath $streamCompilerPath -Text $streamCompilerText -Needle "costs.base_cost_for(key, spec)"
+Assert-MIRContains -RelativePath $streamCompilerPath -Text $streamCompilerText -Needle "planner_prerequisites.build_for(key, ingredients)"
+Assert-MIRContains -RelativePath $streamCompilerPath -Text $streamCompilerText -Needle "icon_builder.icons_for_stream(spec)"
 Assert-MIRContains -RelativePath $streamCompilerPath -Text $streamCompilerText -Needle "stream_emitter.emit(key, spec, fields)"
 Assert-MIRContains -RelativePath $streamCompilerPath -Text $streamCompilerText -Needle "function M.run()"
 
@@ -348,7 +358,8 @@ foreach ($relativePath in $compatibilityShimExpectations.Keys) {
 $recipeProductivityPlannerPath = "prototypes/mir/capabilities/recipe_productivity/planner.lua"
 $recipeProductivityPlannerText = Read-MIRFile -RelativePath $recipeProductivityPlannerPath
 Assert-MIRContains -RelativePath $recipeProductivityPlannerPath -Text $recipeProductivityPlannerText -Needle "function M.match_buckets(key, spec)"
-Assert-MIRContains -RelativePath $recipeProductivityPlannerPath -Text $recipeProductivityPlannerText -Needle "U.recipes_for_stream(spec)"
+Assert-MIRContains -RelativePath $recipeProductivityPlannerPath -Text $recipeProductivityPlannerText -Needle 'require("prototypes.mir.capabilities.recipe_productivity.recipe_matching")'
+Assert-MIRContains -RelativePath $recipeProductivityPlannerPath -Text $recipeProductivityPlannerText -Needle "recipes.recipes_for_stream(spec, C.shared.per_level_default)"
 Assert-MIRContains -RelativePath $recipeProductivityPlannerPath -Text $recipeProductivityPlannerText -Needle "D.recipe_matches(key, buckets)"
 Assert-MIRContains -RelativePath $recipeProductivityPlannerPath -Text $recipeProductivityPlannerText -Needle "function M.effects_from_buckets(key, buckets)"
 Assert-MIRContains -RelativePath $recipeProductivityPlannerPath -Text $recipeProductivityPlannerText -Needle 'type = "change-recipe-productivity"'
@@ -428,6 +439,7 @@ Assert-MIRContains -RelativePath $legacyInventoryPath -Text $legacyInventoryText
 Assert-MIRContains -RelativePath $legacyInventoryPath -Text $legacyInventoryText -Needle "generated_streams_without_manifest"
 Assert-MIRContains -RelativePath $legacyInventoryPath -Text $legacyInventoryText -Needle "compat_active_modules"
 Assert-MIRContains -RelativePath $legacyInventoryPath -Text $legacyInventoryText -Needle "requires_lib"
+Assert-MIRContains -RelativePath $legacyInventoryPath -Text $legacyInventoryText -Needle "MaxRequiresUtil = 1"
 Assert-MIRContains -RelativePath $legacyInventoryPath -Text $legacyInventoryText -Needle "MaxLibActiveModules = 0"
 Assert-MIRContains -RelativePath $legacyInventoryPath -Text $legacyInventoryText -Needle "MIR legacy inventory thresholds passed"
 
@@ -455,9 +467,10 @@ Assert-MIRContains -RelativePath $plannerCompilerPath -Text $plannerCompilerText
 $plannerRequirementsPath = "prototypes/mir/planner/requirements.lua"
 $plannerRequirementsText = Read-MIRFile -RelativePath $plannerRequirementsPath
 Assert-MIRContains -RelativePath $plannerRequirementsPath -Text $plannerRequirementsText -Needle "function M.missing_reason(key, spec)"
+Assert-MIRContains -RelativePath $plannerRequirementsPath -Text $plannerRequirementsText -Needle 'require("prototypes.mir.platform.factorio.prototype_lookup")'
 Assert-MIRContains -RelativePath $plannerRequirementsPath -Text $plannerRequirementsText -Needle 'require("prototypes.mir.planner.technology_requirements")'
-Assert-MIRContains -RelativePath $plannerRequirementsPath -Text $plannerRequirementsText -Needle "U.mod_exists(mod_name)"
-Assert-MIRContains -RelativePath $plannerRequirementsPath -Text $plannerRequirementsText -Needle "U.ammo_category_exists(category)"
+Assert-MIRContains -RelativePath $plannerRequirementsPath -Text $plannerRequirementsText -Needle "lookup.mod_exists(mod_name)"
+Assert-MIRContains -RelativePath $plannerRequirementsPath -Text $plannerRequirementsText -Needle "lookup.ammo_category_exists(category)"
 
 $plannerNativeModifiersPath = "prototypes/mir/planner/native_modifiers.lua"
 $plannerNativeModifiersText = Read-MIRFile -RelativePath $plannerNativeModifiersPath
@@ -469,16 +482,39 @@ Assert-MIRContains -RelativePath $plannerNativeModifiersPath -Text $plannerNativ
 $plannerDirectEffectsPath = "prototypes/mir/planner/direct_effects.lua"
 $plannerDirectEffectsText = Read-MIRFile -RelativePath $plannerDirectEffectsPath
 Assert-MIRContains -RelativePath $plannerDirectEffectsPath -Text $plannerDirectEffectsText -Needle 'require("prototypes.technology-effect-safety")'
+Assert-MIRContains -RelativePath $plannerDirectEffectsPath -Text $plannerDirectEffectsText -Needle 'require("prototypes.mir.emit.icon_builder")'
+Assert-MIRContains -RelativePath $plannerDirectEffectsPath -Text $plannerDirectEffectsText -Needle 'require("prototypes.mir.platform.factorio.prototype_lookup")'
 Assert-MIRContains -RelativePath $plannerDirectEffectsPath -Text $plannerDirectEffectsText -Needle "function M.available_for_stream(key, spec)"
 Assert-MIRContains -RelativePath $plannerDirectEffectsPath -Text $plannerDirectEffectsText -Needle 'effect_safety.assert_effect_allowed(effect, "direct-effect stream " .. key)'
-Assert-MIRContains -RelativePath $plannerDirectEffectsPath -Text $plannerDirectEffectsText -Needle "U.effect_icons_for_stream(spec)"
+Assert-MIRContains -RelativePath $plannerDirectEffectsPath -Text $plannerDirectEffectsText -Needle "icon_builder.effect_icons_for_stream(spec)"
 
 $plannerSciencePath = "prototypes/mir/planner/science.lua"
 $plannerScienceText = Read-MIRFile -RelativePath $plannerSciencePath
 Assert-MIRContains -RelativePath $plannerSciencePath -Text $plannerScienceText -Needle "function M.ingredients_for_stream(key, spec)"
-Assert-MIRContains -RelativePath $plannerSciencePath -Text $plannerScienceText -Needle "U.pick_science_for_stream(spec, key)"
-Assert-MIRContains -RelativePath $plannerSciencePath -Text $plannerScienceText -Needle "U.best_lab_compatible_ingredients"
+Assert-MIRContains -RelativePath $plannerSciencePath -Text $plannerScienceText -Needle 'require("prototypes.mir.capabilities.science_integration.science_packs")'
+Assert-MIRContains -RelativePath $plannerSciencePath -Text $plannerScienceText -Needle 'require("prototypes.mir.capabilities.science_integration.science_selector")'
+Assert-MIRContains -RelativePath $plannerSciencePath -Text $plannerScienceText -Needle "science_selector.pick_science_for_stream(spec, key)"
+Assert-MIRContains -RelativePath $plannerSciencePath -Text $plannerScienceText -Needle "science_packs.best_lab_compatible_ingredients"
 Assert-MIRContains -RelativePath $plannerSciencePath -Text $plannerScienceText -Needle 'lab_status or "full"'
+
+$plannerCostsPath = "prototypes/mir/planner/costs.lua"
+$plannerCostsText = Read-MIRFile -RelativePath $plannerCostsPath
+Assert-MIRContains -RelativePath $plannerCostsPath -Text $plannerCostsText -Needle 'require("prototypes.mir.streams.registry")'
+Assert-MIRContains -RelativePath $plannerCostsPath -Text $plannerCostsText -Needle 'require("prototypes.settings-resolver")'
+Assert-MIRContains -RelativePath $plannerCostsPath -Text $plannerCostsText -Needle "function M.enabled_for(key, spec)"
+Assert-MIRContains -RelativePath $plannerCostsPath -Text $plannerCostsText -Needle "function M.max_level_for(key, spec)"
+
+$plannerPrerequisitesPath = "prototypes/mir/planner/prerequisites.lua"
+$plannerPrerequisitesText = Read-MIRFile -RelativePath $plannerPrerequisitesPath
+Assert-MIRContains -RelativePath $plannerPrerequisitesPath -Text $plannerPrerequisitesText -Needle 'require("prototypes.mir.capabilities.science_integration.science_selector")'
+Assert-MIRContains -RelativePath $plannerPrerequisitesPath -Text $plannerPrerequisitesText -Needle "function M.append_end_game_gate_prerequisite(prereqs)"
+Assert-MIRContains -RelativePath $plannerPrerequisitesPath -Text $plannerPrerequisitesText -Needle "function M.build_for(key, ingredients)"
+
+$scienceSelectorPath = "prototypes/mir/capabilities/science_integration/science_selector.lua"
+$scienceSelectorText = Read-MIRFile -RelativePath $scienceSelectorPath
+Assert-MIRContains -RelativePath $scienceSelectorPath -Text $scienceSelectorText -Needle "function M.apply_science_pack_ingredient_policy(ingredients)"
+Assert-MIRContains -RelativePath $scienceSelectorPath -Text $scienceSelectorText -Needle "function M.pick_science_for_stream(spec, key)"
+Assert-MIRContains -RelativePath $scienceSelectorPath -Text $scienceSelectorText -Needle 'desired == "derive-from-unlocks"'
 
 $airScrubbingOverlayPath = "prototypes/mir/compatibility/overlays/air_scrubbing.lua"
 $airScrubbingOverlayText = Read-MIRFile -RelativePath $airScrubbingOverlayPath
@@ -582,6 +618,11 @@ Assert-MIRNoPatternInLuaTree `
   -RelativeRoot "prototypes" `
   -Pattern 'require\("prototypes\.config"\)' `
   -Message "MIR modules must require prototypes.mir.streams.registry instead of the old prototypes.config shim."
+
+Assert-MIRNoPatternInLuaTree `
+  -RelativeRoot "prototypes/mir" `
+  -Pattern 'require\("prototypes\.util"\)' `
+  -Message "MIR modules must require focused MIR modules instead of the old prototypes.util facade."
 
 $runtimePrototypePattern = "\bdata\.raw\b|data:extend"
 foreach ($relative in @(

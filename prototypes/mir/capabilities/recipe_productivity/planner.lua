@@ -1,11 +1,11 @@
 local C = require("prototypes.mir.streams.registry")
 local D = require("prototypes.mir.report.diagnostics_sink")
-local U = require("prototypes.util")
+local recipes = require("prototypes.mir.capabilities.recipe_productivity.recipe_matching")
 
 local M = {}
 
 function M.match_buckets(key, spec)
-  local buckets = U.recipes_for_stream(spec)
+  local buckets = recipes.recipes_for_stream(spec, C.shared.per_level_default)
   D.recipe_matches(key, buckets)
   return buckets
 end

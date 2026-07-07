@@ -440,7 +440,6 @@ Invoke-RepoCheck "fixture mods have metadata and data entrypoints" {
 
 Invoke-RepoCheck "science-pack progression settings are wired" {
   $settingsText = Get-MIRSettingsSourceText
-  $utilText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\util.lua")
   $baseExtensionsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\base-tech-extensions.lua")
   $settingsResolverText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\settings-resolver.lua")
   $settingsRegistryText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\settings\registry.lua")
@@ -451,12 +450,15 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
   $spoilageText = Get-Content -Raw -LiteralPath (Join-Path $repo "control\effects\spoilage-preservation.lua")
   $agriculturalGrowthText = Get-Content -Raw -LiteralPath (Join-Path $repo "control\effects\agricultural-growth-speed.lua")
   $scienceText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\capabilities\science_integration\science_packs.lua")
+  $scienceSelectorText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\capabilities\science_integration\science_selector.lua")
   $directEffectsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\streams\direct-effects.lua")
   $productivityText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\streams\productivity.lua")
   $recipeMatchingText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\capabilities\recipe_productivity\recipe_matching.lua")
   $prototypeLookupText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\platform\factorio\prototype_lookup.lua")
   $technologyIconsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\emit\icon_builder.lua")
   $techGenText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\tech-gen.lua")
+  $plannerCostsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\planner\costs.lua")
+  $plannerPrerequisitesText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\planner\prerequisites.lua")
   $plannerRequirementsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\planner\requirements.lua")
   $dataFinalFixesText = Get-MIRDataFinalFixesSourceText
   $pipelineExtentText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\pipeline-extent.lua")
@@ -528,10 +530,10 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "control\effects\spoilage-preservation.lua"; Text = $spoilageText; Snippet = 'spoilage preservation skipped: disabled' },
     @{ File = "control\effects\agricultural-growth-speed.lua"; Text = $agriculturalGrowthText; Snippet = 'settings_resolver.stream_enabled(M.stream_key)' },
     @{ File = "control\effects\agricultural-growth-speed.lua"; Text = $agriculturalGrowthText; Snippet = 'agricultural growth speed force state refreshed enabled=' },
-    @{ File = "prototypes\util.lua"; Text = $utilText; Snippet = 'apply_science_pack_ingredient_policy' },
-    @{ File = "prototypes\util.lua"; Text = $utilText; Snippet = 'settings_resolver.stream_enabled(key, spec)' },
+    @{ File = "prototypes\mir\capabilities\science_integration\science_selector.lua"; Text = $scienceSelectorText; Snippet = 'apply_science_pack_ingredient_policy' },
+    @{ File = "prototypes\mir\planner\costs.lua"; Text = $plannerCostsText; Snippet = 'settings_resolver.stream_enabled(key, spec)' },
     @{ File = "prototypes\base-tech-extensions.lua"; Text = $baseExtensionsText; Snippet = 'settings_resolver.base_enabled(key, spec)' },
-    @{ File = "prototypes\util.lua"; Text = $utilText; Snippet = 'append_end_game_gate_prerequisite' },
+    @{ File = "prototypes\mir\planner\prerequisites.lua"; Text = $plannerPrerequisitesText; Snippet = 'append_end_game_gate_prerequisite' },
     @{ File = "prototypes\mir\capabilities\science_integration\science_packs.lua"; Text = $scienceText; Snippet = 'pack_list_official' },
     @{ File = "prototypes\mir\capabilities\science_integration\science_packs.lua"; Text = $scienceText; Snippet = 'is_official_science_pack' },
     @{ File = "prototypes\mir\capabilities\science_integration\science_packs.lua"; Text = $scienceText; Snippet = 'space_age_progression_packs_for' },
@@ -575,7 +577,7 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'mods_any = {"space-age"}' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'research_ash_separation = "Ash separation productivity"' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = '"aai-turbo-loader"' },
-    @{ File = "prototypes\util.lua"; Text = $utilText; Snippet = 'desired == "derive-from-unlocks"' },
+    @{ File = "prototypes\mir\capabilities\science_integration\science_selector.lua"; Text = $scienceSelectorText; Snippet = 'desired == "derive-from-unlocks"' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'research_air_scrubbing_clean_filter = "Air Scrubbing clean-filter productivity"' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = '{technology = "oil-processing"}' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = '"^acid%-neutralisation$"' },
@@ -1098,7 +1100,8 @@ Invoke-RepoCheck "2.2.0 compiler diagnostics are wired" {
 Invoke-RepoCheck "Air Scrubbing clean-filter policy is wired" {
   $dataFinalFixesText = Get-MIRDataFinalFixesSourceText
   $productivityText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\streams\productivity.lua")
-  $utilText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\util.lua")
+  $scienceSelectorText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\capabilities\science_integration\science_selector.lua")
+  $plannerPrerequisitesText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\planner\prerequisites.lua")
   $diagnosticsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\report\diagnostics_sink.lua")
   $converterText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\Convert-MIRCompatAuditResults.ps1")
   $airScrubbingPolicyPath = Join-Path $repo "prototypes\compat\air-scrubbing.lua"
@@ -1130,8 +1133,8 @@ Invoke-RepoCheck "Air Scrubbing clean-filter policy is wired" {
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'prerequisites = "derive-from-unlocks"' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'manifest_id = air_scrubbing_capability.stream.id' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'exact_recipe_patterns(air_scrubbing_capability.exact_recipes)' },
-    @{ File = "prototypes\util.lua"; Text = $utilText; Snippet = 'local function science_from_unlocks(spec)' },
-    @{ File = "prototypes\util.lua"; Text = $utilText; Snippet = 'if spec.prerequisites == "derive-from-unlocks" then' },
+    @{ File = "prototypes\mir\capabilities\science_integration\science_selector.lua"; Text = $scienceSelectorText; Snippet = 'local function science_from_unlocks(spec)' },
+    @{ File = "prototypes\mir\planner\prerequisites.lua"; Text = $plannerPrerequisitesText; Snippet = 'if spec.prerequisites == "derive-from-unlocks" then' },
     @{ File = "prototypes\mir\report\diagnostics_sink.lua"; Text = $diagnosticsText; Snippet = '.. " rejected=" .. tostring(row.rejected or "")' },
     @{ File = "scripts\Convert-MIRCompatAuditResults.ps1"; Text = $converterText; Snippet = 'rejected = [string](Get-MIRObjectProperty -Object $row -Name "rejected")' },
     @{ File = "scripts\Convert-MIRCompatAuditResults.ps1"; Text = $converterText; Snippet = 'generated,rejected,unknown,missing,module_slots' },

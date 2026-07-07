@@ -1,8 +1,12 @@
 local C = require("prototypes.mir.streams.registry")
-local U = require("prototypes.util")
+local costs = require("prototypes.mir.planner.costs")
 local profiles = require("prototypes.mir.compatibility.profiles")
 local productivity_owners = require("prototypes.mir.index.productivity_owners")
 local cleanup = require("prototypes.mir.policy.technology_cleanup")
+local lookup = require("prototypes.mir.platform.factorio.prototype_lookup")
+local recipe_matching = require("prototypes.mir.capabilities.recipe_productivity.recipe_matching")
+local science_packs = require("prototypes.mir.capabilities.science_integration.science_packs")
+local science_selector = require("prototypes.mir.capabilities.science_integration.science_selector")
 local technology_requirements = require("prototypes.mir.planner.technology_requirements")
 local effective_settings = require("prototypes.mir.settings.effective")
 
@@ -29,20 +33,20 @@ end
 
 local function stream_requirement_missing(spec)
   for _, mod_name in ipairs(spec.required_mods or {}) do
-    if not U.mod_exists(mod_name) then return true end
+    if not lookup.mod_exists(mod_name) then return true end
   end
   for _, item_name in ipairs(spec.required_items or {}) do
-    if not U.item_prototype(item_name) then return true end
+    if not lookup.item_prototype(item_name) then return true end
   end
   for _, fluid_name in ipairs(spec.required_fluids or {}) do
-    if not U.fluid_prototype(fluid_name) then return true end
+    if not lookup.fluid_prototype(fluid_name) then return true end
   end
   for _, tech_name in ipairs(spec.required_technologies or {}) do
-    if not U.technology_exists(tech_name) then return true end
+    if not lookup.technology_exists(tech_name) then return true end
   end
   if technology_requirements.skip_reason(spec) then return true end
   for _, category in ipairs(spec.required_ammo_categories or {}) do
-    if not U.ammo_category_exists(category) then return true end
+    if not lookup.ammo_category_exists(category) then return true end
   end
   return false
 end
@@ -50,11 +54,11 @@ end
 local function collect_enabled_stream_recipe_coverage()
   local covered = {}
   for key, spec in pairs(C.streams or {}) do
-    if not spec.direct_effects and U.enabled_for(key, spec) and not stream_requirement_missing(spec) then
-      local ingredients = U.best_lab_compatible_ingredients(U.pick_science_for_stream(spec, key), key)
+    if not spec.direct_effects and costs.enabled_for(key, spec) and not stream_requirement_missing(spec) then
+      local ingredients = science_packs.best_lab_compatible_ingredients(science_selector.pick_science_for_stream(spec, key), key)
       if not ingredients or #ingredients == 0 then goto continue end
 
-      for _, bucket in ipairs(U.recipes_for_stream(spec) or {}) do
+      for _, bucket in ipairs(recipe_matching.recipes_for_stream(spec, C.shared.per_level_default) or {}) do
         for _, recipe_name in ipairs(bucket.recipes or {}) do
           covered[recipe_name] = {
             stream = key,

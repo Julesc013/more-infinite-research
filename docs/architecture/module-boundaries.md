@@ -124,7 +124,13 @@ native technology modifiers and records overlap diagnostics through platform
 prototype access before direct-effect streams are emitted.
 `prototypes/mir/planner/science.lua` selects stream science ingredients and
 normalizes lab-compatibility status while the rest of science integration moves
-out of legacy utility modules. `prototypes/mir/policy/owner_policy.lua`
+out of legacy utility modules. The focused utility split now routes stream
+enablement, cost, growth, research-time, and max-level calculations through
+`prototypes/mir/planner/costs.lua`; configured science-pack policy and
+unlock-derived science selection through
+`prototypes/mir/capabilities/science_integration/science_selector.lua`; and
+stream prerequisite construction through
+`prototypes/mir/planner/prerequisites.lua`. `prototypes/mir/policy/owner_policy.lua`
 centralizes recipe-productivity owner filtering and the associated diagnostic
 rows used by migrated stream planning. `prototypes/mir/policy/adoption_policy.lua`
 wraps productivity-family adoption decisions while the underlying adoption
@@ -415,6 +421,8 @@ prototypes/
       compiler.lua
       candidate.lua
       classifier.lua
+      costs.lua
+      prerequisites.lua
       technology_requirements.lua
       scorer.lua
       proposal.lua
