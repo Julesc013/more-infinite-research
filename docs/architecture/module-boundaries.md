@@ -138,6 +138,9 @@ recipe productivity effects after policy filters run.
 `prototypes/mir/planner/stream_compiler.lua` owns the transitional generated
 stream loop. The old `prototypes/tech-gen.lua` path is a compatibility shim
 that immediately delegates to that MIR planner module.
+`prototypes/mir/emit/legacy_stream_adapter.lua` adapts legacy stream records
+into `StreamSpec` records and forwards them to `technology_builder`; the old
+`prototypes/mir/legacy/stream_emitter.lua` path is now a compatibility shim.
 The old `prototypes/compat/` paths for profiles, owner detection, competing
 productivity cleanup, competing base-extension cleanup, family adoption, and
 compatibility planning are compatibility shims. The active implementations live
@@ -409,6 +412,7 @@ prototypes/
 
     emit/
       technology_builder.lua
+      legacy_stream_adapter.lua
       effect_builder.lua
       prerequisite_builder.lua
       science_builder.lua
@@ -453,7 +457,6 @@ prototypes/
     legacy/
       facts_registry.lua
       tech_gen.lua
-      stream_emitter.lua
       recipe_matching.lua
       compat_profiles.lua
       report_rows.lua

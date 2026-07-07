@@ -309,7 +309,7 @@ Invoke-RepoCheck "unsafe pickup reach technology effects are blocked" {
   $safetyText = Get-Content -Raw -LiteralPath $safetyPath
   $techGenText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\tech-gen.lua")
   $directEffectsPlannerText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\planner\direct_effects.lua")
-  $streamEmitterText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\legacy\stream_emitter.lua")
+  $streamAdapterText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\emit\legacy_stream_adapter.lua")
   $baseExtensionsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\base-tech-extensions.lua")
   $dataFinalFixesText = Get-MIRDataFinalFixesSourceText
   $generationIntegrityFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-generation-integrity\data-final-fixes.lua")
@@ -322,7 +322,7 @@ Invoke-RepoCheck "unsafe pickup reach technology effects are blocked" {
 
   $requiredGuardSnippets = @(
     @{ File = "prototypes\mir\planner\direct_effects.lua"; Text = $directEffectsPlannerText; Snippet = 'effect_safety.assert_effect_allowed(effect, "direct-effect stream " .. key)' },
-    @{ File = "prototypes\mir\legacy\stream_emitter.lua"; Text = $streamEmitterText; Snippet = 'effect_safety.register_generated_technology(technology.name)' },
+    @{ File = "prototypes\mir\emit\legacy_stream_adapter.lua"; Text = $streamAdapterText; Snippet = 'effect_safety.register_generated_technology(technology.name)' },
     @{ File = "prototypes\base-tech-extensions.lua"; Text = $baseExtensionsText; Snippet = 'effect_safety.assert_effects_allowed(desired_effects, "base extension " .. key)' },
     @{ File = "prototypes\base-tech-extensions.lua"; Text = $baseExtensionsText; Snippet = 'effect_safety.register_generated_technology(new.name)' },
     @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'require("prototypes.technology-effect-safety").assert_registered_technology_effects()' },

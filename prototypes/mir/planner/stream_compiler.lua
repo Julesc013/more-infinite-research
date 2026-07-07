@@ -10,7 +10,7 @@ local direct_effects_planner = require("prototypes.mir.planner.direct_effects")
 local native_modifiers = require("prototypes.mir.planner.native_modifiers")
 local planner_requirements = require("prototypes.mir.planner.requirements")
 local planner_science = require("prototypes.mir.planner.science")
-local stream_emitter = require("prototypes.mir.legacy.stream_emitter")
+local stream_emitter = require("prototypes.mir.emit.legacy_stream_adapter")
 
 local M = {}
 

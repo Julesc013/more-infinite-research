@@ -76,6 +76,7 @@ namespace_shims:
   capability_registry: prototypes/mir/capabilities/registry.lua
   recipe_productivity_planner: prototypes/mir/capabilities/recipe_productivity/planner.lua
   technology_builder: prototypes/mir/emit/technology_builder.lua
+  legacy_stream_adapter: prototypes/mir/emit/legacy_stream_adapter.lua
   decision_export: prototypes/mir/report/decision_export.lua
   compatibility_diagnostics_report: prototypes/mir/report/compatibility_diagnostics.lua
   planner_compiler: prototypes/mir/planner/compiler.lua
@@ -98,7 +99,7 @@ namespace_shims:
   exact_recipe_diagnostics_registry: prototypes/mir/compatibility/diagnostics/registry.lua
   air_scrubbing_diagnostics: prototypes/mir/compatibility/diagnostics/air_scrubbing.lua
   atan_ash_diagnostics: prototypes/mir/compatibility/diagnostics/atan_ash.lua
-  legacy_stream_emitter: prototypes/mir/legacy/stream_emitter.lua
+  legacy_stream_emitter_shim: prototypes/mir/legacy/stream_emitter.lua
 
 target_layers:
   stage:

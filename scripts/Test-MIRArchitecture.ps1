@@ -192,6 +192,7 @@ $requiredShims = @(
   "prototypes/mir/capabilities/contract.lua",
   "prototypes/mir/capabilities/registry.lua",
   "prototypes/mir/capabilities/recipe_productivity/planner.lua",
+  "prototypes/mir/emit/legacy_stream_adapter.lua",
   "prototypes/mir/report/decision_export.lua",
   "prototypes/mir/report/compatibility_diagnostics.lua",
   "prototypes/mir/planner/compiler.lua",
@@ -233,12 +234,16 @@ if ($technologyBuilderText -match "data:extend") {
   throw "$technologyBuilderPath must emit through the platform data_raw adapter."
 }
 
+$legacyStreamAdapterPath = "prototypes/mir/emit/legacy_stream_adapter.lua"
+$legacyStreamAdapterText = Read-MIRFile -RelativePath $legacyStreamAdapterPath
+Assert-MIRContains -RelativePath $legacyStreamAdapterPath -Text $legacyStreamAdapterText -Needle 'require("prototypes.mir.domain.streams.stream_spec")'
+Assert-MIRContains -RelativePath $legacyStreamAdapterPath -Text $legacyStreamAdapterText -Needle 'require("prototypes.mir.emit.technology_builder")'
+Assert-MIRContains -RelativePath $legacyStreamAdapterPath -Text $legacyStreamAdapterText -Needle "stream_spec.from_legacy_stream({"
+Assert-MIRContains -RelativePath $legacyStreamAdapterPath -Text $legacyStreamAdapterText -Needle "technology_builder.emit(stream)"
+
 $legacyStreamEmitterPath = "prototypes/mir/legacy/stream_emitter.lua"
 $legacyStreamEmitterText = Read-MIRFile -RelativePath $legacyStreamEmitterPath
-Assert-MIRContains -RelativePath $legacyStreamEmitterPath -Text $legacyStreamEmitterText -Needle 'require("prototypes.mir.domain.streams.stream_spec")'
-Assert-MIRContains -RelativePath $legacyStreamEmitterPath -Text $legacyStreamEmitterText -Needle 'require("prototypes.mir.emit.technology_builder")'
-Assert-MIRContains -RelativePath $legacyStreamEmitterPath -Text $legacyStreamEmitterText -Needle "stream_spec.from_legacy_stream({"
-Assert-MIRContains -RelativePath $legacyStreamEmitterPath -Text $legacyStreamEmitterText -Needle "technology_builder.emit(stream)"
+Assert-MIRContains -RelativePath $legacyStreamEmitterPath -Text $legacyStreamEmitterText -Needle 'return require("prototypes.mir.emit.legacy_stream_adapter")'
 
 $legacyTechGenPath = "prototypes/tech-gen.lua"
 $legacyTechGenText = Read-MIRFile -RelativePath $legacyTechGenPath
@@ -258,7 +263,7 @@ Assert-MIRContains -RelativePath $legacyCapabilityPolicyPath -Text $legacyCapabi
 
 $streamCompilerPath = "prototypes/mir/planner/stream_compiler.lua"
 $streamCompilerText = Read-MIRFile -RelativePath $streamCompilerPath
-Assert-MIRContains -RelativePath $streamCompilerPath -Text $streamCompilerText -Needle 'require("prototypes.mir.legacy.stream_emitter")'
+Assert-MIRContains -RelativePath $streamCompilerPath -Text $streamCompilerText -Needle 'require("prototypes.mir.emit.legacy_stream_adapter")'
 Assert-MIRContains -RelativePath $streamCompilerPath -Text $streamCompilerText -Needle 'require("prototypes.mir.policy.adoption_policy")'
 Assert-MIRContains -RelativePath $streamCompilerPath -Text $streamCompilerText -Needle 'require("prototypes.mir.policy.owner_policy")'
 Assert-MIRContains -RelativePath $streamCompilerPath -Text $streamCompilerText -Needle 'require("prototypes.mir.capabilities.recipe_productivity.planner")'
