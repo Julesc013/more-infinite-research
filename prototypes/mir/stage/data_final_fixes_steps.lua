@@ -40,7 +40,7 @@ function M.emit_compatibility_planner()
 end
 
 function M.assert_registered_technology_effects()
-  require("prototypes.technology-effect-safety").assert_registered_technology_effects()
+  require("prototypes.mir.emit.effect_safety").assert_registered_technology_effects()
 end
 
 function M.flush_diagnostics()

@@ -308,9 +308,9 @@ Invoke-RepoCheck "scripted candidate streams remain default-off before manual pr
 }
 
 Invoke-RepoCheck "unsafe pickup reach technology effects are blocked" {
-  $safetyPath = Join-Path $repo "prototypes\technology-effect-safety.lua"
+  $safetyPath = Join-Path $repo "prototypes\mir\emit\effect_safety.lua"
   if (-not (Test-Path -LiteralPath $safetyPath)) {
-    throw "Missing technology effect safety guard: prototypes/technology-effect-safety.lua"
+    throw "Missing technology effect safety guard: prototypes/mir/emit/effect_safety.lua"
   }
 
   $safetyText = Get-Content -Raw -LiteralPath $safetyPath
@@ -332,7 +332,7 @@ Invoke-RepoCheck "unsafe pickup reach technology effects are blocked" {
     @{ File = "prototypes\mir\emit\legacy_stream_adapter.lua"; Text = $streamAdapterText; Snippet = 'effect_safety.register_generated_technology(technology.name)' },
     @{ File = "prototypes\mir\emit\base_extensions.lua"; Text = $baseExtensionsText; Snippet = 'effect_safety.assert_effects_allowed(desired_effects, "base extension " .. key)' },
     @{ File = "prototypes\mir\emit\base_extensions.lua"; Text = $baseExtensionsText; Snippet = 'effect_safety.register_generated_technology(new.name)' },
-    @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'require("prototypes.technology-effect-safety").assert_registered_technology_effects()' },
+    @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'require("prototypes.mir.emit.effect_safety").assert_registered_technology_effects()' },
     @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'assert_no_blocked_pickup_effects()' }
   )
 
@@ -342,7 +342,7 @@ Invoke-RepoCheck "unsafe pickup reach technology effects are blocked" {
     }
   }
 
-  $safetyRelative = "prototypes/technology-effect-safety.lua"
+  $safetyRelative = "prototypes/mir/emit/effect_safety.lua"
   $prototypeLuaFiles = Get-ChildItem -LiteralPath (Join-Path $repo "prototypes") -Recurse -File -Filter "*.lua"
   foreach ($file in $prototypeLuaFiles) {
     $relative = Get-RepoRelativePath $file.FullName

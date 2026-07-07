@@ -126,7 +126,7 @@ Agricultural growth speed refreshes this force state on init, configuration chan
 - `prototypes/mir/index/productivity_owners.lua`: shared recipe-productivity owner classification, recipe allow-productivity checks, and owner record formatting.
 - `prototypes/mir/policy/productivity_family_adoption.lua`: data-stage adoption of safe residual recipes into configured existing productivity families plus the adoption signature mod-data.
 - `prototypes/mir/policy/competing_productivity.lua`: profile-driven replacement of known fully covered competing infinite recipe-productivity technologies.
-- `prototypes/technology-effect-safety.lua`: blocks unsafe native effect types from MIR-generated technologies.
+- `prototypes/mir/emit/effect_safety.lua`: blocks unsafe native effect types from MIR-generated technologies. The old `prototypes/technology-effect-safety.lua` root path is a compatibility shim.
 
 Keep new domain behavior in these modules rather than growing `util.lua`.
 MIR-owned modules should import these focused paths directly; `prototypes/util.lua`
@@ -173,7 +173,7 @@ Generated recipe-productivity streams can set `dynamic_items_from_lab_inputs = t
 
 Fluid-output productivity streams use the same recipe-productivity generator as item streams. They should be split by recipe ownership/process family, not by every output fluid name. Multi-output recipes such as oil processing belong to one owner stream; conversion families such as oil cracking, lubricant, sulfuric acid and acid neutralization, and thruster fuel/oxidizer can be separate streams when their recipes do not overlap.
 
-Direct-effect stream and base-extension generation must pass through `prototypes/technology-effect-safety.lua`. MIR must not add `character-item-pickup-distance` or `character-loot-pickup-distance` effects to any generated technology; large pickup radii can vacuum belt items into the player inventory and cause severe lag.
+Direct-effect stream and base-extension generation must pass through `prototypes/mir/emit/effect_safety.lua`. MIR must not add `character-item-pickup-distance` or `character-loot-pickup-distance` effects to any generated technology; large pickup radii can vacuum belt items into the player inventory and cause severe lag.
 
 `mir-pipeline-extent-multiplier` is deliberately not research. It is a startup-only prototype pass in `prototypes/pipeline-extent.lua` because `FluidBox.max_pipeline_extent` is resolved from prototypes during load. The dropdown values and parser live in `prototypes/mir/settings/pipeline_extent.lua`; the old `prototypes/pipeline-extent-settings.lua` path is a compatibility shim. The pass is loaded only when the parsed startup setting is not `100%`; at the default `100%`, MIR reads the setting gate and does not load the pipeline module, scan `data.raw`, log pipeline work, or mutate fluid boxes.
 

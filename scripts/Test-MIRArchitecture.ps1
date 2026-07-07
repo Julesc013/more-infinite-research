@@ -528,7 +528,7 @@ Assert-MIRContains -RelativePath $plannerNativeModifiersPath -Text $plannerNativ
 
 $plannerDirectEffectsPath = "prototypes/mir/planner/direct_effects.lua"
 $plannerDirectEffectsText = Read-MIRFile -RelativePath $plannerDirectEffectsPath
-Assert-MIRContains -RelativePath $plannerDirectEffectsPath -Text $plannerDirectEffectsText -Needle 'require("prototypes.technology-effect-safety")'
+Assert-MIRContains -RelativePath $plannerDirectEffectsPath -Text $plannerDirectEffectsText -Needle 'require("prototypes.mir.emit.effect_safety")'
 Assert-MIRContains -RelativePath $plannerDirectEffectsPath -Text $plannerDirectEffectsText -Needle 'require("prototypes.mir.emit.icon_builder")'
 Assert-MIRContains -RelativePath $plannerDirectEffectsPath -Text $plannerDirectEffectsText -Needle 'require("prototypes.mir.platform.factorio.prototype_lookup")'
 Assert-MIRContains -RelativePath $plannerDirectEffectsPath -Text $plannerDirectEffectsText -Needle "function M.available_for_stream(key, spec)"

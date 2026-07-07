@@ -192,6 +192,9 @@ technology prototypes after stream emission.
 rocket/cannon speed cleanup for generated general weapon-speed continuations;
 the old `prototypes/weapon-speed-adjustments.lua` root path is an execution
 shim.
+`prototypes/mir/emit/effect_safety.lua` owns generated technology effect safety
+registration and post-emission assertion; the old
+`prototypes/technology-effect-safety.lua` root path is a compatibility shim.
 
 ## Three Workspaces
 

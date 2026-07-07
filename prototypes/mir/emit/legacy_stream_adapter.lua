@@ -1,4 +1,4 @@
-local effect_safety = require("prototypes.technology-effect-safety")
+local effect_safety = require("prototypes.mir.emit.effect_safety")
 local stream_spec = require("prototypes.mir.domain.streams.stream_spec")
 local technology_builder = require("prototypes.mir.emit.technology_builder")
 

@@ -94,6 +94,7 @@ namespace_shims:
   technology_builder: prototypes/mir/emit/technology_builder.lua
   legacy_stream_adapter: prototypes/mir/emit/legacy_stream_adapter.lua
   base_extensions_emitter: prototypes/mir/emit/base_extensions.lua
+  effect_safety_emitter: prototypes/mir/emit/effect_safety.lua
   icon_builder: prototypes/mir/emit/icon_builder.lua
   decision_export: prototypes/mir/report/decision_export.lua
   compatibility_diagnostics_report: prototypes/mir/report/compatibility_diagnostics.lua
