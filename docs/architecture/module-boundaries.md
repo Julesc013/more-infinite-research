@@ -92,7 +92,9 @@ to the event handlers under `control/`. The old
 `prototypes/mir/legacy/control.lua` path is a compatibility shim back to that
 stage entrypoint. `prototypes/mir/stage/data_final_fixes.lua` owns the
 transitional data-final-fixes call order and delegates old behavior through
-named legacy adapters. The generation modules still move behind `domain/`,
+`prototypes/mir/stage/data_final_fixes_steps.lua`. The old
+`prototypes/mir/legacy/data_final_fixes.lua` path is now a compatibility shim
+back to those stage steps. The generation modules still move behind `domain/`,
 `capabilities/`, `planner/`, and `emit/` in later slices.
 
 The first Factorio platform adapter is
@@ -211,6 +213,7 @@ prototypes/
       data.lua
       data_updates.lua
       data_final_fixes.lua
+      data_final_fixes_steps.lua
       control.lua
 
     core/

@@ -63,6 +63,7 @@ function Get-MIRDataFinalFixesSourceText {
   return Get-MIRCombinedSourceText -RelativePaths @(
     "data-final-fixes.lua",
     "prototypes/mir/stage/data_final_fixes.lua",
+    "prototypes/mir/stage/data_final_fixes_steps.lua",
     "prototypes/mir/legacy/data_final_fixes.lua"
   )
 }
@@ -607,7 +608,7 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "prototypes\mir\planner\requirements.lua"; Text = $plannerRequirementsText; Snippet = 'required_fluids' },
     @{ File = "prototypes\mir\planner\requirements.lua"; Text = $plannerRequirementsText; Snippet = 'technology_requirements.skip_reason(spec)' },
     @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'require("prototypes.pipeline-extent-settings").multiplier()' },
-    @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'require("prototypes.compat.air-scrubbing").emit()' },
+    @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'require("prototypes.mir.compatibility.diagnostics.registry").emit_all()' },
     @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'if pipeline_extent_multiplier ~= 1 then' },
     @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'require("prototypes.pipeline-extent").apply(pipeline_extent_multiplier)' },
     @{ File = "prototypes\pipeline-extent-settings.lua"; Text = $pipelineExtentSettingsText; Snippet = 'S.default_value = "100"' },
@@ -1114,7 +1115,7 @@ Invoke-RepoCheck "Air Scrubbing clean-filter policy is wired" {
   $fixtureText = Get-Content -Raw -LiteralPath $fixturePath
 
   $requiredSnippets = @(
-    @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'require("prototypes.compat.air-scrubbing").emit()' },
+    @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'require("prototypes.mir.compatibility.diagnostics.registry").emit_all()' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'research_air_scrubbing_clean_filter = {' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'science_packs = "derive-from-unlocks"' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'prerequisites = "derive-from-unlocks"' },

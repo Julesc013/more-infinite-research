@@ -77,6 +77,7 @@ namespace_shims:
   planner_science: prototypes/mir/planner/science.lua
   planner_stream_compiler: prototypes/mir/planner/stream_compiler.lua
   data_final_fixes_stage: prototypes/mir/stage/data_final_fixes.lua
+  data_final_fixes_steps: prototypes/mir/stage/data_final_fixes_steps.lua
   compatibility_registry: prototypes/mir/compatibility/registry.lua
   compatibility_overlay_loader: prototypes/mir/compatibility/overlay_loader.lua
   compatibility_claim_registry: prototypes/mir/compatibility/claim_registry.lua
@@ -211,7 +212,7 @@ target_layers:
 
 current_boundary_allowlist:
   prototype_mutators:
-    - prototypes/mir/legacy/data_final_fixes.lua
+    - prototypes/mir/stage/data_final_fixes_steps.lua
     - prototypes/mir/planner/stream_compiler.lua
     - prototypes/base-tech-extensions.lua
     - prototypes/pipeline-extent.lua

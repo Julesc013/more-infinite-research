@@ -128,27 +128,34 @@ foreach ($entry in $entrypoints) {
   if ($entry.Root -eq "control.lua") {
     Assert-MIRContains -RelativePath $entry.StagePath -Text $stageText -Needle "assert_runtime_stage()"
     Assert-MIRContains -RelativePath $entry.StagePath -Text $stageText -Needle 'require("control.scripted-techs").register()'
+  } elseif ($entry.Root -eq "data-final-fixes.lua") {
+    Assert-MIRContains -RelativePath $entry.StagePath -Text $stageText -Needle 'require("prototypes.mir.stage.data_final_fixes_steps")'
   } else {
     Assert-MIRContains -RelativePath $entry.StagePath -Text $stageText -Needle ('require("' + $entry.LegacyModule + '")')
   }
 }
 
 $dataFinalFixesStagePath = "prototypes/mir/stage/data_final_fixes.lua"
+$dataFinalFixesStepsPath = "prototypes/mir/stage/data_final_fixes_steps.lua"
 $dataFinalFixesStageText = Read-MIRFile -RelativePath $dataFinalFixesStagePath
-Assert-MIRContains -RelativePath $dataFinalFixesStagePath -Text $dataFinalFixesStageText -Needle "legacy.apply_pipeline_extent()"
-Assert-MIRContains -RelativePath $dataFinalFixesStagePath -Text $dataFinalFixesStageText -Needle "legacy.emit_legacy_streams()"
+Assert-MIRContains -RelativePath $dataFinalFixesStagePath -Text $dataFinalFixesStageText -Needle "steps.apply_pipeline_extent()"
+Assert-MIRContains -RelativePath $dataFinalFixesStagePath -Text $dataFinalFixesStageText -Needle "steps.emit_streams()"
 Assert-MIRContains -RelativePath $dataFinalFixesStagePath -Text $dataFinalFixesStageText -Needle 'require("prototypes.mir.compatibility.diagnostics.registry").emit_all()'
 Assert-MIRContains -RelativePath $dataFinalFixesStagePath -Text $dataFinalFixesStageText -Needle 'require("prototypes.mir.planner.compiler").emit()'
-Assert-MIRContains -RelativePath $dataFinalFixesStagePath -Text $dataFinalFixesStageText -Needle "legacy.flush_diagnostics()"
+Assert-MIRContains -RelativePath $dataFinalFixesStagePath -Text $dataFinalFixesStageText -Needle "steps.flush_diagnostics()"
 if ($dataFinalFixesStageText.Contains('require("prototypes.mir.compatibility.diagnostics.atan_ash").emit()')) {
   throw "$dataFinalFixesStagePath must emit exact overlay diagnostics through the diagnostics registry."
 }
 
+$dataFinalFixesStepsText = Read-MIRFile -RelativePath $dataFinalFixesStepsPath
+Assert-MIRContains -RelativePath $dataFinalFixesStepsPath -Text $dataFinalFixesStepsText -Needle "function M.apply_pipeline_extent()"
+Assert-MIRContains -RelativePath $dataFinalFixesStepsPath -Text $dataFinalFixesStepsText -Needle "function M.emit_streams()"
+Assert-MIRContains -RelativePath $dataFinalFixesStepsPath -Text $dataFinalFixesStepsText -Needle 'require("prototypes.mir.planner.stream_compiler").run()'
+Assert-MIRContains -RelativePath $dataFinalFixesStepsPath -Text $dataFinalFixesStepsText -Needle "function M.flush_diagnostics()"
+
 $dataFinalFixesLegacyPath = "prototypes/mir/legacy/data_final_fixes.lua"
 $dataFinalFixesLegacyText = Read-MIRFile -RelativePath $dataFinalFixesLegacyPath
-Assert-MIRContains -RelativePath $dataFinalFixesLegacyPath -Text $dataFinalFixesLegacyText -Needle "function M.apply_pipeline_extent()"
-Assert-MIRContains -RelativePath $dataFinalFixesLegacyPath -Text $dataFinalFixesLegacyText -Needle "function M.emit_legacy_streams()"
-Assert-MIRContains -RelativePath $dataFinalFixesLegacyPath -Text $dataFinalFixesLegacyText -Needle "function M.flush_diagnostics()"
+Assert-MIRContains -RelativePath $dataFinalFixesLegacyPath -Text $dataFinalFixesLegacyText -Needle 'return require("prototypes.mir.stage.data_final_fixes_steps")'
 
 $requiredShims = @(
   "prototypes/mir/core/schema.lua",
@@ -178,6 +185,7 @@ $requiredShims = @(
   "prototypes/mir/planner/requirements.lua",
   "prototypes/mir/planner/science.lua",
   "prototypes/mir/planner/stream_compiler.lua",
+  "prototypes/mir/stage/data_final_fixes_steps.lua",
   "prototypes/mir/compatibility/registry.lua",
   "prototypes/mir/compatibility/overlay_loader.lua",
   "prototypes/mir/compatibility/claim_registry.lua",
