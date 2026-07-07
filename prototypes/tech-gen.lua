@@ -10,6 +10,7 @@ local productivity_owners = require("prototypes.compat.productivity-owners")
 local productivity_family_adoption = require("prototypes.compat.productivity-family-adoption")
 local native_modifiers = require("prototypes.mir.planner.native_modifiers")
 local planner_requirements = require("prototypes.mir.planner.requirements")
+local planner_science = require("prototypes.mir.planner.science")
 local stream_emitter = require("prototypes.mir.legacy.stream_emitter")
 
 local function lname(key, spec)
@@ -205,8 +206,7 @@ local function make_stream(key, raw_spec)
     end
   end
 
-  local ingredients, lab_status = U.best_lab_compatible_ingredients(U.pick_science_for_stream(spec, key), key)
-  lab_status = lab_status or "full"
+  local ingredients, lab_status = planner_science.ingredients_for_stream(key, spec)
   if not ingredients or #ingredients == 0 then
     log("[more-infinite-research] Skipping stream "..key.." because no valid lab-compatible science pack set was found.")
     D.stream(D.stream_fields(key, spec, "skipped", "no_lab_compatible_science", ingredients, nil, direct_effects, lab_status))

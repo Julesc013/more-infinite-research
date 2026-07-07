@@ -120,6 +120,9 @@ requirement skip rules before the legacy recipe-productivity generator attempts
 to build a stream. `prototypes/mir/planner/native_modifiers.lua` identifies
 native technology modifiers and records overlap diagnostics through platform
 prototype access before direct-effect streams are emitted.
+`prototypes/mir/planner/science.lua` selects stream science ingredients and
+normalizes lab-compatibility status while the rest of science integration moves
+out of legacy utility modules.
 
 Compatibility policy uses `prototypes/mir/compatibility/`. Named compatibility
 targets live under `prototypes/mir/compatibility/overlays/`; those overlays

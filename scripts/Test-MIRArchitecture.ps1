@@ -169,6 +169,7 @@ $requiredShims = @(
   "prototypes/mir/planner/compiler.lua",
   "prototypes/mir/planner/native_modifiers.lua",
   "prototypes/mir/planner/requirements.lua",
+  "prototypes/mir/planner/science.lua",
   "prototypes/mir/compatibility/registry.lua",
   "prototypes/mir/compatibility/overlay_loader.lua",
   "prototypes/mir/compatibility/claim_registry.lua",
@@ -209,7 +210,9 @@ $legacyTechGenText = Read-MIRFile -RelativePath $legacyTechGenPath
 Assert-MIRContains -RelativePath $legacyTechGenPath -Text $legacyTechGenText -Needle 'require("prototypes.mir.legacy.stream_emitter")'
 Assert-MIRContains -RelativePath $legacyTechGenPath -Text $legacyTechGenText -Needle 'require("prototypes.mir.planner.native_modifiers")'
 Assert-MIRContains -RelativePath $legacyTechGenPath -Text $legacyTechGenText -Needle 'require("prototypes.mir.planner.requirements")'
+Assert-MIRContains -RelativePath $legacyTechGenPath -Text $legacyTechGenText -Needle 'require("prototypes.mir.planner.science")'
 Assert-MIRContains -RelativePath $legacyTechGenPath -Text $legacyTechGenText -Needle "planner_requirements.missing_reason(key, raw_spec)"
+Assert-MIRContains -RelativePath $legacyTechGenPath -Text $legacyTechGenText -Needle "planner_science.ingredients_for_stream(key, spec)"
 Assert-MIRContains -RelativePath $legacyTechGenPath -Text $legacyTechGenText -Needle "native_modifiers.record_overlaps(key, direct_effects)"
 Assert-MIRContains -RelativePath $legacyTechGenPath -Text $legacyTechGenText -Needle "stream_emitter.emit(key, spec, fields)"
 
@@ -277,6 +280,13 @@ Assert-MIRContains -RelativePath $plannerNativeModifiersPath -Text $plannerNativ
 Assert-MIRContains -RelativePath $plannerNativeModifiersPath -Text $plannerNativeModifiersText -Needle "function M.identity(effect)"
 Assert-MIRContains -RelativePath $plannerNativeModifiersPath -Text $plannerNativeModifiersText -Needle 'data_raw.prototypes("technology")'
 Assert-MIRContains -RelativePath $plannerNativeModifiersPath -Text $plannerNativeModifiersText -Needle "function M.record_overlaps(key, effects)"
+
+$plannerSciencePath = "prototypes/mir/planner/science.lua"
+$plannerScienceText = Read-MIRFile -RelativePath $plannerSciencePath
+Assert-MIRContains -RelativePath $plannerSciencePath -Text $plannerScienceText -Needle "function M.ingredients_for_stream(key, spec)"
+Assert-MIRContains -RelativePath $plannerSciencePath -Text $plannerScienceText -Needle "U.pick_science_for_stream(spec, key)"
+Assert-MIRContains -RelativePath $plannerSciencePath -Text $plannerScienceText -Needle "U.best_lab_compatible_ingredients"
+Assert-MIRContains -RelativePath $plannerSciencePath -Text $plannerScienceText -Needle 'lab_status or "full"'
 
 $airScrubbingOverlayPath = "prototypes/mir/compatibility/overlays/air_scrubbing.lua"
 $airScrubbingOverlayText = Read-MIRFile -RelativePath $airScrubbingOverlayPath

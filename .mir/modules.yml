@@ -70,6 +70,7 @@ namespace_shims:
   planner_compiler: prototypes/mir/planner/compiler.lua
   planner_native_modifiers: prototypes/mir/planner/native_modifiers.lua
   planner_requirements: prototypes/mir/planner/requirements.lua
+  planner_science: prototypes/mir/planner/science.lua
   data_final_fixes_stage: prototypes/mir/stage/data_final_fixes.lua
   compatibility_registry: prototypes/mir/compatibility/registry.lua
   compatibility_overlay_loader: prototypes/mir/compatibility/overlay_loader.lua
