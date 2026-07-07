@@ -79,23 +79,18 @@ entrypoint for save/session behavior such as event handlers, commands, remote
 interfaces, GUI, storage, and configuration-change handling. MIR should not add
 or keep `control.lua` for normal generated technology emission. This branch
 keeps it only because scripted technology candidates already have bounded
-runtime handlers under `control/`.
+runtime handlers under `prototypes/mir/runtime/`.
 
 Runtime control files must not inspect `data.raw`, call `data:extend`, or create
 generated technology prototypes. Those responsibilities remain in the data
 stage, primarily behind `data-final-fixes.lua`.
 
-Current migration state: the Factorio root entrypoints route through
+Current state: the Factorio root entrypoints route through
 `prototypes/mir/stage/`. The runtime entrypoint
 `prototypes/mir/stage/control.lua` owns only runtime registration and delegates
-to the event handlers under `control/`. The old
-`prototypes/mir/legacy/control.lua` path is a compatibility shim back to that
-stage entrypoint. `prototypes/mir/stage/data_final_fixes.lua` owns the
-transitional data-final-fixes call order and delegates old behavior through
-`prototypes/mir/stage/data_final_fixes_steps.lua`. The old
-`prototypes/mir/legacy/data_final_fixes.lua` path is now a compatibility shim
-back to those stage steps. The generation modules still move behind `domain/`,
-`capabilities/`, `planner/`, and `emit/` in later slices.
+to event handlers under `prototypes/mir/runtime/`.
+`prototypes/mir/stage/data_final_fixes.lua` owns the data-final-fixes call
+order and delegates each step through MIR-owned modules.
 
 The first Factorio platform adapter is
 `prototypes/mir/platform/factorio/data_raw.lua`. It wraps access to `data.raw`
@@ -113,20 +108,12 @@ settings catalog, settings-stage prototype builder, settings-stage visibility
 evaluation, and the adapter that applies `hidden = true` without deleting
 setting IDs or forcing values. Settings visibility uses `ui_visibility`
 metadata and active mods only; final recipe, item, fluid, and technology facts
-remain data-stage generation concerns. The old
-`prototypes/mir/legacy/settings.lua` path is a compatibility shim to
-`prototypes/mir/settings/stage_builder.lua`.
-`prototypes/mir/settings/resolver.lua` owns startup setting enablement checks
-for data-stage stream and base-extension planning; the old
-`prototypes/settings-resolver.lua` root path is a compatibility shim.
-`prototypes/mir/settings/defaults.lua` owns shared stream and base-extension
-defaults; the root `defaults.lua` path is a compatibility shim.
-`prototypes/mir/settings/pipeline_extent.lua` owns the pipeline extent setting
-catalog and parser; the old `prototypes/pipeline-extent-settings.lua` root path
-is a compatibility shim.
-`prototypes/mir/pipeline/extent.lua` owns the optional pipeline extent
-prototype pass; the old `prototypes/pipeline-extent.lua` root path is a
-compatibility shim.
+remain data-stage generation concerns. `prototypes/mir/settings/resolver.lua`
+owns startup setting enablement checks for data-stage stream and base-extension
+planning. `prototypes/mir/settings/defaults.lua` owns shared stream and
+base-extension defaults. `prototypes/mir/settings/pipeline_extent.lua` owns the
+pipeline extent setting catalog and parser. `prototypes/mir/pipeline/extent.lua`
+owns the optional pipeline extent prototype pass.
 
 The MIR planner namespace owns compiler planning checks as they are migrated out
 of legacy generators. `prototypes/mir/planner/requirements.lua` evaluates
@@ -154,24 +141,14 @@ applying fallback effect icons before emission planning.
 `prototypes/mir/capabilities/recipe_productivity/planner.lua` owns the current
 recipe-productivity bucket matching facade and converts matched buckets into
 recipe productivity effects after policy filters run.
-`prototypes/mir/planner/stream_compiler.lua` owns the transitional generated
-stream loop. The old `prototypes/tech-gen.lua` path is a compatibility shim
-that immediately delegates to that MIR planner module.
-`prototypes/mir/emit/legacy_stream_adapter.lua` adapts legacy stream records
-into `StreamSpec` records and forwards them to `technology_builder`; the old
-`prototypes/mir/legacy/stream_emitter.lua` path is now a compatibility shim.
+`prototypes/mir/planner/stream_compiler.lua` owns the generated stream loop.
+`prototypes/mir/emit/stream_spec_adapter.lua` adapts current stream records
+into `StreamSpec` records and forwards them to `technology_builder`.
 `prototypes/mir/emit/base_extensions.lua` owns base technology continuation
-prototype emission; the old `prototypes/base-tech-extensions.lua` root path is
-now an execution shim for backport compatibility.
-The old `prototypes/compat/` paths for profiles, owner detection, competing
-productivity cleanup, competing base-extension cleanup, family adoption, and
-compatibility planning are compatibility shims. The active implementations live
-under `prototypes/mir/compatibility/`, `prototypes/mir/index/`, and
-`prototypes/mir/policy/`.
-The old `prototypes/lib/capabilities/` and `prototypes/lib/policy/capabilities.lua`
-paths are also compatibility shims; the active capability contract, registry,
-and policy live under `prototypes/mir/capabilities/` and
-`prototypes/mir/policy/capabilities.lua`.
+prototype emission. The 3.x shipped layout has no `prototypes/compat/`,
+`prototypes/lib/`, or `prototypes/mir/legacy/` implementation roots. Active
+compatibility, indexing, policy, capability, and report code lives under
+focused `prototypes/mir/` namespaces.
 
 Compatibility policy uses `prototypes/mir/compatibility/`. Named compatibility
 targets live under `prototypes/mir/compatibility/overlays/`; those overlays
@@ -184,22 +161,17 @@ through `report/` helpers. The stage layer calls
 `prototypes/mir/compatibility/diagnostics/registry.lua` rather than naming
 individual exact-recipe diagnostic modules directly.
 `prototypes/mir/report/diagnostics_sink.lua` owns the existing log/audit-row
-diagnostic sink; the old `prototypes/diagnostics.lua` path is a compatibility
-shim. During the transition it may call `prototypes/mir/emit/icon_builder.lua`
-only to preserve existing icon-source hints in report rows; it must not mutate
+diagnostic sink. It may call `prototypes/mir/emit/icon_builder.lua` only to
+preserve existing icon-source hints in report rows; it must not mutate
 prototypes.
 `prototypes/mir/policy/max_level.lua` owns the post-emission max-level setting
-enforcement pass for generated stream technologies; the old
-`prototypes/max-level-control.lua` root path is an execution shim. This remains
-in the current mutator allowlist because it adjusts already generated MIR
-technology prototypes after stream emission.
+enforcement pass for generated stream technologies. This remains in the current
+mutator allowlist because it adjusts already generated MIR technology
+prototypes after stream emission.
 `prototypes/mir/policy/weapon_speed.lua` owns the optional duplicate
-rocket/cannon speed cleanup for generated general weapon-speed continuations;
-the old `prototypes/weapon-speed-adjustments.lua` root path is an execution
-shim.
+rocket/cannon speed cleanup for generated general weapon-speed continuations.
 `prototypes/mir/emit/effect_safety.lua` owns generated technology effect safety
-registration and post-emission assertion; the old
-`prototypes/technology-effect-safety.lua` root path is a compatibility shim.
+registration and post-emission assertion.
 
 ## Three Workspaces
 
@@ -234,7 +206,6 @@ MIR compiler namespace
   prototypes/mir/emit/
   prototypes/mir/report/
   prototypes/mir/compatibility/
-  prototypes/mir/legacy/
 
 Development workspace
   docs/
@@ -296,7 +267,7 @@ prototypes/
       registry.lua
       visibility.lua
       builder.lua
-      legacy_adapter.lua
+      stage_adapter.lua
 
     streams/
       registry.lua
@@ -462,7 +433,7 @@ prototypes/
 
     emit/
       technology_builder.lua
-      legacy_stream_adapter.lua
+      stream_spec_adapter.lua
       base_extensions.lua
       effect_builder.lua
       prerequisite_builder.lua
@@ -506,11 +477,6 @@ prototypes/
         space_exploration.lua
         pyanodons.lua
 
-    legacy/
-      facts_registry.lua
-      tech_gen.lua
-      compat_profiles.lua
-      report_rows.lua
 ```
 
 The exact folder migration can be staged, but new 3.0 code should prefer this
@@ -534,7 +500,6 @@ shape.
 | `emit/` | validated `StreamSpec` records | prototypes | classification |
 | `report/` | records | report rows | prototype mutation |
 | `compatibility/` | declarative selectors, policies, diagnostics | policy overlays and report rows | direct generation |
-| `legacy/` | new modules | compatibility wrappers | new behavior |
 
 Forbidden dependencies:
 
@@ -546,7 +511,6 @@ settings/ must not inspect data.raw or force hidden values by default
 streams/ must stay declarative
 report/ must not mutate data.raw
 capabilities/ must not create technologies directly
-legacy/ must not contain new business logic
 ```
 
 ## Ports And Adapters
@@ -680,19 +644,13 @@ add_productivity_technology(...)
 
 The `mods` table selects policy. Prototype facts decide behavior.
 
-## Legacy Shims
+## No Shims
 
-Backportability needs stable old paths during the 3.0 migration. Keep old paths
-as wrappers while the compiler moves:
-
-```lua
--- prototypes/lib/recipe-matching.lua
-return require("prototypes.mir.capabilities.recipe_productivity.recipe_matching")
-```
-
-The shim may call new compiler modules, but new business logic belongs in the
-3.0 namespace. The purpose is to reduce cherry-pick friction for `2.2.x`,
-`2.5.x`, and target-line fixes while preserving clean architecture in `dev`.
+MIR 3 dev must not keep old implementation paths as active shims. Backports may
+carry temporary compatibility surfaces on their own branch, but the main 3.x
+line keeps the shipped implementation under `prototypes/mir/` plus the required
+Factorio root entrypoints and stream data tables. The legacy inventory gate
+fails if deleted shim directories or broad root helper files return.
 
 ## Naming Conventions
 
@@ -776,19 +734,20 @@ The measurable transition debt report is:
 It writes `artifacts/legacy-inventory/shipped-mod-legacy.json`,
 `artifacts/legacy-inventory/repo-legacy.json`, and
 `artifacts/legacy-inventory/legacy-summary.md`. The report tracks old-path
-module counts, shim-only status, old import counts, direct prototype access
-matches, and generated stream manifest coverage. The checked form currently
-requires zero active `prototypes/mir/legacy`, `prototypes/compat`, and
-`prototypes/lib` modules, zero MIR-legacy/compat/lib/config/util/diagnostics
-imports, zero direct `data.raw` matches outside the platform adapter, and zero
-generated streams missing manifest rows.
+module counts, deleted shim-directory presence, old root helper presence, old
+import counts, direct prototype access matches, and generated stream manifest
+coverage. The checked form requires zero old shim directories, zero old root
+helper files, zero runtime Lua files under `control/`, zero
+MIR-legacy/compat/lib/config/util/diagnostics imports, zero direct `data.raw`
+matches outside the platform adapter, and zero generated streams missing
+manifest rows.
 
 ## Implementation Sequence
 
-1. Create the shell directories: `stage/`, `core/`, `platform/`, `domain/`, and
-   `legacy/`.
+1. Create the shell directories: `stage/`, `core/`, `platform/`, and
+   `domain/`.
 2. Make root Factorio files call stage modules.
-3. Move old code behind legacy shims without behavior changes.
+3. Move old code into MIR-owned namespaces without behavior changes.
 4. Introduce or formalize schema records for `DecisionRecord`, `StreamSpec`,
    `FactRegistry`, `CompatibilityClaim`, and `StreamManifest`.
 5. Move the current `2.2.0` planner into layers.

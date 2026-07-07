@@ -46,16 +46,16 @@ MIR compiler namespace:
   prototypes/mir/emit/
   prototypes/mir/report/
   prototypes/mir/compatibility/
-  prototypes/mir/legacy/
 
 Development workspace:
   docs/, fixtures/, scripts/, tests/, build/, dist/, todo.md, CONTRIBUTING.md
 ```
 
 Root entrypoints should become thin stage wrappers. Compatibility packs register
-policy overlays only. `emit/` is the only layer that mutates prototypes. Legacy
-paths become shims during the migration so target-line backports can still
-cherry-pick small fixes.
+policy overlays only. `emit/` is the only layer that creates generated
+technology prototypes and MIR mod-data prototypes. Old shim paths are not part
+of the 3.x shipped layout; target-line backports must carry any temporary
+compatibility surface on their own branch.
 
 ## Consequences
 

@@ -149,7 +149,7 @@ Unknown setting IDs and mismatched value types are ignored on the current run,
 not removed from the profile. That keeps profiles portable across optional-mod
 changes and target-line backports.
 
-Runtime command support lives in `control/settings-profile.lua`:
+Runtime command support lives in `prototypes/mir/runtime/settings_profile.lua`:
 
 - `/mir-settings-export [name]` writes the current effective profile to
   `script-output/more-infinite-research/settings/<name>.txt`;

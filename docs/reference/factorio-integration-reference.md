@@ -37,8 +37,8 @@ per-save storage, configuration-change handling, or runtime diagnostics.
 
 MIR's normal compatibility compiler work belongs to the data stage. Prototype
 discovery, recipe indexing, generated technology construction, and `data.raw`
-mutation must not move into `control.lua` or `control/`.
+mutation must not move into `control.lua` or `prototypes/mir/runtime/`.
 
 The current branch keeps `control.lua` because scripted technology candidates
-register runtime events through `control/scripted-techs.lua`. The root file
-stays thin and routes through `prototypes/mir/stage/control.lua`.
+register runtime events through `prototypes/mir/runtime/scripted_techs.lua`.
+The root file stays thin and routes through `prototypes/mir/stage/control.lua`.

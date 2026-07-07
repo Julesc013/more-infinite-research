@@ -8,11 +8,29 @@ current_roots:
       - data-updates.lua
       - data-final-fixes.lua
       - control.lua
-    runtime_directories:
-      - control
+    shipped_directories:
       - locale
       - migrations
       - prototypes
+    forbidden_shim_directories:
+      - control
+      - prototypes/compat
+      - prototypes/lib
+      - prototypes/mir/legacy
+      - prototypes/planner
+    forbidden_root_helpers:
+      - defaults.lua
+      - prototypes/base-tech-extensions.lua
+      - prototypes/config.lua
+      - prototypes/diagnostics.lua
+      - prototypes/max-level-control.lua
+      - prototypes/pipeline-extent.lua
+      - prototypes/pipeline-extent-settings.lua
+      - prototypes/settings-resolver.lua
+      - prototypes/tech-gen.lua
+      - prototypes/technology-effect-safety.lua
+      - prototypes/util.lua
+      - prototypes/weapon-speed-adjustments.lua
 
 stage_entrypoints:
   settings.lua: prototypes/mir/stage/settings.lua
@@ -25,12 +43,12 @@ runtime_boundaries:
   control.lua:
     stage_entrypoint: prototypes/mir/stage/control.lua
     runtime_modules:
-      - control/scripted-techs.lua
-      - control/settings-resolver.lua
-      - control/settings-profile.lua
-      - control/productivity-family-adoption.lua
-      - control/effects/agricultural-growth-speed.lua
-      - control/effects/spoilage-preservation.lua
+      - prototypes/mir/runtime/scripted_techs.lua
+      - prototypes/mir/runtime/settings_resolver.lua
+      - prototypes/mir/runtime/settings_profile.lua
+      - prototypes/mir/runtime/productivity_family_adoption.lua
+      - prototypes/mir/runtime/effects/agricultural_growth_speed.lua
+      - prototypes/mir/runtime/effects/spoilage_preservation.lua
     allowed_globals:
       - script
       - storage
@@ -48,240 +66,183 @@ runtime_boundaries:
       - data:extend
     rule: runtime registration and event handling only; no prototype generation
 
-namespace_shims:
-  schema: prototypes/mir/core/schema.lua
-  deepcopy: prototypes/mir/core/deepcopy.lua
-  table_utils: prototypes/mir/core/table.lua
-  factorio_data_raw: prototypes/mir/platform/factorio/data_raw.lua
-  factorio_mods: prototypes/mir/platform/factorio/mods.lua
-  factorio_prototype_lookup: prototypes/mir/platform/factorio/prototype_lookup.lua
-  pipeline_extent: prototypes/mir/pipeline/extent.lua
-  settings_registry: prototypes/mir/settings/registry.lua
-  settings_defaults: prototypes/mir/settings/defaults.lua
-  settings_visibility: prototypes/mir/settings/visibility.lua
-  settings_builder: prototypes/mir/settings/builder.lua
-  settings_stage_builder: prototypes/mir/settings/stage_builder.lua
-  settings_legacy_adapter: prototypes/mir/settings/legacy_adapter.lua
-  settings_profile_codec: prototypes/mir/settings/profile_codec.lua
-  settings_effective: prototypes/mir/settings/effective.lua
-  settings_resolver: prototypes/mir/settings/resolver.lua
-  settings_pipeline_extent: prototypes/mir/settings/pipeline_extent.lua
-  stream_registry: prototypes/mir/streams/registry.lua
-  adoption_policy: prototypes/mir/policy/adoption_policy.lua
-  owner_policy: prototypes/mir/policy/owner_policy.lua
-  competing_productivity_policy: prototypes/mir/policy/competing_productivity.lua
-  competing_base_extensions_policy: prototypes/mir/policy/competing_base_extensions.lua
-  productivity_family_adoption_policy: prototypes/mir/policy/productivity_family_adoption.lua
-  technology_cleanup_policy: prototypes/mir/policy/technology_cleanup.lua
-  max_level_policy: prototypes/mir/policy/max_level.lua
-  weapon_speed_policy: prototypes/mir/policy/weapon_speed.lua
-  capability_policy: prototypes/mir/policy/capabilities.lua
-  fact_registry: prototypes/mir/index/registry_builder.lua
-  index_productivity_owners: prototypes/mir/index/productivity_owners.lua
-  legacy_fact_registry_shim: prototypes/lib/facts/registry.lua
-  domain_fact_registry_shim: prototypes/mir/domain/facts/registry.lua
-  index_recipes: prototypes/mir/index/recipes.lua
-  index_technologies: prototypes/mir/index/technologies.lua
-  index_labs: prototypes/mir/index/labs.lua
-  index_owners: prototypes/mir/index/owners.lua
-  index_rule_surfaces: prototypes/mir/index/rule_surfaces.lua
-  decision_record: prototypes/mir/domain/decisions/decision_record.lua
-  stream_spec: prototypes/mir/domain/streams/stream_spec.lua
-  capability_contract: prototypes/mir/capabilities/contract.lua
-  capability_registry: prototypes/mir/capabilities/registry.lua
-  recipe_productivity_planner: prototypes/mir/capabilities/recipe_productivity/planner.lua
-  recipe_productivity_matching: prototypes/mir/capabilities/recipe_productivity/recipe_matching.lua
-  science_integration_packs: prototypes/mir/capabilities/science_integration/science_packs.lua
-  science_integration_selector: prototypes/mir/capabilities/science_integration/science_selector.lua
-  technology_builder: prototypes/mir/emit/technology_builder.lua
-  legacy_stream_adapter: prototypes/mir/emit/legacy_stream_adapter.lua
-  base_extensions_emitter: prototypes/mir/emit/base_extensions.lua
-  effect_safety_emitter: prototypes/mir/emit/effect_safety.lua
-  icon_builder: prototypes/mir/emit/icon_builder.lua
-  decision_export: prototypes/mir/report/decision_export.lua
-  compatibility_diagnostics_report: prototypes/mir/report/compatibility_diagnostics.lua
-  diagnostics_sink: prototypes/mir/report/diagnostics_sink.lua
-  planner_compiler: prototypes/mir/planner/compiler.lua
-  planner_costs: prototypes/mir/planner/costs.lua
-  planner_direct_effects: prototypes/mir/planner/direct_effects.lua
-  planner_native_modifiers: prototypes/mir/planner/native_modifiers.lua
-  planner_prerequisites: prototypes/mir/planner/prerequisites.lua
-  planner_requirements: prototypes/mir/planner/requirements.lua
-  planner_technology_requirements: prototypes/mir/planner/technology_requirements.lua
-  planner_science: prototypes/mir/planner/science.lua
-  planner_stream_compiler: prototypes/mir/planner/stream_compiler.lua
-  data_final_fixes_stage: prototypes/mir/stage/data_final_fixes.lua
-  data_final_fixes_steps: prototypes/mir/stage/data_final_fixes_steps.lua
-  compatibility_registry: prototypes/mir/compatibility/registry.lua
-  compatibility_profiles: prototypes/mir/compatibility/profiles.lua
-  compatibility_planner: prototypes/mir/compatibility/planner.lua
-  compatibility_overlay_loader: prototypes/mir/compatibility/overlay_loader.lua
-  compatibility_claim_registry: prototypes/mir/compatibility/claim_registry.lua
-  air_scrubbing_policy_overlay: prototypes/mir/compatibility/overlays/air_scrubbing.lua
-  atan_ash_policy_overlay: prototypes/mir/compatibility/overlays/atan_ash.lua
-  exact_recipe_policy_diagnostics: prototypes/mir/compatibility/diagnostics/exact_recipe_policy.lua
-  exact_recipe_diagnostics_registry: prototypes/mir/compatibility/diagnostics/registry.lua
-  air_scrubbing_diagnostics: prototypes/mir/compatibility/diagnostics/air_scrubbing.lua
-  atan_ash_diagnostics: prototypes/mir/compatibility/diagnostics/atan_ash.lua
-  legacy_stream_emitter_shim: prototypes/mir/legacy/stream_emitter.lua
+modules:
+  core:
+    - prototypes/mir/core/schema.lua
+    - prototypes/mir/core/deepcopy.lua
+    - prototypes/mir/core/table.lua
+  platform:
+    - prototypes/mir/platform/factorio/data_raw.lua
+    - prototypes/mir/platform/factorio/mods.lua
+    - prototypes/mir/platform/factorio/prototype_lookup.lua
+  settings:
+    - prototypes/mir/settings/registry.lua
+    - prototypes/mir/settings/defaults.lua
+    - prototypes/mir/settings/stage_builder.lua
+    - prototypes/mir/settings/stage_adapter.lua
+    - prototypes/mir/settings/visibility.lua
+    - prototypes/mir/settings/builder.lua
+    - prototypes/mir/settings/profile_codec.lua
+    - prototypes/mir/settings/effective.lua
+    - prototypes/mir/settings/resolver.lua
+    - prototypes/mir/settings/pipeline_extent.lua
+  streams:
+    - prototypes/mir/streams/registry.lua
+    - prototypes/streams/productivity.lua
+    - prototypes/streams/direct-effects.lua
+  pipeline:
+    - prototypes/mir/pipeline/extent.lua
+  index:
+    - prototypes/mir/index/registry_builder.lua
+    - prototypes/mir/index/productivity_owners.lua
+    - prototypes/mir/index/recipes.lua
+    - prototypes/mir/index/technologies.lua
+    - prototypes/mir/index/labs.lua
+    - prototypes/mir/index/owners.lua
+    - prototypes/mir/index/rule_surfaces.lua
+  domain:
+    - prototypes/mir/domain/facts/registry.lua
+    - prototypes/mir/domain/decisions/decision_record.lua
+    - prototypes/mir/domain/streams/stream_spec.lua
+  policy:
+    - prototypes/mir/policy/adoption_policy.lua
+    - prototypes/mir/policy/owner_policy.lua
+    - prototypes/mir/policy/competing_productivity.lua
+    - prototypes/mir/policy/competing_base_extensions.lua
+    - prototypes/mir/policy/productivity_family_adoption.lua
+    - prototypes/mir/policy/technology_cleanup.lua
+    - prototypes/mir/policy/max_level.lua
+    - prototypes/mir/policy/weapon_speed.lua
+    - prototypes/mir/policy/capabilities.lua
+  capabilities:
+    - prototypes/mir/capabilities/contract.lua
+    - prototypes/mir/capabilities/registry.lua
+    - prototypes/mir/capabilities/recipe_productivity/planner.lua
+    - prototypes/mir/capabilities/recipe_productivity/recipe_matching.lua
+    - prototypes/mir/capabilities/science_integration/science_packs.lua
+    - prototypes/mir/capabilities/science_integration/science_selector.lua
+  planner:
+    - prototypes/mir/planner/compiler.lua
+    - prototypes/mir/planner/stream_compiler.lua
+    - prototypes/mir/planner/costs.lua
+    - prototypes/mir/planner/direct_effects.lua
+    - prototypes/mir/planner/native_modifiers.lua
+    - prototypes/mir/planner/prerequisites.lua
+    - prototypes/mir/planner/requirements.lua
+    - prototypes/mir/planner/technology_requirements.lua
+    - prototypes/mir/planner/science.lua
+  emit:
+    - prototypes/mir/emit/technology_builder.lua
+    - prototypes/mir/emit/stream_spec_adapter.lua
+    - prototypes/mir/emit/base_extensions.lua
+    - prototypes/mir/emit/effect_safety.lua
+    - prototypes/mir/emit/icon_builder.lua
+    - prototypes/mir/emit/mod_data.lua
+  report:
+    - prototypes/mir/report/decision_export.lua
+    - prototypes/mir/report/compatibility_diagnostics.lua
+    - prototypes/mir/report/diagnostics_sink.lua
+  compatibility:
+    - prototypes/mir/compatibility/registry.lua
+    - prototypes/mir/compatibility/profiles.lua
+    - prototypes/mir/compatibility/planner.lua
+    - prototypes/mir/compatibility/overlay_loader.lua
+    - prototypes/mir/compatibility/claim_registry.lua
+    - prototypes/mir/compatibility/overlays/air_scrubbing.lua
+    - prototypes/mir/compatibility/overlays/atan_ash.lua
+    - prototypes/mir/compatibility/diagnostics/registry.lua
+    - prototypes/mir/compatibility/diagnostics/exact_recipe_policy.lua
+    - prototypes/mir/compatibility/diagnostics/air_scrubbing.lua
+    - prototypes/mir/compatibility/diagnostics/atan_ash.lua
+  runtime:
+    - prototypes/mir/runtime/scripted_techs.lua
+    - prototypes/mir/runtime/settings_resolver.lua
+    - prototypes/mir/runtime/settings_profile.lua
+    - prototypes/mir/runtime/productivity_family_adoption.lua
+    - prototypes/mir/runtime/effects/agricultural_growth_speed.lua
+    - prototypes/mir/runtime/effects/spoilage_preservation.lua
 
 target_layers:
   stage:
     path: prototypes/mir/stage
-    may_require:
-      - core
-      - platform
-      - planner
     may_mutate_data_raw: false
-
+  runtime:
+    path: prototypes/mir/runtime
+    may_read_runtime_globals: true
+    may_mutate_data_raw: false
   core:
     path: prototypes/mir/core
-    may_require: []
     may_mutate_data_raw: false
-
   platform:
     path: prototypes/mir/platform
-    may_require:
-      - core
     may_read_factorio_globals: true
     may_mutate_data_raw: false
-
-  domain:
-    path: prototypes/mir/domain
-    may_require:
-      - core
-    may_read_factorio_globals: false
-    may_mutate_data_raw: false
-
-  index:
-    path: prototypes/mir/index
-    may_require:
-      - core
-      - platform
-      - domain
-    may_mutate_data_raw: false
-
-  graph:
-    path: prototypes/mir/graph
-    may_require:
-      - core
-      - domain
-    may_mutate_data_raw: false
-
-  classify:
-    path: prototypes/mir/classify
-    may_require:
-      - core
-      - domain
-      - graph
-    may_mutate_data_raw: false
-
-  policy:
-    path: prototypes/mir/policy
-    may_require:
-      - core
-      - domain
-      - platform
-    may_mutate_data_raw: false
-
   settings:
     path: prototypes/mir/settings
-    may_require:
-      - core
-      - platform
     may_read_factorio_globals: true
+    may_register_settings: true
     may_mutate_data_raw: false
-
-  streams:
-    path: prototypes/mir/streams
-    may_require:
-      - compatibility
-    may_mutate_data_raw: false
-
   pipeline:
     path: prototypes/mir/pipeline
     may_require:
       - platform
     may_mutate_data_raw: true
-
+  domain:
+    path: prototypes/mir/domain
+    may_read_factorio_globals: false
+    may_mutate_data_raw: false
+  index:
+    path: prototypes/mir/index
+    may_require:
+      - platform
+      - domain
+    may_mutate_data_raw: false
+  policy:
+    path: prototypes/mir/policy
+    may_require:
+      - domain
+      - platform
+    may_mutate_data_raw: false
   capabilities:
     path: prototypes/mir/capabilities
     may_require:
-      - core
-      - domain
-      - graph
-      - classify
       - policy
+      - domain
     may_mutate_data_raw: false
-
   planner:
     path: prototypes/mir/planner
     may_require:
-      - core
-      - domain
       - capabilities
       - policy
+      - domain
     may_mutate_data_raw: false
-
   emit:
     path: prototypes/mir/emit
     may_require:
-      - core
-      - domain
       - platform
+      - domain
     may_mutate_data_raw: true
-
   report:
     path: prototypes/mir/report
     may_require:
-      - core
       - domain
-      - emit
     may_mutate_data_raw: false
-
   compatibility:
     path: prototypes/mir/compatibility
+    overlay_path: prototypes/mir/compatibility/overlays
     may_require:
-      - core
       - policy
       - platform
       - report
     may_mutate_data_raw: false
-    overlay_path: prototypes/mir/compatibility/overlays
-
-  legacy:
-    path: prototypes/mir/legacy
-    may_require:
-      - core
-      - platform
-      - domain
-      - planner
-      - emit
-    may_mutate_data_raw: false
-
-current_boundary_allowlist:
-  prototype_mutators:
-    - prototypes/mir/stage/data_final_fixes_steps.lua
-    - prototypes/mir/planner/stream_compiler.lua
-    - prototypes/mir/emit/base_extensions.lua
-    - prototypes/mir/pipeline/extent.lua
-    - prototypes/mir/policy/max_level.lua
-    - prototypes/mir/policy/weapon_speed.lua
-    - prototypes/mir/policy/competing_productivity.lua
-    - prototypes/mir/policy/competing_base_extensions.lua
-    - prototypes/mir/policy/productivity_family_adoption.lua
-
-forbidden_imports:
-  - from: prototypes/mir/domain
-    to: prototypes/mir/emit
-  - from: prototypes/mir/classify
-    to: prototypes/mir/platform/factorio/data_raw.lua
-  - from: prototypes/mir/compatibility/overlays
-    to: prototypes/mir/emit
 
 rules:
-  - only emission code mutates generated technologies
-  - compatibility overlays register policy only
-  - domain modules do not read Factorio globals
-  - report modules do not mutate prototypes
-  - legacy wrappers do not introduce new behavior
+  - Factorio root entrypoints stay as thin lifecycle wrappers.
+  - Active shipped implementation lives under prototypes/mir except stream data tables.
+  - No old compat/lib/legacy/control/planner shim directories are allowed.
+  - No broad root helper shims are allowed.
+  - Only settings/stage_builder.lua may register setting prototypes directly.
+  - Generated technologies and mod-data prototypes emit through prototypes/mir/emit.
+  - Compatibility overlays register policy only.
+  - Domain modules do not read Factorio globals.
+  - Report modules do not mutate prototypes.

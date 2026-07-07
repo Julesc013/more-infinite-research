@@ -68,7 +68,7 @@ save starts.
 
 MIR should omit `control.lua` unless runtime behavior is required. If it exists,
 it stays a thin wrapper into `prototypes/mir/stage/control.lua` and runtime
-modules under `control/`.
+modules under `prototypes/mir/runtime/`.
 
 Runtime settings-profile commands are export and validation helpers only.
 `/mir-settings-export` writes a profile string to `script-output`, and

@@ -29,7 +29,7 @@ Released generated IDs are save-facing API. Renames, removals, or stream target
 changes require migration review and release notes.
 
 The machine-readable generated stream record remains
-`prototypes/planner/generated-stream-manifest.json`, routed through
+`prototypes/mir/streams/generated_stream_manifest.json`, routed through
 `.mir/streams.yml`.
 
 Every stream key in the current legacy stream tables must have a manifest row.

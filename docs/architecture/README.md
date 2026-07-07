@@ -57,12 +57,15 @@ The runtime layer is intentionally narrow:
 - Prefer native technology modifiers and recipe productivity whenever the engine exposes them.
 - Use scripted effects only when they can be event-driven.
 - Avoid per-tick inventory, belt, lab, container, surface, or broad entity scanning.
-- Keep runtime handlers grouped under a small scripted-tech manager such as `control/scripted-techs.lua`.
+- Keep runtime handlers grouped under the MIR runtime namespace, starting at
+  `prototypes/mir/runtime/scripted_techs.lua`.
 - Route init, configuration change, research finish, research reversal, and technology-effects reset through one recomputation path.
 - Handle runtime setting changes if runtime settings are introduced.
 - Require each scripted feature to document storage keys, disable behavior, multiple-force behavior, and interaction with other mods touching the same state.
 - Label scripted/global/sandbox features clearly in settings and player-facing docs.
-- Static validation fails if `control.lua` or `control/**/*.lua` registers `defines.events.on_tick` or `script.on_nth_tick` without a future explicit allowlist.
+- Static validation fails if `control.lua` or `prototypes/mir/runtime/**/*.lua`
+  registers `defines.events.on_tick` or `script.on_nth_tick` without a future
+  explicit allowlist.
 - Static architecture validation fails if runtime control files use prototype
   mutation APIs such as `data.raw` or `data:extend`.
 
@@ -71,13 +74,15 @@ Do not use runtime code to fake fluid physics, platform speed, module effects, o
 Current control files:
 
 - `control.lua`: loads the runtime registration stage.
-- `control/scripted-techs.lua`: registers init, configuration change, research finish/reversal, technology-effect reset, and agricultural tower planting handlers.
-- `control/settings-profile.lua`: exports current effective MIR startup
+- `prototypes/mir/runtime/scripted_techs.lua`: registers init,
+  configuration change, research finish/reversal, technology-effect reset, and
+  agricultural tower planting handlers.
+- `prototypes/mir/runtime/settings_profile.lua`: exports current effective MIR startup
   settings to a profile string, validates pasted profile strings, and exposes a
   small remote interface for tools. It does not mutate startup settings at
   runtime.
-- `control/effects/spoilage-preservation.lua`: applies the global spoil-time multiplier from the highest completed MIR spoilage preservation level.
-- `control/effects/agricultural-growth-speed.lua`: shortens remaining growth time for newly planted agricultural tower plants.
+- `prototypes/mir/runtime/effects/spoilage_preservation.lua`: applies the global spoil-time multiplier from the highest completed MIR spoilage preservation level.
+- `prototypes/mir/runtime/effects/agricultural_growth_speed.lua`: shortens remaining growth time for newly planted agricultural tower plants.
 
 Current migrations:
 
@@ -106,9 +111,10 @@ Spoilage preservation recomputes from the stored baseline on init, configuration
 
 Agricultural growth speed refreshes this force state on init, configuration changes, research finish, research reversal, and technology-effect resets. The current candidate only applies the multiplier at `on_tower_planted_seed`; it does not rescan existing plants.
 
-## Utility Modules
+## Focused Modules
 
-`prototypes/util.lua` is a facade kept for compatibility with existing call sites. Domain logic lives in focused modules:
+MIR 3 does not keep a broad `prototypes/util.lua` facade. Domain logic lives in
+focused modules:
 
 - `prototypes/mir/platform/factorio/prototype_lookup.lua`: item-like and fluid prototype lookup, technology existence, ammo-category existence, Space Age detection.
 - `prototypes/mir/capabilities/science_integration/science_packs.lua`: lab-input discovery, science-pack existence, end-game science-pack selection, lab-compatible ingredient validation, science-pack unlock prerequisites, ordered pack lists.
@@ -124,13 +130,15 @@ Agricultural growth speed refreshes this force state on init, configuration chan
 - `prototypes/mir/policy/max_level.lua`: post-emission max-level setting enforcement for generated stream technologies.
 - `prototypes/mir/policy/weapon_speed.lua`: optional duplicate rocket/cannon category cleanup from generated general weapon-speed continuations.
 - `prototypes/mir/index/productivity_owners.lua`: shared recipe-productivity owner classification, recipe allow-productivity checks, and owner record formatting.
-- `prototypes/mir/policy/productivity_family_adoption.lua`: data-stage adoption of safe residual recipes into configured existing productivity families plus the adoption signature mod-data.
+- `prototypes/mir/policy/productivity_family_adoption.lua`: data-stage adoption of safe residual recipes into configured existing productivity families plus adoption-signature payload construction.
 - `prototypes/mir/policy/competing_productivity.lua`: profile-driven replacement of known fully covered competing infinite recipe-productivity technologies.
-- `prototypes/mir/emit/effect_safety.lua`: blocks unsafe native effect types from MIR-generated technologies. The old `prototypes/technology-effect-safety.lua` root path is a compatibility shim.
+- `prototypes/mir/emit/effect_safety.lua`: blocks unsafe native effect types from MIR-generated technologies.
+- `prototypes/mir/emit/mod_data.lua`: emits MIR mod-data prototypes through the
+  Factorio platform adapter.
 
-Keep new domain behavior in these modules rather than growing `util.lua`.
-MIR-owned modules should import these focused paths directly; `prototypes/util.lua`
-is a compatibility facade for old root modules and backport surfaces only.
+Keep new domain behavior in these modules. MIR-owned modules must import the
+focused path directly; old broad root helper modules are not part of the
+shipped 3.x layout.
 
 ## Icon Asset Boundary
 
@@ -165,9 +173,8 @@ The stream table is assembled by `prototypes/streams/init.lua` from:
 - `prototypes/streams/productivity.lua`
 - `prototypes/streams/direct-effects.lua`
 
-The old `prototypes/config.lua` path is a compatibility shim. Future expansion
-should add more stream domain modules rather than returning to one large config
-file.
+Future expansion should add more stream domain modules rather than returning to
+one large config file.
 
 Generated recipe-productivity streams can set `dynamic_items_from_lab_inputs = true` when their target item set should include every active lab input discovered during `data-final-fixes.lua`. The science-pack productivity stream uses this so custom science packs can receive productivity effects without hard-coded mod dependencies. If a future dynamic stream uses top-level `items` without `groups`, those items are copied into the generated group before lab inputs are appended.
 
@@ -175,7 +182,7 @@ Fluid-output productivity streams use the same recipe-productivity generator as 
 
 Direct-effect stream and base-extension generation must pass through `prototypes/mir/emit/effect_safety.lua`. MIR must not add `character-item-pickup-distance` or `character-loot-pickup-distance` effects to any generated technology; large pickup radii can vacuum belt items into the player inventory and cause severe lag.
 
-`mir-pipeline-extent-multiplier` is deliberately not research. It is a startup-only prototype pass in `prototypes/mir/pipeline/extent.lua` because `FluidBox.max_pipeline_extent` is resolved from prototypes during load. The old `prototypes/pipeline-extent.lua` root path is a compatibility shim. The dropdown values and parser live in `prototypes/mir/settings/pipeline_extent.lua`; the old `prototypes/pipeline-extent-settings.lua` path is a compatibility shim. The pass is loaded only when the parsed startup setting is not `100%`; at the default `100%`, MIR reads the setting gate and does not load the pipeline module, scan `data.raw`, log pipeline work, or mutate fluid boxes.
+`mir-pipeline-extent-multiplier` is deliberately not research. It is a startup-only prototype pass in `prototypes/mir/pipeline/extent.lua` because `FluidBox.max_pipeline_extent` is resolved from prototypes during load. The dropdown values and parser live in `prototypes/mir/settings/pipeline_extent.lua`. The pass is loaded only when the parsed startup setting is not `100%`; at the default `100%`, MIR reads the setting gate and does not load the pipeline module, scan `data.raw`, log pipeline work, or mutate fluid boxes.
 
 ## Compatibility Profiles
 
@@ -244,7 +251,7 @@ The kernel now has enforceable platform pieces:
 - resolver contract validation in `prototypes/mir/capabilities/contract.lua`;
 - capability-specific policy in `prototypes/mir/policy/capabilities.lua`;
 - generated stream manifest metadata in
-  `prototypes/planner/generated-stream-manifest.json`;
+  `prototypes/mir/streams/generated_stream_manifest.json`;
 - machine-readable claims in `fixtures/compat-matrix/claims.json`;
 - static linting through `scripts/Test-MIRPolicyLints.ps1`;
 - report drift comparison through `scripts/Compare-MIRPlannerReports.ps1`;
@@ -264,8 +271,8 @@ release ladder, and acceptance gates. Use `docs/capabilities/README.md`,
 and `docs/maintainer/README.md` for the focused 3.0 subsystem guidance.
 Use `docs/architecture/module-boundaries.md` for the concrete 3.0 repository
 shape: thin Factorio root files, the `prototypes/mir/` compiler namespace,
-Factorio adapters under `platform/`, legacy shims for backporting, and the
-development-only workspace boundary.
+Factorio adapters under `platform/`, no old shim directories on the main 3.x
+line, and the development-only workspace boundary.
 
 ## Diagnostics
 
@@ -333,7 +340,8 @@ Static validation also checks Factorio changelog formatting, including the requi
 
 Static validation checks every loadable local fixture directory has `info.json`, a `mir-fixture-*` mod name, and at least one data-stage entry file. Non-mod audit inputs under `fixtures/compat-matrix/` and `fixtures/run-profiles/` are excluded from fixture-mod validation. Settings visibility linting also verifies the hidden-setting readability fixture is present.
 
-Static validation rejects runtime tick handlers in `control.lua` and `control/**/*.lua`.
+Static validation rejects runtime tick handlers in `control.lua` and
+`prototypes/mir/runtime/**/*.lua`.
 
 Static validation also rejects unsafe pickup reach effect types outside the dedicated safety guard.
 

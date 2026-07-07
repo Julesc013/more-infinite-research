@@ -34,9 +34,11 @@ visibility metadata, hidden unavailable stream settings, and backport behavior.
    emission, and reporting code in their matching layer.
 5. Put compatibility rules in `prototypes/mir/compatibility/` as declarative
    policy overlays.
-6. Keep old paths as `prototypes/mir/legacy/` shims when backporting would
-   otherwise become noisy.
-7. Do not add new business logic to legacy shims.
+6. Do not reintroduce old implementation paths such as `prototypes/compat/`,
+   `prototypes/lib/`, `prototypes/mir/legacy/`, root `defaults.lua`, or broad
+   root helper shims.
+7. If a backport requires a temporary compatibility surface, document it in the
+   branch policy and remove it before merging back to the MIR 3 main line.
 
 ## Adding A New Capability
 
