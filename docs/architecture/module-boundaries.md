@@ -725,14 +725,17 @@ Static validation should eventually fail when:
 The measurable transition debt report is:
 
 ```powershell
-.\scripts\mir.ps1 legacy inventory
+.\scripts\mir.ps1 legacy inventory --check
 ```
 
 It writes `artifacts/legacy-inventory/shipped-mod-legacy.json`,
 `artifacts/legacy-inventory/repo-legacy.json`, and
 `artifacts/legacy-inventory/legacy-summary.md`. The report tracks old-path
 module counts, shim-only status, old import counts, direct prototype access
-matches, and generated stream manifest coverage.
+matches, and generated stream manifest coverage. The checked form currently
+requires zero active `prototypes/compat` modules, zero active `prototypes/lib`
+modules, zero compat/lib imports, and zero generated streams missing manifest
+rows.
 
 ## Implementation Sequence
 

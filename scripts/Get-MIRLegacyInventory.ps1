@@ -1,6 +1,14 @@
 param(
   [string]$RepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "..")).Path,
-  [string]$OutputRoot = ""
+  [string]$OutputRoot = "",
+  [switch]$CheckThresholds,
+  [int]$MaxMirLegacyActiveModules = 3,
+  [int]$MaxRequiresMirLegacy = 3,
+  [int]$MaxCompatActiveModules = 0,
+  [int]$MaxRequiresCompat = 0,
+  [int]$MaxLibActiveModules = 0,
+  [int]$MaxRequiresLib = 0,
+  [int]$MaxGeneratedStreamsWithoutManifest = 0
 )
 
 $ErrorActionPreference = "Stop"
@@ -79,6 +87,39 @@ function Get-MIRMatches {
   return $matches
 }
 
+function Get-MIRMatchesOutsideRoots {
+  param(
+    [Parameter(Mandatory)]$Matches,
+    [Parameter(Mandatory)][string[]]$AllowedRoots
+  )
+
+  return @(
+    $Matches | Where-Object {
+      $path = [string]$_.path
+      $allowed = $false
+      foreach ($root in $AllowedRoots) {
+        if ($path.StartsWith($root)) {
+          $allowed = $true
+          break
+        }
+      }
+      -not $allowed
+    }
+  )
+}
+
+function Assert-MIRLegacyThreshold {
+  param(
+    [Parameter(Mandatory)][string]$Name,
+    [Parameter(Mandatory)][int]$Actual,
+    [Parameter(Mandatory)][int]$Maximum
+  )
+
+  if ($Actual -gt $Maximum) {
+    throw "MIR legacy inventory threshold failed: $Name=$Actual exceeds max $Maximum"
+  }
+}
+
 function Get-MIRModuleInventory {
   param(
     [Parameter(Mandatory)][string]$RelativeRoot,
@@ -120,8 +161,14 @@ $libModules = @(Get-MIRModuleInventory -RelativeRoot "prototypes\lib" -Label "li
 $legacyRequires = @(Get-MIRMatches -Files $luaFiles -Pattern 'require\("prototypes\.mir\.legacy')
 $compatRequires = @(Get-MIRMatches -Files $luaFiles -Pattern 'require\("prototypes\.compat')
 $libRequires = @(Get-MIRMatches -Files $luaFiles -Pattern 'require\("prototypes\.lib')
+$configRequires = @(Get-MIRMatches -Files $luaFiles -Pattern 'require\("prototypes\.config"\)')
+$utilRequires = @(Get-MIRMatches -Files $luaFiles -Pattern 'require\("prototypes\.util"\)')
+$diagnosticsRequires = @(Get-MIRMatches -Files $luaFiles -Pattern 'require\("prototypes\.diagnostics"\)')
 $dataExtendMatches = @(Get-MIRMatches -Files $luaFiles -Pattern 'data:extend')
 $dataRawMatches = @(Get-MIRMatches -Files $luaFiles -Pattern 'data\.raw')
+$dataRawOutsidePlatform = @(Get-MIRMatchesOutsideRoots -Matches $dataRawMatches -AllowedRoots @(
+  "prototypes/mir/platform/factorio/"
+))
 
 $sourceStreamKeys = @(
   Get-MIRStreamKeysFromSource -Path (Join-Path $repo "prototypes\streams\productivity.lua")
@@ -156,8 +203,12 @@ $shipped = [pscustomobject]@{
     requires_mir_legacy = $legacyRequires.Count
     requires_compat = $compatRequires.Count
     requires_lib = $libRequires.Count
+    requires_config = $configRequires.Count
+    requires_util = $utilRequires.Count
+    requires_diagnostics = $diagnosticsRequires.Count
     data_extend_matches = $dataExtendMatches.Count
     data_raw_matches = $dataRawMatches.Count
+    data_raw_matches_outside_platform = $dataRawOutsidePlatform.Count
     source_stream_keys = $sourceStreamKeys.Count
     generated_streams_without_manifest = $missingManifestKeys.Count
   }
@@ -170,12 +221,35 @@ $shipped = [pscustomobject]@{
     mir_legacy = $legacyRequires
     compat = $compatRequires
     lib = $libRequires
+    config = $configRequires
+    util = $utilRequires
+    diagnostics = $diagnosticsRequires
   }
   prototype_access = [pscustomobject]@{
     data_extend = $dataExtendMatches
     data_raw = $dataRawMatches
+    data_raw_outside_platform = $dataRawOutsidePlatform
+  }
+  thresholds = [pscustomobject]@{
+    max_mir_legacy_active_modules = $MaxMirLegacyActiveModules
+    max_requires_mir_legacy = $MaxRequiresMirLegacy
+    max_compat_active_modules = $MaxCompatActiveModules
+    max_requires_compat = $MaxRequiresCompat
+    max_lib_active_modules = $MaxLibActiveModules
+    max_requires_lib = $MaxRequiresLib
+    max_generated_streams_without_manifest = $MaxGeneratedStreamsWithoutManifest
   }
   generated_streams_without_manifest = $missingManifestKeys
+}
+
+if ($CheckThresholds) {
+  Assert-MIRLegacyThreshold -Name "mir_legacy_active_modules" -Actual ([int]$shipped.counts.mir_legacy_active_modules) -Maximum $MaxMirLegacyActiveModules
+  Assert-MIRLegacyThreshold -Name "requires_mir_legacy" -Actual ([int]$shipped.counts.requires_mir_legacy) -Maximum $MaxRequiresMirLegacy
+  Assert-MIRLegacyThreshold -Name "compat_active_modules" -Actual ([int]$shipped.counts.compat_active_modules) -Maximum $MaxCompatActiveModules
+  Assert-MIRLegacyThreshold -Name "requires_compat" -Actual ([int]$shipped.counts.requires_compat) -Maximum $MaxRequiresCompat
+  Assert-MIRLegacyThreshold -Name "lib_active_modules" -Actual ([int]$shipped.counts.lib_active_modules) -Maximum $MaxLibActiveModules
+  Assert-MIRLegacyThreshold -Name "requires_lib" -Actual ([int]$shipped.counts.requires_lib) -Maximum $MaxRequiresLib
+  Assert-MIRLegacyThreshold -Name "generated_streams_without_manifest" -Actual ([int]$shipped.counts.generated_streams_without_manifest) -Maximum $MaxGeneratedStreamsWithoutManifest
 }
 
 $repoLegacy = [pscustomobject]@{
@@ -226,6 +300,12 @@ $summary += "## Outputs"
 $summary += ""
 $summary += "- shipped-mod-legacy.json"
 $summary += "- repo-legacy.json"
+if ($CheckThresholds) {
+  $summary += ""
+  $summary += "## Thresholds"
+  $summary += ""
+  $summary += "Passed."
+}
 
 $summary | Set-Content -LiteralPath $summaryPath -Encoding UTF8
 
@@ -233,3 +313,6 @@ Write-Host "[ok] wrote MIR legacy inventory to $output"
 Write-Host "  - $shippedPath"
 Write-Host "  - $repoPath"
 Write-Host "  - $summaryPath"
+if ($CheckThresholds) {
+  Write-Host "[ok] MIR legacy inventory thresholds passed."
+}

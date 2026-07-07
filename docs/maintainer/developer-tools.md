@@ -166,6 +166,13 @@ Static validation runs this check:
 .\scripts\Invoke-MIRValidation.ps1 -StaticOnly
 ```
 
+Legacy inventory thresholds are also part of static validation. Run the
+standalone checked inventory when changing module ownership:
+
+```powershell
+.\scripts\mir.ps1 legacy inventory --check
+```
+
 Run it directly when working only on tooling:
 
 ```powershell

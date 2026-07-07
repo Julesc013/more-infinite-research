@@ -381,9 +381,10 @@ Assert-MIRContains -RelativePath $settingsLegacyAdapterPath -Text $settingsLegac
 
 $mirCliPath = "scripts/mir.ps1"
 $mirCliText = Read-MIRFile -RelativePath $mirCliPath
-Assert-MIRContains -RelativePath $mirCliPath -Text $mirCliText -Needle '.\scripts\mir.ps1 legacy inventory [--output <path>]'
+Assert-MIRContains -RelativePath $mirCliPath -Text $mirCliText -Needle '.\scripts\mir.ps1 legacy inventory [--output <path>] [--check]'
 Assert-MIRContains -RelativePath $mirCliPath -Text $mirCliText -Needle '"legacy" {'
 Assert-MIRContains -RelativePath $mirCliPath -Text $mirCliText -Needle 'Get-MIRLegacyInventory.ps1'
+Assert-MIRContains -RelativePath $mirCliPath -Text $mirCliText -Needle 'CheckThresholds'
 
 $legacyInventoryPath = "scripts/Get-MIRLegacyInventory.ps1"
 $legacyInventoryText = Read-MIRFile -RelativePath $legacyInventoryPath
@@ -392,6 +393,9 @@ Assert-MIRContains -RelativePath $legacyInventoryPath -Text $legacyInventoryText
 Assert-MIRContains -RelativePath $legacyInventoryPath -Text $legacyInventoryText -Needle "legacy-summary.md"
 Assert-MIRContains -RelativePath $legacyInventoryPath -Text $legacyInventoryText -Needle "generated_streams_without_manifest"
 Assert-MIRContains -RelativePath $legacyInventoryPath -Text $legacyInventoryText -Needle "compat_active_modules"
+Assert-MIRContains -RelativePath $legacyInventoryPath -Text $legacyInventoryText -Needle "requires_lib"
+Assert-MIRContains -RelativePath $legacyInventoryPath -Text $legacyInventoryText -Needle "MaxLibActiveModules = 0"
+Assert-MIRContains -RelativePath $legacyInventoryPath -Text $legacyInventoryText -Needle "MIR legacy inventory thresholds passed"
 
 $decisionExportPath = "prototypes/mir/report/decision_export.lua"
 $decisionExportText = Read-MIRFile -RelativePath $decisionExportPath
