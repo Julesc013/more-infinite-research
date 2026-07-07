@@ -1,1 +1,1 @@
-return require("prototypes.lib.recipe-matching")
+return require("prototypes.mir.capabilities.recipe_productivity.recipe_matching")

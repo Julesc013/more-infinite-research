@@ -193,6 +193,7 @@ $requiredShims = @(
   "prototypes/mir/capabilities/contract.lua",
   "prototypes/mir/capabilities/registry.lua",
   "prototypes/mir/capabilities/recipe_productivity/planner.lua",
+  "prototypes/mir/capabilities/recipe_productivity/recipe_matching.lua",
   "prototypes/mir/emit/legacy_stream_adapter.lua",
   "prototypes/mir/report/decision_export.lua",
   "prototypes/mir/report/compatibility_diagnostics.lua",
@@ -270,6 +271,10 @@ Assert-MIRContains -RelativePath $legacyPrototypeLookupPath -Text $legacyPrototy
 $legacyDiagnosticsPath = "prototypes/diagnostics.lua"
 $legacyDiagnosticsText = Read-MIRFile -RelativePath $legacyDiagnosticsPath
 Assert-MIRContains -RelativePath $legacyDiagnosticsPath -Text $legacyDiagnosticsText -Needle 'return require("prototypes.mir.report.diagnostics_sink")'
+
+$legacyRecipeMatchingPath = "prototypes/lib/recipe-matching.lua"
+$legacyRecipeMatchingText = Read-MIRFile -RelativePath $legacyRecipeMatchingPath
+Assert-MIRContains -RelativePath $legacyRecipeMatchingPath -Text $legacyRecipeMatchingText -Needle 'return require("prototypes.mir.capabilities.recipe_productivity.recipe_matching")'
 
 $streamCompilerPath = "prototypes/mir/planner/stream_compiler.lua"
 $streamCompilerText = Read-MIRFile -RelativePath $streamCompilerPath

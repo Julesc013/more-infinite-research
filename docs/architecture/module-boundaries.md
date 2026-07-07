@@ -350,6 +350,7 @@ prototypes/
         capability.lua
         discover.lua
         classify.lua
+        recipe_matching.lua
         propose.lua
         validate.lua
         emit.lua
@@ -462,7 +463,6 @@ prototypes/
     legacy/
       facts_registry.lua
       tech_gen.lua
-      recipe_matching.lua
       compat_profiles.lua
       report_rows.lua
 ```
@@ -639,7 +639,7 @@ as wrappers while the compiler moves:
 
 ```lua
 -- prototypes/lib/recipe-matching.lua
-return require("prototypes.mir.legacy.recipe_matching")
+return require("prototypes.mir.capabilities.recipe_productivity.recipe_matching")
 ```
 
 The shim may call new compiler modules, but new business logic belongs in the
