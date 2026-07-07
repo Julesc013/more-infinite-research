@@ -1,5 +1,6 @@
 local D = require("prototypes.diagnostics")
 local capabilities = require("prototypes.lib.capabilities.registry")
+local decision_record = require("prototypes.mir.domain.decisions.decision_record")
 local fact_registry = require("prototypes.lib.facts.registry")
 local productivity_owners = require("prototypes.compat.productivity-owners")
 
@@ -12,20 +13,6 @@ local function join_names(list)
     if value then table.insert(out, tostring(value)) end
   end
   table.sort(out)
-  return table.concat(out, ",")
-end
-
-local function format_bool(value)
-  if value then return "true" end
-  return "false"
-end
-
-local function format_confidence(parts)
-  local out = {}
-  for _, key in ipairs({"family", "unlock", "science", "lab", "loop_safety", "owner", "cap", "total"}) do
-    local value = parts and parts[key]
-    if value ~= nil then table.insert(out, key .. "=" .. tostring(value)) end
-  end
   return table.concat(out, ",")
 end
 
@@ -124,7 +111,7 @@ local function emit_rule_mutations(registry)
       subject_type = fact.subject_type,
       subject = fact.subject,
       family = "rule_mutation",
-      confidence = format_confidence({total = fact.confidence or 0.7}),
+      confidence = decision_record.format_confidence({total = fact.confidence or 0.7}),
       source = "compiler:rule-mutation",
       policy = "diagnose_only",
       decision = "diagnose_only",
@@ -155,7 +142,7 @@ local function emit_loop_risks(registry)
       subject_type = fact.subject_type,
       subject = fact.subject,
       family = "recipe_graph_risk",
-      confidence = format_confidence({loop_safety = 0.25, total = 0.25}),
+      confidence = decision_record.format_confidence({loop_safety = 0.25, total = 0.25}),
       source = "compiler:loop-risk",
       policy = "diagnose_only",
       decision = "diagnose_only",
@@ -173,29 +160,14 @@ local function emit_generated_technology_decisions(registry)
       local fact = registry.technologies[tech_name]
       local labs = fact_registry.labs_for_packs(registry.labs, fact.science_packs)
       local lab_compatible = #labs > 0
-      D.decision({
-        key = tech_name,
-        subject_type = "technology",
-        subject = tech_name,
-        family = "explicit_stream",
-        confidence = format_confidence({
-          family = 1.0,
-          science = 1.0,
-          lab = lab_compatible and 1.0 or 0.0,
-          owner = 1.0,
-          loop_safety = 1.0,
-          total = lab_compatible and 1.0 or 0.5
-        }),
-        source = "compiler:generated-technology",
-        policy = "explicit_stream",
-        decision = lab_compatible and "generate_stream" or "diagnose_only",
-        emitted = format_bool(lab_compatible),
-        reason = lab_compatible and "generated_mir_technology_indexed" or "generated_technology_without_lab",
-        effects = tostring(fact.effect_count or 0),
+      D.decision(decision_record.generated_technology({
+        technology_name = tech_name,
+        lab_compatible = lab_compatible,
+        effect_count = fact.effect_count or 0,
         science = join_names(fact.science_packs),
         labs = join_names(labs),
         stable_stream_id = tech_name
-      })
+      }))
     end
   end
 end

@@ -959,6 +959,7 @@ Invoke-RepoCheck "2.2.0 compiler diagnostics are wired" {
   }
 
   $factRegistryText = Get-Content -Raw -LiteralPath $factRegistryPath
+  $decisionRecordText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\domain\decisions\decision_record.lua")
   $capabilityRegistryText = Get-Content -Raw -LiteralPath $capabilityRegistryPath
   $capabilityContractText = Get-Content -Raw -LiteralPath $capabilityContractPath
   $capabilityPolicyText = Get-Content -Raw -LiteralPath $capabilityPolicyPath
@@ -978,6 +979,8 @@ Invoke-RepoCheck "2.2.0 compiler diagnostics are wired" {
     @{ File = "prototypes\lib\facts\registry.lua"; Text = $factRegistryText; Snippet = 'RuleMutationFact' },
     @{ File = "prototypes\lib\facts\registry.lua"; Text = $factRegistryText; Snippet = 'schema = schema.fact_registry' },
     @{ File = "prototypes\lib\facts\registry.lua"; Text = $factRegistryText; Snippet = 'build_loop_risk_facts' },
+    @{ File = "prototypes\mir\domain\decisions\decision_record.lua"; Text = $decisionRecordText; Snippet = 'function M.generated_technology(record)' },
+    @{ File = "prototypes\mir\domain\decisions\decision_record.lua"; Text = $decisionRecordText; Snippet = 'schema.decision({' },
     @{ File = "prototypes\lib\mir\schema.lua"; Text = $schemaText; Snippet = 'S.decision_record = 1' },
     @{ File = "prototypes\lib\capabilities\contract.lua"; Text = $capabilityContractText; Snippet = 'CapabilityResolver' },
     @{ File = "prototypes\lib\capabilities\contract.lua"; Text = $capabilityContractText; Snippet = '"discover"' },
