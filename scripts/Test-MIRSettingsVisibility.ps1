@@ -91,7 +91,7 @@ Assert-Contains -RelativePath "prototypes/mir/legacy/settings.lua" -Text $legacy
 
 Assert-Contains -RelativePath "prototypes/streams/productivity.lua" -Text $productivityText -Needle "ui_visibility = {"
 Assert-Contains -RelativePath "prototypes/streams/productivity.lua" -Text $productivityText -Needle 'mods_any = air_scrubbing_overlay.applies_when.mods'
-Assert-Contains -RelativePath "prototypes/streams/productivity.lua" -Text $productivityText -Needle 'mods_any = {"atan-ash"}'
+Assert-Contains -RelativePath "prototypes/streams/productivity.lua" -Text $productivityText -Needle 'mods_any = atan_ash_overlay.applies_when.mods'
 Assert-Contains -RelativePath "prototypes/streams/productivity.lua" -Text $productivityText -Needle 'mods_any = {"space-age"}'
 Assert-Contains -RelativePath "prototypes/streams/productivity.lua" -Text $productivityText -Needle "generation_requirements = {"
 Assert-Contains -RelativePath "prototypes/streams/direct-effects.lua" -Text $directEffectsText -Needle "ui_visibility = {"

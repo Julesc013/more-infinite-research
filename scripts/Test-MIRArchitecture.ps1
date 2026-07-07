@@ -152,6 +152,7 @@ $requiredShims = @(
   "prototypes/mir/compatibility/claim_registry.lua",
   "prototypes/mir/compatibility/diagnostics/air_scrubbing.lua",
   "prototypes/mir/compatibility/overlays/air_scrubbing.lua",
+  "prototypes/mir/compatibility/overlays/atan_ash.lua",
   "prototypes/mir/legacy/tech_gen.lua",
   "prototypes/mir/legacy/recipe_matching.lua",
   "prototypes/mir/legacy/compat_profiles.lua",
@@ -221,6 +222,19 @@ $productivityStreamsText = Read-MIRFile -RelativePath $productivityStreamsPath
 Assert-MIRContains -RelativePath $productivityStreamsPath -Text $productivityStreamsText -Needle 'overlay_loader.get("air-scrubbing")'
 Assert-MIRContains -RelativePath $productivityStreamsPath -Text $productivityStreamsText -Needle "air_scrubbing_capability.stream.id"
 Assert-MIRContains -RelativePath $productivityStreamsPath -Text $productivityStreamsText -Needle "exact_recipe_patterns(air_scrubbing_capability.exact_recipes)"
+Assert-MIRContains -RelativePath $productivityStreamsPath -Text $productivityStreamsText -Needle 'overlay_loader.get("atan-ash")'
+Assert-MIRContains -RelativePath $productivityStreamsPath -Text $productivityStreamsText -Needle "atan_ash_capability.stream.id"
+Assert-MIRContains -RelativePath $productivityStreamsPath -Text $productivityStreamsText -Needle "exact_recipe_patterns(atan_ash_capability.exact_recipes)"
+
+$atanAshOverlayPath = "prototypes/mir/compatibility/overlays/atan_ash.lua"
+$atanAshOverlayText = Read-MIRFile -RelativePath $atanAshOverlayPath
+Assert-MIRContains -RelativePath $atanAshOverlayPath -Text $atanAshOverlayText -Needle 'id = "atan-ash"'
+Assert-MIRContains -RelativePath $atanAshOverlayPath -Text $atanAshOverlayText -Needle '"mir-prod-atan-ash-separation"'
+Assert-MIRContains -RelativePath $atanAshOverlayPath -Text $atanAshOverlayText -Needle '"atan-ash-seperation"'
+Assert-MIRContains -RelativePath $atanAshOverlayPath -Text $atanAshOverlayText -Needle '"ash_sink"'
+if ($atanAshOverlayText -match "data:extend") {
+  throw "$atanAshOverlayPath must be policy data, not prototype emission."
+}
 
 $legacyAirScrubbingPath = "prototypes/compat/air-scrubbing.lua"
 $legacyAirScrubbingText = Read-MIRFile -RelativePath $legacyAirScrubbingPath

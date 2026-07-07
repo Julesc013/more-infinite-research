@@ -65,6 +65,7 @@ namespace_shims:
   compatibility_overlay_loader: prototypes/mir/compatibility/overlay_loader.lua
   compatibility_claim_registry: prototypes/mir/compatibility/claim_registry.lua
   air_scrubbing_policy_overlay: prototypes/mir/compatibility/overlays/air_scrubbing.lua
+  atan_ash_policy_overlay: prototypes/mir/compatibility/overlays/atan_ash.lua
   air_scrubbing_diagnostics: prototypes/mir/compatibility/diagnostics/air_scrubbing.lua
 
 target_layers:

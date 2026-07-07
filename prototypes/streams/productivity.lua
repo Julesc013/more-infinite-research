@@ -2,6 +2,8 @@ local overlay_loader = require("prototypes.mir.compatibility.overlay_loader")
 
 local air_scrubbing_overlay = overlay_loader.get("air-scrubbing")
 local air_scrubbing_capability = air_scrubbing_overlay.capabilities["recipe-productivity"]
+local atan_ash_overlay = overlay_loader.get("atan-ash")
+local atan_ash_capability = atan_ash_overlay.capabilities["recipe-productivity"]
 
 local function lua_pattern_escape(value)
   return (tostring(value or ""):gsub("([^%w])", "%%%1"))
@@ -221,22 +223,21 @@ return {
     localised_description = {"technology-description.more-infinite-research.recipe_productivity"},
     ui_visibility = {
       mode = "visible-if-mods-any",
-      mods_any = {"atan-ash"},
+      mods_any = atan_ash_overlay.applies_when.mods,
       hidden_reason = "requires-atan-ash"
     },
     generation_requirements = {
-      require_any_recipe = {"atan-ash-seperation"}
+      require_any_recipe = atan_ash_capability.exact_recipes,
+      deny_risk_flags = atan_ash_capability.deny_risk_flags
     },
     science_packs = "derive-from-unlocks",
     prerequisites = "derive-from-unlocks",
     settings_note = {"", "Targets only the exact ATAN Ash separation recipe. Landfill, brick, nutrient, foundation, tile, and recovery-style ash sinks stay outside this stream."},
-    manifest_id = "mir-prod-atan-ash-separation",
+    manifest_id = atan_ash_capability.stream.id,
     groups = {
       {
         change = 0.05,
-        recipe_patterns = {
-          "^atan%-ash%-seperation$"
-        }
+        recipe_patterns = exact_recipe_patterns(atan_ash_capability.exact_recipes)
       }
     },
     icon_candidates = {
