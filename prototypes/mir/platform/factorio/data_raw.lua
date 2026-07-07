@@ -27,6 +27,12 @@ function M.prototype(prototype_type, name)
   return raw[prototype_type][name]
 end
 
+function M.prototypes(prototype_type)
+  local raw = M.raw()
+  if raw == nil or raw[prototype_type] == nil then return {} end
+  return raw[prototype_type]
+end
+
 function M.technology(name)
   return M.prototype("technology", name)
 end

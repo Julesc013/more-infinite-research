@@ -59,11 +59,13 @@ namespace_shims:
   capability_registry: prototypes/mir/capabilities/registry.lua
   technology_builder: prototypes/mir/emit/technology_builder.lua
   decision_export: prototypes/mir/report/decision_export.lua
+  compatibility_diagnostics_report: prototypes/mir/report/compatibility_diagnostics.lua
   planner_compiler: prototypes/mir/planner/compiler.lua
   compatibility_registry: prototypes/mir/compatibility/registry.lua
   compatibility_overlay_loader: prototypes/mir/compatibility/overlay_loader.lua
   compatibility_claim_registry: prototypes/mir/compatibility/claim_registry.lua
   air_scrubbing_policy_overlay: prototypes/mir/compatibility/overlays/air_scrubbing.lua
+  air_scrubbing_diagnostics: prototypes/mir/compatibility/diagnostics/air_scrubbing.lua
 
 target_layers:
   stage:
@@ -171,6 +173,8 @@ target_layers:
     may_require:
       - core
       - policy
+      - platform
+      - report
     may_mutate_data_raw: false
     overlay_path: prototypes/mir/compatibility/overlays
 

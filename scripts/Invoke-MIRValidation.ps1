@@ -1073,16 +1073,20 @@ Invoke-RepoCheck "Air Scrubbing clean-filter policy is wired" {
   $diagnosticsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\diagnostics.lua")
   $converterText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\Convert-MIRCompatAuditResults.ps1")
   $airScrubbingPolicyPath = Join-Path $repo "prototypes\compat\air-scrubbing.lua"
+  $airScrubbingDiagnosticsPath = Join-Path $repo "prototypes\mir\compatibility\diagnostics\air_scrubbing.lua"
+  $compatibilityDiagnosticsReportPath = Join-Path $repo "prototypes\mir\report\compatibility_diagnostics.lua"
   $manifestPath = Join-Path $repo "prototypes\planner\generated-stream-manifest.json"
   $fixturePath = Join-Path $repo "fixtures\assert-air-scrubbing-clean-filter\data-final-fixes.lua"
 
-  foreach ($path in @($airScrubbingPolicyPath, $manifestPath, $fixturePath)) {
+  foreach ($path in @($airScrubbingPolicyPath, $airScrubbingDiagnosticsPath, $compatibilityDiagnosticsReportPath, $manifestPath, $fixturePath)) {
     if (-not (Test-Path -LiteralPath $path)) {
       throw "Missing Air Scrubbing policy artifact: $path"
     }
   }
 
   $airScrubbingPolicyText = Get-Content -Raw -LiteralPath $airScrubbingPolicyPath
+  $airScrubbingDiagnosticsText = Get-Content -Raw -LiteralPath $airScrubbingDiagnosticsPath
+  $compatibilityDiagnosticsReportText = Get-Content -Raw -LiteralPath $compatibilityDiagnosticsReportPath
   $manifestText = Get-Content -Raw -LiteralPath $manifestPath
   $fixtureText = Get-Content -Raw -LiteralPath $fixturePath
 
@@ -1098,13 +1102,18 @@ Invoke-RepoCheck "Air Scrubbing clean-filter policy is wired" {
     @{ File = "prototypes\diagnostics.lua"; Text = $diagnosticsText; Snippet = '.. " rejected=" .. tostring(row.rejected or "")' },
     @{ File = "scripts\Convert-MIRCompatAuditResults.ps1"; Text = $converterText; Snippet = 'rejected = [string](Get-MIRObjectProperty -Object $row -Name "rejected")' },
     @{ File = "scripts\Convert-MIRCompatAuditResults.ps1"; Text = $converterText; Snippet = 'generated,rejected,unknown,missing,module_slots' },
-    @{ File = "prototypes\compat\air-scrubbing.lua"; Text = $airScrubbingPolicyText; Snippet = 'overlay_loader.get("air-scrubbing")' },
-    @{ File = "prototypes\compat\air-scrubbing.lua"; Text = $airScrubbingPolicyText; Snippet = 'local STREAM_ID = recipe_productivity.stream.id' },
-    @{ File = "prototypes\compat\air-scrubbing.lua"; Text = $airScrubbingPolicyText; Snippet = 'local ALLOWED_RECIPES = recipe_productivity.exact_recipes' },
-    @{ File = "prototypes\compat\air-scrubbing.lua"; Text = $airScrubbingPolicyText; Snippet = 'decision = emitted and "generate_stream" or "diagnose_only"' },
-    @{ File = "prototypes\compat\air-scrubbing.lua"; Text = $airScrubbingPolicyText; Snippet = '"environmental_removal_loop", "scrubbing_environmental"' },
-    @{ File = "prototypes\compat\air-scrubbing.lua"; Text = $airScrubbingPolicyText; Snippet = '"recovery_loop", "cleaning_recovery"' },
-    @{ File = "prototypes\compat\air-scrubbing.lua"; Text = $airScrubbingPolicyText; Snippet = 'decision = "observe_unknown"' },
+    @{ File = "prototypes\compat\air-scrubbing.lua"; Text = $airScrubbingPolicyText; Snippet = 'return require("prototypes.mir.compatibility.diagnostics.air_scrubbing")' },
+    @{ File = "prototypes\mir\compatibility\diagnostics\air_scrubbing.lua"; Text = $airScrubbingDiagnosticsText; Snippet = 'require("prototypes.mir.platform.factorio.data_raw")' },
+    @{ File = "prototypes\mir\compatibility\diagnostics\air_scrubbing.lua"; Text = $airScrubbingDiagnosticsText; Snippet = 'require("prototypes.mir.report.compatibility_diagnostics")' },
+    @{ File = "prototypes\mir\compatibility\diagnostics\air_scrubbing.lua"; Text = $airScrubbingDiagnosticsText; Snippet = 'overlay_loader.get("air-scrubbing")' },
+    @{ File = "prototypes\mir\compatibility\diagnostics\air_scrubbing.lua"; Text = $airScrubbingDiagnosticsText; Snippet = 'local STREAM_ID = recipe_productivity.stream.id' },
+    @{ File = "prototypes\mir\compatibility\diagnostics\air_scrubbing.lua"; Text = $airScrubbingDiagnosticsText; Snippet = 'local ALLOWED_RECIPES = recipe_productivity.exact_recipes' },
+    @{ File = "prototypes\mir\compatibility\diagnostics\air_scrubbing.lua"; Text = $airScrubbingDiagnosticsText; Snippet = 'decision = emitted and "generate_stream" or "diagnose_only"' },
+    @{ File = "prototypes\mir\compatibility\diagnostics\air_scrubbing.lua"; Text = $airScrubbingDiagnosticsText; Snippet = '"environmental_removal_loop", "scrubbing_environmental"' },
+    @{ File = "prototypes\mir\compatibility\diagnostics\air_scrubbing.lua"; Text = $airScrubbingDiagnosticsText; Snippet = '"recovery_loop", "cleaning_recovery"' },
+    @{ File = "prototypes\mir\compatibility\diagnostics\air_scrubbing.lua"; Text = $airScrubbingDiagnosticsText; Snippet = 'decision = "observe_unknown"' },
+    @{ File = "prototypes\mir\report\compatibility_diagnostics.lua"; Text = $compatibilityDiagnosticsReportText; Snippet = 'decision_export.emit(sink, row)' },
+    @{ File = "prototypes\mir\report\compatibility_diagnostics.lua"; Text = $compatibilityDiagnosticsReportText; Snippet = 'sink.compatibility_plan(row)' },
     @{ File = "prototypes\planner\generated-stream-manifest.json"; Text = $manifestText; Snippet = '"mir-prod-air-scrubbing-clean-filter"' },
     @{ File = "prototypes\planner\generated-stream-manifest.json"; Text = $manifestText; Snippet = '"source": "compat_policy:air-scrubbing"' },
     @{ File = "prototypes\planner\generated-stream-manifest.json"; Text = $manifestText; Snippet = '"atan-pollution-filter"' },

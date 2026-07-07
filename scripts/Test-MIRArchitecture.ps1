@@ -145,10 +145,12 @@ $requiredShims = @(
   "prototypes/mir/capabilities/contract.lua",
   "prototypes/mir/capabilities/registry.lua",
   "prototypes/mir/report/decision_export.lua",
+  "prototypes/mir/report/compatibility_diagnostics.lua",
   "prototypes/mir/planner/compiler.lua",
   "prototypes/mir/compatibility/registry.lua",
   "prototypes/mir/compatibility/overlay_loader.lua",
   "prototypes/mir/compatibility/claim_registry.lua",
+  "prototypes/mir/compatibility/diagnostics/air_scrubbing.lua",
   "prototypes/mir/compatibility/overlays/air_scrubbing.lua",
   "prototypes/mir/legacy/tech_gen.lua",
   "prototypes/mir/legacy/recipe_matching.lua",
@@ -194,6 +196,12 @@ $decisionExportText = Read-MIRFile -RelativePath $decisionExportPath
 Assert-MIRContains -RelativePath $decisionExportPath -Text $decisionExportText -Needle "function M.emit(sink, record)"
 Assert-MIRContains -RelativePath $decisionExportPath -Text $decisionExportText -Needle "sink.decision(record)"
 
+$compatibilityDiagnosticsReportPath = "prototypes/mir/report/compatibility_diagnostics.lua"
+$compatibilityDiagnosticsReportText = Read-MIRFile -RelativePath $compatibilityDiagnosticsReportPath
+Assert-MIRContains -RelativePath $compatibilityDiagnosticsReportPath -Text $compatibilityDiagnosticsReportText -Needle 'require("prototypes.mir.report.decision_export")'
+Assert-MIRContains -RelativePath $compatibilityDiagnosticsReportPath -Text $compatibilityDiagnosticsReportText -Needle "function M.compatibility_plan(sink, row)"
+Assert-MIRContains -RelativePath $compatibilityDiagnosticsReportPath -Text $compatibilityDiagnosticsReportText -Needle "sink.loop_risk(row)"
+
 $plannerCompilerPath = "prototypes/planner/compiler.lua"
 $plannerCompilerText = Read-MIRFile -RelativePath $plannerCompilerPath
 Assert-MIRContains -RelativePath $plannerCompilerPath -Text $plannerCompilerText -Needle 'require("prototypes.mir.report.decision_export")'
@@ -216,9 +224,17 @@ Assert-MIRContains -RelativePath $productivityStreamsPath -Text $productivityStr
 
 $legacyAirScrubbingPath = "prototypes/compat/air-scrubbing.lua"
 $legacyAirScrubbingText = Read-MIRFile -RelativePath $legacyAirScrubbingPath
-Assert-MIRContains -RelativePath $legacyAirScrubbingPath -Text $legacyAirScrubbingText -Needle 'overlay_loader.get("air-scrubbing")'
-Assert-MIRContains -RelativePath $legacyAirScrubbingPath -Text $legacyAirScrubbingText -Needle "recipe_productivity.stream.key"
-Assert-MIRContains -RelativePath $legacyAirScrubbingPath -Text $legacyAirScrubbingText -Needle "recipe_productivity.exact_recipes"
+Assert-MIRContains -RelativePath $legacyAirScrubbingPath -Text $legacyAirScrubbingText -Needle 'return require("prototypes.mir.compatibility.diagnostics.air_scrubbing")'
+
+$airScrubbingDiagnosticsPath = "prototypes/mir/compatibility/diagnostics/air_scrubbing.lua"
+$airScrubbingDiagnosticsText = Read-MIRFile -RelativePath $airScrubbingDiagnosticsPath
+Assert-MIRContains -RelativePath $airScrubbingDiagnosticsPath -Text $airScrubbingDiagnosticsText -Needle 'require("prototypes.mir.platform.factorio.data_raw")'
+Assert-MIRContains -RelativePath $airScrubbingDiagnosticsPath -Text $airScrubbingDiagnosticsText -Needle 'require("prototypes.mir.report.compatibility_diagnostics")'
+Assert-MIRContains -RelativePath $airScrubbingDiagnosticsPath -Text $airScrubbingDiagnosticsText -Needle 'overlay_loader.get("air-scrubbing")'
+Assert-MIRContains -RelativePath $airScrubbingDiagnosticsPath -Text $airScrubbingDiagnosticsText -Needle "local STREAM_ID = recipe_productivity.stream.id"
+Assert-MIRContains -RelativePath $airScrubbingDiagnosticsPath -Text $airScrubbingDiagnosticsText -Needle "local ALLOWED_RECIPES = recipe_productivity.exact_recipes"
+Assert-MIRContains -RelativePath $airScrubbingDiagnosticsPath -Text $airScrubbingDiagnosticsText -Needle "report.decision(D, row)"
+Assert-MIRContains -RelativePath $airScrubbingDiagnosticsPath -Text $airScrubbingDiagnosticsText -Needle 'decision = emitted and "generate_stream" or "diagnose_only"'
 
 $claimRegistryPath = "prototypes/mir/compatibility/claim_registry.lua"
 $claimRegistryText = Read-MIRFile -RelativePath $claimRegistryPath

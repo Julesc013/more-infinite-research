@@ -116,6 +116,10 @@ Compatibility policy uses `prototypes/mir/compatibility/`. Named compatibility
 targets live under `prototypes/mir/compatibility/overlays/`; those overlays
 register selectors, claims, deny rules, and policy overrides only. They must not
 create technologies, call `data:extend`, or mutate `data.raw` directly.
+Compatibility diagnostics may live under
+`prototypes/mir/compatibility/diagnostics/` while legacy behavior is being
+migrated, but they must read prototypes through platform adapters and emit rows
+through `report/` helpers.
 
 ## Three Workspaces
 
@@ -371,6 +375,7 @@ prototypes/
       registry_summary.lua
       planner_report.lua
       decision_export.lua
+      compatibility_diagnostics.lua
       observation_export.lua
       claim_export.lua
       fixture_export.lua
@@ -379,6 +384,8 @@ prototypes/
       registry.lua
       overlay_loader.lua
       claim_registry.lua
+      diagnostics/
+        air_scrubbing.lua
       overlays/
         base.lua
         space_age.lua
@@ -420,7 +427,7 @@ shape.
 | `planner/` | analytical records | `DecisionRecord`, `StreamSpec` | direct prototype mutation |
 | `emit/` | validated `StreamSpec` records | prototypes | classification |
 | `report/` | records | report rows | prototype mutation |
-| `compatibility/` | declarative selectors and policies | policy overlays | direct generation |
+| `compatibility/` | declarative selectors, policies, diagnostics | policy overlays and report rows | direct generation |
 | `legacy/` | new modules | compatibility wrappers | new behavior |
 
 Forbidden dependencies:
