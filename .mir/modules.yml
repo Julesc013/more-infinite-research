@@ -66,6 +66,7 @@ namespace_shims:
   stream_spec: prototypes/mir/domain/streams/stream_spec.lua
   capability_contract: prototypes/mir/capabilities/contract.lua
   capability_registry: prototypes/mir/capabilities/registry.lua
+  recipe_productivity_planner: prototypes/mir/capabilities/recipe_productivity/planner.lua
   technology_builder: prototypes/mir/emit/technology_builder.lua
   decision_export: prototypes/mir/report/decision_export.lua
   compatibility_diagnostics_report: prototypes/mir/report/compatibility_diagnostics.lua

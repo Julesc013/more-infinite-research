@@ -130,6 +130,9 @@ implementation is migrated out of the legacy compatibility path.
 `prototypes/mir/planner/direct_effects.lua` prepares direct-effect streams by
 asserting effect safety, dropping unavailable optional ammo categories, and
 applying fallback effect icons before emission planning.
+`prototypes/mir/capabilities/recipe_productivity/planner.lua` owns the current
+recipe-productivity bucket matching facade and converts matched buckets into
+recipe productivity effects after policy filters run.
 
 Compatibility policy uses `prototypes/mir/compatibility/`. Named compatibility
 targets live under `prototypes/mir/compatibility/overlays/`; those overlays

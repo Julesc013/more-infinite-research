@@ -6,6 +6,7 @@ local deepcopy = require("prototypes.lib.deepcopy")
 local table_utils = require("prototypes.lib.table-utils")
 local adoption_policy = require("prototypes.mir.policy.adoption_policy")
 local owner_policy = require("prototypes.mir.policy.owner_policy")
+local recipe_productivity_planner = require("prototypes.mir.capabilities.recipe_productivity.planner")
 local direct_effects_planner = require("prototypes.mir.planner.direct_effects")
 local native_modifiers = require("prototypes.mir.planner.native_modifiers")
 local planner_requirements = require("prototypes.mir.planner.requirements")
@@ -161,8 +162,7 @@ local function make_stream(key, raw_spec)
     return
   end
 
-  local buckets = U.recipes_for_stream(spec)
-  D.recipe_matches(key, buckets)
+  local buckets = recipe_productivity_planner.match_buckets(key, spec)
   local covered_by_existing
   buckets, covered_by_existing = owner_policy.filter_existing_recipe_productivity(key, spec, buckets)
   local adopted_effects, family_blocked, adoption_owner_name
@@ -173,13 +173,7 @@ local function make_stream(key, raw_spec)
       recipes = owner_policy.recipe_names_from_effects(adopted_effects)
     }))
   end
-  local effects = {}
-  for _,b in ipairs(buckets) do
-    for _,r in ipairs(b.recipes) do
-      table.insert(effects, { type="change-recipe-productivity", recipe=r, change=b.change or C.shared.per_level_default })
-      D.record_recipe_match(key, r)
-    end
-  end
+  local effects = recipe_productivity_planner.effects_from_buckets(key, buckets)
   if #effects == 0 then
     if adopted_effects and #adopted_effects > 0 then
       return

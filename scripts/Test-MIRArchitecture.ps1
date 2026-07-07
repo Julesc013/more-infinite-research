@@ -166,6 +166,7 @@ $requiredShims = @(
   "prototypes/mir/domain/facts/registry.lua",
   "prototypes/mir/capabilities/contract.lua",
   "prototypes/mir/capabilities/registry.lua",
+  "prototypes/mir/capabilities/recipe_productivity/planner.lua",
   "prototypes/mir/report/decision_export.lua",
   "prototypes/mir/report/compatibility_diagnostics.lua",
   "prototypes/mir/planner/compiler.lua",
@@ -213,6 +214,7 @@ $legacyTechGenText = Read-MIRFile -RelativePath $legacyTechGenPath
 Assert-MIRContains -RelativePath $legacyTechGenPath -Text $legacyTechGenText -Needle 'require("prototypes.mir.legacy.stream_emitter")'
 Assert-MIRContains -RelativePath $legacyTechGenPath -Text $legacyTechGenText -Needle 'require("prototypes.mir.policy.adoption_policy")'
 Assert-MIRContains -RelativePath $legacyTechGenPath -Text $legacyTechGenText -Needle 'require("prototypes.mir.policy.owner_policy")'
+Assert-MIRContains -RelativePath $legacyTechGenPath -Text $legacyTechGenText -Needle 'require("prototypes.mir.capabilities.recipe_productivity.planner")'
 Assert-MIRContains -RelativePath $legacyTechGenPath -Text $legacyTechGenText -Needle 'require("prototypes.mir.planner.direct_effects")'
 Assert-MIRContains -RelativePath $legacyTechGenPath -Text $legacyTechGenText -Needle 'require("prototypes.mir.planner.native_modifiers")'
 Assert-MIRContains -RelativePath $legacyTechGenPath -Text $legacyTechGenText -Needle 'require("prototypes.mir.planner.requirements")'
@@ -224,6 +226,8 @@ Assert-MIRContains -RelativePath $legacyTechGenPath -Text $legacyTechGenText -Ne
 Assert-MIRContains -RelativePath $legacyTechGenPath -Text $legacyTechGenText -Needle "adoption_policy.adopt_recipe_productivity_family(key, spec, buckets)"
 Assert-MIRContains -RelativePath $legacyTechGenPath -Text $legacyTechGenText -Needle "adoption_policy.emit_mod_data()"
 Assert-MIRContains -RelativePath $legacyTechGenPath -Text $legacyTechGenText -Needle "direct_effects_planner.available_for_stream(key, spec)"
+Assert-MIRContains -RelativePath $legacyTechGenPath -Text $legacyTechGenText -Needle "recipe_productivity_planner.match_buckets(key, spec)"
+Assert-MIRContains -RelativePath $legacyTechGenPath -Text $legacyTechGenText -Needle "recipe_productivity_planner.effects_from_buckets(key, buckets)"
 Assert-MIRContains -RelativePath $legacyTechGenPath -Text $legacyTechGenText -Needle "stream_emitter.emit(key, spec, fields)"
 
 $adoptionPolicyPath = "prototypes/mir/policy/adoption_policy.lua"
@@ -238,6 +242,14 @@ Assert-MIRContains -RelativePath $ownerPolicyPath -Text $ownerPolicyText -Needle
 Assert-MIRContains -RelativePath $ownerPolicyPath -Text $ownerPolicyText -Needle 'require("prototypes.compat.productivity-owners")'
 Assert-MIRContains -RelativePath $ownerPolicyPath -Text $ownerPolicyText -Needle "function M.filter_existing_recipe_productivity(key, spec, buckets)"
 Assert-MIRContains -RelativePath $ownerPolicyPath -Text $ownerPolicyText -Needle "D.recipe_owner({"
+
+$recipeProductivityPlannerPath = "prototypes/mir/capabilities/recipe_productivity/planner.lua"
+$recipeProductivityPlannerText = Read-MIRFile -RelativePath $recipeProductivityPlannerPath
+Assert-MIRContains -RelativePath $recipeProductivityPlannerPath -Text $recipeProductivityPlannerText -Needle "function M.match_buckets(key, spec)"
+Assert-MIRContains -RelativePath $recipeProductivityPlannerPath -Text $recipeProductivityPlannerText -Needle "U.recipes_for_stream(spec)"
+Assert-MIRContains -RelativePath $recipeProductivityPlannerPath -Text $recipeProductivityPlannerText -Needle "D.recipe_matches(key, buckets)"
+Assert-MIRContains -RelativePath $recipeProductivityPlannerPath -Text $recipeProductivityPlannerText -Needle "function M.effects_from_buckets(key, buckets)"
+Assert-MIRContains -RelativePath $recipeProductivityPlannerPath -Text $recipeProductivityPlannerText -Needle 'type = "change-recipe-productivity"'
 
 $indexRegistryPath = "prototypes/mir/index/registry_builder.lua"
 $indexRegistryText = Read-MIRFile -RelativePath $indexRegistryPath
