@@ -154,6 +154,15 @@ foreach ($relative in $requiredShims) {
   $null = Read-MIRFile -RelativePath $relative
 }
 
+$airScrubbingOverlayPath = "prototypes/mir/compatibility/overlays/air_scrubbing.lua"
+$airScrubbingOverlayText = Read-MIRFile -RelativePath $airScrubbingOverlayPath
+Assert-MIRContains -RelativePath $airScrubbingOverlayPath -Text $airScrubbingOverlayText -Needle 'id = "air-scrubbing"'
+Assert-MIRContains -RelativePath $airScrubbingOverlayPath -Text $airScrubbingOverlayText -Needle 'exact_recipes = {'
+Assert-MIRContains -RelativePath $airScrubbingOverlayPath -Text $airScrubbingOverlayText -Needle 'deny_families = {'
+if ($airScrubbingOverlayText -match 'require\("prototypes\.compat\.air-scrubbing"\)') {
+  throw "$airScrubbingOverlayPath must be policy data, not a legacy behavior shim."
+}
+
 Assert-MIRNoPatternInLuaTree `
   -RelativeRoot "prototypes/mir/domain" `
   -Pattern "\b(data\.raw|data:extend|mods|settings)\b" `
