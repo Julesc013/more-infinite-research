@@ -23,11 +23,13 @@ Every module belongs to one compiler layer.
 Only one layer mutates prototypes.
 Compatibility overlays register policy, not behavior.
 Development-only docs, scripts, fixtures, and tests stay outside the shipped zip.
-Legacy paths become shims for backporting.
+Old compatibility, library, legacy, and broad root-helper shim paths do not
+ship on the main 3.x line.
 ```
 
-This is a target structure for the 3.0 refactor. It is not a requirement to move
-every file before useful compiler work can continue.
+This is the current structure target for the MIR 3 shipped mod. Backport
+branches may carry temporary compatibility surfaces only when branch policy
+requires them; those surfaces must not merge back into the main 3.x line.
 
 ## Factorio Shell
 

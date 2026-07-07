@@ -649,7 +649,7 @@ The validation script checks:
 - **`todo.md`:** root executable future-work ledger. Keep the durable task list, release gates, future plans, recurring checklist, companion backlog, and rejected/deferred work here so the plan survives even if derivative docs are reorganized.
 - **`docs/architecture/README.md`:** data-stage flow, utility modules, stream config, compatibility profiles, diagnostics, and validation.
 - **`docs/architecture/compatibility-compiler-charter.md`:** 3.0 architecture charter, compiler pipeline, invariants, release ladder, non-goals, and acceptance gates.
-- **`docs/architecture/module-boundaries.md`:** 3.0 Factorio shell, `prototypes/mir` compiler namespace, layer rules, legacy shims, package boundary, and architecture lint targets.
+- **`docs/architecture/module-boundaries.md`:** 3.0 Factorio shell, `prototypes/mir` compiler namespace, layer rules, no-shim shipped layout, package boundary, and architecture lint targets.
 - **`docs/capabilities/README.md`:** capability resolver lanes, productivity/native-modifier split, confidence model, and settings posture.
 - **`docs/compatibility/policy-overlays.md`:** declarative compatibility-policy model, overlay fields, modes, and lint rules.
 - **`docs/reference/schemas/decision-record.md`:** planned `DecisionRecord` and `StreamSpec` schemas for explainable generation.

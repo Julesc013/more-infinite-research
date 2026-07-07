@@ -139,7 +139,7 @@ set of special-case compatibility files.
 The concrete repository-structure target is
 `docs/architecture/module-boundaries.md`. That note is the active source for
 the Factorio shell, `prototypes/mir/` compiler namespace, platform adapter,
-development workspace, legacy shims, and architecture lint rules. The summary
+development workspace, no-shim shipped layout, and architecture lint rules. The summary
 below is the older high-level shape and should be read as conceptual, not as the
 complete migration checklist.
 

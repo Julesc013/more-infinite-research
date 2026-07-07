@@ -18,7 +18,7 @@ copying generator logic into per-mod files.
 
 Use `docs/architecture/module-boundaries.md` for where new files belong.
 New shipped Lua should go under `prototypes/mir/` unless it is a thin Factorio
-root entrypoint, locale, migration, graphics asset, or a temporary legacy shim.
+root entrypoint, locale, migration, or graphics asset.
 Development-only docs, scripts, fixtures, tests, build output, task ledgers, and
 release archives stay outside the shipped package.
 
@@ -38,7 +38,7 @@ visibility metadata, hidden unavailable stream settings, and backport behavior.
    `prototypes/lib/`, `prototypes/mir/legacy/`, root `defaults.lua`, or broad
    root helper shims.
 7. If a backport requires a temporary compatibility surface, document it in the
-   branch policy and remove it before merging back to the MIR 3 main line.
+   branch policy and keep it off the MIR 3 main line.
 
 ## Adding A New Capability
 
