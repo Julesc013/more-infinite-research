@@ -312,7 +312,7 @@ Invoke-RepoCheck "unsafe pickup reach technology effects are blocked" {
 
   $requiredGuardSnippets = @(
     @{ File = "prototypes\tech-gen.lua"; Text = $techGenText; Snippet = 'effect_safety.assert_effect_allowed(effect, "direct-effect stream " .. key)' },
-    @{ File = "prototypes\tech-gen.lua"; Text = $techGenText; Snippet = 'effect_safety.register_generated_technology(t.name)' },
+    @{ File = "prototypes\tech-gen.lua"; Text = $techGenText; Snippet = 'effect_safety.register_generated_technology(technology.name)' },
     @{ File = "prototypes\base-tech-extensions.lua"; Text = $baseExtensionsText; Snippet = 'effect_safety.assert_effects_allowed(desired_effects, "base extension " .. key)' },
     @{ File = "prototypes\base-tech-extensions.lua"; Text = $baseExtensionsText; Snippet = 'effect_safety.register_generated_technology(new.name)' },
     @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'require("prototypes.technology-effect-safety").assert_registered_technology_effects()' },

@@ -9,6 +9,8 @@ local technology_requirements = require("prototypes.lib.technology-requirements"
 local competing_productivity = require("prototypes.compat.competing-productivity")
 local productivity_owners = require("prototypes.compat.productivity-owners")
 local productivity_family_adoption = require("prototypes.compat.productivity-family-adoption")
+local stream_spec = require("prototypes.mir.domain.streams.stream_spec")
+local technology_builder = require("prototypes.mir.emit.technology_builder")
 
 local function lname(key, spec)
   if spec.localised_name then return spec.localised_name end
@@ -35,6 +37,31 @@ local function ldesc(spec)
     return {"technology-description.more-infinite-research.direct_effect"}
   end
   return {"technology-description.more-infinite-research.recipe_productivity"}
+end
+
+local function emit_stream_technology(key, spec, fields)
+  local stream = stream_spec.from_legacy_stream({
+    manifest_id = spec.manifest_id,
+    stream_key = key,
+    technology_name = "recipe-prod-" .. key .. "-1",
+    localised_name = fields.localised_name,
+    localised_description = fields.localised_description,
+    icons = fields.icons,
+    effects = fields.effects,
+    science = fields.ingredients,
+    prerequisites = fields.prerequisites,
+    count_formula = fields.count_formula,
+    research_time = fields.research_time,
+    upgrade = true,
+    max_level = fields.max_level,
+    order = "p[" .. key .. "]",
+    level = 1,
+    migration_policy = spec.migration_policy
+  })
+
+  local technology = technology_builder.emit(stream)
+  effect_safety.register_generated_technology(technology.name)
+  return technology
 end
 
 local function missing_requirement(key, spec)
@@ -317,26 +344,17 @@ local function make_stream(key, raw_spec)
   if direct_effects and #direct_effects > 0 then
     record_native_modifier_overlaps(key, direct_effects)
     local prerequisites = U.build_prereqs_for(key, ingredients)
-    local t = {
-      type = "technology",
-      name = "recipe-prod-"..key.."-1",
+    local t = emit_stream_technology(key, spec, {
       localised_name = lname(key, spec),
       localised_description = ldesc(spec),
       icons = U.icons_for_stream(spec),
       effects = direct_effects,
       prerequisites = prerequisites,
-      unit = {
-        count_formula = count_formula,
-        ingredients = ingredients,
-        time = research_time
-      },
-      upgrade = true,
+      count_formula = count_formula,
+      ingredients = ingredients,
+      research_time = research_time,
       max_level = max_level,
-      order = "p["..key.."]",
-      level = 1
-    }
-    data:extend({t})
-    effect_safety.register_generated_technology(t.name)
+    })
     D.stream(D.stream_fields(key, spec, "generated", "direct_effect", ingredients, prerequisites, direct_effects, lab_status))
     return
   end
@@ -376,26 +394,17 @@ local function make_stream(key, raw_spec)
   end
 
   local prerequisites = U.build_prereqs_for(key, ingredients)
-  local t = {
-    type = "technology",
-    name = "recipe-prod-"..key.."-1",
+  local t = emit_stream_technology(key, spec, {
     localised_name = lname(key, spec),
     localised_description = ldesc(spec),
     icons = U.icons_for_stream(spec),
     effects = effects,
     prerequisites = prerequisites,
-    unit = {
-      count_formula = count_formula,
-      ingredients = ingredients,
-      time = research_time
-    },
-    upgrade = true,
+    count_formula = count_formula,
+    ingredients = ingredients,
+    research_time = research_time,
     max_level = max_level,
-    order = "p["..key.."]",
-    level = 1
-  }
-  data:extend({t})
-  effect_safety.register_generated_technology(t.name)
+  })
   if D.enabled() then
     log("[more-infinite-research] Registered technology "..t.name)
   end

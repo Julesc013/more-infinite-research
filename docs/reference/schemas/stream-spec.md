@@ -27,3 +27,12 @@ Required fields:
 | `science` | Lab-compatible ingredient set. |
 | `prerequisites` | Validated prerequisite list. |
 | `migration_policy` | Stable, pending migration, or unreleased. |
+
+## Transition Adapter
+
+During the MIR 3.0 refactor, legacy stream definitions are normalized through
+`prototypes/mir/domain/streams/stream_spec.lua` before they enter
+`prototypes/mir/emit/technology_builder.lua`. The adapter preserves existing
+technology names, effects, science ingredients, prerequisites, cost formula,
+research time, max level, and order while moving the actual `data:extend` call
+behind the emit layer.
