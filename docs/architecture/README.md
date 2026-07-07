@@ -121,6 +121,7 @@ Agricultural growth speed refreshes this force state on init, configuration chan
 - `prototypes/mir/core/deepcopy.lua`: shared fallback for data-stage deep copies.
 - `prototypes/mir/core/table.lua`: deterministic table-key ordering helpers.
 - `prototypes/mir/policy/technology_cleanup.lua`: technology removal with prerequisite reference cleanup.
+- `prototypes/mir/policy/max_level.lua`: post-emission max-level setting enforcement for generated stream technologies.
 - `prototypes/mir/index/productivity_owners.lua`: shared recipe-productivity owner classification, recipe allow-productivity checks, and owner record formatting.
 - `prototypes/mir/policy/productivity_family_adoption.lua`: data-stage adoption of safe residual recipes into configured existing productivity families plus the adoption signature mod-data.
 - `prototypes/mir/policy/competing_productivity.lua`: profile-driven replacement of known fully covered competing infinite recipe-productivity technologies.

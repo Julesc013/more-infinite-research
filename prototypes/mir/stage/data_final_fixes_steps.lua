@@ -32,7 +32,7 @@ function M.apply_weapon_speed_adjustments()
 end
 
 function M.apply_max_level_control()
-  require("prototypes.max-level-control")
+  require("prototypes.mir.policy.max_level").apply()
 end
 
 function M.emit_compatibility_planner()

@@ -175,6 +175,11 @@ diagnostic sink; the old `prototypes/diagnostics.lua` path is a compatibility
 shim. During the transition it may call `prototypes/mir/emit/icon_builder.lua`
 only to preserve existing icon-source hints in report rows; it must not mutate
 prototypes.
+`prototypes/mir/policy/max_level.lua` owns the post-emission max-level setting
+enforcement pass for generated stream technologies; the old
+`prototypes/max-level-control.lua` root path is an execution shim. This remains
+in the current mutator allowlist because it adjusts already generated MIR
+technology prototypes after stream emission.
 
 ## Three Workspaces
 
@@ -349,6 +354,7 @@ prototypes/
       family_policy.lua
       science_policy.lua
       cap_policy.lua
+      max_level.lua
       owner_policy.lua
       competing_productivity.lua
       competing_base_extensions.lua

@@ -153,6 +153,7 @@ Assert-MIRContains -RelativePath $dataFinalFixesStepsPath -Text $dataFinalFixesS
 Assert-MIRContains -RelativePath $dataFinalFixesStepsPath -Text $dataFinalFixesStepsText -Needle 'require("prototypes.mir.policy.competing_productivity").prepare()'
 Assert-MIRContains -RelativePath $dataFinalFixesStepsPath -Text $dataFinalFixesStepsText -Needle 'require("prototypes.mir.policy.competing_productivity").apply()'
 Assert-MIRContains -RelativePath $dataFinalFixesStepsPath -Text $dataFinalFixesStepsText -Needle 'require("prototypes.mir.policy.competing_base_extensions").apply()'
+Assert-MIRContains -RelativePath $dataFinalFixesStepsPath -Text $dataFinalFixesStepsText -Needle 'require("prototypes.mir.policy.max_level").apply()'
 Assert-MIRContains -RelativePath $dataFinalFixesStepsPath -Text $dataFinalFixesStepsText -Needle "function M.emit_streams()"
 Assert-MIRContains -RelativePath $dataFinalFixesStepsPath -Text $dataFinalFixesStepsText -Needle 'require("prototypes.mir.planner.stream_compiler").run()'
 Assert-MIRContains -RelativePath $dataFinalFixesStepsPath -Text $dataFinalFixesStepsText -Needle 'require("prototypes.mir.emit.base_extensions").emit_all()'
@@ -186,6 +187,7 @@ $requiredShims = @(
   "prototypes/mir/policy/competing_base_extensions.lua",
   "prototypes/mir/policy/productivity_family_adoption.lua",
   "prototypes/mir/policy/technology_cleanup.lua",
+  "prototypes/mir/policy/max_level.lua",
   "prototypes/mir/policy/capabilities.lua",
   "prototypes/mir/index/registry_builder.lua",
   "prototypes/mir/index/productivity_owners.lua",
@@ -309,6 +311,17 @@ Assert-MIRContains -RelativePath $baseExtensionsEmitterPath -Text $baseExtension
 if ($baseExtensionsEmitterText -match "data:extend") {
   throw "$baseExtensionsEmitterPath must emit through the platform data_raw adapter."
 }
+
+$maxLevelShimPath = "prototypes/max-level-control.lua"
+$maxLevelShimText = Read-MIRFile -RelativePath $maxLevelShimPath
+Assert-MIRContains -RelativePath $maxLevelShimPath -Text $maxLevelShimText -Needle 'return require("prototypes.mir.policy.max_level").apply()'
+
+$maxLevelPolicyPath = "prototypes/mir/policy/max_level.lua"
+$maxLevelPolicyText = Read-MIRFile -RelativePath $maxLevelPolicyPath
+Assert-MIRContains -RelativePath $maxLevelPolicyPath -Text $maxLevelPolicyText -Needle 'require("prototypes.mir.platform.factorio.data_raw")'
+Assert-MIRContains -RelativePath $maxLevelPolicyPath -Text $maxLevelPolicyText -Needle 'require("prototypes.mir.planner.costs")'
+Assert-MIRContains -RelativePath $maxLevelPolicyPath -Text $maxLevelPolicyText -Needle "function M.apply()"
+Assert-MIRContains -RelativePath $maxLevelPolicyPath -Text $maxLevelPolicyText -Needle "data_raw.technology(tech_name)"
 
 $streamCompilerPath = "prototypes/mir/planner/stream_compiler.lua"
 $streamCompilerText = Read-MIRFile -RelativePath $streamCompilerPath
@@ -457,7 +470,7 @@ Assert-MIRContains -RelativePath $legacyInventoryPath -Text $legacyInventoryText
 Assert-MIRContains -RelativePath $legacyInventoryPath -Text $legacyInventoryText -Needle "compat_active_modules"
 Assert-MIRContains -RelativePath $legacyInventoryPath -Text $legacyInventoryText -Needle "requires_lib"
 Assert-MIRContains -RelativePath $legacyInventoryPath -Text $legacyInventoryText -Needle "MaxRequiresUtil = 0"
-Assert-MIRContains -RelativePath $legacyInventoryPath -Text $legacyInventoryText -Needle "MaxDataRawOutsidePlatform = 35"
+Assert-MIRContains -RelativePath $legacyInventoryPath -Text $legacyInventoryText -Needle "MaxDataRawOutsidePlatform = 34"
 Assert-MIRContains -RelativePath $legacyInventoryPath -Text $legacyInventoryText -Needle "MaxLibActiveModules = 0"
 Assert-MIRContains -RelativePath $legacyInventoryPath -Text $legacyInventoryText -Needle "MIR legacy inventory thresholds passed"
 
