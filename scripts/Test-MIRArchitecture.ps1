@@ -194,6 +194,7 @@ $requiredShims = @(
   "prototypes/mir/capabilities/registry.lua",
   "prototypes/mir/capabilities/recipe_productivity/planner.lua",
   "prototypes/mir/capabilities/recipe_productivity/recipe_matching.lua",
+  "prototypes/mir/capabilities/science_integration/science_packs.lua",
   "prototypes/mir/emit/legacy_stream_adapter.lua",
   "prototypes/mir/emit/icon_builder.lua",
   "prototypes/mir/report/decision_export.lua",
@@ -280,6 +281,10 @@ Assert-MIRContains -RelativePath $legacyRecipeMatchingPath -Text $legacyRecipeMa
 $legacyTechnologyIconsPath = "prototypes/lib/technology-icons.lua"
 $legacyTechnologyIconsText = Read-MIRFile -RelativePath $legacyTechnologyIconsPath
 Assert-MIRContains -RelativePath $legacyTechnologyIconsPath -Text $legacyTechnologyIconsText -Needle 'return require("prototypes.mir.emit.icon_builder")'
+
+$legacySciencePacksPath = "prototypes/lib/science-packs.lua"
+$legacySciencePacksText = Read-MIRFile -RelativePath $legacySciencePacksPath
+Assert-MIRContains -RelativePath $legacySciencePacksPath -Text $legacySciencePacksText -Needle 'return require("prototypes.mir.capabilities.science_integration.science_packs")'
 
 $streamCompilerPath = "prototypes/mir/planner/stream_compiler.lua"
 $streamCompilerText = Read-MIRFile -RelativePath $streamCompilerPath

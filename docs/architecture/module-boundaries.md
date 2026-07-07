@@ -392,6 +392,7 @@ prototypes/
 
       science_integration/
         capability.lua
+        science_packs.lua
         pack_detection.lua
         lab_matrix.lua
         prerequisite_planner.lua

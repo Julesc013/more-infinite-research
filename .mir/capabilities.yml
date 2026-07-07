@@ -44,7 +44,7 @@ capabilities:
     owner_policy_required: true
 
   lab-compatibility:
-    current_path: prototypes/lib/science-packs.lua
+    current_path: prototypes/mir/capabilities/science_integration/science_packs.lua
     target_path: prototypes/mir/capabilities/science_integration/lab_matrix.lua
     doc: docs/capabilities/lab-compatibility.md
     emits: []

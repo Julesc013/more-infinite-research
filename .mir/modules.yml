@@ -77,6 +77,7 @@ namespace_shims:
   capability_registry: prototypes/mir/capabilities/registry.lua
   recipe_productivity_planner: prototypes/mir/capabilities/recipe_productivity/planner.lua
   recipe_productivity_matching: prototypes/mir/capabilities/recipe_productivity/recipe_matching.lua
+  science_integration_packs: prototypes/mir/capabilities/science_integration/science_packs.lua
   technology_builder: prototypes/mir/emit/technology_builder.lua
   legacy_stream_adapter: prototypes/mir/emit/legacy_stream_adapter.lua
   icon_builder: prototypes/mir/emit/icon_builder.lua
