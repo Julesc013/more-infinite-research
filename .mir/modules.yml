@@ -27,6 +27,7 @@ runtime_boundaries:
     runtime_modules:
       - control/scripted-techs.lua
       - control/settings-resolver.lua
+      - control/settings-profile.lua
       - control/productivity-family-adoption.lua
       - control/effects/agricultural-growth-speed.lua
       - control/effects/spoilage-preservation.lua
@@ -36,6 +37,9 @@ runtime_boundaries:
       - settings
       - defines
       - game
+      - helpers
+      - commands
+      - remote
       - prototypes
       - log
     forbidden_globals:
@@ -55,6 +59,8 @@ namespace_shims:
   settings_visibility: prototypes/mir/settings/visibility.lua
   settings_builder: prototypes/mir/settings/builder.lua
   settings_legacy_adapter: prototypes/mir/settings/legacy_adapter.lua
+  settings_profile_codec: prototypes/mir/settings/profile_codec.lua
+  settings_effective: prototypes/mir/settings/effective.lua
   adoption_policy: prototypes/mir/policy/adoption_policy.lua
   owner_policy: prototypes/mir/policy/owner_policy.lua
   competing_productivity_policy: prototypes/mir/policy/competing_productivity.lua
@@ -170,7 +176,7 @@ target_layers:
     may_require:
       - core
       - platform
-    may_read_factorio_globals: false
+    may_read_factorio_globals: true
     may_mutate_data_raw: false
 
   capabilities:

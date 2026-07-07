@@ -1,6 +1,7 @@
 local D = {}
 local icons = require("prototypes.mir.emit.icon_builder")
 local schema = require("prototypes.mir.core.schema")
+local effective_settings = require("prototypes.mir.settings.effective")
 
 local rows = {}
 local audit_rows = {}
@@ -8,9 +9,7 @@ local match_rows = {}
 local recipe_to_streams = {}
 
 local function startup_setting(name)
-  local s = settings and settings.startup and settings.startup[name]
-  if s then return s.value end
-  return nil
+  return effective_settings.get(name)
 end
 
 function D.enabled()

@@ -5,13 +5,13 @@ applies_to: "3.0.0+"
 audience: developer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-07-07
+last_reviewed: 2026-07-08
 supersedes: []
 superseded_by: []
 ---
 # API Proof Points
 
-Updated: 2026-07-06
+Updated: 2026-07-08
 
 This ledger records API claims that affect release planning. Use it to avoid turning Reddit ideas or memory into implementation assumptions.
 
@@ -62,6 +62,10 @@ Latest official API docs checked on 2026-07-06: `2.1.9`. Local runtime validatio
 | `mod-data` prototypes can carry arbitrary prototype-stage data and are readable at runtime through `prototypes.mod_data` | Factorio `ModData` docs | Verified | The data stage can publish the productivity-family adoption signature for runtime migration handling |
 | `LuaForce.reset_technology_effects()` reapplies research effects while preserving technology research state | Factorio `LuaForce` docs | Verified | Existing saves can refresh newly adopted recipe effects, but the reset must be signature-guarded because custom force-state changes are lost |
 | `script.on_configuration_changed` runs when mod versions, mod lists, startup settings, prototypes, or migrations change | Factorio `LuaBootstrap` docs | Verified | Adding or removing a planet mod can trigger the adoption-signature refresh path |
+| `settings.startup` exposes startup mod settings as a read table | Factorio `LuaSettings` docs | Verified | MIR can read startup settings during prototype loading but should not rely on runtime code to rewrite startup generation choices |
+| Runtime setting writes are limited to runtime global/player setting tables, not startup settings | Factorio `LuaSettings` docs | Verified | MIR settings-profile import is a startup setting consumed on restart, while runtime commands only export or validate profile strings |
+| `helpers.write_file` writes files under `script-output` | Factorio `LuaHelpers` docs | Verified | `/mir-settings-export` writes profile strings to `script-output/more-infinite-research/settings/` |
+| `helpers.table_to_json`, `helpers.json_to_table`, `helpers.encode_string`, and `helpers.decode_string` exist | Factorio `LuaHelpers` docs | Verified | MIR settings profiles can use a compact `MIRSET1:` encoded JSON payload without adding external parsers |
 | Recipe results can be item or fluid product prototypes | Factorio `ProductPrototype` docs plus runtime fluid-productivity fixtures | Verified | Shared recipe matching can safely inspect fluid outputs as first-class recipe products |
 | Thrusters expose `fuel_fluid_box` and `oxidizer_fluid_box` as `FluidBox` prototype fields | Factorio `ThrusterPrototype` docs | Verified | Pipeline extent scanning can reach thruster fluid boxes; thruster productivity remains recipe-output productivity, not thrust mutation |
 | Fluid prototypes expose `icon`/`icons` fields | Factorio `FluidPrototype` docs | Verified | Fluid-output productivity streams can use fluid prototypes as icon candidates |
@@ -100,6 +104,8 @@ Latest official API docs checked on 2026-07-06: `2.1.9`. Local runtime validatio
 - `LuaItemStack`: <https://lua-api.factorio.com/latest/classes/LuaItemStack.html>
 - `LuaForce`: <https://lua-api.factorio.com/latest/classes/LuaForce.html>
 - `LuaBootstrap`: <https://lua-api.factorio.com/latest/classes/LuaBootstrap.html>
+- `LuaSettings`: <https://lua-api.factorio.com/latest/classes/LuaSettings.html>
+- `LuaHelpers`: <https://lua-api.factorio.com/latest/classes/LuaHelpers.html>
 - `DifficultySettings`: <https://lua-api.factorio.com/latest/concepts/DifficultySettings.html>
 - `PumpPrototype`: <https://lua-api.factorio.com/latest/prototypes/PumpPrototype.html>
 - `FluidBox`: <https://lua-api.factorio.com/latest/types/FluidBox.html>

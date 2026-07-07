@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: maintainer
 doc_type: explanation
 owner: mir-maintainers
-last_reviewed: 2026-07-07
+last_reviewed: 2026-07-08
 supersedes: []
 superseded_by: []
 ---
@@ -37,6 +37,10 @@ MIR settings code must not use:
 This is why hidden technology settings are based on `ui_visibility` provider
 metadata, not final recipe or technology existence.
 
+The settings stage also registers `mir-settings-profile-import`. MIR does not
+decode that profile while creating setting prototypes. The profile is consumed
+later as an effective startup-setting override during prototype generation.
+
 ## Prototype Stage
 
 `data.lua`, `data-updates.lua`, and `data-final-fixes.lua` run after setting
@@ -49,6 +53,12 @@ is safe, ownership policy allows emission, loop risk is acceptable, and the
 stream has a stable manifest row. A visible and enabled setting is not enough to
 generate a technology.
 
+`prototypes/mir/settings/effective.lua` is the data-stage read boundary for
+profile imports. Prototype-stage modules should read startup settings through
+that effective-settings layer so imported profile values apply consistently.
+Imported values are used only when the current branch still registers the
+setting ID and the value type matches the current setting's type.
+
 ## Runtime Stage
 
 `control.lua` is runtime save/session behavior. It may register event handlers,
@@ -59,6 +69,12 @@ save starts.
 MIR should omit `control.lua` unless runtime behavior is required. If it exists,
 it stays a thin wrapper into `prototypes/mir/stage/control.lua` and runtime
 modules under `control/`.
+
+Runtime settings-profile commands are export and validation helpers only.
+`/mir-settings-export` writes a profile string to `script-output`, and
+`/mir-settings-import-check` validates a pasted string. Runtime code cannot make
+startup generation use a new profile until the user stores the string in
+`mir-settings-profile-import` and restarts.
 
 ## Hidden Settings
 

@@ -1,7 +1,7 @@
+local effective_settings = require("prototypes.mir.settings.effective")
+
 local function startup_setting(name)
-  local s = settings and settings.startup and settings.startup[name]
-  if s then return s.value end
-  return nil
+  return effective_settings.get(name)
 end
 
 local function strip_categories_for_mode()

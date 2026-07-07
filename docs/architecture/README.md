@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: maintainer
 doc_type: explanation
 owner: mir-maintainers
-last_reviewed: 2026-07-07
+last_reviewed: 2026-07-08
 supersedes: []
 superseded_by: []
 ---
@@ -70,8 +70,12 @@ Do not use runtime code to fake fluid physics, platform speed, module effects, o
 
 Current control files:
 
-- `control.lua`: loads the scripted technology manager.
+- `control.lua`: loads the runtime registration stage.
 - `control/scripted-techs.lua`: registers init, configuration change, research finish/reversal, technology-effect reset, and agricultural tower planting handlers.
+- `control/settings-profile.lua`: exports current effective MIR startup
+  settings to a profile string, validates pasted profile strings, and exposes a
+  small remote interface for tools. It does not mutate startup settings at
+  runtime.
 - `control/effects/spoilage-preservation.lua`: applies the global spoil-time multiplier from the highest completed MIR spoilage preservation level.
 - `control/effects/agricultural-growth-speed.lua`: shortens remaining growth time for newly planted agricultural tower plants.
 

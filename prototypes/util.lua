@@ -7,6 +7,7 @@ local lookup = require("prototypes.mir.platform.factorio.prototype_lookup")
 local science = require("prototypes.mir.capabilities.science_integration.science_packs")
 local icons = require("prototypes.mir.emit.icon_builder")
 local recipes = require("prototypes.mir.capabilities.recipe_productivity.recipe_matching")
+local effective_settings = require("prototypes.mir.settings.effective")
 
 local U = {}
 
@@ -96,9 +97,7 @@ local STREAM_EXTRA_PACKS = {
 }
 
 local function startup_setting(name)
-  local s = settings and settings.startup and settings.startup[name]
-  if s then return s.value end
-  return nil
+  return effective_settings.get(name)
 end
 
 local function ensure_minimum(value, fallback, minimum)

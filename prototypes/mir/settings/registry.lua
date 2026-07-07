@@ -38,6 +38,10 @@ return {
       ui_visibility = { mode = "always" }
     },
     {
+      key = "mir-settings-profile-import",
+      ui_visibility = { mode = "always" }
+    },
+    {
       key = "mir-debug-generation-report",
       ui_visibility = { mode = "always" }
     },

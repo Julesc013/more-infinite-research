@@ -1,6 +1,7 @@
 local deepcopy = require("prototypes.mir.core.deepcopy")
 local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 local lookup = require("prototypes.mir.platform.factorio.prototype_lookup")
+local effective_settings = require("prototypes.mir.settings.effective")
 
 local I = {}
 
@@ -66,9 +67,7 @@ local function icon_from_fluid(name)
 end
 
 local function startup_setting(name)
-  local setting = settings and settings.startup and settings.startup[name]
-  if setting then return setting.value end
-  return nil
+  return effective_settings.get(name)
 end
 
 local INSTALLED_ASSET_OPT_IN_MODS = {

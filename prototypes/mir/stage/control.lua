@@ -13,6 +13,7 @@ end
 function M.run()
   assert_runtime_stage()
   require("control.scripted-techs").register()
+  require("control.settings-profile").register()
 end
 
 return M

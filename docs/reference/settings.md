@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: developer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-07-07
+last_reviewed: 2026-07-08
 supersedes: [docs/reference/settings-reference.md]
 superseded_by: []
 ---
@@ -36,6 +36,16 @@ ips-research-time-<stream>
 MIR uses `hidden = true` for normal unavailable stream settings. It does not use
 `forced_value` for those settings, because the user's saved value should return
 if the relevant mod or expansion is enabled again.
+
+MIR also registers the global startup setting:
+
+```text
+mir-settings-profile-import
+```
+
+This setting accepts a portable MIR settings profile string. It is always
+registered and stays out of profile exports so importing one profile never
+nests another profile inside it.
 
 ## Visibility
 
@@ -94,3 +104,62 @@ value and map it to a safe data-stage fallback rather than narrowing
 
 Use `forced_value` only for documented safety-invalid or deprecated settings
 where the previous value must not apply.
+
+## Portable Profile Format
+
+The profile codec lives in `prototypes/mir/settings/profile_codec.lua`.
+Profiles are encoded as:
+
+```text
+MIRSET1:<encoded-json>
+```
+
+The decoded payload has schema `1`:
+
+```json
+{
+  "schema": 1,
+  "kind": "mir-settings-profile",
+  "mod": "more-infinite-research",
+  "metadata": {
+    "mir_version": "3.0.0",
+    "factorio_version": "2.1.x",
+    "import_setting": "mir-settings-profile-import"
+  },
+  "settings": {
+    "ips-enable-research_tungsten": true,
+    "ips-max-level-research_tungsten": 0
+  }
+}
+```
+
+Only setting names beginning with `ips-` or `mir-` are exported, and
+`mir-settings-profile-import` is explicitly excluded. The codec accepts either
+the `MIRSET1:` encoded form or raw JSON for maintainer debugging.
+
+`prototypes/mir/settings/effective.lua` reads the import setting once during
+prototype loading. An imported value applies only when:
+
+- the profile schema is supported;
+- the setting exists in the current branch;
+- the setting is not `mir-settings-profile-import`;
+- the imported value has the same Lua type as the current setting value.
+
+Unknown setting IDs and mismatched value types are ignored on the current run,
+not removed from the profile. That keeps profiles portable across optional-mod
+changes and target-line backports.
+
+Runtime command support lives in `control/settings-profile.lua`:
+
+- `/mir-settings-export [name]` writes the current effective profile to
+  `script-output/more-infinite-research/settings/<name>.txt`;
+- `/mir-settings-import-check <profile-string>` validates a pasted profile
+  against the currently registered settings;
+- remote interface `more-infinite-research-settings.export_string()` returns an
+  encoded profile string for other tools;
+- remote interface `more-infinite-research-settings.validate_string(text)`
+  validates a candidate profile.
+
+Runtime commands do not mutate startup settings. Users still paste the profile
+into `mir-settings-profile-import` and restart for data-stage generation to use
+it.

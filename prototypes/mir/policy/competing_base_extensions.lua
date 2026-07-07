@@ -1,6 +1,7 @@
 local defaults = require("defaults")
 local cleanup = require("prototypes.mir.policy.technology_cleanup")
 local settings_resolver = require("prototypes.settings-resolver")
+local effective_settings = require("prototypes.mir.settings.effective")
 
 local M = {}
 
@@ -22,9 +23,7 @@ local COMPETING_BASE_EXTENSIONS = {
 }
 
 local function startup_setting(name)
-  local s = settings and settings.startup and settings.startup[name]
-  if s then return s.value end
-  return nil
+  return effective_settings.get(name)
 end
 
 local function prefer_this_mod_for_competing_techs()

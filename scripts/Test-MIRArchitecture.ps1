@@ -128,6 +128,7 @@ foreach ($entry in $entrypoints) {
   if ($entry.Root -eq "control.lua") {
     Assert-MIRContains -RelativePath $entry.StagePath -Text $stageText -Needle "assert_runtime_stage()"
     Assert-MIRContains -RelativePath $entry.StagePath -Text $stageText -Needle 'require("control.scripted-techs").register()'
+    Assert-MIRContains -RelativePath $entry.StagePath -Text $stageText -Needle 'require("control.settings-profile").register()'
   } elseif ($entry.Root -eq "data-final-fixes.lua") {
     Assert-MIRContains -RelativePath $entry.StagePath -Text $stageText -Needle 'require("prototypes.mir.stage.data_final_fixes_steps")'
   } else {
@@ -175,6 +176,8 @@ $requiredShims = @(
   "prototypes/mir/settings/visibility.lua",
   "prototypes/mir/settings/builder.lua",
   "prototypes/mir/settings/legacy_adapter.lua",
+  "prototypes/mir/settings/profile_codec.lua",
+  "prototypes/mir/settings/effective.lua",
   "prototypes/mir/policy/adoption_policy.lua",
   "prototypes/mir/policy/owner_policy.lua",
   "prototypes/mir/policy/competing_productivity.lua",
@@ -378,6 +381,27 @@ $settingsLegacyAdapterText = Read-MIRFile -RelativePath $settingsLegacyAdapterPa
 Assert-MIRContains -RelativePath $settingsLegacyAdapterPath -Text $settingsLegacyAdapterText -Needle 'require("prototypes.mir.platform.factorio.mods")'
 Assert-MIRContains -RelativePath $settingsLegacyAdapterPath -Text $settingsLegacyAdapterText -Needle 'require("prototypes.mir.settings.builder")'
 Assert-MIRContains -RelativePath $settingsLegacyAdapterPath -Text $settingsLegacyAdapterText -Needle "factorio_mods.snapshot()"
+
+$settingsProfileCodecPath = "prototypes/mir/settings/profile_codec.lua"
+$settingsProfileCodecText = Read-MIRFile -RelativePath $settingsProfileCodecPath
+Assert-MIRContains -RelativePath $settingsProfileCodecPath -Text $settingsProfileCodecText -Needle 'M.prefix = "MIRSET1:"'
+Assert-MIRContains -RelativePath $settingsProfileCodecPath -Text $settingsProfileCodecText -Needle 'M.import_setting_name = "mir-settings-profile-import"'
+Assert-MIRContains -RelativePath $settingsProfileCodecPath -Text $settingsProfileCodecText -Needle "helpers.table_to_json"
+Assert-MIRContains -RelativePath $settingsProfileCodecPath -Text $settingsProfileCodecText -Needle "helpers.encode_string"
+
+$settingsEffectivePath = "prototypes/mir/settings/effective.lua"
+$settingsEffectiveText = Read-MIRFile -RelativePath $settingsEffectivePath
+Assert-MIRContains -RelativePath $settingsEffectivePath -Text $settingsEffectiveText -Needle 'require("prototypes.mir.settings.profile_codec")'
+Assert-MIRContains -RelativePath $settingsEffectivePath -Text $settingsEffectiveText -Needle "function M.get(name)"
+Assert-MIRContains -RelativePath $settingsEffectivePath -Text $settingsEffectiveText -Needle "profile.settings and profile.settings[name]"
+
+$controlSettingsProfilePath = "control/settings-profile.lua"
+$controlSettingsProfileText = Read-MIRFile -RelativePath $controlSettingsProfilePath
+Assert-MIRContains -RelativePath $controlSettingsProfilePath -Text $controlSettingsProfileText -Needle 'commands.add_command('
+Assert-MIRContains -RelativePath $controlSettingsProfilePath -Text $controlSettingsProfileText -Needle '"mir-settings-export"'
+Assert-MIRContains -RelativePath $controlSettingsProfilePath -Text $controlSettingsProfileText -Needle '"mir-settings-import-check"'
+Assert-MIRContains -RelativePath $controlSettingsProfilePath -Text $controlSettingsProfileText -Needle 'helpers.write_file'
+Assert-MIRContains -RelativePath $controlSettingsProfilePath -Text $controlSettingsProfileText -Needle 'remote.add_interface("more-infinite-research-settings"'
 
 $mirCliPath = "scripts/mir.ps1"
 $mirCliText = Read-MIRFile -RelativePath $mirCliPath

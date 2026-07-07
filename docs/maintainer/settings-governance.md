@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: maintainer
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-07-07
+last_reviewed: 2026-07-08
 supersedes: []
 superseded_by: []
 ---
@@ -25,6 +25,11 @@ contract unless there is a documented migration reason to retire it.
 - Keep data-stage generation based on final prototype facts.
 - Record governed setting policy in `.mir/settings.yml`.
 - Keep broad global settings visible unless they are deprecated or unsafe.
+- Preserve portable profile import/export compatibility by keeping
+  `mir-settings-profile-import` registered.
+- Exclude `mir-settings-profile-import` from exported profiles.
+- Treat a profile import as an effective data-stage override, not a runtime
+  mutation of Factorio startup settings.
 
 ## Adding A Stream Setting
 
@@ -72,6 +77,34 @@ This policy supports:
 Do not update already-published release archives just to change setting
 governance docs or manifests.
 
+## Portable Profiles
+
+Portable settings profiles exist so players can keep MIR preferences while
+changing optional mods, changing overhaul packs, downgrading to a supported
+target line, or returning to a newer line later.
+
+The contract:
+
+- exported profiles use the `MIRSET1:` prefix and schema `1`;
+- exports include MIR startup setting IDs beginning `ips-` or `mir-`;
+- exports exclude `mir-settings-profile-import`;
+- imports apply only to current registered setting IDs with matching value
+  types;
+- unknown profile entries are ignored on the current branch and left in the
+  string for future use;
+- invalid profile strings are logged and ignored;
+- runtime commands may export or validate profiles but must not attempt to
+  rewrite startup setting values.
+
+Do not narrow an existing string setting's `allowed_values` on a backport line
+unless there is no safe data-stage fallback. Prefer accepting the value and
+mapping unsupported choices to a documented safe behavior.
+
+When a setting is renamed, keep the old ID as a hidden compatibility alias until
+a documented migration proves that dropping it cannot lose user intent. If the
+old setting must be retired, document the reason and the profile behavior in
+this page and `.mir/settings.yml`.
+
 ## Validation
 
 Run the static gate after settings changes:
@@ -100,3 +133,14 @@ Manual value-retention proof for an optional stream:
 4. Confirm the stream settings are hidden.
 5. Re-enable the provider.
 6. Confirm the custom values return.
+
+Manual profile proof:
+
+1. Configure several MIR stream and global startup settings.
+2. Start a save and run `/mir-settings-export profile-proof`.
+3. Copy the profile string from
+   `script-output/more-infinite-research/settings/profile-proof.txt`.
+4. Paste it into `mir-settings-profile-import`.
+5. Restart with a different optional-mod set.
+6. Run `/mir-settings-import-check <profile-string>` in a save to confirm the
+   recognized and ignored counts match the expected branch/mod set.

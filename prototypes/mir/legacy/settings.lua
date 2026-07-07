@@ -126,6 +126,17 @@ table.insert(settings_data, {
 })
 
 table.insert(settings_data, {
+  type = "string-setting",
+  name = "mir-settings-profile-import",
+  setting_type = "startup",
+  default_value = "",
+  allow_blank = true,
+  order = "a-140",
+  localised_name = {"mod-setting-name.mir-settings-profile-import"},
+  localised_description = {"mod-setting-description.mir-settings-profile-import"}
+})
+
+table.insert(settings_data, {
   type = "bool-setting",
   name = "mir-debug-generation-report",
   setting_type = "startup",

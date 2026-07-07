@@ -4,6 +4,7 @@ local profiles = require("prototypes.mir.compatibility.profiles")
 local productivity_owners = require("prototypes.mir.index.productivity_owners")
 local cleanup = require("prototypes.mir.policy.technology_cleanup")
 local technology_requirements = require("prototypes.mir.planner.technology_requirements")
+local effective_settings = require("prototypes.mir.settings.effective")
 
 local M = {}
 
@@ -17,9 +18,9 @@ local function same_change(a, b)
 end
 
 local function prefer_this_mod_for_competing_techs()
-  local setting = settings and settings.startup and settings.startup["mir-prefer-this-mod-for-competing-techs"]
+  local setting = effective_settings.get("mir-prefer-this-mod-for-competing-techs")
   if setting == nil then return true end
-  return setting.value ~= false
+  return setting ~= false
 end
 
 local function known_competing_mod_active()

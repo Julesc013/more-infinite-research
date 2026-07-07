@@ -1,6 +1,7 @@
 local spoilage = require("control.effects.spoilage-preservation")
 local agricultural_growth = require("control.effects.agricultural-growth-speed")
 local productivity_family_adoption = require("control.productivity-family-adoption")
+local effective_settings = require("prototypes.mir.settings.effective")
 
 local M = {}
 
@@ -17,8 +18,7 @@ local function ensure_storage()
 end
 
 local function debug_enabled()
-  local setting = settings.startup["mir-debug-scripted-effects"]
-  return setting and setting.value == true
+  return effective_settings.get("mir-debug-scripted-effects") == true
 end
 
 local function log_debug(message)

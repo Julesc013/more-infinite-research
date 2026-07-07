@@ -6,6 +6,27 @@ rules:
   setting_ids_are_stable: true
   data_stage_must_validate_targets: true
   visibility_must_not_use_data_raw: true
+  profile_import_is_effective_override_not_runtime_mutation: true
+  settings_profiles_exclude_import_setting: true
+  runtime_export_writes_script_output_only: true
+  import_requires_restart: true
+
+profiles:
+  schema: 1
+  kind: mir-settings-profile
+  string_prefix: MIRSET1
+  import_setting: mir-settings-profile-import
+  exported_by_command: /mir-settings-export
+  validate_command: /mir-settings-import-check
+  file_output: script-output/more-infinite-research/settings/
+  applied_stage: data-stage effective setting reads
+  exported_setting_prefixes:
+    - ips-
+    - mir-
+  excluded_setting_ids:
+    - mir-settings-profile-import
+  unknown_settings: preserved in profile string but ignored on unsupported branches
+  unsupported_value_types: ignored rather than coerced
 
 groups:
   stream:

@@ -8,6 +8,7 @@ local settings_resolver = require("prototypes.settings-resolver")
 local deepcopy = require("prototypes.mir.core.deepcopy")
 local table_utils = require("prototypes.mir.core.table")
 local effect_safety = require("prototypes.technology-effect-safety")
+local effective_settings = require("prototypes.mir.settings.effective")
 
 local function escape_pattern(text)
   return text:gsub("([^%w])", "%%%1")
@@ -22,9 +23,7 @@ local function format_number(value)
 end
 
 local function startup_setting(name)
-  local s = settings and settings.startup and settings.startup[name]
-  if s then return s.value end
-  return nil
+  return effective_settings.get(name)
 end
 
 local function prefer_this_mod_for_competing_techs()
