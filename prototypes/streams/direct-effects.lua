@@ -1,5 +1,13 @@
 return {
   research_spoilage_preservation = {
+    ui_visibility = {
+      mode = "visible-if-mods-any",
+      mods_any = {"space-age"},
+      hidden_reason = "requires-space-age"
+    },
+    generation_requirements = {
+      require_any_item = {"spoilage", "agricultural-science-pack"}
+    },
     required_mods = {"space-age"},
     required_items = {"spoilage", "agricultural-science-pack"},
     icon_item = "spoilage",
@@ -23,6 +31,14 @@ return {
   },
 
   research_agricultural_growth_speed = {
+    ui_visibility = {
+      mode = "visible-if-mods-any",
+      mods_any = {"space-age"},
+      hidden_reason = "requires-space-age"
+    },
+    generation_requirements = {
+      require_any_item = {"agricultural-science-pack"}
+    },
     required_mods = {"space-age"},
     required_items = {"agricultural-science-pack"},
     icon_tech = "agriculture",
@@ -98,6 +114,15 @@ return {
   research_cargo_bay_unloading_distance = {
     -- Cargo logistics modifiers are Space Age behavior even if another mod
     -- exposes similarly named cargo prototypes in a base-only run.
+    ui_visibility = {
+      mode = "visible-if-mods-any",
+      mods_any = {"space-age"},
+      hidden_reason = "requires-space-age"
+    },
+    generation_requirements = {
+      require_any_item = {"landing-pad-unloading-bay"},
+      require_any_technology = {"landing-pad-unloading-bay"}
+    },
     required_mods = {"space-age"},
     required_items = {"landing-pad-unloading-bay"},
     required_technologies = {"landing-pad-unloading-bay"},
@@ -111,8 +136,17 @@ return {
   },
 
   research_cargo_landing_pad_count = {
-    -- Keep this Space Age-only; the startup setting can be enabled in any
-    -- mod set, but generation must still skip without Space Age.
+    -- Keep this Space Age-only; hidden startup settings still remain registered
+    -- so old values can return when Space Age is enabled again.
+    ui_visibility = {
+      mode = "visible-if-mods-any",
+      mods_any = {"space-age"},
+      hidden_reason = "requires-space-age"
+    },
+    generation_requirements = {
+      require_any_item = {"cargo-landing-pad"},
+      require_any_technology = {"rocket-silo"}
+    },
     required_mods = {"space-age"},
     required_items = {"cargo-landing-pad"},
     required_technologies = {"rocket-silo"},

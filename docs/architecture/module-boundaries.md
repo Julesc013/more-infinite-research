@@ -21,7 +21,7 @@ Factorio root files stay thin.
 All meaningful shipped Lua lives under one MIR namespace.
 Every module belongs to one compiler layer.
 Only one layer mutates prototypes.
-Compatibility packs register policy, not behavior.
+Compatibility overlays register policy, not behavior.
 Development-only docs, scripts, fixtures, and tests stay outside the shipped zip.
 Legacy paths become shims for backporting.
 ```
@@ -105,6 +105,13 @@ the active `mods` table because Factorio provides it during settings stage, but
 it must not inspect `data.raw`: item, recipe, fluid, and technology prototypes
 are not finalized until the later prototype stage.
 
+The MIR settings namespace is `prototypes/mir/settings/`. It owns the startup
+settings catalog, settings-stage visibility evaluation, and the adapter that
+lets the legacy settings builder apply `hidden = true` without deleting setting
+IDs or forcing values. Settings visibility uses `ui_visibility` metadata and
+active mods only; final recipe, item, fluid, and technology facts remain
+data-stage generation concerns.
+
 Compatibility policy uses `prototypes/mir/compatibility/`. Named compatibility
 targets live under `prototypes/mir/compatibility/overlays/`; those overlays
 register selectors, claims, deny rules, and policy overrides only. They must not
@@ -136,6 +143,7 @@ MIR compiler namespace
   prototypes/mir/graph/
   prototypes/mir/classify/
   prototypes/mir/policy/
+  prototypes/mir/settings/
   prototypes/mir/capabilities/
   prototypes/mir/planner/
   prototypes/mir/emit/
@@ -196,6 +204,12 @@ prototypes/
         locale.lua
         dependency_order.lua
         feature_flags.lua
+
+    settings/
+      registry.lua
+      visibility.lua
+      builder.lua
+      legacy_adapter.lua
 
     domain/
       facts/
@@ -265,8 +279,6 @@ prototypes/
 
     policy/
       defaults.lua
-      settings_policy.lua
-      settings_visibility.lua
       capability_policy.lua
       family_policy.lua
       science_policy.lua
@@ -403,6 +415,7 @@ shape.
 | `graph/` | `FactRegistry` | graph records | prototype mutation |
 | `classify/` | facts and graphs | classifications | technology creation |
 | `policy/` | settings, overlays, facts | policy decisions | prototype mutation |
+| `settings/` | active-mod context and setting metadata | setting prototypes | `data.raw`, `forced_value` by default |
 | `capabilities/` | facts, classifications, policies | proposals | direct `data:extend` |
 | `planner/` | analytical records | `DecisionRecord`, `StreamSpec` | direct prototype mutation |
 | `emit/` | validated `StreamSpec` records | prototypes | classification |
@@ -416,6 +429,7 @@ Forbidden dependencies:
 domain/ must not require emit/
 classify/ must not require platform/factorio/data_raw.lua
 compatibility/overlays/ must not mutate data.raw
+settings/ must not inspect data.raw or force hidden values by default
 report/ must not mutate data.raw
 capabilities/ must not create technologies directly
 legacy/ must not contain new business logic

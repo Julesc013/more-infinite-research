@@ -426,7 +426,10 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
   $utilText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\util.lua")
   $baseExtensionsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\base-tech-extensions.lua")
   $settingsResolverText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\settings-resolver.lua")
-  $settingsVisibilityText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\policy\settings_visibility.lua")
+  $settingsRegistryText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\settings\registry.lua")
+  $settingsVisibilityText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\settings\visibility.lua")
+  $settingsBuilderText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\settings\builder.lua")
+  $settingsLegacyAdapterText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\settings\legacy_adapter.lua")
   $controlSettingsResolverText = Get-Content -Raw -LiteralPath (Join-Path $repo "control\settings-resolver.lua")
   $spoilageText = Get-Content -Raw -LiteralPath (Join-Path $repo "control\effects\spoilage-preservation.lua")
   $agriculturalGrowthText = Get-Content -Raw -LiteralPath (Join-Path $repo "control\effects\agricultural-growth-speed.lua")
@@ -465,7 +468,7 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'name = "mir-use-installed-space-age-icons"' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'order = "a-120"' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'local pipeline_extent_settings = require("prototypes.pipeline-extent-settings")' },
-    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'local settings_visibility = require("prototypes.mir.policy.settings_visibility")' },
+    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'local settings_adapter = require("prototypes.mir.settings.legacy_adapter")' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'name = "mir-pipeline-extent-multiplier"' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'type = "string-setting"' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'allowed_values = pipeline_extent_settings.allowed_values' },
@@ -482,8 +485,8 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'local technology_setting_groups = {}' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'kind = "stream"' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'kind = "base"' },
-    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'hidden = settings_visibility.hidden_for_stream(stream)' },
-    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'settings_visibility.apply(setting, group and group.hidden)' },
+    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'settings_adapter.visibility_for_stream(stream, settings_context)' },
+    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'settings_adapter.apply(setting, group and group.ui_visibility)' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'local bucket = group.enabled and "100" or "000"' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'order = "a-900"' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'name = "ips-enable-"..key' },
@@ -491,9 +494,14 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'localised_name = {"mod-setting-name.mir-max-level", locale}' },
     @{ File = "prototypes\settings-resolver.lua"; Text = $settingsResolverText; Snippet = 'function R.stream_enabled(key, spec)' },
     @{ File = "prototypes\settings-resolver.lua"; Text = $settingsResolverText; Snippet = 'function R.base_enabled(key, spec)' },
-    @{ File = "prototypes\mir\policy\settings_visibility.lua"; Text = $settingsVisibilityText; Snippet = 'function M.hidden_for_stream(stream)' },
-    @{ File = "prototypes\mir\policy\settings_visibility.lua"; Text = $settingsVisibilityText; Snippet = 'stream.settings_required_mods' },
-    @{ File = "prototypes\mir\policy\settings_visibility.lua"; Text = $settingsVisibilityText; Snippet = 'setting.hidden = true' },
+    @{ File = "prototypes\mir\settings\registry.lua"; Text = $settingsRegistryText; Snippet = 'hidden_means_unavailable_not_deleted = true' },
+    @{ File = "prototypes\mir\settings\registry.lua"; Text = $settingsRegistryText; Snippet = 'do_not_force_hidden_values_by_default = true' },
+    @{ File = "prototypes\mir\settings\visibility.lua"; Text = $settingsVisibilityText; Snippet = 'function M.evaluate(spec, ctx)' },
+    @{ File = "prototypes\mir\settings\visibility.lua"; Text = $settingsVisibilityText; Snippet = 'mode == "visible-if-mods-any"' },
+    @{ File = "prototypes\mir\settings\visibility.lua"; Text = $settingsVisibilityText; Snippet = 'mode == "visible-if-mods-all"' },
+    @{ File = "prototypes\mir\settings\builder.lua"; Text = $settingsBuilderText; Snippet = 'function M.apply_visibility(setting, result)' },
+    @{ File = "prototypes\mir\settings\builder.lua"; Text = $settingsBuilderText; Snippet = 'setting.hidden = true' },
+    @{ File = "prototypes\mir\settings\legacy_adapter.lua"; Text = $settingsLegacyAdapterText; Snippet = 'factorio_mods.snapshot()' },
     @{ File = "prototypes\settings-resolver.lua"; Text = $settingsResolverText; Snippet = 'startup_setting("ips-enable-" .. key)' },
     @{ File = "prototypes\settings-resolver.lua"; Text = $settingsResolverText; Snippet = 'startup_setting("mir-enable-" .. key)' },
     @{ File = "control\settings-resolver.lua"; Text = $controlSettingsResolverText; Snippet = 'function R.stream_enabled(key)' },
@@ -536,13 +544,14 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'research_sulfuric_acid_productivity = {' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'overlay_loader.get("air-scrubbing")' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'research_air_scrubbing_clean_filter = {' },
-    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'settings_required_mods = air_scrubbing_overlay.applies_when.mods' },
+    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'mods_any = air_scrubbing_overlay.applies_when.mods' },
+    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'generation_requirements = {' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'manifest_id = air_scrubbing_capability.stream.id' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'exact_recipe_patterns(air_scrubbing_capability.exact_recipes)' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'research_ash_separation = {' },
-    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'settings_required_mods = {"atan-ash"}' },
+    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'mods_any = {"atan-ash"}' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'manifest_id = "mir-prod-atan-ash-separation"' },
-    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'settings_required_mods = {"space-age"}' },
+    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'mods_any = {"space-age"}' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'research_ash_separation = "Ash separation productivity"' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = '"aai-turbo-loader"' },
     @{ File = "prototypes\util.lua"; Text = $utilText; Snippet = 'desired == "derive-from-unlocks"' },

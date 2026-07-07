@@ -48,12 +48,15 @@ namespace_shims:
   schema: prototypes/mir/core/schema.lua
   factorio_data_raw: prototypes/mir/platform/factorio/data_raw.lua
   factorio_mods: prototypes/mir/platform/factorio/mods.lua
+  settings_registry: prototypes/mir/settings/registry.lua
+  settings_visibility: prototypes/mir/settings/visibility.lua
+  settings_builder: prototypes/mir/settings/builder.lua
+  settings_legacy_adapter: prototypes/mir/settings/legacy_adapter.lua
   fact_registry: prototypes/mir/domain/facts/registry.lua
   decision_record: prototypes/mir/domain/decisions/decision_record.lua
   stream_spec: prototypes/mir/domain/streams/stream_spec.lua
   capability_contract: prototypes/mir/capabilities/contract.lua
   capability_registry: prototypes/mir/capabilities/registry.lua
-  settings_visibility: prototypes/mir/policy/settings_visibility.lua
   technology_builder: prototypes/mir/emit/technology_builder.lua
   decision_export: prototypes/mir/report/decision_export.lua
   planner_compiler: prototypes/mir/planner/compiler.lua
@@ -119,6 +122,14 @@ target_layers:
       - core
       - domain
       - platform
+    may_mutate_data_raw: false
+
+  settings:
+    path: prototypes/mir/settings
+    may_require:
+      - core
+      - platform
+    may_read_factorio_globals: false
     may_mutate_data_raw: false
 
   capabilities:

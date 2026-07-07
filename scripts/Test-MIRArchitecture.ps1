@@ -137,7 +137,10 @@ $requiredShims = @(
   "prototypes/mir/core/schema.lua",
   "prototypes/mir/platform/factorio/data_raw.lua",
   "prototypes/mir/platform/factorio/mods.lua",
-  "prototypes/mir/policy/settings_visibility.lua",
+  "prototypes/mir/settings/registry.lua",
+  "prototypes/mir/settings/visibility.lua",
+  "prototypes/mir/settings/builder.lua",
+  "prototypes/mir/settings/legacy_adapter.lua",
   "prototypes/mir/domain/facts/registry.lua",
   "prototypes/mir/capabilities/contract.lua",
   "prototypes/mir/capabilities/registry.lua",
@@ -166,11 +169,25 @@ if ($technologyBuilderText -match "data:extend") {
   throw "$technologyBuilderPath must emit through the platform data_raw adapter."
 }
 
-$settingsVisibilityPath = "prototypes/mir/policy/settings_visibility.lua"
+$settingsVisibilityPath = "prototypes/mir/settings/visibility.lua"
 $settingsVisibilityText = Read-MIRFile -RelativePath $settingsVisibilityPath
-Assert-MIRContains -RelativePath $settingsVisibilityPath -Text $settingsVisibilityText -Needle 'require("prototypes.mir.platform.factorio.mods")'
-Assert-MIRContains -RelativePath $settingsVisibilityPath -Text $settingsVisibilityText -Needle "function M.hidden_for_stream(stream)"
-Assert-MIRContains -RelativePath $settingsVisibilityPath -Text $settingsVisibilityText -Needle "stream.settings_required_mods"
+Assert-MIRContains -RelativePath $settingsVisibilityPath -Text $settingsVisibilityText -Needle "function M.evaluate(spec, ctx)"
+Assert-MIRContains -RelativePath $settingsVisibilityPath -Text $settingsVisibilityText -Needle 'mode == "visible-if-mods-any"'
+Assert-MIRContains -RelativePath $settingsVisibilityPath -Text $settingsVisibilityText -Needle 'mode == "visible-if-mods-all"'
+Assert-MIRContains -RelativePath $settingsVisibilityPath -Text $settingsVisibilityText -Needle 'reason = "unknown-visibility-rule"'
+
+$settingsBuilderPath = "prototypes/mir/settings/builder.lua"
+$settingsBuilderText = Read-MIRFile -RelativePath $settingsBuilderPath
+Assert-MIRContains -RelativePath $settingsBuilderPath -Text $settingsBuilderText -Needle 'require("prototypes.mir.settings.registry")'
+Assert-MIRContains -RelativePath $settingsBuilderPath -Text $settingsBuilderText -Needle "function M.apply_visibility(setting, result)"
+Assert-MIRContains -RelativePath $settingsBuilderPath -Text $settingsBuilderText -Needle "setting.hidden = true"
+Assert-MIRContains -RelativePath $settingsBuilderPath -Text $settingsBuilderText -Needle "function M.stream_setting_names(stream_key)"
+
+$settingsLegacyAdapterPath = "prototypes/mir/settings/legacy_adapter.lua"
+$settingsLegacyAdapterText = Read-MIRFile -RelativePath $settingsLegacyAdapterPath
+Assert-MIRContains -RelativePath $settingsLegacyAdapterPath -Text $settingsLegacyAdapterText -Needle 'require("prototypes.mir.platform.factorio.mods")'
+Assert-MIRContains -RelativePath $settingsLegacyAdapterPath -Text $settingsLegacyAdapterText -Needle 'require("prototypes.mir.settings.builder")'
+Assert-MIRContains -RelativePath $settingsLegacyAdapterPath -Text $settingsLegacyAdapterText -Needle "factorio_mods.snapshot()"
 
 $decisionExportPath = "prototypes/mir/report/decision_export.lua"
 $decisionExportText = Read-MIRFile -RelativePath $decisionExportPath
@@ -230,6 +247,11 @@ Assert-MIRNoPatternInLuaTree `
   -RelativeRoot "prototypes/mir/report" `
   -Pattern "\bdata\.raw\b|data:extend" `
   -Message "MIR report modules must not mutate prototypes."
+
+Assert-MIRNoPatternInLuaTree `
+  -RelativeRoot "prototypes/mir/settings" `
+  -Pattern "\bdata\.raw\b|data:extend|forced_value" `
+  -Message "MIR settings modules must not inspect finalized prototypes, mutate prototypes, or force hidden values."
 
 $runtimePrototypePattern = "\bdata\.raw\b|data:extend"
 foreach ($relative in @(

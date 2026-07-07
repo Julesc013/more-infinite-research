@@ -11,4 +11,12 @@ function M.all_exist(names)
   return true
 end
 
+function M.snapshot()
+  local out = {}
+  for name, version in pairs(mods or {}) do
+    out[name] = version
+  end
+  return out
+end
+
 return M

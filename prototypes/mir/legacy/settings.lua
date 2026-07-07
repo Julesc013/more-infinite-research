@@ -1,9 +1,10 @@
 local C = require("prototypes.config")
 local defaults = require("defaults")
-local settings_visibility = require("prototypes.mir.policy.settings_visibility")
+local settings_adapter = require("prototypes.mir.settings.legacy_adapter")
 local pipeline_extent_settings = require("prototypes.pipeline-extent-settings")
 
 local settings_data = {}
+local settings_context = settings_adapter.context()
 local base_defaults = defaults.base_extensions or {}
 
 local function lookup_default(key, field, stream, fallback)
@@ -47,7 +48,7 @@ local function append_note(description, note)
 end
 
 local function add_technology_setting(group, setting)
-  table.insert(settings_data, settings_visibility.apply(setting, group and group.hidden))
+  table.insert(settings_data, settings_adapter.apply(setting, group and group.ui_visibility))
 end
 
 table.insert(settings_data, {
@@ -264,7 +265,7 @@ for key, stream in pairs(C.streams) do
     stream = stream,
     sort_name = stream_sort_name(key),
     enabled = default_enabled(key, stream),
-    hidden = settings_visibility.hidden_for_stream(stream)
+    ui_visibility = settings_adapter.visibility_for_stream(stream, settings_context)
   })
 end
 
