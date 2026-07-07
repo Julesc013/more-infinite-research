@@ -172,6 +172,14 @@ if ($airScrubbingOverlayText -match 'require\("prototypes\.compat\.air-scrubbing
   throw "$airScrubbingOverlayPath must be policy data, not a legacy behavior shim."
 }
 
+$claimRegistryPath = "prototypes/mir/compatibility/claim_registry.lua"
+$claimRegistryText = Read-MIRFile -RelativePath $claimRegistryPath
+Assert-MIRContains -RelativePath $claimRegistryPath -Text $claimRegistryText -Needle 'governance = ".mir/compatibility.yml"'
+Assert-MIRContains -RelativePath $claimRegistryPath -Text $claimRegistryText -Needle 'fixture_claims = "fixtures/compat-matrix/claims.json"'
+Assert-MIRContains -RelativePath $claimRegistryPath -Text $claimRegistryText -Needle 'mod = "atan-air-scrubbing"'
+Assert-MIRContains -RelativePath $claimRegistryPath -Text $claimRegistryText -Needle 'mod = "aai-industry"'
+Assert-MIRContains -RelativePath $claimRegistryPath -Text $claimRegistryText -Needle 'function M.get_by_mod(mod)'
+
 Assert-MIRNoPatternInLuaTree `
   -RelativeRoot "prototypes/mir/domain" `
   -Pattern "\b(data\.raw|data:extend|mods|settings)\b" `

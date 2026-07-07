@@ -55,6 +55,18 @@ only proves load compatibility, diagnostic observation, or one narrow family.
 }
 ```
 
+## Repository And Lua Records
+
+`.mir/compatibility.yml` is the repository-governance source for compatibility
+targets, docs, claim levels, fixture evidence, and public claim rules.
+`fixtures/compat-matrix/claims.json` is the fixture/audit claim record copied
+into scenario outputs.
+
+`prototypes/mir/compatibility/claim_registry.lua` mirrors the small
+data-stage/report subset needed by MIR Lua. It is not a separate public claim
+authority; it must stay aligned with `.mir/compatibility.yml` and the fixture
+claim JSON.
+
 ## Lint Rules
 
 The claim linter should fail when:

@@ -2,6 +2,7 @@ schema: 1
 
 canonical_machine_record: fixtures/compat-matrix/claims.json
 canonical_support_lanes: fixtures/compat-matrix/support-lanes.json
+lua_report_registry: prototypes/mir/compatibility/claim_registry.lua
 target_docs_root: docs/compatibility/targets
 
 claims:
