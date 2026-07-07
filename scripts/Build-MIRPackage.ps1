@@ -80,7 +80,6 @@ $files = @(
   "data-final-fixes.lua",
   "data-updates.lua",
   "data.lua",
-  "defaults.lua",
   "info.json",
   "LICENSE",
   "README.md",
@@ -89,7 +88,6 @@ $files = @(
 )
 
 $directories = @(
-  "control",
   "locale",
   "migrations",
   "prototypes"

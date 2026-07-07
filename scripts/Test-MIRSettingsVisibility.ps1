@@ -64,10 +64,10 @@ $stageBuilderText = Read-MIRText -RelativePath "prototypes/mir/settings/stage_bu
 $registryText = Read-MIRText -RelativePath "prototypes/mir/settings/registry.lua"
 $visibilityText = Read-MIRText -RelativePath "prototypes/mir/settings/visibility.lua"
 $builderText = Read-MIRText -RelativePath "prototypes/mir/settings/builder.lua"
-$adapterText = Read-MIRText -RelativePath "prototypes/mir/settings/legacy_adapter.lua"
+$adapterText = Read-MIRText -RelativePath "prototypes/mir/settings/stage_adapter.lua"
 $profileCodecText = Read-MIRText -RelativePath "prototypes/mir/settings/profile_codec.lua"
 $effectiveSettingsText = Read-MIRText -RelativePath "prototypes/mir/settings/effective.lua"
-$controlSettingsProfileText = Read-MIRText -RelativePath "control/settings-profile.lua"
+$runtimeSettingsProfileText = Read-MIRText -RelativePath "prototypes/mir/runtime/settings_profile.lua"
 $userSettingsDocText = Read-MIRText -RelativePath "docs/user/settings.md"
 $referenceSettingsDocText = Read-MIRText -RelativePath "docs/reference/settings.md"
 $settingsGovernanceDocText = Read-MIRText -RelativePath "docs/maintainer/settings-governance.md"
@@ -96,17 +96,17 @@ Assert-Contains -RelativePath "prototypes/mir/settings/visibility.lua" -Text $vi
 Assert-Contains -RelativePath "prototypes/mir/settings/visibility.lua" -Text $visibilityText -Needle 'mode == "visible-if-mods-all"'
 Assert-Contains -RelativePath "prototypes/mir/settings/visibility.lua" -Text $visibilityText -Needle 'mode == "visible-if-mods-any-or-always-on-base"'
 Assert-Contains -RelativePath "prototypes/mir/settings/builder.lua" -Text $builderText -Needle "setting.hidden = true"
-Assert-Contains -RelativePath "prototypes/mir/settings/legacy_adapter.lua" -Text $adapterText -Needle "factorio_mods.snapshot()"
+Assert-Contains -RelativePath "prototypes/mir/settings/stage_adapter.lua" -Text $adapterText -Needle "factorio_mods.snapshot()"
 Assert-Contains -RelativePath "prototypes/mir/settings/profile_codec.lua" -Text $profileCodecText -Needle 'M.prefix = "MIRSET1:"'
 Assert-Contains -RelativePath "prototypes/mir/settings/profile_codec.lua" -Text $profileCodecText -Needle 'M.import_setting_name = "mir-settings-profile-import"'
 Assert-Contains -RelativePath "prototypes/mir/settings/profile_codec.lua" -Text $profileCodecText -Needle "function M.current_profile(options)"
 Assert-Contains -RelativePath "prototypes/mir/settings/effective.lua" -Text $effectiveSettingsText -Needle "function M.get(name)"
 Assert-Contains -RelativePath "prototypes/mir/settings/effective.lua" -Text $effectiveSettingsText -Needle "type_matches(imported, raw_setting(name))"
-Assert-Contains -RelativePath "control/settings-profile.lua" -Text $controlSettingsProfileText -Needle '"mir-settings-export"'
-Assert-Contains -RelativePath "control/settings-profile.lua" -Text $controlSettingsProfileText -Needle '"mir-settings-import-check"'
-Assert-Contains -RelativePath "control/settings-profile.lua" -Text $controlSettingsProfileText -Needle 'script-output/" .. filename'
-Assert-Contains -RelativePath "control/settings-profile.lua" -Text $controlSettingsProfileText -Needle 'remote.add_interface("more-infinite-research-settings"'
-Assert-Contains -RelativePath "prototypes/mir/settings/stage_builder.lua" -Text $stageBuilderText -Needle 'local settings_adapter = require("prototypes.mir.settings.legacy_adapter")'
+Assert-Contains -RelativePath "prototypes/mir/runtime/settings_profile.lua" -Text $runtimeSettingsProfileText -Needle '"mir-settings-export"'
+Assert-Contains -RelativePath "prototypes/mir/runtime/settings_profile.lua" -Text $runtimeSettingsProfileText -Needle '"mir-settings-import-check"'
+Assert-Contains -RelativePath "prototypes/mir/runtime/settings_profile.lua" -Text $runtimeSettingsProfileText -Needle 'script-output/" .. filename'
+Assert-Contains -RelativePath "prototypes/mir/runtime/settings_profile.lua" -Text $runtimeSettingsProfileText -Needle 'remote.add_interface("more-infinite-research-settings"'
+Assert-Contains -RelativePath "prototypes/mir/settings/stage_builder.lua" -Text $stageBuilderText -Needle 'local settings_adapter = require("prototypes.mir.settings.stage_adapter")'
 Assert-Contains -RelativePath "prototypes/mir/settings/stage_builder.lua" -Text $stageBuilderText -Needle 'name = "mir-settings-profile-import"'
 Assert-Contains -RelativePath "prototypes/mir/settings/stage_builder.lua" -Text $stageBuilderText -Needle "allow_blank = true"
 Assert-Contains -RelativePath "prototypes/mir/settings/stage_builder.lua" -Text $stageBuilderText -Needle "settings_adapter.visibility_for_stream(stream, settings_context)"

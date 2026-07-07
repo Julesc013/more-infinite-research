@@ -63,8 +63,7 @@ function Get-MIRDataFinalFixesSourceText {
   return Get-MIRCombinedSourceText -RelativePaths @(
     "data-final-fixes.lua",
     "prototypes/mir/stage/data_final_fixes.lua",
-    "prototypes/mir/stage/data_final_fixes_steps.lua",
-    "prototypes/mir/legacy/data_final_fixes.lua"
+    "prototypes/mir/stage/data_final_fixes_steps.lua"
   )
 }
 
@@ -277,13 +276,13 @@ Invoke-RepoCheck "local image assets have source notes and do not bundle Space A
 Invoke-RepoCheck "control runtime avoids tick handlers" {
   $luaFiles = @()
   $controlLua = Join-Path $repo "control.lua"
-  $controlDir = Join-Path $repo "control"
+  $runtimeDir = Join-Path $repo "prototypes\mir\runtime"
 
   if (Test-Path -LiteralPath $controlLua) {
     $luaFiles += Get-Item -LiteralPath $controlLua
   }
-  if (Test-Path -LiteralPath $controlDir) {
-    $luaFiles += @(Get-ChildItem -LiteralPath $controlDir -Recurse -File -Filter "*.lua")
+  if (Test-Path -LiteralPath $runtimeDir) {
+    $luaFiles += @(Get-ChildItem -LiteralPath $runtimeDir -Recurse -File -Filter "*.lua")
   }
 
   $matches = @(
@@ -314,9 +313,8 @@ Invoke-RepoCheck "unsafe pickup reach technology effects are blocked" {
   }
 
   $safetyText = Get-Content -Raw -LiteralPath $safetyPath
-  $techGenText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\tech-gen.lua")
   $directEffectsPlannerText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\planner\direct_effects.lua")
-  $streamAdapterText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\emit\legacy_stream_adapter.lua")
+  $streamAdapterText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\emit\stream_spec_adapter.lua")
   $baseExtensionsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\emit\base_extensions.lua")
   $dataFinalFixesText = Get-MIRDataFinalFixesSourceText
   $generationIntegrityFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-generation-integrity\data-final-fixes.lua")
@@ -329,7 +327,7 @@ Invoke-RepoCheck "unsafe pickup reach technology effects are blocked" {
 
   $requiredGuardSnippets = @(
     @{ File = "prototypes\mir\planner\direct_effects.lua"; Text = $directEffectsPlannerText; Snippet = 'effect_safety.assert_effect_allowed(effect, "direct-effect stream " .. key)' },
-    @{ File = "prototypes\mir\emit\legacy_stream_adapter.lua"; Text = $streamAdapterText; Snippet = 'effect_safety.register_generated_technology(technology.name)' },
+    @{ File = "prototypes\mir\emit\stream_spec_adapter.lua"; Text = $streamAdapterText; Snippet = 'effect_safety.register_generated_technology(technology.name)' },
     @{ File = "prototypes\mir\emit\base_extensions.lua"; Text = $baseExtensionsText; Snippet = 'effect_safety.assert_effects_allowed(desired_effects, "base extension " .. key)' },
     @{ File = "prototypes\mir\emit\base_extensions.lua"; Text = $baseExtensionsText; Snippet = 'effect_safety.register_generated_technology(new.name)' },
     @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'require("prototypes.mir.emit.effect_safety").assert_registered_technology_effects()' },
@@ -445,10 +443,10 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
   $settingsRegistryText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\settings\registry.lua")
   $settingsVisibilityText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\settings\visibility.lua")
   $settingsBuilderText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\settings\builder.lua")
-  $settingsLegacyAdapterText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\settings\legacy_adapter.lua")
-  $controlSettingsResolverText = Get-Content -Raw -LiteralPath (Join-Path $repo "control\settings-resolver.lua")
-  $spoilageText = Get-Content -Raw -LiteralPath (Join-Path $repo "control\effects\spoilage-preservation.lua")
-  $agriculturalGrowthText = Get-Content -Raw -LiteralPath (Join-Path $repo "control\effects\agricultural-growth-speed.lua")
+  $settingsStageAdapterText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\settings\stage_adapter.lua")
+  $runtimeSettingsResolverText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\runtime\settings_resolver.lua")
+  $spoilageText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\runtime\effects\spoilage_preservation.lua")
+  $agriculturalGrowthText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\runtime\effects\agricultural_growth_speed.lua")
   $scienceText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\capabilities\science_integration\science_packs.lua")
   $scienceSelectorText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\capabilities\science_integration\science_selector.lua")
   $directEffectsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\streams\direct-effects.lua")
@@ -456,7 +454,6 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
   $recipeMatchingText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\capabilities\recipe_productivity\recipe_matching.lua")
   $prototypeLookupText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\platform\factorio\prototype_lookup.lua")
   $technologyIconsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\emit\icon_builder.lua")
-  $techGenText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\tech-gen.lua")
   $plannerCostsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\planner\costs.lua")
   $plannerPrerequisitesText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\planner\prerequisites.lua")
   $plannerRequirementsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\planner\requirements.lua")
@@ -488,7 +485,7 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'name = "mir-use-installed-space-age-icons"' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'order = "a-120"' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'local pipeline_extent_settings = require("prototypes.mir.settings.pipeline_extent")' },
-    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'local settings_adapter = require("prototypes.mir.settings.legacy_adapter")' },
+    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'local settings_adapter = require("prototypes.mir.settings.stage_adapter")' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'name = "mir-pipeline-extent-multiplier"' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'type = "string-setting"' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'allowed_values = pipeline_extent_settings.allowed_values' },
@@ -521,15 +518,15 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "prototypes\mir\settings\visibility.lua"; Text = $settingsVisibilityText; Snippet = 'mode == "visible-if-mods-all"' },
     @{ File = "prototypes\mir\settings\builder.lua"; Text = $settingsBuilderText; Snippet = 'function M.apply_visibility(setting, result)' },
     @{ File = "prototypes\mir\settings\builder.lua"; Text = $settingsBuilderText; Snippet = 'setting.hidden = true' },
-    @{ File = "prototypes\mir\settings\legacy_adapter.lua"; Text = $settingsLegacyAdapterText; Snippet = 'factorio_mods.snapshot()' },
+    @{ File = "prototypes\mir\settings\stage_adapter.lua"; Text = $settingsStageAdapterText; Snippet = 'factorio_mods.snapshot()' },
     @{ File = "prototypes\mir\settings\resolver.lua"; Text = $settingsResolverText; Snippet = 'startup_setting("ips-enable-" .. key)' },
     @{ File = "prototypes\mir\settings\resolver.lua"; Text = $settingsResolverText; Snippet = 'startup_setting("mir-enable-" .. key)' },
-    @{ File = "control\settings-resolver.lua"; Text = $controlSettingsResolverText; Snippet = 'function R.stream_enabled(key)' },
-    @{ File = "control\settings-resolver.lua"; Text = $controlSettingsResolverText; Snippet = 'startup_setting("ips-enable-" .. key)' },
-    @{ File = "control\effects\spoilage-preservation.lua"; Text = $spoilageText; Snippet = 'settings_resolver.stream_enabled(M.stream_key)' },
-    @{ File = "control\effects\spoilage-preservation.lua"; Text = $spoilageText; Snippet = 'spoilage preservation skipped: disabled' },
-    @{ File = "control\effects\agricultural-growth-speed.lua"; Text = $agriculturalGrowthText; Snippet = 'settings_resolver.stream_enabled(M.stream_key)' },
-    @{ File = "control\effects\agricultural-growth-speed.lua"; Text = $agriculturalGrowthText; Snippet = 'agricultural growth speed force state refreshed enabled=' },
+    @{ File = "prototypes\mir\runtime\settings_resolver.lua"; Text = $runtimeSettingsResolverText; Snippet = 'function R.stream_enabled(key)' },
+    @{ File = "prototypes\mir\runtime\settings_resolver.lua"; Text = $runtimeSettingsResolverText; Snippet = 'startup_setting("ips-enable-" .. key)' },
+    @{ File = "prototypes\mir\runtime\effects\spoilage_preservation.lua"; Text = $spoilageText; Snippet = 'settings_resolver.stream_enabled(M.stream_key)' },
+    @{ File = "prototypes\mir\runtime\effects\spoilage_preservation.lua"; Text = $spoilageText; Snippet = 'spoilage preservation skipped: disabled' },
+    @{ File = "prototypes\mir\runtime\effects\agricultural_growth_speed.lua"; Text = $agriculturalGrowthText; Snippet = 'settings_resolver.stream_enabled(M.stream_key)' },
+    @{ File = "prototypes\mir\runtime\effects\agricultural_growth_speed.lua"; Text = $agriculturalGrowthText; Snippet = 'agricultural growth speed force state refreshed enabled=' },
     @{ File = "prototypes\mir\capabilities\science_integration\science_selector.lua"; Text = $scienceSelectorText; Snippet = 'apply_science_pack_ingredient_policy' },
     @{ File = "prototypes\mir\planner\costs.lua"; Text = $plannerCostsText; Snippet = 'settings_resolver.stream_enabled(key, spec)' },
     @{ File = "prototypes\mir\emit\base_extensions.lua"; Text = $baseExtensionsText; Snippet = 'settings_resolver.base_enabled(key, spec)' },
@@ -742,8 +739,8 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'mir-enable-policy-' },
     @{ File = "prototypes\mir\settings\resolver.lua"; Text = $settingsResolverText; Snippet = 'settings-presets' },
     @{ File = "prototypes\mir\settings\resolver.lua"; Text = $settingsResolverText; Snippet = 'Force enabled' },
-    @{ File = "control\settings-resolver.lua"; Text = $controlSettingsResolverText; Snippet = 'settings-presets' },
-    @{ File = "control\settings-resolver.lua"; Text = $controlSettingsResolverText; Snippet = 'mir-enable-policy-' },
+    @{ File = "prototypes\mir\runtime\settings_resolver.lua"; Text = $runtimeSettingsResolverText; Snippet = 'settings-presets' },
+    @{ File = "prototypes\mir\runtime\settings_resolver.lua"; Text = $runtimeSettingsResolverText; Snippet = 'mir-enable-policy-' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-settings-mode=' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-enable-policy-stream=' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-enable-policy-base-tech=' }
@@ -984,31 +981,22 @@ Invoke-RepoCheck "compat audit automation tooling is wired" {
 Invoke-RepoCheck "2.2.0 compiler diagnostics are wired" {
   $dataFinalFixesText = Get-MIRDataFinalFixesSourceText
   $diagnosticsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\report\diagnostics_sink.lua")
-  $diagnosticsShimText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\diagnostics.lua")
-  $factRegistryPath = Join-Path $repo "prototypes\lib\facts\registry.lua"
   $indexRegistryPath = Join-Path $repo "prototypes\mir\index\registry_builder.lua"
   $capabilityRegistryPath = Join-Path $repo "prototypes\mir\capabilities\registry.lua"
   $capabilityContractPath = Join-Path $repo "prototypes\mir\capabilities\contract.lua"
   $capabilityPolicyPath = Join-Path $repo "prototypes\mir\policy\capabilities.lua"
   $schemaPath = Join-Path $repo "prototypes\mir\core\schema.lua"
   $compilerPath = Join-Path $repo "prototypes\mir\planner\compiler.lua"
-  $compilerShimPath = Join-Path $repo "prototypes\planner\compiler.lua"
   $converterText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\Convert-MIRCompatAuditResults.ps1")
   $overnightSummaryText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\Show-MIROvernightSummary.ps1")
   $compatPlannerText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\compatibility\planner.lua")
   $policyLintText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\Test-MIRPolicyLints.ps1")
 
-  if (-not (Test-Path -LiteralPath $factRegistryPath)) {
-    throw "Missing legacy typed fact registry shim: prototypes\lib\facts\registry.lua"
-  }
   if (-not (Test-Path -LiteralPath $indexRegistryPath)) {
     throw "Missing MIR index registry builder: prototypes\mir\index\registry_builder.lua"
   }
   if (-not (Test-Path -LiteralPath $compilerPath)) {
     throw "Missing compiler diagnostics module: prototypes\mir\planner\compiler.lua"
-  }
-  if (-not (Test-Path -LiteralPath $compilerShimPath)) {
-    throw "Missing legacy compiler diagnostics shim: prototypes\planner\compiler.lua"
   }
   if (-not (Test-Path -LiteralPath $capabilityRegistryPath)) {
     throw "Missing capability registry: prototypes\mir\capabilities\registry.lua"
@@ -1019,7 +1007,6 @@ Invoke-RepoCheck "2.2.0 compiler diagnostics are wired" {
     }
   }
 
-  $factRegistryText = Get-Content -Raw -LiteralPath $factRegistryPath
   $indexRegistryText = Get-Content -Raw -LiteralPath $indexRegistryPath
   $decisionRecordText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\domain\decisions\decision_record.lua")
   $decisionExportText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\report\decision_export.lua")
@@ -1028,11 +1015,9 @@ Invoke-RepoCheck "2.2.0 compiler diagnostics are wired" {
   $capabilityPolicyText = Get-Content -Raw -LiteralPath $capabilityPolicyPath
   $schemaText = Get-Content -Raw -LiteralPath $schemaPath
   $compilerText = Get-Content -Raw -LiteralPath $compilerPath
-  $compilerShimText = Get-Content -Raw -LiteralPath $compilerShimPath
 
   $requiredSnippets = @(
     @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'require("prototypes.mir.planner.compiler").emit()' },
-    @{ File = "prototypes\diagnostics.lua"; Text = $diagnosticsShimText; Snippet = 'return require("prototypes.mir.report.diagnostics_sink")' },
     @{ File = "prototypes\mir\report\diagnostics_sink.lua"; Text = $diagnosticsText; Snippet = 'function D.decision(row)' },
     @{ File = "prototypes\mir\report\diagnostics_sink.lua"; Text = $diagnosticsText; Snippet = 'schema.decision(row)' },
     @{ File = "prototypes\mir\report\diagnostics_sink.lua"; Text = $diagnosticsText; Snippet = '.. " capability=" .. tostring(row.capability or "")' },
@@ -1040,7 +1025,6 @@ Invoke-RepoCheck "2.2.0 compiler diagnostics are wired" {
     @{ File = "prototypes\mir\report\diagnostics_sink.lua"; Text = $diagnosticsText; Snippet = 'append("rule_mutation", row)' },
     @{ File = "prototypes\mir\report\diagnostics_sink.lua"; Text = $diagnosticsText; Snippet = 'append("loop_risk", row)' },
     @{ File = "prototypes\mir\report\diagnostics_sink.lua"; Text = $diagnosticsText; Snippet = 'append("lab_matrix", row)' },
-    @{ File = "prototypes\lib\facts\registry.lua"; Text = $factRegistryText; Snippet = 'return require("prototypes.mir.index.registry_builder")' },
     @{ File = "prototypes\mir\index\registry_builder.lua"; Text = $indexRegistryText; Snippet = 'RecipeFact' },
     @{ File = "prototypes\mir\index\registry_builder.lua"; Text = $indexRegistryText; Snippet = 'RuleMutationFact' },
     @{ File = "prototypes\mir\index\registry_builder.lua"; Text = $indexRegistryText; Snippet = 'schema = schema.fact_registry' },
@@ -1062,7 +1046,6 @@ Invoke-RepoCheck "2.2.0 compiler diagnostics are wired" {
     @{ File = "prototypes\mir\capabilities\registry.lua"; Text = $capabilityRegistryText; Snippet = 'id = "native-modifier-ownership"' },
     @{ File = "prototypes\mir\capabilities\registry.lua"; Text = $capabilityRegistryText; Snippet = 'entity_backed_candidates' },
     @{ File = "prototypes\mir\capabilities\registry.lua"; Text = $capabilityRegistryText; Snippet = 'discover,classify,propose,validate,emit,diagnose' },
-    @{ File = "prototypes\planner\compiler.lua"; Text = $compilerShimText; Snippet = 'return require("prototypes.mir.planner.compiler")' },
     @{ File = "prototypes\mir\planner\compiler.lua"; Text = $compilerText; Snippet = 'local decision_export = require("prototypes.mir.report.decision_export")' },
     @{ File = "prototypes\mir\planner\compiler.lua"; Text = $compilerText; Snippet = 'require("prototypes.mir.index.registry_builder")' },
     @{ File = "prototypes\mir\planner\compiler.lua"; Text = $compilerText; Snippet = 'D.fact_registry({' },
@@ -1104,21 +1087,19 @@ Invoke-RepoCheck "Air Scrubbing clean-filter policy is wired" {
   $plannerPrerequisitesText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\planner\prerequisites.lua")
   $diagnosticsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\report\diagnostics_sink.lua")
   $converterText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\Convert-MIRCompatAuditResults.ps1")
-  $airScrubbingPolicyPath = Join-Path $repo "prototypes\compat\air-scrubbing.lua"
   $exactRecipePolicyPath = Join-Path $repo "prototypes\mir\compatibility\diagnostics\exact_recipe_policy.lua"
   $airScrubbingDiagnosticsPath = Join-Path $repo "prototypes\mir\compatibility\diagnostics\air_scrubbing.lua"
   $atanAshDiagnosticsPath = Join-Path $repo "prototypes\mir\compatibility\diagnostics\atan_ash.lua"
   $compatibilityDiagnosticsReportPath = Join-Path $repo "prototypes\mir\report\compatibility_diagnostics.lua"
-  $manifestPath = Join-Path $repo "prototypes\planner\generated-stream-manifest.json"
+  $manifestPath = Join-Path $repo "prototypes\mir\streams\generated_stream_manifest.json"
   $fixturePath = Join-Path $repo "fixtures\assert-air-scrubbing-clean-filter\data-final-fixes.lua"
 
-  foreach ($path in @($airScrubbingPolicyPath, $exactRecipePolicyPath, $airScrubbingDiagnosticsPath, $atanAshDiagnosticsPath, $compatibilityDiagnosticsReportPath, $manifestPath, $fixturePath)) {
+  foreach ($path in @($exactRecipePolicyPath, $airScrubbingDiagnosticsPath, $atanAshDiagnosticsPath, $compatibilityDiagnosticsReportPath, $manifestPath, $fixturePath)) {
     if (-not (Test-Path -LiteralPath $path)) {
       throw "Missing Air Scrubbing policy artifact: $path"
     }
   }
 
-  $airScrubbingPolicyText = Get-Content -Raw -LiteralPath $airScrubbingPolicyPath
   $exactRecipePolicyText = Get-Content -Raw -LiteralPath $exactRecipePolicyPath
   $airScrubbingDiagnosticsText = Get-Content -Raw -LiteralPath $airScrubbingDiagnosticsPath
   $atanAshDiagnosticsText = Get-Content -Raw -LiteralPath $atanAshDiagnosticsPath
@@ -1138,7 +1119,6 @@ Invoke-RepoCheck "Air Scrubbing clean-filter policy is wired" {
     @{ File = "prototypes\mir\report\diagnostics_sink.lua"; Text = $diagnosticsText; Snippet = '.. " rejected=" .. tostring(row.rejected or "")' },
     @{ File = "scripts\Convert-MIRCompatAuditResults.ps1"; Text = $converterText; Snippet = 'rejected = [string](Get-MIRObjectProperty -Object $row -Name "rejected")' },
     @{ File = "scripts\Convert-MIRCompatAuditResults.ps1"; Text = $converterText; Snippet = 'generated,rejected,unknown,missing,module_slots' },
-    @{ File = "prototypes\compat\air-scrubbing.lua"; Text = $airScrubbingPolicyText; Snippet = 'return require("prototypes.mir.compatibility.diagnostics.air_scrubbing")' },
     @{ File = "prototypes\mir\compatibility\diagnostics\exact_recipe_policy.lua"; Text = $exactRecipePolicyText; Snippet = 'require("prototypes.mir.platform.factorio.data_raw")' },
     @{ File = "prototypes\mir\compatibility\diagnostics\exact_recipe_policy.lua"; Text = $exactRecipePolicyText; Snippet = 'require("prototypes.mir.report.compatibility_diagnostics")' },
     @{ File = "prototypes\mir\compatibility\diagnostics\exact_recipe_policy.lua"; Text = $exactRecipePolicyText; Snippet = 'overlay_loader.get(config.overlay_id)' },
@@ -1160,10 +1140,10 @@ Invoke-RepoCheck "Air Scrubbing clean-filter policy is wired" {
     @{ File = "prototypes\mir\compatibility\diagnostics\atan_ash.lua"; Text = $atanAshDiagnosticsText; Snippet = 'risk = "ash_sink"' },
     @{ File = "prototypes\mir\report\compatibility_diagnostics.lua"; Text = $compatibilityDiagnosticsReportText; Snippet = 'decision_export.emit(sink, row)' },
     @{ File = "prototypes\mir\report\compatibility_diagnostics.lua"; Text = $compatibilityDiagnosticsReportText; Snippet = 'sink.compatibility_plan(row)' },
-    @{ File = "prototypes\planner\generated-stream-manifest.json"; Text = $manifestText; Snippet = '"mir-prod-air-scrubbing-clean-filter"' },
-    @{ File = "prototypes\planner\generated-stream-manifest.json"; Text = $manifestText; Snippet = '"source": "compat_policy:air-scrubbing"' },
-    @{ File = "prototypes\planner\generated-stream-manifest.json"; Text = $manifestText; Snippet = '"atan-pollution-filter"' },
-    @{ File = "prototypes\planner\generated-stream-manifest.json"; Text = $manifestText; Snippet = '"atan-spore-filter"' },
+    @{ File = "prototypes\mir\streams\generated_stream_manifest.json"; Text = $manifestText; Snippet = '"mir-prod-air-scrubbing-clean-filter"' },
+    @{ File = "prototypes\mir\streams\generated_stream_manifest.json"; Text = $manifestText; Snippet = '"source": "compat_policy:air-scrubbing"' },
+    @{ File = "prototypes\mir\streams\generated_stream_manifest.json"; Text = $manifestText; Snippet = '"atan-pollution-filter"' },
+    @{ File = "prototypes\mir\streams\generated_stream_manifest.json"; Text = $manifestText; Snippet = '"atan-spore-filter"' },
     @{ File = "fixtures\assert-air-scrubbing-clean-filter\data-final-fixes.lua"; Text = $fixtureText; Snippet = 'atan-pollution-scrubbing' },
     @{ File = "fixtures\assert-air-scrubbing-clean-filter\data-final-fixes.lua"; Text = $fixtureText; Snippet = 'atan-filter-resin' }
   )
@@ -1458,7 +1438,6 @@ Invoke-RepoCheck "generated package archive matches metadata" {
       "${root}data-updates.lua",
       "${root}data-final-fixes.lua",
       "${root}settings.lua",
-      "${root}defaults.lua",
       "${root}locale/en/more-infinite-research.cfg",
       "${root}migrations/more-infinite-research_2.0.5.json"
     )
@@ -1510,11 +1489,10 @@ Invoke-RepoCheck "generated package archive matches metadata" {
       "data-updates.lua",
       "data-final-fixes.lua",
       "settings.lua",
-      "defaults.lua",
       "thumbnail.png"
     )
 
-    foreach ($directory in @("control", "locale", "migrations", "prototypes")) {
+    foreach ($directory in @("locale", "migrations", "prototypes")) {
       $directoryPath = Join-Path $repo $directory
       if (Test-Path -LiteralPath $directoryPath) {
         $mustMatchRepo += @(
@@ -1656,7 +1634,6 @@ function Copy-RepositoryModDirectory {
     "data-final-fixes.lua",
     "data-updates.lua",
     "data.lua",
-    "defaults.lua",
     "info.json",
     "LICENSE",
     "README.md",
@@ -1664,7 +1641,6 @@ function Copy-RepositoryModDirectory {
     "thumbnail.png"
   )
   $directories = @(
-    "control",
     "migrations",
     "locale",
     "prototypes"
@@ -1754,7 +1730,6 @@ function Get-CopiedSettingsImplementationPath {
 
   $candidates = @(
     "more-infinite-research\prototypes\mir\settings\stage_builder.lua",
-    "more-infinite-research\prototypes\mir\legacy\settings.lua",
     "more-infinite-research\settings.lua"
   )
 

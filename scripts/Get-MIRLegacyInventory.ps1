@@ -11,6 +11,10 @@ param(
   [int]$MaxRequiresConfig = 0,
   [int]$MaxRequiresUtil = 0,
   [int]$MaxRequiresDiagnostics = 0,
+  [int]$MaxShimDirectoriesPresent = 0,
+  [int]$MaxOldRootHelperFilesPresent = 0,
+  [int]$MaxRuntimeControlLuaFiles = 0,
+  [int]$MaxDataExtendOutsideAllowed = 0,
   [int]$MaxDataRawOutsidePlatform = 0,
   [int]$MaxGeneratedStreamsWithoutManifest = 0
 )
@@ -49,7 +53,6 @@ function Test-MIRShimOnlyLua {
 
 function Get-MIRLuaFiles {
   $roots = @(
-    "control",
     "prototypes"
   )
 
@@ -162,6 +165,35 @@ $legacyModules = @(Get-MIRModuleInventory -RelativeRoot "prototypes\mir\legacy" 
 $compatModules = @(Get-MIRModuleInventory -RelativeRoot "prototypes\compat" -Label "compat-shim")
 $libModules = @(Get-MIRModuleInventory -RelativeRoot "prototypes\lib" -Label "lib")
 
+$shimDirectories = @(
+  "control",
+  "prototypes\compat",
+  "prototypes\lib",
+  "prototypes\mir\legacy",
+  "prototypes\planner"
+) | Where-Object { Test-Path -LiteralPath (Join-Path $repo $_) }
+
+$oldRootHelperFiles = @(
+  "defaults.lua",
+  "prototypes\base-tech-extensions.lua",
+  "prototypes\config.lua",
+  "prototypes\diagnostics.lua",
+  "prototypes\max-level-control.lua",
+  "prototypes\pipeline-extent.lua",
+  "prototypes\pipeline-extent-settings.lua",
+  "prototypes\settings-resolver.lua",
+  "prototypes\tech-gen.lua",
+  "prototypes\technology-effect-safety.lua",
+  "prototypes\util.lua",
+  "prototypes\weapon-speed-adjustments.lua"
+) | Where-Object { Test-Path -LiteralPath (Join-Path $repo $_) }
+
+$runtimeControlLuaFiles = @()
+$controlDir = Join-Path $repo "control"
+if (Test-Path -LiteralPath $controlDir) {
+  $runtimeControlLuaFiles = @(Get-ChildItem -LiteralPath $controlDir -Recurse -File -Filter "*.lua")
+}
+
 $legacyRequires = @(Get-MIRMatches -Files $luaFiles -Pattern 'require\("prototypes\.mir\.legacy')
 $compatRequires = @(Get-MIRMatches -Files $luaFiles -Pattern 'require\("prototypes\.compat')
 $libRequires = @(Get-MIRMatches -Files $luaFiles -Pattern 'require\("prototypes\.lib')
@@ -170,6 +202,10 @@ $utilRequires = @(Get-MIRMatches -Files $luaFiles -Pattern 'require\("prototypes
 $diagnosticsRequires = @(Get-MIRMatches -Files $luaFiles -Pattern 'require\("prototypes\.diagnostics"\)')
 $dataExtendMatches = @(Get-MIRMatches -Files $luaFiles -Pattern 'data:extend')
 $dataRawMatches = @(Get-MIRMatches -Files $luaFiles -Pattern 'data\.raw')
+$dataExtendOutsideAllowed = @(Get-MIRMatchesOutsideRoots -Matches $dataExtendMatches -AllowedRoots @(
+  "prototypes/mir/platform/factorio/",
+  "prototypes/mir/settings/stage_builder.lua"
+))
 $dataRawOutsidePlatform = @(Get-MIRMatchesOutsideRoots -Matches $dataRawMatches -AllowedRoots @(
   "prototypes/mir/platform/factorio/"
 ))
@@ -178,7 +214,7 @@ $sourceStreamKeys = @(
   Get-MIRStreamKeysFromSource -Path (Join-Path $repo "prototypes\streams\productivity.lua")
   Get-MIRStreamKeysFromSource -Path (Join-Path $repo "prototypes\streams\direct-effects.lua")
 )
-$manifestPath = Join-Path $repo "prototypes\planner\generated-stream-manifest.json"
+$manifestPath = Join-Path $repo "prototypes\mir\streams\generated_stream_manifest.json"
 $manifestRows = @()
 if (Test-Path -LiteralPath $manifestPath) {
   $manifest = Get-Content -Raw -LiteralPath $manifestPath | ConvertFrom-Json
@@ -210,7 +246,11 @@ $shipped = [pscustomobject]@{
     requires_config = $configRequires.Count
     requires_util = $utilRequires.Count
     requires_diagnostics = $diagnosticsRequires.Count
+    shim_directories_present = $shimDirectories.Count
+    old_root_helper_files_present = $oldRootHelperFiles.Count
+    runtime_control_lua_files = $runtimeControlLuaFiles.Count
     data_extend_matches = $dataExtendMatches.Count
+    data_extend_matches_outside_allowed = $dataExtendOutsideAllowed.Count
     data_raw_matches = $dataRawMatches.Count
     data_raw_matches_outside_platform = $dataRawOutsidePlatform.Count
     source_stream_keys = $sourceStreamKeys.Count
@@ -231,8 +271,14 @@ $shipped = [pscustomobject]@{
   }
   prototype_access = [pscustomobject]@{
     data_extend = $dataExtendMatches
+    data_extend_outside_allowed = $dataExtendOutsideAllowed
     data_raw = $dataRawMatches
     data_raw_outside_platform = $dataRawOutsidePlatform
+  }
+  obsolete_paths = [pscustomobject]@{
+    shim_directories = @($shimDirectories | ForEach-Object { $_.Replace("\", "/") })
+    old_root_helper_files = @($oldRootHelperFiles | ForEach-Object { $_.Replace("\", "/") })
+    runtime_control_lua_files = @($runtimeControlLuaFiles | ForEach-Object { Get-MIRRelativePath -Path $_.FullName })
   }
   thresholds = [pscustomobject]@{
     max_mir_legacy_active_modules = $MaxMirLegacyActiveModules
@@ -244,6 +290,10 @@ $shipped = [pscustomobject]@{
     max_requires_config = $MaxRequiresConfig
     max_requires_util = $MaxRequiresUtil
     max_requires_diagnostics = $MaxRequiresDiagnostics
+    max_shim_directories_present = $MaxShimDirectoriesPresent
+    max_old_root_helper_files_present = $MaxOldRootHelperFilesPresent
+    max_runtime_control_lua_files = $MaxRuntimeControlLuaFiles
+    max_data_extend_matches_outside_allowed = $MaxDataExtendOutsideAllowed
     max_data_raw_matches_outside_platform = $MaxDataRawOutsidePlatform
     max_generated_streams_without_manifest = $MaxGeneratedStreamsWithoutManifest
   }
@@ -260,6 +310,10 @@ if ($CheckThresholds) {
   Assert-MIRLegacyThreshold -Name "requires_config" -Actual ([int]$shipped.counts.requires_config) -Maximum $MaxRequiresConfig
   Assert-MIRLegacyThreshold -Name "requires_util" -Actual ([int]$shipped.counts.requires_util) -Maximum $MaxRequiresUtil
   Assert-MIRLegacyThreshold -Name "requires_diagnostics" -Actual ([int]$shipped.counts.requires_diagnostics) -Maximum $MaxRequiresDiagnostics
+  Assert-MIRLegacyThreshold -Name "shim_directories_present" -Actual ([int]$shipped.counts.shim_directories_present) -Maximum $MaxShimDirectoriesPresent
+  Assert-MIRLegacyThreshold -Name "old_root_helper_files_present" -Actual ([int]$shipped.counts.old_root_helper_files_present) -Maximum $MaxOldRootHelperFilesPresent
+  Assert-MIRLegacyThreshold -Name "runtime_control_lua_files" -Actual ([int]$shipped.counts.runtime_control_lua_files) -Maximum $MaxRuntimeControlLuaFiles
+  Assert-MIRLegacyThreshold -Name "data_extend_matches_outside_allowed" -Actual ([int]$shipped.counts.data_extend_matches_outside_allowed) -Maximum $MaxDataExtendOutsideAllowed
   Assert-MIRLegacyThreshold -Name "data_raw_matches_outside_platform" -Actual ([int]$shipped.counts.data_raw_matches_outside_platform) -Maximum $MaxDataRawOutsidePlatform
   Assert-MIRLegacyThreshold -Name "generated_streams_without_manifest" -Actual ([int]$shipped.counts.generated_streams_without_manifest) -Maximum $MaxGeneratedStreamsWithoutManifest
 }

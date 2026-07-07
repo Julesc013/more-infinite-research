@@ -41,11 +41,20 @@ function Assert-MIRContains {
   }
 }
 
+function Assert-MIRAbsent {
+  param([Parameter(Mandatory)][string]$RelativePath)
+  $path = Get-MIRPath -RelativePath $RelativePath
+  if (Test-Path -LiteralPath $path) {
+    throw "Obsolete MIR 3 shim path must be absent: $RelativePath"
+  }
+}
+
 function Assert-MIRNoPatternInLuaTree {
   param(
     [Parameter(Mandatory)][string]$RelativeRoot,
     [Parameter(Mandatory)][string]$Pattern,
-    [Parameter(Mandatory)][string]$Message
+    [Parameter(Mandatory)][string]$Message,
+    [string[]]$ExcludeRelative = @()
   )
 
   $root = Get-MIRPath -RelativePath $RelativeRoot
@@ -53,6 +62,10 @@ function Assert-MIRNoPatternInLuaTree {
 
   $matches = @(
     Get-ChildItem -LiteralPath $root -Recurse -File -Filter "*.lua" |
+      Where-Object {
+        $relative = [System.IO.Path]::GetRelativePath($repo, $_.FullName).Replace("\", "/")
+        $ExcludeRelative -notcontains $relative
+      } |
       Select-String -Pattern $Pattern
   )
   if ($matches.Count -gt 0) {
@@ -101,13 +114,13 @@ $entrypoints = @(
     Root = "data-final-fixes.lua"
     StageModule = "prototypes.mir.stage.data_final_fixes"
     StagePath = "prototypes/mir/stage/data_final_fixes.lua"
-    LegacyModule = "prototypes.mir.legacy.data_final_fixes"
+    StageNeedle = 'require("prototypes.mir.stage.data_final_fixes_steps")'
   },
   @{
     Root = "control.lua"
     StageModule = "prototypes.mir.stage.control"
     StagePath = "prototypes/mir/stage/control.lua"
-    LegacyModule = "prototypes.mir.legacy.control"
+    StageNeedle = 'require("prototypes.mir.runtime.scripted_techs").register()'
   }
 )
 
@@ -125,68 +138,54 @@ foreach ($entry in $entrypoints) {
 
   $stageText = Read-MIRFile -RelativePath $entry.StagePath
   Assert-MIRContains -RelativePath $entry.StagePath -Text $stageText -Needle "function M.run()"
-  if ($entry.Root -eq "control.lua") {
-    Assert-MIRContains -RelativePath $entry.StagePath -Text $stageText -Needle "assert_runtime_stage()"
-    Assert-MIRContains -RelativePath $entry.StagePath -Text $stageText -Needle 'require("control.scripted-techs").register()'
-    Assert-MIRContains -RelativePath $entry.StagePath -Text $stageText -Needle 'require("control.settings-profile").register()'
-  } elseif ($entry.Root -eq "data-final-fixes.lua") {
-    Assert-MIRContains -RelativePath $entry.StagePath -Text $stageText -Needle 'require("prototypes.mir.stage.data_final_fixes_steps")'
-  } elseif ($entry.ContainsKey("StageNeedle")) {
-    Assert-MIRContains -RelativePath $entry.StagePath -Text $stageText -Needle $entry.StageNeedle
-  } else {
-    Assert-MIRContains -RelativePath $entry.StagePath -Text $stageText -Needle ('require("' + $entry.LegacyModule + '")')
-  }
+  Assert-MIRContains -RelativePath $entry.StagePath -Text $stageText -Needle $entry.StageNeedle
 }
 
-$dataFinalFixesStagePath = "prototypes/mir/stage/data_final_fixes.lua"
-$dataFinalFixesStepsPath = "prototypes/mir/stage/data_final_fixes_steps.lua"
-$dataFinalFixesStageText = Read-MIRFile -RelativePath $dataFinalFixesStagePath
-Assert-MIRContains -RelativePath $dataFinalFixesStagePath -Text $dataFinalFixesStageText -Needle "steps.apply_pipeline_extent()"
-Assert-MIRContains -RelativePath $dataFinalFixesStagePath -Text $dataFinalFixesStageText -Needle "steps.emit_streams()"
-Assert-MIRContains -RelativePath $dataFinalFixesStagePath -Text $dataFinalFixesStageText -Needle 'require("prototypes.mir.compatibility.diagnostics.registry").emit_all()'
-Assert-MIRContains -RelativePath $dataFinalFixesStagePath -Text $dataFinalFixesStageText -Needle 'require("prototypes.mir.planner.compiler").emit()'
-Assert-MIRContains -RelativePath $dataFinalFixesStagePath -Text $dataFinalFixesStageText -Needle "steps.flush_diagnostics()"
-if ($dataFinalFixesStageText.Contains('require("prototypes.mir.compatibility.diagnostics.atan_ash").emit()')) {
-  throw "$dataFinalFixesStagePath must emit exact overlay diagnostics through the diagnostics registry."
+$controlStageText = Read-MIRFile -RelativePath "prototypes/mir/stage/control.lua"
+Assert-MIRContains -RelativePath "prototypes/mir/stage/control.lua" -Text $controlStageText -Needle "assert_runtime_stage()"
+Assert-MIRContains -RelativePath "prototypes/mir/stage/control.lua" -Text $controlStageText -Needle 'require("prototypes.mir.runtime.settings_profile").register()'
+
+foreach ($relative in @(
+  "prototypes/compat",
+  "prototypes/lib",
+  "prototypes/mir/legacy",
+  "prototypes/planner",
+  "control",
+  "defaults.lua",
+  "prototypes/base-tech-extensions.lua",
+  "prototypes/config.lua",
+  "prototypes/diagnostics.lua",
+  "prototypes/max-level-control.lua",
+  "prototypes/pipeline-extent.lua",
+  "prototypes/pipeline-extent-settings.lua",
+  "prototypes/settings-resolver.lua",
+  "prototypes/tech-gen.lua",
+  "prototypes/technology-effect-safety.lua",
+  "prototypes/util.lua",
+  "prototypes/weapon-speed-adjustments.lua"
+)) {
+  Assert-MIRAbsent -RelativePath $relative
 }
 
-$dataFinalFixesStepsText = Read-MIRFile -RelativePath $dataFinalFixesStepsPath
-Assert-MIRContains -RelativePath $dataFinalFixesStepsPath -Text $dataFinalFixesStepsText -Needle "function M.apply_pipeline_extent()"
-Assert-MIRContains -RelativePath $dataFinalFixesStepsPath -Text $dataFinalFixesStepsText -Needle 'require("prototypes.mir.pipeline.extent").apply(pipeline_extent_multiplier)'
-Assert-MIRContains -RelativePath $dataFinalFixesStepsPath -Text $dataFinalFixesStepsText -Needle 'require("prototypes.mir.policy.competing_productivity").prepare()'
-Assert-MIRContains -RelativePath $dataFinalFixesStepsPath -Text $dataFinalFixesStepsText -Needle 'require("prototypes.mir.policy.competing_productivity").apply()'
-Assert-MIRContains -RelativePath $dataFinalFixesStepsPath -Text $dataFinalFixesStepsText -Needle 'require("prototypes.mir.policy.competing_base_extensions").apply()'
-Assert-MIRContains -RelativePath $dataFinalFixesStepsPath -Text $dataFinalFixesStepsText -Needle 'require("prototypes.mir.policy.max_level").apply()'
-Assert-MIRContains -RelativePath $dataFinalFixesStepsPath -Text $dataFinalFixesStepsText -Needle 'require("prototypes.mir.policy.weapon_speed").apply()'
-Assert-MIRContains -RelativePath $dataFinalFixesStepsPath -Text $dataFinalFixesStepsText -Needle "function M.emit_streams()"
-Assert-MIRContains -RelativePath $dataFinalFixesStepsPath -Text $dataFinalFixesStepsText -Needle 'require("prototypes.mir.planner.stream_compiler").run()'
-Assert-MIRContains -RelativePath $dataFinalFixesStepsPath -Text $dataFinalFixesStepsText -Needle 'require("prototypes.mir.emit.base_extensions").emit_all()'
-Assert-MIRContains -RelativePath $dataFinalFixesStepsPath -Text $dataFinalFixesStepsText -Needle 'require("prototypes.mir.compatibility.planner").emit()'
-Assert-MIRContains -RelativePath $dataFinalFixesStepsPath -Text $dataFinalFixesStepsText -Needle "function M.flush_diagnostics()"
-if ($dataFinalFixesStepsText -match 'require\("prototypes\.compat\.') {
-  throw "$dataFinalFixesStepsPath must call MIR-owned compatibility and policy modules, not prototypes.compat shims."
-}
-
-$dataFinalFixesLegacyPath = "prototypes/mir/legacy/data_final_fixes.lua"
-$dataFinalFixesLegacyText = Read-MIRFile -RelativePath $dataFinalFixesLegacyPath
-Assert-MIRContains -RelativePath $dataFinalFixesLegacyPath -Text $dataFinalFixesLegacyText -Needle 'return require("prototypes.mir.stage.data_final_fixes_steps")'
-
-$requiredShims = @(
+$requiredMirFiles = @(
   "prototypes/mir/core/schema.lua",
   "prototypes/mir/core/deepcopy.lua",
   "prototypes/mir/core/table.lua",
   "prototypes/mir/platform/factorio/data_raw.lua",
   "prototypes/mir/platform/factorio/mods.lua",
   "prototypes/mir/platform/factorio/prototype_lookup.lua",
-  "prototypes/mir/pipeline/extent.lua",
+  "prototypes/mir/settings/stage_builder.lua",
   "prototypes/mir/settings/registry.lua",
   "prototypes/mir/settings/defaults.lua",
   "prototypes/mir/settings/visibility.lua",
   "prototypes/mir/settings/builder.lua",
-  "prototypes/mir/settings/legacy_adapter.lua",
+  "prototypes/mir/settings/stage_adapter.lua",
   "prototypes/mir/settings/profile_codec.lua",
   "prototypes/mir/settings/effective.lua",
+  "prototypes/mir/settings/resolver.lua",
+  "prototypes/mir/settings/pipeline_extent.lua",
   "prototypes/mir/streams/registry.lua",
+  "prototypes/mir/pipeline/extent.lua",
   "prototypes/mir/policy/adoption_policy.lua",
   "prototypes/mir/policy/owner_policy.lua",
   "prototypes/mir/policy/competing_productivity.lua",
@@ -198,11 +197,6 @@ $requiredShims = @(
   "prototypes/mir/policy/capabilities.lua",
   "prototypes/mir/index/registry_builder.lua",
   "prototypes/mir/index/productivity_owners.lua",
-  "prototypes/mir/index/recipes.lua",
-  "prototypes/mir/index/technologies.lua",
-  "prototypes/mir/index/labs.lua",
-  "prototypes/mir/index/owners.lua",
-  "prototypes/mir/index/rule_surfaces.lua",
   "prototypes/mir/domain/facts/registry.lua",
   "prototypes/mir/capabilities/contract.lua",
   "prototypes/mir/capabilities/registry.lua",
@@ -210,21 +204,29 @@ $requiredShims = @(
   "prototypes/mir/capabilities/recipe_productivity/recipe_matching.lua",
   "prototypes/mir/capabilities/science_integration/science_packs.lua",
   "prototypes/mir/capabilities/science_integration/science_selector.lua",
-  "prototypes/mir/emit/legacy_stream_adapter.lua",
-  "prototypes/mir/emit/base_extensions.lua",
-  "prototypes/mir/emit/icon_builder.lua",
-  "prototypes/mir/report/decision_export.lua",
-  "prototypes/mir/report/compatibility_diagnostics.lua",
-  "prototypes/mir/report/diagnostics_sink.lua",
   "prototypes/mir/planner/compiler.lua",
+  "prototypes/mir/planner/stream_compiler.lua",
   "prototypes/mir/planner/costs.lua",
   "prototypes/mir/planner/direct_effects.lua",
   "prototypes/mir/planner/native_modifiers.lua",
   "prototypes/mir/planner/prerequisites.lua",
   "prototypes/mir/planner/requirements.lua",
-  "prototypes/mir/planner/technology_requirements.lua",
   "prototypes/mir/planner/science.lua",
-  "prototypes/mir/planner/stream_compiler.lua",
+  "prototypes/mir/emit/stream_spec_adapter.lua",
+  "prototypes/mir/emit/base_extensions.lua",
+  "prototypes/mir/emit/icon_builder.lua",
+  "prototypes/mir/emit/effect_safety.lua",
+  "prototypes/mir/emit/mod_data.lua",
+  "prototypes/mir/emit/technology_builder.lua",
+  "prototypes/mir/report/decision_export.lua",
+  "prototypes/mir/report/compatibility_diagnostics.lua",
+  "prototypes/mir/report/diagnostics_sink.lua",
+  "prototypes/mir/runtime/scripted_techs.lua",
+  "prototypes/mir/runtime/settings_profile.lua",
+  "prototypes/mir/runtime/settings_resolver.lua",
+  "prototypes/mir/runtime/productivity_family_adoption.lua",
+  "prototypes/mir/runtime/effects/spoilage_preservation.lua",
+  "prototypes/mir/runtime/effects/agricultural_growth_speed.lua",
   "prototypes/mir/stage/data_final_fixes_steps.lua",
   "prototypes/mir/compatibility/registry.lua",
   "prototypes/mir/compatibility/profiles.lua",
@@ -236,410 +238,82 @@ $requiredShims = @(
   "prototypes/mir/compatibility/diagnostics/air_scrubbing.lua",
   "prototypes/mir/compatibility/diagnostics/atan_ash.lua",
   "prototypes/mir/compatibility/overlays/air_scrubbing.lua",
-  "prototypes/mir/compatibility/overlays/atan_ash.lua",
-  "prototypes/mir/legacy/stream_emitter.lua",
-  "prototypes/mir/legacy/tech_gen.lua",
-  "prototypes/mir/legacy/recipe_matching.lua",
-  "prototypes/mir/legacy/compat_profiles.lua",
-  "prototypes/mir/legacy/diagnostics.lua",
-  "prototypes/mir/legacy/stream_specs.lua"
+  "prototypes/mir/compatibility/overlays/atan_ash.lua"
 )
 
-foreach ($relative in $requiredShims) {
+foreach ($relative in $requiredMirFiles) {
   $null = Read-MIRFile -RelativePath $relative
 }
 
-$technologyBuilderPath = "prototypes/mir/emit/technology_builder.lua"
-$technologyBuilderText = Read-MIRFile -RelativePath $technologyBuilderPath
-Assert-MIRContains -RelativePath $technologyBuilderPath -Text $technologyBuilderText -Needle 'require("prototypes.mir.platform.factorio.data_raw")'
-Assert-MIRContains -RelativePath $technologyBuilderPath -Text $technologyBuilderText -Needle "data_raw.extend({ technology })"
+$dataFinalFixesStageText = Read-MIRFile -RelativePath "prototypes/mir/stage/data_final_fixes.lua"
+Assert-MIRContains -RelativePath "prototypes/mir/stage/data_final_fixes.lua" -Text $dataFinalFixesStageText -Needle "steps.apply_pipeline_extent()"
+Assert-MIRContains -RelativePath "prototypes/mir/stage/data_final_fixes.lua" -Text $dataFinalFixesStageText -Needle "steps.emit_streams()"
+Assert-MIRContains -RelativePath "prototypes/mir/stage/data_final_fixes.lua" -Text $dataFinalFixesStageText -Needle 'require("prototypes.mir.compatibility.diagnostics.registry").emit_all()'
+Assert-MIRContains -RelativePath "prototypes/mir/stage/data_final_fixes.lua" -Text $dataFinalFixesStageText -Needle 'require("prototypes.mir.planner.compiler").emit()'
+Assert-MIRContains -RelativePath "prototypes/mir/stage/data_final_fixes.lua" -Text $dataFinalFixesStageText -Needle "steps.assert_registered_technology_effects()"
+
+$dataFinalFixesStepsText = Read-MIRFile -RelativePath "prototypes/mir/stage/data_final_fixes_steps.lua"
+foreach ($needle in @(
+  'require("prototypes.mir.settings.pipeline_extent").multiplier()',
+  'require("prototypes.mir.pipeline.extent").apply(pipeline_extent_multiplier)',
+  'require("prototypes.mir.policy.competing_productivity").prepare()',
+  'require("prototypes.mir.planner.stream_compiler").run()',
+  'require("prototypes.mir.emit.base_extensions").emit_all()',
+  'require("prototypes.mir.policy.competing_productivity").apply()',
+  'require("prototypes.mir.policy.competing_base_extensions").apply()',
+  'require("prototypes.mir.policy.weapon_speed").apply()',
+  'require("prototypes.mir.policy.max_level").apply()',
+  'require("prototypes.mir.compatibility.planner").emit()',
+  'require("prototypes.mir.emit.effect_safety").assert_registered_technology_effects()',
+  'require("prototypes.mir.report.diagnostics_sink").flush()'
+)) {
+  Assert-MIRContains -RelativePath "prototypes/mir/stage/data_final_fixes_steps.lua" -Text $dataFinalFixesStepsText -Needle $needle
+}
+
+$technologyBuilderText = Read-MIRFile -RelativePath "prototypes/mir/emit/technology_builder.lua"
+Assert-MIRContains -RelativePath "prototypes/mir/emit/technology_builder.lua" -Text $technologyBuilderText -Needle 'require("prototypes.mir.platform.factorio.data_raw")'
+Assert-MIRContains -RelativePath "prototypes/mir/emit/technology_builder.lua" -Text $technologyBuilderText -Needle "data_raw.extend({ technology })"
 if ($technologyBuilderText -match "data:extend") {
-  throw "$technologyBuilderPath must emit through the platform data_raw adapter."
+  throw "prototypes/mir/emit/technology_builder.lua must emit through the platform data_raw adapter."
 }
 
-$legacyStreamAdapterPath = "prototypes/mir/emit/legacy_stream_adapter.lua"
-$legacyStreamAdapterText = Read-MIRFile -RelativePath $legacyStreamAdapterPath
-Assert-MIRContains -RelativePath $legacyStreamAdapterPath -Text $legacyStreamAdapterText -Needle 'require("prototypes.mir.domain.streams.stream_spec")'
-Assert-MIRContains -RelativePath $legacyStreamAdapterPath -Text $legacyStreamAdapterText -Needle 'require("prototypes.mir.emit.technology_builder")'
-Assert-MIRContains -RelativePath $legacyStreamAdapterPath -Text $legacyStreamAdapterText -Needle "stream_spec.from_legacy_stream({"
-Assert-MIRContains -RelativePath $legacyStreamAdapterPath -Text $legacyStreamAdapterText -Needle "technology_builder.emit(stream)"
+$streamAdapterText = Read-MIRFile -RelativePath "prototypes/mir/emit/stream_spec_adapter.lua"
+Assert-MIRContains -RelativePath "prototypes/mir/emit/stream_spec_adapter.lua" -Text $streamAdapterText -Needle 'require("prototypes.mir.domain.streams.stream_spec")'
+Assert-MIRContains -RelativePath "prototypes/mir/emit/stream_spec_adapter.lua" -Text $streamAdapterText -Needle 'require("prototypes.mir.emit.technology_builder")'
+Assert-MIRContains -RelativePath "prototypes/mir/emit/stream_spec_adapter.lua" -Text $streamAdapterText -Needle "technology_builder.emit(stream)"
 
-$legacyStreamEmitterPath = "prototypes/mir/legacy/stream_emitter.lua"
-$legacyStreamEmitterText = Read-MIRFile -RelativePath $legacyStreamEmitterPath
-Assert-MIRContains -RelativePath $legacyStreamEmitterPath -Text $legacyStreamEmitterText -Needle 'return require("prototypes.mir.emit.legacy_stream_adapter")'
+$modDataText = Read-MIRFile -RelativePath "prototypes/mir/emit/mod_data.lua"
+Assert-MIRContains -RelativePath "prototypes/mir/emit/mod_data.lua" -Text $modDataText -Needle 'require("prototypes.mir.platform.factorio.data_raw")'
+Assert-MIRContains -RelativePath "prototypes/mir/emit/mod_data.lua" -Text $modDataText -Needle "data_raw.extend({"
 
-$legacyTechGenPath = "prototypes/tech-gen.lua"
-$legacyTechGenText = Read-MIRFile -RelativePath $legacyTechGenPath
-Assert-MIRContains -RelativePath $legacyTechGenPath -Text $legacyTechGenText -Needle 'return require("prototypes.mir.planner.stream_compiler").run()'
+$streamCompilerText = Read-MIRFile -RelativePath "prototypes/mir/planner/stream_compiler.lua"
+Assert-MIRContains -RelativePath "prototypes/mir/planner/stream_compiler.lua" -Text $streamCompilerText -Needle 'require("prototypes.mir.streams.registry")'
+Assert-MIRContains -RelativePath "prototypes/mir/planner/stream_compiler.lua" -Text $streamCompilerText -Needle 'require("prototypes.mir.emit.stream_spec_adapter")'
+Assert-MIRContains -RelativePath "prototypes/mir/planner/stream_compiler.lua" -Text $streamCompilerText -Needle "function M.run()"
 
-$legacyCapabilityContractPath = "prototypes/lib/capabilities/contract.lua"
-$legacyCapabilityContractText = Read-MIRFile -RelativePath $legacyCapabilityContractPath
-Assert-MIRContains -RelativePath $legacyCapabilityContractPath -Text $legacyCapabilityContractText -Needle 'return require("prototypes.mir.capabilities.contract")'
+$settingsProfileText = Read-MIRFile -RelativePath "prototypes/mir/runtime/settings_profile.lua"
+Assert-MIRContains -RelativePath "prototypes/mir/runtime/settings_profile.lua" -Text $settingsProfileText -Needle '"mir-settings-export"'
+Assert-MIRContains -RelativePath "prototypes/mir/runtime/settings_profile.lua" -Text $settingsProfileText -Needle '"mir-settings-import-check"'
+Assert-MIRContains -RelativePath "prototypes/mir/runtime/settings_profile.lua" -Text $settingsProfileText -Needle 'remote.add_interface("more-infinite-research-settings"'
 
-$legacyCapabilityRegistryPath = "prototypes/lib/capabilities/registry.lua"
-$legacyCapabilityRegistryText = Read-MIRFile -RelativePath $legacyCapabilityRegistryPath
-Assert-MIRContains -RelativePath $legacyCapabilityRegistryPath -Text $legacyCapabilityRegistryText -Needle 'return require("prototypes.mir.capabilities.registry")'
-
-$legacyCapabilityPolicyPath = "prototypes/lib/policy/capabilities.lua"
-$legacyCapabilityPolicyText = Read-MIRFile -RelativePath $legacyCapabilityPolicyPath
-Assert-MIRContains -RelativePath $legacyCapabilityPolicyPath -Text $legacyCapabilityPolicyText -Needle 'return require("prototypes.mir.policy.capabilities")'
-
-$legacyPrototypeLookupPath = "prototypes/lib/prototype-lookup.lua"
-$legacyPrototypeLookupText = Read-MIRFile -RelativePath $legacyPrototypeLookupPath
-Assert-MIRContains -RelativePath $legacyPrototypeLookupPath -Text $legacyPrototypeLookupText -Needle 'return require("prototypes.mir.platform.factorio.prototype_lookup")'
-
-$legacyDiagnosticsPath = "prototypes/diagnostics.lua"
-$legacyDiagnosticsText = Read-MIRFile -RelativePath $legacyDiagnosticsPath
-Assert-MIRContains -RelativePath $legacyDiagnosticsPath -Text $legacyDiagnosticsText -Needle 'return require("prototypes.mir.report.diagnostics_sink")'
-
-$legacyRecipeMatchingPath = "prototypes/lib/recipe-matching.lua"
-$legacyRecipeMatchingText = Read-MIRFile -RelativePath $legacyRecipeMatchingPath
-Assert-MIRContains -RelativePath $legacyRecipeMatchingPath -Text $legacyRecipeMatchingText -Needle 'return require("prototypes.mir.capabilities.recipe_productivity.recipe_matching")'
-
-$legacyTechnologyIconsPath = "prototypes/lib/technology-icons.lua"
-$legacyTechnologyIconsText = Read-MIRFile -RelativePath $legacyTechnologyIconsPath
-Assert-MIRContains -RelativePath $legacyTechnologyIconsPath -Text $legacyTechnologyIconsText -Needle 'return require("prototypes.mir.emit.icon_builder")'
-
-$legacySciencePacksPath = "prototypes/lib/science-packs.lua"
-$legacySciencePacksText = Read-MIRFile -RelativePath $legacySciencePacksPath
-Assert-MIRContains -RelativePath $legacySciencePacksPath -Text $legacySciencePacksText -Needle 'return require("prototypes.mir.capabilities.science_integration.science_packs")'
-
-$baseExtensionsShimPath = "prototypes/base-tech-extensions.lua"
-$baseExtensionsShimText = Read-MIRFile -RelativePath $baseExtensionsShimPath
-Assert-MIRContains -RelativePath $baseExtensionsShimPath -Text $baseExtensionsShimText -Needle 'return require("prototypes.mir.emit.base_extensions").emit_all()'
-
-$baseExtensionsEmitterPath = "prototypes/mir/emit/base_extensions.lua"
-$baseExtensionsEmitterText = Read-MIRFile -RelativePath $baseExtensionsEmitterPath
-Assert-MIRContains -RelativePath $baseExtensionsEmitterPath -Text $baseExtensionsEmitterText -Needle 'require("prototypes.mir.platform.factorio.data_raw")'
-Assert-MIRContains -RelativePath $baseExtensionsEmitterPath -Text $baseExtensionsEmitterText -Needle 'require("prototypes.mir.capabilities.science_integration.science_selector")'
-Assert-MIRContains -RelativePath $baseExtensionsEmitterPath -Text $baseExtensionsEmitterText -Needle "function M.emit_all()"
-Assert-MIRContains -RelativePath $baseExtensionsEmitterPath -Text $baseExtensionsEmitterText -Needle 'data_raw.prototypes("technology")'
-Assert-MIRContains -RelativePath $baseExtensionsEmitterPath -Text $baseExtensionsEmitterText -Needle "data_raw.extend({ new })"
-if ($baseExtensionsEmitterText -match "data:extend") {
-  throw "$baseExtensionsEmitterPath must emit through the platform data_raw adapter."
+foreach ($relative in @(
+  "prototypes/mir/runtime/scripted_techs.lua",
+  "prototypes/mir/runtime/effects/spoilage_preservation.lua",
+  "prototypes/mir/runtime/effects/agricultural_growth_speed.lua"
+)) {
+  $text = Read-MIRFile -RelativePath $relative
+  Assert-MIRContains -RelativePath $relative -Text $text -Needle "return M"
 }
 
-$maxLevelShimPath = "prototypes/max-level-control.lua"
-$maxLevelShimText = Read-MIRFile -RelativePath $maxLevelShimPath
-Assert-MIRContains -RelativePath $maxLevelShimPath -Text $maxLevelShimText -Needle 'return require("prototypes.mir.policy.max_level").apply()'
+Assert-MIRNoPatternInLuaTree `
+  -RelativeRoot "prototypes" `
+  -Pattern 'require\("prototypes\.(compat|lib|config|util|diagnostics|tech-gen|settings-resolver|pipeline-extent|pipeline-extent-settings|technology-effect-safety|base-tech-extensions|max-level-control|weapon-speed-adjustments)' `
+  -Message "Production Lua must not require old MIR 2.x shim paths."
 
-$maxLevelPolicyPath = "prototypes/mir/policy/max_level.lua"
-$maxLevelPolicyText = Read-MIRFile -RelativePath $maxLevelPolicyPath
-Assert-MIRContains -RelativePath $maxLevelPolicyPath -Text $maxLevelPolicyText -Needle 'require("prototypes.mir.platform.factorio.data_raw")'
-Assert-MIRContains -RelativePath $maxLevelPolicyPath -Text $maxLevelPolicyText -Needle 'require("prototypes.mir.planner.costs")'
-Assert-MIRContains -RelativePath $maxLevelPolicyPath -Text $maxLevelPolicyText -Needle "function M.apply()"
-Assert-MIRContains -RelativePath $maxLevelPolicyPath -Text $maxLevelPolicyText -Needle "data_raw.technology(tech_name)"
-
-$weaponSpeedShimPath = "prototypes/weapon-speed-adjustments.lua"
-$weaponSpeedShimText = Read-MIRFile -RelativePath $weaponSpeedShimPath
-Assert-MIRContains -RelativePath $weaponSpeedShimPath -Text $weaponSpeedShimText -Needle 'return require("prototypes.mir.policy.weapon_speed").apply()'
-
-$weaponSpeedPolicyPath = "prototypes/mir/policy/weapon_speed.lua"
-$weaponSpeedPolicyText = Read-MIRFile -RelativePath $weaponSpeedPolicyPath
-Assert-MIRContains -RelativePath $weaponSpeedPolicyPath -Text $weaponSpeedPolicyText -Needle 'require("prototypes.mir.platform.factorio.data_raw")'
-Assert-MIRContains -RelativePath $weaponSpeedPolicyPath -Text $weaponSpeedPolicyText -Needle 'require("prototypes.mir.settings.effective")'
-Assert-MIRContains -RelativePath $weaponSpeedPolicyPath -Text $weaponSpeedPolicyText -Needle "function M.apply()"
-Assert-MIRContains -RelativePath $weaponSpeedPolicyPath -Text $weaponSpeedPolicyText -Needle 'data_raw.prototypes("technology")'
-Assert-MIRContains -RelativePath $weaponSpeedPolicyPath -Text $weaponSpeedPolicyText -Needle "tech.unit and tech.unit.count_formula"
-
-$streamCompilerPath = "prototypes/mir/planner/stream_compiler.lua"
-$streamCompilerText = Read-MIRFile -RelativePath $streamCompilerPath
-Assert-MIRContains -RelativePath $streamCompilerPath -Text $streamCompilerText -Needle 'require("prototypes.mir.emit.legacy_stream_adapter")'
-Assert-MIRContains -RelativePath $streamCompilerPath -Text $streamCompilerText -Needle 'require("prototypes.mir.policy.adoption_policy")'
-Assert-MIRContains -RelativePath $streamCompilerPath -Text $streamCompilerText -Needle 'require("prototypes.mir.planner.costs")'
-Assert-MIRContains -RelativePath $streamCompilerPath -Text $streamCompilerText -Needle 'require("prototypes.mir.emit.icon_builder")'
-Assert-MIRContains -RelativePath $streamCompilerPath -Text $streamCompilerText -Needle 'require("prototypes.mir.policy.owner_policy")'
-Assert-MIRContains -RelativePath $streamCompilerPath -Text $streamCompilerText -Needle 'require("prototypes.mir.capabilities.recipe_productivity.planner")'
-Assert-MIRContains -RelativePath $streamCompilerPath -Text $streamCompilerText -Needle 'require("prototypes.mir.planner.direct_effects")'
-Assert-MIRContains -RelativePath $streamCompilerPath -Text $streamCompilerText -Needle 'require("prototypes.mir.planner.native_modifiers")'
-Assert-MIRContains -RelativePath $streamCompilerPath -Text $streamCompilerText -Needle 'require("prototypes.mir.planner.requirements")'
-Assert-MIRContains -RelativePath $streamCompilerPath -Text $streamCompilerText -Needle 'require("prototypes.mir.planner.prerequisites")'
-Assert-MIRContains -RelativePath $streamCompilerPath -Text $streamCompilerText -Needle 'require("prototypes.mir.planner.science")'
-Assert-MIRContains -RelativePath $streamCompilerPath -Text $streamCompilerText -Needle 'require("prototypes.mir.capabilities.science_integration.science_packs")'
-Assert-MIRContains -RelativePath $streamCompilerPath -Text $streamCompilerText -Needle "planner_requirements.missing_reason(key, raw_spec)"
-Assert-MIRContains -RelativePath $streamCompilerPath -Text $streamCompilerText -Needle "planner_science.ingredients_for_stream(key, spec)"
-Assert-MIRContains -RelativePath $streamCompilerPath -Text $streamCompilerText -Needle "native_modifiers.record_overlaps(key, direct_effects)"
-Assert-MIRContains -RelativePath $streamCompilerPath -Text $streamCompilerText -Needle "owner_policy.filter_existing_recipe_productivity(key, spec, buckets)"
-Assert-MIRContains -RelativePath $streamCompilerPath -Text $streamCompilerText -Needle "adoption_policy.adopt_recipe_productivity_family(key, spec, buckets)"
-Assert-MIRContains -RelativePath $streamCompilerPath -Text $streamCompilerText -Needle "adoption_policy.emit_mod_data()"
-Assert-MIRContains -RelativePath $streamCompilerPath -Text $streamCompilerText -Needle "direct_effects_planner.available_for_stream(key, spec)"
-Assert-MIRContains -RelativePath $streamCompilerPath -Text $streamCompilerText -Needle "recipe_productivity_planner.match_buckets(key, spec)"
-Assert-MIRContains -RelativePath $streamCompilerPath -Text $streamCompilerText -Needle "recipe_productivity_planner.effects_from_buckets(key, buckets)"
-Assert-MIRContains -RelativePath $streamCompilerPath -Text $streamCompilerText -Needle "costs.base_cost_for(key, spec)"
-Assert-MIRContains -RelativePath $streamCompilerPath -Text $streamCompilerText -Needle "planner_prerequisites.build_for(key, ingredients)"
-Assert-MIRContains -RelativePath $streamCompilerPath -Text $streamCompilerText -Needle "icon_builder.icons_for_stream(spec)"
-Assert-MIRContains -RelativePath $streamCompilerPath -Text $streamCompilerText -Needle "stream_emitter.emit(key, spec, fields)"
-Assert-MIRContains -RelativePath $streamCompilerPath -Text $streamCompilerText -Needle "function M.run()"
-
-$adoptionPolicyPath = "prototypes/mir/policy/adoption_policy.lua"
-$adoptionPolicyText = Read-MIRFile -RelativePath $adoptionPolicyPath
-Assert-MIRContains -RelativePath $adoptionPolicyPath -Text $adoptionPolicyText -Needle 'require("prototypes.mir.policy.productivity_family_adoption")'
-Assert-MIRContains -RelativePath $adoptionPolicyPath -Text $adoptionPolicyText -Needle "function M.adopt_recipe_productivity_family(key, spec, buckets)"
-Assert-MIRContains -RelativePath $adoptionPolicyPath -Text $adoptionPolicyText -Needle "function M.emit_mod_data()"
-
-$ownerPolicyPath = "prototypes/mir/policy/owner_policy.lua"
-$ownerPolicyText = Read-MIRFile -RelativePath $ownerPolicyPath
-Assert-MIRContains -RelativePath $ownerPolicyPath -Text $ownerPolicyText -Needle 'require("prototypes.mir.policy.competing_productivity")'
-Assert-MIRContains -RelativePath $ownerPolicyPath -Text $ownerPolicyText -Needle 'require("prototypes.mir.index.productivity_owners")'
-Assert-MIRContains -RelativePath $ownerPolicyPath -Text $ownerPolicyText -Needle "function M.filter_existing_recipe_productivity(key, spec, buckets)"
-Assert-MIRContains -RelativePath $ownerPolicyPath -Text $ownerPolicyText -Needle "D.recipe_owner({"
-
-$compatibilityShimExpectations = @{
-  "prototypes/compat/profiles.lua" = 'return require("prototypes.mir.compatibility.profiles")'
-  "prototypes/compat/planner.lua" = 'return require("prototypes.mir.compatibility.planner")'
-  "prototypes/compat/productivity-owners.lua" = 'return require("prototypes.mir.index.productivity_owners")'
-  "prototypes/compat/competing-productivity.lua" = 'return require("prototypes.mir.policy.competing_productivity")'
-  "prototypes/compat/competing-base-extensions.lua" = 'return require("prototypes.mir.policy.competing_base_extensions")'
-  "prototypes/compat/productivity-family-adoption.lua" = 'return require("prototypes.mir.policy.productivity_family_adoption")'
-}
-
-foreach ($relativePath in $compatibilityShimExpectations.Keys) {
-  $shimText = Read-MIRFile -RelativePath $relativePath
-  $shimCodeLines = @(Get-MIRCodeLines -Text $shimText)
-  if ($shimCodeLines.Count -ne 1) {
-    throw "$relativePath must remain a one-line MIR compatibility shim."
-  }
-  if ($shimCodeLines[0] -ne $compatibilityShimExpectations[$relativePath]) {
-    throw "$relativePath must call $($compatibilityShimExpectations[$relativePath])."
-  }
-}
-
-$recipeProductivityPlannerPath = "prototypes/mir/capabilities/recipe_productivity/planner.lua"
-$recipeProductivityPlannerText = Read-MIRFile -RelativePath $recipeProductivityPlannerPath
-Assert-MIRContains -RelativePath $recipeProductivityPlannerPath -Text $recipeProductivityPlannerText -Needle "function M.match_buckets(key, spec)"
-Assert-MIRContains -RelativePath $recipeProductivityPlannerPath -Text $recipeProductivityPlannerText -Needle 'require("prototypes.mir.capabilities.recipe_productivity.recipe_matching")'
-Assert-MIRContains -RelativePath $recipeProductivityPlannerPath -Text $recipeProductivityPlannerText -Needle "recipes.recipes_for_stream(spec, C.shared.per_level_default)"
-Assert-MIRContains -RelativePath $recipeProductivityPlannerPath -Text $recipeProductivityPlannerText -Needle "D.recipe_matches(key, buckets)"
-Assert-MIRContains -RelativePath $recipeProductivityPlannerPath -Text $recipeProductivityPlannerText -Needle "function M.effects_from_buckets(key, buckets)"
-Assert-MIRContains -RelativePath $recipeProductivityPlannerPath -Text $recipeProductivityPlannerText -Needle 'type = "change-recipe-productivity"'
-
-$indexRegistryPath = "prototypes/mir/index/registry_builder.lua"
-$indexRegistryText = Read-MIRFile -RelativePath $indexRegistryPath
-Assert-MIRContains -RelativePath $indexRegistryPath -Text $indexRegistryText -Needle "RecipeFact"
-Assert-MIRContains -RelativePath $indexRegistryPath -Text $indexRegistryText -Needle "RuleMutationFact"
-Assert-MIRContains -RelativePath $indexRegistryPath -Text $indexRegistryText -Needle "build_loop_risk_facts"
-
-$legacyFactRegistryPath = "prototypes/lib/facts/registry.lua"
-$legacyFactRegistryText = Read-MIRFile -RelativePath $legacyFactRegistryPath
-Assert-MIRContains -RelativePath $legacyFactRegistryPath -Text $legacyFactRegistryText -Needle 'return require("prototypes.mir.index.registry_builder")'
-
-$settingsVisibilityPath = "prototypes/mir/settings/visibility.lua"
-$settingsVisibilityText = Read-MIRFile -RelativePath $settingsVisibilityPath
-Assert-MIRContains -RelativePath $settingsVisibilityPath -Text $settingsVisibilityText -Needle "function M.evaluate(spec, ctx)"
-Assert-MIRContains -RelativePath $settingsVisibilityPath -Text $settingsVisibilityText -Needle 'mode == "visible-if-mods-any"'
-Assert-MIRContains -RelativePath $settingsVisibilityPath -Text $settingsVisibilityText -Needle 'mode == "visible-if-mods-all"'
-Assert-MIRContains -RelativePath $settingsVisibilityPath -Text $settingsVisibilityText -Needle 'reason = "unknown-visibility-rule"'
-
-$settingsBuilderPath = "prototypes/mir/settings/builder.lua"
-$settingsBuilderText = Read-MIRFile -RelativePath $settingsBuilderPath
-Assert-MIRContains -RelativePath $settingsBuilderPath -Text $settingsBuilderText -Needle 'require("prototypes.mir.settings.registry")'
-Assert-MIRContains -RelativePath $settingsBuilderPath -Text $settingsBuilderText -Needle "function M.apply_visibility(setting, result)"
-Assert-MIRContains -RelativePath $settingsBuilderPath -Text $settingsBuilderText -Needle "setting.hidden = true"
-Assert-MIRContains -RelativePath $settingsBuilderPath -Text $settingsBuilderText -Needle "function M.stream_setting_names(stream_key)"
-
-$settingsLegacyAdapterPath = "prototypes/mir/settings/legacy_adapter.lua"
-$settingsLegacyAdapterText = Read-MIRFile -RelativePath $settingsLegacyAdapterPath
-Assert-MIRContains -RelativePath $settingsLegacyAdapterPath -Text $settingsLegacyAdapterText -Needle 'require("prototypes.mir.platform.factorio.mods")'
-Assert-MIRContains -RelativePath $settingsLegacyAdapterPath -Text $settingsLegacyAdapterText -Needle 'require("prototypes.mir.settings.builder")'
-Assert-MIRContains -RelativePath $settingsLegacyAdapterPath -Text $settingsLegacyAdapterText -Needle "factorio_mods.snapshot()"
-
-$streamRegistryPath = "prototypes/mir/streams/registry.lua"
-$streamRegistryText = Read-MIRFile -RelativePath $streamRegistryPath
-Assert-MIRContains -RelativePath $streamRegistryPath -Text $streamRegistryText -Needle 'M.streams = require("prototypes.streams.init")'
-Assert-MIRContains -RelativePath $streamRegistryPath -Text $streamRegistryText -Needle 'require("prototypes.mir.compatibility.profiles").apply(M)'
-
-$configShimPath = "prototypes/config.lua"
-$configShimText = Read-MIRFile -RelativePath $configShimPath
-Assert-MIRContains -RelativePath $configShimPath -Text $configShimText -Needle 'return require("prototypes.mir.streams.registry")'
-
-$settingsProfileCodecPath = "prototypes/mir/settings/profile_codec.lua"
-$settingsProfileCodecText = Read-MIRFile -RelativePath $settingsProfileCodecPath
-Assert-MIRContains -RelativePath $settingsProfileCodecPath -Text $settingsProfileCodecText -Needle 'M.prefix = "MIRSET1:"'
-Assert-MIRContains -RelativePath $settingsProfileCodecPath -Text $settingsProfileCodecText -Needle 'M.import_setting_name = "mir-settings-profile-import"'
-Assert-MIRContains -RelativePath $settingsProfileCodecPath -Text $settingsProfileCodecText -Needle "helpers.table_to_json"
-Assert-MIRContains -RelativePath $settingsProfileCodecPath -Text $settingsProfileCodecText -Needle "helpers.encode_string"
-
-$settingsEffectivePath = "prototypes/mir/settings/effective.lua"
-$settingsEffectiveText = Read-MIRFile -RelativePath $settingsEffectivePath
-Assert-MIRContains -RelativePath $settingsEffectivePath -Text $settingsEffectiveText -Needle 'require("prototypes.mir.settings.profile_codec")'
-Assert-MIRContains -RelativePath $settingsEffectivePath -Text $settingsEffectiveText -Needle "function M.get(name)"
-Assert-MIRContains -RelativePath $settingsEffectivePath -Text $settingsEffectiveText -Needle "profile.settings and profile.settings[name]"
-
-$controlSettingsProfilePath = "control/settings-profile.lua"
-$controlSettingsProfileText = Read-MIRFile -RelativePath $controlSettingsProfilePath
-Assert-MIRContains -RelativePath $controlSettingsProfilePath -Text $controlSettingsProfileText -Needle 'commands.add_command('
-Assert-MIRContains -RelativePath $controlSettingsProfilePath -Text $controlSettingsProfileText -Needle '"mir-settings-export"'
-Assert-MIRContains -RelativePath $controlSettingsProfilePath -Text $controlSettingsProfileText -Needle '"mir-settings-import-check"'
-Assert-MIRContains -RelativePath $controlSettingsProfilePath -Text $controlSettingsProfileText -Needle 'helpers.write_file'
-Assert-MIRContains -RelativePath $controlSettingsProfilePath -Text $controlSettingsProfileText -Needle 'remote.add_interface("more-infinite-research-settings"'
-
-$mirCliPath = "scripts/mir.ps1"
-$mirCliText = Read-MIRFile -RelativePath $mirCliPath
-Assert-MIRContains -RelativePath $mirCliPath -Text $mirCliText -Needle '.\scripts\mir.ps1 legacy inventory [--output <path>] [--check]'
-Assert-MIRContains -RelativePath $mirCliPath -Text $mirCliText -Needle '"legacy" {'
-Assert-MIRContains -RelativePath $mirCliPath -Text $mirCliText -Needle 'Get-MIRLegacyInventory.ps1'
-Assert-MIRContains -RelativePath $mirCliPath -Text $mirCliText -Needle 'CheckThresholds'
-
-$legacyInventoryPath = "scripts/Get-MIRLegacyInventory.ps1"
-$legacyInventoryText = Read-MIRFile -RelativePath $legacyInventoryPath
-Assert-MIRContains -RelativePath $legacyInventoryPath -Text $legacyInventoryText -Needle "shipped-mod-legacy.json"
-Assert-MIRContains -RelativePath $legacyInventoryPath -Text $legacyInventoryText -Needle "repo-legacy.json"
-Assert-MIRContains -RelativePath $legacyInventoryPath -Text $legacyInventoryText -Needle "legacy-summary.md"
-Assert-MIRContains -RelativePath $legacyInventoryPath -Text $legacyInventoryText -Needle "generated_streams_without_manifest"
-Assert-MIRContains -RelativePath $legacyInventoryPath -Text $legacyInventoryText -Needle "compat_active_modules"
-Assert-MIRContains -RelativePath $legacyInventoryPath -Text $legacyInventoryText -Needle "requires_lib"
-Assert-MIRContains -RelativePath $legacyInventoryPath -Text $legacyInventoryText -Needle "MaxMirLegacyActiveModules = 0"
-Assert-MIRContains -RelativePath $legacyInventoryPath -Text $legacyInventoryText -Needle "MaxRequiresMirLegacy = 0"
-Assert-MIRContains -RelativePath $legacyInventoryPath -Text $legacyInventoryText -Needle "MaxRequiresUtil = 0"
-Assert-MIRContains -RelativePath $legacyInventoryPath -Text $legacyInventoryText -Needle "MaxDataRawOutsidePlatform = 0"
-Assert-MIRContains -RelativePath $legacyInventoryPath -Text $legacyInventoryText -Needle "MaxLibActiveModules = 0"
-Assert-MIRContains -RelativePath $legacyInventoryPath -Text $legacyInventoryText -Needle "MIR legacy inventory thresholds passed"
-
-$decisionExportPath = "prototypes/mir/report/decision_export.lua"
-$decisionExportText = Read-MIRFile -RelativePath $decisionExportPath
-Assert-MIRContains -RelativePath $decisionExportPath -Text $decisionExportText -Needle "function M.emit(sink, record)"
-Assert-MIRContains -RelativePath $decisionExportPath -Text $decisionExportText -Needle "sink.decision(record)"
-
-$compatibilityDiagnosticsReportPath = "prototypes/mir/report/compatibility_diagnostics.lua"
-$compatibilityDiagnosticsReportText = Read-MIRFile -RelativePath $compatibilityDiagnosticsReportPath
-Assert-MIRContains -RelativePath $compatibilityDiagnosticsReportPath -Text $compatibilityDiagnosticsReportText -Needle 'require("prototypes.mir.report.decision_export")'
-Assert-MIRContains -RelativePath $compatibilityDiagnosticsReportPath -Text $compatibilityDiagnosticsReportText -Needle "function M.compatibility_plan(sink, row)"
-Assert-MIRContains -RelativePath $compatibilityDiagnosticsReportPath -Text $compatibilityDiagnosticsReportText -Needle "sink.loop_risk(row)"
-
-$plannerCompilerShimPath = "prototypes/planner/compiler.lua"
-$plannerCompilerShimText = Read-MIRFile -RelativePath $plannerCompilerShimPath
-Assert-MIRContains -RelativePath $plannerCompilerShimPath -Text $plannerCompilerShimText -Needle 'return require("prototypes.mir.planner.compiler")'
-
-$plannerCompilerPath = "prototypes/mir/planner/compiler.lua"
-$plannerCompilerText = Read-MIRFile -RelativePath $plannerCompilerPath
-Assert-MIRContains -RelativePath $plannerCompilerPath -Text $plannerCompilerText -Needle 'require("prototypes.mir.index.registry_builder")'
-Assert-MIRContains -RelativePath $plannerCompilerPath -Text $plannerCompilerText -Needle 'require("prototypes.mir.report.decision_export")'
-Assert-MIRContains -RelativePath $plannerCompilerPath -Text $plannerCompilerText -Needle "decision_export.emit(D, decision_record.generated_technology({"
-
-$plannerRequirementsPath = "prototypes/mir/planner/requirements.lua"
-$plannerRequirementsText = Read-MIRFile -RelativePath $plannerRequirementsPath
-Assert-MIRContains -RelativePath $plannerRequirementsPath -Text $plannerRequirementsText -Needle "function M.missing_reason(key, spec)"
-Assert-MIRContains -RelativePath $plannerRequirementsPath -Text $plannerRequirementsText -Needle 'require("prototypes.mir.platform.factorio.prototype_lookup")'
-Assert-MIRContains -RelativePath $plannerRequirementsPath -Text $plannerRequirementsText -Needle 'require("prototypes.mir.planner.technology_requirements")'
-Assert-MIRContains -RelativePath $plannerRequirementsPath -Text $plannerRequirementsText -Needle "lookup.mod_exists(mod_name)"
-Assert-MIRContains -RelativePath $plannerRequirementsPath -Text $plannerRequirementsText -Needle "lookup.ammo_category_exists(category)"
-
-$plannerNativeModifiersPath = "prototypes/mir/planner/native_modifiers.lua"
-$plannerNativeModifiersText = Read-MIRFile -RelativePath $plannerNativeModifiersPath
-Assert-MIRContains -RelativePath $plannerNativeModifiersPath -Text $plannerNativeModifiersText -Needle 'require("prototypes.mir.platform.factorio.data_raw")'
-Assert-MIRContains -RelativePath $plannerNativeModifiersPath -Text $plannerNativeModifiersText -Needle "function M.identity(effect)"
-Assert-MIRContains -RelativePath $plannerNativeModifiersPath -Text $plannerNativeModifiersText -Needle 'data_raw.prototypes("technology")'
-Assert-MIRContains -RelativePath $plannerNativeModifiersPath -Text $plannerNativeModifiersText -Needle "function M.record_overlaps(key, effects)"
-
-$plannerDirectEffectsPath = "prototypes/mir/planner/direct_effects.lua"
-$plannerDirectEffectsText = Read-MIRFile -RelativePath $plannerDirectEffectsPath
-Assert-MIRContains -RelativePath $plannerDirectEffectsPath -Text $plannerDirectEffectsText -Needle 'require("prototypes.mir.emit.effect_safety")'
-Assert-MIRContains -RelativePath $plannerDirectEffectsPath -Text $plannerDirectEffectsText -Needle 'require("prototypes.mir.emit.icon_builder")'
-Assert-MIRContains -RelativePath $plannerDirectEffectsPath -Text $plannerDirectEffectsText -Needle 'require("prototypes.mir.platform.factorio.prototype_lookup")'
-Assert-MIRContains -RelativePath $plannerDirectEffectsPath -Text $plannerDirectEffectsText -Needle "function M.available_for_stream(key, spec)"
-Assert-MIRContains -RelativePath $plannerDirectEffectsPath -Text $plannerDirectEffectsText -Needle 'effect_safety.assert_effect_allowed(effect, "direct-effect stream " .. key)'
-Assert-MIRContains -RelativePath $plannerDirectEffectsPath -Text $plannerDirectEffectsText -Needle "icon_builder.effect_icons_for_stream(spec)"
-
-$plannerSciencePath = "prototypes/mir/planner/science.lua"
-$plannerScienceText = Read-MIRFile -RelativePath $plannerSciencePath
-Assert-MIRContains -RelativePath $plannerSciencePath -Text $plannerScienceText -Needle "function M.ingredients_for_stream(key, spec)"
-Assert-MIRContains -RelativePath $plannerSciencePath -Text $plannerScienceText -Needle 'require("prototypes.mir.capabilities.science_integration.science_packs")'
-Assert-MIRContains -RelativePath $plannerSciencePath -Text $plannerScienceText -Needle 'require("prototypes.mir.capabilities.science_integration.science_selector")'
-Assert-MIRContains -RelativePath $plannerSciencePath -Text $plannerScienceText -Needle "science_selector.pick_science_for_stream(spec, key)"
-Assert-MIRContains -RelativePath $plannerSciencePath -Text $plannerScienceText -Needle "science_packs.best_lab_compatible_ingredients"
-Assert-MIRContains -RelativePath $plannerSciencePath -Text $plannerScienceText -Needle 'lab_status or "full"'
-
-$plannerCostsPath = "prototypes/mir/planner/costs.lua"
-$plannerCostsText = Read-MIRFile -RelativePath $plannerCostsPath
-Assert-MIRContains -RelativePath $plannerCostsPath -Text $plannerCostsText -Needle 'require("prototypes.mir.streams.registry")'
-Assert-MIRContains -RelativePath $plannerCostsPath -Text $plannerCostsText -Needle 'require("prototypes.mir.settings.resolver")'
-Assert-MIRContains -RelativePath $plannerCostsPath -Text $plannerCostsText -Needle "function M.enabled_for(key, spec)"
-Assert-MIRContains -RelativePath $plannerCostsPath -Text $plannerCostsText -Needle "function M.max_level_for(key, spec)"
-
-$plannerPrerequisitesPath = "prototypes/mir/planner/prerequisites.lua"
-$plannerPrerequisitesText = Read-MIRFile -RelativePath $plannerPrerequisitesPath
-Assert-MIRContains -RelativePath $plannerPrerequisitesPath -Text $plannerPrerequisitesText -Needle 'require("prototypes.mir.capabilities.science_integration.science_selector")'
-Assert-MIRContains -RelativePath $plannerPrerequisitesPath -Text $plannerPrerequisitesText -Needle "function M.append_end_game_gate_prerequisite(prereqs)"
-Assert-MIRContains -RelativePath $plannerPrerequisitesPath -Text $plannerPrerequisitesText -Needle "function M.build_for(key, ingredients)"
-
-$scienceSelectorPath = "prototypes/mir/capabilities/science_integration/science_selector.lua"
-$scienceSelectorText = Read-MIRFile -RelativePath $scienceSelectorPath
-Assert-MIRContains -RelativePath $scienceSelectorPath -Text $scienceSelectorText -Needle "function M.apply_science_pack_ingredient_policy(ingredients)"
-Assert-MIRContains -RelativePath $scienceSelectorPath -Text $scienceSelectorText -Needle "function M.pick_science_for_stream(spec, key)"
-Assert-MIRContains -RelativePath $scienceSelectorPath -Text $scienceSelectorText -Needle 'desired == "derive-from-unlocks"'
-
-$airScrubbingOverlayPath = "prototypes/mir/compatibility/overlays/air_scrubbing.lua"
-$airScrubbingOverlayText = Read-MIRFile -RelativePath $airScrubbingOverlayPath
-Assert-MIRContains -RelativePath $airScrubbingOverlayPath -Text $airScrubbingOverlayText -Needle 'id = "air-scrubbing"'
-Assert-MIRContains -RelativePath $airScrubbingOverlayPath -Text $airScrubbingOverlayText -Needle 'exact_recipes = {'
-Assert-MIRContains -RelativePath $airScrubbingOverlayPath -Text $airScrubbingOverlayText -Needle 'deny_families = {'
-if ($airScrubbingOverlayText -match 'require\("prototypes\.compat\.air-scrubbing"\)') {
-  throw "$airScrubbingOverlayPath must be policy data, not a legacy behavior shim."
-}
-
-$productivityStreamsPath = "prototypes/streams/productivity.lua"
-$productivityStreamsText = Read-MIRFile -RelativePath $productivityStreamsPath
-Assert-MIRContains -RelativePath $productivityStreamsPath -Text $productivityStreamsText -Needle 'overlay_loader.get("air-scrubbing")'
-Assert-MIRContains -RelativePath $productivityStreamsPath -Text $productivityStreamsText -Needle "air_scrubbing_capability.stream.id"
-Assert-MIRContains -RelativePath $productivityStreamsPath -Text $productivityStreamsText -Needle "exact_recipe_patterns(air_scrubbing_capability.exact_recipes)"
-Assert-MIRContains -RelativePath $productivityStreamsPath -Text $productivityStreamsText -Needle 'overlay_loader.get("atan-ash")'
-Assert-MIRContains -RelativePath $productivityStreamsPath -Text $productivityStreamsText -Needle "atan_ash_capability.stream.id"
-Assert-MIRContains -RelativePath $productivityStreamsPath -Text $productivityStreamsText -Needle "exact_recipe_patterns(atan_ash_capability.exact_recipes)"
-
-$atanAshOverlayPath = "prototypes/mir/compatibility/overlays/atan_ash.lua"
-$atanAshOverlayText = Read-MIRFile -RelativePath $atanAshOverlayPath
-Assert-MIRContains -RelativePath $atanAshOverlayPath -Text $atanAshOverlayText -Needle 'id = "atan-ash"'
-Assert-MIRContains -RelativePath $atanAshOverlayPath -Text $atanAshOverlayText -Needle '"mir-prod-atan-ash-separation"'
-Assert-MIRContains -RelativePath $atanAshOverlayPath -Text $atanAshOverlayText -Needle '"atan-ash-seperation"'
-Assert-MIRContains -RelativePath $atanAshOverlayPath -Text $atanAshOverlayText -Needle '"ash_sink"'
-if ($atanAshOverlayText -match "data:extend") {
-  throw "$atanAshOverlayPath must be policy data, not prototype emission."
-}
-
-$legacyAirScrubbingPath = "prototypes/compat/air-scrubbing.lua"
-$legacyAirScrubbingText = Read-MIRFile -RelativePath $legacyAirScrubbingPath
-Assert-MIRContains -RelativePath $legacyAirScrubbingPath -Text $legacyAirScrubbingText -Needle 'return require("prototypes.mir.compatibility.diagnostics.air_scrubbing")'
-
-$exactRecipePolicyPath = "prototypes/mir/compatibility/diagnostics/exact_recipe_policy.lua"
-$exactRecipePolicyText = Read-MIRFile -RelativePath $exactRecipePolicyPath
-Assert-MIRContains -RelativePath $exactRecipePolicyPath -Text $exactRecipePolicyText -Needle 'require("prototypes.mir.platform.factorio.data_raw")'
-Assert-MIRContains -RelativePath $exactRecipePolicyPath -Text $exactRecipePolicyText -Needle 'require("prototypes.mir.compatibility.overlay_loader")'
-Assert-MIRContains -RelativePath $exactRecipePolicyPath -Text $exactRecipePolicyText -Needle 'require("prototypes.mir.report.compatibility_diagnostics")'
-Assert-MIRContains -RelativePath $exactRecipePolicyPath -Text $exactRecipePolicyText -Needle 'data_raw.prototypes("recipe")'
-Assert-MIRContains -RelativePath $exactRecipePolicyPath -Text $exactRecipePolicyText -Needle "report.decision(D, row)"
-Assert-MIRContains -RelativePath $exactRecipePolicyPath -Text $exactRecipePolicyText -Needle "report.compatibility_plan(D, {"
-
-$diagnosticsRegistryPath = "prototypes/mir/compatibility/diagnostics/registry.lua"
-$diagnosticsRegistryText = Read-MIRFile -RelativePath $diagnosticsRegistryPath
-Assert-MIRContains -RelativePath $diagnosticsRegistryPath -Text $diagnosticsRegistryText -Needle 'id = "air-scrubbing"'
-Assert-MIRContains -RelativePath $diagnosticsRegistryPath -Text $diagnosticsRegistryText -Needle 'id = "atan-ash"'
-Assert-MIRContains -RelativePath $diagnosticsRegistryPath -Text $diagnosticsRegistryText -Needle 'require("prototypes.mir.compatibility.diagnostics.air_scrubbing")'
-Assert-MIRContains -RelativePath $diagnosticsRegistryPath -Text $diagnosticsRegistryText -Needle 'require("prototypes.mir.compatibility.diagnostics.atan_ash")'
-Assert-MIRContains -RelativePath $diagnosticsRegistryPath -Text $diagnosticsRegistryText -Needle "function M.emit_all()"
-
-$airScrubbingDiagnosticsPath = "prototypes/mir/compatibility/diagnostics/air_scrubbing.lua"
-$airScrubbingDiagnosticsText = Read-MIRFile -RelativePath $airScrubbingDiagnosticsPath
-Assert-MIRContains -RelativePath $airScrubbingDiagnosticsPath -Text $airScrubbingDiagnosticsText -Needle 'require("prototypes.mir.compatibility.diagnostics.exact_recipe_policy")'
-Assert-MIRContains -RelativePath $airScrubbingDiagnosticsPath -Text $airScrubbingDiagnosticsText -Needle 'overlay_id = "air-scrubbing"'
-Assert-MIRContains -RelativePath $airScrubbingDiagnosticsPath -Text $airScrubbingDiagnosticsText -Needle 'allowed_generated_reason = "clean_filter_stream_emitted"'
-Assert-MIRContains -RelativePath $airScrubbingDiagnosticsPath -Text $airScrubbingDiagnosticsText -Needle 'scrubbing_environmental = {'
-Assert-MIRContains -RelativePath $airScrubbingDiagnosticsPath -Text $airScrubbingDiagnosticsText -Needle 'cleaning_recovery = {'
-
-$atanAshDiagnosticsPath = "prototypes/mir/compatibility/diagnostics/atan_ash.lua"
-$atanAshDiagnosticsText = Read-MIRFile -RelativePath $atanAshDiagnosticsPath
-Assert-MIRContains -RelativePath $atanAshDiagnosticsPath -Text $atanAshDiagnosticsText -Needle 'require("prototypes.mir.compatibility.diagnostics.exact_recipe_policy")'
-Assert-MIRContains -RelativePath $atanAshDiagnosticsPath -Text $atanAshDiagnosticsText -Needle 'overlay_id = "atan-ash"'
-Assert-MIRContains -RelativePath $atanAshDiagnosticsPath -Text $atanAshDiagnosticsText -Needle 'allowed_generated_reason = "ash_separation_stream_emitted"'
-Assert-MIRContains -RelativePath $atanAshDiagnosticsPath -Text $atanAshDiagnosticsText -Needle 'tile_surface = {'
-Assert-MIRContains -RelativePath $atanAshDiagnosticsPath -Text $atanAshDiagnosticsText -Needle 'resource_recovery = {'
-
-$claimRegistryPath = "prototypes/mir/compatibility/claim_registry.lua"
-$claimRegistryText = Read-MIRFile -RelativePath $claimRegistryPath
-Assert-MIRContains -RelativePath $claimRegistryPath -Text $claimRegistryText -Needle 'governance = ".mir/compatibility.yml"'
-Assert-MIRContains -RelativePath $claimRegistryPath -Text $claimRegistryText -Needle 'fixture_claims = "fixtures/compat-matrix/claims.json"'
-Assert-MIRContains -RelativePath $claimRegistryPath -Text $claimRegistryText -Needle 'mod = "atan-air-scrubbing"'
-Assert-MIRContains -RelativePath $claimRegistryPath -Text $claimRegistryText -Needle 'mod = "aai-industry"'
-Assert-MIRContains -RelativePath $claimRegistryPath -Text $claimRegistryText -Needle 'function M.get_by_mod(mod)'
+Assert-MIRNoPatternInLuaTree `
+  -RelativeRoot "prototypes" `
+  -Pattern 'require\("control\.' `
+  -Message "Production Lua must not require the removed control/ runtime namespace."
 
 Assert-MIRNoPatternInLuaTree `
   -RelativeRoot "prototypes/mir/domain" `
@@ -676,31 +350,15 @@ if ($settingsExtendMatches.Count -gt 0) {
   throw "Only prototypes/mir/settings/stage_builder.lua may register setting prototypes with data:extend."
 }
 
-Assert-MIRNoPatternInLuaTree `
-  -RelativeRoot "prototypes" `
-  -Pattern 'require\("prototypes\.config"\)' `
-  -Message "MIR modules must require prototypes.mir.streams.registry instead of the old prototypes.config shim."
-
-Assert-MIRNoPatternInLuaTree `
-  -RelativeRoot "prototypes/mir" `
-  -Pattern 'require\("prototypes\.util"\)' `
-  -Message "MIR modules must require focused MIR modules instead of the old prototypes.util facade."
-
 $runtimePrototypePattern = "\bdata\.raw\b|data:extend"
-foreach ($relative in @(
-  "control.lua",
-  "prototypes/mir/stage/control.lua",
-  "prototypes/mir/legacy/control.lua"
-)) {
-  Assert-MIRNoPatternInLuaFile `
-    -RelativePath $relative `
-    -Pattern $runtimePrototypePattern `
-    -Message "MIR runtime control entrypoints must not perform prototype-stage work."
-}
+Assert-MIRNoPatternInLuaFile `
+  -RelativePath "control.lua" `
+  -Pattern $runtimePrototypePattern `
+  -Message "MIR root runtime entrypoint must not perform prototype-stage work."
 
 Assert-MIRNoPatternInLuaTree `
-  -RelativeRoot "control" `
+  -RelativeRoot "prototypes/mir/runtime" `
   -Pattern $runtimePrototypePattern `
-  -Message "MIR runtime control modules must not perform prototype-stage work."
+  -Message "MIR runtime modules must not perform prototype-stage work."
 
 Write-Host "[ok] MIR architecture boundary lint passed."

@@ -1,6 +1,6 @@
 schema: 1
 
-canonical_machine_record: prototypes/planner/generated-stream-manifest.json
+canonical_machine_record: prototypes/mir/streams/generated_stream_manifest.json
 stream_docs_root: docs/reference/schemas
 generated_id_doc: docs/reference/generated-id-reference.md
 
@@ -15,7 +15,7 @@ rules:
 streams:
   records:
     recipe-prod-research_advanced_circuit-1:
-      canonical_row: prototypes/planner/generated-stream-manifest.json#streams.recipe-prod-research_advanced_circuit-1
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_advanced_circuit-1
       introduced_in: "pre-2.2.0"
       source: legacy_stream_table:productivity
       capability: recipe-productivity
@@ -30,7 +30,7 @@ streams:
         fixtures:
           - fixtures/assert-generation-integrity
     recipe-prod-research_agricultural_growth_speed-1:
-      canonical_row: prototypes/planner/generated-stream-manifest.json#streams.recipe-prod-research_agricultural_growth_speed-1
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_agricultural_growth_speed-1
       introduced_in: "pre-2.2.0"
       source: legacy_stream_table:direct-effects
       capability: native-modifier
@@ -45,7 +45,7 @@ streams:
         fixtures:
           - fixtures/assert-generation-integrity
     mir-prod-air-scrubbing-clean-filter:
-      canonical_row: prototypes/planner/generated-stream-manifest.json#streams.mir-prod-air-scrubbing-clean-filter
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.mir-prod-air-scrubbing-clean-filter
       introduced_in: "2.2.0"
       source: compat_policy:air-scrubbing
       capability: recipe-productivity
@@ -64,7 +64,7 @@ streams:
           - fixtures/assert-air-scrubbing-clean-filter
 
     recipe-prod-research_armor_components-1:
-      canonical_row: prototypes/planner/generated-stream-manifest.json#streams.recipe-prod-research_armor_components-1
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_armor_components-1
       introduced_in: "pre-2.2.0"
       source: legacy_stream_table:productivity
       capability: recipe-productivity
@@ -80,7 +80,7 @@ streams:
           - fixtures/assert-generation-integrity
 
     recipe-prod-research_artificial_soil-1:
-      canonical_row: prototypes/planner/generated-stream-manifest.json#streams.recipe-prod-research_artificial_soil-1
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_artificial_soil-1
       introduced_in: "pre-2.2.0"
       source: legacy_stream_table:productivity
       capability: recipe-productivity
@@ -96,7 +96,7 @@ streams:
           - fixtures/assert-generation-integrity
 
     mir-prod-atan-ash-separation:
-      canonical_row: prototypes/planner/generated-stream-manifest.json#streams.mir-prod-atan-ash-separation
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.mir-prod-atan-ash-separation
       introduced_in: "2.2.0"
       source: compat_policy:atan-ash
       capability: recipe-productivity
@@ -114,7 +114,7 @@ streams:
           - fixtures/assert-atan-ash-separation
 
     recipe-prod-research_bacteria_cultivation-1:
-      canonical_row: prototypes/planner/generated-stream-manifest.json#streams.recipe-prod-research_bacteria_cultivation-1
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_bacteria_cultivation-1
       introduced_in: "pre-2.2.0"
       source: legacy_stream_table:productivity
       capability: recipe-productivity
@@ -130,7 +130,7 @@ streams:
           - fixtures/assert-generation-integrity
 
     recipe-prod-research_batteries-1:
-      canonical_row: prototypes/planner/generated-stream-manifest.json#streams.recipe-prod-research_batteries-1
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_batteries-1
       introduced_in: "pre-2.2.0"
       source: legacy_stream_table:productivity
       capability: recipe-productivity
@@ -146,7 +146,7 @@ streams:
           - fixtures/assert-generation-integrity
 
     recipe-prod-research_belts-1:
-      canonical_row: prototypes/planner/generated-stream-manifest.json#streams.recipe-prod-research_belts-1
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_belts-1
       introduced_in: "pre-2.2.0"
       source: legacy_stream_table:productivity
       capability: recipe-productivity
@@ -162,7 +162,7 @@ streams:
           - fixtures/assert-generation-integrity
 
     recipe-prod-research_bioflux-1:
-      canonical_row: prototypes/planner/generated-stream-manifest.json#streams.recipe-prod-research_bioflux-1
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_bioflux-1
       introduced_in: "pre-2.2.0"
       source: legacy_stream_table:productivity
       capability: recipe-productivity
@@ -178,7 +178,7 @@ streams:
           - fixtures/assert-generation-integrity
 
     recipe-prod-research_breeding-1:
-      canonical_row: prototypes/planner/generated-stream-manifest.json#streams.recipe-prod-research_breeding-1
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_breeding-1
       introduced_in: "pre-2.2.0"
       source: legacy_stream_table:productivity
       capability: recipe-productivity
@@ -194,7 +194,7 @@ streams:
           - fixtures/assert-generation-integrity
 
     recipe-prod-research_bullets-1:
-      canonical_row: prototypes/planner/generated-stream-manifest.json#streams.recipe-prod-research_bullets-1
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_bullets-1
       introduced_in: "pre-2.2.0"
       source: legacy_stream_table:productivity
       capability: recipe-productivity
@@ -210,7 +210,7 @@ streams:
           - fixtures/assert-generation-integrity
 
     recipe-prod-research_cannon_shooting_speed-1:
-      canonical_row: prototypes/planner/generated-stream-manifest.json#streams.recipe-prod-research_cannon_shooting_speed-1
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_cannon_shooting_speed-1
       introduced_in: "pre-2.2.0"
       source: legacy_stream_table:direct-effects
       capability: native-modifier
@@ -226,7 +226,7 @@ streams:
           - fixtures/assert-generation-integrity
 
     recipe-prod-research_carbon-1:
-      canonical_row: prototypes/planner/generated-stream-manifest.json#streams.recipe-prod-research_carbon-1
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_carbon-1
       introduced_in: "pre-2.2.0"
       source: legacy_stream_table:productivity
       capability: recipe-productivity
@@ -242,7 +242,7 @@ streams:
           - fixtures/assert-generation-integrity
 
     recipe-prod-research_carbon_fiber-1:
-      canonical_row: prototypes/planner/generated-stream-manifest.json#streams.recipe-prod-research_carbon_fiber-1
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_carbon_fiber-1
       introduced_in: "pre-2.2.0"
       source: legacy_stream_table:productivity
       capability: recipe-productivity
@@ -258,7 +258,7 @@ streams:
           - fixtures/assert-generation-integrity
 
     recipe-prod-research_cargo_bay_unloading_distance-1:
-      canonical_row: prototypes/planner/generated-stream-manifest.json#streams.recipe-prod-research_cargo_bay_unloading_distance-1
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_cargo_bay_unloading_distance-1
       introduced_in: "pre-2.2.0"
       source: legacy_stream_table:direct-effects
       capability: native-modifier
@@ -274,7 +274,7 @@ streams:
           - fixtures/assert-generation-integrity
 
     recipe-prod-research_cargo_landing_pad_count-1:
-      canonical_row: prototypes/planner/generated-stream-manifest.json#streams.recipe-prod-research_cargo_landing_pad_count-1
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_cargo_landing_pad_count-1
       introduced_in: "pre-2.2.0"
       source: legacy_stream_table:direct-effects
       capability: native-modifier
@@ -290,7 +290,7 @@ streams:
           - fixtures/assert-generation-integrity
 
     recipe-prod-research_character_crafting_speed-1:
-      canonical_row: prototypes/planner/generated-stream-manifest.json#streams.recipe-prod-research_character_crafting_speed-1
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_character_crafting_speed-1
       introduced_in: "pre-2.2.0"
       source: legacy_stream_table:direct-effects
       capability: native-modifier
@@ -306,7 +306,7 @@ streams:
           - fixtures/assert-generation-integrity
 
     recipe-prod-research_character_mining_speed-1:
-      canonical_row: prototypes/planner/generated-stream-manifest.json#streams.recipe-prod-research_character_mining_speed-1
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_character_mining_speed-1
       introduced_in: "pre-2.2.0"
       source: legacy_stream_table:direct-effects
       capability: native-modifier
@@ -322,7 +322,7 @@ streams:
           - fixtures/assert-generation-integrity
 
     recipe-prod-research_character_reach-1:
-      canonical_row: prototypes/planner/generated-stream-manifest.json#streams.recipe-prod-research_character_reach-1
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_character_reach-1
       introduced_in: "pre-2.2.0"
       source: legacy_stream_table:direct-effects
       capability: native-modifier
@@ -338,7 +338,7 @@ streams:
           - fixtures/assert-generation-integrity
 
     recipe-prod-research_character_walking_speed-1:
-      canonical_row: prototypes/planner/generated-stream-manifest.json#streams.recipe-prod-research_character_walking_speed-1
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_character_walking_speed-1
       introduced_in: "pre-2.2.0"
       source: legacy_stream_table:direct-effects
       capability: native-modifier
@@ -354,7 +354,7 @@ streams:
           - fixtures/assert-generation-integrity
 
     recipe-prod-research_concrete-1:
-      canonical_row: prototypes/planner/generated-stream-manifest.json#streams.recipe-prod-research_concrete-1
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_concrete-1
       introduced_in: "pre-2.2.0"
       source: legacy_stream_table:productivity
       capability: recipe-productivity
@@ -370,7 +370,7 @@ streams:
           - fixtures/assert-generation-integrity
 
     recipe-prod-research_copper-1:
-      canonical_row: prototypes/planner/generated-stream-manifest.json#streams.recipe-prod-research_copper-1
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_copper-1
       introduced_in: "pre-2.2.0"
       source: legacy_stream_table:productivity
       capability: recipe-productivity
@@ -386,7 +386,7 @@ streams:
           - fixtures/assert-generation-integrity
 
     recipe-prod-research_copper_cable-1:
-      canonical_row: prototypes/planner/generated-stream-manifest.json#streams.recipe-prod-research_copper_cable-1
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_copper_cable-1
       introduced_in: "pre-2.2.0"
       source: legacy_stream_table:productivity
       capability: recipe-productivity
@@ -402,7 +402,7 @@ streams:
           - fixtures/assert-generation-integrity
 
     recipe-prod-research_electric_energy-1:
-      canonical_row: prototypes/planner/generated-stream-manifest.json#streams.recipe-prod-research_electric_energy-1
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_electric_energy-1
       introduced_in: "pre-2.2.0"
       source: legacy_stream_table:productivity
       capability: recipe-productivity
@@ -418,7 +418,7 @@ streams:
           - fixtures/assert-generation-integrity
 
     recipe-prod-research_electric_engine-1:
-      canonical_row: prototypes/planner/generated-stream-manifest.json#streams.recipe-prod-research_electric_engine-1
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_electric_engine-1
       introduced_in: "pre-2.2.0"
       source: legacy_stream_table:productivity
       capability: recipe-productivity
@@ -434,7 +434,7 @@ streams:
           - fixtures/assert-generation-integrity
 
     recipe-prod-research_electric_shooting_speed-1:
-      canonical_row: prototypes/planner/generated-stream-manifest.json#streams.recipe-prod-research_electric_shooting_speed-1
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_electric_shooting_speed-1
       introduced_in: "pre-2.2.0"
       source: legacy_stream_table:direct-effects
       capability: native-modifier
@@ -450,7 +450,7 @@ streams:
           - fixtures/assert-generation-integrity
 
     recipe-prod-research_electronic_circuit-1:
-      canonical_row: prototypes/planner/generated-stream-manifest.json#streams.recipe-prod-research_electronic_circuit-1
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_electronic_circuit-1
       introduced_in: "pre-2.2.0"
       source: legacy_stream_table:productivity
       capability: recipe-productivity
@@ -466,7 +466,7 @@ streams:
           - fixtures/assert-generation-integrity
 
     recipe-prod-research_engine-1:
-      canonical_row: prototypes/planner/generated-stream-manifest.json#streams.recipe-prod-research_engine-1
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_engine-1
       introduced_in: "pre-2.2.0"
       source: legacy_stream_table:productivity
       capability: recipe-productivity
@@ -482,7 +482,7 @@ streams:
           - fixtures/assert-generation-integrity
 
     recipe-prod-research_explosives-1:
-      canonical_row: prototypes/planner/generated-stream-manifest.json#streams.recipe-prod-research_explosives-1
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_explosives-1
       introduced_in: "pre-2.2.0"
       source: legacy_stream_table:productivity
       capability: recipe-productivity
@@ -498,7 +498,7 @@ streams:
           - fixtures/assert-generation-integrity
 
     recipe-prod-research_flamethrower_shooting_speed-1:
-      canonical_row: prototypes/planner/generated-stream-manifest.json#streams.recipe-prod-research_flamethrower_shooting_speed-1
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_flamethrower_shooting_speed-1
       introduced_in: "pre-2.2.0"
       source: legacy_stream_table:direct-effects
       capability: native-modifier
@@ -514,7 +514,7 @@ streams:
           - fixtures/assert-generation-integrity
 
     recipe-prod-research_flying_robot_frame-1:
-      canonical_row: prototypes/planner/generated-stream-manifest.json#streams.recipe-prod-research_flying_robot_frame-1
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_flying_robot_frame-1
       introduced_in: "pre-2.2.0"
       source: legacy_stream_table:productivity
       capability: recipe-productivity
@@ -530,7 +530,7 @@ streams:
           - fixtures/assert-generation-integrity
 
     recipe-prod-research_furnace-1:
-      canonical_row: prototypes/planner/generated-stream-manifest.json#streams.recipe-prod-research_furnace-1
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_furnace-1
       introduced_in: "pre-2.2.0"
       source: legacy_stream_table:productivity
       capability: recipe-productivity
@@ -546,7 +546,7 @@ streams:
           - fixtures/assert-generation-integrity
 
     recipe-prod-research_gears-1:
-      canonical_row: prototypes/planner/generated-stream-manifest.json#streams.recipe-prod-research_gears-1
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_gears-1
       introduced_in: "pre-2.2.0"
       source: legacy_stream_table:productivity
       capability: recipe-productivity
@@ -562,7 +562,7 @@ streams:
           - fixtures/assert-generation-integrity
 
     recipe-prod-research_grenades-1:
-      canonical_row: prototypes/planner/generated-stream-manifest.json#streams.recipe-prod-research_grenades-1
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_grenades-1
       introduced_in: "pre-2.2.0"
       source: legacy_stream_table:productivity
       capability: recipe-productivity
@@ -578,7 +578,7 @@ streams:
           - fixtures/assert-generation-integrity
 
     recipe-prod-research_heavy_ammo-1:
-      canonical_row: prototypes/planner/generated-stream-manifest.json#streams.recipe-prod-research_heavy_ammo-1
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_heavy_ammo-1
       introduced_in: "pre-2.2.0"
       source: legacy_stream_table:productivity
       capability: recipe-productivity
@@ -594,7 +594,7 @@ streams:
           - fixtures/assert-generation-integrity
 
     recipe-prod-research_holmium-1:
-      canonical_row: prototypes/planner/generated-stream-manifest.json#streams.recipe-prod-research_holmium-1
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_holmium-1
       introduced_in: "pre-2.2.0"
       source: legacy_stream_table:productivity
       capability: recipe-productivity
@@ -610,7 +610,7 @@ streams:
           - fixtures/assert-generation-integrity
 
     recipe-prod-research_ice-1:
-      canonical_row: prototypes/planner/generated-stream-manifest.json#streams.recipe-prod-research_ice-1
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_ice-1
       introduced_in: "pre-2.2.0"
       source: legacy_stream_table:productivity
       capability: recipe-productivity
@@ -626,7 +626,7 @@ streams:
           - fixtures/assert-generation-integrity
 
     recipe-prod-research_inserters-1:
-      canonical_row: prototypes/planner/generated-stream-manifest.json#streams.recipe-prod-research_inserters-1
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_inserters-1
       introduced_in: "pre-2.2.0"
       source: legacy_stream_table:productivity
       capability: recipe-productivity
@@ -642,7 +642,7 @@ streams:
           - fixtures/assert-generation-integrity
 
     recipe-prod-research_inventory_capacity-1:
-      canonical_row: prototypes/planner/generated-stream-manifest.json#streams.recipe-prod-research_inventory_capacity-1
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_inventory_capacity-1
       introduced_in: "pre-2.2.0"
       source: legacy_stream_table:direct-effects
       capability: native-modifier
@@ -658,7 +658,7 @@ streams:
           - fixtures/assert-generation-integrity
 
     recipe-prod-research_iron-1:
-      canonical_row: prototypes/planner/generated-stream-manifest.json#streams.recipe-prod-research_iron-1
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_iron-1
       introduced_in: "pre-2.2.0"
       source: legacy_stream_table:productivity
       capability: recipe-productivity
@@ -674,7 +674,7 @@ streams:
           - fixtures/assert-generation-integrity
 
     recipe-prod-research_iron_sticks-1:
-      canonical_row: prototypes/planner/generated-stream-manifest.json#streams.recipe-prod-research_iron_sticks-1
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_iron_sticks-1
       introduced_in: "pre-2.2.0"
       source: legacy_stream_table:productivity
       capability: recipe-productivity
@@ -690,7 +690,7 @@ streams:
           - fixtures/assert-generation-integrity
 
     recipe-prod-research_lab_productivity-1:
-      canonical_row: prototypes/planner/generated-stream-manifest.json#streams.recipe-prod-research_lab_productivity-1
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_lab_productivity-1
       introduced_in: "pre-2.2.0"
       source: legacy_stream_table:direct-effects
       capability: native-modifier
@@ -706,7 +706,7 @@ streams:
           - fixtures/assert-generation-integrity
 
     recipe-prod-research_landfill-1:
-      canonical_row: prototypes/planner/generated-stream-manifest.json#streams.recipe-prod-research_landfill-1
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_landfill-1
       introduced_in: "pre-2.2.0"
       source: legacy_stream_table:productivity
       capability: recipe-productivity
@@ -722,7 +722,7 @@ streams:
           - fixtures/assert-generation-integrity
 
     recipe-prod-research_lithium-1:
-      canonical_row: prototypes/planner/generated-stream-manifest.json#streams.recipe-prod-research_lithium-1
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_lithium-1
       introduced_in: "pre-2.2.0"
       source: legacy_stream_table:productivity
       capability: recipe-productivity
@@ -738,7 +738,7 @@ streams:
           - fixtures/assert-generation-integrity
 
     recipe-prod-research_low_density_structure-1:
-      canonical_row: prototypes/planner/generated-stream-manifest.json#streams.recipe-prod-research_low_density_structure-1
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_low_density_structure-1
       introduced_in: "pre-2.2.0"
       source: legacy_stream_table:productivity
       capability: recipe-productivity
@@ -754,7 +754,7 @@ streams:
           - fixtures/assert-generation-integrity
 
     recipe-prod-research_lubricant_productivity-1:
-      canonical_row: prototypes/planner/generated-stream-manifest.json#streams.recipe-prod-research_lubricant_productivity-1
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_lubricant_productivity-1
       introduced_in: "pre-2.2.0"
       source: legacy_stream_table:productivity
       capability: recipe-productivity
@@ -770,7 +770,7 @@ streams:
           - fixtures/assert-generation-integrity
 
     recipe-prod-research_mining_drill-1:
-      canonical_row: prototypes/planner/generated-stream-manifest.json#streams.recipe-prod-research_mining_drill-1
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_mining_drill-1
       introduced_in: "pre-2.2.0"
       source: legacy_stream_table:productivity
       capability: recipe-productivity
@@ -786,7 +786,7 @@ streams:
           - fixtures/assert-generation-integrity
 
     recipe-prod-research_modules-1:
-      canonical_row: prototypes/planner/generated-stream-manifest.json#streams.recipe-prod-research_modules-1
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_modules-1
       introduced_in: "pre-2.2.0"
       source: legacy_stream_table:productivity
       capability: recipe-productivity
@@ -802,7 +802,7 @@ streams:
           - fixtures/assert-generation-integrity
 
     recipe-prod-research_molten_metals-1:
-      canonical_row: prototypes/planner/generated-stream-manifest.json#streams.recipe-prod-research_molten_metals-1
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_molten_metals-1
       introduced_in: "pre-2.2.0"
       source: legacy_stream_table:productivity
       capability: recipe-productivity
@@ -818,7 +818,7 @@ streams:
           - fixtures/assert-generation-integrity
 
     recipe-prod-research_oil_cracking_productivity-1:
-      canonical_row: prototypes/planner/generated-stream-manifest.json#streams.recipe-prod-research_oil_cracking_productivity-1
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_oil_cracking_productivity-1
       introduced_in: "pre-2.2.0"
       source: legacy_stream_table:productivity
       capability: recipe-productivity
@@ -834,7 +834,7 @@ streams:
           - fixtures/assert-generation-integrity
 
     recipe-prod-research_oil_processing_productivity-1:
-      canonical_row: prototypes/planner/generated-stream-manifest.json#streams.recipe-prod-research_oil_processing_productivity-1
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_oil_processing_productivity-1
       introduced_in: "pre-2.2.0"
       source: legacy_stream_table:productivity
       capability: recipe-productivity
@@ -850,7 +850,7 @@ streams:
           - fixtures/assert-generation-integrity
 
     recipe-prod-research_plastic-1:
-      canonical_row: prototypes/planner/generated-stream-manifest.json#streams.recipe-prod-research_plastic-1
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_plastic-1
       introduced_in: "pre-2.2.0"
       source: legacy_stream_table:productivity
       capability: recipe-productivity
@@ -866,7 +866,7 @@ streams:
           - fixtures/assert-generation-integrity
 
     recipe-prod-research_processing_unit-1:
-      canonical_row: prototypes/planner/generated-stream-manifest.json#streams.recipe-prod-research_processing_unit-1
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_processing_unit-1
       introduced_in: "pre-2.2.0"
       source: legacy_stream_table:productivity
       capability: recipe-productivity
@@ -882,7 +882,7 @@ streams:
           - fixtures/assert-generation-integrity
 
     recipe-prod-research_quantum_processor-1:
-      canonical_row: prototypes/planner/generated-stream-manifest.json#streams.recipe-prod-research_quantum_processor-1
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_quantum_processor-1
       introduced_in: "pre-2.2.0"
       source: legacy_stream_table:productivity
       capability: recipe-productivity
@@ -898,7 +898,7 @@ streams:
           - fixtures/assert-generation-integrity
 
     recipe-prod-research_rails-1:
-      canonical_row: prototypes/planner/generated-stream-manifest.json#streams.recipe-prod-research_rails-1
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_rails-1
       introduced_in: "pre-2.2.0"
       source: legacy_stream_table:productivity
       capability: recipe-productivity
@@ -914,7 +914,7 @@ streams:
           - fixtures/assert-generation-integrity
 
     recipe-prod-research_robot_battery-1:
-      canonical_row: prototypes/planner/generated-stream-manifest.json#streams.recipe-prod-research_robot_battery-1
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_robot_battery-1
       introduced_in: "pre-2.2.0"
       source: legacy_stream_table:direct-effects
       capability: native-modifier
@@ -930,7 +930,7 @@ streams:
           - fixtures/assert-generation-integrity
 
     recipe-prod-research_rocket_fuel-1:
-      canonical_row: prototypes/planner/generated-stream-manifest.json#streams.recipe-prod-research_rocket_fuel-1
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_rocket_fuel-1
       introduced_in: "pre-2.2.0"
       source: legacy_stream_table:productivity
       capability: recipe-productivity
@@ -946,7 +946,7 @@ streams:
           - fixtures/assert-generation-integrity
 
     recipe-prod-research_rocket_shooting_speed-1:
-      canonical_row: prototypes/planner/generated-stream-manifest.json#streams.recipe-prod-research_rocket_shooting_speed-1
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_rocket_shooting_speed-1
       introduced_in: "pre-2.2.0"
       source: legacy_stream_table:direct-effects
       capability: native-modifier
@@ -962,7 +962,7 @@ streams:
           - fixtures/assert-generation-integrity
 
     recipe-prod-research_rockets-1:
-      canonical_row: prototypes/planner/generated-stream-manifest.json#streams.recipe-prod-research_rockets-1
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_rockets-1
       introduced_in: "pre-2.2.0"
       source: legacy_stream_table:productivity
       capability: recipe-productivity
@@ -978,7 +978,7 @@ streams:
           - fixtures/assert-generation-integrity
 
     recipe-prod-research_science_pack_productivity-1:
-      canonical_row: prototypes/planner/generated-stream-manifest.json#streams.recipe-prod-research_science_pack_productivity-1
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_science_pack_productivity-1
       introduced_in: "pre-2.2.0"
       source: legacy_stream_table:productivity
       capability: recipe-productivity
@@ -994,7 +994,7 @@ streams:
           - fixtures/assert-generation-integrity
 
     recipe-prod-research_spoilage_preservation-1:
-      canonical_row: prototypes/planner/generated-stream-manifest.json#streams.recipe-prod-research_spoilage_preservation-1
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_spoilage_preservation-1
       introduced_in: "pre-2.2.0"
       source: legacy_stream_table:direct-effects
       capability: native-modifier
@@ -1010,7 +1010,7 @@ streams:
           - fixtures/assert-generation-integrity
 
     recipe-prod-research_sulfur-1:
-      canonical_row: prototypes/planner/generated-stream-manifest.json#streams.recipe-prod-research_sulfur-1
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_sulfur-1
       introduced_in: "pre-2.2.0"
       source: legacy_stream_table:productivity
       capability: recipe-productivity
@@ -1026,7 +1026,7 @@ streams:
           - fixtures/assert-generation-integrity
 
     recipe-prod-research_sulfuric_acid_productivity-1:
-      canonical_row: prototypes/planner/generated-stream-manifest.json#streams.recipe-prod-research_sulfuric_acid_productivity-1
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_sulfuric_acid_productivity-1
       introduced_in: "pre-2.2.0"
       source: legacy_stream_table:productivity
       capability: recipe-productivity
@@ -1042,7 +1042,7 @@ streams:
           - fixtures/assert-generation-integrity
 
     recipe-prod-research_supercapacitor-1:
-      canonical_row: prototypes/planner/generated-stream-manifest.json#streams.recipe-prod-research_supercapacitor-1
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_supercapacitor-1
       introduced_in: "pre-2.2.0"
       source: legacy_stream_table:productivity
       capability: recipe-productivity
@@ -1058,7 +1058,7 @@ streams:
           - fixtures/assert-generation-integrity
 
     recipe-prod-research_superconductor-1:
-      canonical_row: prototypes/planner/generated-stream-manifest.json#streams.recipe-prod-research_superconductor-1
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_superconductor-1
       introduced_in: "pre-2.2.0"
       source: legacy_stream_table:productivity
       capability: recipe-productivity
@@ -1074,7 +1074,7 @@ streams:
           - fixtures/assert-generation-integrity
 
     recipe-prod-research_thruster_fuel_productivity-1:
-      canonical_row: prototypes/planner/generated-stream-manifest.json#streams.recipe-prod-research_thruster_fuel_productivity-1
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_thruster_fuel_productivity-1
       introduced_in: "pre-2.2.0"
       source: legacy_stream_table:productivity
       capability: recipe-productivity
@@ -1090,7 +1090,7 @@ streams:
           - fixtures/assert-generation-integrity
 
     recipe-prod-research_thruster_oxidizer_productivity-1:
-      canonical_row: prototypes/planner/generated-stream-manifest.json#streams.recipe-prod-research_thruster_oxidizer_productivity-1
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_thruster_oxidizer_productivity-1
       introduced_in: "pre-2.2.0"
       source: legacy_stream_table:productivity
       capability: recipe-productivity
@@ -1106,7 +1106,7 @@ streams:
           - fixtures/assert-generation-integrity
 
     recipe-prod-research_tungsten-1:
-      canonical_row: prototypes/planner/generated-stream-manifest.json#streams.recipe-prod-research_tungsten-1
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_tungsten-1
       introduced_in: "pre-2.2.0"
       source: legacy_stream_table:productivity
       capability: recipe-productivity
@@ -1122,7 +1122,7 @@ streams:
           - fixtures/assert-generation-integrity
 
     recipe-prod-research_walls-1:
-      canonical_row: prototypes/planner/generated-stream-manifest.json#streams.recipe-prod-research_walls-1
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_walls-1
       introduced_in: "pre-2.2.0"
       source: legacy_stream_table:productivity
       capability: recipe-productivity
