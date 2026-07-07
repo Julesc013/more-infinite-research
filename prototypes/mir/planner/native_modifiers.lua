@@ -1,5 +1,5 @@
 local D = require("prototypes.diagnostics")
-local table_utils = require("prototypes.lib.table-utils")
+local table_utils = require("prototypes.mir.core.table")
 local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 
 local M = {}

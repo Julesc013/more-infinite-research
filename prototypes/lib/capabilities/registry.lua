@@ -2,7 +2,7 @@ local D = require("prototypes.diagnostics")
 local contract = require("prototypes.lib.capabilities.contract")
 local fact_registry = require("prototypes.mir.index.registry_builder")
 local policies = require("prototypes.lib.policy.capabilities")
-local schema = require("prototypes.lib.mir.schema")
+local schema = require("prototypes.mir.core.schema")
 local lookup = require("prototypes.lib.prototype-lookup")
 
 local C = {}

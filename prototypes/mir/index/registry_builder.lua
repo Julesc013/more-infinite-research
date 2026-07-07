@@ -1,5 +1,5 @@
 local productivity_owners = require("prototypes.mir.index.productivity_owners")
-local schema = require("prototypes.lib.mir.schema")
+local schema = require("prototypes.mir.core.schema")
 
 local R = {}
 

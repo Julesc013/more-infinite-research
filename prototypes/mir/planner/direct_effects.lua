@@ -1,4 +1,4 @@
-local deepcopy = require("prototypes.lib.deepcopy")
+local deepcopy = require("prototypes.mir.core.deepcopy")
 local effect_safety = require("prototypes.technology-effect-safety")
 local U = require("prototypes.util")
 

@@ -1,4 +1,4 @@
-local deepcopy = require("prototypes.lib.deepcopy")
+local deepcopy = require("prototypes.mir.core.deepcopy")
 local lookup = require("prototypes.lib.prototype-lookup")
 
 local S = {}

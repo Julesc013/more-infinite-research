@@ -2,8 +2,8 @@ local C = require("prototypes.config")
 local U = require("prototypes.util")
 local profiles = require("prototypes.mir.compatibility.profiles")
 local productivity_owners = require("prototypes.mir.index.productivity_owners")
-local cleanup = require("prototypes.lib.technology-cleanup")
-local technology_requirements = require("prototypes.lib.technology-requirements")
+local cleanup = require("prototypes.mir.policy.technology_cleanup")
+local technology_requirements = require("prototypes.mir.planner.technology_requirements")
 
 local M = {}
 

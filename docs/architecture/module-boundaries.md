@@ -327,6 +327,7 @@ prototypes/
       competing_productivity.lua
       competing_base_extensions.lua
       productivity_family_adoption.lua
+      technology_cleanup.lua
       denylist.lua
       overrides.lua
 
@@ -395,6 +396,7 @@ prototypes/
       compiler.lua
       candidate.lua
       classifier.lua
+      technology_requirements.lua
       scorer.lua
       proposal.lua
       validator.lua

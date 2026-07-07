@@ -166,6 +166,8 @@ Assert-MIRContains -RelativePath $dataFinalFixesLegacyPath -Text $dataFinalFixes
 
 $requiredShims = @(
   "prototypes/mir/core/schema.lua",
+  "prototypes/mir/core/deepcopy.lua",
+  "prototypes/mir/core/table.lua",
   "prototypes/mir/platform/factorio/data_raw.lua",
   "prototypes/mir/platform/factorio/mods.lua",
   "prototypes/mir/settings/registry.lua",
@@ -177,6 +179,7 @@ $requiredShims = @(
   "prototypes/mir/policy/competing_productivity.lua",
   "prototypes/mir/policy/competing_base_extensions.lua",
   "prototypes/mir/policy/productivity_family_adoption.lua",
+  "prototypes/mir/policy/technology_cleanup.lua",
   "prototypes/mir/index/registry_builder.lua",
   "prototypes/mir/index/productivity_owners.lua",
   "prototypes/mir/index/recipes.lua",
@@ -194,6 +197,7 @@ $requiredShims = @(
   "prototypes/mir/planner/direct_effects.lua",
   "prototypes/mir/planner/native_modifiers.lua",
   "prototypes/mir/planner/requirements.lua",
+  "prototypes/mir/planner/technology_requirements.lua",
   "prototypes/mir/planner/science.lua",
   "prototypes/mir/planner/stream_compiler.lua",
   "prototypes/mir/stage/data_final_fixes_steps.lua",
@@ -370,7 +374,7 @@ Assert-MIRContains -RelativePath $plannerCompilerPath -Text $plannerCompilerText
 $plannerRequirementsPath = "prototypes/mir/planner/requirements.lua"
 $plannerRequirementsText = Read-MIRFile -RelativePath $plannerRequirementsPath
 Assert-MIRContains -RelativePath $plannerRequirementsPath -Text $plannerRequirementsText -Needle "function M.missing_reason(key, spec)"
-Assert-MIRContains -RelativePath $plannerRequirementsPath -Text $plannerRequirementsText -Needle 'require("prototypes.lib.technology-requirements")'
+Assert-MIRContains -RelativePath $plannerRequirementsPath -Text $plannerRequirementsText -Needle 'require("prototypes.mir.planner.technology_requirements")'
 Assert-MIRContains -RelativePath $plannerRequirementsPath -Text $plannerRequirementsText -Needle "U.mod_exists(mod_name)"
 Assert-MIRContains -RelativePath $plannerRequirementsPath -Text $plannerRequirementsText -Needle "U.ammo_category_exists(category)"
 

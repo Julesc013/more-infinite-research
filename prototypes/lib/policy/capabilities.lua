@@ -1,4 +1,4 @@
-local schema = require("prototypes.lib.mir.schema")
+local schema = require("prototypes.mir.core.schema")
 
 local P = {}
 

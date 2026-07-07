@@ -5,8 +5,8 @@ local base_defaults = defaults.base_extensions or {}
 local U = require("prototypes.util")
 local D = require("prototypes.diagnostics")
 local settings_resolver = require("prototypes.settings-resolver")
-local deepcopy = require("prototypes.lib.deepcopy")
-local table_utils = require("prototypes.lib.table-utils")
+local deepcopy = require("prototypes.mir.core.deepcopy")
+local table_utils = require("prototypes.mir.core.table")
 local effect_safety = require("prototypes.technology-effect-safety")
 
 local function escape_pattern(text)

@@ -980,7 +980,7 @@ Invoke-RepoCheck "2.2.0 compiler diagnostics are wired" {
   $capabilityRegistryPath = Join-Path $repo "prototypes\lib\capabilities\registry.lua"
   $capabilityContractPath = Join-Path $repo "prototypes\lib\capabilities\contract.lua"
   $capabilityPolicyPath = Join-Path $repo "prototypes\lib\policy\capabilities.lua"
-  $schemaPath = Join-Path $repo "prototypes\lib\mir\schema.lua"
+  $schemaPath = Join-Path $repo "prototypes\mir\core\schema.lua"
   $compilerPath = Join-Path $repo "prototypes\mir\planner\compiler.lua"
   $compilerShimPath = Join-Path $repo "prototypes\planner\compiler.lua"
   $converterText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\Convert-MIRCompatAuditResults.ps1")
@@ -1038,7 +1038,7 @@ Invoke-RepoCheck "2.2.0 compiler diagnostics are wired" {
     @{ File = "prototypes\mir\domain\decisions\decision_record.lua"; Text = $decisionRecordText; Snippet = 'schema.decision({' },
     @{ File = "prototypes\mir\report\decision_export.lua"; Text = $decisionExportText; Snippet = 'function M.emit(sink, record)' },
     @{ File = "prototypes\mir\report\decision_export.lua"; Text = $decisionExportText; Snippet = 'sink.decision(record)' },
-    @{ File = "prototypes\lib\mir\schema.lua"; Text = $schemaText; Snippet = 'S.decision_record = 1' },
+    @{ File = "prototypes\mir\core\schema.lua"; Text = $schemaText; Snippet = 'S.decision_record = 1' },
     @{ File = "prototypes\lib\capabilities\contract.lua"; Text = $capabilityContractText; Snippet = 'CapabilityResolver' },
     @{ File = "prototypes\lib\capabilities\contract.lua"; Text = $capabilityContractText; Snippet = '"discover"' },
     @{ File = "prototypes\lib\policy\capabilities.lua"; Text = $capabilityPolicyText; Snippet = 'P.schema_version = schema.capability_policy' },

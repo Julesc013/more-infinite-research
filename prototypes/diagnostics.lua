@@ -1,6 +1,6 @@
 local D = {}
 local icons = require("prototypes.lib.technology-icons")
-local schema = require("prototypes.lib.mir.schema")
+local schema = require("prototypes.mir.core.schema")
 
 local rows = {}
 local audit_rows = {}

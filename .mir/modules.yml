@@ -46,6 +46,8 @@ runtime_boundaries:
 
 namespace_shims:
   schema: prototypes/mir/core/schema.lua
+  deepcopy: prototypes/mir/core/deepcopy.lua
+  table_utils: prototypes/mir/core/table.lua
   factorio_data_raw: prototypes/mir/platform/factorio/data_raw.lua
   factorio_mods: prototypes/mir/platform/factorio/mods.lua
   settings_registry: prototypes/mir/settings/registry.lua
@@ -57,6 +59,7 @@ namespace_shims:
   competing_productivity_policy: prototypes/mir/policy/competing_productivity.lua
   competing_base_extensions_policy: prototypes/mir/policy/competing_base_extensions.lua
   productivity_family_adoption_policy: prototypes/mir/policy/productivity_family_adoption.lua
+  technology_cleanup_policy: prototypes/mir/policy/technology_cleanup.lua
   fact_registry: prototypes/mir/index/registry_builder.lua
   index_productivity_owners: prototypes/mir/index/productivity_owners.lua
   legacy_fact_registry_shim: prototypes/lib/facts/registry.lua
@@ -78,6 +81,7 @@ namespace_shims:
   planner_direct_effects: prototypes/mir/planner/direct_effects.lua
   planner_native_modifiers: prototypes/mir/planner/native_modifiers.lua
   planner_requirements: prototypes/mir/planner/requirements.lua
+  planner_technology_requirements: prototypes/mir/planner/technology_requirements.lua
   planner_science: prototypes/mir/planner/science.lua
   planner_stream_compiler: prototypes/mir/planner/stream_compiler.lua
   data_final_fixes_stage: prototypes/mir/stage/data_final_fixes.lua

@@ -1,5 +1,5 @@
 local U = require("prototypes.util")
-local technology_requirements = require("prototypes.lib.technology-requirements")
+local technology_requirements = require("prototypes.mir.planner.technology_requirements")
 
 local M = {}
 
