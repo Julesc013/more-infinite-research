@@ -1732,7 +1732,10 @@ function Get-FixtureInfos {
 
 function Enable-CopiedDiagnostics {
   param([string]$ModsDir)
-  $copiedDiagnosticsPath = Join-Path $ModsDir "more-infinite-research\prototypes\diagnostics.lua"
+  $copiedDiagnosticsPath = Join-Path $ModsDir "more-infinite-research\prototypes\mir\report\diagnostics_sink.lua"
+  if (-not (Test-Path -LiteralPath $copiedDiagnosticsPath)) {
+    $copiedDiagnosticsPath = Join-Path $ModsDir "more-infinite-research\prototypes\diagnostics.lua"
+  }
   $copiedDiagnostics = Get-Content -Raw -LiteralPath $copiedDiagnosticsPath
   $copiedDiagnostics = $copiedDiagnostics -replace 'return startup_setting\("mir-debug-generation-report"\) == true', 'return true'
   Set-Content -LiteralPath $copiedDiagnosticsPath -Value $copiedDiagnostics -Encoding UTF8
