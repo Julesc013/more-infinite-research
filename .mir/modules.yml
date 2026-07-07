@@ -58,6 +58,7 @@ namespace_shims:
   settings_registry: prototypes/mir/settings/registry.lua
   settings_visibility: prototypes/mir/settings/visibility.lua
   settings_builder: prototypes/mir/settings/builder.lua
+  settings_stage_builder: prototypes/mir/settings/stage_builder.lua
   settings_legacy_adapter: prototypes/mir/settings/legacy_adapter.lua
   settings_profile_codec: prototypes/mir/settings/profile_codec.lua
   settings_effective: prototypes/mir/settings/effective.lua

@@ -109,11 +109,13 @@ it must not inspect `data.raw`: item, recipe, fluid, and technology prototypes
 are not finalized until the later prototype stage.
 
 The MIR settings namespace is `prototypes/mir/settings/`. It owns the startup
-settings catalog, settings-stage visibility evaluation, and the adapter that
-lets the legacy settings builder apply `hidden = true` without deleting setting
-IDs or forcing values. Settings visibility uses `ui_visibility` metadata and
-active mods only; final recipe, item, fluid, and technology facts remain
-data-stage generation concerns.
+settings catalog, settings-stage prototype builder, settings-stage visibility
+evaluation, and the adapter that applies `hidden = true` without deleting
+setting IDs or forcing values. Settings visibility uses `ui_visibility`
+metadata and active mods only; final recipe, item, fluid, and technology facts
+remain data-stage generation concerns. The old
+`prototypes/mir/legacy/settings.lua` path is a compatibility shim to
+`prototypes/mir/settings/stage_builder.lua`.
 
 The MIR planner namespace owns compiler planning checks as they are migrated out
 of legacy generators. `prototypes/mir/planner/requirements.lua` evaluates

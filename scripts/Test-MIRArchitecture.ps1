@@ -83,19 +83,19 @@ $entrypoints = @(
     Root = "settings.lua"
     StageModule = "prototypes.mir.stage.settings"
     StagePath = "prototypes/mir/stage/settings.lua"
-    LegacyModule = "prototypes.mir.legacy.settings"
+    StageNeedle = 'require("prototypes.mir.settings.stage_builder")'
   },
   @{
     Root = "data.lua"
     StageModule = "prototypes.mir.stage.data"
     StagePath = "prototypes/mir/stage/data.lua"
-    LegacyModule = "prototypes.mir.legacy.data"
+    StageNeedle = 'require("prototypes.mir.streams.registry")'
   },
   @{
     Root = "data-updates.lua"
     StageModule = "prototypes.mir.stage.data_updates"
     StagePath = "prototypes/mir/stage/data_updates.lua"
-    LegacyModule = "prototypes.mir.legacy.data_updates"
+    StageNeedle = "Reserved for compatibility hooks"
   },
   @{
     Root = "data-final-fixes.lua"
@@ -131,6 +131,8 @@ foreach ($entry in $entrypoints) {
     Assert-MIRContains -RelativePath $entry.StagePath -Text $stageText -Needle 'require("control.settings-profile").register()'
   } elseif ($entry.Root -eq "data-final-fixes.lua") {
     Assert-MIRContains -RelativePath $entry.StagePath -Text $stageText -Needle 'require("prototypes.mir.stage.data_final_fixes_steps")'
+  } elseif ($entry.ContainsKey("StageNeedle")) {
+    Assert-MIRContains -RelativePath $entry.StagePath -Text $stageText -Needle $entry.StageNeedle
   } else {
     Assert-MIRContains -RelativePath $entry.StagePath -Text $stageText -Needle ('require("' + $entry.LegacyModule + '")')
   }
@@ -656,8 +658,18 @@ Assert-MIRNoPatternInLuaTree `
 
 Assert-MIRNoPatternInLuaTree `
   -RelativeRoot "prototypes/mir/settings" `
-  -Pattern "\bdata\.raw\b|data:extend|forced_value" `
-  -Message "MIR settings modules must not inspect finalized prototypes, mutate prototypes, or force hidden values."
+  -Pattern "\bdata\.raw\b|forced_value" `
+  -Message "MIR settings modules must not inspect finalized prototypes or force hidden values."
+
+$settingsExtendMatches = @(
+  Get-ChildItem -LiteralPath (Get-MIRPath -RelativePath "prototypes/mir/settings") -Recurse -File -Filter "*.lua" |
+    Where-Object { [System.IO.Path]::GetRelativePath($repo, $_.FullName).Replace("\", "/") -ne "prototypes/mir/settings/stage_builder.lua" } |
+    Select-String -Pattern "data:extend"
+)
+if ($settingsExtendMatches.Count -gt 0) {
+  $settingsExtendMatches | Write-Host
+  throw "Only prototypes/mir/settings/stage_builder.lua may register setting prototypes with data:extend."
+}
 
 Assert-MIRNoPatternInLuaTree `
   -RelativeRoot "prototypes" `

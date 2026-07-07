@@ -60,7 +60,7 @@ function Assert-NoPatternInTree {
 }
 
 $settingsManifestText = Read-MIRText -RelativePath ".mir/settings.yml"
-$legacySettingsText = Read-MIRText -RelativePath "prototypes/mir/legacy/settings.lua"
+$stageBuilderText = Read-MIRText -RelativePath "prototypes/mir/settings/stage_builder.lua"
 $registryText = Read-MIRText -RelativePath "prototypes/mir/settings/registry.lua"
 $visibilityText = Read-MIRText -RelativePath "prototypes/mir/settings/visibility.lua"
 $builderText = Read-MIRText -RelativePath "prototypes/mir/settings/builder.lua"
@@ -106,11 +106,11 @@ Assert-Contains -RelativePath "control/settings-profile.lua" -Text $controlSetti
 Assert-Contains -RelativePath "control/settings-profile.lua" -Text $controlSettingsProfileText -Needle '"mir-settings-import-check"'
 Assert-Contains -RelativePath "control/settings-profile.lua" -Text $controlSettingsProfileText -Needle 'script-output/" .. filename'
 Assert-Contains -RelativePath "control/settings-profile.lua" -Text $controlSettingsProfileText -Needle 'remote.add_interface("more-infinite-research-settings"'
-Assert-Contains -RelativePath "prototypes/mir/legacy/settings.lua" -Text $legacySettingsText -Needle 'local settings_adapter = require("prototypes.mir.settings.legacy_adapter")'
-Assert-Contains -RelativePath "prototypes/mir/legacy/settings.lua" -Text $legacySettingsText -Needle 'name = "mir-settings-profile-import"'
-Assert-Contains -RelativePath "prototypes/mir/legacy/settings.lua" -Text $legacySettingsText -Needle "allow_blank = true"
-Assert-Contains -RelativePath "prototypes/mir/legacy/settings.lua" -Text $legacySettingsText -Needle "settings_adapter.visibility_for_stream(stream, settings_context)"
-Assert-Contains -RelativePath "prototypes/mir/legacy/settings.lua" -Text $legacySettingsText -Needle "settings_adapter.apply(setting, group and group.ui_visibility)"
+Assert-Contains -RelativePath "prototypes/mir/settings/stage_builder.lua" -Text $stageBuilderText -Needle 'local settings_adapter = require("prototypes.mir.settings.legacy_adapter")'
+Assert-Contains -RelativePath "prototypes/mir/settings/stage_builder.lua" -Text $stageBuilderText -Needle 'name = "mir-settings-profile-import"'
+Assert-Contains -RelativePath "prototypes/mir/settings/stage_builder.lua" -Text $stageBuilderText -Needle "allow_blank = true"
+Assert-Contains -RelativePath "prototypes/mir/settings/stage_builder.lua" -Text $stageBuilderText -Needle "settings_adapter.visibility_for_stream(stream, settings_context)"
+Assert-Contains -RelativePath "prototypes/mir/settings/stage_builder.lua" -Text $stageBuilderText -Needle "settings_adapter.apply(setting, group and group.ui_visibility)"
 
 Assert-Contains -RelativePath "prototypes/streams/productivity.lua" -Text $productivityText -Needle "ui_visibility = {"
 Assert-Contains -RelativePath "prototypes/streams/productivity.lua" -Text $productivityText -Needle 'mods_any = air_scrubbing_overlay.applies_when.mods'
@@ -135,7 +135,7 @@ Assert-Contains -RelativePath "docs/maintainer/settings-governance.md" -Text $se
 
 Assert-NoPattern -RelativePath "prototypes/mir/settings/visibility.lua" -Text $visibilityText -Pattern "\bdata\.raw\b|data:extend|settings\.startup"
 Assert-NoPattern -RelativePath "prototypes/mir/settings/builder.lua" -Text $builderText -Pattern "forced_value"
-Assert-NoPattern -RelativePath "prototypes/mir/legacy/settings.lua" -Text $legacySettingsText -Pattern "forced_value"
+Assert-NoPattern -RelativePath "prototypes/mir/settings/stage_builder.lua" -Text $stageBuilderText -Pattern "forced_value"
 
 Assert-NoPatternInTree `
   -RelativeRoot "prototypes" `

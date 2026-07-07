@@ -1,1 +1,1 @@
-require("prototypes.mir.streams.registry")
+return require("prototypes.mir.stage.data")

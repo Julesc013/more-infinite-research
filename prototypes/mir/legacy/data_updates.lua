@@ -1,1 +1,1 @@
--- Reserved for compatibility hooks that must run before final recipe and lab scanning.
+return require("prototypes.mir.stage.data_updates")

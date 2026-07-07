@@ -1,7 +1,7 @@
 local M = {}
 
 function M.run()
-  require("prototypes.mir.legacy.data_updates")
+  -- Reserved for compatibility hooks that must run before final recipe and lab scanning.
 end
 
 return M
