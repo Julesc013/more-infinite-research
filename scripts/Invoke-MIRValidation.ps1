@@ -743,6 +743,7 @@ Invoke-RepoCheck "compat audit automation tooling is wired" {
   $stubText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\New-MIRCompatProfileStub.ps1")
   $runnerText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\MIRCompatAudit\FactorioRunner.ps1")
   $releaseTargetedGateText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\Invoke-MIRReleaseTargetedGate.ps1")
+  $localCatalogGateText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\Test-MIRLocalModLibraryCatalog.ps1")
   $mirCliText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\mir.ps1")
   $consoleText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\MIRCli\Console.ps1")
   $runContextText = Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\MIRCli\RunContext.ps1")
@@ -849,6 +850,10 @@ Invoke-RepoCheck "compat audit automation tooling is wired" {
     @{ File = "scripts\Invoke-MIRReleaseTargetedGate.ps1"; Text = $releaseTargetedGateText; Snippet = 'RepairSmokeModNames' },
     @{ File = "scripts\Invoke-MIRReleaseTargetedGate.ps1"; Text = $releaseTargetedGateText; Snippet = 'RepresentativeScenarioName' },
     @{ File = "scripts\Invoke-MIRReleaseTargetedGate.ps1"; Text = $releaseTargetedGateText; Snippet = 'AuditFactorioVersions' },
+    @{ File = "scripts\Test-MIRLocalModLibraryCatalog.ps1"; Text = $localCatalogGateText; Snippet = '[Parameter(Mandatory)][string[]]$LocalModLibraryDirs' },
+    @{ File = "scripts\Test-MIRLocalModLibraryCatalog.ps1"; Text = $localCatalogGateText; Snippet = 'Read-MIRModInfoFromZip' },
+    @{ File = "scripts\Test-MIRLocalModLibraryCatalog.ps1"; Text = $localCatalogGateText; Snippet = 'missing_scenario_mod_count' },
+    @{ File = "scripts\Test-MIRLocalModLibraryCatalog.ps1"; Text = $localCatalogGateText; Snippet = 'AllowMissingScenarioMods' },
     @{ File = "scripts\mir.ps1"; Text = $mirCliText; Snippet = ".\scripts\mir.ps1 release gate" },
     @{ File = "scripts\mir.ps1"; Text = $mirCliText; Snippet = "Invoke-MIRRunProfile" },
     @{ File = "scripts\mir.ps1"; Text = $mirCliText; Snippet = "--factorio-line" },
@@ -909,6 +914,7 @@ Invoke-RepoCheck "compat audit automation tooling is wired" {
     @{ File = "docs\compatibility\README.md"; Text = $compatDocsText; Snippet = 'Local dependency libraries can be supplied separately with `-LocalModLibraryDirs`' },
     @{ File = "docs\compatibility\README.md"; Text = $compatDocsText; Snippet = '`Start-MIROvernightLocalSweep.ps1` is the preferred bedtime command' },
     @{ File = "docs\compatibility\README.md"; Text = $compatDocsText; Snippet = '`GeneratedLocalScenarios` creates scenarios from local zip metadata' },
+    @{ File = "docs\compatibility\README.md"; Text = $compatDocsText; Snippet = 'Test-MIRLocalModLibraryCatalog.ps1' },
     @{ File = "docs\compatibility\README.md"; Text = $compatDocsText; Snippet = 'The grouped converter writes `missing-dependencies.md`' },
     @{ File = "docs\compatibility\README.md"; Text = $compatDocsText; Snippet = 'Do not mix Factorio lines unintentionally.' },
     @{ File = "docs\compatibility\README.md"; Text = $compatDocsText; Snippet = 'Sharded or resumed audits can use `-FromLockfile`, `-StartIndex`, `-Count`, and `-CandidateNames`' },
@@ -920,6 +926,7 @@ Invoke-RepoCheck "compat audit automation tooling is wired" {
     @{ File = "docs\maintainer\developer-tools.md"; Text = $devToolsText; Snippet = "Preferred Commands" },
     @{ File = "docs\maintainer\developer-tools.md"; Text = $devToolsText; Snippet = "scripts/MIRCli/*.ps1" },
     @{ File = "docs\maintainer\developer-tools.md"; Text = $devToolsText; Snippet = "Test-MIRPowerShellQuality.ps1" }
+    @{ File = "docs\maintainer\developer-tools.md"; Text = $devToolsText; Snippet = "Test-MIRLocalModLibraryCatalog.ps1" }
   )
 
   foreach ($check in $requiredSnippets) {

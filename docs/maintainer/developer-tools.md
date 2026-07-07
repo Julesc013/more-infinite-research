@@ -88,6 +88,11 @@ Reusable defaults live in `fixtures/run-profiles/`.
 | `local-bz-smoke` | Narrow BZ Space Age local smoke. |
 | `top25-space-age` | Credentialed top-25 Space Age compatibility audit. |
 
+Run `Test-MIRLocalModLibraryCatalog.ps1` before expensive local sweeps to verify
+that the local zip library contains the root mods named by the committed
+local-library scenario file. This is metadata-only; it does not launch Factorio
+or call the Mod Portal.
+
 Prefer adding or editing a profile over hardcoding paths in `mir.ps1`. Local machine paths are acceptable in profiles because they are explicit operator defaults and easy to override.
 
 `FactorioLine` is a selector for the existing tools, not a separate harness. It controls Mod Portal release matching, local scenario defaults, output naming, and which local library path is chosen when no path is passed. A Factorio `2.0` profile still requires a real Factorio `2.0.x` binary and a source tree whose `info.json` targets Factorio `2.0`.

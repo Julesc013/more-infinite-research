@@ -229,6 +229,11 @@ The default smoke mods and representative scenario are ordinary parameters, so f
 
 `Start-MIROvernightLocalSweep.ps1` is the preferred bedtime command for the local `2.1` library. It removes one-line paste hazards, starts a transcript log, writes `run-manifest.json`, `events.jsonl`, `artifact-index.json`, and `index.html`, runs the strict release gate, then runs the local sweep with `-CollectAll`. The underlying prioritized local sweep covers curated combinations from `fixtures/compat-matrix/local-library-scenarios.json`, generated all-local/cluster stress scenarios, and then each individual local root zip. Missing dependencies and impossible mod combinations are expected to appear as grouped failures; they are still useful evidence because they distinguish "not testable with this local library" from actual MIR generation regressions. `compat-observations.md/json/csv` records diagnostics-only planner rows and cap warnings. `Show-MIROvernightSummary.ps1` summarizes the next-morning triage views across the whole output tree.
 
+Use `Test-MIRLocalModLibraryCatalog.ps1` before a local sweep when you need a
+metadata-only gate. It reads local zip `info.json` files, catalogs available mod
+names, and fails if committed local-library scenario roots are missing from the
+library.
+
 `GeneratedLocalScenarios` creates scenarios from local zip metadata: one all-local mega scenario, cluster scenarios for planet/Space Age content, BZ/resource chains, Bob, Krastorio/K2SO, production/fluid/casting/resource-flow mods, and logistics/transport mods. Add `-IncludeGeneratedLocalPairwise -GeneratedLocalPairwiseLimit 40` to the wrapper when you want a capped pairwise pass inside high-risk local clusters. `LocalModZips` can be sharded with `-ShardLocalModZips -StartIndex N -ShardSize M`; without `-ShardLocalModZips`, it tests every local root.
 
 For idea-mod and overhaul campaigns, do not treat a full-folder load as the main proof. Run `MIR + one mod`, `MIR + one family`, `MIR + known conflict pair`, `MIR + representative overhaul stack`, and only then a full chaos-folder smoke as non-blocking evidence. Public compatibility claims require exact mod versions, role enums, validation artifacts, save-compatibility notes, and clear non-ownership notes for behavior MIR deliberately leaves external.
