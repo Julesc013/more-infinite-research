@@ -11,7 +11,7 @@ param(
   [int]$MaxRequiresConfig = 0,
   [int]$MaxRequiresUtil = 0,
   [int]$MaxRequiresDiagnostics = 0,
-  [int]$MaxDataRawOutsidePlatform = 34,
+  [int]$MaxDataRawOutsidePlatform = 32,
   [int]$MaxGeneratedStreamsWithoutManifest = 0
 )
 

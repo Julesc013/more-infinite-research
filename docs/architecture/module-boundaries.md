@@ -180,6 +180,10 @@ enforcement pass for generated stream technologies; the old
 `prototypes/max-level-control.lua` root path is an execution shim. This remains
 in the current mutator allowlist because it adjusts already generated MIR
 technology prototypes after stream emission.
+`prototypes/mir/policy/weapon_speed.lua` owns the optional duplicate
+rocket/cannon speed cleanup for generated general weapon-speed continuations;
+the old `prototypes/weapon-speed-adjustments.lua` root path is an execution
+shim.
 
 ## Three Workspaces
 
@@ -355,6 +359,7 @@ prototypes/
       science_policy.lua
       cap_policy.lua
       max_level.lua
+      weapon_speed.lua
       owner_policy.lua
       competing_productivity.lua
       competing_base_extensions.lua

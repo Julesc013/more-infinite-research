@@ -154,6 +154,7 @@ Assert-MIRContains -RelativePath $dataFinalFixesStepsPath -Text $dataFinalFixesS
 Assert-MIRContains -RelativePath $dataFinalFixesStepsPath -Text $dataFinalFixesStepsText -Needle 'require("prototypes.mir.policy.competing_productivity").apply()'
 Assert-MIRContains -RelativePath $dataFinalFixesStepsPath -Text $dataFinalFixesStepsText -Needle 'require("prototypes.mir.policy.competing_base_extensions").apply()'
 Assert-MIRContains -RelativePath $dataFinalFixesStepsPath -Text $dataFinalFixesStepsText -Needle 'require("prototypes.mir.policy.max_level").apply()'
+Assert-MIRContains -RelativePath $dataFinalFixesStepsPath -Text $dataFinalFixesStepsText -Needle 'require("prototypes.mir.policy.weapon_speed").apply()'
 Assert-MIRContains -RelativePath $dataFinalFixesStepsPath -Text $dataFinalFixesStepsText -Needle "function M.emit_streams()"
 Assert-MIRContains -RelativePath $dataFinalFixesStepsPath -Text $dataFinalFixesStepsText -Needle 'require("prototypes.mir.planner.stream_compiler").run()'
 Assert-MIRContains -RelativePath $dataFinalFixesStepsPath -Text $dataFinalFixesStepsText -Needle 'require("prototypes.mir.emit.base_extensions").emit_all()'
@@ -188,6 +189,7 @@ $requiredShims = @(
   "prototypes/mir/policy/productivity_family_adoption.lua",
   "prototypes/mir/policy/technology_cleanup.lua",
   "prototypes/mir/policy/max_level.lua",
+  "prototypes/mir/policy/weapon_speed.lua",
   "prototypes/mir/policy/capabilities.lua",
   "prototypes/mir/index/registry_builder.lua",
   "prototypes/mir/index/productivity_owners.lua",
@@ -322,6 +324,18 @@ Assert-MIRContains -RelativePath $maxLevelPolicyPath -Text $maxLevelPolicyText -
 Assert-MIRContains -RelativePath $maxLevelPolicyPath -Text $maxLevelPolicyText -Needle 'require("prototypes.mir.planner.costs")'
 Assert-MIRContains -RelativePath $maxLevelPolicyPath -Text $maxLevelPolicyText -Needle "function M.apply()"
 Assert-MIRContains -RelativePath $maxLevelPolicyPath -Text $maxLevelPolicyText -Needle "data_raw.technology(tech_name)"
+
+$weaponSpeedShimPath = "prototypes/weapon-speed-adjustments.lua"
+$weaponSpeedShimText = Read-MIRFile -RelativePath $weaponSpeedShimPath
+Assert-MIRContains -RelativePath $weaponSpeedShimPath -Text $weaponSpeedShimText -Needle 'return require("prototypes.mir.policy.weapon_speed").apply()'
+
+$weaponSpeedPolicyPath = "prototypes/mir/policy/weapon_speed.lua"
+$weaponSpeedPolicyText = Read-MIRFile -RelativePath $weaponSpeedPolicyPath
+Assert-MIRContains -RelativePath $weaponSpeedPolicyPath -Text $weaponSpeedPolicyText -Needle 'require("prototypes.mir.platform.factorio.data_raw")'
+Assert-MIRContains -RelativePath $weaponSpeedPolicyPath -Text $weaponSpeedPolicyText -Needle 'require("prototypes.mir.settings.effective")'
+Assert-MIRContains -RelativePath $weaponSpeedPolicyPath -Text $weaponSpeedPolicyText -Needle "function M.apply()"
+Assert-MIRContains -RelativePath $weaponSpeedPolicyPath -Text $weaponSpeedPolicyText -Needle 'data_raw.prototypes("technology")'
+Assert-MIRContains -RelativePath $weaponSpeedPolicyPath -Text $weaponSpeedPolicyText -Needle "tech.unit and tech.unit.count_formula"
 
 $streamCompilerPath = "prototypes/mir/planner/stream_compiler.lua"
 $streamCompilerText = Read-MIRFile -RelativePath $streamCompilerPath
@@ -470,7 +484,7 @@ Assert-MIRContains -RelativePath $legacyInventoryPath -Text $legacyInventoryText
 Assert-MIRContains -RelativePath $legacyInventoryPath -Text $legacyInventoryText -Needle "compat_active_modules"
 Assert-MIRContains -RelativePath $legacyInventoryPath -Text $legacyInventoryText -Needle "requires_lib"
 Assert-MIRContains -RelativePath $legacyInventoryPath -Text $legacyInventoryText -Needle "MaxRequiresUtil = 0"
-Assert-MIRContains -RelativePath $legacyInventoryPath -Text $legacyInventoryText -Needle "MaxDataRawOutsidePlatform = 34"
+Assert-MIRContains -RelativePath $legacyInventoryPath -Text $legacyInventoryText -Needle "MaxDataRawOutsidePlatform = 32"
 Assert-MIRContains -RelativePath $legacyInventoryPath -Text $legacyInventoryText -Needle "MaxLibActiveModules = 0"
 Assert-MIRContains -RelativePath $legacyInventoryPath -Text $legacyInventoryText -Needle "MIR legacy inventory thresholds passed"
 

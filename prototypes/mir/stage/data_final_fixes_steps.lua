@@ -28,7 +28,7 @@ function M.emit_base_extensions()
 end
 
 function M.apply_weapon_speed_adjustments()
-  require("prototypes.weapon-speed-adjustments")
+  require("prototypes.mir.policy.weapon_speed").apply()
 end
 
 function M.apply_max_level_control()

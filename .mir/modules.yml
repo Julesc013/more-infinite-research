@@ -69,6 +69,7 @@ namespace_shims:
   productivity_family_adoption_policy: prototypes/mir/policy/productivity_family_adoption.lua
   technology_cleanup_policy: prototypes/mir/policy/technology_cleanup.lua
   max_level_policy: prototypes/mir/policy/max_level.lua
+  weapon_speed_policy: prototypes/mir/policy/weapon_speed.lua
   capability_policy: prototypes/mir/policy/capabilities.lua
   fact_registry: prototypes/mir/index/registry_builder.lua
   index_productivity_owners: prototypes/mir/index/productivity_owners.lua
@@ -253,7 +254,7 @@ current_boundary_allowlist:
     - prototypes/mir/emit/base_extensions.lua
     - prototypes/pipeline-extent.lua
     - prototypes/mir/policy/max_level.lua
-    - prototypes/weapon-speed-adjustments.lua
+    - prototypes/mir/policy/weapon_speed.lua
     - prototypes/mir/policy/competing_productivity.lua
     - prototypes/mir/policy/competing_base_extensions.lua
     - prototypes/mir/policy/productivity_family_adoption.lua
