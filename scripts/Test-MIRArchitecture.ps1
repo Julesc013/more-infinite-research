@@ -167,6 +167,7 @@ $requiredShims = @(
   "prototypes/mir/report/decision_export.lua",
   "prototypes/mir/report/compatibility_diagnostics.lua",
   "prototypes/mir/planner/compiler.lua",
+  "prototypes/mir/planner/native_modifiers.lua",
   "prototypes/mir/planner/requirements.lua",
   "prototypes/mir/compatibility/registry.lua",
   "prototypes/mir/compatibility/overlay_loader.lua",
@@ -206,8 +207,10 @@ Assert-MIRContains -RelativePath $legacyStreamEmitterPath -Text $legacyStreamEmi
 $legacyTechGenPath = "prototypes/tech-gen.lua"
 $legacyTechGenText = Read-MIRFile -RelativePath $legacyTechGenPath
 Assert-MIRContains -RelativePath $legacyTechGenPath -Text $legacyTechGenText -Needle 'require("prototypes.mir.legacy.stream_emitter")'
+Assert-MIRContains -RelativePath $legacyTechGenPath -Text $legacyTechGenText -Needle 'require("prototypes.mir.planner.native_modifiers")'
 Assert-MIRContains -RelativePath $legacyTechGenPath -Text $legacyTechGenText -Needle 'require("prototypes.mir.planner.requirements")'
 Assert-MIRContains -RelativePath $legacyTechGenPath -Text $legacyTechGenText -Needle "planner_requirements.missing_reason(key, raw_spec)"
+Assert-MIRContains -RelativePath $legacyTechGenPath -Text $legacyTechGenText -Needle "native_modifiers.record_overlaps(key, direct_effects)"
 Assert-MIRContains -RelativePath $legacyTechGenPath -Text $legacyTechGenText -Needle "stream_emitter.emit(key, spec, fields)"
 
 $indexRegistryPath = "prototypes/mir/index/registry_builder.lua"
@@ -267,6 +270,13 @@ Assert-MIRContains -RelativePath $plannerRequirementsPath -Text $plannerRequirem
 Assert-MIRContains -RelativePath $plannerRequirementsPath -Text $plannerRequirementsText -Needle 'require("prototypes.lib.technology-requirements")'
 Assert-MIRContains -RelativePath $plannerRequirementsPath -Text $plannerRequirementsText -Needle "U.mod_exists(mod_name)"
 Assert-MIRContains -RelativePath $plannerRequirementsPath -Text $plannerRequirementsText -Needle "U.ammo_category_exists(category)"
+
+$plannerNativeModifiersPath = "prototypes/mir/planner/native_modifiers.lua"
+$plannerNativeModifiersText = Read-MIRFile -RelativePath $plannerNativeModifiersPath
+Assert-MIRContains -RelativePath $plannerNativeModifiersPath -Text $plannerNativeModifiersText -Needle 'require("prototypes.mir.platform.factorio.data_raw")'
+Assert-MIRContains -RelativePath $plannerNativeModifiersPath -Text $plannerNativeModifiersText -Needle "function M.identity(effect)"
+Assert-MIRContains -RelativePath $plannerNativeModifiersPath -Text $plannerNativeModifiersText -Needle 'data_raw.prototypes("technology")'
+Assert-MIRContains -RelativePath $plannerNativeModifiersPath -Text $plannerNativeModifiersText -Needle "function M.record_overlaps(key, effects)"
 
 $airScrubbingOverlayPath = "prototypes/mir/compatibility/overlays/air_scrubbing.lua"
 $airScrubbingOverlayText = Read-MIRFile -RelativePath $airScrubbingOverlayPath
