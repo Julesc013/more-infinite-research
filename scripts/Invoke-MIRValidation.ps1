@@ -461,7 +461,7 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
   $plannerPrerequisitesText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\planner\prerequisites.lua")
   $plannerRequirementsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\planner\requirements.lua")
   $dataFinalFixesText = Get-MIRDataFinalFixesSourceText
-  $pipelineExtentText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\pipeline-extent.lua")
+  $pipelineExtentText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\pipeline\extent.lua")
   $pipelineExtentSettingsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\settings\pipeline_extent.lua")
   $diagnosticsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\report\diagnostics_sink.lua")
   $weaponSpeedText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\policy\weapon_speed.lua")
@@ -619,13 +619,13 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'require("prototypes.mir.settings.pipeline_extent").multiplier()' },
     @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'require("prototypes.mir.compatibility.diagnostics.registry").emit_all()' },
     @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'if pipeline_extent_multiplier ~= 1 then' },
-    @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'require("prototypes.pipeline-extent").apply(pipeline_extent_multiplier)' },
+    @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'require("prototypes.mir.pipeline.extent").apply(pipeline_extent_multiplier)' },
     @{ File = "prototypes\mir\settings\pipeline_extent.lua"; Text = $pipelineExtentSettingsText; Snippet = 'S.default_value = "100"' },
     @{ File = "prototypes\mir\settings\pipeline_extent.lua"; Text = $pipelineExtentSettingsText; Snippet = 'S.allowed_values = {"50", "75", "100", "125", "150", "200", "250", "300", "400", "500"}' },
     @{ File = "prototypes\mir\settings\pipeline_extent.lua"; Text = $pipelineExtentSettingsText; Snippet = 'function S.parse(value)' },
     @{ File = "prototypes\mir\settings\pipeline_extent.lua"; Text = $pipelineExtentSettingsText; Snippet = 'if numeric > 10 then return numeric / 100 end' },
-    @{ File = "prototypes\pipeline-extent.lua"; Text = $pipelineExtentText; Snippet = 'DEFAULT_PIPELINE_EXTENT = 320' },
-    @{ File = "prototypes\pipeline-extent.lua"; Text = $pipelineExtentText; Snippet = 'if multiplier == 1 then return end' },
+    @{ File = "prototypes\mir\pipeline\extent.lua"; Text = $pipelineExtentText; Snippet = 'DEFAULT_PIPELINE_EXTENT = 320' },
+    @{ File = "prototypes\mir\pipeline\extent.lua"; Text = $pipelineExtentText; Snippet = 'if multiplier == 1 then return end' },
     @{ File = "prototypes\mir\report\diagnostics_sink.lua"; Text = $diagnosticsText; Snippet = 'icons.icon_source_for_stream(spec or {})' },
     @{ File = "prototypes\mir\emit\icon_builder.lua"; Text = $technologyIconsText; Snippet = 'local out = strip_constant_overlays(base_icons)' },
     @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'assert_generated_icon_badge(tech_name, tech)' },

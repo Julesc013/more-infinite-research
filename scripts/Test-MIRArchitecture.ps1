@@ -152,6 +152,7 @@ if ($dataFinalFixesStageText.Contains('require("prototypes.mir.compatibility.dia
 
 $dataFinalFixesStepsText = Read-MIRFile -RelativePath $dataFinalFixesStepsPath
 Assert-MIRContains -RelativePath $dataFinalFixesStepsPath -Text $dataFinalFixesStepsText -Needle "function M.apply_pipeline_extent()"
+Assert-MIRContains -RelativePath $dataFinalFixesStepsPath -Text $dataFinalFixesStepsText -Needle 'require("prototypes.mir.pipeline.extent").apply(pipeline_extent_multiplier)'
 Assert-MIRContains -RelativePath $dataFinalFixesStepsPath -Text $dataFinalFixesStepsText -Needle 'require("prototypes.mir.policy.competing_productivity").prepare()'
 Assert-MIRContains -RelativePath $dataFinalFixesStepsPath -Text $dataFinalFixesStepsText -Needle 'require("prototypes.mir.policy.competing_productivity").apply()'
 Assert-MIRContains -RelativePath $dataFinalFixesStepsPath -Text $dataFinalFixesStepsText -Needle 'require("prototypes.mir.policy.competing_base_extensions").apply()'
@@ -177,6 +178,7 @@ $requiredShims = @(
   "prototypes/mir/platform/factorio/data_raw.lua",
   "prototypes/mir/platform/factorio/mods.lua",
   "prototypes/mir/platform/factorio/prototype_lookup.lua",
+  "prototypes/mir/pipeline/extent.lua",
   "prototypes/mir/settings/registry.lua",
   "prototypes/mir/settings/visibility.lua",
   "prototypes/mir/settings/builder.lua",

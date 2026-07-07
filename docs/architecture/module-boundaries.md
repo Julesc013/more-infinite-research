@@ -122,6 +122,9 @@ for data-stage stream and base-extension planning; the old
 `prototypes/mir/settings/pipeline_extent.lua` owns the pipeline extent setting
 catalog and parser; the old `prototypes/pipeline-extent-settings.lua` root path
 is a compatibility shim.
+`prototypes/mir/pipeline/extent.lua` owns the optional pipeline extent
+prototype pass; the old `prototypes/pipeline-extent.lua` root path is a
+compatibility shim.
 
 The MIR planner namespace owns compiler planning checks as they are migrated out
 of legacy generators. `prototypes/mir/planner/requirements.lua` evaluates

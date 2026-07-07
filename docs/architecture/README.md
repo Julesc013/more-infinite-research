@@ -175,7 +175,7 @@ Fluid-output productivity streams use the same recipe-productivity generator as 
 
 Direct-effect stream and base-extension generation must pass through `prototypes/mir/emit/effect_safety.lua`. MIR must not add `character-item-pickup-distance` or `character-loot-pickup-distance` effects to any generated technology; large pickup radii can vacuum belt items into the player inventory and cause severe lag.
 
-`mir-pipeline-extent-multiplier` is deliberately not research. It is a startup-only prototype pass in `prototypes/pipeline-extent.lua` because `FluidBox.max_pipeline_extent` is resolved from prototypes during load. The dropdown values and parser live in `prototypes/mir/settings/pipeline_extent.lua`; the old `prototypes/pipeline-extent-settings.lua` path is a compatibility shim. The pass is loaded only when the parsed startup setting is not `100%`; at the default `100%`, MIR reads the setting gate and does not load the pipeline module, scan `data.raw`, log pipeline work, or mutate fluid boxes.
+`mir-pipeline-extent-multiplier` is deliberately not research. It is a startup-only prototype pass in `prototypes/mir/pipeline/extent.lua` because `FluidBox.max_pipeline_extent` is resolved from prototypes during load. The old `prototypes/pipeline-extent.lua` root path is a compatibility shim. The dropdown values and parser live in `prototypes/mir/settings/pipeline_extent.lua`; the old `prototypes/pipeline-extent-settings.lua` path is a compatibility shim. The pass is loaded only when the parsed startup setting is not `100%`; at the default `100%`, MIR reads the setting gate and does not load the pipeline module, scan `data.raw`, log pipeline work, or mutate fluid boxes.
 
 ## Compatibility Profiles
 
