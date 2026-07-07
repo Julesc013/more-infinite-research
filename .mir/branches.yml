@@ -8,7 +8,7 @@ branches:
       - release-hotfix
       - docs-correction
       - fixture-correction
-      - package-refresh
+      - unpublished-version-package-build
     rejects:
       - broad-new-generation
       - schema-breaking-report-changes
@@ -68,3 +68,31 @@ backport_rules:
     requires:
       - docs-lint
       - no-package-diff
+
+release_artifacts:
+  published_archives_are_immutable: true
+  closed_versions:
+    - version: "2.2.0"
+      branch: main
+      target_factorio: "2.1"
+      artifact: dist/more-infinite-research_2.2.0.zip
+      status: published
+    - version: "1.9.2"
+      branch: legacy
+      target_factorio: "2.0"
+      artifact: dist/more-infinite-research_1.9.2.zip
+      status: published
+  next_release_targets:
+    current_line:
+      version: "3.0.0"
+      branch: dev
+      target_factorio: "2.1"
+    factorio_2_0_backport:
+      version: "2.3.0"
+      branch: legacy
+      target_factorio: "2.0"
+    factorio_1_1_port:
+      version: "1.9.3"
+      branch: tmp/1.1
+      target_factorio: "1.1"
+  package_refresh_rule: only build or refresh dist archives for an unpublished target version; never refresh already-published archives as part of architecture or backport preparation

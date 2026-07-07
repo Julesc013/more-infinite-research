@@ -138,9 +138,17 @@ The immediate transition plan is:
 10. After `1.9.2`, return durable process/docs/tooling improvements to `dev`
     and begin the `3.0.0` architecture line.
 
-As of 2026-07-07, the `2.2.0` current-line release gate and `main` push have
-already been completed once. If a new `2.2.0` build is reopened, repeat the
-full current-line gate before publishing another archive.
+As of 2026-07-07, the `2.2.0` current-line release gate, package upload, and
+`main` push are complete. Treat `dist/more-infinite-research_2.2.0.zip` as a
+published immutable archive, not a live package-parity artifact for later
+`dev` commits. The same rule applies to the `legacy` branch once
+`dist/more-infinite-research_1.9.2.zip` is uploaded.
+
+Post-`2.2.0` source work targets `3.0.0` on the Factorio `2.1` line. The
+planned target-line ports are `2.3.0` for Factorio `2.0` and `1.9.3` for
+Factorio `1.1`. If a validation command rebuilds a published `2.2.0` or
+`1.9.2` archive while testing later source work, restore the published archive
+instead of committing the rebuild.
 
 ## `3.0.0` Charter
 
