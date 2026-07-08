@@ -5,13 +5,13 @@ applies_to: "3.0.0+"
 audience: maintainer
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-07-07
+last_reviewed: 2026-07-09
 supersedes: []
 superseded_by: []
 ---
 # Maintainer Guide
 
-Updated: 2026-07-07
+Updated: 2026-07-09
 
 This guide describes the intended 3.0 workflow for adding compatibility without
 copying generator logic into per-mod files.
@@ -23,7 +23,8 @@ Development-only docs, scripts, fixtures, tests, build output, task ledgers, and
 release archives stay outside the shipped package.
 
 Use [settings governance](settings-governance.md) for startup setting IDs,
-visibility metadata, hidden unavailable stream settings, and backport behavior.
+visibility metadata, provider-gated settings, visible official technology
+settings, and backport behavior.
 
 ## Adding Or Moving Shipped Lua
 

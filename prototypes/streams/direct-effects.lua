@@ -1,9 +1,8 @@
 return {
   research_spoilage_preservation = {
     ui_visibility = {
-      mode = "visible-if-mods-any",
-      mods_any = {"space-age"},
-      hidden_reason = "requires-space-age"
+      mode = "always",
+      reason = "official-stream-settings-visible"
     },
     generation_requirements = {
       require_any_item = {"spoilage", "agricultural-science-pack"}
@@ -32,9 +31,8 @@ return {
 
   research_agricultural_growth_speed = {
     ui_visibility = {
-      mode = "visible-if-mods-any",
-      mods_any = {"space-age"},
-      hidden_reason = "requires-space-age"
+      mode = "always",
+      reason = "official-stream-settings-visible"
     },
     generation_requirements = {
       require_any_item = {"agricultural-science-pack"}
@@ -115,9 +113,8 @@ return {
     -- Cargo logistics modifiers are Space Age behavior even if another mod
     -- exposes similarly named cargo prototypes in a base-only run.
     ui_visibility = {
-      mode = "visible-if-mods-any",
-      mods_any = {"space-age"},
-      hidden_reason = "requires-space-age"
+      mode = "always",
+      reason = "official-stream-settings-visible"
     },
     generation_requirements = {
       require_any_item = {"landing-pad-unloading-bay"},
@@ -136,12 +133,11 @@ return {
   },
 
   research_cargo_landing_pad_count = {
-    -- Keep this Space Age-only; hidden startup settings still remain registered
-    -- so old values can return when Space Age is enabled again.
+    -- The setting remains visible across base and Space Age; generation is
+    -- still Space Age-only through required_mods and prototype checks.
     ui_visibility = {
-      mode = "visible-if-mods-any",
-      mods_any = {"space-age"},
-      hidden_reason = "requires-space-age"
+      mode = "always",
+      reason = "official-stream-settings-visible"
     },
     generation_requirements = {
       require_any_item = {"cargo-landing-pad"},

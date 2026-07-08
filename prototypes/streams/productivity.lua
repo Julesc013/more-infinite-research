@@ -100,9 +100,8 @@ return {
   research_thruster_fuel_productivity = {
     localised_name = {"technology-name.more-infinite-research.research_thruster_fuel_productivity"},
     ui_visibility = {
-      mode = "visible-if-mods-any",
-      mods_any = {"space-age"},
-      hidden_reason = "requires-space-age"
+      mode = "always",
+      reason = "official-stream-settings-visible"
     },
     generation_requirements = {
       require_any_fluid = {"thruster-fuel"}
@@ -120,9 +119,8 @@ return {
   research_thruster_oxidizer_productivity = {
     localised_name = {"technology-name.more-infinite-research.research_thruster_oxidizer_productivity"},
     ui_visibility = {
-      mode = "visible-if-mods-any",
-      mods_any = {"space-age"},
-      hidden_reason = "requires-space-age"
+      mode = "always",
+      reason = "official-stream-settings-visible"
     },
     generation_requirements = {
       require_any_fluid = {"thruster-oxidizer"}
@@ -261,9 +259,8 @@ return {
 
   research_tungsten = {
     ui_visibility = {
-      mode = "visible-if-mods-any",
-      mods_any = {"space-age"},
-      hidden_reason = "requires-space-age"
+      mode = "always",
+      reason = "official-stream-settings-visible"
     },
     generation_requirements = {
       require_any_item = {"tungsten-plate", "tungsten-carbide"}
@@ -274,9 +271,8 @@ return {
   },
   research_lithium = {
     ui_visibility = {
-      mode = "visible-if-mods-any",
-      mods_any = {"space-age"},
-      hidden_reason = "requires-space-age"
+      mode = "always",
+      reason = "official-stream-settings-visible"
     },
     generation_requirements = {
       require_any_item = {"lithium-plate", "lithium"}
@@ -288,9 +284,8 @@ return {
   } },
   research_holmium = {
     ui_visibility = {
-      mode = "visible-if-mods-any",
-      mods_any = {"space-age"},
-      hidden_reason = "requires-space-age"
+      mode = "always",
+      reason = "official-stream-settings-visible"
     },
     generation_requirements = {
       require_any_item = {"holmium-plate"}
@@ -300,9 +295,8 @@ return {
   },
   research_supercapacitor = {
     ui_visibility = {
-      mode = "visible-if-mods-any",
-      mods_any = {"space-age"},
-      hidden_reason = "requires-space-age"
+      mode = "always",
+      reason = "official-stream-settings-visible"
     },
     generation_requirements = {
       require_any_item = {"supercapacitor"}
@@ -312,9 +306,8 @@ return {
   },
   research_superconductor = {
     ui_visibility = {
-      mode = "visible-if-mods-any",
-      mods_any = {"space-age"},
-      hidden_reason = "requires-space-age"
+      mode = "always",
+      reason = "official-stream-settings-visible"
     },
     generation_requirements = {
       require_any_item = {"superconductor"}
@@ -324,9 +317,8 @@ return {
   },
   research_quantum_processor = {
     ui_visibility = {
-      mode = "visible-if-mods-any",
-      mods_any = {"space-age"},
-      hidden_reason = "requires-space-age"
+      mode = "always",
+      reason = "official-stream-settings-visible"
     },
     generation_requirements = {
       require_any_item = {"quantum-processor"}
@@ -336,9 +328,8 @@ return {
   },
   research_carbon = {
     ui_visibility = {
-      mode = "visible-if-mods-any",
-      mods_any = {"space-age"},
-      hidden_reason = "requires-space-age"
+      mode = "always",
+      reason = "official-stream-settings-visible"
     },
     generation_requirements = {
       require_any_item = {"carbon"}
@@ -355,9 +346,8 @@ return {
   } },
   research_carbon_fiber = {
     ui_visibility = {
-      mode = "visible-if-mods-any",
-      mods_any = {"space-age"},
-      hidden_reason = "requires-space-age"
+      mode = "always",
+      reason = "official-stream-settings-visible"
     },
     generation_requirements = {
       require_any_item = {"carbon-fiber"}
@@ -367,9 +357,8 @@ return {
   },
   research_ice = {
     ui_visibility = {
-      mode = "visible-if-mods-any",
-      mods_any = {"space-age"},
-      hidden_reason = "requires-space-age"
+      mode = "always",
+      reason = "official-stream-settings-visible"
     },
     generation_requirements = {
       require_any_item = {"ice"}
@@ -383,9 +372,8 @@ return {
 
   research_bioflux = {
     ui_visibility = {
-      mode = "visible-if-mods-any",
-      mods_any = {"space-age"},
-      hidden_reason = "requires-space-age"
+      mode = "always",
+      reason = "official-stream-settings-visible"
     },
     generation_requirements = {
       require_any_item = {"bioflux"}
@@ -395,9 +383,8 @@ return {
   },
   research_bacteria_cultivation = {
     ui_visibility = {
-      mode = "visible-if-mods-any",
-      mods_any = {"space-age"},
-      hidden_reason = "requires-space-age"
+      mode = "always",
+      reason = "official-stream-settings-visible"
     },
     generation_requirements = {
       require_any_recipe = {"iron-bacteria-cultivation", "copper-bacteria-cultivation"}
@@ -409,9 +396,8 @@ return {
   } },
   research_breeding = {
     ui_visibility = {
-      mode = "visible-if-mods-any",
-      mods_any = {"space-age"},
-      hidden_reason = "requires-space-age"
+      mode = "always",
+      reason = "official-stream-settings-visible"
     },
     generation_requirements = {
       require_any_item = {"raw-fish", "biter-egg", "pentapod-egg"}
@@ -443,9 +429,8 @@ return {
 
   research_artificial_soil = {
     ui_visibility = {
-      mode = "visible-if-mods-any",
-      mods_any = {"space-age"},
-      hidden_reason = "requires-space-age"
+      mode = "always",
+      reason = "official-stream-settings-visible"
     },
     generation_requirements = {
       require_any_item_family = {"artificial-soil", "overgrowth-soil"}
@@ -458,9 +443,8 @@ return {
 
   research_molten_metals = {
     ui_visibility = {
-      mode = "visible-if-mods-any",
-      mods_any = {"space-age"},
-      hidden_reason = "requires-space-age"
+      mode = "always",
+      reason = "official-stream-settings-visible"
     },
     generation_requirements = {
       require_any_recipe = {"molten-iron-from-lava", "molten-copper-from-lava", "iron-ore-melting", "copper-ore-melting"}

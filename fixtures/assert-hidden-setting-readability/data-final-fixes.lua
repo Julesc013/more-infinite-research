@@ -1,5 +1,5 @@
 local function fail(message)
-  error("MIR hidden setting validation failed: " .. message)
+  error("MIR setting registration validation failed: " .. message)
 end
 
 local function assert_startup_setting_readable(name)
@@ -13,41 +13,51 @@ local function assert_startup_setting_readable(name)
   end
 end
 
-local hidden_stream_settings = {
-  "ips-enable-research_tungsten",
-  "ips-cost-base-research_tungsten",
-  "ips-cost-growth-research_tungsten",
-  "ips-max-level-research_tungsten",
-  "ips-research-time-research_tungsten",
-  "ips-enable-research_air_scrubbing_clean_filter",
-  "ips-cost-base-research_air_scrubbing_clean_filter",
-  "ips-cost-growth-research_air_scrubbing_clean_filter",
-  "ips-max-level-research_air_scrubbing_clean_filter",
-  "ips-research-time-research_air_scrubbing_clean_filter",
-  "ips-enable-research_ash_separation",
-  "ips-cost-base-research_ash_separation",
-  "ips-cost-growth-research_ash_separation",
-  "ips-max-level-research_ash_separation",
-  "ips-research-time-research_ash_separation",
-  "ips-enable-research_spoilage_preservation",
-  "ips-cost-base-research_spoilage_preservation",
-  "ips-cost-growth-research_spoilage_preservation",
-  "ips-max-level-research_spoilage_preservation",
-  "ips-research-time-research_spoilage_preservation"
+local governed_stream_keys = {
+  "research_tungsten",
+  "research_lithium",
+  "research_holmium",
+  "research_thruster_fuel_productivity",
+  "research_thruster_oxidizer_productivity",
+  "research_breeding",
+  "research_agricultural_growth_speed",
+  "research_cargo_bay_unloading_distance",
+  "research_cargo_landing_pad_count",
+  "research_spoilage_preservation",
+  "research_air_scrubbing_clean_filter",
+  "research_ash_separation"
 }
 
-for _, setting_name in ipairs(hidden_stream_settings) do
-  assert_startup_setting_readable(setting_name)
+local stream_setting_patterns = {
+  "ips-enable-%s",
+  "ips-cost-base-%s",
+  "ips-cost-growth-%s",
+  "ips-max-level-%s",
+  "ips-research-time-%s"
+}
+
+for _, stream_key in ipairs(governed_stream_keys) do
+  for _, setting_pattern in ipairs(stream_setting_patterns) do
+    assert_startup_setting_readable(string.format(setting_pattern, stream_key))
+  end
 end
 
 if not (mods and mods["space-age"]) then
   local techs = data.raw.technology or {}
   for _, tech_name in ipairs({
     "recipe-prod-research_tungsten-1",
+    "recipe-prod-research_lithium-1",
+    "recipe-prod-research_holmium-1",
+    "recipe-prod-research_thruster_fuel_productivity-1",
+    "recipe-prod-research_thruster_oxidizer_productivity-1",
+    "recipe-prod-research_breeding-1",
+    "recipe-prod-research_agricultural_growth_speed-1",
+    "recipe-prod-research_cargo_bay_unloading_distance-1",
+    "recipe-prod-research_cargo_landing_pad_count-1",
     "recipe-prod-research_spoilage_preservation-1"
   }) do
     if techs[tech_name] then
-      fail("base-only hidden setting fixture expected " .. tech_name .. " to remain ungenerateable.")
+      fail("base-only setting fixture expected " .. tech_name .. " to remain ungenerateable.")
     end
   end
 end

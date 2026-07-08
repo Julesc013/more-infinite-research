@@ -13,6 +13,7 @@ $repo = Resolve-Path (Join-Path $PSScriptRoot "..")
 $repoInfo = Get-Content -Raw (Join-Path $repo "info.json") | ConvertFrom-Json
 $isLegacyFactorio20 = $repoInfo.factorio_version -eq "2.0"
 $isFactorio21Line = $repoInfo.factorio_version -eq "2.1"
+$script:ValidationPackageZipPath = $null
 
 function Invoke-RepoCheck {
   param([string]$Description, [scriptblock]$Script)
@@ -574,7 +575,8 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'manifest_id = atan_ash_capability.stream.id' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'exact_recipe_patterns(atan_ash_capability.exact_recipes)' },
     @{ File = "prototypes\mir\compatibility\overlays\atan_ash.lua"; Text = (Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\compatibility\overlays\atan_ash.lua")); Snippet = '"mir-prod-atan-ash-separation"' },
-    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'mods_any = {"space-age"}' },
+    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'reason = "official-stream-settings-visible"' },
+    @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'reason = "official-stream-settings-visible"' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'research_ash_separation = "Ash separation productivity"' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = '"aai-turbo-loader"' },
     @{ File = "prototypes\mir\capabilities\science_integration\science_selector.lua"; Text = $scienceSelectorText; Snippet = 'desired == "derive-from-unlocks"' },
@@ -1472,6 +1474,7 @@ Invoke-RepoCheck "generated package archive matches metadata" {
   if (-not (Test-Path -LiteralPath $zipPath)) {
     throw "Validation package not found after build: $zipPath"
   }
+  $script:ValidationPackageZipPath = (Resolve-Path -LiteralPath $zipPath).Path
 
   $zip = [System.IO.Compression.ZipFile]::OpenRead($zipPath)
   try {
@@ -2488,6 +2491,73 @@ function Assert-FluidProductivityStreamsGenerated {
     $line = Get-LastStreamReportLine -Key $stream
     Assert-ReportLineGenerated -Line $line -Context "$Context stream $stream"
   }
+}
+
+function Invoke-PackageZipSmokeScenario {
+  param(
+    [string]$ScenarioName,
+    [switch]$EnableSpaceAge
+  )
+
+  if ([string]::IsNullOrWhiteSpace($script:ValidationPackageZipPath) -or -not (Test-Path -LiteralPath $script:ValidationPackageZipPath)) {
+    throw "Validation package zip is unavailable for packaged zip smoke."
+  }
+
+  $scenarioRoot = Join-Path $validationRoot $ScenarioName
+  if (Test-Path -LiteralPath $scenarioRoot) {
+    $resolvedScenarioRoot = (Resolve-Path -LiteralPath $scenarioRoot).Path
+    if (-not $resolvedScenarioRoot.StartsWith($validationRootWithSeparator, [System.StringComparison]::OrdinalIgnoreCase)) {
+      throw "Refusing to remove package smoke directory outside validation root: $resolvedScenarioRoot"
+    }
+    Remove-Item -LiteralPath $resolvedScenarioRoot -Recurse -Force
+  }
+
+  $modsDir = Join-Path $scenarioRoot "mods"
+  New-Item -ItemType Directory -Force -Path $modsDir | Out-Null
+  Copy-Item -LiteralPath $script:ValidationPackageZipPath -Destination (Join-Path $modsDir (Split-Path -Leaf $script:ValidationPackageZipPath)) -Force
+
+  $mods = @(
+    @{ name = "base"; enabled = $true },
+    @{ name = "elevated-rails"; enabled = [bool]$EnableSpaceAge },
+    @{ name = "recycler"; enabled = [bool]$EnableSpaceAge },
+    @{ name = "quality"; enabled = [bool]$EnableSpaceAge },
+    @{ name = "space-age"; enabled = [bool]$EnableSpaceAge },
+    @{ name = "more-infinite-research"; enabled = $true }
+  )
+  $modList = @{ mods = $mods } | ConvertTo-Json -Depth 5
+  Set-Content -LiteralPath (Join-Path $modsDir "mod-list.json") -Value $modList -Encoding UTF8
+
+  $savePath = Join-Path $scenarioRoot "mir-package-zip-smoke.zip"
+  if (Test-Path -LiteralPath $savePath) {
+    Remove-Item -LiteralPath $savePath -Force
+  }
+
+  Write-Host "[run] Factorio packaged zip smoke ($ScenarioName)"
+  Clear-FactorioLog
+  $factorioArgs = @(
+    "--config",
+    $factorioConfigPath,
+    "--no-log-rotation",
+    "--disable-audio",
+    "--mod-directory",
+    $modsDir,
+    "--create",
+    $savePath
+  )
+  $factorioExitCode = Invoke-FactorioProcess -FilePath $FactorioBin -Arguments $factorioArgs
+  if ($factorioExitCode -ne 0) {
+    throw "Factorio package zip smoke $ScenarioName exited with code $factorioExitCode"
+  }
+  if (-not (Test-Path -LiteralPath $savePath)) {
+    throw "Factorio package zip smoke $ScenarioName did not create the expected save: $savePath"
+  }
+
+  Assert-RuntimeLogHealthy -ScenarioName $ScenarioName
+}
+
+Invoke-PackageZipSmokeScenario -ScenarioName "package-zip-base"
+if ($isFactorio21Line) {
+  Invoke-PackageZipSmokeScenario -ScenarioName "package-zip-space-age" -EnableSpaceAge
 }
 
 Invoke-RuntimeScenario -ScenarioName "reduce-policy" -EnabledFixtureNames @(

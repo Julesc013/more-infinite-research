@@ -70,6 +70,8 @@ Date: 2026-07-08
     - Hidden settings keep their setting IDs readable and do not force values.
     - Improved in-game setting labels and descriptions for science-pack and lab-compatibility policies.
     - Grouped generated-technology settings so disabled, risky, special, and vanilla-continuation rows stay easier to find.
+    - Kept MIR-owned official technology settings visible across base and Space Age.
+    - Kept the settings surface stable when toggling official DLC.
     - Updated release and README wording for the architecture move.
     - Documented that generated IDs are preserved and no architecture-only migration is required.
 
@@ -99,6 +101,7 @@ Date: 2026-07-08
     - Added local mod library catalog checks and legacy inventory reporting tools.
     - Fixed compatibility-audit staging so local load-test mod copies exclude repository-only development paths.
     - Fixed compatibility-audit staging so local load-test mod copies exclude ignored output paths.
+    - Fixed release archive packaging so the shipped zip opens cleanly from the mods folder.
     - Added a hidden-setting readability sample for unavailable streams.
     - Proved hidden generated settings remain readable when unavailable streams are hidden.
     - Added release evidence docs for the MIR 3 summary, checklist, and migration guide.

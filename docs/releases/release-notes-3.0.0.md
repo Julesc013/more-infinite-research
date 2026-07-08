@@ -29,6 +29,7 @@ This release is not a broad new gameplay-content wave. It is the release that tu
 - Unsafe, missing, or unresearchable research candidates are skipped or kept diagnostic-only instead of being forced into invalid mod sets.
 - Recipe productivity research is still infinite, but Factorio's normal recipe productivity cap still applies.
 - Science-pack and lab-compatibility startup settings now use clearer player-facing labels while keeping the same internal setting values.
+- MIR-owned official technology settings stay visible across base and Space Age, even when the current active mod set will skip generation.
 - Scripted spoilage preservation and agricultural growth speed remain disabled-by-default experimental options.
 
 ## Compatibility
@@ -92,6 +93,7 @@ This release is not a broad new gameplay-content wave. It is the release that tu
 ## Release Checks
 
 - Static checks passed for docs governance, MIR manifests, architecture boundaries, settings visibility, policy linting, claim linting, changelog syntax, and package hygiene.
+- Packaged release-zip load smokes passed in base-only and Space Age modes.
 - Runtime sample-mod checks passed on the target Factorio `2.1` binary.
 - Targeted local ATAN release-dist isolation reproduced upstream-only schema failures without MIR and passed with MIR for `atan-ash_2.2.1`, `atan-nuclear-science_0.3.3`, `atan-air-scrubbing_0.2.8`, and all three together with Space Age.
 - The targeted local `2.1` mod-library gate passed.

@@ -85,6 +85,7 @@ Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -N
 Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -Needle "profile_import_is_effective_override_not_runtime_mutation: true"
 Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -Needle "settings_profiles_exclude_import_setting: true"
 Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -Needle "runtime_export_writes_script_output_only: true"
+Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -Needle "official_and_mir_owned_technology_settings_stay_visible: true"
 Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -Needle "import_setting: mir-settings-profile-import"
 Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -Needle "string_prefix: MIRSET1"
 
@@ -115,15 +116,21 @@ Assert-Contains -RelativePath "prototypes/mir/settings/stage_builder.lua" -Text 
 Assert-Contains -RelativePath "prototypes/streams/productivity.lua" -Text $productivityText -Needle "ui_visibility = {"
 Assert-Contains -RelativePath "prototypes/streams/productivity.lua" -Text $productivityText -Needle 'mods_any = air_scrubbing_overlay.applies_when.mods'
 Assert-Contains -RelativePath "prototypes/streams/productivity.lua" -Text $productivityText -Needle 'mods_any = atan_ash_overlay.applies_when.mods'
-Assert-Contains -RelativePath "prototypes/streams/productivity.lua" -Text $productivityText -Needle 'mods_any = {"space-age"}'
+Assert-Contains -RelativePath "prototypes/streams/productivity.lua" -Text $productivityText -Needle 'reason = "official-stream-settings-visible"'
+Assert-Contains -RelativePath "prototypes/streams/direct-effects.lua" -Text $directEffectsText -Needle 'reason = "official-stream-settings-visible"'
 Assert-Contains -RelativePath "prototypes/streams/productivity.lua" -Text $productivityText -Needle "generation_requirements = {"
 Assert-Contains -RelativePath "prototypes/streams/direct-effects.lua" -Text $directEffectsText -Needle "ui_visibility = {"
 Assert-Contains -RelativePath "prototypes/streams/direct-effects.lua" -Text $directEffectsText -Needle "generation_requirements = {"
 
 Assert-Contains -RelativePath "fixtures/assert-hidden-setting-readability/info.json" -Text $fixtureInfoText -Needle '"name": "mir-fixture-assert-hidden-setting-readability"'
 Assert-Contains -RelativePath "fixtures/assert-hidden-setting-readability/data-final-fixes.lua" -Text $fixtureText -Needle "assert_startup_setting_readable"
-Assert-Contains -RelativePath "fixtures/assert-hidden-setting-readability/data-final-fixes.lua" -Text $fixtureText -Needle '"ips-enable-research_tungsten"'
-Assert-Contains -RelativePath "fixtures/assert-hidden-setting-readability/data-final-fixes.lua" -Text $fixtureText -Needle '"ips-enable-research_air_scrubbing_clean_filter"'
+Assert-Contains -RelativePath "fixtures/assert-hidden-setting-readability/data-final-fixes.lua" -Text $fixtureText -Needle "governed_stream_keys"
+Assert-Contains -RelativePath "fixtures/assert-hidden-setting-readability/data-final-fixes.lua" -Text $fixtureText -Needle '"research_tungsten"'
+Assert-Contains -RelativePath "fixtures/assert-hidden-setting-readability/data-final-fixes.lua" -Text $fixtureText -Needle '"research_breeding"'
+Assert-Contains -RelativePath "fixtures/assert-hidden-setting-readability/data-final-fixes.lua" -Text $fixtureText -Needle '"research_agricultural_growth_speed"'
+Assert-Contains -RelativePath "fixtures/assert-hidden-setting-readability/data-final-fixes.lua" -Text $fixtureText -Needle '"research_cargo_landing_pad_count"'
+Assert-Contains -RelativePath "fixtures/assert-hidden-setting-readability/data-final-fixes.lua" -Text $fixtureText -Needle '"research_air_scrubbing_clean_filter"'
+Assert-Contains -RelativePath "fixtures/assert-hidden-setting-readability/data-final-fixes.lua" -Text $fixtureText -Needle '"ips-enable-%s"'
 
 Assert-Contains -RelativePath "docs/user/settings.md" -Text $userSettingsDocText -Needle "/mir-settings-export"
 Assert-Contains -RelativePath "docs/user/settings.md" -Text $userSettingsDocText -Needle "mir-settings-profile-import"
@@ -136,6 +143,8 @@ Assert-Contains -RelativePath "docs/maintainer/settings-governance.md" -Text $se
 Assert-NoPattern -RelativePath "prototypes/mir/settings/visibility.lua" -Text $visibilityText -Pattern "\bdata\.raw\b|data:extend|settings\.startup"
 Assert-NoPattern -RelativePath "prototypes/mir/settings/builder.lua" -Text $builderText -Pattern "forced_value"
 Assert-NoPattern -RelativePath "prototypes/mir/settings/stage_builder.lua" -Text $stageBuilderText -Pattern "forced_value"
+Assert-NoPattern -RelativePath "prototypes/streams/productivity.lua" -Text $productivityText -Pattern 'mods_any = \{"space-age"\}'
+Assert-NoPattern -RelativePath "prototypes/streams/direct-effects.lua" -Text $directEffectsText -Pattern 'mods_any = \{"space-age"\}'
 
 Assert-NoPatternInTree `
   -RelativeRoot "prototypes" `

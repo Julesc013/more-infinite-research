@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: developer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-07-08
+last_reviewed: 2026-07-09
 supersedes: [docs/reference/settings-reference.md]
 superseded_by: []
 ---
@@ -19,11 +19,13 @@ machine-readable policy is `.mir/settings.yml`.
 
 ## Contract
 
-MIR keeps every released setting prototype registered. It may hide startup
-settings that are not actionable for the current enabled mod set, but it must
-not delete setting IDs because an optional provider mod is absent.
+MIR keeps every released setting prototype registered. MIR-owned official
+technology settings stay visible across base and Space Age so players get a
+stable settings surface. Exact third-party provider settings may be hidden when
+the provider mod is absent, but MIR must not delete setting IDs because an
+optional provider mod is absent.
 
-Hidden unavailable technology settings preserve the same keys:
+Governed technology settings preserve the same keys:
 
 ```text
 ips-enable-<stream>
@@ -33,9 +35,9 @@ ips-max-level-<stream>
 ips-research-time-<stream>
 ```
 
-MIR uses `hidden = true` for normal unavailable stream settings. It does not use
-`forced_value` for those settings, because the user's saved value should return
-if the relevant mod or expansion is enabled again.
+MIR uses `hidden = true` only for provider-specific or unsupported stream
+settings. It does not use `forced_value` for those settings, because the user's
+saved value should return if the relevant mod or expansion is enabled again.
 
 MIR also registers the global startup setting:
 
@@ -55,7 +57,8 @@ may evaluate active mods and static metadata only; it must not inspect
 
 Supported visibility modes:
 
-- `always`: show the setting group.
+- `always`: show the setting group. Use this for MIR-owned official streams,
+  including Space Age-shaped streams whose generation may skip in base games.
 - `hidden`: hide the setting group by policy.
 - `visible-if-mods-any`: show when any named provider mod is enabled.
 - `visible-if-mods-all`: show when every named provider mod is enabled.
@@ -97,10 +100,10 @@ truth.
 ## Backports
 
 Backport branches keep the same setting IDs where possible. Unsupported
-settings should be registered and hidden instead of removed. If a string setting
-has values meaningful only on a newer line, the older line should accept the
-value and map it to a safe data-stage fallback rather than narrowing
-`allowed_values` and causing settings-load failures.
+provider-specific settings should be registered and hidden instead of removed.
+If a string setting has values meaningful only on a newer line, the older line
+should accept the value and map it to a safe data-stage fallback rather than
+narrowing `allowed_values` and causing settings-load failures.
 
 Use `forced_value` only for documented safety-invalid or deprecated settings
 where the previous value must not apply.

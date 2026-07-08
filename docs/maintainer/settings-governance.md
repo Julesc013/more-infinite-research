@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: maintainer
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-07-08
+last_reviewed: 2026-07-09
 supersedes: []
 superseded_by: []
 ---
@@ -18,10 +18,13 @@ contract unless there is a documented migration reason to retire it.
 ## Rules
 
 - Keep released setting IDs registered.
-- Hide unavailable stream settings instead of deleting them.
+- Keep MIR-owned official technology settings visible across base and Space
+  Age, even when the current active mod set cannot generate that technology.
+- Hide exact third-party provider stream settings when the provider mod is not
+  active instead of deleting them.
 - Do not use `forced_value` for normal unavailable technology streams.
 - Keep settings-stage visibility based on `ui_visibility` metadata and active
-  mods only.
+  mods only. It must not inspect final prototype facts.
 - Keep data-stage generation based on final prototype facts.
 - Record governed setting policy in `.mir/settings.yml`.
 - Keep broad global settings visible unless they are deprecated or unsafe.
@@ -38,14 +41,19 @@ contract unless there is a documented migration reason to retire it.
    `ips-enable-<stream>`, `ips-cost-base-<stream>`,
    `ips-cost-growth-<stream>`, `ips-max-level-<stream>`, and
    `ips-research-time-<stream>`.
-3. Add `ui_visibility` to the stream when it is useful only with known provider
-   mods.
+3. Use `ui_visibility = { mode = "always" }` for MIR-owned official streams,
+   including Space Age-shaped streams. Add provider-gated `ui_visibility` only
+   when the setting is useful only with a specific third-party mod.
 4. Add `generation_requirements` for the data-stage intent.
 5. Add or update the row in `.mir/settings.yml`.
 6. Add fixture or static validation if the stream should be hidden without its
-   provider.
+   provider, or if the stream must remain visible across base and Space Age.
 
 ## Provider Visibility
+
+Use `always` for official or MIR-owned technology rows, including rows that
+will only generate when Space Age prototypes are active. Data-stage generation
+still skips unavailable candidates with clear diagnostics.
 
 Use this pattern for exact optional-provider streams:
 
@@ -57,16 +65,15 @@ ui_visibility = {
 }
 ```
 
-Use `always` for base-game or generic streams with base targets. For example,
-transport belt productivity stays visible in a base game because base belts
-exist even when loader mods are absent.
+Transport belt productivity is also `always`: base belts exist in base games
+and loader recipes are opportunistic additions.
 
 ## Backports
 
 Backport branches keep released setting IDs where possible. If a branch cannot
-support a stream, register the setting and hide it. If a saved string value is
-newer than the branch can act on, accept it and map it to a safe fallback during
-the data stage instead of narrowing `allowed_values`.
+support a stream at all, register the setting and hide it. If a saved string
+value is newer than the branch can act on, accept it and map it to a safe
+fallback during the data stage instead of narrowing `allowed_values`.
 
 This policy supports:
 
@@ -115,8 +122,8 @@ Run the static gate after settings changes:
 
 The static gate runs `scripts/Test-MIRSettingsVisibility.ps1`. The runtime gate
 also enables `mir-fixture-assert-hidden-setting-readability` in the base
-generation scenario to prove hidden optional-stream settings remain registered
-and readable during `data-final-fixes.lua`.
+generation scenario to prove governed optional-stream settings remain
+registered and readable during `data-final-fixes.lua`.
 
 Run the runtime gate before release:
 
@@ -130,7 +137,8 @@ Manual value-retention proof for an optional stream:
 2. Set custom values for the stream's enable, cost, growth, cap, and time
    settings.
 3. Restart without the provider.
-4. Confirm the stream settings are hidden.
+4. Confirm provider-specific stream settings are hidden; official MIR settings
+   should stay visible.
 5. Re-enable the provider.
 6. Confirm the custom values return.
 

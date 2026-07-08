@@ -11,6 +11,7 @@ rules:
   runtime_export_writes_script_output_only: true
   import_requires_restart: true
   technology_settings_sort_by_visibility_then_player_name: true
+  official_and_mir_owned_technology_settings_stay_visible: true
 
 profiles:
   schema: 1
@@ -79,106 +80,105 @@ streams:
       keep_setting_ids: true
 
   research_thruster_fuel_productivity:
-    ui_visibility: &space_age_only
-      mode: visible-if-mods-any
-      mods_any:
-        - space-age
-    hidden_when_unavailable: true
+    ui_visibility: &official_visible
+      mode: always
+      reason: official and MIR-owned technology settings stay visible across base and Space Age; generation still validates active prototypes
+    hidden_when_unavailable: false
     forced_when_hidden: null
 
   research_thruster_oxidizer_productivity:
-    ui_visibility: *space_age_only
-    hidden_when_unavailable: true
+    ui_visibility: *official_visible
+    hidden_when_unavailable: false
     forced_when_hidden: null
 
   research_tungsten:
-    ui_visibility: *space_age_only
-    hidden_when_unavailable: true
+    ui_visibility: *official_visible
+    hidden_when_unavailable: false
     forced_when_hidden: null
 
   research_lithium:
-    ui_visibility: *space_age_only
-    hidden_when_unavailable: true
+    ui_visibility: *official_visible
+    hidden_when_unavailable: false
     forced_when_hidden: null
 
   research_holmium:
-    ui_visibility: *space_age_only
-    hidden_when_unavailable: true
+    ui_visibility: *official_visible
+    hidden_when_unavailable: false
     forced_when_hidden: null
 
   research_supercapacitor:
-    ui_visibility: *space_age_only
-    hidden_when_unavailable: true
+    ui_visibility: *official_visible
+    hidden_when_unavailable: false
     forced_when_hidden: null
 
   research_superconductor:
-    ui_visibility: *space_age_only
-    hidden_when_unavailable: true
+    ui_visibility: *official_visible
+    hidden_when_unavailable: false
     forced_when_hidden: null
 
   research_quantum_processor:
-    ui_visibility: *space_age_only
-    hidden_when_unavailable: true
+    ui_visibility: *official_visible
+    hidden_when_unavailable: false
     forced_when_hidden: null
 
   research_carbon:
-    ui_visibility: *space_age_only
-    hidden_when_unavailable: true
+    ui_visibility: *official_visible
+    hidden_when_unavailable: false
     forced_when_hidden: null
 
   research_carbon_fiber:
-    ui_visibility: *space_age_only
-    hidden_when_unavailable: true
+    ui_visibility: *official_visible
+    hidden_when_unavailable: false
     forced_when_hidden: null
 
   research_ice:
-    ui_visibility: *space_age_only
-    hidden_when_unavailable: true
+    ui_visibility: *official_visible
+    hidden_when_unavailable: false
     forced_when_hidden: null
 
   research_bioflux:
-    ui_visibility: *space_age_only
-    hidden_when_unavailable: true
+    ui_visibility: *official_visible
+    hidden_when_unavailable: false
     forced_when_hidden: null
 
   research_bacteria_cultivation:
-    ui_visibility: *space_age_only
-    hidden_when_unavailable: true
+    ui_visibility: *official_visible
+    hidden_when_unavailable: false
     forced_when_hidden: null
 
   research_breeding:
-    ui_visibility: *space_age_only
-    hidden_when_unavailable: true
+    ui_visibility: *official_visible
+    hidden_when_unavailable: false
     forced_when_hidden: null
 
   research_artificial_soil:
-    ui_visibility: *space_age_only
-    hidden_when_unavailable: true
+    ui_visibility: *official_visible
+    hidden_when_unavailable: false
     forced_when_hidden: null
 
   research_molten_metals:
-    ui_visibility: *space_age_only
-    hidden_when_unavailable: true
+    ui_visibility: *official_visible
+    hidden_when_unavailable: false
     forced_when_hidden: null
 
   research_spoilage_preservation:
-    ui_visibility: *space_age_only
-    hidden_when_unavailable: true
+    ui_visibility: *official_visible
+    hidden_when_unavailable: false
     forced_when_hidden: null
 
   research_agricultural_growth_speed:
-    ui_visibility: *space_age_only
-    hidden_when_unavailable: true
+    ui_visibility: *official_visible
+    hidden_when_unavailable: false
     forced_when_hidden: null
 
   research_cargo_bay_unloading_distance:
-    ui_visibility: *space_age_only
-    hidden_when_unavailable: true
+    ui_visibility: *official_visible
+    hidden_when_unavailable: false
     forced_when_hidden: null
 
   research_cargo_landing_pad_count:
-    ui_visibility: *space_age_only
-    hidden_when_unavailable: true
+    ui_visibility: *official_visible
+    hidden_when_unavailable: false
     forced_when_hidden: null
 
   research_belts:
