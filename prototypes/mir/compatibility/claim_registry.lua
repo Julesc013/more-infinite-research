@@ -43,7 +43,8 @@ M.claims = {
     capabilities = {
       ["recipe-productivity"] = "generated",
       ["tile-surface"] = "diagnostic-only",
-      ["resource-recovery"] = "diagnostic-only"
+      ["resource-recovery"] = "diagnostic-only",
+      ["loader-schema-repair"] = "exact-version recipe category and product probability schema normalization"
     },
     streams = {
       "mir-prod-atan-ash-separation"
@@ -69,7 +70,8 @@ M.claims = {
     public_claim = "science-pack recipe productivity only",
     capabilities = {
       ["science-pack-integration"] = "generated-through-existing-stream",
-      ["lab-compatibility"] = "validated"
+      ["lab-compatibility"] = "validated",
+      ["loader-schema-repair"] = "exact-version recipe category schema normalization"
     },
     generated_through_existing_stream = "research_science_pack_productivity",
     fixtures = {

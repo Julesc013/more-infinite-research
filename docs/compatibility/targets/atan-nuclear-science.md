@@ -24,10 +24,10 @@ Non-goal: atom forge crafting.
 
 ## Upstream Zip Status
 
-Local supported-zip isolation for `3.0.0` found
-`atan-nuclear-science_0.3.3` failing on the tested Factorio `2.1` setup
-without MIR loaded. That failure is treated as an upstream zip/schema blocker,
-not as MIR behavior.
+Local supported-zip isolation for `3.0.0` found `atan-nuclear-science_0.3.3` failing on the tested Factorio `2.1` setup without MIR loaded because several recipes still use the pre-`2.1` `category` recipe field shape.
 
-MIR's public claim remains the fixture-backed science-pack recipe productivity
-path only.
+MIR `3.0.0` now applies an exact-version Factorio `2.1` loader-schema repair when `atan-nuclear-science_0.3.3` is loaded with MIR. The repair only normalizes known ATAN Nuclear Science recipe category fields into the `categories` table so Factorio can construct prototypes; it does not change ingredients, results, unlocks, science, productivity targets, or balance.
+
+Repaired recipe IDs: `atomic-bomb`, `automation-science-pack`, `atan-atom-forge`, `breeder-fuel-cell`, `chemical-science-pack`, `centrifuge`, `explosive-plutonium-cannon-shell`, `explosive-uranium-cannon-shell`, `fission-reactor-equipment`, `fission-reactor-equipment-from-MOX-fuel`, `fission-reactor-equipment-from-plutonium`, `fusion-reactor-equipment`, `logistic-science-pack`, `military-science-pack`, `MOX-fuel-cell`, `nuclear-science-pack`, `nuclear-science-pack-from-plutonium`, `plutonium-atomic-artillery-shell`, `plutonium-cannon-shell`, `plutonium-fuel-cell`, `plutonium-rounds-magazine`, `production-science-pack`, `uranium-cannon-shell`, `uranium-fuel-cell`, `uranium-rounds-magazine`, and `utility-science-pack`.
+
+MIR's public productivity claim remains the fixture-backed science-pack recipe productivity path only.

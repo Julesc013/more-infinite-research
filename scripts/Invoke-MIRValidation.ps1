@@ -1156,6 +1156,51 @@ Invoke-RepoCheck "Air Scrubbing clean-filter policy is wired" {
   }
 }
 
+Invoke-RepoCheck "ATAN Factorio 2.1 schema repairs are wired" {
+  $dataFinalFixesText = Get-MIRDataFinalFixesSourceText
+  $repairPath = Join-Path $repo "prototypes\mir\compatibility\repairs\factorio_2_1_recipe_schema.lua"
+  $modulesText = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir\modules.yml")
+  $compatibilityManifestText = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir\compatibility.yml")
+  $atanAshDocText = Get-Content -Raw -LiteralPath (Join-Path $repo "docs\compatibility\targets\atan-ash.md")
+  $atanNuclearDocText = Get-Content -Raw -LiteralPath (Join-Path $repo "docs\compatibility\targets\atan-nuclear-science.md")
+
+  if (-not (Test-Path -LiteralPath $repairPath)) {
+    throw "Missing ATAN Factorio 2.1 schema repair module: $repairPath"
+  }
+
+  $repairText = Get-Content -Raw -LiteralPath $repairPath
+  $requiredSnippets = @(
+    @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'require("prototypes.mir.compatibility.repairs.factorio_2_1_recipe_schema").apply()' },
+    @{ File = "prototypes\mir\compatibility\repairs\factorio_2_1_recipe_schema.lua"; Text = $repairText; Snippet = '["atan-ash"]' },
+    @{ File = "prototypes\mir\compatibility\repairs\factorio_2_1_recipe_schema.lua"; Text = $repairText; Snippet = '["2.2.1"] = true' },
+    @{ File = "prototypes\mir\compatibility\repairs\factorio_2_1_recipe_schema.lua"; Text = $repairText; Snippet = '"atan-landfill-from-ash"' },
+    @{ File = "prototypes\mir\compatibility\repairs\factorio_2_1_recipe_schema.lua"; Text = $repairText; Snippet = '"atan-ash-seperation"' },
+    @{ File = "prototypes\mir\compatibility\repairs\factorio_2_1_recipe_schema.lua"; Text = $repairText; Snippet = 'product.independent_probability = product.probability' },
+    @{ File = "prototypes\mir\compatibility\repairs\factorio_2_1_recipe_schema.lua"; Text = $repairText; Snippet = 'product.probability = nil' },
+    @{ File = "prototypes\mir\compatibility\repairs\factorio_2_1_recipe_schema.lua"; Text = $repairText; Snippet = '["atan-nuclear-science"]' },
+    @{ File = "prototypes\mir\compatibility\repairs\factorio_2_1_recipe_schema.lua"; Text = $repairText; Snippet = '["0.3.3"] = true' },
+    @{ File = "prototypes\mir\compatibility\repairs\factorio_2_1_recipe_schema.lua"; Text = $repairText; Snippet = '"automation-science-pack"' },
+    @{ File = "prototypes\mir\compatibility\repairs\factorio_2_1_recipe_schema.lua"; Text = $repairText; Snippet = '"fission-reactor-equipment"' },
+    @{ File = "prototypes\mir\compatibility\repairs\factorio_2_1_recipe_schema.lua"; Text = $repairText; Snippet = '"nuclear-science-pack"' },
+    @{ File = "prototypes\mir\compatibility\repairs\factorio_2_1_recipe_schema.lua"; Text = $repairText; Snippet = '"uranium-rounds-magazine"' },
+    @{ File = "prototypes\mir\compatibility\repairs\factorio_2_1_recipe_schema.lua"; Text = $repairText; Snippet = 'recipe.categories = categories' },
+    @{ File = "prototypes\mir\compatibility\repairs\factorio_2_1_recipe_schema.lua"; Text = $repairText; Snippet = 'recipe.category = nil' },
+    @{ File = "prototypes\mir\compatibility\repairs\factorio_2_1_recipe_schema.lua"; Text = $repairText; Snippet = 'recipe.additional_categories = nil' },
+    @{ File = "prototypes\mir\compatibility\repairs\factorio_2_1_recipe_schema.lua"; Text = $repairText; Snippet = 'D.rule_mutation({' },
+    @{ File = ".mir\modules.yml"; Text = $modulesText; Snippet = "prototypes/mir/compatibility/repairs/factorio_2_1_recipe_schema.lua" },
+    @{ File = ".mir\compatibility.yml"; Text = $compatibilityManifestText; Snippet = "factorio_2_1_recipe_schema:atan-ash_2.2.1" },
+    @{ File = ".mir\compatibility.yml"; Text = $compatibilityManifestText; Snippet = "factorio_2_1_recipe_schema:atan-nuclear-science_0.3.3" },
+    @{ File = "docs\compatibility\targets\atan-ash.md"; Text = $atanAshDocText; Snippet = 'exact-version Factorio `2.1` loader-schema repair' },
+    @{ File = "docs\compatibility\targets\atan-nuclear-science.md"; Text = $atanNuclearDocText; Snippet = 'exact-version Factorio `2.1` loader-schema repair' }
+  )
+
+  foreach ($check in $requiredSnippets) {
+    if (-not $check.Text.Contains($check.Snippet)) {
+      throw "Missing ATAN Factorio 2.1 schema repair wiring in $($check.File): $($check.Snippet)"
+    }
+  }
+}
+
 Invoke-RepoCheck "compatibility support lanes are wired" {
   $supportLanePath = Join-Path $repo "fixtures\compat-matrix\support-lanes.json"
   if (-not (Test-Path -LiteralPath $supportLanePath)) {

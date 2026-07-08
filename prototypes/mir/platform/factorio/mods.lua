@@ -4,6 +4,11 @@ function M.exists(name)
   return mods ~= nil and mods[name] ~= nil
 end
 
+function M.version(name)
+  if mods == nil then return nil end
+  return mods[name]
+end
+
 function M.all_exist(names)
   for _, name in ipairs(names or {}) do
     if not M.exists(name) then return false end

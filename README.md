@@ -35,6 +35,7 @@ The mod is built around **graceful compatibility**: it discovers recipes,science
 - **MIR compiler architecture:** keeps active generation under `prototypes/mir/`, with declarative stream data in `prototypes/streams/`.
 - **Compiler diagnostics:** indexes typed prototype facts, compiler decisions, lab matrices, loop risks, rule surfaces, and cap estimates for audits.
 - **Factorio 2.1 recipes:** supports recipe `categories` as well as legacy single `category`.
+- **ATAN 2.1 schema repair:** exact-version loader-schema repairs let `atan-ash_2.2.1` and `atan-nuclear-science_0.3.3` load with MIR on Factorio `2.1`.
 - **Optional DLC:** keeps official DLC mods optional and gates DLC-shaped research behind concrete prototype checks.
 - **Scripted Space Age scaling:** bounded event-driven spoilage preservation and agricultural growth speed are disabled-by-default experimental candidates; default enablement or measured behavior claims require the named manual save matrix.
 - **Clean mod portal metadata:** keeps third-party compatibility-mod dependencies out of `info.json`.
@@ -87,16 +88,17 @@ See **`CONTRIBUTING.md`** for pull request expectations, branch routing, and val
 More Infinite Research mutates and generates prototypes in **`data-final-fixes.lua`**:
 
 1. **Startup-only prototype extensions** such as the opt-in pipeline extent multiplier.
-2. **Known competing recipe-productivity preparation** for removable third-party owners that MIR can fully replace.
-3. **Generated stream technology creation.**
-4. **Known competing recipe-productivity cleanup** after generated MIR effects prove the replacement.
-5. **Known competing base-extension cleanup** when MIR's matching base extension is enabled.
-6. **Base technology infinite extensions.**
-7. **Optional weapon shooting speed overlap adjustment.**
-8. **Max-level enforcement.**
-9. **Compiler diagnostics and compatibility planner reporting.**
-10. **Generated-technology effect safety validation.**
-11. **Optional diagnostics report flush.**
+2. **Exact-version compatibility schema repairs** for known upstream loader-schema breaks such as ATAN `2.1` recipe fields.
+3. **Known competing recipe-productivity preparation** for removable third-party owners that MIR can fully replace.
+4. **Generated stream technology creation.**
+5. **Known competing recipe-productivity cleanup** after generated MIR effects prove the replacement.
+6. **Known competing base-extension cleanup** when MIR's matching base extension is enabled.
+7. **Base technology infinite extensions.**
+8. **Optional weapon shooting speed overlap adjustment.**
+9. **Max-level enforcement.**
+10. **Compiler diagnostics and compatibility planner reporting.**
+11. **Generated-technology effect safety validation.**
+12. **Optional diagnostics report flush.**
 
 This gives the mod a **late view** of recipes, items, labs, science packs, ammo categories, and technologies created by other mods.
 
@@ -417,10 +419,10 @@ These are handled when their **prototypes are visible**:
 | Plates n Circuit Productivity (`plates-n-circuit-productivity`) | Selected competing infinite productivity technologies are prepared before MIR generation and removed only after MIR has generated matching replacement recipe effects with the same productivity value and no other blocking owner. |
 | Castra and PlanetLib-style science packs | Custom science packs can be discovered as lab inputs and receive science-pack productivity when their recipes are visible. |
 | Air Scrubbing (`atan-air-scrubbing`) | Exact clean-filter crafting recipes are covered by Air Scrubbing clean-filter productivity; scrubbing, cleaning, recovery, and environmental-removal recipes are deliberately excluded. |
-| ATAN Ash (`atan-ash`) | Exact ash separation is covered by ash separation productivity; landfill, brick, nutrient, foundation, tile, and recovery-style ash sink recipes are deliberately excluded. |
+| ATAN Ash (`atan-ash`) | Exact ash separation is covered by ash separation productivity; landfill, brick, nutrient, foundation, tile, and recovery-style ash sink recipes are deliberately excluded. MIR also applies an exact `atan-ash_2.2.1` Factorio `2.1` loader-schema repair when that version is loaded with MIR. |
 | AAI Loaders style loader mods | Recipes outputting AAI-style or tier-named loader items are covered by transport belt productivity when their recipes are visible. |
 | Big Mining Drill and Omega Drill style drill mods | Recipes outputting `big-mining-drill`, `omega-drill`, `omega-tau`, or broader modded `*-mining-drill` / `*-drill` items are covered by mining drill productivity. |
-| ATAN Nuclear Science style science-pack mods | Lab-input science-pack items with visible recipes are covered by science-pack productivity; non-science buildings such as atom-forge recipes are not included in the science-pack stream. |
+| ATAN Nuclear Science style science-pack mods | Lab-input science-pack items with visible recipes are covered by science-pack productivity; non-science buildings such as atom-forge recipes are not included in the science-pack stream. MIR also applies an exact `atan-nuclear-science_0.3.3` Factorio `2.1` loader-schema repair when that version is loaded with MIR. |
 
 Generic competing recipe-productivity cleanup is intentionally limited to **known infinite technologies** whose recipe-productivity effects are all covered by enabled MIR streams and then by generated MIR effects. **Finite upgrade chains** from other mods are not removed by the generic cleanup path.
 
@@ -544,9 +546,7 @@ Known 3.0.0 publication notes:
 
 - portal-backed full-catalog checks were not run in this environment because
   `FACTORIO_TOKEN` was not set;
-- local supported-zip isolation found `atan-ash_2.2.1` and
-  `atan-nuclear-science_0.3.3` failing without MIR on the tested Factorio
-  `2.1` setup, so those real upstream package failures are tracked outside MIR;
+- local supported-zip isolation still finds `atan-ash_2.2.1` and `atan-nuclear-science_0.3.3` failing without MIR on the tested Factorio `2.1` setup, but MIR `3.0.0` applies exact-version loader-schema repairs when those zips are loaded with MIR;
 - MIR's ATAN claims remain the narrow ash separation and nuclear-science-pack
   recipe productivity behavior documented under `docs/compatibility/targets/`.
 

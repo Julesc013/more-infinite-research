@@ -25,6 +25,7 @@ This release is not a broad new gameplay-content wave. It is the release that tu
 - Space Age remains optional.
 - Quality, Recycler, and Elevated Rails remain optional or hidden optional dependencies as recorded in `info.json`.
 - Generated research is still created only when the needed recipes, technologies, ammo categories, labs, and science packs are available.
+- Exact loader-schema repairs let `atan-ash_2.2.1` and `atan-nuclear-science_0.3.3` load with MIR on Factorio `2.1`.
 - Unsafe, missing, or unresearchable research candidates are skipped or kept diagnostic-only instead of being forced into invalid mod sets.
 - Recipe productivity research is still infinite, but Factorio's normal recipe productivity cap still applies.
 - Scripted spoilage preservation and agricultural growth speed remain disabled-by-default experimental options.
@@ -35,9 +36,11 @@ This release is not a broad new gameplay-content wave. It is the release that tu
 - MIR intentionally does not add productivity to Air Scrubbing scrubbing, cleaning, recovery, or environmental-removal recipes.
 - ATAN Ash support remains limited to the exact ash separation recipe family.
 - MIR intentionally does not add productivity to ATAN Ash landfill, brick, nutrient, foundation, tile, or recovery-style ash sink recipes.
+- MIR applies an exact `atan-ash_2.2.1` loader-schema repair for known Factorio `2.1` recipe category and result probability fields.
 - AAI-style loader crafting recipes are routed through Transport belt productivity when the required recipes and entities are visible.
 - Standalone big mining drill recipes are routed through Mining drill productivity when the required recipes and entities are visible.
 - ATAN-style Nuclear Science packs are routed through Science pack productivity when the nuclear science pack recipe and lab inputs are visible.
+- MIR applies an exact `atan-nuclear-science_0.3.3` loader-schema repair for known Factorio `2.1` recipe category fields.
 - Fluid Must Flow, Robot Attrition, Jetpack, Equipment Gantry, AAI Containers, and AAI Industry remain scoped to recorded coexistence or diagnostic evidence.
 
 ## Compatibility Boundaries
@@ -79,6 +82,7 @@ This release is not a broad new gameplay-content wave. It is the release that tu
 - Added MIR domain records for `DecisionRecord` and `StreamSpec`.
 - Added a Factorio `data.raw` adapter so prototype reads and prototype writes stay behind narrow boundaries.
 - Added focused MIR index, planner, capability, policy, emit, report, compatibility, settings, and runtime modules.
+- Added a focused MIR compatibility repair module for exact Factorio `2.1` upstream recipe schema normalization.
 - Added architecture, docs governance, settings visibility, package hygiene, claim, and policy checks.
 - Added release evidence docs for the MIR 3 summary, checklist, migration guide, local library gate, regression baseline, risk register, and publish candidate.
 - Added package hygiene checks to keep docs, scripts, sample mods, tests, build output, distribution output, `.mir`, `.codex`, `.github`, `AGENTS.md`, `CONTRIBUTING.md`, and the root work ledger out of release archives.
@@ -87,13 +91,13 @@ This release is not a broad new gameplay-content wave. It is the release that tu
 
 - Static checks passed for docs governance, MIR manifests, architecture boundaries, settings visibility, policy linting, claim linting, changelog syntax, and package hygiene.
 - Runtime sample-mod checks passed on the target Factorio `2.1` binary.
+- Targeted local ATAN release-dist isolation reproduced upstream-only schema failures without MIR and passed with MIR for `atan-ash_2.2.1`, `atan-nuclear-science_0.3.3`, `atan-air-scrubbing_0.2.8`, and all three together with Space Age.
 - The targeted local `2.1` mod-library gate passed.
-- The final package contains `114` entries and zero forbidden repository-only paths.
+- The final package contains `115` entries and zero forbidden repository-only paths.
 - Strict audit, repair, and representative local scenario lanes stayed row-count and hash stable against the recorded `2.2` comparison lanes.
 
 ## Known Notes
 
 - Portal-backed full-catalog checks were not run in the release environment because `FACTORIO_TOKEN` was not set.
-- Local supported-zip isolation found `atan-ash_2.2.1` failing without MIR on the tested Factorio `2.1` setup.
-- Local supported-zip isolation found `atan-nuclear-science_0.3.3` failing without MIR on the tested Factorio `2.1` setup.
-- Those supported-zip failures are tracked as upstream package or schema issues, not MIR regressions.
+- `atan-ash_2.2.1` and `atan-nuclear-science_0.3.3` still fail without MIR on the tested Factorio `2.1` setup.
+- MIR `3.0.0` repairs the exact known recipe schema breaks for those versions when they are loaded with MIR.

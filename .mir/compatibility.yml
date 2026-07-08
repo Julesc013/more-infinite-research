@@ -51,6 +51,8 @@ targets:
         - ash-sinks
         - tile-surface
         - resource-recovery
+      schema_repairs:
+        - factorio_2_1_recipe_schema:atan-ash_2.2.1
 
     atan-nuclear-science:
       mod: atan-nuclear-science
@@ -64,6 +66,8 @@ targets:
       generated_through_existing_stream: research_science_pack_productivity
       diagnostic_only:
         - atom-forge-crafting
+      schema_repairs:
+        - factorio_2_1_recipe_schema:atan-nuclear-science_0.3.3
 
     aai-loaders:
       mod: aai-loaders

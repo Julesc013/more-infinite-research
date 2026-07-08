@@ -154,6 +154,7 @@ modules:
     - prototypes/mir/compatibility/diagnostics/exact_recipe_policy.lua
     - prototypes/mir/compatibility/diagnostics/air_scrubbing.lua
     - prototypes/mir/compatibility/diagnostics/atan_ash.lua
+    - prototypes/mir/compatibility/repairs/factorio_2_1_recipe_schema.lua
   runtime:
     - prototypes/mir/runtime/scripted_techs.lua
     - prototypes/mir/runtime/settings_resolver.lua
@@ -230,11 +231,12 @@ target_layers:
   compatibility:
     path: prototypes/mir/compatibility
     overlay_path: prototypes/mir/compatibility/overlays
+    repair_path: prototypes/mir/compatibility/repairs
     may_require:
       - policy
       - platform
       - report
-    may_mutate_data_raw: false
+    may_mutate_data_raw: repairs-only
 
 rules:
   - Factorio root entrypoints stay as thin lifecycle wrappers.
@@ -244,5 +246,6 @@ rules:
   - Only settings/stage_builder.lua may register setting prototypes directly.
   - Generated technologies and mod-data prototypes emit through prototypes/mir/emit.
   - Compatibility overlays register policy only.
+  - Compatibility repairs may normalize exact-version upstream loader schemas only.
   - Domain modules do not read Factorio globals.
   - Report modules do not mutate prototypes.

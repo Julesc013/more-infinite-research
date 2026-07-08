@@ -20,10 +20,16 @@ Date: 2026-07-08
     - Kept Air Scrubbing scrubbing, cleaning, recovery, and environmental-removal recipes out of generated productivity streams.
     - Kept ATAN Ash support limited to the exact ash separation recipe family that has evidence.
     - Kept ATAN Ash landfill, brick, nutrient, foundation, tile, and recovery-style ash sinks out of generated productivity streams.
+    - Added exact Factorio 2.1 loader-schema repair for atan-ash 2.2.1 when it is loaded with MIR.
+    - The ATAN Ash repair normalizes known recipe category fields and result probability fields only.
+    - The ATAN Ash repair does not change ingredients, result amounts, unlocks, science, productivity targets, or balance.
     - Kept AAI-style loader crafting coverage routed through transport belt productivity.
     - Avoided a separate unproven loader overhaul claim.
     - Kept standalone big mining drill coverage routed through mining drill productivity.
     - Kept ATAN-style Nuclear Science coverage routed through science-pack productivity.
+    - Added exact Factorio 2.1 loader-schema repair for atan-nuclear-science 0.3.3 when it is loaded with MIR.
+    - The ATAN Nuclear Science repair normalizes known recipe category fields only.
+    - The ATAN Nuclear Science repair does not change ingredients, results, unlocks, science, productivity targets, or balance.
     - Kept Fluid Must Flow, Robot Attrition, Jetpack, and Equipment Gantry claims scoped to recorded evidence.
     - Kept AAI Containers and AAI Industry claims scoped to recorded coexistence or diagnostic evidence.
     - Kept generated-output behavior stable across the recorded 2.2 comparison lanes.
@@ -84,6 +90,7 @@ Date: 2026-07-08
     - Added focused MIR report modules for compatibility diagnostics, decision export, and diagnostics sink output.
     - Added focused MIR compatibility modules for overlay loading, profile loading, and claim registration.
     - Added focused MIR compatibility modules for exact recipe, Air Scrubbing, and ATAN Ash diagnostics.
+    - Added a focused MIR compatibility repair module for exact Factorio 2.1 upstream recipe schema normalization.
     - Added focused MIR settings modules for registry data, stage building, visibility, and defaults.
     - Added focused MIR settings modules for effective settings, profile codec support, and pipeline extent settings.
     - Added architecture checks, docs governance checks, and settings visibility checks.
@@ -118,6 +125,9 @@ Date: 2026-07-08
 
     - Legacy inventory passed with zero old shipped shim paths and zero old imports.
     - Legacy inventory passed with zero old root helper files and zero runtime Lua files under control.
+    - Local isolation confirmed atan-ash 2.2.1 still fails without MIR and loads with MIR after exact schema repair.
+    - Local isolation confirmed atan-nuclear-science 0.3.3 still fails without MIR and loads with MIR after exact schema repair.
+    - Local isolation confirmed Air Scrubbing and all tested ATAN zips load together with MIR after exact schema repair.
     - Legacy inventory passed with zero direct prototype access outside allowed layers.
     - Legacy inventory passed with zero generated streams without manifest rows.
     - Static checks passed docs governance, MIR manifests, and architecture boundaries.
@@ -125,11 +135,11 @@ Date: 2026-07-08
     - Runtime sample-mod checks passed on the target Factorio 2.1 binary.
     - The targeted release gate passed using the recorded local 2.1 mod library scenario set.
     - The full targeted gate evidence is recorded in release summary docs.
-    - The final package contains 114 entries and zero forbidden repository-only paths.
+    - The final package contains 115 entries and zero forbidden repository-only paths.
     - Portal-backed full-catalog checks were not run in the release environment because FACTORIO_TOKEN was not set.
-    - Local supported-zip isolation found atan-ash_2.2.1 failing without MIR on the tested Factorio 2.1 setup.
-    - Local supported-zip isolation found atan-nuclear-science_0.3.3 failing without MIR on the tested Factorio 2.1 setup.
-    - Those supported-zip failures remain upstream package/schema non-blockers rather than MIR regressions.
+    - atan-ash_2.2.1 still fails without MIR on the tested Factorio 2.1 setup and loads with MIR after repair.
+    - atan-nuclear-science 0.3.3 still fails without MIR and loads with MIR after exact schema repair.
+    - Those supported-zip failures remain upstream package/schema issues when MIR is not present.
 
 ---------------------------------------------------------------------------------------------------
 Version: 1.9.2

@@ -205,7 +205,9 @@ This helps it work with:
 - Castra and PlanetLib-style planet or science-pack mods.
 - Air Scrubbing clean-filter recipes, with scrubbing and cleaning recipes deliberately excluded.
 - ATAN Ash separation, with landfill, brick, nutrient, foundation, tile, and recovery-style ash sinks deliberately excluded.
+- Exact `atan-ash_2.2.1` Factorio `2.1` loader-schema repair when ATAN Ash is loaded with MIR.
 - ATAN-style Nuclear Science packs through science-pack productivity.
+- Exact `atan-nuclear-science_0.3.3` Factorio `2.1` loader-schema repair when ATAN Nuclear Science is loaded with MIR.
 - AAI-style loader crafting recipes through Transport belt productivity.
 - Standalone big mining drill mods through Mining drill productivity.
 - Advanced Solar HR.
@@ -231,10 +233,7 @@ Known 3.0.0 publication notes:
 
 - Portal-backed full-catalog checks were not run in the release environment
   because `FACTORIO_TOKEN` was not set.
-- Local supported-zip isolation found `atan-ash_2.2.1` and
-  `atan-nuclear-science_0.3.3` failing without MIR on the tested Factorio
-  `2.1` setup. Those are tracked as upstream package/schema issues, not MIR
-  regressions.
+- Local supported-zip isolation still finds `atan-ash_2.2.1` and `atan-nuclear-science_0.3.3` failing without MIR on the tested Factorio `2.1` setup, but MIR `3.0.0` applies exact-version loader-schema repairs when those zips are loaded with MIR.
 
 ## Troubleshooting
 

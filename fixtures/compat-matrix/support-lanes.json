@@ -22,9 +22,11 @@
       "claim_lane": "fixture-backed stream family",
       "claim_level": "science-pack recipe productivity only",
       "mir_behavior": "research_science_pack_productivity",
+      "schema_repair": "factorio_2_1_recipe_schema for atan-nuclear-science_0.3.3",
       "tested_by": [
         "mir-fixture-atan-nuclear-science",
-        "mir-fixture-assert-atan-nuclear-science-productivity"
+        "mir-fixture-assert-atan-nuclear-science-productivity",
+        "local supported-zip load check"
       ],
       "backport_candidate": true
     },
@@ -57,9 +59,11 @@
       "claim_lane": "fixture-backed stream family",
       "claim_level": "ash separation productivity only",
       "mir_behavior": "research_ash_separation",
+      "schema_repair": "factorio_2_1_recipe_schema for atan-ash_2.2.1",
       "tested_by": [
         "mir-fixture-atan-ash",
-        "mir-fixture-assert-atan-ash-separation"
+        "mir-fixture-assert-atan-ash-separation",
+        "local supported-zip load check"
       ],
       "backport_candidate": true
     },

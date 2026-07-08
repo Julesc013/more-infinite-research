@@ -1,5 +1,9 @@
 local M = {}
 
+function M.apply_compatibility_repairs()
+  require("prototypes.mir.compatibility.repairs.factorio_2_1_recipe_schema").apply()
+end
+
 function M.apply_pipeline_extent()
   local pipeline_extent_multiplier = require("prototypes.mir.settings.pipeline_extent").multiplier()
   if pipeline_extent_multiplier ~= 1 then

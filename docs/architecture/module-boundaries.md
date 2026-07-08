@@ -22,6 +22,7 @@ All meaningful shipped Lua lives under one MIR namespace.
 Every module belongs to one compiler layer.
 Only one layer mutates prototypes.
 Compatibility overlays register policy, not behavior.
+Compatibility repairs are exact-version loader-schema adapters, not broad behavior overlays.
 Development-only docs, scripts, fixtures, and tests stay outside the shipped zip.
 Old compatibility, library, legacy, and broad root-helper shim paths do not
 ship on the main 3.x line.
@@ -162,6 +163,7 @@ migrated, but they must read prototypes through platform adapters and emit rows
 through `report/` helpers. The stage layer calls
 `prototypes/mir/compatibility/diagnostics/registry.lua` rather than naming
 individual exact-recipe diagnostic modules directly.
+Exact upstream loader-schema repairs may live under `prototypes/mir/compatibility/repairs/` when they are version-gated, recipe-ID-gated, and limited to schema normalization required for Factorio to construct prototypes. These repairs may mutate existing third-party prototype fields through the platform adapter, but they must not generate technologies, change ingredients, change results, change unlocks, or alter balance.
 `prototypes/mir/report/diagnostics_sink.lua` owns the existing log/audit-row
 diagnostic sink. It may call `prototypes/mir/emit/icon_builder.lua` only to
 preserve existing icon-source hints in report rows; it must not mutate
@@ -464,6 +466,8 @@ prototypes/
         exact_recipe_policy.lua
         air_scrubbing.lua
         atan_ash.lua
+      repairs/
+        factorio_2_1_recipe_schema.lua
       overlays/
         base.lua
         space_age.lua
@@ -501,7 +505,7 @@ shape.
 | `planner/` | analytical records | `DecisionRecord`, `StreamSpec` | direct prototype mutation |
 | `emit/` | validated `StreamSpec` records | prototypes | classification |
 | `report/` | records | report rows | prototype mutation |
-| `compatibility/` | declarative selectors, policies, diagnostics | policy overlays and report rows | direct generation |
+| `compatibility/` | declarative selectors, policies, diagnostics, exact-version loader-schema repair specs | policy overlays, report rows, and bounded schema normalization | direct generation or balance changes |
 
 Forbidden dependencies:
 
@@ -509,6 +513,7 @@ Forbidden dependencies:
 domain/ must not require emit/
 classify/ must not require platform/factorio/data_raw.lua
 compatibility/overlays/ must not mutate data.raw
+compatibility/repairs/ must not generate technologies or change gameplay semantics
 settings/ must not inspect data.raw or force hidden values by default
 streams/ must stay declarative
 report/ must not mutate data.raw

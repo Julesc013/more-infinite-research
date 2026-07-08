@@ -237,6 +237,7 @@ $requiredMirFiles = @(
   "prototypes/mir/compatibility/diagnostics/exact_recipe_policy.lua",
   "prototypes/mir/compatibility/diagnostics/air_scrubbing.lua",
   "prototypes/mir/compatibility/diagnostics/atan_ash.lua",
+  "prototypes/mir/compatibility/repairs/factorio_2_1_recipe_schema.lua",
   "prototypes/mir/compatibility/overlays/air_scrubbing.lua",
   "prototypes/mir/compatibility/overlays/atan_ash.lua"
 )
@@ -246,6 +247,7 @@ foreach ($relative in $requiredMirFiles) {
 }
 
 $dataFinalFixesStageText = Read-MIRFile -RelativePath "prototypes/mir/stage/data_final_fixes.lua"
+Assert-MIRContains -RelativePath "prototypes/mir/stage/data_final_fixes.lua" -Text $dataFinalFixesStageText -Needle "steps.apply_compatibility_repairs()"
 Assert-MIRContains -RelativePath "prototypes/mir/stage/data_final_fixes.lua" -Text $dataFinalFixesStageText -Needle "steps.apply_pipeline_extent()"
 Assert-MIRContains -RelativePath "prototypes/mir/stage/data_final_fixes.lua" -Text $dataFinalFixesStageText -Needle "steps.emit_streams()"
 Assert-MIRContains -RelativePath "prototypes/mir/stage/data_final_fixes.lua" -Text $dataFinalFixesStageText -Needle 'require("prototypes.mir.compatibility.diagnostics.registry").emit_all()'
@@ -254,6 +256,7 @@ Assert-MIRContains -RelativePath "prototypes/mir/stage/data_final_fixes.lua" -Te
 
 $dataFinalFixesStepsText = Read-MIRFile -RelativePath "prototypes/mir/stage/data_final_fixes_steps.lua"
 foreach ($needle in @(
+  'require("prototypes.mir.compatibility.repairs.factorio_2_1_recipe_schema").apply()',
   'require("prototypes.mir.settings.pipeline_extent").multiplier()',
   'require("prototypes.mir.pipeline.extent").apply(pipeline_extent_multiplier)',
   'require("prototypes.mir.policy.competing_productivity").prepare()',
@@ -329,6 +332,28 @@ Assert-MIRNoPatternInLuaTree `
   -RelativeRoot "prototypes/mir/compatibility/overlays" `
   -Pattern "\bdata\.raw\b|data:extend" `
   -Message "MIR compatibility overlays must stay declarative."
+
+$compatibilityRepairText = Read-MIRFile -RelativePath "prototypes/mir/compatibility/repairs/factorio_2_1_recipe_schema.lua"
+foreach ($needle in @(
+  '["atan-ash"]',
+  '["2.2.1"] = true',
+  '"atan-landfill-from-ash"',
+  '"atan-ash-seperation"',
+  'product.independent_probability = product.probability',
+  'product.probability = nil',
+  '["atan-nuclear-science"]',
+  '["0.3.3"] = true',
+  '"automation-science-pack"',
+  '"fission-reactor-equipment"',
+  '"nuclear-science-pack"',
+  '"uranium-rounds-magazine"',
+  'recipe.categories = categories',
+  'recipe.category = nil',
+  'recipe.additional_categories = nil',
+  'D.rule_mutation({'
+)) {
+  Assert-MIRContains -RelativePath "prototypes/mir/compatibility/repairs/factorio_2_1_recipe_schema.lua" -Text $compatibilityRepairText -Needle $needle
+}
 
 Assert-MIRNoPatternInLuaTree `
   -RelativeRoot "prototypes/mir/report" `
