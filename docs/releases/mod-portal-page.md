@@ -62,11 +62,11 @@ Most simple productivity researches give `+10%` productivity per level. Larger g
 
 The mod can add infinite research for:
 
-- Character mining speed, crafting speed, walking speed, inventory slots, logistic trash slots, and optional reach/build distance.
+- Character mining speed, crafting speed, walking speed, inventory slots, logistic trash slots, and reach/build distance.
 - Worker robot battery capacity.
 - Rocket, cannon, flamethrower, electric, and Space Age Tesla weapon shooting speed.
-- Cargo bay unloading distance and optional cargo landing pad count with Space Age.
-- Scripted Space Age spoilage preservation and agricultural growth speed as disabled-by-default experimental candidates.
+- Cargo bay unloading distance and cargo landing pad count with Space Age.
+- Scripted Space Age agricultural growth speed by default, plus optional spoilage preservation.
 
 ### More Vanilla Tech Continuations
 
@@ -147,11 +147,11 @@ Technologies are generated only when their recipes, items, technologies, ammo ca
 | --- | --- | --- | --- |
 | Research productivity | `+10%` lab research productivity | On without Space Age; skipped with Space Age | Base-game equivalent of Space Age's vanilla research productivity. Uses the native `laboratory-productivity` modifier. |
 | Spoilage preservation | `+1%` global spoil time per level | Off | Experimental Space Age scripted technology. Global/map-wide effect; existing item-stack behavior still needs manual validation before stronger claims. |
-| Agricultural growth speed | `+1%` agricultural growth speed per level, capped at `10x` | Off | Experimental Space Age scripted technology. Adds agricultural, electromagnetic, and cryogenic science when available. Applies to newly planted agricultural tower crops; existing planted crops are not globally rescanned. |
+| Agricultural growth speed | `+1%` agricultural growth speed per level, capped at `10x` | On with Space Age | Special Space Age scripted technology. Adds agricultural, electromagnetic, and cryogenic science when available. Applies to newly planted agricultural tower crops; existing planted crops are not globally rescanned. |
 | Character inventory slots | `+1` inventory slot and `+1` logistic trash slot | On | Merges the old separate trash-slot research into one combined technology. A migration preserves old trash-slot progress. |
 | Worker robot battery | `+10%` worker robot battery capacity | On | Uses a gentler default cost growth than shared productivity streams. Skips when Better Bot Battery-style `worker-robots-battery-6` already exists. |
 | Cargo bay unloading distance | `+10` maximum unloading distance tiles | On with Space Age | Requires Space Age unloading bay content. Uses the unloading bay unlock technology art and official base and Space Age science packs. |
-| Cargo landing pad count | `+1` landing pad per surface | Off | Sandbox-style Space Age logistics option. Uses Space platform technology art. Very expensive by default. |
+| Cargo landing pad count | `+1` landing pad per surface | On with Space Age | Special Space Age logistics research. Uses Space platform technology art. Very expensive by default. |
 | Rocket shooting speed | `+10%` shooting speed for rocket ammo category | On | Separate dedicated speed research using electromagnetic science when available. |
 | Cannon shooting speed | `+10%` shooting speed for cannon-shell ammo category | On | Separate dedicated speed research using electromagnetic science when available. |
 | Flamethrower shooting speed | `+10%` flamethrower shooting speed | On | Includes flamethrower turret-style weapons. |
@@ -159,7 +159,7 @@ Technologies are generated only when their recipes, items, technologies, ammo ca
 | Character mining speed | `+5%` mining speed | On | Uses late-game utility/military/agricultural/electromagnetic science when available. |
 | Character crafting speed | `+5%` crafting speed | On | Direct character bonus. |
 | Character walking speed | `+5%` running speed | On | Direct character bonus. |
-| Character reach bonus | `+10` reach, build distance, resource reach, and item drop distance | Off | Disabled by default because large reach bonuses can change normal play. Uses the pickaxe/mining-speed icon. |
+| Character reach bonus | `+10` reach, build distance, resource reach, and item drop distance | On | Special character bonus. Uses the pickaxe/mining-speed icon. |
 
 ### Vanilla Technology Continuations
 
@@ -168,7 +168,7 @@ Technologies are generated only when their recipes, items, technologies, ammo ca
 | Braking force | Continues vanilla braking-force bonuses infinitely | On | Inherits the vanilla chain and adds space science when available. |
 | Lab research speed | Continues vanilla lab research speed infinitely | On | Can add all active lab science packs depending on settings. |
 | Worker robot storage | Continues vanilla robot cargo capacity infinitely | On | Skips when an equivalent infinite extension already exists. |
-| Inserter capacity bonus | Continues inserter stack/bulk capacity bonuses | Off | Default increments are `+2` non-bulk and `+4` bulk/stack. Disabled because it can change factory assumptions. |
+| Inserter capacity bonus | Continues inserter stack/bulk capacity bonuses | Off | Default increments are `+2` non-bulk and `+4` bulk/stack. Disabled because larger hand sizes can break circuit-controlled inserters and reduce engine optimization assumptions. |
 | Weapon shooting speed | Continues vanilla general weapon shooting speed infinitely | On | Finite vanilla tank cannon and rocket bonuses are preserved. Optional cleanup can separate rocket/cannon bonuses into dedicated MIR technologies. |
 | Laser shooting speed | Continues vanilla laser shooting speed infinitely | On | Copies vanilla laser-speed effects. |
 
@@ -263,4 +263,5 @@ Version `2.1.0` preserves generated technology IDs except for documented intenti
 
 Existing saves receive the `2.0.5` and `2.1.0` JSON migrations automatically when the mod loads.
 
-Scripted spoilage and agriculture effects are disabled by default in `3.0.0`.
+Agricultural growth speed is enabled by default in `3.0.0`; spoilage
+preservation remains disabled by default.

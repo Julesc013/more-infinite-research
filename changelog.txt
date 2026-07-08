@@ -70,6 +70,9 @@ Date: 2026-07-08
     - Hidden settings keep their setting IDs readable and do not force values.
     - Improved in-game setting labels and descriptions for science-pack and lab-compatibility policies.
     - Grouped generated-technology settings so disabled, risky, special, and vanilla-continuation rows stay easier to find.
+    - Split generated-technology settings into default-off, enabled special, and ordinary enabled groups.
+    - Enabled breeding, agricultural growth, cargo bay range, cargo landing pad count, and character reach by default.
+    - Kept inserter capacity disabled by default because larger hand sizes can affect circuits and engine optimizations.
     - Kept MIR-owned official technology settings visible across base and Space Age.
     - Kept the settings surface stable when toggling official DLC.
     - Updated release and README wording for the architecture move.

@@ -20,18 +20,24 @@ local defaults = {
       }
     },
     research_agricultural_growth_speed = {
-      enabled = false,
+      enabled = true,
       base_cost = 40000,
       growth_factor = 1.5,
       research_time = 90,
       max_level = 0,
+      settings_priority = "top",
       settings_note = {
-        "mod-setting-description.mir-note-experimental-agriculture"
+        "mod-setting-description.mir-note-agriculture-growth"
       }
     },
     research_inventory_capacity = { growth_factor = 1.10 },
     research_robot_battery = { growth_factor = 1.2 },
+    research_breeding = {
+      enabled = true,
+      settings_priority = "top"
+    },
     research_cargo_bay_unloading_distance = {
+      enabled = true,
       base_cost = 100000,
       growth_factor = 3,
       research_time = 120,
@@ -39,13 +45,14 @@ local defaults = {
       settings_priority = "top"
     },
     research_cargo_landing_pad_count = {
-      enabled = false,
+      enabled = true,
       base_cost = 1000000,
       growth_factor = 10,
       research_time = 240,
       max_level = 0,
+      settings_priority = "top",
       settings_note = {
-        "mod-setting-description.mir-note-sandbox-cargo-pad-count"
+        "mod-setting-description.mir-note-cargo-pad-count"
       }
     },
     research_lab_productivity = {
@@ -62,7 +69,8 @@ local defaults = {
       research_time = 120
     },
     research_character_reach = {
-      enabled = false
+      enabled = true,
+      settings_priority = "top"
     },
     research_rocket_shooting_speed = {
       base_cost = 60,

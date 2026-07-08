@@ -75,6 +75,20 @@ ui_visibility = {
 }
 ```
 
+## Ordering
+
+Generated technology settings use three `b-*` buckets:
+
+- `b-000`: disabled-by-default or experimental rows;
+- `b-050`: enabled special, unusual, balance-sensitive, or vanilla-continuation
+  rows;
+- `b-100`: ordinary enabled rows.
+
+Breeding productivity, agricultural growth speed, cargo bay unloading distance,
+cargo landing pad count, and character reach are enabled by default but remain
+in the special bucket. Inserter capacity bonus remains disabled by default and
+therefore stays in the first bucket.
+
 ## Generation
 
 Visibility does not prove that a stream can generate. Data-stage generation

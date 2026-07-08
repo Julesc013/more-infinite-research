@@ -47,10 +47,11 @@ it cannot generate or mutate prototypes after startup finalizes them.
 The default MIR 3 policy is to omit `control.lua` unless the mod has runtime
 responsibilities. The current `dev` branch does have a small runtime surface for
 scripted technologies such as spoilage preservation and agricultural growth
-speed, so `control.lua` stays as a thin wrapper into the runtime manager. These
-features ship as disabled-by-default experimental candidates because they are
-bounded and event-driven. Stronger behavior claims, default enablement, or broad
-existing-save guarantees still require the named manual save validation.
+speed, so `control.lua` stays as a thin wrapper into the runtime manager.
+Spoilage preservation remains a disabled-by-default experimental candidate.
+Agricultural growth speed is enabled by default as a special Space Age
+technology after event-path coverage, but broad existing-save guarantees still
+require named manual save evidence.
 
 The runtime layer is intentionally narrow:
 

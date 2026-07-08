@@ -33,6 +33,9 @@ contract unless there is a documented migration reason to retire it.
 - Exclude `mir-settings-profile-import` from exported profiles.
 - Treat a profile import as an effective data-stage override, not a runtime
   mutation of Factorio startup settings.
+- Order technology settings in three attention buckets: default-off or
+  experimental rows first, enabled special/unusual rows second, and ordinary
+  enabled rows last. Sort alphabetically inside each bucket.
 
 ## Adding A Stream Setting
 
@@ -67,6 +70,20 @@ ui_visibility = {
 
 Transport belt productivity is also `always`: base belts exist in base games
 and loader recipes are opportunistic additions.
+
+## Attention Ordering
+
+Use the `settings_priority = "top"` stream or base-extension default for
+enabled technologies that are unusual, balance-sensitive, scripted, or
+important enough to keep above the ordinary generated technology list. Disabled
+or experimental rows still sort above that middle bucket because players should
+see opt-in risk first.
+
+In 3.0.0, breeding productivity, agricultural growth speed, cargo bay unloading
+distance, cargo landing pad count, and character reach are enabled by default
+but stay in the special bucket. Inserter capacity bonus also stays near the top
+but remains disabled by default because larger inserter hand sizes can break
+circuit-controlled inserters and reduce engine optimization assumptions.
 
 ## Backports
 

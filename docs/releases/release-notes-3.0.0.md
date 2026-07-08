@@ -30,7 +30,7 @@ This release is not a broad new gameplay-content wave. It is the release that tu
 - Recipe productivity research is still infinite, but Factorio's normal recipe productivity cap still applies.
 - Science-pack and lab-compatibility startup settings now use clearer player-facing labels while keeping the same internal setting values.
 - MIR-owned official technology settings stay visible across base and Space Age, even when the current active mod set will skip generation.
-- Scripted spoilage preservation and agricultural growth speed remain disabled-by-default experimental options.
+- Agricultural growth speed is enabled by default as a special Space Age technology; spoilage preservation remains a disabled-by-default experimental option.
 
 ## Compatibility
 
@@ -62,7 +62,7 @@ This release is not a broad new gameplay-content wave. It is the release that tu
 - Base technology continuations now route through the MIR emit layer.
 - Effect safety, generated icon construction, max-level handling, and weapon-speed cleanup now route through focused MIR modules.
 - Settings are built through the MIR settings stage builder instead of the old large root settings file.
-- Generated-technology setting rows keep disabled, risky, special, and vanilla-continuation groups easier to find before the ordinary enabled alphabetical list.
+- Generated-technology setting rows use three groups: default-off/experimental rows, enabled special rows, then ordinary enabled rows.
 - Runtime scripted technology handlers now live under `prototypes/mir/runtime`.
 - Runtime code stays separate from prototype generation.
 

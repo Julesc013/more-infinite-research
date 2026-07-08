@@ -29,6 +29,13 @@ Use the in-game setting descriptions for exact defaults. Use
 [settings reference](../reference/settings.md) for the canonical
 technical contract once a setting needs maintainer-level detail.
 
+Generated technology settings are ordered so default-off or experimental rows
+come first, enabled special rows come next, and ordinary enabled rows come last.
+Breeding, agricultural growth speed, cargo bay range/count, and character reach
+are enabled by default but remain in the special row group. Inserter capacity
+stays disabled by default because larger hand sizes can change circuit behavior
+and inserter performance assumptions.
+
 ## Portable Settings Profiles
 
 MIR can export a portable settings profile for the current effective MIR startup

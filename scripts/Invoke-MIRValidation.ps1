@@ -299,12 +299,13 @@ Invoke-RepoCheck "control runtime avoids tick handlers" {
   }
 }
 
-Invoke-RepoCheck "scripted candidate streams remain default-off before manual proof" {
+Invoke-RepoCheck "default-off scripted streams remain guarded" {
   $defaultsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\settings\defaults.lua")
-  foreach ($streamKey in @("research_spoilage_preservation", "research_agricultural_growth_speed")) {
-    if ($defaultsText -notmatch "(?s)$streamKey\s*=\s*\{.*?enabled\s*=\s*false") {
-      throw "Scripted candidate stream $streamKey must remain disabled by default until manual save validation supports release claims."
-    }
+  if ($defaultsText -notmatch "(?s)research_spoilage_preservation\s*=\s*\{.*?enabled\s*=\s*false") {
+    throw "Spoilage preservation must remain disabled by default until manual save validation supports stronger release claims."
+  }
+  if ($defaultsText -notmatch "(?s)research_agricultural_growth_speed\s*=\s*\{.*?enabled\s*=\s*true") {
+    throw "Agricultural growth speed should be enabled by default as a promoted special technology."
   }
 }
 
@@ -695,10 +696,10 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-adjust-vanilla-weapon-speed-techs=Rocket/cannon speed cleanup' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-debug-generation-report=Log generated and skipped technologies' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-note-experimental-spoilage=Experimental and disabled by default in v2.1.0.' },
-    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-note-experimental-agriculture=Experimental and disabled by default in v2.1.0.' },
-    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-note-inserter-capacity=Disabled by default.' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-note-agriculture-growth=Applies to newly planted agricultural tower crops.' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-note-inserter-capacity=Disabled by default. Extra inserter capacity can break circuit-controlled inserters and reduce engine optimizations.' },
     @{ File = "prototypes\mir\settings\defaults.lua"; Text = $defaultsText; Snippet = 'mod-setting-description.mir-note-experimental-spoilage' },
-    @{ File = "prototypes\mir\settings\defaults.lua"; Text = $defaultsText; Snippet = 'mod-setting-description.mir-note-experimental-agriculture' },
+    @{ File = "prototypes\mir\settings\defaults.lua"; Text = $defaultsText; Snippet = 'mod-setting-description.mir-note-agriculture-growth' },
     @{ File = "prototypes\mir\settings\defaults.lua"; Text = $defaultsText; Snippet = 'mod-setting-description.mir-note-inserter-capacity' },
     @{ File = "prototypes\mir\settings\defaults.lua"; Text = $defaultsText; Snippet = 'research_lab_productivity = {' }
   )
@@ -717,8 +718,8 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     $requiredSnippets += @(
       @{ File = "settings.lua"; Text = $settingsText; Snippet = 'research_cargo_landing_pad_count = "Cargo landing pad count"' },
       @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'cargo-landing-pad-count=Cargo landing pads per surface: +__1__' },
-      @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-note-sandbox-cargo-pad-count=Sandbox-style and disabled by default.' },
-      @{ File = "prototypes\mir\settings\defaults.lua"; Text = $defaultsText; Snippet = 'mod-setting-description.mir-note-sandbox-cargo-pad-count' },
+      @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-note-cargo-pad-count=Special Space Age logistics research.' },
+      @{ File = "prototypes\mir\settings\defaults.lua"; Text = $defaultsText; Snippet = 'mod-setting-description.mir-note-cargo-pad-count' },
       @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'research_cargo_landing_pad_count = {' },
       @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'required_mods = {"space-age"}' },
       @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'required_technologies = {"rocket-silo"}' },
@@ -779,6 +780,28 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     if ($defaultsText -notmatch '(?s)research_cargo_landing_pad_count\s*=\s*\{.*?research_time\s*=\s*240') {
       throw "Cargo landing pad count default research time must be 240 seconds."
     }
+  }
+
+  foreach ($promotedSpecialStream in @(
+    "research_breeding",
+    "research_agricultural_growth_speed",
+    "research_cargo_bay_unloading_distance",
+    "research_cargo_landing_pad_count",
+    "research_character_reach"
+  )) {
+    if ($defaultsText -notmatch "(?s)$promotedSpecialStream\s*=\s*\{.*?settings_priority\s*=\s*`"top`"") {
+      throw "$promotedSpecialStream must stay in the enabled special technology settings bucket."
+    }
+    if ($defaultsText -notmatch "(?s)$promotedSpecialStream\s*=\s*\{.*?enabled\s*=\s*true") {
+      throw "$promotedSpecialStream must be enabled by default."
+    }
+  }
+
+  if ($defaultsText -notmatch '(?s)\["inserter-capacity-bonus"\]\s*=\s*\{.*?enabled\s*=\s*false') {
+    throw "Inserter capacity bonus must remain disabled by default."
+  }
+  if ($defaultsText -notmatch '(?s)\["inserter-capacity-bonus"\]\s*=\s*\{.*?settings_priority\s*=\s*"top"') {
+    throw "Inserter capacity bonus must stay in the top default-off settings bucket."
   }
 }
 
@@ -2829,19 +2852,20 @@ Assert-ReportLineGenerated -Line $baseInstalledRailsIconLine -Context "Base inst
 Assert-ReportLineContains -Line $baseInstalledRailsIconLine -Expected "icon=__elevated-rails__/graphics/technology/elevated-rail.png" -Context "Base installed official DLC rail productivity icon scenario"
 
 Invoke-RuntimeScenario -ScenarioName "checkbox-enabled-default-off-features" -EnabledFixtureNames @() `
-  -EnabledStreamKeys @("research_character_reach") `
   -EnabledBaseExtensionKeys @("inserter-capacity-bonus")
-$checkboxEnabledReachLine = Get-LastStreamReportLine -Key "research_character_reach"
-Assert-ReportLineGenerated -Line $checkboxEnabledReachLine -Context "Checkbox-enabled stream scenario"
 $checkboxEnabledInserterLine = Get-LastExtensionReportLine -Key "inserter-capacity-bonus"
 Assert-ReportLineGenerated -Line $checkboxEnabledInserterLine -Context "Checkbox-enabled base extension scenario"
 
 Invoke-RuntimeScenario -ScenarioName "checkbox-disabled-default-on-features" -EnabledFixtureNames @() `
-  -DisabledStreamKeys @("research_gears") `
+  -DisabledStreamKeys @("research_gears", "research_character_reach") `
   -DisabledBaseExtensionKeys @("research-speed")
 $checkboxDisabledGearsLine = Get-LastStreamReportLine -Key "research_gears"
 if ($checkboxDisabledGearsLine -notmatch "status=skipped" -or $checkboxDisabledGearsLine -notmatch "disabled") {
   throw "Disabled stream checkbox should skip generated research: $checkboxDisabledGearsLine"
+}
+$checkboxDisabledReachLine = Get-LastStreamReportLine -Key "research_character_reach"
+if ($checkboxDisabledReachLine -notmatch "status=skipped" -or $checkboxDisabledReachLine -notmatch "disabled") {
+  throw "Disabled promoted special stream checkbox should skip generated research: $checkboxDisabledReachLine"
 }
 $checkboxDisabledResearchSpeedLine = Get-LastExtensionReportLine -Key "research-speed"
 if ($checkboxDisabledResearchSpeedLine -notmatch "status=skipped" -or $checkboxDisabledResearchSpeedLine -notmatch "disabled") {
@@ -2932,16 +2956,17 @@ if ($isFactorio21Line) {
   Assert-LogContains -Expected "agricultural growth speed force state refreshed enabled=true" -Context "Checkbox-enabled scripted agricultural runtime scenario"
 
   Invoke-RuntimeScenario -ScenarioName "space-age-scripted-candidates-disabled" -EnabledFixtureNames @() `
+    -DisabledStreamKeys @("research_spoilage_preservation") `
     -ScriptedDiagnostics `
     -EnableSpaceAge
-  foreach ($disabledScriptedStream in @("research_spoilage_preservation", "research_agricultural_growth_speed")) {
-    $disabledScriptedLine = Get-LastStreamReportLine -Key $disabledScriptedStream
-    if ($disabledScriptedLine -notmatch "status=skipped" -or $disabledScriptedLine -notmatch "disabled") {
-      throw "Default-disabled scripted stream should skip when its checkbox is off: $disabledScriptedLine"
-    }
+  $disabledSpoilageLine = Get-LastStreamReportLine -Key "research_spoilage_preservation"
+  if ($disabledSpoilageLine -notmatch "status=skipped" -or $disabledSpoilageLine -notmatch "disabled") {
+    throw "Default-disabled scripted spoilage stream should skip when its checkbox is off: $disabledSpoilageLine"
   }
+  $defaultAgriculturalLine = Get-LastStreamReportLine -Key "research_agricultural_growth_speed"
+  Assert-ReportLineGenerated -Line $defaultAgriculturalLine -Context "Default-enabled scripted agricultural runtime scenario"
   Assert-LogContains -Expected "spoilage preservation skipped: disabled" -Context "Default-disabled scripted spoilage runtime scenario"
-  Assert-LogContains -Expected "agricultural growth speed force state refreshed enabled=false" -Context "Default-disabled scripted agricultural runtime scenario"
+  Assert-LogContains -Expected "agricultural growth speed force state refreshed enabled=true" -Context "Default-enabled scripted agricultural runtime scenario"
 }
 
 Invoke-RuntimeScenario -ScenarioName "space-age-generation-integrity" -EnabledFixtureNames @(
@@ -3154,17 +3179,13 @@ Assert-ReportLineDoesNotContain -Line $gateLine -Unexpected "science=automation-
 if ($isLegacyFactorio20) {
   Write-Host "[skip] Factorio 2.1 cargo runtime fixture scenarios skipped for Factorio 2.0 legacy metadata."
 } else {
-  Invoke-RuntimeScenario -ScenarioName "base-cargo-space-age-gate" -EnabledFixtureNames @() -EnabledStreamKeys @(
-    "research_cargo_landing_pad_count"
-  )
+  Invoke-RuntimeScenario -ScenarioName "base-cargo-space-age-gate" -EnabledFixtureNames @()
   $cargoPadLine = Get-LastStreamReportLine -Key "research_cargo_landing_pad_count"
   if ($cargoPadLine -notmatch "status=skipped" -or $cargoPadLine -notmatch "missing required mod space-age") {
     throw "Cargo landing pad count generated or skipped for the wrong reason without Space Age: $cargoPadLine"
   }
 
-  Invoke-RuntimeScenario -ScenarioName "space-age-cargo-pad-enabled" -EnabledFixtureNames @() -EnabledStreamKeys @(
-    "research_cargo_landing_pad_count"
-  ) -EnableSpaceAge
+  Invoke-RuntimeScenario -ScenarioName "space-age-cargo-pad-enabled" -EnabledFixtureNames @() -EnableSpaceAge
   $spaceAgeCargoPadLine = Get-LastStreamReportLine -Key "research_cargo_landing_pad_count"
   Assert-ReportLineGenerated -Line $spaceAgeCargoPadLine -Context "Space Age cargo landing pad count scenario"
   $spaceAgeCargoDistanceLine = Get-LastStreamReportLine -Key "research_cargo_bay_unloading_distance"
@@ -3172,8 +3193,6 @@ if ($isLegacyFactorio20) {
 
   Invoke-RuntimeScenario -ScenarioName "space-age-cargo-logistics-shape" -EnabledFixtureNames @(
     "mir-fixture-assert-cargo-logistics"
-  ) -EnabledStreamKeys @(
-    "research_cargo_landing_pad_count"
   ) -EnableSpaceAge
   $spaceAgeCargoShapePadLine = Get-LastStreamReportLine -Key "research_cargo_landing_pad_count"
   Assert-ReportLineGenerated -Line $spaceAgeCargoShapePadLine -Context "Space Age cargo logistics shape scenario"
@@ -3183,8 +3202,6 @@ if ($isLegacyFactorio20) {
   Invoke-RuntimeScenario -ScenarioName "space-age-duplicate-cargo-diagnostics" -EnabledFixtureNames @(
     "mir-fixture-duplicate-cargo-tech",
     "mir-fixture-assert-cargo-logistics"
-  ) -EnabledStreamKeys @(
-    "research_cargo_landing_pad_count"
   ) -EnableSpaceAge
   $duplicateCargoPadLine = Get-LastStreamReportLine -Key "research_cargo_landing_pad_count"
   Assert-ReportLineGenerated -Line $duplicateCargoPadLine -Context "Duplicate cargo landing pad diagnostics scenario"
