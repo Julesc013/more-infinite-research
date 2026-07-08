@@ -36,6 +36,8 @@ contract unless there is a documented migration reason to retire it.
 - Order technology settings in three attention buckets: default-off or
   experimental rows first, enabled special/unusual rows second, and ordinary
   enabled rows last. Sort alphabetically inside each bucket.
+- Keep prototype limit settings startup-only, defaulting to `engine-default`,
+  and document every non-default value as an explicit global prototype override.
 
 ## Adding A Stream Setting
 
@@ -84,6 +86,17 @@ distance, cargo landing pad count, and character reach are enabled by default
 but stay in the special bucket. Inserter capacity bonus also stays near the top
 but remains disabled by default because larger inserter hand sizes can break
 circuit-controlled inserters and reduce engine optimization assumptions.
+
+## Prototype Limit Settings
+
+Prototype limit settings must be visible global settings, not hidden behavior.
+`engine-default` means MIR does not touch the corresponding Factorio prototype
+field. Non-default values may mutate recipe productivity caps or effect receiver
+limits during `data-final-fixes`, but they must not require runtime event
+processing.
+
+Keep the implementation in the MIR settings and pipeline layers. Compatibility
+policy files may not apply these overrides directly.
 
 ## Backports
 

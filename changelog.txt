@@ -69,6 +69,8 @@ Date: 2026-07-08
     - Added hidden-setting visibility logic for unavailable technology settings.
     - Hidden settings keep their setting IDs readable and do not force values.
     - Improved in-game setting labels and descriptions for science-pack and lab-compatibility policies.
+    - Added startup dropdowns for recipe productivity, efficiency, speed, and quality prototype caps.
+    - Prototype cap dropdowns leave engine defaults untouched unless explicitly changed.
     - Grouped generated-technology settings so disabled, risky, special, and vanilla-continuation rows stay easier to find.
     - Split generated-technology settings into default-off, enabled special, and ordinary enabled groups.
     - Enabled breeding, agricultural growth, cargo bay range, cargo landing pad count, and character reach by default.
@@ -100,6 +102,7 @@ Date: 2026-07-08
     - Added a focused MIR compatibility repair module for exact Factorio 2.1 upstream recipe schema normalization.
     - Added focused MIR settings modules for registry data, stage building, visibility, and defaults.
     - Added focused MIR settings modules for effective settings, profile codec support, and pipeline extent settings.
+    - Added focused MIR settings and pipeline modules for explicit prototype limit overrides.
     - Added architecture checks, docs governance checks, and settings visibility checks.
     - Added local mod library catalog checks and legacy inventory reporting tools.
     - Fixed compatibility-audit staging so local load-test mod copies exclude repository-only development paths.
@@ -143,6 +146,7 @@ Date: 2026-07-08
     - Static checks passed docs governance, MIR manifests, and architecture boundaries.
     - Static checks passed settings visibility, policy linting, claim linting, changelog syntax, and package hygiene.
     - Runtime sample-mod checks passed on the target Factorio 2.1 binary.
+    - Prototype limit startup overrides passed base-only and Space Age runtime load checks.
     - Selected local zip checks passed for the advertised and recently repaired compatibility targets.
     - The targeted release gate passed using the recorded local 2.1 mod library scenario set.
     - The full targeted gate evidence is recorded in release summary docs.

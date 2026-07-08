@@ -13,6 +13,8 @@ rules:
   technology_settings_sort_by_visibility_then_player_name: true
   official_and_mir_owned_technology_settings_stay_visible: true
   technology_settings_use_three_attention_buckets: true
+  prototype_limit_settings_default_to_engine_default: true
+  prototype_limit_settings_are_startup_only_explicit_overrides: true
 
 profiles:
   schema: 1

@@ -2,6 +2,7 @@ local C = require("prototypes.mir.streams.registry")
 local defaults = require("prototypes.mir.settings.defaults")
 local settings_adapter = require("prototypes.mir.settings.stage_adapter")
 local pipeline_extent_settings = require("prototypes.mir.settings.pipeline_extent")
+local prototype_limit_settings = require("prototypes.mir.settings.prototype_limits")
 
 local settings_data = {}
 local settings_context = settings_adapter.context()
@@ -135,6 +136,10 @@ table.insert(settings_data, {
   localised_name = {"mod-setting-name.mir-settings-profile-import"},
   localised_description = {"mod-setting-description.mir-settings-profile-import"}
 })
+
+for _, setting in ipairs(prototype_limit_settings.setting_prototypes()) do
+  table.insert(settings_data, setting)
+end
 
 table.insert(settings_data, {
   type = "bool-setting",

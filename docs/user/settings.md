@@ -36,6 +36,25 @@ are enabled by default but remain in the special row group. Inserter capacity
 stays disabled by default because larger hand sizes can change circuit behavior
 and inserter performance assumptions.
 
+## Prototype Limit Settings
+
+MIR includes four optional startup-only prototype limit settings:
+
+- Recipe productivity cap
+- Efficiency cap
+- Speed effect cap
+- Quality effect cap
+
+All four default to `Engine default`. That means MIR leaves the relevant
+Factorio prototype fields unchanged. Non-default values are explicit global
+balance overrides for long-running infinite research saves or modpacks that
+want stricter or broader module-effect ceilings.
+
+These settings apply during prototype loading and require a restart after
+changing them. They do not add per-tick runtime processing, and they are not
+part of MIR's generated technology planner. The quality cap changes only the
+machine quality-effect ceiling; it does not change quality-tier probabilities.
+
 ## Portable Settings Profiles
 
 MIR can export a portable settings profile for the current effective MIR startup

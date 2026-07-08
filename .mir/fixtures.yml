@@ -12,6 +12,13 @@ fixtures:
       - hidden-setting-readability
       - stable-setting-ids
 
+  prototype-limits:
+    assertion_path: fixtures/assert-prototype-limits
+    validates:
+      - prototype-limit-startup-overrides
+      - recipe-maximum-productivity-cap
+      - effect-receiver-limits
+
   air-scrubbing:
     path: fixtures/air-scrubbing
     assertion_path: fixtures/assert-air-scrubbing-clean-filter

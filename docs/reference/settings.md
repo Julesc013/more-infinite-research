@@ -89,6 +89,23 @@ cargo landing pad count, and character reach are enabled by default but remain
 in the special bucket. Inserter capacity bonus remains disabled by default and
 therefore stays in the first bucket.
 
+## Prototype Limit Settings
+
+Prototype limit settings are startup-only explicit overrides. Their default
+value is `engine-default`, which means no prototype mutation:
+
+| Setting ID | Non-default target |
+| --- | --- |
+| `mir-prototype-productivity-cap` | `RecipePrototype.maximum_productivity` on non-parameter recipes |
+| `mir-prototype-efficiency-cap` | `effect_receiver.consumption_limits.low` on supported machines, labs, drills, and agricultural towers |
+| `mir-prototype-speed-cap` | `effect_receiver.speed_limits.high` on supported machines, labs, drills, and agricultural towers |
+| `mir-prototype-quality-cap` | `effect_receiver.quality_limits.high` on supported machines, labs, drills, and agricultural towers |
+
+The prototype limit pass runs in `data-final-fixes` after exact compatibility
+repairs and before MIR planning. That keeps upstream schema normalization first,
+then lets generated technology planning and diagnostics observe the selected
+limits. The quality cap does not mutate `QualityPrototype` probability fields.
+
 ## Generation
 
 Visibility does not prove that a stream can generate. Data-stage generation

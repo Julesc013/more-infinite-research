@@ -28,6 +28,7 @@ This release is not a broad new gameplay-content wave. It is the release that tu
 - Exact loader-schema repairs let `atan-ash_2.2.1` and `atan-nuclear-science_0.3.3` load with MIR on Factorio `2.1`.
 - Unsafe, missing, or unresearchable research candidates are skipped or kept diagnostic-only instead of being forced into invalid mod sets.
 - Recipe productivity research is still infinite, but Factorio's normal recipe productivity cap still applies.
+- Optional prototype-limit dropdowns can explicitly raise or lower recipe productivity, efficiency, speed, and quality caps; all default to `Engine default`.
 - Science-pack and lab-compatibility startup settings now use clearer player-facing labels while keeping the same internal setting values.
 - MIR-owned official technology settings stay visible across base and Space Age, even when the current active mod set will skip generation.
 - Agricultural growth speed is enabled by default as a special Space Age technology; spoilage preservation remains a disabled-by-default experimental option.
@@ -95,9 +96,10 @@ This release is not a broad new gameplay-content wave. It is the release that tu
 - Static checks passed for docs governance, MIR manifests, architecture boundaries, settings visibility, policy linting, claim linting, changelog syntax, and package hygiene.
 - Packaged release-zip load smokes passed in base-only and Space Age modes.
 - Runtime sample-mod checks passed on the target Factorio `2.1` binary.
+- Prototype limit startup overrides passed the runtime fixture gate in base-only and Space Age modes.
 - Targeted local ATAN release-dist isolation reproduced upstream-only schema failures without MIR and passed with MIR for `atan-ash_2.2.1`, `atan-nuclear-science_0.3.3`, `atan-air-scrubbing_0.2.8`, and all three together with Space Age.
 - The targeted local `2.1` mod-library gate passed.
-- The final package contains `115` entries and zero forbidden repository-only paths.
+- The final package contains `117` entries and zero forbidden repository-only paths.
 - Strict audit, repair, and representative local scenario lanes stayed row-count and hash stable against the recorded `2.2` comparison lanes.
 
 ## Known Notes

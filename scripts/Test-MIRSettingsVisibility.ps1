@@ -87,6 +87,8 @@ Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -N
 Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -Needle "runtime_export_writes_script_output_only: true"
 Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -Needle "official_and_mir_owned_technology_settings_stay_visible: true"
 Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -Needle "technology_settings_use_three_attention_buckets: true"
+Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -Needle "prototype_limit_settings_default_to_engine_default: true"
+Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -Needle "prototype_limit_settings_are_startup_only_explicit_overrides: true"
 Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -Needle "research_character_reach:"
 Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -Needle "base_extensions:"
 Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -Needle "import_setting: mir-settings-profile-import"
