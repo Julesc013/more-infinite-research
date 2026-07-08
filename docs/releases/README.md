@@ -22,6 +22,7 @@ checklists, and validation records.
 - [3.0.0 migration guide](3.0.0-migration-guide.md)
 - [3.0.0 release checklist](3.0.0-release-checklist.md)
 - [3.0.0 release notes](3.0.0-release-notes.md)
+- [3.0.0 short release notes](release-notes-3.0.0.md)
 - [3.0.0 validation summary](3.0.0-validation-summary.md)
 - [3.0.0 risk register](3.0.0-risk-register.md)
 - [3.1.0 roadmap](3.1.0-roadmap.md)

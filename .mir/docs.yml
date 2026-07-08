@@ -940,6 +940,13 @@ docs:
     doc_type: release-plan
     owner: mir-maintainers
     source_of_truth_for: []
+  - path: docs/releases/release-notes-3.0.0.md
+    title: "More Infinite Research 3.0.0 Release Notes"
+    status: current
+    audience: player
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for: []
   - path: docs/releases/3.0.0-validation-summary.md
     title: "3.0.0 Validation Summary"
     status: current

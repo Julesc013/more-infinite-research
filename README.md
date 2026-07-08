@@ -9,18 +9,12 @@
 
 *Trickle down economics bring productivity gains to all industries.*
 
-More Infinite Research adds **configurable infinite productivity** and **bonus research** for intermediate items,
-logistics chains, combat bonuses, player bonuses, and Space Age gaps that vanilla Factorio does not cover.
+More Infinite Research adds **configurable infinite productivity** and **bonus research** for intermediate items, logistics chains, combat bonuses, player bonuses, and Space Age gaps that vanilla Factorio does not cover.
 
-**MIR 3.0.0** is the compatibility compiler architecture release. It keeps the
-player-facing generated technology IDs stable while moving active implementation
-under the MIR compiler namespace, replacing old compatibility helper paths with
-bounded discovery, policy, report, and emission layers.
-
-Legacy transition releases **`1.9.0`** through **`1.9.2`** target **Factorio `2.0`**.
-The post-3.0 **`2.x.x`** line targets **Factorio `2.0`** starting with **`2.3.0`**.
-
-Version **`3.x.x`**, starting with **`3.0.0`**, targets **Factorio `2.1`** and requires:
+Versions **`1.8.x`** target **Factorio `1.0`** starting with **`1.8.0`**.
+Versions **`1.9.x`** target **Factorio `1.1`** starting with **`1.9.3`**.
+Versions **`2.x.x`** target **Factorio `2.0`** starting with **`2.3.0`**.
+Versions **`3.x.x`** target **Factorio `2.1`** and requires:
 
 - `base >= 2.1.8`
 - hidden optional `elevated-rails`
@@ -28,31 +22,7 @@ Version **`3.x.x`**, starting with **`3.0.0`**, targets **Factorio `2.1`** and r
 - hidden optional `quality`
 - optional `space-age >= 2.1.8`
 
-The mod is built around **graceful compatibility**: it discovers recipes,
-science packs, labs, and optional prototypes from the active mod set, validates
-the candidate research, generates technologies late in **`data-final-fixes.lua`**,
-and *skips unsafe or unavailable streams* instead of requiring compatibility
-mods on the mod portal page.
-
-## MIR 3.0.0 Release Focus
-
-MIR 3.0.0 is not a broad new content wave. It is the release that makes the
-generation architecture durable:
-
-- active shipped implementation lives under `prototypes/mir/`;
-- required Factorio root lifecycle files remain thin wrappers;
-- `prototypes/streams/` stays as declarative stream data;
-- generated IDs are manifest-backed and stable;
-- compatibility behavior is described through narrow claim records and policy
-  overlays;
-- only emission/platform code creates or mutates generated technologies;
-- diagnostic rows explain skipped, rejected, observed, and emitted behavior;
-- package hygiene excludes docs, fixtures, scripts, tests, task ledgers, build
-  outputs, and distribution outputs from the release zip.
-
-The 3.0.0 release archive is
-`dist/more-infinite-research_3.0.0.zip`. The recorded package SHA-256 is kept in
-`docs/releases/3.0.0-validation-summary.md`.
+The mod is built around **graceful compatibility**: it discovers recipes,science packs, labs, and optional prototypes from the active mod set, validates the candidate research, generates technologies late in **`data-final-fixes.lua`**, and *skips unsafe or unavailable streams* instead of requiring compatibility mods on the mod portal page.
 
 ## Quick Summary
 
@@ -74,6 +44,21 @@ The 3.0.0 release archive is
 Recipe productivity researches are infinite, but **Factorio's recipe productivity cap still applies**.
 *Additional levels can eventually have no practical effect after a recipe reaches its cap.*
 
+## New Design
+
+**MIR 3.0.0** is the compatibility compiler architecture release. It keeps the player-facing generated technology IDs stable while moving active implementation under the MIR compiler namespace, replacing old compatibility helper paths with bounded discovery, policy, report, and emission layers.
+
+It is the release that makes the generation architecture durable:
+
+- active shipped implementation lives under `prototypes/mir/`;
+- required Factorio root lifecycle files remain thin wrappers;
+- `prototypes/streams/` stays as declarative stream data;
+- generated IDs are manifest-backed and stable;
+- compatibility behavior is described through narrow claim records and policy overlays;
+- only emission/platform code creates or mutates generated technologies;
+- diagnostic rows explain skipped, rejected, observed, and emitted behavior;
+- package hygiene excludes docs, fixtures, scripts, tests, task ledgers, build outputs, and distribution outputs from the release zip.
+
 ## Installation
 
 Install the mod through the **Factorio mod portal** or place the **release zip** in your Factorio mods directory.
@@ -88,9 +73,9 @@ dist/more-infinite-research_<version>.zip
 
 The repository has **three permanent branches** on `origin`:
 
-- **`main`**: latest stable release line for **Factorio `2.1.x`**.
-- **`dev`**: experimental and development branch for the **Factorio `2.1.x` main line**.
-- **`legacy`**: backport branch for **Factorio `2.0.x`** players.
+- **`main`**: latest stable release line for **Factorio `2.1`**.
+- **`dev`**: experimental and development branch for the **Factorio `2.1` main line**.
+- **`legacy`**: backport branch for **Factorio `2.0`** players.
 
 Normal development should target **`dev`** first. Release-ready hotfixes can target **`main`**.
 Backports that must remain compatible with Factorio `2.0.x` belong on **`legacy`**.
@@ -98,7 +83,7 @@ Legacy releases are snapshot ports of tested current-line releases with unsuppor
 
 See **`CONTRIBUTING.md`** for pull request expectations, branch routing, and validation commands.
 
-## How Generation Works
+## How it Works
 
 More Infinite Research mutates and generates prototypes in **`data-final-fixes.lua`**:
 
