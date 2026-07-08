@@ -83,14 +83,27 @@ not broad new gameplay generation.
 - [x] Run architecture validation with
   `.\scripts\Invoke-MIRValidation.ps1 -ArchitectureOnly`.
 - [x] Run static validation after source-formatting hardening.
-- [ ] Run Factorio `2.1` runtime fixture validation on the release candidate.
-- [ ] Run the targeted release gate against ignored package output.
-- [ ] Compare final planner/report rows with the 3.0 regression baseline and
+- [x] Run Factorio `2.1` runtime fixture validation on the release candidate.
+- [x] Run the targeted release gate against ignored package output.
+- [x] Compare final planner/report rows with the 3.0 regression baseline and
   document any intentional differences.
-- [ ] Bump `info.json` to `3.0.0` only after release gates are clean.
-- [ ] Add the `3.0.0` changelog section with player-facing shipped changes.
-- [ ] Build the final `dist/more-infinite-research_3.0.0.zip` archive only
+- [x] Bump `info.json` to `3.0.0` only after release gates are clean.
+- [x] Add the `3.0.0` changelog section with player-facing shipped changes.
+- [x] Build the final `dist/more-infinite-research_3.0.0.zip` archive only
   from the validated `3.0.0` source tree.
+
+Final gate evidence:
+
+- Final targeted gate artifact:
+  `artifacts/release-targeted-20260708-174658`.
+- Final package:
+  `dist/more-infinite-research_3.0.0.zip`.
+- Final package SHA-256:
+  `399E1FA86D95AF7AB509F4EA08116FD97F5EEF4F104006B0E9C85ED3361E32F3`.
+- Regression comparison:
+  strict audit `814 -> 814`, repair smokes `1820 -> 1820`, representative
+  scenario `924 -> 924`; observation hashes unchanged, claim hash unchanged,
+  unexpected count stayed `0`.
 
 Reference docs:
 
@@ -170,13 +183,17 @@ Reference docs:
 
 ### v3.0.0 Release Gate
 
-- [ ] Run `.\scripts\Invoke-MIRValidation.ps1 -StaticOnly`.
-- [ ] Run Factorio `2.1` runtime validation.
-- [ ] Run `.\scripts\mir.ps1 release gate --profile release-targeted-2.1 --no-git-pull`.
-- [ ] Run `git diff --check`.
-- [ ] Review final planner report diffs.
-- [ ] Confirm package hygiene excludes docs, fixtures, scripts, task ledgers, and generated artifacts that do not belong in the mod zip.
-- [ ] Confirm public docs do not claim broad K2, Bob's, Angel's, Space Exploration, Pyanodons, AAI, native modifier, cap, beacon, recycler, or runtime productivity support beyond fixture-backed behavior.
+- [x] Run `.\scripts\Invoke-MIRValidation.ps1 -StaticOnly`.
+- [x] Run Factorio `2.1` runtime validation.
+- [x] Run the full-profile targeted release gate with `-NoGitPull` and
+  package output under `build/`.
+- [x] Run `git diff --check`.
+- [x] Review final planner report diffs.
+- [x] Confirm package hygiene excludes docs, fixtures, scripts, task ledgers,
+  and generated artifacts that do not belong in the mod zip.
+- [x] Confirm public docs do not claim broad K2, Bob's, Angel's, Space
+  Exploration, Pyanodons, AAI, native modifier, cap, beacon, recycler, or
+  runtime productivity support beyond fixture-backed behavior.
 
 ## Post-3.0 Target-Line Backports
 
