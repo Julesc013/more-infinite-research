@@ -2,13 +2,17 @@ local science_icon = "__base__/graphics/icons/utility-science-pack.png"
 
 data:extend({
   {
-    type = "item",
+    type = "tool",
     name = "nuclear-science-pack",
     icon = science_icon,
     icon_size = 64,
     subgroup = "science-pack",
     order = "mir-nuclear-science-pack",
-    stack_size = 200
+    stack_size = 200,
+    durability = 1,
+    durability_description_key = "description.science-pack-remaining-amount-key",
+    factoriopedia_durability_description_key = "description.factoriopedia-science-pack-remaining-amount-key",
+    durability_description_value = "description.science-pack-remaining-amount-value"
   },
   {
     type = "item",

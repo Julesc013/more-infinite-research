@@ -4,9 +4,9 @@
   "title": "MIR Fixture - Plates n Circuit Productivity",
   "author": "Julesc013",
   "description": "Validation fixture that mirrors the competing Plates n Circuit Productivity technologies.",
-  "factorio_version": "2.1",
+  "factorio_version": "2.0",
   "dependencies": [
-    "base >= 2.1.8",
-    "? space-age >= 2.1.8"
+    "base >= 2.0",
+    "? space-age"
   ]
 }

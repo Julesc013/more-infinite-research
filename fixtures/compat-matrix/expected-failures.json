@@ -63,6 +63,24 @@
       "kind": "^load_failure$",
       "reason": "^exit_code=1$",
       "notes": "External mod uses obsolete Factorio recipe prototype fields in its tested local zip."
+    },
+    {
+      "scenario_pattern": "^(AfraidOfTheDark|all-the-overhaul-modpack|angelsrefining|asphalt-productivity|Big_Brother|cerys-lunaponics|Cerys-Moon-of-Fulgora|Crafting_Speed_Research|crushing-industry-productivity-research|DeadlockBlackRubberBelts|DeleteEmptyChunks|Enhanced_Map_Colors|extended-descriptions|Krastorio2|LSlib|ModuleInserter|Nexus|PipeVisualizer|player_request_crafting_layout|Prod-Beacon|ProgressiveRunningRevived|py_productivity|QuickItemSearch|Reinforced-Walls|Robot_Battery_Research|simhelper|space-exploration|space-exploration-spaceproductivity-2|SpaceMod|Spaghetorio|Squeak Through|stdlib|traintunnels|UltimateResearchQueue|WellPlanner)$",
+      "kind": "^dependency_resolution_failure$",
+      "notes": "Reviewed Factorio 2.0 local zip sweep dependency closure was incomplete or had no compatible local release; not a MIR regression."
+    },
+    {
+      "scenario_pattern": "^(Accumulator-V2|all-the-overhaul-modpack|angelsrefining|asphalt-productivity|cargo-ships|cargo-ships-graphics|cerys-lunaponics|Cerys-Moon-of-Fulgora|crushing-industry-productivity-research|everything-fish|more-quality-scaling|Nexus|no-minimap-on-platforms|Prod-Beacon|productivity_weight_fix|py_productivity|rubia-assets|science-bottles|space-exploration|space-exploration-spaceproductivity-2|Spaghetorio|Water-Friendly-Walls)$",
+      "kind": "^load_failure$",
+      "reason_pattern": "^exit_code=(-1073740940|1)$",
+      "notes": "Reviewed Factorio 2.0 local zip sweep load failure reproduced without MIR in artifacts/backport-2-3-0-upstream-load-isolation-runner."
+    },
+    {
+      "scenario": "^nauv-so$",
+      "mod": "^nauv-so$",
+      "kind": "^invalid_science_pack$",
+      "reason_pattern": "^no_lab_compatible_science$",
+      "notes": "Reviewed Factorio 2.0 local zip sweep: active nauv-so labs accept only Space Age or mod-specific packs for these streams, so MIR skips instead of generating unresearchable research."
     }
   ]
 }

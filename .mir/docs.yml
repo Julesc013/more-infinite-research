@@ -264,6 +264,13 @@ docs:
     doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
+  - path: docs/archive/2.x/release-notes-2.3.0.md
+    title: "More Infinite Research 2.3.0 Release Notes"
+    status: archived
+    audience: maintainer
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
   - path: docs/archive/2.x/release-notes-legacy.md
     title: "More Infinite Research 1.9.0 Release Notes"
     status: archived

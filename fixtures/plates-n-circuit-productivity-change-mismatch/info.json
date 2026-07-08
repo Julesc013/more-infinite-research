@@ -4,9 +4,9 @@
   "title": "MIR Fixture - Plates n Circuit Productivity Change Mismatch",
   "author": "Julesc013",
   "description": "Validation fixture with a known competing circuit productivity technology that uses a different productivity change than MIR.",
-  "factorio_version": "2.1",
+  "factorio_version": "2.0",
   "dependencies": [
-    "base >= 2.1.8",
-    "? space-age >= 2.1.8"
+    "base >= 2.0",
+    "? space-age"
   ]
 }

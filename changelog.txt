@@ -1,4 +1,30 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.3.0
+Date: 2026-07-08
+
+  Compatibility:
+
+    - Ported the MIR 3 compatibility compiler architecture to the Factorio 2.0 release line.
+    - Retargeted package metadata to Factorio 2.0 with `base >= 2.0`.
+    - Kept Quality hidden and optional, and kept Space Age optional without a Factorio 2.1 dependency floor.
+    - Removed Factorio 2.1-only cargo bay unloading distance research from the Factorio 2.0 package.
+    - Removed Factorio 2.1-only cargo landing pad count research from the Factorio 2.0 package.
+    - Kept generated technology IDs stable for streams that remain available on the Factorio 2.0 line.
+    - Kept exact ATAN loader-schema repairs scoped to the known supported upstream versions.
+    - Kept Factorio 2.0 science-pack handling on the older tool prototype model during compatibility checks.
+    - Classified reviewed Factorio 2.0 local zip issues that reproduce without MIR as external local-library issues.
+
+  Checks:
+
+    - Package metadata and base dependency floors now match the Factorio 2.0 line.
+    - The Factorio 2.0 package no longer contains 2.1-only cargo direct-effect modifier strings.
+    - Runtime and local mod-library checks target the matching Factorio 2.0 binary and mod library.
+    - Factorio 2.0 runtime checks passed across base, Space Age, science-pack, lab, ATAN, AAI, and drill scenarios.
+    - Targeted local zip checks passed for AAI, Big Mining Drill, Equipment Gantry, Fluid Must Flow, Jetpack, and robots.
+    - The local Factorio 2.0 BZ suite passed with zero grouped failures.
+    - The full Factorio 2.0 local zip sweep covered 314 roots with zero MIR-owned unexpected failure groups.
+
+---------------------------------------------------------------------------------------------------
 Version: 3.0.0
 Date: 2026-07-08
 
