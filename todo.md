@@ -1,6 +1,6 @@
 # M.I.R. TODO
 
-Updated: 2026-07-07
+Updated: 2026-07-08
 
 This is the active task list for MIR 3.0.0 and later. It should contain future
 work, current gates, deferred decisions, recurring release checks, and issue
@@ -11,7 +11,15 @@ Current assumptions:
 
 - `2.2.0` is released as-is.
 - `1.9.2` is released from `legacy` as-is.
-- Active development now focuses on MIR 3.0.0 on `dev`.
+- Active development now focuses on MIR 3.0.0 final hardening on `dev`.
+- The shipped MIR 3 structure is Factorio root wrappers, `prototypes/mir/`
+  implementation, and declarative `prototypes/streams/` data tables.
+- Old `prototypes/compat/`, `prototypes/lib/`, `prototypes/mir/legacy/`,
+  `prototypes/planner/`, `control/`, and broad root-helper shims must stay
+  absent from the shipped 3.x line.
+- Keep `todo.md` as this root executable future-work ledger.
+- Keep `dist/` as immutable published archive evidence. Build or refresh only
+  the unpublished target archive being released.
 - Do not reopen the 2.x or 1.9.x task ledgers unless a regression, security
   issue, package correction, or explicit maintainer decision requires it.
 
@@ -59,6 +67,30 @@ issue, or packaging correction forces it. Use
 `docs/architecture/compatibility-compiler-charter.md` as the scope boundary.
 The goal is architecture, contracts, migrations, fixtures, and maintainability,
 not broad new gameplay generation.
+
+### v3.0.0 Final Hardening
+
+- [x] Keep Factorio root lifecycle files as thin wrappers into
+  `prototypes/mir/stage/`.
+- [x] Keep active shipped implementation under `prototypes/mir/`, with
+  `prototypes/streams/` retained only as declarative stream data.
+- [x] Keep published `dist/` archives immutable and route validation packages
+  through ignored `build/` paths.
+- [x] Preserve the root `todo.md` ledger as source evidence, not package
+  content.
+- [x] Run strict zero legacy inventory with
+  `.\scripts\mir.ps1 legacy inventory --check`.
+- [x] Run architecture validation with
+  `.\scripts\Invoke-MIRValidation.ps1 -ArchitectureOnly`.
+- [x] Run static validation after source-formatting hardening.
+- [ ] Run Factorio `2.1` runtime fixture validation on the release candidate.
+- [ ] Run the targeted release gate against ignored package output.
+- [ ] Compare final planner/report rows with the 3.0 regression baseline and
+  document any intentional differences.
+- [ ] Bump `info.json` to `3.0.0` only after release gates are clean.
+- [ ] Add the `3.0.0` changelog section with player-facing shipped changes.
+- [ ] Build the final `dist/more-infinite-research_3.0.0.zip` archive only
+  from the validated `3.0.0` source tree.
 
 Reference docs:
 

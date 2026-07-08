@@ -39,3 +39,18 @@ target version being released.
 For regression or architecture work before the version bump, prefer validation
 archives under `build/validation-dist/` and restore any accidental published
 archive rebuilds before committing.
+
+## Repository-Only Evidence
+
+The source repository intentionally keeps governance and release evidence that
+must not ship in the mod zip:
+
+- `todo.md` is the executable future-work ledger.
+- `.mir/` is the machine-readable governance manifest set.
+- `docs/` contains maintainer, user, architecture, release, and reference docs.
+- `fixtures/`, `scripts/`, `tests/`, and `tools/` are validation and maintainer
+  workspaces.
+- `build/` and `dist/` are generated or published artifact locations.
+
+Package validation rejects those repository-only paths inside the generated
+archive. Keeping them tracked in source does not make them release contents.
