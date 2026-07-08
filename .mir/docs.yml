@@ -928,11 +928,19 @@ docs:
       - 3.0.0-local-library-gate-summary
   - path: docs/releases/3.0.0-release-checklist.md
     title: "3.0.0 Release Checklist"
-    status: draft
+    status: current
     audience: release-manager
     doc_type: release-plan
     owner: mir-maintainers
     source_of_truth_for: []
+  - path: docs/releases/3.0.0-validation-summary.md
+    title: "3.0.0 Validation Summary"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - 3.0.0-validation-summary
   - path: docs/releases/3.0.0-risk-register.md
     title: "3.0.0 Risk Register"
     status: draft
