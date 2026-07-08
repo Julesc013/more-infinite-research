@@ -690,9 +690,9 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-note-experimental-spoilage=Experimental and disabled by default in v2.1.0.' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-note-experimental-agriculture=Experimental and disabled by default in v2.1.0.' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-note-inserter-capacity=Disabled by default.' },
-    @{ File = "prototypes\mir\settings\defaults.lua"; Text = $defaultsText; Snippet = 'settings_note = {"mod-setting-description.mir-note-experimental-spoilage"}' },
-    @{ File = "prototypes\mir\settings\defaults.lua"; Text = $defaultsText; Snippet = 'settings_note = {"mod-setting-description.mir-note-experimental-agriculture"}' },
-    @{ File = "prototypes\mir\settings\defaults.lua"; Text = $defaultsText; Snippet = 'settings_note = {"mod-setting-description.mir-note-inserter-capacity"}' },
+    @{ File = "prototypes\mir\settings\defaults.lua"; Text = $defaultsText; Snippet = 'mod-setting-description.mir-note-experimental-spoilage' },
+    @{ File = "prototypes\mir\settings\defaults.lua"; Text = $defaultsText; Snippet = 'mod-setting-description.mir-note-experimental-agriculture' },
+    @{ File = "prototypes\mir\settings\defaults.lua"; Text = $defaultsText; Snippet = 'mod-setting-description.mir-note-inserter-capacity' },
     @{ File = "prototypes\mir\settings\defaults.lua"; Text = $defaultsText; Snippet = 'research_lab_productivity = {' }
   )
 
@@ -711,7 +711,7 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
       @{ File = "settings.lua"; Text = $settingsText; Snippet = 'research_cargo_landing_pad_count = "Cargo landing pad count"' },
       @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'cargo-landing-pad-count=Cargo landing pads per surface: +__1__' },
       @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-note-sandbox-cargo-pad-count=Sandbox-style and disabled by default.' },
-      @{ File = "prototypes\mir\settings\defaults.lua"; Text = $defaultsText; Snippet = 'settings_note = {"mod-setting-description.mir-note-sandbox-cargo-pad-count"}' },
+      @{ File = "prototypes\mir\settings\defaults.lua"; Text = $defaultsText; Snippet = 'mod-setting-description.mir-note-sandbox-cargo-pad-count' },
       @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'research_cargo_landing_pad_count = {' },
       @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'required_mods = {"space-age"}' },
       @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'required_technologies = {"rocket-silo"}' },

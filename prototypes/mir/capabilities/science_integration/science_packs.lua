@@ -31,28 +31,152 @@ local OFFICIAL_PROGRESSION_STEPS = {
   ["automation-science-pack"] = {"automation-science-pack"},
   ["logistic-science-pack"] = {"automation-science-pack", "logistic-science-pack"},
   ["chemical-science-pack"] = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack"},
-  ["production-science-pack"] = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack"},
+  ["production-science-pack"] = {
+    "automation-science-pack",
+    "logistic-science-pack",
+    "chemical-science-pack",
+    "production-science-pack"
+  },
   ["military-science-pack"] = {"automation-science-pack", "logistic-science-pack", "military-science-pack"},
-  ["utility-science-pack"] = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack", "utility-science-pack"},
-  ["space-science-pack"] = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack", "utility-science-pack", "space-science-pack"},
-  ["agricultural-science-pack"] = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack", "utility-science-pack", "space-science-pack", "agricultural-science-pack"},
-  ["metallurgic-science-pack"] = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack", "utility-science-pack", "space-science-pack", "metallurgic-science-pack"},
-  ["electromagnetic-science-pack"] = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack", "utility-science-pack", "space-science-pack", "electromagnetic-science-pack"},
-  ["cryogenic-science-pack"] = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack", "utility-science-pack", "space-science-pack", "cryogenic-science-pack"},
-  ["promethium-science-pack"] = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack", "military-science-pack", "utility-science-pack", "space-science-pack", "agricultural-science-pack", "metallurgic-science-pack", "electromagnetic-science-pack", "cryogenic-science-pack", "promethium-science-pack"}
+  ["utility-science-pack"] = {
+    "automation-science-pack",
+    "logistic-science-pack",
+    "chemical-science-pack",
+    "production-science-pack",
+    "utility-science-pack"
+  },
+  ["space-science-pack"] = {
+    "automation-science-pack",
+    "logistic-science-pack",
+    "chemical-science-pack",
+    "production-science-pack",
+    "utility-science-pack",
+    "space-science-pack"
+  },
+  ["agricultural-science-pack"] = {
+    "automation-science-pack",
+    "logistic-science-pack",
+    "chemical-science-pack",
+    "production-science-pack",
+    "utility-science-pack",
+    "space-science-pack",
+    "agricultural-science-pack"
+  },
+  ["metallurgic-science-pack"] = {
+    "automation-science-pack",
+    "logistic-science-pack",
+    "chemical-science-pack",
+    "production-science-pack",
+    "utility-science-pack",
+    "space-science-pack",
+    "metallurgic-science-pack"
+  },
+  ["electromagnetic-science-pack"] = {
+    "automation-science-pack",
+    "logistic-science-pack",
+    "chemical-science-pack",
+    "production-science-pack",
+    "utility-science-pack",
+    "space-science-pack",
+    "electromagnetic-science-pack"
+  },
+  ["cryogenic-science-pack"] = {
+    "automation-science-pack",
+    "logistic-science-pack",
+    "chemical-science-pack",
+    "production-science-pack",
+    "utility-science-pack",
+    "space-science-pack",
+    "cryogenic-science-pack"
+  },
+  ["promethium-science-pack"] = {
+    "automation-science-pack",
+    "logistic-science-pack",
+    "chemical-science-pack",
+    "production-science-pack",
+    "military-science-pack",
+    "utility-science-pack",
+    "space-science-pack",
+    "agricultural-science-pack",
+    "metallurgic-science-pack",
+    "electromagnetic-science-pack",
+    "cryogenic-science-pack",
+    "promethium-science-pack"
+  }
 }
 
 local EXTENSION_PACKS = {
-  ["braking-force"] = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack", "space-science-pack"},
+  ["braking-force"] = {
+    "automation-science-pack",
+    "logistic-science-pack",
+    "chemical-science-pack",
+    "production-science-pack",
+    "space-science-pack"
+  },
   ["research-speed"] = "all",
-  ["worker-robots-storage"] = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack", "utility-science-pack", "electromagnetic-science-pack"},
-  ["inserter-capacity-bonus"] = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack", "agricultural-science-pack"},
-  ["weapon-shooting-speed"] = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack", "military-science-pack", "space-science-pack"},
-  ["laser-shooting-speed"] = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack", "military-science-pack", "space-science-pack"},
-  research_electric_shooting_speed = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack", "military-science-pack", "electromagnetic-science-pack"},
-  research_flamethrower_shooting_speed = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack", "military-science-pack", "space-science-pack"},
-  research_rocket_shooting_speed = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack", "military-science-pack", "electromagnetic-science-pack"},
-  research_cannon_shooting_speed = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack", "military-science-pack", "electromagnetic-science-pack"}
+  ["worker-robots-storage"] = {
+    "automation-science-pack",
+    "logistic-science-pack",
+    "chemical-science-pack",
+    "production-science-pack",
+    "utility-science-pack",
+    "electromagnetic-science-pack"
+  },
+  ["inserter-capacity-bonus"] = {
+    "automation-science-pack",
+    "logistic-science-pack",
+    "chemical-science-pack",
+    "production-science-pack",
+    "agricultural-science-pack"
+  },
+  ["weapon-shooting-speed"] = {
+    "automation-science-pack",
+    "logistic-science-pack",
+    "chemical-science-pack",
+    "production-science-pack",
+    "military-science-pack",
+    "space-science-pack"
+  },
+  ["laser-shooting-speed"] = {
+    "automation-science-pack",
+    "logistic-science-pack",
+    "chemical-science-pack",
+    "production-science-pack",
+    "military-science-pack",
+    "space-science-pack"
+  },
+  research_electric_shooting_speed = {
+    "automation-science-pack",
+    "logistic-science-pack",
+    "chemical-science-pack",
+    "production-science-pack",
+    "military-science-pack",
+    "electromagnetic-science-pack"
+  },
+  research_flamethrower_shooting_speed = {
+    "automation-science-pack",
+    "logistic-science-pack",
+    "chemical-science-pack",
+    "production-science-pack",
+    "military-science-pack",
+    "space-science-pack"
+  },
+  research_rocket_shooting_speed = {
+    "automation-science-pack",
+    "logistic-science-pack",
+    "chemical-science-pack",
+    "production-science-pack",
+    "military-science-pack",
+    "electromagnetic-science-pack"
+  },
+  research_cannon_shooting_speed = {
+    "automation-science-pack",
+    "logistic-science-pack",
+    "chemical-science-pack",
+    "production-science-pack",
+    "military-science-pack",
+    "electromagnetic-science-pack"
+  }
 }
 
 local lab_inputs_cache = nil
@@ -151,7 +275,11 @@ function S.best_lab_compatible_ingredients(ingredients, context)
   if #source == 0 then return nil, "empty" end
   if S.valid_research_ingredients(source) then return source, "full" end
   if lab_incompatibility_policy() == "skip" then
-    log("[more-infinite-research] Skipping " .. tostring(context or "unknown technology") .. " because no lab accepts the full selected science-pack set and the lab incompatibility policy is skip.")
+    log(
+      "[more-infinite-research] Skipping " ..
+        tostring(context or "unknown technology") ..
+        " because no lab accepts the full selected science-pack set and the lab incompatibility policy is skip."
+    )
     return nil, "invalid"
   end
 
@@ -184,11 +312,21 @@ function S.best_lab_compatible_ingredients(ingredients, context)
   end
 
   if best then
-    log("[more-infinite-research] Reduced science packs for " .. tostring(context or "unknown technology") .. " to a lab-compatible subset accepted by " .. best_lab .. ".")
+    log(
+      "[more-infinite-research] Reduced science packs for " ..
+        tostring(context or "unknown technology") ..
+        " to a lab-compatible subset accepted by " ..
+        best_lab ..
+        "."
+    )
     return best, "reduced"
   end
 
-  log("[more-infinite-research] No lab can research the selected science packs for " .. tostring(context or "unknown technology") .. ".")
+  log(
+    "[more-infinite-research] No lab can research the selected science packs for " ..
+      tostring(context or "unknown technology") ..
+      "."
+  )
   return nil, "invalid"
 end
 

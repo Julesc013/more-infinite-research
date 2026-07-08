@@ -95,4 +95,7 @@ release_artifacts:
       version: "1.9.3"
       branch: tmp/1.1
       target_factorio: "1.1"
-  package_refresh_rule: only build or refresh dist archives for an unpublished target version; never refresh already-published archives as part of architecture or backport preparation
+  package_refresh_rule: >-
+    only build or refresh dist archives for an unpublished target version;
+    never refresh already-published archives as part of architecture or
+    backport preparation

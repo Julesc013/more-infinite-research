@@ -15,7 +15,9 @@ local defaults = {
       growth_factor = 1.5,
       research_time = 120,
       max_level = 0,
-      settings_note = {"mod-setting-description.mir-note-experimental-spoilage"}
+      settings_note = {
+        "mod-setting-description.mir-note-experimental-spoilage"
+      }
     },
     research_agricultural_growth_speed = {
       enabled = false,
@@ -23,7 +25,9 @@ local defaults = {
       growth_factor = 1.5,
       research_time = 90,
       max_level = 0,
-      settings_note = {"mod-setting-description.mir-note-experimental-agriculture"}
+      settings_note = {
+        "mod-setting-description.mir-note-experimental-agriculture"
+      }
     },
     research_inventory_capacity = { growth_factor = 1.10 },
     research_robot_battery = { growth_factor = 1.2 },
@@ -39,7 +43,9 @@ local defaults = {
       growth_factor = 10,
       research_time = 240,
       max_level = 0,
-      settings_note = {"mod-setting-description.mir-note-sandbox-cargo-pad-count"}
+      settings_note = {
+        "mod-setting-description.mir-note-sandbox-cargo-pad-count"
+      }
     },
     research_lab_productivity = {
       base_cost = 1000,
@@ -47,39 +53,61 @@ local defaults = {
       research_time = 120,
       max_level = 0
     },
-    research_ash_separation = { research_time = 90 },
-    research_science_pack_productivity = { research_time = 120 },
-    research_character_reach = { enabled = false },
+    research_ash_separation = {
+      research_time = 90
+    },
+    research_science_pack_productivity = {
+      research_time = 120
+    },
+    research_character_reach = {
+      enabled = false
+    },
     research_rocket_shooting_speed = {
       base_cost = 60,
       growth_factor = 1.5,
       science_packs = {
-        "automation-science-pack","logistic-science-pack","chemical-science-pack",
-        "production-science-pack","military-science-pack","electromagnetic-science-pack"
+        "automation-science-pack",
+        "logistic-science-pack",
+        "chemical-science-pack",
+        "production-science-pack",
+        "military-science-pack",
+        "electromagnetic-science-pack"
       }
     },
     research_cannon_shooting_speed = {
       base_cost = 60,
       growth_factor = 1.5,
       science_packs = {
-        "automation-science-pack","logistic-science-pack","chemical-science-pack",
-        "production-science-pack","military-science-pack","electromagnetic-science-pack"
+        "automation-science-pack",
+        "logistic-science-pack",
+        "chemical-science-pack",
+        "production-science-pack",
+        "military-science-pack",
+        "electromagnetic-science-pack"
       }
     },
     research_flamethrower_shooting_speed = {
       base_cost = 60,
       growth_factor = 1.5,
       science_packs = {
-        "automation-science-pack","logistic-science-pack","chemical-science-pack",
-        "production-science-pack","military-science-pack","space-science-pack"
+        "automation-science-pack",
+        "logistic-science-pack",
+        "chemical-science-pack",
+        "production-science-pack",
+        "military-science-pack",
+        "space-science-pack"
       }
     },
     research_electric_shooting_speed = {
       base_cost = 60,
       growth_factor = 1.5,
       science_packs = {
-        "automation-science-pack","logistic-science-pack","chemical-science-pack",
-        "production-science-pack","military-science-pack","electromagnetic-science-pack"
+        "automation-science-pack",
+        "logistic-science-pack",
+        "chemical-science-pack",
+        "production-science-pack",
+        "military-science-pack",
+        "electromagnetic-science-pack"
       }
     }
   },
@@ -124,7 +152,9 @@ local defaults = {
       research_time = 60,
       non_bulk_increment = 2,
       bulk_increment = 4,
-      settings_note = {"mod-setting-description.mir-note-inserter-capacity"},
+      settings_note = {
+        "mod-setting-description.mir-note-inserter-capacity"
+      },
       science_packs = "inherit",
       add_science_packs = {
         "agricultural-science-pack"

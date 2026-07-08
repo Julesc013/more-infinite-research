@@ -38,12 +38,17 @@ local function run_all(method, event)
 end
 
 local function run_matching_research(method, event)
-  if not (event and event.research and event.research.valid) then return end
+  if not (event and event.research and event.research.valid) then
+    return
+  end
+
   ensure_storage()
   for _, feature in ipairs(features) do
     if feature.technology_name == event.research.name then
       local handler = feature[method]
-      if handler then handler(event, log_debug) end
+      if handler then
+        handler(event, log_debug)
+      end
     end
   end
 end

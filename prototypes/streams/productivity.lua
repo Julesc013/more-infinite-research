@@ -67,7 +67,11 @@ return {
   research_low_density_structure = {
     items={"low-density-structure"},
     icon_candidates={
-      {icon="__space-age__/graphics/technology/low-density-structure-productivity.png", icon_size=256, inactive_mod_asset="space-age"},
+      {
+        icon="__space-age__/graphics/technology/low-density-structure-productivity.png",
+        icon_size=256,
+        inactive_mod_asset="space-age"
+      },
       {technology="low-density-structure"}
     },
     adopt_into_existing_productivity_tech = {
@@ -201,7 +205,11 @@ return {
     },
     science_packs = "derive-from-unlocks",
     prerequisites = "derive-from-unlocks",
-    settings_note = {"", "Targets only exact clean filter crafting recipes. Scrubbing, cleaning, recovery, recycling, and environmental-removal recipes stay diagnostic-only."},
+    settings_note = {
+      "",
+      "Targets only exact clean filter crafting recipes. Scrubbing, cleaning, recovery, " ..
+        "recycling, and environmental-removal recipes stay diagnostic-only."
+    },
     manifest_id = air_scrubbing_capability.stream.id,
     groups = {
       {
@@ -232,7 +240,11 @@ return {
     },
     science_packs = "derive-from-unlocks",
     prerequisites = "derive-from-unlocks",
-    settings_note = {"", "Targets only the exact ATAN Ash separation recipe. Landfill, brick, nutrient, foundation, tile, and recovery-style ash sinks stay outside this stream."},
+    settings_note = {
+      "",
+      "Targets only the exact ATAN Ash separation recipe. Landfill, brick, nutrient, " ..
+        "foundation, tile, and recovery-style ash sinks stay outside this stream."
+    },
     manifest_id = atan_ash_capability.stream.id,
     groups = {
       {
@@ -546,11 +558,59 @@ return {
   }},
 
   research_belts = { icon_tech="logistics", groups = {
-    { change=0.10, items={"transport-belt","underground-belt","splitter","loader","aai-loader","basic-loader"}, item_patterns={"^aai%-loader$","^basic%-loader$"} },
-    { change=0.05, items={"fast-transport-belt","fast-underground-belt","fast-splitter","fast-loader","aai-fast-loader"}, item_patterns={"^.+%-fast%-loader$"} },
-    { change=0.02, items={"express-transport-belt","express-underground-belt","express-splitter","express-loader","aai-express-loader"}, item_patterns={"^.+%-express%-loader$"} },
-    { change=0.01, items={"turbo-transport-belt","turbo-underground-belt","turbo-splitter","turbo-loader","aai-turbo-loader"}, item_patterns={"^turbo%-transport%-belt$","^turbo%-underground%-belt$","^turbo%-splitter$","^.+%-turbo%-loader$"} },
-    { change=0.005, items={"hyper-transport-belt","hyper-underground-belt","hyper-splitter","hyper-loader","aai-hyper-loader"}, item_patterns={"^hyper%-transport%-belt$","^hyper%-underground%-belt$","^hyper%-splitter$","^.+%-hyper%-loader$"} }
+    {
+      change=0.10,
+      items={"transport-belt","underground-belt","splitter","loader","aai-loader","basic-loader"},
+      item_patterns={"^aai%-loader$","^basic%-loader$"}
+    },
+    {
+      change=0.05,
+      items={"fast-transport-belt","fast-underground-belt","fast-splitter","fast-loader","aai-fast-loader"},
+      item_patterns={"^.+%-fast%-loader$"}
+    },
+    {
+      change=0.02,
+      items={
+        "express-transport-belt",
+        "express-underground-belt",
+        "express-splitter",
+        "express-loader",
+        "aai-express-loader"
+      },
+      item_patterns={"^.+%-express%-loader$"}
+    },
+    {
+      change=0.01,
+      items={
+        "turbo-transport-belt",
+        "turbo-underground-belt",
+        "turbo-splitter",
+        "turbo-loader",
+        "aai-turbo-loader"
+      },
+      item_patterns={
+        "^turbo%-transport%-belt$",
+        "^turbo%-underground%-belt$",
+        "^turbo%-splitter$",
+        "^.+%-turbo%-loader$"
+      }
+    },
+    {
+      change=0.005,
+      items={
+        "hyper-transport-belt",
+        "hyper-underground-belt",
+        "hyper-splitter",
+        "hyper-loader",
+        "aai-hyper-loader"
+      },
+      item_patterns={
+        "^hyper%-transport%-belt$",
+        "^hyper%-underground%-belt$",
+        "^hyper%-splitter$",
+        "^.+%-hyper%-loader$"
+      }
+    }
   }},
 
   research_inserters = { icon_tech="fast-inserter", groups = {
@@ -570,9 +630,18 @@ return {
     dynamic_items_from_lab_inputs = true,
     groups = {
     { change=0.10, items={
-      "automation-science-pack","logistic-science-pack","chemical-science-pack","production-science-pack",
-      "military-science-pack","utility-science-pack","space-science-pack",
-      "agricultural-science-pack","metallurgic-science-pack","electromagnetic-science-pack","cryogenic-science-pack","promethium-science-pack"
+      "automation-science-pack",
+      "logistic-science-pack",
+      "chemical-science-pack",
+      "production-science-pack",
+      "military-science-pack",
+      "utility-science-pack",
+      "space-science-pack",
+      "agricultural-science-pack",
+      "metallurgic-science-pack",
+      "electromagnetic-science-pack",
+      "cryogenic-science-pack",
+      "promethium-science-pack"
     }}
   }}
 }
