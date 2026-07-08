@@ -17,7 +17,8 @@ player-facing generated technology IDs stable while moving active implementation
 under the MIR compiler namespace, replacing old compatibility helper paths with
 bounded discovery, policy, report, and emission layers.
 
-Legacy transition releases **`1.9.0`** through **`1.9.2`** target **Factorio `2.0`** and require `base >= 2.0`.
+Legacy transition releases **`1.9.0`** through **`1.9.2`** target **Factorio `2.0`**.
+The post-3.0 **`2.x.x`** line targets **Factorio `2.0`** starting with **`2.3.0`**.
 
 Version **`3.x.x`**, starting with **`3.0.0`**, targets **Factorio `2.1`** and requires:
 
