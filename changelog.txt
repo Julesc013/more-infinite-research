@@ -1,4 +1,23 @@
 ---------------------------------------------------------------------------------------------------
+Version: 3.0.0
+Date: 2026-07-08
+
+  Compatibility:
+
+    - Reworked generation around the MIR compatibility compiler namespace.
+    - Kept existing generated technology IDs stable; no new migration is required.
+    - Kept Air Scrubbing, ATAN Ash, AAI Loaders, Big Mining Drill, and Nuclear Science claim scope narrow.
+    - Kept compatibility policy overlays declarative and out of direct prototype mutation.
+
+  Internal:
+
+    - Moved active shipped implementation under prototypes/mir with Factorio root files as thin wrappers.
+    - Removed old compat, lib, legacy, planner, control-folder, and broad root-helper shim paths.
+    - Routed generated technology emission through StreamSpec adapters and the MIR technology builder.
+    - Kept generated stream manifest coverage strict for every emitted stream.
+    - Clarified package boundaries so docs, scripts, task ledgers, build output, and dist stay out of the zip.
+
+---------------------------------------------------------------------------------------------------
 Version: 1.9.2
 Date: 2026-07-07
 

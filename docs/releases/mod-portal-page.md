@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: release-manager
 doc_type: release-plan
 owner: mir-maintainers
-last_reviewed: 2026-07-07
+last_reviewed: 2026-07-08
 supersedes: []
 superseded_by: []
 ---
@@ -24,7 +24,7 @@ It is built for players who want more *long-term scaling for late-game megabases
 - Adopts safe mod-added recipes into configured vanilla Space Age productivity families instead of creating parallel research.
 
 - Legacy transition releases **`1.9.0`** through **`1.9.2`** target **Factorio `2.0`** and require `base >= 2.0`.
-- Version **`2.x.x`** through **`2.2.0`** targets **Factorio `2.1`**; requires `base >= 2.1.8`. Space Age is optional.
+- Version **`3.x.x`**, starting with **`3.0.0`**, targets **Factorio `2.1`**; requires `base >= 2.1.8`. Space Age is optional.
 
 *Recipe productivity researches are infinite, but Factorio's recipe productivity cap still applies. Once a recipe reaches that cap, more levels may no longer improve that recipe.*
 
@@ -224,6 +224,8 @@ If a recipe did not receive productivity:
 
 ## Save Compatibility
 
+Version `3.0.0` preserves generated technology IDs through the MIR architecture move and does not need a new migration.
+
 Version `2.1.0` preserves generated technology IDs except for documented intentional migrations:
 
 - Old generated trash-slot progress migrates into the combined Character inventory slots technology.
@@ -231,4 +233,4 @@ Version `2.1.0` preserves generated technology IDs except for documented intenti
 
 Existing saves receive the `2.0.5` and `2.1.0` JSON migrations automatically when the mod loads.
 
-Scripted spoilage and agriculture effects are disabled by default in `2.1.0`.
+Scripted spoilage and agriculture effects are disabled by default in `3.0.0`.

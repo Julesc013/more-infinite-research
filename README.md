@@ -14,7 +14,7 @@ logistics chains, combat bonuses, player bonuses, and Space Age gaps that vanill
 
 Legacy transition releases **`1.9.0`** through **`1.9.2`** target **Factorio `2.0`** and require `base >= 2.0`.
 
-Version **`2.x.x`** through **`2.2.0`** targets **Factorio `2.1`** and requires:
+Version **`3.x.x`**, starting with **`3.0.0`**, targets **Factorio `2.1`** and requires:
 
 - `base >= 2.1.8`
 - hidden optional `elevated-rails`
@@ -33,12 +33,13 @@ The mod is built around **graceful compatibility**: it discovers recipes, scienc
 - **Vanilla continuations:** extends selected finite vanilla technology chains into infinite continuations.
 - **Science-pack discovery:** reads active lab inputs, not the old `tool` prototype type.
 - **Lab validation:** checks generated research ingredients against real labs so technologies stay researchable.
+- **MIR compiler architecture:** keeps active generation under `prototypes/mir/`, with declarative stream data in `prototypes/streams/`.
 - **Compiler diagnostics:** indexes typed prototype facts, compiler decisions, lab matrices, loop risks, rule surfaces, and cap estimates for audits.
 - **Factorio 2.1 recipes:** supports recipe `categories` as well as legacy single `category`.
 - **Optional DLC:** keeps official DLC mods optional and gates DLC-shaped research behind concrete prototype checks.
 - **Scripted Space Age scaling:** bounded event-driven spoilage preservation and agricultural growth speed are disabled-by-default experimental candidates; default enablement or measured behavior claims require the named manual save matrix.
 - **Clean mod portal metadata:** keeps third-party compatibility-mod dependencies out of `info.json`.
-- **Save compatibility:** preserves existing generated prototype IDs. Scripted runtime storage is namespaced and must be validated before the scripted features are enabled by default or described with measured runtime behavior.
+- **Save compatibility:** preserves existing generated prototype IDs across the MIR `3.0.0` architecture move. Scripted runtime storage is namespaced and must be validated before the scripted features are enabled by default or described with measured runtime behavior.
 
 Recipe productivity researches are infinite, but **Factorio's recipe productivity cap still applies**.
 *Additional levels can eventually have no practical effect after a recipe reaches its cap.*
@@ -220,7 +221,7 @@ These streams generate `change-recipe-productivity` effects for matching recipes
 
 These streams generate infinite technologies with direct Factorio technology modifiers or visible scripted-effect placeholders. Scripted effects are handled in `control.lua` and remain event-driven.
 
-The scripted streams remain disabled by default in `v2.2.0`. Basic opt-in smoke tests can document their experimental behavior, but default enablement or stronger runtime claims require manual save validation for existing-stack behavior, reversal, disabling, multi-force behavior, and the agricultural tower event path. Graduation belongs in a later release after player testing.
+The scripted streams remain disabled by default in `v3.0.0`. Basic opt-in smoke tests can document their experimental behavior, but default enablement or stronger runtime claims require manual save validation for existing-stack behavior, reversal, disabling, multi-force behavior, and the agricultural tower event path. Graduation belongs in a later release after player testing.
 
 | Stream key | Research | Effect | Default | Gates and notes |
 | --- | --- | --- | --- | --- |
@@ -264,7 +265,7 @@ Recommended default:
 
 - Leave technology enable checkboxes as shipped.
 - Stable generated research lines are enabled.
-- Experimental/scripted candidates stay disabled by default in `v2.2.0`.
+- Experimental/scripted candidates stay disabled by default in `v3.0.0`.
 - Diagnostics stay disabled unless you are troubleshooting a report.
 
 Conservative setup:
@@ -662,6 +663,7 @@ The validation script checks:
 - **`docs/compatibility/README.md`:** compatibility model, known integrations, manual test matrix, fixture designs, and release checklist.
 - **`docs/maintainer/developer-tools.md`:** preferred developer commands, run profiles, script roles, and PowerShell tooling checks.
 - **`docs/releases/3.0.0-plan.md`:** high-level release narrative, scope rationale, why decisions, and pointers back to `todo.md`, `changelog.txt`, and supporting notes.
+- **`docs/releases/3.0.0-release-checklist.md`:** final release gate checklist, package-boundary policy, and current artifact pointers.
 - **`docs/releases/2.2.0-validation-record.md`:** local release validation evidence.
 - **`docs/maintainer/manual-test-plan.md`:** named manual saves/scenarios for release validation.
 - **`docs/releases/mod-portal-page.md`:** mod-portal-ready public description, technology catalog, settings summary, compatibility notes, and troubleshooting text.
@@ -697,7 +699,9 @@ If a generated technology is unresearchable:
 
 ## Save Compatibility
 
-No generated prototype IDs were renamed for **`v2.0.0`**...
+No generated prototype IDs were renamed for **`v3.0.0`**. The MIR namespace move preserves existing generated IDs and does not require a new migration.
+
+No generated prototype IDs were renamed for **`v2.0.0`**.
 **No migration is required** from `v1.2.9`.
 
 `v2.0.5` includes a JSON migration from `recipe-prod-research_character_trash_slots-1` to `recipe-prod-research_inventory_capacity-1` so old trash-slot progress moves into the *combined inventory/trash research*.
