@@ -69,7 +69,24 @@ function Copy-MIRModUnderTest {
     Remove-Item -LiteralPath $target -Recurse -Force
   }
 
-  $exclude = @(".git", "artifacts", "build", "dist")
+  $exclude = @(
+    ".codex",
+    ".git",
+    ".github",
+    ".mir",
+    "AGENTS.md",
+    "CONTRIBUTING.md",
+    "artifacts",
+    "build",
+    "dist",
+    "docs",
+    "fixtures",
+    "scripts",
+    "tests",
+    "tmp",
+    "todo.md",
+    "tools"
+  )
   New-Item -ItemType Directory -Path $target | Out-Null
   Get-ChildItem -LiteralPath $RepoRoot -Force | Where-Object {
     $exclude -notcontains $_.Name

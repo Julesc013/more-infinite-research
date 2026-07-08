@@ -95,6 +95,8 @@ Date: 2026-07-08
     - Added focused MIR settings modules for effective settings, profile codec support, and pipeline extent settings.
     - Added architecture checks, docs governance checks, and settings visibility checks.
     - Added local mod library catalog checks and legacy inventory reporting tools.
+    - Fixed compatibility-audit staging so local load-test mod copies exclude repository-only development paths.
+    - Fixed compatibility-audit staging so local load-test mod copies exclude ignored output paths.
     - Added a hidden-setting readability sample for unavailable streams.
     - Proved hidden generated settings remain readable when unavailable streams are hidden.
     - Added release evidence docs for the MIR 3 summary, checklist, and migration guide.
@@ -133,6 +135,7 @@ Date: 2026-07-08
     - Static checks passed docs governance, MIR manifests, and architecture boundaries.
     - Static checks passed settings visibility, policy linting, claim linting, changelog syntax, and package hygiene.
     - Runtime sample-mod checks passed on the target Factorio 2.1 binary.
+    - Selected local zip checks passed for the advertised and recently repaired compatibility targets.
     - The targeted release gate passed using the recorded local 2.1 mod library scenario set.
     - The full targeted gate evidence is recorded in release summary docs.
     - The final package contains 115 entries and zero forbidden repository-only paths.

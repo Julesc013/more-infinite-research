@@ -258,7 +258,8 @@ Invoke-RepoCheck "local image assets have source notes and do not bundle Space A
           -and -not $relative.StartsWith(".git/") `
           -and -not $relative.StartsWith("artifacts/") `
           -and -not $relative.StartsWith("build/") `
-          -and -not $relative.StartsWith("dist/")
+          -and -not $relative.StartsWith("dist/") `
+          -and -not $relative.StartsWith("tmp/")
       }
   )
 
@@ -842,7 +843,13 @@ Invoke-RepoCheck "compat audit automation tooling is wired" {
     @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = "[int]`$ScenarioTimeoutSeconds = 900" },
     @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = "Stop-Process -Id `$process.Id -Force" },
     @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = "source_path" },
-    @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = '"artifacts", "build", "dist"' },
+    @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = '"artifacts"' },
+    @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = '"build"' },
+    @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = '"dist"' },
+    @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = '"fixtures"' },
+    @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = '"scripts"' },
+    @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = '"tests"' },
+    @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = '"tmp"' },
     @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = 'prototypes\mir\report\diagnostics_sink.lua' },
     @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = "[string[]]`$OfficialBuiltinMods" },
     @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = "enabled = `$enabledLookup.ContainsKey" },
