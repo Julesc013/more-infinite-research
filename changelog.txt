@@ -8,6 +8,7 @@ Date: 2026-07-08
     - Kept existing generated technology IDs stable; no new migration is required.
     - Kept Air Scrubbing, ATAN Ash, AAI Loaders, Big Mining Drill, and Nuclear Science claim scope narrow.
     - Kept compatibility policy overlays declarative and out of direct prototype mutation.
+    - Kept generated-output behavior stable across the recorded 2.2 comparison lanes.
 
   Internal:
 
@@ -15,6 +16,7 @@ Date: 2026-07-08
     - Removed old compat, lib, legacy, planner, control-folder, and broad root-helper shim paths.
     - Routed generated technology emission through StreamSpec adapters and the MIR technology builder.
     - Kept generated stream manifest coverage strict for every emitted stream.
+    - Added a concise 3.0.0 release evidence summary with package size, package hash, and comparison counts.
     - Clarified package boundaries so docs, scripts, task ledgers, build output, and dist stay out of the zip.
 
 ---------------------------------------------------------------------------------------------------

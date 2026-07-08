@@ -11,9 +11,26 @@ superseded_by: []
 ---
 # More Infinite Research
 
-Adds **fully customizable** repeatable late-game research for **productivity, speed, logistics, combat, player bonuses, robots, spoilage, cargo logistics,** and tries to be *compatible with every mod*...
+Adds **fully customizable** repeatable late-game research for **productivity,
+speed, logistics, combat, player bonuses, robots, spoilage, and cargo
+logistics**.
 
-It is built for players who want more *long-term scaling for late-game megabases*, long-running Space Age saves, and modded or overhaul-style playthroughs without turning the mod into a full content overhaul.
+It is built for players who want more *long-term scaling for late-game
+megabases*, long-running Space Age saves, and modded playthroughs without
+turning the mod into a full content overhaul.
+
+## MIR 3.0.0
+
+MIR 3.0.0 is the compatibility compiler architecture release.
+
+It moves active implementation under `prototypes/mir`, keeps generated
+technology IDs stable, keeps compatibility overlays declarative, and continues
+to skip unsafe or unavailable research instead of claiming automatic support for
+every mod.
+
+The architecture change does not require a new migration by itself. Existing
+generated technology IDs are preserved, and the shipped `2.0.5` and `2.1.0`
+migrations remain in place.
 
 ## At a Glance
 
@@ -22,6 +39,7 @@ It is built for players who want more *long-term scaling for late-game megabases
 - Startup **settings let you enable, disable, cap, or rebalance** every generated research.
 - Adds a base-game Research productivity chain when Space Age's vanilla `research-productivity` technology is not present.
 - Adopts safe mod-added recipes into configured vanilla Space Age productivity families instead of creating parallel research.
+- Uses MIR 3 compiler diagnostics to explain generated, skipped, observed, and rejected research decisions.
 
 - Legacy transition releases **`1.9.0`** through **`1.9.2`** target **Factorio `2.0`** and require `base >= 2.0`.
 - Version **`3.x.x`**, starting with **`3.0.0`**, targets **Factorio `2.1`**; requires `base >= 2.1.8`. Space Age is optional.
@@ -201,9 +219,22 @@ This helps it work with:
 
 When this mod is set to prefer its own overlapping research, it only removes known competing infinite technologies that are fully covered by generated More Infinite Research effects. Finite upgrade chains from other mods are left alone. Vanilla Space Age productivity families remain authoritative where safe, so mod-added rocket fuel or low density structure recipes can be appended to the vanilla infinite technology instead of receiving duplicate-looking MIR research.
 
-Compatibility is broad, but not guaranteed for every overhaul. Mods that change recipes or labs very late in loading may still need load-order compatibility.
+Compatibility is broad, but not guaranteed for every overhaul. Mods that change
+recipes or labs very late in loading may still need load-order compatibility.
+MIR 3 public claims are deliberately narrow: a page may claim a named recipe
+family, a diagnostic observation, or coexistence behavior, but not full overhaul
+support unless that claim is explicitly recorded.
 
 For maintainers and pack authors, the repository includes an extended local audit workflow. With a Factorio binary and Mod Portal credentials, it can run top-download audits; with read-only local mod zip libraries, it can also run offline individual-root, curated-combination, and generated local-library stress sweeps. The workflow supports curated overhaul scenarios, local modpack zip roots, safe unattended local sweep and morning summary helpers, parsed MIR diagnostics, checkpointed load results, missing-dependency summaries, grouped expected/unexpected failure reports, explicit official-DLC mod-list isolation, blank-log-line-tolerant audit parsing, and review-only compatibility profile stubs. Exploratory runs collect all scenarios for triage; strict runs can fail on unexpected grouped failures. These tools are for evidence collection; they do not automatically enable new compatibility profiles.
+
+Known 3.0.0 publication notes:
+
+- Portal-backed full-catalog checks were not run in the release environment
+  because `FACTORIO_TOKEN` was not set.
+- Local supported-zip isolation found `atan-ash_2.2.1` and
+  `atan-nuclear-science_0.3.3` failing without MIR on the tested Factorio
+  `2.1` setup. Those are tracked as upstream package/schema issues, not MIR
+  regressions.
 
 ## Troubleshooting
 

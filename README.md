@@ -12,6 +12,11 @@
 More Infinite Research adds **configurable infinite productivity** and **bonus research** for intermediate items,
 logistics chains, combat bonuses, player bonuses, and Space Age gaps that vanilla Factorio does not cover.
 
+**MIR 3.0.0** is the compatibility compiler architecture release. It keeps the
+player-facing generated technology IDs stable while moving active implementation
+under the MIR compiler namespace, replacing old compatibility helper paths with
+bounded discovery, policy, report, and emission layers.
+
 Legacy transition releases **`1.9.0`** through **`1.9.2`** target **Factorio `2.0`** and require `base >= 2.0`.
 
 Version **`3.x.x`**, starting with **`3.0.0`**, targets **Factorio `2.1`** and requires:
@@ -22,7 +27,31 @@ Version **`3.x.x`**, starting with **`3.0.0`**, targets **Factorio `2.1`** and r
 - hidden optional `quality`
 - optional `space-age >= 2.1.8`
 
-The mod is built around **graceful compatibility**: it discovers recipes, science packs, labs, and optional prototypes from the active mod set, generates technologies late in **`data-final-fixes.lua`**, and *skips unsafe or unavailable streams* instead of requiring compatibility mods on the mod portal page.
+The mod is built around **graceful compatibility**: it discovers recipes,
+science packs, labs, and optional prototypes from the active mod set, validates
+the candidate research, generates technologies late in **`data-final-fixes.lua`**,
+and *skips unsafe or unavailable streams* instead of requiring compatibility
+mods on the mod portal page.
+
+## MIR 3.0.0 Release Focus
+
+MIR 3.0.0 is not a broad new content wave. It is the release that makes the
+generation architecture durable:
+
+- active shipped implementation lives under `prototypes/mir/`;
+- required Factorio root lifecycle files remain thin wrappers;
+- `prototypes/streams/` stays as declarative stream data;
+- generated IDs are manifest-backed and stable;
+- compatibility behavior is described through narrow claim records and policy
+  overlays;
+- only emission/platform code creates or mutates generated technologies;
+- diagnostic rows explain skipped, rejected, observed, and emitted behavior;
+- package hygiene excludes docs, fixtures, scripts, tests, task ledgers, build
+  outputs, and distribution outputs from the release zip.
+
+The 3.0.0 release archive is
+`dist/more-infinite-research_3.0.0.zip`. The recorded package SHA-256 is kept in
+`docs/releases/3.0.0-validation-summary.md`.
 
 ## Quick Summary
 
@@ -521,6 +550,21 @@ Enable `mir-debug-generation-report` to log rows like:
 
 Use diagnostics when reporting compatibility issues. It tells whether a stream generated, skipped, reduced science packs, or found no matching recipes. For direct-effect technologies, the report also includes non-blocking `native_modifier_overlap` rows when another infinite non-MIR technology already has the same native modifier target. Compatibility audits also capture planner rows, recipe-cap rows, typed fact summaries, compiler decisions, lab matrices, loop risks, and rule-surface observations in `compat-observations.*`.
 
+MIR 3 compatibility claims are intentionally narrow. A target page can claim
+that a named recipe family is supported, that a mod has been observed, or that
+MIR deliberately avoids a conflict. It should not be read as full overhaul
+support unless a compatibility page and claim record explicitly say so.
+
+Known 3.0.0 publication notes:
+
+- portal-backed full-catalog checks were not run in this environment because
+  `FACTORIO_TOKEN` was not set;
+- local supported-zip isolation found `atan-ash_2.2.1` and
+  `atan-nuclear-science_0.3.3` failing without MIR on the tested Factorio
+  `2.1` setup, so those real upstream package failures are tracked outside MIR;
+- MIR's ATAN claims remain the narrow ash separation and nuclear-science-pack
+  recipe productivity behavior documented under `docs/compatibility/targets/`.
+
 Enable `mir-debug-recipe-matches` to log matched recipe rows like:
 
 ```text
@@ -664,6 +708,8 @@ The validation script checks:
 - **`docs/maintainer/developer-tools.md`:** preferred developer commands, run profiles, script roles, and PowerShell tooling checks.
 - **`docs/releases/3.0.0-plan.md`:** high-level release narrative, scope rationale, why decisions, and pointers back to `todo.md`, `changelog.txt`, and supporting notes.
 - **`docs/releases/3.0.0-release-checklist.md`:** final release gate checklist, package-boundary policy, and current artifact pointers.
+- **`docs/releases/3.0.0-release-notes.md`:** public 3.0.0 release notes and known non-blockers.
+- **`docs/releases/3.0.0-validation-summary.md`:** concise local validation summary, package hash, and row/hash comparison.
 - **`docs/releases/2.2.0-validation-record.md`:** local release validation evidence.
 - **`docs/maintainer/manual-test-plan.md`:** named manual saves/scenarios for release validation.
 - **`docs/releases/mod-portal-page.md`:** mod-portal-ready public description, technology catalog, settings summary, compatibility notes, and troubleshooting text.
