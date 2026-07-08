@@ -11,15 +11,15 @@
 
 More Infinite Research adds **configurable infinite productivity** and **bonus research** for intermediate items, logistics chains, combat bonuses, player bonuses, and Space Age gaps that vanilla Factorio does not cover.
 
-**MIR `2.x.x`** targets **Factorio `2.0`** starting with **`2.3.0`**.
+**MIR `2.x.x`** targets **Factorio `2.0`** *(starting with **`2.3.0`**)*.
 
 **MIR `3.x.x`** targets **Factorio `2.1`** and requires:
 
 - `base >= 2.1.8`
-- hidden optional `elevated-rails`
+- optional `space-age >= 2.1.8`
 - optional `recycler >= 2.1.8`
 - hidden optional `quality`
-- optional `space-age >= 2.1.8`
+- hidden optional `elevated-rails`
 
 The mod is built around **graceful compatibility**: it discovers recipes,science packs, labs, and optional prototypes from the active mod set, validates the candidate research, generates technologies late in **`data-final-fixes.lua`**, and *skips unsafe or unavailable streams* instead of requiring compatibility mods on the mod portal page.
 
@@ -35,7 +35,6 @@ The mod is built around **graceful compatibility**: it discovers recipes,science
 - **MIR compiler architecture:** keeps active generation under `prototypes/mir/`, with declarative stream data in `prototypes/streams/`.
 - **Compiler diagnostics:** indexes typed prototype facts, compiler decisions, lab matrices, loop risks, rule surfaces, and cap estimates for audits.
 - **Factorio 2.1 recipes:** supports recipe `categories` as well as legacy single `category`.
-- **ATAN 2.1 schema repair:** exact-version loader-schema repairs let `atan-ash_2.2.1` and `atan-nuclear-science_0.3.3` load with MIR on Factorio `2.1`.
 - **Optional DLC:** keeps official DLC mods optional and gates DLC-shaped research behind concrete prototype checks.
 - **Scripted Space Age scaling:** bounded event-driven spoilage preservation and agricultural growth speed are disabled-by-default experimental candidates; default enablement or measured behavior claims require the named manual save matrix.
 - **Clean mod portal metadata:** keeps third-party compatibility-mod dependencies out of `info.json`.
