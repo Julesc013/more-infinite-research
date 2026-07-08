@@ -148,7 +148,7 @@ If no valid subset exists, MIR skips the generated technology and logs the reaso
 Two startup settings control late-game progression and global science-pack pressure:
 
 - **`ips-require-space-gate`** is **disabled by default**. When enabled, generated technologies require the end-game science unlock as a prerequisite, but their science-pack ingredients are not changed.
-- **`mir-science-pack-ingredient-policy`** is **`configured` by default**. It can instead add fixed late-game packs, infer missing official or modded progression packs from the selected science packs, add every official base and Space Age science pack, or add every active lab science pack including compatible modded science packs.
+- **Science packs for generated technologies** (`mir-science-pack-ingredient-policy`) is **`configured` by default**. It can instead add fixed late-game packs, infer missing official or modded progression packs from the selected science packs, add every official base and Space Age science pack, or add every active lab science pack including compatible modded science packs. Options are ordered from conservative to broad.
 
 For the end-game science gate, MIR uses **promethium science** in Space Age when available.
 Otherwise it uses **space science** when available.
@@ -296,13 +296,13 @@ Megabase setup:
 
 - Keep most generated streams enabled.
 - Keep max level at `0` for infinite progression.
-- Consider `Extra science packs for generated technologies` values `space-age-progression`, `official-progression`, `mod-progression`, or `all-official` if you want higher-end science sinks without forcing every active modded pack into every technology.
-- Use `What to do when no lab can research a technology` value `reduce` for broad modpack compatibility.
+- Consider **Science packs for generated technologies** values `space-age-progression`, `official-progression`, `mod-progression`, or `all-official` if you want higher-end science sinks without forcing every active modded pack into every technology.
+- Use **Lab compatibility for generated technologies** value `reduce` for broad modpack compatibility.
 
 Modpack compatibility setup:
 
-- Start with `Extra science packs for generated technologies` value `configured`.
-- Use `What to do when no lab can research a technology` value `reduce`.
+- Start with **Science packs for generated technologies** value `configured`.
+- Use **Lab compatibility for generated technologies** value `reduce`.
 - Enable `Log generated and skipped technologies` only while troubleshooting.
 - Enable `Log recipes matched by productivity technologies` only when reporting missing or duplicate productivity chains.
 
@@ -338,14 +338,14 @@ Vanilla continuations:
 | Setting | Type | Default | Description |
 | --- | --- | --- | --- |
 | `ips-require-space-gate` | bool | `false` | Adds the end-game science unlock as a prerequisite without changing science-pack ingredients. Uses promethium science in Space Age when available, otherwise space science. |
-| `mir-science-pack-ingredient-policy` | string | `configured` | Controls extra science packs added to every generated technology. Allowed values: `configured`, `space`, `space-and-promethium`, `space-age-progression`, `official-progression`, `mod-progression`, `all-official`, `all`. |
+| `mir-science-pack-ingredient-policy` | string | `configured` | Chooses how MIR adds science packs to generated technologies. Options are ordered from conservative to broad: `configured`, `space`, `space-and-promethium`, `space-age-progression`, `official-progression`, `mod-progression`, `all-official`, `all`. |
 | `mir-prefer-this-mod-for-competing-techs` | bool | `true` | Lets MIR remove selected competing infinite technologies when MIR has generated or will generate matching replacement behavior. Disable to keep competing technologies from other mods. |
 | `mir-adjust-vanilla-weapon-speed-techs` | string | `off` | Controls whether MIR removes rocket and cannon-shell speed bonuses from MIR's generated weapon shooting speed continuation. Finite vanilla weapon shooting speed technologies keep their original tank cannon and rocket bonuses. Allowed values: `off`, `only-when-dedicated-tech-enabled`, `always`. |
 | `mir-pipeline-extent-multiplier` | string/dropdown | `100%` | Strictly opt-in startup-only multiplier for recognized fluid box pipeline extent fields across prototypes, not only pipe entities. At `100%`, MIR does not load the pipeline pass, scan fluid boxes, or change prototypes. Allowed values: `50%`, `75%`, `100%`, `125%`, `150%`, `200%`, `250%`, `300%`, `400%`, `500%`. Non-`100%` values are experimental and can affect machines, tanks, thrusters, and modded prototypes that define fluid boxes. |
 | `mir-debug-generation-report` | bool | `false` | Writes structured generated/skipped rows to the Factorio log, including science packs, prerequisites, effect counts, lab compatibility, and icon source. |
 | `mir-debug-recipe-matches` | bool | `false` | Writes matched recipe names for each generated productivity stream. Useful for mod compatibility reports, but noisy in large mod packs. |
 | `mir-debug-scripted-effects` | bool | `false` | Writes runtime log entries when scripted technologies recompute global or event-driven effects. |
-| `mir-lab-incompatibility-policy` | string | `reduce` | Controls incompatible science-pack selections. `reduce` uses the largest lab-compatible subset; `skip` skips the technology. |
+| `mir-lab-incompatibility-policy` | string | `reduce` | Chooses what MIR does when the selected science packs cannot be researched by any active lab. `reduce` uses the largest researchable subset; `skip` skips the technology. |
 
 ### Per-Stream Settings
 

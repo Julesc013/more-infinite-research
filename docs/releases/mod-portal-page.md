@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: release-manager
 doc_type: release-plan
 owner: mir-maintainers
-last_reviewed: 2026-07-08
+last_reviewed: 2026-07-09
 supersedes: []
 superseded_by: []
 ---
@@ -187,8 +187,8 @@ For most generated research you can change:
 Other useful settings:
 
 - Require finishing the game before generated technologies: optional, off by default.
-- Extra science packs for generated technologies: keep configured packs, add fixed late-game packs, infer missing official or modded progression packs from selected packs, use all official science packs, or use all active lab science packs.
-- What to do when no lab can research a technology: reduce to compatible science packs by default, or skip incompatible technologies.
+- Science packs for generated technologies: keep default packs, add fixed late-game packs, infer official or modded progression packs, use all official science packs, or use all active lab science packs. Options are ordered from conservative to broad.
+- Lab compatibility for generated technologies: reduce to a researchable science-pack set by default, or skip technologies no lab can research.
 - Use MIR when another mod adds the same infinite research: lets this mod remove selected overlapping infinite technologies when MIR generated replacements exist.
 - Remove duplicate rocket/cannon speed from general weapon speed: optional cleanup; off by default.
 - Diagnostics: log generated/skipped technologies, recipe matches, or scripted effects for troubleshooting.

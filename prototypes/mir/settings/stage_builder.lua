@@ -262,8 +262,14 @@ local function stream_sort_name(key)
   return stream_sort_names[key] or fallback_stream_sort_name(key)
 end
 
+local function group_attention_rank(group)
+  if not group.enabled then return "000" end
+  if group.settings_priority == "top" then return "050" end
+  return "100"
+end
+
 local function group_order_prefix(group)
-  local bucket = group.enabled and "100" or "000"
+  local bucket = group_attention_rank(group)
   return "b-" .. bucket .. "-" .. order_slug(group.sort_name) .. "-" .. group.kind .. "-" .. group.key
 end
 
@@ -276,6 +282,7 @@ for key, stream in pairs(C.streams) do
     stream = stream,
     sort_name = stream_sort_name(key),
     enabled = default_enabled(key, stream),
+    settings_priority = lookup_default(key, "settings_priority", stream, nil),
     ui_visibility = settings_adapter.visibility_for_stream(stream, settings_context)
   })
 end
@@ -290,14 +297,15 @@ for _, spec in ipairs(base_extension_specs) do
     spec = spec,
     defaults_spec = defaults_spec,
     sort_name = spec.sort_name or spec.key,
-    enabled = enabled
+    enabled = enabled,
+    settings_priority = spec.settings_priority or defaults_spec.settings_priority
   })
 end
 
 table.sort(technology_setting_groups, function(a, b)
-  local disabled_a = not a.enabled
-  local disabled_b = not b.enabled
-  if disabled_a ~= disabled_b then return disabled_a end
+  local rank_a = group_attention_rank(a)
+  local rank_b = group_attention_rank(b)
+  if rank_a ~= rank_b then return rank_a < rank_b end
   local sort_a = order_slug(a.sort_name)
   local sort_b = order_slug(b.sort_name)
   if sort_a == sort_b then

@@ -68,6 +68,8 @@ Date: 2026-07-08
     - Added portable settings profile helpers for runtime and data-stage settings resolution.
     - Added hidden-setting visibility logic for unavailable technology settings.
     - Hidden settings keep their setting IDs readable and do not force values.
+    - Improved in-game setting labels and descriptions for science-pack and lab-compatibility policies.
+    - Grouped generated-technology settings so disabled, risky, special, and vanilla-continuation rows stay easier to find.
     - Updated release and README wording for the architecture move.
     - Documented that generated IDs are preserved and no architecture-only migration is required.
 

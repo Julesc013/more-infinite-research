@@ -10,6 +10,7 @@ rules:
   settings_profiles_exclude_import_setting: true
   runtime_export_writes_script_output_only: true
   import_requires_restart: true
+  technology_settings_sort_by_visibility_then_player_name: true
 
 profiles:
   schema: 1
@@ -27,6 +28,17 @@ profiles:
     - mir-settings-profile-import
   unknown_settings: preserved in profile string but ignored on unsupported branches
   unsupported_value_types: ignored rather than coerced
+
+ordering:
+  global_prefix: a
+  technology_prefix: b
+  technology_buckets:
+    - rank: "000"
+      meaning: disabled-by-default technology groups, sorted alphabetically
+    - rank: "050"
+      meaning: enabled attention groups such as risky, special, or vanilla continuation groups, sorted alphabetically
+    - rank: "100"
+      meaning: ordinary enabled technology groups, sorted alphabetically
 
 groups:
   stream:

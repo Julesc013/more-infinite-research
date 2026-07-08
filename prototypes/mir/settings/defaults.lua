@@ -35,7 +35,8 @@ local defaults = {
       base_cost = 100000,
       growth_factor = 3,
       research_time = 120,
-      max_level = 0
+      max_level = 0,
+      settings_priority = "top"
     },
     research_cargo_landing_pad_count = {
       enabled = false,
@@ -51,7 +52,8 @@ local defaults = {
       base_cost = 1000,
       growth_factor = 1.2,
       research_time = 120,
-      max_level = 0
+      max_level = 0,
+      settings_priority = "top"
     },
     research_ash_separation = {
       research_time = 90
@@ -115,6 +117,7 @@ local defaults = {
   base_extensions = {
     ["braking-force"] = {
       enabled = true,
+      settings_priority = "top",
       max_level = 0,
       base_cost = 115,
       growth_factor = 1.333333333333,
@@ -126,6 +129,7 @@ local defaults = {
     },
     ["research-speed"] = {
       enabled = true,
+      settings_priority = "top",
       max_level = 0,
       base_cost = 60,
       growth_factor = 1.5,
@@ -135,6 +139,7 @@ local defaults = {
     },
     ["worker-robots-storage"] = {
       enabled = true,
+      settings_priority = "top",
       max_level = 0,
       base_cost = 200,
       growth_factor = 1.5,
@@ -146,6 +151,7 @@ local defaults = {
     },
     ["inserter-capacity-bonus"] = {
       enabled = false,
+      settings_priority = "top",
       max_level = 0,
       base_cost = 200,
       growth_factor = 3.333333333333,
@@ -162,6 +168,7 @@ local defaults = {
     },
     ["weapon-shooting-speed"] = {
       enabled = true,
+      settings_priority = "top",
       max_level = 0,
       base_cost = 60,
       growth_factor = 1.5,
@@ -174,6 +181,7 @@ local defaults = {
     },
     ["laser-shooting-speed"] = {
       enabled = true,
+      settings_priority = "top",
       max_level = 0,
       base_cost = 60,
       growth_factor = 1.5,

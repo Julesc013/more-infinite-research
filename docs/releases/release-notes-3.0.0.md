@@ -5,7 +5,7 @@ applies_to: "3.0.0"
 audience: player
 doc_type: release-plan
 owner: mir-maintainers
-last_reviewed: 2026-07-08
+last_reviewed: 2026-07-09
 supersedes: []
 superseded_by: []
 ---
@@ -28,6 +28,7 @@ This release is not a broad new gameplay-content wave. It is the release that tu
 - Exact loader-schema repairs let `atan-ash_2.2.1` and `atan-nuclear-science_0.3.3` load with MIR on Factorio `2.1`.
 - Unsafe, missing, or unresearchable research candidates are skipped or kept diagnostic-only instead of being forced into invalid mod sets.
 - Recipe productivity research is still infinite, but Factorio's normal recipe productivity cap still applies.
+- Science-pack and lab-compatibility startup settings now use clearer player-facing labels while keeping the same internal setting values.
 - Scripted spoilage preservation and agricultural growth speed remain disabled-by-default experimental options.
 
 ## Compatibility
@@ -60,6 +61,7 @@ This release is not a broad new gameplay-content wave. It is the release that tu
 - Base technology continuations now route through the MIR emit layer.
 - Effect safety, generated icon construction, max-level handling, and weapon-speed cleanup now route through focused MIR modules.
 - Settings are built through the MIR settings stage builder instead of the old large root settings file.
+- Generated-technology setting rows keep disabled, risky, special, and vanilla-continuation groups easier to find before the ordinary enabled alphabetical list.
 - Runtime scripted technology handlers now live under `prototypes/mir/runtime`.
 - Runtime code stays separate from prototype generation.
 
