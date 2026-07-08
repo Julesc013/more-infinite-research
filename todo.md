@@ -11,7 +11,8 @@ Current assumptions:
 
 - `2.2.0` is released as-is.
 - `1.9.2` is released from `legacy` as-is.
-- Active development now focuses on MIR 3.0.0 final hardening on `dev`.
+- MIR 3.0.0 is frozen as a publish candidate on `dev`; only release-critical
+  fixes should land before publishing.
 - The shipped MIR 3 structure is Factorio root wrappers, `prototypes/mir/`
   implementation, and declarative `prototypes/streams/` data tables.
 - Old `prototypes/compat/`, `prototypes/lib/`, `prototypes/mir/legacy/`,
@@ -95,7 +96,7 @@ not broad new gameplay generation.
 Final gate evidence:
 
 - Final targeted gate artifact:
-  `artifacts/release-targeted-20260708-174658`.
+  `artifacts/release-targeted-20260708-183311`.
 - Final package:
   `dist/more-infinite-research_3.0.0.zip`.
 - Final package SHA-256:
