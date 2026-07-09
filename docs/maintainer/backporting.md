@@ -220,9 +220,11 @@ Current execution state:
   tooling lessons back to `dev`, but do not cut an immediate `3.0.1` release.
 - Keep `dev` as the accumulating Factorio `2.1` integration branch while the
   `3.0.0` backport rings are worked.
-- Release `3.0.5` after the `3.0.0` backport rings have finished and a short
-  community-feedback window has captured early release corrections. Do not
-  bring target-line metadata downgrades back to `dev`.
+- Release `3.0.5` after the Factorio `2.0` port is published, the Factorio
+  `1.1` port is either published or has produced clear portable lessons, the
+  Factorio `1.0` / `0.18` bridge policy is decided, and a short community
+  feedback window has captured early current-line corrections. Do not bring
+  target-line metadata downgrades back to `dev`.
 - Start `3.1.0` only after the `3.0.5` learning patch is stable. Treat `3.1.0`
   as the fixture-backed overhaul support campaign, not as cleanup from the
   backport ladder.
@@ -311,20 +313,57 @@ Minimum gate:
 - build and inspect the package;
 - promote to `legacy` only after all gates pass.
 
+After publication:
+
+1. Upload the exact validated zip recorded in `.mir/branches.yml`.
+2. Verify the Mod Portal lists MIR `2.3.0` for Factorio `2.0`.
+3. Tag the GitHub source point for the released `legacy` commit.
+4. Mark `.mir/branches.yml` as `published` in a follow-up release-evidence
+   commit.
+5. Treat the released `2.3.0` zip as immutable.
+
+Do not rebuild `2.3.0` after upload unless a release-blocking issue is found.
+If the payload changes after publication, the next package is `2.3.1`.
+
 ### Portable Return To `dev` And `3.0.5`
 
 After `2.3.0` and every later ring, bring back only portable improvements to
-`dev`: validation script improvements, target manifest fixes, report diff
-fixes, package hygiene fixes, docs corrections, generic platform-adapter fixes,
-better error messages, and deterministic ordering fixes.
+`dev`: validation runner improvements, package hygiene checks, target manifest
+fixes, report-diff tooling, deterministic ordering fixes, generic
+platform-adapter fixes, clearer diagnostics, docs corrections,
+release-process hardening, test fixtures that also make sense for Factorio
+`2.1`, and bug fixes in shared compiler logic.
 
 Do not release these immediately as `3.0.1`. Keep them on `dev` while the
-`3.0.0` backport rings continue. Once all planned `3.0.0` source-derived
-backports are complete, add a short community-feedback window, resolve the
-portable issues found there, and ship one Factorio `2.1` patch as `3.0.5`.
+`3.0.0` backport rings continue. Use `3.0.5` for the accumulated Factorio
+`2.1` patch after the `2.0` port is published, the `1.1` port is either
+published or has produced clear lessons, the `1.0` / `0.18` policy is decided,
+and a short community-feedback window has surfaced current-line issues.
 
 Do not bring back target-line metadata, dependency-floor downgrades, removed
-`2.1` dependencies, disabled `2.1` features, or `2.0` release wording.
+`2.1` dependencies, disabled `2.1` features, lower-target compromises as
+default Factorio `2.1` behavior, or `2.0` release wording.
+
+Rule:
+
+```text
+Old branches teach the compiler better boundaries.
+They do not drag the modern line backward.
+```
+
+### Emergency `3.0.1` Policy
+
+Do not cut `3.0.1` unless the current Factorio `2.1` line has a serious
+release-blocking issue:
+
+- `3.0.0` has a serious Factorio `2.1` load failure;
+- a migration breaks saves;
+- a generated technology ID problem appears;
+- a package hygiene issue affects users;
+- a public Mod Portal upload is materially wrong;
+- a critical compatibility fix is safe and already validated.
+
+Everything else accumulates for `3.0.5`.
 
 ### `tmp/1.1` To `1.9.3`
 
@@ -338,10 +377,26 @@ Required cuts:
 - replace `storage` with `global` or remove runtime code;
 - disable recipe productivity unless proven in Factorio `1.1`;
 - use modern non-Space-Age science packs only;
+- avoid Factorio `2.x` dependency syntax leakage;
 - validate lab productivity and worker robot battery effect support;
 - validate infinite `max_level` and `count_formula`;
 - validate old recipe result schema and icon schema;
 - validate migrations or omit them.
+
+Required proof:
+
+- `info.json` version is `1.9.3`;
+- `factorio_version` is `1.1`;
+- the matching Factorio `1.1` binary loads the package;
+- science packs are target-valid;
+- technology effects are target-valid;
+- `max_level` and `count_formula` load in the target binary;
+- old recipe schema assumptions are proven;
+- package hygiene passes;
+- release notes describe this as a compatibility port.
+
+`1.1` is the first hard reduction ring. Do not expect it to behave like the
+Factorio `2.0` port.
 
 ### `tmp/1.0` To `1.8.0`
 
@@ -398,6 +453,10 @@ First tasks:
 - build one tiny proof package;
 - load it in the target binary;
 - only then define the actual feature set.
+
+Do not block `3.0.5` on the full museum ladder unless the archive work is
+moving quickly. Lessons from `0.14` and older can feed a later `3.0.6` patch or
+the `3.1.0` tooling and compatibility infrastructure campaign.
 
 ## Release Wording Classes
 

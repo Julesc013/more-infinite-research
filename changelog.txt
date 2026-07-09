@@ -10,7 +10,8 @@ Date: 2026-07-09
     - Removed Factorio 2.1-only cargo bay unloading distance research from the Factorio 2.0 package.
     - Removed Factorio 2.1-only cargo landing pad count research from the Factorio 2.0 package.
     - Kept generated technology IDs stable for streams that remain available on the Factorio 2.0 line.
-    - Kept exact ATAN loader-schema repairs scoped to the known supported upstream versions.
+    - Kept exact ATAN loader-schema repairs scoped to Factorio 2.1+ so Factorio 2.0 keeps its native recipe category fields.
+    - Fixed ATAN Ash 2.2.1 with Space Age on Factorio 2.0 by keeping foundation crafting in `crafting-with-fluid`.
     - Kept Factorio 2.0 science-pack handling on the older tool prototype model during compatibility checks.
     - Classified reviewed Factorio 2.0 local zip issues that reproduce without MIR as external local-library issues.
 
