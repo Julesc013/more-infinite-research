@@ -13,13 +13,13 @@ Date: 2026-07-10
     - Added a target-line adapter for unsupported streams, direct effects, prototype caps, repairs, and runtime handlers.
     - Disabled unsupported 2.x behavior before it can emit 1.1-invalid prototypes.
     - Replaced direct runtime persistence access with a state adapter for global on Factorio 1.1 and storage on Factorio 2.x.
-    - Replaced newer core technology badge overlays on Factorio 1.1 with target-era base technology badge fallbacks.
+    - Used stock high-resolution target-era technology constant badges on Factorio 1.1.
 
   Changes:
 
     - Removed unsupported 2.x startup settings from the 1.1 settings catalog and settings profile surface.
     - Hid settings-profile import and export on Factorio 1.1 because the target API lacks the MIRSET1 string codec.
-    - Ensured Factorio 1.1 direct-effect technologies use target-era effect badges without newer core constant icon paths.
+    - Ensured Factorio 1.1 direct-effect technologies use stock tile badges without copied newer graphics.
     - Retargeted branch-local support mod metadata to Factorio 1.1.
     - Made release tooling target-aware for 1.1 metadata, dependency floors, and cargo modifiers.
     - Updated settings visibility checks for the reduced 1.1 settings surface.

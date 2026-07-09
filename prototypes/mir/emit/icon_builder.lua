@@ -7,8 +7,10 @@ local target_line = require("prototypes.mir.platform.factorio.target_line")
 local I = {}
 
 local CONSTANT_OVERLAYS = {
+  ["laboratory-productivity"] = "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
   ["recipe-productivity"] = "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
   speed = "__core__/graphics/icons/technology/constants/constant-speed.png",
+  ["crafting-speed"] = "__core__/graphics/icons/technology/constants/constant-speed.png",
   ["movement-speed"] = "__core__/graphics/icons/technology/constants/constant-movement-speed.png",
   mining = "__core__/graphics/icons/technology/constants/constant-mining.png",
   battery = "__core__/graphics/icons/technology/constants/constant-battery.png",
@@ -228,7 +230,7 @@ local function overlay_for_stream(stream)
     local t = effect.type
     if t == "character-running-speed" then return "movement-speed" end
     if t == "character-mining-speed" then return "mining" end
-    if t == "laboratory-productivity" then return "recipe-productivity" end
+    if t == "laboratory-productivity" then return "laboratory-productivity" end
     if t == "character-reach-distance"
       or t == "character-build-distance"
       or t == "character-resource-reach-distance"
@@ -238,7 +240,8 @@ local function overlay_for_stream(stream)
     if t == "worker-robot-battery" then return "battery" end
     if t == "max-cargo-bay-unloading-distance" then return "range" end
     if t == "cargo-landing-pad-count" then return "count" end
-    if t == "gun-speed" or t == "character-crafting-speed" then return "speed" end
+    if t == "character-crafting-speed" then return "crafting-speed" end
+    if t == "gun-speed" then return "speed" end
     if t == "braking-force" then return "braking-force" end
     if t == "ammo-damage" or t == "turret-attack" then return "damage" end
   end

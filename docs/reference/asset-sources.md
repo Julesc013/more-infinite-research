@@ -27,7 +27,13 @@ Policy:
   `__elevated-rails__` are allowed only as prototype paths gated by
   `mir-use-installed-space-age-icons`; they are not packaged assets.
 - Target-line fallback overlays should reference assets already present in the
-  active Factorio install, such as `__base__/graphics/technology/*`, rather
-  than packaging copied art from a newer Factorio version.
+  active Factorio install. Prefer the same high-resolution stock core
+  technology badge layers used by the target game's own technology helpers,
+  such as `__core__/graphics/icons/technology/constants/*`, for technology
+  tile overlays. The smaller
+  `__core__/graphics/icons/technology/effect-constant/*` sprites are effect
+  row utility art and should not be used as technology tile badges unless a
+  target line has no high-resolution equivalent and the substitution is
+  documented.
 - Any future MIR-owned or third-party local art must be added to this table with
   an explicit source and redistribution note before package validation can pass.

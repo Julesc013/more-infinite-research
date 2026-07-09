@@ -45,17 +45,22 @@ local omitted_global_settings = {
 }
 
 local legacy_technology_overlay_layers = {
-  ["recipe-productivity"] = "__base__/graphics/technology/productivity-module-3.png",
-  speed = "__base__/graphics/technology/speed-module-3.png",
-  ["movement-speed"] = "__base__/graphics/technology/exoskeleton-equipment.png",
-  mining = "__base__/graphics/technology/mining-productivity.png",
-  battery = "__base__/graphics/technology/battery-equipment.png",
-  capacity = "__base__/graphics/technology/inserter-capacity.png",
-  damage = "__base__/graphics/technology/physical-projectile-damage-2.png",
-  range = "__base__/graphics/technology/artillery-range.png",
-  ["braking-force"] = "__base__/graphics/technology/braking-force.png",
-  equipment = "__base__/graphics/technology/effect-transmission.png",
-  count = "__base__/graphics/technology/inserter-capacity.png"
+  -- Mirror Factorio 1.1's high-resolution util.technology_icon_constant_*
+  -- badge layers. The smaller effect-constant files are utility sprites for
+  -- the effects panel, not technology tile overlays.
+  ["laboratory-productivity"] = "__core__/graphics/icons/technology/constants/constant-mining-productivity.png",
+  ["recipe-productivity"] = "__core__/graphics/icons/technology/constants/constant-mining-productivity.png",
+  speed = "__core__/graphics/icons/technology/constants/constant-speed.png",
+  ["crafting-speed"] = "__core__/graphics/icons/technology/constants/constant-speed.png",
+  ["movement-speed"] = "__core__/graphics/icons/technology/constants/constant-movement-speed.png",
+  mining = "__core__/graphics/icons/technology/constants/constant-mining.png",
+  battery = "__core__/graphics/icons/technology/constants/constant-battery.png",
+  capacity = "__core__/graphics/icons/technology/constants/constant-capacity.png",
+  damage = "__core__/graphics/icons/technology/constants/constant-damage.png",
+  range = "__core__/graphics/icons/technology/constants/constant-range.png",
+  ["braking-force"] = "__core__/graphics/icons/technology/constants/constant-braking-force.png",
+  equipment = "__core__/graphics/icons/technology/constants/constant-equipment.png",
+  count = "__core__/graphics/icons/technology/constants/constant-count.png"
 }
 
 local function has_unsupported_required_mod(spec)
@@ -93,9 +98,9 @@ function M.technology_overlay_layer(overlay)
 
   return {
     icon = icon,
-    icon_size = 256,
-    scale = 0.23,
-    shift = {50, 50}
+    icon_size = 128,
+    shift = {100, 100},
+    floating = true
   }
 end
 

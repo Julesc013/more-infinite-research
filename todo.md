@@ -230,17 +230,18 @@ compatibility port of a tested current-line snapshot.
 - [ ] Accumulate normal portable lessons for `3.0.5` after `2.3.0` is
   published, `1.1` is published or has produced clear lessons, the `1.0` /
   `0.18` bridge is decided, and community feedback has had a short window.
-- [ ] Release `v1.9.3` as the first Factorio `1.1` compatibility port only after target-line implementation and binary validation.
+- [x] Release `v1.9.3` as the first Factorio `1.1` compatibility port only after target-line implementation and binary validation.
   Ring 2 posture: no Space Age, Quality, Recycler, Elevated Rails, cargo
   modifiers, recipe productivity, `storage`, or Factorio `2.x` dependency
   syntax leakage. Prove target-valid science packs, effects,
   `max_level`, `count_formula`, old recipe schema, package hygiene, and
   compatibility-port release wording against a Factorio `1.1` binary.
-  Current RC package: `dist/more-infinite-research_1.9.3.zip`,
-  SHA-256 `81FFB525231EC745747EADF4017205A904A890EC139B09450A72371D86492B5E`,
-  size `298026` bytes, `116` entries, `0` forbidden entries. Static validation,
-  target-era effect-badge assertions, and the reduced Factorio `1.1` runtime
-  gate passed on 2026-07-10. Factorio `1.1.110` rejected
+  Current RC package: `dist/more-infinite-research_1.9.3.zip`, SHA-256
+  `ED63DE563A56D9736C9B48B91A1946A33B6172BF2826742A9CEB000A6BBCC36E`, size
+  `298203` bytes, `121` entries, `0` forbidden entries. Static validation and
+  Factorio `1.1` binary validation passed on 2026-07-10 with
+  `D:\Programs\Factorio\1.1\bin\x64\factorio.exe`, including the packaged zip
+  smoke check and reduced `1.1` fixture gate. Factorio `1.1.110` rejected
   `change-recipe-productivity`, so recipe productivity remains a documented
   target-line exclusion.
 - [ ] Release `v1.8.0` as the first Factorio `1.0` compatibility port only after the Factorio `0.18` bridge policy is recorded.

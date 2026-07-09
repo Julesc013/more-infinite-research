@@ -33,9 +33,33 @@ Factorio `2.x` surfaces before they can emit invalid prototypes.
 - Retargeted branch-local support mod metadata to Factorio `1.1`.
 - Hid settings-profile import/export on the `1.1` line because Factorio `1.1`
   does not expose the `helpers` string codec API used by MIRSET1 profiles.
-- Replaced newer `__core__/graphics/icons/technology/constants/*` badge
-  overlays on the `1.1` line with target-era base technology badge fallbacks
+- Replaced newer unavailable badge overlays on the `1.1` line with stock
+  high-resolution target-era
+  `__core__/graphics/icons/technology/constants/*` technology badge layers
   instead of bundling newer Factorio graphics.
+
+## Factorio 1.1 Icon Substitutions
+
+The `1.1` line does not package copied graphics from newer Factorio versions.
+Technology tiles use stock high-resolution `1.1`
+`__core__/graphics/icons/technology/constants/*` badge layers, matching
+Factorio `1.1`'s own `util.technology_icon_constant_*` helpers. The smaller
+`effect-constant/*` files remain utility sprites for effect rows and are not
+used as technology tile overlays.
+
+| Generated stream | Base technology art on `1.1` | Badge on `1.1` | Reason |
+| --- | --- | --- | --- |
+| Lab productivity | `research-speed`, then `military-science-pack` | `constant-mining-productivity.png` | Factorio `1.1` has native lab productivity but no high-resolution lab-productivity or recipe-productivity technology tile badge; the stock productivity helper uses mining-productivity art. |
+| Rocket shooting speed | `rocketry` | `constant-speed.png` | Native `gun-speed` fire-rate modifier with stock speed badge. |
+| Cannon shooting speed | `weapon-shooting-speed-3`, then `physical-projectile-damage-2`, then `cannon-shell` | `constant-speed.png` | Factorio `1.1` has no cannon-specific technology art, so MIR prefers stock projectile weapon technology art before falling back to the item. |
+| Flamethrower shooting speed | `flamethrower` | `constant-speed.png` | Native `gun-speed` fire-rate modifier with stock speed badge. |
+| Electric shooting speed | `discharge-defense-equipment` when Space Age electric weapon art is unavailable | `constant-speed.png` | Base `1.1` exposes electric discharge defense rather than Space Age Tesla technology art. |
+| Character crafting speed | `automation-3`, then `automation-2`, then `repair-pack` | `constant-speed.png` | Factorio `1.1` has only a small effect-row crafting-speed sprite, not a high-resolution technology tile badge. |
+| Character walking speed | `exoskeleton-equipment` | `constant-movement-speed.png` | Uses the stock equipment technology and stock movement-speed badge. |
+| Character mining speed | `steel-axe` | `constant-mining.png` | Uses the stock mining technology and stock mining badge. |
+| Character reach/build/drop distance | `steel-axe` | `constant-range.png` | Factorio `1.1` has no player-reach technology art, so MIR uses the target-era hand-tool technology with the stock range badge. |
+| Character inventory/trash capacity | `toolbelt` | `constant-capacity.png` | Uses the stock inventory-capacity technology and stock capacity badge. |
+| Worker robot battery | `logistic-robotics` | `constant-battery.png` | Uses stock robotics technology art with the stock battery badge. |
 
 ## Supported Surface
 
@@ -51,6 +75,10 @@ Factorio `2.x` surfaces before they can emit invalid prototypes.
 
 ## Compatibility Checks
 
+- Release candidate package:
+  `dist/more-infinite-research_1.9.3.zip`, SHA-256
+  `ED63DE563A56D9736C9B48B91A1946A33B6172BF2826742A9CEB000A6BBCC36E`,
+  `298203` bytes, `121` entries, `0` forbidden release entries.
 - Static validation passed for the `1.9.3` metadata and package shape.
 - Factorio `1.1` binary validation passed with `D:\Programs\Factorio\1.1\bin\x64\factorio.exe`.
 - The runtime gate loaded the packaged zip and ran the reduced `1.1` scenarios:
@@ -58,8 +86,11 @@ Factorio `2.x` surfaces before they can emit invalid prototypes.
   merged inventory/trash capacity, settings surface, checkbox enable/disable,
   and weapon-speed overlap safety.
 - The `factorio-1.1-direct-effects` runtime scenario now asserts every
-  supported generated direct-effect technology has a target-era effect badge
-  and no newer core constant icon path.
+  supported generated direct-effect technology has a stock high-resolution
+  target-era technology constant badge and no unavailable newer badge path or
+  smaller effect-row sprite as a tile overlay.
+- The final visual-reviewed badge rebuild passed static validation and the
+  Factorio `1.1` runtime fixture gate.
 - A disposable Factorio `1.1.110` proof mod using
   `change-recipe-productivity` failed to load with `Unknown modifier type`,
   confirming recipe productivity streams are an engine-surface exclusion on
