@@ -71,11 +71,12 @@ synthetic badge overlays or native modifier icon metadata for these effects.
 
 ## Compatibility Checks
 
-- Release candidate package:
+- Published package:
   `dist/more-infinite-research_1.8.0.zip`, SHA-256
   `D785E6EBE7A72E6E9F01A3F89774A6AA30479430410447F603FEF1E0B9BD7B24`,
   `300620` bytes, `121` entries, `0` forbidden release entries.
 - Static validation passed for the `1.8.0` metadata and package shape.
+- Factorio `0.18` binary validation passed for the same published archive.
 - The public dist archive and the runtime-validated validation archive contain
   the same `121` file entries with identical per-entry content hashes.
 - Factorio `1.0` bridge-load validation passed with
@@ -90,8 +91,6 @@ synthetic badge overlays or native modifier icon metadata for these effects.
 - The reduced settings/profile fixture asserts generated vanilla continuations
   use explicit target-era localized names and descriptions, including the
   older `laser-turret-speed` chain.
-- A matching Factorio `0.18` binary is required before final publication
-  claims can say the bridge has loaded in the original target line.
 
 ## 1.8.0 Exclusion Manifest
 
@@ -115,5 +114,6 @@ not by blindly changing the `1.8.0` metadata.
 - Recipe productivity is not included on this line.
 - Factorio `2.x` DLC surfaces are not included on this line.
 - Newer Factorio core graphics are not bundled into the package.
-- If a matching Factorio `0.18` binary is unavailable, the dist is a prepared
-  bridge artifact pending final target-binary proof.
+- The published `1.8.0` archive is immutable bridge evidence. Do not rebuild it
+  while preparing `1.8.1`; use a new patch release if the `0.18` payload must
+  change.

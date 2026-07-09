@@ -244,15 +244,15 @@ compatibility port of a tested current-line snapshot.
   smoke check and reduced `1.1` fixture gate. Factorio `1.1.110` rejected
   `change-recipe-productivity`, so recipe productivity remains a documented
   target-line exclusion.
-- [ ] Release `v1.8.0` as the Factorio `0.18` bridge compatibility port from the MIR 3 source anchor plus portable `2.3.0` and `1.9.3` lessons.
-  Current bridge candidate package: `dist/more-infinite-research_1.8.0.zip`,
+- [x] Release `v1.8.0` as the Factorio `0.18` bridge compatibility port from the MIR 3 source anchor plus portable `2.3.0` and `1.9.3` lessons.
+  Published bridge package: `dist/more-infinite-research_1.8.0.zip`,
   SHA-256 `D785E6EBE7A72E6E9F01A3F89774A6AA30479430410447F603FEF1E0B9BD7B24`,
   size `300620` bytes, `121` entries, `0` forbidden entries. Static validation
-  passed, Factorio `1.0` bridge validation passed with
+  passed, Factorio `0.18` binary validation passed, Factorio `1.0` bridge
+  validation passed with
   `D:\Programs\Factorio\1.0\bin\x64\factorio.exe`, and the public dist archive
-  content matches the runtime-validated archive. A matching Factorio `0.18`
-  binary is still required before final publication. The bridge uses target-era
-  base technology art only; it does not package newer Factorio 1.1+ technology
+  content matches the runtime-validated archive. The bridge uses target-era base
+  technology art only; it does not package newer Factorio 1.1+ technology
   constant badge graphics, synthetic badge overlays, or unsupported native
   modifier icon metadata. Research productivity uses stock military science
   technology art as its main tile.

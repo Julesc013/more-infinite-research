@@ -114,8 +114,8 @@ release_artifacts:
       forbidden_entries: 0
       validation_content_matches_dist: true
       factorio_1_0_bridge_validation: passed
-      factorio_0_18_validation: pending-binary
-      status: bridge-candidate-1.0-validated-pending-0.18-binary
+      factorio_0_18_validation: passed
+      status: published
   closed_versions:
     - version: "2.2.0"
       branch: main
