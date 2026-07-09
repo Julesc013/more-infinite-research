@@ -237,14 +237,15 @@ compatibility port of a tested current-line snapshot.
   `max_level`, `count_formula`, old recipe schema, package hygiene, and
   compatibility-port release wording against a Factorio `1.1` binary.
   Current RC package: `dist/more-infinite-research_1.9.3.zip`, SHA-256
-  `ED63DE563A56D9736C9B48B91A1946A33B6172BF2826742A9CEB000A6BBCC36E`, size
-  `298203` bytes, `121` entries, `0` forbidden entries. Static validation and
+  `1723C10FEDD9A12003052991CC7574F1F6BF4E4ABC506F0323571DF680C0444B`, size
+  `298759` bytes, `121` entries, `0` forbidden entries. Static validation and
   Factorio `1.1` binary validation passed on 2026-07-10 with
   `D:\Programs\Factorio\1.1\bin\x64\factorio.exe`, including the packaged zip
   smoke check and reduced `1.1` fixture gate. Factorio `1.1.110` rejected
   `change-recipe-productivity`, so recipe productivity remains a documented
   target-line exclusion.
-- [ ] Release `v1.8.0` as the first Factorio `1.0` compatibility port only after the Factorio `0.18` bridge policy is recorded.
+- [ ] Release `v1.8.0` as the Factorio `0.18` bridge compatibility port from the MIR 3 source anchor plus portable `2.3.0` and `1.9.3` lessons.
+- [ ] Release `v1.8.1` as the true Factorio `1.0` compatibility port only if the `0.18` bridge does not cover the public `1.0` release shape.
 - [ ] Release `v1.7.0`, `v1.6.0`, and `v1.5.0` as reduced native-infinite editions for Factorio `0.17`, `0.16`, and `0.15` only after target binary proof.
 - [ ] Release `v1.4.0`, `v1.3.0`, and `v0.12.0` as archive finite-ladder reconstructions only after target binary proof.
 - [ ] Release `v0.11.0` through `v0.6.0` as museum/discovery builds only after target binary and base-file discovery.

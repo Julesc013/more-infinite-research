@@ -33,7 +33,7 @@ generation. They no longer only encode MIR's internal architecture generation.
 | `3.x.x` | Factorio `2.1` | `3.0.0` | Canonical modern | Current-line compiler architecture release. |
 | `2.x.x` | Factorio `2.0` | `2.3.0` | Maintained `2.0` backport | First post-3.0 port of the compiler architecture. |
 | `1.9.x` | Factorio `1.1` | `1.9.3` | Compatibility port | `1.9.0` through `1.9.2` are transition exceptions for Factorio `2.0`. |
-| `1.8.x` | Factorio `1.0` | `1.8.0` | Compatibility port | Factorio `0.18` remains a bridge decision, not a separate locked line. |
+| `1.8.x` | Factorio `0.18` / `1.0` | `1.8.0` / `1.8.1` | Compatibility port | `1.8.0` is the `0.18` bridge line; `1.8.1` is the true `1.0` follow-up if still needed. |
 | `1.7.x` | Factorio `0.17` | `1.7.0` | Reduced native-infinite | First old-line native-infinite target. |
 | `1.6.x` | Factorio `0.16` | `1.6.0` | Old-science native-infinite | Requires old science-pack mapping. |
 | `1.5.x` | Factorio `0.15` | `1.5.0` | Minimal native-infinite | Earliest plausible native-infinite floor. |
@@ -75,7 +75,7 @@ Use these branch roles during the transition:
 | `legacy` | Stable Factorio `2.0` branch. It receives `1.9.0` through `1.9.2` during the transition and `2.x.x` after the 3.0 architecture port. | `2.x.x` starting at `2.3.0` |
 | `tmp/2.0` | Working Factorio `2.0` port branch or worktree. | `2.x.x` starting at `2.3.0` |
 | `tmp/1.1` | Working Factorio `1.1` port branch or worktree. | `1.9.x` starting at `1.9.3` |
-| `tmp/1.0` | Working Factorio `1.0` port branch or worktree. | `1.8.x` |
+| `tmp/1.0` | Working Factorio `0.18` bridge and `1.0` port branch or worktree. | `1.8.x` |
 | `tmp/0.17` | Working Factorio `0.17` port branch or worktree. | `1.7.x` |
 | `tmp/0.16` | Working Factorio `0.16` port branch or worktree. | `1.6.x` |
 | `tmp/0.15` | Working Factorio `0.15` port branch or worktree. | `1.5.x` |
@@ -398,15 +398,26 @@ Required proof:
 `1.1` is the first hard reduction ring. Do not expect it to behave like the
 Factorio `2.0` port.
 
-### `tmp/1.0` To `1.8.0`
+### `tmp/1.0` To `1.8.0` / `1.8.1`
 
-Resolve the Factorio `0.18` bridge before implementation:
+Ring 3 follows the same synthesis pattern as `1.9.3`: start from the `3.0.0`
+source anchor plus portable `2.3.0` and `1.9.3` lessons, then remove or adapt
+only the surfaces the target binary cannot support.
+
+The public version split is:
+
+- `1.8.0` for the Factorio `0.18` bridge package;
+- `1.8.1` for a true Factorio `1.0` package if the bridge proof still shows a
+  separate `1.0` upload is needed.
+
+Resolve the Factorio `0.18` bridge before the `1.0` package is implemented:
 
 1. Build a tiny `0.18` proof artifact.
 2. Test it in `0.18`.
 3. Test the same artifact in `1.0`.
-4. Decide whether `1.8.0` should be a true `1.0` package or a `0.18` bridge
-   package.
+4. Ship or reject `1.8.0` as the bridge package based on binary proof.
+5. Implement `1.8.1` for Factorio `1.0` only if the bridge package is not the
+   right public release shape for `1.0` users.
 
 ### `tmp/0.17`, `tmp/0.16`, And `tmp/0.15`
 

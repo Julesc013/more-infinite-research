@@ -12,7 +12,9 @@ superseded_by: ["../../releases/README.md"]
 # More Infinite Research 1.9.3 Release Notes
 
 `1.9.3` is the Factorio `1.1` compatibility port of the MIR 3 compatibility
-compiler architecture.
+compiler architecture. It is built from the `3.0.0` source anchor plus the
+portable branch-policy, validation, package-hygiene, and documentation lessons
+proven during the `2.3.0` Factorio `2.0` port.
 
 It is not a feature-parity backport of the Factorio `2.0` or `2.1` releases.
 It keeps the architecture where Factorio `1.1` can support it and removes
@@ -77,8 +79,8 @@ used as technology tile overlays.
 
 - Release candidate package:
   `dist/more-infinite-research_1.9.3.zip`, SHA-256
-  `ED63DE563A56D9736C9B48B91A1946A33B6172BF2826742A9CEB000A6BBCC36E`,
-  `298203` bytes, `121` entries, `0` forbidden release entries.
+  `1723C10FEDD9A12003052991CC7574F1F6BF4E4ABC506F0323571DF680C0444B`,
+  `298759` bytes, `121` entries, `0` forbidden release entries.
 - Static validation passed for the `1.9.3` metadata and package shape.
 - Factorio `1.1` binary validation passed with `D:\Programs\Factorio\1.1\bin\x64\factorio.exe`.
 - The runtime gate loaded the packaged zip and ran the reduced `1.1` scenarios:
