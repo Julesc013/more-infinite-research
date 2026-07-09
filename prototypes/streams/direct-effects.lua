@@ -1,64 +1,4 @@
 return {
-  research_spoilage_preservation = {
-    ui_visibility = {
-      mode = "always",
-      reason = "official-stream-settings-visible"
-    },
-    generation_requirements = {
-      require_any_item = {"spoilage", "agricultural-science-pack"}
-    },
-    required_mods = {"space-age"},
-    required_items = {"spoilage", "agricultural-science-pack"},
-    icon_item = "spoilage",
-    overlay = "speed",
-    localised_description = {"technology-description.more-infinite-research.spoilage_preservation"},
-    science_packs = {
-      "automation-science-pack",
-      "logistic-science-pack",
-      "chemical-science-pack",
-      "production-science-pack",
-      "space-science-pack",
-      "agricultural-science-pack",
-      "cryogenic-science-pack"
-    },
-    direct_effects = {
-      {
-        type = "nothing",
-        effect_description = {"modifier-description.more-infinite-research.spoilage_preservation"}
-      }
-    }
-  },
-
-  research_agricultural_growth_speed = {
-    ui_visibility = {
-      mode = "always",
-      reason = "official-stream-settings-visible"
-    },
-    generation_requirements = {
-      require_any_item = {"agricultural-science-pack"}
-    },
-    required_mods = {"space-age"},
-    required_items = {"agricultural-science-pack"},
-    icon_tech = "agriculture",
-    overlay = "speed",
-    localised_description = {"technology-description.more-infinite-research.agricultural_growth_speed"},
-    science_packs = {
-      "automation-science-pack",
-      "logistic-science-pack",
-      "chemical-science-pack",
-      "production-science-pack",
-      "agricultural-science-pack",
-      "electromagnetic-science-pack",
-      "cryogenic-science-pack"
-    },
-    direct_effects = {
-      {
-        type = "nothing",
-        effect_description = {"modifier-description.more-infinite-research.agricultural_growth_speed"}
-      }
-    }
-  },
-
   research_inventory_capacity = {
     icon_tech = "toolbelt",
     science_packs = {
@@ -106,52 +46,6 @@ return {
     },
     direct_effects = {
       { type = "laboratory-productivity", modifier = 0.10 }
-    }
-  },
-
-  research_cargo_bay_unloading_distance = {
-    -- Cargo logistics modifiers are Space Age behavior even if another mod
-    -- exposes similarly named cargo prototypes in a base-only run.
-    ui_visibility = {
-      mode = "always",
-      reason = "official-stream-settings-visible"
-    },
-    generation_requirements = {
-      require_any_item = {"landing-pad-unloading-bay"},
-      require_any_technology = {"landing-pad-unloading-bay"}
-    },
-    required_mods = {"space-age"},
-    required_items = {"landing-pad-unloading-bay"},
-    required_technologies = {"landing-pad-unloading-bay"},
-    icon_tech = "landing-pad-unloading-bay",
-    overlay = "range",
-    localised_description = {"technology-description.more-infinite-research.cargo_bay_unloading_distance"},
-    science_packs = "all-official",
-    direct_effects = {
-      { type = "max-cargo-bay-unloading-distance", modifier = 10 }
-    }
-  },
-
-  research_cargo_landing_pad_count = {
-    -- The setting remains visible across base and Space Age; generation is
-    -- still Space Age-only through required_mods and prototype checks.
-    ui_visibility = {
-      mode = "always",
-      reason = "official-stream-settings-visible"
-    },
-    generation_requirements = {
-      require_any_item = {"cargo-landing-pad"},
-      require_any_technology = {"rocket-silo"}
-    },
-    required_mods = {"space-age"},
-    required_items = {"cargo-landing-pad"},
-    required_technologies = {"rocket-silo"},
-    icon_tech = "space-platform",
-    overlay = "count",
-    localised_description = {"technology-description.more-infinite-research.cargo_landing_pad_count"},
-    science_packs = "all-official",
-    direct_effects = {
-      { type = "cargo-landing-pad-count", modifier = 1 }
     }
   },
 

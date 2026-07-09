@@ -1,4 +1,29 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.9.3
+Date: 2026-07-10
+
+  Compatibility:
+
+    - Ported the MIR 3 compatibility compiler architecture to Factorio 1.1 as a reduced compatibility port.
+    - Retargeted package metadata to Factorio 1.1 with a base-only dependency floor.
+    - Removed Factorio 2.x DLC dependency surfaces from the 1.1 package target.
+    - Removed Space Age, Quality, Recycler, Elevated Rails, cargo logistics, spoilage, and agriculture streams.
+    - Removed recipe-productivity streams from the 1.1 target until Factorio 1.1 support is proven.
+    - Kept only target-supported direct-effect and base-extension research candidates for the first 1.1 release line.
+    - Added a target-line adapter for unsupported streams, direct effects, prototype caps, repairs, and runtime handlers.
+    - Disabled unsupported 2.x behavior before it can emit 1.1-invalid prototypes.
+    - Replaced direct runtime persistence access with a state adapter that uses global on Factorio 1.1 and storage on Factorio 2.x.
+
+  Changes:
+
+    - Removed unsupported 2.x startup settings from the 1.1 settings catalog and settings profile surface.
+    - Hid settings-profile import and export on Factorio 1.1 because the target API lacks the MIRSET1 string codec.
+    - Retargeted branch-local support mod metadata to Factorio 1.1.
+    - Made release tooling target-aware for 1.1 metadata, dependency floors, and cargo modifiers.
+    - Updated settings visibility checks for the reduced 1.1 settings surface.
+    - Documented the release as a compatibility port, not a feature-parity backport of the Factorio 2.x releases.
+
+---------------------------------------------------------------------------------------------------
 Version: 3.0.0
 Date: 2026-07-08
 

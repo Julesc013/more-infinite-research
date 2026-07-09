@@ -75,6 +75,7 @@ modules:
     - prototypes/mir/platform/factorio/data_raw.lua
     - prototypes/mir/platform/factorio/mods.lua
     - prototypes/mir/platform/factorio/prototype_lookup.lua
+    - prototypes/mir/platform/factorio/target_line.lua
   settings:
     - prototypes/mir/settings/registry.lua
     - prototypes/mir/settings/catalog.lua
@@ -164,6 +165,7 @@ modules:
     - prototypes/mir/runtime/settings_resolver.lua
     - prototypes/mir/runtime/settings_profile.lua
     - prototypes/mir/runtime/productivity_family_adoption.lua
+    - prototypes/mir/runtime/state.lua
     - prototypes/mir/runtime/effects/agricultural_growth_speed.lua
     - prototypes/mir/runtime/effects/spoilage_preservation.lua
 

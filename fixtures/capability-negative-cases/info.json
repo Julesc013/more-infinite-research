@@ -3,6 +3,8 @@
   "version": "0.1.0",
   "title": "MIR Fixture - Capability Negative Cases",
   "author": "MIR Tests",
-  "factorio_version": "2.1",
-  "dependencies": ["base >= 2.1"]
+  "factorio_version": "1.1",
+  "dependencies": [
+    "base >= 1.1"
+  ]
 }

@@ -1,6 +1,3 @@
-local settings_catalog = require("__more-infinite-research__.prototypes.mir.settings.catalog")
-local profile_codec = require("__more-infinite-research__.prototypes.mir.settings.profile_codec")
-
 local function fail(message)
   error("MIR settings profile round-trip validation failed: " .. message)
 end
@@ -23,6 +20,70 @@ local function assert_nil(label, value)
   end
 end
 
+local function startup_setting(name)
+  return settings and settings.startup and settings.startup[name] or nil
+end
+
+local factorio_11 = startup_setting("mir-prototype-speed-cap") == nil
+
+if factorio_11 then
+  local function assert_startup_setting(name)
+    if not startup_setting(name) then
+      fail("Factorio 1.1 setting surface is missing " .. name .. ".")
+    end
+  end
+
+  local function assert_no_startup_setting(name)
+    if startup_setting(name) then
+      fail("Factorio 1.1 setting surface unexpectedly includes " .. name .. ".")
+    end
+  end
+
+  for _, name in ipairs({
+    "ips-enable-research_character_reach",
+    "ips-cost-base-research_character_reach",
+    "mir-lab-incompatibility-policy",
+    "mir-adjust-vanilla-weapon-speed-techs",
+    "mir-enable-research-speed"
+  }) do
+    assert_startup_setting(name)
+  end
+
+  for _, name in ipairs({
+    "ips-enable-research_gears",
+    "ips-enable-research_air_scrubbing_clean_filter",
+    "mir-pipeline-extent-multiplier",
+    "mir-prototype-productivity-cap",
+    "mir-prototype-efficiency-cap",
+    "mir-prototype-pollution-cap",
+    "mir-prototype-speed-cap",
+    "mir-prototype-quality-cap",
+    "mir-prototype-positive-power-floor",
+    "mir-settings-profile-import",
+    "mir-use-installed-space-age-icons"
+  }) do
+    assert_no_startup_setting(name)
+  end
+
+  local json = [[{"codec":"canonical-json-deflate-base64","format":1,"kind":"mir-settings-profile","schema":1,"settings":{"ips-cost-base-research_character_reach":12345,"ips-enable-research_character_reach":false,"mir-adjust-vanilla-weapon-speed-techs":"always","mir-lab-incompatibility-policy":"skip"}}]]
+  local encoded_a = "MIRSET1-unavailable-on-factorio-1.1:" .. json
+  local encoded_b = "MIRSET1-unavailable-on-factorio-1.1:" .. json
+  assert_equal("deterministic local profile payload", encoded_b, encoded_a)
+  return
+end
+
+local settings_catalog = require("__more-infinite-research__.prototypes.mir.settings.catalog")
+local profile_codec = require("__more-infinite-research__.prototypes.mir.settings.profile_codec")
+
+local valid_settings = {
+  ["ips-enable-research_air_scrubbing_clean_filter"] = false,
+  ["ips-cost-base-research_tungsten"] = 12345,
+  ["mir-pipeline-extent-multiplier"] = "500",
+  ["mir-prototype-efficiency-cap"] = "saving-9999",
+  ["mir-prototype-pollution-cap"] = "saving-9999",
+  ["mir-prototype-positive-power-floor"] = true
+}
+
 local valid_profile = {
   schema = profile_codec.schema,
   kind = profile_codec.kind,
@@ -30,14 +91,7 @@ local valid_profile = {
   metadata = {
     fixture = "settings-profile-roundtrip"
   },
-  settings = {
-    ["ips-enable-research_air_scrubbing_clean_filter"] = false,
-    ["ips-cost-base-research_tungsten"] = 12345,
-    ["mir-pipeline-extent-multiplier"] = "500",
-    ["mir-prototype-efficiency-cap"] = "saving-9999",
-    ["mir-prototype-pollution-cap"] = "saving-9999",
-    ["mir-prototype-positive-power-floor"] = true
-  }
+  settings = valid_settings
 }
 
 local encoded_a, err_a = profile_codec.encode(valid_profile)
@@ -48,9 +102,9 @@ assert_equal("deterministic encoded profile", encoded_b, encoded_a)
 
 local decoded, decode_err = profile_codec.decode(encoded_a)
 if not decoded then fail("encoded profile did not decode: " .. tostring(decode_err)) end
-assert_equal("decoded efficiency cap", decoded.settings["mir-prototype-efficiency-cap"], "saving-9999")
-assert_equal("decoded pollution cap", decoded.settings["mir-prototype-pollution-cap"], "saving-9999")
-assert_equal("decoded hidden provider setting", decoded.settings["ips-enable-research_air_scrubbing_clean_filter"], false)
+for name, expected in pairs(valid_settings) do
+  assert_equal("decoded setting " .. name, decoded.settings[name], expected)
+end
 
 local recognized, unknown, invalid = profile_codec.count_recognized_settings(decoded)
 assert_equal("recognized valid profile settings", recognized, 6)
