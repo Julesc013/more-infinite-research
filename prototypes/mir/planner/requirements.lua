@@ -28,6 +28,19 @@ function M.missing_reason(key, spec)
     end
   end
 
+  for _, candidates in ipairs(spec.required_technology_candidates or {}) do
+    local found = false
+    for _, tech_name in ipairs(candidates or {}) do
+      if lookup.technology_exists(tech_name) then
+        found = true
+        break
+      end
+    end
+    if not found then
+      return "missing required technology candidate " .. table.concat(candidates or {}, ",")
+    end
+  end
+
   local skip_reason = technology_requirements.skip_reason(spec)
   if skip_reason then return skip_reason end
 

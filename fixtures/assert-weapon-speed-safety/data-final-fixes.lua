@@ -39,20 +39,27 @@ if has_gun_speed(generated, "cannon-shell") or has_gun_speed(generated, "rocket"
 end
 
 local expected_prerequisites = {
-  ["recipe-prod-research_rocket_shooting_speed-1"] = {"rocketry"},
-  ["recipe-prod-research_cannon_shooting_speed-1"] = {"tanks", "weapon-shooting-speed-5"},
-  ["recipe-prod-research_flamethrower_shooting_speed-1"] = {"flamethrower"},
-  ["recipe-prod-research_electric_shooting_speed-1"] = {"discharge-defense-equipment"}
+  ["recipe-prod-research_rocket_shooting_speed-1"] = {{"rocketry"}},
+  ["recipe-prod-research_cannon_shooting_speed-1"] = {{"tank", "tanks"}, {"weapon-shooting-speed-5"}},
+  ["recipe-prod-research_flamethrower_shooting_speed-1"] = {{"flamethrower"}},
+  ["recipe-prod-research_electric_shooting_speed-1"] = {{"discharge-defense-equipment"}}
 }
 
-for tech_name, prerequisites in pairs(expected_prerequisites) do
+for tech_name, prerequisite_groups in pairs(expected_prerequisites) do
   local tech = techs[tech_name]
   if not tech then
     error("MIR validation failed: expected shooting-speed technology was not generated: " .. tech_name)
   end
-  for _, prerequisite in ipairs(prerequisites) do
-    if not has_prerequisite(tech, prerequisite) then
-      error("MIR validation failed: " .. tech_name .. " is missing prerequisite " .. prerequisite .. ".")
+  for _, candidates in ipairs(prerequisite_groups) do
+    local found = false
+    for _, prerequisite in ipairs(candidates) do
+      if has_prerequisite(tech, prerequisite) then
+        found = true
+        break
+      end
+    end
+    if not found then
+      error("MIR validation failed: " .. tech_name .. " is missing prerequisite candidate " .. table.concat(candidates, ",") .. ".")
     end
   end
 end

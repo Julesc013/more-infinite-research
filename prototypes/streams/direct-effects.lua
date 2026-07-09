@@ -69,7 +69,8 @@ return {
       {technology = "physical-projectile-damage-2"},
       {item = "cannon-shell"}
     },
-    required_technologies = {"tanks", "weapon-shooting-speed-5"},
+    required_technologies = {"weapon-shooting-speed-5"},
+    required_technology_candidates = {{"tank", "tanks"}},
     science_packs = {
       "automation-science-pack","logistic-science-pack","chemical-science-pack",
       "production-science-pack","military-science-pack"
