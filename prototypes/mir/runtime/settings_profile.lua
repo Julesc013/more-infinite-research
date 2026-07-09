@@ -29,6 +29,31 @@ local function sanitized_export_name(parameter)
   return name
 end
 
+local function export_options(parameter)
+  local text = tostring(parameter or "")
+  text = string.gsub(text, "^%s+", "")
+  text = string.gsub(text, "%s+$", "")
+
+  local compact = false
+  if text == "--compact" or text == "compact" then
+    compact = true
+    text = ""
+  elseif string.sub(text, 1, 10) == "--compact " then
+    compact = true
+    text = string.sub(text, 11)
+  elseif string.sub(text, 1, 8) == "compact " then
+    compact = true
+    text = string.sub(text, 9)
+  end
+
+  text = string.gsub(text, "^%s+", "")
+  text = string.gsub(text, "%s+$", "")
+  return {
+    compact = compact,
+    name = text
+  }
+end
+
 local function write_export_file(filename, data, player_index)
   if helpers and helpers.write_file then
     helpers.write_file(filename, data, false, player_index)
@@ -54,9 +79,11 @@ local function export_metadata(command)
 end
 
 local function export_profile(command)
+  local options = export_options(command.parameter)
   local profile = profile_codec.current_profile({
     value_resolver = effective_settings.get,
-    metadata = export_metadata(command)
+    metadata = export_metadata(command),
+    compact = options.compact
   })
   local encoded, err = profile_codec.encode(profile)
   if not encoded then
@@ -64,14 +91,15 @@ local function export_profile(command)
     return
   end
 
-  local filename = "more-infinite-research/settings/" .. sanitized_export_name(command.parameter)
+  local filename = "more-infinite-research/settings/" .. sanitized_export_name(options.name)
   if not write_export_file(filename, encoded .. "\n", command.player_index) then
     reply(command, "MIR settings export failed: file export API is not available.")
     return
   end
 
   reply(command, "MIR settings profile exported to script-output/" .. filename
-    .. " (" .. tostring(profile_codec.count_settings(profile)) .. " settings).")
+    .. " (" .. tostring(profile_codec.count_settings(profile)) .. " settings, "
+    .. (options.compact and "compact" or "full") .. ").")
 end
 
 local function validate_profile(command)
@@ -82,10 +110,12 @@ local function validate_profile(command)
     return
   end
 
-  local recognized, unknown = profile_codec.count_recognized_settings(profile)
+  local recognized, unknown, invalid = profile_codec.count_recognized_settings(profile)
   reply(command, "Valid MIR settings profile: "
     .. tostring(recognized)
     .. " recognized settings, "
+    .. tostring(invalid)
+    .. " invalid values, "
     .. tostring(unknown)
     .. " ignored or unavailable settings. Paste it into startup setting "
     .. profile_codec.import_setting_name
@@ -95,7 +125,7 @@ end
 function M.register()
   commands.add_command(
     "mir-settings-export",
-    "Export the current effective MIR startup settings to script-output/more-infinite-research/settings/<name>.txt.",
+    "Export the current effective MIR startup settings to script-output/more-infinite-research/settings/<name>.txt. Use --compact to omit defaults.",
     export_profile
   )
 
@@ -106,9 +136,11 @@ function M.register()
   )
 
   remote.add_interface("more-infinite-research-settings", {
-    export_string = function()
+    export_string = function(options)
+      if type(options) ~= "table" then options = {} end
       local profile = profile_codec.current_profile({
         value_resolver = effective_settings.get,
+        compact = options.compact == true,
         metadata = {
           mir_version = script.active_mods["more-infinite-research"],
           factorio_version = helpers and helpers.game_version or nil,
@@ -128,10 +160,11 @@ function M.register()
         }
       end
 
-      local recognized, unknown = profile_codec.count_recognized_settings(profile)
+      local recognized, unknown, invalid = profile_codec.count_recognized_settings(profile)
       return {
         valid = true,
         recognized = recognized,
+        invalid = invalid,
         unknown = unknown,
         import_setting = profile_codec.import_setting_name
       }

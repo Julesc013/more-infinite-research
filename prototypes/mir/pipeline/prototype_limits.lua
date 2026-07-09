@@ -16,6 +16,7 @@ local effect_receiver_types = {
 
 local engine_defaults = {
   consumption_limits = { low = -0.8, high = 1000 },
+  pollution_limits = { low = -0.8, high = 1000 },
   speed_limits = { low = -0.8, high = 1000 },
   quality_limits = { low = 0, high = 1000 }
 }
@@ -79,23 +80,74 @@ local function apply_effect_receiver_limit(field, side, value)
   return changed
 end
 
+local function energy_watts(value)
+  if type(value) == "number" then return value end
+  if type(value) ~= "string" then return nil end
+
+  local number, unit = string.match(value, "^%s*([%+%-]?%d+%.?%d*)%s*([kKmMgGtT]?)[wW]%s*$")
+  if not number then return nil end
+
+  local multiplier_by_unit = {
+    [""] = 1,
+    k = 1000,
+    m = 1000000,
+    g = 1000000000,
+    t = 1000000000000
+  }
+  local multiplier = multiplier_by_unit[string.lower(unit or "")]
+  if not multiplier then return nil end
+
+  return tonumber(number) * multiplier
+end
+
+local function apply_positive_power_floor()
+  if effective_settings.get(prototype_limit_settings.positive_power_floor_setting_name) ~= true then
+    return 0
+  end
+
+  local changed = 0
+  for _, group in pairs(data_raw.raw()) do
+    if type(group) == "table" then
+      for _, prototype in pairs(group) do
+        if type(prototype) == "table" and prototype.energy_usage ~= nil and energy_watts(prototype.energy_usage) == 0 then
+          prototype.energy_usage = "1W"
+          changed = changed + 1
+        end
+      end
+    end
+  end
+  return changed
+end
+
 function P.apply()
   local changed = {
     productivity = apply_recipe_productivity_cap(selected("productivity")),
     efficiency = apply_effect_receiver_limit("consumption_limits", "low", selected("efficiency")),
+    pollution = apply_effect_receiver_limit("pollution_limits", "low", selected("pollution")),
     speed = apply_effect_receiver_limit("speed_limits", "high", selected("speed")),
-    quality = apply_effect_receiver_limit("quality_limits", "high", selected("quality"))
+    quality = apply_effect_receiver_limit("quality_limits", "high", selected("quality")),
+    positive_power_floor = apply_positive_power_floor()
   }
 
-  if changed.productivity > 0 or changed.efficiency > 0 or changed.speed > 0 or changed.quality > 0 then
+  if changed.productivity > 0
+    or changed.efficiency > 0
+    or changed.pollution > 0
+    or changed.speed > 0
+    or changed.quality > 0
+    or changed.positive_power_floor > 0
+  then
     log("[more-infinite-research] Applied prototype limits: productivity_recipes="
       .. tostring(changed.productivity)
       .. " efficiency_receivers="
       .. tostring(changed.efficiency)
+      .. " pollution_receivers="
+      .. tostring(changed.pollution)
       .. " speed_receivers="
       .. tostring(changed.speed)
       .. " quality_receivers="
       .. tostring(changed.quality)
+      .. " positive_power_floor_entities="
+      .. tostring(changed.positive_power_floor)
       .. ".")
   end
 

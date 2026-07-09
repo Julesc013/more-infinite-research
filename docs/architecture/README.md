@@ -41,8 +41,11 @@ settings-stage, prototype-stage, and runtime-stage separation behind the MIR 3
 settings and control-file rules.
 
 Prototype limit settings are startup-only data-stage controls. The unchanged
-dropdown entries, such as `300% (unchanged)`, leave Factorio's recipe
-productivity and effect receiver limits untouched. Non-default values run after
+dropdown entries, such as `+300% (unchanged)`, `-80% (unchanged)`, and
+`+100000% (unchanged)`, leave Factorio's recipe productivity and effect
+receiver limits untouched. Non-default energy and pollution settings write
+separate `EffectReceiver` lower limits, and the default-off non-zero power floor
+only changes explicit `0W` active-use prototypes to `1W`. These passes run after
 exact compatibility repairs and before MIR planning, so generated technology
 diagnostics can observe the selected caps without adding runtime processing.
 

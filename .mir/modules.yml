@@ -77,6 +77,7 @@ modules:
     - prototypes/mir/platform/factorio/prototype_lookup.lua
   settings:
     - prototypes/mir/settings/registry.lua
+    - prototypes/mir/settings/catalog.lua
     - prototypes/mir/settings/defaults.lua
     - prototypes/mir/settings/stage_builder.lua
     - prototypes/mir/settings/stage_adapter.lua

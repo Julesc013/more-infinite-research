@@ -86,6 +86,7 @@ function Assert-NoPatternInTree {
 
 $settingsManifestText = Read-MIRText -RelativePath ".mir/settings.yml"
 $stageBuilderText = Read-MIRText -RelativePath "prototypes/mir/settings/stage_builder.lua"
+$catalogText = Read-MIRText -RelativePath "prototypes/mir/settings/catalog.lua"
 $settingOrderText = Read-MIRText -RelativePath "prototypes/mir/settings/order.lua"
 $prototypeLimitSettingsText = Read-MIRText -RelativePath "prototypes/mir/settings/prototype_limits.lua"
 $registryText = Read-MIRText -RelativePath "prototypes/mir/settings/registry.lua"
@@ -107,7 +108,7 @@ $streamKeys = @(
   Get-RegexValues -Text $productivityText -Pattern '(?m)^\s*(research_[A-Za-z0-9_]+)\s*='
   Get-RegexValues -Text $directEffectsText -Pattern '(?m)^\s*(research_[A-Za-z0-9_]+)\s*='
 ) | Sort-Object -Unique
-$baseExtensionKeys = Get-RegexValues -Text $stageBuilderText -Pattern '\{\s*key\s*=\s*"([^"]+)"' | Sort-Object -Unique
+$baseExtensionKeys = Get-RegexValues -Text $catalogText -Pattern '\{\s*key\s*=\s*"([^"]+)"' | Sort-Object -Unique
 
 if ($streamKeys.Count -lt 60) {
   throw "Expected to discover at least 60 generated stream settings, found $($streamKeys.Count)."
@@ -127,9 +128,14 @@ Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -N
 Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -Needle "runtime_export_writes_script_output_only: true"
 Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -Needle "official_and_mir_owned_technology_settings_stay_visible: true"
 Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -Needle "technology_settings_use_three_attention_buckets: true"
+Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -Needle "canonical_settings_catalog_required: true"
+Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -Needle "profile_import_validates_catalog_constraints: true"
+Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -Needle "settings_profiles_support_compact_export: true"
+Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -Needle "settings_profile_encoding_is_deterministic: true"
 Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -Needle "prototype_limit_settings_default_to_engine_default: true"
 Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -Needle "prototype_limit_settings_are_startup_only_explicit_overrides: true"
-Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -Needle "efficiency_cap_is_supported_power_floor_control: true"
+Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -Needle "energy_and_pollution_caps_are_separate: true"
+Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -Needle "positive_power_floor_is_default_off_opt_in: true"
 Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -Needle "global_settings_use_visible_section_prefixes: true"
 Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -Needle "rich_text_section_prefixes_are_optional_enhancement: true"
 Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -Needle "fake_divider_settings_are_disallowed: true"
@@ -139,8 +145,16 @@ Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -N
 Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -Needle "base_extensions:"
 Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -Needle "import_setting: mir-settings-profile-import"
 Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -Needle "string_prefix: MIRSET1"
+Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -Needle "compact_export_command: /mir-settings-export --compact"
+Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -Needle "validation_source: prototypes/mir/settings/catalog.lua"
 
 Assert-Contains -RelativePath "prototypes/mir/settings/registry.lua" -Text $registryText -Needle "setting_ids_are_stable = true"
+Assert-Contains -RelativePath "prototypes/mir/settings/catalog.lua" -Text $catalogText -Needle "function M.global_setting_prototypes()"
+Assert-Contains -RelativePath "prototypes/mir/settings/catalog.lua" -Text $catalogText -Needle "function M.validate_value(name, value)"
+Assert-Contains -RelativePath "prototypes/mir/settings/prototype_limits.lua" -Text $prototypeLimitSettingsText -Needle 'name = "mir-prototype-pollution-cap"'
+Assert-Contains -RelativePath "prototypes/mir/settings/catalog.lua" -Text $catalogText -Needle 'name = prototype_limit_settings.positive_power_floor_setting_name'
+Assert-Contains -RelativePath "prototypes/mir/settings/catalog.lua" -Text $catalogText -Needle "function M.stream_setting_specs(key, stream)"
+Assert-Contains -RelativePath "prototypes/mir/settings/catalog.lua" -Text $catalogText -Needle "function M.base_extension_setting_specs(key)"
 Assert-Contains -RelativePath "prototypes/mir/settings/registry.lua" -Text $registryText -Needle 'enable = "ips-enable-%s"'
 Assert-Contains -RelativePath "prototypes/mir/settings/registry.lua" -Text $registryText -Needle 'key = "mir-settings-profile-import"'
 Assert-Contains -RelativePath "prototypes/mir/settings/visibility.lua" -Text $visibilityText -Needle "function M.evaluate(spec, ctx)"
@@ -150,18 +164,23 @@ Assert-Contains -RelativePath "prototypes/mir/settings/visibility.lua" -Text $vi
 Assert-Contains -RelativePath "prototypes/mir/settings/builder.lua" -Text $builderText -Needle "setting.hidden = true"
 Assert-Contains -RelativePath "prototypes/mir/settings/stage_adapter.lua" -Text $adapterText -Needle "factorio_mods.snapshot()"
 Assert-Contains -RelativePath "prototypes/mir/settings/profile_codec.lua" -Text $profileCodecText -Needle 'M.prefix = "MIRSET1:"'
-Assert-Contains -RelativePath "prototypes/mir/settings/profile_codec.lua" -Text $profileCodecText -Needle 'M.import_setting_name = "mir-settings-profile-import"'
+Assert-Contains -RelativePath "prototypes/mir/settings/profile_codec.lua" -Text $profileCodecText -Needle 'M.import_setting_name = settings_catalog.import_setting_name'
+Assert-Contains -RelativePath "prototypes/mir/settings/profile_codec.lua" -Text $profileCodecText -Needle 'M.codec = "canonical-json-deflate-base64"'
+Assert-Contains -RelativePath "prototypes/mir/settings/profile_codec.lua" -Text $profileCodecText -Needle "local function sorted_keys(value)"
 Assert-Contains -RelativePath "prototypes/mir/settings/profile_codec.lua" -Text $profileCodecText -Needle "function M.current_profile(options)"
 Assert-Contains -RelativePath "prototypes/mir/settings/effective.lua" -Text $effectiveSettingsText -Needle "function M.get(name)"
-Assert-Contains -RelativePath "prototypes/mir/settings/effective.lua" -Text $effectiveSettingsText -Needle "type_matches(imported, raw_setting(name))"
+Assert-Contains -RelativePath "prototypes/mir/settings/effective.lua" -Text $effectiveSettingsText -Needle "settings_catalog.validate_value(name, imported)"
 Assert-Contains -RelativePath "prototypes/mir/runtime/settings_profile.lua" -Text $runtimeSettingsProfileText -Needle '"mir-settings-export"'
 Assert-Contains -RelativePath "prototypes/mir/runtime/settings_profile.lua" -Text $runtimeSettingsProfileText -Needle '"mir-settings-import-check"'
+Assert-Contains -RelativePath "prototypes/mir/runtime/settings_profile.lua" -Text $runtimeSettingsProfileText -Needle 'Use --compact to omit defaults.'
 Assert-Contains -RelativePath "prototypes/mir/runtime/settings_profile.lua" -Text $runtimeSettingsProfileText -Needle 'script-output/" .. filename'
 Assert-Contains -RelativePath "prototypes/mir/runtime/settings_profile.lua" -Text $runtimeSettingsProfileText -Needle 'remote.add_interface("more-infinite-research-settings"'
 Assert-Contains -RelativePath "prototypes/mir/settings/stage_builder.lua" -Text $stageBuilderText -Needle 'local settings_adapter = require("prototypes.mir.settings.stage_adapter")'
+Assert-Contains -RelativePath "prototypes/mir/settings/stage_builder.lua" -Text $stageBuilderText -Needle 'local settings_catalog = require("prototypes.mir.settings.catalog")'
 Assert-Contains -RelativePath "prototypes/mir/settings/stage_builder.lua" -Text $stageBuilderText -Needle 'local setting_order = require("prototypes.mir.settings.order")'
-Assert-Contains -RelativePath "prototypes/mir/settings/stage_builder.lua" -Text $stageBuilderText -Needle 'name = "mir-settings-profile-import"'
-Assert-Contains -RelativePath "prototypes/mir/settings/stage_builder.lua" -Text $stageBuilderText -Needle "allow_blank = true"
+Assert-Contains -RelativePath "prototypes/mir/settings/stage_builder.lua" -Text $stageBuilderText -Needle "settings_catalog.global_setting_prototypes()"
+Assert-Contains -RelativePath "prototypes/mir/settings/catalog.lua" -Text $catalogText -Needle 'name = "mir-settings-profile-import"'
+Assert-Contains -RelativePath "prototypes/mir/settings/catalog.lua" -Text $catalogText -Needle "allow_blank = true"
 Assert-Contains -RelativePath "prototypes/mir/settings/stage_builder.lua" -Text $stageBuilderText -Needle "settings_adapter.visibility_for_stream(stream, settings_context)"
 Assert-Contains -RelativePath "prototypes/mir/settings/stage_builder.lua" -Text $stageBuilderText -Needle "settings_adapter.apply(setting, group and group.ui_visibility)"
 Assert-Contains -RelativePath "prototypes/mir/settings/order.lua" -Text $settingOrderText -Needle 'main = "a-0"'
@@ -172,10 +191,10 @@ Assert-Contains -RelativePath "prototypes/mir/settings/order.lua" -Text $setting
 Assert-Contains -RelativePath "prototypes/mir/settings/order.lua" -Text $settingOrderText -Needle 'generated_technologies = "b"'
 Assert-Contains -RelativePath "prototypes/mir/settings/order.lua" -Text $settingOrderText -Needle 'function M.global(section, index)'
 Assert-Contains -RelativePath "prototypes/mir/settings/order.lua" -Text $settingOrderText -Needle 'function M.technology(bucket, name_slug, kind, key)'
-Assert-Contains -RelativePath "prototypes/mir/settings/stage_builder.lua" -Text $stageBuilderText -Needle 'order = setting_order.global("main", 10)'
-Assert-Contains -RelativePath "prototypes/mir/settings/stage_builder.lua" -Text $stageBuilderText -Needle 'order = setting_order.global("compatibility", 10)'
-Assert-Contains -RelativePath "prototypes/mir/settings/stage_builder.lua" -Text $stageBuilderText -Needle 'order = setting_order.global("advanced", 10)'
-Assert-Contains -RelativePath "prototypes/mir/settings/stage_builder.lua" -Text $stageBuilderText -Needle 'order = setting_order.global("diagnostics", 10)'
+Assert-Contains -RelativePath "prototypes/mir/settings/catalog.lua" -Text $catalogText -Needle 'order = setting_order.global("main", 10)'
+Assert-Contains -RelativePath "prototypes/mir/settings/catalog.lua" -Text $catalogText -Needle 'order = setting_order.global("compatibility", 10)'
+Assert-Contains -RelativePath "prototypes/mir/settings/catalog.lua" -Text $catalogText -Needle 'order = setting_order.global("advanced", 10)'
+Assert-Contains -RelativePath "prototypes/mir/settings/catalog.lua" -Text $catalogText -Needle 'order = setting_order.global("diagnostics", 10)'
 Assert-Contains -RelativePath "prototypes/mir/settings/prototype_limits.lua" -Text $prototypeLimitSettingsText -Needle 'order = setting_order.global("prototype_limits", 10)'
 Assert-Contains -RelativePath "prototypes/mir/settings/prototype_limits.lua" -Text $prototypeLimitSettingsText -Needle 'order = setting_order.global("prototype_limits", 40)'
 Assert-Contains -RelativePath "prototypes/mir/settings/stage_builder.lua" -Text $stageBuilderText -Needle 'if not group.enabled then return "000" end'
@@ -224,10 +243,11 @@ foreach ($baseExtensionKey in $baseExtensionKeys) {
 }
 
 Assert-Contains -RelativePath "docs/user/settings.md" -Text $userSettingsDocText -Needle "/mir-settings-export"
+Assert-Contains -RelativePath "docs/user/settings.md" -Text $userSettingsDocText -Needle "/mir-settings-export --compact"
 Assert-Contains -RelativePath "docs/user/settings.md" -Text $userSettingsDocText -Needle "mir-settings-profile-import"
 Assert-Contains -RelativePath "docs/user/settings.md" -Text $userSettingsDocText -Needle "Unknown settings remain"
 Assert-Contains -RelativePath "docs/reference/settings.md" -Text $referenceSettingsDocText -Needle "MIRSET1:<encoded-json>"
-Assert-Contains -RelativePath "docs/reference/settings.md" -Text $referenceSettingsDocText -Needle "Unknown setting IDs and mismatched value types are ignored"
+Assert-Contains -RelativePath "docs/reference/settings.md" -Text $referenceSettingsDocText -Needle "Unknown setting IDs, wrong value types, invalid enum values, and out-of-range"
 Assert-Contains -RelativePath "docs/maintainer/settings-governance.md" -Text $settingsGovernanceDocText -Needle "Portable Profiles"
 Assert-Contains -RelativePath "docs/maintainer/settings-governance.md" -Text $settingsGovernanceDocText -Needle "runtime commands may export or validate profiles"
 

@@ -2,10 +2,12 @@ local S = {}
 local setting_order = require("prototypes.mir.settings.order")
 
 S.engine_default = "engine-default"
+S.positive_power_floor_setting_name = "mir-prototype-positive-power-floor"
 
 S.order = {
   "productivity",
   "efficiency",
+  "pollution",
   "speed",
   "quality"
 }
@@ -15,18 +17,18 @@ S.settings = {
     name = "mir-prototype-productivity-cap",
     default_value = S.engine_default,
     allowed_values = {
-      S.engine_default,
-      "percent-50",
-      "percent-75",
-      "percent-100",
-      "percent-200",
-      "percent-250",
-      "percent-400",
-      "percent-500",
-      "percent-1000",
-      "percent-2500",
+      "percent-100000",
       "percent-10000",
-      "percent-100000"
+      "percent-2500",
+      "percent-1000",
+      "percent-500",
+      "percent-400",
+      S.engine_default,
+      "percent-250",
+      "percent-200",
+      "percent-100",
+      "percent-75",
+      "percent-50"
     },
     values = {
       ["percent-50"] = 0.5,
@@ -48,14 +50,14 @@ S.settings = {
     name = "mir-prototype-efficiency-cap",
     default_value = S.engine_default,
     allowed_values = {
-      S.engine_default,
-      "saving-50",
-      "saving-75",
-      "saving-90",
-      "saving-95",
-      "saving-99",
+      "saving-9999",
       "saving-999",
-      "saving-9999"
+      "saving-99",
+      "saving-95",
+      "saving-90",
+      S.engine_default,
+      "saving-75",
+      "saving-50"
     },
     values = {
       ["saving-50"] = -0.5,
@@ -69,53 +71,47 @@ S.settings = {
     order = setting_order.global("prototype_limits", 20)
   },
 
+  pollution = {
+    name = "mir-prototype-pollution-cap",
+    default_value = S.engine_default,
+    allowed_values = {
+      "saving-9999",
+      "saving-999",
+      "saving-99",
+      "saving-95",
+      "saving-90",
+      S.engine_default,
+      "saving-75",
+      "saving-50"
+    },
+    values = {
+      ["saving-50"] = -0.5,
+      ["saving-75"] = -0.75,
+      ["saving-90"] = -0.9,
+      ["saving-95"] = -0.95,
+      ["saving-99"] = -0.99,
+      ["saving-999"] = -0.999,
+      ["saving-9999"] = -0.9999
+    },
+    order = setting_order.global("prototype_limits", 30)
+  },
+
   speed = {
     name = "mir-prototype-speed-cap",
     default_value = S.engine_default,
     allowed_values = {
       S.engine_default,
-      "bonus-50",
-      "bonus-75",
-      "bonus-100",
-      "bonus-200",
-      "bonus-250",
-      "bonus-400",
-      "bonus-500",
-      "bonus-1000",
       "bonus-10000",
-      "bonus-100000"
-    },
-    values = {
-      ["bonus-50"] = 0.5,
-      ["bonus-75"] = 0.75,
-      ["bonus-100"] = 1.0,
-      ["bonus-200"] = 2.0,
-      ["bonus-250"] = 2.5,
-      ["bonus-400"] = 4.0,
-      ["bonus-500"] = 5.0,
-      ["bonus-1000"] = 10.0,
-      ["bonus-10000"] = 100.0,
-      ["bonus-100000"] = 1000.0
-    },
-    order = setting_order.global("prototype_limits", 30)
-  },
-
-  quality = {
-    name = "mir-prototype-quality-cap",
-    default_value = S.engine_default,
-    allowed_values = {
-      S.engine_default,
-      "bonus-50",
-      "bonus-75",
-      "bonus-100",
-      "bonus-200",
-      "bonus-250",
-      "bonus-400",
-      "bonus-500",
       "bonus-1000",
-      "bonus-10000",
-      "bonus-100000"
+      "bonus-500",
+      "bonus-400",
+      "bonus-250",
+      "bonus-200",
+      "bonus-100",
+      "bonus-75",
+      "bonus-50"
     },
+    accepted_import_values = {"bonus-100000"},
     values = {
       ["bonus-50"] = 0.5,
       ["bonus-75"] = 0.75,
@@ -129,6 +125,37 @@ S.settings = {
       ["bonus-100000"] = 1000.0
     },
     order = setting_order.global("prototype_limits", 40)
+  },
+
+  quality = {
+    name = "mir-prototype-quality-cap",
+    default_value = S.engine_default,
+    allowed_values = {
+      S.engine_default,
+      "bonus-10000",
+      "bonus-1000",
+      "bonus-500",
+      "bonus-400",
+      "bonus-250",
+      "bonus-200",
+      "bonus-100",
+      "bonus-75",
+      "bonus-50"
+    },
+    accepted_import_values = {"bonus-100000"},
+    values = {
+      ["bonus-50"] = 0.5,
+      ["bonus-75"] = 0.75,
+      ["bonus-100"] = 1.0,
+      ["bonus-200"] = 2.0,
+      ["bonus-250"] = 2.5,
+      ["bonus-400"] = 4.0,
+      ["bonus-500"] = 5.0,
+      ["bonus-1000"] = 10.0,
+      ["bonus-10000"] = 100.0,
+      ["bonus-100000"] = 1000.0
+    },
+    order = setting_order.global("prototype_limits", 50)
   }
 }
 

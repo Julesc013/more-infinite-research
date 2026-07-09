@@ -13,9 +13,14 @@ rules:
   technology_settings_sort_by_visibility_then_player_name: true
   official_and_mir_owned_technology_settings_stay_visible: true
   technology_settings_use_three_attention_buckets: true
+  canonical_settings_catalog_required: true
+  profile_import_validates_catalog_constraints: true
+  settings_profiles_support_compact_export: true
+  settings_profile_encoding_is_deterministic: true
   prototype_limit_settings_default_to_engine_default: true
   prototype_limit_settings_are_startup_only_explicit_overrides: true
-  efficiency_cap_is_supported_power_floor_control: true
+  energy_and_pollution_caps_are_separate: true
+  positive_power_floor_is_default_off_opt_in: true
   global_settings_use_visible_section_prefixes: true
   rich_text_section_prefixes_are_optional_enhancement: true
   fake_divider_settings_are_disallowed: true
@@ -27,15 +32,19 @@ profiles:
   import_setting: mir-settings-profile-import
   exported_by_command: /mir-settings-export
   validate_command: /mir-settings-import-check
+  compact_export_command: /mir-settings-export --compact
   file_output: script-output/more-infinite-research/settings/
   applied_stage: data-stage effective setting reads
+  codec: canonical-json-deflate-base64
+  deterministic_encoding: true
   exported_setting_prefixes:
     - ips-
     - mir-
   excluded_setting_ids:
     - mir-settings-profile-import
   unknown_settings: preserved in profile string but ignored on unsupported branches
-  unsupported_value_types: ignored rather than coerced
+  invalid_values: ignored rather than coerced
+  validation_source: prototypes/mir/settings/catalog.lua
 
 ordering:
   global_prefix: a

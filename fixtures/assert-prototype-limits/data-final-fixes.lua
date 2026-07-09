@@ -23,6 +23,13 @@ local expected_by_setting = {
     ["saving-999"] = -0.999,
     ["saving-9999"] = -0.9999
   },
+  ["mir-prototype-pollution-cap"] = {
+    ["saving-90"] = -0.9,
+    ["saving-95"] = -0.95,
+    ["saving-99"] = -0.99,
+    ["saving-999"] = -0.999,
+    ["saving-9999"] = -0.9999
+  },
   ["mir-prototype-speed-cap"] = {
     ["bonus-100"] = 1.0,
     ["bonus-500"] = 5.0,
@@ -47,10 +54,11 @@ end
 
 local expected_productivity = expected_value("mir-prototype-productivity-cap")
 local expected_efficiency = expected_value("mir-prototype-efficiency-cap")
+local expected_pollution = expected_value("mir-prototype-pollution-cap")
 local expected_speed = expected_value("mir-prototype-speed-cap")
 local expected_quality = expected_value("mir-prototype-quality-cap")
 
-if not expected_productivity and not expected_efficiency and not expected_speed and not expected_quality then
+if not expected_productivity and not expected_efficiency and not expected_pollution and not expected_speed and not expected_quality and startup_setting("mir-prototype-positive-power-floor") ~= true then
   return
 end
 
@@ -93,6 +101,14 @@ for _, id in ipairs(effect_receiver_prototypes) do
         receiver.consumption_limits and receiver.consumption_limits.high,
         1000)
     end
+    if expected_pollution then
+      assert_close(id.type .. "." .. id.name .. " pollution_limits.low",
+        receiver.pollution_limits and receiver.pollution_limits.low,
+        expected_pollution)
+      assert_close(id.type .. "." .. id.name .. " pollution_limits.high",
+        receiver.pollution_limits and receiver.pollution_limits.high,
+        1000)
+    end
     if expected_speed then
       assert_close(id.type .. "." .. id.name .. " speed_limits.high",
         receiver.speed_limits and receiver.speed_limits.high,
@@ -109,5 +125,13 @@ for _, id in ipairs(effect_receiver_prototypes) do
         receiver.quality_limits and receiver.quality_limits.low,
         0)
     end
+  end
+end
+
+if startup_setting("mir-prototype-positive-power-floor") == true then
+  local beacon = data.raw.beacon and data.raw.beacon["mir-fixture-zero-watt-beacon"]
+  if not beacon then fail("missing zero-watt beacon fixture prototype.") end
+  if beacon.energy_usage ~= "1W" then
+    fail("zero-watt beacon energy_usage was " .. tostring(beacon.energy_usage) .. ", expected 1W.")
   end
 end

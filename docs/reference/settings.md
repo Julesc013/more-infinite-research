@@ -109,21 +109,32 @@ therefore stays in the first bucket.
 Prototype limit settings are startup-only explicit overrides. Their internal
 default value is `engine-default`, which means no prototype mutation. In the
 settings UI, the unchanged options are labelled as concrete values:
-`300% (unchanged)` for recipe productivity, `80% savings (unchanged)` for
-efficiency, and `+100000% (unchanged)` for speed and quality effect caps.
+`+300% (unchanged)` for recipe productivity, `-80% (unchanged)` for energy and
+pollution reductions, and `+100000% (unchanged)` for speed and quality effect
+caps. Numeric dropdowns are ordered highest to lowest with the unchanged
+default in its numeric position.
 
 | Setting ID | Non-default target |
 | --- | --- |
 | `mir-prototype-productivity-cap` | `RecipePrototype.maximum_productivity` on non-parameter recipes |
 | `mir-prototype-efficiency-cap` | `effect_receiver.consumption_limits.low` on supported machines, labs, drills, and agricultural towers |
+| `mir-prototype-pollution-cap` | `effect_receiver.pollution_limits.low` on supported machines, labs, drills, and agricultural towers |
 | `mir-prototype-speed-cap` | `effect_receiver.speed_limits.high` on supported machines, labs, drills, and agricultural towers |
 | `mir-prototype-quality-cap` | `effect_receiver.quality_limits.high` on supported machines, labs, drills, and agricultural towers |
+| `mir-prototype-positive-power-floor` | explicit `energy_usage = "0W"` prototype fields, changed to `"1W"` only when enabled |
 
-The energy savings cap is the supported 3.0.0 control for modpacks where
-stacked beacon, module, or quality effects can make machine energy use approach
-zero. Selecting `75% savings` or `50% savings` writes a stricter
-`consumption_limits.low` floor on supported effect receivers. MIR does not add
-a separate runtime power-use correction loop.
+Efficiency modules can reduce both energy use and pollution, but MIR exposes
+those floors separately because modpacks may want different behavior for active
+power draw and pollution output. The strongest selectable reduction is
+`-99.99%`; Factorio's effect receiver bounds do not allow a literal `-100%`
+lower limit. MIR does not add a runtime power-use correction loop.
+
+The non-zero power floor is a default-off compatibility workaround. It scans
+prototype tables only when enabled and changes explicit `0W` active
+`energy_usage` fields to `1W`. This is intentionally separate from
+`consumption_limits.low`: effect limits control module/beacon/surface effects,
+while the power floor preserves machines that should draw a tiny non-zero
+amount and suppresses unwanted zero-power warning icons.
 
 The prototype limit pass runs in `data-final-fixes` after exact compatibility
 repairs and before MIR planning. That keeps upstream schema normalization first,
@@ -165,6 +176,10 @@ where the previous value must not apply.
 
 ## Portable Profile Format
 
+The canonical settings catalog lives in `prototypes/mir/settings/catalog.lua`.
+Registration, profile export, import validation, and tests use that catalog for
+setting IDs, defaults, allowed values, and numeric bounds.
+
 The profile codec lives in `prototypes/mir/settings/profile_codec.lua`.
 Profiles are encoded as:
 
@@ -178,6 +193,8 @@ The decoded payload has schema `1`:
 {
   "schema": 1,
   "kind": "mir-settings-profile",
+  "format": 1,
+  "codec": "canonical-json-deflate-base64",
   "mod": "more-infinite-research",
   "metadata": {
     "mir_version": "3.0.0",
@@ -191,9 +208,15 @@ The decoded payload has schema `1`:
 }
 ```
 
-Only setting names beginning with `ips-` or `mir-` are exported, and
-`mir-settings-profile-import` is explicitly excluded. The codec accepts either
-the `MIRSET1:` encoded form or raw JSON for maintainer debugging.
+Only cataloged setting names beginning with `ips-` or `mir-` are exported, and
+`mir-settings-profile-import` is explicitly excluded. Full export is the safe
+default. `/mir-settings-export --compact [name]` omits settings that still
+equal the catalog default. The codec accepts either the `MIRSET1:` encoded form
+or raw JSON for maintainer debugging.
+
+The encoded JSON is canonicalized before compression: object keys are sorted,
+schema `1` carries explicit `format` and `codec` fields, and future schema
+migration is centralized in the codec's decode path.
 
 `prototypes/mir/settings/effective.lua` reads the import setting once during
 prototype loading. An imported value applies only when:
@@ -201,20 +224,26 @@ prototype loading. An imported value applies only when:
 - the profile schema is supported;
 - the setting exists in the current branch;
 - the setting is not `mir-settings-profile-import`;
-- the imported value has the same Lua type as the current setting value.
+- the imported value matches the catalog setting type;
+- string values are in the allowed-value set or documented legacy import set;
+- numeric values fit the catalog minimum and maximum bounds.
 
-Unknown setting IDs and mismatched value types are ignored on the current run,
-not removed from the profile. That keeps profiles portable across optional-mod
-changes and target-line backports.
+Unknown setting IDs, wrong value types, invalid enum values, and out-of-range
+numbers are ignored on the current run, not removed from the profile. That keeps
+profiles portable across optional-mod changes and target-line backports without
+coercing unsafe values.
 
 Runtime command support lives in `prototypes/mir/runtime/settings_profile.lua`:
 
-- `/mir-settings-export [name]` writes the current effective profile to
+- `/mir-settings-export [name]` writes the current effective full profile to
   `script-output/more-infinite-research/settings/<name>.txt`;
+- `/mir-settings-export --compact [name]` writes only non-default settings;
 - `/mir-settings-import-check <profile-string>` validates a pasted profile
-  against the currently registered settings;
+  against the currently registered catalog settings;
 - remote interface `more-infinite-research-settings.export_string()` returns an
   encoded profile string for other tools;
+- remote interface `more-infinite-research-settings.export_string({compact =
+  true})` returns a compact encoded profile string;
 - remote interface `more-infinite-research-settings.validate_string(text)`
   validates a candidate profile.
 

@@ -1,8 +1,7 @@
 local C = require("prototypes.mir.streams.registry")
 local defaults = require("prototypes.mir.settings.defaults")
+local settings_catalog = require("prototypes.mir.settings.catalog")
 local settings_adapter = require("prototypes.mir.settings.stage_adapter")
-local pipeline_extent_settings = require("prototypes.mir.settings.pipeline_extent")
-local prototype_limit_settings = require("prototypes.mir.settings.prototype_limits")
 local setting_order = require("prototypes.mir.settings.order")
 
 local settings_data = {}
@@ -53,124 +52,9 @@ local function add_technology_setting(group, setting)
   table.insert(settings_data, settings_adapter.apply(setting, group and group.ui_visibility))
 end
 
-table.insert(settings_data, {
-  type = "bool-setting",
-  name = "ips-require-space-gate",
-  setting_type = "startup",
-  default_value = false,
-  order = setting_order.global("main", 10),
-  localised_name = {"mod-setting-name.ips-require-space-gate"},
-  localised_description = {"mod-setting-description.ips-require-space-gate"}
-})
-
-table.insert(settings_data, {
-  type = "string-setting",
-  name = "mir-science-pack-ingredient-policy",
-  setting_type = "startup",
-  default_value = "configured",
-  allowed_values = {"configured", "space", "space-and-promethium", "space-age-progression", "official-progression", "mod-progression", "all-official", "all"},
-  order = setting_order.global("main", 20),
-  localised_name = {"mod-setting-name.mir-science-pack-ingredient-policy"},
-  localised_description = {"mod-setting-description.mir-science-pack-ingredient-policy"}
-})
-
-table.insert(settings_data, {
-  type = "string-setting",
-  name = "mir-lab-incompatibility-policy",
-  setting_type = "startup",
-  default_value = "reduce",
-  allowed_values = {"reduce", "skip"},
-  order = setting_order.global("main", 30),
-  localised_name = {"mod-setting-name.mir-lab-incompatibility-policy"},
-  localised_description = {"mod-setting-description.mir-lab-incompatibility-policy"}
-})
-
-table.insert(settings_data, {
-  type = "bool-setting",
-  name = "mir-prefer-this-mod-for-competing-techs",
-  setting_type = "startup",
-  default_value = true,
-  order = setting_order.global("main", 40),
-  localised_name = {"mod-setting-name.mir-prefer-this-mod-for-competing-techs"},
-  localised_description = {"mod-setting-description.mir-prefer-this-mod-for-competing-techs"}
-})
-
-table.insert(settings_data, {
-  type = "string-setting",
-  name = "mir-adjust-vanilla-weapon-speed-techs",
-  setting_type = "startup",
-  default_value = "off",
-  allowed_values = {"off", "only-when-dedicated-tech-enabled", "always"},
-  order = setting_order.global("compatibility", 10),
-  localised_name = {"mod-setting-name.mir-adjust-vanilla-weapon-speed-techs"},
-  localised_description = {"mod-setting-description.mir-adjust-vanilla-weapon-speed-techs"}
-})
-
-table.insert(settings_data, {
-  type = "bool-setting",
-  name = "mir-use-installed-space-age-icons",
-  setting_type = "startup",
-  default_value = false,
-  order = setting_order.global("compatibility", 20),
-  localised_name = {"mod-setting-name.mir-use-installed-space-age-icons"},
-  localised_description = {"mod-setting-description.mir-use-installed-space-age-icons"}
-})
-
-table.insert(settings_data, {
-  type = "string-setting",
-  name = "mir-pipeline-extent-multiplier",
-  setting_type = "startup",
-  default_value = pipeline_extent_settings.default_value,
-  allowed_values = pipeline_extent_settings.allowed_values,
-  order = setting_order.global("compatibility", 30),
-  localised_name = {"mod-setting-name.mir-pipeline-extent-multiplier"},
-  localised_description = {"mod-setting-description.mir-pipeline-extent-multiplier"}
-})
-
-table.insert(settings_data, {
-  type = "string-setting",
-  name = "mir-settings-profile-import",
-  setting_type = "startup",
-  default_value = "",
-  allow_blank = true,
-  order = setting_order.global("advanced", 10),
-  localised_name = {"mod-setting-name.mir-settings-profile-import"},
-  localised_description = {"mod-setting-description.mir-settings-profile-import"}
-})
-
-for _, setting in ipairs(prototype_limit_settings.setting_prototypes()) do
+for _, setting in ipairs(settings_catalog.global_setting_prototypes()) do
   table.insert(settings_data, setting)
 end
-
-table.insert(settings_data, {
-  type = "bool-setting",
-  name = "mir-debug-generation-report",
-  setting_type = "startup",
-  default_value = false,
-  order = setting_order.global("diagnostics", 10),
-  localised_name = {"mod-setting-name.mir-debug-generation-report"},
-  localised_description = {"mod-setting-description.mir-debug-generation-report"}
-})
-
-table.insert(settings_data, {
-  type = "bool-setting",
-  name = "mir-debug-recipe-matches",
-  setting_type = "startup",
-  default_value = false,
-  order = setting_order.global("diagnostics", 20),
-  localised_name = {"mod-setting-name.mir-debug-recipe-matches"},
-  localised_description = {"mod-setting-description.mir-debug-recipe-matches"}
-})
-
-table.insert(settings_data, {
-  type = "bool-setting",
-  name = "mir-debug-scripted-effects",
-  setting_type = "startup",
-  default_value = false,
-  order = setting_order.global("diagnostics", 30),
-  localised_name = {"mod-setting-name.mir-debug-scripted-effects"},
-  localised_description = {"mod-setting-description.mir-debug-scripted-effects"}
-})
 
 local stream_sort_names = {
   research_advanced_circuit = "Advanced circuit productivity",
@@ -245,14 +129,7 @@ local stream_sort_names = {
   research_walls = "Wall productivity"
 }
 
-local base_extension_specs = {
-  { key = "braking-force", sort_name = "Braking force" },
-  { key = "inserter-capacity-bonus", sort_name = "Inserter capacity bonus" },
-  { key = "laser-shooting-speed", sort_name = "Laser shooting speed" },
-  { key = "research-speed", sort_name = "Lab research speed" },
-  { key = "weapon-shooting-speed", sort_name = "Weapon shooting speed" },
-  { key = "worker-robots-storage", sort_name = "Worker robot cargo size" }
-}
+local base_extension_specs = settings_catalog.base_extension_specs
 
 local function order_slug(value)
   local out = tostring(value or ""):lower():gsub("[^%w]+", "-"):gsub("^%-+", ""):gsub("%-+$", "")

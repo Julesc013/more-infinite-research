@@ -66,15 +66,22 @@ Date: 2026-07-08
     - Moved runtime scripted technology handlers under prototypes/mir/runtime.
     - Kept runtime code separate from prototype generation.
     - Added portable settings profile helpers for runtime and data-stage settings resolution.
+    - Portable settings profiles now ignore wrong types, invalid dropdown choices, and out-of-range numbers.
+    - Added optional compact settings profile export that omits unchanged defaults.
+    - Made settings profile strings stable for repeat exports of the same settings.
     - Added hidden-setting visibility logic for unavailable technology settings.
     - Hidden settings keep their setting IDs readable and do not force values.
     - Improved in-game setting labels and descriptions for science-pack and lab-compatibility policies.
-    - Added startup dropdowns for recipe productivity, efficiency, speed, and quality prototype caps.
+    - Added startup dropdowns for recipe productivity, energy-use, pollution, speed, and quality prototype caps.
+    - Added a default-off non-zero power floor checkbox for explicit 0W active-use prototypes.
     - Prototype cap dropdowns leave engine defaults untouched unless explicitly changed.
     - Added visible Main, Compatibility, Limits, Advanced, and Diagnostics prefixes to global startup settings.
-    - Changed prototype limit dropdown defaults to value-first labels such as 300% (unchanged).
-    - Efficiency, speed, and quality limit defaults now show their unchanged cap values.
-    - Added lower and intermediate prototype limit dropdown choices for productivity, efficiency, speed, and quality caps.
+    - Changed prototype limit dropdown defaults to signed value-first labels.
+    - Recipe productivity defaults now show +300% (unchanged); energy and pollution savings defaults now show -80% (unchanged).
+    - Energy-use, pollution, speed, and quality limit defaults now show their unchanged modifier cap values.
+    - Added lower and intermediate prototype limit dropdown choices for all prototype cap settings.
+    - Sorted numeric prototype limit dropdowns from highest to lowest with unchanged defaults in their numeric positions.
+    - Shortened rocket/cannon speed cleanup text to "Only if dedicated tech exists".
     - Added color and bold emphasis to global setting prefixes where Factorio renders rich text.
     - Grouped generated-technology settings so disabled, risky, special, and vanilla-continuation rows stay easier to find.
     - Split generated-technology settings into default-off, enabled special, and ordinary enabled groups.
@@ -106,8 +113,9 @@ Date: 2026-07-08
     - Added focused MIR compatibility modules for overlay loading, profile loading, and claim registration.
     - Added focused MIR compatibility modules for exact recipe, Air Scrubbing, and ATAN Ash diagnostics.
     - Added a focused MIR compatibility repair module for exact Factorio 2.1 upstream recipe schema normalization.
-    - Added focused MIR settings modules for registry data, stage building, visibility, and defaults.
+    - Added focused MIR settings modules for registry data, catalog data, stage building, visibility, and defaults.
     - Added focused MIR settings modules for effective settings, profile codec support, order ranges, and pipeline extent settings.
+    - Hardened settings profile import and export for compact export, hidden IDs, wrong types, and invalid enum values.
     - Added focused MIR settings and pipeline modules for explicit prototype limit overrides.
     - Added architecture checks, docs governance checks, and settings visibility checks.
     - Added local mod library catalog checks and legacy inventory reporting tools.
@@ -156,7 +164,7 @@ Date: 2026-07-08
     - Selected local zip checks passed for the advertised and recently repaired compatibility targets.
     - The targeted release gate passed using the recorded local 2.1 mod library scenario set.
     - The full targeted gate evidence is recorded in release summary docs.
-    - The final package contains 118 entries and zero forbidden repository-only paths.
+    - The final package contains 119 entries and zero forbidden repository-only paths.
     - Portal-backed full-catalog checks were not run in the release environment because FACTORIO_TOKEN was not set.
     - atan-ash_2.2.1 still fails without MIR on the tested Factorio 2.1 setup and loads with MIR after repair.
     - atan-nuclear-science 0.3.3 still fails without MIR and loads with MIR after exact schema repair.

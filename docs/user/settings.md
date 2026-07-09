@@ -42,25 +42,33 @@ and inserter performance assumptions.
 
 ## Prototype Limit Settings
 
-MIR includes four optional startup-only prototype limit settings:
+MIR includes startup-only prototype limit settings:
 
 - Recipe productivity cap
 - Energy savings cap
+- Pollution reduction cap
 - Speed effect cap
 - Quality effect cap
+- Non-zero power floor
 
-The unchanged dropdown entries are value-first labels: `300% (unchanged)` for
-recipe productivity, `80% savings (unchanged)` for efficiency, and
-`+100000% (unchanged)` for speed and quality. Those unchanged entries leave the
+The unchanged dropdown entries are value-first labels: `+300% (unchanged)` for
+recipe productivity, `-80% (unchanged)` for energy and pollution reductions,
+and `+100000% (unchanged)` for speed and quality. Those unchanged entries leave the
 relevant Factorio prototype fields alone. Non-default values are explicit global
 balance overrides for long-running infinite research saves or modpacks that want
 stricter or broader module-effect ceilings.
 
 Use the energy savings cap when a modpack's beacon, module, or quality effects
-can push machines toward zero active power draw. `75% savings` keeps supported
-effect receivers at 25% or more active energy use after consumption effects,
-and `50% savings` keeps them at 50% or more. This is a startup prototype
-override, not a runtime script.
+can push machines toward near-zero active power draw. The pollution reduction
+cap is separate because efficiency modules can reduce both energy use and
+pollution, while modpacks may want different floors for each effect.
+
+The strongest selectable reduction is `-99.99%`. Factorio's effect receiver
+prototype bounds do not allow a literal `-100%` effect limit. Use the separate
+Non-zero power floor checkbox only when a modpack has explicit `0W` active-use
+entity prototypes that create unwanted low-power warning icons. When enabled,
+MIR changes those explicit `0W` `energy_usage` prototypes to `1W` during
+prototype loading. Leave it off to preserve zero-power prototypes exactly.
 
 These settings apply during prototype loading and require a restart after
 changing them. They do not add per-tick runtime processing, and they are not
@@ -110,9 +118,19 @@ You can validate a pasted profile before using it:
 ```
 
 The validation command reports how many setting IDs are recognized by the
-current branch and how many are unavailable or ignored. Unknown settings remain
-inside the profile string, so the same profile can still be useful when you
-reenable a provider mod or move back to a branch that knows those setting IDs.
+current branch, how many values are invalid, and how many IDs are unavailable
+or ignored. Unknown settings remain inside the profile string, so the same
+profile can still be useful when you reenable a provider mod or move back to a
+branch that knows those setting IDs.
+
+For shorter strings, run:
+
+```text
+/mir-settings-export --compact my-pack-name
+```
+
+Compact export omits settings that still equal MIR's catalog default. Full
+export remains the default because it is easier to audit.
 
 MIR does not use a direct OS clipboard or arbitrary file-import API. Factorio
 runtime code can write export files under `script-output`, while import happens

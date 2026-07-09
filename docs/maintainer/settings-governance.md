@@ -27,6 +27,8 @@ contract unless there is a documented migration reason to retire it.
   mods only. It must not inspect final prototype facts.
 - Keep data-stage generation based on final prototype facts.
 - Record governed setting policy in `.mir/settings.yml`.
+- Add new setting IDs to `prototypes/mir/settings/catalog.lua` before using
+  them in registration, profile export/import, docs, or tests.
 - Keep broad global settings visible unless they are deprecated or unsafe.
 - Preserve portable profile import/export compatibility by keeping
   `mir-settings-profile-import` registered.
@@ -38,6 +40,8 @@ contract unless there is a documented migration reason to retire it.
   enabled rows last. Sort alphabetically inside each bucket.
 - Keep prototype limit settings startup-only, defaulting to `engine-default`,
   and document every non-default value as an explicit global prototype override.
+- Keep energy-use limits, pollution limits, and zero-power prototype rewrites as
+  separate controls. The zero-power rewrite must remain default off.
 - Use visible section prefixes and order ranges for global settings. Do not add
   fake divider settings.
 - Treat rich text in setting labels as a visual enhancement only; the plain
@@ -108,9 +112,15 @@ circuit-controlled inserters and reduce engine optimization assumptions.
 Prototype limit settings must be visible global settings, not hidden behavior.
 `engine-default` means MIR does not touch the corresponding Factorio prototype
 field. Player-facing labels should show the effective unchanged cap, such as
-`300% (unchanged)`, instead of exposing the internal value. Non-default values
-may mutate recipe productivity caps or effect receiver limits during
+`+300% (unchanged)` for recipe productivity or `-80% (unchanged)` for energy
+or pollution reductions, instead of exposing the internal value. Non-default
+values may mutate recipe productivity caps or effect receiver limits during
 `data-final-fixes`, but they must not require runtime event processing.
+
+Do not couple the non-zero power floor to the energy savings cap. The energy
+savings cap writes `effect_receiver.consumption_limits.low`; the pollution cap
+writes `effect_receiver.pollution_limits.low`; the default-off power-floor
+checkbox changes explicit `0W` active `energy_usage` prototypes to `1W`.
 
 Keep the implementation in the MIR settings and pipeline layers. Compatibility
 policy files may not apply these overrides directly.
@@ -140,12 +150,19 @@ target line, or returning to a newer line later.
 The contract:
 
 - exported profiles use the `MIRSET1:` prefix and schema `1`;
-- exports include MIR startup setting IDs beginning `ips-` or `mir-`;
+- exports include cataloged MIR startup setting IDs beginning `ips-` or `mir-`;
 - exports exclude `mir-settings-profile-import`;
-- imports apply only to current registered setting IDs with matching value
-  types;
+- full export is the default;
+- compact export is opt-in through `/mir-settings-export --compact` and omits
+  values that still match the catalog default;
+- profile JSON is emitted in canonical key order before compression so repeated
+  exports of the same settings are deterministic;
+- imports apply only to current registered setting IDs whose values pass
+  catalog type, allowed-value, and numeric-bound checks;
 - unknown profile entries are ignored on the current branch and left in the
   string for future use;
+- wrong-type, invalid-enum, and out-of-range profile values are ignored rather
+  than coerced;
 - invalid profile strings are logged and ignored;
 - runtime commands may export or validate profiles but must not attempt to
   rewrite startup setting values.

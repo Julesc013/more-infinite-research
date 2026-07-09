@@ -56,6 +56,9 @@ function Get-MIRSettingsSourceText {
   return Get-MIRCombinedSourceText -RelativePaths @(
     "settings.lua",
     "prototypes/mir/stage/settings.lua",
+    "prototypes/mir/settings/catalog.lua",
+    "prototypes/mir/settings/pipeline_extent.lua",
+    "prototypes/mir/settings/prototype_limits.lua",
     "prototypes/mir/settings/stage_builder.lua"
   )
 }
@@ -627,7 +630,7 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'if pipeline_extent_multiplier ~= 1 then' },
     @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'require("prototypes.mir.pipeline.extent").apply(pipeline_extent_multiplier)' },
     @{ File = "prototypes\mir\settings\pipeline_extent.lua"; Text = $pipelineExtentSettingsText; Snippet = 'S.default_value = "100"' },
-    @{ File = "prototypes\mir\settings\pipeline_extent.lua"; Text = $pipelineExtentSettingsText; Snippet = 'S.allowed_values = {"50", "75", "100", "125", "150", "200", "250", "300", "400", "500"}' },
+    @{ File = "prototypes\mir\settings\pipeline_extent.lua"; Text = $pipelineExtentSettingsText; Snippet = 'S.allowed_values = {"500", "400", "300", "250", "200", "150", "125", "100", "75", "50"}' },
     @{ File = "prototypes\mir\settings\pipeline_extent.lua"; Text = $pipelineExtentSettingsText; Snippet = 'function S.parse(value)' },
     @{ File = "prototypes\mir\settings\pipeline_extent.lua"; Text = $pipelineExtentSettingsText; Snippet = 'if numeric > 10 then return numeric / 100 end' },
     @{ File = "prototypes\mir\pipeline\extent.lua"; Text = $pipelineExtentText; Snippet = 'DEFAULT_PIPELINE_EXTENT = 320' },
@@ -825,8 +828,10 @@ Invoke-RepoCheck "prototype limit settings are wired" {
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'prototype_limit_settings.setting_prototypes()' },
     @{ File = "prototypes\mir\settings\prototype_limits.lua"; Text = $prototypeLimitSettingsText; Snippet = 'name = "mir-prototype-productivity-cap"' },
     @{ File = "prototypes\mir\settings\prototype_limits.lua"; Text = $prototypeLimitSettingsText; Snippet = 'name = "mir-prototype-efficiency-cap"' },
+    @{ File = "prototypes\mir\settings\prototype_limits.lua"; Text = $prototypeLimitSettingsText; Snippet = 'name = "mir-prototype-pollution-cap"' },
     @{ File = "prototypes\mir\settings\prototype_limits.lua"; Text = $prototypeLimitSettingsText; Snippet = 'name = "mir-prototype-speed-cap"' },
     @{ File = "prototypes\mir\settings\prototype_limits.lua"; Text = $prototypeLimitSettingsText; Snippet = 'name = "mir-prototype-quality-cap"' },
+    @{ File = "prototypes\mir\settings\prototype_limits.lua"; Text = $prototypeLimitSettingsText; Snippet = 'positive_power_floor_setting_name = "mir-prototype-positive-power-floor"' },
     @{ File = "prototypes\mir\settings\prototype_limits.lua"; Text = $prototypeLimitSettingsText; Snippet = 'default_value = S.engine_default' },
     @{ File = "prototypes\mir\settings\prototype_limits.lua"; Text = $prototypeLimitSettingsText; Snippet = '["percent-50"] = 0.5' },
     @{ File = "prototypes\mir\settings\prototype_limits.lua"; Text = $prototypeLimitSettingsText; Snippet = '["percent-400"] = 4.0' },
@@ -841,28 +846,38 @@ Invoke-RepoCheck "prototype limit settings are wired" {
     @{ File = "prototypes\mir\pipeline\prototype_limits.lua"; Text = $prototypeLimitPipelineText; Snippet = 'recipe.maximum_productivity = value' },
     @{ File = "prototypes\mir\pipeline\prototype_limits.lua"; Text = $prototypeLimitPipelineText; Snippet = '"agricultural-tower"' },
     @{ File = "prototypes\mir\pipeline\prototype_limits.lua"; Text = $prototypeLimitPipelineText; Snippet = 'apply_effect_receiver_limit("consumption_limits", "low", selected("efficiency"))' },
+    @{ File = "prototypes\mir\pipeline\prototype_limits.lua"; Text = $prototypeLimitPipelineText; Snippet = 'apply_effect_receiver_limit("pollution_limits", "low", selected("pollution"))' },
     @{ File = "prototypes\mir\pipeline\prototype_limits.lua"; Text = $prototypeLimitPipelineText; Snippet = 'apply_effect_receiver_limit("speed_limits", "high", selected("speed"))' },
     @{ File = "prototypes\mir\pipeline\prototype_limits.lua"; Text = $prototypeLimitPipelineText; Snippet = 'apply_effect_receiver_limit("quality_limits", "high", selected("quality"))' },
+    @{ File = "prototypes\mir\pipeline\prototype_limits.lua"; Text = $prototypeLimitPipelineText; Snippet = 'prototype.energy_usage = "1W"' },
     @{ File = "prototypes\mir\pipeline\prototype_limits.lua"; Text = $prototypeLimitPipelineText; Snippet = 'Applied prototype limits: productivity_recipes=' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-prototype-productivity-cap=[font=default-bold][color=orange]Limits:[/color][/font] Recipe productivity cap' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-prototype-efficiency-cap=[font=default-bold][color=orange]Limits:[/color][/font] Energy savings cap' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-prototype-pollution-cap=[font=default-bold][color=orange]Limits:[/color][/font] Pollution reduction cap' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-prototype-speed-cap=[font=default-bold][color=orange]Limits:[/color][/font] Speed effect cap' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-prototype-quality-cap=[font=default-bold][color=orange]Limits:[/color][/font] Quality effect cap' },
-    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-prototype-productivity-cap-engine-default=300% (unchanged)' },
-    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-prototype-productivity-cap-percent-50=50%' },
-    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-prototype-efficiency-cap-saving-99=99% savings' },
-    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-prototype-efficiency-cap-engine-default=80% savings (unchanged)' },
-    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'Set 75% or 50% to keep effect bonuses from pushing active machine energy use to near zero.' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-prototype-positive-power-floor=[font=default-bold][color=orange]Limits:[/color][/font] Non-zero power floor' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-prototype-productivity-cap-engine-default=+300% (unchanged)' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-prototype-productivity-cap-percent-50=+50%' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-prototype-efficiency-cap-saving-99=-99%' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-prototype-efficiency-cap-engine-default=-80% (unchanged)' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-prototype-pollution-cap-saving-99=-99%' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'explicit 0W active energy_usage prototypes to 1W' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-prototype-speed-cap-engine-default=+100000% (unchanged)' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-prototype-speed-cap-bonus-400=+400%' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-prototype-quality-cap-bonus-400=+400%' },
     @{ File = ".mir\settings.yml"; Text = $settingsManifestText; Snippet = 'prototype_limit_settings_default_to_engine_default: true' },
-    @{ File = ".mir\settings.yml"; Text = $settingsManifestText; Snippet = 'efficiency_cap_is_supported_power_floor_control: true' },
+    @{ File = ".mir\settings.yml"; Text = $settingsManifestText; Snippet = 'energy_and_pollution_caps_are_separate: true' },
+    @{ File = ".mir\settings.yml"; Text = $settingsManifestText; Snippet = 'positive_power_floor_is_default_off_opt_in: true' },
+    @{ File = ".mir\modules.yml"; Text = $modulesManifestText; Snippet = 'prototypes/mir/settings/catalog.lua' },
     @{ File = ".mir\modules.yml"; Text = $modulesManifestText; Snippet = 'prototypes/mir/settings/prototype_limits.lua' },
     @{ File = ".mir\modules.yml"; Text = $modulesManifestText; Snippet = 'prototypes/mir/pipeline/prototype_limits.lua' },
     @{ File = ".mir\fixtures.yml"; Text = $fixturesManifestText; Snippet = 'prototype-limit-startup-overrides' },
+    @{ File = ".mir\fixtures.yml"; Text = $fixturesManifestText; Snippet = 'settings-profile-roundtrip' },
     @{ File = "fixtures\assert-prototype-limits\data-final-fixes.lua"; Text = $prototypeLimitFixtureText; Snippet = 'iron-gear-wheel maximum_productivity' },
     @{ File = "fixtures\assert-prototype-limits\data-final-fixes.lua"; Text = $prototypeLimitFixtureText; Snippet = 'consumption_limits.low' },
+    @{ File = "fixtures\assert-prototype-limits\data-final-fixes.lua"; Text = $prototypeLimitFixtureText; Snippet = 'pollution_limits.low' },
+    @{ File = "fixtures\assert-prototype-limits\data-final-fixes.lua"; Text = $prototypeLimitFixtureText; Snippet = 'zero-watt beacon energy_usage' },
     @{ File = "fixtures\assert-prototype-limits\data-final-fixes.lua"; Text = $prototypeLimitFixtureText; Snippet = 'quality_limits.high' },
     @{ File = "scripts\Invoke-MIRValidation.ps1"; Text = (Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\Invoke-MIRValidation.ps1")); Snippet = 'prototype-limit-overrides' }
   )
@@ -1846,6 +1861,7 @@ $postMirAssertionFixtures = @(
   "mir-fixture-assert-plates-n-circuit-productivity-blocked",
   "mir-fixture-assert-plates-n-circuit-productivity-change-mismatch",
   "mir-fixture-assert-prototype-limits",
+  "mir-fixture-assert-settings-profile-roundtrip",
   "mir-fixture-assert-vanilla-family-adoption",
   "mir-fixture-assert-vanilla-family-exact-owner",
   "mir-fixture-assert-vanilla-family-mixed-owner",
@@ -1900,6 +1916,30 @@ function Get-CopiedSettingsImplementationPath {
   throw "Unable to find copied settings implementation."
 }
 
+function Get-CopiedStartupSettingImplementationPaths {
+  param([string]$ModsDir)
+
+  $candidates = @(
+    "more-infinite-research\prototypes\mir\settings\catalog.lua",
+    "more-infinite-research\prototypes\mir\settings\stage_builder.lua",
+    "more-infinite-research\settings.lua"
+  )
+
+  $paths = @()
+  foreach ($relative in $candidates) {
+    $path = Join-Path $ModsDir $relative
+    if (Test-Path -LiteralPath $path) {
+      $paths += $path
+    }
+  }
+
+  if ($paths.Count -eq 0) {
+    throw "Unable to find copied settings implementation."
+  }
+
+  return $paths
+}
+
 function Set-CopiedStartupSettingDefault {
   param(
     [string]$ModsDir,
@@ -1907,20 +1947,22 @@ function Set-CopiedStartupSettingDefault {
     [string]$ValueLiteral
   )
 
-  $copiedSettingsPath = Get-CopiedSettingsImplementationPath -ModsDir $ModsDir
-  $copiedSettings = Get-Content -Raw -LiteralPath $copiedSettingsPath
   $escapedName = [regex]::Escape($Name)
   $pattern = "(?s)(name\s*=\s*`"$escapedName`".*?default_value\s*=\s*)([^,\r\n]+)"
-  $match = [regex]::Match($copiedSettings, $pattern)
-  if (-not $match.Success) {
-    throw "Unable to find startup setting default for $Name in copied settings implementation."
+  foreach ($copiedSettingsPath in Get-CopiedStartupSettingImplementationPaths -ModsDir $ModsDir) {
+    $copiedSettings = Get-Content -Raw -LiteralPath $copiedSettingsPath
+    $match = [regex]::Match($copiedSettings, $pattern)
+    if ($match.Success) {
+      $valueGroup = $match.Groups[2]
+      $copiedSettings = $copiedSettings.Substring(0, $valueGroup.Index) +
+        $ValueLiteral +
+        $copiedSettings.Substring($valueGroup.Index + $valueGroup.Length)
+      Set-Content -LiteralPath $copiedSettingsPath -Value $copiedSettings -Encoding UTF8
+      return
+    }
   }
 
-  $valueGroup = $match.Groups[2]
-  $copiedSettings = $copiedSettings.Substring(0, $valueGroup.Index) +
-    $ValueLiteral +
-    $copiedSettings.Substring($valueGroup.Index + $valueGroup.Length)
-  Set-Content -LiteralPath $copiedSettingsPath -Value $copiedSettings -Encoding UTF8
+  throw "Unable to find startup setting default for $Name in copied settings implementation."
 }
 
 function Set-CopiedGeneratedStartupSettingDefault {
@@ -1986,8 +2028,10 @@ function Set-CopiedPrototypeLimitDefaults {
     [string]$ModsDir,
     [string]$ProductivityCap,
     [string]$EfficiencyCap,
+    [string]$PollutionCap,
     [string]$SpeedCap,
-    [string]$QualityCap
+    [string]$QualityCap,
+    [bool]$PositivePowerFloor = $false
   )
 
   if (-not [string]::IsNullOrWhiteSpace($ProductivityCap)) {
@@ -1996,11 +2040,17 @@ function Set-CopiedPrototypeLimitDefaults {
   if (-not [string]::IsNullOrWhiteSpace($EfficiencyCap)) {
     Set-CopiedGeneratedStartupSettingDefault -ModsDir $ModsDir -Name "mir-prototype-efficiency-cap" -ValueLiteral "`"$EfficiencyCap`""
   }
+  if (-not [string]::IsNullOrWhiteSpace($PollutionCap)) {
+    Set-CopiedGeneratedStartupSettingDefault -ModsDir $ModsDir -Name "mir-prototype-pollution-cap" -ValueLiteral "`"$PollutionCap`""
+  }
   if (-not [string]::IsNullOrWhiteSpace($SpeedCap)) {
     Set-CopiedGeneratedStartupSettingDefault -ModsDir $ModsDir -Name "mir-prototype-speed-cap" -ValueLiteral "`"$SpeedCap`""
   }
   if (-not [string]::IsNullOrWhiteSpace($QualityCap)) {
     Set-CopiedGeneratedStartupSettingDefault -ModsDir $ModsDir -Name "mir-prototype-quality-cap" -ValueLiteral "`"$QualityCap`""
+  }
+  if ($PositivePowerFloor) {
+    Set-CopiedGeneratedStartupSettingDefault -ModsDir $ModsDir -Name "mir-prototype-positive-power-floor" -ValueLiteral "true"
   }
 }
 
@@ -2103,10 +2153,13 @@ function Initialize-RuntimeScenario {
     [string]$PrototypeProductivityCap = "",
     [ValidateSet("", "engine-default", "saving-50", "saving-75", "saving-90", "saving-95", "saving-99", "saving-999", "saving-9999")]
     [string]$PrototypeEfficiencyCap = "",
+    [ValidateSet("", "engine-default", "saving-50", "saving-75", "saving-90", "saving-95", "saving-99", "saving-999", "saving-9999")]
+    [string]$PrototypePollutionCap = "",
     [ValidateSet("", "engine-default", "bonus-50", "bonus-75", "bonus-100", "bonus-200", "bonus-250", "bonus-400", "bonus-500", "bonus-1000", "bonus-10000", "bonus-100000")]
     [string]$PrototypeSpeedCap = "",
     [ValidateSet("", "engine-default", "bonus-50", "bonus-75", "bonus-100", "bonus-200", "bonus-250", "bonus-400", "bonus-500", "bonus-1000", "bonus-10000", "bonus-100000")]
     [string]$PrototypeQualityCap = "",
+    [switch]$PrototypePositivePowerFloor,
     [switch]$RequireSpaceGate,
     [switch]$UseInstalledSpaceAgeIcons,
     [switch]$ScriptedDiagnostics,
@@ -2168,8 +2221,10 @@ function Initialize-RuntimeScenario {
     -ModsDir $modsDir `
     -ProductivityCap $PrototypeProductivityCap `
     -EfficiencyCap $PrototypeEfficiencyCap `
+    -PollutionCap $PrototypePollutionCap `
     -SpeedCap $PrototypeSpeedCap `
-    -QualityCap $PrototypeQualityCap
+    -QualityCap $PrototypeQualityCap `
+    -PositivePowerFloor ([bool]$PrototypePositivePowerFloor)
   if ($UseInstalledSpaceAgeIcons) {
     Set-CopiedStartupSettingDefault -ModsDir $modsDir -Name "mir-use-installed-space-age-icons" -ValueLiteral "true"
   }
@@ -2257,10 +2312,13 @@ function Invoke-RuntimeScenario {
     [string]$PrototypeProductivityCap = "",
     [ValidateSet("", "engine-default", "saving-50", "saving-75", "saving-90", "saving-95", "saving-99", "saving-999", "saving-9999")]
     [string]$PrototypeEfficiencyCap = "",
+    [ValidateSet("", "engine-default", "saving-50", "saving-75", "saving-90", "saving-95", "saving-99", "saving-999", "saving-9999")]
+    [string]$PrototypePollutionCap = "",
     [ValidateSet("", "engine-default", "bonus-50", "bonus-75", "bonus-100", "bonus-200", "bonus-250", "bonus-400", "bonus-500", "bonus-1000", "bonus-10000", "bonus-100000")]
     [string]$PrototypeSpeedCap = "",
     [ValidateSet("", "engine-default", "bonus-50", "bonus-75", "bonus-100", "bonus-200", "bonus-250", "bonus-400", "bonus-500", "bonus-1000", "bonus-10000", "bonus-100000")]
     [string]$PrototypeQualityCap = "",
+    [switch]$PrototypePositivePowerFloor,
     [switch]$RequireSpaceGate,
     [switch]$UseInstalledSpaceAgeIcons,
     [switch]$ScriptedDiagnostics,
@@ -2280,8 +2338,10 @@ function Invoke-RuntimeScenario {
     -PipelineExtentMultiplier $PipelineExtentMultiplier `
     -PrototypeProductivityCap $PrototypeProductivityCap `
     -PrototypeEfficiencyCap $PrototypeEfficiencyCap `
+    -PrototypePollutionCap $PrototypePollutionCap `
     -PrototypeSpeedCap $PrototypeSpeedCap `
     -PrototypeQualityCap $PrototypeQualityCap `
+    -PrototypePositivePowerFloor:$PrototypePositivePowerFloor `
     -RequireSpaceGate:$RequireSpaceGate `
     -UseInstalledSpaceAgeIcons:$UseInstalledSpaceAgeIcons `
     -ScriptedDiagnostics:$ScriptedDiagnostics `
@@ -2961,8 +3021,10 @@ Invoke-RuntimeScenario -ScenarioName "prototype-limit-overrides-base" -EnabledFi
 ) `
   -PrototypeProductivityCap "percent-500" `
   -PrototypeEfficiencyCap "saving-95" `
+  -PrototypePollutionCap "saving-95" `
   -PrototypeSpeedCap "bonus-500" `
-  -PrototypeQualityCap "bonus-500"
+  -PrototypeQualityCap "bonus-500" `
+  -PrototypePositivePowerFloor
 Assert-LogContains -Expected "Applied prototype limits: productivity_recipes=" -Context "Base prototype limit override scenario"
 
 Invoke-RuntimeScenario -ScenarioName "prototype-limit-overrides-space-age" -EnabledFixtureNames @(
@@ -2970,10 +3032,15 @@ Invoke-RuntimeScenario -ScenarioName "prototype-limit-overrides-space-age" -Enab
 ) `
   -PrototypeProductivityCap "percent-1000" `
   -PrototypeEfficiencyCap "saving-99" `
+  -PrototypePollutionCap "saving-99" `
   -PrototypeSpeedCap "bonus-1000" `
   -PrototypeQualityCap "bonus-1000" `
   -EnableSpaceAge
 Assert-LogContains -Expected "Applied prototype limits: productivity_recipes=" -Context "Space Age prototype limit override scenario"
+
+Invoke-RuntimeScenario -ScenarioName "settings-profile-roundtrip" -EnabledFixtureNames @(
+  "mir-fixture-assert-settings-profile-roundtrip"
+)
 
 Invoke-RuntimeScenario -ScenarioName "base-generation-integrity-inserter-enabled" -EnabledFixtureNames @(
   "mir-fixture-assert-generation-integrity"
