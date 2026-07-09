@@ -617,8 +617,9 @@ Create a local test mod that:
 - Enables the weapon-speed overlap adjustment scenario.
 - Fails loading if finite vanilla `weapon-shooting-speed-5` or `weapon-shooting-speed-6` loses `cannon-shell` speed effects.
 - Fails loading if MIR's generated weapon shooting speed continuation keeps `rocket` or `cannon-shell` overlap effects when the dedicated replacement techs are active.
+- Fails loading if dedicated rocket, cannon, flamethrower, or electric shooting speed research is missing its target-era unlock prerequisite.
 
-Expected result: vanilla tank cannon fire rate is preserved while MIR avoids duplicate infinite rocket/cannon-shell speed scaling in its generated continuation.
+Expected result: vanilla tank cannon fire rate is preserved while MIR avoids duplicate infinite rocket/cannon-shell speed scaling in its generated continuation and keeps dedicated shooting speed research on reachable target-era branches.
 
 ## Release Checklist
 

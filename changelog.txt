@@ -18,6 +18,8 @@ Date: 2026-07-10
     - Reused the older-line `global` runtime state adapter.
     - Reused target-era technology art without newer badge overlays or unsupported native modifier icon metadata.
     - Added Factorio 0.17 metadata, settings visibility, and reduced-line runtime support.
+    - Anchored dedicated rocket, cannon, flamethrower, and electric shooting speed research to target-era unlocks.
+    - Kept MIR's generated weapon shooting speed continuation from duplicating rocket and cannon-shell speed ownership by default.
     - Documented 1.7.0 as the first old-line native-infinite edition and the next ring after 1.8.x.
 
 ---------------------------------------------------------------------------------------------------

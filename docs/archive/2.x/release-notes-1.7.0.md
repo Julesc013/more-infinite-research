@@ -29,6 +29,11 @@ Factorio `1.0` package.
 - Kept the older-line `global` runtime state adapter.
 - Kept target-supported direct-effect infinite researches and base technology
   continuations.
+- Anchored dedicated rocket, cannon, flamethrower, and electric shooting speed
+  research to target-era unlock prerequisites.
+- Removed duplicate rocket and cannon-shell speed ownership from MIR's generated
+  weapon shooting speed continuation by default when dedicated replacement
+  research is active.
 - Removed Factorio `2.x` and DLC surfaces from the package.
 - Left recipe productivity, Space Age, Quality, Recycler, Elevated Rails, cargo
   logistics, spoilage, agriculture, prototype cap settings, pipeline extent
@@ -58,8 +63,8 @@ Factorio `1.0` package.
 
 - Release-candidate package:
   `dist/more-infinite-research_1.7.0.zip`, SHA-256
-  `4C685EDCD1317DD3E99E54D3C7DFF7447FB4BE2C7182C9A0B44EF8AC7E53E326`,
-  `383734` bytes, `121` entries, `0` forbidden release entries.
+  `2143A59ED3BDF709051CB66D0B056A0A9039029F645BF55C6F669966EC02F135`,
+  `300818` bytes, `121` entries, `0` forbidden release entries.
 - Static validation passed for the `1.7.0` metadata and package shape.
 - Factorio `0.17` binary validation passed with
   `D:\Programs\Factorio\0.17\bin\x64\factorio.exe`.
@@ -69,6 +74,8 @@ Factorio `1.0` package.
   scenario, lab productivity owner skip, robot battery owner skip, merged
   inventory/trash capacity, reduced settings surface, checkbox
   enable/disable, and weapon-speed overlap safety scenarios.
+- The weapon-speed overlap safety scenario also verifies dedicated weapon speed
+  streams depend on their target-era unlock technologies.
 
 ## Release Wording
 

@@ -150,7 +150,7 @@ function M.global_setting_prototypes()
       type = "string-setting",
       name = "mir-adjust-vanilla-weapon-speed-techs",
       setting_type = "startup",
-      default_value = "off",
+      default_value = "only-when-dedicated-tech-enabled",
       allowed_values = {"off", "only-when-dedicated-tech-enabled", "always"},
       order = setting_order.global("compatibility", 10),
       localised_name = {"mod-setting-name.mir-adjust-vanilla-weapon-speed-techs"},

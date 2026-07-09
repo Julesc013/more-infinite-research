@@ -53,6 +53,7 @@ return {
 
   research_rocket_shooting_speed = {
     icon_tech = "rocketry",
+    required_technologies = {"rocketry"},
     science_packs = {
       "automation-science-pack","logistic-science-pack","chemical-science-pack",
       "production-science-pack","military-science-pack"
@@ -68,6 +69,7 @@ return {
       {technology = "physical-projectile-damage-2"},
       {item = "cannon-shell"}
     },
+    required_technologies = {"tanks", "weapon-shooting-speed-5"},
     science_packs = {
       "automation-science-pack","logistic-science-pack","chemical-science-pack",
       "production-science-pack","military-science-pack"
@@ -80,6 +82,7 @@ return {
   research_flamethrower_shooting_speed = {
     icon_tech = "flamethrower",
     localised_description = {"technology-description.more-infinite-research.flamethrower_shooting_speed"},
+    required_technologies = {"flamethrower"},
     science_packs = {
       "automation-science-pack","logistic-science-pack","chemical-science-pack",
       "production-science-pack","military-science-pack","space-science-pack"

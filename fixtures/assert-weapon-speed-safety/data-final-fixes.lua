@@ -7,6 +7,13 @@ local function has_gun_speed(tech, ammo_category)
   return false
 end
 
+local function has_prerequisite(tech, prerequisite)
+  for _, name in ipairs((tech and tech.prerequisites) or {}) do
+    if name == prerequisite then return true end
+  end
+  return false
+end
+
 local techs = data.raw.technology or {}
 
 for _, tech_name in ipairs({"weapon-shooting-speed-5", "weapon-shooting-speed-6"}) do
@@ -29,4 +36,23 @@ end
 
 if has_gun_speed(generated, "cannon-shell") or has_gun_speed(generated, "rocket") then
   error("MIR validation failed: generated weapon shooting speed continuation still contains rocket or cannon-shell overlap effects.")
+end
+
+local expected_prerequisites = {
+  ["recipe-prod-research_rocket_shooting_speed-1"] = {"rocketry"},
+  ["recipe-prod-research_cannon_shooting_speed-1"] = {"tanks", "weapon-shooting-speed-5"},
+  ["recipe-prod-research_flamethrower_shooting_speed-1"] = {"flamethrower"},
+  ["recipe-prod-research_electric_shooting_speed-1"] = {"discharge-defense-equipment"}
+}
+
+for tech_name, prerequisites in pairs(expected_prerequisites) do
+  local tech = techs[tech_name]
+  if not tech then
+    error("MIR validation failed: expected shooting-speed technology was not generated: " .. tech_name)
+  end
+  for _, prerequisite in ipairs(prerequisites) do
+    if not has_prerequisite(tech, prerequisite) then
+      error("MIR validation failed: " .. tech_name .. " is missing prerequisite " .. prerequisite .. ".")
+    end
+  end
 end
