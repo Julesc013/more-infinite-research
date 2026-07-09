@@ -82,7 +82,7 @@ release_artifacts:
       status: validated-main-pushed
     mir_2_3_0:
       version: "2.3.0"
-      branch: tmp/2.0
+      branch: legacy
       target_factorio: "2.0"
       source_anchor: mir_3_0_0
       artifact: dist/more-infinite-research_2.3.0.zip
@@ -90,7 +90,7 @@ release_artifacts:
       size_bytes: 296124
       entries: 119
       forbidden_entries: 0
-      status: quick-tested-tmp-2.0-pending-long-gates
+      status: release-ready
   closed_versions:
     - version: "2.2.0"
       branch: main
@@ -107,7 +107,7 @@ release_artifacts:
       version: "3.0.5"
       branch: dev
       target_factorio: "2.1"
-      purpose: patch durable fixes, checks, and tooling learned during target-line ports
+      purpose: accumulated portable fixes, compatibility lessons, tooling updates, docs corrections, and community feedback after the 3.0.0 backport rings
     factorio_2_0_backport:
       version: "2.3.0"
       branch: legacy

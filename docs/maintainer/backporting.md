@@ -216,8 +216,14 @@ Current execution state:
 - Release older lines from their own `tmp/*` or stable target branches in
   descending order, using the target-line matrix below and the historical
   cadence note as the release order guide.
-- After the downward port ladder, bring portable fixes, tests, and tooling
-  lessons back to `dev` as a `3.0.5` current-line patch. Do not bring
+- After each backport ring, bring portable fixes, tests, documentation, and
+  tooling lessons back to `dev`, but do not cut an immediate `3.0.1` release.
+- Keep `dev` as the accumulating Factorio `2.1` integration branch while the
+  `3.0.0` backport rings are worked.
+- Release `3.0.5` after the Factorio `2.0` port is published, the Factorio
+  `1.1` port is either published or has produced clear portable lessons, the
+  Factorio `1.0` / `0.18` bridge policy is decided, and a short community
+  feedback window has captured early current-line corrections. Do not bring
   target-line metadata downgrades back to `dev`.
 - Start `3.1.0` only after the `3.0.5` learning patch is stable. Treat `3.1.0`
   as the fixture-backed overhaul support campaign, not as cleanup from the
@@ -247,6 +253,210 @@ Expected degradation by target line:
 If an older line cannot support a surface, the port should remove, disable, or
 report that surface and document the exclusion rather than simulating feature
 parity with unsafe runtime behavior.
+
+## Backport Rings
+
+Use rings, not a waterfall. Do not flow constraints from a lower target line
+back into higher lines as inherited architecture.
+
+The source of truth for every ring is the `3.0.0` source anchor plus portable
+fixes deliberately brought back to `dev`. Lower target branches must not inherit
+from each other unless a change is explicitly target-line local and already
+validated for that line.
+
+| Ring | Target | Rule |
+| --- | --- | --- |
+| 1 | Factorio `2.0` | Port from `3.0.0`; remove or disable Factorio `2.1` surfaces. |
+| 2 | Factorio `1.1` | Reduced port from `3.0.0` plus portable `2.0` lessons. |
+| 3 | Factorio `1.0` / `0.18` bridge | Prove the bridge with a tiny artifact before choosing the release shape. |
+| 4 | Factorio `0.17` / `0.16` / `0.15` | Native-infinite subsets only after binary proof. |
+| 5 | Factorio `0.14` / `0.13` / `0.12` | Archive finite-ladder packages unless binary proof supports more. |
+| 6 | Factorio `0.11` through `0.6` | Museum/discovery builds defined from matching binaries and base files. |
+
+Each ring can send portable improvements back to `dev`: validation script
+improvements, target manifest fixes, report diff fixes, package hygiene fixes,
+docs corrections, generic platform-adapter fixes, clearer errors, and
+deterministic ordering fixes. These returns accumulate on `dev`; they are not a
+reason to cut `3.0.1` while the backport ladder is still active.
+
+Target-line edits must stay out of `dev`: `factorio_version = "2.0"` or older,
+lower `base` dependency floors, removed `2.1` dependencies, disabled `2.1`
+features, and old-line release wording.
+
+## Phase Gates
+
+### `tmp/2.0` To `2.3.0`
+
+`2.3.0` is the maintained Factorio `2.0` port of the MIR 3 compatibility
+compiler architecture. It removes or disables Factorio `2.1`-only surfaces. Do
+not describe it as identical to `3.0.0`.
+
+Minimum gate:
+
+- start from the exact `3.0.0` source anchor;
+- set `info.json` to version `2.3.0`, `factorio_version = "2.0"`, and
+  `base >= 2.0`;
+- remove Factorio `2.1` dependency floors;
+- validate hidden optional dependency syntax and official DLC names on the real
+  Factorio `2.0` install;
+- remove or guard `2.1`-only cargo modifiers and any other `2.1`-only direct
+  effects;
+- verify recipe `categories` / `category` behavior against Factorio `2.0`;
+- verify Space Age and Quality behavior against the actual `2.0` install;
+- run static validation and Factorio `2.0` binary validation from
+  `D:\Programs\Factorio`;
+- run base-only and Space Age/Quality `2.0` load checks;
+- run selected local mod-library checks;
+- compare planner and report output against `3.0.0` expectations;
+- update README, changelog, Mod Portal copy, and release notes for Factorio
+  `2.0`;
+- build and inspect the package;
+- promote to `legacy` only after all gates pass.
+
+After publication:
+
+1. Upload the exact validated zip recorded in `.mir/branches.yml`.
+2. Verify the Mod Portal lists MIR `2.3.0` for Factorio `2.0`.
+3. Tag the GitHub source point for the released `legacy` commit.
+4. Mark `.mir/branches.yml` as `published` in a follow-up release-evidence
+   commit.
+5. Treat the released `2.3.0` zip as immutable.
+
+Do not rebuild `2.3.0` after upload unless a release-blocking issue is found.
+If the payload changes after publication, the next package is `2.3.1`.
+
+### Portable Return To `dev` And `3.0.5`
+
+After `2.3.0` and every later ring, bring back only portable improvements to
+`dev`: validation runner improvements, package hygiene checks, target manifest
+fixes, report-diff tooling, deterministic ordering fixes, generic
+platform-adapter fixes, clearer diagnostics, docs corrections,
+release-process hardening, test fixtures that also make sense for Factorio
+`2.1`, and bug fixes in shared compiler logic.
+
+Do not release these immediately as `3.0.1`. Keep them on `dev` while the
+`3.0.0` backport rings continue. Use `3.0.5` for the accumulated Factorio
+`2.1` patch after the `2.0` port is published, the `1.1` port is either
+published or has produced clear lessons, the `1.0` / `0.18` policy is decided,
+and a short community-feedback window has surfaced current-line issues.
+
+Do not bring back target-line metadata, dependency-floor downgrades, removed
+`2.1` dependencies, disabled `2.1` features, lower-target compromises as
+default Factorio `2.1` behavior, or `2.0` release wording.
+
+Rule:
+
+```text
+Old branches teach the compiler better boundaries.
+They do not drag the modern line backward.
+```
+
+### Emergency `3.0.1` Policy
+
+Do not cut `3.0.1` unless the current Factorio `2.1` line has a serious
+release-blocking issue:
+
+- `3.0.0` has a serious Factorio `2.1` load failure;
+- a migration breaks saves;
+- a generated technology ID problem appears;
+- a package hygiene issue affects users;
+- a public Mod Portal upload is materially wrong;
+- a critical compatibility fix is safe and already validated.
+
+Everything else accumulates for `3.0.5`.
+
+### `tmp/1.1` To `1.9.3`
+
+`1.9.3` is a Factorio `1.1` compatibility port generated from the MIR 3
+architecture. Feature parity with `2.x` and `3.x` is not promised.
+
+Required cuts:
+
+- remove Space Age, Quality, Recycler, and Elevated Rails;
+- remove cargo platform and landing-pad modifiers;
+- replace `storage` with `global` or remove runtime code;
+- disable recipe productivity unless proven in Factorio `1.1`;
+- use modern non-Space-Age science packs only;
+- avoid Factorio `2.x` dependency syntax leakage;
+- validate lab productivity and worker robot battery effect support;
+- validate infinite `max_level` and `count_formula`;
+- validate old recipe result schema and icon schema;
+- validate migrations or omit them.
+
+Required proof:
+
+- `info.json` version is `1.9.3`;
+- `factorio_version` is `1.1`;
+- the matching Factorio `1.1` binary loads the package;
+- science packs are target-valid;
+- technology effects are target-valid;
+- `max_level` and `count_formula` load in the target binary;
+- old recipe schema assumptions are proven;
+- package hygiene passes;
+- release notes describe this as a compatibility port.
+
+`1.1` is the first hard reduction ring. Do not expect it to behave like the
+Factorio `2.0` port.
+
+### `tmp/1.0` To `1.8.0`
+
+Resolve the Factorio `0.18` bridge before implementation:
+
+1. Build a tiny `0.18` proof artifact.
+2. Test it in `0.18`.
+3. Test the same artifact in `1.0`.
+4. Decide whether `1.8.0` should be a true `1.0` package or a `0.18` bridge
+   package.
+
+### `tmp/0.17`, `tmp/0.16`, And `tmp/0.15`
+
+These are reduced native-infinite editions:
+
+- `tmp/0.17` to `1.7.0`: first old-line native-infinite proof;
+- `tmp/0.16` to `1.6.0`: old-science native-infinite proof;
+- `tmp/0.15` to `1.5.0`: earliest plausible native-infinite floor.
+
+Required work:
+
+- remove all `2.x` DLC surfaces;
+- remove recipe productivity unless binary proof supports it;
+- use `global` or no runtime;
+- build target-specific science pack maps;
+- validate `max_level`, `count_formula`, and every direct effect by binary;
+- use minimal settings and target-era icon and recipe schemas;
+- package and load in the matching binary.
+
+### `tmp/0.14`, `tmp/0.13`, And `tmp/0.12`
+
+These are archive finite-ladder reconstructions unless binary proof supports
+more:
+
+- `tmp/0.14` to `1.4.0`;
+- `tmp/0.13` to `1.3.0`;
+- `tmp/0.12` to `0.12.0`.
+
+The first proof package should contain one technology, one effect, one finite
+continuation, target-era science packs, no modern settings surface, and no
+current infinite generator.
+
+### `tmp/0.11` Through `tmp/0.6`
+
+These are museum/discovery builds. Do not call them release candidates until a
+matching old binary loads a package.
+
+First tasks:
+
+- acquire the matching binary;
+- inspect target base files;
+- identify mod structure, technology prototype shape, science pack names, and
+  available effect types;
+- build one tiny proof package;
+- load it in the target binary;
+- only then define the actual feature set.
+
+Do not block `3.0.5` on the full museum ladder unless the archive work is
+moving quickly. Lessons from `0.14` and older can feed a later `3.0.6` patch or
+the `3.1.0` tooling and compatibility infrastructure campaign.
 
 ## Release Wording Classes
 
