@@ -90,7 +90,18 @@ release_artifacts:
       size_bytes: 296124
       entries: 119
       forbidden_entries: 0
-      status: release-ready
+      status: published
+    mir_1_9_3:
+      version: "1.9.3"
+      branch: tmp/1.1
+      target_factorio: "1.1"
+      source_anchor: mir_3_0_0
+      artifact: dist/more-infinite-research_1.9.3.zip
+      sha256: 1723C10FEDD9A12003052991CC7574F1F6BF4E4ABC506F0323571DF680C0444B
+      size_bytes: 298759
+      entries: 121
+      forbidden_entries: 0
+      status: release-candidate
   closed_versions:
     - version: "2.2.0"
       branch: main
@@ -108,14 +119,20 @@ release_artifacts:
       branch: dev
       target_factorio: "2.1"
       purpose: accumulated portable fixes, compatibility lessons, tooling updates, docs corrections, and community feedback after the 3.0.0 backport rings
-    factorio_2_0_backport:
-      version: "2.3.0"
-      branch: legacy
-      target_factorio: "2.0"
     factorio_1_1_port:
       version: "1.9.3"
       branch: tmp/1.1
       target_factorio: "1.1"
+    factorio_0_18_bridge:
+      version: "1.8.0"
+      branch: tmp/1.0
+      target_factorio: "0.18"
+      purpose: bridge proof and release candidate from the MIR 3 source anchor plus portable 2.3.0 and 1.9.3 lessons
+    factorio_1_0_port:
+      version: "1.8.1"
+      branch: tmp/1.0
+      target_factorio: "1.0"
+      purpose: true Factorio 1.0 follow-up only if the 0.18 bridge does not cover the public release shape
     current_line_feature:
       version: "3.1.0"
       branch: dev

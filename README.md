@@ -9,7 +9,9 @@
 
 *Trickle down economics bring productivity gains to all industries.*
 
-More Infinite Research adds **configurable infinite productivity** and **bonus research** for intermediate items, logistics chains, combat bonuses, player bonuses, and Space Age gaps that vanilla Factorio does not cover.
+More Infinite Research adds **configurable infinite productivity** and **bonus research** for intermediate items, logistics chains, combat bonuses, player bonuses, and Space Age gaps that vanilla Factorio does not cover on supported modern target lines.
+
+**MIR `1.9.3+`** targets **Factorio `1.1`** as a reduced compatibility port. It keeps supported direct-effect bonuses and base technology continuations, but does not include recipe productivity, Space Age, Quality, Recycler, Elevated Rails, cargo logistics, prototype cap settings, pipeline extent settings, or settings profiles.
 
 **MIR `2.x.x`** targets **Factorio `2.0`** *(starting with **`2.3.0`**)*.
 

@@ -91,9 +91,11 @@ return {
     icon_candidates = {
       {technology = "research-productivity", required_mod = "space-age"},
       {icon = "__space-age__/graphics/technology/research-productivity.png", icon_size = 256, inactive_mod_asset = "space-age"},
+      {technology = "research-speed-6"},
+      {technology = "research-speed-5"},
       {technology = "military-science-pack"}
     },
-    overlay = "recipe-productivity",
+    overlay = "laboratory-productivity",
     localised_description = {"technology-description.more-infinite-research.lab_productivity"},
     science_packs = {
       "automation-science-pack",
@@ -167,7 +169,11 @@ return {
   },
 
   research_cannon_shooting_speed = {
-    icon_item = "cannon-shell",
+    icon_candidates = {
+      {technology = "weapon-shooting-speed-3"},
+      {technology = "physical-projectile-damage-2"},
+      {item = "cannon-shell"}
+    },
     science_packs = {
       "automation-science-pack","logistic-science-pack","chemical-science-pack",
       "production-science-pack","military-science-pack","electromagnetic-science-pack"
@@ -210,8 +216,7 @@ return {
   },
 
   research_character_mining_speed = {
-    icon = "__base__/graphics/technology/steel-axe.png",
-    icon_size = 256,
+    icon_tech = "steel-axe",
     science_packs = {
       "utility-science-pack","military-science-pack","agricultural-science-pack",
       "electromagnetic-science-pack"
@@ -222,7 +227,11 @@ return {
   },
 
   research_character_crafting_speed = {
-    icon_tech = "repair-pack",
+    icon_candidates = {
+      {technology = "automation-3"},
+      {technology = "automation-2"},
+      {item = "repair-pack"}
+    },
     science_packs = {
       "utility-science-pack","military-science-pack","agricultural-science-pack",
       "electromagnetic-science-pack"
@@ -233,7 +242,7 @@ return {
   },
 
   research_character_walking_speed = {
-    icon_item = "exoskeleton-equipment",
+    icon_tech = "exoskeleton-equipment",
     science_packs = {
       "utility-science-pack","military-science-pack","agricultural-science-pack",
       "electromagnetic-science-pack"
@@ -244,8 +253,7 @@ return {
   },
 
   research_character_reach = {
-    icon = "__base__/graphics/technology/steel-axe.png",
-    icon_size = 256,
+    icon_tech = "steel-axe",
     science_packs = {
       "utility-science-pack","military-science-pack","agricultural-science-pack",
       "cryogenic-science-pack"

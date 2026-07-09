@@ -215,6 +215,13 @@ docs:
     doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
+  - path: docs/archive/2.x/rc-plan-factorio-1.1.md
+    title: "Factorio 1.1 RC Planning Report"
+    status: archived
+    audience: maintainer
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
   - path: docs/archive/2.x/README.md
     title: "2.x Archive"
     status: archived
@@ -238,6 +245,13 @@ docs:
     source_of_truth_for: []
   - path: docs/archive/2.x/release-notes-1.9.2.md
     title: "More Infinite Research 1.9.2 Release Notes"
+    status: archived
+    audience: maintainer
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/archive/2.x/release-notes-1.9.3.md
+    title: "More Infinite Research 1.9.3 Release Notes"
     status: archived
     audience: maintainer
     doc_type: archive

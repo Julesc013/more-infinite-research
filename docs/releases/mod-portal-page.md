@@ -13,7 +13,7 @@ superseded_by: []
 
 Adds **fully customizable** repeatable late-game research for **productivity,
 speed, logistics, combat, player bonuses, robots, spoilage, and cargo
-logistics**.
+logistics** on supported modern target lines.
 
 It is built for players who want more *long-term scaling for late-game
 megabases*, long-running Space Age saves, and modded playthroughs without
@@ -30,6 +30,12 @@ turning the mod into a full content overhaul.
 - Uses MIR 3 compiler diagnostics to explain generated, skipped, observed, and rejected research decisions.
 
 **MIR `2.x.x`** targets **Factorio `2.0`** *(starting with **`2.3.0`**)*.
+
+**MIR `1.9.3+`** targets **Factorio `1.1`** as a reduced compatibility port:
+supported direct-effect bonuses and base technology continuations only, with
+no recipe productivity, Space Age, Quality, Recycler, Elevated Rails, cargo
+logistics, prototype cap settings, pipeline extent settings, or settings
+profiles.
 
 **MIR `3.x.x`** targets **Factorio `2.1`** and requires `base >= 2.1.8`. Space Age is optional.
 
