@@ -62,6 +62,21 @@ If README, changelog, locale, or any other package-visible file changes, rebuild
 `dist/more-infinite-research_<version>.zip` and update the recorded size and
 SHA-256 before promotion.
 
+## Backport Publication Freeze
+
+For target-line backports, the release branch and `.mir/branches.yml` must
+record the exact zip that is uploaded.
+
+After a backport is uploaded:
+
+- verify the Mod Portal lists the intended MIR version and Factorio line;
+- tag the GitHub source point;
+- mark the `.mir/branches.yml` artifact row as `published`;
+- treat the uploaded zip as immutable.
+
+Do not rebuild a published backport archive. A changed payload after upload
+must become the next patch version, such as `2.3.1` after `2.3.0`.
+
 ## Main Promotion
 
 Promote `dev` to `main` only after the publish-candidate check passes.
@@ -106,3 +121,18 @@ For the first 24 to 72 hours after a major release, use patch releases only for:
 
 Do not add broad generation, new capability emissions, new stream IDs, or broad
 compatibility claims in the first patch window.
+
+## Current-Line Emergency Patch Policy
+
+Do not cut `3.0.1` unless the Factorio `2.1` current line has a real
+release-blocking issue:
+
+- serious load failure;
+- broken save migration;
+- generated technology ID problem;
+- package hygiene issue that affects users;
+- materially wrong public upload;
+- critical compatibility fix that is already validated.
+
+All other portable lessons from target-line backports accumulate on `dev` for
+`3.0.5`.

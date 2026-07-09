@@ -1,6 +1,6 @@
 # M.I.R. TODO
 
-Updated: 2026-07-08
+Updated: 2026-07-09
 
 This is the active task list for MIR 3.0.0 and later. It should contain future
 work, current gates, deferred decisions, recurring release checks, and issue
@@ -11,8 +11,11 @@ Current assumptions:
 
 - `2.2.0` is released as-is.
 - `1.9.2` is released from `legacy` as-is.
-- MIR 3.0.0 is frozen as a publish candidate on `dev`; only release-critical
-  fixes should land before publishing.
+- MIR 3.0.0 is the validated Factorio `2.1` source anchor on `main` and
+  `dev`.
+- MIR 2.3.0 is staged on `legacy` as the Factorio `2.0` port of that source
+  anchor; upload only the exact validated `dist/more-infinite-research_2.3.0.zip`
+  recorded in `.mir/branches.yml`.
 - The shipped MIR 3 structure is Factorio root wrappers, `prototypes/mir/`
   implementation, and declarative `prototypes/streams/` data tables.
 - Old `prototypes/compat/`, `prototypes/lib/`, `prototypes/mir/legacy/`,
@@ -204,8 +207,34 @@ compatibility port of a tested current-line snapshot.
 - [ ] Use `docs/maintainer/backporting.md` as the source of truth for the locked version-line mapping.
 - [ ] Use `docs/archive/2.x/legacy-backport-cadence.md` as the source of truth for target order, support class, and source snapshot language.
 - [ ] Treat every lower line as a separate target-line port, not a wholesale `3.0.0` backport.
-- [ ] Release `v2.3.0` as the first Factorio `2.0` port of the MIR 3 architecture only after `v3.0.0` is stable and a Factorio `2.0` binary loads the exact built package.
+- [ ] Upload `v2.3.0` as the first Factorio `2.0` port of the MIR 3 architecture from the validated `legacy` branch package.
+  Current release package: `dist/more-infinite-research_2.3.0.zip`,
+  SHA-256 `84287C5ACD047F6A3E1A6EDD568DEF313C13403CD35BB165CA399F4B02E19133`.
+- [ ] After Mod Portal upload, verify it lists `2.3.0` for Factorio `2.0`,
+  tag the GitHub release point, mark `.mir/branches.yml` as `published`, and
+  treat the uploaded zip as immutable.
+- [ ] Do not rebuild `2.3.0` after upload; any changed payload becomes
+  `2.3.1`.
+- [ ] Bring only portable lessons from `2.3.0` back into `dev`: validation
+  runner improvements, package hygiene checks, target manifest improvements,
+  report-diff tooling, deterministic ordering fixes, generic platform-adapter
+  fixes, clearer diagnostics, docs corrections, release-process hardening,
+  shared 2.1-valid fixtures, and shared compiler bug fixes.
+- [ ] Do not bring Factorio `2.0` metadata, lower dependency floors, disabled
+  `2.1` surfaces, 2.0 release wording, or lower-target compromises back into
+  default Factorio `2.1` behavior.
+- [ ] Do not cut `3.0.1` unless the current Factorio `2.1` line has a serious
+  load failure, broken migration, generated-ID problem, package hygiene issue,
+  materially wrong upload, or already-validated critical compatibility fix.
+- [ ] Accumulate normal portable lessons for `3.0.5` after `2.3.0` is
+  published, `1.1` is published or has produced clear lessons, the `1.0` /
+  `0.18` bridge is decided, and community feedback has had a short window.
 - [ ] Release `v1.9.3` as the first Factorio `1.1` compatibility port only after target-line implementation and binary validation.
+  Ring 2 posture: no Space Age, Quality, Recycler, Elevated Rails, cargo
+  modifiers, unproven recipe productivity, `storage`, or Factorio `2.x`
+  dependency syntax leakage. Prove target-valid science packs, effects,
+  `max_level`, `count_formula`, old recipe schema, package hygiene, and
+  compatibility-port release wording against a Factorio `1.1` binary.
 - [ ] Release `v1.8.0` as the first Factorio `1.0` compatibility port only after the Factorio `0.18` bridge policy is recorded.
 - [ ] Release `v1.7.0`, `v1.6.0`, and `v1.5.0` as reduced native-infinite editions for Factorio `0.17`, `0.16`, and `0.15` only after target binary proof.
 - [ ] Release `v1.4.0`, `v1.3.0`, and `v0.12.0` as archive finite-ladder reconstructions only after target binary proof.
