@@ -97,8 +97,8 @@ release_artifacts:
       target_factorio: "1.1"
       source_anchor: mir_3_0_0
       artifact: dist/more-infinite-research_1.9.3.zip
-      sha256: 8AC5C55F78562B22C3E9397223043C0E2CCEF6C4A7C4414A776A38D0B3AB4CF8
-      size_bytes: 297722
+      sha256: 81FFB525231EC745747EADF4017205A904A890EC139B09450A72371D86492B5E
+      size_bytes: 298026
       entries: 116
       forbidden_entries: 0
       status: release-candidate

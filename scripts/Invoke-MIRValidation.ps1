@@ -1899,6 +1899,7 @@ $postMirAssertionFixtures = @(
   "mir-fixture-assert-science-pack-productivity",
   "mir-fixture-assert-lab-skip-policy",
   "mir-fixture-assert-lab-productivity-owner-skip",
+  "mir-fixture-assert-legacy-effect-icons",
   "mir-fixture-assert-base-extension-boundary",
   "mir-fixture-assert-cargo-logistics",
   "mir-fixture-assert-fluid-productivity",
@@ -2816,7 +2817,9 @@ if ($isFactorio21Line) {
 if ($isFactorio11Line) {
   Write-Host "[info] Factorio 1.1 reduced runtime gate skips 2.x recipe-productivity and DLC scenarios."
 
-  Invoke-RuntimeScenario -ScenarioName "factorio-1.1-direct-effects" -EnabledFixtureNames @()
+  Invoke-RuntimeScenario -ScenarioName "factorio-1.1-direct-effects" -EnabledFixtureNames @(
+    "mir-fixture-assert-legacy-effect-icons"
+  )
   foreach ($stream in @(
     "research_cannon_shooting_speed",
     "research_character_crafting_speed",

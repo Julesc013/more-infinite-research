@@ -255,20 +255,27 @@ local function add_constant_overlay(base_icons, overlay)
     }}
   end
   if overlay == false then return out end
-  if not target_line.feature_enabled("technology_constant_overlays") then return out end
 
-  local path = CONSTANT_OVERLAYS[overlay or "recipe-productivity"] or overlay
-  if type(path) ~= "string" then return out end
+  local layer = nil
+  if target_line.technology_overlay_layer then
+    layer = target_line.technology_overlay_layer(overlay)
+    if layer == false then return out end
+  end
 
-  -- Match Wube's technology constant helpers so the corner badge floats
-  -- outside normal icon bounds instead of shrinking the base icon.
-  table.insert(out, {
-    icon = path,
-    icon_size = 128,
-    scale = 0.5,
-    shift = {50, 50},
-    floating = true
-  })
+  if not layer then
+    if not target_line.feature_enabled("technology_constant_overlays") then return out end
+    local path = CONSTANT_OVERLAYS[overlay or "recipe-productivity"] or overlay
+    if type(path) ~= "string" then return out end
+    layer = {
+      icon = path,
+      icon_size = 128,
+      scale = 0.5,
+      shift = {50, 50},
+      floating = true
+    }
+  end
+
+  table.insert(out, deepcopy(layer))
   return out
 end
 

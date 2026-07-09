@@ -44,6 +44,20 @@ local omitted_global_settings = {
   ["mir-use-installed-space-age-icons"] = true
 }
 
+local legacy_technology_overlay_layers = {
+  ["recipe-productivity"] = "__base__/graphics/technology/productivity-module-3.png",
+  speed = "__base__/graphics/technology/speed-module-3.png",
+  ["movement-speed"] = "__base__/graphics/technology/exoskeleton-equipment.png",
+  mining = "__base__/graphics/technology/mining-productivity.png",
+  battery = "__base__/graphics/technology/battery-equipment.png",
+  capacity = "__base__/graphics/technology/inserter-capacity.png",
+  damage = "__base__/graphics/technology/physical-projectile-damage-2.png",
+  range = "__base__/graphics/technology/artillery-range.png",
+  ["braking-force"] = "__base__/graphics/technology/braking-force.png",
+  equipment = "__base__/graphics/technology/effect-transmission.png",
+  count = "__base__/graphics/technology/inserter-capacity.png"
+}
+
 local function has_unsupported_required_mod(spec)
   for _, mod_name in ipairs((spec and spec.required_mods) or {}) do
     if unsupported_required_mods[mod_name] then return true end
@@ -71,6 +85,18 @@ end
 
 function M.feature_enabled(name)
   return M.supports[name] == true
+end
+
+function M.technology_overlay_layer(overlay)
+  local icon = legacy_technology_overlay_layers[overlay or "recipe-productivity"]
+  if not icon then return nil end
+
+  return {
+    icon = icon,
+    icon_size = 256,
+    scale = 0.23,
+    shift = {50, 50}
+  }
 end
 
 return M

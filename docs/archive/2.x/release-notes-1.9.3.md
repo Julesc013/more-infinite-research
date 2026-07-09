@@ -33,9 +33,9 @@ Factorio `2.x` surfaces before they can emit invalid prototypes.
 - Retargeted branch-local support mod metadata to Factorio `1.1`.
 - Hid settings-profile import/export on the `1.1` line because Factorio `1.1`
   does not expose the `helpers` string codec API used by MIRSET1 profiles.
-- Disabled newer `__core__/graphics/icons/technology/constants/*` badge
-  overlays on the `1.1` line and used target-era source icons instead of
-  bundling newer Factorio graphics.
+- Replaced newer `__core__/graphics/icons/technology/constants/*` badge
+  overlays on the `1.1` line with target-era base technology badge fallbacks
+  instead of bundling newer Factorio graphics.
 
 ## Supported Surface
 
@@ -57,11 +57,18 @@ Factorio `2.x` surfaces before they can emit invalid prototypes.
   direct effects, lab productivity owner skip, robot battery owner skip,
   merged inventory/trash capacity, settings surface, checkbox enable/disable,
   and weapon-speed overlap safety.
+- The `factorio-1.1-direct-effects` runtime scenario now asserts every
+  supported generated direct-effect technology has a target-era effect badge
+  and no newer core constant icon path.
+- A disposable Factorio `1.1.110` proof mod using
+  `change-recipe-productivity` failed to load with `Unknown modifier type`,
+  confirming recipe productivity streams are an engine-surface exclusion on
+  the `1.1` line.
 
 ## Known Boundaries
 
 - Recipe productivity is not included in this Factorio `1.1` compatibility
-  port.
+  port because the target binary rejects `change-recipe-productivity`.
 - Space Age, Quality, Recycler, Elevated Rails, cargo logistics, spoilage,
   agriculture, prototype cap settings, pipeline extent settings, and settings
   profiles are not included on the `1.1` line.
