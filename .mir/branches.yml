@@ -129,6 +129,24 @@ release_artifacts:
       factorio_0_18_validation: passed
       factorio_1_0_bridge_validation: passed
       status: published
+    mir_1_8_1:
+      version: "1.8.1"
+      branch: tmp/1.0
+      target_factorio: "1.0"
+      source_anchor: mir_1_9_3
+      source_lessons:
+        - mir_1_8_0_bridge_evidence
+        - dev_portable_fixes
+      artifact: dist/more-infinite-research_1.8.1.zip
+      sha256: B1622AB0BC6D72265842D698781DBE21B7286662E29FB6992057FBCFF87D8E29
+      size_bytes: 300526
+      entries: 116
+      forbidden_entries: 0
+      validation_content_matches_dist: true
+      static_validation: passed
+      factorio_1_0_validation: passed
+      factorio_1_0_binary: D:\Programs\Factorio\1.0\bin\x64\factorio.exe
+      status: release-candidate
   closed_versions:
     - version: "2.2.0"
       branch: main
@@ -173,7 +191,7 @@ release_artifacts:
 target_lines:
   factorio_0_18_bridge:
     version: "1.8.0"
-    branch: port/1.1-to-0.18
+    branch: tmp/0.18
     target_factorio: "0.18"
     support_class: bridge-archive
     source: mir_1_9_3
@@ -187,6 +205,8 @@ target_lines:
     branch: tmp/1.0
     target_factorio: "1.0"
     support_class: compatibility-port
-    source: mir_1_8_0_or_mir_1_9_3_plus_bridge_lessons
+    source: mir_1_9_3_plus_mir_1_8_0_bridge_lessons_plus_dev_portable_fixes
     publish_policy: maintained
     future_maintenance: "1.8.x"
+    required_binary_proof:
+      - factorio_1.0

@@ -795,7 +795,11 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
           $_.Snippet -in @(
             'reason = "official-stream-settings-visible"',
             "ui_visibility = {",
-            "generation_requirements = {"
+            "generation_requirements = {",
+            '{technology = "electric-weapons-damage-1", required_mod = "space-age"}',
+            '__space-age__/graphics/technology/electric-weapons-damage.png',
+            '{technology = "research-productivity", required_mod = "space-age"}',
+            'ammo_category = "tesla", modifier = 0.1'
           )
         ) -and -not (
           $_.File -eq "prototypes\mir\settings\defaults.lua" -and
@@ -811,6 +815,23 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
   foreach ($check in $requiredSnippets) {
     if (-not $check.Text.Contains($check.Snippet)) {
       throw "Missing science-pack progression setting wiring in $($check.File): $($check.Snippet)"
+    }
+  }
+
+  if ($isReducedLegacyLine) {
+    $reducedForbiddenDirectEffectSnippets = @(
+      '__space-age__/',
+      '{technology = "electric-weapons-damage-1", required_mod = "space-age"}',
+      '{technology = "research-productivity", required_mod = "space-age"}',
+      'ammo_category = "tesla"',
+      '"agricultural-science-pack"',
+      '"electromagnetic-science-pack"',
+      '"cryogenic-science-pack"'
+    )
+    foreach ($snippet in $reducedForbiddenDirectEffectSnippets) {
+      if ($directEffectsText.Contains($snippet)) {
+        throw "Factorio $($repoInfo.factorio_version) direct-effect streams must not carry newer-line surface '$snippet'."
+      }
     }
   }
 
@@ -842,11 +863,19 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
       throw "Missing explicit default science pack list for $weaponSpeedStream in prototypes/mir/settings/defaults.lua."
     }
     $packs = $match.Groups["packs"].Value
-    if (-not $packs.Contains("electromagnetic-science-pack")) {
-      throw "$weaponSpeedStream prototypes/mir/settings/defaults.lua science packs must include electromagnetic-science-pack."
-    }
-    if ($packs.Contains("agricultural-science-pack")) {
-      throw "$weaponSpeedStream prototypes/mir/settings/defaults.lua science packs must not include agricultural-science-pack."
+    if ($isReducedLegacyLine) {
+      foreach ($newerPack in @("agricultural-science-pack", "electromagnetic-science-pack", "cryogenic-science-pack")) {
+        if ($packs.Contains($newerPack)) {
+          throw "$weaponSpeedStream prototypes/mir/settings/defaults.lua science packs must not include $newerPack on Factorio $($repoInfo.factorio_version)."
+        }
+      }
+    } else {
+      if (-not $packs.Contains("electromagnetic-science-pack")) {
+        throw "$weaponSpeedStream prototypes/mir/settings/defaults.lua science packs must include electromagnetic-science-pack."
+      }
+      if ($packs.Contains("agricultural-science-pack")) {
+        throw "$weaponSpeedStream prototypes/mir/settings/defaults.lua science packs must not include agricultural-science-pack."
+      }
     }
   }
 

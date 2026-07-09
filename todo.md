@@ -267,10 +267,17 @@ compatibility port of a tested current-line snapshot.
   constant badge graphics, synthetic badge overlays, or unsupported native
   modifier icon metadata. Research productivity uses stock military science
   technology art as its main tile.
-- [ ] Release `v1.8.1` as the first maintained Factorio `1.0` compatibility
+- [x] Release `v1.8.1` as the first maintained Factorio `1.0` compatibility
   port from the `1.9.3` source posture, proven `1.8.0` bridge lessons, and
-  current dev portable fixes. Do not use `0.8.x` for Factorio `1.0`; `0.8.x`
-  remains reserved for the later Factorio `0.8` museum line.
+  current dev portable fixes. Package candidate:
+  `dist/more-infinite-research_1.8.1.zip`, SHA-256
+  `B1622AB0BC6D72265842D698781DBE21B7286662E29FB6992057FBCFF87D8E29`,
+  size `300526` bytes, `116` entries, `0` forbidden entries. Static
+  validation passed, Factorio `1.0` binary validation passed with
+  `D:\Programs\Factorio\1.0\bin\x64\factorio.exe`, and the public dist archive
+  content matches the runtime-validated archive. Do not use `0.8.x` for
+  Factorio `1.0`; `0.8.x` remains reserved for the later Factorio `0.8` museum
+  line.
 - [ ] Release `v1.7.0`, `v1.6.0`, and `v1.5.0` as reduced native-infinite editions for Factorio `0.17`, `0.16`, and `0.15` only after target binary proof.
 - [ ] Release `v1.4.0`, `v1.3.0`, and `v0.12.0` as archive finite-ladder reconstructions only after target binary proof.
 - [ ] Release `v0.11.0` through `v0.6.0` as museum/discovery builds only after target binary and base-file discovery.

@@ -31,6 +31,11 @@ continuations only, and does not include recipe productivity, Factorio 2.x DLC
 surfaces, prototype cap settings, pipeline extent settings, settings profiles,
 newer technology badge overlays, or synthetic old-line badge overlays.
 
+**MIR `1.8.1+`** targets **Factorio `1.0`** as the maintained compatibility
+port line. It is derived from the validated Factorio `1.1` port and the
+Factorio `0.18` bridge lessons, with Factorio `1.0` metadata, validation, and
+target-supported behavior restored where proven.
+
 **MIR `1.9.3+`** targets **Factorio `1.1`** as a reduced compatibility port:
 supported direct-effect bonuses and base technology continuations only, with
 no recipe productivity, Space Age, Quality, Recycler, Elevated Rails, cargo

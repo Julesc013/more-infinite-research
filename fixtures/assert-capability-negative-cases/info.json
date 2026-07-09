@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "title": "MIR Fixture Assert - Capability Negative Cases",
   "author": "MIR Tests",
-  "factorio_version": "2.1",
+  "factorio_version": "1.0",
   "dependencies": [
-    "base >= 2.1",
+    "base >= 1.0",
     "mir-fixture-capability-negative-cases",
     "more-infinite-research"
   ]
