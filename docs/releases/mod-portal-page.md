@@ -19,19 +19,6 @@ It is built for players who want more *long-term scaling for late-game
 megabases*, long-running Space Age saves, and modded playthroughs without
 turning the mod into a full content overhaul.
 
-## MIR 3.0.0
-
-MIR 3.0.0 is the compatibility compiler architecture release.
-
-It moves active implementation under `prototypes/mir`, keeps generated
-technology IDs stable, keeps compatibility overlays declarative, and continues
-to skip unsafe or unavailable research instead of claiming automatic support for
-every mod.
-
-The architecture change does not require a new migration by itself. Existing
-generated technology IDs are preserved, and the shipped `2.0.5` and `2.1.0`
-migrations remain in place.
-
 ## At a Glance
 
 - Adds many **configurable infinite productivity researches** for vanilla, Space Age, and compatible modded production chains.
@@ -42,8 +29,9 @@ migrations remain in place.
 - Adopts safe mod-added recipes into configured vanilla Space Age productivity families instead of creating parallel research.
 - Uses MIR 3 compiler diagnostics to explain generated, skipped, observed, and rejected research decisions.
 
-- Legacy transition releases **`1.9.0`** through **`1.9.2`** target **Factorio `2.0`** and require `base >= 2.0`.
-- Version **`3.x.x`**, starting with **`3.0.0`**, targets **Factorio `2.1`**; requires `base >= 2.1.8`. Space Age is optional.
+**MIR `2.x.x`** targets **Factorio `2.0`** *(starting with **`2.3.0`**)*.
+
+**MIR `3.x.x`** targets **Factorio `2.1`** and requires `base >= 2.1.8`. Space Age is optional.
 
 *Recipe productivity researches are infinite, but Factorio's recipe productivity cap still applies. Once a recipe reaches that cap, more levels may no longer improve that recipe.*
 
@@ -233,12 +221,6 @@ support unless that claim is explicitly recorded.
 
 For maintainers and pack authors, the repository includes an extended local audit workflow. With a Factorio binary and Mod Portal credentials, it can run top-download audits; with read-only local mod zip libraries, it can also run offline individual-root, curated-combination, and generated local-library stress sweeps. The workflow supports curated overhaul scenarios, local modpack zip roots, safe unattended local sweep and morning summary helpers, parsed MIR diagnostics, checkpointed load results, missing-dependency summaries, grouped expected/unexpected failure reports, explicit official-DLC mod-list isolation, blank-log-line-tolerant audit parsing, and review-only compatibility profile stubs. Exploratory runs collect all scenarios for triage; strict runs can fail on unexpected grouped failures. These tools are for evidence collection; they do not automatically enable new compatibility profiles.
 
-Known 3.0.0 publication notes:
-
-- Portal-backed full-catalog checks were not run in the release environment
-  because `FACTORIO_TOKEN` was not set.
-- Local supported-zip isolation still finds `atan-ash_2.2.1` and `atan-nuclear-science_0.3.3` failing without MIR on the tested Factorio `2.1` setup, but MIR `3.0.0` applies exact-version loader-schema repairs when those zips are loaded with MIR.
-
 ## Troubleshooting
 
 If a technology is missing:
@@ -260,12 +242,11 @@ If a recipe did not receive productivity:
 
 Version `3.0.0` preserves generated technology IDs through the MIR architecture move and does not need a new migration.
 
+Agricultural growth speed is enabled by default in `3.0.0`; spoilage preservation remains disabled by default.
+
+Existing saves receive the `2.0.5` and `2.1.0` JSON migrations automatically when the mod loads.
+
 Version `2.1.0` preserves generated technology IDs except for documented intentional migrations:
 
 - Old generated trash-slot progress migrates into the combined Character inventory slots technology.
 - Old generated Stone product productivity progress migrates into the new Landfill productivity technology. Artificial soil productivity and Molten metals productivity are new separate research lines.
-
-Existing saves receive the `2.0.5` and `2.1.0` JSON migrations automatically when the mod loads.
-
-Agricultural growth speed is enabled by default in `3.0.0`; spoilage
-preservation remains disabled by default.

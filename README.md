@@ -46,7 +46,7 @@ Recipe productivity researches are infinite, but **Factorio's recipe productivit
 
 ## New Design
 
-**MIR 3.0.0** is the compatibility compiler architecture release. It keeps the player-facing generated technology IDs stable while moving active implementation under the MIR compiler namespace, replacing old compatibility helper paths with bounded discovery, policy, report, and emission layers.
+**MIR 3** is the compatibility compiler architecture release. It keeps the player-facing generated technology IDs stable while moving active implementation under the MIR compiler namespace, replacing old compatibility helper paths with bounded discovery, policy, report, and emission layers.
 
 It is the release that makes the generation architecture durable:
 
@@ -63,10 +63,10 @@ It is the release that makes the generation architecture durable:
 
 Install the mod through the **Factorio mod portal** or place the **release zip** in your Factorio mods directory.
 
-Packaged release archives are named:
+Packaged release archives are in `dist/` named:
 
 ```text
-dist/more-infinite-research_<version>.zip
+more-infinite-research_<version>.zip
 ```
 
 ## Branch Policy
