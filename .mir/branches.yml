@@ -1,0 +1,127 @@
+schema: 1
+
+branches:
+  main:
+    purpose: latest stable Factorio 2.1.x release line
+    factorio_version: "2.1"
+    accepts:
+      - release-hotfix
+      - docs-correction
+      - fixture-correction
+      - unpublished-version-package-build
+    rejects:
+      - broad-new-generation
+      - schema-breaking-report-changes
+      - large-architecture-rewrite
+
+  dev:
+    purpose: active 3.x and main-line 2.1 development
+    factorio_version: "2.1"
+    accepts:
+      - architecture
+      - new-capabilities
+      - docs
+      - fixtures
+      - refactors
+      - validation
+
+  legacy:
+    purpose: Factorio 2.0.x backport branch
+    factorio_version: "2.0"
+    accepts:
+      - safety-fix
+      - compatibility-diagnostic-fix
+      - docs-correction
+      - exact-policy-fix
+    rejects:
+      - 3.0-directory-reorg
+      - schema-breaking-change
+      - generated-id-rename
+      - broad-new-generation
+
+  factorio-2.0-lane:
+    purpose: planned Space Exploration and other 2.0-only campaign lane
+    factorio_version: "2.0"
+    accepts:
+      - platform-compatible-backport
+      - 2.0-fixture
+      - no-2.1-only-prototype-assumption
+
+backport_rules:
+  pure_classifier_fix:
+    from: dev
+    to:
+      - main
+      - legacy
+    requires:
+      - fixture
+      - no-stream-id-change
+
+  generated_stream_change:
+    requires:
+      - stream-manifest-update
+      - migration-review
+      - fixture-update
+      - release-note
+
+  docs_only:
+    requires:
+      - docs-lint
+      - no-package-diff
+
+release_artifacts:
+  published_archives_are_immutable: true
+  source_anchors:
+    mir_3_0_0:
+      version: "3.0.0"
+      branch: main
+      target_factorio: "2.1"
+      commit: 8da631a6e5774af6d8804a49107a61a7964a5b2c
+      artifact: dist/more-infinite-research_3.0.0.zip
+      sha256: E9A644468217D6B8B07F30E92179BE7BB2DFE951A14F211C1E924A5A505ECCDC
+      status: validated-main-pushed
+    mir_2_3_0:
+      version: "2.3.0"
+      branch: legacy
+      target_factorio: "2.0"
+      source_anchor: mir_3_0_0
+      artifact: dist/more-infinite-research_2.3.0.zip
+      sha256: 84287C5ACD047F6A3E1A6EDD568DEF313C13403CD35BB165CA399F4B02E19133
+      size_bytes: 296124
+      entries: 119
+      forbidden_entries: 0
+      status: release-ready
+  closed_versions:
+    - version: "2.2.0"
+      branch: main
+      target_factorio: "2.1"
+      artifact: dist/more-infinite-research_2.2.0.zip
+      status: published
+    - version: "1.9.2"
+      branch: legacy
+      target_factorio: "2.0"
+      artifact: dist/more-infinite-research_1.9.2.zip
+      status: published
+  next_release_targets:
+    current_line:
+      version: "3.0.5"
+      branch: dev
+      target_factorio: "2.1"
+      purpose: accumulated portable fixes, compatibility lessons, tooling updates, docs corrections, and community feedback after the 3.0.0 backport rings
+    factorio_2_0_backport:
+      version: "2.3.0"
+      branch: legacy
+      target_factorio: "2.0"
+    factorio_1_1_port:
+      version: "1.9.3"
+      branch: tmp/1.1
+      target_factorio: "1.1"
+    current_line_feature:
+      version: "3.1.0"
+      branch: dev
+      target_factorio: "2.1"
+      purpose: fixture-backed overhaul compatibility support campaign after the 3.0.5 patch
+  package_refresh_rule: >-
+    only build or refresh dist archives for an unpublished target version;
+    never refresh already-published archives as part of architecture or
+    backport preparation
