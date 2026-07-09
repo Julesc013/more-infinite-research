@@ -114,9 +114,15 @@ metadata and active mods only; final recipe, item, fluid, and technology facts
 remain data-stage generation concerns. `prototypes/mir/settings/resolver.lua`
 owns startup setting enablement checks for data-stage stream and base-extension
 planning. `prototypes/mir/settings/defaults.lua` owns shared stream and
-base-extension defaults. `prototypes/mir/settings/pipeline_extent.lua` owns the
+base-extension defaults. `prototypes/mir/settings/order.lua` owns global
+setting section ranges and generated-technology ordering helpers.
+`prototypes/mir/settings/pipeline_extent.lua` owns the
 pipeline extent setting catalog and parser. `prototypes/mir/pipeline/extent.lua`
 owns the optional pipeline extent prototype pass.
+`prototypes/mir/settings/prototype_limits.lua` owns the prototype-limit setting
+catalog and value parser. `prototypes/mir/pipeline/prototype_limits.lua` owns
+the optional data-final-fixes prototype mutation pass for selected recipe
+productivity and effect receiver limits.
 
 The MIR planner namespace owns compiler planning checks as they are migrated out
 of legacy generators. `prototypes/mir/planner/requirements.lua` evaluates

@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: maintainer
 doc_type: explanation
 owner: mir-maintainers
-last_reviewed: 2026-07-08
+last_reviewed: 2026-07-09
 supersedes: []
 superseded_by: []
 ---
@@ -21,22 +21,34 @@ More Infinite Research is organized around a compatibility-first data-stage pipe
 
 `data-final-fixes.lua` runs the actual generation pipeline:
 
-1. Startup-only prototype passes such as the opt-in pipeline extent multiplier.
-2. Known competing recipe-productivity preparation from active compatibility profiles.
-3. Generated stream technology creation, with recipe-productivity ownership delegated to compatibility owner and adoption modules.
-4. Known competing recipe-productivity cleanup based on actual generated MIR effects.
-5. Known competing base-extension cleanup when MIR's matching base extension is enabled.
-6. Base technology infinite extensions.
-7. Weapon speed overlap adjustment for generated continuations.
-8. Max-level enforcement.
-9. Generated-technology effect safety validation.
-10. Optional diagnostics and audit report flush.
+1. Exact compatibility repairs needed before Factorio finalizes broken upstream prototypes.
+2. Startup-only prototype limit overrides, when a user selected a non-default cap.
+3. Startup-only pipeline extent scaling, when the multiplier is not `100%`.
+4. Known competing recipe-productivity preparation from active compatibility profiles.
+5. Generated stream technology creation, with recipe-productivity ownership delegated to compatibility owner and adoption modules.
+6. Known competing recipe-productivity cleanup based on actual generated MIR effects.
+7. Known competing base-extension cleanup when MIR's matching base extension is enabled.
+8. Base technology infinite extensions.
+9. Weapon speed overlap adjustment for generated continuations.
+10. Max-level enforcement.
+11. Planner, compatibility, and audit diagnostics.
+12. Generated-technology effect safety validation and diagnostics flush.
 
 This order gives the mod the best practical view of recipes, labs, science packs, and technologies created by other mods while still keeping this mod's final cleanup deterministic.
 
 Use [Factorio lifecycle boundaries](factorio-lifecycle.md) for the exact
 settings-stage, prototype-stage, and runtime-stage separation behind the MIR 3
 settings and control-file rules.
+
+Prototype limit settings are startup-only data-stage controls. The unchanged
+dropdown entries, such as `+300% (unchanged)`, `-80% (unchanged)`, and
+`+100000% (unchanged)`, leave Factorio's recipe productivity and effect
+receiver limits untouched. Non-default energy and pollution settings write
+separate `EffectReceiver` lower limits. The default-off Compatibility non-zero
+power floor only changes explicit `0W` active-use prototypes to `1W`. These
+passes run after exact compatibility repairs and before MIR planning, so
+generated technology diagnostics can observe the selected caps and workaround
+state without adding runtime processing.
 
 ## Control Stage Boundary
 
@@ -47,10 +59,11 @@ it cannot generate or mutate prototypes after startup finalizes them.
 The default MIR 3 policy is to omit `control.lua` unless the mod has runtime
 responsibilities. The current `dev` branch does have a small runtime surface for
 scripted technologies such as spoilage preservation and agricultural growth
-speed, so `control.lua` stays as a thin wrapper into the runtime manager. These
-features ship as disabled-by-default experimental candidates because they are
-bounded and event-driven. Stronger behavior claims, default enablement, or broad
-existing-save guarantees still require the named manual save validation.
+speed, so `control.lua` stays as a thin wrapper into the runtime manager.
+Spoilage preservation remains a disabled-by-default experimental candidate.
+Agricultural growth speed is enabled by default as a special Space Age
+technology after event-path coverage, but broad existing-save guarantees still
+require named manual save evidence.
 
 The runtime layer is intentionally narrow:
 
@@ -345,7 +358,7 @@ Static validation rejects runtime tick handlers in `control.lua` and
 
 Static validation also rejects unsafe pickup reach effect types outside the dedicated safety guard.
 
-The fixture mods under `fixtures/` test item-based science packs, custom labs, late recipe creation, the default `reduce` lab incompatibility behavior, the `skip` lab incompatibility behavior, science-pack ingredient policy modes, the end-game prerequisite gate, hidden startup setting readability, base-only cargo skip behavior, Space Age cargo logistics effect shape, Maraxis-like duplicate cargo modifier diagnostics, finite vanilla-chain preservation, broad generation integrity, unsafe pickup reach exclusion, weapon-speed overlap safety, Omega-style drill productivity matching, fluid-output productivity ownership, pipeline extent startup scaling, and post-MIR assertions for runtime-sensitive generated technologies.
+The fixture mods under `fixtures/` test item-based science packs, custom labs, late recipe creation, the default `reduce` lab incompatibility behavior, the `skip` lab incompatibility behavior, science-pack ingredient policy modes, the end-game prerequisite gate, hidden startup setting readability, base-only cargo skip behavior, Space Age cargo logistics effect shape, Maraxis-like duplicate cargo modifier diagnostics, finite vanilla-chain preservation, broad generation integrity, unsafe pickup reach exclusion, weapon-speed overlap safety, Omega-style drill productivity matching, fluid-output productivity ownership, pipeline extent startup scaling, prototype limit startup overrides, and post-MIR assertions for runtime-sensitive generated technologies.
 
 `mir-fixture-assert-generation-integrity` is the broad guardrail fixture. It runs after MIR in both base-only and Space Age runtime scenarios and verifies:
 

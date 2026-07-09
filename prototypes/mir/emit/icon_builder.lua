@@ -10,6 +10,7 @@ local CONSTANT_OVERLAYS = {
   speed = "__core__/graphics/icons/technology/constants/constant-speed.png",
   ["movement-speed"] = "__core__/graphics/icons/technology/constants/constant-movement-speed.png",
   mining = "__core__/graphics/icons/technology/constants/constant-mining.png",
+  battery = "__core__/graphics/icons/technology/constants/constant-battery.png",
   capacity = "__core__/graphics/icons/technology/constants/constant-capacity.png",
   damage = "__core__/graphics/icons/technology/constants/constant-damage.png",
   range = "__core__/graphics/icons/technology/constants/constant-range.png",
@@ -232,8 +233,8 @@ local function overlay_for_stream(stream)
       or t == "character-resource-reach-distance"
       or t == "character-item-drop-distance" then return "range" end
     if t == "character-inventory-slots-bonus"
-      or t == "character-logistic-trash-slots"
-      or t == "worker-robot-battery" then return "capacity" end
+      or t == "character-logistic-trash-slots" then return "capacity" end
+    if t == "worker-robot-battery" then return "battery" end
     if t == "max-cargo-bay-unloading-distance" then return "range" end
     if t == "cargo-landing-pad-count" then return "count" end
     if t == "gun-speed" or t == "character-crafting-speed" then return "speed" end

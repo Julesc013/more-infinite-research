@@ -12,6 +12,23 @@ fixtures:
       - hidden-setting-readability
       - stable-setting-ids
 
+  prototype-limits:
+    assertion_path: fixtures/assert-prototype-limits
+    validates:
+      - prototype-limit-startup-overrides
+      - recipe-maximum-productivity-cap
+      - effect-receiver-limits
+      - separate-energy-and-pollution-limits
+      - positive-power-floor-opt-in
+
+  settings-profile-roundtrip:
+    assertion_path: fixtures/assert-settings-profile-roundtrip
+    validates:
+      - settings-profile-deterministic-encoding
+      - settings-profile-compact-export
+      - settings-profile-strict-import-validation
+      - hidden-provider-setting-profile-roundtrip
+
   air-scrubbing:
     path: fixtures/air-scrubbing
     assertion_path: fixtures/assert-air-scrubbing-clean-filter

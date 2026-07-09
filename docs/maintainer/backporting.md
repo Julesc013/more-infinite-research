@@ -5,13 +5,13 @@ applies_to: "3.0.0+"
 audience: maintainer
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-07-07
+last_reviewed: 2026-07-09
 supersedes: []
 superseded_by: []
 ---
 # Target-Line Versioning And Backports
 
-Updated: 2026-07-07
+Updated: 2026-07-09
 
 This note records the locked maintainer policy for separating MIR release
 numbers by Factorio target line after the `2.2.0` compatibility-platform
@@ -199,6 +199,29 @@ Once `3.0.0` is stable on the Factorio `2.1` line:
 3. Run the matching binary and local mod-library validation for each line.
 4. Bring portable fixes back to `dev`.
 5. Publish only target lines that pass their own validation.
+
+Current execution state:
+
+- The `3.0.0` source anchor is commit
+  `8da631a6e5774af6d8804a49107a61a7964a5b2c` on `main`, with package
+  `dist/more-infinite-research_3.0.0.zip`.
+- The `3.0.0` package SHA-256 is
+  `E9A644468217D6B8B07F30E92179BE7BB2DFE951A14F211C1E924A5A505ECCDC`.
+- Fast-forward `dev` to the validated `main` anchor before starting target-line
+  ports.
+- Merge or snapshot `dev` into `tmp/2.0`, then apply Factorio `2.0` metadata,
+  API guards, release docs, package rebuild, and validation for `2.3.0`.
+- Merge or fast-forward `tmp/2.0` into `legacy` only after the `2.3.0` package
+  loads on a real Factorio `2.0` binary and the release docs match the branch.
+- Release older lines from their own `tmp/*` or stable target branches in
+  descending order, using the target-line matrix below and the historical
+  cadence note as the release order guide.
+- After the downward port ladder, bring portable fixes, tests, and tooling
+  lessons back to `dev` as a `3.0.5` current-line patch. Do not bring
+  target-line metadata downgrades back to `dev`.
+- Start `3.1.0` only after the `3.0.5` learning patch is stable. Treat `3.1.0`
+  as the fixture-backed overhaul support campaign, not as cleanup from the
+  backport ladder.
 
 Backports from `3.0.0` should preserve the compiler architecture only where the
 target Factorio line can support it. Do not describe this as backporting

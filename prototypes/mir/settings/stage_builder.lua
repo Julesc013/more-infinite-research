@@ -1,7 +1,8 @@
 local C = require("prototypes.mir.streams.registry")
 local defaults = require("prototypes.mir.settings.defaults")
+local settings_catalog = require("prototypes.mir.settings.catalog")
 local settings_adapter = require("prototypes.mir.settings.stage_adapter")
-local pipeline_extent_settings = require("prototypes.mir.settings.pipeline_extent")
+local setting_order = require("prototypes.mir.settings.order")
 
 local settings_data = {}
 local settings_context = settings_adapter.context()
@@ -51,120 +52,9 @@ local function add_technology_setting(group, setting)
   table.insert(settings_data, settings_adapter.apply(setting, group and group.ui_visibility))
 end
 
-table.insert(settings_data, {
-  type = "bool-setting",
-  name = "ips-require-space-gate",
-  setting_type = "startup",
-  default_value = false,
-  order = "a-010",
-  localised_name = {"mod-setting-name.ips-require-space-gate"},
-  localised_description = {"mod-setting-description.ips-require-space-gate"}
-})
-
-table.insert(settings_data, {
-  type = "string-setting",
-  name = "mir-science-pack-ingredient-policy",
-  setting_type = "startup",
-  default_value = "configured",
-  allowed_values = {"configured", "space", "space-and-promethium", "space-age-progression", "official-progression", "mod-progression", "all-official", "all"},
-  order = "a-020",
-  localised_name = {"mod-setting-name.mir-science-pack-ingredient-policy"},
-  localised_description = {"mod-setting-description.mir-science-pack-ingredient-policy"}
-})
-
-table.insert(settings_data, {
-  type = "string-setting",
-  name = "mir-lab-incompatibility-policy",
-  setting_type = "startup",
-  default_value = "reduce",
-  allowed_values = {"reduce", "skip"},
-  order = "a-030",
-  localised_name = {"mod-setting-name.mir-lab-incompatibility-policy"},
-  localised_description = {"mod-setting-description.mir-lab-incompatibility-policy"}
-})
-
-table.insert(settings_data, {
-  type = "bool-setting",
-  name = "mir-prefer-this-mod-for-competing-techs",
-  setting_type = "startup",
-  default_value = true,
-  order = "a-100",
-  localised_name = {"mod-setting-name.mir-prefer-this-mod-for-competing-techs"},
-  localised_description = {"mod-setting-description.mir-prefer-this-mod-for-competing-techs"}
-})
-
-table.insert(settings_data, {
-  type = "string-setting",
-  name = "mir-adjust-vanilla-weapon-speed-techs",
-  setting_type = "startup",
-  default_value = "off",
-  allowed_values = {"off", "only-when-dedicated-tech-enabled", "always"},
-  order = "a-110",
-  localised_name = {"mod-setting-name.mir-adjust-vanilla-weapon-speed-techs"},
-  localised_description = {"mod-setting-description.mir-adjust-vanilla-weapon-speed-techs"}
-})
-
-table.insert(settings_data, {
-  type = "bool-setting",
-  name = "mir-use-installed-space-age-icons",
-  setting_type = "startup",
-  default_value = false,
-  order = "a-120",
-  localised_name = {"mod-setting-name.mir-use-installed-space-age-icons"},
-  localised_description = {"mod-setting-description.mir-use-installed-space-age-icons"}
-})
-
-table.insert(settings_data, {
-  type = "string-setting",
-  name = "mir-pipeline-extent-multiplier",
-  setting_type = "startup",
-  default_value = pipeline_extent_settings.default_value,
-  allowed_values = pipeline_extent_settings.allowed_values,
-  order = "a-130",
-  localised_name = {"mod-setting-name.mir-pipeline-extent-multiplier"},
-  localised_description = {"mod-setting-description.mir-pipeline-extent-multiplier"}
-})
-
-table.insert(settings_data, {
-  type = "string-setting",
-  name = "mir-settings-profile-import",
-  setting_type = "startup",
-  default_value = "",
-  allow_blank = true,
-  order = "a-140",
-  localised_name = {"mod-setting-name.mir-settings-profile-import"},
-  localised_description = {"mod-setting-description.mir-settings-profile-import"}
-})
-
-table.insert(settings_data, {
-  type = "bool-setting",
-  name = "mir-debug-generation-report",
-  setting_type = "startup",
-  default_value = false,
-  order = "a-900",
-  localised_name = {"mod-setting-name.mir-debug-generation-report"},
-  localised_description = {"mod-setting-description.mir-debug-generation-report"}
-})
-
-table.insert(settings_data, {
-  type = "bool-setting",
-  name = "mir-debug-recipe-matches",
-  setting_type = "startup",
-  default_value = false,
-  order = "a-910",
-  localised_name = {"mod-setting-name.mir-debug-recipe-matches"},
-  localised_description = {"mod-setting-description.mir-debug-recipe-matches"}
-})
-
-table.insert(settings_data, {
-  type = "bool-setting",
-  name = "mir-debug-scripted-effects",
-  setting_type = "startup",
-  default_value = false,
-  order = "a-920",
-  localised_name = {"mod-setting-name.mir-debug-scripted-effects"},
-  localised_description = {"mod-setting-description.mir-debug-scripted-effects"}
-})
+for _, setting in ipairs(settings_catalog.global_setting_prototypes()) do
+  table.insert(settings_data, setting)
+end
 
 local stream_sort_names = {
   research_advanced_circuit = "Advanced circuit productivity",
@@ -239,14 +129,7 @@ local stream_sort_names = {
   research_walls = "Wall productivity"
 }
 
-local base_extension_specs = {
-  { key = "braking-force", sort_name = "Braking force" },
-  { key = "inserter-capacity-bonus", sort_name = "Inserter capacity bonus" },
-  { key = "laser-shooting-speed", sort_name = "Laser shooting speed" },
-  { key = "research-speed", sort_name = "Lab research speed" },
-  { key = "weapon-shooting-speed", sort_name = "Weapon shooting speed" },
-  { key = "worker-robots-storage", sort_name = "Worker robot cargo size" }
-}
+local base_extension_specs = settings_catalog.base_extension_specs
 
 local function order_slug(value)
   local out = tostring(value or ""):lower():gsub("[^%w]+", "-"):gsub("^%-+", ""):gsub("%-+$", "")
@@ -262,9 +145,15 @@ local function stream_sort_name(key)
   return stream_sort_names[key] or fallback_stream_sort_name(key)
 end
 
+local function group_attention_rank(group)
+  if not group.enabled then return "000" end
+  if group.settings_priority == "top" then return "050" end
+  return "100"
+end
+
 local function group_order_prefix(group)
-  local bucket = group.enabled and "100" or "000"
-  return "b-" .. bucket .. "-" .. order_slug(group.sort_name) .. "-" .. group.kind .. "-" .. group.key
+  local bucket = group_attention_rank(group)
+  return setting_order.technology(bucket, order_slug(group.sort_name), group.kind, group.key)
 end
 
 local technology_setting_groups = {}
@@ -276,6 +165,7 @@ for key, stream in pairs(C.streams) do
     stream = stream,
     sort_name = stream_sort_name(key),
     enabled = default_enabled(key, stream),
+    settings_priority = lookup_default(key, "settings_priority", stream, nil),
     ui_visibility = settings_adapter.visibility_for_stream(stream, settings_context)
   })
 end
@@ -290,14 +180,15 @@ for _, spec in ipairs(base_extension_specs) do
     spec = spec,
     defaults_spec = defaults_spec,
     sort_name = spec.sort_name or spec.key,
-    enabled = enabled
+    enabled = enabled,
+    settings_priority = spec.settings_priority or defaults_spec.settings_priority
   })
 end
 
 table.sort(technology_setting_groups, function(a, b)
-  local disabled_a = not a.enabled
-  local disabled_b = not b.enabled
-  if disabled_a ~= disabled_b then return disabled_a end
+  local rank_a = group_attention_rank(a)
+  local rank_b = group_attention_rank(b)
+  if rank_a ~= rank_b then return rank_a < rank_b end
   local sort_a = order_slug(a.sort_name)
   local sort_b = order_slug(b.sort_name)
   if sort_a == sort_b then

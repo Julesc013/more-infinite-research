@@ -5,7 +5,7 @@ applies_to: "3.0.0"
 audience: player
 doc_type: release-plan
 owner: mir-maintainers
-last_reviewed: 2026-07-08
+last_reviewed: 2026-07-09
 supersedes: []
 superseded_by: []
 ---
@@ -28,7 +28,12 @@ This release is not a broad new gameplay-content wave. It is the release that tu
 - Exact loader-schema repairs let `atan-ash_2.2.1` and `atan-nuclear-science_0.3.3` load with MIR on Factorio `2.1`.
 - Unsafe, missing, or unresearchable research candidates are skipped or kept diagnostic-only instead of being forced into invalid mod sets.
 - Recipe productivity research is still infinite, but Factorio's normal recipe productivity cap still applies.
-- Scripted spoilage preservation and agricultural growth speed remain disabled-by-default experimental options.
+- Optional prototype-limit dropdowns can explicitly raise or lower recipe productivity, energy-use, pollution, speed, and quality caps; unchanged defaults are shown as signed cap values. A separate default-off Compatibility setting can raise explicit `0W` active-use prototypes to `1W`.
+- Portable settings profiles now use a canonical catalog for export/import, strict allowed-value and bounds checks, deterministic encoding, and optional compact export.
+- Science-pack and lab-compatibility startup settings now use clearer player-facing labels while keeping the same internal setting values.
+- Startup settings now use visible Main, Compatibility, Limits, Advanced, and Diagnostics prefixes for faster scanning.
+- MIR-owned official technology settings stay visible across base and Space Age, even when the current active mod set will skip generation.
+- Agricultural growth speed is enabled by default as a special Space Age technology; spoilage preservation remains a disabled-by-default experimental option.
 
 ## Compatibility
 
@@ -60,6 +65,9 @@ This release is not a broad new gameplay-content wave. It is the release that tu
 - Base technology continuations now route through the MIR emit layer.
 - Effect safety, generated icon construction, max-level handling, and weapon-speed cleanup now route through focused MIR modules.
 - Settings are built through the MIR settings stage builder instead of the old large root settings file.
+- Global settings now use stable section order ranges and color-emphasized section prefixes where Factorio renders rich text.
+- Generated-technology setting rows use three groups: default-off/experimental rows, enabled special rows, then ordinary enabled rows.
+- Generated-technology setting labels now put the technology name before the field name.
 - Runtime scripted technology handlers now live under `prototypes/mir/runtime`.
 - Runtime code stays separate from prototype generation.
 
@@ -90,10 +98,12 @@ This release is not a broad new gameplay-content wave. It is the release that tu
 ## Release Checks
 
 - Static checks passed for docs governance, MIR manifests, architecture boundaries, settings visibility, policy linting, claim linting, changelog syntax, and package hygiene.
+- Packaged release-zip load smokes passed in base-only and Space Age modes.
 - Runtime sample-mod checks passed on the target Factorio `2.1` binary.
+- Prototype limit startup overrides passed the runtime fixture gate in base-only and Space Age modes.
 - Targeted local ATAN release-dist isolation reproduced upstream-only schema failures without MIR and passed with MIR for `atan-ash_2.2.1`, `atan-nuclear-science_0.3.3`, `atan-air-scrubbing_0.2.8`, and all three together with Space Age.
 - The targeted local `2.1` mod-library gate passed.
-- The final package contains `115` entries and zero forbidden repository-only paths.
+- The final package contains `119` entries and zero forbidden repository-only paths.
 - Strict audit, repair, and representative local scenario lanes stayed row-count and hash stable against the recorded `2.2` comparison lanes.
 
 ## Known Notes

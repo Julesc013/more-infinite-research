@@ -5,13 +5,13 @@ applies_to: "3.0.0+"
 audience: developer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-07-08
+last_reviewed: 2026-07-09
 supersedes: []
 superseded_by: []
 ---
 # API Proof Points
 
-Updated: 2026-07-08
+Updated: 2026-07-09
 
 This ledger records API claims that affect release planning. Use it to avoid turning Reddit ideas or memory into implementation assumptions.
 
@@ -54,6 +54,9 @@ Latest official API docs checked on 2026-07-06: `2.1.9`. Local runtime validatio
 | Technology prototypes expose effects and `max_level = "infinite"` | Factorio `TechnologyPrototype` docs | Verified | Generated stream IDs and migration policy are save-compatibility surfaces, not temporary report IDs |
 | Technology modifier list includes mining-drill productivity, belt stack size, lab productivity, lab speed, and worker robot modifiers | Factorio modifier docs | Verified | Native modifier ownership diagnostics must stay separate from recipe-productivity streams |
 | `RecipePrototype` exposes productivity eligibility, productivity caps, results, ingredients, and surface conditions | Factorio `RecipePrototype` docs | Verified | The compatibility kernel can observe recipe-productivity risk without mutating recipe rules |
+| `RecipePrototype.maximum_productivity` is an optional non-negative cap | Factorio `RecipePrototype` docs | Verified | MIR's recipe productivity cap setting can set explicit startup-only recipe caps, while the default leaves recipes unchanged |
+| `EffectReceiver` exposes consumption, pollution, speed, and quality effect limits with documented bounds; consumption and pollution lower bounds cannot be below `-0.9999` | Factorio `EffectReceiver` docs | Verified | MIR's energy, pollution, speed, and quality cap settings can mutate effect receiver limit tables during prototype loading; UI exposes `-99.99%` rather than invalid `-100%` |
+| `QualityPrototype` chance fields are separate from machine quality effect limits | Factorio `QualityPrototype` docs | Verified | MIR's quality cap setting changes effect receiver caps only; it does not change quality-tier probabilities |
 | Loader entities are distinct `LoaderPrototype` surfaces, including the `loader` and `loader-1x1` prototype types seen in local base prototypes | Factorio `LoaderPrototype` docs plus local Factorio `2.1.9` base prototypes | Verified | Loader support should mean loader crafting productivity, not loader throughput or operating behavior |
 | Mining drills are distinct `MiningDrillPrototype` entities | Factorio `MiningDrillPrototype` docs plus local Factorio `2.1.9` base prototypes | Verified | Drill manufacturing productivity and native mining-yield productivity are separate lanes |
 | Labs expose accepted science inputs on `LabPrototype` | Factorio `LabPrototype` docs plus runtime custom-lab fixtures | Verified | Added science packs should be validated against labs instead of hard-coded by mod name |
@@ -92,6 +95,8 @@ Latest official API docs checked on 2026-07-06: `2.1.9`. Local runtime validatio
 - `TechnologyPrototype`: <https://lua-api.factorio.com/latest/prototypes/TechnologyPrototype.html>
 - `ChangeRecipeProductivityModifier`: <https://lua-api.factorio.com/latest/types/ChangeRecipeProductivityModifier.html>
 - `RecipePrototype`: <https://lua-api.factorio.com/latest/prototypes/RecipePrototype.html>
+- `EffectReceiver`: <https://lua-api.factorio.com/latest/types/EffectReceiver.html>
+- `QualityPrototype`: <https://lua-api.factorio.com/latest/prototypes/QualityPrototype.html>
 - `LoaderPrototype`: <https://lua-api.factorio.com/latest/prototypes/LoaderPrototype.html>
 - `MiningDrillPrototype`: <https://lua-api.factorio.com/latest/prototypes/MiningDrillPrototype.html>
 - `LabPrototype`: <https://lua-api.factorio.com/latest/prototypes/LabPrototype.html>

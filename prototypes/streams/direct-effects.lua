@@ -1,9 +1,8 @@
 return {
   research_spoilage_preservation = {
     ui_visibility = {
-      mode = "visible-if-mods-any",
-      mods_any = {"space-age"},
-      hidden_reason = "requires-space-age"
+      mode = "always",
+      reason = "official-stream-settings-visible"
     },
     generation_requirements = {
       require_any_item = {"spoilage", "agricultural-science-pack"}
@@ -32,9 +31,8 @@ return {
 
   research_agricultural_growth_speed = {
     ui_visibility = {
-      mode = "visible-if-mods-any",
-      mods_any = {"space-age"},
-      hidden_reason = "requires-space-age"
+      mode = "always",
+      reason = "official-stream-settings-visible"
     },
     generation_requirements = {
       require_any_item = {"agricultural-science-pack"}

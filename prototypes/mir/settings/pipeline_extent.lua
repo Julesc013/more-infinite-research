@@ -1,8 +1,7 @@
 local S = {}
-local effective_settings = require("prototypes.mir.settings.effective")
 
 S.default_value = "100"
-S.allowed_values = {"50", "75", "100", "125", "150", "200", "250", "300", "400", "500"}
+S.allowed_values = {"500", "400", "300", "250", "200", "150", "125", "100", "75", "50"}
 
 local multiplier_by_value = {
   ["50"] = 0.5,
@@ -18,6 +17,7 @@ local multiplier_by_value = {
 }
 
 local function startup_setting(name)
+  local effective_settings = require("prototypes.mir.settings.effective")
   return effective_settings.get(name)
 end
 

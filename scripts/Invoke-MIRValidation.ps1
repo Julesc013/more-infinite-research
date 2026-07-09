@@ -13,6 +13,7 @@ $repo = Resolve-Path (Join-Path $PSScriptRoot "..")
 $repoInfo = Get-Content -Raw (Join-Path $repo "info.json") | ConvertFrom-Json
 $isLegacyFactorio20 = $repoInfo.factorio_version -eq "2.0"
 $isFactorio21Line = $repoInfo.factorio_version -eq "2.1"
+$script:ValidationPackageZipPath = $null
 
 function Invoke-RepoCheck {
   param([string]$Description, [scriptblock]$Script)
@@ -55,6 +56,9 @@ function Get-MIRSettingsSourceText {
   return Get-MIRCombinedSourceText -RelativePaths @(
     "settings.lua",
     "prototypes/mir/stage/settings.lua",
+    "prototypes/mir/settings/catalog.lua",
+    "prototypes/mir/settings/pipeline_extent.lua",
+    "prototypes/mir/settings/prototype_limits.lua",
     "prototypes/mir/settings/stage_builder.lua"
   )
 }
@@ -258,7 +262,8 @@ Invoke-RepoCheck "local image assets have source notes and do not bundle Space A
           -and -not $relative.StartsWith(".git/") `
           -and -not $relative.StartsWith("artifacts/") `
           -and -not $relative.StartsWith("build/") `
-          -and -not $relative.StartsWith("dist/")
+          -and -not $relative.StartsWith("dist/") `
+          -and -not $relative.StartsWith("tmp/")
       }
   )
 
@@ -297,12 +302,13 @@ Invoke-RepoCheck "control runtime avoids tick handlers" {
   }
 }
 
-Invoke-RepoCheck "scripted candidate streams remain default-off before manual proof" {
+Invoke-RepoCheck "default-off scripted streams remain guarded" {
   $defaultsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\settings\defaults.lua")
-  foreach ($streamKey in @("research_spoilage_preservation", "research_agricultural_growth_speed")) {
-    if ($defaultsText -notmatch "(?s)$streamKey\s*=\s*\{.*?enabled\s*=\s*false") {
-      throw "Scripted candidate stream $streamKey must remain disabled by default until manual save validation supports release claims."
-    }
+  if ($defaultsText -notmatch "(?s)research_spoilage_preservation\s*=\s*\{.*?enabled\s*=\s*false") {
+    throw "Spoilage preservation must remain disabled by default until manual save validation supports stronger release claims."
+  }
+  if ($defaultsText -notmatch "(?s)research_agricultural_growth_speed\s*=\s*\{.*?enabled\s*=\s*true") {
+    throw "Agricultural growth speed should be enabled by default as a promoted special technology."
   }
 }
 
@@ -483,13 +489,14 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'name = "mir-science-pack-ingredient-policy"' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'allowed_values = {"configured", "space", "space-and-promethium", "space-age-progression", "official-progression", "mod-progression", "all-official", "all"}' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'name = "mir-use-installed-space-age-icons"' },
-    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'order = "a-120"' },
+    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'local setting_order = require("prototypes.mir.settings.order")' },
+    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'order = setting_order.global("compatibility", 20)' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'local pipeline_extent_settings = require("prototypes.mir.settings.pipeline_extent")' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'local settings_adapter = require("prototypes.mir.settings.stage_adapter")' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'name = "mir-pipeline-extent-multiplier"' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'type = "string-setting"' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'allowed_values = pipeline_extent_settings.allowed_values' },
-    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'order = "a-130"' },
+    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'order = setting_order.global("compatibility", 30)' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'local function append_note(description, note)' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'local function add_technology_setting(group, setting)' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'local stream_sort_names = {' },
@@ -504,8 +511,10 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'kind = "base"' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'settings_adapter.visibility_for_stream(stream, settings_context)' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'settings_adapter.apply(setting, group and group.ui_visibility)' },
-    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'local bucket = group.enabled and "100" or "000"' },
-    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'order = "a-900"' },
+    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'local function group_attention_rank(group)' },
+    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'if group.settings_priority == "top" then return "050" end' },
+    @{ File = "prototypes\mir\settings\defaults.lua"; Text = $defaultsText; Snippet = 'settings_priority = "top"' },
+    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'order = setting_order.global("diagnostics", 10)' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'name = "ips-enable-"..key' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'localised_description = append_note({"mod-setting-description.ips-enable-stream", tech_locale}, settings_note)' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'localised_name = {"mod-setting-name.mir-max-level", locale}' },
@@ -571,7 +580,8 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'manifest_id = atan_ash_capability.stream.id' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'exact_recipe_patterns(atan_ash_capability.exact_recipes)' },
     @{ File = "prototypes\mir\compatibility\overlays\atan_ash.lua"; Text = (Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\compatibility\overlays\atan_ash.lua")); Snippet = '"mir-prod-atan-ash-separation"' },
-    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'mods_any = {"space-age"}' },
+    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'reason = "official-stream-settings-visible"' },
+    @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'reason = "official-stream-settings-visible"' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'research_ash_separation = "Ash separation productivity"' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = '"aai-turbo-loader"' },
     @{ File = "prototypes\mir\capabilities\science_integration\science_selector.lua"; Text = $scienceSelectorText; Snippet = 'desired == "derive-from-unlocks"' },
@@ -600,6 +610,8 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'skip_if_technology_effects = {' },
     @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'technology = "laboratory-productivity-4", type = "laboratory-productivity", modifier = 0.10, max_level = "infinite"' },
     @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'technology = "worker-robots-battery-6", type = "worker-robot-battery", modifier = 0.70, max_level = "infinite"' },
+    @{ File = "prototypes\mir\emit\icon_builder.lua"; Text = $technologyIconsText; Snippet = 'battery = "__core__/graphics/icons/technology/constants/constant-battery.png"' },
+    @{ File = "prototypes\mir\emit\icon_builder.lua"; Text = $technologyIconsText; Snippet = 'if t == "worker-robot-battery" then return "battery" end' },
     @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = '{technology = "research-productivity", required_mod = "space-age"}' },
     @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = '{technology = "military-science-pack"}' },
     @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'ammo_category = "tesla", modifier = 0.1' },
@@ -618,7 +630,7 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'if pipeline_extent_multiplier ~= 1 then' },
     @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'require("prototypes.mir.pipeline.extent").apply(pipeline_extent_multiplier)' },
     @{ File = "prototypes\mir\settings\pipeline_extent.lua"; Text = $pipelineExtentSettingsText; Snippet = 'S.default_value = "100"' },
-    @{ File = "prototypes\mir\settings\pipeline_extent.lua"; Text = $pipelineExtentSettingsText; Snippet = 'S.allowed_values = {"50", "75", "100", "125", "150", "200", "250", "300", "400", "500"}' },
+    @{ File = "prototypes\mir\settings\pipeline_extent.lua"; Text = $pipelineExtentSettingsText; Snippet = 'S.allowed_values = {"500", "400", "300", "250", "200", "150", "125", "100", "75", "50"}' },
     @{ File = "prototypes\mir\settings\pipeline_extent.lua"; Text = $pipelineExtentSettingsText; Snippet = 'function S.parse(value)' },
     @{ File = "prototypes\mir\settings\pipeline_extent.lua"; Text = $pipelineExtentSettingsText; Snippet = 'if numeric > 10 then return numeric / 100 end' },
     @{ File = "prototypes\mir\pipeline\extent.lua"; Text = $pipelineExtentText; Snippet = 'DEFAULT_PIPELINE_EXTENT = 320' },
@@ -661,37 +673,39 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'more-infinite-research.research_oil_processing_productivity=Oil processing productivity' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'more-infinite-research.research_thruster_fuel_productivity=Thruster fuel productivity' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'more-infinite-research.lab_productivity=Increases research progress gained from each consumed science pack' },
-    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-use-installed-space-age-icons=Use installed official DLC icons in base games' },
-    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-pipeline-extent-multiplier=Pipeline extent multiplier' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-use-installed-space-age-icons=[font=default-bold][color=cyan]Compatibility:[/color][/font] Use installed DLC icons in base games' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-pipeline-extent-multiplier=[font=default-bold][color=cyan]Compatibility:[/color][/font] Pipeline extent multiplier' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'Factorio cannot recover gracefully from missing icon files during prototype loading.' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'flamethrower-shooting-speed-bonus=Flamethrower shooting speed: +__1__' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'electric-shooting-speed-bonus=Electric shooting speed: +__1__' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'tesla-shooting-speed-bonus=Tesla shooting speed: +__1__' },
-    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-science-pack-ingredient-policy-configured=Configured per technology' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-science-pack-ingredient-policy-configured=Default science packs' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-science-pack-ingredient-policy-space=Add space science' },
-    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-science-pack-ingredient-policy-space-and-promethium=Add space and promethium science' },
-    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-science-pack-ingredient-policy-space-age-progression=Match Space Age progression' },
-    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-science-pack-ingredient-policy-official-progression=Fill official progression' },
-    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-science-pack-ingredient-policy-mod-progression=Match modded progression' },
-    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-science-pack-ingredient-policy-all-official=Use all official science packs' },
-    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-science-pack-ingredient-policy-all=Use all lab science packs' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-science-pack-ingredient-policy-space-and-promethium=Add space + promethium' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-science-pack-ingredient-policy-space-age-progression=Space Age progression' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-science-pack-ingredient-policy-official-progression=Official progression' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-science-pack-ingredient-policy-mod-progression=Modded progression' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-science-pack-ingredient-policy-all-official=All official science packs' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-science-pack-ingredient-policy-all=All lab science packs' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = '[string-mod-setting-description]' },
-    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-science-pack-ingredient-policy-configured=Use the science packs configured for each generated technology. Safest default.' },
-    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-lab-incompatibility-policy-reduce=Keep the technology by reducing its science packs to the largest compatible set accepted by an active lab. Safest default for mod packs.' },
-    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'ips-enable-stream=Enable __1__ technology' },
-    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-max-level=Maximum level for infinite __1__' },
-    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'ips-research-time-stream=Research unit time for __1__' },
-    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'ips-require-space-gate=Require finishing the game before generated technologies' },
-    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-science-pack-ingredient-policy=Extra science packs for generated technologies' },
-    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-lab-incompatibility-policy=What to do when no lab can research a technology' },
-    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-prefer-this-mod-for-competing-techs=Use MIR when another mod adds the same infinite research' },
-    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-adjust-vanilla-weapon-speed-techs=Remove duplicate rocket/cannon speed from general weapon speed' },
-    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-debug-generation-report=Log generated and skipped technologies' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = "mir-science-pack-ingredient-policy-configured=Use each generated technology's configured science packs. Safest default." },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-lab-incompatibility-policy-reduce=Use researchable packs' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-lab-incompatibility-policy-skip=Skip unsupported techs' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-lab-incompatibility-policy-reduce=Keep the technology by reducing its science packs to the largest set accepted by an active lab. Safest default for mod packs.' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'ips-enable-stream=[font=default-bold]__1__[/font] — enable' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-max-level=[font=default-bold]Infinite __1__[/font] — max level' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'ips-research-time-stream=[font=default-bold]__1__[/font] — research time' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'ips-require-space-gate=[font=default-bold][color=green]Main:[/color][/font] Require game completion before generated technologies' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-science-pack-ingredient-policy=[font=default-bold][color=green]Main:[/color][/font] Science packs for generated technologies' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-lab-incompatibility-policy=[font=default-bold][color=green]Main:[/color][/font] Lab compatibility for generated technologies' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-prefer-this-mod-for-competing-techs=[font=default-bold][color=green]Main:[/color][/font] Prefer MIR for duplicate infinite research' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-adjust-vanilla-weapon-speed-techs=[font=default-bold][color=cyan]Compatibility:[/color][/font] Rocket/cannon speed cleanup' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-debug-generation-report=[font=default-bold][color=yellow]Diagnostics:[/color][/font] Generated and skipped technologies' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-note-experimental-spoilage=Experimental and disabled by default in v2.1.0.' },
-    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-note-experimental-agriculture=Experimental and disabled by default in v2.1.0.' },
-    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-note-inserter-capacity=Disabled by default.' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-note-agriculture-growth=Applies to newly planted agricultural tower crops.' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-note-inserter-capacity=Disabled by default. Extra inserter capacity can break circuit-controlled inserters and reduce engine optimizations.' },
     @{ File = "prototypes\mir\settings\defaults.lua"; Text = $defaultsText; Snippet = 'mod-setting-description.mir-note-experimental-spoilage' },
-    @{ File = "prototypes\mir\settings\defaults.lua"; Text = $defaultsText; Snippet = 'mod-setting-description.mir-note-experimental-agriculture' },
+    @{ File = "prototypes\mir\settings\defaults.lua"; Text = $defaultsText; Snippet = 'mod-setting-description.mir-note-agriculture-growth' },
     @{ File = "prototypes\mir\settings\defaults.lua"; Text = $defaultsText; Snippet = 'mod-setting-description.mir-note-inserter-capacity' },
     @{ File = "prototypes\mir\settings\defaults.lua"; Text = $defaultsText; Snippet = 'research_lab_productivity = {' }
   )
@@ -710,8 +724,8 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     $requiredSnippets += @(
       @{ File = "settings.lua"; Text = $settingsText; Snippet = 'research_cargo_landing_pad_count = "Cargo landing pad count"' },
       @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'cargo-landing-pad-count=Cargo landing pads per surface: +__1__' },
-      @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-note-sandbox-cargo-pad-count=Sandbox-style and disabled by default.' },
-      @{ File = "prototypes\mir\settings\defaults.lua"; Text = $defaultsText; Snippet = 'mod-setting-description.mir-note-sandbox-cargo-pad-count' },
+      @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-note-cargo-pad-count=Special Space Age logistics research.' },
+      @{ File = "prototypes\mir\settings\defaults.lua"; Text = $defaultsText; Snippet = 'mod-setting-description.mir-note-cargo-pad-count' },
       @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'research_cargo_landing_pad_count = {' },
       @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'required_mods = {"space-age"}' },
       @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'required_technologies = {"rocket-silo"}' },
@@ -772,6 +786,111 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     if ($defaultsText -notmatch '(?s)research_cargo_landing_pad_count\s*=\s*\{.*?research_time\s*=\s*240') {
       throw "Cargo landing pad count default research time must be 240 seconds."
     }
+  }
+
+  foreach ($promotedSpecialStream in @(
+    "research_breeding",
+    "research_agricultural_growth_speed",
+    "research_cargo_bay_unloading_distance",
+    "research_cargo_landing_pad_count",
+    "research_character_reach"
+  )) {
+    if ($defaultsText -notmatch "(?s)$promotedSpecialStream\s*=\s*\{.*?settings_priority\s*=\s*`"top`"") {
+      throw "$promotedSpecialStream must stay in the enabled special technology settings bucket."
+    }
+    if ($defaultsText -notmatch "(?s)$promotedSpecialStream\s*=\s*\{.*?enabled\s*=\s*true") {
+      throw "$promotedSpecialStream must be enabled by default."
+    }
+  }
+
+  if ($defaultsText -notmatch '(?s)\["inserter-capacity-bonus"\]\s*=\s*\{.*?enabled\s*=\s*false') {
+    throw "Inserter capacity bonus must remain disabled by default."
+  }
+  if ($defaultsText -notmatch '(?s)\["inserter-capacity-bonus"\]\s*=\s*\{.*?settings_priority\s*=\s*"top"') {
+    throw "Inserter capacity bonus must stay in the top default-off settings bucket."
+  }
+}
+
+Invoke-RepoCheck "prototype limit settings are wired" {
+  $settingsText = Get-MIRSettingsSourceText
+  $dataFinalFixesText = Get-MIRDataFinalFixesSourceText
+  $stepsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\stage\data_final_fixes_steps.lua")
+  $prototypeLimitSettingsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\settings\prototype_limits.lua")
+  $prototypeLimitPipelineText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\pipeline\prototype_limits.lua")
+  $localeText = Get-Content -Raw -LiteralPath (Join-Path $repo "locale\en\more-infinite-research.cfg")
+  $settingsManifestText = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir\settings.yml")
+  $modulesManifestText = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir\modules.yml")
+  $fixturesManifestText = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir\fixtures.yml")
+  $prototypeLimitFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-prototype-limits\data-final-fixes.lua")
+
+  $requiredSnippets = @(
+    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'local prototype_limit_settings = require("prototypes.mir.settings.prototype_limits")' },
+    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'prototype_limit_settings.setting_prototypes()' },
+    @{ File = "prototypes\mir\settings\prototype_limits.lua"; Text = $prototypeLimitSettingsText; Snippet = 'name = "mir-prototype-productivity-cap"' },
+    @{ File = "prototypes\mir\settings\prototype_limits.lua"; Text = $prototypeLimitSettingsText; Snippet = 'name = "mir-prototype-efficiency-cap"' },
+    @{ File = "prototypes\mir\settings\prototype_limits.lua"; Text = $prototypeLimitSettingsText; Snippet = 'name = "mir-prototype-pollution-cap"' },
+    @{ File = "prototypes\mir\settings\prototype_limits.lua"; Text = $prototypeLimitSettingsText; Snippet = 'name = "mir-prototype-speed-cap"' },
+    @{ File = "prototypes\mir\settings\prototype_limits.lua"; Text = $prototypeLimitSettingsText; Snippet = 'name = "mir-prototype-quality-cap"' },
+    @{ File = "prototypes\mir\settings\prototype_limits.lua"; Text = $prototypeLimitSettingsText; Snippet = 'positive_power_floor_setting_name = "mir-prototype-positive-power-floor"' },
+    @{ File = "prototypes\mir\settings\prototype_limits.lua"; Text = $prototypeLimitSettingsText; Snippet = 'default_value = S.engine_default' },
+    @{ File = "prototypes\mir\settings\prototype_limits.lua"; Text = $prototypeLimitSettingsText; Snippet = '["percent-50"] = 0.5' },
+    @{ File = "prototypes\mir\settings\prototype_limits.lua"; Text = $prototypeLimitSettingsText; Snippet = '["percent-400"] = 4.0' },
+    @{ File = "prototypes\mir\settings\prototype_limits.lua"; Text = $prototypeLimitSettingsText; Snippet = '["saving-50"] = -0.5' },
+    @{ File = "prototypes\mir\settings\prototype_limits.lua"; Text = $prototypeLimitSettingsText; Snippet = '["saving-99"] = -0.99' },
+    @{ File = "prototypes\mir\settings\prototype_limits.lua"; Text = $prototypeLimitSettingsText; Snippet = '["bonus-50"] = 0.5' },
+    @{ File = "prototypes\mir\settings\prototype_limits.lua"; Text = $prototypeLimitSettingsText; Snippet = '["bonus-400"] = 4.0' },
+    @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'steps.apply_prototype_limits()' },
+    @{ File = "prototypes\mir\stage\data_final_fixes_steps.lua"; Text = $stepsText; Snippet = 'require("prototypes.mir.pipeline.prototype_limits").apply()' },
+    @{ File = "prototypes\mir\pipeline\prototype_limits.lua"; Text = $prototypeLimitPipelineText; Snippet = 'data_raw.prototypes("recipe")' },
+    @{ File = "prototypes\mir\pipeline\prototype_limits.lua"; Text = $prototypeLimitPipelineText; Snippet = 'recipe.parameter ~= true' },
+    @{ File = "prototypes\mir\pipeline\prototype_limits.lua"; Text = $prototypeLimitPipelineText; Snippet = 'recipe.maximum_productivity = value' },
+    @{ File = "prototypes\mir\pipeline\prototype_limits.lua"; Text = $prototypeLimitPipelineText; Snippet = '"agricultural-tower"' },
+    @{ File = "prototypes\mir\pipeline\prototype_limits.lua"; Text = $prototypeLimitPipelineText; Snippet = 'apply_effect_receiver_limit("consumption_limits", "low", selected("efficiency"))' },
+    @{ File = "prototypes\mir\pipeline\prototype_limits.lua"; Text = $prototypeLimitPipelineText; Snippet = 'apply_effect_receiver_limit("pollution_limits", "low", selected("pollution"))' },
+    @{ File = "prototypes\mir\pipeline\prototype_limits.lua"; Text = $prototypeLimitPipelineText; Snippet = 'apply_effect_receiver_limit("speed_limits", "high", selected("speed"))' },
+    @{ File = "prototypes\mir\pipeline\prototype_limits.lua"; Text = $prototypeLimitPipelineText; Snippet = 'apply_effect_receiver_limit("quality_limits", "high", selected("quality"))' },
+    @{ File = "prototypes\mir\pipeline\prototype_limits.lua"; Text = $prototypeLimitPipelineText; Snippet = 'prototype.energy_usage = "1W"' },
+    @{ File = "prototypes\mir\pipeline\prototype_limits.lua"; Text = $prototypeLimitPipelineText; Snippet = 'Applied prototype limits: productivity_recipes=' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-prototype-productivity-cap=[font=default-bold][color=orange]Limits:[/color][/font] Recipe productivity cap' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-prototype-efficiency-cap=[font=default-bold][color=orange]Limits:[/color][/font] Energy savings cap' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-prototype-pollution-cap=[font=default-bold][color=orange]Limits:[/color][/font] Pollution reduction cap' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-prototype-speed-cap=[font=default-bold][color=orange]Limits:[/color][/font] Speed effect cap' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-prototype-quality-cap=[font=default-bold][color=orange]Limits:[/color][/font] Quality effect cap' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-prototype-positive-power-floor=[font=default-bold][color=cyan]Compatibility:[/color][/font] Non-zero power floor' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-prototype-productivity-cap-engine-default=+300% (unchanged)' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-prototype-productivity-cap-percent-50=+50%' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-prototype-efficiency-cap-saving-99=-99%' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-prototype-efficiency-cap-engine-default=-80% (unchanged)' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-prototype-pollution-cap-saving-99=-99%' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'explicit 0W active energy_usage prototypes to 1W' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-prototype-speed-cap-engine-default=+100000% (unchanged)' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-prototype-speed-cap-bonus-400=+400%' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-prototype-quality-cap-bonus-400=+400%' },
+    @{ File = ".mir\settings.yml"; Text = $settingsManifestText; Snippet = 'prototype_limit_settings_default_to_engine_default: true' },
+    @{ File = ".mir\settings.yml"; Text = $settingsManifestText; Snippet = 'energy_and_pollution_caps_are_separate: true' },
+    @{ File = ".mir\settings.yml"; Text = $settingsManifestText; Snippet = 'positive_power_floor_is_default_off_opt_in: true' },
+    @{ File = ".mir\settings.yml"; Text = $settingsManifestText; Snippet = 'positive_power_floor_is_compatibility_section_setting: true' },
+    @{ File = ".mir\modules.yml"; Text = $modulesManifestText; Snippet = 'prototypes/mir/settings/catalog.lua' },
+    @{ File = ".mir\modules.yml"; Text = $modulesManifestText; Snippet = 'prototypes/mir/settings/prototype_limits.lua' },
+    @{ File = ".mir\modules.yml"; Text = $modulesManifestText; Snippet = 'prototypes/mir/pipeline/prototype_limits.lua' },
+    @{ File = ".mir\fixtures.yml"; Text = $fixturesManifestText; Snippet = 'prototype-limit-startup-overrides' },
+    @{ File = ".mir\fixtures.yml"; Text = $fixturesManifestText; Snippet = 'settings-profile-roundtrip' },
+    @{ File = "fixtures\assert-prototype-limits\data-final-fixes.lua"; Text = $prototypeLimitFixtureText; Snippet = 'iron-gear-wheel maximum_productivity' },
+    @{ File = "fixtures\assert-prototype-limits\data-final-fixes.lua"; Text = $prototypeLimitFixtureText; Snippet = 'consumption_limits.low' },
+    @{ File = "fixtures\assert-prototype-limits\data-final-fixes.lua"; Text = $prototypeLimitFixtureText; Snippet = 'pollution_limits.low' },
+    @{ File = "fixtures\assert-prototype-limits\data-final-fixes.lua"; Text = $prototypeLimitFixtureText; Snippet = 'zero-watt beacon energy_usage' },
+    @{ File = "fixtures\assert-prototype-limits\data-final-fixes.lua"; Text = $prototypeLimitFixtureText; Snippet = 'quality_limits.high' },
+    @{ File = "scripts\Invoke-MIRValidation.ps1"; Text = (Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\Invoke-MIRValidation.ps1")); Snippet = 'prototype-limit-overrides' }
+  )
+
+  foreach ($check in $requiredSnippets) {
+    if (-not $check.Text.Contains($check.Snippet)) {
+      throw "Missing prototype limit setting wiring in $($check.File): $($check.Snippet)"
+    }
+  }
+
+  if ($dataFinalFixesText -notmatch '(?s)steps\.apply_compatibility_repairs\(\).*steps\.apply_prototype_limits\(\).*steps\.apply_pipeline_extent\(\).*steps\.prepare_competing_productivity\(\)') {
+    throw "Prototype limit pass must run after compatibility repairs and before pipeline extent, planning, and recipe-cap diagnostics."
   }
 }
 
@@ -842,7 +961,13 @@ Invoke-RepoCheck "compat audit automation tooling is wired" {
     @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = "[int]`$ScenarioTimeoutSeconds = 900" },
     @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = "Stop-Process -Id `$process.Id -Force" },
     @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = "source_path" },
-    @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = '"artifacts", "build", "dist"' },
+    @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = '"artifacts"' },
+    @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = '"build"' },
+    @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = '"dist"' },
+    @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = '"fixtures"' },
+    @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = '"scripts"' },
+    @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = '"tests"' },
+    @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = '"tmp"' },
     @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = 'prototypes\mir\report\diagnostics_sink.lua' },
     @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = "[string[]]`$OfficialBuiltinMods" },
     @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = "enabled = `$enabledLookup.ContainsKey" },
@@ -1461,6 +1586,7 @@ Invoke-RepoCheck "generated package archive matches metadata" {
   if (-not (Test-Path -LiteralPath $zipPath)) {
     throw "Validation package not found after build: $zipPath"
   }
+  $script:ValidationPackageZipPath = (Resolve-Path -LiteralPath $zipPath).Path
 
   $zip = [System.IO.Compression.ZipFile]::OpenRead($zipPath)
   try {
@@ -1735,6 +1861,8 @@ $postMirAssertionFixtures = @(
   "mir-fixture-assert-plates-n-circuit-productivity",
   "mir-fixture-assert-plates-n-circuit-productivity-blocked",
   "mir-fixture-assert-plates-n-circuit-productivity-change-mismatch",
+  "mir-fixture-assert-prototype-limits",
+  "mir-fixture-assert-settings-profile-roundtrip",
   "mir-fixture-assert-vanilla-family-adoption",
   "mir-fixture-assert-vanilla-family-exact-owner",
   "mir-fixture-assert-vanilla-family-mixed-owner",
@@ -1789,6 +1917,30 @@ function Get-CopiedSettingsImplementationPath {
   throw "Unable to find copied settings implementation."
 }
 
+function Get-CopiedStartupSettingImplementationPaths {
+  param([string]$ModsDir)
+
+  $candidates = @(
+    "more-infinite-research\prototypes\mir\settings\catalog.lua",
+    "more-infinite-research\prototypes\mir\settings\stage_builder.lua",
+    "more-infinite-research\settings.lua"
+  )
+
+  $paths = @()
+  foreach ($relative in $candidates) {
+    $path = Join-Path $ModsDir $relative
+    if (Test-Path -LiteralPath $path) {
+      $paths += $path
+    }
+  }
+
+  if ($paths.Count -eq 0) {
+    throw "Unable to find copied settings implementation."
+  }
+
+  return $paths
+}
+
 function Set-CopiedStartupSettingDefault {
   param(
     [string]$ModsDir,
@@ -1796,20 +1948,22 @@ function Set-CopiedStartupSettingDefault {
     [string]$ValueLiteral
   )
 
-  $copiedSettingsPath = Get-CopiedSettingsImplementationPath -ModsDir $ModsDir
-  $copiedSettings = Get-Content -Raw -LiteralPath $copiedSettingsPath
   $escapedName = [regex]::Escape($Name)
   $pattern = "(?s)(name\s*=\s*`"$escapedName`".*?default_value\s*=\s*)([^,\r\n]+)"
-  $match = [regex]::Match($copiedSettings, $pattern)
-  if (-not $match.Success) {
-    throw "Unable to find startup setting default for $Name in copied settings implementation."
+  foreach ($copiedSettingsPath in Get-CopiedStartupSettingImplementationPaths -ModsDir $ModsDir) {
+    $copiedSettings = Get-Content -Raw -LiteralPath $copiedSettingsPath
+    $match = [regex]::Match($copiedSettings, $pattern)
+    if ($match.Success) {
+      $valueGroup = $match.Groups[2]
+      $copiedSettings = $copiedSettings.Substring(0, $valueGroup.Index) +
+        $ValueLiteral +
+        $copiedSettings.Substring($valueGroup.Index + $valueGroup.Length)
+      Set-Content -LiteralPath $copiedSettingsPath -Value $copiedSettings -Encoding UTF8
+      return
+    }
   }
 
-  $valueGroup = $match.Groups[2]
-  $copiedSettings = $copiedSettings.Substring(0, $valueGroup.Index) +
-    $ValueLiteral +
-    $copiedSettings.Substring($valueGroup.Index + $valueGroup.Length)
-  Set-Content -LiteralPath $copiedSettingsPath -Value $copiedSettings -Encoding UTF8
+  throw "Unable to find startup setting default for $Name in copied settings implementation."
 }
 
 function Set-CopiedGeneratedStartupSettingDefault {
@@ -1868,6 +2022,37 @@ function Set-CopiedPipelineExtentMultiplier {
     throw "Unsupported pipeline extent multiplier for dropdown validation: $Multiplier ($percent%)."
   }
   Set-CopiedStartupSettingDefault -ModsDir $ModsDir -Name "mir-pipeline-extent-multiplier" -ValueLiteral "`"$percent`""
+}
+
+function Set-CopiedPrototypeLimitDefaults {
+  param(
+    [string]$ModsDir,
+    [string]$ProductivityCap,
+    [string]$EfficiencyCap,
+    [string]$PollutionCap,
+    [string]$SpeedCap,
+    [string]$QualityCap,
+    [bool]$PositivePowerFloor = $false
+  )
+
+  if (-not [string]::IsNullOrWhiteSpace($ProductivityCap)) {
+    Set-CopiedGeneratedStartupSettingDefault -ModsDir $ModsDir -Name "mir-prototype-productivity-cap" -ValueLiteral "`"$ProductivityCap`""
+  }
+  if (-not [string]::IsNullOrWhiteSpace($EfficiencyCap)) {
+    Set-CopiedGeneratedStartupSettingDefault -ModsDir $ModsDir -Name "mir-prototype-efficiency-cap" -ValueLiteral "`"$EfficiencyCap`""
+  }
+  if (-not [string]::IsNullOrWhiteSpace($PollutionCap)) {
+    Set-CopiedGeneratedStartupSettingDefault -ModsDir $ModsDir -Name "mir-prototype-pollution-cap" -ValueLiteral "`"$PollutionCap`""
+  }
+  if (-not [string]::IsNullOrWhiteSpace($SpeedCap)) {
+    Set-CopiedGeneratedStartupSettingDefault -ModsDir $ModsDir -Name "mir-prototype-speed-cap" -ValueLiteral "`"$SpeedCap`""
+  }
+  if (-not [string]::IsNullOrWhiteSpace($QualityCap)) {
+    Set-CopiedGeneratedStartupSettingDefault -ModsDir $ModsDir -Name "mir-prototype-quality-cap" -ValueLiteral "`"$QualityCap`""
+  }
+  if ($PositivePowerFloor) {
+    Set-CopiedGeneratedStartupSettingDefault -ModsDir $ModsDir -Name "mir-prototype-positive-power-floor" -ValueLiteral "true"
+  }
 }
 
 function Set-CopiedStreamCheckboxDefault {
@@ -1965,6 +2150,17 @@ function Initialize-RuntimeScenario {
     [ValidateSet("", "off", "only-when-dedicated-tech-enabled", "always")]
     [string]$WeaponSpeedAdjustmentMode = "",
     [double]$PipelineExtentMultiplier = 1,
+    [ValidateSet("", "engine-default", "percent-50", "percent-75", "percent-100", "percent-200", "percent-250", "percent-400", "percent-500", "percent-1000", "percent-2500", "percent-10000", "percent-100000")]
+    [string]$PrototypeProductivityCap = "",
+    [ValidateSet("", "engine-default", "saving-50", "saving-75", "saving-90", "saving-95", "saving-99", "saving-999", "saving-9999")]
+    [string]$PrototypeEfficiencyCap = "",
+    [ValidateSet("", "engine-default", "saving-50", "saving-75", "saving-90", "saving-95", "saving-99", "saving-999", "saving-9999")]
+    [string]$PrototypePollutionCap = "",
+    [ValidateSet("", "engine-default", "bonus-50", "bonus-75", "bonus-100", "bonus-200", "bonus-250", "bonus-400", "bonus-500", "bonus-1000", "bonus-10000", "bonus-100000")]
+    [string]$PrototypeSpeedCap = "",
+    [ValidateSet("", "engine-default", "bonus-50", "bonus-75", "bonus-100", "bonus-200", "bonus-250", "bonus-400", "bonus-500", "bonus-1000", "bonus-10000", "bonus-100000")]
+    [string]$PrototypeQualityCap = "",
+    [switch]$PrototypePositivePowerFloor,
     [switch]$RequireSpaceGate,
     [switch]$UseInstalledSpaceAgeIcons,
     [switch]$ScriptedDiagnostics,
@@ -2022,6 +2218,14 @@ function Initialize-RuntimeScenario {
   if ($PipelineExtentMultiplier -ne 1) {
     Set-CopiedPipelineExtentMultiplier -ModsDir $modsDir -Multiplier $PipelineExtentMultiplier
   }
+  Set-CopiedPrototypeLimitDefaults `
+    -ModsDir $modsDir `
+    -ProductivityCap $PrototypeProductivityCap `
+    -EfficiencyCap $PrototypeEfficiencyCap `
+    -PollutionCap $PrototypePollutionCap `
+    -SpeedCap $PrototypeSpeedCap `
+    -QualityCap $PrototypeQualityCap `
+    -PositivePowerFloor ([bool]$PrototypePositivePowerFloor)
   if ($UseInstalledSpaceAgeIcons) {
     Set-CopiedStartupSettingDefault -ModsDir $modsDir -Name "mir-use-installed-space-age-icons" -ValueLiteral "true"
   }
@@ -2105,6 +2309,17 @@ function Invoke-RuntimeScenario {
     [ValidateSet("", "off", "only-when-dedicated-tech-enabled", "always")]
     [string]$WeaponSpeedAdjustmentMode = "",
     [double]$PipelineExtentMultiplier = 1,
+    [ValidateSet("", "engine-default", "percent-50", "percent-75", "percent-100", "percent-200", "percent-250", "percent-400", "percent-500", "percent-1000", "percent-2500", "percent-10000", "percent-100000")]
+    [string]$PrototypeProductivityCap = "",
+    [ValidateSet("", "engine-default", "saving-50", "saving-75", "saving-90", "saving-95", "saving-99", "saving-999", "saving-9999")]
+    [string]$PrototypeEfficiencyCap = "",
+    [ValidateSet("", "engine-default", "saving-50", "saving-75", "saving-90", "saving-95", "saving-99", "saving-999", "saving-9999")]
+    [string]$PrototypePollutionCap = "",
+    [ValidateSet("", "engine-default", "bonus-50", "bonus-75", "bonus-100", "bonus-200", "bonus-250", "bonus-400", "bonus-500", "bonus-1000", "bonus-10000", "bonus-100000")]
+    [string]$PrototypeSpeedCap = "",
+    [ValidateSet("", "engine-default", "bonus-50", "bonus-75", "bonus-100", "bonus-200", "bonus-250", "bonus-400", "bonus-500", "bonus-1000", "bonus-10000", "bonus-100000")]
+    [string]$PrototypeQualityCap = "",
+    [switch]$PrototypePositivePowerFloor,
     [switch]$RequireSpaceGate,
     [switch]$UseInstalledSpaceAgeIcons,
     [switch]$ScriptedDiagnostics,
@@ -2122,6 +2337,12 @@ function Invoke-RuntimeScenario {
     -SciencePackIngredientPolicy $SciencePackIngredientPolicy `
     -WeaponSpeedAdjustmentMode $WeaponSpeedAdjustmentMode `
     -PipelineExtentMultiplier $PipelineExtentMultiplier `
+    -PrototypeProductivityCap $PrototypeProductivityCap `
+    -PrototypeEfficiencyCap $PrototypeEfficiencyCap `
+    -PrototypePollutionCap $PrototypePollutionCap `
+    -PrototypeSpeedCap $PrototypeSpeedCap `
+    -PrototypeQualityCap $PrototypeQualityCap `
+    -PrototypePositivePowerFloor:$PrototypePositivePowerFloor `
     -RequireSpaceGate:$RequireSpaceGate `
     -UseInstalledSpaceAgeIcons:$UseInstalledSpaceAgeIcons `
     -ScriptedDiagnostics:$ScriptedDiagnostics `
@@ -2479,6 +2700,73 @@ function Assert-FluidProductivityStreamsGenerated {
   }
 }
 
+function Invoke-PackageZipSmokeScenario {
+  param(
+    [string]$ScenarioName,
+    [switch]$EnableSpaceAge
+  )
+
+  if ([string]::IsNullOrWhiteSpace($script:ValidationPackageZipPath) -or -not (Test-Path -LiteralPath $script:ValidationPackageZipPath)) {
+    throw "Validation package zip is unavailable for packaged zip smoke."
+  }
+
+  $scenarioRoot = Join-Path $validationRoot $ScenarioName
+  if (Test-Path -LiteralPath $scenarioRoot) {
+    $resolvedScenarioRoot = (Resolve-Path -LiteralPath $scenarioRoot).Path
+    if (-not $resolvedScenarioRoot.StartsWith($validationRootWithSeparator, [System.StringComparison]::OrdinalIgnoreCase)) {
+      throw "Refusing to remove package smoke directory outside validation root: $resolvedScenarioRoot"
+    }
+    Remove-Item -LiteralPath $resolvedScenarioRoot -Recurse -Force
+  }
+
+  $modsDir = Join-Path $scenarioRoot "mods"
+  New-Item -ItemType Directory -Force -Path $modsDir | Out-Null
+  Copy-Item -LiteralPath $script:ValidationPackageZipPath -Destination (Join-Path $modsDir (Split-Path -Leaf $script:ValidationPackageZipPath)) -Force
+
+  $mods = @(
+    @{ name = "base"; enabled = $true },
+    @{ name = "elevated-rails"; enabled = [bool]$EnableSpaceAge },
+    @{ name = "recycler"; enabled = [bool]$EnableSpaceAge },
+    @{ name = "quality"; enabled = [bool]$EnableSpaceAge },
+    @{ name = "space-age"; enabled = [bool]$EnableSpaceAge },
+    @{ name = "more-infinite-research"; enabled = $true }
+  )
+  $modList = @{ mods = $mods } | ConvertTo-Json -Depth 5
+  Set-Content -LiteralPath (Join-Path $modsDir "mod-list.json") -Value $modList -Encoding UTF8
+
+  $savePath = Join-Path $scenarioRoot "mir-package-zip-smoke.zip"
+  if (Test-Path -LiteralPath $savePath) {
+    Remove-Item -LiteralPath $savePath -Force
+  }
+
+  Write-Host "[run] Factorio packaged zip smoke ($ScenarioName)"
+  Clear-FactorioLog
+  $factorioArgs = @(
+    "--config",
+    $factorioConfigPath,
+    "--no-log-rotation",
+    "--disable-audio",
+    "--mod-directory",
+    $modsDir,
+    "--create",
+    $savePath
+  )
+  $factorioExitCode = Invoke-FactorioProcess -FilePath $FactorioBin -Arguments $factorioArgs
+  if ($factorioExitCode -ne 0) {
+    throw "Factorio package zip smoke $ScenarioName exited with code $factorioExitCode"
+  }
+  if (-not (Test-Path -LiteralPath $savePath)) {
+    throw "Factorio package zip smoke $ScenarioName did not create the expected save: $savePath"
+  }
+
+  Assert-RuntimeLogHealthy -ScenarioName $ScenarioName
+}
+
+Invoke-PackageZipSmokeScenario -ScenarioName "package-zip-base"
+if ($isFactorio21Line) {
+  Invoke-PackageZipSmokeScenario -ScenarioName "package-zip-space-age" -EnableSpaceAge
+}
+
 Invoke-RuntimeScenario -ScenarioName "reduce-policy" -EnabledFixtureNames @(
   "mir-fixture-item-science-pack",
   "mir-fixture-custom-lab",
@@ -2608,6 +2896,7 @@ Invoke-RuntimeScenario -ScenarioName "base-generation-integrity" -EnabledFixture
   "mir-fixture-assert-hidden-setting-readability"
 )
 Assert-LogDoesNotContain -Unexpected "Applied pipeline extent multiplier" -Context "Default pipeline extent scenario"
+Assert-LogDoesNotContain -Unexpected "Applied prototype limits" -Context "Default prototype limit scenario"
 Assert-BaseCoreProductivityStreamsGenerated -Context "Base generation integrity scenario"
 Assert-DefaultBaseExtensionDiagnostics -Context "Base generation integrity scenario"
 $baseRailsLine = Get-LastStreamReportLine -Key "research_rails"
@@ -2653,6 +2942,7 @@ Assert-ReportLineContains -Line $bigMiningCapabilityLine -Expected "evidence=ite
 
 Invoke-RuntimeScenario -ScenarioName "atan-nuclear-science-productivity" -EnabledFixtureNames @(
   "mir-fixture-atan-nuclear-science",
+  "mir-fixture-assert-hidden-setting-readability",
   "mir-fixture-assert-atan-nuclear-science-productivity"
 )
 $atanNuclearScienceLine = Get-LastStreamReportLine -Key "research_science_pack_productivity"
@@ -2662,6 +2952,7 @@ Assert-ReportLineContains -Line $atanNuclearScienceLine -Expected "atan-nuclear-
 
 Invoke-RuntimeScenario -ScenarioName "atan-ash-separation" -EnabledFixtureNames @(
   "mir-fixture-atan-ash",
+  "mir-fixture-assert-hidden-setting-readability",
   "mir-fixture-assert-atan-ash-separation"
 )
 $atanAshLine = Get-LastStreamReportLine -Key "research_ash_separation"
@@ -2687,6 +2978,7 @@ Assert-ReportLineContains -Line $atanAshSinkRisk -Expected "risks=ash_sink" -Con
 
 Invoke-RuntimeScenario -ScenarioName "air-scrubbing-clean-filter" -EnabledFixtureNames @(
   "mir-fixture-air-scrubbing",
+  "mir-fixture-assert-hidden-setting-readability",
   "mir-fixture-assert-air-scrubbing-clean-filter"
 )
 $airScrubbingLine = Get-LastStreamReportLine -Key "research_air_scrubbing_clean_filter"
@@ -2725,6 +3017,32 @@ Invoke-RuntimeScenario -ScenarioName "pipeline-extent-multiplier-50" -EnabledFix
 ) -PipelineExtentMultiplier 0.5
 Assert-LogContains -Expected "Applied pipeline extent multiplier 0.5" -Context "Pipeline extent multiplier 50 percent scenario"
 
+Invoke-RuntimeScenario -ScenarioName "prototype-limit-overrides-base" -EnabledFixtureNames @(
+  "mir-fixture-assert-prototype-limits"
+) `
+  -PrototypeProductivityCap "percent-500" `
+  -PrototypeEfficiencyCap "saving-95" `
+  -PrototypePollutionCap "saving-95" `
+  -PrototypeSpeedCap "bonus-500" `
+  -PrototypeQualityCap "bonus-500" `
+  -PrototypePositivePowerFloor
+Assert-LogContains -Expected "Applied prototype limits: productivity_recipes=" -Context "Base prototype limit override scenario"
+
+Invoke-RuntimeScenario -ScenarioName "prototype-limit-overrides-space-age" -EnabledFixtureNames @(
+  "mir-fixture-assert-prototype-limits"
+) `
+  -PrototypeProductivityCap "percent-1000" `
+  -PrototypeEfficiencyCap "saving-99" `
+  -PrototypePollutionCap "saving-99" `
+  -PrototypeSpeedCap "bonus-1000" `
+  -PrototypeQualityCap "bonus-1000" `
+  -EnableSpaceAge
+Assert-LogContains -Expected "Applied prototype limits: productivity_recipes=" -Context "Space Age prototype limit override scenario"
+
+Invoke-RuntimeScenario -ScenarioName "settings-profile-roundtrip" -EnabledFixtureNames @(
+  "mir-fixture-assert-settings-profile-roundtrip"
+)
+
 Invoke-RuntimeScenario -ScenarioName "base-generation-integrity-inserter-enabled" -EnabledFixtureNames @(
   "mir-fixture-assert-generation-integrity"
 ) -EnabledBaseExtensionKeys @(
@@ -2748,19 +3066,20 @@ Assert-ReportLineGenerated -Line $baseInstalledRailsIconLine -Context "Base inst
 Assert-ReportLineContains -Line $baseInstalledRailsIconLine -Expected "icon=__elevated-rails__/graphics/technology/elevated-rail.png" -Context "Base installed official DLC rail productivity icon scenario"
 
 Invoke-RuntimeScenario -ScenarioName "checkbox-enabled-default-off-features" -EnabledFixtureNames @() `
-  -EnabledStreamKeys @("research_character_reach") `
   -EnabledBaseExtensionKeys @("inserter-capacity-bonus")
-$checkboxEnabledReachLine = Get-LastStreamReportLine -Key "research_character_reach"
-Assert-ReportLineGenerated -Line $checkboxEnabledReachLine -Context "Checkbox-enabled stream scenario"
 $checkboxEnabledInserterLine = Get-LastExtensionReportLine -Key "inserter-capacity-bonus"
 Assert-ReportLineGenerated -Line $checkboxEnabledInserterLine -Context "Checkbox-enabled base extension scenario"
 
 Invoke-RuntimeScenario -ScenarioName "checkbox-disabled-default-on-features" -EnabledFixtureNames @() `
-  -DisabledStreamKeys @("research_gears") `
+  -DisabledStreamKeys @("research_gears", "research_character_reach") `
   -DisabledBaseExtensionKeys @("research-speed")
 $checkboxDisabledGearsLine = Get-LastStreamReportLine -Key "research_gears"
 if ($checkboxDisabledGearsLine -notmatch "status=skipped" -or $checkboxDisabledGearsLine -notmatch "disabled") {
   throw "Disabled stream checkbox should skip generated research: $checkboxDisabledGearsLine"
+}
+$checkboxDisabledReachLine = Get-LastStreamReportLine -Key "research_character_reach"
+if ($checkboxDisabledReachLine -notmatch "status=skipped" -or $checkboxDisabledReachLine -notmatch "disabled") {
+  throw "Disabled promoted special stream checkbox should skip generated research: $checkboxDisabledReachLine"
 }
 $checkboxDisabledResearchSpeedLine = Get-LastExtensionReportLine -Key "research-speed"
 if ($checkboxDisabledResearchSpeedLine -notmatch "status=skipped" -or $checkboxDisabledResearchSpeedLine -notmatch "disabled") {
@@ -2851,20 +3170,22 @@ if ($isFactorio21Line) {
   Assert-LogContains -Expected "agricultural growth speed force state refreshed enabled=true" -Context "Checkbox-enabled scripted agricultural runtime scenario"
 
   Invoke-RuntimeScenario -ScenarioName "space-age-scripted-candidates-disabled" -EnabledFixtureNames @() `
+    -DisabledStreamKeys @("research_spoilage_preservation") `
     -ScriptedDiagnostics `
     -EnableSpaceAge
-  foreach ($disabledScriptedStream in @("research_spoilage_preservation", "research_agricultural_growth_speed")) {
-    $disabledScriptedLine = Get-LastStreamReportLine -Key $disabledScriptedStream
-    if ($disabledScriptedLine -notmatch "status=skipped" -or $disabledScriptedLine -notmatch "disabled") {
-      throw "Default-disabled scripted stream should skip when its checkbox is off: $disabledScriptedLine"
-    }
+  $disabledSpoilageLine = Get-LastStreamReportLine -Key "research_spoilage_preservation"
+  if ($disabledSpoilageLine -notmatch "status=skipped" -or $disabledSpoilageLine -notmatch "disabled") {
+    throw "Default-disabled scripted spoilage stream should skip when its checkbox is off: $disabledSpoilageLine"
   }
+  $defaultAgriculturalLine = Get-LastStreamReportLine -Key "research_agricultural_growth_speed"
+  Assert-ReportLineGenerated -Line $defaultAgriculturalLine -Context "Default-enabled scripted agricultural runtime scenario"
   Assert-LogContains -Expected "spoilage preservation skipped: disabled" -Context "Default-disabled scripted spoilage runtime scenario"
-  Assert-LogContains -Expected "agricultural growth speed force state refreshed enabled=false" -Context "Default-disabled scripted agricultural runtime scenario"
+  Assert-LogContains -Expected "agricultural growth speed force state refreshed enabled=true" -Context "Default-enabled scripted agricultural runtime scenario"
 }
 
 Invoke-RuntimeScenario -ScenarioName "space-age-generation-integrity" -EnabledFixtureNames @(
-  "mir-fixture-assert-generation-integrity"
+  "mir-fixture-assert-generation-integrity",
+  "mir-fixture-assert-hidden-setting-readability"
 ) -EnableSpaceAge
 Assert-SpaceAgeVanillaOwnedProductivityStreamsSkipped -Context "Space Age generation integrity scenario"
 Assert-DefaultBaseExtensionDiagnostics -Context "Space Age generation integrity scenario"
@@ -3073,17 +3394,13 @@ Assert-ReportLineDoesNotContain -Line $gateLine -Unexpected "science=automation-
 if ($isLegacyFactorio20) {
   Write-Host "[skip] Factorio 2.1 cargo runtime fixture scenarios skipped for Factorio 2.0 legacy metadata."
 } else {
-  Invoke-RuntimeScenario -ScenarioName "base-cargo-space-age-gate" -EnabledFixtureNames @() -EnabledStreamKeys @(
-    "research_cargo_landing_pad_count"
-  )
+  Invoke-RuntimeScenario -ScenarioName "base-cargo-space-age-gate" -EnabledFixtureNames @()
   $cargoPadLine = Get-LastStreamReportLine -Key "research_cargo_landing_pad_count"
   if ($cargoPadLine -notmatch "status=skipped" -or $cargoPadLine -notmatch "missing required mod space-age") {
     throw "Cargo landing pad count generated or skipped for the wrong reason without Space Age: $cargoPadLine"
   }
 
-  Invoke-RuntimeScenario -ScenarioName "space-age-cargo-pad-enabled" -EnabledFixtureNames @() -EnabledStreamKeys @(
-    "research_cargo_landing_pad_count"
-  ) -EnableSpaceAge
+  Invoke-RuntimeScenario -ScenarioName "space-age-cargo-pad-enabled" -EnabledFixtureNames @() -EnableSpaceAge
   $spaceAgeCargoPadLine = Get-LastStreamReportLine -Key "research_cargo_landing_pad_count"
   Assert-ReportLineGenerated -Line $spaceAgeCargoPadLine -Context "Space Age cargo landing pad count scenario"
   $spaceAgeCargoDistanceLine = Get-LastStreamReportLine -Key "research_cargo_bay_unloading_distance"
@@ -3091,8 +3408,6 @@ if ($isLegacyFactorio20) {
 
   Invoke-RuntimeScenario -ScenarioName "space-age-cargo-logistics-shape" -EnabledFixtureNames @(
     "mir-fixture-assert-cargo-logistics"
-  ) -EnabledStreamKeys @(
-    "research_cargo_landing_pad_count"
   ) -EnableSpaceAge
   $spaceAgeCargoShapePadLine = Get-LastStreamReportLine -Key "research_cargo_landing_pad_count"
   Assert-ReportLineGenerated -Line $spaceAgeCargoShapePadLine -Context "Space Age cargo logistics shape scenario"
@@ -3102,8 +3417,6 @@ if ($isLegacyFactorio20) {
   Invoke-RuntimeScenario -ScenarioName "space-age-duplicate-cargo-diagnostics" -EnabledFixtureNames @(
     "mir-fixture-duplicate-cargo-tech",
     "mir-fixture-assert-cargo-logistics"
-  ) -EnabledStreamKeys @(
-    "research_cargo_landing_pad_count"
   ) -EnableSpaceAge
   $duplicateCargoPadLine = Get-LastStreamReportLine -Key "research_cargo_landing_pad_count"
   Assert-ReportLineGenerated -Line $duplicateCargoPadLine -Context "Duplicate cargo landing pad diagnostics scenario"
