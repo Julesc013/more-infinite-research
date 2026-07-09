@@ -19,7 +19,8 @@ superseded_by: ["../../releases/README.md"]
 - Kept Quality hidden and optional, and kept Space Age optional without Factorio `2.1` dependency floors.
 - Removed the Factorio `2.1` cargo bay unloading distance and cargo landing pad count research streams from the Factorio `2.0` package.
 - Kept generated technology IDs stable for every stream that remains available on the Factorio `2.0` line.
-- Kept exact ATAN loader-schema repairs for the known supported upstream ATAN Ash and ATAN Nuclear Science packages.
+- Kept exact ATAN loader-schema repairs for the known supported upstream ATAN Ash and ATAN Nuclear Science packages when the runtime base game uses the Factorio `2.1` recipe schema.
+- Fixed the Factorio `2.0` ATAN Ash 2.2.1 + Space Age load path by leaving `atan-foundation-from-ash` in `crafting-with-fluid` instead of converting it to the Factorio `2.1` `categories` field.
 - Backported the canonical settings catalog, deterministic `MIRSET1` settings profiles, strict profile import checks, and optional compact profile export.
 - Backported signed, high-to-low prototype cap dropdowns for recipe productivity, energy-use, pollution, speed, and quality caps.
 - Split energy-use and pollution cap settings while keeping the explicit `0W` positive power floor as a default-off Compatibility setting.
@@ -39,8 +40,8 @@ superseded_by: ["../../releases/README.md"]
 ## Package Evidence
 
 - Archive: `dist/more-infinite-research_2.3.0.zip`
-- Package size: `295968` bytes
-- SHA-256: `1D695899119B4B755411B8F7619E1B0D9F24BC0EC16268D0F818877CE2A0997E`
+- Package size: `296124` bytes
+- SHA-256: `84287C5ACD047F6A3E1A6EDD568DEF313C13403CD35BB165CA399F4B02E19133`
 - Package hygiene: `119` entries and zero forbidden repository-only paths
 
 ## Known Boundaries

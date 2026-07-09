@@ -55,6 +55,18 @@ local repairs = {
   }
 }
 
+local function parse_major_minor(version)
+  local major, minor = string.match(tostring(version or ""), "^(%d+)%.(%d+)")
+  return tonumber(major), tonumber(minor)
+end
+
+local function supports_factorio_2_1_recipe_schema()
+  local major, minor = parse_major_minor(factorio_mods.version("base"))
+  if not major or not minor then return false end
+  if major > 2 then return true end
+  return major == 2 and minor >= 1
+end
+
 local function add_unique(out, seen, value)
   if type(value) ~= "string" or value == "" then return end
   if seen[value] then return end
@@ -191,6 +203,8 @@ local function apply_mod_repair(mod_name, spec)
 end
 
 function M.apply()
+  if not supports_factorio_2_1_recipe_schema() then return 0 end
+
   local count = 0
 
   for mod_name, spec in pairs(repairs) do
