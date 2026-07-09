@@ -35,6 +35,9 @@ direct-effect infinite researches and supported base technology continuations.
 - Added explicit target-era localized names and descriptions to generated
   vanilla continuations so numbered continuation technologies do not show
   unresolved locale keys in older Factorio UIs.
+- Added explicit modifier descriptions for reduced-line character, lab,
+  inventory, and robot direct-effect tooltips because Factorio `1.0` does not
+  provide every `modifier-description.*` key used by those effects.
 
 ## Icon Policy
 
@@ -65,11 +68,11 @@ without badge overlays.
 
 - Release candidate package:
   `dist/more-infinite-research_1.8.0.zip`, SHA-256
-  `3D5065B492C25E42AB174C38349BEE4EF5D12928BE53366369E25EDA11F3B105`,
-  `298879` bytes, `116` entries, `0` forbidden release entries.
+  `CBAEEB54EE1ECA0AB5854551466D14A49FF464E6B92439A048C3E84338B0E750`,
+  `300209` bytes, `121` entries, `0` forbidden release entries.
 - Static validation passed for the `1.8.0` metadata and package shape.
 - The public dist archive and the runtime-validated validation archive contain
-  the same `116` file entries with identical per-entry content hashes.
+  the same `121` file entries with identical per-entry content hashes.
 - Factorio `1.0` bridge-load validation passed with
   `D:\Programs\Factorio\1.0\bin\x64\factorio.exe`.
 - The `1.0` bridge gate loaded the package, ran the reduced direct-effect
