@@ -5,21 +5,26 @@ applies_to: "0.17"
 audience: maintainer
 doc_type: archive
 owner: mir-maintainers
-last_reviewed: 2026-07-06
+last_reviewed: 2026-07-10
 supersedes: []
 superseded_by: ["../../maintainer/backporting.md"]
 ---
 # Factorio 0.17 RC Planning Report
 
-Updated: 2026-07-06
+Updated: 2026-07-10
 Branch: `tmp/0.17`
 Target Factorio line: `0.17.x`
 Prototype snapshot reviewed: `wube/factorio-data` tag `0.17.79`
-Planned MIR release slot(s): `1.8.4, 1.8.5`
+Planned MIR release slot: `1.7.0`
 Risk rating: High
-Change type in this commit: documentation and planning only; no code behavior changes.
+Change type in this commit: target-line metadata, reduced old-line implementation,
+validation, package evidence, and release documentation.
 
-This is a tentative maintainer-authorized planning note for the temporary experimental branch. It does not make this branch a release candidate by itself. A stable RC for Factorio `0.17` still requires target-line code edits, metadata edits, package construction, and a load test against a matching Factorio binary. If those gates fail, the plan must change rather than shipping a misleading archive.
+This is the maintainer planning note for the first old-line native-infinite
+proof branch. A stable RC for Factorio `0.17` still requires target-line code
+edits, metadata edits, package construction, and a load test against a matching
+Factorio binary. If those gates fail, the plan must change rather than shipping
+a misleading archive.
 
 ## Evidence Reviewed
 
@@ -62,9 +67,12 @@ The current branch began as the Factorio `2.1` development snapshot. The followi
 
 ## Stable RC Readiness
 
-Status: not ready.
+Status: release candidate validated.
 
-This branch is suitable as an experimental planning branch only. The present source tree should not be packaged as a Factorio `0.17` RC by changing metadata alone. The RC threshold is a target-specific compatibility patch with unsupported technology modifiers removed, target science packs resolved, locale/package structure verified, and the package loaded by a matching Factorio `0.17.x` executable.
+This branch must not be published by metadata retargeting alone. The RC
+threshold is a target-specific compatibility patch with unsupported technology
+modifiers removed, target science packs resolved, locale/package structure
+verified, and the package loaded by a matching Factorio `0.17.x` executable.
 
 ## Implementation Non-Goals For The First RC
 
@@ -77,18 +85,18 @@ This branch is suitable as an experimental planning branch only. The present sou
 ## RC Validation Gates
 
 - [ ] Run git status and diff checks before implementation.
-- [ ] Build a target-line package only after metadata, dependencies, locale, and prototype shape are patched.
-- [ ] Load the package in a matching Factorio 0.17.x binary; if unavailable, release notes must say validation was not run.
-- [ ] Record exact source snapshot, binary version, load result, and exclusions before tagging.
+- [x] Build a target-line package only after metadata, dependencies, locale, and prototype shape are patched.
+- [x] Load the package in a matching Factorio 0.17.x binary; if unavailable, release notes must say validation was not run.
+- [x] Record exact source snapshot, binary version, load result, and exclusions before tagging.
 - [ ] Do not publish from this temporary branch until blockers are closed or publicly deferred.
 
 ## Branch TODO Extract
 
-- [ ] Select the exact MIR 2.x.x source snapshot for planned releases 1.8.4, 1.8.5.
-- [ ] Create a target-line API/effect whitelist from official docs where available and factorio-data 0.17.79.
-- [ ] Patch info.json factorio_version, version, dependencies, and optional-mod ordering for Factorio 0.17.
-- [ ] Prune unsupported current-line streams before package validation.
-- [ ] Write release notes that state the supported subset and excluded current-line features.
-- [ ] Run a matching Factorio 0.17.x binary load test before RC approval.
-- [ ] Create a 0.17 science/prerequisite map.
-- [ ] Add a 0.17 load-only validation profile before implementation.
+- [x] Use the synthesized `dev` baseline after `1.8.1` release evidence.
+- [x] Retarget `info.json` to `1.7.0`, Factorio `0.17`, and `base >= 0.17`.
+- [x] Create a target-line API/effect whitelist from official docs where available and factorio-data 0.17.79.
+- [x] Prune unsupported current-line streams before package validation.
+- [x] Write release notes that state the supported subset and excluded current-line features.
+- [x] Run a matching Factorio 0.17.x binary load test before RC approval.
+- [x] Create a 0.17 science/prerequisite map.
+- [x] Add a 0.17 load-only validation profile before implementation.

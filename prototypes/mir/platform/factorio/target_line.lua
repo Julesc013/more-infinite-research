@@ -1,28 +1,72 @@
 local M = {}
 
-M.factorio_version = "2.1"
+M.factorio_version = "0.17"
 
 M.supports = {
-  compatibility_repairs = true,
-  pipeline_extent = true,
-  prototype_limits = true,
-  recipe_productivity = true,
-  settings_profiles = true,
-  scripted_techs = true,
-  technology_constant_overlays = true,
-  productivity_family_adoption = true
+  compatibility_repairs = false,
+  pipeline_extent = false,
+  prototype_limits = false,
+  recipe_productivity = false,
+  settings_profiles = false,
+  scripted_techs = false,
+  technology_constant_overlays = false,
+  productivity_family_adoption = false
 }
 
-function M.stream_supported()
+local unsupported_streams = {
+  research_agricultural_growth_speed = true,
+  research_cargo_bay_unloading_distance = true,
+  research_cargo_landing_pad_count = true,
+  research_spoilage_preservation = true
+}
+
+local unsupported_required_mods = {
+  ["elevated-rails"] = true,
+  quality = true,
+  recycler = true,
+  ["space-age"] = true
+}
+
+local unsupported_effect_types = {
+  ["cargo-landing-pad-count"] = true,
+  ["max-cargo-bay-unloading-distance"] = true
+}
+
+local omitted_global_settings = {
+  ["mir-pipeline-extent-multiplier"] = true,
+  ["mir-prototype-productivity-cap"] = true,
+  ["mir-prototype-efficiency-cap"] = true,
+  ["mir-prototype-pollution-cap"] = true,
+  ["mir-prototype-speed-cap"] = true,
+  ["mir-prototype-quality-cap"] = true,
+  ["mir-prototype-positive-power-floor"] = true,
+  ["mir-settings-profile-import"] = true,
+  ["mir-use-installed-space-age-icons"] = true
+}
+
+local function has_unsupported_required_mod(spec)
+  for _, mod_name in ipairs((spec and spec.required_mods) or {}) do
+    if unsupported_required_mods[mod_name] then return true end
+  end
+  return false
+end
+
+function M.stream_supported(key, spec)
+  if unsupported_streams[key] then return false end
+  if has_unsupported_required_mod(spec) then return false end
+  if not (spec and spec.direct_effects) then
+    return M.supports.recipe_productivity
+  end
   return true
 end
 
 function M.effect_supported(effect)
-  return effect and effect.type ~= nil
+  local effect_type = effect and effect.type
+  return effect_type ~= nil and not unsupported_effect_types[effect_type]
 end
 
-function M.global_setting_supported()
-  return true
+function M.global_setting_supported(name)
+  return not omitted_global_settings[name]
 end
 
 function M.feature_enabled(name)
@@ -30,7 +74,10 @@ function M.feature_enabled(name)
 end
 
 function M.technology_overlay_layer()
-  return nil
+  -- Factorio 0.17 does not ship the 1.1+ stock technology constant badge
+  -- assets or a documented native modifier icon surface. Keep generated
+  -- technologies on target-era technology art.
+  return false
 end
 
 return M

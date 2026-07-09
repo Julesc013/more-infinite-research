@@ -279,6 +279,13 @@ compatibility port of a tested current-line snapshot.
   Factorio `1.0`; `0.8.x` remains reserved for the later Factorio `0.8` museum
   line.
 - [ ] Release `v1.7.0`, `v1.6.0`, and `v1.5.0` as reduced native-infinite editions for Factorio `0.17`, `0.16`, and `0.15` only after target binary proof.
+  `v1.7.0` is built as a validated release candidate for Factorio `0.17`:
+  `dist/more-infinite-research_1.7.0.zip`, SHA-256
+  `4C685EDCD1317DD3E99E54D3C7DFF7447FB4BE2C7182C9A0B44EF8AC7E53E326`,
+  size `383734` bytes, `121` entries, `0` forbidden entries. Static
+  validation passed, Factorio `0.17` binary validation passed with
+  `D:\Programs\Factorio\0.17\bin\x64\factorio.exe`, and the public dist archive
+  was copied from the runtime-validated archive.
 - [ ] Release `v1.4.0`, `v1.3.0`, and `v0.12.0` as archive finite-ladder reconstructions only after target binary proof.
 - [ ] Release `v0.11.0` through `v0.6.0` as museum/discovery builds only after target binary and base-file discovery.
 - [ ] Validate each target-line release with a matching target Factorio binary when available, and document any missing validation in release notes.

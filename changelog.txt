@@ -1,4 +1,26 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.7.0
+Date: 2026-07-10
+
+  Compatibility:
+
+    - Ported the first reduced native-infinite edition to Factorio 0.17 from the 1.8.x old-line lessons.
+    - Included current dev portable fixes without restoring 2.x-only surfaces.
+    - Retargeted package metadata to Factorio 0.17 with `base >= 0.17`.
+    - Kept modern non-Space-Age science pack names for the target line.
+    - Kept only target-probed direct-effect infinite researches and base technology continuations.
+    - Kept recipe productivity, Space Age, Quality, Recycler, Elevated Rails, and cargo logistics out of 0.17.
+    - Kept spoilage and agriculture out of 0.17.
+    - Kept prototype cap settings, pipeline extent settings, settings profiles, and newer technology badge overlays out of 0.17.
+
+  Changes:
+
+    - Reused the older-line `global` runtime state adapter.
+    - Reused target-era technology art without newer badge overlays or unsupported native modifier icon metadata.
+    - Added Factorio 0.17 metadata, settings visibility, and reduced-line runtime support.
+    - Documented 1.7.0 as the first old-line native-infinite edition and the next ring after 1.8.x.
+
+---------------------------------------------------------------------------------------------------
 Version: 1.8.1
 Date: 2026-07-10
 

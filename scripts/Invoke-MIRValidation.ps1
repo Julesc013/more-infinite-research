@@ -1907,16 +1907,44 @@ function Remove-CopiedModDirectory {
   return $target
 }
 
+function Get-ScenarioModFolderName {
+  param(
+    [string]$Name,
+    [string]$Version
+  )
+
+  if ($isFactorio017Line -and -not [string]::IsNullOrWhiteSpace($Version)) {
+    return "$Name`_$Version"
+  }
+  return $Name
+}
+
+function Get-CopiedMIRModPath {
+  param([string]$ModsDir)
+  $folderName = Get-ScenarioModFolderName -Name $repoInfo.name -Version $repoInfo.version
+  return Join-Path $ModsDir $folderName
+}
+
+function Join-CopiedMIRPath {
+  param(
+    [string]$ModsDir,
+    [string]$RelativePath
+  )
+  return Join-Path (Get-CopiedMIRModPath -ModsDir $ModsDir) $RelativePath
+}
+
 function Copy-ModDirectory {
-  param([string]$Source, [string]$Name, [string]$ModsDir)
-  $target = Remove-CopiedModDirectory -Name $Name -ModsDir $ModsDir
+  param([string]$Source, [string]$Name, [string]$Version, [string]$ModsDir)
+  $folderName = Get-ScenarioModFolderName -Name $Name -Version $Version
+  $target = Remove-CopiedModDirectory -Name $folderName -ModsDir $ModsDir
   Copy-Item -LiteralPath $Source -Destination $target -Recurse
 }
 
 function Copy-RepositoryModDirectory {
   param([string]$ModsDir)
 
-  $target = Remove-CopiedModDirectory -Name "more-infinite-research" -ModsDir $ModsDir
+  $folderName = Get-ScenarioModFolderName -Name $repoInfo.name -Version $repoInfo.version
+  $target = Remove-CopiedModDirectory -Name $folderName -ModsDir $ModsDir
   New-Item -ItemType Directory -Force -Path $target | Out-Null
 
   $files = @(
@@ -1997,6 +2025,7 @@ function Get-FixtureInfos {
     $info = Get-Content -Raw (Join-Path $fixture.FullName "info.json") | ConvertFrom-Json
     $infos += [pscustomobject]@{
       Name = $info.name
+      Version = $info.version
       Path = $fixture.FullName
     }
   }
@@ -2005,9 +2034,9 @@ function Get-FixtureInfos {
 
 function Enable-CopiedDiagnostics {
   param([string]$ModsDir)
-  $copiedDiagnosticsPath = Join-Path $ModsDir "more-infinite-research\prototypes\mir\report\diagnostics_sink.lua"
+  $copiedDiagnosticsPath = Join-CopiedMIRPath -ModsDir $ModsDir -RelativePath "prototypes\mir\report\diagnostics_sink.lua"
   if (-not (Test-Path -LiteralPath $copiedDiagnosticsPath)) {
-    $copiedDiagnosticsPath = Join-Path $ModsDir "more-infinite-research\prototypes\diagnostics.lua"
+    $copiedDiagnosticsPath = Join-CopiedMIRPath -ModsDir $ModsDir -RelativePath "prototypes\diagnostics.lua"
   }
   $copiedDiagnostics = Get-Content -Raw -LiteralPath $copiedDiagnosticsPath
   $copiedDiagnostics = $copiedDiagnostics -replace 'return startup_setting\("mir-debug-generation-report"\) == true', 'return true'
@@ -2023,12 +2052,12 @@ function Get-CopiedSettingsImplementationPath {
   param([string]$ModsDir)
 
   $candidates = @(
-    "more-infinite-research\prototypes\mir\settings\stage_builder.lua",
-    "more-infinite-research\settings.lua"
+    "prototypes\mir\settings\stage_builder.lua",
+    "settings.lua"
   )
 
   foreach ($relative in $candidates) {
-    $path = Join-Path $ModsDir $relative
+    $path = Join-CopiedMIRPath -ModsDir $ModsDir -RelativePath $relative
     if (Test-Path -LiteralPath $path) {
       return $path
     }
@@ -2041,14 +2070,14 @@ function Get-CopiedStartupSettingImplementationPaths {
   param([string]$ModsDir)
 
   $candidates = @(
-    "more-infinite-research\prototypes\mir\settings\catalog.lua",
-    "more-infinite-research\prototypes\mir\settings\stage_builder.lua",
-    "more-infinite-research\settings.lua"
+    "prototypes\mir\settings\catalog.lua",
+    "prototypes\mir\settings\stage_builder.lua",
+    "settings.lua"
   )
 
   $paths = @()
   foreach ($relative in $candidates) {
-    $path = Join-Path $ModsDir $relative
+    $path = Join-CopiedMIRPath -ModsDir $ModsDir -RelativePath $relative
     if (Test-Path -LiteralPath $path) {
       $paths += $path
     }
@@ -2187,7 +2216,7 @@ function Set-CopiedStreamCheckboxDefault {
     Set-CopiedGeneratedStartupSettingDefault -ModsDir $ModsDir -Name "ips-enable-$StreamKey" -ValueLiteral $valueLiteral
     return
   } catch {
-    $copiedDefaultsPath = Join-Path $ModsDir "more-infinite-research\prototypes\mir\settings\defaults.lua"
+    $copiedDefaultsPath = Join-CopiedMIRPath -ModsDir $ModsDir -RelativePath "prototypes\mir\settings\defaults.lua"
     $copiedDefaults = Get-Content -Raw -LiteralPath $copiedDefaultsPath
     if ($copiedDefaults -notmatch "return\s+defaults") {
       throw "Unable to find return defaults in copied prototypes/mir/settings/defaults.lua while setting stream $StreamKey."
@@ -2227,7 +2256,7 @@ function Set-CopiedBaseExtensionDefault {
     Set-CopiedGeneratedStartupSettingDefault -ModsDir $ModsDir -Name "mir-enable-$BaseExtensionKey" -ValueLiteral $valueLiteral
     return
   } catch {
-    $copiedDefaultsPath = Join-Path $ModsDir "more-infinite-research\prototypes\mir\settings\defaults.lua"
+    $copiedDefaultsPath = Join-CopiedMIRPath -ModsDir $ModsDir -RelativePath "prototypes\mir\settings\defaults.lua"
     $copiedDefaults = Get-Content -Raw -LiteralPath $copiedDefaultsPath
     if ($copiedDefaults -notmatch "return\s+defaults") {
       throw "Unable to find return defaults in copied prototypes/mir/settings/defaults.lua while setting base extension $BaseExtensionKey."
@@ -2303,11 +2332,11 @@ function Initialize-RuntimeScenario {
 
   $fixtureInfos = Get-FixtureInfos
   foreach ($fixtureInfo in $fixtureInfos) {
-    Copy-ModDirectory -Source $fixtureInfo.Path -Name $fixtureInfo.Name -ModsDir $modsDir
+    Copy-ModDirectory -Source $fixtureInfo.Path -Name $fixtureInfo.Name -Version $fixtureInfo.Version -ModsDir $modsDir
   }
 
   $fixtureNames = @($fixtureInfos | Select-Object -ExpandProperty Name)
-  $copiedInfoPath = Join-Path $modsDir "more-infinite-research\info.json"
+  $copiedInfoPath = Join-CopiedMIRPath -ModsDir $modsDir -RelativePath "info.json"
   $copiedInfo = Get-Content -Raw -LiteralPath $copiedInfoPath | ConvertFrom-Json
   $dependencies = @($copiedInfo.dependencies)
   foreach ($fixtureName in @($fixtureNames | Where-Object { $_ -notin $postMirAssertionFixtures })) {

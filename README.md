@@ -11,6 +11,8 @@
 
 More Infinite Research adds **configurable infinite productivity** and **bonus research** for intermediate items, logistics chains, combat bonuses, player bonuses, and Space Age gaps that vanilla Factorio does not cover on supported modern target lines.
 
+**MIR `1.7.x`** targets **Factorio `0.17`** as a reduced native-infinite edition. It keeps target-proven direct-effect bonuses and base technology continuations with modern non-Space-Age science names, but does not include recipe productivity, Space Age, Quality, Recycler, Elevated Rails, cargo logistics, prototype cap settings, pipeline extent settings, settings profiles, or newer technology badge overlays.
+
 **MIR `1.8.0`** targets **Factorio `0.18`** as a bridge/archive compatibility package. It keeps the reduced direct-effect bonuses and base technology continuations that the older target can support, but does not include recipe productivity, Space Age, Quality, Recycler, Elevated Rails, cargo logistics, prototype cap settings, pipeline extent settings, settings profiles, or newer technology badge overlays.
 
 **MIR `1.8.1+`** targets **Factorio `1.0`** as the maintained compatibility port line. It is derived from the validated Factorio `1.1` port and the Factorio `0.18` bridge lessons, with Factorio `1.0` metadata, validation, and target-supported behavior restored where proven. It is not a metadata bump of `1.8.0`.

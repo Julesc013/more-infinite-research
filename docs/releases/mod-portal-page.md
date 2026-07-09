@@ -25,6 +25,13 @@ It is built for players who want more *long-term scaling for late-game megabases
 - Adopts safe mod-added recipes into configured vanilla Space Age productivity families instead of creating parallel research.
 - Uses MIR 3 compiler diagnostics to explain generated, skipped, observed, and rejected research decisions.
 
+**MIR `1.7.x`** targets **Factorio `0.17`** as a reduced native-infinite
+edition. It keeps target-proven direct-effect bonuses and base technology
+continuations with modern non-Space-Age science names, but does not include
+recipe productivity, Factorio 2.x DLC surfaces, prototype cap settings,
+pipeline extent settings, settings profiles, newer technology badge overlays,
+or synthetic old-line badge overlays.
+
 **MIR `1.8.0`** targets **Factorio `0.18`** as a bridge/archive compatibility
 package. It keeps reduced direct-effect bonuses and base technology
 continuations only, and does not include recipe productivity, Factorio 2.x DLC

@@ -159,6 +159,25 @@ release_artifacts:
       publication_scope: github-release
       mod_portal_visibility: not-visible-from-downloads-page-as-of-2026-07-10
       status: published
+    mir_1_7_0:
+      version: "1.7.0"
+      branch: tmp/0.17
+      target_factorio: "0.17"
+      source_anchor: mir_1_8_1
+      source_lessons:
+        - mir_1_8_0_bridge_evidence
+        - mir_1_8_1_factorio_1_0_port
+        - dev_portable_fixes
+      artifact: dist/more-infinite-research_1.7.0.zip
+      sha256: 4C685EDCD1317DD3E99E54D3C7DFF7447FB4BE2C7182C9A0B44EF8AC7E53E326
+      size_bytes: 383734
+      entries: 121
+      forbidden_entries: 0
+      validation_content_matches_dist: true
+      static_validation: passed
+      factorio_0_17_validation: passed
+      factorio_0_17_binary: D:\Programs\Factorio\0.17\bin\x64\factorio.exe
+      status: release-candidate
   closed_versions:
     - version: "2.2.0"
       branch: main
