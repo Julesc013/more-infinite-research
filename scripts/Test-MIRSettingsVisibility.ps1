@@ -6,7 +6,7 @@ $ErrorActionPreference = "Stop"
 
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
 $repoInfo = Get-Content -Raw -LiteralPath (Join-Path $repo "info.json") | ConvertFrom-Json
-$isFactorio11Line = $repoInfo.factorio_version -eq "1.1"
+$isReducedLegacyLine = $repoInfo.factorio_version -in @("0.18", "1.0", "1.1")
 
 function Read-MIRText {
   param([Parameter(Mandatory)][string]$RelativePath)
@@ -207,14 +207,14 @@ Assert-Contains -RelativePath "prototypes/mir/settings/stage_builder.lua" -Text 
 Assert-Contains -RelativePath "prototypes/mir/settings/stage_builder.lua" -Text $stageBuilderText -Needle 'return setting_order.technology(bucket, order_slug(group.sort_name), group.kind, group.key)'
 Assert-Contains -RelativePath "prototypes/mir/settings/stage_builder.lua" -Text $stageBuilderText -Needle 'if rank_a ~= rank_b then return rank_a < rank_b end'
 Assert-Contains -RelativePath "prototypes/mir/settings/stage_builder.lua" -Text $stageBuilderText -Needle 'local sort_a = order_slug(a.sort_name)'
-if (-not $isFactorio11Line) {
+if (-not $isReducedLegacyLine) {
   Assert-Matches -RelativePath "prototypes/mir/settings/defaults.lua" -Text $defaultsText -Pattern '(?s)research_breeding\s*=\s*\{.*?enabled\s*=\s*true.*?settings_priority\s*=\s*"top"'
   Assert-Matches -RelativePath "prototypes/mir/settings/defaults.lua" -Text $defaultsText -Pattern '(?s)research_agricultural_growth_speed\s*=\s*\{.*?enabled\s*=\s*true.*?settings_priority\s*=\s*"top"'
   Assert-Matches -RelativePath "prototypes/mir/settings/defaults.lua" -Text $defaultsText -Pattern '(?s)research_cargo_bay_unloading_distance\s*=\s*\{.*?enabled\s*=\s*true.*?settings_priority\s*=\s*"top"'
   Assert-Matches -RelativePath "prototypes/mir/settings/defaults.lua" -Text $defaultsText -Pattern '(?s)research_cargo_landing_pad_count\s*=\s*\{.*?enabled\s*=\s*true.*?settings_priority\s*=\s*"top"'
 }
 Assert-Matches -RelativePath "prototypes/mir/settings/defaults.lua" -Text $defaultsText -Pattern '(?s)research_character_reach\s*=\s*\{.*?enabled\s*=\s*true.*?settings_priority\s*=\s*"top"'
-if (-not $isFactorio11Line) {
+if (-not $isReducedLegacyLine) {
   Assert-Matches -RelativePath "prototypes/mir/settings/defaults.lua" -Text $defaultsText -Pattern '(?s)research_spoilage_preservation\s*=\s*\{.*?enabled\s*=\s*false'
 } else {
   Assert-NoPattern -RelativePath "prototypes/mir/settings/defaults.lua" -Text $defaultsText -Pattern 'research_spoilage_preservation\s*='
@@ -227,11 +227,11 @@ Assert-Contains -RelativePath "prototypes/streams/productivity.lua" -Text $produ
 Assert-Contains -RelativePath "prototypes/streams/productivity.lua" -Text $productivityText -Needle 'mods_any = air_scrubbing_overlay.applies_when.mods'
 Assert-Contains -RelativePath "prototypes/streams/productivity.lua" -Text $productivityText -Needle 'mods_any = atan_ash_overlay.applies_when.mods'
 Assert-Contains -RelativePath "prototypes/streams/productivity.lua" -Text $productivityText -Needle 'reason = "official-stream-settings-visible"'
-if (-not $isFactorio11Line) {
+if (-not $isReducedLegacyLine) {
   Assert-Contains -RelativePath "prototypes/streams/direct-effects.lua" -Text $directEffectsText -Needle 'reason = "official-stream-settings-visible"'
 }
 Assert-Contains -RelativePath "prototypes/streams/productivity.lua" -Text $productivityText -Needle "generation_requirements = {"
-if (-not $isFactorio11Line) {
+if (-not $isReducedLegacyLine) {
   Assert-Contains -RelativePath "prototypes/streams/direct-effects.lua" -Text $directEffectsText -Needle "ui_visibility = {"
   Assert-Contains -RelativePath "prototypes/streams/direct-effects.lua" -Text $directEffectsText -Needle "generation_requirements = {"
 }
@@ -239,7 +239,7 @@ if (-not $isFactorio11Line) {
 Assert-Contains -RelativePath "fixtures/assert-hidden-setting-readability/info.json" -Text $fixtureInfoText -Needle '"name": "mir-fixture-assert-hidden-setting-readability"'
 Assert-Contains -RelativePath "fixtures/assert-hidden-setting-readability/data-final-fixes.lua" -Text $fixtureText -Needle "assert_startup_setting_readable"
 Assert-Contains -RelativePath "fixtures/assert-hidden-setting-readability/data-final-fixes.lua" -Text $fixtureText -Needle "governed_stream_keys"
-if (-not $isFactorio11Line) {
+if (-not $isReducedLegacyLine) {
   Assert-Contains -RelativePath "fixtures/assert-hidden-setting-readability/data-final-fixes.lua" -Text $fixtureText -Needle '"research_tungsten"'
   Assert-Contains -RelativePath "fixtures/assert-hidden-setting-readability/data-final-fixes.lua" -Text $fixtureText -Needle '"research_breeding"'
   Assert-Contains -RelativePath "fixtures/assert-hidden-setting-readability/data-final-fixes.lua" -Text $fixtureText -Needle '"research_agricultural_growth_speed"'
