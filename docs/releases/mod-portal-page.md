@@ -1,3 +1,14 @@
+---
+title: "More Infinite Research"
+status: current
+applies_to: "3.0.0+"
+audience: release-manager
+doc_type: release-plan
+owner: mir-maintainers
+last_reviewed: 2026-07-10
+supersedes: []
+superseded_by: []
+---
 # More Infinite Research
 
 Adds **fully customizable** repeatable late-game research for **productivity, speed, logistics, combat, player bonuses, robots, spoilage, and cargo logistics**.
@@ -13,6 +24,18 @@ It is built for players who want more *long-term scaling for late-game megabases
 - Adds a base-game Research productivity chain when Space Age's vanilla `research-productivity` technology is not present.
 - Adopts safe mod-added recipes into configured vanilla Space Age productivity families instead of creating parallel research.
 - Uses MIR 3 compiler diagnostics to explain generated, skipped, observed, and rejected research decisions.
+
+**MIR `1.8.0`** targets **Factorio `0.18`** as a bridge/archive compatibility
+package. It keeps reduced direct-effect bonuses and base technology
+continuations only, and does not include recipe productivity, Factorio 2.x DLC
+surfaces, prototype cap settings, pipeline extent settings, settings profiles,
+newer technology badge overlays, or synthetic old-line badge overlays.
+
+**MIR `1.9.3+`** targets **Factorio `1.1`** as a reduced compatibility port:
+supported direct-effect bonuses and base technology continuations only, with
+no recipe productivity, Space Age, Quality, Recycler, Elevated Rails, cargo
+logistics, prototype cap settings, pipeline extent settings, or settings
+profiles.
 
 **MIR `2.x.x`** targets **Factorio `2.0`** *(starting with **`2.3.0`**)*.
 
