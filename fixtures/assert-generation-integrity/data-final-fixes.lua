@@ -390,7 +390,7 @@ if techs["recipe-prod-research_lab_productivity-1"] then
   if use_installed_space_age_icons then
     assert_tech_uses_icon_path("recipe-prod-research_lab_productivity-1", "__space-age__/graphics/technology/research-productivity.png")
   else
-    assert_tech_uses_technology_icon("recipe-prod-research_lab_productivity-1", "research-speed-6")
+    assert_tech_uses_technology_icon("recipe-prod-research_lab_productivity-1", "military-science-pack")
   end
 end
 if techs["recipe-prod-research_rocket_fuel-1"] then

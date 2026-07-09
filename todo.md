@@ -225,7 +225,11 @@ compatibility port of a tested current-line snapshot.
   adapter seams, runtime state adapter usage, 1.1 binary validation profile
   improvements, package hygiene checks, stock target-era icon fallback policy,
   release documentation, and shared 2.1-valid fixture corrections.
-- [x] Do not bring Factorio `2.0` or `1.1` metadata, lower dependency floors, disabled
+- [x] Bring only portable lessons from `1.8.0` back into `dev`: immutable bridge
+  release evidence, release documentation, reduced-line validation profile
+  improvements, continuation locale-source handling, old-line modifier locale
+  fallbacks, stock target-era icon fallback policy, and package hygiene notes.
+- [x] Do not bring Factorio `2.0`, `1.1`, `1.0`, or `0.18` metadata, lower dependency floors, disabled
   `2.1` surfaces, 2.0 release wording, or lower-target compromises back into
   default Factorio `2.1` behavior.
 - [ ] Do not cut `3.0.1` unless the current Factorio `2.1` line has a serious
@@ -251,13 +255,22 @@ compatibility port of a tested current-line snapshot.
 - [ ] Publish or record `v1.9.3` as public: upload the exact validated zip if
   not already public, verify the Mod Portal lists Factorio `1.1`, tag the
   source point, and mark `.mir/branches.yml` as `published`.
-- [ ] Release `v1.8.0` as the frozen Factorio `0.18` bridge/archive package
-  from the validated `1.9.3` source point. The exact same
-  `dist/more-infinite-research_1.8.0.zip` must load in both Factorio `0.18`
-  and Factorio `1.0` before publication.
+- [x] Release `v1.8.0` as the Factorio `0.18` bridge compatibility port from the MIR 3 source anchor plus portable `2.3.0` and `1.9.3` lessons.
+  Published bridge package: `dist/more-infinite-research_1.8.0.zip`,
+  SHA-256 `D785E6EBE7A72E6E9F01A3F89774A6AA30479430410447F603FEF1E0B9BD7B24`,
+  size `300620` bytes, `121` entries, `0` forbidden entries. Static validation
+  passed, Factorio `0.18` binary validation passed, Factorio `1.0` bridge
+  validation passed with
+  `D:\Programs\Factorio\1.0\bin\x64\factorio.exe`, and the public dist archive
+  content matches the runtime-validated archive. The bridge uses target-era base
+  technology art only; it does not package newer Factorio 1.1+ technology
+  constant badge graphics, synthetic badge overlays, or unsupported native
+  modifier icon metadata. Research productivity uses stock military science
+  technology art as its main tile.
 - [ ] Release `v1.8.1` as the first maintained Factorio `1.0` compatibility
-  port. Do not use `0.8.x` for Factorio `1.0`; `0.8.x` remains reserved for
-  the later Factorio `0.8` museum line.
+  port from the `1.9.3` source posture, proven `1.8.0` bridge lessons, and
+  current dev portable fixes. Do not use `0.8.x` for Factorio `1.0`; `0.8.x`
+  remains reserved for the later Factorio `0.8` museum line.
 - [ ] Release `v1.7.0`, `v1.6.0`, and `v1.5.0` as reduced native-infinite editions for Factorio `0.17`, `0.16`, and `0.15` only after target binary proof.
 - [ ] Release `v1.4.0`, `v1.3.0`, and `v0.12.0` as archive finite-ladder reconstructions only after target binary proof.
 - [ ] Release `v0.11.0` through `v0.6.0` as museum/discovery builds only after target binary and base-file discovery.

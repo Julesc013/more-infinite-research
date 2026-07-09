@@ -115,6 +115,20 @@ release_artifacts:
       entries: 121
       forbidden_entries: 0
       status: release-candidate
+    mir_1_8_0:
+      version: "1.8.0"
+      branch: tmp/0.18
+      target_factorio: "0.18"
+      source_anchor: mir_1_9_3
+      artifact: dist/more-infinite-research_1.8.0.zip
+      sha256: D785E6EBE7A72E6E9F01A3F89774A6AA30479430410447F603FEF1E0B9BD7B24
+      size_bytes: 300620
+      entries: 121
+      forbidden_entries: 0
+      validation_content_matches_dist: true
+      factorio_0_18_validation: passed
+      factorio_1_0_bridge_validation: passed
+      status: published
   closed_versions:
     - version: "2.2.0"
       branch: main
@@ -138,9 +152,9 @@ release_artifacts:
       target_factorio: "1.1"
     factorio_0_18_bridge:
       version: "1.8.0"
-      branch: port/1.1-to-0.18
+      branch: tmp/0.18
       target_factorio: "0.18"
-      purpose: one-time bridge/archive package from the validated 1.9.3 source point; must load in both Factorio 0.18 and Factorio 1.0 before publication
+      purpose: published bridge/archive package from the MIR 3 source anchor plus portable 2.3.0 and 1.9.3 lessons
     factorio_1_0_port:
       version: "1.8.1"
       branch: tmp/1.0

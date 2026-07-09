@@ -11,7 +11,10 @@ param(
 $ErrorActionPreference = "Stop"
 $repo = Resolve-Path (Join-Path $PSScriptRoot "..")
 $repoInfo = Get-Content -Raw (Join-Path $repo "info.json") | ConvertFrom-Json
+$isFactorio018Line = $repoInfo.factorio_version -eq "0.18"
+$isFactorio10Line = $repoInfo.factorio_version -eq "1.0"
 $isFactorio11Line = $repoInfo.factorio_version -eq "1.1"
+$isReducedLegacyLine = $isFactorio018Line -or $isFactorio10Line -or $isFactorio11Line
 $isLegacyFactorio20 = $repoInfo.factorio_version -eq "2.0"
 $isFactorio21Line = $repoInfo.factorio_version -eq "2.1"
 $script:ValidationPackageZipPath = $null
@@ -136,7 +139,25 @@ Invoke-RepoCheck "info.json parses" {
 Invoke-RepoCheck "release metadata matches Factorio line" {
   $deps = @($repoInfo.dependencies)
 
-  if ($isFactorio11Line) {
+  if ($isFactorio018Line) {
+    if ($deps -notcontains "base >= 0.18") {
+      throw "Factorio 0.18 metadata must declare base >= 0.18."
+    }
+
+    $newerDeps = @($deps | Where-Object { $_ -match ">=\s*(1|2)\." -or $_ -match "(space-age|quality|recycler|elevated-rails)" })
+    if ($newerDeps.Count -gt 0) {
+      throw "Factorio 0.18 metadata must not carry Factorio 1.x, 2.x, or DLC dependencies: $($newerDeps -join ', ')"
+    }
+  } elseif ($isFactorio10Line) {
+    if ($deps -notcontains "base >= 1.0") {
+      throw "Factorio 1.0 metadata must declare base >= 1.0."
+    }
+
+    $newerDeps = @($deps | Where-Object { $_ -match ">=\s*(1\.1|2)\." -or $_ -match "(space-age|quality|recycler|elevated-rails)" })
+    if ($newerDeps.Count -gt 0) {
+      throw "Factorio 1.0 metadata must not carry Factorio 1.1, 2.x, or DLC dependencies: $($newerDeps -join ', ')"
+    }
+  } elseif ($isFactorio11Line) {
     if ($deps -notcontains "base >= 1.1") {
       throw "Factorio 1.1 metadata must declare base >= 1.1."
     }
@@ -314,9 +335,9 @@ Invoke-RepoCheck "control runtime avoids tick handlers" {
 
 Invoke-RepoCheck "default-off scripted streams remain guarded" {
   $defaultsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\settings\defaults.lua")
-  if ($isFactorio11Line) {
+  if ($isReducedLegacyLine) {
     if ($defaultsText -match "research_(spoilage_preservation|agricultural_growth_speed)\s*=") {
-      throw "Factorio 1.1 must omit scripted Space Age streams instead of carrying disabled settings."
+      throw "Factorio $($repoInfo.factorio_version) must omit scripted Space Age streams instead of carrying disabled settings."
     }
     return
   }
@@ -430,7 +451,15 @@ Invoke-RepoCheck "fixture mods have metadata and data entrypoints" {
       throw "Fixture $($info.name) must target Factorio $($repoInfo.factorio_version) on this branch; found $($info.factorio_version)."
     }
     $fixtureBaseDependency = @($info.dependencies) | Where-Object { $_ -match "^base\s+>=" } | Select-Object -First 1
-    if ($isFactorio11Line) {
+    if ($isFactorio018Line) {
+      if ($fixtureBaseDependency -notmatch "^base\s+>=\s+0\.18(\.|$)") {
+        throw "Fixture $($info.name) must use a Factorio 0.18 base dependency on this branch; found '$fixtureBaseDependency'."
+      }
+    } elseif ($isFactorio10Line) {
+      if ($fixtureBaseDependency -notmatch "^base\s+>=\s+1\.0(\.|$)") {
+        throw "Fixture $($info.name) must use a Factorio 1.0 base dependency on this branch; found '$fixtureBaseDependency'."
+      }
+    } elseif ($isFactorio11Line) {
       if ($fixtureBaseDependency -notmatch "^base\s+>=\s+1\.1(\.|$)") {
         throw "Fixture $($info.name) must use a Factorio 1.1 base dependency on this branch; found '$fixtureBaseDependency'."
       }
@@ -537,6 +566,7 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'order = setting_order.global("diagnostics", 10)' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'name = "ips-enable-"..key' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'localised_description = append_note({"mod-setting-description.ips-enable-stream", tech_locale}, settings_note)' },
+    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'local locale_key = defaults_spec.locale_key or defaults_spec.chain_key or spec.locale_key or spec.key' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'localised_name = {"mod-setting-name.mir-max-level", locale}' },
     @{ File = "prototypes\mir\settings\resolver.lua"; Text = $settingsResolverText; Snippet = 'function R.stream_enabled(key, spec)' },
     @{ File = "prototypes\mir\settings\resolver.lua"; Text = $settingsResolverText; Snippet = 'function R.base_enabled(key, spec)' },
@@ -633,7 +663,6 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "prototypes\mir\emit\icon_builder.lua"; Text = $technologyIconsText; Snippet = 'battery = "__core__/graphics/icons/technology/constants/constant-battery.png"' },
     @{ File = "prototypes\mir\emit\icon_builder.lua"; Text = $technologyIconsText; Snippet = 'if t == "worker-robot-battery" then return "battery" end' },
     @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = '{technology = "research-productivity", required_mod = "space-age"}' },
-    @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = '{technology = "research-speed-6"}' },
     @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = '{technology = "military-science-pack"}' },
     @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'ammo_category = "tesla", modifier = 0.1' },
     @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'ammo_category = "electric", modifier = 0.1' },
@@ -665,7 +694,7 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'assert_tech_uses_item_icon("recipe-prod-research_heavy_ammo-1", "cannon-shell")' },
     @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'assert_tech_uses_technology_icon("recipe-prod-research_electric_shooting_speed-1", "electric-weapons-damage-1")' },
     @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'assert_tech_uses_technology_icon("recipe-prod-research_walls-1", "gate")' },
-    @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'assert_tech_uses_technology_icon("recipe-prod-research_lab_productivity-1", "research-speed-6")' },
+    @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'assert_tech_uses_technology_icon("recipe-prod-research_lab_productivity-1", "military-science-pack")' },
     @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'assert_tech_uses_technology_icon("recipe-prod-research_rocket_fuel-1", "rocket-fuel")' },
     @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'effect_type == "laboratory-productivity"' },
     @{ File = "fixtures\assert-fluid-productivity\data-final-fixes.lua"; Text = $fluidProductivityFixtureText; Snippet = 'recipe-prod-research_oil_processing_productivity-1' },
@@ -731,7 +760,7 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "prototypes\mir\settings\defaults.lua"; Text = $defaultsText; Snippet = 'research_lab_productivity = {' }
   )
 
-  if ($isFactorio11Line -or $isLegacyFactorio20) {
+  if ($isReducedLegacyLine -or $isLegacyFactorio20) {
     $legacyForbiddenCargoSnippets = @(
       'type = "max-cargo-bay-unloading-distance"',
       'type = "cargo-landing-pad-count"'
@@ -758,7 +787,7 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     )
   }
 
-  if ($isFactorio11Line) {
+  if ($isReducedLegacyLine) {
     $requiredSnippets = @(
       $requiredSnippets | Where-Object {
         -not (
@@ -831,7 +860,7 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
   }
 
   $promotedSpecialStreams = @("research_character_reach")
-  if (-not $isFactorio11Line) {
+  if (-not $isReducedLegacyLine) {
     $promotedSpecialStreams = @(
       "research_breeding",
       "research_agricultural_growth_speed",
@@ -2815,12 +2844,15 @@ if ($isFactorio21Line) {
   Invoke-PackageZipSmokeScenario -ScenarioName "package-zip-space-age" -EnableSpaceAge
 }
 
-if ($isFactorio11Line) {
-  Write-Host "[info] Factorio 1.1 reduced runtime gate skips 2.x recipe-productivity and DLC scenarios."
+if ($isReducedLegacyLine) {
+  $reducedLineLabel = "Factorio $($repoInfo.factorio_version)"
+  Write-Host "[info] $reducedLineLabel reduced runtime gate skips 2.x recipe-productivity and DLC scenarios."
 
-  Invoke-RuntimeScenario -ScenarioName "factorio-1.1-direct-effects" -EnabledFixtureNames @(
-    "mir-fixture-assert-legacy-effect-icons"
-  )
+  $directEffectFixtureNames = @()
+  if ($isFactorio018Line -or $isFactorio10Line -or $isFactorio11Line) {
+    $directEffectFixtureNames += "mir-fixture-assert-legacy-effect-icons"
+  }
+  Invoke-RuntimeScenario -ScenarioName "factorio-$($repoInfo.factorio_version)-direct-effects" -EnabledFixtureNames $directEffectFixtureNames
   foreach ($stream in @(
     "research_cannon_shooting_speed",
     "research_character_crafting_speed",
@@ -2835,11 +2867,11 @@ if ($isFactorio11Line) {
     "research_rocket_shooting_speed"
   )) {
     $line = Get-LastStreamReportLine -Key $stream
-    Assert-ReportLineGenerated -Line $line -Context "Factorio 1.1 direct-effect stream $stream"
+    Assert-ReportLineGenerated -Line $line -Context "$reducedLineLabel direct-effect stream $stream"
   }
-  Assert-NoStreamReportLine -Key "research_science_pack_productivity" -Context "Factorio 1.1 recipe-productivity cut"
-  Assert-NoStreamReportLine -Key "research_gears" -Context "Factorio 1.1 recipe-productivity cut"
-  Assert-DefaultBaseExtensionDiagnostics -Context "Factorio 1.1 base-extension scenario"
+  Assert-NoStreamReportLine -Key "research_science_pack_productivity" -Context "$reducedLineLabel recipe-productivity cut"
+  Assert-NoStreamReportLine -Key "research_gears" -Context "$reducedLineLabel recipe-productivity cut"
+  Assert-DefaultBaseExtensionDiagnostics -Context "$reducedLineLabel base-extension scenario"
 
   Invoke-RuntimeScenario -ScenarioName "lab-productivity-owner-skip" -EnabledFixtureNames @(
     "mir-fixture-lab-productivity-owner",
@@ -2861,9 +2893,9 @@ if ($isFactorio11Line) {
 
   Invoke-RuntimeScenario -ScenarioName "character-inventory-merged-effects" -EnabledFixtureNames @()
   $inventoryCapacityLine = Get-LastStreamReportLine -Key "research_inventory_capacity"
-  Assert-ReportLineGenerated -Line $inventoryCapacityLine -Context "Factorio 1.1 merged character inventory/trash slot scenario"
-  Assert-ReportLineContains -Line $inventoryCapacityLine -Expected "effects=2" -Context "Factorio 1.1 merged character inventory/trash slot scenario"
-  Assert-NoStreamReportLine -Key "research_character_trash_slots" -Context "Factorio 1.1 merged character inventory/trash slot scenario"
+  Assert-ReportLineGenerated -Line $inventoryCapacityLine -Context "$reducedLineLabel merged character inventory/trash slot scenario"
+  Assert-ReportLineContains -Line $inventoryCapacityLine -Expected "effects=2" -Context "$reducedLineLabel merged character inventory/trash slot scenario"
+  Assert-NoStreamReportLine -Key "research_character_trash_slots" -Context "$reducedLineLabel merged character inventory/trash slot scenario"
 
   Invoke-RuntimeScenario -ScenarioName "settings-profile-roundtrip" -EnabledFixtureNames @(
     "mir-fixture-assert-settings-profile-roundtrip"
@@ -2872,7 +2904,7 @@ if ($isFactorio11Line) {
   Invoke-RuntimeScenario -ScenarioName "checkbox-enabled-default-off-features" -EnabledFixtureNames @() `
     -EnabledBaseExtensionKeys @("inserter-capacity-bonus")
   $checkboxEnabledInserterLine = Get-LastExtensionReportLine -Key "inserter-capacity-bonus"
-  Assert-ReportLineGenerated -Line $checkboxEnabledInserterLine -Context "Factorio 1.1 checkbox-enabled base extension scenario"
+  Assert-ReportLineGenerated -Line $checkboxEnabledInserterLine -Context "$reducedLineLabel checkbox-enabled base extension scenario"
 
   Invoke-RuntimeScenario -ScenarioName "checkbox-disabled-default-on-features" -EnabledFixtureNames @() `
     -DisabledStreamKeys @("research_character_reach") `
@@ -2890,7 +2922,7 @@ if ($isFactorio11Line) {
     "mir-fixture-assert-weapon-speed-safety"
   ) -WeaponSpeedAdjustmentMode "only-when-dedicated-tech-enabled"
   $weaponSpeedLine = Get-LastExtensionReportLine -Key "weapon-shooting-speed"
-  Assert-ReportLineGenerated -Line $weaponSpeedLine -Context "Factorio 1.1 weapon shooting speed overlap safety scenario"
+  Assert-ReportLineGenerated -Line $weaponSpeedLine -Context "$reducedLineLabel weapon shooting speed overlap safety scenario"
 
   if ($usesGeneratedUserDataDir -and (Test-Path -LiteralPath $validationRoot)) {
     Remove-Item -LiteralPath $validationRoot -Recurse -Force
@@ -2923,7 +2955,7 @@ if ($sciencePackEffectCount -lt 1) {
 $baseLabProductivityLine = Get-LastStreamReportLine -Key "research_lab_productivity"
 Assert-ReportLineGenerated -Line $baseLabProductivityLine -Context "Base research productivity scenario"
 Assert-ReportLineContains -Line $baseLabProductivityLine -Expected "effects=1" -Context "Base research productivity scenario"
-Assert-ReportLineContains -Line $baseLabProductivityLine -Expected "icon=tech:research-speed-6" -Context "Base research productivity icon scenario"
+Assert-ReportLineContains -Line $baseLabProductivityLine -Expected "icon=tech:military-science-pack" -Context "Base research productivity icon scenario"
 $compatibilityPlanLine = Get-LastCompatibilityPlanLine -Key "compatibility_planner"
 Assert-ReportLineContains -Line $compatibilityPlanLine -Expected "status=diagnostic" -Context "Base compatibility planner diagnostics scenario"
 $compilerPlanLine = Get-LastCompatibilityPlanLine -Key "productivity_compiler"

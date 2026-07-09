@@ -422,7 +422,20 @@ The public version split is:
 - `1.8.1` for the true Factorio `1.0` package;
 - `1.8.2+` for any later Factorio `1.0` fixes.
 
-The clean branch posture is:
+As of 2026-07-10, `1.8.0` is the published Factorio `0.18` bridge/archive
+package. Its immutable archive is
+`dist/more-infinite-research_1.8.0.zip` with SHA-256
+`D785E6EBE7A72E6E9F01A3F89774A6AA30479430410447F603FEF1E0B9BD7B24`,
+`300620` bytes, `121` entries, and `0` forbidden release entries. Static
+validation, Factorio `0.18` binary validation, and Factorio `1.0` bridge-load
+validation are recorded as passed in `.mir/branches.yml`.
+
+The `1.0` follow-up must not be made by changing only the `1.8.0` metadata.
+Build `1.8.1` from the `1.9.3` reduced source posture plus proven `1.8.0`
+bridge lessons and current `dev` portable fixes. Re-probe anything cut only
+because Factorio `0.18` rejected it; keep Factorio `2.x` and DLC surfaces cut.
+
+The resolved bridge sequence was:
 
 1. Create `port/1.1-to-0.18` from the validated `1.9.3` source point.
 2. Retarget that branch to version `1.8.0`, `factorio_version = "0.18"`, and

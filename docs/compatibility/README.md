@@ -32,7 +32,7 @@ Release-line summary:
 | `3.x.x` | `2.1.x` | canonical modern line starting at `3.0.0`; MIR compiler architecture |
 | `2.x.x` | `2.0.x` | maintained Factorio `2.0` line starting at `2.3.0`; first post-3.0 architecture port |
 | `1.9.3+` | `1.1.x` | compatibility port; `1.9.0` through `1.9.2` remain transition exceptions for Factorio `2.0` |
-| `1.8.0` | `0.18.x` bridge | frozen bridge/archive package; must load in both Factorio `0.18` and `1.0` before publication |
+| `1.8.0` | `0.18.x` bridge | published bridge/archive package that also passed Factorio `1.0` bridge-load validation |
 | `1.8.1+` | `1.0.x` | maintained Factorio `1.0` compatibility port line |
 | `1.7.x` / `1.6.x` / `1.5.x` | `0.17.x` / `0.16.x` / `0.15.x` | reduced native-infinite editions |
 | `1.4.x` / `1.3.x` / `0.12.x` | `0.14.x` / `0.13.x` / `0.12.x` | archive finite-ladder reconstructions |
