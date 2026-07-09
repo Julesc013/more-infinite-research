@@ -13,9 +13,10 @@ Current assumptions:
 - `1.9.2` is released from `legacy` as-is.
 - MIR 3.0.0 is the validated Factorio `2.1` source anchor on `main` and
   `dev`.
-- MIR 2.3.0 is staged on `legacy` as the Factorio `2.0` port of that source
-  anchor; upload only the exact validated `dist/more-infinite-research_2.3.0.zip`
-  recorded in `.mir/branches.yml`.
+- MIR 2.3.0 is published from `legacy` as the Factorio `2.0` port of that
+  source anchor. Treat the exact validated
+  `dist/more-infinite-research_2.3.0.zip` recorded in `.mir/branches.yml` as
+  immutable.
 - The shipped MIR 3 structure is Factorio root wrappers, `prototypes/mir/`
   implementation, and declarative `prototypes/streams/` data tables.
 - Old `prototypes/compat/`, `prototypes/lib/`, `prototypes/mir/legacy/`,
@@ -207,15 +208,15 @@ compatibility port of a tested current-line snapshot.
 - [ ] Use `docs/maintainer/backporting.md` as the source of truth for the locked version-line mapping.
 - [ ] Use `docs/archive/2.x/legacy-backport-cadence.md` as the source of truth for target order, support class, and source snapshot language.
 - [ ] Treat every lower line as a separate target-line port, not a wholesale `3.0.0` backport.
-- [ ] Upload `v2.3.0` as the first Factorio `2.0` port of the MIR 3 architecture from the validated `legacy` branch package.
+- [x] Upload `v2.3.0` as the first Factorio `2.0` port of the MIR 3 architecture from the validated `legacy` branch package.
   Current release package: `dist/more-infinite-research_2.3.0.zip`,
   SHA-256 `84287C5ACD047F6A3E1A6EDD568DEF313C13403CD35BB165CA399F4B02E19133`.
-- [ ] After Mod Portal upload, verify it lists `2.3.0` for Factorio `2.0`,
+- [x] After Mod Portal upload, verify it lists `2.3.0` for Factorio `2.0`,
   tag the GitHub release point, mark `.mir/branches.yml` as `published`, and
   treat the uploaded zip as immutable.
-- [ ] Do not rebuild `2.3.0` after upload; any changed payload becomes
+- [x] Do not rebuild `2.3.0` after upload; any changed payload becomes
   `2.3.1`.
-- [ ] Bring only portable lessons from `2.3.0` back into `dev`: validation
+- [x] Bring only portable lessons from `2.3.0` back into `dev`: validation
   runner improvements, package hygiene checks, target manifest improvements,
   report-diff tooling, deterministic ordering fixes, generic platform-adapter
   fixes, clearer diagnostics, docs corrections, release-process hardening,
