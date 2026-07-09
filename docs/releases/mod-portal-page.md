@@ -5,35 +5,49 @@ applies_to: "3.0.0+"
 audience: release-manager
 doc_type: release-plan
 owner: mir-maintainers
-last_reviewed: 2026-07-09
+last_reviewed: 2026-07-10
 supersedes: []
 superseded_by: []
 ---
 # More Infinite Research
 
-Adds **fully customizable** repeatable late-game research for **productivity,
-speed, logistics, combat, player bonuses, robots, spoilage, and cargo
-logistics**.
+Adds **fully customizable** repeatable late-game research for **productivity, speed, logistics, combat, player bonuses, robots, spoilage, and cargo logistics**.
 
-It is built for players who want more *long-term scaling for late-game
-megabases*, long-running Space Age saves, and modded playthroughs without
-turning the mod into a full content overhaul.
+It is built for players who want more *long-term scaling for late-game megabases*, long-running Space Age saves, and modded playthroughs without turning the mod into a full content overhaul.
 
 ## At a Glance
 
 - Adds many **configurable infinite productivity researches** for vanilla, Space Age, and compatible modded production chains.
 - Adds repeatable player, robot, weapon-speed, cargo-logistics, and selected vanilla technology bonuses.
 - Startup **settings let you enable, disable, cap, or rebalance** every generated research.
-- Optional prototype-limit dropdowns can explicitly adjust recipe productivity, energy-use, pollution, speed, and quality caps; unchanged defaults are shown as signed cap values. A separate default-off checkbox can raise explicit `0W` active-use prototypes to `1W` for packs that otherwise show unwanted low-power warnings.
+- Optional prototype-limit dropdowns can explicitly adjust recipe productivity, energy-use, pollution, speed, and quality caps.
 - Adds a base-game Research productivity chain when Space Age's vanilla `research-productivity` technology is not present.
 - Adopts safe mod-added recipes into configured vanilla Space Age productivity families instead of creating parallel research.
 - Uses MIR 3 compiler diagnostics to explain generated, skipped, observed, and rejected research decisions.
+
+**MIR `1.8.0`** targets **Factorio `0.18`** as a bridge/archive compatibility
+package. It keeps reduced direct-effect bonuses and base technology
+continuations only, and does not include recipe productivity, Factorio 2.x DLC
+surfaces, prototype cap settings, pipeline extent settings, settings profiles,
+newer technology badge overlays, or synthetic old-line badge overlays.
+
+**MIR `1.8.1+`** targets **Factorio `1.0`** as the maintained compatibility
+port line. It is derived from the validated Factorio `1.1` port and the
+Factorio `0.18` bridge lessons, with Factorio `1.0` metadata, validation, and
+target-supported behavior restored where proven.
+
+**MIR `1.9.3+`** targets **Factorio `1.1`** as a reduced compatibility port:
+supported direct-effect bonuses and base technology continuations only, with
+no recipe productivity, Space Age, Quality, Recycler, Elevated Rails, cargo
+logistics, prototype cap settings, pipeline extent settings, or settings
+profiles.
 
 **MIR `2.x.x`** targets **Factorio `2.0`** *(starting with **`2.3.0`**)*.
 
 **MIR `3.x.x`** targets **Factorio `2.1`** and requires `base >= 2.1.8`. Space Age is optional.
 
-*Recipe productivity researches are infinite, but Factorio's recipe productivity cap still applies. Once a recipe reaches that cap, more levels may no longer improve that recipe.*
+*Recipe productivity researches are infinite, but Factorio's recipe productivity cap still applies.*
+***This cap can now be modified*** *under the "limits" section of the* ***startup setttings.***
 
 ## Main Features
 
@@ -70,7 +84,8 @@ Several vanilla technology chains can continue past their normal final level:
 
 ## Technology Catalog
 
-Technologies are generated only when their recipes, items, technologies, ammo categories, labs, and science packs exist in the active mod set. "On" means enabled by default when the required prototypes exist. "Off" means available as an opt-in startup setting.
+Technologies are generated only when their recipes, items, technologies, ammo categories, labs, and science packs exist in the active mod set.
+"On" means enabled by default when the required prototypes exist. "Off" means available as an opt-in startup setting.
 
 ### Recipe Productivity
 
@@ -175,15 +190,10 @@ For most generated research you can change:
 
 Other useful settings:
 
-- Main: require game completion before generated technologies, choose science
-  packs, choose lab compatibility, and prefer MIR for duplicate infinite
-  research.
-- Compatibility: control rocket/cannon speed cleanup, installed DLC icon paths,
-  pipeline extent scaling, and the default-off non-zero power floor workaround.
-- Limits: explicitly adjust recipe productivity, energy-use, pollution, speed,
-  or quality caps; all default to engine unchanged.
-- Diagnostics: log generated/skipped technologies, recipe matches, or scripted
-  effects for troubleshooting.
+- Main: require game completion before generated technologies, choose science packs, choose lab compatibility, and prefer MIR for duplicate infinite research.
+- Compatibility: control rocket/cannon speed cleanup, installed DLC icon paths, pipeline extent scaling, and the default-off non-zero power floor workaround.
+- Limits: explicitly adjust recipe productivity, energy-use, pollution, speed, or quality caps; all default to engine unchanged.
+- Diagnostics: log generated/skipped technologies, recipe matches, or scripted effects for troubleshooting.
 
 ## Compatibility
 
@@ -194,32 +204,27 @@ This helps it work with:
 - Base Factorio and optional Space Age content.
 - Space Age installs without Quality.
 - Custom science-pack and custom lab mods.
-- Castra and PlanetLib-style planet or science-pack mods.
-- Air Scrubbing clean-filter recipes, with scrubbing and cleaning recipes deliberately excluded.
-- ATAN Ash separation, with landfill, brick, nutrient, foundation, tile, and recovery-style ash sinks deliberately excluded.
-- Exact `atan-ash_2.2.1` Factorio `2.1` loader-schema repair when ATAN Ash is loaded with MIR.
-- ATAN-style Nuclear Science packs through science-pack productivity.
-- Exact `atan-nuclear-science_0.3.3` Factorio `2.1` loader-schema repair when ATAN Nuclear Science is loaded with MIR.
-- AAI-style loader crafting recipes through Transport belt productivity.
-- Standalone big mining drill mods through Mining drill productivity.
 - Advanced Solar HR.
 - Better Robots Extended.
-- OCs Ammo and Armor.
-- OCs Stone Casting.
 - Fluid Quality Imprinting.
-- Plates n Circuit Productivity, with replacement limited to exact known infinite technologies that MIR can fully replace with matching recipe productivity values and no other blocking owner.
-- Panglia-style planet mods that add alternate rocket fuel or low density structure recipes.
 - Omega Drill style drill mods.
+- OCs Ammo and Armor and OCs Stone Casting.
+- Castra and PlanetLib-style planet or science-pack mods.
+- Standalone big mining drill mods through Mining drill productivity.
+- AAI-style loader crafting recipes through Transport belt productivity.
+- ATAN-style Nuclear Science packs through science-pack productivity.
+- Panglia-style planet mods that add alternate rocket fuel or low density structure recipes.
+- Air Scrubbing clean-filter recipes, with scrubbing and cleaning recipes deliberately excluded.
+- Plates n Circuit Productivity, with replacement limited to exact known infinite technologies that MIR can fully replace with matching recipe productivity values and no other blocking owner.
 
 When this mod is set to prefer its own overlapping research, it only removes known competing infinite technologies that are fully covered by generated More Infinite Research effects. Finite upgrade chains from other mods are left alone. Vanilla Space Age productivity families remain authoritative where safe, so mod-added rocket fuel or low density structure recipes can be appended to the vanilla infinite technology instead of receiving duplicate-looking MIR research.
 
-Compatibility is broad, but not guaranteed for every overhaul. Mods that change
-recipes or labs very late in loading may still need load-order compatibility.
+Compatibility is broad, but not guaranteed for every overhaul. Mods that change recipes or labs very late in loading may still need load-order compatibility.
 MIR 3 public claims are deliberately narrow: a page may claim a named recipe
 family, a diagnostic observation, or coexistence behavior, but not full overhaul
 support unless that claim is explicitly recorded.
 
-For maintainers and pack authors, the repository includes an extended local audit workflow. With a Factorio binary and Mod Portal credentials, it can run top-download audits; with read-only local mod zip libraries, it can also run offline individual-root, curated-combination, and generated local-library stress sweeps. The workflow supports curated overhaul scenarios, local modpack zip roots, safe unattended local sweep and morning summary helpers, parsed MIR diagnostics, checkpointed load results, missing-dependency summaries, grouped expected/unexpected failure reports, explicit official-DLC mod-list isolation, blank-log-line-tolerant audit parsing, and review-only compatibility profile stubs. Exploratory runs collect all scenarios for triage; strict runs can fail on unexpected grouped failures. These tools are for evidence collection; they do not automatically enable new compatibility profiles.
+For maintainers and pack authors, the repository includes an extended local audit workflow. With a Factorio binary and Mod Portal credentials, it can run top-download audits; with read-only local mod zip libraries, it can also run offline individual-root, curated-combination, and generated local-library stress sweeps. The workflow supports curated overhaul scenarios, local modpack zip roots, safe unattended local sweep and morning summary helpers, parsed MIR diagnostics, checkpointed load results, missing-dependency summaries, grouped expected/unexpected failure reports, explcit official-DLC mod-list isolation, blank-log-line-tolerant audit parsing, and review-only compatibility profile stubs. Exploratory runs collect all scenarios for triage; strict runs can fail on unexpected grouped failures. These tools are for evidence collection; they do not automatically enable new compatibility profiles.
 
 ## Troubleshooting
 

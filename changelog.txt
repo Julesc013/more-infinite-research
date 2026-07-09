@@ -1,4 +1,118 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.8.1
+Date: 2026-07-10
+
+  Compatibility:
+
+    - Ported the maintained Factorio 1.0 line from the 1.9.3 reduced source posture plus proven 1.8.0 bridge lessons.
+    - Retargeted package metadata to Factorio 1.0 with `base >= 1.0`.
+    - Kept supported direct-effect infinite researches and base technology continuations.
+    - Kept recipe productivity, Space Age, Quality, Recycler, Elevated Rails, cargo logistics, spoilage, and agriculture out of 1.0.
+    - Kept prototype cap settings, pipeline extent settings, settings profiles, and newer technology badge overlays out of 1.0.
+    - Preserved the old-line runtime state adapter so Factorio 1.0 uses `global` instead of the Factorio 2.x `storage` table.
+
+  Changes:
+
+    - Removed 2.x DLC dependencies and newer science-pack names from generated direct-effect and base-extension defaults.
+    - Reused the 1.8.0 target-era icon policy: generated direct-effect technologies use base technology art only.
+    - Kept unsupported native modifier icon metadata out of generated old-line direct-effect technologies.
+    - Carried the older `laser-turret-speed` base technology chain adapter into the maintained 1.0 line.
+    - Added a Factorio 1.0 runtime check that rejects unavailable newer badge paths and synthetic old-line badge overlays.
+    - Extended the Factorio 1.0 runtime check to reject unsupported native modifier icon metadata.
+    - Retargeted branch-local support mod metadata to Factorio 1.0 for the reduced-line release gate.
+    - Documented 1.8.1 as a maintained Factorio 1.0 compatibility port, not a metadata bump of the 0.18 bridge package.
+    - Documented that 1.8.1 is not a feature-parity backport of the modern line.
+
+---------------------------------------------------------------------------------------------------
+Version: 1.9.3
+Date: 2026-07-10
+
+  Compatibility:
+
+    - Ported the MIR 3 compatibility compiler architecture to Factorio 1.1 as a reduced compatibility port.
+    - Synthesized the 3.0.0 source anchor with portable lessons from the 2.3.0 Factorio 2.0 port.
+    - Retargeted package metadata to Factorio 1.1 with a base-only dependency floor.
+    - Removed Factorio 2.x DLC dependency surfaces from the 1.1 package target.
+    - Removed Space Age, Quality, Recycler, Elevated Rails, cargo logistics, spoilage, and agriculture streams.
+    - Removed recipe-productivity streams from the 1.1 target because Factorio 1.1.110 rejects the modifier type.
+    - Kept only target-supported direct-effect and base-extension research candidates for the first 1.1 release line.
+    - Added a target-line adapter for unsupported streams, direct effects, prototype caps, repairs, and runtime handlers.
+    - Disabled unsupported 2.x behavior before it can emit 1.1-invalid prototypes.
+    - Replaced direct runtime persistence access with a state adapter for global on Factorio 1.1 and storage on Factorio 2.x.
+    - Used stock high-resolution target-era technology constant badges on Factorio 1.1.
+
+  Changes:
+
+    - Removed unsupported 2.x startup settings from the 1.1 settings catalog and settings profile surface.
+    - Hid settings-profile import and export on Factorio 1.1 because the target API lacks the MIRSET1 string codec.
+    - Ensured Factorio 1.1 direct-effect technologies use stock tile badges without copied newer graphics.
+    - Retargeted branch-local support mod metadata to Factorio 1.1.
+    - Made release tooling target-aware for 1.1 metadata, dependency floors, and cargo modifiers.
+    - Updated settings visibility checks for the reduced 1.1 settings surface.
+    - Documented the release as a compatibility port, not a feature-parity backport of the Factorio 2.x releases.
+
+---------------------------------------------------------------------------------------------------
+Version: 1.8.0
+Date: 2026-07-10
+
+  Compatibility:
+
+    - Ported the reduced MIR 3 compatibility compiler architecture to Factorio 0.18 as the bridge/archive package for 1.0.
+    - Synthesized the 3.0.0 source anchor with portable 2.3.0 and 1.9.3 backport lessons.
+    - Retargeted package metadata to Factorio 0.18 with `base >= 0.18`.
+    - Kept the reduced direct-effect and base-extension surface, with recipe productivity and Factorio 2.x DLC surfaces disabled.
+    - Removed unavailable 1.1 technology constant badge overlays from the 0.18 bridge.
+    - Used target-era base technology art only instead of packaging or simulating newer Factorio graphics.
+
+  Changes:
+
+    - Updated Research productivity icon selection to prefer stock military science technology art.
+    - Extended metadata, settings visibility, and reduced-line runtime checks for the Factorio 0.18 bridge target.
+    - Removed unavailable newer badge paths and synthetic badge overlays from the 0.18 bridge.
+    - Added explicit target-era names and descriptions to generated vanilla continuations to avoid unresolved locale keys.
+    - Added old-line modifier descriptions for character, lab, inventory, and robot direct-effect tooltips.
+    - Removed unsupported native modifier icon metadata after Factorio 1.0 ignored those fields.
+    - Character, range, and weapon speed technologies use target-era main textures and localized text instead of fake badges.
+    - Documented 1.8.0 as a bridge/archive compatibility port, not a feature-parity backport of 1.1, 2.0, or 2.1.
+
+---------------------------------------------------------------------------------------------------
+Version: 2.3.0
+Date: 2026-07-09
+
+  Compatibility:
+
+    - Ported the MIR 3 compatibility compiler architecture to the Factorio 2.0 release line.
+    - Retargeted package metadata to Factorio 2.0 with `base >= 2.0`.
+    - Kept Quality hidden and optional, and kept Space Age optional without a Factorio 2.1 dependency floor.
+    - Removed Factorio 2.1-only cargo bay unloading distance research from the Factorio 2.0 package.
+    - Removed Factorio 2.1-only cargo landing pad count research from the Factorio 2.0 package.
+    - Kept generated technology IDs stable for streams that remain available on the Factorio 2.0 line.
+    - Kept exact ATAN loader-schema repairs scoped to Factorio 2.1+ so Factorio 2.0 keeps its native fields.
+    - Fixed ATAN Ash 2.2.1 with Space Age on Factorio 2.0 by keeping foundation crafting in `crafting-with-fluid`.
+    - Kept Factorio 2.0 science-pack handling on the older tool prototype model during compatibility checks.
+    - Classified reviewed Factorio 2.0 local zip issues that reproduce without MIR as external local-library issues.
+
+  Changes:
+
+    - Backported the canonical settings catalog, deterministic MIRSET1 profiles, strict import checks, and compact export.
+    - Backported prototype cap dropdowns for recipe productivity, energy-use, pollution, speed, and quality caps.
+    - Backported signed high-to-low prototype cap labels, including +300% productivity and -80% savings defaults.
+    - Split energy-use and pollution cap settings because efficiency effects can reduce both.
+    - Added the default-off Compatibility setting for the opt-in positive power floor on explicit 0W active energy use.
+    - Kept Factorio 2.0 cargo logistics exclusions while preserving the shared settings and profile code.
+
+  Checks:
+
+    - Package metadata and base dependency floors now match the Factorio 2.0 line.
+    - The Factorio 2.0 package no longer contains 2.1-only cargo direct-effect modifier strings.
+    - Runtime and local mod-library checks target the matching Factorio 2.0 binary and mod library.
+    - Factorio 2.0 runtime checks passed across base, Space Age, science-pack, lab, ATAN, AAI, and drill scenarios.
+    - Factorio 2.0 runtime checks passed for prototype limits and settings profile round trips.
+    - Targeted local zip checks passed for AAI, Big Mining Drill, Equipment Gantry, Fluid Must Flow, Jetpack, and robots.
+    - The local Factorio 2.0 BZ suite passed with zero grouped failures.
+    - The full Factorio 2.0 local zip sweep covered 314 roots with zero MIR-owned unexpected failure groups.
+
+---------------------------------------------------------------------------------------------------
 Version: 3.0.0
 Date: 2026-07-08
 
