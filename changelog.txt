@@ -1,4 +1,134 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.3.0
+Date: 2026-07-09
+
+  Compatibility:
+
+    - Ported the MIR 3 compatibility compiler architecture to the Factorio 2.0 release line.
+    - Retargeted package metadata to Factorio 2.0 with `base >= 2.0`.
+    - Kept Quality hidden and optional, and kept Space Age optional without a Factorio 2.1 dependency floor.
+    - Removed Factorio 2.1-only cargo bay unloading distance research from the Factorio 2.0 package.
+    - Removed Factorio 2.1-only cargo landing pad count research from the Factorio 2.0 package.
+    - Kept generated technology IDs stable for streams that remain available on the Factorio 2.0 line.
+    - Kept exact ATAN loader-schema repairs scoped to the known supported upstream versions.
+    - Kept Factorio 2.0 science-pack handling on the older tool prototype model during compatibility checks.
+    - Classified reviewed Factorio 2.0 local zip issues that reproduce without MIR as external local-library issues.
+
+  Changes:
+
+    - Backported the canonical settings catalog, deterministic MIRSET1 profiles, strict import checks, and compact export.
+    - Backported prototype cap dropdowns for recipe productivity, energy-use, pollution, speed, and quality caps.
+    - Backported signed high-to-low prototype cap labels, including +300% productivity and -80% savings defaults.
+    - Split energy-use and pollution cap settings because efficiency effects can reduce both.
+    - Added the default-off Compatibility setting for the opt-in positive power floor on explicit 0W active energy use.
+    - Kept Factorio 2.0 cargo logistics exclusions while preserving the shared settings and profile code.
+
+  Checks:
+
+    - Package metadata and base dependency floors now match the Factorio 2.0 line.
+    - The Factorio 2.0 package no longer contains 2.1-only cargo direct-effect modifier strings.
+    - Runtime and local mod-library checks target the matching Factorio 2.0 binary and mod library.
+    - Factorio 2.0 runtime checks passed across base, Space Age, science-pack, lab, ATAN, AAI, and drill scenarios.
+    - Factorio 2.0 runtime checks passed for prototype limits and settings profile round trips.
+    - Targeted local zip checks passed for AAI, Big Mining Drill, Equipment Gantry, Fluid Must Flow, Jetpack, and robots.
+    - The local Factorio 2.0 BZ suite passed with zero grouped failures.
+    - The full Factorio 2.0 local zip sweep covered 314 roots with zero MIR-owned unexpected failure groups.
+
+---------------------------------------------------------------------------------------------------
+Version: 3.0.0
+Date: 2026-07-08
+
+  Compatibility:
+
+    - Reworked MIR around the MIR 3 compatibility compiler for Factorio 2.1 while preserving generated technology IDs.
+    - No new migration is required for the architecture move; the shipped 2.0.5 and 2.1.0 migrations remain included.
+    - Space Age remains optional; Quality, Recycler, and Elevated Rails remain optional or hidden optional dependencies.
+    - Generated research is gated by active recipes, items, fluids, technologies, ammo categories, labs, and science packs.
+    - Unsafe or unavailable candidates are skipped or reported instead of forced into invalid mod sets.
+    - Compatibility overlays remain declarative: selectors, claims, denials, and policy data only; no prototype mutation.
+    - Air Scrubbing support is limited to clean-filter recipe families; scrubbing and recovery recipes stay excluded.
+    - ATAN Ash support is limited to ash separation; landfill, brick, nutrient, foundation, tile, and recovery sinks stay excluded.
+    - Added exact Factorio 2.1 loader-schema repairs for atan-ash 2.2.1 and atan-nuclear-science 0.3.3.
+    - ATAN repairs normalize known category and probability fields only, without changing ingredients, unlocks, science, or balance.
+    - AAI loaders route through belt productivity, and big mining drills route through mining productivity.
+    - ATAN Nuclear Science routes through science-pack productivity.
+    - Fluid Must Flow, Robot Attrition, Jetpack, Equipment Gantry, AAI Containers, and AAI Industry stay scoped.
+    - Public compatibility claims remain narrow and evidence-backed; this is not a full overhaul-support claim.
+    - Generated output stayed stable against recorded 2.2 comparison lanes.
+
+  Changes:
+
+    - Made MIR 3.0.0 an architecture/compiler release rather than a broad new gameplay-content wave.
+    - Moved active implementation under prototypes/mir and made the Factorio root lifecycle files thin stage wrappers.
+    - The prototypes/streams directory remains declarative stream data.
+    - MIR planner, policy, emit, and report modules now handle generation behavior.
+    - Made data-final-fixes ordering explicit so exact compatibility repairs run before prototype limit passes and MIR planning.
+    - Moved scripted technology runtime handlers under prototypes/mir/runtime.
+    - Added a canonical settings catalog for registration, effective reads, profile export/import, docs, and tests.
+    - Added deterministic MIRSET1 settings profiles with full export by default and optional compact export.
+    - Settings profile imports now ignore unknown IDs, wrong types, invalid choices, and out-of-range numbers.
+    - Added visible Main, Compatibility, Limits, Advanced, and Diagnostics prefixes to global startup settings.
+    - Generated technology settings now use technology-name-first labels and stable attention buckets.
+    - MIR-owned official technology settings stay visible across base and Space Age.
+    - Hidden unavailable settings keep readable IDs and do not force values.
+    - Added startup dropdowns for recipe productivity, energy-use, pollution, speed, and quality prototype caps.
+    - Prototype cap dropdowns leave engine defaults unchanged unless explicitly changed.
+    - Prototype cap dropdowns use signed labels and high-to-low numeric order with unchanged defaults in numeric position.
+    - Recipe productivity default labels show +300%; energy and pollution savings defaults show -80%.
+    - Split energy-use and pollution cap settings because efficiency effects can reduce both.
+    - Added a default-off Compatibility setting that changes explicit 0W active energy_usage prototypes to 1W only when enabled.
+    - Shortened rocket/cannon speed cleanup text to "Only if dedicated tech exists".
+    - Enabled breeding, agricultural growth speed, cargo bay range/count, and character reach by default.
+    - Inserter capacity bonus remains disabled because larger hand sizes can affect circuits and engine optimization assumptions.
+    - Updated README, user docs, maintainer docs, reference docs, release notes, Mod Portal copy, and result summaries.
+
+  Internal:
+
+    - Added and updated .mir manifests for branch policy, module boundaries, streams, claims, docs, settings, and capabilities.
+    - Added generated stream manifest coverage and required every emitted stable stream to have a manifest row.
+    - Added DecisionRecord and StreamSpec records plus a compatibility claim registry.
+    - Added Factorio data.raw and mods adapters so prototype reads and settings-stage mod checks stay behind boundaries.
+    - Added focused MIR modules for indexing, planning, policy, emission, reporting, overlays, exact repairs, settings, and runtime.
+    - Added load-check coverage for hidden settings, prototype limits, settings profile round trips, and accepted legacy imports.
+    - Profile round-trip coverage checks defaults, hidden provider settings, unknown IDs, wrong types, and invalid choices.
+    - Added or extended architecture, docs, settings visibility, policy, claim, changelog, package, and runtime checks.
+    - Added local mod library catalog checks and legacy inventory reporting tools.
+    - Fixed compatibility-audit staging so local load-test mod copies exclude repo-only development and ignored output paths.
+    - Fixed release archive packaging so the shipped zip opens cleanly from the mods folder.
+    - Added release evidence docs for the MIR 3 summary, checklist, migration guide, local library gate, and risk register.
+    - Package hygiene rejects docs, sample mods, scripts, tests, .mir, .codex, .github, build output, and dist output.
+    - Package hygiene rejects AGENTS.md, CONTRIBUTING.md, and the root work ledger.
+
+  Removed:
+
+    - Removed old shipped paths for prototypes/compat/air-scrubbing.lua, prototypes/tech-gen.lua, and max-level-control.lua.
+    - Removed the old generated-stream manifest location in favor of the MIR manifest path.
+    - Removed shipped control-folder runtime module paths; runtime handlers now live under prototypes/mir/runtime.
+    - Removed broad root-helper ownership for defaults, config, diagnostics, settings, pipeline extent, utilities, and cleanup.
+    - Removed broad root-helper ownership for effect safety and weapon speed.
+    - Removed direct Air Scrubbing and ATAN Ash behavior scripts; declarative overlays now feed policy and diagnostics.
+    - Removed old-path imports that pointed at compat, lib, legacy, planner, control-folder, and broad root-helper modules.
+    - Removed direct prototype mutation responsibility from compatibility policy overlays.
+
+  Checks:
+
+    - Legacy inventory passed with zero old shipped shim paths, old imports, root helper files, and control-folder runtime Lua.
+    - Legacy inventory passed with zero direct prototype access outside allowed layers and zero streams without manifest rows.
+    - Static checks passed docs governance, MIR manifests, architecture boundaries, settings visibility, policy, and claims.
+    - Static checks passed changelog syntax, package hygiene, and git whitespace checks.
+    - Runtime load checks passed on the target Factorio 2.1 binary in packaged zip, base-only, and Space Age modes.
+    - Prototype limit checks passed in base-only and Space Age modes, including split energy/pollution caps and opt-in power floor.
+    - Settings profile round-trip checks passed for deterministic encoding, compact export, hidden settings, and unknown IDs.
+    - Settings profile round-trip checks passed for wrong types, invalid choices, and accepted legacy import values.
+    - Local isolation confirmed atan-ash 2.2.1 and atan-nuclear-science 0.3.3 fail without MIR and load with MIR.
+    - Local isolation confirmed Air Scrubbing and all tested ATAN zips load together with MIR after exact schema repair.
+    - Selected local zip checks passed for advertised and recently repaired compatibility targets.
+    - The targeted release gate passed using the recorded local Factorio 2.1 mod library scenario set.
+    - The final package contains 119 entries and zero forbidden repository-only paths.
+    - Portal-backed full-catalog checks were not run in the release environment because FACTORIO_TOKEN was not set.
+    - Full release evidence is recorded in the 3.0.0 checklist, release notes, result summary, and targeted gate artifacts.
+
+---------------------------------------------------------------------------------------------------
 Version: 1.9.2
 Date: 2026-07-07
 

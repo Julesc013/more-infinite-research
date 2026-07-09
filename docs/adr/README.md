@@ -1,3 +1,14 @@
+---
+title: "Architecture Decision Records"
+status: current
+applies_to: "3.0.0+"
+audience: maintainer
+doc_type: explanation
+owner: mir-maintainers
+last_reviewed: 2026-07-07
+supersedes: []
+superseded_by: []
+---
 # Architecture Decision Records
 
 Updated: 2026-07-07

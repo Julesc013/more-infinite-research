@@ -1,3 +1,22 @@
+local overlay_loader = require("prototypes.mir.compatibility.overlay_loader")
+
+local air_scrubbing_overlay = overlay_loader.get("air-scrubbing")
+local air_scrubbing_capability = air_scrubbing_overlay.capabilities["recipe-productivity"]
+local atan_ash_overlay = overlay_loader.get("atan-ash")
+local atan_ash_capability = atan_ash_overlay.capabilities["recipe-productivity"]
+
+local function lua_pattern_escape(value)
+  return (tostring(value or ""):gsub("([^%w])", "%%%1"))
+end
+
+local function exact_recipe_patterns(recipes)
+  local out = {}
+  for _, recipe_name in ipairs(recipes or {}) do
+    table.insert(out, "^" .. lua_pattern_escape(recipe_name) .. "$")
+  end
+  return out
+end
+
 return {
   research_copper = { items={"copper-plate"}, icon_item="copper-plate" },
   research_iron   = { items={"iron-plate"}, icon_item="iron-plate" },
@@ -48,7 +67,11 @@ return {
   research_low_density_structure = {
     items={"low-density-structure"},
     icon_candidates={
-      {icon="__space-age__/graphics/technology/low-density-structure-productivity.png", icon_size=256, inactive_mod_asset="space-age"},
+      {
+        icon="__space-age__/graphics/technology/low-density-structure-productivity.png",
+        icon_size=256,
+        inactive_mod_asset="space-age"
+      },
       {technology="low-density-structure"}
     },
     adopt_into_existing_productivity_tech = {
@@ -76,6 +99,13 @@ return {
 
   research_thruster_fuel_productivity = {
     localised_name = {"technology-name.more-infinite-research.research_thruster_fuel_productivity"},
+    ui_visibility = {
+      mode = "always",
+      reason = "official-stream-settings-visible"
+    },
+    generation_requirements = {
+      require_any_fluid = {"thruster-fuel"}
+    },
     required_fluids = {"thruster-fuel"},
     fluids = {"thruster-fuel"},
     exclude_recipe_patterns = {"^empty%-.*%-barrel$"},
@@ -88,6 +118,13 @@ return {
 
   research_thruster_oxidizer_productivity = {
     localised_name = {"technology-name.more-infinite-research.research_thruster_oxidizer_productivity"},
+    ui_visibility = {
+      mode = "always",
+      reason = "official-stream-settings-visible"
+    },
+    generation_requirements = {
+      require_any_fluid = {"thruster-oxidizer"}
+    },
     required_fluids = {"thruster-oxidizer"},
     fluids = {"thruster-oxidizer"},
     exclude_recipe_patterns = {"^empty%-.*%-barrel$"},
@@ -155,17 +192,27 @@ return {
   research_air_scrubbing_clean_filter = {
     localised_name = {"", "Air Scrubbing clean-filter productivity"},
     localised_description = {"technology-description.more-infinite-research.recipe_productivity"},
+    ui_visibility = {
+      mode = "visible-if-mods-any",
+      mods_any = air_scrubbing_overlay.applies_when.mods,
+      hidden_reason = "requires-atan-air-scrubbing"
+    },
+    generation_requirements = {
+      require_any_recipe = air_scrubbing_capability.exact_recipes,
+      deny_risk_flags = air_scrubbing_capability.deny_risk_flags
+    },
     science_packs = "derive-from-unlocks",
     prerequisites = "derive-from-unlocks",
-    settings_note = {"", "Targets only exact clean filter crafting recipes. Scrubbing, cleaning, recovery, recycling, and environmental-removal recipes stay diagnostic-only."},
-    manifest_id = "mir-prod-air-scrubbing-clean-filter",
+    settings_note = {
+      "",
+      "Targets only exact clean filter crafting recipes. Scrubbing, cleaning, recovery, " ..
+        "recycling, and environmental-removal recipes stay diagnostic-only."
+    },
+    manifest_id = air_scrubbing_capability.stream.id,
     groups = {
       {
         change = 0.05,
-        recipe_patterns = {
-          "^atan%-pollution%-filter$",
-          "^atan%-spore%-filter$"
-        }
+        recipe_patterns = exact_recipe_patterns(air_scrubbing_capability.exact_recipes)
       }
     },
     icon_candidates = {
@@ -180,16 +227,27 @@ return {
   research_ash_separation = {
     localised_name = {"", "Ash separation productivity"},
     localised_description = {"technology-description.more-infinite-research.recipe_productivity"},
+    ui_visibility = {
+      mode = "visible-if-mods-any",
+      mods_any = atan_ash_overlay.applies_when.mods,
+      hidden_reason = "requires-atan-ash"
+    },
+    generation_requirements = {
+      require_any_recipe = atan_ash_capability.exact_recipes,
+      deny_risk_flags = atan_ash_capability.deny_risk_flags
+    },
     science_packs = "derive-from-unlocks",
     prerequisites = "derive-from-unlocks",
-    settings_note = {"", "Targets only the exact ATAN Ash separation recipe. Landfill, brick, nutrient, foundation, tile, and recovery-style ash sinks stay outside this stream."},
-    manifest_id = "mir-prod-atan-ash-separation",
+    settings_note = {
+      "",
+      "Targets only the exact ATAN Ash separation recipe. Landfill, brick, nutrient, " ..
+        "foundation, tile, and recovery-style ash sinks stay outside this stream."
+    },
+    manifest_id = atan_ash_capability.stream.id,
     groups = {
       {
         change = 0.05,
-        recipe_patterns = {
-          "^atan%-ash%-seperation$"
-        }
+        recipe_patterns = exact_recipe_patterns(atan_ash_capability.exact_recipes)
       }
     },
     icon_candidates = {
@@ -199,16 +257,85 @@ return {
     }
   },
 
-  research_tungsten = { items={"tungsten-plate","tungsten-carbide"}, icon_item="tungsten-plate", icon_tech="tungsten-processing" },
-  research_lithium = { icon_tech="lithium-processing", groups = {
+  research_tungsten = {
+    ui_visibility = {
+      mode = "always",
+      reason = "official-stream-settings-visible"
+    },
+    generation_requirements = {
+      require_any_item = {"tungsten-plate", "tungsten-carbide"}
+    },
+    items={"tungsten-plate","tungsten-carbide"},
+    icon_item="tungsten-plate",
+    icon_tech="tungsten-processing"
+  },
+  research_lithium = {
+    ui_visibility = {
+      mode = "always",
+      reason = "official-stream-settings-visible"
+    },
+    generation_requirements = {
+      require_any_item = {"lithium-plate", "lithium"}
+    },
+    icon_tech="lithium-processing",
+    groups = {
     { change = 0.10, items = { "lithium-plate" } },
     { change = 0.05, items = { "lithium" }, recipe_patterns = { "^lithium$" } }
   } },
-  research_holmium = { items={"holmium-plate"}, icon_tech="holmium-processing" },
-  research_supercapacitor = { items={"supercapacitor"}, icon_tech="supercapacitor" },
-  research_superconductor = { items={"superconductor"}, icon_tech="superconductor" },
-  research_quantum_processor = { items={"quantum-processor"}, icon_tech="quantum-processor" },
-  research_carbon = { icon_item="carbon", groups = {
+  research_holmium = {
+    ui_visibility = {
+      mode = "always",
+      reason = "official-stream-settings-visible"
+    },
+    generation_requirements = {
+      require_any_item = {"holmium-plate"}
+    },
+    items={"holmium-plate"},
+    icon_tech="holmium-processing"
+  },
+  research_supercapacitor = {
+    ui_visibility = {
+      mode = "always",
+      reason = "official-stream-settings-visible"
+    },
+    generation_requirements = {
+      require_any_item = {"supercapacitor"}
+    },
+    items={"supercapacitor"},
+    icon_tech="supercapacitor"
+  },
+  research_superconductor = {
+    ui_visibility = {
+      mode = "always",
+      reason = "official-stream-settings-visible"
+    },
+    generation_requirements = {
+      require_any_item = {"superconductor"}
+    },
+    items={"superconductor"},
+    icon_tech="superconductor"
+  },
+  research_quantum_processor = {
+    ui_visibility = {
+      mode = "always",
+      reason = "official-stream-settings-visible"
+    },
+    generation_requirements = {
+      require_any_item = {"quantum-processor"}
+    },
+    items={"quantum-processor"},
+    icon_tech="quantum-processor"
+  },
+  research_carbon = {
+    ui_visibility = {
+      mode = "always",
+      reason = "official-stream-settings-visible"
+    },
+    generation_requirements = {
+      require_any_item = {"carbon"}
+    },
+    icon_item="carbon",
+    groups = {
     { change = 0.10, items = { "carbon" }, recipe_patterns = {
       "^carbonic%-asteroid%-crushing$",
       "^advanced%-carbonic%-asteroid%-crushing$",
@@ -217,18 +344,64 @@ return {
     { change = 0.05, recipe_patterns = { "^burnt%-spoilage$" } },
     { change = 0.02, recipe_patterns = { "^coal%-synthesis$" } }
   } },
-  research_carbon_fiber = { items={"carbon-fiber"}, icon_tech="carbon-fiber" },
-  research_ice = { items={"ice"}, icon_item="ice", recipe_patterns = {
+  research_carbon_fiber = {
+    ui_visibility = {
+      mode = "always",
+      reason = "official-stream-settings-visible"
+    },
+    generation_requirements = {
+      require_any_item = {"carbon-fiber"}
+    },
+    items={"carbon-fiber"},
+    icon_tech="carbon-fiber"
+  },
+  research_ice = {
+    ui_visibility = {
+      mode = "always",
+      reason = "official-stream-settings-visible"
+    },
+    generation_requirements = {
+      require_any_item = {"ice"}
+    },
+    items={"ice"},
+    icon_item="ice",
+    recipe_patterns = {
     "^oxide%-asteroid%-crushing$",
     "^advanced%-oxide%-asteroid%-crushing$"
   } },
 
-  research_bioflux = { items={"bioflux"}, icon_tech="bioflux" },
-  research_bacteria_cultivation = { icon_tech = "bacteria-cultivation", recipe_patterns = {
+  research_bioflux = {
+    ui_visibility = {
+      mode = "always",
+      reason = "official-stream-settings-visible"
+    },
+    generation_requirements = {
+      require_any_item = {"bioflux"}
+    },
+    items={"bioflux"},
+    icon_tech="bioflux"
+  },
+  research_bacteria_cultivation = {
+    ui_visibility = {
+      mode = "always",
+      reason = "official-stream-settings-visible"
+    },
+    generation_requirements = {
+      require_any_recipe = {"iron-bacteria-cultivation", "copper-bacteria-cultivation"}
+    },
+    icon_tech = "bacteria-cultivation",
+    recipe_patterns = {
     "^iron%-bacteria%-cultivation$",
     "^copper%-bacteria%-cultivation$"
   } },
   research_breeding = {
+    ui_visibility = {
+      mode = "always",
+      reason = "official-stream-settings-visible"
+    },
+    generation_requirements = {
+      require_any_item = {"raw-fish", "biter-egg", "pentapod-egg"}
+    },
     items = {"raw-fish","biter-egg","pentapod-egg"},
     mode = "by_category_or_match",
     match = { name_patterns={"cultivation","culture","breeding"} },
@@ -254,12 +427,30 @@ return {
     "^atan%-foundation%-from%-ash$"
   }, exclude_ingredient_patterns={"scrap"} },
 
-  research_artificial_soil = { icon_tech = "artificial-soil", groups = {
+  research_artificial_soil = {
+    ui_visibility = {
+      mode = "always",
+      reason = "official-stream-settings-visible"
+    },
+    generation_requirements = {
+      require_any_item_family = {"artificial-soil", "overgrowth-soil"}
+    },
+    icon_tech = "artificial-soil",
+    groups = {
     { change = 0.10, item_patterns = { "^artificial%-.+%-soil$" } },
     { change = 0.05, item_patterns = { "^overgrowth%-.+%-soil$" } }
   } },
 
-  research_molten_metals = { icon_tech = "foundry", groups = {
+  research_molten_metals = {
+    ui_visibility = {
+      mode = "always",
+      reason = "official-stream-settings-visible"
+    },
+    generation_requirements = {
+      require_any_recipe = {"molten-iron-from-lava", "molten-copper-from-lava", "iron-ore-melting", "copper-ore-melting"}
+    },
+    icon_tech = "foundry",
+    groups = {
     { change = 0.10, recipe_patterns = { "^molten%-iron%-from%-lava$", "^molten%-copper%-from%-lava$" } },
     { change = 0.05, recipe_patterns = { "^iron%-ore%-melting$", "^copper%-ore%-melting$" } }
   }, exclude_ingredient_patterns={"scrap"} },
@@ -351,11 +542,59 @@ return {
   }},
 
   research_belts = { icon_tech="logistics", groups = {
-    { change=0.10, items={"transport-belt","underground-belt","splitter","loader","aai-loader","basic-loader"}, item_patterns={"^aai%-loader$","^basic%-loader$"} },
-    { change=0.05, items={"fast-transport-belt","fast-underground-belt","fast-splitter","fast-loader","aai-fast-loader"}, item_patterns={"^.+%-fast%-loader$"} },
-    { change=0.02, items={"express-transport-belt","express-underground-belt","express-splitter","express-loader","aai-express-loader"}, item_patterns={"^.+%-express%-loader$"} },
-    { change=0.01, items={"turbo-transport-belt","turbo-underground-belt","turbo-splitter","turbo-loader","aai-turbo-loader"}, item_patterns={"^turbo%-transport%-belt$","^turbo%-underground%-belt$","^turbo%-splitter$","^.+%-turbo%-loader$"} },
-    { change=0.005, items={"hyper-transport-belt","hyper-underground-belt","hyper-splitter","hyper-loader","aai-hyper-loader"}, item_patterns={"^hyper%-transport%-belt$","^hyper%-underground%-belt$","^hyper%-splitter$","^.+%-hyper%-loader$"} }
+    {
+      change=0.10,
+      items={"transport-belt","underground-belt","splitter","loader","aai-loader","basic-loader"},
+      item_patterns={"^aai%-loader$","^basic%-loader$"}
+    },
+    {
+      change=0.05,
+      items={"fast-transport-belt","fast-underground-belt","fast-splitter","fast-loader","aai-fast-loader"},
+      item_patterns={"^.+%-fast%-loader$"}
+    },
+    {
+      change=0.02,
+      items={
+        "express-transport-belt",
+        "express-underground-belt",
+        "express-splitter",
+        "express-loader",
+        "aai-express-loader"
+      },
+      item_patterns={"^.+%-express%-loader$"}
+    },
+    {
+      change=0.01,
+      items={
+        "turbo-transport-belt",
+        "turbo-underground-belt",
+        "turbo-splitter",
+        "turbo-loader",
+        "aai-turbo-loader"
+      },
+      item_patterns={
+        "^turbo%-transport%-belt$",
+        "^turbo%-underground%-belt$",
+        "^turbo%-splitter$",
+        "^.+%-turbo%-loader$"
+      }
+    },
+    {
+      change=0.005,
+      items={
+        "hyper-transport-belt",
+        "hyper-underground-belt",
+        "hyper-splitter",
+        "hyper-loader",
+        "aai-hyper-loader"
+      },
+      item_patterns={
+        "^hyper%-transport%-belt$",
+        "^hyper%-underground%-belt$",
+        "^hyper%-splitter$",
+        "^.+%-hyper%-loader$"
+      }
+    }
   }},
 
   research_inserters = { icon_tech="fast-inserter", groups = {
@@ -375,9 +614,18 @@ return {
     dynamic_items_from_lab_inputs = true,
     groups = {
     { change=0.10, items={
-      "automation-science-pack","logistic-science-pack","chemical-science-pack","production-science-pack",
-      "military-science-pack","utility-science-pack","space-science-pack",
-      "agricultural-science-pack","metallurgic-science-pack","electromagnetic-science-pack","cryogenic-science-pack","promethium-science-pack"
+      "automation-science-pack",
+      "logistic-science-pack",
+      "chemical-science-pack",
+      "production-science-pack",
+      "military-science-pack",
+      "utility-science-pack",
+      "space-science-pack",
+      "agricultural-science-pack",
+      "metallurgic-science-pack",
+      "electromagnetic-science-pack",
+      "cryogenic-science-pack",
+      "promethium-science-pack"
     }}
   }}
 }
