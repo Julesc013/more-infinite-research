@@ -21,6 +21,7 @@ rules:
   prototype_limit_settings_are_startup_only_explicit_overrides: true
   energy_and_pollution_caps_are_separate: true
   positive_power_floor_is_default_off_opt_in: true
+  positive_power_floor_is_compatibility_section_setting: true
   global_settings_use_visible_section_prefixes: true
   rich_text_section_prefixes_are_optional_enhancement: true
   fake_divider_settings_are_disallowed: true

@@ -191,8 +191,8 @@ Other useful settings:
   packs, choose lab compatibility, and prefer MIR for duplicate infinite
   research.
 - Compatibility: control rocket/cannon speed cleanup, installed DLC icon paths,
-  and pipeline extent scaling.
-- Limits: explicitly adjust recipe productivity, efficiency, speed,
+  pipeline extent scaling, and the default-off non-zero power floor workaround.
+- Limits: explicitly adjust recipe productivity, energy-use, pollution, speed,
   or quality caps; all default to engine unchanged.
 - Diagnostics: log generated/skipped technologies, recipe matches, or scripted
   effects for troubleshooting.

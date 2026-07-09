@@ -28,7 +28,7 @@ This release is not a broad new gameplay-content wave. It is the release that tu
 - Exact loader-schema repairs let `atan-ash_2.2.1` and `atan-nuclear-science_0.3.3` load with MIR on Factorio `2.1`.
 - Unsafe, missing, or unresearchable research candidates are skipped or kept diagnostic-only instead of being forced into invalid mod sets.
 - Recipe productivity research is still infinite, but Factorio's normal recipe productivity cap still applies.
-- Optional prototype-limit dropdowns can explicitly raise or lower recipe productivity, energy-use, pollution, speed, and quality caps; unchanged defaults are shown as signed cap values. A separate default-off non-zero power floor can raise explicit `0W` active-use prototypes to `1W`.
+- Optional prototype-limit dropdowns can explicitly raise or lower recipe productivity, energy-use, pollution, speed, and quality caps; unchanged defaults are shown as signed cap values. A separate default-off Compatibility setting can raise explicit `0W` active-use prototypes to `1W`.
 - Portable settings profiles now use a canonical catalog for export/import, strict allowed-value and bounds checks, deterministic encoding, and optional compact export.
 - Science-pack and lab-compatibility startup settings now use clearer player-facing labels while keeping the same internal setting values.
 - Startup settings now use visible Main, Compatibility, Limits, Advanced, and Diagnostics prefixes for faster scanning.

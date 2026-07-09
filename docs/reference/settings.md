@@ -83,8 +83,8 @@ ranges:
 | Range | Visible prefix | Purpose |
 | --- | --- | --- |
 | `a-0-*` | Main | Main behavior settings |
-| `a-1-*` | Compatibility | Compatibility behavior and prototype compatibility passes |
-| `a-2-*` | Limits | Explicit prototype cap overrides |
+| `a-1-*` | Compatibility | Compatibility behavior and prototype compatibility passes, including the default-off non-zero power floor |
+| `a-2-*` | Limits | Explicit numeric prototype cap overrides |
 | `a-7-*` | Advanced | Settings profile import and future advanced controls |
 | `a-8-*` | Diagnostics | Log and audit controls |
 
@@ -106,7 +106,7 @@ therefore stays in the first bucket.
 
 ## Prototype Limit Settings
 
-Prototype limit settings are startup-only explicit overrides. Their internal
+Prototype limit settings are startup-only explicit numeric overrides. Their internal
 default value is `engine-default`, which means no prototype mutation. In the
 settings UI, the unchanged options are labelled as concrete values:
 `+300% (unchanged)` for recipe productivity, `-80% (unchanged)` for energy and
@@ -121,7 +121,6 @@ default in its numeric position.
 | `mir-prototype-pollution-cap` | `effect_receiver.pollution_limits.low` on supported machines, labs, drills, and agricultural towers |
 | `mir-prototype-speed-cap` | `effect_receiver.speed_limits.high` on supported machines, labs, drills, and agricultural towers |
 | `mir-prototype-quality-cap` | `effect_receiver.quality_limits.high` on supported machines, labs, drills, and agricultural towers |
-| `mir-prototype-positive-power-floor` | explicit `energy_usage = "0W"` prototype fields, changed to `"1W"` only when enabled |
 
 Efficiency modules can reduce both energy use and pollution, but MIR exposes
 those floors separately because modpacks may want different behavior for active
@@ -129,9 +128,9 @@ power draw and pollution output. The strongest selectable reduction is
 `-99.99%`; Factorio's effect receiver bounds do not allow a literal `-100%`
 lower limit. MIR does not add a runtime power-use correction loop.
 
-The non-zero power floor is a default-off compatibility workaround. It scans
-prototype tables only when enabled and changes explicit `0W` active
-`energy_usage` fields to `1W`. This is intentionally separate from
+The non-zero power floor is a default-off Compatibility setting, not a Limits
+cap. It scans prototype tables only when enabled and changes explicit `0W`
+active `energy_usage` fields to `1W`. This is intentionally separate from
 `consumption_limits.low`: effect limits control module/beacon/surface effects,
 while the power floor preserves machines that should draw a tiny non-zero
 amount and suppresses unwanted zero-power warning icons.

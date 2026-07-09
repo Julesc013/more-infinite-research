@@ -73,7 +73,7 @@ Date: 2026-07-08
     - Hidden settings keep their setting IDs readable and do not force values.
     - Improved in-game setting labels and descriptions for science-pack and lab-compatibility policies.
     - Added startup dropdowns for recipe productivity, energy-use, pollution, speed, and quality prototype caps.
-    - Added a default-off non-zero power floor checkbox for explicit 0W active-use prototypes.
+    - Added a default-off Compatibility setting for explicit 0W active-use prototypes.
     - Prototype cap dropdowns leave engine defaults untouched unless explicitly changed.
     - Added visible Main, Compatibility, Limits, Advanced, and Diagnostics prefixes to global startup settings.
     - Changed prototype limit dropdown defaults to signed value-first labels.

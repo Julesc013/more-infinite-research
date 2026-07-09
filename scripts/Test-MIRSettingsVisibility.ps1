@@ -136,6 +136,7 @@ Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -N
 Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -Needle "prototype_limit_settings_are_startup_only_explicit_overrides: true"
 Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -Needle "energy_and_pollution_caps_are_separate: true"
 Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -Needle "positive_power_floor_is_default_off_opt_in: true"
+Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -Needle "positive_power_floor_is_compatibility_section_setting: true"
 Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -Needle "global_settings_use_visible_section_prefixes: true"
 Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -Needle "rich_text_section_prefixes_are_optional_enhancement: true"
 Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -Needle "fake_divider_settings_are_disallowed: true"
@@ -153,6 +154,7 @@ Assert-Contains -RelativePath "prototypes/mir/settings/catalog.lua" -Text $catal
 Assert-Contains -RelativePath "prototypes/mir/settings/catalog.lua" -Text $catalogText -Needle "function M.validate_value(name, value)"
 Assert-Contains -RelativePath "prototypes/mir/settings/prototype_limits.lua" -Text $prototypeLimitSettingsText -Needle 'name = "mir-prototype-pollution-cap"'
 Assert-Contains -RelativePath "prototypes/mir/settings/catalog.lua" -Text $catalogText -Needle 'name = prototype_limit_settings.positive_power_floor_setting_name'
+Assert-Contains -RelativePath "prototypes/mir/settings/catalog.lua" -Text $catalogText -Needle 'order = setting_order.global("compatibility", 40)'
 Assert-Contains -RelativePath "prototypes/mir/settings/catalog.lua" -Text $catalogText -Needle "function M.stream_setting_specs(key, stream)"
 Assert-Contains -RelativePath "prototypes/mir/settings/catalog.lua" -Text $catalogText -Needle "function M.base_extension_setting_specs(key)"
 Assert-Contains -RelativePath "prototypes/mir/settings/registry.lua" -Text $registryText -Needle 'enable = "ips-enable-%s"'

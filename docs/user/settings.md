@@ -49,7 +49,6 @@ MIR includes startup-only prototype limit settings:
 - Pollution reduction cap
 - Speed effect cap
 - Quality effect cap
-- Non-zero power floor
 
 The unchanged dropdown entries are value-first labels: `+300% (unchanged)` for
 recipe productivity, `-80% (unchanged)` for energy and pollution reductions,
@@ -64,11 +63,13 @@ cap is separate because efficiency modules can reduce both energy use and
 pollution, while modpacks may want different floors for each effect.
 
 The strongest selectable reduction is `-99.99%`. Factorio's effect receiver
-prototype bounds do not allow a literal `-100%` effect limit. Use the separate
-Non-zero power floor checkbox only when a modpack has explicit `0W` active-use
-entity prototypes that create unwanted low-power warning icons. When enabled,
-MIR changes those explicit `0W` `energy_usage` prototypes to `1W` during
-prototype loading. Leave it off to preserve zero-power prototypes exactly.
+prototype bounds do not allow a literal `-100%` effect limit.
+
+The Non-zero power floor is a separate Compatibility setting, not a Limits
+cap. Use it only when a modpack has explicit `0W` active-use entity prototypes
+that create unwanted low-power warning icons. When enabled, MIR changes those
+explicit `0W` `energy_usage` prototypes to `1W` during prototype loading.
+Leave it off to preserve zero-power prototypes exactly.
 
 These settings apply during prototype loading and require a restart after
 changing them. They do not add per-tick runtime processing, and they are not

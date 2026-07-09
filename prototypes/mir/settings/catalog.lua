@@ -185,7 +185,7 @@ function M.global_setting_prototypes()
     name = prototype_limit_settings.positive_power_floor_setting_name,
     setting_type = "startup",
     default_value = false,
-    order = setting_order.global("prototype_limits", 60),
+    order = setting_order.global("compatibility", 40),
     localised_name = {"mod-setting-name." .. prototype_limit_settings.positive_power_floor_setting_name},
     localised_description = {"mod-setting-description." .. prototype_limit_settings.positive_power_floor_setting_name}
   })

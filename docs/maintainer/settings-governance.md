@@ -87,8 +87,9 @@ Global startup settings use the order helper in
 `prototypes/mir/settings/order.lua`:
 
 - `Main`: main behavior settings;
-- `Compatibility`: compatibility behavior and prototype compatibility passes;
-- `Limits`: explicit global prototype cap overrides;
+- `Compatibility`: compatibility behavior and prototype compatibility passes,
+  including the default-off non-zero power floor;
+- `Limits`: explicit global numeric prototype cap overrides;
 - `Advanced`: profile import and future advanced controls;
 - `Diagnostics`: log and audit controls.
 
@@ -117,7 +118,9 @@ or pollution reductions, instead of exposing the internal value. Non-default
 values may mutate recipe productivity caps or effect receiver limits during
 `data-final-fixes`, but they must not require runtime event processing.
 
-Do not couple the non-zero power floor to the energy savings cap. The energy
+Do not couple the non-zero power floor to the energy savings cap. It is a
+Compatibility setting because it is an opt-in prototype compatibility
+workaround, not a numeric cap. The energy
 savings cap writes `effect_receiver.consumption_limits.low`; the pollution cap
 writes `effect_receiver.pollution_limits.low`; the default-off power-floor
 checkbox changes explicit `0W` active `energy_usage` prototypes to `1W`.
