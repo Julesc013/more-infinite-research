@@ -71,7 +71,10 @@ Date: 2026-07-08
     - Improved in-game setting labels and descriptions for science-pack and lab-compatibility policies.
     - Added startup dropdowns for recipe productivity, efficiency, speed, and quality prototype caps.
     - Prototype cap dropdowns leave engine defaults untouched unless explicitly changed.
-    - Added visible Main, Compatibility, Prototype limits, Advanced, and Diagnostics prefixes to global startup settings.
+    - Added visible Main, Compatibility, Limits, Advanced, and Diagnostics prefixes to global startup settings.
+    - Changed prototype limit dropdown defaults to value-first labels such as 300% (unchanged).
+    - Efficiency, speed, and quality limit defaults now show their unchanged cap values.
+    - Added lower and intermediate prototype limit dropdown choices for productivity, efficiency, speed, and quality caps.
     - Added color and bold emphasis to global setting prefixes where Factorio renders rich text.
     - Grouped generated-technology settings so disabled, risky, special, and vanilla-continuation rows stay easier to find.
     - Split generated-technology settings into default-off, enabled special, and ordinary enabled groups.
@@ -153,7 +156,7 @@ Date: 2026-07-08
     - Selected local zip checks passed for the advertised and recently repaired compatibility targets.
     - The targeted release gate passed using the recorded local 2.1 mod library scenario set.
     - The full targeted gate evidence is recorded in release summary docs.
-    - The final package contains 115 entries and zero forbidden repository-only paths.
+    - The final package contains 118 entries and zero forbidden repository-only paths.
     - Portal-backed full-catalog checks were not run in the release environment because FACTORIO_TOKEN was not set.
     - atan-ash_2.2.1 still fails without MIR on the tested Factorio 2.1 setup and loads with MIR after repair.
     - atan-nuclear-science 0.3.3 still fails without MIR and loads with MIR after exact schema repair.

@@ -16,6 +16,12 @@ S.settings = {
     default_value = S.engine_default,
     allowed_values = {
       S.engine_default,
+      "percent-50",
+      "percent-75",
+      "percent-100",
+      "percent-200",
+      "percent-250",
+      "percent-400",
       "percent-500",
       "percent-1000",
       "percent-2500",
@@ -23,6 +29,12 @@ S.settings = {
       "percent-100000"
     },
     values = {
+      ["percent-50"] = 0.5,
+      ["percent-75"] = 0.75,
+      ["percent-100"] = 1.0,
+      ["percent-200"] = 2.0,
+      ["percent-250"] = 2.5,
+      ["percent-400"] = 4.0,
       ["percent-500"] = 5.0,
       ["percent-1000"] = 10.0,
       ["percent-2500"] = 25.0,
@@ -37,6 +49,8 @@ S.settings = {
     default_value = S.engine_default,
     allowed_values = {
       S.engine_default,
+      "saving-50",
+      "saving-75",
       "saving-90",
       "saving-95",
       "saving-99",
@@ -44,6 +58,8 @@ S.settings = {
       "saving-9999"
     },
     values = {
+      ["saving-50"] = -0.5,
+      ["saving-75"] = -0.75,
       ["saving-90"] = -0.9,
       ["saving-95"] = -0.95,
       ["saving-99"] = -0.99,
@@ -58,14 +74,24 @@ S.settings = {
     default_value = S.engine_default,
     allowed_values = {
       S.engine_default,
+      "bonus-50",
+      "bonus-75",
       "bonus-100",
+      "bonus-200",
+      "bonus-250",
+      "bonus-400",
       "bonus-500",
       "bonus-1000",
       "bonus-10000",
       "bonus-100000"
     },
     values = {
+      ["bonus-50"] = 0.5,
+      ["bonus-75"] = 0.75,
       ["bonus-100"] = 1.0,
+      ["bonus-200"] = 2.0,
+      ["bonus-250"] = 2.5,
+      ["bonus-400"] = 4.0,
       ["bonus-500"] = 5.0,
       ["bonus-1000"] = 10.0,
       ["bonus-10000"] = 100.0,
@@ -79,14 +105,24 @@ S.settings = {
     default_value = S.engine_default,
     allowed_values = {
       S.engine_default,
+      "bonus-50",
+      "bonus-75",
       "bonus-100",
+      "bonus-200",
+      "bonus-250",
+      "bonus-400",
       "bonus-500",
       "bonus-1000",
       "bonus-10000",
       "bonus-100000"
     },
     values = {
+      ["bonus-50"] = 0.5,
+      ["bonus-75"] = 0.75,
       ["bonus-100"] = 1.0,
+      ["bonus-200"] = 2.0,
+      ["bonus-250"] = 2.5,
+      ["bonus-400"] = 4.0,
       ["bonus-500"] = 5.0,
       ["bonus-1000"] = 10.0,
       ["bonus-10000"] = 100.0,

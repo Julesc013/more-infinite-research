@@ -84,7 +84,7 @@ ranges:
 | --- | --- | --- |
 | `a-0-*` | Main | Main behavior settings |
 | `a-1-*` | Compatibility | Compatibility behavior and prototype compatibility passes |
-| `a-2-*` | Prototype limits | Explicit prototype cap overrides |
+| `a-2-*` | Limits | Explicit prototype cap overrides |
 | `a-7-*` | Advanced | Settings profile import and future advanced controls |
 | `a-8-*` | Diagnostics | Log and audit controls |
 
@@ -106,8 +106,11 @@ therefore stays in the first bucket.
 
 ## Prototype Limit Settings
 
-Prototype limit settings are startup-only explicit overrides. Their default
-value is `engine-default`, which means no prototype mutation:
+Prototype limit settings are startup-only explicit overrides. Their internal
+default value is `engine-default`, which means no prototype mutation. In the
+settings UI, the unchanged options are labelled as concrete values:
+`300% (unchanged)` for recipe productivity, `80% savings (unchanged)` for
+efficiency, and `+100000% (unchanged)` for speed and quality effect caps.
 
 | Setting ID | Non-default target |
 | --- | --- |

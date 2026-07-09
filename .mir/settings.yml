@@ -47,7 +47,7 @@ ordering:
       label: Compatibility
       meaning: compatibility behavior and prototype compatibility passes
     - range: a-2
-      label: Prototype limits
+      label: Limits
       meaning: explicit global prototype cap overrides
     - range: a-7
       label: Advanced

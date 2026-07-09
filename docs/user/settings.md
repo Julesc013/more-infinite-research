@@ -30,7 +30,7 @@ Use the in-game setting descriptions for exact defaults. Use
 technical contract once a setting needs maintainer-level detail.
 
 Global settings are grouped with visible prefixes: Main, Compatibility,
-Prototype limits, Advanced, and Diagnostics. Some prefixes are color-emphasized
+Limits, Advanced, and Diagnostics. Some prefixes are color-emphasized
 in-game for faster scanning, but the label text is still the structure.
 
 Generated technology settings are ordered so default-off or experimental rows
@@ -49,10 +49,12 @@ MIR includes four optional startup-only prototype limit settings:
 - Speed effect cap
 - Quality effect cap
 
-All four default to `Engine default`. That means MIR leaves the relevant
-Factorio prototype fields unchanged. Non-default values are explicit global
-balance overrides for long-running infinite research saves or modpacks that
-want stricter or broader module-effect ceilings.
+The unchanged dropdown entries are value-first labels: `300% (unchanged)` for
+recipe productivity, `80% savings (unchanged)` for efficiency, and
+`+100000% (unchanged)` for speed and quality. Those unchanged entries leave the
+relevant Factorio prototype fields alone. Non-default values are explicit global
+balance overrides for long-running infinite research saves or modpacks that want
+stricter or broader module-effect ceilings.
 
 These settings apply during prototype loading and require a restart after
 changing them. They do not add per-tick runtime processing, and they are not

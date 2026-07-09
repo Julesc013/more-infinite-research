@@ -28,9 +28,9 @@ This release is not a broad new gameplay-content wave. It is the release that tu
 - Exact loader-schema repairs let `atan-ash_2.2.1` and `atan-nuclear-science_0.3.3` load with MIR on Factorio `2.1`.
 - Unsafe, missing, or unresearchable research candidates are skipped or kept diagnostic-only instead of being forced into invalid mod sets.
 - Recipe productivity research is still infinite, but Factorio's normal recipe productivity cap still applies.
-- Optional prototype-limit dropdowns can explicitly raise or lower recipe productivity, efficiency, speed, and quality caps; all default to `Engine default`.
+- Optional prototype-limit dropdowns can explicitly raise or lower recipe productivity, efficiency, speed, and quality caps; unchanged defaults are shown as concrete cap values.
 - Science-pack and lab-compatibility startup settings now use clearer player-facing labels while keeping the same internal setting values.
-- Startup settings now use visible Main, Compatibility, Prototype limits, Advanced, and Diagnostics prefixes for faster scanning.
+- Startup settings now use visible Main, Compatibility, Limits, Advanced, and Diagnostics prefixes for faster scanning.
 - MIR-owned official technology settings stay visible across base and Space Age, even when the current active mod set will skip generation.
 - Agricultural growth speed is enabled by default as a special Space Age technology; spoilage preservation remains a disabled-by-default experimental option.
 

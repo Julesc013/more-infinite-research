@@ -826,9 +826,12 @@ Invoke-RepoCheck "prototype limit settings are wired" {
     @{ File = "prototypes\mir\settings\prototype_limits.lua"; Text = $prototypeLimitSettingsText; Snippet = 'name = "mir-prototype-speed-cap"' },
     @{ File = "prototypes\mir\settings\prototype_limits.lua"; Text = $prototypeLimitSettingsText; Snippet = 'name = "mir-prototype-quality-cap"' },
     @{ File = "prototypes\mir\settings\prototype_limits.lua"; Text = $prototypeLimitSettingsText; Snippet = 'default_value = S.engine_default' },
-    @{ File = "prototypes\mir\settings\prototype_limits.lua"; Text = $prototypeLimitSettingsText; Snippet = '["percent-1000"] = 10.0' },
+    @{ File = "prototypes\mir\settings\prototype_limits.lua"; Text = $prototypeLimitSettingsText; Snippet = '["percent-50"] = 0.5' },
+    @{ File = "prototypes\mir\settings\prototype_limits.lua"; Text = $prototypeLimitSettingsText; Snippet = '["percent-400"] = 4.0' },
+    @{ File = "prototypes\mir\settings\prototype_limits.lua"; Text = $prototypeLimitSettingsText; Snippet = '["saving-50"] = -0.5' },
     @{ File = "prototypes\mir\settings\prototype_limits.lua"; Text = $prototypeLimitSettingsText; Snippet = '["saving-99"] = -0.99' },
-    @{ File = "prototypes\mir\settings\prototype_limits.lua"; Text = $prototypeLimitSettingsText; Snippet = '["bonus-1000"] = 10.0' },
+    @{ File = "prototypes\mir\settings\prototype_limits.lua"; Text = $prototypeLimitSettingsText; Snippet = '["bonus-50"] = 0.5' },
+    @{ File = "prototypes\mir\settings\prototype_limits.lua"; Text = $prototypeLimitSettingsText; Snippet = '["bonus-400"] = 4.0' },
     @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'steps.apply_prototype_limits()' },
     @{ File = "prototypes\mir\stage\data_final_fixes_steps.lua"; Text = $stepsText; Snippet = 'require("prototypes.mir.pipeline.prototype_limits").apply()' },
     @{ File = "prototypes\mir\pipeline\prototype_limits.lua"; Text = $prototypeLimitPipelineText; Snippet = 'data_raw.prototypes("recipe")' },
@@ -839,14 +842,17 @@ Invoke-RepoCheck "prototype limit settings are wired" {
     @{ File = "prototypes\mir\pipeline\prototype_limits.lua"; Text = $prototypeLimitPipelineText; Snippet = 'apply_effect_receiver_limit("speed_limits", "high", selected("speed"))' },
     @{ File = "prototypes\mir\pipeline\prototype_limits.lua"; Text = $prototypeLimitPipelineText; Snippet = 'apply_effect_receiver_limit("quality_limits", "high", selected("quality"))' },
     @{ File = "prototypes\mir\pipeline\prototype_limits.lua"; Text = $prototypeLimitPipelineText; Snippet = 'Applied prototype limits: productivity_recipes=' },
-    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-prototype-productivity-cap=[font=default-bold][color=orange]Prototype limits:[/color][/font] Recipe productivity cap' },
-    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-prototype-efficiency-cap=[font=default-bold][color=orange]Prototype limits:[/color][/font] Efficiency cap' },
-    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-prototype-speed-cap=[font=default-bold][color=orange]Prototype limits:[/color][/font] Speed effect cap' },
-    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-prototype-quality-cap=[font=default-bold][color=orange]Prototype limits:[/color][/font] Quality effect cap' },
-    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-prototype-productivity-cap-engine-default=Engine default — unchanged' },
-    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-prototype-efficiency-cap-saving-99=99% max savings' },
-    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-prototype-speed-cap-bonus-1000=+1000%' },
-    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-prototype-quality-cap-bonus-1000=+1000%' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-prototype-productivity-cap=[font=default-bold][color=orange]Limits:[/color][/font] Recipe productivity cap' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-prototype-efficiency-cap=[font=default-bold][color=orange]Limits:[/color][/font] Efficiency cap' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-prototype-speed-cap=[font=default-bold][color=orange]Limits:[/color][/font] Speed effect cap' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-prototype-quality-cap=[font=default-bold][color=orange]Limits:[/color][/font] Quality effect cap' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-prototype-productivity-cap-engine-default=300% (unchanged)' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-prototype-productivity-cap-percent-50=50%' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-prototype-efficiency-cap-saving-99=99% savings' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-prototype-efficiency-cap-engine-default=80% savings (unchanged)' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-prototype-speed-cap-engine-default=+100000% (unchanged)' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-prototype-speed-cap-bonus-400=+400%' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-prototype-quality-cap-bonus-400=+400%' },
     @{ File = ".mir\settings.yml"; Text = $settingsManifestText; Snippet = 'prototype_limit_settings_default_to_engine_default: true' },
     @{ File = ".mir\modules.yml"; Text = $modulesManifestText; Snippet = 'prototypes/mir/settings/prototype_limits.lua' },
     @{ File = ".mir\modules.yml"; Text = $modulesManifestText; Snippet = 'prototypes/mir/pipeline/prototype_limits.lua' },
@@ -2089,13 +2095,13 @@ function Initialize-RuntimeScenario {
     [ValidateSet("", "off", "only-when-dedicated-tech-enabled", "always")]
     [string]$WeaponSpeedAdjustmentMode = "",
     [double]$PipelineExtentMultiplier = 1,
-    [ValidateSet("", "engine-default", "percent-500", "percent-1000", "percent-2500", "percent-10000", "percent-100000")]
+    [ValidateSet("", "engine-default", "percent-50", "percent-75", "percent-100", "percent-200", "percent-250", "percent-400", "percent-500", "percent-1000", "percent-2500", "percent-10000", "percent-100000")]
     [string]$PrototypeProductivityCap = "",
-    [ValidateSet("", "engine-default", "saving-90", "saving-95", "saving-99", "saving-999", "saving-9999")]
+    [ValidateSet("", "engine-default", "saving-50", "saving-75", "saving-90", "saving-95", "saving-99", "saving-999", "saving-9999")]
     [string]$PrototypeEfficiencyCap = "",
-    [ValidateSet("", "engine-default", "bonus-100", "bonus-500", "bonus-1000", "bonus-10000", "bonus-100000")]
+    [ValidateSet("", "engine-default", "bonus-50", "bonus-75", "bonus-100", "bonus-200", "bonus-250", "bonus-400", "bonus-500", "bonus-1000", "bonus-10000", "bonus-100000")]
     [string]$PrototypeSpeedCap = "",
-    [ValidateSet("", "engine-default", "bonus-100", "bonus-500", "bonus-1000", "bonus-10000", "bonus-100000")]
+    [ValidateSet("", "engine-default", "bonus-50", "bonus-75", "bonus-100", "bonus-200", "bonus-250", "bonus-400", "bonus-500", "bonus-1000", "bonus-10000", "bonus-100000")]
     [string]$PrototypeQualityCap = "",
     [switch]$RequireSpaceGate,
     [switch]$UseInstalledSpaceAgeIcons,
@@ -2243,13 +2249,13 @@ function Invoke-RuntimeScenario {
     [ValidateSet("", "off", "only-when-dedicated-tech-enabled", "always")]
     [string]$WeaponSpeedAdjustmentMode = "",
     [double]$PipelineExtentMultiplier = 1,
-    [ValidateSet("", "engine-default", "percent-500", "percent-1000", "percent-2500", "percent-10000", "percent-100000")]
+    [ValidateSet("", "engine-default", "percent-50", "percent-75", "percent-100", "percent-200", "percent-250", "percent-400", "percent-500", "percent-1000", "percent-2500", "percent-10000", "percent-100000")]
     [string]$PrototypeProductivityCap = "",
-    [ValidateSet("", "engine-default", "saving-90", "saving-95", "saving-99", "saving-999", "saving-9999")]
+    [ValidateSet("", "engine-default", "saving-50", "saving-75", "saving-90", "saving-95", "saving-99", "saving-999", "saving-9999")]
     [string]$PrototypeEfficiencyCap = "",
-    [ValidateSet("", "engine-default", "bonus-100", "bonus-500", "bonus-1000", "bonus-10000", "bonus-100000")]
+    [ValidateSet("", "engine-default", "bonus-50", "bonus-75", "bonus-100", "bonus-200", "bonus-250", "bonus-400", "bonus-500", "bonus-1000", "bonus-10000", "bonus-100000")]
     [string]$PrototypeSpeedCap = "",
-    [ValidateSet("", "engine-default", "bonus-100", "bonus-500", "bonus-1000", "bonus-10000", "bonus-100000")]
+    [ValidateSet("", "engine-default", "bonus-50", "bonus-75", "bonus-100", "bonus-200", "bonus-250", "bonus-400", "bonus-500", "bonus-1000", "bonus-10000", "bonus-100000")]
     [string]$PrototypeQualityCap = "",
     [switch]$RequireSpaceGate,
     [switch]$UseInstalledSpaceAgeIcons,

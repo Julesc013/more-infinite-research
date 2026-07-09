@@ -84,7 +84,7 @@ Global startup settings use the order helper in
 
 - `Main`: main behavior settings;
 - `Compatibility`: compatibility behavior and prototype compatibility passes;
-- `Prototype limits`: explicit global prototype cap overrides;
+- `Limits`: explicit global prototype cap overrides;
 - `Advanced`: profile import and future advanced controls;
 - `Diagnostics`: log and audit controls.
 
@@ -107,9 +107,10 @@ circuit-controlled inserters and reduce engine optimization assumptions.
 
 Prototype limit settings must be visible global settings, not hidden behavior.
 `engine-default` means MIR does not touch the corresponding Factorio prototype
-field. Non-default values may mutate recipe productivity caps or effect receiver
-limits during `data-final-fixes`, but they must not require runtime event
-processing.
+field. Player-facing labels should show the effective unchanged cap, such as
+`300% (unchanged)`, instead of exposing the internal value. Non-default values
+may mutate recipe productivity caps or effect receiver limits during
+`data-final-fixes`, but they must not require runtime event processing.
 
 Keep the implementation in the MIR settings and pipeline layers. Compatibility
 policy files may not apply these overrides directly.

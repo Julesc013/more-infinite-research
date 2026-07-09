@@ -37,7 +37,7 @@ migrations remain in place.
 - Adds many **configurable infinite productivity researches** for vanilla, Space Age, and compatible modded production chains.
 - Adds repeatable player, robot, weapon-speed, cargo-logistics, and selected vanilla technology bonuses.
 - Startup **settings let you enable, disable, cap, or rebalance** every generated research.
-- Optional prototype-limit dropdowns can explicitly adjust recipe productivity, efficiency, speed, and quality caps; all default to `Engine default`.
+- Optional prototype-limit dropdowns can explicitly adjust recipe productivity, efficiency, speed, and quality caps; unchanged defaults are shown as concrete cap values.
 - Adds a base-game Research productivity chain when Space Age's vanilla `research-productivity` technology is not present.
 - Adopts safe mod-added recipes into configured vanilla Space Age productivity families instead of creating parallel research.
 - Uses MIR 3 compiler diagnostics to explain generated, skipped, observed, and rejected research decisions.
@@ -192,7 +192,7 @@ Other useful settings:
   research.
 - Compatibility: control rocket/cannon speed cleanup, installed DLC icon paths,
   and pipeline extent scaling.
-- Prototype limits: explicitly adjust recipe productivity, efficiency, speed,
+- Limits: explicitly adjust recipe productivity, efficiency, speed,
   or quality caps; all default to engine unchanged.
 - Diagnostics: log generated/skipped technologies, recipe matches, or scripted
   effects for troubleshooting.

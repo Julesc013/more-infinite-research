@@ -37,6 +37,17 @@ function Assert-NoPattern {
   }
 }
 
+function Assert-Matches {
+  param(
+    [Parameter(Mandatory)][string]$RelativePath,
+    [Parameter(Mandatory)][string]$Text,
+    [Parameter(Mandatory)][string]$Pattern
+  )
+  if ($Text -notmatch $Pattern) {
+    throw "$RelativePath is missing required settings visibility pattern: $Pattern"
+  }
+}
+
 function Assert-NoPatternInTree {
   param(
     [Parameter(Mandatory)][string]$RelativeRoot,
@@ -61,6 +72,8 @@ function Assert-NoPatternInTree {
 
 $settingsManifestText = Read-MIRText -RelativePath ".mir/settings.yml"
 $stageBuilderText = Read-MIRText -RelativePath "prototypes/mir/settings/stage_builder.lua"
+$settingOrderText = Read-MIRText -RelativePath "prototypes/mir/settings/order.lua"
+$prototypeLimitSettingsText = Read-MIRText -RelativePath "prototypes/mir/settings/prototype_limits.lua"
 $registryText = Read-MIRText -RelativePath "prototypes/mir/settings/registry.lua"
 $visibilityText = Read-MIRText -RelativePath "prototypes/mir/settings/visibility.lua"
 $builderText = Read-MIRText -RelativePath "prototypes/mir/settings/builder.lua"
@@ -71,6 +84,7 @@ $runtimeSettingsProfileText = Read-MIRText -RelativePath "prototypes/mir/runtime
 $userSettingsDocText = Read-MIRText -RelativePath "docs/user/settings.md"
 $referenceSettingsDocText = Read-MIRText -RelativePath "docs/reference/settings.md"
 $settingsGovernanceDocText = Read-MIRText -RelativePath "docs/maintainer/settings-governance.md"
+$defaultsText = Read-MIRText -RelativePath "prototypes/mir/settings/defaults.lua"
 $productivityText = Read-MIRText -RelativePath "prototypes/streams/productivity.lua"
 $directEffectsText = Read-MIRText -RelativePath "prototypes/streams/direct-effects.lua"
 $fixtureText = Read-MIRText -RelativePath "fixtures/assert-hidden-setting-readability/data-final-fixes.lua"
@@ -92,7 +106,7 @@ Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -N
 Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -Needle "global_settings_use_visible_section_prefixes: true"
 Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -Needle "rich_text_section_prefixes_are_optional_enhancement: true"
 Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -Needle "fake_divider_settings_are_disallowed: true"
-Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -Needle "label: Prototype limits"
+Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -Needle "label: Limits"
 Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -Needle "label: Diagnostics"
 Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -Needle "research_character_reach:"
 Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -Needle "base_extensions:"
@@ -118,10 +132,38 @@ Assert-Contains -RelativePath "prototypes/mir/runtime/settings_profile.lua" -Tex
 Assert-Contains -RelativePath "prototypes/mir/runtime/settings_profile.lua" -Text $runtimeSettingsProfileText -Needle 'script-output/" .. filename'
 Assert-Contains -RelativePath "prototypes/mir/runtime/settings_profile.lua" -Text $runtimeSettingsProfileText -Needle 'remote.add_interface("more-infinite-research-settings"'
 Assert-Contains -RelativePath "prototypes/mir/settings/stage_builder.lua" -Text $stageBuilderText -Needle 'local settings_adapter = require("prototypes.mir.settings.stage_adapter")'
+Assert-Contains -RelativePath "prototypes/mir/settings/stage_builder.lua" -Text $stageBuilderText -Needle 'local setting_order = require("prototypes.mir.settings.order")'
 Assert-Contains -RelativePath "prototypes/mir/settings/stage_builder.lua" -Text $stageBuilderText -Needle 'name = "mir-settings-profile-import"'
 Assert-Contains -RelativePath "prototypes/mir/settings/stage_builder.lua" -Text $stageBuilderText -Needle "allow_blank = true"
 Assert-Contains -RelativePath "prototypes/mir/settings/stage_builder.lua" -Text $stageBuilderText -Needle "settings_adapter.visibility_for_stream(stream, settings_context)"
 Assert-Contains -RelativePath "prototypes/mir/settings/stage_builder.lua" -Text $stageBuilderText -Needle "settings_adapter.apply(setting, group and group.ui_visibility)"
+Assert-Contains -RelativePath "prototypes/mir/settings/order.lua" -Text $settingOrderText -Needle 'main = "a-0"'
+Assert-Contains -RelativePath "prototypes/mir/settings/order.lua" -Text $settingOrderText -Needle 'compatibility = "a-1"'
+Assert-Contains -RelativePath "prototypes/mir/settings/order.lua" -Text $settingOrderText -Needle 'prototype_limits = "a-2"'
+Assert-Contains -RelativePath "prototypes/mir/settings/order.lua" -Text $settingOrderText -Needle 'advanced = "a-7"'
+Assert-Contains -RelativePath "prototypes/mir/settings/order.lua" -Text $settingOrderText -Needle 'diagnostics = "a-8"'
+Assert-Contains -RelativePath "prototypes/mir/settings/order.lua" -Text $settingOrderText -Needle 'generated_technologies = "b"'
+Assert-Contains -RelativePath "prototypes/mir/settings/order.lua" -Text $settingOrderText -Needle 'function M.global(section, index)'
+Assert-Contains -RelativePath "prototypes/mir/settings/order.lua" -Text $settingOrderText -Needle 'function M.technology(bucket, name_slug, kind, key)'
+Assert-Contains -RelativePath "prototypes/mir/settings/stage_builder.lua" -Text $stageBuilderText -Needle 'order = setting_order.global("main", 10)'
+Assert-Contains -RelativePath "prototypes/mir/settings/stage_builder.lua" -Text $stageBuilderText -Needle 'order = setting_order.global("compatibility", 10)'
+Assert-Contains -RelativePath "prototypes/mir/settings/stage_builder.lua" -Text $stageBuilderText -Needle 'order = setting_order.global("advanced", 10)'
+Assert-Contains -RelativePath "prototypes/mir/settings/stage_builder.lua" -Text $stageBuilderText -Needle 'order = setting_order.global("diagnostics", 10)'
+Assert-Contains -RelativePath "prototypes/mir/settings/prototype_limits.lua" -Text $prototypeLimitSettingsText -Needle 'order = setting_order.global("prototype_limits", 10)'
+Assert-Contains -RelativePath "prototypes/mir/settings/prototype_limits.lua" -Text $prototypeLimitSettingsText -Needle 'order = setting_order.global("prototype_limits", 40)'
+Assert-Contains -RelativePath "prototypes/mir/settings/stage_builder.lua" -Text $stageBuilderText -Needle 'if not group.enabled then return "000" end'
+Assert-Contains -RelativePath "prototypes/mir/settings/stage_builder.lua" -Text $stageBuilderText -Needle 'if group.settings_priority == "top" then return "050" end'
+Assert-Contains -RelativePath "prototypes/mir/settings/stage_builder.lua" -Text $stageBuilderText -Needle 'return "100"'
+Assert-Contains -RelativePath "prototypes/mir/settings/stage_builder.lua" -Text $stageBuilderText -Needle 'return setting_order.technology(bucket, order_slug(group.sort_name), group.kind, group.key)'
+Assert-Contains -RelativePath "prototypes/mir/settings/stage_builder.lua" -Text $stageBuilderText -Needle 'if rank_a ~= rank_b then return rank_a < rank_b end'
+Assert-Contains -RelativePath "prototypes/mir/settings/stage_builder.lua" -Text $stageBuilderText -Needle 'local sort_a = order_slug(a.sort_name)'
+Assert-Matches -RelativePath "prototypes/mir/settings/defaults.lua" -Text $defaultsText -Pattern '(?s)research_breeding\s*=\s*\{.*?enabled\s*=\s*true.*?settings_priority\s*=\s*"top"'
+Assert-Matches -RelativePath "prototypes/mir/settings/defaults.lua" -Text $defaultsText -Pattern '(?s)research_agricultural_growth_speed\s*=\s*\{.*?enabled\s*=\s*true.*?settings_priority\s*=\s*"top"'
+Assert-Matches -RelativePath "prototypes/mir/settings/defaults.lua" -Text $defaultsText -Pattern '(?s)research_cargo_bay_unloading_distance\s*=\s*\{.*?enabled\s*=\s*true.*?settings_priority\s*=\s*"top"'
+Assert-Matches -RelativePath "prototypes/mir/settings/defaults.lua" -Text $defaultsText -Pattern '(?s)research_cargo_landing_pad_count\s*=\s*\{.*?enabled\s*=\s*true.*?settings_priority\s*=\s*"top"'
+Assert-Matches -RelativePath "prototypes/mir/settings/defaults.lua" -Text $defaultsText -Pattern '(?s)research_character_reach\s*=\s*\{.*?enabled\s*=\s*true.*?settings_priority\s*=\s*"top"'
+Assert-Matches -RelativePath "prototypes/mir/settings/defaults.lua" -Text $defaultsText -Pattern '(?s)research_spoilage_preservation\s*=\s*\{.*?enabled\s*=\s*false'
+Assert-Matches -RelativePath "prototypes/mir/settings/defaults.lua" -Text $defaultsText -Pattern '(?s)\["inserter-capacity-bonus"\]\s*=\s*\{.*?enabled\s*=\s*false.*?settings_priority\s*=\s*"top"'
 
 Assert-Contains -RelativePath "prototypes/streams/productivity.lua" -Text $productivityText -Needle "ui_visibility = {"
 Assert-Contains -RelativePath "prototypes/streams/productivity.lua" -Text $productivityText -Needle 'mods_any = air_scrubbing_overlay.applies_when.mods'

@@ -40,11 +40,11 @@ Use [Factorio lifecycle boundaries](factorio-lifecycle.md) for the exact
 settings-stage, prototype-stage, and runtime-stage separation behind the MIR 3
 settings and control-file rules.
 
-Prototype limit settings are startup-only data-stage controls. `Engine default`
-leaves Factorio's recipe productivity and effect receiver limits untouched.
-Non-default values run after exact compatibility repairs and before MIR planning,
-so generated technology diagnostics can observe the selected caps without adding
-runtime processing.
+Prototype limit settings are startup-only data-stage controls. The unchanged
+dropdown entries, such as `300% (unchanged)`, leave Factorio's recipe
+productivity and effect receiver limits untouched. Non-default values run after
+exact compatibility repairs and before MIR planning, so generated technology
+diagnostics can observe the selected caps without adding runtime processing.
 
 ## Control Stage Boundary
 
