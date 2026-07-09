@@ -9,56 +9,73 @@
 
 *Trickle down economics bring productivity gains to all industries.*
 
-More Infinite Research adds **configurable infinite productivity** and **bonus research** for intermediate items,
-logistics chains, combat bonuses, player bonuses, and Space Age gaps that vanilla Factorio does not cover.
+More Infinite Research adds **configurable infinite productivity** and **bonus research** for intermediate items, logistics chains, combat bonuses, player bonuses, and Space Age gaps that vanilla Factorio does not cover.
 
-Version **`1.x.x`** targets **Factorio `2.0`** and requires `base >= 2.0`.
+**MIR `2.x.x`** targets **Factorio `2.0`** *(starting with **`2.3.0`**)*.
 
-Version **`2.x.x`** targets **Factorio `2.1`** and requires:
+**MIR `3.x.x`** targets **Factorio `2.1`** and requires:
 
 - `base >= 2.1.8`
-- hidden optional `elevated-rails`
+- optional `space-age >= 2.1.8`
 - optional `recycler >= 2.1.8`
 - hidden optional `quality`
-- optional `space-age >= 2.1.8`
+- hidden optional `elevated-rails`
 
-The mod is built around **graceful compatibility**: it discovers recipes, science packs, labs, and optional prototypes from the active mod set, generates technologies late in **`data-final-fixes.lua`**, and *skips unsafe or unavailable streams* instead of requiring compatibility mods on the mod portal page.
+The mod is built around **graceful compatibility**: it discovers recipes, science packs, labs, and optional prototypes from the active mod set, validates the candidate research, generates technologies late in **`data-final-fixes.lua`**, and *skips unsafe or unavailable streams* instead of requiring compatibility mods on the mod portal page.
 
 ## Quick Summary
 
 - **Recipe productivity:** adds infinite research for intermediate, logistics, combat, infrastructure, science-pack, and Space Age production chains.
 - **Fluid-output productivity:** adds process-family recipe productivity for oil processing, oil cracking, lubricant, sulfuric acid, acid neutralization, and Space Age thruster propellant fluids where those recipes exist.
 - **Direct-effect bonuses:** adds infinite research for cargo logistics, weapon speed, character bonuses, combined character inventory/trash slots, and worker robot battery.
-- **Fluid prototype tuning:** includes an opt-in startup-only pipeline extent multiplier dropdown, default `100%`/unchanged.
+- **Fluid and prototype tuning:** includes opt-in startup-only pipeline extent, recipe productivity, energy-use, pollution, speed, and quality limit controls.
+- **Settings profiles:** exports full MIR startup profiles by default, with optional compact export that omits unchanged defaults.
 - **Vanilla continuations:** extends selected finite vanilla technology chains into infinite continuations.
 - **Science-pack discovery:** reads active lab inputs, not the old `tool` prototype type.
 - **Lab validation:** checks generated research ingredients against real labs so technologies stay researchable.
+- **MIR compiler architecture:** keeps active generation under `prototypes/mir/`, with declarative stream data in `prototypes/streams/`.
+- **Compiler diagnostics:** indexes typed prototype facts, compiler decisions, lab matrices, loop risks, rule surfaces, and cap estimates for audits.
 - **Factorio 2.1 recipes:** supports recipe `categories` as well as legacy single `category`.
 - **Optional DLC:** keeps official DLC mods optional and gates DLC-shaped research behind concrete prototype checks.
 - **Scripted Space Age scaling:** bounded event-driven spoilage preservation and agricultural growth speed are disabled-by-default experimental candidates; default enablement or measured behavior claims require the named manual save matrix.
 - **Clean mod portal metadata:** keeps third-party compatibility-mod dependencies out of `info.json`.
-- **Save compatibility:** preserves existing generated prototype IDs. Scripted runtime storage is namespaced and must be validated before the scripted features are enabled by default or described with measured runtime behavior.
+- **Save compatibility:** preserves existing generated prototype IDs across the MIR `3.0.0` architecture move. Scripted runtime storage is namespaced and must be validated before the scripted features are enabled by default or described with measured runtime behavior.
 
 Recipe productivity researches are infinite, but **Factorio's recipe productivity cap still applies**.
 *Additional levels can eventually have no practical effect after a recipe reaches its cap.*
+
+## New Design
+
+**MIR 3** is the compatibility compiler architecture release. It keeps the player-facing generated technology IDs stable while moving active implementation under the MIR compiler namespace, replacing old compatibility helper paths with bounded discovery, policy, report, and emission layers.
+
+It is the release that makes the generation architecture durable:
+
+- active shipped implementation lives under `prototypes/mir/`;
+- required Factorio root lifecycle files remain thin wrappers;
+- `prototypes/streams/` stays as declarative stream data;
+- generated IDs are manifest-backed and stable;
+- compatibility behavior is described through narrow claim records and policy overlays;
+- only emission/platform code creates or mutates generated technologies;
+- diagnostic rows explain skipped, rejected, observed, and emitted behavior;
+- package hygiene excludes docs, fixtures, scripts, tests, task ledgers, build outputs, and distribution outputs from the release zip.
 
 ## Installation
 
 Install the mod through the **Factorio mod portal** or place the **release zip** in your Factorio mods directory.
 
-Packaged release archives are named:
+Packaged release archives are in `dist/` named:
 
 ```text
-dist/more-infinite-research_<version>.zip
+more-infinite-research_<version>.zip
 ```
 
 ## Branch Policy
 
 The repository has **three permanent branches** on `origin`:
 
-- **`main`**: latest stable release line for **Factorio `2.1.x`**.
-- **`dev`**: experimental and development branch for the **Factorio `2.1.x` main line**.
-- **`legacy`**: backport branch for **Factorio `2.0.x`** players.
+- **`main`**: latest stable release line for **Factorio `2.1`**.
+- **`dev`**: experimental and development branch for the **Factorio `2.1` main line**.
+- **`legacy`**: backport branch for **Factorio `2.0`** players.
 
 Normal development should target **`dev`** first. Release-ready hotfixes can target **`main`**.
 Backports that must remain compatible with Factorio `2.0.x` belong on **`legacy`**.
@@ -66,20 +83,22 @@ Legacy releases are snapshot ports of tested current-line releases with unsuppor
 
 See **`CONTRIBUTING.md`** for pull request expectations, branch routing, and validation commands.
 
-## How Generation Works
+## How it Works
 
 More Infinite Research mutates and generates prototypes in **`data-final-fixes.lua`**:
 
 1. **Startup-only prototype extensions** such as the opt-in pipeline extent multiplier.
-2. **Known competing recipe-productivity preparation** for removable third-party owners that MIR can fully replace.
-3. **Generated stream technology creation.**
-4. **Known competing recipe-productivity cleanup** after generated MIR effects prove the replacement.
-5. **Known competing base-extension cleanup** when MIR's matching base extension is enabled.
-6. **Base technology infinite extensions.**
-7. **Optional weapon shooting speed overlap adjustment.**
-8. **Max-level enforcement.**
-9. **Generated-technology effect safety validation.**
-10. **Optional diagnostics report flush.**
+2. **Exact-version compatibility schema repairs** for known upstream loader-schema breaks such as ATAN `2.1` recipe fields.
+3. **Known competing recipe-productivity preparation** for removable third-party owners that MIR can fully replace.
+4. **Generated stream technology creation.**
+5. **Known competing recipe-productivity cleanup** after generated MIR effects prove the replacement.
+6. **Known competing base-extension cleanup** when MIR's matching base extension is enabled.
+7. **Base technology infinite extensions.**
+8. **Optional weapon shooting speed overlap adjustment.**
+9. **Max-level enforcement.**
+10. **Compiler diagnostics and compatibility planner reporting.**
+11. **Generated-technology effect safety validation.**
+12. **Optional diagnostics report flush.**
 
 This gives the mod a **late view** of recipes, items, labs, science packs, ammo categories, and technologies created by other mods.
 
@@ -129,7 +148,7 @@ If no valid subset exists, MIR skips the generated technology and logs the reaso
 Two startup settings control late-game progression and global science-pack pressure:
 
 - **`ips-require-space-gate`** is **disabled by default**. When enabled, generated technologies require the end-game science unlock as a prerequisite, but their science-pack ingredients are not changed.
-- **`mir-science-pack-ingredient-policy`** is **`configured` by default**. It can instead add space science, add both space and promethium science, add every official base and Space Age science pack, or add every active lab science pack including compatible modded science packs.
+- **Science packs for generated technologies** (`mir-science-pack-ingredient-policy`) is **`configured` by default**. It can instead add fixed late-game packs, infer missing official or modded progression packs from the selected science packs, add every official base and Space Age science pack, or add every active lab science pack including compatible modded science packs. Options are ordered from conservative to broad.
 
 For the end-game science gate, MIR uses **promethium science** in Space Age when available.
 Otherwise it uses **space science** when available.
@@ -181,6 +200,8 @@ These streams generate `change-recipe-productivity` effects for matching recipes
 | `research_oil_cracking_productivity` | Oil cracking productivity | `heavy-oil-cracking`, `light-oil-cracking` | `+10%` | Separate from oil processing because cracking recipes are single conversion steps. Uses the oil processing unlock technology art. Adds agricultural science when available. |
 | `research_lubricant_productivity` | Lubricant productivity | Recipes outputting `lubricant`, including Space Age `biolubricant` when present | `+10%` | Requires the `lubricant` fluid and excludes barrel-emptying recipes. Adds electromagnetic science when available. |
 | `research_sulfuric_acid_productivity` | Sulfuric acid productivity | Recipes outputting `sulfuric-acid`, plus Space Age `acid-neutralisation` and compatible `acid-neutralization` recipes when present | `+10%` | Requires the `sulfuric-acid` fluid, uses sulfuric acid fluid art, and excludes barrel-emptying recipes. Adds metallurgic science when available. |
+| `research_air_scrubbing_clean_filter` | Air Scrubbing clean-filter productivity | Exact `atan-pollution-filter` and `atan-spore-filter` recipes | `+5%` | Uses unlock-derived science and prerequisites. Scrubbing, cleaning, recovery, recycling, and environmental-removal recipes are not targeted. |
+| `research_ash_separation` | Ash separation productivity | Exact `atan-ash-seperation` recipe | `+5%` | Uses unlock-derived science and prerequisites. Landfill, stone brick, nutrient, foundation, tile, and recovery-style ash sink recipes are not targeted. |
 | `research_tungsten` | Tungsten productivity | `tungsten-plate`, `tungsten-carbide` | `+10%` | Adds metallurgic science when available. |
 | `research_lithium` | Lithium productivity | `lithium-plate`; lithium from brine | `+10%`; `+5%` | Adds cryogenic science when available. |
 | `research_holmium` | Holmium productivity | `holmium-plate` | `+10%` | Generates when matching visible recipes exist; adds electromagnetic science when available. |
@@ -208,15 +229,15 @@ These streams generate `change-recipe-productivity` effects for matching recipes
 | `research_rockets` | Rocket productivity | rocket; explosive rocket; atomic bomb; plutonium bomb patterns | `+10%`; `+5%`; `+2%`; `+1%` | Adds agricultural and military science when available. |
 | `research_armor_components` | Armor component productivity | armor/armour plating and plate patterns | `+5%`; `+2%` | Adds military, metallurgic, and space science when available. |
 | `research_modules` | Module productivity | tier 1 modules; tier 2 modules; tier 3 modules, including quality modules when present | `+10%`; `+5%`; `+2%` | Adds cryogenic science when available. |
-| `research_belts` | Transport belt productivity | yellow, red, blue, turbo, and hyper belt/underground/splitter families | `+10%`; `+5%`; `+2%`; `+1%`; `+0.5%` | Adds space science when available. |
+| `research_belts` | Transport belt productivity | yellow, red, blue, turbo, and hyper belt/underground/splitter/loader families, including AAI-style loader recipe IDs when visible | `+10%`; `+5%`; `+2%`; `+1%`; `+0.5%` | Adds space science when available. Loader recipes are treated as logistics crafting productivity, not loader behavior or operating-mode changes. |
 | `research_inserters` | Inserter productivity | basic/burner; fast/long-handed; bulk; stack inserters | `+10%`; `+5%`; `+2%`; `+1%` | Adds space science when available. |
-| `research_science_pack_productivity` | Science pack productivity | vanilla and Space Age science packs, plus active modded lab inputs | `+10%` | Recipe productivity for producing science packs. Uses dynamic lab-input targets. Uses vanilla `research-productivity` art when present and the white space-science technology art as the base-game fallback. Research unit time default is `120` seconds. |
+| `research_science_pack_productivity` | Science pack productivity | vanilla and Space Age science packs, plus active modded lab inputs such as ATAN-style Nuclear Science packs | `+10%` | Recipe productivity for producing science packs. Uses dynamic lab-input targets and unlock-derived prerequisites for modded science-pack recipes. Uses vanilla `research-productivity` art when present and the white space-science technology art as the base-game fallback. Research unit time default is `120` seconds. |
 
 ### Direct-Effect And Scripted Streams
 
 These streams generate infinite technologies with direct Factorio technology modifiers or visible scripted-effect placeholders. Scripted effects are handled in `control.lua` and remain event-driven.
 
-The scripted streams remain disabled by default in `v2.1.0`. Basic opt-in smoke tests can document their experimental behavior, but default enablement or stronger runtime claims require manual save validation for existing-stack behavior, reversal, disabling, multi-force behavior, and the agricultural tower event path. Graduation belongs in a later release after player testing.
+The scripted streams remain disabled by default in `v3.0.0`. Basic opt-in smoke tests can document their experimental behavior, but default enablement or stronger runtime claims require manual save validation for existing-stack behavior, reversal, disabling, multi-force behavior, and the agricultural tower event path. Graduation belongs in a later release after player testing.
 
 | Stream key | Research | Effect | Default | Gates and notes |
 | --- | --- | --- | --- | --- |
@@ -260,7 +281,7 @@ Recommended default:
 
 - Leave technology enable checkboxes as shipped.
 - Stable generated research lines are enabled.
-- Experimental/scripted candidates stay disabled by default in `v2.1.0`.
+- Experimental/scripted candidates stay disabled by default in `v3.0.0`.
 - Diagnostics stay disabled unless you are troubleshooting a report.
 
 Conservative setup:
@@ -275,13 +296,13 @@ Megabase setup:
 
 - Keep most generated streams enabled.
 - Keep max level at `0` for infinite progression.
-- Consider `Extra science packs for generated technologies` values `space`, `space-and-promethium`, or `all-official` if you want higher-end science sinks.
-- Use `What to do when no lab can research a technology` value `reduce` for broad modpack compatibility.
+- Consider **Science packs for generated technologies** values `space-age-progression`, `official-progression`, `mod-progression`, or `all-official` if you want higher-end science sinks without forcing every active modded pack into every technology.
+- Use **Lab compatibility for generated technologies** value `reduce` for broad modpack compatibility.
 
 Modpack compatibility setup:
 
-- Start with `Extra science packs for generated technologies` value `configured`.
-- Use `What to do when no lab can research a technology` value `reduce`.
+- Start with **Science packs for generated technologies** value `configured`.
+- Use **Lab compatibility for generated technologies** value `reduce`.
 - Enable `Log generated and skipped technologies` only while troubleshooting.
 - Enable `Log recipes matched by productivity technologies` only when reporting missing or duplicate productivity chains.
 
@@ -317,14 +338,14 @@ Vanilla continuations:
 | Setting | Type | Default | Description |
 | --- | --- | --- | --- |
 | `ips-require-space-gate` | bool | `false` | Adds the end-game science unlock as a prerequisite without changing science-pack ingredients. Uses promethium science in Space Age when available, otherwise space science. |
-| `mir-science-pack-ingredient-policy` | string | `configured` | Controls extra science packs added to every generated technology. Allowed values: `configured`, `space`, `space-and-promethium`, `all-official`, `all`. |
+| `mir-science-pack-ingredient-policy` | string | `configured` | Chooses how MIR adds science packs to generated technologies. Options are ordered from conservative to broad: `configured`, `space`, `space-and-promethium`, `space-age-progression`, `official-progression`, `mod-progression`, `all-official`, `all`. |
 | `mir-prefer-this-mod-for-competing-techs` | bool | `true` | Lets MIR remove selected competing infinite technologies when MIR has generated or will generate matching replacement behavior. Disable to keep competing technologies from other mods. |
 | `mir-adjust-vanilla-weapon-speed-techs` | string | `off` | Controls whether MIR removes rocket and cannon-shell speed bonuses from MIR's generated weapon shooting speed continuation. Finite vanilla weapon shooting speed technologies keep their original tank cannon and rocket bonuses. Allowed values: `off`, `only-when-dedicated-tech-enabled`, `always`. |
 | `mir-pipeline-extent-multiplier` | string/dropdown | `100%` | Strictly opt-in startup-only multiplier for recognized fluid box pipeline extent fields across prototypes, not only pipe entities. At `100%`, MIR does not load the pipeline pass, scan fluid boxes, or change prototypes. Allowed values: `50%`, `75%`, `100%`, `125%`, `150%`, `200%`, `250%`, `300%`, `400%`, `500%`. Non-`100%` values are experimental and can affect machines, tanks, thrusters, and modded prototypes that define fluid boxes. |
 | `mir-debug-generation-report` | bool | `false` | Writes structured generated/skipped rows to the Factorio log, including science packs, prerequisites, effect counts, lab compatibility, and icon source. |
 | `mir-debug-recipe-matches` | bool | `false` | Writes matched recipe names for each generated productivity stream. Useful for mod compatibility reports, but noisy in large mod packs. |
 | `mir-debug-scripted-effects` | bool | `false` | Writes runtime log entries when scripted technologies recompute global or event-driven effects. |
-| `mir-lab-incompatibility-policy` | string | `reduce` | Controls incompatible science-pack selections. `reduce` uses the largest lab-compatible subset; `skip` skips the technology. |
+| `mir-lab-incompatibility-policy` | string | `reduce` | Chooses what MIR does when the selected science packs cannot be researched by any active lab. `reduce` uses the largest researchable subset; `skip` skips the technology. |
 
 ### Per-Stream Settings
 
@@ -397,7 +418,11 @@ These are handled when their **prototypes are visible**:
 | Fluid Quality Imprinting (`fluid-quality-imprinting`) | Covered plate and intermediate outputs are picked up when the recipes output standard items. |
 | Plates n Circuit Productivity (`plates-n-circuit-productivity`) | Selected competing infinite productivity technologies are prepared before MIR generation and removed only after MIR has generated matching replacement recipe effects with the same productivity value and no other blocking owner. |
 | Castra and PlanetLib-style science packs | Custom science packs can be discovered as lab inputs and receive science-pack productivity when their recipes are visible. |
-| Omega Drill style drill mods | Recipes outputting `omega-drill`, `omega-tau`, or broader modded `*-mining-drill` / `*-drill` items are covered by mining drill productivity. |
+| Air Scrubbing (`atan-air-scrubbing`) | Exact clean-filter crafting recipes are covered by Air Scrubbing clean-filter productivity; scrubbing, cleaning, recovery, and environmental-removal recipes are deliberately excluded. |
+| ATAN Ash (`atan-ash`) | Exact ash separation is covered by ash separation productivity; landfill, brick, nutrient, foundation, tile, and recovery-style ash sink recipes are deliberately excluded. MIR also applies an exact `atan-ash_2.2.1` Factorio `2.1` loader-schema repair when that version is loaded with MIR. |
+| AAI Loaders style loader mods | Recipes outputting AAI-style or tier-named loader items are covered by transport belt productivity when their recipes are visible. |
+| Big Mining Drill and Omega Drill style drill mods | Recipes outputting `big-mining-drill`, `omega-drill`, `omega-tau`, or broader modded `*-mining-drill` / `*-drill` items are covered by mining drill productivity. |
+| ATAN Nuclear Science style science-pack mods | Lab-input science-pack items with visible recipes are covered by science-pack productivity; non-science buildings such as atom-forge recipes are not included in the science-pack stream. MIR also applies an exact `atan-nuclear-science_0.3.3` Factorio `2.1` loader-schema repair when that version is loaded with MIR. |
 
 Generic competing recipe-productivity cleanup is intentionally limited to **known infinite technologies** whose recipe-productivity effects are all covered by enabled MIR streams and then by generated MIR effects. **Finite upgrade chains** from other mods are not removed by the generic cleanup path.
 
@@ -418,37 +443,46 @@ Generic competing recipe-productivity cleanup is intentionally limited to **know
 
 | File | Purpose |
 | --- | --- |
-| `control.lua` | Loads the scripted technology manager for bounded runtime effects. |
-| `control/scripted-techs.lua` | Registers scripted technology lifecycle and event handlers. |
-| `control/effects/spoilage-preservation.lua` | Applies and restores the global spoilage preservation multiplier. |
-| `control/effects/agricultural-growth-speed.lua` | Adjusts newly planted agricultural tower crops from researched growth speed. |
+| `control.lua` | Thin runtime wrapper for bounded scripted effects; not part of prototype generation. |
+| `prototypes/mir/runtime/scripted_techs.lua` | Registers scripted technology lifecycle and event handlers. |
+| `prototypes/mir/runtime/settings_profile.lua` | Exports current effective MIR startup settings, validates pasted profile strings, and exposes a small remote interface. |
+| `prototypes/mir/runtime/effects/spoilage_preservation.lua` | Applies and restores the global spoilage preservation multiplier. |
+| `prototypes/mir/runtime/effects/agricultural_growth_speed.lua` | Adjusts newly planted agricultural tower crops from researched growth speed. |
 | `migrations/more-infinite-research_2.0.5.json` | Maps the removed generated trash-slot technology ID into the combined inventory/trash technology ID. |
 | `migrations/more-infinite-research_2.1.0.json` | Maps the retired generated stone-product productivity technology ID into the new landfill productivity technology ID. |
-| `data.lua` | Loads stable shared config and utility facades only. |
-| `data-updates.lua` | Reserved for future pre-final compatibility hooks. |
-| `data-final-fixes.lua` | Runs startup-only prototype extensions, generation, cleanup, extensions, adjustments, max-level control, and diagnostics. |
-| `defaults.lua` | Shared stream defaults, per-stream overrides, and base-extension defaults. |
-| `settings.lua` | Startup settings generated from streams and base-extension defaults. |
-| `prototypes/pipeline-extent-settings.lua` | Owns pipeline extent dropdown values and parsing. |
-| `prototypes/pipeline-extent.lua` | Applies the opt-in startup-only pipeline extent multiplier to fluid boxes. |
-| `prototypes/config.lua` | Assembles shared config and stream table. |
-| `prototypes/tech-gen.lua` | Generates stream technologies. |
-| `prototypes/base-tech-extensions.lua` | Extends finite vanilla technology chains. |
-| `prototypes/technology-effect-safety.lua` | Blocks unsafe native effect types from MIR-generated technologies. |
-| `prototypes/weapon-speed-adjustments.lua` | Optionally removes rocket/cannon-shell overlap from MIR's generated weapon speed continuation while preserving finite vanilla bonuses. |
-| `prototypes/max-level-control.lua` | Applies stream max levels after generation. |
-| `prototypes/diagnostics.lua` | Structured generation report logging. |
+| `data.lua` | Thin data-stage wrapper into `prototypes/mir/stage/data.lua`. |
+| `data-updates.lua` | Thin data-updates wrapper into `prototypes/mir/stage/data_updates.lua`; reserved for future pre-final compatibility hooks. |
+| `data-final-fixes.lua` | Thin final-fixes wrapper into `prototypes/mir/stage/data_final_fixes.lua`. |
+| `prototypes/mir/settings/catalog.lua` | Canonical setting IDs, defaults, allowed values, bounds, and profile-validation metadata. |
+| `prototypes/mir/settings/defaults.lua` | Shared stream defaults, per-stream overrides, and base-extension defaults. |
+| `settings.lua` | Thin settings-stage wrapper into `prototypes/mir/stage/settings.lua`; startup settings are generated by `prototypes/mir/settings/stage_builder.lua`. |
+| `prototypes/mir/settings/pipeline_extent.lua` | Owns pipeline extent dropdown values and parsing. |
+| `prototypes/mir/pipeline/extent.lua` | Applies the opt-in startup-only pipeline extent multiplier to fluid boxes. |
+| `prototypes/mir/streams/registry.lua` | Assembles shared stream config and compatibility profile overlays. |
+| `prototypes/mir/planner/stream_compiler.lua` | Owns the generated stream loop. |
+| `prototypes/mir/emit/base_extensions.lua` | Extends finite vanilla technology chains. |
+| `prototypes/mir/emit/effect_safety.lua` | Blocks unsafe native effect types from MIR-generated technologies. |
+| `prototypes/mir/emit/mod_data.lua` | Emits MIR mod-data prototypes used by runtime state reconciliation. |
+| `prototypes/mir/policy/weapon_speed.lua` | Optionally removes rocket/cannon-shell overlap from MIR's generated weapon speed continuation while preserving finite vanilla bonuses. |
+| `prototypes/mir/policy/max_level.lua` | Applies stream max levels after generation. |
+| `prototypes/mir/report/diagnostics_sink.lua` | Structured generation report logging. |
 | `prototypes/streams/productivity.lua` | Recipe-productivity stream definitions. |
 | `prototypes/streams/direct-effects.lua` | Direct-effect stream definitions. |
-| `prototypes/lib/prototype-lookup.lua` | Shared prototype lookup helpers for items, fluids, technologies, ammo categories, mods, and labs. |
-| `prototypes/lib/science-packs.lua` | Lab input discovery, science-pack ordering, lab validation, prerequisite lookup. |
-| `prototypes/lib/recipe-matching.lua` | Item/fluid recipe output matching, pattern matching, category filters, hidden/recycling skips. |
-| `prototypes/lib/technology-icons.lua` | Technology, item, fluid, and explicit icon resolution plus constant overlay construction. |
-| `prototypes/lib/table-utils.lua` | Small shared table helpers such as deterministic sorted keys. |
-| `prototypes/lib/technology-cleanup.lua` | Removes technologies and cleans prerequisite references from remaining technologies. |
-| `prototypes/compat/profiles.lua` | Mod-specific stream patch scaffolding. |
-| `prototypes/compat/competing-productivity.lua` | Known competing recipe-productivity cleanup. |
-| `prototypes/compat/competing-base-extensions.lua` | Known competing base-extension cleanup. |
+| `prototypes/mir/platform/factorio/prototype_lookup.lua` | Shared prototype lookup helpers for items, fluids, technologies, ammo categories, mods, and labs. |
+| `prototypes/mir/capabilities/science_integration/science_packs.lua` | Lab input discovery, science-pack ordering, lab validation, and prerequisite lookup. |
+| `prototypes/mir/capabilities/recipe_productivity/recipe_matching.lua` | Item/fluid recipe output matching, pattern matching, category filters, hidden/recycling skips. |
+| `prototypes/mir/emit/icon_builder.lua` | Technology, item, fluid, and explicit icon resolution plus constant overlay construction. |
+| `prototypes/mir/core/table.lua` | Small shared table helpers such as deterministic sorted keys. |
+| `prototypes/mir/policy/technology_cleanup.lua` | Removes technologies and cleans prerequisite references from remaining technologies. |
+| `prototypes/mir/compatibility/profiles.lua` | Mod-specific stream patch scaffolding. |
+| `prototypes/mir/policy/competing_productivity.lua` | Known competing recipe-productivity cleanup. |
+| `prototypes/mir/policy/competing_base_extensions.lua` | Known competing base-extension cleanup. |
+
+The shipped MIR 3 layout intentionally has no `prototypes/compat/`,
+`prototypes/lib/`, `prototypes/mir/legacy/`, root `defaults.lua`, or broad
+root helper shims such as `prototypes/util.lua`, `prototypes/config.lua`,
+`prototypes/diagnostics.lua`, or `prototypes/tech-gen.lua`. Factorio root
+entrypoints remain as required one-line lifecycle wrappers.
 
 ### Stream Schema
 
@@ -483,7 +517,7 @@ Productivity and direct-effect streams are Lua tables keyed by stream ID. Common
 
 ### Compatibility Profiles
 
-`prototypes/compat/profiles.lua` supports append-style fields so future mod profiles can extend base stream definitions without replacing arrays:
+`prototypes/mir/compatibility/profiles.lua` supports append-style fields so future mod profiles can extend base stream definitions without replacing arrays:
 
 - `append_items`
 - `append_item_patterns`
@@ -502,7 +536,20 @@ Enable `mir-debug-generation-report` to log rows like:
 [more-infinite-research] report kind=stream key=research_science_pack_productivity status=generated reason=recipe_productivity science=... prerequisites=... effects=13 lab_status=reduced icon=tech:space-science-pack
 ```
 
-Use diagnostics when reporting compatibility issues. It tells whether a stream generated, skipped, reduced science packs, or found no matching recipes. For direct-effect technologies, the report also includes non-blocking `native_modifier_overlap` rows when another infinite non-MIR technology already has the same native modifier target.
+Use diagnostics when reporting compatibility issues. It tells whether a stream generated, skipped, reduced science packs, or found no matching recipes. For direct-effect technologies, the report also includes non-blocking `native_modifier_overlap` rows when another infinite non-MIR technology already has the same native modifier target. Compatibility audits also capture planner rows, recipe-cap rows, typed fact summaries, compiler decisions, lab matrices, loop risks, and rule-surface observations in `compat-observations.*`.
+
+MIR 3 compatibility claims are intentionally narrow. A target page can claim
+that a named recipe family is supported, that a mod has been observed, or that
+MIR deliberately avoids a conflict. It should not be read as full overhaul
+support unless a compatibility page and claim record explicitly say so.
+
+Known 3.0.0 publication notes:
+
+- portal-backed full-catalog checks were not run in this environment because
+  `FACTORIO_TOKEN` was not set;
+- local supported-zip isolation still finds `atan-ash_2.2.1` and `atan-nuclear-science_0.3.3` failing without MIR on the tested Factorio `2.1` setup, but MIR `3.0.0` applies exact-version loader-schema repairs when those zips are loaded with MIR;
+- MIR's ATAN claims remain the narrow ash separation and nuclear-science-pack
+  recipe productivity behavior documented under `docs/compatibility/targets/`.
 
 Enable `mir-debug-recipe-matches` to log matched recipe rows like:
 
@@ -536,13 +583,14 @@ When either diagnostics setting is enabled, MIR also reports duplicate recipe ma
 
 ```powershell
 .\scripts\mir.ps1 release gate
+.\scripts\mir.ps1 release docs-only
 .\scripts\mir.ps1 overnight local
 .\scripts\mir.ps1 audit local
 .\scripts\mir.ps1 report latest
 .\scripts\mir.ps1 local-index build --mods C:\Projects\Factorio\testmods_2.1
 ```
 
-`mir.ps1` is the normal human front door. It delegates to the existing scripts, loads JSON run profiles from `fixtures/run-profiles/`, and accepts common overrides such as `--factorio`, `--factorio-line`, `--mods`, `--output`, `--timeout`, and `--link-mode`. Use `docs/dev-tools.md` for the command map and script roles.
+`mir.ps1` is the normal human front door. It delegates to the existing scripts, loads JSON run profiles from `fixtures/run-profiles/`, and accepts common overrides such as `--factorio`, `--factorio-line`, `--mods`, `--output`, `--timeout`, and `--link-mode`. Use `docs/maintainer/developer-tools.md` for the command map and script roles.
 
 **Release gate with local smoke scenarios:**
 
@@ -558,6 +606,14 @@ This is the short release command. It runs:
 - package rebuild, whitespace check, and clean-git-status check.
 
 Defaults live in `fixtures/run-profiles/release-targeted.json`. Use `--profile`, `--factorio-line`, `--factorio`, `--mods`, `--output`, or `--timeout` for a different local setup. Use the overnight local sweep separately for broad compatibility evidence.
+
+**Docs-only release refresh after a clean full gate:**
+
+```powershell
+.\scripts\mir.ps1 release docs-only
+```
+
+Use this only after the same release candidate has already passed the full gate and the remaining edits are documentation, release-note, changelog, or package-refresh changes. It rebuilds the package, runs static/package validation, checks whitespace, and fails if code, prototype, script, fixture, locale, or other non-doc files changed.
 
 Stable direct script equivalent:
 
@@ -583,7 +639,7 @@ Use read-only local mod libraries for large offline sweeps:
 .\scripts\mir.ps1 overnight local
 ```
 
-`mir.ps1 overnight local` uses a line-specific run profile and delegates to `Start-MIROvernightLocalSweep.ps1`. The default profile targets Factorio `2.1`; use `--factorio-line 2.0` or `--profile overnight-local-2.0` for a legacy-line sweep after selecting a real Factorio `2.0.x` binary and a matching local zip library. The bedtime script verifies the configured local library, disables AC sleep/hibernate for the current machine, runs the strict `Static,Runtime,AuditSmoke` gate first, then runs the prioritized local sweep with a transcript at `artifacts/overnight-local-<line>-*/overnight.log`. Each run also writes `run-manifest.json`, `events.jsonl`, `artifact-index.json`, and `index.html`. Use `--mods <path>` when your downloaded zip library is elsewhere. In the morning, run `.\scripts\mir.ps1 report latest` or `.\scripts\Show-MIROvernightSummary.ps1 -OutputRoot <overnight-output-dir>` to print the log tail, artifact paths, release/local summaries, grouped failures, missing dependencies, and profile-candidate counts.
+`mir.ps1 overnight local` uses a line-specific run profile and delegates to `Start-MIROvernightLocalSweep.ps1`. The default profile targets Factorio `2.1`; use `--factorio-line 2.0` or `--profile overnight-local-2.0` for a legacy-line sweep after selecting a real Factorio `2.0.x` binary and a matching local zip library. The bedtime script verifies the configured local library, disables AC sleep/hibernate for the current machine, runs the strict `Static,Runtime,AuditSmoke` gate first, then runs the prioritized local sweep with a transcript at `artifacts/overnight-local-<line>-*/overnight.log`. Each run also writes `run-manifest.json`, `events.jsonl`, `artifact-index.json`, and `index.html`. Use `--mods <path>` when your downloaded zip library is elsewhere. In the morning, run `.\scripts\mir.ps1 report latest` or `.\scripts\Show-MIROvernightSummary.ps1 -OutputRoot <overnight-output-dir>` to print the log tail, artifact paths, release/local summaries, grouped failures, missing dependencies, profile-candidate counts, and compatibility observation counts.
 
 Run local-library tiers in priority order: `LocalLibraryScenarios` covers curated high-value combinations, `GeneratedLocalScenarios` creates generated mega and metadata-cluster stress cases, and `LocalModZips` tests each local root zip as an individual scenario. Add `-IncludeGeneratedLocalPairwise -GeneratedLocalPairwiseLimit 40` when you want capped pairwise cluster coverage. Add `-ShardLocalModZips -StartIndex N -ShardSize M` to resume local-root sweeps in chunks.
 
@@ -591,7 +647,7 @@ Run local-library tiers in priority order: `LocalLibraryScenarios` covers curate
 
 Use `-CollectAll` for overnight exploration so one failing modset does not stop the run. Use `-FailFast -FailOnAuditFailures` for strict CI-style gates; that mode fails when grouped unexpected audit failures remain after the converter runs.
 
-Load-test tiers print per-scenario start/result lines with scenario index, type, root mods, dependency-failure count, pass/skip/timeout status, exit code, parsed audit-row count, and elapsed seconds. `load-results.json` is checkpointed after every scenario so partial results remain readable if a long run is interrupted. Extended-wrapper runs write their own manifest, event log, artifact index, and static HTML report under the selected output root. Pipe all streams through `Tee-Object` when you want a live VS Code terminal view and a durable overnight log. The grouped converter also writes `missing-dependencies.md`, `missing-dependencies.json`, and `missing-dependencies.csv` for local-library completion work.
+Load-test tiers print per-scenario start/result lines with scenario index, type, root mods, dependency-failure count, pass/skip/timeout status, exit code, parsed audit-row count, and elapsed seconds. `load-results.json` is checkpointed after every scenario so partial results remain readable if a long run is interrupted. Extended-wrapper runs write their own manifest, event log, artifact index, and static HTML report under the selected output root. Pipe all streams through `Tee-Object` when you want a live VS Code terminal view and a durable overnight log. The grouped converter also writes `missing-dependencies.md`, `missing-dependencies.json`, and `missing-dependencies.csv` for local-library completion work, plus `compat-observations.md/json/csv` for diagnostics that are useful but not failures.
 
 The audit runner writes an explicit isolated `mod-list.json`: official built-ins are disabled unless required by the scenario. If a scenario requests `space-age`, the runner enables `space-age` plus the official companion mods that actually exist beside the selected Factorio binary. Blank lines in Factorio logs are ignored by the MIR audit parser, so partial overnight runs remain convertible even when third-party logs contain empty lines.
 
@@ -607,7 +663,7 @@ The validation script checks:
 - **PowerShell tooling:** scripts parse, duplicate parameters are rejected, generated output paths stay ignored, and obvious secret output is blocked.
 - **Changelog:** `changelog.txt` uses Factorio's 99-dash format with one-line bullets capped at 132 characters.
 - **Generated package:** validation builds an ignored archive from the current source tree and checks its root, metadata, load-critical files, and forbidden artifacts.
-- **Package parity:** the generated archive's source directories, documentation, locale, migrations, and root mod files match the repository copy while allowing docs and helper modules to be rearranged inside their packaged trees.
+- **Package parity:** the generated archive's runtime source directories, locale, migrations, and root mod files match the repository copy. Developer docs, fixtures, scripts, and task ledgers are not shipped in the release zip.
 - **Compatibility automation:** the Mod Portal audit runner, manual scenario execution, sharding/resume, scenario timeout, dependency-failure skipping, grouped failure converter, expected-failure fixture, profile-stub generator, and self-hosted extended workflow stay wired.
 - **Whitespace:** `git diff --check` passes.
 - **Runtime load:** fixture loading reaches save creation when a Factorio binary is supplied.
@@ -622,18 +678,31 @@ The validation script checks:
 ## Documentation Map
 
 - **`todo.md`:** root executable future-work ledger. Keep the durable task list, release gates, future plans, recurring checklist, companion backlog, and rejected/deferred work here so the plan survives even if derivative docs are reorganized.
-- **`docs/architecture.md`:** data-stage flow, utility modules, stream config, compatibility profiles, diagnostics, and validation.
-- **`docs/api-proof-points.md`:** API claims, proof status, and open in-game verification questions.
-- **`docs/compatibility.md`:** compatibility model, known integrations, manual test matrix, fixture designs, and release checklist.
-- **`docs/dev-tools.md`:** preferred developer commands, run profiles, script roles, and PowerShell tooling checks.
-- **`docs/roadmap.md`:** high-level release narrative, scope rationale, why decisions, and pointers back to `todo.md`, `changelog.txt`, and supporting notes.
-- **`docs/test-results.md`:** local release validation evidence.
-- **`docs/notes/manual-test-plan.md`:** named manual saves/scenarios for release validation.
-- **`docs/notes/mod-portal-page.md`:** mod-portal-ready public description, technology catalog, settings summary, compatibility notes, and troubleshooting text.
-- **`docs/notes/release-plan-2.1.0.md`:** detailed release-gated implementation plan for the Factorio `2.1` feature wave. Summarize durable future tasks back into `todo.md`.
-- **`docs/notes/post-2.0-feature-plan.md`:** post-v2.0.0 feature triage, MIR scope boundaries, Reddit feedback, and staged implementation archive. Summarize durable future tasks back into `todo.md`.
-- **`docs/notes/release-notes-2.1.0.md`:** simplified player-facing `2.1.0` release-note summary derived from the detailed changelog.
-- **`docs/notes/archive/`:** historical release notes and pre-manual reports. `changelog.txt` remains the authoritative past-change ledger.
+- **`docs/architecture/README.md`:** data-stage flow, utility modules, stream config, compatibility profiles, diagnostics, and validation.
+- **`docs/architecture/compatibility-compiler-charter.md`:** 3.0 architecture charter, compiler pipeline, invariants, release ladder, non-goals, and acceptance gates.
+- **`docs/architecture/module-boundaries.md`:** 3.0 Factorio shell, `prototypes/mir` compiler namespace, layer rules, no-shim shipped layout, package boundary, and architecture lint targets.
+- **`docs/capabilities/README.md`:** capability resolver lanes, productivity/native-modifier split, confidence model, and settings posture.
+- **`docs/compatibility/policy-overlays.md`:** declarative compatibility-policy model, overlay fields, modes, and lint rules.
+- **`docs/reference/schemas/decision-record.md`:** planned `DecisionRecord` and `StreamSpec` schemas for explainable generation.
+- **`docs/reference/schemas/stream-manifest.md`:** generated technology ID manifest and migration rules.
+- **`docs/compatibility/claim-levels.md`:** claim levels, claim manifest shape, public wording rules, and claim linting.
+- **`docs/maintainer/testing.md`:** 3.0 fixture, negative-test, report-diff, and release-gate strategy.
+- **`docs/maintainer/README.md`:** workflow for adding capabilities, policies, fixtures, and bug-report proof cases.
+- **`docs/adr/`:** architecture decision records for the 3.0 compatibility compiler.
+- **`docs/reference/factorio-api-proof-points.md`:** API claims, proof status, and open in-game verification questions.
+- **`docs/compatibility/README.md`:** compatibility model, known integrations, manual test matrix, fixture designs, and release checklist.
+- **`docs/maintainer/developer-tools.md`:** preferred developer commands, run profiles, script roles, and PowerShell tooling checks.
+- **`docs/releases/3.0.0-plan.md`:** high-level release narrative, scope rationale, why decisions, and pointers back to `todo.md`, `changelog.txt`, and supporting notes.
+- **`docs/releases/3.0.0-release-checklist.md`:** final release gate checklist, package-boundary policy, and current artifact pointers.
+- **`docs/releases/3.0.0-release-notes.md`:** public 3.0.0 release notes and known non-blockers.
+- **`docs/releases/3.0.0-validation-summary.md`:** concise local validation summary, package hash, and row/hash comparison.
+- **`docs/releases/2.2.0-validation-record.md`:** local release validation evidence.
+- **`docs/maintainer/manual-test-plan.md`:** named manual saves/scenarios for release validation.
+- **`docs/releases/mod-portal-page.md`:** mod-portal-ready public description, technology catalog, settings summary, compatibility notes, and troubleshooting text.
+- **`docs/archive/2.x/release-plan-2.1.0.md`:** detailed release-gated implementation plan for the Factorio `2.1` feature wave. Summarize durable future tasks back into `todo.md`.
+- **`docs/archive/2.x/post-2.0-feature-plan.md`:** post-v2.0.0 feature triage, MIR scope boundaries, Reddit feedback, and staged implementation archive. Summarize durable future tasks back into `todo.md`.
+- **`docs/archive/2.x/release-notes-2.1.0.md`:** simplified player-facing `2.1.0` release-note summary derived from the detailed changelog.
+- **`docs/archive/2.x/`:** historical release notes and pre-manual reports. `changelog.txt` remains the authoritative past-change ledger.
 - **`CONTRIBUTING.md`:** branch policy, pull request expectations, validation commands, and mod portal changelog rules.
 - **`changelog.txt`:** release history and user-facing changes.
 
@@ -662,7 +731,11 @@ If a generated technology is unresearchable:
 
 ## Save Compatibility
 
+No generated prototype IDs were renamed for **`v3.0.0`**. The MIR namespace move preserves existing generated IDs and does not require a new migration.
+
 No generated prototype IDs were renamed for **`v2.0.0`**.
-`v2.0.5` includes a JSON migration from `recipe-prod-research_character_trash_slots-1` to `recipe-prod-research_inventory_capacity-1` so old trash-slot progress moves into the combined inventory/trash research.
-`v2.1.0` includes a JSON migration from `recipe-prod-research_stone_products-1` to `recipe-prod-research_landfill-1` so old stone-product progress moves to the closest successor after landfill, artificial soil, and molten metals become separate research lines.
-**No migration is required** from `v1.2.9` (latest for Factorio 2.0).
+**No migration is required** from `v1.2.9`.
+
+`v2.0.5` includes a JSON migration from `recipe-prod-research_character_trash_slots-1` to `recipe-prod-research_inventory_capacity-1` so old trash-slot progress moves into the *combined inventory/trash research*.
+
+`v2.1.0` includes a JSON migration from `recipe-prod-research_stone_products-1` to `recipe-prod-research_landfill-1` so old stone-product progress moves to the closest successor after landfill, artificial soil, and molten metals become *separate research lines*.

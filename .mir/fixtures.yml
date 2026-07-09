@@ -1,0 +1,82 @@
+schema: 1
+
+fixture_roots:
+  synthetic: fixtures
+  compatibility_matrix: fixtures/compat-matrix
+  run_profiles: fixtures/run-profiles
+
+fixtures:
+  settings-visibility:
+    assertion_path: fixtures/assert-hidden-setting-readability
+    validates:
+      - hidden-setting-readability
+      - stable-setting-ids
+
+  prototype-limits:
+    assertion_path: fixtures/assert-prototype-limits
+    validates:
+      - prototype-limit-startup-overrides
+      - recipe-maximum-productivity-cap
+      - effect-receiver-limits
+      - separate-energy-and-pollution-limits
+      - positive-power-floor-opt-in
+
+  settings-profile-roundtrip:
+    assertion_path: fixtures/assert-settings-profile-roundtrip
+    validates:
+      - settings-profile-deterministic-encoding
+      - settings-profile-compact-export
+      - settings-profile-strict-import-validation
+      - hidden-provider-setting-profile-roundtrip
+
+  air-scrubbing:
+    path: fixtures/air-scrubbing
+    assertion_path: fixtures/assert-air-scrubbing-clean-filter
+    claim: atan-air-scrubbing
+    validates:
+      - generated-streams
+      - loop-risk-rejections
+      - lab-compatibility
+      - package-hygiene
+
+  atan-ash:
+    path: fixtures/atan-ash
+    assertion_path: fixtures/assert-atan-ash-separation
+    claim: atan-ash
+    validates:
+      - generated-streams
+      - excluded-ash-sinks
+      - loop-risk-rejections
+
+  atan-nuclear-science:
+    path: fixtures/atan-nuclear-science
+    assertion_path: fixtures/assert-atan-nuclear-science-productivity
+    claim: atan-nuclear-science
+    validates:
+      - science-pack-integration
+      - lab-compatibility
+
+  aai-loaders:
+    path: fixtures/aai-loaders
+    assertion_path: fixtures/assert-aai-loader-belt-productivity
+    claim: aai-loaders
+    validates:
+      - loader-entity-indexing
+      - loader-recipe-candidates
+      - belt-stream-coverage
+
+  big-mining-drill:
+    path: fixtures/big-mining-drill
+    assertion_path: fixtures/assert-big-mining-drill-productivity
+    claim: big-mining-drill
+    validates:
+      - mining-drill-entity-indexing
+      - mining-drill-recipe-candidates
+      - native-mining-owner-observation
+
+  omega-drill:
+    path: fixtures/omega-drill
+    assertion_path: fixtures/assert-omega-drill-productivity
+    validates:
+      - mining-drill-recipe-candidates
+      - effect-count

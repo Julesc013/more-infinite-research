@@ -11,6 +11,7 @@ param(
   [string]$PullRemote = "origin",
   [string]$PullBranch = "",
   [string]$OutputRoot = "",
+  [string]$PackageOutputDir = "",
   [int]$ScenarioTimeoutSeconds = 900,
   [switch]$SkipBuild,
   [switch]$SkipRepairSmokes,
@@ -151,6 +152,7 @@ function Write-MIRReleaseGateSummary {
     generated_at = (Get-Date).ToString("yyyy-MM-ddTHH:mm:ssK")
     repo = $repo.Path
     output_root = $script:resolvedOutputRoot
+    package_output_dir = $script:packageOutputDir
     factorio_bin = $script:resolvedFactorioBin
     local_mod_dir = $script:resolvedLocalModDir
     repair_smoke_mod_names = @($RepairSmokeModNames)
@@ -177,6 +179,7 @@ function Write-MIRReleaseGateSummary {
   $md += ('- Generated: {0}' -f (Get-Date -Format 'yyyy-MM-dd HH:mm:ss zzz'))
   $md += ('- Repo: `{0}`' -f $repo.Path)
   $md += ('- Output root: `{0}`' -f $script:resolvedOutputRoot)
+  $md += ('- Package output dir: `{0}`' -f $script:packageOutputDir)
 $md += ('- Factorio: `{0}`' -f $script:resolvedFactorioBin)
 $md += ('- Factorio line: `{0}`' -f $FactorioLine)
 $md += ('- Local mod dir: `{0}`' -f $script:resolvedLocalModDir)
@@ -221,6 +224,10 @@ $md += ('- Local mod dir: `{0}`' -f $script:resolvedLocalModDir)
 $script:releaseGateResults = @()
 $script:resolvedFactorioBin = Resolve-MIRReleaseGateFactorioBinary -Path $FactorioBin
 $script:resolvedLocalModDir = ""
+$script:packageOutputDir = $PackageOutputDir
+if ([string]::IsNullOrWhiteSpace($script:packageOutputDir)) {
+  $script:packageOutputDir = "dist"
+}
 $script:resolvedManualScenariosPath = Resolve-MIRReleaseGatePath -Path $ManualScenariosPath
 if (-not (Test-Path -LiteralPath $script:resolvedManualScenariosPath)) {
   throw "Manual scenarios file does not exist: $script:resolvedManualScenariosPath"
@@ -339,7 +346,7 @@ try {
 
   if (-not $SkipBuild) {
     Invoke-MIRReleaseGateStep -Name "package-build" -Action {
-      & (Join-Path $repo "scripts\Build-MIRPackage.ps1")
+      & (Join-Path $repo "scripts\Build-MIRPackage.ps1") -OutputDir $script:packageOutputDir
       & git -C $repo diff --check
     }
   }
@@ -361,5 +368,5 @@ try {
 }
 
 Write-Host "[release] targeted release checks passed: $script:resolvedOutputRoot"
-$publishCandidate = Join-Path "dist" ("{0}_{1}.zip" -f $modName, $modVersion)
-Write-Host "[release] publish candidate: $publishCandidate"
+$packageCandidate = Join-Path $script:packageOutputDir ("{0}_{1}.zip" -f $modName, $modVersion)
+Write-Host "[release] package candidate: $packageCandidate"
