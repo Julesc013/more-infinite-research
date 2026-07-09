@@ -17,13 +17,20 @@ function Show-MIRHelp {
 MIR developer CLI
 
 Usage:
+  .\scripts\mir.ps1 docs check
+  .\scripts\mir.ps1 architecture check
+  .\scripts\mir.ps1 manifests check
   .\scripts\mir.ps1 release gate [--profile <name>] [--no-git-pull]
+  .\scripts\mir.ps1 release docs-only
+  .\scripts\mir.ps1 release docs-refresh
   .\scripts\mir.ps1 overnight local [--profile <name>]
   .\scripts\mir.ps1 audit local [--profile <name>]
   .\scripts\mir.ps1 audit top25 --space-age
   .\scripts\mir.ps1 package build
   .\scripts\mir.ps1 report latest
   .\scripts\mir.ps1 report missing-deps --run <path>
+  .\scripts\mir.ps1 report observations --run <path>
+  .\scripts\mir.ps1 legacy inventory [--output <path>] [--check]
   .\scripts\mir.ps1 profile stub <group-id> --grouped-failures <path>
   .\scripts\mir.ps1 run -Profile <profile-name-or-path>
   .\scripts\mir.ps1 local-index build --mods <path>
@@ -268,6 +275,76 @@ function Invoke-MIRRunProfile {
   }
 }
 
+function Get-MIRGitStatusPaths {
+  $lines = @(& git -C $repo status --porcelain)
+  if ($LASTEXITCODE -ne 0) { throw "git status failed." }
+
+  $paths = @()
+  foreach ($line in $lines) {
+    if ([string]::IsNullOrWhiteSpace($line) -or $line.Length -lt 4) { continue }
+    $pathText = $line.Substring(3)
+    if ($pathText -match " -> ") {
+      $paths += @($pathText -split " -> ")
+    } else {
+      $paths += $pathText
+    }
+  }
+
+  return @($paths | ForEach-Object { ([string]$_).Replace("\", "/") } | Sort-Object -Unique)
+}
+
+function Test-MIRDocsOnlyReleasePath {
+  param([Parameter(Mandatory)][string]$Path)
+
+  $normalized = $Path.Replace("\", "/")
+  return (
+    $normalized -match "^docs/" -or
+    $normalized -match "^dist/[^/]+\.zip$" -or
+    $normalized -in @(
+      "README.md",
+      "changelog.txt",
+      "CONTRIBUTING.md",
+      "LICENSE",
+      "todo.md"
+    )
+  )
+}
+
+function Assert-MIRDocsOnlyReleaseStatus {
+  param([Parameter(Mandatory)][string]$Stage)
+
+  $paths = @(Get-MIRGitStatusPaths)
+  $bad = @($paths | Where-Object { -not (Test-MIRDocsOnlyReleasePath -Path $_) })
+  if ($bad.Count -gt 0) {
+    throw "Docs-only release check found non-doc/package changes during ${Stage}: $($bad -join ', '). Run the full release gate instead."
+  }
+
+  if ($paths.Count -eq 0) {
+    Write-MIRInfo "$Stage git status: clean"
+  } else {
+    Write-MIRInfo "$Stage allowed changes: $($paths -join ', ')"
+  }
+}
+
+function Invoke-MIRDocsOnlyReleaseCheck {
+  Assert-MIRDocsOnlyReleaseStatus -Stage "before docs-only validation"
+
+  Write-MIRStep "building release package"
+  & (Join-Path $scriptRoot "Build-MIRPackage.ps1")
+  if ($LASTEXITCODE -ne 0) { throw "Build-MIRPackage.ps1 failed." }
+
+  Write-MIRStep "running static/package validation"
+  & (Join-Path $scriptRoot "Invoke-MIRValidation.ps1") -StaticOnly
+  if ($LASTEXITCODE -ne 0) { throw "Invoke-MIRValidation.ps1 -StaticOnly failed." }
+
+  Write-MIRStep "checking whitespace"
+  & git -C $repo diff --check
+  if ($LASTEXITCODE -ne 0) { throw "git diff --check failed." }
+
+  Assert-MIRDocsOnlyReleaseStatus -Stage "after docs-only validation"
+  Write-MIRSuccess "docs-only release validation passed"
+}
+
 if ($Args.Count -eq 0 -or $Args[0] -eq "help" -or $Args -contains "-h" -or $Args -contains "--help") {
   Show-MIRHelp
   exit 0
@@ -277,10 +354,32 @@ $area = $Args[0]
 $verb = if ($Args.Count -gt 1) { $Args[1] } else { "" }
 
 switch ($area) {
+  "docs" {
+    if ($verb -ne "check") { throw "Unknown docs command: $verb" }
+    & (Join-Path $scriptRoot "Invoke-MIRValidation.ps1") -DocsOnly
+  }
+  "architecture" {
+    if ($verb -ne "check") { throw "Unknown architecture command: $verb" }
+    & (Join-Path $scriptRoot "Invoke-MIRValidation.ps1") -ArchitectureOnly
+  }
+  "manifests" {
+    if ($verb -ne "check") { throw "Unknown manifests command: $verb" }
+    & (Join-Path $scriptRoot "Invoke-MIRValidation.ps1") -ManifestsOnly
+  }
   "release" {
-    if ($verb -ne "gate") { throw "Unknown release command: $verb" }
-    $profile = Get-MIRCommandProfile -Items $Args -Default "release-targeted"
-    Invoke-MIRRunProfile -Profile $profile -Overrides (New-MIRProfileOverrides -Items $Args)
+    switch ($verb) {
+      "gate" {
+        $profile = Get-MIRCommandProfile -Items $Args -Default "release-targeted"
+        Invoke-MIRRunProfile -Profile $profile -Overrides (New-MIRProfileOverrides -Items $Args)
+      }
+      "docs-only" {
+        Invoke-MIRDocsOnlyReleaseCheck
+      }
+      "docs-refresh" {
+        Invoke-MIRDocsOnlyReleaseCheck
+      }
+      default { throw "Unknown release command: $verb" }
+    }
   }
   "overnight" {
     if ($verb -ne "local") { throw "Unknown overnight command: $verb" }
@@ -319,8 +418,26 @@ switch ($area) {
           Select-Object @{Name='mod';Expression={$_.Name}},Count |
           Format-Table -AutoSize
       }
+      "observations" {
+        $run = Get-MIRArgValue -Items $Args -Name "--run" -Default (Get-MIRLatestRunRoot)
+        Get-ChildItem -LiteralPath $run -Recurse -Filter compat-observations.csv -File |
+          ForEach-Object { Import-Csv -LiteralPath $_.FullName } |
+          Group-Object kind |
+          Sort-Object Count -Descending |
+          Select-Object @{Name='kind';Expression={$_.Name}},Count |
+          Format-Table -AutoSize
+      }
       default { throw "Unknown report command: $verb" }
     }
+  }
+  "legacy" {
+    if ($verb -ne "inventory") { throw "Unknown legacy command: $verb" }
+    $output = Get-MIRArgValue -Items $Args -Name "--output" -Default (Join-Path $repo "artifacts\legacy-inventory")
+    $params = @{ OutputRoot = $output }
+    if (Test-MIRArgSwitch -Items $Args -Name "--check") {
+      $params.CheckThresholds = $true
+    }
+    & (Join-Path $scriptRoot "Get-MIRLegacyInventory.ps1") @params
   }
   "profile" {
     if ($verb -ne "stub") { throw "Unknown profile command: $verb" }

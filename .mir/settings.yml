@@ -1,0 +1,243 @@
+schema: 1
+
+rules:
+  hidden_means_unavailable_not_deleted: true
+  do_not_force_hidden_values_by_default: true
+  setting_ids_are_stable: true
+  data_stage_must_validate_targets: true
+  visibility_must_not_use_data_raw: true
+  profile_import_is_effective_override_not_runtime_mutation: true
+  settings_profiles_exclude_import_setting: true
+  runtime_export_writes_script_output_only: true
+  import_requires_restart: true
+  technology_settings_sort_by_visibility_then_player_name: true
+  official_and_mir_owned_technology_settings_stay_visible: true
+  technology_settings_use_three_attention_buckets: true
+  canonical_settings_catalog_required: true
+  profile_import_validates_catalog_constraints: true
+  settings_profiles_support_compact_export: true
+  settings_profile_encoding_is_deterministic: true
+  prototype_limit_settings_default_to_engine_default: true
+  prototype_limit_settings_are_startup_only_explicit_overrides: true
+  energy_and_pollution_caps_are_separate: true
+  positive_power_floor_is_default_off_opt_in: true
+  positive_power_floor_is_compatibility_section_setting: true
+  global_settings_use_visible_section_prefixes: true
+  rich_text_section_prefixes_are_optional_enhancement: true
+  fake_divider_settings_are_disallowed: true
+
+profiles:
+  schema: 1
+  kind: mir-settings-profile
+  string_prefix: MIRSET1
+  import_setting: mir-settings-profile-import
+  exported_by_command: /mir-settings-export
+  validate_command: /mir-settings-import-check
+  compact_export_command: /mir-settings-export --compact
+  file_output: script-output/more-infinite-research/settings/
+  applied_stage: data-stage effective setting reads
+  codec: canonical-json-deflate-base64
+  deterministic_encoding: true
+  exported_setting_prefixes:
+    - ips-
+    - mir-
+  excluded_setting_ids:
+    - mir-settings-profile-import
+  unknown_settings: preserved in profile string but ignored on unsupported branches
+  invalid_values: ignored rather than coerced
+  validation_source: prototypes/mir/settings/catalog.lua
+
+ordering:
+  global_prefix: a
+  technology_prefix: b
+  global_sections:
+    - range: a-0
+      label: Main
+      meaning: main behavior settings
+    - range: a-1
+      label: Compatibility
+      meaning: compatibility behavior and prototype compatibility passes
+    - range: a-2
+      label: Limits
+      meaning: explicit global prototype cap overrides
+    - range: a-7
+      label: Advanced
+      meaning: profile import and future advanced controls
+    - range: a-8
+      label: Diagnostics
+      meaning: log and audit controls
+  technology_buckets:
+    - rank: "000"
+      meaning: disabled-by-default or experimental technology groups, sorted alphabetically
+    - rank: "050"
+      meaning: enabled unusual, special, or vanilla-continuation groups, sorted alphabetically
+    - rank: "100"
+      meaning: ordinary enabled technology groups, sorted alphabetically
+
+groups:
+  stream:
+    generated_settings:
+      - enable
+      - base_cost
+      - growth
+      - max_level
+      - research_time
+    name_patterns:
+      enable: ips-enable-%s
+      base_cost: ips-cost-base-%s
+      growth: ips-cost-growth-%s
+      max_level: ips-max-level-%s
+      research_time: ips-research-time-%s
+
+streams:
+  research_air_scrubbing_clean_filter:
+    manifest: mir-prod-air-scrubbing-clean-filter
+    ui_visibility:
+      mode: visible-if-mods-any
+      mods_any:
+        - atan-air-scrubbing
+    hidden_when_unavailable: true
+    forced_when_hidden: null
+    backport:
+      keep_setting_ids: true
+
+  research_ash_separation:
+    manifest: mir-prod-atan-ash-separation
+    ui_visibility:
+      mode: visible-if-mods-any
+      mods_any:
+        - atan-ash
+    hidden_when_unavailable: true
+    forced_when_hidden: null
+    backport:
+      keep_setting_ids: true
+
+  research_thruster_fuel_productivity:
+    ui_visibility: &official_visible
+      mode: always
+      reason: official and MIR-owned technology settings stay visible across base and Space Age; generation still validates active prototypes
+    hidden_when_unavailable: false
+    forced_when_hidden: null
+
+  research_thruster_oxidizer_productivity:
+    ui_visibility: *official_visible
+    hidden_when_unavailable: false
+    forced_when_hidden: null
+
+  research_tungsten:
+    ui_visibility: *official_visible
+    hidden_when_unavailable: false
+    forced_when_hidden: null
+
+  research_lithium:
+    ui_visibility: *official_visible
+    hidden_when_unavailable: false
+    forced_when_hidden: null
+
+  research_holmium:
+    ui_visibility: *official_visible
+    hidden_when_unavailable: false
+    forced_when_hidden: null
+
+  research_supercapacitor:
+    ui_visibility: *official_visible
+    hidden_when_unavailable: false
+    forced_when_hidden: null
+
+  research_superconductor:
+    ui_visibility: *official_visible
+    hidden_when_unavailable: false
+    forced_when_hidden: null
+
+  research_quantum_processor:
+    ui_visibility: *official_visible
+    hidden_when_unavailable: false
+    forced_when_hidden: null
+
+  research_carbon:
+    ui_visibility: *official_visible
+    hidden_when_unavailable: false
+    forced_when_hidden: null
+
+  research_carbon_fiber:
+    ui_visibility: *official_visible
+    hidden_when_unavailable: false
+    forced_when_hidden: null
+
+  research_ice:
+    ui_visibility: *official_visible
+    hidden_when_unavailable: false
+    forced_when_hidden: null
+
+  research_bioflux:
+    ui_visibility: *official_visible
+    hidden_when_unavailable: false
+    forced_when_hidden: null
+
+  research_bacteria_cultivation:
+    ui_visibility: *official_visible
+    hidden_when_unavailable: false
+    forced_when_hidden: null
+
+  research_breeding:
+    ui_visibility: *official_visible
+    default_enabled: true
+    settings_priority: top
+    hidden_when_unavailable: false
+    forced_when_hidden: null
+
+  research_artificial_soil:
+    ui_visibility: *official_visible
+    hidden_when_unavailable: false
+    forced_when_hidden: null
+
+  research_molten_metals:
+    ui_visibility: *official_visible
+    hidden_when_unavailable: false
+    forced_when_hidden: null
+
+  research_spoilage_preservation:
+    ui_visibility: *official_visible
+    hidden_when_unavailable: false
+    forced_when_hidden: null
+
+  research_agricultural_growth_speed:
+    ui_visibility: *official_visible
+    default_enabled: true
+    settings_priority: top
+    hidden_when_unavailable: false
+    forced_when_hidden: null
+
+  research_cargo_bay_unloading_distance:
+    ui_visibility: *official_visible
+    default_enabled: true
+    settings_priority: top
+    hidden_when_unavailable: false
+    forced_when_hidden: null
+
+  research_cargo_landing_pad_count:
+    ui_visibility: *official_visible
+    default_enabled: true
+    settings_priority: top
+    hidden_when_unavailable: false
+    forced_when_hidden: null
+
+  research_character_reach:
+    default_enabled: true
+    settings_priority: top
+
+  research_belts:
+    ui_visibility:
+      mode: always
+    reason: base-game belt targets exist; loader recipes are opportunistic additions
+
+base_extensions:
+  inserter-capacity-bonus:
+    default_enabled: false
+    settings_priority: top
+    disabled_reason: balance-sensitive; can change circuit-controlled inserter behavior and engine optimization assumptions
+
+backports:
+  keep_released_setting_ids: true
+  hide_unsupported_settings_instead_of_removing: true
+  accept_unsupported_string_values_and_map_in_data_stage: true
