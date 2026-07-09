@@ -71,6 +71,15 @@ backport_rules:
 
 release_artifacts:
   published_archives_are_immutable: true
+  source_anchors:
+    mir_3_0_0:
+      version: "3.0.0"
+      branch: main
+      target_factorio: "2.1"
+      commit: 8da631a6e5774af6d8804a49107a61a7964a5b2c
+      artifact: dist/more-infinite-research_3.0.0.zip
+      sha256: E9A644468217D6B8B07F30E92179BE7BB2DFE951A14F211C1E924A5A505ECCDC
+      status: validated-main-pushed
   closed_versions:
     - version: "2.2.0"
       branch: main
@@ -84,9 +93,10 @@ release_artifacts:
       status: published
   next_release_targets:
     current_line:
-      version: "3.0.0"
+      version: "3.0.5"
       branch: dev
       target_factorio: "2.1"
+      purpose: patch durable fixes, checks, and tooling learned during target-line ports
     factorio_2_0_backport:
       version: "2.3.0"
       branch: legacy
@@ -95,6 +105,11 @@ release_artifacts:
       version: "1.9.3"
       branch: tmp/1.1
       target_factorio: "1.1"
+    current_line_feature:
+      version: "3.1.0"
+      branch: dev
+      target_factorio: "2.1"
+      purpose: fixture-backed overhaul compatibility support campaign after the 3.0.5 patch
   package_refresh_rule: >-
     only build or refresh dist archives for an unpublished target version;
     never refresh already-published archives as part of architecture or
