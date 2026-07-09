@@ -1,0 +1,58 @@
+schema: 1
+
+capabilities:
+  recipe-productivity:
+    current_path: prototypes/streams/productivity.lua
+    target_path: prototypes/mir/capabilities/recipe_productivity
+    doc: docs/capabilities/recipe-productivity.md
+    emits:
+      - change-recipe-productivity
+    default_mode: safe
+    requires:
+      - stream-manifest
+      - owner-policy
+      - science-lab-validation
+      - loop-risk-validation
+
+  loader-manufacturing:
+    current_path: prototypes/mir/capabilities/registry.lua
+    target_path: prototypes/mir/capabilities/logistics_manufacturing/loaders.lua
+    doc: docs/capabilities/loader-manufacturing.md
+    emits:
+      - change-recipe-productivity
+    default_mode: safe
+    required_fixtures:
+      - aai-loaders
+
+  mining-drill-manufacturing:
+    current_path: prototypes/mir/capabilities/registry.lua
+    target_path: prototypes/mir/capabilities/machine_manufacturing/mining_drills.lua
+    doc: docs/capabilities/mining-drill-manufacturing.md
+    emits:
+      - change-recipe-productivity
+    default_mode: safe
+    required_fixtures:
+      - big-mining-drill
+      - omega-drill
+
+  native-modifier-ownership:
+    current_path: prototypes/mir/capabilities/registry.lua
+    target_path: prototypes/mir/capabilities/native_modifiers
+    doc: docs/capabilities/native-modifiers.md
+    emits: []
+    default_mode: observe
+    owner_policy_required: true
+
+  lab-compatibility:
+    current_path: prototypes/mir/capabilities/science_integration/science_packs.lua
+    target_path: prototypes/mir/capabilities/science_integration/lab_matrix.lua
+    doc: docs/capabilities/lab-compatibility.md
+    emits: []
+    default_mode: hard-gate
+
+  rule-surfaces:
+    current_path: prototypes/mir/planner/compiler.lua
+    target_path: prototypes/mir/capabilities/rule_surfaces
+    doc: docs/capabilities/rule-surfaces.md
+    emits: []
+    default_mode: diagnostic-only

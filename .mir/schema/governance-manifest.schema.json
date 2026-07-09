@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "MIR governance manifest",
+  "type": "object",
+  "required": ["schema"],
+  "properties": {
+    "schema": {
+      "const": 1
+    }
+  }
+}
