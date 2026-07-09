@@ -6,6 +6,7 @@ function New-MIRHtmlReport {
 
   $summaryFiles = @(Get-ChildItem -LiteralPath $OutputRoot -Recurse -Filter "*summary.md" -File -ErrorAction SilentlyContinue)
   $failureFiles = @(Get-ChildItem -LiteralPath $OutputRoot -Recurse -Filter "compat-failures.grouped.json" -File -ErrorAction SilentlyContinue)
+  $observationFiles = @(Get-ChildItem -LiteralPath $OutputRoot -Recurse -Filter "compat-observations.md" -File -ErrorAction SilentlyContinue)
   $missingFiles = @(Get-ChildItem -LiteralPath $OutputRoot -Recurse -Filter "missing-dependencies.csv" -File -ErrorAction SilentlyContinue)
 
   $html = @()
@@ -18,6 +19,8 @@ function New-MIRHtmlReport {
   foreach ($file in $summaryFiles) { $html += "<li><code>$($file.FullName)</code></li>" }
   $html += "</ul><h2>Grouped Failure Files</h2><ul>"
   foreach ($file in $failureFiles) { $html += "<li><code>$($file.FullName)</code></li>" }
+  $html += "</ul><h2>Compatibility Observation Files</h2><ul>"
+  foreach ($file in $observationFiles) { $html += "<li><code>$($file.FullName)</code></li>" }
   $html += "</ul><h2>Missing Dependency Files</h2><ul>"
   foreach ($file in $missingFiles) { $html += "<li><code>$($file.FullName)</code></li>" }
   $html += "</ul></body></html>"
