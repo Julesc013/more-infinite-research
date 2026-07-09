@@ -49,8 +49,9 @@ fields on normal native technology modifiers. Those fields loaded, but the old
 UI ignored them for the native modifier rows that matter here.
 
 Generated direct-effect technologies use target-era base technology art only.
-The lab productivity stream prefers stock `mining-productivity-*` technology
-art for its main tile so it reads as productivity rather than research speed.
+The Research productivity stream prefers stock `military-science-pack`
+technology art for its main tile, matching the `1.1` fallback when no Space
+Age research productivity technology is available.
 Character reach, walking speed, crafting speed, mining speed, inventory,
 robot battery, and weapon speed streams keep their target-era main technology
 textures and localized names/descriptions. The `0.18` bridge does not emit
@@ -72,8 +73,8 @@ synthetic badge overlays or native modifier icon metadata for these effects.
 
 - Release candidate package:
   `dist/more-infinite-research_1.8.0.zip`, SHA-256
-  `13BA374C5008CD737A5ABC88B34A94FA56800F243E82178DCBCA57264BDE08D7`,
-  `300615` bytes, `121` entries, `0` forbidden release entries.
+  `D785E6EBE7A72E6E9F01A3F89774A6AA30479430410447F603FEF1E0B9BD7B24`,
+  `300620` bytes, `121` entries, `0` forbidden release entries.
 - Static validation passed for the `1.8.0` metadata and package shape.
 - The public dist archive and the runtime-validated validation archive contain
   the same `121` file entries with identical per-entry content hashes.
