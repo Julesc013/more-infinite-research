@@ -222,6 +222,47 @@ local function resolve_base_icons_for_stream(stream)
   return nil, source or "fallback"
 end
 
+local function has_effect_icon_override(stream)
+  stream = stream or {}
+  return stream.effect_icons ~= nil
+    or stream.effect_icon ~= nil
+    or stream.effect_icon_candidates ~= nil
+    or stream.effect_icon_tech ~= nil
+    or stream.effect_icon_item ~= nil
+    or stream.effect_icon_fluid ~= nil
+end
+
+local function resolve_effect_icons_for_stream(stream)
+  stream = stream or {}
+
+  if stream.effect_icons then
+    return copy_icons(stream.effect_icons), "custom-effect-icons"
+  elseif stream.effect_icon then
+    return {{
+      icon = stream.effect_icon,
+      icon_size = stream.effect_icon_size or stream.icon_size or 64
+    }}, source_label("icon", stream.effect_icon)
+  end
+
+  local candidates = {}
+  for _, candidate in ipairs(stream.effect_icon_candidates or {}) do
+    table.insert(candidates, candidate)
+  end
+  if stream.effect_icon_tech then
+    table.insert(candidates, {technology = stream.effect_icon_tech})
+  end
+  if stream.effect_icon_item then
+    table.insert(candidates, {item = stream.effect_icon_item})
+  end
+  if stream.effect_icon_fluid then
+    table.insert(candidates, {fluid = stream.effect_icon_fluid})
+  end
+
+  local icons, source = resolve_icon_candidates(candidates)
+  if icons then return copy_icons(icons), source end
+  return nil, source
+end
+
 local function overlay_for_stream(stream)
   if stream.overlay ~= nil then return stream.overlay end
 
@@ -287,7 +328,14 @@ function I.icons_for_stream(stream)
   return add_constant_overlay(base, overlay_for_stream(stream))
 end
 
+function I.has_effect_icon_override(stream)
+  return has_effect_icon_override(stream)
+end
+
 function I.effect_icons_for_stream(stream)
+  local explicit = resolve_effect_icons_for_stream(stream)
+  if explicit and #explicit > 0 then return explicit end
+
   local base = resolve_base_icons_for_stream(stream)
   if base and #base > 0 then return base end
   return {{

@@ -16,7 +16,9 @@ function M.available_for_stream(key, spec)
     elseif effect.type == "gun-speed" and effect.ammo_category and not lookup.ammo_category_exists(effect.ammo_category) then
       log("[more-infinite-research] Skipping unavailable gun-speed effect for "..key..": missing ammo category "..effect.ammo_category)
     else
-      if effect.type == "nothing" and not effect.icon and not effect.icons then
+      local has_explicit_effect_icon = effect.icon or effect.icons
+      local needs_effect_icon = effect.type == "nothing" or icon_builder.has_effect_icon_override(spec)
+      if needs_effect_icon and not has_explicit_effect_icon then
         effect.icons = icon_builder.effect_icons_for_stream(spec)
       end
       table.insert(out, effect)

@@ -52,6 +52,9 @@ The lab productivity stream prefers `research-speed-6`, then
 reuse the same stock technology art selected by the reduced `1.1` port, but
 without badge overlays.
 
+The lab productivity effect row uses target-era mining productivity art so the
+modifier reads as productivity rather than lab speed in Factorio `1.0`.
+
 ## Supported Surface
 
 - Target-supported direct-effect infinite researches: weapon shooting speed,
@@ -68,8 +71,8 @@ without badge overlays.
 
 - Release candidate package:
   `dist/more-infinite-research_1.8.0.zip`, SHA-256
-  `CBAEEB54EE1ECA0AB5854551466D14A49FF464E6B92439A048C3E84338B0E750`,
-  `300209` bytes, `121` entries, `0` forbidden release entries.
+  `5FF92565DC104F173658A53726BDBB81688350C6EAA94401B5B398A2D75A7436`,
+  `300578` bytes, `121` entries, `0` forbidden release entries.
 - Static validation passed for the `1.8.0` metadata and package shape.
 - The public dist archive and the runtime-validated validation archive contain
   the same `121` file entries with identical per-entry content hashes.

@@ -35,6 +35,12 @@ return {
       {technology = "research-speed-5"},
       {technology = "military-science-pack"}
     },
+    effect_icon_candidates = {
+      {technology = "mining-productivity-4"},
+      {technology = "mining-productivity-3"},
+      {technology = "mining-productivity-1"},
+      {icon = "__base__/graphics/technology/mining-productivity.png", icon_size = 128}
+    },
     overlay = "laboratory-productivity",
     localised_description = {"technology-description.more-infinite-research.lab_productivity"},
     science_packs = {
