@@ -44,19 +44,21 @@ direct-effect infinite researches and supported base technology continuations.
 The `0.18` bridge does not package graphics copied from newer Factorio
 versions. Factorio `0.18` and `1.0` do not ship the Factorio `1.1`
 `__core__/graphics/icons/technology/constants/*` technology badge assets, so
-MIR disables technology constant overlays on this target line.
+MIR uses target-era stock technology art for visible tile badges instead of
+referencing or bundling newer core files.
 
 Generated direct-effect technologies use target-era base technology art only.
 The lab productivity stream prefers `research-speed-6`, then
-`research-speed-5`, then `military-science-pack`. Other direct-effect streams
-reuse the same stock technology art selected by the reduced `1.1` port, but
-without badge overlays.
+`research-speed-5`, then `military-science-pack` for its main tile. Its visible
+tile badge resolves from mining productivity technology art. Character range
+badges resolve from artillery range technology art, and character/weapon speed
+badges resolve from speed module technology art. Capacity and battery rows use
+the matching target-era stock technology art.
 
-Generated native modifier effect rows also use target-era stock art where the
-older UI would otherwise show generic effect markers. Lab productivity uses
-mining-productivity art so it reads as productivity rather than lab speed,
-character reach/build/resource/drop distance uses artillery range art, and
-character/weapon speed rows use speed module art.
+Generated native modifier effects still carry explicit icon metadata, but
+Factorio `1.0` does not render those custom fields for every native modifier
+row. The visible technology tile badge is therefore the compatibility path for
+distinguishing productivity, range, and speed research in the old UI.
 
 ## Supported Surface
 
@@ -105,7 +107,7 @@ not by blindly changing the `1.8.0` metadata.
 | Spoilage and agriculture streams | Cut | Factorio `2.x` runtime/prototype surfaces. | Keep cut on `1.0`. |
 | Prototype cap and pipeline extent settings | Cut | Modern prototype limit/pipeline tuning surfaces are not part of the reduced old-line package. | Keep cut unless a `1.0` fixture proves a safe subset. |
 | Settings profiles | Cut from runtime UI | Older target lines do not expose the MIRSET1 runtime profile surface used by modern packages. | Keep cut unless a `1.0` runtime fixture proves a portable profile path. |
-| Technology constant badge overlays | Cut | Factorio `0.18` and `1.0` do not ship the Factorio `1.1` `__core__/graphics/icons/technology/constants/*` assets. | Keep target-era base technology art unless a `1.0`-native badge source is proven. |
+| Technology constant badge overlays | Adapted | Factorio `0.18` and `1.0` do not ship the Factorio `1.1` `__core__/graphics/icons/technology/constants/*` assets. | Use target-era stock technology-art badges for `1.8.1`; do not bundle newer core graphics. |
 | Laser shooting speed continuation | Adapted | Factorio `1.0` uses `laser-turret-speed-*`; MIR keeps the modern setting key but extends the target-era source chain. | Carry this adapter into `1.8.1` if the `1.0` report diff confirms it avoids an accidental loss. |
 
 ## Known Boundaries

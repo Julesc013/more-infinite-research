@@ -2846,7 +2846,7 @@ if ($isReducedLegacyLine) {
   Write-Host "[info] $reducedLineLabel reduced runtime gate skips 2.x recipe-productivity and DLC scenarios."
 
   $directEffectFixtureNames = @()
-  if ($isFactorio11Line) {
+  if ($isFactorio11Line -or $isFactorio018Line) {
     $directEffectFixtureNames += "mir-fixture-assert-legacy-effect-icons"
   }
   Invoke-RuntimeScenario -ScenarioName "factorio-$($repoInfo.factorio_version)-direct-effects" -EnabledFixtureNames $directEffectFixtureNames

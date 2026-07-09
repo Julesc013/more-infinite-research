@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "title": "MIR Fixture - Assert Legacy Effect Icons",
   "author": "Julesc013",
-  "description": "Validation fixture that asserts Factorio 1.1 direct-effect technologies use high-resolution target-era core technology constant badge overlays and no unavailable newer badge icons.",
+  "description": "Validation fixture that asserts old-line direct-effect technologies use visible target-era technology tile badge overlays and no unavailable newer badge icons.",
   "factorio_version": "0.18",
   "dependencies": [
     "base >= 0.18",

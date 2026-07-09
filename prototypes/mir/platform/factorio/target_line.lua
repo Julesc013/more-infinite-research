@@ -1,3 +1,5 @@
+local data_raw = require("prototypes.mir.platform.factorio.data_raw")
+
 local M = {}
 
 M.factorio_version = "0.18"
@@ -44,6 +46,95 @@ local omitted_global_settings = {
   ["mir-use-installed-space-age-icons"] = true
 }
 
+local old_line_overlay_sources = {
+  ["laboratory-productivity"] = {
+    "mining-productivity-4",
+    "mining-productivity-3",
+    "mining-productivity-1"
+  },
+  ["recipe-productivity"] = {
+    "mining-productivity-4",
+    "mining-productivity-3",
+    "mining-productivity-1"
+  },
+  speed = {
+    "speed-module-3",
+    "speed-module-2",
+    "speed-module",
+    "weapon-shooting-speed-6",
+    "weapon-shooting-speed-3"
+  },
+  ["crafting-speed"] = {
+    "speed-module-3",
+    "speed-module-2",
+    "speed-module"
+  },
+  ["movement-speed"] = {
+    "speed-module-3",
+    "speed-module-2",
+    "speed-module"
+  },
+  mining = {
+    "speed-module-3",
+    "speed-module-2",
+    "speed-module"
+  },
+  range = {
+    "artillery-shell-range-1"
+  },
+  battery = {
+    "battery",
+    "battery-equipment",
+    "logistic-robotics"
+  },
+  capacity = {
+    "toolbelt",
+    "inserter-capacity-bonus-7",
+    "inserter-capacity-bonus-1"
+  },
+  damage = {
+    "physical-projectile-damage-7",
+    "physical-projectile-damage-3",
+    "physical-projectile-damage-1"
+  },
+  ["braking-force"] = {
+    "braking-force-7",
+    "braking-force-1"
+  },
+  count = {
+    "inserter-capacity-bonus-7",
+    "inserter-capacity-bonus-1"
+  }
+}
+
+local function layer_from_technology(technology)
+  if not technology then return nil end
+
+  local source = nil
+  if technology.icons and technology.icons[1] then
+    source = technology.icons[1]
+  elseif technology.icon then
+    source = technology
+  end
+  if not source or not source.icon then return nil end
+
+  return {
+    icon = source.icon,
+    icon_size = source.icon_size or technology.icon_size or 128,
+    scale = 0.42,
+    shift = {44, 44},
+    floating = true
+  }
+end
+
+local function resolve_old_line_overlay_layer(overlay)
+  for _, tech_name in ipairs(old_line_overlay_sources[overlay] or {}) do
+    local layer = layer_from_technology(data_raw.technology(tech_name))
+    if layer then return layer end
+  end
+  return false
+end
+
 local function has_unsupported_required_mod(spec)
   for _, mod_name in ipairs((spec and spec.required_mods) or {}) do
     if unsupported_required_mods[mod_name] then return true end
@@ -73,11 +164,11 @@ function M.feature_enabled(name)
   return M.supports[name] == true
 end
 
-function M.technology_overlay_layer()
+function M.technology_overlay_layer(overlay)
   -- Factorio 0.18 and the 1.0 bridge path do not ship the 1.1+ stock
-  -- technology constant badge assets. Keep the generated technologies on
-  -- target-era base technology art instead of bundling newer game files.
-  return false
+  -- technology constant badge assets. Use small target-era technology-art
+  -- badges instead of bundling newer game files.
+  return resolve_old_line_overlay_layer(overlay)
 end
 
 return M
