@@ -5,7 +5,7 @@ applies_to: "2.0"
 audience: maintainer
 doc_type: archive
 owner: mir-maintainers
-last_reviewed: 2026-07-08
+last_reviewed: 2026-07-09
 supersedes: []
 superseded_by: ["../../releases/README.md"]
 ---
@@ -20,17 +20,28 @@ superseded_by: ["../../releases/README.md"]
 - Removed the Factorio `2.1` cargo bay unloading distance and cargo landing pad count research streams from the Factorio `2.0` package.
 - Kept generated technology IDs stable for every stream that remains available on the Factorio `2.0` line.
 - Kept exact ATAN loader-schema repairs for the known supported upstream ATAN Ash and ATAN Nuclear Science packages.
+- Backported the canonical settings catalog, deterministic `MIRSET1` settings profiles, strict profile import checks, and optional compact profile export.
+- Backported signed, high-to-low prototype cap dropdowns for recipe productivity, energy-use, pollution, speed, and quality caps.
+- Split energy-use and pollution cap settings while keeping the explicit `0W` positive power floor as a default-off Compatibility setting.
 - Restored Factorio `2.0` science-pack fixture shape so custom and ATAN-style science packs are represented as `tool` prototypes during the backport checks.
 - Added reviewed expected-failure rules for the Factorio `2.0` local zip sweep so incomplete dependency closures and no-MIR-reproduced upstream load failures stay visible without blocking MIR release gates.
 
 ## Compatibility Checks
 
 - Static checks passed for the `2.3.0` metadata and package shape.
-- Factorio `2.0.77` runtime checks passed across the existing base, Space Age, science-pack, lab-policy, productivity-family, pipeline, ATAN, AAI loader, Big Mining Drill, Omega Drill, weapon-speed, and base-extension scenarios.
+- Factorio `2.0.77` runtime checks passed across base, Space Age, science-pack, lab-policy, productivity-family, pipeline, ATAN, AAI loader, Big Mining Drill, Omega Drill, weapon-speed, and base-extension scenarios.
+- Factorio `2.0.77` runtime checks passed for prototype limit overrides and settings profile round trips.
 - Targeted local zip checks passed for AAI Containers, AAI Industry, AAI Loaders, Big Mining Drill, Equipment Gantry, Fluid Must Flow, Jetpack, and Robot Attrition from `C:\Projects\Factorio\testmods_2.0`.
 - The Factorio `2.0` BZ representative local scenario passed with zero grouped failures.
 - The ATAN Factorio `2.0` isolation matrix passed for ATAN Ash, ATAN Nuclear Science with Space Age, ATAN Air Scrubbing, and the combined ATAN stack with MIR.
 - The full `testmods_2.0` local root sweep covered 314 local roots and reconverted to zero unexpected grouped failures after reviewed external failures were classified.
+
+## Package Evidence
+
+- Archive: `dist/more-infinite-research_2.3.0.zip`
+- Package size: `295968` bytes
+- SHA-256: `1D695899119B4B755411B8F7619E1B0D9F24BC0EC16268D0F818877CE2A0997E`
+- Package hygiene: `119` entries and zero forbidden repository-only paths
 
 ## Known Boundaries
 

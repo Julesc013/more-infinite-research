@@ -80,6 +80,17 @@ release_artifacts:
       artifact: dist/more-infinite-research_3.0.0.zip
       sha256: E9A644468217D6B8B07F30E92179BE7BB2DFE951A14F211C1E924A5A505ECCDC
       status: validated-main-pushed
+    mir_2_3_0:
+      version: "2.3.0"
+      branch: tmp/2.0
+      target_factorio: "2.0"
+      source_anchor: mir_3_0_0
+      artifact: dist/more-infinite-research_2.3.0.zip
+      sha256: 1D695899119B4B755411B8F7619E1B0D9F24BC0EC16268D0F818877CE2A0997E
+      size_bytes: 295968
+      entries: 119
+      forbidden_entries: 0
+      status: validated-tmp-2.0-pending-legacy-promotion
   closed_versions:
     - version: "2.2.0"
       branch: main

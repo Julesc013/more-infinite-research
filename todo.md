@@ -1,6 +1,6 @@
 # M.I.R. TODO
 
-Updated: 2026-07-08
+Updated: 2026-07-09
 
 This is the active task list for MIR 3.0.0 and later. It should contain future
 work, current gates, deferred decisions, recurring release checks, and issue
@@ -11,8 +11,11 @@ Current assumptions:
 
 - `2.2.0` is released as-is.
 - `1.9.2` is released from `legacy` as-is.
-- MIR 3.0.0 is frozen as a publish candidate on `dev`; only release-critical
-  fixes should land before publishing.
+- MIR 3.0.0 is the validated Factorio `2.1` source anchor on `main` and
+  `dev`.
+- MIR 2.3.0 is staged on `tmp/2.0` as the Factorio `2.0` port of that source
+  anchor; promote it to `legacy` only after branch-local package and runtime
+  checks are clean.
 - The shipped MIR 3 structure is Factorio root wrappers, `prototypes/mir/`
   implementation, and declarative `prototypes/streams/` data tables.
 - Old `prototypes/compat/`, `prototypes/lib/`, `prototypes/mir/legacy/`,
@@ -205,6 +208,8 @@ compatibility port of a tested current-line snapshot.
 - [ ] Use `docs/archive/2.x/legacy-backport-cadence.md` as the source of truth for target order, support class, and source snapshot language.
 - [ ] Treat every lower line as a separate target-line port, not a wholesale `3.0.0` backport.
 - [ ] Release `v2.3.0` as the first Factorio `2.0` port of the MIR 3 architecture only after `v3.0.0` is stable and a Factorio `2.0` binary loads the exact built package.
+  Current `tmp/2.0` candidate: `dist/more-infinite-research_2.3.0.zip`,
+  SHA-256 `1D695899119B4B755411B8F7619E1B0D9F24BC0EC16268D0F818877CE2A0997E`.
 - [ ] Release `v1.9.3` as the first Factorio `1.1` compatibility port only after target-line implementation and binary validation.
 - [ ] Release `v1.8.0` as the first Factorio `1.0` compatibility port only after the Factorio `0.18` bridge policy is recorded.
 - [ ] Release `v1.7.0`, `v1.6.0`, and `v1.5.0` as reduced native-infinite editions for Factorio `0.17`, `0.16`, and `0.15` only after target binary proof.

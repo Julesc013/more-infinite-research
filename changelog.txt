@@ -1,6 +1,6 @@
 ---------------------------------------------------------------------------------------------------
 Version: 2.3.0
-Date: 2026-07-08
+Date: 2026-07-09
 
   Compatibility:
 
@@ -14,12 +14,22 @@ Date: 2026-07-08
     - Kept Factorio 2.0 science-pack handling on the older tool prototype model during compatibility checks.
     - Classified reviewed Factorio 2.0 local zip issues that reproduce without MIR as external local-library issues.
 
+  Changes:
+
+    - Backported the canonical settings catalog, deterministic MIRSET1 profiles, strict import checks, and compact export.
+    - Backported prototype cap dropdowns for recipe productivity, energy-use, pollution, speed, and quality caps.
+    - Backported signed high-to-low prototype cap labels, including +300% productivity and -80% savings defaults.
+    - Split energy-use and pollution cap settings because efficiency effects can reduce both.
+    - Added the default-off Compatibility setting for the opt-in positive power floor on explicit 0W active energy use.
+    - Kept Factorio 2.0 cargo logistics exclusions while preserving the shared settings and profile code.
+
   Checks:
 
     - Package metadata and base dependency floors now match the Factorio 2.0 line.
     - The Factorio 2.0 package no longer contains 2.1-only cargo direct-effect modifier strings.
     - Runtime and local mod-library checks target the matching Factorio 2.0 binary and mod library.
     - Factorio 2.0 runtime checks passed across base, Space Age, science-pack, lab, ATAN, AAI, and drill scenarios.
+    - Factorio 2.0 runtime checks passed for prototype limits and settings profile round trips.
     - Targeted local zip checks passed for AAI, Big Mining Drill, Equipment Gantry, Fluid Must Flow, Jetpack, and robots.
     - The local Factorio 2.0 BZ suite passed with zero grouped failures.
     - The full Factorio 2.0 local zip sweep covered 314 roots with zero MIR-owned unexpected failure groups.
