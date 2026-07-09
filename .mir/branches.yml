@@ -47,6 +47,19 @@ branches:
       - 2.0-fixture
       - no-2.1-only-prototype-assumption
 
+  port/1.1-to-0.18:
+    purpose: short-lived Factorio 0.18 bridge/archive package branch seeded from the validated 1.9.3 source point
+    factorio_version: "0.18"
+    accepts:
+      - bridge-proof
+      - target-metadata
+      - binary-validation
+      - release-docs
+    rejects:
+      - long-lived-0.18-maintenance
+      - feature-expansion
+      - target-line-waterfall-inheritance
+
 backport_rules:
   pure_classifier_fix:
     from: dev
@@ -125,14 +138,14 @@ release_artifacts:
       target_factorio: "1.1"
     factorio_0_18_bridge:
       version: "1.8.0"
-      branch: tmp/1.0
+      branch: port/1.1-to-0.18
       target_factorio: "0.18"
-      purpose: bridge proof and release candidate from the MIR 3 source anchor plus portable 2.3.0 and 1.9.3 lessons
+      purpose: one-time bridge/archive package from the validated 1.9.3 source point; must load in both Factorio 0.18 and Factorio 1.0 before publication
     factorio_1_0_port:
       version: "1.8.1"
       branch: tmp/1.0
       target_factorio: "1.0"
-      purpose: true Factorio 1.0 follow-up only if the 0.18 bridge does not cover the public release shape
+      purpose: maintained Factorio 1.0 support line after the 0.18 bridge proof; future 1.0 maintenance stays on 1.8.x
     current_line_feature:
       version: "3.1.0"
       branch: dev
@@ -142,3 +155,24 @@ release_artifacts:
     only build or refresh dist archives for an unpublished target version;
     never refresh already-published archives as part of architecture or
     backport preparation
+
+target_lines:
+  factorio_0_18_bridge:
+    version: "1.8.0"
+    branch: port/1.1-to-0.18
+    target_factorio: "0.18"
+    support_class: bridge-archive
+    source: mir_1_9_3
+    publish_policy: one_time_bridge
+    future_maintenance: frozen_except_severe_package_or_load_defect
+    required_binary_proof:
+      - factorio_0.18
+      - factorio_1.0_same_zip
+  factorio_1_0:
+    version: "1.8.1"
+    branch: tmp/1.0
+    target_factorio: "1.0"
+    support_class: compatibility-port
+    source: mir_1_8_0_or_mir_1_9_3_plus_bridge_lessons
+    publish_policy: maintained
+    future_maintenance: "1.8.x"
