@@ -90,7 +90,7 @@ release_artifacts:
       size_bytes: 296124
       entries: 119
       forbidden_entries: 0
-      status: release-ready
+      status: published
   closed_versions:
     - version: "2.2.0"
       branch: main
@@ -108,10 +108,6 @@ release_artifacts:
       branch: dev
       target_factorio: "2.1"
       purpose: accumulated portable fixes, compatibility lessons, tooling updates, docs corrections, and community feedback after the 3.0.0 backport rings
-    factorio_2_0_backport:
-      version: "2.3.0"
-      branch: legacy
-      target_factorio: "2.0"
     factorio_1_1_port:
       version: "1.9.3"
       branch: tmp/1.1
