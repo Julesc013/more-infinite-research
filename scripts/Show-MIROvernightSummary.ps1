@@ -118,3 +118,30 @@ if ($profileRows.Count -eq 0) {
 } else {
   $profileRows | Sort-Object candidates -Descending | Format-Table -AutoSize | Out-String | Write-Host
 }
+
+$observationRows = @(
+  Get-ChildItem -LiteralPath $resolvedOutputRoot -Recurse -Filter compat-observations.json -File |
+    ForEach-Object {
+      $json = Get-Content -Raw -LiteralPath $_.FullName | ConvertFrom-Json
+      [pscustomobject]@{
+        file = $_.FullName
+        observations = [int]$json.observation_count
+        recipe_cap = @($json.observations | Where-Object { $_.kind -eq "recipe_cap" }).Count
+        roles = @($json.observations | Where-Object { $_.kind -eq "compatibility_role" }).Count
+        decisions = @($json.observations | Where-Object { $_.kind -eq "decision" }).Count
+        capabilities = @($json.observations | Where-Object { -not [string]::IsNullOrWhiteSpace($_.capability) }).Count
+        loop_risks = @($json.observations | Where-Object { $_.kind -eq "loop_risk" }).Count
+        rule_surfaces = @($json.observations | Where-Object { $_.kind -eq "rule_mutation" }).Count
+        fact_registry = @($json.observations | Where-Object { $_.kind -eq "fact_registry" }).Count
+        lab_matrix = @($json.observations | Where-Object { $_.kind -eq "lab_matrix" }).Count
+      }
+    }
+)
+
+Write-Host ""
+Write-Host "## Compatibility Observations"
+if ($observationRows.Count -eq 0) {
+  Write-Host "No compatibility-observation files found."
+} else {
+  $observationRows | Sort-Object observations -Descending | Format-Table -AutoSize | Out-String | Write-Host
+}

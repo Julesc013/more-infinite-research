@@ -1,2 +1,1 @@
-require("prototypes.config")
-require("prototypes.util")
+require("prototypes.mir.stage.data").run()

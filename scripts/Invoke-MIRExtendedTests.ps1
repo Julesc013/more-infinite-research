@@ -306,10 +306,13 @@ foreach ($entry in $expandedTiers) {
     }
     "AuditSmoke" {
       Invoke-MIRStep -Name "AuditSmoke" -Action {
+        Assert-MIRFactorioBin
         $auditDir = New-MIROutputDirectory -Name "audit-smoke"
         $auditSmokeScenario = if ($FactorioLine -eq "2.0") { "base-baseline" } else { "space-age-baseline" }
         $auditParams = @{
+          FactorioBin = $FactorioBin
           RunManualScenarios = $true
+          RunLoadTests = $true
           ManualScenariosPath = (Join-Path $repo "fixtures\compat-matrix\manual-scenarios.json")
           ScenarioNames = @($auditSmokeScenario)
           CatalogPages = 0
@@ -478,6 +481,7 @@ Write-MIRArtifactIndex -Path $runContext.artifact_index_path -RunId $runContext.
   events = "events.jsonl"
   summary_md = "extended-summary.md"
   summary_json = "extended-summary.json"
+  observations_glob = "**\compat-observations.md"
   html = "index.html"
 } -Tiers @($expandedTiers | ForEach-Object {
   [ordered]@{
