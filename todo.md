@@ -100,7 +100,7 @@ Final gate evidence:
 - Final package:
   `dist/more-infinite-research_3.0.0.zip`.
 - Final package SHA-256:
-  `7E37A20A84E1FEDF71772F219E206F10E6E3F1EB7F8D2CBF4F897BD79D91890F`.
+  `2B8B4D199AAFED0B4B9551D93E402D096A154FE3AFEADFF2604384BEE7D5A31C`.
 - Regression comparison:
   strict audit `814 -> 814`, repair smokes `1820 -> 1820`, representative
   scenario `924 -> 924`; observation hashes unchanged, claim hash unchanged,

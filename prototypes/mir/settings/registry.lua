@@ -5,7 +5,9 @@ return {
     hidden_means_unavailable_not_deleted = true,
     do_not_force_hidden_values_by_default = true,
     setting_ids_are_stable = true,
-    data_stage_must_validate_targets = true
+    data_stage_must_validate_targets = true,
+    canonical_settings_catalog_required = true,
+    profile_import_validates_catalog_constraints = true
   },
 
   global = {
@@ -35,6 +37,30 @@ return {
     },
     {
       key = "mir-pipeline-extent-multiplier",
+      ui_visibility = { mode = "always" }
+    },
+    {
+      key = "mir-prototype-productivity-cap",
+      ui_visibility = { mode = "always" }
+    },
+    {
+      key = "mir-prototype-efficiency-cap",
+      ui_visibility = { mode = "always" }
+    },
+    {
+      key = "mir-prototype-pollution-cap",
+      ui_visibility = { mode = "always" }
+    },
+    {
+      key = "mir-prototype-speed-cap",
+      ui_visibility = { mode = "always" }
+    },
+    {
+      key = "mir-prototype-quality-cap",
+      ui_visibility = { mode = "always" }
+    },
+    {
+      key = "mir-prototype-positive-power-floor",
       ui_visibility = { mode = "always" }
     },
     {

@@ -3,6 +3,7 @@ local steps = require("prototypes.mir.stage.data_final_fixes_steps")
 
 function M.run()
   steps.apply_compatibility_repairs()
+  steps.apply_prototype_limits()
   steps.apply_pipeline_extent()
   steps.prepare_competing_productivity()
   steps.emit_streams()

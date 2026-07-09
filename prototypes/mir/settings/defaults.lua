@@ -20,38 +20,47 @@ local defaults = {
       }
     },
     research_agricultural_growth_speed = {
-      enabled = false,
+      enabled = true,
       base_cost = 40000,
       growth_factor = 1.5,
       research_time = 90,
       max_level = 0,
+      settings_priority = "top",
       settings_note = {
-        "mod-setting-description.mir-note-experimental-agriculture"
+        "mod-setting-description.mir-note-agriculture-growth"
       }
     },
     research_inventory_capacity = { growth_factor = 1.10 },
     research_robot_battery = { growth_factor = 1.2 },
+    research_breeding = {
+      enabled = true,
+      settings_priority = "top"
+    },
     research_cargo_bay_unloading_distance = {
+      enabled = true,
       base_cost = 100000,
       growth_factor = 3,
       research_time = 120,
-      max_level = 0
+      max_level = 0,
+      settings_priority = "top"
     },
     research_cargo_landing_pad_count = {
-      enabled = false,
+      enabled = true,
       base_cost = 1000000,
       growth_factor = 10,
       research_time = 240,
       max_level = 0,
+      settings_priority = "top",
       settings_note = {
-        "mod-setting-description.mir-note-sandbox-cargo-pad-count"
+        "mod-setting-description.mir-note-cargo-pad-count"
       }
     },
     research_lab_productivity = {
       base_cost = 1000,
       growth_factor = 1.2,
       research_time = 120,
-      max_level = 0
+      max_level = 0,
+      settings_priority = "top"
     },
     research_ash_separation = {
       research_time = 90
@@ -60,7 +69,8 @@ local defaults = {
       research_time = 120
     },
     research_character_reach = {
-      enabled = false
+      enabled = true,
+      settings_priority = "top"
     },
     research_rocket_shooting_speed = {
       base_cost = 60,
@@ -115,6 +125,7 @@ local defaults = {
   base_extensions = {
     ["braking-force"] = {
       enabled = true,
+      settings_priority = "top",
       max_level = 0,
       base_cost = 115,
       growth_factor = 1.333333333333,
@@ -126,6 +137,7 @@ local defaults = {
     },
     ["research-speed"] = {
       enabled = true,
+      settings_priority = "top",
       max_level = 0,
       base_cost = 60,
       growth_factor = 1.5,
@@ -135,6 +147,7 @@ local defaults = {
     },
     ["worker-robots-storage"] = {
       enabled = true,
+      settings_priority = "top",
       max_level = 0,
       base_cost = 200,
       growth_factor = 1.5,
@@ -146,6 +159,7 @@ local defaults = {
     },
     ["inserter-capacity-bonus"] = {
       enabled = false,
+      settings_priority = "top",
       max_level = 0,
       base_cost = 200,
       growth_factor = 3.333333333333,
@@ -162,6 +176,7 @@ local defaults = {
     },
     ["weapon-shooting-speed"] = {
       enabled = true,
+      settings_priority = "top",
       max_level = 0,
       base_cost = 60,
       growth_factor = 1.5,
@@ -174,6 +189,7 @@ local defaults = {
     },
     ["laser-shooting-speed"] = {
       enabled = true,
+      settings_priority = "top",
       max_level = 0,
       base_cost = 60,
       growth_factor = 1.5,

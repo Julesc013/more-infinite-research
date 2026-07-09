@@ -77,6 +77,7 @@ modules:
     - prototypes/mir/platform/factorio/prototype_lookup.lua
   settings:
     - prototypes/mir/settings/registry.lua
+    - prototypes/mir/settings/catalog.lua
     - prototypes/mir/settings/defaults.lua
     - prototypes/mir/settings/stage_builder.lua
     - prototypes/mir/settings/stage_adapter.lua
@@ -85,13 +86,16 @@ modules:
     - prototypes/mir/settings/profile_codec.lua
     - prototypes/mir/settings/effective.lua
     - prototypes/mir/settings/resolver.lua
+    - prototypes/mir/settings/order.lua
     - prototypes/mir/settings/pipeline_extent.lua
+    - prototypes/mir/settings/prototype_limits.lua
   streams:
     - prototypes/mir/streams/registry.lua
     - prototypes/streams/productivity.lua
     - prototypes/streams/direct-effects.lua
   pipeline:
     - prototypes/mir/pipeline/extent.lua
+    - prototypes/mir/pipeline/prototype_limits.lua
   index:
     - prototypes/mir/index/registry_builder.lua
     - prototypes/mir/index/productivity_owners.lua
@@ -186,7 +190,9 @@ target_layers:
   pipeline:
     path: prototypes/mir/pipeline
     may_require:
+      - core
       - platform
+      - settings
     may_mutate_data_raw: true
   domain:
     path: prototypes/mir/domain

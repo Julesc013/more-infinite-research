@@ -1,4 +1,5 @@
 local profile_codec = require("prototypes.mir.settings.profile_codec")
+local settings_catalog = require("prototypes.mir.settings.catalog")
 
 local M = {}
 
@@ -14,14 +15,6 @@ end
 
 local function setting_exists(name)
   return settings and settings.startup and settings.startup[name] ~= nil
-end
-
-local function type_matches(value, fallback)
-  if fallback == nil then return true end
-
-  local expected = type(fallback)
-  if expected == "number" then return type(value) == "number" end
-  return type(value) == expected
 end
 
 local function load_import_profile()
@@ -52,7 +45,7 @@ function M.get(name)
   local profile = load_import_profile()
   if profile and name ~= profile_codec.import_setting_name and setting_exists(name) then
     local imported = profile.settings and profile.settings[name]
-    if imported ~= nil and type_matches(imported, raw_setting(name)) then
+    if imported ~= nil and settings_catalog.validate_value(name, imported) then
       return imported
     end
   end
@@ -64,11 +57,12 @@ function M.import_status()
   load_import_profile()
 
   if import_profile then
-    local recognized, unknown = profile_codec.count_recognized_settings(import_profile)
+    local recognized, unknown, invalid = profile_codec.count_recognized_settings(import_profile)
     return {
       active = true,
       recognized = recognized,
       unknown = unknown,
+      invalid = invalid,
       error = nil
     }
   end
@@ -77,6 +71,7 @@ function M.import_status()
     active = false,
     recognized = 0,
     unknown = 0,
+    invalid = 0,
     error = import_error
   }
 end

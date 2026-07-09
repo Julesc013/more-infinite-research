@@ -21,14 +21,15 @@ More Infinite Research adds **configurable infinite productivity** and **bonus r
 - hidden optional `quality`
 - hidden optional `elevated-rails`
 
-The mod is built around **graceful compatibility**: it discovers recipes,science packs, labs, and optional prototypes from the active mod set, validates the candidate research, generates technologies late in **`data-final-fixes.lua`**, and *skips unsafe or unavailable streams* instead of requiring compatibility mods on the mod portal page.
+The mod is built around **graceful compatibility**: it discovers recipes, science packs, labs, and optional prototypes from the active mod set, validates the candidate research, generates technologies late in **`data-final-fixes.lua`**, and *skips unsafe or unavailable streams* instead of requiring compatibility mods on the mod portal page.
 
 ## Quick Summary
 
 - **Recipe productivity:** adds infinite research for intermediate, logistics, combat, infrastructure, science-pack, and Space Age production chains.
 - **Fluid-output productivity:** adds process-family recipe productivity for oil processing, oil cracking, lubricant, sulfuric acid, acid neutralization, and Space Age thruster propellant fluids where those recipes exist.
 - **Direct-effect bonuses:** adds infinite research for cargo logistics, weapon speed, character bonuses, combined character inventory/trash slots, and worker robot battery.
-- **Fluid prototype tuning:** includes an opt-in startup-only pipeline extent multiplier dropdown, default `100%`/unchanged.
+- **Fluid and prototype tuning:** includes opt-in startup-only pipeline extent, recipe productivity, energy-use, pollution, speed, and quality limit controls.
+- **Settings profiles:** exports full MIR startup profiles by default, with optional compact export that omits unchanged defaults.
 - **Vanilla continuations:** extends selected finite vanilla technology chains into infinite continuations.
 - **Science-pack discovery:** reads active lab inputs, not the old `tool` prototype type.
 - **Lab validation:** checks generated research ingredients against real labs so technologies stay researchable.
@@ -147,7 +148,7 @@ If no valid subset exists, MIR skips the generated technology and logs the reaso
 Two startup settings control late-game progression and global science-pack pressure:
 
 - **`ips-require-space-gate`** is **disabled by default**. When enabled, generated technologies require the end-game science unlock as a prerequisite, but their science-pack ingredients are not changed.
-- **`mir-science-pack-ingredient-policy`** is **`configured` by default**. It can instead add fixed late-game packs, infer missing official or modded progression packs from the selected science packs, add every official base and Space Age science pack, or add every active lab science pack including compatible modded science packs.
+- **Science packs for generated technologies** (`mir-science-pack-ingredient-policy`) is **`configured` by default**. It can instead add fixed late-game packs, infer missing official or modded progression packs from the selected science packs, add every official base and Space Age science pack, or add every active lab science pack including compatible modded science packs. Options are ordered from conservative to broad.
 
 For the end-game science gate, MIR uses **promethium science** in Space Age when available.
 Otherwise it uses **space science** when available.
@@ -295,13 +296,13 @@ Megabase setup:
 
 - Keep most generated streams enabled.
 - Keep max level at `0` for infinite progression.
-- Consider `Extra science packs for generated technologies` values `space-age-progression`, `official-progression`, `mod-progression`, or `all-official` if you want higher-end science sinks without forcing every active modded pack into every technology.
-- Use `What to do when no lab can research a technology` value `reduce` for broad modpack compatibility.
+- Consider **Science packs for generated technologies** values `space-age-progression`, `official-progression`, `mod-progression`, or `all-official` if you want higher-end science sinks without forcing every active modded pack into every technology.
+- Use **Lab compatibility for generated technologies** value `reduce` for broad modpack compatibility.
 
 Modpack compatibility setup:
 
-- Start with `Extra science packs for generated technologies` value `configured`.
-- Use `What to do when no lab can research a technology` value `reduce`.
+- Start with **Science packs for generated technologies** value `configured`.
+- Use **Lab compatibility for generated technologies** value `reduce`.
 - Enable `Log generated and skipped technologies` only while troubleshooting.
 - Enable `Log recipes matched by productivity technologies` only when reporting missing or duplicate productivity chains.
 
@@ -337,14 +338,14 @@ Vanilla continuations:
 | Setting | Type | Default | Description |
 | --- | --- | --- | --- |
 | `ips-require-space-gate` | bool | `false` | Adds the end-game science unlock as a prerequisite without changing science-pack ingredients. Uses promethium science in Space Age when available, otherwise space science. |
-| `mir-science-pack-ingredient-policy` | string | `configured` | Controls extra science packs added to every generated technology. Allowed values: `configured`, `space`, `space-and-promethium`, `space-age-progression`, `official-progression`, `mod-progression`, `all-official`, `all`. |
+| `mir-science-pack-ingredient-policy` | string | `configured` | Chooses how MIR adds science packs to generated technologies. Options are ordered from conservative to broad: `configured`, `space`, `space-and-promethium`, `space-age-progression`, `official-progression`, `mod-progression`, `all-official`, `all`. |
 | `mir-prefer-this-mod-for-competing-techs` | bool | `true` | Lets MIR remove selected competing infinite technologies when MIR has generated or will generate matching replacement behavior. Disable to keep competing technologies from other mods. |
 | `mir-adjust-vanilla-weapon-speed-techs` | string | `off` | Controls whether MIR removes rocket and cannon-shell speed bonuses from MIR's generated weapon shooting speed continuation. Finite vanilla weapon shooting speed technologies keep their original tank cannon and rocket bonuses. Allowed values: `off`, `only-when-dedicated-tech-enabled`, `always`. |
 | `mir-pipeline-extent-multiplier` | string/dropdown | `100%` | Strictly opt-in startup-only multiplier for recognized fluid box pipeline extent fields across prototypes, not only pipe entities. At `100%`, MIR does not load the pipeline pass, scan fluid boxes, or change prototypes. Allowed values: `50%`, `75%`, `100%`, `125%`, `150%`, `200%`, `250%`, `300%`, `400%`, `500%`. Non-`100%` values are experimental and can affect machines, tanks, thrusters, and modded prototypes that define fluid boxes. |
 | `mir-debug-generation-report` | bool | `false` | Writes structured generated/skipped rows to the Factorio log, including science packs, prerequisites, effect counts, lab compatibility, and icon source. |
 | `mir-debug-recipe-matches` | bool | `false` | Writes matched recipe names for each generated productivity stream. Useful for mod compatibility reports, but noisy in large mod packs. |
 | `mir-debug-scripted-effects` | bool | `false` | Writes runtime log entries when scripted technologies recompute global or event-driven effects. |
-| `mir-lab-incompatibility-policy` | string | `reduce` | Controls incompatible science-pack selections. `reduce` uses the largest lab-compatible subset; `skip` skips the technology. |
+| `mir-lab-incompatibility-policy` | string | `reduce` | Chooses what MIR does when the selected science packs cannot be researched by any active lab. `reduce` uses the largest researchable subset; `skip` skips the technology. |
 
 ### Per-Stream Settings
 
@@ -452,6 +453,7 @@ Generic competing recipe-productivity cleanup is intentionally limited to **know
 | `data.lua` | Thin data-stage wrapper into `prototypes/mir/stage/data.lua`. |
 | `data-updates.lua` | Thin data-updates wrapper into `prototypes/mir/stage/data_updates.lua`; reserved for future pre-final compatibility hooks. |
 | `data-final-fixes.lua` | Thin final-fixes wrapper into `prototypes/mir/stage/data_final_fixes.lua`. |
+| `prototypes/mir/settings/catalog.lua` | Canonical setting IDs, defaults, allowed values, bounds, and profile-validation metadata. |
 | `prototypes/mir/settings/defaults.lua` | Shared stream defaults, per-stream overrides, and base-extension defaults. |
 | `settings.lua` | Thin settings-stage wrapper into `prototypes/mir/stage/settings.lua`; startup settings are generated by `prototypes/mir/settings/stage_builder.lua`. |
 | `prototypes/mir/settings/pipeline_extent.lua` | Owns pipeline extent dropdown values and parsing. |
