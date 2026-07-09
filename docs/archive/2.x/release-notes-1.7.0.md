@@ -63,8 +63,8 @@ Factorio `1.0` package.
 
 - Release-candidate package:
   `dist/more-infinite-research_1.7.0.zip`, SHA-256
-  `2143A59ED3BDF709051CB66D0B056A0A9039029F645BF55C6F669966EC02F135`,
-  `300818` bytes, `121` entries, `0` forbidden release entries.
+  `D1362E3674F0161BD7D874C475094231511A43C325890D6908915C6E0CF0563A`,
+  `300899` bytes, `121` entries, `0` forbidden release entries.
 - Static validation passed for the `1.7.0` metadata and package shape.
 - Factorio `0.17` binary validation passed with
   `D:\Programs\Factorio\0.17\bin\x64\factorio.exe`.

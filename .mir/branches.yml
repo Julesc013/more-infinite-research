@@ -169,8 +169,8 @@ release_artifacts:
         - mir_1_8_1_factorio_1_0_port
         - dev_portable_fixes
       artifact: dist/more-infinite-research_1.7.0.zip
-      sha256: 2143A59ED3BDF709051CB66D0B056A0A9039029F645BF55C6F669966EC02F135
-      size_bytes: 300818
+      sha256: D1362E3674F0161BD7D874C475094231511A43C325890D6908915C6E0CF0563A
+      size_bytes: 300899
       entries: 121
       forbidden_entries: 0
       validation_content_matches_dist: true
