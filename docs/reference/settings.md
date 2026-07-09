@@ -77,6 +77,21 @@ ui_visibility = {
 
 ## Ordering
 
+Global startup settings use visible section prefixes and stable `a-*` order
+ranges:
+
+| Range | Visible prefix | Purpose |
+| --- | --- | --- |
+| `a-0-*` | Main | Main behavior settings |
+| `a-1-*` | Compatibility | Compatibility behavior and prototype compatibility passes |
+| `a-2-*` | Prototype limits | Explicit prototype cap overrides |
+| `a-7-*` | Advanced | Settings profile import and future advanced controls |
+| `a-8-*` | Diagnostics | Log and audit controls |
+
+The visible prefixes may use Factorio rich text for color and bold emphasis,
+but the plain section words remain part of the label. Do not add fake divider
+settings for 3.0.0.
+
 Generated technology settings use three `b-*` buckets:
 
 - `b-000`: disabled-by-default or experimental rows;

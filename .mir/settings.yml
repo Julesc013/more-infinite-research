@@ -15,6 +15,9 @@ rules:
   technology_settings_use_three_attention_buckets: true
   prototype_limit_settings_default_to_engine_default: true
   prototype_limit_settings_are_startup_only_explicit_overrides: true
+  global_settings_use_visible_section_prefixes: true
+  rich_text_section_prefixes_are_optional_enhancement: true
+  fake_divider_settings_are_disallowed: true
 
 profiles:
   schema: 1
@@ -36,6 +39,22 @@ profiles:
 ordering:
   global_prefix: a
   technology_prefix: b
+  global_sections:
+    - range: a-0
+      label: Main
+      meaning: main behavior settings
+    - range: a-1
+      label: Compatibility
+      meaning: compatibility behavior and prototype compatibility passes
+    - range: a-2
+      label: Prototype limits
+      meaning: explicit global prototype cap overrides
+    - range: a-7
+      label: Advanced
+      meaning: profile import and future advanced controls
+    - range: a-8
+      label: Diagnostics
+      meaning: log and audit controls
   technology_buckets:
     - rank: "000"
       meaning: disabled-by-default or experimental technology groups, sorted alphabetically

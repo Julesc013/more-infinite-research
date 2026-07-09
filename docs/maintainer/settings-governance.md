@@ -38,6 +38,10 @@ contract unless there is a documented migration reason to retire it.
   enabled rows last. Sort alphabetically inside each bucket.
 - Keep prototype limit settings startup-only, defaulting to `engine-default`,
   and document every non-default value as an explicit global prototype override.
+- Use visible section prefixes and order ranges for global settings. Do not add
+  fake divider settings.
+- Treat rich text in setting labels as a visual enhancement only; the plain
+  section words must still be readable if styling is not rendered.
 
 ## Adding A Stream Setting
 
@@ -74,6 +78,18 @@ Transport belt productivity is also `always`: base belts exist in base games
 and loader recipes are opportunistic additions.
 
 ## Attention Ordering
+
+Global startup settings use the order helper in
+`prototypes/mir/settings/order.lua`:
+
+- `Main`: main behavior settings;
+- `Compatibility`: compatibility behavior and prototype compatibility passes;
+- `Prototype limits`: explicit global prototype cap overrides;
+- `Advanced`: profile import and future advanced controls;
+- `Diagnostics`: log and audit controls.
+
+Use these visible prefixes instead of fake section rows. Fake dividers are real
+settings, can be clicked, and make the settings UI noisier.
 
 Use the `settings_priority = "top"` stream or base-extension default for
 enabled technologies that are unusual, balance-sensitive, scripted, or

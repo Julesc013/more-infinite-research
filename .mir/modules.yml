@@ -85,6 +85,7 @@ modules:
     - prototypes/mir/settings/profile_codec.lua
     - prototypes/mir/settings/effective.lua
     - prototypes/mir/settings/resolver.lua
+    - prototypes/mir/settings/order.lua
     - prototypes/mir/settings/pipeline_extent.lua
     - prototypes/mir/settings/prototype_limits.lua
   streams:

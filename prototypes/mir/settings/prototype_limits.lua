@@ -1,4 +1,5 @@
 local S = {}
+local setting_order = require("prototypes.mir.settings.order")
 
 S.engine_default = "engine-default"
 
@@ -28,7 +29,7 @@ S.settings = {
       ["percent-10000"] = 100.0,
       ["percent-100000"] = 1000.0
     },
-    order = "a-200"
+    order = setting_order.global("prototype_limits", 10)
   },
 
   efficiency = {
@@ -49,7 +50,7 @@ S.settings = {
       ["saving-999"] = -0.999,
       ["saving-9999"] = -0.9999
     },
-    order = "a-210"
+    order = setting_order.global("prototype_limits", 20)
   },
 
   speed = {
@@ -70,7 +71,7 @@ S.settings = {
       ["bonus-10000"] = 100.0,
       ["bonus-100000"] = 1000.0
     },
-    order = "a-220"
+    order = setting_order.global("prototype_limits", 30)
   },
 
   quality = {
@@ -91,7 +92,7 @@ S.settings = {
       ["bonus-10000"] = 100.0,
       ["bonus-100000"] = 1000.0
     },
-    order = "a-230"
+    order = setting_order.global("prototype_limits", 40)
   }
 }
 

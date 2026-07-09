@@ -71,8 +71,11 @@ Date: 2026-07-08
     - Improved in-game setting labels and descriptions for science-pack and lab-compatibility policies.
     - Added startup dropdowns for recipe productivity, efficiency, speed, and quality prototype caps.
     - Prototype cap dropdowns leave engine defaults untouched unless explicitly changed.
+    - Added visible Main, Compatibility, Prototype limits, Advanced, and Diagnostics prefixes to global startup settings.
+    - Added color and bold emphasis to global setting prefixes where Factorio renders rich text.
     - Grouped generated-technology settings so disabled, risky, special, and vanilla-continuation rows stay easier to find.
     - Split generated-technology settings into default-off, enabled special, and ordinary enabled groups.
+    - Renamed generated-technology setting rows so the technology name comes before the field name.
     - Enabled breeding, agricultural growth, cargo bay range, cargo landing pad count, and character reach by default.
     - Kept inserter capacity disabled by default because larger hand sizes can affect circuits and engine optimizations.
     - Kept MIR-owned official technology settings visible across base and Space Age.
@@ -101,7 +104,7 @@ Date: 2026-07-08
     - Added focused MIR compatibility modules for exact recipe, Air Scrubbing, and ATAN Ash diagnostics.
     - Added a focused MIR compatibility repair module for exact Factorio 2.1 upstream recipe schema normalization.
     - Added focused MIR settings modules for registry data, stage building, visibility, and defaults.
-    - Added focused MIR settings modules for effective settings, profile codec support, and pipeline extent settings.
+    - Added focused MIR settings modules for effective settings, profile codec support, order ranges, and pipeline extent settings.
     - Added focused MIR settings and pipeline modules for explicit prototype limit overrides.
     - Added architecture checks, docs governance checks, and settings visibility checks.
     - Added local mod library catalog checks and legacy inventory reporting tools.

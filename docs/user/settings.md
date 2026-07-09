@@ -29,6 +29,10 @@ Use the in-game setting descriptions for exact defaults. Use
 [settings reference](../reference/settings.md) for the canonical
 technical contract once a setting needs maintainer-level detail.
 
+Global settings are grouped with visible prefixes: Main, Compatibility,
+Prototype limits, Advanced, and Diagnostics. Some prefixes are color-emphasized
+in-game for faster scanning, but the label text is still the structure.
+
 Generated technology settings are ordered so default-off or experimental rows
 come first, enabled special rows come next, and ordinary enabled rows come last.
 Breeding, agricultural growth speed, cargo bay range/count, and character reach

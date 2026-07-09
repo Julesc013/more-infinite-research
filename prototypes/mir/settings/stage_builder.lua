@@ -3,6 +3,7 @@ local defaults = require("prototypes.mir.settings.defaults")
 local settings_adapter = require("prototypes.mir.settings.stage_adapter")
 local pipeline_extent_settings = require("prototypes.mir.settings.pipeline_extent")
 local prototype_limit_settings = require("prototypes.mir.settings.prototype_limits")
+local setting_order = require("prototypes.mir.settings.order")
 
 local settings_data = {}
 local settings_context = settings_adapter.context()
@@ -57,7 +58,7 @@ table.insert(settings_data, {
   name = "ips-require-space-gate",
   setting_type = "startup",
   default_value = false,
-  order = "a-010",
+  order = setting_order.global("main", 10),
   localised_name = {"mod-setting-name.ips-require-space-gate"},
   localised_description = {"mod-setting-description.ips-require-space-gate"}
 })
@@ -68,7 +69,7 @@ table.insert(settings_data, {
   setting_type = "startup",
   default_value = "configured",
   allowed_values = {"configured", "space", "space-and-promethium", "space-age-progression", "official-progression", "mod-progression", "all-official", "all"},
-  order = "a-020",
+  order = setting_order.global("main", 20),
   localised_name = {"mod-setting-name.mir-science-pack-ingredient-policy"},
   localised_description = {"mod-setting-description.mir-science-pack-ingredient-policy"}
 })
@@ -79,7 +80,7 @@ table.insert(settings_data, {
   setting_type = "startup",
   default_value = "reduce",
   allowed_values = {"reduce", "skip"},
-  order = "a-030",
+  order = setting_order.global("main", 30),
   localised_name = {"mod-setting-name.mir-lab-incompatibility-policy"},
   localised_description = {"mod-setting-description.mir-lab-incompatibility-policy"}
 })
@@ -89,7 +90,7 @@ table.insert(settings_data, {
   name = "mir-prefer-this-mod-for-competing-techs",
   setting_type = "startup",
   default_value = true,
-  order = "a-100",
+  order = setting_order.global("main", 40),
   localised_name = {"mod-setting-name.mir-prefer-this-mod-for-competing-techs"},
   localised_description = {"mod-setting-description.mir-prefer-this-mod-for-competing-techs"}
 })
@@ -100,7 +101,7 @@ table.insert(settings_data, {
   setting_type = "startup",
   default_value = "off",
   allowed_values = {"off", "only-when-dedicated-tech-enabled", "always"},
-  order = "a-110",
+  order = setting_order.global("compatibility", 10),
   localised_name = {"mod-setting-name.mir-adjust-vanilla-weapon-speed-techs"},
   localised_description = {"mod-setting-description.mir-adjust-vanilla-weapon-speed-techs"}
 })
@@ -110,7 +111,7 @@ table.insert(settings_data, {
   name = "mir-use-installed-space-age-icons",
   setting_type = "startup",
   default_value = false,
-  order = "a-120",
+  order = setting_order.global("compatibility", 20),
   localised_name = {"mod-setting-name.mir-use-installed-space-age-icons"},
   localised_description = {"mod-setting-description.mir-use-installed-space-age-icons"}
 })
@@ -121,7 +122,7 @@ table.insert(settings_data, {
   setting_type = "startup",
   default_value = pipeline_extent_settings.default_value,
   allowed_values = pipeline_extent_settings.allowed_values,
-  order = "a-130",
+  order = setting_order.global("compatibility", 30),
   localised_name = {"mod-setting-name.mir-pipeline-extent-multiplier"},
   localised_description = {"mod-setting-description.mir-pipeline-extent-multiplier"}
 })
@@ -132,7 +133,7 @@ table.insert(settings_data, {
   setting_type = "startup",
   default_value = "",
   allow_blank = true,
-  order = "a-140",
+  order = setting_order.global("advanced", 10),
   localised_name = {"mod-setting-name.mir-settings-profile-import"},
   localised_description = {"mod-setting-description.mir-settings-profile-import"}
 })
@@ -146,7 +147,7 @@ table.insert(settings_data, {
   name = "mir-debug-generation-report",
   setting_type = "startup",
   default_value = false,
-  order = "a-900",
+  order = setting_order.global("diagnostics", 10),
   localised_name = {"mod-setting-name.mir-debug-generation-report"},
   localised_description = {"mod-setting-description.mir-debug-generation-report"}
 })
@@ -156,7 +157,7 @@ table.insert(settings_data, {
   name = "mir-debug-recipe-matches",
   setting_type = "startup",
   default_value = false,
-  order = "a-910",
+  order = setting_order.global("diagnostics", 20),
   localised_name = {"mod-setting-name.mir-debug-recipe-matches"},
   localised_description = {"mod-setting-description.mir-debug-recipe-matches"}
 })
@@ -166,7 +167,7 @@ table.insert(settings_data, {
   name = "mir-debug-scripted-effects",
   setting_type = "startup",
   default_value = false,
-  order = "a-920",
+  order = setting_order.global("diagnostics", 30),
   localised_name = {"mod-setting-name.mir-debug-scripted-effects"},
   localised_description = {"mod-setting-description.mir-debug-scripted-effects"}
 })
@@ -275,7 +276,7 @@ end
 
 local function group_order_prefix(group)
   local bucket = group_attention_rank(group)
-  return "b-" .. bucket .. "-" .. order_slug(group.sort_name) .. "-" .. group.kind .. "-" .. group.key
+  return setting_order.technology(bucket, order_slug(group.sort_name), group.kind, group.key)
 end
 
 local technology_setting_groups = {}

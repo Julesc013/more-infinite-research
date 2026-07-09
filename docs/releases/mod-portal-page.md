@@ -187,12 +187,15 @@ For most generated research you can change:
 
 Other useful settings:
 
-- Require finishing the game before generated technologies: optional, off by default.
-- Science packs for generated technologies: keep default packs, add fixed late-game packs, infer official or modded progression packs, use all official science packs, or use all active lab science packs. Options are ordered from conservative to broad.
-- Lab compatibility for generated technologies: use researchable packs by default, or skip unsupported technologies.
-- Use MIR when another mod adds the same infinite research: lets this mod remove selected overlapping infinite technologies when MIR generated replacements exist.
-- Rocket/cannon speed cleanup: optional duplicate-removal behavior; off by default.
-- Diagnostics: log generated/skipped technologies, recipe matches, or scripted effects for troubleshooting.
+- Main: require game completion before generated technologies, choose science
+  packs, choose lab compatibility, and prefer MIR for duplicate infinite
+  research.
+- Compatibility: control rocket/cannon speed cleanup, installed DLC icon paths,
+  and pipeline extent scaling.
+- Prototype limits: explicitly adjust recipe productivity, efficiency, speed,
+  or quality caps; all default to engine unchanged.
+- Diagnostics: log generated/skipped technologies, recipe matches, or scripted
+  effects for troubleshooting.
 
 ## Compatibility
 
