@@ -1,5 +1,6 @@
 local M = {}
 local settings_resolver = require("prototypes.mir.runtime.settings_resolver")
+local runtime_state = require("prototypes.mir.runtime.state")
 
 M.technology_name = "recipe-prod-research_agricultural_growth_speed-1"
 M.stream_key = "research_agricultural_growth_speed"
@@ -12,9 +13,7 @@ local function feature_enabled()
 end
 
 local function state()
-  storage.mir = storage.mir or {}
-  storage.mir.agricultural_growth_speed = storage.mir.agricultural_growth_speed or {}
-  return storage.mir.agricultural_growth_speed
+  return runtime_state.bucket("agricultural_growth_speed")
 end
 
 local function completed_levels(force)

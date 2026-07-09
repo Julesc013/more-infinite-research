@@ -356,7 +356,7 @@ for tech_name, tech in pairs(techs) do
 end
 
 assert_tech_uses_item_icon("recipe-prod-research_heavy_ammo-1", "cannon-shell")
-assert_tech_uses_item_icon("recipe-prod-research_cannon_shooting_speed-1", "cannon-shell")
+assert_tech_uses_technology_icon("recipe-prod-research_cannon_shooting_speed-1", "weapon-shooting-speed-3")
 if is_space_age then
   assert_tech_uses_technology_icon("recipe-prod-research_electric_shooting_speed-1", "electric-weapons-damage-1")
 elseif use_installed_space_age_icons then
@@ -390,7 +390,7 @@ if techs["recipe-prod-research_lab_productivity-1"] then
   if use_installed_space_age_icons then
     assert_tech_uses_icon_path("recipe-prod-research_lab_productivity-1", "__space-age__/graphics/technology/research-productivity.png")
   else
-    assert_tech_uses_technology_icon("recipe-prod-research_lab_productivity-1", "military-science-pack")
+    assert_tech_uses_technology_icon("recipe-prod-research_lab_productivity-1", "research-speed-6")
   end
 end
 if techs["recipe-prod-research_rocket_fuel-1"] then

@@ -2,12 +2,15 @@ local deepcopy = require("prototypes.mir.core.deepcopy")
 local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 local lookup = require("prototypes.mir.platform.factorio.prototype_lookup")
 local effective_settings = require("prototypes.mir.settings.effective")
+local target_line = require("prototypes.mir.platform.factorio.target_line")
 
 local I = {}
 
 local CONSTANT_OVERLAYS = {
+  ["laboratory-productivity"] = "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
   ["recipe-productivity"] = "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
   speed = "__core__/graphics/icons/technology/constants/constant-speed.png",
+  ["crafting-speed"] = "__core__/graphics/icons/technology/constants/constant-speed.png",
   ["movement-speed"] = "__core__/graphics/icons/technology/constants/constant-movement-speed.png",
   mining = "__core__/graphics/icons/technology/constants/constant-mining.png",
   battery = "__core__/graphics/icons/technology/constants/constant-battery.png",
@@ -227,7 +230,7 @@ local function overlay_for_stream(stream)
     local t = effect.type
     if t == "character-running-speed" then return "movement-speed" end
     if t == "character-mining-speed" then return "mining" end
-    if t == "laboratory-productivity" then return "recipe-productivity" end
+    if t == "laboratory-productivity" then return "laboratory-productivity" end
     if t == "character-reach-distance"
       or t == "character-build-distance"
       or t == "character-resource-reach-distance"
@@ -237,7 +240,8 @@ local function overlay_for_stream(stream)
     if t == "worker-robot-battery" then return "battery" end
     if t == "max-cargo-bay-unloading-distance" then return "range" end
     if t == "cargo-landing-pad-count" then return "count" end
-    if t == "gun-speed" or t == "character-crafting-speed" then return "speed" end
+    if t == "character-crafting-speed" then return "crafting-speed" end
+    if t == "gun-speed" then return "speed" end
     if t == "braking-force" then return "braking-force" end
     if t == "ammo-damage" or t == "turret-attack" then return "damage" end
   end
@@ -255,18 +259,26 @@ local function add_constant_overlay(base_icons, overlay)
   end
   if overlay == false then return out end
 
-  local path = CONSTANT_OVERLAYS[overlay or "recipe-productivity"] or overlay
-  if type(path) ~= "string" then return out end
+  local layer = nil
+  if target_line.technology_overlay_layer then
+    layer = target_line.technology_overlay_layer(overlay)
+    if layer == false then return out end
+  end
 
-  -- Match Wube's technology constant helpers so the corner badge floats
-  -- outside normal icon bounds instead of shrinking the base icon.
-  table.insert(out, {
-    icon = path,
-    icon_size = 128,
-    scale = 0.5,
-    shift = {50, 50},
-    floating = true
-  })
+  if not layer then
+    if not target_line.feature_enabled("technology_constant_overlays") then return out end
+    local path = CONSTANT_OVERLAYS[overlay or "recipe-productivity"] or overlay
+    if type(path) ~= "string" then return out end
+    layer = {
+      icon = path,
+      icon_size = 128,
+      scale = 0.5,
+      shift = {50, 50},
+      floating = true
+    }
+  end
+
+  table.insert(out, deepcopy(layer))
   return out
 end
 
