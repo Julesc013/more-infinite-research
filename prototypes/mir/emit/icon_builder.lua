@@ -22,37 +22,6 @@ local CONSTANT_OVERLAYS = {
   count = "__core__/graphics/icons/technology/constants/constant-count.png"
 }
 
-local EFFECT_CONTROL_ICON_CANDIDATES = {
-  productivity = {
-    {technology = "mining-productivity-4"},
-    {technology = "mining-productivity-3"},
-    {technology = "mining-productivity-1"}
-  },
-  range = {
-    {technology = "artillery-shell-range-1"}
-  },
-  speed = {
-    {technology = "speed-module-3"},
-    {technology = "speed-module-2"},
-    {technology = "speed-module"},
-    {technology = "weapon-shooting-speed-6"},
-    {technology = "weapon-shooting-speed-3"}
-  },
-  battery = {
-    {technology = "battery"},
-    {technology = "battery-equipment"},
-    {technology = "logistic-robotics"}
-  },
-  capacity = {
-    {technology = "toolbelt"}
-  },
-  damage = {
-    {technology = "physical-projectile-damage-7"},
-    {technology = "physical-projectile-damage-3"},
-    {technology = "weapon-shooting-speed-3"}
-  }
-}
-
 local function copy_icons(icons)
   local out = {}
   for _, layer in ipairs(icons or {}) do
@@ -294,43 +263,14 @@ local function resolve_effect_icons_for_stream(stream)
   return nil, source
 end
 
-local function effect_control_icon_kind(effect)
-  local t = effect and effect.type
-  if t == "laboratory-productivity" then return "productivity" end
-  if t == "gun-speed"
-    or t == "character-crafting-speed"
-    or t == "character-mining-speed"
-    or t == "character-running-speed" then return "speed" end
-  if t == "character-reach-distance"
-    or t == "character-build-distance"
-    or t == "character-resource-reach-distance"
-    or t == "character-item-drop-distance"
-    or t == "max-cargo-bay-unloading-distance" then return "range" end
-  if t == "worker-robot-battery" then return "battery" end
-  if t == "character-inventory-slots-bonus"
-    or t == "character-logistic-trash-slots"
-    or t == "cargo-landing-pad-count" then return "capacity" end
-  if t == "ammo-damage" or t == "turret-attack" then return "damage" end
-  return nil
-end
-
-local function resolve_effect_icons_for_effect(effect)
-  local kind = effect_control_icon_kind(effect)
-  if not kind then return nil, nil end
-
-  local icons, source = resolve_icon_candidates(EFFECT_CONTROL_ICON_CANDIDATES[kind])
-  if icons then return copy_icons(icons), source end
-  return nil, source
-end
-
 local function overlay_for_stream(stream)
   if stream.overlay ~= nil then return stream.overlay end
 
   local effect = stream.direct_effects and stream.direct_effects[1]
   if effect then
     local t = effect.type
-    if t == "character-running-speed"
-      or t == "character-mining-speed" then return "speed" end
+    if t == "character-running-speed" then return "movement-speed" end
+    if t == "character-mining-speed" then return "mining" end
     if t == "laboratory-productivity" then return "laboratory-productivity" end
     if t == "character-reach-distance"
       or t == "character-build-distance"
@@ -392,16 +332,9 @@ function I.has_effect_icon_override(stream)
   return has_effect_icon_override(stream)
 end
 
-function I.has_effect_control_icon(effect)
-  return effect_control_icon_kind(effect) ~= nil
-end
-
-function I.effect_icons_for_stream(stream, effect)
+function I.effect_icons_for_stream(stream)
   local explicit = resolve_effect_icons_for_stream(stream)
   if explicit and #explicit > 0 then return explicit end
-
-  local control_icons = resolve_effect_icons_for_effect(effect)
-  if control_icons and #control_icons > 0 then return control_icons end
 
   local base = resolve_base_icons_for_stream(stream)
   if base and #base > 0 then return base end

@@ -31,15 +31,10 @@ return {
     icon_candidates = {
       {technology = "research-productivity", required_mod = "space-age"},
       {icon = "__space-age__/graphics/technology/research-productivity.png", icon_size = 256, inactive_mod_asset = "space-age"},
-      {technology = "research-speed-6"},
-      {technology = "research-speed-5"},
-      {technology = "military-science-pack"}
-    },
-    effect_icon_candidates = {
       {technology = "mining-productivity-4"},
       {technology = "mining-productivity-3"},
       {technology = "mining-productivity-1"},
-      {icon = "__base__/graphics/technology/mining-productivity.png", icon_size = 128}
+      {technology = "military-science-pack"}
     },
     overlay = "laboratory-productivity",
     localised_description = {"technology-description.more-infinite-research.lab_productivity"},

@@ -35,5 +35,9 @@ Policy:
   row utility art and should not be used as technology tile badges unless a
   target line has no high-resolution equivalent and the substitution is
   documented.
+- If a target line has no separate technology constant/control icon assets and
+  no documented native modifier icon surface, do not simulate badges from
+  unrelated technology art. Use the best target-era main technology texture and
+  locale text instead.
 - Any future MIR-owned or third-party local art must be added to this table with
   an explicit source and redistribution note before package validation can pass.

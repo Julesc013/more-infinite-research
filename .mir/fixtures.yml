@@ -32,7 +32,8 @@ fixtures:
   legacy-effect-icons:
     assertion_path: fixtures/assert-legacy-effect-icons
     validates:
-      - factorio-1-1-target-era-effect-icon-badges
+      - factorio-0-18-no-unavailable-newer-badge-icons
+      - factorio-0-18-no-unsupported-native-modifier-icon-metadata
       - no-newer-core-graphics-in-legacy-package
 
   air-scrubbing:

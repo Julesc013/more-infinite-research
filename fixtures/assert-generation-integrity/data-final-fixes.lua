@@ -183,9 +183,10 @@ local function expected_icon_badge(tech)
       return "recipe-productivity"
     elseif effect_type == "gun-speed" or effect_type == "character-crafting-speed" then
       return "speed"
-    elseif effect_type == "character-running-speed"
-      or effect_type == "character-mining-speed" then
-      return "speed"
+    elseif effect_type == "character-running-speed" then
+      return "movement-speed"
+    elseif effect_type == "character-mining-speed" then
+      return "mining"
     elseif effect_type == "character-reach-distance"
       or effect_type == "character-build-distance"
       or effect_type == "character-resource-reach-distance"
@@ -321,37 +322,6 @@ local function assert_tech_uses_icon_path(tech_name, icon_path)
   fail("generated technology " .. tech_name .. " does not use expected icon path " .. icon_path .. ".")
 end
 
-local function assert_effect_uses_technology_icon(tech_name, effect_type, source_tech_name)
-  local tech = techs[tech_name]
-  if not tech then
-    fail("missing generated technology " .. tech_name .. " for effect icon assertion.")
-  end
-
-  local source = techs[source_tech_name]
-  local expected_paths = prototype_icon_paths(source)
-  if not next(expected_paths) then
-    fail("missing technology effect icon source for " .. source_tech_name .. ".")
-  end
-
-  for _, effect in ipairs(tech.effects or {}) do
-    if effect.type == effect_type then
-      for _, layer in ipairs(effect.icons or {}) do
-        if expected_paths[layer.icon] then return end
-      end
-      if effect.icon and expected_paths[effect.icon] then return end
-      fail("generated technology " .. tech_name .. " effect " .. effect_type
-        .. " does not use " .. source_tech_name .. " effect icon art.")
-    end
-  end
-
-  fail("generated technology " .. tech_name .. " has no effect " .. effect_type .. ".")
-end
-
-local function assert_optional_effect_uses_technology_icon(tech_name, effect_type, source_tech_name)
-  if not techs[tech_name] then return end
-  assert_effect_uses_technology_icon(tech_name, effect_type, source_tech_name)
-end
-
 local owners_by_recipe = {}
 for tech_name, tech in pairs(techs) do
   if string.match(tech_name, "^recipe%-prod%-") then
@@ -420,69 +390,9 @@ if techs["recipe-prod-research_lab_productivity-1"] then
   if use_installed_space_age_icons then
     assert_tech_uses_icon_path("recipe-prod-research_lab_productivity-1", "__space-age__/graphics/technology/research-productivity.png")
   else
-    assert_tech_uses_technology_icon("recipe-prod-research_lab_productivity-1", "military-science-pack")
+    assert_tech_uses_technology_icon("recipe-prod-research_lab_productivity-1", "mining-productivity-4")
   end
-  assert_effect_uses_technology_icon(
-    "recipe-prod-research_lab_productivity-1",
-    "laboratory-productivity",
-    "mining-productivity-4"
-  )
 end
-assert_optional_effect_uses_technology_icon(
-  "recipe-prod-research_character_reach-1",
-  "character-reach-distance",
-  "artillery-shell-range-1"
-)
-assert_optional_effect_uses_technology_icon(
-  "recipe-prod-research_character_reach-1",
-  "character-build-distance",
-  "artillery-shell-range-1"
-)
-assert_optional_effect_uses_technology_icon(
-  "recipe-prod-research_character_reach-1",
-  "character-resource-reach-distance",
-  "artillery-shell-range-1"
-)
-assert_optional_effect_uses_technology_icon(
-  "recipe-prod-research_character_reach-1",
-  "character-item-drop-distance",
-  "artillery-shell-range-1"
-)
-assert_optional_effect_uses_technology_icon(
-  "recipe-prod-research_character_crafting_speed-1",
-  "character-crafting-speed",
-  "speed-module-3"
-)
-assert_optional_effect_uses_technology_icon(
-  "recipe-prod-research_character_mining_speed-1",
-  "character-mining-speed",
-  "speed-module-3"
-)
-assert_optional_effect_uses_technology_icon(
-  "recipe-prod-research_character_walking_speed-1",
-  "character-running-speed",
-  "speed-module-3"
-)
-assert_optional_effect_uses_technology_icon(
-  "recipe-prod-research_rocket_shooting_speed-1",
-  "gun-speed",
-  "speed-module-3"
-)
-assert_optional_effect_uses_technology_icon(
-  "recipe-prod-research_cannon_shooting_speed-1",
-  "gun-speed",
-  "speed-module-3"
-)
-assert_optional_effect_uses_technology_icon(
-  "recipe-prod-research_flamethrower_shooting_speed-1",
-  "gun-speed",
-  "speed-module-3"
-)
-assert_optional_effect_uses_technology_icon(
-  "recipe-prod-research_electric_shooting_speed-1",
-  "gun-speed",
-  "speed-module-3"
-)
 if techs["recipe-prod-research_rocket_fuel-1"] then
   if use_installed_space_age_icons then
     assert_tech_uses_icon_path("recipe-prod-research_rocket_fuel-1", "__space-age__/graphics/technology/rocket-fuel-productivity.png")

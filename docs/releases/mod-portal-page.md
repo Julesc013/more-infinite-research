@@ -33,7 +33,7 @@ turning the mod into a full content overhaul.
 package. It keeps reduced direct-effect bonuses and base technology
 continuations only, and does not include recipe productivity, Factorio 2.x DLC
 surfaces, prototype cap settings, pipeline extent settings, settings profiles,
-or newer technology badge overlays.
+newer technology badge overlays, or synthetic old-line badge overlays.
 
 **MIR `1.9.3+`** targets **Factorio `1.1`** as a reduced compatibility port:
 supported direct-effect bonuses and base technology continuations only, with

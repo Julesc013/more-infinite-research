@@ -8,20 +8,19 @@ Date: 2026-07-10
     - Synthesized the 3.0.0 source anchor with portable 2.3.0 and 1.9.3 backport lessons.
     - Retargeted package metadata to Factorio 0.18 with `base >= 0.18`.
     - Kept the reduced direct-effect and base-extension surface, with recipe productivity and Factorio 2.x DLC surfaces disabled.
-    - Replaced 1.1 technology constant badge overlays with target-era stock technology-art badges.
-    - Used target-era base technology art instead of packaging newer Factorio graphics.
+    - Removed unavailable 1.1 technology constant badge overlays from the 0.18 bridge.
+    - Used target-era base technology art only instead of packaging or simulating newer Factorio graphics.
 
   Changes:
 
-    - Updated lab productivity icon selection to prefer stock `research-speed-6` and `research-speed-5` before military science.
+    - Updated lab productivity icon selection to prefer stock mining productivity technology art.
     - Extended metadata, settings visibility, and reduced-line runtime checks for the Factorio 0.18 bridge target.
-    - Skipped the 1.1-only badge check on 0.18 while retaining direct-effect, owner-skip, checkbox, and base-extension checks.
+    - Removed unavailable newer badge paths and synthetic badge overlays from the 0.18 bridge.
     - Added explicit target-era names and descriptions to generated vanilla continuations to avoid unresolved locale keys.
     - Added old-line modifier descriptions for character, lab, inventory, and robot direct-effect tooltips.
-    - Added old-line effect-row art for native modifier rows.
-    - Lab research productivity uses mining productivity art, and character range uses artillery range art.
-    - Character and weapon speed effect rows use speed module art.
-    - Added matching visible tile badges because Factorio 1.0 ignores custom icons on native modifier effect rows.
+    - Removed unsupported native modifier icon metadata after Factorio 1.0 ignored those fields.
+    - Lab research productivity now uses mining productivity art as its main technology tile.
+    - Character, range, and weapon speed technologies use target-era main textures and localized text instead of fake badges.
     - Documented 1.8.0 as a bridge/archive compatibility port, not a feature-parity backport of 1.1, 2.0, or 2.1.
 
 ---------------------------------------------------------------------------------------------------
