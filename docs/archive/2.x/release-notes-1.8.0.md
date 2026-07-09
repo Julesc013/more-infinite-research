@@ -52,8 +52,11 @@ The lab productivity stream prefers `research-speed-6`, then
 reuse the same stock technology art selected by the reduced `1.1` port, but
 without badge overlays.
 
-The lab productivity effect row uses target-era mining productivity art so the
-modifier reads as productivity rather than lab speed in Factorio `1.0`.
+Generated native modifier effect rows also use target-era stock art where the
+older UI would otherwise show generic effect markers. Lab productivity uses
+mining-productivity art so it reads as productivity rather than lab speed,
+character reach/build/resource/drop distance uses artillery range art, and
+character/weapon speed rows use speed module art.
 
 ## Supported Surface
 

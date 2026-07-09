@@ -18,7 +18,9 @@ Date: 2026-07-10
     - Skipped the 1.1-only badge check on 0.18 while retaining direct-effect, owner-skip, checkbox, and base-extension checks.
     - Added explicit target-era names and descriptions to generated vanilla continuations to avoid unresolved locale keys.
     - Added old-line modifier descriptions for character, lab, inventory, and robot direct-effect tooltips.
-    - Made lab research productivity use mining productivity effect art so it is visually distinct from lab research speed.
+    - Added old-line effect-row art for native modifier rows.
+    - Lab research productivity uses mining productivity art, and character range uses artillery range art.
+    - Character and weapon speed effect rows use speed module art.
     - Documented 1.8.0 as a bridge/archive compatibility port, not a feature-parity backport of 1.1, 2.0, or 2.1.
 
 ---------------------------------------------------------------------------------------------------

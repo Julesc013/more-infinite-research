@@ -246,14 +246,15 @@ compatibility port of a tested current-line snapshot.
   target-line exclusion.
 - [ ] Release `v1.8.0` as the Factorio `0.18` bridge compatibility port from the MIR 3 source anchor plus portable `2.3.0` and `1.9.3` lessons.
   Current bridge candidate package: `dist/more-infinite-research_1.8.0.zip`,
-  SHA-256 `5FF92565DC104F173658A53726BDBB81688350C6EAA94401B5B398A2D75A7436`,
-  size `300578` bytes, `121` entries, `0` forbidden entries. Static validation
+  SHA-256 `4CC84135B6E6E6D7EFCBE17AA40C9358AFFF205C616DA8D4193EA4B7A7BF6DF9`,
+  size `301052` bytes, `121` entries, `0` forbidden entries. Static validation
   passed, Factorio `1.0` bridge validation passed with
   `D:\Programs\Factorio\1.0\bin\x64\factorio.exe`, and the public dist archive
   content matches the runtime-validated archive. A matching Factorio `0.18`
   binary is still required before final publication. The bridge uses target-era
   base technology art only; it does not package newer Factorio 1.1+ technology
-  constant badge graphics.
+  constant badge graphics. Native effect rows use stock productivity, range,
+  and speed art where old UI fallback icons would otherwise be ambiguous.
 - [ ] Release `v1.8.1` as the true Factorio `1.0` compatibility port only if the `0.18` bridge does not cover the public `1.0` release shape.
 - [ ] Release `v1.7.0`, `v1.6.0`, and `v1.5.0` as reduced native-infinite editions for Factorio `0.17`, `0.16`, and `0.15` only after target binary proof.
 - [ ] Release `v1.4.0`, `v1.3.0`, and `v0.12.0` as archive finite-ladder reconstructions only after target binary proof.
