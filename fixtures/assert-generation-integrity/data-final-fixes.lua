@@ -164,6 +164,7 @@ local constant_overlay_by_kind = {
   speed = "__core__/graphics/icons/technology/constants/constant-speed.png",
   ["movement-speed"] = "__core__/graphics/icons/technology/constants/constant-movement-speed.png",
   mining = "__core__/graphics/icons/technology/constants/constant-mining.png",
+  battery = "__core__/graphics/icons/technology/constants/constant-battery.png",
   capacity = "__core__/graphics/icons/technology/constants/constant-capacity.png",
   damage = "__core__/graphics/icons/technology/constants/constant-damage.png",
   range = "__core__/graphics/icons/technology/constants/constant-range.png",
@@ -193,8 +194,10 @@ local function expected_icon_badge(tech)
       return "range"
     elseif effect_type == "character-inventory-slots-bonus"
       or effect_type == "character-logistic-trash-slots"
-      or effect_type == "worker-robot-battery" then
+    then
       return "capacity"
+    elseif effect_type == "worker-robot-battery" then
+      return "battery"
     elseif effect_type == "max-cargo-bay-unloading-distance" then
       return "range"
     elseif effect_type == "cargo-landing-pad-count" then
