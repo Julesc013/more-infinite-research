@@ -607,6 +607,8 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'skip_if_technology_effects = {' },
     @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'technology = "laboratory-productivity-4", type = "laboratory-productivity", modifier = 0.10, max_level = "infinite"' },
     @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'technology = "worker-robots-battery-6", type = "worker-robot-battery", modifier = 0.70, max_level = "infinite"' },
+    @{ File = "prototypes\mir\emit\icon_builder.lua"; Text = $technologyIconsText; Snippet = 'battery = "__core__/graphics/icons/technology/constants/constant-battery.png"' },
+    @{ File = "prototypes\mir\emit\icon_builder.lua"; Text = $technologyIconsText; Snippet = 'if t == "worker-robot-battery" then return "battery" end' },
     @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = '{technology = "research-productivity", required_mod = "space-age"}' },
     @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = '{technology = "military-science-pack"}' },
     @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'ammo_category = "tesla", modifier = 0.1' },
@@ -843,17 +845,19 @@ Invoke-RepoCheck "prototype limit settings are wired" {
     @{ File = "prototypes\mir\pipeline\prototype_limits.lua"; Text = $prototypeLimitPipelineText; Snippet = 'apply_effect_receiver_limit("quality_limits", "high", selected("quality"))' },
     @{ File = "prototypes\mir\pipeline\prototype_limits.lua"; Text = $prototypeLimitPipelineText; Snippet = 'Applied prototype limits: productivity_recipes=' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-prototype-productivity-cap=[font=default-bold][color=orange]Limits:[/color][/font] Recipe productivity cap' },
-    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-prototype-efficiency-cap=[font=default-bold][color=orange]Limits:[/color][/font] Efficiency cap' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-prototype-efficiency-cap=[font=default-bold][color=orange]Limits:[/color][/font] Energy savings cap' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-prototype-speed-cap=[font=default-bold][color=orange]Limits:[/color][/font] Speed effect cap' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-prototype-quality-cap=[font=default-bold][color=orange]Limits:[/color][/font] Quality effect cap' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-prototype-productivity-cap-engine-default=300% (unchanged)' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-prototype-productivity-cap-percent-50=50%' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-prototype-efficiency-cap-saving-99=99% savings' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-prototype-efficiency-cap-engine-default=80% savings (unchanged)' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'Set 75% or 50% to keep effect bonuses from pushing active machine energy use to near zero.' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-prototype-speed-cap-engine-default=+100000% (unchanged)' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-prototype-speed-cap-bonus-400=+400%' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-prototype-quality-cap-bonus-400=+400%' },
     @{ File = ".mir\settings.yml"; Text = $settingsManifestText; Snippet = 'prototype_limit_settings_default_to_engine_default: true' },
+    @{ File = ".mir\settings.yml"; Text = $settingsManifestText; Snippet = 'efficiency_cap_is_supported_power_floor_control: true' },
     @{ File = ".mir\modules.yml"; Text = $modulesManifestText; Snippet = 'prototypes/mir/settings/prototype_limits.lua' },
     @{ File = ".mir\modules.yml"; Text = $modulesManifestText; Snippet = 'prototypes/mir/pipeline/prototype_limits.lua' },
     @{ File = ".mir\fixtures.yml"; Text = $fixturesManifestText; Snippet = 'prototype-limit-startup-overrides' },
@@ -2877,6 +2881,7 @@ Assert-ReportLineContains -Line $bigMiningCapabilityLine -Expected "evidence=ite
 
 Invoke-RuntimeScenario -ScenarioName "atan-nuclear-science-productivity" -EnabledFixtureNames @(
   "mir-fixture-atan-nuclear-science",
+  "mir-fixture-assert-hidden-setting-readability",
   "mir-fixture-assert-atan-nuclear-science-productivity"
 )
 $atanNuclearScienceLine = Get-LastStreamReportLine -Key "research_science_pack_productivity"
@@ -2886,6 +2891,7 @@ Assert-ReportLineContains -Line $atanNuclearScienceLine -Expected "atan-nuclear-
 
 Invoke-RuntimeScenario -ScenarioName "atan-ash-separation" -EnabledFixtureNames @(
   "mir-fixture-atan-ash",
+  "mir-fixture-assert-hidden-setting-readability",
   "mir-fixture-assert-atan-ash-separation"
 )
 $atanAshLine = Get-LastStreamReportLine -Key "research_ash_separation"
@@ -2911,6 +2917,7 @@ Assert-ReportLineContains -Line $atanAshSinkRisk -Expected "risks=ash_sink" -Con
 
 Invoke-RuntimeScenario -ScenarioName "air-scrubbing-clean-filter" -EnabledFixtureNames @(
   "mir-fixture-air-scrubbing",
+  "mir-fixture-assert-hidden-setting-readability",
   "mir-fixture-assert-air-scrubbing-clean-filter"
 )
 $airScrubbingLine = Get-LastStreamReportLine -Key "research_air_scrubbing_clean_filter"
@@ -3109,7 +3116,8 @@ if ($isFactorio21Line) {
 }
 
 Invoke-RuntimeScenario -ScenarioName "space-age-generation-integrity" -EnabledFixtureNames @(
-  "mir-fixture-assert-generation-integrity"
+  "mir-fixture-assert-generation-integrity",
+  "mir-fixture-assert-hidden-setting-readability"
 ) -EnableSpaceAge
 Assert-SpaceAgeVanillaOwnedProductivityStreamsSkipped -Context "Space Age generation integrity scenario"
 Assert-DefaultBaseExtensionDiagnostics -Context "Space Age generation integrity scenario"

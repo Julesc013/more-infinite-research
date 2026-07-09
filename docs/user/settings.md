@@ -45,7 +45,7 @@ and inserter performance assumptions.
 MIR includes four optional startup-only prototype limit settings:
 
 - Recipe productivity cap
-- Efficiency cap
+- Energy savings cap
 - Speed effect cap
 - Quality effect cap
 
@@ -55,6 +55,12 @@ recipe productivity, `80% savings (unchanged)` for efficiency, and
 relevant Factorio prototype fields alone. Non-default values are explicit global
 balance overrides for long-running infinite research saves or modpacks that want
 stricter or broader module-effect ceilings.
+
+Use the energy savings cap when a modpack's beacon, module, or quality effects
+can push machines toward zero active power draw. `75% savings` keeps supported
+effect receivers at 25% or more active energy use after consumption effects,
+and `50% savings` keeps them at 50% or more. This is a startup prototype
+override, not a runtime script.
 
 These settings apply during prototype loading and require a restart after
 changing them. They do not add per-tick runtime processing, and they are not

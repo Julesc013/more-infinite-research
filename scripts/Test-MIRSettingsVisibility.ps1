@@ -48,6 +48,20 @@ function Assert-Matches {
   }
 }
 
+function Get-RegexValues {
+  param(
+    [Parameter(Mandatory)][string]$Text,
+    [Parameter(Mandatory)][string]$Pattern,
+    [int]$Group = 1
+  )
+
+  $values = @()
+  foreach ($match in [regex]::Matches($Text, $Pattern)) {
+    $values += $match.Groups[$Group].Value
+  }
+  return $values
+}
+
 function Assert-NoPatternInTree {
   param(
     [Parameter(Mandatory)][string]$RelativeRoot,
@@ -89,6 +103,18 @@ $productivityText = Read-MIRText -RelativePath "prototypes/streams/productivity.
 $directEffectsText = Read-MIRText -RelativePath "prototypes/streams/direct-effects.lua"
 $fixtureText = Read-MIRText -RelativePath "fixtures/assert-hidden-setting-readability/data-final-fixes.lua"
 $fixtureInfoText = Read-MIRText -RelativePath "fixtures/assert-hidden-setting-readability/info.json"
+$streamKeys = @(
+  Get-RegexValues -Text $productivityText -Pattern '(?m)^\s*(research_[A-Za-z0-9_]+)\s*='
+  Get-RegexValues -Text $directEffectsText -Pattern '(?m)^\s*(research_[A-Za-z0-9_]+)\s*='
+) | Sort-Object -Unique
+$baseExtensionKeys = Get-RegexValues -Text $stageBuilderText -Pattern '\{\s*key\s*=\s*"([^"]+)"' | Sort-Object -Unique
+
+if ($streamKeys.Count -lt 60) {
+  throw "Expected to discover at least 60 generated stream settings, found $($streamKeys.Count)."
+}
+if ($baseExtensionKeys.Count -lt 6) {
+  throw "Expected to discover at least 6 base extension setting groups, found $($baseExtensionKeys.Count)."
+}
 
 Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -Needle "schema: 1"
 Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -Needle "hidden_means_unavailable_not_deleted: true"
@@ -103,6 +129,7 @@ Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -N
 Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -Needle "technology_settings_use_three_attention_buckets: true"
 Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -Needle "prototype_limit_settings_default_to_engine_default: true"
 Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -Needle "prototype_limit_settings_are_startup_only_explicit_overrides: true"
+Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -Needle "efficiency_cap_is_supported_power_floor_control: true"
 Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -Needle "global_settings_use_visible_section_prefixes: true"
 Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -Needle "rich_text_section_prefixes_are_optional_enhancement: true"
 Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -Needle "fake_divider_settings_are_disallowed: true"
@@ -183,6 +210,18 @@ Assert-Contains -RelativePath "fixtures/assert-hidden-setting-readability/data-f
 Assert-Contains -RelativePath "fixtures/assert-hidden-setting-readability/data-final-fixes.lua" -Text $fixtureText -Needle '"research_cargo_landing_pad_count"'
 Assert-Contains -RelativePath "fixtures/assert-hidden-setting-readability/data-final-fixes.lua" -Text $fixtureText -Needle '"research_air_scrubbing_clean_filter"'
 Assert-Contains -RelativePath "fixtures/assert-hidden-setting-readability/data-final-fixes.lua" -Text $fixtureText -Needle '"ips-enable-%s"'
+Assert-Contains -RelativePath "fixtures/assert-hidden-setting-readability/data-final-fixes.lua" -Text $fixtureText -Needle "base_extension_keys"
+Assert-Contains -RelativePath "fixtures/assert-hidden-setting-readability/data-final-fixes.lua" -Text $fixtureText -Needle '"worker-robots-storage"'
+Assert-Contains -RelativePath "fixtures/assert-hidden-setting-readability/data-final-fixes.lua" -Text $fixtureText -Needle '"mir-enable-%s"'
+
+foreach ($streamKey in $streamKeys) {
+  Assert-Contains -RelativePath "prototypes/mir/settings/stage_builder.lua" -Text $stageBuilderText -Needle "$streamKey ="
+  Assert-Contains -RelativePath "fixtures/assert-hidden-setting-readability/data-final-fixes.lua" -Text $fixtureText -Needle "`"$streamKey`""
+}
+
+foreach ($baseExtensionKey in $baseExtensionKeys) {
+  Assert-Contains -RelativePath "fixtures/assert-hidden-setting-readability/data-final-fixes.lua" -Text $fixtureText -Needle "`"$baseExtensionKey`""
+}
 
 Assert-Contains -RelativePath "docs/user/settings.md" -Text $userSettingsDocText -Needle "/mir-settings-export"
 Assert-Contains -RelativePath "docs/user/settings.md" -Text $userSettingsDocText -Needle "mir-settings-profile-import"

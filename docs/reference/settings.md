@@ -119,6 +119,12 @@ efficiency, and `+100000% (unchanged)` for speed and quality effect caps.
 | `mir-prototype-speed-cap` | `effect_receiver.speed_limits.high` on supported machines, labs, drills, and agricultural towers |
 | `mir-prototype-quality-cap` | `effect_receiver.quality_limits.high` on supported machines, labs, drills, and agricultural towers |
 
+The energy savings cap is the supported 3.0.0 control for modpacks where
+stacked beacon, module, or quality effects can make machine energy use approach
+zero. Selecting `75% savings` or `50% savings` writes a stricter
+`consumption_limits.low` floor on supported effect receivers. MIR does not add
+a separate runtime power-use correction loop.
+
 The prototype limit pass runs in `data-final-fixes` after exact compatibility
 repairs and before MIR planning. That keeps upstream schema normalization first,
 then lets generated technology planning and diagnostics observe the selected

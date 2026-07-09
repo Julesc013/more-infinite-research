@@ -167,10 +167,13 @@ Run the static gate after settings changes:
 .\scripts\Invoke-MIRValidation.ps1 -StaticOnly
 ```
 
-The static gate runs `scripts/Test-MIRSettingsVisibility.ps1`. The runtime gate
-also enables `mir-fixture-assert-hidden-setting-readability` in the base
-generation scenario to prove governed optional-stream settings remain
-registered and readable during `data-final-fixes.lua`.
+The static gate runs `scripts/Test-MIRSettingsVisibility.ps1`, which discovers
+every stream key from `prototypes/streams/*.lua` and requires a generated
+settings sort label plus hidden-setting readability fixture coverage. The
+runtime gate also enables `mir-fixture-assert-hidden-setting-readability` in
+base, Space Age, and named provider-mod compatibility scenarios to prove stream
+and base-extension startup settings remain registered and readable during
+`data-final-fixes.lua`.
 
 Run the runtime gate before release:
 

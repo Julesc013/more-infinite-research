@@ -15,6 +15,7 @@ rules:
   technology_settings_use_three_attention_buckets: true
   prototype_limit_settings_default_to_engine_default: true
   prototype_limit_settings_are_startup_only_explicit_overrides: true
+  efficiency_cap_is_supported_power_floor_control: true
   global_settings_use_visible_section_prefixes: true
   rich_text_section_prefixes_are_optional_enhancement: true
   fake_divider_settings_are_disallowed: true
