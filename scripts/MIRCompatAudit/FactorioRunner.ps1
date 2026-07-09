@@ -69,7 +69,24 @@ function Copy-MIRModUnderTest {
     Remove-Item -LiteralPath $target -Recurse -Force
   }
 
-  $exclude = @(".git", "artifacts", "build", "dist")
+  $exclude = @(
+    ".codex",
+    ".git",
+    ".github",
+    ".mir",
+    "AGENTS.md",
+    "CONTRIBUTING.md",
+    "artifacts",
+    "build",
+    "dist",
+    "docs",
+    "fixtures",
+    "scripts",
+    "tests",
+    "tmp",
+    "todo.md",
+    "tools"
+  )
   New-Item -ItemType Directory -Path $target | Out-Null
   Get-ChildItem -LiteralPath $RepoRoot -Force | Where-Object {
     $exclude -notcontains $_.Name
@@ -83,8 +100,10 @@ function Copy-MIRModUnderTest {
 function Enable-MIRCopiedGenerationReport {
   param([Parameter(Mandatory)][string]$ModsDir)
 
-  $diagnosticsPath = Join-Path $ModsDir "more-infinite-research\prototypes\diagnostics.lua"
-  if (-not (Test-Path -LiteralPath $diagnosticsPath)) { return }
+  $diagnosticsPath = Join-Path $ModsDir "more-infinite-research\prototypes\mir\report\diagnostics_sink.lua"
+  if (-not (Test-Path -LiteralPath $diagnosticsPath)) {
+    throw "Unable to find copied MIR diagnostics sink: $diagnosticsPath"
+  }
 
   $diagnostics = Get-Content -Raw -LiteralPath $diagnosticsPath
   $diagnostics = $diagnostics -replace 'return startup_setting\("mir-debug-generation-report"\) == true', 'return true'
