@@ -11,10 +11,11 @@ param(
 $ErrorActionPreference = "Stop"
 $repo = Resolve-Path (Join-Path $PSScriptRoot "..")
 $repoInfo = Get-Content -Raw (Join-Path $repo "info.json") | ConvertFrom-Json
+$isFactorio017Line = $repoInfo.factorio_version -eq "0.17"
 $isFactorio018Line = $repoInfo.factorio_version -eq "0.18"
 $isFactorio10Line = $repoInfo.factorio_version -eq "1.0"
 $isFactorio11Line = $repoInfo.factorio_version -eq "1.1"
-$isReducedLegacyLine = $isFactorio018Line -or $isFactorio10Line -or $isFactorio11Line
+$isReducedLegacyLine = $isFactorio017Line -or $isFactorio018Line -or $isFactorio10Line -or $isFactorio11Line
 $isLegacyFactorio20 = $repoInfo.factorio_version -eq "2.0"
 $isFactorio21Line = $repoInfo.factorio_version -eq "2.1"
 $script:ValidationPackageZipPath = $null
@@ -139,7 +140,16 @@ Invoke-RepoCheck "info.json parses" {
 Invoke-RepoCheck "release metadata matches Factorio line" {
   $deps = @($repoInfo.dependencies)
 
-  if ($isFactorio018Line) {
+  if ($isFactorio017Line) {
+    if ($deps -notcontains "base >= 0.17") {
+      throw "Factorio 0.17 metadata must declare base >= 0.17."
+    }
+
+    $newerDeps = @($deps | Where-Object { $_ -match ">=\s*(0\.18|1|2)\." -or $_ -match "(space-age|quality|recycler|elevated-rails)" })
+    if ($newerDeps.Count -gt 0) {
+      throw "Factorio 0.17 metadata must not carry Factorio 0.18, 1.x, 2.x, or DLC dependencies: $($newerDeps -join ', ')"
+    }
+  } elseif ($isFactorio018Line) {
     if ($deps -notcontains "base >= 0.18") {
       throw "Factorio 0.18 metadata must declare base >= 0.18."
     }
@@ -451,7 +461,11 @@ Invoke-RepoCheck "fixture mods have metadata and data entrypoints" {
       throw "Fixture $($info.name) must target Factorio $($repoInfo.factorio_version) on this branch; found $($info.factorio_version)."
     }
     $fixtureBaseDependency = @($info.dependencies) | Where-Object { $_ -match "^base\s+>=" } | Select-Object -First 1
-    if ($isFactorio018Line) {
+    if ($isFactorio017Line) {
+      if ($fixtureBaseDependency -notmatch "^base\s+>=\s+0\.17(\.|$)") {
+        throw "Fixture $($info.name) must use a Factorio 0.17 base dependency on this branch; found '$fixtureBaseDependency'."
+      }
+    } elseif ($isFactorio018Line) {
       if ($fixtureBaseDependency -notmatch "^base\s+>=\s+0\.18(\.|$)") {
         throw "Fixture $($info.name) must use a Factorio 0.18 base dependency on this branch; found '$fixtureBaseDependency'."
       }
@@ -795,7 +809,11 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
           $_.Snippet -in @(
             'reason = "official-stream-settings-visible"',
             "ui_visibility = {",
-            "generation_requirements = {"
+            "generation_requirements = {",
+            '{technology = "electric-weapons-damage-1", required_mod = "space-age"}',
+            '__space-age__/graphics/technology/electric-weapons-damage.png',
+            '{technology = "research-productivity", required_mod = "space-age"}',
+            'ammo_category = "tesla", modifier = 0.1'
           )
         ) -and -not (
           $_.File -eq "prototypes\mir\settings\defaults.lua" -and
@@ -806,6 +824,23 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
         )
       }
     )
+  }
+
+  if ($isReducedLegacyLine) {
+    $reducedForbiddenDirectEffectSnippets = @(
+      '__space-age__/',
+      '{technology = "electric-weapons-damage-1", required_mod = "space-age"}',
+      '{technology = "research-productivity", required_mod = "space-age"}',
+      'ammo_category = "tesla"',
+      '"agricultural-science-pack"',
+      '"electromagnetic-science-pack"',
+      '"cryogenic-science-pack"'
+    )
+    foreach ($snippet in $reducedForbiddenDirectEffectSnippets) {
+      if ($directEffectsText.Contains($snippet)) {
+        throw "Factorio $($repoInfo.factorio_version) direct-effect streams must not carry newer-line surface '$snippet'."
+      }
+    }
   }
 
   foreach ($check in $requiredSnippets) {
@@ -842,11 +877,19 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
       throw "Missing explicit default science pack list for $weaponSpeedStream in prototypes/mir/settings/defaults.lua."
     }
     $packs = $match.Groups["packs"].Value
-    if (-not $packs.Contains("electromagnetic-science-pack")) {
-      throw "$weaponSpeedStream prototypes/mir/settings/defaults.lua science packs must include electromagnetic-science-pack."
-    }
-    if ($packs.Contains("agricultural-science-pack")) {
-      throw "$weaponSpeedStream prototypes/mir/settings/defaults.lua science packs must not include agricultural-science-pack."
+    if ($isReducedLegacyLine) {
+      foreach ($newerPack in @("agricultural-science-pack", "electromagnetic-science-pack", "cryogenic-science-pack")) {
+        if ($packs.Contains($newerPack)) {
+          throw "$weaponSpeedStream prototypes/mir/settings/defaults.lua science packs must not include $newerPack on Factorio $($repoInfo.factorio_version)."
+        }
+      }
+    } else {
+      if (-not $packs.Contains("electromagnetic-science-pack")) {
+        throw "$weaponSpeedStream prototypes/mir/settings/defaults.lua science packs must include electromagnetic-science-pack."
+      }
+      if ($packs.Contains("agricultural-science-pack")) {
+        throw "$weaponSpeedStream prototypes/mir/settings/defaults.lua science packs must not include agricultural-science-pack."
+      }
     }
   }
 
@@ -2849,7 +2892,7 @@ if ($isReducedLegacyLine) {
   Write-Host "[info] $reducedLineLabel reduced runtime gate skips 2.x recipe-productivity and DLC scenarios."
 
   $directEffectFixtureNames = @()
-  if ($isFactorio018Line -or $isFactorio10Line -or $isFactorio11Line) {
+  if ($isFactorio017Line -or $isFactorio018Line -or $isFactorio10Line -or $isFactorio11Line) {
     $directEffectFixtureNames += "mir-fixture-assert-legacy-effect-icons"
   }
   Invoke-RuntimeScenario -ScenarioName "factorio-$($repoInfo.factorio_version)-direct-effects" -EnabledFixtureNames $directEffectFixtureNames

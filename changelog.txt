@@ -1,4 +1,29 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.8.1
+Date: 2026-07-10
+
+  Compatibility:
+
+    - Ported the maintained Factorio 1.0 line from the 1.9.3 reduced source posture plus proven 1.8.0 bridge lessons.
+    - Retargeted package metadata to Factorio 1.0 with `base >= 1.0`.
+    - Kept supported direct-effect infinite researches and base technology continuations.
+    - Kept recipe productivity, Space Age, Quality, Recycler, Elevated Rails, cargo logistics, spoilage, and agriculture out of 1.0.
+    - Kept prototype cap settings, pipeline extent settings, settings profiles, and newer technology badge overlays out of 1.0.
+    - Preserved the old-line runtime state adapter so Factorio 1.0 uses `global` instead of the Factorio 2.x `storage` table.
+
+  Changes:
+
+    - Removed 2.x DLC dependencies and newer science-pack names from generated direct-effect and base-extension defaults.
+    - Reused the 1.8.0 target-era icon policy: generated direct-effect technologies use base technology art only.
+    - Kept unsupported native modifier icon metadata out of generated old-line direct-effect technologies.
+    - Carried the older `laser-turret-speed` base technology chain adapter into the maintained 1.0 line.
+    - Added a Factorio 1.0 runtime check that rejects unavailable newer badge paths and synthetic old-line badge overlays.
+    - Extended the Factorio 1.0 runtime check to reject unsupported native modifier icon metadata.
+    - Retargeted branch-local support mod metadata to Factorio 1.0 for the reduced-line release gate.
+    - Documented 1.8.1 as a maintained Factorio 1.0 compatibility port, not a metadata bump of the 0.18 bridge package.
+    - Documented that 1.8.1 is not a feature-parity backport of the modern line.
+
+---------------------------------------------------------------------------------------------------
 Version: 1.9.3
 Date: 2026-07-10
 

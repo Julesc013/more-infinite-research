@@ -31,6 +31,11 @@ continuations only, and does not include recipe productivity, Factorio 2.x DLC
 surfaces, prototype cap settings, pipeline extent settings, settings profiles,
 newer technology badge overlays, or synthetic old-line badge overlays.
 
+**MIR `1.8.1+`** targets **Factorio `1.0`** as the maintained compatibility
+port line. It is derived from the validated Factorio `1.1` port and the
+Factorio `0.18` bridge lessons, with Factorio `1.0` metadata, validation, and
+target-supported behavior restored where proven.
+
 **MIR `1.9.3+`** targets **Factorio `1.1`** as a reduced compatibility port:
 supported direct-effect bonuses and base technology continuations only, with
 no recipe productivity, Space Age, Quality, Recycler, Elevated Rails, cargo
@@ -215,7 +220,9 @@ This helps it work with:
 When this mod is set to prefer its own overlapping research, it only removes known competing infinite technologies that are fully covered by generated More Infinite Research effects. Finite upgrade chains from other mods are left alone. Vanilla Space Age productivity families remain authoritative where safe, so mod-added rocket fuel or low density structure recipes can be appended to the vanilla infinite technology instead of receiving duplicate-looking MIR research.
 
 Compatibility is broad, but not guaranteed for every overhaul. Mods that change recipes or labs very late in loading may still need load-order compatibility.
-MIR 3 public claims are deliberately narrow: a page may claim a named recipe family, a diagnostic observation, or coexistence behavior, but not full overhaul support unless that claim is explicitly recorded.
+MIR 3 public claims are deliberately narrow: a page may claim a named recipe
+family, a diagnostic observation, or coexistence behavior, but not full overhaul
+support unless that claim is explicitly recorded.
 
 For maintainers and pack authors, the repository includes an extended local audit workflow. With a Factorio binary and Mod Portal credentials, it can run top-download audits; with read-only local mod zip libraries, it can also run offline individual-root, curated-combination, and generated local-library stress sweeps. The workflow supports curated overhaul scenarios, local modpack zip roots, safe unattended local sweep and morning summary helpers, parsed MIR diagnostics, checkpointed load results, missing-dependency summaries, grouped expected/unexpected failure reports, explcit official-DLC mod-list isolation, blank-log-line-tolerant audit parsing, and review-only compatibility profile stubs. Exploratory runs collect all scenarios for triage; strict runs can fail on unexpected grouped failures. These tools are for evidence collection; they do not automatically enable new compatibility profiles.
 

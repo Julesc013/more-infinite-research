@@ -238,7 +238,7 @@ compatibility port of a tested current-line snapshot.
 - [ ] Accumulate normal portable lessons for `3.0.5` after `2.3.0` is
   published, `1.1` is published or has produced clear lessons, the `1.0` /
   `0.18` bridge is decided, and community feedback has had a short window.
-- [x] Release `v1.9.3` as the first Factorio `1.1` compatibility port only after target-line implementation and binary validation.
+- [x] Prepare and validate `v1.9.3` as the first Factorio `1.1` compatibility port after target-line implementation and binary validation.
   Ring 2 posture: no Space Age, Quality, Recycler, Elevated Rails, cargo
   modifiers, recipe productivity, `storage`, or Factorio `2.x` dependency
   syntax leakage. Prove target-valid science packs, effects,
@@ -252,6 +252,9 @@ compatibility port of a tested current-line snapshot.
   smoke check and reduced `1.1` fixture gate. Factorio `1.1.110` rejected
   `change-recipe-productivity`, so recipe productivity remains a documented
   target-line exclusion.
+- [ ] Publish or record `v1.9.3` as public: upload the exact validated zip if
+  not already public, verify the Mod Portal lists Factorio `1.1`, tag the
+  source point, and mark `.mir/branches.yml` as `published`.
 - [x] Release `v1.8.0` as the Factorio `0.18` bridge compatibility port from the MIR 3 source anchor plus portable `2.3.0` and `1.9.3` lessons.
   Published bridge package: `dist/more-infinite-research_1.8.0.zip`,
   SHA-256 `D785E6EBE7A72E6E9F01A3F89774A6AA30479430410447F603FEF1E0B9BD7B24`,
@@ -264,7 +267,17 @@ compatibility port of a tested current-line snapshot.
   constant badge graphics, synthetic badge overlays, or unsupported native
   modifier icon metadata. Research productivity uses stock military science
   technology art as its main tile.
-- [ ] Release `v1.8.1` as the true Factorio `1.0` compatibility port only if the `0.18` bridge does not cover the public `1.0` release shape.
+- [x] Release `v1.8.1` as the first maintained Factorio `1.0` compatibility
+  port from the `1.9.3` source posture, proven `1.8.0` bridge lessons, and
+  current dev portable fixes. Package candidate:
+  `dist/more-infinite-research_1.8.1.zip`, SHA-256
+  `B1622AB0BC6D72265842D698781DBE21B7286662E29FB6992057FBCFF87D8E29`,
+  size `300526` bytes, `116` entries, `0` forbidden entries. Static
+  validation passed, Factorio `1.0` binary validation passed with
+  `D:\Programs\Factorio\1.0\bin\x64\factorio.exe`, and the public dist archive
+  content matches the runtime-validated archive. Do not use `0.8.x` for
+  Factorio `1.0`; `0.8.x` remains reserved for the later Factorio `0.8` museum
+  line.
 - [ ] Release `v1.7.0`, `v1.6.0`, and `v1.5.0` as reduced native-infinite editions for Factorio `0.17`, `0.16`, and `0.15` only after target binary proof.
 - [ ] Release `v1.4.0`, `v1.3.0`, and `v0.12.0` as archive finite-ladder reconstructions only after target binary proof.
 - [ ] Release `v0.11.0` through `v0.6.0` as museum/discovery builds only after target binary and base-file discovery.
