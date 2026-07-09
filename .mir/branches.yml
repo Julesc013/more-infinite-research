@@ -90,7 +90,7 @@ release_artifacts:
       size_bytes: 295968
       entries: 119
       forbidden_entries: 0
-      status: legacy-rc
+      status: release-ready
   closed_versions:
     - version: "2.2.0"
       branch: main
@@ -104,10 +104,10 @@ release_artifacts:
       status: published
   next_release_targets:
     current_line:
-      version: "3.0.1"
+      version: "3.0.5"
       branch: dev
       target_factorio: "2.1"
-      purpose: immediate portable cleanup learned during the 2.0 backport
+      purpose: accumulated portable fixes, compatibility lessons, tooling updates, docs corrections, and community feedback after the 3.0.0 backport rings
     factorio_2_0_backport:
       version: "2.3.0"
       branch: legacy
@@ -121,11 +121,6 @@ release_artifacts:
       branch: dev
       target_factorio: "2.1"
       purpose: fixture-backed overhaul compatibility support campaign after the 3.0.5 patch
-    current_line_feedback_patch:
-      version: "3.0.5"
-      branch: dev
-      target_factorio: "2.1"
-      purpose: accumulated compatibility and tooling patch after the 2.0, 1.1, 1.0, and 0.17 lessons
   package_refresh_rule: >-
     only build or refresh dist archives for an unpublished target version;
     never refresh already-published archives as part of architecture or

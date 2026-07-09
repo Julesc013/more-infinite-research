@@ -216,11 +216,13 @@ Current execution state:
 - Release older lines from their own `tmp/*` or stable target branches in
   descending order, using the target-line matrix below and the historical
   cadence note as the release order guide.
-- After the `2.3.0` port, bring immediate portable fixes, tests, and tooling
-  lessons back to `dev` as `3.0.1`. Do not bring target-line metadata
-  downgrades back to `dev`.
-- Reserve `3.0.5` for accumulated compatibility and tooling lessons after the
-  `2.0`, `1.1`, `1.0`, and `0.17` target-line work has produced more evidence.
+- After each backport ring, bring portable fixes, tests, documentation, and
+  tooling lessons back to `dev`, but do not cut an immediate `3.0.1` release.
+- Keep `dev` as the accumulating Factorio `2.1` integration branch while the
+  `3.0.0` backport rings are worked.
+- Release `3.0.5` after the `3.0.0` backport rings have finished and a short
+  community-feedback window has captured early release corrections. Do not
+  bring target-line metadata downgrades back to `dev`.
 - Start `3.1.0` only after the `3.0.5` learning patch is stable. Treat `3.1.0`
   as the fixture-backed overhaul support campaign, not as cleanup from the
   backport ladder.
@@ -272,7 +274,8 @@ validated for that line.
 Each ring can send portable improvements back to `dev`: validation script
 improvements, target manifest fixes, report diff fixes, package hygiene fixes,
 docs corrections, generic platform-adapter fixes, clearer errors, and
-deterministic ordering fixes.
+deterministic ordering fixes. These returns accumulate on `dev`; they are not a
+reason to cut `3.0.1` while the backport ladder is still active.
 
 Target-line edits must stay out of `dev`: `factorio_version = "2.0"` or older,
 lower `base` dependency floors, removed `2.1` dependencies, disabled `2.1`
@@ -308,12 +311,17 @@ Minimum gate:
 - build and inspect the package;
 - promote to `legacy` only after all gates pass.
 
-### Portable Return To `dev`
+### Portable Return To `dev` And `3.0.5`
 
-After `2.3.0`, bring back only portable improvements as `3.0.1`: validation
-script improvements, target manifest fixes, report diff fixes, package hygiene
-fixes, docs corrections, generic platform-adapter fixes, better error messages,
-and deterministic ordering fixes.
+After `2.3.0` and every later ring, bring back only portable improvements to
+`dev`: validation script improvements, target manifest fixes, report diff
+fixes, package hygiene fixes, docs corrections, generic platform-adapter fixes,
+better error messages, and deterministic ordering fixes.
+
+Do not release these immediately as `3.0.1`. Keep them on `dev` while the
+`3.0.0` backport rings continue. Once all planned `3.0.0` source-derived
+backports are complete, add a short community-feedback window, resolve the
+portable issues found there, and ship one Factorio `2.1` patch as `3.0.5`.
 
 Do not bring back target-line metadata, dependency-floor downgrades, removed
 `2.1` dependencies, disabled `2.1` features, or `2.0` release wording.
