@@ -246,8 +246,8 @@ compatibility port of a tested current-line snapshot.
   target-line exclusion.
 - [ ] Release `v1.8.0` as the Factorio `0.18` bridge compatibility port from the MIR 3 source anchor plus portable `2.3.0` and `1.9.3` lessons.
   Current bridge candidate package: `dist/more-infinite-research_1.8.0.zip`,
-  SHA-256 `2AB8D4805B5846FD478731182F210AE325B05C6012E3942ED0665C4325B77B0E`,
-  size `298778` bytes, `116` entries, `0` forbidden entries. Static validation
+  SHA-256 `3D5065B492C25E42AB174C38349BEE4EF5D12928BE53366369E25EDA11F3B105`,
+  size `298879` bytes, `116` entries, `0` forbidden entries. Static validation
   passed, Factorio `1.0` bridge validation passed with
   `D:\Programs\Factorio\1.0\bin\x64\factorio.exe`, and the public dist archive
   content matches the runtime-validated archive. A matching Factorio `0.18`

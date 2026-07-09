@@ -32,6 +32,9 @@ direct-effect infinite researches and supported base technology continuations.
   bridge target.
 - Reused the global runtime-state adapter from the `1.1` port and kept
   unsupported runtime handlers disabled.
+- Added explicit target-era localized names and descriptions to generated
+  vanilla continuations so numbered continuation technologies do not show
+  unresolved locale keys in older Factorio UIs.
 
 ## Icon Policy
 
@@ -62,8 +65,8 @@ without badge overlays.
 
 - Release candidate package:
   `dist/more-infinite-research_1.8.0.zip`, SHA-256
-  `2AB8D4805B5846FD478731182F210AE325B05C6012E3942ED0665C4325B77B0E`,
-  `298778` bytes, `116` entries, `0` forbidden release entries.
+  `3D5065B492C25E42AB174C38349BEE4EF5D12928BE53366369E25EDA11F3B105`,
+  `298879` bytes, `116` entries, `0` forbidden release entries.
 - Static validation passed for the `1.8.0` metadata and package shape.
 - The public dist archive and the runtime-validated validation archive contain
   the same `116` file entries with identical per-entry content hashes.
@@ -73,6 +76,9 @@ without badge overlays.
   scenario, lab productivity owner skip, robot battery owner skip, merged
   inventory/trash capacity, settings surface, checkbox enable/disable, and
   weapon-speed overlap safety scenarios.
+- The reduced settings/profile fixture asserts generated vanilla continuations
+  use explicit target-era localized names and descriptions, including the
+  older `laser-turret-speed` chain.
 - A matching Factorio `0.18` binary is required before final publication
   claims can say the bridge has loaded in the original target line.
 

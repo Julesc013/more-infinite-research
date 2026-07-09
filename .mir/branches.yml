@@ -108,8 +108,8 @@ release_artifacts:
       target_factorio: "0.18"
       source_anchor: mir_1_9_3
       artifact: dist/more-infinite-research_1.8.0.zip
-      sha256: 2AB8D4805B5846FD478731182F210AE325B05C6012E3942ED0665C4325B77B0E
-      size_bytes: 298778
+      sha256: 3D5065B492C25E42AB174C38349BEE4EF5D12928BE53366369E25EDA11F3B105
+      size_bytes: 298879
       entries: 116
       forbidden_entries: 0
       validation_content_matches_dist: true

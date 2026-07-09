@@ -261,6 +261,7 @@ local function extend_chain(key)
   local spec = base_defaults[key] or {}
   local chain_key = spec.chain_key or key
   local generated_key = spec.generated_key or chain_key
+  local locale_key = spec.locale_key or chain_key
   if not is_enabled(key, spec) then
     D.extension(D.extension_fields(key, "skipped", "disabled"))
     return
@@ -428,8 +429,8 @@ local function extend_chain(key)
 
   local new = deepcopy(base_tech)
   new.name = new_name
-  new.localised_name = base_tech.localised_name
-  new.localised_description = base_tech.localised_description
+  new.localised_name = spec.localised_name or base_tech.localised_name or {"technology-name." .. locale_key}
+  new.localised_description = spec.localised_description or base_tech.localised_description or {"technology-description." .. locale_key}
   new.prerequisites = build_prerequisites(chain_key .. "-" .. base_level, base_tech.prerequisites)
   new.level = desired_new_level
 

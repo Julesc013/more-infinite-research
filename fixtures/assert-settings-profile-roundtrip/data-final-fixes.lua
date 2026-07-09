@@ -69,6 +69,39 @@ if reduced_older_line then
   local encoded_a = "MIRSET1-unavailable-on-reduced-line:" .. json
   local encoded_b = "MIRSET1-unavailable-on-reduced-line:" .. json
   assert_equal("deterministic local profile payload", encoded_b, encoded_a)
+
+  local continuation_locale = {
+    ["braking-force"] = "braking-force",
+    ["research-speed"] = "research-speed",
+    ["worker-robots-storage"] = "worker-robots-storage",
+    ["weapon-shooting-speed"] = "weapon-shooting-speed",
+    ["laser-turret-speed"] = "laser-turret-speed"
+  }
+
+  local function assert_localised_reference(label, value, expected_key)
+    if type(value) ~= "table" then
+      fail(label .. " does not have an explicit localised string.")
+    end
+    assert_equal(label .. " locale key", value[1], expected_key)
+  end
+
+  for chain_key, locale_key in pairs(continuation_locale) do
+    local highest
+    for name, tech in pairs(data.raw.technology or {}) do
+      local level = tonumber(string.match(name, "^" .. chain_key:gsub("([^%w])", "%%%1") .. "%-(%d+)$"))
+      if level and tech.max_level == "infinite" and (not highest or level > highest.level) then
+        highest = {
+          level = level,
+          name = name,
+          tech = tech
+        }
+      end
+    end
+    if highest then
+      assert_localised_reference(highest.name .. " localised_name", highest.tech.localised_name, "technology-name." .. locale_key)
+      assert_localised_reference(highest.name .. " localised_description", highest.tech.localised_description, "technology-description." .. locale_key)
+    end
+  end
   return
 end
 

@@ -16,6 +16,7 @@ Date: 2026-07-10
     - Updated lab productivity icon selection to prefer stock `research-speed-6` and `research-speed-5` before military science.
     - Extended metadata, settings visibility, and reduced-line runtime checks for the Factorio 0.18 bridge target.
     - Skipped the 1.1-only badge check on 0.18 while retaining direct-effect, owner-skip, checkbox, and base-extension checks.
+    - Added explicit target-era names and descriptions to generated vanilla continuations to avoid unresolved locale keys.
     - Documented 1.8.0 as a bridge/archive compatibility port, not a feature-parity backport of 1.1, 2.0, or 2.1.
 
 ---------------------------------------------------------------------------------------------------
