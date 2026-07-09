@@ -236,6 +236,10 @@ compatibility port of a tested current-line snapshot.
   dependency syntax leakage. Prove target-valid science packs, effects,
   `max_level`, `count_formula`, old recipe schema, package hygiene, and
   compatibility-port release wording against a Factorio `1.1` binary.
+  Current RC package: `dist/more-infinite-research_1.9.3.zip`,
+  SHA-256 `7EA618FD4B9A4777F12E3738A8BD85F693FFC6B74B8C29FB92749A2C8BBA227D`,
+  size `297625` bytes, `116` entries, `0` forbidden entries. Static validation
+  and the reduced Factorio `1.1` runtime gate passed on 2026-07-10.
 - [ ] Release `v1.8.0` as the first Factorio `1.0` compatibility port only after the Factorio `0.18` bridge policy is recorded.
 - [ ] Release `v1.7.0`, `v1.6.0`, and `v1.5.0` as reduced native-infinite editions for Factorio `0.17`, `0.16`, and `0.15` only after target binary proof.
 - [ ] Release `v1.4.0`, `v1.3.0`, and `v0.12.0` as archive finite-ladder reconstructions only after target binary proof.

@@ -91,6 +91,17 @@ release_artifacts:
       entries: 119
       forbidden_entries: 0
       status: published
+    mir_1_9_3:
+      version: "1.9.3"
+      branch: tmp/1.1
+      target_factorio: "1.1"
+      source_anchor: mir_3_0_0
+      artifact: dist/more-infinite-research_1.9.3.zip
+      sha256: 7EA618FD4B9A4777F12E3738A8BD85F693FFC6B74B8C29FB92749A2C8BBA227D
+      size_bytes: 297625
+      entries: 116
+      forbidden_entries: 0
+      status: release-candidate
   closed_versions:
     - version: "2.2.0"
       branch: main
