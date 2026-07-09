@@ -33,6 +33,9 @@ Factorio `2.x` surfaces before they can emit invalid prototypes.
 - Retargeted branch-local support mod metadata to Factorio `1.1`.
 - Hid settings-profile import/export on the `1.1` line because Factorio `1.1`
   does not expose the `helpers` string codec API used by MIRSET1 profiles.
+- Disabled newer `__core__/graphics/icons/technology/constants/*` badge
+  overlays on the `1.1` line and used target-era source icons instead of
+  bundling newer Factorio graphics.
 
 ## Supported Surface
 
@@ -62,6 +65,8 @@ Factorio `2.x` surfaces before they can emit invalid prototypes.
 - Space Age, Quality, Recycler, Elevated Rails, cargo logistics, spoilage,
   agriculture, prototype cap settings, pipeline extent settings, and settings
   profiles are not included on the `1.1` line.
+- Newer Factorio core graphics are not bundled into the `1.1` package; MIR
+  falls back to icons available in the target install.
 - Compatibility docs should describe this release as a reduced compatibility
   port generated from the MIR 3 architecture, not as identical to `2.3.0` or
   `3.0.0`.

@@ -9,6 +9,7 @@ M.supports = {
   recipe_productivity = false,
   settings_profiles = false,
   scripted_techs = false,
+  technology_constant_overlays = false,
   productivity_family_adoption = false
 }
 

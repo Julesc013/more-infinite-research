@@ -13,6 +13,7 @@ Date: 2026-07-10
     - Added a target-line adapter for unsupported streams, direct effects, prototype caps, repairs, and runtime handlers.
     - Disabled unsupported 2.x behavior before it can emit 1.1-invalid prototypes.
     - Replaced direct runtime persistence access with a state adapter that uses global on Factorio 1.1 and storage on Factorio 2.x.
+    - Disabled newer core technology badge overlays on Factorio 1.1 and used target-era source icons instead.
 
   Changes:
 

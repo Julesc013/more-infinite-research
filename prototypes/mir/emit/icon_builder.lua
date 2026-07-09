@@ -2,6 +2,7 @@ local deepcopy = require("prototypes.mir.core.deepcopy")
 local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 local lookup = require("prototypes.mir.platform.factorio.prototype_lookup")
 local effective_settings = require("prototypes.mir.settings.effective")
+local target_line = require("prototypes.mir.platform.factorio.target_line")
 
 local I = {}
 
@@ -254,6 +255,7 @@ local function add_constant_overlay(base_icons, overlay)
     }}
   end
   if overlay == false then return out end
+  if not target_line.feature_enabled("technology_constant_overlays") then return out end
 
   local path = CONSTANT_OVERLAYS[overlay or "recipe-productivity"] or overlay
   if type(path) ~= "string" then return out end
