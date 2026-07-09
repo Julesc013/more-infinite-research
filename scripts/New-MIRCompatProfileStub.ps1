@@ -101,7 +101,7 @@ if ([string]::IsNullOrWhiteSpace($OutputPath)) {
 
 $lines = @()
 $lines += "-- Generated from MIR compatibility audit evidence."
-$lines += "-- Review and refine this stub before enabling it in prototypes/compat/profiles.lua."
+$lines += "-- Review and refine this stub before enabling it in prototypes/mir/compatibility/profiles.lua."
 $lines += "-- Group: $GroupId"
 $lines += "-- Kind: $kind"
 $lines += ""

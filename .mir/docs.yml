@@ -1,0 +1,1111 @@
+schema: 1
+
+docs:
+  - path: docs/adr/0001-mir-3-compatibility-compiler-architecture.md
+    title: "ADR 0001: MIR 3.0 Compatibility Compiler Architecture"
+    status: current
+    audience: maintainer
+    doc_type: adr
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/adr/0002-capability-resolver-interface.md
+    title: "ADR 0002: Capability Resolver Interface"
+    status: current
+    audience: maintainer
+    doc_type: adr
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/adr/0003-decision-record-and-stream-spec-schemas.md
+    title: "ADR 0003: DecisionRecord And StreamSpec Schemas"
+    status: current
+    audience: maintainer
+    doc_type: adr
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/adr/0004-policy-overlays-not-behavior-scripts.md
+    title: "ADR 0004: Policy Overlays, Not Behavior Scripts"
+    status: current
+    audience: maintainer
+    doc_type: adr
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/adr/0005-generated-id-and-migration-policy.md
+    title: "ADR 0005: Generated ID And Migration Policy"
+    status: current
+    audience: maintainer
+    doc_type: adr
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/adr/0006-science-and-lab-planning-policy.md
+    title: "ADR 0006: Science And Lab Planning Policy"
+    status: current
+    audience: maintainer
+    doc_type: adr
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/adr/0007-native-modifier-ownership-policy.md
+    title: "ADR 0007: Native Modifier Ownership Policy"
+    status: current
+    audience: maintainer
+    doc_type: adr
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/adr/0008-loop-risk-policy.md
+    title: "ADR 0008: Loop-Risk Policy"
+    status: current
+    audience: maintainer
+    doc_type: adr
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/adr/0009-compatibility-claim-levels.md
+    title: "ADR 0009: Compatibility Claim Levels"
+    status: current
+    audience: maintainer
+    doc_type: adr
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/adr/0010-settings-and-customization-policy.md
+    title: "ADR 0010: Settings And Customization Policy"
+    status: current
+    audience: maintainer
+    doc_type: adr
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/adr/0011-runtime-code-boundaries.md
+    title: "ADR 0011: Runtime Code Boundaries"
+    status: current
+    audience: maintainer
+    doc_type: adr
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/adr/0012-fixture-and-report-diff-strategy.md
+    title: "ADR 0012: Fixture And Report-Diff Strategy"
+    status: current
+    audience: maintainer
+    doc_type: adr
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/adr/0013-factorio-shell-and-mir-compiler-namespace.md
+    title: "ADR 0013: Factorio Shell And MIR Compiler Namespace"
+    status: current
+    audience: maintainer
+    doc_type: adr
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/adr/README.md
+    title: "Architecture Decision Records"
+    status: current
+    audience: maintainer
+    doc_type: explanation
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/architecture/compatibility-compiler-charter.md
+    title: "MIR 3.0.0 Compatibility Compiler Charter"
+    status: current
+    audience: maintainer
+    doc_type: explanation
+    owner: mir-maintainers
+    source_of_truth_for:
+      - compatibility-compiler-charter
+  - path: docs/architecture/module-boundaries.md
+    title: "MIR 3.0.0 Repository Structure"
+    status: current
+    audience: maintainer
+    doc_type: explanation
+    owner: mir-maintainers
+    source_of_truth_for:
+      - module-boundaries
+  - path: docs/architecture/factorio-lifecycle.md
+    title: "Factorio Lifecycle Boundaries"
+    status: current
+    audience: maintainer
+    doc_type: explanation
+    owner: mir-maintainers
+    source_of_truth_for:
+      - factorio-lifecycle-boundaries
+  - path: docs/architecture/procedural-compatibility-kernel.md
+    title: "Procedural Compatibility Kernel"
+    status: current
+    audience: maintainer
+    doc_type: explanation
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/architecture/README.md
+    title: "Architecture"
+    status: current
+    audience: maintainer
+    doc_type: explanation
+    owner: mir-maintainers
+    source_of_truth_for:
+      - architecture-overview
+  - path: docs/archive/2.x/2.2.0-feature-intake.md
+    title: "2.2.0 Feature Intake From The July 2026 Suggestion Transcript"
+    status: archived
+    audience: maintainer
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/archive/2.x/completed-task-ledger.md
+    title: "2.x Completed Task Ledger"
+    status: archived
+    audience: maintainer
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/archive/2.x/legacy-backport-cadence.md
+    title: "Legacy Backport Cadence"
+    status: archived
+    audience: maintainer
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/archive/2.x/legacy-backport-capabilities.md
+    title: "Legacy Backport Capability Matrix"
+    status: archived
+    audience: maintainer
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/archive/2.x/legacy-backport-plan.md
+    title: "Legacy Backport Plan"
+    status: archived
+    audience: maintainer
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/archive/2.x/mod-ideas-audit.md
+    title: "Local Idea Mods Audit And Release Plan - 2026-07-05"
+    status: archived
+    audience: maintainer
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/archive/2.x/mod-ideas-features.md
+    title: "Idea Mods Feature Audit - 2026-07-05"
+    status: archived
+    audience: maintainer
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/archive/2.x/post-2.0-feature-plan.md
+    title: "Post-2.0 Feature Plan"
+    status: archived
+    audience: maintainer
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/archive/2.x/pre-manual-2.0.5-report.md
+    title: "v2.0.5 Pre-Manual Readiness Report"
+    status: archived
+    audience: maintainer
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/archive/2.x/rc-plan-factorio-2.0.md
+    title: "Factorio 2.0 RC Planning Report"
+    status: archived
+    audience: maintainer
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/archive/2.x/rc-plan-factorio-0.13.md
+    title: "Factorio 0.13 RC Planning Report"
+    status: archived
+    audience: maintainer
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/archive/2.x/README.md
+    title: "2.x Archive"
+    status: archived
+    audience: maintainer
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/archive/2.x/release-notes-1.9.0.md
+    title: "More Infinite Research 1.9.0 Release Notes"
+    status: archived
+    audience: maintainer
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/archive/2.x/release-notes-1.9.1.md
+    title: "More Infinite Research 1.9.1 Release Notes"
+    status: archived
+    audience: maintainer
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/archive/2.x/release-notes-1.9.2.md
+    title: "More Infinite Research 1.9.2 Release Notes"
+    status: archived
+    audience: maintainer
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/archive/2.x/release-notes-2.0.5.md
+    title: "More Infinite Research 2.0.5 Release Notes"
+    status: archived
+    audience: maintainer
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/archive/2.x/release-notes-2.1.0.md
+    title: "More Infinite Research 2.1.0 Release Notes"
+    status: archived
+    audience: maintainer
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/archive/2.x/release-notes-2.1.5.md
+    title: "More Infinite Research 2.1.5 Release Notes"
+    status: archived
+    audience: maintainer
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/archive/2.x/release-notes-2.2.0.md
+    title: "2.2.0 Release Notes"
+    status: archived
+    audience: maintainer
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/archive/2.x/release-notes-2.3.0.md
+    title: "More Infinite Research 2.3.0 Release Notes"
+    status: archived
+    audience: maintainer
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/archive/2.x/release-notes-legacy.md
+    title: "More Infinite Research 1.9.0 Release Notes"
+    status: archived
+    audience: maintainer
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/archive/2.x/release-plan-2.1.0.md
+    title: "More Infinite Research 2.1.0 Release-Gated Plan"
+    status: archived
+    audience: maintainer
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/archive/README.md
+    title: "Archive"
+    status: current
+    audience: maintainer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/archive/superseded/README.md
+    title: "Superseded Docs"
+    status: archived
+    audience: maintainer
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/assets/diagrams/README.md
+    title: "Diagrams"
+    status: current
+    audience: maintainer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/assets/README.md
+    title: "Assets"
+    status: current
+    audience: maintainer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/assets/screenshots/README.md
+    title: "Screenshots"
+    status: current
+    audience: maintainer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/capabilities/lab-compatibility.md
+    title: "Lab Compatibility Capability"
+    status: current
+    audience: developer
+    doc_type: explanation
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/capabilities/loader-manufacturing.md
+    title: "Loader Manufacturing Capability"
+    status: current
+    audience: developer
+    doc_type: explanation
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/capabilities/logistics-manufacturing.md
+    title: "Logistics Manufacturing Capability"
+    status: draft
+    audience: developer
+    doc_type: explanation
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/capabilities/loop-risk.md
+    title: "Loop Risk Capability"
+    status: current
+    audience: developer
+    doc_type: explanation
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/capabilities/machine-manufacturing.md
+    title: "Machine Manufacturing Capability"
+    status: draft
+    audience: developer
+    doc_type: explanation
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/capabilities/mining-drill-manufacturing.md
+    title: "Mining Drill Manufacturing Capability"
+    status: current
+    audience: developer
+    doc_type: explanation
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/capabilities/native-modifiers.md
+    title: "Native Modifiers Capability"
+    status: current
+    audience: developer
+    doc_type: explanation
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/capabilities/ore-processing.md
+    title: "Ore Processing Capability"
+    status: draft
+    audience: developer
+    doc_type: explanation
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/capabilities/owner-conflicts.md
+    title: "Owner Conflicts Capability"
+    status: current
+    audience: developer
+    doc_type: explanation
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/capabilities/README.md
+    title: "Capabilities"
+    status: current
+    audience: developer
+    doc_type: explanation
+    owner: mir-maintainers
+    source_of_truth_for:
+      - capability-model
+  - path: docs/capabilities/recipe-productivity.md
+    title: "Recipe Productivity Capability"
+    status: current
+    audience: developer
+    doc_type: explanation
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/capabilities/rule-surfaces.md
+    title: "Rule Surfaces Capability"
+    status: current
+    audience: developer
+    doc_type: explanation
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/capabilities/science-integration.md
+    title: "Science Integration Capability"
+    status: current
+    audience: developer
+    doc_type: explanation
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/capabilities/tile-surfaces.md
+    title: "Tile Surfaces Capability"
+    status: draft
+    audience: developer
+    doc_type: explanation
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/compatibility/campaigns/factorio-2.0-lane.md
+    title: "Factorio 2.0 Lane"
+    status: draft
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/compatibility/campaigns/factorio-2.1-lane.md
+    title: "Factorio 2.1 Lane"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/compatibility/campaigns/README.md
+    title: "Compatibility Campaigns"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/compatibility/claim-levels.md
+    title: "Compatibility Claims"
+    status: current
+    audience: modpack-author
+    doc_type: explanation
+    owner: mir-maintainers
+    source_of_truth_for:
+      - compatibility-claim-levels
+  - path: docs/compatibility/compatibility-matrix.md
+    title: "MIR Compatibility Matrix"
+    status: current
+    audience: modpack-author
+    doc_type: explanation
+    owner: mir-maintainers
+    source_of_truth_for:
+      - compatibility-matrix
+  - path: docs/compatibility/targets/aai-containers.md
+    title: "AAI Containers Compatibility"
+    status: current
+    audience: modpack-author
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/compatibility/targets/aai-industry.md
+    title: "AAI Industry Compatibility"
+    status: current
+    audience: modpack-author
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/compatibility/targets/aai-loaders.md
+    title: "AAI Loaders Compatibility"
+    status: current
+    audience: modpack-author
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/compatibility/targets/atan-air-scrubbing.md
+    title: "ATAN Air Scrubbing Compatibility"
+    status: current
+    audience: modpack-author
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/compatibility/targets/atan-ash.md
+    title: "ATAN Ash Compatibility"
+    status: current
+    audience: modpack-author
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/compatibility/targets/atan-nuclear-science.md
+    title: "ATAN Nuclear Science Compatibility"
+    status: current
+    audience: modpack-author
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/compatibility/targets/big-mining-drill.md
+    title: "Big Mining Drill Compatibility"
+    status: current
+    audience: modpack-author
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/compatibility/targets/equipment-gantry.md
+    title: "Equipment Gantry Compatibility"
+    status: current
+    audience: modpack-author
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/compatibility/targets/fluid-must-flow.md
+    title: "Fluid Must Flow Compatibility"
+    status: current
+    audience: modpack-author
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/compatibility/targets/jetpack.md
+    title: "Jetpack Compatibility"
+    status: current
+    audience: modpack-author
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/compatibility/targets/README.md
+    title: "Compatibility Targets"
+    status: current
+    audience: modpack-author
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/compatibility/targets/robot-attrition.md
+    title: "Robot Attrition Compatibility"
+    status: current
+    audience: modpack-author
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/compatibility/policy-overlays.md
+    title: "Policy Overlays"
+    status: current
+    audience: modpack-author
+    doc_type: explanation
+    owner: mir-maintainers
+    source_of_truth_for:
+      - policy-overlays
+  - path: docs/compatibility/README.md
+    title: "Compatibility and Validation"
+    status: current
+    audience: modpack-author
+    doc_type: explanation
+    owner: mir-maintainers
+    source_of_truth_for:
+      - compatibility-model
+  - path: docs/compatibility/support-lanes.md
+    title: "MIR Compatibility Program"
+    status: current
+    audience: modpack-author
+    doc_type: explanation
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/maintainer/adding-a-capability.md
+    title: "Adding A Capability"
+    status: current
+    audience: developer
+    doc_type: how-to
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/maintainer/adding-a-compatibility-fixture.md
+    title: "Adding A Compatibility Fixture"
+    status: current
+    audience: developer
+    doc_type: how-to
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/maintainer/adding-a-generated-stream.md
+    title: "Adding A Generated Stream"
+    status: current
+    audience: developer
+    doc_type: how-to
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/maintainer/adding-a-policy-overlay.md
+    title: "Adding A Policy Overlay"
+    status: current
+    audience: developer
+    doc_type: how-to
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/maintainer/backporting.md
+    title: "Target-Line Versioning And Backports"
+    status: current
+    audience: maintainer
+    doc_type: how-to
+    owner: mir-maintainers
+    source_of_truth_for:
+      - backporting-policy
+  - path: docs/maintainer/build-and-package.md
+    title: "Build And Package"
+    status: current
+    audience: maintainer
+    doc_type: how-to
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/maintainer/developer-tools.md
+    title: "Developer Tools"
+    status: current
+    audience: maintainer
+    doc_type: how-to
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/maintainer/documentation-governance.md
+    title: "Documentation Governance"
+    status: current
+    audience: maintainer
+    doc_type: how-to
+    owner: mir-maintainers
+    source_of_truth_for:
+      - documentation-governance
+  - path: docs/maintainer/fixture-workflow.md
+    title: "Fixture Workflow"
+    status: current
+    audience: maintainer
+    doc_type: how-to
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/maintainer/localization.md
+    title: "Localization Maintenance"
+    status: current
+    audience: maintainer
+    doc_type: how-to
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/maintainer/manual-test-plan.md
+    title: "Manual Test Plan"
+    status: current
+    audience: maintainer
+    doc_type: how-to
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/maintainer/README.md
+    title: "Maintainer Guide"
+    status: current
+    audience: maintainer
+    doc_type: how-to
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/maintainer/release-process.md
+    title: "Release Process"
+    status: current
+    audience: release-manager
+    doc_type: how-to
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/maintainer/settings-governance.md
+    title: "Settings Governance"
+    status: current
+    audience: maintainer
+    doc_type: how-to
+    owner: mir-maintainers
+    source_of_truth_for:
+      - settings-governance
+  - path: docs/maintainer/report-diffing.md
+    title: "Report Diffing"
+    status: current
+    audience: developer
+    doc_type: how-to
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/maintainer/testing.md
+    title: "Testing And Fixture Strategy"
+    status: current
+    audience: maintainer
+    doc_type: how-to
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/maintainer/triage-playbook.md
+    title: "Triage Playbook"
+    status: current
+    audience: maintainer
+    doc_type: how-to
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/maintainer/validation.md
+    title: "Validation"
+    status: current
+    audience: maintainer
+    doc_type: how-to
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/README.md
+    title: "More Infinite Research Documentation"
+    status: current
+    audience: maintainer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/reference/asset-sources.md
+    title: "Asset Sources"
+    status: current
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/reference/factorio-api-proof-points.md
+    title: "API Proof Points"
+    status: current
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/reference/factorio-integration-reference.md
+    title: "Factorio Integration Reference"
+    status: current
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/reference/generated-id-reference.md
+    title: "Generated ID Reference"
+    status: current
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - generated-ids
+  - path: docs/reference/glossary.md
+    title: "Glossary"
+    status: draft
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/reference/README.md
+    title: "Reference"
+    status: current
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/reference/reports/cap-diagnostics.md
+    title: "Capability Diagnostics"
+    status: draft
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/reference/reports/compatibility-observations.md
+    title: "Compatibility Observations"
+    status: draft
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/reference/reports/lab-matrix.md
+    title: "Lab Matrix"
+    status: draft
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/reference/reports/loop-risk.md
+    title: "Loop Risk"
+    status: draft
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/reference/reports/owner-summary.md
+    title: "Owner Summary"
+    status: draft
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/reference/reports/planner-report.md
+    title: "Planner Report"
+    status: draft
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/reference/reports/README.md
+    title: "Reports"
+    status: current
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/reference/reports/registry-summary.md
+    title: "Registry Summary"
+    status: draft
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/reference/reports/rule-surfaces.md
+    title: "Rule Surfaces"
+    status: draft
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/reference/schemas/compatibility-claim.md
+    title: "Compatibility Claim Schema"
+    status: current
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/reference/schemas/decision-record.md
+    title: "Decision Records And Stream Specs"
+    status: current
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - decision-record-schema
+  - path: docs/reference/schemas/fixture-expectation.md
+    title: "Fixture Expectation Schema"
+    status: draft
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/reference/schemas/policy-overlay.md
+    title: "Policy Overlay Schema"
+    status: draft
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/reference/schemas/README.md
+    title: "Schemas"
+    status: current
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/reference/schemas/report-row.md
+    title: "Report Row Schema"
+    status: draft
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/reference/schemas/stream-manifest.md
+    title: "Generated Stream Manifest And Migration Policy"
+    status: current
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - stream-manifest-schema
+  - path: docs/reference/schemas/stream-spec.md
+    title: "StreamSpec Schema"
+    status: draft
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - stream-spec-schema
+  - path: docs/reference/settings.md
+    title: "Settings Reference"
+    status: current
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - settings-reference
+  - path: docs/reference/settings-reference.md
+    title: "Settings Reference"
+    status: archived
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/releases/2.2.0-validation-record.md
+    title: "Test Results"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/releases/3.0.0-migration-guide.md
+    title: "Migration Guide: 2.x To 3.0"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/releases/3.0.0-plan.md
+    title: "M.I.R. Roadmap"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - 3.0.0-release-plan
+  - path: docs/releases/3.0.0-regression-baseline.md
+    title: "3.0.0 Regression Baseline"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - 3.0.0-regression-baseline
+  - path: docs/releases/3.0.0-transition-checkpoint-2.md
+    title: "3.0.0 Transition Checkpoint 2"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - 3.0.0-transition-checkpoint-2
+  - path: docs/releases/3.0.0-transition-checkpoint-3.md
+    title: "3.0.0 Transition Checkpoint 3"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - 3.0.0-transition-checkpoint-3
+  - path: docs/releases/3.0.0-local-library-gate-summary.md
+    title: "3.0.0 Local Library Gate Summary"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - 3.0.0-local-library-gate-summary
+  - path: docs/releases/3.0.0-release-checklist.md
+    title: "3.0.0 Release Checklist"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/releases/3.0.0-release-notes.md
+    title: "More Infinite Research 3.0.0 Release Notes"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/releases/release-notes-3.0.0.md
+    title: "More Infinite Research 3.0.0 Release Notes"
+    status: current
+    audience: player
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/releases/3.0.0-validation-summary.md
+    title: "3.0.0 Validation Summary"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - 3.0.0-validation-summary
+  - path: docs/releases/3.0.0-risk-register.md
+    title: "3.0.0 Risk Register"
+    status: draft
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/releases/3.1.0-roadmap.md
+    title: "3.1.0 Roadmap"
+    status: draft
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/releases/mod-portal-page.md
+    title: "More Infinite Research"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/releases/README.md
+    title: "Releases"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/templates/adr-template.md
+    title: "ADR Template"
+    status: current
+    audience: maintainer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/templates/capability-template.md
+    title: "Capability Template"
+    status: current
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/templates/compatibility-pack-template.md
+    title: "Compatibility Pack Template"
+    status: current
+    audience: modpack-author
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/templates/fixture-template.md
+    title: "Fixture Template"
+    status: current
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/templates/migration-guide-template.md
+    title: "Migration Guide Template"
+    status: current
+    audience: release-manager
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/templates/README.md
+    title: "Templates"
+    status: current
+    audience: maintainer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/templates/release-plan-template.md
+    title: "Release Plan Template"
+    status: current
+    audience: release-manager
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/templates/troubleshooting-entry-template.md
+    title: "Troubleshooting Entry Template"
+    status: current
+    audience: maintainer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/user/compatibility-claims.md
+    title: "Compatibility Claims"
+    status: current
+    audience: modpack-author
+    doc_type: explanation
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/user/diagnostics.md
+    title: "Diagnostics"
+    status: current
+    audience: player
+    doc_type: how-to
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/user/faq.md
+    title: "FAQ"
+    status: current
+    audience: player
+    doc_type: explanation
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/user/generated-technologies.md
+    title: "Generated Technologies"
+    status: current
+    audience: player
+    doc_type: explanation
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/user/installation.md
+    title: "Installation"
+    status: current
+    audience: player
+    doc_type: how-to
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/user/README.md
+    title: "User Guide"
+    status: current
+    audience: player
+    doc_type: how-to
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/user/settings.md
+    title: "Settings"
+    status: current
+    audience: player
+    doc_type: how-to
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/user/troubleshooting.md
+    title: "Troubleshooting"
+    status: current
+    audience: player
+    doc_type: how-to
+    owner: mir-maintainers
+    source_of_truth_for: []
