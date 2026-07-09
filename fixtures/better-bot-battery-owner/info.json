@@ -4,8 +4,8 @@
   "title": "MIR Fixture - Better Bot Battery Owner",
   "author": "Julesc013",
   "description": "Validation fixture that exposes Better Bot Battery-style worker robot battery technologies.",
-  "factorio_version": "1.1",
+  "factorio_version": "0.18",
   "dependencies": [
-    "base >= 1.1"
+    "base >= 0.18"
   ]
 }

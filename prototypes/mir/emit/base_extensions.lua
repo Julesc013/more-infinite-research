@@ -259,12 +259,14 @@ local SPECIALS = {
 
 local function extend_chain(key)
   local spec = base_defaults[key] or {}
+  local chain_key = spec.chain_key or key
+  local generated_key = spec.generated_key or chain_key
   if not is_enabled(key, spec) then
     D.extension(D.extension_fields(key, "skipped", "disabled"))
     return
   end
 
-  local pattern = "^" .. escape_pattern(key) .. "%-(%d+)$"
+  local pattern = "^" .. escape_pattern(chain_key) .. "%-(%d+)$"
   local levels, by_level = {}, {}
   local has_infinite = false
 
@@ -316,7 +318,7 @@ local function extend_chain(key)
   -- Allow anchoring when the base tech exists; vanilla-derived cost inference
   -- still requires numeric unit.count values.
 
-  local new_name = key .. "-" .. desired_new_level
+  local new_name = generated_key .. "-" .. desired_new_level
   -- Never replace an existing vanilla or modded continuation level.
   if data_raw.technology(new_name) then
     D.extension(D.extension_fields(key, "skipped", "target_exists"))
@@ -428,7 +430,7 @@ local function extend_chain(key)
   new.name = new_name
   new.localised_name = base_tech.localised_name
   new.localised_description = base_tech.localised_description
-  new.prerequisites = build_prerequisites(key .. "-" .. base_level, base_tech.prerequisites)
+  new.prerequisites = build_prerequisites(chain_key .. "-" .. base_level, base_tech.prerequisites)
   new.level = desired_new_level
 
   local special = SPECIALS[key]
@@ -440,14 +442,14 @@ local function extend_chain(key)
   end
   effect_safety.assert_effects_allowed(desired_effects, "base extension " .. key)
   if not prefer_this_mod_for_competing_techs() then
-    local other_choice = find_any_infinite_extension(key .. "-" .. base_level, new_name)
+    local other_choice = find_any_infinite_extension(chain_key .. "-" .. base_level, new_name)
     if other_choice then
       log("[more-infinite-research] Skipping extension for " .. key .. ": competing infinite tech kept from other mod (" .. other_choice .. ").")
       D.extension(D.extension_fields(key, "skipped", "competing_infinite_kept"))
       return
     end
   end
-  local existing = find_equivalent_infinite_extension(key .. "-" .. base_level, desired_effects)
+  local existing = find_equivalent_infinite_extension(chain_key .. "-" .. base_level, desired_effects)
   if existing then
     log("[more-infinite-research] Skipping extension for " .. key .. ": equivalent infinite tech already exists (" .. existing .. ").")
     D.extension(D.extension_fields(key, "skipped", "equivalent_infinite_exists"))

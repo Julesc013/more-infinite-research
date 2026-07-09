@@ -1,0 +1,102 @@
+---
+title: "More Infinite Research 1.8.0 Release Notes"
+status: archived
+applies_to: "0.18"
+audience: maintainer
+doc_type: archive
+owner: mir-maintainers
+last_reviewed: 2026-07-10
+supersedes: []
+superseded_by: ["../../releases/README.md"]
+---
+# More Infinite Research 1.8.0 Release Notes
+
+`1.8.0` is the Factorio `0.18` bridge/archive compatibility package generated
+from the MIR 3 architecture. It starts from the `3.0.0` source anchor plus the
+portable lessons proven by the `2.3.0` Factorio `2.0` port and the `1.9.3`
+Factorio `1.1` reduced port.
+
+It is not a feature-parity backport of the Factorio `1.1`, `2.0`, or `2.1`
+releases. It keeps only the older-line surfaces that can be generated safely:
+direct-effect infinite researches and supported base technology continuations.
+
+## What Changed
+
+- Retargeted package metadata to `version = "1.8.0"`,
+  `factorio_version = "0.18"`, and `base >= 0.18`.
+- Kept the reduced `1.9.3` posture: no recipe productivity, Space Age,
+  Quality, Recycler, Elevated Rails, cargo logistics, spoilage, agriculture,
+  prototype cap settings, pipeline extent settings, or settings profiles.
+- Extended validation metadata checks, fixture floors, settings visibility
+  checks, and reduced-line runtime checks to recognize the Factorio `0.18`
+  bridge target.
+- Reused the global runtime-state adapter from the `1.1` port and kept
+  unsupported runtime handlers disabled.
+
+## Icon Policy
+
+The `0.18` bridge does not package graphics copied from newer Factorio
+versions. Factorio `0.18` and `1.0` do not ship the Factorio `1.1`
+`__core__/graphics/icons/technology/constants/*` technology badge assets, so
+MIR disables technology constant overlays on this target line.
+
+Generated direct-effect technologies use target-era base technology art only.
+The lab productivity stream prefers `research-speed-6`, then
+`research-speed-5`, then `military-science-pack`. Other direct-effect streams
+reuse the same stock technology art selected by the reduced `1.1` port, but
+without badge overlays.
+
+## Supported Surface
+
+- Target-supported direct-effect infinite researches: weapon shooting speed,
+  cannon shooting speed, rocket shooting speed, electric shooting speed,
+  flamethrower shooting speed, character crafting, character mining, character
+  reach, character walking speed, character inventory/trash-slot capacity, lab
+  productivity, and worker robot battery.
+- Vanilla finite-chain continuations for supported base technologies such as
+  braking force, lab research speed, laser shooting speed, weapon shooting
+  speed, worker robot cargo size, and opt-in inserter capacity.
+- Startup settings for supported streams and base continuations.
+
+## Compatibility Checks
+
+- Release candidate package:
+  `dist/more-infinite-research_1.8.0.zip`, SHA-256
+  `2AB8D4805B5846FD478731182F210AE325B05C6012E3942ED0665C4325B77B0E`,
+  `298778` bytes, `116` entries, `0` forbidden release entries.
+- Static validation passed for the `1.8.0` metadata and package shape.
+- The public dist archive and the runtime-validated validation archive contain
+  the same `116` file entries with identical per-entry content hashes.
+- Factorio `1.0` bridge-load validation passed with
+  `D:\Programs\Factorio\1.0\bin\x64\factorio.exe`.
+- The `1.0` bridge gate loaded the package, ran the reduced direct-effect
+  scenario, lab productivity owner skip, robot battery owner skip, merged
+  inventory/trash capacity, settings surface, checkbox enable/disable, and
+  weapon-speed overlap safety scenarios.
+- A matching Factorio `0.18` binary is required before final publication
+  claims can say the bridge has loaded in the original target line.
+
+## 1.8.0 Exclusion Manifest
+
+This manifest is the handoff for the true Factorio `1.0` package. The `1.8.1`
+line must start from the validated `1.9.3` source plus proven `1.8.0` lessons,
+not by blindly changing the `1.8.0` metadata.
+
+| Surface | 1.8.0 decision | Reason | 1.8.1 action |
+| --- | --- | --- | --- |
+| Recipe productivity | Cut | Factorio `1.1.110` rejected `change-recipe-productivity`; no `0.18` proof is available. | Re-probe on Factorio `1.0` only with a focused binary fixture before restoring. |
+| Space Age, Quality, Recycler, Elevated Rails | Cut | Factorio `2.x` DLC surfaces. | Keep cut on `1.0`. |
+| Cargo logistics modifiers | Cut | Factorio `2.1` direct-effect modifiers. | Keep cut on `1.0`. |
+| Spoilage and agriculture streams | Cut | Factorio `2.x` runtime/prototype surfaces. | Keep cut on `1.0`. |
+| Prototype cap and pipeline extent settings | Cut | Modern prototype limit/pipeline tuning surfaces are not part of the reduced old-line package. | Keep cut unless a `1.0` fixture proves a safe subset. |
+| Settings profiles | Cut from runtime UI | Older target lines do not expose the MIRSET1 runtime profile surface used by modern packages. | Keep cut unless a `1.0` runtime fixture proves a portable profile path. |
+| Technology constant badge overlays | Cut | Factorio `0.18` and `1.0` do not ship the Factorio `1.1` `__core__/graphics/icons/technology/constants/*` assets. | Keep target-era base technology art unless a `1.0`-native badge source is proven. |
+| Laser shooting speed continuation | Adapted | Factorio `1.0` uses `laser-turret-speed-*`; MIR keeps the modern setting key but extends the target-era source chain. | Carry this adapter into `1.8.1` if the `1.0` report diff confirms it avoids an accidental loss. |
+
+## Known Boundaries
+
+- Recipe productivity is not included on this line.
+- Factorio `2.x` DLC surfaces are not included on this line.
+- Newer Factorio core graphics are not bundled into the package.
+- If a matching Factorio `0.18` binary is unavailable, the dist is a prepared
+  bridge artifact pending final target-binary proof.

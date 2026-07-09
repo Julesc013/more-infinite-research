@@ -1,4 +1,24 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.8.0
+Date: 2026-07-10
+
+  Compatibility:
+
+    - Ported the reduced MIR 3 compatibility compiler architecture to Factorio 0.18 as the bridge/archive package for 1.0.
+    - Synthesized the 3.0.0 source anchor with portable 2.3.0 and 1.9.3 backport lessons.
+    - Retargeted package metadata to Factorio 0.18 with `base >= 0.18`.
+    - Kept the reduced direct-effect and base-extension surface, with recipe productivity and Factorio 2.x DLC surfaces disabled.
+    - Disabled 1.1 technology constant badge overlays because Factorio 0.18 and 1.0 do not ship those core assets.
+    - Used target-era base technology art instead of packaging newer Factorio graphics.
+
+  Changes:
+
+    - Updated lab productivity icon selection to prefer stock `research-speed-6` and `research-speed-5` before military science.
+    - Extended metadata, settings visibility, and reduced-line runtime checks for the Factorio 0.18 bridge target.
+    - Skipped the 1.1-only badge check on 0.18 while retaining direct-effect, owner-skip, checkbox, and base-extension checks.
+    - Documented 1.8.0 as a bridge/archive compatibility port, not a feature-parity backport of 1.1, 2.0, or 2.1.
+
+---------------------------------------------------------------------------------------------------
 Version: 1.9.3
 Date: 2026-07-10
 

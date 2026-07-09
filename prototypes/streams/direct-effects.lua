@@ -31,7 +31,8 @@ return {
     icon_candidates = {
       {technology = "research-productivity", required_mod = "space-age"},
       {icon = "__space-age__/graphics/technology/research-productivity.png", icon_size = 256, inactive_mod_asset = "space-age"},
-      {technology = "research-speed"},
+      {technology = "research-speed-6"},
+      {technology = "research-speed-5"},
       {technology = "military-science-pack"}
     },
     overlay = "laboratory-productivity",

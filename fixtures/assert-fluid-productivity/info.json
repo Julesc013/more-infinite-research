@@ -4,9 +4,9 @@
   "title": "MIR Fixture - Assert Fluid Productivity",
   "author": "Julesc013",
   "description": "Validation fixture that asserts MIR fluid-output productivity streams own the intended recipe families without duplicate infinite owners.",
-  "factorio_version": "1.1",
+  "factorio_version": "0.18",
   "dependencies": [
-    "base >= 1.1",
+    "base >= 0.18",
     "more-infinite-research"
   ]
 }

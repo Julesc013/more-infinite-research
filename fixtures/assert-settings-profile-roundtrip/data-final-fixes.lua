@@ -24,18 +24,18 @@ local function startup_setting(name)
   return settings and settings.startup and settings.startup[name] or nil
 end
 
-local factorio_11 = startup_setting("mir-prototype-speed-cap") == nil
+local reduced_older_line = startup_setting("mir-prototype-speed-cap") == nil
 
-if factorio_11 then
+if reduced_older_line then
   local function assert_startup_setting(name)
     if not startup_setting(name) then
-      fail("Factorio 1.1 setting surface is missing " .. name .. ".")
+      fail("Reduced older-line setting surface is missing " .. name .. ".")
     end
   end
 
   local function assert_no_startup_setting(name)
     if startup_setting(name) then
-      fail("Factorio 1.1 setting surface unexpectedly includes " .. name .. ".")
+      fail("Reduced older-line setting surface unexpectedly includes " .. name .. ".")
     end
   end
 
@@ -66,8 +66,8 @@ if factorio_11 then
   end
 
   local json = [[{"codec":"canonical-json-deflate-base64","format":1,"kind":"mir-settings-profile","schema":1,"settings":{"ips-cost-base-research_character_reach":12345,"ips-enable-research_character_reach":false,"mir-adjust-vanilla-weapon-speed-techs":"always","mir-lab-incompatibility-policy":"skip"}}]]
-  local encoded_a = "MIRSET1-unavailable-on-factorio-1.1:" .. json
-  local encoded_b = "MIRSET1-unavailable-on-factorio-1.1:" .. json
+  local encoded_a = "MIRSET1-unavailable-on-reduced-line:" .. json
+  local encoded_b = "MIRSET1-unavailable-on-reduced-line:" .. json
   assert_equal("deterministic local profile payload", encoded_b, encoded_a)
   return
 end
