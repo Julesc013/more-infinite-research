@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "MIR docs manifest",
+  "type": "object",
+  "required": ["schema", "docs"],
+  "properties": {
+    "schema": {
+      "const": 1
+    },
+    "docs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["path", "title", "status", "audience", "doc_type", "owner"],
+        "properties": {
+          "path": {
+            "type": "string",
+            "pattern": "^docs/.+\\.md$"
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "enum": ["current", "draft", "deprecated", "archived"]
+          },
+          "audience": {
+            "enum": ["player", "modpack-author", "maintainer", "developer", "release-manager"]
+          },
+          "doc_type": {
+            "enum": ["tutorial", "how-to", "reference", "explanation", "adr", "release-plan", "archive"]
+          },
+          "owner": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source_of_truth_for": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  }
+}
