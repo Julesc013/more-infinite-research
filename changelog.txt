@@ -15,6 +15,9 @@ Date: 2026-07-11
     - Limited weapon overlap cleanup to MIR-generated continuations and required external owners to use obtainable science.
     - Rejected external research owners that use unrecognized science ingredients.
     - Kept incineration sink recipes out of breeding productivity research so later recipe removal cannot leave invalid effects.
+    - Added opt-in above-300% productivity scoping for proven non-generative self-recycling recipes.
+    - Added opt-in unrestricted module permissions across existing recipe, machine, and beacon slots.
+    - Added per-generated-technology effect-per-level controls while preserving canonical mixed-tier ratios.
 
   Changes:
 
@@ -26,6 +29,7 @@ Date: 2026-07-11
     - Bound release evidence to exact source, target-profile, required-group, package-content, and runtime-summary fingerprints.
     - Allowed exact external rocket or cannon speed owners when the existing competition preference keeps external research.
     - Added classifier-boundary, late recipe-removal, and exact Planet Crucible plus Rigor Module regression gates.
+    - Consolidated generated technology setting registration through the canonical catalog and added fixture-backed policy checks.
 
 ---------------------------------------------------------------------------------------------------
 Version: 1.7.0

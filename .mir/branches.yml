@@ -120,7 +120,7 @@ release_artifacts:
           files: 122
           reason: BP-018 rejects external owners with unrecognized research ingredients
           status: superseded-unpublished-candidate
-      candidate_commit: 99a34a5da41a7c455aa4e77df516428d236d28df
+      candidate_commit: pending
       artifact: dist/more-infinite-research_3.0.5.zip
       sha256: 80D6E0B33517B1EEEDACE5A634AF56D5B5985D6CFFE1587245278C55E706D08B
       size_bytes: 309903
@@ -146,7 +146,7 @@ release_artifacts:
       factorio_2_1_crucible_rigor_exact_dist: passed
       automated_gate: passed
       manual_gate: pending
-      status: release-candidate-awaiting-manual-review
+      status: rebuilding-after-package-visible-change
     mir_2_3_0:
       version: "2.3.0"
       branch: legacy
