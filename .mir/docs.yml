@@ -1072,6 +1072,14 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - mir-3.0.5-release-plan
+  - path: docs/releases/3.0.5-convergence-review.md
+    title: "MIR 3.0.5 Convergence Review"
+    status: current
+    audience: maintainer
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-3.0.5-convergence-review
   - path: docs/releases/mod-portal-page.md
     title: "More Infinite Research"
     status: current

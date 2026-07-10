@@ -278,7 +278,7 @@ target_lines:
     branch: tmp/0.16
     target_factorio: "0.16"
     support_class: old-science-native-infinite
-    source: mir_1_7_0_plus_old_science_map
+    source: mir_3_0_5_plus_synthesized_mir_1_7_0_lessons_plus_old_science_map
     publish_policy: binary_proof_required
     required_binary_proof:
       - factorio_0.16

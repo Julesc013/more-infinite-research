@@ -46,8 +46,10 @@ profiles.
 
 **MIR `3.x.x`** targets **Factorio `2.1`** and requires `base >= 2.1.8`. Space Age is optional.
 
-*Recipe productivity researches are infinite, but Factorio's recipe productivity cap still applies.*
-***This cap can now be modified*** *under the "limits" section of the* ***startup setttings.***
+*Recipe productivity researches are infinite, but each recipe's Factorio
+`maximum_productivity` cap still applies. MIR leaves the engine's +300% recipe
+default unchanged unless you explicitly select another value under startup
+settings > Limits. The separate non-zero power floor is also off by default.*
 
 ## Main Features
 
@@ -224,7 +226,7 @@ MIR 3 public claims are deliberately narrow: a page may claim a named recipe
 family, a diagnostic observation, or coexistence behavior, but not full overhaul
 support unless that claim is explicitly recorded.
 
-For maintainers and pack authors, the repository includes an extended local audit workflow. With a Factorio binary and Mod Portal credentials, it can run top-download audits; with read-only local mod zip libraries, it can also run offline individual-root, curated-combination, and generated local-library stress sweeps. The workflow supports curated overhaul scenarios, local modpack zip roots, safe unattended local sweep and morning summary helpers, parsed MIR diagnostics, checkpointed load results, missing-dependency summaries, grouped expected/unexpected failure reports, explcit official-DLC mod-list isolation, blank-log-line-tolerant audit parsing, and review-only compatibility profile stubs. Exploratory runs collect all scenarios for triage; strict runs can fail on unexpected grouped failures. These tools are for evidence collection; they do not automatically enable new compatibility profiles.
+For maintainers and pack authors, the repository includes an extended local audit workflow. With a Factorio binary and Mod Portal credentials, it can run top-download audits; with read-only local mod zip libraries, it can also run offline individual-root, curated-combination, and generated local-library stress sweeps. The workflow supports curated overhaul scenarios, local modpack zip roots, safe unattended local sweep and morning summary helpers, parsed MIR diagnostics, checkpointed load results, missing-dependency summaries, grouped expected/unexpected failure reports, explicit official-DLC mod-list isolation, blank-log-line-tolerant audit parsing, and review-only compatibility profile stubs. Exploratory runs collect all scenarios for triage; strict runs can fail on unexpected grouped failures. These tools are for evidence collection; they do not automatically enable new compatibility profiles.
 
 ## Troubleshooting
 

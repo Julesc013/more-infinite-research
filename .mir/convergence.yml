@@ -121,7 +121,7 @@ behaviors:
     decision: reconcile-docs
     impact: documentation
     evidence: docs-governance
-    status: planned
+    status: complete
 
 release_gates:
   - static-validation

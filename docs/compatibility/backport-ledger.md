@@ -30,7 +30,7 @@ does not grant implementation authority; `dev` remains canonical.
 | BP-010 | `tmp/0.17` | 0.17 metadata and reduced defaults stay target-local | E | Reject from dev | branch policy | Complete |
 | BP-011 | generic convergence proposal | Host plugin registry and lifecycle | F | Defer to 3.1+ | future ADR required | Deferred |
 | BP-012 | planned 0.16 ring | Old science roles map to old prototype IDs | F | Defer to `tmp/0.16` | 0.16 binary proof | Deferred |
-| BP-013 | dev audit | Planning and public docs match current evidence | B | Reconcile | governance lint | Planned |
+| BP-013 | dev audit | Planning and public docs match current evidence | B | Reconcile | governance lint | Complete |
 
 ## Classification Rules
 
