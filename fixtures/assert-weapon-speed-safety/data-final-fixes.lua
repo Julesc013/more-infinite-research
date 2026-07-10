@@ -76,7 +76,23 @@ end
 local mode_setting = settings.startup["mir-adjust-vanilla-weapon-speed-techs"]
 local mode = mode_setting and mode_setting.value or "only-when-dedicated-tech-enabled"
 local generated_count = 0
-for _, name in ipairs(generated_registry.sorted_names()) do
+local generated_names = generated_registry.sorted_names()
+local registry_visible = #generated_names > 0
+if not registry_visible then
+  -- Factorio 2.0 isolates cross-mod require state. Inspect final prototypes for
+  -- assertions while MIR itself continues to use its private registry.
+  for name, tech in pairs(techs) do
+    if string.match(name, "^weapon%-shooting%-speed%-%d+$")
+      and tech.unit
+      and tech.unit.count_formula
+    then
+      table.insert(generated_names, name)
+    end
+  end
+  table.sort(generated_names)
+end
+
+for _, name in ipairs(generated_names) do
   local tech = techs[name]
   if string.match(name, "^weapon%-shooting%-speed%-%d+$") and tech.unit and tech.unit.count_formula then
     generated_count = generated_count + 1
@@ -139,22 +155,24 @@ if external_owner then
     fail("science-unreachable external owner was accepted as replacement coverage")
   end
 
-  local external_continuation = table.deepcopy(external_owner)
-  external_continuation.name = "weapon-shooting-speed-99"
-  external_continuation.localised_name = "MIR fixture external weapon speed continuation"
-  data:extend({external_continuation})
+  if registry_visible then
+    local external_continuation = table.deepcopy(external_owner)
+    external_continuation.name = "weapon-shooting-speed-99"
+    external_continuation.localised_name = "MIR fixture external weapon speed continuation"
+    data:extend({external_continuation})
 
-  -- Re-run the cleanup after the external continuation exists. Old broad name
-  -- scanning would mutate it; registry-scoped cleanup must leave it untouched.
-  weapon_speed_policy.apply()
+    -- Re-run the cleanup after the external continuation exists. Old broad
+    -- name scanning would mutate it; registry-scoped cleanup must not.
+    weapon_speed_policy.apply()
 
-  if not has_gun_speed(techs["weapon-shooting-speed-99"], "rocket")
-    or not has_gun_speed(techs["weapon-shooting-speed-99"], "cannon-shell")
-  then
-    fail("external weapon shooting speed continuation was mutated")
+    if not has_gun_speed(techs["weapon-shooting-speed-99"], "rocket")
+      or not has_gun_speed(techs["weapon-shooting-speed-99"], "cannon-shell")
+    then
+      fail("external weapon shooting speed continuation was mutated")
+    end
+
+    -- Factorio forbids a numbered level after an infinite continuation. The
+    -- transient prototype exists only long enough to exercise policy scope.
+    techs["weapon-shooting-speed-99"] = nil
   end
-
-  -- Factorio forbids a numbered level after an infinite continuation. The
-  -- transient prototype exists only long enough to exercise policy scope.
-  techs["weapon-shooting-speed-99"] = nil
 end
