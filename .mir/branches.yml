@@ -159,6 +159,31 @@ release_artifacts:
       publication_scope: github-release
       mod_portal_visibility: not-visible-from-downloads-page-as-of-2026-07-10
       status: published
+    mir_1_7_0:
+      version: "1.7.0"
+      branch: tmp/0.17
+      target_factorio: "0.17"
+      source_anchor: mir_1_8_1
+      source_lessons:
+        - mir_1_8_0_bridge_evidence
+        - mir_1_8_1_factorio_1_0_port
+        - dev_portable_fixes
+      commit: 1a9b5a7b1162f8dca8125ef7bb792f57a9ae282b
+      tag: "1.7.0"
+      artifact: dist/more-infinite-research_1.7.0.zip
+      sha256: 3FA9419253C3E79572305E983B0443CC657683CC761DA3F4292FBF798B8C613C
+      size_bytes: 301428
+      entries: 121
+      forbidden_entries: 0
+      validation_content_matches_dist: true
+      static_validation: passed
+      factorio_0_17_validation: passed
+      factorio_0_17_binary: D:\Programs\Factorio\0.17\bin\x64\factorio.exe
+      weapon_speed_unlock_validation: passed
+      generated_prerequisite_validation: passed
+      unlock_all_technology_validation: passed
+      publication_scope: github-release
+      status: published
   closed_versions:
     - version: "2.2.0"
       branch: main
@@ -243,7 +268,9 @@ target_lines:
     target_factorio: "0.17"
     support_class: reduced-native-infinite
     source: mir_1_8_1_plus_dev_portable_lessons
-    publish_policy: binary_proof_required
+    publish_policy: published
+    release_commit: 1a9b5a7b1162f8dca8125ef7bb792f57a9ae282b
+    release_tag: "1.7.0"
     required_binary_proof:
       - factorio_0.17
   factorio_0_16:

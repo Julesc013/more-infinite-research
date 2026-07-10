@@ -20,6 +20,13 @@ target line still needs its own source branch, metadata, package build,
 Factorio binary, mod library, validation artifacts, and public release notes
 before it can be published.
 
+Factorio `0.17` completed that gate on 2026-07-10. MIR `1.7.0` was published
+from commit `1a9b5a7b1162f8dca8125ef7bb792f57a9ae282b` and tag `1.7.0` using the
+exact archive recorded in `.mir/branches.yml`. Its portable prerequisite and
+graph-safety lessons are inputs to the `3.0.5` convergence phase; its metadata,
+reduced feature surface, `global` runtime backend, and target-era assets remain
+local to the Factorio `0.17` line.
+
 ## Current Transition State
 
 The `2.2.0` release was cut under the old numbering scheme, where the active
