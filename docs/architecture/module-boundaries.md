@@ -150,6 +150,10 @@ applying fallback effect icons before emission planning.
 `prototypes/mir/capabilities/recipe_productivity/planner.lua` owns the current
 recipe-productivity bucket matching facade and converts matched buckets into
 recipe productivity effects after policy filters run.
+`prototypes/mir/index/recipe_unlocks.lua` builds the immutable recipe-to-unlock
+technology fact index. Science selection, prerequisite planning, and explicit
+technology requirements apply shared researchability policy to those facts
+instead of rescanning technology prototypes independently.
 `prototypes/mir/planner/stream_compiler.lua` owns the generated stream loop.
 `prototypes/mir/emit/stream_spec_adapter.lua` adapts current stream records
 into `StreamSpec` records and forwards them to `technology_builder`.

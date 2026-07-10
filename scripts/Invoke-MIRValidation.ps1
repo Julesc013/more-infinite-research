@@ -544,6 +544,7 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
   $plannerCostsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\planner\costs.lua")
   $plannerPrerequisitesText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\planner\prerequisites.lua")
   $plannerRequirementsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\planner\requirements.lua")
+  $recipeUnlockIndexText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\index\recipe_unlocks.lua")
   $productivityStreamsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\streams\productivity.lua")
   $dataFinalFixesText = Get-MIRDataFinalFixesSourceText
   $pipelineExtentText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\pipeline\extent.lua")
@@ -732,7 +733,15 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'assert_no_space_age_icon_path_in_base(tech_name, tech)' },
     @{ File = "fixtures\assert-generated-prerequisite-safety\data-final-fixes.lua"; Text = $generatedPrerequisiteFixtureText; Snippet = 'initial_status ~= "initial"' },
     @{ File = "fixtures\assert-generated-prerequisite-safety\data-final-fixes.lua"; Text = $generatedPrerequisiteFixtureText; Snippet = 'mir-fixture-custom-unlocker-a' },
+    @{ File = "fixtures\assert-generated-prerequisite-safety\data-final-fixes.lua"; Text = $generatedPrerequisiteFixtureText; Snippet = 'mir-fixture-self-lock-science-pack' },
+    @{ File = "fixtures\assert-generated-prerequisite-safety\data-final-fixes.lua"; Text = $generatedPrerequisiteFixtureText; Snippet = 'mir-fixture-cycle-science-pack-a' },
+    @{ File = "fixtures\assert-generated-prerequisite-safety\data-final-fixes.lua"; Text = $generatedPrerequisiteFixtureText; Snippet = 'missing-research-mechanism' },
     @{ File = "fixtures\assert-generated-prerequisite-safety\control.lua"; Text = $generatedPrerequisiteRuntimeText; Snippet = 'force.research_all_technologies()' },
+    @{ File = "prototypes\mir\index\recipe_unlocks.lua"; Text = $recipeUnlockIndexText; Snippet = 'function M.for_recipe(recipe_name)' },
+    @{ File = "prototypes\mir\capabilities\science_integration\science_packs.lua"; Text = $scienceText; Snippet = 'function S.researchable_unlockers_for_recipe(recipe_name)' },
+    @{ File = "prototypes\mir\capabilities\science_integration\science_selector.lua"; Text = $scienceSelectorText; Snippet = 'science.researchable_unlockers_for_recipe(recipe_name)' },
+    @{ File = "prototypes\mir\planner\prerequisites.lua"; Text = $plannerPrerequisitesText; Snippet = 'science.researchable_unlockers_for_recipe(recipe_name)' },
+    @{ File = "prototypes\mir\planner\requirements.lua"; Text = $plannerRequirementsText; Snippet = 'science.technology_researchability_reason(tech_name)' },
     @{ File = "fixtures\rigor-late-recipe-removal\data-final-fixes.lua"; Text = $lateRecipeRemovalFixtureText; Snippet = 'data.raw.recipe[target] = nil' },
     @{ File = "fixtures\rigor-late-recipe-removal\data-final-fixes.lua"; Text = $lateRecipeRemovalFixtureText; Snippet = 'microculture-vat-breeding' },
     @{ File = "fixtures\rigor-late-recipe-removal\data-final-fixes.lua"; Text = $lateRecipeRemovalFixtureText; Snippet = 'example-culture-incinerate' },
@@ -2555,6 +2564,16 @@ function Invoke-RuntimeScenario {
   } catch {
     Complete-MIRValidationScenario -Record $resultRecord -Status "failed" -ErrorMessage $_.Exception.Message
     throw
+  }
+
+  $duplicatedUnlockScan = 'effect.type == "unlock-recipe" and effect.recipe == recipe_name'
+  foreach ($consumer in @(
+    @{ File = "prototypes\mir\capabilities\science_integration\science_selector.lua"; Text = $scienceSelectorText },
+    @{ File = "prototypes\mir\planner\prerequisites.lua"; Text = $plannerPrerequisitesText }
+  )) {
+    if ($consumer.Text.Contains($duplicatedUnlockScan)) {
+      throw "Recipe unlock facts must come from the shared index: $($consumer.File)"
+    }
   }
 }
 

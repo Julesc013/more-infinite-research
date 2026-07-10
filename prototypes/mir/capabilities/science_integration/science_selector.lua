@@ -91,27 +91,6 @@ local function append_ingredient(out, seen, name, amount)
   end
 end
 
-local function sorted_keys(tbl)
-  local keys = {}
-  for key, _ in pairs(tbl or {}) do table.insert(keys, key) end
-  table.sort(keys)
-  return keys
-end
-
-local function recipe_unlock_techs(recipe_name)
-  local out = {}
-  for _, tech_name in ipairs(sorted_keys(data_raw.prototypes("technology"))) do
-    local tech = data_raw.technology(tech_name)
-    for _, effect in ipairs((tech and tech.effects) or {}) do
-      if effect.type == "unlock-recipe" and effect.recipe == recipe_name then
-        table.insert(out, tech_name)
-        break
-      end
-    end
-  end
-  return out
-end
-
 local function stream_recipe_names(spec)
   local seen = {}
   local out = {}
@@ -130,7 +109,7 @@ end
 local function science_from_unlocks(spec)
   local out, seen = {}, {}
   for _, recipe_name in ipairs(stream_recipe_names(spec)) do
-    for _, tech_name in ipairs(recipe_unlock_techs(recipe_name)) do
+    for _, tech_name in ipairs(science.researchable_unlockers_for_recipe(recipe_name)) do
       local tech = data_raw.technology(tech_name)
       for _, ingredient in ipairs(((tech and tech.unit) and tech.unit.ingredients) or {}) do
         append_ingredient(out, seen, ingredient_name(ingredient), ingredient_amount(ingredient))

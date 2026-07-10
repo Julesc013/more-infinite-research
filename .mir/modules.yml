@@ -101,6 +101,7 @@ modules:
     - prototypes/mir/pipeline/prototype_limits.lua
   index:
     - prototypes/mir/index/registry_builder.lua
+    - prototypes/mir/index/recipe_unlocks.lua
     - prototypes/mir/index/productivity_owners.lua
     - prototypes/mir/index/recipes.lua
     - prototypes/mir/index/technologies.lua
