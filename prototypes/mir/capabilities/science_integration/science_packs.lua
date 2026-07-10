@@ -181,6 +181,7 @@ local EXTENSION_PACKS = {
 
 local lab_inputs_cache = nil
 local science_pack_unlock_cache = nil
+local science_pack_initial_availability_cache = nil
 local mod_progression_cache = {}
 
 local function ingredient_name(ingredient)
@@ -522,6 +523,41 @@ local function recipe_outputs_item(recipe, item_name)
   return scan(recipe)
 end
 
+local function recipe_enabled_without_research(recipe)
+  if not recipe or recipe.hidden == true or recipe.enabled == false then return false end
+
+  local variants = {}
+  if recipe.normal then table.insert(variants, recipe.normal) end
+  if recipe.expensive then table.insert(variants, recipe.expensive) end
+  for _, variant in ipairs(variants) do
+    if variant.enabled == false then return false end
+  end
+
+  return true
+end
+
+local function build_science_pack_initial_availability_cache()
+  if science_pack_initial_availability_cache then return science_pack_initial_availability_cache end
+
+  science_pack_initial_availability_cache = {}
+  local lab_inputs = S.all_lab_inputs()
+  for _, recipe in pairs(data_raw.prototypes("recipe")) do
+    if recipe_enabled_without_research(recipe) then
+      for _, pack_name in ipairs(lab_inputs) do
+        if recipe_outputs_item(recipe, pack_name) then
+          science_pack_initial_availability_cache[pack_name] = true
+        end
+      end
+    end
+  end
+
+  return science_pack_initial_availability_cache
+end
+
+local function pack_recipe_enabled_without_research(pack_name)
+  return build_science_pack_initial_availability_cache()[pack_name] == true
+end
+
 local function build_science_pack_unlock_cache()
   if science_pack_unlock_cache then return science_pack_unlock_cache end
   science_pack_unlock_cache = {}
@@ -533,13 +569,15 @@ local function build_science_pack_unlock_cache()
   table.sort(technology_names)
   for _, tech_name in ipairs(technology_names) do
     local tech = data_raw.technology(tech_name)
-    for _, effect in ipairs(tech.effects or {}) do
-      if effect.type == "unlock-recipe" and effect.recipe then
-        local recipe = data_raw.prototype("recipe", effect.recipe)
-        if recipe then
-          for _, pack_name in ipairs(lab_inputs) do
-            if recipe_outputs_item(recipe, pack_name) and not science_pack_unlock_cache[pack_name] then
-              science_pack_unlock_cache[pack_name] = tech_name
+    if tech and tech.enabled ~= false then
+      for _, effect in ipairs(tech.effects or {}) do
+        if effect.type == "unlock-recipe" and effect.recipe then
+          local recipe = data_raw.prototype("recipe", effect.recipe)
+          if recipe then
+            for _, pack_name in ipairs(lab_inputs) do
+              if recipe_outputs_item(recipe, pack_name) and not science_pack_unlock_cache[pack_name] then
+                science_pack_unlock_cache[pack_name] = tech_name
+              end
             end
           end
         end
@@ -550,7 +588,11 @@ local function build_science_pack_unlock_cache()
 end
 
 function S.prereq_tech_for_science_pack(pack_name)
-  if lookup.technology_exists(pack_name) then return pack_name end
+  if pack_recipe_enabled_without_research(pack_name) then return nil end
+
+  local named_technology = data_raw.technology(pack_name)
+  if named_technology and named_technology.enabled ~= false then return pack_name end
+
   local cache = build_science_pack_unlock_cache()
   local tech_name = cache[pack_name]
   if tech_name and lookup.technology_exists(tech_name) then return tech_name end

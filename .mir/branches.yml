@@ -169,14 +169,16 @@ release_artifacts:
         - mir_1_8_1_factorio_1_0_port
         - dev_portable_fixes
       artifact: dist/more-infinite-research_1.7.0.zip
-      sha256: D1362E3674F0161BD7D874C475094231511A43C325890D6908915C6E0CF0563A
-      size_bytes: 300899
+      sha256: 3FA9419253C3E79572305E983B0443CC657683CC761DA3F4292FBF798B8C613C
+      size_bytes: 301428
       entries: 121
       forbidden_entries: 0
       validation_content_matches_dist: true
       static_validation: passed
       factorio_0_17_validation: passed
       weapon_speed_unlock_validation: passed
+      generated_prerequisite_validation: passed
+      unlock_all_technology_validation: passed
       factorio_0_17_binary: D:\Programs\Factorio\0.17\bin\x64\factorio.exe
       status: release-candidate
   closed_versions:

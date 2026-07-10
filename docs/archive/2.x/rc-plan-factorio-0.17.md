@@ -49,6 +49,12 @@ Science-pack surface observed for the target: modern 0.17 science names are pres
 - 0.17 predates change-recipe-productivity and Space Age concepts.
 - 0.17 still has normal/expensive recipe forms, so scanners must preserve that shape if used.
 - Runtime storage must use global if control code remains.
+- The disabled tutorial technology `basic-mining` also lists the normally
+  enabled Automation science recipe as an unlock. It is not a freeplay
+  progression gate.
+- `LuaForce.research_all_technologies()` excludes disabled prototypes by
+  default, so generated technology prerequisites must never infer
+  `basic-mining` or another disabled tutorial/scenario technology.
 
 ## Current MIR Code Surfaces That Do Not Backport Cleanly
 
@@ -100,3 +106,7 @@ verified, and the package loaded by a matching Factorio `0.17.x` executable.
 - [x] Run a matching Factorio 0.17.x binary load test before RC approval.
 - [x] Create a 0.17 science/prerequisite map.
 - [x] Add a 0.17 load-only validation profile before implementation.
+- [x] Reject disabled prerequisites on generated streams in the matching 0.17
+  binary gate.
+- [x] Run an exact-dist unlock-all probe and confirm all eleven generated
+  direct-effect streams have no unmet or disabled prerequisites afterward.

@@ -20,6 +20,8 @@ Date: 2026-07-10
     - Added Factorio 0.17 metadata, settings visibility, and reduced-line runtime support.
     - Anchored dedicated rocket, cannon, flamethrower, and electric shooting speed research to target-era unlocks.
     - Kept MIR's generated weapon shooting speed continuation from duplicating rocket and cannon-shell speed ownership by default.
+    - Stopped enabled science-pack recipes from inheriting disabled tutorial technology prerequisites.
+    - Kept generated infinite research available after normal prerequisite completion and unlock-all commands.
     - Documented 1.7.0 as the first old-line native-infinite edition and the next ring after 1.8.x.
 
 ---------------------------------------------------------------------------------------------------

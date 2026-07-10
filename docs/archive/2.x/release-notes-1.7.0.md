@@ -34,6 +34,11 @@ Factorio `1.0` package.
 - Removed duplicate rocket and cannon-shell speed ownership from MIR's generated
   weapon shooting speed continuation by default when dedicated replacement
   research is active.
+- Excluded disabled tutorial and scenario technologies from inferred
+  science-pack unlock prerequisites.
+- Treated already-enabled science-pack recipes as requiring no unlock
+  prerequisite, preventing Factorio `0.17`'s disabled `basic-mining` tutorial
+  technology from blocking generated research.
 - Removed Factorio `2.x` and DLC surfaces from the package.
 - Left recipe productivity, Space Age, Quality, Recycler, Elevated Rails, cargo
   logistics, spoilage, agriculture, prototype cap settings, pipeline extent
@@ -63,8 +68,8 @@ Factorio `1.0` package.
 
 - Release-candidate package:
   `dist/more-infinite-research_1.7.0.zip`, SHA-256
-  `D1362E3674F0161BD7D874C475094231511A43C325890D6908915C6E0CF0563A`,
-  `300899` bytes, `121` entries, `0` forbidden release entries.
+  `3FA9419253C3E79572305E983B0443CC657683CC761DA3F4292FBF798B8C613C`,
+  `301428` bytes, `121` entries, `0` forbidden release entries.
 - Static validation passed for the `1.7.0` metadata and package shape.
 - Factorio `0.17` binary validation passed with
   `D:\Programs\Factorio\0.17\bin\x64\factorio.exe`.
@@ -76,6 +81,12 @@ Factorio `1.0` package.
   enable/disable, and weapon-speed overlap safety scenarios.
 - The weapon-speed overlap safety scenario also verifies dedicated weapon speed
   streams depend on their target-era unlock technologies.
+- The generated-prerequisite safety fixture rejects any generated stream that
+  depends on a technology with `enabled = false` or remains blocked after the
+  normal unlock-all command.
+- An exact-dist Factorio `0.17.79` unlock-all probe advanced all eleven
+  generated direct-effect technologies to level `2` with zero unmet or
+  disabled prerequisites.
 
 ## Release Wording
 

@@ -355,6 +355,16 @@ Vanilla continuations:
 | `mir-debug-scripted-effects` | bool | `false` | Writes runtime log entries when scripted technologies recompute global or event-driven effects. |
 | `mir-lab-incompatibility-policy` | string | `reduce` | Chooses what MIR does when the selected science packs cannot be researched by any active lab. `reduce` uses the largest researchable subset; `skip` skips the technology. |
 
+The conditional weapon-speed cleanup is the recommended default across target
+lines: it removes rocket and cannon-shell effects from MIR's generated general
+continuation only when the dedicated MIR replacement technologies exist. Use
+`off` as a compatibility escape hatch; `always` can remove those effects even
+when no replacement was generated.
+
+Science-pack prerequisites are added only for enabled unlock technologies.
+When a science-pack recipe is already available without research, MIR does not
+invent an unlock prerequisite for it.
+
 ### Per-Stream Settings
 
 Every generated stream receives:

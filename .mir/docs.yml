@@ -215,6 +215,13 @@ docs:
     doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
+  - path: docs/archive/2.x/technology-audit-factorio-0.17.md
+    title: "Factorio 0.17 Technology Availability Audit"
+    status: archived
+    audience: maintainer
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
   - path: docs/archive/2.x/rc-plan-factorio-0.18.md
     title: "Factorio 0.18 Bridge Planning Report"
     status: archived

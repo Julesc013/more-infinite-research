@@ -532,6 +532,8 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
   $diagnosticsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\report\diagnostics_sink.lua")
   $weaponSpeedText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\policy\weapon_speed.lua")
   $generationIntegrityFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-generation-integrity\data-final-fixes.lua")
+  $generatedPrerequisiteFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-generated-prerequisite-safety\data-final-fixes.lua")
+  $generatedPrerequisiteRuntimeText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-generated-prerequisite-safety\control.lua")
   $fluidProductivityFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-fluid-productivity\data-final-fixes.lua")
   $pipelineExtentFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-pipeline-extent\data-final-fixes.lua")
   $betterBotBatteryFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-better-bot-battery-skip\data-final-fixes.lua")
@@ -610,6 +612,8 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "prototypes\mir\capabilities\science_integration\science_packs.lua"; Text = $scienceText; Snippet = 'official_progression_packs_for' },
     @{ File = "prototypes\mir\capabilities\science_integration\science_packs.lua"; Text = $scienceText; Snippet = 'mod_progression_packs_for' },
     @{ File = "prototypes\mir\capabilities\science_integration\science_packs.lua"; Text = $scienceText; Snippet = 'desired == "all-official"' },
+    @{ File = "prototypes\mir\capabilities\science_integration\science_packs.lua"; Text = $scienceText; Snippet = 'pack_recipe_enabled_without_research' },
+    @{ File = "prototypes\mir\capabilities\science_integration\science_packs.lua"; Text = $scienceText; Snippet = 'tech and tech.enabled ~= false' },
     @{ File = "prototypes\mir\emit\base_extensions.lua"; Text = $baseExtensionsText; Snippet = 'if data_raw.technology(new_name) then' },
     @{ File = "prototypes\mir\emit\base_extensions.lua"; Text = $baseExtensionsText; Snippet = '"target_exists"' },
     @{ File = "prototypes\mir\emit\base_extensions.lua"; Text = $baseExtensionsText; Snippet = 'apply_science_pack_ingredient_policy' },
@@ -703,6 +707,8 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "prototypes\mir\emit\icon_builder.lua"; Text = $technologyIconsText; Snippet = 'local out = strip_constant_overlays(base_icons)' },
     @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'assert_generated_icon_badge(tech_name, tech)' },
     @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'assert_no_space_age_icon_path_in_base(tech_name, tech)' },
+    @{ File = "fixtures\assert-generated-prerequisite-safety\data-final-fixes.lua"; Text = $generatedPrerequisiteFixtureText; Snippet = 'prerequisite.enabled == false' },
+    @{ File = "fixtures\assert-generated-prerequisite-safety\control.lua"; Text = $generatedPrerequisiteRuntimeText; Snippet = 'force.research_all_technologies()' },
     @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'mir-use-installed-space-age-icons' },
     @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'assert_tech_uses_icon_path("recipe-prod-research_electric_shooting_speed-1", "__space-age__/graphics/technology/electric-weapons-damage.png")' },
     @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'assert_tech_uses_item_icon("recipe-prod-research_heavy_ammo-1", "cannon-shell")' },
@@ -1996,6 +2002,7 @@ $postMirAssertionFixtures = @(
   "mir-fixture-assert-big-mining-drill-productivity",
   "mir-fixture-assert-capability-negative-cases",
   "mir-fixture-assert-generation-integrity",
+  "mir-fixture-assert-generated-prerequisite-safety",
   "mir-fixture-assert-hidden-setting-readability",
   "mir-fixture-assert-science-pack-productivity",
   "mir-fixture-assert-lab-skip-policy",
@@ -2924,6 +2931,7 @@ if ($isReducedLegacyLine) {
   if ($isFactorio017Line -or $isFactorio018Line -or $isFactorio10Line -or $isFactorio11Line) {
     $directEffectFixtureNames += "mir-fixture-assert-legacy-effect-icons"
   }
+  $directEffectFixtureNames += "mir-fixture-assert-generated-prerequisite-safety"
   Invoke-RuntimeScenario -ScenarioName "factorio-$($repoInfo.factorio_version)-direct-effects" -EnabledFixtureNames $directEffectFixtureNames
   foreach ($stream in @(
     "research_cannon_shooting_speed",
@@ -3131,6 +3139,7 @@ Assert-NoStreamReportLine -Key "research_character_trash_slots" -Context "Merged
 
 Invoke-RuntimeScenario -ScenarioName "base-generation-integrity" -EnabledFixtureNames @(
   "mir-fixture-assert-generation-integrity",
+  "mir-fixture-assert-generated-prerequisite-safety",
   "mir-fixture-assert-hidden-setting-readability"
 )
 Assert-LogDoesNotContain -Unexpected "Applied pipeline extent multiplier" -Context "Default pipeline extent scenario"
