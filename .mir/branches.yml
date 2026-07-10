@@ -113,11 +113,33 @@ release_artifacts:
           files: 121
           reason: BP-015 science reachability and BP-016 weapon ownership changed package-visible source
           status: superseded-unpublished-candidate
-      candidate_commit: pending
+      candidate_commit: 302cccdff22490cfd84ca8fee3eda1e759b7cee5
       artifact: dist/more-infinite-research_3.0.5.zip
-      automated_gate: pending
+      sha256: 57AF0E55EB92035452B154AEFF3A6F15EE149A671E3E27EEDF460CD7ABFE1BC9
+      size_bytes: 309930
+      entries: 127
+      files: 122
+      forbidden_entries: 0
+      package_content_sha256: 8AABB2F1B18BA5D2E45A235E1E39A6BECC195304ADBD34047BE4AE2A000D16A4
+      package_source_sha256: 8AABB2F1B18BA5D2E45A235E1E39A6BECC195304ADBD34047BE4AE2A000D16A4
+      target_profile_sha256: 8FAFF43EAA1BC93A8819E2E0EAAC168A97A26AB394FE5238EED299B448E30B24
+      required_groups_sha256: 57A1DF87A8FB594B2B51C7E230D775E88028F23D52DF9D5D7DA1336F9271C78A
+      validation_package_sha256: 4E8CBAA4E9C431AD053F1F56296966702F39F57DEC2A5BB52E5966D3E3C7B8C4
+      validation_package_content_sha256: 8AABB2F1B18BA5D2E45A235E1E39A6BECC195304ADBD34047BE4AE2A000D16A4
+      structured_summary_path: .mir/evidence/3.0.5-rc2-validation-summary.json
+      structured_summary_run_id: b136b69e-0e47-497c-9266-6278126ef094
+      structured_summary_status: passed
+      structured_summary_duration_seconds: 441.368
+      validation_content_matches_dist: true
+      static_validation: passed
+      factorio_2_1_validation: passed
+      factorio_2_1_binary: Factorio 2.1.9 build 86829 win64 steam
+      exact_dist_base_smoke: passed
+      exact_dist_space_age_smoke: passed
+      factorio_2_1_crucible_rigor_exact_dist: passed
+      automated_gate: passed
       manual_gate: pending
-      status: rebuilding-after-package-visible-change
+      status: release-candidate-awaiting-manual-review
     mir_2_3_0:
       version: "2.3.0"
       branch: legacy
