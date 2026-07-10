@@ -29,10 +29,32 @@ superseded_candidates:
 
 candidate:
   artifact: dist/more-infinite-research_2.3.5.zip
-  source_commit: pending
-  automated_gate: pending
+  source_commit: 29e3039de392ba3a9bb6a5f156425d6e52487005
+  sha256: 5C6289474D2D510ACB28115E2AC023E4FA2CEDD7E9D1A211E0503138F7204AD4
+  size_bytes: 309823
+  entries: 127
+  files: 122
+  forbidden_entries: 0
+  package_content_sha256: 2EE7DA3F65235B639A803C75A8D56435DC7CFC8A05E428C384787092C19C824B
+  package_source_sha256: 2EE7DA3F65235B639A803C75A8D56435DC7CFC8A05E428C384787092C19C824B
+  target_profile_sha256: 768AE17AC43C7240E8DBBAC6D67C37166D87B47AA4728E1BF68C616E85C42797
+  required_groups_sha256: 57A1DF87A8FB594B2B51C7E230D775E88028F23D52DF9D5D7DA1336F9271C78A
+  validation_package_sha256: 3032CDE90C28950224BDDB58AC19C78A6DCCA57B04B8A8E46818CC00C284BCDD
+  validation_package_content_sha256: 2EE7DA3F65235B639A803C75A8D56435DC7CFC8A05E428C384787092C19C824B
+  structured_summary_path: .mir/evidence/2.3.5-rc1-validation-summary.json
+  structured_summary_run_id: e211a868-5859-4fe9-9430-08b2807013dc
+  structured_summary_status: passed
+  structured_summary_duration_seconds: 335.997
+  validation_content_matches_dist: true
+  static_validation: passed
+  factorio_2_0_validation: passed
+  factorio_2_0_binary: Factorio 2.0.77 build 84539 win64 full space-age
+  exact_dist_base_smoke: passed
+  exact_dist_space_age_smoke: passed
+  factorio_2_0_crucible_rigor_exact_dist: passed
+  automated_gate: passed
   manual_gate: pending
-  status: rebuilding-after-package-visible-change
+  status: release-candidate-awaiting-manual-review
 
 rules:
   - dev-remains-the-canonical-modern-implementation
