@@ -5,6 +5,16 @@ fixture_roots:
   compatibility_matrix: fixtures/compat-matrix
   run_profiles: fixtures/run-profiles
 
+real_mod_gates:
+  factorio-2.1-crucible-rigor:
+    scenario: local-2-1-crucible-rigor-exact-dist
+    roots:
+      - planet-crucible
+      - rigor-module
+    requires_exact_dist: true
+    requires_fresh_save: true
+    status: required
+
 fixtures:
   rigor-late-recipe-removal:
     path: fixtures/rigor-late-recipe-removal

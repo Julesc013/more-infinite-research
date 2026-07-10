@@ -2,6 +2,15 @@
   "schema": 1,
   "scenarios": [
     {
+      "name": "local-2-1-crucible-rigor-exact-dist",
+      "include_space_age": true,
+      "mods": [
+        "planet-crucible",
+        "rigor-module"
+      ],
+      "notes": "Required 3.0.5 compatibility gate for Planet Crucible and Rigor Module using the exact MIR candidate archive."
+    },
+    {
       "name": "local-2-1-space-age-planet-cluster",
       "include_space_age": true,
       "mods": [

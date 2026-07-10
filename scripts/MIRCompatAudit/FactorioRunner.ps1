@@ -61,8 +61,19 @@ function Get-MIRSafeScenarioFileName {
 function Copy-MIRModUnderTest {
   param(
     [Parameter(Mandatory)][string]$RepoRoot,
-    [Parameter(Mandatory)][string]$ModsDir
+    [Parameter(Mandatory)][string]$ModsDir,
+    [string]$ZipPath = ""
   )
+
+  if (-not [string]::IsNullOrWhiteSpace($ZipPath)) {
+    $resolvedZip = (Resolve-Path -LiteralPath $ZipPath).Path
+    if ([System.IO.Path]::GetExtension($resolvedZip) -ne ".zip") {
+      throw "MIR mod-under-test archive must be a zip: $resolvedZip"
+    }
+    $zipTarget = Join-Path $ModsDir ([System.IO.Path]::GetFileName($resolvedZip))
+    Copy-Item -LiteralPath $resolvedZip -Destination $zipTarget -Force
+    return $zipTarget
+  }
 
   $target = Join-Path $ModsDir "more-infinite-research"
   if (Test-Path -LiteralPath $target) {
