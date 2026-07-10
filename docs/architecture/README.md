@@ -34,6 +34,13 @@ More Infinite Research is organized around a compatibility-first data-stage pipe
 11. Planner, compatibility, and audit diagnostics.
 12. Generated-technology effect safety validation and diagnostics flush.
 
+Generated technology safety now includes the prerequisite graph as well as
+effect types. Emission registers every generated stream and base continuation;
+the final safety pass rejects missing or disabled prerequisites, prerequisite
+cycles, structurally unreachable ancestry, invalid lab science sets, and
+recipe-produced science packs without an initially enabled recipe or enabled
+reachable unlocker.
+
 This order gives the mod the best practical view of recipes, labs, science packs, and technologies created by other mods while still keeping this mod's final cleanup deterministic.
 
 Use [Factorio lifecycle boundaries](factorio-lifecycle.md) for the exact

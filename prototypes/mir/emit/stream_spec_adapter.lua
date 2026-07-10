@@ -1,4 +1,4 @@
-local effect_safety = require("prototypes.mir.emit.effect_safety")
+local generated_registry = require("prototypes.mir.emit.generated_technology_registry")
 local stream_spec = require("prototypes.mir.domain.streams.stream_spec")
 local technology_builder = require("prototypes.mir.emit.technology_builder")
 
@@ -25,7 +25,7 @@ function M.emit(key, spec, fields)
   })
 
   local technology = technology_builder.emit(stream)
-  effect_safety.register_generated_technology(technology.name)
+  generated_registry.register(technology.name)
   return technology
 end
 

@@ -6,6 +6,16 @@ fixture_roots:
   run_profiles: fixtures/run-profiles
 
 fixtures:
+  generated-prerequisite-safety:
+    assertion_path: fixtures/assert-generated-prerequisite-safety
+    validates:
+      - generated-stream-prerequisites-exist-and-are-enabled
+      - generated-stream-prerequisites-are-acyclic-and-reachable
+      - already-enabled-science-pack-recipe-needs-no-unlock
+      - disabled-technology-unlocker-exclusion
+      - deterministic-multiple-unlocker-selection
+      - unlock-all-generated-stream-reachability
+
   settings-visibility:
     assertion_path: fixtures/assert-hidden-setting-readability
     validates:
