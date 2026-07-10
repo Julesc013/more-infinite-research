@@ -37,7 +37,7 @@ generation. They no longer only encode MIR's internal architecture generation.
 
 | MIR version range | Factorio target line | First planned release in range | Support class | Notes |
 | --- | --- | --- | --- | --- |
-| `3.x.x` | Factorio `2.1` | `3.0.0` | Canonical modern | Current-line compiler architecture release. |
+| `3.x.x` | Factorio `2.1` | `3.0.5` | Canonical modern | Compatibility-hardening candidate from the 3.0.0 source anchor. |
 | `2.x.x` | Factorio `2.0` | `2.3.0` | Maintained `2.0` backport | First post-3.0 port of the compiler architecture. |
 | `1.9.x` | Factorio `1.1` | `1.9.3` | Compatibility port | `1.9.0` through `1.9.2` are transition exceptions for Factorio `2.0`. |
 | `1.8.x` | Factorio `0.18` bridge / `1.0` | `1.8.0` / `1.8.1` | Bridge archive / compatibility port | `1.8.0` is the one-time `0.18` bridge exception; `1.8.1+` is the maintained `1.0` line. |
@@ -245,11 +245,10 @@ Current execution state:
   tooling lessons back to `dev`, but do not cut an immediate `3.0.1` release.
 - Keep `dev` as the accumulating Factorio `2.1` integration branch while the
   `3.0.0` backport rings are worked.
-- Release `3.0.5` after the Factorio `2.0` port is published, the Factorio
-  `1.1` port is either published or has produced clear portable lessons, the
-  Factorio `1.0` / `0.18` bridge policy is decided, and a short community
-  feedback window has captured early current-line corrections. Do not bring
-  target-line metadata downgrades back to `dev`.
+- The automated `3.0.5` candidate gate is complete after the published 2.0,
+  1.1, 1.0, 0.18, and 0.17 lines produced portable lessons. Publication still
+  requires manual acceptance of the exact archive. Target-line metadata
+  downgrades remain excluded from `dev`.
 - Start `3.1.0` only after the `3.0.5` learning patch is stable. Treat `3.1.0`
   as the fixture-backed overhaul support campaign, not as cleanup from the
   backport ladder.
@@ -522,8 +521,9 @@ the MIR 3 architecture and the Factorio 0.18 bridge proof. Feature parity with
 
 These are reduced native-infinite editions:
 
-- `tmp/0.17` to `1.7.0`: first old-line native-infinite proof;
-- `tmp/0.16` to `1.6.0`: old-science native-infinite proof;
+- `tmp/0.17` to `1.7.0`: published first old-line native-infinite proof;
+- `tmp/0.16` to `1.6.0`: next old-science native-infinite proof, sourced from
+  the 3.0.5 canonical baseline plus synthesized 1.7.0 behavior;
 - `tmp/0.15` to `1.5.0`: earliest plausible native-infinite floor.
 
 Required work:

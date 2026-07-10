@@ -147,8 +147,8 @@ source for its original wording.
   coverage and preserve explicit existing choices.
 - [x] Run the complete Factorio 2.1 base and Space Age suite after behavior
   synthesis.
-- [ ] Build and checksum the exact 3.0.5 candidate archive.
-- [ ] Record exact-dist evidence and a complete structured result summary.
+- [x] Build and checksum the exact 3.0.5 candidate archive.
+- [x] Record exact-dist evidence and a complete structured result summary.
 - [ ] Tag and publish only after final manual review; do not rebuild verified
   bytes during publication.
 

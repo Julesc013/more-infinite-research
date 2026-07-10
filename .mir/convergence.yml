@@ -9,6 +9,18 @@ release:
   objective: behavioral-superset-implementation-subset
   public_contract_change: patch-compatible
 
+candidate:
+  source_commit: da961e542dbcbaeb14c0ba15555cd25f5f162944
+  artifact: dist/more-infinite-research_3.0.5.zip
+  sha256: 5BA004917B30C553C927B8D20DA18466194875BA443CC641583A41CBCEC2D44E
+  size_bytes: 308457
+  entries: 126
+  forbidden_entries: 0
+  content_matches_runtime_archive: true
+  automated_gate: passed
+  manual_gate: pending
+  status: release-candidate-awaiting-manual-review
+
 rules:
   - dev-remains-the-canonical-modern-implementation
   - historical-branches-provide-behavioral-evidence-not-implementation-authority

@@ -93,6 +93,27 @@ release_artifacts:
       artifact: dist/more-infinite-research_3.0.0.zip
       sha256: E9A644468217D6B8B07F30E92179BE7BB2DFE951A14F211C1E924A5A505ECCDC
       status: validated-main-pushed
+    mir_3_0_5:
+      version: "3.0.5"
+      branch: dev
+      target_factorio: "2.1"
+      source_anchor: mir_3_0_0
+      candidate_commit: da961e542dbcbaeb14c0ba15555cd25f5f162944
+      artifact: dist/more-infinite-research_3.0.5.zip
+      sha256: 5BA004917B30C553C927B8D20DA18466194875BA443CC641583A41CBCEC2D44E
+      size_bytes: 308457
+      entries: 126
+      files: 121
+      forbidden_entries: 0
+      validation_content_matches_dist: true
+      static_validation: passed
+      factorio_2_1_validation: passed
+      factorio_2_1_binary: Factorio 2.1.9 build 86829 win64 steam
+      structured_summary_status: passed
+      structured_summary_duration_seconds: 355.056
+      exact_dist_base_smoke: passed
+      exact_dist_space_age_smoke: passed
+      status: release-candidate-awaiting-manual-review
     mir_2_3_0:
       version: "2.3.0"
       branch: legacy

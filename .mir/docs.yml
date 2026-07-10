@@ -1096,6 +1096,14 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - mir-3.0.5-release-notes
+  - path: docs/releases/3.0.5-validation-summary.md
+    title: "MIR 3.0.5 Validation Summary"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-3.0.5-validation-summary
   - path: docs/releases/mod-portal-page.md
     title: "More Infinite Research"
     status: current
