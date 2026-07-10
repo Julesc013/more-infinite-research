@@ -1,8 +1,18 @@
-data:extend({
-  {
+local recipe_names = {
+  "item-microculture-vat-incineration",
+  "example-culture-incinerate",
+  "example-incineration",
+  "microculture-vat-breeding",
+  "microculture-cultivation",
+  "mir-fixture-normal-crafting"
+}
+
+local recipes = {}
+for _, name in ipairs(recipe_names) do
+  table.insert(recipes, {
     type = "recipe",
-    name = "item-microculture-vat-incineration",
-    category = "crafting",
+    name = name,
+    categories = {"crafting"},
     enabled = true,
     hidden = false,
     allow_productivity = true,
@@ -12,5 +22,7 @@ data:extend({
     results = {
       {type = "item", name = "stone", amount = 1}
     }
-  }
-})
+  })
+end
+
+data:extend(recipes)

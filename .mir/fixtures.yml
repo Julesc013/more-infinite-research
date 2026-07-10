@@ -20,6 +20,7 @@ fixtures:
     path: fixtures/rigor-late-recipe-removal
     validates:
       - incineration-sink-excluded-from-breeding
+      - breeding-classifier-positive-negative-matrix
       - generated-recipe-target-integrity
       - dependent-mod-late-recipe-removal
 
