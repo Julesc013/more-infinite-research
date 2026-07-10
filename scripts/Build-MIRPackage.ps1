@@ -7,6 +7,7 @@ param(
 $ErrorActionPreference = "Stop"
 
 $repo = Resolve-Path (Join-Path $PSScriptRoot "..")
+. (Join-Path $repo "scripts\validation\PackageIdentity.ps1")
 $infoPath = Join-Path $repo "info.json"
 $info = Get-Content -Raw -LiteralPath $infoPath | ConvertFrom-Json
 
@@ -74,37 +75,14 @@ if (Test-Path -LiteralPath $packageRoot) {
 New-Item -ItemType Directory -Force -Path $packageRoot | Out-Null
 New-Item -ItemType Directory -Force -Path $outputRoot | Out-Null
 
-$files = @(
-  "changelog.txt",
-  "control.lua",
-  "data-final-fixes.lua",
-  "data-updates.lua",
-  "data.lua",
-  "info.json",
-  "LICENSE",
-  "README.md",
-  "settings.lua",
-  "thumbnail.png"
-)
-
-$directories = @(
-  "locale",
-  "migrations",
-  "prototypes"
-)
-
-foreach ($file in $files) {
-  $source = Join-Path $repo $file
-  if (Test-Path -LiteralPath $source) {
-    Copy-Item -LiteralPath $source -Destination (Join-Path $packageRoot $file)
+foreach ($relative in Get-MIRPackageSourceFiles -RepoRoot $repo) {
+  $source = Join-Path $repo $relative
+  $destination = Join-Path $packageRoot $relative
+  $parent = Split-Path -Parent $destination
+  if (-not (Test-Path -LiteralPath $parent)) {
+    New-Item -ItemType Directory -Force -Path $parent | Out-Null
   }
-}
-
-foreach ($directory in $directories) {
-  $source = Join-Path $repo $directory
-  if (Test-Path -LiteralPath $source) {
-    Copy-Item -LiteralPath $source -Destination (Join-Path $packageRoot $directory) -Recurse
-  }
+  Copy-Item -LiteralPath $source -Destination $destination
 }
 
 if (Test-Path -LiteralPath $tempZipPath) {

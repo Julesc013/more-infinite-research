@@ -70,14 +70,32 @@ function Initialize-MIRValidationResult {
   param(
     [Parameter(Mandatory)][string]$OutputPath,
     [Parameter(Mandatory)][string]$FactorioVersion,
-    [string[]]$RequiredGroups = @()
+    [string[]]$RequiredGroups = @(),
+    [string]$MirVersion = "",
+    [string]$GitCommit = "",
+    [string]$TargetProfileSha256 = "",
+    [string]$RequiredGroupsSha256 = "",
+    [string]$PackageSourceSha256 = "",
+    [string]$ValidationPackageSha256 = "",
+    [string]$ValidationPackageContentSha256 = "",
+    [string]$FactorioBinaryVersion = "",
+    [bool]$PackageSourceGitDirty = $false
   )
 
   $script:MIRValidationSummaryPath = [System.IO.Path]::GetFullPath($OutputPath)
   $script:MIRValidationResultState = [ordered]@{
-    schema = 1
+    schema = 2
     run_id = [Guid]::NewGuid().ToString("D")
+    mir_version = $MirVersion
     factorio_version = $FactorioVersion
+    factorio_binary_version = $FactorioBinaryVersion
+    git_commit = $GitCommit
+    package_source_git_dirty = $PackageSourceGitDirty
+    target_profile_sha256 = $TargetProfileSha256
+    required_groups_sha256 = $RequiredGroupsSha256
+    package_source_sha256 = $PackageSourceSha256
+    validation_package_sha256 = $ValidationPackageSha256
+    validation_package_content_sha256 = $ValidationPackageContentSha256
     status = "incomplete"
     started_at = Get-MIRValidationTimestamp
     completed_at = $null

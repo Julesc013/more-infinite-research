@@ -275,7 +275,9 @@ foreach ($needle in @(
   'baseline_tag: pre-3.0.5-synthesis',
   'BP-002:',
   'BP-013:',
+  'BP-017:',
   'target-profile-drift-check',
+  'candidate-freshness',
   'complete-structured-validation-summary'
 )) {
   if (-not $convergenceText.Contains($needle)) {
@@ -290,6 +292,54 @@ $behaviorIds = @(
 $duplicateBehaviorIds = @($behaviorIds | Group-Object | Where-Object { $_.Count -gt 1 })
 if ($duplicateBehaviorIds.Count -gt 0) {
   throw ".mir/convergence.yml has duplicate behavior IDs: $($duplicateBehaviorIds.Name -join ', ')"
+}
+
+$allowedBehaviorStatuses = @("complete", "deferred", "in-progress")
+$behaviorBlocks = [regex]::Matches(
+  $convergenceText,
+  '(?ms)^  (?<id>BP-\d{3}):\r?\n(?<body>(?:^    [^\r\n]*\r?\n?)*)'
+)
+if ($behaviorBlocks.Count -ne $behaviorIds.Count) {
+  throw ".mir/convergence.yml behavior blocks could not be parsed unambiguously."
+}
+foreach ($block in $behaviorBlocks) {
+  $id = $block.Groups["id"].Value
+  $fields = @{}
+  foreach ($line in $block.Groups["body"].Value -split "\r?\n") {
+    if ($line -match '^    ([a-z0-9_]+):\s*(.*?)\s*$') {
+      $fields[$matches[1]] = $matches[2].Trim().Trim('"')
+    }
+  }
+  foreach ($requiredField in @("source", "behavior", "class", "decision", "impact", "evidence", "status")) {
+    if (-not $fields.ContainsKey($requiredField) -or [string]::IsNullOrWhiteSpace([string]$fields[$requiredField])) {
+      throw ".mir/convergence.yml $id is missing required field $requiredField."
+    }
+  }
+  if ([string]$fields.class -notmatch '^[A-G]-[a-z0-9-]+$') {
+    throw ".mir/convergence.yml $id has invalid behavior class: $($fields.class)"
+  }
+  if ([string]$fields.status -notin $allowedBehaviorStatuses) {
+    throw ".mir/convergence.yml $id has invalid status: $($fields.status)"
+  }
+  if ([string]$fields.status -eq "complete" -and [string]$fields.evidence -eq "none") {
+    throw ".mir/convergence.yml $id is complete without named evidence."
+  }
+}
+
+$releaseGateMatch = [regex]::Match(
+  $convergenceText,
+  '(?ms)^release_gates:\r?\n(?<body>(?:^  - [^\r\n]+\r?\n?)*)'
+)
+if (-not $releaseGateMatch.Success) {
+  throw ".mir/convergence.yml must define release_gates."
+}
+$releaseGates = @(
+  [regex]::Matches($releaseGateMatch.Groups["body"].Value, '(?m)^  - ([a-z0-9-]+)\s*$') |
+    ForEach-Object { $_.Groups[1].Value }
+)
+$duplicateReleaseGates = @($releaseGates | Group-Object | Where-Object { $_.Count -gt 1 })
+if ($duplicateReleaseGates.Count -gt 0) {
+  throw ".mir/convergence.yml has duplicate release gates: $($duplicateReleaseGates.Name -join ', ')"
 }
 
 $claimsManifestText = Read-MIRText -RelativePath ".mir/compatibility.yml"

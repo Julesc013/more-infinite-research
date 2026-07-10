@@ -11,6 +11,7 @@ param(
 
 $ErrorActionPreference = "Stop"
 $repo = Resolve-Path (Join-Path $PSScriptRoot "..")
+. (Join-Path $repo "scripts\validation\PackageIdentity.ps1")
 . (Join-Path $repo "scripts\validation\TargetProfiles.ps1")
 . (Join-Path $repo "scripts\validation\ScenarioGroups.ps1")
 . (Join-Path $repo "scripts\validation\ResultAggregation.ps1")
@@ -144,6 +145,10 @@ Invoke-RepoCheck "info.json parses" {
 
 Invoke-RepoCheck "target profile views match canonical manifest" {
   & (Join-Path $repo "scripts\Sync-MIRTargetProfiles.ps1") -RepoRoot $repo -Check
+}
+
+Invoke-RepoCheck "release candidate evidence is fresh or explicitly rebuilding" {
+  & (Join-Path $repo "scripts\Test-MIRCandidateFreshness.ps1") -RepoRoot $repo
 }
 
 Invoke-RepoCheck "release metadata matches Factorio line" {
@@ -1899,7 +1904,16 @@ if ([string]::IsNullOrWhiteSpace($ValidationSummaryPath)) {
 Initialize-MIRValidationResult `
   -OutputPath $ValidationSummaryPath `
   -FactorioVersion $repoInfo.factorio_version `
-  -RequiredGroups @($targetProfile.required_validation_groups) | Out-Null
+  -RequiredGroups @($targetProfile.required_validation_groups) `
+  -MirVersion $repoInfo.version `
+  -GitCommit (Get-MIRGitCommit -RepoRoot $repo) `
+  -TargetProfileSha256 (Get-MIRTargetProfileFingerprint -Profile $targetProfile) `
+  -RequiredGroupsSha256 (Get-MIRRequiredGroupsFingerprint -RequiredGroups @($targetProfile.required_validation_groups)) `
+  -PackageSourceSha256 (Get-MIRPackageSourceFingerprint -RepoRoot $repo) `
+  -ValidationPackageSha256 (Get-MIRFileSha256 -Path $script:ValidationPackageZipPath) `
+  -ValidationPackageContentSha256 (Get-MIRZipContentFingerprint -Path $script:ValidationPackageZipPath) `
+  -FactorioBinaryVersion (Get-MIRFactorioBinaryVersion -Path $FactorioBin) `
+  -PackageSourceGitDirty (Test-MIRPackageSourceGitDirty -RepoRoot $repo) | Out-Null
 Add-MIRValidationCompletedScenario -Name "static-validation" -Group "static" -EvidencePaths @("scripts/Invoke-MIRValidation.ps1")
 Add-MIRValidationCompletedScenario -Name "package-build" -Group "package" -EvidencePaths @("build/validation-dist")
 Add-MIRValidationCompletedScenario -Name "runtime-state-contract" -Group "runtime-state" -EvidencePaths @("prototypes/mir/platform/factorio/runtime_state.lua")

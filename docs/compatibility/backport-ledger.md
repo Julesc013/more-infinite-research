@@ -32,6 +32,9 @@ does not grant implementation authority; `dev` remains canonical.
 | BP-012 | planned 0.16 ring | Old science roles map to old prototype IDs | F | Defer to `tmp/0.16` | 0.16 binary proof | Deferred |
 | BP-013 | dev audit | Planning and public docs match current evidence | B | Reconcile | governance lint | Complete |
 | BP-014 | Planet Crucible 1.1.4 + Rigor Module 1.1.7 | Incineration sinks are not breeding and emitted recipe effects retain valid targets | B | Narrow classifier exclusion and final invariant | synthetic late-removal and real exact-archive gates | Complete |
+| BP-015 | Factorio 0.17 prerequisite lesson + dev hardening | Recipe unlock facts have one authority; disabled, unreachable, science-self-locked, and cyclic unlockers are rejected before planning | C | Centralize unlock facts and researchability | generated-prerequisite safety | Complete |
+| BP-016 | Factorio 0.17 weapon overlap + dev hardening | Cleanup mutates only MIR-generated continuations; external owners count only with researchable exact effect coverage | C | Restrict to generated registry and prove external coverage | weapon-speed safety matrix | Complete |
+| BP-017 | stale 3.0.5 candidate review | Candidate evidence identifies exact source, target profile, required groups, package source, archive content, binary, and structured summary | B | Enforce candidate freshness | candidate-freshness gate | In progress |
 
 ## Classification Rules
 

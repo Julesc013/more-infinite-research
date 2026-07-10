@@ -155,6 +155,30 @@ behaviors:
     impact: recipe-productivity-target-filter
     evidence: rigor-late-recipe-removal
     status: complete
+  BP-015:
+    source: 0.17-prerequisite-lesson-plus-dev-hardening
+    behavior: recipe unlock inference and required technologies use one researchability authority including science self-lock detection
+    class: C-partially-present
+    decision: centralize-recipe-unlock-facts-and-researchability
+    impact: generated-science-and-prerequisites
+    evidence: generated-prerequisite-safety
+    status: complete
+  BP-016:
+    source: 1.7.0-weapon-overlap-plus-dev-hardening
+    behavior: weapon cleanup mutates only MIR-generated continuations and external owners must be science-researchable
+    class: C-partially-present
+    decision: restrict-to-generated-registry-and-prove-external-coverage
+    impact: weapon-overlap-ownership
+    evidence: weapon-speed-safety-matrix
+    status: complete
+  BP-017:
+    source: stale-3.0.5-candidate-review
+    behavior: release evidence is bound to source package profile required groups and structured validation identity
+    class: B-missing-and-compatible
+    decision: enforce-candidate-freshness
+    impact: release-governance
+    evidence: candidate-freshness
+    status: in-progress
 
 release_gates:
   - static-validation
@@ -164,6 +188,7 @@ release_gates:
   - weapon-overlap-policy-matrix
   - settings-profile-codec
   - target-profile-drift-check
+  - candidate-freshness
   - exact-dist-package-validation
   - complete-structured-validation-summary
   - rigor-late-recipe-removal

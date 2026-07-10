@@ -25,11 +25,24 @@ foreach ($case in $cases) {
 $testRoot = Join-Path ([System.IO.Path]::GetTempPath()) ("mir-validation-results-" + [Guid]::NewGuid().ToString("N"))
 try {
   $completePath = Join-Path $testRoot "complete.json"
-  Initialize-MIRValidationResult -OutputPath $completePath -FactorioVersion "test" -RequiredGroups @("static", "base-load") | Out-Null
+  Initialize-MIRValidationResult -OutputPath $completePath -FactorioVersion "test" -RequiredGroups @("static", "base-load") `
+    -MirVersion "3.0.5" -GitCommit ("a" * 40) -TargetProfileSha256 "profile" `
+    -RequiredGroupsSha256 "groups" -PackageSourceSha256 "source" `
+    -ValidationPackageSha256 "archive" -ValidationPackageContentSha256 "content" `
+    -FactorioBinaryVersion "2.1-test" | Out-Null
   Add-MIRValidationCompletedScenario -Name "static-gate" -Group "static"
   Add-MIRValidationCompletedScenario -Name "base-load" -Group "base-load"
   Complete-MIRValidationRun
   $complete = Get-Content -Raw -LiteralPath $completePath | ConvertFrom-Json
+  if ($complete.schema -ne 2) {
+    throw "Completed result should use validation schema 2."
+  }
+  if ($complete.git_commit -ne ("a" * 40)) {
+    throw "Completed result should retain its source commit."
+  }
+  if ($complete.package_source_sha256 -ne "source") {
+    throw "Completed result should retain its package-source fingerprint."
+  }
   if ($complete.status -ne "passed" -or @($complete.groups | Where-Object { $_.status -ne "passed" }).Count -ne 0) {
     throw "Completed validation summary did not report all required groups as passed."
   }
