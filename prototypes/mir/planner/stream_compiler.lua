@@ -9,6 +9,7 @@ local owner_policy = require("prototypes.mir.policy.owner_policy")
 local recipe_productivity_planner = require("prototypes.mir.capabilities.recipe_productivity.planner")
 local direct_effects_planner = require("prototypes.mir.planner.direct_effects")
 local native_modifiers = require("prototypes.mir.planner.native_modifiers")
+local native_effect_coverage = require("prototypes.mir.policy.native_effect_coverage")
 local planner_requirements = require("prototypes.mir.planner.requirements")
 local planner_prerequisites = require("prototypes.mir.planner.prerequisites")
 local planner_science = require("prototypes.mir.planner.science")
@@ -134,6 +135,15 @@ local function make_stream(key, raw_spec)
       log("[more-infinite-research] Skipping stream "..key.." because no available direct effects remain.")
       D.stream(D.stream_fields(key, spec, "skipped", "no_available_direct_effects"))
       return
+    end
+    if spec.adopt_exact_native_effect_owner and not native_effect_coverage.prefer_mir() then
+      local covered, owners = native_effect_coverage.external_coverage_for_effects(direct_effects)
+      if covered then
+        D.stream(D.stream_fields(key, spec, "skipped", "covered_by_existing_infinite_native_modifier", nil, nil, direct_effects, nil, {
+          owners = table.concat(owners, ",")
+        }))
+        return
+      end
     end
   end
 

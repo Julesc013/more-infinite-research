@@ -1,5 +1,7 @@
 local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 local effective_settings = require("prototypes.mir.settings.effective")
+local native_effect_coverage = require("prototypes.mir.policy.native_effect_coverage")
+local target_line = require("prototypes.mir.platform.factorio.target_line")
 
 local M = {}
 
@@ -8,7 +10,7 @@ local function startup_setting(name)
 end
 
 local function strip_categories_for_mode()
-  local mode = startup_setting("mir-adjust-vanilla-weapon-speed-techs") or "off"
+  local mode = startup_setting("mir-adjust-vanilla-weapon-speed-techs") or target_line.weapon_overlap_default()
   if mode == "off" then return {} end
 
   if mode == "always" then
@@ -19,15 +21,34 @@ local function strip_categories_for_mode()
   end
 
   local out = {}
-  local tech_names = {
-    "recipe-prod-research_rocket_shooting_speed-1",
-    "recipe-prod-research_cannon_shooting_speed-1"
+  local replacements = {
+    rocket = {
+      technology = "recipe-prod-research_rocket_shooting_speed-1",
+      effect = { type = "gun-speed", ammo_category = "rocket", modifier = 0.1 }
+    },
+    ["cannon-shell"] = {
+      technology = "recipe-prod-research_cannon_shooting_speed-1",
+      effect = { type = "gun-speed", ammo_category = "cannon-shell", modifier = 0.1 }
+    }
   }
-  for _, tech_name in ipairs(tech_names) do
-    local tech = data_raw.technology(tech_name)
-    for _, effect in ipairs((tech and tech.effects) or {}) do
-      if effect.type == "gun-speed" and effect.ammo_category then
-        out[effect.ammo_category] = true
+
+  for category, replacement in pairs(replacements) do
+    if native_effect_coverage.technology_has_exact_effect(replacement.technology, replacement.effect) then
+      out[category] = true
+    elseif not native_effect_coverage.prefer_mir() then
+      local excluded_names = {
+        [replacement.technology] = true
+      }
+      for name, _ in pairs(data_raw.prototypes("technology")) do
+        if string.match(name, "^weapon%-shooting%-speed%-%d+$") then
+          excluded_names[name] = true
+        end
+      end
+      if #native_effect_coverage.exact_owner_names(replacement.effect, {
+        external_only = true,
+        excluded_names = excluded_names
+      }) > 0 then
+        out[category] = true
       end
     end
   end

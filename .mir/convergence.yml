@@ -81,7 +81,7 @@ behaviors:
     decision: adapt-to-coverage-aware-policy
     impact: new-configuration-default
     evidence: weapon-speed-safety-matrix
-    status: planned
+    status: complete
   BP-009:
     source: dev@b9b1abc
     behavior: target-specific rocket cannon flamethrower and electric progression gates

@@ -613,12 +613,27 @@ Expected result: the startup-only pipeline multiplier mutates common fluid boxes
 Create a local test mod that:
 
 - Runs after More Infinite Research.
-- Enables the weapon-speed overlap adjustment scenario.
+- Runs `off`, conditional, and `always` with dedicated coverage both present
+  and absent.
 - Fails loading if finite vanilla `weapon-shooting-speed-5` or `weapon-shooting-speed-6` loses `cannon-shell` speed effects.
-- Fails loading if MIR's generated weapon shooting speed continuation keeps `rocket` or `cannon-shell` overlap effects when the dedicated replacement techs are active.
+- Fails loading if MIR's generated continuation removes an effect without
+  accepted replacement coverage or retains an overlap when policy requires
+  removal.
+- Adds an exact external infinite owner while preferring external competing
+  technologies, then verifies MIR suppresses its dedicated rocket/cannon
+  streams and still removes overlap from the general continuation.
 - Fails loading if dedicated rocket, cannon, flamethrower, or electric shooting speed research is missing its target-era unlock prerequisite.
 
-Expected result: vanilla tank cannon fire rate is preserved while MIR avoids duplicate infinite rocket/cannon-shell speed scaling in its generated continuation and keeps dedicated shooting speed research on reachable target-era branches.
+Replacement coverage requires an enabled, structurally reachable infinite
+technology with the same effect type, ammo category, and modifier. Hidden
+technology is not rejected merely for being hidden. A finite, disabled,
+unreachable, differently scaled, or general continuation technology cannot
+justify removal. External coverage is accepted only when the existing
+competition setting prefers the external owner.
+
+Expected result: vanilla tank cannon fire rate is preserved while MIR avoids
+duplicate infinite rocket/cannon-shell scaling without creating an ownership
+gap.
 
 ## Release Checklist
 

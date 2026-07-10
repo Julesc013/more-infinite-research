@@ -25,7 +25,7 @@ does not grant implementation authority; `dev` remains canonical.
 | BP-005 | 1.9.3 through 1.7.0 | Target explicitly selects `storage` or `global` | C | Platform adapter | architecture lint | Complete |
 | BP-006 | all target rings | Scenarios have groups, durations, and durable partial results | C | Extract runner seams | structured summary | Complete |
 | BP-007 | reduced target rings | Reduced setting visibility is not codec coverage | C | Split fixture | two named gates | Complete |
-| BP-008 | 1.7.0 | Conditional weapon cleanup requires replacement coverage | C | Adapt owner policy | six-case matrix plus external owner | Planned |
+| BP-008 | 1.7.0 | Conditional weapon cleanup requires replacement coverage | C | Adapt owner policy | six-case matrix plus external owner | Complete |
 | BP-009 | `dev@b9b1abc` | Dedicated weapon streams retain target progression gates | A | Keep modern implementation | generation integrity | Complete |
 | BP-010 | `tmp/0.17` | 0.17 metadata and reduced defaults stay target-local | E | Reject from dev | branch policy | Complete |
 | BP-011 | generic convergence proposal | Host plugin registry and lifecycle | F | Defer to 3.1+ | future ADR required | Deferred |

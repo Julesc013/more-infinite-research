@@ -161,6 +161,7 @@ return {
   research_rocket_shooting_speed = {
     icon_tech = "rocketry",
     required_technologies = {"rocketry"},
+    adopt_exact_native_effect_owner = true,
     science_packs = {
       "automation-science-pack","logistic-science-pack","chemical-science-pack",
       "production-science-pack","military-science-pack","electromagnetic-science-pack"
@@ -178,6 +179,7 @@ return {
     },
     required_technologies = {"weapon-shooting-speed-5"},
     required_technology_candidates = {{"tank", "tanks"}},
+    adopt_exact_native_effect_owner = true,
     science_packs = {
       "automation-science-pack","logistic-science-pack","chemical-science-pack",
       "production-science-pack","military-science-pack","electromagnetic-science-pack"

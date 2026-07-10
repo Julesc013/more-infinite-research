@@ -346,7 +346,7 @@ Vanilla continuations:
 | `ips-require-space-gate` | bool | `false` | Adds the end-game science unlock as a prerequisite without changing science-pack ingredients. Uses promethium science in Space Age when available, otherwise space science. |
 | `mir-science-pack-ingredient-policy` | string | `configured` | Chooses how MIR adds science packs to generated technologies. Options are ordered from conservative to broad: `configured`, `space`, `space-and-promethium`, `space-age-progression`, `official-progression`, `mod-progression`, `all-official`, `all`. |
 | `mir-prefer-this-mod-for-competing-techs` | bool | `true` | Lets MIR remove selected competing infinite technologies when MIR has generated or will generate matching replacement behavior. Disable to keep competing technologies from other mods. |
-| `mir-adjust-vanilla-weapon-speed-techs` | string | `off` | Controls whether MIR removes rocket and cannon-shell speed bonuses from MIR's generated weapon shooting speed continuation. Finite vanilla weapon shooting speed technologies keep their original tank cannon and rocket bonuses. Allowed values: `off`, `only-when-dedicated-tech-enabled`, `always`. |
+| `mir-adjust-vanilla-weapon-speed-techs` | string | `only-when-dedicated-tech-enabled` | Removes rocket and cannon-shell bonuses from MIR's generated general continuation only when an enabled, reachable infinite technology provides the exact replacement effect. Finite vanilla technologies are never stripped. Existing saved startup choices are not rewritten. Allowed values: `off`, `only-when-dedicated-tech-enabled`, `always`. |
 | `mir-pipeline-extent-multiplier` | string/dropdown | `100%` | Strictly opt-in startup-only multiplier for recognized fluid box pipeline extent fields across prototypes, not only pipe entities. At `100%`, MIR does not load the pipeline pass, scan fluid boxes, or change prototypes. Allowed values: `50%`, `75%`, `100%`, `125%`, `150%`, `200%`, `250%`, `300%`, `400%`, `500%`. Non-`100%` values are experimental and can affect machines, tanks, thrusters, and modded prototypes that define fluid boxes. |
 | `mir-debug-generation-report` | bool | `false` | Writes structured generated/skipped rows to the Factorio log, including science packs, prerequisites, effect counts, lab compatibility, and icon source. |
 | `mir-debug-recipe-matches` | bool | `false` | Writes matched recipe names for each generated productivity stream. Useful for mod compatibility reports, but noisy in large mod packs. |
@@ -469,7 +469,8 @@ Generic competing recipe-productivity cleanup is intentionally limited to **know
 | `prototypes/mir/emit/base_extensions.lua` | Extends finite vanilla technology chains. |
 | `prototypes/mir/emit/effect_safety.lua` | Blocks unsafe native effect types from MIR-generated technologies. |
 | `prototypes/mir/emit/mod_data.lua` | Emits MIR mod-data prototypes used by runtime state reconciliation. |
-| `prototypes/mir/policy/weapon_speed.lua` | Optionally removes rocket/cannon-shell overlap from MIR's generated weapon speed continuation while preserving finite vanilla bonuses. |
+| `prototypes/mir/policy/weapon_speed.lua` | Removes rocket/cannon-shell overlap from MIR's generated weapon speed continuation only under the configured coverage policy. |
+| `prototypes/mir/policy/native_effect_coverage.lua` | Identifies exact, enabled, reachable infinite native-effect owners for ownership and overlap decisions. |
 | `prototypes/mir/policy/max_level.lua` | Applies stream max levels after generation. |
 | `prototypes/mir/report/diagnostics_sink.lua` | Structured generation report logging. |
 | `prototypes/streams/productivity.lua` | Recipe-productivity stream definitions. |

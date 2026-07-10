@@ -120,6 +120,7 @@ modules:
     - prototypes/mir/policy/technology_cleanup.lua
     - prototypes/mir/policy/max_level.lua
     - prototypes/mir/policy/weapon_speed.lua
+    - prototypes/mir/policy/native_effect_coverage.lua
     - prototypes/mir/policy/capabilities.lua
   capabilities:
     - prototypes/mir/capabilities/contract.lua

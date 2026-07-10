@@ -46,6 +46,16 @@ fixtures:
       - modern-only-settings-are-omitted
       - reduced-continuation-locales-are-explicit
 
+  weapon-speed-safety:
+    path: fixtures/weapon-speed-external-owner
+    assertion_path: fixtures/assert-weapon-speed-safety
+    validates:
+      - finite-vanilla-weapon-effects-preserved
+      - weapon-overlap-six-case-policy-matrix
+      - exact-infinite-replacement-coverage
+      - external-owner-suppresses-dedicated-streams-when-preferred
+      - dedicated-weapon-prerequisites
+
   air-scrubbing:
     path: fixtures/air-scrubbing
     assertion_path: fixtures/assert-air-scrubbing-clean-filter

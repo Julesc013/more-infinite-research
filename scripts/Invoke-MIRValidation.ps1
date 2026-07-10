@@ -548,6 +548,8 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
   $pipelineExtentSettingsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\settings\pipeline_extent.lua")
   $diagnosticsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\report\diagnostics_sink.lua")
   $weaponSpeedText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\policy\weapon_speed.lua")
+  $nativeEffectCoverageText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\policy\native_effect_coverage.lua")
+  $weaponSpeedFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-weapon-speed-safety\data-final-fixes.lua")
   $generationIntegrityFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-generation-integrity\data-final-fixes.lua")
   $generatedPrerequisiteFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-generated-prerequisite-safety\data-final-fixes.lua")
   $generatedPrerequisiteRuntimeText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-generated-prerequisite-safety\control.lua")
@@ -751,6 +753,11 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "fixtures\assert-better-bot-battery-skip\data-final-fixes.lua"; Text = $betterBotBatteryFixtureText; Snippet = 'recipe-prod-research_robot_battery-1' },
     @{ File = "fixtures\assert-better-bot-battery-skip\data-final-fixes.lua"; Text = $betterBotBatteryFixtureText; Snippet = 'worker-robots-battery-6' },
     @{ File = "prototypes\mir\policy\weapon_speed.lua"; Text = $weaponSpeedText; Snippet = 'tech.unit and tech.unit.count_formula' },
+    @{ File = "prototypes\mir\policy\weapon_speed.lua"; Text = $weaponSpeedText; Snippet = 'native_effect_coverage.technology_has_exact_effect' },
+    @{ File = "prototypes\mir\policy\native_effect_coverage.lua"; Text = $nativeEffectCoverageText; Snippet = 'technology.enabled == false' },
+    @{ File = "prototypes\mir\policy\native_effect_coverage.lua"; Text = $nativeEffectCoverageText; Snippet = 'technology.max_level ~= "infinite"' },
+    @{ File = "fixtures\assert-weapon-speed-safety\data-final-fixes.lua"; Text = $weaponSpeedFixtureText; Snippet = 'weapon-shooting-speed-5' },
+    @{ File = "fixtures\assert-weapon-speed-safety\data-final-fixes.lua"; Text = $weaponSpeedFixtureText; Snippet = 'mir-fixture-external-weapon-speed-owner' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = '[modifier-description]' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'more-infinite-research.electric_shooting_speed=' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'more-infinite-research.flamethrower_shooting_speed=' },
@@ -2941,6 +2948,50 @@ function Invoke-PackageZipSmokeScenario {
   }
 }
 
+function Invoke-WeaponSpeedPolicyMatrix {
+  param([string]$Context)
+
+  $dedicatedStreams = @(
+    "research_rocket_shooting_speed",
+    "research_cannon_shooting_speed"
+  )
+  $cases = @(
+    @{ Name = "weapon-overlap-off-coverage-absent"; Mode = "off"; CoverageAbsent = $true },
+    @{ Name = "weapon-overlap-off-coverage-present"; Mode = "off" },
+    @{ Name = "weapon-overlap-conditional-coverage-absent"; Mode = "only-when-dedicated-tech-enabled"; CoverageAbsent = $true },
+    @{ Name = "weapon-overlap-conditional-coverage-present"; Mode = "only-when-dedicated-tech-enabled" },
+    @{ Name = "weapon-overlap-always-coverage-absent"; Mode = "always"; CoverageAbsent = $true },
+    @{ Name = "weapon-overlap-always-coverage-present"; Mode = "always" }
+  )
+
+  foreach ($case in $cases) {
+    $parameters = @{
+      ScenarioName = $case.Name
+      EnabledFixtureNames = @("mir-fixture-assert-weapon-speed-safety")
+      WeaponSpeedAdjustmentMode = $case.Mode
+    }
+    if ($case.CoverageAbsent) {
+      $parameters.DisabledStreamKeys = $dedicatedStreams
+    }
+    Invoke-RuntimeScenario @parameters
+    $extensionLine = Get-LastExtensionReportLine -Key "weapon-shooting-speed"
+    Assert-ReportLineGenerated -Line $extensionLine -Context "$Context $($case.Name)"
+  }
+
+  Invoke-RuntimeScenario -ScenarioName "weapon-overlap-conditional-external-owner" -EnabledFixtureNames @(
+    "mir-fixture-weapon-speed-external-owner",
+    "mir-fixture-assert-weapon-speed-safety"
+  ) -WeaponSpeedAdjustmentMode "only-when-dedicated-tech-enabled"
+  $externalExtensionLine = Get-LastExtensionReportLine -Key "weapon-shooting-speed"
+  Assert-ReportLineGenerated -Line $externalExtensionLine -Context "$Context external owner"
+  foreach ($stream in $dedicatedStreams) {
+    $streamLine = Get-LastStreamReportLine -Key $stream
+    Assert-ReportLineContains -Line $streamLine -Expected "status=skipped" -Context "$Context external owner stream $stream"
+    Assert-ReportLineContains -Line $streamLine -Expected "reason=covered_by_existing_infinite_native_modifier" -Context "$Context external owner stream $stream"
+    Assert-ReportLineContains -Line $streamLine -Expected "owners=mir-fixture-external-weapon-speed-owner" -Context "$Context external owner stream $stream"
+  }
+}
+
 try {
 Invoke-PackageZipSmokeScenario -ScenarioName "package-zip-base"
 if ($isFactorio21Line) {
@@ -3021,11 +3072,7 @@ if ($isReducedLegacyLine) {
     throw "Disabled base extension checkbox should skip generated continuation: $checkboxDisabledResearchSpeedLine"
   }
 
-  Invoke-RuntimeScenario -ScenarioName "weapon-speed-overlap-safety" -EnabledFixtureNames @(
-    "mir-fixture-assert-weapon-speed-safety"
-  ) -WeaponSpeedAdjustmentMode "only-when-dedicated-tech-enabled"
-  $weaponSpeedLine = Get-LastExtensionReportLine -Key "weapon-shooting-speed"
-  Assert-ReportLineGenerated -Line $weaponSpeedLine -Context "$reducedLineLabel weapon shooting speed overlap safety scenario"
+  Invoke-WeaponSpeedPolicyMatrix -Context "$reducedLineLabel weapon shooting speed policy"
 
   Complete-MIRValidationRun
   if ($usesGeneratedUserDataDir -and (Test-Path -LiteralPath $validationRoot)) {
@@ -3642,11 +3689,7 @@ $baseExtensionBoundaryLine = Get-LastExtensionReportLine -Key "research-speed"
 Assert-ReportLineGenerated -Line $baseExtensionBoundaryLine -Context "Base extension boundary scenario"
 Assert-ReportLineContains -Line $baseExtensionBoundaryLine -Expected "mir-fixture-science-pack" -Context "Base extension boundary scenario"
 
-Invoke-RuntimeScenario -ScenarioName "weapon-speed-overlap-safety" -EnabledFixtureNames @(
-  "mir-fixture-assert-weapon-speed-safety"
-) -WeaponSpeedAdjustmentMode "only-when-dedicated-tech-enabled"
-$weaponSpeedLine = Get-LastExtensionReportLine -Key "weapon-shooting-speed"
-Assert-ReportLineGenerated -Line $weaponSpeedLine -Context "Weapon shooting speed overlap safety scenario"
+Invoke-WeaponSpeedPolicyMatrix -Context "Weapon shooting speed policy"
 
 Invoke-RuntimeScenario -ScenarioName "omega-drill-productivity" -EnabledFixtureNames @(
   "mir-fixture-omega-drill",
