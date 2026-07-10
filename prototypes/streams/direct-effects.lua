@@ -1,5 +1,11 @@
 return {
   research_spoilage_preservation = {
+    effect_per_level = {
+      field = "runtime_multiplier_delta",
+      unit = "percent",
+      canonical_anchor = 0.01,
+      runtime_multiplier_delta = true
+    },
     ui_visibility = {
       mode = "always",
       reason = "official-stream-settings-visible"
@@ -30,6 +36,12 @@ return {
   },
 
   research_agricultural_growth_speed = {
+    effect_per_level = {
+      field = "runtime_multiplier_delta",
+      unit = "percent",
+      canonical_anchor = 0.01,
+      runtime_multiplier_delta = true
+    },
     ui_visibility = {
       mode = "always",
       reason = "official-stream-settings-visible"
