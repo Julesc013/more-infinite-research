@@ -161,6 +161,10 @@ function Get-MIRValidationHarnessFingerprint {
       })
     }
   }
+  $files = @($files | Where-Object {
+    $_ -notmatch '^\.mir/evidence/' -and
+    $_ -notin @('.mir/branches.yml', '.mir/convergence.yml')
+  })
   $rows = foreach ($relative in @($files | Sort-Object -Unique)) {
     $path = Join-Path $repo $relative
     $item = Get-Item -LiteralPath $path
@@ -177,7 +181,11 @@ function Test-MIRValidationHarnessGitDirty {
   if ($LASTEXITCODE -ne 0) {
     throw "Unable to inspect validation harness Git state."
   }
-  return $status.Count -gt 0
+  $relevant = @($status | Where-Object {
+    $_ -notmatch '\.mir/evidence/' -and
+    $_ -notmatch '\.mir/(branches|convergence)\.yml$'
+  })
+  return $relevant.Count -gt 0
 }
 
 function Get-MIRFactorioBinaryVersion {
