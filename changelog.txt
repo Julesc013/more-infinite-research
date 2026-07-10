@@ -1,6 +1,6 @@
 ---------------------------------------------------------------------------------------------------
 Version: 3.0.5
-Date: 2026-07-10
+Date: 2026-07-11
 
   Compatibility:
 
@@ -10,6 +10,7 @@ Date: 2026-07-10
     - Made science recipe unlock selection deterministic when multiple reachable technologies provide the same recipe.
     - Made rocket and cannon overlap cleanup conditional on exact reachable infinite replacement coverage for new configurations.
     - Preserved finite vanilla weapon speed bonuses and existing stored overlap-mode choices.
+    - Kept incineration sink recipes out of breeding productivity research so later recipe removal cannot leave invalid effects.
 
   Changes:
 

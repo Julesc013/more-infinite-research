@@ -98,22 +98,31 @@ release_artifacts:
       branch: dev
       target_factorio: "2.1"
       source_anchor: mir_3_0_0
-      candidate_commit: da961e542dbcbaeb14c0ba15555cd25f5f162944
+      superseded_candidates:
+        - candidate_commit: da961e542dbcbaeb14c0ba15555cd25f5f162944
+          sha256: 5BA004917B30C553C927B8D20DA18466194875BA443CC641583A41CBCEC2D44E
+          size_bytes: 308457
+          entries: 126
+          files: 121
+          reason: BP-014 Planet Crucible and Rigor Module dangling recipe target
+          status: superseded-unpublished-candidate
+      candidate_commit: pending
       artifact: dist/more-infinite-research_3.0.5.zip
-      sha256: 5BA004917B30C553C927B8D20DA18466194875BA443CC641583A41CBCEC2D44E
-      size_bytes: 308457
-      entries: 126
-      files: 121
-      forbidden_entries: 0
-      validation_content_matches_dist: true
-      static_validation: passed
-      factorio_2_1_validation: passed
+      sha256: pending
+      size_bytes: null
+      entries: null
+      files: null
+      forbidden_entries: null
+      validation_content_matches_dist: pending
+      static_validation: pending
+      factorio_2_1_validation: pending
       factorio_2_1_binary: Factorio 2.1.9 build 86829 win64 steam
-      structured_summary_status: passed
-      structured_summary_duration_seconds: 355.056
-      exact_dist_base_smoke: passed
-      exact_dist_space_age_smoke: passed
-      status: release-candidate-awaiting-manual-review
+      structured_summary_status: pending
+      structured_summary_duration_seconds: null
+      exact_dist_base_smoke: pending
+      exact_dist_space_age_smoke: pending
+      factorio_2_1_crucible_rigor_exact_dist: pending
+      status: rebuilding-after-bp-014
     mir_2_3_0:
       version: "2.3.0"
       branch: legacy

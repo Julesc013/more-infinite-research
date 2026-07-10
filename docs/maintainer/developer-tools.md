@@ -101,6 +101,10 @@ Local audit profiles distinguish roots from libraries:
 
 - `local_mod_zip_dirs` lists root mods that may become one-mod, curated, or generated local scenarios.
 - `local_mod_library_dirs` lists dependency libraries used to close those scenarios offline.
+
+For an exact release-archive compatibility gate, pass `-ModUnderTestZip` to
+`Invoke-MIRCompatAudit.ps1`. Exact-archive mode copies the zip unchanged and
+does not enable diagnostics by modifying the mod under test.
 - Generated local scenarios are built only from root zips, not dependency-only library zips.
 
 Use a writable dependency-cache library for downloaded prerequisites instead of changing the read-only mod collection. For large local audits, prefer an output path on a roomy drive and choose a staging mode explicitly:

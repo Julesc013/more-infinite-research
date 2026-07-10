@@ -249,6 +249,9 @@ If a recipe did not receive productivity:
 
 Version `3.0.5` preserves the MIR 3 generated technology IDs and persisted-state schemas and does not need a new migration.
 
+It also excludes incineration sink recipes from breeding productivity and
+checks every emitted recipe-productivity target before MIR finishes loading.
+
 Existing stored weapon overlap choices remain authoritative. The safer
 conditional coverage mode is the default only for configurations without a
 stored value.

@@ -5,7 +5,7 @@ applies_to: "3.0.5"
 audience: maintainer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-07-10
+last_reviewed: 2026-07-11
 supersedes: []
 superseded_by: []
 ---
@@ -31,7 +31,7 @@ does not grant implementation authority; `dev` remains canonical.
 | BP-011 | generic convergence proposal | Host plugin registry and lifecycle | F | Defer to 3.1+ | future ADR required | Deferred |
 | BP-012 | planned 0.16 ring | Old science roles map to old prototype IDs | F | Defer to `tmp/0.16` | 0.16 binary proof | Deferred |
 | BP-013 | dev audit | Planning and public docs match current evidence | B | Reconcile | governance lint | Complete |
-| BP-014 | Planet Crucible 1.1.4 + Rigor Module 1.1.7 | Incineration sinks are not breeding and emitted recipe effects retain valid targets | B | Narrow classifier exclusion and final invariant | late-removal lifecycle fixture | In progress |
+| BP-014 | Planet Crucible 1.1.4 + Rigor Module 1.1.7 | Incineration sinks are not breeding and emitted recipe effects retain valid targets | B | Narrow classifier exclusion and final invariant | synthetic late-removal and real exact-archive gates | Complete |
 
 ## Classification Rules
 
