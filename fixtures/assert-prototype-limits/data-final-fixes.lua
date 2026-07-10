@@ -61,7 +61,8 @@ local expected_quality = expected_value("mir-prototype-quality-cap")
 local scoped_cap = startup_setting("mir-productivity-cap-self-recycling-only") == true
 local unrestricted_modules = startup_setting("mir-unrestricted-modules") == true
 
-if not expected_productivity and not expected_efficiency and not expected_pollution and not expected_speed and not expected_quality and startup_setting("mir-prototype-positive-power-floor") ~= true then
+if not expected_productivity and not expected_efficiency and not expected_pollution and not expected_speed and not expected_quality
+  and startup_setting("mir-prototype-positive-power-floor") ~= true and not unrestricted_modules then
   return
 end
 

@@ -29,7 +29,7 @@ Date: 2026-07-11
     - Bound release evidence to exact source, target-profile, required-group, package-content, and runtime-summary fingerprints.
     - Allowed exact external rocket or cannon speed owners when the existing competition preference keeps external research.
     - Added classifier-boundary, late recipe-removal, and exact Planet Crucible plus Rigor Module regression gates.
-    - Consolidated generated technology setting registration through the canonical catalog and added fixture-backed policy checks.
+    - Consolidated generated setting registration through the canonical catalog and aligned controls with generated effects.
 
 ---------------------------------------------------------------------------------------------------
 Version: 1.7.0
