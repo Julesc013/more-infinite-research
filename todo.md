@@ -171,9 +171,11 @@ Current checkpoint facts:
   `prototypes/mir/settings/effect_contracts.lua`; runtime lookup remains in
   `effect_scaling.lua`.
 - The architecture gate now rejects top-level MIR Lua require cycles.
-- Effect-per-level defaults now use the lowest canonical tier, not the highest
-  tier. The furnace mixed-tier case proves a selected 4% anchor scales canonical
-  20%, 10%, and 5% effects to 40%, 20%, and 10%.
+- Effect-per-level defaults now use the primary/base tier (the first declared
+  technology tier), not the smallest numeric bonus from an optional late tier.
+  Furnace therefore displays 20%, belts display 10%, and a selected 40%
+  furnace anchor scales canonical 20%, 10%, and 5% effects to 40%, 20%, and
+  10%.
 - Scripted spoilage-preservation and agricultural-growth settings scale the
   `0.01` multiplier delta and then add one. A selected 2% effect resolves to
   `1.02`, never `1.01 * 2`.
@@ -187,14 +189,20 @@ Current checkpoint facts:
   scaling, scripted-effect, owner/adoption, weapon, and compatibility matrix in
   `466.256` seconds. That run used package-visible uncommitted changes and is
   behavioral evidence, not clean candidate evidence.
+- The primary-tier correction passed the complete static gate, packaged base
+  and Space Age smoke loads, ordinary settings-stage default assertions, and
+  the 40% Furnace mixed-tier runtime scenario. The maintainer intentionally
+  stopped the longer repeat matrix after those checkpoints; rerun the complete
+  clean-source matrix after phase 2 instead of treating this as final candidate
+  evidence.
 - Current rebuilt archive:
   `dist/more-infinite-research_3.0.5.zip`.
 - Current rebuilt archive SHA-256:
-  `41B7C2155490F16E620EB1982C81B303C205A933952710A730B41CFA7134D797`.
-- Current rebuilt archive size and shape: `319986` bytes, `132` zip entries,
+  `1FF086F3DC76E1AAF5F3EDFE15481022809DB37AE9C2BBC028769DAB712EFAD2`.
+- Current rebuilt archive size and shape: `320286` bytes, `132` zip entries,
   `127` files, and `0` forbidden release paths.
 - Current archive/source content fingerprint:
-  `BCB34C39E75721E5E197725E270AC23AEB30F68515FC51AF4C242DFEBF1B1CF6`.
+  `C29708DF6D81345F50ACB4AC9E28528759A6E57620D9E51D180C6814444FD68C`.
 
 #### URGENT P0 — Clean Candidate Evidence
 
@@ -223,6 +231,11 @@ Current checkpoint facts:
   clean automated gate and manual checks are both recorded.
 
 #### URGENT P1 — Architecture Refactor Phase 2
+
+- [ ] Replace the implicit "first declared group/effect is primary" convention
+  with explicit typed primary-effect metadata, then lint every stream so a data
+  reorder cannot silently change a public setting default. Preserve the 3.0.5
+  values and ratios established by the settings-stage fixture.
 
 - [ ] Split the 799-line
   `prototypes/mir/capabilities/science_integration/science_packs.lua` module into

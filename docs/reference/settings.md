@@ -136,7 +136,9 @@ slots, including beacons. It does not create slots or mutate module prototypes.
 Every generated stream and base continuation also has an
 `ips-effect-per-level-<stream>` or `mir-effect-per-level-<extension>` setting.
 The selected value is an anchor, and MIR scales only the numeric effects it
-emits from the canonical anchor. Ownership, adoption, and equivalence decisions
+emits from the primary/base-tier canonical anchor. Later tiers retain their
+declared ratios and cannot lower the displayed default merely by being present
+in the stream contract. Ownership, adoption, and equivalence decisions
 use unscaled canonical effects; external technologies and adopted owner values
 are not rewritten.
 

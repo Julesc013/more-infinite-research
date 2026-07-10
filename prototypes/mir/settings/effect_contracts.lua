@@ -32,10 +32,10 @@ local whole_number_effects = {
 }
 
 local base_default_anchors = {
-  ["braking-force"] = { unit = "percent", canonical_anchor = 0.10 },
+  ["braking-force"] = { unit = "percent", canonical_anchor = 0.15 },
   ["inserter-capacity-bonus"] = { unit = "native", canonical_anchor = 4, whole_number = true },
-  ["laser-shooting-speed"] = { unit = "percent", canonical_anchor = 0.40 },
-  ["research-speed"] = { unit = "percent", canonical_anchor = 0.10 },
+  ["laser-shooting-speed"] = { unit = "percent", canonical_anchor = 0.50 },
+  ["research-speed"] = { unit = "percent", canonical_anchor = 0.60 },
   ["weapon-shooting-speed"] = { unit = "percent", canonical_anchor = 0.40 },
   ["worker-robots-storage"] = { unit = "native", canonical_anchor = 1, whole_number = true }
 }
@@ -67,7 +67,9 @@ function M.descriptor_from_effects(effects)
     if descriptor and (descriptor.field ~= candidate.field or descriptor.unit ~= candidate.unit) then
       return nil
     end
-    if not descriptor or candidate.value < descriptor.canonical_anchor then
+    -- Effect arrays are ordered declarations. The first effect is the
+    -- player-facing primary/base effect; later effects keep their ratios to it.
+    if not descriptor then
       descriptor = {
         field = candidate.field,
         unit = candidate.unit,
@@ -81,10 +83,16 @@ function M.descriptor_from_effects(effects)
 end
 
 local function productivity_descriptor(spec)
+  -- Productivity groups are declared from the primary/base tier outward.
+  -- Optional late tiers may have much smaller bonuses, but must not change the
+  -- displayed default when their target prototypes are absent or present.
   local anchor = nil
   for _, group in ipairs((spec and spec.groups) or {}) do
     local change = tonumber(group.change)
-    if change and change > 0 and (not anchor or change < anchor) then anchor = change end
+    if change and change > 0 then
+      anchor = change
+      break
+    end
   end
   if not anchor then anchor = 0.10 end
   return {

@@ -59,7 +59,8 @@ fixtures:
   effect-scaling:
     assertion_path: fixtures/assert-generation-integrity
     validates:
-      - lowest-tier-default-anchor
+      - primary-base-tier-default-anchor
+      - vanilla-continuation-default-anchors
       - proportional-mixed-tier-scaling
       - scripted-runtime-multiplier-delta
 

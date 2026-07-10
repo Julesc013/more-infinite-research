@@ -43,7 +43,10 @@ function M.scale_base_effects(key, effects)
   local catalog_default = catalog and catalog.canonical_anchor * (catalog.unit == "percent" and 100 or 1)
   if selected == nil or selected == catalog_default then return deepcopy(effects or {}) end
 
-  local factor = selected_factor(setting_name, actual)
+  -- The catalog value is the stable player-facing primary effect. Modded base
+  -- chains are preserved exactly at the default; an explicit selection scales
+  -- their final effects relative to that stable control value.
+  local factor = selected_factor(setting_name, catalog or actual)
   if factor == 1 then return deepcopy(effects or {}) end
   local out = deepcopy(effects or {})
   for _, effect in ipairs(out) do

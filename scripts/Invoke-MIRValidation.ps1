@@ -1077,7 +1077,7 @@ Invoke-RepoCheck "prototype limit settings are wired" {
     @{ File = "fixtures\assert-prototype-limits\data-final-fixes.lua"; Text = $prototypeLimitFixtureText; Snippet = 'zero-watt beacon energy_usage' },
     @{ File = "fixtures\assert-prototype-limits\data-final-fixes.lua"; Text = $prototypeLimitFixtureText; Snippet = 'quality_limits.high' },
     @{ File = "prototypes\mir\settings\catalog.lua"; Text = $settingsCatalogText; Snippet = 'require("prototypes.mir.settings.effect_contracts")' },
-    @{ File = "prototypes\mir\settings\effect_contracts.lua"; Text = $effectContractsText; Snippet = 'candidate.value < descriptor.canonical_anchor' },
+    @{ File = "prototypes\mir\settings\effect_contracts.lua"; Text = $effectContractsText; Snippet = 'anchor = change' },
     @{ File = "prototypes\mir\settings\effect_scaling.lua"; Text = $effectScalingText; Snippet = 'local effective_settings = require("prototypes.mir.settings.effective")' },
     @{ File = "scripts\Invoke-MIRValidation.ps1"; Text = (Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\Invoke-MIRValidation.ps1")); Snippet = 'prototype-limit-overrides' }
   )
@@ -3485,7 +3485,7 @@ Assert-LogContains -Expected "Unrestricted module permissions enabled:" -Context
 Invoke-RuntimeScenario -ScenarioName "effect-scaling-mixed-tier" -EnabledFixtureNames @(
   "mir-fixture-assert-generation-integrity"
 ) -EffectPerLevelOverrides @{
-  research_furnace = 4
+  research_furnace = 40
 }
 Assert-BaseCoreProductivityStreamsGenerated -Context "Mixed-tier effect scaling scenario"
 

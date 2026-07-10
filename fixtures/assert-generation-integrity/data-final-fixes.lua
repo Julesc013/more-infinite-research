@@ -161,10 +161,10 @@ local furnace_effect_setting = settings
   and settings.startup
   and settings.startup["ips-effect-per-level-research_furnace"]
 local furnace_anchor = furnace_effect_setting and furnace_effect_setting.value or nil
-if furnace_anchor ~= 2 and furnace_anchor ~= 4 then
-  fail("furnace effect-per-level anchor should default to the lowest 2% tier; got " .. tostring(furnace_anchor) .. ".")
+if furnace_anchor ~= 20 and furnace_anchor ~= 40 then
+  fail("furnace effect-per-level anchor should default to the primary 20% tier; got " .. tostring(furnace_anchor) .. ".")
 end
-if furnace_anchor == 4 then
+if furnace_anchor == 40 then
   local furnace_technology = techs["recipe-prod-research_furnace-1"]
   if not furnace_technology then fail("missing furnace technology for mixed-tier effect scaling check.") end
   for recipe_name, expected in pairs({

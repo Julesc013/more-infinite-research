@@ -87,9 +87,11 @@ Leave it off to preserve zero-power prototypes exactly.
 ## Generated Technology Effect Settings
 
 Each generated technology has an `Effect per level` setting beside
-its cost and level controls. Its default is MIR's lowest-tier baseline. Changing
-it scales all related tiers and effects proportionally, preserving ratios such
-as a technology with +10%, +5%, and +2% effects. Percentage effects use
+its cost and level controls. Its default is the primary, base-tier effect—the
+first tier shown by MIR's technology contract. Changing it scales all related
+tiers and effects proportionally, preserving ratios such as a technology with
++10%, +5%, and +2% effects. Optional later tiers no longer make the displayed
+default unexpectedly small. Percentage effects use
 percentage points; slots, counts, and distances use their native units. The
 enable checkbox remains the way to disable a technology—zero is not a disable
 value.

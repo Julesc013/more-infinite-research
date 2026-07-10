@@ -19,7 +19,8 @@ Date: 2026-07-11
     - Added opt-in unrestricted module permissions across existing recipe, machine, and beacon slots.
     - Added per-generated-technology effect-per-level controls while preserving canonical mixed-tier ratios.
     - Fixed a settings-stage circular import that prevented 3.0.5 from loading.
-    - Made effect controls use the lowest tier and scale scripted multiplier deltas instead of full multipliers.
+    - Made effect controls display each technology's primary base-tier value while preserving later-tier ratios.
+    - Kept scripted effect controls scaling multiplier deltas instead of full multipliers.
 
   Changes:
 
