@@ -13,6 +13,7 @@ Date: 2026-07-11
     - Made rocket and cannon overlap cleanup conditional on exact reachable infinite replacement coverage for new configurations.
     - Preserved finite vanilla weapon speed bonuses and existing stored overlap-mode choices.
     - Limited weapon overlap cleanup to MIR-generated continuations and required external owners to use obtainable science.
+    - Rejected external research owners that use unrecognized science ingredients.
     - Kept incineration sink recipes out of breeding productivity research so later recipe removal cannot leave invalid effects.
 
   Changes:
