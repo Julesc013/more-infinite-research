@@ -44,3 +44,10 @@ The Factorio 2.0 candidate requires a clean committed validation harness, an
 exact expected-scenario fingerprint, the complete base/Space Age/settings and
 compatibility matrix, and exact-dist checks. Final runtime status is recorded
 only after a matching Factorio 2.0 binary reruns that matrix.
+
+The release-candidate archive passed all 66 expected scenarios exactly once on
+Factorio 2.0.77. The exact packaged archive also passed the offline Planet
+Crucible 0.5.10 and Rigor Module 0.7.0 load check with no dependency or audit
+failure. Automated qualification is complete; publication remains gated on a
+normal-mod-directory check, an existing 2.3.0 save upgrade, and startup-setting
+retention checks.

@@ -156,11 +156,42 @@ release_artifacts:
       branch: tmp/2.0
       target_factorio: "2.0"
       source_anchor: mir_3_0_5
+      superseded_candidates:
+        - candidate_commit: 1a81a30
+          sha256: A2A3BA644D646B2A836CBA8C31FB1C71549C157AB36DCD19CE35509749529F4A
+          size_bytes: 321145
+          reason: scripted effect-per-level descriptors were omitted during the Factorio 2.0 conflict resolution
+          status: superseded-unpublished-candidate
       artifact: dist/more-infinite-research_2.3.5.zip
-      candidate_commit: pending
-      automated_gate: pending
+      candidate_commit: dd0cfd4a4bf3743d1e88b84a228feb7b8fddc992
+      sha256: 95A52BFBE1C161CA3D34AC177FABF9868F2D8587AFD88A29BF0D5A03DDEA50EB
+      size_bytes: 321227
+      entries: 132
+      files: 127
+      forbidden_entries: 0
+      package_content_sha256: 6D421D48F748A22DCB73F909248E9DF10C853C4316D373D3E0495D1B8BF273C6
+      package_source_sha256: 6D421D48F748A22DCB73F909248E9DF10C853C4316D373D3E0495D1B8BF273C6
+      target_profile_sha256: 9D8EC1B8813609DD855023FF81D73F307BB2A348B7B8E41AA4D10AEC268A6E18
+      required_groups_sha256: 57A1DF87A8FB594B2B51C7E230D775E88028F23D52DF9D5D7DA1336F9271C78A
+      validation_harness_sha256: 41FEA7BC3907B3627929264F3662D0F672CA9421CE17306FCB75F5516B858360
+      expected_scenarios_sha256: 60D5232C92099381BB2D7E582AD989F9B00DF654D80F4C40131B6088E2F8300E
+      validation_package_sha256: D0B402EA115EE8C178EC75FE4D01A2E879FE363BE9AC5EE46E66AA310C785C6C
+      validation_package_content_sha256: 6D421D48F748A22DCB73F909248E9DF10C853C4316D373D3E0495D1B8BF273C6
+      structured_summary_path: .mir/evidence/2.3.5-rc3-validation-summary.json
+      structured_summary_run_id: b513dced-dcf6-4d83-a036-61ef6b58bdc3
+      structured_summary_status: passed
+      structured_summary_duration_seconds: 352.506
+      scenario_count: 66
+      validation_content_matches_dist: true
+      static_validation: passed
+      factorio_2_0_validation: passed
+      factorio_2_0_binary: Factorio 2.0.77 build 84539 win64 full
+      exact_dist_base_smoke: passed
+      exact_dist_space_age_smoke: passed
+      factorio_2_0_crucible_rigor_exact_dist: passed
+      automated_gate: passed
       manual_gate: pending
-      status: rebuilding-after-package-visible-change
+      status: release-candidate-awaiting-manual-review
     mir_1_9_3:
       version: "1.9.3"
       branch: tmp/1.1
