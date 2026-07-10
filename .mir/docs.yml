@@ -1111,6 +1111,13 @@ docs:
     doc_type: release-plan
     owner: mir-maintainers
     source_of_truth_for: []
+  - path: docs/releases/2.4.0-roadmap.md
+    title: "2.4.0 Roadmap"
+    status: draft
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for: []
   - path: docs/releases/README.md
     title: "Releases"
     status: current

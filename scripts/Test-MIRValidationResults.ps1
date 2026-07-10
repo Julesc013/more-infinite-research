@@ -54,6 +54,20 @@ try {
   if ($partial.status -ne "incomplete" -or $partial.scenarios[0].status -ne "running" -or $partial.groups[0].status -ne "incomplete") {
     throw "Interrupted validation summary did not preserve an incomplete running scenario."
   }
+
+  $missingPath = Join-Path $testRoot "missing-scenario.json"
+  Initialize-MIRValidationResult -OutputPath $missingPath -FactorioVersion "test" -RequiredGroups @("static") `
+    -ExpectedScenarios @("required-one", "required-two") -ExpectedScenariosSha256 "manifest" | Out-Null
+  Add-MIRValidationCompletedScenario -Name "required-one" -Group "static"
+  $failedAsExpected = $false
+  try {
+    Complete-MIRValidationRun
+  } catch {
+    $failedAsExpected = $_.Exception.Message -match "scenario completeness failed"
+  }
+  if (-not $failedAsExpected) {
+    throw "Missing expected validation scenario did not fail completion."
+  }
 } finally {
   if (Test-Path -LiteralPath $testRoot) {
     Remove-Item -LiteralPath $testRoot -Recurse -Force

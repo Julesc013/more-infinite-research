@@ -151,7 +151,7 @@ focused modules:
 - `prototypes/mir/planner/prerequisites.lua`: stream prerequisite construction, unlock-derived prerequisites, and the optional end-game prerequisite gate.
 - `prototypes/mir/core/deepcopy.lua`: shared fallback for data-stage deep copies.
 - `prototypes/mir/core/table.lua`: deterministic table-key ordering helpers.
-- `prototypes/mir/policy/technology_cleanup.lua`: technology removal with prerequisite reference cleanup.
+- `prototypes/mir/emit/technology_replacement.lua`: graph-safe transactional replacement with prerequisite rewiring; unreferenced removal is an explicit separate operation.
 - `prototypes/mir/policy/max_level.lua`: post-emission max-level setting enforcement for generated stream technologies.
 - `prototypes/mir/policy/weapon_speed.lua`: coverage-aware rocket/cannon category cleanup from generated general weapon-speed continuations.
 - `prototypes/mir/policy/native_effect_coverage.lua`: exact reachable infinite native-effect ownership shared by direct-stream adoption and weapon overlap policy.

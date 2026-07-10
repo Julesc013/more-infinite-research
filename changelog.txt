@@ -4,13 +4,13 @@ Date: 2026-07-11
 
   Compatibility:
 
-    - Kept the modern Factorio 2.1 compiler, dependencies, generated technology IDs, and feature surface unchanged.
+    - Kept the canonical MIR 3 compiler, generated technology IDs, and existing default behavior stable.
     - Fixed generated research that could inherit an unavailable tutorial technology from an already-enabled science recipe.
     - Kept disabled or cyclic technology prerequisites out of generated research while preserving legitimate progression gates.
     - Rejected self-locked, cyclic, or non-researchable science recipe unlocks.
     - Skipped generated streams whose required technologies are disabled or unreachable instead of emitting a fatal graph edge.
     - Made science recipe unlock selection deterministic when multiple reachable technologies provide the same recipe.
-    - Made rocket and cannon overlap cleanup conditional on exact reachable infinite replacement coverage for new configurations.
+    - Made rocket and cannon overlap cleanup use semantic effect identity and positive emitted coverage for new configurations.
     - Preserved finite vanilla weapon speed bonuses and existing stored overlap-mode choices.
     - Limited weapon overlap cleanup to MIR-generated continuations and required external owners to use obtainable science.
     - Rejected external research owners that use unrecognized science ingredients.
@@ -21,6 +21,10 @@ Date: 2026-07-11
     - Fixed a settings-stage circular import that prevented 3.0.5 from loading.
     - Made effect controls display each technology's primary base-tier value while preserving later-tier ratios.
     - Kept scripted effect controls scaling multiplier deltas instead of full multipliers.
+    - Made competing technology replacement transactional.
+    - Rewired dependent prerequisites only after MIR emitted graph-safe coverage.
+    - Isolated unrestricted module-permission arrays per prototype and gave the pass its own target capability.
+    - Made scripted effect tooltips display the selected per-level value.
 
   Changes:
 

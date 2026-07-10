@@ -59,6 +59,11 @@ if ($status -eq "rebuilding-after-package-visible-change") {
   if ((Get-MIRRequiredCandidateField -Fields $candidate -Name "automated_gate") -ne "pending") {
     throw "A rebuilding candidate must use automated_gate: pending."
   }
+  $allowedRebuildingFields = @("artifact", "source_commit", "automated_gate", "manual_gate", "status")
+  $staleFields = @($candidate.Keys | Where-Object { $_ -notin $allowedRebuildingFields })
+  if ($staleFields.Count -gt 0) {
+    throw "A rebuilding candidate must not retain obsolete pass/hash fields: $($staleFields -join ', ')."
+  }
   Write-Host "[ok] MIR release evidence is explicitly rebuilding; stale candidate bytes cannot be promoted."
   exit 0
 }
@@ -78,6 +83,9 @@ if ($LASTEXITCODE -ne 0) {
 
 if (Test-MIRPackageSourceGitDirty -RepoRoot $repo) {
   throw "Package-visible working-tree changes make the active release candidate stale."
+}
+if (Test-MIRRepositoryGitDirty -RepoRoot $repo) {
+  throw "The entire repository working tree must be clean before candidate promotion."
 }
 $packageRoots = @(Get-MIRPackageSourceRoots)
 $changedPackagePaths = @(& git -C $repo diff --name-only $sourceCommit HEAD -- @packageRoots)
@@ -100,6 +108,8 @@ $checks = [ordered]@{
   package_source_sha256 = Get-MIRPackageSourceFingerprint -RepoRoot $repo
   target_profile_sha256 = Get-MIRTargetProfileFingerprint -Profile $profile
   required_groups_sha256 = Get-MIRRequiredGroupsFingerprint -RequiredGroups $requiredGroups
+  validation_harness_sha256 = Get-MIRValidationHarnessFingerprint -RepoRoot $repo
+  expected_scenarios_sha256 = Get-MIRFileSha256 -Path (Join-Path $repo "fixtures\compat-matrix\expected-scenarios.json")
 }
 foreach ($field in $checks.Keys) {
   $expected = Get-MIRRequiredCandidateField -Fields $candidate -Name $field
@@ -126,6 +136,8 @@ $summaryExpectations = [ordered]@{
   package_source_sha256 = $checks.package_source_sha256
   validation_package_sha256 = Get-MIRRequiredCandidateField -Fields $candidate -Name "validation_package_sha256"
   validation_package_content_sha256 = $checks.package_content_sha256
+  validation_harness_sha256 = $checks.validation_harness_sha256
+  expected_scenarios_sha256 = $checks.expected_scenarios_sha256
 }
 foreach ($field in $summaryExpectations.Keys) {
   if ([string]$summary.$field -ne [string]$summaryExpectations[$field]) {
@@ -134,6 +146,9 @@ foreach ($field in $summaryExpectations.Keys) {
 }
 if ([bool]$summary.package_source_git_dirty) {
   throw "Structured summary was produced from a package-visible dirty tree."
+}
+if ([bool]$summary.validation_harness_git_dirty) {
+  throw "Structured summary was produced from a dirty validation harness."
 }
 
 $summaryRequired = @($summary.required_groups | ForEach-Object { [string]$_ } | Sort-Object -Unique)

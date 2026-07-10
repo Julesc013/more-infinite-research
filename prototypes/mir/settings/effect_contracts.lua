@@ -31,6 +31,15 @@ local whole_number_effects = {
   ["worker-robot-storage"] = true
 }
 
+local identity_fields = {
+  "type",
+  "recipe",
+  "ammo_category",
+  "turret_id",
+  "fluid",
+  "item"
+}
+
 local base_default_anchors = {
   ["braking-force"] = { unit = "percent", canonical_anchor = 0.15 },
   ["inserter-capacity-bonus"] = { unit = "native", canonical_anchor = 4, whole_number = true },
@@ -57,6 +66,43 @@ function M.numeric_effect_descriptor(effect)
     return { field = "modifier", unit = "native", display_multiplier = 1, value = effect.modifier }
   end
   return nil
+end
+
+function M.effect_identity(effect)
+  local identity = {}
+  for _, field in ipairs(identity_fields) do
+    if effect and effect[field] ~= nil then identity[field] = effect[field] end
+  end
+  return identity
+end
+
+function M.effect_identity_signature(effect)
+  local parts = {}
+  for _, field in ipairs(identity_fields) do
+    if effect and effect[field] ~= nil then
+      table.insert(parts, field .. "=" .. tostring(effect[field]))
+    end
+  end
+  return table.concat(parts, ";")
+end
+
+function M.effect_has_positive_numeric_value(effect)
+  local descriptor = M.numeric_effect_descriptor(effect)
+  return descriptor ~= nil and descriptor.value > 0
+end
+
+function M.contract_from_effect(effect, selected_effect)
+  local canonical = M.numeric_effect_descriptor(effect)
+  local emitted = M.numeric_effect_descriptor(selected_effect or effect)
+  return {
+    identity = M.effect_identity(effect),
+    identity_signature = M.effect_identity_signature(effect),
+    canonical_value = canonical and canonical.value or nil,
+    selected_value = emitted and emitted.value or nil,
+    emitted_value = emitted and emitted.value or nil,
+    owner_match_policy = "identity-and-policy",
+    replacement_policy = "transactional"
+  }
 end
 
 function M.descriptor_from_effects(effects)

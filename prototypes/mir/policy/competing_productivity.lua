@@ -2,7 +2,9 @@ local C = require("prototypes.mir.streams.registry")
 local costs = require("prototypes.mir.planner.costs")
 local profiles = require("prototypes.mir.compatibility.profiles")
 local productivity_owners = require("prototypes.mir.index.productivity_owners")
-local cleanup = require("prototypes.mir.policy.technology_cleanup")
+local replacement = require("prototypes.mir.emit.technology_replacement")
+local generated_registry = require("prototypes.mir.domain.facts.generated_technology_registry")
+local effect_contracts = require("prototypes.mir.settings.effect_contracts")
 local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 local lookup = require("prototypes.mir.platform.factorio.prototype_lookup")
 local recipe_matching = require("prototypes.mir.capabilities.recipe_productivity.recipe_matching")
@@ -88,35 +90,32 @@ local function known_competing_tech_name(name)
   return known == true
 end
 
-local function collect_owned_recipes()
-  local owned = {}
-  for key, _ in pairs(C.streams or {}) do
-    local tech_name = "recipe-prod-" .. key .. "-1"
-    local tech = data_raw.technology(tech_name)
-    for _, effect in ipairs((tech and tech.effects) or {}) do
-      if effect.type == "change-recipe-productivity" and effect.recipe then
-        owned[effect.recipe] = {
-          tech = tech_name,
-          change = effect.change
-        }
+local function replacement_names_for_effects(effects)
+  local replacements, seen = {}, {}
+  for _, expected in ipairs(effects or {}) do
+    local expected_identity = effect_contracts.effect_identity_signature(expected)
+    local owner = nil
+    for _, name in ipairs(generated_registry.sorted_names({ kind = "stream" })) do
+      local technology = data_raw.technology(name)
+      if technology and technology.max_level == "infinite" then
+        for _, effect in ipairs(technology.effects or {}) do
+          if effect_contracts.effect_identity_signature(effect) == expected_identity
+            and effect_contracts.effect_has_positive_numeric_value(effect) then
+            owner = name
+            break
+          end
+        end
       end
+      if owner then break end
+    end
+    if not owner then return nil end
+    if not seen[owner] then
+      seen[owner] = true
+      table.insert(replacements, owner)
     end
   end
-  return owned
-end
-
-local function is_external_recipe_productivity_tech(name, tech, owned_recipes)
-  if productivity_owners.is_mir_recipe_productivity_tech(name) then return false end
-  if not known_competing_tech_name(name) then return false end
-  if tech.max_level ~= "infinite" then return false end
-
-  local effects = productivity_owners.recipe_productivity_effects_only(tech)
-  if not effects then return false end
-  for _, effect in ipairs(effects) do
-    local owned = owned_recipes[effect.recipe]
-    if not owned or not same_change(owned.change, effect.change) then return false end
-  end
-  return true
+  table.sort(replacements)
+  return replacements
 end
 
 function M.prepare()
@@ -164,24 +163,23 @@ function M.apply()
   if not prefer_this_mod_for_competing_techs() then return end
   if not known_competing_mod_active() then return end
 
-  local owned_recipes = collect_owned_recipes()
-  local to_remove = {}
   local candidates = prepared_removable_techs or {}
-  if not prepared_removable_techs then
-    for name, _ in pairs(data_raw.prototypes("technology")) do
-      candidates[name] = true
-    end
-  end
-
   for name, _ in pairs(candidates) do
     local tech = data_raw.technology(name)
-    if is_external_recipe_productivity_tech(name, tech, owned_recipes) then
-      table.insert(to_remove, name)
+    local effects = productivity_owners.recipe_productivity_effects_only(tech)
+    local replacement_names = effects and replacement_names_for_effects(effects) or nil
+    if replacement_names and #replacement_names > 0 then
+      local replaced, reason = replacement.replace_technology(name, replacement_names)
+      if replaced then
+        log("[more-infinite-research] Replaced competing recipe productivity technology: "
+          .. name .. " -> " .. table.concat(replacement_names, ","))
+      else
+        log("[more-infinite-research] Retained competing recipe productivity technology because replacement was unsafe: "
+          .. name .. " reason=" .. tostring(reason))
+      end
+    else
+      log("[more-infinite-research] Retained competing recipe productivity technology because MIR did not emit complete replacement coverage: " .. name)
     end
-  end
-  for _, name in ipairs(to_remove) do
-    cleanup.remove_technology_and_prereq_refs(name)
-    log("[more-infinite-research] Removed competing recipe productivity technology: " .. name)
   end
 end
 

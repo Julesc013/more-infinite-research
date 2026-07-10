@@ -17,6 +17,12 @@ local receiver_types = {
 
 local allowed_effects = {"speed", "productivity", "consumption", "pollution", "quality"}
 
+local function copy_array(values)
+  local out = {}
+  for _, value in ipairs(values or {}) do table.insert(out, value) end
+  return out
+end
+
 local function discovered_categories()
   local seen = {}
   for name, _ in pairs(data_raw.prototypes("module-category")) do seen[name] = true end
@@ -39,7 +45,7 @@ local function apply_recipe(recipe, categories)
   recipe.allow_consumption = true
   recipe.allow_pollution = true
   recipe.allow_quality = true
-  recipe.allowed_module_categories = categories
+  recipe.allowed_module_categories = copy_array(categories)
   return true
 end
 
@@ -47,8 +53,8 @@ local function apply_receiver(prototype, categories)
   if type(prototype) ~= "table" then return false end
   local slots = tonumber(prototype.module_slots)
   if not slots or slots <= 0 then return false end
-  prototype.allowed_effects = allowed_effects
-  prototype.allowed_module_categories = categories
+  prototype.allowed_effects = copy_array(allowed_effects)
+  prototype.allowed_module_categories = copy_array(categories)
   return true
 end
 

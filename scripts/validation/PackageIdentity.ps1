@@ -132,6 +132,54 @@ function Test-MIRPackageSourceGitDirty {
   return $status.Count -gt 0
 }
 
+function Test-MIRRepositoryGitDirty {
+  param([Parameter(Mandatory)][string]$RepoRoot)
+
+  $status = @(& git -C $RepoRoot status --porcelain --untracked-files=all 2>$null)
+  if ($LASTEXITCODE -ne 0) {
+    throw "Unable to inspect repository Git state."
+  }
+  return $status.Count -gt 0
+}
+
+function Get-MIRValidationHarnessRoots {
+  return @("scripts", "fixtures", ".mir", ".github/workflows")
+}
+
+function Get-MIRValidationHarnessFingerprint {
+  param([Parameter(Mandatory)][string]$RepoRoot)
+
+  $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+  $files = @()
+  foreach ($relative in Get-MIRValidationHarnessRoots) {
+    $path = Join-Path $repo $relative
+    if (Test-Path -LiteralPath $path -PathType Leaf) {
+      $files += $relative.Replace("\", "/")
+    } elseif (Test-Path -LiteralPath $path -PathType Container) {
+      $files += @(Get-ChildItem -LiteralPath $path -Recurse -File | ForEach-Object {
+        [System.IO.Path]::GetRelativePath($repo, $_.FullName).Replace("\", "/")
+      })
+    }
+  }
+  $rows = foreach ($relative in @($files | Sort-Object -Unique)) {
+    $path = Join-Path $repo $relative
+    $item = Get-Item -LiteralPath $path
+    "{0}`t{1}`t{2}" -f $relative, $item.Length, (Get-MIRFileSha256 -Path $path)
+  }
+  return Get-MIRStringSha256 -Value ($rows -join "`n")
+}
+
+function Test-MIRValidationHarnessGitDirty {
+  param([Parameter(Mandatory)][string]$RepoRoot)
+
+  $roots = @(Get-MIRValidationHarnessRoots)
+  $status = @(& git -C $RepoRoot status --porcelain --untracked-files=all -- @roots 2>$null)
+  if ($LASTEXITCODE -ne 0) {
+    throw "Unable to inspect validation harness Git state."
+  }
+  return $status.Count -gt 0
+}
+
 function Get-MIRFactorioBinaryVersion {
   param([Parameter(Mandatory)][string]$Path)
 

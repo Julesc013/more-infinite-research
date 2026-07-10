@@ -186,8 +186,9 @@ Current checkpoint facts:
   and no longer demands unrelated `effect_receiver` tables during a
   productivity-only/module-only scenario.
 - Factorio 2.1.9 completed the full static, base, Space Age, settings, mixed-tier
-  scaling, scripted-effect, owner/adoption, weapon, and compatibility matrix in
-  `466.256` seconds. That run used package-visible uncommitted changes and is
+  scaling, scripted-effect, owner/adoption, weapon, transactional replacement,
+  and compatibility matrix with 74 scenarios in `460.9` seconds. That run used
+  package-visible uncommitted changes and is
   behavioral evidence, not clean candidate evidence.
 - The primary-tier correction passed the complete static gate, packaged base
   and Space Age smoke loads, ordinary settings-stage default assertions, and
@@ -197,12 +198,23 @@ Current checkpoint facts:
   evidence.
 - Current rebuilt archive:
   `dist/more-infinite-research_3.0.5.zip`.
-- Current rebuilt archive SHA-256:
-  `1FF086F3DC76E1AAF5F3EDFE15481022809DB37AE9C2BBC028769DAB712EFAD2`.
-- Current rebuilt archive size and shape: `320286` bytes, `132` zip entries,
-  `127` files, and `0` forbidden release paths.
-- Current archive/source content fingerprint:
-  `C29708DF6D81345F50ACB4AC9E28528759A6E57620D9E51D180C6814444FD68C`.
+- Active rebuilding candidate hashes and old passed fields are cleared until
+  the clean committed source is rebuilt and revalidated.
+
+Completed stabilization audit items:
+
+- [x] Separate semantic effect identity from canonical and selected emitted
+  numeric values.
+- [x] Make scaled MIR weapon replacement coverage identity-based and positive.
+- [x] Make known productivity and base-extension replacement transactional.
+- [x] Rewire and deduplicate dependent prerequisites with cycle rejection.
+- [x] Replace generated-name prefix ownership with the explicit registry.
+- [x] Copy unrestricted module permission arrays per prototype and add the
+  independent `module_permissions` target capability.
+- [x] Bind scripted effect descriptions to selected values.
+- [x] Add expected-scenario and validation-harness fingerprints and require a
+  clean repository at promotion.
+- [x] Add a candidate-SHA, archive-SHA, manual-environment release workflow.
 
 #### URGENT P0 — Clean Candidate Evidence
 
@@ -254,7 +266,7 @@ Current checkpoint facts:
   scenarios with a declarative test-setting override mechanism. Tests must not
   depend on editing implementation source text to select generated setting
   values.
-- [ ] Replace `native_effect_coverage.lua`'s `^recipe%-prod%-` name-prefix
+- [x] Replace `native_effect_coverage.lua`'s `^recipe%-prod%-` name-prefix
   heuristic with explicit MIR ownership/registry evidence. An external mod that
   happens to use the same prefix must not be silently excluded from exact-owner
   analysis.
@@ -263,7 +275,7 @@ Current checkpoint facts:
   family adoption remain named policy-layer exceptions or move their mutations
   behind focused pipeline/emit commands. Make `.mir/modules.yml`, architecture
   docs, and lints agree with the actual decision.
-- [ ] Decide whether unrestricted module permissions need their own target
+- [x] Give unrestricted module permissions their own target
   feature capability instead of borrowing `prototype_limits`. If the shared
   gate remains, document why the support matrix is intentionally identical.
 - [ ] Keep `effect_contracts.lua` pure and immutable. Add an architecture check
@@ -288,7 +300,7 @@ Current checkpoint facts:
 - [ ] Add a settings-stage package smoke as a named fast gate. It must load the
   exact built archive far enough to construct all startup settings and must run
   before the longer compatibility matrix.
-- [ ] Add a regression proving an external exact native owner with a
+- [x] Add a regression proving an external recipe-productivity owner with a
   `recipe-prod-` prefix is classified by ownership evidence rather than name.
 - [ ] Add a reduced-target manifest assertion that every target with
   `prototype_limits = false` omits both

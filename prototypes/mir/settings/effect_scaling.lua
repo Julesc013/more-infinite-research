@@ -6,11 +6,17 @@ local effective_settings = require("prototypes.mir.settings.effective")
 -- used by the settings catalog. This prevents catalog/profile import cycles.
 local M = {}
 
-local function selected_factor(setting_name, descriptor)
+local function selected_value(setting_name, descriptor)
   local value = effective_settings.get(setting_name)
-  if type(value) ~= "number" then return 1 end
+  if type(value) ~= "number" then return descriptor.canonical_anchor end
   local selected = value / descriptor.display_multiplier
-  if selected <= 0 or descriptor.canonical_anchor <= 0 then return 1 end
+  if selected <= 0 then return descriptor.canonical_anchor end
+  return selected
+end
+
+local function selected_factor(setting_name, descriptor)
+  local selected = selected_value(setting_name, descriptor)
+  if descriptor.canonical_anchor <= 0 then return 1 end
   return selected / descriptor.canonical_anchor
 end
 
@@ -18,13 +24,16 @@ function M.scale_stream_effects(key, spec, effects)
   local descriptor = contracts.stream_descriptor(spec)
   if not descriptor then return deepcopy(effects or {}) end
   local factor = selected_factor(contracts.stream_setting_name(key), descriptor)
-  if factor == 1 then return deepcopy(effects or {}) end
-
   local out = deepcopy(effects or {})
   for _, effect in ipairs(out) do
     local candidate = contracts.numeric_effect_descriptor(effect)
     if candidate and candidate.field == descriptor.field and candidate.unit == descriptor.unit then
       effect[descriptor.field] = effect[descriptor.field] * factor
+    elseif descriptor.runtime_multiplier_delta and effect.type == "nothing"
+      and type(effect.effect_description) == "table" then
+      effect.effect_description[2] = tostring(
+        selected_value(contracts.stream_setting_name(key), descriptor) * descriptor.display_multiplier
+      )
     end
   end
   return out

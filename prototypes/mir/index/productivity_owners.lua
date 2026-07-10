@@ -1,10 +1,11 @@
 local profiles = require("prototypes.mir.compatibility.profiles")
 local data_raw = require("prototypes.mir.platform.factorio.data_raw")
+local generated_registry = require("prototypes.mir.domain.facts.generated_technology_registry")
 
 local O = {}
 
 function O.is_mir_recipe_productivity_tech(tech_name)
-  return tech_name and string.find(tech_name, "^recipe%-prod%-") ~= nil
+  return generated_registry.contains(tech_name)
 end
 
 function O.recipe_productivity_effects(tech)

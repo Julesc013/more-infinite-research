@@ -480,7 +480,7 @@ Generic competing recipe-productivity cleanup is intentionally limited to **know
 | `prototypes/mir/capabilities/recipe_productivity/recipe_matching.lua` | Item/fluid recipe output matching, pattern matching, category filters, hidden/recycling skips. |
 | `prototypes/mir/emit/icon_builder.lua` | Technology, item, fluid, and explicit icon resolution plus constant overlay construction. |
 | `prototypes/mir/core/table.lua` | Small shared table helpers such as deterministic sorted keys. |
-| `prototypes/mir/policy/technology_cleanup.lua` | Removes technologies and cleans prerequisite references from remaining technologies. |
+| `prototypes/mir/emit/technology_replacement.lua` | Commits graph-safe technology replacement only after emitted coverage exists, rewiring and deduplicating prerequisite edges transactionally. |
 | `prototypes/mir/compatibility/profiles.lua` | Mod-specific stream patch scaffolding. |
 | `prototypes/mir/policy/competing_productivity.lua` | Known competing recipe-productivity cleanup. |
 | `prototypes/mir/policy/competing_base_extensions.lua` | Known competing base-extension cleanup. |

@@ -2,6 +2,8 @@ local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 local effective_settings = require("prototypes.mir.settings.effective")
 local science = require("prototypes.mir.capabilities.science_integration.science_packs")
 local table_utils = require("prototypes.mir.core.table")
+local effect_contracts = require("prototypes.mir.settings.effect_contracts")
+local generated_registry = require("prototypes.mir.domain.facts.generated_technology_registry")
 
 local M = {}
 
@@ -53,13 +55,27 @@ function M.technology_has_exact_effect(name, expected_effect)
   return false
 end
 
+function M.technology_has_effect_identity(name, expected_effect, options)
+  if not M.technology_is_researchable_infinite(name) then return false end
+  local expected_identity = effect_contracts.effect_identity_signature(expected_effect)
+  for _, effect in ipairs((data_raw.technology(name) or {}).effects or {}) do
+    if effect_contracts.effect_identity_signature(effect) == expected_identity then
+      if not (options and options.positive_numeric_value)
+        or effect_contracts.effect_has_positive_numeric_value(effect) then
+        return true
+      end
+    end
+  end
+  return false
+end
+
 function M.exact_owner_names(expected_effect, options)
   options = options or {}
   local excluded = options.excluded_names or {}
   local owners = {}
   for _, name in ipairs(table_utils.sorted_keys(data_raw.prototypes("technology"))) do
     if not excluded[name]
-      and (not options.external_only or not string.match(name, "^recipe%-prod%-"))
+      and (not options.external_only or not generated_registry.contains(name))
       and M.technology_has_exact_effect(name, expected_effect)
     then
       table.insert(owners, name)

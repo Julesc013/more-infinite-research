@@ -1,6 +1,6 @@
 local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 local effective_settings = require("prototypes.mir.settings.effective")
-local generated_registry = require("prototypes.mir.emit.generated_technology_registry")
+local generated_registry = require("prototypes.mir.domain.facts.generated_technology_registry")
 local native_effect_coverage = require("prototypes.mir.policy.native_effect_coverage")
 local target_line = require("prototypes.mir.platform.factorio.target_line")
 
@@ -34,7 +34,10 @@ local function strip_categories_for_mode()
   }
 
   for category, replacement in pairs(replacements) do
-    if native_effect_coverage.technology_has_exact_effect(replacement.technology, replacement.effect) then
+    if generated_registry.contains(replacement.technology)
+      and native_effect_coverage.technology_has_effect_identity(replacement.technology, replacement.effect, {
+        positive_numeric_value = true
+      }) then
       out[category] = true
     elseif not native_effect_coverage.prefer_mir() then
       local excluded_names = {

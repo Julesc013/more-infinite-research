@@ -52,6 +52,7 @@ fixtures:
       - recipe-maximum-productivity-cap
       - above-300-cap-self-recycling-scope
       - unrestricted-module-permissions
+      - module-permission-array-isolation
       - effect-receiver-limits
       - separate-energy-and-pollution-limits
       - positive-power-floor-opt-in
@@ -63,6 +64,22 @@ fixtures:
       - vanilla-continuation-default-anchors
       - proportional-mixed-tier-scaling
       - scripted-runtime-multiplier-delta
+      - scripted-effect-selected-description
+
+  competing-productivity-transaction:
+    path: fixtures/plates-n-circuit-productivity
+    assertion_path: fixtures/assert-plates-n-circuit-productivity
+    validates:
+      - scaled-known-productivity-competitor
+      - external-recipe-productivity-prefix-owner
+      - technology-prerequisite-rewire
+
+  competing-base-extension-transaction:
+    path: fixtures/better-robots-extended-competitor
+    assertion_path: fixtures/assert-base-competitor-transaction
+    validates:
+      - base-competitor-rollback
+      - technology-prerequisite-rewire
 
   settings-profile-roundtrip:
     assertion_path: fixtures/assert-settings-profile-roundtrip
@@ -90,6 +107,7 @@ fixtures:
       - external-continuation-non-mutation
       - external-owner-suppresses-dedicated-streams-when-preferred
       - dedicated-weapon-prerequisites
+      - scaled-weapon-overlap
 
   air-scrubbing:
     path: fixtures/air-scrubbing

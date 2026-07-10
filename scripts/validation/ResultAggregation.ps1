@@ -79,7 +79,11 @@ function Initialize-MIRValidationResult {
     [string]$ValidationPackageSha256 = "",
     [string]$ValidationPackageContentSha256 = "",
     [string]$FactorioBinaryVersion = "",
-    [bool]$PackageSourceGitDirty = $false
+    [bool]$PackageSourceGitDirty = $false,
+    [string]$ValidationHarnessSha256 = "",
+    [bool]$ValidationHarnessGitDirty = $false,
+    [string]$ExpectedScenariosSha256 = "",
+    [string[]]$ExpectedScenarios = @()
   )
 
   $script:MIRValidationSummaryPath = [System.IO.Path]::GetFullPath($OutputPath)
@@ -91,6 +95,10 @@ function Initialize-MIRValidationResult {
     factorio_binary_version = $FactorioBinaryVersion
     git_commit = $GitCommit
     package_source_git_dirty = $PackageSourceGitDirty
+    validation_harness_sha256 = $ValidationHarnessSha256
+    validation_harness_git_dirty = $ValidationHarnessGitDirty
+    expected_scenarios_sha256 = $ExpectedScenariosSha256
+    expected_scenarios = @($ExpectedScenarios | Sort-Object -Unique)
     target_profile_sha256 = $TargetProfileSha256
     required_groups_sha256 = $RequiredGroupsSha256
     package_source_sha256 = $PackageSourceSha256
@@ -193,6 +201,21 @@ function Complete-MIRValidationRun {
   }
 
   $script:MIRValidationResultState.groups = @(Get-MIRValidationGroupResults)
+  $expected = @($script:MIRValidationResultState.expected_scenarios)
+  if ($expected.Count -gt 0) {
+    $actual = @($script:MIRValidationResultState.scenarios | ForEach-Object { [string]$_.name })
+    $duplicates = @($actual | Group-Object | Where-Object Count -ne 1 | ForEach-Object Name)
+    $difference = @(Compare-Object -ReferenceObject @($expected | Sort-Object) -DifferenceObject @($actual | Sort-Object))
+    $nonPassed = @($script:MIRValidationResultState.scenarios | Where-Object status -ne "passed" | ForEach-Object name)
+    if ($duplicates.Count -gt 0 -or $difference.Count -gt 0 -or $nonPassed.Count -gt 0) {
+      $message = "Validation scenario completeness failed."
+      if ($duplicates.Count -gt 0) { $message += " Duplicate scenarios: $($duplicates -join ',')." }
+      if ($difference.Count -gt 0) { $message += " Manifest/result difference: $($difference.InputObject -join ',')." }
+      if ($nonPassed.Count -gt 0) { $message += " Required scenarios not passed: $($nonPassed -join ',')." }
+      Fail-MIRValidationRun -ErrorMessage $message
+      throw $message
+    }
+  }
   $unmet = @(
     $script:MIRValidationResultState.groups |
       Where-Object { $_.required -and $_.status -ne "passed" }

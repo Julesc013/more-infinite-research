@@ -128,6 +128,13 @@ descriptors used by the settings catalog. Runtime setting lookup and scaling
 remain in `prototypes/mir/settings/effect_scaling.lua`, keeping catalog/profile
 loading acyclic.
 
+Effect contracts separate semantic identity from canonical, selected, and
+emitted numeric values. Owner discovery may use semantic identity, while
+external adoption and replacement policy decide independently whether numeric
+equivalence is required. Competing technology removal is committed through
+`prototypes/mir/emit/technology_replacement.lua` only after registered emitted
+coverage exists and the rewritten prerequisite graph is acyclic.
+
 The MIR planner namespace owns compiler planning checks as they are migrated out
 of legacy generators. `prototypes/mir/planner/requirements.lua` evaluates
 required mods, prototype families, technology gates, and legacy technology
@@ -374,7 +381,6 @@ prototypes/
       competing_productivity.lua
       competing_base_extensions.lua
       productivity_family_adoption.lua
-      technology_cleanup.lua
       denylist.lua
       overrides.lua
 
@@ -455,6 +461,7 @@ prototypes/
       diagnostics.lua
 
     emit/
+      technology_replacement.lua
       technology_builder.lua
       stream_spec_adapter.lua
       base_extensions.lua

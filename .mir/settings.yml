@@ -21,6 +21,7 @@ rules:
   prototype_limit_settings_are_startup_only_explicit_overrides: true
   productivity_cap_scope_is_above_300_self_recycling_only: true
   unrestricted_modules_is_opt_in_and_does_not_add_slots: true
+  unrestricted_modules_requires_module_permissions_target_capability: true
   effect_per_level_settings_are_per_technology: true
   effect_per_level_defaults_use_primary_base_tier: true
   scripted_multiplier_effects_scale_delta_not_full_multiplier: true

@@ -1,5 +1,5 @@
 local data_raw = require("prototypes.mir.platform.factorio.data_raw")
-local generated_registry = require("prototypes.mir.emit.generated_technology_registry")
+local generated_registry = require("prototypes.mir.domain.facts.generated_technology_registry")
 
 local S = {}
 
