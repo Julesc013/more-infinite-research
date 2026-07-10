@@ -153,4 +153,8 @@ if external_owner then
   then
     fail("external weapon shooting speed continuation was mutated")
   end
+
+  -- Factorio forbids a numbered level after an infinite continuation. The
+  -- transient prototype exists only long enough to exercise policy scope.
+  techs["weapon-shooting-speed-99"] = nil
 end
