@@ -22,3 +22,8 @@ repeatable evidence.
    changes.
 5. Run static validation first, then runtime validation with a Factorio binary.
 
+Keep fixture names aligned with the behavior they prove. In particular,
+reduced-target setting visibility belongs to `reduced-settings-surface`; it
+must not be folded into `settings-profile-roundtrip` when the codec is not
+shipped on that target.
+

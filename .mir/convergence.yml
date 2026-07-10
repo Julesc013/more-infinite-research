@@ -73,7 +73,7 @@ behaviors:
     decision: split-fixtures
     impact: validation
     evidence: reduced-settings-surface
-    status: planned
+    status: complete
   BP-008:
     source: 1.7.0-weapon-overlap-policy
     behavior: general weapon speed ownership is removed only with exact replacement coverage

@@ -2016,6 +2016,7 @@ $postMirAssertionFixtures = @(
   "mir-fixture-assert-plates-n-circuit-productivity-blocked",
   "mir-fixture-assert-plates-n-circuit-productivity-change-mismatch",
   "mir-fixture-assert-prototype-limits",
+  "mir-fixture-assert-reduced-settings-surface",
   "mir-fixture-assert-settings-profile-roundtrip",
   "mir-fixture-assert-vanilla-family-adoption",
   "mir-fixture-assert-vanilla-family-exact-owner",
@@ -2999,8 +3000,8 @@ if ($isReducedLegacyLine) {
   Assert-ReportLineContains -Line $inventoryCapacityLine -Expected "effects=2" -Context "$reducedLineLabel merged character inventory/trash slot scenario"
   Assert-NoStreamReportLine -Key "research_character_trash_slots" -Context "$reducedLineLabel merged character inventory/trash slot scenario"
 
-  Invoke-RuntimeScenario -ScenarioName "settings-profile-roundtrip" -EnabledFixtureNames @(
-    "mir-fixture-assert-settings-profile-roundtrip"
+  Invoke-RuntimeScenario -ScenarioName "reduced-settings-surface" -EnabledFixtureNames @(
+    "mir-fixture-assert-reduced-settings-surface"
   )
 
   Invoke-RuntimeScenario -ScenarioName "checkbox-enabled-default-off-features" -EnabledFixtureNames @() `

@@ -39,6 +39,13 @@ fixtures:
       - settings-profile-strict-import-validation
       - hidden-provider-setting-profile-roundtrip
 
+  reduced-settings-surface:
+    assertion_path: fixtures/assert-reduced-settings-surface
+    validates:
+      - reduced-supported-settings-remain-visible
+      - modern-only-settings-are-omitted
+      - reduced-continuation-locales-are-explicit
+
   air-scrubbing:
     path: fixtures/air-scrubbing
     assertion_path: fixtures/assert-air-scrubbing-clean-filter

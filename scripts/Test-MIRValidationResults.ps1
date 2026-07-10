@@ -10,6 +10,7 @@ $cases = @(
   @{ Name = "generated-prerequisite-safety"; Kind = "runtime"; SpaceAge = $false; Expected = "science-prerequisites" },
   @{ Name = "weapon-speed-overlap-safety"; Kind = "runtime"; SpaceAge = $false; Expected = "weapon-overlap" },
   @{ Name = "settings-profile-roundtrip"; Kind = "runtime"; SpaceAge = $false; Expected = "settings-codec" },
+  @{ Name = "reduced-settings-surface"; Kind = "runtime"; SpaceAge = $false; Expected = "reduced-settings-surface" },
   @{ Name = "space-age-generation-integrity"; Kind = "runtime"; SpaceAge = $true; Expected = "space-age" },
   @{ Name = "package-zip-base"; Kind = "package"; SpaceAge = $false; Expected = "exact-dist" },
   @{ Name = "base-generation-integrity"; Kind = "runtime"; SpaceAge = $false; Expected = "base-load" }

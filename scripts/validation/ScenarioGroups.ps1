@@ -19,7 +19,7 @@ function Get-MIRValidationScenarioGroup {
     return "settings-codec"
   }
   if ($ScenarioName -eq "reduced-settings-surface") {
-    return "settings-surface"
+    return "reduced-settings-surface"
   }
   if ($ScenarioName -match "direct-effects|owner-skip|character-inventory-merged-effects") {
     return "direct-effects"
