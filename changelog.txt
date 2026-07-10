@@ -18,6 +18,8 @@ Date: 2026-07-11
     - Added opt-in above-300% productivity scoping for proven non-generative self-recycling recipes.
     - Added opt-in unrestricted module permissions across existing recipe, machine, and beacon slots.
     - Added per-generated-technology effect-per-level controls while preserving canonical mixed-tier ratios.
+    - Fixed a settings-stage circular import that prevented 3.0.5 from loading.
+    - Made effect controls use the lowest tier and scale scripted multiplier deltas instead of full multipliers.
 
   Changes:
 

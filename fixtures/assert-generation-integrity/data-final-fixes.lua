@@ -148,6 +148,38 @@ local function has_recipe_productivity_effect(tech, recipe_name)
   return false
 end
 
+local function recipe_productivity_change(tech, recipe_name)
+  for _, effect in ipairs((tech and tech.effects) or {}) do
+    if effect.type == "change-recipe-productivity" and effect.recipe == recipe_name then
+      return effect.change
+    end
+  end
+  return nil
+end
+
+local furnace_effect_setting = settings
+  and settings.startup
+  and settings.startup["ips-effect-per-level-research_furnace"]
+local furnace_anchor = furnace_effect_setting and furnace_effect_setting.value or nil
+if furnace_anchor ~= 2 and furnace_anchor ~= 4 then
+  fail("furnace effect-per-level anchor should default to the lowest 2% tier; got " .. tostring(furnace_anchor) .. ".")
+end
+if furnace_anchor == 4 then
+  local furnace_technology = techs["recipe-prod-research_furnace-1"]
+  if not furnace_technology then fail("missing furnace technology for mixed-tier effect scaling check.") end
+  for recipe_name, expected in pairs({
+    ["stone-furnace"] = 0.40,
+    ["steel-furnace"] = 0.20,
+    ["electric-furnace"] = 0.10
+  }) do
+    local actual = recipe_productivity_change(furnace_technology, recipe_name)
+    if not actual or math.abs(actual - expected) > 0.000001 then
+      fail("scaled furnace effect for " .. recipe_name .. " was " .. tostring(actual)
+        .. ", expected " .. tostring(expected) .. ".")
+    end
+  end
+end
+
 local function recipe_productivity_owners(recipe_name)
   local owners = {}
   for tech_name, tech in pairs(techs) do

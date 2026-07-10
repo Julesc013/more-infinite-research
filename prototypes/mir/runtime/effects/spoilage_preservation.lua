@@ -7,11 +7,15 @@ M.stream_key = "research_spoilage_preservation"
 
 local MIN_MODIFIER = 0.01
 local MAX_MODIFIER = 100
-local PER_LEVEL = 1.01
+local CANONICAL_PER_LEVEL_DELTA = 0.01
 local EPSILON = 0.000001
 
 local function feature_enabled()
   return settings_resolver.stream_enabled(M.stream_key)
+end
+
+local function per_level_multiplier()
+  return settings_resolver.stream_runtime_multiplier(M.stream_key, CANONICAL_PER_LEVEL_DELTA)
 end
 
 local function state()
@@ -102,7 +106,8 @@ local function apply(log_debug)
 
   local level = effective_level()
   local baseline = data.baseline or 1
-  local requested_multiplier = PER_LEVEL ^ level
+  local per_level = per_level_multiplier()
+  local requested_multiplier = per_level ^ level
   local target = clamp(baseline * requested_multiplier)
   local applied_multiplier = baseline > 0 and (target / baseline) or 1
   game.difficulty_settings.spoil_time_modifier = target
@@ -113,6 +118,7 @@ local function apply(log_debug)
 
   if log_debug then
     log_debug("spoilage preservation applied level=" .. tostring(level)
+      .. " per_level_multiplier=" .. tostring(per_level)
       .. " requested_multiplier=" .. tostring(requested_multiplier)
       .. " applied_multiplier=" .. tostring(applied_multiplier)
       .. " value=" .. tostring(target))

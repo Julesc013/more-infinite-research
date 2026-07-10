@@ -133,12 +133,16 @@ five recipe module permission flags, discovers final module categories, and
 opens those categories and effect types on every existing receiver with module
 slots, including beacons. It does not create slots or mutate module prototypes.
 
-Every non-scripted generated stream and base continuation also has an
+Every generated stream and base continuation also has an
 `ips-effect-per-level-<stream>` or `mir-effect-per-level-<extension>` setting.
 The selected value is an anchor, and MIR scales only the numeric effects it
 emits from the canonical anchor. Ownership, adoption, and equivalence decisions
 use unscaled canonical effects; external technologies and adopted owner values
 are not rewritten.
+
+Scripted multiplier streams use a typed runtime-delta descriptor. Their selected
+percentage is converted to a delta and added to one, so 2% becomes `1.02` per
+level rather than multiplying the full canonical `1.01` multiplier.
 
 Efficiency modules can reduce both energy use and pollution, but MIR exposes
 those floors separately because modpacks may want different behavior for active

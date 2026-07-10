@@ -56,6 +56,13 @@ fixtures:
       - separate-energy-and-pollution-limits
       - positive-power-floor-opt-in
 
+  effect-scaling:
+    assertion_path: fixtures/assert-generation-integrity
+    validates:
+      - lowest-tier-default-anchor
+      - proportional-mixed-tier-scaling
+      - scripted-runtime-multiplier-delta
+
   settings-profile-roundtrip:
     assertion_path: fixtures/assert-settings-profile-roundtrip
     validates:

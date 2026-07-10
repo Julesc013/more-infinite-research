@@ -54,13 +54,14 @@ local function apply_recipe_productivity_cap(value)
 
   local changed = 0
   local scoped = effective_settings.get(prototype_limit_settings.self_recycling_scope_setting_name) == true
+  local scope_classifier = scoped and value > 3.0 and cap_scope.build() or nil
   local approved = 0
   local rejected = 0
   for _, recipe in pairs(data_raw.prototypes("recipe")) do
     if type(recipe) == "table" and recipe.parameter ~= true then
       local should_apply = true
-      if scoped and value > 3.0 then
-        local safe = cap_scope.approve(recipe)
+      if scope_classifier then
+        local safe = scope_classifier.approve(recipe)
         should_apply = safe == true
         if should_apply then approved = approved + 1 else rejected = rejected + 1 end
       end

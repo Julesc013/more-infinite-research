@@ -123,6 +123,10 @@ owns the optional pipeline extent prototype pass.
 catalog and value parser. `prototypes/mir/pipeline/prototype_limits.lua` owns
 the optional data-final-fixes prototype mutation pass for selected recipe
 productivity and effect receiver limits.
+`prototypes/mir/settings/effect_contracts.lua` owns pure typed per-level effect
+descriptors used by the settings catalog. Runtime setting lookup and scaling
+remain in `prototypes/mir/settings/effect_scaling.lua`, keeping catalog/profile
+loading acyclic.
 
 The MIR planner namespace owns compiler planning checks as they are migrated out
 of legacy generators. `prototypes/mir/planner/requirements.lua` evaluates
@@ -737,6 +741,7 @@ Instrument mode is a development tool, not a shipped MIR package feature.
 
 Static validation should eventually fail when:
 
+- top-level MIR Lua imports form a dependency cycle;
 - `compatibility/overlays/` calls `data:extend`;
 - `classify/` requires the Factorio `data_raw` adapter directly;
 - `domain/` requires `emit/`;

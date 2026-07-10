@@ -17,27 +17,6 @@ local function lookup_default(key, field, stream, fallback)
   return fallback
 end
 
-local function default_base_cost(key, stream)
-  return lookup_default(key, "base_cost", stream, C.shared.base_cost)
-end
-
-local function default_growth_factor(key, stream)
-  return lookup_default(key, "growth_factor", stream, C.shared.growth_factor)
-end
-
-local function default_max_level_setting(key, stream)
-  local ml = lookup_default(key, "max_level", stream, 0)
-  if ml == nil or ml == "infinite" then return 0 end
-  local num = tonumber(ml)
-  if not num or num <= 0 then return 0 end
-  return math.floor(num)
-end
-
-local function default_research_time_setting(key, stream)
-  local value = lookup_default(key, "research_time", stream, C.shared.research_time)
-  if not value or value <= 0 then value = C.shared.research_time end
-  return math.floor(value + 0.5)
-end
 local function default_enabled(key, stream)
   local value = lookup_default(key, "enabled", stream, true)
   return not not value

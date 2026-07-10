@@ -86,7 +86,7 @@ Leave it off to preserve zero-power prototypes exactly.
 
 ## Generated Technology Effect Settings
 
-Each generated non-scripted technology has an `Effect per level` setting beside
+Each generated technology has an `Effect per level` setting beside
 its cost and level controls. Its default is MIR's lowest-tier baseline. Changing
 it scales all related tiers and effects proportionally, preserving ratios such
 as a technology with +10%, +5%, and +2% effects. Percentage effects use
@@ -94,9 +94,14 @@ percentage points; slots, counts, and distances use their native units. The
 enable checkbox remains the way to disable a technology—zero is not a disable
 value.
 
-These settings apply during prototype loading and require a restart after
-changing them. They do not add per-tick runtime processing, and they are not
-part of MIR's generated technology planner. The quality cap changes only the
+For scripted multiplier technologies, such as spoilage preservation and
+agricultural growth speed, the setting scales the per-level delta. A selected
+2% effect therefore becomes a `1.02` multiplier per level; MIR never multiplies
+the full canonical `1.01` value.
+
+These settings require a restart after changing them. Numeric prototype effects
+are applied during prototype loading; existing bounded scripted handlers read
+their selected delta at runtime. The quality cap changes only the
 machine quality-effect ceiling; it does not change quality-tier probabilities.
 
 ## Portable Settings Profiles

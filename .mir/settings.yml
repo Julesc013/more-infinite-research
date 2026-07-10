@@ -22,6 +22,8 @@ rules:
   productivity_cap_scope_is_above_300_self_recycling_only: true
   unrestricted_modules_is_opt_in_and_does_not_add_slots: true
   effect_per_level_settings_are_per_technology: true
+  effect_per_level_defaults_use_lowest_canonical_tier: true
+  scripted_multiplier_effects_scale_delta_not_full_multiplier: true
   energy_and_pollution_caps_are_separate: true
   positive_power_floor_is_default_off_opt_in: true
   positive_power_floor_is_compatibility_section_setting: true

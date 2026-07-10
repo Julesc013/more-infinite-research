@@ -68,6 +68,7 @@ function Get-MIRSettingsSourceText {
     "settings.lua",
     "prototypes/mir/stage/settings.lua",
     "prototypes/mir/settings/catalog.lua",
+    "prototypes/mir/settings/effect_contracts.lua",
     "prototypes/mir/settings/effect_scaling.lua",
     "prototypes/mir/settings/pipeline_extent.lua",
     "prototypes/mir/settings/prototype_limits.lua",
@@ -1003,6 +1004,9 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
 
 Invoke-RepoCheck "prototype limit settings are wired" {
   $settingsText = Get-MIRSettingsSourceText
+  $settingsCatalogText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\settings\catalog.lua")
+  $effectContractsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\settings\effect_contracts.lua")
+  $effectScalingText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\settings\effect_scaling.lua")
   $dataFinalFixesText = Get-MIRDataFinalFixesSourceText
   $stepsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\stage\data_final_fixes_steps.lua")
   $prototypeLimitSettingsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\settings\prototype_limits.lua")
@@ -1072,6 +1076,9 @@ Invoke-RepoCheck "prototype limit settings are wired" {
     @{ File = "fixtures\assert-prototype-limits\data-final-fixes.lua"; Text = $prototypeLimitFixtureText; Snippet = 'pollution_limits.low' },
     @{ File = "fixtures\assert-prototype-limits\data-final-fixes.lua"; Text = $prototypeLimitFixtureText; Snippet = 'zero-watt beacon energy_usage' },
     @{ File = "fixtures\assert-prototype-limits\data-final-fixes.lua"; Text = $prototypeLimitFixtureText; Snippet = 'quality_limits.high' },
+    @{ File = "prototypes\mir\settings\catalog.lua"; Text = $settingsCatalogText; Snippet = 'require("prototypes.mir.settings.effect_contracts")' },
+    @{ File = "prototypes\mir\settings\effect_contracts.lua"; Text = $effectContractsText; Snippet = 'candidate.value < descriptor.canonical_anchor' },
+    @{ File = "prototypes\mir\settings\effect_scaling.lua"; Text = $effectScalingText; Snippet = 'local effective_settings = require("prototypes.mir.settings.effective")' },
     @{ File = "scripts\Invoke-MIRValidation.ps1"; Text = (Get-Content -Raw -LiteralPath (Join-Path $repo "scripts\Invoke-MIRValidation.ps1")); Snippet = 'prototype-limit-overrides' }
   )
 
@@ -1079,6 +1086,13 @@ Invoke-RepoCheck "prototype limit settings are wired" {
     if (-not $check.Text.Contains($check.Snippet)) {
       throw "Missing prototype limit setting wiring in $($check.File): $($check.Snippet)"
     }
+  }
+
+  if ($settingsCatalogText.Contains('require("prototypes.mir.settings.effect_scaling")')) {
+    throw "Settings catalog must depend on pure effect contracts, not runtime effect scaling."
+  }
+  if ($effectContractsText.Contains('require("prototypes.mir.settings.effective")')) {
+    throw "Effect contracts must not import effective settings; catalog/profile loading would recurse."
   }
 
   if ($dataFinalFixesText -notmatch '(?s)steps\.apply_compatibility_repairs\(\).*steps\.apply_prototype_limits\(\).*steps\.apply_pipeline_extent\(\).*steps\.prepare_competing_productivity\(\)') {
@@ -2211,6 +2225,22 @@ end
   Set-Content -LiteralPath $copiedSettingsPath -Value $copiedSettings -Encoding UTF8
 }
 
+function Set-CopiedEffectPerLevelDefaults {
+  param(
+    [string]$ModsDir,
+    [hashtable]$Overrides
+  )
+
+  foreach ($streamKey in @($Overrides.Keys | Sort-Object)) {
+    $value = [double]$Overrides[$streamKey]
+    $literal = $value.ToString([System.Globalization.CultureInfo]::InvariantCulture)
+    Set-CopiedGeneratedStartupSettingDefault `
+      -ModsDir $ModsDir `
+      -Name "ips-effect-per-level-$streamKey" `
+      -ValueLiteral $literal
+  }
+}
+
 function Set-CopiedLabPolicySkip {
   param([string]$ModsDir)
   Set-CopiedStartupSettingDefault -ModsDir $ModsDir -Name "mir-lab-incompatibility-policy" -ValueLiteral '"skip"'
@@ -2274,6 +2304,7 @@ function Set-CopiedPrototypeLimitDefaults {
   if ($PositivePowerFloor) {
     Set-CopiedGeneratedStartupSettingDefault -ModsDir $ModsDir -Name "mir-prototype-positive-power-floor" -ValueLiteral "true"
   }
+
   if ($ProductivityCapSelfRecyclingOnly) {
     Set-CopiedGeneratedStartupSettingDefault -ModsDir $ModsDir -Name "mir-productivity-cap-self-recycling-only" -ValueLiteral "true"
   }
@@ -2371,6 +2402,7 @@ function Initialize-RuntimeScenario {
     [string[]]$EnabledBaseExtensionKeys = @(),
     [string[]]$DisabledStreamKeys = @(),
     [string[]]$DisabledBaseExtensionKeys = @(),
+    [hashtable]$EffectPerLevelOverrides = @{},
     [switch]$LabPolicySkip,
     [ValidateSet("configured", "space", "space-and-promethium", "space-age-progression", "official-progression", "mod-progression", "all-official", "all")]
     [string]$SciencePackIngredientPolicy = "configured",
@@ -2472,6 +2504,7 @@ function Initialize-RuntimeScenario {
   foreach ($baseExtensionKey in $DisabledBaseExtensionKeys) {
     Set-CopiedBaseExtensionDisabled -ModsDir $modsDir -BaseExtensionKey $baseExtensionKey
   }
+  Set-CopiedEffectPerLevelDefaults -ModsDir $modsDir -Overrides $EffectPerLevelOverrides
 
   $mods = @(
     @{ name = "base"; enabled = $true },
@@ -2534,6 +2567,7 @@ function Invoke-RuntimeScenario {
     [string[]]$EnabledBaseExtensionKeys = @(),
     [string[]]$DisabledStreamKeys = @(),
     [string[]]$DisabledBaseExtensionKeys = @(),
+    [hashtable]$EffectPerLevelOverrides = @{},
     [switch]$LabPolicySkip,
     [ValidateSet("configured", "space", "space-and-promethium", "space-age-progression", "official-progression", "mod-progression", "all-official", "all")]
     [string]$SciencePackIngredientPolicy = "configured",
@@ -2569,6 +2603,7 @@ function Invoke-RuntimeScenario {
       -EnabledBaseExtensionKeys $EnabledBaseExtensionKeys `
       -DisabledStreamKeys $DisabledStreamKeys `
       -DisabledBaseExtensionKeys $DisabledBaseExtensionKeys `
+      -EffectPerLevelOverrides $EffectPerLevelOverrides `
       -LabPolicySkip:$LabPolicySkip `
       -SciencePackIngredientPolicy $SciencePackIngredientPolicy `
       -WeaponSpeedAdjustmentMode $WeaponSpeedAdjustmentMode `
@@ -3447,6 +3482,13 @@ Invoke-RuntimeScenario -ScenarioName "prototype-limit-self-recycling-and-unrestr
 Assert-LogContains -Expected "Productivity cap self-recycling scope: approved=" -Context "Self-recycling productivity cap scope scenario"
 Assert-LogContains -Expected "Unrestricted module permissions enabled:" -Context "Unrestricted module permission scenario"
 
+Invoke-RuntimeScenario -ScenarioName "effect-scaling-mixed-tier" -EnabledFixtureNames @(
+  "mir-fixture-assert-generation-integrity"
+) -EffectPerLevelOverrides @{
+  research_furnace = 4
+}
+Assert-BaseCoreProductivityStreamsGenerated -Context "Mixed-tier effect scaling scenario"
+
 Invoke-RuntimeScenario -ScenarioName "settings-profile-roundtrip" -EnabledFixtureNames @(
   "mir-fixture-assert-settings-profile-roundtrip"
 )
@@ -3559,7 +3601,10 @@ if ($isFactorio21Line) {
   ) -EnabledStreamKeys @(
     "research_spoilage_preservation",
     "research_agricultural_growth_speed"
-  ) -ScriptedDiagnostics -EnableSpaceAge
+  ) -EffectPerLevelOverrides @{
+    research_spoilage_preservation = 2
+    research_agricultural_growth_speed = 2
+  } -ScriptedDiagnostics -EnableSpaceAge
   foreach ($scriptedStream in @("research_spoilage_preservation", "research_agricultural_growth_speed")) {
     $spaceAgeScriptedLine = Get-LastStreamReportLine -Key $scriptedStream
     Assert-ReportLineGenerated -Line $spaceAgeScriptedLine -Context "Space Age scripted candidate stream $scriptedStream"
@@ -3576,6 +3621,8 @@ if ($isFactorio21Line) {
   }
   Assert-LogContains -Expected "spoilage preservation applied level=0" -Context "Checkbox-enabled scripted spoilage runtime scenario"
   Assert-LogContains -Expected "agricultural growth speed force state refreshed enabled=true" -Context "Checkbox-enabled scripted agricultural runtime scenario"
+  Assert-LogContains -Expected "spoilage preservation applied level=0 per_level_multiplier=1.02" -Context "Scripted spoilage effect scaling scenario"
+  Assert-LogContains -Expected "agricultural growth speed force state refreshed enabled=true per_level_multiplier=1.02" -Context "Scripted agricultural effect scaling scenario"
 
   Invoke-RuntimeScenario -ScenarioName "space-age-scripted-candidates-disabled" -EnabledFixtureNames @() `
     -DisabledStreamKeys @("research_spoilage_preservation") `
