@@ -52,6 +52,78 @@ local function add_technology_setting(group, setting)
   table.insert(settings_data, settings_adapter.apply(setting, group and group.ui_visibility))
 end
 
+local function copy_spec(spec)
+  local out = {}
+  for key, value in pairs(spec) do out[key] = value end
+  return out
+end
+
+local function decorate_stream_setting(spec, tech_locale, order_prefix)
+  local out = copy_spec(spec)
+  out.setting_type = "startup"
+  if string.find(out.name, "^ips%-enable%-") then
+    out.order = order_prefix .. "-0"
+    out.localised_name = {"mod-setting-name.ips-enable-stream", tech_locale}
+    out.localised_description = append_note({"mod-setting-description.ips-enable-stream", tech_locale}, nil)
+  elseif string.find(out.name, "^ips%-cost%-base%-") then
+    out.order = order_prefix .. "-1"
+    out.localised_name = {"mod-setting-name.ips-cost-base-stream", tech_locale}
+    out.localised_description = {"mod-setting-description.ips-cost-base-stream", tech_locale}
+  elseif string.find(out.name, "^ips%-cost%-growth%-") then
+    out.order = order_prefix .. "-2"
+    out.localised_name = {"mod-setting-name.ips-cost-growth-stream", tech_locale}
+    out.localised_description = {"mod-setting-description.ips-cost-growth-stream", tech_locale}
+  elseif string.find(out.name, "^ips%-max%-level%-") then
+    out.order = order_prefix .. "-3"
+    out.localised_name = {"mod-setting-name.ips-max-level-stream", tech_locale}
+    out.localised_description = {"mod-setting-description.ips-max-level-stream", tech_locale}
+  elseif string.find(out.name, "^ips%-research%-time%-") then
+    out.order = order_prefix .. "-4"
+    out.localised_name = {"mod-setting-name.ips-research-time-stream", tech_locale}
+    out.localised_description = {"mod-setting-description.ips-research-time-stream", tech_locale}
+  elseif string.find(out.name, "^ips%-effect%-per%-level%-") then
+    out.order = order_prefix .. "-5"
+    out.localised_name = {"mod-setting-name.ips-effect-per-level-stream", tech_locale}
+    out.localised_description = {"mod-setting-description.ips-effect-per-level-stream", tech_locale}
+  else
+    error("Unknown generated stream setting: " .. tostring(out.name))
+  end
+  return out
+end
+
+local function decorate_base_setting(spec, tech_locale, order_prefix, settings_note)
+  local out = copy_spec(spec)
+  out.setting_type = "startup"
+  if string.find(out.name, "^mir%-enable%-") then
+    out.order = order_prefix .. "-0"
+    out.localised_name = {"mod-setting-name.mir-enable-base-tech", tech_locale}
+    out.localised_description = append_note({"mod-setting-description.mir-enable-base-tech", tech_locale}, settings_note)
+  elseif string.find(out.name, "^mir%-cost%-base%-") then
+    out.order = order_prefix .. "-1"
+    out.localised_name = {"mod-setting-name.mir-cost-base", tech_locale}
+    out.localised_description = {"mod-setting-description.mir-cost-base", tech_locale}
+  elseif string.find(out.name, "^mir%-cost%-growth%-") then
+    out.order = order_prefix .. "-2"
+    out.localised_name = {"mod-setting-name.mir-cost-growth", tech_locale}
+    out.localised_description = {"mod-setting-description.mir-cost-growth", tech_locale}
+  elseif string.find(out.name, "^mir%-max%-level%-") then
+    out.order = order_prefix .. "-3"
+    out.localised_name = {"mod-setting-name.mir-max-level", tech_locale}
+    out.localised_description = {"mod-setting-description.mir-max-level", tech_locale}
+  elseif string.find(out.name, "^mir%-research%-time%-") then
+    out.order = order_prefix .. "-4"
+    out.localised_name = {"mod-setting-name.mir-research-time", tech_locale}
+    out.localised_description = {"mod-setting-description.mir-research-time", tech_locale}
+  elseif string.find(out.name, "^mir%-effect%-per%-level%-") then
+    out.order = order_prefix .. "-5"
+    out.localised_name = {"mod-setting-name.mir-effect-per-level", tech_locale}
+    out.localised_description = {"mod-setting-description.mir-effect-per-level", tech_locale}
+  else
+    error("Unknown base extension setting: " .. tostring(out.name))
+  end
+  return out
+end
+
 for _, setting in ipairs(settings_catalog.global_setting_prototypes()) do
   table.insert(settings_data, setting)
 end
@@ -206,133 +278,21 @@ for _, group in ipairs(technology_setting_groups) do
     local stream = group.stream
     local tech_locale = stream.localised_name or {"technology-name.more-infinite-research."..key}
     local settings_note = lookup_default(key, "settings_note", stream, nil)
-    add_technology_setting(group, {
-      type = "bool-setting",
-      name = "ips-enable-"..key,
-      setting_type = "startup",
-      default_value = group.enabled,
-      order = order_prefix.."-0",
-      localised_name = {"mod-setting-name.ips-enable-stream", tech_locale},
-      localised_description = append_note({"mod-setting-description.ips-enable-stream", tech_locale}, settings_note)
-    })
-    add_technology_setting(group, {
-      type = "int-setting",
-      name = "ips-cost-base-"..key,
-      setting_type = "startup",
-      default_value = default_base_cost(key, stream),
-      minimum_value = 1,
-      maximum_value = 2147483647,
-      order = order_prefix.."-1",
-      localised_name = {"mod-setting-name.ips-cost-base-stream", tech_locale},
-      localised_description = {"mod-setting-description.ips-cost-base-stream", tech_locale}
-    })
-    add_technology_setting(group, {
-      type = "double-setting",
-      name = "ips-cost-growth-"..key,
-      setting_type = "startup",
-      default_value = default_growth_factor(key, stream),
-      minimum_value = 1,
-      order = order_prefix.."-2",
-      localised_name = {"mod-setting-name.ips-cost-growth-stream", tech_locale},
-      localised_description = {"mod-setting-description.ips-cost-growth-stream", tech_locale}
-    })
-    add_technology_setting(group, {
-      type = "int-setting",
-      name = "ips-max-level-"..key,
-      setting_type = "startup",
-      default_value = default_max_level_setting(key, stream),
-      minimum_value = 0,
-      maximum_value = 2147483647,
-      order = order_prefix.."-3",
-      localised_name = {"mod-setting-name.ips-max-level-stream", tech_locale},
-      localised_description = {"mod-setting-description.ips-max-level-stream", tech_locale}
-    })
-    add_technology_setting(group, {
-      type = "int-setting",
-      name = "ips-research-time-"..key,
-      setting_type = "startup",
-      default_value = default_research_time_setting(key, stream),
-      minimum_value = 0,
-      maximum_value = 2147483647,
-      order = order_prefix.."-4",
-      localised_name = {"mod-setting-name.ips-research-time-stream", tech_locale},
-      localised_description = {"mod-setting-description.ips-research-time-stream", tech_locale}
-    })
+    for _, spec in ipairs(settings_catalog.stream_setting_specs(key, stream)) do
+      local setting = decorate_stream_setting(spec, tech_locale, order_prefix)
+      if string.find(setting.name, "^ips%-enable%-") then
+        setting.localised_description = append_note(setting.localised_description, settings_note)
+      end
+      add_technology_setting(group, setting)
+    end
   else
     local spec = group.spec
     local defaults_spec = group.defaults_spec
     local locale_key = defaults_spec.locale_key or defaults_spec.chain_key or spec.locale_key or spec.key
-    local enabled_default = group.enabled
-    local base_default = tonumber(defaults_spec.base_cost) or 0
-    if base_default < 0 then base_default = 0 end
-    local growth_default = tonumber(defaults_spec.growth_factor) or 0
-    if growth_default < 0 then growth_default = 0 end
-    local research_time_default = tonumber(defaults_spec.research_time) or 60
-    if research_time_default < 1 then research_time_default = 60 end
-    local max_level_default = defaults_spec.max_level
-    if max_level_default == nil or max_level_default == "infinite" then
-      max_level_default = 0
-    else
-      local num = tonumber(max_level_default)
-      if not num or num <= 0 then
-        max_level_default = 0
-      else
-        max_level_default = math.floor(num + 0.5)
-      end
-    end
     local locale = {"technology-name."..locale_key}
-    add_technology_setting(group, {
-      type = "bool-setting",
-      name = "mir-enable-"..spec.key,
-      setting_type = "startup",
-      default_value = enabled_default,
-      order = order_prefix.."-0",
-      localised_name = {"mod-setting-name.mir-enable-base-tech", locale},
-      localised_description = append_note({"mod-setting-description.mir-enable-base-tech", locale}, defaults_spec.settings_note)
-    })
-    add_technology_setting(group, {
-      type = "int-setting",
-      name = "mir-cost-base-"..spec.key,
-      setting_type = "startup",
-      default_value = math.floor(base_default + 0.5),
-      minimum_value = 0,
-      maximum_value = 2147483647,
-      order = order_prefix.."-1",
-      localised_name = {"mod-setting-name.mir-cost-base", locale},
-      localised_description = {"mod-setting-description.mir-cost-base", locale}
-    })
-    add_technology_setting(group, {
-      type = "double-setting",
-      name = "mir-cost-growth-"..spec.key,
-      setting_type = "startup",
-      default_value = growth_default,
-      minimum_value = 0,
-      order = order_prefix.."-2",
-      localised_name = {"mod-setting-name.mir-cost-growth", locale},
-      localised_description = {"mod-setting-description.mir-cost-growth", locale}
-    })
-    add_technology_setting(group, {
-      type = "int-setting",
-      name = "mir-max-level-"..spec.key,
-      setting_type = "startup",
-      default_value = max_level_default,
-      minimum_value = 0,
-      maximum_value = 2147483647,
-      order = order_prefix.."-3",
-      localised_name = {"mod-setting-name.mir-max-level", locale},
-      localised_description = {"mod-setting-description.mir-max-level", locale}
-    })
-    add_technology_setting(group, {
-      type = "int-setting",
-      name = "mir-research-time-"..spec.key,
-      setting_type = "startup",
-      default_value = math.floor(research_time_default + 0.5),
-      minimum_value = 0,
-      maximum_value = 2147483647,
-      order = order_prefix.."-4",
-      localised_name = {"mod-setting-name.mir-research-time", locale},
-      localised_description = {"mod-setting-description.mir-research-time", locale}
-    })
+    for _, setting_spec in ipairs(settings_catalog.base_extension_setting_specs(spec.key)) do
+      add_technology_setting(group, decorate_base_setting(setting_spec, locale, order_prefix, defaults_spec.settings_note))
+    end
   end
 end
 

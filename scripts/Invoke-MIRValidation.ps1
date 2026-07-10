@@ -68,6 +68,7 @@ function Get-MIRSettingsSourceText {
     "settings.lua",
     "prototypes/mir/stage/settings.lua",
     "prototypes/mir/settings/catalog.lua",
+    "prototypes/mir/settings/effect_scaling.lua",
     "prototypes/mir/settings/pipeline_extent.lua",
     "prototypes/mir/settings/prototype_limits.lua",
     "prototypes/mir/settings/stage_builder.lua"
@@ -610,10 +611,12 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'if group.settings_priority == "top" then return "050" end' },
     @{ File = "prototypes\mir\settings\defaults.lua"; Text = $defaultsText; Snippet = 'settings_priority = "top"' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'order = setting_order.global("diagnostics", 10)' },
-    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'name = "ips-enable-"..key' },
-    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'localised_description = append_note({"mod-setting-description.ips-enable-stream", tech_locale}, settings_note)' },
+    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'settings_catalog.stream_setting_specs(key, stream)' },
+    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'decorate_stream_setting(spec, tech_locale, order_prefix)' },
+    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'settings_catalog.base_extension_setting_specs(spec.key)' },
+    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'ips-effect-per-level' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'local locale_key = defaults_spec.locale_key or defaults_spec.chain_key or spec.locale_key or spec.key' },
-    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'localised_name = {"mod-setting-name.mir-max-level", locale}' },
+    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'out.localised_name = {"mod-setting-name.mir-max-level", tech_locale}' },
     @{ File = "prototypes\mir\settings\resolver.lua"; Text = $settingsResolverText; Snippet = 'function R.stream_enabled(key, spec)' },
     @{ File = "prototypes\mir\settings\resolver.lua"; Text = $settingsResolverText; Snippet = 'function R.base_enabled(key, spec)' },
     @{ File = "prototypes\mir\settings\registry.lua"; Text = $settingsRegistryText; Snippet = 'hidden_means_unavailable_not_deleted = true' },
@@ -1063,6 +1066,8 @@ Invoke-RepoCheck "prototype limit settings are wired" {
     @{ File = ".mir\fixtures.yml"; Text = $fixturesManifestText; Snippet = 'prototype-limit-startup-overrides' },
     @{ File = ".mir\fixtures.yml"; Text = $fixturesManifestText; Snippet = 'settings-profile-roundtrip' },
     @{ File = "fixtures\assert-prototype-limits\data-final-fixes.lua"; Text = $prototypeLimitFixtureText; Snippet = 'iron-gear-wheel maximum_productivity' },
+    @{ File = "fixtures\assert-prototype-limits\data-final-fixes.lua"; Text = $prototypeLimitFixtureText; Snippet = 'self-recycling production maximum_productivity' },
+    @{ File = "fixtures\assert-prototype-limits\data-final-fixes.lua"; Text = $prototypeLimitFixtureText; Snippet = 'unrestricted module permissions did not open all recipe effect flags' },
     @{ File = "fixtures\assert-prototype-limits\data-final-fixes.lua"; Text = $prototypeLimitFixtureText; Snippet = 'consumption_limits.low' },
     @{ File = "fixtures\assert-prototype-limits\data-final-fixes.lua"; Text = $prototypeLimitFixtureText; Snippet = 'pollution_limits.low' },
     @{ File = "fixtures\assert-prototype-limits\data-final-fixes.lua"; Text = $prototypeLimitFixtureText; Snippet = 'zero-watt beacon energy_usage' },
@@ -2246,7 +2251,9 @@ function Set-CopiedPrototypeLimitDefaults {
     [string]$PollutionCap,
     [string]$SpeedCap,
     [string]$QualityCap,
-    [bool]$PositivePowerFloor = $false
+    [bool]$PositivePowerFloor = $false,
+    [bool]$ProductivityCapSelfRecyclingOnly = $false,
+    [bool]$UnrestrictedModules = $false
   )
 
   if (-not [string]::IsNullOrWhiteSpace($ProductivityCap)) {
@@ -2266,6 +2273,12 @@ function Set-CopiedPrototypeLimitDefaults {
   }
   if ($PositivePowerFloor) {
     Set-CopiedGeneratedStartupSettingDefault -ModsDir $ModsDir -Name "mir-prototype-positive-power-floor" -ValueLiteral "true"
+  }
+  if ($ProductivityCapSelfRecyclingOnly) {
+    Set-CopiedGeneratedStartupSettingDefault -ModsDir $ModsDir -Name "mir-productivity-cap-self-recycling-only" -ValueLiteral "true"
+  }
+  if ($UnrestrictedModules) {
+    Set-CopiedGeneratedStartupSettingDefault -ModsDir $ModsDir -Name "mir-unrestricted-modules" -ValueLiteral "true"
   }
 }
 
@@ -2375,6 +2388,8 @@ function Initialize-RuntimeScenario {
     [ValidateSet("", "engine-default", "bonus-50", "bonus-75", "bonus-100", "bonus-200", "bonus-250", "bonus-400", "bonus-500", "bonus-1000", "bonus-10000", "bonus-100000")]
     [string]$PrototypeQualityCap = "",
     [switch]$PrototypePositivePowerFloor,
+    [switch]$ProductivityCapSelfRecyclingOnly,
+    [switch]$UnrestrictedModules,
     [switch]$RequireSpaceGate,
     [switch]$UseInstalledSpaceAgeIcons,
     [switch]$ScriptedDiagnostics,
@@ -2439,7 +2454,9 @@ function Initialize-RuntimeScenario {
     -PollutionCap $PrototypePollutionCap `
     -SpeedCap $PrototypeSpeedCap `
     -QualityCap $PrototypeQualityCap `
-    -PositivePowerFloor ([bool]$PrototypePositivePowerFloor)
+    -PositivePowerFloor ([bool]$PrototypePositivePowerFloor) `
+    -ProductivityCapSelfRecyclingOnly ([bool]$ProductivityCapSelfRecyclingOnly) `
+    -UnrestrictedModules ([bool]$UnrestrictedModules)
   if ($UseInstalledSpaceAgeIcons) {
     Set-CopiedStartupSettingDefault -ModsDir $modsDir -Name "mir-use-installed-space-age-icons" -ValueLiteral "true"
   }
@@ -2534,6 +2551,8 @@ function Invoke-RuntimeScenario {
     [ValidateSet("", "engine-default", "bonus-50", "bonus-75", "bonus-100", "bonus-200", "bonus-250", "bonus-400", "bonus-500", "bonus-1000", "bonus-10000", "bonus-100000")]
     [string]$PrototypeQualityCap = "",
     [switch]$PrototypePositivePowerFloor,
+    [switch]$ProductivityCapSelfRecyclingOnly,
+    [switch]$UnrestrictedModules,
     [switch]$RequireSpaceGate,
     [switch]$UseInstalledSpaceAgeIcons,
     [switch]$ScriptedDiagnostics,
@@ -2560,6 +2579,8 @@ function Invoke-RuntimeScenario {
       -PrototypeSpeedCap $PrototypeSpeedCap `
       -PrototypeQualityCap $PrototypeQualityCap `
       -PrototypePositivePowerFloor:$PrototypePositivePowerFloor `
+      -ProductivityCapSelfRecyclingOnly:$ProductivityCapSelfRecyclingOnly `
+      -UnrestrictedModules:$UnrestrictedModules `
       -RequireSpaceGate:$RequireSpaceGate `
       -UseInstalledSpaceAgeIcons:$UseInstalledSpaceAgeIcons `
       -ScriptedDiagnostics:$ScriptedDiagnostics `
@@ -3416,6 +3437,15 @@ Invoke-RuntimeScenario -ScenarioName "prototype-limit-overrides-space-age" -Enab
   -PrototypeQualityCap "bonus-1000" `
   -EnableSpaceAge
 Assert-LogContains -Expected "Applied prototype limits: productivity_recipes=" -Context "Space Age prototype limit override scenario"
+
+Invoke-RuntimeScenario -ScenarioName "prototype-limit-self-recycling-and-unrestricted-modules" -EnabledFixtureNames @(
+  "mir-fixture-assert-prototype-limits"
+) `
+  -PrototypeProductivityCap "percent-500" `
+  -ProductivityCapSelfRecyclingOnly `
+  -UnrestrictedModules
+Assert-LogContains -Expected "Productivity cap self-recycling scope: approved=" -Context "Self-recycling productivity cap scope scenario"
+Assert-LogContains -Expected "Unrestricted module permissions enabled:" -Context "Unrestricted module permission scenario"
 
 Invoke-RuntimeScenario -ScenarioName "settings-profile-roundtrip" -EnabledFixtureNames @(
   "mir-fixture-assert-settings-profile-roundtrip"

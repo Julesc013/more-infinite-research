@@ -19,6 +19,9 @@ rules:
   settings_profile_encoding_is_deterministic: true
   prototype_limit_settings_default_to_engine_default: true
   prototype_limit_settings_are_startup_only_explicit_overrides: true
+  productivity_cap_scope_is_above_300_self_recycling_only: true
+  unrestricted_modules_is_opt_in_and_does_not_add_slots: true
+  effect_per_level_settings_are_per_technology: true
   energy_and_pollution_caps_are_separate: true
   positive_power_floor_is_default_off_opt_in: true
   positive_power_floor_is_compatibility_section_setting: true
@@ -82,12 +85,14 @@ groups:
       - growth
       - max_level
       - research_time
+      - effect_per_level
     name_patterns:
       enable: ips-enable-%s
       base_cost: ips-cost-base-%s
       growth: ips-cost-growth-%s
       max_level: ips-max-level-%s
       research_time: ips-research-time-%s
+      effect_per_level: ips-effect-per-level-%s
 
 streams:
   research_air_scrubbing_clean_filter:

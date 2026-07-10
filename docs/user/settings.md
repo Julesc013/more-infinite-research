@@ -50,6 +50,19 @@ MIR includes startup-only prototype limit settings:
 - Speed effect cap
 - Quality effect cap
 
+When the productivity cap is selected above +300%, the default-off
+`mir-productivity-cap-self-recycling-only` checkbox limits MIR's upward cap
+mutation to recipes with a proven single-item self-recycling path whose
+expected loop is non-generative. Unsafe recipes keep their existing cap, and
+MIR never raises the recycling recipe itself. The checkbox has no effect at
++300% or below.
+
+The experimental `mir-unrestricted-modules` Compatibility setting opens all
+five module effect types and every discovered module category on recipes and
+existing module receivers that already have slots, including beacons. It does
+not add slots or change module prototypes and can create severe productivity,
+quality, and modded-module balance exploits.
+
 The unchanged dropdown entries are value-first labels: `+300% (unchanged)` for
 recipe productivity, `-80% (unchanged)` for energy and pollution reductions,
 and `+100000% (unchanged)` for speed and quality. Those unchanged entries leave the
@@ -70,6 +83,16 @@ cap. Use it only when a modpack has explicit `0W` active-use entity prototypes
 that create unwanted low-power warning icons. When enabled, MIR changes those
 explicit `0W` `energy_usage` prototypes to `1W` during prototype loading.
 Leave it off to preserve zero-power prototypes exactly.
+
+## Generated Technology Effect Settings
+
+Each generated non-scripted technology has an `Effect per level` setting beside
+its cost and level controls. Its default is MIR's lowest-tier baseline. Changing
+it scales all related tiers and effects proportionally, preserving ratios such
+as a technology with +10%, +5%, and +2% effects. Percentage effects use
+percentage points; slots, counts, and distances use their native units. The
+enable checkbox remains the way to disable a technology—zero is not a disable
+value.
 
 These settings apply during prototype loading and require a restart after
 changing them. They do not add per-tick runtime processing, and they are not

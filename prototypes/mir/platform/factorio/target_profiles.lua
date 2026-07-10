@@ -133,6 +133,8 @@ local M = {
         "mir-prototype-speed-cap",
         "mir-prototype-quality-cap",
         "mir-prototype-positive-power-floor",
+        "mir-productivity-cap-self-recycling-only",
+        "mir-unrestricted-modules",
         "mir-settings-profile-import",
         "mir-use-installed-space-age-icons"
       },
@@ -253,6 +255,8 @@ local M = {
         "mir-prototype-speed-cap",
         "mir-prototype-quality-cap",
         "mir-prototype-positive-power-floor",
+        "mir-productivity-cap-self-recycling-only",
+        "mir-unrestricted-modules",
         "mir-settings-profile-import",
         "mir-use-installed-space-age-icons"
       },
@@ -313,6 +317,8 @@ local M = {
         "mir-prototype-speed-cap",
         "mir-prototype-quality-cap",
         "mir-prototype-positive-power-floor",
+        "mir-productivity-cap-self-recycling-only",
+        "mir-unrestricted-modules",
         "mir-settings-profile-import",
         "mir-use-installed-space-age-icons"
       },
@@ -373,6 +379,8 @@ local M = {
         "mir-prototype-speed-cap",
         "mir-prototype-quality-cap",
         "mir-prototype-positive-power-floor",
+        "mir-productivity-cap-self-recycling-only",
+        "mir-unrestricted-modules",
         "mir-settings-profile-import",
         "mir-use-installed-space-age-icons"
       },
@@ -434,6 +442,8 @@ local M = {
         "mir-prototype-speed-cap",
         "mir-prototype-quality-cap",
         "mir-prototype-positive-power-floor",
+        "mir-productivity-cap-self-recycling-only",
+        "mir-unrestricted-modules",
         "mir-settings-profile-import",
         "mir-use-installed-space-age-icons"
       },

@@ -2,6 +2,7 @@ local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 local deepcopy = require("prototypes.mir.core.deepcopy")
 local effective_settings = require("prototypes.mir.settings.effective")
 local prototype_limit_settings = require("prototypes.mir.settings.prototype_limits")
+local cap_scope = require("prototypes.mir.policy.productivity_cap_scope")
 
 local P = {}
 
@@ -52,11 +53,33 @@ local function apply_recipe_productivity_cap(value)
   if value == nil then return 0 end
 
   local changed = 0
+  local scoped = effective_settings.get(prototype_limit_settings.self_recycling_scope_setting_name) == true
+  local approved = 0
+  local rejected = 0
   for _, recipe in pairs(data_raw.prototypes("recipe")) do
-    if type(recipe) == "table" and recipe.parameter ~= true and recipe.maximum_productivity ~= value then
-      recipe.maximum_productivity = value
-      changed = changed + 1
+    if type(recipe) == "table" and recipe.parameter ~= true then
+      local should_apply = true
+      if scoped and value > 3.0 then
+        local safe = cap_scope.approve(recipe)
+        should_apply = safe == true
+        if should_apply then approved = approved + 1 else rejected = rejected + 1 end
+      end
+      if should_apply then
+        local current = recipe.maximum_productivity
+        -- A scoped setting is an opt-in upward mutation.  Preserve a larger
+        -- cap deliberately supplied by another mod.
+        if not scoped or current == nil or current < value then
+          if current ~= value then
+            recipe.maximum_productivity = value
+            changed = changed + 1
+          end
+        end
+      end
     end
+  end
+  if scoped and value > 3.0 then
+    log("[more-infinite-research] Productivity cap self-recycling scope: approved="
+      .. tostring(approved) .. " rejected=" .. tostring(rejected) .. ".")
   end
   return changed
 end

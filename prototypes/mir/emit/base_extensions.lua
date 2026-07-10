@@ -13,6 +13,7 @@ local planner_prerequisites = require("prototypes.mir.planner.prerequisites")
 local science_packs = require("prototypes.mir.capabilities.science_integration.science_packs")
 local science_selector = require("prototypes.mir.capabilities.science_integration.science_selector")
 local effective_settings = require("prototypes.mir.settings.effective")
+local effect_scaling = require("prototypes.mir.settings.effect_scaling")
 
 local M = {}
 
@@ -457,7 +458,7 @@ local function extend_chain(key)
     D.extension(D.extension_fields(key, "skipped", "equivalent_infinite_exists"))
     return
   end
-  new.effects = desired_effects
+  new.effects = effect_scaling.scale_base_effects(key, desired_effects)
 
   new.max_level = max_level_value
   new.upgrade = true

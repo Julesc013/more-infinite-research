@@ -16,6 +16,7 @@ local planner_science = require("prototypes.mir.planner.science")
 local science_packs = require("prototypes.mir.capabilities.science_integration.science_packs")
 local stream_emitter = require("prototypes.mir.emit.stream_spec_adapter")
 local target_line = require("prototypes.mir.platform.factorio.target_line")
+local effect_scaling = require("prototypes.mir.settings.effect_scaling")
 
 local M = {}
 
@@ -162,18 +163,19 @@ local function make_stream(key, raw_spec)
   if direct_effects and #direct_effects > 0 then
     native_modifiers.record_overlaps(key, direct_effects)
     local prerequisites = planner_prerequisites.build_for(key, ingredients)
+    local emitted_effects = effect_scaling.scale_stream_effects(key, spec, direct_effects)
     local t = emit_stream_technology(key, spec, {
       localised_name = lname(key, spec),
       localised_description = ldesc(spec),
       icons = icon_builder.icons_for_stream(spec),
-      effects = direct_effects,
+      effects = emitted_effects,
       prerequisites = prerequisites,
       count_formula = count_formula,
       ingredients = ingredients,
       research_time = research_time,
       max_level = max_level,
     })
-    D.stream(D.stream_fields(key, spec, "generated", "direct_effect", ingredients, prerequisites, direct_effects, lab_status))
+    D.stream(D.stream_fields(key, spec, "generated", "direct_effect", ingredients, prerequisites, emitted_effects, lab_status))
     return
   end
 
@@ -211,11 +213,12 @@ local function make_stream(key, raw_spec)
   end
 
   local prerequisites = planner_prerequisites.build_for(key, ingredients)
+  local emitted_effects = effect_scaling.scale_stream_effects(key, spec, effects)
   local t = emit_stream_technology(key, spec, {
     localised_name = lname(key, spec),
     localised_description = ldesc(spec),
     icons = icon_builder.icons_for_stream(spec),
-    effects = effects,
+    effects = emitted_effects,
     prerequisites = prerequisites,
     count_formula = count_formula,
     ingredients = ingredients,
@@ -225,7 +228,7 @@ local function make_stream(key, raw_spec)
   if D.enabled() then
     log("[more-infinite-research] Registered technology "..t.name)
   end
-  D.stream(D.stream_fields(key, spec, "generated", "recipe_productivity", ingredients, prerequisites, effects, lab_status))
+  D.stream(D.stream_fields(key, spec, "generated", "recipe_productivity", ingredients, prerequisites, emitted_effects, lab_status))
 end
 
 function M.run()
