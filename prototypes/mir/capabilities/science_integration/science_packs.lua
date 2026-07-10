@@ -675,7 +675,10 @@ technology_researchability_reason = function(tech_name, context)
     or nil
   for _, ingredient in ipairs(ingredients) do
     local pack_name = ingredient_name(ingredient)
-    if pack_name and S.science_pack_exists(pack_name) then
+    if pack_name then
+      if not S.science_pack_exists(pack_name) then
+        return finish("unrecognized-science-" .. pack_name)
+      end
       if unlock_recipe and recipe_outputs_item(unlock_recipe, pack_name) then
         return finish("science-self-lock-" .. pack_name)
       end
