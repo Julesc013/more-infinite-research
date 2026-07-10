@@ -1064,6 +1064,30 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - validation-result-summary
+  - path: docs/releases/2.3.5-release-notes.md
+    title: "MIR 2.3.5 Release Notes"
+    status: current
+    audience: player
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-2.3.5-release-notes
+  - path: docs/releases/2.3.5-release-checklist.md
+    title: "MIR 2.3.5 Release Checklist"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-2.3.5-release-checklist
+  - path: docs/releases/2.3.5-validation-summary.md
+    title: "MIR 2.3.5 Validation Summary"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-2.3.5-validation-summary
   - path: docs/releases/3.0.5-convergence-plan.md
     title: "MIR 3.0.5 Convergence Plan"
     status: current

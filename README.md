@@ -18,6 +18,10 @@ More Infinite Research adds **configurable infinite productivity** and **bonus r
 **MIR `1.9.3+`** targets **Factorio `1.1`** as a reduced compatibility port. It keeps supported direct-effect bonuses and base technology continuations, but does not include recipe productivity, Space Age, Quality, Recycler, Elevated Rails, cargo logistics, prototype cap settings, pipeline extent settings, or settings profiles.
 
 **MIR `2.x.x`** targets **Factorio `2.0`** *(starting with **`2.3.0`**)*.
+This `2.3.5` package is the maintained Factorio 2.0 port of the 3.0.5
+compatibility-hardening source. It uses `base >= 2.0`, optional Quality, and
+optional Space Age without 2.1 dependency floors. Factorio 2.1-only cargo bay
+range and landing pad count modifiers are intentionally excluded.
 
 **MIR `3.x.x`** targets **Factorio `2.1`** and requires:
 
@@ -33,7 +37,7 @@ The mod is built around **graceful compatibility**: it discovers recipes, scienc
 
 - **Recipe productivity:** adds infinite research for intermediate, logistics, combat, infrastructure, science-pack, and Space Age production chains.
 - **Fluid-output productivity:** adds process-family recipe productivity for oil processing, oil cracking, lubricant, sulfuric acid, acid neutralization, and Space Age thruster propellant fluids where those recipes exist.
-- **Direct-effect bonuses:** adds infinite research for cargo logistics, weapon speed, character bonuses, combined character inventory/trash slots, and worker robot battery.
+- **Direct-effect bonuses:** adds infinite research for weapon speed, character bonuses, combined character inventory/trash slots, and worker robot battery. Cargo logistics modifiers are available only on Factorio 2.1.
 - **Fluid and prototype tuning:** includes opt-in startup-only pipeline extent, recipe productivity, energy-use, pollution, speed, and quality limit controls.
 - **Settings profiles:** exports full MIR startup profiles by default, with optional compact export that omits unchanged defaults.
 - **Vanilla continuations:** extends selected finite vanilla technology chains into infinite continuations.
@@ -41,7 +45,7 @@ The mod is built around **graceful compatibility**: it discovers recipes, scienc
 - **Lab validation:** checks generated research ingredients against real labs so technologies stay researchable.
 - **MIR compiler architecture:** keeps active generation under `prototypes/mir/`, with declarative stream data in `prototypes/streams/`.
 - **Compiler diagnostics:** indexes typed prototype facts, compiler decisions, lab matrices, loop risks, rule surfaces, and cap estimates for audits.
-- **Factorio 2.1 recipes:** supports recipe `categories` as well as legacy single `category`.
+- **Modern recipe schemas:** supports Factorio 2.1 recipe `categories` and the Factorio 2.0 legacy single `category` field.
 - **Optional DLC:** keeps official DLC mods optional and gates DLC-shaped research behind concrete prototype checks.
 - **Scripted Space Age scaling:** bounded event-driven spoilage preservation remains opt-in, while agricultural growth speed is enabled as a special Space Age technology for newly planted tower crops; broader existing-save claims still require the named manual save matrix.
 - **Clean mod portal metadata:** keeps third-party compatibility-mod dependencies out of `info.json`.

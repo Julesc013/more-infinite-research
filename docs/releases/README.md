@@ -19,7 +19,14 @@ The 3.0.5 convergence plan, checklist, and validation summary are the active
 release authority. The 3.0.0 records are the published architecture baseline
 and historical evidence.
 
+On `tmp/2.0`, the 2.3.5 release notes, checklist, and validation summary are the
+active Factorio 2.0 port authority. The 3.0.5 records remain the canonical
+source evidence.
+
 - [3.0.0 plan](3.0.0-plan.md)
+- [2.3.5 release notes](2.3.5-release-notes.md)
+- [2.3.5 release checklist](2.3.5-release-checklist.md)
+- [2.3.5 validation summary](2.3.5-validation-summary.md)
 - [3.0.0 regression baseline](3.0.0-regression-baseline.md)
 - [3.0.0 transition checkpoint 2](3.0.0-transition-checkpoint-2.md)
 - [3.0.0 local library gate summary](3.0.0-local-library-gate-summary.md)

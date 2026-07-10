@@ -151,6 +151,16 @@ release_artifacts:
       entries: 119
       forbidden_entries: 0
       status: published
+    mir_2_3_5:
+      version: "2.3.5"
+      branch: tmp/2.0
+      target_factorio: "2.0"
+      source_anchor: mir_3_0_5
+      artifact: dist/more-infinite-research_2.3.5.zip
+      candidate_commit: pending
+      automated_gate: pending
+      manual_gate: pending
+      status: rebuilding-after-package-visible-change
     mir_1_9_3:
       version: "1.9.3"
       branch: tmp/1.1

@@ -14,6 +14,17 @@ real_mod_gates:
     requires_exact_dist: true
     requires_fresh_save: true
     status: required
+  factorio-2.0-crucible-rigor:
+    scenario: local-2-0-crucible-rigor-exact-dist
+    roots:
+      - planet-crucible
+      - rigor-module
+    versions:
+      planet-crucible: 0.5.10
+      rigor-module: 0.7.0
+    requires_exact_dist: true
+    requires_fresh_save: true
+    status: required
 
 fixtures:
   rigor-late-recipe-removal:
