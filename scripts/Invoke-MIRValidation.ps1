@@ -552,6 +552,7 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
   $diagnosticsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\report\diagnostics_sink.lua")
   $weaponSpeedText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\policy\weapon_speed.lua")
   $nativeEffectCoverageText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\policy\native_effect_coverage.lua")
+  $generatedRegistryText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\emit\generated_technology_registry.lua")
   $weaponSpeedFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-weapon-speed-safety\data-final-fixes.lua")
   $generationIntegrityFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-generation-integrity\data-final-fixes.lua")
   $generatedPrerequisiteFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-generated-prerequisite-safety\data-final-fixes.lua")
@@ -773,10 +774,14 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "fixtures\assert-better-bot-battery-skip\data-final-fixes.lua"; Text = $betterBotBatteryFixtureText; Snippet = 'worker-robots-battery-6' },
     @{ File = "prototypes\mir\policy\weapon_speed.lua"; Text = $weaponSpeedText; Snippet = 'tech.unit and tech.unit.count_formula' },
     @{ File = "prototypes\mir\policy\weapon_speed.lua"; Text = $weaponSpeedText; Snippet = 'native_effect_coverage.technology_has_exact_effect' },
-    @{ File = "prototypes\mir\policy\native_effect_coverage.lua"; Text = $nativeEffectCoverageText; Snippet = 'technology.enabled == false' },
+    @{ File = "prototypes\mir\policy\weapon_speed.lua"; Text = $weaponSpeedText; Snippet = 'generated_registry.contains(name)' },
+    @{ File = "prototypes\mir\emit\generated_technology_registry.lua"; Text = $generatedRegistryText; Snippet = 'function M.contains(name)' },
+    @{ File = "prototypes\mir\policy\native_effect_coverage.lua"; Text = $nativeEffectCoverageText; Snippet = 'science.technology_is_researchable(name)' },
     @{ File = "prototypes\mir\policy\native_effect_coverage.lua"; Text = $nativeEffectCoverageText; Snippet = 'technology.max_level ~= "infinite"' },
     @{ File = "fixtures\assert-weapon-speed-safety\data-final-fixes.lua"; Text = $weaponSpeedFixtureText; Snippet = 'weapon-shooting-speed-5' },
     @{ File = "fixtures\assert-weapon-speed-safety\data-final-fixes.lua"; Text = $weaponSpeedFixtureText; Snippet = 'mir-fixture-external-weapon-speed-owner' },
+    @{ File = "fixtures\assert-weapon-speed-safety\data-final-fixes.lua"; Text = $weaponSpeedFixtureText; Snippet = 'mir-fixture-unreachable-weapon-speed-owner' },
+    @{ File = "fixtures\assert-weapon-speed-safety\data-final-fixes.lua"; Text = $weaponSpeedFixtureText; Snippet = 'weapon-shooting-speed-99' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = '[modifier-description]' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'more-infinite-research.electric_shooting_speed=' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'more-infinite-research.flamethrower_shooting_speed=' },

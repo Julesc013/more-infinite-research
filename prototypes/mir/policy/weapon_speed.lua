@@ -1,5 +1,6 @@
 local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 local effective_settings = require("prototypes.mir.settings.effective")
+local generated_registry = require("prototypes.mir.emit.generated_technology_registry")
 local native_effect_coverage = require("prototypes.mir.policy.native_effect_coverage")
 local target_line = require("prototypes.mir.platform.factorio.target_line")
 
@@ -57,9 +58,14 @@ end
 
 local function strip_weapon_speed_effects()
   local strip_categories = strip_categories_for_mode()
-  for name, tech in pairs(data_raw.prototypes("technology")) do
-    local is_generated_continuation = tech.unit and tech.unit.count_formula
-    if string.match(name, "^weapon%-shooting%-speed%-%d+$") and tech.effects and is_generated_continuation then
+  for _, name in ipairs(generated_registry.sorted_names()) do
+    local tech = data_raw.technology(name)
+    local is_generated_continuation = tech and tech.unit and tech.unit.count_formula
+    if generated_registry.contains(name)
+      and string.match(name, "^weapon%-shooting%-speed%-%d+$")
+      and tech.effects
+      and is_generated_continuation
+    then
       local filtered = {}
       for _, effect in ipairs(tech.effects) do
         if effect.type == "gun-speed" then

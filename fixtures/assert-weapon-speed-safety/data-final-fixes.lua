@@ -2,6 +2,9 @@ local function fail(message)
   error("MIR weapon speed validation failed: " .. message)
 end
 
+local generated_registry = require("__more-infinite-research__.prototypes.mir.emit.generated_technology_registry")
+local native_effect_coverage = require("__more-infinite-research__.prototypes.mir.policy.native_effect_coverage")
+
 local function has_gun_speed(tech, ammo_category)
   for _, effect in ipairs((tech and tech.effects) or {}) do
     if effect.type == "gun-speed" and effect.ammo_category == ammo_category then
@@ -32,41 +35,12 @@ end
 
 local techs = data.raw.technology or {}
 
-local function structurally_reachable(name, visiting, memo)
-  if memo[name] ~= nil then return memo[name] end
-  if visiting[name] then
-    memo[name] = false
-    return false
-  end
-  local tech = techs[name]
-  if not tech or tech.enabled == false then
-    memo[name] = false
-    return false
-  end
-  visiting[name] = true
-  for _, prerequisite in ipairs(tech.prerequisites or {}) do
-    if not structurally_reachable(prerequisite, visiting, memo) then
-      visiting[name] = nil
-      memo[name] = false
-      return false
-    end
-  end
-  visiting[name] = nil
-  memo[name] = true
-  return true
-end
-
 local function exact_infinite_owner(name, category)
-  local tech = techs[name]
-  return tech ~= nil
-    and tech.enabled ~= false
-    and tech.max_level == "infinite"
-    and tech.unit ~= nil
-    and tech.unit.ingredients ~= nil
-    and #tech.unit.ingredients > 0
-    and (tech.unit.count ~= nil or tech.unit.count_formula ~= nil)
-    and has_exact_gun_speed(tech, category)
-    and structurally_reachable(name, {}, {})
+  return native_effect_coverage.technology_has_exact_effect(name, {
+    type = "gun-speed",
+    ammo_category = category,
+    modifier = 0.1
+  })
 end
 
 local dedicated_names = {
@@ -101,7 +75,8 @@ end
 local mode_setting = settings.startup["mir-adjust-vanilla-weapon-speed-techs"]
 local mode = mode_setting and mode_setting.value or "only-when-dedicated-tech-enabled"
 local generated_count = 0
-for name, tech in pairs(techs) do
+for _, name in ipairs(generated_registry.sorted_names()) do
+  local tech = techs[name]
   if string.match(name, "^weapon%-shooting%-speed%-%d+$") and tech.unit and tech.unit.count_formula then
     generated_count = generated_count + 1
     for _, category in ipairs({"rocket", "cannon-shell"}) do
@@ -155,5 +130,18 @@ if external_owner then
     or not exact_infinite_owner("mir-fixture-external-weapon-speed-owner", "cannon-shell")
   then
     fail("external owner does not provide exact reachable infinite replacement coverage")
+  end
+
+  if native_effect_coverage.technology_is_researchable_infinite(
+    "mir-fixture-unreachable-weapon-speed-owner"
+  ) then
+    fail("science-unreachable external owner was accepted as replacement coverage")
+  end
+
+  local external_continuation = techs["weapon-shooting-speed-99"]
+  if not has_gun_speed(external_continuation, "rocket")
+    or not has_gun_speed(external_continuation, "cannon-shell")
+  then
+    fail("external weapon shooting speed continuation was mutated")
   end
 end

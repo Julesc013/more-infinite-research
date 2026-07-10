@@ -1,5 +1,6 @@
 local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 local effective_settings = require("prototypes.mir.settings.effective")
+local science = require("prototypes.mir.capabilities.science_integration.science_packs")
 local table_utils = require("prototypes.mir.core.table")
 
 local M = {}
@@ -35,38 +36,12 @@ function M.prefer_mir()
   return value ~= false
 end
 
-local function technology_reachable(name, visiting, memo)
-  if memo[name] ~= nil then return memo[name] end
-  if visiting[name] then
-    memo[name] = false
-    return false
-  end
-
-  local technology = data_raw.technology(name)
-  if not technology or technology.enabled == false then
-    memo[name] = false
-    return false
-  end
-
-  visiting[name] = true
-  for _, prerequisite in ipairs(technology.prerequisites or {}) do
-    if not technology_reachable(prerequisite, visiting, memo) then
-      visiting[name] = nil
-      memo[name] = false
-      return false
-    end
-  end
-  visiting[name] = nil
-  memo[name] = true
-  return true
-end
-
 function M.technology_is_researchable_infinite(name)
   local technology = data_raw.technology(name)
   if not technology or technology.enabled == false or technology.max_level ~= "infinite" then return false end
   if not technology.unit or not technology.unit.ingredients or #technology.unit.ingredients == 0 then return false end
   if technology.unit.count == nil and technology.unit.count_formula == nil then return false end
-  return technology_reachable(name, {}, {})
+  return science.technology_is_researchable(name)
 end
 
 function M.technology_has_exact_effect(name, expected_effect)

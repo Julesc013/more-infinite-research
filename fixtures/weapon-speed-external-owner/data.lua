@@ -20,4 +20,35 @@ owner.level = 1
 owner.upgrade = true
 owner.hidden = true
 
-data:extend({owner})
+local unreachable_pack = {
+  type = "item",
+  name = "mir-fixture-unreachable-weapon-science-pack",
+  icon = "__base__/graphics/icons/automation-science-pack.png",
+  icon_size = 64,
+  subgroup = "science-pack",
+  order = "z[mir-fixture-unreachable-weapon-science-pack]",
+  stack_size = 200
+}
+
+local unreachable_recipe = {
+  type = "recipe",
+  name = unreachable_pack.name,
+  enabled = false,
+  ingredients = {{type = "item", name = "iron-plate", amount = 1}},
+  results = {{type = "item", name = unreachable_pack.name, amount = 1}}
+}
+
+local unreachable_owner = table.deepcopy(owner)
+unreachable_owner.name = "mir-fixture-unreachable-weapon-speed-owner"
+unreachable_owner.unit.ingredients = {{unreachable_pack.name, 1}}
+
+local external_continuation = table.deepcopy(owner)
+external_continuation.name = "weapon-shooting-speed-99"
+external_continuation.localised_name = "MIR fixture external weapon speed continuation"
+
+data:extend({owner, unreachable_pack, unreachable_recipe, unreachable_owner, external_continuation})
+
+for _, lab in pairs(data.raw.lab or {}) do
+  lab.inputs = lab.inputs or {}
+  table.insert(lab.inputs, unreachable_pack.name)
+end
