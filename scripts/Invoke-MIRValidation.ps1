@@ -907,6 +907,16 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     }
   }
 
+  $duplicatedUnlockScan = 'effect.type == "unlock-recipe" and effect.recipe == recipe_name'
+  foreach ($consumer in @(
+    @{ File = "prototypes\mir\capabilities\science_integration\science_selector.lua"; Text = $scienceSelectorText },
+    @{ File = "prototypes\mir\planner\prerequisites.lua"; Text = $plannerPrerequisitesText }
+  )) {
+    if ($consumer.Text.Contains($duplicatedUnlockScan)) {
+      throw "Recipe unlock facts must come from the shared index: $($consumer.File)"
+    }
+  }
+
   $settingsPresetsPath = Join-Path $repo "prototypes\settings-presets.lua"
   if (Test-Path -LiteralPath $settingsPresetsPath) {
     throw "Removed settings preset module should not exist: prototypes\settings-presets.lua"
@@ -2585,15 +2595,6 @@ function Invoke-RuntimeScenario {
     throw
   }
 
-  $duplicatedUnlockScan = 'effect.type == "unlock-recipe" and effect.recipe == recipe_name'
-  foreach ($consumer in @(
-    @{ File = "prototypes\mir\capabilities\science_integration\science_selector.lua"; Text = $scienceSelectorText },
-    @{ File = "prototypes\mir\planner\prerequisites.lua"; Text = $plannerPrerequisitesText }
-  )) {
-    if ($consumer.Text.Contains($duplicatedUnlockScan)) {
-      throw "Recipe unlock facts must come from the shared index: $($consumer.File)"
-    }
-  }
 }
 
 function Invoke-RuntimeConfigurationChangeScenario {
