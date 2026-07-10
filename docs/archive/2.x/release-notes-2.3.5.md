@@ -26,13 +26,21 @@ stable.
 - Each non-scripted generated technology exposes an effect-per-level setting.
   Changing its anchor scales related tiers proportionally; adopted external
   owner values are not rewritten.
+- MIR-owned weapon replacement uses semantic effect identity and the selected
+  positive emitted value, so non-default rocket/cannon settings cannot leave
+  duplicate ownership.
+- Known productivity and base-extension competitors are removed only after MIR
+  emits complete graph-safe replacement coverage. Dependent prerequisites are
+  rewired transactionally; failed generation retains the external owner.
+- Module-permission arrays are copied per prototype and scripted-effect
+  tooltips carry the selected value.
 
 The settings are startup-only and require a restart. They are opt-in and can
 substantially change factory balance.
 
 ## Validation boundary
 
-The same static, package, Factorio 2.0 base, Space Age, settings-profile, and
-compatibility fixture gates used by the existing 2.3.5 candidate remain
-required before publication. This note does not claim runtime validation until
-the Factorio 2.0 binary gate is rerun for the new settings matrix.
+The Factorio 2.0 candidate requires a clean committed validation harness, an
+exact expected-scenario fingerprint, the complete base/Space Age/settings and
+compatibility matrix, and exact-dist checks. Final runtime status is recorded
+only after a matching Factorio 2.0 binary reruns that matrix.

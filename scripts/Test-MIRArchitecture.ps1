@@ -194,13 +194,13 @@ $requiredMirFiles = @(
   "prototypes/mir/policy/competing_productivity.lua",
   "prototypes/mir/policy/competing_base_extensions.lua",
   "prototypes/mir/policy/productivity_family_adoption.lua",
-  "prototypes/mir/policy/technology_cleanup.lua",
   "prototypes/mir/policy/max_level.lua",
   "prototypes/mir/policy/weapon_speed.lua",
   "prototypes/mir/policy/capabilities.lua",
   "prototypes/mir/index/registry_builder.lua",
   "prototypes/mir/index/productivity_owners.lua",
   "prototypes/mir/domain/facts/registry.lua",
+  "prototypes/mir/domain/facts/generated_technology_registry.lua",
   "prototypes/mir/capabilities/contract.lua",
   "prototypes/mir/capabilities/registry.lua",
   "prototypes/mir/capabilities/recipe_productivity/planner.lua",
@@ -221,6 +221,7 @@ $requiredMirFiles = @(
   "prototypes/mir/emit/effect_safety.lua",
   "prototypes/mir/emit/mod_data.lua",
   "prototypes/mir/emit/technology_builder.lua",
+  "prototypes/mir/emit/technology_replacement.lua",
   "prototypes/mir/report/decision_export.lua",
   "prototypes/mir/report/compatibility_diagnostics.lua",
   "prototypes/mir/report/diagnostics_sink.lua",
@@ -293,7 +294,7 @@ $streamAdapterText = Read-MIRFile -RelativePath "prototypes/mir/emit/stream_spec
 Assert-MIRContains -RelativePath "prototypes/mir/emit/stream_spec_adapter.lua" -Text $streamAdapterText -Needle 'require("prototypes.mir.domain.streams.stream_spec")'
 Assert-MIRContains -RelativePath "prototypes/mir/emit/stream_spec_adapter.lua" -Text $streamAdapterText -Needle 'require("prototypes.mir.emit.technology_builder")'
 Assert-MIRContains -RelativePath "prototypes/mir/emit/stream_spec_adapter.lua" -Text $streamAdapterText -Needle "technology_builder.emit(stream)"
-Assert-MIRContains -RelativePath "prototypes/mir/emit/stream_spec_adapter.lua" -Text $streamAdapterText -Needle "generated_registry.register(technology.name)"
+Assert-MIRContains -RelativePath "prototypes/mir/emit/stream_spec_adapter.lua" -Text $streamAdapterText -Needle "generated_registry.register(technology.name,"
 
 $graphSafetyText = Read-MIRFile -RelativePath "prototypes/mir/emit/technology_graph_safety.lua"
 Assert-MIRContains -RelativePath "prototypes/mir/emit/technology_graph_safety.lua" -Text $graphSafetyText -Needle "generated_registry.sorted_names()"

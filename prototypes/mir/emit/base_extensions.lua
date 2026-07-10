@@ -8,7 +8,8 @@ local settings_resolver = require("prototypes.mir.settings.resolver")
 local deepcopy = require("prototypes.mir.core.deepcopy")
 local table_utils = require("prototypes.mir.core.table")
 local effect_safety = require("prototypes.mir.emit.effect_safety")
-local generated_registry = require("prototypes.mir.emit.generated_technology_registry")
+local generated_registry = require("prototypes.mir.domain.facts.generated_technology_registry")
+local competing_base_extensions = require("prototypes.mir.policy.competing_base_extensions")
 local planner_prerequisites = require("prototypes.mir.planner.prerequisites")
 local science_packs = require("prototypes.mir.capabilities.science_integration.science_packs")
 local science_selector = require("prototypes.mir.capabilities.science_integration.science_selector")
@@ -117,7 +118,8 @@ end
 local function find_equivalent_infinite_extension(previous_name, expected_effects)
   local expected_signature = effects_signature(expected_effects)
   for tech_name, tech in pairs(data_raw.prototypes("technology")) do
-    if tech.max_level == "infinite" and tech_name ~= previous_name then
+    if tech.max_level == "infinite" and tech_name ~= previous_name
+      and not competing_base_extensions.ignores_existing_owner(tech_name) then
       if has_prereq(tech, previous_name) and effects_signature(tech.effects) == expected_signature then
         return tech_name
       end
@@ -496,7 +498,7 @@ local function extend_chain(key)
   end
 
   data_raw.extend({ new })
-  generated_registry.register(new.name)
+  generated_registry.register(new.name, { kind = "base_extension", key = key })
   D.extension(D.extension_fields(key, "generated", "base_extension", resolved_ingredients, new.prerequisites, new.effects, lab_status))
 end
 

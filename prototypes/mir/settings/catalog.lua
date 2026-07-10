@@ -2,7 +2,7 @@ local C = require("prototypes.mir.streams.registry")
 local defaults = require("prototypes.mir.settings.defaults")
 local pipeline_extent_settings = require("prototypes.mir.settings.pipeline_extent")
 local prototype_limit_settings = require("prototypes.mir.settings.prototype_limits")
-local effect_scaling = require("prototypes.mir.settings.effect_scaling")
+local effect_contracts = require("prototypes.mir.settings.effect_contracts")
 local setting_order = require("prototypes.mir.settings.order")
 local target_line = require("prototypes.mir.platform.factorio.target_line")
 
@@ -295,7 +295,7 @@ function M.stream_setting_specs(key, stream)
       maximum_value = 2147483647
     }
   }
-  local effect_setting = effect_scaling.stream_setting_spec(key, stream)
+  local effect_setting = effect_contracts.stream_setting_spec(key, stream)
   if effect_setting then table.insert(out, effect_setting) end
   return out
 end
@@ -339,7 +339,7 @@ function M.base_extension_setting_specs(key)
       maximum_value = 2147483647
     }
   }
-  local effect_setting = effect_scaling.base_setting_spec(key)
+  local effect_setting = effect_contracts.base_setting_spec(key)
   if effect_setting then table.insert(out, effect_setting) end
   return out
 end

@@ -106,6 +106,17 @@ if unrestricted_modules then
     if not machine.allowed_effects or #machine.allowed_effects ~= 5 then fail("assembling machine effect permissions were not opened.") end
     if not machine.allowed_module_categories or #machine.allowed_module_categories == 0 then fail("assembling machine module categories were not opened.") end
   end
+
+  local first = data.raw.recipe["iron-gear-wheel"]
+  local second = data.raw.recipe["copper-cable"]
+  if first and second and first.allowed_module_categories and second.allowed_module_categories then
+    local second_count = #second.allowed_module_categories
+    local removed = table.remove(first.allowed_module_categories)
+    if #second.allowed_module_categories ~= second_count then
+      fail("recipe allowed_module_categories arrays are aliased.")
+    end
+    if removed then table.insert(first.allowed_module_categories, removed) end
+  end
 end
 
 local effect_receiver_prototypes = {

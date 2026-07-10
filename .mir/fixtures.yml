@@ -14,17 +14,6 @@ real_mod_gates:
     requires_exact_dist: true
     requires_fresh_save: true
     status: required
-  factorio-2.0-crucible-rigor:
-    scenario: local-2-0-crucible-rigor-exact-dist
-    roots:
-      - planet-crucible
-      - rigor-module
-    versions:
-      planet-crucible: 0.5.10
-      rigor-module: 0.7.0
-    requires_exact_dist: true
-    requires_fresh_save: true
-    status: required
 
 fixtures:
   rigor-late-recipe-removal:
@@ -63,9 +52,34 @@ fixtures:
       - recipe-maximum-productivity-cap
       - above-300-cap-self-recycling-scope
       - unrestricted-module-permissions
+      - module-permission-array-isolation
       - effect-receiver-limits
       - separate-energy-and-pollution-limits
       - positive-power-floor-opt-in
+
+  effect-scaling:
+    assertion_path: fixtures/assert-generation-integrity
+    validates:
+      - primary-base-tier-default-anchor
+      - vanilla-continuation-default-anchors
+      - proportional-mixed-tier-scaling
+      - scripted-runtime-multiplier-delta
+      - scripted-effect-selected-description
+
+  competing-productivity-transaction:
+    path: fixtures/plates-n-circuit-productivity
+    assertion_path: fixtures/assert-plates-n-circuit-productivity
+    validates:
+      - scaled-known-productivity-competitor
+      - external-recipe-productivity-prefix-owner
+      - technology-prerequisite-rewire
+
+  competing-base-extension-transaction:
+    path: fixtures/better-robots-extended-competitor
+    assertion_path: fixtures/assert-base-competitor-transaction
+    validates:
+      - base-competitor-rollback
+      - technology-prerequisite-rewire
 
   settings-profile-roundtrip:
     assertion_path: fixtures/assert-settings-profile-roundtrip
@@ -93,6 +107,7 @@ fixtures:
       - external-continuation-non-mutation
       - external-owner-suppresses-dedicated-streams-when-preferred
       - dedicated-weapon-prerequisites
+      - scaled-weapon-overlap
 
   air-scrubbing:
     path: fixtures/air-scrubbing

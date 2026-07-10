@@ -9,7 +9,11 @@ Date: 2026-07-11
     - Kept Factorio 2.1-only cargo bay range and landing pad count modifiers out of this target.
     - Fixed science unlock inference, disabled prerequisites, science self-locks, and unreachable required technologies.
     - Kept incineration sinks out of breeding productivity across the dependent late-removal lifecycle.
-    - Limited weapon overlap cleanup to MIR-generated continuations with exact researchable replacement coverage.
+    - Limited weapon overlap cleanup to MIR-generated continuations with semantic, positive replacement coverage.
+    - Made competing technology replacement transactional and graph-safe.
+    - Rewired dependent prerequisites only after MIR emitted complete replacement coverage.
+    - Isolated unrestricted module-permission arrays per prototype.
+    - Made scripted effect tooltips display the selected per-level value.
 
   Changes:
 

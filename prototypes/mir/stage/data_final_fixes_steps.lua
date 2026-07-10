@@ -12,8 +12,12 @@ function M.apply_prototype_limits()
 end
 
 function M.apply_module_permissions()
-  if not target_line.feature_enabled("prototype_limits") then return end
+  if not target_line.feature_enabled("module_permissions") then return end
   require("prototypes.mir.pipeline.module_permissions").apply()
+end
+
+function M.prepare_competing_base_extensions()
+  require("prototypes.mir.policy.competing_base_extensions").prepare()
 end
 
 function M.apply_pipeline_extent()

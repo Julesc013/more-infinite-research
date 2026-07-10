@@ -1,0 +1,9 @@
+{
+  "name": "mir-fixture-assert-base-competitor-transaction",
+  "version": "0.1.0",
+  "title": "MIR Fixture - Assert Base Competitor Transaction",
+  "author": "Julesc013",
+  "description": "Asserts rollback and graph rewiring for base extension replacement.",
+  "factorio_version": "2.0",
+  "dependencies": ["base >= 2.0", "Better_Robots_Extended", "more-infinite-research"]
+}

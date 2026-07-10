@@ -2,7 +2,7 @@ local function fail(message)
   error("MIR weapon speed validation failed: " .. message)
 end
 
-local generated_registry = require("__more-infinite-research__.prototypes.mir.emit.generated_technology_registry")
+local generated_registry = require("__more-infinite-research__.prototypes.mir.domain.facts.generated_technology_registry")
 local native_effect_coverage = require("__more-infinite-research__.prototypes.mir.policy.native_effect_coverage")
 local weapon_speed_policy = require("__more-infinite-research__.prototypes.mir.policy.weapon_speed")
 
@@ -25,6 +25,15 @@ local function has_exact_gun_speed(tech, ammo_category)
     end
   end
   return false
+end
+
+local function gun_speed_modifier(tech, ammo_category)
+  for _, effect in ipairs((tech and tech.effects) or {}) do
+    if effect.type == "gun-speed" and effect.ammo_category == ammo_category then
+      return tonumber(effect.modifier)
+    end
+  end
+  return nil
 end
 
 local function has_prerequisite(tech, prerequisite)
@@ -53,7 +62,10 @@ local prefer_mir_setting = settings.startup["mir-prefer-this-mod-for-competing-t
 local prefer_mir = not prefer_mir_setting or prefer_mir_setting.value ~= false
 
 local function replacement_coverage(category)
-  if exact_infinite_owner(dedicated_names[category], category) then return true end
+  if native_effect_coverage.technology_has_effect_identity(dedicated_names[category], {
+    type = "gun-speed",
+    ammo_category = category
+  }, { positive_numeric_value = true }) then return true end
   if prefer_mir then return false end
 
   for name, _ in pairs(techs) do
@@ -65,6 +77,21 @@ local function replacement_coverage(category)
     end
   end
   return false
+end
+
+
+for category, tech_name in pairs(dedicated_names) do
+  local technology = techs[tech_name]
+  if technology then
+    local setting = settings.startup["ips-effect-per-level-research_" ..
+      (category == "rocket" and "rocket" or "cannon") .. "_shooting_speed"]
+    local expected = setting and tonumber(setting.value) and tonumber(setting.value) / 100 or 0.1
+    local actual = gun_speed_modifier(technology, category)
+    if not actual or math.abs(actual - expected) > 0.000001 then
+      fail(tech_name .. " emitted " .. tostring(actual) .. " for " .. category
+        .. ", expected selected value " .. tostring(expected))
+    end
+  end
 end
 
 for _, tech_name in ipairs({"weapon-shooting-speed-5", "weapon-shooting-speed-6"}) do

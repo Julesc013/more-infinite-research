@@ -445,6 +445,20 @@ if is_space_age then
     assert_tech_uses_technology_icon("recipe-prod-research_agricultural_growth_speed-1", "agriculture")
   end
 
+  for _, key in ipairs({"research_spoilage_preservation", "research_agricultural_growth_speed"}) do
+    local technology = techs["recipe-prod-" .. key .. "-1"]
+    if technology then
+      local effect = technology.effects and technology.effects[1]
+      local selected = settings.startup["ips-effect-per-level-" .. key]
+      if not effect or effect.type ~= "nothing" or type(effect.effect_description) ~= "table" then
+        fail(key .. " scripted effect description is missing")
+      end
+      if not selected or tonumber(effect.effect_description[2]) ~= tonumber(selected.value) then
+        fail(key .. " scripted effect description does not carry selected value")
+      end
+    end
+  end
+
   for _, tech_name in ipairs({
     "recipe-prod-research_lab_productivity-1",
     "recipe-prod-research_processing_unit-1",

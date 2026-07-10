@@ -65,3 +65,6 @@ probe both names or silently choose a fallback.
 When a target branch changes `info.json`, regenerate the Lua profile view and
 run architecture validation. Target-local capability changes must first update
 the canonical manifest and must not weaken the Factorio 2.1 profile.
+The unrestricted module-permission pass has its own `module_permissions`
+feature flag. Its setting registration, target capability, and executable pass
+must agree; it does not inherit support from `prototype_limits`.
