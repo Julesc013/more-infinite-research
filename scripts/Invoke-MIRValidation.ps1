@@ -10,13 +10,15 @@ param(
 
 $ErrorActionPreference = "Stop"
 $repo = Resolve-Path (Join-Path $PSScriptRoot "..")
+. (Join-Path $repo "scripts\validation\TargetProfiles.ps1")
 $repoInfo = Get-Content -Raw (Join-Path $repo "info.json") | ConvertFrom-Json
+$targetProfile = Get-MIRTargetProfile -RepoRoot $repo -FactorioVersion $repoInfo.factorio_version
 $isFactorio017Line = $repoInfo.factorio_version -eq "0.17"
 $isFactorio018Line = $repoInfo.factorio_version -eq "0.18"
 $isFactorio10Line = $repoInfo.factorio_version -eq "1.0"
 $isFactorio11Line = $repoInfo.factorio_version -eq "1.1"
-$isReducedLegacyLine = $isFactorio017Line -or $isFactorio018Line -or $isFactorio10Line -or $isFactorio11Line
-$isLegacyFactorio20 = $repoInfo.factorio_version -eq "2.0"
+$isReducedLegacyLine = [bool]$targetProfile.reduced_legacy
+$isLegacyFactorio20 = [bool]$targetProfile.legacy_factorio_2_0
 $isFactorio21Line = $repoInfo.factorio_version -eq "2.1"
 $script:ValidationPackageZipPath = $null
 
@@ -135,6 +137,10 @@ if ($ArchitectureOnly) {
 
 Invoke-RepoCheck "info.json parses" {
   $null = $repoInfo
+}
+
+Invoke-RepoCheck "target profile views match canonical manifest" {
+  & (Join-Path $repo "scripts\Sync-MIRTargetProfiles.ps1") -RepoRoot $repo -Check
 }
 
 Invoke-RepoCheck "release metadata matches Factorio line" {

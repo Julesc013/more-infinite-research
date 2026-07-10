@@ -5,8 +5,10 @@ param(
 $ErrorActionPreference = "Stop"
 
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+. (Join-Path $repo "scripts\validation\TargetProfiles.ps1")
 $repoInfo = Get-Content -Raw -LiteralPath (Join-Path $repo "info.json") | ConvertFrom-Json
-$isReducedLegacyLine = $repoInfo.factorio_version -in @("0.18", "1.0", "1.1")
+$targetProfile = Get-MIRTargetProfile -RepoRoot $repo -FactorioVersion $repoInfo.factorio_version
+$isReducedLegacyLine = [bool]$targetProfile.reduced_legacy
 
 function Read-MIRText {
   param([Parameter(Mandatory)][string]$RelativePath)

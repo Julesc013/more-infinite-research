@@ -83,6 +83,9 @@ The runtime layer is intentionally narrow:
 - Handle runtime setting changes if runtime settings are introduced.
 - Require each scripted feature to document storage keys, disable behavior, multiple-force behavior, and interaction with other mods touching the same state.
 - Label scripted/global/sandbox features clearly in settings and player-facing docs.
+- Select the persisted runtime root through the active
+  [target capability profile](target-profiles.md): `storage` on Factorio 2.x
+  and `global` on Factorio 1.1 and older.
 - Static validation fails if `control.lua` or `prototypes/mir/runtime/**/*.lua`
   registers `defines.events.on_tick` or `script.on_nth_tick` without a future
   explicit allowlist.
@@ -111,7 +114,9 @@ Current migrations:
 
 ### Scripted Runtime Storage
 
-All runtime storage is namespaced below `storage.mir`.
+All runtime state is namespaced below `mir` on the target-selected persisted
+root. On the current Factorio 2.1 line that is `storage.mir`; older target
+profiles select `global.mir`.
 
 `storage.mir.scripted_techs` is reserved for manager-level state. It is currently initialized so future manager metadata has a stable namespace, but it does not store behavior state yet.
 

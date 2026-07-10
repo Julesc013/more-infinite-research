@@ -76,6 +76,8 @@ modules:
     - prototypes/mir/platform/factorio/mods.lua
     - prototypes/mir/platform/factorio/prototype_lookup.lua
     - prototypes/mir/platform/factorio/target_line.lua
+    - prototypes/mir/platform/factorio/target_profiles.lua
+    - prototypes/mir/platform/factorio/runtime_state.lua
   settings:
     - prototypes/mir/settings/registry.lua
     - prototypes/mir/settings/catalog.lua

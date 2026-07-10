@@ -49,7 +49,7 @@ behaviors:
     decision: centralize-and-generate
     impact: internal-architecture
     evidence: target-profile-drift-check
-    status: planned
+    status: complete
   BP-005:
     source: 1.9.3-through-1.7.0-runtime-adapters
     behavior: runtime persistence backend is selected explicitly by target
@@ -57,7 +57,7 @@ behaviors:
     decision: adapt-through-platform-runtime-state
     impact: internal-runtime-access
     evidence: runtime-state-adapter-check
-    status: planned
+    status: complete
   BP-006:
     source: all-backport-validation-rings
     behavior: validation scenarios have stable groups and persistent partial summaries

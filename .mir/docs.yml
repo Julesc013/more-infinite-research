@@ -115,6 +115,14 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - module-boundaries
+  - path: docs/architecture/target-profiles.md
+    title: "Target Capability Profiles"
+    status: current
+    audience: developer
+    doc_type: explanation
+    owner: mir-maintainers
+    source_of_truth_for:
+      - target-capability-profiles
   - path: docs/architecture/factorio-lifecycle.md
     title: "Factorio Lifecycle Boundaries"
     status: current

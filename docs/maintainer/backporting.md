@@ -118,6 +118,12 @@ For safer local work, prefer `git worktree` checkouts for `tmp/*` branches so a
 Factorio `2.0` port can be validated while `dev` remains available for Factorio
 `2.1` fixes.
 
+Target capability classifications are centralized in `.mir/targets.json`.
+After retargeting `info.json` on a branch, run
+`.\scripts\Sync-MIRTargetProfiles.ps1` and commit the generated Lua view.
+PowerShell gates read the same manifest directly, and architecture validation
+rejects drift between the manifest, generated Lua, and current metadata.
+
 ## Immediate `2.2.0` To `1.9.2` Flow
 
 The immediate transition plan is:

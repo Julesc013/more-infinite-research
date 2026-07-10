@@ -134,6 +134,19 @@ foreach ($manifest in @(
   Assert-MIRFileHasSchemaOne -RelativePath $manifest
 }
 
+$targetManifestPath = Join-Path $repo ".mir\targets.json"
+if (-not (Test-Path -LiteralPath $targetManifestPath -PathType Leaf)) {
+  throw "Missing required target profile manifest: .mir/targets.json"
+}
+$targetManifest = Get-Content -Raw -LiteralPath $targetManifestPath | ConvertFrom-Json
+if ($targetManifest.schema -ne 1 -or -not $targetManifest.profiles) {
+  throw ".mir/targets.json must use schema 1 and define profiles."
+}
+$repoInfo = Get-Content -Raw -LiteralPath (Join-Path $repo "info.json") | ConvertFrom-Json
+if (-not $targetManifest.profiles.PSObject.Properties[$repoInfo.factorio_version]) {
+  throw ".mir/targets.json has no profile for current Factorio $($repoInfo.factorio_version)."
+}
+
 $docsManifestText = Read-MIRText -RelativePath ".mir/docs.yml"
 $manifestDocPaths = @(Get-MIRManifestDocPaths -Text $docsManifestText)
 if ($manifestDocPaths.Count -eq 0) {

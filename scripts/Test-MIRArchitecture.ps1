@@ -174,6 +174,9 @@ $requiredMirFiles = @(
   "prototypes/mir/platform/factorio/data_raw.lua",
   "prototypes/mir/platform/factorio/mods.lua",
   "prototypes/mir/platform/factorio/prototype_lookup.lua",
+  "prototypes/mir/platform/factorio/target_profiles.lua",
+  "prototypes/mir/platform/factorio/target_line.lua",
+  "prototypes/mir/platform/factorio/runtime_state.lua",
   "prototypes/mir/settings/stage_builder.lua",
   "prototypes/mir/settings/registry.lua",
   "prototypes/mir/settings/defaults.lua",
@@ -246,6 +249,11 @@ foreach ($relative in $requiredMirFiles) {
   $null = Read-MIRFile -RelativePath $relative
 }
 
+& (Join-Path $repo "scripts\Sync-MIRTargetProfiles.ps1") -RepoRoot $repo -Check
+if ($LASTEXITCODE -ne 0) {
+  throw "Generated target profile validation failed with exit code $LASTEXITCODE."
+}
+
 $dataFinalFixesStageText = Read-MIRFile -RelativePath "prototypes/mir/stage/data_final_fixes.lua"
 Assert-MIRContains -RelativePath "prototypes/mir/stage/data_final_fixes.lua" -Text $dataFinalFixesStageText -Needle "steps.apply_compatibility_repairs()"
 Assert-MIRContains -RelativePath "prototypes/mir/stage/data_final_fixes.lua" -Text $dataFinalFixesStageText -Needle "steps.apply_pipeline_extent()"
@@ -305,6 +313,17 @@ Assert-MIRContains -RelativePath "prototypes/mir/runtime/settings_profile.lua" -
 Assert-MIRContains -RelativePath "prototypes/mir/runtime/settings_profile.lua" -Text $settingsProfileText -Needle '"mir-settings-import-check"'
 Assert-MIRContains -RelativePath "prototypes/mir/runtime/settings_profile.lua" -Text $settingsProfileText -Needle 'remote.add_interface("more-infinite-research-settings"'
 
+$targetLineText = Read-MIRFile -RelativePath "prototypes/mir/platform/factorio/target_line.lua"
+Assert-MIRContains -RelativePath "prototypes/mir/platform/factorio/target_line.lua" -Text $targetLineText -Needle 'require("prototypes.mir.platform.factorio.target_profiles")'
+Assert-MIRContains -RelativePath "prototypes/mir/platform/factorio/target_line.lua" -Text $targetLineText -Needle "function M.runtime_state_backend()"
+
+$runtimeStateAdapterText = Read-MIRFile -RelativePath "prototypes/mir/platform/factorio/runtime_state.lua"
+Assert-MIRContains -RelativePath "prototypes/mir/platform/factorio/runtime_state.lua" -Text $runtimeStateAdapterText -Needle 'backend == "storage"'
+Assert-MIRContains -RelativePath "prototypes/mir/platform/factorio/runtime_state.lua" -Text $runtimeStateAdapterText -Needle 'backend == "global"'
+
+$runtimeStateText = Read-MIRFile -RelativePath "prototypes/mir/runtime/state.lua"
+Assert-MIRContains -RelativePath "prototypes/mir/runtime/state.lua" -Text $runtimeStateText -Needle 'require("prototypes.mir.platform.factorio.runtime_state")'
+
 foreach ($relative in @(
   "prototypes/mir/runtime/scripted_techs.lua",
   "prototypes/mir/runtime/effects/spoilage_preservation.lua",
@@ -333,6 +352,11 @@ Assert-MIRNoPatternInLuaTree `
   -RelativeRoot "prototypes/mir/capabilities" `
   -Pattern "data:extend" `
   -Message "MIR capability modules must not emit prototypes directly."
+
+Assert-MIRNoPatternInLuaTree `
+  -RelativeRoot "prototypes/mir/runtime" `
+  -Pattern "\b(global|storage)\b" `
+  -Message "MIR runtime modules must access persisted state through the platform runtime-state adapter."
 
 Assert-MIRNoPatternInLuaTree `
   -RelativeRoot "prototypes/mir/compatibility/overlays" `
