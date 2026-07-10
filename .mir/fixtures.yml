@@ -6,6 +6,13 @@ fixture_roots:
   run_profiles: fixtures/run-profiles
 
 fixtures:
+  rigor-late-recipe-removal:
+    path: fixtures/rigor-late-recipe-removal
+    validates:
+      - incineration-sink-excluded-from-breeding
+      - generated-recipe-target-integrity
+      - dependent-mod-late-recipe-removal
+
   generated-prerequisite-safety:
     assertion_path: fixtures/assert-generated-prerequisite-safety
     validates:

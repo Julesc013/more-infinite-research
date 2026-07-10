@@ -12,6 +12,9 @@ function Get-MIRValidationScenarioGroup {
   if ($ScenarioName -eq "generated-prerequisite-safety") {
     return "science-prerequisites"
   }
+  if ($ScenarioName -eq "rigor-late-recipe-removal") {
+    return "recipe-target-integrity"
+  }
   if ($ScenarioName -match "weapon-speed|weapon-overlap") {
     return "weapon-overlap"
   }
