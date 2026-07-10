@@ -33,7 +33,7 @@ behaviors:
     decision: adapt-at-science-capability-boundary
     impact: generated-prerequisites
     evidence: generated-prerequisite-safety
-    status: planned
+    status: complete
   BP-003:
     source: 1.7.0@1a9b5a7b1162f8dca8125ef7bb792f57a9ae282b
     behavior: emitted technology prerequisites are enabled acyclic and reachable
@@ -41,7 +41,7 @@ behaviors:
     decision: promote-to-general-graph-invariant
     impact: validation
     evidence: generated-prerequisite-safety
-    status: planned
+    status: complete
   BP-004:
     source: dev-plus-2.3.0-1.9.3-1.8.x-1.7.0-lessons
     behavior: one canonical target capability profile drives Lua and PowerShell

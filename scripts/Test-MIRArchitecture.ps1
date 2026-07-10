@@ -252,7 +252,7 @@ Assert-MIRContains -RelativePath "prototypes/mir/stage/data_final_fixes.lua" -Te
 Assert-MIRContains -RelativePath "prototypes/mir/stage/data_final_fixes.lua" -Text $dataFinalFixesStageText -Needle "steps.emit_streams()"
 Assert-MIRContains -RelativePath "prototypes/mir/stage/data_final_fixes.lua" -Text $dataFinalFixesStageText -Needle 'require("prototypes.mir.compatibility.diagnostics.registry").emit_all()'
 Assert-MIRContains -RelativePath "prototypes/mir/stage/data_final_fixes.lua" -Text $dataFinalFixesStageText -Needle 'require("prototypes.mir.planner.compiler").emit()'
-Assert-MIRContains -RelativePath "prototypes/mir/stage/data_final_fixes.lua" -Text $dataFinalFixesStageText -Needle "steps.assert_registered_technology_effects()"
+Assert-MIRContains -RelativePath "prototypes/mir/stage/data_final_fixes.lua" -Text $dataFinalFixesStageText -Needle "steps.assert_registered_technology_safety()"
 
 $dataFinalFixesStepsText = Read-MIRFile -RelativePath "prototypes/mir/stage/data_final_fixes_steps.lua"
 foreach ($needle in @(
@@ -268,6 +268,7 @@ foreach ($needle in @(
   'require("prototypes.mir.policy.max_level").apply()',
   'require("prototypes.mir.compatibility.planner").emit()',
   'require("prototypes.mir.emit.effect_safety").assert_registered_technology_effects()',
+  'require("prototypes.mir.emit.technology_graph_safety").assert_registered_technologies()',
   'require("prototypes.mir.report.diagnostics_sink").flush()'
 )) {
   Assert-MIRContains -RelativePath "prototypes/mir/stage/data_final_fixes_steps.lua" -Text $dataFinalFixesStepsText -Needle $needle
@@ -284,6 +285,11 @@ $streamAdapterText = Read-MIRFile -RelativePath "prototypes/mir/emit/stream_spec
 Assert-MIRContains -RelativePath "prototypes/mir/emit/stream_spec_adapter.lua" -Text $streamAdapterText -Needle 'require("prototypes.mir.domain.streams.stream_spec")'
 Assert-MIRContains -RelativePath "prototypes/mir/emit/stream_spec_adapter.lua" -Text $streamAdapterText -Needle 'require("prototypes.mir.emit.technology_builder")'
 Assert-MIRContains -RelativePath "prototypes/mir/emit/stream_spec_adapter.lua" -Text $streamAdapterText -Needle "technology_builder.emit(stream)"
+Assert-MIRContains -RelativePath "prototypes/mir/emit/stream_spec_adapter.lua" -Text $streamAdapterText -Needle "generated_registry.register(technology.name)"
+
+$graphSafetyText = Read-MIRFile -RelativePath "prototypes/mir/emit/technology_graph_safety.lua"
+Assert-MIRContains -RelativePath "prototypes/mir/emit/technology_graph_safety.lua" -Text $graphSafetyText -Needle "generated_registry.sorted_names()"
+Assert-MIRContains -RelativePath "prototypes/mir/emit/technology_graph_safety.lua" -Text $graphSafetyText -Needle "science.pack_production_status(pack_name)"
 
 $modDataText = Read-MIRFile -RelativePath "prototypes/mir/emit/mod_data.lua"
 Assert-MIRContains -RelativePath "prototypes/mir/emit/mod_data.lua" -Text $modDataText -Needle 'require("prototypes.mir.platform.factorio.data_raw")'

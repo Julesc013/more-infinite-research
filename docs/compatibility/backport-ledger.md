@@ -19,8 +19,8 @@ does not grant implementation authority; `dev` remains canonical.
 | ID | Source | Observable contract | Class | Decision | Evidence | Status |
 | --- | --- | --- | --- | --- | --- | --- |
 | BP-001 | `1.7.0@1a9b5a7` | Preserve exact release provenance | A | Record evidence only | branch manifest and archive hash | Complete |
-| BP-002 | `1.7.0@1a9b5a7` | Enabled science recipes gain no disabled unlock gate | B | Adapt in science capability | generated-prerequisite fixture | Planned |
-| BP-003 | `1.7.0@1a9b5a7` | Emitted prerequisites are enabled, acyclic, and reachable | B | General invariant | data and runtime graph fixture | Planned |
+| BP-002 | `1.7.0@1a9b5a7` | Enabled science recipes gain no disabled unlock gate | B | Adapt in science capability | generated-prerequisite fixture | Complete |
+| BP-003 | `1.7.0@1a9b5a7` | Emitted prerequisites are enabled, acyclic, and reachable | B | General invariant | data and runtime graph fixture | Complete |
 | BP-004 | all target rings | Lua and validation use one target profile authority | C | Centralize and generate | drift check | Planned |
 | BP-005 | 1.9.3 through 1.7.0 | Target explicitly selects `storage` or `global` | C | Platform adapter | architecture lint | Planned |
 | BP-006 | all target rings | Scenarios have groups, durations, and durable partial results | C | Extract runner seams | structured summary | Planned |

@@ -137,6 +137,8 @@ modules:
     - prototypes/mir/planner/technology_requirements.lua
     - prototypes/mir/planner/science.lua
   emit:
+    - prototypes/mir/emit/generated_technology_registry.lua
+    - prototypes/mir/emit/technology_graph_safety.lua
     - prototypes/mir/emit/technology_builder.lua
     - prototypes/mir/emit/stream_spec_adapter.lua
     - prototypes/mir/emit/base_extensions.lua

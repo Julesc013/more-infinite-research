@@ -1,4 +1,5 @@
 local data_raw = require("prototypes.mir.platform.factorio.data_raw")
+local generated_registry = require("prototypes.mir.emit.generated_technology_registry")
 
 local S = {}
 
@@ -6,8 +7,6 @@ local blocked_effect_types = {
   ["character-item-pickup-distance"] = "item pickup reach can vacuum nearby belt items into player inventories and cause severe lag",
   ["character-loot-pickup-distance"] = "loot pickup reach can vacuum nearby belt items into player inventories and cause severe lag"
 }
-
-local generated_technology_names = {}
 
 function S.assert_effect_allowed(effect, context)
   local effect_type = effect and effect.type
@@ -30,13 +29,11 @@ function S.assert_effects_allowed(effects, context)
 end
 
 function S.register_generated_technology(name)
-  if name then
-    generated_technology_names[name] = true
-  end
+  generated_registry.register(name)
 end
 
 function S.assert_registered_technology_effects()
-  for name, _ in pairs(generated_technology_names) do
+  for _, name in ipairs(generated_registry.sorted_names()) do
     local tech = data_raw.technology(name)
     if tech then
       S.assert_effects_allowed(tech.effects, name)

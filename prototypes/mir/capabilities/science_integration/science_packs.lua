@@ -181,6 +181,8 @@ local EXTENSION_PACKS = {
 
 local lab_inputs_cache = nil
 local science_pack_unlock_cache = nil
+local science_pack_recipe_status_cache = nil
+local technology_reachability_cache = {}
 local mod_progression_cache = {}
 
 local function ingredient_name(ingredient)
@@ -271,7 +273,22 @@ function S.valid_research_ingredients(ingredients)
 end
 
 function S.best_lab_compatible_ingredients(ingredients, context)
-  local source = deepcopy(ingredients or {})
+  local source = {}
+  for _, ingredient in ipairs(deepcopy(ingredients or {})) do
+    local pack_name = ingredient_name(ingredient)
+    local production_status = pack_name and S.pack_production_status(pack_name) or "unreachable"
+    if production_status ~= "unreachable" then
+      table.insert(source, ingredient)
+    else
+      log(
+        "[more-infinite-research] Excluding science pack " ..
+          tostring(pack_name) ..
+          " from " ..
+          tostring(context or "unknown technology") ..
+          " because it has no initially available recipe or enabled reachable unlock technology."
+      )
+    end
+  end
   if #source == 0 then return nil, "empty" end
   if S.valid_research_ingredients(source) then return source, "full" end
   if lab_incompatibility_policy() == "skip" then
@@ -522,10 +539,88 @@ local function recipe_outputs_item(recipe, item_name)
   return scan(recipe)
 end
 
+local function recipe_enabled_without_research(recipe)
+  if not recipe or recipe.hidden == true or recipe.enabled == false then return false end
+
+  local variants = {}
+  if recipe.normal then table.insert(variants, recipe.normal) end
+  if recipe.expensive then table.insert(variants, recipe.expensive) end
+  for _, variant in ipairs(variants) do
+    if variant.enabled == false then return false end
+  end
+
+  return true
+end
+
+local function technology_is_enabled_and_reachable(tech_name, visiting)
+  if technology_reachability_cache[tech_name] ~= nil then
+    return technology_reachability_cache[tech_name]
+  end
+
+  local tech = data_raw.technology(tech_name)
+  if not tech or tech.enabled == false then
+    technology_reachability_cache[tech_name] = false
+    return false
+  end
+
+  visiting = visiting or {}
+  if visiting[tech_name] then
+    technology_reachability_cache[tech_name] = false
+    return false
+  end
+
+  visiting[tech_name] = true
+  local prerequisites = {}
+  for _, prerequisite in ipairs(tech.prerequisites or {}) do
+    table.insert(prerequisites, prerequisite)
+  end
+  table.sort(prerequisites)
+
+  for _, prerequisite in ipairs(prerequisites) do
+    if not technology_is_enabled_and_reachable(prerequisite, visiting) then
+      visiting[tech_name] = nil
+      technology_reachability_cache[tech_name] = false
+      return false
+    end
+  end
+
+  visiting[tech_name] = nil
+  technology_reachability_cache[tech_name] = true
+  return true
+end
+
+local function build_science_pack_recipe_status_cache()
+  if science_pack_recipe_status_cache then return science_pack_recipe_status_cache end
+
+  science_pack_recipe_status_cache = {}
+  local lab_inputs = S.all_lab_inputs()
+  for _, pack_name in ipairs(lab_inputs) do
+    science_pack_recipe_status_cache[pack_name] = {
+      has_recipe = false,
+      initially_available = false
+    }
+  end
+
+  for _, recipe in pairs(data_raw.prototypes("recipe")) do
+    for _, pack_name in ipairs(lab_inputs) do
+      if recipe_outputs_item(recipe, pack_name) then
+        local status = science_pack_recipe_status_cache[pack_name]
+        status.has_recipe = true
+        if recipe_enabled_without_research(recipe) then
+          status.initially_available = true
+        end
+      end
+    end
+  end
+
+  return science_pack_recipe_status_cache
+end
+
 local function build_science_pack_unlock_cache()
   if science_pack_unlock_cache then return science_pack_unlock_cache end
   science_pack_unlock_cache = {}
   local lab_inputs = S.all_lab_inputs()
+  local recipe_statuses = build_science_pack_recipe_status_cache()
   local technology_names = {}
   for tech_name, _ in pairs(data_raw.prototypes("technology")) do
     table.insert(technology_names, tech_name)
@@ -533,13 +628,21 @@ local function build_science_pack_unlock_cache()
   table.sort(technology_names)
   for _, tech_name in ipairs(technology_names) do
     local tech = data_raw.technology(tech_name)
-    for _, effect in ipairs(tech.effects or {}) do
-      if effect.type == "unlock-recipe" and effect.recipe then
-        local recipe = data_raw.prototype("recipe", effect.recipe)
-        if recipe then
-          for _, pack_name in ipairs(lab_inputs) do
-            if recipe_outputs_item(recipe, pack_name) and not science_pack_unlock_cache[pack_name] then
-              science_pack_unlock_cache[pack_name] = tech_name
+    if technology_is_enabled_and_reachable(tech_name) then
+      for _, effect in ipairs(tech.effects or {}) do
+        if effect.type == "unlock-recipe" and effect.recipe then
+          local recipe = data_raw.prototype("recipe", effect.recipe)
+          if recipe then
+            for _, pack_name in ipairs(lab_inputs) do
+              local status = recipe_statuses[pack_name]
+              if status
+                and status.has_recipe
+                and not status.initially_available
+                and recipe_outputs_item(recipe, pack_name)
+                and not science_pack_unlock_cache[pack_name]
+              then
+                science_pack_unlock_cache[pack_name] = tech_name
+              end
             end
           end
         end
@@ -549,12 +652,35 @@ local function build_science_pack_unlock_cache()
   return science_pack_unlock_cache
 end
 
+function S.pack_production_status(pack_name)
+  if not pack_name or not S.science_pack_exists(pack_name) then return "unreachable", nil end
+
+  local status = build_science_pack_recipe_status_cache()[pack_name]
+  if status and status.initially_available then return "initial", nil end
+
+  if status and status.has_recipe then
+    local unlocker = build_science_pack_unlock_cache()[pack_name]
+    if unlocker then return "research", unlocker end
+    return "unreachable", nil
+  end
+
+  if technology_is_enabled_and_reachable(pack_name) then
+    return "non-recipe", pack_name
+  end
+
+  -- Some science packs are supplied by launch products, scripts, or other
+  -- non-recipe systems. Their presence in an active lab is the available
+  -- evidence; do not invent a recipe-unlock prerequisite.
+  return "non-recipe", nil
+end
+
+function S.technology_is_enabled_and_reachable(tech_name)
+  return technology_is_enabled_and_reachable(tech_name)
+end
+
 function S.prereq_tech_for_science_pack(pack_name)
-  if lookup.technology_exists(pack_name) then return pack_name end
-  local cache = build_science_pack_unlock_cache()
-  local tech_name = cache[pack_name]
-  if tech_name and lookup.technology_exists(tech_name) then return tech_name end
-  return nil
+  local _, prerequisite = S.pack_production_status(pack_name)
+  return prerequisite
 end
 
 return S

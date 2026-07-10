@@ -8,6 +8,7 @@ local settings_resolver = require("prototypes.mir.settings.resolver")
 local deepcopy = require("prototypes.mir.core.deepcopy")
 local table_utils = require("prototypes.mir.core.table")
 local effect_safety = require("prototypes.mir.emit.effect_safety")
+local generated_registry = require("prototypes.mir.emit.generated_technology_registry")
 local planner_prerequisites = require("prototypes.mir.planner.prerequisites")
 local science_packs = require("prototypes.mir.capabilities.science_integration.science_packs")
 local science_selector = require("prototypes.mir.capabilities.science_integration.science_selector")
@@ -494,7 +495,7 @@ local function extend_chain(key)
   end
 
   data_raw.extend({ new })
-  effect_safety.register_generated_technology(new.name)
+  generated_registry.register(new.name)
   D.extension(D.extension_fields(key, "generated", "base_extension", resolved_ingredients, new.prerequisites, new.effects, lab_status))
 end
 
