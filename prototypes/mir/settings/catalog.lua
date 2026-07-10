@@ -7,6 +7,7 @@ local setting_order = require("prototypes.mir.settings.order")
 local target_line = require("prototypes.mir.platform.factorio.target_line")
 
 local M = {}
+local spec_by_name_cache = nil
 
 M.import_setting_name = "mir-settings-profile-import"
 
@@ -394,11 +395,13 @@ function M.all_specs()
 end
 
 function M.spec_by_name()
+  if spec_by_name_cache then return spec_by_name_cache end
   local out = {}
   for _, spec in ipairs(M.all_specs()) do
     out[spec.name] = spec
   end
-  return out
+  spec_by_name_cache = out
+  return spec_by_name_cache
 end
 
 function M.spec(name)

@@ -51,7 +51,7 @@ if safe_item and unsafe_item then
   table.insert(fixture_prototypes, {
     type = "recipe",
     name = "mir-fixture-self-recycling-production",
-    category = "crafting",
+    categories = {"crafting"},
     enabled = true,
     allow_productivity = true,
     ingredients = {{type = "item", name = "iron-plate", amount = 1}},
@@ -60,7 +60,7 @@ if safe_item and unsafe_item then
   table.insert(fixture_prototypes, {
     type = "recipe",
     name = "mir-fixture-self-recycling-loop",
-    category = "crafting",
+    categories = {"crafting"},
     enabled = true,
     allow_productivity = true,
     ingredients = {{type = "item", name = safe_item.name, amount = 1}},
@@ -69,7 +69,7 @@ if safe_item and unsafe_item then
   table.insert(fixture_prototypes, {
     type = "recipe",
     name = "mir-fixture-non-recycling-production",
-    category = "crafting",
+    categories = {"crafting"},
     enabled = true,
     allow_productivity = true,
     ingredients = {{type = "item", name = "copper-plate", amount = 1}},

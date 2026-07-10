@@ -91,6 +91,49 @@ function Assert-MIRNoPatternInLuaFile {
   }
 }
 
+function Assert-MIRNoTopLevelRequireCycles {
+  $luaRoot = Get-MIRPath -RelativePath "prototypes/mir"
+  $graph = @{}
+  foreach ($file in Get-ChildItem -LiteralPath $luaRoot -Recurse -File -Filter "*.lua") {
+    $relative = [System.IO.Path]::GetRelativePath($repo, $file.FullName).Replace("\", "/")
+    $module = ($relative -replace '\.lua$', '').Replace("/", ".")
+    $dependencies = @()
+    $text = Get-Content -Raw -LiteralPath $file.FullName
+    foreach ($match in [regex]::Matches($text, '(?m)^(?:local\s+\w+\s*=\s*|return\s+)require\("([^"]+)"\)')) {
+      $dependency = $match.Groups[1].Value
+      if ($dependency.StartsWith("prototypes.mir.")) {
+        $dependencies += $dependency
+      }
+    }
+    $graph[$module] = @($dependencies | Sort-Object -Unique)
+  }
+
+  $state = @{}
+  $stack = [System.Collections.Generic.List[string]]::new()
+  function Visit-MIRModule([string]$Module) {
+    if ($state[$Module] -eq 2) { return }
+    if ($state[$Module] -eq 1) {
+      $start = $stack.IndexOf($Module)
+      $cycle = @($stack.GetRange($start, $stack.Count - $start)) + $Module
+      throw "Top-level Lua require cycle: $($cycle -join ' -> ')"
+    }
+
+    $state[$Module] = 1
+    $stack.Add($Module) | Out-Null
+    foreach ($dependency in @($graph[$Module])) {
+      if ($graph.ContainsKey($dependency)) {
+        Visit-MIRModule -Module $dependency
+      }
+    }
+    $stack.RemoveAt($stack.Count - 1)
+    $state[$Module] = 2
+  }
+
+  foreach ($module in @($graph.Keys | Sort-Object)) {
+    Visit-MIRModule -Module $module
+  }
+}
+
 $entrypoints = @(
   @{
     Root = "settings.lua"
@@ -185,6 +228,8 @@ $requiredMirFiles = @(
   "prototypes/mir/settings/stage_adapter.lua",
   "prototypes/mir/settings/profile_codec.lua",
   "prototypes/mir/settings/effective.lua",
+  "prototypes/mir/settings/effect_contracts.lua",
+  "prototypes/mir/settings/effect_scaling.lua",
   "prototypes/mir/settings/resolver.lua",
   "prototypes/mir/settings/pipeline_extent.lua",
   "prototypes/mir/streams/registry.lua",
@@ -416,5 +461,7 @@ Assert-MIRNoPatternInLuaTree `
   -RelativeRoot "prototypes/mir/runtime" `
   -Pattern $runtimePrototypePattern `
   -Message "MIR runtime modules must not perform prototype-stage work."
+
+Assert-MIRNoTopLevelRequireCycles
 
 Write-Host "[ok] MIR architecture boundary lint passed."

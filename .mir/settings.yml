@@ -31,6 +31,8 @@ rules:
   unrestricted_modules_is_opt_in_and_does_not_add_slots: true
   unrestricted_modules_requires_module_permissions_target_capability: true
   effect_per_level_settings_are_per_technology: true
+  effect_per_level_defaults_use_lowest_canonical_tier: true
+  scripted_multiplier_effects_scale_delta_not_full_multiplier: true
   energy_and_pollution_caps_are_separate: true
   positive_speed_cap_and_negative_speed_floor_are_separate: true
   positive_power_floor_is_default_off_opt_in: true

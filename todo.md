@@ -1,6 +1,6 @@
 # M.I.R. TODO
 
-Updated: 2026-07-10
+Updated: 2026-07-11
 
 This is the active task list for MIR 3.0.5 and later. It should contain future
 work, current gates, deferred decisions, recurring release checks, and issue
@@ -154,6 +154,156 @@ source for its original wording.
 - [x] Record exact-dist evidence and a complete structured result summary.
 - [ ] Tag and publish only after final manual review; do not rebuild verified
   bytes during publication.
+
+### URGENT: 3.0.5 Refactor Phase 2 And Release Closure
+
+This is the mandatory next-turn handoff. Do not start the 2.3.5 semantic
+backport until every release-blocking item in this section is complete or has a
+written maintainer disposition. The current checkpoint repaired the reported
+settings-stage recursion and completed the first post-3.0.0 architecture audit,
+but candidate metadata intentionally remains in
+`rebuilding-after-package-visible-change` state.
+
+Current checkpoint facts:
+
+- The reported `catalog -> effect_scaling -> effective -> profile_codec ->
+  catalog` import recursion is removed. Pure descriptors now live in
+  `prototypes/mir/settings/effect_contracts.lua`; runtime lookup remains in
+  `effect_scaling.lua`.
+- The architecture gate now rejects top-level MIR Lua require cycles.
+- Effect-per-level defaults now use the lowest canonical tier, not the highest
+  tier. The furnace mixed-tier case proves a selected 4% anchor scales canonical
+  20%, 10%, and 5% effects to 40%, 20%, and 10%.
+- Scripted spoilage-preservation and agricultural-growth settings scale the
+  `0.01` multiplier delta and then add one. A selected 2% effect resolves to
+  `1.02`, never `1.01 * 2`.
+- Recycling facts and conversion reachability are indexed once per scoped-cap
+  pass. Policy classification no longer rebuilds the full recipe graph for
+  every recipe.
+- The prototype-limit fixture uses the Factorio 2.1 `categories` recipe field
+  and no longer demands unrelated `effect_receiver` tables during a
+  productivity-only/module-only scenario.
+- Factorio 2.1.9 completed the full static, base, Space Age, settings, mixed-tier
+  scaling, scripted-effect, owner/adoption, weapon, and compatibility matrix in
+  `466.256` seconds. That run used package-visible uncommitted changes and is
+  behavioral evidence, not clean candidate evidence.
+- Current rebuilt archive:
+  `dist/more-infinite-research_3.0.5.zip`.
+- Current rebuilt archive SHA-256:
+  `41B7C2155490F16E620EB1982C81B303C205A933952710A730B41CFA7134D797`.
+- Current rebuilt archive size and shape: `319986` bytes, `132` zip entries,
+  `127` files, and `0` forbidden release paths.
+- Current archive/source content fingerprint:
+  `BCB34C39E75721E5E197725E270AC23AEB30F68515FC51AF4C242DFEBF1B1CF6`.
+
+#### URGENT P0 — Clean Candidate Evidence
+
+- [ ] From the clean checkpoint commit, rerun:
+  `./scripts/Invoke-MIRValidation.ps1 -FactorioBin "C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe"`.
+  Require `package_source_git_dirty = false`, all required groups passed, and
+  archive/source content equality.
+- [ ] Rebuild `dist/more-infinite-research_3.0.5.zip` only if the committed
+  package-visible source differs from the recorded content fingerprint. If it
+  changes, replace every hash, size, entry-count, and content-fingerprint record
+  before continuing.
+- [ ] Persist the clean structured summary as the next `.mir/evidence/3.0.5-*`
+  record and bind it to the exact source commit, Factorio binary version, target
+  profile, required-group fingerprint, validation-package hash, package-source
+  hash, and dist-content hash.
+- [ ] Update `.mir/convergence.yml` and the `mir_3_0_5` entry in
+  `.mir/branches.yml` from rebuilding/pending to the correct candidate state
+  only after `Test-MIRCandidateFreshness.ps1` passes from a clean tree.
+- [ ] Rerun the exact Planet Crucible 1.1.4 plus Rigor Module 1.1.7 fresh-save
+  gate against the final rebuilt `dist` bytes. The general runtime matrix does
+  not replace this named third-party gate.
+- [ ] Load the exact archive from the normal Factorio mods directory, test a
+  new configuration and an existing 3.0.0 save, and verify stored weapon-mode
+  and new startup-setting values survive configuration changes.
+- [ ] Do not tag, publish, upload, or begin backport release packaging until the
+  clean automated gate and manual checks are both recorded.
+
+#### URGENT P1 — Architecture Refactor Phase 2
+
+- [ ] Split the 799-line
+  `prototypes/mir/capabilities/science_integration/science_packs.lua` module into
+  focused pack-registry, lab-compatibility, researchability-graph, and
+  production-reachability modules. Preserve deterministic ordering and the
+  current caches; do not duplicate prototype scans in the new modules.
+- [ ] Give science reachability one canonical immutable technology/unlock fact
+  source. Reconcile `index/recipe_unlocks.lua`, prerequisite planning,
+  required-technology checks, and final technology-graph safety so they consume
+  the same facts and reason codes instead of parallel recursive interpretations.
+- [ ] Split the large `Invoke-MIRValidation.ps1` orchestration surface into
+  reusable scenario setup, copied-setting override, Factorio runner, assertion,
+  and release-evidence modules. Preserve the existing command line and result
+  schema.
+- [ ] Replace regex injection into copied `stage_builder.lua` during runtime
+  scenarios with a declarative test-setting override mechanism. Tests must not
+  depend on editing implementation source text to select generated setting
+  values.
+- [ ] Replace `native_effect_coverage.lua`'s `^recipe%-prod%-` name-prefix
+  heuristic with explicit MIR ownership/registry evidence. An external mod that
+  happens to use the same prefix must not be silently excluded from exact-owner
+  analysis.
+- [ ] Audit the documented prototype-mutation allowlist. Decide whether
+  `max_level.lua`, `weapon_speed.lua`, technology cleanup, and productivity
+  family adoption remain named policy-layer exceptions or move their mutations
+  behind focused pipeline/emit commands. Make `.mir/modules.yml`, architecture
+  docs, and lints agree with the actual decision.
+- [ ] Decide whether unrestricted module permissions need their own target
+  feature capability instead of borrowing `prototype_limits`. If the shared
+  gate remains, document why the support matrix is intentionally identical.
+- [ ] Keep `effect_contracts.lua` pure and immutable. Add an architecture check
+  that no catalog/profile dependency can reach `effective.lua`, directly or
+  transitively, rather than relying only on the present direct-import guards.
+
+#### URGENT P1 — Missing And Boundary Tests
+
+- [ ] Add recycling-scope fixtures for multiple self-return recipes,
+  self-return with byproducts, probabilistic returns, partial
+  `ignored_by_productivity`, fluid involvement, normal/expensive variants, and
+  a conversion path from recycled output back to production input.
+- [ ] Add a large synthetic recipe-graph performance case and record a bounded
+  scoped-cap runtime. This must catch any regression back to per-recipe graph
+  reconstruction.
+- [ ] Extend scripted-effect runtime tests beyond level zero. Research at least
+  two levels, verify the actual `1 + selected_delta` exponent, reverse a level,
+  reset technology effects, and verify bounded/reversible state restoration.
+- [ ] Add profile export/import assertions for all new effect-per-level IDs,
+  including scripted streams, compact-default omission, invalid numeric bounds,
+  and mixed target visibility.
+- [ ] Add a settings-stage package smoke as a named fast gate. It must load the
+  exact built archive far enough to construct all startup settings and must run
+  before the longer compatibility matrix.
+- [ ] Add a regression proving an external exact native owner with a
+  `recipe-prod-` prefix is classified by ownership evidence rather than name.
+- [ ] Add a reduced-target manifest assertion that every target with
+  `prototype_limits = false` omits both
+  `mir-productivity-cap-self-recycling-only` and
+  `mir-unrestricted-modules`. The missing Factorio 1.0 omissions found in phase
+  1 must not recur.
+
+#### URGENT P2 — Maintainability And Performance Follow-up
+
+- [ ] Measure and document data-stage time for base, Space Age, and at least one
+  large local modpack with scoped caps off and on. Keep performance claims tied
+  to recorded evidence rather than intuition.
+- [ ] Review `settings/catalog.lua` cache ownership and return values. Callers
+  must not be able to mutate cached canonical specs; clone or freeze returned
+  records if future consumers need writable tables.
+- [ ] Reconcile `stage_builder.lua` sorting metadata with canonical stream
+  metadata so player-facing sort names are not maintained in an independent
+  manual table indefinitely.
+- [ ] Review the remaining large modules (`emit/base_extensions.lua` and the
+  declarative `prototypes/streams/productivity.lua`) for extraction seams, but
+  do not split declarative data merely to reduce line count.
+- [ ] Run a second `3.0.0..HEAD` unused-module, dead-local, direct-global,
+  mutation-boundary, nondeterministic-iteration, and repeated-prototype-scan
+  audit after phase 2. Record accepted exceptions explicitly.
+- [ ] Only after phase 2 and the 3.0.5 candidate gate are complete, start the
+  2.3.5 semantic backport. Reuse the same public setting IDs and tests, adapt to
+  Factorio 2.0 schema/API differences, and do not blind-cherry-pick the modern
+  implementation.
 
 ## Post-3.0 Target-Line Backports
 

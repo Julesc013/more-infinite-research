@@ -1,7 +1,8 @@
 local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 
+-- Immutable recipe/recycling facts. Safety decisions live in policy so the
+-- final recipe graph is indexed once even on very large mod packs.
 local M = {}
-local EPSILON = 0.000001
 
 local function variants(recipe)
   if type(recipe.normal) == "table" or type(recipe.expensive) == "table" then
@@ -14,21 +15,11 @@ local function variants(recipe)
 end
 
 local function name_of(entry)
-  if type(entry) ~= "table" then return nil end
-  return entry.name or entry[1]
+  return type(entry) == "table" and (entry.name or entry[1]) or nil
 end
 
 local function type_of(entry)
-  if type(entry) ~= "table" then return nil end
-  return entry.type or "item"
-end
-
-local function amount_of(entry)
-  if type(entry) ~= "table" then return nil end
-  local amount = entry.amount
-  if amount == nil then amount = entry[2] end
-  if amount == nil then amount = entry.amount_max or entry.amount_min end
-  return tonumber(amount)
+  return type(entry) == "table" and (entry.type or "item") or nil
 end
 
 local function max_amount_of(entry)
@@ -52,11 +43,13 @@ end
 local function list_for(variant, field)
   local entries = variant[field]
   if type(entries) == "table" then return entries end
-  local singular = field == "results" and variant.result or variant["ingredient"]
-  if singular ~= nil then
-    return {{name = singular, type = field == "results" and "item" or "item", amount = field == "results" and (variant.result_count or 1) or (variant.ingredient_amount or 1)}}
-  end
-  return {}
+  local singular = field == "results" and variant.result or variant.ingredient
+  if singular == nil then return {} end
+  return {{
+    name = singular,
+    type = "item",
+    amount = field == "results" and (variant.result_count or 1) or (variant.ingredient_amount or 1)
+  }}
 end
 
 local function item_entries(variant, field)
@@ -68,41 +61,97 @@ local function item_entries(variant, field)
     if kind == "fluid" then return nil, "fluid-product" end
     if kind ~= "item" then return nil, "unsupported-product-shape" end
     local amount = max_amount_of(entry)
-    if not amount or amount <= 0 then return nil, "unsupported-product-shape" end
     local probability = probability_of(entry)
-    if not probability or probability < 0 or probability > 1 then return nil, "unsupported-product-shape" end
-    table.insert(out, {name = name, amount = amount, probability = probability, ignored_by_productivity = tonumber(entry.ignored_by_productivity or 0) or 0})
+    if not amount or amount <= 0 or not probability or probability < 0 or probability > 1 then
+      return nil, "unsupported-product-shape"
+    end
+    table.insert(out, {
+      name = name,
+      amount = amount,
+      probability = probability,
+      ignored_by_productivity = tonumber(entry.ignored_by_productivity or 0) or 0
+    })
   end
   return out
 end
 
-local function canonical_variant(recipe)
+local function parse_recipe(recipe)
+  if type(recipe) ~= "table" or recipe.parameter == true then
+    return {valid = false, reason = "unsupported-product-shape"}
+  end
   local all = variants(recipe)
-  if #all ~= 1 then return nil, "ambiguous-recycling-path" end
-  return all[1]
+  if #all ~= 1 then return {valid = false, reason = "ambiguous-recycling-path"} end
+  local ingredients, ingredient_reason = item_entries(all[1], "ingredients")
+  local results, result_reason = item_entries(all[1], "results")
+  if not ingredients or not results then
+    return {valid = false, reason = ingredient_reason or result_reason}
+  end
+  return {
+    valid = true,
+    ingredients = ingredients,
+    results = results
+  }
 end
 
-local function conversion_graph()
-  local graph = {}
-  for _, recipe in pairs(data_raw.prototypes("recipe")) do
-    local variant = canonical_variant(recipe)
-    if variant then
-      local ingredients = item_entries(variant, "ingredients") or {}
-      local results = item_entries(variant, "results") or {}
-      for _, ingredient in ipairs(ingredients) do
-        graph[ingredient.name] = graph[ingredient.name] or {}
-        for _, result in ipairs(results) do graph[ingredient.name][result.name] = true end
+local function returns_item(results, item_name)
+  for _, result in ipairs(results or {}) do
+    if result.name == item_name then return true end
+  end
+  return false
+end
+
+function M.build()
+  local facts = {
+    graph = {},
+    recipes = {},
+    self_return_paths = {}
+  }
+
+  for name, recipe in pairs(data_raw.prototypes("recipe")) do
+    local parsed = parse_recipe(recipe)
+    facts.recipes[name] = parsed
+    if parsed.valid then
+      for _, ingredient in ipairs(parsed.ingredients) do
+        facts.graph[ingredient.name] = facts.graph[ingredient.name] or {}
+        for _, result in ipairs(parsed.results) do
+          facts.graph[ingredient.name][result.name] = true
+        end
+      end
+
+      if #parsed.ingredients == 1 then
+        local input = parsed.ingredients[1]
+        if returns_item(parsed.results, input.name) then
+          facts.self_return_paths[input.name] = facts.self_return_paths[input.name] or {}
+          table.insert(facts.self_return_paths[input.name], {
+            name = name,
+            recipe = recipe,
+            input = input,
+            results = parsed.results,
+            exact_identity = #parsed.results == 1 and parsed.results[1].name == input.name
+          })
+        end
       end
     end
   end
-  return graph
+
+  for _, paths in pairs(facts.self_return_paths) do
+    table.sort(paths, function(a, b) return a.name < b.name end)
+  end
+  return facts
 end
 
-local function reaches(graph, start, target_set)
+function M.recipe_facts(index, recipe)
+  local name = type(recipe) == "table" and recipe.name or nil
+  return (name and index.recipes[name]) or parse_recipe(recipe)
+end
+
+function M.reaches(index, start, target_set)
   local pending, seen = {start}, {[start] = true}
-  while #pending > 0 do
-    local current = table.remove(pending, 1)
-    for next_name, _ in pairs(graph[current] or {}) do
+  local cursor = 1
+  while cursor <= #pending do
+    local current = pending[cursor]
+    cursor = cursor + 1
+    for next_name, _ in pairs(index.graph[current] or {}) do
       if next_name ~= start and target_set[next_name] then return true end
       if not seen[next_name] then
         seen[next_name] = true
@@ -111,63 +160,6 @@ local function reaches(graph, start, target_set)
     end
   end
   return false
-end
-
-local function self_return_recipe(product)
-  local found = nil
-  for name, recipe in pairs(data_raw.prototypes("recipe")) do
-    if recipe.parameter ~= true then
-      local variant = canonical_variant(recipe)
-      if variant then
-        local ingredients = item_entries(variant, "ingredients")
-        local results = item_entries(variant, "results")
-        if ingredients and results and #ingredients == 1 and #results == 1 and ingredients[1].name == product and results[1].name == product then
-          if found then return nil, "ambiguous-recycling-path" end
-          found = {name = name, recipe = recipe, input = ingredients[1], result = results[1]}
-        end
-      end
-    end
-  end
-  if not found then return nil, "no-self-return-recipe" end
-  return found
-end
-
-function M.classify(recipe)
-  if type(recipe) ~= "table" or recipe.parameter == true then return false, "unsupported-product-shape" end
-  local variant, variant_reason = canonical_variant(recipe)
-  if not variant then return false, variant_reason end
-  local ingredients, ingredient_reason = item_entries(variant, "ingredients")
-  local results, result_reason = item_entries(variant, "results")
-  if not ingredients or not results then return false, ingredient_reason or result_reason end
-  if #results ~= 1 then return false, "multiple-production-products" end
-  local product = results[1]
-  if product.probability < 1 then return false, "probabilistic-identity" end
-
-  local inputs = {}
-  for _, ingredient in ipairs(ingredients) do
-    inputs[ingredient.name] = true
-    if ingredient.name == product.name then return false, "candidate-consumes-own-product" end
-  end
-  local self_return, self_reason = self_return_recipe(product.name)
-  if not self_return then return false, self_reason end
-  local graph = conversion_graph()
-  if reaches(graph, product.name, inputs) then return false, "conversion-cycle-to-input" end
-
-  local recycling_cap = tonumber(self_return.recipe.maximum_productivity)
-  if recycling_cap == nil then recycling_cap = 3.0 end
-  if recycling_cap < 0 then return false, "unsupported-product-shape" end
-  local input_amount = self_return.input.amount
-  local result_amount = self_return.result.amount * self_return.result.probability
-  local bonus_amount = self_return.result.ignored_by_productivity >= result_amount and 0 or result_amount * recycling_cap
-  local gain = (result_amount + bonus_amount) / input_amount
-  if gain > 1 + EPSILON then return false, "recycling-loop-gain-above-one" end
-
-  return true, "safe-single-item-self-return", {
-    product = product.name,
-    recycling_recipe = self_return.name,
-    return_ratio = result_amount / input_amount,
-    maximum_loop_gain = gain
-  }
 end
 
 return M

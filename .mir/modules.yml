@@ -92,6 +92,7 @@ modules:
     - prototypes/mir/settings/order.lua
     - prototypes/mir/settings/pipeline_extent.lua
     - prototypes/mir/settings/prototype_limits.lua
+    - prototypes/mir/settings/effect_contracts.lua
     - prototypes/mir/settings/effect_scaling.lua
   streams:
     - prototypes/mir/streams/registry.lua
@@ -271,3 +272,4 @@ rules:
   - Target and convergence policy live in machine-readable .mir manifests.
   - Historical branches provide behavior evidence and do not define a parallel core.
   - Public extension framework work is outside the 3.0.5 convergence boundary.
+  - Top-level MIR Lua module dependencies must remain acyclic.
