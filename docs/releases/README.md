@@ -15,6 +15,10 @@ superseded_by: []
 Release docs are version-specific plans, migration guides, risk registers,
 checklists, and validation records.
 
+The 3.0.5 convergence plan, checklist, and validation summary are the active
+release authority. The 3.0.0 records are the published architecture baseline
+and historical evidence.
+
 - [3.0.0 plan](3.0.0-plan.md)
 - [3.0.0 regression baseline](3.0.0-regression-baseline.md)
 - [3.0.0 transition checkpoint 2](3.0.0-transition-checkpoint-2.md)

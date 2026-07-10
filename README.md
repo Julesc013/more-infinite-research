@@ -43,7 +43,7 @@ The mod is built around **graceful compatibility**: it discovers recipes, scienc
 - **Compiler diagnostics:** indexes typed prototype facts, compiler decisions, lab matrices, loop risks, rule surfaces, and cap estimates for audits.
 - **Factorio 2.1 recipes:** supports recipe `categories` as well as legacy single `category`.
 - **Optional DLC:** keeps official DLC mods optional and gates DLC-shaped research behind concrete prototype checks.
-- **Scripted Space Age scaling:** bounded event-driven spoilage preservation and agricultural growth speed are disabled-by-default experimental candidates; default enablement or measured behavior claims require the named manual save matrix.
+- **Scripted Space Age scaling:** bounded event-driven spoilage preservation remains opt-in, while agricultural growth speed is enabled as a special Space Age technology for newly planted tower crops; broader existing-save claims still require the named manual save matrix.
 - **Clean mod portal metadata:** keeps third-party compatibility-mod dependencies out of `info.json`.
 - **Save compatibility:** preserves existing generated prototype IDs across the MIR `3.0.0` architecture move. Scripted runtime storage is namespaced and must be validated before the scripted features are enabled by default or described with measured runtime behavior.
 
@@ -243,12 +243,12 @@ These streams generate `change-recipe-productivity` effects for matching recipes
 
 These streams generate infinite technologies with direct Factorio technology modifiers or visible scripted-effect placeholders. Scripted effects are handled in `control.lua` and remain event-driven.
 
-The scripted streams remain disabled by default in `v3.0.0`. Basic opt-in smoke tests can document their experimental behavior, but default enablement or stronger runtime claims require manual save validation for existing-stack behavior, reversal, disabling, multi-force behavior, and the agricultural tower event path. Graduation belongs in a later release after player testing.
+Spoilage preservation remains disabled by default. Agricultural growth speed is enabled by default after event-path coverage, but its bounded first slice applies only to newly planted agricultural tower crops. Stronger existing-save, reversal, disabling, and multi-force claims still require the named manual save matrix.
 
 | Stream key | Research | Effect | Default | Gates and notes |
 | --- | --- | --- | --- | --- |
 | `research_spoilage_preservation` | Spoilage preservation | Scripted global spoil time modifier through a `nothing` technology effect | `+1%` spoil time per completed level, capped by Factorio's global spoil-time range | Disabled by default until manual validation is recorded. Requires Space Age and spoilage; its research cost includes space, agricultural, and cryogenic science. Uses the highest completed level across non-enemy/non-neutral forces. No inventory or item-stack scan. |
-| `research_agricultural_growth_speed` | Agricultural growth speed | Scripted `on_tower_planted_seed` adjustment of plant `tick_grown` through a `nothing` technology effect | `+1%` growth speed per completed level, capped at `10x` | Disabled by default until manual validation is recorded. Requires Space Age and agricultural science; its research cost also includes electromagnetic and cryogenic science when available. Applies to newly planted agricultural tower plants in this first slice; existing farms are not globally rescanned. |
+| `research_agricultural_growth_speed` | Agricultural growth speed | Scripted `on_tower_planted_seed` adjustment of plant `tick_grown` through a `nothing` technology effect | `+1%` growth speed per completed level, capped at `10x` | Enabled by default as a special Space Age technology. Requires Space Age and agricultural science; its research cost also includes electromagnetic and cryogenic science when available. Applies to newly planted agricultural tower plants in this first slice; existing farms are not globally rescanned. |
 | `research_lab_productivity` | Research productivity | `laboratory-productivity` | `+10%` lab research productivity per level | Base-game equivalent of Space Age's native `research-productivity` chain. Generates only when no effect-proven infinite `research-productivity` or `laboratory-productivity-4` lab-productivity owner is present, so existing native lab-productivity owners keep their chain. Uses Military science pack technology art as the base-game icon. |
 | `research_cargo_bay_unloading_distance` | Cargo bay unloading distance | `max-cargo-bay-unloading-distance` | `+10` tiles per level | Requires Space Age plus the `landing-pad-unloading-bay` item and technology. Uses the unloading bay unlock technology art. Uses all official base and Space Age science packs, not modded science packs. Base cost `100000`, growth `3`, time `120`. |
 | `research_cargo_landing_pad_count` | Cargo landing pad count | `cargo-landing-pad-count` | `+1` landing pad per surface per level | Requires Space Age plus the `cargo-landing-pad` item and `rocket-silo` technology. Disabled by default. Uses Space platform technology art. Uses all official base and Space Age science packs, not modded science packs. Base cost `1000000`, growth `10`, time `240`. |
@@ -287,7 +287,7 @@ Recommended default:
 
 - Leave technology enable checkboxes as shipped.
 - Stable generated research lines are enabled.
-- Experimental/scripted candidates stay disabled by default in `v3.0.0`.
+- Spoilage preservation stays disabled by default; agricultural growth speed is enabled for newly planted tower crops.
 - Diagnostics stay disabled unless you are troubleshooting a report.
 
 Conservative setup:
@@ -295,7 +295,7 @@ Conservative setup:
 - Generated productivity streams stay enabled where their recipes and labs are valid.
 - Disable MIR vanilla-chain continuations you do not want to extend.
 - Keep Cargo landing pad count disabled unless you want sandbox-style Space Age logistics.
-- Keep Spoilage preservation and Agricultural growth speed disabled unless testing them.
+- Keep Spoilage preservation disabled; disable Agricultural growth speed if you do not want its newly planted crop adjustment.
 - Use science pack policy `configured`.
 
 Megabase setup:
@@ -699,10 +699,10 @@ The validation script checks:
 - **`docs/reference/factorio-api-proof-points.md`:** API claims, proof status, and open in-game verification questions.
 - **`docs/compatibility/README.md`:** compatibility model, known integrations, manual test matrix, fixture designs, and release checklist.
 - **`docs/maintainer/developer-tools.md`:** preferred developer commands, run profiles, script roles, and PowerShell tooling checks.
-- **`docs/releases/3.0.0-plan.md`:** high-level release narrative, scope rationale, why decisions, and pointers back to `todo.md`, `changelog.txt`, and supporting notes.
-- **`docs/releases/3.0.0-release-checklist.md`:** final release gate checklist, package-boundary policy, and current artifact pointers.
-- **`docs/releases/3.0.0-release-notes.md`:** public 3.0.0 release notes and known non-blockers.
-- **`docs/releases/3.0.0-validation-summary.md`:** concise local validation summary, package hash, and row/hash comparison.
+- **`docs/releases/3.0.5-convergence-plan.md`:** active compatibility-hardening scope, architecture boundaries, and release gates.
+- **`docs/releases/3.0.5-release-checklist.md`:** active automated, candidate, manual, and publication gates.
+- **`docs/releases/3.0.5-release-notes.md`:** current player-facing compatibility changes.
+- **`docs/releases/3.0.5-validation-summary.md`:** current candidate identity and validation evidence; the 3.0.0 records remain historical baseline evidence.
 - **`docs/releases/2.2.0-validation-record.md`:** local release validation evidence.
 - **`docs/maintainer/manual-test-plan.md`:** named manual saves/scenarios for release validation.
 - **`docs/releases/mod-portal-page.md`:** mod-portal-ready public description, technology catalog, settings summary, compatibility notes, and troubleshooting text.

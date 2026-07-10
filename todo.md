@@ -31,8 +31,11 @@ Current assumptions:
 - Do not reopen the 2.x or 1.9.x task ledgers unless a regression, security
   issue, package correction, or explicit maintainer decision requires it.
 
-Use `docs/releases/3.0.0-plan.md` for release scope, product boundaries,
-rationale, and high-level explanations. Use
+Use `.mir/convergence.yml` and `docs/releases/3.0.5-convergence-plan.md` for
+active release scope, product boundaries, rationale, and high-level
+explanations. Use `docs/releases/3.0.5-release-checklist.md` and
+`docs/releases/3.0.5-validation-summary.md` for the active gate and evidence.
+Treat `docs/releases/3.0.0-plan.md` as historical baseline context. Use
 `docs/archive/2.x/completed-task-ledger.md` for the historical completed task
 ledger. Use `docs/archive/2.x/post-2.0-feature-plan.md` for the deeper idea
 archive, `docs/archive/2.x/legacy-backport-cadence.md` for historical older-line
@@ -55,8 +58,8 @@ past-change ledger for shipped player-facing changes.
   technology effects.
 - Keep past shipped changes in `changelog.txt`; release notes and mod-portal
   copy are derivative summaries.
-- Keep `docs/releases/3.0.0-plan.md` synchronized with this file and
-  `changelog.txt`, but at a higher level with rationale and scope boundaries.
+- Keep the 3.0.5 convergence plan, checklist, and validation summary
+  synchronized with this file and `changelog.txt` while 3.0.5 is active.
 - Treat the compatibility planner as the contract between prototype discovery,
   owner classification, validation, mutation, and diagnostics.
 

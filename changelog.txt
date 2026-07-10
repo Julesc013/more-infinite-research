@@ -7,9 +7,12 @@ Date: 2026-07-11
     - Kept the modern Factorio 2.1 compiler, dependencies, generated technology IDs, and feature surface unchanged.
     - Fixed generated research that could inherit an unavailable tutorial technology from an already-enabled science recipe.
     - Kept disabled or cyclic technology prerequisites out of generated research while preserving legitimate progression gates.
+    - Rejected self-locked, cyclic, or non-researchable science recipe unlocks.
+    - Skipped generated streams whose required technologies are disabled or unreachable instead of emitting a fatal graph edge.
     - Made science recipe unlock selection deterministic when multiple reachable technologies provide the same recipe.
     - Made rocket and cannon overlap cleanup conditional on exact reachable infinite replacement coverage for new configurations.
     - Preserved finite vanilla weapon speed bonuses and existing stored overlap-mode choices.
+    - Limited weapon overlap cleanup to MIR-generated continuations and required external owners to use obtainable science.
     - Kept incineration sink recipes out of breeding productivity research so later recipe removal cannot leave invalid effects.
 
   Changes:
@@ -19,7 +22,9 @@ Date: 2026-07-11
     - Added final generated-technology checks for enabled prerequisites, cycles, science production, labs, and reachability.
     - Separated reduced target setting visibility from modern settings profile encoding behavior.
     - Added durable grouped developer-run summaries with passed, failed, skipped, and incomplete outcomes.
+    - Bound release evidence to exact source, target-profile, required-group, package-content, and runtime-summary fingerprints.
     - Allowed exact external rocket or cannon speed owners when the existing competition preference keeps external research.
+    - Added classifier-boundary, late recipe-removal, and exact Planet Crucible plus Rigor Module regression gates.
 
 ---------------------------------------------------------------------------------------------------
 Version: 1.7.0
@@ -404,7 +409,7 @@ Date: 2026-07-01
 
     - Expanded Electric Shooting Speed to cover base electric weapons and Space Age Tesla weapons.
     - Mining Drill Productivity now covers Omega Drill-style and broader modded mining-drill recipes.
-    - Added optional Spoilage Preservation and Agricultural Growth Speed research, disabled by default.
+    - Kept Spoilage Preservation disabled and enabled Agricultural Growth Speed for newly planted tower crops.
     - Agricultural Growth Speed affects newly planted tower crops and does not rescan existing crops.
     - Combined Character Logistic Trash Slot bonuses into Character Inventory Slot research.
     - Renamed Heavy Ammunition Productivity to Cannon Shell Productivity and broadened shell/ammo coverage.
