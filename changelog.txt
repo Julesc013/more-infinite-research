@@ -1,4 +1,22 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.3.5
+Date: 2026-07-11
+
+  Compatibility:
+
+    - Ported the MIR 3.0.5 compatibility hardening source to Factorio 2.0.
+    - Kept Factorio 2.0 metadata, dependencies, runtime storage, settings profiles, and supported Space Age surfaces.
+    - Kept Factorio 2.1-only cargo bay range and landing pad count modifiers out of this target.
+    - Fixed science unlock inference, disabled prerequisites, science self-locks, and unreachable required technologies.
+    - Kept incineration sinks out of breeding productivity across the dependent late-removal lifecycle.
+    - Limited weapon overlap cleanup to MIR-generated continuations with exact researchable replacement coverage.
+
+  Changes:
+
+    - Reused canonical target profiles, grouped run summaries, and exact stale-package checks.
+    - Added Factorio 2.0 safeguards for generated prerequisites, recipe targets, and weapon overlap ownership.
+
+---------------------------------------------------------------------------------------------------
 Version: 3.0.5
 Date: 2026-07-11
 

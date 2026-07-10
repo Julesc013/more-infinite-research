@@ -1,12 +1,12 @@
 schema: 1
 
 release:
-  version: "3.0.5"
-  branch: dev
-  factorio_version: "2.1"
-  baseline_commit: b9b1abc859d5d57baa941010e4cd7dd660c1caac
-  baseline_tag: pre-3.0.5-synthesis
-  objective: behavioral-superset-implementation-subset
+  version: "2.3.5"
+  branch: tmp/2.0
+  factorio_version: "2.0"
+  baseline_commit: 302cccdff22490cfd84ca8fee3eda1e759b7cee5
+  baseline_tag: mir-3.0.5-rc2-source
+  objective: target-port-behavioral-subset
   public_contract_change: patch-compatible
 
 superseded_candidates:
@@ -28,25 +28,11 @@ superseded_candidates:
     status: superseded-unpublished-candidate
 
 candidate:
-  artifact: dist/more-infinite-research_3.0.5.zip
-  source_commit: 302cccdff22490cfd84ca8fee3eda1e759b7cee5
-  sha256: 57AF0E55EB92035452B154AEFF3A6F15EE149A671E3E27EEDF460CD7ABFE1BC9
-  size_bytes: 309930
-  entries: 127
-  files: 122
-  forbidden_entries: 0
-  package_content_sha256: 8AABB2F1B18BA5D2E45A235E1E39A6BECC195304ADBD34047BE4AE2A000D16A4
-  package_source_sha256: 8AABB2F1B18BA5D2E45A235E1E39A6BECC195304ADBD34047BE4AE2A000D16A4
-  target_profile_sha256: 8FAFF43EAA1BC93A8819E2E0EAAC168A97A26AB394FE5238EED299B448E30B24
-  required_groups_sha256: 57A1DF87A8FB594B2B51C7E230D775E88028F23D52DF9D5D7DA1336F9271C78A
-  validation_package_sha256: 4E8CBAA4E9C431AD053F1F56296966702F39F57DEC2A5BB52E5966D3E3C7B8C4
-  validation_package_content_sha256: 8AABB2F1B18BA5D2E45A235E1E39A6BECC195304ADBD34047BE4AE2A000D16A4
-  structured_summary_path: .mir/evidence/3.0.5-rc2-validation-summary.json
-  structured_summary_run_id: b136b69e-0e47-497c-9266-6278126ef094
-  content_matches_runtime_archive: true
-  automated_gate: passed
+  artifact: dist/more-infinite-research_2.3.5.zip
+  source_commit: pending
+  automated_gate: pending
   manual_gate: pending
-  status: release-candidate-awaiting-manual-review
+  status: rebuilding-after-package-visible-change
 
 rules:
   - dev-remains-the-canonical-modern-implementation
