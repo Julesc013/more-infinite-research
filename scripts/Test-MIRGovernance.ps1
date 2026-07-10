@@ -269,10 +269,36 @@ foreach ($match in [regex]::Matches($fixturesText, "(?m)^\s+(path|assertion_path
 }
 
 $convergenceText = Read-MIRText -RelativePath ".mir/convergence.yml"
+$repoInfo = Get-Content -Raw -LiteralPath (Join-Path $repo "info.json") | ConvertFrom-Json
+$releaseMatch = [regex]::Match(
+  $convergenceText,
+  '(?ms)^release:\r?\n(?<body>(?:^  [^\r\n]*\r?\n?)*)'
+)
+if (-not $releaseMatch.Success) {
+  throw ".mir/convergence.yml must define a top-level release block."
+}
+$releaseFields = @{}
+foreach ($line in $releaseMatch.Groups["body"].Value -split "\r?\n") {
+  if ($line -match '^  ([a-z0-9_]+):\s*(.*?)\s*$') {
+    $releaseFields[$matches[1]] = $matches[2].Trim().Trim('"')
+  }
+}
+foreach ($requiredField in @("version", "branch", "factorio_version", "baseline_commit", "objective", "public_contract_change")) {
+  if (-not $releaseFields.ContainsKey($requiredField) -or [string]::IsNullOrWhiteSpace([string]$releaseFields[$requiredField])) {
+    throw ".mir/convergence.yml release is missing required field $requiredField."
+  }
+}
+if ([string]$releaseFields.version -ne [string]$repoInfo.version) {
+  throw ".mir/convergence.yml release version does not match info.json."
+}
+if ([string]$releaseFields.factorio_version -ne [string]$repoInfo.factorio_version) {
+  throw ".mir/convergence.yml Factorio version does not match info.json."
+}
+if ([string]$releaseFields.objective -notin @("behavioral-superset-implementation-subset", "target-port-behavioral-subset")) {
+  throw ".mir/convergence.yml has unsupported release objective: $($releaseFields.objective)"
+}
+
 foreach ($needle in @(
-  'version: "3.0.5"',
-  'objective: behavioral-superset-implementation-subset',
-  'baseline_tag: pre-3.0.5-synthesis',
   'BP-002:',
   'BP-013:',
   'BP-017:',
