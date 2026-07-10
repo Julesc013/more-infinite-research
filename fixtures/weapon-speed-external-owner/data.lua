@@ -20,8 +20,9 @@ owner.level = 1
 owner.upgrade = true
 owner.hidden = true
 
+local science_pack_type = data.raw.tool and data.raw.tool["automation-science-pack"] and "tool" or "item"
 local unreachable_pack = {
-  type = "item",
+  type = science_pack_type,
   name = "mir-fixture-unreachable-weapon-science-pack",
   icon = "__base__/graphics/icons/automation-science-pack.png",
   icon_size = 64,
@@ -29,6 +30,12 @@ local unreachable_pack = {
   order = "z[mir-fixture-unreachable-weapon-science-pack]",
   stack_size = 200
 }
+if science_pack_type == "tool" then
+  unreachable_pack.durability = 1
+  unreachable_pack.durability_description_key = "description.science-pack-remaining-amount-key"
+  unreachable_pack.factoriopedia_durability_description_key = "description.factoriopedia-science-pack-remaining-amount-key"
+  unreachable_pack.durability_description_value = "description.science-pack-remaining-amount-value"
+end
 
 local unreachable_recipe = {
   type = "recipe",
