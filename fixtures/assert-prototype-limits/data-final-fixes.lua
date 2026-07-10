@@ -130,7 +130,7 @@ local effect_receiver_prototypes = {
 
 for _, id in ipairs(effect_receiver_prototypes) do
   local prototype = data.raw[id.type] and data.raw[id.type][id.name]
-  if prototype then
+  if prototype and (expected_efficiency or expected_pollution or expected_speed or expected_quality) then
     local receiver = prototype.effect_receiver
     if not receiver then
       fail(id.type .. "." .. id.name .. " has no effect_receiver.")
