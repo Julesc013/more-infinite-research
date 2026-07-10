@@ -247,7 +247,11 @@ If a recipe did not receive productivity:
 
 ## Save Compatibility
 
-Version `3.0.0` preserves generated technology IDs through the MIR architecture move and does not need a new migration.
+Version `3.0.5` preserves the MIR 3 generated technology IDs and persisted-state schemas and does not need a new migration.
+
+Existing stored weapon overlap choices remain authoritative. The safer
+conditional coverage mode is the default only for configurations without a
+stored value.
 
 Agricultural growth speed is enabled by default in `3.0.0`; spoilage preservation remains disabled by default.
 

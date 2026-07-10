@@ -738,7 +738,7 @@ If a generated technology is unresearchable:
 
 ## Save Compatibility
 
-No generated prototype IDs were renamed for **`v3.0.0`**. The MIR namespace move preserves existing generated IDs and does not require a new migration.
+No generated prototype IDs were renamed for **`v3.0.5`**. The convergence work preserves existing generated IDs and persisted-state schemas and does not require a new migration.
 
 No generated prototype IDs were renamed for **`v2.0.0`**.
 **No migration is required** from `v1.2.9`.

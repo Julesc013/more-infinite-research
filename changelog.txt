@@ -1,4 +1,26 @@
 ---------------------------------------------------------------------------------------------------
+Version: 3.0.5
+Date: 2026-07-10
+
+  Compatibility:
+
+    - Kept the modern Factorio 2.1 compiler, dependencies, generated technology IDs, and feature surface unchanged.
+    - Fixed generated research that could inherit an unavailable tutorial technology from an already-enabled science recipe.
+    - Kept disabled or cyclic technology prerequisites out of generated research while preserving legitimate progression gates.
+    - Made science recipe unlock selection deterministic when multiple reachable technologies provide the same recipe.
+    - Made rocket and cannon overlap cleanup conditional on exact reachable infinite replacement coverage for new configurations.
+    - Preserved finite vanilla weapon speed bonuses and existing stored overlap-mode choices.
+
+  Changes:
+
+    - Centralized target capabilities so the mod and developer tools consume the same Factorio-line profile.
+    - Made the runtime persistence backend an explicit target choice: storage on Factorio 2.x and global on older lines.
+    - Added final generated-technology checks for enabled prerequisites, cycles, science production, labs, and reachability.
+    - Separated reduced target setting visibility from modern settings profile encoding behavior.
+    - Added durable grouped developer-run summaries with passed, failed, skipped, and incomplete outcomes.
+    - Allowed exact external rocket or cannon speed owners when the existing competition preference keeps external research.
+
+---------------------------------------------------------------------------------------------------
 Version: 1.7.0
 Date: 2026-07-10
 

@@ -27,5 +27,7 @@ checklists, and validation records.
 - [3.0.0 risk register](3.0.0-risk-register.md)
 - [3.0.5 convergence plan](3.0.5-convergence-plan.md)
 - [3.0.5 convergence review](3.0.5-convergence-review.md)
+- [3.0.5 release checklist](3.0.5-release-checklist.md)
+- [3.0.5 release notes](3.0.5-release-notes.md)
 - [3.1.0 roadmap](3.1.0-roadmap.md)
 - [2.2.0 validation record](2.2.0-validation-record.md)
