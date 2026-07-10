@@ -61,6 +61,8 @@ fixtures:
     validates:
       - prototype-limit-startup-overrides
       - recipe-maximum-productivity-cap
+      - above-300-cap-self-recycling-scope
+      - unrestricted-module-permissions
       - effect-receiver-limits
       - separate-energy-and-pollution-limits
       - positive-power-floor-opt-in

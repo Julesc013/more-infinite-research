@@ -157,7 +157,7 @@ release_artifacts:
       target_factorio: "2.0"
       source_anchor: mir_3_0_5
       artifact: dist/more-infinite-research_2.3.5.zip
-      candidate_commit: 29e3039de392ba3a9bb6a5f156425d6e52487005
+      candidate_commit: pending
       sha256: 5C6289474D2D510ACB28115E2AC023E4FA2CEDD7E9D1A211E0503138F7204AD4
       size_bytes: 309823
       entries: 127
@@ -182,7 +182,7 @@ release_artifacts:
       factorio_2_0_crucible_rigor_exact_dist: passed
       automated_gate: passed
       manual_gate: pending
-      status: release-candidate-awaiting-manual-review
+      status: rebuilding-after-package-visible-change
     mir_1_9_3:
       version: "1.9.3"
       branch: tmp/1.1

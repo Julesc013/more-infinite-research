@@ -58,6 +58,9 @@ local expected_pollution = expected_value("mir-prototype-pollution-cap")
 local expected_speed = expected_value("mir-prototype-speed-cap")
 local expected_quality = expected_value("mir-prototype-quality-cap")
 
+local scoped_cap = startup_setting("mir-productivity-cap-self-recycling-only") == true
+local unrestricted_modules = startup_setting("mir-unrestricted-modules") == true
+
 if not expected_productivity and not expected_efficiency and not expected_pollution and not expected_speed and not expected_quality and startup_setting("mir-prototype-positive-power-floor") ~= true then
   return
 end
@@ -74,7 +77,35 @@ end
 if expected_productivity then
   local recipe = data.raw.recipe and data.raw.recipe["iron-gear-wheel"]
   if not recipe then fail("missing iron-gear-wheel recipe.") end
-  assert_close("iron-gear-wheel maximum_productivity", recipe.maximum_productivity, expected_productivity)
+  if not (scoped_cap and expected_productivity > 3) then
+    assert_close("iron-gear-wheel maximum_productivity", recipe.maximum_productivity, expected_productivity)
+  end
+  if scoped_cap and expected_productivity > 3 then
+    local safe = data.raw.recipe["mir-fixture-self-recycling-production"]
+    local unsafe = data.raw.recipe["mir-fixture-non-recycling-production"]
+    local loop = data.raw.recipe["mir-fixture-self-recycling-loop"]
+    if safe then assert_close("self-recycling production maximum_productivity", safe.maximum_productivity, expected_productivity) end
+    if unsafe and unsafe.maximum_productivity ~= nil then fail("non-recycling production recipe was raised by scoped cap.") end
+    if loop and loop.maximum_productivity ~= nil then fail("self-recycling loop recipe was raised by scoped cap.") end
+  end
+end
+
+if unrestricted_modules then
+  local recipe = data.raw.recipe["iron-gear-wheel"]
+  if recipe then
+    if recipe.allow_speed ~= true or recipe.allow_productivity ~= true or recipe.allow_consumption ~= true
+      or recipe.allow_pollution ~= true or recipe.allow_quality ~= true then
+      fail("unrestricted module permissions did not open all recipe effect flags.")
+    end
+    if not recipe.allowed_module_categories or #recipe.allowed_module_categories == 0 then
+      fail("unrestricted module permissions did not discover module categories.")
+    end
+  end
+  local machine = data.raw["assembling-machine"] and data.raw["assembling-machine"]["assembling-machine-1"]
+  if machine and (tonumber(machine.module_slots) or 0) > 0 then
+    if not machine.allowed_effects or #machine.allowed_effects ~= 5 then fail("assembling machine effect permissions were not opened.") end
+    if not machine.allowed_module_categories or #machine.allowed_module_categories == 0 then fail("assembling machine module categories were not opened.") end
+  end
 end
 
 local effect_receiver_prototypes = {

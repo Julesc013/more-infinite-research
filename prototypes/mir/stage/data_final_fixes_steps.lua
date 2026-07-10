@@ -11,6 +11,11 @@ function M.apply_prototype_limits()
   require("prototypes.mir.pipeline.prototype_limits").apply()
 end
 
+function M.apply_module_permissions()
+  if not target_line.feature_enabled("prototype_limits") then return end
+  require("prototypes.mir.pipeline.module_permissions").apply()
+end
+
 function M.apply_pipeline_extent()
   if not target_line.feature_enabled("pipeline_extent") then return end
   local pipeline_extent_multiplier = require("prototypes.mir.settings.pipeline_extent").multiplier()

@@ -350,6 +350,13 @@ docs:
     doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
+  - path: docs/archive/2.x/release-notes-2.3.5.md
+    title: "More Infinite Research 2.3.5 Release Notes"
+    status: archived
+    audience: player
+    doc_type: explanation
+    owner: mir-maintainers
+    source_of_truth_for: []
   - path: docs/archive/2.x/release-notes-legacy.md
     title: "More Infinite Research 1.9.0 Release Notes"
     status: archived

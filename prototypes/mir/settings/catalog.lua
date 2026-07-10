@@ -2,6 +2,7 @@ local C = require("prototypes.mir.streams.registry")
 local defaults = require("prototypes.mir.settings.defaults")
 local pipeline_extent_settings = require("prototypes.mir.settings.pipeline_extent")
 local prototype_limit_settings = require("prototypes.mir.settings.prototype_limits")
+local effect_scaling = require("prototypes.mir.settings.effect_scaling")
 local setting_order = require("prototypes.mir.settings.order")
 local target_line = require("prototypes.mir.platform.factorio.target_line")
 
@@ -183,6 +184,26 @@ function M.global_setting_prototypes()
 
   table.insert(out, {
     type = "bool-setting",
+    name = prototype_limit_settings.self_recycling_scope_setting_name,
+    setting_type = "startup",
+    default_value = false,
+    order = setting_order.global("prototype_limits", 15),
+    localised_name = {"mod-setting-name." .. prototype_limit_settings.self_recycling_scope_setting_name},
+    localised_description = {"mod-setting-description." .. prototype_limit_settings.self_recycling_scope_setting_name}
+  })
+
+  table.insert(out, {
+    type = "bool-setting",
+    name = prototype_limit_settings.unrestricted_modules_setting_name,
+    setting_type = "startup",
+    default_value = false,
+    order = setting_order.global("compatibility", 35),
+    localised_name = {"mod-setting-name." .. prototype_limit_settings.unrestricted_modules_setting_name},
+    localised_description = {"mod-setting-description." .. prototype_limit_settings.unrestricted_modules_setting_name}
+  })
+
+  table.insert(out, {
+    type = "bool-setting",
     name = prototype_limit_settings.positive_power_floor_setting_name,
     setting_type = "startup",
     default_value = false,
@@ -240,7 +261,7 @@ function M.global_setting_prototypes()
 end
 
 function M.stream_setting_specs(key, stream)
-  return {
+  local out = {
     {
       type = "bool-setting",
       name = "ips-enable-" .. key,
@@ -274,6 +295,9 @@ function M.stream_setting_specs(key, stream)
       maximum_value = 2147483647
     }
   }
+  local effect_setting = effect_scaling.stream_setting_spec(key, stream)
+  if effect_setting then table.insert(out, effect_setting) end
+  return out
 end
 
 function M.base_extension_setting_specs(key)
@@ -281,7 +305,7 @@ function M.base_extension_setting_specs(key)
   local base_default = math.floor(base_number(defaults_spec, "base_cost", 0, 0) + 0.5)
   local growth_default = base_number(defaults_spec, "growth_factor", 0, 0)
   local research_time_default = math.floor(base_number(defaults_spec, "research_time", 60, 1) + 0.5)
-  return {
+  local out = {
     {
       type = "bool-setting",
       name = "mir-enable-" .. key,
@@ -315,6 +339,9 @@ function M.base_extension_setting_specs(key)
       maximum_value = 2147483647
     }
   }
+  local effect_setting = effect_scaling.base_setting_spec(key)
+  if effect_setting then table.insert(out, effect_setting) end
+  return out
 end
 
 function M.all_specs()

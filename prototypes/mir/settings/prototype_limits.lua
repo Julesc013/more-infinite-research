@@ -3,6 +3,8 @@ local setting_order = require("prototypes.mir.settings.order")
 
 S.engine_default = "engine-default"
 S.positive_power_floor_setting_name = "mir-prototype-positive-power-floor"
+S.self_recycling_scope_setting_name = "mir-productivity-cap-self-recycling-only"
+S.unrestricted_modules_setting_name = "mir-unrestricted-modules"
 
 S.order = {
   "productivity",

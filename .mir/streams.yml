@@ -6,6 +6,7 @@ generated_id_doc: docs/reference/generated-id-reference.md
 
 rules:
   - every generated technology has a stable manifest row
+  - per-technology effect settings preserve canonical tier ratios
   - released stream IDs are not renamed without migration review
   - removed stream targets require migration review
   - release notes mention generated stream changes

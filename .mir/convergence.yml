@@ -29,7 +29,7 @@ superseded_candidates:
 
 candidate:
   artifact: dist/more-infinite-research_2.3.5.zip
-  source_commit: 29e3039de392ba3a9bb6a5f156425d6e52487005
+  source_commit: pending
   sha256: 5C6289474D2D510ACB28115E2AC023E4FA2CEDD7E9D1A211E0503138F7204AD4
   size_bytes: 309823
   entries: 127
@@ -52,9 +52,9 @@ candidate:
   exact_dist_base_smoke: passed
   exact_dist_space_age_smoke: passed
   factorio_2_0_crucible_rigor_exact_dist: passed
-  automated_gate: passed
+  automated_gate: pending
   manual_gate: pending
-  status: release-candidate-awaiting-manual-review
+  status: rebuilding-after-package-visible-change
 
 rules:
   - dev-remains-the-canonical-modern-implementation

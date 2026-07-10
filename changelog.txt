@@ -15,6 +15,8 @@ Date: 2026-07-11
 
     - Reused canonical target profiles, grouped run summaries, and exact stale-package checks.
     - Added Factorio 2.0 safeguards for generated prerequisites, recipe targets, and weapon overlap ownership.
+    - Added the default-off above-300% self-recycling cap scope and unrestricted module-permission settings.
+    - Added per-generated-technology effect-per-level controls that preserve mixed-tier ratios for MIR-emitted effects.
 
 ---------------------------------------------------------------------------------------------------
 Version: 3.0.5

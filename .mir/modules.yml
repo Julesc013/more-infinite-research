@@ -92,6 +92,7 @@ modules:
     - prototypes/mir/settings/order.lua
     - prototypes/mir/settings/pipeline_extent.lua
     - prototypes/mir/settings/prototype_limits.lua
+    - prototypes/mir/settings/effect_scaling.lua
   streams:
     - prototypes/mir/streams/registry.lua
     - prototypes/streams/productivity.lua
@@ -99,6 +100,7 @@ modules:
   pipeline:
     - prototypes/mir/pipeline/extent.lua
     - prototypes/mir/pipeline/prototype_limits.lua
+    - prototypes/mir/pipeline/module_permissions.lua
   index:
     - prototypes/mir/index/registry_builder.lua
     - prototypes/mir/index/recipe_unlocks.lua
@@ -108,6 +110,7 @@ modules:
     - prototypes/mir/index/labs.lua
     - prototypes/mir/index/owners.lua
     - prototypes/mir/index/rule_surfaces.lua
+    - prototypes/mir/index/recycling.lua
   domain:
     - prototypes/mir/domain/facts/registry.lua
     - prototypes/mir/domain/decisions/decision_record.lua
@@ -123,6 +126,7 @@ modules:
     - prototypes/mir/policy/weapon_speed.lua
     - prototypes/mir/policy/native_effect_coverage.lua
     - prototypes/mir/policy/capabilities.lua
+    - prototypes/mir/policy/productivity_cap_scope.lua
   capabilities:
     - prototypes/mir/capabilities/contract.lua
     - prototypes/mir/capabilities/registry.lua
@@ -217,6 +221,7 @@ target_layers:
     may_require:
       - domain
       - platform
+      - index
     may_mutate_data_raw: false
   capabilities:
     path: prototypes/mir/capabilities

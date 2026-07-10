@@ -33,6 +33,7 @@ ips-cost-base-<stream>
 ips-cost-growth-<stream>
 ips-max-level-<stream>
 ips-research-time-<stream>
+ips-effect-per-level-<stream>
 ```
 
 MIR uses `hidden = true` only for provider-specific or unsupported stream
@@ -121,6 +122,23 @@ default in its numeric position.
 | `mir-prototype-pollution-cap` | `effect_receiver.pollution_limits.low` on supported machines, labs, drills, and agricultural towers |
 | `mir-prototype-speed-cap` | `effect_receiver.speed_limits.high` on supported machines, labs, drills, and agricultural towers |
 | `mir-prototype-quality-cap` | `effect_receiver.quality_limits.high` on supported machines, labs, drills, and agricultural towers |
+
+`mir-productivity-cap-self-recycling-only` is a default-off scope guard for
+selected productivity caps above +300%. It raises only recipes classified as a
+single-item, expected-value non-generative self-recycling path; nonqualifying
+recipes retain their existing cap and the recycling recipe is never raised.
+
+`mir-unrestricted-modules` is a default-off compatibility setting. It sets all
+five recipe module permission flags, discovers final module categories, and
+opens those categories and effect types on every existing receiver with module
+slots, including beacons. It does not create slots or mutate module prototypes.
+
+Every non-scripted generated stream and base continuation also has an
+`ips-effect-per-level-<stream>` or `mir-effect-per-level-<extension>` setting.
+The selected value is an anchor, and MIR scales only the numeric effects it
+emits from the canonical anchor. Ownership, adoption, and equivalence decisions
+use unscaled canonical effects; external technologies and adopted owner values
+are not rewritten.
 
 Efficiency modules can reduce both energy use and pollution, but MIR exposes
 those floors separately because modpacks may want different behavior for active
