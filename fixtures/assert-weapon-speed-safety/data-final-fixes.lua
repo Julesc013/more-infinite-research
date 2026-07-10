@@ -4,6 +4,7 @@ end
 
 local generated_registry = require("__more-infinite-research__.prototypes.mir.emit.generated_technology_registry")
 local native_effect_coverage = require("__more-infinite-research__.prototypes.mir.policy.native_effect_coverage")
+local weapon_speed_policy = require("__more-infinite-research__.prototypes.mir.policy.weapon_speed")
 
 local function has_gun_speed(tech, ammo_category)
   for _, effect in ipairs((tech and tech.effects) or {}) do
@@ -138,9 +139,17 @@ if external_owner then
     fail("science-unreachable external owner was accepted as replacement coverage")
   end
 
-  local external_continuation = techs["weapon-shooting-speed-99"]
-  if not has_gun_speed(external_continuation, "rocket")
-    or not has_gun_speed(external_continuation, "cannon-shell")
+  local external_continuation = table.deepcopy(external_owner)
+  external_continuation.name = "weapon-shooting-speed-99"
+  external_continuation.localised_name = "MIR fixture external weapon speed continuation"
+  data:extend({external_continuation})
+
+  -- Re-run the cleanup after the external continuation exists. Old broad name
+  -- scanning would mutate it; registry-scoped cleanup must leave it untouched.
+  weapon_speed_policy.apply()
+
+  if not has_gun_speed(techs["weapon-shooting-speed-99"], "rocket")
+    or not has_gun_speed(techs["weapon-shooting-speed-99"], "cannon-shell")
   then
     fail("external weapon shooting speed continuation was mutated")
   end

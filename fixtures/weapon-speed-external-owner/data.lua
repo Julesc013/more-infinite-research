@@ -42,11 +42,7 @@ local unreachable_owner = table.deepcopy(owner)
 unreachable_owner.name = "mir-fixture-unreachable-weapon-speed-owner"
 unreachable_owner.unit.ingredients = {{unreachable_pack.name, 1}}
 
-local external_continuation = table.deepcopy(owner)
-external_continuation.name = "weapon-shooting-speed-99"
-external_continuation.localised_name = "MIR fixture external weapon speed continuation"
-
-data:extend({owner, unreachable_pack, unreachable_recipe, unreachable_owner, external_continuation})
+data:extend({owner, unreachable_pack, unreachable_recipe, unreachable_owner})
 
 for _, lab in pairs(data.raw.lab or {}) do
   lab.inputs = lab.inputs or {}
