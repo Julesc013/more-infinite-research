@@ -18,18 +18,21 @@ superseded_candidates:
     forbidden_entries: 0
     reason: BP-014 Planet Crucible and Rigor Module dangling recipe target
     status: superseded-unpublished-candidate
+  - source_commit: b15a1f456aa56fe4374ed98b538e8dda6235dd85
+    artifact: dist/more-infinite-research_3.0.5.zip
+    sha256: 1D0D493AF53A3DCD61DC6328A182EE5DAD8181D9251AE0492A63D0D8AA0907AA
+    size_bytes: 308688
+    entries: 126
+    forbidden_entries: 0
+    reason: BP-015 science reachability and BP-016 weapon ownership changed package-visible source
+    status: superseded-unpublished-candidate
 
 candidate:
-  source_commit: b15a1f456aa56fe4374ed98b538e8dda6235dd85
   artifact: dist/more-infinite-research_3.0.5.zip
-  sha256: 1D0D493AF53A3DCD61DC6328A182EE5DAD8181D9251AE0492A63D0D8AA0907AA
-  size_bytes: 308688
-  entries: 126
-  forbidden_entries: 0
-  content_matches_runtime_archive: true
-  automated_gate: passed
+  source_commit: pending
+  automated_gate: pending
   manual_gate: pending
-  status: release-candidate-awaiting-manual-review
+  status: rebuilding-after-package-visible-change
 
 rules:
   - dev-remains-the-canonical-modern-implementation

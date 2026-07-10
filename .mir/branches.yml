@@ -106,23 +106,18 @@ release_artifacts:
           files: 121
           reason: BP-014 Planet Crucible and Rigor Module dangling recipe target
           status: superseded-unpublished-candidate
-      candidate_commit: b15a1f456aa56fe4374ed98b538e8dda6235dd85
+        - candidate_commit: b15a1f456aa56fe4374ed98b538e8dda6235dd85
+          sha256: 1D0D493AF53A3DCD61DC6328A182EE5DAD8181D9251AE0492A63D0D8AA0907AA
+          size_bytes: 308688
+          entries: 126
+          files: 121
+          reason: BP-015 science reachability and BP-016 weapon ownership changed package-visible source
+          status: superseded-unpublished-candidate
+      candidate_commit: pending
       artifact: dist/more-infinite-research_3.0.5.zip
-      sha256: 1D0D493AF53A3DCD61DC6328A182EE5DAD8181D9251AE0492A63D0D8AA0907AA
-      size_bytes: 308688
-      entries: 126
-      files: 121
-      forbidden_entries: 0
-      validation_content_matches_dist: true
-      static_validation: passed
-      factorio_2_1_validation: passed
-      factorio_2_1_binary: Factorio 2.1.9 build 86829 win64 steam
-      structured_summary_status: passed
-      structured_summary_duration_seconds: 365.396
-      exact_dist_base_smoke: passed
-      exact_dist_space_age_smoke: passed
-      factorio_2_1_crucible_rigor_exact_dist: passed
-      status: release-candidate-awaiting-manual-review
+      automated_gate: pending
+      manual_gate: pending
+      status: rebuilding-after-package-visible-change
     mir_2_3_0:
       version: "2.3.0"
       branch: legacy
