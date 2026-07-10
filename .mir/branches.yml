@@ -120,11 +120,36 @@ release_artifacts:
           files: 122
           reason: BP-018 rejects external owners with unrecognized research ingredients
           status: superseded-unpublished-candidate
-      candidate_commit: pending
+      candidate_commit: 27b7ffab867eb50faa60faf072b1092e53edb0b4
       artifact: dist/more-infinite-research_3.0.5.zip
-      automated_gate: pending
+      sha256: AA1A057E7960474E4D5A2B45DE7FB0A6754FFC97E0F7DBC2408107339053BFFE
+      size_bytes: 322365
+      entries: 132
+      files: 127
+      forbidden_entries: 0
+      package_content_sha256: A72E39E308CA5EDFE85C2E25269A67340BFFEDEB76BBECC3865C4F280597915E
+      package_source_sha256: A72E39E308CA5EDFE85C2E25269A67340BFFEDEB76BBECC3865C4F280597915E
+      target_profile_sha256: E1EF758114CECB4B896F5E3365B214E95EC2794A64364492BF174AFE710B3E8F
+      required_groups_sha256: 57A1DF87A8FB594B2B51C7E230D775E88028F23D52DF9D5D7DA1336F9271C78A
+      validation_harness_sha256: 49115360716617C3443F2788E5AEA1BCC8528E6EA862A47E4C73C610ACA41596
+      expected_scenarios_sha256: DB7ABC80594F586B1B90D5313A2E005936E1A8019FECFE17E87F964E06CD90AA
+      validation_package_sha256: B7FDEDC27841098F82DC990F72B5C61ECA6F51B06BC4F43B4F752331E32F3851
+      validation_package_content_sha256: A72E39E308CA5EDFE85C2E25269A67340BFFEDEB76BBECC3865C4F280597915E
+      structured_summary_path: .mir/evidence/3.0.5-rc4-validation-summary.json
+      structured_summary_run_id: 887f7d59-c815-4bf0-b6d0-7c5cdf079fe4
+      structured_summary_status: passed
+      structured_summary_duration_seconds: 437.87
+      scenario_count: 74
+      validation_content_matches_dist: true
+      static_validation: passed
+      factorio_2_1_validation: passed
+      factorio_2_1_binary: Factorio 2.1.9 build 86829 win64 steam
+      exact_dist_base_smoke: passed
+      exact_dist_space_age_smoke: passed
+      factorio_2_1_crucible_rigor_exact_dist: passed
+      automated_gate: passed
       manual_gate: pending
-      status: rebuilding-after-package-visible-change
+      status: release-candidate-awaiting-manual-review
     mir_2_3_0:
       version: "2.3.0"
       branch: legacy

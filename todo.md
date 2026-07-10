@@ -218,22 +218,22 @@ Completed stabilization audit items:
 
 #### URGENT P0 — Clean Candidate Evidence
 
-- [ ] From the clean checkpoint commit, rerun:
+- [x] From the clean checkpoint commit, rerun:
   `./scripts/Invoke-MIRValidation.ps1 -FactorioBin "C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe"`.
   Require `package_source_git_dirty = false`, all required groups passed, and
   archive/source content equality.
-- [ ] Rebuild `dist/more-infinite-research_3.0.5.zip` only if the committed
+- [x] Rebuild `dist/more-infinite-research_3.0.5.zip` only if the committed
   package-visible source differs from the recorded content fingerprint. If it
   changes, replace every hash, size, entry-count, and content-fingerprint record
   before continuing.
-- [ ] Persist the clean structured summary as the next `.mir/evidence/3.0.5-*`
+- [x] Persist the clean structured summary as the next `.mir/evidence/3.0.5-*`
   record and bind it to the exact source commit, Factorio binary version, target
   profile, required-group fingerprint, validation-package hash, package-source
   hash, and dist-content hash.
-- [ ] Update `.mir/convergence.yml` and the `mir_3_0_5` entry in
+- [x] Update `.mir/convergence.yml` and the `mir_3_0_5` entry in
   `.mir/branches.yml` from rebuilding/pending to the correct candidate state
   only after `Test-MIRCandidateFreshness.ps1` passes from a clean tree.
-- [ ] Rerun the exact Planet Crucible 1.1.4 plus Rigor Module 1.1.7 fresh-save
+- [x] Rerun the exact Planet Crucible 1.1.4 plus Rigor Module 1.1.7 fresh-save
   gate against the final rebuilt `dist` bytes. The general runtime matrix does
   not replace this named third-party gate.
 - [ ] Load the exact archive from the normal Factorio mods directory, test a
