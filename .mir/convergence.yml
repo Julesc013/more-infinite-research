@@ -1,0 +1,135 @@
+schema: 1
+
+release:
+  version: "3.0.5"
+  branch: dev
+  factorio_version: "2.1"
+  baseline_commit: b9b1abc859d5d57baa941010e4cd7dd660c1caac
+  baseline_tag: pre-3.0.5-synthesis
+  objective: behavioral-superset-implementation-subset
+  public_contract_change: patch-compatible
+
+rules:
+  - dev-remains-the-canonical-modern-implementation
+  - historical-branches-provide-behavioral-evidence-not-implementation-authority
+  - every-accepted-behavior-needs-a-fixture-or-named-load-check
+  - target-metadata-and-feature-cuts-never-flow-back-to-dev
+  - one-supported-behavior-has-one-canonical-implementation
+  - speculative-extension-framework-work-is-deferred-to-3.1-or-later
+
+behaviors:
+  BP-001:
+    source: 1.7.0@1a9b5a7b1162f8dca8125ef7bb792f57a9ae282b
+    behavior: immutable Factorio 0.17 release evidence and provenance
+    class: A-superseded-or-evidence-only
+    decision: accept-evidence
+    impact: none
+    evidence: .mir/branches.yml
+    status: complete
+  BP-002:
+    source: 1.7.0@1a9b5a7b1162f8dca8125ef7bb792f57a9ae282b
+    behavior: enabled science recipes do not inherit disabled technology gates
+    class: B-missing-and-compatible
+    decision: adapt-at-science-capability-boundary
+    impact: generated-prerequisites
+    evidence: generated-prerequisite-safety
+    status: planned
+  BP-003:
+    source: 1.7.0@1a9b5a7b1162f8dca8125ef7bb792f57a9ae282b
+    behavior: emitted technology prerequisites are enabled acyclic and reachable
+    class: B-missing-and-compatible
+    decision: promote-to-general-graph-invariant
+    impact: validation
+    evidence: generated-prerequisite-safety
+    status: planned
+  BP-004:
+    source: dev-plus-2.3.0-1.9.3-1.8.x-1.7.0-lessons
+    behavior: one canonical target capability profile drives Lua and PowerShell
+    class: C-partially-present
+    decision: centralize-and-generate
+    impact: internal-architecture
+    evidence: target-profile-drift-check
+    status: planned
+  BP-005:
+    source: 1.9.3-through-1.7.0-runtime-adapters
+    behavior: runtime persistence backend is selected explicitly by target
+    class: C-partially-present
+    decision: adapt-through-platform-runtime-state
+    impact: internal-runtime-access
+    evidence: runtime-state-adapter-check
+    status: planned
+  BP-006:
+    source: all-backport-validation-rings
+    behavior: validation scenarios have stable groups and persistent partial summaries
+    class: C-partially-present
+    decision: extract-orchestration-seams
+    impact: developer-tooling
+    evidence: validation-result-summary
+    status: planned
+  BP-007:
+    source: reduced-lines-settings-profile-fixture
+    behavior: reduced settings surface is tested separately from profile codec behavior
+    class: C-partially-present
+    decision: split-fixtures
+    impact: validation
+    evidence: reduced-settings-surface
+    status: planned
+  BP-008:
+    source: 1.7.0-weapon-overlap-policy
+    behavior: general weapon speed ownership is removed only with exact replacement coverage
+    class: C-partially-present
+    decision: adapt-to-coverage-aware-policy
+    impact: new-configuration-default
+    evidence: weapon-speed-safety-matrix
+    status: planned
+  BP-009:
+    source: dev@b9b1abc
+    behavior: target-specific rocket cannon flamethrower and electric progression gates
+    class: A-superseded-or-evidence-only
+    decision: keep-modern-implementation
+    impact: none
+    evidence: generation-integrity
+    status: complete
+  BP-010:
+    source: tmp/0.17
+    behavior: Factorio 0.17 metadata global backend reduced settings and feature cuts
+    class: E-obsolete-or-target-local
+    decision: reject-from-dev
+    impact: none
+    evidence: docs/maintainer/backporting.md
+    status: complete
+  BP-011:
+    source: convergence-plan-extension-proposal
+    behavior: host-managed extension manifest registry and lifecycle
+    class: F-public-surface-change
+    decision: defer-to-3.1-or-later
+    impact: public-api
+    evidence: none
+    status: deferred
+  BP-012:
+    source: planned-tmp/0.16
+    behavior: semantic old-science roles map to Factorio 0.16 prototype IDs
+    class: F-target-specific-future-work
+    decision: defer-to-tmp/0.16-after-3.0.5
+    impact: target-profile
+    evidence: factorio-0.16-binary-required
+    status: deferred
+  BP-013:
+    source: dev-documentation-audit
+    behavior: current release and planning docs contain no stale completed tasks or public-copy errors
+    class: B-missing-and-compatible
+    decision: reconcile-docs
+    impact: documentation
+    evidence: docs-governance
+    status: planned
+
+release_gates:
+  - static-validation
+  - factorio-2.1-base-runtime
+  - factorio-2.1-space-age-runtime
+  - generated-prerequisite-safety
+  - weapon-overlap-policy-matrix
+  - settings-profile-codec
+  - target-profile-drift-check
+  - exact-dist-package-validation
+  - complete-structured-validation-summary

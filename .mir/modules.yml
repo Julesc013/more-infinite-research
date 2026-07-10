@@ -257,3 +257,6 @@ rules:
   - Compatibility repairs may normalize exact-version upstream loader schemas only.
   - Domain modules do not read Factorio globals.
   - Report modules do not mutate prototypes.
+  - Target and convergence policy live in machine-readable .mir manifests.
+  - Historical branches provide behavior evidence and do not define a parallel core.
+  - Public extension framework work is outside the 3.0.5 convergence boundary.

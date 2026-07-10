@@ -128,6 +128,7 @@ foreach ($manifest in @(
   ".mir/streams.yml",
   ".mir/fixtures.yml",
   ".mir/branches.yml",
+  ".mir/convergence.yml",
   ".mir/agents.yml"
 )) {
   Assert-MIRFileHasSchemaOne -RelativePath $manifest
@@ -252,6 +253,30 @@ foreach ($match in [regex]::Matches($fixturesText, "(?m)^\s+(path|assertion_path
   if (-not (Test-MIRRepoPath -RelativePath $relative)) {
     throw ".mir/fixtures.yml references missing fixture path: $relative"
   }
+}
+
+$convergenceText = Read-MIRText -RelativePath ".mir/convergence.yml"
+foreach ($needle in @(
+  'version: "3.0.5"',
+  'objective: behavioral-superset-implementation-subset',
+  'baseline_tag: pre-3.0.5-synthesis',
+  'BP-002:',
+  'BP-013:',
+  'target-profile-drift-check',
+  'complete-structured-validation-summary'
+)) {
+  if (-not $convergenceText.Contains($needle)) {
+    throw ".mir/convergence.yml is missing required convergence contract text: $needle"
+  }
+}
+
+$behaviorIds = @(
+  [regex]::Matches($convergenceText, '(?m)^\s{2}(BP-\d{3}):\s*$') |
+    ForEach-Object { $_.Groups[1].Value }
+)
+$duplicateBehaviorIds = @($behaviorIds | Group-Object | Where-Object { $_.Count -gt 1 })
+if ($duplicateBehaviorIds.Count -gt 0) {
+  throw ".mir/convergence.yml has duplicate behavior IDs: $($duplicateBehaviorIds.Name -join ', ')"
 }
 
 $claimsManifestText = Read-MIRText -RelativePath ".mir/compatibility.yml"
