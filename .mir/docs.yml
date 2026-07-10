@@ -1062,7 +1062,8 @@ docs:
     audience: release-manager
     doc_type: release-plan
     owner: mir-maintainers
-    source_of_truth_for: []
+    source_of_truth_for:
+      - validation-result-summary
   - path: docs/releases/3.0.5-convergence-plan.md
     title: "MIR 3.0.5 Convergence Plan"
     status: current

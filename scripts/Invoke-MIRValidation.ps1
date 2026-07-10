@@ -5,12 +5,15 @@ param(
   [switch]$DocsOnly,
   [switch]$ManifestsOnly,
   [switch]$ArchitectureOnly,
-  [switch]$StaticOnly
+  [switch]$StaticOnly,
+  [string]$ValidationSummaryPath = $env:MIR_VALIDATION_SUMMARY
 )
 
 $ErrorActionPreference = "Stop"
 $repo = Resolve-Path (Join-Path $PSScriptRoot "..")
 . (Join-Path $repo "scripts\validation\TargetProfiles.ps1")
+. (Join-Path $repo "scripts\validation\ScenarioGroups.ps1")
+. (Join-Path $repo "scripts\validation\ResultAggregation.ps1")
 $repoInfo = Get-Content -Raw (Join-Path $repo "info.json") | ConvertFrom-Json
 $targetProfile = Get-MIRTargetProfile -RepoRoot $repo -FactorioVersion $repoInfo.factorio_version
 $isFactorio017Line = $repoInfo.factorio_version -eq "0.17"
@@ -446,6 +449,10 @@ Invoke-RepoCheck "locale files match English fallback" {
 
 Invoke-RepoCheck "PowerShell scripts parse and avoid duplicate parameters" {
   & (Join-Path $repo "scripts\Test-MIRPowerShellQuality.ps1") -RepoRoot $repo
+}
+
+Invoke-RepoCheck "validation scenario groups and partial result aggregation are stable" {
+  & (Join-Path $repo "scripts\Test-MIRValidationResults.ps1") -RepoRoot $repo
 }
 
 Invoke-RepoCheck "fixture mods have metadata and data entrypoints" {
@@ -1852,6 +1859,17 @@ if (-not (Test-Path -LiteralPath $FactorioBin)) {
   throw "Factorio binary not found: $FactorioBin"
 }
 
+if ([string]::IsNullOrWhiteSpace($ValidationSummaryPath)) {
+  $ValidationSummaryPath = Join-Path $repo "artifacts\validation\factorio-$($repoInfo.factorio_version)-summary.json"
+}
+Initialize-MIRValidationResult `
+  -OutputPath $ValidationSummaryPath `
+  -FactorioVersion $repoInfo.factorio_version `
+  -RequiredGroups @($targetProfile.required_validation_groups) | Out-Null
+Add-MIRValidationCompletedScenario -Name "static-validation" -Group "static" -EvidencePaths @("scripts/Invoke-MIRValidation.ps1")
+Add-MIRValidationCompletedScenario -Name "package-build" -Group "package" -EvidencePaths @("build/validation-dist")
+Add-MIRValidationCompletedScenario -Name "runtime-state-contract" -Group "runtime-state" -EvidencePaths @("prototypes/mir/platform/factorio/runtime_state.lua")
+
 $usesGeneratedUserDataDir = [string]::IsNullOrWhiteSpace($UserDataDir)
 if ($usesGeneratedUserDataDir) {
   $UserDataDir = Join-Path ([System.IO.Path]::GetTempPath()) ("mir-factorio-userdata-" + [guid]::NewGuid().ToString("N"))
@@ -2462,52 +2480,60 @@ function Invoke-RuntimeScenario {
     [switch]$EnableSpaceAge
   )
 
-  $scenario = Initialize-RuntimeScenario `
-    -ScenarioName $ScenarioName `
-    -EnabledFixtureNames $EnabledFixtureNames `
-    -EnabledStreamKeys $EnabledStreamKeys `
-    -EnabledBaseExtensionKeys $EnabledBaseExtensionKeys `
-    -DisabledStreamKeys $DisabledStreamKeys `
-    -DisabledBaseExtensionKeys $DisabledBaseExtensionKeys `
-    -LabPolicySkip:$LabPolicySkip `
-    -SciencePackIngredientPolicy $SciencePackIngredientPolicy `
-    -WeaponSpeedAdjustmentMode $WeaponSpeedAdjustmentMode `
-    -PipelineExtentMultiplier $PipelineExtentMultiplier `
-    -PrototypeProductivityCap $PrototypeProductivityCap `
-    -PrototypeEfficiencyCap $PrototypeEfficiencyCap `
-    -PrototypePollutionCap $PrototypePollutionCap `
-    -PrototypeSpeedCap $PrototypeSpeedCap `
-    -PrototypeQualityCap $PrototypeQualityCap `
-    -PrototypePositivePowerFloor:$PrototypePositivePowerFloor `
-    -RequireSpaceGate:$RequireSpaceGate `
-    -UseInstalledSpaceAgeIcons:$UseInstalledSpaceAgeIcons `
-    -ScriptedDiagnostics:$ScriptedDiagnostics `
-    -EnableSpaceAge:$EnableSpaceAge
-  if (Test-Path -LiteralPath $scenario.SavePath) {
-    Remove-Item -LiteralPath $scenario.SavePath -Force
-  }
+  $scenarioGroup = Get-MIRValidationScenarioGroup -ScenarioName $ScenarioName -Kind "runtime" -EnableSpaceAge:$EnableSpaceAge
+  $resultRecord = Start-MIRValidationScenario -Name $ScenarioName -Kind "runtime" -Group $scenarioGroup -EvidencePaths @($FactorioLog)
+  try {
+    $scenario = Initialize-RuntimeScenario `
+      -ScenarioName $ScenarioName `
+      -EnabledFixtureNames $EnabledFixtureNames `
+      -EnabledStreamKeys $EnabledStreamKeys `
+      -EnabledBaseExtensionKeys $EnabledBaseExtensionKeys `
+      -DisabledStreamKeys $DisabledStreamKeys `
+      -DisabledBaseExtensionKeys $DisabledBaseExtensionKeys `
+      -LabPolicySkip:$LabPolicySkip `
+      -SciencePackIngredientPolicy $SciencePackIngredientPolicy `
+      -WeaponSpeedAdjustmentMode $WeaponSpeedAdjustmentMode `
+      -PipelineExtentMultiplier $PipelineExtentMultiplier `
+      -PrototypeProductivityCap $PrototypeProductivityCap `
+      -PrototypeEfficiencyCap $PrototypeEfficiencyCap `
+      -PrototypePollutionCap $PrototypePollutionCap `
+      -PrototypeSpeedCap $PrototypeSpeedCap `
+      -PrototypeQualityCap $PrototypeQualityCap `
+      -PrototypePositivePowerFloor:$PrototypePositivePowerFloor `
+      -RequireSpaceGate:$RequireSpaceGate `
+      -UseInstalledSpaceAgeIcons:$UseInstalledSpaceAgeIcons `
+      -ScriptedDiagnostics:$ScriptedDiagnostics `
+      -EnableSpaceAge:$EnableSpaceAge
+    if (Test-Path -LiteralPath $scenario.SavePath) {
+      Remove-Item -LiteralPath $scenario.SavePath -Force
+    }
 
-  Write-Host "[run] Factorio load check with fixture mods ($ScenarioName)"
-  Clear-FactorioLog
-  $factorioArgs = @(
-    "--config",
-    $factorioConfigPath,
-    "--no-log-rotation",
-    "--disable-audio",
-    "--mod-directory",
-    $scenario.ModsDir,
-    "--create",
-    $scenario.SavePath
-  )
-  $factorioExitCode = Invoke-FactorioProcess -FilePath $FactorioBin -Arguments $factorioArgs
-  if ($factorioExitCode -ne 0) {
-    throw "Factorio runtime validation scenario $ScenarioName exited with code $factorioExitCode"
-  }
-  if (-not (Test-Path -LiteralPath $scenario.SavePath)) {
-    throw "Factorio runtime validation scenario $ScenarioName did not create the expected save: $($scenario.SavePath). Factorio exit code: $factorioExitCode"
-  }
+    Write-Host "[run] Factorio load check with fixture mods ($ScenarioName)"
+    Clear-FactorioLog
+    $factorioArgs = @(
+      "--config",
+      $factorioConfigPath,
+      "--no-log-rotation",
+      "--disable-audio",
+      "--mod-directory",
+      $scenario.ModsDir,
+      "--create",
+      $scenario.SavePath
+    )
+    $factorioExitCode = Invoke-FactorioProcess -FilePath $FactorioBin -Arguments $factorioArgs
+    if ($factorioExitCode -ne 0) {
+      throw "Factorio runtime validation scenario $ScenarioName exited with code $factorioExitCode"
+    }
+    if (-not (Test-Path -LiteralPath $scenario.SavePath)) {
+      throw "Factorio runtime validation scenario $ScenarioName did not create the expected save: $($scenario.SavePath). Factorio exit code: $factorioExitCode"
+    }
 
-  Assert-RuntimeLogHealthy -ScenarioName $ScenarioName
+    Assert-RuntimeLogHealthy -ScenarioName $ScenarioName
+    Complete-MIRValidationScenario -Record $resultRecord -Status "passed"
+  } catch {
+    Complete-MIRValidationScenario -Record $resultRecord -Status "failed" -ErrorMessage $_.Exception.Message
+    throw
+  }
 }
 
 function Invoke-RuntimeConfigurationChangeScenario {
@@ -2518,64 +2544,72 @@ function Invoke-RuntimeConfigurationChangeScenario {
     [switch]$EnableSpaceAge
   )
 
-  $initialScenario = Initialize-RuntimeScenario `
-    -ScenarioName "$ScenarioName-initial" `
-    -EnabledFixtureNames $InitialFixtureNames `
-    -EnableSpaceAge:$EnableSpaceAge
-  if (Test-Path -LiteralPath $initialScenario.SavePath) {
-    Remove-Item -LiteralPath $initialScenario.SavePath -Force
+  $scenarioGroup = Get-MIRValidationScenarioGroup -ScenarioName $ScenarioName -Kind "configuration-change" -EnableSpaceAge:$EnableSpaceAge
+  $resultRecord = Start-MIRValidationScenario -Name $ScenarioName -Kind "configuration-change" -Group $scenarioGroup -EvidencePaths @($FactorioLog)
+  try {
+    $initialScenario = Initialize-RuntimeScenario `
+      -ScenarioName "$ScenarioName-initial" `
+      -EnabledFixtureNames $InitialFixtureNames `
+      -EnableSpaceAge:$EnableSpaceAge
+    if (Test-Path -LiteralPath $initialScenario.SavePath) {
+      Remove-Item -LiteralPath $initialScenario.SavePath -Force
+    }
+
+    Write-Host "[run] Factorio initial save for configuration-change check ($ScenarioName)"
+    Clear-FactorioLog
+    $createArgs = @(
+      "--config",
+      $factorioConfigPath,
+      "--no-log-rotation",
+      "--disable-audio",
+      "--mod-directory",
+      $initialScenario.ModsDir,
+      "--create",
+      $initialScenario.SavePath
+    )
+    $createExitCode = Invoke-FactorioProcess -FilePath $FactorioBin -Arguments $createArgs
+    if ($createExitCode -ne 0) {
+      throw "Factorio configuration-change initial scenario $ScenarioName exited with code $createExitCode"
+    }
+    if (-not (Test-Path -LiteralPath $initialScenario.SavePath)) {
+      throw "Factorio configuration-change initial scenario $ScenarioName did not create the expected save: $($initialScenario.SavePath)."
+    }
+
+    Assert-RuntimeLogHealthy -ScenarioName "$ScenarioName initial"
+
+    $changedScenario = Initialize-RuntimeScenario `
+      -ScenarioName "$ScenarioName-changed" `
+      -EnabledFixtureNames $ChangedFixtureNames `
+      -EnableSpaceAge:$EnableSpaceAge
+
+    Write-Host "[run] Factorio configuration-change load check with fixture mods ($ScenarioName)"
+    Clear-FactorioLog
+    $benchmarkArgs = @(
+      "--config",
+      $factorioConfigPath,
+      "--no-log-rotation",
+      "--disable-audio",
+      "--mod-directory",
+      $changedScenario.ModsDir,
+      "--benchmark",
+      $initialScenario.SavePath,
+      "--benchmark-ticks",
+      "1",
+      "--benchmark-runs",
+      "1",
+      "--benchmark-sanitize"
+    )
+    $benchmarkExitCode = Invoke-FactorioProcess -FilePath $FactorioBin -Arguments $benchmarkArgs
+    if ($benchmarkExitCode -ne 0) {
+      throw "Factorio configuration-change load scenario $ScenarioName exited with code $benchmarkExitCode"
+    }
+
+    Assert-RuntimeLogHealthy -ScenarioName "$ScenarioName changed"
+    Complete-MIRValidationScenario -Record $resultRecord -Status "passed"
+  } catch {
+    Complete-MIRValidationScenario -Record $resultRecord -Status "failed" -ErrorMessage $_.Exception.Message
+    throw
   }
-
-  Write-Host "[run] Factorio initial save for configuration-change check ($ScenarioName)"
-  Clear-FactorioLog
-  $createArgs = @(
-    "--config",
-    $factorioConfigPath,
-    "--no-log-rotation",
-    "--disable-audio",
-    "--mod-directory",
-    $initialScenario.ModsDir,
-    "--create",
-    $initialScenario.SavePath
-  )
-  $createExitCode = Invoke-FactorioProcess -FilePath $FactorioBin -Arguments $createArgs
-  if ($createExitCode -ne 0) {
-    throw "Factorio configuration-change initial scenario $ScenarioName exited with code $createExitCode"
-  }
-  if (-not (Test-Path -LiteralPath $initialScenario.SavePath)) {
-    throw "Factorio configuration-change initial scenario $ScenarioName did not create the expected save: $($initialScenario.SavePath)."
-  }
-
-  Assert-RuntimeLogHealthy -ScenarioName "$ScenarioName initial"
-
-  $changedScenario = Initialize-RuntimeScenario `
-    -ScenarioName "$ScenarioName-changed" `
-    -EnabledFixtureNames $ChangedFixtureNames `
-    -EnableSpaceAge:$EnableSpaceAge
-
-  Write-Host "[run] Factorio configuration-change load check with fixture mods ($ScenarioName)"
-  Clear-FactorioLog
-  $benchmarkArgs = @(
-    "--config",
-    $factorioConfigPath,
-    "--no-log-rotation",
-    "--disable-audio",
-    "--mod-directory",
-    $changedScenario.ModsDir,
-    "--benchmark",
-    $initialScenario.SavePath,
-    "--benchmark-ticks",
-    "1",
-    "--benchmark-runs",
-    "1",
-    "--benchmark-sanitize"
-  )
-  $benchmarkExitCode = Invoke-FactorioProcess -FilePath $FactorioBin -Arguments $benchmarkArgs
-  if ($benchmarkExitCode -ne 0) {
-    throw "Factorio configuration-change load scenario $ScenarioName exited with code $benchmarkExitCode"
-  }
-
-  Assert-RuntimeLogHealthy -ScenarioName "$ScenarioName changed"
 }
 
 function Get-LastStreamReportLine {
@@ -2842,9 +2876,12 @@ function Invoke-PackageZipSmokeScenario {
     [switch]$EnableSpaceAge
   )
 
-  if ([string]::IsNullOrWhiteSpace($script:ValidationPackageZipPath) -or -not (Test-Path -LiteralPath $script:ValidationPackageZipPath)) {
-    throw "Validation package zip is unavailable for packaged zip smoke."
-  }
+  $scenarioGroup = Get-MIRValidationScenarioGroup -ScenarioName $ScenarioName -Kind "package" -EnableSpaceAge:$EnableSpaceAge
+  $resultRecord = Start-MIRValidationScenario -Name $ScenarioName -Kind "package" -Group $scenarioGroup -EvidencePaths @($script:ValidationPackageZipPath, $FactorioLog)
+  try {
+    if ([string]::IsNullOrWhiteSpace($script:ValidationPackageZipPath) -or -not (Test-Path -LiteralPath $script:ValidationPackageZipPath)) {
+      throw "Validation package zip is unavailable for packaged zip smoke."
+    }
 
   $scenarioRoot = Join-Path $validationRoot $ScenarioName
   if (Test-Path -LiteralPath $scenarioRoot) {
@@ -2895,9 +2932,15 @@ function Invoke-PackageZipSmokeScenario {
     throw "Factorio package zip smoke $ScenarioName did not create the expected save: $savePath"
   }
 
-  Assert-RuntimeLogHealthy -ScenarioName $ScenarioName
+    Assert-RuntimeLogHealthy -ScenarioName $ScenarioName
+    Complete-MIRValidationScenario -Record $resultRecord -Status "passed"
+  } catch {
+    Complete-MIRValidationScenario -Record $resultRecord -Status "failed" -ErrorMessage $_.Exception.Message
+    throw
+  }
 }
 
+try {
 Invoke-PackageZipSmokeScenario -ScenarioName "package-zip-base"
 if ($isFactorio21Line) {
   Invoke-PackageZipSmokeScenario -ScenarioName "package-zip-space-age" -EnableSpaceAge
@@ -2983,6 +3026,7 @@ if ($isReducedLegacyLine) {
   $weaponSpeedLine = Get-LastExtensionReportLine -Key "weapon-shooting-speed"
   Assert-ReportLineGenerated -Line $weaponSpeedLine -Context "$reducedLineLabel weapon shooting speed overlap safety scenario"
 
+  Complete-MIRValidationRun
   if ($usesGeneratedUserDataDir -and (Test-Path -LiteralPath $validationRoot)) {
     Remove-Item -LiteralPath $validationRoot -Recurse -Force
   }
@@ -3661,8 +3705,15 @@ if (-not $isFactorio21Line) {
 }
 
 if ($usesGeneratedUserDataDir -and (Test-Path -LiteralPath $validationRoot)) {
+  Complete-MIRValidationRun
   Remove-Item -LiteralPath $validationRoot -Recurse -Force
+} else {
+  Complete-MIRValidationRun
 }
 
 Write-Host "[ok] Validation completed."
 $global:LASTEXITCODE = 0
+} catch {
+  Fail-MIRValidationRun -ErrorMessage $_.Exception.Message
+  throw
+}

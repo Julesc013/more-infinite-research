@@ -23,7 +23,7 @@ does not grant implementation authority; `dev` remains canonical.
 | BP-003 | `1.7.0@1a9b5a7` | Emitted prerequisites are enabled, acyclic, and reachable | B | General invariant | data and runtime graph fixture | Complete |
 | BP-004 | all target rings | Lua and validation use one target profile authority | C | Centralize and generate | drift check | Complete |
 | BP-005 | 1.9.3 through 1.7.0 | Target explicitly selects `storage` or `global` | C | Platform adapter | architecture lint | Complete |
-| BP-006 | all target rings | Scenarios have groups, durations, and durable partial results | C | Extract runner seams | structured summary | Planned |
+| BP-006 | all target rings | Scenarios have groups, durations, and durable partial results | C | Extract runner seams | structured summary | Complete |
 | BP-007 | reduced target rings | Reduced setting visibility is not codec coverage | C | Split fixture | two named gates | Planned |
 | BP-008 | 1.7.0 | Conditional weapon cleanup requires replacement coverage | C | Adapt owner policy | six-case matrix plus external owner | Planned |
 | BP-009 | `dev@b9b1abc` | Dedicated weapon streams retain target progression gates | A | Keep modern implementation | generation integrity | Complete |

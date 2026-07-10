@@ -65,7 +65,7 @@ behaviors:
     decision: extract-orchestration-seams
     impact: developer-tooling
     evidence: validation-result-summary
-    status: planned
+    status: complete
   BP-007:
     source: reduced-lines-settings-profile-fixture
     behavior: reduced settings surface is tested separately from profile codec behavior
