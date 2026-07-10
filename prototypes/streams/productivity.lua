@@ -405,7 +405,12 @@ return {
     items = {"raw-fish","biter-egg","pentapod-egg"},
     mode = "by_category_or_match",
     match = { name_patterns={"cultivation","culture","breeding"} },
-    exclude_recipe_patterns = {"^iron%-bacteria%-cultivation$", "^copper%-bacteria%-cultivation$"},
+    exclude_recipe_patterns = {
+      "^iron%-bacteria%-cultivation$",
+      "^copper%-bacteria%-cultivation$",
+      "%-incineration$",
+      "%-incinerate$"
+    },
     icon_tech = "fish-breeding"
   },
 

@@ -1,4 +1,135 @@
 ---------------------------------------------------------------------------------------------------
+Version: 3.0.5
+Date: 2026-07-11
+
+  Compatibility:
+
+    - Kept the modern Factorio 2.1 compiler, dependencies, generated technology IDs, and feature surface unchanged.
+    - Fixed generated research that could inherit an unavailable tutorial technology from an already-enabled science recipe.
+    - Kept disabled or cyclic technology prerequisites out of generated research while preserving legitimate progression gates.
+    - Rejected self-locked, cyclic, or non-researchable science recipe unlocks.
+    - Skipped generated streams whose required technologies are disabled or unreachable instead of emitting a fatal graph edge.
+    - Made science recipe unlock selection deterministic when multiple reachable technologies provide the same recipe.
+    - Made rocket and cannon overlap cleanup conditional on exact reachable infinite replacement coverage for new configurations.
+    - Preserved finite vanilla weapon speed bonuses and existing stored overlap-mode choices.
+    - Limited weapon overlap cleanup to MIR-generated continuations and required external owners to use obtainable science.
+    - Kept incineration sink recipes out of breeding productivity research so later recipe removal cannot leave invalid effects.
+
+  Changes:
+
+    - Centralized target capabilities so the mod and developer tools consume the same Factorio-line profile.
+    - Made the runtime persistence backend an explicit target choice: storage on Factorio 2.x and global on older lines.
+    - Added final generated-technology checks for enabled prerequisites, cycles, science production, labs, and reachability.
+    - Separated reduced target setting visibility from modern settings profile encoding behavior.
+    - Added durable grouped developer-run summaries with passed, failed, skipped, and incomplete outcomes.
+    - Bound release evidence to exact source, target-profile, required-group, package-content, and runtime-summary fingerprints.
+    - Allowed exact external rocket or cannon speed owners when the existing competition preference keeps external research.
+    - Added classifier-boundary, late recipe-removal, and exact Planet Crucible plus Rigor Module regression gates.
+
+---------------------------------------------------------------------------------------------------
+Version: 1.7.0
+Date: 2026-07-10
+
+  Compatibility:
+
+    - Ported the first reduced native-infinite edition to Factorio 0.17 from the 1.8.x old-line lessons.
+    - Included current dev portable fixes without restoring 2.x-only surfaces.
+    - Retargeted package metadata to Factorio 0.17 with `base >= 0.17`.
+    - Kept modern non-Space-Age science pack names for the target line.
+    - Kept only target-probed direct-effect infinite researches and base technology continuations.
+    - Kept recipe productivity, Space Age, Quality, Recycler, Elevated Rails, and cargo logistics out of 0.17.
+    - Kept spoilage and agriculture out of 0.17.
+    - Kept prototype cap settings, pipeline extent settings, settings profiles, and newer technology badge overlays out of 0.17.
+
+  Changes:
+
+    - Reused the older-line `global` runtime state adapter.
+    - Reused target-era technology art without newer badge overlays or unsupported native modifier icon metadata.
+    - Added Factorio 0.17 metadata, settings visibility, and reduced-line runtime support.
+    - Anchored dedicated rocket, cannon, flamethrower, and electric shooting speed research to target-era unlocks.
+    - Kept MIR's generated weapon shooting speed continuation from duplicating rocket and cannon-shell speed ownership by default.
+    - Stopped enabled science-pack recipes from inheriting disabled tutorial technology prerequisites.
+    - Kept generated infinite research available after normal prerequisite completion and unlock-all commands.
+    - Documented 1.7.0 as the first old-line native-infinite edition and the next ring after 1.8.x.
+
+---------------------------------------------------------------------------------------------------
+Version: 1.8.1
+Date: 2026-07-10
+
+  Compatibility:
+
+    - Ported the maintained Factorio 1.0 line from the 1.9.3 reduced source posture plus proven 1.8.0 bridge lessons.
+    - Retargeted package metadata to Factorio 1.0 with `base >= 1.0`.
+    - Kept supported direct-effect infinite researches and base technology continuations.
+    - Kept recipe productivity, Space Age, Quality, Recycler, Elevated Rails, cargo logistics, spoilage, and agriculture out of 1.0.
+    - Kept prototype cap settings, pipeline extent settings, settings profiles, and newer technology badge overlays out of 1.0.
+    - Preserved the old-line runtime state adapter so Factorio 1.0 uses `global` instead of the Factorio 2.x `storage` table.
+
+  Changes:
+
+    - Removed 2.x DLC dependencies and newer science-pack names from generated direct-effect and base-extension defaults.
+    - Reused the 1.8.0 target-era icon policy: generated direct-effect technologies use base technology art only.
+    - Kept unsupported native modifier icon metadata out of generated old-line direct-effect technologies.
+    - Carried the older `laser-turret-speed` base technology chain adapter into the maintained 1.0 line.
+    - Added a Factorio 1.0 runtime check that rejects unavailable newer badge paths and synthetic old-line badge overlays.
+    - Extended the Factorio 1.0 runtime check to reject unsupported native modifier icon metadata.
+    - Retargeted branch-local support mod metadata to Factorio 1.0 for the reduced-line release gate.
+    - Documented 1.8.1 as a maintained Factorio 1.0 compatibility port, not a metadata bump of the 0.18 bridge package.
+    - Documented that 1.8.1 is not a feature-parity backport of the modern line.
+
+---------------------------------------------------------------------------------------------------
+Version: 1.9.3
+Date: 2026-07-10
+
+  Compatibility:
+
+    - Ported the MIR 3 compatibility compiler architecture to Factorio 1.1 as a reduced compatibility port.
+    - Synthesized the 3.0.0 source anchor with portable lessons from the 2.3.0 Factorio 2.0 port.
+    - Retargeted package metadata to Factorio 1.1 with a base-only dependency floor.
+    - Removed Factorio 2.x DLC dependency surfaces from the 1.1 package target.
+    - Removed Space Age, Quality, Recycler, Elevated Rails, cargo logistics, spoilage, and agriculture streams.
+    - Removed recipe-productivity streams from the 1.1 target because Factorio 1.1.110 rejects the modifier type.
+    - Kept only target-supported direct-effect and base-extension research candidates for the first 1.1 release line.
+    - Added a target-line adapter for unsupported streams, direct effects, prototype caps, repairs, and runtime handlers.
+    - Disabled unsupported 2.x behavior before it can emit 1.1-invalid prototypes.
+    - Replaced direct runtime persistence access with a state adapter for global on Factorio 1.1 and storage on Factorio 2.x.
+    - Used stock high-resolution target-era technology constant badges on Factorio 1.1.
+
+  Changes:
+
+    - Removed unsupported 2.x startup settings from the 1.1 settings catalog and settings profile surface.
+    - Hid settings-profile import and export on Factorio 1.1 because the target API lacks the MIRSET1 string codec.
+    - Ensured Factorio 1.1 direct-effect technologies use stock tile badges without copied newer graphics.
+    - Retargeted branch-local support mod metadata to Factorio 1.1.
+    - Made release tooling target-aware for 1.1 metadata, dependency floors, and cargo modifiers.
+    - Updated settings visibility checks for the reduced 1.1 settings surface.
+    - Documented the release as a compatibility port, not a feature-parity backport of the Factorio 2.x releases.
+
+---------------------------------------------------------------------------------------------------
+Version: 1.8.0
+Date: 2026-07-10
+
+  Compatibility:
+
+    - Ported the reduced MIR 3 compatibility compiler architecture to Factorio 0.18 as the bridge/archive package for 1.0.
+    - Synthesized the 3.0.0 source anchor with portable 2.3.0 and 1.9.3 backport lessons.
+    - Retargeted package metadata to Factorio 0.18 with `base >= 0.18`.
+    - Kept the reduced direct-effect and base-extension surface, with recipe productivity and Factorio 2.x DLC surfaces disabled.
+    - Removed unavailable 1.1 technology constant badge overlays from the 0.18 bridge.
+    - Used target-era base technology art only instead of packaging or simulating newer Factorio graphics.
+
+  Changes:
+
+    - Updated Research productivity icon selection to prefer stock military science technology art.
+    - Extended metadata, settings visibility, and reduced-line runtime checks for the Factorio 0.18 bridge target.
+    - Removed unavailable newer badge paths and synthetic badge overlays from the 0.18 bridge.
+    - Added explicit target-era names and descriptions to generated vanilla continuations to avoid unresolved locale keys.
+    - Added old-line modifier descriptions for character, lab, inventory, and robot direct-effect tooltips.
+    - Removed unsupported native modifier icon metadata after Factorio 1.0 ignored those fields.
+    - Character, range, and weapon speed technologies use target-era main textures and localized text instead of fake badges.
+    - Documented 1.8.0 as a bridge/archive compatibility port, not a feature-parity backport of 1.1, 2.0, or 2.1.
+
+---------------------------------------------------------------------------------------------------
 Version: 2.3.0
 Date: 2026-07-09
 
@@ -278,7 +409,7 @@ Date: 2026-07-01
 
     - Expanded Electric Shooting Speed to cover base electric weapons and Space Age Tesla weapons.
     - Mining Drill Productivity now covers Omega Drill-style and broader modded mining-drill recipes.
-    - Added optional Spoilage Preservation and Agricultural Growth Speed research, disabled by default.
+    - Kept Spoilage Preservation disabled and enabled Agricultural Growth Speed for newly planted tower crops.
     - Agricultural Growth Speed affects newly planted tower crops and does not rescan existing crops.
     - Combined Character Logistic Trash Slot bonuses into Character Inventory Slot research.
     - Renamed Heavy Ammunition Productivity to Cannon Shell Productivity and broadened shell/ammo coverage.

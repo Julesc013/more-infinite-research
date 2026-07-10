@@ -224,6 +224,7 @@ streams:
       evidence:
         fixtures:
           - fixtures/assert-generation-integrity
+          - fixtures/assert-weapon-speed-safety
 
     recipe-prod-research_carbon-1:
       canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_carbon-1
@@ -448,6 +449,7 @@ streams:
       evidence:
         fixtures:
           - fixtures/assert-generation-integrity
+          - fixtures/assert-weapon-speed-safety
 
     recipe-prod-research_electronic_circuit-1:
       canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_electronic_circuit-1
@@ -512,6 +514,7 @@ streams:
       evidence:
         fixtures:
           - fixtures/assert-generation-integrity
+          - fixtures/assert-weapon-speed-safety
 
     recipe-prod-research_flying_robot_frame-1:
       canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_flying_robot_frame-1
@@ -960,6 +963,7 @@ streams:
       evidence:
         fixtures:
           - fixtures/assert-generation-integrity
+          - fixtures/assert-weapon-speed-safety
 
     recipe-prod-research_rockets-1:
       canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_rockets-1

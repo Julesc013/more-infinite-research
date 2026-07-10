@@ -11,6 +11,10 @@ superseded_by: ["../../releases/README.md"]
 ---
 # Legacy Backport Capability Matrix
 
+> Historical release slots in this archived matrix are superseded by
+> `docs/maintainer/backporting.md`. Its capability classifications remain
+> useful; its old numeric slots are not current release policy.
+
 Updated: 2026-07-06
 Branch: `legacy`
 Scope: read-only capability matrix for the temporary legacy backport `tmp/*` branches.

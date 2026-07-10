@@ -21,6 +21,7 @@ param(
   [string[]]$LocalModLibraryDirs = @(),
   [string[]]$LocalModLibraryZips = @(),
   [string[]]$LocalModNames = @(),
+  [string]$ModUnderTestZip = "",
   [switch]$DownloadMods,
   [switch]$RunLoadTests,
   [switch]$RunManualScenarios,
@@ -51,6 +52,11 @@ $moduleRoot = Join-Path $PSScriptRoot "MIRCompatAudit"
 . (Join-Path $moduleRoot "DependencyResolver.ps1")
 . (Join-Path $moduleRoot "DiagnosticsParser.ps1")
 . (Join-Path $moduleRoot "FactorioRunner.ps1")
+
+$resolvedModUnderTestZip = ""
+if (-not [string]::IsNullOrWhiteSpace($ModUnderTestZip)) {
+  $resolvedModUnderTestZip = (Resolve-Path -LiteralPath $ModUnderTestZip).Path
+}
 
 if ([string]::IsNullOrWhiteSpace($FactorioLine)) {
   $lineCandidates = @($FactorioVersions | Where-Object { $_ -in @("2.0", "2.1") } | Select-Object -Unique)
@@ -892,8 +898,10 @@ function Invoke-MIRScenarioLoad {
 
   $userData = New-MIRCompatUserDataDir -Root $runRoot
   $modsDir = Join-Path $userData "mods"
-  $null = Copy-MIRModUnderTest -RepoRoot $repo.Path -ModsDir $modsDir
-  Enable-MIRCopiedGenerationReport -ModsDir $modsDir
+  $null = Copy-MIRModUnderTest -RepoRoot $repo.Path -ModsDir $modsDir -ZipPath $resolvedModUnderTestZip
+  if ([string]::IsNullOrWhiteSpace($resolvedModUnderTestZip)) {
+    Enable-MIRCopiedGenerationReport -ModsDir $modsDir
+  }
 
   Copy-MIRCachedModZips -CacheDir $resolvedCacheDir -ModsDir $modsDir -LockEntries $Scenario.lock_entries -LinkMode $LinkMode
 
@@ -1106,6 +1114,7 @@ $lock = [ordered]@{
   local_mod_zips = @($LocalModZips)
   local_mod_library_dirs = @($LocalModLibraryDirs)
   local_mod_library_zips = @($LocalModLibraryZips)
+  mod_under_test_zip = $resolvedModUnderTestZip
   link_mode = $LinkMode
   local_root_zip_count = $localRootZipPaths.Count
   local_library_zip_count = $localLibraryZipPaths.Count

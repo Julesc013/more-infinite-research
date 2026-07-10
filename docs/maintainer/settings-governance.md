@@ -170,9 +170,23 @@ The contract:
 - runtime commands may export or validate profiles but must not attempt to
   rewrite startup setting values.
 
+Profile serialization and reduced-target visibility are separate contracts.
+`settings-profile-roundtrip` runs only where the profile codec is shipped and
+checks canonical encoding, compact export, and strict import validation.
+`reduced-settings-surface` runs on reduced lines where profiles are omitted and
+checks that supported settings remain available while modern-only settings are
+absent. A locally constructed placeholder string is not profile-codec evidence.
+
 Do not narrow an existing string setting's `allowed_values` on a backport line
 unless there is no safe data-stage fallback. Prefer accepting the value and
 mapping unsupported choices to a documented safe behavior.
+
+`mir-adjust-vanilla-weapon-speed-techs` defaults to
+`only-when-dedicated-tech-enabled` for new configurations. The stable setting
+value is retained for compatibility, while its implementation is
+coverage-aware: removal requires an exact reachable infinite replacement from
+MIR or an external owner accepted by competition policy. Existing persisted
+`off`, conditional, or `always` choices are not migration-forced.
 
 When a setting is renamed, keep the old ID as a hidden compatibility alias until
 a documented migration proves that dropping it cannot lose user intent. If the

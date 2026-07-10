@@ -5,13 +5,24 @@ param(
   [switch]$DocsOnly,
   [switch]$ManifestsOnly,
   [switch]$ArchitectureOnly,
-  [switch]$StaticOnly
+  [switch]$StaticOnly,
+  [string]$ValidationSummaryPath = $env:MIR_VALIDATION_SUMMARY
 )
 
 $ErrorActionPreference = "Stop"
 $repo = Resolve-Path (Join-Path $PSScriptRoot "..")
+. (Join-Path $repo "scripts\validation\PackageIdentity.ps1")
+. (Join-Path $repo "scripts\validation\TargetProfiles.ps1")
+. (Join-Path $repo "scripts\validation\ScenarioGroups.ps1")
+. (Join-Path $repo "scripts\validation\ResultAggregation.ps1")
 $repoInfo = Get-Content -Raw (Join-Path $repo "info.json") | ConvertFrom-Json
-$isLegacyFactorio20 = $repoInfo.factorio_version -eq "2.0"
+$targetProfile = Get-MIRTargetProfile -RepoRoot $repo -FactorioVersion $repoInfo.factorio_version
+$isFactorio017Line = $repoInfo.factorio_version -eq "0.17"
+$isFactorio018Line = $repoInfo.factorio_version -eq "0.18"
+$isFactorio10Line = $repoInfo.factorio_version -eq "1.0"
+$isFactorio11Line = $repoInfo.factorio_version -eq "1.1"
+$isReducedLegacyLine = [bool]$targetProfile.reduced_legacy
+$isLegacyFactorio20 = [bool]$targetProfile.legacy_factorio_2_0
 $isFactorio21Line = $repoInfo.factorio_version -eq "2.1"
 $script:ValidationPackageZipPath = $null
 
@@ -132,10 +143,54 @@ Invoke-RepoCheck "info.json parses" {
   $null = $repoInfo
 }
 
+Invoke-RepoCheck "target profile views match canonical manifest" {
+  & (Join-Path $repo "scripts\Sync-MIRTargetProfiles.ps1") -RepoRoot $repo -Check
+}
+
+Invoke-RepoCheck "release candidate evidence is fresh or explicitly rebuilding" {
+  & (Join-Path $repo "scripts\Test-MIRCandidateFreshness.ps1") -RepoRoot $repo
+}
+
 Invoke-RepoCheck "release metadata matches Factorio line" {
   $deps = @($repoInfo.dependencies)
 
-  if ($isLegacyFactorio20) {
+  if ($isFactorio017Line) {
+    if ($deps -notcontains "base >= 0.17") {
+      throw "Factorio 0.17 metadata must declare base >= 0.17."
+    }
+
+    $newerDeps = @($deps | Where-Object { $_ -match ">=\s*(0\.18|1|2)\." -or $_ -match "(space-age|quality|recycler|elevated-rails)" })
+    if ($newerDeps.Count -gt 0) {
+      throw "Factorio 0.17 metadata must not carry Factorio 0.18, 1.x, 2.x, or DLC dependencies: $($newerDeps -join ', ')"
+    }
+  } elseif ($isFactorio018Line) {
+    if ($deps -notcontains "base >= 0.18") {
+      throw "Factorio 0.18 metadata must declare base >= 0.18."
+    }
+
+    $newerDeps = @($deps | Where-Object { $_ -match ">=\s*(1|2)\." -or $_ -match "(space-age|quality|recycler|elevated-rails)" })
+    if ($newerDeps.Count -gt 0) {
+      throw "Factorio 0.18 metadata must not carry Factorio 1.x, 2.x, or DLC dependencies: $($newerDeps -join ', ')"
+    }
+  } elseif ($isFactorio10Line) {
+    if ($deps -notcontains "base >= 1.0") {
+      throw "Factorio 1.0 metadata must declare base >= 1.0."
+    }
+
+    $newerDeps = @($deps | Where-Object { $_ -match ">=\s*(1\.1|2)\." -or $_ -match "(space-age|quality|recycler|elevated-rails)" })
+    if ($newerDeps.Count -gt 0) {
+      throw "Factorio 1.0 metadata must not carry Factorio 1.1, 2.x, or DLC dependencies: $($newerDeps -join ', ')"
+    }
+  } elseif ($isFactorio11Line) {
+    if ($deps -notcontains "base >= 1.1") {
+      throw "Factorio 1.1 metadata must declare base >= 1.1."
+    }
+
+    $newerDeps = @($deps | Where-Object { $_ -match ">=\s*2\." -or $_ -match "(space-age|quality|recycler|elevated-rails)" })
+    if ($newerDeps.Count -gt 0) {
+      throw "Factorio 1.1 metadata must not carry Factorio 2.x or DLC dependencies: $($newerDeps -join ', ')"
+    }
+  } elseif ($isLegacyFactorio20) {
     if ($deps -notcontains "base >= 2.0") {
       throw "Factorio 2.0 legacy metadata must declare base >= 2.0."
     }
@@ -304,6 +359,12 @@ Invoke-RepoCheck "control runtime avoids tick handlers" {
 
 Invoke-RepoCheck "default-off scripted streams remain guarded" {
   $defaultsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\settings\defaults.lua")
+  if ($isReducedLegacyLine) {
+    if ($defaultsText -match "research_(spoilage_preservation|agricultural_growth_speed)\s*=") {
+      throw "Factorio $($repoInfo.factorio_version) must omit scripted Space Age streams instead of carrying disabled settings."
+    }
+    return
+  }
   if ($defaultsText -notmatch "(?s)research_spoilage_preservation\s*=\s*\{.*?enabled\s*=\s*false") {
     throw "Spoilage preservation must remain disabled by default until manual save validation supports stronger release claims."
   }
@@ -322,6 +383,7 @@ Invoke-RepoCheck "unsafe pickup reach technology effects are blocked" {
   $directEffectsPlannerText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\planner\direct_effects.lua")
   $streamAdapterText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\emit\stream_spec_adapter.lua")
   $baseExtensionsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\emit\base_extensions.lua")
+  $graphSafetyText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\emit\technology_graph_safety.lua")
   $dataFinalFixesText = Get-MIRDataFinalFixesSourceText
   $generationIntegrityFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-generation-integrity\data-final-fixes.lua")
 
@@ -333,10 +395,14 @@ Invoke-RepoCheck "unsafe pickup reach technology effects are blocked" {
 
   $requiredGuardSnippets = @(
     @{ File = "prototypes\mir\planner\direct_effects.lua"; Text = $directEffectsPlannerText; Snippet = 'effect_safety.assert_effect_allowed(effect, "direct-effect stream " .. key)' },
-    @{ File = "prototypes\mir\emit\stream_spec_adapter.lua"; Text = $streamAdapterText; Snippet = 'effect_safety.register_generated_technology(technology.name)' },
+    @{ File = "prototypes\mir\emit\stream_spec_adapter.lua"; Text = $streamAdapterText; Snippet = 'generated_registry.register(technology.name)' },
     @{ File = "prototypes\mir\emit\base_extensions.lua"; Text = $baseExtensionsText; Snippet = 'effect_safety.assert_effects_allowed(desired_effects, "base extension " .. key)' },
-    @{ File = "prototypes\mir\emit\base_extensions.lua"; Text = $baseExtensionsText; Snippet = 'effect_safety.register_generated_technology(new.name)' },
+    @{ File = "prototypes\mir\emit\base_extensions.lua"; Text = $baseExtensionsText; Snippet = 'generated_registry.register(new.name)' },
     @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'require("prototypes.mir.emit.effect_safety").assert_registered_technology_effects()' },
+    @{ File = "prototypes\mir\emit\effect_safety.lua"; Text = $safetyText; Snippet = 'data_raw.prototype("recipe", recipe_name)' },
+    @{ File = "prototypes\mir\emit\technology_graph_safety.lua"; Text = $graphSafetyText; Snippet = 'generated_registry.sorted_names()' },
+    @{ File = "prototypes\mir\emit\technology_graph_safety.lua"; Text = $graphSafetyText; Snippet = 'technology.enabled == false' },
+    @{ File = "prototypes\mir\emit\technology_graph_safety.lua"; Text = $graphSafetyText; Snippet = 'science.pack_production_status(pack_name)' },
     @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'assert_no_blocked_pickup_effects()' }
   )
 
@@ -391,6 +457,10 @@ Invoke-RepoCheck "PowerShell scripts parse and avoid duplicate parameters" {
   & (Join-Path $repo "scripts\Test-MIRPowerShellQuality.ps1") -RepoRoot $repo
 }
 
+Invoke-RepoCheck "validation scenario groups and partial result aggregation are stable" {
+  & (Join-Path $repo "scripts\Test-MIRValidationResults.ps1") -RepoRoot $repo
+}
+
 Invoke-RepoCheck "fixture mods have metadata and data entrypoints" {
   $fixtureRootForStatic = Join-Path $repo "fixtures"
   if (-not (Test-Path -LiteralPath $fixtureRootForStatic)) {
@@ -414,7 +484,23 @@ Invoke-RepoCheck "fixture mods have metadata and data entrypoints" {
       throw "Fixture $($info.name) must target Factorio $($repoInfo.factorio_version) on this branch; found $($info.factorio_version)."
     }
     $fixtureBaseDependency = @($info.dependencies) | Where-Object { $_ -match "^base\s+>=" } | Select-Object -First 1
-    if ($isLegacyFactorio20) {
+    if ($isFactorio017Line) {
+      if ($fixtureBaseDependency -notmatch "^base\s+>=\s+0\.17(\.|$)") {
+        throw "Fixture $($info.name) must use a Factorio 0.17 base dependency on this branch; found '$fixtureBaseDependency'."
+      }
+    } elseif ($isFactorio018Line) {
+      if ($fixtureBaseDependency -notmatch "^base\s+>=\s+0\.18(\.|$)") {
+        throw "Fixture $($info.name) must use a Factorio 0.18 base dependency on this branch; found '$fixtureBaseDependency'."
+      }
+    } elseif ($isFactorio10Line) {
+      if ($fixtureBaseDependency -notmatch "^base\s+>=\s+1\.0(\.|$)") {
+        throw "Fixture $($info.name) must use a Factorio 1.0 base dependency on this branch; found '$fixtureBaseDependency'."
+      }
+    } elseif ($isFactorio11Line) {
+      if ($fixtureBaseDependency -notmatch "^base\s+>=\s+1\.1(\.|$)") {
+        throw "Fixture $($info.name) must use a Factorio 1.1 base dependency on this branch; found '$fixtureBaseDependency'."
+      }
+    } elseif ($isLegacyFactorio20) {
       if ($fixtureBaseDependency -notmatch "^base\s+>=\s+2\.0(\.|$)") {
         throw "Fixture $($info.name) must use a Factorio 2.0 base dependency on legacy; found '$fixtureBaseDependency'."
       }
@@ -463,12 +549,21 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
   $plannerCostsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\planner\costs.lua")
   $plannerPrerequisitesText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\planner\prerequisites.lua")
   $plannerRequirementsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\planner\requirements.lua")
+  $recipeUnlockIndexText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\index\recipe_unlocks.lua")
+  $productivityStreamsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\streams\productivity.lua")
   $dataFinalFixesText = Get-MIRDataFinalFixesSourceText
   $pipelineExtentText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\pipeline\extent.lua")
   $pipelineExtentSettingsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\settings\pipeline_extent.lua")
   $diagnosticsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\report\diagnostics_sink.lua")
   $weaponSpeedText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\policy\weapon_speed.lua")
+  $nativeEffectCoverageText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\policy\native_effect_coverage.lua")
+  $generatedRegistryText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\emit\generated_technology_registry.lua")
+  $weaponSpeedFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-weapon-speed-safety\data-final-fixes.lua")
   $generationIntegrityFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-generation-integrity\data-final-fixes.lua")
+  $generatedPrerequisiteFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-generated-prerequisite-safety\data-final-fixes.lua")
+  $generatedPrerequisiteRuntimeText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-generated-prerequisite-safety\control.lua")
+  $lateRecipeRemovalFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\rigor-late-recipe-removal\data-final-fixes.lua")
+  $lateRecipeRemovalDataText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\rigor-late-recipe-removal\data.lua")
   $fluidProductivityFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-fluid-productivity\data-final-fixes.lua")
   $pipelineExtentFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-pipeline-extent\data-final-fixes.lua")
   $betterBotBatteryFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-better-bot-battery-skip\data-final-fixes.lua")
@@ -517,6 +612,7 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'order = setting_order.global("diagnostics", 10)' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'name = "ips-enable-"..key' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'localised_description = append_note({"mod-setting-description.ips-enable-stream", tech_locale}, settings_note)' },
+    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'local locale_key = defaults_spec.locale_key or defaults_spec.chain_key or spec.locale_key or spec.key' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'localised_name = {"mod-setting-name.mir-max-level", locale}' },
     @{ File = "prototypes\mir\settings\resolver.lua"; Text = $settingsResolverText; Snippet = 'function R.stream_enabled(key, spec)' },
     @{ File = "prototypes\mir\settings\resolver.lua"; Text = $settingsResolverText; Snippet = 'function R.base_enabled(key, spec)' },
@@ -637,8 +733,25 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "prototypes\mir\pipeline\extent.lua"; Text = $pipelineExtentText; Snippet = 'if multiplier == 1 then return end' },
     @{ File = "prototypes\mir\report\diagnostics_sink.lua"; Text = $diagnosticsText; Snippet = 'icons.icon_source_for_stream(spec or {})' },
     @{ File = "prototypes\mir\emit\icon_builder.lua"; Text = $technologyIconsText; Snippet = 'local out = strip_constant_overlays(base_icons)' },
+    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityStreamsText; Snippet = '"%-incineration$"' },
+    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityStreamsText; Snippet = '"%-incinerate$"' },
     @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'assert_generated_icon_badge(tech_name, tech)' },
     @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'assert_no_space_age_icon_path_in_base(tech_name, tech)' },
+    @{ File = "fixtures\assert-generated-prerequisite-safety\data-final-fixes.lua"; Text = $generatedPrerequisiteFixtureText; Snippet = 'initial_status ~= "initial"' },
+    @{ File = "fixtures\assert-generated-prerequisite-safety\data-final-fixes.lua"; Text = $generatedPrerequisiteFixtureText; Snippet = 'mir-fixture-custom-unlocker-a' },
+    @{ File = "fixtures\assert-generated-prerequisite-safety\data-final-fixes.lua"; Text = $generatedPrerequisiteFixtureText; Snippet = 'mir-fixture-self-lock-science-pack' },
+    @{ File = "fixtures\assert-generated-prerequisite-safety\data-final-fixes.lua"; Text = $generatedPrerequisiteFixtureText; Snippet = 'mir-fixture-cycle-science-pack-a' },
+    @{ File = "fixtures\assert-generated-prerequisite-safety\data-final-fixes.lua"; Text = $generatedPrerequisiteFixtureText; Snippet = 'missing-research-mechanism' },
+    @{ File = "fixtures\assert-generated-prerequisite-safety\control.lua"; Text = $generatedPrerequisiteRuntimeText; Snippet = 'force.research_all_technologies()' },
+    @{ File = "prototypes\mir\index\recipe_unlocks.lua"; Text = $recipeUnlockIndexText; Snippet = 'function M.for_recipe(recipe_name)' },
+    @{ File = "prototypes\mir\capabilities\science_integration\science_packs.lua"; Text = $scienceText; Snippet = 'function S.researchable_unlockers_for_recipe(recipe_name)' },
+    @{ File = "prototypes\mir\capabilities\science_integration\science_selector.lua"; Text = $scienceSelectorText; Snippet = 'science.researchable_unlockers_for_recipe(recipe_name)' },
+    @{ File = "prototypes\mir\planner\prerequisites.lua"; Text = $plannerPrerequisitesText; Snippet = 'science.researchable_unlockers_for_recipe(recipe_name)' },
+    @{ File = "prototypes\mir\planner\requirements.lua"; Text = $plannerRequirementsText; Snippet = 'science.technology_researchability_reason(tech_name)' },
+    @{ File = "fixtures\rigor-late-recipe-removal\data-final-fixes.lua"; Text = $lateRecipeRemovalFixtureText; Snippet = 'data.raw.recipe[target] = nil' },
+    @{ File = "fixtures\rigor-late-recipe-removal\data-final-fixes.lua"; Text = $lateRecipeRemovalFixtureText; Snippet = 'microculture-vat-breeding' },
+    @{ File = "fixtures\rigor-late-recipe-removal\data-final-fixes.lua"; Text = $lateRecipeRemovalFixtureText; Snippet = 'example-culture-incinerate' },
+    @{ File = "fixtures\rigor-late-recipe-removal\data.lua"; Text = $lateRecipeRemovalDataText; Snippet = 'mir-fixture-normal-crafting' },
     @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'mir-use-installed-space-age-icons' },
     @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'assert_tech_uses_icon_path("recipe-prod-research_electric_shooting_speed-1", "__space-age__/graphics/technology/electric-weapons-damage.png")' },
     @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'assert_tech_uses_item_icon("recipe-prod-research_heavy_ammo-1", "cannon-shell")' },
@@ -665,6 +778,15 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "fixtures\assert-better-bot-battery-skip\data-final-fixes.lua"; Text = $betterBotBatteryFixtureText; Snippet = 'recipe-prod-research_robot_battery-1' },
     @{ File = "fixtures\assert-better-bot-battery-skip\data-final-fixes.lua"; Text = $betterBotBatteryFixtureText; Snippet = 'worker-robots-battery-6' },
     @{ File = "prototypes\mir\policy\weapon_speed.lua"; Text = $weaponSpeedText; Snippet = 'tech.unit and tech.unit.count_formula' },
+    @{ File = "prototypes\mir\policy\weapon_speed.lua"; Text = $weaponSpeedText; Snippet = 'native_effect_coverage.technology_has_exact_effect' },
+    @{ File = "prototypes\mir\policy\weapon_speed.lua"; Text = $weaponSpeedText; Snippet = 'generated_registry.contains(name)' },
+    @{ File = "prototypes\mir\emit\generated_technology_registry.lua"; Text = $generatedRegistryText; Snippet = 'function M.contains(name)' },
+    @{ File = "prototypes\mir\policy\native_effect_coverage.lua"; Text = $nativeEffectCoverageText; Snippet = 'science.technology_is_researchable(name)' },
+    @{ File = "prototypes\mir\policy\native_effect_coverage.lua"; Text = $nativeEffectCoverageText; Snippet = 'technology.max_level ~= "infinite"' },
+    @{ File = "fixtures\assert-weapon-speed-safety\data-final-fixes.lua"; Text = $weaponSpeedFixtureText; Snippet = 'weapon-shooting-speed-5' },
+    @{ File = "fixtures\assert-weapon-speed-safety\data-final-fixes.lua"; Text = $weaponSpeedFixtureText; Snippet = 'mir-fixture-external-weapon-speed-owner' },
+    @{ File = "fixtures\assert-weapon-speed-safety\data-final-fixes.lua"; Text = $weaponSpeedFixtureText; Snippet = 'mir-fixture-unreachable-weapon-speed-owner' },
+    @{ File = "fixtures\assert-weapon-speed-safety\data-final-fixes.lua"; Text = $weaponSpeedFixtureText; Snippet = 'weapon-shooting-speed-99' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = '[modifier-description]' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'more-infinite-research.electric_shooting_speed=' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'more-infinite-research.flamethrower_shooting_speed=' },
@@ -710,14 +832,14 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "prototypes\mir\settings\defaults.lua"; Text = $defaultsText; Snippet = 'research_lab_productivity = {' }
   )
 
-  if ($isLegacyFactorio20) {
+  if ($isReducedLegacyLine -or $isLegacyFactorio20) {
     $legacyForbiddenCargoSnippets = @(
       'type = "max-cargo-bay-unloading-distance"',
       'type = "cargo-landing-pad-count"'
     )
     foreach ($snippet in $legacyForbiddenCargoSnippets) {
       if ($directEffectsText.Contains($snippet)) {
-        throw "Factorio 2.0 legacy must not include Factorio 2.1-only cargo technology modifier in prototypes\streams\direct-effects.lua: $snippet"
+        throw "Factorio $($repoInfo.factorio_version) must not include Factorio 2.1-only cargo technology modifier in prototypes\streams\direct-effects.lua: $snippet"
       }
     }
   } else {
@@ -737,9 +859,61 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     )
   }
 
+  if ($isReducedLegacyLine) {
+    $requiredSnippets = @(
+      $requiredSnippets | Where-Object {
+        -not (
+          $_.File -eq "prototypes\streams\direct-effects.lua" -and
+          $_.Snippet -in @(
+            'reason = "official-stream-settings-visible"',
+            "ui_visibility = {",
+            "generation_requirements = {",
+            '{technology = "electric-weapons-damage-1", required_mod = "space-age"}',
+            '__space-age__/graphics/technology/electric-weapons-damage.png',
+            '{technology = "research-productivity", required_mod = "space-age"}',
+            'ammo_category = "tesla", modifier = 0.1'
+          )
+        ) -and -not (
+          $_.File -eq "prototypes\mir\settings\defaults.lua" -and
+          $_.Snippet -in @(
+            "mod-setting-description.mir-note-experimental-spoilage",
+            "mod-setting-description.mir-note-agriculture-growth"
+          )
+        )
+      }
+    )
+  }
+
+  if ($isReducedLegacyLine) {
+    $reducedForbiddenDirectEffectSnippets = @(
+      '__space-age__/',
+      '{technology = "electric-weapons-damage-1", required_mod = "space-age"}',
+      '{technology = "research-productivity", required_mod = "space-age"}',
+      'ammo_category = "tesla"',
+      '"agricultural-science-pack"',
+      '"electromagnetic-science-pack"',
+      '"cryogenic-science-pack"'
+    )
+    foreach ($snippet in $reducedForbiddenDirectEffectSnippets) {
+      if ($directEffectsText.Contains($snippet)) {
+        throw "Factorio $($repoInfo.factorio_version) direct-effect streams must not carry newer-line surface '$snippet'."
+      }
+    }
+  }
+
   foreach ($check in $requiredSnippets) {
     if (-not $check.Text.Contains($check.Snippet)) {
       throw "Missing science-pack progression setting wiring in $($check.File): $($check.Snippet)"
+    }
+  }
+
+  $duplicatedUnlockScan = 'effect.type == "unlock-recipe" and effect.recipe == recipe_name'
+  foreach ($consumer in @(
+    @{ File = "prototypes\mir\capabilities\science_integration\science_selector.lua"; Text = $scienceSelectorText },
+    @{ File = "prototypes\mir\planner\prerequisites.lua"; Text = $plannerPrerequisitesText }
+  )) {
+    if ($consumer.Text.Contains($duplicatedUnlockScan)) {
+      throw "Recipe unlock facts must come from the shared index: $($consumer.File)"
     }
   }
 
@@ -771,15 +945,23 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
       throw "Missing explicit default science pack list for $weaponSpeedStream in prototypes/mir/settings/defaults.lua."
     }
     $packs = $match.Groups["packs"].Value
-    if (-not $packs.Contains("electromagnetic-science-pack")) {
-      throw "$weaponSpeedStream prototypes/mir/settings/defaults.lua science packs must include electromagnetic-science-pack."
-    }
-    if ($packs.Contains("agricultural-science-pack")) {
-      throw "$weaponSpeedStream prototypes/mir/settings/defaults.lua science packs must not include agricultural-science-pack."
+    if ($isReducedLegacyLine) {
+      foreach ($newerPack in @("agricultural-science-pack", "electromagnetic-science-pack", "cryogenic-science-pack")) {
+        if ($packs.Contains($newerPack)) {
+          throw "$weaponSpeedStream prototypes/mir/settings/defaults.lua science packs must not include $newerPack on Factorio $($repoInfo.factorio_version)."
+        }
+      }
+    } else {
+      if (-not $packs.Contains("electromagnetic-science-pack")) {
+        throw "$weaponSpeedStream prototypes/mir/settings/defaults.lua science packs must include electromagnetic-science-pack."
+      }
+      if ($packs.Contains("agricultural-science-pack")) {
+        throw "$weaponSpeedStream prototypes/mir/settings/defaults.lua science packs must not include agricultural-science-pack."
+      }
     }
   }
 
-  if (-not $isLegacyFactorio20) {
+  if ($isFactorio21Line) {
     if ($defaultsText -notmatch '(?s)research_cargo_bay_unloading_distance\s*=\s*\{.*?research_time\s*=\s*120') {
       throw "Cargo bay unloading distance default research time must be 120 seconds."
     }
@@ -788,13 +970,18 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     }
   }
 
-  foreach ($promotedSpecialStream in @(
-    "research_breeding",
-    "research_agricultural_growth_speed",
-    "research_cargo_bay_unloading_distance",
-    "research_cargo_landing_pad_count",
-    "research_character_reach"
-  )) {
+  $promotedSpecialStreams = @("research_character_reach")
+  if (-not $isReducedLegacyLine) {
+    $promotedSpecialStreams = @(
+      "research_breeding",
+      "research_agricultural_growth_speed",
+      "research_cargo_bay_unloading_distance",
+      "research_cargo_landing_pad_count",
+      "research_character_reach"
+    )
+  }
+
+  foreach ($promotedSpecialStream in $promotedSpecialStreams) {
     if ($defaultsText -notmatch "(?s)$promotedSpecialStream\s*=\s*\{.*?settings_priority\s*=\s*`"top`"") {
       throw "$promotedSpecialStream must stay in the enabled special technology settings bucket."
     }
@@ -937,6 +1124,7 @@ Invoke-RepoCheck "compat audit automation tooling is wired" {
     @{ File = "scripts\Invoke-MIRCompatAudit.ps1"; Text = $compatAuditText; Snippet = "[switch]`$ContinueOnDependencyFailure" },
     @{ File = "scripts\Invoke-MIRCompatAudit.ps1"; Text = $compatAuditText; Snippet = "[string[]]`$LocalModZipDirs = @()" },
     @{ File = "scripts\Invoke-MIRCompatAudit.ps1"; Text = $compatAuditText; Snippet = "[string[]]`$LocalModLibraryDirs = @()" },
+    @{ File = "scripts\Invoke-MIRCompatAudit.ps1"; Text = $compatAuditText; Snippet = "[string]`$ModUnderTestZip = `"`"" },
     @{ File = "scripts\Invoke-MIRCompatAudit.ps1"; Text = $compatAuditText; Snippet = "[switch]`$RunLocalModZips" },
     @{ File = "scripts\Invoke-MIRCompatAudit.ps1"; Text = $compatAuditText; Snippet = "[switch]`$RunGeneratedLocalScenarios" },
     @{ File = "scripts\Invoke-MIRCompatAudit.ps1"; Text = $compatAuditText; Snippet = "[switch]`$GenerateLocalClusterScenarios" },
@@ -961,6 +1149,7 @@ Invoke-RepoCheck "compat audit automation tooling is wired" {
     @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = "[int]`$ScenarioTimeoutSeconds = 900" },
     @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = "Stop-Process -Id `$process.Id -Force" },
     @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = "source_path" },
+    @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = '[string]$ZipPath = ""' },
     @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = '"artifacts"' },
     @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = '"build"' },
     @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = '"dist"' },
@@ -971,6 +1160,7 @@ Invoke-RepoCheck "compat audit automation tooling is wired" {
     @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = 'prototypes\mir\report\diagnostics_sink.lua' },
     @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = "[string[]]`$OfficialBuiltinMods" },
     @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = "enabled = `$enabledLookup.ContainsKey" },
+    @{ File = "fixtures\compat-matrix\local-library-scenarios.json"; Text = $localLibraryScenariosText; Snippet = "local-2-1-crucible-rigor-exact-dist" },
     @{ File = "scripts\MIRCompatAudit\ModPortal.ps1"; Text = $modPortalText; Snippet = '[^\s<>=]+' },
     @{ File = "scripts\MIRCompatAudit\DependencyResolver.ps1"; Text = $dependencyResolverText; Snippet = "[switch]`$IncludeRecommendedDependencies" },
     @{ File = "scripts\MIRCompatAudit\DiagnosticsParser.ps1"; Text = $diagnosticsParserText; Snippet = "[AllowEmptyString()][string]`$Line" },
@@ -1718,6 +1908,26 @@ if (-not (Test-Path -LiteralPath $FactorioBin)) {
   throw "Factorio binary not found: $FactorioBin"
 }
 
+if ([string]::IsNullOrWhiteSpace($ValidationSummaryPath)) {
+  $ValidationSummaryPath = Join-Path $repo "artifacts\validation\factorio-$($repoInfo.factorio_version)-summary.json"
+}
+Initialize-MIRValidationResult `
+  -OutputPath $ValidationSummaryPath `
+  -FactorioVersion $repoInfo.factorio_version `
+  -RequiredGroups @($targetProfile.required_validation_groups) `
+  -MirVersion $repoInfo.version `
+  -GitCommit (Get-MIRGitCommit -RepoRoot $repo) `
+  -TargetProfileSha256 (Get-MIRTargetProfileFingerprint -Profile $targetProfile) `
+  -RequiredGroupsSha256 (Get-MIRRequiredGroupsFingerprint -RequiredGroups @($targetProfile.required_validation_groups)) `
+  -PackageSourceSha256 (Get-MIRPackageSourceFingerprint -RepoRoot $repo) `
+  -ValidationPackageSha256 (Get-MIRFileSha256 -Path $script:ValidationPackageZipPath) `
+  -ValidationPackageContentSha256 (Get-MIRZipContentFingerprint -Path $script:ValidationPackageZipPath) `
+  -FactorioBinaryVersion (Get-MIRFactorioBinaryVersion -Path $FactorioBin) `
+  -PackageSourceGitDirty (Test-MIRPackageSourceGitDirty -RepoRoot $repo) | Out-Null
+Add-MIRValidationCompletedScenario -Name "static-validation" -Group "static" -EvidencePaths @("scripts/Invoke-MIRValidation.ps1")
+Add-MIRValidationCompletedScenario -Name "package-build" -Group "package" -EvidencePaths @("build/validation-dist")
+Add-MIRValidationCompletedScenario -Name "runtime-state-contract" -Group "runtime-state" -EvidencePaths @("prototypes/mir/platform/factorio/runtime_state.lua")
+
 $usesGeneratedUserDataDir = [string]::IsNullOrWhiteSpace($UserDataDir)
 if ($usesGeneratedUserDataDir) {
   $UserDataDir = Join-Path ([System.IO.Path]::GetTempPath()) ("mir-factorio-userdata-" + [guid]::NewGuid().ToString("N"))
@@ -1849,10 +2059,13 @@ $postMirAssertionFixtures = @(
   "mir-fixture-assert-big-mining-drill-productivity",
   "mir-fixture-assert-capability-negative-cases",
   "mir-fixture-assert-generation-integrity",
+  "mir-fixture-assert-generated-prerequisite-safety",
+  "mir-fixture-rigor-late-recipe-removal",
   "mir-fixture-assert-hidden-setting-readability",
   "mir-fixture-assert-science-pack-productivity",
   "mir-fixture-assert-lab-skip-policy",
   "mir-fixture-assert-lab-productivity-owner-skip",
+  "mir-fixture-assert-legacy-effect-icons",
   "mir-fixture-assert-base-extension-boundary",
   "mir-fixture-assert-cargo-logistics",
   "mir-fixture-assert-fluid-productivity",
@@ -1862,6 +2075,7 @@ $postMirAssertionFixtures = @(
   "mir-fixture-assert-plates-n-circuit-productivity-blocked",
   "mir-fixture-assert-plates-n-circuit-productivity-change-mismatch",
   "mir-fixture-assert-prototype-limits",
+  "mir-fixture-assert-reduced-settings-surface",
   "mir-fixture-assert-settings-profile-roundtrip",
   "mir-fixture-assert-vanilla-family-adoption",
   "mir-fixture-assert-vanilla-family-exact-owner",
@@ -2326,52 +2540,61 @@ function Invoke-RuntimeScenario {
     [switch]$EnableSpaceAge
   )
 
-  $scenario = Initialize-RuntimeScenario `
-    -ScenarioName $ScenarioName `
-    -EnabledFixtureNames $EnabledFixtureNames `
-    -EnabledStreamKeys $EnabledStreamKeys `
-    -EnabledBaseExtensionKeys $EnabledBaseExtensionKeys `
-    -DisabledStreamKeys $DisabledStreamKeys `
-    -DisabledBaseExtensionKeys $DisabledBaseExtensionKeys `
-    -LabPolicySkip:$LabPolicySkip `
-    -SciencePackIngredientPolicy $SciencePackIngredientPolicy `
-    -WeaponSpeedAdjustmentMode $WeaponSpeedAdjustmentMode `
-    -PipelineExtentMultiplier $PipelineExtentMultiplier `
-    -PrototypeProductivityCap $PrototypeProductivityCap `
-    -PrototypeEfficiencyCap $PrototypeEfficiencyCap `
-    -PrototypePollutionCap $PrototypePollutionCap `
-    -PrototypeSpeedCap $PrototypeSpeedCap `
-    -PrototypeQualityCap $PrototypeQualityCap `
-    -PrototypePositivePowerFloor:$PrototypePositivePowerFloor `
-    -RequireSpaceGate:$RequireSpaceGate `
-    -UseInstalledSpaceAgeIcons:$UseInstalledSpaceAgeIcons `
-    -ScriptedDiagnostics:$ScriptedDiagnostics `
-    -EnableSpaceAge:$EnableSpaceAge
-  if (Test-Path -LiteralPath $scenario.SavePath) {
-    Remove-Item -LiteralPath $scenario.SavePath -Force
+  $scenarioGroup = Get-MIRValidationScenarioGroup -ScenarioName $ScenarioName -Kind "runtime" -EnableSpaceAge:$EnableSpaceAge
+  $resultRecord = Start-MIRValidationScenario -Name $ScenarioName -Kind "runtime" -Group $scenarioGroup -EvidencePaths @($FactorioLog)
+  try {
+    $scenario = Initialize-RuntimeScenario `
+      -ScenarioName $ScenarioName `
+      -EnabledFixtureNames $EnabledFixtureNames `
+      -EnabledStreamKeys $EnabledStreamKeys `
+      -EnabledBaseExtensionKeys $EnabledBaseExtensionKeys `
+      -DisabledStreamKeys $DisabledStreamKeys `
+      -DisabledBaseExtensionKeys $DisabledBaseExtensionKeys `
+      -LabPolicySkip:$LabPolicySkip `
+      -SciencePackIngredientPolicy $SciencePackIngredientPolicy `
+      -WeaponSpeedAdjustmentMode $WeaponSpeedAdjustmentMode `
+      -PipelineExtentMultiplier $PipelineExtentMultiplier `
+      -PrototypeProductivityCap $PrototypeProductivityCap `
+      -PrototypeEfficiencyCap $PrototypeEfficiencyCap `
+      -PrototypePollutionCap $PrototypePollutionCap `
+      -PrototypeSpeedCap $PrototypeSpeedCap `
+      -PrototypeQualityCap $PrototypeQualityCap `
+      -PrototypePositivePowerFloor:$PrototypePositivePowerFloor `
+      -RequireSpaceGate:$RequireSpaceGate `
+      -UseInstalledSpaceAgeIcons:$UseInstalledSpaceAgeIcons `
+      -ScriptedDiagnostics:$ScriptedDiagnostics `
+      -EnableSpaceAge:$EnableSpaceAge
+    if (Test-Path -LiteralPath $scenario.SavePath) {
+      Remove-Item -LiteralPath $scenario.SavePath -Force
+    }
+
+    Write-Host "[run] Factorio load check with fixture mods ($ScenarioName)"
+    Clear-FactorioLog
+    $factorioArgs = @(
+      "--config",
+      $factorioConfigPath,
+      "--no-log-rotation",
+      "--disable-audio",
+      "--mod-directory",
+      $scenario.ModsDir,
+      "--create",
+      $scenario.SavePath
+    )
+    $factorioExitCode = Invoke-FactorioProcess -FilePath $FactorioBin -Arguments $factorioArgs
+    if ($factorioExitCode -ne 0) {
+      throw "Factorio runtime validation scenario $ScenarioName exited with code $factorioExitCode"
+    }
+    if (-not (Test-Path -LiteralPath $scenario.SavePath)) {
+      throw "Factorio runtime validation scenario $ScenarioName did not create the expected save: $($scenario.SavePath). Factorio exit code: $factorioExitCode"
+    }
+
+    Assert-RuntimeLogHealthy -ScenarioName $ScenarioName
+    Complete-MIRValidationScenario -Record $resultRecord -Status "passed"
+  } catch {
+    Complete-MIRValidationScenario -Record $resultRecord -Status "failed" -ErrorMessage $_.Exception.Message
+    throw
   }
 
-  Write-Host "[run] Factorio load check with fixture mods ($ScenarioName)"
-  Clear-FactorioLog
-  $factorioArgs = @(
-    "--config",
-    $factorioConfigPath,
-    "--no-log-rotation",
-    "--disable-audio",
-    "--mod-directory",
-    $scenario.ModsDir,
-    "--create",
-    $scenario.SavePath
-  )
-  $factorioExitCode = Invoke-FactorioProcess -FilePath $FactorioBin -Arguments $factorioArgs
-  if ($factorioExitCode -ne 0) {
-    throw "Factorio runtime validation scenario $ScenarioName exited with code $factorioExitCode"
-  }
-  if (-not (Test-Path -LiteralPath $scenario.SavePath)) {
-    throw "Factorio runtime validation scenario $ScenarioName did not create the expected save: $($scenario.SavePath). Factorio exit code: $factorioExitCode"
-  }
-
-  Assert-RuntimeLogHealthy -ScenarioName $ScenarioName
 }
 
 function Invoke-RuntimeConfigurationChangeScenario {
@@ -2382,64 +2605,72 @@ function Invoke-RuntimeConfigurationChangeScenario {
     [switch]$EnableSpaceAge
   )
 
-  $initialScenario = Initialize-RuntimeScenario `
-    -ScenarioName "$ScenarioName-initial" `
-    -EnabledFixtureNames $InitialFixtureNames `
-    -EnableSpaceAge:$EnableSpaceAge
-  if (Test-Path -LiteralPath $initialScenario.SavePath) {
-    Remove-Item -LiteralPath $initialScenario.SavePath -Force
+  $scenarioGroup = Get-MIRValidationScenarioGroup -ScenarioName $ScenarioName -Kind "configuration-change" -EnableSpaceAge:$EnableSpaceAge
+  $resultRecord = Start-MIRValidationScenario -Name $ScenarioName -Kind "configuration-change" -Group $scenarioGroup -EvidencePaths @($FactorioLog)
+  try {
+    $initialScenario = Initialize-RuntimeScenario `
+      -ScenarioName "$ScenarioName-initial" `
+      -EnabledFixtureNames $InitialFixtureNames `
+      -EnableSpaceAge:$EnableSpaceAge
+    if (Test-Path -LiteralPath $initialScenario.SavePath) {
+      Remove-Item -LiteralPath $initialScenario.SavePath -Force
+    }
+
+    Write-Host "[run] Factorio initial save for configuration-change check ($ScenarioName)"
+    Clear-FactorioLog
+    $createArgs = @(
+      "--config",
+      $factorioConfigPath,
+      "--no-log-rotation",
+      "--disable-audio",
+      "--mod-directory",
+      $initialScenario.ModsDir,
+      "--create",
+      $initialScenario.SavePath
+    )
+    $createExitCode = Invoke-FactorioProcess -FilePath $FactorioBin -Arguments $createArgs
+    if ($createExitCode -ne 0) {
+      throw "Factorio configuration-change initial scenario $ScenarioName exited with code $createExitCode"
+    }
+    if (-not (Test-Path -LiteralPath $initialScenario.SavePath)) {
+      throw "Factorio configuration-change initial scenario $ScenarioName did not create the expected save: $($initialScenario.SavePath)."
+    }
+
+    Assert-RuntimeLogHealthy -ScenarioName "$ScenarioName initial"
+
+    $changedScenario = Initialize-RuntimeScenario `
+      -ScenarioName "$ScenarioName-changed" `
+      -EnabledFixtureNames $ChangedFixtureNames `
+      -EnableSpaceAge:$EnableSpaceAge
+
+    Write-Host "[run] Factorio configuration-change load check with fixture mods ($ScenarioName)"
+    Clear-FactorioLog
+    $benchmarkArgs = @(
+      "--config",
+      $factorioConfigPath,
+      "--no-log-rotation",
+      "--disable-audio",
+      "--mod-directory",
+      $changedScenario.ModsDir,
+      "--benchmark",
+      $initialScenario.SavePath,
+      "--benchmark-ticks",
+      "1",
+      "--benchmark-runs",
+      "1",
+      "--benchmark-sanitize"
+    )
+    $benchmarkExitCode = Invoke-FactorioProcess -FilePath $FactorioBin -Arguments $benchmarkArgs
+    if ($benchmarkExitCode -ne 0) {
+      throw "Factorio configuration-change load scenario $ScenarioName exited with code $benchmarkExitCode"
+    }
+
+    Assert-RuntimeLogHealthy -ScenarioName "$ScenarioName changed"
+    Complete-MIRValidationScenario -Record $resultRecord -Status "passed"
+  } catch {
+    Complete-MIRValidationScenario -Record $resultRecord -Status "failed" -ErrorMessage $_.Exception.Message
+    throw
   }
-
-  Write-Host "[run] Factorio initial save for configuration-change check ($ScenarioName)"
-  Clear-FactorioLog
-  $createArgs = @(
-    "--config",
-    $factorioConfigPath,
-    "--no-log-rotation",
-    "--disable-audio",
-    "--mod-directory",
-    $initialScenario.ModsDir,
-    "--create",
-    $initialScenario.SavePath
-  )
-  $createExitCode = Invoke-FactorioProcess -FilePath $FactorioBin -Arguments $createArgs
-  if ($createExitCode -ne 0) {
-    throw "Factorio configuration-change initial scenario $ScenarioName exited with code $createExitCode"
-  }
-  if (-not (Test-Path -LiteralPath $initialScenario.SavePath)) {
-    throw "Factorio configuration-change initial scenario $ScenarioName did not create the expected save: $($initialScenario.SavePath)."
-  }
-
-  Assert-RuntimeLogHealthy -ScenarioName "$ScenarioName initial"
-
-  $changedScenario = Initialize-RuntimeScenario `
-    -ScenarioName "$ScenarioName-changed" `
-    -EnabledFixtureNames $ChangedFixtureNames `
-    -EnableSpaceAge:$EnableSpaceAge
-
-  Write-Host "[run] Factorio configuration-change load check with fixture mods ($ScenarioName)"
-  Clear-FactorioLog
-  $benchmarkArgs = @(
-    "--config",
-    $factorioConfigPath,
-    "--no-log-rotation",
-    "--disable-audio",
-    "--mod-directory",
-    $changedScenario.ModsDir,
-    "--benchmark",
-    $initialScenario.SavePath,
-    "--benchmark-ticks",
-    "1",
-    "--benchmark-runs",
-    "1",
-    "--benchmark-sanitize"
-  )
-  $benchmarkExitCode = Invoke-FactorioProcess -FilePath $FactorioBin -Arguments $benchmarkArgs
-  if ($benchmarkExitCode -ne 0) {
-    throw "Factorio configuration-change load scenario $ScenarioName exited with code $benchmarkExitCode"
-  }
-
-  Assert-RuntimeLogHealthy -ScenarioName "$ScenarioName changed"
 }
 
 function Get-LastStreamReportLine {
@@ -2706,9 +2937,12 @@ function Invoke-PackageZipSmokeScenario {
     [switch]$EnableSpaceAge
   )
 
-  if ([string]::IsNullOrWhiteSpace($script:ValidationPackageZipPath) -or -not (Test-Path -LiteralPath $script:ValidationPackageZipPath)) {
-    throw "Validation package zip is unavailable for packaged zip smoke."
-  }
+  $scenarioGroup = Get-MIRValidationScenarioGroup -ScenarioName $ScenarioName -Kind "package" -EnableSpaceAge:$EnableSpaceAge
+  $resultRecord = Start-MIRValidationScenario -Name $ScenarioName -Kind "package" -Group $scenarioGroup -EvidencePaths @($script:ValidationPackageZipPath, $FactorioLog)
+  try {
+    if ([string]::IsNullOrWhiteSpace($script:ValidationPackageZipPath) -or -not (Test-Path -LiteralPath $script:ValidationPackageZipPath)) {
+      throw "Validation package zip is unavailable for packaged zip smoke."
+    }
 
   $scenarioRoot = Join-Path $validationRoot $ScenarioName
   if (Test-Path -LiteralPath $scenarioRoot) {
@@ -2759,12 +2993,148 @@ function Invoke-PackageZipSmokeScenario {
     throw "Factorio package zip smoke $ScenarioName did not create the expected save: $savePath"
   }
 
-  Assert-RuntimeLogHealthy -ScenarioName $ScenarioName
+    Assert-RuntimeLogHealthy -ScenarioName $ScenarioName
+    Complete-MIRValidationScenario -Record $resultRecord -Status "passed"
+  } catch {
+    Complete-MIRValidationScenario -Record $resultRecord -Status "failed" -ErrorMessage $_.Exception.Message
+    throw
+  }
 }
 
+function Invoke-WeaponSpeedPolicyMatrix {
+  param([string]$Context)
+
+  $dedicatedStreams = @(
+    "research_rocket_shooting_speed",
+    "research_cannon_shooting_speed"
+  )
+  $cases = @(
+    @{ Name = "weapon-overlap-off-coverage-absent"; Mode = "off"; CoverageAbsent = $true },
+    @{ Name = "weapon-overlap-off-coverage-present"; Mode = "off" },
+    @{ Name = "weapon-overlap-conditional-coverage-absent"; Mode = "only-when-dedicated-tech-enabled"; CoverageAbsent = $true },
+    @{ Name = "weapon-overlap-conditional-coverage-present"; Mode = "only-when-dedicated-tech-enabled" },
+    @{ Name = "weapon-overlap-always-coverage-absent"; Mode = "always"; CoverageAbsent = $true },
+    @{ Name = "weapon-overlap-always-coverage-present"; Mode = "always" }
+  )
+
+  foreach ($case in $cases) {
+    $parameters = @{
+      ScenarioName = $case.Name
+      EnabledFixtureNames = @("mir-fixture-assert-weapon-speed-safety")
+      WeaponSpeedAdjustmentMode = $case.Mode
+    }
+    if ($case.CoverageAbsent) {
+      $parameters.DisabledStreamKeys = $dedicatedStreams
+    }
+    Invoke-RuntimeScenario @parameters
+    $extensionLine = Get-LastExtensionReportLine -Key "weapon-shooting-speed"
+    Assert-ReportLineGenerated -Line $extensionLine -Context "$Context $($case.Name)"
+  }
+
+  Invoke-RuntimeScenario -ScenarioName "weapon-overlap-conditional-external-owner" -EnabledFixtureNames @(
+    "mir-fixture-weapon-speed-external-owner",
+    "mir-fixture-assert-weapon-speed-safety"
+  ) -WeaponSpeedAdjustmentMode "only-when-dedicated-tech-enabled"
+  $externalExtensionLine = Get-LastExtensionReportLine -Key "weapon-shooting-speed"
+  Assert-ReportLineGenerated -Line $externalExtensionLine -Context "$Context external owner"
+  foreach ($stream in $dedicatedStreams) {
+    $streamLine = Get-LastStreamReportLine -Key $stream
+    Assert-ReportLineContains -Line $streamLine -Expected "status=skipped" -Context "$Context external owner stream $stream"
+    Assert-ReportLineContains -Line $streamLine -Expected "reason=covered_by_existing_infinite_native_modifier" -Context "$Context external owner stream $stream"
+    Assert-ReportLineContains -Line $streamLine -Expected "owners=mir-fixture-external-weapon-speed-owner" -Context "$Context external owner stream $stream"
+  }
+}
+
+try {
 Invoke-PackageZipSmokeScenario -ScenarioName "package-zip-base"
 if ($isFactorio21Line) {
   Invoke-PackageZipSmokeScenario -ScenarioName "package-zip-space-age" -EnableSpaceAge
+}
+
+if ($isReducedLegacyLine) {
+  $reducedLineLabel = "Factorio $($repoInfo.factorio_version)"
+  Write-Host "[info] $reducedLineLabel reduced runtime gate skips 2.x recipe-productivity and DLC scenarios."
+
+  $directEffectFixtureNames = @()
+  if ($isFactorio017Line -or $isFactorio018Line -or $isFactorio10Line -or $isFactorio11Line) {
+    $directEffectFixtureNames += "mir-fixture-assert-legacy-effect-icons"
+  }
+  Invoke-RuntimeScenario -ScenarioName "factorio-$($repoInfo.factorio_version)-direct-effects" -EnabledFixtureNames $directEffectFixtureNames
+  foreach ($stream in @(
+    "research_cannon_shooting_speed",
+    "research_character_crafting_speed",
+    "research_character_mining_speed",
+    "research_character_reach",
+    "research_character_walking_speed",
+    "research_electric_shooting_speed",
+    "research_flamethrower_shooting_speed",
+    "research_inventory_capacity",
+    "research_lab_productivity",
+    "research_robot_battery",
+    "research_rocket_shooting_speed"
+  )) {
+    $line = Get-LastStreamReportLine -Key $stream
+    Assert-ReportLineGenerated -Line $line -Context "$reducedLineLabel direct-effect stream $stream"
+  }
+  Assert-NoStreamReportLine -Key "research_science_pack_productivity" -Context "$reducedLineLabel recipe-productivity cut"
+  Assert-NoStreamReportLine -Key "research_gears" -Context "$reducedLineLabel recipe-productivity cut"
+  Assert-DefaultBaseExtensionDiagnostics -Context "$reducedLineLabel base-extension scenario"
+
+  Invoke-RuntimeScenario -ScenarioName "lab-productivity-owner-skip" -EnabledFixtureNames @(
+    "mir-fixture-lab-productivity-owner",
+    "mir-fixture-assert-lab-productivity-owner-skip"
+  )
+  $labProductivityOwnerSkipLine = Get-LastStreamReportLine -Key "research_lab_productivity"
+  if ($labProductivityOwnerSkipLine -notmatch "status=skipped" -or $labProductivityOwnerSkipLine -notmatch "existing technology effect laboratory-productivity-4 laboratory-productivity") {
+    throw "MIR research productivity should skip when laboratory-productivity-4 has the expected native effect: $labProductivityOwnerSkipLine"
+  }
+
+  Invoke-RuntimeScenario -ScenarioName "better-bot-battery-owner-skip" -EnabledFixtureNames @(
+    "mir-fixture-better-bot-battery-owner",
+    "mir-fixture-assert-better-bot-battery-skip"
+  )
+  $betterBotBatterySkipLine = Get-LastStreamReportLine -Key "research_robot_battery"
+  if ($betterBotBatterySkipLine -notmatch "status=skipped" -or $betterBotBatterySkipLine -notmatch "existing technology effect worker-robots-battery-6 worker-robot-battery") {
+    throw "MIR robot battery should skip when worker-robots-battery-6 has the expected native effect: $betterBotBatterySkipLine"
+  }
+
+  Invoke-RuntimeScenario -ScenarioName "character-inventory-merged-effects" -EnabledFixtureNames @()
+  $inventoryCapacityLine = Get-LastStreamReportLine -Key "research_inventory_capacity"
+  Assert-ReportLineGenerated -Line $inventoryCapacityLine -Context "$reducedLineLabel merged character inventory/trash slot scenario"
+  Assert-ReportLineContains -Line $inventoryCapacityLine -Expected "effects=2" -Context "$reducedLineLabel merged character inventory/trash slot scenario"
+  Assert-NoStreamReportLine -Key "research_character_trash_slots" -Context "$reducedLineLabel merged character inventory/trash slot scenario"
+
+  Invoke-RuntimeScenario -ScenarioName "reduced-settings-surface" -EnabledFixtureNames @(
+    "mir-fixture-assert-reduced-settings-surface"
+  )
+
+  Invoke-RuntimeScenario -ScenarioName "checkbox-enabled-default-off-features" -EnabledFixtureNames @() `
+    -EnabledBaseExtensionKeys @("inserter-capacity-bonus")
+  $checkboxEnabledInserterLine = Get-LastExtensionReportLine -Key "inserter-capacity-bonus"
+  Assert-ReportLineGenerated -Line $checkboxEnabledInserterLine -Context "$reducedLineLabel checkbox-enabled base extension scenario"
+
+  Invoke-RuntimeScenario -ScenarioName "checkbox-disabled-default-on-features" -EnabledFixtureNames @() `
+    -DisabledStreamKeys @("research_character_reach") `
+    -DisabledBaseExtensionKeys @("research-speed")
+  $checkboxDisabledReachLine = Get-LastStreamReportLine -Key "research_character_reach"
+  if ($checkboxDisabledReachLine -notmatch "status=skipped" -or $checkboxDisabledReachLine -notmatch "disabled") {
+    throw "Disabled direct-effect stream checkbox should skip generated research: $checkboxDisabledReachLine"
+  }
+  $checkboxDisabledResearchSpeedLine = Get-LastExtensionReportLine -Key "research-speed"
+  if ($checkboxDisabledResearchSpeedLine -notmatch "status=skipped" -or $checkboxDisabledResearchSpeedLine -notmatch "disabled") {
+    throw "Disabled base extension checkbox should skip generated continuation: $checkboxDisabledResearchSpeedLine"
+  }
+
+  Invoke-WeaponSpeedPolicyMatrix -Context "$reducedLineLabel weapon shooting speed policy"
+
+  Complete-MIRValidationRun
+  if ($usesGeneratedUserDataDir -and (Test-Path -LiteralPath $validationRoot)) {
+    Remove-Item -LiteralPath $validationRoot -Recurse -Force
+  }
+
+  Write-Host "[ok] Validation completed."
+  $global:LASTEXITCODE = 0
+  return
 }
 
 Invoke-RuntimeScenario -ScenarioName "reduce-policy" -EnabledFixtureNames @(
@@ -2902,6 +3272,14 @@ Assert-DefaultBaseExtensionDiagnostics -Context "Base generation integrity scena
 $baseRailsLine = Get-LastStreamReportLine -Key "research_rails"
 Assert-ReportLineContains -Line $baseRailsLine -Expected "effects=1" -Context "Base rail productivity scenario"
 Assert-ReportLineContains -Line $baseRailsLine -Expected "icon=item:rail" -Context "Base rail productivity icon scenario"
+
+Invoke-RuntimeScenario -ScenarioName "generated-prerequisite-safety" -EnabledFixtureNames @(
+  "mir-fixture-assert-generated-prerequisite-safety"
+) -SciencePackIngredientPolicy "all"
+
+Invoke-RuntimeScenario -ScenarioName "rigor-late-recipe-removal" -EnabledFixtureNames @(
+  "mir-fixture-rigor-late-recipe-removal"
+)
 
 Invoke-RuntimeScenario -ScenarioName "base-fluid-productivity" -EnabledFixtureNames @(
   "mir-fixture-assert-fluid-productivity"
@@ -3368,11 +3746,7 @@ $baseExtensionBoundaryLine = Get-LastExtensionReportLine -Key "research-speed"
 Assert-ReportLineGenerated -Line $baseExtensionBoundaryLine -Context "Base extension boundary scenario"
 Assert-ReportLineContains -Line $baseExtensionBoundaryLine -Expected "mir-fixture-science-pack" -Context "Base extension boundary scenario"
 
-Invoke-RuntimeScenario -ScenarioName "weapon-speed-overlap-safety" -EnabledFixtureNames @(
-  "mir-fixture-assert-weapon-speed-safety"
-) -WeaponSpeedAdjustmentMode "only-when-dedicated-tech-enabled"
-$weaponSpeedLine = Get-LastExtensionReportLine -Key "weapon-shooting-speed"
-Assert-ReportLineGenerated -Line $weaponSpeedLine -Context "Weapon shooting speed overlap safety scenario"
+Invoke-WeaponSpeedPolicyMatrix -Context "Weapon shooting speed policy"
 
 Invoke-RuntimeScenario -ScenarioName "omega-drill-productivity" -EnabledFixtureNames @(
   "mir-fixture-omega-drill",
@@ -3391,8 +3765,8 @@ Assert-ReportLineGenerated -Line $gateLine -Context "End-game prerequisite gate 
 Assert-ReportLineContains -Line $gateLine -Expected "prerequisites=automation-science-pack,logistic-science-pack,chemical-science-pack,production-science-pack,space-science-pack" -Context "End-game prerequisite gate scenario"
 Assert-ReportLineDoesNotContain -Line $gateLine -Unexpected "science=automation-science-pack,logistic-science-pack,chemical-science-pack,production-science-pack,space-science-pack" -Context "End-game prerequisite gate scenario"
 
-if ($isLegacyFactorio20) {
-  Write-Host "[skip] Factorio 2.1 cargo runtime fixture scenarios skipped for Factorio 2.0 legacy metadata."
+if (-not $isFactorio21Line) {
+  Write-Host "[skip] Factorio 2.1 cargo runtime fixture scenarios skipped for Factorio $($repoInfo.factorio_version) metadata."
 } else {
   Invoke-RuntimeScenario -ScenarioName "base-cargo-space-age-gate" -EnabledFixtureNames @()
   $cargoPadLine = Get-LastStreamReportLine -Key "research_cargo_landing_pad_count"
@@ -3432,8 +3806,15 @@ if ($isLegacyFactorio20) {
 }
 
 if ($usesGeneratedUserDataDir -and (Test-Path -LiteralPath $validationRoot)) {
+  Complete-MIRValidationRun
   Remove-Item -LiteralPath $validationRoot -Recurse -Force
+} else {
+  Complete-MIRValidationRun
 }
 
 Write-Host "[ok] Validation completed."
 $global:LASTEXITCODE = 0
+} catch {
+  Fail-MIRValidationRun -ErrorMessage $_.Exception.Message
+  throw
+}

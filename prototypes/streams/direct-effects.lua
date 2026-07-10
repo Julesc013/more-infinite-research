@@ -91,9 +91,12 @@ return {
     icon_candidates = {
       {technology = "research-productivity", required_mod = "space-age"},
       {icon = "__space-age__/graphics/technology/research-productivity.png", icon_size = 256, inactive_mod_asset = "space-age"},
-      {technology = "military-science-pack"}
+      {technology = "military-science-pack"},
+      {technology = "mining-productivity-4"},
+      {technology = "mining-productivity-3"},
+      {technology = "mining-productivity-1"}
     },
-    overlay = "recipe-productivity",
+    overlay = "laboratory-productivity",
     localised_description = {"technology-description.more-infinite-research.lab_productivity"},
     science_packs = {
       "automation-science-pack",
@@ -111,6 +114,8 @@ return {
 
   research_rocket_shooting_speed = {
     icon_tech = "rocketry",
+    required_technologies = {"rocketry"},
+    adopt_exact_native_effect_owner = true,
     science_packs = {
       "automation-science-pack","logistic-science-pack","chemical-science-pack",
       "production-science-pack","military-science-pack","electromagnetic-science-pack"
@@ -121,7 +126,14 @@ return {
   },
 
   research_cannon_shooting_speed = {
-    icon_item = "cannon-shell",
+    icon_candidates = {
+      {technology = "weapon-shooting-speed-3"},
+      {technology = "physical-projectile-damage-2"},
+      {item = "cannon-shell"}
+    },
+    required_technologies = {"weapon-shooting-speed-5"},
+    required_technology_candidates = {{"tank", "tanks"}},
+    adopt_exact_native_effect_owner = true,
     science_packs = {
       "automation-science-pack","logistic-science-pack","chemical-science-pack",
       "production-science-pack","military-science-pack","electromagnetic-science-pack"
@@ -134,6 +146,7 @@ return {
   research_flamethrower_shooting_speed = {
     icon_tech = "flamethrower",
     localised_description = {"technology-description.more-infinite-research.flamethrower_shooting_speed"},
+    required_technologies = {"flamethrower"},
     science_packs = {
       "automation-science-pack","logistic-science-pack","chemical-science-pack",
       "production-science-pack","military-science-pack","space-science-pack"
@@ -164,8 +177,7 @@ return {
   },
 
   research_character_mining_speed = {
-    icon = "__base__/graphics/technology/steel-axe.png",
-    icon_size = 256,
+    icon_tech = "steel-axe",
     science_packs = {
       "utility-science-pack","military-science-pack","agricultural-science-pack",
       "electromagnetic-science-pack"
@@ -176,7 +188,11 @@ return {
   },
 
   research_character_crafting_speed = {
-    icon_tech = "repair-pack",
+    icon_candidates = {
+      {technology = "automation-3"},
+      {technology = "automation-2"},
+      {item = "repair-pack"}
+    },
     science_packs = {
       "utility-science-pack","military-science-pack","agricultural-science-pack",
       "electromagnetic-science-pack"
@@ -187,7 +203,7 @@ return {
   },
 
   research_character_walking_speed = {
-    icon_item = "exoskeleton-equipment",
+    icon_tech = "exoskeleton-equipment",
     science_packs = {
       "utility-science-pack","military-science-pack","agricultural-science-pack",
       "electromagnetic-science-pack"
@@ -198,8 +214,7 @@ return {
   },
 
   research_character_reach = {
-    icon = "__base__/graphics/technology/steel-axe.png",
-    icon_size = 256,
+    icon_tech = "steel-axe",
     science_packs = {
       "utility-science-pack","military-science-pack","agricultural-science-pack",
       "cryogenic-science-pack"

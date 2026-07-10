@@ -1,8 +1,8 @@
 # M.I.R. TODO
 
-Updated: 2026-07-09
+Updated: 2026-07-10
 
-This is the active task list for MIR 3.0.0 and later. It should contain future
+This is the active task list for MIR 3.0.5 and later. It should contain future
 work, current gates, deferred decisions, recurring release checks, and issue
 creation tasks. Completed 2.x and 1.9.x transition work is archived instead of
 being kept as an ever-growing checklist.
@@ -13,9 +13,13 @@ Current assumptions:
 - `1.9.2` is released from `legacy` as-is.
 - MIR 3.0.0 is the validated Factorio `2.1` source anchor on `main` and
   `dev`.
-- MIR 2.3.0 is staged on `legacy` as the Factorio `2.0` port of that source
-  anchor; upload only the exact validated `dist/more-infinite-research_2.3.0.zip`
-  recorded in `.mir/branches.yml`.
+- MIR 2.3.0 is published from `legacy` as the Factorio `2.0` port of that
+  source anchor. Treat the exact validated
+  `dist/more-infinite-research_2.3.0.zip` recorded in `.mir/branches.yml` as
+  immutable.
+- MIR 1.9.3, 1.8.0, 1.8.1, and 1.7.0 are published target-line evidence.
+- MIR 3.0.5 is the active Factorio 2.1 convergence and compatibility-hardening
+  release. It remains based on the modern `dev` implementation.
 - The shipped MIR 3 structure is Factorio root wrappers, `prototypes/mir/`
   implementation, and declarative `prototypes/streams/` data tables.
 - Old `prototypes/compat/`, `prototypes/lib/`, `prototypes/mir/legacy/`,
@@ -27,8 +31,11 @@ Current assumptions:
 - Do not reopen the 2.x or 1.9.x task ledgers unless a regression, security
   issue, package correction, or explicit maintainer decision requires it.
 
-Use `docs/releases/3.0.0-plan.md` for release scope, product boundaries,
-rationale, and high-level explanations. Use
+Use `.mir/convergence.yml` and `docs/releases/3.0.5-convergence-plan.md` for
+active release scope, product boundaries, rationale, and high-level
+explanations. Use `docs/releases/3.0.5-release-checklist.md` and
+`docs/releases/3.0.5-validation-summary.md` for the active gate and evidence.
+Treat `docs/releases/3.0.0-plan.md` as historical baseline context. Use
 `docs/archive/2.x/completed-task-ledger.md` for the historical completed task
 ledger. Use `docs/archive/2.x/post-2.0-feature-plan.md` for the deeper idea
 archive, `docs/archive/2.x/legacy-backport-cadence.md` for historical older-line
@@ -38,9 +45,9 @@ past-change ledger for shipped player-facing changes.
 
 ## Working Rules
 
-- Target `dev` for MIR 3.0.0 Factorio `2.1` development.
-- Treat MIR 3.0.0 as an architecture, contract, migration, fixture, and
-  maintainability release before adding broad new gameplay generation.
+- Target `dev` for MIR 3.0.5 Factorio `2.1` development.
+- Treat MIR 3.0.5 as bounded convergence and compatibility hardening, not a
+  historical implementation merge or broad gameplay release.
 - Keep generated technology names stable unless a tested migration exists.
 - Prefer native modifiers and recipe productivity.
 - Scripted effects must be event-driven, bounded, reversible where practical,
@@ -51,8 +58,8 @@ past-change ledger for shipped player-facing changes.
   technology effects.
 - Keep past shipped changes in `changelog.txt`; release notes and mod-portal
   copy are derivative summaries.
-- Keep `docs/releases/3.0.0-plan.md` synchronized with this file and
-  `changelog.txt`, but at a higher level with rationale and scope boundaries.
+- Keep the 3.0.5 convergence plan, checklist, and validation summary
+  synchronized with this file and `changelog.txt` while 3.0.5 is active.
 - Treat the compatibility planner as the contract between prototype discovery,
   owner classification, validation, mutation, and diagnostics.
 
@@ -63,14 +70,12 @@ past-change ledger for shipped player-facing changes.
 - Historical post-2.0 feature plan: `docs/archive/2.x/post-2.0-feature-plan.md`
 - Historical backport cadence: `docs/archive/2.x/legacy-backport-cadence.md`
 
-## v3.0.0 Compatibility Compiler
+## MIR 3 Current Line
 
-This is now the active development line. `2.2.0` and `1.9.2` are treated as
-released as-is; do not reopen their task ledgers unless a regression, security
-issue, or packaging correction forces it. Use
-`docs/architecture/compatibility-compiler-charter.md` as the scope boundary.
-The goal is architecture, contracts, migrations, fixtures, and maintainability,
-not broad new gameplay generation.
+MIR 3.0.0 is the published architecture baseline. MIR 3.0.5 converges portable
+lessons from the released target lines while keeping Factorio 2.1 behavior and
+the modern compiler authoritative. Use `.mir/convergence.yml` and
+`docs/compatibility/backport-ledger.md` for the active behavior contract.
 
 ### v3.0.0 Final Hardening
 
@@ -122,121 +127,115 @@ Reference docs:
 - `docs/maintainer/README.md`
 - `docs/adr/`
 
-### v3.0.0 Alpha 1: Skeleton And Contracts
+### Historical 3.0.0 Alpha And Beta Work
 
-- [ ] Create the Factorio shell plus `prototypes/mir/` compiler namespace from `docs/architecture/module-boundaries.md`.
-- [ ] Convert root Factorio files into thin stage wrappers without changing behavior.
-- [ ] Add `stage/`, `core/`, `platform/`, `domain/`, and `legacy/` as the first migration shell.
-- [ ] Keep existing public module paths as legacy shims where that reduces target-line backport friction.
-- [ ] Add or formalize schema validators for facts, candidates, decisions, stream specs, manifests, claims, fixtures, and migrations.
-- [ ] Promote the capability resolver contract to the public 3.0 architecture boundary.
-- [ ] Add `DecisionRecord` v1 validation.
-- [ ] Add `StreamSpec` v1 validation.
-- [ ] Add policy overlay schema validation.
-- [ ] Add stable ID helper tests.
-- [ ] Confirm alpha 1 adds no new gameplay behavior.
+The completed architecture transition is represented by the shipped tree,
+3.0.0 release records, ADRs, and
+`docs/archive/2.x/completed-task-ledger.md`. The obsolete unchecked alpha/beta
+intake was removed from this active future-work ledger; git history remains the
+source for its original wording.
 
-### v3.0.0 Alpha 2: Current Behavior Through Compiler Phases
+### v3.0.5 Convergence Gate
 
-- [ ] Move old generator, recipe-matching, compat-profile, and report-row code behind legacy shims before deeper rewrites.
-- [ ] Move existing explicit stream generation behind validated `StreamSpec` records without changing released technology IDs.
-- [ ] Move Air Scrubbing clean-filter support through capability and policy records.
-- [ ] Move owner, cap, lab, and loop diagnostics into report modules.
-- [ ] Make the emission layer the only layer that mutates technology prototypes.
-- [ ] Run report diffs proving no unexpected generated technology changes.
-
-### v3.0.0 Alpha 3: Fact Registry V2
-
-- [ ] Expand facts for items, fluids, entities, technologies, labs, machines, resources, modules, owners, and rule surfaces.
-- [ ] Add entity-backed item and recipe links.
-- [ ] Add loader and mining-drill facts.
-- [ ] Add machine base-productivity facts.
-- [ ] Add rule-surface facts for caps, modules, beacons, recyclers, and labs.
-
-### v3.0.0 Alpha 4: Capability Registry
-
-- [ ] Keep recipe productivity separate from native modifiers.
-- [ ] Add machine manufacturing capability.
-- [ ] Add loader manufacturing capability as report-first unless an existing stream owns the target.
-- [ ] Add mining-drill manufacturing capability as report-first unless an existing stream owns the target.
-- [ ] Add native modifier capability as observe-only by default.
-- [ ] Add science/lab integration capability as a hard researchability gate.
-
-### v3.0.0 Beta 1: Graph And Safety
-
-- [ ] Add or formalize recipe graph, technology graph, science graph, resource-chain graph, and loop-risk graph outputs.
-- [ ] Expand negative fixtures for self-return, barrel/container return, cleaning, catalyst, recycling, voiding, matter/transmutation, hidden recipes, zero caps, external owners, loader decoys, drill decoys, and lab incompatibility.
-- [ ] Require report diff review for broad classifier or policy changes.
-- [ ] Add performance budgets for large modpacks and verbose diagnostics.
-
-### v3.0.0 Beta 2: Compatibility Proof
-
-- [ ] Revalidate Air Scrubbing through the new compiler path.
-- [ ] Revalidate ATAN Nuclear Science as a science/lab fixture.
-- [ ] Revalidate AAI Loaders as a loader manufacturing report or existing belt-stream proof.
-- [ ] Revalidate Big Mining Drill as a drill manufacturing report or existing drill-stream proof.
-- [ ] Add ore-crushing productivity only if exact recipe IDs, owner checks, loop checks, cap checks, lab checks, and manifest rows pass.
-
-### v3.0.0 Beta 3: Docs, Claims, And Migrations
-
-- [ ] Keep compatibility claim manifests synchronized with public docs.
-- [ ] Keep generated stream manifests synchronized with emitted technologies.
-- [ ] Write migration notes for any changed generated technology IDs.
-- [ ] Refresh README for the 3.0 compatibility compiler model.
-- [ ] Keep ADRs current when architectural decisions change.
-
-### v3.0.0 Release Gate
-
-- [x] Run `.\scripts\Invoke-MIRValidation.ps1 -StaticOnly`.
-- [x] Run Factorio `2.1` runtime validation.
-- [x] Run the full-profile targeted release gate with `-NoGitPull` and
-  package output under `build/`.
-- [x] Run `git diff --check`.
-- [x] Review final planner report diffs.
-- [x] Confirm package hygiene excludes docs, fixtures, scripts, task ledgers,
-  and generated artifacts that do not belong in the mod zip.
-- [x] Confirm public docs do not claim broad K2, Bob's, Angel's, Space
-  Exploration, Pyanodons, AAI, native modifier, cap, beacon, recycler, or
-  runtime productivity support beyond fixture-backed behavior.
+- [x] Freeze the modern baseline at `pre-3.0.5-synthesis` and enable rerere.
+- [x] Record 1.7.0 release evidence and classify accepted behavior in
+  `.mir/convergence.yml`.
+- [x] Port science-prerequisite reachability as a generic compiler invariant.
+- [x] Centralize target capabilities and generate the Lua profile view.
+- [x] Select `storage` or `global` through an explicit target-owned adapter.
+- [x] Persist grouped runtime results, including interrupted/incomplete runs.
+- [x] Split reduced settings-surface evidence from settings-profile codec
+  behavior.
+- [x] Make conditional weapon overlap removal depend on exact replacement
+  coverage and preserve explicit existing choices.
+- [x] Run the complete Factorio 2.1 base and Space Age suite after behavior
+  synthesis.
+- [x] Build and checksum the exact 3.0.5 candidate archive.
+- [x] Record exact-dist evidence and a complete structured result summary.
+- [ ] Tag and publish only after final manual review; do not rebuild verified
+  bytes during publication.
 
 ## Post-3.0 Target-Line Backports
 
 Do not reconstruct old releases commit-by-commit. A target-line release is a
 compatibility port of a tested current-line snapshot.
 
-- [ ] Use `docs/maintainer/backporting.md` as the source of truth for the locked version-line mapping.
-- [ ] Use `docs/archive/2.x/legacy-backport-cadence.md` as the source of truth for target order, support class, and source snapshot language.
-- [ ] Treat every lower line as a separate target-line port, not a wholesale `3.0.0` backport.
-- [ ] Upload `v2.3.0` as the first Factorio `2.0` port of the MIR 3 architecture from the validated `legacy` branch package.
+- [x] Use `docs/maintainer/backporting.md` as the source of truth for the locked version-line mapping.
+- [x] Use `docs/archive/2.x/legacy-backport-cadence.md` as the source of truth for target order, support class, and source snapshot language.
+- [x] Treat every lower line as a separate target-line port, not a wholesale `3.0.0` backport.
+- [x] Upload `v2.3.0` as the first Factorio `2.0` port of the MIR 3 architecture from the validated `legacy` branch package.
   Current release package: `dist/more-infinite-research_2.3.0.zip`,
   SHA-256 `84287C5ACD047F6A3E1A6EDD568DEF313C13403CD35BB165CA399F4B02E19133`.
-- [ ] After Mod Portal upload, verify it lists `2.3.0` for Factorio `2.0`,
+- [x] After Mod Portal upload, verify it lists `2.3.0` for Factorio `2.0`,
   tag the GitHub release point, mark `.mir/branches.yml` as `published`, and
   treat the uploaded zip as immutable.
-- [ ] Do not rebuild `2.3.0` after upload; any changed payload becomes
+- [x] Do not rebuild `2.3.0` after upload; any changed payload becomes
   `2.3.1`.
-- [ ] Bring only portable lessons from `2.3.0` back into `dev`: validation
+- [x] Bring only portable lessons from `2.3.0` back into `dev`: validation
   runner improvements, package hygiene checks, target manifest improvements,
   report-diff tooling, deterministic ordering fixes, generic platform-adapter
   fixes, clearer diagnostics, docs corrections, release-process hardening,
   shared 2.1-valid fixtures, and shared compiler bug fixes.
-- [ ] Do not bring Factorio `2.0` metadata, lower dependency floors, disabled
+- [x] Bring only portable lessons from `1.9.3` back into `dev`: target-line
+  adapter seams, runtime state adapter usage, 1.1 binary validation profile
+  improvements, package hygiene checks, stock target-era icon fallback policy,
+  release documentation, and shared 2.1-valid fixture corrections.
+- [x] Bring only portable lessons from `1.8.0` back into `dev`: immutable bridge
+  release evidence, release documentation, reduced-line validation profile
+  improvements, continuation locale-source handling, old-line modifier locale
+  fallbacks, stock target-era icon fallback policy, and package hygiene notes.
+- [x] Do not bring Factorio `2.0`, `1.1`, `1.0`, or `0.18` metadata, lower dependency floors, disabled
   `2.1` surfaces, 2.0 release wording, or lower-target compromises back into
   default Factorio `2.1` behavior.
-- [ ] Do not cut `3.0.1` unless the current Factorio `2.1` line has a serious
-  load failure, broken migration, generated-ID problem, package hygiene issue,
-  materially wrong upload, or already-validated critical compatibility fix.
-- [ ] Accumulate normal portable lessons for `3.0.5` after `2.3.0` is
+- [x] Skip `3.0.1`; no emergency current-line defect required that release.
+- [x] Accumulate normal portable lessons for `3.0.5` after `2.3.0` is
   published, `1.1` is published or has produced clear lessons, the `1.0` /
   `0.18` bridge is decided, and community feedback has had a short window.
-- [ ] Release `v1.9.3` as the first Factorio `1.1` compatibility port only after target-line implementation and binary validation.
+- [x] Prepare and validate `v1.9.3` as the first Factorio `1.1` compatibility port after target-line implementation and binary validation.
   Ring 2 posture: no Space Age, Quality, Recycler, Elevated Rails, cargo
-  modifiers, unproven recipe productivity, `storage`, or Factorio `2.x`
-  dependency syntax leakage. Prove target-valid science packs, effects,
+  modifiers, recipe productivity, `storage`, or Factorio `2.x` dependency
+  syntax leakage. Prove target-valid science packs, effects,
   `max_level`, `count_formula`, old recipe schema, package hygiene, and
   compatibility-port release wording against a Factorio `1.1` binary.
-- [ ] Release `v1.8.0` as the first Factorio `1.0` compatibility port only after the Factorio `0.18` bridge policy is recorded.
-- [ ] Release `v1.7.0`, `v1.6.0`, and `v1.5.0` as reduced native-infinite editions for Factorio `0.17`, `0.16`, and `0.15` only after target binary proof.
+  Current RC package: `dist/more-infinite-research_1.9.3.zip`, SHA-256
+  `1723C10FEDD9A12003052991CC7574F1F6BF4E4ABC506F0323571DF680C0444B`, size
+  `298759` bytes, `121` entries, `0` forbidden entries. Static validation and
+  Factorio `1.1` binary validation passed on 2026-07-10 with
+  `D:\Programs\Factorio\1.1\bin\x64\factorio.exe`, including the packaged zip
+  smoke check and reduced `1.1` fixture gate. Factorio `1.1.110` rejected
+  `change-recipe-productivity`, so recipe productivity remains a documented
+  target-line exclusion.
+- [x] Publish and record `v1.9.3`; the exact archive, tag, commit, and public
+  status are recorded in `.mir/branches.yml`.
+- [x] Release `v1.8.0` as the Factorio `0.18` bridge compatibility port from the MIR 3 source anchor plus portable `2.3.0` and `1.9.3` lessons.
+  Published bridge package: `dist/more-infinite-research_1.8.0.zip`,
+  SHA-256 `D785E6EBE7A72E6E9F01A3F89774A6AA30479430410447F603FEF1E0B9BD7B24`,
+  size `300620` bytes, `121` entries, `0` forbidden entries. Static validation
+  passed, Factorio `0.18` binary validation passed, Factorio `1.0` bridge
+  validation passed with
+  `D:\Programs\Factorio\1.0\bin\x64\factorio.exe`, and the public dist archive
+  content matches the runtime-validated archive. The bridge uses target-era base
+  technology art only; it does not package newer Factorio 1.1+ technology
+  constant badge graphics, synthetic badge overlays, or unsupported native
+  modifier icon metadata. Research productivity uses stock military science
+  technology art as its main tile.
+- [x] Release `v1.8.1` as the first maintained Factorio `1.0` compatibility
+  port from the `1.9.3` source posture, proven `1.8.0` bridge lessons, and
+  current dev portable fixes. Package candidate:
+  `dist/more-infinite-research_1.8.1.zip`, SHA-256
+  `B1622AB0BC6D72265842D698781DBE21B7286662E29FB6992057FBCFF87D8E29`,
+  size `300526` bytes, `116` entries, `0` forbidden entries. Static
+  validation passed, Factorio `1.0` binary validation passed with
+  `D:\Programs\Factorio\1.0\bin\x64\factorio.exe`, and the public dist archive
+  content matches the runtime-validated archive. Do not use `0.8.x` for
+  Factorio `1.0`; `0.8.x` remains reserved for the later Factorio `0.8` museum
+  line.
+- [x] Release `v1.7.0` as the reduced native-infinite edition for Factorio
+  `0.17` after exact-package validation against Factorio `0.17.79`.
+- [ ] Release `v1.6.0` and `v1.5.0` as old-science native-infinite editions for
+  Factorio `0.16` and `0.15` only after 3.0.5 convergence and target binary
+  proof. Seed 0.16 from the 3.0.5 canonical source plus synthesized 1.7.0
+  behavior, not by merging the 0.17 implementation wholesale.
 - [ ] Release `v1.4.0`, `v1.3.0`, and `v0.12.0` as archive finite-ladder reconstructions only after target binary proof.
 - [ ] Release `v0.11.0` through `v0.6.0` as museum/discovery builds only after target binary and base-file discovery.
 - [ ] Validate each target-line release with a matching target Factorio binary when available, and document any missing validation in release notes.

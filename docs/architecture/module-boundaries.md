@@ -150,6 +150,10 @@ applying fallback effect icons before emission planning.
 `prototypes/mir/capabilities/recipe_productivity/planner.lua` owns the current
 recipe-productivity bucket matching facade and converts matched buckets into
 recipe productivity effects after policy filters run.
+`prototypes/mir/index/recipe_unlocks.lua` builds the immutable recipe-to-unlock
+technology fact index. Science selection, prerequisite planning, and explicit
+technology requirements apply shared researchability policy to those facts
+instead of rescanning technology prototypes independently.
 `prototypes/mir/planner/stream_compiler.lua` owns the generated stream loop.
 `prototypes/mir/emit/stream_spec_adapter.lua` adapts current stream records
 into `StreamSpec` records and forwards them to `technology_builder`.
@@ -180,6 +184,11 @@ mutator allowlist because it adjusts already generated MIR technology
 prototypes after stream emission.
 `prototypes/mir/policy/weapon_speed.lua` owns the optional duplicate
 rocket/cannon speed cleanup for generated general weapon-speed continuations.
+It delegates owner qualification to
+`prototypes/mir/policy/native_effect_coverage.lua`; prototype names alone are
+not coverage. The coverage policy may inspect technology prototypes but may
+not emit or mutate them. Only `weapon_speed.lua` performs the selected cleanup
+mutation after stream and base-continuation emission.
 `prototypes/mir/emit/effect_safety.lua` owns generated technology effect safety
 registration and post-emission assertion.
 

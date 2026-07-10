@@ -1,6 +1,3 @@
-local settings_catalog = require("__more-infinite-research__.prototypes.mir.settings.catalog")
-local profile_codec = require("__more-infinite-research__.prototypes.mir.settings.profile_codec")
-
 local function fail(message)
   error("MIR settings profile round-trip validation failed: " .. message)
 end
@@ -22,6 +19,9 @@ local function assert_nil(label, value)
     fail(label .. " was " .. tostring(value) .. ", expected nil.")
   end
 end
+
+local settings_catalog = require("__more-infinite-research__.prototypes.mir.settings.catalog")
+local profile_codec = require("__more-infinite-research__.prototypes.mir.settings.profile_codec")
 
 local valid_profile = {
   schema = profile_codec.schema,

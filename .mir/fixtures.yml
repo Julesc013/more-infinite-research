@@ -5,7 +5,40 @@ fixture_roots:
   compatibility_matrix: fixtures/compat-matrix
   run_profiles: fixtures/run-profiles
 
+real_mod_gates:
+  factorio-2.1-crucible-rigor:
+    scenario: local-2-1-crucible-rigor-exact-dist
+    roots:
+      - planet-crucible
+      - rigor-module
+    requires_exact_dist: true
+    requires_fresh_save: true
+    status: required
+
 fixtures:
+  rigor-late-recipe-removal:
+    path: fixtures/rigor-late-recipe-removal
+    validates:
+      - incineration-sink-excluded-from-breeding
+      - breeding-classifier-positive-negative-matrix
+      - generated-recipe-target-integrity
+      - dependent-mod-late-recipe-removal
+
+  generated-prerequisite-safety:
+    assertion_path: fixtures/assert-generated-prerequisite-safety
+    validates:
+      - generated-stream-prerequisites-exist-and-are-enabled
+      - generated-stream-prerequisites-are-acyclic-and-reachable
+      - already-enabled-science-pack-recipe-needs-no-unlock
+      - disabled-technology-unlocker-exclusion
+      - deterministic-multiple-unlocker-selection
+      - direct-science-self-lock-exclusion
+      - two-pack-science-cycle-exclusion
+      - missing-research-mechanism-exclusion
+      - shared-recipe-unlocker-index
+      - researchable-required-technology-policy
+      - unlock-all-generated-stream-reachability
+
   settings-visibility:
     assertion_path: fixtures/assert-hidden-setting-readability
     validates:
@@ -28,6 +61,25 @@ fixtures:
       - settings-profile-compact-export
       - settings-profile-strict-import-validation
       - hidden-provider-setting-profile-roundtrip
+
+  reduced-settings-surface:
+    assertion_path: fixtures/assert-reduced-settings-surface
+    validates:
+      - reduced-supported-settings-remain-visible
+      - modern-only-settings-are-omitted
+      - reduced-continuation-locales-are-explicit
+
+  weapon-speed-safety:
+    path: fixtures/weapon-speed-external-owner
+    assertion_path: fixtures/assert-weapon-speed-safety
+    validates:
+      - finite-vanilla-weapon-effects-preserved
+      - weapon-overlap-six-case-policy-matrix
+      - exact-infinite-replacement-coverage
+      - external-owner-science-reachability
+      - external-continuation-non-mutation
+      - external-owner-suppresses-dedicated-streams-when-preferred
+      - dedicated-weapon-prerequisites
 
   air-scrubbing:
     path: fixtures/air-scrubbing

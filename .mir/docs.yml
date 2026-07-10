@@ -115,6 +115,14 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - module-boundaries
+  - path: docs/architecture/target-profiles.md
+    title: "Target Capability Profiles"
+    status: current
+    audience: developer
+    doc_type: explanation
+    owner: mir-maintainers
+    source_of_truth_for:
+      - target-capability-profiles
   - path: docs/architecture/factorio-lifecycle.md
     title: "Factorio Lifecycle Boundaries"
     status: current
@@ -208,6 +216,42 @@ docs:
     doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
+  - path: docs/archive/2.x/rc-plan-factorio-0.18.md
+    title: "Factorio 0.18 Bridge Planning Report"
+    status: archived
+    audience: maintainer
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/adr/0014-3.0.5-convergence.md
+    title: "ADR 0014: MIR 3.0.5 Convergence"
+    status: current
+    audience: maintainer
+    doc_type: adr
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-3.0.5-convergence-decision
+  - path: docs/archive/2.x/rc-plan-factorio-0.17.md
+    title: "Factorio 0.17 RC Planning Report"
+    status: archived
+    audience: maintainer
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/archive/2.x/rc-plan-factorio-1.0.md
+    title: "Factorio 1.0 RC Planning Report"
+    status: archived
+    audience: maintainer
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/archive/2.x/rc-plan-factorio-1.1.md
+    title: "Factorio 1.1 RC Planning Report"
+    status: archived
+    audience: maintainer
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
   - path: docs/archive/2.x/README.md
     title: "2.x Archive"
     status: archived
@@ -231,6 +275,41 @@ docs:
     source_of_truth_for: []
   - path: docs/archive/2.x/release-notes-1.9.2.md
     title: "More Infinite Research 1.9.2 Release Notes"
+    status: archived
+    audience: maintainer
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/archive/2.x/release-notes-1.9.3.md
+    title: "More Infinite Research 1.9.3 Release Notes"
+    status: archived
+    audience: maintainer
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/archive/2.x/release-notes-1.8.0.md
+    title: "More Infinite Research 1.8.0 Release Notes"
+    status: archived
+    audience: maintainer
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/archive/2.x/release-notes-1.8.1.md
+    title: "More Infinite Research 1.8.1 Release Notes"
+    status: archived
+    audience: maintainer
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/archive/2.x/release-notes-1.7.0.md
+    title: "More Infinite Research 1.7.0 Release Notes"
+    status: archived
+    audience: maintainer
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/archive/2.x/technology-audit-factorio-0.17.md
+    title: "Factorio 0.17 Technology Availability Audit"
     status: archived
     audience: maintainer
     doc_type: archive
@@ -556,6 +635,14 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - compatibility-model
+  - path: docs/compatibility/backport-ledger.md
+    title: "3.0.5 Backport Behavior Ledger"
+    status: current
+    audience: maintainer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-3.0.5-backport-ledger
   - path: docs/compatibility/support-lanes.md
     title: "MIR Compatibility Program"
     status: current
@@ -975,7 +1062,48 @@ docs:
     audience: release-manager
     doc_type: release-plan
     owner: mir-maintainers
-    source_of_truth_for: []
+    source_of_truth_for:
+      - validation-result-summary
+  - path: docs/releases/3.0.5-convergence-plan.md
+    title: "MIR 3.0.5 Convergence Plan"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-3.0.5-release-plan
+  - path: docs/releases/3.0.5-convergence-review.md
+    title: "MIR 3.0.5 Convergence Review"
+    status: current
+    audience: maintainer
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-3.0.5-convergence-review
+  - path: docs/releases/3.0.5-release-checklist.md
+    title: "MIR 3.0.5 Release Checklist"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-3.0.5-release-checklist
+  - path: docs/releases/3.0.5-release-notes.md
+    title: "MIR 3.0.5 Release Notes"
+    status: current
+    audience: player
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-3.0.5-release-notes
+  - path: docs/releases/3.0.5-validation-summary.md
+    title: "MIR 3.0.5 Validation Summary"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-3.0.5-validation-summary
   - path: docs/releases/mod-portal-page.md
     title: "More Infinite Research"
     status: current
