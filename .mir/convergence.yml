@@ -134,6 +134,14 @@ behaviors:
     impact: documentation
     evidence: docs-governance
     status: complete
+  BP-014:
+    source: planet-crucible-1.1.4-plus-rigor-module-1.1.7
+    behavior: breeding productivity excludes incineration sinks and emitted recipe effects retain valid targets
+    class: B-missing-and-compatible
+    decision: narrow-classifier-exclusion-plus-final-effect-invariant
+    impact: recipe-productivity-target-filter
+    evidence: rigor-late-recipe-removal
+    status: in-progress
 
 release_gates:
   - static-validation
@@ -145,3 +153,4 @@ release_gates:
   - target-profile-drift-check
   - exact-dist-package-validation
   - complete-structured-validation-summary
+  - rigor-late-recipe-removal

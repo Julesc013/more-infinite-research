@@ -28,6 +28,19 @@ function S.assert_effects_allowed(effects, context)
   end
 end
 
+local function assert_effect_target_exists(effect, technology_name)
+  if not effect or effect.type ~= "change-recipe-productivity" then return end
+
+  local recipe_name = effect.recipe
+  if type(recipe_name) ~= "string" or not data_raw.prototype("recipe", recipe_name) then
+    error("MIR generated technology "
+      .. tostring(technology_name)
+      .. " references missing recipe "
+      .. tostring(recipe_name)
+      .. ".")
+  end
+end
+
 function S.register_generated_technology(name)
   generated_registry.register(name)
 end
@@ -37,6 +50,9 @@ function S.assert_registered_technology_effects()
     local tech = data_raw.technology(name)
     if tech then
       S.assert_effects_allowed(tech.effects, name)
+      for _, effect in ipairs(tech.effects or {}) do
+        assert_effect_target_exists(effect, name)
+      end
     end
   end
 end

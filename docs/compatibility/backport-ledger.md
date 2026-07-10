@@ -31,6 +31,7 @@ does not grant implementation authority; `dev` remains canonical.
 | BP-011 | generic convergence proposal | Host plugin registry and lifecycle | F | Defer to 3.1+ | future ADR required | Deferred |
 | BP-012 | planned 0.16 ring | Old science roles map to old prototype IDs | F | Defer to `tmp/0.16` | 0.16 binary proof | Deferred |
 | BP-013 | dev audit | Planning and public docs match current evidence | B | Reconcile | governance lint | Complete |
+| BP-014 | Planet Crucible 1.1.4 + Rigor Module 1.1.7 | Incineration sinks are not breeding and emitted recipe effects retain valid targets | B | Narrow classifier exclusion and final invariant | late-removal lifecycle fixture | In progress |
 
 ## Classification Rules
 
