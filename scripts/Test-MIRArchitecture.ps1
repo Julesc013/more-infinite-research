@@ -471,6 +471,7 @@ foreach ($fixtureId in @(
   "prototype-limits",
   "effect-scaling",
   "scripted-runtime-lifecycle",
+  "upgrade-3-0-5-to-3-1-0",
   "competing-productivity-transaction",
   "competing-base-extension-transaction",
   "settings-profile-roundtrip",

@@ -117,6 +117,16 @@ fixtures:
       - scripted-settings-disable-restoration
       - scripted-settings-reenable
 
+  upgrade-3-0-5-to-3-1-0:
+    requires_features: [scripted_techs]
+    assertion_path: fixtures/assert-upgrade-3-0-5-to-3-1-0
+    validates:
+      - exact-3-0-5-source-archive
+      - non-default-startup-setting-retention
+      - scripted-technology-level-retention
+      - runtime-state-effect-retention
+      - exact-3-1-0-candidate-normal-mod-directory-load
+
   competing-productivity-transaction:
     requires_features: [recipe_productivity]
     path: fixtures/plates-n-circuit-productivity
