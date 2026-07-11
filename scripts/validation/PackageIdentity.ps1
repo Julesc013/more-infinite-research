@@ -56,6 +56,87 @@ function Get-MIRFileSha256 {
   return (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToUpperInvariant()
 }
 
+function Test-MIRTextFingerprintPath {
+  param([Parameter(Mandatory)][string]$RelativePath)
+
+  $extension = [System.IO.Path]::GetExtension($RelativePath).ToLowerInvariant()
+  if ($extension -in @(".cfg", ".json", ".jsonl", ".lua", ".md", ".ps1", ".psm1", ".txt", ".yml", ".yaml")) {
+    return $true
+  }
+
+  return [System.IO.Path]::GetFileName($RelativePath) -eq "LICENSE"
+}
+
+function Get-MIRNormalizedTextIdentity {
+  param([Parameter(Mandatory)][AllowEmptyString()][string]$Text)
+
+  $normalized = $Text.Replace("`r`n", "`n").Replace("`r", "`n")
+  $bytes = [System.Text.UTF8Encoding]::new($false).GetBytes($normalized)
+  $sha = [System.Security.Cryptography.SHA256]::Create()
+  try {
+    return [pscustomobject]@{
+      Length = $bytes.Length
+      Sha256 = [System.BitConverter]::ToString($sha.ComputeHash($bytes)).Replace("-", "")
+    }
+  } finally {
+    $sha.Dispose()
+  }
+}
+
+function Get-MIRFileContentIdentity {
+  param(
+    [Parameter(Mandatory)][string]$Path,
+    [Parameter(Mandatory)][string]$RelativePath
+  )
+
+  if (Test-MIRTextFingerprintPath -RelativePath $RelativePath) {
+    return Get-MIRNormalizedTextIdentity -Text ([System.IO.File]::ReadAllText($Path))
+  }
+
+  $item = Get-Item -LiteralPath $Path
+  return [pscustomobject]@{
+    Length = $item.Length
+    Sha256 = Get-MIRFileSha256 -Path $Path
+  }
+}
+
+function Get-MIRZipEntryContentIdentity {
+  param(
+    [Parameter(Mandatory)]$Entry,
+    [Parameter(Mandatory)][string]$RelativePath
+  )
+
+  $stream = $Entry.Open()
+  try {
+    if (Test-MIRTextFingerprintPath -RelativePath $RelativePath) {
+      $reader = [System.IO.StreamReader]::new(
+        $stream,
+        [System.Text.UTF8Encoding]::new($false),
+        $true,
+        1024,
+        $true
+      )
+      try {
+        return Get-MIRNormalizedTextIdentity -Text $reader.ReadToEnd()
+      } finally {
+        $reader.Dispose()
+      }
+    }
+
+    $sha = [System.Security.Cryptography.SHA256]::Create()
+    try {
+      return [pscustomobject]@{
+        Length = $Entry.Length
+        Sha256 = [System.BitConverter]::ToString($sha.ComputeHash($stream)).Replace("-", "")
+      }
+    } finally {
+      $sha.Dispose()
+    }
+  } finally {
+    $stream.Dispose()
+  }
+}
+
 function Get-MIRPackageSourceFingerprint {
   param([Parameter(Mandatory)][string]$RepoRoot)
 
@@ -63,8 +144,8 @@ function Get-MIRPackageSourceFingerprint {
   $rows = @(
     foreach ($relative in Get-MIRPackageSourceFiles -RepoRoot $repo) {
       $path = Join-Path $repo $relative
-      $item = Get-Item -LiteralPath $path
-      "{0}`t{1}`t{2}" -f $relative, $item.Length, (Get-MIRFileSha256 -Path $path)
+      $identity = Get-MIRFileContentIdentity -Path $path -RelativePath $relative
+      "{0}`t{1}`t{2}" -f $relative, $identity.Length, $identity.Sha256
     }
   )
   return Get-MIRStringSha256 -Value ($rows -join "`n")
@@ -88,26 +169,19 @@ function Get-MIRZipContentFingerprint {
   param([Parameter(Mandatory)][string]$Path)
 
   Add-Type -AssemblyName System.IO.Compression.FileSystem
-  $sha = [System.Security.Cryptography.SHA256]::Create()
   $zip = [System.IO.Compression.ZipFile]::OpenRead($Path)
   try {
     $rows = @(
       foreach ($entry in @($zip.Entries | Where-Object { -not [string]::IsNullOrEmpty($_.Name) } | Sort-Object FullName)) {
-        $stream = $entry.Open()
-        try {
-          $entryHash = [System.BitConverter]::ToString($sha.ComputeHash($stream)).Replace("-", "")
-        } finally {
-          $stream.Dispose()
-        }
         $slash = $entry.FullName.IndexOf("/")
         $relative = if ($slash -ge 0) { $entry.FullName.Substring($slash + 1) } else { $entry.FullName }
-        "{0}`t{1}`t{2}" -f $relative, $entry.Length, $entryHash
+        $identity = Get-MIRZipEntryContentIdentity -Entry $entry -RelativePath $relative
+        "{0}`t{1}`t{2}" -f $relative, $identity.Length, $identity.Sha256
       }
     )
     return Get-MIRStringSha256 -Value ($rows -join "`n")
   } finally {
     $zip.Dispose()
-    $sha.Dispose()
   }
 }
 
@@ -167,8 +241,8 @@ function Get-MIRValidationHarnessFingerprint {
   })
   $rows = foreach ($relative in @($files | Sort-Object -Unique)) {
     $path = Join-Path $repo $relative
-    $item = Get-Item -LiteralPath $path
-    "{0}`t{1}`t{2}" -f $relative, $item.Length, (Get-MIRFileSha256 -Path $path)
+    $identity = Get-MIRFileContentIdentity -Path $path -RelativePath $relative
+    "{0}`t{1}`t{2}" -f $relative, $identity.Length, $identity.Sha256
   }
   return Get-MIRStringSha256 -Value ($rows -join "`n")
 }

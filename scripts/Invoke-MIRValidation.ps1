@@ -463,6 +463,10 @@ Invoke-RepoCheck "validation scenario groups and partial result aggregation are 
   & (Join-Path $repo "scripts\Test-MIRValidationResults.ps1") -RepoRoot $repo
 }
 
+Invoke-RepoCheck "package and harness fingerprints are checkout-line-ending invariant" {
+  & (Join-Path $repo "scripts\Test-MIRPackageIdentity.ps1") -RepoRoot $repo
+}
+
 Invoke-RepoCheck "fixture mods have metadata and data entrypoints" {
   $fixtureRootForStatic = Join-Path $repo "fixtures"
   if (-not (Test-Path -LiteralPath $fixtureRootForStatic)) {
