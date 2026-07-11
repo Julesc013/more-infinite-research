@@ -18,56 +18,11 @@ $outputRoot = Join-Path $repo $OutputDir
 $zipPath = Join-Path $outputRoot "$packageName.zip"
 $tempZipPath = Join-Path $buildRoot "$packageName.new.zip"
 
+Add-Type -AssemblyName System.IO.Compression
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 
-function Get-MIRZipContentManifest {
-  param([Parameter(Mandatory)][string]$Path)
-
-  $sha256 = [System.Security.Cryptography.SHA256]::Create()
-  $zip = [System.IO.Compression.ZipFile]::OpenRead($Path)
-  try {
-    return @(
-      $zip.Entries |
-        Where-Object { -not [string]::IsNullOrEmpty($_.Name) } |
-        Sort-Object FullName |
-        ForEach-Object {
-          $stream = $_.Open()
-          try {
-            $hashBytes = $sha256.ComputeHash($stream)
-            $hash = [System.BitConverter]::ToString($hashBytes).Replace("-", "").ToLowerInvariant()
-          } finally {
-            $stream.Dispose()
-          }
-
-          "{0}`t{1}`t{2}" -f $_.FullName, $_.Length, $hash
-        }
-    )
-  } finally {
-    $zip.Dispose()
-    $sha256.Dispose()
-  }
-}
-
-function Test-MIRZipContentEqual {
-  param(
-    [Parameter(Mandatory)][string]$Left,
-    [Parameter(Mandatory)][string]$Right
-  )
-
-  if (-not (Test-Path -LiteralPath $Left) -or -not (Test-Path -LiteralPath $Right)) {
-    return $false
-  }
-
-  $leftManifest = @(Get-MIRZipContentManifest -Path $Left)
-  $rightManifest = @(Get-MIRZipContentManifest -Path $Right)
-  if ($leftManifest.Count -ne $rightManifest.Count) { return $false }
-
-  for ($i = 0; $i -lt $leftManifest.Count; $i++) {
-    if ($leftManifest[$i] -ne $rightManifest[$i]) { return $false }
-  }
-
-  return $true
-}
+$fixedTimestamp = [DateTimeOffset]::new(1980, 1, 1, 0, 0, 0, [TimeSpan]::Zero)
+$compression = [System.IO.Compression.CompressionLevel]::$CompressionLevel
 
 if (Test-Path -LiteralPath $packageRoot) {
   Remove-Item -LiteralPath $packageRoot -Recurse -Force
@@ -89,9 +44,34 @@ if (Test-Path -LiteralPath $tempZipPath) {
   Remove-Item -LiteralPath $tempZipPath -Force
 }
 
-Compress-Archive -LiteralPath $packageRoot -DestinationPath $tempZipPath -CompressionLevel $CompressionLevel
+$fileStream = [System.IO.File]::Open($tempZipPath, [System.IO.FileMode]::CreateNew)
+$archive = [System.IO.Compression.ZipArchive]::new(
+  $fileStream,
+  [System.IO.Compression.ZipArchiveMode]::Create,
+  $false
+)
+try {
+  foreach ($relative in @(Get-MIRPackageSourceFiles -RepoRoot $repo | Sort-Object)) {
+    $entryName = ($packageName + "/" + $relative.Replace("\", "/"))
+    $entry = $archive.CreateEntry($entryName, $compression)
+    $entry.LastWriteTime = $fixedTimestamp
+    $entry.ExternalAttributes = 0
+    $input = [System.IO.File]::OpenRead((Join-Path $repo $relative))
+    $output = $entry.Open()
+    try {
+      $input.CopyTo($output)
+    } finally {
+      $output.Dispose()
+      $input.Dispose()
+    }
+  }
+} finally {
+  $archive.Dispose()
+  $fileStream.Dispose()
+}
 
-if ((Test-Path -LiteralPath $zipPath) -and (Test-MIRZipContentEqual -Left $zipPath -Right $tempZipPath)) {
+if ((Test-Path -LiteralPath $zipPath) -and
+  (Get-MIRFileSha256 -Path $zipPath) -eq (Get-MIRFileSha256 -Path $tempZipPath)) {
   Remove-Item -LiteralPath $tempZipPath -Force
   Write-Host "Built $zipPath (unchanged)"
   return

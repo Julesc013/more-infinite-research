@@ -15,6 +15,7 @@ Date: 2026-07-12
     - Preserved the public science facade and existing deterministic rejection reason codes while isolating fact caches.
     - Added immutable build-once recipe facts and indexes for stream matching and science reachability.
     - Replaced maintained 2.1 and 2.0 stream/effect denylists with positive mod and effect support declarations.
+    - Made package ZIP entry order, timestamps, attributes, and compression inputs deterministic.
 
 ---------------------------------------------------------------------------------------------------
 Version: 3.0.5

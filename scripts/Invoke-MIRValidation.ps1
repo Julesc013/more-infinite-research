@@ -1974,6 +1974,10 @@ Invoke-RepoCheck "generated package archive matches metadata" {
   }
 }
 
+Invoke-RepoCheck "package construction is byte deterministic" {
+  & (Join-Path $repo "scripts\Test-MIRDeterministicPackage.ps1") -RepoRoot $repo | Out-Host
+}
+
 Invoke-RepoCheck "git whitespace check" {
   git -C $repo diff --check
   if ($LASTEXITCODE -ne 0) {
