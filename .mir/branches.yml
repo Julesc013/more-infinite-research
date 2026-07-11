@@ -127,25 +127,25 @@ release_artifacts:
           files: 127
           reason: retained non-default base effect settings could load an incomplete descriptor
           status: superseded-unpublished-candidate
-      candidate_commit: dcd616cc9fc1355cea59bd9add1fe8ac4cade0a9
+      candidate_commit: a2974d68775fbc30b1b25eb61e638145cce65f9b
       artifact: dist/more-infinite-research_3.0.5.zip
-      sha256: 94B32E04A3486E850F559BAF776027E9644ED319624F0B80BEEDFE24D98AD436
-      size_bytes: 336413
+      sha256: 1B496195CA13B4F7C6AF5A59856086A802FE950CA9DED1C84EE61ECC85464217
+      size_bytes: 336460
       entries: 132
       files: 127
       forbidden_entries: 0
-      package_content_sha256: 99FF391656695ACA65E843490F673E8F263C885182EEF11BAAC91C4079F50D4D
-      package_source_sha256: 99FF391656695ACA65E843490F673E8F263C885182EEF11BAAC91C4079F50D4D
+      package_content_sha256: E4C787569BFACE40CB5527AF6FDEB06DB38D8EA40EDB06979B1BDD92E19EEC6B
+      package_source_sha256: E4C787569BFACE40CB5527AF6FDEB06DB38D8EA40EDB06979B1BDD92E19EEC6B
       target_profile_sha256: E1EF758114CECB4B896F5E3365B214E95EC2794A64364492BF174AFE710B3E8F
       required_groups_sha256: 57A1DF87A8FB594B2B51C7E230D775E88028F23D52DF9D5D7DA1336F9271C78A
-      validation_harness_sha256: 40FE629AE1862B310BC7B560A92DEB879164051D2CB6DFF427A3658E896AC157
+      validation_harness_sha256: A0F490F1F080A51BBA896140B30EFC9961356F42857279A274EE35959BC06F80
       expected_scenarios_sha256: 500D63A94FC228057371D24003F7A31EE3182ED5A442E5935EB5EEA40999AB7A
-      validation_package_sha256: 38EF2E50C78AF5ADD85AC449C85D4DA821C40C0F897FD5D30F0BE54E1A6A9539
-      validation_package_content_sha256: 99FF391656695ACA65E843490F673E8F263C885182EEF11BAAC91C4079F50D4D
-      structured_summary_path: .mir/evidence/3.0.5-rc8-validation-summary.json
-      structured_summary_run_id: 0dc33647-d7c9-48bc-9e06-245e0bf78e2b
+      validation_package_sha256: 6E2B807994E765D38A4DC8FB5016F0E1BF62098DC44FC26848D8F939670EFC27
+      validation_package_content_sha256: E4C787569BFACE40CB5527AF6FDEB06DB38D8EA40EDB06979B1BDD92E19EEC6B
+      structured_summary_path: .mir/evidence/3.0.5-rc9-validation-summary.json
+      structured_summary_run_id: 76ebe5dc-6c13-4498-bd4e-c36f527e1685
       structured_summary_status: passed
-      structured_summary_duration_seconds: 495.715
+      structured_summary_duration_seconds: 487.786
       scenario_count: 76
       validation_content_matches_dist: true
       static_validation: passed

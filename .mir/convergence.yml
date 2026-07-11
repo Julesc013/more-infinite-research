@@ -61,10 +61,35 @@ superseded_candidates:
 
 candidate:
   artifact: dist/more-infinite-research_3.0.5.zip
-  source_commit: pending
-  automated_gate: pending
+  source_commit: a2974d68775fbc30b1b25eb61e638145cce65f9b
+  sha256: 1B496195CA13B4F7C6AF5A59856086A802FE950CA9DED1C84EE61ECC85464217
+  size_bytes: 336460
+  entries: 132
+  files: 127
+  forbidden_entries: 0
+  package_content_sha256: E4C787569BFACE40CB5527AF6FDEB06DB38D8EA40EDB06979B1BDD92E19EEC6B
+  package_source_sha256: E4C787569BFACE40CB5527AF6FDEB06DB38D8EA40EDB06979B1BDD92E19EEC6B
+  target_profile_sha256: E1EF758114CECB4B896F5E3365B214E95EC2794A64364492BF174AFE710B3E8F
+  required_groups_sha256: 57A1DF87A8FB594B2B51C7E230D775E88028F23D52DF9D5D7DA1336F9271C78A
+  validation_harness_sha256: A0F490F1F080A51BBA896140B30EFC9961356F42857279A274EE35959BC06F80
+  expected_scenarios_sha256: 500D63A94FC228057371D24003F7A31EE3182ED5A442E5935EB5EEA40999AB7A
+  validation_package_sha256: 6E2B807994E765D38A4DC8FB5016F0E1BF62098DC44FC26848D8F939670EFC27
+  validation_package_content_sha256: E4C787569BFACE40CB5527AF6FDEB06DB38D8EA40EDB06979B1BDD92E19EEC6B
+  structured_summary_path: .mir/evidence/3.0.5-rc9-validation-summary.json
+  structured_summary_run_id: 76ebe5dc-6c13-4498-bd4e-c36f527e1685
+  structured_summary_status: passed
+  structured_summary_duration_seconds: 487.786
+  scenario_count: 76
+  validation_content_matches_dist: true
+  static_validation: passed
+  factorio_2_1_validation: passed
+  factorio_2_1_binary: Factorio 2.1.9 build 86829 win64 steam
+  exact_dist_base_smoke: passed
+  exact_dist_space_age_smoke: passed
+  retained_base_effect_settings: passed
+  automated_gate: passed
   manual_gate: pending
-  status: rebuilding-after-package-visible-change
+  status: release-candidate-awaiting-manual-review
 
 rules:
   - dev-remains-the-canonical-modern-implementation
