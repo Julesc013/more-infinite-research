@@ -35,6 +35,9 @@ MIR 3.0.5 is the published immutable behavior baseline. The 2.3.5 backport plan 
 - [Backport wave dashboard](backport-wave-dashboard.md)
 - [3.1.0 plan](3.1.0-plan.md)
 - [3.1.0 release checklist](3.1.0-checklist.md)
+- [3.1.0 release notes](notes/release-notes-3.1.0.md)
+- [3.1.0 migration guide](3.1.0-migration-guide.md)
+- [3.1.0 validation summary](3.1.0-validation-summary.md)
 - [3.1.0 roadmap](3.1.0-roadmap.md)
 - [2.2.0 validation record](2.2.0-validation-record.md)
 

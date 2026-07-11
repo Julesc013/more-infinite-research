@@ -20,6 +20,10 @@ Date: 2026-07-12
     - Made settings catalog snapshots immutable, target-positive, and descriptor-ordered.
     - Added conservative recycler-loop handling for ambiguous paths, byproducts, fluids, variants, and conversion cycles.
     - Routed loader, mining-drill, and native-owner capability diagnostics through a validated lifecycle.
+    - Covered scripted effects across level reversal, force changes, save reloads, settings toggles, and baseline restoration.
+    - Split developer load tooling into reusable process, setting, target, grouping, package, and result modules.
+    - Added target-explicit scenario declarations and budgets for base, Space Age, caps, diagnostics, local packs, and full runs.
+    - Proved exact 3.0.5 upgrades retain non-default settings, research levels, persisted state, and scripted effects.
 
 ---------------------------------------------------------------------------------------------------
 Version: 3.0.5
