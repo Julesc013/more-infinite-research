@@ -138,16 +138,25 @@ local function assert_close(label, actual, expected)
 end
 
 if expected_productivity then
-  local inverse_threshold = recycling_chance and recycling_chance > 0
-    and math.max(0, (1 / recycling_chance) - 1) or math.huge
+  local scope_recycling_chance = recycling_chance
+  if scope_recycling_chance == nil then scope_recycling_chance = 0.25 end
+  local inverse_threshold = scope_recycling_chance > 0
+    and math.max(0, (1 / scope_recycling_chance) - 1) or math.huge
+  local scope_active = scoped_cap and expected_productivity > inverse_threshold + 0.000001
   local recipe = data.raw.recipe and data.raw.recipe["iron-gear-wheel"]
   if not recipe then fail("missing iron-gear-wheel recipe.") end
-  if not (scoped_cap and expected_productivity > inverse_threshold) then
+  if not scope_active then
     assert_close("iron-gear-wheel maximum_productivity", recipe.maximum_productivity, expected_productivity)
   else
     assert_close("iron-gear-wheel inverse recycling maximum_productivity", recipe.maximum_productivity, inverse_threshold)
   end
-  if scoped_cap and expected_productivity > inverse_threshold then
+  local preexisting = data.raw.recipe["mir-fixture-preexisting-high-productivity-cap"]
+  if preexisting then
+    assert_close("pre-existing high maximum_productivity",
+      preexisting.maximum_productivity,
+      scope_active and inverse_threshold or expected_productivity)
+  end
+  if scope_active then
     local safe = data.raw.recipe["mir-fixture-self-recycling-production"]
     local unsafe = data.raw.recipe["mir-fixture-non-recycling-production"]
     local loop = data.raw.recipe["mir-fixture-self-recycling-loop"]
@@ -157,19 +166,25 @@ if expected_productivity then
   end
 end
 
-if recycling_chance then
-  local generated = data.raw.recipe["mir-fixture-generated-recycling"]
-  local visible = data.raw.recipe["mir-fixture-visible-recycling"]
-  if not generated or not generated.results or not generated.results[1] then
-    fail("missing generated recycling fixture recipe.")
-  end
-  assert_close("generated recycling independent_probability",
-    generated.results[1].independent_probability,
-    recycling_chance)
-  if visible and visible.results and visible.results[1] then
-    assert_close("visible recycling independent_probability",
-      visible.results[1].independent_probability,
-      0.25)
+local generated = data.raw.recipe["mir-fixture-generated-recycling"]
+local visible = data.raw.recipe["mir-fixture-visible-recycling"]
+if not generated or not generated.results or not generated.results[1] then
+  fail("missing generated recycling fixture recipe.")
+end
+assert_close("generated recycling independent_probability",
+  generated.results[1].independent_probability,
+  recycling_chance or 0.25)
+if generated.maximum_productivity ~= nil then
+  fail("generated recycling maximum_productivity was changed to "
+    .. tostring(generated.maximum_productivity) .. ".")
+end
+if visible and visible.results and visible.results[1] then
+  assert_close("visible recycling independent_probability",
+    visible.results[1].independent_probability,
+    0.25)
+  if visible.maximum_productivity ~= nil then
+    fail("visible recycling maximum_productivity was changed to "
+      .. tostring(visible.maximum_productivity) .. ".")
   end
 end
 

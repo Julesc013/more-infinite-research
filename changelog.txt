@@ -25,7 +25,7 @@ Date: 2026-07-11
 
 ---------------------------------------------------------------------------------------------------
 Version: 3.0.5
-Date: 2026-07-11
+Date: 2026-07-12
 
   Compatibility:
 
@@ -40,6 +40,9 @@ Date: 2026-07-11
     - Limited weapon overlap cleanup to MIR-generated continuations and required external owners to use obtainable science.
     - Kept incineration sink recipes out of breeding productivity research so later recipe removal cannot leave invalid effects.
     - Made opt-in productivity scoping derive its unrestricted threshold from the inverse effective recycler return.
+    - Kept recycling-category recipe productivity caps outside both the global production cap and scoped-cap passes.
+    - Made the scope checkbox inert at or below the inverse threshold, including cap-matched boundaries.
+    - Defined engine-unchanged recycling as a conservative 25% threshold baseline without changing recycler returns.
     - Added a recycler-return dropdown with unchanged, cap-matched, and fixed choices from 20% down to 0.1%.
     - Hid the redundant fixed 25% recycler row while retaining legacy profile compatibility for that enum.
     - Cap-matched recycling uses total output: +400% gives 20% returns and +1000% about 9.09%, never above vanilla 25%.
@@ -73,6 +76,7 @@ Date: 2026-07-11
     - Added classifier-boundary, late recipe-removal, and exact Planet Crucible plus Rigor Module regression gates.
     - Consolidated generated setting registration through the canonical catalog and aligned controls with generated effects.
     - Kept visible recycling processes such as scrap recycling outside MIR's generated-recycler balance pass.
+    - Added recycler combination coverage for unchanged, fixed, and cap-matched modes and independent recipe caps.
     - Corrected recycling safety indexing for Factorio 2.0 product probability fields.
 
 ---------------------------------------------------------------------------------------------------

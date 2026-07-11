@@ -1096,6 +1096,8 @@ Invoke-RepoCheck "prototype limit settings are wired" {
     @{ File = "fixtures\assert-prototype-limits\data-final-fixes.lua"; Text = $prototypeLimitFixtureText; Snippet = 'consumption_limits.low' },
     @{ File = "fixtures\assert-prototype-limits\data-final-fixes.lua"; Text = $prototypeLimitFixtureText; Snippet = 'pollution_limits.low' },
     @{ File = "fixtures\assert-prototype-limits\data-final-fixes.lua"; Text = $prototypeLimitFixtureText; Snippet = 'generated recycling independent_probability' },
+    @{ File = "fixtures\assert-prototype-limits\data-final-fixes.lua"; Text = $prototypeLimitFixtureText; Snippet = 'generated recycling maximum_productivity was changed' },
+    @{ File = "fixtures\assert-prototype-limits\data-final-fixes.lua"; Text = $prototypeLimitFixtureText; Snippet = 'pre-existing high maximum_productivity' },
     @{ File = "fixtures\assert-prototype-limits\data-final-fixes.lua"; Text = $prototypeLimitFixtureText; Snippet = 'tier-4 module recipe was not discovered by module prototype tier' },
     @{ File = "fixtures\assert-prototype-limits\data-final-fixes.lua"; Text = $prototypeLimitFixtureText; Snippet = 'zero-watt beacon energy_usage' },
     @{ File = "fixtures\assert-prototype-limits\data-final-fixes.lua"; Text = $prototypeLimitFixtureText; Snippet = 'quality_limits.high' },
@@ -3619,6 +3621,27 @@ Invoke-RuntimeScenario -ScenarioName "prototype-limit-self-recycling-and-unrestr
   -UnrestrictedModules
 Assert-LogContains -Expected "Productivity cap self-recycling scope: approved=" -Context "Self-recycling productivity cap scope scenario"
 Assert-LogContains -Expected "Unrestricted module permissions enabled:" -Context "Unrestricted module permission scenario"
+
+Invoke-RuntimeScenario -ScenarioName "prototype-limit-scope-inert-at-fixed-threshold" -EnabledFixtureNames @(
+  "mir-fixture-assert-prototype-limits"
+) `
+  -PrototypeProductivityCap "percent-400" `
+  -RecyclingReturnChance "percent-20" `
+  -ProductivityCapSelfRecyclingOnly
+
+Invoke-RuntimeScenario -ScenarioName "prototype-limit-scope-engine-unchanged-baseline" -EnabledFixtureNames @(
+  "mir-fixture-assert-prototype-limits"
+) `
+  -PrototypeProductivityCap "percent-500" `
+  -ProductivityCapSelfRecyclingOnly
+Assert-LogContains -Expected "inverse_threshold=3" -Context "Engine-unchanged recycler threshold scenario"
+
+Invoke-RuntimeScenario -ScenarioName "prototype-limit-scope-inert-at-matched-threshold" -EnabledFixtureNames @(
+  "mir-fixture-assert-prototype-limits"
+) `
+  -PrototypeProductivityCap "percent-25000" `
+  -RecyclingReturnChance "match-productivity-cap" `
+  -ProductivityCapSelfRecyclingOnly
 
 Invoke-RuntimeScenario -ScenarioName "effect-scaling-mixed-tier" -EnabledFixtureNames @(
   "mir-fixture-assert-generation-integrity"

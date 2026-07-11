@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: player
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-07-11
+last_reviewed: 2026-07-12
 supersedes: []
 superseded_by: []
 ---
@@ -57,7 +57,10 @@ unrestricted productivity threshold from the effective recycler return using
 `1 / return - 1`. With 25% returns the threshold is +300%; with 10% returns it
 is +900%. Above that threshold, only recipes with a proven non-generative
 self-recycling path receive the selected higher cap. Other recipes are capped
-at the derived threshold, and MIR never raises the recycling recipe itself.
+at the derived threshold. At or below the threshold, the checkbox has no effect
+on the selected productivity cap. Recycling-category recipes are never changed
+by this cap setting. When recycler returns are left unchanged, the guard uses
+Factorio's normal 25% return as its conservative +300% threshold baseline.
 
 The `mir-recycling-return-chance` dropdown is a separate balance control for
 hidden generated recycling recipes. `Match productivity cap` uses the

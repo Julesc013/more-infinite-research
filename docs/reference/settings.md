@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: developer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-07-11
+last_reviewed: 2026-07-12
 supersedes: [docs/reference/settings-reference.md]
 superseded_by: []
 ---
@@ -125,7 +125,7 @@ default in its numeric position.
 
 | Setting ID | Non-default target |
 | --- | --- |
-| `mir-prototype-productivity-cap` | `RecipePrototype.maximum_productivity` on non-parameter recipes |
+| `mir-prototype-productivity-cap` | `RecipePrototype.maximum_productivity` on non-parameter, non-recycling recipes |
 | `mir-prototype-efficiency-cap` | `effect_receiver.consumption_limits.low` on supported machines, labs, drills, and agricultural towers |
 | `mir-prototype-pollution-cap` | `effect_receiver.pollution_limits.low` on supported machines, labs, drills, and agricultural towers |
 | `mir-prototype-speed-floor` | `effect_receiver.speed_limits.low` on supported machines, labs, drills, and agricultural towers |
@@ -135,18 +135,22 @@ default in its numeric position.
 `mir-productivity-cap-self-recycling-only` is a default-off scope guard whose
 threshold is the inverse of the effective recycler return:
 `(1 / return chance) - 1`. Selected productivity above that threshold is
-available only to recipes classified as a single-item, expected-value
-non-generative self-recycling path. Other recipes are capped at the threshold;
-the recycling recipe itself is never raised. A zero return produces no finite
-restriction, and cap-matched recycling makes the threshold equal the selected
-productivity cap.
+available only to production recipes classified as a single-item,
+expected-value non-generative self-recycling path. Other production recipes are
+capped at the threshold; recycling-category recipes are never changed. A zero
+return produces no finite restriction, cap-matched recycling makes the
+threshold equal the selected productivity cap, and the checkbox is inert at or
+below the threshold. Engine unchanged uses the normal 25% generated-recycler
+return as a deterministic conservative baseline without inspecting or mutating
+individual recipe returns.
 
 `mir-recycling-return-chance` targets only hidden generated recipes in the
 `recycling` category with one item input and `unlock_results = false`. Automatic
 mode uses `min(0.25, 1 / (1 + selected_productivity_bonus))`, then scales each
 item product's independent probability relative to Factorio's normal 25%
 return. It does not mutate visible recycling processes, shared-probability
-products, or scrap recycling. Fixed UI options are 20%, 15%, 12.5%, 10%,
+products, scrap recycling, or any recipe's `maximum_productivity`. Fixed UI
+options are 20%, 15%, 12.5%, 10%,
 7.5%, 5%, 2.5%, 1%, 0.5%, and 0.1%.
 The older `percent-25` enum remains a valid profile import, while the duplicate
 fixed 25% UI row is omitted because the unchanged option already shows 25%.

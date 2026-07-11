@@ -5,6 +5,7 @@ local prototype_limit_settings = require("prototypes.mir.settings.prototype_limi
 local cap_scope = require("prototypes.mir.policy.productivity_cap_scope")
 
 local P = {}
+local EPSILON = 0.000001
 
 local effect_receiver_types = {
   "assembling-machine",
@@ -51,52 +52,12 @@ end
 
 local function inverse_recycling_productivity_bonus(recycling_chance)
   local chance = tonumber(recycling_chance)
+  -- Engine unchanged leaves recipe probabilities alone.  The scope guard still
+  -- needs one deterministic global threshold, so use Factorio's normal 25%
+  -- generated-recycler return as the conservative baseline.
   if chance == nil then chance = 0.25 end
   if chance <= 0 then return math.huge end
   return math.max(0, (1 / chance) - 1)
-end
-
-local function apply_recipe_productivity_cap(value, recycling_chance)
-  if value == nil then return 0 end
-
-  local changed = 0
-  local scoped = effective_settings.get(prototype_limit_settings.self_recycling_scope_setting_name) == true
-  local scope_threshold = inverse_recycling_productivity_bonus(recycling_chance)
-  local scope_classifier = scoped and value > scope_threshold and cap_scope.build() or nil
-  local approved = 0
-  local rejected = 0
-  for _, recipe in pairs(data_raw.prototypes("recipe")) do
-    if type(recipe) == "table" and recipe.parameter ~= true then
-      local should_apply = true
-      if scope_classifier then
-        local safe = scope_classifier.approve(recipe)
-        if safe == true then approved = approved + 1 else rejected = rejected + 1 end
-        local target = safe == true and value or scope_threshold
-        if recipe.maximum_productivity ~= target then
-          recipe.maximum_productivity = target
-          changed = changed + 1
-        end
-        should_apply = false
-      end
-      if should_apply then
-        local current = recipe.maximum_productivity
-        -- A scoped setting is an opt-in upward mutation.  Preserve a larger
-        -- cap deliberately supplied by another mod.
-        if not scoped or current == nil or current < value then
-          if current ~= value then
-            recipe.maximum_productivity = value
-            changed = changed + 1
-          end
-        end
-      end
-    end
-  end
-  if scope_classifier then
-    log("[more-infinite-research] Productivity cap self-recycling scope: approved="
-      .. tostring(approved) .. " rejected=" .. tostring(rejected)
-      .. " inverse_threshold=" .. tostring(scope_threshold) .. ".")
-  end
-  return changed
 end
 
 local function recipe_categories(recipe)
@@ -110,6 +71,48 @@ local function has_category(recipe, wanted)
     if category == wanted then return true end
   end
   return false
+end
+
+local function apply_recipe_productivity_cap(value, recycling_chance)
+  if value == nil then return 0 end
+
+  local changed = 0
+  local scoped = effective_settings.get(prototype_limit_settings.self_recycling_scope_setting_name) == true
+  local scope_threshold = inverse_recycling_productivity_bonus(recycling_chance)
+  local scope_active = scoped and value > scope_threshold + EPSILON
+  local scope_classifier = scope_active and cap_scope.build() or nil
+  local approved = 0
+  local rejected = 0
+  local skipped_recycling = 0
+  for _, recipe in pairs(data_raw.prototypes("recipe")) do
+    if type(recipe) == "table" and recipe.parameter ~= true then
+      -- Recycling recipes are owned exclusively by the recycler-return
+      -- setting.  Never blur that control by rewriting their productivity cap.
+      if has_category(recipe, "recycling") then
+        skipped_recycling = skipped_recycling + 1
+      elseif scope_classifier then
+        local safe = scope_classifier.approve(recipe)
+        if safe == true then approved = approved + 1 else rejected = rejected + 1 end
+        local target = safe == true and value or scope_threshold
+        if recipe.maximum_productivity ~= target then
+          recipe.maximum_productivity = target
+          changed = changed + 1
+        end
+      elseif recipe.maximum_productivity ~= value then
+        -- At or below the inverse threshold the checkbox is deliberately inert:
+        -- the selected global cap has exactly the same behavior in either state.
+        recipe.maximum_productivity = value
+        changed = changed + 1
+      end
+    end
+  end
+  if scope_classifier then
+    log("[more-infinite-research] Productivity cap self-recycling scope: approved="
+      .. tostring(approved) .. " rejected=" .. tostring(rejected)
+      .. " skipped_recycling=" .. tostring(skipped_recycling)
+      .. " inverse_threshold=" .. tostring(scope_threshold) .. ".")
+  end
+  return changed
 end
 
 local function recipe_variants(recipe)

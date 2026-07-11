@@ -77,6 +77,16 @@ if safe_item and unsafe_item then
   })
   table.insert(fixture_prototypes, {
     type = "recipe",
+    name = "mir-fixture-preexisting-high-productivity-cap",
+    categories = {"crafting"},
+    enabled = true,
+    allow_productivity = true,
+    maximum_productivity = 50,
+    ingredients = {{type = "item", name = "copper-plate", amount = 1}},
+    results = {{type = "item", name = unsafe_item.name, amount = 1}}
+  })
+  table.insert(fixture_prototypes, {
+    type = "recipe",
     name = "mir-fixture-generated-recycling",
     categories = {"recycling"},
     hidden = true,
