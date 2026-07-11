@@ -107,6 +107,14 @@ assert_equal("unknown invalid-profile settings", invalid_status.unknown, 1)
 
 local speed_legacy_ok = settings_catalog.validate_value("mir-prototype-speed-cap", "bonus-100000")
 assert_true("legacy speed import cap remains accepted", speed_legacy_ok)
+local recycler_legacy_ok = settings_catalog.validate_value("mir-recycling-return-chance", "percent-25")
+assert_true("legacy fixed 25 percent recycler import remains accepted", recycler_legacy_ok)
+local recycler_spec = settings_catalog.spec("mir-recycling-return-chance")
+for _, value in ipairs((recycler_spec and recycler_spec.allowed_values) or {}) do
+  if value == "percent-25" then
+    fail("fixed 25 percent recycler value should not be visible in the dropdown")
+  end
+end
 
 local pipeline_extent = require("__more-infinite-research__.prototypes.mir.settings.pipeline_extent")
 local prototype_limits = require("__more-infinite-research__.prototypes.mir.settings.prototype_limits")

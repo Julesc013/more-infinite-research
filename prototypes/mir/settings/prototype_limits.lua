@@ -7,11 +7,11 @@ S.recycling_return_setting_name = "mir-recycling-return-chance"
 S.self_recycling_scope_setting_name = "mir-productivity-cap-self-recycling-only"
 S.unrestricted_modules_setting_name = "mir-unrestricted-modules"
 S.recycling_return_balanced = "match-productivity-cap"
+S.recycling_return_accepted_import_values = {"percent-25"}
 
 S.recycling_return_allowed_values = {
   S.engine_default,
   S.recycling_return_balanced,
-  "percent-25",
   "percent-20",
   "percent-15",
   "percent-12-5",

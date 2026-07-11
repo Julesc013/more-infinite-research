@@ -142,8 +142,10 @@ recipes retain their existing cap and the recycling recipe is never raised.
 mode uses `min(0.25, 1 / (1 + selected_productivity_bonus))`, then scales each
 item product's independent probability relative to Factorio's normal 25%
 return. It does not mutate visible recycling processes, shared-probability
-products, or scrap recycling. Fixed options are 25%, 20%, 15%, 12.5%, 10%,
+products, or scrap recycling. Fixed UI options are 20%, 15%, 12.5%, 10%,
 7.5%, 5%, 2.5%, 1%, 0.5%, and 0.1%.
+The older `percent-25` enum remains a valid profile import, while the duplicate
+fixed 25% UI row is omitted because the unchanged option already shows 25%.
 
 `mir-prototype-speed-floor` writes `effect_receiver.speed_limits.low`
 independently from `mir-prototype-speed-cap`, which writes the high side. The
