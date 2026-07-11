@@ -146,77 +146,77 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - architecture-overview
-  - path: docs/archive/2.x/2.2.0-feature-intake.md
+  - path: docs/archive/superseded/2.2.0-feature-intake.md
     title: "2.2.0 Feature Intake From The July 2026 Suggestion Transcript"
     status: archived
     audience: maintainer
     doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
-  - path: docs/archive/2.x/completed-task-ledger.md
+  - path: docs/archive/superseded/completed-task-ledger.md
     title: "2.x Completed Task Ledger"
     status: archived
     audience: maintainer
     doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
-  - path: docs/archive/2.x/legacy-backport-cadence.md
+  - path: docs/archive/superseded/legacy-backport-cadence.md
     title: "Legacy Backport Cadence"
     status: archived
     audience: maintainer
     doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
-  - path: docs/archive/2.x/legacy-backport-capabilities.md
+  - path: docs/archive/superseded/legacy-backport-capabilities.md
     title: "Legacy Backport Capability Matrix"
     status: archived
     audience: maintainer
     doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
-  - path: docs/archive/2.x/legacy-backport-plan.md
+  - path: docs/archive/superseded/legacy-backport-plan.md
     title: "Legacy Backport Plan"
     status: archived
     audience: maintainer
     doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
-  - path: docs/archive/2.x/mod-ideas-audit.md
+  - path: docs/archive/superseded/mod-ideas-audit.md
     title: "Local Idea Mods Audit And Release Plan - 2026-07-05"
     status: archived
     audience: maintainer
     doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
-  - path: docs/archive/2.x/mod-ideas-features.md
+  - path: docs/archive/superseded/mod-ideas-features.md
     title: "Idea Mods Feature Audit - 2026-07-05"
     status: archived
     audience: maintainer
     doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
-  - path: docs/archive/2.x/post-2.0-feature-plan.md
+  - path: docs/archive/superseded/post-2.0-feature-plan.md
     title: "Post-2.0 Feature Plan"
     status: archived
     audience: maintainer
     doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
-  - path: docs/archive/2.x/pre-manual-2.0.5-report.md
+  - path: docs/archive/superseded/pre-manual-2.0.5-report.md
     title: "v2.0.5 Pre-Manual Readiness Report"
     status: archived
     audience: maintainer
     doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
-  - path: docs/archive/2.x/rc-plan-factorio-2.0.md
+  - path: docs/archive/superseded/rc-plan-factorio-2.0.md
     title: "Factorio 2.0 RC Planning Report"
     status: archived
     audience: maintainer
     doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
-  - path: docs/archive/2.x/rc-plan-factorio-0.18.md
+  - path: docs/archive/superseded/rc-plan-factorio-0.18.md
     title: "Factorio 0.18 Bridge Planning Report"
     status: archived
     audience: maintainer
@@ -231,133 +231,126 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - mir-3.0.5-convergence-decision
-  - path: docs/archive/2.x/rc-plan-factorio-0.17.md
+  - path: docs/archive/superseded/rc-plan-factorio-0.17.md
     title: "Factorio 0.17 RC Planning Report"
     status: archived
     audience: maintainer
     doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
-  - path: docs/archive/2.x/rc-plan-factorio-1.0.md
+  - path: docs/archive/superseded/rc-plan-factorio-1.0.md
     title: "Factorio 1.0 RC Planning Report"
     status: archived
     audience: maintainer
     doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
-  - path: docs/archive/2.x/rc-plan-factorio-1.1.md
+  - path: docs/archive/superseded/rc-plan-factorio-1.1.md
     title: "Factorio 1.1 RC Planning Report"
     status: archived
     audience: maintainer
     doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
-  - path: docs/archive/2.x/README.md
-    title: "2.x Archive"
-    status: archived
-    audience: maintainer
-    doc_type: archive
-    owner: mir-maintainers
-    source_of_truth_for: []
-  - path: docs/archive/2.x/release-notes-1.9.0.md
+  - path: docs/releases/notes/release-notes-1.9.0.md
     title: "More Infinite Research 1.9.0 Release Notes"
     status: archived
     audience: maintainer
     doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
-  - path: docs/archive/2.x/release-notes-1.9.1.md
+  - path: docs/releases/notes/release-notes-1.9.1.md
     title: "More Infinite Research 1.9.1 Release Notes"
     status: archived
     audience: maintainer
     doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
-  - path: docs/archive/2.x/release-notes-1.9.2.md
+  - path: docs/releases/notes/release-notes-1.9.2.md
     title: "More Infinite Research 1.9.2 Release Notes"
     status: archived
     audience: maintainer
     doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
-  - path: docs/archive/2.x/release-notes-1.9.3.md
+  - path: docs/releases/notes/release-notes-1.9.3.md
     title: "More Infinite Research 1.9.3 Release Notes"
     status: archived
     audience: maintainer
     doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
-  - path: docs/archive/2.x/release-notes-1.8.0.md
+  - path: docs/releases/notes/release-notes-1.8.0.md
     title: "More Infinite Research 1.8.0 Release Notes"
     status: archived
     audience: maintainer
     doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
-  - path: docs/archive/2.x/release-notes-1.8.1.md
+  - path: docs/releases/notes/release-notes-1.8.1.md
     title: "More Infinite Research 1.8.1 Release Notes"
     status: archived
     audience: maintainer
     doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
-  - path: docs/archive/2.x/release-notes-1.7.0.md
+  - path: docs/releases/notes/release-notes-1.7.0.md
     title: "More Infinite Research 1.7.0 Release Notes"
     status: archived
     audience: maintainer
     doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
-  - path: docs/archive/2.x/technology-audit-factorio-0.17.md
+  - path: docs/archive/superseded/technology-audit-factorio-0.17.md
     title: "Factorio 0.17 Technology Availability Audit"
     status: archived
     audience: maintainer
     doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
-  - path: docs/archive/2.x/release-notes-2.0.5.md
+  - path: docs/releases/notes/release-notes-2.0.5.md
     title: "More Infinite Research 2.0.5 Release Notes"
     status: archived
     audience: maintainer
     doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
-  - path: docs/archive/2.x/release-notes-2.1.0.md
+  - path: docs/releases/notes/release-notes-2.1.0.md
     title: "More Infinite Research 2.1.0 Release Notes"
     status: archived
     audience: maintainer
     doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
-  - path: docs/archive/2.x/release-notes-2.1.5.md
+  - path: docs/releases/notes/release-notes-2.1.5.md
     title: "More Infinite Research 2.1.5 Release Notes"
     status: archived
     audience: maintainer
     doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
-  - path: docs/archive/2.x/release-notes-2.2.0.md
+  - path: docs/releases/notes/release-notes-2.2.0.md
     title: "2.2.0 Release Notes"
     status: archived
     audience: maintainer
     doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
-  - path: docs/archive/2.x/release-notes-2.3.0.md
+  - path: docs/releases/notes/release-notes-2.3.0.md
     title: "More Infinite Research 2.3.0 Release Notes"
     status: archived
     audience: maintainer
     doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
-  - path: docs/archive/2.x/release-notes-legacy.md
+  - path: docs/archive/superseded/release-notes-legacy.md
     title: "More Infinite Research 1.9.0 Release Notes"
     status: archived
     audience: maintainer
     doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
-  - path: docs/archive/2.x/release-plan-2.1.0.md
+  - path: docs/archive/superseded/release-plan-2.1.0.md
     title: "More Infinite Research 2.1.0 Release-Gated Plan"
     status: archived
     audience: maintainer
@@ -1041,7 +1034,7 @@ docs:
     doc_type: release-plan
     owner: mir-maintainers
     source_of_truth_for: []
-  - path: docs/releases/3.0.0-release-notes.md
+  - path: docs/releases/notes/release-notes-3.0.0.md
     title: "More Infinite Research 3.0.0 Release Notes"
     status: current
     audience: release-manager
@@ -1102,7 +1095,7 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - mir-3.0.5-release-checklist
-  - path: docs/releases/3.0.5-release-notes.md
+  - path: docs/releases/notes/release-notes-3.0.5.md
     title: "MIR 3.0.5 Release Notes"
     status: current
     audience: player
@@ -1147,6 +1140,14 @@ docs:
     doc_type: release-plan
     owner: mir-maintainers
     source_of_truth_for: []
+  - path: docs/releases/notes/README.md
+    title: "Release Notes"
+    status: current
+    audience: player
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - release-notes-index
   - path: docs/templates/adr-template.md
     title: "ADR Template"
     status: current

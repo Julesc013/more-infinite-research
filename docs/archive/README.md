@@ -16,5 +16,8 @@ Archived docs are retained for historical context only. They are not normative
 for current development unless an active doc links to them as historical
 evidence.
 
-- [2.x archive](2.x/README.md)
 - [Superseded docs](superseded/README.md)
+
+Superseded plans, audits, and historical implementation notes live in the
+superseded archive. Versioned player-facing release notes live under
+[release notes](../releases/notes/).

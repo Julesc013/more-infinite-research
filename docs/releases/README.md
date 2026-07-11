@@ -25,14 +25,17 @@ and historical evidence.
 - [3.0.0 local library gate summary](3.0.0-local-library-gate-summary.md)
 - [3.0.0 migration guide](3.0.0-migration-guide.md)
 - [3.0.0 release checklist](3.0.0-release-checklist.md)
-- [3.0.0 release notes](3.0.0-release-notes.md)
+- [3.0.0 release notes](notes/release-notes-3.0.0.md)
 - [3.0.0 short release notes](release-notes-3.0.0.md)
 - [3.0.0 validation summary](3.0.0-validation-summary.md)
 - [3.0.0 risk register](3.0.0-risk-register.md)
 - [3.0.5 convergence plan](3.0.5-convergence-plan.md)
 - [3.0.5 convergence review](3.0.5-convergence-review.md)
 - [3.0.5 release checklist](3.0.5-release-checklist.md)
-- [3.0.5 release notes](3.0.5-release-notes.md)
+- [3.0.5 release notes](notes/release-notes-3.0.5.md)
 - [3.0.5 validation summary](3.0.5-validation-summary.md)
 - [3.1.0 roadmap](3.1.0-roadmap.md)
 - [2.2.0 validation record](2.2.0-validation-record.md)
+
+Historical player-facing release notes are collected in the
+[release-notes directory](notes/).

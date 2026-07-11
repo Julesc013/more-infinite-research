@@ -36,9 +36,9 @@ active release scope, product boundaries, rationale, and high-level
 explanations. Use `docs/releases/3.0.5-release-checklist.md` and
 `docs/releases/3.0.5-validation-summary.md` for the active gate and evidence.
 Treat `docs/releases/3.0.0-plan.md` as historical baseline context. Use
-`docs/archive/2.x/completed-task-ledger.md` for the historical completed task
-ledger. Use `docs/archive/2.x/post-2.0-feature-plan.md` for the deeper idea
-archive, `docs/archive/2.x/legacy-backport-cadence.md` for historical older-line
+`docs/archive/superseded/completed-task-ledger.md` for the historical completed task
+ledger. Use `docs/archive/superseded/post-2.0-feature-plan.md` for the deeper idea
+archive, `docs/archive/superseded/legacy-backport-cadence.md` for historical older-line
 backport planning, and `docs/maintainer/backporting.md` for the locked
 post-`2.2.0` target-line policy. Use `changelog.txt` as the authoritative
 past-change ledger for shipped player-facing changes.
@@ -65,10 +65,10 @@ past-change ledger for shipped player-facing changes.
 
 ## Archived Historical Ledgers
 
-- Historical completed task ledger: `docs/archive/2.x/completed-task-ledger.md`
-- Historical 2.2 feature intake: `docs/archive/2.x/2.2.0-feature-intake.md`
-- Historical post-2.0 feature plan: `docs/archive/2.x/post-2.0-feature-plan.md`
-- Historical backport cadence: `docs/archive/2.x/legacy-backport-cadence.md`
+- Historical completed task ledger: `docs/archive/superseded/completed-task-ledger.md`
+- Historical 2.2 feature intake: `docs/archive/superseded/2.2.0-feature-intake.md`
+- Historical post-2.0 feature plan: `docs/archive/superseded/post-2.0-feature-plan.md`
+- Historical backport cadence: `docs/archive/superseded/legacy-backport-cadence.md`
 
 ## MIR 3 Current Line
 
@@ -131,7 +131,7 @@ Reference docs:
 
 The completed architecture transition is represented by the shipped tree,
 3.0.0 release records, ADRs, and
-`docs/archive/2.x/completed-task-ledger.md`. The obsolete unchecked alpha/beta
+`docs/archive/superseded/completed-task-ledger.md`. The obsolete unchecked alpha/beta
 intake was removed from this active future-work ledger; git history remains the
 source for its original wording.
 
@@ -336,7 +336,7 @@ Do not reconstruct old releases commit-by-commit. A target-line release is a
 compatibility port of a tested current-line snapshot.
 
 - [x] Use `docs/maintainer/backporting.md` as the source of truth for the locked version-line mapping.
-- [x] Use `docs/archive/2.x/legacy-backport-cadence.md` as the source of truth for target order, support class, and source snapshot language.
+- [x] Use `docs/archive/superseded/legacy-backport-cadence.md` as historical context for target order, support class, and source snapshot language.
 - [x] Treat every lower line as a separate target-line port, not a wholesale `3.0.0` backport.
 - [x] Upload `v2.3.0` as the first Factorio `2.0` port of the MIR 3 architecture from the validated `legacy` branch package.
   Current release package: `dist/more-infinite-research_2.3.0.zip`,

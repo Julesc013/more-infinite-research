@@ -701,15 +701,15 @@ The validation script checks:
 - **`docs/maintainer/developer-tools.md`:** preferred developer commands, run profiles, script roles, and PowerShell tooling checks.
 - **`docs/releases/3.0.5-convergence-plan.md`:** active compatibility-hardening scope, architecture boundaries, and release gates.
 - **`docs/releases/3.0.5-release-checklist.md`:** active automated, candidate, manual, and publication gates.
-- **`docs/releases/3.0.5-release-notes.md`:** current player-facing compatibility changes.
+- **`docs/releases/notes/release-notes-3.0.5.md`:** current player-facing compatibility changes.
 - **`docs/releases/3.0.5-validation-summary.md`:** current candidate identity and validation evidence; the 3.0.0 records remain historical baseline evidence.
 - **`docs/releases/2.2.0-validation-record.md`:** local release validation evidence.
 - **`docs/maintainer/manual-test-plan.md`:** named manual saves/scenarios for release validation.
 - **`docs/releases/mod-portal-page.md`:** mod-portal-ready public description, technology catalog, settings summary, compatibility notes, and troubleshooting text.
-- **`docs/archive/2.x/release-plan-2.1.0.md`:** detailed release-gated implementation plan for the Factorio `2.1` feature wave. Summarize durable future tasks back into `todo.md`.
-- **`docs/archive/2.x/post-2.0-feature-plan.md`:** post-v2.0.0 feature triage, MIR scope boundaries, Reddit feedback, and staged implementation archive. Summarize durable future tasks back into `todo.md`.
-- **`docs/archive/2.x/release-notes-2.1.0.md`:** simplified player-facing `2.1.0` release-note summary derived from the detailed changelog.
-- **`docs/archive/2.x/`:** historical release notes and pre-manual reports. `changelog.txt` remains the authoritative past-change ledger.
+- **`docs/archive/superseded/release-plan-2.1.0.md`:** historical release-gated implementation plan for the Factorio `2.1` feature wave.
+- **`docs/archive/superseded/post-2.0-feature-plan.md`:** historical post-v2.0.0 feature triage and staged implementation archive.
+- **`docs/releases/notes/release-notes-2.1.0.md`:** player-facing `2.1.0` release-note summary derived from the detailed changelog.
+- **`docs/archive/superseded/`:** superseded plans and reports retained as historical context. `changelog.txt` remains the authoritative past-change ledger.
 - **`CONTRIBUTING.md`:** branch policy, pull request expectations, validation commands, and mod portal changelog rules.
 - **`changelog.txt`:** release history and user-facing changes.
 

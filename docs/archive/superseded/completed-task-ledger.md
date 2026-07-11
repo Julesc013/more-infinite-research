@@ -62,7 +62,7 @@ Done in the current development branch:
 - [x] Add diagnostic-only native modifier overlap reporting for direct-effect streams.
 - [x] Add a Maraxis-like duplicate cargo fixture proving cargo overlaps are reported without changing MIR generation.
 - [x] Fix runtime validation temp-copy behavior so fixture scenarios copy package source instead of the whole Git repository.
-- [x] Add `docs/archive/2.x/pre-manual-2.0.5-report.md`.
+- [x] Add `docs/archive/superseded/pre-manual-2.0.5-report.md`.
 - [x] Fix scripted `NothingModifier` effect icons so spoilage/agriculture effect rows do not inherit floating technology constant overlays.
 - [x] Merge character logistic trash slots into character inventory slot research and remove the separate current generated trash-slot stream.
 - [x] Add a JSON migration from the old generated trash-slot technology ID into the combined inventory/trash technology ID.
@@ -251,7 +251,7 @@ Status: released from the `legacy` branch. Keep this section as historical proce
 
 ## v2.1.0 Larger Feature Wave
 
-`v2.1.0` should take the harder work after `v2.0.5` feedback, but it should stay selective. Use `docs/archive/2.x/release-plan-2.1.0.md` as the detailed release-gated implementation note, and keep the durable release tasks mirrored here.
+`v2.1.0` should take the harder work after `v2.0.5` feedback, but it should stay selective. Use `docs/archive/superseded/release-plan-2.1.0.md` as the historical detailed release-gated implementation note, and keep the durable release tasks mirrored here.
 
 Theme:
 
@@ -305,7 +305,7 @@ Do not turn `v2.1.0` into a bucket for every plausible feature idea.
 - [x] Parser-friendly generation audit rows added for stream/native-overlap/recipe-owner diagnostics.
 - [x] Local mod-portal compatibility audit harness added with committed matrix inputs and ignored generated reports.
 - [x] Extended compatibility automation added: executable manual scenarios, sharded/resumable audits, grouped failure reports, review-only profile stubs, tiered extended-test wrapper, and self-hosted workflow.
-- [x] Documentation hierarchy reorganized: root `todo.md` is future-work authority, `changelog.txt` is past-change authority, `docs/releases/3.0.0-plan.md` is high-level rationale, and `docs/archive/2.x/` contains historical derivative plans and release-note material.
+- [x] Documentation hierarchy reorganized: root `todo.md` is future-work authority, `changelog.txt` is past-change authority, `docs/releases/3.0.0-plan.md` is high-level rationale, `docs/archive/superseded/` contains historical plans, and `docs/releases/notes/` contains release-note material.
 - [ ] Run full mod-portal compatibility audit with credentials and a local Factorio binary.
 - [ ] Convert recurring audit failures into small declarative compatibility profiles only when the report shows concrete, repeatable patterns.
 - [x] Runtime-test the refactored recipe-productivity owner/adoption modules with `FACTORIO_BIN` configured.
@@ -473,7 +473,7 @@ small bug fixes, compatibility profiles, docs corrections, validation/tooling
 updates, or feature slices that pass the release gate. If a week has no safe
 candidate, record the skip reason instead of publishing an under-tested archive.
 
-Idea-mod audit planning lives in `docs/archive/2.x/mod-ideas-audit.md`.
+Idea-mod audit planning lives in `docs/archive/superseded/mod-ideas-audit.md`.
 
 | Audit lane | `v2.1.5` decision |
 | --- | --- |
@@ -499,7 +499,7 @@ Idea-mod audit planning lives in `docs/archive/2.x/mod-ideas-audit.md`.
 
 Use `v2.2.0` for the next larger batch after the `v2.1.x` feedback cycle. Most ideamods are compatibility signals, not planned MIR features. Keep this release to compatibility planner foundations plus the first new MIR-owned behavior proven by fixtures; do not turn it into every interesting idea-mod signal.
 
-Idea-mod audit candidates should be promoted only after recipe-ID proof, balance decisions, licensing review, save-compatibility policy, and validation fixtures. Use `docs/compatibility/support-lanes.md` for the role taxonomy and one-archive audit template. Use `docs/archive/2.x/2.2.0-feature-intake.md` for the July 2026 suggestions-transcript intake; it rejects separate product names and keeps future settings inside one plain MIR settings model.
+Idea-mod audit candidates should be promoted only after recipe-ID proof, balance decisions, licensing review, save-compatibility policy, and validation fixtures. Use `docs/compatibility/support-lanes.md` for the role taxonomy and one-archive audit template. Use `docs/archive/superseded/2.2.0-feature-intake.md` for the historical July 2026 suggestions-transcript intake; it rejects separate product names and keeps future settings inside one plain MIR settings model.
 
 | Candidate | Source signal | First useful slice |
 | --- | --- | --- |
@@ -606,7 +606,7 @@ unless the maintainer revives the pre-reset final Factorio `2.0` plan.
 ### Locked Target-Line Backport Ladder
 
 - [ ] Use `docs/maintainer/backporting.md` as the source of truth for the locked version-line mapping.
-- [ ] Use `docs/archive/2.x/legacy-backport-cadence.md` as the source of truth for target order, support class, and source snapshot language.
+- [ ] Use `docs/archive/superseded/legacy-backport-cadence.md` as historical context for target order, support class, and source snapshot language.
 - [ ] Treat every lower line as a separate target-line port, not a wholesale `3.0.0` backport.
 - [ ] Release `v2.3.0` as the first Factorio `2.0` port of the MIR 3 architecture only after `v3.0.0` is stable and a Factorio `2.0` binary loads the exact built package.
 - [ ] Release `v1.9.3` as the first Factorio `1.1` compatibility port only after target-line implementation and binary validation.

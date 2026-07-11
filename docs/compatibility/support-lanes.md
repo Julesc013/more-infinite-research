@@ -542,7 +542,7 @@ docs/audited-zips-YYYY-MM-DD.json
 ```
 
 The current July 5, 2026 idea-mod ledger is
-`docs/archive/2.x/audited-zips-2026-07-05.json`.
+`docs/archive/superseded/audited-zips-2026-07-05.json`.
 
 Recommended fields:
 
