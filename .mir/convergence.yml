@@ -122,8 +122,12 @@ candidate:
   factorio_2_1_modules_t4_finite_exact_dist: passed
   retained_base_effect_settings: passed
   automated_gate: passed
-  manual_gate: pending
-  status: release-candidate-awaiting-manual-review
+  manual_gate: accepted-for-publication
+  release_commit: 89d7764c4f0f5b67f7b2a2ca0a3827006e3a63d7
+  release_tag: 3.0.5
+  published_at: 2026-07-11T16:51:53Z
+  release_url: https://github.com/Julesc013/more-infinite-research/releases/tag/3.0.5
+  status: published
 
 rules:
   - dev-remains-the-canonical-modern-implementation

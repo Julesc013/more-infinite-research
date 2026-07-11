@@ -34,10 +34,7 @@ Run runtime validation when a Factorio binary is available:
 
 ## Structured Runtime Results
 
-A runtime run writes an atomic JSON summary to
-`artifacts/validation/factorio-<line>-summary.json`. Override that location
-with `-ValidationSummaryPath` or `MIR_VALIDATION_SUMMARY`. The output remains
-outside release packages and records:
+A runtime run writes an atomic JSON summary to `artifacts/validation/factorio-<line>-summary.json`. Override that location with `-ValidationSummaryPath` or `MIR_VALIDATION_SUMMARY`. The output remains outside release packages and records:
 
 - the target profile's required groups;
 - every started scenario, its group, duration, and evidence paths;
@@ -45,24 +42,14 @@ outside release packages and records:
 - the currently running scenario, if the process is interrupted;
 - the complete run duration and terminal error, when available.
 
-Scenario groups are classified by `scripts/validation/ScenarioGroups.ps1`.
-The runner persists a `running` scenario before Factorio starts and updates it
-after the process and log checks finish. Therefore an external timeout leaves
-an `incomplete` record instead of being reported as a failed Factorio load.
-An observed nonzero exit, fatal log marker, or assertion is a failure.
+Scenario groups are classified by `scripts/validation/ScenarioGroups.ps1`. The runner persists a `running` scenario before Factorio starts and updates it after the process and log checks finish. Therefore an external timeout leaves an `incomplete` record instead of being reported as a failed Factorio load. An observed nonzero exit, fatal log marker, or assertion is a failure.
 
-The final gate calls `Complete-MIRValidationRun`, which rejects any required
-target-profile group that did not pass. `scripts/Test-MIRValidationResults.ps1`
-checks both complete and interrupted result shapes during static validation.
+The final gate calls `Complete-MIRValidationRun`, which rejects any required target-profile group that did not pass. `scripts/Test-MIRValidationResults.ps1` checks both complete and interrupted result shapes during static validation.
 
 ## Reproducible Candidate Fingerprints
 
-Package-source, packaged-content, validation-harness, and expected-scenario
-fingerprints normalize text files to UTF-8 with LF line endings before hashing.
-This makes one clean Git commit retain the same content identity under LF and
-CRLF checkout policy. Binary files and the final release archive remain
-byte-exact SHA-256 inputs.
+Package-source, packaged-content, validation-harness, and expected-scenario fingerprints normalize text files to UTF-8 with LF line endings before hashing. This makes one clean Git commit retain the same content identity under LF and CRLF checkout policy. Binary files and the final release archive remain byte-exact SHA-256 inputs.
 
-`scripts/Test-MIRPackageIdentity.ps1` proves that LF and CRLF copies produce
-matching semantic fingerprints, that binary/archive byte hashes remain exact,
-and that a real text change still changes the package identity.
+`scripts/Test-MIRPackageIdentity.ps1` proves that LF and CRLF copies produce matching semantic fingerprints, that binary/archive byte hashes remain exact, and that a real text change still changes the package identity.
+
+After publication, candidate freshness treats the recorded runtime summary and fingerprints as historical evidence and verifies the immutable release archive, release tag, source ancestry, and clean validation result. Later `dev` documentation, fixtures, and validation-harness improvements do not rewrite or invalidate the published evidence.
