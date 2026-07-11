@@ -5,13 +5,13 @@ applies_to: "3.0.0+"
 audience: maintainer
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-07-09
+last_reviewed: 2026-07-10
 supersedes: []
 superseded_by: []
 ---
 # Target-Line Versioning And Backports
 
-Updated: 2026-07-09
+Updated: 2026-07-10
 
 This note records the locked maintainer policy for separating MIR release
 numbers by Factorio target line after the `2.2.0` compatibility-platform
@@ -19,6 +19,13 @@ release. It is a release-operations note, not a feature-parity promise. Every
 target line still needs its own source branch, metadata, package build,
 Factorio binary, mod library, validation artifacts, and public release notes
 before it can be published.
+
+Factorio `0.17` completed that gate on 2026-07-10. MIR `1.7.0` was published
+from commit `1a9b5a7b1162f8dca8125ef7bb792f57a9ae282b` and tag `1.7.0` using the
+exact archive recorded in `.mir/branches.yml`. Its portable prerequisite and
+graph-safety lessons are inputs to the `3.0.5` convergence phase; its metadata,
+reduced feature surface, `global` runtime backend, and target-era assets remain
+local to the Factorio `0.17` line.
 
 ## Current Transition State
 
@@ -30,10 +37,10 @@ generation. They no longer only encode MIR's internal architecture generation.
 
 | MIR version range | Factorio target line | First planned release in range | Support class | Notes |
 | --- | --- | --- | --- | --- |
-| `3.x.x` | Factorio `2.1` | `3.0.0` | Canonical modern | Current-line compiler architecture release. |
+| `3.x.x` | Factorio `2.1` | `3.0.5` | Canonical modern | Compatibility-hardening candidate from the 3.0.0 source anchor. |
 | `2.x.x` | Factorio `2.0` | `2.3.0` | Maintained `2.0` backport | First post-3.0 port of the compiler architecture. |
 | `1.9.x` | Factorio `1.1` | `1.9.3` | Compatibility port | `1.9.0` through `1.9.2` are transition exceptions for Factorio `2.0`. |
-| `1.8.x` | Factorio `1.0` | `1.8.0` | Compatibility port | Factorio `0.18` remains a bridge decision, not a separate locked line. |
+| `1.8.x` | Factorio `0.18` bridge / `1.0` | `1.8.0` / `1.8.1` | Bridge archive / compatibility port | `1.8.0` is the one-time `0.18` bridge exception; `1.8.1+` is the maintained `1.0` line. |
 | `1.7.x` | Factorio `0.17` | `1.7.0` | Reduced native-infinite | First old-line native-infinite target. |
 | `1.6.x` | Factorio `0.16` | `1.6.0` | Old-science native-infinite | Requires old science-pack mapping. |
 | `1.5.x` | Factorio `0.15` | `1.5.0` | Minimal native-infinite | Earliest plausible native-infinite floor. |
@@ -64,6 +71,17 @@ Target-line mapping era:
   3.x.x targets Factorio 2.1 starting at 3.0.0.
 ```
 
+The `1.8.x` range has one deliberate bridge exception:
+
+```text
+1.8.0 targets Factorio 0.18 as a frozen bridge/archive package.
+1.8.1 and later target Factorio 1.0 as the maintained support line.
+0.8.x remains reserved for Factorio 0.8 museum/discovery builds.
+```
+
+Do not use `0.8.1` or any other `0.8.x` release number for Factorio `1.0`.
+That range belongs to the later Factorio `0.8` museum line.
+
 ## Branch Roles
 
 Use these branch roles during the transition:
@@ -75,7 +93,8 @@ Use these branch roles during the transition:
 | `legacy` | Stable Factorio `2.0` branch. It receives `1.9.0` through `1.9.2` during the transition and `2.x.x` after the 3.0 architecture port. | `2.x.x` starting at `2.3.0` |
 | `tmp/2.0` | Working Factorio `2.0` port branch or worktree. | `2.x.x` starting at `2.3.0` |
 | `tmp/1.1` | Working Factorio `1.1` port branch or worktree. | `1.9.x` starting at `1.9.3` |
-| `tmp/1.0` | Working Factorio `1.0` port branch or worktree. | `1.8.x` |
+| `port/1.1-to-0.18` | Short-lived Factorio `0.18` bridge branch seeded from the validated `1.9.3` source point. | `1.8.0` only |
+| `tmp/1.0` | Working Factorio `1.0` port branch or worktree after the `0.18` bridge proof. | `1.8.1+` |
 | `tmp/0.17` | Working Factorio `0.17` port branch or worktree. | `1.7.x` |
 | `tmp/0.16` | Working Factorio `0.16` port branch or worktree. | `1.6.x` |
 | `tmp/0.15` | Working Factorio `0.15` port branch or worktree. | `1.5.x` |
@@ -98,6 +117,12 @@ back into the current line.
 For safer local work, prefer `git worktree` checkouts for `tmp/*` branches so a
 Factorio `2.0` port can be validated while `dev` remains available for Factorio
 `2.1` fixes.
+
+Target capability classifications are centralized in `.mir/targets.json`.
+After retargeting `info.json` on a branch, run
+`.\scripts\Sync-MIRTargetProfiles.ps1` and commit the generated Lua view.
+PowerShell gates read the same manifest directly, and architecture validation
+rejects drift between the manifest, generated Lua, and current metadata.
 
 ## Immediate `2.2.0` To `1.9.2` Flow
 
@@ -220,11 +245,10 @@ Current execution state:
   tooling lessons back to `dev`, but do not cut an immediate `3.0.1` release.
 - Keep `dev` as the accumulating Factorio `2.1` integration branch while the
   `3.0.0` backport rings are worked.
-- Release `3.0.5` after the Factorio `2.0` port is published, the Factorio
-  `1.1` port is either published or has produced clear portable lessons, the
-  Factorio `1.0` / `0.18` bridge policy is decided, and a short community
-  feedback window has captured early current-line corrections. Do not bring
-  target-line metadata downgrades back to `dev`.
+- The automated `3.0.5` candidate gate is complete after the published 2.0,
+  1.1, 1.0, 0.18, and 0.17 lines produced portable lessons. Publication still
+  requires manual acceptance of the exact archive. Target-line metadata
+  downgrades remain excluded from `dev`.
 - Start `3.1.0` only after the `3.0.5` learning patch is stable. Treat `3.1.0`
   as the fixture-backed overhaul support campaign, not as cleanup from the
   backport ladder.
@@ -268,7 +292,7 @@ validated for that line.
 | --- | --- | --- |
 | 1 | Factorio `2.0` | Port from `3.0.0`; remove or disable Factorio `2.1` surfaces. |
 | 2 | Factorio `1.1` | Reduced port from `3.0.0` plus portable `2.0` lessons. |
-| 3 | Factorio `1.0` / `0.18` bridge | Prove the bridge with a tiny artifact before choosing the release shape. |
+| 3 | Factorio `0.18` bridge and Factorio `1.0` | Build `1.8.0` as the bridge/archive proof from `1.9.3`, then establish `1.8.1+` as the maintained `1.0` line. |
 | 4 | Factorio `0.17` / `0.16` / `0.15` | Native-infinite subsets only after binary proof. |
 | 5 | Factorio `0.14` / `0.13` / `0.12` | Archive finite-ladder packages unless binary proof supports more. |
 | 6 | Factorio `0.11` through `0.6` | Museum/discovery builds defined from matching binaries and base files. |
@@ -398,22 +422,108 @@ Required proof:
 `1.1` is the first hard reduction ring. Do not expect it to behave like the
 Factorio `2.0` port.
 
-### `tmp/1.0` To `1.8.0`
+### `tmp/1.0` To `1.8.0` / `1.8.1`
 
-Resolve the Factorio `0.18` bridge before implementation:
+Ring 3 follows the same synthesis pattern as `1.9.3`: start from the `3.0.0`
+source anchor plus portable `2.3.0` and `1.9.3` lessons, then remove or adapt
+only the surfaces the target binary cannot support.
 
-1. Build a tiny `0.18` proof artifact.
-2. Test it in `0.18`.
-3. Test the same artifact in `1.0`.
-4. Decide whether `1.8.0` should be a true `1.0` package or a `0.18` bridge
-   package.
+The public version split is:
+
+- `1.8.0` for the Factorio `0.18` bridge/archive package;
+- `1.8.1` for the true Factorio `1.0` package;
+- `1.8.2+` for any later Factorio `1.0` fixes.
+
+As of 2026-07-10, `1.8.0` is the published Factorio `0.18` bridge/archive
+package. Its immutable archive is
+`dist/more-infinite-research_1.8.0.zip` with SHA-256
+`D785E6EBE7A72E6E9F01A3F89774A6AA30479430410447F603FEF1E0B9BD7B24`,
+`300620` bytes, `121` entries, and `0` forbidden release entries. Static
+validation, Factorio `0.18` binary validation, and Factorio `1.0` bridge-load
+validation are recorded as passed in `.mir/branches.yml`.
+
+The `1.0` follow-up must not be made by changing only the `1.8.0` metadata.
+Build `1.8.1` from the `1.9.3` reduced source posture plus proven `1.8.0`
+bridge lessons and current `dev` portable fixes. Re-probe anything cut only
+because Factorio `0.18` rejected it; keep Factorio `2.x` and DLC surfaces cut.
+
+The resolved bridge sequence was:
+
+1. Create `port/1.1-to-0.18` from the validated `1.9.3` source point.
+2. Retarget that branch to version `1.8.0`, `factorio_version = "0.18"`, and
+   `base >= 0.18`.
+3. Cut any remaining `1.1` assumptions that the Factorio `0.18` binary rejects.
+4. Build `dist/more-infinite-research_1.8.0.zip`.
+5. Load the exact same zip in Factorio `0.18` and Factorio `1.0`.
+6. Publish `1.8.0` only if both binary loads pass.
+7. Freeze `1.8.0` after publication unless a severe package or load defect is
+   found.
+8. Build `1.8.1` on `tmp/1.0` as the direct Factorio `1.0` package.
+
+Do not treat `1.8.0` as the maintained `0.18` line. It is a bridge/archive
+exception because Factorio documents `0.18` packages as loadable by `1.0`.
+Future `1.0` fixes go to `1.8.2+`, not to a higher `0.18` bridge package.
+
+Minimum `1.8.0` metadata:
+
+```json
+{
+  "version": "1.8.0",
+  "factorio_version": "0.18",
+  "dependencies": [
+    "base >= 0.18"
+  ]
+}
+```
+
+Minimum `1.8.1` metadata:
+
+```json
+{
+  "version": "1.8.1",
+  "factorio_version": "1.0",
+  "dependencies": [
+    "base >= 1.0"
+  ]
+}
+```
+
+First-release policy for both packages:
+
+- keep target-proven direct-effect infinite technologies;
+- keep target-proven base-extension continuations;
+- keep `global` runtime state or remove runtime code;
+- cut recipe productivity unless a target binary proves the exact modifier;
+- cut Space Age, Quality, Recycler, Elevated Rails, cargo logistics, spoilage,
+  agriculture, and Factorio `2.x` prototype repairs;
+- do not add new features in `1.8.1` beyond what is needed for direct Factorio
+  `1.0` compatibility.
+
+Release wording for `1.8.0`:
+
+```text
+MIR 1.8.0 is a Factorio 0.18 bridge/archive compatibility port derived from
+the MIR 3 architecture and the Factorio 1.1 compatibility port. It is provided
+for players on the final Factorio 0.18 experimental line and is expected to
+load in Factorio 1.0 under Factorio's documented 0.18-to-1.0 compatibility
+exception. It is not the maintained Factorio 1.0 line.
+```
+
+Release wording for `1.8.1`:
+
+```text
+MIR 1.8.1 is the first maintained Factorio 1.0 compatibility port derived from
+the MIR 3 architecture and the Factorio 0.18 bridge proof. Feature parity with
+2.x and 3.x is not promised.
+```
 
 ### `tmp/0.17`, `tmp/0.16`, And `tmp/0.15`
 
 These are reduced native-infinite editions:
 
-- `tmp/0.17` to `1.7.0`: first old-line native-infinite proof;
-- `tmp/0.16` to `1.6.0`: old-science native-infinite proof;
+- `tmp/0.17` to `1.7.0`: published first old-line native-infinite proof;
+- `tmp/0.16` to `1.6.0`: next old-science native-infinite proof, sourced from
+  the 3.0.5 canonical baseline plus synthesized 1.7.0 behavior;
 - `tmp/0.15` to `1.5.0`: earliest plausible native-infinite floor.
 
 Required work:
@@ -466,7 +576,9 @@ Use these public wording classes:
 | --- | --- |
 | `3.x.x` | Canonical MIR release for Factorio `2.1`. |
 | `2.x.x` | Maintained Factorio `2.0` port of the canonical MIR architecture. |
-| `1.9.x` / `1.8.x` | Compatibility port for Factorio `1.1` / `1.0`; feature parity with `2.x`/`3.x` is not promised. |
+| `1.9.x` | Compatibility port for Factorio `1.1`; feature parity with `2.x`/`3.x` is not promised. |
+| `1.8.0` | Frozen Factorio `0.18` bridge/archive package; expected to load in `1.0` only as bridge proof. |
+| `1.8.1+` | Maintained compatibility port for Factorio `1.0`; feature parity with `2.x`/`3.x` is not promised. |
 | `1.7.x` / `1.6.x` / `1.5.x` | Reduced native-infinite edition for Factorio `0.17` / `0.16` / `0.15`. |
 | `1.4.x` / `1.3.x` / `0.12.x` | Archive finite-ladder reconstruction. |
 | `0.11.x` through `0.6.x` | Museum/discovery build. |
@@ -487,8 +599,8 @@ The plan is sound, but these guardrails would make it safer:
   code fixes instead.
 - Make the `1.9.0` through `1.9.2` historical exception visible in release
   notes because the new scheme reassigns `1.9.3+` to Factorio `1.1`.
-- Record the Factorio `0.18` bridge policy before the `1.8.x` Factorio `1.0`
-  line ships. Do not invent a new version line for `0.18` unless the locked
-  scheme is explicitly reopened.
+- Keep the Factorio `0.18` bridge frozen at `1.8.0` unless a severe
+  package/load defect is found. Do not invent a new version line for `0.18`
+  unless the locked scheme is explicitly reopened.
 - Do not start broad 3.0 backports until the 3.0 architecture, migration
   manifest, claim manifest, and negative fixtures are stable on Factorio `2.1`.

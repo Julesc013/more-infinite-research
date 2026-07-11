@@ -8,10 +8,13 @@ local settings_resolver = require("prototypes.mir.settings.resolver")
 local deepcopy = require("prototypes.mir.core.deepcopy")
 local table_utils = require("prototypes.mir.core.table")
 local effect_safety = require("prototypes.mir.emit.effect_safety")
+local generated_registry = require("prototypes.mir.domain.facts.generated_technology_registry")
+local competing_base_extensions = require("prototypes.mir.policy.competing_base_extensions")
 local planner_prerequisites = require("prototypes.mir.planner.prerequisites")
 local science_packs = require("prototypes.mir.capabilities.science_integration.science_packs")
 local science_selector = require("prototypes.mir.capabilities.science_integration.science_selector")
 local effective_settings = require("prototypes.mir.settings.effective")
+local effect_scaling = require("prototypes.mir.settings.effect_scaling")
 
 local M = {}
 
@@ -115,7 +118,8 @@ end
 local function find_equivalent_infinite_extension(previous_name, expected_effects)
   local expected_signature = effects_signature(expected_effects)
   for tech_name, tech in pairs(data_raw.prototypes("technology")) do
-    if tech.max_level == "infinite" and tech_name ~= previous_name then
+    if tech.max_level == "infinite" and tech_name ~= previous_name
+      and not competing_base_extensions.ignores_existing_owner(tech_name) then
       if has_prereq(tech, previous_name) and effects_signature(tech.effects) == expected_signature then
         return tech_name
       end
@@ -259,12 +263,15 @@ local SPECIALS = {
 
 local function extend_chain(key)
   local spec = base_defaults[key] or {}
+  local chain_key = spec.chain_key or key
+  local generated_key = spec.generated_key or chain_key
+  local locale_key = spec.locale_key or chain_key
   if not is_enabled(key, spec) then
     D.extension(D.extension_fields(key, "skipped", "disabled"))
     return
   end
 
-  local pattern = "^" .. escape_pattern(key) .. "%-(%d+)$"
+  local pattern = "^" .. escape_pattern(chain_key) .. "%-(%d+)$"
   local levels, by_level = {}, {}
   local has_infinite = false
 
@@ -316,7 +323,7 @@ local function extend_chain(key)
   -- Allow anchoring when the base tech exists; vanilla-derived cost inference
   -- still requires numeric unit.count values.
 
-  local new_name = key .. "-" .. desired_new_level
+  local new_name = generated_key .. "-" .. desired_new_level
   -- Never replace an existing vanilla or modded continuation level.
   if data_raw.technology(new_name) then
     D.extension(D.extension_fields(key, "skipped", "target_exists"))
@@ -426,9 +433,9 @@ local function extend_chain(key)
 
   local new = deepcopy(base_tech)
   new.name = new_name
-  new.localised_name = base_tech.localised_name
-  new.localised_description = base_tech.localised_description
-  new.prerequisites = build_prerequisites(key .. "-" .. base_level, base_tech.prerequisites)
+  new.localised_name = spec.localised_name or base_tech.localised_name or {"technology-name." .. locale_key}
+  new.localised_description = spec.localised_description or base_tech.localised_description or {"technology-description." .. locale_key}
+  new.prerequisites = build_prerequisites(chain_key .. "-" .. base_level, base_tech.prerequisites)
   new.level = desired_new_level
 
   local special = SPECIALS[key]
@@ -440,20 +447,20 @@ local function extend_chain(key)
   end
   effect_safety.assert_effects_allowed(desired_effects, "base extension " .. key)
   if not prefer_this_mod_for_competing_techs() then
-    local other_choice = find_any_infinite_extension(key .. "-" .. base_level, new_name)
+    local other_choice = find_any_infinite_extension(chain_key .. "-" .. base_level, new_name)
     if other_choice then
       log("[more-infinite-research] Skipping extension for " .. key .. ": competing infinite tech kept from other mod (" .. other_choice .. ").")
       D.extension(D.extension_fields(key, "skipped", "competing_infinite_kept"))
       return
     end
   end
-  local existing = find_equivalent_infinite_extension(key .. "-" .. base_level, desired_effects)
+  local existing = find_equivalent_infinite_extension(chain_key .. "-" .. base_level, desired_effects)
   if existing then
     log("[more-infinite-research] Skipping extension for " .. key .. ": equivalent infinite tech already exists (" .. existing .. ").")
     D.extension(D.extension_fields(key, "skipped", "equivalent_infinite_exists"))
     return
   end
-  new.effects = desired_effects
+  new.effects = effect_scaling.scale_base_effects(key, desired_effects)
 
   new.max_level = max_level_value
   new.upgrade = true
@@ -491,7 +498,7 @@ local function extend_chain(key)
   end
 
   data_raw.extend({ new })
-  effect_safety.register_generated_technology(new.name)
+  generated_registry.register(new.name, { kind = "base_extension", key = key })
   D.extension(D.extension_fields(key, "generated", "base_extension", resolved_ingredients, new.prerequisites, new.effects, lab_status))
 end
 

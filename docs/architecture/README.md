@@ -34,6 +34,13 @@ More Infinite Research is organized around a compatibility-first data-stage pipe
 11. Planner, compatibility, and audit diagnostics.
 12. Generated-technology effect safety validation and diagnostics flush.
 
+Generated technology safety now includes the prerequisite graph as well as
+effect types. Emission registers every generated stream and base continuation;
+the final safety pass rejects missing or disabled prerequisites, prerequisite
+cycles, structurally unreachable ancestry, invalid lab science sets, and
+recipe-produced science packs without an initially enabled recipe or enabled
+reachable unlocker.
+
 This order gives the mod the best practical view of recipes, labs, science packs, and technologies created by other mods while still keeping this mod's final cleanup deterministic.
 
 Use [Factorio lifecycle boundaries](factorio-lifecycle.md) for the exact
@@ -76,6 +83,9 @@ The runtime layer is intentionally narrow:
 - Handle runtime setting changes if runtime settings are introduced.
 - Require each scripted feature to document storage keys, disable behavior, multiple-force behavior, and interaction with other mods touching the same state.
 - Label scripted/global/sandbox features clearly in settings and player-facing docs.
+- Select the persisted runtime root through the active
+  [target capability profile](target-profiles.md): `storage` on Factorio 2.x
+  and `global` on Factorio 1.1 and older.
 - Static validation fails if `control.lua` or `prototypes/mir/runtime/**/*.lua`
   registers `defines.events.on_tick` or `script.on_nth_tick` without a future
   explicit allowlist.
@@ -104,7 +114,9 @@ Current migrations:
 
 ### Scripted Runtime Storage
 
-All runtime storage is namespaced below `storage.mir`.
+All runtime state is namespaced below `mir` on the target-selected persisted
+root. On the current Factorio 2.1 line that is `storage.mir`; older target
+profiles select `global.mir`.
 
 `storage.mir.scripted_techs` is reserved for manager-level state. It is currently initialized so future manager metadata has a stable namespace, but it does not store behavior state yet.
 
@@ -139,9 +151,10 @@ focused modules:
 - `prototypes/mir/planner/prerequisites.lua`: stream prerequisite construction, unlock-derived prerequisites, and the optional end-game prerequisite gate.
 - `prototypes/mir/core/deepcopy.lua`: shared fallback for data-stage deep copies.
 - `prototypes/mir/core/table.lua`: deterministic table-key ordering helpers.
-- `prototypes/mir/policy/technology_cleanup.lua`: technology removal with prerequisite reference cleanup.
+- `prototypes/mir/emit/technology_replacement.lua`: graph-safe transactional replacement with prerequisite rewiring; unreferenced removal is an explicit separate operation.
 - `prototypes/mir/policy/max_level.lua`: post-emission max-level setting enforcement for generated stream technologies.
-- `prototypes/mir/policy/weapon_speed.lua`: optional duplicate rocket/cannon category cleanup from generated general weapon-speed continuations.
+- `prototypes/mir/policy/weapon_speed.lua`: coverage-aware rocket/cannon category cleanup from generated general weapon-speed continuations.
+- `prototypes/mir/policy/native_effect_coverage.lua`: exact reachable infinite native-effect ownership shared by direct-stream adoption and weapon overlap policy.
 - `prototypes/mir/index/productivity_owners.lua`: shared recipe-productivity owner classification, recipe allow-productivity checks, and owner record formatting.
 - `prototypes/mir/policy/productivity_family_adoption.lua`: data-stage adoption of safe residual recipes into configured existing productivity families plus adoption-signature payload construction.
 - `prototypes/mir/policy/competing_productivity.lua`: profile-driven replacement of known fully covered competing infinite recipe-productivity technologies.
@@ -193,7 +206,7 @@ Generated recipe-productivity streams can set `dynamic_items_from_lab_inputs = t
 
 Fluid-output productivity streams use the same recipe-productivity generator as item streams. They should be split by recipe ownership/process family, not by every output fluid name. Multi-output recipes such as oil processing belong to one owner stream; conversion families such as oil cracking, lubricant, sulfuric acid and acid neutralization, and thruster fuel/oxidizer can be separate streams when their recipes do not overlap.
 
-Direct-effect stream and base-extension generation must pass through `prototypes/mir/emit/effect_safety.lua`. MIR must not add `character-item-pickup-distance` or `character-loot-pickup-distance` effects to any generated technology; large pickup radii can vacuum belt items into the player inventory and cause severe lag.
+Direct-effect stream and base-extension generation must pass through `prototypes/mir/emit/effect_safety.lua`. MIR must not add `character-item-pickup-distance` or `character-loot-pickup-distance` effects to any generated technology; large pickup radii can vacuum belt items into the player inventory and cause severe lag. The same final pass verifies that every registered `change-recipe-productivity` effect still names an existing recipe when MIR finishes. Later dependent mods can still mutate prototypes, so classifier policy and dependent final-fixes fixtures must cover evidenced late-removal cases.
 
 `mir-pipeline-extent-multiplier` is deliberately not research. It is a startup-only prototype pass in `prototypes/mir/pipeline/extent.lua` because `FluidBox.max_pipeline_extent` is resolved from prototypes during load. The dropdown values and parser live in `prototypes/mir/settings/pipeline_extent.lua`. The pass is loaded only when the parsed startup setting is not `100%`; at the default `100%`, MIR reads the setting gate and does not load the pipeline module, scan `data.raw`, log pipeline work, or mutate fluid boxes.
 

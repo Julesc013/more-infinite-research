@@ -14,6 +14,15 @@
       "notes": "Space Age baseline for Factorio 2.0 binaries that include Space Age. If not installed, the audit reports an official-mod dependency failure."
     },
     {
+      "name": "local-2-0-crucible-rigor-exact-dist",
+      "include_space_age": true,
+      "mods": [
+        "planet-crucible",
+        "rigor-module"
+      ],
+      "notes": "Required 2.3.5 compatibility gate for Planet Crucible 0.5.10 and Rigor Module 0.7.0 using the exact MIR candidate archive."
+    },
+    {
       "name": "local-2-0-bz-suite",
       "include_space_age": false,
       "mods": [

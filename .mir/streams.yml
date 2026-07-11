@@ -6,6 +6,7 @@ generated_id_doc: docs/reference/generated-id-reference.md
 
 rules:
   - every generated technology has a stable manifest row
+  - per-technology effect settings preserve canonical tier ratios
   - released stream IDs are not renamed without migration review
   - removed stream targets require migration review
   - release notes mention generated stream changes
@@ -29,6 +30,7 @@ streams:
       evidence:
         fixtures:
           - fixtures/assert-generation-integrity
+          - fixtures/assert-prototype-limits
     recipe-prod-research_agricultural_growth_speed-1:
       canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_agricultural_growth_speed-1
       introduced_in: "pre-2.2.0"
@@ -224,6 +226,7 @@ streams:
       evidence:
         fixtures:
           - fixtures/assert-generation-integrity
+          - fixtures/assert-weapon-speed-safety
 
     recipe-prod-research_carbon-1:
       canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_carbon-1
@@ -448,6 +451,7 @@ streams:
       evidence:
         fixtures:
           - fixtures/assert-generation-integrity
+          - fixtures/assert-weapon-speed-safety
 
     recipe-prod-research_electronic_circuit-1:
       canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_electronic_circuit-1
@@ -512,6 +516,7 @@ streams:
       evidence:
         fixtures:
           - fixtures/assert-generation-integrity
+          - fixtures/assert-weapon-speed-safety
 
     recipe-prod-research_flying_robot_frame-1:
       canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_flying_robot_frame-1
@@ -960,6 +965,7 @@ streams:
       evidence:
         fixtures:
           - fixtures/assert-generation-integrity
+          - fixtures/assert-weapon-speed-safety
 
     recipe-prod-research_rockets-1:
       canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_rockets-1

@@ -59,3 +59,20 @@ data:extend({
     prerequisites = {"chemical-science-pack"}
   }
 })
+
+local prefix_owner = table.deepcopy(data.raw.technology["basic-plate-productivity"])
+prefix_owner.name = "recipe-prod-external-prefix-owner"
+prefix_owner.effects = {
+  {type = "change-recipe-productivity", recipe = "iron-gear-wheel", change = 0.1}
+}
+prefix_owner.prerequisites = {"automation-2"}
+
+local dependent = table.deepcopy(data.raw.technology["basic-plate-productivity"])
+dependent.name = "mir-fixture-productivity-dependent"
+dependent.max_level = nil
+dependent.unit.count_formula = nil
+dependent.unit.count = 100
+dependent.effects = {}
+dependent.prerequisites = {"basic-plate-productivity"}
+
+data:extend({prefix_owner, dependent})

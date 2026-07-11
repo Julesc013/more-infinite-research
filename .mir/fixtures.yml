@@ -5,7 +5,40 @@ fixture_roots:
   compatibility_matrix: fixtures/compat-matrix
   run_profiles: fixtures/run-profiles
 
+real_mod_gates:
+  factorio-2.1-crucible-rigor:
+    scenario: local-2-1-crucible-rigor-exact-dist
+    roots:
+      - planet-crucible
+      - rigor-module
+    requires_exact_dist: true
+    requires_fresh_save: true
+    status: required
+
 fixtures:
+  rigor-late-recipe-removal:
+    path: fixtures/rigor-late-recipe-removal
+    validates:
+      - incineration-sink-excluded-from-breeding
+      - breeding-classifier-positive-negative-matrix
+      - generated-recipe-target-integrity
+      - dependent-mod-late-recipe-removal
+
+  generated-prerequisite-safety:
+    assertion_path: fixtures/assert-generated-prerequisite-safety
+    validates:
+      - generated-stream-prerequisites-exist-and-are-enabled
+      - generated-stream-prerequisites-are-acyclic-and-reachable
+      - already-enabled-science-pack-recipe-needs-no-unlock
+      - disabled-technology-unlocker-exclusion
+      - deterministic-multiple-unlocker-selection
+      - direct-science-self-lock-exclusion
+      - two-pack-science-cycle-exclusion
+      - missing-research-mechanism-exclusion
+      - shared-recipe-unlocker-index
+      - researchable-required-technology-policy
+      - unlock-all-generated-stream-reachability
+
   settings-visibility:
     assertion_path: fixtures/assert-hidden-setting-readability
     validates:
@@ -17,9 +50,44 @@ fixtures:
     validates:
       - prototype-limit-startup-overrides
       - recipe-maximum-productivity-cap
+      - inverse-recycler-threshold-self-recycling-scope
+      - productivity-scope-inert-at-or-below-threshold
+      - engine-unchanged-conservative-threshold
+      - cap-balanced-generated-recycling-return
+      - recycling-recipe-productivity-cap-exclusion
+      - visible-recycling-process-exclusion
+      - unrestricted-module-permissions
+      - module-permission-array-isolation
+      - module-prototype-tier-recipe-discovery
       - effect-receiver-limits
       - separate-energy-and-pollution-limits
+      - separate-positive-speed-cap-and-negative-speed-floor
       - positive-power-floor-opt-in
+
+  effect-scaling:
+    assertion_path: fixtures/assert-generation-integrity
+    validates:
+      - primary-base-tier-default-anchor
+      - vanilla-continuation-default-anchors
+      - proportional-mixed-tier-scaling
+      - scripted-runtime-multiplier-delta
+      - scripted-effect-selected-description
+      - retained-non-default-base-effect-settings
+
+  competing-productivity-transaction:
+    path: fixtures/plates-n-circuit-productivity
+    assertion_path: fixtures/assert-plates-n-circuit-productivity
+    validates:
+      - scaled-known-productivity-competitor
+      - external-recipe-productivity-prefix-owner
+      - technology-prerequisite-rewire
+
+  competing-base-extension-transaction:
+    path: fixtures/better-robots-extended-competitor
+    assertion_path: fixtures/assert-base-competitor-transaction
+    validates:
+      - base-competitor-rollback
+      - technology-prerequisite-rewire
 
   settings-profile-roundtrip:
     assertion_path: fixtures/assert-settings-profile-roundtrip
@@ -28,6 +96,26 @@ fixtures:
       - settings-profile-compact-export
       - settings-profile-strict-import-validation
       - hidden-provider-setting-profile-roundtrip
+
+  reduced-settings-surface:
+    assertion_path: fixtures/assert-reduced-settings-surface
+    validates:
+      - reduced-supported-settings-remain-visible
+      - modern-only-settings-are-omitted
+      - reduced-continuation-locales-are-explicit
+
+  weapon-speed-safety:
+    path: fixtures/weapon-speed-external-owner
+    assertion_path: fixtures/assert-weapon-speed-safety
+    validates:
+      - finite-vanilla-weapon-effects-preserved
+      - weapon-overlap-six-case-policy-matrix
+      - exact-infinite-replacement-coverage
+      - external-owner-science-reachability
+      - external-continuation-non-mutation
+      - external-owner-suppresses-dedicated-streams-when-preferred
+      - dedicated-weapon-prerequisites
+      - scaled-weapon-overlap
 
   air-scrubbing:
     path: fixtures/air-scrubbing

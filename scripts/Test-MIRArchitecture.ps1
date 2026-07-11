@@ -91,6 +91,49 @@ function Assert-MIRNoPatternInLuaFile {
   }
 }
 
+function Assert-MIRNoTopLevelRequireCycles {
+  $luaRoot = Get-MIRPath -RelativePath "prototypes/mir"
+  $graph = @{}
+  foreach ($file in Get-ChildItem -LiteralPath $luaRoot -Recurse -File -Filter "*.lua") {
+    $relative = [System.IO.Path]::GetRelativePath($repo, $file.FullName).Replace("\", "/")
+    $module = ($relative -replace '\.lua$', '').Replace("/", ".")
+    $dependencies = @()
+    $text = Get-Content -Raw -LiteralPath $file.FullName
+    foreach ($match in [regex]::Matches($text, '(?m)^(?:local\s+\w+\s*=\s*|return\s+)require\("([^"]+)"\)')) {
+      $dependency = $match.Groups[1].Value
+      if ($dependency.StartsWith("prototypes.mir.")) {
+        $dependencies += $dependency
+      }
+    }
+    $graph[$module] = @($dependencies | Sort-Object -Unique)
+  }
+
+  $state = @{}
+  $stack = [System.Collections.Generic.List[string]]::new()
+  function Visit-MIRModule([string]$Module) {
+    if ($state[$Module] -eq 2) { return }
+    if ($state[$Module] -eq 1) {
+      $start = $stack.IndexOf($Module)
+      $cycle = @($stack.GetRange($start, $stack.Count - $start)) + $Module
+      throw "Top-level Lua require cycle: $($cycle -join ' -> ')"
+    }
+
+    $state[$Module] = 1
+    $stack.Add($Module) | Out-Null
+    foreach ($dependency in @($graph[$Module])) {
+      if ($graph.ContainsKey($dependency)) {
+        Visit-MIRModule -Module $dependency
+      }
+    }
+    $stack.RemoveAt($stack.Count - 1)
+    $state[$Module] = 2
+  }
+
+  foreach ($module in @($graph.Keys | Sort-Object)) {
+    Visit-MIRModule -Module $module
+  }
+}
+
 $entrypoints = @(
   @{
     Root = "settings.lua"
@@ -174,6 +217,9 @@ $requiredMirFiles = @(
   "prototypes/mir/platform/factorio/data_raw.lua",
   "prototypes/mir/platform/factorio/mods.lua",
   "prototypes/mir/platform/factorio/prototype_lookup.lua",
+  "prototypes/mir/platform/factorio/target_profiles.lua",
+  "prototypes/mir/platform/factorio/target_line.lua",
+  "prototypes/mir/platform/factorio/runtime_state.lua",
   "prototypes/mir/settings/stage_builder.lua",
   "prototypes/mir/settings/registry.lua",
   "prototypes/mir/settings/defaults.lua",
@@ -182,6 +228,8 @@ $requiredMirFiles = @(
   "prototypes/mir/settings/stage_adapter.lua",
   "prototypes/mir/settings/profile_codec.lua",
   "prototypes/mir/settings/effective.lua",
+  "prototypes/mir/settings/effect_contracts.lua",
+  "prototypes/mir/settings/effect_scaling.lua",
   "prototypes/mir/settings/resolver.lua",
   "prototypes/mir/settings/pipeline_extent.lua",
   "prototypes/mir/streams/registry.lua",
@@ -191,13 +239,13 @@ $requiredMirFiles = @(
   "prototypes/mir/policy/competing_productivity.lua",
   "prototypes/mir/policy/competing_base_extensions.lua",
   "prototypes/mir/policy/productivity_family_adoption.lua",
-  "prototypes/mir/policy/technology_cleanup.lua",
   "prototypes/mir/policy/max_level.lua",
   "prototypes/mir/policy/weapon_speed.lua",
   "prototypes/mir/policy/capabilities.lua",
   "prototypes/mir/index/registry_builder.lua",
   "prototypes/mir/index/productivity_owners.lua",
   "prototypes/mir/domain/facts/registry.lua",
+  "prototypes/mir/domain/facts/generated_technology_registry.lua",
   "prototypes/mir/capabilities/contract.lua",
   "prototypes/mir/capabilities/registry.lua",
   "prototypes/mir/capabilities/recipe_productivity/planner.lua",
@@ -218,6 +266,7 @@ $requiredMirFiles = @(
   "prototypes/mir/emit/effect_safety.lua",
   "prototypes/mir/emit/mod_data.lua",
   "prototypes/mir/emit/technology_builder.lua",
+  "prototypes/mir/emit/technology_replacement.lua",
   "prototypes/mir/report/decision_export.lua",
   "prototypes/mir/report/compatibility_diagnostics.lua",
   "prototypes/mir/report/diagnostics_sink.lua",
@@ -246,13 +295,18 @@ foreach ($relative in $requiredMirFiles) {
   $null = Read-MIRFile -RelativePath $relative
 }
 
+& (Join-Path $repo "scripts\Sync-MIRTargetProfiles.ps1") -RepoRoot $repo -Check
+if ($LASTEXITCODE -ne 0) {
+  throw "Generated target profile validation failed with exit code $LASTEXITCODE."
+}
+
 $dataFinalFixesStageText = Read-MIRFile -RelativePath "prototypes/mir/stage/data_final_fixes.lua"
 Assert-MIRContains -RelativePath "prototypes/mir/stage/data_final_fixes.lua" -Text $dataFinalFixesStageText -Needle "steps.apply_compatibility_repairs()"
 Assert-MIRContains -RelativePath "prototypes/mir/stage/data_final_fixes.lua" -Text $dataFinalFixesStageText -Needle "steps.apply_pipeline_extent()"
 Assert-MIRContains -RelativePath "prototypes/mir/stage/data_final_fixes.lua" -Text $dataFinalFixesStageText -Needle "steps.emit_streams()"
 Assert-MIRContains -RelativePath "prototypes/mir/stage/data_final_fixes.lua" -Text $dataFinalFixesStageText -Needle 'require("prototypes.mir.compatibility.diagnostics.registry").emit_all()'
 Assert-MIRContains -RelativePath "prototypes/mir/stage/data_final_fixes.lua" -Text $dataFinalFixesStageText -Needle 'require("prototypes.mir.planner.compiler").emit()'
-Assert-MIRContains -RelativePath "prototypes/mir/stage/data_final_fixes.lua" -Text $dataFinalFixesStageText -Needle "steps.assert_registered_technology_effects()"
+Assert-MIRContains -RelativePath "prototypes/mir/stage/data_final_fixes.lua" -Text $dataFinalFixesStageText -Needle "steps.assert_registered_technology_safety()"
 
 $dataFinalFixesStepsText = Read-MIRFile -RelativePath "prototypes/mir/stage/data_final_fixes_steps.lua"
 foreach ($needle in @(
@@ -268,6 +322,7 @@ foreach ($needle in @(
   'require("prototypes.mir.policy.max_level").apply()',
   'require("prototypes.mir.compatibility.planner").emit()',
   'require("prototypes.mir.emit.effect_safety").assert_registered_technology_effects()',
+  'require("prototypes.mir.emit.technology_graph_safety").assert_registered_technologies()',
   'require("prototypes.mir.report.diagnostics_sink").flush()'
 )) {
   Assert-MIRContains -RelativePath "prototypes/mir/stage/data_final_fixes_steps.lua" -Text $dataFinalFixesStepsText -Needle $needle
@@ -284,6 +339,11 @@ $streamAdapterText = Read-MIRFile -RelativePath "prototypes/mir/emit/stream_spec
 Assert-MIRContains -RelativePath "prototypes/mir/emit/stream_spec_adapter.lua" -Text $streamAdapterText -Needle 'require("prototypes.mir.domain.streams.stream_spec")'
 Assert-MIRContains -RelativePath "prototypes/mir/emit/stream_spec_adapter.lua" -Text $streamAdapterText -Needle 'require("prototypes.mir.emit.technology_builder")'
 Assert-MIRContains -RelativePath "prototypes/mir/emit/stream_spec_adapter.lua" -Text $streamAdapterText -Needle "technology_builder.emit(stream)"
+Assert-MIRContains -RelativePath "prototypes/mir/emit/stream_spec_adapter.lua" -Text $streamAdapterText -Needle "generated_registry.register(technology.name,"
+
+$graphSafetyText = Read-MIRFile -RelativePath "prototypes/mir/emit/technology_graph_safety.lua"
+Assert-MIRContains -RelativePath "prototypes/mir/emit/technology_graph_safety.lua" -Text $graphSafetyText -Needle "generated_registry.sorted_names()"
+Assert-MIRContains -RelativePath "prototypes/mir/emit/technology_graph_safety.lua" -Text $graphSafetyText -Needle "science.pack_production_status(pack_name)"
 
 $modDataText = Read-MIRFile -RelativePath "prototypes/mir/emit/mod_data.lua"
 Assert-MIRContains -RelativePath "prototypes/mir/emit/mod_data.lua" -Text $modDataText -Needle 'require("prototypes.mir.platform.factorio.data_raw")'
@@ -298,6 +358,17 @@ $settingsProfileText = Read-MIRFile -RelativePath "prototypes/mir/runtime/settin
 Assert-MIRContains -RelativePath "prototypes/mir/runtime/settings_profile.lua" -Text $settingsProfileText -Needle '"mir-settings-export"'
 Assert-MIRContains -RelativePath "prototypes/mir/runtime/settings_profile.lua" -Text $settingsProfileText -Needle '"mir-settings-import-check"'
 Assert-MIRContains -RelativePath "prototypes/mir/runtime/settings_profile.lua" -Text $settingsProfileText -Needle 'remote.add_interface("more-infinite-research-settings"'
+
+$targetLineText = Read-MIRFile -RelativePath "prototypes/mir/platform/factorio/target_line.lua"
+Assert-MIRContains -RelativePath "prototypes/mir/platform/factorio/target_line.lua" -Text $targetLineText -Needle 'require("prototypes.mir.platform.factorio.target_profiles")'
+Assert-MIRContains -RelativePath "prototypes/mir/platform/factorio/target_line.lua" -Text $targetLineText -Needle "function M.runtime_state_backend()"
+
+$runtimeStateAdapterText = Read-MIRFile -RelativePath "prototypes/mir/platform/factorio/runtime_state.lua"
+Assert-MIRContains -RelativePath "prototypes/mir/platform/factorio/runtime_state.lua" -Text $runtimeStateAdapterText -Needle 'backend == "storage"'
+Assert-MIRContains -RelativePath "prototypes/mir/platform/factorio/runtime_state.lua" -Text $runtimeStateAdapterText -Needle 'backend == "global"'
+
+$runtimeStateText = Read-MIRFile -RelativePath "prototypes/mir/runtime/state.lua"
+Assert-MIRContains -RelativePath "prototypes/mir/runtime/state.lua" -Text $runtimeStateText -Needle 'require("prototypes.mir.platform.factorio.runtime_state")'
 
 foreach ($relative in @(
   "prototypes/mir/runtime/scripted_techs.lua",
@@ -327,6 +398,11 @@ Assert-MIRNoPatternInLuaTree `
   -RelativeRoot "prototypes/mir/capabilities" `
   -Pattern "data:extend" `
   -Message "MIR capability modules must not emit prototypes directly."
+
+Assert-MIRNoPatternInLuaTree `
+  -RelativeRoot "prototypes/mir/runtime" `
+  -Pattern "\b(global|storage)\b" `
+  -Message "MIR runtime modules must access persisted state through the platform runtime-state adapter."
 
 Assert-MIRNoPatternInLuaTree `
   -RelativeRoot "prototypes/mir/compatibility/overlays" `
@@ -385,5 +461,7 @@ Assert-MIRNoPatternInLuaTree `
   -RelativeRoot "prototypes/mir/runtime" `
   -Pattern $runtimePrototypePattern `
   -Message "MIR runtime modules must not perform prototype-stage work."
+
+Assert-MIRNoTopLevelRequireCycles
 
 Write-Host "[ok] MIR architecture boundary lint passed."

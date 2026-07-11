@@ -15,6 +15,11 @@ Updated: 2026-07-06
 Branch: `legacy`
 Scope: synthesized planning report for the temporary `tmp/*` Factorio-line branches.
 
+> Historical version slots in this document are superseded. Current authority
+> is `docs/maintainer/backporting.md`: Factorio 0.17 shipped as MIR 1.7.0,
+> Factorio 0.16 maps to 1.6.0, and Factorio 0.15 maps to 1.5.0. The old slot
+> table remains here only to preserve the original planning record.
+
 This is a docs-only synthesis of the temporary RC planning sweep. It is a planning
 artifact, not a release-candidate approval. Every target still needs actual
 target-line implementation work, metadata changes, package construction, and a

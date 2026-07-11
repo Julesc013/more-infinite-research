@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: modpack-author
 doc_type: explanation
 owner: mir-maintainers
-last_reviewed: 2026-07-07
+last_reviewed: 2026-07-10
 supersedes: []
 superseded_by: []
 ---
@@ -32,7 +32,8 @@ Release-line summary:
 | `3.x.x` | `2.1.x` | canonical modern line starting at `3.0.0`; MIR compiler architecture |
 | `2.x.x` | `2.0.x` | maintained Factorio `2.0` line starting at `2.3.0`; first post-3.0 architecture port |
 | `1.9.3+` | `1.1.x` | compatibility port; `1.9.0` through `1.9.2` remain transition exceptions for Factorio `2.0` |
-| `1.8.x` | `1.0.x` | compatibility port; Factorio `0.18` bridge policy still needs recording |
+| `1.8.0` | `0.18.x` bridge | published bridge/archive package that also passed Factorio `1.0` bridge-load validation |
+| `1.8.1+` | `1.0.x` | maintained Factorio `1.0` compatibility port line |
 | `1.7.x` / `1.6.x` / `1.5.x` | `0.17.x` / `0.16.x` / `0.15.x` | reduced native-infinite editions |
 | `1.4.x` / `1.3.x` / `0.12.x` | `0.14.x` / `0.13.x` / `0.12.x` | archive finite-ladder reconstructions |
 | `0.11.x` through `0.6.x` | `0.11.x` through `0.6.x` | museum/discovery builds |
@@ -58,6 +59,8 @@ clear support boundaries outrank the calendar.
 - A generated technology must have at least one lab that accepts its complete science-pack set. If no lab accepts the full set, `mir-lab-incompatibility-policy` controls whether the mod tries the largest deterministic lab-compatible subset (`reduce`, default) or skips the technology (`skip`). If no subset exists, the stream is skipped and logged.
 - `ips-require-space-gate` adds an end-game science unlock prerequisite only. `mir-science-pack-ingredient-policy` controls whether generated technologies keep their configured ingredients, add fixed late-game packs, infer missing official or modded progression packs from selected packs, add all official base and Space Age science packs, or add every active lab science pack including compatible modded packs.
 - Recipe matching supports both `recipe.category` and Factorio 2.1 `recipe.categories`, and can match visible item or fluid recipe outputs.
+- Broad breeding discovery excludes incineration suffixes before name matching. Incineration recipes are sinks, even when a longer word contains `culture`.
+- Every MIR-generated recipe-productivity effect must reference an existing recipe when MIR finishes. A dependent late-removal fixture and the Planet Crucible plus Rigor Module exact-archive gate cover the later-mod lifecycle that an internal final pass cannot observe.
 - Recipe-productivity generation skips recipe effects already owned by another infinite recipe-productivity technology. In Space Age this prevents parallel MIR technologies for vanilla `processing-unit-productivity`, `low-density-structure-productivity`, `plastic-bar-productivity`, and `rocket-fuel-productivity`.
 - Recipe-productivity ownership is validated by exact recipe ID, not by similar technology icons. Base-only green, red, and blue circuit recipes are MIR-owned; with Space Age enabled, green and red circuits remain MIR-owned while vanilla `processing-unit-productivity` is the single infinite owner for the `processing-unit` recipe.
 - Fluid-output productivity is split by process family, not by every possible fluid name. Multi-output oil-processing recipes are owned by one oil-processing stream; cracking, lubricant, sulfuric acid and acid neutralization, and thruster propellant streams stay separate because they cover narrower conversion families.
@@ -110,7 +113,7 @@ The broad mod-portal audit is local/manual because it can require Factorio crede
 - `fixtures/compat-matrix/expected-failures.json`: reviewed expected-failure rules used by grouped reports so known external breakage can be separated from unexpected MIR regressions.
 - `fixtures/compat-matrix/known-exclusions.json`: stable exclusions for official DLC, localization, and internal-only portal entries.
 
-Local modpack zips can be supplied with `-LocalModZipDirs` or `-LocalModZips`. Local dependency libraries can be supplied separately with `-LocalModLibraryDirs` or `-LocalModLibraryZips`. The audit runner reads each zip's `info.json`, creates local lock entries with `source_path`, copies local archives into isolated Factorio runs directly from disk, and resolves missing third-party dependencies from the local library before falling back to the normal Mod Portal path. Pass `-Offline` to make missing local metadata or archives fail as dependency-resolution evidence instead of calling the Mod Portal.
+Local modpack zips can be supplied with `-LocalModZipDirs` or `-LocalModZips`. Local dependency libraries can be supplied separately with `-LocalModLibraryDirs` or `-LocalModLibraryZips`. The audit runner reads each zip's `info.json`, creates local lock entries with `source_path`, copies local archives into isolated Factorio runs directly from disk, and resolves missing third-party dependencies from the local library before falling back to the normal Mod Portal path. Pass `-Offline` to make missing local metadata or archives fail as dependency-resolution evidence instead of calling the Mod Portal. Pass `-ModUnderTestZip` for release gates that must load immutable MIR candidate bytes instead of an instrumented source copy.
 
 The `LocalModZips` extended tier automatically enables `-IncludeRecommendedDependencies` because Factorio modpack wrapper mods often use `+` dependencies to describe the pack contents rather than strict required dependencies. `LocalModZips` treats root zip dirs as the set of individual scenarios to test. `LocalModLibraryDirs` is dependency-library-only; it does not turn every library zip into a root scenario unless the same directory is also passed through `-LocalModZipDirs`.
 
@@ -383,6 +386,7 @@ Claims must stay precise:
 ## Known Limits
 
 - No mod can observe another mod's later `data-final-fixes.lua` mutations unless a user, modpack, or future targeted integration imposes a later load order.
+- A mod that removes a recipe after MIR runs must also avoid or repair dangling third-party technology effects. MIR filters evidenced sink classes and tests known combinations, but it cannot validate mutations that have not happened yet.
 - Lab validation prevents impossible research ingredients, but it cannot infer every overhaul mod's intended progression.
 - Recipe productivity technologies remain bounded by Factorio's recipe productivity cap even when research levels are infinite.
 - Vanilla Space Age productivity technologies remain authoritative for processing units, low density structures, plastic, and rocket fuel. Where those configured families have additional productivity-allowed recipes that are not exactly owned by another infinite technology, MIR adopts them into the existing vanilla infinite productivity technology instead of generating a parallel MIR technology.
@@ -612,11 +616,27 @@ Expected result: the startup-only pipeline multiplier mutates common fluid boxes
 Create a local test mod that:
 
 - Runs after More Infinite Research.
-- Enables the weapon-speed overlap adjustment scenario.
+- Runs `off`, conditional, and `always` with dedicated coverage both present
+  and absent.
 - Fails loading if finite vanilla `weapon-shooting-speed-5` or `weapon-shooting-speed-6` loses `cannon-shell` speed effects.
-- Fails loading if MIR's generated weapon shooting speed continuation keeps `rocket` or `cannon-shell` overlap effects when the dedicated replacement techs are active.
+- Fails loading if MIR's generated continuation removes an effect without
+  accepted replacement coverage or retains an overlap when policy requires
+  removal.
+- Adds an exact external infinite owner while preferring external competing
+  technologies, then verifies MIR suppresses its dedicated rocket/cannon
+  streams and still removes overlap from the general continuation.
+- Fails loading if dedicated rocket, cannon, flamethrower, or electric shooting speed research is missing its target-era unlock prerequisite.
 
-Expected result: vanilla tank cannon fire rate is preserved while MIR avoids duplicate infinite rocket/cannon-shell speed scaling in its generated continuation.
+Replacement coverage requires an enabled, structurally reachable infinite
+technology with the same effect type, ammo category, and modifier. Hidden
+technology is not rejected merely for being hidden. A finite, disabled,
+unreachable, differently scaled, or general continuation technology cannot
+justify removal. External coverage is accepted only when the existing
+competition setting prefers the external owner.
+
+Expected result: vanilla tank cannon fire rate is preserved while MIR avoids
+duplicate infinite rocket/cannon-shell scaling without creating an ownership
+gap.
 
 ## Release Checklist
 

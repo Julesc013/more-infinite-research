@@ -1,0 +1,247 @@
+schema: 1
+
+release:
+  version: "2.3.5"
+  branch: legacy
+  factorio_version: "2.0"
+  baseline_commit: b93808c54946f3913cea1244a6df89a154abd98e
+  baseline_tag: "3.0.5"
+  objective: target-port-behavioral-subset
+  public_contract_change: patch-compatible
+
+superseded_candidates:
+  - source_commit: da961e542dbcbaeb14c0ba15555cd25f5f162944
+    artifact: dist/more-infinite-research_3.0.5.zip
+    sha256: 5BA004917B30C553C927B8D20DA18466194875BA443CC641583A41CBCEC2D44E
+    size_bytes: 308457
+    entries: 126
+    forbidden_entries: 0
+    reason: BP-014 Planet Crucible and Rigor Module dangling recipe target
+    status: superseded-unpublished-candidate
+  - source_commit: b15a1f456aa56fe4374ed98b538e8dda6235dd85
+    artifact: dist/more-infinite-research_3.0.5.zip
+    sha256: 1D0D493AF53A3DCD61DC6328A182EE5DAD8181D9251AE0492A63D0D8AA0907AA
+    size_bytes: 308688
+    entries: 126
+    forbidden_entries: 0
+    reason: BP-015 science reachability and BP-016 weapon ownership changed package-visible source
+    status: superseded-unpublished-candidate
+  - source_commit: 1a81a30
+    artifact: dist/more-infinite-research_2.3.5.zip
+    sha256: A2A3BA644D646B2A836CBA8C31FB1C71549C157AB36DCD19CE35509749529F4A
+    size_bytes: 321145
+    reason: scripted effect-per-level descriptors were omitted during the Factorio 2.0 conflict resolution
+    status: superseded-unpublished-candidate
+  - source_commit: dd0cfd4a4bf3743d1e88b84a228feb7b8fddc992
+    artifact: dist/more-infinite-research_2.3.5.zip
+    sha256: 95A52BFBE1C161CA3D34AC177FABF9868F2D8587AFD88A29BF0D5A03DDEA50EB
+    size_bytes: 321227
+    reason: retained non-default base effect settings could load an incomplete descriptor
+    status: superseded-unpublished-candidate
+  - source_commit: 2d1eb296f15b71ef538d0547147ce42ac03098a0
+    artifact: dist/more-infinite-research_2.3.5.zip
+    sha256: 65A1575CF6C31B64D46FD1DD43E355036DFB704843E4DF3D85461371E6C74C2E
+    size_bytes: 321314
+    entries: 132
+    package_content_sha256: 46D99E946675A9899E44503802D7F8FEB55D4F9967828F89A0FFCEA4EF51CEE7
+    validation_summary: .mir/evidence/2.3.5-rc4-validation-summary.json
+    validation_run_id: c63ad6cd-1b1e-4314-acd1-53d859728c77
+    scenario_count: 67
+    reason: final released 3.0.5 expanded settings and recycler interaction contract had not yet been ported
+    status: superseded-unpublished-candidate
+
+candidate:
+  artifact: dist/more-infinite-research_2.3.5.zip
+  source_commit: 861565d3e898166eca8920e6eade6887b7db087d
+  sha256: 97B3DC9B6E352C6C4B8FF76D77020333FAAFFE93BD89EDB6B8F3370405ED68DE
+  size_bytes: 336718
+  entries: 132
+  files: 127
+  forbidden_entries: 0
+  package_content_sha256: 5B1BAFFF4A6D26C2CFB704705F224CFE562724230F054B2F16FEAC90E08F56D6
+  package_source_sha256: 5B1BAFFF4A6D26C2CFB704705F224CFE562724230F054B2F16FEAC90E08F56D6
+  target_profile_sha256: 9D8EC1B8813609DD855023FF81D73F307BB2A348B7B8E41AA4D10AEC268A6E18
+  required_groups_sha256: 57A1DF87A8FB594B2B51C7E230D775E88028F23D52DF9D5D7DA1336F9271C78A
+  validation_harness_sha256: A3962103F3713E1DCA219A20F2355B2359CC896E059122E3AB1B94DC5C58D54B
+  expected_scenarios_sha256: C06163A3C3AEF3D85328B413F45E7E3C9CABDFF2882BF56151285ADD0B075561
+  validation_package_sha256: 77DA0151C97DFAB823730B25AA8670E5C5DE21BBB40B8D093C0DCA4F5EA7871D
+  validation_package_content_sha256: 5B1BAFFF4A6D26C2CFB704705F224CFE562724230F054B2F16FEAC90E08F56D6
+  structured_summary_path: .mir/evidence/2.3.5-rc5-validation-summary.json
+  structured_summary_run_id: 74543fb0-1a55-429c-9f23-68d1407fec8f
+  structured_summary_status: passed
+  structured_summary_duration_seconds: 400.594
+  scenario_count: 71
+  release_targeted_summary_path: .mir/evidence/2.3.5-release-targeted-summary.json
+  exact_dist_base_log: .mir/evidence/2.3.5-exact-dist-base.txt
+  exact_dist_space_age_log: .mir/evidence/2.3.5-exact-dist-space-age.txt
+  upgrade_from_2_3_0_log: .mir/evidence/2.3.5-upgrade-2.3.5-load.txt
+  validation_content_matches_dist: true
+  exact_dist_base_smoke: passed
+  exact_dist_space_age_smoke: passed
+  upgrade_from_2_3_0: passed
+  automated_gate: passed
+  manual_gate: accepted-by-maintainer-directive
+  interactive_ui_observation: not-independently-performed
+  acceptance_date: "2026-07-12"
+  acceptance_basis: maintainer-directed-continuation-after-automated-and-exact-archive-gates
+  promotion_authorized: true
+  status: release-candidate-awaiting-manual-review
+
+rules:
+  - dev-remains-the-canonical-modern-implementation
+  - historical-branches-provide-behavioral-evidence-not-implementation-authority
+  - every-accepted-behavior-needs-a-fixture-or-named-load-check
+  - target-metadata-and-feature-cuts-never-flow-back-to-dev
+  - one-supported-behavior-has-one-canonical-implementation
+  - speculative-extension-framework-work-is-deferred-to-3.1-or-later
+
+behaviors:
+  BP-001:
+    source: 1.7.0@1a9b5a7b1162f8dca8125ef7bb792f57a9ae282b
+    behavior: immutable Factorio 0.17 release evidence and provenance
+    class: A-superseded-or-evidence-only
+    decision: accept-evidence
+    impact: none
+    evidence: .mir/branches.yml
+    status: complete
+  BP-002:
+    source: 1.7.0@1a9b5a7b1162f8dca8125ef7bb792f57a9ae282b
+    behavior: enabled science recipes do not inherit disabled technology gates
+    class: B-missing-and-compatible
+    decision: adapt-at-science-capability-boundary
+    impact: generated-prerequisites
+    evidence: generated-prerequisite-safety
+    status: complete
+  BP-003:
+    source: 1.7.0@1a9b5a7b1162f8dca8125ef7bb792f57a9ae282b
+    behavior: emitted technology prerequisites are enabled acyclic and reachable
+    class: B-missing-and-compatible
+    decision: promote-to-general-graph-invariant
+    impact: validation
+    evidence: generated-prerequisite-safety
+    status: complete
+  BP-004:
+    source: dev-plus-2.3.0-1.9.3-1.8.x-1.7.0-lessons
+    behavior: one canonical target capability profile drives Lua and PowerShell
+    class: C-partially-present
+    decision: centralize-and-generate
+    impact: internal-architecture
+    evidence: target-profile-drift-check
+    status: complete
+  BP-005:
+    source: 1.9.3-through-1.7.0-runtime-adapters
+    behavior: runtime persistence backend is selected explicitly by target
+    class: C-partially-present
+    decision: adapt-through-platform-runtime-state
+    impact: internal-runtime-access
+    evidence: runtime-state-adapter-check
+    status: complete
+  BP-006:
+    source: all-backport-validation-rings
+    behavior: validation scenarios have stable groups and persistent partial summaries
+    class: C-partially-present
+    decision: extract-orchestration-seams
+    impact: developer-tooling
+    evidence: validation-result-summary
+    status: complete
+  BP-007:
+    source: reduced-lines-settings-profile-fixture
+    behavior: reduced settings surface is tested separately from profile codec behavior
+    class: C-partially-present
+    decision: split-fixtures
+    impact: validation
+    evidence: reduced-settings-surface
+    status: complete
+  BP-008:
+    source: 1.7.0-weapon-overlap-policy
+    behavior: general weapon speed ownership is removed only with exact replacement coverage
+    class: C-partially-present
+    decision: adapt-to-coverage-aware-policy
+    impact: new-configuration-default
+    evidence: weapon-speed-safety-matrix
+    status: complete
+  BP-009:
+    source: dev@b9b1abc
+    behavior: target-specific rocket cannon flamethrower and electric progression gates
+    class: A-superseded-or-evidence-only
+    decision: keep-modern-implementation
+    impact: none
+    evidence: generation-integrity
+    status: complete
+  BP-010:
+    source: tmp/0.17
+    behavior: Factorio 0.17 metadata global backend reduced settings and feature cuts
+    class: E-obsolete-or-target-local
+    decision: reject-from-dev
+    impact: none
+    evidence: docs/maintainer/backporting.md
+    status: complete
+  BP-011:
+    source: convergence-plan-extension-proposal
+    behavior: host-managed extension manifest registry and lifecycle
+    class: F-public-surface-change
+    decision: defer-to-3.1-or-later
+    impact: public-api
+    evidence: none
+    status: deferred
+  BP-012:
+    source: planned-tmp/0.16
+    behavior: semantic old-science roles map to Factorio 0.16 prototype IDs
+    class: F-target-specific-future-work
+    decision: defer-to-tmp/0.16-after-3.0.5
+    impact: target-profile
+    evidence: factorio-0.16-binary-required
+    status: deferred
+  BP-013:
+    source: dev-documentation-audit
+    behavior: current release and planning docs contain no stale completed tasks or public-copy errors
+    class: B-missing-and-compatible
+    decision: reconcile-docs
+    impact: documentation
+    evidence: docs-governance
+    status: complete
+  BP-014:
+    source: planet-crucible-1.1.4-plus-rigor-module-1.1.7
+    behavior: breeding productivity excludes incineration sinks and emitted recipe effects retain valid targets
+    class: B-missing-and-compatible
+    decision: narrow-classifier-exclusion-plus-final-effect-invariant
+    impact: recipe-productivity-target-filter
+    evidence: rigor-late-recipe-removal
+    status: complete
+  BP-015:
+    source: 0.17-prerequisite-lesson-plus-dev-hardening
+    behavior: recipe unlock inference and required technologies use one researchability authority including science self-lock detection
+    class: C-partially-present
+    decision: centralize-recipe-unlock-facts-and-researchability
+    impact: generated-science-and-prerequisites
+    evidence: generated-prerequisite-safety
+    status: complete
+  BP-016:
+    source: 1.7.0-weapon-overlap-plus-dev-hardening
+    behavior: weapon cleanup mutates only MIR-generated continuations and external owners must be science-researchable
+    class: C-partially-present
+    decision: restrict-to-generated-registry-and-prove-external-coverage
+    impact: weapon-overlap-ownership
+    evidence: weapon-speed-safety-matrix
+    status: complete
+  BP-017:
+    source: stale-3.0.5-candidate-review
+    behavior: release evidence is bound to source package profile required groups and structured validation identity
+    class: B-missing-and-compatible
+    decision: enforce-candidate-freshness
+    impact: release-governance
+    evidence: candidate-freshness
+    status: complete
+
+release_gates:
+  - static-validation
+  - factorio-2.0-base-runtime
+  - factorio-2.0-space-age-runtime
+  - generated-prerequisite-safety
+  - weapon-overlap-policy-matrix
+  - settings-profile-codec
+  - target-profile-drift-check
+  - candidate-freshness
+  - exact-dist-package-validation
+  - complete-structured-validation-summary
+  - rigor-late-recipe-removal

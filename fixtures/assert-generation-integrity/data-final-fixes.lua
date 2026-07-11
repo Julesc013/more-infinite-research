@@ -148,6 +148,68 @@ local function has_recipe_productivity_effect(tech, recipe_name)
   return false
 end
 
+local function startup_setting_number(name)
+  local setting = settings and settings.startup and settings.startup[name]
+  return setting and tonumber(setting.value) or nil
+end
+
+local function assert_base_effect_value(key, effect_type, expected)
+  local _, infinite = chain_levels(key)
+  if #infinite ~= 1 then
+    fail("cannot inspect retained effect setting for " .. key .. ": expected one infinite continuation.")
+  end
+  for _, effect in ipairs(infinite[1].tech.effects or {}) do
+    if effect.type == effect_type then
+      local actual = tonumber(effect.modifier)
+      if not actual or math.abs(actual - expected) > 0.000001 then
+        fail("retained effect setting for " .. key .. " emitted " .. tostring(actual)
+          .. ", expected " .. tostring(expected) .. ".")
+      end
+      return
+    end
+  end
+  fail("retained effect setting for " .. key .. " could not find effect " .. effect_type .. ".")
+end
+
+if startup_setting_number("mir-effect-per-level-research-speed") == 120 then
+  assert_base_effect_value("research-speed", "laboratory-speed", 1.2)
+end
+if startup_setting_number("mir-effect-per-level-worker-robots-storage") == 2 then
+  assert_base_effect_value("worker-robots-storage", "worker-robot-storage", 2)
+end
+
+local function recipe_productivity_change(tech, recipe_name)
+  for _, effect in ipairs((tech and tech.effects) or {}) do
+    if effect.type == "change-recipe-productivity" and effect.recipe == recipe_name then
+      return effect.change
+    end
+  end
+  return nil
+end
+
+local furnace_effect_setting = settings
+  and settings.startup
+  and settings.startup["ips-effect-per-level-research_furnace"]
+local furnace_anchor = furnace_effect_setting and furnace_effect_setting.value or nil
+if furnace_anchor ~= 20 and furnace_anchor ~= 40 then
+  fail("furnace effect-per-level anchor should default to the primary 20% tier; got " .. tostring(furnace_anchor) .. ".")
+end
+if furnace_anchor == 40 then
+  local furnace_technology = techs["recipe-prod-research_furnace-1"]
+  if not furnace_technology then fail("missing furnace technology for mixed-tier effect scaling check.") end
+  for recipe_name, expected in pairs({
+    ["stone-furnace"] = 0.40,
+    ["steel-furnace"] = 0.20,
+    ["electric-furnace"] = 0.10
+  }) do
+    local actual = recipe_productivity_change(furnace_technology, recipe_name)
+    if not actual or math.abs(actual - expected) > 0.000001 then
+      fail("scaled furnace effect for " .. recipe_name .. " was " .. tostring(actual)
+        .. ", expected " .. tostring(expected) .. ".")
+    end
+  end
+end
+
 local function recipe_productivity_owners(recipe_name)
   local owners = {}
   for tech_name, tech in pairs(techs) do
@@ -356,7 +418,7 @@ for tech_name, tech in pairs(techs) do
 end
 
 assert_tech_uses_item_icon("recipe-prod-research_heavy_ammo-1", "cannon-shell")
-assert_tech_uses_item_icon("recipe-prod-research_cannon_shooting_speed-1", "cannon-shell")
+assert_tech_uses_technology_icon("recipe-prod-research_cannon_shooting_speed-1", "weapon-shooting-speed-3")
 if is_space_age then
   assert_tech_uses_technology_icon("recipe-prod-research_electric_shooting_speed-1", "electric-weapons-damage-1")
 elseif use_installed_space_age_icons then
@@ -443,6 +505,20 @@ end
 if is_space_age then
   if techs["recipe-prod-research_agricultural_growth_speed-1"] then
     assert_tech_uses_technology_icon("recipe-prod-research_agricultural_growth_speed-1", "agriculture")
+  end
+
+  for _, key in ipairs({"research_spoilage_preservation", "research_agricultural_growth_speed"}) do
+    local technology = techs["recipe-prod-" .. key .. "-1"]
+    if technology then
+      local effect = technology.effects and technology.effects[1]
+      local selected = settings.startup["ips-effect-per-level-" .. key]
+      if not effect or effect.type ~= "nothing" or type(effect.effect_description) ~= "table" then
+        fail(key .. " scripted effect description is missing")
+      end
+      if not selected or tonumber(effect.effect_description[2]) ~= tonumber(selected.value) then
+        fail(key .. " scripted effect description does not carry selected value")
+      end
+    end
   end
 
   for _, tech_name in ipairs({

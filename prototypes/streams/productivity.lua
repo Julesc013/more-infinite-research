@@ -405,7 +405,12 @@ return {
     items = {"raw-fish","biter-egg","pentapod-egg"},
     mode = "by_category_or_match",
     match = { name_patterns={"cultivation","culture","breeding"} },
-    exclude_recipe_patterns = {"^iron%-bacteria%-cultivation$", "^copper%-bacteria%-cultivation$"},
+    exclude_recipe_patterns = {
+      "^iron%-bacteria%-cultivation$",
+      "^copper%-bacteria%-cultivation$",
+      "%-incineration$",
+      "%-incinerate$"
+    },
     icon_tech = "fish-breeding"
   },
 
@@ -536,9 +541,10 @@ return {
   }},
 
   research_modules = { icon_tech="modules", groups = {
-    { change=0.10, items={"productivity-module","speed-module","efficiency-module","quality-module"} },
-    { change=0.05, items={"productivity-module-2","speed-module-2","efficiency-module-2","quality-module-2"} },
-    { change=0.02, items={"productivity-module-3","speed-module-3","efficiency-module-3","quality-module-3"} }
+    { change=0.10, module_tiers={1} },
+    { change=0.05, module_tiers={2} },
+    { change=0.02, module_tiers={3} },
+    { change=0.01, module_tier_min=4 }
   }},
 
   research_belts = { icon_tech="logistics", groups = {

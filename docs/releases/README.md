@@ -15,7 +15,18 @@ superseded_by: []
 Release docs are version-specific plans, migration guides, risk registers,
 checklists, and validation records.
 
+The 3.0.5 convergence plan, checklist, and validation summary are the active
+release authority. The 3.0.0 records are the published architecture baseline
+and historical evidence.
+
+On `tmp/2.0`, the 2.3.5 release notes, checklist, and validation summary are the
+active Factorio 2.0 port authority. The 3.0.5 records remain the canonical
+source evidence.
+
 - [3.0.0 plan](3.0.0-plan.md)
+- [2.3.5 release notes](2.3.5-release-notes.md)
+- [2.3.5 release checklist](2.3.5-release-checklist.md)
+- [2.3.5 validation summary](2.3.5-validation-summary.md)
 - [3.0.0 regression baseline](3.0.0-regression-baseline.md)
 - [3.0.0 transition checkpoint 2](3.0.0-transition-checkpoint-2.md)
 - [3.0.0 local library gate summary](3.0.0-local-library-gate-summary.md)
@@ -25,5 +36,10 @@ checklists, and validation records.
 - [3.0.0 short release notes](release-notes-3.0.0.md)
 - [3.0.0 validation summary](3.0.0-validation-summary.md)
 - [3.0.0 risk register](3.0.0-risk-register.md)
+- [3.0.5 convergence plan](3.0.5-convergence-plan.md)
+- [3.0.5 convergence review](3.0.5-convergence-review.md)
+- [3.0.5 release checklist](3.0.5-release-checklist.md)
+- [3.0.5 release notes](3.0.5-release-notes.md)
+- [3.0.5 validation summary](3.0.5-validation-summary.md)
 - [3.1.0 roadmap](3.1.0-roadmap.md)
 - [2.2.0 validation record](2.2.0-validation-record.md)

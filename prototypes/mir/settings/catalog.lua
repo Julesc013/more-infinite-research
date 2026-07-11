@@ -2,9 +2,12 @@ local C = require("prototypes.mir.streams.registry")
 local defaults = require("prototypes.mir.settings.defaults")
 local pipeline_extent_settings = require("prototypes.mir.settings.pipeline_extent")
 local prototype_limit_settings = require("prototypes.mir.settings.prototype_limits")
+local effect_contracts = require("prototypes.mir.settings.effect_contracts")
 local setting_order = require("prototypes.mir.settings.order")
+local target_line = require("prototypes.mir.platform.factorio.target_line")
 
 local M = {}
+local spec_by_name_cache = nil
 
 M.import_setting_name = "mir-settings-profile-import"
 
@@ -131,7 +134,7 @@ function M.global_setting_prototypes()
       name = "mir-lab-incompatibility-policy",
       setting_type = "startup",
       default_value = "reduce",
-      allowed_values = {"reduce", "skip"},
+      allowed_values = {"reduce", "skip", "engine-default"},
       order = setting_order.global("main", 30),
       localised_name = {"mod-setting-name.mir-lab-incompatibility-policy"},
       localised_description = {"mod-setting-description.mir-lab-incompatibility-policy"}
@@ -149,7 +152,7 @@ function M.global_setting_prototypes()
       type = "string-setting",
       name = "mir-adjust-vanilla-weapon-speed-techs",
       setting_type = "startup",
-      default_value = "off",
+      default_value = target_line.weapon_overlap_default(),
       allowed_values = {"off", "only-when-dedicated-tech-enabled", "always"},
       order = setting_order.global("compatibility", 10),
       localised_name = {"mod-setting-name.mir-adjust-vanilla-weapon-speed-techs"},
@@ -179,6 +182,37 @@ function M.global_setting_prototypes()
   for _, setting in ipairs(prototype_limit_settings.setting_prototypes()) do
     table.insert(out, setting)
   end
+
+  table.insert(out, {
+    type = "string-setting",
+    name = prototype_limit_settings.recycling_return_setting_name,
+    setting_type = "startup",
+    default_value = prototype_limit_settings.engine_default,
+    allowed_values = prototype_limit_settings.recycling_return_allowed_values,
+    order = setting_order.global("prototype_limits", 15),
+    localised_name = {"mod-setting-name." .. prototype_limit_settings.recycling_return_setting_name},
+    localised_description = {"mod-setting-description." .. prototype_limit_settings.recycling_return_setting_name}
+  })
+
+  table.insert(out, {
+    type = "bool-setting",
+    name = prototype_limit_settings.self_recycling_scope_setting_name,
+    setting_type = "startup",
+    default_value = false,
+    order = setting_order.global("prototype_limits", 17),
+    localised_name = {"mod-setting-name." .. prototype_limit_settings.self_recycling_scope_setting_name},
+    localised_description = {"mod-setting-description." .. prototype_limit_settings.self_recycling_scope_setting_name}
+  })
+
+  table.insert(out, {
+    type = "bool-setting",
+    name = prototype_limit_settings.unrestricted_modules_setting_name,
+    setting_type = "startup",
+    default_value = false,
+    order = setting_order.global("compatibility", 35),
+    localised_name = {"mod-setting-name." .. prototype_limit_settings.unrestricted_modules_setting_name},
+    localised_description = {"mod-setting-description." .. prototype_limit_settings.unrestricted_modules_setting_name}
+  })
 
   table.insert(out, {
     type = "bool-setting",
@@ -231,13 +265,15 @@ function M.global_setting_prototypes()
 
   local cloned = {}
   for _, spec in ipairs(out) do
-    table.insert(cloned, clone_spec(spec))
+    if target_line.global_setting_supported(spec.name) then
+      table.insert(cloned, clone_spec(spec))
+    end
   end
   return cloned
 end
 
 function M.stream_setting_specs(key, stream)
-  return {
+  local out = {
     {
       type = "bool-setting",
       name = "ips-enable-" .. key,
@@ -271,6 +307,9 @@ function M.stream_setting_specs(key, stream)
       maximum_value = 2147483647
     }
   }
+  local effect_setting = effect_contracts.stream_setting_spec(key, stream)
+  if effect_setting then table.insert(out, effect_setting) end
+  return out
 end
 
 function M.base_extension_setting_specs(key)
@@ -278,7 +317,7 @@ function M.base_extension_setting_specs(key)
   local base_default = math.floor(base_number(defaults_spec, "base_cost", 0, 0) + 0.5)
   local growth_default = base_number(defaults_spec, "growth_factor", 0, 0)
   local research_time_default = math.floor(base_number(defaults_spec, "research_time", 60, 1) + 0.5)
-  return {
+  local out = {
     {
       type = "bool-setting",
       name = "mir-enable-" .. key,
@@ -312,16 +351,31 @@ function M.base_extension_setting_specs(key)
       maximum_value = 2147483647
     }
   }
+  local effect_setting = effect_contracts.base_setting_spec(key)
+  if effect_setting then table.insert(out, effect_setting) end
+  return out
 end
 
 function M.all_specs()
   local out = {}
   for _, spec in ipairs(M.global_setting_prototypes()) do
     local profile_spec = with_profile_export(spec)
+    if profile_spec.name == "mir-pipeline-extent-multiplier" then
+      profile_spec.import_numeric_minimum = 0.1
+      profile_spec.import_numeric_maximum = 100000
+    elseif profile_spec.name == prototype_limit_settings.recycling_return_setting_name then
+      profile_spec.import_numeric_minimum = 0
+      profile_spec.import_numeric_maximum = 25
+      profile_spec.accepted_import_values = copy_array(prototype_limit_settings.recycling_return_accepted_import_values)
+    end
     for _, key in ipairs(prototype_limit_settings.order) do
       local limit_spec = prototype_limit_settings.settings[key]
-      if limit_spec and limit_spec.name == profile_spec.name and limit_spec.accepted_import_values then
-        profile_spec.accepted_import_values = copy_array(limit_spec.accepted_import_values)
+      if limit_spec and limit_spec.name == profile_spec.name then
+        if limit_spec.accepted_import_values then
+          profile_spec.accepted_import_values = copy_array(limit_spec.accepted_import_values)
+        end
+        profile_spec.import_numeric_minimum = limit_spec.import_numeric_minimum
+        profile_spec.import_numeric_maximum = limit_spec.import_numeric_maximum
       end
     end
     table.insert(out, profile_spec)
@@ -341,11 +395,13 @@ function M.all_specs()
 end
 
 function M.spec_by_name()
+  if spec_by_name_cache then return spec_by_name_cache end
   local out = {}
   for _, spec in ipairs(M.all_specs()) do
     out[spec.name] = spec
   end
-  return out
+  spec_by_name_cache = out
+  return spec_by_name_cache
 end
 
 function M.spec(name)
@@ -395,8 +451,21 @@ function M.validate_value(name, value)
   if not spec then return false, "unknown setting" end
 
   local expected = value_type_for_spec(spec)
-  if expected and type(value) ~= expected then
+  local numeric_dropdown_import = spec.type == "string-setting"
+    and type(value) == "number"
+    and spec.import_numeric_minimum ~= nil
+    and spec.import_numeric_maximum ~= nil
+  if expected and type(value) ~= expected and not numeric_dropdown_import then
     return false, "wrong type"
+  end
+
+  if numeric_dropdown_import then
+    if value ~= value or value == math.huge or value == -math.huge then
+      return false, "not finite"
+    end
+    if value < spec.import_numeric_minimum then return false, "below minimum" end
+    if value > spec.import_numeric_maximum then return false, "above maximum" end
+    return true
   end
 
   if spec.type == "int-setting" then

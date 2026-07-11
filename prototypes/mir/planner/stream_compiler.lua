@@ -9,11 +9,14 @@ local owner_policy = require("prototypes.mir.policy.owner_policy")
 local recipe_productivity_planner = require("prototypes.mir.capabilities.recipe_productivity.planner")
 local direct_effects_planner = require("prototypes.mir.planner.direct_effects")
 local native_modifiers = require("prototypes.mir.planner.native_modifiers")
+local native_effect_coverage = require("prototypes.mir.policy.native_effect_coverage")
 local planner_requirements = require("prototypes.mir.planner.requirements")
 local planner_prerequisites = require("prototypes.mir.planner.prerequisites")
 local planner_science = require("prototypes.mir.planner.science")
 local science_packs = require("prototypes.mir.capabilities.science_integration.science_packs")
 local stream_emitter = require("prototypes.mir.emit.stream_spec_adapter")
+local target_line = require("prototypes.mir.platform.factorio.target_line")
+local effect_scaling = require("prototypes.mir.settings.effect_scaling")
 
 local M = {}
 
@@ -134,6 +137,15 @@ local function make_stream(key, raw_spec)
       D.stream(D.stream_fields(key, spec, "skipped", "no_available_direct_effects"))
       return
     end
+    if spec.adopt_exact_native_effect_owner and not native_effect_coverage.prefer_mir() then
+      local covered, owners = native_effect_coverage.external_coverage_for_effects(direct_effects)
+      if covered then
+        D.stream(D.stream_fields(key, spec, "skipped", "covered_by_existing_infinite_native_modifier", nil, nil, direct_effects, nil, {
+          owners = table.concat(owners, ",")
+        }))
+        return
+      end
+    end
   end
 
   local ingredients, lab_status = planner_science.ingredients_for_stream(key, spec)
@@ -151,18 +163,25 @@ local function make_stream(key, raw_spec)
   if direct_effects and #direct_effects > 0 then
     native_modifiers.record_overlaps(key, direct_effects)
     local prerequisites = planner_prerequisites.build_for(key, ingredients)
+    local emitted_effects = effect_scaling.scale_stream_effects(key, spec, direct_effects)
     local t = emit_stream_technology(key, spec, {
       localised_name = lname(key, spec),
       localised_description = ldesc(spec),
       icons = icon_builder.icons_for_stream(spec),
-      effects = direct_effects,
+      effects = emitted_effects,
       prerequisites = prerequisites,
       count_formula = count_formula,
       ingredients = ingredients,
       research_time = research_time,
       max_level = max_level,
     })
-    D.stream(D.stream_fields(key, spec, "generated", "direct_effect", ingredients, prerequisites, direct_effects, lab_status))
+    D.stream(D.stream_fields(key, spec, "generated", "direct_effect", ingredients, prerequisites, emitted_effects, lab_status))
+    return
+  end
+
+  if not target_line.feature_enabled("recipe_productivity") then
+    log("[more-infinite-research] Skipping stream "..key.." because recipe productivity is unsupported on Factorio "..target_line.factorio_version..".")
+    D.stream(D.stream_fields(key, spec, "skipped", "recipe_productivity_unsupported", ingredients, nil, {}, lab_status))
     return
   end
 
@@ -194,11 +213,12 @@ local function make_stream(key, raw_spec)
   end
 
   local prerequisites = planner_prerequisites.build_for(key, ingredients)
+  local emitted_effects = effect_scaling.scale_stream_effects(key, spec, effects)
   local t = emit_stream_technology(key, spec, {
     localised_name = lname(key, spec),
     localised_description = ldesc(spec),
     icons = icon_builder.icons_for_stream(spec),
-    effects = effects,
+    effects = emitted_effects,
     prerequisites = prerequisites,
     count_formula = count_formula,
     ingredients = ingredients,
@@ -208,7 +228,7 @@ local function make_stream(key, raw_spec)
   if D.enabled() then
     log("[more-infinite-research] Registered technology "..t.name)
   end
-  D.stream(D.stream_fields(key, spec, "generated", "recipe_productivity", ingredients, prerequisites, effects, lab_status))
+  D.stream(D.stream_fields(key, spec, "generated", "recipe_productivity", ingredients, prerequisites, emitted_effects, lab_status))
 end
 
 function M.run()
@@ -216,7 +236,9 @@ function M.run()
     make_stream(key, C.streams[key])
   end
 
-  adoption_policy.emit_mod_data()
+  if target_line.feature_enabled("recipe_productivity") then
+    adoption_policy.emit_mod_data()
+  end
 end
 
 return M

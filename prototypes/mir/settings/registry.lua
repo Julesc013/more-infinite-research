@@ -44,6 +44,14 @@ return {
       ui_visibility = { mode = "always" }
     },
     {
+      key = "mir-recycling-return-chance",
+      ui_visibility = { mode = "always" }
+    },
+    {
+      key = "mir-productivity-cap-self-recycling-only",
+      ui_visibility = { mode = "always" }
+    },
+    {
       key = "mir-prototype-efficiency-cap",
       ui_visibility = { mode = "always" }
     },
@@ -56,11 +64,19 @@ return {
       ui_visibility = { mode = "always" }
     },
     {
+      key = "mir-prototype-speed-floor",
+      ui_visibility = { mode = "always" }
+    },
+    {
       key = "mir-prototype-quality-cap",
       ui_visibility = { mode = "always" }
     },
     {
       key = "mir-prototype-positive-power-floor",
+      ui_visibility = { mode = "always" }
+    },
+    {
+      key = "mir-unrestricted-modules",
       ui_visibility = { mode = "always" }
     },
     {
@@ -87,7 +103,8 @@ return {
       base_cost = "ips-cost-base-%s",
       growth = "ips-cost-growth-%s",
       max_level = "ips-max-level-%s",
-      research_time = "ips-research-time-%s"
+      research_time = "ips-research-time-%s",
+      effect_per_level = "ips-effect-per-level-%s"
     }
   }
 }

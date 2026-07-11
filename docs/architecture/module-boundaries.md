@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: maintainer
 doc_type: explanation
 owner: mir-maintainers
-last_reviewed: 2026-07-08
+last_reviewed: 2026-07-12
 supersedes: []
 superseded_by: []
 ---
@@ -122,7 +122,25 @@ owns the optional pipeline extent prototype pass.
 `prototypes/mir/settings/prototype_limits.lua` owns the prototype-limit setting
 catalog and value parser. `prototypes/mir/pipeline/prototype_limits.lua` owns
 the optional data-final-fixes prototype mutation pass for selected recipe
-productivity and effect receiver limits.
+productivity and effect receiver limits. Recipe productivity caps apply only to
+non-parameter, non-recycling recipes. The same pass owns explicit generated
+recycler-return scaling because it is a global prototype-limit balance choice;
+it changes only eligible hidden generated recycler probabilities and never
+rewrites recycling-recipe productivity caps or visible processes such as scrap
+recycling. The optional inverse-return scope is inert at or below its threshold
+and uses the normal 25% generated return as the engine-unchanged baseline.
+Positive speed caps and negative speed floors remain independently selectable.
+`prototypes/mir/settings/effect_contracts.lua` owns pure typed per-level effect
+descriptors used by the settings catalog. Runtime setting lookup and scaling
+remain in `prototypes/mir/settings/effect_scaling.lua`, keeping catalog/profile
+loading acyclic.
+
+Effect contracts separate semantic identity from canonical, selected, and
+emitted numeric values. Owner discovery may use semantic identity, while
+external adoption and replacement policy decide independently whether numeric
+equivalence is required. Competing technology removal is committed through
+`prototypes/mir/emit/technology_replacement.lua` only after registered emitted
+coverage exists and the rewritten prerequisite graph is acyclic.
 
 The MIR planner namespace owns compiler planning checks as they are migrated out
 of legacy generators. `prototypes/mir/planner/requirements.lua` evaluates
@@ -150,6 +168,13 @@ applying fallback effect icons before emission planning.
 `prototypes/mir/capabilities/recipe_productivity/planner.lua` owns the current
 recipe-productivity bucket matching facade and converts matched buckets into
 recipe productivity effects after policy filters run.
+`recipe_productivity/recipe_matching.lua` may discover module recipe outputs
+from final `ModulePrototype.tier` facts. Stream data selects tier ranges; it
+does not hard-code third-party module mod IDs.
+`prototypes/mir/index/recipe_unlocks.lua` builds the immutable recipe-to-unlock
+technology fact index. Science selection, prerequisite planning, and explicit
+technology requirements apply shared researchability policy to those facts
+instead of rescanning technology prototypes independently.
 `prototypes/mir/planner/stream_compiler.lua` owns the generated stream loop.
 `prototypes/mir/emit/stream_spec_adapter.lua` adapts current stream records
 into `StreamSpec` records and forwards them to `technology_builder`.
@@ -180,6 +205,11 @@ mutator allowlist because it adjusts already generated MIR technology
 prototypes after stream emission.
 `prototypes/mir/policy/weapon_speed.lua` owns the optional duplicate
 rocket/cannon speed cleanup for generated general weapon-speed continuations.
+It delegates owner qualification to
+`prototypes/mir/policy/native_effect_coverage.lua`; prototype names alone are
+not coverage. The coverage policy may inspect technology prototypes but may
+not emit or mutate them. Only `weapon_speed.lua` performs the selected cleanup
+mutation after stream and base-continuation emission.
 `prototypes/mir/emit/effect_safety.lua` owns generated technology effect safety
 registration and post-emission assertion.
 
@@ -361,7 +391,6 @@ prototypes/
       competing_productivity.lua
       competing_base_extensions.lua
       productivity_family_adoption.lua
-      technology_cleanup.lua
       denylist.lua
       overrides.lua
 
@@ -442,6 +471,7 @@ prototypes/
       diagnostics.lua
 
     emit/
+      technology_replacement.lua
       technology_builder.lua
       stream_spec_adapter.lua
       base_extensions.lua

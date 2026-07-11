@@ -4,6 +4,12 @@ rules:
   hidden_means_unavailable_not_deleted: true
   do_not_force_hidden_values_by_default: true
   setting_ids_are_stable: true
+  every_dropdown_has_a_neutral_bypass_option: true
+  existing_dropdown_enum_values_remain_valid: true
+  duplicate_neutral_equivalent_dropdown_rows_are_hidden_but_importable: true
+  numeric_dropdowns_use_consistent_expanded_ladders: true
+  numeric_dropdown_profile_imports_accept_valid_custom_percentages: true
+  custom_numeric_imports_use_displayed_percentage_units: true
   data_stage_must_validate_targets: true
   visibility_must_not_use_data_raw: true
   profile_import_is_effective_override_not_runtime_mutation: true
@@ -19,7 +25,16 @@ rules:
   settings_profile_encoding_is_deterministic: true
   prototype_limit_settings_default_to_engine_default: true
   prototype_limit_settings_are_startup_only_explicit_overrides: true
+  productivity_cap_scope_threshold_is_inverse_of_effective_recycler_return: true
+  recycling_return_policy_is_explicit_and_generated_recipes_only: true
+  automatic_recycling_return_is_total-output-inverse_and_never_buffs_vanilla: true
+  unrestricted_modules_is_opt_in_and_does_not_add_slots: true
+  unrestricted_modules_requires_module_permissions_target_capability: true
+  effect_per_level_settings_are_per_technology: true
+  effect_per_level_defaults_use_lowest_canonical_tier: true
+  scripted_multiplier_effects_scale_delta_not_full_multiplier: true
   energy_and_pollution_caps_are_separate: true
+  positive_speed_cap_and_negative_speed_floor_are_separate: true
   positive_power_floor_is_default_off_opt_in: true
   positive_power_floor_is_compatibility_section_setting: true
   global_settings_use_visible_section_prefixes: true
@@ -46,6 +61,15 @@ profiles:
   unknown_settings: preserved in profile string but ignored on unsupported branches
   invalid_values: ignored rather than coerced
   validation_source: prototypes/mir/settings/catalog.lua
+  custom_numeric_dropdown_imports:
+    mir-pipeline-extent-multiplier: { minimum: 0.1, maximum: 100000 }
+    mir-prototype-productivity-cap: { minimum: 0, maximum: 100000 }
+    mir-recycling-return-chance: { minimum: 0, maximum: 25 }
+    mir-prototype-efficiency-cap: { minimum: -99.99, maximum: 0 }
+    mir-prototype-pollution-cap: { minimum: -99.99, maximum: 0 }
+    mir-prototype-speed-floor: { minimum: -99.99, maximum: 0 }
+    mir-prototype-speed-cap: { minimum: 0, maximum: 100000 }
+    mir-prototype-quality-cap: { minimum: 0, maximum: 100000 }
 
 ordering:
   global_prefix: a
@@ -82,12 +106,14 @@ groups:
       - growth
       - max_level
       - research_time
+      - effect_per_level
     name_patterns:
       enable: ips-enable-%s
       base_cost: ips-cost-base-%s
       growth: ips-cost-growth-%s
       max_level: ips-max-level-%s
       research_time: ips-research-time-%s
+      effect_per_level: ips-effect-per-level-%s
 
 streams:
   research_air_scrubbing_clean_filter:
