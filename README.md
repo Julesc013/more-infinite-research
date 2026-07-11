@@ -11,11 +11,11 @@
 
 More Infinite Research adds **configurable infinite productivity** and **bonus research** for intermediate items, logistics chains, combat bonuses, player bonuses, and Space Age gaps that vanilla Factorio does not cover on supported modern target lines.
 
-**MIR `2.x.x`** targets **Factorio `2.0`** starting with **`2.3.0`**.
-
 **MIR `3.x.x`** targets **Factorio `2.1`** and requires `base >= 2.1.8`.
 
-**MIR `1.9.x`** targets **Factorio `1.1`** as a reduced compatibility port.
+**MIR `2.x.x`** targets **Factorio `2.0`** starting with **`2.3.0`**.
+
+**MIR `1.x.x`** targets **Factorio `1.1`** and earlier as reduced backports.
 
 The mod is built around **graceful compatibility**: it discovers recipes, science packs, labs, and optional prototypes from the active mod set, validates the candidate research, generates technologies late in **`data-final-fixes.lua`**, and *skips unsafe or unavailable streams* instead of requiring compatibility mods on the mod portal page.
 
