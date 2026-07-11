@@ -625,7 +625,7 @@ Instrument mode is a development tool, not a shipped MIR package feature.
 
 `scripts/Invoke-MIRValidation.ps1` remains the stable validation facade. Reusable concerns live under `scripts/validation/`: package identity, target metadata, scenario grouping, structured evidence aggregation, and Factorio process/copied-mod handling. Extracted modules receive paths explicitly and must retain the facade's existing parameters, scenario names, group assignments, and schema-2 result contract.
 
-The process module owns hidden process launch, timeout termination, safe copied-mod replacement, and release-shaped source copying. The settings-override module owns deterministic edits to the copied mod's declarative test override table. Scenario orchestration may call these modules but must not reimplement their operations inline.
+The process module owns hidden process launch, timeout termination, safe copied-mod replacement, and release-shaped source copying. The settings-override module owns deterministic edits to the copied mod's declarative test override table. The scenario registry imports one target profile from the expected-scenario manifest, rejects duplicate or undeclared names, and resolves every gate, runtime, configuration-change, and package invocation through a target-bound declaration record. Scenario orchestration may call these modules but must not reimplement their operations inline.
 
 ## Architecture Lints
 

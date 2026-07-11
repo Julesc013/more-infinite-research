@@ -17,6 +17,7 @@ $repo = Resolve-Path (Join-Path $PSScriptRoot "..")
 . (Join-Path $repo "scripts\validation\ResultAggregation.ps1")
 . (Join-Path $repo "scripts\validation\FactorioProcess.ps1")
 . (Join-Path $repo "scripts\validation\SettingsOverrides.ps1")
+. (Join-Path $repo "scripts\validation\ScenarioRegistry.ps1")
 $repoInfo = Get-Content -Raw (Join-Path $repo "info.json") | ConvertFrom-Json
 $targetProfile = Get-MIRTargetProfile -RepoRoot $repo -FactorioVersion $repoInfo.factorio_version
 $isFactorio017Line = $repoInfo.factorio_version -eq "0.17"
@@ -2003,14 +2004,8 @@ if ([string]::IsNullOrWhiteSpace($ValidationSummaryPath)) {
   $ValidationSummaryPath = Join-Path $repo "artifacts\validation\factorio-$($repoInfo.factorio_version)-summary.json"
 }
 $expectedScenariosPath = Join-Path $repo "fixtures\compat-matrix\expected-scenarios.json"
-$expectedScenariosManifest = Get-Content -Raw -LiteralPath $expectedScenariosPath | ConvertFrom-Json
-if ($expectedScenariosManifest.schema -ne 1) {
-  throw "Expected validation scenario manifest must use schema 1."
-}
-$expectedScenarios = @($expectedScenariosManifest.profiles.($repoInfo.factorio_version) | ForEach-Object { [string]$_ })
-if ($expectedScenarios.Count -eq 0) {
-  throw "Expected validation scenario manifest has no profile for Factorio $($repoInfo.factorio_version)."
-}
+$scenarioRegistry = Import-MIRScenarioRegistry -Path $expectedScenariosPath -TargetProfile $repoInfo.factorio_version
+$expectedScenarios = Get-MIRExpectedScenarioNames -Registry $scenarioRegistry
 Initialize-MIRValidationResult `
   -OutputPath $ValidationSummaryPath `
   -FactorioVersion $repoInfo.factorio_version `
@@ -2028,9 +2023,12 @@ Initialize-MIRValidationResult `
   -ValidationHarnessGitDirty (Test-MIRValidationHarnessGitDirty -RepoRoot $repo) `
   -ExpectedScenariosSha256 (Get-MIRFileContentSha256 -Path $expectedScenariosPath -RelativePath "fixtures/compat-matrix/expected-scenarios.json") `
   -ExpectedScenarios $expectedScenarios | Out-Null
-Add-MIRValidationCompletedScenario -Name "static-validation" -Group "static" -EvidencePaths @("scripts/Invoke-MIRValidation.ps1")
-Add-MIRValidationCompletedScenario -Name "package-build" -Group "package" -EvidencePaths @("build/validation-dist")
-Add-MIRValidationCompletedScenario -Name "runtime-state-contract" -Group "runtime-state" -EvidencePaths @("prototypes/mir/platform/factorio/runtime_state.lua")
+$staticDeclaration = Resolve-MIRScenarioDeclaration -Registry $scenarioRegistry -ScenarioName "static-validation" -Kind "gate"
+$packageBuildDeclaration = Resolve-MIRScenarioDeclaration -Registry $scenarioRegistry -ScenarioName "package-build" -Kind "gate"
+$runtimeStateDeclaration = Resolve-MIRScenarioDeclaration -Registry $scenarioRegistry -ScenarioName "runtime-state-contract" -Kind "gate"
+Add-MIRValidationCompletedScenario -Name $staticDeclaration.name -Group $staticDeclaration.group -EvidencePaths @("scripts/Invoke-MIRValidation.ps1")
+Add-MIRValidationCompletedScenario -Name $packageBuildDeclaration.name -Group $packageBuildDeclaration.group -EvidencePaths @("build/validation-dist")
+Add-MIRValidationCompletedScenario -Name $runtimeStateDeclaration.name -Group $runtimeStateDeclaration.group -EvidencePaths @("prototypes/mir/platform/factorio/runtime_state.lua")
 
 $usesGeneratedUserDataDir = [string]::IsNullOrWhiteSpace($UserDataDir)
 if ($usesGeneratedUserDataDir) {
@@ -2338,7 +2336,12 @@ function Invoke-RuntimeScenario {
     [switch]$EnableSpaceAge
   )
 
-  $scenarioGroup = Get-MIRValidationScenarioGroup -ScenarioName $ScenarioName -Kind "runtime" -EnableSpaceAge:$EnableSpaceAge
+  $declaration = Resolve-MIRScenarioDeclaration `
+    -Registry $scenarioRegistry `
+    -ScenarioName $ScenarioName `
+    -Kind "runtime" `
+    -EnableSpaceAge:$EnableSpaceAge
+  $scenarioGroup = $declaration.group
   $resultRecord = Start-MIRValidationScenario -Name $ScenarioName -Kind "runtime" -Group $scenarioGroup -EvidencePaths @($FactorioLog)
   try {
     $scenario = Initialize-RuntimeScenario `
@@ -2418,7 +2421,12 @@ function Invoke-RuntimeConfigurationChangeScenario {
     [switch]$EnableSpaceAge
   )
 
-  $scenarioGroup = Get-MIRValidationScenarioGroup -ScenarioName $ScenarioName -Kind "configuration-change" -EnableSpaceAge:$EnableSpaceAge
+  $declaration = Resolve-MIRScenarioDeclaration `
+    -Registry $scenarioRegistry `
+    -ScenarioName $ScenarioName `
+    -Kind "configuration-change" `
+    -EnableSpaceAge:$EnableSpaceAge
+  $scenarioGroup = $declaration.group
   $resultRecord = Start-MIRValidationScenario -Name $ScenarioName -Kind "configuration-change" -Group $scenarioGroup -EvidencePaths @($FactorioLog)
   try {
     $initialScenario = Initialize-RuntimeScenario `
@@ -2758,7 +2766,12 @@ function Invoke-PackageZipSmokeScenario {
     [switch]$EnableSpaceAge
   )
 
-  $scenarioGroup = Get-MIRValidationScenarioGroup -ScenarioName $ScenarioName -Kind "package" -EnableSpaceAge:$EnableSpaceAge
+  $declaration = Resolve-MIRScenarioDeclaration `
+    -Registry $scenarioRegistry `
+    -ScenarioName $ScenarioName `
+    -Kind "package" `
+    -EnableSpaceAge:$EnableSpaceAge
+  $scenarioGroup = $declaration.group
   $resultRecord = Start-MIRValidationScenario -Name $ScenarioName -Kind "package" -Group $scenarioGroup -EvidencePaths @($script:ValidationPackageZipPath, $FactorioLog)
   try {
     if ([string]::IsNullOrWhiteSpace($script:ValidationPackageZipPath) -or -not (Test-Path -LiteralPath $script:ValidationPackageZipPath)) {
