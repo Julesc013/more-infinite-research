@@ -1,15 +1,23 @@
 local science_icon = "__base__/graphics/icons/utility-science-pack.png"
+local science_pack_type = data.raw.tool and data.raw.tool["automation-science-pack"] and "tool" or "item"
+local nuclear_science_pack = {
+  type = science_pack_type,
+  name = "nuclear-science-pack",
+  icon = science_icon,
+  icon_size = 64,
+  subgroup = "science-pack",
+  order = "mir-nuclear-science-pack",
+  stack_size = 200
+}
+if science_pack_type == "tool" then
+  nuclear_science_pack.durability = 1
+  nuclear_science_pack.durability_description_key = "description.science-pack-remaining-amount-key"
+  nuclear_science_pack.factoriopedia_durability_description_key = "description.factoriopedia-science-pack-remaining-amount-key"
+  nuclear_science_pack.durability_description_value = "description.science-pack-remaining-amount-value"
+end
 
 data:extend({
-  {
-    type = "item",
-    name = "nuclear-science-pack",
-    icon = science_icon,
-    icon_size = 64,
-    subgroup = "science-pack",
-    order = "mir-nuclear-science-pack",
-    stack_size = 200
-  },
+  nuclear_science_pack,
   {
     type = "item",
     name = "atan-atom-forge",

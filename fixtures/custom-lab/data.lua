@@ -31,8 +31,9 @@ if base_lab then
     stack_size = 10
   }
 
+  local science_pack_type = data.raw.tool and data.raw.tool["automation-science-pack"] and "tool" or "item"
   local pack = {
-    type = "item",
+    type = science_pack_type,
     name = "mir-custom-only-science-pack",
     icon = "__base__/graphics/icons/logistic-science-pack.png",
     icon_size = 64,
@@ -40,6 +41,12 @@ if base_lab then
     order = "z[mir-custom-only-science-pack]",
     stack_size = 200
   }
+  if science_pack_type == "tool" then
+    pack.durability = 1
+    pack.durability_description_key = "description.science-pack-remaining-amount-key"
+    pack.factoriopedia_durability_description_key = "description.factoriopedia-science-pack-remaining-amount-key"
+    pack.durability_description_value = "description.science-pack-remaining-amount-value"
+  end
 
   data:extend({item, pack, custom})
 end
