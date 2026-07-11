@@ -4,8 +4,8 @@ release:
   version: "2.3.5"
   branch: tmp/2.0
   factorio_version: "2.0"
-  baseline_commit: 302cccdff22490cfd84ca8fee3eda1e759b7cee5
-  baseline_tag: mir-3.0.5-rc2-source
+  baseline_commit: b93808c54946f3913cea1244a6df89a154abd98e
+  baseline_tag: "3.0.5"
   objective: target-port-behavioral-subset
   public_contract_change: patch-compatible
 
@@ -52,10 +52,36 @@ superseded_candidates:
 
 candidate:
   artifact: dist/more-infinite-research_2.3.5.zip
-  source_commit: pending
-  automated_gate: pending
-  manual_gate: pending
-  status: rebuilding-after-package-visible-change
+  source_commit: 861565d3e898166eca8920e6eade6887b7db087d
+  sha256: 97B3DC9B6E352C6C4B8FF76D77020333FAAFFE93BD89EDB6B8F3370405ED68DE
+  size_bytes: 336718
+  entries: 132
+  files: 127
+  forbidden_entries: 0
+  package_content_sha256: 5B1BAFFF4A6D26C2CFB704705F224CFE562724230F054B2F16FEAC90E08F56D6
+  package_source_sha256: 5B1BAFFF4A6D26C2CFB704705F224CFE562724230F054B2F16FEAC90E08F56D6
+  target_profile_sha256: 9D8EC1B8813609DD855023FF81D73F307BB2A348B7B8E41AA4D10AEC268A6E18
+  required_groups_sha256: 57A1DF87A8FB594B2B51C7E230D775E88028F23D52DF9D5D7DA1336F9271C78A
+  validation_harness_sha256: A3962103F3713E1DCA219A20F2355B2359CC896E059122E3AB1B94DC5C58D54B
+  expected_scenarios_sha256: C06163A3C3AEF3D85328B413F45E7E3C9CABDFF2882BF56151285ADD0B075561
+  validation_package_sha256: 77DA0151C97DFAB823730B25AA8670E5C5DE21BBB40B8D093C0DCA4F5EA7871D
+  validation_package_content_sha256: 5B1BAFFF4A6D26C2CFB704705F224CFE562724230F054B2F16FEAC90E08F56D6
+  structured_summary_path: .mir/evidence/2.3.5-rc5-validation-summary.json
+  structured_summary_run_id: 74543fb0-1a55-429c-9f23-68d1407fec8f
+  structured_summary_status: passed
+  structured_summary_duration_seconds: 400.594
+  scenario_count: 71
+  release_targeted_summary_path: .mir/evidence/2.3.5-release-targeted-summary.json
+  exact_dist_base_log: .mir/evidence/2.3.5-exact-dist-base.txt
+  exact_dist_space_age_log: .mir/evidence/2.3.5-exact-dist-space-age.txt
+  upgrade_from_2_3_0_log: .mir/evidence/2.3.5-upgrade-2.3.5-load.txt
+  validation_content_matches_dist: true
+  exact_dist_base_smoke: passed
+  exact_dist_space_age_smoke: passed
+  upgrade_from_2_3_0: passed
+  automated_gate: passed
+  manual_gate: pending-ui-review
+  status: release-candidate-awaiting-manual-review
 
 rules:
   - dev-remains-the-canonical-modern-implementation

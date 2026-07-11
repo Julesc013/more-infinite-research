@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "mir_version": "2.3.5",
+  "factorio_version": "2.0.77",
+  "factorio_build": 84539,
+  "candidate_source_commit": "861565d3e898166eca8920e6eade6887b7db087d",
+  "candidate_archive": "dist/more-infinite-research_2.3.5.zip",
+  "candidate_sha256": "97B3DC9B6E352C6C4B8FF76D77020333FAAFFE93BD89EDB6B8F3370405ED68DE",
+  "candidate_content_sha256": "5B1BAFFF4A6D26C2CFB704705F224CFE562724230F054B2F16FEAC90E08F56D6",
+  "exact_dist": {
+    "base": {
+      "exit_code": 0,
+      "save_created": true,
+      "save_size_bytes": 789330,
+      "log": ".mir/evidence/2.3.5-exact-dist-base.txt"
+    },
+    "space_age": {
+      "official_mods": ["quality", "elevated-rails", "space-age"],
+      "exit_code": 0,
+      "save_created": true,
+      "save_size_bytes": 562428,
+      "log": ".mir/evidence/2.3.5-exact-dist-space-age.txt"
+    }
+  },
+  "upgrade": {
+    "source_archive": "dist/more-infinite-research_2.3.0.zip",
+    "source_sha256": "84287C5ACD047F6A3E1A6EDD568DEF313C13403CD35BB165CA399F4B02E19133",
+    "settings_source": "Factorio 2.0 weapon-overlap validation scenario",
+    "create_exit_code": 0,
+    "candidate_load_exit_code": 0,
+    "settings_parse_errors": 0,
+    "save_size_bytes": 670133,
+    "create_log": ".mir/evidence/2.3.5-upgrade-2.3.0-create.txt",
+    "load_log": ".mir/evidence/2.3.5-upgrade-2.3.5-load.txt"
+  },
+  "status": "passed"
+}
