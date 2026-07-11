@@ -46,10 +46,16 @@ $status = Get-MIRRequiredCandidateField -Fields $candidate -Name "status"
 $allowedStatuses = @(
   "rebuilding-after-package-visible-change",
   "release-candidate-awaiting-manual-review",
+  "release-candidate-accepted",
   "published"
 )
 if ($status -notin $allowedStatuses) {
-  throw "Unsupported 3.0.5 candidate status: $status"
+  throw "Unsupported MIR candidate status: $status"
+}
+
+if ($status -eq "release-candidate-accepted" -and
+    (Get-MIRRequiredCandidateField -Fields $candidate -Name "manual_gate") -ne "accepted-for-publication") {
+  throw "An accepted release candidate must record manual_gate: accepted-for-publication."
 }
 
 if ($status -eq "rebuilding-after-package-visible-change") {
