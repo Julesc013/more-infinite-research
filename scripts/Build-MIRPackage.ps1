@@ -56,13 +56,23 @@ try {
     $entry = $archive.CreateEntry($entryName, $compression)
     $entry.LastWriteTime = $fixedTimestamp
     $entry.ExternalAttributes = 0
-    $input = [System.IO.File]::OpenRead((Join-Path $repo $relative))
     $output = $entry.Open()
     try {
-      $input.CopyTo($output)
+      $sourcePath = Join-Path $repo $relative
+      if (Test-MIRTextFingerprintPath -RelativePath $relative) {
+        $text = [System.IO.File]::ReadAllText($sourcePath).Replace("`r`n", "`n").Replace("`r", "`n")
+        $bytes = [System.Text.UTF8Encoding]::new($false).GetBytes($text)
+        $output.Write($bytes, 0, $bytes.Length)
+      } else {
+        $input = [System.IO.File]::OpenRead($sourcePath)
+        try {
+          $input.CopyTo($output)
+        } finally {
+          $input.Dispose()
+        }
+      }
     } finally {
       $output.Dispose()
-      $input.Dispose()
     }
   }
 } finally {
