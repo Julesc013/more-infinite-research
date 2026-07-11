@@ -12,11 +12,8 @@ superseded_by: []
 
 # Diagnostics
 
-Enable `mir-debug-generation-report` when a generated technology is missing or
-unexpected. The report explains whether a stream generated, skipped, reduced its
-science pack set, hit a lab incompatibility, or detected a competing owner.
+Enable `mir-debug-generation-report` when a generated technology is missing or unexpected. The report explains whether a stream generated, skipped, reduced its science pack set, hit a lab incompatibility, or detected a competing owner.
 
-Enable `mir-debug-recipe-matches` when a recipe did not receive productivity and
-you need the matched recipe list for a stream.
+Enable `mir-debug-recipe-matches` when a recipe did not receive productivity and you need the matched recipe list for a stream.
 
 Attach the relevant log rows when reporting compatibility issues.

@@ -12,5 +12,4 @@ superseded_by: []
 
 # Owner Summary
 
-Owner-summary rows record MIR and external ownership of recipe productivity or
-native modifier effects.
+Owner-summary rows record MIR and external ownership of recipe productivity or native modifier effects.

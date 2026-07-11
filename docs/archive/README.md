@@ -12,12 +12,8 @@ superseded_by: []
 
 # Archive
 
-Archived docs are retained for historical context only. They are not normative
-for current development unless an active doc links to them as historical
-evidence.
+Archived docs are retained for historical context only. They are not normative for current development unless an active doc links to them as historical evidence.
 
 - [Superseded docs](superseded/README.md)
 
-Superseded plans, audits, and historical implementation notes live in the
-superseded archive. Versioned player-facing release notes live under
-[release notes](../releases/notes/).
+Superseded plans, audits, and historical implementation notes live in the superseded archive. Versioned player-facing release notes live under [release notes](../releases/notes/).

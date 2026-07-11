@@ -11,13 +11,7 @@ superseded_by: ["../../maintainer/backporting.md"]
 ---
 # Factorio 1.0 RC Planning Report
 
-Updated: 2026-07-10
-Branch: `tmp/1.0`
-Target Factorio line: `1.0.x`
-Prototype snapshot reviewed: `wube/factorio-data` tag `1.0.0`
-Planned MIR release slot(s): `1.8.1+`
-Risk rating: High
-Change type in this commit: documentation and planning only; no code behavior changes.
+Updated: 2026-07-10 Branch: `tmp/1.0` Target Factorio line: `1.0.x` Prototype snapshot reviewed: `wube/factorio-data` tag `1.0.0` Planned MIR release slot(s): `1.8.1+` Risk rating: High Change type in this commit: documentation and planning only; no code behavior changes.
 
 This is a tentative maintainer-authorized planning note for the temporary experimental branch. It does not make this branch a release candidate by itself. A stable RC for Factorio `1.0` still requires target-line code edits, metadata edits, package construction, and a load test against a matching Factorio binary. If those gates fail, the plan must change rather than shipping a misleading archive.
 
@@ -43,9 +37,7 @@ Science-pack surface observed for the target: modern science names are present, 
 - factorio-data 1.0.0 shows max_level/count_formula, mining-drill productivity, inventory/trash slots, stack inserter capacity, gun/ammo/turret/toolbelt, and character mining speed.
 - No change-recipe-productivity proof was found.
 - 1.0 is before storage rename, so runtime state must use global.
-- Latest mod-structure docs note a `0.18`-to-`1.0` exception. MIR uses that
-  only for the frozen `1.8.0` bridge package; `1.8.1+` is the maintained
-  direct Factorio `1.0` line.
+- Latest mod-structure docs note a `0.18`-to-`1.0` exception. MIR uses that only for the frozen `1.8.0` bridge package; `1.8.1+` is the maintained direct Factorio `1.0` line.
 
 ## Current MIR Code Surfaces That Do Not Backport Cleanly
 
@@ -58,13 +50,10 @@ The current branch began as the Factorio `2.1` development snapshot. The followi
 
 ## Minimum RC Plan
 
-- Treat `1.0` as a `1.1`-style reduced feature port with extra API-export
-  caution, seeded from the validated `1.9.3` source point plus lessons from the
-  `1.8.0` bridge proof.
+- Treat `1.0` as a `1.1`-style reduced feature port with extra API-export caution, seeded from the validated `1.9.3` source point plus lessons from the `1.8.0` bridge proof.
 - Use factorio-data 1.0.0 and a real 1.0 binary load as mandatory proof.
 - Do not claim recipe productivity unless a target binary accepts it in a fixture.
-- Do not add new features in `1.8.1`; the release establishes the maintained
-  `1.0` line after the bridge proof.
+- Do not add new features in `1.8.1`; the release establishes the maintained `1.0` line after the bridge proof.
 
 ## Stable RC Readiness
 
@@ -90,11 +79,9 @@ This branch is suitable as an experimental planning branch only. The present sou
 
 ## Branch TODO Extract
 
-- [ ] Start from the validated `1.8.0` bridge commit or from `1.9.3` plus
-  bridge lessons, choosing the cleaner diff.
+- [ ] Start from the validated `1.8.0` bridge commit or from `1.9.3` plus bridge lessons, choosing the cleaner diff.
 - [ ] Create a target-line API/effect whitelist from official docs where available and factorio-data 1.0.0.
-- [ ] Patch info.json to `version = "1.8.1"`,
-  `factorio_version = "1.0"`, and `base >= 1.0`.
+- [ ] Patch info.json to `version = "1.8.1"`, `factorio_version = "1.0"`, and `base >= 1.0`.
 - [ ] Prune unsupported current-line streams before package validation.
 - [ ] Write release notes that state the supported subset and excluded current-line features.
 - [ ] Run a matching Factorio 1.0.x binary load test before RC approval.

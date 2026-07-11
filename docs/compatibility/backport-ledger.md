@@ -12,9 +12,7 @@ superseded_by: []
 
 # 3.0.5 Backport Behavior Ledger
 
-This ledger translates historical branch work into observable contracts. The
-machine-readable authority is `.mir/convergence.yml`. Historical commit order
-does not grant implementation authority; `dev` remains canonical.
+This ledger translates historical branch work into observable contracts. The machine-readable authority is `.mir/convergence.yml`. Historical commit order does not grant implementation authority; `dev` remains canonical.
 
 | ID | Source | Observable contract | Class | Decision | Evidence | Status |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -47,6 +45,4 @@ does not grant implementation authority; `dev` remains canonical.
 - F: behavior changes the public contract or belongs to a future target/release.
 - G: behavior is unknown and cannot be integrated until investigated.
 
-Every accepted row must end with one canonical implementation and named
-evidence. Target metadata, dependency floors, science IDs, assets, and disabled
-modern surfaces never qualify as portable behavior by themselves.
+Every accepted row must end with one canonical implementation and named evidence. Target metadata, dependency floors, science IDs, assets, and disabled modern surfaces never qualify as portable behavior by themselves.

@@ -11,8 +11,7 @@ superseded_by: ["../../releases/README.md"]
 ---
 # More Infinite Research 2.1.0 Release-Gated Plan
 
-This document turns the post-`2.0.5` roadmap into an executable release gate for
-the next Factorio `2.1` feature wave.
+This document turns the post-`2.0.5` roadmap into an executable release gate for the next Factorio `2.1` feature wave.
 
 Primary rule:
 
@@ -20,9 +19,7 @@ Primary rule:
 v2.1.0 = user-facing control + compatibility discipline + proof-gated expansion
 ```
 
-Do not use `v2.1.0` as a bucket for every good Reddit or Discord idea. Every
-feature must have a lane, an implementation type, and a validation gate before
-code work starts.
+Do not use `v2.1.0` as a bucket for every good Reddit or Discord idea. Every feature must have a lane, an implementation type, and a validation gate before code work starts.
 
 ## Release Theme
 
@@ -38,8 +35,7 @@ Ship the features that make MIR easier to control and safer in modded saves:
 
 ## Required Ship Gates
 
-These are the core `v2.1.0` gates. The release should not ship without a clear
-decision for each one.
+These are the core `v2.1.0` gates. The release should not ship without a clear decision for each one.
 
 | Gate | Required outcome | Release blocker? |
 | --- | --- | ---: |
@@ -92,13 +88,9 @@ Per-feature state:
 - Enable checkbox off
 ```
 
-Cost, growth, maximum level, and research unit time settings remain the existing
-manual tunables. Preset modes and per-feature enable-policy dropdowns are
-deferred because they added startup-setting noise without solving preset
-sharing.
+Cost, growth, maximum level, and research unit time settings remain the existing manual tunables. Preset modes and per-feature enable-policy dropdowns are deferred because they added startup-setting noise without solving preset sharing.
 
-Future preset work should be designed as an import/export or shareable settings
-profile flow, not as another override control beside every technology.
+Future preset work should be designed as an import/export or shareable settings profile flow, not as another override control beside every technology.
 
 Acceptance criteria:
 
@@ -109,9 +101,7 @@ Acceptance criteria:
 
 ## Native Modifier Overlap Policy
 
-`v2.0.5` reports native modifier overlaps diagnostically. `v2.1.0` keeps that
-broad native-modifier behavior diagnostic-only and ships narrower compatibility
-work where recipe ownership can be proven exactly.
+`v2.0.5` reports native modifier overlaps diagnostically. `v2.1.0` keeps that broad native-modifier behavior diagnostic-only and ships narrower compatibility work where recipe ownership can be proven exactly.
 
 Recommended setting:
 
@@ -129,8 +119,7 @@ Recommended default:
 Prefer existing owner
 ```
 
-Rationale: safer for overhaul mods and Maraxis-like mods that already provide
-equivalent cargo/logistics/native modifier research.
+Rationale: safer for overhaul mods and Maraxis-like mods that already provide equivalent cargo/logistics/native modifier research.
 
 Acceptance criteria:
 
@@ -143,42 +132,25 @@ Acceptance criteria:
 
 ## Icon Source And Asset Policy
 
-Keep MIR's current icon strategy: borrow the best active prototype icon, then add
-MIR's own effect-type badge. The `dev` line now has an explicit ordered
-`icon_candidates` resolver; keep improving that resolver instead of broadening
-the asset ownership boundary.
+Keep MIR's current icon strategy: borrow the best active prototype icon, then add MIR's own effect-type badge. The `dev` line now has an explicit ordered `icon_candidates` resolver; keep improving that resolver instead of broadening the asset ownership boundary.
 
 Allowed:
 
 - Prefer loaded Space Age technology icons when `space-age` is active.
-- Fall back to loaded base-game technology or item icons when Space Age is not
-  active.
-- Optionally use direct `__space-age__` icon paths when
-  `mir-use-installed-space-age-icons` is enabled for a base game where the Space
-  Age files are installed but the Space Age mod is disabled.
-- Add an explicit icon-candidate registry so streams can say "prefer this Space
-  Age technology, then this base technology, then this item" without duplicating
-  lookup logic.
-- Add MIR-owned fallback art only when the asset is original to MIR, generated
-  for MIR, or otherwise clearly licensed for redistribution.
-- Keep effect badges sourced from Factorio's technology constant icons when
-  available, because those are already used as small modifier markers by MIR's
-  generated technologies.
+- Fall back to loaded base-game technology or item icons when Space Age is not active.
+- Optionally use direct `__space-age__` icon paths when `mir-use-installed-space-age-icons` is enabled for a base game where the Space Age files are installed but the Space Age mod is disabled.
+- Add an explicit icon-candidate registry so streams can say "prefer this Space Age technology, then this base technology, then this item" without duplicating lookup logic.
+- Add MIR-owned fallback art only when the asset is original to MIR, generated for MIR, or otherwise clearly licensed for redistribution.
+- Keep effect badges sourced from Factorio's technology constant icons when available, because those are already used as small modifier markers by MIR's generated technologies.
 
 Not allowed in the main mod:
 
-- Do not copy original Space Age PNGs or other DLC asset files into MIR so
-  base-only games can display them.
+- Do not copy original Space Age PNGs or other DLC asset files into MIR so base-only games can display them.
 - Do not make the base-only package behave as a Space Age art pack.
-- Do not reference `__space-age__` paths in generated prototypes unless Space
-  Age is loaded or the user explicitly enabled installed Space Age icon paths.
-- Do not replace Wube's package ownership boundary with a local cache of their
-  DLC assets.
+- Do not reference `__space-age__` paths in generated prototypes unless Space Age is loaded or the user explicitly enabled installed Space Age icon paths.
+- Do not replace Wube's package ownership boundary with a local cache of their DLC assets.
 
-Rationale: base-only games can have polished icons, but they should be base
-icons, MIR-owned icons, generated composites, or explicit references to locally
-installed Space Age files when the user opts in. MIR should not redistribute
-Space Age art.
+Rationale: base-only games can have polished icons, but they should be base icons, MIR-owned icons, generated composites, or explicit references to locally installed Space Age files when the user opts in. MIR should not redistribute Space Age art.
 
 Implementation shape:
 
@@ -191,30 +163,20 @@ icon_candidates = {
 }
 ```
 
-The resolver should evaluate candidates in order, skip candidates whose required
-mod is not loaded, skip inactive asset candidates unless the user enabled them,
-copy the active prototype icon layers, strip inherited Wube constant overlays,
-and then apply MIR's own effect badge.
+The resolver should evaluate candidates in order, skip candidates whose required mod is not loaded, skip inactive asset candidates unless the user enabled them, copy the active prototype icon layers, strip inherited Wube constant overlays, and then apply MIR's own effect badge.
 
 Acceptance criteria:
 
-- Default base-only runtime fixtures never resolve generated technology icons to
-  `__space-age__` paths.
-- Opt-in base-only runtime fixtures with `mir-use-installed-space-age-icons`
-  enabled resolve selected candidates to direct `__space-age__` icon paths.
-- Space Age runtime fixtures still prefer the intended Space Age technology art
-  when it is loaded.
-- Package validation fails if MIR adds copied Space Age asset files under its
-  own package paths without an explicit allowlisted source/license note.
-- Diagnostics report the selected icon source as technology, item, explicit
-  path, or MIR-owned local asset.
-- README or compatibility docs explain that MIR references Space Age art only
-  when Space Age is loaded.
+- Default base-only runtime fixtures never resolve generated technology icons to `__space-age__` paths.
+- Opt-in base-only runtime fixtures with `mir-use-installed-space-age-icons` enabled resolve selected candidates to direct `__space-age__` icon paths.
+- Space Age runtime fixtures still prefer the intended Space Age technology art when it is loaded.
+- Package validation fails if MIR adds copied Space Age asset files under its own package paths without an explicit allowlisted source/license note.
+- Diagnostics report the selected icon source as technology, item, explicit path, or MIR-owned local asset.
+- README or compatibility docs explain that MIR references Space Age art only when Space Age is loaded.
 
 ## Scripted Spoilage Gate
 
-Spoilage preservation uses Factorio's global spoil time modifier. Keep it
-conservative until manual evidence proves behavior in real saves.
+Spoilage preservation uses Factorio's global spoil time modifier. Keep it conservative until manual evidence proves behavior in real saves.
 
 Required manual results before stronger claims:
 
@@ -233,8 +195,7 @@ Default recommendation until proven: keep Spoilage preservation off unless inten
 
 ## Scripted Agriculture Gate
 
-Newly planted agricultural tower crops are the stable first path. Existing plant
-rescale is conditional.
+Newly planted agricultural tower crops are the stable first path. Existing plant rescale is conditional.
 
 Existing plant rescale may ship only if:
 
@@ -286,8 +247,7 @@ These features now have `v2.1.0` implementation coverage and automated fixture p
 
 ## GitHub Milestone Checklist
 
-Create a `v2.1.0` milestone and one issue per gate when GitHub milestone tooling
-is available.
+Create a `v2.1.0` milestone and one issue per gate when GitHub milestone tooling is available.
 
 Suggested issue titles:
 
@@ -334,5 +294,4 @@ Minimum issue template:
 - static/package validation passes;
 - runtime fixture validation passes on Factorio `2.1.x`;
 - branch policy validation passes;
-- README, compatibility docs, roadmap, TODO, manual test plan, test results,
-  changelog, and release notes agree.
+- README, compatibility docs, roadmap, TODO, manual test plan, test results, changelog, and release notes agree.

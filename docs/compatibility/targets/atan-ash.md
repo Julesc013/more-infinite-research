@@ -20,8 +20,7 @@ Evidence:
 - `mir-fixture-assert-atan-ash-separation`
 - Stream `mir-prod-atan-ash-separation`
 
-Non-goals: landfill, brick, nutrient, foundation, tile, and recovery-style ash
-sink recipes.
+Non-goals: landfill, brick, nutrient, foundation, tile, and recovery-style ash sink recipes.
 
 ## Upstream Zip Status
 

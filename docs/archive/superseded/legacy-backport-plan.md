@@ -11,33 +11,22 @@ superseded_by: ["../../releases/README.md"]
 ---
 # Legacy Backport Plan
 
-Updated: 2026-07-06
-Branch: `legacy`
-Scope: synthesized planning report for the temporary `tmp/*` Factorio-line branches.
+Updated: 2026-07-06 Branch: `legacy` Scope: synthesized planning report for the temporary `tmp/*` Factorio-line branches.
 
 > Historical version slots in this document are superseded. Current authority
 > is `docs/maintainer/backporting.md`: Factorio 0.17 shipped as MIR 1.7.0,
 > Factorio 0.16 maps to 1.6.0, and Factorio 0.15 maps to 1.5.0. The old slot
 > table remains here only to preserve the original planning record.
 
-This is a docs-only synthesis of the temporary RC planning sweep. It is a planning
-artifact, not a release-candidate approval. Every target still needs actual
-target-line implementation work, metadata changes, package construction, and a
-matching Factorio binary load test before it can be called stable.
+This is a docs-only synthesis of the temporary RC planning sweep. It is a planning artifact, not a release-candidate approval. Every target still needs actual target-line implementation work, metadata changes, package construction, and a matching Factorio binary load test before it can be called stable.
 
 ## Read-Only Audit Follow-Up
 
-The attached read-only branch audit is materialized as
-`docs/notes/legacy-backport-capabilities.md`. Treat that matrix
-as the next planning layer after this plan: it records the branch-by-branch
-capability gates, sharpens the `0.15` native-infinite boundary, and uses the
-stricter wording that `0.14` and older targets are archive/museum
-reconstructions unless matching old binaries prove stronger support.
+The attached read-only branch audit is materialized as `docs/notes/legacy-backport-capabilities.md`. Treat that matrix as the next planning layer after this plan: it records the branch-by-branch capability gates, sharpens the `0.15` native-infinite boundary, and uses the stricter wording that `0.14` and older targets are archive/museum reconstructions unless matching old binaries prove stronger support.
 
 ## What Was Done
 
-Each temporary branch now has its own branch-local RC planning report in
-`docs/notes` and an updated root `todo.md` checklist on that branch:
+Each temporary branch now has its own branch-local RC planning report in `docs/notes` and an updated root `todo.md` checklist on that branch:
 
 | Branch | Target | Planned MIR release slot(s) | Planning commit | Status |
 | --- | --- | --- | --- | --- |
@@ -82,11 +71,7 @@ Primary references used across the sweep:
 
 No target is RC-ready by metadata change alone.
 
-The current MIR source is Factorio `2.1` shaped. It assumes modern metadata,
-modern science packs, `storage`, Space Age/Quality/elevated-rails/recycler
-surfaces, recipe productivity, modern optional dependency behavior, and runtime
-events that do not exist on most target lines. A stable RC requires a real
-target-line compatibility implementation for each branch.
+The current MIR source is Factorio `2.1` shaped. It assumes modern metadata, modern science packs, `storage`, Space Age/Quality/elevated-rails/recycler surfaces, recipe productivity, modern optional dependency behavior, and runtime events that do not exist on most target lines. A stable RC requires a real target-line compatibility implementation for each branch.
 
 ## Compatibility Breakpoints
 
@@ -124,8 +109,4 @@ The safest implementation order is:
 
 ## Final Read
 
-The campaign is feasible as a celebration/backport ladder only if we accept
-progressively smaller feature subsets on older lines. `2.0` can be close to the
-current line. `1.1` through `0.15` can probably support useful native infinite
-research subsets. `0.14` and older should be treated as finite or historical
-ports until direct binary proof says otherwise.
+The campaign is feasible as a celebration/backport ladder only if we accept progressively smaller feature subsets on older lines. `2.0` can be close to the current line. `1.1` through `0.15` can probably support useful native infinite research subsets. `0.14` and older should be treated as finite or historical ports until direct binary proof says otherwise.

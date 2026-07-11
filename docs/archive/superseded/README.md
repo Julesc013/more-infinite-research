@@ -17,6 +17,4 @@ superseded_by: ["../README.md"]
 > This folder is retained for historical context only.
 > Current replacement: [Archive](../README.md)
 
-Move replaced plans, audits, and implementation notes here when they are no
-longer normative but should remain available as historical context. Published
-player-facing release notes belong under `docs/releases/notes/`.
+Move replaced plans, audits, and implementation notes here when they are no longer normative but should remain available as historical context. Published player-facing release notes belong under `docs/releases/notes/`.

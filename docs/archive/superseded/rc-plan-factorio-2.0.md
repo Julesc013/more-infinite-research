@@ -11,13 +11,7 @@ superseded_by: ["../../releases/README.md"]
 ---
 # Factorio 2.0 RC Planning Report
 
-Updated: 2026-07-06
-Branch: `tmp/2.0`
-Target Factorio line: `2.0.x`
-Prototype snapshot reviewed: `wube/factorio-data` tag `2.0.77`
-Planned MIR release slot(s): `1.9.7, 1.9.8, 1.9.9`
-Risk rating: Moderate
-Change type in this commit: documentation and planning only; no code behavior changes.
+Updated: 2026-07-06 Branch: `tmp/2.0` Target Factorio line: `2.0.x` Prototype snapshot reviewed: `wube/factorio-data` tag `2.0.77` Planned MIR release slot(s): `1.9.7, 1.9.8, 1.9.9` Risk rating: Moderate Change type in this commit: documentation and planning only; no code behavior changes.
 
 This is a tentative maintainer-authorized planning note for the temporary experimental branch. It does not make this branch a release candidate by itself. A stable RC for Factorio `2.0` still requires target-line code edits, metadata edits, package construction, and a load test against a matching Factorio binary. If those gates fail, the plan must change rather than shipping a misleading archive.
 

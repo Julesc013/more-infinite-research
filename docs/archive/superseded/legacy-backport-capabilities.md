@@ -15,19 +15,11 @@ superseded_by: ["../../releases/README.md"]
 > `docs/maintainer/backporting.md`. Its capability classifications remain
 > useful; its old numeric slots are not current release policy.
 
-Updated: 2026-07-06
-Branch: `legacy`
-Scope: read-only capability matrix for the temporary legacy backport `tmp/*` branches.
+Updated: 2026-07-06 Branch: `legacy` Scope: read-only capability matrix for the temporary legacy backport `tmp/*` branches.
 
-This note materializes the immediate follow-up requested by the read-only RC
-audit of the `tmp/x.x` branches. It is a planning artifact only. It does not
-certify any branch as a release candidate, and it does not imply that any
-branch-local code, metadata, package, or runtime validation has been changed.
-Read it as the capability appendix to `docs/notes/legacy-backport-plan.md`.
+This note materializes the immediate follow-up requested by the read-only RC audit of the `tmp/x.x` branches. It is a planning artifact only. It does not certify any branch as a release candidate, and it does not imply that any branch-local code, metadata, package, or runtime validation has been changed. Read it as the capability appendix to `docs/notes/legacy-backport-plan.md`.
 
-The important conclusion is unchanged but sharper: every `tmp/*` branch still
-needs target-line implementation work before RC naming is honest. The branches
-are useful staging branches, not RC branches.
+The important conclusion is unchanged but sharper: every `tmp/*` branch still needs target-line implementation work before RC naming is honest. The branches are useful staging branches, not RC branches.
 
 ## Status Terms
 
@@ -160,10 +152,7 @@ No branch should be called RC until all of these are true for that branch:
 
 ## Source Basis
 
-This matrix synthesizes the branch-local RC planning notes, the attached
-read-only RC audit, official Factorio Lua API documentation, scanned
-`wube/factorio-data` history, and historical Factorio blog/FFF posts already
-listed in `legacy-backport-plan.md`.
+This matrix synthesizes the branch-local RC planning notes, the attached read-only RC audit, official Factorio Lua API documentation, scanned `wube/factorio-data` history, and historical Factorio blog/FFF posts already listed in `legacy-backport-plan.md`.
 
 Key external references:
 

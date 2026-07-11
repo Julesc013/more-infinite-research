@@ -12,5 +12,4 @@ superseded_by: []
 
 # Capability Diagnostics
 
-Capability diagnostics report what resolver lanes discovered, classified,
-generated through existing streams, proposed, or refused.
+Capability diagnostics report what resolver lanes discovered, classified, generated through existing streams, proposed, or refused.

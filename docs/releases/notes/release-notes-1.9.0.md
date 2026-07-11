@@ -11,18 +11,13 @@ superseded_by: ["../../releases/README.md"]
 ---
 # More Infinite Research 1.9.0 Release Notes
 
-This is the short, player-facing release summary for the `1.9.0` Factorio `2.0`
-legacy release notes. It is derived from `changelog.txt`; the changelog remains
-the detailed source of truth.
+This is the short, player-facing release summary for the `1.9.0` Factorio `2.0` legacy release notes. It is derived from `changelog.txt`; the changelog remains the detailed source of truth.
 
 ## Headline
 
-`1.9.0` is the Factorio `2.0` legacy backport of the tested More Infinite
-Research `2.0.5` codebase.
+`1.9.0` is the Factorio `2.0` legacy backport of the tested More Infinite Research `2.0.5` codebase.
 
-This release brings the current generator, settings, diagnostics, compatibility,
-recipe matching, custom science-pack handling, custom lab handling, and validation
-work back to Factorio `2.0`.
+This release brings the current generator, settings, diagnostics, compatibility, recipe matching, custom science-pack handling, custom lab handling, and validation work back to Factorio `2.0`.
 
 ## What This Release Is
 
@@ -59,8 +54,7 @@ work back to Factorio `2.0`.
 
 ## Legacy Differences From 2.0.5
 
-The Factorio `2.0` legacy package intentionally excludes known Factorio `2.1`
-cargo modifier streams:
+The Factorio `2.0` legacy package intentionally excludes known Factorio `2.1` cargo modifier streams:
 
 - Cargo bay unloading distance.
 - Cargo landing pad count.
@@ -74,9 +68,7 @@ Those technologies remain current-line `2.x` features only.
 - Spoilage Preservation.
 - Agricultural Growth Speed.
 
-They are opt-in for testing. They are not enabled by default, and stronger
-gameplay claims still need manual validation for existing spoilable stacks,
-existing farms, reversal, disabling, multi-force behavior, and larger real saves.
+They are opt-in for testing. They are not enabled by default, and stronger gameplay claims still need manual validation for existing spoilable stacks, existing farms, reversal, disabling, multi-force behavior, and larger real saves.
 
 ## Validation
 
@@ -91,8 +83,7 @@ Validated checks include:
 - Space Age release-zip smoke test.
 - Basic old-save smoke: a base-only `1.2.9` save loaded headlessly under `1.9.0`.
 
-The old-save smoke proves basic save loading. A real save with old trash-slot
-research progress is still the best manual check for that specific migration path.
+The old-save smoke proves basic save loading. A real save with old trash-slot research progress is still the best manual check for that specific migration path.
 
 ## Known Notes
 

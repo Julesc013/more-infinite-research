@@ -27,5 +27,4 @@ Each resolver has a stable ID and schema version.
 
 ## Consequences
 
-Loaders, mining drills, ore processing, science packs, native modifiers, and
-material families become capability lanes rather than per-mod generator code.
+Loaders, mining drills, ore processing, science packs, native modifiers, and material families become capability lanes rather than per-mod generator code.

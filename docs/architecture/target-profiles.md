@@ -12,23 +12,15 @@ superseded_by: []
 
 # Target Capability Profiles
 
-`.mir/targets.json` is the canonical target-line capability manifest. JSON is
-used deliberately: PowerShell can consume it without an external YAML module,
-and a deterministic build step can generate Lua compatible with old Factorio
-targets that do not expose a common JSON helper during prototype loading.
+`.mir/targets.json` is the canonical target-line capability manifest. JSON is used deliberately: PowerShell can consume it without an external YAML module, and a deterministic build step can generate Lua compatible with old Factorio targets that do not expose a common JSON helper during prototype loading.
 
-The checked-in Lua view is
-`prototypes/mir/platform/factorio/target_profiles.lua`. Generate it with:
+The checked-in Lua view is `prototypes/mir/platform/factorio/target_profiles.lua`. Generate it with:
 
 ```powershell
 .\scripts\Sync-MIRTargetProfiles.ps1
 ```
 
-Static and architecture validation run the same command with `-Check` and fail
-when the generated view differs from `.mir/targets.json` or the active
-`info.json` target. PowerShell validation reads the canonical JSON directly
-through `scripts/validation/TargetProfiles.ps1`; it does not maintain a second
-hand-written target classification.
+Static and architecture validation run the same command with `-Check` and fail when the generated view differs from `.mir/targets.json` or the active `info.json` target. PowerShell validation reads the canonical JSON directly through `scripts/validation/TargetProfiles.ps1`; it does not maintain a second hand-written target classification.
 
 Each profile declares:
 
@@ -43,28 +35,14 @@ Each profile declares:
 - unsupported streams, mods, effects, and settings;
 - required validation groups.
 
-`target_line.lua` converts the selected profile into the stable adapter API
-used by settings, planning, emission, stage orchestration, and runtime state.
-Target profiles classify capabilities; they do not create or mutate prototypes.
+`target_line.lua` converts the selected profile into the stable adapter API used by settings, planning, emission, stage orchestration, and runtime state. Target profiles classify capabilities; they do not create or mutate prototypes.
 
-Profiles for released lines record validated historical behavior. Profiles for
-Factorio 0.16 and 0.15 are explicitly marked as planned and do not constitute
-binary support claims. Their science and effect surfaces still require matching
-target-binary proof.
+Profiles for released lines record validated historical behavior. Profiles for Factorio 0.16 and 0.15 are explicitly marked as planned and do not constitute binary support claims. Their science and effect surfaces still require matching target-binary proof.
 
 ## Runtime State
 
-`prototypes/mir/platform/factorio/runtime_state.lua` is the only production Lua
-module that accesses Factorio's persisted runtime root directly. Factorio 2.x
-profiles select `storage`; Factorio 1.1 and older profiles select `global`.
-Runtime feature modules consume `prototypes/mir/runtime/state.lua` and cannot
-probe both names or silently choose a fallback.
+`prototypes/mir/platform/factorio/runtime_state.lua` is the only production Lua module that accesses Factorio's persisted runtime root directly. Factorio 2.x profiles select `storage`; Factorio 1.1 and older profiles select `global`. Runtime feature modules consume `prototypes/mir/runtime/state.lua` and cannot probe both names or silently choose a fallback.
 
 ## Backport Rule
 
-When a target branch changes `info.json`, regenerate the Lua profile view and
-run architecture validation. Target-local capability changes must first update
-the canonical manifest and must not weaken the Factorio 2.1 profile.
-The unrestricted module-permission pass has its own `module_permissions`
-feature flag. Its setting registration, target capability, and executable pass
-must agree; it does not inherit support from `prototype_limits`.
+When a target branch changes `info.json`, regenerate the Lua profile view and run architecture validation. Target-local capability changes must first update the canonical manifest and must not weaken the Factorio 2.1 profile. The unrestricted module-permission pass has its own `module_permissions` feature flag. Its setting registration, target capability, and executable pass must agree; it does not inherit support from `prototype_limits`.
