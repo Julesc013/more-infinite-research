@@ -66,13 +66,48 @@ superseded_candidates:
     forbidden_entries: 0
     reason: recycler and productivity cap controls required stricter ownership and combination fixtures
     status: superseded-unpublished-candidate
+  - source_commit: ff2aea90a4b9b6530601da40474bdf1dd783ccff
+    artifact: dist/more-infinite-research_3.0.5.zip
+    sha256: 12F4C14EE408EFA6D2F6116320F8C424B2F357E69477397F922A54568D6442B0
+    size_bytes: 337551
+    entries: 132
+    forbidden_entries: 0
+    reason: documentation reorganization changed packaged README content and the validation harness
+    status: superseded-unpublished-candidate
 
 candidate:
   artifact: dist/more-infinite-research_3.0.5.zip
-  source_commit: pending
-  automated_gate: pending
+  source_commit: 8891d675062416764d181b27497a6fa1ef42e070
+  sha256: 40AF95C3F4411DDF6C24C98897489D696339A1B85B0439FA4A3BDFEDDDF0E5C5
+  size_bytes: 337527
+  entries: 132
+  files: 127
+  forbidden_entries: 0
+  package_content_sha256: 54295B33408FB00A796F4CD0C4174477AFAC9CEBC7F3D9BC834633360DF53DE9
+  package_source_sha256: 54295B33408FB00A796F4CD0C4174477AFAC9CEBC7F3D9BC834633360DF53DE9
+  target_profile_sha256: E1EF758114CECB4B896F5E3365B214E95EC2794A64364492BF174AFE710B3E8F
+  required_groups_sha256: 57A1DF87A8FB594B2B51C7E230D775E88028F23D52DF9D5D7DA1336F9271C78A
+  validation_harness_sha256: 6F9256043ECD174002F7A5767A89DAB9CE6536A9097DA6C53A99CFF88F1F278A
+  expected_scenarios_sha256: 293639DC393025C47D186CB932C584D77958AAC6F916F952D176AADE26E9EB8D
+  validation_package_sha256: 526E2EFA9B0F0CAA5BE785A3D06D548FF3B11B95121BCD3E6D4131F34E4F4988
+  validation_package_content_sha256: 54295B33408FB00A796F4CD0C4174477AFAC9CEBC7F3D9BC834633360DF53DE9
+  structured_summary_path: .mir/evidence/3.0.5-rc13-validation-summary.json
+  structured_summary_run_id: 2916dd99-8ea2-435b-b3a4-0ae4fae0cf0c
+  structured_summary_status: passed
+  structured_summary_duration_seconds: 545.679
+  scenario_count: 79
+  validation_content_matches_dist: true
+  static_validation: passed
+  factorio_2_1_validation: passed
+  factorio_2_1_binary: Factorio 2.1.9 win64 steam
+  exact_dist_base_smoke: passed
+  exact_dist_space_age_smoke: passed
+  factorio_2_1_crucible_rigor_exact_dist: passed
+  factorio_2_1_modules_t4_finite_exact_dist: passed
+  retained_base_effect_settings: passed
+  automated_gate: passed
   manual_gate: pending
-  status: rebuilding-after-package-visible-change
+  status: release-candidate-awaiting-manual-review
 
 rules:
   - dev-remains-the-canonical-modern-implementation
