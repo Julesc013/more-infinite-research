@@ -5,7 +5,7 @@ applies_to: "3.0.5+"
 audience: developer
 doc_type: explanation
 owner: mir-maintainers
-last_reviewed: 2026-07-10
+last_reviewed: 2026-07-12
 supersedes: []
 superseded_by: []
 ---
@@ -32,10 +32,13 @@ Each profile declares:
 - weapon-overlap default;
 - technology overlay policy;
 - feature switches;
-- unsupported streams, mods, effects, and settings;
+- positive supported mod namespaces and technology effect types on maintained modern lines;
+- temporary unsupported-stream/effect/settings cuts only on historical reduced profiles awaiting refresh;
 - required validation groups.
 
 `target_line.lua` converts the selected profile into the stable adapter API used by settings, planning, emission, stage orchestration, and runtime state. Target profiles classify capabilities; they do not create or mutate prototypes.
+
+For Factorio 2.1 and 2.0, stream descriptors declare required features, mods, prototypes, technologies, and effect types. The selected profile must positively admit every required feature, mod namespace, and effect type. These profiles are not allowed to carry the older `unsupported_streams`, `unsupported_required_mods`, or `unsupported_effect_types` denylists. Historical reduced profiles retain that transitional shape until their independent refresh and binary-proof waves.
 
 Profiles for released lines record validated historical behavior. Profiles for Factorio 0.16 and 0.15 are explicitly marked as planned and do not constitute binary support claims. Their science and effect surfaces still require matching target-binary proof.
 

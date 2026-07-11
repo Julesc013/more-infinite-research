@@ -48,5 +48,18 @@ function Get-MIRTargetProfile {
     throw "Factorio $FactorioVersion has invalid runtime_state_backend $($profile.runtime_state_backend)."
   }
 
+  if ($FactorioVersion -in @("2.0", "2.1")) {
+    foreach ($positiveField in @("supported_required_mods", "supported_effect_types")) {
+      if ($null -eq $profile.$positiveField) {
+        throw "Maintained modern Factorio $FactorioVersion profile is missing positive field $positiveField."
+      }
+    }
+    foreach ($legacyNegativeField in @("unsupported_streams", "unsupported_required_mods", "unsupported_effect_types")) {
+      if ($null -ne $profile.$legacyNegativeField) {
+        throw "Maintained modern Factorio $FactorioVersion profile must not use legacy negative field $legacyNegativeField."
+      }
+    }
+  }
+
   return $profile
 }

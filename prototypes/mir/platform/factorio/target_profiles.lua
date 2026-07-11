@@ -26,9 +26,25 @@ local M = {
         technology_constant_overlays = true,
         productivity_family_adoption = true
       },
-      unsupported_streams = {},
-      unsupported_required_mods = {},
-      unsupported_effect_types = {},
+      supported_required_mods = {
+        "space-age"
+      },
+      supported_effect_types = {
+        "cargo-landing-pad-count",
+        "character-build-distance",
+        "character-crafting-speed",
+        "character-inventory-slots-bonus",
+        "character-item-drop-distance",
+        "character-logistic-trash-slots",
+        "character-mining-speed",
+        "character-reach-distance",
+        "character-resource-reach-distance",
+        "character-running-speed",
+        "gun-speed",
+        "laboratory-productivity",
+        "max-cargo-bay-unloading-distance",
+        "worker-robot-battery"
+      },
       omitted_global_settings = {},
       required_validation_groups = {
         "static",
@@ -66,14 +82,22 @@ local M = {
         technology_constant_overlays = true,
         productivity_family_adoption = true
       },
-      unsupported_streams = {
-        "research_cargo_bay_unloading_distance",
-        "research_cargo_landing_pad_count"
+      supported_required_mods = {
+        "space-age"
       },
-      unsupported_required_mods = {},
-      unsupported_effect_types = {
-        "cargo-landing-pad-count",
-        "max-cargo-bay-unloading-distance"
+      supported_effect_types = {
+        "character-build-distance",
+        "character-crafting-speed",
+        "character-inventory-slots-bonus",
+        "character-item-drop-distance",
+        "character-logistic-trash-slots",
+        "character-mining-speed",
+        "character-reach-distance",
+        "character-resource-reach-distance",
+        "character-running-speed",
+        "gun-speed",
+        "laboratory-productivity",
+        "worker-robot-battery"
       },
       omitted_global_settings = {},
       required_validation_groups = {
