@@ -9,7 +9,9 @@ local M = {}
 local function selected_value(setting_name, descriptor)
   local value = effective_settings.get(setting_name)
   if type(value) ~= "number" then return descriptor.canonical_anchor end
-  local selected = value / descriptor.display_multiplier
+  local display_multiplier = descriptor.display_multiplier
+    or (descriptor.unit == "percent" and 100 or 1)
+  local selected = value / display_multiplier
   if selected <= 0 then return descriptor.canonical_anchor end
   return selected
 end

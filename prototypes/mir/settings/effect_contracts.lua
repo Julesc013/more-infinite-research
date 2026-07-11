@@ -200,15 +200,18 @@ function M.stream_setting_spec(key, stream)
 end
 
 function M.base_default_descriptor(key)
-  local descriptor = base_default_anchors[key]
-  return descriptor and deepcopy(descriptor) or nil
+  local source = base_default_anchors[key]
+  if not source then return nil end
+  local descriptor = deepcopy(source)
+  descriptor.field = descriptor.field or "modifier"
+  descriptor.display_multiplier = descriptor.display_multiplier
+    or (descriptor.unit == "percent" and 100 or 1)
+  return descriptor
 end
 
 function M.base_setting_spec(key)
   local descriptor = M.base_default_descriptor(key)
   if not descriptor then return nil end
-  descriptor.field = "modifier"
-  descriptor.display_multiplier = descriptor.unit == "percent" and 100 or 1
   return setting_spec(M.base_setting_name(key), descriptor)
 end
 
