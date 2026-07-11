@@ -1169,6 +1169,8 @@ Invoke-RepoCheck "compat audit automation tooling is wired" {
     @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = "Get-MIRSafeScenarioFileName" },
     @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = "[int]`$ScenarioTimeoutSeconds = 900" },
     @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = "Stop-Process -Id `$process.Id -Force" },
+    @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = '"--config", $configPath' },
+    @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = "write-data=`$UserDataDir" },
     @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = "source_path" },
     @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = '[string]$ZipPath = ""' },
     @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = '"artifacts"' },
@@ -2257,6 +2259,22 @@ function Set-CopiedEffectPerLevelDefaults {
   }
 }
 
+function Set-CopiedBaseEffectPerLevelDefaults {
+  param(
+    [string]$ModsDir,
+    [hashtable]$Overrides
+  )
+
+  foreach ($baseExtensionKey in @($Overrides.Keys | Sort-Object)) {
+    $value = [double]$Overrides[$baseExtensionKey]
+    $literal = $value.ToString([System.Globalization.CultureInfo]::InvariantCulture)
+    Set-CopiedGeneratedStartupSettingDefault `
+      -ModsDir $ModsDir `
+      -Name "mir-effect-per-level-$baseExtensionKey" `
+      -ValueLiteral $literal
+  }
+}
+
 function Set-CopiedLabPolicySkip {
   param([string]$ModsDir)
   Set-CopiedStartupSettingDefault -ModsDir $ModsDir -Name "mir-lab-incompatibility-policy" -ValueLiteral '"skip"'
@@ -2437,6 +2455,7 @@ function Initialize-RuntimeScenario {
     [string[]]$DisabledStreamKeys = @(),
     [string[]]$DisabledBaseExtensionKeys = @(),
     [hashtable]$EffectPerLevelOverrides = @{},
+    [hashtable]$BaseEffectPerLevelOverrides = @{},
     [hashtable]$BaseMaxLevelOverrides = @{},
     [switch]$LabPolicySkip,
     [ValidateSet("configured", "space", "space-and-promethium", "space-age-progression", "official-progression", "mod-progression", "all-official", "all")]
@@ -2540,6 +2559,7 @@ function Initialize-RuntimeScenario {
     Set-CopiedBaseExtensionDisabled -ModsDir $modsDir -BaseExtensionKey $baseExtensionKey
   }
   Set-CopiedEffectPerLevelDefaults -ModsDir $modsDir -Overrides $EffectPerLevelOverrides
+  Set-CopiedBaseEffectPerLevelDefaults -ModsDir $modsDir -Overrides $BaseEffectPerLevelOverrides
   foreach ($key in $BaseMaxLevelOverrides.Keys) {
     Set-CopiedBaseExtensionMaxLevel -ModsDir $modsDir -BaseExtensionKey $key -MaxLevel ([int]$BaseMaxLevelOverrides[$key])
   }
@@ -2606,6 +2626,7 @@ function Invoke-RuntimeScenario {
     [string[]]$DisabledStreamKeys = @(),
     [string[]]$DisabledBaseExtensionKeys = @(),
     [hashtable]$EffectPerLevelOverrides = @{},
+    [hashtable]$BaseEffectPerLevelOverrides = @{},
     [hashtable]$BaseMaxLevelOverrides = @{},
     [switch]$LabPolicySkip,
     [ValidateSet("configured", "space", "space-and-promethium", "space-age-progression", "official-progression", "mod-progression", "all-official", "all")]
@@ -2643,6 +2664,7 @@ function Invoke-RuntimeScenario {
       -DisabledStreamKeys $DisabledStreamKeys `
       -DisabledBaseExtensionKeys $DisabledBaseExtensionKeys `
       -EffectPerLevelOverrides $EffectPerLevelOverrides `
+      -BaseEffectPerLevelOverrides $BaseEffectPerLevelOverrides `
       -BaseMaxLevelOverrides $BaseMaxLevelOverrides `
       -LabPolicySkip:$LabPolicySkip `
       -SciencePackIngredientPolicy $SciencePackIngredientPolicy `
@@ -3881,6 +3903,13 @@ Invoke-RuntimeScenario -ScenarioName "base-extension-boundary-policy" -EnabledFi
 $baseExtensionBoundaryLine = Get-LastExtensionReportLine -Key "research-speed"
 Assert-ReportLineGenerated -Line $baseExtensionBoundaryLine -Context "Base extension boundary scenario"
 Assert-ReportLineContains -Line $baseExtensionBoundaryLine -Expected "mir-fixture-science-pack" -Context "Base extension boundary scenario"
+
+Invoke-RuntimeScenario -ScenarioName "base-effect-setting-retention" -EnabledFixtureNames @(
+  "mir-fixture-assert-generation-integrity"
+) -BaseEffectPerLevelOverrides @{
+  "research-speed" = 120
+  "worker-robots-storage" = 2
+}
 
 Invoke-WeaponSpeedPolicyMatrix -Context "Weapon shooting speed policy"
 

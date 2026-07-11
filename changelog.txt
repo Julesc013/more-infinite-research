@@ -14,6 +14,7 @@ Date: 2026-07-11
     - Rewired dependent prerequisites only after MIR emitted complete replacement coverage.
     - Isolated unrestricted module-permission arrays per prototype.
     - Made scripted effect tooltips display the selected per-level value.
+    - Preserved retained non-default base effect settings during upgrades instead of failing on an incomplete scaling descriptor.
 
   Changes:
 

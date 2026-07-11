@@ -65,6 +65,7 @@ fixtures:
       - proportional-mixed-tier-scaling
       - scripted-runtime-multiplier-delta
       - scripted-effect-selected-description
+      - retained-non-default-base-effect-settings
 
   competing-productivity-transaction:
     path: fixtures/plates-n-circuit-productivity

@@ -56,6 +56,7 @@
       "all-official-pack-policy",
       "all-pack-policy",
       "base-extension-boundary-policy",
+      "base-effect-setting-retention",
       "weapon-overlap-off-coverage-absent",
       "weapon-overlap-off-coverage-present",
       "weapon-overlap-conditional-coverage-absent",

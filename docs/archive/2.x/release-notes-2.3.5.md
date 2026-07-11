@@ -34,6 +34,8 @@ stable.
   rewired transactionally; failed generation retains the external owner.
 - Module-permission arrays are copied per prototype and scripted-effect
   tooltips carry the selected value.
+- Existing non-default base-continuation effect settings load and scale during
+  upgrades without requiring a settings reset.
 
 The settings are startup-only and require a restart. They are opt-in and can
 substantially change factory balance.
