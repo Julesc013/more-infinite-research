@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: release-manager
 doc_type: release-plan
 owner: mir-maintainers
-last_reviewed: 2026-07-10
+last_reviewed: 2026-07-12
 supersedes: []
 superseded_by: []
 ---
@@ -49,7 +49,9 @@ profiles.
 *Recipe productivity researches are infinite, but each recipe's Factorio
 `maximum_productivity` cap still applies. MIR leaves the engine's +300% recipe
 default unchanged unless you explicitly select another value under startup
-settings > Limits. The separate non-zero power floor is also off by default.*
+settings > Limits. Explicit productivity caps do not rewrite recycling-category
+recipes; recycler returns have their own separate control. The separate
+non-zero power floor is also off by default.*
 
 ## Main Features
 

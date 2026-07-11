@@ -51,7 +51,10 @@ fixtures:
       - prototype-limit-startup-overrides
       - recipe-maximum-productivity-cap
       - inverse-recycler-threshold-self-recycling-scope
+      - productivity-scope-inert-at-or-below-threshold
+      - engine-unchanged-conservative-threshold
       - cap-balanced-generated-recycling-return
+      - recycling-recipe-productivity-cap-exclusion
       - visible-recycling-process-exclusion
       - unrestricted-module-permissions
       - module-permission-array-isolation

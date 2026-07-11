@@ -58,38 +58,21 @@ superseded_candidates:
     forbidden_entries: 0
     reason: duplicate fixed 25 percent recycler row removed from the final UI
     status: superseded-unpublished-candidate
+  - source_commit: 3d1c70fa37137b962abbbdfab069a3ba70547642
+    artifact: dist/more-infinite-research_3.0.5.zip
+    sha256: C1FCF5E4045EF9D3AF74758CD508719CD2A49D2F0B565E940A0B045DAAAEF2E7
+    size_bytes: 337017
+    entries: 132
+    forbidden_entries: 0
+    reason: recycler and productivity cap controls required stricter ownership and combination fixtures
+    status: superseded-unpublished-candidate
 
 candidate:
   artifact: dist/more-infinite-research_3.0.5.zip
-  source_commit: 3d1c70fa37137b962abbbdfab069a3ba70547642
-  sha256: C1FCF5E4045EF9D3AF74758CD508719CD2A49D2F0B565E940A0B045DAAAEF2E7
-  size_bytes: 337017
-  entries: 132
-  files: 127
-  forbidden_entries: 0
-  package_content_sha256: 378C362DE80CF736A1C55FDE9AB96FCE3143C94A47BA66C8265F9D0400264626
-  package_source_sha256: 378C362DE80CF736A1C55FDE9AB96FCE3143C94A47BA66C8265F9D0400264626
-  target_profile_sha256: E1EF758114CECB4B896F5E3365B214E95EC2794A64364492BF174AFE710B3E8F
-  required_groups_sha256: 57A1DF87A8FB594B2B51C7E230D775E88028F23D52DF9D5D7DA1336F9271C78A
-  validation_harness_sha256: 5D5C4A95C6C4CDFF468C950A9CD6AA19B697FA7FB1F9A54564D3BD8D6B11365A
-  expected_scenarios_sha256: 500D63A94FC228057371D24003F7A31EE3182ED5A442E5935EB5EEA40999AB7A
-  validation_package_sha256: 2B686A7F81AE0E3CBB6C45FCCCD23F73A9C4DBC5FD661DE53B1F20B78D06F7CD
-  validation_package_content_sha256: 378C362DE80CF736A1C55FDE9AB96FCE3143C94A47BA66C8265F9D0400264626
-  structured_summary_path: .mir/evidence/3.0.5-rc10-validation-summary.json
-  structured_summary_run_id: f27adeb5-68bc-44a3-b0d9-cf1a17a59d75
-  structured_summary_status: passed
-  structured_summary_duration_seconds: 511.749
-  scenario_count: 76
-  validation_content_matches_dist: true
-  static_validation: passed
-  factorio_2_1_validation: passed
-  factorio_2_1_binary: Factorio 2.1.9 build 86829 win64 steam
-  exact_dist_base_smoke: passed
-  exact_dist_space_age_smoke: passed
-  retained_base_effect_settings: passed
-  automated_gate: passed
+  source_commit: pending
+  automated_gate: pending
   manual_gate: pending
-  status: release-candidate-awaiting-manual-review
+  status: rebuilding-after-package-visible-change
 
 rules:
   - dev-remains-the-canonical-modern-implementation
@@ -244,6 +227,14 @@ behaviors:
     impact: external-owner-coverage
     evidence: weapon-speed-safety-matrix
     status: complete
+  BP-019:
+    source: 3.0.5-community-recycler-setting-review
+    behavior: recycler returns and production productivity caps remain independent across every checkbox and dropdown combination
+    class: B-missing-and-compatible
+    decision: isolate-recycling-recipes-and-prove-inverse-threshold-boundaries
+    impact: prototype-limits
+    evidence: prototype-limits
+    status: complete
 
 release_gates:
   - static-validation
@@ -257,3 +248,4 @@ release_gates:
   - exact-dist-package-validation
   - complete-structured-validation-summary
   - rigor-late-recipe-removal
+  - prototype-limit-combination-boundaries

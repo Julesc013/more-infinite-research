@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: maintainer
 doc_type: explanation
 owner: mir-maintainers
-last_reviewed: 2026-07-08
+last_reviewed: 2026-07-12
 supersedes: []
 superseded_by: []
 ---
@@ -122,10 +122,14 @@ owns the optional pipeline extent prototype pass.
 `prototypes/mir/settings/prototype_limits.lua` owns the prototype-limit setting
 catalog and value parser. `prototypes/mir/pipeline/prototype_limits.lua` owns
 the optional data-final-fixes prototype mutation pass for selected recipe
-productivity and effect receiver limits. The same pass owns explicit generated
+productivity and effect receiver limits. Recipe productivity caps apply only to
+non-parameter, non-recycling recipes. The same pass owns explicit generated
 recycler-return scaling because it is a global prototype-limit balance choice;
-it excludes visible recycling processes such as scrap recycling. Positive
-speed caps and negative speed floors remain independently selectable.
+it changes only eligible hidden generated recycler probabilities and never
+rewrites recycling-recipe productivity caps or visible processes such as scrap
+recycling. The optional inverse-return scope is inert at or below its threshold
+and uses the normal 25% generated return as the engine-unchanged baseline.
+Positive speed caps and negative speed floors remain independently selectable.
 `prototypes/mir/settings/effect_contracts.lua` owns pure typed per-level effect
 descriptors used by the settings catalog. Runtime setting lookup and scaling
 remain in `prototypes/mir/settings/effect_scaling.lua`, keeping catalog/profile
