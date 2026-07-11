@@ -619,6 +619,12 @@ Factorio mod Lua cannot use arbitrary filesystem output in normal mod code, so M
 
 Instrument mode is a development tool, not a shipped MIR package feature.
 
+## Validation Tooling Boundary
+
+`scripts/Invoke-MIRValidation.ps1` remains the stable validation facade. Reusable concerns live under `scripts/validation/`: package identity, target metadata, scenario grouping, structured evidence aggregation, and Factorio process/copied-mod handling. Extracted modules receive paths explicitly and must retain the facade's existing parameters, scenario names, group assignments, and schema-2 result contract.
+
+The process module owns hidden process launch, timeout termination, safe copied-mod replacement, and release-shaped source copying. Scenario orchestration may call it but must not reimplement those operations inline.
+
 ## Architecture Lints
 
 Static validation should eventually fail when:

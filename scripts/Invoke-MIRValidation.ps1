@@ -15,6 +15,7 @@ $repo = Resolve-Path (Join-Path $PSScriptRoot "..")
 . (Join-Path $repo "scripts\validation\TargetProfiles.ps1")
 . (Join-Path $repo "scripts\validation\ScenarioGroups.ps1")
 . (Join-Path $repo "scripts\validation\ResultAggregation.ps1")
+. (Join-Path $repo "scripts\validation\FactorioProcess.ps1")
 $repoInfo = Get-Content -Raw (Join-Path $repo "info.json") | ConvertFrom-Json
 $targetProfile = Get-MIRTargetProfile -RepoRoot $repo -FactorioVersion $repoInfo.factorio_version
 $isFactorio017Line = $repoInfo.factorio_version -eq "0.17"
@@ -2058,93 +2059,6 @@ disable-blueprint-storage=true
 "@
 Set-Content -LiteralPath $factorioConfigPath -Value $factorioConfigText -Encoding UTF8
 
-function Invoke-FactorioProcess {
-  param(
-    [string]$FilePath,
-    [string[]]$Arguments,
-    [int]$TimeoutMs = 300000
-  )
-
-  $processInfo = [System.Diagnostics.ProcessStartInfo]::new()
-  $processInfo.FileName = $FilePath
-  $processInfo.UseShellExecute = $false
-  $processInfo.CreateNoWindow = $true
-  $processInfo.WindowStyle = [System.Diagnostics.ProcessWindowStyle]::Hidden
-  foreach ($arg in $Arguments) {
-    [void]$processInfo.ArgumentList.Add($arg)
-  }
-
-  $process = [System.Diagnostics.Process]::Start($processInfo)
-  if (-not $process.WaitForExit($TimeoutMs)) {
-    try {
-      $process.Kill($true)
-    } catch {
-      $process.Kill()
-    }
-    throw "Factorio runtime validation timed out after $TimeoutMs ms."
-  }
-  return $process.ExitCode
-}
-
-function Remove-CopiedModDirectory {
-  param([string]$Name, [string]$ModsDir)
-  $modsRootWithSeparator = (Resolve-Path -LiteralPath $ModsDir).Path.TrimEnd("\") + "\"
-  $target = Join-Path $modsDir $Name
-  if (Test-Path -LiteralPath $target) {
-    $resolvedTarget = (Resolve-Path -LiteralPath $target).Path
-    if (-not $resolvedTarget.StartsWith($modsRootWithSeparator, [System.StringComparison]::OrdinalIgnoreCase)) {
-      throw "Refusing to remove mod directory outside scenario mods root: $resolvedTarget"
-    }
-    Remove-Item -LiteralPath $resolvedTarget -Recurse -Force
-  }
-  return $target
-}
-
-function Copy-ModDirectory {
-  param([string]$Source, [string]$Name, [string]$ModsDir)
-  $target = Remove-CopiedModDirectory -Name $Name -ModsDir $ModsDir
-  Copy-Item -LiteralPath $Source -Destination $target -Recurse
-}
-
-function Copy-RepositoryModDirectory {
-  param([string]$ModsDir)
-
-  $target = Remove-CopiedModDirectory -Name "more-infinite-research" -ModsDir $ModsDir
-  New-Item -ItemType Directory -Force -Path $target | Out-Null
-
-  $files = @(
-    "changelog.txt",
-    "control.lua",
-    "data-final-fixes.lua",
-    "data-updates.lua",
-    "data.lua",
-    "info.json",
-    "LICENSE",
-    "README.md",
-    "settings.lua",
-    "thumbnail.png"
-  )
-  $directories = @(
-    "migrations",
-    "locale",
-    "prototypes"
-  )
-
-  foreach ($file in $files) {
-    $source = Join-Path $repo $file
-    if (Test-Path -LiteralPath $source) {
-      Copy-Item -LiteralPath $source -Destination (Join-Path $target $file)
-    }
-  }
-
-  foreach ($directory in $directories) {
-    $source = Join-Path $repo $directory
-    if (Test-Path -LiteralPath $source) {
-      Copy-Item -LiteralPath $source -Destination (Join-Path $target $directory) -Recurse
-    }
-  }
-}
-
 $fixtureRoot = Join-Path $repo "fixtures"
 if (-not (Test-Path -LiteralPath $fixtureRoot)) {
   throw "Fixture directory not found: $fixtureRoot"
@@ -2477,11 +2391,11 @@ function Initialize-RuntimeScenario {
   $modsDir = Join-Path $scenarioRoot "mods"
   New-Item -ItemType Directory -Force -Path $modsDir | Out-Null
 
-  Copy-RepositoryModDirectory -ModsDir $modsDir
+  Copy-MIRRepositoryModDirectory -RepoRoot $repo -ModsDir $modsDir
 
   $fixtureInfos = Get-FixtureInfos
   foreach ($fixtureInfo in $fixtureInfos) {
-    Copy-ModDirectory -Source $fixtureInfo.Path -Name $fixtureInfo.Name -ModsDir $modsDir
+    Copy-MIRModDirectory -Source $fixtureInfo.Path -Name $fixtureInfo.Name -ModsDir $modsDir
   }
 
   $fixtureNames = @($fixtureInfos | Select-Object -ExpandProperty Name)

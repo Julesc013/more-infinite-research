@@ -307,3 +307,16 @@ rules:
   - Historical branches provide behavior evidence and do not define a parallel core.
   - Public extension framework work is outside the 3.0.5 convergence boundary.
   - Top-level MIR Lua module dependencies must remain acyclic.
+
+validation_tooling:
+  facade: scripts/Invoke-MIRValidation.ps1
+  modules:
+    package_identity: scripts/validation/PackageIdentity.ps1
+    target_metadata: scripts/validation/TargetProfiles.ps1
+    scenario_groups: scripts/validation/ScenarioGroups.ps1
+    structured_evidence: scripts/validation/ResultAggregation.ps1
+    factorio_process: scripts/validation/FactorioProcess.ps1
+  rules:
+    - the facade preserves its public parameters and structured result schema
+    - process launch and copied-mod filesystem safety are reusable modules
+    - scenarios retain stable names and explicit groups while decomposition proceeds
