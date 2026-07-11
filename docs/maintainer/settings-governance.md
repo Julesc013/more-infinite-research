@@ -144,8 +144,9 @@ must preserve engine or configured baseline behavior and bypass the optional
 transformation. Use an existing stable enum when it already has that meaning:
 `configured`, `off`, and pipeline `100` are neutral. Use `engine-default` when
 the setting controls a Factorio prototype or when an explicit MIR policy bypass
-is needed. A neutral label must include `unchanged` or `bypass` so its behavior
-is visible without opening source code.
+is needed. Prototype-preserving values may use `unchanged`. MIR-added features
+use concise mod-specific labels such as `Off`, `Configured packs`, or `No MIR
+adjustment`; do not describe those choices as engine behavior.
 
 Do not remove or rename released enum values when broadening a dropdown. Numeric
 dropdowns use monotonic, reusable ladders: quarter steps around baseline,
