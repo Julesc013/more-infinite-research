@@ -302,10 +302,10 @@ release_artifacts:
       status: published
   next_release_targets:
     current_line:
-      version: "3.0.5"
+      version: "3.1.0"
       branch: dev
       target_factorio: "2.1"
-      purpose: accumulated portable fixes, compatibility lessons, tooling updates, docs corrections, and community feedback after the 3.0.0 backport rings
+      purpose: bounded correctness, contract modernization, deterministic packaging, and fixture-backed capability expansion from the frozen 3.0.5 baseline
     factorio_1_1_port:
       version: "1.9.3"
       branch: tmp/1.1
