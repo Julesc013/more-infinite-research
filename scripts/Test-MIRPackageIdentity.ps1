@@ -87,6 +87,16 @@ try {
     throw "Validation-harness fingerprint differs between LF and CRLF checkouts."
   }
 
+  $lfExpected = Get-MIRFileContentSha256 `
+    -Path (Join-Path $lfRoot "fixtures/case.json") `
+    -RelativePath "fixtures/compat-matrix/expected-scenarios.json"
+  $crlfExpected = Get-MIRFileContentSha256 `
+    -Path (Join-Path $crlfRoot "fixtures/case.json") `
+    -RelativePath "fixtures/compat-matrix/expected-scenarios.json"
+  if ($lfExpected -ne $crlfExpected) {
+    throw "Expected-scenario fingerprint differs between LF and CRLF checkouts."
+  }
+
   $lfZip = Join-Path $testRoot "lf.zip"
   $crlfZip = Join-Path $testRoot "crlf.zip"
   New-MIRIdentityTestZip -Path $lfZip -Text "one`ntwo`n"

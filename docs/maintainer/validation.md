@@ -57,10 +57,11 @@ checks both complete and interrupted result shapes during static validation.
 
 ## Reproducible Candidate Fingerprints
 
-Package-source, packaged-content, and validation-harness fingerprints normalize
-text files to UTF-8 with LF line endings before hashing. This makes one clean
-Git commit retain the same content identity under LF and CRLF checkout policy.
-Binary files and the final release archive remain byte-exact SHA-256 inputs.
+Package-source, packaged-content, validation-harness, and expected-scenario
+fingerprints normalize text files to UTF-8 with LF line endings before hashing.
+This makes one clean Git commit retain the same content identity under LF and
+CRLF checkout policy. Binary files and the final release archive remain
+byte-exact SHA-256 inputs.
 
 `scripts/Test-MIRPackageIdentity.ps1` proves that LF and CRLF copies produce
 matching semantic fingerprints, that binary/archive byte hashes remain exact,

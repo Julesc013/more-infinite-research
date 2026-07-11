@@ -1985,7 +1985,7 @@ Initialize-MIRValidationResult `
   -PackageSourceGitDirty (Test-MIRPackageSourceGitDirty -RepoRoot $repo) `
   -ValidationHarnessSha256 (Get-MIRValidationHarnessFingerprint -RepoRoot $repo) `
   -ValidationHarnessGitDirty (Test-MIRValidationHarnessGitDirty -RepoRoot $repo) `
-  -ExpectedScenariosSha256 (Get-MIRFileSha256 -Path $expectedScenariosPath) `
+  -ExpectedScenariosSha256 (Get-MIRFileContentSha256 -Path $expectedScenariosPath -RelativePath "fixtures/compat-matrix/expected-scenarios.json") `
   -ExpectedScenarios $expectedScenarios | Out-Null
 Add-MIRValidationCompletedScenario -Name "static-validation" -Group "static" -EvidencePaths @("scripts/Invoke-MIRValidation.ps1")
 Add-MIRValidationCompletedScenario -Name "package-build" -Group "package" -EvidencePaths @("build/validation-dist")
