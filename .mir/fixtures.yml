@@ -118,6 +118,10 @@ fixtures:
       - settings-profile-compact-export
       - settings-profile-strict-import-validation
       - hidden-provider-setting-profile-roundtrip
+      - every-effect-setting-profile-roundtrip
+      - all-default-effect-settings-compact-omission
+      - effect-setting-numeric-bound-rejection
+      - settings-catalog-copy-isolation
 
   reduced-settings-surface:
     assertion_path: fixtures/assert-reduced-settings-surface
