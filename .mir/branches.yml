@@ -148,25 +148,32 @@ release_artifacts:
           files: 127
           reason: documentation reorganization changed packaged README content and the validation harness
           status: superseded-unpublished-candidate
-      candidate_commit: 8891d675062416764d181b27497a6fa1ef42e070
+        - candidate_commit: 8891d675062416764d181b27497a6fa1ef42e070
+          sha256: 40AF95C3F4411DDF6C24C98897489D696339A1B85B0439FA4A3BDFEDDDF0E5C5
+          size_bytes: 337527
+          entries: 132
+          files: 127
+          reason: raw text fingerprints differed between local CRLF and GitHub Actions LF checkouts
+          status: superseded-unpublished-candidate
+      candidate_commit: b1a8a76fac549fd8164a8910f77b1c665c69589f
       artifact: dist/more-infinite-research_3.0.5.zip
       sha256: 40AF95C3F4411DDF6C24C98897489D696339A1B85B0439FA4A3BDFEDDDF0E5C5
       size_bytes: 337527
       entries: 132
       files: 127
       forbidden_entries: 0
-      package_content_sha256: 54295B33408FB00A796F4CD0C4174477AFAC9CEBC7F3D9BC834633360DF53DE9
-      package_source_sha256: 54295B33408FB00A796F4CD0C4174477AFAC9CEBC7F3D9BC834633360DF53DE9
+      package_content_sha256: 17752E868FA9DD697F99B8C8621A34B60BF9039C2A0604C309FBA7D606AD65F1
+      package_source_sha256: 17752E868FA9DD697F99B8C8621A34B60BF9039C2A0604C309FBA7D606AD65F1
       target_profile_sha256: E1EF758114CECB4B896F5E3365B214E95EC2794A64364492BF174AFE710B3E8F
       required_groups_sha256: 57A1DF87A8FB594B2B51C7E230D775E88028F23D52DF9D5D7DA1336F9271C78A
-      validation_harness_sha256: 6F9256043ECD174002F7A5767A89DAB9CE6536A9097DA6C53A99CFF88F1F278A
+      validation_harness_sha256: 3B6671775610CCEAFDB85CFA3F01B0C1E8FF8CEE2799A5B43E056CA4A80D5F2C
       expected_scenarios_sha256: 293639DC393025C47D186CB932C584D77958AAC6F916F952D176AADE26E9EB8D
       validation_package_sha256: 526E2EFA9B0F0CAA5BE785A3D06D548FF3B11B95121BCD3E6D4131F34E4F4988
-      validation_package_content_sha256: 54295B33408FB00A796F4CD0C4174477AFAC9CEBC7F3D9BC834633360DF53DE9
-      structured_summary_path: .mir/evidence/3.0.5-rc13-validation-summary.json
-      structured_summary_run_id: 2916dd99-8ea2-435b-b3a4-0ae4fae0cf0c
+      validation_package_content_sha256: 17752E868FA9DD697F99B8C8621A34B60BF9039C2A0604C309FBA7D606AD65F1
+      structured_summary_path: .mir/evidence/3.0.5-rc14-validation-summary.json
+      structured_summary_run_id: a09cc185-3bea-4cf3-8eef-aa59114de18d
       structured_summary_status: passed
-      structured_summary_duration_seconds: 545.679
+      structured_summary_duration_seconds: 510.349
       scenario_count: 79
       validation_content_matches_dist: true
       static_validation: passed
