@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: maintainer
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-07-10
+last_reviewed: 2026-07-12
 supersedes: ["testing.md"]
 superseded_by: []
 ---
@@ -54,3 +54,14 @@ An observed nonzero exit, fatal log marker, or assertion is a failure.
 The final gate calls `Complete-MIRValidationRun`, which rejects any required
 target-profile group that did not pass. `scripts/Test-MIRValidationResults.ps1`
 checks both complete and interrupted result shapes during static validation.
+
+## Reproducible Candidate Fingerprints
+
+Package-source, packaged-content, and validation-harness fingerprints normalize
+text files to UTF-8 with LF line endings before hashing. This makes one clean
+Git commit retain the same content identity under LF and CRLF checkout policy.
+Binary files and the final release archive remain byte-exact SHA-256 inputs.
+
+`scripts/Test-MIRPackageIdentity.ps1` proves that LF and CRLF copies produce
+matching semantic fingerprints, that binary/archive byte hashes remain exact,
+and that a real text change still changes the package identity.
