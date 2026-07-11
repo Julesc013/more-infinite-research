@@ -316,7 +316,9 @@ validation_tooling:
     scenario_groups: scripts/validation/ScenarioGroups.ps1
     structured_evidence: scripts/validation/ResultAggregation.ps1
     factorio_process: scripts/validation/FactorioProcess.ps1
+    settings_overrides: scripts/validation/SettingsOverrides.ps1
   rules:
     - the facade preserves its public parameters and structured result schema
     - process launch and copied-mod filesystem safety are reusable modules
+    - settings overrides are declarative and isolated from scenario orchestration
     - scenarios retain stable names and explicit groups while decomposition proceeds
