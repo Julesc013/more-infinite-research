@@ -822,7 +822,7 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-science-pack-ingredient-policy-all-official=All official science packs' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-science-pack-ingredient-policy-all=All lab science packs' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = '[string-mod-setting-description]' },
-    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = "mir-science-pack-ingredient-policy-configured=Keep each generated technology's configured science packs unchanged and bypass optional ingredient expansion. Safest default." },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = "mir-science-pack-ingredient-policy-configured=Use each generated technology's configured science packs without optional ingredient expansion. MIR default." },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-lab-incompatibility-policy-reduce=Use researchable packs' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-lab-incompatibility-policy-skip=Skip unsupported techs' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-lab-incompatibility-policy-engine-default=No MIR adjustment' },
