@@ -132,10 +132,14 @@ default in its numeric position.
 | `mir-prototype-speed-cap` | `effect_receiver.speed_limits.high` on supported machines, labs, drills, and agricultural towers |
 | `mir-prototype-quality-cap` | `effect_receiver.quality_limits.high` on supported machines, labs, drills, and agricultural towers |
 
-`mir-productivity-cap-self-recycling-only` is a default-off scope guard for
-selected productivity caps above +300%. It raises only recipes classified as a
-single-item, expected-value non-generative self-recycling path; nonqualifying
-recipes retain their existing cap and the recycling recipe is never raised.
+`mir-productivity-cap-self-recycling-only` is a default-off scope guard whose
+threshold is the inverse of the effective recycler return:
+`(1 / return chance) - 1`. Selected productivity above that threshold is
+available only to recipes classified as a single-item, expected-value
+non-generative self-recycling path. Other recipes are capped at the threshold;
+the recycling recipe itself is never raised. A zero return produces no finite
+restriction, and cap-matched recycling makes the threshold equal the selected
+productivity cap.
 
 `mir-recycling-return-chance` targets only hidden generated recipes in the
 `recycling` category with one item input and `unlock_results = false`. Automatic

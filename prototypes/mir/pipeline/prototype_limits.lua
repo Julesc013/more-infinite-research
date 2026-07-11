@@ -49,20 +49,34 @@ local function set_limit(receiver, field, side, value)
   receiver[field][side] = value
 end
 
-local function apply_recipe_productivity_cap(value)
+local function inverse_recycling_productivity_bonus(recycling_chance)
+  local chance = tonumber(recycling_chance)
+  if chance == nil then chance = 0.25 end
+  if chance <= 0 then return math.huge end
+  return math.max(0, (1 / chance) - 1)
+end
+
+local function apply_recipe_productivity_cap(value, recycling_chance)
   if value == nil then return 0 end
 
   local changed = 0
   local scoped = effective_settings.get(prototype_limit_settings.self_recycling_scope_setting_name) == true
+  local scope_threshold = inverse_recycling_productivity_bonus(recycling_chance)
+  local scope_classifier = scoped and value > scope_threshold and cap_scope.build() or nil
   local approved = 0
   local rejected = 0
   for _, recipe in pairs(data_raw.prototypes("recipe")) do
     if type(recipe) == "table" and recipe.parameter ~= true then
       local should_apply = true
-      if scoped and value > 3.0 then
-        local safe = cap_scope.approve(recipe)
-        should_apply = safe == true
-        if should_apply then approved = approved + 1 else rejected = rejected + 1 end
+      if scope_classifier then
+        local safe = scope_classifier.approve(recipe)
+        if safe == true then approved = approved + 1 else rejected = rejected + 1 end
+        local target = safe == true and value or scope_threshold
+        if recipe.maximum_productivity ~= target then
+          recipe.maximum_productivity = target
+          changed = changed + 1
+        end
+        should_apply = false
       end
       if should_apply then
         local current = recipe.maximum_productivity
@@ -77,9 +91,10 @@ local function apply_recipe_productivity_cap(value)
       end
     end
   end
-  if scoped and value > 3.0 then
+  if scope_classifier then
     log("[more-infinite-research] Productivity cap self-recycling scope: approved="
-      .. tostring(approved) .. " rejected=" .. tostring(rejected) .. ".")
+      .. tostring(approved) .. " rejected=" .. tostring(rejected)
+      .. " inverse_threshold=" .. tostring(scope_threshold) .. ".")
   end
   return changed
 end
@@ -228,7 +243,7 @@ function P.apply()
   local recycling = apply_recycling_return_chance(productivity_cap)
   local changed = {
     recycling = recycling,
-    productivity = apply_recipe_productivity_cap(productivity_cap),
+    productivity = apply_recipe_productivity_cap(productivity_cap, recycling.chance),
     efficiency = apply_effect_receiver_limit("consumption_limits", "low", selected("efficiency")),
     pollution = apply_effect_receiver_limit("pollution_limits", "low", selected("pollution")),
     speed_floor = apply_effect_receiver_limit("speed_limits", "low", selected("speed_floor")),

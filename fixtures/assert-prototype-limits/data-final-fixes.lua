@@ -138,18 +138,22 @@ local function assert_close(label, actual, expected)
 end
 
 if expected_productivity then
+  local inverse_threshold = recycling_chance and recycling_chance > 0
+    and math.max(0, (1 / recycling_chance) - 1) or math.huge
   local recipe = data.raw.recipe and data.raw.recipe["iron-gear-wheel"]
   if not recipe then fail("missing iron-gear-wheel recipe.") end
-  if not (scoped_cap and expected_productivity > 3) then
+  if not (scoped_cap and expected_productivity > inverse_threshold) then
     assert_close("iron-gear-wheel maximum_productivity", recipe.maximum_productivity, expected_productivity)
+  else
+    assert_close("iron-gear-wheel inverse recycling maximum_productivity", recipe.maximum_productivity, inverse_threshold)
   end
-  if scoped_cap and expected_productivity > 3 then
+  if scoped_cap and expected_productivity > inverse_threshold then
     local safe = data.raw.recipe["mir-fixture-self-recycling-production"]
     local unsafe = data.raw.recipe["mir-fixture-non-recycling-production"]
     local loop = data.raw.recipe["mir-fixture-self-recycling-loop"]
     if safe then assert_close("self-recycling production maximum_productivity", safe.maximum_productivity, expected_productivity) end
-    if unsafe and unsafe.maximum_productivity ~= nil then fail("non-recycling production recipe was raised by scoped cap.") end
-    if loop and loop.maximum_productivity ~= nil then fail("self-recycling loop recipe was raised by scoped cap.") end
+    if unsafe then assert_close("non-recycling production inverse cap", unsafe.maximum_productivity, inverse_threshold) end
+    if loop then assert_close("self-recycling loop inverse cap", loop.maximum_productivity, inverse_threshold) end
   end
 end
 
