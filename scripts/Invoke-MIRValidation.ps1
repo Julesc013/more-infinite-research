@@ -72,7 +72,8 @@ function Get-MIRSettingsSourceText {
     "prototypes/mir/settings/effect_scaling.lua",
     "prototypes/mir/settings/pipeline_extent.lua",
     "prototypes/mir/settings/prototype_limits.lua",
-    "prototypes/mir/settings/stage_builder.lua"
+    "prototypes/mir/settings/stage_builder.lua",
+    "prototypes/mir/domain/streams/descriptor.lua"
   )
 }
 
@@ -616,7 +617,7 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'order = setting_order.global("compatibility", 30)' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'local function append_note(description, note)' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'local function add_technology_setting(group, setting)' },
-    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'local stream_sort_names = {' },
+    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'local settings_sort_names = {' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'research_agricultural_growth_speed = "Agricultural growth speed"' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'research_character_reach = "Character reach bonus"' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'research_oil_processing_productivity = "Oil processing productivity"' },
@@ -2201,60 +2202,12 @@ function Get-FixtureInfos {
 
 function Enable-CopiedDiagnostics {
   param([string]$ModsDir)
-  $copiedDiagnosticsPath = Join-Path $ModsDir "more-infinite-research\prototypes\mir\report\diagnostics_sink.lua"
-  if (-not (Test-Path -LiteralPath $copiedDiagnosticsPath)) {
-    $copiedDiagnosticsPath = Join-Path $ModsDir "more-infinite-research\prototypes\diagnostics.lua"
-  }
-  $copiedDiagnostics = Get-Content -Raw -LiteralPath $copiedDiagnosticsPath
-  $copiedDiagnostics = $copiedDiagnostics -replace 'return startup_setting\("mir-debug-generation-report"\) == true', 'return true'
-  Set-Content -LiteralPath $copiedDiagnosticsPath -Value $copiedDiagnostics -Encoding UTF8
+  Set-CopiedStartupSettingDefault -ModsDir $ModsDir -Name "mir-debug-generation-report" -ValueLiteral "true"
 }
 
 function Enable-CopiedScriptedDiagnostics {
   param([string]$ModsDir)
   Set-CopiedStartupSettingDefault -ModsDir $ModsDir -Name "mir-debug-scripted-effects" -ValueLiteral "true"
-}
-
-function Get-CopiedSettingsImplementationPath {
-  param([string]$ModsDir)
-
-  $candidates = @(
-    "more-infinite-research\prototypes\mir\settings\stage_builder.lua",
-    "more-infinite-research\settings.lua"
-  )
-
-  foreach ($relative in $candidates) {
-    $path = Join-Path $ModsDir $relative
-    if (Test-Path -LiteralPath $path) {
-      return $path
-    }
-  }
-
-  throw "Unable to find copied settings implementation."
-}
-
-function Get-CopiedStartupSettingImplementationPaths {
-  param([string]$ModsDir)
-
-  $candidates = @(
-    "more-infinite-research\prototypes\mir\settings\catalog.lua",
-    "more-infinite-research\prototypes\mir\settings\stage_builder.lua",
-    "more-infinite-research\settings.lua"
-  )
-
-  $paths = @()
-  foreach ($relative in $candidates) {
-    $path = Join-Path $ModsDir $relative
-    if (Test-Path -LiteralPath $path) {
-      $paths += $path
-    }
-  }
-
-  if ($paths.Count -eq 0) {
-    throw "Unable to find copied settings implementation."
-  }
-
-  return $paths
 }
 
 function Set-CopiedStartupSettingDefault {
@@ -2264,22 +2217,18 @@ function Set-CopiedStartupSettingDefault {
     [string]$ValueLiteral
   )
 
-  $escapedName = [regex]::Escape($Name)
-  $pattern = "(?s)(name\s*=\s*`"$escapedName`".*?default_value\s*=\s*)([^,\r\n]+)"
-  foreach ($copiedSettingsPath in Get-CopiedStartupSettingImplementationPaths -ModsDir $ModsDir) {
-    $copiedSettings = Get-Content -Raw -LiteralPath $copiedSettingsPath
-    $match = [regex]::Match($copiedSettings, $pattern)
-    if ($match.Success) {
-      $valueGroup = $match.Groups[2]
-      $copiedSettings = $copiedSettings.Substring(0, $valueGroup.Index) +
-        $ValueLiteral +
-        $copiedSettings.Substring($valueGroup.Index + $valueGroup.Length)
-      Set-Content -LiteralPath $copiedSettingsPath -Value $copiedSettings -Encoding UTF8
-      return
-    }
+  $overridePath = Join-Path $ModsDir "more-infinite-research\prototypes\mir\settings\test_overrides.lua"
+  if (-not (Test-Path -LiteralPath $overridePath -PathType Leaf)) {
+    throw "Unable to find declarative settings override module."
   }
-
-  throw "Unable to find startup setting default for $Name in copied settings implementation."
+  $escapedNameLiteral = $Name.Replace("\", "\\").Replace('"', '\"')
+  $declaration = "overrides[`"$escapedNameLiteral`"] = $ValueLiteral`r`n"
+  $text = Get-Content -Raw -LiteralPath $overridePath
+  if (-not $text.Contains("return overrides")) {
+    throw "Declarative settings override module is missing its return marker."
+  }
+  $text = $text.Replace("return overrides", $declaration + "return overrides")
+  Set-Content -LiteralPath $overridePath -Value $text -Encoding UTF8
 }
 
 function Set-CopiedGeneratedStartupSettingDefault {
@@ -2289,23 +2238,7 @@ function Set-CopiedGeneratedStartupSettingDefault {
     [string]$ValueLiteral
   )
 
-  $copiedSettingsPath = Get-CopiedSettingsImplementationPath -ModsDir $ModsDir
-  $copiedSettings = Get-Content -Raw -LiteralPath $copiedSettingsPath
-  if ($copiedSettings -notmatch "data:extend\(settings_data\)") {
-    throw "Unable to find data:extend(settings_data) while setting generated startup default for $Name."
-  }
-
-  $escapedNameLiteral = $Name.Replace("\", "\\").Replace('"', '\"')
-  $override = @"
-for _, setting in ipairs(settings_data) do
-  if setting.name == "$escapedNameLiteral" then
-    setting.default_value = $ValueLiteral
-  end
-end
-
-"@
-  $copiedSettings = $copiedSettings -replace "data:extend\(settings_data\)", ($override + "data:extend(settings_data)")
-  Set-Content -LiteralPath $copiedSettingsPath -Value $copiedSettings -Encoding UTF8
+  Set-CopiedStartupSettingDefault -ModsDir $ModsDir -Name $Name -ValueLiteral $ValueLiteral
 }
 
 function Set-CopiedEffectPerLevelDefaults {
@@ -2428,21 +2361,7 @@ function Set-CopiedStreamCheckboxDefault {
   )
 
   $valueLiteral = if ($Enabled) { "true" } else { "false" }
-  try {
-    Set-CopiedGeneratedStartupSettingDefault -ModsDir $ModsDir -Name "ips-enable-$StreamKey" -ValueLiteral $valueLiteral
-    return
-  } catch {
-    $copiedDefaultsPath = Join-Path $ModsDir "more-infinite-research\prototypes\mir\settings\defaults.lua"
-    $copiedDefaults = Get-Content -Raw -LiteralPath $copiedDefaultsPath
-    if ($copiedDefaults -notmatch "return\s+defaults") {
-      throw "Unable to find return defaults in copied prototypes/mir/settings/defaults.lua while setting stream $StreamKey."
-    }
-
-    $escapedStreamKey = $StreamKey.Replace("\", "\\").Replace('"', '\"')
-    $override = "defaults.streams[`"$escapedStreamKey`"] = defaults.streams[`"$escapedStreamKey`"] or {}`r`ndefaults.streams[`"$escapedStreamKey`"].enabled = $valueLiteral`r`n"
-    $copiedDefaults = $copiedDefaults -replace "return\s+defaults", ($override + "return defaults")
-    Set-Content -LiteralPath $copiedDefaultsPath -Value $copiedDefaults -Encoding UTF8
-  }
+  Set-CopiedGeneratedStartupSettingDefault -ModsDir $ModsDir -Name "ips-enable-$StreamKey" -ValueLiteral $valueLiteral
 }
 
 function Set-CopiedStreamEnabled {
@@ -2468,21 +2387,7 @@ function Set-CopiedBaseExtensionDefault {
     [bool]$Enabled
   )
   $valueLiteral = if ($Enabled) { "true" } else { "false" }
-  try {
-    Set-CopiedGeneratedStartupSettingDefault -ModsDir $ModsDir -Name "mir-enable-$BaseExtensionKey" -ValueLiteral $valueLiteral
-    return
-  } catch {
-    $copiedDefaultsPath = Join-Path $ModsDir "more-infinite-research\prototypes\mir\settings\defaults.lua"
-    $copiedDefaults = Get-Content -Raw -LiteralPath $copiedDefaultsPath
-    if ($copiedDefaults -notmatch "return\s+defaults") {
-      throw "Unable to find return defaults in copied prototypes/mir/settings/defaults.lua while setting base extension $BaseExtensionKey."
-    }
-
-    $escapedBaseExtensionKey = $BaseExtensionKey.Replace("\", "\\").Replace('"', '\"')
-    $override = "defaults.base_extensions[`"$escapedBaseExtensionKey`"] = defaults.base_extensions[`"$escapedBaseExtensionKey`"] or {}`r`ndefaults.base_extensions[`"$escapedBaseExtensionKey`"].enabled = $valueLiteral`r`n"
-    $copiedDefaults = $copiedDefaults -replace "return\s+defaults", ($override + "return defaults")
-    Set-Content -LiteralPath $copiedDefaultsPath -Value $copiedDefaults -Encoding UTF8
-  }
+  Set-CopiedGeneratedStartupSettingDefault -ModsDir $ModsDir -Name "mir-enable-$BaseExtensionKey" -ValueLiteral $valueLiteral
 }
 
 function Set-CopiedBaseExtensionEnabled {
@@ -2513,15 +2418,10 @@ function Set-CopiedBaseExtensionMaxLevel {
     [int]$MaxLevel
   )
 
-  $copiedDefaultsPath = Join-Path $ModsDir "more-infinite-research\prototypes\mir\settings\defaults.lua"
-  $copiedDefaults = Get-Content -Raw -LiteralPath $copiedDefaultsPath
-  if ($copiedDefaults -notmatch "return\s+defaults") {
-    throw "Unable to find return defaults in copied prototypes/mir/settings/defaults.lua while setting maximum level for $BaseExtensionKey."
-  }
-  $escapedKey = $BaseExtensionKey.Replace("\", "\\").Replace('"', '\"')
-  $override = "defaults.base_extensions[`"$escapedKey`"] = defaults.base_extensions[`"$escapedKey`"] or {}`r`ndefaults.base_extensions[`"$escapedKey`"].max_level = $MaxLevel`r`n"
-  $copiedDefaults = $copiedDefaults -replace "return\s+defaults", ($override + "return defaults")
-  Set-Content -LiteralPath $copiedDefaultsPath -Value $copiedDefaults -Encoding UTF8
+  Set-CopiedGeneratedStartupSettingDefault `
+    -ModsDir $ModsDir `
+    -Name "mir-max-level-$BaseExtensionKey" `
+    -ValueLiteral $MaxLevel
 }
 
 function Initialize-RuntimeScenario {

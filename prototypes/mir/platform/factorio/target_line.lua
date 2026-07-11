@@ -78,6 +78,19 @@ function M.global_setting_supported(name)
   return not omitted_global_settings[name]
 end
 
+function M.setting_supported(spec)
+  if not spec or not M.global_setting_supported(spec.name) then return false end
+  local requirements = spec.targets or {}
+  for _, feature in ipairs(requirements.requires_features or {}) do
+    if not M.feature_enabled(feature) then return false end
+  end
+  for _, effect_type in ipairs(requirements.required_effect_types or {}) do
+    if supported_effect_types and not supported_effect_types[effect_type] then return false end
+    if not supported_effect_types and unsupported_effect_types[effect_type] then return false end
+  end
+  return true
+end
+
 function M.feature_enabled(name)
   return M.supports[name] == true
 end

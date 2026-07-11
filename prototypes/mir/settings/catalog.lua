@@ -5,6 +5,8 @@ local prototype_limit_settings = require("prototypes.mir.settings.prototype_limi
 local effect_contracts = require("prototypes.mir.settings.effect_contracts")
 local setting_order = require("prototypes.mir.settings.order")
 local target_line = require("prototypes.mir.platform.factorio.target_line")
+local deepcopy = require("prototypes.mir.core.deepcopy")
+local test_overrides = require("prototypes.mir.settings.test_overrides")
 
 local M = {}
 local spec_by_name_cache = nil
@@ -12,7 +14,7 @@ local streams = C.snapshot()
 
 M.import_setting_name = "mir-settings-profile-import"
 
-M.base_extension_specs = {
+local base_extension_specs = {
   { key = "braking-force", sort_name = "Braking force" },
   { key = "inserter-capacity-bonus", sort_name = "Inserter capacity bonus" },
   { key = "laser-shooting-speed", sort_name = "Laser shooting speed" },
@@ -23,24 +25,25 @@ M.base_extension_specs = {
 
 local base_defaults = defaults.base_extensions or {}
 
+local function clone_spec(spec)
+  return deepcopy(spec)
+end
+
 local function copy_array(values)
-  local out = {}
-  for _, value in ipairs(values or {}) do
-    table.insert(out, value)
-  end
+  return deepcopy(values or {})
+end
+
+local function apply_declaration_defaults(spec, requirements)
+  local out = clone_spec(spec)
+  out.targets = clone_spec(requirements or { requires_features = {}, required_effect_types = {} })
+  out.targets.requires_features = copy_array(out.targets.requires_features)
+  out.targets.required_effect_types = copy_array(out.targets.required_effect_types)
+  if test_overrides[out.name] ~= nil then out.default_value = test_overrides[out.name] end
   return out
 end
 
-local function clone_spec(spec)
-  local out = {}
-  for key, value in pairs(spec) do
-    if type(value) == "table" then
-      out[key] = copy_array(value)
-    else
-      out[key] = value
-    end
-  end
-  return out
+function M.base_extension_specs()
+  return deepcopy(base_extension_specs)
 end
 
 local function lookup_default(key, field, stream, fallback)
@@ -266,8 +269,23 @@ function M.global_setting_prototypes()
 
   local cloned = {}
   for _, spec in ipairs(out) do
-    if target_line.global_setting_supported(spec.name) then
-      table.insert(cloned, clone_spec(spec))
+    local requirements = { requires_features = {}, required_effect_types = {} }
+    if spec.name == "mir-pipeline-extent-multiplier" then
+      requirements.requires_features = {"pipeline_extent"}
+    elseif spec.name == M.import_setting_name then
+      requirements.requires_features = {"settings_profiles"}
+    elseif spec.name == prototype_limit_settings.unrestricted_modules_setting_name then
+      requirements.requires_features = {"module_permissions"}
+    elseif spec.name == "mir-debug-scripted-effects" then
+      requirements.requires_features = {"scripted_techs"}
+    elseif spec.name:find("^mir%-prototype%-")
+      or spec.name == prototype_limit_settings.recycling_return_setting_name
+      or spec.name == prototype_limit_settings.self_recycling_scope_setting_name then
+      requirements.requires_features = {"prototype_limits"}
+    end
+    local declared = apply_declaration_defaults(spec, requirements)
+    if target_line.setting_supported(declared) then
+      table.insert(cloned, declared)
     end
   end
   return cloned
@@ -310,7 +328,10 @@ function M.stream_setting_specs(key, stream)
   }
   local effect_setting = effect_contracts.stream_setting_spec(key, stream)
   if effect_setting then table.insert(out, effect_setting) end
-  return out
+  local requirements = clone_spec(stream.descriptor.targets)
+  local declared = {}
+  for _, spec in ipairs(out) do table.insert(declared, apply_declaration_defaults(spec, requirements)) end
+  return declared
 end
 
 function M.base_extension_setting_specs(key)
@@ -354,7 +375,14 @@ function M.base_extension_setting_specs(key)
   }
   local effect_setting = effect_contracts.base_setting_spec(key)
   if effect_setting then table.insert(out, effect_setting) end
-  return out
+  local declared = {}
+  for _, spec in ipairs(out) do
+    table.insert(declared, apply_declaration_defaults(spec, {
+      requires_features = {},
+      required_effect_types = {}
+    }))
+  end
+  return declared
 end
 
 function M.all_specs()
@@ -386,7 +414,7 @@ function M.all_specs()
       table.insert(out, with_profile_export(spec))
     end
   end
-  for _, base_spec in ipairs(M.base_extension_specs) do
+  for _, base_spec in ipairs(base_extension_specs) do
     for _, spec in ipairs(M.base_extension_setting_specs(base_spec.key)) do
       table.insert(out, with_profile_export(spec))
     end
@@ -395,7 +423,7 @@ function M.all_specs()
   return out
 end
 
-function M.spec_by_name()
+local function canonical_spec_by_name()
   if spec_by_name_cache then return spec_by_name_cache end
   local out = {}
   for _, spec in ipairs(M.all_specs()) do
@@ -405,8 +433,12 @@ function M.spec_by_name()
   return spec_by_name_cache
 end
 
+function M.spec_by_name()
+  return deepcopy(canonical_spec_by_name())
+end
+
 function M.spec(name)
-  return M.spec_by_name()[name]
+  return deepcopy(canonical_spec_by_name()[name])
 end
 
 function M.default_value(name)

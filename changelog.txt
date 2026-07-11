@@ -17,6 +17,7 @@ Date: 2026-07-12
     - Replaced maintained 2.1 and 2.0 stream/effect denylists with positive mod and effect support declarations.
     - Made package ZIP entry order, timestamps, attributes, and compression inputs deterministic.
     - Routed data-final-fixes passes through named commands with owned implementations and positive target requirements.
+    - Made settings catalog snapshots immutable, target-positive, and descriptor-ordered.
 
 ---------------------------------------------------------------------------------------------------
 Version: 3.0.5

@@ -40,6 +40,10 @@ rules:
   global_settings_use_visible_section_prefixes: true
   rich_text_section_prefixes_are_optional_enhancement: true
   fake_divider_settings_are_disallowed: true
+  every_setting_declares_positive_target_requirements: true
+  catalog_specs_are_returned_as_deep_copies: true
+  technology_sort_names_come_from_canonical_descriptors: true
+  validation_overrides_are_declarative_not_source_rewrites: true
 
 profiles:
   schema: 1

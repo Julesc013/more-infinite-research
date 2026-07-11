@@ -90,6 +90,7 @@ function Assert-NoPatternInTree {
 
 $settingsManifestText = Read-MIRText -RelativePath ".mir/settings.yml"
 $stageBuilderText = Read-MIRText -RelativePath "prototypes/mir/settings/stage_builder.lua"
+$streamDescriptorText = Read-MIRText -RelativePath "prototypes/mir/domain/streams/descriptor.lua"
 $catalogText = Read-MIRText -RelativePath "prototypes/mir/settings/catalog.lua"
 $settingOrderText = Read-MIRText -RelativePath "prototypes/mir/settings/order.lua"
 $prototypeLimitSettingsText = Read-MIRText -RelativePath "prototypes/mir/settings/prototype_limits.lua"
@@ -100,6 +101,8 @@ $adapterText = Read-MIRText -RelativePath "prototypes/mir/settings/stage_adapter
 $profileCodecText = Read-MIRText -RelativePath "prototypes/mir/settings/profile_codec.lua"
 $effectiveSettingsText = Read-MIRText -RelativePath "prototypes/mir/settings/effective.lua"
 $runtimeSettingsProfileText = Read-MIRText -RelativePath "prototypes/mir/runtime/settings_profile.lua"
+$testOverridesText = Read-MIRText -RelativePath "prototypes/mir/settings/test_overrides.lua"
+$validationRunnerText = Read-MIRText -RelativePath "scripts/Invoke-MIRValidation.ps1"
 $userSettingsDocText = Read-MIRText -RelativePath "docs/user/settings.md"
 $referenceSettingsDocText = Read-MIRText -RelativePath "docs/reference/settings.md"
 $settingsGovernanceDocText = Read-MIRText -RelativePath "docs/maintainer/settings-governance.md"
@@ -161,6 +164,12 @@ Assert-Contains -RelativePath "prototypes/mir/settings/catalog.lua" -Text $catal
 Assert-Contains -RelativePath "prototypes/mir/settings/catalog.lua" -Text $catalogText -Needle 'order = setting_order.global("compatibility", 40)'
 Assert-Contains -RelativePath "prototypes/mir/settings/catalog.lua" -Text $catalogText -Needle "function M.stream_setting_specs(key, stream)"
 Assert-Contains -RelativePath "prototypes/mir/settings/catalog.lua" -Text $catalogText -Needle "function M.base_extension_setting_specs(key)"
+Assert-Contains -RelativePath "prototypes/mir/settings/catalog.lua" -Text $catalogText -Needle 'require("prototypes.mir.settings.test_overrides")'
+Assert-Contains -RelativePath "prototypes/mir/settings/catalog.lua" -Text $catalogText -Needle "return deepcopy(canonical_spec_by_name())"
+Assert-Contains -RelativePath "prototypes/mir/settings/catalog.lua" -Text $catalogText -Needle "return deepcopy(canonical_spec_by_name()[name])"
+Assert-Contains -RelativePath "prototypes/mir/settings/catalog.lua" -Text $catalogText -Needle "out.targets.requires_features"
+Assert-Contains -RelativePath "prototypes/mir/settings/test_overrides.lua" -Text $testOverridesText -Needle "local overrides = {}"
+Assert-Contains -RelativePath "prototypes/mir/settings/stage_builder.lua" -Text $stageBuilderText -Needle "stream.descriptor.ui.sort_name"
 Assert-Contains -RelativePath "prototypes/mir/settings/registry.lua" -Text $registryText -Needle 'enable = "ips-enable-%s"'
 Assert-Contains -RelativePath "prototypes/mir/settings/registry.lua" -Text $registryText -Needle 'key = "mir-settings-profile-import"'
 Assert-Contains -RelativePath "prototypes/mir/settings/visibility.lua" -Text $visibilityText -Needle "function M.evaluate(spec, ctx)"
@@ -254,7 +263,7 @@ Assert-Contains -RelativePath "fixtures/assert-hidden-setting-readability/data-f
 Assert-Contains -RelativePath "fixtures/assert-hidden-setting-readability/data-final-fixes.lua" -Text $fixtureText -Needle '"mir-enable-%s"'
 
 foreach ($streamKey in $streamKeys) {
-  Assert-Contains -RelativePath "prototypes/mir/settings/stage_builder.lua" -Text $stageBuilderText -Needle "$streamKey ="
+  Assert-Contains -RelativePath "prototypes/mir/domain/streams/descriptor.lua" -Text $streamDescriptorText -Needle "$streamKey ="
   Assert-Contains -RelativePath "fixtures/assert-hidden-setting-readability/data-final-fixes.lua" -Text $fixtureText -Needle "`"$streamKey`""
 }
 
@@ -274,6 +283,8 @@ Assert-Contains -RelativePath "docs/maintainer/settings-governance.md" -Text $se
 Assert-NoPattern -RelativePath "prototypes/mir/settings/visibility.lua" -Text $visibilityText -Pattern "\bdata\.raw\b|data:extend|settings\.startup"
 Assert-NoPattern -RelativePath "prototypes/mir/settings/builder.lua" -Text $builderText -Pattern "forced_value"
 Assert-NoPattern -RelativePath "prototypes/mir/settings/stage_builder.lua" -Text $stageBuilderText -Pattern "forced_value"
+Assert-NoPattern -RelativePath "scripts/Invoke-MIRValidation.ps1" -Text $validationRunnerText -Pattern '\$copied(Settings|Defaults|Diagnostics)\s*=.*-replace'
+Assert-NoPattern -RelativePath "scripts/Invoke-MIRValidation.ps1" -Text $validationRunnerText -Pattern 'data:extend\\\(settings_data\\\).*setting.default_value'
 Assert-NoPattern -RelativePath "prototypes/streams/productivity.lua" -Text $productivityText -Pattern 'mods_any = \{"space-age"\}'
 Assert-NoPattern -RelativePath "prototypes/streams/direct-effects.lua" -Text $directEffectsText -Pattern 'mods_any = \{"space-age"\}'
 

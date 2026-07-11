@@ -94,6 +94,7 @@ modules:
     - prototypes/mir/settings/prototype_limits.lua
     - prototypes/mir/settings/effect_contracts.lua
     - prototypes/mir/settings/effect_scaling.lua
+    - prototypes/mir/settings/test_overrides.lua
   streams:
     - prototypes/mir/streams/registry.lua
     - prototypes/streams/productivity.lua
