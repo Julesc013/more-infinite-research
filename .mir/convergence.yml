@@ -84,7 +84,8 @@ candidate:
   interactive_ui_observation: not-independently-performed
   acceptance_date: "2026-07-12"
   acceptance_basis: maintainer-directed-continuation-after-automated-and-exact-archive-gates
-  status: accepted-for-promotion
+  promotion_authorized: true
+  status: release-candidate-awaiting-manual-review
 
 rules:
   - dev-remains-the-canonical-modern-implementation
