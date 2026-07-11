@@ -1,4 +1,5 @@
 local C = require("prototypes.mir.streams.registry")
+local deepcopy = require("prototypes.mir.core.deepcopy")
 local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 local science = require("prototypes.mir.capabilities.science_integration.science_packs")
 local recipes = require("prototypes.mir.capabilities.recipe_productivity.recipe_matching")
@@ -120,9 +121,15 @@ local function science_from_unlocks(spec)
 end
 
 function M.apply_science_pack_ingredient_policy(ingredients)
+  local policy = startup_setting("mir-science-pack-ingredient-policy") or "configured"
+  if policy == "configured" then
+    -- Neutral/bypass option: preserve the stream's configured ingredients
+    -- without loading any of the optional ingredient expansion policies.
+    return deepcopy(ingredients or {})
+  end
+
   local out, seen = {}, {}
   local selected_packs = {}
-  local policy = startup_setting("mir-science-pack-ingredient-policy") or "configured"
   for _, ingredient in ipairs(ingredients or {}) do
     local name = ingredient_name(ingredient)
     if name then table.insert(selected_packs, name) end

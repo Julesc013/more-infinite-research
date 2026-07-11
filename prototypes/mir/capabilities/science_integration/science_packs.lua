@@ -203,6 +203,7 @@ end
 
 local function lab_incompatibility_policy()
   local value = startup_setting("mir-lab-incompatibility-policy")
+  if value == "engine-default" then return "engine-default" end
   if value == "skip" then return "skip" end
   return "reduce"
 end
@@ -274,6 +275,30 @@ function S.valid_research_ingredients(ingredients)
 end
 
 function S.best_lab_compatible_ingredients(ingredients, context)
+  if lab_incompatibility_policy() == "engine-default" then
+    -- Explicit neutral/bypass option. Never rewrite the selected ingredients.
+    -- Preserve a Factorio-safe set unchanged, or omit the generated technology
+    -- rather than emitting a prototype the final graph guard must reject.
+    local unchanged = deepcopy(ingredients or {})
+    local reachable = #unchanged > 0
+    for _, ingredient in ipairs(unchanged) do
+      local pack_name = ingredient_name(ingredient)
+      if not pack_name or S.pack_production_status(pack_name) == "unreachable" then
+        reachable = false
+        break
+      end
+    end
+    if reachable and S.valid_research_ingredients(unchanged) then
+      return unchanged, "unchanged"
+    end
+    log(
+      "[more-infinite-research] Skipping " ..
+        tostring(context or "unknown technology") ..
+        " because engine-default lab policy forbids ingredient rewriting and the selected set is not safely researchable."
+    )
+    return nil, "invalid"
+  end
+
   local source = {}
   for _, ingredient in ipairs(deepcopy(ingredients or {})) do
     local pack_name = ingredient_name(ingredient)

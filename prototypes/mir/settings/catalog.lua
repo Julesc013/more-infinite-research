@@ -133,7 +133,7 @@ function M.global_setting_prototypes()
       name = "mir-lab-incompatibility-policy",
       setting_type = "startup",
       default_value = "reduce",
-      allowed_values = {"reduce", "skip"},
+      allowed_values = {"reduce", "skip", "engine-default"},
       order = setting_order.global("main", 30),
       localised_name = {"mod-setting-name.mir-lab-incompatibility-policy"},
       localised_description = {"mod-setting-description.mir-lab-incompatibility-policy"}
@@ -183,11 +183,22 @@ function M.global_setting_prototypes()
   end
 
   table.insert(out, {
+    type = "string-setting",
+    name = prototype_limit_settings.recycling_return_setting_name,
+    setting_type = "startup",
+    default_value = prototype_limit_settings.engine_default,
+    allowed_values = prototype_limit_settings.recycling_return_allowed_values,
+    order = setting_order.global("prototype_limits", 15),
+    localised_name = {"mod-setting-name." .. prototype_limit_settings.recycling_return_setting_name},
+    localised_description = {"mod-setting-description." .. prototype_limit_settings.recycling_return_setting_name}
+  })
+
+  table.insert(out, {
     type = "bool-setting",
     name = prototype_limit_settings.self_recycling_scope_setting_name,
     setting_type = "startup",
     default_value = false,
-    order = setting_order.global("prototype_limits", 15),
+    order = setting_order.global("prototype_limits", 17),
     localised_name = {"mod-setting-name." .. prototype_limit_settings.self_recycling_scope_setting_name},
     localised_description = {"mod-setting-description." .. prototype_limit_settings.self_recycling_scope_setting_name}
   })
@@ -348,10 +359,21 @@ function M.all_specs()
   local out = {}
   for _, spec in ipairs(M.global_setting_prototypes()) do
     local profile_spec = with_profile_export(spec)
+    if profile_spec.name == "mir-pipeline-extent-multiplier" then
+      profile_spec.import_numeric_minimum = 0.1
+      profile_spec.import_numeric_maximum = 100000
+    elseif profile_spec.name == prototype_limit_settings.recycling_return_setting_name then
+      profile_spec.import_numeric_minimum = 0
+      profile_spec.import_numeric_maximum = 25
+    end
     for _, key in ipairs(prototype_limit_settings.order) do
       local limit_spec = prototype_limit_settings.settings[key]
-      if limit_spec and limit_spec.name == profile_spec.name and limit_spec.accepted_import_values then
-        profile_spec.accepted_import_values = copy_array(limit_spec.accepted_import_values)
+      if limit_spec and limit_spec.name == profile_spec.name then
+        if limit_spec.accepted_import_values then
+          profile_spec.accepted_import_values = copy_array(limit_spec.accepted_import_values)
+        end
+        profile_spec.import_numeric_minimum = limit_spec.import_numeric_minimum
+        profile_spec.import_numeric_maximum = limit_spec.import_numeric_maximum
       end
     end
     table.insert(out, profile_spec)
@@ -425,8 +447,21 @@ function M.validate_value(name, value)
   if not spec then return false, "unknown setting" end
 
   local expected = value_type_for_spec(spec)
-  if expected and type(value) ~= expected then
+  local numeric_dropdown_import = spec.type == "string-setting"
+    and type(value) == "number"
+    and spec.import_numeric_minimum ~= nil
+    and spec.import_numeric_maximum ~= nil
+  if expected and type(value) ~= expected and not numeric_dropdown_import then
     return false, "wrong type"
+  end
+
+  if numeric_dropdown_import then
+    if value ~= value or value == math.huge or value == -math.huge then
+      return false, "not finite"
+    end
+    if value < spec.import_numeric_minimum then return false, "below minimum" end
+    if value > spec.import_numeric_maximum then return false, "above maximum" end
+    return true
   end
 
   if spec.type == "int-setting" then

@@ -587,6 +587,7 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'default_value = false' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'name = "mir-science-pack-ingredient-policy"' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'allowed_values = {"configured", "space", "space-and-promethium", "space-age-progression", "official-progression", "mod-progression", "all-official", "all"}' },
+    @{ File = "settings.lua"; Text = $settingsText; Snippet = 'allowed_values = {"reduce", "skip", "engine-default"}' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'name = "mir-use-installed-space-age-icons"' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'local setting_order = require("prototypes.mir.settings.order")' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'order = setting_order.global("compatibility", 20)' },
@@ -639,6 +640,8 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "prototypes\mir\runtime\effects\agricultural_growth_speed.lua"; Text = $agriculturalGrowthText; Snippet = 'settings_resolver.stream_enabled(M.stream_key)' },
     @{ File = "prototypes\mir\runtime\effects\agricultural_growth_speed.lua"; Text = $agriculturalGrowthText; Snippet = 'agricultural growth speed force state refreshed enabled=' },
     @{ File = "prototypes\mir\capabilities\science_integration\science_selector.lua"; Text = $scienceSelectorText; Snippet = 'apply_science_pack_ingredient_policy' },
+    @{ File = "prototypes\mir\capabilities\science_integration\science_selector.lua"; Text = $scienceSelectorText; Snippet = 'if policy == "configured" then' },
+    @{ File = "prototypes\mir\capabilities\science_integration\science_packs.lua"; Text = $scienceText; Snippet = 'if lab_incompatibility_policy() == "engine-default" then' },
     @{ File = "prototypes\mir\planner\costs.lua"; Text = $plannerCostsText; Snippet = 'settings_resolver.stream_enabled(key, spec)' },
     @{ File = "prototypes\mir\emit\base_extensions.lua"; Text = $baseExtensionsText; Snippet = 'settings_resolver.base_enabled(key, spec)' },
     @{ File = "prototypes\mir\planner\prerequisites.lua"; Text = $plannerPrerequisitesText; Snippet = 'append_end_game_gate_prerequisite' },
@@ -732,10 +735,12 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'if pipeline_extent_multiplier ~= 1 then' },
     @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'require("prototypes.mir.pipeline.extent").apply(pipeline_extent_multiplier)' },
     @{ File = "prototypes\mir\settings\pipeline_extent.lua"; Text = $pipelineExtentSettingsText; Snippet = 'S.default_value = "100"' },
-    @{ File = "prototypes\mir\settings\pipeline_extent.lua"; Text = $pipelineExtentSettingsText; Snippet = 'S.allowed_values = {"500", "400", "300", "250", "200", "150", "125", "100", "75", "50"}' },
+    @{ File = "prototypes\mir\settings\pipeline_extent.lua"; Text = $pipelineExtentSettingsText; Snippet = 'S.allowed_values = {"1000", "750", "500", "400", "300", "250", "200", "150", "125", "100", "75", "50", "25"}' },
     @{ File = "prototypes\mir\settings\pipeline_extent.lua"; Text = $pipelineExtentSettingsText; Snippet = 'function S.parse(value)' },
+    @{ File = "prototypes\mir\settings\pipeline_extent.lua"; Text = $pipelineExtentSettingsText; Snippet = 'if type(value) == "number" then return value / 100 end' },
     @{ File = "prototypes\mir\settings\pipeline_extent.lua"; Text = $pipelineExtentSettingsText; Snippet = 'if numeric > 10 then return numeric / 100 end' },
     @{ File = "prototypes\mir\pipeline\extent.lua"; Text = $pipelineExtentText; Snippet = 'DEFAULT_PIPELINE_EXTENT = 320' },
+    @{ File = "prototypes\mir\pipeline\extent.lua"; Text = $pipelineExtentText; Snippet = 'MAX_PIPELINE_EXTENT = 4294967295' },
     @{ File = "prototypes\mir\pipeline\extent.lua"; Text = $pipelineExtentText; Snippet = 'if multiplier == 1 then return end' },
     @{ File = "prototypes\mir\report\diagnostics_sink.lua"; Text = $diagnosticsText; Snippet = 'icons.icon_source_for_stream(spec or {})' },
     @{ File = "prototypes\mir\emit\icon_builder.lua"; Text = $technologyIconsText; Snippet = 'local out = strip_constant_overlays(base_icons)' },
@@ -784,6 +789,7 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "fixtures\assert-better-bot-battery-skip\data-final-fixes.lua"; Text = $betterBotBatteryFixtureText; Snippet = 'recipe-prod-research_robot_battery-1' },
     @{ File = "fixtures\assert-better-bot-battery-skip\data-final-fixes.lua"; Text = $betterBotBatteryFixtureText; Snippet = 'worker-robots-battery-6' },
     @{ File = "prototypes\mir\policy\weapon_speed.lua"; Text = $weaponSpeedText; Snippet = 'tech.unit and tech.unit.count_formula' },
+    @{ File = "prototypes\mir\policy\weapon_speed.lua"; Text = $weaponSpeedText; Snippet = 'if mode == "off" then return {} end' },
     @{ File = "prototypes\mir\policy\weapon_speed.lua"; Text = $weaponSpeedText; Snippet = 'native_effect_coverage.technology_has_effect_identity' },
     @{ File = "prototypes\mir\policy\weapon_speed.lua"; Text = $weaponSpeedText; Snippet = 'generated_registry.contains(name)' },
     @{ File = "prototypes\mir\domain\facts\generated_technology_registry.lua"; Text = $generatedRegistryText; Snippet = 'function M.contains(name)' },
@@ -807,7 +813,7 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'flamethrower-shooting-speed-bonus=Flamethrower shooting speed: +__1__' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'electric-shooting-speed-bonus=Electric shooting speed: +__1__' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'tesla-shooting-speed-bonus=Tesla shooting speed: +__1__' },
-    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-science-pack-ingredient-policy-configured=Default science packs' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-science-pack-ingredient-policy-configured=Configured packs (unchanged)' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-science-pack-ingredient-policy-space=Add space science' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-science-pack-ingredient-policy-space-and-promethium=Add space + promethium' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-science-pack-ingredient-policy-space-age-progression=Space Age progression' },
@@ -816,10 +822,12 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-science-pack-ingredient-policy-all-official=All official science packs' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-science-pack-ingredient-policy-all=All lab science packs' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = '[string-mod-setting-description]' },
-    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = "mir-science-pack-ingredient-policy-configured=Use each generated technology's configured science packs. Safest default." },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = "mir-science-pack-ingredient-policy-configured=Keep each generated technology's configured science packs unchanged and bypass optional ingredient expansion. Safest default." },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-lab-incompatibility-policy-reduce=Use researchable packs' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-lab-incompatibility-policy-skip=Skip unsupported techs' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-lab-incompatibility-policy-engine-default=Engine unchanged / bypass' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-lab-incompatibility-policy-reduce=Keep the technology by reducing its science packs to the largest set accepted by an active lab. Safest default for mod packs.' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-lab-incompatibility-policy-engine-default=Never rewrite the selected science-pack set.' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'ips-enable-stream=[font=default-bold]__1__[/font] — enable' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-max-level=[font=default-bold]Infinite __1__[/font] — max level' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'ips-research-time-stream=[font=default-bold]__1__[/font] — research time' },
@@ -1026,6 +1034,7 @@ Invoke-RepoCheck "prototype limit settings are wired" {
     @{ File = "prototypes\mir\settings\prototype_limits.lua"; Text = $prototypeLimitSettingsText; Snippet = 'name = "mir-prototype-efficiency-cap"' },
     @{ File = "prototypes\mir\settings\prototype_limits.lua"; Text = $prototypeLimitSettingsText; Snippet = 'name = "mir-prototype-pollution-cap"' },
     @{ File = "prototypes\mir\settings\prototype_limits.lua"; Text = $prototypeLimitSettingsText; Snippet = 'name = "mir-prototype-speed-cap"' },
+    @{ File = "prototypes\mir\settings\prototype_limits.lua"; Text = $prototypeLimitSettingsText; Snippet = 'name = "mir-prototype-speed-floor"' },
     @{ File = "prototypes\mir\settings\prototype_limits.lua"; Text = $prototypeLimitSettingsText; Snippet = 'name = "mir-prototype-quality-cap"' },
     @{ File = "prototypes\mir\settings\prototype_limits.lua"; Text = $prototypeLimitSettingsText; Snippet = 'positive_power_floor_setting_name = "mir-prototype-positive-power-floor"' },
     @{ File = "prototypes\mir\settings\prototype_limits.lua"; Text = $prototypeLimitSettingsText; Snippet = 'default_value = S.engine_default' },
@@ -1035,6 +1044,7 @@ Invoke-RepoCheck "prototype limit settings are wired" {
     @{ File = "prototypes\mir\settings\prototype_limits.lua"; Text = $prototypeLimitSettingsText; Snippet = '["saving-99"] = -0.99' },
     @{ File = "prototypes\mir\settings\prototype_limits.lua"; Text = $prototypeLimitSettingsText; Snippet = '["bonus-50"] = 0.5' },
     @{ File = "prototypes\mir\settings\prototype_limits.lua"; Text = $prototypeLimitSettingsText; Snippet = '["bonus-400"] = 4.0' },
+    @{ File = "prototypes\mir\settings\prototype_limits.lua"; Text = $prototypeLimitSettingsText; Snippet = 'if type(raw_value) == "number" then return raw_value / 100 end' },
     @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'steps.apply_prototype_limits()' },
     @{ File = "prototypes\mir\stage\data_final_fixes_steps.lua"; Text = $stepsText; Snippet = 'require("prototypes.mir.pipeline.prototype_limits").apply()' },
     @{ File = "prototypes\mir\pipeline\prototype_limits.lua"; Text = $prototypeLimitPipelineText; Snippet = 'data_raw.prototypes("recipe")' },
@@ -1044,6 +1054,9 @@ Invoke-RepoCheck "prototype limit settings are wired" {
     @{ File = "prototypes\mir\pipeline\prototype_limits.lua"; Text = $prototypeLimitPipelineText; Snippet = 'apply_effect_receiver_limit("consumption_limits", "low", selected("efficiency"))' },
     @{ File = "prototypes\mir\pipeline\prototype_limits.lua"; Text = $prototypeLimitPipelineText; Snippet = 'apply_effect_receiver_limit("pollution_limits", "low", selected("pollution"))' },
     @{ File = "prototypes\mir\pipeline\prototype_limits.lua"; Text = $prototypeLimitPipelineText; Snippet = 'apply_effect_receiver_limit("speed_limits", "high", selected("speed"))' },
+    @{ File = "prototypes\mir\pipeline\prototype_limits.lua"; Text = $prototypeLimitPipelineText; Snippet = 'apply_effect_receiver_limit("speed_limits", "low", selected("speed_floor"))' },
+    @{ File = "prototypes\mir\pipeline\prototype_limits.lua"; Text = $prototypeLimitPipelineText; Snippet = 'apply_recycling_return_chance(productivity_cap)' },
+    @{ File = "prototypes\mir\pipeline\prototype_limits.lua"; Text = $prototypeLimitPipelineText; Snippet = 'recipe.hidden ~= true or recipe.unlock_results ~= false' },
     @{ File = "prototypes\mir\pipeline\prototype_limits.lua"; Text = $prototypeLimitPipelineText; Snippet = 'apply_effect_receiver_limit("quality_limits", "high", selected("quality"))' },
     @{ File = "prototypes\mir\pipeline\prototype_limits.lua"; Text = $prototypeLimitPipelineText; Snippet = 'prototype.energy_usage = "1W"' },
     @{ File = "prototypes\mir\pipeline\prototype_limits.lua"; Text = $prototypeLimitPipelineText; Snippet = 'Applied prototype limits: productivity_recipes=' },
@@ -1051,6 +1064,8 @@ Invoke-RepoCheck "prototype limit settings are wired" {
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-prototype-efficiency-cap=[font=default-bold][color=orange]Limits:[/color][/font] Energy savings cap' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-prototype-pollution-cap=[font=default-bold][color=orange]Limits:[/color][/font] Pollution reduction cap' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-prototype-speed-cap=[font=default-bold][color=orange]Limits:[/color][/font] Speed effect cap' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-prototype-speed-floor=[font=default-bold][color=orange]Limits:[/color][/font] Minimum machine speed' },
+    @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-recycling-return-chance=[font=default-bold][color=orange]Limits:[/color][/font] Generated recycler return rate' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-prototype-quality-cap=[font=default-bold][color=orange]Limits:[/color][/font] Quality effect cap' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-prototype-positive-power-floor=[font=default-bold][color=cyan]Compatibility:[/color][/font] Non-zero power floor' },
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-prototype-productivity-cap-engine-default=+300% (unchanged)' },
@@ -1064,6 +1079,9 @@ Invoke-RepoCheck "prototype limit settings are wired" {
     @{ File = "locale\en\more-infinite-research.cfg"; Text = $localeText; Snippet = 'mir-prototype-quality-cap-bonus-400=+400%' },
     @{ File = ".mir\settings.yml"; Text = $settingsManifestText; Snippet = 'prototype_limit_settings_default_to_engine_default: true' },
     @{ File = ".mir\settings.yml"; Text = $settingsManifestText; Snippet = 'energy_and_pollution_caps_are_separate: true' },
+    @{ File = ".mir\settings.yml"; Text = $settingsManifestText; Snippet = 'positive_speed_cap_and_negative_speed_floor_are_separate: true' },
+    @{ File = ".mir\settings.yml"; Text = $settingsManifestText; Snippet = 'automatic_recycling_return_is_total-output-inverse_and_never_buffs_vanilla: true' },
+    @{ File = ".mir\settings.yml"; Text = $settingsManifestText; Snippet = 'numeric_dropdown_profile_imports_accept_valid_custom_percentages: true' },
     @{ File = ".mir\settings.yml"; Text = $settingsManifestText; Snippet = 'positive_power_floor_is_default_off_opt_in: true' },
     @{ File = ".mir\settings.yml"; Text = $settingsManifestText; Snippet = 'positive_power_floor_is_compatibility_section_setting: true' },
     @{ File = ".mir\modules.yml"; Text = $modulesManifestText; Snippet = 'prototypes/mir/settings/catalog.lua' },
@@ -1076,6 +1094,8 @@ Invoke-RepoCheck "prototype limit settings are wired" {
     @{ File = "fixtures\assert-prototype-limits\data-final-fixes.lua"; Text = $prototypeLimitFixtureText; Snippet = 'unrestricted module permissions did not open all recipe effect flags' },
     @{ File = "fixtures\assert-prototype-limits\data-final-fixes.lua"; Text = $prototypeLimitFixtureText; Snippet = 'consumption_limits.low' },
     @{ File = "fixtures\assert-prototype-limits\data-final-fixes.lua"; Text = $prototypeLimitFixtureText; Snippet = 'pollution_limits.low' },
+    @{ File = "fixtures\assert-prototype-limits\data-final-fixes.lua"; Text = $prototypeLimitFixtureText; Snippet = 'generated recycling independent_probability' },
+    @{ File = "fixtures\assert-prototype-limits\data-final-fixes.lua"; Text = $prototypeLimitFixtureText; Snippet = 'tier-4 module recipe was not discovered by module prototype tier' },
     @{ File = "fixtures\assert-prototype-limits\data-final-fixes.lua"; Text = $prototypeLimitFixtureText; Snippet = 'zero-watt beacon energy_usage' },
     @{ File = "fixtures\assert-prototype-limits\data-final-fixes.lua"; Text = $prototypeLimitFixtureText; Snippet = 'quality_limits.high' },
     @{ File = "prototypes\mir\settings\catalog.lua"; Text = $settingsCatalogText; Snippet = 'require("prototypes.mir.settings.effect_contracts")' },
@@ -2300,7 +2320,7 @@ function Set-CopiedPipelineExtentMultiplier {
     [double]$Multiplier
   )
   $percent = [int][Math]::Round($Multiplier * 100)
-  $allowedPercents = @(50, 75, 100, 125, 150, 200, 250, 300, 400, 500)
+  $allowedPercents = @(25, 50, 75, 100, 125, 150, 200, 250, 300, 400, 500, 750, 1000)
   if ($allowedPercents -notcontains $percent) {
     throw "Unsupported pipeline extent multiplier for dropdown validation: $Multiplier ($percent%)."
   }
@@ -2313,8 +2333,10 @@ function Set-CopiedPrototypeLimitDefaults {
     [string]$ProductivityCap,
     [string]$EfficiencyCap,
     [string]$PollutionCap,
+    [string]$SpeedFloor,
     [string]$SpeedCap,
     [string]$QualityCap,
+    [string]$RecyclingReturnChance,
     [bool]$PositivePowerFloor = $false,
     [bool]$ProductivityCapSelfRecyclingOnly = $false,
     [bool]$UnrestrictedModules = $false
@@ -2329,6 +2351,9 @@ function Set-CopiedPrototypeLimitDefaults {
   if (-not [string]::IsNullOrWhiteSpace($PollutionCap)) {
     Set-CopiedGeneratedStartupSettingDefault -ModsDir $ModsDir -Name "mir-prototype-pollution-cap" -ValueLiteral "`"$PollutionCap`""
   }
+  if (-not [string]::IsNullOrWhiteSpace($SpeedFloor)) {
+    Set-CopiedGeneratedStartupSettingDefault -ModsDir $ModsDir -Name "mir-prototype-speed-floor" -ValueLiteral "`"$SpeedFloor`""
+  }
   if (-not [string]::IsNullOrWhiteSpace($SpeedCap)) {
     Set-CopiedGeneratedStartupSettingDefault -ModsDir $ModsDir -Name "mir-prototype-speed-cap" -ValueLiteral "`"$SpeedCap`""
   }
@@ -2337,6 +2362,9 @@ function Set-CopiedPrototypeLimitDefaults {
   }
   if ($PositivePowerFloor) {
     Set-CopiedGeneratedStartupSettingDefault -ModsDir $ModsDir -Name "mir-prototype-positive-power-floor" -ValueLiteral "true"
+  }
+  if (-not [string]::IsNullOrWhiteSpace($RecyclingReturnChance)) {
+    Set-CopiedGeneratedStartupSettingDefault -ModsDir $ModsDir -Name "mir-recycling-return-chance" -ValueLiteral "`"$RecyclingReturnChance`""
   }
 
   if ($ProductivityCapSelfRecyclingOnly) {
@@ -2428,6 +2456,11 @@ function Set-CopiedBaseExtensionDisabled {
   Set-CopiedBaseExtensionDefault -ModsDir $ModsDir -BaseExtensionKey $BaseExtensionKey -Enabled $false
 }
 
+function Set-CopiedLabPolicyEngineDefault {
+  param([string]$ModsDir)
+  Set-CopiedStartupSettingDefault -ModsDir $ModsDir -Name "mir-lab-incompatibility-policy" -ValueLiteral '"engine-default"'
+}
+
 function Set-CopiedBaseExtensionMaxLevel {
   param(
     [string]$ModsDir,
@@ -2458,21 +2491,26 @@ function Initialize-RuntimeScenario {
     [hashtable]$BaseEffectPerLevelOverrides = @{},
     [hashtable]$BaseMaxLevelOverrides = @{},
     [switch]$LabPolicySkip,
+    [switch]$LabPolicyEngineDefault,
     [ValidateSet("configured", "space", "space-and-promethium", "space-age-progression", "official-progression", "mod-progression", "all-official", "all")]
     [string]$SciencePackIngredientPolicy = "configured",
     [ValidateSet("", "off", "only-when-dedicated-tech-enabled", "always")]
     [string]$WeaponSpeedAdjustmentMode = "",
     [double]$PipelineExtentMultiplier = 1,
-    [ValidateSet("", "engine-default", "percent-50", "percent-75", "percent-100", "percent-200", "percent-250", "percent-400", "percent-500", "percent-1000", "percent-2500", "percent-10000", "percent-100000")]
+    [ValidateSet("", "engine-default", "percent-25", "percent-50", "percent-75", "percent-100", "percent-125", "percent-150", "percent-200", "percent-250", "percent-400", "percent-500", "percent-750", "percent-1000", "percent-2500", "percent-5000", "percent-10000", "percent-25000", "percent-100000")]
     [string]$PrototypeProductivityCap = "",
-    [ValidateSet("", "engine-default", "saving-50", "saving-75", "saving-90", "saving-95", "saving-99", "saving-999", "saving-9999")]
+    [ValidateSet("", "engine-default", "saving-25", "saving-50", "saving-75", "saving-90", "saving-95", "saving-99", "saving-999", "saving-9999")]
     [string]$PrototypeEfficiencyCap = "",
-    [ValidateSet("", "engine-default", "saving-50", "saving-75", "saving-90", "saving-95", "saving-99", "saving-999", "saving-9999")]
+    [ValidateSet("", "engine-default", "saving-25", "saving-50", "saving-75", "saving-90", "saving-95", "saving-99", "saving-999", "saving-9999")]
     [string]$PrototypePollutionCap = "",
-    [ValidateSet("", "engine-default", "bonus-50", "bonus-75", "bonus-100", "bonus-200", "bonus-250", "bonus-400", "bonus-500", "bonus-1000", "bonus-10000", "bonus-100000")]
+    [ValidateSet("", "engine-default", "bonus-25", "bonus-50", "bonus-75", "bonus-100", "bonus-125", "bonus-150", "bonus-200", "bonus-250", "bonus-300", "bonus-400", "bonus-500", "bonus-750", "bonus-1000", "bonus-2500", "bonus-5000", "bonus-10000", "bonus-25000", "bonus-100000")]
     [string]$PrototypeSpeedCap = "",
-    [ValidateSet("", "engine-default", "bonus-50", "bonus-75", "bonus-100", "bonus-200", "bonus-250", "bonus-400", "bonus-500", "bonus-1000", "bonus-10000", "bonus-100000")]
+    [ValidateSet("", "engine-default", "saving-25", "saving-50", "saving-75", "saving-90", "saving-95", "saving-99", "saving-999", "saving-9999")]
+    [string]$PrototypeSpeedFloor = "",
+    [ValidateSet("", "engine-default", "bonus-25", "bonus-50", "bonus-75", "bonus-100", "bonus-125", "bonus-150", "bonus-200", "bonus-250", "bonus-300", "bonus-400", "bonus-500", "bonus-750", "bonus-1000", "bonus-2500", "bonus-5000", "bonus-10000", "bonus-25000", "bonus-100000")]
     [string]$PrototypeQualityCap = "",
+    [ValidateSet("", "engine-default", "match-productivity-cap", "percent-25", "percent-20", "percent-15", "percent-12-5", "percent-10", "percent-7-5", "percent-5", "percent-2-5", "percent-1", "percent-0-5", "percent-0-1")]
+    [string]$RecyclingReturnChance = "",
     [switch]$PrototypePositivePowerFloor,
     [switch]$ProductivityCapSelfRecyclingOnly,
     [switch]$UnrestrictedModules,
@@ -2521,6 +2559,9 @@ function Initialize-RuntimeScenario {
   if ($LabPolicySkip) {
     Set-CopiedLabPolicySkip -ModsDir $modsDir
   }
+  if ($LabPolicyEngineDefault) {
+    Set-CopiedLabPolicyEngineDefault -ModsDir $modsDir
+  }
   if ($SciencePackIngredientPolicy -ne "configured") {
     Set-CopiedSciencePackIngredientPolicy -ModsDir $modsDir -Policy $SciencePackIngredientPolicy
   }
@@ -2538,8 +2579,10 @@ function Initialize-RuntimeScenario {
     -ProductivityCap $PrototypeProductivityCap `
     -EfficiencyCap $PrototypeEfficiencyCap `
     -PollutionCap $PrototypePollutionCap `
+    -SpeedFloor $PrototypeSpeedFloor `
     -SpeedCap $PrototypeSpeedCap `
     -QualityCap $PrototypeQualityCap `
+    -RecyclingReturnChance $RecyclingReturnChance `
     -PositivePowerFloor ([bool]$PrototypePositivePowerFloor) `
     -ProductivityCapSelfRecyclingOnly ([bool]$ProductivityCapSelfRecyclingOnly) `
     -UnrestrictedModules ([bool]$UnrestrictedModules)
@@ -2629,21 +2672,26 @@ function Invoke-RuntimeScenario {
     [hashtable]$BaseEffectPerLevelOverrides = @{},
     [hashtable]$BaseMaxLevelOverrides = @{},
     [switch]$LabPolicySkip,
+    [switch]$LabPolicyEngineDefault,
     [ValidateSet("configured", "space", "space-and-promethium", "space-age-progression", "official-progression", "mod-progression", "all-official", "all")]
     [string]$SciencePackIngredientPolicy = "configured",
     [ValidateSet("", "off", "only-when-dedicated-tech-enabled", "always")]
     [string]$WeaponSpeedAdjustmentMode = "",
     [double]$PipelineExtentMultiplier = 1,
-    [ValidateSet("", "engine-default", "percent-50", "percent-75", "percent-100", "percent-200", "percent-250", "percent-400", "percent-500", "percent-1000", "percent-2500", "percent-10000", "percent-100000")]
+    [ValidateSet("", "engine-default", "percent-25", "percent-50", "percent-75", "percent-100", "percent-125", "percent-150", "percent-200", "percent-250", "percent-400", "percent-500", "percent-750", "percent-1000", "percent-2500", "percent-5000", "percent-10000", "percent-25000", "percent-100000")]
     [string]$PrototypeProductivityCap = "",
-    [ValidateSet("", "engine-default", "saving-50", "saving-75", "saving-90", "saving-95", "saving-99", "saving-999", "saving-9999")]
+    [ValidateSet("", "engine-default", "saving-25", "saving-50", "saving-75", "saving-90", "saving-95", "saving-99", "saving-999", "saving-9999")]
     [string]$PrototypeEfficiencyCap = "",
-    [ValidateSet("", "engine-default", "saving-50", "saving-75", "saving-90", "saving-95", "saving-99", "saving-999", "saving-9999")]
+    [ValidateSet("", "engine-default", "saving-25", "saving-50", "saving-75", "saving-90", "saving-95", "saving-99", "saving-999", "saving-9999")]
     [string]$PrototypePollutionCap = "",
-    [ValidateSet("", "engine-default", "bonus-50", "bonus-75", "bonus-100", "bonus-200", "bonus-250", "bonus-400", "bonus-500", "bonus-1000", "bonus-10000", "bonus-100000")]
+    [ValidateSet("", "engine-default", "bonus-25", "bonus-50", "bonus-75", "bonus-100", "bonus-125", "bonus-150", "bonus-200", "bonus-250", "bonus-300", "bonus-400", "bonus-500", "bonus-750", "bonus-1000", "bonus-2500", "bonus-5000", "bonus-10000", "bonus-25000", "bonus-100000")]
     [string]$PrototypeSpeedCap = "",
-    [ValidateSet("", "engine-default", "bonus-50", "bonus-75", "bonus-100", "bonus-200", "bonus-250", "bonus-400", "bonus-500", "bonus-1000", "bonus-10000", "bonus-100000")]
+    [ValidateSet("", "engine-default", "saving-25", "saving-50", "saving-75", "saving-90", "saving-95", "saving-99", "saving-999", "saving-9999")]
+    [string]$PrototypeSpeedFloor = "",
+    [ValidateSet("", "engine-default", "bonus-25", "bonus-50", "bonus-75", "bonus-100", "bonus-125", "bonus-150", "bonus-200", "bonus-250", "bonus-300", "bonus-400", "bonus-500", "bonus-750", "bonus-1000", "bonus-2500", "bonus-5000", "bonus-10000", "bonus-25000", "bonus-100000")]
     [string]$PrototypeQualityCap = "",
+    [ValidateSet("", "engine-default", "match-productivity-cap", "percent-25", "percent-20", "percent-15", "percent-12-5", "percent-10", "percent-7-5", "percent-5", "percent-2-5", "percent-1", "percent-0-5", "percent-0-1")]
+    [string]$RecyclingReturnChance = "",
     [switch]$PrototypePositivePowerFloor,
     [switch]$ProductivityCapSelfRecyclingOnly,
     [switch]$UnrestrictedModules,
@@ -2667,6 +2715,7 @@ function Invoke-RuntimeScenario {
       -BaseEffectPerLevelOverrides $BaseEffectPerLevelOverrides `
       -BaseMaxLevelOverrides $BaseMaxLevelOverrides `
       -LabPolicySkip:$LabPolicySkip `
+      -LabPolicyEngineDefault:$LabPolicyEngineDefault `
       -SciencePackIngredientPolicy $SciencePackIngredientPolicy `
       -WeaponSpeedAdjustmentMode $WeaponSpeedAdjustmentMode `
       -PipelineExtentMultiplier $PipelineExtentMultiplier `
@@ -2674,7 +2723,9 @@ function Invoke-RuntimeScenario {
       -PrototypeEfficiencyCap $PrototypeEfficiencyCap `
       -PrototypePollutionCap $PrototypePollutionCap `
       -PrototypeSpeedCap $PrototypeSpeedCap `
+      -PrototypeSpeedFloor $PrototypeSpeedFloor `
       -PrototypeQualityCap $PrototypeQualityCap `
+      -RecyclingReturnChance $RecyclingReturnChance `
       -PrototypePositivePowerFloor:$PrototypePositivePowerFloor `
       -ProductivityCapSelfRecyclingOnly:$ProductivityCapSelfRecyclingOnly `
       -UnrestrictedModules:$UnrestrictedModules `
@@ -3371,6 +3422,16 @@ if ($skipPolicyLine -notmatch "status=skipped" -or $skipPolicyLine -notmatch "la
   throw "Skip-policy runtime validation did not skip incompatible science-pack productivity as expected: $skipPolicyLine"
 }
 
+Invoke-RuntimeScenario -ScenarioName "lab-policy-engine-default" -EnabledFixtureNames @(
+  "mir-fixture-item-science-pack",
+  "mir-fixture-custom-lab",
+  "mir-fixture-late-recipe"
+) -LabPolicyEngineDefault
+
+$engineDefaultLabPolicyLine = Get-LastStreamReportLine -Key "research_science_pack_productivity"
+Assert-ReportLineContains -Line $engineDefaultLabPolicyLine -Expected "status=skipped" -Context "Engine-unchanged lab policy scenario"
+Assert-ReportLineContains -Line $engineDefaultLabPolicyLine -Expected "lab_status=invalid" -Context "Engine-unchanged lab policy scenario"
+
 Invoke-RuntimeScenario -ScenarioName "space-pack-policy" -EnabledFixtureNames @() -SciencePackIngredientPolicy "space"
 $spacePackLine = Get-LastStreamReportLine -Key "research_gears"
 Assert-ReportLineGenerated -Line $spacePackLine -Context "Space science-pack ingredient policy scenario"
@@ -3514,8 +3575,8 @@ Assert-ReportLineContains -Line $airScrubbingUnknownDecision -Expected "decision
 
 Invoke-RuntimeScenario -ScenarioName "pipeline-extent-multiplier" -EnabledFixtureNames @(
   "mir-fixture-assert-pipeline-extent"
-) -PipelineExtentMultiplier 2
-Assert-LogContains -Expected "Applied pipeline extent multiplier 2" -Context "Pipeline extent multiplier scenario"
+) -PipelineExtentMultiplier 10
+Assert-LogContains -Expected "Applied pipeline extent multiplier 10" -Context "Pipeline extent multiplier scenario"
 
 Invoke-RuntimeScenario -ScenarioName "pipeline-extent-multiplier-50" -EnabledFixtureNames @(
   "mir-fixture-assert-pipeline-extent"
@@ -3525,22 +3586,26 @@ Assert-LogContains -Expected "Applied pipeline extent multiplier 0.5" -Context "
 Invoke-RuntimeScenario -ScenarioName "prototype-limit-overrides-base" -EnabledFixtureNames @(
   "mir-fixture-assert-prototype-limits"
 ) `
-  -PrototypeProductivityCap "percent-500" `
-  -PrototypeEfficiencyCap "saving-95" `
-  -PrototypePollutionCap "saving-95" `
-  -PrototypeSpeedCap "bonus-500" `
-  -PrototypeQualityCap "bonus-500" `
+  -PrototypeProductivityCap "percent-750" `
+  -PrototypeEfficiencyCap "saving-25" `
+  -PrototypePollutionCap "saving-25" `
+  -PrototypeSpeedFloor "saving-25" `
+  -PrototypeSpeedCap "bonus-25000" `
+  -PrototypeQualityCap "bonus-25" `
+  -RecyclingReturnChance "percent-0-1" `
   -PrototypePositivePowerFloor
 Assert-LogContains -Expected "Applied prototype limits: productivity_recipes=" -Context "Base prototype limit override scenario"
 
 Invoke-RuntimeScenario -ScenarioName "prototype-limit-overrides-space-age" -EnabledFixtureNames @(
   "mir-fixture-assert-prototype-limits"
 ) `
-  -PrototypeProductivityCap "percent-1000" `
+  -PrototypeProductivityCap "percent-25000" `
   -PrototypeEfficiencyCap "saving-99" `
   -PrototypePollutionCap "saving-99" `
-  -PrototypeSpeedCap "bonus-1000" `
-  -PrototypeQualityCap "bonus-1000" `
+  -PrototypeSpeedFloor "saving-9999" `
+  -PrototypeSpeedCap "bonus-2500" `
+  -PrototypeQualityCap "bonus-2500" `
+  -RecyclingReturnChance "match-productivity-cap" `
   -EnableSpaceAge
 Assert-LogContains -Expected "Applied prototype limits: productivity_recipes=" -Context "Space Age prototype limit override scenario"
 

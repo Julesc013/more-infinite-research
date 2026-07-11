@@ -30,6 +30,7 @@ streams:
       evidence:
         fixtures:
           - fixtures/assert-generation-integrity
+          - fixtures/assert-prototype-limits
     recipe-prod-research_agricultural_growth_speed-1:
       canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_agricultural_growth_speed-1
       introduced_in: "pre-2.2.0"

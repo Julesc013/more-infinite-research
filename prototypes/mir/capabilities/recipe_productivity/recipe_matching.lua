@@ -133,6 +133,28 @@ local function add_pattern_outputs(want, patterns, iterator)
   end)
 end
 
+local function add_module_outputs(want, options)
+  local tiers = options.module_tiers
+  local tier_set = nil
+  if type(tiers) == "table" then
+    tier_set = {}
+    for _, tier in ipairs(tiers) do tier_set[tonumber(tier)] = true end
+  end
+  local minimum = tonumber(options.module_tier_min)
+  local maximum = tonumber(options.module_tier_max)
+  if not tier_set and minimum == nil and maximum == nil then return end
+  for name, module in pairs(data_raw.prototypes("module")) do
+    local tier = type(module) == "table" and tonumber(module.tier) or nil
+    if tier
+      and (not tier_set or tier_set[tier])
+      and (minimum == nil or tier >= minimum)
+      and (maximum == nil or tier <= maximum)
+    then
+      want[name] = true
+    end
+  end
+end
+
 local function gather_by_items(items, patterns, options)
   local want = {}
   options = options or {}
@@ -141,6 +163,7 @@ local function gather_by_items(items, patterns, options)
   add_wanted_outputs(want, options.extra_outputs)
   add_pattern_outputs(want, patterns, lookup.each_item_prototype)
   add_pattern_outputs(want, options.fluid_patterns, lookup.each_fluid_prototype)
+  add_module_outputs(want, options)
   local seen, list = {}, {}
   for rname, r in pairs(data_raw.prototypes("recipe")) do
     if not should_skip_recipe(rname, r, options) then
@@ -183,6 +206,9 @@ function R.recipes_for_stream(spec, per_level_default)
         exclude_ingredient_patterns = merge_lists(spec.exclude_ingredient_patterns, g.exclude_ingredient_patterns),
         include_hidden = spec.include_hidden or g.include_hidden,
         include_recycling = spec.include_recycling or g.include_recycling,
+        module_tiers = g.module_tiers,
+        module_tier_min = g.module_tier_min,
+        module_tier_max = g.module_tier_max,
         match_mode = g.mode or spec.mode,
         match_stream = g.match and g or spec
       })
@@ -211,6 +237,9 @@ function R.recipes_for_stream(spec, per_level_default)
     exclude_ingredient_patterns = spec.exclude_ingredient_patterns,
     include_hidden = spec.include_hidden,
     include_recycling = spec.include_recycling,
+    module_tiers = spec.module_tiers,
+    module_tier_min = spec.module_tier_min,
+    module_tier_max = spec.module_tier_max,
     match_mode = spec.mode,
     match_stream = spec
   })

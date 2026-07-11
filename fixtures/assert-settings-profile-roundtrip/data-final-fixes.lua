@@ -14,6 +14,12 @@ local function assert_true(label, value)
   end
 end
 
+local function assert_close(label, actual, expected)
+  if type(actual) ~= "number" or math.abs(actual - expected) > 0.0000001 then
+    fail(label .. " was " .. tostring(actual) .. ", expected " .. tostring(expected) .. ".")
+  end
+end
+
 local function assert_nil(label, value)
   if value ~= nil then
     fail(label .. " was " .. tostring(value) .. ", expected nil.")
@@ -33,9 +39,13 @@ local valid_profile = {
   settings = {
     ["ips-enable-research_air_scrubbing_clean_filter"] = false,
     ["ips-cost-base-research_tungsten"] = 12345,
-    ["mir-pipeline-extent-multiplier"] = "500",
-    ["mir-prototype-efficiency-cap"] = "saving-9999",
-    ["mir-prototype-pollution-cap"] = "saving-9999",
+    ["mir-pipeline-extent-multiplier"] = 123.45,
+    ["mir-prototype-productivity-cap"] = 4321.5,
+    ["mir-recycling-return-chance"] = 12.34,
+    ["mir-prototype-efficiency-cap"] = -83.25,
+    ["mir-prototype-pollution-cap"] = -91.125,
+    ["mir-prototype-speed-cap"] = 1234.5,
+    ["mir-prototype-quality-cap"] = 678.9,
     ["mir-prototype-positive-power-floor"] = true
   }
 }
@@ -48,12 +58,15 @@ assert_equal("deterministic encoded profile", encoded_b, encoded_a)
 
 local decoded, decode_err = profile_codec.decode(encoded_a)
 if not decoded then fail("encoded profile did not decode: " .. tostring(decode_err)) end
-assert_equal("decoded efficiency cap", decoded.settings["mir-prototype-efficiency-cap"], "saving-9999")
-assert_equal("decoded pollution cap", decoded.settings["mir-prototype-pollution-cap"], "saving-9999")
+assert_equal("decoded custom pipeline percentage", decoded.settings["mir-pipeline-extent-multiplier"], 123.45)
+assert_equal("decoded custom productivity percentage", decoded.settings["mir-prototype-productivity-cap"], 4321.5)
+assert_equal("decoded custom recycler percentage", decoded.settings["mir-recycling-return-chance"], 12.34)
+assert_equal("decoded custom efficiency percentage", decoded.settings["mir-prototype-efficiency-cap"], -83.25)
+assert_equal("decoded custom pollution percentage", decoded.settings["mir-prototype-pollution-cap"], -91.125)
 assert_equal("decoded hidden provider setting", decoded.settings["ips-enable-research_air_scrubbing_clean_filter"], false)
 
 local recognized, unknown, invalid = profile_codec.count_recognized_settings(decoded)
-assert_equal("recognized valid profile settings", recognized, 6)
+assert_equal("recognized valid profile settings", recognized, 10)
 assert_equal("unknown valid profile settings", unknown, 0)
 assert_equal("invalid valid profile settings", invalid, 0)
 
@@ -79,16 +92,25 @@ local invalid_profile = {
   settings = {
     ["ips-enable-research_air_scrubbing_clean_filter"] = false,
     ["ips-cost-base-research_tungsten"] = "wrong-type",
-    ["mir-pipeline-extent-multiplier"] = "1000",
+    ["mir-pipeline-extent-multiplier"] = "2000",
     ["mir-prototype-efficiency-cap"] = "saving-100000",
+    ["mir-prototype-productivity-cap"] = -1,
+    ["mir-recycling-return-chance"] = 25.1,
     ["mir-fixture-unknown-setting"] = true
   }
 }
 
 local invalid_status = profile_codec.profile_status(invalid_profile)
 assert_equal("recognized invalid-profile settings", invalid_status.recognized, 1)
-assert_equal("invalid invalid-profile settings", invalid_status.invalid, 3)
+assert_equal("invalid invalid-profile settings", invalid_status.invalid, 5)
 assert_equal("unknown invalid-profile settings", invalid_status.unknown, 1)
 
 local speed_legacy_ok = settings_catalog.validate_value("mir-prototype-speed-cap", "bonus-100000")
 assert_true("legacy speed import cap remains accepted", speed_legacy_ok)
+
+local pipeline_extent = require("__more-infinite-research__.prototypes.mir.settings.pipeline_extent")
+local prototype_limits = require("__more-infinite-research__.prototypes.mir.settings.prototype_limits")
+assert_close("custom pipeline percentage parse", pipeline_extent.parse(123.45), 1.2345)
+assert_close("custom productivity percentage parse", prototype_limits.value("productivity", 4321.5), 43.215)
+assert_close("custom efficiency percentage parse", prototype_limits.value("efficiency", -83.25), -0.8325)
+assert_close("custom recycler percentage parse", prototype_limits.recycling_return_value(12.34, nil), 0.1234)

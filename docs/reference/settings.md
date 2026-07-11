@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: developer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-07-09
+last_reviewed: 2026-07-11
 supersedes: [docs/reference/settings-reference.md]
 superseded_by: []
 ---
@@ -107,6 +107,14 @@ therefore stays in the first bucket.
 
 ## Prototype Limit Settings
 
+Every string dropdown has a neutral/bypass value. Existing values serve that
+role where possible: `configured` for science ingredients, `off` for weapon
+speed cleanup, `100` for pipeline extent, and `engine-default` for lab handling
+and prototype overrides. The lab `engine-default` path never rewrites the
+selected ingredients: a safely researchable set is preserved exactly, while an
+unsafe set causes the generated technology to be omitted. Neutral options must
+not load or apply the corresponding optional mutation pass.
+
 Prototype limit settings are startup-only explicit numeric overrides. Their internal
 default value is `engine-default`, which means no prototype mutation. In the
 settings UI, the unchanged options are labelled as concrete values:
@@ -120,6 +128,7 @@ default in its numeric position.
 | `mir-prototype-productivity-cap` | `RecipePrototype.maximum_productivity` on non-parameter recipes |
 | `mir-prototype-efficiency-cap` | `effect_receiver.consumption_limits.low` on supported machines, labs, drills, and agricultural towers |
 | `mir-prototype-pollution-cap` | `effect_receiver.pollution_limits.low` on supported machines, labs, drills, and agricultural towers |
+| `mir-prototype-speed-floor` | `effect_receiver.speed_limits.low` on supported machines, labs, drills, and agricultural towers |
 | `mir-prototype-speed-cap` | `effect_receiver.speed_limits.high` on supported machines, labs, drills, and agricultural towers |
 | `mir-prototype-quality-cap` | `effect_receiver.quality_limits.high` on supported machines, labs, drills, and agricultural towers |
 
@@ -128,12 +137,44 @@ selected productivity caps above +300%. It raises only recipes classified as a
 single-item, expected-value non-generative self-recycling path; nonqualifying
 recipes retain their existing cap and the recycling recipe is never raised.
 
+`mir-recycling-return-chance` targets only hidden generated recipes in the
+`recycling` category with one item input and `unlock_results = false`. Automatic
+mode uses `min(0.25, 1 / (1 + selected_productivity_bonus))`, then scales each
+item product's independent probability relative to Factorio's normal 25%
+return. It does not mutate visible recycling processes, shared-probability
+products, or scrap recycling. Fixed options are 25%, 20%, 15%, 12.5%, 10%,
+7.5%, 5%, 2.5%, 1%, 0.5%, and 0.1%.
+
+`mir-prototype-speed-floor` writes `effect_receiver.speed_limits.low`
+independently from `mir-prototype-speed-cap`, which writes the high side. The
+floor options are -25%, -50%, -75%, unchanged -80%, -90%, -95%, -99%,
+-99.9%, and -99.99%.
+
+The shared positive ladder is 25%, 50%, 75%, 100%, 125%, 150%, 200%, 250%,
+300%, 400%, 500%, 750%, 1000%, 2500%, 5000%, 10000%, 25000%, and 100000%
+where the underlying Factorio field permits it. Pipeline extent uses 25%, 50%,
+75%, 100%, 125%, 150%, 200%, 250%, 300%, 400%, 500%, 750%, and 1000%.
+Productivity exposes the full shared ladder; speed and quality use the engine's
+unchanged +100000% entry plus explicit overrides through +25000%.
+
+Portable profiles may supply a JSON number instead of a dropdown enum for the
+numeric dropdowns. Numbers use displayed percentage units, are checked for
+finiteness and setting-specific bounds, and are converted only after catalog
+validation. The UI setting remains a string dropdown, so arbitrary values never
+enter Factorio's `allowed_values` registration. Pipeline accepts 0.1..100000,
+productivity 0..100000, recycler return 0..25, negative floors -99.99..0, and
+positive speed/quality caps 0..100000.
+
 `mir-unrestricted-modules` is a default-off compatibility setting. It sets all
 five recipe module permission flags, discovers final module categories, and
 opens those categories and effect types on every existing receiver with module
 slots, including beacons. It does not create slots or mutate module prototypes.
 
-Every non-scripted generated stream and base continuation also has an
+The module productivity stream resolves recipe outputs from final
+`ModulePrototype.tier` values. Tier ranges live in stream data: tier 1 is 10%,
+tier 2 is 5%, tier 3 is 2%, and tier 4 or later is 1% per research level.
+
+Every generated stream and base continuation also has an
 `ips-effect-per-level-<stream>` or `mir-effect-per-level-<extension>` setting.
 The selected value is an anchor, and MIR scales only the numeric effects it
 emits from the canonical anchor. Ownership, adoption, and equivalence decisions

@@ -51,10 +51,14 @@ fixtures:
       - prototype-limit-startup-overrides
       - recipe-maximum-productivity-cap
       - above-300-cap-self-recycling-scope
+      - cap-balanced-generated-recycling-return
+      - visible-recycling-process-exclusion
       - unrestricted-module-permissions
       - module-permission-array-isolation
+      - module-prototype-tier-recipe-discovery
       - effect-receiver-limits
       - separate-energy-and-pollution-limits
+      - separate-positive-speed-cap-and-negative-speed-floor
       - positive-power-floor-opt-in
 
   effect-scaling:

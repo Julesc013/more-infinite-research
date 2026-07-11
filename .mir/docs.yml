@@ -598,6 +598,20 @@ docs:
     doc_type: reference
     owner: mir-maintainers
     source_of_truth_for: []
+  - path: docs/compatibility/targets/modules-t4.md
+    title: "Tier 4 Modules Compatibility"
+    status: current
+    audience: modpack-author
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/compatibility/targets/finite-prod-techs.md
+    title: "Finite Productivity Technologies Compatibility"
+    status: current
+    audience: modpack-author
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for: []
   - path: docs/compatibility/targets/fluid-must-flow.md
     title: "Fluid Must Flow Compatibility"
     status: current
@@ -1127,6 +1141,14 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - mir-3.0.5-release-notes
+  - path: docs/releases/3.0.5-settings-inventory.md
+    title: "MIR 3.0.5 Settings Inventory"
+    status: current
+    audience: player
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-3.0.5-settings-inventory
   - path: docs/releases/3.0.5-validation-summary.md
     title: "MIR 3.0.5 Validation Summary"
     status: current

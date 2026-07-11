@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: maintainer
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-07-09
+last_reviewed: 2026-07-11
 supersedes: []
 superseded_by: []
 ---
@@ -42,6 +42,10 @@ contract unless there is a documented migration reason to retire it.
   and document every non-default value as an explicit global prototype override.
 - Keep energy-use limits, pollution limits, and zero-power prototype rewrites as
   separate controls. The zero-power rewrite must remain default off.
+- Keep positive speed caps and negative speed floors as separate controls.
+- Recycler-return overrides must remain explicit, default unchanged, and
+  limited to hidden generated recycling recipes; visible recycling processes
+  are outside this setting.
 - Use visible section prefixes and order ranges for global settings. Do not add
   fake divider settings.
 - Treat rich text in setting labels as a visual enhancement only; the plain
@@ -127,6 +131,35 @@ checkbox changes explicit `0W` active `energy_usage` prototypes to `1W`.
 
 Keep the implementation in the MIR settings and pipeline layers. Compatibility
 policy files may not apply these overrides directly.
+
+The automatic recycler choice uses the inverse of total capped output, not the
+inverse of the bonus alone. A +400% bonus produces five total crafts, so the
+safe return is 20%; using 25% would still create a positive loop. The automatic
+choice must never increase Factorio's normal 25% return.
+
+## Dropdown Neutrality And Value Ladders
+
+Every dropdown must retain at least one explicit neutral option. Selecting it
+must preserve engine or configured baseline behavior and bypass the optional
+transformation. Use an existing stable enum when it already has that meaning:
+`configured`, `off`, and pipeline `100` are neutral. Use `engine-default` when
+the setting controls a Factorio prototype or when an explicit MIR policy bypass
+is needed. A neutral label must include `unchanged` or `bypass` so its behavior
+is visible without opening source code.
+
+Do not remove or rename released enum values when broadening a dropdown. Numeric
+dropdowns use monotonic, reusable ladders: quarter steps around baseline,
+progressively wider high-end values, and precision steps near the Factorio
+negative-effect limit. The canonical arrays and value maps live in the settings
+modules; locale, fixtures, profile validation, and runtime parameter validation
+must be updated together.
+
+Curated dropdown values are a UI contract, not the full advanced profile
+contract. Numeric dropdowns may opt into validated JSON-number imports using
+displayed percentage units. Keep the import bounds beside the canonical catalog
+spec, reject non-finite and out-of-range values, and make the setting parser
+handle imported numbers explicitly. Do not add catalog-only metadata to the
+prototype table passed to `data:extend`.
 
 ## Backports
 
