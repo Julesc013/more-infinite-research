@@ -73,6 +73,12 @@ fixtures:
       - scripted-runtime-multiplier-delta
       - scripted-effect-selected-description
       - retained-non-default-base-effect-settings
+      - typed-stream-effect-contracts
+      - declaration-order-invariant-defaults
+      - canonical-descriptor-copy-isolation
+      - duplicate-stream-id-rejection
+      - overlay-descriptor-injection-rejection
+      - positive-stream-target-requirements
 
   competing-productivity-transaction:
     path: fixtures/plates-n-circuit-productivity

@@ -40,9 +40,22 @@ local function has_unsupported_required_mod(spec)
   return false
 end
 
+local function has_missing_positive_requirement(spec)
+  local requirements = spec and spec.descriptor and spec.descriptor.targets
+  if type(requirements) ~= "table" then return true end
+  for _, feature in ipairs(requirements.requires_features or {}) do
+    if not M.feature_enabled(feature) then return true end
+  end
+  for _, effect_type in ipairs(requirements.required_effect_types or {}) do
+    if unsupported_effect_types[effect_type] then return true end
+  end
+  return false
+end
+
 function M.stream_supported(key, spec)
   if unsupported_streams[key] then return false end
   if has_unsupported_required_mod(spec) then return false end
+  if has_missing_positive_requirement(spec) then return false end
   if not (spec and spec.direct_effects) then
     return M.feature_enabled("recipe_productivity")
   end

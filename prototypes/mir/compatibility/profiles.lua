@@ -53,7 +53,12 @@ end
 local function apply_profile(config, profile)
   if profile.streams then
     for key, patch in pairs(profile.streams) do
-      config.streams[key] = config.streams[key] or {}
+      if config.streams[key] == nil then
+        error("MIR compatibility profile attempted to recreate unknown or filtered stream " .. tostring(key) .. ".", 3)
+      end
+      if patch.descriptor ~= nil then
+        error("MIR compatibility profile must not replace canonical descriptor for stream " .. tostring(key) .. ".", 3)
+      end
       patch_stream(config.streams[key], patch)
     end
   end

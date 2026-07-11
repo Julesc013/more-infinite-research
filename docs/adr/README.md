@@ -5,13 +5,13 @@ applies_to: "3.0.0+"
 audience: maintainer
 doc_type: explanation
 owner: mir-maintainers
-last_reviewed: 2026-07-07
+last_reviewed: 2026-07-12
 supersedes: []
 superseded_by: []
 ---
 # Architecture Decision Records
 
-Updated: 2026-07-07
+Updated: 2026-07-12
 
 ADRs record durable 3.0 compatibility-compiler decisions. They should be short, specific, and updated by adding a new ADR rather than rewriting history.
 
@@ -30,3 +30,5 @@ Initial ADR set:
 - `0011`: Runtime code boundaries.
 - `0012`: Fixture and report-diff strategy.
 - `0013`: Factorio shell and MIR compiler namespace.
+- `0014`: MIR 3.0.5 convergence.
+- `0015`: Canonical stream descriptors.

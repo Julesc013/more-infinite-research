@@ -6,6 +6,9 @@ local use_installed_space_age_icons =
   and settings.startup
   and settings.startup["mir-use-installed-space-age-icons"]
   and settings.startup["mir-use-installed-space-age-icons"].value == true
+local stream_registry = require("__more-infinite-research__.prototypes.mir.streams.registry")
+local stream_descriptor = require("__more-infinite-research__.prototypes.mir.domain.streams.descriptor")
+local raw_stream_catalog = require("__more-infinite-research__.prototypes.mir.domain.streams.raw_catalog")
 
 local function fail(message)
   error("MIR validation failed: " .. message)
@@ -25,6 +28,78 @@ local function assert_no_blocked_pickup_effects()
     end
   end
 end
+
+local function assert_descriptor_contracts()
+  local snapshot = stream_registry.snapshot()
+  local count = 0
+  for key, spec in pairs(snapshot) do
+    count = count + 1
+    local descriptor = spec.descriptor
+    if not descriptor or descriptor.schema ~= 1 or descriptor.id ~= key then
+      fail("stream " .. key .. " is missing its canonical descriptor identity")
+    end
+    if descriptor.kind ~= "recipe-productivity" and descriptor.kind ~= "direct-effect" then
+      fail("stream " .. key .. " has invalid descriptor kind")
+    end
+    if not descriptor.effect or not descriptor.effect.canonical_anchor
+      or descriptor.effect.canonical_anchor <= 0 then
+      fail("stream " .. key .. " is missing its typed positive effect contract")
+    end
+    if not descriptor.targets or type(descriptor.targets.requires_features) ~= "table"
+      or type(descriptor.targets.required_effect_types) ~= "table" then
+      fail("stream " .. key .. " is missing positive target requirements")
+    end
+  end
+  if count ~= 70 then fail("canonical descriptor catalog expected 70 streams, got " .. tostring(count)) end
+
+  local first = stream_registry.get("research_copper")
+  first.descriptor.effect.canonical_anchor = 999
+  first.items[1] = "mutated-through-copy"
+  local second = stream_registry.get("research_copper")
+  if second.descriptor.effect.canonical_anchor == 999 or second.items[1] == "mutated-through-copy" then
+    fail("registry copies can mutate the require-cached canonical descriptor")
+  end
+
+  local productivity_a = stream_descriptor.normalize("order-productivity", {
+    groups = {{change = 0.05}, {change = 0.10}}
+  })
+  local productivity_b = stream_descriptor.normalize("order-productivity", {
+    groups = {{change = 0.10}, {change = 0.05}}
+  })
+  if productivity_a.descriptor.effect.canonical_anchor ~= productivity_b.descriptor.effect.canonical_anchor then
+    fail("productivity effect contract depends on declaration order")
+  end
+
+  local direct_a = stream_descriptor.normalize("order-direct", {
+    direct_effects = {
+      {type = "gun-speed", ammo_category = "rocket", modifier = 0.1},
+      {type = "gun-speed", ammo_category = "cannon-shell", modifier = 0.2}
+    }
+  })
+  local direct_b = stream_descriptor.normalize("order-direct", {
+    direct_effects = {
+      {type = "gun-speed", ammo_category = "cannon-shell", modifier = 0.2},
+      {type = "gun-speed", ammo_category = "rocket", modifier = 0.1}
+    }
+  })
+  if direct_a.descriptor.effect.canonical_anchor ~= direct_b.descriptor.effect.canonical_anchor then
+    fail("direct effect contract depends on declaration order")
+  end
+
+  local unique_ok = pcall(raw_stream_catalog.merge_unique, {
+    {name = "one", streams = {duplicate = {}}},
+    {name = "two", streams = {duplicate = {}}}
+  })
+  if unique_ok then fail("duplicate stream ids did not fail closed") end
+
+  local overlay_ok = pcall(stream_descriptor.normalize, "overlay-injection", {
+    descriptor = {},
+    groups = {{change = 0.1}}
+  })
+  if overlay_ok then fail("overlay descriptor injection did not fail closed") end
+end
+
+assert_descriptor_contracts()
 
 local function escape_pattern(text)
   return text:gsub("([^%w])", "%%%1")

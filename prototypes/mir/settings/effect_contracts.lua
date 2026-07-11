@@ -113,8 +113,6 @@ function M.descriptor_from_effects(effects)
     if descriptor and (descriptor.field ~= candidate.field or descriptor.unit ~= candidate.unit) then
       return nil
     end
-    -- Effect arrays are ordered declarations. The first effect is the
-    -- player-facing primary/base effect; later effects keep their ratios to it.
     if not descriptor then
       descriptor = {
         field = candidate.field,
@@ -123,56 +121,20 @@ function M.descriptor_from_effects(effects)
         canonical_anchor = candidate.value,
         whole_number = candidate.unit == "native" and close_to_integer(candidate.value)
       }
+    elseif candidate.value > descriptor.canonical_anchor then
+      descriptor.canonical_anchor = candidate.value
+      descriptor.whole_number = candidate.unit == "native" and close_to_integer(candidate.value)
     end
   end
   return descriptor
 end
 
-local function productivity_descriptor(spec)
-  -- Productivity groups are declared from the primary/base tier outward.
-  -- Optional late tiers may have much smaller bonuses, but must not change the
-  -- displayed default when their target prototypes are absent or present.
-  local anchor = nil
-  for _, group in ipairs((spec and spec.groups) or {}) do
-    local change = tonumber(group.change)
-    if change and change > 0 then
-      anchor = change
-      break
-    end
-  end
-  if not anchor then anchor = 0.10 end
-  return {
-    field = "change",
-    unit = "percent",
-    display_multiplier = 100,
-    canonical_anchor = anchor,
-    whole_number = false
-  }
-end
-
-local function explicit_descriptor(spec)
-  local descriptor = spec and spec.effect_per_level
-  if type(descriptor) ~= "table" then return nil end
-  local anchor = tonumber(descriptor.canonical_anchor)
-  if not anchor or anchor <= 0 then return nil end
-  local unit = descriptor.unit == "native" and "native" or "percent"
-  return {
-    field = descriptor.field or "modifier",
-    unit = unit,
-    display_multiplier = tonumber(descriptor.display_multiplier) or (unit == "percent" and 100 or 1),
-    canonical_anchor = anchor,
-    whole_number = descriptor.whole_number == true,
-    runtime_multiplier_delta = descriptor.runtime_multiplier_delta == true
-  }
-end
-
 function M.stream_descriptor(spec)
-  local explicit = explicit_descriptor(spec)
-  if explicit then return explicit end
-  if spec and spec.direct_effects then
-    return M.descriptor_from_effects(spec.direct_effects)
+  local source = spec and spec.descriptor and spec.descriptor.effect
+  if type(source) ~= "table" then
+    error("MIR stream is missing its canonical typed effect descriptor.", 2)
   end
-  return productivity_descriptor(spec)
+  return deepcopy(source)
 end
 
 function M.stream_setting_name(key)

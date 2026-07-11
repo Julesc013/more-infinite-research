@@ -232,8 +232,9 @@ local function make_stream(key, raw_spec)
 end
 
 function M.run()
-  for _, key in ipairs(table_utils.sorted_keys(C.streams)) do
-    make_stream(key, C.streams[key])
+  local streams = C.snapshot()
+  for _, key in ipairs(table_utils.sorted_keys(streams)) do
+    make_stream(key, streams[key])
   end
 
   if target_line.feature_enabled("recipe_productivity") then

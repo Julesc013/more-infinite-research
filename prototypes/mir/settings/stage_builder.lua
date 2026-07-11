@@ -1,4 +1,5 @@
 local C = require("prototypes.mir.streams.registry")
+local streams = C.snapshot()
 local defaults = require("prototypes.mir.settings.defaults")
 local settings_catalog = require("prototypes.mir.settings.catalog")
 local settings_adapter = require("prototypes.mir.settings.stage_adapter")
@@ -209,7 +210,7 @@ end
 
 local technology_setting_groups = {}
 
-for key, stream in pairs(C.streams) do
+for key, stream in pairs(streams) do
   table.insert(technology_setting_groups, {
     kind = "stream",
     key = key,

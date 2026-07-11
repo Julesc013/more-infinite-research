@@ -43,8 +43,8 @@ function M.append_end_game_gate_prerequisite(prereqs)
 end
 
 function M.build_for(key, ingredients)
-  local spec = C.streams[key] or {}
-  local packs = ingredients or science.best_lab_compatible_ingredients(science_selector.pick_science_for_stream(C.streams[key], key), key)
+  local spec = C.get(key) or {}
+  local packs = ingredients or science.best_lab_compatible_ingredients(science_selector.pick_science_for_stream(spec, key), key)
   local reqs, seen = {}, {}
   local function add(t)
     if t and science.technology_is_researchable(t) and not seen[t] then

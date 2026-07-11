@@ -6,6 +6,11 @@ generated_id_doc: docs/reference/generated-id-reference.md
 
 rules:
   - every generated technology has a stable manifest row
+  - every stream normalizes to a schema-1 canonical descriptor before settings or planning
+  - canonical descriptors expose typed effect and positive target-requirement contracts
+  - consumers receive deep copies and cannot mutate require-cached canonical descriptors
+  - duplicate stream IDs and overlay descriptor injection fail closed
+  - effect defaults are invariant under effect and productivity-group declaration order
   - per-technology effect settings preserve canonical tier ratios
   - released stream IDs are not renamed without migration review
   - removed stream targets require migration review

@@ -8,6 +8,7 @@ local target_line = require("prototypes.mir.platform.factorio.target_line")
 
 local M = {}
 local spec_by_name_cache = nil
+local streams = C.snapshot()
 
 M.import_setting_name = "mir-settings-profile-import"
 
@@ -380,7 +381,7 @@ function M.all_specs()
     end
     table.insert(out, profile_spec)
   end
-  for key, stream in pairs(C.streams) do
+  for key, stream in pairs(streams) do
     for _, spec in ipairs(M.stream_setting_specs(key, stream)) do
       table.insert(out, with_profile_export(spec))
     end

@@ -117,6 +117,8 @@ modules:
     - prototypes/mir/domain/facts/generated_technology_registry.lua
     - prototypes/mir/domain/decisions/decision_record.lua
     - prototypes/mir/domain/streams/stream_spec.lua
+    - prototypes/mir/domain/streams/raw_catalog.lua
+    - prototypes/mir/domain/streams/descriptor.lua
   policy:
     - prototypes/mir/policy/adoption_policy.lua
     - prototypes/mir/policy/owner_policy.lua

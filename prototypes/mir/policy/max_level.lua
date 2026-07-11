@@ -18,7 +18,7 @@ local function apply_max_level(key, spec)
 end
 
 function M.apply()
-  for key, spec in pairs(C.streams) do
+  for key, spec in pairs(C.snapshot()) do
     apply_max_level(key, spec)
   end
 

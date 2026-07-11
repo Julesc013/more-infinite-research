@@ -66,7 +66,7 @@ end
 
 local function collect_enabled_stream_recipe_coverage()
   local covered = {}
-  for key, spec in pairs(C.streams or {}) do
+  for key, spec in pairs(C.snapshot()) do
     if not spec.direct_effects and costs.enabled_for(key, spec) and not stream_requirement_missing(spec) then
       local ingredients = science_packs.best_lab_compatible_ingredients(science_selector.pick_science_for_stream(spec, key), key)
       if not ingredients or #ingredients == 0 then goto continue end

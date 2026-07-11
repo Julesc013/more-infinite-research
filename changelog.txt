@@ -7,6 +7,9 @@ Date: 2026-07-12
     - Started the bounded 3.1 contract modernization from the immutable 3.0.5 behavior baseline.
     - Preserved released generated IDs, setting IDs and defaults, profile schema, and runtime namespaces as protected contracts.
     - Recorded exact 3.0.5 package, target, settings, stream, runtime, and diagnostic characterization evidence.
+    - Normalized every stream into a typed canonical descriptor shared by settings and planning.
+    - Made effect defaults invariant under declaration order and isolated canonical descriptors from require-cache mutation.
+    - Made duplicate stream IDs, unknown overlay streams, and overlay descriptor injection fail closed.
 
 ---------------------------------------------------------------------------------------------------
 Version: 3.0.5
