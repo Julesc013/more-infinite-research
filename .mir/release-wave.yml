@@ -98,8 +98,10 @@ waves:
     version: "3.1.0"
     branch: dev
     source_anchor_required: published-3.0.5-plus-accepted-portable-return
+    baseline_tag: pre-3.1-modernization
+    baseline_commit: f3d3b6073166b5acdc2ae5636c0d68302b757f0f
     implementation_gate: authorized-by-maintainer-directed-continuation
-    status: characterization
+    status: implementation
 
   mir_2_4_0:
     version: "2.4.0"
