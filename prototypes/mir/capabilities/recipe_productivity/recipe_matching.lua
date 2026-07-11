@@ -1,5 +1,6 @@
 local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 local lookup = require("prototypes.mir.platform.factorio.prototype_lookup")
+local recipe_facts = require("prototypes.mir.index.recipe_facts")
 
 local R = {}
 
@@ -15,42 +16,12 @@ local function merge_lists(a, b)
   return out
 end
 
-local function recipe_outputs(rec)
-  local out = {}
-  local function push(p)
-    if not p then return end
-    local name = type(p) == "string" and p or p.name or p[1]
-    if name then out[name] = true end
-  end
-  local function scan(def)
-    if not def then return end
-    if def.results then
-      for _, pp in pairs(def.results) do push(pp) end
-    elseif def.result then
-      push(def.result)
-    end
-  end
-  if rec.normal or rec.expensive then
-    scan(rec.normal)
-    scan(rec.expensive)
-  else
-    scan(rec)
-  end
-  return out
-end
-
 local function recipe_categories(recipe)
-  -- Factorio 2.1 can expose multiple categories; older prototypes used one.
-  if recipe.categories then return recipe.categories end
-  if recipe.category then return {recipe.category} end
-  return {"crafting"}
+  return recipe.categories or {"crafting"}
 end
 
 local function recipe_is_hidden(recipe)
-  if recipe.hidden then return true end
-  if recipe.normal and recipe.normal.hidden then return true end
-  if recipe.expensive and recipe.expensive.hidden then return true end
-  return false
+  return recipe.hidden == true
 end
 
 local function has_category(recipe, categories)
@@ -86,18 +57,10 @@ local function recipe_uses_blocked_ingredient(rec, patterns)
     end
     return false
   end
-  local function scan(def)
-    if not def or not def.ingredients then return false end
-    for _, ing in pairs(def.ingredients) do
-      local name = type(ing) == "string" and ing or ing.name or ing[1]
-      if name and matches(name) then return true end
-    end
-    return false
+  for _, name in ipairs(rec.ingredient_names or {}) do
+    if matches(name) then return true end
   end
-  if rec.normal or rec.expensive then
-    return scan(rec.normal) or scan(rec.expensive)
-  end
-  return scan(rec)
+  return false
 end
 
 local function should_skip_recipe(recipe_name, recipe, options)
@@ -164,10 +127,21 @@ local function gather_by_items(items, patterns, options)
   add_pattern_outputs(want, patterns, lookup.each_item_prototype)
   add_pattern_outputs(want, options.fluid_patterns, lookup.each_fluid_prototype)
   add_module_outputs(want, options)
+  local candidate_categories, candidate_patterns = {}, {}
+  local stream_match = options.match_stream and options.match_stream.match
+  if options.match_mode == "by_category_or_match" and stream_match then
+    for _, category in ipairs(stream_match.categories or {}) do table.insert(candidate_categories, category) end
+    for _, pattern in ipairs(stream_match.name_patterns or {}) do table.insert(candidate_patterns, pattern) end
+    for _, pattern in ipairs(stream_match.recipe_patterns or {}) do table.insert(candidate_patterns, pattern) end
+  end
+  for _, pattern in ipairs(options.recipe_patterns or {}) do table.insert(candidate_patterns, pattern) end
+
   local seen, list = {}, {}
-  for rname, r in pairs(data_raw.prototypes("recipe")) do
+  for _, rname in ipairs(recipe_facts.candidate_names(want, candidate_categories, candidate_patterns)) do
+    local r = recipe_facts.get(rname)
     if not should_skip_recipe(rname, r, options) then
-      local outs = recipe_outputs(r)
+      local outs = {}
+      for _, output_name in ipairs(r.result_names or {}) do outs[output_name] = true end
       local match = false
       for it, _ in pairs(want) do
         if it == "rail" then

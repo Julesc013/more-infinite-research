@@ -9,6 +9,7 @@ local use_installed_space_age_icons =
 local stream_registry = require("__more-infinite-research__.prototypes.mir.streams.registry")
 local stream_descriptor = require("__more-infinite-research__.prototypes.mir.domain.streams.descriptor")
 local raw_stream_catalog = require("__more-infinite-research__.prototypes.mir.domain.streams.raw_catalog")
+local canonical_recipe_facts = require("__more-infinite-research__.prototypes.mir.index.recipe_facts")
 
 local function fail(message)
   error("MIR validation failed: " .. message)
@@ -100,6 +101,21 @@ local function assert_descriptor_contracts()
 end
 
 assert_descriptor_contracts()
+
+local function assert_recipe_fact_contracts()
+  if canonical_recipe_facts.scan_count() ~= 1 then
+    fail("canonical recipe facts scanned recipe prototypes more than once")
+  end
+  local first = canonical_recipe_facts.get("iron-gear-wheel")
+  if not first or #first.result_names == 0 then fail("canonical iron gear recipe fact is missing") end
+  first.result_names[1] = "mutated-through-copy"
+  local second = canonical_recipe_facts.get("iron-gear-wheel")
+  if second.result_names[1] == "mutated-through-copy" then
+    fail("recipe fact consumer mutated the canonical require-cached fact")
+  end
+end
+
+assert_recipe_fact_contracts()
 
 local function escape_pattern(text)
   return text:gsub("([^%w])", "%%%1")

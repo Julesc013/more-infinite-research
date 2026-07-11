@@ -82,6 +82,8 @@ fixtures:
       - duplicate-stream-id-rejection
       - overlay-descriptor-injection-rejection
       - positive-stream-target-requirements
+      - canonical-recipe-fact-single-scan
+      - canonical-recipe-fact-copy-isolation
 
   competing-productivity-transaction:
     path: fixtures/plates-n-circuit-productivity

@@ -947,6 +947,22 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     }
   }
 
+  foreach ($consumer in @(
+    @{ File = "prototypes\mir\capabilities\recipe_productivity\recipe_matching.lua"; Text = $recipeMatchingText },
+    @{ File = "prototypes\mir\capabilities\science_integration\recipe_unlock_facts.lua"; Text = $scienceText }
+  )) {
+    if ($consumer.Text.Contains('data_raw.prototypes("recipe")')) {
+      throw "Recipe consumers must query the canonical build-once fact catalog: $($consumer.File)"
+    }
+  }
+  $recipeFactsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\index\recipe_facts.lua")
+  if (-not $recipeFactsText.Contains("function M.candidate_names") -or -not $recipeFactsText.Contains("function M.scan_count")) {
+    throw "Canonical recipe facts must expose indexed candidate queries and scan-count evidence."
+  }
+  if (-not $generationIntegrityFixtureText.Contains("canonical_recipe_facts.scan_count() ~= 1")) {
+    throw "Generation integrity fixture must prove one canonical recipe prototype scan."
+  }
+
   $settingsPresetsPath = Join-Path $repo "prototypes\settings-presets.lua"
   if (Test-Path -LiteralPath $settingsPresetsPath) {
     throw "Removed settings preset module should not exist: prototypes\settings-presets.lua"

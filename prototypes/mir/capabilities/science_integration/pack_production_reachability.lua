@@ -1,6 +1,6 @@
-local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 local pack_registry = require("prototypes.mir.capabilities.science_integration.pack_registry")
 local recipe_facts = require("prototypes.mir.capabilities.science_integration.recipe_unlock_facts")
+local canonical_recipe_facts = require("prototypes.mir.index.recipe_facts")
 
 local M = {}
 local technology_researchability_reason = nil
@@ -69,7 +69,7 @@ function M.pack_production_status(pack_name, visiting_packs)
 end
 
 function M.researchable_unlockers_for_recipe(recipe_name)
-  local recipe = data_raw.prototype("recipe", recipe_name)
+  local recipe = canonical_recipe_facts.get(recipe_name)
   if not recipe or recipe_facts.recipe_enabled_without_research(recipe) then return {} end
   local out = {}
   for _, technology_name in ipairs(recipe_facts.unlockers_for_recipe(recipe_name)) do
