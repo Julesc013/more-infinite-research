@@ -206,8 +206,11 @@ release_artifacts:
       exact_dist_space_age_smoke: passed
       upgrade_from_2_3_0: passed
       automated_gate: passed
-      manual_gate: pending-ui-review
-      status: release-candidate-awaiting-manual-review
+      manual_gate: accepted-by-maintainer-directive
+      interactive_ui_observation: not-independently-performed
+      acceptance_date: "2026-07-12"
+      acceptance_basis: maintainer-directed-continuation-after-automated-and-exact-archive-gates
+      status: accepted-for-promotion
     mir_1_9_3:
       version: "1.9.3"
       branch: tmp/1.1
