@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "generated_at": "2026-07-12T09:47:12+10:00",
+  "factorio_line": "2.0",
+  "tiers": [
+    "Static",
+    "Runtime",
+    "AuditSmoke"
+  ],
+  "include_full_audit": false,
+  "fail_on_audit_failures": true,
+  "collect_all": false,
+  "continue_on_dependency_failure": false,
+  "offline": false,
+  "from_lockfile": "",
+  "manual_scenarios_path": "",
+  "local_mod_zip_dirs": [],
+  "local_mod_zips": [],
+  "local_mod_library_dirs": [],
+  "local_mod_library_zips": [],
+  "scenario_names": [],
+  "local_mod_names": [],
+  "include_generated_local_pairwise": false,
+  "generated_local_pairwise_limit": 40,
+  "shard_local_mod_zips": false,
+  "link_mode": "Copy",
+  "scenario_timeout_seconds": 900,
+  "start_index": 0,
+  "shard_size": 25,
+  "results": [
+    {
+      "name": "Static",
+      "status": "passed",
+      "message": "",
+      "seconds": 15.93
+    },
+    {
+      "name": "Runtime",
+      "status": "passed",
+      "message": "",
+      "seconds": 512.98
+    },
+    {
+      "name": "AuditSmoke",
+      "status": "passed",
+      "message": "",
+      "seconds": 5.24
+    }
+  ]
+}
