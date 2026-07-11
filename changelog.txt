@@ -10,6 +10,9 @@ Date: 2026-07-12
     - Normalized every stream into a typed canonical descriptor shared by settings and planning.
     - Made effect defaults invariant under declaration order and isolated canonical descriptors from require-cache mutation.
     - Made duplicate stream IDs, unknown overlay streams, and overlay descriptor injection fail closed.
+    - Split science integration into pack registry, lab compatibility, recipe unlock facts, and technology researchability.
+    - Separated pack production reachability and science selection policy from shared facts.
+    - Preserved the public science facade and existing deterministic rejection reason codes while isolating fact caches.
 
 ---------------------------------------------------------------------------------------------------
 Version: 3.0.5

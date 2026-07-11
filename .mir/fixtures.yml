@@ -38,6 +38,9 @@ fixtures:
       - shared-recipe-unlocker-index
       - researchable-required-technology-policy
       - unlock-all-generated-stream-reachability
+      - decomposed-science-authority-parity
+      - stable-science-rejection-reason-codes
+      - shared-pack-production-reachability-cache
 
   settings-visibility:
     assertion_path: fixtures/assert-hidden-setting-readability

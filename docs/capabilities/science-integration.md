@@ -14,6 +14,17 @@ superseded_by: []
 
 Science integration decides when active science packs participate in generated research costs or science-pack productivity. Lab compatibility remains the hard gate.
 
+The 3.1 implementation separates six authorities behind the stable `science_packs.lua` facade:
+
+- `pack_registry.lua` discovers research packs from active lab inputs and owns official ordering;
+- `lab_compatibility.lua` validates or deterministically reduces ingredient sets;
+- `recipe_unlock_facts.lua` owns recipe output, initial-availability, and indexed unlock facts;
+- `technology_researchability.lua` owns enabled, acyclic, lab-valid researchability and reason codes;
+- `pack_production_reachability.lua` resolves initial, research-gated, non-recipe, and unreachable pack production;
+- `science_selection_policy.lua` owns configured, official, Space Age, mod-progression, and extension selection.
+
+The facade wires the two recursive authorities through explicit callbacks, avoiding module-load cycles while preserving the existing public functions and rejection strings. Each fact cache is private; consumers receive values or copies rather than mutable cache tables.
+
 Science ingredients and progression prerequisites are separate decisions. MIR adds no prerequisite when any visible recipe producing the pack is already enabled in every declared recipe difficulty. When pack production requires a recipe unlock, candidates must:
 
 - exist and remain enabled in the final prototype graph;

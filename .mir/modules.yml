@@ -137,6 +137,12 @@ modules:
     - prototypes/mir/capabilities/recipe_productivity/recipe_matching.lua
     - prototypes/mir/capabilities/science_integration/science_packs.lua
     - prototypes/mir/capabilities/science_integration/science_selector.lua
+    - prototypes/mir/capabilities/science_integration/pack_registry.lua
+    - prototypes/mir/capabilities/science_integration/lab_compatibility.lua
+    - prototypes/mir/capabilities/science_integration/recipe_unlock_facts.lua
+    - prototypes/mir/capabilities/science_integration/technology_researchability.lua
+    - prototypes/mir/capabilities/science_integration/pack_production_reachability.lua
+    - prototypes/mir/capabilities/science_integration/science_selection_policy.lua
   planner:
     - prototypes/mir/planner/compiler.lua
     - prototypes/mir/planner/stream_compiler.lua
