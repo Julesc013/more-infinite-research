@@ -14,7 +14,7 @@ superseded_by: []
 
 Recipe productivity is the capability lane that creates `change-recipe-productivity` effects for validated recipe families.
 
-`prototypes/mir/index/recipe_facts.lua` scans final recipe prototypes once and keeps the normalized authority private. It exposes copied facts plus indexed candidate queries by output, category, and name pattern. Recipe productivity matching and science pack production facts share that authority instead of rebuilding independent recipe views or walking every recipe once per stream. The generation-integrity fixture asserts a single prototype scan and copy isolation.
+`prototypes/mir/index/recipe_facts.lua` scans final recipe prototypes once and keeps the normalized authority private. It exposes copied facts plus indexed candidate queries by output, category, and name pattern. Recipe productivity matching, science pack production facts, compatibility diagnostics, and the diagnostic fact registry share that authority instead of rebuilding independent recipe views or walking every recipe once per stream. The generation-integrity fixture asserts a single prototype scan and copy isolation. Prototype mutation passes and the recycler pre-mutation safety classifier remain phase-local live-prototype operations, not competing general fact authorities.
 
 ## Gates
 

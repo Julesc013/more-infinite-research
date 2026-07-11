@@ -83,6 +83,16 @@ local function enabled_without_research(recipe)
   return true
 end
 
+local function main_product(recipe, result_names)
+  if recipe.main_product then return recipe.main_product end
+  for _, variant in ipairs(variants(recipe)) do
+    if variant.value.main_product then return variant.value.main_product end
+    if variant.value.result then return variant.value.result end
+  end
+  if #result_names == 1 then return result_names[1] end
+  return nil
+end
+
 local function append_index(index, key, recipe_name)
   index[key] = index[key] or {}
   table.insert(index[key], recipe_name)
@@ -104,6 +114,7 @@ local function build()
       ingredient_names = ingredient_names,
       results = results,
       result_names = result_names,
+      main_product = main_product(recipe, result_names),
       hidden = hidden(recipe),
       enabled_without_research = enabled_without_research(recipe),
       parameter = recipe.parameter == true,
