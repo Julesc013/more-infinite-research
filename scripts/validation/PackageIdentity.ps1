@@ -100,6 +100,15 @@ function Get-MIRFileContentIdentity {
   }
 }
 
+function Get-MIRFileContentSha256 {
+  param(
+    [Parameter(Mandatory)][string]$Path,
+    [Parameter(Mandatory)][string]$RelativePath
+  )
+
+  return (Get-MIRFileContentIdentity -Path $Path -RelativePath $RelativePath).Sha256
+}
+
 function Get-MIRZipEntryContentIdentity {
   param(
     [Parameter(Mandatory)]$Entry,
