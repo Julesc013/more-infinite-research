@@ -80,7 +80,8 @@ function Get-MIRDataFinalFixesSourceText {
   return Get-MIRCombinedSourceText -RelativePaths @(
     "data-final-fixes.lua",
     "prototypes/mir/stage/data_final_fixes.lua",
-    "prototypes/mir/stage/data_final_fixes_steps.lua"
+    "prototypes/mir/stage/data_final_fixes_steps.lua",
+    "prototypes/mir/pipeline/commands.lua"
   )
 }
 
@@ -748,8 +749,8 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "prototypes\mir\planner\requirements.lua"; Text = $plannerRequirementsText; Snippet = 'technology_requirements.skip_reason(spec)' },
     @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'require("prototypes.mir.settings.pipeline_extent").multiplier()' },
     @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'require("prototypes.mir.compatibility.diagnostics.registry").emit_all()' },
-    @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'if pipeline_extent_multiplier ~= 1 then' },
-    @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'require("prototypes.mir.pipeline.extent").apply(pipeline_extent_multiplier)' },
+    @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'if multiplier ~= 1 then' },
+    @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'require("prototypes.mir.pipeline.extent").apply(multiplier)' },
     @{ File = "prototypes\mir\settings\pipeline_extent.lua"; Text = $pipelineExtentSettingsText; Snippet = 'S.default_value = "100"' },
     @{ File = "prototypes\mir\settings\pipeline_extent.lua"; Text = $pipelineExtentSettingsText; Snippet = 'S.allowed_values = {"1000", "750", "500", "400", "300", "250", "200", "150", "125", "100", "75", "50", "25"}' },
     @{ File = "prototypes\mir\settings\pipeline_extent.lua"; Text = $pipelineExtentSettingsText; Snippet = 'function S.parse(value)' },
@@ -1053,7 +1054,8 @@ Invoke-RepoCheck "prototype limit settings are wired" {
   $streamDescriptorText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\domain\streams\descriptor.lua")
   $effectScalingText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\settings\effect_scaling.lua")
   $dataFinalFixesText = Get-MIRDataFinalFixesSourceText
-  $stepsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\stage\data_final_fixes_steps.lua")
+  $stepsText = (Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\stage\data_final_fixes_steps.lua")) + "`n" +
+    (Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\pipeline\commands.lua"))
   $prototypeLimitSettingsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\settings\prototype_limits.lua")
   $prototypeLimitPipelineText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\pipeline\prototype_limits.lua")
   $localeText = Get-Content -Raw -LiteralPath (Join-Path $repo "locale\en\more-infinite-research.cfg")

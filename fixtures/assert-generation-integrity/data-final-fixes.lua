@@ -10,6 +10,7 @@ local stream_registry = require("__more-infinite-research__.prototypes.mir.strea
 local stream_descriptor = require("__more-infinite-research__.prototypes.mir.domain.streams.descriptor")
 local raw_stream_catalog = require("__more-infinite-research__.prototypes.mir.domain.streams.raw_catalog")
 local canonical_recipe_facts = require("__more-infinite-research__.prototypes.mir.index.recipe_facts")
+local pipeline_commands = require("__more-infinite-research__.prototypes.mir.pipeline.commands")
 
 local function fail(message)
   error("MIR validation failed: " .. message)
@@ -116,6 +117,24 @@ local function assert_recipe_fact_contracts()
 end
 
 assert_recipe_fact_contracts()
+
+local function assert_pipeline_command_contracts()
+  local catalog = pipeline_commands.snapshot()
+  local count = 0
+  local allowed_kinds = {mutation = true, emission = true, plan = true, assertion = true}
+  for id, command in pairs(catalog) do
+    count = count + 1
+    if command.id ~= id or not allowed_kinds[command.kind] then
+      fail("pipeline command " .. tostring(id) .. " has invalid identity or kind")
+    end
+    if type(command.requires_features) ~= "table" or type(command.implementation) ~= "string" then
+      fail("pipeline command " .. id .. " is missing positive target requirements or implementation ownership")
+    end
+  end
+  if count ~= 13 then fail("expected 13 governed pipeline commands, got " .. tostring(count)) end
+end
+
+assert_pipeline_command_contracts()
 
 local function escape_pattern(text)
   return text:gsub("([^%w])", "%%%1")

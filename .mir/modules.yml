@@ -99,6 +99,7 @@ modules:
     - prototypes/streams/productivity.lua
     - prototypes/streams/direct-effects.lua
   pipeline:
+    - prototypes/mir/pipeline/commands.lua
     - prototypes/mir/pipeline/extent.lua
     - prototypes/mir/pipeline/prototype_limits.lua
     - prototypes/mir/pipeline/module_permissions.lua
@@ -188,6 +189,29 @@ modules:
     - prototypes/mir/runtime/state.lua
     - prototypes/mir/runtime/effects/agricultural_growth_speed.lua
     - prototypes/mir/runtime/effects/spoilage_preservation.lua
+
+mutation_commands:
+  registry: prototypes/mir/pipeline/commands.lua
+  rules:
+    - every prototype-changing pass has a stable command id
+    - every command declares positive target feature requirements
+    - only emission commands may create generated technology prototypes
+    - mutation commands may change existing prototypes only through their listed implementation
+    - exact-version compatibility repairs remain separately bounded
+  ids:
+    - compatibility-repairs
+    - module-permissions
+    - prototype-limits
+    - pipeline-extent
+    - prepare-competing-productivity
+    - prepare-competing-base-extensions
+    - emit-streams
+    - apply-competing-productivity
+    - emit-base-extensions
+    - apply-competing-base-extensions
+    - weapon-speed-adjustments
+    - max-level-control
+    - assert-technology-safety
 
 target_layers:
   stage:

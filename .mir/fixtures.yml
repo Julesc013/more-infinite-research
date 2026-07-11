@@ -84,6 +84,8 @@ fixtures:
       - positive-stream-target-requirements
       - canonical-recipe-fact-single-scan
       - canonical-recipe-fact-copy-isolation
+      - governed-pipeline-command-catalog
+      - pipeline-command-positive-target-requirements
 
   competing-productivity-transaction:
     path: fixtures/plates-n-circuit-productivity

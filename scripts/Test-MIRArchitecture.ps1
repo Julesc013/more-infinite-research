@@ -233,6 +233,7 @@ $requiredMirFiles = @(
   "prototypes/mir/settings/resolver.lua",
   "prototypes/mir/settings/pipeline_extent.lua",
   "prototypes/mir/streams/registry.lua",
+  "prototypes/mir/pipeline/commands.lua",
   "prototypes/mir/pipeline/extent.lua",
   "prototypes/mir/policy/adoption_policy.lua",
   "prototypes/mir/policy/owner_policy.lua",
@@ -308,11 +309,12 @@ Assert-MIRContains -RelativePath "prototypes/mir/stage/data_final_fixes.lua" -Te
 Assert-MIRContains -RelativePath "prototypes/mir/stage/data_final_fixes.lua" -Text $dataFinalFixesStageText -Needle 'require("prototypes.mir.planner.compiler").emit()'
 Assert-MIRContains -RelativePath "prototypes/mir/stage/data_final_fixes.lua" -Text $dataFinalFixesStageText -Needle "steps.assert_registered_technology_safety()"
 
-$dataFinalFixesStepsText = Read-MIRFile -RelativePath "prototypes/mir/stage/data_final_fixes_steps.lua"
+$dataFinalFixesStepsText = (Read-MIRFile -RelativePath "prototypes/mir/stage/data_final_fixes_steps.lua") + "`n" +
+  (Read-MIRFile -RelativePath "prototypes/mir/pipeline/commands.lua")
 foreach ($needle in @(
   'require("prototypes.mir.compatibility.repairs.factorio_2_1_recipe_schema").apply()',
   'require("prototypes.mir.settings.pipeline_extent").multiplier()',
-  'require("prototypes.mir.pipeline.extent").apply(pipeline_extent_multiplier)',
+  'require("prototypes.mir.pipeline.extent").apply(multiplier)',
   'require("prototypes.mir.policy.competing_productivity").prepare()',
   'require("prototypes.mir.planner.stream_compiler").run()',
   'require("prototypes.mir.emit.base_extensions").emit_all()',
@@ -326,6 +328,31 @@ foreach ($needle in @(
   'require("prototypes.mir.report.diagnostics_sink").flush()'
 )) {
   Assert-MIRContains -RelativePath "prototypes/mir/stage/data_final_fixes_steps.lua" -Text $dataFinalFixesStepsText -Needle $needle
+}
+
+$stageStepsOnlyText = Read-MIRFile -RelativePath "prototypes/mir/stage/data_final_fixes_steps.lua"
+foreach ($commandId in @(
+  "compatibility-repairs",
+  "module-permissions",
+  "prototype-limits",
+  "pipeline-extent",
+  "prepare-competing-productivity",
+  "prepare-competing-base-extensions",
+  "emit-streams",
+  "apply-competing-productivity",
+  "emit-base-extensions",
+  "apply-competing-base-extensions",
+  "weapon-speed-adjustments",
+  "max-level-control",
+  "assert-technology-safety"
+)) {
+  Assert-MIRContains `
+    -RelativePath "prototypes/mir/stage/data_final_fixes_steps.lua" `
+    -Text $stageStepsOnlyText `
+    -Needle ('commands.run("' + $commandId + '")')
+}
+if ($stageStepsOnlyText -match 'require\("prototypes\.mir\.(pipeline\.(extent|prototype_limits|module_permissions)|policy\.(competing_productivity|competing_base_extensions|max_level|weapon_speed)|planner\.stream_compiler|emit\.base_extensions|compatibility\.repairs\.)') {
+  throw "Data-final-fixes stage wrappers must execute mutators and emitters only through pipeline commands."
 }
 
 $technologyBuilderText = Read-MIRFile -RelativePath "prototypes/mir/emit/technology_builder.lua"

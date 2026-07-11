@@ -16,6 +16,7 @@ Date: 2026-07-12
     - Added immutable build-once recipe facts and indexes for stream matching and science reachability.
     - Replaced maintained 2.1 and 2.0 stream/effect denylists with positive mod and effect support declarations.
     - Made package ZIP entry order, timestamps, attributes, and compression inputs deterministic.
+    - Routed data-final-fixes passes through named commands with owned implementations and positive target requirements.
 
 ---------------------------------------------------------------------------------------------------
 Version: 3.0.5
