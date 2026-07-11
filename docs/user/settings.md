@@ -45,7 +45,7 @@ and inserter performance assumptions.
 MIR includes startup-only prototype limit settings:
 
 - Recipe productivity cap
-- Generated recycler return rate
+- Recycler return rate
 - Energy savings cap
 - Pollution reduction cap
 - Minimum machine speed
@@ -60,7 +60,7 @@ MIR never raises the recycling recipe itself. The checkbox has no effect at
 +300% or below.
 
 The `mir-recycling-return-chance` dropdown is a separate balance control for
-hidden generated recycling recipes. `Match productivity cap (safe)` uses the
+hidden generated recycling recipes. `Match productivity cap` uses the
 inverse of total capped output, `1 / (1 + bonus)`, and never raises the normal
 25% return. That means +400% productivity uses a 20% recycler return and
 +1000% uses about 9.09%. Fixed 25%, 20%, 15%, 12.5%, 10%, 7.5%, 5%, 2.5%,
