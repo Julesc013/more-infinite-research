@@ -1,0 +1,138 @@
+schema: 1
+updated_at: 2026-07-12
+source_baseline:
+  release: "3.0.5"
+  tag: "3.0.5"
+  package_source_commit: b93808c54946f3913cea1244a6df89a154abd98e
+
+classifications:
+  - portable-shared-fix
+  - portable-tooling
+  - portable-fixture
+  - portable-docs
+  - portable-target-profile
+  - target-local-schema
+  - target-local-feature-cut
+  - target-local-asset
+  - obsolete-workaround
+  - deferred
+
+lessons:
+  PL-001:
+    source_target: factorio-2.0
+    source_branch: tmp/2.0
+    source_commit: 2d1eb296f15b71ef538d0547147ce42ac03098a0
+    observable_issue: the stale 2.3.5 RC4 did not include the final released 3.0.5 expanded settings and recycler interaction contract
+    classification: portable-target-profile
+    affected_targets: ["2.0"]
+    modern_decision: keep the released 3.0.5 implementation authoritative
+    target_local_decision: replay the final settings and recycler contract through the Factorio 2.0 profile
+    fixture_evidence:
+      - prototype-limit-self-recycling-and-unrestricted-modules
+      - prototype-limit-scope-inert-at-fixed-threshold
+      - prototype-limit-scope-engine-unchanged-baseline
+      - prototype-limit-scope-inert-at-matched-threshold
+    dev_commit: b93808c54946f3913cea1244a6df89a154abd98e
+    replayed_target_commits:
+      - e9f4f3a
+      - 903e7ca
+    release_impact: 2.3.5 candidate rebuilt and fully requalified
+    status: complete
+
+  PL-002:
+    source_target: factorio-2.0
+    source_branch: tmp/2.0
+    source_commit: 903e7ca
+    observable_issue: the final cap pass called the reusable classifier builder while the target branch still exposed the older per-recipe classifier API
+    classification: portable-shared-fix
+    affected_targets: ["2.1", "2.0"]
+    modern_decision: retain the immutable recycling index and build-once classifier already present in released 3.0.5
+    target_local_decision: port the same pure fact and policy boundary without changing Factorio 2.0 metadata
+    fixture_evidence:
+      - prototype-limit-self-recycling-and-unrestricted-modules
+    dev_commit: 762ac23
+    replayed_target_commits:
+      - 8fd3fac
+    release_impact: fixes a Factorio 2.0 data-final-fixes load error
+    status: complete
+
+  PL-003:
+    source_target: factorio-2.0
+    source_branch: tmp/2.0
+    source_commit: 8fd3fac
+    observable_issue: four executed 2.0 scenarios were absent from the target expected-scenario manifest
+    classification: portable-tooling
+    affected_targets: ["2.1", "2.0", "future-targets"]
+    modern_decision: 3.1 validation decomposition must make every scenario declaration target-explicit and completeness-checked before runtime
+    target_local_decision: register the missing 2.0 scenarios immediately
+    fixture_evidence:
+      - lab-policy-engine-default
+      - prototype-limit-scope-inert-at-fixed-threshold
+      - prototype-limit-scope-engine-unchanged-baseline
+      - prototype-limit-scope-inert-at-matched-threshold
+    dev_commit: pending-3.1
+    replayed_target_commits:
+      - 8dabd2d
+    release_impact: 71 of 71 scenarios pass with exact manifest equality
+    status: accepted-for-3.1
+
+  PL-004:
+    source_target: factorio-2.0
+    source_branch: tmp/2.0
+    source_commit: 5b06805
+    observable_issue: candidate fingerprints must be checkout-line-ending invariant on Windows and CI
+    classification: portable-tooling
+    affected_targets: ["all"]
+    modern_decision: retain normalized text and scenario-manifest identities
+    target_local_decision: replay the final 3.0.5 identity implementation before qualification
+    fixture_evidence:
+      - package-identity-line-ending-invariance
+    dev_commit: b93808c54946f3913cea1244a6df89a154abd98e
+    replayed_target_commits:
+      - 64140c0
+      - 5b06805
+    release_impact: candidate freshness passes from a clean checkout
+    status: complete
+
+  PL-005:
+    source_target: factorio-2.0
+    source_branch: tmp/2.0
+    source_commit: 7588eadc18f49f60d17d145ce366b5a777d9be43
+    observable_issue: content equality does not replace direct loading of the exact frozen distribution archive
+    classification: portable-tooling
+    affected_targets: ["all-release-targets"]
+    modern_decision: add exact-dist base, expansion, upgrade, and clean targeted-gate records to the release-wave contract
+    target_local_decision: preserve the direct 2.3.5 logs and structured proof under .mir/evidence
+    fixture_evidence:
+      - .mir/evidence/2.3.5-exact-dist-and-upgrade-proof.json
+    dev_commit: pending-3.1
+    replayed_target_commits:
+      - 7588eadc18f49f60d17d145ce366b5a777d9be43
+    release_impact: exact 2.3.5 base, Space Age, and 2.3.0 upgrade loads pass
+    status: accepted-for-3.1
+
+  PL-006:
+    source_target: factorio-2.0
+    source_branch: tmp/2.0
+    source_commit: 7588eadc18f49f60d17d145ce366b5a777d9be43
+    observable_issue: Factorio 2.1 cargo modifiers and dependency floors are not valid Factorio 2.0 defaults
+    classification: target-local-feature-cut
+    affected_targets: ["2.0"]
+    modern_decision: reject the target metadata and feature cuts from dev
+    target_local_decision: keep cargo streams absent and retain the Factorio 2.0 dependency profile
+    fixture_evidence:
+      - target-profile-drift-check
+      - exact-dist-space-age
+    dev_commit: none-target-local
+    replayed_target_commits:
+      - 7588eadc18f49f60d17d145ce366b5a777d9be43
+    release_impact: intentional target-only shipped diff
+    status: complete
+
+fixed_point:
+  last_completed_sweep: null
+  zero_new_portable_compiler_fixes: false
+  zero_new_reusable_validation_fixes: false
+  zero_new_higher-target-profile_corrections: false
+  zero_new_package_governance_fixes: false
+  status: open

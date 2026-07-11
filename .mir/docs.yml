@@ -1260,3 +1260,43 @@ docs:
     doc_type: how-to
     owner: mir-maintainers
     source_of_truth_for: []
+  - path: docs/compatibility/portable-return-ledger.md
+    title: "Portable Return Ledger"
+    status: current
+    audience: maintainer
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - portable-return-ledger
+  - path: docs/releases/backport-wave-dashboard.md
+    title: "Backport Wave Dashboard"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - backport-wave-status
+  - path: docs/releases/2.3.5-backport-plan.md
+    title: "MIR 2.3.5 Backport Plan"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-2.3.5-backport-plan
+  - path: docs/releases/3.1.0-plan.md
+    title: "MIR 3.1.0 Plan"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-3.1.0-plan
+  - path: docs/releases/3.1.0-checklist.md
+    title: "MIR 3.1.0 Release Checklist"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-3.1.0-release-gate

@@ -14,7 +14,7 @@ superseded_by: []
 
 Release docs are version-specific plans, migration guides, risk registers, checklists, and validation records.
 
-The 3.0.5 convergence plan, checklist, and validation summary are the active release authority. The 3.0.0 records are the published architecture baseline and historical evidence.
+MIR 3.0.5 is the published immutable behavior baseline. The 2.3.5 backport plan and backport-wave dashboard govern the active Factorio 2.0 release gate. The 3.1 plan and checklist govern the next modern feature line after 2.3.5 is published and frozen. The 3.0.0 records remain the published architecture baseline and historical evidence.
 
 - [3.0.0 plan](3.0.0-plan.md)
 - [3.0.0 regression baseline](3.0.0-regression-baseline.md)
@@ -31,6 +31,10 @@ The 3.0.5 convergence plan, checklist, and validation summary are the active rel
 - [3.0.5 release checklist](3.0.5-release-checklist.md)
 - [3.0.5 release notes](notes/release-notes-3.0.5.md)
 - [3.0.5 validation summary](3.0.5-validation-summary.md)
+- [2.3.5 backport plan](2.3.5-backport-plan.md)
+- [Backport wave dashboard](backport-wave-dashboard.md)
+- [3.1.0 plan](3.1.0-plan.md)
+- [3.1.0 release checklist](3.1.0-checklist.md)
 - [3.1.0 roadmap](3.1.0-roadmap.md)
 - [2.2.0 validation record](2.2.0-validation-record.md)
 
