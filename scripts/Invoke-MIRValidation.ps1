@@ -3697,7 +3697,7 @@ if ($isFactorio21Line) {
 
   Invoke-RuntimeConfigurationChangeScenario `
     -ScenarioName "space-age-scripted-runtime-reenable" `
-    -InitialFixtureNames @() `
+    -InitialFixtureNames @("mir-fixture-assert-scripted-runtime-lifecycle") `
     -ChangedFixtureNames @("mir-fixture-assert-scripted-runtime-lifecycle") `
     -InitialDisabledStreamKeys @("research_spoilage_preservation") `
     -ChangedEnabledStreamKeys @("research_spoilage_preservation") `

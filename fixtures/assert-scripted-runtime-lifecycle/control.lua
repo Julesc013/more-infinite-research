@@ -26,6 +26,13 @@ local function set_completed_levels(force, levels)
 end
 
 script.on_init(function()
+  local enabled = settings.startup["ips-enable-research_spoilage_preservation"].value == true
+  if not enabled then
+    storage.mir_scripted_fixture = {disabled_initial = true}
+    log("[mir-fixture] scripted lifecycle disabled initial state recorded")
+    return
+  end
+
   local force = game.forces.player
   local baseline = game.difficulty_settings.spoil_time_modifier
   storage.mir_scripted_fixture = {baseline = baseline, pending_reload_proof = true}
@@ -72,6 +79,19 @@ end)
 script.on_configuration_changed(function()
   local state = storage.mir_scripted_fixture
   local enabled = settings.startup["ips-enable-research_spoilage_preservation"].value == true
+  if state and state.disabled_initial then
+    if not enabled then fail("scripted stream remained disabled during re-enable proof") end
+    local baseline = game.difficulty_settings.spoil_time_modifier
+    set_completed_levels(game.forces.player, 2)
+    assert_close("configuration-change enable application",
+      game.difficulty_settings.spoil_time_modifier,
+      baseline * per_level ^ 2)
+    set_completed_levels(game.forces.player, 0)
+    assert_close("configuration-change enable restoration", game.difficulty_settings.spoil_time_modifier, baseline)
+    state.disabled_initial = false
+    log("[mir-fixture] scripted lifecycle enable proof complete")
+    return
+  end
   if not state then
     if not enabled then fail("new scripted fixture was loaded while its stream was disabled") end
     local baseline = game.difficulty_settings.spoil_time_modifier
