@@ -13,8 +13,7 @@ superseded_by: []
 
 Updated: 2026-07-07
 
-This note refines the `3.0.0` compatibility compiler plan into a concrete
-repository structure. The organizing rule is:
+This note refines the `3.0.0` compatibility compiler plan into a concrete repository structure. The organizing rule is:
 
 ```text
 Factorio root files stay thin.
@@ -28,9 +27,7 @@ Old compatibility, library, legacy, and broad root-helper shim paths do not
 ship on the main 3.x line.
 ```
 
-This is the current structure target for the MIR 3 shipped mod. Backport
-branches may carry temporary compatibility surfaces only when branch policy
-requires them; those surfaces must not merge back into the main 3.x line.
+This is the current structure target for the MIR 3 shipped mod. Backport branches may carry temporary compatibility surfaces only when branch policy requires them; those surfaces must not merge back into the main 3.x line.
 
 ## Factorio Shell
 
@@ -42,15 +39,11 @@ Factorio imposes the outer shell:
 - root `control.lua` is runtime scripting and should exist only when needed;
 - `locale/` and `migrations/` are Factorio-recognized folders;
 - the zip name follows `{mod-name}_{version}`;
-- `info.json` has one `factorio_version`, so a single archive targets one
-  Factorio major line.
+- `info.json` has one `factorio_version`, so a single archive targets one Factorio major line.
 
-That means MIR should not be structured like a normal application with dynamic
-file I/O or arbitrary runtime loading. MIR is primarily a deterministic
-data-stage compiler.
+That means MIR should not be structured like a normal application with dynamic file I/O or arbitrary runtime loading. MIR is primarily a deterministic data-stage compiler.
 
-Before implementing this refactor, re-check these Factorio documentation
-surfaces:
+Before implementing this refactor, re-check these Factorio documentation surfaces:
 
 - `https://lua-api.factorio.com/latest/auxiliary/mod-structure.html`
 - `https://lua-api.factorio.com/latest/auxiliary/data-lifecycle.html`
@@ -77,141 +70,23 @@ data-final-fixes.lua
 control.lua, only if runtime code is genuinely needed
 ```
 
-`control.lua` is not part of the prototype compiler. It is Factorio's runtime
-entrypoint for save/session behavior such as event handlers, commands, remote
-interfaces, GUI, storage, and configuration-change handling. MIR should not add
-or keep `control.lua` for normal generated technology emission. This branch
-keeps it only because scripted technology candidates already have bounded
-runtime handlers under `prototypes/mir/runtime/`.
+`control.lua` is not part of the prototype compiler. It is Factorio's runtime entrypoint for save/session behavior such as event handlers, commands, remote interfaces, GUI, storage, and configuration-change handling. MIR should not add or keep `control.lua` for normal generated technology emission. This branch keeps it only because scripted technology candidates already have bounded runtime handlers under `prototypes/mir/runtime/`.
 
-Runtime control files must not inspect `data.raw`, call `data:extend`, or create
-generated technology prototypes. Those responsibilities remain in the data
-stage, primarily behind `data-final-fixes.lua`.
+Runtime control files must not inspect `data.raw`, call `data:extend`, or create generated technology prototypes. Those responsibilities remain in the data stage, primarily behind `data-final-fixes.lua`.
 
-Current state: the Factorio root entrypoints route through
-`prototypes/mir/stage/`. The runtime entrypoint
-`prototypes/mir/stage/control.lua` owns only runtime registration and delegates
-to event handlers under `prototypes/mir/runtime/`.
-`prototypes/mir/stage/data_final_fixes.lua` owns the data-final-fixes call
-order and delegates each step through MIR-owned modules.
+Current state: the Factorio root entrypoints route through `prototypes/mir/stage/`. The runtime entrypoint `prototypes/mir/stage/control.lua` owns only runtime registration and delegates to event handlers under `prototypes/mir/runtime/`. `prototypes/mir/stage/data_final_fixes.lua` owns the data-final-fixes call order and delegates each step through MIR-owned modules.
 
-The first Factorio platform adapter is
-`prototypes/mir/platform/factorio/data_raw.lua`. It wraps access to `data.raw`
-and `data:extend` so emitters can depend on a narrow Factorio port instead of
-calling global prototype mutation APIs directly.
+The first Factorio platform adapter is `prototypes/mir/platform/factorio/data_raw.lua`. It wraps access to `data.raw` and `data:extend` so emitters can depend on a narrow Factorio port instead of calling global prototype mutation APIs directly.
 
-The settings-stage active-mod adapter is
-`prototypes/mir/platform/factorio/mods.lua`. Startup setting visibility may use
-the active `mods` table because Factorio provides it during settings stage, but
-it must not inspect `data.raw`: item, recipe, fluid, and technology prototypes
-are not finalized until the later prototype stage.
+The settings-stage active-mod adapter is `prototypes/mir/platform/factorio/mods.lua`. Startup setting visibility may use the active `mods` table because Factorio provides it during settings stage, but it must not inspect `data.raw`: item, recipe, fluid, and technology prototypes are not finalized until the later prototype stage.
 
-The MIR settings namespace is `prototypes/mir/settings/`. It owns the startup
-settings catalog, settings-stage prototype builder, settings-stage visibility
-evaluation, and the adapter that applies `hidden = true` without deleting
-setting IDs or forcing values. Settings visibility uses `ui_visibility`
-metadata and active mods only; final recipe, item, fluid, and technology facts
-remain data-stage generation concerns. `prototypes/mir/settings/resolver.lua`
-owns startup setting enablement checks for data-stage stream and base-extension
-planning. `prototypes/mir/settings/defaults.lua` owns shared stream and
-base-extension defaults. `prototypes/mir/settings/order.lua` owns global
-setting section ranges and generated-technology ordering helpers.
-`prototypes/mir/settings/pipeline_extent.lua` owns the
-pipeline extent setting catalog and parser. `prototypes/mir/pipeline/extent.lua`
-owns the optional pipeline extent prototype pass.
-`prototypes/mir/settings/prototype_limits.lua` owns the prototype-limit setting
-catalog and value parser. `prototypes/mir/pipeline/prototype_limits.lua` owns
-the optional data-final-fixes prototype mutation pass for selected recipe
-productivity and effect receiver limits. Recipe productivity caps apply only to
-non-parameter, non-recycling recipes. The same pass owns explicit generated
-recycler-return scaling because it is a global prototype-limit balance choice;
-it changes only eligible hidden generated recycler probabilities and never
-rewrites recycling-recipe productivity caps or visible processes such as scrap
-recycling. The optional inverse-return scope is inert at or below its threshold
-and uses the normal 25% generated return as the engine-unchanged baseline.
-Positive speed caps and negative speed floors remain independently selectable.
-`prototypes/mir/settings/effect_contracts.lua` owns pure typed per-level effect
-descriptors used by the settings catalog. Runtime setting lookup and scaling
-remain in `prototypes/mir/settings/effect_scaling.lua`, keeping catalog/profile
-loading acyclic.
+The MIR settings namespace is `prototypes/mir/settings/`. It owns the startup settings catalog, settings-stage prototype builder, settings-stage visibility evaluation, and the adapter that applies `hidden = true` without deleting setting IDs or forcing values. Settings visibility uses `ui_visibility` metadata and active mods only; final recipe, item, fluid, and technology facts remain data-stage generation concerns. `prototypes/mir/settings/resolver.lua` owns startup setting enablement checks for data-stage stream and base-extension planning. `prototypes/mir/settings/defaults.lua` owns shared stream and base-extension defaults. `prototypes/mir/settings/order.lua` owns global setting section ranges and generated-technology ordering helpers. `prototypes/mir/settings/pipeline_extent.lua` owns the pipeline extent setting catalog and parser. `prototypes/mir/pipeline/extent.lua` owns the optional pipeline extent prototype pass. `prototypes/mir/settings/prototype_limits.lua` owns the prototype-limit setting catalog and value parser. `prototypes/mir/pipeline/prototype_limits.lua` owns the optional data-final-fixes prototype mutation pass for selected recipe productivity and effect receiver limits. Recipe productivity caps apply only to non-parameter, non-recycling recipes. The same pass owns explicit generated recycler-return scaling because it is a global prototype-limit balance choice; it changes only eligible hidden generated recycler probabilities and never rewrites recycling-recipe productivity caps or visible processes such as scrap recycling. The optional inverse-return scope is inert at or below its threshold and uses the normal 25% generated return as the engine-unchanged baseline. Positive speed caps and negative speed floors remain independently selectable. `prototypes/mir/settings/effect_contracts.lua` owns pure typed per-level effect descriptors used by the settings catalog. Runtime setting lookup and scaling remain in `prototypes/mir/settings/effect_scaling.lua`, keeping catalog/profile loading acyclic.
 
-Effect contracts separate semantic identity from canonical, selected, and
-emitted numeric values. Owner discovery may use semantic identity, while
-external adoption and replacement policy decide independently whether numeric
-equivalence is required. Competing technology removal is committed through
-`prototypes/mir/emit/technology_replacement.lua` only after registered emitted
-coverage exists and the rewritten prerequisite graph is acyclic.
+Effect contracts separate semantic identity from canonical, selected, and emitted numeric values. Owner discovery may use semantic identity, while external adoption and replacement policy decide independently whether numeric equivalence is required. Competing technology removal is committed through `prototypes/mir/emit/technology_replacement.lua` only after registered emitted coverage exists and the rewritten prerequisite graph is acyclic.
 
-The MIR planner namespace owns compiler planning checks as they are migrated out
-of legacy generators. `prototypes/mir/planner/requirements.lua` evaluates
-required mods, prototype families, technology gates, and legacy technology
-requirement skip rules before the legacy recipe-productivity generator attempts
-to build a stream. `prototypes/mir/planner/native_modifiers.lua` identifies
-native technology modifiers and records overlap diagnostics through platform
-prototype access before direct-effect streams are emitted.
-`prototypes/mir/planner/science.lua` selects stream science ingredients and
-normalizes lab-compatibility status while the rest of science integration moves
-out of legacy utility modules. The focused utility split now routes stream
-enablement, cost, growth, research-time, and max-level calculations through
-`prototypes/mir/planner/costs.lua`; configured science-pack policy and
-unlock-derived science selection through
-`prototypes/mir/capabilities/science_integration/science_selector.lua`; and
-stream prerequisite construction through
-`prototypes/mir/planner/prerequisites.lua`. `prototypes/mir/policy/owner_policy.lua`
-centralizes recipe-productivity owner filtering and the associated diagnostic
-rows used by migrated stream planning. `prototypes/mir/policy/adoption_policy.lua`
-wraps productivity-family adoption decisions while the underlying adoption
-implementation is migrated out of the legacy compatibility path.
-`prototypes/mir/planner/direct_effects.lua` prepares direct-effect streams by
-asserting effect safety, dropping unavailable optional ammo categories, and
-applying fallback effect icons before emission planning.
-`prototypes/mir/capabilities/recipe_productivity/planner.lua` owns the current
-recipe-productivity bucket matching facade and converts matched buckets into
-recipe productivity effects after policy filters run.
-`recipe_productivity/recipe_matching.lua` may discover module recipe outputs
-from final `ModulePrototype.tier` facts. Stream data selects tier ranges; it
-does not hard-code third-party module mod IDs.
-`prototypes/mir/index/recipe_unlocks.lua` builds the immutable recipe-to-unlock
-technology fact index. Science selection, prerequisite planning, and explicit
-technology requirements apply shared researchability policy to those facts
-instead of rescanning technology prototypes independently.
-`prototypes/mir/planner/stream_compiler.lua` owns the generated stream loop.
-`prototypes/mir/emit/stream_spec_adapter.lua` adapts current stream records
-into `StreamSpec` records and forwards them to `technology_builder`.
-`prototypes/mir/emit/base_extensions.lua` owns base technology continuation
-prototype emission. The 3.x shipped layout has no `prototypes/compat/`,
-`prototypes/lib/`, or `prototypes/mir/legacy/` implementation roots. Active
-compatibility, indexing, policy, capability, and report code lives under
-focused `prototypes/mir/` namespaces.
+The MIR planner namespace owns compiler planning checks as they are migrated out of legacy generators. `prototypes/mir/planner/requirements.lua` evaluates required mods, prototype families, technology gates, and legacy technology requirement skip rules before the legacy recipe-productivity generator attempts to build a stream. `prototypes/mir/planner/native_modifiers.lua` identifies native technology modifiers and records overlap diagnostics through platform prototype access before direct-effect streams are emitted. `prototypes/mir/planner/science.lua` selects stream science ingredients and normalizes lab-compatibility status while the rest of science integration moves out of legacy utility modules. The focused utility split now routes stream enablement, cost, growth, research-time, and max-level calculations through `prototypes/mir/planner/costs.lua`; configured science-pack policy and unlock-derived science selection through `prototypes/mir/capabilities/science_integration/science_selector.lua`; and stream prerequisite construction through `prototypes/mir/planner/prerequisites.lua`. `prototypes/mir/policy/owner_policy.lua` centralizes recipe-productivity owner filtering and the associated diagnostic rows used by migrated stream planning. `prototypes/mir/policy/adoption_policy.lua` wraps productivity-family adoption decisions while the underlying adoption implementation is migrated out of the legacy compatibility path. `prototypes/mir/planner/direct_effects.lua` prepares direct-effect streams by asserting effect safety, dropping unavailable optional ammo categories, and applying fallback effect icons before emission planning. `prototypes/mir/capabilities/recipe_productivity/planner.lua` owns the current recipe-productivity bucket matching facade and converts matched buckets into recipe productivity effects after policy filters run. `recipe_productivity/recipe_matching.lua` may discover module recipe outputs from final `ModulePrototype.tier` facts. Stream data selects tier ranges; it does not hard-code third-party module mod IDs. `prototypes/mir/index/recipe_unlocks.lua` builds the immutable recipe-to-unlock technology fact index. Science selection, prerequisite planning, and explicit technology requirements apply shared researchability policy to those facts instead of rescanning technology prototypes independently. `prototypes/mir/planner/stream_compiler.lua` owns the generated stream loop. `prototypes/mir/emit/stream_spec_adapter.lua` adapts current stream records into `StreamSpec` records and forwards them to `technology_builder`. `prototypes/mir/emit/base_extensions.lua` owns base technology continuation prototype emission. The 3.x shipped layout has no `prototypes/compat/`, `prototypes/lib/`, or `prototypes/mir/legacy/` implementation roots. Active compatibility, indexing, policy, capability, and report code lives under focused `prototypes/mir/` namespaces.
 
-Compatibility policy uses `prototypes/mir/compatibility/`. Named compatibility
-targets live under `prototypes/mir/compatibility/overlays/`; those overlays
-register selectors, claims, deny rules, and policy overrides only. They must not
-create technologies, call `data:extend`, or mutate `data.raw` directly.
-Compatibility diagnostics may live under
-`prototypes/mir/compatibility/diagnostics/` while legacy behavior is being
-migrated, but they must read prototypes through platform adapters and emit rows
-through `report/` helpers. The stage layer calls
-`prototypes/mir/compatibility/diagnostics/registry.lua` rather than naming
-individual exact-recipe diagnostic modules directly.
-Exact upstream loader-schema repairs may live under `prototypes/mir/compatibility/repairs/` when they are version-gated, recipe-ID-gated, and limited to schema normalization required for Factorio to construct prototypes. These repairs may mutate existing third-party prototype fields through the platform adapter, but they must not generate technologies, change ingredients, change results, change unlocks, or alter balance.
-`prototypes/mir/report/diagnostics_sink.lua` owns the existing log/audit-row
-diagnostic sink. It may call `prototypes/mir/emit/icon_builder.lua` only to
-preserve existing icon-source hints in report rows; it must not mutate
-prototypes.
-`prototypes/mir/policy/max_level.lua` owns the post-emission max-level setting
-enforcement pass for generated stream technologies. This remains in the current
-mutator allowlist because it adjusts already generated MIR technology
-prototypes after stream emission.
-`prototypes/mir/policy/weapon_speed.lua` owns the optional duplicate
-rocket/cannon speed cleanup for generated general weapon-speed continuations.
-It delegates owner qualification to
-`prototypes/mir/policy/native_effect_coverage.lua`; prototype names alone are
-not coverage. The coverage policy may inspect technology prototypes but may
-not emit or mutate them. Only `weapon_speed.lua` performs the selected cleanup
-mutation after stream and base-continuation emission.
-`prototypes/mir/emit/effect_safety.lua` owns generated technology effect safety
-registration and post-emission assertion.
+Compatibility policy uses `prototypes/mir/compatibility/`. Named compatibility targets live under `prototypes/mir/compatibility/overlays/`; those overlays register selectors, claims, deny rules, and policy overrides only. They must not create technologies, call `data:extend`, or mutate `data.raw` directly. Compatibility diagnostics may live under `prototypes/mir/compatibility/diagnostics/` while legacy behavior is being migrated, but they must read prototypes through platform adapters and emit rows through `report/` helpers. The stage layer calls `prototypes/mir/compatibility/diagnostics/registry.lua` rather than naming individual exact-recipe diagnostic modules directly. Exact upstream loader-schema repairs may live under `prototypes/mir/compatibility/repairs/` when they are version-gated, recipe-ID-gated, and limited to schema normalization required for Factorio to construct prototypes. These repairs may mutate existing third-party prototype fields through the platform adapter, but they must not generate technologies, change ingredients, change results, change unlocks, or alter balance. `prototypes/mir/report/diagnostics_sink.lua` owns the existing log/audit-row diagnostic sink. It may call `prototypes/mir/emit/icon_builder.lua` only to preserve existing icon-source hints in report rows; it must not mutate prototypes. `prototypes/mir/policy/max_level.lua` owns the post-emission max-level setting enforcement pass for generated stream technologies. This remains in the current mutator allowlist because it adjusts already generated MIR technology prototypes after stream emission. `prototypes/mir/policy/weapon_speed.lua` owns the optional duplicate rocket/cannon speed cleanup for generated general weapon-speed continuations. It delegates owner qualification to `prototypes/mir/policy/native_effect_coverage.lua`; prototype names alone are not coverage. The coverage policy may inspect technology prototypes but may not emit or mutate them. Only `weapon_speed.lua` performs the selected cleanup mutation after stream and base-continuation emission. `prototypes/mir/emit/effect_safety.lua` owns generated technology effect safety registration and post-emission assertion.
 
 ## Three Workspaces
 
@@ -258,9 +133,7 @@ Development workspace
   CONTRIBUTING.md
 ```
 
-Only the Factorio shell and shipped Lua/assets belong in the release archive.
-Developer docs, fixtures, scripts, tests, build output, distribution output, and
-task ledgers stay outside the mod zip.
+Only the Factorio shell and shipped Lua/assets belong in the release archive. Developer docs, fixtures, scripts, tests, build output, distribution output, and task ledgers stay outside the mod zip.
 
 ## Target Module Tree
 
@@ -521,8 +394,7 @@ prototypes/
 
 ```
 
-The exact folder migration can be staged, but new 3.0 code should prefer this
-shape.
+The exact folder migration can be staged, but new 3.0 code should prefer this shape.
 
 ## Layer Rules
 
@@ -576,8 +448,7 @@ Outputs
   stream manifest
 ```
 
-This gives MIR a real boundary between Factorio-specific access and pure
-compiler logic.
+This gives MIR a real boundary between Factorio-specific access and pure compiler logic.
 
 ## Capability Folder Pattern
 
@@ -689,11 +560,7 @@ The `mods` table selects policy. Prototype facts decide behavior.
 
 ## No Shims
 
-MIR 3 dev must not keep old implementation paths as active shims. Backports may
-carry temporary compatibility surfaces on their own branch, but the main 3.x
-line keeps the shipped implementation under `prototypes/mir/` plus the required
-Factorio root entrypoints and stream data tables. The legacy inventory gate
-fails if deleted shim directories or broad root helper files return.
+MIR 3 dev must not keep old implementation paths as active shims. Backports may carry temporary compatibility surfaces on their own branch, but the main 3.x line keeps the shipped implementation under `prototypes/mir/` plus the required Factorio root entrypoints and stream data tables. The legacy inventory gate fails if deleted shim directories or broad root helper files return.
 
 ## Naming Conventions
 
@@ -722,8 +589,7 @@ new.lua
 stuff.lua
 ```
 
-Generic names are acceptable only in constrained folders such as `core/table.lua`
-or `capabilities/registry.lua`.
+Generic names are acceptable only in constrained folders such as `core/table.lua` or `capabilities/registry.lua`.
 
 ## Dependency Strategy
 
@@ -731,26 +597,19 @@ For the Factorio `2.1` `3.x.x` line:
 
 - keep `base >= 2.1.0` as the hard dependency;
 - keep Space Age optional unless a release truly requires it;
-- use hidden optional dependencies only for curated compatibility targets whose
-  load order matters;
+- use hidden optional dependencies only for curated compatibility targets whose load order matters;
 - avoid hundreds of optional dependencies;
 - prefer diagnostics for unknown late-mutating mods;
 - use incompatibilities only for known unsafe coexistence.
 
-Curated hidden optionals may include major overhauls, known rule mutators,
-native-owner mods, science/lab overhauls, loader ecosystems, and mining-drill
-ecosystems. Add them because load order matters, not because MIR claims full
-support.
+Curated hidden optionals may include major overhauls, known rule mutators, native-owner mods, science/lab overhauls, loader ecosystems, and mining-drill ecosystems. Add them because load order matters, not because MIR claims full support.
 
 ## Data-Stage Reporting
 
-Factorio mod Lua cannot use arbitrary filesystem output in normal mod code, so
-MIR reports should remain split:
+Factorio mod Lua cannot use arbitrary filesystem output in normal mod code, so MIR reports should remain split:
 
-- in-game/data-stage report rows through logs, diagnostics, or generated
-  prototype-visible surfaces where appropriate;
-- development/audit exports through scripts that launch Factorio, parse logs,
-  use fixtures, or use instrument-mode tooling.
+- in-game/data-stage report rows through logs, diagnostics, or generated prototype-visible surfaces where appropriate;
+- development/audit exports through scripts that launch Factorio, parse logs, use fixtures, or use instrument-mode tooling.
 
 Instrument mode is a development tool, not a shipped MIR package feature.
 
@@ -775,30 +634,18 @@ The measurable transition debt report is:
 .\scripts\mir.ps1 legacy inventory --check
 ```
 
-It writes `artifacts/legacy-inventory/shipped-mod-legacy.json`,
-`artifacts/legacy-inventory/repo-legacy.json`, and
-`artifacts/legacy-inventory/legacy-summary.md`. The report tracks old-path
-module counts, deleted shim-directory presence, old root helper presence, old
-import counts, direct prototype access matches, and generated stream manifest
-coverage. The checked form requires zero old shim directories, zero old root
-helper files, zero runtime Lua files under `control/`, zero
-MIR-legacy/compat/lib/config/util/diagnostics imports, zero direct `data.raw`
-matches outside the platform adapter, and zero generated streams missing
-manifest rows.
+It writes `artifacts/legacy-inventory/shipped-mod-legacy.json`, `artifacts/legacy-inventory/repo-legacy.json`, and `artifacts/legacy-inventory/legacy-summary.md`. The report tracks old-path module counts, deleted shim-directory presence, old root helper presence, old import counts, direct prototype access matches, and generated stream manifest coverage. The checked form requires zero old shim directories, zero old root helper files, zero runtime Lua files under `control/`, zero MIR-legacy/compat/lib/config/util/diagnostics imports, zero direct `data.raw` matches outside the platform adapter, and zero generated streams missing manifest rows.
 
 ## Implementation Sequence
 
-1. Create the shell directories: `stage/`, `core/`, `platform/`, and
-   `domain/`.
+1. Create the shell directories: `stage/`, `core/`, `platform/`, and `domain/`.
 2. Make root Factorio files call stage modules.
 3. Move old code into MIR-owned namespaces without behavior changes.
-4. Introduce or formalize schema records for `DecisionRecord`, `StreamSpec`,
-   `FactRegistry`, `CompatibilityClaim`, and `StreamManifest`.
+4. Introduce or formalize schema records for `DecisionRecord`, `StreamSpec`, `FactRegistry`, `CompatibilityClaim`, and `StreamManifest`.
 5. Move the current `2.2.0` planner into layers.
 6. Add architecture lint gates.
 7. Add report-only capabilities under the standard folder pattern.
-8. Add one generated proof only if the compiler gates are stable; otherwise
-   keep `3.0.0` as a pure architecture release and defer gameplay to `3.1`.
+8. Add one generated proof only if the compiler gates are stable; otherwise keep `3.0.0` as a pure architecture release and defer gameplay to `3.1`.
 
 The design rule is:
 

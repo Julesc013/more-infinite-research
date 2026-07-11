@@ -12,6 +12,4 @@ superseded_by: []
 
 # Screenshots
 
-Store documentation screenshots here only when they are sourceable and licensed
-for repository use. Do not copy Space Age or other third-party art into this
-repository as a fallback asset.
+Store documentation screenshots here only when they are sourceable and licensed for repository use. Do not copy Space Age or other third-party art into this repository as a fallback asset.

@@ -12,14 +12,11 @@ superseded_by: []
 
 # Release Process
 
-Use the release checklist, static validation, runtime validation, package
-validation, changelog review, compatibility claim review, and package hash
-record before publishing.
+Use the release checklist, static validation, runtime validation, package validation, changelog review, compatibility claim review, and package hash record before publishing.
 
 ## Release Freeze
 
-After a version archive exists under `dist/`, freeze the release branch until
-publication.
+After a version archive exists under `dist/`, freeze the release branch until publication.
 
 Allowed before publish:
 
@@ -36,8 +33,7 @@ Blocked before publish:
 - new generated stream;
 - broad formatting pass;
 - stream definition change;
-- package-visible copy change that is not followed by a rebuilt archive and
-  updated hash.
+- package-visible copy change that is not followed by a rebuilt archive and updated hash.
 
 ## Publish-Candidate Check
 
@@ -58,14 +54,11 @@ git diff --check
 git status
 ```
 
-If README, changelog, locale, or any other package-visible file changes, rebuild
-`dist/more-infinite-research_<version>.zip` and update the recorded size and
-SHA-256 before promotion.
+If README, changelog, locale, or any other package-visible file changes, rebuild `dist/more-infinite-research_<version>.zip` and update the recorded size and SHA-256 before promotion.
 
 ## Backport Publication Freeze
 
-For target-line backports, the release branch and `.mir/branches.yml` must
-record the exact zip that is uploaded.
+For target-line backports, the release branch and `.mir/branches.yml` must record the exact zip that is uploaded.
 
 After a backport is uploaded:
 
@@ -74,8 +67,7 @@ After a backport is uploaded:
 - mark the `.mir/branches.yml` artifact row as `published`;
 - treat the uploaded zip as immutable.
 
-Do not rebuild a published backport archive. A changed payload after upload
-must become the next patch version, such as `2.3.1` after `2.3.0`.
+Do not rebuild a published backport archive. A changed payload after upload must become the next patch version, such as `2.3.1` after `2.3.0`.
 
 ## Main Promotion
 
@@ -119,13 +111,11 @@ For the first 24 to 72 hours after a major release, use patch releases only for:
 - release-note correction;
 - false positive in the strict architecture gate.
 
-Do not add broad generation, new capability emissions, new stream IDs, or broad
-compatibility claims in the first patch window.
+Do not add broad generation, new capability emissions, new stream IDs, or broad compatibility claims in the first patch window.
 
 ## Current-Line Emergency Patch Policy
 
-Do not cut `3.0.1` unless the Factorio `2.1` current line has a real
-release-blocking issue:
+Do not cut `3.0.1` unless the Factorio `2.1` current line has a real release-blocking issue:
 
 - serious load failure;
 - broken save migration;
@@ -134,5 +124,4 @@ release-blocking issue:
 - materially wrong public upload;
 - critical compatibility fix that is already validated.
 
-All other portable lessons from target-line backports accumulate on `dev` for
-`3.0.5`.
+All other portable lessons from target-line backports accumulate on `dev` for `3.0.5`.

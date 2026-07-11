@@ -34,76 +34,41 @@ More Infinite Research is organized around a compatibility-first data-stage pipe
 11. Planner, compatibility, and audit diagnostics.
 12. Generated-technology effect safety validation and diagnostics flush.
 
-Generated technology safety now includes the prerequisite graph as well as
-effect types. Emission registers every generated stream and base continuation;
-the final safety pass rejects missing or disabled prerequisites, prerequisite
-cycles, structurally unreachable ancestry, invalid lab science sets, and
-recipe-produced science packs without an initially enabled recipe or enabled
-reachable unlocker.
+Generated technology safety now includes the prerequisite graph as well as effect types. Emission registers every generated stream and base continuation; the final safety pass rejects missing or disabled prerequisites, prerequisite cycles, structurally unreachable ancestry, invalid lab science sets, and recipe-produced science packs without an initially enabled recipe or enabled reachable unlocker.
 
 This order gives the mod the best practical view of recipes, labs, science packs, and technologies created by other mods while still keeping this mod's final cleanup deterministic.
 
-Use [Factorio lifecycle boundaries](factorio-lifecycle.md) for the exact
-settings-stage, prototype-stage, and runtime-stage separation behind the MIR 3
-settings and control-file rules.
+Use [Factorio lifecycle boundaries](factorio-lifecycle.md) for the exact settings-stage, prototype-stage, and runtime-stage separation behind the MIR 3 settings and control-file rules.
 
-Prototype limit settings are startup-only data-stage controls. The unchanged
-dropdown entries, such as `+300% (unchanged)`, `-80% (unchanged)`, and
-`+100000% (unchanged)`, leave Factorio's recipe productivity and effect
-receiver limits untouched. Non-default energy and pollution settings write
-separate `EffectReceiver` lower limits. The default-off Compatibility non-zero
-power floor only changes explicit `0W` active-use prototypes to `1W`. These
-passes run after exact compatibility repairs and before MIR planning, so
-generated technology diagnostics can observe the selected caps and workaround
-state without adding runtime processing.
+Prototype limit settings are startup-only data-stage controls. The unchanged dropdown entries, such as `+300% (unchanged)`, `-80% (unchanged)`, and `+100000% (unchanged)`, leave Factorio's recipe productivity and effect receiver limits untouched. Non-default energy and pollution settings write separate `EffectReceiver` lower limits. The default-off Compatibility non-zero power floor only changes explicit `0W` active-use prototypes to `1W`. These passes run after exact compatibility repairs and before MIR planning, so generated technology diagnostics can observe the selected caps and workaround state without adding runtime processing.
 
 ## Control Stage Boundary
 
-`control.lua` is Factorio's runtime entrypoint. It is separate from
-`settings.lua`, `data.lua`, `data-updates.lua`, and `data-final-fixes.lua`, and
-it cannot generate or mutate prototypes after startup finalizes them.
+`control.lua` is Factorio's runtime entrypoint. It is separate from `settings.lua`, `data.lua`, `data-updates.lua`, and `data-final-fixes.lua`, and it cannot generate or mutate prototypes after startup finalizes them.
 
-The default MIR 3 policy is to omit `control.lua` unless the mod has runtime
-responsibilities. The current `dev` branch does have a small runtime surface for
-scripted technologies such as spoilage preservation and agricultural growth
-speed, so `control.lua` stays as a thin wrapper into the runtime manager.
-Spoilage preservation remains a disabled-by-default experimental candidate.
-Agricultural growth speed is enabled by default as a special Space Age
-technology after event-path coverage, but broad existing-save guarantees still
-require named manual save evidence.
+The default MIR 3 policy is to omit `control.lua` unless the mod has runtime responsibilities. The current `dev` branch does have a small runtime surface for scripted technologies such as spoilage preservation and agricultural growth speed, so `control.lua` stays as a thin wrapper into the runtime manager. Spoilage preservation remains a disabled-by-default experimental candidate. Agricultural growth speed is enabled by default as a special Space Age technology after event-path coverage, but broad existing-save guarantees still require named manual save evidence.
 
 The runtime layer is intentionally narrow:
 
 - Prefer native technology modifiers and recipe productivity whenever the engine exposes them.
 - Use scripted effects only when they can be event-driven.
 - Avoid per-tick inventory, belt, lab, container, surface, or broad entity scanning.
-- Keep runtime handlers grouped under the MIR runtime namespace, starting at
-  `prototypes/mir/runtime/scripted_techs.lua`.
+- Keep runtime handlers grouped under the MIR runtime namespace, starting at `prototypes/mir/runtime/scripted_techs.lua`.
 - Route init, configuration change, research finish, research reversal, and technology-effects reset through one recomputation path.
 - Handle runtime setting changes if runtime settings are introduced.
 - Require each scripted feature to document storage keys, disable behavior, multiple-force behavior, and interaction with other mods touching the same state.
 - Label scripted/global/sandbox features clearly in settings and player-facing docs.
-- Select the persisted runtime root through the active
-  [target capability profile](target-profiles.md): `storage` on Factorio 2.x
-  and `global` on Factorio 1.1 and older.
-- Static validation fails if `control.lua` or `prototypes/mir/runtime/**/*.lua`
-  registers `defines.events.on_tick` or `script.on_nth_tick` without a future
-  explicit allowlist.
-- Static architecture validation fails if runtime control files use prototype
-  mutation APIs such as `data.raw` or `data:extend`.
+- Select the persisted runtime root through the active [target capability profile](target-profiles.md): `storage` on Factorio 2.x and `global` on Factorio 1.1 and older.
+- Static validation fails if `control.lua` or `prototypes/mir/runtime/**/*.lua` registers `defines.events.on_tick` or `script.on_nth_tick` without a future explicit allowlist.
+- Static architecture validation fails if runtime control files use prototype mutation APIs such as `data.raw` or `data:extend`.
 
 Do not use runtime code to fake fluid physics, platform speed, module effects, or machine behavior when the requested feature is really a prototype/entity unlock or companion-mod feature.
 
 Current control files:
 
 - `control.lua`: loads the runtime registration stage.
-- `prototypes/mir/runtime/scripted_techs.lua`: registers init,
-  configuration change, research finish/reversal, technology-effect reset, and
-  agricultural tower planting handlers.
-- `prototypes/mir/runtime/settings_profile.lua`: exports current effective MIR startup
-  settings to a profile string, validates pasted profile strings, and exposes a
-  small remote interface for tools. It does not mutate startup settings at
-  runtime.
+- `prototypes/mir/runtime/scripted_techs.lua`: registers init, configuration change, research finish/reversal, technology-effect reset, and agricultural tower planting handlers.
+- `prototypes/mir/runtime/settings_profile.lua`: exports current effective MIR startup settings to a profile string, validates pasted profile strings, and exposes a small remote interface for tools. It does not mutate startup settings at runtime.
 - `prototypes/mir/runtime/effects/spoilage_preservation.lua`: applies the global spoil-time multiplier from the highest completed MIR spoilage preservation level.
 - `prototypes/mir/runtime/effects/agricultural_growth_speed.lua`: shortens remaining growth time for newly planted agricultural tower plants.
 
@@ -114,9 +79,7 @@ Current migrations:
 
 ### Scripted Runtime Storage
 
-All runtime state is namespaced below `mir` on the target-selected persisted
-root. On the current Factorio 2.1 line that is `storage.mir`; older target
-profiles select `global.mir`.
+All runtime state is namespaced below `mir` on the target-selected persisted root. On the current Factorio 2.1 line that is `storage.mir`; older target profiles select `global.mir`.
 
 `storage.mir.scripted_techs` is reserved for manager-level state. It is currently initialized so future manager metadata has a stable namespace, but it does not store behavior state yet.
 
@@ -138,8 +101,7 @@ Agricultural growth speed refreshes this force state on init, configuration chan
 
 ## Focused Modules
 
-MIR 3 does not keep a broad `prototypes/util.lua` facade. Domain logic lives in
-focused modules:
+MIR 3 does not keep a broad `prototypes/util.lua` facade. Domain logic lives in focused modules:
 
 - `prototypes/mir/platform/factorio/prototype_lookup.lua`: item-like and fluid prototype lookup, technology existence, ammo-category existence, Space Age detection.
 - `prototypes/mir/capabilities/science_integration/science_packs.lua`: lab-input discovery, science-pack existence, end-game science-pack selection, lab-compatible ingredient validation, science-pack unlock prerequisites, ordered pack lists.
@@ -159,33 +121,21 @@ focused modules:
 - `prototypes/mir/policy/productivity_family_adoption.lua`: data-stage adoption of safe residual recipes into configured existing productivity families plus adoption-signature payload construction.
 - `prototypes/mir/policy/competing_productivity.lua`: profile-driven replacement of known fully covered competing infinite recipe-productivity technologies.
 - `prototypes/mir/emit/effect_safety.lua`: blocks unsafe native effect types from MIR-generated technologies.
-- `prototypes/mir/emit/mod_data.lua`: emits MIR mod-data prototypes through the
-  Factorio platform adapter.
+- `prototypes/mir/emit/mod_data.lua`: emits MIR mod-data prototypes through the Factorio platform adapter.
 
-Keep new domain behavior in these modules. MIR-owned modules must import the
-focused path directly; old broad root helper modules are not part of the
-shipped 3.x layout.
+Keep new domain behavior in these modules. MIR-owned modules must import the focused path directly; old broad root helper modules are not part of the shipped 3.x layout.
 
 ## Icon Asset Boundary
 
-Generated technologies may borrow icon layers from active prototypes and then add
-MIR's own effect-type badge. The `dev` line supports explicit `icon_candidates`
-for ordered technology/item/icon fallback, but keeps the package boundary strict:
+Generated technologies may borrow icon layers from active prototypes and then add MIR's own effect-type badge. The `dev` line supports explicit `icon_candidates` for ordered technology/item/icon fallback, but keeps the package boundary strict:
 
-- use official DLC technology or item art when the relevant DLC mod is loaded
-  and the active prototype provides that icon;
-- optionally use direct official DLC icon paths such as `__space-age__` or
-  `__elevated-rails__` in base-only games only when the user enables
-  `mir-use-installed-space-age-icons`;
-- otherwise fall back to base-game technology or item art, MIR-owned local art,
-  or another clearly redistributable asset when Space Age is not loaded;
-- do not copy original Space Age PNGs or other DLC assets into MIR as base-only
-  fallbacks;
-- require any MIR-packaged local art to have an explicit source/license note and
-  package-validation coverage.
+- use official DLC technology or item art when the relevant DLC mod is loaded and the active prototype provides that icon;
+- optionally use direct official DLC icon paths such as `__space-age__` or `__elevated-rails__` in base-only games only when the user enables `mir-use-installed-space-age-icons`;
+- otherwise fall back to base-game technology or item art, MIR-owned local art, or another clearly redistributable asset when Space Age is not loaded;
+- do not copy original Space Age PNGs or other DLC assets into MIR as base-only fallbacks;
+- require any MIR-packaged local art to have an explicit source/license note and package-validation coverage.
 
-This keeps the OEM-plus look when the relevant Wube content is present without
-turning MIR into a redistributable Space Age art cache.
+This keeps the OEM-plus look when the relevant Wube content is present without turning MIR into a redistributable Space Age art cache.
 
 ## Stream Configuration
 
@@ -199,8 +149,7 @@ The stream table is assembled by `prototypes/streams/init.lua` from:
 - `prototypes/streams/productivity.lua`
 - `prototypes/streams/direct-effects.lua`
 
-Future expansion should add more stream domain modules rather than returning to
-one large config file.
+Future expansion should add more stream domain modules rather than returning to one large config file.
 
 Generated recipe-productivity streams can set `dynamic_items_from_lab_inputs = true` when their target item set should include every active lab input discovered during `data-final-fixes.lua`. The science-pack productivity stream uses this so custom science packs can receive productivity effects without hard-coded mod dependencies. If a future dynamic stream uses top-level `items` without `groups`, those items are copied into the generated group before lab inputs are appended.
 
@@ -226,8 +175,7 @@ Weapon-speed overlap handling is intentionally narrower than general compatibili
 
 ## Compatibility Planner Direction
 
-The next compatibility-heavy architecture step is a planner layer, not a broad
-new generator. The durable policy is in `docs/compatibility/support-lanes.md`.
+The next compatibility-heavy architecture step is a planner layer, not a broad new generator. The durable policy is in `docs/compatibility/support-lanes.md`.
 
 Keep the responsibilities separate:
 
@@ -238,67 +186,34 @@ Keep the responsibilities separate:
 - Diagnostics explain generated actions and deliberate non-actions.
 - Fixtures prove exact duplicates, wrong values, mixed effects, cap changes, native overlaps, and loaded rule mutators.
 
-Compatibility adapters should register facts about known external mods. They
-should not generate MIR content directly. Streams generate content; adapters
-classify external owners and constraints; diagnostics explain the resulting plan.
+Compatibility adapters should register facts about known external mods. They should not generate MIR content directly. Streams generate content; adapters classify external owners and constraints; diagnostics explain the resulting plan.
 
-The first planner slice in `v2.1.5` is diagnostics-only. It emits active
-compatibility-role rows, a planner summary, and recipe-cap warnings when
-diagnostics are enabled. It does not add streams, change recipe caps, change
-maximum levels, or broaden cleanup beyond the guarded exact-overlap model.
+The first planner slice in `v2.1.5` is diagnostics-only. It emits active compatibility-role rows, a planner summary, and recipe-cap warnings when diagnostics are enabled. It does not add streams, change recipe caps, change maximum levels, or broaden cleanup beyond the guarded exact-overlap model.
 
-`v2.2.0` adds the compiler spine behind that diagnostics surface. The compiler
-builds typed facts for recipes, technologies, machines, labs, owners, and rule
-surfaces; emits `DecisionRecord`-style rows for generated MIR technologies and
-diagnostic-only blockers; reports obvious loop-risk flags; reports lab matrices;
-and carries useful-level estimates for cap warnings. This path is report-only:
-unknown or risky mod behavior is observed before any new automatic stream emits.
+`v2.2.0` adds the compiler spine behind that diagnostics surface. The compiler builds typed facts for recipes, technologies, machines, labs, owners, and rule surfaces; emits `DecisionRecord`-style rows for generated MIR technologies and diagnostic-only blockers; reports obvious loop-risk flags; reports lab matrices; and carries useful-level estimates for cap warnings. This path is report-only: unknown or risky mod behavior is observed before any new automatic stream emits.
 
-`v2.2.0` also starts the procedural compatibility kernel documented in
-`docs/architecture/procedural-compatibility-kernel.md`. The first capability resolvers are
-report-first:
+`v2.2.0` also starts the procedural compatibility kernel documented in `docs/architecture/procedural-compatibility-kernel.md`. The first capability resolvers are report-first:
 
-- loader manufacturing classification from item `place_result`, placed loader
-  entity type, and recipe output evidence;
-- mining-drill manufacturing classification from item `place_result`, placed
-  mining-drill entity type, and recipe output evidence;
-- native modifier ownership observation for selected lab, mining, logistics, and
-  robot effect types.
+- loader manufacturing classification from item `place_result`, placed loader entity type, and recipe output evidence;
+- mining-drill manufacturing classification from item `place_result`, placed mining-drill entity type, and recipe output evidence;
+- native modifier ownership observation for selected lab, mining, logistics, and robot effect types.
 
-Those rows explain existing MIR behavior; they do not create a general
-productivity generator. Existing streams still own emission. For example, loader
-recipes are covered by belt productivity when visible, mining-drill recipes are
-covered by mining drill productivity when visible, and native mining-yield
-modifiers remain separate from drill manufacturing productivity.
+Those rows explain existing MIR behavior; they do not create a general productivity generator. Existing streams still own emission. For example, loader recipes are covered by belt productivity when visible, mining-drill recipes are covered by mining drill productivity when visible, and native mining-yield modifiers remain separate from drill manufacturing productivity.
 
 The kernel now has enforceable platform pieces:
 
 - schema versions in `prototypes/mir/core/schema.lua`;
 - resolver contract validation in `prototypes/mir/capabilities/contract.lua`;
 - capability-specific policy in `prototypes/mir/policy/capabilities.lua`;
-- generated stream manifest metadata in
-  `prototypes/mir/streams/generated_stream_manifest.json`;
+- generated stream manifest metadata in `prototypes/mir/streams/generated_stream_manifest.json`;
 - machine-readable claims in `fixtures/compat-matrix/claims.json`;
 - static linting through `scripts/Test-MIRPolicyLints.ps1`;
 - report drift comparison through `scripts/Compare-MIRPlannerReports.ps1`;
-- negative capability fixtures for loop risks, hidden recipes, cap-zero recipes,
-  and structural loader/drill decoys.
+- negative capability fixtures for loop risks, hidden recipes, cap-zero recipes, and structural loader/drill decoys.
 
-New mod support should add policy and fixtures first. New behavior classes
-should add or extend a capability resolver. New false positives should become
-classifier or policy fixes. New bug reports should become negative fixtures.
+New mod support should add policy and fixtures first. New behavior classes should add or extend a capability resolver. New false positives should become classifier or policy fixes. New bug reports should become negative fixtures.
 
-The `3.0.0` line promotes this kernel into the public compatibility compiler
-architecture. Use `docs/architecture/compatibility-compiler-charter.md` as the
-source of truth for the 3.0 charter, invariants, module boundaries, non-goals,
-release ladder, and acceptance gates. Use `docs/capabilities/README.md`,
-`docs/compatibility/policy-overlays.md`, `docs/reference/schemas/decision-record.md`,
-`docs/reference/schemas/stream-manifest.md`, `docs/compatibility/claim-levels.md`, `docs/maintainer/testing.md`,
-and `docs/maintainer/README.md` for the focused 3.0 subsystem guidance.
-Use `docs/architecture/module-boundaries.md` for the concrete 3.0 repository
-shape: thin Factorio root files, the `prototypes/mir/` compiler namespace,
-Factorio adapters under `platform/`, no old shim directories on the main 3.x
-line, and the development-only workspace boundary.
+The `3.0.0` line promotes this kernel into the public compatibility compiler architecture. Use `docs/architecture/compatibility-compiler-charter.md` as the source of truth for the 3.0 charter, invariants, module boundaries, non-goals, release ladder, and acceptance gates. Use `docs/capabilities/README.md`, `docs/compatibility/policy-overlays.md`, `docs/reference/schemas/decision-record.md`, `docs/reference/schemas/stream-manifest.md`, `docs/compatibility/claim-levels.md`, `docs/maintainer/testing.md`, and `docs/maintainer/README.md` for the focused 3.0 subsystem guidance. Use `docs/architecture/module-boundaries.md` for the concrete 3.0 repository shape: thin Factorio root files, the `prototypes/mir/` compiler namespace, Factorio adapters under `platform/`, no old shim directories on the main 3.x line, and the development-only workspace boundary.
 
 ## Diagnostics
 
@@ -318,12 +233,7 @@ Use this setting when triaging user reports. It is off by default to avoid noisy
 
 When `mir-debug-generation-report` is enabled, MIR also emits an `Audit report` block with stable `audit schema=1 kind=...` rows. These rows mirror stream, extension, native-overlap, recipe-owner, compatibility-role, compatibility-plan, recipe-cap, fact-registry, decision, rule-mutation, loop-risk, lab-matrix, and capability decisions in a parser-friendly key/value format for `scripts/Invoke-MIRCompatAudit.ps1` and future large-mod compatibility sweeps.
 
-Recipe-cap diagnostics compare generated recipe-productivity effects with the
-recipe's `maximum_productivity` value. Default caps stay quiet except for the
-summary row. Lowered, raised, zero, unusual, or effectively uncapped values are
-reported as diagnostics so players and compatibility audits can see when an
-infinite stream may become misleading. `v2.2.0` also reports a useful-level
-estimate for warning rows. MIR does not change recipe caps by default.
+Recipe-cap diagnostics compare generated recipe-productivity effects with the recipe's `maximum_productivity` value. Default caps stay quiet except for the summary row. Lowered, raised, zero, unusual, or effectively uncapped values are reported as diagnostics so players and compatibility audits can see when an infinite stream may become misleading. `v2.2.0` also reports a useful-level estimate for warning rows. MIR does not change recipe caps by default.
 
 `mir-debug-recipe-matches` logs matched recipe names per generated productivity stream. When either diagnostics setting is enabled, duplicate recipe matches across streams are also reported as non-blocking warnings.
 
@@ -366,8 +276,7 @@ Static validation also checks Factorio changelog formatting, including the requi
 
 Static validation checks every loadable local fixture directory has `info.json`, a `mir-fixture-*` mod name, and at least one data-stage entry file. Non-mod audit inputs under `fixtures/compat-matrix/` and `fixtures/run-profiles/` are excluded from fixture-mod validation. Settings visibility linting also verifies the hidden-setting readability fixture is present.
 
-Static validation rejects runtime tick handlers in `control.lua` and
-`prototypes/mir/runtime/**/*.lua`.
+Static validation rejects runtime tick handlers in `control.lua` and `prototypes/mir/runtime/**/*.lua`.
 
 Static validation also rejects unsafe pickup reach effect types outside the dedicated safety guard.
 

@@ -13,8 +13,7 @@ superseded_by: []
 
 Updated: 2026-07-07
 
-ADRs record durable 3.0 compatibility-compiler decisions. They should be short,
-specific, and updated by adding a new ADR rather than rewriting history.
+ADRs record durable 3.0 compatibility-compiler decisions. They should be short, specific, and updated by adding a new ADR rather than rewriting history.
 
 Initial ADR set:
 

@@ -12,8 +12,7 @@ superseded_by: []
 
 # Assets
 
-Documentation assets live here. Runtime assets shipped in the mod belong in
-Factorio runtime directories, not in `docs/assets/`.
+Documentation assets live here. Runtime assets shipped in the mod belong in Factorio runtime directories, not in `docs/assets/`.
 
 - [Diagrams](diagrams/README.md)
 - [Screenshots](screenshots/README.md)

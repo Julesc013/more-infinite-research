@@ -17,12 +17,9 @@ superseded_by: ["../../../todo.md", "../../releases/3.0.0-plan.md"]
 > This page is retained for historical context only.
 > Current replacement: [root active TODO](../../../todo.md) and [3.0.0 plan](../../releases/3.0.0-plan.md).
 
-This file preserves the old root `todo.md` completion ledger for the 2.0.5,
-2.1.x, 2.2.0, and 1.9.x transition work. It was archived when `2.2.0` and
-`1.9.2` were accepted as released as-is and the active queue moved to MIR 3.0.0.
+This file preserves the old root `todo.md` completion ledger for the 2.0.5, 2.1.x, 2.2.0, and 1.9.x transition work. It was archived when `2.2.0` and `1.9.2` were accepted as released as-is and the active queue moved to MIR 3.0.0.
 
-Unchecked items in this archive are not active by default. Re-promote them into
-`todo.md`, a release plan, or an issue before treating them as current work.
+Unchecked items in this archive are not active by default. Re-promote them into `todo.md`, a release plan, or an issue before treating them as current work.
 
 ## Immediate Status
 
@@ -467,11 +464,7 @@ The current overnight/local-library automation is usable. Keep `scripts/mir.ps1`
 
 Use `v2.1.5` for small fixes after `v2.1.0`.
 
-Through December 2026, keep the current-line release rhythm weekly when there is
-a safe, validated Factorio `2.1` package to publish. Weekly releases may be
-small bug fixes, compatibility profiles, docs corrections, validation/tooling
-updates, or feature slices that pass the release gate. If a week has no safe
-candidate, record the skip reason instead of publishing an under-tested archive.
+Through December 2026, keep the current-line release rhythm weekly when there is a safe, validated Factorio `2.1` package to publish. Weekly releases may be small bug fixes, compatibility profiles, docs corrections, validation/tooling updates, or feature slices that pass the release gate. If a week has no safe candidate, record the skip reason instead of publishing an under-tested archive.
 
 Idea-mod audit planning lives in `docs/archive/superseded/mod-ideas-audit.md`.
 
@@ -591,17 +584,13 @@ Do not reconstruct old releases commit-by-commit for `legacy`. A legacy release 
 
 ### Superseded v1.9.7 / v1.9.8 / v1.9.9 Factorio 2.0 Backports
 
-The older `v1.9.7`, `v1.9.8`, and `v1.9.9` Factorio `2.0` ladder is superseded
-by the `v1.9.2` transition backport and the post-transition target-line
-versioning reset unless the maintainer explicitly revives it.
+The older `v1.9.7`, `v1.9.8`, and `v1.9.9` Factorio `2.0` ladder is superseded by the `v1.9.2` transition backport and the post-transition target-line versioning reset unless the maintainer explicitly revives it.
 
-If revived, restore these only after recording the selected source point,
-Factorio binary, local library, target metadata, and release reason.
+If revived, restore these only after recording the selected source point, Factorio binary, local library, target metadata, and release reason.
 
 ### v1.9.9 Final Factorio 2.0 Backport
 
-This section is retained as historical planning context only. It is not active
-unless the maintainer revives the pre-reset final Factorio `2.0` plan.
+This section is retained as historical planning context only. It is not active unless the maintainer revives the pre-reset final Factorio `2.0` plan.
 
 ### Locked Target-Line Backport Ladder
 

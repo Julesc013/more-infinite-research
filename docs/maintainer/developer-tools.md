@@ -49,28 +49,13 @@ Common overrides:
 
 `mir.ps1` delegates to the existing scripts. It should stay thin: argument routing, profile loading, and memorable command names. Do not add new compatibility logic directly to it.
 
-`release docs-only` and `release docs-refresh` are aliases for the fast
-post-gate documentation path. Use them only after the current release candidate
-has already passed the full release gate and the remaining edits are docs,
-release notes, changelog text, or the release archive. The command rebuilds the
-package, runs static/package validation, checks whitespace, and rejects
-non-doc/package changes so code, prototype, script, fixture, or locale edits
-still require the full release gate.
+`release docs-only` and `release docs-refresh` are aliases for the fast post-gate documentation path. Use them only after the current release candidate has already passed the full release gate and the remaining edits are docs, release notes, changelog text, or the release archive. The command rebuilds the package, runs static/package validation, checks whitespace, and rejects non-doc/package changes so code, prototype, script, fixture, or locale edits still require the full release gate.
 
-`report observations` summarizes `compat-observations.csv` rows produced by the
-audit converter. Use it to see diagnostics-only planner rows and recipe-cap
-warnings without treating them as failures or profile candidates.
+`report observations` summarizes `compat-observations.csv` rows produced by the audit converter. Use it to see diagnostics-only planner rows and recipe-cap warnings without treating them as failures or profile candidates.
 
-`Test-MIRPolicyLints.ps1` is the static policy gate for the procedural
-compatibility kernel. It checks resolver contract wiring, capability policy,
-generated stream manifest fields, support-lane fixtures, compatibility claims,
-and broad public-claim wording.
+`Test-MIRPolicyLints.ps1` is the static policy gate for the procedural compatibility kernel. It checks resolver contract wiring, capability policy, generated stream manifest fields, support-lane fixtures, compatibility claims, and broad public-claim wording.
 
-`Compare-MIRPlannerReports.ps1` compares two runs that contain
-`compat-observations.json`. Use it after changing classifier, policy, or
-compatibility fixture behavior to see new and removed generated streams,
-capability decisions, unknown candidates, loop risks, owner rows,
-science/lab rows, cap diagnostics, and claim-level entries.
+`Compare-MIRPlannerReports.ps1` compares two runs that contain `compat-observations.json`. Use it after changing classifier, policy, or compatibility fixture behavior to see new and removed generated streams, capability decisions, unknown candidates, loop risks, owner rows, science/lab rows, cap diagnostics, and claim-level entries.
 
 ## Run Profiles
 
@@ -88,10 +73,7 @@ Reusable defaults live in `fixtures/run-profiles/`.
 | `local-bz-smoke` | Narrow BZ Space Age local smoke. |
 | `top25-space-age` | Credentialed top-25 Space Age compatibility audit. |
 
-Run `Test-MIRLocalModLibraryCatalog.ps1` before expensive local sweeps to verify
-that the local zip library contains the root mods named by the committed
-local-library scenario file. This is metadata-only; it does not launch Factorio
-or call the Mod Portal.
+Run `Test-MIRLocalModLibraryCatalog.ps1` before expensive local sweeps to verify that the local zip library contains the root mods named by the committed local-library scenario file. This is metadata-only; it does not launch Factorio or call the Mod Portal.
 
 Prefer adding or editing a profile over hardcoding paths in `mir.ps1`. Local machine paths are acceptable in profiles because they are explicit operator defaults and easy to override.
 
@@ -102,9 +84,7 @@ Local audit profiles distinguish roots from libraries:
 - `local_mod_zip_dirs` lists root mods that may become one-mod, curated, or generated local scenarios.
 - `local_mod_library_dirs` lists dependency libraries used to close those scenarios offline.
 
-For an exact release-archive compatibility gate, pass `-ModUnderTestZip` to
-`Invoke-MIRCompatAudit.ps1`. Exact-archive mode copies the zip unchanged and
-does not enable diagnostics by modifying the mod under test.
+For an exact release-archive compatibility gate, pass `-ModUnderTestZip` to `Invoke-MIRCompatAudit.ps1`. Exact-archive mode copies the zip unchanged and does not enable diagnostics by modifying the mod under test.
 - Generated local scenarios are built only from root zips, not dependency-only library zips.
 
 Use a writable dependency-cache library for downloaded prerequisites instead of changing the read-only mod collection. For large local audits, prefer an output path on a roomy drive and choose a staging mode explicitly:
@@ -170,8 +150,7 @@ Static validation runs this check:
 .\scripts\Invoke-MIRValidation.ps1 -StaticOnly
 ```
 
-Legacy inventory thresholds are also part of static validation. Run the
-standalone checked inventory when changing module ownership:
+Legacy inventory thresholds are also part of static validation. Run the standalone checked inventory when changing module ownership:
 
 ```powershell
 .\scripts\mir.ps1 legacy inventory --check

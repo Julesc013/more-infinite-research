@@ -12,5 +12,4 @@ superseded_by: []
 
 # Registry Summary
 
-Registry summary rows count indexed facts for recipes, technologies, machines,
-labs, owners, and rule surfaces.
+Registry summary rows count indexed facts for recipes, technologies, machines, labs, owners, and rule surfaces.

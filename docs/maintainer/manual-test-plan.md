@@ -119,7 +119,4 @@ Required on the `legacy` branch with a Factorio `2.0.x` binary:
 
 Do not validate the legacy port with the Steam-updated Factorio `2.1.x` binary.
 
-For the expanded Factorio `1.1` through `0.6` backport ladder, use
-`docs/archive/superseded/legacy-backport-cadence.md` as historical context for the release matrix. Each target line
-needs its own binary smoke check when a compatible binary is available, and
-release notes must identify any target-line validation that could not be run.
+For the expanded Factorio `1.1` through `0.6` backport ladder, use `docs/archive/superseded/legacy-backport-cadence.md` as historical context for the release matrix. Each target line needs its own binary smoke check when a compatible binary is available, and release notes must identify any target-line validation that could not be run.

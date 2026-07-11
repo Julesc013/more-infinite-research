@@ -11,20 +11,9 @@ superseded_by: ["../../maintainer/backporting.md"]
 ---
 # Factorio 0.17 RC Planning Report
 
-Updated: 2026-07-10
-Branch: `tmp/0.17`
-Target Factorio line: `0.17.x`
-Prototype snapshot reviewed: `wube/factorio-data` tag `0.17.79`
-Planned MIR release slot: `1.7.0`
-Risk rating: High
-Change type in this commit: target-line metadata, reduced old-line implementation,
-validation, package evidence, and release documentation.
+Updated: 2026-07-10 Branch: `tmp/0.17` Target Factorio line: `0.17.x` Prototype snapshot reviewed: `wube/factorio-data` tag `0.17.79` Planned MIR release slot: `1.7.0` Risk rating: High Change type in this commit: target-line metadata, reduced old-line implementation, validation, package evidence, and release documentation.
 
-This is the maintainer planning note for the first old-line native-infinite
-proof branch. A stable RC for Factorio `0.17` still requires target-line code
-edits, metadata edits, package construction, and a load test against a matching
-Factorio binary. If those gates fail, the plan must change rather than shipping
-a misleading archive.
+This is the maintainer planning note for the first old-line native-infinite proof branch. A stable RC for Factorio `0.17` still requires target-line code edits, metadata edits, package construction, and a load test against a matching Factorio binary. If those gates fail, the plan must change rather than shipping a misleading archive.
 
 ## Evidence Reviewed
 
@@ -49,12 +38,8 @@ Science-pack surface observed for the target: modern 0.17 science names are pres
 - 0.17 predates change-recipe-productivity and Space Age concepts.
 - 0.17 still has normal/expensive recipe forms, so scanners must preserve that shape if used.
 - Runtime storage must use global if control code remains.
-- The disabled tutorial technology `basic-mining` also lists the normally
-  enabled Automation science recipe as an unlock. It is not a freeplay
-  progression gate.
-- `LuaForce.research_all_technologies()` excludes disabled prototypes by
-  default, so generated technology prerequisites must never infer
-  `basic-mining` or another disabled tutorial/scenario technology.
+- The disabled tutorial technology `basic-mining` also lists the normally enabled Automation science recipe as an unlock. It is not a freeplay progression gate.
+- `LuaForce.research_all_technologies()` excludes disabled prototypes by default, so generated technology prerequisites must never infer `basic-mining` or another disabled tutorial/scenario technology.
 
 ## Current MIR Code Surfaces That Do Not Backport Cleanly
 
@@ -75,10 +60,7 @@ The current branch began as the Factorio `2.1` development snapshot. The followi
 
 Status: release candidate validated.
 
-This branch must not be published by metadata retargeting alone. The RC
-threshold is a target-specific compatibility patch with unsupported technology
-modifiers removed, target science packs resolved, locale/package structure
-verified, and the package loaded by a matching Factorio `0.17.x` executable.
+This branch must not be published by metadata retargeting alone. The RC threshold is a target-specific compatibility patch with unsupported technology modifiers removed, target science packs resolved, locale/package structure verified, and the package loaded by a matching Factorio `0.17.x` executable.
 
 ## Implementation Non-Goals For The First RC
 
@@ -106,7 +88,5 @@ verified, and the package loaded by a matching Factorio `0.17.x` executable.
 - [x] Run a matching Factorio 0.17.x binary load test before RC approval.
 - [x] Create a 0.17 science/prerequisite map.
 - [x] Add a 0.17 load-only validation profile before implementation.
-- [x] Reject disabled prerequisites on generated streams in the matching 0.17
-  binary gate.
-- [x] Run an exact-dist unlock-all probe and confirm all eleven generated
-  direct-effect streams have no unmet or disabled prerequisites afterward.
+- [x] Reject disabled prerequisites on generated streams in the matching 0.17 binary gate.
+- [x] Run an exact-dist unlock-all probe and confirm all eleven generated direct-effect streams have no unmet or disabled prerequisites afterward.

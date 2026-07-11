@@ -467,6 +467,10 @@ Invoke-RepoCheck "package and harness fingerprints are checkout-line-ending inva
   & (Join-Path $repo "scripts\Test-MIRPackageIdentity.ps1") -RepoRoot $repo
 }
 
+Invoke-RepoCheck "Markdown formatter preserves structural syntax" {
+  & (Join-Path $repo "scripts\Test-MIRMarkdownFormatting.ps1") -RepoRoot $repo
+}
+
 Invoke-RepoCheck "fixture mods have metadata and data entrypoints" {
   $fixtureRootForStatic = Join-Path $repo "fixtures"
   if (-not (Test-Path -LiteralPath $fixtureRootForStatic)) {

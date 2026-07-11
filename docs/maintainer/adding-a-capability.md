@@ -12,9 +12,7 @@ superseded_by: []
 
 # Adding A Capability
 
-Start with report-first classification. Do not emit new behavior until the lane
-has policy, owner checks, lab checks, loop-risk handling, stream manifest rows,
-fixtures, and docs.
+Start with report-first classification. Do not emit new behavior until the lane has policy, owner checks, lab checks, loop-risk handling, stream manifest rows, fixtures, and docs.
 
 Update:
 

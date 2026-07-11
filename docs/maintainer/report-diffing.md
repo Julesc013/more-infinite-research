@@ -12,5 +12,4 @@ superseded_by: []
 
 # Report Diffing
 
-Use `scripts/Compare-MIRPlannerReports.ps1` to compare generated and diagnostic
-row sets before and after compatibility or capability changes.
+Use `scripts/Compare-MIRPlannerReports.ps1` to compare generated and diagnostic row sets before and after compatibility or capability changes.

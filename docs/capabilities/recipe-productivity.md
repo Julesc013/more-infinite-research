@@ -12,15 +12,13 @@ superseded_by: []
 
 # Recipe Productivity Capability
 
-Recipe productivity is the capability lane that creates
-`change-recipe-productivity` effects for validated recipe families.
+Recipe productivity is the capability lane that creates `change-recipe-productivity` effects for validated recipe families.
 
 ## Gates
 
 - Target recipes must exist and be visible unless the stream explicitly opts in.
 - Recipe productivity must be allowed by the prototype.
-- The recipe must not be owned by a conflicting infinite technology unless an
-  exact replacement or adoption policy passes.
+- The recipe must not be owned by a conflicting infinite technology unless an exact replacement or adoption policy passes.
 - Science ingredients must be lab-compatible.
 - Loop-risk and recovery signals must be rejected or explicitly allowed.
 - The generated stream must have a stable manifest row.

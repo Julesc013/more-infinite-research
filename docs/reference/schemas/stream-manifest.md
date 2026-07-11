@@ -13,13 +13,11 @@ superseded_by: []
 
 Updated: 2026-07-07
 
-Generated technology IDs are save-compatibility surface area. Once released,
-they must be treated like an API.
+Generated technology IDs are save-compatibility surface area. Once released, they must be treated like an API.
 
 ## Manifest Purpose
 
-The stream manifest records stable generated IDs, capability ownership, target
-recipes, and migration policy:
+The stream manifest records stable generated IDs, capability ownership, target recipes, and migration policy:
 
 ```json
 {
@@ -44,15 +42,9 @@ recipes, and migration policy:
 }
 ```
 
-The manifest row key is the stable stream ID used by governance and reporting.
-For generic legacy streams it is usually the generated technology name. For
-policy overlays, such as Air Scrubbing and ATAN Ash, the stable stream ID may be
-a clearer `mir-prod-*` ID while `generated_technology` preserves the actual
-Factorio prototype name.
+The manifest row key is the stable stream ID used by governance and reporting. For generic legacy streams it is usually the generated technology name. For policy overlays, such as Air Scrubbing and ATAN Ash, the stable stream ID may be a clearer `mir-prod-*` ID while `generated_technology` preserves the actual Factorio prototype name.
 
-During the MIR 3 transition, legacy stream rows may use a target marker in the
-form `stream:<stream_key>` until their exact recipe, item, fluid, or modifier
-target sets are materialized in the capability layer.
+During the MIR 3 transition, legacy stream rows may use a target marker in the form `stream:<stream_key>` until their exact recipe, item, fluid, or modifier target sets are materialized in the capability layer.
 
 ## Rules
 

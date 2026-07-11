@@ -17,9 +17,7 @@ Date: 2026-07-07
 
 ## Decision
 
-Released generated technology IDs are save-compatibility surface area. Every
-generated stream must have a manifest row. Renames or removals require an
-explicit migration or documented unreleased status.
+Released generated technology IDs are save-compatibility surface area. Every generated stream must have a manifest row. Renames or removals require an explicit migration or documented unreleased status.
 
 ## Consequences
 

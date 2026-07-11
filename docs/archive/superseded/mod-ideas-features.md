@@ -22,18 +22,11 @@ Audited archive count: 60 zip archives.
 
 Checksum ledger: `docs/notes/archive/audited-zips-2026-07-05.json`
 
-Audit method: text-only extraction of source/config files from each archive, then
-manual review of technology effects, runtime scripts, startup settings, recipe
-changes, cap changes, allowed-effect mutations, and metadata.
+Audit method: text-only extraction of source/config files from each archive, then manual review of technology effects, runtime scripts, startup settings, recipe changes, cap changes, allowed-effect mutations, and metadata.
 
-This file is the decision surface for choosing what MIR should recreate,
-cooperate with, diagnose, or deliberately leave alone. It is not a promise to
-absorb every mod. Most entries are compatibility signals.
+This file is the decision surface for choosing what MIR should recreate, cooperate with, diagnose, or deliberately leave alone. It is not a promise to absorb every mod. Most entries are compatibility signals.
 
-The later July 2026 suggestions transcript is summarized in
-`docs/notes/2.2.0-feature-intake.md`. That intake accepts the useful feature-risk
-analysis but rejects separate product names and "Extended" branding. MIR remains
-one mod with plain, feature-family settings.
+The later July 2026 suggestions transcript is summarized in `docs/notes/2.2.0-feature-intake.md`. That intake accepts the useful feature-risk analysis but rejects separate product names and "Extended" branding. MIR remains one mod with plain, feature-family settings.
 
 ## Decision Vocabulary
 
@@ -48,33 +41,22 @@ one mod with plain, feature-family settings.
 
 ## Executive Cut
 
-Keep `2.1.5` narrow for gameplay behavior. The current release should remain
-guarded duplicate cleanup plus effect-backed native-owner skips, with
-non-mutating diagnostics, scripts, tools, and report surfaces allowed because
-they do not change generated technologies. Better Bot Battery duplicate
-avoidance fits this lane when fixture-backed; Air Scrubbing clean-filter
-productivity is a good feature, but it is a new MIR-owned stream and belongs in
-`2.2.0`.
+Keep `2.1.5` narrow for gameplay behavior. The current release should remain guarded duplicate cleanup plus effect-backed native-owner skips, with non-mutating diagnostics, scripts, tools, and report surfaces allowed because they do not change generated technologies. Better Bot Battery duplicate avoidance fits this lane when fixture-backed; Air Scrubbing clean-filter productivity is a good feature, but it is a new MIR-owned stream and belongs in `2.2.0`.
 
 Use `2.2.0` for designed, fixture-backed behavior and broader policy work:
 
-1. Broader compatibility planner policy beyond the diagnostics-only `2.1.5`
-   rows.
-2. Cap-aware productivity settings or mutation policy beyond the warning-only
-   `2.1.5` diagnostics.
+1. Broader compatibility planner policy beyond the diagnostics-only `2.1.5` rows.
+2. Cap-aware productivity settings or mutation policy beyond the warning-only `2.1.5` diagnostics.
 3. Ore-crushing productivity if exact visible recipe fixtures pass.
 4. Tile/surface productivity policy before any tile stream ships.
 5. One narrow overhaul material-family prototype, not a generic productivity generator.
 6. Native direct-effect overlap policy, kept smaller than the broad idea-mod pile.
 
-Do not clone rule mutators, runtime productivity systems, research-cost systems,
-beacons, broad module changes, or radar/logistics content into MIR core.
+Do not clone rule mutators, runtime productivity systems, research-cost systems, beacons, broad module changes, or radar/logistics content into MIR core.
 
 ## Requested Mod Portal Signals
 
-These are not necessarily local idea archives. They are current compatibility
-requests that should be kept separate from the audited zip count unless their zip
-is also copied into `ideamods_mix`.
+These are not necessarily local idea archives. They are current compatibility requests that should be kept separate from the audited zip count unless their zip is also copied into `ideamods_mix`.
 
 ### `atan-air-scrubbing`
 
@@ -687,8 +669,7 @@ These are candidates for MIR-owned implementation, not cloning:
 
 ## Compatibility Only
 
-These should be supported through load tests, diagnostics, or non-action rather
-than recreated:
+These should be supported through load tests, diagnostics, or non-action rather than recreated:
 
 - `5dim_mining`
 - `aai-containers`
@@ -717,8 +698,7 @@ than recreated:
 
 ## Do Not Copy Into MIR Core
 
-These change rules, runtime state, or gameplay systems outside MIR's current
-identity:
+These change rules, runtime state, or gameplay systems outside MIR's current identity:
 
 - `base-prod`
 - `Prod-Beacon`

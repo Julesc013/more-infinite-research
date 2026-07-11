@@ -12,12 +12,9 @@ superseded_by: []
 
 # Releases
 
-Release docs are version-specific plans, migration guides, risk registers,
-checklists, and validation records.
+Release docs are version-specific plans, migration guides, risk registers, checklists, and validation records.
 
-The 3.0.5 convergence plan, checklist, and validation summary are the active
-release authority. The 3.0.0 records are the published architecture baseline
-and historical evidence.
+The 3.0.5 convergence plan, checklist, and validation summary are the active release authority. The 3.0.0 records are the published architecture baseline and historical evidence.
 
 - [3.0.0 plan](3.0.0-plan.md)
 - [3.0.0 regression baseline](3.0.0-regression-baseline.md)
@@ -37,5 +34,4 @@ and historical evidence.
 - [3.1.0 roadmap](3.1.0-roadmap.md)
 - [2.2.0 validation record](2.2.0-validation-record.md)
 
-Historical player-facing release notes are collected in the
-[release-notes directory](notes/).
+Historical player-facing release notes are collected in the [release-notes directory](notes/).

@@ -11,13 +11,7 @@ superseded_by: ["../../maintainer/backporting.md"]
 ---
 # Factorio 1.1 RC Planning Report
 
-Updated: 2026-07-06
-Branch: `tmp/1.1`
-Target Factorio line: `1.1.x`
-Prototype snapshot reviewed: `wube/factorio-data` tag `1.1.110`
-Planned MIR release slot(s): `1.8.8, 1.8.9`
-Risk rating: High
-Change type in this commit: documentation and planning only; no code behavior changes.
+Updated: 2026-07-06 Branch: `tmp/1.1` Target Factorio line: `1.1.x` Prototype snapshot reviewed: `wube/factorio-data` tag `1.1.110` Planned MIR release slot(s): `1.8.8, 1.8.9` Risk rating: High Change type in this commit: documentation and planning only; no code behavior changes.
 
 This is a tentative maintainer-authorized planning note for the temporary experimental branch. It does not make this branch a release candidate by itself. A stable RC for Factorio `1.1` still requires target-line code edits, metadata edits, package construction, and a load test against a matching Factorio binary. If those gates fail, the plan must change rather than shipping a misleading archive.
 

@@ -830,10 +830,7 @@ Post-transition MIR v3 architecture -> MIR v1.9.3 on Factorio 1.1.x where the ta
 Post-transition MIR v3 architecture -> MIR v1.8.0 and lower as progressively reduced, archive, or museum target-line ports
 ```
 
-The expanded older-line cadence for Factorio `1.1` through `0.6` is recorded in
-`docs/notes/legacy-backport-cadence.md`. Those releases are higher-risk
-compatibility ports, not parity promises, and should be validated against each
-target Factorio line before public claims are made.
+The expanded older-line cadence for Factorio `1.1` through `0.6` is recorded in `docs/notes/legacy-backport-cadence.md`. Those releases are higher-risk compatibility ports, not parity promises, and should be validated against each target Factorio line before public claims are made.
 
 Be careful with the backport promise. The current 2.1 path can use clean agricultural tower events and cargo landing pad APIs. The 2.0 line may not have those APIs, so the `1.9.0` port must explicitly remove or guard unsupported `2.0.5` current-line surfaces.
 
