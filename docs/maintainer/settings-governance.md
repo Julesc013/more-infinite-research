@@ -91,6 +91,8 @@ Keep the implementation in the MIR settings and pipeline layers. Compatibility p
 
 The automatic recycler choice uses the inverse of total capped output, not the inverse of the bonus alone. A +400% bonus produces five total crafts, so the safe return is 20%; using 25% would still create a positive loop. The automatic choice must never increase Factorio's normal 25% return.
 
+The scoped productivity policy also computes a per-path ceiling for every exact self-return recipe. That ceiling accounts for the path's actual probability, amount, and `ignored_by_productivity`, and may be lower than the global ceiling derived from the selected generated-recycler return. MIR clamps the return recipe to the lower ceiling before allowing its production recipe a higher cap.
+
 ## Dropdown Neutrality And Value Ladders
 
 Every dropdown must retain at least one explicit neutral option. Selecting it must preserve engine or configured baseline behavior and bypass the optional transformation. Use an existing stable enum when it already has that meaning: `configured`, `off`, and pipeline `100` are neutral. Use `engine-default` when the setting controls a Factorio prototype or when an explicit MIR policy bypass is needed. Prototype-preserving values may use `unchanged`. MIR-added features use concise mod-specific labels such as `Off`, `Configured packs`, or `No MIR adjustment`; do not describe those choices as engine behavior.

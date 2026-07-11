@@ -162,7 +162,7 @@ if expected_productivity then
     local loop = data.raw.recipe["mir-fixture-self-recycling-loop"]
     if safe then assert_close("self-recycling production maximum_productivity", safe.maximum_productivity, expected_productivity) end
     if unsafe then assert_close("non-recycling production inverse cap", unsafe.maximum_productivity, inverse_threshold) end
-    if loop then assert_close("self-recycling loop inverse cap", loop.maximum_productivity, inverse_threshold) end
+    if loop then assert_close("self-recycling loop path-safe cap", loop.maximum_productivity, math.min(inverse_threshold, 3)) end
   end
 end
 
@@ -230,6 +230,35 @@ if unrestricted_modules then
     end
     if removed then table.insert(first.allowed_module_categories, removed) end
   end
+end
+
+if scoped_cap and expected_productivity and unrestricted_modules then
+  local cap_scope = require("__more-infinite-research__.prototypes.mir.policy.productivity_cap_scope")
+  local classifier = cap_scope.build()
+  local function assert_scope_result(recipe_name, expected_approved, expected_reason)
+    local recipe = data.raw.recipe and data.raw.recipe[recipe_name]
+    if not recipe then fail("missing recycler boundary recipe " .. recipe_name .. ".") end
+    local approved, reason = classifier.approve(recipe)
+    if approved ~= expected_approved or reason ~= expected_reason then
+      fail(recipe_name .. " scope result was " .. tostring(approved) .. "/" .. tostring(reason)
+        .. ", expected " .. tostring(expected_approved) .. "/" .. expected_reason .. ".")
+    end
+  end
+
+  assert_scope_result("mir-fixture-boundary-multiple-path-candidate", false, "ambiguous-recycling-path")
+  assert_scope_result("mir-fixture-boundary-byproduct-candidate", false, "self-return-has-byproducts")
+  assert_scope_result("mir-fixture-boundary-probabilistic-candidate", false, "probabilistic-identity")
+  assert_scope_result("mir-fixture-boundary-ignored-candidate", true, "safe-single-item-self-return")
+  assert_scope_result("mir-fixture-boundary-fluid-candidate", false, "fluid-product")
+  assert_scope_result("mir-fixture-boundary-variant-candidate", false, "ambiguous-recycling-path")
+  assert_scope_result("mir-fixture-boundary-conversion-candidate", false, "conversion-cycle-to-input")
+  assert_scope_result("mir-fixture-boundary-nonstandard-candidate", true, "safe-single-item-self-return")
+  assert_close("partial ignored-productivity return maximum_productivity",
+    data.raw.recipe["mir-fixture-boundary-ignored-return"].maximum_productivity,
+    5)
+  assert_close("nonstandard ten-percent return maximum_productivity",
+    data.raw.recipe["mir-fixture-boundary-nonstandard-return"].maximum_productivity,
+    9)
 end
 
 local effect_receiver_prototypes = {

@@ -80,7 +80,7 @@ local function apply_recipe_productivity_cap(value, recycling_chance)
   local scoped = effective_settings.get(prototype_limit_settings.self_recycling_scope_setting_name) == true
   local scope_threshold = inverse_recycling_productivity_bonus(recycling_chance)
   local scope_active = scoped and value > scope_threshold + EPSILON
-  local scope_classifier = scope_active and cap_scope.build() or nil
+  local scope_classifier = scope_active and cap_scope.build(scope_threshold) or nil
   local approved = 0
   local rejected = 0
   local skipped_recycling = 0
@@ -94,6 +94,8 @@ local function apply_recipe_productivity_cap(value, recycling_chance)
         local safe = scope_classifier.approve(recipe)
         if safe == true then approved = approved + 1 else rejected = rejected + 1 end
         local target = safe == true and value or scope_threshold
+        local path_cap = scope_classifier.maximum_safe_productivity(recipe)
+        if path_cap ~= nil then target = math.min(target, path_cap) end
         if recipe.maximum_productivity ~= target then
           recipe.maximum_productivity = target
           changed = changed + 1

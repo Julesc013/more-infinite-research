@@ -60,6 +60,15 @@ fixtures:
       - recycling-recipe-productivity-cap-exclusion
       - visible-recycling-process-exclusion
       - unrestricted-module-permissions
+      - recycler-multiple-return-path-rejection
+      - recycler-self-return-byproduct-rejection
+      - recycler-probabilistic-production-rejection
+      - recycler-partial-ignored-productivity-proof
+      - recycler-fluid-shape-rejection
+      - recycler-normal-expensive-variant-rejection
+      - recycler-conversion-to-input-rejection
+      - recycler-nonstandard-return-proof
+      - unrestricted-module-recycler-cross-policy-outcomes
       - module-permission-array-isolation
       - module-prototype-tier-recipe-discovery
       - effect-receiver-limits
