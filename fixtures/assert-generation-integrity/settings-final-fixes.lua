@@ -8,7 +8,7 @@ local expected_double_defaults = {
   ["ips-effect-per-level-research_agricultural_growth_speed"] = {1, 2},
   ["mir-effect-per-level-braking-force"] = 15,
   ["mir-effect-per-level-laser-shooting-speed"] = 50,
-  ["mir-effect-per-level-research-speed"] = 60,
+  ["mir-effect-per-level-research-speed"] = {60, 120},
   ["mir-effect-per-level-weapon-shooting-speed"] = 40
 }
 
@@ -16,7 +16,7 @@ local expected_int_defaults = {
   ["ips-effect-per-level-research_character_reach"] = 10,
   ["ips-effect-per-level-research_inventory_capacity"] = 1,
   ["mir-effect-per-level-inserter-capacity-bonus"] = 4,
-  ["mir-effect-per-level-worker-robots-storage"] = 1
+  ["mir-effect-per-level-worker-robots-storage"] = {1, 2}
 }
 
 local function assert_defaults(prototype_type, expected)
