@@ -4,6 +4,6 @@
   "title": "MIR Fixture - Better Robots Extended Competitor",
   "author": "Julesc013",
   "description": "Validation fixture for transactional worker robot storage replacement.",
-  "factorio_version": "2.1",
-  "dependencies": ["base >= 2.1.8"]
+  "factorio_version": "2.0",
+  "dependencies": ["base >= 2.0"]
 }

@@ -1,4 +1,16 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.4.0
+Date: 2026-07-12
+
+  Changes:
+
+    - Ported the accepted 3.1.0 compatibility-compiler contracts to the maintained Factorio 2.0 line.
+    - Preserved the 2.3.x generated IDs, setting IDs, runtime namespaces, and save-compatible behavior surface.
+    - Applied positive Factorio 2.0 target requirements instead of carrying 2.1-only effect or metadata assumptions.
+    - Retained the canonical descriptor, immutable recipe-fact, science-split, and mutation-command improvements from 3.1.0.
+    - Retained the deterministic-package and decomposed load-test improvements from 3.1.0.
+
+---------------------------------------------------------------------------------------------------
 Version: 3.1.0
 Date: 2026-07-12
 

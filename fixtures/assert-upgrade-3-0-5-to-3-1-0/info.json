@@ -3,10 +3,10 @@
   "version": "0.1.0",
   "title": "MIR Fixture - Assert 3.0.5 to 3.1.0 Upgrade",
   "author": "MIR maintainers",
-  "factorio_version": "2.1",
+  "factorio_version": "2.0",
   "dependencies": [
-    "base >= 2.1.0",
-    "space-age >= 2.1.0",
+    "base >= 2.0",
+    "space-age >= 2.0",
     "more-infinite-research >= 3.0.5"
   ]
 }

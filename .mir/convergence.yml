@@ -1,12 +1,12 @@
 schema: 1
 
 release:
-  version: "3.1.0"
-  branch: dev
-  factorio_version: "2.1"
-  baseline_commit: f3d3b6073166b5acdc2ae5636c0d68302b757f0f
-  baseline_tag: pre-3.1-modernization
-  objective: bounded-correctness-and-contract-modernization
+  version: "2.4.0"
+  branch: tmp/2.0
+  factorio_version: "2.0"
+  baseline_commit: 6272cb67c96855c574c96032cb27dfcf0721aa74
+  baseline_tag: "3.1.0"
+  objective: target-port-behavioral-subset
   public_contract_change: minor-compatible
 
 superseded_candidates:
@@ -92,21 +92,11 @@ superseded_candidates:
     status: superseded-unpublished-candidate
 
 candidate:
-  artifact: dist/more-infinite-research_3.1.0.zip
-  source_commit: 0dd8d7f27d9bbbbb728a70ef00b7c955af48cbb7
-  sha256: 0244D40A9971C450274FE1FD7EA142FA5D23E4A2271A0191F31F395589267C1A
-  package_content_sha256: 5D5162EEAF13E87E2FB1A5A2A31B5EC14ABDCCD2308CFAF8E70C20297C56E82F
-  package_source_sha256: 5D5162EEAF13E87E2FB1A5A2A31B5EC14ABDCCD2308CFAF8E70C20297C56E82F
-  target_profile_sha256: EFC9454504E73010B50A9A68DC9AD56E533EDFD4FDBDE0D1F6467E2A19AE04B0
-  required_groups_sha256: 57A1DF87A8FB594B2B51C7E230D775E88028F23D52DF9D5D7DA1336F9271C78A
-  validation_harness_sha256: E9094E4B7D8B0C990BCCE8927A3F51D04862A24110D0095806F4F83FDB5EBC9E
-  expected_scenarios_sha256: A4198544BE15EE20F228D18DC6990ABE179D84A53EB3C30AEF4A9FF3DBE195C7
-  structured_summary_path: .mir/evidence/3.1.0-rc1-validation-summary.json
-  structured_summary_run_id: a961b15a-a018-4ebe-9799-f6bafc8bc2ed
-  validation_package_sha256: 6E241687B13F99561D24E18A7D0F1EFC4DFE5B2FCD3D7A084EE83B85D67865FD
-  automated_gate: passed
-  manual_gate: accepted-for-publication
-  status: release-candidate-awaiting-manual-review
+  artifact: dist/more-infinite-research_2.4.0.zip
+  source_commit: pending
+  automated_gate: pending
+  manual_gate: pending
+  status: rebuilding-after-package-visible-change
 
 rules:
   - dev-remains-the-canonical-modern-implementation
