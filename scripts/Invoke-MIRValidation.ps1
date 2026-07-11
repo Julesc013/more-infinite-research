@@ -3613,7 +3613,8 @@ Assert-LogContains -Expected "Applied prototype limits: productivity_recipes=" -
 Invoke-RuntimeScenario -ScenarioName "prototype-limit-self-recycling-and-unrestricted-modules" -EnabledFixtureNames @(
   "mir-fixture-assert-prototype-limits"
 ) `
-  -PrototypeProductivityCap "percent-500" `
+  -PrototypeProductivityCap "percent-1000" `
+  -RecyclingReturnChance "percent-10" `
   -ProductivityCapSelfRecyclingOnly `
   -UnrestrictedModules
 Assert-LogContains -Expected "Productivity cap self-recycling scope: approved=" -Context "Self-recycling productivity cap scope scenario"

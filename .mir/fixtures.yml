@@ -50,7 +50,7 @@ fixtures:
     validates:
       - prototype-limit-startup-overrides
       - recipe-maximum-productivity-cap
-      - above-300-cap-self-recycling-scope
+      - inverse-recycler-threshold-self-recycling-scope
       - cap-balanced-generated-recycling-return
       - visible-recycling-process-exclusion
       - unrestricted-module-permissions

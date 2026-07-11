@@ -15,7 +15,7 @@ Date: 2026-07-11
     - Limited weapon overlap cleanup to MIR-generated continuations and required external owners to use obtainable science.
     - Rejected external research owners that use unrecognized science ingredients.
     - Kept incineration sink recipes out of breeding productivity research so later recipe removal cannot leave invalid effects.
-    - Added opt-in above-300% productivity scoping for proven non-generative self-recycling recipes.
+    - Made opt-in productivity scoping derive its unrestricted threshold from the inverse effective recycler return.
     - Added a recycler-return dropdown with unchanged, cap-matched, and fixed choices from 20% down to 0.1%.
     - Hid the redundant fixed 25% recycler row while retaining legacy profile compatibility for that enum.
     - Cap-matched recycling uses total output: +400% gives 20% returns and +1000% about 9.09%, never above vanilla 25%.

@@ -52,12 +52,12 @@ MIR includes startup-only prototype limit settings:
 - Speed effect cap
 - Quality effect cap
 
-When the productivity cap is selected above +300%, the default-off
-`mir-productivity-cap-self-recycling-only` checkbox limits MIR's upward cap
-mutation to recipes with a proven single-item self-recycling path whose
-expected loop is non-generative. Unsafe recipes keep their existing cap, and
-MIR never raises the recycling recipe itself. The checkbox has no effect at
-+300% or below.
+The default-off `mir-productivity-cap-self-recycling-only` checkbox derives an
+unrestricted productivity threshold from the effective recycler return using
+`1 / return - 1`. With 25% returns the threshold is +300%; with 10% returns it
+is +900%. Above that threshold, only recipes with a proven non-generative
+self-recycling path receive the selected higher cap. Other recipes are capped
+at the derived threshold, and MIR never raises the recycling recipe itself.
 
 The `mir-recycling-return-chance` dropdown is a separate balance control for
 hidden generated recycling recipes. `Match productivity cap` uses the

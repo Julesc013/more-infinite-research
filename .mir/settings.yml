@@ -25,7 +25,7 @@ rules:
   settings_profile_encoding_is_deterministic: true
   prototype_limit_settings_default_to_engine_default: true
   prototype_limit_settings_are_startup_only_explicit_overrides: true
-  productivity_cap_scope_is_above_300_self_recycling_only: true
+  productivity_cap_scope_threshold_is_inverse_of_effective_recycler_return: true
   recycling_return_policy_is_explicit_and_generated_recipes_only: true
   automatic_recycling_return_is_total-output-inverse_and_never_buffs_vanilla: true
   unrestricted_modules_is_opt_in_and_does_not_add_slots: true
