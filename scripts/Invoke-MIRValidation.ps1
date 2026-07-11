@@ -464,6 +464,10 @@ Invoke-RepoCheck "PowerShell scripts parse and avoid duplicate parameters" {
   & (Join-Path $repo "scripts\Test-MIRPowerShellQuality.ps1") -RepoRoot $repo
 }
 
+Invoke-RepoCheck "compatibility dependency declarations preserve full mod names" {
+  & (Join-Path $repo "scripts\Test-MIRDependencyResolver.ps1") -RepoRoot $repo
+}
+
 Invoke-RepoCheck "validation scenario groups and partial result aggregation are stable" {
   & (Join-Path $repo "scripts\Test-MIRValidationResults.ps1") -RepoRoot $repo
 }
@@ -1249,7 +1253,7 @@ Invoke-RepoCheck "compat audit automation tooling is wired" {
     @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = "[string[]]`$OfficialBuiltinMods" },
     @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = "enabled = `$enabledLookup.ContainsKey" },
     @{ File = "fixtures\compat-matrix\local-library-scenarios.json"; Text = $localLibraryScenariosText; Snippet = "local-2-1-crucible-rigor-exact-dist" },
-    @{ File = "scripts\MIRCompatAudit\ModPortal.ps1"; Text = $modPortalText; Snippet = '[^\s<>=]+' },
+    @{ File = "scripts\MIRCompatAudit\ModPortal.ps1"; Text = $modPortalText; Snippet = '\s+(?:>=|<=|=|>|<)\s*\d' },
     @{ File = "scripts\MIRCompatAudit\DependencyResolver.ps1"; Text = $dependencyResolverText; Snippet = "[switch]`$IncludeRecommendedDependencies" },
     @{ File = "scripts\MIRCompatAudit\DiagnosticsParser.ps1"; Text = $diagnosticsParserText; Snippet = "[AllowEmptyString()][string]`$Line" },
     @{ File = "scripts\MIRCompatAudit\DiagnosticsParser.ps1"; Text = $diagnosticsParserText; Snippet = "IsNullOrWhiteSpace(`$line)" },
