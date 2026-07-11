@@ -106,7 +106,7 @@ candidate:
   validation_package_sha256: 6E241687B13F99561D24E18A7D0F1EFC4DFE5B2FCD3D7A084EE83B85D67865FD
   automated_gate: passed
   manual_gate: accepted-for-publication
-  status: release-candidate-accepted
+  status: release-candidate-awaiting-manual-review
 
 rules:
   - dev-remains-the-canonical-modern-implementation
