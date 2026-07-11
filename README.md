@@ -13,9 +13,9 @@ More Infinite Research adds **configurable infinite productivity** and **bonus r
 
 **MIR `3.x.x`** targets **Factorio `2.1`** and requires `base >= 2.1.8`.
 
-**MIR `2.x.x`** targets **Factorio `2.0`** starting with **`2.3.0`**.
+**MIR `2.x.x`** targets **Factorio `2.0`** and requires `base >= 2.0`.
 
-**MIR `1.x.x`** targets **Factorio `1.1`** and earlier as reduced backports.
+**MIR `1.x.x`** targets **Factorio `1.1`** and earlier as *reduced backports*.
 
 The mod is built around **graceful compatibility**: it discovers recipes, science packs, labs, and optional prototypes from the active mod set, validates the candidate research, generates technologies late in **`data-final-fixes.lua`**, and *skips unsafe or unavailable streams* instead of requiring compatibility mods on the mod portal page.
 
