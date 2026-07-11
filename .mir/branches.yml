@@ -167,6 +167,16 @@ release_artifacts:
           size_bytes: 321227
           reason: retained non-default base effect settings could load an incomplete descriptor
           status: superseded-unpublished-candidate
+        - candidate_commit: 2d1eb296f15b71ef538d0547147ce42ac03098a0
+          sha256: 65A1575CF6C31B64D46FD1DD43E355036DFB704843E4DF3D85461371E6C74C2E
+          size_bytes: 321314
+          entries: 132
+          package_content_sha256: 46D99E946675A9899E44503802D7F8FEB55D4F9967828F89A0FFCEA4EF51CEE7
+          validation_summary: .mir/evidence/2.3.5-rc4-validation-summary.json
+          validation_run_id: c63ad6cd-1b1e-4314-acd1-53d859728c77
+          scenario_count: 67
+          reason: final released 3.0.5 expanded settings and recycler interaction contract had not yet been ported
+          status: superseded-unpublished-candidate
       artifact: dist/more-infinite-research_2.3.5.zip
       candidate_commit: pending
       automated_gate: pending
