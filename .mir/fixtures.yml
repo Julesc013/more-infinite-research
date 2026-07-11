@@ -104,6 +104,19 @@ fixtures:
       - repeated-full-recipe-scan-rejection
       - non-aliased-capability-lifecycle-stages
 
+  scripted-runtime-lifecycle:
+    requires_features: [scripted_techs]
+    assertion_path: fixtures/assert-scripted-runtime-lifecycle
+    validates:
+      - scripted-multiple-level-application
+      - scripted-reversal-and-reset
+      - scripted-force-create-and-merge
+      - scripted-external-baseline-rebase
+      - scripted-save-load-configuration-change
+      - scripted-final-restoration
+      - scripted-settings-disable-restoration
+      - scripted-settings-reenable
+
   competing-productivity-transaction:
     requires_features: [recipe_productivity]
     path: fixtures/plates-n-circuit-productivity

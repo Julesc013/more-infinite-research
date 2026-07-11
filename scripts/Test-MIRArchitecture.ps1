@@ -470,6 +470,7 @@ foreach ($fixtureId in @(
   "settings-visibility",
   "prototype-limits",
   "effect-scaling",
+  "scripted-runtime-lifecycle",
   "competing-productivity-transaction",
   "competing-base-extension-transaction",
   "settings-profile-roundtrip",

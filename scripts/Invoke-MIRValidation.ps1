@@ -2094,6 +2094,7 @@ $postMirAssertionFixtures = @(
   "mir-fixture-assert-prototype-limits",
   "mir-fixture-assert-reduced-settings-surface",
   "mir-fixture-assert-settings-profile-roundtrip",
+  "mir-fixture-assert-scripted-runtime-lifecycle",
   "mir-fixture-assert-vanilla-family-adoption",
   "mir-fixture-assert-vanilla-family-exact-owner",
   "mir-fixture-assert-vanilla-family-mixed-owner",
@@ -2630,6 +2631,13 @@ function Invoke-RuntimeConfigurationChangeScenario {
     [string]$ScenarioName,
     [string[]]$InitialFixtureNames = @(),
     [string[]]$ChangedFixtureNames = @(),
+    [string[]]$EnabledStreamKeys = @(),
+    [string[]]$InitialEnabledStreamKeys = @(),
+    [string[]]$ChangedEnabledStreamKeys = @(),
+    [string[]]$InitialDisabledStreamKeys = @(),
+    [string[]]$ChangedDisabledStreamKeys = @(),
+    [hashtable]$EffectPerLevelOverrides = @{},
+    [switch]$ScriptedDiagnostics,
     [switch]$EnableSpaceAge
   )
 
@@ -2639,6 +2647,10 @@ function Invoke-RuntimeConfigurationChangeScenario {
     $initialScenario = Initialize-RuntimeScenario `
       -ScenarioName "$ScenarioName-initial" `
       -EnabledFixtureNames $InitialFixtureNames `
+      -EnabledStreamKeys @($EnabledStreamKeys + $InitialEnabledStreamKeys) `
+      -DisabledStreamKeys $InitialDisabledStreamKeys `
+      -EffectPerLevelOverrides $EffectPerLevelOverrides `
+      -ScriptedDiagnostics:$ScriptedDiagnostics `
       -EnableSpaceAge:$EnableSpaceAge
     if (Test-Path -LiteralPath $initialScenario.SavePath) {
       Remove-Item -LiteralPath $initialScenario.SavePath -Force
@@ -2669,6 +2681,10 @@ function Invoke-RuntimeConfigurationChangeScenario {
     $changedScenario = Initialize-RuntimeScenario `
       -ScenarioName "$ScenarioName-changed" `
       -EnabledFixtureNames $ChangedFixtureNames `
+      -EnabledStreamKeys @($EnabledStreamKeys + $ChangedEnabledStreamKeys) `
+      -DisabledStreamKeys $ChangedDisabledStreamKeys `
+      -EffectPerLevelOverrides $EffectPerLevelOverrides `
+      -ScriptedDiagnostics:$ScriptedDiagnostics `
       -EnableSpaceAge:$EnableSpaceAge
 
     Write-Host "[run] Factorio configuration-change load check with fixture mods ($ScenarioName)"
@@ -3653,6 +3669,44 @@ if ($isFactorio21Line) {
   Assert-ReportLineGenerated -Line $defaultAgriculturalLine -Context "Default-enabled scripted agricultural runtime scenario"
   Assert-LogContains -Expected "spoilage preservation skipped: disabled" -Context "Default-disabled scripted spoilage runtime scenario"
   Assert-LogContains -Expected "agricultural growth speed force state refreshed enabled=true" -Context "Default-enabled scripted agricultural runtime scenario"
+
+  Invoke-RuntimeConfigurationChangeScenario `
+    -ScenarioName "space-age-scripted-runtime-lifecycle" `
+    -InitialFixtureNames @("mir-fixture-assert-scripted-runtime-lifecycle") `
+    -ChangedFixtureNames @("mir-fixture-assert-scripted-runtime-lifecycle") `
+    -EnabledStreamKeys @("research_spoilage_preservation") `
+    -EffectPerLevelOverrides @{ research_spoilage_preservation = 2 } `
+    -ScriptedDiagnostics `
+    -EnableSpaceAge
+  Assert-LogContains `
+    -Expected "[mir-fixture] scripted lifecycle retention proof complete" `
+    -Context "Scripted runtime save/load retention scenario"
+
+  Invoke-RuntimeConfigurationChangeScenario `
+    -ScenarioName "space-age-scripted-runtime-disable-restoration" `
+    -InitialFixtureNames @("mir-fixture-assert-scripted-runtime-lifecycle") `
+    -ChangedFixtureNames @("mir-fixture-assert-scripted-runtime-lifecycle") `
+    -InitialEnabledStreamKeys @("research_spoilage_preservation") `
+    -ChangedDisabledStreamKeys @("research_spoilage_preservation") `
+    -EffectPerLevelOverrides @{ research_spoilage_preservation = 2 } `
+    -ScriptedDiagnostics `
+    -EnableSpaceAge
+  Assert-LogContains `
+    -Expected "[mir-fixture] scripted lifecycle disable proof complete" `
+    -Context "Scripted runtime disable restoration scenario"
+
+  Invoke-RuntimeConfigurationChangeScenario `
+    -ScenarioName "space-age-scripted-runtime-reenable" `
+    -InitialFixtureNames @() `
+    -ChangedFixtureNames @("mir-fixture-assert-scripted-runtime-lifecycle") `
+    -InitialDisabledStreamKeys @("research_spoilage_preservation") `
+    -ChangedEnabledStreamKeys @("research_spoilage_preservation") `
+    -EffectPerLevelOverrides @{ research_spoilage_preservation = 2 } `
+    -ScriptedDiagnostics `
+    -EnableSpaceAge
+  Assert-LogContains `
+    -Expected "[mir-fixture] scripted lifecycle enable proof complete" `
+    -Context "Scripted runtime re-enable scenario"
 }
 
 Invoke-RuntimeScenario -ScenarioName "space-age-generation-integrity" -EnabledFixtureNames @(
