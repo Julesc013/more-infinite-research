@@ -452,6 +452,41 @@ foreach ($stage in @("discovered", "classified", "proposed", "validated", "emitt
   Assert-MIRContains -RelativePath "prototypes/mir/capabilities/registry.lua" -Text $capabilityRegistryText -Needle ('"' + $stage + '"')
 }
 
+foreach ($runtimeHandler in @(
+  "prototypes/mir/runtime/scripted_techs.lua",
+  "prototypes/mir/runtime/settings_profile.lua",
+  "prototypes/mir/runtime/productivity_family_adoption.lua",
+  "prototypes/mir/runtime/effects/spoilage_preservation.lua",
+  "prototypes/mir/runtime/effects/agricultural_growth_speed.lua"
+)) {
+  $handlerText = Read-MIRFile -RelativePath $runtimeHandler
+  Assert-MIRContains -RelativePath $runtimeHandler -Text $handlerText -Needle "M.requires_features = {"
+}
+
+$fixturesManifestText = Read-MIRFile -RelativePath ".mir/fixtures.yml"
+foreach ($fixtureId in @(
+  "rigor-late-recipe-removal",
+  "generated-prerequisite-safety",
+  "settings-visibility",
+  "prototype-limits",
+  "effect-scaling",
+  "competing-productivity-transaction",
+  "competing-base-extension-transaction",
+  "settings-profile-roundtrip",
+  "reduced-settings-surface",
+  "weapon-speed-safety",
+  "air-scrubbing",
+  "atan-ash",
+  "atan-nuclear-science",
+  "aai-loaders",
+  "big-mining-drill",
+  "omega-drill"
+)) {
+  if ($fixturesManifestText -notmatch ("(?ms)^  " + [regex]::Escape($fixtureId) + ":\s*\r?\n    requires_features: \[")) {
+    throw "Governed fixture $fixtureId must declare positive target feature requirements."
+  }
+}
+
 Assert-MIRNoPatternInLuaTree `
   -RelativeRoot "prototypes/mir/runtime" `
   -Pattern "\b(global|storage)\b" `

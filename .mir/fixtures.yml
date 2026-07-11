@@ -17,6 +17,7 @@ real_mod_gates:
 
 fixtures:
   rigor-late-recipe-removal:
+    requires_features: [recipe_productivity]
     path: fixtures/rigor-late-recipe-removal
     validates:
       - incineration-sink-excluded-from-breeding
@@ -25,6 +26,7 @@ fixtures:
       - dependent-mod-late-recipe-removal
 
   generated-prerequisite-safety:
+    requires_features: [recipe_productivity]
     assertion_path: fixtures/assert-generated-prerequisite-safety
     validates:
       - generated-stream-prerequisites-exist-and-are-enabled
@@ -43,12 +45,14 @@ fixtures:
       - shared-pack-production-reachability-cache
 
   settings-visibility:
+    requires_features: []
     assertion_path: fixtures/assert-hidden-setting-readability
     validates:
       - hidden-setting-readability
       - stable-setting-ids
 
   prototype-limits:
+    requires_features: [prototype_limits]
     assertion_path: fixtures/assert-prototype-limits
     validates:
       - prototype-limit-startup-overrides
@@ -77,6 +81,7 @@ fixtures:
       - positive-power-floor-opt-in
 
   effect-scaling:
+    requires_features: []
     assertion_path: fixtures/assert-generation-integrity
     validates:
       - primary-base-tier-default-anchor
@@ -100,6 +105,7 @@ fixtures:
       - non-aliased-capability-lifecycle-stages
 
   competing-productivity-transaction:
+    requires_features: [recipe_productivity]
     path: fixtures/plates-n-circuit-productivity
     assertion_path: fixtures/assert-plates-n-circuit-productivity
     validates:
@@ -108,6 +114,7 @@ fixtures:
       - technology-prerequisite-rewire
 
   competing-base-extension-transaction:
+    requires_features: []
     path: fixtures/better-robots-extended-competitor
     assertion_path: fixtures/assert-base-competitor-transaction
     validates:
@@ -115,6 +122,7 @@ fixtures:
       - technology-prerequisite-rewire
 
   settings-profile-roundtrip:
+    requires_features: [settings_profiles]
     assertion_path: fixtures/assert-settings-profile-roundtrip
     validates:
       - settings-profile-deterministic-encoding
@@ -127,6 +135,7 @@ fixtures:
       - settings-catalog-copy-isolation
 
   reduced-settings-surface:
+    requires_features: []
     assertion_path: fixtures/assert-reduced-settings-surface
     validates:
       - reduced-supported-settings-remain-visible
@@ -134,6 +143,7 @@ fixtures:
       - reduced-continuation-locales-are-explicit
 
   weapon-speed-safety:
+    requires_features: []
     path: fixtures/weapon-speed-external-owner
     assertion_path: fixtures/assert-weapon-speed-safety
     validates:
@@ -147,6 +157,7 @@ fixtures:
       - scaled-weapon-overlap
 
   air-scrubbing:
+    requires_features: [recipe_productivity]
     path: fixtures/air-scrubbing
     assertion_path: fixtures/assert-air-scrubbing-clean-filter
     claim: atan-air-scrubbing
@@ -157,6 +168,7 @@ fixtures:
       - package-hygiene
 
   atan-ash:
+    requires_features: [recipe_productivity]
     path: fixtures/atan-ash
     assertion_path: fixtures/assert-atan-ash-separation
     claim: atan-ash
@@ -166,6 +178,7 @@ fixtures:
       - loop-risk-rejections
 
   atan-nuclear-science:
+    requires_features: [recipe_productivity]
     path: fixtures/atan-nuclear-science
     assertion_path: fixtures/assert-atan-nuclear-science-productivity
     claim: atan-nuclear-science
@@ -174,6 +187,7 @@ fixtures:
       - lab-compatibility
 
   aai-loaders:
+    requires_features: [recipe_productivity]
     path: fixtures/aai-loaders
     assertion_path: fixtures/assert-aai-loader-belt-productivity
     claim: aai-loaders
@@ -183,6 +197,7 @@ fixtures:
       - belt-stream-coverage
 
   big-mining-drill:
+    requires_features: [recipe_productivity]
     path: fixtures/big-mining-drill
     assertion_path: fixtures/assert-big-mining-drill-productivity
     claim: big-mining-drill
@@ -192,6 +207,7 @@ fixtures:
       - native-mining-owner-observation
 
   omega-drill:
+    requires_features: [recipe_productivity]
     path: fixtures/omega-drill
     assertion_path: fixtures/assert-omega-drill-productivity
     validates:

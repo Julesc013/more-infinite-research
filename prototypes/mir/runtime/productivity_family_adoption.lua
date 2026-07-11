@@ -1,4 +1,5 @@
 local M = {}
+M.requires_features = {"productivity_family_adoption"}
 local runtime_state = require("prototypes.mir.runtime.state")
 
 local ADOPTION_DATA_NAME = "more-infinite-research-productivity-family-adoption"

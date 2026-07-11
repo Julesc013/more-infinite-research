@@ -40,6 +40,8 @@ Each profile declares:
 
 For Factorio 2.1 and 2.0, stream descriptors declare required features, mods, prototypes, technologies, and effect types. The selected profile must positively admit every required feature, mod namespace, and effect type. These profiles are not allowed to carry the older `unsupported_streams`, `unsupported_required_mods`, or `unsupported_effect_types` denylists. Historical reduced profiles retain that transitional shape until their independent refresh and binary-proof waves.
 
+The same positive declaration rule applies to generated settings, pipeline commands, runtime event handlers, and governed fixtures. An empty `requires_features` array is an explicit portable declaration, not missing metadata. Architecture lint fails when a handler or fixture omits its declaration.
+
 Profiles for released lines record validated historical behavior. Profiles for Factorio 0.16 and 0.15 are explicitly marked as planned and do not constitute binary support claims. Their science and effect surfaces still require matching target-binary proof.
 
 ## Runtime State

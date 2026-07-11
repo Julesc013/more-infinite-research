@@ -4,6 +4,7 @@ local runtime_state = require("prototypes.mir.runtime.state")
 
 M.technology_name = "recipe-prod-research_agricultural_growth_speed-1"
 M.stream_key = "research_agricultural_growth_speed"
+M.requires_features = {"scripted_techs"}
 
 local CANONICAL_PER_LEVEL_DELTA = 0.01
 local MAX_MULTIPLIER = 10
