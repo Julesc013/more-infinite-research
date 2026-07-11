@@ -114,6 +114,15 @@ local function assert_recipe_fact_contracts()
   if second.result_names[1] == "mutated-through-copy" then
     fail("recipe fact consumer mutated the canonical require-cached fact")
   end
+  local synthetic_names = canonical_recipe_facts.candidate_names({
+    ["mir-fixture-synthetic-item-1000"] = true
+  }, {}, {})
+  if #synthetic_names ~= 1 or synthetic_names[1] ~= "mir-fixture-synthetic-recipe-1000" then
+    fail("large synthetic recipe index did not return the exact terminal recipe")
+  end
+  if canonical_recipe_facts.scan_count() ~= 1 then
+    fail("large synthetic recipe queries triggered a repeated full recipe scan")
+  end
 end
 
 assert_recipe_fact_contracts()

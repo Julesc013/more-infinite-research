@@ -95,6 +95,8 @@ fixtures:
       - canonical-recipe-fact-copy-isolation
       - governed-pipeline-command-catalog
       - pipeline-command-positive-target-requirements
+      - large-synthetic-recipe-index
+      - repeated-full-recipe-scan-rejection
 
   competing-productivity-transaction:
     path: fixtures/plates-n-circuit-productivity
