@@ -1332,6 +1332,38 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - mir-3.1.0-release-notes
+  - path: docs/releases/2.4.0-checklist.md
+    title: "MIR 2.4.0 Release Checklist"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-2.4.0-release-gate
+  - path: docs/releases/2.4.0-validation-summary.md
+    title: "MIR 2.4.0 Validation Summary"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-2.4.0-validation-result
+  - path: docs/releases/2.4.0-migration-guide.md
+    title: "MIR 2.4.0 Migration Guide"
+    status: current
+    audience: player
+    doc_type: how-to
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-2.4.0-migration
+  - path: docs/releases/notes/release-notes-2.4.0.md
+    title: "MIR 2.4.0 Release Notes"
+    status: current
+    audience: player
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-2.4.0-release-notes
   - path: docs/adr/0015-canonical-stream-descriptors.md
     title: "ADR-0015: Canonical Stream Descriptors"
     status: current
