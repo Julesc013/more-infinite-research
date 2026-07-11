@@ -37,8 +37,7 @@ The mod is built around **graceful compatibility**: it discovers recipes, scienc
 - **Clean mod portal metadata:** keeps third-party compatibility-mod dependencies out of `info.json`.
 - **Save compatibility:** preserves existing generated prototype IDs across the MIR `3.0.0` architecture move. Scripted runtime storage is namespaced and must be validated before the scripted features are enabled by default or described with measured runtime behavior.
 
-Recipe productivity researches are infinite, but **Factorio's recipe productivity cap still applies**.
-*Additional levels can eventually have no practical effect after a recipe reaches its cap.*
+Recipe productivity researches are infinite, and this mod allows you to modify Factorio's recipe productivity cap/limit.
 
 ## New Design
 
