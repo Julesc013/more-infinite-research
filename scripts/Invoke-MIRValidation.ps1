@@ -468,6 +468,10 @@ Invoke-RepoCheck "compatibility dependency declarations preserve full mod names"
   & (Join-Path $repo "scripts\Test-MIRDependencyResolver.ps1") -RepoRoot $repo
 }
 
+Invoke-RepoCheck "performance budgets declare every required surface" {
+  & (Join-Path $repo "scripts\Test-MIRPerformanceBudgets.ps1") -RepoRoot $repo -ValidateManifestOnly
+}
+
 Invoke-RepoCheck "validation scenario groups and partial result aggregation are stable" {
   & (Join-Path $repo "scripts\Test-MIRValidationResults.ps1") -RepoRoot $repo
 }
