@@ -296,7 +296,11 @@ if ([string]$releaseFields.version -ne [string]$repoInfo.version) {
 if ([string]$releaseFields.factorio_version -ne [string]$repoInfo.factorio_version) {
   throw ".mir/convergence.yml Factorio version does not match info.json."
 }
-if ([string]$releaseFields.objective -notin @("behavioral-superset-implementation-subset", "target-port-behavioral-subset")) {
+if ([string]$releaseFields.objective -notin @(
+  "behavioral-superset-implementation-subset",
+  "target-port-behavioral-subset",
+  "bounded-correctness-and-contract-modernization"
+)) {
   throw ".mir/convergence.yml has unsupported release objective: $($releaseFields.objective)"
 }
 
