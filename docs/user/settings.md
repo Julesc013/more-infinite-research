@@ -63,9 +63,14 @@ The `mir-recycling-return-chance` dropdown is a separate balance control for
 hidden generated recycling recipes. `Match productivity cap` uses the
 inverse of total capped output, `1 / (1 + bonus)`, and never raises the normal
 25% return. That means +400% productivity uses a 20% recycler return and
-+1000% uses about 9.09%. Fixed 25%, 20%, 15%, 12.5%, 10%, 7.5%, 5%, 2.5%,
++1000% uses about 9.09%. Fixed 20%, 15%, 12.5%, 10%, 7.5%, 5%, 2.5%,
 1%, 0.5%, and 0.1% choices are also available. Visible processes such as scrap recycling are intentionally
 excluded.
+
+The fixed 25% menu entry is intentionally omitted because the unchanged option
+already displays the normal 25% return. Existing profiles that contain the
+older `percent-25` enum remain accepted, and advanced profiles can import the
+numeric value `25`.
 
 The experimental `mir-unrestricted-modules` Compatibility setting opens all
 five module effect types and every discovered module category on recipes and

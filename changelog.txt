@@ -16,7 +16,8 @@ Date: 2026-07-11
     - Rejected external research owners that use unrecognized science ingredients.
     - Kept incineration sink recipes out of breeding productivity research so later recipe removal cannot leave invalid effects.
     - Added opt-in above-300% productivity scoping for proven non-generative self-recycling recipes.
-    - Added a generated-recycler return dropdown with unchanged, cap-matched safe, and fixed choices from 25% down to 0.1%.
+    - Added a recycler-return dropdown with unchanged, cap-matched, and fixed choices from 20% down to 0.1%.
+    - Hid the redundant fixed 25% recycler row while retaining legacy profile compatibility for that enum.
     - Cap-matched recycling uses total output: +400% gives 20% returns and +1000% about 9.09%, never above vanilla 25%.
     - Added a separate negative speed-floor dropdown down to -99.99% while keeping the positive speed cap independent.
     - Expanded the numeric dropdown ladders from quarter-scale values through high-end megabase and modpack values.

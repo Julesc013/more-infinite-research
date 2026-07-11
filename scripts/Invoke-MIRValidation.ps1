@@ -1037,6 +1037,7 @@ Invoke-RepoCheck "prototype limit settings are wired" {
     @{ File = "prototypes\mir\settings\prototype_limits.lua"; Text = $prototypeLimitSettingsText; Snippet = 'name = "mir-prototype-speed-floor"' },
     @{ File = "prototypes\mir\settings\prototype_limits.lua"; Text = $prototypeLimitSettingsText; Snippet = 'name = "mir-prototype-quality-cap"' },
     @{ File = "prototypes\mir\settings\prototype_limits.lua"; Text = $prototypeLimitSettingsText; Snippet = 'positive_power_floor_setting_name = "mir-prototype-positive-power-floor"' },
+    @{ File = "prototypes\mir\settings\prototype_limits.lua"; Text = $prototypeLimitSettingsText; Snippet = 'S.recycling_return_accepted_import_values = {"percent-25"}' },
     @{ File = "prototypes\mir\settings\prototype_limits.lua"; Text = $prototypeLimitSettingsText; Snippet = 'default_value = S.engine_default' },
     @{ File = "prototypes\mir\settings\prototype_limits.lua"; Text = $prototypeLimitSettingsText; Snippet = '["percent-50"] = 0.5' },
     @{ File = "prototypes\mir\settings\prototype_limits.lua"; Text = $prototypeLimitSettingsText; Snippet = '["percent-400"] = 4.0' },

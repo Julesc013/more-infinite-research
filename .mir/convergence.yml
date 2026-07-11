@@ -50,42 +50,21 @@ superseded_candidates:
     forbidden_entries: 0
     reason: feedback RC adds recycler returns, negative speed floors, and modded module tier discovery
     status: superseded-unpublished-candidate
+  - source_commit: dcd616cc9fc1355cea59bd9add1fe8ac4cade0a9
+    artifact: dist/more-infinite-research_3.0.5.zip
+    sha256: 94B32E04A3486E850F559BAF776027E9644ED319624F0B80BEEDFE24D98AD436
+    size_bytes: 336413
+    entries: 132
+    forbidden_entries: 0
+    reason: duplicate fixed 25 percent recycler row removed from the final UI
+    status: superseded-unpublished-candidate
 
 candidate:
   artifact: dist/more-infinite-research_3.0.5.zip
-  source_commit: dcd616cc9fc1355cea59bd9add1fe8ac4cade0a9
-  sha256: 94B32E04A3486E850F559BAF776027E9644ED319624F0B80BEEDFE24D98AD436
-  size_bytes: 336413
-  entries: 132
-  files: 127
-  forbidden_entries: 0
-  package_content_sha256: 99FF391656695ACA65E843490F673E8F263C885182EEF11BAAC91C4079F50D4D
-  package_source_sha256: 99FF391656695ACA65E843490F673E8F263C885182EEF11BAAC91C4079F50D4D
-  target_profile_sha256: E1EF758114CECB4B896F5E3365B214E95EC2794A64364492BF174AFE710B3E8F
-  required_groups_sha256: 57A1DF87A8FB594B2B51C7E230D775E88028F23D52DF9D5D7DA1336F9271C78A
-  validation_harness_sha256: 40FE629AE1862B310BC7B560A92DEB879164051D2CB6DFF427A3658E896AC157
-  expected_scenarios_sha256: 500D63A94FC228057371D24003F7A31EE3182ED5A442E5935EB5EEA40999AB7A
-  validation_package_sha256: 38EF2E50C78AF5ADD85AC449C85D4DA821C40C0F897FD5D30F0BE54E1A6A9539
-  validation_package_content_sha256: 99FF391656695ACA65E843490F673E8F263C885182EEF11BAAC91C4079F50D4D
-  structured_summary_path: .mir/evidence/3.0.5-rc8-validation-summary.json
-  structured_summary_run_id: 0dc33647-d7c9-48bc-9e06-245e0bf78e2b
-  structured_summary_status: passed
-  structured_summary_duration_seconds: 495.715
-  scenario_count: 76
-  validation_content_matches_dist: true
-  static_validation: passed
-  factorio_2_1_validation: passed
-  factorio_2_1_binary: Factorio 2.1.9 build 86829 win64 steam
-  exact_dist_base_smoke: passed
-  exact_dist_space_age_smoke: passed
-  factorio_2_1_crucible_rigor_exact_dist: passed
-  factorio_2_1_modules_t4_exact_dist: passed
-  factorio_2_1_finite_prod_techs_exact_dist: passed
-  factorio_2_1_feedback_mods_space_age_exact_dist: passed
-  retained_base_effect_settings: passed
-  automated_gate: passed
+  source_commit: pending
+  automated_gate: pending
   manual_gate: pending
-  status: release-candidate-awaiting-manual-review
+  status: rebuilding-after-package-visible-change
 
 rules:
   - dev-remains-the-canonical-modern-implementation

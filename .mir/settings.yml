@@ -6,6 +6,7 @@ rules:
   setting_ids_are_stable: true
   every_dropdown_has_a_neutral_bypass_option: true
   existing_dropdown_enum_values_remain_valid: true
+  duplicate_neutral_equivalent_dropdown_rows_are_hidden_but_importable: true
   numeric_dropdowns_use_consistent_expanded_ladders: true
   numeric_dropdown_profile_imports_accept_valid_custom_percentages: true
   custom_numeric_imports_use_displayed_percentage_units: true

@@ -366,6 +366,7 @@ function M.all_specs()
     elseif profile_spec.name == prototype_limit_settings.recycling_return_setting_name then
       profile_spec.import_numeric_minimum = 0
       profile_spec.import_numeric_maximum = 25
+      profile_spec.accepted_import_values = copy_array(prototype_limit_settings.recycling_return_accepted_import_values)
     end
     for _, key in ipairs(prototype_limit_settings.order) do
       local limit_spec = prototype_limit_settings.settings[key]
