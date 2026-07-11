@@ -11,21 +11,11 @@
 
 More Infinite Research adds **configurable infinite productivity** and **bonus research** for intermediate items, logistics chains, combat bonuses, player bonuses, and Space Age gaps that vanilla Factorio does not cover on supported modern target lines.
 
-**MIR `1.8.0`** targets **Factorio `0.18`** as a bridge/archive compatibility package. It keeps the reduced direct-effect bonuses and base technology continuations that the older target can support, but does not include recipe productivity, Space Age, Quality, Recycler, Elevated Rails, cargo logistics, prototype cap settings, pipeline extent settings, settings profiles, or newer technology badge overlays.
+**MIR `3.x.x`** targets **Factorio `2.1`** and requires `base >= 2.1.8`.
 
-**MIR `1.8.1+`** targets **Factorio `1.0`** as the maintained compatibility port line. It is derived from the validated Factorio `1.1` port and the Factorio `0.18` bridge lessons, with Factorio `1.0` metadata, validation, and target-supported behavior restored where proven. It is not a metadata bump of `1.8.0`.
+**MIR `2.x.x`** targets **Factorio `2.0`** starting with **`2.3.0`**.
 
-**MIR `1.9.3+`** targets **Factorio `1.1`** as a reduced compatibility port. It keeps supported direct-effect bonuses and base technology continuations, but does not include recipe productivity, Space Age, Quality, Recycler, Elevated Rails, cargo logistics, prototype cap settings, pipeline extent settings, or settings profiles.
-
-**MIR `2.x.x`** targets **Factorio `2.0`** *(starting with **`2.3.0`**)*.
-
-**MIR `3.x.x`** targets **Factorio `2.1`** and requires:
-
-- `base >= 2.1.8`
-- optional `space-age >= 2.1.8`
-- optional `recycler >= 2.1.8`
-- hidden optional `quality`
-- hidden optional `elevated-rails`
+**MIR `1.x.x`** targets **Factorio `1.1`** and earlier as reduced backports.
 
 The mod is built around **graceful compatibility**: it discovers recipes, science packs, labs, and optional prototypes from the active mod set, validates the candidate research, generates technologies late in **`data-final-fixes.lua`**, and *skips unsafe or unavailable streams* instead of requiring compatibility mods on the mod portal page.
 
@@ -47,8 +37,7 @@ The mod is built around **graceful compatibility**: it discovers recipes, scienc
 - **Clean mod portal metadata:** keeps third-party compatibility-mod dependencies out of `info.json`.
 - **Save compatibility:** preserves existing generated prototype IDs across the MIR `3.0.0` architecture move. Scripted runtime storage is namespaced and must be validated before the scripted features are enabled by default or described with measured runtime behavior.
 
-Recipe productivity researches are infinite, but **Factorio's recipe productivity cap still applies**.
-*Additional levels can eventually have no practical effect after a recipe reaches its cap.*
+Recipe productivity researches are infinite, and this mod allows you to modify Factorio's recipe productivity cap/limit.
 
 ## New Design
 
