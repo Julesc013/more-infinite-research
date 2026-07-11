@@ -97,6 +97,7 @@ fixtures:
       - pipeline-command-positive-target-requirements
       - large-synthetic-recipe-index
       - repeated-full-recipe-scan-rejection
+      - non-aliased-capability-lifecycle-stages
 
   competing-productivity-transaction:
     path: fixtures/plates-n-circuit-productivity

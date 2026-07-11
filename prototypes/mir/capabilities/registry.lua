@@ -200,16 +200,24 @@ local function evidence_for(candidate)
   }, ",")
 end
 
-local function emit_recipe_capability_decisions(registry, resolver, wanted_entity_types)
+local function emit_recipe_capability_decisions(registry, resolver, wanted_entity_types, classified_candidates)
   local mir_owners, external_owners = recipe_owner_maps(registry)
   local generated = 0
   local proposed = 0
   local diagnosed = 0
-  local candidates = entity_backed_candidates(registry, wanted_entity_types)
+  local candidates = classified_candidates or entity_backed_candidates(registry, wanted_entity_types)
 
   for _, candidate in ipairs(candidates) do
     local recipe = candidate.recipe_fact or {}
-    local decision, emitted, blockers, owners = ownership_decision(candidate.recipe, mir_owners, external_owners)
+    local decision, emitted, blockers, owners
+    if candidate.decision then
+      decision = candidate.decision
+      emitted = candidate.emitted
+      blockers = candidate.blockers
+      owners = candidate.owners
+    else
+      decision, emitted, blockers, owners = ownership_decision(candidate.recipe, mir_owners, external_owners)
+    end
     if emitted then
       generated = generated + 1
     elseif decision == "propose_stream" then
@@ -288,8 +296,8 @@ local function native_owner_summary(registry)
   return by_effect
 end
 
-local function emit_native_modifier_decisions(registry, resolver)
-  local rows = native_owner_summary(registry)
+local function emit_native_modifier_decisions(registry, resolver, discovered_rows)
+  local rows = discovered_rows or native_owner_summary(registry)
   local total = 0
   local warnings = 0
 
@@ -337,39 +345,133 @@ local function emit_native_modifier_decisions(registry, resolver)
   return total, 0, 0, warnings
 end
 
-local function lifecycle_passthrough(value)
-  return value
+local function require_stage(state, expected, next_stage)
+  if type(state) ~= "table" or state.stage ~= expected then
+    error("MIR capability lifecycle expected " .. expected .. " state.", 3)
+  end
+  state.stage = next_stage
+  return state
+end
+
+local function discover_recipe_state(registry, resolver, wanted_entity_types)
+  return {
+    stage = "discovered",
+    registry = registry,
+    resolver = resolver,
+    wanted_entity_types = wanted_entity_types,
+    candidates = entity_backed_candidates(registry, wanted_entity_types)
+  }
+end
+
+local function classify_recipe_state(state)
+  require_stage(state, "discovered", "classified")
+  local mir_owners, external_owners = recipe_owner_maps(state.registry)
+  for _, candidate in ipairs(state.candidates) do
+    candidate.decision, candidate.emitted, candidate.blockers, candidate.owners =
+      ownership_decision(candidate.recipe, mir_owners, external_owners)
+    candidate.risks = candidate.recipe_fact.allow_productivity
+      and {} or {"recipe_productivity_not_explicitly_allowed"}
+  end
+  return state
+end
+
+local function propose_recipe_state(state)
+  require_stage(state, "classified", "proposed")
+  for _, candidate in ipairs(state.candidates) do candidate.proposal = candidate.decision end
+  return state
+end
+
+local function validate_recipe_state(state)
+  require_stage(state, "proposed", "validated")
+  for _, candidate in ipairs(state.candidates) do
+    candidate.valid = candidate.item ~= nil
+      and candidate.entity ~= nil
+      and candidate.recipe ~= nil
+      and candidate.proposal ~= nil
+    if not candidate.valid then error("Invalid entity-backed capability candidate.", 2) end
+  end
+  return state
+end
+
+local function emit_recipe_state(state)
+  require_stage(state, "validated", "emitted")
+  state.result = {emit_recipe_capability_decisions(
+    state.registry,
+    state.resolver,
+    state.wanted_entity_types,
+    state.candidates
+  )}
+  return state
+end
+
+local function diagnose_recipe_state(state)
+  require_stage(state, "emitted", "diagnosed")
+  return state.result
+end
+
+local function discover_native_state(registry, resolver)
+  return {stage = "discovered", registry = registry, resolver = resolver, rows = native_owner_summary(registry)}
+end
+
+local function classify_native_state(state)
+  require_stage(state, "discovered", "classified")
+  for _, row in pairs(state.rows) do
+    row.decision = "observe_existing_owner"
+    row.has_conflict = row.external > 0
+  end
+  return state
+end
+
+local function propose_native_state(state)
+  return require_stage(state, "classified", "proposed")
+end
+
+local function validate_native_state(state)
+  require_stage(state, "proposed", "validated")
+  for effect_type, row in pairs(state.rows) do
+    if row.effect_type ~= effect_type or not row.decision then
+      error("Invalid native modifier ownership capability row.", 2)
+    end
+  end
+  return state
+end
+
+local function emit_native_state(state)
+  require_stage(state, "validated", "emitted")
+  state.result = {emit_native_modifier_decisions(state.registry, state.resolver, state.rows)}
+  return state
+end
+
+local function diagnose_native_state(state)
+  require_stage(state, "emitted", "diagnosed")
+  return state.result
 end
 
 local function configure_resolvers()
   RESOLVERS[1].discover = function(registry)
-    return entity_backed_candidates(registry, {loader = true, ["loader-1x1"] = true})
+    return discover_recipe_state(registry, RESOLVERS[1], {loader = true, ["loader-1x1"] = true})
   end
-  RESOLVERS[1].classify = lifecycle_passthrough
-  RESOLVERS[1].propose = lifecycle_passthrough
-  RESOLVERS[1].validate = lifecycle_passthrough
-  RESOLVERS[1].emit = function(registry, resolver)
-    return emit_recipe_capability_decisions(registry, resolver, {loader = true, ["loader-1x1"] = true})
-  end
-  RESOLVERS[1].diagnose = lifecycle_passthrough
+  RESOLVERS[1].classify = classify_recipe_state
+  RESOLVERS[1].propose = propose_recipe_state
+  RESOLVERS[1].validate = validate_recipe_state
+  RESOLVERS[1].emit = emit_recipe_state
+  RESOLVERS[1].diagnose = diagnose_recipe_state
 
   RESOLVERS[2].discover = function(registry)
-    return entity_backed_candidates(registry, {["mining-drill"] = true})
+    return discover_recipe_state(registry, RESOLVERS[2], {["mining-drill"] = true})
   end
-  RESOLVERS[2].classify = lifecycle_passthrough
-  RESOLVERS[2].propose = lifecycle_passthrough
-  RESOLVERS[2].validate = lifecycle_passthrough
-  RESOLVERS[2].emit = function(registry, resolver)
-    return emit_recipe_capability_decisions(registry, resolver, {["mining-drill"] = true})
-  end
-  RESOLVERS[2].diagnose = lifecycle_passthrough
+  RESOLVERS[2].classify = classify_recipe_state
+  RESOLVERS[2].propose = propose_recipe_state
+  RESOLVERS[2].validate = validate_recipe_state
+  RESOLVERS[2].emit = emit_recipe_state
+  RESOLVERS[2].diagnose = diagnose_recipe_state
 
-  RESOLVERS[3].discover = native_owner_summary
-  RESOLVERS[3].classify = lifecycle_passthrough
-  RESOLVERS[3].propose = lifecycle_passthrough
-  RESOLVERS[3].validate = lifecycle_passthrough
-  RESOLVERS[3].emit = emit_native_modifier_decisions
-  RESOLVERS[3].diagnose = lifecycle_passthrough
+  RESOLVERS[3].discover = function(registry) return discover_native_state(registry, RESOLVERS[3]) end
+  RESOLVERS[3].classify = classify_native_state
+  RESOLVERS[3].propose = propose_native_state
+  RESOLVERS[3].validate = validate_native_state
+  RESOLVERS[3].emit = emit_native_state
+  RESOLVERS[3].diagnose = diagnose_native_state
 end
 
 configure_resolvers()
@@ -387,23 +489,18 @@ function C.emit(registry)
   local warnings = 0
 
   local resolvers = C.resolvers()
-  local count, gen, prop, warn = resolvers[1].emit(registry, resolvers[1])
-  total = total + count
-  generated = generated + gen
-  proposed = proposed + prop
-  warnings = warnings + warn
-
-  count, gen, prop, warn = resolvers[2].emit(registry, resolvers[2])
-  total = total + count
-  generated = generated + gen
-  proposed = proposed + prop
-  warnings = warnings + warn
-
-  count, gen, prop, warn = resolvers[3].emit(registry, resolvers[3])
-  total = total + count
-  generated = generated + gen
-  proposed = proposed + prop
-  warnings = warnings + warn
+  for _, resolver in ipairs(resolvers) do
+    local state = resolver.discover(registry)
+    state = resolver.classify(state)
+    state = resolver.propose(state)
+    state = resolver.validate(state)
+    state = resolver.emit(state)
+    local result = resolver.diagnose(state)
+    total = total + result[1]
+    generated = generated + result[2]
+    proposed = proposed + result[3]
+    warnings = warnings + result[4]
+  end
 
   D.compatibility_plan({
     key = "capability_registry",

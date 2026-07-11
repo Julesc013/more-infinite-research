@@ -508,6 +508,8 @@ diagnose:
   Rejected Proposal -> DecisionRecord
 ```
 
+The 3.1 registry enforces this as an explicit state machine. Loader manufacturing, mining-drill manufacturing, and native-modifier ownership pass distinct discovered, classified, proposed, validated, emitted, and diagnosed states. The loader and drill paths consume structural item/place-result/entity/recipe evidence and existing owner facts; named mods only supply fixtures. Science and lab acceptance remain hard gates in the shared science fact modules rather than mod-name branches.
+
 ## Compatibility Overlay Format
 
 Compatibility overlays should be declarative:

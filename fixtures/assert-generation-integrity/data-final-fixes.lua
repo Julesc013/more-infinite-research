@@ -11,6 +11,7 @@ local stream_descriptor = require("__more-infinite-research__.prototypes.mir.dom
 local raw_stream_catalog = require("__more-infinite-research__.prototypes.mir.domain.streams.raw_catalog")
 local canonical_recipe_facts = require("__more-infinite-research__.prototypes.mir.index.recipe_facts")
 local pipeline_commands = require("__more-infinite-research__.prototypes.mir.pipeline.commands")
+local capability_registry = require("__more-infinite-research__.prototypes.mir.capabilities.registry")
 
 local function fail(message)
   error("MIR validation failed: " .. message)
@@ -144,6 +145,21 @@ local function assert_pipeline_command_contracts()
 end
 
 assert_pipeline_command_contracts()
+
+local function assert_capability_lifecycle_contracts()
+  local resolvers = capability_registry.resolvers()
+  if #resolvers ~= 3 then fail("expected three governed capability resolvers") end
+  for _, resolver in ipairs(resolvers) do
+    local functions = {}
+    for _, stage in ipairs({"discover", "classify", "propose", "validate", "emit", "diagnose"}) do
+      if type(resolver[stage]) ~= "function" then fail(resolver.id .. " is missing lifecycle stage " .. stage) end
+      if functions[resolver[stage]] then fail(resolver.id .. " aliases lifecycle stage " .. stage) end
+      functions[resolver[stage]] = true
+    end
+  end
+end
+
+assert_capability_lifecycle_contracts()
 
 local function escape_pattern(text)
   return text:gsub("([^%w])", "%%%1")

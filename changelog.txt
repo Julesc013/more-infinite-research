@@ -19,6 +19,7 @@ Date: 2026-07-12
     - Routed data-final-fixes passes through named commands with owned implementations and positive target requirements.
     - Made settings catalog snapshots immutable, target-positive, and descriptor-ordered.
     - Added conservative recycler-loop handling for ambiguous paths, byproducts, fluids, variants, and conversion cycles.
+    - Routed loader, mining-drill, and native-owner capability diagnostics through a validated lifecycle.
 
 ---------------------------------------------------------------------------------------------------
 Version: 3.0.5

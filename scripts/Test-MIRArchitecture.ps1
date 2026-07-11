@@ -444,6 +444,14 @@ Assert-MIRNoPatternInLuaTree `
   -Pattern "data:extend" `
   -Message "MIR capability modules must not emit prototypes directly."
 
+$capabilityRegistryText = Read-MIRFile -RelativePath "prototypes/mir/capabilities/registry.lua"
+if ($capabilityRegistryText.Contains("lifecycle_passthrough")) {
+  throw "Capability lifecycle stages must perform explicit state transitions, not alias a passthrough function."
+}
+foreach ($stage in @("discovered", "classified", "proposed", "validated", "emitted", "diagnosed")) {
+  Assert-MIRContains -RelativePath "prototypes/mir/capabilities/registry.lua" -Text $capabilityRegistryText -Needle ('"' + $stage + '"')
+}
+
 Assert-MIRNoPatternInLuaTree `
   -RelativeRoot "prototypes/mir/runtime" `
   -Pattern "\b(global|storage)\b" `
