@@ -1,7 +1,7 @@
    0.001 2026-07-12 07:53:10; Factorio 2.1.9 (build 86829, win64, steam, space-age)
-   0.002 Operating system: Windows 10 (build 19045) 
+   0.002 Operating system: Windows 10 (build 19045)
    0.002 Not rotating logs.
-   0.002 Program arguments: "C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe" "--config" "C:\Users\Jules\AppData\Local\Temp\mir-upgrade-3-0-5-to-3-1-0-109a75eaf2884bd0bf015d3c5babb70e\config.ini" "--no-log-rotation" "--disable-audio" "--mod-directory" "C:\Users\Jules\AppData\Local\Temp\mir-upgrade-3-0-5-to-3-1-0-109a75eaf2884bd0bf015d3c5babb70e\mods" "--create" "C:\Users\Jules\AppData\Local\Temp\mir-upgrade-3-0-5-to-3-1-0-109a75eaf2884bd0bf015d3c5babb70e\mir-3.0.5-save.zip" 
+   0.002 Program arguments: "C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe" "--config" "C:\Users\Jules\AppData\Local\Temp\mir-upgrade-3-0-5-to-3-1-0-109a75eaf2884bd0bf015d3c5babb70e\config.ini" "--no-log-rotation" "--disable-audio" "--mod-directory" "C:\Users\Jules\AppData\Local\Temp\mir-upgrade-3-0-5-to-3-1-0-109a75eaf2884bd0bf015d3c5babb70e\mods" "--create" "C:\Users\Jules\AppData\Local\Temp\mir-upgrade-3-0-5-to-3-1-0-109a75eaf2884bd0bf015d3c5babb70e\mir-3.0.5-save.zip"
    0.002 Config path: C:/Users/Jules/AppData/Local/Temp/mir-upgrade-3-0-5-to-3-1-0-109a75eaf2884bd0bf015d3c5babb70e/config.ini
    0.003 Read data path: C:/Program Files/Steam/steamapps/common/Factorio/data
    0.003 Write data path: C:/Users/Jules/AppData/Local/Temp/mir-upgrade-3-0-5-to-3-1-0-109a75eaf2884bd0bf015d3c5babb70e/userdata [16310/450559MB]

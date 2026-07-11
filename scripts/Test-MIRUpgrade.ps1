@@ -15,6 +15,17 @@ function Resolve-MIRUpgradePath {
   return (Resolve-Path -LiteralPath (Join-Path $RepoRoot $Path)).Path
 }
 
+function Copy-MIRUpgradeLogEvidence {
+  param(
+    [Parameter(Mandatory)][string]$Source,
+    [Parameter(Mandatory)][string]$Destination
+  )
+  @(
+    Get-Content -LiteralPath $Source |
+      ForEach-Object { $_.TrimEnd() }
+  ) | Set-Content -LiteralPath $Destination -Encoding UTF8
+}
+
 $factorio = Resolve-MIRUpgradePath -Path $FactorioBin
 $from = Resolve-MIRUpgradePath -Path $FromZip
 $to = Resolve-MIRUpgradePath -Path $ToZip
@@ -61,7 +72,7 @@ if (-not $createText.Contains("[mir-fixture] 3.0.5 upgrade source proof complete
   throw "MIR 3.0.5 upgrade source proof marker is missing."
 }
 $createEvidence = Join-Path $outputParent "3.1.0-upgrade-from-3.0.5-create.txt"
-Copy-Item -LiteralPath $log -Destination $createEvidence -Force
+Copy-MIRUpgradeLogEvidence -Source $log -Destination $createEvidence
 
 Get-ChildItem -LiteralPath $mods -File -Filter "more-infinite-research_*.zip" | Remove-Item -Force
 Copy-Item -LiteralPath $to -Destination (Join-Path $mods (Split-Path -Leaf $to))
@@ -76,7 +87,7 @@ if (-not $loadText.Contains("[mir-fixture] 3.0.5 to 3.1.0 upgrade proof complete
   throw "MIR 3.1.0 upgrade proof marker is missing."
 }
 $loadEvidence = Join-Path $outputParent "3.1.0-upgrade-from-3.0.5-load.txt"
-Copy-Item -LiteralPath $log -Destination $loadEvidence -Force
+Copy-MIRUpgradeLogEvidence -Source $log -Destination $loadEvidence
 
 [ordered]@{
   schema = 1
