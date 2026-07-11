@@ -1300,3 +1300,11 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - mir-3.1.0-release-gate
+  - path: docs/releases/3.1.0-characterization.md
+    title: "MIR 3.1.0 Baseline Characterization"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-3.1.0-protected-baseline

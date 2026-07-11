@@ -17,17 +17,20 @@ waves:
 
   mir_2_3_5:
     version: "2.3.5"
-    branch: tmp/2.0
+    branch: legacy
     source_commit: 861565d3e898166eca8920e6eade6887b7db087d
-    evidence_commit: 7588eadc18f49f60d17d145ce366b5a777d9be43
+    evidence_commit: d9171893f55cdb46167b1710c5d53faf2df54856
+    promotion_commit: 9eabc5439d3743be10c6f76d5ee36d9804a60f25
+    tag: "2.3.5"
     archive: dist/more-infinite-research_2.3.5.zip
     sha256: 97B3DC9B6E352C6C4B8FF76D77020333FAAFFE93BD89EDB6B8F3370405ED68DE
     automated_gate: passed
     exact_dist_base: passed
     exact_dist_space_age: passed
     upgrade_from_2_3_0: passed
-    interactive_gate: pending
-    status: candidate-qualified-awaiting-interactive-review
+    interactive_gate: accepted-by-maintainer-directive
+    interactive_ui_observation: not-independently-performed
+    status: tagged-awaiting-external-upload
 
   old_targets:
     factorio_1_1:
@@ -95,8 +98,8 @@ waves:
     version: "3.1.0"
     branch: dev
     source_anchor_required: published-3.0.5-plus-accepted-portable-return
-    implementation_gate: blocked-on-2.3.5-interactive-publication
-    status: planned
+    implementation_gate: authorized-by-maintainer-directed-continuation
+    status: characterization
 
   mir_2_4_0:
     version: "2.4.0"
