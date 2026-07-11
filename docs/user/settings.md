@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: player
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-07-09
+last_reviewed: 2026-07-11
 supersedes: []
 superseded_by: []
 ---
@@ -45,8 +45,10 @@ and inserter performance assumptions.
 MIR includes startup-only prototype limit settings:
 
 - Recipe productivity cap
+- Generated recycler return rate
 - Energy savings cap
 - Pollution reduction cap
+- Minimum machine speed
 - Speed effect cap
 - Quality effect cap
 
@@ -57,18 +59,54 @@ expected loop is non-generative. Unsafe recipes keep their existing cap, and
 MIR never raises the recycling recipe itself. The checkbox has no effect at
 +300% or below.
 
+The `mir-recycling-return-chance` dropdown is a separate balance control for
+hidden generated recycling recipes. `Match productivity cap (safe)` uses the
+inverse of total capped output, `1 / (1 + bonus)`, and never raises the normal
+25% return. That means +400% productivity uses a 20% recycler return and
++1000% uses about 9.09%. Fixed 25%, 20%, 15%, 12.5%, 10%, 7.5%, 5%, 2.5%,
+1%, 0.5%, and 0.1% choices are also available. Visible processes such as scrap recycling are intentionally
+excluded.
+
 The experimental `mir-unrestricted-modules` Compatibility setting opens all
 five module effect types and every discovered module category on recipes and
 existing module receivers that already have slots, including beacons. It does
 not add slots or change module prototypes and can create severe productivity,
 quality, and modded-module balance exploits.
 
-The unchanged dropdown entries are value-first labels: `+300% (unchanged)` for
+Every dropdown has a neutral option that bypasses its optional transformation.
+The prototype-limit entries are value-first labels: `+300% (unchanged)` for
 recipe productivity, `-80% (unchanged)` for energy and pollution reductions,
-and `+100000% (unchanged)` for speed and quality. Those unchanged entries leave the
+and `+100000% (unchanged)` for speed and quality. Science-pack `configured`,
+weapon-speed cleanup `off`, pipeline `100%`, and lab compatibility
+`engine-default` are the other neutral paths. Those unchanged entries leave the
 relevant Factorio prototype fields alone. Non-default values are explicit global
 balance overrides for long-running infinite research saves or modpacks that want
 stricter or broader module-effect ceilings.
+
+Minimum machine speed is independent from the positive speed-effect cap. Its
+unchanged value is -80%; the dropdown spans -25%, -50%, -75%, and deeper floors
+as far as -99.99%,
+which is a near-stop but not zero or negative crafting speed.
+
+The consistent broad ladders reach 1000% for pipeline extent, +100000% for
+productivity, +25000% as an explicit speed or quality override (with the engine's
++100000% ceiling available through unchanged), and -99.99% for negative effect
+limits. Existing option IDs remain valid for imported profiles and backports.
+
+Advanced portable profiles can use any valid decimal percentage within the
+setting's safe bounds even when that value is not listed in the dropdown. Use a
+JSON number in displayed percentage units, such as `123.45` or `-83.25`; invalid
+or out-of-range values are ignored. The in-game dropdown remains curated for
+easy selection.
+
+For the exact option list and a count of every checkbox, dropdown, numeric field,
+and text setting in 3.0.5, see the
+[3.0.5 settings inventory](../releases/3.0.5-settings-inventory.md).
+
+Module productivity discovers final `module` prototypes by their declared
+tier. Tiers 1, 2, and 3 keep the existing +10%, +5%, and +2% per-level values;
+tier 4 and later module recipes receive +1% per level. This includes modded
+module categories without requiring name patterns or a per-mod checkbox.
 
 Use the energy savings cap when a modpack's beacon, module, or quality effects
 can push machines toward near-zero active power draw. The pollution reduction

@@ -29,8 +29,15 @@ end
 
 local function probability_of(entry)
   if type(entry) ~= "table" then return nil end
-  if entry.probability == nil then return 1 end
-  return tonumber(entry.probability)
+  local independent = entry.independent_probability
+  if independent == nil then independent = entry.probability end
+  if independent == nil then independent = 1 end
+  local shared = entry.shared_probability
+  local shared_width = 1
+  if type(shared) == "table" then
+    shared_width = (tonumber(shared.max) or 1) - (tonumber(shared.min) or 0)
+  end
+  return tonumber(independent) * shared_width
 end
 
 local function list_for(variant, field)

@@ -85,6 +85,87 @@ local function apply_recipe_productivity_cap(value)
   return changed
 end
 
+local function recipe_categories(recipe)
+  if type(recipe.categories) == "table" then return recipe.categories end
+  if recipe.category then return {recipe.category} end
+  return {"crafting"}
+end
+
+local function has_category(recipe, wanted)
+  for _, category in ipairs(recipe_categories(recipe)) do
+    if category == wanted then return true end
+  end
+  return false
+end
+
+local function recipe_variants(recipe)
+  if type(recipe.normal) == "table" or type(recipe.expensive) == "table" then
+    local out = {}
+    if type(recipe.normal) == "table" then table.insert(out, recipe.normal) end
+    if type(recipe.expensive) == "table" then table.insert(out, recipe.expensive) end
+    return out
+  end
+  return {recipe}
+end
+
+local function item_name(entry)
+  if type(entry) ~= "table" then return nil end
+  if entry.type ~= nil and entry.type ~= "item" then return nil end
+  return entry.name or entry[1]
+end
+
+local function generated_recycling_recipe(recipe)
+  if type(recipe) ~= "table" or recipe.parameter == true then return false end
+  if not has_category(recipe, "recycling") then return false end
+  -- Official and convention-following generated recycler recipes are hidden
+  -- and do not unlock their products. This deliberately excludes visible
+  -- recycling processes such as scrap recycling.
+  if recipe.hidden ~= true or recipe.unlock_results ~= false then return false end
+  for _, variant in ipairs(recipe_variants(recipe)) do
+    local ingredients = variant.ingredients or {}
+    if #ingredients ~= 1 or not item_name(ingredients[1]) then return false end
+  end
+  return true
+end
+
+local function scale_recycling_product(product, multiplier)
+  if not item_name(product) then return false end
+  if product.shared_probability ~= nil then return false end
+  local current = tonumber(product.independent_probability)
+  if current == nil then current = tonumber(product.probability) end
+  if current == nil then current = 1 end
+  local replacement = math.max(0, math.min(1, current * multiplier))
+  if math.abs(replacement - current) < 0.0000001 and product.probability == nil then return false end
+  product.independent_probability = replacement
+  product.probability = nil
+  return true
+end
+
+local function apply_recycling_return_chance(productivity_cap)
+  local raw = effective_settings.get(prototype_limit_settings.recycling_return_setting_name)
+  local chance = prototype_limit_settings.recycling_return_value(raw, productivity_cap)
+  if chance == nil then return {recipes = 0, products = 0, chance = nil} end
+
+  local multiplier = chance / 0.25
+  local recipes_changed = 0
+  local products_changed = 0
+  for _, recipe in pairs(data_raw.prototypes("recipe")) do
+    if generated_recycling_recipe(recipe) then
+      local recipe_changed = false
+      for _, variant in ipairs(recipe_variants(recipe)) do
+        for _, product in ipairs(variant.results or {}) do
+          if scale_recycling_product(product, multiplier) then
+            products_changed = products_changed + 1
+            recipe_changed = true
+          end
+        end
+      end
+      if recipe_changed then recipes_changed = recipes_changed + 1 end
+    end
+  end
+  return {recipes = recipes_changed, products = products_changed, chance = chance}
+end
+
 local function apply_effect_receiver_limit(field, side, value)
   if value == nil then return 0 end
 
@@ -144,28 +225,42 @@ local function apply_positive_power_floor()
 end
 
 function P.apply()
+  local productivity_cap = selected("productivity")
+  local recycling = apply_recycling_return_chance(productivity_cap)
   local changed = {
-    productivity = apply_recipe_productivity_cap(selected("productivity")),
+    recycling = recycling,
+    productivity = apply_recipe_productivity_cap(productivity_cap),
     efficiency = apply_effect_receiver_limit("consumption_limits", "low", selected("efficiency")),
     pollution = apply_effect_receiver_limit("pollution_limits", "low", selected("pollution")),
+    speed_floor = apply_effect_receiver_limit("speed_limits", "low", selected("speed_floor")),
     speed = apply_effect_receiver_limit("speed_limits", "high", selected("speed")),
     quality = apply_effect_receiver_limit("quality_limits", "high", selected("quality")),
     positive_power_floor = apply_positive_power_floor()
   }
 
   if changed.productivity > 0
+    or changed.recycling.recipes > 0
     or changed.efficiency > 0
     or changed.pollution > 0
+    or changed.speed_floor > 0
     or changed.speed > 0
     or changed.quality > 0
     or changed.positive_power_floor > 0
   then
     log("[more-infinite-research] Applied prototype limits: productivity_recipes="
       .. tostring(changed.productivity)
+      .. " recycling_recipes="
+      .. tostring(changed.recycling.recipes)
+      .. " recycling_products="
+      .. tostring(changed.recycling.products)
+      .. " recycling_return_chance="
+      .. tostring(changed.recycling.chance)
       .. " efficiency_receivers="
       .. tostring(changed.efficiency)
       .. " pollution_receivers="
       .. tostring(changed.pollution)
+      .. " speed_floor_receivers="
+      .. tostring(changed.speed_floor)
       .. " speed_receivers="
       .. tostring(changed.speed)
       .. " quality_receivers="

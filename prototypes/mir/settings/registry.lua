@@ -44,6 +44,10 @@ return {
       ui_visibility = { mode = "always" }
     },
     {
+      key = "mir-recycling-return-chance",
+      ui_visibility = { mode = "always" }
+    },
+    {
       key = "mir-productivity-cap-self-recycling-only",
       ui_visibility = { mode = "always" }
     },
@@ -57,6 +61,10 @@ return {
     },
     {
       key = "mir-prototype-speed-cap",
+      ui_visibility = { mode = "always" }
+    },
+    {
+      key = "mir-prototype-speed-floor",
       ui_visibility = { mode = "always" }
     },
     {

@@ -132,9 +132,11 @@
         "mir-prototype-efficiency-cap",
         "mir-prototype-pollution-cap",
         "mir-prototype-speed-cap",
+        "mir-prototype-speed-floor",
         "mir-prototype-quality-cap",
         "mir-prototype-positive-power-floor",
         "mir-productivity-cap-self-recycling-only",
+        "mir-recycling-return-chance",
         "mir-unrestricted-modules",
         "mir-settings-profile-import",
         "mir-use-installed-space-age-icons"
@@ -187,9 +189,11 @@
         "mir-prototype-efficiency-cap",
         "mir-prototype-pollution-cap",
         "mir-prototype-speed-cap",
+        "mir-prototype-speed-floor",
         "mir-prototype-quality-cap",
         "mir-prototype-positive-power-floor",
         "mir-productivity-cap-self-recycling-only",
+        "mir-recycling-return-chance",
         "mir-unrestricted-modules",
         "mir-settings-profile-import",
         "mir-use-installed-space-age-icons"
@@ -221,7 +225,7 @@
       "unsupported_streams": ["research_agricultural_growth_speed", "research_cargo_bay_unloading_distance", "research_cargo_landing_pad_count", "research_spoilage_preservation"],
       "unsupported_required_mods": ["elevated-rails", "quality", "recycler", "space-age"],
       "unsupported_effect_types": ["cargo-landing-pad-count", "max-cargo-bay-unloading-distance"],
-      "omitted_global_settings": ["mir-pipeline-extent-multiplier", "mir-prototype-productivity-cap", "mir-prototype-efficiency-cap", "mir-prototype-pollution-cap", "mir-prototype-speed-cap", "mir-prototype-quality-cap", "mir-prototype-positive-power-floor", "mir-productivity-cap-self-recycling-only", "mir-unrestricted-modules", "mir-settings-profile-import", "mir-use-installed-space-age-icons"],
+      "omitted_global_settings": ["mir-pipeline-extent-multiplier", "mir-prototype-productivity-cap", "mir-prototype-efficiency-cap", "mir-prototype-pollution-cap", "mir-prototype-speed-cap", "mir-prototype-speed-floor", "mir-prototype-quality-cap", "mir-prototype-positive-power-floor", "mir-productivity-cap-self-recycling-only", "mir-recycling-return-chance", "mir-unrestricted-modules", "mir-settings-profile-import", "mir-use-installed-space-age-icons"],
       "required_validation_groups": ["static", "package", "base-load", "science-prerequisites", "direct-effects", "weapon-overlap", "reduced-settings-surface", "runtime-state", "exact-dist"]
     },
     "0.17": {
@@ -249,7 +253,7 @@
       "unsupported_streams": ["research_agricultural_growth_speed", "research_cargo_bay_unloading_distance", "research_cargo_landing_pad_count", "research_spoilage_preservation"],
       "unsupported_required_mods": ["elevated-rails", "quality", "recycler", "space-age"],
       "unsupported_effect_types": ["cargo-landing-pad-count", "max-cargo-bay-unloading-distance"],
-      "omitted_global_settings": ["mir-pipeline-extent-multiplier", "mir-prototype-productivity-cap", "mir-prototype-efficiency-cap", "mir-prototype-pollution-cap", "mir-prototype-speed-cap", "mir-prototype-quality-cap", "mir-prototype-positive-power-floor", "mir-productivity-cap-self-recycling-only", "mir-unrestricted-modules", "mir-settings-profile-import", "mir-use-installed-space-age-icons"],
+      "omitted_global_settings": ["mir-pipeline-extent-multiplier", "mir-prototype-productivity-cap", "mir-prototype-efficiency-cap", "mir-prototype-pollution-cap", "mir-prototype-speed-cap", "mir-prototype-speed-floor", "mir-prototype-quality-cap", "mir-prototype-positive-power-floor", "mir-productivity-cap-self-recycling-only", "mir-recycling-return-chance", "mir-unrestricted-modules", "mir-settings-profile-import", "mir-use-installed-space-age-icons"],
       "required_validation_groups": ["static", "package", "base-load", "science-prerequisites", "direct-effects", "weapon-overlap", "reduced-settings-surface", "runtime-state", "exact-dist"]
     },
     "0.16": {
@@ -277,7 +281,7 @@
       "unsupported_streams": ["research_agricultural_growth_speed", "research_cargo_bay_unloading_distance", "research_cargo_landing_pad_count", "research_spoilage_preservation"],
       "unsupported_required_mods": ["elevated-rails", "quality", "recycler", "space-age"],
       "unsupported_effect_types": ["cargo-landing-pad-count", "max-cargo-bay-unloading-distance"],
-      "omitted_global_settings": ["mir-pipeline-extent-multiplier", "mir-prototype-productivity-cap", "mir-prototype-efficiency-cap", "mir-prototype-pollution-cap", "mir-prototype-speed-cap", "mir-prototype-quality-cap", "mir-prototype-positive-power-floor", "mir-productivity-cap-self-recycling-only", "mir-unrestricted-modules", "mir-settings-profile-import", "mir-use-installed-space-age-icons"],
+      "omitted_global_settings": ["mir-pipeline-extent-multiplier", "mir-prototype-productivity-cap", "mir-prototype-efficiency-cap", "mir-prototype-pollution-cap", "mir-prototype-speed-cap", "mir-prototype-speed-floor", "mir-prototype-quality-cap", "mir-prototype-positive-power-floor", "mir-productivity-cap-self-recycling-only", "mir-recycling-return-chance", "mir-unrestricted-modules", "mir-settings-profile-import", "mir-use-installed-space-age-icons"],
       "required_validation_groups": ["static", "package", "base-load", "science-prerequisites", "direct-effects", "weapon-overlap", "reduced-settings-surface", "runtime-state", "old-science-map", "exact-dist"]
     },
     "0.15": {
@@ -305,7 +309,7 @@
       "unsupported_streams": ["research_agricultural_growth_speed", "research_cargo_bay_unloading_distance", "research_cargo_landing_pad_count", "research_spoilage_preservation"],
       "unsupported_required_mods": ["elevated-rails", "quality", "recycler", "space-age"],
       "unsupported_effect_types": ["cargo-landing-pad-count", "max-cargo-bay-unloading-distance"],
-      "omitted_global_settings": ["mir-pipeline-extent-multiplier", "mir-prototype-productivity-cap", "mir-prototype-efficiency-cap", "mir-prototype-pollution-cap", "mir-prototype-speed-cap", "mir-prototype-quality-cap", "mir-prototype-positive-power-floor", "mir-productivity-cap-self-recycling-only", "mir-unrestricted-modules", "mir-settings-profile-import", "mir-use-installed-space-age-icons"],
+      "omitted_global_settings": ["mir-pipeline-extent-multiplier", "mir-prototype-productivity-cap", "mir-prototype-efficiency-cap", "mir-prototype-pollution-cap", "mir-prototype-speed-cap", "mir-prototype-speed-floor", "mir-prototype-quality-cap", "mir-prototype-positive-power-floor", "mir-productivity-cap-self-recycling-only", "mir-recycling-return-chance", "mir-unrestricted-modules", "mir-settings-profile-import", "mir-use-installed-space-age-icons"],
       "required_validation_groups": ["static", "package", "base-load", "science-prerequisites", "direct-effects", "weapon-overlap", "reduced-settings-surface", "runtime-state", "old-science-map", "exact-dist"]
     }
   }

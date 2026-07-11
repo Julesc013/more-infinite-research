@@ -16,6 +16,15 @@ Date: 2026-07-11
     - Rejected external research owners that use unrecognized science ingredients.
     - Kept incineration sink recipes out of breeding productivity research so later recipe removal cannot leave invalid effects.
     - Added opt-in above-300% productivity scoping for proven non-generative self-recycling recipes.
+    - Added a generated-recycler return dropdown with unchanged, cap-matched safe, and fixed choices from 25% down to 0.1%.
+    - Cap-matched recycling uses total output: +400% gives 20% returns and +1000% about 9.09%, never above vanilla 25%.
+    - Added a separate negative speed-floor dropdown down to -99.99% while keeping the positive speed cap independent.
+    - Expanded the numeric dropdown ladders from quarter-scale values through high-end megabase and modpack values.
+    - Gave every dropdown an explicit unchanged/bypass option while retaining all existing enum IDs.
+    - Allowed portable profiles to use validated custom decimal percentages beyond the curated dropdown steps.
+    - Added an engine-unchanged lab policy that bypasses MIR reachability, reduction, and skip intervention.
+    - Made module productivity discover recipes through final module prototype tiers, including tier 4 and later modded modules.
+    - Cooperated with Finite Productivity Technologies 0.1.1's hidden load-after dependency for final cap conversion.
     - Added opt-in unrestricted module permissions across existing recipe, machine, and beacon slots.
     - Added per-generated-technology effect-per-level controls while preserving canonical mixed-tier ratios.
     - Fixed a settings-stage circular import that prevented 3.0.5 from loading.
@@ -38,6 +47,9 @@ Date: 2026-07-11
     - Allowed exact external rocket or cannon speed owners when the existing competition preference keeps external research.
     - Added classifier-boundary, late recipe-removal, and exact Planet Crucible plus Rigor Module regression gates.
     - Consolidated generated setting registration through the canonical catalog and aligned controls with generated effects.
+    - Kept visible recycling processes such as scrap recycling outside MIR's generated-recycler balance pass.
+    - Corrected recycling safety indexing for Factorio 2.1 independent and shared product probabilities.
+    - Added a complete 3.0.5 inventory for all 477 dropdown, checkbox, numeric, and profile-import settings.
 
 ---------------------------------------------------------------------------------------------------
 Version: 1.7.0

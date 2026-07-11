@@ -122,7 +122,10 @@ owns the optional pipeline extent prototype pass.
 `prototypes/mir/settings/prototype_limits.lua` owns the prototype-limit setting
 catalog and value parser. `prototypes/mir/pipeline/prototype_limits.lua` owns
 the optional data-final-fixes prototype mutation pass for selected recipe
-productivity and effect receiver limits.
+productivity and effect receiver limits. The same pass owns explicit generated
+recycler-return scaling because it is a global prototype-limit balance choice;
+it excludes visible recycling processes such as scrap recycling. Positive
+speed caps and negative speed floors remain independently selectable.
 `prototypes/mir/settings/effect_contracts.lua` owns pure typed per-level effect
 descriptors used by the settings catalog. Runtime setting lookup and scaling
 remain in `prototypes/mir/settings/effect_scaling.lua`, keeping catalog/profile
@@ -161,6 +164,9 @@ applying fallback effect icons before emission planning.
 `prototypes/mir/capabilities/recipe_productivity/planner.lua` owns the current
 recipe-productivity bucket matching facade and converts matched buckets into
 recipe productivity effects after policy filters run.
+`recipe_productivity/recipe_matching.lua` may discover module recipe outputs
+from final `ModulePrototype.tier` facts. Stream data selects tier ranges; it
+does not hard-code third-party module mod IDs.
 `prototypes/mir/index/recipe_unlocks.lua` builds the immutable recipe-to-unlock
 technology fact index. Science selection, prerequisite planning, and explicit
 technology requirements apply shared researchability policy to those facts
