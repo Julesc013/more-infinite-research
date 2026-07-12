@@ -130,7 +130,7 @@ MIR 3 does not keep a broad `prototypes/util.lua` facade. Domain logic lives in
 focused modules:
 
 - `prototypes/mir/platform/factorio/prototype_lookup.lua`: item-like and fluid prototype lookup, technology existence, ammo-category existence, Space Age detection.
-- `prototypes/mir/capabilities/science_integration/science_packs.lua`: lab-input discovery, science-pack existence, end-game science-pack selection, lab-compatible ingredient validation, science-pack unlock prerequisites, ordered pack lists.
+- `prototypes/mir/capabilities/science_integration/science_packs.lua`: lab-input discovery, science-pack existence, end-game science-pack selection, lab-compatible ingredient validation, enabled science-pack unlock prerequisites, ordered pack lists.
 - `prototypes/mir/capabilities/science_integration/science_selector.lua`: stream science-pack selection, configured science-pack ingredient policy, unlock-derived science discovery.
 - `prototypes/mir/capabilities/recipe_productivity/recipe_matching.lua`: item/fluid-output matching, output-pattern expansion, recipe category matching, hidden/recycling filtering.
 - `prototypes/mir/emit/icon_builder.lua`: borrowed icon copying, explicit `icon_candidates` resolution, legacy technology/item/fluid icon fallback, Wube-style constant overlays.
@@ -358,7 +358,7 @@ Static validation rejects runtime tick handlers in `control.lua` and
 
 Static validation also rejects unsafe pickup reach effect types outside the dedicated safety guard.
 
-The fixture mods under `fixtures/` test item-based science packs, custom labs, late recipe creation, the default `reduce` lab incompatibility behavior, the `skip` lab incompatibility behavior, science-pack ingredient policy modes, the end-game prerequisite gate, hidden startup setting readability, base-only cargo skip behavior, Space Age cargo logistics effect shape, Maraxis-like duplicate cargo modifier diagnostics, finite vanilla-chain preservation, broad generation integrity, unsafe pickup reach exclusion, weapon-speed overlap safety, Omega-style drill productivity matching, fluid-output productivity ownership, pipeline extent startup scaling, prototype limit startup overrides, and post-MIR assertions for runtime-sensitive generated technologies.
+The fixture mods under `fixtures/` test item-based science packs, custom labs, late recipe creation, the default `reduce` lab incompatibility behavior, the `skip` lab incompatibility behavior, science-pack ingredient policy modes, the end-game prerequisite gate, disabled generated prerequisite rejection, hidden startup setting readability, base-only cargo skip behavior, Space Age cargo logistics effect shape, Maraxis-like duplicate cargo modifier diagnostics, finite vanilla-chain preservation, broad generation integrity, unsafe pickup reach exclusion, weapon-speed overlap safety, Omega-style drill productivity matching, fluid-output productivity ownership, pipeline extent startup scaling, prototype limit startup overrides, and post-MIR assertions for runtime-sensitive generated technologies.
 
 `mir-fixture-assert-generation-integrity` is the broad guardrail fixture. It runs after MIR in both base-only and Space Age runtime scenarios and verifies:
 

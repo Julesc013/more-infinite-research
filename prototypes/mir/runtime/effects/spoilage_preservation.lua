@@ -1,5 +1,6 @@
 local M = {}
 local settings_resolver = require("prototypes.mir.runtime.settings_resolver")
+local runtime_state = require("prototypes.mir.runtime.state")
 
 M.technology_name = "recipe-prod-research_spoilage_preservation-1"
 M.stream_key = "research_spoilage_preservation"
@@ -14,9 +15,7 @@ local function feature_enabled()
 end
 
 local function state()
-  storage.mir = storage.mir or {}
-  storage.mir.spoilage_preservation = storage.mir.spoilage_preservation or {}
-  return storage.mir.spoilage_preservation
+  return runtime_state.bucket("spoilage_preservation")
 end
 
 local function clamp(value)

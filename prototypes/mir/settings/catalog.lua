@@ -3,6 +3,7 @@ local defaults = require("prototypes.mir.settings.defaults")
 local pipeline_extent_settings = require("prototypes.mir.settings.pipeline_extent")
 local prototype_limit_settings = require("prototypes.mir.settings.prototype_limits")
 local setting_order = require("prototypes.mir.settings.order")
+local target_line = require("prototypes.mir.platform.factorio.target_line")
 
 local M = {}
 
@@ -149,7 +150,7 @@ function M.global_setting_prototypes()
       type = "string-setting",
       name = "mir-adjust-vanilla-weapon-speed-techs",
       setting_type = "startup",
-      default_value = "off",
+      default_value = "only-when-dedicated-tech-enabled",
       allowed_values = {"off", "only-when-dedicated-tech-enabled", "always"},
       order = setting_order.global("compatibility", 10),
       localised_name = {"mod-setting-name.mir-adjust-vanilla-weapon-speed-techs"},
@@ -231,7 +232,9 @@ function M.global_setting_prototypes()
 
   local cloned = {}
   for _, spec in ipairs(out) do
-    table.insert(cloned, clone_spec(spec))
+    if target_line.global_setting_supported(spec.name) then
+      table.insert(cloned, clone_spec(spec))
+    end
   end
   return cloned
 end
