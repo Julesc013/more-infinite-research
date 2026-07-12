@@ -1,0 +1,30 @@
+   0.001 2026-07-13 08:36:50; Factorio 1.0.0 (build 54889, win64, alpha)
+   0.001 Operating system: Windows 10 (build 19045)
+   0.001 Not rotating logs.
+   0.001 Program arguments: "D:\Programs\Factorio\1.0\bin\x64\factorio.exe" "--config" "C:\Projects\Factorio\more-infinite-research-old-wave\artifacts\old-wave\1.8.2\config-fresh-create.ini" "--no-log-rotation" "--disable-audio" "--mod-directory" "C:\Projects\Factorio\more-infinite-research-old-wave\artifacts\old-wave\1.8.2\fresh-mods" "--create" "C:\Projects\Factorio\more-infinite-research-old-wave\artifacts\old-wave\1.8.2\fresh-1.8.2.zip"
+   0.002 Read data path: D:/Programs/Factorio/1.0/data
+   0.002 Write data path: C:/Projects/Factorio/more-infinite-research-old-wave/artifacts/old-wave/1.8.2/user-fresh-create [18526/450559MB]
+   0.002 Binaries path: D:/Programs/Factorio/1.0/bin
+   0.010 System info: [CPU: Intel(R) Core(TM) i7-7700HQ CPU @ 2.80GHz, 8 cores, RAM: 9519/16257 MB, page: 14988/18739 MB, virtual: 4251/134217727 MB, extended virtual: 0 MB]
+   0.010 Running in headless mode
+   0.027 Loading mod settings more-infinite-research 1.8.2 (settings.lua)
+   0.037 Loading mod core 0.0.0 (data.lua)
+   0.098 Loading mod base 1.0.0 (data.lua)
+   0.434 Loading mod more-infinite-research 1.8.2 (data.lua)
+   0.594 Loading mod base 1.0.0 (data-updates.lua)
+   0.757 Loading mod more-infinite-research 1.8.2 (data-updates.lua)
+   0.916 Loading mod more-infinite-research 1.8.2 (data-final-fixes.lua)
+   1.167 Checksum for core: 2630831588
+   1.167 Checksum of base: 3509992273
+   1.167 Checksum of more-infinite-research: 4159975746
+   1.360 Prototype list checksum: 278186799
+   1.412 Info PlayerData.cpp:70: Local player-data.json unavailable
+   1.412 Info PlayerData.cpp:75: Cloud player-data.json unavailable
+   1.414 Info GlobalContext.cpp:1269: Resetting config.
+   1.416 Factorio initialised
+   1.416 Info Main.cpp:724: Creating new map C:\Projects\Factorio\more-infinite-research-old-wave\artifacts\old-wave\1.8.2\fresh-1.8.2.zip
+   2.134 Loading level.dat: 1218669 bytes.
+   2.134 Info Scenario.cpp:187: Map version 1.0.0-0
+   2.160 Checksum for script C:/Projects/Factorio/more-infinite-research-old-wave/artifacts/old-wave/1.8.2/user-fresh-create/temp/currently-playing/control.lua: 3931528263
+   2.162 Checksum for script __more-infinite-research__/control.lua: 1578769891
+   2.395 Goodbye
