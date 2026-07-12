@@ -43,7 +43,31 @@ function Remove-MIRCopiedModDirectory {
 function Copy-MIRModDirectory {
   param([string]$Source, [string]$Name, [string]$ModsDir)
   $target = Remove-MIRCopiedModDirectory -Name $Name -ModsDir $ModsDir
-  Copy-Item -LiteralPath $Source -Destination $target -Recurse
+  New-Item -ItemType Directory -Force -Path $target | Out-Null
+  $sourceRoot = (Resolve-Path -LiteralPath $Source).Path
+  foreach ($directory in Get-ChildItem -LiteralPath $sourceRoot -Recurse -Directory) {
+    $relative = [System.IO.Path]::GetRelativePath($sourceRoot, $directory.FullName)
+    New-Item -ItemType Directory -Force -Path (Join-Path $target $relative) | Out-Null
+  }
+  foreach ($file in Get-ChildItem -LiteralPath $sourceRoot -Recurse -File) {
+    $relative = [System.IO.Path]::GetRelativePath($sourceRoot, $file.FullName)
+    $destination = Join-Path $target $relative
+    try {
+      New-Item -ItemType HardLink -Path $destination -Target $file.FullName -ErrorAction Stop | Out-Null
+    } catch {
+      Copy-Item -LiteralPath $file.FullName -Destination $destination
+    }
+  }
+}
+
+function Copy-MIRFileWithHardlinkFallback {
+  param([Parameter(Mandatory)][string]$Source, [Parameter(Mandatory)][string]$Destination)
+  if (Test-Path -LiteralPath $Destination) { Remove-Item -LiteralPath $Destination -Force }
+  try {
+    New-Item -ItemType HardLink -Path $Destination -Target $Source -ErrorAction Stop | Out-Null
+  } catch {
+    Copy-Item -LiteralPath $Source -Destination $Destination -Force
+  }
 }
 
 function Copy-MIRRepositoryModDirectory {

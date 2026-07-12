@@ -10,8 +10,8 @@ $ErrorActionPreference = "Stop"
 $registry = Import-MIRScenarioRegistry `
   -Path (Join-Path $RepoRoot "fixtures\compat-matrix\expected-scenarios.json") `
   -TargetProfile "2.1"
-if ($registry.schema -ne 2 -or $registry.records.Count -lt 1) {
-  throw "Scenario manifest schema-2 full records did not load."
+if ($registry.schema -ne 3 -or $registry.records.Count -lt 1) {
+  throw "Scenario manifest schema-3 full records did not load."
 }
 $semanticDeclaration = Resolve-MIRScenarioDeclaration `
   -Registry $registry `
@@ -83,6 +83,21 @@ try {
   if (-not $failedAsExpected) {
     throw "Missing expected validation scenario did not fail completion."
   }
+
+  $zeroAssertionPath = Join-Path $testRoot "zero-assertions.json"
+  Initialize-MIRValidationResult -OutputPath $zeroAssertionPath -FactorioVersion "test" `
+    -ExpectedScenarios @("runtime-zero") -ExpectedScenariosSha256 "manifest" | Out-Null
+  $zeroRecord = Start-MIRValidationScenario -Name "runtime-zero" -Kind "runtime" -Group "test"
+  Complete-MIRValidationScenario -Record $zeroRecord -Status "passed" -AssertionsExecuted 0
+  $zeroFailed = $false
+  try { Complete-MIRValidationRun } catch { $zeroFailed = $_.Exception.Message -match "zero assertions" }
+  if (-not $zeroFailed) { throw "Runtime scenario with zero executed assertions did not fail completion." }
+
+  $failurePacketPath = Join-Path $testRoot "failure-packets\runtime-failure.json"
+  Initialize-MIRValidationResult -OutputPath (Join-Path $testRoot "failure.json") -FactorioVersion "test" | Out-Null
+  $failureRecord = Start-MIRValidationScenario -Name "runtime-failure" -Kind "runtime" -Group "test"
+  Complete-MIRValidationScenario -Record $failureRecord -Status "failed" -ErrorMessage "expected failure"
+  if (-not (Test-Path -LiteralPath $failurePacketPath)) { throw "Structured scenario failure packet was not written." }
 } finally {
   if (Test-Path -LiteralPath $testRoot) {
     Remove-Item -LiteralPath $testRoot -Recurse -Force

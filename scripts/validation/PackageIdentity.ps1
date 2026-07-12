@@ -229,6 +229,17 @@ function Get-MIRValidationHarnessRoots {
   return @("scripts", "fixtures", ".mir", ".github/workflows")
 }
 
+function Test-MIRValidationHarnessEvidencePath {
+  param([Parameter(Mandatory)][string]$RelativePath)
+
+  return $RelativePath -match '^\.mir/evidence/' -or $RelativePath -in @(
+    '.mir/branches.yml',
+    '.mir/compatibility.yml',
+    '.mir/convergence.yml',
+    '.mir/release-wave.yml'
+  )
+}
+
 function Get-MIRValidationHarnessFingerprint {
   param([Parameter(Mandatory)][string]$RepoRoot)
 
@@ -244,10 +255,7 @@ function Get-MIRValidationHarnessFingerprint {
       })
     }
   }
-  $files = @($files | Where-Object {
-    $_ -notmatch '^\.mir/evidence/' -and
-    $_ -notin @('.mir/branches.yml', '.mir/convergence.yml', '.mir/release-wave.yml')
-  })
+  $files = @($files | Where-Object { -not (Test-MIRValidationHarnessEvidencePath -RelativePath $_) })
   $rows = foreach ($relative in @($files | Sort-Object -Unique)) {
     $path = Join-Path $repo $relative
     $identity = Get-MIRFileContentIdentity -Path $path -RelativePath $relative
@@ -265,8 +273,8 @@ function Test-MIRValidationHarnessGitDirty {
     throw "Unable to inspect validation harness Git state."
   }
   $relevant = @($status | Where-Object {
-    $_ -notmatch '\.mir/evidence/' -and
-    $_ -notmatch '\.mir/(branches|convergence)\.yml$'
+    $relative = ($_ -replace '^..\s+', '').Replace("\", "/")
+    -not (Test-MIRValidationHarnessEvidencePath -RelativePath $relative)
   })
   return $relevant.Count -gt 0
 }

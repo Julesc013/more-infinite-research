@@ -1,0 +1,48 @@
+{
+  "schema": 1,
+  "baseline_scenarios": [
+    "package-zip-base",
+    "package-zip-space-age",
+    "compiler-contracts"
+  ],
+  "paths": [
+    {
+      "pattern": "prototypes/mir/families/**",
+      "scenarios": ["semantic-family-off", "semantic-family-report", "semantic-family-attach", "semantic-family-generate", "semantic-family-exact-pack"]
+    },
+    {
+      "pattern": "prototypes/mir/compatibility/packs/**",
+      "scenarios": ["compiler-contracts", "semantic-family-attach", "semantic-family-exact-pack"]
+    },
+    {
+      "pattern": "prototypes/mir/planner/**",
+      "groups": ["automatic-compiler", "base-load", "science-prerequisites"],
+      "scenarios": ["space-age-galore-effect-ownership"]
+    },
+    {
+      "pattern": "prototypes/mir/emit/base_extensions.lua",
+      "groups": ["base-load", "science-prerequisites"]
+    },
+    {
+      "pattern": "prototypes/mir/emit/technology_graph_safety.lua",
+      "groups": ["base-load", "science-prerequisites"],
+      "scenarios": ["external-technology-cycle"]
+    },
+    {
+      "pattern": "prototypes/mir/runtime/**",
+      "groups": ["runtime-state"]
+    },
+    {
+      "pattern": "fixtures/**",
+      "groups": ["local-mod-library"]
+    },
+    {
+      "pattern": "scripts/Invoke-MIRValidation.ps1",
+      "tags": ["smoke"]
+    },
+    {
+      "pattern": "scripts/validation/**",
+      "tags": ["smoke"]
+    }
+  ]
+}

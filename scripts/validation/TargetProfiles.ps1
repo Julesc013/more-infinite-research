@@ -64,16 +64,14 @@ function Get-MIRTargetProfile {
     throw "Factorio $FactorioVersion target profile must declare a positive expected_stream_count."
   }
 
-  if ($FactorioVersion -in @("2.0", "2.1")) {
-    foreach ($positiveField in @("supported_required_mods", "supported_effect_types")) {
-      if ($null -eq $profile.$positiveField) {
-        throw "Maintained modern Factorio $FactorioVersion profile is missing positive field $positiveField."
-      }
+  foreach ($positiveField in @("supported_required_mods", "supported_effect_types")) {
+    if ($null -eq $profile.PSObject.Properties[$positiveField]) {
+      throw "Factorio $FactorioVersion profile is missing positive field $positiveField."
     }
-    foreach ($legacyNegativeField in @("unsupported_streams", "unsupported_required_mods", "unsupported_effect_types")) {
-      if ($null -ne $profile.$legacyNegativeField) {
-        throw "Maintained modern Factorio $FactorioVersion profile must not use legacy negative field $legacyNegativeField."
-      }
+  }
+  foreach ($negativeField in @("unsupported_streams", "unsupported_required_mods", "unsupported_effect_types", "omitted_global_settings")) {
+    if ($null -ne $profile.PSObject.Properties[$negativeField]) {
+      throw "Factorio $FactorioVersion profile must not use negative field $negativeField."
     }
   }
 
