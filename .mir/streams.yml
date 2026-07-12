@@ -162,6 +162,8 @@ streams:
       generated_technology: recipe-prod-research_bacteria_cultivation-1
       stream_key: research_bacteria_cultivation
       migration_policy: stable
+      reviewed_risk_exceptions:
+        - exact-bacteria-cultivation-autocatalytic-family
       targets:
         - stream:research_bacteria_cultivation
       evidence:

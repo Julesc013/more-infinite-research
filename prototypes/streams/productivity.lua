@@ -383,6 +383,7 @@ return {
     icon_tech="bioflux"
   },
   research_bacteria_cultivation = {
+    allow_shared_input_output = true,
     ui_visibility = {
       mode = "always",
       reason = "official-stream-settings-visible"
