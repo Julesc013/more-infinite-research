@@ -80,4 +80,8 @@ function M.technology_overlay_layer()
   return false
 end
 
+function M.fallback_technology_icon_size()
+  return 128
+end
+
 return M
