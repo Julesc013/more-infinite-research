@@ -51,19 +51,19 @@ This is the executable release queue. `.mir/release-wave.yml` is the machine-rea
 
 - [x] Clean static validation after fixed-point release-harness evidence binding at validation source `2490d2d`, package evidence source `4cdb859`, and package source anchor `81e73ea`.
 - [x] Complete Factorio 2.1.9 declared runtime matrix with no skipped required group at validation source `2490d2d` (`86/86`).
-- [x] Exact 3.0.5-to-3.1.0 save upgrade with non-default settings, research levels, storage, and scripted effects retained against archive `7CC222EC...676D`.
+- [x] Exact 3.0.5-to-3.1.0 save upgrade with non-default settings, research levels, storage, and scripted effects retained against RC4 archive `BD89A34D...DDDA3`.
 - [x] Exact 3.1.0 development archive base and Space Age loads from an isolated normal mods directory; rerun if package-visible source changes.
 - [x] Final-version performance evidence with recipe, technology, effect, edge, candidate, and scan counts; rerun if package-visible source changes.
 - [ ] Independent exact-archive campaigns for AAI, BZ, Bob, Angel, Krastorio/K2SO, Space Exploration, Pyanodon, and representative planet mods where complete dependency closures are available.
 - [x] Characterize the earlier final-version archive across all currently complete local closures: AAI, BZ, Bob, Krastorio base, and K2SO (`8/8`, zero dependency failures).
-- [x] Rerun those eight exact-archive `loads` scenarios against validation source `4cdb859` (`8/8`, zero dependency failures).
-- [ ] Acquire complete Angel, Space Exploration, Pyanodon, and representative planet dependency closures, then run their independent exact-archive campaigns.
+- [x] Rerun the available exact-archive `loads` scenarios against source `3699fec` (`9/9`, zero dependency failures), including a complete 46-mod planet cluster.
+- [ ] Acquire complete Angel, Space Exploration, and Pyanodon dependency closures, then run their independent exact-archive campaigns.
 - [x] Preserve `loads`, `observed`, `cooperates`, partial-family, and full-family claim boundaries; inventory never counts as proof.
 - [ ] Interactive settings, locale, icon, technology-tree, save-load, and balance review on the exact candidate.
 - [x] Materialize the RC2 deterministic archive, release notes, migration guide, validation summary, upgrade proof, campaign lock/evidence, and pending identity-bound GUI packet.
 - [x] Pass candidate freshness from the clean RC3 evidence commit with source, package, validation, upgrade, ecosystem, and pending-interactive bindings.
 - [ ] Complete and bind the GUI review without rebuilding the archive.
-- [ ] Rebuild and requalify after the representative planet cluster exposed a generated base extension anchored to a disabled prerequisite chain.
+- [x] Rebuild and requalify after the representative planet cluster exposed a generated base extension anchored to a disabled prerequisite chain.
 - [ ] Push accepted `dev` to `main`, create the real 3.1.0 tag, publish exact validated bytes, then mark immutable.
 
 ## 2.4.0 Factorio 2.0 Companion

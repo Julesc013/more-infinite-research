@@ -27,17 +27,16 @@ campaigns:
     - .mir/evidence/pre-3.1-renumber-core-ecosystems-load-campaign.json
     - .mir/evidence/pre-3.1-renumber-aai-load-campaign.json
   final_3_1_0_load_evidence:
-    available_ecosystems: .mir/evidence/3.1.0-rc2-ecosystem-campaign.json
-    status: 8-passed-load-claims
+    available_ecosystems: .mir/evidence/3.1.0-rc4-ecosystem-campaign.json
+    status: 9-passed-load-claims-including-planet-cluster
     current_archive_status: passed
-    source_commit: 4cdb8595de94316b45169e1722d623684d9086a1
-    archive_sha256: 7CC222EC860F21EBAA5C3E72F2C42BD97BF7A8DA8AE938AFA57D83994991676D
-    dependency_lock_sha256: 2F5255AC993B5B95FFD6142AB00BAD1D0BF99AB44E6C22575C692E42FF65ACF6
+    source_commit: 3699fecb021ee64e0fcdeaf741e32b1b89cf27b3
+    archive_sha256: BD89A34D1EACA6C7FD93412072FFC1434F38DE90FA7E1156B75CE23DC07DDDA3
+    dependency_lock_sha256: 6135C3F6FF5D980BBDCA1C59B291A68A67097017DD53771CEBB46946C1748388
     missing_dependency_closures:
       - angels
       - space-exploration
       - pyanodon
-      - representative-planet-campaign
 
 claims:
   allowed_levels:

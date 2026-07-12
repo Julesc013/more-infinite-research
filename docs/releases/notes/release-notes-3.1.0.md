@@ -29,7 +29,7 @@ MIR 3.1.0 is the first plan-first automatic compatibility compiler release for F
 
 The current exact-source Factorio 2.1 matrix contains `86` passing scenarios across base, Space Age, exact ZIP loading, compiler contracts, mutation ownership, settings, recycler policy, scripted runtime behavior, compatibility ownership, and local fixtures. Exact 3.0.5-to-3.1.0 upgrade evidence retains non-default settings, research levels, persisted fixture state, and the active scripted multiplier.
 
-Eight independent exact-archive scenarios currently pass for available local closures: four AAI configurations, BZ with Space Age, Bob 3.0, Krastorio 2 base, and K2SO. These are `loads` claims only. They do not claim complete automatic coverage, progression, balance, migration, or full-pack support. Angel, Space Exploration, Pyanodon, and representative planet campaigns remain unclaimed until complete dependency closures are executed.
+Nine independent exact-archive scenarios currently pass for available local closures: four AAI configurations, BZ with Space Age, Bob 3.0, Krastorio 2 base, K2SO, and a complete 46-mod Space Age planet cluster. These are `loads` claims only. They do not claim complete automatic coverage, progression, balance, migration, or full-pack support. Angel, Space Exploration, and Pyanodon remain unclaimed until complete dependency closures are executed.
 
 ## Maintainer Changes
 

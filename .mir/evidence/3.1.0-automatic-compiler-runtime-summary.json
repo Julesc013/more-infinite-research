@@ -4,30 +4,30 @@
   "release": "3.1.0",
   "publication_status": "unreleased",
   "generated_at": "2026-07-12T11:00:56.6091352Z",
-  "source_commit": "2490d2d9a700eff631851b2ff27d116ccdb5ec16",
-  "package_evidence_commit": "4cdb8595de94316b45169e1722d623684d9086a1",
-  "package_source_commit": "81e73eabf356e054aa9d2277d8f7d68255c726ff",
+  "source_commit": "3699fecb021ee64e0fcdeaf741e32b1b89cf27b3",
+  "package_evidence_commit": "3699fecb021ee64e0fcdeaf741e32b1b89cf27b3",
+  "package_source_commit": "3699fecb021ee64e0fcdeaf741e32b1b89cf27b3",
   "source_tree_dirty": false,
   "factorio_line": "2.1",
   "factorio_binary_version": "2.1.9",
   "runtime_validation": {
-    "run_id": "c0638088-e8d3-4ab0-bc65-4d6c910376aa",
+    "run_id": "4efeae92-9d41-4765-85f9-6a424ac3e4fe",
     "result": "passed",
     "scenario_count": 86,
-    "duration_seconds": 752.418,
+    "duration_seconds": 830.6,
     "required_groups_skipped": 0,
-    "validation_harness_sha256": "05E78669930E13905F03466740ED5E55044051C7263B4AE6B68BEA897B5E4FF2",
+    "validation_harness_sha256": "60C98A6FD088F1C69FAE60F467855E55FFAB0CC6CBDFF9DCFD1A2341A6A0BA0F",
     "scenario_manifest_sha256": "2F1E608A1E1374A3B859724264FCB4408FBC068437AC199528351313F91E271D",
     "target_profile_sha256": "C584A745225E7CAD7A245A1A039064F9878E7DC951D3012AD92809CE00A9DAF6",
-    "package_source_sha256": "689BBB236E96177FB45254711C1FF0ECAAEFC556A923633F783D7345B418F247",
-    "validation_package_sha256": "7CC222EC860F21EBAA5C3E72F2C42BD97BF7A8DA8AE938AFA57D83994991676D",
+    "package_source_sha256": "3408ECCE260089F73C84A576AFAF7B1F6560F740E0318DC809C792E4234827C7",
+    "validation_package_sha256": "BD89A34D1EACA6C7FD93412072FFC1434F38DE90FA7E1156B75CE23DC07DDDA3",
     "exact_package_base": "passed",
     "exact_package_space_age": "passed"
   },
   "synthetic_scale_gate": {
     "scenario_id": "synthetic-scale-graph",
     "result": "passed",
-    "duration_seconds": 7.72,
+    "duration_seconds": 8.68,
     "budget_seconds": 30.0,
     "recipe_count": 1000,
     "technology_count": 1000,
@@ -42,7 +42,7 @@
   "compiler_contract_gate": {
     "scenario_id": "compiler-contracts",
     "result": "passed",
-    "duration_seconds": 6.0,
+    "duration_seconds": 5.57,
     "assertions": [
       "schema-rejection",
       "stable-sorting",
@@ -63,5 +63,5 @@
       "max-level"
     ]
   },
-  "claim_boundary": "Automated release-candidate evidence. Exact upgrade and eight available-ecosystem load scenarios pass; interactive acceptance, unavailable dependency closures, and publication remain separate."
+  "claim_boundary": "Automated release-candidate evidence. Exact upgrade and nine available-ecosystem load scenarios, including a complete 46-mod planet closure, pass; interactive acceptance, unavailable Angel/SE/Py closures, and publication remain separate."
 }
