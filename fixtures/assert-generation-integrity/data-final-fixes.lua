@@ -13,6 +13,7 @@ local canonical_recipe_facts = require("__more-infinite-research__.prototypes.mi
 local pipeline_commands = require("__more-infinite-research__.prototypes.mir.pipeline.commands")
 local capability_registry = require("__more-infinite-research__.prototypes.mir.capabilities.registry")
 local stream_compiler = require("__more-infinite-research__.prototypes.mir.planner.stream_compiler")
+local target_profile = require("__more-infinite-research__.prototypes.mir.platform.factorio.target_profiles").current()
 
 local function fail(message)
   error("MIR validation failed: " .. message)
@@ -102,7 +103,9 @@ local function assert_descriptor_contracts()
       fail("stream " .. key .. " is missing positive target requirements")
     end
   end
-  if count ~= 70 then fail("canonical descriptor catalog expected 70 streams, got " .. tostring(count)) end
+  if count ~= target_profile.expected_stream_count then
+    fail("canonical descriptor catalog expected " .. tostring(target_profile.expected_stream_count) .. " streams, got " .. tostring(count))
+  end
 
   local first = stream_registry.get("research_copper")
   first.descriptor.effect.canonical_anchor = 999

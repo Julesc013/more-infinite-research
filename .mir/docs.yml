@@ -1413,3 +1413,11 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - mir-1.5.0-factorio-0.15-plan
+  - path: docs/adr/0019-target-profile-v2.md
+    title: "ADR 0019: TargetProfileV2"
+    status: current
+    audience: maintainer
+    doc_type: adr
+    owner: mir-maintainers
+    source_of_truth_for:
+      - target-profile-v2

@@ -32,3 +32,4 @@ Initial ADR set:
 - `0013`: Factorio shell and MIR compiler namespace.
 - `0014`: MIR 3.0.5 convergence.
 - `0015`: Canonical stream descriptors.
+- `0019`: TargetProfileV2.
