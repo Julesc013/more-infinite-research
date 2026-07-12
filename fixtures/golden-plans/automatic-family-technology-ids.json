@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "release": "3.2.0",
+  "release": "3.1.0",
   "technology_ids": [
     "mir-auto-prod-manufacturing-assembling-machine-1",
     "mir-auto-prod-manufacturing-lab-1"
