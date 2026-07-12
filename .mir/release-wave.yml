@@ -191,4 +191,10 @@ waves:
     core_ecosystem_load_scenarios: 4
     core_ecosystem_load_result: passed
     core_ecosystem_load_claim_level: loads
+    aai_load_evidence: .mir/evidence/3.2.0-aai-load-campaign.json
+    aai_load_archive_sha256: 54CB6E7A3139F9A9FC78A0E5455FCFC16E8EF07439F47975B67A4BC7AA5F40E1
+    aai_load_dependency_lock_sha256: 2ECE35AC073782D6E242E95834A26C4BA498EDA85F80909BA76B1586ABF9E39E
+    aai_load_scenarios: 4
+    aai_load_result: passed
+    aai_load_claim_level: loads
     status: integration-validated

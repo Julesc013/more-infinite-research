@@ -25,6 +25,7 @@ campaigns:
   current_load_evidence:
     - .mir/evidence/3.2.0-bz-bob-load-campaign-summary.json
     - .mir/evidence/3.2.0-core-ecosystems-load-campaign.json
+    - .mir/evidence/3.2.0-aai-load-campaign.json
 
 claims:
   allowed_levels:
