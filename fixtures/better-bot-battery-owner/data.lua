@@ -15,13 +15,13 @@ for level = 1, 6 do
     {"science-pack-3", 1}
   }
   if level >= 3 then
-    table.insert(ingredients, {"high-tech-science-pack", 1})
+    table.insert(ingredients, {"alien-science-pack", 1})
   end
   if level >= 5 then
-    table.insert(ingredients, {"production-science-pack", 1})
+    table.insert(ingredients, {"alien-science-pack", 1})
   end
   if level >= 6 then
-    table.insert(ingredients, {"space-science-pack", 1})
+    table.insert(ingredients, {"alien-science-pack", 1})
   end
 
   local tech = {

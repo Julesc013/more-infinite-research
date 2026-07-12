@@ -11,13 +11,14 @@ param(
 $ErrorActionPreference = "Stop"
 $repo = Resolve-Path (Join-Path $PSScriptRoot "..")
 $repoInfo = Get-Content -Raw (Join-Path $repo "info.json") | ConvertFrom-Json
+$isFactorio014Line = $repoInfo.factorio_version -eq "0.14"
 $isFactorio015Line = $repoInfo.factorio_version -eq "0.15"
 $isFactorio016Line = $repoInfo.factorio_version -eq "0.16"
 $isFactorio017Line = $repoInfo.factorio_version -eq "0.17"
 $isFactorio018Line = $repoInfo.factorio_version -eq "0.18"
 $isFactorio10Line = $repoInfo.factorio_version -eq "1.0"
 $isFactorio11Line = $repoInfo.factorio_version -eq "1.1"
-$isReducedLegacyLine = $isFactorio015Line -or $isFactorio016Line -or $isFactorio017Line -or $isFactorio018Line -or $isFactorio10Line -or $isFactorio11Line
+$isReducedLegacyLine = $isFactorio014Line -or $isFactorio015Line -or $isFactorio016Line -or $isFactorio017Line -or $isFactorio018Line -or $isFactorio10Line -or $isFactorio11Line
 $isLegacyFactorio20 = $repoInfo.factorio_version -eq "2.0"
 $isFactorio21Line = $repoInfo.factorio_version -eq "2.1"
 $script:ValidationPackageZipPath = $null
@@ -142,7 +143,16 @@ Invoke-RepoCheck "info.json parses" {
 Invoke-RepoCheck "release metadata matches Factorio line" {
   $deps = @($repoInfo.dependencies)
 
-  if ($isFactorio015Line) {
+  if ($isFactorio014Line) {
+    if ($deps -notcontains "base >= 0.14") {
+      throw "Factorio 0.14 metadata must declare base >= 0.14."
+    }
+
+    $newerDeps = @($deps | Where-Object { $_ -match ">=\s*(0\.15|0\.16|0\.17|0\.18|1|2)\." -or $_ -match "(space-age|quality|recycler|elevated-rails)" })
+    if ($newerDeps.Count -gt 0) {
+      throw "Factorio 0.14 metadata must not carry Factorio 0.15+, 1.x, 2.x, or DLC dependencies: $($newerDeps -join ', ')"
+    }
+  } elseif ($isFactorio015Line) {
     if ($deps -notcontains "base >= 0.15") {
       throw "Factorio 0.15 metadata must declare base >= 0.15."
     }
@@ -502,7 +512,11 @@ Invoke-RepoCheck "fixture mods have metadata and data entrypoints" {
       throw "Fixture $($info.name) must target Factorio $($repoInfo.factorio_version) on this branch; found $($info.factorio_version)."
     }
     $fixtureBaseDependency = @($info.dependencies) | Where-Object { $_ -match "^base\s+>=" } | Select-Object -First 1
-    if ($isFactorio015Line) {
+    if ($isFactorio014Line) {
+      if ($fixtureBaseDependency -notmatch "^base\s+>=\s+0\.14(\.|$)") {
+        throw "Fixture $($info.name) must use a Factorio 0.14 base dependency on this branch; found '$fixtureBaseDependency'."
+      }
+    } elseif ($isFactorio015Line) {
       if ($fixtureBaseDependency -notmatch "^base\s+>=\s+0\.15(\.|$)") {
         throw "Fixture $($info.name) must use a Factorio 0.15 base dependency on this branch; found '$fixtureBaseDependency'."
       }
@@ -676,7 +690,7 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = '__space-age__/graphics/technology/rocket-fuel-productivity.png' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = '__space-age__/graphics/technology/research-productivity.png' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = '{technology="research-productivity", required_mod="space-age"}' },
-    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = '{technology="space-science-pack"}' },
+    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = $(if ($isFactorio014Line) { '{technology="alien-science-pack"}' } else { '{technology="space-science-pack"}' }) },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = '{technology="processing-unit"}' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'research_rocket_fuel = {' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'research_thruster_fuel_productivity = {' },
@@ -730,7 +744,7 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "prototypes\mir\emit\icon_builder.lua"; Text = $technologyIconsText; Snippet = 'battery = "__core__/graphics/icons/technology/constants/constant-battery.png"' },
     @{ File = "prototypes\mir\emit\icon_builder.lua"; Text = $technologyIconsText; Snippet = 'if t == "worker-robot-battery" then return "battery" end' },
     @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = '{technology = "research-productivity", required_mod = "space-age"}' },
-    @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = '{technology = "military-science-pack"}' },
+    @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = $(if ($isFactorio014Line) { '{technology = "alien-science-pack"}' } else { '{technology = "military-science-pack"}' }) },
     @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'ammo_category = "tesla", modifier = 0.1' },
     @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'ammo_category = "electric", modifier = 0.1' },
     @{ File = "prototypes\mir\emit\icon_builder.lua"; Text = $technologyIconsText; Snippet = 'local function strip_constant_overlays(icons)' },
@@ -763,7 +777,7 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'assert_tech_uses_item_icon("recipe-prod-research_heavy_ammo-1", "cannon-shell")' },
     @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'assert_tech_uses_technology_icon("recipe-prod-research_electric_shooting_speed-1", "electric-weapons-damage-1")' },
     @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'assert_tech_uses_technology_icon("recipe-prod-research_walls-1", "gate")' },
-    @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'assert_tech_uses_technology_icon("recipe-prod-research_lab_productivity-1", "military-science-pack")' },
+    @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = $(if ($isFactorio014Line) { 'assert_tech_uses_technology_icon("recipe-prod-research_lab_productivity-1", "alien-science-pack")' } else { 'assert_tech_uses_technology_icon("recipe-prod-research_lab_productivity-1", "military-science-pack")' }) },
     @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'assert_tech_uses_technology_icon("recipe-prod-research_rocket_fuel-1", "rocket-fuel")' },
     @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'effect_type == "laboratory-productivity"' },
     @{ File = "fixtures\assert-fluid-productivity\data-final-fixes.lua"; Text = $fluidProductivityFixtureText; Snippet = 'recipe-prod-research_oil_processing_productivity-1' },
@@ -1968,7 +1982,7 @@ function Get-ScenarioModFolderName {
     [string]$Version
   )
 
-  if (($isFactorio015Line -or $isFactorio016Line -or $isFactorio017Line) -and -not [string]::IsNullOrWhiteSpace($Version)) {
+  if (($isFactorio014Line -or $isFactorio015Line -or $isFactorio016Line -or $isFactorio017Line) -and -not [string]::IsNullOrWhiteSpace($Version)) {
     return "$Name`_$Version"
   }
   return $Name
@@ -2820,7 +2834,7 @@ $defaultEnabledBaseExtensionKeys = @(
   "weapon-shooting-speed",
   "laser-shooting-speed"
 )
-if ($isFactorio015Line -or $isFactorio016Line) {
+if ($isFactorio014Line -or $isFactorio015Line -or $isFactorio016Line) {
   $defaultEnabledBaseExtensionKeys = @($defaultEnabledBaseExtensionKeys | Where-Object { $_ -ne "weapon-shooting-speed" })
 }
 
@@ -2980,7 +2994,7 @@ if ($isReducedLegacyLine) {
   Write-Host "[info] $reducedLineLabel reduced runtime gate skips 2.x recipe-productivity and DLC scenarios."
 
   $directEffectFixtureNames = @()
-  if ($isFactorio015Line -or $isFactorio016Line -or $isFactorio017Line -or $isFactorio018Line -or $isFactorio10Line -or $isFactorio11Line) {
+  if ($isFactorio014Line -or $isFactorio015Line -or $isFactorio016Line -or $isFactorio017Line -or $isFactorio018Line -or $isFactorio10Line -or $isFactorio11Line) {
     $directEffectFixtureNames += "mir-fixture-assert-legacy-effect-icons"
   }
   $directEffectFixtureNames += "mir-fixture-assert-generated-prerequisite-safety"
@@ -2998,7 +3012,7 @@ if ($isReducedLegacyLine) {
     "research_robot_battery",
     "research_rocket_shooting_speed"
   )
-  if ($isFactorio015Line) {
+  if ($isFactorio014Line -or $isFactorio015Line) {
     $reducedDirectEffectStreams = @(
       "research_electric_shooting_speed",
       "research_flamethrower_shooting_speed",
@@ -3015,7 +3029,7 @@ if ($isReducedLegacyLine) {
   Assert-NoStreamReportLine -Key "research_gears" -Context "$reducedLineLabel recipe-productivity cut"
   Assert-DefaultBaseExtensionDiagnostics -Context "$reducedLineLabel base-extension scenario"
 
-  if ($isFactorio015Line) {
+  if ($isFactorio014Line -or $isFactorio015Line) {
     foreach ($unsupportedStream in @(
         "research_character_crafting_speed",
         "research_character_mining_speed",
@@ -3096,7 +3110,7 @@ if ($isReducedLegacyLine) {
     throw "Disabled base extension checkbox should skip generated continuation: $checkboxDisabledResearchSpeedLine"
   }
 
-  if (-not ($isFactorio015Line -or $isFactorio016Line)) {
+  if (-not ($isFactorio014Line -or $isFactorio015Line -or $isFactorio016Line)) {
     Invoke-RuntimeScenario -ScenarioName "weapon-speed-overlap-safety" -EnabledFixtureNames @(
       "mir-fixture-assert-weapon-speed-safety"
     ) -WeaponSpeedAdjustmentMode "only-when-dedicated-tech-enabled"

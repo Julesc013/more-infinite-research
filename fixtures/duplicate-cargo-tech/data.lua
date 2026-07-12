@@ -2,7 +2,7 @@ local science = {
   {"science-pack-1", 1},
   {"science-pack-2", 1},
   {"science-pack-3", 1},
-  {"space-science-pack", 1}
+  {"alien-science-pack", 1}
 }
 
 data:extend({

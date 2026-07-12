@@ -1,4 +1,18 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.4.0
+Date: 2026-07-13
+
+  Features:
+
+    - Reconstructed a finite continuation edition for Factorio 0.14 and its alien-science era.
+    - Preserved iterative generated-technology graph checks without unsupported infinite prototype fields.
+
+  Changes:
+
+    - Replaced native infinite formulas with target-supported fixed research counts.
+    - Kept only target-proven technology effects and omitted all later game and DLC surfaces.
+
+---------------------------------------------------------------------------------------------------
 Version: 1.5.0
 Date: 2026-07-13
 

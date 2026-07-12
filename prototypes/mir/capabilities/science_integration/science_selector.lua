@@ -7,32 +7,32 @@ local effective_settings = require("prototypes.mir.settings.effective")
 local M = {}
 
 local STREAM_EXTRA_PACKS = {
-  research_concrete = {"space-science-pack"},
+  research_concrete = {"alien-science-pack"},
   research_furnace = {"metallurgic-science-pack"},
-  research_landfill = {"metallurgic-science-pack", "space-science-pack"},
-  research_artificial_soil = {"agricultural-science-pack", "space-science-pack"},
+  research_landfill = {"metallurgic-science-pack", "alien-science-pack"},
+  research_artificial_soil = {"agricultural-science-pack", "alien-science-pack"},
   research_molten_metals = {"metallurgic-science-pack"},
   research_mining_drill = {"metallurgic-science-pack"},
-  research_walls = {"military-science-pack", "space-science-pack"},
-  research_grenades = {"military-science-pack", "space-science-pack"},
-  research_rails = {"space-science-pack"},
+  research_walls = {"alien-science-pack", "alien-science-pack"},
+  research_grenades = {"alien-science-pack", "alien-science-pack"},
+  research_rails = {"alien-science-pack"},
   research_electric_energy = {"electromagnetic-science-pack"},
 
   research_breeding = {"agricultural-science-pack", "cryogenic-science-pack"},
   research_plastic = {"agricultural-science-pack"},
   research_rocket_fuel = {"agricultural-science-pack"},
-  research_thruster_fuel_productivity = {"space-science-pack", "agricultural-science-pack"},
-  research_thruster_oxidizer_productivity = {"space-science-pack", "agricultural-science-pack"},
+  research_thruster_fuel_productivity = {"alien-science-pack", "agricultural-science-pack"},
+  research_thruster_oxidizer_productivity = {"alien-science-pack", "agricultural-science-pack"},
   research_oil_processing_productivity = {"cryogenic-science-pack"},
   research_oil_cracking_productivity = {"agricultural-science-pack"},
   research_lubricant_productivity = {"electromagnetic-science-pack"},
   research_sulfuric_acid_productivity = {"metallurgic-science-pack"},
   research_bacteria_cultivation = {"agricultural-science-pack", "cryogenic-science-pack"},
   research_bioflux = {"agricultural-science-pack"},
-  research_carbon = {"space-science-pack"},
+  research_carbon = {"alien-science-pack"},
   research_carbon_fiber = {"agricultural-science-pack"},
-  research_ice = {"space-science-pack"},
-  research_rockets = {"agricultural-science-pack", "military-science-pack"},
+  research_ice = {"alien-science-pack"},
+  research_rockets = {"agricultural-science-pack", "alien-science-pack"},
 
   research_sulfur = {"metallurgic-science-pack"},
   research_explosives = {"metallurgic-science-pack"},
@@ -54,14 +54,14 @@ local STREAM_EXTRA_PACKS = {
   research_quantum_processor = {"cryogenic-science-pack"},
   research_modules = {"cryogenic-science-pack"},
 
-  research_belts = {"space-science-pack"},
-  research_inserters = {"space-science-pack"},
-  research_bullets = {"military-science-pack", "space-science-pack"},
-  research_heavy_ammo = {"military-science-pack", "metallurgic-science-pack", "space-science-pack"},
-  research_armor_components = {"military-science-pack", "metallurgic-science-pack", "space-science-pack"},
+  research_belts = {"alien-science-pack"},
+  research_inserters = {"alien-science-pack"},
+  research_bullets = {"alien-science-pack", "alien-science-pack"},
+  research_heavy_ammo = {"alien-science-pack", "metallurgic-science-pack", "alien-science-pack"},
+  research_armor_components = {"alien-science-pack", "metallurgic-science-pack", "alien-science-pack"},
 
   research_inventory_capacity = {"agricultural-science-pack"},
-  research_robot_battery = {"space-science-pack"},
+  research_robot_battery = {"alien-science-pack"},
   research_science_pack_productivity = {}
 }
 
@@ -155,9 +155,9 @@ function M.apply_science_pack_ingredient_policy(ingredients)
   -- This setting intentionally changes only research ingredients. The
   -- finish-game prerequisite gate is handled separately in prerequisites.
   if policy == "space" then
-    append_ingredient(out, seen, "space-science-pack", 1)
+    append_ingredient(out, seen, "alien-science-pack", 1)
   elseif policy == "space-and-promethium" then
-    append_ingredient(out, seen, "space-science-pack", 1)
+    append_ingredient(out, seen, "alien-science-pack", 1)
     append_ingredient(out, seen, "promethium-science-pack", 1)
   elseif policy == "space-age-progression" then
     for _, pack in ipairs(science.space_age_progression_packs_for(selected_packs)) do
@@ -201,7 +201,7 @@ function M.pick_science_for_stream(spec, key)
   elseif key == "research_science_pack_productivity" then
     for _, p in ipairs(science.pack_list_all()) do add_if_science_pack_exists(packs, p) end
   else
-    for _, p in ipairs({"science-pack-1", "science-pack-2", "science-pack-3", "production-science-pack"}) do
+    for _, p in ipairs({"science-pack-1", "science-pack-2", "science-pack-3", "alien-science-pack"}) do
       add_if_science_pack_exists(packs, p)
     end
     for _, p in ipairs(STREAM_EXTRA_PACKS[key] or {}) do add_if_science_pack_exists(packs, p) end

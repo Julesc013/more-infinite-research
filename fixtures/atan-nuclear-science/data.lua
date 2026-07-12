@@ -1,4 +1,4 @@
-local science_icon = "__base__/graphics/icons/high-tech-science-pack.png"
+local science_icon = "__base__/graphics/icons/alien-science-pack.png"
 
 data:extend({
   {

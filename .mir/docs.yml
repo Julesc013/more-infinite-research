@@ -1,6 +1,22 @@
 schema: 1
 
 docs:
+  - path: docs/releases/1.4.0-validation-summary.md
+    title: "MIR 1.4.0 Validation Summary"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-1.4.0-validation
+  - path: docs/releases/release-notes-1.4.0.md
+    title: "MIR 1.4.0 Candidate Notes"
+    status: current
+    audience: player
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-1.4.0-release-notes
   - path: docs/releases/1.5.0-validation-summary.md
     title: "MIR 1.5.0 Validation Summary"
     status: current

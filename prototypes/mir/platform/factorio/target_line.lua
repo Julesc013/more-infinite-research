@@ -1,6 +1,6 @@
 local M = {}
 
-M.factorio_version = "0.15"
+M.factorio_version = "0.14"
 
 M.supports = {
   compatibility_repairs = false,
@@ -37,9 +37,7 @@ local supported_effect_types = {
   ["gun-speed"] = true,
   ["inserter-stack-size-bonus"] = true,
   ["laboratory-speed"] = true,
-  ["mining-drill-productivity-bonus"] = true,
   ["stack-inserter-capacity-bonus"] = true,
-  ["train-braking-force-bonus"] = true,
   ["turret-attack"] = true,
   ["worker-robot-speed"] = true,
   ["worker-robot-storage"] = true
@@ -87,7 +85,7 @@ function M.feature_enabled(name)
 end
 
 function M.technology_overlay_layer()
-  -- Factorio 0.15 does not ship the 1.1+ stock technology constant badge
+  -- Factorio 0.14 does not ship the 1.1+ stock technology constant badge
   -- assets or a documented native modifier icon surface. Keep generated
   -- technologies on target-era technology art.
   return false
@@ -95,6 +93,16 @@ end
 
 function M.fallback_technology_icon_size()
   return 128
+end
+
+function M.supports_native_infinite_technology()
+  return false
+end
+
+function M.finite_research_count(count_formula)
+  local leading = tonumber(string.match(tostring(count_formula or ""), "^([%d%.]+)"))
+  if not leading or leading < 1 then return 1000 end
+  return math.floor(leading + 0.5)
 end
 
 return M

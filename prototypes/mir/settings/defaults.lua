@@ -35,8 +35,8 @@ local defaults = {
         "science-pack-1",
         "science-pack-2",
         "science-pack-3",
-        "production-science-pack",
-        "military-science-pack"
+        "alien-science-pack",
+        "alien-science-pack"
       }
     },
     research_cannon_shooting_speed = {
@@ -46,8 +46,8 @@ local defaults = {
         "science-pack-1",
         "science-pack-2",
         "science-pack-3",
-        "production-science-pack",
-        "military-science-pack"
+        "alien-science-pack",
+        "alien-science-pack"
       }
     },
     research_flamethrower_shooting_speed = {
@@ -57,9 +57,9 @@ local defaults = {
         "science-pack-1",
         "science-pack-2",
         "science-pack-3",
-        "production-science-pack",
-        "military-science-pack",
-        "space-science-pack"
+        "alien-science-pack",
+        "alien-science-pack",
+        "alien-science-pack"
       }
     },
     research_electric_shooting_speed = {
@@ -69,8 +69,8 @@ local defaults = {
         "science-pack-1",
         "science-pack-2",
         "science-pack-3",
-        "production-science-pack",
-        "military-science-pack"
+        "alien-science-pack",
+        "alien-science-pack"
       }
     }
   },
@@ -85,7 +85,7 @@ local defaults = {
       research_time = 60,
       science_packs = "inherit",
       add_science_packs = {
-        "space-science-pack"
+        "alien-science-pack"
       }
     },
     ["research-speed"] = {
@@ -131,8 +131,8 @@ local defaults = {
       research_time = 120,
       science_packs = "inherit",
       add_science_packs = {
-        "military-science-pack",
-        "space-science-pack"
+        "alien-science-pack",
+        "alien-science-pack"
       }
     },
     ["laser-shooting-speed"] = {
@@ -146,8 +146,8 @@ local defaults = {
       research_time = 120,
       science_packs = "inherit",
       add_science_packs = {
-        "military-science-pack",
-        "space-science-pack"
+        "alien-science-pack",
+        "alien-science-pack"
       }
     }
   }

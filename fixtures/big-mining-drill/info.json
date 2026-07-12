@@ -4,8 +4,8 @@
   "title": "MIR Fixture - Big Mining Drill",
   "author": "Julesc013",
   "description": "Validation fixture that adds a standalone big-mining-drill recipe for MIR mining drill productivity matching.",
-  "factorio_version": "0.15",
+  "factorio_version": "0.14",
   "dependencies": [
-    "base >= 0.15"
+    "base >= 0.14"
   ]
 }

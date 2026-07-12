@@ -12,6 +12,7 @@ local planner_prerequisites = require("prototypes.mir.planner.prerequisites")
 local science_packs = require("prototypes.mir.capabilities.science_integration.science_packs")
 local science_selector = require("prototypes.mir.capabilities.science_integration.science_selector")
 local effective_settings = require("prototypes.mir.settings.effective")
+local target_line = require("prototypes.mir.platform.factorio.target_line")
 
 local M = {}
 
@@ -458,7 +459,11 @@ local function extend_chain(key)
   end
   new.effects = desired_effects
 
-  new.max_level = max_level_value
+  if target_line.supports_native_infinite_technology() then
+    new.max_level = max_level_value
+  else
+    new.max_level = nil
+  end
   new.upgrade = true
 
   local research_setting = sanitize_number(startup_setting("mir-research-time-" .. key))
@@ -483,10 +488,14 @@ local function extend_chain(key)
     return
   end
   new.unit = {
-    count_formula = format_number(base_value) .. "*" .. format_number(growth) .. "^(L-1)",
     ingredients = resolved_ingredients,
     time = research_time
   }
+  if target_line.supports_native_infinite_technology() then
+    new.unit.count_formula = format_number(base_value) .. "*" .. format_number(growth) .. "^(L-1)"
+  else
+    new.unit.count = math.max(1, math.floor((last_count or base_value) * growth + 0.5))
+  end
   new.prerequisites = planner_prerequisites.append_end_game_gate_prerequisite(append_pack_prerequisites(new.prerequisites, resolved_ingredients))
 
   if special and special.on_extend then

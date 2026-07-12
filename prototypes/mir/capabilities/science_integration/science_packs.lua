@@ -9,10 +9,10 @@ local VANILLA_PACK_ORDER = {
   "science-pack-1",
   "science-pack-2",
   "science-pack-3",
-  "production-science-pack",
-  "military-science-pack",
-  "high-tech-science-pack",
-  "space-science-pack",
+  "alien-science-pack",
+  "alien-science-pack",
+  "alien-science-pack",
+  "alien-science-pack",
   "agricultural-science-pack",
   "metallurgic-science-pack",
   "electromagnetic-science-pack",
@@ -31,72 +31,72 @@ local OFFICIAL_PROGRESSION_STEPS = {
   ["science-pack-1"] = {"science-pack-1"},
   ["science-pack-2"] = {"science-pack-1", "science-pack-2"},
   ["science-pack-3"] = {"science-pack-1", "science-pack-2", "science-pack-3"},
-  ["production-science-pack"] = {
+  ["alien-science-pack"] = {
     "science-pack-1",
     "science-pack-2",
     "science-pack-3",
-    "production-science-pack"
+    "alien-science-pack"
   },
-  ["military-science-pack"] = {"science-pack-1", "science-pack-2", "military-science-pack"},
-  ["high-tech-science-pack"] = {
+  ["alien-science-pack"] = {"science-pack-1", "science-pack-2", "alien-science-pack"},
+  ["alien-science-pack"] = {
     "science-pack-1",
     "science-pack-2",
     "science-pack-3",
-    "production-science-pack",
-    "high-tech-science-pack"
+    "alien-science-pack",
+    "alien-science-pack"
   },
-  ["space-science-pack"] = {
+  ["alien-science-pack"] = {
     "science-pack-1",
     "science-pack-2",
     "science-pack-3",
-    "production-science-pack",
-    "high-tech-science-pack",
-    "space-science-pack"
+    "alien-science-pack",
+    "alien-science-pack",
+    "alien-science-pack"
   },
   ["agricultural-science-pack"] = {
     "science-pack-1",
     "science-pack-2",
     "science-pack-3",
-    "production-science-pack",
-    "high-tech-science-pack",
-    "space-science-pack",
+    "alien-science-pack",
+    "alien-science-pack",
+    "alien-science-pack",
     "agricultural-science-pack"
   },
   ["metallurgic-science-pack"] = {
     "science-pack-1",
     "science-pack-2",
     "science-pack-3",
-    "production-science-pack",
-    "high-tech-science-pack",
-    "space-science-pack",
+    "alien-science-pack",
+    "alien-science-pack",
+    "alien-science-pack",
     "metallurgic-science-pack"
   },
   ["electromagnetic-science-pack"] = {
     "science-pack-1",
     "science-pack-2",
     "science-pack-3",
-    "production-science-pack",
-    "high-tech-science-pack",
-    "space-science-pack",
+    "alien-science-pack",
+    "alien-science-pack",
+    "alien-science-pack",
     "electromagnetic-science-pack"
   },
   ["cryogenic-science-pack"] = {
     "science-pack-1",
     "science-pack-2",
     "science-pack-3",
-    "production-science-pack",
-    "high-tech-science-pack",
-    "space-science-pack",
+    "alien-science-pack",
+    "alien-science-pack",
+    "alien-science-pack",
     "cryogenic-science-pack"
   },
   ["promethium-science-pack"] = {
     "science-pack-1",
     "science-pack-2",
     "science-pack-3",
-    "production-science-pack",
-    "military-science-pack",
-    "high-tech-science-pack",
-    "space-science-pack",
+    "alien-science-pack",
+    "alien-science-pack",
+    "alien-science-pack",
+    "alien-science-pack",
     "agricultural-science-pack",
     "metallurgic-science-pack",
     "electromagnetic-science-pack",
@@ -110,71 +110,71 @@ local EXTENSION_PACKS = {
     "science-pack-1",
     "science-pack-2",
     "science-pack-3",
-    "production-science-pack",
-    "space-science-pack"
+    "alien-science-pack",
+    "alien-science-pack"
   },
   ["research-speed"] = "all",
   ["worker-robots-storage"] = {
     "science-pack-1",
     "science-pack-2",
     "science-pack-3",
-    "production-science-pack",
-    "high-tech-science-pack",
+    "alien-science-pack",
+    "alien-science-pack",
     "electromagnetic-science-pack"
   },
   ["inserter-capacity-bonus"] = {
     "science-pack-1",
     "science-pack-2",
     "science-pack-3",
-    "production-science-pack",
+    "alien-science-pack",
     "agricultural-science-pack"
   },
   ["weapon-shooting-speed"] = {
     "science-pack-1",
     "science-pack-2",
     "science-pack-3",
-    "production-science-pack",
-    "military-science-pack",
-    "space-science-pack"
+    "alien-science-pack",
+    "alien-science-pack",
+    "alien-science-pack"
   },
   ["laser-shooting-speed"] = {
     "science-pack-1",
     "science-pack-2",
     "science-pack-3",
-    "production-science-pack",
-    "military-science-pack",
-    "space-science-pack"
+    "alien-science-pack",
+    "alien-science-pack",
+    "alien-science-pack"
   },
   research_electric_shooting_speed = {
     "science-pack-1",
     "science-pack-2",
     "science-pack-3",
-    "production-science-pack",
-    "military-science-pack",
+    "alien-science-pack",
+    "alien-science-pack",
     "electromagnetic-science-pack"
   },
   research_flamethrower_shooting_speed = {
     "science-pack-1",
     "science-pack-2",
     "science-pack-3",
-    "production-science-pack",
-    "military-science-pack",
-    "space-science-pack"
+    "alien-science-pack",
+    "alien-science-pack",
+    "alien-science-pack"
   },
   research_rocket_shooting_speed = {
     "science-pack-1",
     "science-pack-2",
     "science-pack-3",
-    "production-science-pack",
-    "military-science-pack",
+    "alien-science-pack",
+    "alien-science-pack",
     "electromagnetic-science-pack"
   },
   research_cannon_shooting_speed = {
     "science-pack-1",
     "science-pack-2",
     "science-pack-3",
-    "production-science-pack",
-    "military-science-pack",
+    "alien-science-pack",
+    "alien-science-pack",
     "electromagnetic-science-pack"
   }
 }
@@ -412,7 +412,7 @@ function S.space_age_progression_packs_for(selected_packs)
   end
 
   local out = {}
-  if has_space_age_pack then table.insert(out, "space-science-pack") end
+  if has_space_age_pack then table.insert(out, "alien-science-pack") end
   if selected["promethium-science-pack"] then
     for _, pack in ipairs(SPACE_AGE_PLANET_PACKS) do table.insert(out, pack) end
     table.insert(out, "promethium-science-pack")
@@ -483,8 +483,8 @@ function S.end_game_science_pack()
   if lookup.is_space_age() and S.science_pack_exists("promethium-science-pack") then
     return "promethium-science-pack"
   end
-  if S.science_pack_exists("space-science-pack") then
-    return "space-science-pack"
+  if S.science_pack_exists("alien-science-pack") then
+    return "alien-science-pack"
   end
   return nil
 end
