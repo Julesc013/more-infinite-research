@@ -57,6 +57,10 @@ function M.assert_registered_technology_effects()
   require("prototypes.mir.emit.effect_safety").assert_registered_technology_effects()
 end
 
+function M.assert_registered_technology_safety()
+  require("prototypes.mir.emit.technology_graph_safety").assert_registered_technologies()
+end
+
 function M.flush_diagnostics()
   require("prototypes.mir.report.diagnostics_sink").flush()
 end

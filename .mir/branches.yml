@@ -181,6 +181,15 @@ release_artifacts:
       unlock_all_technology_validation: passed
       factorio_0_17_binary: D:\Programs\Factorio\0.17\bin\x64\factorio.exe
       status: release-candidate
+    mir_1_7_1:
+      version: "1.7.1"
+      branch: tmp/0.17
+      target_factorio: "0.17"
+      source_anchor: mir_1_7_0
+      artifact: dist/more-infinite-research_1.7.1.zip
+      automated_gate: pending-final-package
+      public_release: false
+      status: candidate-building
   closed_versions:
     - version: "2.2.0"
       branch: main
@@ -213,7 +222,7 @@ release_artifacts:
       target_factorio: "1.0"
       purpose: maintained Factorio 1.0 support line after the 0.18 bridge proof; future 1.0 maintenance stays on 1.8.x
     factorio_0_17_port:
-      version: "1.7.0"
+      version: "1.7.1"
       branch: tmp/0.17
       target_factorio: "0.17"
       purpose: first old-line native-infinite proof after 1.8.x release synthesis
@@ -260,7 +269,7 @@ target_lines:
     required_binary_proof:
       - factorio_1.0
   factorio_0_17:
-    version: "1.7.0"
+    version: "1.7.1"
     branch: tmp/0.17
     target_factorio: "0.17"
     support_class: reduced-native-infinite

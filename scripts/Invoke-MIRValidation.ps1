@@ -407,6 +407,27 @@ Invoke-RepoCheck "unsafe pickup reach technology effects are blocked" {
   }
 }
 
+Invoke-RepoCheck "generated technology graph safety is iterative" {
+  $graphSafetyPath = Join-Path $repo "prototypes\mir\emit\technology_graph_safety.lua"
+  $graphSafetyText = Get-Content -Raw -LiteralPath $graphSafetyPath
+  $stepsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\stage\data_final_fixes_steps.lua")
+  $stageText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\stage\data_final_fixes.lua")
+  foreach ($snippet in @(
+      'local stack = {{name = root_name, entered = false}}',
+      'while #stack > 0 do',
+      'MIR generated technology prerequisite cycle:',
+      'generated_registry.sorted_generated_technology_names()'
+    )) {
+    if (-not $graphSafetyText.Contains($snippet)) {
+      throw "Iterative generated technology graph safety is missing '$snippet'."
+    }
+  }
+  if (-not $stepsText.Contains('require("prototypes.mir.emit.technology_graph_safety").assert_registered_technologies()') -or
+      -not $stageText.Contains('steps.assert_registered_technology_safety()')) {
+    throw "Generated technology graph safety is not wired into data-final-fixes."
+  }
+}
+
 Invoke-RepoCheck "merged trash-slot technology has save migration" {
   $migrationPath = Join-Path $repo "migrations\more-infinite-research_2.0.5.json"
   if (-not (Test-Path -LiteralPath $migrationPath)) {

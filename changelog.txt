@@ -1,4 +1,14 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.7.1
+Date: 2026-07-13
+
+  Bugfixes:
+
+    - Added strict generated-technology prerequisite graph checks to the Factorio 0.17 line.
+    - Replaced recursive graph traversal with a deterministic iterative walk for deep modded technology trees.
+    - Preserved rejection of missing, disabled, and cyclic prerequisite paths without importing newer game features.
+
+---------------------------------------------------------------------------------------------------
 Version: 1.7.0
 Date: 2026-07-10
 

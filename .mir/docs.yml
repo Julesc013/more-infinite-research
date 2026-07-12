@@ -1,6 +1,22 @@
 schema: 1
 
 docs:
+  - path: docs/releases/1.7.1-validation-summary.md
+    title: "MIR 1.7.1 Validation Summary"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-1.7.1-validation
+  - path: docs/releases/release-notes-1.7.1.md
+    title: "MIR 1.7.1 Candidate Notes"
+    status: current
+    audience: player
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-1.7.1-release-notes
   - path: docs/adr/0001-mir-3-compatibility-compiler-architecture.md
     title: "ADR 0001: MIR 3.0 Compatibility Compiler Architecture"
     status: current

@@ -141,6 +141,7 @@ modules:
     - prototypes/mir/emit/stream_spec_adapter.lua
     - prototypes/mir/emit/base_extensions.lua
     - prototypes/mir/emit/effect_safety.lua
+    - prototypes/mir/emit/technology_graph_safety.lua
     - prototypes/mir/emit/icon_builder.lua
     - prototypes/mir/emit/mod_data.lua
   report:
