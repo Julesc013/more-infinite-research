@@ -93,10 +93,24 @@ superseded_candidates:
 
 candidate:
   artifact: dist/more-infinite-research_3.1.0.zip
-  source_commit: pending
-  automated_gate: pending
+  source_commit: 2490d2d9a700eff631851b2ff27d116ccdb5ec16
+  package_source_commit: 4cdb8595de94316b45169e1722d623684d9086a1
+  sha256: 7CC222EC860F21EBAA5C3E72F2C42BD97BF7A8DA8AE938AFA57D83994991676D
+  package_content_sha256: 689BBB236E96177FB45254711C1FF0ECAAEFC556A923633F783D7345B418F247
+  package_source_sha256: 689BBB236E96177FB45254711C1FF0ECAAEFC556A923633F783D7345B418F247
+  target_profile_sha256: C584A745225E7CAD7A245A1A039064F9878E7DC951D3012AD92809CE00A9DAF6
+  required_groups_sha256: 57A1DF87A8FB594B2B51C7E230D775E88028F23D52DF9D5D7DA1336F9271C78A
+  validation_package_sha256: 7CC222EC860F21EBAA5C3E72F2C42BD97BF7A8DA8AE938AFA57D83994991676D
+  validation_harness_sha256: 05E78669930E13905F03466740ED5E55044051C7263B4AE6B68BEA897B5E4FF2
+  expected_scenarios_sha256: 2F1E608A1E1374A3B859724264FCB4408FBC068437AC199528351313F91E271D
+  structured_summary_path: .mir/evidence/3.1.0-rc3-validation-summary.json
+  structured_summary_run_id: c0638088-e8d3-4ab0-bc65-4d6c910376aa
+  upgrade_evidence_path: .mir/evidence/3.1.0-rc2-upgrade-proof.json
+  ecosystem_evidence_path: .mir/evidence/3.1.0-rc2-ecosystem-campaign.json
+  interactive_evidence_path: .mir/evidence/3.1.0-rc2-interactive-review.json
+  automated_gate: passed
   manual_gate: pending
-  status: rebuilding-after-package-visible-change
+  status: release-candidate-awaiting-manual-review
 
 rules:
   - dev-remains-the-canonical-modern-implementation
