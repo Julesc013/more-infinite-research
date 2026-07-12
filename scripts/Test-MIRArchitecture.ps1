@@ -157,7 +157,7 @@ $entrypoints = @(
     Root = "data-final-fixes.lua"
     StageModule = "prototypes.mir.stage.data_final_fixes"
     StagePath = "prototypes/mir/stage/data_final_fixes.lua"
-    StageNeedle = 'require("prototypes.mir.stage.data_final_fixes_steps")'
+    StageNeedle = 'require("prototypes.mir.pipeline.commands")'
   },
   @{
     Root = "control.lua"
@@ -248,6 +248,7 @@ $requiredMirFiles = @(
   "prototypes/mir/index/relationships.lua",
   "prototypes/mir/index/productivity_owners.lua",
   "prototypes/mir/domain/facts/registry.lua",
+  "prototypes/mir/domain/facts/recipe_semantics.lua",
   "prototypes/mir/domain/effects/metadata.lua",
   "prototypes/mir/domain/facts/generated_technology_registry.lua",
   "prototypes/mir/capabilities/contract.lua",
@@ -260,8 +261,10 @@ $requiredMirFiles = @(
   "prototypes/mir/capabilities/science_integration/science_packs.lua",
   "prototypes/mir/capabilities/science_integration/science_selector.lua",
   "prototypes/mir/planner/compiler.lua",
+  "prototypes/mir/planner/compilation_plan.lua",
   "prototypes/mir/planner/stream_compiler.lua",
   "prototypes/mir/planner/generation_plan.lua",
+  "prototypes/mir/planner/output_validator.lua",
   "prototypes/mir/planner/costs.lua",
   "prototypes/mir/planner/direct_effects.lua",
   "prototypes/mir/planner/native_modifiers.lua",
@@ -327,12 +330,10 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 $dataFinalFixesStageText = Read-MIRFile -RelativePath "prototypes/mir/stage/data_final_fixes.lua"
-Assert-MIRContains -RelativePath "prototypes/mir/stage/data_final_fixes.lua" -Text $dataFinalFixesStageText -Needle "steps.apply_compatibility_repairs()"
-Assert-MIRContains -RelativePath "prototypes/mir/stage/data_final_fixes.lua" -Text $dataFinalFixesStageText -Needle "steps.apply_pipeline_extent()"
-Assert-MIRContains -RelativePath "prototypes/mir/stage/data_final_fixes.lua" -Text $dataFinalFixesStageText -Needle "steps.emit_streams()"
-Assert-MIRContains -RelativePath "prototypes/mir/stage/data_final_fixes.lua" -Text $dataFinalFixesStageText -Needle 'require("prototypes.mir.compatibility.diagnostics.registry").emit_all()'
-Assert-MIRContains -RelativePath "prototypes/mir/stage/data_final_fixes.lua" -Text $dataFinalFixesStageText -Needle 'require("prototypes.mir.planner.compiler").emit()'
-Assert-MIRContains -RelativePath "prototypes/mir/stage/data_final_fixes.lua" -Text $dataFinalFixesStageText -Needle "steps.assert_registered_technology_safety()"
+Assert-MIRContains -RelativePath "prototypes/mir/stage/data_final_fixes.lua" -Text $dataFinalFixesStageText -Needle "commands.run_all()"
+if ($dataFinalFixesStageText -match 'commands\.run\("') {
+  throw "Data-final-fixes stage must execute the governed command DAG, not name individual commands."
+}
 
 $dataFinalFixesStepsText = (Read-MIRFile -RelativePath "prototypes/mir/stage/data_final_fixes_steps.lua") + "`n" +
   (Read-MIRFile -RelativePath "prototypes/mir/pipeline/commands.lua")
@@ -343,13 +344,15 @@ foreach ($needle in @(
   'require("prototypes.mir.settings.pipeline_extent").multiplier()',
   'require("prototypes.mir.pipeline.extent").apply(multiplier)',
   'require("prototypes.mir.policy.competing_productivity").prepare()',
-  'require("prototypes.mir.planner.stream_compiler").run()',
-  'require("prototypes.mir.emit.base_extensions").emit_all()',
-  'require("prototypes.mir.policy.competing_productivity").apply()',
-  'require("prototypes.mir.policy.competing_base_extensions").apply()',
-  'require("prototypes.mir.policy.weapon_speed").apply()',
-  'require("prototypes.mir.policy.max_level").apply()',
+  'require("prototypes.mir.planner.compilation_plan").compile()',
+  'require("prototypes.mir.planner.compilation_plan").apply_streams()',
+  'require("prototypes.mir.planner.compilation_plan").apply_base_extensions()',
+  'require("prototypes.mir.pipeline.mutations.competing_productivity").apply()',
+  'require("prototypes.mir.pipeline.mutations.competing_base_extensions").apply()',
+  'require("prototypes.mir.pipeline.mutations.weapon_speed").apply()',
+  'require("prototypes.mir.pipeline.mutations.max_level").apply()',
   'require("prototypes.mir.compatibility.planner").emit()',
+  'require("prototypes.mir.planner.compilation_plan").assert_output()',
   'require("prototypes.mir.emit.effect_safety").assert_registered_technology_effects()',
   'require("prototypes.mir.emit.technology_graph_safety").assert_registered_technologies()',
   'require("prototypes.mir.report.diagnostics_sink").flush()'
@@ -357,7 +360,7 @@ foreach ($needle in @(
   Assert-MIRContains -RelativePath "prototypes/mir/stage/data_final_fixes_steps.lua" -Text $dataFinalFixesStepsText -Needle $needle
 }
 
-$stageStepsOnlyText = Read-MIRFile -RelativePath "prototypes/mir/stage/data_final_fixes_steps.lua"
+$commandCatalogText = Read-MIRFile -RelativePath "prototypes/mir/pipeline/commands.lua"
 foreach ($commandId in @(
   "compatibility-repairs",
   "module-permissions",
@@ -365,22 +368,26 @@ foreach ($commandId in @(
   "pipeline-extent",
   "prepare-competing-productivity",
   "prepare-competing-base-extensions",
+  "compile-generation-plan",
   "emit-streams",
   "apply-competing-productivity",
   "emit-base-extensions",
   "apply-competing-base-extensions",
   "weapon-speed-adjustments",
   "max-level-control",
-  "assert-technology-safety"
+  "emit-compatibility-diagnostics",
+  "emit-compiler-reports",
+  "emit-compatibility-planner",
+  "assert-plan-output",
+  "assert-technology-safety",
+  "flush-diagnostics"
 )) {
   Assert-MIRContains `
-    -RelativePath "prototypes/mir/stage/data_final_fixes_steps.lua" `
-    -Text $stageStepsOnlyText `
-    -Needle ('commands.run("' + $commandId + '")')
+    -RelativePath "prototypes/mir/pipeline/commands.lua" `
+    -Text $commandCatalogText `
+    -Needle ('["' + $commandId + '"]')
 }
-if ($stageStepsOnlyText -match 'require\("prototypes\.mir\.(pipeline\.(extent|prototype_limits|module_permissions)|policy\.(competing_productivity|competing_base_extensions|max_level|weapon_speed)|planner\.stream_compiler|emit\.base_extensions|compatibility\.repairs\.)') {
-  throw "Data-final-fixes stage wrappers must execute mutators and emitters only through pipeline commands."
-}
+Assert-MIRContains -RelativePath "prototypes/mir/pipeline/commands.lua" -Text $commandCatalogText -Needle "function M.run_all()"
 
 $technologyBuilderText = Read-MIRFile -RelativePath "prototypes/mir/emit/technology_builder.lua"
 Assert-MIRContains -RelativePath "prototypes/mir/emit/technology_builder.lua" -Text $technologyBuilderText -Needle 'require("prototypes.mir.platform.factorio.data_raw")'
@@ -418,6 +425,22 @@ Assert-MIRContains -RelativePath "prototypes/mir/planner/generation_plan.lua" -T
 $familyRegistryText = Read-MIRFile -RelativePath "prototypes/mir/families/registry.lua"
 Assert-MIRContains -RelativePath "prototypes/mir/families/registry.lua" -Text $familyRegistryText -Needle "FamilyRule must be data-only"
 Assert-MIRContains -RelativePath "prototypes/mir/families/registry.lua" -Text $familyRegistryText -Needle "Duplicate FamilyRule id"
+
+foreach ($relativePath in @(
+  "prototypes/mir/policy/competing_productivity.lua",
+  "prototypes/mir/policy/competing_base_extensions.lua",
+  "prototypes/mir/policy/productivity_family_adoption.lua",
+  "prototypes/mir/policy/weapon_speed.lua",
+  "prototypes/mir/policy/max_level.lua"
+)) {
+  $policyText = Read-MIRFile -RelativePath $relativePath
+  if ($policyText -match '(?:tech|technology|owner)\.(?:effects|max_level)\s*=(?!=)' -or $policyText -match 'replace_technology\(') {
+    throw "Policy module retains prototype mutation: $relativePath"
+  }
+}
+
+$adoptionTransactionText = Read-MIRFile -RelativePath "prototypes/mir/emit/transactions/productivity_family_adoption.lua"
+Assert-MIRContains -RelativePath "prototypes/mir/emit/transactions/productivity_family_adoption.lua" -Text $adoptionTransactionText -Needle "table.insert(owner.effects, effect)"
 
 $settingsProfileText = Read-MIRFile -RelativePath "prototypes/mir/runtime/settings_profile.lua"
 Assert-MIRContains -RelativePath "prototypes/mir/runtime/settings_profile.lua" -Text $settingsProfileText -Needle '"mir-settings-export"'
