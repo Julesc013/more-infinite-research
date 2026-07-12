@@ -2843,7 +2843,13 @@ $defaultEnabledBaseExtensionKeys = @(
   "weapon-shooting-speed",
   "laser-shooting-speed"
 )
-if ($isFactorio014Line -or $isFactorio015Line -or $isFactorio016Line) {
+if ($isFactorio014Line) {
+  $defaultEnabledBaseExtensionKeys = @(
+    "research-speed",
+    "worker-robots-storage",
+    "laser-shooting-speed"
+  )
+} elseif ($isFactorio015Line -or $isFactorio016Line) {
   $defaultEnabledBaseExtensionKeys = @($defaultEnabledBaseExtensionKeys | Where-Object { $_ -ne "weapon-shooting-speed" })
 }
 
