@@ -69,6 +69,8 @@ $luaClaimRegistryPath = Join-Path $repo "prototypes\mir\compatibility\claim_regi
 $policyText = Get-Content -Raw -LiteralPath $policyPath
 $contractText = Get-Content -Raw -LiteralPath $contractPath
 $capabilityRegistryText = Get-Content -Raw -LiteralPath $capabilityRegistryPath
+$productivityStreamsText = Get-Content -Raw -LiteralPath $productivityStreamsPath
+$directEffectStreamsText = Get-Content -Raw -LiteralPath $directEffectStreamsPath
 $manifest = Read-MIRJson -Path $manifestPath
 $claims = Read-MIRJson -Path $claimsPath
 $supportLanes = Read-MIRJson -Path $supportLanePath
@@ -118,6 +120,7 @@ if ([int](Get-MIRProperty -Object $claims -Name "schema" -Default 0) -ne 1) {
 $manifestStreamIds = @{}
 $manifestStreamKeys = @{}
 $manifestGeneratedTechnologies = @{}
+$manifestTechnologyByStreamKey = @{}
 foreach ($streamProperty in @($streams.PSObject.Properties)) {
   $streamId = [string]$streamProperty.Name
   $stream = $streamProperty.Value
@@ -137,6 +140,7 @@ foreach ($streamProperty in @($streams.PSObject.Properties)) {
   $manifestStreamIds[$streamId] = $true
   $manifestStreamKeys[$streamKey] = $true
   $manifestGeneratedTechnologies[$generatedTechnology] = $true
+  $manifestTechnologyByStreamKey[$streamKey] = $generatedTechnology
 }
 
 $sourceStreamKeys = @(
@@ -151,7 +155,13 @@ foreach ($streamKey in $sourceStreamKeys) {
 
   $expectedGeneratedTechnology = "recipe-prod-$streamKey-1"
   if (-not $manifestGeneratedTechnologies[$expectedGeneratedTechnology]) {
-    throw "Generated stream manifest missing emitted technology id for $streamKey`: $expectedGeneratedTechnology"
+    $declaredTechnology = [string]$manifestTechnologyByStreamKey[$streamKey]
+    $escapedTechnology = [regex]::Escape($declaredTechnology)
+    $sourceDeclaresTechnology = $productivityStreamsText -match "technology_name\s*=\s*`"$escapedTechnology`"" -or
+      $directEffectStreamsText -match "technology_name\s*=\s*`"$escapedTechnology`""
+    if (-not $sourceDeclaresTechnology) {
+      throw "Generated stream manifest missing default id and source-owned technology_name for $streamKey`: $expectedGeneratedTechnology"
+    }
   }
 }
 
