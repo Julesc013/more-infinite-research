@@ -229,6 +229,20 @@ release_artifacts:
       github_release: https://github.com/Julesc013/more-infinite-research/releases/tag/3.1.0
       mod_portal_upload: blocked-missing-mod-upload-api-key
       status: published
+    mir_2_4_0:
+      version: "2.4.0"
+      branch: tmp/2.0
+      target_factorio: "2.0"
+      source_anchor: mir_3_1_0
+      source_commit: b9172ab1ab3fc75ba0c1dec79cc9f2c3ae6063c3
+      release_commit: 575fc4f5ae4a52205d1e72604934ead35e69c99e
+      tag: "2.4.0"
+      artifact: dist/more-infinite-research_2.4.0.zip
+      sha256: 8618CAF031EF24EB83641DB03566F2390DD29AD98D2099A80D596EEB527EDA12
+      size_bytes: 344995
+      publication_scope: github-release
+      github_release: https://github.com/Julesc013/more-infinite-research/releases/tag/2.4.0
+      status: published
     mir_2_3_0:
       version: "2.3.0"
       branch: legacy
@@ -333,10 +347,10 @@ release_artifacts:
       status: published
   next_release_targets:
     current_line:
-      version: "3.1.0"
+      version: "3.2.0"
       branch: dev
       target_factorio: "2.1"
-      purpose: bounded correctness, contract modernization, deterministic packaging, and fixture-backed capability expansion from the frozen 3.0.5 baseline
+      purpose: plan-first automatic family compiler development from the immutable 3.1.0 behavior baseline
     factorio_1_1_port:
       version: "1.9.3"
       branch: tmp/1.1
@@ -367,10 +381,10 @@ release_artifacts:
       target_factorio: "0.15"
       purpose: earliest plausible native-infinite floor after old-science proof
     current_line_feature:
-      version: "3.1.0"
+      version: "3.2.0"
       branch: dev
       target_factorio: "2.1"
-      purpose: fixture-backed overhaul compatibility support campaign after the 3.0.5 patch
+      purpose: whole-plan validation, consolidated facts, attach-only family automation, and reviewed compatibility packs
   package_refresh_rule: >-
     only build or refresh dist archives for an unpublished target version;
     never refresh already-published archives as part of architecture or

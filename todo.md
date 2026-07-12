@@ -6,10 +6,10 @@ This file is the concise executable queue. Detailed scope, decisions, evidence, 
 
 ## Current Truth
 
-- MIR 3.0.5 is published and frozen. Its archive SHA-256 is `40AF95C3F4411DDF6C24C98897489D696339A1B85B0439FA4A3BDFEDDDF0E5C5`; never rebuild it.
-- MIR 2.3.5 is qualified on `tmp/2.0` at evidence commit `7588eadc18f49f60d17d145ce366b5a777d9be43`. Its frozen candidate archive SHA-256 is `97B3DC9B6E352C6C4B8FF76D77020333FAAFFE93BD89EDB6B8F3370405ED68DE`.
-- The 2.3.5 automated, release-targeted, exact-dist base/Space Age, and 2.3.0 upgrade gates pass. Interactive settings UI and retained-value inspection remains before promotion, tag, or publication.
-- Package-visible 3.1 implementation does not start until 2.3.5 is published and frozen.
+- MIR 3.0.5 and 3.1.0 are published and frozen for Factorio 2.1. Their exact archives must never be rebuilt.
+- MIR 2.3.5 is frozen on `legacy`; MIR 2.4.0 is published and frozen on `tmp/2.0` with SHA-256 `8618CAF031EF24EB83641DB03566F2390DD29AD98D2099A80D596EEB527EDA12`.
+- `tmp/1.1` has a qualified 1.9.4 candidate. `tmp/1.0` has a staged but unqualified 1.8.2 candidate and still requires valid runtime proof.
+- Active `dev` work starts from the immutable 3.1.0 behavior baseline and implements the automatic family compiler contract without altering released bytes.
 
 ## Authoritative Records
 
@@ -22,12 +22,12 @@ This file is the concise executable queue. Detailed scope, decisions, evidence, 
 
 ## Next Actions
 
-1. Inspect the exact 2.3.5 archive in the Factorio 2.0 startup settings UI, confirm retained weapon/profile values and recycler/cap/scope independence, then record acceptance without rebuilding.
-2. Promote the exact 2.3.5 candidate to `legacy`, rerun freshness, tag, upload, verify public Factorio 2.0 visibility, and mark the archive published/frozen.
-3. Create `pre-3.1-modernization` from released 3.0.5 plus accepted portable-return records.
-4. Execute the 3.1 plan in dependency order and stop at every release gate.
-5. Create 2.4.0 from the accepted 3.1 source anchor and apply only positive Factorio 2.0 target cuts.
-6. Replay the final portable patch set to older targets and complete a fixed-point sweep.
+1. Compile all existing streams into one pure `GenerationPlan`, validate the complete plan, then emit with stable-ID and output parity.
+2. Consolidate RecipeFactV2 and shared relationship indexes.
+3. Add data-only family rules and fixture-backed attach-only automation; create no new technology IDs in this gate.
+4. Separate production compatibility policy from fixture-only profiles and add data-only compatibility packs.
+5. Upgrade scenario declarations and golden-plan evidence, then run static, full Factorio 2.1, exact-package, upgrade, performance, and interactive gates.
+6. Complete old-target qualification and one portable-return fixed-point sweep independently.
 
 ## Recurring Release Gate
 

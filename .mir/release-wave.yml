@@ -116,10 +116,30 @@ waves:
     version: "2.4.0"
     branch: tmp/2.0
     source_anchor_required: accepted-3.1.0
-    status: implementation-authorized
+    source_commit: b9172ab1ab3fc75ba0c1dec79cc9f2c3ae6063c3
+    release_commit: 575fc4f5ae4a52205d1e72604934ead35e69c99e
+    tag: "2.4.0"
+    archive: dist/more-infinite-research_2.4.0.zip
+    sha256: 8618CAF031EF24EB83641DB03566F2390DD29AD98D2099A80D596EEB527EDA12
+    size_bytes: 344995
+    scenario_count: 78
+    exact_dist_base: passed
+    exact_dist_space_age: passed
+    upgrade_from_2_3_5: passed
+    release_targeted_gate: passed
+    automated_gate: passed
+    interactive_gate: passed
+    published_at: 2026-07-12T01:02:42Z
+    github_release: https://github.com/Julesc013/more-infinite-research/releases/tag/2.4.0
+    publication_evidence: .mir/evidence/2.4.0-publication.md
+    mod_portal_upload: blocked-missing-mod-upload-api-key
+    status: published-frozen
 
   mir_3_2_0:
     version: "3.2.0"
     branch: dev
     source_anchor_required: stable-3.1.0-and-2.4.0
-    status: gated-roadmap
+    implementation_gate: authorized-by-maintainer-directed-continuation
+    behavior_baseline: immutable-3.1.0
+    architecture_contract: docs/architecture/automatic-family-compiler.md
+    status: implementation-in-progress

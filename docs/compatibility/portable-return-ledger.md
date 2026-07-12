@@ -24,12 +24,15 @@ superseded_by: []
 | PL-004 | Raw text hashes drift across CRLF and LF checkouts | `portable-tooling` | Keep normalized identities | Replay the final identity implementation | Complete |
 | PL-005 | Content equality alone does not prove the exact frozen archive loads | `portable-tooling` | Require exact-dist and upgrade proof in the wave contract | Preserve base, Space Age, and upgrade logs | Accepted for 3.1 |
 | PL-006 | Factorio 2.1 cargo and dependency surfaces are invalid 2.0 defaults | `target-local-feature-cut` | Reject from `dev` | Keep target-owned exclusions | Complete |
+| PL-007 | Runtime validation used a Factorio-line test instead of positive capabilities | `portable-tooling` | Use capability-driven dispatch | Execute all positively declared 2.0 gates | Accepted for next `dev` |
+| PL-008 | Shared fixtures assumed 2.1 science, recycler, and setting shapes | `portable-fixture` | Derive assertions from target capabilities | Use the positive 2.0 profile | Accepted for next `dev` |
+| PL-009 | Upgrade automation encoded one release pair | `portable-tooling` | Parameterize prior/current/fixture identities | Prove exact 2.3.5 to 2.4.0 retention | Accepted for next `dev` |
 
 ## Fixed-Point Rule
 
 The convergence loop is not complete until one full old-target sweep produces zero new portable compiler fixes, reusable validation fixes, higher-target profile corrections, and package-governance fixes. Target-local schema, asset, and feature cuts do not restart unrelated targets.
 
-The current fixed point is open. MIR 2.3.5 produced accepted 3.1 tooling work, and the 1.1 through 0.6 refresh remains pending.
+The current fixed point is open. MIR 2.4.0 added three portable validation lessons. The 1.1 candidate is qualified, the 1.0 candidate is not yet runtime-qualified, and the remaining old-target sweep is pending.
 
 ## Release Boundaries
 

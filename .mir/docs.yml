@@ -138,6 +138,14 @@ docs:
     doc_type: explanation
     owner: mir-maintainers
     source_of_truth_for: []
+  - path: docs/architecture/automatic-family-compiler.md
+    title: "Automatic Family Compiler"
+    status: current
+    audience: maintainer
+    doc_type: explanation
+    owner: mir-maintainers
+    source_of_truth_for:
+      - automatic-family-compiler
   - path: docs/architecture/README.md
     title: "Architecture"
     status: current

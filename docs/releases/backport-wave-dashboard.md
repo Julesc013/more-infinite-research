@@ -18,9 +18,9 @@ superseded_by: []
 | --- | ---: | --- | --- | --- | --- | --- | --- |
 | Factorio 2.1 | 3.1.0 | `main` | `0dd8d7f` package source / `6272cb6` release | `0244D40A...7C1A` | 82 scenarios, exact upgrade, performance budgets, and interactive review passed | GitHub published and frozen | Mod Portal upload API key |
 | Factorio 2.0 | 2.3.5 | `legacy` | `861565d` source / `9eabc54` promotion | `97B3DC9B...68DE` | 71 scenarios, targeted gate, exact-dist base/Space Age, and upgrade passed | Tagged and frozen | External upload credentials |
-| Factorio 2.0 | 2.4.0 | `tmp/2.0` | Accepted 3.1.0 anchor | Pending | Port and target-specific proof pending | Implementation authorized | Factorio 2.0 adaptation and validation |
-| Factorio 1.1 | 1.9.4 planned | `tmp/1.1` | Pending replay | Pending | Binary available | Refresh pending | Final portable patch set |
-| Factorio 1.0 | 1.8.2 planned | `tmp/1.0` | Pending replay | Pending | Binary available | Refresh pending | Final portable patch set |
+| Factorio 2.0 | 2.4.0 | `tmp/2.0` | `b9172ab` source / `575fc4f` release | `8618CAF0...A12` | 78 scenarios, exact-dist base/Space Age, upgrade, performance, and interactive review passed | GitHub published and frozen | Mod Portal upload API key |
+| Factorio 1.1 | 1.9.4 | `tmp/1.1` | `4f3962f` qualified candidate | `431CD5B0...A46E` | Factorio 1.1.110 reduced full gate, exact dist, reload, and upgrade passed | Candidate qualified | Publication gate |
+| Factorio 1.0 | 1.8.2 staged | `tmp/1.0` | `aeb1483` staged candidate | `4ED750E5...0D3C` | Static package staging only; prior exact-save automation did not load MIR | Unqualified | Correct Factorio 1.0 runtime proof |
 | Factorio 0.18 | 1.8.0 | `tmp/0.18` | Published frozen evidence | `D785E6EB...7B24` | 0.18 and 1.0 bridge passed | Frozen verified | None |
 | Factorio 0.17 | 1.7.1 planned | `tmp/0.17` | Pending replay | Pending | Binary available | Refresh pending | Final portable patch set |
 | Factorio 0.16 | 1.6.0 planned | `tmp/0.16` | Pending proof | Pending | Binary available | Discovery | Old-science adapter proof |
@@ -30,11 +30,11 @@ superseded_by: []
 
 ## Immediate Gate
 
-MIR 3.1.0 and 2.3.5 are immutable anchors. Seed the 2.4.0 work only from the accepted 3.1.0 source and apply explicit positive Factorio 2.0 target cuts; do not merge target-local metadata back into `dev`.
+MIR 3.1.0, 2.3.5, and 2.4.0 are immutable anchors. Continue the plan-first automatic family compiler on `dev` from the released 3.1.0 behavior baseline. Do not merge Factorio 2.0 metadata or feature cuts upward.
 
 ## Next Executable Sequence
 
-1. Create 2.4.0 on `tmp/2.0` from the accepted 3.1.0 source anchor and apply only positive Factorio 2.0 target cuts.
-2. Re-run static, architecture, target-profile, fixture, exact-package, upgrade, performance, and interactive gates on Factorio 2.0.
-3. Promote the independently accepted 2.4.0 archive without changing the frozen 2.3.5 or 3.1.0 bytes.
-4. Replay the final portable patch set to older targets and run one full fixed-point sweep.
+1. Compile all fixed streams through a pure whole-plan validation gate without changing their stable IDs.
+2. Consolidate recipe facts and indexes, then enable fixture-backed attach-only family rules.
+3. Keep ambiguous candidates diagnostic-only and prove decisions with golden plans and target runtime scenarios.
+4. Finish the independently qualified old-target candidates without changing any published archive bytes.
