@@ -250,6 +250,30 @@ docs:
     doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
+  - path: docs/releases/1.9.4-checklist.md
+    title: "MIR 1.9.4 Candidate Checklist"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-1.9.4-candidate-gate
+  - path: docs/releases/1.9.4-validation-summary.md
+    title: "MIR 1.9.4 Validation Summary"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-1.9.4-validation-result
+  - path: docs/releases/release-notes-1.9.4.md
+    title: "MIR 1.9.4 Candidate Notes"
+    status: current
+    audience: player
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-1.9.4-candidate-notes
   - path: docs/archive/2.x/release-notes-2.0.5.md
     title: "More Infinite Research 2.0.5 Release Notes"
     status: archived

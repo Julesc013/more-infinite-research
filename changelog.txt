@@ -1,4 +1,22 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.9.4
+Date: 2026-07-12
+
+  Compatibility:
+
+    - Kept the reduced Factorio 1.1 feature surface from 1.9.3 without importing Factorio 2.x metadata or unsupported effects.
+    - Added deterministic generated-prerequisite reachability checks using Factorio 1.1 tool-based science packs.
+    - Rejected disabled, cyclic, self-locked, and unrecognized science paths when selecting generated prerequisites.
+    - Restricted weapon-speed cleanup to technologies registered as MIR-generated.
+    - Preserved external infinite weapon-speed continuations as target-owned compatibility authorities.
+
+  Changes:
+
+    - Added the shared recipe-unlock fact index and researchability authority used by prerequisite planning.
+    - Added exact Factorio 1.1 safeguards for generated graph reachability and external weapon continuation ownership.
+    - Expanded automatic compatibility coverage for both new safeguards.
+
+---------------------------------------------------------------------------------------------------
 Version: 1.9.3
 Date: 2026-07-10
 

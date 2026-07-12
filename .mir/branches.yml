@@ -102,6 +102,14 @@ release_artifacts:
       entries: 121
       forbidden_entries: 0
       status: release-candidate
+    mir_1_9_4:
+      version: "1.9.4"
+      branch: tmp/1.1
+      target_factorio: "1.1"
+      source_anchor: mir_1_9_3
+      artifact: dist/more-infinite-research_1.9.4.zip
+      automated_gate: pending-final-package
+      status: candidate-building
   closed_versions:
     - version: "2.2.0"
       branch: main
@@ -120,7 +128,7 @@ release_artifacts:
       target_factorio: "2.1"
       purpose: accumulated portable fixes, compatibility lessons, tooling updates, docs corrections, and community feedback after the 3.0.0 backport rings
     factorio_1_1_port:
-      version: "1.9.3"
+      version: "1.9.4"
       branch: tmp/1.1
       target_factorio: "1.1"
     factorio_0_18_bridge:
