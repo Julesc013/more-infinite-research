@@ -1,0 +1,37 @@
+   0.001 2026-07-13 08:57:00; Factorio 0.16.51 (build 36654, win64, alpha)
+   0.001 Operating system: Windows 10 (build 19045)
+   0.001 Not rotating logs.
+   0.001 Program arguments: "D:\Programs\Factorio\0.16\bin\x64\factorio.exe" "--config" "C:\Projects\Factorio\more-infinite-research-tmp-0.16\artifacts\old-wave\1.6.0\config-reload.ini" "--no-log-rotation" "--disable-audio" "--mod-directory" "C:\Projects\Factorio\more-infinite-research-tmp-0.16\artifacts\old-wave\1.6.0\mods" "--start-server" "C:\Projects\Factorio\more-infinite-research-tmp-0.16\artifacts\old-wave\1.6.0\fresh-1.6.0.zip"
+   0.002 Read data path: D:/Programs/Factorio/0.16/data
+   0.002 Write data path: C:/Projects/Factorio/more-infinite-research-tmp-0.16/artifacts/old-wave/1.6.0/user-reload [18457/450559MB]
+   0.002 Binaries path: D:/Programs/Factorio/0.16/bin
+   0.010 System info: [CPU: Intel(R) Core(TM) i7-7700HQ CPU @ 2.80GHz, 8 cores, RAM: 9734/16257 MB, page: 15259/19160 MB, virtual: 4243/134217727 MB, extended virtual: 0 MB]
+   0.010 Running in headless mode
+   0.020 Loading mod settings more-infinite-research 1.6.0 (settings.lua)
+   0.034 Loading mod core 0.0.0 (data.lua)
+   0.051 Loading mod base 0.16.51 (data.lua)
+   0.205 Loading mod more-infinite-research 1.6.0 (data.lua)
+   0.253 Loading mod base 0.16.51 (data-updates.lua)
+   0.297 Loading mod more-infinite-research 1.6.0 (data-updates.lua)
+   0.339 Loading mod more-infinite-research 1.6.0 (data-final-fixes.lua)
+   0.358 Script @__more-infinite-research__/prototypes/mir/planner/stream_compiler.lua:117: [more-infinite-research] Skipping stream research_cannon_shooting_speed because missing required technology weapon-shooting-speed-5.
+   0.416 Checksum for core: 840319042
+   0.417 Checksum of base: 3323233190
+   0.417 Checksum of more-infinite-research: 3471108743
+   0.505 Info PlayerData.cpp:65: Local player-data.json available, timestamp 1783896867
+   0.505 Info PlayerData.cpp:72: Cloud player-data.json unavailable
+   0.508 Info GlobalContext.cpp:1102: Resetting config.
+   0.508 Custom inputs active: 0
+   0.509 Factorio initialised
+   0.510 Info ServerSynchronizer.cpp:29: nextHeartbeatSequenceNumber(0) initialized Synchronizer nextTickClosureTick(0).
+   0.510 Info ServerMultiplayerManager.cpp:699: mapTick(4294967295) changing state from(Ready) to(PreparedToHostGame)
+   0.510 Info ServerMultiplayerManager.cpp:699: mapTick(4294967295) changing state from(PreparedToHostGame) to(CreatingGame)
+   0.511 Loading map C:\Projects\Factorio\more-infinite-research-tmp-0.16\artifacts\old-wave\1.6.0\fresh-1.6.0.zip: 900561 bytes.
+   0.592 Loading Level.dat: 1157922 bytes.
+   0.599 Info Scenario.cpp:136: Map version 0.16.51-0
+   0.630 Loading script.dat: 231 bytes.
+   0.634 Checksum for script C:/Projects/Factorio/more-infinite-research-tmp-0.16/artifacts/old-wave/1.6.0/user-reload/temp/currently-playing/control.lua: 950616531
+   0.636 Checksum for script __more-infinite-research__/control.lua: 3842758460
+   0.636 Info UDPSocket.cpp:27: Opening socket at (IP ADDR:({0.0.0.0:34197}))
+   0.637 Hosting game at IP ADDR:({0.0.0.0:34197})
+   0.638 Info HttpSharedState.cpp:54: Downloading https://auth.factorio.com/generate-server-padlock-2
