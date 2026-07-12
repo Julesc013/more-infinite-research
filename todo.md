@@ -24,7 +24,7 @@ This is the executable release queue. `.mir/release-wave.yml` is the machine-rea
 - [x] Keep generated-node cycles, missing prerequisites, and disabled prerequisites fatal.
 - [x] Replace recursive graph walking with a deterministic iterative walk and a 4,096-node regression.
 - [x] Add exact local closure metadata for Astroponics, Muluna, and Secretas; the available Astroponics 1.7.3 archive fails earlier on its own removed Factorio helper and does not qualify as MIR load evidence.
-- [ ] Bind the complete 91-scenario Factorio 2.1 matrix, exact archive, upgrade, and available ecosystem checks to the clean 3.1.2 candidate.
+- [x] Bind the complete 91-scenario Factorio 2.1 matrix, exact archive, 3.0.5 upgrade, and nine available ecosystem checks to the clean 3.1.2 candidate.
 
 ### Implemented
 

@@ -234,10 +234,12 @@ release_artifacts:
       branch: dev
       target_factorio: "2.1"
       source_anchor: mir_3_1_1
-      source_commit: pending-current-dev-head
-      release_gate: pending-hotfix-full-matrix
+      source_commit: b36996a30bf2def7d163c2f70472f3cc68ad92f6
+      artifact: dist/more-infinite-research_3.1.2.zip
+      sha256: D5BFA665DAF813718E4B6E948497FEC885B6A58F11E0C1FB6E1177807D9525F5
+      release_gate: automated-passed-manual-pending
       publication_status: unreleased
-      status: hotfix-validation
+      status: release-candidate-awaiting-manual-review
     mir_2_4_0:
       version: "2.4.0"
       branch: tmp/2.0

@@ -151,19 +151,24 @@ waves:
     baseline_tag: "3.1.1"
     baseline_commit: e91963cf5f20b7f8c785196840a6ebcae8e8dd66
     implementation_gate: emergency-hotfix-authorized-by-maintainer
-    source_commit: pending-hotfix-acceptance
+    source_commit: b36996a30bf2def7d163c2f70472f3cc68ad92f6
     architecture_contract: docs/architecture/module-boundaries.md
     stable_technology_id_count: 70
     generation_plan_schema: 3
     runtime_scenario_count: 91
-    structured_validation_evidence: pending
-    upgrade_evidence: pending
-    available_ecosystem_load_evidence: pending
-    exact_package_gate: pending
-    candidate_freshness_gate: rebuilding-after-package-visible-change
+    runtime_source_commit: b36996a30bf2def7d163c2f70472f3cc68ad92f6
+    package_source_commit: b36996a30bf2def7d163c2f70472f3cc68ad92f6
+    runtime_run_id: e25e2985-9285-4aa7-9175-1b0f29ceb61f
+    runtime_package_sha256: D5BFA665DAF813718E4B6E948497FEC885B6A58F11E0C1FB6E1177807D9525F5
+    structured_validation_evidence: .mir/evidence/3.1.2-rc1-validation-summary.json
+    upgrade_evidence: .mir/evidence/3.1.2-rc1/upgrade-proof.json
+    available_ecosystem_load_evidence: .mir/evidence/3.1.2-rc1-ecosystem/campaign-evidence.json
+    available_ecosystem_load_gate: 9-passed-zero-dependency-failures-load-claims-only
+    exact_package_gate: passed-base-space-age-and-deterministic-archive
+    candidate_freshness_gate: pending-clean-evidence-commit
     interactive_gate: pending
     publication_status: unreleased
-    status: hotfix-validation
+    status: release-candidate-awaiting-manual-review
 
   mir_2_4_0:
     version: "2.4.0"
