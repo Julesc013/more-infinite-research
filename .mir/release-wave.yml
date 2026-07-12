@@ -123,11 +123,11 @@ waves:
     pre_renumber_core_ecosystem_load_characterization: .mir/evidence/pre-3.1-renumber-core-ecosystems-load-campaign.json
     pre_renumber_aai_load_characterization: .mir/evidence/pre-3.1-renumber-aai-load-campaign.json
     automatic_compiler_runtime_summary: .mir/evidence/3.1.0-automatic-compiler-runtime-summary.json
-    runtime_source_commit: beffc50ba131b89432d9d4f388c66f3d002e7a22
-    runtime_run_id: bd1d26b1-b1ef-4c61-a7b5-b49a5ff964b0
+    runtime_source_commit: c6f2a576745e947f6c442da8a5081ee4b969174b
+    runtime_run_id: 4ef5ac51-c1e4-46e4-9aca-5a63b1bda15c
     runtime_scenario_count: 86
-    runtime_package_sha256: 0D9C944CF75F20ED7E9EDD120B3386A94B892382E479EAB4A80DA1AEC8C32005
-    runtime_package_content_sha256: 7D69861345FF48181C79E0D8A6E8C45C199AB23FA9770F5A95B2CC3CE508C8D9
+    runtime_package_sha256: E34250ECBFC247C81E576F73BB2F9265B8C97A1B61BB7226025C43B55265CB9C
+    runtime_package_content_sha256: DC661339F8CAF87F38DC2A91F4A5B44DC70F0D3F60DAB044DF386366CEE88587
     available_ecosystem_load_evidence: .mir/evidence/3.1.0-automatic-compiler-load-campaign.json
     available_ecosystem_dependency_lock_sha256: 1EC7AC252BE87094674B4311E12C175899580F22DC3A42CAFB1A385F47679CF5
     available_ecosystem_load_gate: superseded-by-package-visible-compiler-contract-change

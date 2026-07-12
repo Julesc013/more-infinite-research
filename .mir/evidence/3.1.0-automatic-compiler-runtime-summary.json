@@ -3,29 +3,29 @@
   "kind": "mir-automatic-compiler-runtime-summary",
   "release": "3.1.0",
   "publication_status": "unreleased",
-  "generated_at": "2026-07-12T10:02:05.8830103Z",
-  "source_commit": "beffc50ba131b89432d9d4f388c66f3d002e7a22",
+  "generated_at": "2026-07-12T10:34:26.188214Z",
+  "source_commit": "c6f2a576745e947f6c442da8a5081ee4b969174b",
   "source_tree_dirty": false,
   "factorio_line": "2.1",
   "factorio_binary_version": "2.1.9",
   "runtime_validation": {
-    "run_id": "bd1d26b1-b1ef-4c61-a7b5-b49a5ff964b0",
+    "run_id": "4ef5ac51-c1e4-46e4-9aca-5a63b1bda15c",
     "result": "passed",
     "scenario_count": 86,
-    "duration_seconds": 778.911,
+    "duration_seconds": 714.866,
     "required_groups_skipped": 0,
-    "validation_harness_sha256": "91DFE6B16B0A44886D5D21DF2D41EEE5E744442142DFEDA027D29E9475B102A1",
+    "validation_harness_sha256": "7AFB87B037B7CA99B029133D9631D9B75E9D35E05A58AD6EB9034043E1B0373D",
     "scenario_manifest_sha256": "2F1E608A1E1374A3B859724264FCB4408FBC068437AC199528351313F91E271D",
     "target_profile_sha256": "4AE6FCC2DAB5BE2F960B03CED800738E8F42BA51B69928899D7EB4962F404C3C",
-    "package_source_sha256": "7D69861345FF48181C79E0D8A6E8C45C199AB23FA9770F5A95B2CC3CE508C8D9",
-    "validation_package_sha256": "0D9C944CF75F20ED7E9EDD120B3386A94B892382E479EAB4A80DA1AEC8C32005",
+    "package_source_sha256": "DC661339F8CAF87F38DC2A91F4A5B44DC70F0D3F60DAB044DF386366CEE88587",
+    "validation_package_sha256": "E34250ECBFC247C81E576F73BB2F9265B8C97A1B61BB7226025C43B55265CB9C",
     "exact_package_base": "passed",
     "exact_package_space_age": "passed"
   },
   "synthetic_scale_gate": {
     "scenario_id": "synthetic-scale-graph",
     "result": "passed",
-    "duration_seconds": 7.874,
+    "duration_seconds": 7.523,
     "budget_seconds": 30.0,
     "recipe_count": 1000,
     "technology_count": 1000,
@@ -40,7 +40,7 @@
   "compiler_contract_gate": {
     "scenario_id": "compiler-contracts",
     "result": "passed",
-    "duration_seconds": 5.497,
+    "duration_seconds": 5.332,
     "assertions": [
       "schema-rejection",
       "stable-sorting",
@@ -48,6 +48,17 @@
       "target-and-applicability-filtering",
       "stable-identities",
       "deterministic-fingerprints"
+    ]
+  },
+  "mutation_boundary_gate": {
+    "result": "passed",
+    "policy_prototype_mutation_count": 0,
+    "transaction_surfaces": [
+      "competing-productivity",
+      "competing-base-extensions",
+      "productivity-family-adoption",
+      "weapon-speed",
+      "max-level"
     ]
   },
   "claim_boundary": "Automated development-candidate evidence only. Upgrade, interactive, independent campaign, freshness, and publication gates remain separate."

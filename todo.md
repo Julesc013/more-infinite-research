@@ -49,8 +49,8 @@ This is the executable release queue. `.mir/release-wave.yml` is the machine-rea
 
 ### Final 3.1.0 Evidence
 
-- [x] Clean static validation after version/governance reconciliation and compiler-contract work at source `beffc50`.
-- [x] Complete Factorio 2.1.9 declared runtime matrix with no skipped required group at source `beffc50` (`86/86`).
+- [x] Clean static validation after version/governance reconciliation, compiler contracts, and mutation-boundary work at source `c6f2a57`.
+- [x] Complete Factorio 2.1.9 declared runtime matrix with no skipped required group at source `c6f2a57` (`86/86`).
 - [ ] Exact 3.0.5-to-final-3.1.0 save upgrade with non-default settings, research levels, storage, and scripted effects retained.
 - [x] Exact 3.1.0 development archive base and Space Age loads from an isolated normal mods directory; rerun if package-visible source changes.
 - [x] Final-version performance evidence with recipe, technology, effect, edge, candidate, and scan counts; rerun if package-visible source changes.
