@@ -195,6 +195,7 @@ function M.compile()
   latest = M.finalize(stream_plan, base_plan)
   latest.stream_plan_object = stream_plan
   stream_compiler.accept(stream_plan)
+  require("prototypes.mir.emit.mod_data").emit_generation_plan(latest.stream_plan)
   return latest
 end
 

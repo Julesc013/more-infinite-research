@@ -427,7 +427,6 @@ end
 function M.run()
   local plan = M.compile()
   M.accept(plan)
-  require("prototypes.mir.emit.mod_data").emit_generation_plan(plan:artifact())
   M.apply(plan)
   return plan
 end
