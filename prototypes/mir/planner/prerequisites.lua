@@ -34,12 +34,18 @@ function M.append_end_game_gate_prerequisite(prereqs)
   local gate_on = startup_setting("ips-require-space-gate") == true
   if gate_on then
     local prereq = science.prereq_tech_for_science_pack(science.end_game_science_pack())
-    if prereq and lookup.technology_exists(prereq) and not seen[prereq] then
+    if not prereq or not lookup.technology_exists(prereq) then
+      return out, "missing_end_game_gate_prerequisite"
+    end
+    if not science.technology_is_researchable(prereq) then
+      return out, "unreachable_end_game_gate_prerequisite"
+    end
+    if not seen[prereq] then
       table.insert(out, prereq)
     end
   end
 
-  return out
+  return out, nil
 end
 
 function M.build_for(key, ingredients)

@@ -45,41 +45,47 @@ local commands = {
     implementation = "prototypes/mir/policy/competing_base_extensions.lua",
     apply = function() require("prototypes.mir.policy.competing_base_extensions").prepare() end
   },
+  ["compile-generation-plan"] = {
+    kind = "plan",
+    requires_features = {},
+    implementation = "prototypes/mir/planner/compilation_plan.lua",
+    apply = function() require("prototypes.mir.planner.compilation_plan").compile() end
+  },
   ["emit-streams"] = {
     kind = "emission",
     requires_features = {},
     implementation = "prototypes/mir/planner/stream_compiler.lua",
-    apply = function() require("prototypes.mir.planner.stream_compiler").run() end
+    apply = function() require("prototypes.mir.planner.compilation_plan").apply_streams() end
   },
   ["apply-competing-productivity"] = {
     kind = "mutation",
     requires_features = {"recipe_productivity"},
-    implementation = "prototypes/mir/policy/competing_productivity.lua",
-    apply = function() require("prototypes.mir.policy.competing_productivity").apply() end
+    implementation = "prototypes/mir/pipeline/mutations/competing_productivity.lua",
+    apply = function() require("prototypes.mir.pipeline.mutations.competing_productivity").apply() end
   },
   ["emit-base-extensions"] = {
     kind = "emission",
     requires_features = {},
     implementation = "prototypes/mir/emit/base_extensions.lua",
-    apply = function() require("prototypes.mir.emit.base_extensions").emit_all() end
+    apply = function() require("prototypes.mir.planner.compilation_plan").apply_base_extensions() end
   },
   ["apply-competing-base-extensions"] = {
     kind = "mutation",
     requires_features = {},
-    implementation = "prototypes/mir/policy/competing_base_extensions.lua",
-    apply = function() require("prototypes.mir.policy.competing_base_extensions").apply() end
+    implementation = "prototypes/mir/pipeline/mutations/competing_base_extensions.lua",
+    apply = function() require("prototypes.mir.pipeline.mutations.competing_base_extensions").apply() end
   },
   ["weapon-speed-adjustments"] = {
     kind = "mutation",
     requires_features = {},
-    implementation = "prototypes/mir/policy/weapon_speed.lua",
-    apply = function() require("prototypes.mir.policy.weapon_speed").apply() end
+    implementation = "prototypes/mir/pipeline/mutations/weapon_speed.lua",
+    apply = function() require("prototypes.mir.pipeline.mutations.weapon_speed").apply() end
   },
   ["max-level-control"] = {
     kind = "mutation",
     requires_features = {},
-    implementation = "prototypes/mir/policy/max_level.lua",
-    apply = function() require("prototypes.mir.policy.max_level").apply() end
+    implementation = "prototypes/mir/pipeline/mutations/max_level.lua",
+    apply = function() require("prototypes.mir.pipeline.mutations.max_level").apply() end
   },
   ["assert-technology-safety"] = {
     kind = "assertion",
@@ -89,6 +95,36 @@ local commands = {
       require("prototypes.mir.emit.effect_safety").assert_registered_technology_effects()
       require("prototypes.mir.emit.technology_graph_safety").assert_registered_technologies()
     end
+  },
+  ["emit-compatibility-diagnostics"] = {
+    kind = "report",
+    requires_features = {},
+    implementation = "prototypes/mir/compatibility/diagnostics/registry.lua",
+    apply = function() require("prototypes.mir.compatibility.diagnostics.registry").emit_all() end
+  },
+  ["emit-compiler-reports"] = {
+    kind = "report",
+    requires_features = {},
+    implementation = "prototypes/mir/planner/compiler.lua",
+    apply = function() require("prototypes.mir.planner.compiler").emit() end
+  },
+  ["emit-compatibility-planner"] = {
+    kind = "report",
+    requires_features = {},
+    implementation = "prototypes/mir/compatibility/planner.lua",
+    apply = function() require("prototypes.mir.compatibility.planner").emit() end
+  },
+  ["assert-plan-output"] = {
+    kind = "assertion",
+    requires_features = {},
+    implementation = "prototypes/mir/planner/output_validator.lua",
+    apply = function() require("prototypes.mir.planner.compilation_plan").assert_output() end
+  },
+  ["flush-diagnostics"] = {
+    kind = "report",
+    requires_features = {},
+    implementation = "prototypes/mir/report/diagnostics_sink.lua",
+    apply = function() require("prototypes.mir.report.diagnostics_sink").flush() end
   }
 }
 
@@ -99,14 +135,21 @@ local ORDERING = {
   ["pipeline-extent"] = {phase = 20, dependencies = {"compatibility-repairs", "prototype-limits"}},
   ["prepare-competing-productivity"] = {phase = 30, dependencies = {"pipeline-extent"}},
   ["prepare-competing-base-extensions"] = {phase = 30, dependencies = {"prepare-competing-productivity"}},
-  ["emit-streams"] = {phase = 40, dependencies = {"prepare-competing-base-extensions"}},
+  ["compile-generation-plan"] = {phase = 35, dependencies = {"prepare-competing-base-extensions"}},
+  ["emit-streams"] = {phase = 40, dependencies = {"compile-generation-plan"}},
   ["apply-competing-productivity"] = {phase = 50, dependencies = {"emit-streams"}},
   ["emit-base-extensions"] = {phase = 50, dependencies = {"apply-competing-productivity"}},
   ["apply-competing-base-extensions"] = {phase = 60, dependencies = {"emit-base-extensions"}},
   ["weapon-speed-adjustments"] = {phase = 70, dependencies = {"apply-competing-base-extensions"}},
   ["max-level-control"] = {phase = 70, dependencies = {"weapon-speed-adjustments"}},
-  ["assert-technology-safety"] = {phase = 90, dependencies = {"max-level-control"}}
+  ["emit-compatibility-diagnostics"] = {phase = 80, dependencies = {"max-level-control"}},
+  ["emit-compiler-reports"] = {phase = 80, dependencies = {"emit-compatibility-diagnostics"}},
+  ["emit-compatibility-planner"] = {phase = 80, dependencies = {"emit-compiler-reports"}},
+  ["assert-plan-output"] = {phase = 90, dependencies = {"emit-compatibility-planner"}},
+  ["assert-technology-safety"] = {phase = 90, dependencies = {"assert-plan-output"}},
+  ["flush-diagnostics"] = {phase = 100, dependencies = {"assert-technology-safety"}}
 }
+
 
 for id, command in pairs(commands) do
   local ordering = ORDERING[id]
@@ -136,6 +179,10 @@ function M.run(id)
   command.apply()
   completed[id] = "applied"
   return true
+end
+
+function M.run_all()
+  for _, id in ipairs(M.order()) do M.run(id) end
 end
 
 function M.order()

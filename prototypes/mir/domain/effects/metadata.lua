@@ -1,4 +1,5 @@
 local M = {}
+M.schema = 1
 
 local IDENTITY_FIELDS = {"type", "recipe", "ammo_category", "turret_id", "fluid", "item"}
 

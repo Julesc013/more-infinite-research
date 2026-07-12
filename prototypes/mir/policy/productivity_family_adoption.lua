@@ -4,10 +4,6 @@ local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 
 local A = {}
 
-local MOD_DATA_NAME = "more-infinite-research-productivity-family-adoption"
-local VERSION = 1
-local adopted_productivity_family_recipes = {}
-
 local function append_recipe_to_bucket(out, bucket, recipe_name)
   local target = out[#out]
   if not target or target.change ~= bucket.change then
@@ -92,15 +88,6 @@ local function adoption_owner_for(spec)
   }
 end
 
-local function record(key, owner_name, recipe_name, change)
-  table.insert(adopted_productivity_family_recipes, {
-    key = key,
-    owner = owner_name,
-    recipe = recipe_name,
-    change = change
-  })
-end
-
 function A.plan(key, spec, buckets)
   local adoption = spec and spec.adopt_into_existing_productivity_tech
   if not adoption then return buckets, {}, {} end
@@ -138,70 +125,6 @@ function A.plan(key, spec, buckets)
     owner = owner.name,
     effects = adopted
   }
-end
-
-function A.apply(plan)
-  if not plan then return {} end
-  local owner = data_raw.technology(plan.owner)
-  if not owner then
-    error("Planned productivity-family adoption owner disappeared: " .. tostring(plan.owner), 2)
-  end
-
-  local adopted = {}
-  owner.effects = owner.effects or {}
-  for _, effect in ipairs(plan.effects or {}) do
-    if not productivity_owners.has_recipe_productivity_effect(owner, effect.recipe) then
-      table.insert(owner.effects, effect)
-      table.insert(adopted, effect)
-      record(plan.key, plan.owner, effect.recipe, effect.change)
-      log("[more-infinite-research] Adopted productivity-family recipe for "
-        .. plan.key .. " recipe=" .. effect.recipe .. " into " .. plan.owner .. ".")
-    end
-  end
-  return adopted
-end
-
-function A.adopt(key, spec, buckets)
-  local remaining, adopted, blocked, owner_name, plan = A.plan(key, spec, buckets)
-  if plan then A.apply(plan) end
-  return remaining, adopted, blocked, owner_name
-end
-
-local function signature()
-  local entries = {}
-  for _, entry in ipairs(adopted_productivity_family_recipes) do
-    table.insert(entries,
-      "schema=" .. tostring(VERSION)
-      .. "|owner=" .. tostring(entry.owner)
-      .. "|recipe=" .. tostring(entry.recipe)
-      .. "|change=" .. tostring(entry.change))
-  end
-  table.sort(entries)
-  return table.concat(entries, ";")
-end
-
-function A.mod_data_payload()
-  local adoption_signature = signature()
-  return {
-    name = MOD_DATA_NAME,
-    data_type = "more-infinite-research.productivity-family-adoption",
-    data = {
-      version = VERSION,
-      adopted = #adopted_productivity_family_recipes > 0,
-      adopted_count = #adopted_productivity_family_recipes,
-      signature = adoption_signature
-    }
-  }
-end
-
-function A.snapshot()
-  local out = {}
-  for _, entry in ipairs(adopted_productivity_family_recipes) do
-    local copy = {}
-    for key, value in pairs(entry) do copy[key] = value end
-    table.insert(out, copy)
-  end
-  return out
 end
 
 return A

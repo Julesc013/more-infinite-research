@@ -7,7 +7,7 @@ local generated_registry = require("prototypes.mir.domain.facts.generated_techno
 local mod_data = require("prototypes.mir.emit.mod_data")
 local recipe_facts = require("prototypes.mir.index.recipe_facts")
 local target_line = require("prototypes.mir.platform.factorio.target_line")
-local adoption = require("prototypes.mir.policy.productivity_family_adoption")
+local adoption = require("prototypes.mir.emit.transactions.productivity_family_adoption")
 
 local M = {}
 local latest = nil

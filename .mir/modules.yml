@@ -105,6 +105,10 @@ modules:
     - prototypes/mir/pipeline/extent.lua
     - prototypes/mir/pipeline/prototype_limits.lua
     - prototypes/mir/pipeline/module_permissions.lua
+    - prototypes/mir/pipeline/mutations/competing_productivity.lua
+    - prototypes/mir/pipeline/mutations/competing_base_extensions.lua
+    - prototypes/mir/pipeline/mutations/weapon_speed.lua
+    - prototypes/mir/pipeline/mutations/max_level.lua
   index:
     - prototypes/mir/index/registry_builder.lua
     - prototypes/mir/index/recipe_facts.lua
@@ -119,6 +123,7 @@ modules:
     - prototypes/mir/index/recycling.lua
   domain:
     - prototypes/mir/domain/facts/registry.lua
+    - prototypes/mir/domain/facts/recipe_semantics.lua
     - prototypes/mir/domain/facts/generated_technology_registry.lua
     - prototypes/mir/domain/decisions/decision_record.lua
     - prototypes/mir/domain/effects/metadata.lua
@@ -155,8 +160,10 @@ modules:
     - prototypes/mir/families/resolver.lua
   planner:
     - prototypes/mir/planner/compiler.lua
+    - prototypes/mir/planner/compilation_plan.lua
     - prototypes/mir/planner/stream_compiler.lua
     - prototypes/mir/planner/generation_plan.lua
+    - prototypes/mir/planner/output_validator.lua
     - prototypes/mir/planner/costs.lua
     - prototypes/mir/planner/direct_effects.lua
     - prototypes/mir/planner/native_modifiers.lua
@@ -173,6 +180,7 @@ modules:
     - prototypes/mir/emit/effect_safety.lua
     - prototypes/mir/emit/icon_builder.lua
     - prototypes/mir/emit/mod_data.lua
+    - prototypes/mir/emit/transactions/productivity_family_adoption.lua
   report:
     - prototypes/mir/report/decision_export.lua
     - prototypes/mir/report/compatibility_diagnostics.lua
@@ -182,6 +190,7 @@ modules:
     - prototypes/mir/compatibility/profiles.lua
     - prototypes/mir/compatibility/packs/schema.lua
     - prototypes/mir/compatibility/packs/registry.lua
+    - prototypes/mir/compatibility/packs/precedence.lua
     - prototypes/mir/compatibility/planner.lua
     - prototypes/mir/compatibility/overlay_loader.lua
     - prototypes/mir/compatibility/claim_registry.lua
@@ -212,6 +221,9 @@ mutation_commands:
     - command dependencies are acyclic and enforced before execution
     - only emission commands may create generated technology prototypes
     - mutation commands may change existing prototypes only through their listed implementation
+    - CompilationPlan schema 2 globally finalizes stream adoption and base-extension operations before emission
+    - output validation compares numeric effects technology shape and generated-registry identity
+    - reviewed compatibility data cannot override hard prototype safety facts
     - exact-version compatibility repairs remain separately bounded
   ids:
     - compatibility-repairs
@@ -220,6 +232,7 @@ mutation_commands:
     - pipeline-extent
     - prepare-competing-productivity
     - prepare-competing-base-extensions
+    - compile-generation-plan
     - emit-streams
     - apply-competing-productivity
     - emit-base-extensions
@@ -227,6 +240,11 @@ mutation_commands:
     - weapon-speed-adjustments
     - max-level-control
     - assert-technology-safety
+    - emit-compatibility-diagnostics
+    - emit-compiler-reports
+    - emit-compatibility-planner
+    - assert-plan-output
+    - flush-diagnostics
 
 target_layers:
   stage:
@@ -343,9 +361,13 @@ validation_tooling:
     settings_overrides: scripts/validation/SettingsOverrides.ps1
     scenario_registry: scripts/validation/ScenarioRegistry.ps1
     golden_plans: scripts/Test-MIRGoldenPlans.ps1
+    campaign_scenarios: scripts/Test-MIRScenarioManifests.ps1
+    planner_artifacts: scripts/Test-MIRPlannerTools.ps1
+    compiler_schema_drift: scripts/Test-MIRCompilerSchemaDrift.ps1
   rules:
     - the facade preserves its public parameters and structured result schema
     - process launch and copied-mod filesystem safety are reusable modules
     - settings overrides are declarative and isolated from scenario orchestration
     - every executed scenario resolves through a target-bound declaration record
+    - compatibility campaign records own setup roots settings expectations timeout and claim level
     - scenarios retain stable names and explicit groups while decomposition proceeds

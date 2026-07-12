@@ -2,7 +2,6 @@ local C = require("prototypes.mir.streams.registry")
 local costs = require("prototypes.mir.planner.costs")
 local profiles = require("prototypes.mir.compatibility.profiles")
 local productivity_owners = require("prototypes.mir.index.productivity_owners")
-local replacement = require("prototypes.mir.emit.technology_replacement")
 local generated_registry = require("prototypes.mir.domain.facts.generated_technology_registry")
 local effect_contracts = require("prototypes.mir.settings.effect_contracts")
 local data_raw = require("prototypes.mir.platform.factorio.data_raw")
@@ -159,28 +158,21 @@ function M.ignores_existing_owner(tech_name)
   return prepared_removable_techs and prepared_removable_techs[tech_name] == true
 end
 
-function M.apply()
-  if not prefer_this_mod_for_competing_techs() then return end
-  if not known_competing_mod_active() then return end
+function M.replacement_plan()
+  if not prefer_this_mod_for_competing_techs() then return {} end
+  if not known_competing_mod_active() then return {} end
 
   local candidates = prepared_removable_techs or {}
-  for name, _ in pairs(candidates) do
+  local names, plan = {}, {}
+  for name, _ in pairs(candidates) do table.insert(names, name) end
+  table.sort(names)
+  for _, name in ipairs(names) do
     local tech = data_raw.technology(name)
     local effects = productivity_owners.recipe_productivity_effects_only(tech)
     local replacement_names = effects and replacement_names_for_effects(effects) or nil
-    if replacement_names and #replacement_names > 0 then
-      local replaced, reason = replacement.replace_technology(name, replacement_names)
-      if replaced then
-        log("[more-infinite-research] Replaced competing recipe productivity technology: "
-          .. name .. " -> " .. table.concat(replacement_names, ","))
-      else
-        log("[more-infinite-research] Retained competing recipe productivity technology because replacement was unsafe: "
-          .. name .. " reason=" .. tostring(reason))
-      end
-    else
-      log("[more-infinite-research] Retained competing recipe productivity technology because MIR did not emit complete replacement coverage: " .. name)
-    end
+    table.insert(plan, {technology = name, replacements = replacement_names or {}})
   end
+  return plan
 end
 
 return M

@@ -11,7 +11,7 @@ S.capability_policy = 1
 S.decision_record = 2
 S.generated_stream_manifest = 1
 S.compatibility_claims = 1
-S.generation_plan = 2
+S.generation_plan = 3
 S.target_profile = 2
 
 function S.with_schema(kind, row)

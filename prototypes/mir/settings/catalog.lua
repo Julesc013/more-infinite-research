@@ -151,8 +151,8 @@ function M.global_setting_prototypes()
       allowed_values = {"off", "report", "safe-attach", "safe-generate", "exact-pack"},
       order = setting_order.global("main", 35),
       targets = {requires_features = {"recipe_productivity"}, required_effect_types = {}},
-      localised_name = {"", "[font=default-bold][color=green]Main:[/color][/font] Automatic compiler mode"},
-      localised_description = {"", "Controls structural candidate handling. Safe attach is the default; safe generation enables only predeclared family technologies."}
+      localised_name = {"mod-setting-name.mir-automatic-compiler-mode"},
+      localised_description = {"mod-setting-description.mir-automatic-compiler-mode"}
     },
     {
       type = "bool-setting",

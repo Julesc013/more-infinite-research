@@ -1,5 +1,7 @@
 local deepcopy = require("prototypes.mir.core.deepcopy")
 local data_raw = require("prototypes.mir.platform.factorio.data_raw")
+local recipe_semantics = require("prototypes.mir.domain.facts.recipe_semantics")
+local target_profiles = require("prototypes.mir.platform.factorio.target_profiles")
 
 local M = {}
 local canonical = nil
@@ -20,7 +22,10 @@ local function productive_amount(entry)
   if type(entry) ~= "table" then return 1 end
   local maximum = tonumber(entry.amount_max or entry.amount or entry[2] or entry.amount_min) or 1
   local ignored = tonumber(entry.ignored_by_productivity or 0) or 0
-  return math.max(0, maximum - ignored)
+  local probability = tonumber(entry.independent_probability)
+  if probability == nil then probability = tonumber(entry.probability) end
+  if probability == nil then probability = 1 end
+  return math.max(0, maximum - ignored) * probability
 end
 
 local function normalized_entry(entry)
@@ -30,21 +35,35 @@ local function normalized_entry(entry)
   if type(entry) ~= "table" then return nil end
   local name = name_of(entry)
   if not name then return nil end
+  local probability = entry.independent_probability
+  if probability == nil then probability = entry.probability end
+  if probability == nil then probability = 1 end
   return {
     type = entry.type or "item",
     name = name,
     amount = entry.amount or entry[2],
     amount_min = entry.amount_min,
     amount_max = entry.amount_max,
-    probability = entry.probability or 1,
+    probability = probability,
+    independent_probability = probability,
+    declared_probability = entry.probability,
+    declared_independent_probability = entry.independent_probability,
     shared_probability = entry.shared_probability,
+    extra_count_fraction = entry.extra_count_fraction,
     catalyst_amount = entry.catalyst_amount,
     ignored_by_productivity = entry.ignored_by_productivity,
     ignored_by_stats = entry.ignored_by_stats,
     temperature = entry.temperature,
     minimum_temperature = entry.minimum_temperature,
     maximum_temperature = entry.maximum_temperature,
-    fluidbox_index = entry.fluidbox_index
+    fluidbox_index = entry.fluidbox_index,
+    percent_spoiled = entry.percent_spoiled,
+    always_fresh = entry.always_fresh,
+    reset_freshness_on_craft = entry.reset_freshness_on_craft,
+    quality_min = entry.quality_min,
+    quality_max = entry.quality_max,
+    quality_change = entry.quality_change,
+    affected_by_quality = entry.affected_by_quality
   }
 end
 
@@ -106,6 +125,7 @@ end
 
 local function normalized_variant(variant)
   local definition = variant.value
+  local semantics = recipe_semantics.resolve(variant.recipe, definition, target_profiles.current())
   local ingredients, results = {}, {}
   local categories, seen_categories = {}, {}
   local function add_category(category)
@@ -142,16 +162,25 @@ local function normalized_variant(variant)
     hidden = definition.hidden == true,
     energy_required = definition.energy_required,
     main_product = definition.main_product or definition.result,
-    maximum_productivity = definition.maximum_productivity,
-    allow_productivity = definition.allow_productivity,
-    allow_quality = definition.allow_quality,
+    maximum_productivity = semantics.effective_maximum_productivity,
+    declared_maximum_productivity = semantics.declared_maximum_productivity,
+    effective_maximum_productivity = semantics.effective_maximum_productivity,
+    allow_productivity = semantics.effective_allow_productivity,
+    declared_allow_productivity = semantics.declared_allow_productivity,
+    effective_allow_productivity = semantics.effective_allow_productivity,
+    allow_quality = semantics.effective_allow_quality,
+    declared_allow_quality = semantics.declared_allow_quality,
+    effective_allow_quality = semantics.effective_allow_quality,
     surface_conditions = deepcopy(definition.surface_conditions)
   }
 end
 
 local function variant_facts(recipe)
   local out = {}
-  for _, variant in ipairs(variants(recipe)) do table.insert(out, normalized_variant(variant)) end
+  for _, variant in ipairs(variants(recipe)) do
+    variant.recipe = recipe
+    table.insert(out, normalized_variant(variant))
+  end
   return out
 end
 
@@ -233,6 +262,17 @@ local function build()
   local facts = {}
   local by_output, by_productive_output, by_ingredient, by_category, names = {}, {}, {}, {}, {}
   for recipe_name, recipe in pairs(data_raw.prototypes("recipe")) do
+    local semantics = recipe_semantics.resolve(recipe, recipe, target_profiles.current())
+    local normalized_variants = variant_facts(recipe)
+    local all_variants_allow_productivity = #normalized_variants > 0
+    local effective_maximum_productivity = nil
+    for _, variant in ipairs(normalized_variants) do
+      if variant.effective_allow_productivity ~= true then all_variants_allow_productivity = false end
+      local variant_maximum = tonumber(variant.effective_maximum_productivity)
+      if variant_maximum and (effective_maximum_productivity == nil or variant_maximum < effective_maximum_productivity) then
+        effective_maximum_productivity = variant_maximum
+      end
+    end
     local ingredients, ingredient_names = aggregate_io(recipe, "ingredients")
     local results, result_names = aggregate_io(recipe, "results")
     local categories = categories_for(recipe)
@@ -241,7 +281,7 @@ local function build()
     facts[recipe_name] = {
       schema = SCHEMA,
       name = recipe_name,
-      variants = variant_facts(recipe),
+      variants = normalized_variants,
       categories = categories,
       ingredients = ingredients,
       ingredient_names = ingredient_names,
@@ -252,9 +292,15 @@ local function build()
       hidden = is_hidden,
       enabled_without_research = enabled_without_research(recipe),
       parameter = recipe.parameter == true,
-      maximum_productivity = recipe.maximum_productivity,
-      allow_productivity = recipe.allow_productivity,
-      allow_quality = recipe.allow_quality,
+      maximum_productivity = effective_maximum_productivity,
+      declared_maximum_productivity = semantics.declared_maximum_productivity,
+      effective_maximum_productivity = effective_maximum_productivity,
+      allow_productivity = all_variants_allow_productivity,
+      declared_allow_productivity = semantics.declared_allow_productivity,
+      effective_allow_productivity = all_variants_allow_productivity,
+      allow_quality = semantics.effective_allow_quality,
+      declared_allow_quality = semantics.declared_allow_quality,
+      effective_allow_quality = semantics.effective_allow_quality,
       surface_conditions = deepcopy(recipe.surface_conditions),
       source_class = source_class(recipe, categories, is_hidden)
     }
