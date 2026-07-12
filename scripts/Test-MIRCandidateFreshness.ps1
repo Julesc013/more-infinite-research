@@ -39,6 +39,95 @@ function Get-MIRRequiredCandidateField {
   return [string]$Fields[$Name]
 }
 
+function Get-MIRCandidateEvidenceJson {
+  param(
+    [Parameter(Mandatory)]$Fields,
+    [Parameter(Mandatory)][string]$Field,
+    [Parameter(Mandatory)][string]$Label
+  )
+
+  $relative = Get-MIRRequiredCandidateField -Fields $Fields -Name $Field
+  $path = Join-Path $repo $relative
+  if (-not (Test-Path -LiteralPath $path -PathType Leaf)) {
+    throw "$Label evidence is missing: $relative"
+  }
+  try {
+    return Get-Content -Raw -LiteralPath $path | ConvertFrom-Json
+  } catch {
+    throw "$Label evidence is not valid JSON: $relative"
+  }
+}
+
+function Assert-MIRCandidateBoundEvidence {
+  param(
+    [Parameter(Mandatory)]$Fields,
+    [Parameter(Mandatory)][string]$SourceCommit,
+    [Parameter(Mandatory)][string]$ArchiveSha256,
+    [Parameter(Mandatory)][string]$PackageContentSha256,
+    [Parameter(Mandatory)][string]$PackageSourceSha256,
+    [Parameter(Mandatory)][string]$Version,
+    [Parameter(Mandatory)][ValidateSet("pending", "passed")][string]$InteractiveStatus
+  )
+
+  $upgrade = Get-MIRCandidateEvidenceJson -Fields $Fields -Field "upgrade_evidence_path" -Label "Upgrade"
+  if ([int]$upgrade.schema -ne 1 -or [string]$upgrade.status -ne "passed") {
+    throw "Upgrade evidence must be schema 1 with status passed."
+  }
+  if ([string]$upgrade.git_commit -ne $SourceCommit -or [string]$upgrade.to.version -ne $Version -or [string]$upgrade.to.sha256 -ne $ArchiveSha256) {
+    throw "Upgrade evidence is not bound to the active candidate source, version, and archive."
+  }
+
+  $campaign = Get-MIRCandidateEvidenceJson -Fields $Fields -Field "ecosystem_evidence_path" -Label "Ecosystem campaign"
+  if ([int]$campaign.schema -ne 1 -or [string]$campaign.kind -ne "mir-modpack-campaign-evidence") {
+    throw "Ecosystem campaign evidence must be schema 1 mir-modpack-campaign-evidence."
+  }
+  if ([string]$campaign.mir_archive.source_commit -ne $SourceCommit -or [string]$campaign.mir_archive.sha256 -ne $ArchiveSha256) {
+    throw "Ecosystem campaign evidence is not bound to the active candidate source and archive."
+  }
+  $failedCampaignRows = @($campaign.scenarios | Where-Object {
+    [string]$_.result -ne "passed" -or [int]$_.dependency_failure_count -ne 0 -or
+    [string]$_.claim_level -notin @("loads", "observed", "cooperates", "partial-family", "full-family")
+  })
+  if (@($campaign.scenarios).Count -eq 0 -or $failedCampaignRows.Count -gt 0) {
+    throw "Ecosystem campaign evidence contains no scenarios or a non-passing/malformed scenario."
+  }
+
+  $interactive = Get-MIRCandidateEvidenceJson -Fields $Fields -Field "interactive_evidence_path" -Label "Interactive review"
+  if ([int]$interactive.schema -ne 1 -or [string]$interactive.kind -ne "mir-interactive-review") {
+    throw "Interactive review evidence must be schema 1 mir-interactive-review."
+  }
+  foreach ($binding in ([ordered]@{
+    status = $InteractiveStatus
+    version = $Version
+    source_commit = $SourceCommit
+    archive_sha256 = $ArchiveSha256
+    package_content_sha256 = $PackageContentSha256
+    package_source_sha256 = $PackageSourceSha256
+  }).GetEnumerator()) {
+    if ([string]$interactive.($binding.Key) -ne [string]$binding.Value) {
+      throw "Interactive review $($binding.Key) is stale: expected $($binding.Value), current $($interactive.($binding.Key))."
+    }
+  }
+  if ($InteractiveStatus -eq "passed") {
+    if ([string]::IsNullOrWhiteSpace([string]$interactive.reviewer) -or [string]::IsNullOrWhiteSpace([string]$interactive.reviewed_at)) {
+      throw "Passed interactive review evidence must identify the reviewer and review time."
+    }
+    $captures = @($interactive.captures)
+    if ($captures.Count -lt 3) {
+      throw "Passed interactive review evidence requires at least three bound captures."
+    }
+    foreach ($capture in $captures) {
+      $capturePath = Join-Path $repo ([string]$capture.path)
+      if (-not (Test-Path -LiteralPath $capturePath -PathType Leaf)) {
+        throw "Interactive review capture is missing: $($capture.path)"
+      }
+      if ((Get-MIRFileSha256 -Path $capturePath) -ne [string]$capture.sha256) {
+        throw "Interactive review capture hash is stale: $($capture.path)"
+      }
+    }
+  }
+}
+
 $manifestPath = Join-Path $repo ".mir\convergence.yml"
 $manifestText = Get-Content -Raw -LiteralPath $manifestPath
 $candidate = Get-MIRCandidateFields -Text $manifestText
@@ -46,10 +135,11 @@ $status = Get-MIRRequiredCandidateField -Fields $candidate -Name "status"
 $allowedStatuses = @(
   "rebuilding-after-package-visible-change",
   "release-candidate-awaiting-manual-review",
+  "release-candidate-accepted",
   "published"
 )
 if ($status -notin $allowedStatuses) {
-  throw "Unsupported 3.0.5 candidate status: $status"
+  throw "Unsupported MIR release candidate status: $status"
 }
 
 if ($status -eq "rebuilding-after-package-visible-change") {
@@ -112,6 +202,14 @@ if ($status -eq "published") {
       throw "Published release artifact $field changed: expected $expected, current $actual."
     }
   }
+  Assert-MIRCandidateBoundEvidence `
+    -Fields $candidate `
+    -SourceCommit $sourceCommit `
+    -ArchiveSha256 (Get-MIRRequiredCandidateField -Fields $candidate -Name "sha256") `
+    -PackageContentSha256 (Get-MIRRequiredCandidateField -Fields $candidate -Name "package_content_sha256") `
+    -PackageSourceSha256 (Get-MIRRequiredCandidateField -Fields $candidate -Name "package_source_sha256") `
+    -Version ([string]$info.version) `
+    -InteractiveStatus "passed"
 
   $summaryRelative = Get-MIRRequiredCandidateField -Fields $candidate -Name "structured_summary_path"
   $summaryPath = Join-Path $repo $summaryRelative
@@ -195,6 +293,22 @@ foreach ($field in $checks.Keys) {
   }
 }
 
+$expectedManualGate = if ($status -eq "release-candidate-accepted") { "accepted-for-publication" } else { "pending" }
+if ((Get-MIRRequiredCandidateField -Fields $candidate -Name "automated_gate") -ne "passed") {
+  throw "An active release candidate must record automated_gate: passed."
+}
+if ((Get-MIRRequiredCandidateField -Fields $candidate -Name "manual_gate") -ne $expectedManualGate) {
+  throw "Candidate status $status requires manual_gate: $expectedManualGate."
+}
+Assert-MIRCandidateBoundEvidence `
+  -Fields $candidate `
+  -SourceCommit $sourceCommit `
+  -ArchiveSha256 $checks.sha256 `
+  -PackageContentSha256 $checks.package_content_sha256 `
+  -PackageSourceSha256 $checks.package_source_sha256 `
+  -Version ([string]$info.version) `
+  -InteractiveStatus $(if ($status -eq "release-candidate-accepted") { "passed" } else { "pending" })
+
 $summaryRelative = Get-MIRRequiredCandidateField -Fields $candidate -Name "structured_summary_path"
 $summaryPath = Join-Path $repo $summaryRelative
 if (-not (Test-Path -LiteralPath $summaryPath -PathType Leaf)) {
@@ -239,4 +353,4 @@ foreach ($requiredGroup in $requiredGroups) {
   }
 }
 
-Write-Host "[ok] MIR release candidate evidence matches source, profile, package, and structured validation summary."
+Write-Host "[ok] MIR release candidate evidence matches source, package, validation, upgrade, ecosystem, and interactive-review state."
