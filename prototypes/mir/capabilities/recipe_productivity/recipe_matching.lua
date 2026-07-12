@@ -63,6 +63,15 @@ local function recipe_uses_blocked_ingredient(rec, patterns)
   return false
 end
 
+local function has_shared_input_output(recipe)
+  local ingredients = {}
+  for _, entry in ipairs(recipe.ingredients or {}) do ingredients[entry.name] = true end
+  for _, entry in ipairs(recipe.results or {}) do
+    if ingredients[entry.name] then return true end
+  end
+  return false
+end
+
 local function should_skip_recipe(recipe_name, recipe, options)
   if options.exclude_recipe_patterns and name_matches(recipe_name, options.exclude_recipe_patterns) then
     return true
@@ -73,6 +82,7 @@ local function should_skip_recipe(recipe_name, recipe, options)
   if recipe_is_hidden(recipe) and not options.include_hidden then
     return true
   end
+  if has_shared_input_output(recipe) then return true end
   if not options.include_recycling then
     for _, category in ipairs(recipe_categories(recipe)) do
       if DEFAULT_SKIP_CATEGORIES[category] then return true end

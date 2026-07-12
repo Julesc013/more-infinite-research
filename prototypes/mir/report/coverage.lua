@@ -67,6 +67,11 @@ local function base_skip(fact)
   if fact.source_class == "recycling" then return "safe_skip", "recycling_recipe" end
   if fact.allow_productivity == false then return "safe_skip", "recipe_productivity_not_allowed" end
   if tonumber(fact.maximum_productivity) == 0 then return "safe_skip", "zero_productivity_cap" end
+  local ingredients = {}
+  for _, entry in ipairs(fact.ingredients or {}) do ingredients[entry.name] = true end
+  for _, entry in ipairs(fact.results or {}) do
+    if ingredients[entry.name] then return "unsafe_skip", "shared_input_output_loop_risk" end
+  end
   return nil, nil
 end
 

@@ -21,3 +21,5 @@ The summary records total, visible, productivity-eligible, and accounted recipe 
 Release interpretation is stricter than load success. Accounted recipes must equal total recipes. Dangling effects and unintended duplicate owners must be zero. Every unresolved row must remain explicit and reviewable, and repeated identical inputs must produce the same fingerprint.
 
 The report does not claim that every recipe should receive productivity. `safe_skip` and `unsafe_skip` are valid accounted outcomes when their reason is stable and safety remains fail-closed.
+
+Recipes that return any input as an output are globally ineligible for fixed-stream and family emission. Coverage records them as `unsafe_skip/shared_input_output_loop_risk`; a name, output match, or confidence score cannot override that veto.
