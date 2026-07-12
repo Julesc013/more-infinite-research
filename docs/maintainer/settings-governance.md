@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: maintainer
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-07-11
+last_reviewed: 2026-07-12
 supersedes: []
 superseded_by: []
 ---
@@ -36,6 +36,7 @@ Settings are compatibility surface. Treat a released setting ID like a public co
 - Use visible section prefixes and order ranges for global settings. Do not add fake divider settings.
 - Treat rich text in setting labels as a visual enhancement only; the plain section words must still be readable if styling is not rendered.
 - Require every catalog setting to carry positive target feature/effect requirements. Filter declarations through the target adapter; do not maintain a second settings denylist.
+- Store each global setting's target requirements on that setting declaration or its owning settings module. Do not infer requirements from a centralized setting-name conditional.
 - Return deep copies from catalog lookups and snapshots. A profile, fixture, or settings-stage decorator must never mutate the canonical cached spec.
 - Keep generated technology sort labels in the canonical stream descriptor and consume them from there.
 - Scenario defaults belong in `prototypes/mir/settings/test_overrides.lua`. Validation copies may populate that declaration, but must not rewrite catalog, defaults, stage-builder, or diagnostics implementation source.

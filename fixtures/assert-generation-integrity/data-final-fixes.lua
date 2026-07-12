@@ -64,6 +64,23 @@ local function assert_decision_record_v2()
   end
 end
 
+local function assert_setting_target_ownership()
+  local settings_catalog = require("__more-infinite-research__.prototypes.mir.settings.catalog")
+  local expected = {
+    ["mir-pipeline-extent-multiplier"] = "pipeline_extent",
+    ["mir-prototype-productivity-cap"] = "prototype_limits",
+    ["mir-settings-profile-import"] = "settings_profiles",
+    ["mir-unrestricted-modules"] = "module_permissions",
+    ["mir-debug-scripted-effects"] = "scripted_techs"
+  }
+  for setting_name, feature in pairs(expected) do
+    local spec = settings_catalog.spec(setting_name)
+    if not spec or not spec.targets or spec.targets.requires_features[1] ~= feature then
+      fail("setting declaration does not own target requirement: " .. setting_name)
+    end
+  end
+end
+
 local function assert_descriptor_contracts()
   local snapshot = stream_registry.snapshot()
   local count = 0
@@ -300,6 +317,7 @@ local base_extension_defaults = {
 assert_no_blocked_pickup_effects()
 assert_generation_plan_v2()
 assert_decision_record_v2()
+assert_setting_target_ownership()
 
 for key, default_enabled in pairs(base_extension_defaults) do
   if effective_base_extension_enabled(key, default_enabled) then
