@@ -45,6 +45,16 @@ local function stream_requirement_missing(spec)
   for _, tech_name in ipairs(spec.required_technologies or {}) do
     if not lookup.technology_exists(tech_name) then return true end
   end
+  for _, candidates in ipairs(spec.required_technology_candidates or {}) do
+    local found = false
+    for _, tech_name in ipairs(candidates or {}) do
+      if lookup.technology_exists(tech_name) then
+        found = true
+        break
+      end
+    end
+    if not found then return true end
+  end
   if technology_requirements.skip_reason(spec) then return true end
   for _, category in ipairs(spec.required_ammo_categories or {}) do
     if not lookup.ammo_category_exists(category) then return true end

@@ -1,0 +1,31 @@
+   0.001 2026-07-13 08:56:58; Factorio 0.16.51 (build 36654, win64, alpha)
+   0.001 Operating system: Windows 10 (build 19045)
+   0.001 Not rotating logs.
+   0.001 Program arguments: "D:\Programs\Factorio\0.16\bin\x64\factorio.exe" "--config" "C:\Projects\Factorio\more-infinite-research-tmp-0.16\artifacts\old-wave\1.6.0\config-create.ini" "--no-log-rotation" "--disable-audio" "--mod-directory" "C:\Projects\Factorio\more-infinite-research-tmp-0.16\artifacts\old-wave\1.6.0\mods" "--create" "C:\Projects\Factorio\more-infinite-research-tmp-0.16\artifacts\old-wave\1.6.0\fresh-1.6.0.zip"
+   0.002 Read data path: D:/Programs/Factorio/0.16/data
+   0.002 Write data path: C:/Projects/Factorio/more-infinite-research-tmp-0.16/artifacts/old-wave/1.6.0/user-create [18458/450559MB]
+   0.002 Binaries path: D:/Programs/Factorio/0.16/bin
+   0.010 System info: [CPU: Intel(R) Core(TM) i7-7700HQ CPU @ 2.80GHz, 8 cores, RAM: 9719/16257 MB, page: 15243/19160 MB, virtual: 4243/134217727 MB, extended virtual: 0 MB]
+   0.010 Running in headless mode
+   0.032 Loading mod settings more-infinite-research 1.6.0 (settings.lua)
+   0.045 Loading mod core 0.0.0 (data.lua)
+   0.058 Loading mod base 0.16.51 (data.lua)
+   0.220 Loading mod more-infinite-research 1.6.0 (data.lua)
+   0.267 Loading mod base 0.16.51 (data-updates.lua)
+   0.321 Loading mod more-infinite-research 1.6.0 (data-updates.lua)
+   0.371 Loading mod more-infinite-research 1.6.0 (data-final-fixes.lua)
+   0.390 Script @__more-infinite-research__/prototypes/mir/planner/stream_compiler.lua:117: [more-infinite-research] Skipping stream research_cannon_shooting_speed because missing required technology weapon-shooting-speed-5.
+   0.450 Checksum for core: 840319042
+   0.450 Checksum of base: 3323233190
+   0.450 Checksum of more-infinite-research: 3471108743
+   0.542 Info PlayerData.cpp:65: Local player-data.json available, timestamp 1783896812
+   0.542 Info PlayerData.cpp:72: Cloud player-data.json unavailable
+   0.546 Info GlobalContext.cpp:1102: Resetting config.
+   0.546 Custom inputs active: 0
+   0.550 Factorio initialised
+   0.550 Info Main.cpp:858: Creating new map C:\Projects\Factorio\more-infinite-research-tmp-0.16\artifacts\old-wave\1.6.0\fresh-1.6.0.zip
+   1.547 Loading Level.dat: 1157871 bytes.
+   1.548 Info Scenario.cpp:136: Map version 0.16.51-0
+   1.589 Checksum for script C:/Projects/Factorio/more-infinite-research-tmp-0.16/artifacts/old-wave/1.6.0/user-create/temp/currently-playing/control.lua: 950616531
+   1.591 Checksum for script __more-infinite-research__/control.lua: 3842758460
+   1.957 Goodbye

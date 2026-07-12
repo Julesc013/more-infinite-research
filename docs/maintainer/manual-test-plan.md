@@ -111,7 +111,11 @@ Required on the `legacy` branch with a Factorio `2.0.x` binary:
 | `legacy-1.9.2-runtime-2.0` | Validate the tested `v2.2.0 -> v1.9.2` transition port |
 | `target-2.3.0-runtime-2.0` | Validate the first Factorio `2.0` port of the MIR 3 architecture |
 | `target-1.9.3-runtime-1.1` | Validate the first Factorio `1.1` compatibility port under the locked mapping |
-| `target-1.8.0-runtime-1.0` | Validate the first Factorio `1.0` compatibility port after the `0.18` bridge policy is recorded |
+| `target-1.8.0-runtime-0.18` | Validate the Factorio `0.18` bridge/archive package in a matching `0.18` binary |
+| `target-1.8.0-bridge-runtime-1.0` | Validate the exact same `1.8.0` zip in Factorio `1.0` before bridge publication |
+| `target-1.8.1-runtime-1.0` | Validate the first maintained Factorio `1.0` compatibility port |
+| `target-1.7.0-runtime-0.17` | Validate the reduced Factorio `0.17` port and confirm generated streams never depend on disabled tutorial technologies |
+| `target-1.7.0-research-all-0.17` | Run `research_all_technologies()` and confirm the next level of each generated infinite stream is available rather than red |
 | `legacy-space-age` | Confirm any optional Space Age subset supported by Factorio `2.0.x` |
 | `legacy-generated-tech-ids` | Compare generated technology names against expected legacy snapshot |
 

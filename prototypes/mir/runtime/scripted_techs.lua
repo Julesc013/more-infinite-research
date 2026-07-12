@@ -2,6 +2,7 @@ local spoilage = require("prototypes.mir.runtime.effects.spoilage_preservation")
 local agricultural_growth = require("prototypes.mir.runtime.effects.agricultural_growth_speed")
 local productivity_family_adoption = require("prototypes.mir.runtime.productivity_family_adoption")
 local effective_settings = require("prototypes.mir.settings.effective")
+local runtime_state = require("prototypes.mir.runtime.state")
 
 local M = {}
 
@@ -12,9 +13,7 @@ local features = {
 }
 
 local function ensure_storage()
-  storage.mir = storage.mir or {}
-  storage.mir.scripted_techs = storage.mir.scripted_techs or {}
-  return storage.mir.scripted_techs
+  return runtime_state.bucket("scripted_techs")
 end
 
 local function debug_enabled()

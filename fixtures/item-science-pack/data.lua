@@ -1,7 +1,7 @@
 local pack = {
   type = "item",
   name = "mir-fixture-science-pack",
-  icon = "__base__/graphics/icons/automation-science-pack.png",
+  icon = "__base__/graphics/icons/science-pack-1.png",
   icon_size = 64,
   subgroup = "science-pack",
   order = "z[mir-fixture-science-pack]",
@@ -13,7 +13,7 @@ local recipe = {
   name = "mir-fixture-science-pack",
   enabled = false,
   ingredients = {
-    {type = "item", name = "automation-science-pack", amount = 1}
+    {type = "item", name = "science-pack-1", amount = 1}
   },
   results = {
     {type = "item", name = "mir-fixture-science-pack", amount = 1}
@@ -23,14 +23,14 @@ local recipe = {
 local tech = {
   type = "technology",
   name = "mir-fixture-science-pack",
-  icon = "__base__/graphics/technology/automation-science-pack.png",
+  icon = "__base__/graphics/technology/science-pack-1.png",
   icon_size = 256,
   effects = {
     {type = "unlock-recipe", recipe = "mir-fixture-science-pack"}
   },
   unit = {
     count = 10,
-    ingredients = {{"automation-science-pack", 1}},
+    ingredients = {{"science-pack-1", 1}},
     time = 10
   }
 }

@@ -14,6 +14,7 @@ local planner_prerequisites = require("prototypes.mir.planner.prerequisites")
 local planner_science = require("prototypes.mir.planner.science")
 local science_packs = require("prototypes.mir.capabilities.science_integration.science_packs")
 local stream_emitter = require("prototypes.mir.emit.stream_spec_adapter")
+local target_line = require("prototypes.mir.platform.factorio.target_line")
 
 local M = {}
 
@@ -123,7 +124,7 @@ local function make_stream(key, raw_spec)
   local base_cost = costs.base_cost_for(key, spec)
   local growth_factor = costs.growth_factor_for(key, spec)
   local max_level = costs.max_level_for(key, spec)
-  local count_formula = tostring(base_cost) .. " * " .. tostring(growth_factor) .. "^(L-1)"
+  local count_formula = tostring(base_cost) .. "*" .. tostring(growth_factor) .. "^(L-1)"
   local research_time = costs.research_time_for(key, spec)
 
   local direct_effects = nil
@@ -163,6 +164,12 @@ local function make_stream(key, raw_spec)
       max_level = max_level,
     })
     D.stream(D.stream_fields(key, spec, "generated", "direct_effect", ingredients, prerequisites, direct_effects, lab_status))
+    return
+  end
+
+  if not target_line.feature_enabled("recipe_productivity") then
+    log("[more-infinite-research] Skipping stream "..key.." because recipe productivity is unsupported on Factorio "..target_line.factorio_version..".")
+    D.stream(D.stream_fields(key, spec, "skipped", "recipe_productivity_unsupported", ingredients, nil, {}, lab_status))
     return
   end
 
@@ -216,7 +223,9 @@ function M.run()
     make_stream(key, C.streams[key])
   end
 
-  adoption_policy.emit_mod_data()
+  if target_line.feature_enabled("recipe_productivity") then
+    adoption_policy.emit_mod_data()
+  end
 end
 
 return M

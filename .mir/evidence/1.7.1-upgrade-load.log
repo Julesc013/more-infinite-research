@@ -1,0 +1,30 @@
+   0.001 2026-07-13 08:43:43; Factorio 0.17.79 (build 47865, win64, alpha)
+   0.001 Operating system: Windows 10 (build 19045)
+   0.002 Program arguments: "D:\Programs\Factorio\0.17\bin\x64\factorio.exe" "--config" "C:\Projects\Factorio\more-infinite-research-tmp-0.17\artifacts\old-wave\1.7.1\config-upgrade-load.ini" "--no-log-rotation" "--disable-audio" "--mod-directory" "C:\Projects\Factorio\more-infinite-research-tmp-0.17\artifacts\old-wave\1.7.1\upgrade-mods" "--benchmark" "C:\Projects\Factorio\more-infinite-research-tmp-0.17\artifacts\old-wave\1.7.1\upgrade-from-1.7.0.zip" "--benchmark-ticks" "1" "--benchmark-runs" "1"
+   0.002 Read data path: D:/Programs/Factorio/0.17/data
+   0.002 Write data path: C:/Projects/Factorio/more-infinite-research-tmp-0.17/artifacts/old-wave/1.7.1/user-upgrade-load [18497/450559MB]
+   0.002 Binaries path: D:/Programs/Factorio/0.17/bin
+   0.013 System info: [CPU: Intel(R) Core(TM) i7-7700HQ CPU @ 2.80GHz, 8 cores, RAM: 9620/16257 MB, page: 15091/18739 MB, virtual: 4247/134217727 MB, extended virtual: 0 MB]
+   0.013 Running in headless mode
+   0.029 Loading mod settings more-infinite-research 1.7.1 (settings.lua)
+   0.040 Loading mod core 0.0.0 (data.lua)
+   0.101 Loading mod base 0.17.79 (data.lua)
+   0.353 Loading mod more-infinite-research 1.7.1 (data.lua)
+   0.486 Loading mod base 0.17.79 (data-updates.lua)
+   0.607 Loading mod more-infinite-research 1.7.1 (data-updates.lua)
+   0.724 Loading mod more-infinite-research 1.7.1 (data-final-fixes.lua)
+   0.883 Checksum for core: 2035938594
+   0.883 Checksum of base: 4156627525
+   0.883 Checksum of more-infinite-research: 2958803276
+   1.068 Prototype list checksum: 1500841871
+   1.105 Info PlayerData.cpp:70: Local player-data.json unavailable
+   1.105 Info PlayerData.cpp:75: Cloud player-data.json unavailable
+   1.107 Info GlobalContext.cpp:1199: Resetting config.
+   1.108 Factorio initialised
+   1.109 Loading map C:\Projects\Factorio\more-infinite-research-tmp-0.17\artifacts\old-wave\1.7.1\upgrade-from-1.7.0.zip: 538769 bytes.
+   1.212 Loading level.dat: 991671 bytes.
+   1.217 Info Scenario.cpp:187: Map version 0.17.79-0
+   1.289 Loading script.dat: 383 bytes.
+   1.293 Checksum for script C:/Projects/Factorio/more-infinite-research-tmp-0.17/artifacts/old-wave/1.7.1/user-upgrade-load/temp/currently-playing/control.lua: 3265260072
+   1.295 Checksum for script __more-infinite-research__/control.lua: 3769129508
+   1.375 Goodbye

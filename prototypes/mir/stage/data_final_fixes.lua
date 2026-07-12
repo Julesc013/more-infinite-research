@@ -18,6 +18,7 @@ function M.run()
   steps.emit_compatibility_planner()
 
   steps.assert_registered_technology_effects()
+  steps.assert_registered_technology_safety()
   steps.flush_diagnostics()
 end
 

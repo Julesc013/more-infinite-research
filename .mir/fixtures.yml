@@ -6,6 +6,14 @@ fixture_roots:
   run_profiles: fixtures/run-profiles
 
 fixtures:
+  generated-prerequisite-safety:
+    assertion_path: fixtures/assert-generated-prerequisite-safety
+    validates:
+      - generated-stream-prerequisites-enabled
+      - already-enabled-science-pack-recipe-needs-no-unlock
+      - disabled-tutorial-technology-exclusion
+      - unlock-all-generated-stream-reachability
+
   settings-visibility:
     assertion_path: fixtures/assert-hidden-setting-readability
     validates:
@@ -28,6 +36,13 @@ fixtures:
       - settings-profile-compact-export
       - settings-profile-strict-import-validation
       - hidden-provider-setting-profile-roundtrip
+
+  legacy-effect-icons:
+    assertion_path: fixtures/assert-legacy-effect-icons
+    validates:
+      - factorio-0-17-no-unavailable-newer-badge-icons
+      - factorio-0-17-no-unsupported-native-modifier-icon-metadata
+      - no-newer-core-graphics-in-legacy-package
 
   air-scrubbing:
     path: fixtures/air-scrubbing

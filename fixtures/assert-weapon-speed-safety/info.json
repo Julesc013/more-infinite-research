@@ -4,9 +4,9 @@
   "title": "MIR Fixture - Assert Weapon Speed Safety",
   "author": "Julesc013",
   "description": "Validation fixture that asserts MIR weapon-speed overlap handling does not strip finite vanilla tank cannon speed bonuses.",
-  "factorio_version": "2.1",
+  "factorio_version": "0.16",
   "dependencies": [
-    "base >= 2.1.8",
+    "base >= 0.16",
     "more-infinite-research"
   ]
 }
