@@ -96,18 +96,31 @@ waves:
 
   mir_3_1_0:
     version: "3.1.0"
-    branch: dev
+    branch: main
     source_anchor_required: published-3.0.5-plus-accepted-portable-return
     baseline_tag: pre-3.1-modernization
     baseline_commit: f3d3b6073166b5acdc2ae5636c0d68302b757f0f
     implementation_gate: authorized-by-maintainer-directed-continuation
-    status: implementation
+    source_commit: 0dd8d7f27d9bbbbb728a70ef00b7c955af48cbb7
+    release_commit: 6272cb67c96855c574c96032cb27dfcf0721aa74
+    tag: "3.1.0"
+    archive: dist/more-infinite-research_3.1.0.zip
+    sha256: 0244D40A9971C450274FE1FD7EA142FA5D23E4A2271A0191F31F395589267C1A
+    automated_gate: passed
+    interactive_gate: passed
+    publication_scope: github-release
+    mod_portal_upload: blocked-missing-mod-upload-api-key
+    status: published-frozen
 
   mir_2_4_0:
     version: "2.4.0"
     branch: tmp/2.0
     source_anchor_required: accepted-3.1.0
-    status: planned
+    source_commit: pending-final-revalidation
+    archive: dist/more-infinite-research_2.4.0.zip
+    automated_gate: revalidating
+    manual_gate: pending
+    status: rebuilding-after-target-profile-status-update
 
   mir_3_2_0:
     version: "3.2.0"

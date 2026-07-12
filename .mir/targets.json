@@ -61,7 +61,7 @@
     "2.0": {
       "factorio_version": "2.0",
       "support_class": "maintained-modern-port",
-      "validation_status": "validated-historical-release",
+      "validation_status": "validated-current-candidate",
       "runtime_state_backend": "storage",
       "science_family": "modern-space-age-capable",
       "reduced_legacy": false,

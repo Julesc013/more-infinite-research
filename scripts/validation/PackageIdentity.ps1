@@ -246,7 +246,7 @@ function Get-MIRValidationHarnessFingerprint {
   }
   $files = @($files | Where-Object {
     $_ -notmatch '^\.mir/evidence/' -and
-    $_ -notin @('.mir/branches.yml', '.mir/convergence.yml')
+    $_ -notin @('.mir/branches.yml', '.mir/convergence.yml', '.mir/release-wave.yml')
   })
   $rows = foreach ($relative in @($files | Sort-Object -Unique)) {
     $path = Join-Path $repo $relative
