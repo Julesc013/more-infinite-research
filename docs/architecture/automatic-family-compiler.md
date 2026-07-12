@@ -49,3 +49,4 @@ Planning is side-effect free. Only modules under `prototypes/mir/emit/` may crea
 
 Each gate requires focused pure tests, static validation, deterministic plan evidence, a generated-ID parity check, and target runtime validation before it can become a release candidate.
 
+`fixtures/golden-plans/stable-technology-ids.json` locks the 70 released 3.1.0 technology identities. Attach-only changes must pass this golden before runtime validation; a future manifest-reviewed family technology must update the golden explicitly rather than appearing as incidental compiler output.

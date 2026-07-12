@@ -339,6 +339,7 @@ validation_tooling:
     factorio_process: scripts/validation/FactorioProcess.ps1
     settings_overrides: scripts/validation/SettingsOverrides.ps1
     scenario_registry: scripts/validation/ScenarioRegistry.ps1
+    golden_plans: scripts/Test-MIRGoldenPlans.ps1
   rules:
     - the facade preserves its public parameters and structured result schema
     - process launch and copied-mod filesystem safety are reusable modules

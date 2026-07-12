@@ -1646,6 +1646,10 @@ Invoke-RepoCheck "compatibility policy and claim lints pass" {
   & (Join-Path $repo "scripts\Test-MIRPolicyLints.ps1") -RepoRoot $repo
 }
 
+Invoke-RepoCheck "stable generated technology golden plan passes" {
+  & (Join-Path $repo "scripts\Test-MIRGoldenPlans.ps1") -RepoRoot $repo
+}
+
 Invoke-RepoCheck "release documentation lists final manual and API checks" {
   $documentation = @(
     foreach ($file in Get-DocumentationFiles) {
@@ -2073,7 +2077,7 @@ if (-not (Test-Path -LiteralPath $fixtureRoot)) {
   throw "Fixture directory not found: $fixtureRoot"
 }
 
-$nonModFixtureDirs = @("compat-matrix", "run-profiles")
+$nonModFixtureDirs = @("compat-matrix", "golden-plans", "run-profiles")
 
 $postMirAssertionFixtures = @(
   "mir-fixture-assert-aai-loader-belt-productivity",

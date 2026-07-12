@@ -5,6 +5,13 @@ scenario_manifest:
   schema: 2
   declarations: full-records
 
+golden_plans:
+  stable_technology_ids:
+    path: fixtures/golden-plans/stable-technology-ids.json
+    baseline: immutable-3.1.0
+    expected_count: 70
+    validator: scripts/Test-MIRGoldenPlans.ps1
+
 fixture_roots:
   synthetic: fixtures
   compatibility_matrix: fixtures/compat-matrix
