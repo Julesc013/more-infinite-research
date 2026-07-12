@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "status": "passed",
+  "version": "1.9.4",
+  "branch": "tmp/1.1",
+  "source_commit": "498408854170e893a0fa13bdbd11930197892b1d",
+  "factorio_version": "1.1.110",
+  "factorio_binary_sha256": "B7B4B834FCA2E32AFA9D3476EB42CC09B02F1205BE97F688DC6FC6ACE7BA8FE1",
+  "artifact": "dist/more-infinite-research_1.9.4.zip",
+  "artifact_sha256": "431CD5B011B678B089BB4F9B04B22EB5DD32A3411EDB8E7E453E02D920E3A46E",
+  "artifact_size_bytes": 302312,
+  "artifact_entries": 124,
+  "forbidden_entries": 0,
+  "prior_artifact": "dist/more-infinite-research_1.9.3.zip",
+  "prior_artifact_sha256": "1723C10FEDD9A12003052991CC7574F1F6BF4E4ABC506F0323571DF680C0444B",
+  "static_gate": "passed",
+  "runtime_scenarios": 10,
+  "fresh_create": "passed",
+  "fresh_reload": "passed",
+  "upgrade_from_1_9_3": "passed",
+  "public_release": false,
+  "evidence": [
+    ".mir/evidence/1.9.4-fresh-create.log",
+    ".mir/evidence/1.9.4-fresh-reload.log",
+    ".mir/evidence/1.9.4-upgrade-create-1.9.3.log",
+    ".mir/evidence/1.9.4-upgrade-load.log"
+  ]
+}

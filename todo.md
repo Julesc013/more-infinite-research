@@ -244,6 +244,12 @@ compatibility port of a tested current-line snapshot.
   smoke check and reduced `1.1` fixture gate. Factorio `1.1.110` rejected
   `change-recipe-productivity`, so recipe productivity remains a documented
   target-line exclusion.
+- [x] Qualify the unreleased `v1.9.4` Factorio `1.1` maintenance RC with portable prerequisite and ownership safety.
+  Exact package: `dist/more-infinite-research_1.9.4.zip`, SHA-256
+  `431CD5B011B678B089BB4F9B04B22EB5DD32A3411EDB8E7E453E02D920E3A46E`,
+  `302312` bytes, `124` entries, `0` forbidden entries. Static, ten-scenario
+  real-binary, fresh-create, reload, and exact `1.9.3` upgrade gates pass on
+  Factorio `1.1.110`. Keep this RC unpublished during the old-target wave.
 - [ ] Release `v1.8.0` as the Factorio `0.18` bridge compatibility port from the MIR 3 source anchor plus portable `2.3.0` and `1.9.3` lessons.
 - [ ] Release `v1.8.1` as the true Factorio `1.0` compatibility port only if the `0.18` bridge does not cover the public `1.0` release shape.
 - [ ] Release `v1.7.0`, `v1.6.0`, and `v1.5.0` as reduced native-infinite editions for Factorio `0.17`, `0.16`, and `0.15` only after target binary proof.

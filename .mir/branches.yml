@@ -107,9 +107,20 @@ release_artifacts:
       branch: tmp/1.1
       target_factorio: "1.1"
       source_anchor: mir_1_9_3
+      source_commit: 498408854170e893a0fa13bdbd11930197892b1d
       artifact: dist/more-infinite-research_1.9.4.zip
-      automated_gate: pending-final-package
-      status: candidate-building
+      sha256: 431CD5B011B678B089BB4F9B04B22EB5DD32A3411EDB8E7E453E02D920E3A46E
+      size_bytes: 302312
+      entries: 124
+      forbidden_entries: 0
+      automated_gate: passed
+      exact_dist_base: passed
+      fresh_create: passed
+      fresh_reload: passed
+      upgrade_from_1_9_3: passed
+      structured_summary_path: .mir/evidence/1.9.4-candidate-summary.json
+      public_release: false
+      status: candidate-qualified
   closed_versions:
     - version: "2.2.0"
       branch: main
