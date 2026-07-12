@@ -1,4 +1,18 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.3.0
+Date: 2026-07-13
+
+  Features:
+
+    - Reconstructed a finite continuation edition for Factorio 0.13 and its alien-science era.
+    - Retained iterative generated-technology prerequisite safety on the earliest supported archive line.
+
+  Changes:
+
+    - Limited generated effects and technology fields to surfaces proved by the Factorio 0.13 data and binary.
+    - Added target-era package and save compatibility for the archive candidate.
+
+---------------------------------------------------------------------------------------------------
 Version: 1.4.0
 Date: 2026-07-13
 

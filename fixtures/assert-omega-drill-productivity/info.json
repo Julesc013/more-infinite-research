@@ -4,9 +4,9 @@
   "title": "MIR Fixture - Assert Omega Drill Productivity",
   "author": "Julesc013",
   "description": "Validation fixture that asserts Omega-style drill recipes receive MIR mining drill productivity.",
-  "factorio_version": "0.14",
+  "factorio_version": "0.13",
   "dependencies": [
-    "base >= 0.14",
+    "base >= 0.13",
     "more-infinite-research",
     "mir-fixture-omega-drill"
   ]

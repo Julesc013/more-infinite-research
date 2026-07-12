@@ -4,8 +4,8 @@
   "title": "MIR Fixture - Finite Base Extension Level",
   "author": "Julesc013",
   "description": "Validation fixture that adds a finite vanilla-chain level before MIR extends that chain.",
-  "factorio_version": "0.14",
+  "factorio_version": "0.13",
   "dependencies": [
-    "base >= 0.14"
+    "base >= 0.13"
   ]
 }
