@@ -253,6 +253,9 @@ $requiredMirFiles = @(
   "prototypes/mir/capabilities/registry.lua",
   "prototypes/mir/capabilities/recipe_productivity/planner.lua",
   "prototypes/mir/capabilities/recipe_productivity/recipe_matching.lua",
+  "prototypes/mir/families/rules.lua",
+  "prototypes/mir/families/registry.lua",
+  "prototypes/mir/families/resolver.lua",
   "prototypes/mir/capabilities/science_integration/science_packs.lua",
   "prototypes/mir/capabilities/science_integration/science_selector.lua",
   "prototypes/mir/planner/compiler.lua",
@@ -401,12 +404,17 @@ $streamCompilerText = Read-MIRFile -RelativePath "prototypes/mir/planner/stream_
 Assert-MIRContains -RelativePath "prototypes/mir/planner/stream_compiler.lua" -Text $streamCompilerText -Needle 'require("prototypes.mir.streams.registry")'
 Assert-MIRContains -RelativePath "prototypes/mir/planner/stream_compiler.lua" -Text $streamCompilerText -Needle 'require("prototypes.mir.emit.stream_spec_adapter")'
 Assert-MIRContains -RelativePath "prototypes/mir/planner/stream_compiler.lua" -Text $streamCompilerText -Needle "function M.run()"
+Assert-MIRContains -RelativePath "prototypes/mir/planner/stream_compiler.lua" -Text $streamCompilerText -Needle 'require("prototypes.mir.families.resolver")'
 Assert-MIRContains -RelativePath "prototypes/mir/planner/stream_compiler.lua" -Text $streamCompilerText -Needle "function M.compile()"
 Assert-MIRContains -RelativePath "prototypes/mir/planner/stream_compiler.lua" -Text $streamCompilerText -Needle "function M.apply(plan)"
 
 $generationPlanText = Read-MIRFile -RelativePath "prototypes/mir/planner/generation_plan.lua"
 Assert-MIRContains -RelativePath "prototypes/mir/planner/generation_plan.lua" -Text $generationPlanText -Needle "function Plan:finalize()"
 Assert-MIRContains -RelativePath "prototypes/mir/planner/generation_plan.lua" -Text $generationPlanText -Needle "duplicate technology name"
+
+$familyRegistryText = Read-MIRFile -RelativePath "prototypes/mir/families/registry.lua"
+Assert-MIRContains -RelativePath "prototypes/mir/families/registry.lua" -Text $familyRegistryText -Needle "FamilyRule must be data-only"
+Assert-MIRContains -RelativePath "prototypes/mir/families/registry.lua" -Text $familyRegistryText -Needle "Duplicate FamilyRule id"
 
 $settingsProfileText = Read-MIRFile -RelativePath "prototypes/mir/runtime/settings_profile.lua"
 Assert-MIRContains -RelativePath "prototypes/mir/runtime/settings_profile.lua" -Text $settingsProfileText -Needle '"mir-settings-export"'

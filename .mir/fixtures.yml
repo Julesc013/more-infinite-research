@@ -236,3 +236,14 @@ fixtures:
     validates:
       - mining-drill-recipe-candidates
       - effect-count
+
+  semantic-family-attach:
+    requires_features: [recipe_productivity]
+    path: fixtures/semantic-family-attach
+    assertion_path: fixtures/assert-semantic-family-attach
+    validates:
+      - data-only-family-rules
+      - structural-entity-backed-recipe-attachment
+      - module-tier-attachment
+      - existing-stable-stream-only
+      - proposal-only-lab-manufacturing

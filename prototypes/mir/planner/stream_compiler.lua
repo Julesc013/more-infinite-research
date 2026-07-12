@@ -18,6 +18,7 @@ local stream_emitter = require("prototypes.mir.emit.stream_spec_adapter")
 local target_line = require("prototypes.mir.platform.factorio.target_line")
 local effect_scaling = require("prototypes.mir.settings.effect_scaling")
 local generation_plan = require("prototypes.mir.planner.generation_plan")
+local family_resolver = require("prototypes.mir.families.resolver")
 
 local M = {}
 
@@ -135,6 +136,31 @@ local function skip_row(key, spec, reason, ingredients, effects, lab_status, ext
   )
 end
 
+local function attach_family_recipes(key, buckets)
+  local attachments = family_resolver.attachments_for_stream(key)
+  if #attachments == 0 then return buckets end
+
+  local assigned, buckets_by_change = {}, {}
+  for _, bucket in ipairs(buckets or {}) do
+    buckets_by_change[bucket.change] = bucket
+    for _, recipe_name in ipairs(bucket.recipes or {}) do assigned[recipe_name] = true end
+  end
+  for _, attachment in ipairs(attachments) do
+    if not assigned[attachment.recipe] then
+      local bucket = buckets_by_change[attachment.change]
+      if not bucket then
+        bucket = {change = attachment.change, recipes = {}}
+        buckets_by_change[attachment.change] = bucket
+        table.insert(buckets, bucket)
+      end
+      table.insert(bucket.recipes, attachment.recipe)
+      assigned[attachment.recipe] = true
+    end
+  end
+  for _, bucket in ipairs(buckets or {}) do table.sort(bucket.recipes) end
+  return buckets
+end
+
 local function plan_stream(key, raw_spec)
   if not costs.enabled_for(key, raw_spec) then
     return skip_row(key, raw_spec, "disabled")
@@ -201,6 +227,7 @@ local function plan_stream(key, raw_spec)
   end
 
   local buckets = recipe_productivity_planner.match_buckets(key, spec)
+  buckets = attach_family_recipes(key, buckets)
   local covered_by_existing
   buckets, covered_by_existing = owner_policy.filter_existing_recipe_productivity(key, spec, buckets)
   local adopted_effects, family_blocked, adoption_owner_name, adoption

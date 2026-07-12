@@ -5,6 +5,7 @@ local policies = require("prototypes.mir.policy.capabilities")
 local schema = require("prototypes.mir.core.schema")
 local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 local relationships = require("prototypes.mir.index.relationships")
+local family_resolver = require("prototypes.mir.families.resolver")
 
 local C = {}
 
@@ -316,6 +317,46 @@ local function emit_native_modifier_decisions(registry, resolver, discovered_row
   return total, 0, 0, warnings
 end
 
+local function emit_family_rule_decisions()
+  local rows = family_resolver.snapshot().decisions
+  local attached, proposed, diagnosed = 0, 0, 0
+  for _, row in ipairs(rows) do
+    if row.decision == "attach" then attached = attached + 1
+    elseif row.decision == "propose" then proposed = proposed + 1
+    else diagnosed = diagnosed + 1 end
+    D.decision({
+      key = row.recipe,
+      status = "diagnostic",
+      reason = "semantic_family_rule_decision",
+      subject_type = "recipe",
+      subject = row.recipe,
+      capability = row.capability,
+      family = row.rule,
+      source = "family-rule:" .. row.rule,
+      policy = "attach-existing-only",
+      decision = row.decision,
+      emitted = row.decision == "attach" and "true" or "false",
+      blockers = row.blocker or "",
+      stable_stream_id = row.target_stream or "",
+      recipe = row.recipe,
+      target = row.item,
+      effect = "change-recipe-productivity",
+      evidence = "recipe-output:item-place-result:entity-type"
+    })
+  end
+  D.compatibility_plan({
+    key = "family_rule_registry",
+    status = "diagnostic",
+    reason = "semantic_family_rules_resolved",
+    capability = "recipe-productivity",
+    total = tostring(#rows),
+    generated = tostring(attached),
+    unknown = tostring(proposed),
+    warnings = tostring(diagnosed),
+    evidence = "RecipeFactV2,relationship-index,FamilyRule"
+  })
+end
+
 local function require_stage(state, expected, next_stage)
   if type(state) ~= "table" or state.stage ~= expected then
     error("MIR capability lifecycle expected " .. expected .. " state.", 3)
@@ -472,6 +513,8 @@ function C.emit(registry)
     proposed = proposed + result[3]
     warnings = warnings + result[4]
   end
+
+  emit_family_rule_decisions()
 
   D.compatibility_plan({
     key = "capability_registry",

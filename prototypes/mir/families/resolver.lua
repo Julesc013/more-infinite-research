@@ -1,0 +1,144 @@
+local deepcopy = require("prototypes.mir.core.deepcopy")
+local recipe_facts = require("prototypes.mir.index.recipe_facts")
+local relationships = require("prototypes.mir.index.relationships")
+local rule_registry = require("prototypes.mir.families.registry")
+
+local M = {}
+local canonical = nil
+
+local function sorted_keys(tbl)
+  local out = {}
+  for key, _ in pairs(tbl or {}) do table.insert(out, key) end
+  table.sort(out)
+  return out
+end
+
+local function has_self_return(fact)
+  local ingredients = {}
+  for _, entry in ipairs(fact.ingredients or {}) do ingredients[entry.name] = true end
+  for _, entry in ipairs(fact.results or {}) do
+    if ingredients[entry.name] then return true end
+  end
+  return false
+end
+
+local function eligibility(fact)
+  if not fact then return false, "recipe_fact_missing" end
+  if fact.hidden then return false, "hidden_recipe" end
+  if fact.parameter then return false, "parameter_recipe" end
+  if fact.source_class == "recycling" then return false, "recycling_recipe" end
+  if fact.allow_productivity == false then return false, "recipe_productivity_not_allowed" end
+  if tonumber(fact.maximum_productivity) == 0 then return false, "zero_productivity_cap" end
+  if has_self_return(fact) then return false, "self_return_risk" end
+  return true, nil
+end
+
+local function module_change(rule, tier)
+  tier = tonumber(tier) or 0
+  return rule.tier_changes and rule.tier_changes[tier]
+    or (tier > #(rule.tier_changes or {}) and rule.high_tier_change)
+    or rule.high_tier_change
+end
+
+local function candidate_items(rule, indexes)
+  local items = {}
+  local seen = {}
+  for _, entity_type in ipairs(rule.entity_types or {}) do
+    for _, entity_name in ipairs(indexes.entities_by_type[entity_type] or {}) do
+      for _, item_name in ipairs(indexes.items_by_place_result[entity_name] or {}) do
+        if not seen[item_name] then seen[item_name] = true; table.insert(items, item_name) end
+      end
+    end
+  end
+  for _, prototype_type in ipairs(rule.item_prototype_types or {}) do
+    if prototype_type == "module" then
+      for _, tier in ipairs(sorted_keys(indexes.modules_by_tier)) do
+        for _, item_name in ipairs(indexes.modules_by_tier[tier]) do
+          if not seen[item_name] then seen[item_name] = true; table.insert(items, item_name) end
+        end
+      end
+    end
+  end
+  table.sort(items)
+  return items
+end
+
+local function build()
+  if canonical then return canonical end
+  local indexes = relationships.snapshot()
+  local rules = rule_registry.snapshot().rules
+  local attachments, decisions, ownership = {}, {}, {}
+
+  for _, rule in ipairs(rules) do
+    for _, item_name in ipairs(candidate_items(rule, indexes)) do
+      for _, recipe_name in ipairs(indexes.recipes_by_output[item_name] or {}) do
+        local fact = recipe_facts.get(recipe_name)
+        local eligible, blocker = eligibility(fact)
+        local external_owners = indexes.technologies_by_recipe_effect[recipe_name] or {}
+        if #external_owners > 0 then eligible, blocker = false, "existing_recipe_productivity_owner" end
+
+        local change = rule.change
+        if rule.item_prototype_types then
+          local item = indexes.items[item_name]
+          local tier = nil
+          for candidate_tier, names in pairs(indexes.modules_by_tier) do
+            for _, name in ipairs(names) do if name == item_name then tier = candidate_tier end end
+          end
+          change = module_change(rule, tier)
+        end
+
+        local decision = rule.mode == "proposal-only" and "propose" or "attach"
+        if not eligible then decision = "diagnose" end
+        table.insert(decisions, {
+          schema = 1,
+          rule = rule.id,
+          capability = rule.capability,
+          recipe = recipe_name,
+          item = item_name,
+          target_stream = rule.target_stream,
+          decision = decision,
+          blocker = blocker or rule.blocker,
+          change = change
+        })
+
+        if eligible and rule.mode == "attach-existing" then
+          local previous = ownership[recipe_name]
+          if previous and previous ~= rule.target_stream then
+            error("FamilyRule attachment is ambiguous for recipe " .. recipe_name, 2)
+          end
+          ownership[recipe_name] = rule.target_stream
+          attachments[rule.target_stream] = attachments[rule.target_stream] or {}
+          table.insert(attachments[rule.target_stream], {
+            recipe = recipe_name,
+            change = change,
+            rule = rule.id
+          })
+        end
+      end
+    end
+  end
+
+  for _, rows in pairs(attachments) do
+    table.sort(rows, function(a, b)
+      if a.change ~= b.change then return a.change > b.change end
+      return a.recipe < b.recipe
+    end)
+  end
+  table.sort(decisions, function(a, b)
+    if a.rule ~= b.rule then return a.rule < b.rule end
+    return a.recipe < b.recipe
+  end)
+  canonical = {schema = 1, attachments = attachments, decisions = decisions}
+  return canonical
+end
+
+function M.attachments_for_stream(stream_key)
+  return deepcopy(build().attachments[stream_key] or {})
+end
+
+function M.snapshot()
+  return deepcopy(build())
+end
+
+return M
+

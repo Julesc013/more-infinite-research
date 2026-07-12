@@ -605,6 +605,7 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
   $atanAshAssertText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-atan-ash-separation\data-final-fixes.lua")
   $aaiLoaderFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-aai-loader-belt-productivity\data-final-fixes.lua")
   $bigMiningDrillFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-big-mining-drill-productivity\data-final-fixes.lua")
+  $semanticFamilyFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-semantic-family-attach\data-final-fixes.lua")
   $atanNuclearScienceFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-atan-nuclear-science-productivity\data-final-fixes.lua")
   $capabilityNegativeFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\capability-negative-cases\data.lua")
   $capabilityNegativeAssertText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-capability-negative-cases\data-final-fixes.lua")
@@ -811,6 +812,7 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "fixtures\assert-atan-ash-separation\data-final-fixes.lua"; Text = $atanAshAssertText; Snippet = 'atan-landfill-from-ash' },
     @{ File = "fixtures\assert-aai-loader-belt-productivity\data-final-fixes.lua"; Text = $aaiLoaderFixtureText; Snippet = 'aai-turbo-loader' },
     @{ File = "fixtures\assert-big-mining-drill-productivity\data-final-fixes.lua"; Text = $bigMiningDrillFixtureText; Snippet = 'big-mining-drill should use +0.05' },
+    @{ File = "fixtures\assert-semantic-family-attach\data-final-fixes.lua"; Text = $semanticFamilyFixtureText; Snippet = 'proposal-only lab manufacturing recipe was emitted' },
     @{ File = "fixtures\assert-atan-nuclear-science-productivity\data-final-fixes.lua"; Text = $atanNuclearScienceFixtureText; Snippet = 'nuclear-science-pack did not receive science-pack productivity' },
     @{ File = "fixtures\capability-negative-cases\data.lua"; Text = $capabilityNegativeFixtureText; Snippet = 'mir-loader-like-container' },
     @{ File = "fixtures\capability-negative-cases\data.lua"; Text = $capabilityNegativeFixtureText; Snippet = 'maximum_productivity = 0' },
@@ -2080,6 +2082,7 @@ $postMirAssertionFixtures = @(
   "mir-fixture-assert-atan-nuclear-science-productivity",
   "mir-fixture-assert-better-bot-battery-skip",
   "mir-fixture-assert-big-mining-drill-productivity",
+  "mir-fixture-assert-semantic-family-attach",
   "mir-fixture-assert-capability-negative-cases",
   "mir-fixture-assert-generation-integrity",
   "mir-fixture-assert-generated-prerequisite-safety",
@@ -3178,6 +3181,18 @@ $bigMiningCapabilityLine = Get-DiagnosticReportLineContaining -Kind "decision" -
 Assert-ReportLineContains -Line $bigMiningCapabilityLine -Expected "decision=generate_stream" -Context "Big Mining Drill capability resolver scenario"
 Assert-ReportLineContains -Line $bigMiningCapabilityLine -Expected "subfamily=mining_drill" -Context "Big Mining Drill capability subfamily scenario"
 Assert-ReportLineContains -Line $bigMiningCapabilityLine -Expected "evidence=item_type:item,item_place_result:big-mining-drill,entity_type:mining-drill,recipe_outputs_item:big-mining-drill" -Context "Big Mining Drill entity-backed evidence scenario"
+
+Invoke-RuntimeScenario -ScenarioName "semantic-family-attach" -EnabledFixtureNames @(
+  "mir-fixture-semantic-family-attach",
+  "mir-fixture-assert-semantic-family-attach"
+)
+$semanticFamilyLine = Get-LastStreamReportLine -Key "research_belts"
+Assert-ReportLineGenerated -Line $semanticFamilyLine -Context "Semantic family attach scenario"
+$semanticLoaderDecision = Get-DiagnosticReportLineContaining -Kind "decision" -Key "assemble-alpha" -Expected "family=loader-manufacturing"
+Assert-ReportLineContains -Line $semanticLoaderDecision -Expected "decision=attach" -Context "Semantic loader attachment decision"
+$semanticLabDecision = Get-DiagnosticReportLineContaining -Kind "decision" -Key "assemble-zeta" -Expected "family=lab-manufacturing"
+Assert-ReportLineContains -Line $semanticLabDecision -Expected "decision=propose" -Context "Semantic lab proposal-only decision"
+Assert-ReportLineContains -Line $semanticLabDecision -Expected "blockers=no_stable_lab_manufacturing_stream" -Context "Semantic lab proposal blocker"
 
 Invoke-RuntimeScenario -ScenarioName "atan-nuclear-science-productivity" -EnabledFixtureNames @(
   "mir-fixture-atan-nuclear-science",

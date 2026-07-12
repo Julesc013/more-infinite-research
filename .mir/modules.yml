@@ -147,6 +147,10 @@ modules:
     - prototypes/mir/capabilities/science_integration/technology_researchability.lua
     - prototypes/mir/capabilities/science_integration/pack_production_reachability.lua
     - prototypes/mir/capabilities/science_integration/science_selection_policy.lua
+  families:
+    - prototypes/mir/families/rules.lua
+    - prototypes/mir/families/registry.lua
+    - prototypes/mir/families/resolver.lua
   planner:
     - prototypes/mir/planner/compiler.lua
     - prototypes/mir/planner/stream_compiler.lua
@@ -266,10 +270,17 @@ target_layers:
       - policy
       - domain
     may_mutate_data_raw: false
+  families:
+    path: prototypes/mir/families
+    may_require:
+      - core
+      - index
+    may_mutate_data_raw: false
   planner:
     path: prototypes/mir/planner
     may_require:
       - capabilities
+      - families
       - policy
       - domain
     may_mutate_data_raw: false

@@ -412,6 +412,7 @@ The exact folder migration can be staged, but new 3.0 code should prefer this sh
 | `platform/` | `data.raw`, `mods`, `settings` | `data:extend` only through emit path | classification or policy |
 | `domain/` | plain Lua tables | plain Lua tables | Factorio globals |
 | `index/` | platform facts | `FactRegistry` | policy decisions |
+| `families/` | RecipeFactV2 and relationship indexes | data-only family decisions and attach proposals | prototype reads or mutation |
 | `graph/` | `FactRegistry` | graph records | prototype mutation |
 | `classify/` | facts and graphs | classifications | technology creation |
 | `policy/` | settings, overlays, facts | policy decisions | prototype mutation |
@@ -432,6 +433,7 @@ compatibility/overlays/ must not mutate data.raw
 compatibility/repairs/ must not generate technologies or change gameplay semantics
 settings/ must not inspect data.raw or force hidden values by default
 streams/ must stay declarative
+families/ must consume copied facts and must not read data.raw
 report/ must not mutate data.raw
 capabilities/ must not create technologies directly
 ```

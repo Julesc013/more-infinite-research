@@ -163,6 +163,14 @@ docs:
     source_of_truth_for:
       - recipe-fact-v2
       - relationship-indexes
+  - path: docs/reference/schemas/family-rule.md
+    title: "FamilyRule Schema"
+    status: current
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - family-rule-schema
   - path: docs/architecture/README.md
     title: "Architecture"
     status: current
