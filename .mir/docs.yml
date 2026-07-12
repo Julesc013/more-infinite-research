@@ -264,6 +264,30 @@ docs:
     doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
+  - path: docs/releases/1.8.2-checklist.md
+    title: "MIR 1.8.2 Candidate Checklist"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-1.8.2-candidate-gate
+  - path: docs/releases/1.8.2-validation-summary.md
+    title: "MIR 1.8.2 Validation Summary"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-1.8.2-validation-result
+  - path: docs/releases/release-notes-1.8.2.md
+    title: "MIR 1.8.2 Candidate Notes"
+    status: current
+    audience: player
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-1.8.2-candidate-notes
   - path: docs/archive/2.x/release-notes-1.8.0.md
     title: "More Infinite Research 1.8.0 Release Notes"
     status: archived

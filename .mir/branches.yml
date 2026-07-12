@@ -147,6 +147,14 @@ release_artifacts:
       factorio_1_0_validation: passed
       factorio_1_0_binary: D:\Programs\Factorio\1.0\bin\x64\factorio.exe
       status: release-candidate
+    mir_1_8_2:
+      version: "1.8.2"
+      branch: tmp/1.0
+      target_factorio: "1.0"
+      source_anchor: mir_1_8_1
+      artifact: dist/more-infinite-research_1.8.2.zip
+      automated_gate: pending-final-package
+      status: candidate-building
   closed_versions:
     - version: "2.2.0"
       branch: main
@@ -174,7 +182,7 @@ release_artifacts:
       target_factorio: "0.18"
       purpose: published bridge/archive package from the MIR 3 source anchor plus portable 2.3.0 and 1.9.3 lessons
     factorio_1_0_port:
-      version: "1.8.1"
+      version: "1.8.2"
       branch: tmp/1.0
       target_factorio: "1.0"
       purpose: maintained Factorio 1.0 support line after the 0.18 bridge proof; future 1.0 maintenance stays on 1.8.x

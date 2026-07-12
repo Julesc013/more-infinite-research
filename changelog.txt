@@ -1,4 +1,22 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.8.2
+Date: 2026-07-12
+
+  Compatibility:
+
+    - Kept the reduced Factorio 1.0 feature surface from 1.8.1 without importing newer engine metadata or effects.
+    - Added deterministic generated-prerequisite reachability using Factorio 1.0 tool-based science packs.
+    - Rejected disabled, cyclic, self-locked, and unrecognized science paths when selecting generated prerequisites.
+    - Restricted weapon-speed cleanup to technologies registered as MIR-generated.
+    - Preserved external infinite weapon-speed continuations and the target-era tanks prerequisite.
+
+  Changes:
+
+    - Added the shared recipe-unlock fact index and researchability authority used by prerequisite planning.
+    - Added exact Factorio 1.0 safeguards for generated graph reachability and external continuation ownership.
+    - Expanded automatic compatibility coverage for both safeguards.
+
+---------------------------------------------------------------------------------------------------
 Version: 1.8.1
 Date: 2026-07-10
 
