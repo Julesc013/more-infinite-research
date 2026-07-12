@@ -70,7 +70,8 @@ modules:
   core:
     - prototypes/mir/core/schema.lua
     - prototypes/mir/core/deepcopy.lua
-    - prototypes/mir/core/table.lua
+      - prototypes/mir/core/table.lua
+      - prototypes/mir/core/fingerprint.lua
   platform:
     - prototypes/mir/platform/factorio/data_raw.lua
     - prototypes/mir/platform/factorio/mods.lua

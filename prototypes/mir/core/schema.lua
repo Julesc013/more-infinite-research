@@ -8,10 +8,10 @@ S.family_decision = 1
 S.compatibility_pack = 1
 S.capability_resolver = 2
 S.capability_policy = 1
-S.decision_record = 1
+S.decision_record = 2
 S.generated_stream_manifest = 1
 S.compatibility_claims = 1
-S.generation_plan = 1
+S.generation_plan = 2
 
 function S.with_schema(kind, row)
   row = row or {}

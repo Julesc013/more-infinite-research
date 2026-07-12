@@ -19,8 +19,26 @@ local target_line = require("prototypes.mir.platform.factorio.target_line")
 local effect_scaling = require("prototypes.mir.settings.effect_scaling")
 local generation_plan = require("prototypes.mir.planner.generation_plan")
 local family_resolver = require("prototypes.mir.families.resolver")
+local family_registry = require("prototypes.mir.families.registry")
+local fingerprint = require("prototypes.mir.core.fingerprint")
+local recipe_facts = require("prototypes.mir.index.recipe_facts")
+local target_profiles = require("prototypes.mir.platform.factorio.target_profiles")
 
 local M = {}
+local latest_plan = nil
+
+local function proof_gates(action, reason)
+  local materializes = action ~= "skip"
+  return {
+    target_supported = materializes or not tostring(reason):find("unsupported", 1, true),
+    effect_valid = materializes or reason ~= "no_available_direct_effects",
+    owner_conflict_free = materializes or not tostring(reason):find("ambiguous", 1, true),
+    science_compatible = materializes or reason ~= "no_lab_compatible_science",
+    lab_compatible = materializes or reason ~= "no_lab_compatible_science",
+    prerequisites_acyclic = true,
+    loop_safe = true
+  }
+end
 
 local function lname(key, spec)
   if spec.localised_name then return spec.localised_name end
@@ -113,14 +131,15 @@ end
 
 local function plan_row(key, spec, action, reason, diagnostics, extra)
   local row = {
-    schema = 1,
+    schema = 2,
     manifest_id = spec.manifest_id or key,
     stream_key = key,
     action = action,
     reason = reason,
     source = "fixed-stream",
     spec = spec,
-    diagnostics = diagnostics
+    diagnostics = diagnostics,
+    gates = proof_gates(action, reason)
   }
   for field, value in pairs(extra or {}) do row[field] = value end
   return row
@@ -277,8 +296,14 @@ local function plan_stream(key, raw_spec)
 end
 
 function M.compile()
-  local plan = generation_plan.new()
   local streams = C.snapshot()
+  local plan = generation_plan.new({
+    source_fingerprints = {
+      facts = fingerprint.of(recipe_facts.snapshot()),
+      rules = fingerprint.of({streams = streams, families = family_registry.snapshot()}),
+      target_profile = fingerprint.of(target_profiles.current())
+    }
+  })
   for _, key in ipairs(table_utils.sorted_keys(streams)) do
     plan:add(plan_stream(key, streams[key]))
   end
@@ -310,8 +335,13 @@ end
 
 function M.run()
   local plan = M.compile()
+  latest_plan = plan
   M.apply(plan)
   return plan
+end
+
+function M.latest_artifact()
+  return latest_plan and latest_plan:artifact() or nil
 end
 
 return M

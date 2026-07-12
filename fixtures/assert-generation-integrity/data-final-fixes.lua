@@ -12,6 +12,7 @@ local raw_stream_catalog = require("__more-infinite-research__.prototypes.mir.do
 local canonical_recipe_facts = require("__more-infinite-research__.prototypes.mir.index.recipe_facts")
 local pipeline_commands = require("__more-infinite-research__.prototypes.mir.pipeline.commands")
 local capability_registry = require("__more-infinite-research__.prototypes.mir.capabilities.registry")
+local stream_compiler = require("__more-infinite-research__.prototypes.mir.planner.stream_compiler")
 
 local function fail(message)
   error("MIR validation failed: " .. message)
@@ -29,6 +30,37 @@ local function assert_no_blocked_pickup_effects()
         fail("technology " .. tech_name .. " uses blocked pickup reach effect " .. effect.type .. ".")
       end
     end
+  end
+end
+
+local function assert_generation_plan_v2()
+  local plan = stream_compiler.latest_artifact()
+  if not plan or plan.schema ~= 2 or not plan.validation_summary or plan.validation_summary.valid ~= true then
+    fail("missing accepted GenerationPlan schema 2 artifact")
+  end
+  if type(plan.plan_fingerprint) ~= "string" or not plan.plan_fingerprint:match("^mir32%-") then
+    fail("GenerationPlan schema 2 fingerprint is missing")
+  end
+  for _, source in ipairs({"facts", "rules", "target_profile"}) do
+    if type(plan.source_fingerprints[source]) ~= "string" then
+      fail("GenerationPlan source fingerprint is missing: " .. source)
+    end
+  end
+  for _, row in ipairs(plan.rows or {}) do
+    for _, gate in ipairs({"target_supported", "effect_valid", "owner_conflict_free", "science_compatible", "lab_compatible", "prerequisites_acyclic", "loop_safe"}) do
+      if type(row.gates and row.gates[gate]) ~= "boolean" then
+        fail("GenerationPlan row is missing boolean gate " .. gate)
+      end
+    end
+  end
+end
+
+local function assert_decision_record_v2()
+  local decision_record = require("__more-infinite-research__.prototypes.mir.domain.decisions.decision_record")
+  local confidence = decision_record.confidence({identity = 1, family = 0.95, loop_safety = 0.25, total = 0.75})
+  if confidence.identity ~= "exact" or confidence.family ~= "structural"
+    or confidence.loop_safety ~= "heuristic" or confidence.total ~= 0.75 then
+    fail("DecisionRecordV2 typed confidence contract changed")
   end
 end
 
@@ -266,6 +298,8 @@ local base_extension_defaults = {
 }
 
 assert_no_blocked_pickup_effects()
+assert_generation_plan_v2()
+assert_decision_record_v2()
 
 for key, default_enabled in pairs(base_extension_defaults) do
   if effective_base_extension_enabled(key, default_enabled) then

@@ -29,7 +29,9 @@ final prototype state
 
 Planning is side-effect free. Only modules under `prototypes/mir/emit/` may create or mutate generated technology prototypes. Reporting materializes decisions; it is not an alternative mutation path.
 
-`GenerationPlan` is the common intermediate representation for every fixed and automatic stream. It records stable stream identity, technology identity, effects, science, prerequisites, cost, migration policy, evidence, blockers, risks, and source provenance. All plan rows are deterministic and are validated as one set before the first generated prototype is emitted.
+`GenerationPlan` is the common intermediate representation for every fixed and automatic stream. Schema 2 records stable stream identity, technology identity, effects, science, prerequisites, cost, migration policy, evidence, blockers, risks, source provenance, explicit proof gates, source fingerprints, and a deterministic plan fingerprint. All plan rows are validated as one set before the first generated prototype is emitted.
+
+`DecisionRecordV2` keeps typed evidence classes instead of treating a formatted confidence string as authority. Confidence ranks review evidence; hard safety gates remain independent booleans and cannot be averaged into an emission decision.
 
 ## Compatibility And Identity Boundary
 

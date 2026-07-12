@@ -2,6 +2,7 @@ local D = {}
 local icons = require("prototypes.mir.emit.icon_builder")
 local schema = require("prototypes.mir.core.schema")
 local effective_settings = require("prototypes.mir.settings.effective")
+local decision_record = require("prototypes.mir.domain.decisions.decision_record")
 
 local rows = {}
 local audit_rows = {}
@@ -85,7 +86,10 @@ end
 
 function D.decision(row)
   schema.decision(row)
-  append("decision", row)
+  local projected = {}
+  for field, value in pairs(row) do projected[field] = value end
+  projected.confidence = decision_record.format_typed_confidence(row.confidence)
+  append("decision", projected)
 end
 
 function D.rule_mutation(row)
