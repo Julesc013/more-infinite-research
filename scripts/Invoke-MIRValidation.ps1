@@ -2909,7 +2909,9 @@ if ($isFactorio11Line) {
     "mir-fixture-assert-weapon-speed-safety"
   ) -WeaponSpeedAdjustmentMode "only-when-dedicated-tech-enabled"
   $weaponSpeedLine = Get-LastExtensionReportLine -Key "weapon-shooting-speed"
-  Assert-ReportLineGenerated -Line $weaponSpeedLine -Context "Factorio 1.1 weapon shooting speed overlap safety scenario"
+  if ($weaponSpeedLine -notmatch "status=skipped" -or $weaponSpeedLine -notmatch "already_infinite") {
+    throw "Factorio 1.1 external weapon continuation should remain authoritative: $weaponSpeedLine"
+  }
 
   Invoke-RuntimeScenario -ScenarioName "generated-prerequisite-safety" -EnabledFixtureNames @(
     "mir-fixture-assert-generated-prerequisite-safety"
