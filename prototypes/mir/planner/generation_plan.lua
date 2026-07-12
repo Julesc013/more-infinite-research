@@ -18,8 +18,41 @@ local REQUIRED_GATES = {
   "science_compatible",
   "lab_compatible",
   "prerequisites_acyclic",
-  "loop_safe"
+  "loop_safe",
+  "progression_safe",
+  "migration_safe",
+  "output_identity_safe"
 }
+
+local function effect_identity(effect)
+  if not effect or effect.type == nil or effect.type == "nothing" then return "" end
+  local fields = {}
+  for key, value in pairs(effect or {}) do
+    if key ~= "change" and key ~= "modifier" and key ~= "icon" and key ~= "icons"
+      and (type(value) == "string" or type(value) == "number" or type(value) == "boolean") then
+      table.insert(fields, tostring(key) .. "=" .. tostring(value))
+    end
+  end
+  table.sort(fields)
+  return table.concat(fields, ";")
+end
+
+local function validate_gate(row, gate_name)
+  local gate = row.gates[gate_name]
+  if type(gate) ~= "table" or type(gate.passed) ~= "boolean"
+    or type(gate.status) ~= "string" or type(gate.evidence) ~= "table" then
+    error("GenerationPlan row gate must be an evidence record: " .. gate_name, 3)
+  end
+  if gate.status ~= "passed" and gate.status ~= "failed" and gate.status ~= "not-applicable" then
+    error("GenerationPlan row gate has unsupported status: " .. gate_name, 3)
+  end
+  if gate.status == "failed" and gate.passed then
+    error("GenerationPlan failed gate cannot pass: " .. gate_name, 3)
+  end
+  if row.action ~= "skip" and not gate.passed then
+    error("GenerationPlan materializing row failed gate " .. gate_name .. ": " .. row.stream_key, 3)
+  end
+end
 
 local function required(row, field)
   if row[field] == nil then
@@ -29,7 +62,7 @@ end
 
 local function validate_row(row)
   if type(row) ~= "table" then error("GenerationPlan row must be a table", 3) end
-  if row.schema ~= 2 then error("GenerationPlan row schema must be 2", 3) end
+  if row.schema ~= 3 then error("GenerationPlan row schema must be 3", 3) end
   required(row, "stream_key")
   required(row, "manifest_id")
   required(row, "action")
@@ -39,12 +72,7 @@ local function validate_row(row)
   end
   required(row, "gates")
   for _, gate in ipairs(REQUIRED_GATES) do
-    if type(row.gates[gate]) ~= "boolean" then
-      error("GenerationPlan row gate must be boolean: " .. gate, 3)
-    end
-    if row.action ~= "skip" and not row.gates[gate] then
-      error("GenerationPlan materializing row failed gate " .. gate .. ": " .. row.stream_key, 3)
-    end
+    validate_gate(row, gate)
   end
   if row.action == "emit" then
     required(row, "technology_name")
@@ -94,6 +122,7 @@ function Plan:finalize()
   local manifest_ids = {}
   local technology_names = {}
   local adopted_recipes = {}
+  local materialized_effects = {}
   for _, row in ipairs(self.rows) do
     validate_row(row)
     if stream_keys[row.stream_key] then
@@ -110,6 +139,15 @@ function Plan:finalize()
       end
       manifest_ids[row.manifest_id] = true
       technology_names[row.technology_name] = true
+      for _, effect in ipairs(row.fields.effects or {}) do
+        local identity = effect_identity(effect)
+        if identity ~= "" then
+          if materialized_effects[identity] then
+            error("GenerationPlan contains duplicate materialized effect identity: " .. identity, 2)
+          end
+          materialized_effects[identity] = row.technology_name
+        end
+      end
     elseif row.action == "adopt" then
       for _, effect in ipairs(row.adoption.effects) do
         local identity = row.adoption.owner .. "\0" .. tostring(effect.recipe)
@@ -117,6 +155,13 @@ function Plan:finalize()
           error("GenerationPlan contains duplicate adopted recipe: " .. tostring(effect.recipe), 2)
         end
         adopted_recipes[identity] = true
+        local effect_key = effect_identity(effect)
+        if effect_key ~= "" then
+          if materialized_effects[effect_key] then
+            error("GenerationPlan contains duplicate materialized effect identity: " .. effect_key, 2)
+          end
+          materialized_effects[effect_key] = row.adoption.owner
+        end
       end
     end
   end
@@ -135,7 +180,7 @@ function Plan:finalize()
     reason_counts = reason_counts
   }
   self.plan_fingerprint = fingerprint.of({
-    schema = 2,
+    schema = 3,
     source_fingerprints = self.source_fingerprints,
     rows = self.rows,
     validation_summary = self.validation_summary
@@ -159,12 +204,16 @@ end
 function Plan:artifact()
   if not self.finalized then error("GenerationPlan must be finalized before artifact export", 2) end
   return deepcopy({
-    schema = 2,
+    schema = 3,
     plan_fingerprint = self.plan_fingerprint,
     source_fingerprints = self.source_fingerprints,
     rows = self.rows,
     validation_summary = self.validation_summary
   })
+end
+
+function M.effect_identity(effect)
+  return effect_identity(effect)
 end
 
 return M

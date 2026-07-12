@@ -20,7 +20,7 @@ Assert-MIRText "prototypes\mir\domain\streams\descriptor.lua" "schema = 1"
 Assert-MIRText "prototypes\mir\families\rules.lua" "schema = 2"
 Assert-MIRText "prototypes\mir\families\registry.lua" "FamilyRule registry schema must be 2"
 Assert-MIRText "prototypes\mir\compatibility\packs\schema.lua" "CompatibilityPack schema must be 2"
-Assert-MIRText "prototypes\mir\planner\generation_plan.lua" "GenerationPlan row schema must be 2"
+Assert-MIRText "prototypes\mir\planner\generation_plan.lua" "GenerationPlan row schema must be 3"
 Assert-MIRText "prototypes\mir\settings\effect_contracts.lua" 'require("prototypes.mir.domain.effects.metadata")'
 
 $authorityTable = Read-MIRText "docs\reference\compiler-authority-table.md"
@@ -30,7 +30,7 @@ foreach ($row in @(
   "| Canonical StreamSpec descriptor | 1 |",
   "| FamilyRule | 2 |",
   "| CompatibilityPack | 2 |",
-  "| GenerationPlan | 2 |",
+  "| GenerationPlan | 3 |",
   "| RecipeFactV2 | 2 |",
   "| Runtime scenario declaration | 2 |",
   "| Campaign scenario declaration | 2 |"
@@ -41,7 +41,7 @@ foreach ($row in @(
 foreach ($docCheck in @(
   @{Path="docs\reference\schemas\family-rule.md"; Needle='schema-2 `FamilyRule`'},
   @{Path="docs\reference\schemas\compatibility-pack.md"; Needle='schema-2 `CompatibilityPack`'},
-  @{Path="docs\reference\schemas\generation-plan.md"; Needle="schema 2"},
+  @{Path="docs\reference\schemas\generation-plan.md"; Needle="schema 3"},
   @{Path="docs\reference\schemas\recipe-fact-v2.md"; Needle="schema-2"},
   @{Path="docs\reference\schemas\scenario-manifest.md"; Needle="schema 2"}
 )) {

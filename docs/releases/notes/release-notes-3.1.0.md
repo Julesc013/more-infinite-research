@@ -33,7 +33,9 @@ Nine independent exact-archive scenarios currently pass for available local clos
 
 ## Maintainer Changes
 
-- `GenerationPlan` schema 2 validates all fixed and automatic streams as one deterministic set before emission.
+- `GenerationPlan` schema 3 uses evidence-bearing gates, rejects duplicate semantic effects, and validates final output ownership; the compilation envelope also plans base continuations before emission.
+- Recipe facts now resolve Factorio defaults and preserve independent/shared probability, extra-count, freshness, and quality fields before structural family decisions.
+- Compatibility packs now apply exact selectors, aliases, family hints, reviewed risk overrides, science roles, owner claims, and deterministic precedence in production resolution.
 - `RecipeFactV2` preserves recipe variants, item/fluid types, probabilities, amount ranges, catalysts, productivity exclusions, surface conditions, quality evidence, and recycling identity.
 - Shared indexes replace repeated technology and entity scans; the scale gate materializes 1,000 recipes, 1,000 technologies, 10,000 effects, and 999 graph edges.
 - `FamilyRule` and `CompatibilityPack` schema 2 are data-only, target-filtered, applicability-bound, and fail closed on ownership, science, lab, prerequisite, loop, or risk uncertainty.

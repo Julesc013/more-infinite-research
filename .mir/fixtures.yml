@@ -138,6 +138,10 @@ fixtures:
       - positive-stream-target-requirements
       - canonical-recipe-fact-single-scan
       - canonical-recipe-fact-copy-isolation
+      - effective-recipe-property-defaults
+      - root-variant-recipe-property-inheritance
+      - complete-factorio-2-1-product-normalization
+      - target-declared-product-probability-fields
       - governed-pipeline-command-catalog
       - pipeline-command-positive-target-requirements
       - large-synthetic-recipe-index
@@ -308,7 +312,13 @@ fixtures:
       - deterministic-rule-precedence
       - equal-precedence-conflict-rejection
       - compatibility-pack-target-and-applicability-filtering
+      - compatibility-pack-any-all-none-and-version-range-filtering
+      - compatibility-pack-refinement-consumption
+      - compatibility-pack-science-role-consumption
       - stable-generation-plan-identities
+      - evidence-bearing-generation-plan-gates
+      - duplicate-materialized-effect-rejection
+      - final-plan-output-owner-parity
       - insertion-order-independent-plan-fingerprints
       - cyclic-fingerprint-rejection
 

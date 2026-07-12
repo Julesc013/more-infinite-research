@@ -22,10 +22,23 @@ local M = {
           "item"
         },
         product_probability_fields = {
-          "probability",
+          "independent_probability",
+          "shared_probability",
+          "extra_count_fraction",
           "ignored_by_productivity",
           "ignored_by_stats",
-          "percent_spoiled"
+          "percent_spoiled",
+          "always_fresh",
+          "reset_freshness_on_craft",
+          "quality_min",
+          "quality_max",
+          "quality_change",
+          "affected_by_quality"
+        },
+        recipe_property_defaults = {
+          allow_productivity = false,
+          allow_quality = true,
+          maximum_productivity = 3
         },
         technology_formula = true,
         quality = true,
@@ -102,8 +115,14 @@ local M = {
         },
         product_probability_fields = {
           "probability",
+          "extra_count_fraction",
           "ignored_by_productivity",
           "ignored_by_stats"
+        },
+        recipe_property_defaults = {
+          allow_productivity = false,
+          allow_quality = true,
+          maximum_productivity = 3
         },
         technology_formula = true,
         quality = true,

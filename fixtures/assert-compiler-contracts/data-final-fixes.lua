@@ -36,21 +36,27 @@ local function valid_pack(id, line, mod_id, version)
 end
 
 local function skip_row(stream_key, manifest_id)
+  local function proof(evidence)
+    return {passed = true, status = "not-applicable", evidence = {evidence}}
+  end
   return {
-    schema = 2,
+    schema = 3,
     stream_key = stream_key,
     manifest_id = manifest_id,
     action = "skip",
     source = "compiler-contract-test",
     reason = "pure-test",
     gates = {
-      target_supported = true,
-      effect_valid = true,
-      owner_conflict_free = true,
-      science_compatible = true,
-      lab_compatible = true,
-      prerequisites_acyclic = true,
-      loop_safe = true
+      target_supported = proof("test:target"),
+      effect_valid = proof("test:effect"),
+      owner_conflict_free = proof("test:owner"),
+      science_compatible = proof("test:science"),
+      lab_compatible = proof("test:lab"),
+      prerequisites_acyclic = proof("test:prerequisite"),
+      loop_safe = proof("test:loop"),
+      progression_safe = proof("test:progression"),
+      migration_safe = proof("test:migration"),
+      output_identity_safe = proof("test:output")
     }
   }
 end
@@ -91,6 +97,31 @@ local compiled = pack_registry.compile({
 if #compiled ~= 2 or compiled[1].id ~= "pack-a" or compiled[2].id ~= "pack-z" then
   fail("CompatibilityPack target/applicability filtering or stable sorting failed")
 end
+local ranged_pack = valid_pack("pack-range", "2.1", "test-mod", ">= 0.9.0, < 2.0.0")
+ranged_pack.applicability.mods_all = {{id = "required-peer", version = ">= 2.0.0"}}
+ranged_pack.applicability.mods_none = {{id = "blocked-peer"}}
+local ranged = pack_registry.compile({[ranged_pack.id] = ranged_pack}, {
+  factorio_line = "2.1",
+  active_mods = {['test-mod'] = "1.0.0", ['required-peer'] = "2.1.0"}
+})
+if #ranged ~= 1 then fail("CompatibilityPack mods_all/mods_none or version-range applicability failed") end
+
+local operational_pack = valid_pack("pack-operational", "2.1", "test-mod", "1.0.0")
+operational_pack.exact.excludes = {{recipe = "blocked-recipe", reason = "reviewed-deny"}}
+operational_pack.exact.includes = {{recipe = "included-recipe", family = "assembler", change = 0.03}}
+operational_pack.aliases = {['aliased-item'] = {family = "assembler", change = 0.02}}
+operational_pack.family_hints = {{recipe = "hinted-recipe", family = "assembler", change = 0.04}}
+operational_pack.science_roles = {{stream = "research_auto_assembling_machine", pack = "automation-science-pack", role = "include"}}
+operational_pack.risk_overrides = {{recipe = "reviewed-recipe", risk = "recycling_recipe", action = "allow-reviewed", evidence = {"compiler-contracts"}}}
+local active_operational = {pack_schema.validate(operational_pack)}
+local excluded = pack_registry.resolve_candidate({recipe = "blocked-recipe", item = "x", family = "assembler", stream = "s"}, active_operational)
+if excluded.action ~= "diagnose" then fail("CompatibilityPack exact exclude did not affect candidate resolution") end
+local included = pack_registry.resolve_candidate({recipe = "included-recipe", item = "x", family = "assembler", stream = "s"}, active_operational)
+if included.action ~= "attach" or included.change ~= 0.03 then fail("CompatibilityPack exact include did not affect candidate resolution") end
+local reviewed = pack_registry.resolve_candidate({recipe = "reviewed-recipe", item = "x", family = "assembler", stream = "s", blocker = "recycling_recipe"}, active_operational)
+if reviewed.action ~= "attach" then fail("CompatibilityPack reviewed risk override did not affect candidate resolution") end
+local roles = pack_registry.science_roles_for_stream("research_auto_assembling_machine", active_operational)
+if #roles ~= 1 or roles[1].pack ~= "automation-science-pack" then fail("CompatibilityPack science role was not consumed") end
 expect_error("CompatibilityPack transport identity", "transport key must match pack id", function()
   pack_registry.compile({wrong = base_pack}, {factorio_line = "2.1", active_mods = {['test-mod'] = "1.0.0"}})
 end)
@@ -132,6 +163,23 @@ local duplicate_plan = generation_plan.new()
 duplicate_plan:add(skip_row("same", "id-a"))
 duplicate_plan:add(skip_row("same", "id-b"))
 expect_error("duplicate GenerationPlan stream id", "duplicate stream key", function() duplicate_plan:finalize() end)
+
+local function emitted_row(stream_key, technology_name)
+  local row = skip_row(stream_key, stream_key)
+  row.action = "emit"
+  row.technology_name = technology_name
+  row.fields = {
+    effects = {{type = "change-recipe-productivity", recipe = "shared-recipe", change = 0.1}},
+    ingredients = {{"automation-science-pack", 1}}, prerequisites = {},
+    count_formula = "100", research_time = 30, max_level = "infinite"
+  }
+  for _, proof in pairs(row.gates) do proof.status = "passed" end
+  return row
+end
+local duplicate_effect_plan = generation_plan.new()
+duplicate_effect_plan:add(emitted_row("effect-a", "effect-tech-a"))
+duplicate_effect_plan:add(emitted_row("effect-b", "effect-tech-b"))
+expect_error("duplicate materialized effect", "duplicate materialized effect identity", function() duplicate_effect_plan:finalize() end)
 
 if fingerprint.of({b = 2, a = 1}) ~= fingerprint.of({a = 1, b = 2}) then fail("map fingerprint is iteration-order dependent") end
 local cyclic = {}; cyclic.self = cyclic

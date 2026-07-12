@@ -4,6 +4,7 @@ local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 local science = require("prototypes.mir.capabilities.science_integration.science_packs")
 local recipes = require("prototypes.mir.capabilities.recipe_productivity.recipe_matching")
 local effective_settings = require("prototypes.mir.settings.effective")
+local compatibility_packs = require("prototypes.mir.compatibility.packs.registry")
 
 local M = {}
 
@@ -193,6 +194,14 @@ function M.pick_science_for_stream(spec, key)
     for _, p in ipairs(STREAM_EXTRA_PACKS[key] or {}) do add_if_science_pack_exists(packs, p) end
   end
 
+  local denied = {}
+  for _, role in ipairs(compatibility_packs.science_roles_for_stream(key)) do
+    if role.role == "exclude" then denied[role.pack] = true end
+  end
+  for _, role in ipairs(compatibility_packs.science_roles_for_stream(key)) do
+    if role.role ~= "exclude" and not denied[role.pack] then add_if_science_pack_exists(packs, role.pack) end
+  end
+
   if desired == "derive-from-unlocks" and #packs == 0 then
     for _, p in ipairs({"automation-science-pack", "logistic-science-pack", "chemical-science-pack"}) do
       add_if_science_pack_exists(packs, p)
@@ -201,7 +210,7 @@ function M.pick_science_for_stream(spec, key)
 
   local out, seen = {}, {}
   for _, name in ipairs(packs) do
-    if not seen[name] then
+    if not seen[name] and not denied[name] then
       seen[name] = true
       table.insert(out, {name, 1})
     end

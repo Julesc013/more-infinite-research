@@ -29,18 +29,32 @@ end
 
 local function validate_applicability(pack)
   require_table(pack, "applicability")
-  local mods = pack.applicability.mods
-  if type(mods) ~= "table" or #mods == 0 then fail(pack, "applicability.mods must not be empty") end
+  local mods = pack.applicability.mods_any or pack.applicability.mods
+  if type(mods) ~= "table" or #mods == 0 then fail(pack, "applicability.mods or mods_any must not be empty") end
   local seen = {}
-  for _, candidate in ipairs(mods) do
-    if type(candidate) ~= "table" or type(candidate.id) ~= "string" or candidate.id == "" then
-      fail(pack, "each applicable mod requires an id")
+  for _, group in ipairs({mods, pack.applicability.mods_all or {}, pack.applicability.mods_none or {}}) do
+    for _, candidate in ipairs(group) do
+      if type(candidate) == "string" then candidate = {id = candidate} end
+      if type(candidate) ~= "table" or type(candidate.id) ~= "string" or candidate.id == "" then
+        fail(pack, "each applicable mod requires an id")
+      end
+      if seen[candidate.id] then fail(pack, "duplicate applicable mod " .. candidate.id) end
+      if candidate.version ~= nil and type(candidate.version) ~= "string" then
+        fail(pack, "mod version constraint must be a string for " .. candidate.id)
+      end
+      seen[candidate.id] = true
     end
-    if seen[candidate.id] then fail(pack, "duplicate applicable mod " .. candidate.id) end
-    if candidate.version ~= nil and type(candidate.version) ~= "string" then
-      fail(pack, "mod version constraint must be a string for " .. candidate.id)
+  end
+end
+
+local function validate_refinement_rows(pack, field, rows)
+  for _, row in ipairs(rows or {}) do
+    if type(row) ~= "string" and type(row) ~= "table" then
+      fail(pack, field .. " rows must be strings or selector tables")
     end
-    seen[candidate.id] = true
+    if type(row) == "table" and row.recipe == nil and row.item == nil and row.family == nil and row.stream == nil then
+      fail(pack, field .. " selector requires recipe, item, family, or stream")
+    end
   end
 end
 
@@ -94,6 +108,10 @@ function M.validate(pack)
   if type(pack.exact.includes) ~= "table" or type(pack.exact.excludes) ~= "table" then
     fail(pack, "exact includes and excludes are required")
   end
+  validate_refinement_rows(pack, "exact.includes", pack.exact.includes)
+  validate_refinement_rows(pack, "exact.excludes", pack.exact.excludes)
+  validate_refinement_rows(pack, "family_hints", pack.family_hints)
+  validate_refinement_rows(pack, "science_roles", pack.science_roles)
   if type(pack.targets.factorio_lines) ~= "table" or #pack.targets.factorio_lines == 0 then
     fail(pack, "targets.factorio_lines must not be empty")
   end

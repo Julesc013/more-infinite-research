@@ -123,6 +123,7 @@ modules:
     - prototypes/mir/index/recycling.lua
   domain:
     - prototypes/mir/domain/facts/registry.lua
+    - prototypes/mir/domain/facts/recipe_semantics.lua
     - prototypes/mir/domain/facts/generated_technology_registry.lua
     - prototypes/mir/domain/decisions/decision_record.lua
     - prototypes/mir/domain/effects/metadata.lua
@@ -159,8 +160,10 @@ modules:
     - prototypes/mir/families/resolver.lua
   planner:
     - prototypes/mir/planner/compiler.lua
+    - prototypes/mir/planner/compilation_plan.lua
     - prototypes/mir/planner/stream_compiler.lua
     - prototypes/mir/planner/generation_plan.lua
+    - prototypes/mir/planner/output_validator.lua
     - prototypes/mir/planner/costs.lua
     - prototypes/mir/planner/direct_effects.lua
     - prototypes/mir/planner/native_modifiers.lua
@@ -224,6 +227,7 @@ mutation_commands:
     - pipeline-extent
     - prepare-competing-productivity
     - prepare-competing-base-extensions
+    - compile-generation-plan
     - emit-streams
     - apply-competing-productivity
     - emit-base-extensions
@@ -231,6 +235,11 @@ mutation_commands:
     - weapon-speed-adjustments
     - max-level-control
     - assert-technology-safety
+    - emit-compatibility-diagnostics
+    - emit-compiler-reports
+    - emit-compatibility-planner
+    - assert-plan-output
+    - flush-diagnostics
 
 target_layers:
   stage:

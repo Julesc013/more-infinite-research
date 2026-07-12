@@ -4,7 +4,7 @@ local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 local lookup = require("prototypes.mir.platform.factorio.prototype_lookup")
 
 local M = {}
-local canonical = nil
+local canonical = {}
 
 local ENTITY_TYPES = {
   "accumulator", "ammo-turret", "assembling-machine", "beacon", "boiler",
@@ -41,12 +41,15 @@ local function effect_identity(effect)
   return table.concat(parts, ";")
 end
 
-local function build()
-  if canonical then return canonical end
+local function build(phase)
+  phase = phase or "input"
+  if phase ~= "input" and phase ~= "output" then error("Unknown relationship snapshot phase: " .. tostring(phase), 2) end
+  if canonical[phase] then return canonical[phase] end
 
   local recipe_index = recipe_facts.snapshot()
   local out = {
-    schema = 1,
+    schema = 2,
+    phase = phase,
     recipes_by_output = recipe_index.by_productive_output,
     recipes_by_ingredient = recipe_index.by_ingredient,
     recipes_by_category = recipe_index.by_category,
@@ -126,16 +129,16 @@ local function build()
     sort_index(index)
   end
 
-  canonical = out
-  return canonical
+  canonical[phase] = out
+  return out
 end
 
-function M.snapshot()
-  return deepcopy(build())
+function M.snapshot(phase)
+  return deepcopy(build(phase))
 end
 
 function M.entity_type(name)
-  return build().entity_type_by_name[name]
+  return build("input").entity_type_by_name[name]
 end
 
 return M

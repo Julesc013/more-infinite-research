@@ -261,7 +261,7 @@ local SPECIALS = {
   }
 }
 
-local function extend_chain(key)
+local function plan_chain(key)
   local spec = base_defaults[key] or {}
   local chain_key = spec.chain_key or key
   local generated_key = spec.generated_key or chain_key
@@ -510,16 +510,47 @@ local function extend_chain(key)
     special.on_extend(new, base_tech, spec)
   end
 
-  data_raw.extend({ new })
-  generated_registry.register(new.name, { kind = "base_extension", key = key })
-  D.extension(D.extension_fields(key, "generated", "base_extension", resolved_ingredients, new.prerequisites, new.effects, lab_status))
+  return {
+    schema = 1,
+    operation = "emit_base_extension",
+    key = key,
+    technology_name = new.name,
+    technology = new,
+    diagnostics = D.extension_fields(key, "generated", "base_extension", resolved_ingredients, new.prerequisites, new.effects, lab_status)
+  }
+end
+
+function M.plan_all()
+  local plan, names = {}, {}
+  for _, key in ipairs(table_utils.sorted_keys(base_defaults)) do
+    local operation = plan_chain(key)
+    if operation then
+      if names[operation.technology_name] then
+        error("Base extension plan contains duplicate technology name: " .. operation.technology_name, 2)
+      end
+      names[operation.technology_name] = true
+      table.insert(plan, operation)
+    end
+  end
+  return plan
+end
+
+function M.apply_plan(plan)
+  for _, operation in ipairs(plan or {}) do
+    if operation.operation ~= "emit_base_extension" then
+      error("Unsupported base extension plan operation: " .. tostring(operation.operation), 2)
+    end
+    if data_raw.technology(operation.technology_name) then
+      error("Base extension output identity appeared after planning: " .. operation.technology_name, 2)
+    end
+    data_raw.extend({deepcopy(operation.technology)})
+    generated_registry.register(operation.technology_name, {kind = "base_extension", key = operation.key})
+    D.extension(operation.diagnostics)
+  end
 end
 
 function M.emit_all()
-  for _, key in ipairs(table_utils.sorted_keys(base_defaults)) do
-    extend_chain(key)
-  end
-
+  M.apply_plan(M.plan_all())
   return M
 end
 

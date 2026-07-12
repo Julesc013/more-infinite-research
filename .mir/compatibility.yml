@@ -11,6 +11,20 @@ compatibility_packs:
   registry: prototypes/mir/compatibility/packs/registry.lua
   external_transport: more-infinite-research-compatibility-pack
   fixture_only_profiles_allowed_in_production_registry: false
+  applicability:
+    any_field: mods_any
+    all_field: mods_all
+    none_field: mods_none
+    legacy_any_field: mods
+    version_constraints: comma-separated-comparators
+  production_consumers:
+    - exact-includes-excludes
+    - aliases
+    - family-hints
+    - science-roles
+    - owner-claims
+    - reviewed-risk-overrides
+    - deterministic-precedence
 
 campaigns:
   evidence_contract: mir-modpack-campaign-evidence-v1

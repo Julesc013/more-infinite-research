@@ -21,8 +21,8 @@ This table names one machine authority, validator, and reference contract for ea
 | Canonical StreamSpec descriptor | 1 | `prototypes/mir/domain/streams/descriptor.lua` | `scripts/Test-MIRArchitecture.ps1` | settings and GenerationPlan compilation |
 | FamilyRule | 2 | `prototypes/mir/families/rules.lua` | `prototypes/mir/families/registry.lua` | structural family resolver |
 | CompatibilityPack | 2 | `prototypes/mir/compatibility/packs/schema.lua` | `prototypes/mir/compatibility/packs/registry.lua` | pack filtering, precedence, ownership policy |
-| GenerationPlan | 2 | `prototypes/mir/planner/generation_plan.lua` | whole-plan finalization and compiler-contract fixture | transaction and emission layers |
-| RecipeFactV2 | 2 | `prototypes/mir/index/registry_builder.lua` | generation-integrity and compiler fixtures | rules, safety, coverage, ownership |
+| GenerationPlan | 3 | `prototypes/mir/planner/generation_plan.lua` | whole-plan finalization, output validation, and compiler-contract fixture | transaction and emission layers |
+| RecipeFactV2 | 2 | `prototypes/mir/index/recipe_facts.lua` | generation-integrity and compiler fixtures | rules, safety, coverage, ownership |
 | Runtime scenario declaration | 2 | `fixtures/compat-matrix/expected-scenarios.json` | `scripts/validation/ScenarioRegistry.ps1` | validation harness |
 | Campaign scenario declaration | 2 | `fixtures/compat-matrix/local-library-scenarios.json` | `scripts/Test-MIRScenarioManifests.ps1` | compatibility audit runner |
 

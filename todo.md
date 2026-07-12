@@ -1,6 +1,6 @@
 # M.I.R. TODO
 
-Updated: 2026-07-12
+Updated: 2026-07-13
 
 This is the executable release queue. `.mir/release-wave.yml` is the machine-readable status authority. Detailed architecture and acceptance criteria live in the linked governed records.
 
@@ -17,14 +17,14 @@ This is the executable release queue. `.mir/release-wave.yml` is the machine-rea
 
 ### Implemented
 
-- [x] Pure GenerationPlan schema 2 boundary before prototype mutation.
+- [x] Pure GenerationPlan schema 3 boundary with evidence-bearing gates before prototype mutation.
 - [x] All fixed streams and deferred family adoption route through whole-plan validation.
-- [x] RecipeFactV2 preserves variant, type, probability, catalyst, productivity-exclusion, surface, and recycling evidence.
-- [x] Shared recipe, entity, unlock, effect-owner, lab, module, upgrade, subgroup, and surface indexes.
+- [x] RecipeFactV2 resolves target-aware defaults and preserves variant, type, independent/shared probability, extra-count, freshness, quality, catalyst, productivity-exclusion, surface, and recycling evidence.
+- [x] Shared phase-labelled input/output recipe, entity, unlock, effect-owner, lab, module, upgrade, subgroup, and surface indexes.
 - [x] One effect metadata authority drives identity, units, scaling, target support, settings, and emission checks.
 - [x] Positive TargetProfileV2 and declaration-owned setting requirements.
 - [x] FamilyRule schema 2 with structural selectors, hard safety requirements, risk denials, ownership, science, prerequisites, targets, and claims.
-- [x] CompatibilityPack schema 2 with applicability, refinements, targets, evidence, claims, and reviewed-risk boundaries.
+- [x] CompatibilityPack schema 2 with operational applicability groups, aliases, exact selectors, family hints, science roles, owner claims, reviewed-risk boundaries, and precedence.
 - [x] Structural attachment for modules, loaders, belts, drills, inserters, furnaces, assembling machines, labs, and solar/storage families.
 - [x] Reviewed stable generic assembler and lab identities behind `safe-generate`; default remains `safe-attach`.
 - [x] Stable generated-ID manifest and golden checks for 70 existing plus two reviewed family identities.
@@ -32,6 +32,7 @@ This is the executable release queue. `.mir/release-wave.yml` is the machine-rea
 - [x] Shared-input/output, catalyst-return, recycling, probability, and external-owner safety vetoes.
 - [x] Auditable scale counts and a real 1,000-recipe, 1,000-technology, 10,000-effect synthetic gate.
 - [x] Dependency-ordered command graph and deterministic package construction.
+- [x] Command-DAG orchestration, pre-emission base-continuation planning, duplicate semantic-effect rejection, and final plan/output owner parity.
 - [x] Exact-archive load characterization for AAI, BZ, Bob, Krastorio base, and K2SO at `loads` claim level only.
 
 ### Required Before Candidate Freeze
@@ -49,6 +50,10 @@ This is the executable release queue. `.mir/release-wave.yml` is the machine-rea
 
 ### Final 3.1.0 Evidence
 
+- [x] Complete RC6 correctness matrix on Factorio 2.1.9 after effective-default, product-shape, CompatibilityPack, plan-proof, base-planning, and output-parity changes (`86/86`).
+- [x] Reconcile the two `main`-only changes before promotion: preserve the MIR 2.x requirement wording and keep the host-specific history exporter deleted; the final deterministic package SHA-256 is `269C27DC...B1A7DB`.
+- [x] Mark RC5 evidence superseded and reopen candidate construction; RC6 automated runtime success is development evidence until committed candidate identities and interactive review are rebound.
+
 - [x] Clean static validation after fixed-point release-harness evidence binding at validation source `2490d2d`, package evidence source `4cdb859`, and package source anchor `81e73ea`.
 - [x] Complete Factorio 2.1.9 declared runtime matrix with no skipped required group at validation source `2490d2d` (`86/86`).
 - [x] Exact 3.0.5-to-3.1.0 save upgrade with non-default settings, research levels, storage, and scripted effects retained against RC4 archive `BD89A34D...DDDA3`.
@@ -61,8 +66,8 @@ This is the executable release queue. `.mir/release-wave.yml` is the machine-rea
 - [x] Bind the remaining closure blockers to exact missing archive identities and reject zero-root process success as compatibility evidence.
 - [x] Preserve `loads`, `observed`, `cooperates`, partial-family, and full-family claim boundaries; inventory never counts as proof.
 - [ ] Interactive settings, locale, icon, technology-tree, save-load, and balance review on the exact candidate.
-- [x] Materialize the RC2 deterministic archive, release notes, migration guide, validation summary, upgrade proof, campaign lock/evidence, and pending identity-bound GUI packet.
-- [x] Pass candidate freshness from the clean claim-gated RC5 evidence commit with source, package, validation, upgrade, nine-ecosystem, and pending-interactive bindings.
+- [x] Preserve the superseded RC2-RC5 archives, release notes, migration guide, validation summaries, upgrade proof, campaign lock/evidence, and pending identity-bound GUI packet as historical evidence.
+- [ ] Bind a clean RC6 candidate commit, package, validation summary, upgrade proof, ecosystem campaign, and fresh pending-interactive packet.
 - [ ] Complete and bind the GUI review without rebuilding the archive.
 - [x] Revalidate the unchanged planet-safe package after campaign evidence is hardened so unresolved roots cannot report a passing claim row.
 - [x] Rebuild and requalify after the representative planet cluster exposed a generated base extension anchored to a disabled prerequisite chain.

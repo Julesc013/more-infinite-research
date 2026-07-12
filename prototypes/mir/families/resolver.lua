@@ -2,6 +2,7 @@ local deepcopy = require("prototypes.mir.core.deepcopy")
 local recipe_facts = require("prototypes.mir.index.recipe_facts")
 local relationships = require("prototypes.mir.index.relationships")
 local rule_registry = require("prototypes.mir.families.registry")
+local compatibility_packs = require("prototypes.mir.compatibility.packs.registry")
 
 local M = {}
 local canonical = nil
@@ -28,15 +29,16 @@ end
 
 local function safe_placeable_output(fact, item_name)
   for _, variant in ipairs(fact.variants or {}) do
-    if variant.allow_productivity == false then return false, "variant_productivity_not_allowed" end
+    if variant.effective_allow_productivity ~= true then return false, "variant_productivity_not_allowed" end
     if tonumber(variant.maximum_productivity) == 0 then return false, "variant_zero_productivity_cap" end
     if #(variant.results or {}) ~= 1 then return false, "non_exclusive_placeable_output" end
     local result = variant.results[1]
     if result.type ~= "item" or result.name ~= item_name then
       return false, "non_exclusive_placeable_output"
     end
-    if tonumber(result.probability or 1) ~= 1
+    if tonumber(result.independent_probability or result.probability or 1) ~= 1
       or result.shared_probability ~= nil
+      or tonumber(result.extra_count_fraction or 0) ~= 0
       or result.amount_min ~= nil
       or result.amount_max ~= nil
       or not is_zero_or_nil(result.catalyst_amount)
@@ -64,7 +66,7 @@ local function eligibility(rule, fact, item_name)
   if fact.source_class == "recycling" and risk_denied(rule, "recycling_loop") then
     return false, "recycling_recipe"
   end
-  if rule.require.productivity_supported and fact.allow_productivity == false then
+  if rule.require.productivity_supported and fact.effective_allow_productivity ~= true then
     return false, "recipe_productivity_not_allowed"
   end
   if tonumber(fact.maximum_productivity) == 0 then return false, "zero_productivity_cap" end
@@ -123,6 +125,18 @@ local function build()
       for _, recipe_name in ipairs(indexes.recipes_by_output[item_name] or {}) do
         local fact = recipe_facts.get(recipe_name)
         local eligible, blocker = eligibility(rule, fact, item_name)
+        local pack_decision = compatibility_packs.resolve_candidate({
+          recipe = recipe_name,
+          item = item_name,
+          family = rule.id,
+          stream = rule.grouping.stream,
+          blocker = blocker
+        })
+        if pack_decision.action == "attach" then
+          eligible, blocker = true, nil
+        elseif pack_decision.action == "diagnose" then
+          eligible, blocker = false, pack_decision.reason or blocker
+        end
         local external_owners = indexes.technologies_by_recipe_effect[recipe_name] or {}
         if #external_owners > 0 then eligible, blocker = false, "existing_recipe_productivity_owner" end
 
@@ -135,6 +149,7 @@ local function build()
           end
           change = module_change(rule, tier)
         end
+        if tonumber(pack_decision.change) then change = tonumber(pack_decision.change) end
 
         local decision = rule.grouping.strategy == "proposal-only" and "propose" or "attach"
         if not eligible then decision = "diagnose" end

@@ -110,7 +110,7 @@ waves:
     reviewed_generic_family_id_count: 2
     family_rule_schema: 2
     compatibility_pack_schema: 2
-    generation_plan_schema: 2
+    generation_plan_schema: 3
     previous_candidate_commit: 6272cb67c96855c574c96032cb27dfcf0721aa74
     previous_candidate_archive: dist/more-infinite-research_3.1.0.zip
     previous_candidate_sha256: 0244D40A9971C450274FE1FD7EA142FA5D23E4A2271A0191F31F395589267C1A
