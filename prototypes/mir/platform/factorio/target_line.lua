@@ -1,6 +1,6 @@
 local M = {}
 
-M.factorio_version = "0.17"
+M.factorio_version = "0.16"
 
 M.supports = {
   compatibility_repairs = false,
@@ -74,7 +74,7 @@ function M.feature_enabled(name)
 end
 
 function M.technology_overlay_layer()
-  -- Factorio 0.17 does not ship the 1.1+ stock technology constant badge
+  -- Factorio 0.16 does not ship the 1.1+ stock technology constant badge
   -- assets or a documented native modifier icon surface. Keep generated
   -- technologies on target-era technology art.
   return false

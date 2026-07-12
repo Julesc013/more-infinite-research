@@ -1,4 +1,18 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.6.0
+Date: 2026-07-13
+
+  Features:
+
+    - Ported the reduced native-infinite compiler and graph-safety guard to Factorio 0.16.
+    - Added the 0.16 science-pack-1, science-pack-2, science-pack-3, production, military, high-tech, and space science map.
+
+  Changes:
+
+    - Kept only target-supported direct effects and base technology continuations.
+    - Kept Factorio 0.17+, 1.x, 2.x, and DLC-only behavior out of this package.
+
+---------------------------------------------------------------------------------------------------
 Version: 1.7.1
 Date: 2026-07-13
 

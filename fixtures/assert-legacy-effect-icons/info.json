@@ -4,9 +4,9 @@
   "title": "MIR Fixture - Assert Legacy Effect Icons",
   "author": "Julesc013",
   "description": "Validation fixture that asserts old-line direct-effect technologies avoid unavailable newer badge icons and unsupported native modifier icon metadata.",
-  "factorio_version": "0.17",
+  "factorio_version": "0.16",
   "dependencies": [
-    "base >= 0.17",
+    "base >= 0.16",
     "more-infinite-research"
   ]
 }

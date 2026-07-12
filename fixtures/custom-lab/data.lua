@@ -16,7 +16,7 @@ if base_lab then
   custom.minable = custom.minable and deepcopy(custom.minable) or nil
   if custom.minable then custom.minable.result = "mir-fixture-custom-lab" end
   custom.inputs = {
-    "automation-science-pack",
+    "science-pack-1",
     "mir-custom-only-science-pack"
   }
 
@@ -34,7 +34,7 @@ if base_lab then
   local pack = {
     type = "item",
     name = "mir-custom-only-science-pack",
-    icon = "__base__/graphics/icons/logistic-science-pack.png",
+    icon = "__base__/graphics/icons/science-pack-2.png",
     icon_size = 64,
     subgroup = "science-pack",
     order = "z[mir-custom-only-science-pack]",

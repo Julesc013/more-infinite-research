@@ -2,7 +2,7 @@ return {
   research_inventory_capacity = {
     icon_tech = "toolbelt",
     science_packs = {
-      "utility-science-pack","military-science-pack"
+      "high-tech-science-pack","military-science-pack"
     },
     direct_effects = {
       { type = "character-inventory-slots-bonus", modifier = 1 },
@@ -38,12 +38,12 @@ return {
     overlay = "laboratory-productivity",
     localised_description = {"technology-description.more-infinite-research.lab_productivity"},
     science_packs = {
-      "automation-science-pack",
-      "logistic-science-pack",
+      "science-pack-1",
+      "science-pack-2",
       "military-science-pack",
-      "chemical-science-pack",
+      "science-pack-3",
       "production-science-pack",
-      "utility-science-pack",
+      "high-tech-science-pack",
       "space-science-pack"
     },
     direct_effects = {
@@ -55,7 +55,7 @@ return {
     icon_tech = "rocketry",
     required_technologies = {"rocketry"},
     science_packs = {
-      "automation-science-pack","logistic-science-pack","chemical-science-pack",
+      "science-pack-1","science-pack-2","science-pack-3",
       "production-science-pack","military-science-pack"
     },
     direct_effects = {
@@ -72,7 +72,7 @@ return {
     required_technologies = {"weapon-shooting-speed-5"},
     required_technology_candidates = {{"tank", "tanks"}},
     science_packs = {
-      "automation-science-pack","logistic-science-pack","chemical-science-pack",
+      "science-pack-1","science-pack-2","science-pack-3",
       "production-science-pack","military-science-pack"
     },
     direct_effects = {
@@ -85,7 +85,7 @@ return {
     localised_description = {"technology-description.more-infinite-research.flamethrower_shooting_speed"},
     required_technologies = {"flamethrower"},
     science_packs = {
-      "automation-science-pack","logistic-science-pack","chemical-science-pack",
+      "science-pack-1","science-pack-2","science-pack-3",
       "production-science-pack","military-science-pack","space-science-pack"
     },
     direct_effects = {
@@ -100,7 +100,7 @@ return {
     required_technologies = {"discharge-defense-equipment"},
     localised_description = {"technology-description.more-infinite-research.electric_shooting_speed"},
     science_packs = {
-      "automation-science-pack","logistic-science-pack","chemical-science-pack",
+      "science-pack-1","science-pack-2","science-pack-3",
       "production-science-pack","military-science-pack"
     },
     direct_effects = {
@@ -111,7 +111,7 @@ return {
   research_character_mining_speed = {
     icon_tech = "steel-axe",
     science_packs = {
-      "utility-science-pack","military-science-pack"
+      "high-tech-science-pack","military-science-pack"
     },
     direct_effects = {
       { type = "character-mining-speed", modifier = 0.05 }
@@ -125,7 +125,7 @@ return {
       {item = "repair-pack"}
     },
     science_packs = {
-      "utility-science-pack","military-science-pack"
+      "high-tech-science-pack","military-science-pack"
     },
     direct_effects = {
       { type = "character-crafting-speed", modifier = 0.05 }
@@ -135,7 +135,7 @@ return {
   research_character_walking_speed = {
     icon_tech = "exoskeleton-equipment",
     science_packs = {
-      "utility-science-pack","military-science-pack"
+      "high-tech-science-pack","military-science-pack"
     },
     direct_effects = {
       { type = "character-running-speed", modifier = 0.05 }
@@ -145,7 +145,7 @@ return {
   research_character_reach = {
     icon_tech = "steel-axe",
     science_packs = {
-      "utility-science-pack","military-science-pack"
+      "high-tech-science-pack","military-science-pack"
     },
     direct_effects = {
       { type = "character-reach-distance", modifier = 10 },

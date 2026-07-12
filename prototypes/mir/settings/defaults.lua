@@ -32,9 +32,9 @@ local defaults = {
       base_cost = 60,
       growth_factor = 1.5,
       science_packs = {
-        "automation-science-pack",
-        "logistic-science-pack",
-        "chemical-science-pack",
+        "science-pack-1",
+        "science-pack-2",
+        "science-pack-3",
         "production-science-pack",
         "military-science-pack"
       }
@@ -43,9 +43,9 @@ local defaults = {
       base_cost = 60,
       growth_factor = 1.5,
       science_packs = {
-        "automation-science-pack",
-        "logistic-science-pack",
-        "chemical-science-pack",
+        "science-pack-1",
+        "science-pack-2",
+        "science-pack-3",
         "production-science-pack",
         "military-science-pack"
       }
@@ -54,9 +54,9 @@ local defaults = {
       base_cost = 60,
       growth_factor = 1.5,
       science_packs = {
-        "automation-science-pack",
-        "logistic-science-pack",
-        "chemical-science-pack",
+        "science-pack-1",
+        "science-pack-2",
+        "science-pack-3",
         "production-science-pack",
         "military-science-pack",
         "space-science-pack"
@@ -66,9 +66,9 @@ local defaults = {
       base_cost = 60,
       growth_factor = 1.5,
       science_packs = {
-        "automation-science-pack",
-        "logistic-science-pack",
-        "chemical-science-pack",
+        "science-pack-1",
+        "science-pack-2",
+        "science-pack-3",
         "production-science-pack",
         "military-science-pack"
       }

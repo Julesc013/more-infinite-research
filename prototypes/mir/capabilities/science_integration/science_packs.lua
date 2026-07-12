@@ -6,12 +6,12 @@ local effective_settings = require("prototypes.mir.settings.effective")
 local S = {}
 
 local VANILLA_PACK_ORDER = {
-  "automation-science-pack",
-  "logistic-science-pack",
-  "chemical-science-pack",
+  "science-pack-1",
+  "science-pack-2",
+  "science-pack-3",
   "production-science-pack",
   "military-science-pack",
-  "utility-science-pack",
+  "high-tech-science-pack",
   "space-science-pack",
   "agricultural-science-pack",
   "metallurgic-science-pack",
@@ -28,74 +28,74 @@ local SPACE_AGE_PLANET_PACKS = {
 }
 
 local OFFICIAL_PROGRESSION_STEPS = {
-  ["automation-science-pack"] = {"automation-science-pack"},
-  ["logistic-science-pack"] = {"automation-science-pack", "logistic-science-pack"},
-  ["chemical-science-pack"] = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack"},
+  ["science-pack-1"] = {"science-pack-1"},
+  ["science-pack-2"] = {"science-pack-1", "science-pack-2"},
+  ["science-pack-3"] = {"science-pack-1", "science-pack-2", "science-pack-3"},
   ["production-science-pack"] = {
-    "automation-science-pack",
-    "logistic-science-pack",
-    "chemical-science-pack",
+    "science-pack-1",
+    "science-pack-2",
+    "science-pack-3",
     "production-science-pack"
   },
-  ["military-science-pack"] = {"automation-science-pack", "logistic-science-pack", "military-science-pack"},
-  ["utility-science-pack"] = {
-    "automation-science-pack",
-    "logistic-science-pack",
-    "chemical-science-pack",
+  ["military-science-pack"] = {"science-pack-1", "science-pack-2", "military-science-pack"},
+  ["high-tech-science-pack"] = {
+    "science-pack-1",
+    "science-pack-2",
+    "science-pack-3",
     "production-science-pack",
-    "utility-science-pack"
+    "high-tech-science-pack"
   },
   ["space-science-pack"] = {
-    "automation-science-pack",
-    "logistic-science-pack",
-    "chemical-science-pack",
+    "science-pack-1",
+    "science-pack-2",
+    "science-pack-3",
     "production-science-pack",
-    "utility-science-pack",
+    "high-tech-science-pack",
     "space-science-pack"
   },
   ["agricultural-science-pack"] = {
-    "automation-science-pack",
-    "logistic-science-pack",
-    "chemical-science-pack",
+    "science-pack-1",
+    "science-pack-2",
+    "science-pack-3",
     "production-science-pack",
-    "utility-science-pack",
+    "high-tech-science-pack",
     "space-science-pack",
     "agricultural-science-pack"
   },
   ["metallurgic-science-pack"] = {
-    "automation-science-pack",
-    "logistic-science-pack",
-    "chemical-science-pack",
+    "science-pack-1",
+    "science-pack-2",
+    "science-pack-3",
     "production-science-pack",
-    "utility-science-pack",
+    "high-tech-science-pack",
     "space-science-pack",
     "metallurgic-science-pack"
   },
   ["electromagnetic-science-pack"] = {
-    "automation-science-pack",
-    "logistic-science-pack",
-    "chemical-science-pack",
+    "science-pack-1",
+    "science-pack-2",
+    "science-pack-3",
     "production-science-pack",
-    "utility-science-pack",
+    "high-tech-science-pack",
     "space-science-pack",
     "electromagnetic-science-pack"
   },
   ["cryogenic-science-pack"] = {
-    "automation-science-pack",
-    "logistic-science-pack",
-    "chemical-science-pack",
+    "science-pack-1",
+    "science-pack-2",
+    "science-pack-3",
     "production-science-pack",
-    "utility-science-pack",
+    "high-tech-science-pack",
     "space-science-pack",
     "cryogenic-science-pack"
   },
   ["promethium-science-pack"] = {
-    "automation-science-pack",
-    "logistic-science-pack",
-    "chemical-science-pack",
+    "science-pack-1",
+    "science-pack-2",
+    "science-pack-3",
     "production-science-pack",
     "military-science-pack",
-    "utility-science-pack",
+    "high-tech-science-pack",
     "space-science-pack",
     "agricultural-science-pack",
     "metallurgic-science-pack",
@@ -107,72 +107,72 @@ local OFFICIAL_PROGRESSION_STEPS = {
 
 local EXTENSION_PACKS = {
   ["braking-force"] = {
-    "automation-science-pack",
-    "logistic-science-pack",
-    "chemical-science-pack",
+    "science-pack-1",
+    "science-pack-2",
+    "science-pack-3",
     "production-science-pack",
     "space-science-pack"
   },
   ["research-speed"] = "all",
   ["worker-robots-storage"] = {
-    "automation-science-pack",
-    "logistic-science-pack",
-    "chemical-science-pack",
+    "science-pack-1",
+    "science-pack-2",
+    "science-pack-3",
     "production-science-pack",
-    "utility-science-pack",
+    "high-tech-science-pack",
     "electromagnetic-science-pack"
   },
   ["inserter-capacity-bonus"] = {
-    "automation-science-pack",
-    "logistic-science-pack",
-    "chemical-science-pack",
+    "science-pack-1",
+    "science-pack-2",
+    "science-pack-3",
     "production-science-pack",
     "agricultural-science-pack"
   },
   ["weapon-shooting-speed"] = {
-    "automation-science-pack",
-    "logistic-science-pack",
-    "chemical-science-pack",
+    "science-pack-1",
+    "science-pack-2",
+    "science-pack-3",
     "production-science-pack",
     "military-science-pack",
     "space-science-pack"
   },
   ["laser-shooting-speed"] = {
-    "automation-science-pack",
-    "logistic-science-pack",
-    "chemical-science-pack",
+    "science-pack-1",
+    "science-pack-2",
+    "science-pack-3",
     "production-science-pack",
     "military-science-pack",
     "space-science-pack"
   },
   research_electric_shooting_speed = {
-    "automation-science-pack",
-    "logistic-science-pack",
-    "chemical-science-pack",
+    "science-pack-1",
+    "science-pack-2",
+    "science-pack-3",
     "production-science-pack",
     "military-science-pack",
     "electromagnetic-science-pack"
   },
   research_flamethrower_shooting_speed = {
-    "automation-science-pack",
-    "logistic-science-pack",
-    "chemical-science-pack",
+    "science-pack-1",
+    "science-pack-2",
+    "science-pack-3",
     "production-science-pack",
     "military-science-pack",
     "space-science-pack"
   },
   research_rocket_shooting_speed = {
-    "automation-science-pack",
-    "logistic-science-pack",
-    "chemical-science-pack",
+    "science-pack-1",
+    "science-pack-2",
+    "science-pack-3",
     "production-science-pack",
     "military-science-pack",
     "electromagnetic-science-pack"
   },
   research_cannon_shooting_speed = {
-    "automation-science-pack",
-    "logistic-science-pack",
-    "chemical-science-pack",
+    "science-pack-1",
+    "science-pack-2",
+    "science-pack-3",
     "production-science-pack",
     "military-science-pack",
     "electromagnetic-science-pack"
@@ -206,7 +206,7 @@ local function lab_incompatibility_policy()
 end
 
 local function science_packs_require_tool_prototypes()
-  local automation_pack = lookup.item_prototype("automation-science-pack")
+  local automation_pack = lookup.item_prototype("science-pack-1")
   return automation_pack and automation_pack.type == "tool"
 end
 

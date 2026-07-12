@@ -139,13 +139,13 @@ data:extend({
       {type = "unlock-recipe", recipe = "atan-pollution-filter-cleaning"},
       {type = "unlock-recipe", recipe = "atan-filter-resin"}
     },
-    prerequisites = {"chemical-science-pack"},
+    prerequisites = {"science-pack-3"},
     unit = {
       count = 100,
       ingredients = {
-        {"automation-science-pack", 1},
-        {"logistic-science-pack", 1},
-        {"chemical-science-pack", 1}
+        {"science-pack-1", 1},
+        {"science-pack-2", 1},
+        {"science-pack-3", 1}
       },
       time = 30
     }
@@ -164,9 +164,9 @@ data:extend({
     unit = {
       count = 100,
       ingredients = {
-        {"automation-science-pack", 1},
-        {"logistic-science-pack", 1},
-        {"chemical-science-pack", 1}
+        {"science-pack-1", 1},
+        {"science-pack-2", 1},
+        {"science-pack-3", 1}
       },
       time = 30
     }
