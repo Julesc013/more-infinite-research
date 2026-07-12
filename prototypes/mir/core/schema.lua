@@ -1,6 +1,8 @@
 local S = {}
 
-S.fact_registry = 1
+S.fact_registry = 2
+S.recipe_fact = 2
+S.relationship_index = 1
 S.capability_resolver = 1
 S.capability_policy = 1
 S.decision_record = 1

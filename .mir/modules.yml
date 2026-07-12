@@ -107,6 +107,7 @@ modules:
   index:
     - prototypes/mir/index/registry_builder.lua
     - prototypes/mir/index/recipe_facts.lua
+    - prototypes/mir/index/relationships.lua
     - prototypes/mir/index/recipe_unlocks.lua
     - prototypes/mir/index/productivity_owners.lua
     - prototypes/mir/index/recipes.lua

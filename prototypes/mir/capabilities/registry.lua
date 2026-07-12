@@ -4,44 +4,12 @@ local fact_registry = require("prototypes.mir.index.registry_builder")
 local policies = require("prototypes.mir.policy.capabilities")
 local schema = require("prototypes.mir.core.schema")
 local data_raw = require("prototypes.mir.platform.factorio.data_raw")
-local lookup = require("prototypes.mir.platform.factorio.prototype_lookup")
+local relationships = require("prototypes.mir.index.relationships")
 
 local C = {}
 
 -- Capability resolvers are report-first. They classify prototype evidence and
 -- explain how existing MIR streams treat it; they do not emit technologies.
-
-local ENTITY_TYPES = {
-  "accumulator",
-  "ammo-turret",
-  "assembling-machine",
-  "beacon",
-  "boiler",
-  "burner-generator",
-  "container",
-  "electric-energy-interface",
-  "electric-pole",
-  "furnace",
-  "generator",
-  "inserter",
-  "lab",
-  "loader",
-  "loader-1x1",
-  "logistic-container",
-  "mining-drill",
-  "pipe",
-  "pipe-to-ground",
-  "pump",
-  "radar",
-  "reactor",
-  "rocket-silo",
-  "roboport",
-  "solar-panel",
-  "splitter",
-  "storage-tank",
-  "transport-belt",
-  "underground-belt"
-}
 
 local NATIVE_MODIFIERS = {
   ["belt-stack-size-bonus"] = "native_logistics_modifier",
@@ -111,14 +79,14 @@ end
 
 local function entity_prototype(name)
   if not name then return nil, nil end
-  for _, entity_type in ipairs(ENTITY_TYPES) do
-    local bucket = data_raw.prototypes(entity_type)
-    if bucket and bucket[name] then return bucket[name], entity_type end
-  end
-  return nil, nil
+  local entity_type = relationships.entity_type(name)
+  return entity_type and data_raw.prototype(entity_type, name) or nil, entity_type
 end
 
 local function recipe_outputs_by_item(registry)
+  if registry.indexes and registry.indexes.recipes_by_output then
+    return registry.indexes.recipes_by_output
+  end
   local by_item = {}
   for _, recipe_name in ipairs(sorted_keys(registry.recipes)) do
     local recipe = registry.recipes[recipe_name]
@@ -147,31 +115,34 @@ end
 
 local function entity_backed_candidates(registry, wanted_entity_types)
   local recipes_by_item = recipe_outputs_by_item(registry)
+  local indexes = registry.indexes or relationships.snapshot()
   local candidates = {}
   local seen = {}
 
-  lookup.each_item_prototype(function(item_name, item, item_type)
-    local place_result = item and item.place_result
-    if not place_result then return end
-
-    local _, entity_type = entity_prototype(place_result)
-    if not entity_type or not wanted_entity_types[entity_type] then return end
-
-    for _, recipe_name in ipairs(recipes_by_item[item_name] or {}) do
-      local key = recipe_name .. "|" .. item_name
-      if not seen[key] then
-        seen[key] = true
-        table.insert(candidates, {
-          item = item_name,
-          item_type = item_type,
-          recipe = recipe_name,
-          recipe_fact = registry.recipes[recipe_name],
-          entity = place_result,
-          entity_type = entity_type
-        })
+  for _, item_name in ipairs(sorted_keys(indexes.items)) do
+    local item = indexes.items[item_name]
+    local item_type = item.prototype_type
+    local place_result = item.place_result
+    if place_result then
+      local _, entity_type = entity_prototype(place_result)
+      if entity_type and wanted_entity_types[entity_type] then
+        for _, recipe_name in ipairs(recipes_by_item[item_name] or {}) do
+          local key = recipe_name .. "|" .. item_name
+          if not seen[key] then
+            seen[key] = true
+            table.insert(candidates, {
+              item = item_name,
+              item_type = item_type,
+              recipe = recipe_name,
+              recipe_fact = registry.recipes[recipe_name],
+              entity = place_result,
+              entity_type = entity_type
+            })
+          end
+        end
       end
     end
-  end)
+  end
 
   table.sort(candidates, function(a, b)
     if a.recipe ~= b.recipe then return a.recipe < b.recipe end

@@ -244,6 +244,8 @@ $requiredMirFiles = @(
   "prototypes/mir/policy/weapon_speed.lua",
   "prototypes/mir/policy/capabilities.lua",
   "prototypes/mir/index/registry_builder.lua",
+  "prototypes/mir/index/recipe_facts.lua",
+  "prototypes/mir/index/relationships.lua",
   "prototypes/mir/index/productivity_owners.lua",
   "prototypes/mir/domain/facts/registry.lua",
   "prototypes/mir/domain/facts/generated_technology_registry.lua",
