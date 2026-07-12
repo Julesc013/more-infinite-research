@@ -116,11 +116,19 @@ waves:
     version: "2.4.0"
     branch: tmp/2.0
     source_anchor_required: accepted-3.1.0
-    source_commit: pending-final-revalidation
+    source_commit: b9172ab1ab3fc75ba0c1dec79cc9f2c3ae6063c3
     archive: dist/more-infinite-research_2.4.0.zip
-    automated_gate: revalidating
+    sha256: 8618CAF031EF24EB83641DB03566F2390DD29AD98D2099A80D596EEB527EDA12
+    structured_summary_path: .mir/evidence/2.4.0-rc3-validation-summary.json
+    structured_summary_run_id: 99895145-6529-4d99-be33-62484856b685
+    scenario_count: 78
+    exact_dist_base: passed
+    exact_dist_space_age: passed
+    upgrade_from_2_3_5: passed
+    release_targeted_gate: passed
+    automated_gate: passed
     manual_gate: pending
-    status: rebuilding-after-target-profile-status-update
+    status: release-candidate-awaiting-manual-review
 
   mir_3_2_0:
     version: "3.2.0"
