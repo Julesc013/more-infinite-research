@@ -137,8 +137,9 @@ local function assert_pipeline_command_contracts()
     if command.id ~= id or not allowed_kinds[command.kind] then
       fail("pipeline command " .. tostring(id) .. " has invalid identity or kind")
     end
-    if type(command.requires_features) ~= "table" or type(command.implementation) ~= "string" then
-      fail("pipeline command " .. id .. " is missing positive target requirements or implementation ownership")
+    if type(command.requires_features) ~= "table" or type(command.implementation) ~= "string"
+      or type(command.phase) ~= "number" or type(command.dependencies) ~= "table" then
+      fail("pipeline command " .. id .. " is missing requirements, ordering, or implementation ownership")
     end
   end
   if count ~= 13 then fail("expected 13 governed pipeline commands, got " .. tostring(count)) end
@@ -151,7 +152,7 @@ local function assert_capability_lifecycle_contracts()
   if #resolvers ~= 3 then fail("expected three governed capability resolvers") end
   for _, resolver in ipairs(resolvers) do
     local functions = {}
-    for _, stage in ipairs({"discover", "classify", "propose", "validate", "emit", "diagnose"}) do
+    for _, stage in ipairs({"discover", "classify", "propose", "validate", "materialize", "result"}) do
       if type(resolver[stage]) ~= "function" then fail(resolver.id .. " is missing lifecycle stage " .. stage) end
       if functions[resolver[stage]] then fail(resolver.id .. " aliases lifecycle stage " .. stage) end
       functions[resolver[stage]] = true
