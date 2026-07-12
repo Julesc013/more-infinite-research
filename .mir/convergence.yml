@@ -109,7 +109,7 @@ candidate:
   manual_gate: accepted-for-publication
   interactive_review: .mir/evidence/2.4.0-interactive-review.md
   release_commit: 575fc4f5ae4a52205d1e72604934ead35e69c99e
-  tag: "2.4.0"
+  release_tag: "2.4.0"
   published_at: 2026-07-12T01:02:42Z
   github_release: https://github.com/Julesc013/more-infinite-research/releases/tag/2.4.0
   publication_evidence: .mir/evidence/2.4.0-publication.md
