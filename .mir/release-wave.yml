@@ -104,7 +104,7 @@ waves:
     baseline_tag: pre-3.1-modernization
     baseline_commit: f3d3b6073166b5acdc2ae5636c0d68302b757f0f
     implementation_gate: authorized-by-maintainer-directed-continuation
-    source_commit: aa05c4e93fe37f64e4d8004b8ba83d9fad274922
+    source_commit: b9293df08f0db2863e9dbe8a5b48503b705b2630
     architecture_contract: docs/architecture/automatic-family-compiler.md
     stable_technology_id_count: 70
     reviewed_generic_family_id_count: 2
@@ -123,27 +123,27 @@ waves:
     pre_renumber_core_ecosystem_load_characterization: .mir/evidence/pre-3.1-renumber-core-ecosystems-load-campaign.json
     pre_renumber_aai_load_characterization: .mir/evidence/pre-3.1-renumber-aai-load-campaign.json
     automatic_compiler_runtime_summary: .mir/evidence/3.1.0-automatic-compiler-runtime-summary.json
-    runtime_source_commit: aa05c4e93fe37f64e4d8004b8ba83d9fad274922
-    package_evidence_commit: d2d86132d71f694db0ca95c191da60abdb7add2c
-    package_source_commit: aa05c4e93fe37f64e4d8004b8ba83d9fad274922
-    runtime_run_id: e2f320fe-4ed9-4eed-894d-3b26551922c8
+    runtime_source_commit: b9293df08f0db2863e9dbe8a5b48503b705b2630
+    package_evidence_commit: pending-rc8-evidence-commit
+    package_source_commit: b9293df08f0db2863e9dbe8a5b48503b705b2630
+    runtime_run_id: 76604aa6-ae3c-4530-9b13-6e7e022177d1
     runtime_scenario_count: 89
-    runtime_package_sha256: 3F4A3A042F8486922397C1048D068745431257790F73FEDFE275BA0BF6F15780
-    runtime_validation_archive_sha256: C793D0659CA15B7C3FD01BF61B6DD8005BDD890A772C9F7CF5DA37A6206B868A
-    runtime_package_content_sha256: F85216318020CB438F30F6F956432CD2D673189BEE0D33B69F3C576B827ADDBF
-    structured_validation_evidence: .mir/evidence/3.1.0-rc7-validation-summary.json
-    upgrade_evidence: .mir/evidence/3.1.0-rc7/upgrade-proof.json
-    available_ecosystem_load_evidence: .mir/evidence/3.1.0-rc7-ecosystem-campaign.json
-    available_ecosystem_dependency_lock_sha256: 9299FC452654ADB12DE95695031FE0A310133DA40D4F3DB87C1CBBB194E200BB
-    interactive_evidence: .mir/evidence/3.1.0-rc7-interactive-review.json
+    runtime_package_sha256: 25B166D56712FB85037437B073F9AC59C500EDD0A404949F94BB4A1F9637DAB3
+    runtime_validation_archive_sha256: A8D06BDF798138EDB5487CF9AC871E5DD5503F0422A4C32CAA951F1BA4608254
+    runtime_package_content_sha256: 13A63773AA39D36262C50D98908A9B54653562F62F7EA76B2E33B7D01441912B
+    structured_validation_evidence: .mir/evidence/3.1.0-rc8-validation-summary.json
+    upgrade_evidence: .mir/evidence/3.1.0-rc8/upgrade-proof.json
+    available_ecosystem_load_evidence: .mir/evidence/3.1.0-rc8-ecosystem-campaign.json
+    available_ecosystem_dependency_lock_sha256: 8ADEE6C75778EB3DCEC1D49EAEE077309A644C13391D7816C361D8A95CAAE64C
+    interactive_evidence: .mir/evidence/3.1.0-rc8-interactive-review.json
     available_ecosystem_load_gate: 9-passed-zero-dependency-failures-load-claims-only-including-46-mod-planet-cluster
     current_archive_ecosystem_load_gate: passed
     renumbered_static_gate: passed
     renumbered_runtime_gate: passed
-    exact_package_gate: passed-exact-dist-base-and-space-age-on-main
+    exact_package_gate: passed-validation-package-base-and-space-age-pending-main-dist-recheck
     upgrade_from_3_0_5: passed-exact-archives-retained-settings-levels-storage-and-scripted-effects
-    candidate_freshness_gate: passed-clean-tree-rc7-source-package-validation-upgrade-nine-claim-gated-ecosystems-and-pending-interactive-bindings
-    interactive_gate: pending-rc7-identity-bound-packet-created-no-independent-ui-observation
+    candidate_freshness_gate: pending-clean-tree-rc8-evidence-commit
+    interactive_gate: pending-rc8-identity-bound-packet-created-no-independent-ui-observation
     publication_status: unreleased
     status: release-candidate-awaiting-manual-review
 

@@ -70,7 +70,7 @@ This is the executable release queue. `.mir/release-wave.yml` is the machine-rea
 - [x] Preserve `loads`, `observed`, `cooperates`, partial-family, and full-family claim boundaries; inventory never counts as proof.
 - [ ] Interactive settings, locale, icon, technology-tree, save-load, and balance review on the exact candidate.
 - [x] Preserve the superseded RC2-RC5 archives, release notes, migration guide, validation summaries, upgrade proof, campaign lock/evidence, and pending identity-bound GUI packet as historical evidence.
-- [x] Bind clean hardened source `aa05c4e`, archive `3F4A3A04...6F15780`, the `89/89` validation summary, exact upgrade proof, `9/9` ecosystem campaign, and a fresh pending interactive packet.
+- [x] Rebind user-facing settings source `b9293df`, archive `25B166D5...637DAB3`, the `89/89` validation summary, exact upgrade proof, `9/9` ecosystem campaign, and a fresh pending interactive packet.
 - [ ] Complete and bind the GUI review without rebuilding the archive.
 - [x] Revalidate the unchanged planet-safe package after campaign evidence is hardened so unresolved roots cannot report a passing claim row.
 - [x] Rebuild and requalify after the representative planet cluster exposed a generated base extension anchored to a disabled prerequisite chain.
