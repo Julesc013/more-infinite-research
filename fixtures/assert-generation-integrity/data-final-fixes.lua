@@ -35,11 +35,8 @@ local function assert_no_blocked_pickup_effects()
 end
 
 local function assert_generation_plan_v3()
-  local plan = stream_compiler.latest_artifact()
-  if not plan then
-    local compiled = stream_compiler.compile()
-    plan = compiled and compiled:artifact() or nil
-  end
+  local prototype = (data.raw["mod-data"] or {})["more-infinite-research-generation-plan"]
+  local plan = (prototype and prototype.data) or stream_compiler.latest_artifact()
   if not plan or plan.schema ~= 3 or not plan.validation_summary or plan.validation_summary.valid ~= true then
     fail("missing accepted GenerationPlan schema 3 artifact")
   end
