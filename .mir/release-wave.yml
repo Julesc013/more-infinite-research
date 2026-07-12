@@ -141,7 +141,7 @@ waves:
     renumbered_runtime_gate: passed
     exact_package_gate: passed-base-and-space-age
     upgrade_from_3_0_5: passed-exact-archives-retained-settings-levels-storage-and-scripted-effects
-    candidate_freshness_gate: awaiting-clean-tree-verification-after-rc3-record
+    candidate_freshness_gate: passed-clean-tree-source-package-validation-upgrade-ecosystem-and-pending-interactive-bindings
     interactive_gate: pending-identity-bound-packet-created
     publication_status: unreleased
     status: in-development

@@ -61,7 +61,8 @@ This is the executable release queue. `.mir/release-wave.yml` is the machine-rea
 - [x] Preserve `loads`, `observed`, `cooperates`, partial-family, and full-family claim boundaries; inventory never counts as proof.
 - [ ] Interactive settings, locale, icon, technology-tree, save-load, and balance review on the exact candidate.
 - [x] Materialize the RC2 deterministic archive, release notes, migration guide, validation summary, upgrade proof, campaign lock/evidence, and pending identity-bound GUI packet.
-- [ ] Pass candidate freshness from the clean RC2 evidence commit, then complete and bind the GUI review without rebuilding the archive.
+- [x] Pass candidate freshness from the clean RC3 evidence commit with source, package, validation, upgrade, ecosystem, and pending-interactive bindings.
+- [ ] Complete and bind the GUI review without rebuilding the archive.
 - [ ] Push accepted `dev` to `main`, create the real 3.1.0 tag, publish exact validated bytes, then mark immutable.
 
 ## 2.4.0 Factorio 2.0 Companion
