@@ -492,7 +492,7 @@ local function plan_chain(key)
     return
   end
   new.unit = {
-    count_formula = format_number(base_value) .. " * " .. format_number(growth) .. "^(L-1)",
+    count_formula = format_number(base_value) .. "*" .. format_number(growth) .. "^(L-1)",
     ingredients = resolved_ingredients,
     time = research_time
   }

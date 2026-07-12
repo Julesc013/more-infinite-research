@@ -243,7 +243,7 @@ local function plan_stream(key, raw_spec)
   local base_cost = costs.base_cost_for(key, spec)
   local growth_factor = costs.growth_factor_for(key, spec)
   local max_level = costs.max_level_for(key, spec)
-  local count_formula = tostring(base_cost) .. " * " .. tostring(growth_factor) .. "^(L-1)"
+  local count_formula = tostring(base_cost) .. "*" .. tostring(growth_factor) .. "^(L-1)"
   local research_time = costs.research_time_for(key, spec)
 
   local direct_effects = nil

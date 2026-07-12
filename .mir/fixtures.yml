@@ -205,6 +205,16 @@ fixtures:
       - runtime-state-effect-retention
       - exact-3-1-0-candidate-normal-mod-directory-load
 
+  upgrade-3-0-5-to-3-1-5:
+    requires_features: [scripted_techs]
+    assertion_path: fixtures/assert-upgrade-3-0-5-to-3-1-5
+    validates:
+      - exact-3-0-5-source-archive
+      - non-default-startup-setting-retention
+      - scripted-technology-level-retention
+      - runtime-state-effect-retention
+      - exact-3-1-5-candidate-normal-mod-directory-load
+
   upgrade-3-0-5-to-3-1-0-automatic-compiler:
     requires_features: [scripted_techs]
     assertion_path: fixtures/assert-upgrade-3-0-5-to-3-1-0-automatic-compiler

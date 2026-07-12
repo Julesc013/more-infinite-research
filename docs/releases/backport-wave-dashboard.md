@@ -5,7 +5,7 @@ applies_to: "3.0.5+"
 audience: release-manager
 doc_type: release-plan
 owner: mir-maintainers
-last_reviewed: 2026-07-12
+last_reviewed: 2026-07-13
 supersedes: []
 superseded_by: []
 ---
@@ -17,27 +17,26 @@ superseded_by: []
 | Target | MIR version | Branch | Source | Archive SHA-256 | Binary state | Status | Blocker |
 | --- | ---: | --- | --- | --- | --- | --- | --- |
 | Factorio 2.1 | 3.1.1 | `main` published baseline | `e91963c` | `FAAA6AA3...C7EB9` | Published emergency Galore ownership hotfix | Published and frozen | None |
-| Factorio 2.1 | 3.1.2 | `dev` | Pending hotfix acceptance | Pending | Technology-cycle repair and generated-prerequisite regression pass; full 91-scenario evidence is rebuilding | Hotfix validation | Full gate and exact archive qualification |
+| Factorio 2.1 | 3.1.2 | `main` | `b36996a` source / `4d74514` evidence | `D5BFA665...25F5` | 91 scenarios, exact upgrade, ecosystem 9/9, and exact dist passed | Candidate qualified | Manual release decision |
 | Factorio 2.0 | 2.3.5 | `legacy` published baseline | `861565d` source / `9eabc54` promotion | `97B3DC9B...68DE` | 71 scenarios, targeted gate, exact-dist base/Space Age, and upgrade passed | Published and frozen | None |
-| Factorio 2.0 | 2.4.0 | `tmp/2.0` | Must be re-derived from accepted 3.1.2 | Pending | Preserved pre-acceptance work is non-authoritative | Blocked | Accepted 3.1.2 source |
-| Factorio 1.1 | 1.9.4 | `tmp/1.1` | `4f3962f` qualified candidate | `431CD5B0...A46E` | Factorio 1.1.110 reduced full gate, exact dist, reload, and upgrade passed | Candidate qualified | Publication gate |
-| Factorio 1.0 | 1.8.2 staged | `tmp/1.0` | `aeb1483` staged candidate | `4ED750E5...0D3C` | Static package staging only; prior exact-save automation did not load MIR | Unqualified | Correct Factorio 1.0 runtime proof |
+| Factorio 2.0 | 2.5.0 | `tmp/2.0` | `f5c58f5` qualified source | `0BE57ED4...CBFD` | Factorio 2.0.77 full 82-scenario gate and exact dist passed | Candidate qualified | Publication gate; 2.4.0 bytes remain immutable |
+| Factorio 1.1 | 1.9.4 | `tmp/1.1` | `30ef8c7` qualified source | `9184524A...A35` | Factorio 1.1.110 10 scenarios, exact fresh/reload, and 1.9.3 upgrade passed | Candidate qualified | Publication gate |
+| Factorio 1.0 | 1.8.2 | `tmp/1.0` | `0b06b9b` qualified source | `1D474CF4...EDF6` | Factorio 1.0.0 10 scenarios, exact fresh/reload, and genuine 1.8.1 upgrade passed | Candidate qualified | Publication gate |
 | Factorio 0.18 | 1.8.0 bridge | `tmp/0.18` | Historical bridge evidence | `D785E6EB...7B24` | 0.18 and 1.0 bridge passed | Evidence only | 1.8.2 Factorio 1.0 qualification |
-| Factorio 0.17 | 1.7.1 planned | `tmp/0.17` | Pending replay | Pending | Binary available | Refresh pending | Final portable patch set |
-| Factorio 0.16 | 1.6.0 planned | `tmp/0.16` | Pending proof | Pending | Binary available | Discovery | Old-science adapter proof |
-| Factorio 0.15 | 1.5.0 planned | `tmp/0.15` | Pending proof | Pending | Binary available | Discovery | Independent native-infinite proof |
-| Factorio 0.14 | 1.4.0 planned | `tmp/0.14` | Pending proof | Pending | Binary available | Discovery | Target-era schema and finite/native proof |
-| Factorio 0.13 | 1.3.0 planned | `tmp/0.13` | Pending proof | Pending | Binary available | Discovery | Target-era schema and finite/native proof |
+| Factorio 0.17 | 1.7.1 | `tmp/0.17` | `efb5d0a` qualified source | `CC112180...1BFA` | Factorio 0.17.79 9 scenarios, exact fresh/reload, and 1.7.0 upgrade passed | Candidate qualified | Publication gate |
+| Factorio 0.16 | 1.6.0 | `tmp/0.16` | `2dfb1a7` qualified source | `6EE5FF57...6BAB` | Factorio 0.16.51 8 scenarios, exact package/fresh, and server reload passed | Candidate qualified | Publication gate |
+| Factorio 0.15 | 1.5.0 | `tmp/0.15` | `d416787` qualified source | `2EB2E965...817` | Factorio 0.15.40 4 target scenarios, exact package/fresh, and server reload passed | Candidate qualified | Publication gate |
+| Factorio 0.14 | 1.4.0 | `tmp/0.14` | `fa3b532` qualified source | `F6E90F29...CBD6` | Factorio 0.14.23 2 target scenarios, exact package/fresh, and server reload passed | Candidate qualified | Publication gate |
+| Factorio 0.13 | 1.3.0 | `tmp/0.13` | `095264d` qualified source | `3061783F...80AF` | Factorio 0.13.20 2 target scenarios, exact package/fresh, and server reload passed | Candidate qualified | Publication gate |
 | Factorio 0.11 through 0.6 | Museum versions | matching `tmp/*` | Pending | Pending | Unresolved | Discovery | Binary and base-file acquisition |
 
-## Immediate Gate
+## Completed Wave
 
-MIR 3.1.1 and 2.3.5 are the immutable published anchors. Complete the technology-cycle hotfix as untagged MIR 3.1.2 on `dev`, then use that exact accepted source for every descending RC. Do not merge lower-line metadata or feature cuts upward, and do not open 3.2.0 until the stability ladder returns its portable lessons.
+The 3.1.2 technology-cycle hotfix and every requested descending target are candidate-qualified and pushed without tags or releases. MIR 2.5.0 is used for Factorio 2.0 because the earlier 2.4.0 archive is immutable. Target metadata, finite-research emulation, old science names, effect whitelists, and engine-specific runtime cuts remain isolated on their target branches.
 
 ## Next Executable Sequence
 
-1. Freeze one clean untagged 3.1.2 hotfix candidate and run the full matrix, exact upgrade, available ecosystems, and exact-dist checks.
-2. Synchronize `dev` and `main` without creating a tag or public release.
-3. Create MIR 2.4.0 on the Factorio 2.0 line from accepted modern source with target-declared cuts only.
-4. Qualify 1.9.4, 1.8.2, 1.7.1, 1.6.0, 1.5.0, 1.4.0, and 1.3.0 in descending order with matching binaries.
-5. Classify and return portable lessons after each target, close the fixed-point sweep into `dev`, then open MIR 3.2.0.
+1. Finish the portable return sweep as untagged MIR 3.1.5 on `dev`.
+2. Run the complete Factorio 2.1 matrix, exact upgrade, ecosystem checks, and exact-dist qualification.
+3. Keep `main` on the exact 3.1.2 candidate until a human chooses which candidate to tag and publish.
+4. Tag or release only in a separate explicitly authorized publication turn.

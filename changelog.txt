@@ -1,4 +1,20 @@
 ---------------------------------------------------------------------------------------------------
+Version: 3.1.5
+Date: 2026-07-13
+
+  Changes:
+
+    - Returned portable compiler-plan and settings-override improvements from historical Factorio support work.
+    - Improved configuration-change reliability across supported Factorio lines.
+    - Standardized generated research formulas on compact syntax accepted across historical and current Factorio parsers.
+    - Improved compatibility across maintained and archive targets from Factorio 2.0 through 0.13.
+
+  Bugfixes:
+
+    - Preserved the 3.1.2 iterative prerequisite-cycle repair and strict generated-graph safety checks.
+    - Published compiled generation plans only after authoritative safety checks complete.
+
+---------------------------------------------------------------------------------------------------
 Version: 3.1.2
 Date: 2026-07-13
 

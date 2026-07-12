@@ -315,6 +315,17 @@ Invoke-RepoCheck "no old tool-based science pack authority remains" {
   }
 }
 
+Invoke-RepoCheck "generated count formulas use compact cross-version syntax" {
+  $streamCompilerText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\planner\stream_compiler.lua")
+  $baseExtensionsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\emit\base_extensions.lua")
+  if ($streamCompilerText -notmatch 'tostring\(base_cost\) \.\. "\*" \.\. tostring\(growth_factor\)') {
+    throw "Stream compiler count formulas must use compact multiplication syntax."
+  }
+  if ($baseExtensionsText -notmatch 'format_number\(base_value\) \.\. "\*" \.\. format_number\(growth\)') {
+    throw "Base extension count formulas must use compact multiplication syntax."
+  }
+}
+
 Invoke-RepoCheck "generated icons do not use icon_mipmaps" {
   $matches = Find-RepositoryText -Path (Join-Path $repo "prototypes") -Pattern "icon_mipmaps"
   if ($matches.Count -gt 0) {
