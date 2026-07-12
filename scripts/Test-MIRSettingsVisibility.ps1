@@ -6,7 +6,7 @@ $ErrorActionPreference = "Stop"
 
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
 $repoInfo = Get-Content -Raw -LiteralPath (Join-Path $repo "info.json") | ConvertFrom-Json
-$isReducedLegacyLine = $repoInfo.factorio_version -in @("0.16", "0.17", "0.18", "1.0", "1.1")
+$isReducedLegacyLine = $repoInfo.factorio_version -in @("0.15", "0.16", "0.17", "0.18", "1.0", "1.1")
 
 function Read-MIRText {
   param([Parameter(Mandatory)][string]$RelativePath)

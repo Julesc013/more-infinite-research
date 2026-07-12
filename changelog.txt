@@ -1,4 +1,17 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.5.0
+Date: 2026-07-13
+
+  Features:
+
+    - Ported the old-science native-infinite compiler and iterative graph-safety guard to Factorio 0.15.
+
+  Changes:
+
+    - Kept the target-era science map and whitespace-free infinite count formulas proven on the older engine.
+    - Kept Factorio 0.16+, 1.x, 2.x, and DLC-only behavior out of this package.
+
+---------------------------------------------------------------------------------------------------
 Version: 1.6.0
 Date: 2026-07-13
 

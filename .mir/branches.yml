@@ -218,6 +218,15 @@ release_artifacts:
       structured_summary_path: .mir/evidence/1.6.0-candidate-summary.json
       public_release: false
       status: candidate-qualified
+    mir_1_5_0:
+      version: "1.5.0"
+      branch: tmp/0.15
+      target_factorio: "0.15"
+      source_anchor: mir_1_6_0
+      artifact: dist/more-infinite-research_1.5.0.zip
+      automated_gate: pending-final-package
+      public_release: false
+      status: candidate-building
   closed_versions:
     - version: "2.2.0"
       branch: main

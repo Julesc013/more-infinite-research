@@ -11,12 +11,13 @@ param(
 $ErrorActionPreference = "Stop"
 $repo = Resolve-Path (Join-Path $PSScriptRoot "..")
 $repoInfo = Get-Content -Raw (Join-Path $repo "info.json") | ConvertFrom-Json
+$isFactorio015Line = $repoInfo.factorio_version -eq "0.15"
 $isFactorio016Line = $repoInfo.factorio_version -eq "0.16"
 $isFactorio017Line = $repoInfo.factorio_version -eq "0.17"
 $isFactorio018Line = $repoInfo.factorio_version -eq "0.18"
 $isFactorio10Line = $repoInfo.factorio_version -eq "1.0"
 $isFactorio11Line = $repoInfo.factorio_version -eq "1.1"
-$isReducedLegacyLine = $isFactorio016Line -or $isFactorio017Line -or $isFactorio018Line -or $isFactorio10Line -or $isFactorio11Line
+$isReducedLegacyLine = $isFactorio015Line -or $isFactorio016Line -or $isFactorio017Line -or $isFactorio018Line -or $isFactorio10Line -or $isFactorio11Line
 $isLegacyFactorio20 = $repoInfo.factorio_version -eq "2.0"
 $isFactorio21Line = $repoInfo.factorio_version -eq "2.1"
 $script:ValidationPackageZipPath = $null
@@ -141,7 +142,16 @@ Invoke-RepoCheck "info.json parses" {
 Invoke-RepoCheck "release metadata matches Factorio line" {
   $deps = @($repoInfo.dependencies)
 
-  if ($isFactorio016Line) {
+  if ($isFactorio015Line) {
+    if ($deps -notcontains "base >= 0.15") {
+      throw "Factorio 0.15 metadata must declare base >= 0.15."
+    }
+
+    $newerDeps = @($deps | Where-Object { $_ -match ">=\s*(0\.16|0\.17|0\.18|1|2)\." -or $_ -match "(space-age|quality|recycler|elevated-rails)" })
+    if ($newerDeps.Count -gt 0) {
+      throw "Factorio 0.15 metadata must not carry Factorio 0.16+, 1.x, 2.x, or DLC dependencies: $($newerDeps -join ', ')"
+    }
+  } elseif ($isFactorio016Line) {
     if ($deps -notcontains "base >= 0.16") {
       throw "Factorio 0.16 metadata must declare base >= 0.16."
     }
@@ -492,7 +502,11 @@ Invoke-RepoCheck "fixture mods have metadata and data entrypoints" {
       throw "Fixture $($info.name) must target Factorio $($repoInfo.factorio_version) on this branch; found $($info.factorio_version)."
     }
     $fixtureBaseDependency = @($info.dependencies) | Where-Object { $_ -match "^base\s+>=" } | Select-Object -First 1
-    if ($isFactorio016Line) {
+    if ($isFactorio015Line) {
+      if ($fixtureBaseDependency -notmatch "^base\s+>=\s+0\.15(\.|$)") {
+        throw "Fixture $($info.name) must use a Factorio 0.15 base dependency on this branch; found '$fixtureBaseDependency'."
+      }
+    } elseif ($isFactorio016Line) {
       if ($fixtureBaseDependency -notmatch "^base\s+>=\s+0\.16(\.|$)") {
         throw "Fixture $($info.name) must use a Factorio 0.16 base dependency on this branch; found '$fixtureBaseDependency'."
       }
@@ -1954,7 +1968,7 @@ function Get-ScenarioModFolderName {
     [string]$Version
   )
 
-  if (($isFactorio016Line -or $isFactorio017Line) -and -not [string]::IsNullOrWhiteSpace($Version)) {
+  if (($isFactorio015Line -or $isFactorio016Line -or $isFactorio017Line) -and -not [string]::IsNullOrWhiteSpace($Version)) {
     return "$Name`_$Version"
   }
   return $Name
@@ -2806,7 +2820,7 @@ $defaultEnabledBaseExtensionKeys = @(
   "weapon-shooting-speed",
   "laser-shooting-speed"
 )
-if ($isFactorio016Line) {
+if ($isFactorio015Line -or $isFactorio016Line) {
   $defaultEnabledBaseExtensionKeys = @($defaultEnabledBaseExtensionKeys | Where-Object { $_ -ne "weapon-shooting-speed" })
 }
 
@@ -2966,7 +2980,7 @@ if ($isReducedLegacyLine) {
   Write-Host "[info] $reducedLineLabel reduced runtime gate skips 2.x recipe-productivity and DLC scenarios."
 
   $directEffectFixtureNames = @()
-  if ($isFactorio016Line -or $isFactorio017Line -or $isFactorio018Line -or $isFactorio10Line -or $isFactorio11Line) {
+  if ($isFactorio015Line -or $isFactorio016Line -or $isFactorio017Line -or $isFactorio018Line -or $isFactorio10Line -or $isFactorio11Line) {
     $directEffectFixtureNames += "mir-fixture-assert-legacy-effect-icons"
   }
   $directEffectFixtureNames += "mir-fixture-assert-generated-prerequisite-safety"
@@ -2984,7 +2998,7 @@ if ($isReducedLegacyLine) {
     "research_robot_battery",
     "research_rocket_shooting_speed"
   )
-  if ($isFactorio016Line) {
+  if ($isFactorio015Line -or $isFactorio016Line) {
     $reducedDirectEffectStreams = @($reducedDirectEffectStreams | Where-Object { $_ -ne "research_cannon_shooting_speed" })
   }
   foreach ($stream in $reducedDirectEffectStreams) {
@@ -3040,7 +3054,7 @@ if ($isReducedLegacyLine) {
     throw "Disabled base extension checkbox should skip generated continuation: $checkboxDisabledResearchSpeedLine"
   }
 
-  if (-not $isFactorio016Line) {
+  if (-not ($isFactorio015Line -or $isFactorio016Line)) {
     Invoke-RuntimeScenario -ScenarioName "weapon-speed-overlap-safety" -EnabledFixtureNames @(
       "mir-fixture-assert-weapon-speed-safety"
     ) -WeaponSpeedAdjustmentMode "only-when-dedicated-tech-enabled"

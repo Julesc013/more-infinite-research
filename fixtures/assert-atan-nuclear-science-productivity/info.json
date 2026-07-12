@@ -4,9 +4,9 @@
   "title": "MIR Fixture - Assert ATAN Nuclear Science Productivity",
   "author": "Julesc013",
   "description": "Validation fixture that asserts an ATAN-style nuclear science pack receives MIR science-pack productivity and lab-compatible science.",
-  "factorio_version": "0.16",
+  "factorio_version": "0.15",
   "dependencies": [
-    "base >= 0.16",
+    "base >= 0.15",
     "more-infinite-research",
     "mir-fixture-atan-nuclear-science"
   ]
