@@ -6,13 +6,14 @@ local cycle_pack_a_name = "mir-fixture-cycle-science-pack-a"
 local cycle_pack_b_name = "mir-fixture-cycle-science-pack-b"
 
 local pack = {
-  type = "item",
+  type = "tool",
   name = pack_name,
   icon = "__base__/graphics/icons/automation-science-pack.png",
   icon_size = 64,
   subgroup = "science-pack",
   order = "z[mir-fixture-prerequisite-science-pack]",
-  stack_size = 200
+  stack_size = 200,
+  durability = 1
 }
 
 local recipe = {
