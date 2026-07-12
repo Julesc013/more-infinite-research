@@ -49,11 +49,11 @@ This is the executable release queue. `.mir/release-wave.yml` is the machine-rea
 
 ### Final 3.1.0 Evidence
 
-- [ ] Clean static validation after all version/governance reconciliation.
-- [ ] Complete Factorio 2.1.9 declared runtime matrix with no skipped required group.
+- [x] Clean static validation after version/governance reconciliation at source `1b91c40`.
+- [x] Complete Factorio 2.1.9 declared runtime matrix with no skipped required group at source `1b91c40` (`85/85`).
 - [ ] Exact 3.0.5-to-final-3.1.0 save upgrade with non-default settings, research levels, storage, and scripted effects retained.
-- [ ] Exact final archive base and Space Age loads from a normal mods directory.
-- [ ] Final-source performance evidence with recipe, technology, effect, edge, candidate, and scan counts.
+- [x] Exact 3.1.0 development archive base and Space Age loads from an isolated normal mods directory; rerun if package-visible source changes.
+- [x] Final-version performance evidence with recipe, technology, effect, edge, candidate, and scan counts; rerun if package-visible source changes.
 - [ ] Independent exact-archive campaigns for AAI, BZ, Bob, Angel, Krastorio/K2SO, Space Exploration, Pyanodon, and representative planet mods where complete dependency closures are available.
 - [ ] Preserve `loads`, `observed`, `cooperates`, partial-family, and full-family claim boundaries; inventory never counts as proof.
 - [ ] Interactive settings, locale, icon, technology-tree, save-load, and balance review on the exact candidate.

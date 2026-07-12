@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "kind": "mir-automatic-compiler-runtime-summary",
+  "release": "3.1.0",
+  "publication_status": "unreleased",
+  "generated_at": "2026-07-12T09:16:07.3798782Z",
+  "source_commit": "1b91c401936e0f403c92ec02703fc42c93e47308",
+  "source_tree_dirty": false,
+  "factorio_line": "2.1",
+  "factorio_binary_version": "2.1.9",
+  "runtime_validation": {
+    "run_id": "c2ba427d-75dc-4e3c-83de-003e59ccbc1b",
+    "result": "passed",
+    "scenario_count": 85,
+    "duration_seconds": 722.176,
+    "required_groups_skipped": 0,
+    "validation_harness_sha256": "81EA18B14CD59B0D003A4FE751A84118997E7202A9D54D7A63D8A8CEF2B06BB0",
+    "scenario_manifest_sha256": "A9E9A1E6C36B3E0A3C0D377D93D41E20113AC0950F36A6A3BC7E62A25B468ED2",
+    "target_profile_sha256": "4AE6FCC2DAB5BE2F960B03CED800738E8F42BA51B69928899D7EB4962F404C3C",
+    "package_source_sha256": "18EB49BB714FADF3B48D361A1ED696980AEE8750CC41DCD542E126AE48698246",
+    "validation_package_sha256": "D71B6EA227B39A69AB8DA8D17BE5EF1242DF7386D39EC2C134E39A624745DC3A",
+    "exact_package_base": "passed",
+    "exact_package_space_age": "passed"
+  },
+  "synthetic_scale_gate": {
+    "scenario_id": "synthetic-scale-graph",
+    "result": "passed",
+    "duration_seconds": 7.915,
+    "budget_seconds": 30.0,
+    "recipe_count": 1000,
+    "technology_count": 1000,
+    "effect_count": 10000,
+    "graph_edge_count": 999,
+    "candidate_count_minimum": 1000,
+    "scan_count": 2,
+    "complete_recipe_accounting": true,
+    "dangling_effect_count": 0,
+    "duplicate_owner_count": 0
+  },
+  "claim_boundary": "Automated development-candidate evidence only. Upgrade, interactive, independent campaign, freshness, and publication gates remain separate."
+}
