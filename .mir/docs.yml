@@ -1341,6 +1341,14 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - mir-3.1.0-plan
+  - path: docs/releases/3.2.0-development-summary.md
+    title: "Post-3.1 Automatic Compiler Development Summary"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - post-3.1-automatic-compiler-result
   - path: docs/releases/3.1.0-checklist.md
     title: "MIR 3.1.0 Release Checklist"
     status: current

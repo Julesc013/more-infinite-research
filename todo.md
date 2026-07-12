@@ -22,12 +22,20 @@ This file is the concise executable queue. Detailed scope, decisions, evidence, 
 
 ## Next Actions
 
-1. Compile all existing streams into one pure `GenerationPlan`, validate the complete plan, then emit with stable-ID and output parity.
-2. Consolidate RecipeFactV2 and shared relationship indexes.
-3. Add data-only family rules and fixture-backed attach-only automation; create no new technology IDs in this gate.
-4. Separate production compatibility policy from fixture-only profiles and add data-only compatibility packs.
-5. Upgrade scenario declarations and golden-plan evidence, then run static, full Factorio 2.1, exact-package, upgrade, performance, and interactive gates.
-6. Complete old-target qualification and one portable-return fixed-point sweep independently.
+1. Review performance budgets for the larger RecipeFactV2, relationship-index, and decision payloads.
+2. Run selected real-mod compatibility packs and compare planner reports against the 3.1.0 baseline.
+3. Review attach-only balance values and keep lab manufacturing proposal-only unless a new stable stream passes manifest and migration review.
+4. Complete eventual-version save upgrade, exact-package, interactive UI, and release-candidate gates without rebuilding published 3.1.0.
+5. Complete old-target qualification and one portable-return fixed-point sweep independently.
+
+## Completed Development Gates
+
+- [x] Pure whole-plan compilation and deferred adoption mutation.
+- [x] RecipeFactV2 and shared relationship indexes.
+- [x] Data-only FamilyRule registry with existing-stream-only attachment.
+- [x] Fixture-only policy removed from production profiles; CompatibilityPack schema active.
+- [x] Capability `materialize/result`, central effect metadata, and dependency-enforced commands.
+- [x] Scenario manifest schema 2, 70-ID golden plan, static suite, and 83/83 Factorio 2.1 integration matrix.
 
 ## Recurring Release Gate
 

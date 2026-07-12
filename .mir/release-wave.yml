@@ -142,4 +142,15 @@ waves:
     implementation_gate: authorized-by-maintainer-directed-continuation
     behavior_baseline: immutable-3.1.0
     architecture_contract: docs/architecture/automatic-family-compiler.md
-    status: implementation-in-progress
+    validation_source_commit: ea35733e230532a248d71147dd06ffb53d802af4
+    rebased_equivalent_commit: 67cef34c22093a8d0a8576a563c534edcb6e8c41
+    validation_source_tree_equivalent: passed
+    structured_summary_path: .mir/evidence/post-3.1-automatic-compiler-final-summary.json
+    structured_summary_run_id: e61369cb-7a64-4d92-b727-e1bce9b90602
+    scenario_count: 83
+    scenario_result: passed
+    stable_technology_id_count: 70
+    stable_technology_golden: passed
+    validation_package_sha256: EEB2567CBDB0B839943FCE9C3447F0FABBC206F47C90616879D762155851B3D2
+    package_content_sha256: F8C064661D109AE06E6AD9C5E00AF5A0F89DA7915523AE273B8FE7772049503A
+    status: integration-validated
