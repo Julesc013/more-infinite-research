@@ -3,7 +3,10 @@ param(
   [Parameter(Mandatory)][string]$FactorioBin,
   [Parameter(Mandatory)][string]$FromZip,
   [Parameter(Mandatory)][string]$ToZip,
-  [string]$OutputPath = ".mir\evidence\3.1.0-upgrade-proof.json"
+  [string]$FromVersion = "3.0.5",
+  [string]$ToVersion = "3.1.0",
+  [string]$FixtureName = "assert-upgrade-3-0-5-to-3-1-0",
+  [string]$OutputPath = ""
 )
 
 $ErrorActionPreference = "Stop"
@@ -29,12 +32,18 @@ function Copy-MIRUpgradeLogEvidence {
 $factorio = Resolve-MIRUpgradePath -Path $FactorioBin
 $from = Resolve-MIRUpgradePath -Path $FromZip
 $to = Resolve-MIRUpgradePath -Path $ToZip
-$fixture = Resolve-MIRUpgradePath -Path (Join-Path $RepoRoot "fixtures\assert-upgrade-3-0-5-to-3-1-0")
+$fixture = Resolve-MIRUpgradePath -Path (Join-Path $RepoRoot "fixtures\$FixtureName")
+$fixtureInfo = Get-Content -Raw -LiteralPath (Join-Path $fixture "info.json") | ConvertFrom-Json
+$fixtureModName = [string]$fixtureInfo.name
+if ([string]::IsNullOrWhiteSpace($OutputPath)) {
+  $OutputPath = ".mir\evidence\$ToVersion-upgrade-proof.json"
+}
 $output = if ([System.IO.Path]::IsPathRooted($OutputPath)) { $OutputPath } else { Join-Path $RepoRoot $OutputPath }
 $outputParent = Split-Path -Parent $output
 if (-not (Test-Path -LiteralPath $outputParent)) { New-Item -ItemType Directory -Force -Path $outputParent | Out-Null }
 
-$root = Join-Path ([System.IO.Path]::GetTempPath()) ("mir-upgrade-3-0-5-to-3-1-0-" + [guid]::NewGuid().ToString("N"))
+$upgradeSlug = (($FromVersion + "-to-" + $ToVersion) -replace '[^0-9A-Za-z.-]', '-')
+$root = Join-Path ([System.IO.Path]::GetTempPath()) ("mir-upgrade-$upgradeSlug-" + [guid]::NewGuid().ToString("N"))
 $mods = Join-Path $root "mods"
 $userdata = Join-Path $root "userdata"
 New-Item -ItemType Directory -Force -Path $mods, $userdata | Out-Null
@@ -54,24 +63,24 @@ $modList = [ordered]@{ mods = @(
   @{ name = "recycler"; enabled = $true },
   @{ name = "space-age"; enabled = $true },
   @{ name = "more-infinite-research"; enabled = $true },
-  @{ name = "mir-fixture-assert-upgrade-3-0-5-to-3-1-0"; enabled = $true }
+  @{ name = $fixtureModName; enabled = $true }
 ) }
 $modList | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath (Join-Path $mods "mod-list.json") -Encoding UTF8
 Copy-Item -LiteralPath $from -Destination (Join-Path $mods (Split-Path -Leaf $from))
-Copy-Item -LiteralPath $fixture -Destination (Join-Path $mods "mir-fixture-assert-upgrade-3-0-5-to-3-1-0") -Recurse
+Copy-Item -LiteralPath $fixture -Destination (Join-Path $mods $fixtureModName) -Recurse
 
-$save = Join-Path $root "mir-3.0.5-save.zip"
+$save = Join-Path $root "mir-$FromVersion-save.zip"
 $log = Join-Path $userdata "factorio-current.log"
 $createArgs = @("--config", $config, "--no-log-rotation", "--disable-audio", "--mod-directory", $mods, "--create", $save)
 $createExitCode = Invoke-FactorioProcess -FilePath $factorio -Arguments $createArgs
 if ($createExitCode -ne 0 -or -not (Test-Path -LiteralPath $save)) {
-  throw "MIR 3.0.5 upgrade source save creation failed with exit code $createExitCode."
+  throw "MIR $FromVersion upgrade source save creation failed with exit code $createExitCode."
 }
 $createText = Get-Content -Raw -LiteralPath $log
-if (-not $createText.Contains("[mir-fixture] 3.0.5 upgrade source proof complete")) {
-  throw "MIR 3.0.5 upgrade source proof marker is missing."
+if (-not $createText.Contains("[mir-fixture] $FromVersion upgrade source proof complete")) {
+  throw "MIR $FromVersion upgrade source proof marker is missing."
 }
-$createEvidence = Join-Path $outputParent "3.1.0-upgrade-from-3.0.5-create.txt"
+$createEvidence = Join-Path $outputParent "$ToVersion-upgrade-from-$FromVersion-create.txt"
 Copy-MIRUpgradeLogEvidence -Source $log -Destination $createEvidence
 
 Get-ChildItem -LiteralPath $mods -File -Filter "more-infinite-research_*.zip" | Remove-Item -Force
@@ -81,12 +90,12 @@ $loadArgs = @(
   "--benchmark", $save, "--benchmark-ticks", "1", "--benchmark-runs", "1", "--benchmark-sanitize"
 )
 $loadExitCode = Invoke-FactorioProcess -FilePath $factorio -Arguments $loadArgs
-if ($loadExitCode -ne 0) { throw "MIR 3.1.0 upgrade load failed with exit code $loadExitCode." }
+if ($loadExitCode -ne 0) { throw "MIR $ToVersion upgrade load failed with exit code $loadExitCode." }
 $loadText = Get-Content -Raw -LiteralPath $log
-if (-not $loadText.Contains("[mir-fixture] 3.0.5 to 3.1.0 upgrade proof complete")) {
-  throw "MIR 3.1.0 upgrade proof marker is missing."
+if (-not $loadText.Contains("[mir-fixture] $FromVersion to $ToVersion upgrade proof complete")) {
+  throw "MIR $ToVersion upgrade proof marker is missing."
 }
-$loadEvidence = Join-Path $outputParent "3.1.0-upgrade-from-3.0.5-load.txt"
+$loadEvidence = Join-Path $outputParent "$ToVersion-upgrade-from-$FromVersion-load.txt"
 Copy-MIRUpgradeLogEvidence -Source $log -Destination $loadEvidence
 
 [ordered]@{
@@ -95,8 +104,8 @@ Copy-MIRUpgradeLogEvidence -Source $log -Destination $loadEvidence
   generated_at = (Get-Date).ToUniversalTime().ToString("o")
   git_commit = (& git -C $RepoRoot rev-parse HEAD).Trim()
   factorio_binary_version = (Get-Item -LiteralPath $factorio).VersionInfo.FileVersion
-  from = [ordered]@{ version = "3.0.5"; path = $FromZip; sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $from).Hash }
-  to = [ordered]@{ version = "3.1.0"; path = $ToZip; sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $to).Hash }
+  from = [ordered]@{ version = $FromVersion; path = $FromZip; sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $from).Hash }
+  to = [ordered]@{ version = $ToVersion; path = $ToZip; sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $to).Hash }
   assertions = @(
     "startup-setting-retained",
     "effect-setting-retained",
@@ -109,4 +118,4 @@ Copy-MIRUpgradeLogEvidence -Source $log -Destination $loadEvidence
   load_log = (Split-Path -Leaf $loadEvidence)
 } | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $output -Encoding UTF8
 
-Write-Host "[ok] MIR 3.0.5 to 3.1.0 upgrade proof: $output"
+Write-Host "[ok] MIR $FromVersion to $ToVersion upgrade proof: $output"

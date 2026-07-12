@@ -2905,7 +2905,7 @@ function Invoke-WeaponSpeedPolicyMatrix {
 
 try {
 Invoke-PackageZipSmokeScenario -ScenarioName "package-zip-base"
-if ($isFactorio21Line) {
+if ([bool]$targetProfile.supports_space_age) {
   Invoke-PackageZipSmokeScenario -ScenarioName "package-zip-space-age" -EnableSpaceAge
 }
 
@@ -3434,7 +3434,7 @@ $modProgressionScienceLine = Get-LastStreamReportLine -Key "research_science_pac
 Assert-ReportLineGenerated -Line $modProgressionScienceLine -Context "Mod progression science-pack ingredient policy selected mod pack scenario"
 Assert-ReportScienceContains -Line $modProgressionScienceLine -Expected "mir-fixture-science-pack" -Context "Mod progression science-pack ingredient policy selected mod pack scenario"
 
-if ($isFactorio21Line) {
+if ([bool]$targetProfile.features.scripted_techs -and [bool]$targetProfile.supports_space_age) {
   Invoke-RuntimeScenario -ScenarioName "base-scripted-candidates-enabled" -EnabledFixtureNames @() -EnabledStreamKeys @(
     "research_spoilage_preservation",
     "research_agricultural_growth_speed"
