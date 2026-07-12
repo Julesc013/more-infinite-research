@@ -74,7 +74,8 @@ This is the executable release queue. `.mir/release-wave.yml` is the machine-rea
 - [ ] Complete and bind the GUI review without rebuilding the archive.
 - [x] Revalidate the unchanged planet-safe package after campaign evidence is hardened so unresolved roots cannot report a passing claim row.
 - [x] Rebuild and requalify after the representative planet cluster exposed a generated base extension anchored to a disabled prerequisite chain.
-- [ ] Push accepted `dev` to `main`, create the real 3.1.0 tag, publish exact validated bytes, then mark immutable.
+- [x] Fast-forward accepted `dev` to `main` and synchronize local/origin `dev` and `main` at the same RC7 evidence commit.
+- [ ] Complete the real interactive gate, create the real 3.1.0 tag, publish the exact validated bytes, then mark immutable.
 
 ## 2.4.0 Factorio 2.0 Companion
 

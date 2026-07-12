@@ -140,7 +140,7 @@ waves:
     current_archive_ecosystem_load_gate: passed
     renumbered_static_gate: passed
     renumbered_runtime_gate: passed
-    exact_package_gate: passed-base-and-space-age
+    exact_package_gate: passed-exact-dist-base-and-space-age-on-main
     upgrade_from_3_0_5: passed-exact-archives-retained-settings-levels-storage-and-scripted-effects
     candidate_freshness_gate: passed-clean-tree-rc7-source-package-validation-upgrade-nine-claim-gated-ecosystems-and-pending-interactive-bindings
     interactive_gate: pending-rc7-identity-bound-packet-created-no-independent-ui-observation
