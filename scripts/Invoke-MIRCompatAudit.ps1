@@ -1339,6 +1339,17 @@ if ($RunLoadTests) {
   $campaignScenarios = @(
     foreach ($scenario in $selectedScenarios) {
       $result = $resultByScenario[[string]$scenario.name]
+      $dependencyFailureCount = @($scenario.dependency_failures).Count
+      $expectedPlan = Get-MIRObjectProperty -Object $scenario -Name "expected_plan" -Default ([pscustomobject]@{})
+      $maximumDependencyFailures = [int](Get-MIRObjectProperty -Object $expectedPlan -Name "maximum_dependency_failures" -Default 0)
+      $processResult = if ($result.passed -eq $true) { "passed" } elseif ($result.skipped -eq $true) { "skipped" } else { "failed" }
+      $claimGateResult = if ($processResult -eq "passed" -and $dependencyFailureCount -le $maximumDependencyFailures) {
+        "passed"
+      } elseif ($processResult -eq "skipped") {
+        "skipped"
+      } else {
+        "failed"
+      }
       $closure = @(
         foreach ($entry in @($scenario.lock_entries | Sort-Object name, version -Unique)) {
           if ([string]::IsNullOrWhiteSpace([string]$entry.sha256)) {
@@ -1359,13 +1370,14 @@ if ($RunLoadTests) {
         resolved_mods = @($scenario.resolved_mods)
         official_mods = @($scenario.official_mods)
         dependency_closure = $closure
-        dependency_failure_count = @($scenario.dependency_failures).Count
-        result = if ($result.passed -eq $true) { "passed" } elseif ($result.skipped -eq $true) { "skipped" } else { "failed" }
+        dependency_failure_count = $dependencyFailureCount
+        process_result = $processResult
+        result = $claimGateResult
         exit_code = $result.exit_code
         timed_out = [bool]$result.timed_out
         timeout_seconds = [int](Get-MIRObjectProperty -Object $scenario -Name "timeout_seconds" -Default $ScenarioTimeoutSeconds)
         settings = Get-MIRObjectProperty -Object $scenario -Name "settings" -Default ([pscustomobject]@{})
-        expected_plan = Get-MIRObjectProperty -Object $scenario -Name "expected_plan" -Default ([pscustomobject]@{})
+        expected_plan = $expectedPlan
         source_manifest = [string](Get-MIRObjectProperty -Object $scenario -Name "source_manifest" -Default "")
         claim_level = [string](Get-MIRObjectProperty -Object $scenario -Name "claim_level" -Default "loads")
       }

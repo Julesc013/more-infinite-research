@@ -58,11 +58,13 @@ This is the executable release queue. `.mir/release-wave.yml` is the machine-rea
 - [x] Characterize the earlier final-version archive across all currently complete local closures: AAI, BZ, Bob, Krastorio base, and K2SO (`8/8`, zero dependency failures).
 - [x] Rerun the available exact-archive `loads` scenarios against source `3699fec` (`9/9`, zero dependency failures), including a complete 46-mod planet cluster.
 - [ ] Acquire complete Angel, Space Exploration, and Pyanodon dependency closures, then run their independent exact-archive campaigns.
+- [x] Bind the remaining closure blockers to exact missing archive identities and reject zero-root process success as compatibility evidence.
 - [x] Preserve `loads`, `observed`, `cooperates`, partial-family, and full-family claim boundaries; inventory never counts as proof.
 - [ ] Interactive settings, locale, icon, technology-tree, save-load, and balance review on the exact candidate.
 - [x] Materialize the RC2 deterministic archive, release notes, migration guide, validation summary, upgrade proof, campaign lock/evidence, and pending identity-bound GUI packet.
 - [x] Pass candidate freshness from the clean planet-safe RC4 evidence commit with source, package, validation, upgrade, nine-ecosystem, and pending-interactive bindings.
 - [ ] Complete and bind the GUI review without rebuilding the archive.
+- [ ] Revalidate the unchanged RC4 package after campaign evidence is hardened so unresolved roots cannot report a passing claim row.
 - [x] Rebuild and requalify after the representative planet cluster exposed a generated base extension anchored to a disabled prerequisite chain.
 - [ ] Push accepted `dev` to `main`, create the real 3.1.0 tag, publish exact validated bytes, then mark immutable.
 

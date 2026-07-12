@@ -141,10 +141,10 @@ waves:
     renumbered_runtime_gate: passed
     exact_package_gate: passed-base-and-space-age
     upgrade_from_3_0_5: passed-exact-archives-retained-settings-levels-storage-and-scripted-effects
-    candidate_freshness_gate: passed-clean-tree-rc4-source-package-validation-upgrade-nine-ecosystems-and-pending-interactive-bindings
+    candidate_freshness_gate: invalidated-by-campaign-result-gate-hardening
     interactive_gate: pending-rc4-identity-bound-packet-created
     publication_status: unreleased
-    status: release-candidate-awaiting-manual-review
+    status: rebuilding-after-campaign-result-gate-hardening
 
   mir_2_4_0:
     version: "2.4.0"
