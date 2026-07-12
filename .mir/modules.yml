@@ -192,6 +192,8 @@ modules:
     - prototypes/mir/compatibility/diagnostics/air_scrubbing.lua
     - prototypes/mir/compatibility/diagnostics/atan_ash.lua
     - prototypes/mir/compatibility/repairs/factorio_2_1_recipe_schema.lua
+    - prototypes/mir/compatibility/repairs/technology_prerequisite_cycles.lua
+    - prototypes/mir/compatibility/repairs/registry.lua
   runtime:
     - prototypes/mir/runtime/scripted_techs.lua
     - prototypes/mir/runtime/settings_resolver.lua
@@ -322,7 +324,7 @@ rules:
   - Only settings/stage_builder.lua may register setting prototypes directly.
   - Generated technologies and mod-data prototypes emit through prototypes/mir/emit.
   - Compatibility overlays register policy only.
-  - Compatibility repairs may normalize exact-version upstream loader schemas only.
+  - Compatibility repairs may normalize exact-version upstream loader schemas or remove one topology-proven cross-mod cycle edge.
   - Domain modules do not read Factorio globals.
   - Report modules do not mutate prototypes.
   - Target and convergence policy live in machine-readable .mir manifests.

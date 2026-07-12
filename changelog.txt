@@ -9,6 +9,8 @@ Date: 2026-07-12
     - Added RecipeFactV2, shared relationship indexes, schema-2 family rules, compatibility packs, and coverage accounting.
     - Applied Factorio 2.0 target-declared stream, effect, setting, recipe-shape, and emitter cuts.
     - Retained whole-plan safety checks, deterministic results, and exact-owner protections from the modern source.
+    - Fixed the Muluna and Astroponics cycle by removing only Astroponics' circular Space Science prerequisite.
+    - Switched prerequisite checks to an iterative graph walk so deep modded technology trees remain safe.
 
 ---------------------------------------------------------------------------------------------------
 Version: 3.1.0

@@ -21,7 +21,7 @@ All meaningful shipped Lua lives under one MIR namespace.
 Every module belongs to one compiler layer.
 Only one layer mutates prototypes.
 Compatibility overlays register policy, not behavior.
-Compatibility repairs are exact-version loader-schema adapters, not broad behavior overlays.
+Compatibility repairs are bounded schema or graph adapters, not broad behavior overlays. A graph repair must name the participating mods, prove the mutual prerequisite path from finalized prototypes, and remove only the single edge that closes the cycle.
 Development-only docs, scripts, fixtures, and tests stay outside the shipped zip.
 Old compatibility, library, legacy, and broad root-helper shim paths do not
 ship on the main 3.x line.

@@ -12,6 +12,18 @@ compatibility_packs:
   external_transport: more-infinite-research-compatibility-pack
   fixture_only_profiles_allowed_in_production_registry: false
 
+technology_prerequisite_cycle_repairs:
+  - id: muluna-astroponics-space-science-cycle
+    required_mods:
+      - astroponics
+      - planet-muluna
+    trigger: astroponics-requires-space-science-and-space-science-transitively-requires-astroponics
+    mutation: remove-only-astroponics-to-space-science-prerequisite
+    implementation: prototypes/mir/compatibility/repairs/technology_prerequisite_cycles.lua
+    fixture: fixtures/external-technology-cycle
+    claim_level: diagnostic-only
+    public_scope: bounded startup-cycle interoperability repair only
+
 campaigns:
   evidence_contract: mir-modpack-campaign-evidence-v1
   exact_mir_archive_sha256_required: true

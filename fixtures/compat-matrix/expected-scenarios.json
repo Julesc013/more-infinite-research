@@ -141,6 +141,14 @@
         ]
       },
       {
+        "name": "external-technology-cycle",
+        "target_profile": "2.0",
+        "kind": "runtime",
+        "group": "science-prerequisites",
+        "surface": "base",
+        "required_features": []
+      },
+      {
         "name": "rigor-late-recipe-removal",
         "target_profile": "2.0",
         "kind": "runtime",
@@ -863,6 +871,14 @@
         "required_features": [
           "recipe_productivity"
         ]
+      },
+      {
+        "name": "external-technology-cycle",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "science-prerequisites",
+        "surface": "base",
+        "required_features": []
       },
       {
         "name": "rigor-late-recipe-removal",

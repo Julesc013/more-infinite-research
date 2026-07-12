@@ -1592,7 +1592,7 @@ Invoke-RepoCheck "ATAN Factorio 2.1 schema repairs are wired" {
 
   $repairText = Get-Content -Raw -LiteralPath $repairPath
   $requiredSnippets = @(
-    @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'require("prototypes.mir.compatibility.repairs.factorio_2_1_recipe_schema").apply()' },
+    @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'require("prototypes.mir.compatibility.repairs.registry").apply()' },
     @{ File = "prototypes\mir\compatibility\repairs\factorio_2_1_recipe_schema.lua"; Text = $repairText; Snippet = '["atan-ash"]' },
     @{ File = "prototypes\mir\compatibility\repairs\factorio_2_1_recipe_schema.lua"; Text = $repairText; Snippet = '["2.2.1"] = true' },
     @{ File = "prototypes\mir\compatibility\repairs\factorio_2_1_recipe_schema.lua"; Text = $repairText; Snippet = '"atan-landfill-from-ash"' },
@@ -1619,6 +1619,26 @@ Invoke-RepoCheck "ATAN Factorio 2.1 schema repairs are wired" {
   foreach ($check in $requiredSnippets) {
     if (-not $check.Text.Contains($check.Snippet)) {
       throw "Missing ATAN Factorio 2.1 schema repair wiring in $($check.File): $($check.Snippet)"
+    }
+  }
+}
+
+Invoke-RepoCheck "bounded technology prerequisite cycle repairs are wired" {
+  $registryText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\compatibility\repairs\registry.lua")
+  $repairText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\compatibility\repairs\technology_prerequisite_cycles.lua")
+  $fixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\external-technology-cycle\data-final-fixes.lua")
+  $compatibilityText = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir\compatibility.yml")
+  foreach ($check in @(
+    @{ File = "registry.lua"; Text = $registryText; Snippet = 'require("prototypes.mir.compatibility.repairs.technology_prerequisite_cycles").apply()' },
+    @{ File = "technology_prerequisite_cycles.lua"; Text = $repairText; Snippet = 'id = "muluna-astroponics-space-science-cycle"' },
+    @{ File = "technology_prerequisite_cycles.lua"; Text = $repairText; Snippet = 'required_mods = {"astroponics", "planet-muluna"}' },
+    @{ File = "technology_prerequisite_cycles.lua"; Text = $repairText; Snippet = 'and reaches(technologies, repair.reverse_path_start, repair.technology)' },
+    @{ File = "technology_prerequisite_cycles.lua"; Text = $repairText; Snippet = 'if prerequisite ~= operation.remove_prerequisite' },
+    @{ File = "external-technology-cycle fixture"; Text = $fixtureText; Snippet = 'cycle containing a generated technology did not remain fatal' },
+    @{ File = ".mir/compatibility.yml"; Text = $compatibilityText; Snippet = 'muluna-astroponics-space-science-cycle' }
+  )) {
+    if (-not $check.Text.Contains($check.Snippet)) {
+      throw "Missing bounded technology cycle repair wiring in $($check.File): $($check.Snippet)"
     }
   }
 }
@@ -2101,6 +2121,7 @@ $postMirAssertionFixtures = @(
   "mir-fixture-assert-synthetic-scale-graph",
   "mir-fixture-assert-generation-integrity",
   "mir-fixture-assert-generated-prerequisite-safety",
+  "mir-fixture-external-technology-cycle",
   "mir-fixture-rigor-late-recipe-removal",
   "mir-fixture-assert-hidden-setting-readability",
   "mir-fixture-assert-science-pack-productivity",
@@ -3165,6 +3186,10 @@ Assert-ReportLineContains -Line $baseRailsLine -Expected "icon=item:rail" -Conte
 Invoke-RuntimeScenario -ScenarioName "generated-prerequisite-safety" -EnabledFixtureNames @(
   "mir-fixture-assert-generated-prerequisite-safety"
 ) -SciencePackIngredientPolicy "all"
+
+Invoke-RuntimeScenario -ScenarioName "external-technology-cycle" -EnabledFixtureNames @(
+  "mir-fixture-external-technology-cycle"
+)
 
 Invoke-RuntimeScenario -ScenarioName "rigor-late-recipe-removal" -EnabledFixtureNames @(
   "mir-fixture-rigor-late-recipe-removal"
