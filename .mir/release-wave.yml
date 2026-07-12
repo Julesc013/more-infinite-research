@@ -167,4 +167,14 @@ waves:
     generic_family_scenario_count: 84
     generic_family_result: passed
     reviewed_generic_family_id_count: 2
+    coverage_performance_source_commit: 9abf5ba12d3c3eb5b68ed371d0a7eef07756a7c8
+    coverage_performance_summary_path: .mir/evidence/3.2.0-coverage-performance-runtime-summary.json
+    coverage_performance_run_id: f16daf45-d092-40b6-8e86-922219ec3228
+    coverage_performance_scenario_count: 85
+    coverage_performance_result: passed
+    synthetic_scale_duration_seconds: 7.258
+    synthetic_scale_budget_seconds: 30.0
+    bz_coverage_accounted_recipes: 769
+    bz_coverage_recipe_count: 769
+    bz_coverage_scan_count: 2
     status: integration-validated
