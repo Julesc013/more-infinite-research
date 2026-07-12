@@ -23,6 +23,7 @@ local family_registry = require("prototypes.mir.families.registry")
 local fingerprint = require("prototypes.mir.core.fingerprint")
 local recipe_facts = require("prototypes.mir.index.recipe_facts")
 local target_profiles = require("prototypes.mir.platform.factorio.target_profiles")
+local effective_settings = require("prototypes.mir.settings.effective")
 
 local M = {}
 local latest_plan = nil
@@ -136,7 +137,7 @@ local function plan_row(key, spec, action, reason, diagnostics, extra)
     stream_key = key,
     action = action,
     reason = reason,
-    source = "fixed-stream",
+    source = spec.automatic_family and "family-rule" or "fixed-stream",
     spec = spec,
     diagnostics = diagnostics,
     gates = proof_gates(action, reason)
@@ -156,6 +157,8 @@ local function skip_row(key, spec, reason, ingredients, effects, lab_status, ext
 end
 
 local function attach_family_recipes(key, buckets)
+  local mode = effective_settings.get("mir-automatic-compiler-mode") or "safe-attach"
+  if mode == "off" or mode == "report" then return buckets end
   local attachments = family_resolver.attachments_for_stream(key)
   if #attachments == 0 then return buckets end
 
@@ -181,6 +184,12 @@ local function attach_family_recipes(key, buckets)
 end
 
 local function plan_stream(key, raw_spec)
+  if raw_spec.automatic_family then
+    local mode = effective_settings.get("mir-automatic-compiler-mode") or "safe-attach"
+    if mode ~= "safe-generate" and mode ~= "exact-pack" then
+      return skip_row(key, raw_spec, "automatic_family_mode_" .. tostring(mode))
+    end
+  end
   if not costs.enabled_for(key, raw_spec) then
     return skip_row(key, raw_spec, "disabled")
   end
@@ -234,7 +243,7 @@ local function plan_stream(key, raw_spec)
     }
     return plan_row(key, spec, "emit", "direct_effect",
       D.stream_fields(key, spec, "generated", "direct_effect", ingredients, prerequisites, emitted_effects, lab_status), {
-        technology_name = "recipe-prod-" .. key .. "-1",
+        technology_name = spec.technology_name or ("recipe-prod-" .. key .. "-1"),
         fields = fields,
         direct_effects = true,
         overlap_effects = direct_effects
@@ -289,7 +298,7 @@ local function plan_stream(key, raw_spec)
   }
   return plan_row(key, spec, "emit", "recipe_productivity",
     D.stream_fields(key, spec, "generated", "recipe_productivity", ingredients, prerequisites, emitted_effects, lab_status), {
-      technology_name = "recipe-prod-" .. key .. "-1",
+      technology_name = spec.technology_name or ("recipe-prod-" .. key .. "-1"),
       fields = fields,
       direct_effects = false
     })

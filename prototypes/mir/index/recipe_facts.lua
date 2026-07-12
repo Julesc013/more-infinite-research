@@ -30,6 +30,7 @@ local function normalized_entry(entry)
     amount_min = entry.amount_min,
     amount_max = entry.amount_max,
     probability = entry.probability or 1,
+    shared_probability = entry.shared_probability,
     catalyst_amount = entry.catalyst_amount,
     ignored_by_productivity = entry.ignored_by_productivity,
     ignored_by_stats = entry.ignored_by_stats,

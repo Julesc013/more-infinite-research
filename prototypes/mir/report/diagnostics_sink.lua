@@ -15,6 +15,7 @@ end
 
 function D.enabled()
   return startup_setting("mir-debug-generation-report") == true
+    or startup_setting("mir-automatic-compiler-mode") == "report"
 end
 
 function D.recipe_matches_enabled()

@@ -191,6 +191,16 @@
         ]
       },
       {
+        "name": "semantic-family-generate",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "local-mod-library",
+        "surface": "base",
+        "required_features": [
+          "recipe_productivity"
+        ]
+      },
+      {
         "name": "atan-nuclear-science-productivity",
         "target_profile": "2.1",
         "kind": "runtime",

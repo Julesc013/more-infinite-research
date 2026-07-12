@@ -1421,3 +1421,11 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - target-profile-v2
+  - path: docs/adr/0018-automatic-generated-id-policy.md
+    title: "ADR 0018: Automatic Generated ID Policy"
+    status: current
+    audience: maintainer
+    doc_type: adr
+    owner: mir-maintainers
+    source_of_truth_for:
+      - automatic-generated-id-policy

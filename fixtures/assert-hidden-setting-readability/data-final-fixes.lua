@@ -18,6 +18,8 @@ local governed_stream_keys = {
   "research_agricultural_growth_speed",
   "research_air_scrubbing_clean_filter",
   "research_armor_components",
+  "research_auto_assembling_machine",
+  "research_auto_lab",
   "research_artificial_soil",
   "research_ash_separation",
   "research_bacteria_cultivation",

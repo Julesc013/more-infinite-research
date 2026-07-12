@@ -33,8 +33,18 @@ for technology_name, technology in pairs(data.raw.technology or {}) do
   if string.find(technology_name, "^recipe%-prod%-") then
     for _, effect in ipairs(technology.effects or {}) do
       if effect.type == "change-recipe-productivity" and effect.recipe == "assemble-zeta" then
-        fail("proposal-only lab manufacturing recipe was emitted")
+        fail("lab manufacturing recipe was attached to an unrelated fixed stream")
       end
     end
+  end
+end
+
+
+for _, technology_name in ipairs({
+  "mir-auto-prod-manufacturing-assembling-machine-1",
+  "mir-auto-prod-manufacturing-lab-1"
+}) do
+  if data.raw.technology and data.raw.technology[technology_name] then
+    fail("safe-attach default emitted generated family technology " .. technology_name)
   end
 end

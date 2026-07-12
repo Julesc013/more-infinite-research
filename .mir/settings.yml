@@ -44,6 +44,7 @@ rules:
   catalog_specs_are_returned_as_deep_copies: true
   technology_sort_names_come_from_canonical_descriptors: true
   validation_overrides_are_declarative_not_source_rewrites: true
+  automatic_compiler_mode_is_predeclared_and_defaults_to_safe_attach: true
 
 profiles:
   schema: 1

@@ -22,7 +22,33 @@ local function has_self_return(fact)
   return false
 end
 
-local function eligibility(fact)
+local function is_zero_or_nil(value)
+  return value == nil or tonumber(value) == 0
+end
+
+local function safe_placeable_output(fact, item_name)
+  for _, variant in ipairs(fact.variants or {}) do
+    if variant.allow_productivity == false then return false, "variant_productivity_not_allowed" end
+    if tonumber(variant.maximum_productivity) == 0 then return false, "variant_zero_productivity_cap" end
+    if #(variant.results or {}) ~= 1 then return false, "non_exclusive_placeable_output" end
+    local result = variant.results[1]
+    if result.type ~= "item" or result.name ~= item_name then
+      return false, "non_exclusive_placeable_output"
+    end
+    if tonumber(result.probability or 1) ~= 1
+      or result.shared_probability ~= nil
+      or result.amount_min ~= nil
+      or result.amount_max ~= nil
+      or not is_zero_or_nil(result.catalyst_amount)
+      or not is_zero_or_nil(result.ignored_by_productivity)
+    then
+      return false, "non_deterministic_placeable_output"
+    end
+  end
+  return true, nil
+end
+
+local function eligibility(fact, item_name)
   if not fact then return false, "recipe_fact_missing" end
   if fact.hidden then return false, "hidden_recipe" end
   if fact.parameter then return false, "parameter_recipe" end
@@ -30,6 +56,8 @@ local function eligibility(fact)
   if fact.allow_productivity == false then return false, "recipe_productivity_not_allowed" end
   if tonumber(fact.maximum_productivity) == 0 then return false, "zero_productivity_cap" end
   if has_self_return(fact) then return false, "self_return_risk" end
+  local output_safe, output_blocker = safe_placeable_output(fact, item_name)
+  if not output_safe then return false, output_blocker end
   return true, nil
 end
 
@@ -73,7 +101,7 @@ local function build()
     for _, item_name in ipairs(candidate_items(rule, indexes)) do
       for _, recipe_name in ipairs(indexes.recipes_by_output[item_name] or {}) do
         local fact = recipe_facts.get(recipe_name)
-        local eligible, blocker = eligibility(fact)
+        local eligible, blocker = eligibility(fact, item_name)
         local external_owners = indexes.technologies_by_recipe_effect[recipe_name] or {}
         if #external_owners > 0 then eligible, blocker = false, "existing_recipe_productivity_owner" end
 
@@ -141,4 +169,3 @@ function M.snapshot()
 end
 
 return M
-

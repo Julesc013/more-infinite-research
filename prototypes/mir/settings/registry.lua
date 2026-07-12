@@ -36,6 +36,10 @@ return {
       ui_visibility = { mode = "always" }
     },
     {
+      key = "mir-automatic-compiler-mode",
+      ui_visibility = { mode = "always" }
+    },
+    {
       key = "mir-pipeline-extent-multiplier",
       ui_visibility = { mode = "always" }
     },

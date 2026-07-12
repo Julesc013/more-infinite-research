@@ -63,6 +63,10 @@ clone_entity("lab", "lab", "opaque-research-device", "opaque-research-device")
 add_item("opaque-research-device", "__base__/graphics/icons/lab.png", "production-machine", "opaque-research-device")
 add_recipe("assemble-zeta", "opaque-research-device", "electronic-circuit")
 
+clone_entity("assembling-machine", "assembling-machine-2", "opaque-fabrication-device", "opaque-fabrication-device")
+add_item("opaque-fabrication-device", "__base__/graphics/icons/assembling-machine-2.png", "production-machine", "opaque-fabrication-device")
+add_recipe("assemble-theta", "opaque-fabrication-device", "electronic-circuit")
+
 local source_module = data.raw.module and data.raw.module["speed-module"]
 if source_module then
   local module = table.deepcopy(source_module)

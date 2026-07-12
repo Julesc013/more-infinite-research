@@ -20,5 +20,6 @@ The initial selectors are entity types reached through item `place_result` relat
 
 Before attachment, the resolver rejects hidden, parameterized, recycling, self-returning, productivity-disabled, zero-cap, and externally owned recipes. An attachment may only add an effect to an existing stable stream. It cannot create a technology, technology ID, setting, or migration record.
 
-The initial attach-only rules cover structurally proven loaders and belts, mining drills, furnaces, inserters, accumulators and solar panels, and module tiers. Lab manufacturing is proposal-only until a stable manufacturing stream is separately reviewed and added to the generated stream manifest.
+For placeable-item families, every recipe variant must also have one deterministic item result: the structurally matched placeable item. Probability, range, shared-probability, catalyst, ignored-productivity, and extra-output shapes fail closed.
 
+The initial attach-only rules cover structurally proven loaders and belts, mining drills, furnaces, inserters, accumulators and solar panels, and module tiers. Assembling-machine and lab manufacturing target separately reviewed stable generic-family streams; those streams emit only in `safe-generate` or exact-pack mode.

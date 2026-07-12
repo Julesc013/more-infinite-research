@@ -2,6 +2,14 @@ return {
   schema = 1,
   rules = {
     {
+      id = "assembling-machine-manufacturing",
+      capability = "recipe-productivity",
+      mode = "attach-existing",
+      target_stream = "research_auto_assembling_machine",
+      entity_types = {"assembling-machine"},
+      change = 0.02
+    },
+    {
       id = "furnace-manufacturing",
       capability = "recipe-productivity",
       mode = "attach-existing",
@@ -20,9 +28,10 @@ return {
     {
       id = "lab-manufacturing",
       capability = "recipe-productivity",
-      mode = "proposal-only",
+      mode = "attach-existing",
+      target_stream = "research_auto_lab",
       entity_types = {"lab"},
-      blocker = "no_stable_lab_manufacturing_stream"
+      change = 0.02
     },
     {
       id = "loader-manufacturing",
@@ -67,4 +76,3 @@ return {
     }
   }
 }
-

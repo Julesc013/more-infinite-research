@@ -20,6 +20,8 @@ Use the in-game setting descriptions for exact defaults. Use [settings reference
 
 Global settings are grouped with visible prefixes: Main, Compatibility, Limits, Advanced, and Diagnostics. Some prefixes are color-emphasized in-game for faster scanning, but the label text is still the structure.
 
+The Automatic compiler mode controls structural family handling. `safe-attach` is the default and may attach structurally proven recipes to an existing stable MIR technology. `safe-generate` also enables the reviewed generic assembling-machine and lab technology families. `report` records decisions without attaching or generating, `off` disables family handling, and `exact-pack` is reserved for reviewed pack rules. Generation remains fail-closed when any safety proof is missing.
+
 Generated technology settings are ordered so default-off or experimental rows come first, enabled special rows come next, and ordinary enabled rows come last. Breeding, agricultural growth speed, cargo bay range/count, and character reach are enabled by default but remain in the special row group. Inserter capacity stays disabled by default because larger hand sizes can change circuit behavior and inserter performance assumptions.
 
 ## Prototype Limit Settings

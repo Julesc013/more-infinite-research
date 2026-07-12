@@ -8,6 +8,8 @@ local settings_sort_names = {
   research_agricultural_growth_speed = "Agricultural growth speed",
   research_air_scrubbing_clean_filter = "Air Scrubbing clean-filter productivity",
   research_armor_components = "Armor component productivity",
+  research_auto_assembling_machine = "Assembling machine manufacturing productivity",
+  research_auto_lab = "Lab manufacturing productivity",
   research_ash_separation = "Ash separation productivity",
   research_bacteria_cultivation = "Bacteria cultivation productivity",
   research_batteries = "Battery productivity",
@@ -197,6 +199,9 @@ function M.normalize(key, raw_spec)
   end
 
   local spec = deepcopy(raw_spec)
+  if spec.technology_name ~= nil and (type(spec.technology_name) ~= "string" or spec.technology_name == "") then
+    error("Raw MIR stream " .. key .. " has invalid technology_name.", 2)
+  end
   local kind = spec.direct_effects and "direct-effect" or "recipe-productivity"
   local effect = kind == "direct-effect"
     and direct_effect_contract(key, spec)

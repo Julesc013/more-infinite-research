@@ -144,6 +144,17 @@ function M.global_setting_prototypes()
       localised_description = {"mod-setting-description.mir-lab-incompatibility-policy"}
     },
     {
+      type = "string-setting",
+      name = "mir-automatic-compiler-mode",
+      setting_type = "startup",
+      default_value = "safe-attach",
+      allowed_values = {"off", "report", "safe-attach", "safe-generate", "exact-pack"},
+      order = setting_order.global("main", 35),
+      targets = {requires_features = {"recipe_productivity"}, required_effect_types = {}},
+      localised_name = {"", "[font=default-bold][color=green]Main:[/color][/font] Automatic compiler mode"},
+      localised_description = {"", "Controls structural candidate handling. Safe attach is the default; safe generation enables only predeclared family technologies."}
+    },
+    {
       type = "bool-setting",
       name = "mir-prefer-this-mod-for-competing-techs",
       setting_type = "startup",
