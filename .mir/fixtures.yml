@@ -2,7 +2,7 @@ schema: 1
 
 scenario_manifest:
   path: fixtures/compat-matrix/expected-scenarios.json
-  schema: 2
+  schema: 3
   declarations: full-records
 
 golden_plans:
@@ -33,6 +33,24 @@ real_mod_gates:
     status: required
 
 fixtures:
+  compiler-contracts:
+    requires_features: [recipe_productivity]
+    assertion_path: fixtures/assert-compiler-contracts
+    validates:
+      - invalid-family-rule-rejection
+      - invalid-compatibility-pack-rejection
+      - stable-rule-and-pack-sorting
+      - deterministic-rule-precedence
+      - equal-precedence-conflict-rejection
+      - compatibility-pack-target-and-applicability-filtering
+      - stable-generation-plan-identities
+      - evidence-bearing-generation-plan-gates
+      - deterministic-cross-stream-effect-arbitration
+      - compilation-plan-cross-collision
+      - final-plan-output-owner-parity
+      - insertion-order-independent-plan-fingerprints
+      - cyclic-fingerprint-rejection
+
   rigor-late-recipe-removal:
     requires_features: [recipe_productivity]
     path: fixtures/rigor-late-recipe-removal
