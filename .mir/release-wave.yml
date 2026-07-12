@@ -165,7 +165,7 @@ waves:
     available_ecosystem_load_evidence: .mir/evidence/3.1.2-rc1-ecosystem/campaign-evidence.json
     available_ecosystem_load_gate: 9-passed-zero-dependency-failures-load-claims-only
     exact_package_gate: passed-base-space-age-and-deterministic-archive
-    candidate_freshness_gate: pending-clean-evidence-commit
+    candidate_freshness_gate: passed
     interactive_gate: pending
     publication_status: unreleased
     status: release-candidate-awaiting-manual-review
