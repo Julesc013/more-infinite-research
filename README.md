@@ -8,7 +8,7 @@ More Infinite Research adds **configurable infinite productivity** and **bonus r
 
 **MIR `3.x.x`** targets **Factorio `2.1`** and requires `base >= 2.1.8`.
 
-**MIR `2.x.x`** targets **Factorio `2.0`** starting with **`2.3.0`**.
+**MIR `2.x.x`** targets **Factorio `2.0`** and requires `base >= 2.0`.
 
 **MIR `1.x.x`** targets **Factorio `1.1`** and earlier as reduced backports.
 
