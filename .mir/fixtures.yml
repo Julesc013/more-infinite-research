@@ -103,6 +103,21 @@ fixtures:
       - stable-science-rejection-reason-codes
       - shared-pack-production-reachability-cache
 
+  external-technology-cycle:
+    requires_features: []
+    path: fixtures/external-technology-cycle
+    validates:
+      - muluna-astroponics-mutual-path-reproduction
+      - single-edge-bounded-cycle-repair
+      - inactive-without-both-named-mods
+      - inactive-without-mutual-prerequisite-path
+      - unknown-external-cycle-remains-fatal
+      - generated-node-cycle-remains-fatal
+      - missing-prerequisite-remains-fatal
+      - disabled-prerequisite-remains-fatal
+      - iterative-deep-technology-graph-walk
+      - deterministic-cycle-identity
+
   settings-visibility:
     requires_features: []
     assertion_path: fixtures/assert-hidden-setting-readability

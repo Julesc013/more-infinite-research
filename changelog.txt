@@ -1,4 +1,15 @@
 ---------------------------------------------------------------------------------------------------
+Version: 3.1.2
+Date: 2026-07-13
+
+  Bugfixes:
+
+    - Fixed a startup crash when Muluna and Astroponics formed a mutual prerequisite path through space science.
+    - Removed only Astroponics' redundant space-science prerequisite when both named mods create that exact cycle.
+    - Kept missing, disabled, and MIR-created technology prerequisite failures strict.
+    - Made deep technology graph checks iterative so very large modpacks cannot exhaust the Lua call stack.
+
+---------------------------------------------------------------------------------------------------
 Version: 3.1.1
 Date: 2026-07-13
 

@@ -6,14 +6,25 @@ This is the executable release queue. `.mir/release-wave.yml` is the machine-rea
 
 ## Current Truth
 
-- MIR 3.0.5 for Factorio 2.1 and MIR 2.3.5 for Factorio 2.0 are the published immutable baselines.
-- MIR 3.1.1 is the emergency automatic-compiler hotfix under validation on `dev`; unpublished 3.1.0 candidate bytes are superseded.
-- MIR 2.4.0 is unreleased and begins from the accepted 3.1.1 source only after the modern gate closes.
+- MIR 3.1.1 for Factorio 2.1 and MIR 2.3.5 for Factorio 2.0 are the published immutable baselines.
+- MIR 3.1.2 is the untagged emergency technology-cycle hotfix under validation on `dev`.
+- MIR 2.4.0 is unreleased and begins from the accepted 3.1.2 source only after the modern gate closes.
 - Earlier local 3.1.0 and 2.4.0 tags, commits, archives, and validation packets are superseded candidate evidence, not publication authority.
 - Work temporarily labeled 3.2.0 has been preserved as 3.1.0 implementation or honest pre-renumber characterization. Work temporarily labeled 2.5.0 is preserved but non-authoritative until it is re-derived as 2.4.0.
-- MIR 3.2.0 does not open on `dev` until 3.1.1, 2.4.0, and the descending backport distributions are stable and their portable lessons return.
+- MIR 3.2.0 does not open on `dev` until 3.1.2, 2.4.0, and the descending backport distributions are stable and their portable lessons return.
 
-## 3.1.1 Automatic Compiler Hotfix
+## 3.1.2 Automatic Compiler Hotfix
+
+### Technology Cycle Repair
+
+- [x] Reproduce the reported `space-science-pack -> ... -> astroponics -> space-science-pack` mutual path.
+- [x] Prove Factorio rejects an unrepaired external cycle rather than merely suppressing MIR's assertion.
+- [x] Add one topology-gated Muluna and Astroponics repair that removes only `astroponics -> space-science-pack`.
+- [x] Keep the repair inactive without both mods or without the reverse prerequisite path.
+- [x] Keep generated-node cycles, missing prerequisites, and disabled prerequisites fatal.
+- [x] Replace recursive graph walking with a deterministic iterative walk and a 4,096-node regression.
+- [x] Add exact local closure metadata for Astroponics, Muluna, and Secretas; the available Astroponics 1.7.3 archive fails earlier on its own removed Factorio helper and does not qualify as MIR load evidence.
+- [ ] Bind the complete 91-scenario Factorio 2.1 matrix, exact archive, upgrade, and available ecosystem checks to the clean 3.1.2 candidate.
 
 ### Implemented
 
@@ -51,12 +62,12 @@ This is the executable release queue. `.mir/release-wave.yml` is the machine-rea
 - [x] Keep complex chemistry, catalyst, recovery, voiding, transmutation, recycling, probabilistic output, and multi-output loops report-only until graph proof exists.
 - [x] Define a distinct deferred RecipeVariantPlan contract for recycling-safe duplicate recipes without authorizing any 3.1.0 implementation.
 
-### Final 3.1.1 Evidence
+### Final 3.1.2 Evidence
 
 - [x] Reproduce the Space Age Galore multi-output collision with `vgal-coal-crushing` matched by carbon and sulfur streams.
 - [x] Resolve cross-stream recipe effects to one deterministic owner while retaining unique effects and the final malformed-duplicate assertion.
 - [x] Prove deterministic insertion order, partial-loss retention, adoption precedence, same-stream rejection, and exactly one Galore-shaped owner.
-- [ ] Rebuild and bind the complete 90-scenario runtime, exact-upgrade, exact-dist, ecosystem, and interactive evidence to 3.1.1.
+- [ ] Rebuild and bind the complete 91-scenario runtime, exact-upgrade, exact-dist, ecosystem, and interactive evidence to 3.1.2.
 
 - [x] Complete RC6 correctness matrix on Factorio 2.1.9 after effective-default, product-shape, CompatibilityPack, plan-proof, base-planning, and output-parity changes (`86/86`).
 - [x] Reconcile the two `main`-only changes before promotion: preserve the MIR 2.x requirement wording and keep the host-specific history exporter deleted; the final deterministic package SHA-256 is `269C27DC...B1A7DB`.
@@ -80,13 +91,13 @@ This is the executable release queue. `.mir/release-wave.yml` is the machine-rea
 - [x] Revalidate the unchanged planet-safe package after campaign evidence is hardened so unresolved roots cannot report a passing claim row.
 - [x] Rebuild and requalify after the representative planet cluster exposed a generated base extension anchored to a disabled prerequisite chain.
 - [x] Fast-forward accepted `dev` to `main` and synchronize local/origin `dev` and `main` at the same RC7 evidence commit.
-- [ ] Complete the real interactive gate, create the real 3.1.1 tag, publish the exact validated bytes, then mark immutable.
+- [ ] Complete the 3.1.2 RC evidence and synchronize `dev` and `main` without tagging or publishing.
 
 ## 2.4.0 Factorio 2.0 Companion
 
-- [ ] Start only from the accepted 3.1.1 source; preserve the current experimental 2.0 work as reference, not authority.
+- [ ] Start only from the accepted 3.1.2 source; preserve the current experimental 2.0 work as reference, not authority.
 - [ ] Apply only Factorio 2.0 metadata, dependency floors, target effect cuts, schema adapters, target fixture shapes, and target assets.
-- [ ] Share fact, rule, pack, plan, ID, coverage, test, package, and evidence schemas with 3.1.1.
+- [ ] Share fact, rule, pack, plan, ID, coverage, test, package, and evidence schemas with 3.1.2.
 - [ ] Preserve 2.3.5 technology IDs, settings, runtime namespaces, and save behavior.
 - [ ] Run clean static, complete Factorio 2.0.77, exact-package base/Space Age, 2.3.5 upgrade, performance, campaign, and interactive gates.
 - [ ] Return portable target dispatch, fixture, harness, and fixed-point lessons to `dev` without returning 2.0 metadata or feature cuts.

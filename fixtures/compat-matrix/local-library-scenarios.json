@@ -64,6 +64,34 @@
       "notes": "Locally available Factorio 2.1 Space Age planet cluster. Missing asset/library dependencies are reported as dependency-resolution failures until the local library is filled."
     },
     {
+      "name": "local-2-1-muluna-secretas-astroponics-cycle",
+      "targets": [
+        "2.1"
+      ],
+      "kind": "modpack-load",
+      "group": "compatibility-campaign",
+      "setup": {
+        "mode": "local-library",
+        "include_space_age": true,
+        "offline": true,
+        "exact_mir_archive": true
+      },
+      "roots": [
+        "astroponics",
+        "planet-muluna",
+        "secretas"
+      ],
+      "settings": {},
+      "expected_plan": {
+        "mode": "load-only",
+        "required_result": "passed",
+        "maximum_dependency_failures": 0
+      },
+      "timeout_seconds": 900,
+      "claim_level": "loads",
+      "notes": "Exact local regression for the Muluna and Astroponics mutual space-science prerequisite cycle reached through Secretas robot-storage levels."
+    },
+    {
       "name": "local-2-1-aai-loaders",
       "targets": [
         "2.1"

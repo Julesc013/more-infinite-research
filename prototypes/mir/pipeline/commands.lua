@@ -7,9 +7,9 @@ local commands = {
   ["compatibility-repairs"] = {
     kind = "mutation",
     requires_features = {"compatibility_repairs"},
-    implementation = "prototypes/mir/compatibility/repairs/factorio_2_1_recipe_schema.lua",
+    implementation = "prototypes/mir/compatibility/repairs/registry.lua",
     apply = function()
-      require("prototypes.mir.compatibility.repairs.factorio_2_1_recipe_schema").apply()
+      require("prototypes.mir.compatibility.repairs.registry").apply()
     end
   },
   ["module-permissions"] = {

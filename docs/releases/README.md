@@ -14,7 +14,7 @@ superseded_by: []
 
 Release docs are version-specific plans, migration guides, risk registers, checklists, and validation records.
 
-MIR 3.0.5 and 2.3.5 are the published immutable behavior baselines. The 3.1.1 automatic-compiler hotfix and backport-wave dashboard govern the current campaign. MIR 2.4.0 begins only after 3.1.1 acceptance, followed by 1.9.4, 1.8.2, 1.7.1, 1.6.0, 1.5.0, 1.4.0, and 1.3.0. MIR 3.2.0 does not open on `dev` until that stability ladder and its portable-return sweep are complete.
+MIR 3.1.1 and 2.3.5 are the published immutable behavior baselines. The untagged 3.1.2 technology-cycle hotfix and backport-wave dashboard govern the current campaign. MIR 2.4.0 begins from the accepted 3.1.2 source, followed by 1.9.4, 1.8.2, 1.7.1, 1.6.0, 1.5.0, 1.4.0, and 1.3.0. MIR 3.2.0 does not open on `dev` until that stability ladder and its portable-return sweep are complete.
 
 - [3.0.0 plan](3.0.0-plan.md)
 - [3.0.0 regression baseline](3.0.0-regression-baseline.md)
@@ -37,6 +37,7 @@ MIR 3.0.5 and 2.3.5 are the published immutable behavior baselines. The 3.1.1 au
 - [3.1.0 release checklist](3.1.0-checklist.md)
 - [3.1.0 release notes](notes/release-notes-3.1.0.md)
 - [3.1.1 release notes](notes/release-notes-3.1.1.md)
+- [3.1.2 release notes](notes/release-notes-3.1.2.md)
 - [3.1.0 migration guide](3.1.0-migration-guide.md)
 - [3.1.0 validation summary](3.1.0-validation-summary.md)
 - [3.1.0 roadmap](3.1.0-roadmap.md)

@@ -24,6 +24,11 @@
       "groups": ["base-load", "science-prerequisites"]
     },
     {
+      "pattern": "prototypes/mir/emit/technology_graph_safety.lua",
+      "groups": ["base-load", "science-prerequisites"],
+      "scenarios": ["external-technology-cycle"]
+    },
+    {
       "pattern": "prototypes/mir/runtime/**",
       "groups": ["runtime-state"]
     },

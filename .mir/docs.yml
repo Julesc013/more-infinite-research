@@ -1439,6 +1439,14 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - mir-3.1.1-release-notes
+  - path: docs/releases/notes/release-notes-3.1.2.md
+    title: "MIR 3.1.2 Release Notes"
+    status: current
+    audience: player
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-3.1.2-release-notes
   - path: docs/adr/0015-canonical-stream-descriptors.md
     title: "ADR-0015: Canonical Stream Descriptors"
     status: current

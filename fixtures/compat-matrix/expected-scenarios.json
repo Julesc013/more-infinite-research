@@ -710,6 +710,34 @@
         ]
       },
       {
+        "name": "external-technology-cycle",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "science-prerequisites",
+        "surface": "base",
+        "required_features": [],
+        "fixtures": [
+          "mir-fixture-external-technology-cycle"
+        ],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 120,
+        "tags": [
+          "base",
+          "full",
+          "runtime",
+          "science-prerequisites",
+          "smoke"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "external-cycle-diagnosed-with-generated-cycle-safety-retained",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
         "name": "lab-policy-engine-default",
         "target_profile": "2.1",
         "kind": "runtime",

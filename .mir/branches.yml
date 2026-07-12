@@ -2,7 +2,7 @@ schema: 1
 
 branches:
   main:
-    purpose: stable Factorio 2.1 line receiving the validated MIR 3.1.1 hotfix
+    purpose: stable Factorio 2.1 line receiving the validated MIR 3.1.2 hotfix
     factorio_version: "2.1"
     accepts:
       - release-hotfix
@@ -15,7 +15,7 @@ branches:
       - large-architecture-rewrite
 
   dev:
-    purpose: canonical MIR 3.1.1 automatic compiler source and future Factorio 2.1 development
+    purpose: canonical MIR 3.1.2 automatic compiler source and future Factorio 2.1 development
     factorio_version: "2.1"
     accepts:
       - architecture
@@ -217,12 +217,24 @@ release_artifacts:
       branch: dev
       target_factorio: "2.1"
       source_anchor: mir_3_0_5
-      source_commit: pending-hotfix-acceptance
+      source_commit: e91963cf5f20b7f8c785196840a6ebcae8e8dd66
       previous_candidate_commit: b9293df08f0db2863e9dbe8a5b48503b705b2630
       previous_candidate_artifact: dist/more-infinite-research_3.1.0.zip
       previous_candidate_sha256: 25B166D56712FB85037437B073F9AC59C500EDD0A404949F94BB4A1F9637DAB3
       previous_candidate_status: superseded-unreleased-candidate
       architecture_contract: docs/architecture/automatic-family-compiler.md
+      release_gate: pending-hotfix-full-matrix
+      artifact: dist/more-infinite-research_3.1.1.zip
+      sha256: FAAA6AA3DAC2206014E008E4BCB2F9329E050897585224251292F41DED1907B5
+      tag: "3.1.1"
+      publication_status: published
+      status: published
+    mir_3_1_2:
+      version: "3.1.2"
+      branch: dev
+      target_factorio: "2.1"
+      source_anchor: mir_3_1_1
+      source_commit: pending-current-dev-head
       release_gate: pending-hotfix-full-matrix
       publication_status: unreleased
       status: hotfix-validation
@@ -230,14 +242,14 @@ release_artifacts:
       version: "2.4.0"
       branch: tmp/2.0
       target_factorio: "2.0"
-      source_anchor: mir_3_1_1
-      source_commit: pending-accepted-3.1.1
+      source_anchor: mir_3_1_2
+      source_commit: pending-accepted-3.1.2
       previous_candidate_commit: 575fc4f5ae4a52205d1e72604934ead35e69c99e
       previous_candidate_artifact: dist/more-infinite-research_2.4.0.zip
       previous_candidate_sha256: 8618CAF031EF24EB83641DB03566F2390DD29AD98D2099A80D596EEB527EDA12
       previous_candidate_status: superseded-unreleased-candidate
       publication_status: unreleased
-      status: blocked-on-accepted-3.1.1
+      status: blocked-on-accepted-3.1.2
     mir_2_3_0:
       version: "2.3.0"
       branch: legacy

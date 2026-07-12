@@ -340,7 +340,7 @@ $dataFinalFixesStepsText = (Read-MIRFile -RelativePath "prototypes/mir/stage/dat
 Assert-MIRContains -RelativePath "prototypes/mir/pipeline/commands.lua" -Text $dataFinalFixesStepsText -Needle "function M.order()"
 Assert-MIRContains -RelativePath "prototypes/mir/pipeline/commands.lua" -Text $dataFinalFixesStepsText -Needle "ran before dependency"
 foreach ($needle in @(
-  'require("prototypes.mir.compatibility.repairs.factorio_2_1_recipe_schema").apply()',
+  'require("prototypes.mir.compatibility.repairs.registry").apply()',
   'require("prototypes.mir.settings.pipeline_extent").multiplier()',
   'require("prototypes.mir.pipeline.extent").apply(multiplier)',
   'require("prototypes.mir.policy.competing_productivity").prepare()',
