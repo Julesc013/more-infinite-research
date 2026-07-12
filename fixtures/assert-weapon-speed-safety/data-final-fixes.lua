@@ -4,7 +4,7 @@ end
 
 local generated_registry = require("__more-infinite-research__.prototypes.mir.domain.facts.generated_technology_registry")
 local native_effect_coverage = require("__more-infinite-research__.prototypes.mir.policy.native_effect_coverage")
-local weapon_speed_policy = require("__more-infinite-research__.prototypes.mir.policy.weapon_speed")
+local weapon_speed_mutation = require("__more-infinite-research__.prototypes.mir.pipeline.mutations.weapon_speed")
 
 local function has_gun_speed(tech, ammo_category)
   for _, effect in ipairs((tech and tech.effects) or {}) do
@@ -190,7 +190,7 @@ if external_owner then
 
     -- Re-run the cleanup after the external continuation exists. Old broad
     -- name scanning would mutate it; registry-scoped cleanup must not.
-    weapon_speed_policy.apply()
+    weapon_speed_mutation.apply()
 
     if not has_gun_speed(techs["weapon-shooting-speed-99"], "rocket")
       or not has_gun_speed(techs["weapon-shooting-speed-99"], "cannon-shell")
