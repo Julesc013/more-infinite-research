@@ -15,18 +15,27 @@ for _, tech_name in ipairs({"weapon-shooting-speed-5", "weapon-shooting-speed-6"
   end
 end
 
+local external = techs["weapon-shooting-speed-7"]
+if not has_gun_speed(external, "cannon-shell") or not has_gun_speed(external, "rocket") then
+  error("MIR validation failed: external numbered infinite weapon technology was mutated.")
+end
+
 local generated
 for name, tech in pairs(techs) do
-  if string.match(name, "^weapon%-shooting%-speed%-%d+$") and tech.unit and tech.unit.count_formula then
+  if name ~= "weapon-shooting-speed-7"
+    and string.match(name, "^weapon%-shooting%-speed%-%d+$")
+    and tech.unit
+    and tech.unit.count_formula
+  then
     generated = tech
     break
   end
 end
 
-if not generated then
-  error("MIR validation failed: generated weapon shooting speed continuation was not found.")
+if not generated and not external then
+  error("MIR validation failed: neither generated nor external weapon shooting speed continuation was found.")
 end
 
-if has_gun_speed(generated, "cannon-shell") or has_gun_speed(generated, "rocket") then
+if generated and (has_gun_speed(generated, "cannon-shell") or has_gun_speed(generated, "rocket")) then
   error("MIR validation failed: generated weapon shooting speed continuation still contains rocket or cannon-shell overlap effects.")
 end
