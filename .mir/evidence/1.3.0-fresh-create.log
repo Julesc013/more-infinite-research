@@ -1,0 +1,44 @@
+   0.001 2026-07-13 09:26:12; Factorio 0.13.20 (build 24011, win64, alpha)
+   0.001 Operating system: Windows 10
+   0.001 Not rotating logs.
+   0.002 Program arguments: "D:\Programs\Factorio\0.13\bin\x64\factorio.exe" "--config" "C:\Projects\Factorio\more-infinite-research-tmp-0.13\artifacts\old-wave\1.3.0\config-create.ini" "--no-log-rotation" "--mod-directory" "C:\Projects\Factorio\more-infinite-research-tmp-0.13\artifacts\old-wave\1.3.0\mods" "--create" "C:\Projects\Factorio\more-infinite-research-tmp-0.13\artifacts\old-wave\1.3.0\fresh-1.3.0.zip"
+   0.002 Read data path: D:/Programs/Factorio/0.13/data
+   0.002 Write data path: C:/Projects/Factorio/more-infinite-research-tmp-0.13/artifacts/old-wave/1.3.0/user-create
+   0.002 Binaries path: D:/Programs/Factorio/0.13/bin
+   0.016 Running in headless mode
+   0.034 Loading mod core 0.0.0 (data.lua)
+   0.039 Loading mod base 0.13.20 (data.lua)
+   0.182 Loading mod more-infinite-research 1.3.0 (data.lua)
+   0.276 Loading mod more-infinite-research 1.3.0 (data-updates.lua)
+   0.350 Loading mod more-infinite-research 1.3.0 (data-final-fixes.lua)
+   0.368 Script stream_compiler.lua:117: [more-infinite-research] Skipping stream research_cannon_shooting_speed because missing required technology weapon-shooting-speed-5.
+   0.369 Script direct_effects.lua:15: [more-infinite-research] Skipping unsupported technology effect for research_character_crafting_speed: character-crafting-speed
+   0.369 Script stream_compiler.lua:134: [more-infinite-research] Skipping stream research_character_crafting_speed because no available direct effects remain.
+   0.369 Script direct_effects.lua:15: [more-infinite-research] Skipping unsupported technology effect for research_character_mining_speed: character-mining-speed
+   0.369 Script stream_compiler.lua:134: [more-infinite-research] Skipping stream research_character_mining_speed because no available direct effects remain.
+   0.369 Script direct_effects.lua:15: [more-infinite-research] Skipping unsupported technology effect for research_character_reach: character-reach-distance
+   0.369 Script direct_effects.lua:15: [more-infinite-research] Skipping unsupported technology effect for research_character_reach: character-build-distance
+   0.369 Script direct_effects.lua:15: [more-infinite-research] Skipping unsupported technology effect for research_character_reach: character-resource-reach-distance
+   0.370 Script direct_effects.lua:15: [more-infinite-research] Skipping unsupported technology effect for research_character_reach: character-item-drop-distance
+   0.370 Script stream_compiler.lua:134: [more-infinite-research] Skipping stream research_character_reach because no available direct effects remain.
+   0.370 Script direct_effects.lua:15: [more-infinite-research] Skipping unsupported technology effect for research_character_walking_speed: character-running-speed
+   0.370 Script stream_compiler.lua:134: [more-infinite-research] Skipping stream research_character_walking_speed because no available direct effects remain.
+   0.371 Script stream_compiler.lua:117: [more-infinite-research] Skipping stream research_flamethrower_shooting_speed because missing required technology flamethrower.
+   0.371 Script direct_effects.lua:15: [more-infinite-research] Skipping unsupported technology effect for research_inventory_capacity: character-inventory-slots-bonus
+   0.372 Script direct_effects.lua:15: [more-infinite-research] Skipping unsupported technology effect for research_inventory_capacity: character-logistic-trash-slots
+   0.372 Script stream_compiler.lua:134: [more-infinite-research] Skipping stream research_inventory_capacity because no available direct effects remain.
+   0.372 Script direct_effects.lua:15: [more-infinite-research] Skipping unsupported technology effect for research_lab_productivity: laboratory-productivity
+   0.372 Script stream_compiler.lua:134: [more-infinite-research] Skipping stream research_lab_productivity because no available direct effects remain.
+   0.372 Script direct_effects.lua:15: [more-infinite-research] Skipping unsupported technology effect for research_robot_battery: worker-robot-battery
+   0.372 Script stream_compiler.lua:134: [more-infinite-research] Skipping stream research_robot_battery because no available direct effects remain.
+   0.433 Checksum for core: 303426634
+   0.433 Checksum for mod base: 1460151764
+   0.433 Checksum for mod more-infinite-research: 1665636460
+   0.837 Info PlayerData.cpp:47: Local player-data.json unavailable
+   0.837 Info PlayerData.cpp:52: Cloud player-data.json unavailable
+   0.842 Custom inputs active: 0
+   0.846 Factorio initialised
+   0.847 Info Main.cpp:547: Creating new map C:\Projects\Factorio\more-infinite-research-tmp-0.13\artifacts\old-wave\1.3.0\fresh-1.3.0.zip
+   3.185 Info Scenario.cpp:127: Map version 0.13.20-0
+   3.284 Checksum for script C:/Projects/Factorio/more-infinite-research-tmp-0.13/artifacts/old-wave/1.3.0/user-create/temp/currently-playing/control.lua: 900459546
+   3.286 Checksum for script __more-infinite-research__/control.lua: 2723487020
