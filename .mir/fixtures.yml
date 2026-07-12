@@ -1,5 +1,10 @@
 schema: 1
 
+scenario_manifest:
+  path: fixtures/compat-matrix/expected-scenarios.json
+  schema: 2
+  declarations: full-records
+
 fixture_roots:
   synthetic: fixtures
   compatibility_matrix: fixtures/compat-matrix

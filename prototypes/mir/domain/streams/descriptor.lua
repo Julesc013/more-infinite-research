@@ -1,4 +1,5 @@
 local deepcopy = require("prototypes.mir.core.deepcopy")
+local effect_metadata = require("prototypes.mir.domain.effects.metadata")
 
 local M = {}
 
@@ -75,32 +76,6 @@ local settings_sort_names = {
   research_walls = "Wall productivity"
 }
 
-local percentage_effects = {
-  ["braking-force"] = true,
-  ["character-crafting-speed"] = true,
-  ["character-mining-speed"] = true,
-  ["character-running-speed"] = true,
-  ["gun-speed"] = true,
-  ["laboratory-productivity"] = true,
-  ["laboratory-speed"] = true,
-  ["worker-robot-battery"] = true
-}
-
-local whole_number_effects = {
-  ["bulk-inserter-capacity-bonus"] = true,
-  ["cargo-landing-pad-count"] = true,
-  ["character-build-distance"] = true,
-  ["character-inventory-slots-bonus"] = true,
-  ["character-item-drop-distance"] = true,
-  ["character-logistic-trash-slots"] = true,
-  ["character-reach-distance"] = true,
-  ["character-resource-reach-distance"] = true,
-  ["inserter-stack-size-bonus"] = true,
-  ["max-cargo-bay-unloading-distance"] = true,
-  ["stack-inserter-capacity-bonus"] = true,
-  ["worker-robot-storage"] = true
-}
-
 local function append_unique(out, seen, value)
   if value ~= nil and not seen[value] then
     seen[value] = true
@@ -117,18 +92,7 @@ local function sorted_unique(values)
 end
 
 local function numeric_effect(effect)
-  if type(effect) ~= "table" then return nil end
-  if effect.type == "change-recipe-productivity" and type(effect.change) == "number" then
-    return { field = "change", unit = "percent", display_multiplier = 100, value = effect.change }
-  end
-  if type(effect.modifier) ~= "number" then return nil end
-  if percentage_effects[effect.type] then
-    return { field = "modifier", unit = "percent", display_multiplier = 100, value = effect.modifier }
-  end
-  if whole_number_effects[effect.type] then
-    return { field = "modifier", unit = "native", display_multiplier = 1, value = effect.modifier }
-  end
-  return nil
+  return effect_metadata.numeric_descriptor(effect)
 end
 
 local function close_to_integer(value)

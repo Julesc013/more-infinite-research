@@ -1,90 +1,731 @@
 {
-  "schema": 1,
+  "schema": 2,
   "profiles": {
     "2.1": [
-      "static-validation",
-      "package-build",
-      "runtime-state-contract",
-      "package-zip-base",
-      "package-zip-space-age",
-      "reduce-policy",
-      "recipe-cap-diagnostics",
-      "capability-negative-cases",
-      "lab-productivity-owner-skip",
-      "better-bot-battery-owner-skip",
-      "skip-policy",
-      "lab-policy-engine-default",
-      "space-pack-policy",
-      "character-inventory-merged-effects",
-      "base-generation-integrity",
-      "generated-prerequisite-safety",
-      "rigor-late-recipe-removal",
-      "base-fluid-productivity",
-      "aai-loader-belt-productivity",
-      "big-mining-drill-productivity",
-      "semantic-family-attach",
-      "atan-nuclear-science-productivity",
-      "atan-ash-separation",
-      "air-scrubbing-clean-filter",
-      "pipeline-extent-multiplier",
-      "pipeline-extent-multiplier-50",
-      "prototype-limit-overrides-base",
-      "prototype-limit-overrides-space-age",
-      "prototype-limit-self-recycling-and-unrestricted-modules",
-      "prototype-limit-scope-inert-at-fixed-threshold",
-      "prototype-limit-scope-engine-unchanged-baseline",
-      "prototype-limit-scope-inert-at-matched-threshold",
-      "effect-scaling-mixed-tier",
-      "settings-profile-roundtrip",
-      "base-generation-integrity-inserter-enabled",
-      "base-installed-space-age-icon-assets",
-      "checkbox-enabled-default-off-features",
-      "checkbox-disabled-default-on-features",
-      "base-space-promethium-pack-policy",
-      "space-age-space-pack-policy",
-      "space-age-progression-pack-policy",
-      "official-progression-pack-policy",
-      "mod-progression-pack-policy",
-      "base-scripted-candidates-enabled",
-      "space-age-scripted-candidates-enabled",
-      "space-age-scripted-candidates-disabled",
-      "space-age-scripted-runtime-lifecycle",
-      "space-age-scripted-runtime-disable-restoration",
-      "space-age-scripted-runtime-reenable",
-      "space-age-generation-integrity",
-      "space-age-plates-n-circuit-productivity-compat",
-      "scaled-known-productivity-competitor",
-      "space-age-plates-n-circuit-productivity-partial-coverage",
-      "space-age-plates-n-circuit-productivity-change-mismatch",
-      "space-age-plates-n-circuit-productivity-blocked-owner",
-      "space-age-vanilla-family-adoption",
-      "space-age-vanilla-family-adoption-config-change",
-      "space-age-vanilla-family-owner-prepatched",
-      "space-age-vanilla-family-exact-owner",
-      "space-age-vanilla-family-mixed-owner",
-      "space-age-fluid-productivity",
-      "space-age-generation-integrity-inserter-enabled",
-      "space-age-space-promethium-pack-policy",
-      "all-official-pack-policy",
-      "all-pack-policy",
-      "base-extension-boundary-policy",
-      "base-effect-setting-retention",
-      "weapon-overlap-off-coverage-absent",
-      "weapon-overlap-off-coverage-present",
-      "weapon-overlap-conditional-coverage-absent",
-      "weapon-overlap-conditional-coverage-present",
-      "weapon-overlap-always-coverage-absent",
-      "weapon-overlap-always-coverage-present",
-      "scaled-weapon-overlap",
-      "weapon-overlap-conditional-external-owner",
-      "omega-drill-productivity",
-      "base-competitor-rollback",
-      "technology-prerequisite-rewire",
-      "end-game-prerequisite-gate",
-      "base-cargo-space-age-gate",
-      "space-age-cargo-pad-enabled",
-      "space-age-cargo-logistics-shape",
-      "space-age-duplicate-cargo-diagnostics"
+      {
+        "name": "static-validation",
+        "target_profile": "2.1",
+        "kind": "gate",
+        "group": "static",
+        "surface": "base",
+        "required_features": []
+      },
+      {
+        "name": "package-build",
+        "target_profile": "2.1",
+        "kind": "gate",
+        "group": "package",
+        "surface": "base",
+        "required_features": []
+      },
+      {
+        "name": "runtime-state-contract",
+        "target_profile": "2.1",
+        "kind": "gate",
+        "group": "runtime-state",
+        "surface": "base",
+        "required_features": []
+      },
+      {
+        "name": "package-zip-base",
+        "target_profile": "2.1",
+        "kind": "package",
+        "group": "exact-dist",
+        "surface": "base",
+        "required_features": []
+      },
+      {
+        "name": "package-zip-space-age",
+        "target_profile": "2.1",
+        "kind": "package",
+        "group": "exact-dist",
+        "surface": "space-age",
+        "required_features": []
+      },
+      {
+        "name": "reduce-policy",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "local-mod-library",
+        "surface": "base",
+        "required_features": []
+      },
+      {
+        "name": "recipe-cap-diagnostics",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "local-mod-library",
+        "surface": "base",
+        "required_features": [
+          "recipe_productivity"
+        ]
+      },
+      {
+        "name": "capability-negative-cases",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "local-mod-library",
+        "surface": "base",
+        "required_features": []
+      },
+      {
+        "name": "lab-productivity-owner-skip",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "direct-effects",
+        "surface": "base",
+        "required_features": [
+          "recipe_productivity"
+        ]
+      },
+      {
+        "name": "better-bot-battery-owner-skip",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "direct-effects",
+        "surface": "base",
+        "required_features": [
+          "recipe_productivity"
+        ]
+      },
+      {
+        "name": "skip-policy",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "local-mod-library",
+        "surface": "base",
+        "required_features": []
+      },
+      {
+        "name": "lab-policy-engine-default",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "local-mod-library",
+        "surface": "base",
+        "required_features": []
+      },
+      {
+        "name": "space-pack-policy",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "official-science",
+        "surface": "base",
+        "required_features": []
+      },
+      {
+        "name": "character-inventory-merged-effects",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "direct-effects",
+        "surface": "base",
+        "required_features": []
+      },
+      {
+        "name": "base-generation-integrity",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "base-load",
+        "surface": "base",
+        "required_features": [
+          "recipe_productivity"
+        ]
+      },
+      {
+        "name": "generated-prerequisite-safety",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "science-prerequisites",
+        "surface": "base",
+        "required_features": [
+          "recipe_productivity"
+        ]
+      },
+      {
+        "name": "rigor-late-recipe-removal",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "recipe-target-integrity",
+        "surface": "base",
+        "required_features": [
+          "recipe_productivity"
+        ]
+      },
+      {
+        "name": "base-fluid-productivity",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "local-mod-library",
+        "surface": "base",
+        "required_features": [
+          "recipe_productivity"
+        ]
+      },
+      {
+        "name": "aai-loader-belt-productivity",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "local-mod-library",
+        "surface": "base",
+        "required_features": [
+          "recipe_productivity"
+        ]
+      },
+      {
+        "name": "big-mining-drill-productivity",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "local-mod-library",
+        "surface": "base",
+        "required_features": [
+          "recipe_productivity"
+        ]
+      },
+      {
+        "name": "semantic-family-attach",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "local-mod-library",
+        "surface": "base",
+        "required_features": [
+          "recipe_productivity"
+        ]
+      },
+      {
+        "name": "atan-nuclear-science-productivity",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "official-science",
+        "surface": "base",
+        "required_features": [
+          "recipe_productivity"
+        ]
+      },
+      {
+        "name": "atan-ash-separation",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "local-mod-library",
+        "surface": "base",
+        "required_features": []
+      },
+      {
+        "name": "air-scrubbing-clean-filter",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "local-mod-library",
+        "surface": "base",
+        "required_features": []
+      },
+      {
+        "name": "pipeline-extent-multiplier",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "local-mod-library",
+        "surface": "base",
+        "required_features": []
+      },
+      {
+        "name": "pipeline-extent-multiplier-50",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "local-mod-library",
+        "surface": "base",
+        "required_features": []
+      },
+      {
+        "name": "prototype-limit-overrides-base",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "local-mod-library",
+        "surface": "base",
+        "required_features": []
+      },
+      {
+        "name": "prototype-limit-overrides-space-age",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": []
+      },
+      {
+        "name": "prototype-limit-self-recycling-and-unrestricted-modules",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "local-mod-library",
+        "surface": "base",
+        "required_features": []
+      },
+      {
+        "name": "prototype-limit-scope-inert-at-fixed-threshold",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "local-mod-library",
+        "surface": "base",
+        "required_features": []
+      },
+      {
+        "name": "prototype-limit-scope-engine-unchanged-baseline",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "local-mod-library",
+        "surface": "base",
+        "required_features": []
+      },
+      {
+        "name": "prototype-limit-scope-inert-at-matched-threshold",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "local-mod-library",
+        "surface": "base",
+        "required_features": []
+      },
+      {
+        "name": "effect-scaling-mixed-tier",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "local-mod-library",
+        "surface": "base",
+        "required_features": []
+      },
+      {
+        "name": "settings-profile-roundtrip",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "settings-codec",
+        "surface": "base",
+        "required_features": []
+      },
+      {
+        "name": "base-generation-integrity-inserter-enabled",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "base-load",
+        "surface": "base",
+        "required_features": [
+          "recipe_productivity"
+        ]
+      },
+      {
+        "name": "base-installed-space-age-icon-assets",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "local-mod-library",
+        "surface": "base",
+        "required_features": []
+      },
+      {
+        "name": "checkbox-enabled-default-off-features",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "base-load",
+        "surface": "base",
+        "required_features": []
+      },
+      {
+        "name": "checkbox-disabled-default-on-features",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "base-load",
+        "surface": "base",
+        "required_features": []
+      },
+      {
+        "name": "base-space-promethium-pack-policy",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": []
+      },
+      {
+        "name": "space-age-space-pack-policy",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": []
+      },
+      {
+        "name": "space-age-progression-pack-policy",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": []
+      },
+      {
+        "name": "official-progression-pack-policy",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": []
+      },
+      {
+        "name": "mod-progression-pack-policy",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "official-science",
+        "surface": "base",
+        "required_features": []
+      },
+      {
+        "name": "base-scripted-candidates-enabled",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "local-mod-library",
+        "surface": "base",
+        "required_features": []
+      },
+      {
+        "name": "space-age-scripted-candidates-enabled",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": []
+      },
+      {
+        "name": "space-age-scripted-candidates-disabled",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": []
+      },
+      {
+        "name": "space-age-scripted-runtime-lifecycle",
+        "target_profile": "2.1",
+        "kind": "configuration-change",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": []
+      },
+      {
+        "name": "space-age-scripted-runtime-disable-restoration",
+        "target_profile": "2.1",
+        "kind": "configuration-change",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": []
+      },
+      {
+        "name": "space-age-scripted-runtime-reenable",
+        "target_profile": "2.1",
+        "kind": "configuration-change",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": []
+      },
+      {
+        "name": "space-age-generation-integrity",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": [
+          "recipe_productivity"
+        ]
+      },
+      {
+        "name": "space-age-plates-n-circuit-productivity-compat",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": [
+          "recipe_productivity"
+        ]
+      },
+      {
+        "name": "scaled-known-productivity-competitor",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": [
+          "recipe_productivity"
+        ]
+      },
+      {
+        "name": "space-age-plates-n-circuit-productivity-partial-coverage",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": [
+          "recipe_productivity"
+        ]
+      },
+      {
+        "name": "space-age-plates-n-circuit-productivity-change-mismatch",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": [
+          "recipe_productivity"
+        ]
+      },
+      {
+        "name": "space-age-plates-n-circuit-productivity-blocked-owner",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": [
+          "recipe_productivity"
+        ]
+      },
+      {
+        "name": "space-age-vanilla-family-adoption",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": [
+          "recipe_productivity"
+        ]
+      },
+      {
+        "name": "space-age-vanilla-family-adoption-config-change",
+        "target_profile": "2.1",
+        "kind": "configuration-change",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": [
+          "recipe_productivity"
+        ]
+      },
+      {
+        "name": "space-age-vanilla-family-owner-prepatched",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": [
+          "recipe_productivity"
+        ]
+      },
+      {
+        "name": "space-age-vanilla-family-exact-owner",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": [
+          "recipe_productivity"
+        ]
+      },
+      {
+        "name": "space-age-vanilla-family-mixed-owner",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": [
+          "recipe_productivity"
+        ]
+      },
+      {
+        "name": "space-age-fluid-productivity",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": [
+          "recipe_productivity"
+        ]
+      },
+      {
+        "name": "space-age-generation-integrity-inserter-enabled",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": [
+          "recipe_productivity"
+        ]
+      },
+      {
+        "name": "space-age-space-promethium-pack-policy",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": []
+      },
+      {
+        "name": "all-official-pack-policy",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "official-science",
+        "surface": "base",
+        "required_features": []
+      },
+      {
+        "name": "all-pack-policy",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "official-science",
+        "surface": "base",
+        "required_features": []
+      },
+      {
+        "name": "base-extension-boundary-policy",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "base-load",
+        "surface": "base",
+        "required_features": []
+      },
+      {
+        "name": "base-effect-setting-retention",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "local-mod-library",
+        "surface": "base",
+        "required_features": []
+      },
+      {
+        "name": "weapon-overlap-off-coverage-absent",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "weapon-overlap",
+        "surface": "base",
+        "required_features": []
+      },
+      {
+        "name": "weapon-overlap-off-coverage-present",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "weapon-overlap",
+        "surface": "base",
+        "required_features": []
+      },
+      {
+        "name": "weapon-overlap-conditional-coverage-absent",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "weapon-overlap",
+        "surface": "base",
+        "required_features": []
+      },
+      {
+        "name": "weapon-overlap-conditional-coverage-present",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "weapon-overlap",
+        "surface": "base",
+        "required_features": []
+      },
+      {
+        "name": "weapon-overlap-always-coverage-absent",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "weapon-overlap",
+        "surface": "base",
+        "required_features": []
+      },
+      {
+        "name": "weapon-overlap-always-coverage-present",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "weapon-overlap",
+        "surface": "base",
+        "required_features": []
+      },
+      {
+        "name": "scaled-weapon-overlap",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "weapon-overlap",
+        "surface": "base",
+        "required_features": []
+      },
+      {
+        "name": "weapon-overlap-conditional-external-owner",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "weapon-overlap",
+        "surface": "base",
+        "required_features": [
+          "recipe_productivity"
+        ]
+      },
+      {
+        "name": "omega-drill-productivity",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "local-mod-library",
+        "surface": "base",
+        "required_features": [
+          "recipe_productivity"
+        ]
+      },
+      {
+        "name": "base-competitor-rollback",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "local-mod-library",
+        "surface": "base",
+        "required_features": [
+          "recipe_productivity"
+        ]
+      },
+      {
+        "name": "technology-prerequisite-rewire",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "local-mod-library",
+        "surface": "base",
+        "required_features": [
+          "recipe_productivity"
+        ]
+      },
+      {
+        "name": "end-game-prerequisite-gate",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "local-mod-library",
+        "surface": "base",
+        "required_features": [
+          "recipe_productivity"
+        ]
+      },
+      {
+        "name": "base-cargo-space-age-gate",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": []
+      },
+      {
+        "name": "space-age-cargo-pad-enabled",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": []
+      },
+      {
+        "name": "space-age-cargo-logistics-shape",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": []
+      },
+      {
+        "name": "space-age-duplicate-cargo-diagnostics",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": []
+      }
     ]
   }
 }

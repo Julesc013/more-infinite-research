@@ -248,6 +248,7 @@ $requiredMirFiles = @(
   "prototypes/mir/index/relationships.lua",
   "prototypes/mir/index/productivity_owners.lua",
   "prototypes/mir/domain/facts/registry.lua",
+  "prototypes/mir/domain/effects/metadata.lua",
   "prototypes/mir/domain/facts/generated_technology_registry.lua",
   "prototypes/mir/capabilities/contract.lua",
   "prototypes/mir/capabilities/registry.lua",
@@ -335,6 +336,8 @@ Assert-MIRContains -RelativePath "prototypes/mir/stage/data_final_fixes.lua" -Te
 
 $dataFinalFixesStepsText = (Read-MIRFile -RelativePath "prototypes/mir/stage/data_final_fixes_steps.lua") + "`n" +
   (Read-MIRFile -RelativePath "prototypes/mir/pipeline/commands.lua")
+Assert-MIRContains -RelativePath "prototypes/mir/pipeline/commands.lua" -Text $dataFinalFixesStepsText -Needle "function M.order()"
+Assert-MIRContains -RelativePath "prototypes/mir/pipeline/commands.lua" -Text $dataFinalFixesStepsText -Needle "ran before dependency"
 foreach ($needle in @(
   'require("prototypes.mir.compatibility.repairs.factorio_2_1_recipe_schema").apply()',
   'require("prototypes.mir.settings.pipeline_extent").multiplier()',
@@ -465,7 +468,7 @@ $capabilityRegistryText = Read-MIRFile -RelativePath "prototypes/mir/capabilitie
 if ($capabilityRegistryText.Contains("lifecycle_passthrough")) {
   throw "Capability lifecycle stages must perform explicit state transitions, not alias a passthrough function."
 }
-foreach ($stage in @("discovered", "classified", "proposed", "validated", "emitted", "diagnosed")) {
+foreach ($stage in @("discovered", "classified", "proposed", "validated", "materialized", "result")) {
   Assert-MIRContains -RelativePath "prototypes/mir/capabilities/registry.lua" -Text $capabilityRegistryText -Needle ('"' + $stage + '"')
 }
 

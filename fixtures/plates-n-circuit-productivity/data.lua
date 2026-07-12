@@ -76,3 +76,29 @@ dependent.effects = {}
 dependent.prerequisites = {"basic-plate-productivity"}
 
 data:extend({prefix_owner, dependent})
+
+data:extend({
+  {
+    type = "mod-data",
+    name = "more-infinite-research-compatibility-pack",
+    data = {
+      packs = {
+        ["plates-n-circuit-fixture"] = {
+          schema = 1,
+          id = "plates-n-circuit-fixture",
+          known_competing_productivity = {
+            tech_patterns = {
+              "^basic%-plate%-productivity$",
+              "^plate%-productivity$",
+              "^electric%-circuit%-productivity$",
+              "^electronic%-circuit%-productivity$",
+              "^advanced%-circuit%-productivity$"
+            }
+          },
+          expected_decisions = {"replace-exact-or-preserve-owner"},
+          claim_level = "fixture-only"
+        }
+      }
+    }
+  }
+})

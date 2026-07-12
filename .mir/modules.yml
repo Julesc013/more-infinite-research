@@ -120,6 +120,7 @@ modules:
     - prototypes/mir/domain/facts/registry.lua
     - prototypes/mir/domain/facts/generated_technology_registry.lua
     - prototypes/mir/domain/decisions/decision_record.lua
+    - prototypes/mir/domain/effects/metadata.lua
     - prototypes/mir/domain/streams/stream_spec.lua
     - prototypes/mir/domain/streams/raw_catalog.lua
     - prototypes/mir/domain/streams/descriptor.lua
@@ -178,6 +179,8 @@ modules:
   compatibility:
     - prototypes/mir/compatibility/registry.lua
     - prototypes/mir/compatibility/profiles.lua
+    - prototypes/mir/compatibility/packs/schema.lua
+    - prototypes/mir/compatibility/packs/registry.lua
     - prototypes/mir/compatibility/planner.lua
     - prototypes/mir/compatibility/overlay_loader.lua
     - prototypes/mir/compatibility/claim_registry.lua
@@ -202,6 +205,8 @@ mutation_commands:
   rules:
     - every prototype-changing pass has a stable command id
     - every command declares positive target feature requirements
+    - every command declares a phase and explicit dependencies
+    - command dependencies are acyclic and enforced before execution
     - only emission commands may create generated technology prototypes
     - mutation commands may change existing prototypes only through their listed implementation
     - exact-version compatibility repairs remain separately bounded
@@ -238,6 +243,9 @@ target_layers:
   settings:
     path: prototypes/mir/settings
     may_read_factorio_globals: true
+    may_require:
+      - core
+      - domain
     may_register_settings: true
     may_mutate_data_raw: false
   pipeline:

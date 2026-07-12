@@ -171,6 +171,22 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - family-rule-schema
+  - path: docs/reference/schemas/compatibility-pack.md
+    title: "CompatibilityPack Schema"
+    status: current
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - compatibility-pack-schema
+  - path: docs/reference/schemas/scenario-manifest.md
+    title: "Scenario Manifest Schema"
+    status: current
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - scenario-manifest-schema
   - path: docs/architecture/README.md
     title: "Architecture"
     status: current

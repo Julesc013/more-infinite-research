@@ -29,18 +29,18 @@ A capability resolver follows this contract:
 ```lua
 CapabilityResolver = {
   id = "loader-manufacturing-productivity",
-  schema_version = 1,
+  schema_version = 2,
 
   discover = function(facts) end,
   classify = function(candidate, facts) end,
   propose = function(classified, facts, policy) end,
   validate = function(proposal, facts, policy) end,
-  emit = function(validated, emit_context) end,
-  diagnose = function(rejected, report_context) end,
+  materialize = function(validated, decision_context) end,
+  result = function(materialized, report_context) end,
 }
 ```
 
-The `2.2.0` resolver contract is report-first. In 3.0, a resolver may emit only after it produces a validated `StreamSpec` with a stable manifest row, owner checks, lab checks, cap diagnostics, loop-risk denial, fixture evidence, and claim text.
+The current resolver contract is report-first. It materializes typed decisions but cannot emit prototypes. Prototype creation requires a validated `GenerationPlan` and `StreamSpec` with a stable manifest row, owner checks, lab checks, cap diagnostics, loop-risk denial, fixture evidence, and claim text.
 
 ## Capability Lanes
 

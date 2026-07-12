@@ -115,42 +115,6 @@ local PROFILES = {
     "^fish%-breeding%-productivity$"
   }),
 
-  ["mir-fixture-plates-n-circuit-productivity"] = {
-    known_competing_productivity = {
-      tech_patterns = {
-        "^basic%-plate%-productivity$",
-        "^plate%-productivity$",
-        "^electric%-circuit%-productivity$",
-        "^electronic%-circuit%-productivity$",
-        "^advanced%-circuit%-productivity$"
-      }
-    }
-  },
-
-  ["mir-fixture-plates-n-circuit-productivity-blocked"] = {
-    known_competing_productivity = {
-      tech_patterns = {
-        "^basic%-plate%-productivity$",
-        "^plate%-productivity$",
-        "^electric%-circuit%-productivity$",
-        "^electronic%-circuit%-productivity$",
-        "^advanced%-circuit%-productivity$"
-      }
-    }
-  },
-
-  ["mir-fixture-plates-n-circuit-productivity-change-mismatch"] = {
-    known_competing_productivity = {
-      tech_patterns = {
-        "^basic%-plate%-productivity$",
-        "^plate%-productivity$",
-        "^electric%-circuit%-productivity$",
-        "^electronic%-circuit%-productivity$",
-        "^advanced%-circuit%-productivity$"
-      }
-    }
-  },
-
   ["ProductivityResearch"] = known_competing_productivity_profile(SEM_PRFE_PRODUCTIVITY_TECH_PATTERNS),
 
   ["ProductivityResearchForEveryone"] = known_competing_productivity_profile(SEM_PRFE_PRODUCTIVITY_TECH_PATTERNS),
@@ -194,6 +158,10 @@ function P.active_known_competing_productivity_profiles()
         policy = entry.profile.known_competing_productivity
       })
     end
+  end
+  local pack_registry = require("prototypes.mir.compatibility.packs.registry")
+  for _, entry in ipairs(pack_registry.active_known_competing_productivity_profiles()) do
+    table.insert(active, entry)
   end
   return active
 end

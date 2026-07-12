@@ -405,8 +405,8 @@ local function validate_recipe_state(state)
   return state
 end
 
-local function emit_recipe_state(state)
-  require_stage(state, "validated", "emitted")
+local function materialize_recipe_state(state)
+  require_stage(state, "validated", "materialized")
   state.result = {emit_recipe_capability_decisions(
     state.registry,
     state.resolver,
@@ -416,8 +416,8 @@ local function emit_recipe_state(state)
   return state
 end
 
-local function diagnose_recipe_state(state)
-  require_stage(state, "emitted", "diagnosed")
+local function recipe_result(state)
+  require_stage(state, "materialized", "result")
   return state.result
 end
 
@@ -448,14 +448,14 @@ local function validate_native_state(state)
   return state
 end
 
-local function emit_native_state(state)
-  require_stage(state, "validated", "emitted")
+local function materialize_native_state(state)
+  require_stage(state, "validated", "materialized")
   state.result = {emit_native_modifier_decisions(state.registry, state.resolver, state.rows)}
   return state
 end
 
-local function diagnose_native_state(state)
-  require_stage(state, "emitted", "diagnosed")
+local function native_result(state)
+  require_stage(state, "materialized", "result")
   return state.result
 end
 
@@ -466,8 +466,8 @@ local function configure_resolvers()
   RESOLVERS[1].classify = classify_recipe_state
   RESOLVERS[1].propose = propose_recipe_state
   RESOLVERS[1].validate = validate_recipe_state
-  RESOLVERS[1].emit = emit_recipe_state
-  RESOLVERS[1].diagnose = diagnose_recipe_state
+  RESOLVERS[1].materialize = materialize_recipe_state
+  RESOLVERS[1].result = recipe_result
 
   RESOLVERS[2].discover = function(registry)
     return discover_recipe_state(registry, RESOLVERS[2], {["mining-drill"] = true})
@@ -475,15 +475,15 @@ local function configure_resolvers()
   RESOLVERS[2].classify = classify_recipe_state
   RESOLVERS[2].propose = propose_recipe_state
   RESOLVERS[2].validate = validate_recipe_state
-  RESOLVERS[2].emit = emit_recipe_state
-  RESOLVERS[2].diagnose = diagnose_recipe_state
+  RESOLVERS[2].materialize = materialize_recipe_state
+  RESOLVERS[2].result = recipe_result
 
   RESOLVERS[3].discover = function(registry) return discover_native_state(registry, RESOLVERS[3]) end
   RESOLVERS[3].classify = classify_native_state
   RESOLVERS[3].propose = propose_native_state
   RESOLVERS[3].validate = validate_native_state
-  RESOLVERS[3].emit = emit_native_state
-  RESOLVERS[3].diagnose = diagnose_native_state
+  RESOLVERS[3].materialize = materialize_native_state
+  RESOLVERS[3].result = native_result
 end
 
 configure_resolvers()
@@ -506,8 +506,8 @@ function C.emit(registry)
     state = resolver.classify(state)
     state = resolver.propose(state)
     state = resolver.validate(state)
-    state = resolver.emit(state)
-    local result = resolver.diagnose(state)
+    state = resolver.materialize(state)
+    local result = resolver.result(state)
     total = total + result[1]
     generated = generated + result[2]
     proposed = proposed + result[3]
@@ -525,7 +525,7 @@ function C.emit(registry)
     generated = tostring(generated),
     unknown = tostring(proposed),
     warnings = tostring(warnings),
-    evidence = "discover,classify,propose,validate,emit,diagnose"
+    evidence = "discover,classify,propose,validate,materialize,result"
   })
 end
 

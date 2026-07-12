@@ -79,7 +79,8 @@ $luaClaimRegistryText = Get-Content -Raw -LiteralPath $luaClaimRegistryPath
 
 Assert-MIRTextContains -Text $contractText -Snippet "schema_version" -Context "capability contract"
 Assert-MIRTextContains -Text $contractText -Snippet "discover" -Context "capability contract"
-Assert-MIRTextContains -Text $contractText -Snippet "diagnose" -Context "capability contract"
+Assert-MIRTextContains -Text $contractText -Snippet "materialize" -Context "capability contract"
+Assert-MIRTextContains -Text $contractText -Snippet "result" -Context "capability contract"
 Assert-MIRTextContains -Text $capabilityRegistryText -Snippet "contract.validate_all(RESOLVERS)" -Context "capability registry"
 Assert-MIRTextContains -Text $policyText -Snippet "P.schema_version = schema.capability_policy" -Context "capability policy"
 Assert-MIRTextContains -Text $policyText -Snippet "deny_risk_flags" -Context "capability policy"

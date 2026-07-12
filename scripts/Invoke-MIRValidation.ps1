@@ -1459,7 +1459,7 @@ Invoke-RepoCheck "2.2.0 compiler diagnostics are wired" {
     @{ File = "prototypes\mir\capabilities\registry.lua"; Text = $capabilityRegistryText; Snippet = 'id = "mining-drill-manufacturing"' },
     @{ File = "prototypes\mir\capabilities\registry.lua"; Text = $capabilityRegistryText; Snippet = 'id = "native-modifier-ownership"' },
     @{ File = "prototypes\mir\capabilities\registry.lua"; Text = $capabilityRegistryText; Snippet = 'entity_backed_candidates' },
-    @{ File = "prototypes\mir\capabilities\registry.lua"; Text = $capabilityRegistryText; Snippet = 'discover,classify,propose,validate,emit,diagnose' },
+    @{ File = "prototypes\mir\capabilities\registry.lua"; Text = $capabilityRegistryText; Snippet = 'discover,classify,propose,validate,materialize,result' },
     @{ File = "prototypes\mir\planner\compiler.lua"; Text = $compilerText; Snippet = 'local decision_export = require("prototypes.mir.report.decision_export")' },
     @{ File = "prototypes\mir\planner\compiler.lua"; Text = $compilerText; Snippet = 'require("prototypes.mir.index.registry_builder")' },
     @{ File = "prototypes\mir\planner\compiler.lua"; Text = $compilerText; Snippet = 'D.fact_registry({' },
