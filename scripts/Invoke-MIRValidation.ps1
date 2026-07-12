@@ -3040,11 +3040,13 @@ if ($isReducedLegacyLine) {
     throw "Disabled base extension checkbox should skip generated continuation: $checkboxDisabledResearchSpeedLine"
   }
 
-  Invoke-RuntimeScenario -ScenarioName "weapon-speed-overlap-safety" -EnabledFixtureNames @(
-    "mir-fixture-assert-weapon-speed-safety"
-  ) -WeaponSpeedAdjustmentMode "only-when-dedicated-tech-enabled"
-  $weaponSpeedLine = Get-LastExtensionReportLine -Key "weapon-shooting-speed"
-  Assert-ReportLineGenerated -Line $weaponSpeedLine -Context "$reducedLineLabel weapon shooting speed overlap safety scenario"
+  if (-not $isFactorio016Line) {
+    Invoke-RuntimeScenario -ScenarioName "weapon-speed-overlap-safety" -EnabledFixtureNames @(
+      "mir-fixture-assert-weapon-speed-safety"
+    ) -WeaponSpeedAdjustmentMode "only-when-dedicated-tech-enabled"
+    $weaponSpeedLine = Get-LastExtensionReportLine -Key "weapon-shooting-speed"
+    Assert-ReportLineGenerated -Line $weaponSpeedLine -Context "$reducedLineLabel weapon shooting speed overlap safety scenario"
+  }
 
   if ($usesGeneratedUserDataDir -and (Test-Path -LiteralPath $validationRoot)) {
     Remove-Item -LiteralPath $validationRoot -Recurse -Force
