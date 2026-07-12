@@ -9,6 +9,8 @@ Date: 2026-07-12
     - Rejected disabled, cyclic, self-locked, and unrecognized science paths when selecting generated prerequisites.
     - Restricted weapon-speed cleanup to technologies registered as MIR-generated.
     - Preserved external infinite weapon-speed continuations as target-owned compatibility authorities.
+    - Replaced recursive technology-graph traversal with a deterministic iterative walk.
+    - Large modpacks can no longer exhaust the Lua call stack while MIR validates prerequisites.
 
   Changes:
 
