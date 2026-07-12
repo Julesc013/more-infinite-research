@@ -1286,7 +1286,10 @@
         "required_features": [
           "recipe_productivity"
         ],
-        "fixtures": [],
+        "fixtures": [
+          "mir-fixture-plates-n-circuit-productivity",
+          "mir-fixture-assert-plates-n-circuit-productivity"
+        ],
         "settings": {},
         "source_mode": "exact-package",
         "timeout_seconds": 180,
@@ -1338,8 +1341,14 @@
         "required_features": [
           "recipe_productivity"
         ],
-        "fixtures": [],
-        "settings": {},
+        "fixtures": [
+          "mir-fixture-plates-n-circuit-productivity"
+        ],
+        "settings": {
+          "DisabledStreamKeys": [
+            "research_copper"
+          ]
+        },
         "source_mode": "exact-package",
         "timeout_seconds": 180,
         "tags": [
@@ -1364,7 +1373,10 @@
         "required_features": [
           "recipe_productivity"
         ],
-        "fixtures": [],
+        "fixtures": [
+          "mir-fixture-plates-n-circuit-productivity-change-mismatch",
+          "mir-fixture-assert-plates-n-circuit-productivity-change-mismatch"
+        ],
         "settings": {},
         "source_mode": "exact-package",
         "timeout_seconds": 180,
@@ -1390,7 +1402,10 @@
         "required_features": [
           "recipe_productivity"
         ],
-        "fixtures": [],
+        "fixtures": [
+          "mir-fixture-plates-n-circuit-productivity-blocked",
+          "mir-fixture-assert-plates-n-circuit-productivity-blocked"
+        ],
         "settings": {},
         "source_mode": "exact-package",
         "timeout_seconds": 180,
