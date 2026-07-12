@@ -179,6 +179,15 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - compatibility-pack-schema
+  - path: docs/reference/compiler-authority-table.md
+    title: "Compiler Authority Table"
+    status: current
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - compiler-schema-authorities
+      - compiler-schema-drift-policy
   - path: docs/reference/schemas/scenario-manifest.md
     title: "Scenario Manifest Schema"
     status: current

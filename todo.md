@@ -41,7 +41,7 @@ This is the executable release queue. `.mir/release-wave.yml` is the machine-rea
 - [x] Move competing-owner replacement, productivity-family adoption, weapon-speed, and max-level mutation bodies out of `policy/` into `pipeline/mutations/` or `emit/transactions/`; policy stays plan-only.
 - [x] Replace remaining hybrid target denylists with positive feature, mod, effect, emitter, and shape declarations; every target now fails closed from allowlists.
 - [x] Add deterministic plan/coverage snapshot export, plan and target-plan diff, review-required CompatibilityPack scaffolding, snapshot minimization, and static tool tests.
-- [ ] Consolidate the final effect/stream/rule/pack documentation tables and add schema drift checks.
+- [x] Consolidate effect, stream, descriptor, rule, pack, plan, fact, and scenario authorities into one governed table with code/manifest/doc schema drift checks.
 - [ ] Review every automatic effect value and generated science/prerequisite choice for balance and reachability.
 - [ ] Decide whether beacon, rail/support, ammunition, armor, battery, circuit, plate, structural-component, or fluid-process families remain report-only or receive fixture-backed rules.
 - [ ] Keep complex chemistry, catalyst, recovery, voiding, transmutation, recycling, and multi-output loops report-only until graph proof exists.

@@ -472,6 +472,10 @@ Invoke-RepoCheck "planner artifact tools are deterministic and schema-bound" {
   & (Join-Path $repo "scripts\Test-MIRPlannerTools.ps1") -RepoRoot $repo
 }
 
+Invoke-RepoCheck "compiler schema authorities and reference docs do not drift" {
+  & (Join-Path $repo "scripts\Test-MIRCompilerSchemaDrift.ps1") -RepoRoot $repo
+}
+
 Invoke-RepoCheck "compatibility dependency declarations preserve full mod names" {
   & (Join-Path $repo "scripts\Test-MIRDependencyResolver.ps1") -RepoRoot $repo
 }
