@@ -3026,7 +3026,7 @@ if ($isReducedLegacyLine) {
         "research_robot_battery"
       )) {
       $unsupportedLine = Get-LastStreamReportLine -Key $unsupportedStream
-      if ($unsupportedLine -notmatch "status=skipped" -or $unsupportedLine -notmatch "no_supported_effects") {
+      if ($unsupportedLine -notmatch "status=skipped" -or $unsupportedLine -notmatch "no_available_direct_effects") {
         throw "$reducedLineLabel unsupported direct effect did not skip cleanly: $unsupportedLine"
       }
     }
