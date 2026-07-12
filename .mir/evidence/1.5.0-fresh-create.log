@@ -1,0 +1,54 @@
+   0.001 2026-07-13 09:05:47; Factorio 0.15.40 (build 30950, win64, alpha)
+   0.001 Operating system: Windows 10 (build 19045)
+   0.001 Not rotating logs.
+   0.001 Program arguments: "D:\Programs\Factorio\0.15\bin\x64\factorio.exe" "--config" "C:\Projects\Factorio\more-infinite-research-tmp-0.15\artifacts\old-wave\1.5.0\config-create.ini" "--no-log-rotation" "--disable-audio" "--mod-directory" "C:\Projects\Factorio\more-infinite-research-tmp-0.15\artifacts\old-wave\1.5.0\mods" "--create" "C:\Projects\Factorio\more-infinite-research-tmp-0.15\artifacts\old-wave\1.5.0\fresh-1.5.0.zip"
+   0.002 Read data path: D:/Programs/Factorio/0.15/data
+   0.002 Write data path: C:/Projects/Factorio/more-infinite-research-tmp-0.15/artifacts/old-wave/1.5.0/user-create
+   0.002 Binaries path: D:/Programs/Factorio/0.15/bin
+   0.010 System info: [CPU: Intel(R) Core(TM) i7-7700HQ CPU @ 2.80GHz, 8 cores, RAM: 16257MB]
+   0.011 Running in headless mode
+   0.028 Loading mod settings more-infinite-research 1.5.0 (settings.lua)
+   0.038 Loading mod core 0.0.0 (data.lua)
+   0.045 Loading mod base 0.15.40 (data.lua)
+   0.158 Loading mod more-infinite-research 1.5.0 (data.lua)
+   0.186 Loading mod base 0.15.40 (data-updates.lua)
+   0.211 Loading mod more-infinite-research 1.5.0 (data-updates.lua)
+   0.233 Loading mod more-infinite-research 1.5.0 (data-final-fixes.lua)
+   0.250 Script @__more-infinite-research__/prototypes/mir/planner/stream_compiler.lua:117: [more-infinite-research] Skipping stream research_cannon_shooting_speed because missing required technology weapon-shooting-speed-5.
+   0.250 Script @__more-infinite-research__/prototypes/mir/planner/direct_effects.lua:15: [more-infinite-research] Skipping unsupported technology effect for research_character_crafting_speed: character-crafting-speed
+   0.250 Script @__more-infinite-research__/prototypes/mir/planner/stream_compiler.lua:134: [more-infinite-research] Skipping stream research_character_crafting_speed because no available direct effects remain.
+   0.250 Script @__more-infinite-research__/prototypes/mir/planner/direct_effects.lua:15: [more-infinite-research] Skipping unsupported technology effect for research_character_mining_speed: character-mining-speed
+   0.250 Script @__more-infinite-research__/prototypes/mir/planner/stream_compiler.lua:134: [more-infinite-research] Skipping stream research_character_mining_speed because no available direct effects remain.
+   0.251 Script @__more-infinite-research__/prototypes/mir/planner/direct_effects.lua:15: [more-infinite-research] Skipping unsupported technology effect for research_character_reach: character-reach-distance
+   0.251 Script @__more-infinite-research__/prototypes/mir/planner/direct_effects.lua:15: [more-infinite-research] Skipping unsupported technology effect for research_character_reach: character-build-distance
+   0.251 Script @__more-infinite-research__/prototypes/mir/planner/direct_effects.lua:15: [more-infinite-research] Skipping unsupported technology effect for research_character_reach: character-resource-reach-distance
+   0.251 Script @__more-infinite-research__/prototypes/mir/planner/direct_effects.lua:15: [more-infinite-research] Skipping unsupported technology effect for research_character_reach: character-item-drop-distance
+   0.251 Script @__more-infinite-research__/prototypes/mir/planner/stream_compiler.lua:134: [more-infinite-research] Skipping stream research_character_reach because no available direct effects remain.
+   0.251 Script @__more-infinite-research__/prototypes/mir/planner/direct_effects.lua:15: [more-infinite-research] Skipping unsupported technology effect for research_character_walking_speed: character-running-speed
+   0.251 Script @__more-infinite-research__/prototypes/mir/planner/stream_compiler.lua:134: [more-infinite-research] Skipping stream research_character_walking_speed because no available direct effects remain.
+   0.254 Script @__more-infinite-research__/prototypes/mir/planner/direct_effects.lua:15: [more-infinite-research] Skipping unsupported technology effect for research_inventory_capacity: character-inventory-slots-bonus
+   0.254 Script @__more-infinite-research__/prototypes/mir/planner/direct_effects.lua:15: [more-infinite-research] Skipping unsupported technology effect for research_inventory_capacity: character-logistic-trash-slots
+   0.254 Script @__more-infinite-research__/prototypes/mir/planner/stream_compiler.lua:134: [more-infinite-research] Skipping stream research_inventory_capacity because no available direct effects remain.
+   0.254 Script @__more-infinite-research__/prototypes/mir/planner/direct_effects.lua:15: [more-infinite-research] Skipping unsupported technology effect for research_lab_productivity: laboratory-productivity
+   0.254 Script @__more-infinite-research__/prototypes/mir/planner/stream_compiler.lua:134: [more-infinite-research] Skipping stream research_lab_productivity because no available direct effects remain.
+   0.255 Script @__more-infinite-research__/prototypes/mir/planner/direct_effects.lua:15: [more-infinite-research] Skipping unsupported technology effect for research_robot_battery: worker-robot-battery
+   0.255 Script @__more-infinite-research__/prototypes/mir/planner/stream_compiler.lua:134: [more-infinite-research] Skipping stream research_robot_battery because no available direct effects remain.
+   0.292 Checksum for core: 3865022077
+   0.292 Checksum of base: 1503927233
+   0.292 Checksum of more-infinite-research: 3817387064
+   0.411 Info PlayerData.cpp:60: Local player-data.json unavailable
+   0.411 Info PlayerData.cpp:65: Cloud player-data.json unavailable
+   0.413 Info GlobalContext.cpp:939: Resetting config.
+   0.413 Custom inputs active: 0
+   0.414 Factorio initialised
+   0.414 Info Main.cpp:775: Creating new map C:\Projects\Factorio\more-infinite-research-tmp-0.15\artifacts\old-wave\1.5.0\fresh-1.5.0.zip
+   2.363 Info BlueprintLibrary.cpp:49: Loaded external blueprint storage: playerIndex = 65535, nextRecordID = 0; timestamp = 1783897549; records:
+   2.363 Info BlueprintLibrary.cpp:49: Loaded external blueprint storage: playerIndex = 65535, nextRecordID = 0; timestamp = 1783897549; records:
+   2.469 Loading Level.dat: 928741 bytes.
+   2.469 Info Scenario.cpp:135: Map version 0.15.40-0
+   2.512 Info BlueprintLibrary.cpp:226: Loaded library shelves:
+   2.512 Info BlueprintLibrary.cpp:794: Game shelf: playerIndex = 65535, nextRecordID = 0; timestamp = 1783897547; records:
+   2.514 Info BlueprintLibrary.cpp:49: Loaded external blueprint storage: playerIndex = 65535, nextRecordID = 0; timestamp = 1783897549; records:
+   2.519 Checksum for script C:/Projects/Factorio/more-infinite-research-tmp-0.15/artifacts/old-wave/1.5.0/user-create/temp/currently-playing/control.lua: 282129324
+   2.521 Checksum for script __more-infinite-research__/control.lua: 3121553990
+   2.725 Goodbye
