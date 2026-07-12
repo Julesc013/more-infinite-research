@@ -1,78 +1,78 @@
+local COMMON_REQUIREMENTS = {
+  visible_recipe = true,
+  parameter = false,
+  productivity_supported = true,
+  output_placeable = true,
+  researchable = true,
+  lab_compatible = true
+}
+
+local COMMON_DENY_RISKS = {
+  "recycling_loop",
+  "catalyst_or_self_return",
+  "non_deterministic_output",
+  "voiding_or_destruction",
+  "matter_or_transmutation",
+  "hidden_internal"
+}
+
+local function structural_rule(row)
+  row.schema = 2
+  row.capability = "recipe-productivity"
+  row.required_evidence = {
+    "recipe-fact-v2",
+    "place-result-index",
+    "effect-owner-index"
+  }
+  row.require = COMMON_REQUIREMENTS
+  row.deny_risks = COMMON_DENY_RISKS
+  row.ownership = {strategy = "prefer-existing-exact-owner"}
+  row.science = {strategy = "inherit-target-stream"}
+  row.prerequisites = {strategy = "inherit-target-stream"}
+  row.targets = {requires_features = {"recipe_productivity"}}
+  row.default_action = "attach-existing"
+  row.support_claim = {level = "structural-attachment", public = false}
+  return row
+end
+
+local function placeable(id, stream, entity_types, change)
+  return structural_rule({
+    id = id,
+    family = id,
+    selector = {
+      output_item = {place_result_entity_types = entity_types}
+    },
+    grouping = {strategy = "attach-existing", stream = stream},
+    tier = {strategy = "structural-single-tier"},
+    effects = {strategy = "fixed", default = change}
+  })
+end
+
 return {
-  schema = 1,
+  schema = 2,
   rules = {
-    {
-      id = "assembling-machine-manufacturing",
-      capability = "recipe-productivity",
-      mode = "attach-existing",
-      target_stream = "research_auto_assembling_machine",
-      entity_types = {"assembling-machine"},
-      change = 0.02
-    },
-    {
-      id = "furnace-manufacturing",
-      capability = "recipe-productivity",
-      mode = "attach-existing",
-      target_stream = "research_furnace",
-      entity_types = {"furnace"},
-      change = 0.02
-    },
-    {
-      id = "inserter-manufacturing",
-      capability = "recipe-productivity",
-      mode = "attach-existing",
-      target_stream = "research_inserters",
-      entity_types = {"inserter"},
-      change = 0.01
-    },
-    {
-      id = "lab-manufacturing",
-      capability = "recipe-productivity",
-      mode = "attach-existing",
-      target_stream = "research_auto_lab",
-      entity_types = {"lab"},
-      change = 0.02
-    },
-    {
-      id = "loader-manufacturing",
-      capability = "recipe-productivity",
-      mode = "attach-existing",
-      target_stream = "research_belts",
-      entity_types = {"loader", "loader-1x1"},
-      change = 0.01
-    },
-    {
-      id = "logistics-manufacturing",
-      capability = "recipe-productivity",
-      mode = "attach-existing",
-      target_stream = "research_belts",
-      entity_types = {"splitter", "transport-belt", "underground-belt"},
-      change = 0.01
-    },
-    {
-      id = "mining-drill-manufacturing",
-      capability = "recipe-productivity",
-      mode = "attach-existing",
-      target_stream = "research_mining_drill",
-      entity_types = {"mining-drill"},
-      change = 0.05
-    },
-    {
+    placeable("assembling-machine-manufacturing", "research_auto_assembling_machine", {"assembling-machine"}, 0.02),
+    placeable("furnace-manufacturing", "research_furnace", {"furnace"}, 0.02),
+    placeable("inserter-manufacturing", "research_inserters", {"inserter"}, 0.01),
+    placeable("lab-manufacturing", "research_auto_lab", {"lab"}, 0.02),
+    placeable("loader-manufacturing", "research_belts", {"loader", "loader-1x1"}, 0.01),
+    placeable("logistics-manufacturing", "research_belts", {"splitter", "transport-belt", "underground-belt"}, 0.01),
+    placeable("mining-drill-manufacturing", "research_mining_drill", {"mining-drill"}, 0.05),
+    structural_rule({
       id = "module-manufacturing",
-      capability = "recipe-productivity",
-      mode = "attach-existing",
-      target_stream = "research_modules",
-      item_prototype_types = {"module"},
-      tier_changes = {0.10, 0.05, 0.02},
-      high_tier_change = 0.01
-    },
-    {
-      id = "power-storage-and-generation",
-      capability = "recipe-productivity",
-      mode = "attach-existing",
-      target_stream = "research_electric_energy",
-      entity_types = {"accumulator", "solar-panel"},
-      change = 0.02
-    }
+      family = "module-manufacturing",
+      selector = {
+        output_item = {prototype_types = {"module"}}
+      },
+      grouping = {strategy = "attach-existing", stream = "research_modules"},
+      tier = {strategy = "item-prototype-tier"},
+      effects = {
+        strategy = "tier-table",
+        tiers = {0.10, 0.05, 0.02},
+        high_tier = 0.01,
+        default = 0.01
+      }
+    }),
+    placeable("power-storage-and-generation", "research_electric_energy", {"accumulator", "solar-panel"}, 0.02)
   }
 }

@@ -1,7 +1,7 @@
 ---
 title: "CompatibilityPack Schema"
 status: current
-applies_to: "post-3.1 dev"
+applies_to: "3.2.0+"
 audience: developer
 doc_type: reference
 owner: mir-maintainers
@@ -12,9 +12,19 @@ superseded_by: []
 
 # CompatibilityPack Schema
 
-A schema-1 `CompatibilityPack` is a data-only policy packet. It may declare selectors, guarded competing-owner patterns, expected decision classes, and claim metadata. It cannot contain functions or prototype mutation callbacks.
+A schema-2 `CompatibilityPack` is a data-only refinement packet. It cannot contain functions, prototype mutation callbacks, emitters, or direct technology definitions.
 
-External fixtures may register a pack through the `more-infinite-research-compatibility-pack` `mod-data` prototype. MIR validates and consumes that packet during final planning. This keeps fixture-only mod identities and policies out of the production profile table while exercising the same pack schema a reviewed modpack policy would use.
+Every pack declares:
 
-Compatibility packs never create technologies. They may only influence a policy decision that is still subject to owner, effect identity, science, graph, plan, and emission validation.
+- a stable ID and applicable mod IDs with optional version constraints;
+- aliases, exact includes and excludes, family or tier hints, and science roles;
+- exact owner claims and reviewed risk overrides;
+- positive Factorio target lines;
+- fixture and real-mod evidence;
+- a claim level and explicit public or internal boundary.
 
+An `allow-reviewed` risk override requires named evidence. Fixture-only packs cannot publish a claim. The registry also rejects duplicate transport keys, pack IDs that differ from their transport key, empty applicability or target sets, and incomplete exact or evidence records.
+
+External fixtures may register a pack through the internal `more-infinite-research-compatibility-pack` `mod-data` prototype. MIR validates the complete packet during final planning and fingerprints the active pack set into `GenerationPlan`. This is not a stable public extension API.
+
+Compatibility packs never create technologies and cannot bypass target, effect identity, owner, science, lab, prerequisite, loop-safety, whole-plan, or emission validation. Test-only packs are injected by fixtures and never added to the production profile registry.

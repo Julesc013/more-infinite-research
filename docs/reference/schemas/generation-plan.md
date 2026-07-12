@@ -14,7 +14,7 @@ superseded_by: []
 
 `GenerationPlan` is the side-effect-free boundary between stream planning and prototype emission. The compiler creates every row, validates the complete set, and only then passes the finalized snapshot to mutation code.
 
-The exported plan artifact is schema 2. It contains a deterministic plan fingerprint, fingerprints for facts, rules, and the target profile, the complete row set, and a validation summary with action and reason counts.
+The exported plan artifact is schema 2. It contains a deterministic plan fingerprint, fingerprints for facts, rules, active compatibility packs, and the target profile, the complete row set, and a validation summary with action and reason counts.
 
 Every schema-2 row contains:
 

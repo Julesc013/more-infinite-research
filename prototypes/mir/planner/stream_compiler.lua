@@ -24,6 +24,7 @@ local fingerprint = require("prototypes.mir.core.fingerprint")
 local recipe_facts = require("prototypes.mir.index.recipe_facts")
 local target_profiles = require("prototypes.mir.platform.factorio.target_profiles")
 local effective_settings = require("prototypes.mir.settings.effective")
+local compatibility_packs = require("prototypes.mir.compatibility.packs.registry")
 
 local M = {}
 local latest_plan = nil
@@ -310,6 +311,7 @@ function M.compile()
     source_fingerprints = {
       facts = fingerprint.of(recipe_facts.snapshot()),
       rules = fingerprint.of({streams = streams, families = family_registry.snapshot()}),
+      compatibility_packs = fingerprint.of(compatibility_packs.snapshot()),
       target_profile = fingerprint.of(target_profiles.current())
     }
   })

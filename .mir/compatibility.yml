@@ -6,7 +6,7 @@ lua_report_registry: prototypes/mir/compatibility/claim_registry.lua
 target_docs_root: docs/compatibility/targets
 
 compatibility_packs:
-  schema: 1
+  schema: 2
   validator: prototypes/mir/compatibility/packs/schema.lua
   registry: prototypes/mir/compatibility/packs/registry.lua
   external_transport: more-infinite-research-compatibility-pack

@@ -720,6 +720,22 @@ docs:
     doc_type: how-to
     owner: mir-maintainers
     source_of_truth_for: []
+  - path: docs/maintainer/adding-a-compatibility-pack.md
+    title: "Adding A Compatibility Pack"
+    status: current
+    audience: developer
+    doc_type: how-to
+    owner: mir-maintainers
+    source_of_truth_for:
+      - compatibility-pack-workflow
+  - path: docs/maintainer/adding-a-family-rule.md
+    title: "Adding A Family Rule"
+    status: current
+    audience: developer
+    doc_type: how-to
+    owner: mir-maintainers
+    source_of_truth_for:
+      - family-rule-workflow
   - path: docs/maintainer/adding-a-generated-stream.md
     title: "Adding A Generated Stream"
     status: current

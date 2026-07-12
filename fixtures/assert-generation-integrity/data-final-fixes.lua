@@ -42,7 +42,7 @@ local function assert_generation_plan_v2()
   if type(plan.plan_fingerprint) ~= "string" or not plan.plan_fingerprint:match("^mir32%-") then
     fail("GenerationPlan schema 2 fingerprint is missing")
   end
-  for _, source in ipairs({"facts", "rules", "target_profile"}) do
+  for _, source in ipairs({"facts", "rules", "compatibility_packs", "target_profile"}) do
     if type(plan.source_fingerprints[source]) ~= "string" then
       fail("GenerationPlan source fingerprint is missing: " .. source)
     end

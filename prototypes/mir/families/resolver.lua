@@ -48,37 +48,58 @@ local function safe_placeable_output(fact, item_name)
   return true, nil
 end
 
-local function eligibility(fact, item_name)
+local function risk_denied(rule, risk)
+  for _, candidate in ipairs(rule.deny_risks or {}) do
+    if candidate == risk then return true end
+  end
+  return false
+end
+
+local function eligibility(rule, fact, item_name)
   if not fact then return false, "recipe_fact_missing" end
-  if fact.hidden then return false, "hidden_recipe" end
-  if fact.parameter then return false, "parameter_recipe" end
-  if fact.source_class == "recycling" then return false, "recycling_recipe" end
-  if fact.allow_productivity == false then return false, "recipe_productivity_not_allowed" end
+  if rule.require.visible_recipe and fact.hidden and risk_denied(rule, "hidden_internal") then
+    return false, "hidden_recipe"
+  end
+  if rule.require.parameter == false and fact.parameter then return false, "parameter_recipe" end
+  if fact.source_class == "recycling" and risk_denied(rule, "recycling_loop") then
+    return false, "recycling_recipe"
+  end
+  if rule.require.productivity_supported and fact.allow_productivity == false then
+    return false, "recipe_productivity_not_allowed"
+  end
   if tonumber(fact.maximum_productivity) == 0 then return false, "zero_productivity_cap" end
-  if has_self_return(fact) then return false, "self_return_risk" end
-  local output_safe, output_blocker = safe_placeable_output(fact, item_name)
-  if not output_safe then return false, output_blocker end
+  if has_self_return(fact) and risk_denied(rule, "catalyst_or_self_return") then
+    return false, "self_return_risk"
+  end
+  if rule.require.output_placeable then
+    local output_safe, output_blocker = safe_placeable_output(fact, item_name)
+    if not output_safe and risk_denied(rule, "non_deterministic_output") then
+      return false, output_blocker
+    end
+  end
   return true, nil
 end
 
 local function module_change(rule, tier)
   tier = tonumber(tier) or 0
-  return rule.tier_changes and rule.tier_changes[tier]
-    or (tier > #(rule.tier_changes or {}) and rule.high_tier_change)
-    or rule.high_tier_change
+  local values = rule.effects.tiers or {}
+  return values[tier]
+    or (tier > #values and rule.effects.high_tier)
+    or rule.effects.default
 end
 
 local function candidate_items(rule, indexes)
   local items = {}
   local seen = {}
-  for _, entity_type in ipairs(rule.entity_types or {}) do
+  local selector = rule.selector.output_item
+  for _, entity_type in ipairs(selector.place_result_entity_types or {}) do
     for _, entity_name in ipairs(indexes.entities_by_type[entity_type] or {}) do
       for _, item_name in ipairs(indexes.items_by_place_result[entity_name] or {}) do
         if not seen[item_name] then seen[item_name] = true; table.insert(items, item_name) end
       end
     end
   end
-  for _, prototype_type in ipairs(rule.item_prototype_types or {}) do
+  for _, prototype_type in ipairs(selector.prototype_types or {}) do
     if prototype_type == "module" then
       for _, tier in ipairs(sorted_keys(indexes.modules_by_tier)) do
         for _, item_name in ipairs(indexes.modules_by_tier[tier]) do
@@ -101,12 +122,12 @@ local function build()
     for _, item_name in ipairs(candidate_items(rule, indexes)) do
       for _, recipe_name in ipairs(indexes.recipes_by_output[item_name] or {}) do
         local fact = recipe_facts.get(recipe_name)
-        local eligible, blocker = eligibility(fact, item_name)
+        local eligible, blocker = eligibility(rule, fact, item_name)
         local external_owners = indexes.technologies_by_recipe_effect[recipe_name] or {}
         if #external_owners > 0 then eligible, blocker = false, "existing_recipe_productivity_owner" end
 
-        local change = rule.change
-        if rule.item_prototype_types then
+        local change = rule.effects.default
+        if rule.effects.strategy == "tier-table" then
           local item = indexes.items[item_name]
           local tier = nil
           for candidate_tier, names in pairs(indexes.modules_by_tier) do
@@ -115,28 +136,28 @@ local function build()
           change = module_change(rule, tier)
         end
 
-        local decision = rule.mode == "proposal-only" and "propose" or "attach"
+        local decision = rule.grouping.strategy == "proposal-only" and "propose" or "attach"
         if not eligible then decision = "diagnose" end
         table.insert(decisions, {
-          schema = 1,
+          schema = 2,
           rule = rule.id,
           capability = rule.capability,
           recipe = recipe_name,
           item = item_name,
-          target_stream = rule.target_stream,
+          target_stream = rule.grouping.stream,
           decision = decision,
           blocker = blocker or rule.blocker,
           change = change
         })
 
-        if eligible and rule.mode == "attach-existing" then
+        if eligible and rule.grouping.strategy == "attach-existing" then
           local previous = ownership[recipe_name]
-          if previous and previous ~= rule.target_stream then
+          if previous and previous ~= rule.grouping.stream then
             error("FamilyRule attachment is ambiguous for recipe " .. recipe_name, 2)
           end
-          ownership[recipe_name] = rule.target_stream
-          attachments[rule.target_stream] = attachments[rule.target_stream] or {}
-          table.insert(attachments[rule.target_stream], {
+          ownership[recipe_name] = rule.grouping.stream
+          attachments[rule.grouping.stream] = attachments[rule.grouping.stream] or {}
+          table.insert(attachments[rule.grouping.stream], {
             recipe = recipe_name,
             change = change,
             rule = rule.id
@@ -156,7 +177,7 @@ local function build()
     if a.rule ~= b.rule then return a.rule < b.rule end
     return a.recipe < b.recipe
   end)
-  canonical = {schema = 1, attachments = attachments, decisions = decisions}
+  canonical = {schema = 2, attachments = attachments, decisions = decisions}
   return canonical
 end
 
