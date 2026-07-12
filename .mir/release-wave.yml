@@ -156,4 +156,9 @@ waves:
     stable_technology_golden: passed
     validation_package_sha256: EEB2567CBDB0B839943FCE9C3447F0FABBC206F47C90616879D762155851B3D2
     package_content_sha256: F8C064661D109AE06E6AD9C5E00AF5A0F89DA7915523AE273B8FE7772049503A
+    plan_v2_source_commit: 7e2fc6e86474e9460bf7c368092121ba432465e0
+    plan_v2_summary_path: .mir/evidence/3.2.0-plan-v2-gate-summary.json
+    plan_v2_run_id: f037c887-593c-4daf-b302-2c64656b0051
+    plan_v2_scenario_count: 83
+    plan_v2_result: passed
     status: integration-validated
