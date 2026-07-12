@@ -2,7 +2,7 @@ schema: 1
 
 branches:
   main:
-    purpose: published Factorio 2.1 MIR 3.0.5 baseline until 3.1.0 acceptance
+    purpose: stable Factorio 2.1 line receiving the validated MIR 3.1.0 release candidate
     factorio_version: "2.1"
     accepts:
       - release-hotfix
@@ -15,7 +15,7 @@ branches:
       - large-architecture-rewrite
 
   dev:
-    purpose: active unreleased MIR 3.1.0 automatic compiler development
+    purpose: canonical MIR 3.1.0 automatic compiler source and future Factorio 2.1 development
     factorio_version: "2.1"
     accepts:
       - architecture

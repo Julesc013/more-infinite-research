@@ -62,7 +62,7 @@ This is the executable release queue. `.mir/release-wave.yml` is the machine-rea
 - [x] Exact 3.0.5-to-3.1.0 save upgrade with non-default settings, research levels, storage, and scripted effects retained against RC4 archive `BD89A34D...DDDA3`.
 - [x] Exact 3.1.0 development archive base and Space Age loads from an isolated normal mods directory; rerun if package-visible source changes.
 - [x] Final-version performance evidence with recipe, technology, effect, edge, candidate, and scan counts; rerun if package-visible source changes.
-- [ ] Independent exact-archive campaigns for AAI, BZ, Bob, Angel, Krastorio/K2SO, Space Exploration, Pyanodon, and representative planet mods where complete dependency closures are available.
+- [x] Rerun every locally complete exact-archive campaign for AAI, BZ, Bob, Krastorio/K2SO, and the representative 46-mod planet cluster against the hardened archive (`9/9`, `loads` claims only).
 - [x] Characterize the earlier final-version archive across all currently complete local closures: AAI, BZ, Bob, Krastorio base, and K2SO (`8/8`, zero dependency failures).
 - [x] Rerun the available exact-archive `loads` scenarios against source `3699fec` (`9/9`, zero dependency failures), including a complete 46-mod planet cluster.
 - [ ] Acquire complete Angel, Space Exploration, and Pyanodon dependency closures, then run their independent exact-archive campaigns.
@@ -70,7 +70,7 @@ This is the executable release queue. `.mir/release-wave.yml` is the machine-rea
 - [x] Preserve `loads`, `observed`, `cooperates`, partial-family, and full-family claim boundaries; inventory never counts as proof.
 - [ ] Interactive settings, locale, icon, technology-tree, save-load, and balance review on the exact candidate.
 - [x] Preserve the superseded RC2-RC5 archives, release notes, migration guide, validation summaries, upgrade proof, campaign lock/evidence, and pending identity-bound GUI packet as historical evidence.
-- [ ] Bind a clean hardened candidate commit, package, `89/89` validation summary, upgrade proof, ecosystem campaign, and fresh interactive decision packet.
+- [x] Bind clean hardened source `aa05c4e`, archive `3F4A3A04...6F15780`, the `89/89` validation summary, exact upgrade proof, `9/9` ecosystem campaign, and a fresh pending interactive packet.
 - [ ] Complete and bind the GUI review without rebuilding the archive.
 - [x] Revalidate the unchanged planet-safe package after campaign evidence is hardened so unresolved roots cannot report a passing claim row.
 - [x] Rebuild and requalify after the representative planet cluster exposed a generated base extension anchored to a disabled prerequisite chain.
