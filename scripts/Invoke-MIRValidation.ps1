@@ -3068,6 +3068,20 @@ if ($isReducedLegacyLine) {
       }
     }
 
+    # Factorio 0.14 predates the startup-setting override format used by the
+    # checkbox scenarios below. Its supported runtime proof therefore stops at
+    # the package smoke test, generated direct effects, finite continuations,
+    # clean unsupported-effect skips, and prerequisite graph validation.
+    if ($isFactorio014Line) {
+      if ($usesGeneratedUserDataDir -and (Test-Path -LiteralPath $validationRoot)) {
+        Remove-Item -LiteralPath $validationRoot -Recurse -Force
+      }
+
+      Write-Host "[ok] Validation completed."
+      $global:LASTEXITCODE = 0
+      return
+    }
+
     Invoke-RuntimeScenario -ScenarioName "checkbox-enabled-default-off-features" -EnabledFixtureNames @() `
       -EnabledBaseExtensionKeys @("inserter-capacity-bonus")
     $checkboxEnabledInserterLine = Get-LastExtensionReportLine -Key "inserter-capacity-bonus"
