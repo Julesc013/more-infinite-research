@@ -188,6 +188,23 @@ docs:
     source_of_truth_for:
       - compiler-schema-authorities
       - compiler-schema-drift-policy
+  - path: docs/architecture/automatic-family-balance.md
+    title: "Automatic Family Balance And Scope"
+    status: current
+    audience: maintainer
+    doc_type: explanation
+    owner: mir-maintainers
+    source_of_truth_for:
+      - automatic-family-balance
+      - automatic-family-release-scope
+  - path: docs/architecture/recipe-variant-plan.md
+    title: "RecipeVariantPlan Design"
+    status: draft
+    audience: maintainer
+    doc_type: explanation
+    owner: mir-maintainers
+    source_of_truth_for:
+      - recipe-variant-plan-design
   - path: docs/reference/schemas/scenario-manifest.md
     title: "Scenario Manifest Schema"
     status: current

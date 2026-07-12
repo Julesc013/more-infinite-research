@@ -42,10 +42,10 @@ This is the executable release queue. `.mir/release-wave.yml` is the machine-rea
 - [x] Replace remaining hybrid target denylists with positive feature, mod, effect, emitter, and shape declarations; every target now fails closed from allowlists.
 - [x] Add deterministic plan/coverage snapshot export, plan and target-plan diff, review-required CompatibilityPack scaffolding, snapshot minimization, and static tool tests.
 - [x] Consolidate effect, stream, descriptor, rule, pack, plan, fact, and scenario authorities into one governed table with code/manifest/doc schema drift checks.
-- [ ] Review every automatic effect value and generated science/prerequisite choice for balance and reachability.
-- [ ] Decide whether beacon, rail/support, ammunition, armor, battery, circuit, plate, structural-component, or fluid-process families remain report-only or receive fixture-backed rules.
-- [ ] Keep complex chemistry, catalyst, recovery, voiding, transmutation, recycling, and multi-output loops report-only until graph proof exists.
-- [ ] Add a distinct RecipeVariantPlan design for recycling-safe duplicate recipes only after the core candidate is accepted; do not fold it into this release unless separately authorized.
+- [x] Review and lock every automatic effect value and generated science/prerequisite choice for balance and reachability.
+- [x] Keep beacon diagnostic-only and retain rail/support, ammunition, armor, battery, circuit, plate, and structural components under existing fixed streams; add no unproved broad rules in 3.1.0.
+- [x] Keep complex chemistry, catalyst, recovery, voiding, transmutation, recycling, probabilistic output, and multi-output loops report-only until graph proof exists.
+- [x] Define a distinct deferred RecipeVariantPlan contract for recycling-safe duplicate recipes without authorizing any 3.1.0 implementation.
 
 ### Final 3.1.0 Evidence
 
