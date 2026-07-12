@@ -1,7 +1,7 @@
 ---
 title: "GenerationPlan Schema"
 status: current
-applies_to: "post-3.1 dev"
+applies_to: "3.1.0+"
 audience: developer
 doc_type: reference
 owner: mir-maintainers
@@ -14,13 +14,15 @@ superseded_by: []
 
 `GenerationPlan` is the side-effect-free boundary between stream planning and prototype emission. The compiler creates every row, validates the complete set, and only then passes the finalized snapshot to mutation code.
 
-The exported plan artifact is schema 2. It contains a deterministic plan fingerprint, fingerprints for facts, rules, active compatibility packs, and the target profile, the complete row set, and a validation summary with action and reason counts.
+The exported stream plan artifact is schema 3. It contains a deterministic plan fingerprint, fingerprints for facts, rules, active compatibility packs, and the target profile, the complete row set, and a validation summary with action and reason counts.
 
-Every schema-2 row contains:
+`CompilationPlan` schema 2 globally finalizes materializing stream, adoption, and base-extension operations before the first emission. It adds a base-operation source fingerprint, stable operation ordering, a global fingerprint and validation summary, and rejects cross-part technology names, manifests, direct-effect identities, missing prerequisite targets, and unsupported effects.
+
+Every schema-3 row contains:
 
 | Field | Meaning |
 | --- | --- |
-| `schema` | Row schema version; currently `2`. |
+| `schema` | Row schema version; currently `3`. |
 | `manifest_id` | Stable generated-stream manifest identity. |
 | `stream_key` | Stable stream declaration key. |
 | `action` | `emit`, `adopt`, or `skip`. |
@@ -28,8 +30,10 @@ Every schema-2 row contains:
 | `reason` | Stable decision reason. |
 | `spec` | Canonical stream descriptor snapshot. |
 | `diagnostics` | Decision/report payload materialized after validation. |
-| `gates` | Explicit boolean target, effect, owner, science, lab, prerequisite, and loop-safety proofs. |
+| `gates` | Evidence records for target, effect, owner, science, lab, prerequisites, loops, progression, migration, and output identity. |
 
 An `emit` row also contains the stable technology name and all fields required by `StreamSpec`: effects, science ingredients, prerequisites, cost formula, research time, and maximum level. An `adopt` row contains the existing owner and exact effects to attach. A `skip` row contains no mutation intent.
 
-Whole-plan validation rejects duplicate stream keys, emitted manifest IDs, technology names, owner/recipe adoption identities, and any materializing row whose proof gate is false. A finalized plan is immutable to consumers because `snapshot()` and `artifact()` return deep copies.
+Each gate records `passed`, a `passed`, `failed`, or `not-applicable` status, stable evidence IDs, and an optional reason. Materializing rows must pass every gate. Skip rows record the failed or inapplicable proof directly instead of encoding gate state in a reason string.
+
+Whole-plan validation rejects duplicate stream keys, emitted manifest IDs, technology names, owner/recipe adoption identities, duplicate semantic effect identities across emission and adoption, and any materializing row whose proof gate fails. After all mutations, the compilation output validator compares full normalized effect values with a declared tolerance plus prerequisites, science ingredients, count formula, research time, maximum level, enabled/hidden/upgrade state when declared, and generated-registry records. Stream adoption is checked as an exact expected-effect subset; emitted stream and base-extension technologies require exact planned shapes. Snapshots are deep copies.
