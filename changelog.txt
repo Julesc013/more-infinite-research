@@ -8,7 +8,7 @@ Date: 2026-07-12
     - Preserved published 2.4.0 technology IDs, setting IDs, runtime namespaces, and save-compatible behavior.
     - Added RecipeFactV2, shared relationship indexes, schema-2 family rules, compatibility packs, and coverage accounting.
     - Applied Factorio 2.0 target-declared stream, effect, setting, recipe-shape, and emitter cuts.
-    - Retained whole-plan validation, deterministic packaging, and exact-owner safety gates from the modern source.
+    - Retained whole-plan safety checks, deterministic results, and exact-owner protections from the modern source.
 
 ---------------------------------------------------------------------------------------------------
 Version: 3.1.0
