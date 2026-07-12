@@ -186,7 +186,7 @@ assert_recipe_fact_contracts()
 local function assert_pipeline_command_contracts()
   local catalog = pipeline_commands.snapshot()
   local count = 0
-  local allowed_kinds = {mutation = true, emission = true, plan = true, assertion = true}
+  local allowed_kinds = {mutation = true, emission = true, plan = true, assertion = true, report = true}
   for id, command in pairs(catalog) do
     count = count + 1
     if command.id ~= id or not allowed_kinds[command.kind] then
@@ -197,7 +197,7 @@ local function assert_pipeline_command_contracts()
       fail("pipeline command " .. id .. " is missing requirements, ordering, or implementation ownership")
     end
   end
-  if count ~= 13 then fail("expected 13 governed pipeline commands, got " .. tostring(count)) end
+  if count ~= 19 then fail("expected 19 governed pipeline commands, got " .. tostring(count)) end
 end
 
 assert_pipeline_command_contracts()
