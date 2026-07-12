@@ -1429,3 +1429,11 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - automatic-generated-id-policy
+  - path: docs/maintainer/modpack-campaigns.md
+    title: "Modpack Campaigns"
+    status: current
+    audience: release-manager
+    doc_type: how-to
+    owner: mir-maintainers
+    source_of_truth_for:
+      - modpack-campaign-evidence-contract

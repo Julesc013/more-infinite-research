@@ -12,6 +12,19 @@ compatibility_packs:
   external_transport: more-infinite-research-compatibility-pack
   fixture_only_profiles_allowed_in_production_registry: false
 
+campaigns:
+  evidence_contract: mir-modpack-campaign-evidence-v1
+  exact_mir_archive_sha256_required: true
+  exact_mir_source_commit_required: true
+  dependency_lock_sha256_required: true
+  actual_executed_roots_required: true
+  root_versions_required: true
+  resolved_archive_sha256_required: true
+  result_and_claim_level_required: true
+  mega_smash_qualifies_individual_ecosystems: false
+  current_load_evidence:
+    - .mir/evidence/3.2.0-bz-bob-load-campaign-summary.json
+
 claims:
   allowed_levels:
     - loads

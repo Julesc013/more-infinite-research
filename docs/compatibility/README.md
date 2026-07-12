@@ -152,6 +152,8 @@ Manual scenarios can now be executed with `-RunManualScenarios`:
   -OutputDir .\artifacts\compat-audit-manual
 ```
 
+Exact release campaigns should also pass `-ModUnderTestZip` and `-ModUnderTestSourceCommit`. A load-tested run then writes `campaign-evidence.json` with the candidate SHA-256, dependency-lock fingerprint, actual roots, closure versions and SHA-256 values, result, timeout state, and claim level. See [modpack campaigns](../maintainer/modpack-campaigns.md).
+
 Sharded or resumed audits can use `-FromLockfile`, `-StartIndex`, `-Count`, and `-CandidateNames`:
 
 ```powershell
