@@ -2308,7 +2308,7 @@ function Initialize-RuntimeScenario {
   }
 
   $fixtureNames = @($fixtureInfos | Select-Object -ExpandProperty Name)
-  Initialize-MIRSettingsOverrideMod -ModsDir $modsDir
+  Initialize-MIRSettingsOverrideMod -ModsDir $modsDir -FactorioVersion ([string]$repoInfo.factorio_version)
 
   Enable-CopiedDiagnostics -ModsDir $modsDir
   if ($ScriptedDiagnostics) {

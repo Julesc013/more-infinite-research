@@ -1,5 +1,8 @@
 function Initialize-MIRSettingsOverrideMod {
-  param([Parameter(Mandatory)][string]$ModsDir)
+  param(
+    [Parameter(Mandatory)][string]$ModsDir,
+    [Parameter(Mandatory)][string]$FactorioVersion
+  )
 
   $path = Join-Path $ModsDir "mir-validation-settings-overrides"
   New-Item -ItemType Directory -Force -Path $path | Out-Null
@@ -8,7 +11,7 @@ function Initialize-MIRSettingsOverrideMod {
     version = "0.1.0"
     title = "MIR Validation Settings Overrides"
     author = "MIR validation harness"
-    factorio_version = "2.1"
+    factorio_version = $FactorioVersion
     dependencies = @("more-infinite-research")
   } | ConvertTo-Json -Depth 4 | Set-Content -LiteralPath (Join-Path $path "info.json") -Encoding UTF8
   @'
