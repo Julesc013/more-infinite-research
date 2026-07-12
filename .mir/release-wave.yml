@@ -161,4 +161,10 @@ waves:
     plan_v2_run_id: f037c887-593c-4daf-b302-2c64656b0051
     plan_v2_scenario_count: 83
     plan_v2_result: passed
+    generic_family_validation_source_commit: acd782023db8c88eb78287e778a911df2dcc0707
+    generic_family_summary_path: .mir/evidence/3.2.0-generic-family-runtime-gate-summary.json
+    generic_family_run_id: 0c2739c9-d278-4b3b-9444-d86907e3f674
+    generic_family_scenario_count: 84
+    generic_family_result: passed
+    reviewed_generic_family_id_count: 2
     status: integration-validated
