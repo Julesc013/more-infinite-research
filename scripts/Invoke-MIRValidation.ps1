@@ -606,6 +606,7 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
   $weaponSpeedFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-weapon-speed-safety\data-final-fixes.lua")
   $generationIntegrityFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-generation-integrity\data-final-fixes.lua")
   $generatedPrerequisiteFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-generated-prerequisite-safety\data-final-fixes.lua")
+  $generatedPrerequisiteSetupText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-generated-prerequisite-safety\data-updates.lua")
   $generatedPrerequisiteRuntimeText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-generated-prerequisite-safety\control.lua")
   $lateRecipeRemovalFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\rigor-late-recipe-removal\data-final-fixes.lua")
   $lateRecipeRemovalDataText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\rigor-late-recipe-removal\data.lua")
@@ -795,6 +796,8 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "fixtures\assert-generated-prerequisite-safety\data-final-fixes.lua"; Text = $generatedPrerequisiteFixtureText; Snippet = 'mir-fixture-self-lock-science-pack' },
     @{ File = "fixtures\assert-generated-prerequisite-safety\data-final-fixes.lua"; Text = $generatedPrerequisiteFixtureText; Snippet = 'mir-fixture-cycle-science-pack-a' },
     @{ File = "fixtures\assert-generated-prerequisite-safety\data-final-fixes.lua"; Text = $generatedPrerequisiteFixtureText; Snippet = 'missing-research-mechanism' },
+    @{ File = "fixtures\assert-generated-prerequisite-safety\data-updates.lua"; Text = $generatedPrerequisiteSetupText; Snippet = 'worker-robots-storage-3' },
+    @{ File = "fixtures\assert-generated-prerequisite-safety\data-final-fixes.lua"; Text = $generatedPrerequisiteFixtureText; Snippet = 'base extension was emitted from disabled worker-robots-storage-3' },
     @{ File = "fixtures\assert-generated-prerequisite-safety\control.lua"; Text = $generatedPrerequisiteRuntimeText; Snippet = 'force.research_all_technologies()' },
     @{ File = "prototypes\mir\index\recipe_unlocks.lua"; Text = $recipeUnlockIndexText; Snippet = 'function M.for_recipe(recipe_name)' },
     @{ File = "prototypes\mir\capabilities\science_integration"; Text = $scienceText; Snippet = 'S.researchable_unlockers_for_recipe = pack_production_reachability.researchable_unlockers_for_recipe' },

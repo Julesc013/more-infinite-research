@@ -230,7 +230,10 @@ local function plan_stream(key, raw_spec)
   end
 
   if direct_effects and #direct_effects > 0 then
-    local prerequisites = planner_prerequisites.build_for(key, ingredients)
+    local prerequisites, prerequisite_reason = planner_prerequisites.build_for(key, ingredients)
+    if prerequisite_reason then
+      return skip_row(key, spec, prerequisite_reason, ingredients, direct_effects, lab_status)
+    end
     local emitted_effects = effect_scaling.scale_stream_effects(key, spec, direct_effects)
     local fields = {
       localised_name = lname(key, spec),
@@ -285,7 +288,10 @@ local function plan_stream(key, raw_spec)
     return skip_row(key, spec, reason, ingredients, effects, lab_status)
   end
 
-  local prerequisites = planner_prerequisites.build_for(key, ingredients)
+  local prerequisites, prerequisite_reason = planner_prerequisites.build_for(key, ingredients)
+  if prerequisite_reason then
+    return skip_row(key, spec, prerequisite_reason, ingredients, effects, lab_status)
+  end
   local emitted_effects = effect_scaling.scale_stream_effects(key, spec, effects)
   local fields = {
     localised_name = lname(key, spec),

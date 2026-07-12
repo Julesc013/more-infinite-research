@@ -70,6 +70,7 @@ fixtures:
     validates:
       - generated-stream-prerequisites-exist-and-are-enabled
       - generated-stream-prerequisites-are-acyclic-and-reachable
+      - disabled-base-extension-anchor-is-skipped-before-emission
       - already-enabled-science-pack-recipe-needs-no-unlock
       - disabled-technology-unlocker-exclusion
       - deterministic-multiple-unlocker-selection

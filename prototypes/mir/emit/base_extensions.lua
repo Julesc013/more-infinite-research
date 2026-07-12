@@ -230,7 +230,7 @@ local function append_pack_prerequisites(prereqs, ingredients)
   for _, pair in ipairs(ingredients or {}) do
     local pack_name = pair.name or pair[1]
     local prereq = science_packs.prereq_tech_for_science_pack(pack_name)
-    if prereq and not seen[prereq] then
+    if prereq and science_packs.technology_is_researchable(prereq) and not seen[prereq] then
       seen[prereq] = true
       table.insert(prereqs, prereq)
     end
@@ -318,6 +318,11 @@ local function extend_chain(key)
   end
   if base_tech.max_level == "infinite" then
     D.extension(D.extension_fields(key, "skipped", "base_already_infinite"))
+    return
+  end
+  local base_researchability_reason = science_packs.technology_researchability_reason(chain_key .. "-" .. base_level)
+  if base_researchability_reason then
+    D.extension(D.extension_fields(key, "skipped", "unresearchable_base_technology_" .. base_researchability_reason))
     return
   end
   -- Allow anchoring when the base tech exists; vanilla-derived cost inference
@@ -491,7 +496,15 @@ local function extend_chain(key)
     ingredients = resolved_ingredients,
     time = research_time
   }
-  new.prerequisites = planner_prerequisites.append_end_game_gate_prerequisite(append_pack_prerequisites(new.prerequisites, resolved_ingredients))
+  local prerequisite_reason
+  new.prerequisites, prerequisite_reason = planner_prerequisites.append_end_game_gate_prerequisite(
+    append_pack_prerequisites(new.prerequisites, resolved_ingredients)
+  )
+  if prerequisite_reason then
+    log("[more-infinite-research] Skipping extension for " .. key .. ": " .. prerequisite_reason .. ".")
+    D.extension(D.extension_fields(key, "skipped", prerequisite_reason, resolved_ingredients, new.prerequisites, desired_effects, lab_status))
+    return
+  end
 
   if special and special.on_extend then
     special.on_extend(new, base_tech, spec)

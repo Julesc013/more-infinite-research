@@ -20,7 +20,10 @@ local function assert_reachable(name, complete, visiting, path)
     error("MIR generated technology graph references missing technology " .. tostring(name) .. ".", 3)
   end
   if technology.enabled == false then
-    error("MIR generated technology graph references disabled technology " .. name .. ".", 3)
+    local chain = {}
+    for _, entry in ipairs(path) do table.insert(chain, entry) end
+    table.insert(chain, name)
+    error("MIR generated technology graph references disabled technology " .. name .. " in path " .. table.concat(chain, " -> ") .. ".", 3)
   end
 
   visiting[name] = true

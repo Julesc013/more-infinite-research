@@ -63,6 +63,7 @@ This is the executable release queue. `.mir/release-wave.yml` is the machine-rea
 - [x] Materialize the RC2 deterministic archive, release notes, migration guide, validation summary, upgrade proof, campaign lock/evidence, and pending identity-bound GUI packet.
 - [x] Pass candidate freshness from the clean RC3 evidence commit with source, package, validation, upgrade, ecosystem, and pending-interactive bindings.
 - [ ] Complete and bind the GUI review without rebuilding the archive.
+- [ ] Rebuild and requalify after the representative planet cluster exposed a generated base extension anchored to a disabled prerequisite chain.
 - [ ] Push accepted `dev` to `main`, create the real 3.1.0 tag, publish exact validated bytes, then mark immutable.
 
 ## 2.4.0 Factorio 2.0 Companion
