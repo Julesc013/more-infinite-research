@@ -1,35 +1,35 @@
-   0.001 2026-07-12 12:49:15; Factorio 1.1.110 (build 62357, win64, full)
+   0.001 2026-07-13 08:33:10; Factorio 1.1.110 (build 62357, win64, full)
    0.001 Operating system: Windows 10 (build 19045) 
-   0.002 Program arguments: "D:\Programs\Factorio\1.1\bin\x64\factorio.exe" "--config" "C:\Projects\Factorio\more-infinite-research-old-wave\artifacts\old-wave\1.9.4\config-upgrade-proof.ini" "--no-log-rotation" "--disable-audio" "--mod-directory" "C:\Projects\Factorio\more-infinite-research-old-wave\artifacts\old-wave\1.9.4\prior-proof-mods" "--benchmark" "C:\Projects\Factorio\more-infinite-research-old-wave\artifacts\old-wave\1.9.4\upgrade-proof-from-1.9.3.zip" "--benchmark-ticks" "1" "--benchmark-runs" "1" 
+   0.001 Program arguments: "D:\Programs\Factorio\1.1\bin\x64\factorio.exe" "--config" "C:\Projects\Factorio\more-infinite-research-old-wave\artifacts\old-wave\1.9.4\config-upgrade-proof.ini" "--no-log-rotation" "--disable-audio" "--mod-directory" "C:\Projects\Factorio\more-infinite-research-old-wave\artifacts\old-wave\1.9.4\prior-proof-mods" "--benchmark" "C:\Projects\Factorio\more-infinite-research-old-wave\artifacts\old-wave\1.9.4\upgrade-proof-from-1.9.3.zip" "--benchmark-ticks" "1" "--benchmark-runs" "1"
    0.002 Config path: C:/Projects/Factorio/more-infinite-research-old-wave/artifacts/old-wave/1.9.4/config-upgrade-proof.ini
    0.002 Read data path: D:/Programs/Factorio/1.1/data
-   0.002 Write data path: C:/Projects/Factorio/more-infinite-research-old-wave/artifacts/old-wave/1.9.4/user-upgrade-proof [15556/450559MB]
+   0.002 Write data path: C:/Projects/Factorio/more-infinite-research-old-wave/artifacts/old-wave/1.9.4/user-upgrade-proof [18527/450559MB]
    0.002 Binaries path: D:/Programs/Factorio/1.1/bin
-   0.012 System info: [CPU: Intel(R) Core(TM) i7-7700HQ CPU @ 2.80GHz, 8 cores, RAM: 10686/16257 MB, page: 16247/20227 MB, virtual: 4257/134217727 MB, extended virtual: 0 MB]
-   0.032 Memory info:
-   0.032  [0]: 066D TN48G24S817-VHA/R 8192 MB 2400 MHz 1.2 v
-   0.032  [1]: 066D TN48G24S817-VHA/R 8192 MB 2400 MHz 1.2 v
-   0.034 Running in headless mode
-   0.052 Loading mod settings more-infinite-research 1.9.4 (settings.lua)
-   0.063 Loading mod core 0.0.0 (data.lua)
-   0.089 Loading mod base 1.1.110 (data.lua)
-   0.322 Loading mod more-infinite-research 1.9.4 (data.lua)
-   0.339 Loading mod base 1.1.110 (data-updates.lua)
-   0.352 Loading mod more-infinite-research 1.9.4 (data-updates.lua)
-   0.363 Loading mod more-infinite-research 1.9.4 (data-final-fixes.lua)
-   0.431 Script @__more-infinite-research__/prototypes/mir/planner/direct_effects.lua:17: [more-infinite-research] Skipping unavailable gun-speed effect for research_electric_shooting_speed: missing ammo category tesla
-   0.743 Checksum for core: 607699937
-   0.743 Checksum of base: 2464433227
-   0.743 Checksum of more-infinite-research: 2240444246
-   0.993 Prototype list checksum: 1221069375
-   1.054 Info PlayerData.cpp:78: Local player-data.json unavailable
-   1.054 Info PlayerData.cpp:83: Cloud player-data.json unavailable
-   1.055 Info GlobalContext.cpp:1317: Resetting config.
-   1.056 Factorio initialised
-   1.057 Loading map C:\Projects\Factorio\more-infinite-research-old-wave\artifacts\old-wave\1.9.4\upgrade-proof-from-1.9.3.zip: 704219 bytes.
-   1.190 Loading level.dat: 1170209 bytes.
-   1.203 Info Scenario.cpp:204: Map version 1.1.110-0
-   1.270 Loading script.dat: 1211 bytes.
-   1.276 Checksum for script C:/Projects/Factorio/more-infinite-research-old-wave/artifacts/old-wave/1.9.4/user-upgrade-proof/temp/currently-playing/control.lua: 3702463597
-   1.277 Checksum for script __more-infinite-research__/control.lua: 1368249708
-   1.372 Goodbye
+   0.010 System info: [CPU: Intel(R) Core(TM) i7-7700HQ CPU @ 2.80GHz, 8 cores, RAM: 9556/16257 MB, page: 15032/18739 MB, virtual: 4257/134217727 MB, extended virtual: 0 MB]
+   0.028 Memory info:
+   0.028  [0]: 066D TN48G24S817-VHA/R 8192 MB 2400 MHz 1.2 v
+   0.028  [1]: 066D TN48G24S817-VHA/R 8192 MB 2400 MHz 1.2 v
+   0.029 Running in headless mode
+   0.038 Loading mod settings more-infinite-research 1.9.4 (settings.lua)
+   0.047 Loading mod core 0.0.0 (data.lua)
+   0.074 Loading mod base 1.1.110 (data.lua)
+   0.300 Loading mod more-infinite-research 1.9.4 (data.lua)
+   0.314 Loading mod base 1.1.110 (data-updates.lua)
+   0.326 Loading mod more-infinite-research 1.9.4 (data-updates.lua)
+   0.337 Loading mod more-infinite-research 1.9.4 (data-final-fixes.lua)
+   0.375 Script @__more-infinite-research__/prototypes/mir/planner/direct_effects.lua:17: [more-infinite-research] Skipping unavailable gun-speed effect for research_electric_shooting_speed: missing ammo category tesla
+   0.526 Checksum for core: 607699937
+   0.526 Checksum of base: 2464433227
+   0.526 Checksum of more-infinite-research: 1407689814
+   0.726 Prototype list checksum: 1221069375
+   0.782 Info PlayerData.cpp:76: Local player-data.json available, timestamp 1783895461
+   0.782 Info PlayerData.cpp:83: Cloud player-data.json unavailable
+   0.785 Info GlobalContext.cpp:1317: Resetting config.
+   0.785 Factorio initialised
+   0.786 Loading map C:\Projects\Factorio\more-infinite-research-old-wave\artifacts\old-wave\1.9.4\upgrade-proof-from-1.9.3.zip: 704219 bytes.
+   0.927 Loading level.dat: 1170209 bytes.
+   0.932 Info Scenario.cpp:204: Map version 1.1.110-0
+   0.999 Loading script.dat: 1211 bytes.
+   1.003 Checksum for script C:/Projects/Factorio/more-infinite-research-old-wave/artifacts/old-wave/1.9.4/user-upgrade-proof/temp/currently-playing/control.lua: 3702463597
+   1.005 Checksum for script __more-infinite-research__/control.lua: 1368249708
+   1.096 Goodbye

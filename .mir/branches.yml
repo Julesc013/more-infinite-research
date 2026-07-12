@@ -107,10 +107,10 @@ release_artifacts:
       branch: tmp/1.1
       target_factorio: "1.1"
       source_anchor: mir_1_9_3
-      source_commit: 498408854170e893a0fa13bdbd11930197892b1d
+      source_commit: 30ef8c7cab3c049aa0bb5efa0d74dd12e9c1ec40
       artifact: dist/more-infinite-research_1.9.4.zip
-      sha256: 431CD5B011B678B089BB4F9B04B22EB5DD32A3411EDB8E7E453E02D920E3A46E
-      size_bytes: 302312
+      sha256: 9184524A2E37115F6D30830191054F70AE556142306E226CDAE4308DC7285A35
+      size_bytes: 302681
       entries: 124
       forbidden_entries: 0
       automated_gate: passed
