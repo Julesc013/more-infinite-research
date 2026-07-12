@@ -297,6 +297,20 @@ fixtures:
       - existing-stable-stream-only
       - safe-generate-gated-lab-manufacturing
 
+  compiler-contracts:
+    requires_features: [recipe_productivity]
+    assertion_path: fixtures/assert-compiler-contracts
+    validates:
+      - invalid-family-rule-rejection
+      - invalid-compatibility-pack-rejection
+      - stable-rule-and-pack-sorting
+      - deterministic-rule-precedence
+      - equal-precedence-conflict-rejection
+      - compatibility-pack-target-and-applicability-filtering
+      - stable-generation-plan-identities
+      - insertion-order-independent-plan-fingerprints
+      - cyclic-fingerprint-rejection
+
   semantic-family-generate:
     requires_features: [recipe_productivity]
     path: fixtures/semantic-family-attach

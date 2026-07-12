@@ -84,6 +84,12 @@ end
 function Plan:finalize()
   if self.finalized then return self end
 
+  table.sort(self.rows, function(a, b)
+    if a.stream_key ~= b.stream_key then return a.stream_key < b.stream_key end
+    if a.action ~= b.action then return a.action < b.action end
+    return tostring(a.manifest_id) < tostring(b.manifest_id)
+  end)
+
   local stream_keys = {}
   local manifest_ids = {}
   local technology_names = {}

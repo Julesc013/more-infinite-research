@@ -36,13 +36,12 @@ local function assert_data_only(value, path)
   end
 end
 
-local function build()
-  if canonical then return canonical end
-  if raw.schema ~= 2 then error("FamilyRule registry schema must be 2", 2) end
-  assert_data_only(raw, "family_rules")
+local function validate(source)
+  if source.schema ~= 2 then error("FamilyRule registry schema must be 2", 2) end
+  assert_data_only(source, "family_rules")
 
   local rules, ids = {}, {}
-  for _, rule in ipairs(raw.rules or {}) do
+  for _, rule in ipairs(source.rules or {}) do
     if type(rule.id) ~= "string" or rule.id == "" then error("FamilyRule id is required", 2) end
     if ids[rule.id] then error("Duplicate FamilyRule id: " .. rule.id, 2) end
     if rule.schema ~= 2 then error("FamilyRule schema must be 2: " .. rule.id, 2) end
@@ -88,8 +87,18 @@ local function build()
     table.insert(rules, deepcopy(rule))
   end
   table.sort(rules, function(a, b) return a.id < b.id end)
-  canonical = {schema = 2, rules = rules}
+  return {schema = 2, rules = rules}
+end
+
+local function build()
+  if canonical then return canonical end
+  canonical = validate(raw)
   return canonical
+end
+
+function M.validate(source)
+  if type(source) ~= "table" then error("FamilyRule registry must be a table", 2) end
+  return deepcopy(validate(source))
 end
 
 function M.snapshot()

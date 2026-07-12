@@ -745,6 +745,14 @@
         "group": "space-age",
         "surface": "space-age",
         "required_features": []
+      },
+      {
+        "name": "compiler-contracts",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "local-mod-library",
+        "surface": "base",
+        "required_features": []
       }
     ]
   }

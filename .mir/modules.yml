@@ -182,6 +182,7 @@ modules:
     - prototypes/mir/compatibility/profiles.lua
     - prototypes/mir/compatibility/packs/schema.lua
     - prototypes/mir/compatibility/packs/registry.lua
+    - prototypes/mir/compatibility/packs/precedence.lua
     - prototypes/mir/compatibility/planner.lua
     - prototypes/mir/compatibility/overlay_loader.lua
     - prototypes/mir/compatibility/claim_registry.lua

@@ -2099,6 +2099,7 @@ $postMirAssertionFixtures = @(
   "mir-fixture-assert-atan-nuclear-science-productivity",
   "mir-fixture-assert-better-bot-battery-skip",
   "mir-fixture-assert-big-mining-drill-productivity",
+  "mir-fixture-assert-compiler-contracts",
   "mir-fixture-assert-semantic-family-attach",
   "mir-fixture-assert-semantic-family-generate",
   "mir-fixture-assert-capability-negative-cases",
@@ -3210,6 +3211,10 @@ $bigMiningCapabilityLine = Get-DiagnosticReportLineContaining -Kind "decision" -
 Assert-ReportLineContains -Line $bigMiningCapabilityLine -Expected "decision=generate_stream" -Context "Big Mining Drill capability resolver scenario"
 Assert-ReportLineContains -Line $bigMiningCapabilityLine -Expected "subfamily=mining_drill" -Context "Big Mining Drill capability subfamily scenario"
 Assert-ReportLineContains -Line $bigMiningCapabilityLine -Expected "evidence=item_type:item,item_place_result:big-mining-drill,entity_type:mining-drill,recipe_outputs_item:big-mining-drill" -Context "Big Mining Drill entity-backed evidence scenario"
+
+Invoke-RuntimeScenario -ScenarioName "compiler-contracts" -EnabledFixtureNames @(
+  "mir-fixture-assert-compiler-contracts"
+)
 
 Invoke-RuntimeScenario -ScenarioName "semantic-family-attach" -EnabledFixtureNames @(
   "mir-fixture-semantic-family-attach",
