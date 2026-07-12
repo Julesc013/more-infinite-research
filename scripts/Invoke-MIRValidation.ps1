@@ -3114,6 +3114,55 @@ if ($selectionActive) {
           $parameters[$property.Name] = $property.Value
         }
         Invoke-RuntimeScenario @parameters
+      } elseif ($declaration.kind -eq "configuration-change") {
+        switch ($declaration.name) {
+          "space-age-vanilla-family-adoption-config-change" {
+            Invoke-RuntimeConfigurationChangeScenario `
+              -ScenarioName $declaration.name `
+              -ChangedFixtureNames @("mir-fixture-vanilla-family-adoption-recipes") `
+              -EnableSpaceAge
+            Assert-LogContains -Expected "Reset technology effects for productivity family adoption signature change" -Context $declaration.name
+            Assert-LogContains -Expected "schema=1|owner=rocket-fuel-productivity|recipe=mir-fixture-adopt-rocket-fuel|change=0.1" -Context $declaration.name
+          }
+          "space-age-scripted-runtime-lifecycle" {
+            Invoke-RuntimeConfigurationChangeScenario `
+              -ScenarioName $declaration.name `
+              -InitialFixtureNames @("mir-fixture-assert-scripted-runtime-lifecycle") `
+              -ChangedFixtureNames @("mir-fixture-assert-scripted-runtime-lifecycle") `
+              -EnabledStreamKeys @("research_spoilage_preservation") `
+              -EffectPerLevelOverrides @{ research_spoilage_preservation = 2 } `
+              -ScriptedDiagnostics `
+              -EnableSpaceAge
+            Assert-LogContains -Expected "[mir-fixture] scripted lifecycle retention proof complete" -Context $declaration.name
+          }
+          "space-age-scripted-runtime-disable-restoration" {
+            Invoke-RuntimeConfigurationChangeScenario `
+              -ScenarioName $declaration.name `
+              -InitialFixtureNames @("mir-fixture-assert-scripted-runtime-lifecycle") `
+              -ChangedFixtureNames @("mir-fixture-assert-scripted-runtime-lifecycle") `
+              -InitialEnabledStreamKeys @("research_spoilage_preservation") `
+              -ChangedDisabledStreamKeys @("research_spoilage_preservation") `
+              -EffectPerLevelOverrides @{ research_spoilage_preservation = 2 } `
+              -ScriptedDiagnostics `
+              -EnableSpaceAge
+            Assert-LogContains -Expected "[mir-fixture] scripted lifecycle disable proof complete" -Context $declaration.name
+          }
+          "space-age-scripted-runtime-reenable" {
+            Invoke-RuntimeConfigurationChangeScenario `
+              -ScenarioName $declaration.name `
+              -InitialFixtureNames @("mir-fixture-assert-scripted-runtime-lifecycle") `
+              -ChangedFixtureNames @("mir-fixture-assert-scripted-runtime-lifecycle") `
+              -InitialDisabledStreamKeys @("research_spoilage_preservation") `
+              -ChangedEnabledStreamKeys @("research_spoilage_preservation") `
+              -EffectPerLevelOverrides @{ research_spoilage_preservation = 2 } `
+              -ScriptedDiagnostics `
+              -EnableSpaceAge
+            Assert-LogContains -Expected "[mir-fixture] scripted lifecycle enable proof complete" -Context $declaration.name
+          }
+          default {
+            throw "Selected validation has no configuration-change executor for $($declaration.name)."
+          }
+        }
       } else {
         throw "Selected validation currently requires a manifest-driven runtime or package scenario: $($declaration.name)"
       }
