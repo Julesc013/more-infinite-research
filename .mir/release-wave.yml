@@ -184,4 +184,11 @@ waves:
     rule_pack_schema_result: passed
     family_rule_schema: 2
     compatibility_pack_schema: 2
+    core_ecosystem_load_evidence: .mir/evidence/3.2.0-core-ecosystems-load-campaign.json
+    core_ecosystem_load_source_commit: bae27f521070bd62a13ec54689818cd8394b3554
+    core_ecosystem_load_archive_sha256: 54CB6E7A3139F9A9FC78A0E5455FCFC16E8EF07439F47975B67A4BC7AA5F40E1
+    core_ecosystem_dependency_lock_sha256: 47263935C52C6A2E231FCB0E39B7557F58645B9615FB6C30FCEBB79089BBFD8C
+    core_ecosystem_load_scenarios: 4
+    core_ecosystem_load_result: passed
+    core_ecosystem_load_claim_level: loads
     status: integration-validated
