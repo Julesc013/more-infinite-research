@@ -58,10 +58,9 @@
       "mods": [
         "aai-containers",
         "aai-industry",
-        "aai-loaders",
-        "big-mining-drill"
+        "aai-loaders"
       ],
-      "notes": "Representative AAI transport and placeable-machine extension gate without using a mega-smash as ecosystem proof."
+      "notes": "Representative AAI container, transport, and Industry machine gate without using a mega-smash as ecosystem proof. Big Mining Drill is intentionally separate because its archive declares AAI Industry incompatible."
     },
     {
       "name": "local-2-1-space-age-mega-smash",
