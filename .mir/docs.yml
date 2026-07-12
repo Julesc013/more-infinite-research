@@ -1155,8 +1155,8 @@ docs:
     owner: mir-maintainers
     source_of_truth_for: []
   - path: docs/releases/3.1.0-roadmap.md
-    title: "3.1.0 Roadmap"
-    status: draft
+    title: "MIR 3.1.0 Automatic Compiler Roadmap"
+    status: current
     audience: release-manager
     doc_type: release-plan
     owner: mir-maintainers
