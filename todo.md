@@ -40,7 +40,7 @@ This is the executable release queue. `.mir/release-wave.yml` is the machine-rea
 - [x] Add minimal-Factorio pure schema and algorithm tests for invalid FamilyRules, invalid CompatibilityPacks, equal-precedence conflicts, deterministic precedence, target/applicability filtering, stable IDs, stable sorting, and deterministic fingerprints.
 - [x] Move competing-owner replacement, productivity-family adoption, weapon-speed, and max-level mutation bodies out of `policy/` into `pipeline/mutations/` or `emit/transactions/`; policy stays plan-only.
 - [x] Replace remaining hybrid target denylists with positive feature, mod, effect, emitter, and shape declarations; every target now fails closed from allowlists.
-- [ ] Add plan export/diff, coverage export, compatibility-pack scaffold, snapshot minimizer, and target-plan diff tooling.
+- [x] Add deterministic plan/coverage snapshot export, plan and target-plan diff, review-required CompatibilityPack scaffolding, snapshot minimization, and static tool tests.
 - [ ] Consolidate the final effect/stream/rule/pack documentation tables and add schema drift checks.
 - [ ] Review every automatic effect value and generated science/prerequisite choice for balance and reachability.
 - [ ] Decide whether beacon, rail/support, ammunition, armor, battery, circuit, plate, structural-component, or fluid-process families remain report-only or receive fixture-backed rules.

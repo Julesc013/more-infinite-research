@@ -468,6 +468,10 @@ Invoke-RepoCheck "scenario schema 2 manifests own complete execution records" {
   & (Join-Path $repo "scripts\Test-MIRScenarioManifests.ps1") -RepoRoot $repo
 }
 
+Invoke-RepoCheck "planner artifact tools are deterministic and schema-bound" {
+  & (Join-Path $repo "scripts\Test-MIRPlannerTools.ps1") -RepoRoot $repo
+}
+
 Invoke-RepoCheck "compatibility dependency declarations preserve full mod names" {
   & (Join-Path $repo "scripts\Test-MIRDependencyResolver.ps1") -RepoRoot $repo
 }

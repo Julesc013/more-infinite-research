@@ -348,6 +348,7 @@ validation_tooling:
     scenario_registry: scripts/validation/ScenarioRegistry.ps1
     golden_plans: scripts/Test-MIRGoldenPlans.ps1
     campaign_scenarios: scripts/Test-MIRScenarioManifests.ps1
+    planner_artifacts: scripts/Test-MIRPlannerTools.ps1
   rules:
     - the facade preserves its public parameters and structured result schema
     - process launch and copied-mod filesystem safety are reusable modules
