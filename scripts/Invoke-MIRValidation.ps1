@@ -2911,6 +2911,10 @@ if ($isFactorio11Line) {
   $weaponSpeedLine = Get-LastExtensionReportLine -Key "weapon-shooting-speed"
   Assert-ReportLineGenerated -Line $weaponSpeedLine -Context "Factorio 1.1 weapon shooting speed overlap safety scenario"
 
+  Invoke-RuntimeScenario -ScenarioName "generated-prerequisite-safety" -EnabledFixtureNames @(
+    "mir-fixture-assert-generated-prerequisite-safety"
+  ) -SciencePackIngredientPolicy "all"
+
   if ($usesGeneratedUserDataDir -and (Test-Path -LiteralPath $validationRoot)) {
     Remove-Item -LiteralPath $validationRoot -Recurse -Force
   }
