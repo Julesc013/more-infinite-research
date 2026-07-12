@@ -17,12 +17,12 @@ local_campaign_manifest:
 golden_plans:
   stable_technology_ids:
     path: fixtures/golden-plans/stable-technology-ids.json
-    baseline: immutable-3.1.0
+    baseline: published-3.0.5
     expected_count: 70
     validator: scripts/Test-MIRGoldenPlans.ps1
   automatic_family_technology_ids:
     path: fixtures/golden-plans/automatic-family-technology-ids.json
-    release: "3.2.0"
+    release: "3.1.0"
     expected_count: 2
     validator: scripts/Test-MIRGoldenPlans.ps1
 
@@ -153,15 +153,15 @@ fixtures:
       - runtime-state-effect-retention
       - exact-3-1-0-candidate-normal-mod-directory-load
 
-  upgrade-3-1-0-to-3-2-0:
+  upgrade-3-0-5-to-3-1-0-automatic-compiler:
     requires_features: [scripted_techs]
-    assertion_path: fixtures/assert-upgrade-3-1-0-to-3-2-0
+    assertion_path: fixtures/assert-upgrade-3-0-5-to-3-1-0-automatic-compiler
     validates:
-      - exact-3-1-0-source-archive
+      - exact-3-0-5-source-archive
       - non-default-startup-setting-retention
       - scripted-technology-level-retention
       - runtime-state-effect-retention
-      - exact-3-2-0-candidate-normal-mod-directory-load
+      - exact-3-1-0-automatic-compiler-candidate-normal-mod-directory-load
 
   competing-productivity-transaction:
     requires_features: [recipe_productivity]

@@ -22,10 +22,11 @@ campaigns:
   resolved_archive_sha256_required: true
   result_and_claim_level_required: true
   mega_smash_qualifies_individual_ecosystems: false
-  current_load_evidence:
-    - .mir/evidence/3.2.0-bz-bob-load-campaign-summary.json
-    - .mir/evidence/3.2.0-core-ecosystems-load-campaign.json
-    - .mir/evidence/3.2.0-aai-load-campaign.json
+  pre_renumber_load_characterization:
+    - .mir/evidence/pre-3.1-renumber-bz-bob-load-campaign-summary.json
+    - .mir/evidence/pre-3.1-renumber-core-ecosystems-load-campaign.json
+    - .mir/evidence/pre-3.1-renumber-aai-load-campaign.json
+  final_3_1_0_load_evidence: pending
 
 claims:
   allowed_levels:

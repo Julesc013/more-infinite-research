@@ -1,41 +1,24 @@
 ---------------------------------------------------------------------------------------------------
-Version: 3.2.0
-Date: 2026-07-12
-
-  Changes:
-
-    - Started the plan-first automatic family compiler from the immutable 3.1.0 behavior baseline.
-    - Routed fixed streams and deferred productivity-family adoption through whole-plan checks before mutation.
-    - Added variant-preserving recipe facts and shared relationship indexes for structural family discovery.
-    - Attached structurally proven manufacturing recipes to existing stable streams without creating new technology IDs.
-    - Added data-only family-rule and compatibility-pack contracts, dependency-ordered commands, and stable ID golden checks.
-
----------------------------------------------------------------------------------------------------
 Version: 3.1.0
 Date: 2026-07-12
 
   Changes:
 
-    - Started the bounded 3.1 contract modernization from the immutable 3.0.5 behavior baseline.
-    - Preserved released generated IDs, setting IDs and defaults, profile schema, and runtime namespaces as protected contracts.
-    - Recorded exact 3.0.5 package, target, settings, stream, runtime, and diagnostic characterization evidence.
-    - Normalized every stream into a typed canonical descriptor shared by settings and planning.
-    - Made effect defaults invariant under declaration order and isolated canonical descriptors from require-cache mutation.
-    - Made duplicate stream IDs, unknown overlay streams, and overlay descriptor injection fail closed.
-    - Split science integration into pack registry, lab compatibility, recipe unlock facts, and technology researchability.
-    - Separated pack production reachability and science selection policy from shared facts.
-    - Preserved the public science facade and existing deterministic rejection reason codes while isolating fact caches.
-    - Added immutable build-once recipe facts and indexes for stream matching and science reachability.
-    - Replaced maintained 2.1 and 2.0 stream/effect denylists with positive mod and effect support declarations.
-    - Made package ZIP entry order, timestamps, attributes, and compression inputs deterministic.
-    - Routed data-final-fixes passes through named commands with owned implementations and positive target requirements.
-    - Made settings catalog snapshots immutable, target-positive, and descriptor-ordered.
-    - Added conservative recycler-loop handling for ambiguous paths, byproducts, fluids, variants, and conversion cycles.
-    - Routed loader, mining-drill, and native-owner capability diagnostics through a validated lifecycle.
-    - Covered scripted effects across level reversal, force changes, save reloads, settings toggles, and baseline restoration.
-    - Split developer load tooling into reusable process, setting, target, grouping, package, and result modules.
-    - Added target-explicit scenario declarations and budgets for base, Space Age, caps, diagnostics, local packs, and full runs.
-    - Proved exact 3.0.5 upgrades retain non-default settings, research levels, persisted state, and scripted effects.
+    - Added automatic structural coverage for loaders, belts, drills, inserters, furnaces, machines, labs, and modules.
+    - Added structural coverage for solar generation and power storage equipment.
+    - Added conservative automatic modes ranging from reporting only through reviewed generic family generation.
+    - Preserved existing technology names, setting names, defaults, profiles, and saved-game state.
+    - Added whole-plan safety checks before any generated technology or adopted effect is applied.
+    - Preserved recipe variants, fluids, probabilities, catalysts, surfaces, and productivity exclusions during discovery.
+    - Rejected recycling, self-return, catalyst, voiding, transmutation, ambiguous-owner, and unsafe multi-output loops.
+    - Preferred an exact existing productivity owner instead of creating duplicate infinite research.
+    - Added complete recipe accounting with stable reasons for covered, external, safe-skip, unsafe, and unresolved recipes.
+    - Added positive target capabilities so unsupported effects, settings, and prototype shapes fail closed.
+    - Made generated outputs and archive construction deterministic.
+    - Improved science-pack, lab, prerequisite, and technology reachability decisions.
+    - Added independent compatibility load coverage for AAI, BZ, Bob, Krastorio, and Krastorio Spaced Out.
+    - Kept complex chemistry, recovery, recycling, catalysts, and byproduct loops conservative unless explicitly proven safe.
+    - Preserved non-default settings, research levels, saved state, and scripted effects when upgrading from 3.0.5.
 
 ---------------------------------------------------------------------------------------------------
 Version: 3.0.5

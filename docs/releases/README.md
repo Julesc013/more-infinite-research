@@ -14,7 +14,7 @@ superseded_by: []
 
 Release docs are version-specific plans, migration guides, risk registers, checklists, and validation records.
 
-MIR 3.1.0 and 2.4.0 are published immutable behavior baselines. The 3.2.0 development summary and backport-wave dashboard govern the automatic compiler campaign. The 1.6.0 and 1.5.0 plans are the current plans for Factorio 0.16 and 0.15; archived older-number plans remain historical evidence.
+MIR 3.0.5 and 2.3.5 are the published immutable behavior baselines. The unreleased 3.1.0 automatic-compiler development summary and backport-wave dashboard govern the current campaign. MIR 2.4.0 begins only after 3.1.0 acceptance, followed by 1.9.4, 1.8.2, 1.7.1, 1.6.0, 1.5.0, 1.4.0, and 1.3.0. MIR 3.2.0 does not open on `dev` until that stability ladder and its portable-return sweep are complete.
 
 - [3.0.0 plan](3.0.0-plan.md)
 - [3.0.0 regression baseline](3.0.0-regression-baseline.md)
@@ -39,7 +39,7 @@ MIR 3.1.0 and 2.4.0 are published immutable behavior baselines. The 3.2.0 develo
 - [3.1.0 migration guide](3.1.0-migration-guide.md)
 - [3.1.0 validation summary](3.1.0-validation-summary.md)
 - [3.1.0 roadmap](3.1.0-roadmap.md)
-- [3.2.0 development summary](3.2.0-development-summary.md)
+- [3.1.0 automatic compiler development summary](3.1.0-automatic-compiler-development-summary.md)
 - [1.6.0 Factorio 0.16 plan](1.6.0-plan.md)
 - [1.5.0 Factorio 0.15 plan](1.5.0-plan.md)
 - [2.2.0 validation record](2.2.0-validation-record.md)

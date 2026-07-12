@@ -1,7 +1,7 @@
 ---
 title: "FamilyRule Schema"
 status: current
-applies_to: "3.2.0+"
+applies_to: "3.1.0+"
 audience: developer
 doc_type: reference
 owner: mir-maintainers

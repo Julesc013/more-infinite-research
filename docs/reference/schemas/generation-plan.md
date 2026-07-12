@@ -1,7 +1,7 @@
 ---
 title: "GenerationPlan Schema"
 status: current
-applies_to: "post-3.1 dev"
+applies_to: "3.1.0+"
 audience: developer
 doc_type: reference
 owner: mir-maintainers

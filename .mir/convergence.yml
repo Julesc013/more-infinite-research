@@ -1,11 +1,11 @@
 schema: 1
 
 release:
-  version: "3.2.0"
+  version: "3.1.0"
   branch: dev
   factorio_version: "2.1"
-  baseline_commit: 0dd8d7f27d9bbbbb728a70ef00b7c955af48cbb7
-  baseline_tag: "3.1.0"
+  baseline_commit: 89d7764c4f0f5b67f7b2a2ca0a3827006e3a63d7
+  baseline_tag: "3.0.5"
   objective: plan-first-automatic-family-compiler
   public_contract_change: minor-compatible
 
@@ -105,15 +105,11 @@ candidate:
   structured_summary_run_id: a961b15a-a018-4ebe-9799-f6bafc8bc2ed
   validation_package_sha256: 6E241687B13F99561D24E18A7D0F1EFC4DFE5B2FCD3D7A084EE83B85D67865FD
   validation_package_content_sha256: 5D5162EEAF13E87E2FB1A5A2A31B5EC14ABDCCD2308CFAF8E70C20297C56E82F
-  automated_gate: passed
-  manual_gate: accepted-for-publication
-  release_commit: 6272cb67c96855c574c96032cb27dfcf0721aa74
-  release_tag: "3.1.0"
-  published_at: 2026-07-11T22:33:10Z
-  publication_scope: github-release
-  github_release: https://github.com/Julesc013/more-infinite-research/releases/tag/3.1.0
-  mod_portal_upload: blocked-missing-mod-upload-api-key
-  status: published
+  automated_gate: superseded-by-automatic-compiler-refactor
+  manual_gate: superseded-unreleased-candidate
+  candidate_commit: 6272cb67c96855c574c96032cb27dfcf0721aa74
+  publication_scope: none
+  status: superseded-unreleased-candidate
 
 rules:
   - dev-remains-the-canonical-modern-implementation

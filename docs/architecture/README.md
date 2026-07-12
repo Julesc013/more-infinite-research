@@ -215,7 +215,7 @@ New mod support should add policy and fixtures first. New behavior classes shoul
 
 The `3.0.0` line promotes this kernel into the public compatibility compiler architecture. Use `docs/architecture/compatibility-compiler-charter.md` as the source of truth for the 3.0 charter, invariants, module boundaries, non-goals, release ladder, and acceptance gates. Use `docs/capabilities/README.md`, `docs/compatibility/policy-overlays.md`, `docs/reference/schemas/decision-record.md`, `docs/reference/schemas/stream-manifest.md`, `docs/compatibility/claim-levels.md`, `docs/maintainer/testing.md`, and `docs/maintainer/README.md` for the focused 3.0 subsystem guidance. Use `docs/architecture/module-boundaries.md` for the concrete 3.0 repository shape: thin Factorio root files, the `prototypes/mir/` compiler namespace, Factorio adapters under `platform/`, no old shim directories on the main 3.x line, and the development-only workspace boundary.
 
-Development after the immutable 3.1.0 release is governed by `docs/architecture/automatic-family-compiler.md`. It adds a pure whole-plan boundary, consolidated semantic facts, data-only family rules, and attach-only automatic coverage before any new generated technology identity is considered.
+Unreleased MIR 3.1.0 automatic-compiler development is governed by `docs/architecture/automatic-family-compiler.md` from the published 3.0.5 baseline. It adds a pure whole-plan boundary, consolidated semantic facts, data-only family rules, and attach-only automatic coverage before any new generated technology identity is considered.
 
 ## Diagnostics
 

@@ -1,9 +1,9 @@
 schema: 1
 
-release: 3.2.0
+release: 3.1.0
 factorio_line: "2.1"
 budget_manifest: .mir/performance-budgets.json
-accepted_evidence: .mir/evidence/3.2.0-coverage-performance-runtime-summary.json
+accepted_evidence: pending-3.1.0-renumbered-runtime-gate
 
 measurement_policy:
   - Budgets are set before performance optimization and include host-load headroom.

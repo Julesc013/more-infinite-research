@@ -1,7 +1,7 @@
 ---
 title: "Automatic Family Compiler"
 status: current
-applies_to: "post-3.1 dev"
+applies_to: "3.1.0 dev"
 audience: maintainer
 doc_type: explanation
 owner: mir-maintainers
@@ -12,7 +12,7 @@ superseded_by: []
 
 # Automatic Family Compiler
 
-MIR 3.1.0 is the immutable released behavior baseline. Development after that release turns its fixed declarative stream compiler into a plan-first semantic family compiler. This work originates on `dev`; it does not rebuild, retag, or change the published 3.1.0 archive.
+MIR 3.0.5 is the published immutable behavior baseline. MIR 3.1.0 turns its fixed declarative stream compiler into a plan-first semantic family compiler on `dev`. Earlier 3.1.0 candidate artifacts and tags are superseded development evidence, not published release authority.
 
 ## Pipeline Contract
 
@@ -51,4 +51,4 @@ Planning is side-effect free. Only modules under `prototypes/mir/emit/` may crea
 
 Each gate requires focused pure tests, static validation, deterministic plan evidence, a generated-ID parity check, and target runtime validation before it can become a release candidate.
 
-`fixtures/golden-plans/stable-technology-ids.json` locks the 70 released 3.1.0 identities. `automatic-family-technology-ids.json` separately locks reviewed 3.2.0 generic-family identities. Both must pass before runtime validation; a future family technology must update its reviewed golden explicitly rather than appearing as incidental compiler output.
+`fixtures/golden-plans/stable-technology-ids.json` locks the 70 released 3.1.0 identities. `automatic-family-technology-ids.json` separately locks reviewed 3.1.0 generic-family identities. Both must pass before runtime validation; a future family technology must update its reviewed golden explicitly rather than appearing as incidental compiler output.

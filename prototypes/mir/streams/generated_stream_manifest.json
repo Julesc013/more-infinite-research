@@ -2,7 +2,7 @@
   "schema": 1,
   "streams": {
     "mir-auto-prod-manufacturing-assembling-machine-1": {
-      "introduced_in": "3.2.0",
+      "introduced_in": "3.1.0",
       "source": "family-rule:assembling-machine-manufacturing",
       "capability": "recipe-productivity",
       "family": "manufacturing_assembling_machine",
@@ -14,7 +14,7 @@
       "targets": ["family:assembling-machine"]
     },
     "mir-auto-prod-manufacturing-lab-1": {
-      "introduced_in": "3.2.0",
+      "introduced_in": "3.1.0",
       "source": "family-rule:lab-manufacturing",
       "capability": "recipe-productivity",
       "family": "manufacturing_lab",

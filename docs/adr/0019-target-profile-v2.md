@@ -1,7 +1,7 @@
 ---
 title: "ADR 0019: TargetProfileV2"
 status: current
-applies_to: "3.2.0+"
+applies_to: "3.1.0+"
 audience: maintainer
 doc_type: adr
 owner: mir-maintainers

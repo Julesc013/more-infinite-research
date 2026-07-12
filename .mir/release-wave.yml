@@ -30,7 +30,7 @@ waves:
     upgrade_from_2_3_0: passed
     interactive_gate: accepted-by-maintainer-directive
     interactive_ui_observation: not-independently-performed
-    status: tagged-awaiting-external-upload
+    status: published-frozen
 
   old_targets:
     factorio_1_1:
@@ -99,102 +99,45 @@ waves:
 
   mir_3_1_0:
     version: "3.1.0"
-    branch: main
+    branch: dev
     source_anchor_required: published-3.0.5-plus-accepted-portable-return
     baseline_tag: pre-3.1-modernization
     baseline_commit: f3d3b6073166b5acdc2ae5636c0d68302b757f0f
     implementation_gate: authorized-by-maintainer-directed-continuation
-    source_commit: 0dd8d7f27d9bbbbb728a70ef00b7c955af48cbb7
-    release_commit: 6272cb67c96855c574c96032cb27dfcf0721aa74
-    tag: "3.1.0"
-    archive: dist/more-infinite-research_3.1.0.zip
-    sha256: 0244D40A9971C450274FE1FD7EA142FA5D23E4A2271A0191F31F395589267C1A
-    automated_gate: passed
-    interactive_gate: passed
-    publication_scope: github-release
-    mod_portal_upload: blocked-missing-mod-upload-api-key
-    status: published-frozen
+    source_commit: pending-current-dev-head
+    architecture_contract: docs/architecture/automatic-family-compiler.md
+    stable_technology_id_count: 70
+    reviewed_generic_family_id_count: 2
+    family_rule_schema: 2
+    compatibility_pack_schema: 2
+    generation_plan_schema: 2
+    previous_candidate_commit: 6272cb67c96855c574c96032cb27dfcf0721aa74
+    previous_candidate_archive: dist/more-infinite-research_3.1.0.zip
+    previous_candidate_sha256: 0244D40A9971C450274FE1FD7EA142FA5D23E4A2271A0191F31F395589267C1A
+    previous_candidate_status: superseded-unreleased-candidate
+    integration_summary_path: .mir/evidence/3.1.0-automatic-compiler-integration-gate-summary.json
+    pre_renumber_plan_v2_characterization: .mir/evidence/pre-3.1-renumber-plan-v2-gate-summary.json
+    pre_renumber_generic_family_characterization: .mir/evidence/pre-3.1-renumber-generic-family-runtime-gate-summary.json
+    pre_renumber_coverage_characterization: .mir/evidence/pre-3.1-renumber-coverage-performance-runtime-summary.json
+    pre_renumber_rule_pack_characterization: .mir/evidence/pre-3.1-renumber-rule-pack-schema-runtime-summary.json
+    pre_renumber_core_ecosystem_load_characterization: .mir/evidence/pre-3.1-renumber-core-ecosystems-load-campaign.json
+    pre_renumber_aai_load_characterization: .mir/evidence/pre-3.1-renumber-aai-load-campaign.json
+    renumbered_static_gate: pending
+    renumbered_runtime_gate: pending
+    exact_package_gate: pending
+    upgrade_from_3_0_5: pending
+    interactive_gate: pending
+    publication_status: unreleased
+    status: in-development
 
   mir_2_4_0:
     version: "2.4.0"
     branch: tmp/2.0
     source_anchor_required: accepted-3.1.0
-    source_commit: b9172ab1ab3fc75ba0c1dec79cc9f2c3ae6063c3
-    release_commit: 575fc4f5ae4a52205d1e72604934ead35e69c99e
-    tag: "2.4.0"
-    archive: dist/more-infinite-research_2.4.0.zip
-    sha256: 8618CAF031EF24EB83641DB03566F2390DD29AD98D2099A80D596EEB527EDA12
-    size_bytes: 344995
-    scenario_count: 78
-    exact_dist_base: passed
-    exact_dist_space_age: passed
-    upgrade_from_2_3_5: passed
-    release_targeted_gate: passed
-    automated_gate: passed
-    interactive_gate: passed
-    published_at: 2026-07-12T01:02:42Z
-    github_release: https://github.com/Julesc013/more-infinite-research/releases/tag/2.4.0
-    publication_evidence: .mir/evidence/2.4.0-publication.md
-    mod_portal_upload: blocked-missing-mod-upload-api-key
-    status: published-frozen
-
-  mir_3_2_0:
-    version: "3.2.0"
-    branch: dev
-    source_anchor_required: stable-3.1.0-and-2.4.0
-    implementation_gate: authorized-by-maintainer-directed-continuation
-    behavior_baseline: immutable-3.1.0
-    architecture_contract: docs/architecture/automatic-family-compiler.md
-    validation_source_commit: ea35733e230532a248d71147dd06ffb53d802af4
-    rebased_equivalent_commit: 67cef34c22093a8d0a8576a563c534edcb6e8c41
-    validation_source_tree_equivalent: passed
-    structured_summary_path: .mir/evidence/post-3.1-automatic-compiler-final-summary.json
-    structured_summary_run_id: e61369cb-7a64-4d92-b727-e1bce9b90602
-    scenario_count: 83
-    scenario_result: passed
-    stable_technology_id_count: 70
-    stable_technology_golden: passed
-    validation_package_sha256: EEB2567CBDB0B839943FCE9C3447F0FABBC206F47C90616879D762155851B3D2
-    package_content_sha256: F8C064661D109AE06E6AD9C5E00AF5A0F89DA7915523AE273B8FE7772049503A
-    plan_v2_source_commit: 7e2fc6e86474e9460bf7c368092121ba432465e0
-    plan_v2_summary_path: .mir/evidence/3.2.0-plan-v2-gate-summary.json
-    plan_v2_run_id: f037c887-593c-4daf-b302-2c64656b0051
-    plan_v2_scenario_count: 83
-    plan_v2_result: passed
-    generic_family_validation_source_commit: acd782023db8c88eb78287e778a911df2dcc0707
-    generic_family_summary_path: .mir/evidence/3.2.0-generic-family-runtime-gate-summary.json
-    generic_family_run_id: 0c2739c9-d278-4b3b-9444-d86907e3f674
-    generic_family_scenario_count: 84
-    generic_family_result: passed
-    reviewed_generic_family_id_count: 2
-    coverage_performance_source_commit: 9abf5ba12d3c3eb5b68ed371d0a7eef07756a7c8
-    coverage_performance_summary_path: .mir/evidence/3.2.0-coverage-performance-runtime-summary.json
-    coverage_performance_run_id: f16daf45-d092-40b6-8e86-922219ec3228
-    coverage_performance_scenario_count: 85
-    coverage_performance_result: passed
-    synthetic_scale_duration_seconds: 7.258
-    synthetic_scale_budget_seconds: 30.0
-    bz_coverage_accounted_recipes: 769
-    bz_coverage_recipe_count: 769
-    bz_coverage_scan_count: 2
-    rule_pack_schema_source_commit: bae27f521070bd62a13ec54689818cd8394b3554
-    rule_pack_schema_summary_path: .mir/evidence/3.2.0-rule-pack-schema-runtime-summary.json
-    rule_pack_schema_run_id: a3742534-a79f-44b9-94bd-f5f4573db121
-    rule_pack_schema_scenario_count: 85
-    rule_pack_schema_result: passed
-    family_rule_schema: 2
-    compatibility_pack_schema: 2
-    core_ecosystem_load_evidence: .mir/evidence/3.2.0-core-ecosystems-load-campaign.json
-    core_ecosystem_load_source_commit: bae27f521070bd62a13ec54689818cd8394b3554
-    core_ecosystem_load_archive_sha256: 54CB6E7A3139F9A9FC78A0E5455FCFC16E8EF07439F47975B67A4BC7AA5F40E1
-    core_ecosystem_dependency_lock_sha256: 47263935C52C6A2E231FCB0E39B7557F58645B9615FB6C30FCEBB79089BBFD8C
-    core_ecosystem_load_scenarios: 4
-    core_ecosystem_load_result: passed
-    core_ecosystem_load_claim_level: loads
-    aai_load_evidence: .mir/evidence/3.2.0-aai-load-campaign.json
-    aai_load_archive_sha256: 54CB6E7A3139F9A9FC78A0E5455FCFC16E8EF07439F47975B67A4BC7AA5F40E1
-    aai_load_dependency_lock_sha256: 2ECE35AC073782D6E242E95834A26C4BA498EDA85F80909BA76B1586ABF9E39E
-    aai_load_scenarios: 4
-    aai_load_result: passed
-    aai_load_claim_level: loads
-    status: integration-validated
+    source_commit: pending-accepted-3.1.0
+    previous_candidate_commit: 575fc4f5ae4a52205d1e72604934ead35e69c99e
+    previous_candidate_archive: dist/more-infinite-research_2.4.0.zip
+    previous_candidate_sha256: 8618CAF031EF24EB83641DB03566F2390DD29AD98D2099A80D596EEB527EDA12
+    previous_candidate_status: superseded-unreleased-candidate
+    publication_status: unreleased
+    status: blocked-on-accepted-3.1.0

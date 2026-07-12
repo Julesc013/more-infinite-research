@@ -1,7 +1,7 @@
 ---
 title: "RecipeFactV2 And Relationship Indexes"
 status: current
-applies_to: "post-3.1 dev"
+applies_to: "3.1.0+"
 audience: developer
 doc_type: reference
 owner: mir-maintainers
@@ -26,4 +26,3 @@ The compatibility aggregate fields from schema 1 remain available so existing ma
 `prototypes/mir/index/relationships.lua` derives one immutable shared index snapshot from final prototype state. It owns recipe lookups by output, ingredient, category, and unlock; item placement and subgroup links; entity type, subgroup, upgrade, and surface links; technology effect identities and recipe-productivity owners; lab acceptance by science pack; and modules by tier.
 
 Consumers receive deep copies. Index modules may inspect final prototypes but may not mutate them. Policy, capability, and planner code must use these facts instead of creating another general prototype scan.
-

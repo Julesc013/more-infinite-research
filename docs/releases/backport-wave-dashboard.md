@@ -16,25 +16,28 @@ superseded_by: []
 
 | Target | MIR version | Branch | Source | Archive SHA-256 | Binary state | Status | Blocker |
 | --- | ---: | --- | --- | --- | --- | --- | --- |
-| Factorio 2.1 | 3.1.0 | `main` | `0dd8d7f` package source / `6272cb6` release | `0244D40A...7C1A` | 82 scenarios, exact upgrade, performance budgets, and interactive review passed | GitHub published and frozen | Mod Portal upload API key |
-| Factorio 2.0 | 2.3.5 | `legacy` frozen baseline | `861565d` source / `9eabc54` promotion | `97B3DC9B...68DE` | 71 scenarios, targeted gate, exact-dist base/Space Age, and upgrade passed | Tagged and frozen | External upload credentials |
-| Factorio 2.0 | 2.4.0 | `tmp/2.0` | `b9172ab` source / `575fc4f` release | `8618CAF0...A12` | 78 scenarios, exact-dist base/Space Age, upgrade, performance, and interactive review passed | GitHub published and frozen | Mod Portal upload API key |
+| Factorio 2.1 | 3.0.5 | `main` published baseline | `89d7764` | `40AF95C3...0E5C5` | Published characterization and runtime gates passed | Published and frozen | None |
+| Factorio 2.1 | 3.1.0 | `dev` | Current automatic-compiler source | Pending | Pre-renumber 85-scenario characterization passed; final renumbered gate pending | In development | Final polish, upgrade, package, campaigns, and interactive gate |
+| Factorio 2.0 | 2.3.5 | `legacy` published baseline | `861565d` source / `9eabc54` promotion | `97B3DC9B...68DE` | 71 scenarios, targeted gate, exact-dist base/Space Age, and upgrade passed | Published and frozen | None |
+| Factorio 2.0 | 2.4.0 | `tmp/2.0` | Must be re-derived from accepted 3.1.0 | Pending | Preserved pre-acceptance work is non-authoritative | Blocked | Accepted 3.1.0 source |
 | Factorio 1.1 | 1.9.4 | `tmp/1.1` | `4f3962f` qualified candidate | `431CD5B0...A46E` | Factorio 1.1.110 reduced full gate, exact dist, reload, and upgrade passed | Candidate qualified | Publication gate |
 | Factorio 1.0 | 1.8.2 staged | `tmp/1.0` | `aeb1483` staged candidate | `4ED750E5...0D3C` | Static package staging only; prior exact-save automation did not load MIR | Unqualified | Correct Factorio 1.0 runtime proof |
-| Factorio 0.18 | 1.8.0 | `tmp/0.18` | Published frozen evidence | `D785E6EB...7B24` | 0.18 and 1.0 bridge passed | Frozen verified | None |
+| Factorio 0.18 | 1.8.0 bridge | `tmp/0.18` | Historical bridge evidence | `D785E6EB...7B24` | 0.18 and 1.0 bridge passed | Evidence only | 1.8.2 Factorio 1.0 qualification |
 | Factorio 0.17 | 1.7.1 planned | `tmp/0.17` | Pending replay | Pending | Binary available | Refresh pending | Final portable patch set |
 | Factorio 0.16 | 1.6.0 planned | `tmp/0.16` | Pending proof | Pending | Binary available | Discovery | Old-science adapter proof |
 | Factorio 0.15 | 1.5.0 planned | `tmp/0.15` | Pending proof | Pending | Binary available | Discovery | Independent native-infinite proof |
-| Factorio 0.14 through 0.12 | Planned finite ladders | matching `tmp/*` | Pending | Pending | Unresolved | Discovery | Matching binary and schema proof |
+| Factorio 0.14 | 1.4.0 planned | `tmp/0.14` | Pending proof | Pending | Binary available | Discovery | Target-era schema and finite/native proof |
+| Factorio 0.13 | 1.3.0 planned | `tmp/0.13` | Pending proof | Pending | Binary available | Discovery | Target-era schema and finite/native proof |
 | Factorio 0.11 through 0.6 | Museum versions | matching `tmp/*` | Pending | Pending | Unresolved | Discovery | Binary and base-file acquisition |
 
 ## Immediate Gate
 
-MIR 3.1.0, 2.3.5, and 2.4.0 are immutable anchors. Continue the plan-first automatic family compiler on `dev` from the released 3.1.0 behavior baseline. Do not merge Factorio 2.0 metadata or feature cuts upward.
+MIR 3.0.5 and 2.3.5 are the immutable published anchors. Complete the plan-first automatic family compiler as unreleased MIR 3.1.0 on `dev`. Do not merge Factorio 2.0 metadata or feature cuts upward, and do not open 3.2.0 until the full stability ladder returns its portable lessons.
 
 ## Next Executable Sequence
 
 1. Complete positive TargetProfileV2, portable fixture shaping, coverage accounting, and the remaining safe family rules on `dev`.
-2. Run candidate-bound performance, upgrade, exact-package, and independent ecosystem campaigns for MIR 3.2.0.
-3. Create MIR 2.5.0 on `tmp/2.0` from accepted modern source with target-declared cuts only.
-4. Close a portable-return fixed-point sweep, then finish independently qualified old-target candidates without changing published archive bytes.
+2. Run candidate-bound performance, upgrade, exact-package, and independent ecosystem campaigns for MIR 3.1.0.
+3. Create MIR 2.4.0 on `tmp/2.0` from accepted modern source with target-declared cuts only.
+4. Qualify 1.9.4, 1.8.2, 1.7.1, 1.6.0, 1.5.0, 1.4.0, and 1.3.0 in descending order with matching binaries.
+5. Close the portable-return fixed-point sweep into `dev`, then open MIR 3.2.0.

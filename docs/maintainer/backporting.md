@@ -13,9 +13,9 @@ superseded_by: []
 
 Updated: 2026-07-12
 
-## Current Post-3.1 Release Roles
+## Current 3.1 Release Roles
 
-Published MIR `3.1.0` on `main` and MIR `2.4.0` on `tmp/2.0` are immutable. New automatic-compiler work is MIR `3.2.0` on `dev`; its Factorio 2.0 semantic companion will be MIR `2.5.0` on `tmp/2.0` after the modern implementation passes. `legacy` is intentionally retained as the frozen MIR `2.3.x` baseline and is not the maintained head of the current 2.x release line.
+Published MIR `3.0.5` on the Factorio 2.1 line and MIR `2.3.5` on `legacy` are immutable. Automatic-compiler work is unreleased MIR `3.1.0` on `dev`; its Factorio 2.0 semantic companion will be unreleased MIR `2.4.0` on `tmp/2.0` only after the modern implementation passes. Earlier 3.1.0 and 2.4.0 candidate commits, tags, and archives are superseded development evidence and are not publication authority.
 
 The current older-target state is MIR `1.9.4` qualified but unreleased on `tmp/1.1`, MIR `1.8.2` staged but runtime-unqualified on `tmp/1.0`, MIR `1.7.1` planned on `tmp/0.17`, MIR `1.6.0` planned on `tmp/0.16`, and MIR `1.5.0` planned on `tmp/0.15`. Archived plans retain their historical version numbers; current 0.16 and 0.15 work follows the new 1.6.0 and 1.5.0 plans.
 
@@ -79,7 +79,7 @@ Use these branch roles during the transition:
 | `main` | Stable canonical Factorio `2.1` line after gates. | `3.x.x` after `3.0.0` |
 | `dev` | Development canonical Factorio `2.1` line. | `3.x.x` after `3.0.0` |
 | `legacy` | Frozen Factorio `2.0` MIR `2.3.x` stable baseline. | No new feature releases. |
-| `tmp/2.0` | Maintained Factorio `2.0` release and semantic companion branch. | Current `2.x.x`, including frozen `2.4.0` and planned `2.5.0`. |
+| `tmp/2.0` | Maintained Factorio `2.0` semantic companion branch after 3.1.0 acceptance. | Unreleased `2.4.0` from frozen `2.3.5`. |
 | `tmp/1.1` | Working Factorio `1.1` port branch or worktree. | `1.9.x` starting at `1.9.3` |
 | `port/1.1-to-0.18` | Short-lived Factorio `0.18` bridge branch seeded from the validated `1.9.3` source point. | `1.8.0` only |
 | `tmp/1.0` | Working Factorio `1.0` port branch or worktree after the `0.18` bridge proof. | `1.8.1+` |

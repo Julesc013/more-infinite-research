@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "baseline": "immutable-3.1.0",
+  "baseline": "immutable-3.0.5",
   "source": "prototypes/mir/streams/generated_stream_manifest.json",
   "technology_ids": [
     "mir-prod-air-scrubbing-clean-filter",
