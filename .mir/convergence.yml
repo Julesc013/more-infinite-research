@@ -1,12 +1,12 @@
 schema: 1
 
 release:
-  version: "3.1.0"
+  version: "3.2.0"
   branch: dev
   factorio_version: "2.1"
-  baseline_commit: f3d3b6073166b5acdc2ae5636c0d68302b757f0f
-  baseline_tag: pre-3.1-modernization
-  objective: bounded-correctness-and-contract-modernization
+  baseline_commit: 0dd8d7f27d9bbbbb728a70ef00b7c955af48cbb7
+  baseline_tag: "3.1.0"
+  objective: plan-first-automatic-family-compiler
   public_contract_change: minor-compatible
 
 superseded_candidates:

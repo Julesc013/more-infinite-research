@@ -1,4 +1,16 @@
 ---------------------------------------------------------------------------------------------------
+Version: 3.2.0
+Date: 2026-07-12
+
+  Changes:
+
+    - Started the plan-first automatic family compiler from the immutable 3.1.0 behavior baseline.
+    - Routed fixed streams and deferred productivity-family adoption through whole-plan checks before mutation.
+    - Added variant-preserving recipe facts and shared relationship indexes for structural family discovery.
+    - Attached structurally proven manufacturing recipes to existing stable streams without creating new technology IDs.
+    - Added data-only family-rule and compatibility-pack contracts, dependency-ordered commands, and stable ID golden checks.
+
+---------------------------------------------------------------------------------------------------
 Version: 3.1.0
 Date: 2026-07-12
 

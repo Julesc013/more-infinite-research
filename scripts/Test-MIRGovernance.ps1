@@ -299,7 +299,8 @@ if ([string]$releaseFields.factorio_version -ne [string]$repoInfo.factorio_versi
 if ([string]$releaseFields.objective -notin @(
   "behavioral-superset-implementation-subset",
   "target-port-behavioral-subset",
-  "bounded-correctness-and-contract-modernization"
+  "bounded-correctness-and-contract-modernization",
+  "plan-first-automatic-family-compiler"
 )) {
   throw ".mir/convergence.yml has unsupported release objective: $($releaseFields.objective)"
 }
