@@ -16,13 +16,38 @@
       "profile_schema": 2,
       "prototype_shapes": {
         "recipe_category": "categories-or-category",
-        "science_pack_prototype_kinds": ["item"],
-        "product_probability_fields": ["probability", "ignored_by_productivity", "ignored_by_stats", "percent_spoiled"],
+        "science_pack_prototype_kinds": [
+          "item"
+        ],
+        "product_probability_fields": [
+          "independent_probability",
+          "shared_probability",
+          "extra_count_fraction",
+          "ignored_by_productivity",
+          "ignored_by_stats",
+          "percent_spoiled",
+          "always_fresh",
+          "reset_freshness_on_craft",
+          "quality_min",
+          "quality_max",
+          "quality_change",
+          "affected_by_quality"
+        ],
+        "recipe_property_defaults": {
+          "allow_productivity": false,
+          "allow_quality": true,
+          "maximum_productivity": 3.0
+        },
         "technology_formula": true,
         "quality": true,
         "surface_conditions": true
       },
-      "emitter_families": ["technology", "adoption", "replacement", "scripted-effect"],
+      "emitter_families": [
+        "technology",
+        "adoption",
+        "replacement",
+        "scripted-effect"
+      ],
       "asset_policy": "modern-optional-dlc",
       "expected_stream_count": 72,
       "features": {
@@ -55,7 +80,6 @@
         "max-cargo-bay-unloading-distance",
         "worker-robot-battery"
       ],
-      "omitted_global_settings": [],
       "required_validation_groups": [
         "static",
         "package",
@@ -73,7 +97,7 @@
     "2.0": {
       "factorio_version": "2.0",
       "support_class": "maintained-modern-port",
-      "validation_status": "validated-current-candidate",
+      "validation_status": "validated-historical-release",
       "runtime_state_backend": "storage",
       "science_family": "modern-space-age-capable",
       "reduced_legacy": false,
@@ -84,13 +108,30 @@
       "profile_schema": 2,
       "prototype_shapes": {
         "recipe_category": "category-or-categories",
-        "science_pack_prototype_kinds": ["tool"],
-        "product_probability_fields": ["probability", "ignored_by_productivity", "ignored_by_stats"],
+        "science_pack_prototype_kinds": [
+          "tool"
+        ],
+        "product_probability_fields": [
+          "probability",
+          "extra_count_fraction",
+          "ignored_by_productivity",
+          "ignored_by_stats"
+        ],
+        "recipe_property_defaults": {
+          "allow_productivity": false,
+          "allow_quality": true,
+          "maximum_productivity": 3.0
+        },
         "technology_formula": true,
         "quality": true,
         "surface_conditions": true
       },
-      "emitter_families": ["technology", "adoption", "replacement", "scripted-effect"],
+      "emitter_families": [
+        "technology",
+        "adoption",
+        "replacement",
+        "scripted-effect"
+      ],
       "asset_policy": "factorio-2.0-dlc",
       "expected_stream_count": 70,
       "features": {
@@ -121,7 +162,6 @@
         "laboratory-productivity",
         "worker-robot-battery"
       ],
-      "omitted_global_settings": [],
       "required_validation_groups": [
         "static",
         "package",
@@ -150,13 +190,20 @@
       "profile_schema": 2,
       "prototype_shapes": {
         "recipe_category": "category",
-        "science_pack_prototype_kinds": ["tool"],
-        "product_probability_fields": ["probability", "catalyst_amount"],
+        "science_pack_prototype_kinds": [
+          "tool"
+        ],
+        "product_probability_fields": [
+          "probability",
+          "catalyst_amount"
+        ],
         "technology_formula": true,
         "quality": false,
         "surface_conditions": false
       },
-      "emitter_families": ["technology"],
+      "emitter_families": [
+        "technology"
+      ],
       "asset_policy": "legacy-modern-icons",
       "expected_stream_count": 11,
       "features": {
@@ -170,37 +217,6 @@
         "technology_constant_overlays": false,
         "productivity_family_adoption": false
       },
-      "unsupported_streams": [
-        "research_agricultural_growth_speed",
-        "research_cargo_bay_unloading_distance",
-        "research_cargo_landing_pad_count",
-        "research_spoilage_preservation"
-      ],
-      "unsupported_required_mods": [
-        "elevated-rails",
-        "quality",
-        "recycler",
-        "space-age"
-      ],
-      "unsupported_effect_types": [
-        "cargo-landing-pad-count",
-        "max-cargo-bay-unloading-distance"
-      ],
-      "omitted_global_settings": [
-        "mir-pipeline-extent-multiplier",
-        "mir-prototype-productivity-cap",
-        "mir-prototype-efficiency-cap",
-        "mir-prototype-pollution-cap",
-        "mir-prototype-speed-cap",
-        "mir-prototype-speed-floor",
-        "mir-prototype-quality-cap",
-        "mir-prototype-positive-power-floor",
-        "mir-productivity-cap-self-recycling-only",
-        "mir-recycling-return-chance",
-        "mir-unrestricted-modules",
-        "mir-settings-profile-import",
-        "mir-use-installed-space-age-icons"
-      ],
       "required_validation_groups": [
         "static",
         "package",
@@ -227,13 +243,20 @@
       "profile_schema": 2,
       "prototype_shapes": {
         "recipe_category": "category",
-        "science_pack_prototype_kinds": ["tool"],
-        "product_probability_fields": ["probability", "catalyst_amount"],
+        "science_pack_prototype_kinds": [
+          "tool"
+        ],
+        "product_probability_fields": [
+          "probability",
+          "catalyst_amount"
+        ],
         "technology_formula": true,
         "quality": false,
         "surface_conditions": false
       },
-      "emitter_families": ["technology"],
+      "emitter_families": [
+        "technology"
+      ],
       "asset_policy": "legacy-modern-icons",
       "expected_stream_count": 11,
       "features": {
@@ -247,30 +270,17 @@
         "technology_constant_overlays": false,
         "productivity_family_adoption": false
       },
-      "unsupported_streams": [
-        "research_agricultural_growth_speed",
-        "research_cargo_bay_unloading_distance",
-        "research_cargo_landing_pad_count",
-        "research_spoilage_preservation"
-      ],
-      "unsupported_required_mods": ["elevated-rails", "quality", "recycler", "space-age"],
-      "unsupported_effect_types": ["cargo-landing-pad-count", "max-cargo-bay-unloading-distance"],
-      "omitted_global_settings": [
-        "mir-pipeline-extent-multiplier",
-        "mir-prototype-productivity-cap",
-        "mir-prototype-efficiency-cap",
-        "mir-prototype-pollution-cap",
-        "mir-prototype-speed-cap",
-        "mir-prototype-speed-floor",
-        "mir-prototype-quality-cap",
-        "mir-prototype-positive-power-floor",
-        "mir-productivity-cap-self-recycling-only",
-        "mir-recycling-return-chance",
-        "mir-unrestricted-modules",
-        "mir-settings-profile-import",
-        "mir-use-installed-space-age-icons"
-      ],
-      "required_validation_groups": ["static", "package", "base-load", "science-prerequisites", "direct-effects", "weapon-overlap", "reduced-settings-surface", "runtime-state", "exact-dist"]
+      "required_validation_groups": [
+        "static",
+        "package",
+        "base-load",
+        "science-prerequisites",
+        "direct-effects",
+        "weapon-overlap",
+        "reduced-settings-surface",
+        "runtime-state",
+        "exact-dist"
+      ]
     },
     "0.18": {
       "factorio_version": "0.18",
@@ -286,13 +296,20 @@
       "profile_schema": 2,
       "prototype_shapes": {
         "recipe_category": "category",
-        "science_pack_prototype_kinds": ["tool"],
-        "product_probability_fields": ["probability", "catalyst_amount"],
+        "science_pack_prototype_kinds": [
+          "tool"
+        ],
+        "product_probability_fields": [
+          "probability",
+          "catalyst_amount"
+        ],
         "technology_formula": true,
         "quality": false,
         "surface_conditions": false
       },
-      "emitter_families": ["technology"],
+      "emitter_families": [
+        "technology"
+      ],
       "asset_policy": "legacy-modern-icons",
       "expected_stream_count": 11,
       "features": {
@@ -306,11 +323,17 @@
         "technology_constant_overlays": false,
         "productivity_family_adoption": false
       },
-      "unsupported_streams": ["research_agricultural_growth_speed", "research_cargo_bay_unloading_distance", "research_cargo_landing_pad_count", "research_spoilage_preservation"],
-      "unsupported_required_mods": ["elevated-rails", "quality", "recycler", "space-age"],
-      "unsupported_effect_types": ["cargo-landing-pad-count", "max-cargo-bay-unloading-distance"],
-      "omitted_global_settings": ["mir-pipeline-extent-multiplier", "mir-prototype-productivity-cap", "mir-prototype-efficiency-cap", "mir-prototype-pollution-cap", "mir-prototype-speed-cap", "mir-prototype-speed-floor", "mir-prototype-quality-cap", "mir-prototype-positive-power-floor", "mir-productivity-cap-self-recycling-only", "mir-recycling-return-chance", "mir-unrestricted-modules", "mir-settings-profile-import", "mir-use-installed-space-age-icons"],
-      "required_validation_groups": ["static", "package", "base-load", "science-prerequisites", "direct-effects", "weapon-overlap", "reduced-settings-surface", "runtime-state", "exact-dist"]
+      "required_validation_groups": [
+        "static",
+        "package",
+        "base-load",
+        "science-prerequisites",
+        "direct-effects",
+        "weapon-overlap",
+        "reduced-settings-surface",
+        "runtime-state",
+        "exact-dist"
+      ]
     },
     "0.17": {
       "factorio_version": "0.17",
@@ -326,13 +349,20 @@
       "profile_schema": 2,
       "prototype_shapes": {
         "recipe_category": "category",
-        "science_pack_prototype_kinds": ["tool"],
-        "product_probability_fields": ["probability", "catalyst_amount"],
+        "science_pack_prototype_kinds": [
+          "tool"
+        ],
+        "product_probability_fields": [
+          "probability",
+          "catalyst_amount"
+        ],
         "technology_formula": true,
         "quality": false,
         "surface_conditions": false
       },
-      "emitter_families": ["technology"],
+      "emitter_families": [
+        "technology"
+      ],
       "asset_policy": "factorio-0.17-icons",
       "expected_stream_count": 11,
       "features": {
@@ -346,11 +376,17 @@
         "technology_constant_overlays": false,
         "productivity_family_adoption": false
       },
-      "unsupported_streams": ["research_agricultural_growth_speed", "research_cargo_bay_unloading_distance", "research_cargo_landing_pad_count", "research_spoilage_preservation"],
-      "unsupported_required_mods": ["elevated-rails", "quality", "recycler", "space-age"],
-      "unsupported_effect_types": ["cargo-landing-pad-count", "max-cargo-bay-unloading-distance"],
-      "omitted_global_settings": ["mir-pipeline-extent-multiplier", "mir-prototype-productivity-cap", "mir-prototype-efficiency-cap", "mir-prototype-pollution-cap", "mir-prototype-speed-cap", "mir-prototype-speed-floor", "mir-prototype-quality-cap", "mir-prototype-positive-power-floor", "mir-productivity-cap-self-recycling-only", "mir-recycling-return-chance", "mir-unrestricted-modules", "mir-settings-profile-import", "mir-use-installed-space-age-icons"],
-      "required_validation_groups": ["static", "package", "base-load", "science-prerequisites", "direct-effects", "weapon-overlap", "reduced-settings-surface", "runtime-state", "exact-dist"]
+      "required_validation_groups": [
+        "static",
+        "package",
+        "base-load",
+        "science-prerequisites",
+        "direct-effects",
+        "weapon-overlap",
+        "reduced-settings-surface",
+        "runtime-state",
+        "exact-dist"
+      ]
     },
     "0.16": {
       "factorio_version": "0.16",
@@ -366,13 +402,20 @@
       "profile_schema": 2,
       "prototype_shapes": {
         "recipe_category": "category",
-        "science_pack_prototype_kinds": ["tool"],
-        "product_probability_fields": ["probability", "catalyst_amount"],
+        "science_pack_prototype_kinds": [
+          "tool"
+        ],
+        "product_probability_fields": [
+          "probability",
+          "catalyst_amount"
+        ],
         "technology_formula": true,
         "quality": false,
         "surface_conditions": false
       },
-      "emitter_families": ["technology"],
+      "emitter_families": [
+        "technology"
+      ],
       "asset_policy": "factorio-0.16-icons",
       "expected_stream_count": 11,
       "features": {
@@ -386,11 +429,18 @@
         "technology_constant_overlays": false,
         "productivity_family_adoption": false
       },
-      "unsupported_streams": ["research_agricultural_growth_speed", "research_cargo_bay_unloading_distance", "research_cargo_landing_pad_count", "research_spoilage_preservation"],
-      "unsupported_required_mods": ["elevated-rails", "quality", "recycler", "space-age"],
-      "unsupported_effect_types": ["cargo-landing-pad-count", "max-cargo-bay-unloading-distance"],
-      "omitted_global_settings": ["mir-pipeline-extent-multiplier", "mir-prototype-productivity-cap", "mir-prototype-efficiency-cap", "mir-prototype-pollution-cap", "mir-prototype-speed-cap", "mir-prototype-speed-floor", "mir-prototype-quality-cap", "mir-prototype-positive-power-floor", "mir-productivity-cap-self-recycling-only", "mir-recycling-return-chance", "mir-unrestricted-modules", "mir-settings-profile-import", "mir-use-installed-space-age-icons"],
-      "required_validation_groups": ["static", "package", "base-load", "science-prerequisites", "direct-effects", "weapon-overlap", "reduced-settings-surface", "runtime-state", "old-science-map", "exact-dist"]
+      "required_validation_groups": [
+        "static",
+        "package",
+        "base-load",
+        "science-prerequisites",
+        "direct-effects",
+        "weapon-overlap",
+        "reduced-settings-surface",
+        "runtime-state",
+        "old-science-map",
+        "exact-dist"
+      ]
     },
     "0.15": {
       "factorio_version": "0.15",
@@ -406,13 +456,20 @@
       "profile_schema": 2,
       "prototype_shapes": {
         "recipe_category": "category",
-        "science_pack_prototype_kinds": ["tool"],
-        "product_probability_fields": ["probability", "catalyst_amount"],
+        "science_pack_prototype_kinds": [
+          "tool"
+        ],
+        "product_probability_fields": [
+          "probability",
+          "catalyst_amount"
+        ],
         "technology_formula": true,
         "quality": false,
         "surface_conditions": false
       },
-      "emitter_families": ["technology"],
+      "emitter_families": [
+        "technology"
+      ],
       "asset_policy": "factorio-0.15-icons",
       "expected_stream_count": 11,
       "features": {
@@ -426,11 +483,18 @@
         "technology_constant_overlays": false,
         "productivity_family_adoption": false
       },
-      "unsupported_streams": ["research_agricultural_growth_speed", "research_cargo_bay_unloading_distance", "research_cargo_landing_pad_count", "research_spoilage_preservation"],
-      "unsupported_required_mods": ["elevated-rails", "quality", "recycler", "space-age"],
-      "unsupported_effect_types": ["cargo-landing-pad-count", "max-cargo-bay-unloading-distance"],
-      "omitted_global_settings": ["mir-pipeline-extent-multiplier", "mir-prototype-productivity-cap", "mir-prototype-efficiency-cap", "mir-prototype-pollution-cap", "mir-prototype-speed-cap", "mir-prototype-speed-floor", "mir-prototype-quality-cap", "mir-prototype-positive-power-floor", "mir-productivity-cap-self-recycling-only", "mir-recycling-return-chance", "mir-unrestricted-modules", "mir-settings-profile-import", "mir-use-installed-space-age-icons"],
-      "required_validation_groups": ["static", "package", "base-load", "science-prerequisites", "direct-effects", "weapon-overlap", "reduced-settings-surface", "runtime-state", "old-science-map", "exact-dist"]
+      "required_validation_groups": [
+        "static",
+        "package",
+        "base-load",
+        "science-prerequisites",
+        "direct-effects",
+        "weapon-overlap",
+        "reduced-settings-surface",
+        "runtime-state",
+        "old-science-map",
+        "exact-dist"
+      ]
     }
   }
 }
