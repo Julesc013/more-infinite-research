@@ -3,6 +3,7 @@ local D = require("prototypes.mir.report.diagnostics_sink")
 local deepcopy = require("prototypes.mir.core.deepcopy")
 local table_utils = require("prototypes.mir.core.table")
 local adoption_policy = require("prototypes.mir.policy.adoption_policy")
+local adoption_transaction = require("prototypes.mir.emit.transactions.productivity_family_adoption")
 local costs = require("prototypes.mir.planner.costs")
 local icon_builder = require("prototypes.mir.emit.icon_builder")
 local owner_policy = require("prototypes.mir.policy.owner_policy")
@@ -332,7 +333,7 @@ function M.apply(plan)
         log("[more-infinite-research] Registered technology " .. technology.name)
       end
     elseif row.action == "adopt" then
-      adoption_policy.apply_recipe_productivity_family(row.adoption)
+      adoption_transaction.apply(row.adoption)
     elseif row.reason ~= "disabled" then
       log("[more-infinite-research] Skipping stream " .. row.stream_key .. " because " .. row.reason .. ".")
     end
@@ -340,7 +341,7 @@ function M.apply(plan)
   end
 
   if target_line.feature_enabled("recipe_productivity") then
-    adoption_policy.emit_mod_data()
+    adoption_transaction.emit_mod_data()
   end
 end
 

@@ -345,10 +345,10 @@ foreach ($needle in @(
   'require("prototypes.mir.policy.competing_productivity").prepare()',
   'require("prototypes.mir.planner.stream_compiler").run()',
   'require("prototypes.mir.emit.base_extensions").emit_all()',
-  'require("prototypes.mir.policy.competing_productivity").apply()',
-  'require("prototypes.mir.policy.competing_base_extensions").apply()',
-  'require("prototypes.mir.policy.weapon_speed").apply()',
-  'require("prototypes.mir.policy.max_level").apply()',
+  'require("prototypes.mir.pipeline.mutations.competing_productivity").apply()',
+  'require("prototypes.mir.pipeline.mutations.competing_base_extensions").apply()',
+  'require("prototypes.mir.pipeline.mutations.weapon_speed").apply()',
+  'require("prototypes.mir.pipeline.mutations.max_level").apply()',
   'require("prototypes.mir.compatibility.planner").emit()',
   'require("prototypes.mir.emit.effect_safety").assert_registered_technology_effects()',
   'require("prototypes.mir.emit.technology_graph_safety").assert_registered_technologies()',
@@ -418,6 +418,22 @@ Assert-MIRContains -RelativePath "prototypes/mir/planner/generation_plan.lua" -T
 $familyRegistryText = Read-MIRFile -RelativePath "prototypes/mir/families/registry.lua"
 Assert-MIRContains -RelativePath "prototypes/mir/families/registry.lua" -Text $familyRegistryText -Needle "FamilyRule must be data-only"
 Assert-MIRContains -RelativePath "prototypes/mir/families/registry.lua" -Text $familyRegistryText -Needle "Duplicate FamilyRule id"
+
+foreach ($relativePath in @(
+  "prototypes/mir/policy/competing_productivity.lua",
+  "prototypes/mir/policy/competing_base_extensions.lua",
+  "prototypes/mir/policy/productivity_family_adoption.lua",
+  "prototypes/mir/policy/weapon_speed.lua",
+  "prototypes/mir/policy/max_level.lua"
+)) {
+  $policyText = Read-MIRFile -RelativePath $relativePath
+  if ($policyText -match '(?:tech|technology|owner)\.(?:effects|max_level)\s*=(?!=)' -or $policyText -match 'replace_technology\(') {
+    throw "Policy module retains prototype mutation: $relativePath"
+  }
+}
+
+$adoptionTransactionText = Read-MIRFile -RelativePath "prototypes/mir/emit/transactions/productivity_family_adoption.lua"
+Assert-MIRContains -RelativePath "prototypes/mir/emit/transactions/productivity_family_adoption.lua" -Text $adoptionTransactionText -Needle "table.insert(owner.effects, effect)"
 
 $settingsProfileText = Read-MIRFile -RelativePath "prototypes/mir/runtime/settings_profile.lua"
 Assert-MIRContains -RelativePath "prototypes/mir/runtime/settings_profile.lua" -Text $settingsProfileText -Needle '"mir-settings-export"'

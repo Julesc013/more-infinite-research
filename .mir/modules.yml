@@ -105,6 +105,10 @@ modules:
     - prototypes/mir/pipeline/extent.lua
     - prototypes/mir/pipeline/prototype_limits.lua
     - prototypes/mir/pipeline/module_permissions.lua
+    - prototypes/mir/pipeline/mutations/competing_productivity.lua
+    - prototypes/mir/pipeline/mutations/competing_base_extensions.lua
+    - prototypes/mir/pipeline/mutations/weapon_speed.lua
+    - prototypes/mir/pipeline/mutations/max_level.lua
   index:
     - prototypes/mir/index/registry_builder.lua
     - prototypes/mir/index/recipe_facts.lua
@@ -173,6 +177,7 @@ modules:
     - prototypes/mir/emit/effect_safety.lua
     - prototypes/mir/emit/icon_builder.lua
     - prototypes/mir/emit/mod_data.lua
+    - prototypes/mir/emit/transactions/productivity_family_adoption.lua
   report:
     - prototypes/mir/report/decision_export.lua
     - prototypes/mir/report/compatibility_diagnostics.lua

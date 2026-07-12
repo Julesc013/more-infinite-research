@@ -38,7 +38,7 @@ This is the executable release queue. `.mir/release-wave.yml` is the machine-rea
 
 - [x] Finish campaign scenario schema 2 ownership: target, setup, roots, settings, expected plan, timeout, and claim level are validated data rather than duplicated PowerShell call arguments.
 - [x] Add minimal-Factorio pure schema and algorithm tests for invalid FamilyRules, invalid CompatibilityPacks, equal-precedence conflicts, deterministic precedence, target/applicability filtering, stable IDs, stable sorting, and deterministic fingerprints.
-- [ ] Move remaining prototype mutation bodies out of `policy/` into `pipeline/mutations/` or `emit/transactions/`; policy stays pure.
+- [x] Move competing-owner replacement, productivity-family adoption, weapon-speed, and max-level mutation bodies out of `policy/` into `pipeline/mutations/` or `emit/transactions/`; policy stays plan-only.
 - [ ] Replace remaining hybrid target denylists with positive feature and shape declarations where target evidence exists.
 - [ ] Add plan export/diff, coverage export, compatibility-pack scaffold, snapshot minimizer, and target-plan diff tooling.
 - [ ] Consolidate the final effect/stream/rule/pack documentation tables and add schema drift checks.

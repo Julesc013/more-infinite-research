@@ -54,8 +54,8 @@ local commands = {
   ["apply-competing-productivity"] = {
     kind = "mutation",
     requires_features = {"recipe_productivity"},
-    implementation = "prototypes/mir/policy/competing_productivity.lua",
-    apply = function() require("prototypes.mir.policy.competing_productivity").apply() end
+    implementation = "prototypes/mir/pipeline/mutations/competing_productivity.lua",
+    apply = function() require("prototypes.mir.pipeline.mutations.competing_productivity").apply() end
   },
   ["emit-base-extensions"] = {
     kind = "emission",
@@ -66,20 +66,20 @@ local commands = {
   ["apply-competing-base-extensions"] = {
     kind = "mutation",
     requires_features = {},
-    implementation = "prototypes/mir/policy/competing_base_extensions.lua",
-    apply = function() require("prototypes.mir.policy.competing_base_extensions").apply() end
+    implementation = "prototypes/mir/pipeline/mutations/competing_base_extensions.lua",
+    apply = function() require("prototypes.mir.pipeline.mutations.competing_base_extensions").apply() end
   },
   ["weapon-speed-adjustments"] = {
     kind = "mutation",
     requires_features = {},
-    implementation = "prototypes/mir/policy/weapon_speed.lua",
-    apply = function() require("prototypes.mir.policy.weapon_speed").apply() end
+    implementation = "prototypes/mir/pipeline/mutations/weapon_speed.lua",
+    apply = function() require("prototypes.mir.pipeline.mutations.weapon_speed").apply() end
   },
   ["max-level-control"] = {
     kind = "mutation",
     requires_features = {},
-    implementation = "prototypes/mir/policy/max_level.lua",
-    apply = function() require("prototypes.mir.policy.max_level").apply() end
+    implementation = "prototypes/mir/pipeline/mutations/max_level.lua",
+    apply = function() require("prototypes.mir.pipeline.mutations.max_level").apply() end
   },
   ["assert-technology-safety"] = {
     kind = "assertion",

@@ -59,8 +59,9 @@ local function strip_categories_for_mode()
   return out
 end
 
-local function strip_weapon_speed_effects()
+function M.plan()
   local strip_categories = strip_categories_for_mode()
+  local commands = {}
   for _, name in ipairs(generated_registry.sorted_names()) do
     local tech = data_raw.technology(name)
     local is_generated_continuation = tech and tech.unit and tech.unit.count_formula
@@ -82,14 +83,10 @@ local function strip_weapon_speed_effects()
           table.insert(filtered, effect)
         end
       end
-      tech.effects = filtered
+      table.insert(commands, {technology = name, effects = filtered})
     end
   end
-end
-
-function M.apply()
-  strip_weapon_speed_effects()
-  return M
+  return commands
 end
 
 return M
