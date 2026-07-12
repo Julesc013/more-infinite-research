@@ -28,6 +28,42 @@
       "notes": "Locally available Factorio 2.1 Space Age planet cluster. Missing asset/library dependencies are reported as dependency-resolution failures until the local library is filled."
     },
     {
+      "name": "local-2-1-aai-loaders",
+      "include_space_age": false,
+      "mods": [
+        "aai-loaders"
+      ],
+      "notes": "Independent AAI Loaders archive gate. This is a load claim; structural loader behavior remains fixture-gated separately."
+    },
+    {
+      "name": "local-2-1-aai-industry",
+      "include_space_age": false,
+      "mods": [
+        "aai-industry"
+      ],
+      "notes": "Independent AAI Industry archive gate without opportunistic optional roots."
+    },
+    {
+      "name": "local-2-1-aai-loaders-industry",
+      "include_space_age": false,
+      "mods": [
+        "aai-industry",
+        "aai-loaders"
+      ],
+      "notes": "Independent combined AAI Industry and AAI Loaders archive gate."
+    },
+    {
+      "name": "local-2-1-aai-representative-extensions",
+      "include_space_age": false,
+      "mods": [
+        "aai-containers",
+        "aai-industry",
+        "aai-loaders",
+        "big-mining-drill"
+      ],
+      "notes": "Representative AAI transport and placeable-machine extension gate without using a mega-smash as ecosystem proof."
+    },
+    {
       "name": "local-2-1-space-age-mega-smash",
       "include_space_age": true,
       "mods": [

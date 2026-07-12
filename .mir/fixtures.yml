@@ -5,6 +5,15 @@ scenario_manifest:
   schema: 2
   declarations: full-records
 
+local_campaign_manifest:
+  path: fixtures/compat-matrix/local-library-scenarios.json
+  schema: 1
+  independent_aai_scenarios:
+    - local-2-1-aai-loaders
+    - local-2-1-aai-industry
+    - local-2-1-aai-loaders-industry
+    - local-2-1-aai-representative-extensions
+
 golden_plans:
   stable_technology_ids:
     path: fixtures/golden-plans/stable-technology-ids.json
