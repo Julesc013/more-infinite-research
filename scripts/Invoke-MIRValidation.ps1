@@ -2582,6 +2582,9 @@ function Invoke-RuntimeScenario {
     "--create",
     $scenario.SavePath
   )
+  if ($isFactorio014Line) {
+    $factorioArgs = @($factorioArgs | Where-Object { $_ -ne "--disable-audio" })
+  }
   $factorioExitCode = Invoke-FactorioProcess -FilePath $FactorioBin -Arguments $factorioArgs
   if ($factorioExitCode -ne 0) {
     throw "Factorio runtime validation scenario $ScenarioName exited with code $factorioExitCode"
@@ -2621,6 +2624,9 @@ function Invoke-RuntimeConfigurationChangeScenario {
     "--create",
     $initialScenario.SavePath
   )
+  if ($isFactorio014Line) {
+    $createArgs = @($createArgs | Where-Object { $_ -ne "--disable-audio" })
+  }
   $createExitCode = Invoke-FactorioProcess -FilePath $FactorioBin -Arguments $createArgs
   if ($createExitCode -ne 0) {
     throw "Factorio configuration-change initial scenario $ScenarioName exited with code $createExitCode"
@@ -2653,6 +2659,9 @@ function Invoke-RuntimeConfigurationChangeScenario {
     "1",
     "--benchmark-sanitize"
   )
+  if ($isFactorio014Line) {
+    $benchmarkArgs = @($benchmarkArgs | Where-Object { $_ -ne "--disable-audio" })
+  }
   $benchmarkExitCode = Invoke-FactorioProcess -FilePath $FactorioBin -Arguments $benchmarkArgs
   if ($benchmarkExitCode -ne 0) {
     throw "Factorio configuration-change load scenario $ScenarioName exited with code $benchmarkExitCode"
@@ -2973,6 +2982,9 @@ function Invoke-PackageZipSmokeScenario {
     "--create",
     $savePath
   )
+  if ($isFactorio014Line) {
+    $factorioArgs = @($factorioArgs | Where-Object { $_ -ne "--disable-audio" })
+  }
   $factorioExitCode = Invoke-FactorioProcess -FilePath $FactorioBin -Arguments $factorioArgs
   if ($factorioExitCode -ne 0) {
     throw "Factorio package zip smoke $ScenarioName exited with code $factorioExitCode"
