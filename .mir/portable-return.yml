@@ -70,11 +70,11 @@ lessons:
       - prototype-limit-scope-inert-at-fixed-threshold
       - prototype-limit-scope-engine-unchanged-baseline
       - prototype-limit-scope-inert-at-matched-threshold
-    dev_commit: pending-3.1
+    dev_commit: 0dd8d7f27d9bbbbb728a70ef00b7c955af48cbb7
     replayed_target_commits:
       - 8dabd2d
     release_impact: 71 of 71 scenarios pass with exact manifest equality
-    status: accepted-for-3.1
+    status: complete
 
   PL-004:
     source_target: factorio-2.0
@@ -105,11 +105,11 @@ lessons:
     target_local_decision: preserve the direct 2.3.5 logs and structured proof under .mir/evidence
     fixture_evidence:
       - .mir/evidence/2.3.5-exact-dist-and-upgrade-proof.json
-    dev_commit: pending-3.1
+    dev_commit: 0dd8d7f27d9bbbbb728a70ef00b7c955af48cbb7
     replayed_target_commits:
       - 7588eadc18f49f60d17d145ce366b5a777d9be43
     release_impact: exact 2.3.5 base, Space Age, and 2.3.0 upgrade loads pass
-    status: accepted-for-3.1
+    status: complete
 
   PL-006:
     source_target: factorio-2.0
@@ -128,6 +128,60 @@ lessons:
       - 7588eadc18f49f60d17d145ce366b5a777d9be43
     release_impact: intentional target-only shipped diff
     status: complete
+
+  PL-007:
+    source_target: factorio-2.0
+    source_branch: tmp/2.0
+    source_commit: a94460b16dbc09970a0482f268e7651a59cba412
+    observable_issue: runtime validation dispatch tied Space Age and scripted gates to a hard-coded Factorio 2.1 line check instead of declared positive target capabilities
+    classification: portable-tooling
+    affected_targets: ["all-multi-target-validation"]
+    modern_decision: integrate capability-driven dispatch when the next dev development release opens without rewriting frozen 3.1.0 evidence
+    target_local_decision: run every positively declared Factorio 2.0 runtime gate for 2.4.0
+    fixture_evidence:
+      - .mir/evidence/2.4.0-rc3-validation-summary.json
+    dev_commit: pending-next-dev
+    replayed_target_commits:
+      - a94460b16dbc09970a0482f268e7651a59cba412
+    release_impact: all 78 target-declared scenarios execute on Factorio 2.0
+    status: accepted-for-next-dev
+
+  PL-008:
+    source_target: factorio-2.0
+    source_branch: tmp/2.0
+    source_commit: 25a68446a9d6a7172b0b5ce35afd58b915d6fb1d
+    observable_issue: cross-version fixtures assumed Factorio 2.1 item science packs plural recycler categories and cargo settings that are absent on the 2.0 target
+    classification: portable-fixture
+    affected_targets: ["2.1", "2.0", "future-targets"]
+    modern_decision: retain target-derived prototype and settings assertions in the next dev development release
+    target_local_decision: derive science-pack type recycler category shape stream count and omitted settings from the positive 2.0 target profile
+    fixture_evidence:
+      - item-science-pack-progression
+      - custom-lab-policy
+      - reduced-settings-surface
+      - recycler-boundary
+    dev_commit: pending-next-dev
+    replayed_target_commits:
+      - 25a68446a9d6a7172b0b5ce35afd58b915d6fb1d
+    release_impact: target-shaped fixtures pass without weakening shared contracts
+    status: accepted-for-next-dev
+
+  PL-009:
+    source_target: factorio-2.0
+    source_branch: tmp/2.0
+    source_commit: 5d63e8b29f1575ee0066dfb6e3205212256edd31
+    observable_issue: the upgrade harness encoded one release pair instead of accepting explicit prior current and fixture identities
+    classification: portable-tooling
+    affected_targets: ["all-release-targets"]
+    modern_decision: carry the parameterized upgrade harness into the next dev development release
+    target_local_decision: prove the exact 2.3.5 to 2.4.0 save and settings transition
+    fixture_evidence:
+      - .mir/evidence/2.4.0-upgrade-proof.json
+    dev_commit: pending-next-dev
+    replayed_target_commits:
+      - 5d63e8b29f1575ee0066dfb6e3205212256edd31
+    release_impact: the 2.4.0 prior-release upgrade is reproducible without a one-off harness
+    status: accepted-for-next-dev
 
 fixed_point:
   last_completed_sweep: null

@@ -130,7 +130,14 @@ waves:
     manual_gate: accepted-for-publication
     interactive_gate: passed
     interactive_review: .mir/evidence/2.4.0-interactive-review.md
-    status: release-candidate-awaiting-manual-review
+    release_commit: 575fc4f5ae4a52205d1e72604934ead35e69c99e
+    tag: "2.4.0"
+    published_at: 2026-07-12T01:02:42Z
+    github_release: https://github.com/Julesc013/more-infinite-research/releases/tag/2.4.0
+    publication_evidence: .mir/evidence/2.4.0-publication.md
+    publication_scope: github-release
+    mod_portal_upload: blocked-missing-mod-upload-api-key
+    status: published-frozen
 
   mir_3_2_0:
     version: "3.2.0"
