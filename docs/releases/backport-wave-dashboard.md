@@ -5,7 +5,7 @@ applies_to: "3.0.5+"
 audience: release-manager
 doc_type: release-plan
 owner: mir-maintainers
-last_reviewed: 2026-07-12
+last_reviewed: 2026-07-13
 supersedes: []
 superseded_by: []
 ---
@@ -19,6 +19,7 @@ superseded_by: []
 | Factorio 2.1 | 3.1.0 | `main` | `0dd8d7f` package source / `6272cb6` release | `0244D40A...7C1A` | 82 scenarios, exact upgrade, performance budgets, and interactive review passed | GitHub published and frozen | Mod Portal upload API key |
 | Factorio 2.0 | 2.3.5 | `legacy` frozen baseline | `861565d` source / `9eabc54` promotion | `97B3DC9B...68DE` | 71 scenarios, targeted gate, exact-dist base/Space Age, and upgrade passed | Tagged and frozen | External upload credentials |
 | Factorio 2.0 | 2.4.0 | `tmp/2.0` | `b9172ab` source / `575fc4f` release | `8618CAF0...A12` | 78 scenarios, exact-dist base/Space Age, upgrade, performance, and interactive review passed | GitHub published and frozen | Mod Portal upload API key |
+| Factorio 2.0 | 2.5.0 RC | `tmp/2.0` | `f5c58f5` validated source | `0BE57ED4...CBFD` | 82/82 Factorio 2.0 scenarios, exact-dist, compiler contracts, upgrade paths, and compatibility packs passed | Candidate qualified | Interactive release review |
 | Factorio 1.1 | 1.9.4 | `tmp/1.1` | `4f3962f` qualified candidate | `431CD5B0...A46E` | Factorio 1.1.110 reduced full gate, exact dist, reload, and upgrade passed | Candidate qualified | Publication gate |
 | Factorio 1.0 | 1.8.2 staged | `tmp/1.0` | `aeb1483` staged candidate | `4ED750E5...0D3C` | Static package staging only; prior exact-save automation did not load MIR | Unqualified | Correct Factorio 1.0 runtime proof |
 | Factorio 0.18 | 1.8.0 | `tmp/0.18` | Published frozen evidence | `D785E6EB...7B24` | 0.18 and 1.0 bridge passed | Frozen verified | None |
@@ -34,7 +35,7 @@ MIR 3.1.0, 2.3.5, and 2.4.0 are immutable anchors. Continue the plan-first autom
 
 ## Next Executable Sequence
 
-1. Complete positive TargetProfileV2, portable fixture shaping, coverage accounting, and the remaining safe family rules on `dev`.
-2. Run candidate-bound performance, upgrade, exact-package, and independent ecosystem campaigns for MIR 3.2.0.
-3. Create MIR 2.5.0 on `tmp/2.0` from accepted modern source with target-declared cuts only.
-4. Close a portable-return fixed-point sweep, then finish independently qualified old-target candidates without changing published archive bytes.
+1. Preserve the qualified MIR 2.5.0 Factorio 2.0 archive and its exact validation evidence without changing published 2.4.0 bytes.
+2. Return portable compiler, validation, and fixture lessons to `dev` without importing Factorio 2.0 metadata.
+3. Finish independently qualified old-target candidates in descending target order.
+4. Close the portable-return fixed-point sweep on `dev` after the older-target wave.

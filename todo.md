@@ -1,6 +1,6 @@
 # M.I.R. TODO
 
-Updated: 2026-07-12
+Updated: 2026-07-13
 
 This file is the concise executable queue. Detailed scope, decisions, evidence, and target state live in the governed records linked below.
 
@@ -8,6 +8,7 @@ This file is the concise executable queue. Detailed scope, decisions, evidence, 
 
 - MIR 3.0.5 and 3.1.0 are published and frozen for Factorio 2.1. Their exact archives must never be rebuilt.
 - MIR 2.3.5 is frozen on `legacy`; MIR 2.4.0 is published and frozen on `tmp/2.0` with SHA-256 `8618CAF031EF24EB83641DB03566F2390DD29AD98D2099A80D596EEB527EDA12`.
+- MIR 2.5.0 is a qualified, unpublished Factorio 2.0 release candidate: 82/82 scenarios passed and the archive SHA-256 is `0BE57ED4C51DDF08F80AB4CFB2D5762DF2714B17AB26DB58CA9980289350CBFD`.
 - `tmp/1.1` has a qualified 1.9.4 candidate. `tmp/1.0` has a staged but unqualified 1.8.2 candidate and still requires valid runtime proof.
 - Active `dev` work starts from the immutable 3.1.0 behavior baseline and implements the automatic family compiler contract without altering released bytes.
 
@@ -22,11 +23,9 @@ This file is the concise executable queue. Detailed scope, decisions, evidence, 
 
 ## Next Actions
 
-1. Review performance budgets for the larger RecipeFactV2, relationship-index, and decision payloads.
-2. Run selected real-mod compatibility packs and compare planner reports against the 3.1.0 baseline.
-3. Review attach-only balance values and keep lab manufacturing proposal-only unless a new stable stream passes manifest and migration review.
-4. Complete eventual-version save upgrade, exact-package, interactive UI, and release-candidate gates without rebuilding published 3.1.0.
-5. Complete old-target qualification and one portable-return fixed-point sweep independently.
+1. Preserve the exact MIR 2.5.0 RC archive and complete interactive release review before any later tag or publication action.
+2. Return portable Factorio 2.0 fixes and validation lessons to `dev` without target metadata.
+3. Complete old-target qualification and one portable-return fixed-point sweep independently.
 
 ## Completed Development Gates
 

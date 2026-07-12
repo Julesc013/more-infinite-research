@@ -190,5 +190,14 @@ waves:
     target_profile_schema: 2
     family_rule_schema: 2
     compatibility_pack_schema: 2
-    validation_status: pending-factorio-2.0-gate
-    status: port-integration
+    candidate_source_commit: f5c58f5358291c9a65326388c60702dc9878b9d7
+    archive: dist/more-infinite-research_2.5.0.zip
+    sha256: 0BE57ED4C51DDF08F80AB4CFB2D5762DF2714B17AB26DB58CA9980289350CBFD
+    validation_evidence: .mir/evidence/2.5.0-rc1-validation-summary.json
+    validation_run_id: 5bbedb9b-cf3c-4f91-ae5a-f6bf274ad172
+    scenario_count: 82
+    exact_dist_gate: passed
+    factorio_2_0_gate: passed
+    validation_status: passed
+    interactive_gate: pending-release-review
+    status: release-candidate

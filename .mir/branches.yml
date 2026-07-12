@@ -397,6 +397,12 @@ release_artifacts:
       branch: tmp/2.0
       target_factorio: "2.0"
       source_anchor: bae27f521070bd62a13ec54689818cd8394b3554
+      candidate_source_commit: f5c58f5358291c9a65326388c60702dc9878b9d7
+      artifact: dist/more-infinite-research_2.5.0.zip
+      sha256: 0BE57ED4C51DDF08F80AB4CFB2D5762DF2714B17AB26DB58CA9980289350CBFD
+      validation_evidence: .mir/evidence/2.5.0-rc1-validation-summary.json
+      validation_status: passed
+      status: release-candidate
       purpose: semantic Factorio 2.0 companion using shared plan, fact, rule, pack, ID, and validation contracts with target-declared cuts
     factorio_1_1_port:
       version: "1.9.4"
