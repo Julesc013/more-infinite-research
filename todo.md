@@ -64,7 +64,7 @@ This is the executable release queue. `.mir/release-wave.yml` is the machine-rea
 - [x] Materialize the RC2 deterministic archive, release notes, migration guide, validation summary, upgrade proof, campaign lock/evidence, and pending identity-bound GUI packet.
 - [x] Pass candidate freshness from the clean planet-safe RC4 evidence commit with source, package, validation, upgrade, nine-ecosystem, and pending-interactive bindings.
 - [ ] Complete and bind the GUI review without rebuilding the archive.
-- [ ] Revalidate the unchanged RC4 package after campaign evidence is hardened so unresolved roots cannot report a passing claim row.
+- [x] Revalidate the unchanged planet-safe package after campaign evidence is hardened so unresolved roots cannot report a passing claim row.
 - [x] Rebuild and requalify after the representative planet cluster exposed a generated base extension anchored to a disabled prerequisite chain.
 - [ ] Push accepted `dev` to `main`, create the real 3.1.0 tag, publish exact validated bytes, then mark immutable.
 

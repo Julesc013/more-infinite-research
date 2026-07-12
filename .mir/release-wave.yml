@@ -123,17 +123,17 @@ waves:
     pre_renumber_core_ecosystem_load_characterization: .mir/evidence/pre-3.1-renumber-core-ecosystems-load-campaign.json
     pre_renumber_aai_load_characterization: .mir/evidence/pre-3.1-renumber-aai-load-campaign.json
     automatic_compiler_runtime_summary: .mir/evidence/3.1.0-automatic-compiler-runtime-summary.json
-    runtime_source_commit: 3699fecb021ee64e0fcdeaf741e32b1b89cf27b3
+    runtime_source_commit: 37985c7b4fe59ccd01645d1662b5fdd607661d23
     package_evidence_commit: 3699fecb021ee64e0fcdeaf741e32b1b89cf27b3
     package_source_commit: 3699fecb021ee64e0fcdeaf741e32b1b89cf27b3
-    runtime_run_id: 4efeae92-9d41-4765-85f9-6a424ac3e4fe
+    runtime_run_id: 634549a1-6de6-4942-8c1c-1ee6a71caacb
     runtime_scenario_count: 86
     runtime_package_sha256: BD89A34D1EACA6C7FD93412072FFC1434F38DE90FA7E1156B75CE23DC07DDDA3
     runtime_package_content_sha256: 3408ECCE260089F73C84A576AFAF7B1F6560F740E0318DC809C792E4234827C7
-    structured_validation_evidence: .mir/evidence/3.1.0-rc4-validation-summary.json
+    structured_validation_evidence: .mir/evidence/3.1.0-rc5-validation-summary.json
     upgrade_evidence: .mir/evidence/3.1.0-rc4-upgrade-proof.json
-    available_ecosystem_load_evidence: .mir/evidence/3.1.0-rc4-ecosystem-campaign.json
-    available_ecosystem_dependency_lock_sha256: 6135C3F6FF5D980BBDCA1C59B291A68A67097017DD53771CEBB46946C1748388
+    available_ecosystem_load_evidence: .mir/evidence/3.1.0-rc5-ecosystem-campaign.json
+    available_ecosystem_dependency_lock_sha256: 225E28FB37626A52AC224B5A1275B01AC7C2101C3A806984208646B00E143AC4
     interactive_evidence: .mir/evidence/3.1.0-rc4-interactive-review.json
     available_ecosystem_load_gate: 9-passed-zero-dependency-failures-load-claims-only-including-46-mod-planet-cluster
     current_archive_ecosystem_load_gate: passed
@@ -141,10 +141,10 @@ waves:
     renumbered_runtime_gate: passed
     exact_package_gate: passed-base-and-space-age
     upgrade_from_3_0_5: passed-exact-archives-retained-settings-levels-storage-and-scripted-effects
-    candidate_freshness_gate: invalidated-by-campaign-result-gate-hardening
+    candidate_freshness_gate: awaiting-clean-tree-verification-after-rc5-record
     interactive_gate: pending-rc4-identity-bound-packet-created
     publication_status: unreleased
-    status: rebuilding-after-campaign-result-gate-hardening
+    status: release-candidate-awaiting-manual-review
 
   mir_2_4_0:
     version: "2.4.0"

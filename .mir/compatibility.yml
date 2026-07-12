@@ -27,12 +27,12 @@ campaigns:
     - .mir/evidence/pre-3.1-renumber-core-ecosystems-load-campaign.json
     - .mir/evidence/pre-3.1-renumber-aai-load-campaign.json
   final_3_1_0_load_evidence:
-    available_ecosystems: .mir/evidence/3.1.0-rc4-ecosystem-campaign.json
+    available_ecosystems: .mir/evidence/3.1.0-rc5-ecosystem-campaign.json
     status: 9-passed-load-claims-including-planet-cluster
     current_archive_status: passed
     source_commit: 3699fecb021ee64e0fcdeaf741e32b1b89cf27b3
     archive_sha256: BD89A34D1EACA6C7FD93412072FFC1434F38DE90FA7E1156B75CE23DC07DDDA3
-    dependency_lock_sha256: 6135C3F6FF5D980BBDCA1C59B291A68A67097017DD53771CEBB46946C1748388
+    dependency_lock_sha256: 225E28FB37626A52AC224B5A1275B01AC7C2101C3A806984208646B00E143AC4
     missing_dependency_closures:
       - angels
       - space-exploration
