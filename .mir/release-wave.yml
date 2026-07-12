@@ -127,7 +127,9 @@ waves:
     upgrade_from_2_3_5: passed
     release_targeted_gate: passed
     automated_gate: passed
-    manual_gate: pending
+    manual_gate: accepted-for-publication
+    interactive_gate: passed
+    interactive_review: .mir/evidence/2.4.0-interactive-review.md
     status: release-candidate-awaiting-manual-review
 
   mir_3_2_0:

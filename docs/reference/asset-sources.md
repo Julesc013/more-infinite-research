@@ -19,6 +19,9 @@ This file records local image assets packaged by More Infinite Research. Generat
 | `.mir/evidence/3.1.0-interactive-save-loaded.png` | Local Factorio 2.1.9 screenshot captured during the MIR 3.1.0 interactive release review. | Validation evidence only; excluded from the release zip and not presented as a redistributable game asset. |
 | `.mir/evidence/3.1.0-interactive-mod-settings.png` | Local Factorio 2.1.9 screenshot captured during the MIR 3.1.0 interactive release review. | Validation evidence only; excluded from the release zip and not presented as a redistributable game asset. |
 | `.mir/evidence/3.1.0-interactive-technology.png` | Local Factorio 2.1.9 screenshot captured during the MIR 3.1.0 interactive release review. | Validation evidence only; excluded from the release zip and not presented as a redistributable game asset. |
+| `.mir/evidence/2.4.0-interactive-save-loaded.png` | Local Factorio 2.0.77 screenshot captured during the MIR 2.4.0 interactive release review. | Validation evidence only; excluded from the release zip and not presented as a redistributable game asset. |
+| `.mir/evidence/2.4.0-interactive-mod-settings.png` | Local Factorio 2.0.77 screenshot captured during the MIR 2.4.0 interactive release review. | Validation evidence only; excluded from the release zip and not presented as a redistributable game asset. |
+| `.mir/evidence/2.4.0-interactive-technology.png` | Local Factorio 2.0.77 screenshot captured during the MIR 2.4.0 interactive release review. | Validation evidence only; excluded from the release zip and not presented as a redistributable game asset. |
 
 Policy:
 

@@ -106,7 +106,8 @@ candidate:
   validation_package_sha256: AAE86FA983C573A7CE433E15E7827E8C2D89CCD572CD741C509701B223ECA129
   validation_package_content_sha256: 74B84AAC6148F08F6F50D0C71866C35D9762489BA0F9CA8090864870FC9178C0
   automated_gate: passed
-  manual_gate: pending
+  manual_gate: accepted-for-publication
+  interactive_review: .mir/evidence/2.4.0-interactive-review.md
   status: release-candidate-awaiting-manual-review
 
 rules:

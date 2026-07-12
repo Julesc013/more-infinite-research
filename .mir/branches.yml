@@ -234,7 +234,8 @@ release_artifacts:
       structured_summary_run_id: 99895145-6529-4d99-be33-62484856b685
       scenario_count: 78
       automated_gate: passed
-      manual_gate: pending
+      manual_gate: accepted-for-publication
+      interactive_review: .mir/evidence/2.4.0-interactive-review.md
       status: release-candidate-awaiting-manual-review
     mir_2_3_0:
       version: "2.3.0"
