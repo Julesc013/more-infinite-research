@@ -4,6 +4,13 @@ local function fail(message)
   error("MIR generated prerequisite safety validation failed: " .. message)
 end
 
+if data.raw.technology["worker-robots-storage-4"] then
+  fail("base extension was emitted from disabled worker-robots-storage-3.")
+end
+if data.raw.technology["worker-robots-storage-3"].enabled ~= false then
+  fail("disabled base-extension anchor was unexpectedly re-enabled.")
+end
+
 local initial_status, initial_prerequisite = science.pack_production_status("mir-fixture-initial-science-pack")
 if initial_status ~= "initial" or initial_prerequisite ~= nil then
   fail("already-enabled fixture science should have no inferred prerequisite.")
