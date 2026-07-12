@@ -57,7 +57,7 @@ local function normalized_base_operation(operation)
   return out
 end
 
-local function apply_weapon_overlap_policy(operation, stream_operations)
+local function apply_weapon_overlap_policy(operation, stream_operations, stream_rows)
   if operation.key ~= "weapon-shooting-speed" then return operation end
   local mode = effective_settings.get("mir-adjust-vanilla-weapon-speed-techs") or target_line.weapon_overlap_default()
   if mode == "off" then
@@ -73,6 +73,19 @@ local function apply_weapon_overlap_policy(operation, stream_operations)
       for _, effect in ipairs((stream_operation.technology and stream_operation.technology.effects) or {}) do
         if effect.type == "gun-speed" and (effect.ammo_category == "rocket" or effect.ammo_category == "cannon-shell") then
           strip[effect.ammo_category] = true
+        end
+      end
+    end
+    -- An exact external infinite owner suppresses the MIR stream but still
+    -- takes over the same category. Preserve that finalized skip decision in
+    -- the base-operation plan so the later mutation and output validator use
+    -- one authority.
+    for _, row in ipairs(stream_rows or {}) do
+      if row.action == "skip" and row.reason == "covered_by_existing_infinite_native_modifier" then
+        for _, effect in ipairs((row.spec and row.spec.direct_effects) or {}) do
+          if effect.type == "gun-speed" and (effect.ammo_category == "rocket" or effect.ammo_category == "cannon-shell") then
+            strip[effect.ammo_category] = true
+          end
         end
       end
     end
@@ -151,7 +164,7 @@ function M.finalize(stream_plan, base_plan)
   local stream_operations = deepcopy(operations)
   local normalized_base = {}
   for _, operation in ipairs(base_plan or {}) do
-    local normalized = apply_weapon_overlap_policy(normalized_base_operation(operation), stream_operations)
+    local normalized = apply_weapon_overlap_policy(normalized_base_operation(operation), stream_operations, stream_artifact.rows)
     table.insert(normalized_base, normalized)
     table.insert(operations, deepcopy(normalized))
   end
