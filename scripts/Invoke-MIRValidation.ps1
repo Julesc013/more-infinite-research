@@ -2806,6 +2806,9 @@ $defaultEnabledBaseExtensionKeys = @(
   "weapon-shooting-speed",
   "laser-shooting-speed"
 )
+if ($isFactorio016Line) {
+  $defaultEnabledBaseExtensionKeys = @($defaultEnabledBaseExtensionKeys | Where-Object { $_ -ne "weapon-shooting-speed" })
+}
 
 $spaceAgeVanillaOwnedProductivityStreams = @(
   "research_low_density_structure",
