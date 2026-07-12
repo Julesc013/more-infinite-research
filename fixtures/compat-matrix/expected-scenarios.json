@@ -69,6 +69,16 @@
         "required_features": []
       },
       {
+        "name": "synthetic-scale-graph",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "local-mod-library",
+        "surface": "base",
+        "required_features": [
+          "recipe_productivity"
+        ]
+      },
+      {
         "name": "lab-productivity-owner-skip",
         "target_profile": "2.1",
         "kind": "runtime",

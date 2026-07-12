@@ -286,3 +286,16 @@ fixtures:
       - predeclared-settings-stage-mode
       - full-recipe-coverage-accounting
       - coverage-artifact-fingerprint
+
+  synthetic-scale-graph:
+    requires_features: [recipe_productivity]
+    path: fixtures/synthetic-scale-graph
+    assertion_path: fixtures/assert-synthetic-scale-graph
+    validates:
+      - 1000-explicit-recipes
+      - 1000-explicit-technologies
+      - 10000-explicit-technology-effects
+      - high-family-candidate-fanout
+      - single-recipe-fact-scan
+      - single-technology-coverage-scan
+      - complete-recipe-accounting
