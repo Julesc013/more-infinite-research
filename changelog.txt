@@ -20,6 +20,7 @@ Date: 2026-07-13
     - Added positive target capabilities so unsupported effects, settings, and prototype shapes fail closed.
     - Made generated outputs and archive construction deterministic.
     - Made every runtime scenario test one exact archive, with setup reuse, focused selection, and bounded parallel workers.
+    - Renamed Automatic Research Coverage options and added detailed setting and per-option tooltips.
     - Improved science-pack, lab, prerequisite, and technology reachability decisions.
     - Added independent compatibility load coverage for AAI, BZ, Bob, Krastorio, and Krastorio Spaced Out.
     - Kept complex chemistry, recovery, recycling, catalysts, and byproduct loops conservative unless explicitly proven safe.

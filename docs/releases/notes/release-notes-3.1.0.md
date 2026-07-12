@@ -12,7 +12,7 @@ superseded_by: []
 
 # MIR 3.1.0 Release Notes
 
-MIR 3.1.0 is the first plan-first automatic compatibility compiler release for Factorio 2.1. It preserves the released 3.0.5 generated technology IDs, settings/profile contract, runtime namespaces, and default behavior while replacing fixed, order-sensitive generation paths with immutable facts, data-defined family rules, whole-plan validation, and transactional emission.
+MIR 3.1.0 is the first automatic compatibility compiler release for Factorio 2.1. It preserves the released 3.0.5 generated technology IDs, settings/profile contract, runtime namespaces, and default behavior while replacing fixed, order-sensitive generation paths with immutable facts, data-defined family rules, whole-plan validation, and transactional emission.
 
 ## Player-Facing Changes
 
@@ -24,6 +24,7 @@ MIR 3.1.0 is the first plan-first automatic compatibility compiler release for F
 - Every final recipe receives an accounting outcome such as generated coverage, attachment, external ownership, safe skip, unsafe skip, target unsupported, ambiguity, or unclassified. Accounting is diagnostic evidence, not a promise that every recipe should receive productivity.
 - Settings catalogs and portable profiles are isolated from mutation, preserve released values, and retain target/provider-specific values when rows are hidden.
 - Release archives are byte reproducible; identical package-visible source produces identical ZIP bytes.
+- Renamed the player-facing automatic-family setting to Automatic Research Coverage and added clear, capitalized option names plus a detailed tooltip for every dropdown choice. Internal setting keys and stored values are unchanged.
 
 ## Compatibility Evidence
 

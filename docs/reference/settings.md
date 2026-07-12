@@ -39,7 +39,7 @@ mir-settings-profile-import
 
 This setting accepts a portable MIR settings profile string. It is always registered and stays out of profile exports so importing one profile never nests another profile inside it.
 
-`mir-automatic-compiler-mode` has the stable values `off`, `report`, `safe-attach`, `safe-generate`, and `exact-pack`. Its default is `safe-attach`. Report and off modes do not attach family candidates; report mode enables the decision projection. Safe generation materializes the two predeclared manifest-owned generic families. Exact-pack retains safe attachment and materializes only a family named by active reviewed pack authorization; an unrelated active pack enables nothing.
+`mir-automatic-compiler-mode` is displayed as Automatic Research Coverage. It retains the stable stored values `off`, `report`, `safe-attach`, `safe-generate`, and `exact-pack`, presented as Disabled, Preview Only, Extend Existing Research, Add Reviewed Research, and Approved Packs Only. Its default remains `safe-attach`. Preview and disabled modes do not attach family candidates; preview enables the decision projection. Add Reviewed Research materializes only the two predeclared manifest-owned generic families. Approved Packs Only retains safe attachment and materializes only a family named by active reviewed exact-version pack authorization; an unrelated active pack enables nothing. The setting and every dropdown option have explicit locale descriptions.
 
 ## Visibility
 
