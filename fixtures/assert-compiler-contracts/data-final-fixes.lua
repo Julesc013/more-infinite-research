@@ -7,6 +7,7 @@ local precedence = require("__more-infinite-research__.prototypes.mir.compatibil
 local generation_plan = require("__more-infinite-research__.prototypes.mir.planner.generation_plan")
 local compilation_plan = require("__more-infinite-research__.prototypes.mir.planner.compilation_plan")
 local output_validator = require("__more-infinite-research__.prototypes.mir.planner.output_validator")
+local effect_ownership = require("__more-infinite-research__.prototypes.mir.planner.effect_ownership")
 
 local function fail(message)
   error("MIR compiler contract validation failed: " .. message)
@@ -217,6 +218,59 @@ local duplicate_effect_plan = generation_plan.new()
 duplicate_effect_plan:add(emitted_row("effect-a", "effect-tech-a"))
 duplicate_effect_plan:add(emitted_row("effect-b", "effect-tech-b"))
 expect_error("duplicate materialized effect", "duplicate materialized effect identity", function() duplicate_effect_plan:finalize() end)
+
+local overlap_b = emitted_row("research_sulfur", "effect-tech-sulfur")
+overlap_b.fields.effects[1].change = 0.05
+local resolved_overlap, overlap_summary = effect_ownership.resolve({overlap_b, emitted_row("research_carbon", "effect-tech-carbon")})
+if overlap_summary.conflict_count ~= 1 then fail("effect ownership did not count the cross-stream collision") end
+if resolved_overlap[1].stream_key ~= "research_carbon" or resolved_overlap[1].action ~= "emit" then
+  fail("effect ownership did not select the stable lexical fixed-stream owner")
+end
+if resolved_overlap[2].stream_key ~= "research_sulfur" or resolved_overlap[2].action ~= "skip"
+  or resolved_overlap[2].reason ~= "covered_by_planned_stream" then
+  fail("effect ownership did not convert an empty losing stream into an auditable skip")
+end
+local resolved_plan = generation_plan.new()
+for _, row in ipairs(resolved_overlap) do resolved_plan:add(row) end
+resolved_plan:finalize()
+if resolved_plan.validation_summary.effect_ownership_conflict_count ~= 1 then
+  fail("GenerationPlan did not retain the resolved ownership conflict count")
+end
+
+local reversed_overlap = effect_ownership.resolve({emitted_row("research_carbon", "effect-tech-carbon"), overlap_b})
+if fingerprint.of(resolved_overlap) ~= fingerprint.of(reversed_overlap) then
+  fail("effect ownership depends on candidate insertion order")
+end
+
+local malformed_single_stream = emitted_row("malformed-single-stream", "malformed-single-stream-tech")
+table.insert(malformed_single_stream.fields.effects, {
+  type = "change-recipe-productivity", recipe = "shared-recipe", change = 0.1
+})
+local malformed_rows = effect_ownership.resolve({malformed_single_stream})
+local malformed_plan = generation_plan.new()
+malformed_plan:add(malformed_rows[1])
+expect_error("same-stream duplicate materialized effect", "duplicate materialized effect identity", function()
+  malformed_plan:finalize()
+end)
+
+local partial = emitted_row("research_sulfur", "effect-tech-sulfur")
+table.insert(partial.fields.effects, {type = "change-recipe-productivity", recipe = "sulfur-only-recipe", change = 0.1})
+local partial_rows = effect_ownership.resolve({partial, emitted_row("research_carbon", "effect-tech-carbon")})
+if partial_rows[2].action ~= "emit" or #partial_rows[2].fields.effects ~= 1
+  or partial_rows[2].fields.effects[1].recipe ~= "sulfur-only-recipe" then
+  fail("effect ownership removed a losing stream instead of retaining its unique effects")
+end
+
+local adoption = emitted_row("research_adopted", "unused")
+adoption.action = "adopt"
+adoption.technology_name = nil
+adoption.fields = nil
+adoption.adoption = {owner = "existing-productivity-owner", effects = {{type = "change-recipe-productivity", recipe = "shared-recipe", change = 0.03}}}
+local adoption_rows = effect_ownership.resolve({emitted_row("research_emitted", "effect-tech-emitted"), adoption})
+if adoption_rows[1].stream_key ~= "research_adopted" or adoption_rows[1].action ~= "adopt"
+  or adoption_rows[2].action ~= "skip" then
+  fail("existing adopted effect ownership did not win over generated ownership")
+end
 
 local collision_plan = generation_plan.new()
 collision_plan:add(emitted_row("collision-stream", "collision-tech"))

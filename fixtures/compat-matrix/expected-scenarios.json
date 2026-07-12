@@ -624,6 +624,36 @@
         ]
       },
       {
+        "name": "space-age-galore-effect-ownership",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "automatic-compiler",
+        "surface": "space-age",
+        "required_features": [
+          "recipe_productivity"
+        ],
+        "fixtures": [
+          "mir-fixture-space-age-galore-overlap"
+        ],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 180,
+        "tags": [
+          "automatic-compiler",
+          "full",
+          "runtime",
+          "smoke",
+          "space-age"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "single-deterministic-owner-for-multi-output-recipe",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
         "name": "end-game-prerequisite-gate",
         "target_profile": "2.1",
         "kind": "runtime",

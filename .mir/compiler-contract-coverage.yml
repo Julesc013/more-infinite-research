@@ -12,7 +12,7 @@
   ],
   "automatic_modes": ["off", "report", "safe-attach", "safe-generate", "exact-pack"],
   "mutation_sentinels": [
-    "hard-safety", "owner-conflict", "missing-prerequisite", "target-filter", "output-value-parity", "pack-applicability"
+    "hard-safety", "owner-conflict", "cross-stream-effect-arbitration", "missing-prerequisite", "target-filter", "output-value-parity", "pack-applicability"
   ],
   "positive_negative_required": true,
   "runtime_fixture": "fixtures/assert-compiler-contracts/data-final-fixes.lua"

@@ -16,7 +16,8 @@
     },
     {
       "pattern": "prototypes/mir/planner/**",
-      "groups": ["automatic-compiler", "base-load", "science-prerequisites"]
+      "groups": ["automatic-compiler", "base-load", "science-prerequisites"],
+      "scenarios": ["space-age-galore-effect-ownership"]
     },
     {
       "pattern": "prototypes/mir/emit/base_extensions.lua",

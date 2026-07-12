@@ -3408,6 +3408,10 @@ Invoke-RuntimeScenario -ScenarioName "compiler-contracts" -EnabledFixtureNames @
   "mir-fixture-assert-compiler-contracts"
 )
 
+Invoke-RuntimeScenario -ScenarioName "space-age-galore-effect-ownership" -EnabledFixtureNames @(
+  "mir-fixture-space-age-galore-overlap"
+) -EnableSpaceAge
+
 Invoke-RuntimeScenario -ScenarioName "semantic-family-attach" -EnabledFixtureNames @(
   "mir-fixture-semantic-family-attach",
   "mir-fixture-assert-semantic-family-attach"

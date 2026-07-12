@@ -1,13 +1,13 @@
 schema: 1
 
 release:
-  version: "3.1.0"
+  version: "3.1.1"
   branch: dev
   factorio_version: "2.1"
   baseline_commit: 89d7764c4f0f5b67f7b2a2ca0a3827006e3a63d7
   baseline_tag: "3.0.5"
   objective: plan-first-automatic-family-compiler
-  public_contract_change: minor-compatible
+  public_contract_change: patch-compatible
 
 superseded_candidates:
   - source_commit: da961e542dbcbaeb14c0ba15555cd25f5f162944
@@ -100,30 +100,21 @@ superseded_candidates:
     reason: RC6 compiler correctness closure changed package-visible source and invalidated RC5 evidence
     status: superseded-unpublished-candidate
 
+  - source_commit: b9293df08f0db2863e9dbe8a5b48503b705b2630
+    artifact: dist/more-infinite-research_3.1.0.zip
+    sha256: 25B166D56712FB85037437B073F9AC59C500EDD0A404949F94BB4A1F9637DAB3
+    size_bytes: 383525
+    entries: 157
+    forbidden_entries: 0
+    reason: RC8 exposed a cross-stream duplicate recipe effect during Space Age Galore startup
+    status: superseded-unpublished-candidate
+
 candidate:
-  artifact: dist/more-infinite-research_3.1.0.zip
-  source_commit: b9293df08f0db2863e9dbe8a5b48503b705b2630
-  package_source_commit: b9293df08f0db2863e9dbe8a5b48503b705b2630
-  sha256: 25B166D56712FB85037437B073F9AC59C500EDD0A404949F94BB4A1F9637DAB3
-  size_bytes: 383525
-  entries: 157
-  forbidden_entries: 0
-  package_content_sha256: 13A63773AA39D36262C50D98908A9B54653562F62F7EA76B2E33B7D01441912B
-  package_source_sha256: 13A63773AA39D36262C50D98908A9B54653562F62F7EA76B2E33B7D01441912B
-  target_profile_sha256: F415D66E21D47DC95B7465A63CF45788CA00BE2BE9984EA28238D1FD2C739F91
-  required_groups_sha256: 57A1DF87A8FB594B2B51C7E230D775E88028F23D52DF9D5D7DA1336F9271C78A
-  validation_harness_sha256: C9EC2BE636E1B1154FA1419CB134EBDE146479248BD8F788716053D1CF5086EB
-  expected_scenarios_sha256: 0C13E752B06CD6321DE4435A2CC88673B9896A3E3C1E9D3EC03C6DD595ECDBD9
-  validation_package_sha256: A8D06BDF798138EDB5487CF9AC871E5DD5503F0422A4C32CAA951F1BA4608254
-  validation_package_content_sha256: 13A63773AA39D36262C50D98908A9B54653562F62F7EA76B2E33B7D01441912B
-  structured_summary_path: .mir/evidence/3.1.0-rc8-validation-summary.json
-  structured_summary_run_id: 76604aa6-ae3c-4530-9b13-6e7e022177d1
-  upgrade_evidence_path: .mir/evidence/3.1.0-rc8/upgrade-proof.json
-  ecosystem_evidence_path: .mir/evidence/3.1.0-rc8-ecosystem-campaign.json
-  interactive_evidence_path: .mir/evidence/3.1.0-rc8-interactive-review.json
-  automated_gate: passed
+  artifact: dist/more-infinite-research_3.1.1.zip
+  source_commit: pending
+  automated_gate: pending
   manual_gate: pending
-  status: release-candidate-awaiting-manual-review
+  status: rebuilding-after-package-visible-change
 
 rules:
   - dev-remains-the-canonical-modern-implementation

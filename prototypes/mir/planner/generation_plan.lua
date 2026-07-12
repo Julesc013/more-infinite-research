@@ -182,11 +182,16 @@ function Plan:finalize()
     local reason = row.reason or row.action
     reason_counts[reason] = (reason_counts[reason] or 0) + 1
   end
+  local ownership_conflict_count = 0
+  for _, row in ipairs(self.rows) do
+    ownership_conflict_count = ownership_conflict_count + #((row.effect_ownership and row.effect_ownership.lost) or {})
+  end
   self.validation_summary = {
     valid = true,
     row_count = #self.rows,
     action_counts = action_counts,
-    reason_counts = reason_counts
+    reason_counts = reason_counts,
+    effect_ownership_conflict_count = ownership_conflict_count
   }
   self.plan_fingerprint = fingerprint.of({
     schema = 3,

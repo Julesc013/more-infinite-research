@@ -345,12 +345,27 @@ fixtures:
       - stable-generation-plan-identities
       - evidence-bearing-generation-plan-gates
       - duplicate-materialized-effect-rejection
+      - deterministic-cross-stream-effect-arbitration
+      - same-stream-duplicate-effect-rejection-after-arbitration
+      - adoption-wins-over-generated-effect-claim
+      - partial-loser-retains-unique-effects
+      - insertion-order-independent-effect-ownership
       - compilation-plan-cross-collision
       - output-effect-value-parity
       - base-extension-output-parity
       - final-plan-output-owner-parity
       - insertion-order-independent-plan-fingerprints
       - cyclic-fingerprint-rejection
+
+  space-age-galore-effect-ownership:
+    requires_features: [recipe_productivity]
+    path: fixtures/space-age-galore-overlap
+    validates:
+      - vgal-coal-crushing-multi-output-shape
+      - carbon-and-sulfur-cross-stream-claim
+      - exactly-one-materialized-effect-owner
+      - stable-owner-selection
+      - no-settings-reset-required
 
   semantic-family-generate:
     requires_features: [recipe_productivity]

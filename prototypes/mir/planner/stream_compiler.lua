@@ -26,6 +26,7 @@ local recipe_facts = require("prototypes.mir.index.recipe_facts")
 local target_profiles = require("prototypes.mir.platform.factorio.target_profiles")
 local effective_settings = require("prototypes.mir.settings.effective")
 local compatibility_packs = require("prototypes.mir.compatibility.packs.registry")
+local effect_ownership = require("prototypes.mir.planner.effect_ownership")
 
 local M = {}
 local latest_plan = nil
@@ -380,14 +381,28 @@ function M.compile()
       target_profile = fingerprint.of(target_profiles.current())
     }
   })
+  local rows = {}
   for _, key in ipairs(table_utils.sorted_keys(streams)) do
-    plan:add(plan_stream(key, streams[key]))
+    table.insert(rows, plan_stream(key, streams[key]))
+  end
+  rows = effect_ownership.resolve(rows)
+  for _, row in ipairs(rows) do
+    plan:add(row)
   end
   return plan:finalize()
 end
 
 function M.apply(plan)
   for _, row in ipairs(plan:snapshot()) do
+    for _, conflict in ipairs((row.effect_ownership and row.effect_ownership.lost) or {}) do
+      D.recipe_owner({
+        recipe = conflict.recipe,
+        action = "planned-owner-won",
+        owners = conflict.winner_owner,
+        owner_actions = conflict.winner_stream,
+        warning_class = conflict.reason
+      })
+    end
     if row.action == "emit" then
       if row.direct_effects then
         native_modifiers.record_overlaps(row.stream_key, row.overlap_effects)

@@ -1,13 +1,13 @@
 ---
 title: "MIR 3.1.0 Release Notes"
-status: current
+status: archived
 applies_to: "3.1.0"
 audience: player
 doc_type: release-plan
 owner: mir-maintainers
 last_reviewed: 2026-07-13
 supersedes: []
-superseded_by: []
+superseded_by: ["release-notes-3.1.1.md"]
 ---
 
 # MIR 3.1.0 Release Notes

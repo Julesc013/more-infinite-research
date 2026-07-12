@@ -1,4 +1,16 @@
 ---------------------------------------------------------------------------------------------------
+Version: 3.1.1
+Date: 2026-07-13
+
+  Bugfixes:
+
+    - Fixed a startup crash when one multi-output recipe matched more than one generated productivity research stream.
+    - Made overlapping recipe effects choose one stable owner while preserving every non-overlapping effect.
+    - Preferred compatible existing productivity research when it already owns an overlapping recipe effect.
+    - Kept a final duplicate-effect safety check after overlapping ownership is resolved.
+    - Added regression coverage for Space Age Galore's coal-crushing recipe shape and related ownership cases.
+
+---------------------------------------------------------------------------------------------------
 Version: 3.1.0
 Date: 2026-07-13
 

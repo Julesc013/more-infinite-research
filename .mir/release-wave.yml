@@ -97,23 +97,23 @@ waves:
       next_version: "0.6.0"
       status: discovery-pending
 
-  mir_3_1_0:
-    version: "3.1.0"
+  mir_3_1_1:
+    version: "3.1.1"
     branch: dev
     source_anchor_required: published-3.0.5-plus-accepted-portable-return
     baseline_tag: pre-3.1-modernization
     baseline_commit: f3d3b6073166b5acdc2ae5636c0d68302b757f0f
     implementation_gate: authorized-by-maintainer-directed-continuation
-    source_commit: b9293df08f0db2863e9dbe8a5b48503b705b2630
+    source_commit: pending-hotfix-acceptance
     architecture_contract: docs/architecture/automatic-family-compiler.md
     stable_technology_id_count: 70
     reviewed_generic_family_id_count: 2
     family_rule_schema: 2
     compatibility_pack_schema: 2
     generation_plan_schema: 3
-    previous_candidate_commit: 6272cb67c96855c574c96032cb27dfcf0721aa74
+    previous_candidate_commit: b9293df08f0db2863e9dbe8a5b48503b705b2630
     previous_candidate_archive: dist/more-infinite-research_3.1.0.zip
-    previous_candidate_sha256: 0244D40A9971C450274FE1FD7EA142FA5D23E4A2271A0191F31F395589267C1A
+    previous_candidate_sha256: 25B166D56712FB85037437B073F9AC59C500EDD0A404949F94BB4A1F9637DAB3
     previous_candidate_status: superseded-unreleased-candidate
     integration_summary_path: .mir/evidence/3.1.0-automatic-compiler-integration-gate-summary.json
     pre_renumber_plan_v2_characterization: .mir/evidence/pre-3.1-renumber-plan-v2-gate-summary.json
@@ -123,38 +123,33 @@ waves:
     pre_renumber_core_ecosystem_load_characterization: .mir/evidence/pre-3.1-renumber-core-ecosystems-load-campaign.json
     pre_renumber_aai_load_characterization: .mir/evidence/pre-3.1-renumber-aai-load-campaign.json
     automatic_compiler_runtime_summary: .mir/evidence/3.1.0-automatic-compiler-runtime-summary.json
-    runtime_source_commit: b9293df08f0db2863e9dbe8a5b48503b705b2630
-    package_evidence_commit: 5fc40b6db3210680c5837a2e27344d3f11ef5b52
-    package_source_commit: b9293df08f0db2863e9dbe8a5b48503b705b2630
-    runtime_run_id: 76604aa6-ae3c-4530-9b13-6e7e022177d1
-    runtime_scenario_count: 89
-    runtime_package_sha256: 25B166D56712FB85037437B073F9AC59C500EDD0A404949F94BB4A1F9637DAB3
-    runtime_validation_archive_sha256: A8D06BDF798138EDB5487CF9AC871E5DD5503F0422A4C32CAA951F1BA4608254
-    runtime_package_content_sha256: 13A63773AA39D36262C50D98908A9B54653562F62F7EA76B2E33B7D01441912B
-    structured_validation_evidence: .mir/evidence/3.1.0-rc8-validation-summary.json
-    upgrade_evidence: .mir/evidence/3.1.0-rc8/upgrade-proof.json
-    available_ecosystem_load_evidence: .mir/evidence/3.1.0-rc8-ecosystem-campaign.json
-    available_ecosystem_dependency_lock_sha256: 8ADEE6C75778EB3DCEC1D49EAEE077309A644C13391D7816C361D8A95CAAE64C
-    interactive_evidence: .mir/evidence/3.1.0-rc8-interactive-review.json
-    available_ecosystem_load_gate: 9-passed-zero-dependency-failures-load-claims-only-including-46-mod-planet-cluster
-    current_archive_ecosystem_load_gate: passed
-    renumbered_static_gate: passed
-    renumbered_runtime_gate: passed
-    exact_package_gate: passed-validation-package-base-and-space-age-pending-main-dist-recheck
-    upgrade_from_3_0_5: passed-exact-archives-retained-settings-levels-storage-and-scripted-effects
-    candidate_freshness_gate: passed-clean-tree-rc8-source-package-validation-upgrade-nine-claim-gated-ecosystems-and-pending-interactive-bindings
-    interactive_gate: pending-rc8-identity-bound-packet-created-no-independent-ui-observation
+    runtime_source_commit: pending
+    package_evidence_commit: pending
+    package_source_commit: pending
+    runtime_scenario_count: 90
+    structured_validation_evidence: .mir/evidence/3.1.1-galore-hotfix-validation-summary.json
+    emergency_validation_basis: 89-existing-full-scenarios-passed-plus-separate-galore-hotfix-scenario-passed
+    upgrade_evidence: pending
+    available_ecosystem_load_evidence: pending
+    available_ecosystem_load_gate: pending-hotfix-recheck
+    current_archive_ecosystem_load_gate: pending
+    renumbered_static_gate: passed-with-hotfix-summary
+    renumbered_runtime_gate: passed-89-existing-plus-1-hotfix
+    exact_package_gate: pending-hotfix-recheck
+    upgrade_from_3_0_5: pending-hotfix-recheck
+    candidate_freshness_gate: rebuilding-after-package-visible-change
+    interactive_gate: pending
     publication_status: unreleased
-    status: release-candidate-awaiting-manual-review
+    status: emergency-hotfix-qualified-awaiting-candidate-binding
 
   mir_2_4_0:
     version: "2.4.0"
     branch: tmp/2.0
-    source_anchor_required: accepted-3.1.0
-    source_commit: pending-accepted-3.1.0
+    source_anchor_required: accepted-3.1.1
+    source_commit: pending-accepted-3.1.1
     previous_candidate_commit: 575fc4f5ae4a52205d1e72604934ead35e69c99e
     previous_candidate_archive: dist/more-infinite-research_2.4.0.zip
     previous_candidate_sha256: 8618CAF031EF24EB83641DB03566F2390DD29AD98D2099A80D596EEB527EDA12
     previous_candidate_status: superseded-unreleased-candidate
     publication_status: unreleased
-    status: blocked-on-accepted-3.1.0
+    status: blocked-on-accepted-3.1.1
