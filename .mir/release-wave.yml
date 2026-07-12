@@ -177,4 +177,11 @@ waves:
     bz_coverage_accounted_recipes: 769
     bz_coverage_recipe_count: 769
     bz_coverage_scan_count: 2
+    rule_pack_schema_source_commit: bae27f521070bd62a13ec54689818cd8394b3554
+    rule_pack_schema_summary_path: .mir/evidence/3.2.0-rule-pack-schema-runtime-summary.json
+    rule_pack_schema_run_id: a3742534-a79f-44b9-94bd-f5f4573db121
+    rule_pack_schema_scenario_count: 85
+    rule_pack_schema_result: passed
+    family_rule_schema: 2
+    compatibility_pack_schema: 2
     status: integration-validated
