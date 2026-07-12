@@ -2852,7 +2852,7 @@ function Assert-SpaceAgeVanillaOwnedProductivityStreamsSkipped {
 function Assert-BaseCoreProductivityStreamsGenerated {
   param([string]$Context)
 
-  $reducedDirectEffectStreams = @(
+  foreach ($stream in @(
     "research_electronic_circuit",
     "research_advanced_circuit",
     "research_processing_unit",
@@ -2968,7 +2968,7 @@ if ($isReducedLegacyLine) {
   }
   $directEffectFixtureNames += "mir-fixture-assert-generated-prerequisite-safety"
   Invoke-RuntimeScenario -ScenarioName "factorio-$($repoInfo.factorio_version)-direct-effects" -EnabledFixtureNames $directEffectFixtureNames
-  foreach ($stream in @(
+  $reducedDirectEffectStreams = @(
     "research_cannon_shooting_speed",
     "research_character_crafting_speed",
     "research_character_mining_speed",
