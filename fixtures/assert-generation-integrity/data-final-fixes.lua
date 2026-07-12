@@ -34,13 +34,17 @@ local function assert_no_blocked_pickup_effects()
   end
 end
 
-local function assert_generation_plan_v2()
+local function assert_generation_plan_v3()
   local plan = stream_compiler.latest_artifact()
-  if not plan or plan.schema ~= 2 or not plan.validation_summary or plan.validation_summary.valid ~= true then
-    fail("missing accepted GenerationPlan schema 2 artifact")
+  if not plan then
+    local compiled = stream_compiler.compile()
+    plan = compiled and compiled:artifact() or nil
+  end
+  if not plan or plan.schema ~= 3 or not plan.validation_summary or plan.validation_summary.valid ~= true then
+    fail("missing accepted GenerationPlan schema 3 artifact")
   end
   if type(plan.plan_fingerprint) ~= "string" or not plan.plan_fingerprint:match("^mir32%-") then
-    fail("GenerationPlan schema 2 fingerprint is missing")
+    fail("GenerationPlan schema 3 fingerprint is missing")
   end
   for _, source in ipairs({"facts", "rules", "compatibility_packs", "target_profile"}) do
     if type(plan.source_fingerprints[source]) ~= "string" then
@@ -48,9 +52,11 @@ local function assert_generation_plan_v2()
     end
   end
   for _, row in ipairs(plan.rows or {}) do
-    for _, gate in ipairs({"target_supported", "effect_valid", "owner_conflict_free", "science_compatible", "lab_compatible", "prerequisites_acyclic", "loop_safe"}) do
-      if type(row.gates and row.gates[gate]) ~= "boolean" then
-        fail("GenerationPlan row is missing boolean gate " .. gate)
+    for _, gate in ipairs({"target_supported", "effect_valid", "owner_conflict_free", "science_compatible", "lab_compatible", "prerequisites_acyclic", "loop_safe", "progression_safe", "migration_safe", "output_identity_safe"}) do
+      local proof = row.gates and row.gates[gate]
+      if type(proof) ~= "table" or type(proof.passed) ~= "boolean"
+        or type(proof.status) ~= "string" or type(proof.evidence) ~= "table" then
+        fail("GenerationPlan row is missing evidence gate " .. gate)
       end
     end
   end
@@ -318,7 +324,7 @@ local base_extension_defaults = {
 }
 
 assert_no_blocked_pickup_effects()
-assert_generation_plan_v2()
+assert_generation_plan_v3()
 assert_decision_record_v2()
 assert_setting_target_ownership()
 
