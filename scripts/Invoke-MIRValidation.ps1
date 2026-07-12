@@ -2087,6 +2087,7 @@ $postMirAssertionFixtures = @(
   "mir-fixture-assert-better-bot-battery-skip",
   "mir-fixture-assert-big-mining-drill-productivity",
   "mir-fixture-assert-semantic-family-attach",
+  "mir-fixture-assert-semantic-family-generate",
   "mir-fixture-assert-capability-negative-cases",
   "mir-fixture-assert-generation-integrity",
   "mir-fixture-assert-generated-prerequisite-safety",
