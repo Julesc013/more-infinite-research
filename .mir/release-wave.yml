@@ -124,7 +124,7 @@ waves:
     pre_renumber_aai_load_characterization: .mir/evidence/pre-3.1-renumber-aai-load-campaign.json
     automatic_compiler_runtime_summary: .mir/evidence/3.1.0-automatic-compiler-runtime-summary.json
     runtime_source_commit: b9293df08f0db2863e9dbe8a5b48503b705b2630
-    package_evidence_commit: pending-rc8-evidence-commit
+    package_evidence_commit: 5fc40b6db3210680c5837a2e27344d3f11ef5b52
     package_source_commit: b9293df08f0db2863e9dbe8a5b48503b705b2630
     runtime_run_id: 76604aa6-ae3c-4530-9b13-6e7e022177d1
     runtime_scenario_count: 89
@@ -142,7 +142,7 @@ waves:
     renumbered_runtime_gate: passed
     exact_package_gate: passed-validation-package-base-and-space-age-pending-main-dist-recheck
     upgrade_from_3_0_5: passed-exact-archives-retained-settings-levels-storage-and-scripted-effects
-    candidate_freshness_gate: pending-clean-tree-rc8-evidence-commit
+    candidate_freshness_gate: passed-clean-tree-rc8-source-package-validation-upgrade-nine-claim-gated-ecosystems-and-pending-interactive-bindings
     interactive_gate: pending-rc8-identity-bound-packet-created-no-independent-ui-observation
     publication_status: unreleased
     status: release-candidate-awaiting-manual-review
