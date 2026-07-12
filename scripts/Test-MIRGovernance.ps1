@@ -139,8 +139,8 @@ if (-not (Test-Path -LiteralPath $targetManifestPath -PathType Leaf)) {
   throw "Missing required target profile manifest: .mir/targets.json"
 }
 $targetManifest = Get-Content -Raw -LiteralPath $targetManifestPath | ConvertFrom-Json
-if ($targetManifest.schema -ne 1 -or -not $targetManifest.profiles) {
-  throw ".mir/targets.json must use schema 1 and define profiles."
+if ($targetManifest.schema -ne 2 -or -not $targetManifest.profiles) {
+  throw ".mir/targets.json must use schema 2 and define profiles."
 }
 $repoInfo = Get-Content -Raw -LiteralPath (Join-Path $repo "info.json") | ConvertFrom-Json
 if (-not $targetManifest.profiles.PSObject.Properties[$repoInfo.factorio_version]) {
@@ -299,7 +299,8 @@ if ([string]$releaseFields.factorio_version -ne [string]$repoInfo.factorio_versi
 if ([string]$releaseFields.objective -notin @(
   "behavioral-superset-implementation-subset",
   "target-port-behavioral-subset",
-  "bounded-correctness-and-contract-modernization"
+  "bounded-correctness-and-contract-modernization",
+  "plan-first-automatic-family-compiler"
 )) {
   throw ".mir/convergence.yml has unsupported release objective: $($releaseFields.objective)"
 }

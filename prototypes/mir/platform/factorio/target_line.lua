@@ -103,6 +103,21 @@ function M.science_family()
   return profile.science_family
 end
 
+function M.prototype_shapes()
+  return profile.prototype_shapes
+end
+
+function M.expected_stream_count()
+  return profile.expected_stream_count
+end
+
+function M.emitter_supported(name)
+  for _, emitter in ipairs(profile.emitter_families or {}) do
+    if emitter == name then return true end
+  end
+  return false
+end
+
 function M.weapon_overlap_default()
   return profile.weapon_overlap_default
 end

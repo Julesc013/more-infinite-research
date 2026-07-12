@@ -1,4 +1,5 @@
 local deepcopy = require("prototypes.mir.core.deepcopy")
+local effect_metadata = require("prototypes.mir.domain.effects.metadata")
 
 local M = {}
 
@@ -7,6 +8,8 @@ local settings_sort_names = {
   research_agricultural_growth_speed = "Agricultural growth speed",
   research_air_scrubbing_clean_filter = "Air Scrubbing clean-filter productivity",
   research_armor_components = "Armor component productivity",
+  research_auto_assembling_machine = "Assembling machine manufacturing productivity",
+  research_auto_lab = "Lab manufacturing productivity",
   research_ash_separation = "Ash separation productivity",
   research_bacteria_cultivation = "Bacteria cultivation productivity",
   research_batteries = "Battery productivity",
@@ -75,32 +78,6 @@ local settings_sort_names = {
   research_walls = "Wall productivity"
 }
 
-local percentage_effects = {
-  ["braking-force"] = true,
-  ["character-crafting-speed"] = true,
-  ["character-mining-speed"] = true,
-  ["character-running-speed"] = true,
-  ["gun-speed"] = true,
-  ["laboratory-productivity"] = true,
-  ["laboratory-speed"] = true,
-  ["worker-robot-battery"] = true
-}
-
-local whole_number_effects = {
-  ["bulk-inserter-capacity-bonus"] = true,
-  ["cargo-landing-pad-count"] = true,
-  ["character-build-distance"] = true,
-  ["character-inventory-slots-bonus"] = true,
-  ["character-item-drop-distance"] = true,
-  ["character-logistic-trash-slots"] = true,
-  ["character-reach-distance"] = true,
-  ["character-resource-reach-distance"] = true,
-  ["inserter-stack-size-bonus"] = true,
-  ["max-cargo-bay-unloading-distance"] = true,
-  ["stack-inserter-capacity-bonus"] = true,
-  ["worker-robot-storage"] = true
-}
-
 local function append_unique(out, seen, value)
   if value ~= nil and not seen[value] then
     seen[value] = true
@@ -117,18 +94,7 @@ local function sorted_unique(values)
 end
 
 local function numeric_effect(effect)
-  if type(effect) ~= "table" then return nil end
-  if effect.type == "change-recipe-productivity" and type(effect.change) == "number" then
-    return { field = "change", unit = "percent", display_multiplier = 100, value = effect.change }
-  end
-  if type(effect.modifier) ~= "number" then return nil end
-  if percentage_effects[effect.type] then
-    return { field = "modifier", unit = "percent", display_multiplier = 100, value = effect.modifier }
-  end
-  if whole_number_effects[effect.type] then
-    return { field = "modifier", unit = "native", display_multiplier = 1, value = effect.modifier }
-  end
-  return nil
+  return effect_metadata.numeric_descriptor(effect)
 end
 
 local function close_to_integer(value)
@@ -233,6 +199,9 @@ function M.normalize(key, raw_spec)
   end
 
   local spec = deepcopy(raw_spec)
+  if spec.technology_name ~= nil and (type(spec.technology_name) ~= "string" or spec.technology_name == "") then
+    error("Raw MIR stream " .. key .. " has invalid technology_name.", 2)
+  end
   local kind = spec.direct_effects and "direct-effect" or "recipe-productivity"
   local effect = kind == "direct-effect"
     and direct_effect_contract(key, spec)

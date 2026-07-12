@@ -63,6 +63,19 @@ local function recipe_uses_blocked_ingredient(rec, patterns)
   return false
 end
 
+local function has_productive_shared_input_output(recipe)
+  for _, variant in ipairs(recipe.variants or {}) do
+    local ingredients = {}
+    for _, entry in ipairs(variant.ingredients or {}) do ingredients[entry.name] = true end
+    for _, entry in ipairs(variant.results or {}) do
+      local maximum = tonumber(entry.amount_max or entry.amount or entry.amount_min) or 1
+      local ignored = tonumber(entry.ignored_by_productivity or 0) or 0
+      if ingredients[entry.name] and maximum - ignored > 0 then return true end
+    end
+  end
+  return false
+end
+
 local function should_skip_recipe(recipe_name, recipe, options)
   if options.exclude_recipe_patterns and name_matches(recipe_name, options.exclude_recipe_patterns) then
     return true
@@ -73,6 +86,7 @@ local function should_skip_recipe(recipe_name, recipe, options)
   if recipe_is_hidden(recipe) and not options.include_hidden then
     return true
   end
+  if has_productive_shared_input_output(recipe) and not options.allow_shared_input_output then return true end
   if not options.include_recycling then
     for _, category in ipairs(recipe_categories(recipe)) do
       if DEFAULT_SKIP_CATEGORIES[category] then return true end
@@ -141,7 +155,7 @@ local function gather_by_items(items, patterns, options)
     local r = recipe_facts.get(rname)
     if not should_skip_recipe(rname, r, options) then
       local outs = {}
-      for _, output_name in ipairs(r.result_names or {}) do outs[output_name] = true end
+      for _, output_name in ipairs(r.productive_result_names or {}) do outs[output_name] = true end
       local match = false
       for it, _ in pairs(want) do
         if it == "rail" then
@@ -180,6 +194,7 @@ function R.recipes_for_stream(spec, per_level_default)
         exclude_ingredient_patterns = merge_lists(spec.exclude_ingredient_patterns, g.exclude_ingredient_patterns),
         include_hidden = spec.include_hidden or g.include_hidden,
         include_recycling = spec.include_recycling or g.include_recycling,
+        allow_shared_input_output = spec.allow_shared_input_output or g.allow_shared_input_output,
         module_tiers = g.module_tiers,
         module_tier_min = g.module_tier_min,
         module_tier_max = g.module_tier_max,
@@ -211,6 +226,7 @@ function R.recipes_for_stream(spec, per_level_default)
     exclude_ingredient_patterns = spec.exclude_ingredient_patterns,
     include_hidden = spec.include_hidden,
     include_recycling = spec.include_recycling,
+    allow_shared_input_output = spec.allow_shared_input_output,
     module_tiers = spec.module_tiers,
     module_tier_min = spec.module_tier_min,
     module_tier_max = spec.module_tier_max,

@@ -22,6 +22,7 @@ param(
   [string[]]$LocalModLibraryZips = @(),
   [string[]]$LocalModNames = @(),
   [string]$ModUnderTestZip = "",
+  [string]$ModUnderTestSourceCommit = "",
   [switch]$DownloadMods,
   [switch]$RunLoadTests,
   [switch]$RunManualScenarios,
@@ -56,6 +57,9 @@ $moduleRoot = Join-Path $PSScriptRoot "MIRCompatAudit"
 $resolvedModUnderTestZip = ""
 if (-not [string]::IsNullOrWhiteSpace($ModUnderTestZip)) {
   $resolvedModUnderTestZip = (Resolve-Path -LiteralPath $ModUnderTestZip).Path
+}
+if (-not [string]::IsNullOrWhiteSpace($ModUnderTestSourceCommit) -and $ModUnderTestSourceCommit -notmatch '^[0-9a-fA-F]{40}$') {
+  throw "ModUnderTestSourceCommit must be a full 40-character git commit."
 }
 
 if ([string]::IsNullOrWhiteSpace($FactorioLine)) {
@@ -148,6 +152,7 @@ function ConvertTo-MIRLockEntry {
     owner = [string]$FullMod.owner
     file_name = [string]$Release.file_name
     sha1 = [string]$Release.sha1
+    sha256 = [string](Get-MIRObjectProperty -Object $Release -Name "sha256" -Default "")
     download_url = [string]$Release.download_url
     source = ""
     source_path = ""
@@ -201,6 +206,7 @@ function ConvertTo-MIRLocalFullMod {
   })
   $file = Get-Item -LiteralPath $resolvedZip
   $sha1 = (Get-FileHash -Algorithm SHA1 -LiteralPath $resolvedZip).Hash.ToLowerInvariant()
+  $sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $resolvedZip).Hash.ToLowerInvariant()
 
   [pscustomobject]@{
     name = [string]$info.name
@@ -213,6 +219,7 @@ function ConvertTo-MIRLocalFullMod {
         version = [string]$info.version
         file_name = $file.Name
         sha1 = $sha1
+        sha256 = $sha256
         download_url = ""
         source_path = $resolvedZip
         source = "local_zip"
@@ -262,6 +269,7 @@ function New-MIRScenario {
     [string[]]$OfficialMods = @(),
     [object[]]$LockEntries = @(),
     [object[]]$Failures = @(),
+    [string]$ClaimLevel = "loads",
     [string]$Notes = ""
   )
 
@@ -274,6 +282,7 @@ function New-MIRScenario {
     official_mods = @($OfficialMods | Sort-Object -Unique)
     lock_entries = @($LockEntries | Sort-Object name, version -Unique)
     dependency_failures = @($Failures)
+    claim_level = $ClaimLevel
     notes = $Notes
   }
 }
@@ -738,6 +747,7 @@ function Resolve-MIRPortalScenario {
     [Parameter(Mandatory)][string]$Type,
     [string[]]$RequestedMods = @(),
     [bool]$EnableSpaceAgeBundle,
+    [string]$ClaimLevel = "loads",
     [string]$Notes = ""
   )
 
@@ -818,6 +828,7 @@ function Resolve-MIRPortalScenario {
     -OfficialMods $officialMods `
     -LockEntries $scenarioLockEntries `
     -Failures $scenarioFailures `
+    -ClaimLevel $ClaimLevel `
     -Notes $Notes
 }
 
@@ -1016,6 +1027,7 @@ if ($RunManualScenarios) {
       -Type "manual" `
       -RequestedMods $scenarioMods `
       -EnableSpaceAgeBundle $includeBundle `
+      -ClaimLevel ([string](Get-MIRObjectProperty -Object $scenario -Name "claim_level" -Default "loads")) `
       -Notes ([string](Get-MIRObjectProperty -Object $scenario -Name "notes" -Default ""))
   }
 }
@@ -1115,6 +1127,8 @@ $lock = [ordered]@{
   local_mod_library_dirs = @($LocalModLibraryDirs)
   local_mod_library_zips = @($LocalModLibraryZips)
   mod_under_test_zip = $resolvedModUnderTestZip
+  mod_under_test_sha256 = if ($resolvedModUnderTestZip) { (Get-FileHash -Algorithm SHA256 -LiteralPath $resolvedModUnderTestZip).Hash.ToUpperInvariant() } else { "" }
+  mod_under_test_source_commit = $ModUnderTestSourceCommit
   link_mode = $LinkMode
   local_root_zip_count = $localRootZipPaths.Count
   local_library_zip_count = $localLibraryZipPaths.Count
@@ -1141,6 +1155,7 @@ $scenarioSummaries = @($selectedScenarios | ForEach-Object {
     resolved_mods = @($_.resolved_mods)
     official_mods = @($_.official_mods)
     dependency_failures = @($_.dependency_failures)
+    claim_level = [string](Get-MIRObjectProperty -Object $_ -Name "claim_level" -Default "loads")
     notes = $_.notes
   }
 })
@@ -1234,13 +1249,13 @@ if (($DownloadMods -or ($RunLoadTests -and -not $UseCachedDownloads)) -and $down
   }
 }
 
+$results = @()
 if ($RunLoadTests) {
   if ([string]::IsNullOrWhiteSpace($FactorioBin)) {
     throw "Load tests require -FactorioBin or FACTORIO_BIN."
   }
 
   $runRoot = New-MIRDirectory -Path (Join-Path $resolvedOutputDir "runs")
-  $results = @()
   $loadResultsPath = Join-Path $resolvedOutputDir "load-results.json"
   $manualResultsPath = Join-Path $resolvedOutputDir "manual-results.json"
   $scenarioList = @($selectedScenarios)
@@ -1269,9 +1284,65 @@ if ($RunLoadTests) {
   if ($manualResults.Count -gt 0) {
     $manualResults | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $manualResultsPath -Encoding UTF8
   }
+
+  $lockSha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $lockPath).Hash.ToUpperInvariant()
+  $resultByScenario = @{}
+  foreach ($result in $results) { $resultByScenario[[string]$result.scenario] = $result }
+  $campaignScenarios = @(
+    foreach ($scenario in $selectedScenarios) {
+      $result = $resultByScenario[[string]$scenario.name]
+      $closure = @(
+        foreach ($entry in @($scenario.lock_entries | Sort-Object name, version -Unique)) {
+          if ([string]::IsNullOrWhiteSpace([string]$entry.sha256)) {
+            throw "Campaign evidence requires SHA-256 for resolved mod $($entry.name) $($entry.version)."
+          }
+          [ordered]@{
+            name = [string]$entry.name
+            version = [string]$entry.version
+            sha256 = [string]$entry.sha256
+            source = [string]$entry.source
+          }
+        }
+      )
+      [ordered]@{
+        scenario_id = [string]$scenario.name
+        requested_roots = @($scenario.requested_mods)
+        actual_executed_roots = @($scenario.root_mods)
+        resolved_mods = @($scenario.resolved_mods)
+        official_mods = @($scenario.official_mods)
+        dependency_closure = $closure
+        dependency_failure_count = @($scenario.dependency_failures).Count
+        result = if ($result.passed -eq $true) { "passed" } elseif ($result.skipped -eq $true) { "skipped" } else { "failed" }
+        exit_code = $result.exit_code
+        timed_out = [bool]$result.timed_out
+        claim_level = [string](Get-MIRObjectProperty -Object $scenario -Name "claim_level" -Default "loads")
+      }
+    }
+  )
+  $campaignEvidence = [ordered]@{
+    schema = 1
+    kind = "mir-modpack-campaign-evidence"
+    generated_at = (Get-Date).ToUniversalTime().ToString("o")
+    factorio_line = $FactorioLine
+    factorio_binary = (Resolve-Path -LiteralPath $FactorioBin).Path
+    mir_archive = [ordered]@{
+      path = $resolvedModUnderTestZip
+      sha256 = $lock.mod_under_test_sha256
+      source_commit = $ModUnderTestSourceCommit
+      source_commit_binding = if ([string]::IsNullOrWhiteSpace($ModUnderTestSourceCommit)) { "unbound" } else { "declared" }
+    }
+    dependency_lock = [ordered]@{
+      path = $lockPath
+      sha256 = $lockSha256
+    }
+    scenarios = $campaignScenarios
+  }
+  $campaignEvidencePath = Join-Path $resolvedOutputDir "campaign-evidence.json"
+  $campaignEvidence | ConvertTo-Json -Depth 30 | Set-Content -LiteralPath $campaignEvidencePath -Encoding UTF8
 }
 
 Write-Host "[compat-audit] wrote $lockPath"
 Write-Host "[compat-audit] wrote $reportPath"
 Write-Host "[compat-audit] wrote $jsonReportPath"
 Write-Host "[compat-audit] wrote $failureCsvPath"
+if ($RunLoadTests) { Write-Host "[compat-audit] wrote $campaignEvidencePath" }

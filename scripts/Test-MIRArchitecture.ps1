@@ -244,17 +244,24 @@ $requiredMirFiles = @(
   "prototypes/mir/policy/weapon_speed.lua",
   "prototypes/mir/policy/capabilities.lua",
   "prototypes/mir/index/registry_builder.lua",
+  "prototypes/mir/index/recipe_facts.lua",
+  "prototypes/mir/index/relationships.lua",
   "prototypes/mir/index/productivity_owners.lua",
   "prototypes/mir/domain/facts/registry.lua",
+  "prototypes/mir/domain/effects/metadata.lua",
   "prototypes/mir/domain/facts/generated_technology_registry.lua",
   "prototypes/mir/capabilities/contract.lua",
   "prototypes/mir/capabilities/registry.lua",
   "prototypes/mir/capabilities/recipe_productivity/planner.lua",
   "prototypes/mir/capabilities/recipe_productivity/recipe_matching.lua",
+  "prototypes/mir/families/rules.lua",
+  "prototypes/mir/families/registry.lua",
+  "prototypes/mir/families/resolver.lua",
   "prototypes/mir/capabilities/science_integration/science_packs.lua",
   "prototypes/mir/capabilities/science_integration/science_selector.lua",
   "prototypes/mir/planner/compiler.lua",
   "prototypes/mir/planner/stream_compiler.lua",
+  "prototypes/mir/planner/generation_plan.lua",
   "prototypes/mir/planner/costs.lua",
   "prototypes/mir/planner/direct_effects.lua",
   "prototypes/mir/planner/native_modifiers.lua",
@@ -329,6 +336,8 @@ Assert-MIRContains -RelativePath "prototypes/mir/stage/data_final_fixes.lua" -Te
 
 $dataFinalFixesStepsText = (Read-MIRFile -RelativePath "prototypes/mir/stage/data_final_fixes_steps.lua") + "`n" +
   (Read-MIRFile -RelativePath "prototypes/mir/pipeline/commands.lua")
+Assert-MIRContains -RelativePath "prototypes/mir/pipeline/commands.lua" -Text $dataFinalFixesStepsText -Needle "function M.order()"
+Assert-MIRContains -RelativePath "prototypes/mir/pipeline/commands.lua" -Text $dataFinalFixesStepsText -Needle "ran before dependency"
 foreach ($needle in @(
   'require("prototypes.mir.compatibility.repairs.factorio_2_1_recipe_schema").apply()',
   'require("prototypes.mir.settings.pipeline_extent").multiplier()',
@@ -398,6 +407,17 @@ $streamCompilerText = Read-MIRFile -RelativePath "prototypes/mir/planner/stream_
 Assert-MIRContains -RelativePath "prototypes/mir/planner/stream_compiler.lua" -Text $streamCompilerText -Needle 'require("prototypes.mir.streams.registry")'
 Assert-MIRContains -RelativePath "prototypes/mir/planner/stream_compiler.lua" -Text $streamCompilerText -Needle 'require("prototypes.mir.emit.stream_spec_adapter")'
 Assert-MIRContains -RelativePath "prototypes/mir/planner/stream_compiler.lua" -Text $streamCompilerText -Needle "function M.run()"
+Assert-MIRContains -RelativePath "prototypes/mir/planner/stream_compiler.lua" -Text $streamCompilerText -Needle 'require("prototypes.mir.families.resolver")'
+Assert-MIRContains -RelativePath "prototypes/mir/planner/stream_compiler.lua" -Text $streamCompilerText -Needle "function M.compile()"
+Assert-MIRContains -RelativePath "prototypes/mir/planner/stream_compiler.lua" -Text $streamCompilerText -Needle "function M.apply(plan)"
+
+$generationPlanText = Read-MIRFile -RelativePath "prototypes/mir/planner/generation_plan.lua"
+Assert-MIRContains -RelativePath "prototypes/mir/planner/generation_plan.lua" -Text $generationPlanText -Needle "function Plan:finalize()"
+Assert-MIRContains -RelativePath "prototypes/mir/planner/generation_plan.lua" -Text $generationPlanText -Needle "duplicate technology name"
+
+$familyRegistryText = Read-MIRFile -RelativePath "prototypes/mir/families/registry.lua"
+Assert-MIRContains -RelativePath "prototypes/mir/families/registry.lua" -Text $familyRegistryText -Needle "FamilyRule must be data-only"
+Assert-MIRContains -RelativePath "prototypes/mir/families/registry.lua" -Text $familyRegistryText -Needle "Duplicate FamilyRule id"
 
 $settingsProfileText = Read-MIRFile -RelativePath "prototypes/mir/runtime/settings_profile.lua"
 Assert-MIRContains -RelativePath "prototypes/mir/runtime/settings_profile.lua" -Text $settingsProfileText -Needle '"mir-settings-export"'
@@ -448,7 +468,7 @@ $capabilityRegistryText = Read-MIRFile -RelativePath "prototypes/mir/capabilitie
 if ($capabilityRegistryText.Contains("lifecycle_passthrough")) {
   throw "Capability lifecycle stages must perform explicit state transitions, not alias a passthrough function."
 }
-foreach ($stage in @("discovered", "classified", "proposed", "validated", "emitted", "diagnosed")) {
+foreach ($stage in @("discovered", "classified", "proposed", "validated", "materialized", "result")) {
   Assert-MIRContains -RelativePath "prototypes/mir/capabilities/registry.lua" -Text $capabilityRegistryText -Needle ('"' + $stage + '"')
 }
 

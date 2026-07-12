@@ -101,7 +101,7 @@ local function record(key, owner_name, recipe_name, change)
   })
 end
 
-function A.adopt(key, spec, buckets)
+function A.plan(key, spec, buckets)
   local adoption = spec and spec.adopt_into_existing_productivity_tech
   if not adoption then return buckets, {}, {} end
 
@@ -128,17 +128,43 @@ function A.adopt(key, spec, buckets)
           recipe = recipe_name,
           change = owner.change
         }
-        owner.tech.effects = owner.tech.effects or {}
-        table.insert(owner.tech.effects, effect)
         table.insert(adopted, effect)
-        record(key, owner.name, recipe_name, owner.change)
-        log("[more-infinite-research] Adopted productivity-family recipe for "
-          .. key .. " recipe=" .. recipe_name .. " into " .. owner.name .. ".")
       end
     end
   end
 
-  return {}, adopted, blocked, owner.name
+  return {}, adopted, blocked, owner.name, {
+    key = key,
+    owner = owner.name,
+    effects = adopted
+  }
+end
+
+function A.apply(plan)
+  if not plan then return {} end
+  local owner = data_raw.technology(plan.owner)
+  if not owner then
+    error("Planned productivity-family adoption owner disappeared: " .. tostring(plan.owner), 2)
+  end
+
+  local adopted = {}
+  owner.effects = owner.effects or {}
+  for _, effect in ipairs(plan.effects or {}) do
+    if not productivity_owners.has_recipe_productivity_effect(owner, effect.recipe) then
+      table.insert(owner.effects, effect)
+      table.insert(adopted, effect)
+      record(plan.key, plan.owner, effect.recipe, effect.change)
+      log("[more-infinite-research] Adopted productivity-family recipe for "
+        .. plan.key .. " recipe=" .. effect.recipe .. " into " .. plan.owner .. ".")
+    end
+  end
+  return adopted
+end
+
+function A.adopt(key, spec, buckets)
+  local remaining, adopted, blocked, owner_name, plan = A.plan(key, spec, buckets)
+  if plan then A.apply(plan) end
+  return remaining, adopted, blocked, owner_name
 end
 
 local function signature()
@@ -166,6 +192,16 @@ function A.mod_data_payload()
       signature = adoption_signature
     }
   }
+end
+
+function A.snapshot()
+  local out = {}
+  for _, entry in ipairs(adopted_productivity_family_recipes) do
+    local copy = {}
+    for key, value in pairs(entry) do copy[key] = value end
+    table.insert(out, copy)
+  end
+  return out
 end
 
 return A

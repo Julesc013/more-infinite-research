@@ -20,6 +20,38 @@ rules:
 
 streams:
   records:
+    mir-auto-prod-manufacturing-assembling-machine-1:
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.mir-auto-prod-manufacturing-assembling-machine-1
+      introduced_in: "3.2.0"
+      source: family-rule:assembling-machine-manufacturing
+      capability: recipe-productivity
+      family: manufacturing_assembling_machine
+      policy: automatic.safe-family-generation
+      generated_technology: mir-auto-prod-manufacturing-assembling-machine-1
+      stream_key: research_auto_assembling_machine
+      migration_policy: stable
+      targets:
+        - family:assembling-machine
+      evidence:
+        fixtures:
+          - fixtures/semantic-family-generate
+          - fixtures/assert-semantic-family-generate
+    mir-auto-prod-manufacturing-lab-1:
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.mir-auto-prod-manufacturing-lab-1
+      introduced_in: "3.2.0"
+      source: family-rule:lab-manufacturing
+      capability: recipe-productivity
+      family: manufacturing_lab
+      policy: automatic.safe-family-generation
+      generated_technology: mir-auto-prod-manufacturing-lab-1
+      stream_key: research_auto_lab
+      migration_policy: stable
+      targets:
+        - family:lab
+      evidence:
+        fixtures:
+          - fixtures/semantic-family-generate
+          - fixtures/assert-semantic-family-generate
     recipe-prod-research_advanced_circuit-1:
       canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_advanced_circuit-1
       introduced_in: "pre-2.2.0"
@@ -130,6 +162,8 @@ streams:
       generated_technology: recipe-prod-research_bacteria_cultivation-1
       stream_key: research_bacteria_cultivation
       migration_policy: stable
+      reviewed_risk_exceptions:
+        - exact-bacteria-cultivation-autocatalytic-family
       targets:
         - stream:research_bacteria_cultivation
       evidence:
@@ -158,7 +192,7 @@ streams:
       source: legacy_stream_table:productivity
       capability: recipe-productivity
       family: belts
-      policy: legacy.recipe-productivity-stream
+      policy: fixed-plus-family-rule.attach-existing
       generated_technology: recipe-prod-research_belts-1
       stream_key: research_belts
       migration_policy: stable
@@ -167,6 +201,7 @@ streams:
       evidence:
         fixtures:
           - fixtures/assert-generation-integrity
+          - fixtures/assert-semantic-family-attach
 
     recipe-prod-research_bioflux-1:
       canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_bioflux-1
@@ -415,7 +450,7 @@ streams:
       source: legacy_stream_table:productivity
       capability: recipe-productivity
       family: electric_energy
-      policy: legacy.recipe-productivity-stream
+      policy: fixed-plus-family-rule.attach-existing
       generated_technology: recipe-prod-research_electric_energy-1
       stream_key: research_electric_energy
       migration_policy: stable
@@ -424,6 +459,7 @@ streams:
       evidence:
         fixtures:
           - fixtures/assert-generation-integrity
+          - fixtures/assert-semantic-family-attach
 
     recipe-prod-research_electric_engine-1:
       canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_electric_engine-1
@@ -545,7 +581,7 @@ streams:
       source: legacy_stream_table:productivity
       capability: recipe-productivity
       family: furnace
-      policy: legacy.recipe-productivity-stream
+      policy: fixed-plus-family-rule.attach-existing
       generated_technology: recipe-prod-research_furnace-1
       stream_key: research_furnace
       migration_policy: stable
@@ -554,6 +590,7 @@ streams:
       evidence:
         fixtures:
           - fixtures/assert-generation-integrity
+          - fixtures/assert-semantic-family-attach
 
     recipe-prod-research_gears-1:
       canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_gears-1
@@ -641,7 +678,7 @@ streams:
       source: legacy_stream_table:productivity
       capability: recipe-productivity
       family: inserters
-      policy: legacy.recipe-productivity-stream
+      policy: fixed-plus-family-rule.attach-existing
       generated_technology: recipe-prod-research_inserters-1
       stream_key: research_inserters
       migration_policy: stable
@@ -650,6 +687,7 @@ streams:
       evidence:
         fixtures:
           - fixtures/assert-generation-integrity
+          - fixtures/assert-semantic-family-attach
 
     recipe-prod-research_inventory_capacity-1:
       canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_inventory_capacity-1
@@ -785,7 +823,7 @@ streams:
       source: legacy_stream_table:productivity
       capability: recipe-productivity
       family: mining_drill
-      policy: legacy.recipe-productivity-stream
+      policy: fixed-plus-family-rule.attach-existing
       generated_technology: recipe-prod-research_mining_drill-1
       stream_key: research_mining_drill
       migration_policy: stable
@@ -794,6 +832,7 @@ streams:
       evidence:
         fixtures:
           - fixtures/assert-generation-integrity
+          - fixtures/assert-semantic-family-attach
 
     recipe-prod-research_modules-1:
       canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_modules-1
@@ -801,7 +840,7 @@ streams:
       source: legacy_stream_table:productivity
       capability: recipe-productivity
       family: modules
-      policy: legacy.recipe-productivity-stream
+      policy: fixed-plus-family-rule.attach-existing
       generated_technology: recipe-prod-research_modules-1
       stream_key: research_modules
       migration_policy: stable
@@ -810,6 +849,7 @@ streams:
       evidence:
         fixtures:
           - fixtures/assert-generation-integrity
+          - fixtures/assert-semantic-family-attach
 
     recipe-prod-research_molten_metals-1:
       canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_molten_metals-1
@@ -853,6 +893,8 @@ streams:
       generated_technology: recipe-prod-research_oil_processing_productivity-1
       stream_key: research_oil_processing_productivity
       migration_policy: stable
+      reviewed_risk_exceptions:
+        - exact-coal-liquefaction-shared-input-output
       targets:
         - stream:research_oil_processing_productivity
       evidence:

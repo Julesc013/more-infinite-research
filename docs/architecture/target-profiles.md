@@ -22,7 +22,7 @@ The checked-in Lua view is `prototypes/mir/platform/factorio/target_profiles.lua
 
 Static and architecture validation run the same command with `-Check` and fail when the generated view differs from `.mir/targets.json` or the active `info.json` target. PowerShell validation reads the canonical JSON directly through `scripts/validation/TargetProfiles.ps1`; it does not maintain a second hand-written target classification.
 
-Each profile declares:
+Every profile is now a `TargetProfileV2` record and declares:
 
 - support class and validation status;
 - `storage` or `global` runtime state backend;
@@ -32,6 +32,8 @@ Each profile declares:
 - weapon-overlap default;
 - technology overlay policy;
 - feature switches;
+- positive recipe, science-pack, probability, formula, quality, and surface-condition shapes;
+- available emitter families, asset policy, and expected stream count;
 - positive supported mod namespaces and technology effect types on maintained modern lines;
 - temporary unsupported-stream/effect/settings cuts only on historical reduced profiles awaiting refresh;
 - required validation groups.
@@ -40,7 +42,7 @@ Each profile declares:
 
 For Factorio 2.1 and 2.0, stream descriptors declare required features, mods, prototypes, technologies, and effect types. The selected profile must positively admit every required feature, mod namespace, and effect type. These profiles are not allowed to carry the older `unsupported_streams`, `unsupported_required_mods`, or `unsupported_effect_types` denylists. Historical reduced profiles retain that transitional shape until their independent refresh and binary-proof waves.
 
-The same positive declaration rule applies to generated settings, pipeline commands, runtime event handlers, and governed fixtures. An empty `requires_features` array is an explicit portable declaration, not missing metadata. Architecture lint fails when a handler or fixture omits its declaration.
+The same positive declaration rule applies to generated settings, pipeline commands, runtime event handlers, and governed fixtures. An empty `requires_features` array is an explicit portable declaration, not missing metadata. Architecture lint fails when a handler or fixture omits its declaration. Cross-target fixtures obtain science-pack prototype kind and stream-count expectations from TargetProfileV2 rather than branching on Factorio version or hard-coding modern values.
 
 Profiles for released lines record validated historical behavior. Profiles for Factorio 0.16 and 0.15 are explicitly marked as planned and do not constitute binary support claims. Their science and effect surfaces still require matching target-binary proof.
 

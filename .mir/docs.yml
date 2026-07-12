@@ -138,6 +138,55 @@ docs:
     doc_type: explanation
     owner: mir-maintainers
     source_of_truth_for: []
+  - path: docs/architecture/automatic-family-compiler.md
+    title: "Automatic Family Compiler"
+    status: current
+    audience: maintainer
+    doc_type: explanation
+    owner: mir-maintainers
+    source_of_truth_for:
+      - automatic-family-compiler
+  - path: docs/reference/schemas/generation-plan.md
+    title: "GenerationPlan Schema"
+    status: current
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - generation-plan-schema
+  - path: docs/reference/schemas/recipe-fact-v2.md
+    title: "RecipeFactV2 And Relationship Indexes"
+    status: current
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - recipe-fact-v2
+      - relationship-indexes
+  - path: docs/reference/schemas/family-rule.md
+    title: "FamilyRule Schema"
+    status: current
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - family-rule-schema
+  - path: docs/reference/schemas/compatibility-pack.md
+    title: "CompatibilityPack Schema"
+    status: current
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - compatibility-pack-schema
+  - path: docs/reference/schemas/scenario-manifest.md
+    title: "Scenario Manifest Schema"
+    status: current
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - scenario-manifest-schema
   - path: docs/architecture/README.md
     title: "Architecture"
     status: current
@@ -671,6 +720,22 @@ docs:
     doc_type: how-to
     owner: mir-maintainers
     source_of_truth_for: []
+  - path: docs/maintainer/adding-a-compatibility-pack.md
+    title: "Adding A Compatibility Pack"
+    status: current
+    audience: developer
+    doc_type: how-to
+    owner: mir-maintainers
+    source_of_truth_for:
+      - compatibility-pack-workflow
+  - path: docs/maintainer/adding-a-family-rule.md
+    title: "Adding A Family Rule"
+    status: current
+    audience: developer
+    doc_type: how-to
+    owner: mir-maintainers
+    source_of_truth_for:
+      - family-rule-workflow
   - path: docs/maintainer/adding-a-generated-stream.md
     title: "Adding A Generated Stream"
     status: current
@@ -1292,6 +1357,22 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - mir-3.1.0-plan
+  - path: docs/releases/3.2.0-development-summary.md
+    title: "Post-3.1 Automatic Compiler Development Summary"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - post-3.1-automatic-compiler-result
+  - path: docs/releases/2.5.0-development-summary.md
+    title: "MIR 2.5.0 Automatic Compiler Development Summary"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-2.5.0-development
   - path: docs/releases/3.1.0-checklist.md
     title: "MIR 3.1.0 Release Checklist"
     status: current
@@ -1372,3 +1453,51 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - canonical-stream-descriptor-contract
+  - path: docs/releases/1.6.0-plan.md
+    title: "MIR 1.6.0 Factorio 0.16 Plan"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-1.6.0-factorio-0.16-plan
+  - path: docs/releases/1.5.0-plan.md
+    title: "MIR 1.5.0 Factorio 0.15 Plan"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-1.5.0-factorio-0.15-plan
+  - path: docs/adr/0019-target-profile-v2.md
+    title: "ADR 0019: TargetProfileV2"
+    status: current
+    audience: maintainer
+    doc_type: adr
+    owner: mir-maintainers
+    source_of_truth_for:
+      - target-profile-v2
+  - path: docs/adr/0018-automatic-generated-id-policy.md
+    title: "ADR 0018: Automatic Generated ID Policy"
+    status: current
+    audience: maintainer
+    doc_type: adr
+    owner: mir-maintainers
+    source_of_truth_for:
+      - automatic-generated-id-policy
+  - path: docs/maintainer/modpack-campaigns.md
+    title: "Modpack Campaigns"
+    status: current
+    audience: release-manager
+    doc_type: how-to
+    owner: mir-maintainers
+    source_of_truth_for:
+      - modpack-campaign-evidence-contract
+  - path: docs/reference/reports/coverage-report.md
+    title: "Coverage Report"
+    status: current
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - recipe-coverage-accounting-contract

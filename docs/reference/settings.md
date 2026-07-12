@@ -39,6 +39,8 @@ mir-settings-profile-import
 
 This setting accepts a portable MIR settings profile string. It is always registered and stays out of profile exports so importing one profile never nests another profile inside it.
 
+`mir-automatic-compiler-mode` has the stable values `off`, `report`, `safe-attach`, `safe-generate`, and `exact-pack`. Its default is `safe-attach`. Report and off modes do not attach family candidates; report mode enables the decision projection. Safe generation materializes only predeclared, manifest-owned family technologies, while exact-pack additionally authorizes reviewed pack behavior.
+
 ## Visibility
 
 Stream visibility is declared with `ui_visibility` metadata. The settings stage may evaluate active mods and static metadata only; it must not inspect `data.raw` recipes, items, fluids, technologies, labs, or machines.

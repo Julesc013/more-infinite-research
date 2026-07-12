@@ -12,6 +12,10 @@ superseded_by: []
 
 # Generated ID Reference
 
+## Reviewed Automatic Family IDs
+
+MIR 3.2.0 predeclares `mir-auto-prod-manufacturing-assembling-machine-1` and `mir-auto-prod-manufacturing-lab-1`. These IDs derive from stable semantic family names, never from mod or recipe names. They remain absent in the default `safe-attach` mode and may emit only in `safe-generate` or exact-pack mode after whole-plan validation.
+
 Generated recipe-productivity technologies use stable names:
 
 ```text

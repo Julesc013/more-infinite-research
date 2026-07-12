@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "release": "3.1.0",
-  "factorio_line": "2.1",
+  "release": "2.5.0",
+  "factorio_line": "2.0",
   "budgets": [
     { "id": "base", "source": "validation_scenario", "key": "base-generation-integrity", "max_seconds": 8.0 },
     { "id": "space-age", "source": "validation_scenario", "key": "space-age-generation-integrity", "max_seconds": 18.0 },
@@ -11,7 +11,7 @@
     { "id": "diagnostics-on", "source": "validation_scenario", "key": "base-generation-integrity", "max_seconds": 8.0 },
     { "id": "medium-pack", "source": "medium_pack_step", "key": "representative-local-scenario", "max_seconds": 90.0 },
     { "id": "large-pack", "source": "large_pack_step", "key": "LocalLibraryScenarios", "max_seconds": 90.0 },
-    { "id": "large-synthetic-graph", "source": "validation_scenario", "key": "capability-negative-cases", "max_seconds": 8.0 },
+    { "id": "large-synthetic-graph", "source": "validation_scenario", "key": "synthetic-scale-graph", "max_seconds": 30.0 },
     { "id": "full-matrix", "source": "validation_total", "key": "all", "max_seconds": 900.0 }
   ]
 }

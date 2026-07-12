@@ -26,7 +26,7 @@ branches:
       - validation
 
   legacy:
-    purpose: Factorio 2.0.x backport branch
+    purpose: frozen Factorio 2.0 2.3.x stable baseline
     factorio_version: "2.0"
     accepts:
       - safety-fix
@@ -38,6 +38,20 @@ branches:
       - schema-breaking-change
       - generated-id-rename
       - broad-new-generation
+
+  tmp/2.0:
+    purpose: maintained Factorio 2.0 release and semantic companion branch
+    factorio_version: "2.0"
+    accepts:
+      - platform-compatible-backport
+      - target-profile-adapter
+      - 2.0-fixture
+      - release-evidence
+      - docs-correction
+    rejects:
+      - 2.1-only-metadata
+      - generated-id-rename
+      - unproven-feature-parity
 
   factorio-2.0-lane:
     purpose: planned Space Exploration and other 2.0-only campaign lane
@@ -208,7 +222,25 @@ release_artifacts:
       tag: "3.1.0"
       artifact: dist/more-infinite-research_3.1.0.zip
       sha256: 0244D40A9971C450274FE1FD7EA142FA5D23E4A2271A0191F31F395589267C1A
+      size_bytes: 345134
+      entries: 138
+      forbidden_entries: 0
+      package_content_sha256: 5D5162EEAF13E87E2FB1A5A2A31B5EC14ABDCCD2308CFAF8E70C20297C56E82F
+      package_source_sha256: 5D5162EEAF13E87E2FB1A5A2A31B5EC14ABDCCD2308CFAF8E70C20297C56E82F
+      target_profile_sha256: EFC9454504E73010B50A9A68DC9AD56E533EDFD4FDBDE0D1F6467E2A19AE04B0
+      required_groups_sha256: 57A1DF87A8FB594B2B51C7E230D775E88028F23D52DF9D5D7DA1336F9271C78A
+      validation_harness_sha256: E9094E4B7D8B0C990BCCE8927A3F51D04862A24110D0095806F4F83FDB5EBC9E
+      expected_scenarios_sha256: A4198544BE15EE20F228D18DC6990ABE179D84A53EB3C30AEF4A9FF3DBE195C7
+      validation_package_sha256: 6E241687B13F99561D24E18A7D0F1EFC4DFE5B2FCD3D7A084EE83B85D67865FD
+      validation_package_content_sha256: 5D5162EEAF13E87E2FB1A5A2A31B5EC14ABDCCD2308CFAF8E70C20297C56E82F
+      structured_summary_path: .mir/evidence/3.1.0-rc1-validation-summary.json
+      structured_summary_run_id: a961b15a-a018-4ebe-9799-f6bafc8bc2ed
+      scenario_count: 82
+      automated_gate: passed
+      manual_gate: accepted-for-publication
+      published_at: 2026-07-11T22:33:10Z
       publication_scope: github-release
+      github_release: https://github.com/Julesc013/more-infinite-research/releases/tag/3.1.0
       mod_portal_upload: blocked-missing-mod-upload-api-key
       status: published
     mir_2_4_0:
@@ -217,32 +249,13 @@ release_artifacts:
       target_factorio: "2.0"
       source_anchor: mir_3_1_0
       source_commit: b9172ab1ab3fc75ba0c1dec79cc9f2c3ae6063c3
+      release_commit: 575fc4f5ae4a52205d1e72604934ead35e69c99e
+      tag: "2.4.0"
       artifact: dist/more-infinite-research_2.4.0.zip
       sha256: 8618CAF031EF24EB83641DB03566F2390DD29AD98D2099A80D596EEB527EDA12
       size_bytes: 344995
-      entries: 138
-      forbidden_entries: 0
-      package_content_sha256: 74B84AAC6148F08F6F50D0C71866C35D9762489BA0F9CA8090864870FC9178C0
-      package_source_sha256: 74B84AAC6148F08F6F50D0C71866C35D9762489BA0F9CA8090864870FC9178C0
-      target_profile_sha256: E23C4F6468AAFADF9198C0C6A8F8D0EDC6EBEB684D2E2D720C9271C4ABEDC41C
-      required_groups_sha256: 57A1DF87A8FB594B2B51C7E230D775E88028F23D52DF9D5D7DA1336F9271C78A
-      validation_harness_sha256: 7CA3E598B9FB669620684732FE53973EBAD368FFE1631B08A13D3B1A0E4F2AB8
-      expected_scenarios_sha256: A0A7F5A88CDE3F0940C6828DC92B10690B5B496EBBA0C0F0F4B21E0ADFCC1ED5
-      validation_package_sha256: AAE86FA983C573A7CE433E15E7827E8C2D89CCD572CD741C509701B223ECA129
-      validation_package_content_sha256: 74B84AAC6148F08F6F50D0C71866C35D9762489BA0F9CA8090864870FC9178C0
-      structured_summary_path: .mir/evidence/2.4.0-rc3-validation-summary.json
-      structured_summary_run_id: 99895145-6529-4d99-be33-62484856b685
-      scenario_count: 78
-      automated_gate: passed
-      manual_gate: accepted-for-publication
-      interactive_review: .mir/evidence/2.4.0-interactive-review.md
-      release_commit: 575fc4f5ae4a52205d1e72604934ead35e69c99e
-      tag: "2.4.0"
-      published_at: 2026-07-12T01:02:42Z
-      github_release: https://github.com/Julesc013/more-infinite-research/releases/tag/2.4.0
-      publication_evidence: .mir/evidence/2.4.0-publication.md
       publication_scope: github-release
-      mod_portal_upload: blocked-missing-mod-upload-api-key
+      github_release: https://github.com/Julesc013/more-infinite-research/releases/tag/2.4.0
       status: published
     mir_2_3_0:
       version: "2.3.0"
@@ -269,6 +282,24 @@ release_artifacts:
       forbidden_entries: 0
       publication_scope: mod-portal-and-github-release
       status: published
+    mir_1_9_4:
+      version: "1.9.4"
+      branch: tmp/1.1
+      target_factorio: "1.1"
+      source_anchor: mir_1_9_3
+      source_commit: 498408854170e893a0fa13bdbd11930197892b1d
+      artifact: dist/more-infinite-research_1.9.4.zip
+      sha256: 431CD5B011B678B089BB4F9B04B22EB5DD32A3411EDB8E7E453E02D920E3A46E
+      size_bytes: 302312
+      entries: 124
+      forbidden_entries: 0
+      automated_gate: passed
+      exact_dist_base: passed
+      fresh_create: passed
+      fresh_reload: passed
+      upgrade_from_1_9_3: passed
+      publication_scope: unreleased
+      status: candidate-qualified
     mir_1_8_0:
       version: "1.8.0"
       branch: tmp/0.18
@@ -310,6 +341,15 @@ release_artifacts:
       publication_scope: github-release
       mod_portal_visibility: not-visible-from-downloads-page-as-of-2026-07-10
       status: published
+    mir_1_8_2:
+      version: "1.8.2"
+      branch: tmp/1.0
+      target_factorio: "1.0"
+      source_anchor: mir_1_8_1
+      staged_commit: aeb14831132572037c4288b595b22978fdda6646
+      artifact: dist/more-infinite-research_1.8.2.zip
+      automated_gate: pending-runtime-proof
+      status: staged-unqualified
     mir_1_7_0:
       version: "1.7.0"
       branch: tmp/0.17
@@ -348,12 +388,18 @@ release_artifacts:
       status: published
   next_release_targets:
     current_line:
-      version: "3.1.0"
+      version: "3.2.0"
       branch: dev
       target_factorio: "2.1"
-      purpose: bounded correctness, contract modernization, deterministic packaging, and fixture-backed capability expansion from the frozen 3.0.5 baseline
+      purpose: plan-first automatic family compiler development from the immutable 3.1.0 behavior baseline
+    factorio_2_0_companion:
+      version: "2.5.0"
+      branch: tmp/2.0
+      target_factorio: "2.0"
+      source_anchor: bae27f521070bd62a13ec54689818cd8394b3554
+      purpose: semantic Factorio 2.0 companion using shared plan, fact, rule, pack, ID, and validation contracts with target-declared cuts
     factorio_1_1_port:
-      version: "1.9.3"
+      version: "1.9.4"
       branch: tmp/1.1
       target_factorio: "1.1"
     factorio_0_18_bridge:
@@ -362,7 +408,7 @@ release_artifacts:
       target_factorio: "0.18"
       purpose: published bridge/archive package from the MIR 3 source anchor plus portable 2.3.0 and 1.9.3 lessons
     factorio_1_0_port:
-      version: "1.8.1"
+      version: "1.8.2"
       branch: tmp/1.0
       target_factorio: "1.0"
       purpose: maintained Factorio 1.0 support line after the 0.18 bridge proof; future 1.0 maintenance stays on 1.8.x
@@ -382,10 +428,10 @@ release_artifacts:
       target_factorio: "0.15"
       purpose: earliest plausible native-infinite floor after old-science proof
     current_line_feature:
-      version: "3.1.0"
+      version: "3.2.0"
       branch: dev
       target_factorio: "2.1"
-      purpose: fixture-backed overhaul compatibility support campaign after the 3.0.5 patch
+      purpose: whole-plan validation, consolidated facts, attach-only family automation, and reviewed compatibility packs
   package_refresh_rule: >-
     only build or refresh dist archives for an unpublished target version;
     never refresh already-published archives as part of architecture or
@@ -404,11 +450,11 @@ target_lines:
       - factorio_0.18
       - factorio_1.0_same_zip
   factorio_1_0:
-    version: "1.8.1"
+    version: "1.8.2"
     branch: tmp/1.0
     target_factorio: "1.0"
     support_class: compatibility-port
-    source: mir_1_9_3_plus_mir_1_8_0_bridge_lessons_plus_dev_portable_fixes
+    source: mir_1_8_1_plus_current_portable_fixes
     publish_policy: maintained
     future_maintenance: "1.8.x"
     required_binary_proof:

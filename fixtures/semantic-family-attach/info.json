@@ -1,0 +1,9 @@
+{
+  "name": "mir-fixture-semantic-family-attach",
+  "version": "0.1.0",
+  "title": "MIR Fixture - Semantic Family Attach",
+  "author": "Julesc013",
+  "description": "Adds deliberately opaque recipe names backed by structural entity and module relationships.",
+  "factorio_version": "2.0",
+  "dependencies": ["base >= 2.0.76"]
+}

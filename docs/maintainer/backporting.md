@@ -5,13 +5,19 @@ applies_to: "3.0.0+"
 audience: maintainer
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-07-10
+last_reviewed: 2026-07-12
 supersedes: []
 superseded_by: []
 ---
 # Target-Line Versioning And Backports
 
-Updated: 2026-07-10
+Updated: 2026-07-12
+
+## Current Post-3.1 Release Roles
+
+Published MIR `3.1.0` on `main` and MIR `2.4.0` on `tmp/2.0` are immutable. New automatic-compiler work is MIR `3.2.0` on `dev`; its Factorio 2.0 semantic companion will be MIR `2.5.0` on `tmp/2.0` after the modern implementation passes. `legacy` is intentionally retained as the frozen MIR `2.3.x` baseline and is not the maintained head of the current 2.x release line.
+
+The current older-target state is MIR `1.9.4` qualified but unreleased on `tmp/1.1`, MIR `1.8.2` staged but runtime-unqualified on `tmp/1.0`, MIR `1.7.1` planned on `tmp/0.17`, MIR `1.6.0` planned on `tmp/0.16`, and MIR `1.5.0` planned on `tmp/0.15`. Archived plans retain their historical version numbers; current 0.16 and 0.15 work follows the new 1.6.0 and 1.5.0 plans.
 
 This note records the locked maintainer policy for separating MIR release numbers by Factorio target line after the `2.2.0` compatibility-platform release. It is a release-operations note, not a feature-parity promise. Every target line still needs its own source branch, metadata, package build, Factorio binary, mod library, validation artifacts, and public release notes before it can be published.
 
@@ -72,8 +78,8 @@ Use these branch roles during the transition:
 | --- | --- | ---: |
 | `main` | Stable canonical Factorio `2.1` line after gates. | `3.x.x` after `3.0.0` |
 | `dev` | Development canonical Factorio `2.1` line. | `3.x.x` after `3.0.0` |
-| `legacy` | Stable Factorio `2.0` baseline branch, frozen at `2.3.5` for the 3.1/2.4 release wave unless a later promotion is explicitly authorized. | `2.x.x` starting at `2.3.0` |
-| `tmp/2.0` | Factorio `2.0` port branch or worktree; explicitly retained as the frozen `2.4.0` companion-release branch for the 3.1/2.4 wave. | `2.x.x` starting at `2.3.0` |
+| `legacy` | Frozen Factorio `2.0` MIR `2.3.x` stable baseline. | No new feature releases. |
+| `tmp/2.0` | Maintained Factorio `2.0` release and semantic companion branch. | Current `2.x.x`, including frozen `2.4.0` and planned `2.5.0`. |
 | `tmp/1.1` | Working Factorio `1.1` port branch or worktree. | `1.9.x` starting at `1.9.3` |
 | `port/1.1-to-0.18` | Short-lived Factorio `0.18` bridge branch seeded from the validated `1.9.3` source point. | `1.8.0` only |
 | `tmp/1.0` | Working Factorio `1.0` port branch or worktree after the `0.18` bridge proof. | `1.8.1+` |
@@ -90,7 +96,7 @@ Use these branch roles during the transition:
 | `tmp/0.7` | Working Factorio `0.7` port branch or worktree. | `0.7.x` |
 | `tmp/0.6` | Working Factorio `0.6` port branch or worktree. | `0.6.x` |
 
-`tmp/*` branches should normally be treated as disposable validation workspaces. They can carry target-line metadata, API removals, and diagnostic experiments while the port is being proven. An explicitly designated target-release branch is the exception: `tmp/2.0` is frozen at tagged release `2.4.0` while `legacy` preserves `2.3.5`. Durable fixes discovered there should be cherry-picked or ported into the next `dev` development release, but target-line metadata downgrades should not be merged back into the current line or into immutable 3.1.0 evidence.
+`tmp/*` branches should be treated as disposable validation workspaces. They can carry target-line metadata, API removals, and diagnostic experiments while the port is being proven. Durable fixes discovered there should be cherry-picked or ported back to `dev`, but target-line metadata downgrades should not be merged back into the current line.
 
 For safer local work, prefer `git worktree` checkouts for `tmp/*` branches so a Factorio `2.0` port can be validated while `dev` remains available for Factorio `2.1` fixes.
 
@@ -459,7 +465,7 @@ Use these public wording classes:
 The plan is sound, but these guardrails would make it safer:
 
 - Tag or record the exact source commit for every backport before editing target-line metadata.
-- Keep `tmp/*` as staging only unless one is explicitly designated and frozen as a target-line release branch; otherwise release from `main`, `legacy`, or an explicit target-line release branch.
+- Keep `tmp/*` as staging only; release from `main`, `legacy`, or explicit target-line release branches.
 - Use worktrees for simultaneous `dev`, `tmp/2.0`, and future target-line ports.
 - Add a machine-readable target-line matrix so docs, release profiles, and validation scripts agree on version range, Factorio binary, local mod library, metadata floor, and known exclusions.
 - Do not merge target-line metadata changes back to `dev`; cherry-pick portable code fixes instead.

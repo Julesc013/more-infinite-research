@@ -1,5 +1,22 @@
 schema: 1
 
+scenario_manifest:
+  path: fixtures/compat-matrix/expected-scenarios.json
+  schema: 2
+  declarations: full-records
+
+golden_plans:
+  stable_technology_ids:
+    path: fixtures/golden-plans/stable-technology-ids.json
+    baseline: immutable-3.1.0
+    expected_count: 70
+    validator: scripts/Test-MIRGoldenPlans.ps1
+  automatic_family_technology_ids:
+    path: fixtures/golden-plans/automatic-family-technology-ids.json
+    release: "3.2.0"
+    expected_count: 2
+    validator: scripts/Test-MIRGoldenPlans.ps1
+
 fixture_roots:
   synthetic: fixtures
   compatibility_matrix: fixtures/compat-matrix
@@ -127,15 +144,15 @@ fixtures:
       - runtime-state-effect-retention
       - exact-3-1-0-candidate-normal-mod-directory-load
 
-  upgrade-2-3-5-to-2-4-0:
+  upgrade-3-1-0-to-3-2-0:
     requires_features: [scripted_techs]
-    assertion_path: fixtures/assert-upgrade-2-3-5-to-2-4-0
+    assertion_path: fixtures/assert-upgrade-3-1-0-to-3-2-0
     validates:
-      - exact-2-3-5-source-archive
+      - exact-3-1-0-source-archive
       - non-default-startup-setting-retention
       - scripted-technology-level-retention
       - runtime-state-effect-retention
-      - exact-2-4-0-candidate-normal-mod-directory-load
+      - exact-3-2-0-candidate-normal-mod-directory-load
 
   competing-productivity-transaction:
     requires_features: [recipe_productivity]
@@ -246,3 +263,39 @@ fixtures:
     validates:
       - mining-drill-recipe-candidates
       - effect-count
+
+  semantic-family-attach:
+    requires_features: [recipe_productivity]
+    path: fixtures/semantic-family-attach
+    assertion_path: fixtures/assert-semantic-family-attach
+    validates:
+      - data-only-family-rules
+      - structural-entity-backed-recipe-attachment
+      - module-tier-attachment
+      - existing-stable-stream-only
+      - safe-generate-gated-lab-manufacturing
+
+  semantic-family-generate:
+    requires_features: [recipe_productivity]
+    path: fixtures/semantic-family-attach
+    assertion_path: fixtures/assert-semantic-family-generate
+    validates:
+      - stable-generic-family-technology-ids
+      - arbitrary-name-assembling-machine-generation
+      - arbitrary-name-lab-generation
+      - predeclared-settings-stage-mode
+      - full-recipe-coverage-accounting
+      - coverage-artifact-fingerprint
+
+  synthetic-scale-graph:
+    requires_features: [recipe_productivity]
+    path: fixtures/synthetic-scale-graph
+    assertion_path: fixtures/assert-synthetic-scale-graph
+    validates:
+      - 1000-explicit-recipes
+      - 1000-explicit-technologies
+      - 10000-explicit-technology-effects
+      - high-family-candidate-fanout
+      - single-recipe-fact-scan
+      - single-technology-coverage-scan
+      - complete-recipe-accounting

@@ -36,11 +36,14 @@ waves:
     factorio_1_1:
       branch: tmp/1.1
       next_version: "1.9.4"
-      status: refresh-pending
+      source_commit: 498408854170e893a0fa13bdbd11930197892b1d
+      archive_sha256: 431CD5B011B678B089BB4F9B04B22EB5DD32A3411EDB8E7E453E02D920E3A46E
+      status: candidate-qualified-unreleased
     factorio_1_0:
       branch: tmp/1.0
       next_version: "1.8.2"
-      status: refresh-pending
+      staged_commit: aeb14831132572037c4288b595b22978fdda6646
+      status: staged-unqualified
     factorio_0_18:
       branch: tmp/0.18
       version: "1.8.0"
@@ -117,25 +120,21 @@ waves:
     branch: tmp/2.0
     source_anchor_required: accepted-3.1.0
     source_commit: b9172ab1ab3fc75ba0c1dec79cc9f2c3ae6063c3
+    release_commit: 575fc4f5ae4a52205d1e72604934ead35e69c99e
+    tag: "2.4.0"
     archive: dist/more-infinite-research_2.4.0.zip
     sha256: 8618CAF031EF24EB83641DB03566F2390DD29AD98D2099A80D596EEB527EDA12
-    structured_summary_path: .mir/evidence/2.4.0-rc3-validation-summary.json
-    structured_summary_run_id: 99895145-6529-4d99-be33-62484856b685
+    size_bytes: 344995
     scenario_count: 78
     exact_dist_base: passed
     exact_dist_space_age: passed
     upgrade_from_2_3_5: passed
     release_targeted_gate: passed
     automated_gate: passed
-    manual_gate: accepted-for-publication
     interactive_gate: passed
-    interactive_review: .mir/evidence/2.4.0-interactive-review.md
-    release_commit: 575fc4f5ae4a52205d1e72604934ead35e69c99e
-    tag: "2.4.0"
     published_at: 2026-07-12T01:02:42Z
     github_release: https://github.com/Julesc013/more-infinite-research/releases/tag/2.4.0
     publication_evidence: .mir/evidence/2.4.0-publication.md
-    publication_scope: github-release
     mod_portal_upload: blocked-missing-mod-upload-api-key
     status: published-frozen
 
@@ -143,4 +142,53 @@ waves:
     version: "3.2.0"
     branch: dev
     source_anchor_required: stable-3.1.0-and-2.4.0
-    status: gated-roadmap
+    implementation_gate: authorized-by-maintainer-directed-continuation
+    behavior_baseline: immutable-3.1.0
+    architecture_contract: docs/architecture/automatic-family-compiler.md
+    validation_source_commit: ea35733e230532a248d71147dd06ffb53d802af4
+    rebased_equivalent_commit: 67cef34c22093a8d0a8576a563c534edcb6e8c41
+    validation_source_tree_equivalent: passed
+    structured_summary_path: .mir/evidence/post-3.1-automatic-compiler-final-summary.json
+    structured_summary_run_id: e61369cb-7a64-4d92-b727-e1bce9b90602
+    scenario_count: 83
+    scenario_result: passed
+    stable_technology_id_count: 70
+    stable_technology_golden: passed
+    validation_package_sha256: EEB2567CBDB0B839943FCE9C3447F0FABBC206F47C90616879D762155851B3D2
+    package_content_sha256: F8C064661D109AE06E6AD9C5E00AF5A0F89DA7915523AE273B8FE7772049503A
+    plan_v2_source_commit: 7e2fc6e86474e9460bf7c368092121ba432465e0
+    plan_v2_summary_path: .mir/evidence/3.2.0-plan-v2-gate-summary.json
+    plan_v2_run_id: f037c887-593c-4daf-b302-2c64656b0051
+    plan_v2_scenario_count: 83
+    plan_v2_result: passed
+    generic_family_validation_source_commit: acd782023db8c88eb78287e778a911df2dcc0707
+    generic_family_summary_path: .mir/evidence/3.2.0-generic-family-runtime-gate-summary.json
+    generic_family_run_id: 0c2739c9-d278-4b3b-9444-d86907e3f674
+    generic_family_scenario_count: 84
+    generic_family_result: passed
+    reviewed_generic_family_id_count: 2
+    coverage_performance_source_commit: 9abf5ba12d3c3eb5b68ed371d0a7eef07756a7c8
+    coverage_performance_summary_path: .mir/evidence/3.2.0-coverage-performance-runtime-summary.json
+    coverage_performance_run_id: f16daf45-d092-40b6-8e86-922219ec3228
+    coverage_performance_scenario_count: 85
+    coverage_performance_result: passed
+    synthetic_scale_duration_seconds: 7.258
+    synthetic_scale_budget_seconds: 30.0
+    bz_coverage_accounted_recipes: 769
+    bz_coverage_recipe_count: 769
+    bz_coverage_scan_count: 2
+    status: integration-validated
+
+  mir_2_5_0:
+    version: "2.5.0"
+    branch: tmp/2.0
+    target_factorio: "2.0"
+    source_anchor_required: accepted-3.2.0-compiler-source
+    source_anchor_commit: bae27f521070bd62a13ec54689818cd8394b3554
+    behavior_baseline: immutable-2.4.0
+    architecture_contract: docs/architecture/automatic-family-compiler.md
+    target_profile_schema: 2
+    family_rule_schema: 2
+    compatibility_pack_schema: 2
+    validation_status: pending-factorio-2.0-gate
+    status: port-integration

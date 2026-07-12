@@ -12,6 +12,7 @@ local raw_stream_catalog = require("__more-infinite-research__.prototypes.mir.do
 local canonical_recipe_facts = require("__more-infinite-research__.prototypes.mir.index.recipe_facts")
 local pipeline_commands = require("__more-infinite-research__.prototypes.mir.pipeline.commands")
 local capability_registry = require("__more-infinite-research__.prototypes.mir.capabilities.registry")
+local stream_compiler = require("__more-infinite-research__.prototypes.mir.planner.stream_compiler")
 local target_profile = require("__more-infinite-research__.prototypes.mir.platform.factorio.target_profiles").current()
 
 local function fail(message)
@@ -29,6 +30,54 @@ local function assert_no_blocked_pickup_effects()
       if blocked_pickup_effect_types[effect.type] then
         fail("technology " .. tech_name .. " uses blocked pickup reach effect " .. effect.type .. ".")
       end
+    end
+  end
+end
+
+local function assert_generation_plan_v2()
+  local plan = stream_compiler.latest_artifact()
+  if not plan or plan.schema ~= 2 or not plan.validation_summary or plan.validation_summary.valid ~= true then
+    fail("missing accepted GenerationPlan schema 2 artifact")
+  end
+  if type(plan.plan_fingerprint) ~= "string" or not plan.plan_fingerprint:match("^mir32%-") then
+    fail("GenerationPlan schema 2 fingerprint is missing")
+  end
+  for _, source in ipairs({"facts", "rules", "compatibility_packs", "target_profile"}) do
+    if type(plan.source_fingerprints[source]) ~= "string" then
+      fail("GenerationPlan source fingerprint is missing: " .. source)
+    end
+  end
+  for _, row in ipairs(plan.rows or {}) do
+    for _, gate in ipairs({"target_supported", "effect_valid", "owner_conflict_free", "science_compatible", "lab_compatible", "prerequisites_acyclic", "loop_safe"}) do
+      if type(row.gates and row.gates[gate]) ~= "boolean" then
+        fail("GenerationPlan row is missing boolean gate " .. gate)
+      end
+    end
+  end
+end
+
+local function assert_decision_record_v2()
+  local decision_record = require("__more-infinite-research__.prototypes.mir.domain.decisions.decision_record")
+  local confidence = decision_record.confidence({identity = 1, family = 0.95, loop_safety = 0.25, total = 0.75})
+  if confidence.identity ~= "exact" or confidence.family ~= "structural"
+    or confidence.loop_safety ~= "heuristic" or confidence.total ~= 0.75 then
+    fail("DecisionRecordV2 typed confidence contract changed")
+  end
+end
+
+local function assert_setting_target_ownership()
+  local settings_catalog = require("__more-infinite-research__.prototypes.mir.settings.catalog")
+  local expected = {
+    ["mir-pipeline-extent-multiplier"] = "pipeline_extent",
+    ["mir-prototype-productivity-cap"] = "prototype_limits",
+    ["mir-settings-profile-import"] = "settings_profiles",
+    ["mir-unrestricted-modules"] = "module_permissions",
+    ["mir-debug-scripted-effects"] = "scripted_techs"
+  }
+  for setting_name, feature in pairs(expected) do
+    local spec = settings_catalog.spec(setting_name)
+    if not spec or not spec.targets or spec.targets.requires_features[1] ~= feature then
+      fail("setting declaration does not own target requirement: " .. setting_name)
     end
   end
 end
@@ -54,9 +103,8 @@ local function assert_descriptor_contracts()
       fail("stream " .. key .. " is missing positive target requirements")
     end
   end
-  local expected_count = target_profile.legacy_factorio_2_0 and 68 or 70
-  if count ~= expected_count then
-    fail("canonical descriptor catalog expected " .. tostring(expected_count) .. " streams, got " .. tostring(count))
+  if count ~= target_profile.expected_stream_count then
+    fail("canonical descriptor catalog expected " .. tostring(target_profile.expected_stream_count) .. " streams, got " .. tostring(count))
   end
 
   local first = stream_registry.get("research_copper")
@@ -141,8 +189,9 @@ local function assert_pipeline_command_contracts()
     if command.id ~= id or not allowed_kinds[command.kind] then
       fail("pipeline command " .. tostring(id) .. " has invalid identity or kind")
     end
-    if type(command.requires_features) ~= "table" or type(command.implementation) ~= "string" then
-      fail("pipeline command " .. id .. " is missing positive target requirements or implementation ownership")
+    if type(command.requires_features) ~= "table" or type(command.implementation) ~= "string"
+      or type(command.phase) ~= "number" or type(command.dependencies) ~= "table" then
+      fail("pipeline command " .. id .. " is missing requirements, ordering, or implementation ownership")
     end
   end
   if count ~= 13 then fail("expected 13 governed pipeline commands, got " .. tostring(count)) end
@@ -155,7 +204,7 @@ local function assert_capability_lifecycle_contracts()
   if #resolvers ~= 3 then fail("expected three governed capability resolvers") end
   for _, resolver in ipairs(resolvers) do
     local functions = {}
-    for _, stage in ipairs({"discover", "classify", "propose", "validate", "emit", "diagnose"}) do
+    for _, stage in ipairs({"discover", "classify", "propose", "validate", "materialize", "result"}) do
       if type(resolver[stage]) ~= "function" then fail(resolver.id .. " is missing lifecycle stage " .. stage) end
       if functions[resolver[stage]] then fail(resolver.id .. " aliases lifecycle stage " .. stage) end
       functions[resolver[stage]] = true
@@ -269,6 +318,9 @@ local base_extension_defaults = {
 }
 
 assert_no_blocked_pickup_effects()
+assert_generation_plan_v2()
+assert_decision_record_v2()
+assert_setting_target_ownership()
 
 for key, default_enabled in pairs(base_extension_defaults) do
   if effective_base_extension_enabled(key, default_enabled) then

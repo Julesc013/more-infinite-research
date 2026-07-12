@@ -3,7 +3,7 @@ local schema = require("prototypes.mir.core.schema")
 local Contract = {}
 
 -- CapabilityResolver schema: id, schema_version, family, subfamily, source,
--- policy, discover, classify, propose, validate, emit, and diagnose.
+-- policy, discover, classify, propose, validate, materialize, and result.
 
 local REQUIRED_FIELDS = {
   "id",
@@ -16,8 +16,8 @@ local REQUIRED_FIELDS = {
   "classify",
   "propose",
   "validate",
-  "emit",
-  "diagnose"
+  "materialize",
+  "result"
 }
 
 local FUNCTION_FIELDS = {
@@ -25,8 +25,8 @@ local FUNCTION_FIELDS = {
   classify = true,
   propose = true,
   validate = true,
-  emit = true,
-  diagnose = true
+  materialize = true,
+  result = true
 }
 
 local function fail(message)

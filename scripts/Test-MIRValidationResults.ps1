@@ -5,6 +5,21 @@ param(
 $ErrorActionPreference = "Stop"
 . (Join-Path $RepoRoot "scripts\validation\ScenarioGroups.ps1")
 . (Join-Path $RepoRoot "scripts\validation\ResultAggregation.ps1")
+. (Join-Path $RepoRoot "scripts\validation\ScenarioRegistry.ps1")
+
+$registry = Import-MIRScenarioRegistry `
+  -Path (Join-Path $RepoRoot "fixtures\compat-matrix\expected-scenarios.json") `
+  -TargetProfile "2.1"
+if ($registry.schema -ne 2 -or $registry.records.Count -lt 1) {
+  throw "Scenario manifest schema-2 full records did not load."
+}
+$semanticDeclaration = Resolve-MIRScenarioDeclaration `
+  -Registry $registry `
+  -ScenarioName "semantic-family-attach" `
+  -Kind "runtime"
+if ($semanticDeclaration.group -ne "local-mod-library" -or $semanticDeclaration.surface -ne "base") {
+  throw "Semantic family scenario did not retain its declared group and surface."
+}
 
 $cases = @(
   @{ Name = "generated-prerequisite-safety"; Kind = "runtime"; SpaceAge = $false; Expected = "science-prerequisites" },

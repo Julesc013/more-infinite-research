@@ -20,7 +20,7 @@ Date: 2026-07-07
 Capability resolvers use the contract:
 
 ```text
-discover -> classify -> propose -> validate -> emit -> diagnose
+discover -> classify -> propose -> validate -> materialize -> result
 ```
 
 Each resolver has a stable ID and schema version.

@@ -137,6 +137,7 @@ return {
 
   research_oil_processing_productivity = {
     localised_name = {"technology-name.more-infinite-research.research_oil_processing_productivity"},
+    allow_shared_input_output = true,
     recipe_patterns = {
       "^basic%-oil%-processing$",
       "^advanced%-oil%-processing$",
@@ -382,6 +383,7 @@ return {
     icon_tech="bioflux"
   },
   research_bacteria_cultivation = {
+    allow_shared_input_output = true,
     ui_visibility = {
       mode = "always",
       reason = "official-stream-settings-visible"
@@ -609,6 +611,24 @@ return {
     { change=0.02, items={"bulk-inserter"}, item_patterns={"bulk%-inserter"} },
     { change=0.01, items={"stack-inserter"}, item_patterns={"stack%-inserter"} }
   }},
+
+  research_auto_assembling_machine = {
+    manifest_id = "mir-auto-prod-manufacturing-assembling-machine-1",
+    technology_name = "mir-auto-prod-manufacturing-assembling-machine-1",
+    automatic_family = true,
+    localised_name = {"", "Assembling machine manufacturing productivity"},
+    icon_item = "assembling-machine-3",
+    groups = {{change = 0.02, items = {}}}
+  },
+
+  research_auto_lab = {
+    manifest_id = "mir-auto-prod-manufacturing-lab-1",
+    technology_name = "mir-auto-prod-manufacturing-lab-1",
+    automatic_family = true,
+    localised_name = {"", "Lab manufacturing productivity"},
+    icon_item = "lab",
+    groups = {{change = 0.02, items = {}}}
+  },
 
   research_science_pack_productivity = {
     icon_candidates={

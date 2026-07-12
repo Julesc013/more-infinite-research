@@ -70,7 +70,8 @@ modules:
   core:
     - prototypes/mir/core/schema.lua
     - prototypes/mir/core/deepcopy.lua
-    - prototypes/mir/core/table.lua
+      - prototypes/mir/core/table.lua
+      - prototypes/mir/core/fingerprint.lua
   platform:
     - prototypes/mir/platform/factorio/data_raw.lua
     - prototypes/mir/platform/factorio/mods.lua
@@ -107,6 +108,7 @@ modules:
   index:
     - prototypes/mir/index/registry_builder.lua
     - prototypes/mir/index/recipe_facts.lua
+    - prototypes/mir/index/relationships.lua
     - prototypes/mir/index/recipe_unlocks.lua
     - prototypes/mir/index/productivity_owners.lua
     - prototypes/mir/index/recipes.lua
@@ -119,6 +121,7 @@ modules:
     - prototypes/mir/domain/facts/registry.lua
     - prototypes/mir/domain/facts/generated_technology_registry.lua
     - prototypes/mir/domain/decisions/decision_record.lua
+    - prototypes/mir/domain/effects/metadata.lua
     - prototypes/mir/domain/streams/stream_spec.lua
     - prototypes/mir/domain/streams/raw_catalog.lua
     - prototypes/mir/domain/streams/descriptor.lua
@@ -146,9 +149,14 @@ modules:
     - prototypes/mir/capabilities/science_integration/technology_researchability.lua
     - prototypes/mir/capabilities/science_integration/pack_production_reachability.lua
     - prototypes/mir/capabilities/science_integration/science_selection_policy.lua
+  families:
+    - prototypes/mir/families/rules.lua
+    - prototypes/mir/families/registry.lua
+    - prototypes/mir/families/resolver.lua
   planner:
     - prototypes/mir/planner/compiler.lua
     - prototypes/mir/planner/stream_compiler.lua
+    - prototypes/mir/planner/generation_plan.lua
     - prototypes/mir/planner/costs.lua
     - prototypes/mir/planner/direct_effects.lua
     - prototypes/mir/planner/native_modifiers.lua
@@ -172,6 +180,8 @@ modules:
   compatibility:
     - prototypes/mir/compatibility/registry.lua
     - prototypes/mir/compatibility/profiles.lua
+    - prototypes/mir/compatibility/packs/schema.lua
+    - prototypes/mir/compatibility/packs/registry.lua
     - prototypes/mir/compatibility/planner.lua
     - prototypes/mir/compatibility/overlay_loader.lua
     - prototypes/mir/compatibility/claim_registry.lua
@@ -196,6 +206,8 @@ mutation_commands:
   rules:
     - every prototype-changing pass has a stable command id
     - every command declares positive target feature requirements
+    - every command declares a phase and explicit dependencies
+    - command dependencies are acyclic and enforced before execution
     - only emission commands may create generated technology prototypes
     - mutation commands may change existing prototypes only through their listed implementation
     - exact-version compatibility repairs remain separately bounded
@@ -232,6 +244,9 @@ target_layers:
   settings:
     path: prototypes/mir/settings
     may_read_factorio_globals: true
+    may_require:
+      - core
+      - domain
     may_register_settings: true
     may_mutate_data_raw: false
   pipeline:
@@ -264,10 +279,17 @@ target_layers:
       - policy
       - domain
     may_mutate_data_raw: false
+  families:
+    path: prototypes/mir/families
+    may_require:
+      - core
+      - index
+    may_mutate_data_raw: false
   planner:
     path: prototypes/mir/planner
     may_require:
       - capabilities
+      - families
       - policy
       - domain
     may_mutate_data_raw: false
@@ -318,6 +340,7 @@ validation_tooling:
     factorio_process: scripts/validation/FactorioProcess.ps1
     settings_overrides: scripts/validation/SettingsOverrides.ps1
     scenario_registry: scripts/validation/ScenarioRegistry.ps1
+    golden_plans: scripts/Test-MIRGoldenPlans.ps1
   rules:
     - the facade preserves its public parameters and structured result schema
     - process launch and copied-mod filesystem safety are reusable modules

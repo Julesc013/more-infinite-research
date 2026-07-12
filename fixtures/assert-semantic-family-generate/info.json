@@ -1,0 +1,13 @@
+{
+  "name": "mir-fixture-assert-semantic-family-generate",
+  "version": "0.1.0",
+  "title": "MIR Fixture - Assert Semantic Family Generation",
+  "author": "Julesc013",
+  "description": "Enables reviewed generic family generation and asserts stable assembler and lab technology identities.",
+  "factorio_version": "2.0",
+  "dependencies": [
+    "base >= 2.0.76",
+    "more-infinite-research",
+    "mir-fixture-semantic-family-attach"
+  ]
+}

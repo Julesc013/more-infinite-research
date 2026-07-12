@@ -1,44 +1,12 @@
 local deepcopy = require("prototypes.mir.core.deepcopy")
+local effect_metadata = require("prototypes.mir.domain.effects.metadata")
 
 -- Pure setting/effect descriptors shared by the settings stage and emitters.
 -- This module must not read Factorio settings: catalog/profile loading depends
 -- on it before effective startup settings can safely be resolved.
 local M = {}
 
-local percentage_effects = {
-  ["braking-force"] = true,
-  ["character-crafting-speed"] = true,
-  ["character-mining-speed"] = true,
-  ["character-running-speed"] = true,
-  ["gun-speed"] = true,
-  ["laboratory-productivity"] = true,
-  ["laboratory-speed"] = true,
-  ["worker-robot-battery"] = true
-}
-
-local whole_number_effects = {
-  ["bulk-inserter-capacity-bonus"] = true,
-  ["cargo-landing-pad-count"] = true,
-  ["character-build-distance"] = true,
-  ["character-inventory-slots-bonus"] = true,
-  ["character-item-drop-distance"] = true,
-  ["character-logistic-trash-slots"] = true,
-  ["character-reach-distance"] = true,
-  ["character-resource-reach-distance"] = true,
-  ["inserter-stack-size-bonus"] = true,
-  ["max-cargo-bay-unloading-distance"] = true,
-  ["stack-inserter-capacity-bonus"] = true,
-  ["worker-robot-storage"] = true
-}
-
-local identity_fields = {
-  "type",
-  "recipe",
-  "ammo_category",
-  "turret_id",
-  "fluid",
-  "item"
-}
+local identity_fields = effect_metadata.identity_fields()
 
 local base_default_anchors = {
   ["braking-force"] = { unit = "percent", canonical_anchor = 0.15 },
@@ -54,18 +22,7 @@ local function close_to_integer(value)
 end
 
 function M.numeric_effect_descriptor(effect)
-  if type(effect) ~= "table" then return nil end
-  if effect.type == "change-recipe-productivity" and type(effect.change) == "number" then
-    return { field = "change", unit = "percent", display_multiplier = 100, value = effect.change }
-  end
-  if type(effect.modifier) ~= "number" then return nil end
-  if percentage_effects[effect.type] then
-    return { field = "modifier", unit = "percent", display_multiplier = 100, value = effect.modifier }
-  end
-  if whole_number_effects[effect.type] then
-    return { field = "modifier", unit = "native", display_multiplier = 1, value = effect.modifier }
-  end
-  return nil
+  return effect_metadata.numeric_descriptor(effect)
 end
 
 function M.effect_identity(effect)

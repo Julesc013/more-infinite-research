@@ -1,14 +1,14 @@
 ---------------------------------------------------------------------------------------------------
-Version: 2.4.0
+Version: 2.5.0
 Date: 2026-07-12
 
   Changes:
 
-    - Ported the accepted 3.1.0 compatibility-compiler contracts to the maintained Factorio 2.0 line.
-    - Preserved the 2.3.x generated IDs, setting IDs, runtime namespaces, and save-compatible behavior surface.
-    - Applied positive Factorio 2.0 target requirements instead of carrying 2.1-only effect or metadata assumptions.
-    - Retained the canonical descriptor, immutable recipe-fact, science-split, and mutation-command improvements from 3.1.0.
-    - Retained the deterministic-package and decomposed load-test improvements from 3.1.0.
+    - Ported the accepted 3.2.0 plan-first automatic compiler contracts to the maintained Factorio 2.0 line.
+    - Preserved published 2.4.0 technology IDs, setting IDs, runtime namespaces, and save-compatible behavior.
+    - Added RecipeFactV2, shared relationship indexes, schema-2 family rules and compatibility packs, and complete coverage accounting.
+    - Applied Factorio 2.0 target-declared stream, effect, setting, fixture, and recipe-shape cuts without renaming shared identities.
+    - Retained whole-plan validation, deterministic packaging, and exact-owner safety gates from the modern source.
 
 ---------------------------------------------------------------------------------------------------
 Version: 3.1.0

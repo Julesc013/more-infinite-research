@@ -11,6 +11,7 @@ end
 
 local base_lab = data.raw.lab and data.raw.lab.lab
 if base_lab then
+  local target_profile = require("__more-infinite-research__.prototypes.mir.platform.factorio.target_profiles").current()
   local custom = deepcopy(base_lab)
   custom.name = "mir-fixture-custom-lab"
   custom.minable = custom.minable and deepcopy(custom.minable) or nil
@@ -31,7 +32,7 @@ if base_lab then
     stack_size = 10
   }
 
-  local science_pack_type = data.raw.tool and data.raw.tool["automation-science-pack"] and "tool" or "item"
+  local science_pack_type = target_profile.prototype_shapes.science_pack_prototype_kinds[1]
   local pack = {
     type = science_pack_type,
     name = "mir-custom-only-science-pack",

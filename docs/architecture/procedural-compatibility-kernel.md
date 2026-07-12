@@ -34,7 +34,7 @@ The implemented report-first pieces are:
 
 - `prototypes/mir/index/registry_builder.lua` builds typed facts for recipes, technologies, machines, labs, owners, rule surfaces, and loop-risk signals.
 - `prototypes/mir/core/schema.lua` centralizes schema versions for the fact registry, resolver contract, capability policies, DecisionRecords, stream manifest rows, and compatibility claims.
-- `prototypes/mir/capabilities/contract.lua` validates the resolver interface: `discover`, `classify`, `propose`, `validate`, `emit`, and `diagnose`.
+- `prototypes/mir/capabilities/contract.lua` validates the resolver interface: `discover`, `classify`, `propose`, `validate`, `materialize`, and `result`.
 - `prototypes/mir/capabilities/registry.lua` classifies entity-backed loader recipes, entity-backed mining-drill recipes, and native modifier owners.
 - `prototypes/mir/policy/capabilities.lua` stores capability-specific policy defaults, including confidence thresholds, owner policy, science policy, and deny-risk flags.
 - `prototypes/mir/planner/compiler.lua` emits fact summaries, lab matrices, DecisionRecord-style rows, loop-risk rows, rule-surface rows, capability rows, and useful cap estimates when generation diagnostics are enabled.
@@ -114,12 +114,12 @@ CapabilityResolver = {
   classify,
   propose,
   validate,
-  emit,
-  diagnose
+  materialize,
+  result
 }
 ```
 
-For now, `emit` means "report the stream or policy that already emitted", not "create a new technology". A future resolver may emit only after it has stable IDs, fixture coverage, owner checks, lab checks, cap diagnostics, and loop-risk denials.
+`materialize` records the decision or the stable stream that already owns it; it never creates a technology. `result` returns the typed resolver outcome for reporting and plan composition. New prototype emission remains exclusively behind a validated `GenerationPlan` and the emit layer.
 
 Decision rows should include:
 

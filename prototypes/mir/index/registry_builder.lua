@@ -2,6 +2,7 @@ local productivity_owners = require("prototypes.mir.index.productivity_owners")
 local canonical_recipe_facts = require("prototypes.mir.index.recipe_facts")
 local schema = require("prototypes.mir.core.schema")
 local data_raw = require("prototypes.mir.platform.factorio.data_raw")
+local relationships = require("prototypes.mir.index.relationships")
 
 local R = {}
 
@@ -135,7 +136,9 @@ local function build_recipe_facts(unlocks)
     table.sort(owner_names)
 
     facts[name] = {
+      schema = recipe.schema,
       name = name,
+      variants = recipe.variants,
       categories = recipe.categories,
       ingredients = recipe.ingredients,
       results = recipe.results,
@@ -147,6 +150,7 @@ local function build_recipe_facts(unlocks)
       enabled = recipe.enabled_without_research,
       unlock_techs = unlocks[name] or {},
       surface_conditions = recipe.surface_conditions,
+      source_class = recipe.source_class,
       owners = owner_names
     }
   end
@@ -467,6 +471,7 @@ function R.build()
     owners = owners,
     rule_mutations = rule_mutations,
     loop_risks = loop_risks,
+    indexes = relationships.snapshot(),
     summary = {
       recipes = table_count(recipes),
       technologies = table_count(technologies),

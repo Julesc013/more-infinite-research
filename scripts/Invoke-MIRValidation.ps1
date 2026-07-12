@@ -490,7 +490,7 @@ Invoke-RepoCheck "fixture mods have metadata and data entrypoints" {
     throw "Fixture directory not found: $fixtureRootForStatic"
   }
 
-  $nonModFixtureDirs = @("compat-matrix", "run-profiles")
+  $nonModFixtureDirs = @("compat-matrix", "golden-plans", "run-profiles")
   foreach ($fixture in Get-ChildItem -LiteralPath $fixtureRootForStatic -Directory) {
     if ($nonModFixtureDirs -contains $fixture.Name) { continue }
 
@@ -605,6 +605,7 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
   $atanAshAssertText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-atan-ash-separation\data-final-fixes.lua")
   $aaiLoaderFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-aai-loader-belt-productivity\data-final-fixes.lua")
   $bigMiningDrillFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-big-mining-drill-productivity\data-final-fixes.lua")
+  $semanticFamilyFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-semantic-family-attach\data-final-fixes.lua")
   $atanNuclearScienceFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-atan-nuclear-science-productivity\data-final-fixes.lua")
   $capabilityNegativeFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\capability-negative-cases\data.lua")
   $capabilityNegativeAssertText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-capability-negative-cases\data-final-fixes.lua")
@@ -811,6 +812,7 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "fixtures\assert-atan-ash-separation\data-final-fixes.lua"; Text = $atanAshAssertText; Snippet = 'atan-landfill-from-ash' },
     @{ File = "fixtures\assert-aai-loader-belt-productivity\data-final-fixes.lua"; Text = $aaiLoaderFixtureText; Snippet = 'aai-turbo-loader' },
     @{ File = "fixtures\assert-big-mining-drill-productivity\data-final-fixes.lua"; Text = $bigMiningDrillFixtureText; Snippet = 'big-mining-drill should use +0.05' },
+    @{ File = "fixtures\assert-semantic-family-attach\data-final-fixes.lua"; Text = $semanticFamilyFixtureText; Snippet = 'safe-attach default emitted generated family technology' },
     @{ File = "fixtures\assert-atan-nuclear-science-productivity\data-final-fixes.lua"; Text = $atanNuclearScienceFixtureText; Snippet = 'nuclear-science-pack did not receive science-pack productivity' },
     @{ File = "fixtures\capability-negative-cases\data.lua"; Text = $capabilityNegativeFixtureText; Snippet = 'mir-loader-like-container' },
     @{ File = "fixtures\capability-negative-cases\data.lua"; Text = $capabilityNegativeFixtureText; Snippet = 'maximum_productivity = 0' },
@@ -1219,6 +1221,9 @@ Invoke-RepoCheck "compat audit automation tooling is wired" {
     @{ File = "scripts\Invoke-MIRCompatAudit.ps1"; Text = $compatAuditText; Snippet = "[string[]]`$LocalModZipDirs = @()" },
     @{ File = "scripts\Invoke-MIRCompatAudit.ps1"; Text = $compatAuditText; Snippet = "[string[]]`$LocalModLibraryDirs = @()" },
     @{ File = "scripts\Invoke-MIRCompatAudit.ps1"; Text = $compatAuditText; Snippet = "[string]`$ModUnderTestZip = `"`"" },
+    @{ File = "scripts\Invoke-MIRCompatAudit.ps1"; Text = $compatAuditText; Snippet = "[string]`$ModUnderTestSourceCommit = `"`"" },
+    @{ File = "scripts\Invoke-MIRCompatAudit.ps1"; Text = $compatAuditText; Snippet = 'kind = "mir-modpack-campaign-evidence"' },
+    @{ File = "scripts\Invoke-MIRCompatAudit.ps1"; Text = $compatAuditText; Snippet = "Campaign evidence requires SHA-256" },
     @{ File = "scripts\Invoke-MIRCompatAudit.ps1"; Text = $compatAuditText; Snippet = "[switch]`$RunLocalModZips" },
     @{ File = "scripts\Invoke-MIRCompatAudit.ps1"; Text = $compatAuditText; Snippet = "[switch]`$RunGeneratedLocalScenarios" },
     @{ File = "scripts\Invoke-MIRCompatAudit.ps1"; Text = $compatAuditText; Snippet = "[switch]`$GenerateLocalClusterScenarios" },
@@ -1253,7 +1258,8 @@ Invoke-RepoCheck "compat audit automation tooling is wired" {
     @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = '"scripts"' },
     @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = '"tests"' },
     @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = '"tmp"' },
-    @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = 'prototypes\mir\report\diagnostics_sink.lua' },
+    @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = 'prototypes\mir\settings\test_overrides.lua' },
+    @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = 'overrides[`"mir-debug-generation-report`"] = true' },
     @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = "[string[]]`$OfficialBuiltinMods" },
     @{ File = "scripts\MIRCompatAudit\FactorioRunner.ps1"; Text = $runnerText; Snippet = "enabled = `$enabledLookup.ContainsKey" },
     @{ File = "fixtures\compat-matrix\local-library-scenarios.json"; Text = $localLibraryScenariosText; Snippet = "local-2-1-crucible-rigor-exact-dist" },
@@ -1422,6 +1428,7 @@ Invoke-RepoCheck "2.2.0 compiler diagnostics are wired" {
   $indexRegistryText = Get-Content -Raw -LiteralPath $indexRegistryPath
   $decisionRecordText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\domain\decisions\decision_record.lua")
   $decisionExportText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\report\decision_export.lua")
+  $coverageReportText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\report\coverage.lua")
   $capabilityRegistryText = Get-Content -Raw -LiteralPath $capabilityRegistryPath
   $capabilityContractText = Get-Content -Raw -LiteralPath $capabilityContractPath
   $capabilityPolicyText = Get-Content -Raw -LiteralPath $capabilityPolicyPath
@@ -1438,6 +1445,7 @@ Invoke-RepoCheck "2.2.0 compiler diagnostics are wired" {
     @{ File = "prototypes\mir\report\diagnostics_sink.lua"; Text = $diagnosticsText; Snippet = 'append("loop_risk", row)' },
     @{ File = "prototypes\mir\report\diagnostics_sink.lua"; Text = $diagnosticsText; Snippet = 'append("lab_matrix", row)' },
     @{ File = "prototypes\mir\index\registry_builder.lua"; Text = $indexRegistryText; Snippet = 'RecipeFact' },
+    @{ File = "prototypes\mir\index\recipe_facts.lua"; Text = (Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\index\recipe_facts.lua")); Snippet = 'productive_result_names' },
     @{ File = "prototypes\mir\index\registry_builder.lua"; Text = $indexRegistryText; Snippet = 'RuleMutationFact' },
     @{ File = "prototypes\mir\index\registry_builder.lua"; Text = $indexRegistryText; Snippet = 'schema = schema.fact_registry' },
     @{ File = "prototypes\mir\index\registry_builder.lua"; Text = $indexRegistryText; Snippet = 'build_loop_risk_facts' },
@@ -1445,7 +1453,10 @@ Invoke-RepoCheck "2.2.0 compiler diagnostics are wired" {
     @{ File = "prototypes\mir\domain\decisions\decision_record.lua"; Text = $decisionRecordText; Snippet = 'schema.decision({' },
     @{ File = "prototypes\mir\report\decision_export.lua"; Text = $decisionExportText; Snippet = 'function M.emit(sink, record)' },
     @{ File = "prototypes\mir\report\decision_export.lua"; Text = $decisionExportText; Snippet = 'sink.decision(record)' },
-    @{ File = "prototypes\mir\core\schema.lua"; Text = $schemaText; Snippet = 'S.decision_record = 1' },
+    @{ File = "prototypes\mir\report\coverage.lua"; Text = $coverageReportText; Snippet = 'kind = "mir-coverage-report"' },
+    @{ File = "prototypes\mir\report\coverage.lua"; Text = $coverageReportText; Snippet = 'accounted_recipes = #rows' },
+    @{ File = "prototypes\mir\report\coverage.lua"; Text = $coverageReportText; Snippet = 'technology_effect_count' },
+    @{ File = "prototypes\mir\core\schema.lua"; Text = $schemaText; Snippet = 'S.decision_record = 2' },
     @{ File = "prototypes\mir\capabilities\contract.lua"; Text = $capabilityContractText; Snippet = 'CapabilityResolver' },
     @{ File = "prototypes\mir\capabilities\contract.lua"; Text = $capabilityContractText; Snippet = '"discover"' },
     @{ File = "prototypes\mir\policy\capabilities.lua"; Text = $capabilityPolicyText; Snippet = 'P.schema_version = schema.capability_policy' },
@@ -1457,7 +1468,7 @@ Invoke-RepoCheck "2.2.0 compiler diagnostics are wired" {
     @{ File = "prototypes\mir\capabilities\registry.lua"; Text = $capabilityRegistryText; Snippet = 'id = "mining-drill-manufacturing"' },
     @{ File = "prototypes\mir\capabilities\registry.lua"; Text = $capabilityRegistryText; Snippet = 'id = "native-modifier-ownership"' },
     @{ File = "prototypes\mir\capabilities\registry.lua"; Text = $capabilityRegistryText; Snippet = 'entity_backed_candidates' },
-    @{ File = "prototypes\mir\capabilities\registry.lua"; Text = $capabilityRegistryText; Snippet = 'discover,classify,propose,validate,emit,diagnose' },
+    @{ File = "prototypes\mir\capabilities\registry.lua"; Text = $capabilityRegistryText; Snippet = 'discover,classify,propose,validate,materialize,result' },
     @{ File = "prototypes\mir\planner\compiler.lua"; Text = $compilerText; Snippet = 'local decision_export = require("prototypes.mir.report.decision_export")' },
     @{ File = "prototypes\mir\planner\compiler.lua"; Text = $compilerText; Snippet = 'require("prototypes.mir.index.registry_builder")' },
     @{ File = "prototypes\mir\planner\compiler.lua"; Text = $compilerText; Snippet = 'D.fact_registry({' },
@@ -1642,6 +1653,10 @@ Invoke-RepoCheck "compatibility support lanes are wired" {
 
 Invoke-RepoCheck "compatibility policy and claim lints pass" {
   & (Join-Path $repo "scripts\Test-MIRPolicyLints.ps1") -RepoRoot $repo
+}
+
+Invoke-RepoCheck "stable generated technology golden plan passes" {
+  & (Join-Path $repo "scripts\Test-MIRGoldenPlans.ps1") -RepoRoot $repo
 }
 
 Invoke-RepoCheck "release documentation lists final manual and API checks" {
@@ -2071,7 +2086,7 @@ if (-not (Test-Path -LiteralPath $fixtureRoot)) {
   throw "Fixture directory not found: $fixtureRoot"
 }
 
-$nonModFixtureDirs = @("compat-matrix", "run-profiles")
+$nonModFixtureDirs = @("compat-matrix", "golden-plans", "run-profiles")
 
 $postMirAssertionFixtures = @(
   "mir-fixture-assert-aai-loader-belt-productivity",
@@ -2080,7 +2095,10 @@ $postMirAssertionFixtures = @(
   "mir-fixture-assert-atan-nuclear-science-productivity",
   "mir-fixture-assert-better-bot-battery-skip",
   "mir-fixture-assert-big-mining-drill-productivity",
+  "mir-fixture-assert-semantic-family-attach",
+  "mir-fixture-assert-semantic-family-generate",
   "mir-fixture-assert-capability-negative-cases",
+  "mir-fixture-assert-synthetic-scale-graph",
   "mir-fixture-assert-generation-integrity",
   "mir-fixture-assert-generated-prerequisite-safety",
   "mir-fixture-rigor-late-recipe-removal",
@@ -3065,6 +3083,16 @@ Assert-ReportLineContains -Line $zeroCapRuleLine -Expected "field=maximum_produc
 Assert-NoDiagnosticReportLineContaining -Kind "decision" -Key "mir-loader-like-container" -Unexpected "capability=logistics-loader-manufacturing" -Context "Negative loader-like container capability scenario"
 Assert-NoDiagnosticReportLineContaining -Kind "decision" -Key "mir-drill-like-container" -Unexpected "capability=mining-drill-manufacturing" -Context "Negative drill-like container capability scenario"
 
+Invoke-RuntimeScenario -ScenarioName "synthetic-scale-graph" -EnabledFixtureNames @(
+  "mir-fixture-synthetic-scale-graph",
+  "mir-fixture-assert-synthetic-scale-graph"
+)
+$syntheticCoverageLine = Get-DiagnosticReportLineContaining -Kind "coverage" -Key "recipe_accounting" -Expected "recipe_count="
+Assert-ReportLineContains -Line $syntheticCoverageLine -Expected "candidate_count=" -Context "Synthetic graph candidate count"
+Assert-ReportLineContains -Line $syntheticCoverageLine -Expected "effect_count=" -Context "Synthetic graph effect count"
+Assert-ReportLineContains -Line $syntheticCoverageLine -Expected "graph_edge_count=" -Context "Synthetic graph edge count"
+Assert-ReportLineContains -Line $syntheticCoverageLine -Expected "scan_count=2" -Context "Synthetic graph bounded scan count"
+
 Invoke-RuntimeScenario -ScenarioName "lab-productivity-owner-skip" -EnabledFixtureNames @(
   "mir-fixture-lab-productivity-owner",
   "mir-fixture-assert-lab-productivity-owner-skip"
@@ -3178,6 +3206,26 @@ $bigMiningCapabilityLine = Get-DiagnosticReportLineContaining -Kind "decision" -
 Assert-ReportLineContains -Line $bigMiningCapabilityLine -Expected "decision=generate_stream" -Context "Big Mining Drill capability resolver scenario"
 Assert-ReportLineContains -Line $bigMiningCapabilityLine -Expected "subfamily=mining_drill" -Context "Big Mining Drill capability subfamily scenario"
 Assert-ReportLineContains -Line $bigMiningCapabilityLine -Expected "evidence=item_type:item,item_place_result:big-mining-drill,entity_type:mining-drill,recipe_outputs_item:big-mining-drill" -Context "Big Mining Drill entity-backed evidence scenario"
+
+Invoke-RuntimeScenario -ScenarioName "semantic-family-attach" -EnabledFixtureNames @(
+  "mir-fixture-semantic-family-attach",
+  "mir-fixture-assert-semantic-family-attach"
+)
+$semanticFamilyLine = Get-LastStreamReportLine -Key "research_belts"
+Assert-ReportLineGenerated -Line $semanticFamilyLine -Context "Semantic family attach scenario"
+$semanticLoaderDecision = Get-DiagnosticReportLineContaining -Kind "decision" -Key "assemble-alpha" -Expected "family=loader-manufacturing"
+Assert-ReportLineContains -Line $semanticLoaderDecision -Expected "decision=attach" -Context "Semantic loader attachment decision"
+$semanticLabDecision = Get-DiagnosticReportLineContaining -Kind "decision" -Key "assemble-zeta" -Expected "family=lab-manufacturing"
+Assert-ReportLineContains -Line $semanticLabDecision -Expected "decision=attach" -Context "Semantic lab gated-family decision"
+
+Invoke-RuntimeScenario -ScenarioName "semantic-family-generate" -EnabledFixtureNames @(
+  "mir-fixture-semantic-family-attach",
+  "mir-fixture-assert-semantic-family-generate"
+)
+$semanticAssemblerFamilyLine = Get-LastStreamReportLine -Key "research_auto_assembling_machine"
+Assert-ReportLineGenerated -Line $semanticAssemblerFamilyLine -Context "Semantic assembling-machine family generation"
+$semanticLabFamilyLine = Get-LastStreamReportLine -Key "research_auto_lab"
+Assert-ReportLineGenerated -Line $semanticLabFamilyLine -Context "Semantic lab family generation"
 
 Invoke-RuntimeScenario -ScenarioName "atan-nuclear-science-productivity" -EnabledFixtureNames @(
   "mir-fixture-atan-nuclear-science",

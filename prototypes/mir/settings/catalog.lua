@@ -144,6 +144,17 @@ function M.global_setting_prototypes()
       localised_description = {"mod-setting-description.mir-lab-incompatibility-policy"}
     },
     {
+      type = "string-setting",
+      name = "mir-automatic-compiler-mode",
+      setting_type = "startup",
+      default_value = "safe-attach",
+      allowed_values = {"off", "report", "safe-attach", "safe-generate", "exact-pack"},
+      order = setting_order.global("main", 35),
+      targets = {requires_features = {"recipe_productivity"}, required_effect_types = {}},
+      localised_name = {"", "[font=default-bold][color=green]Main:[/color][/font] Automatic compiler mode"},
+      localised_description = {"", "Controls structural candidate handling. Safe attach is the default; safe generation enables only predeclared family technologies."}
+    },
+    {
       type = "bool-setting",
       name = "mir-prefer-this-mod-for-competing-techs",
       setting_type = "startup",
@@ -168,6 +179,7 @@ function M.global_setting_prototypes()
       setting_type = "startup",
       default_value = false,
       order = setting_order.global("compatibility", 20),
+      targets = {requires_features = {"technology_constant_overlays"}, required_effect_types = {}},
       localised_name = {"mod-setting-name.mir-use-installed-space-age-icons"},
       localised_description = {"mod-setting-description.mir-use-installed-space-age-icons"}
     },
@@ -178,6 +190,7 @@ function M.global_setting_prototypes()
       default_value = pipeline_extent_settings.default_value,
       allowed_values = pipeline_extent_settings.allowed_values,
       order = setting_order.global("compatibility", 30),
+      targets = {requires_features = {"pipeline_extent"}, required_effect_types = {}},
       localised_name = {"mod-setting-name.mir-pipeline-extent-multiplier"},
       localised_description = {"mod-setting-description.mir-pipeline-extent-multiplier"}
     }
@@ -194,6 +207,7 @@ function M.global_setting_prototypes()
     default_value = prototype_limit_settings.engine_default,
     allowed_values = prototype_limit_settings.recycling_return_allowed_values,
     order = setting_order.global("prototype_limits", 15),
+    targets = {requires_features = {"prototype_limits"}, required_effect_types = {}},
     localised_name = {"mod-setting-name." .. prototype_limit_settings.recycling_return_setting_name},
     localised_description = {"mod-setting-description." .. prototype_limit_settings.recycling_return_setting_name}
   })
@@ -204,6 +218,7 @@ function M.global_setting_prototypes()
     setting_type = "startup",
     default_value = false,
     order = setting_order.global("prototype_limits", 17),
+    targets = {requires_features = {"prototype_limits"}, required_effect_types = {}},
     localised_name = {"mod-setting-name." .. prototype_limit_settings.self_recycling_scope_setting_name},
     localised_description = {"mod-setting-description." .. prototype_limit_settings.self_recycling_scope_setting_name}
   })
@@ -214,6 +229,7 @@ function M.global_setting_prototypes()
     setting_type = "startup",
     default_value = false,
     order = setting_order.global("compatibility", 35),
+    targets = {requires_features = {"module_permissions"}, required_effect_types = {}},
     localised_name = {"mod-setting-name." .. prototype_limit_settings.unrestricted_modules_setting_name},
     localised_description = {"mod-setting-description." .. prototype_limit_settings.unrestricted_modules_setting_name}
   })
@@ -224,6 +240,7 @@ function M.global_setting_prototypes()
     setting_type = "startup",
     default_value = false,
     order = setting_order.global("compatibility", 40),
+    targets = {requires_features = {"prototype_limits"}, required_effect_types = {}},
     localised_name = {"mod-setting-name." .. prototype_limit_settings.positive_power_floor_setting_name},
     localised_description = {"mod-setting-description." .. prototype_limit_settings.positive_power_floor_setting_name}
   })
@@ -235,6 +252,7 @@ function M.global_setting_prototypes()
     default_value = "",
     allow_blank = true,
     order = setting_order.global("advanced", 10),
+    targets = {requires_features = {"settings_profiles"}, required_effect_types = {}},
     localised_name = {"mod-setting-name." .. M.import_setting_name},
     localised_description = {"mod-setting-description." .. M.import_setting_name}
   })
@@ -263,27 +281,14 @@ function M.global_setting_prototypes()
     setting_type = "startup",
     default_value = false,
     order = setting_order.global("diagnostics", 30),
+    targets = {requires_features = {"scripted_techs"}, required_effect_types = {}},
     localised_name = {"mod-setting-name.mir-debug-scripted-effects"},
     localised_description = {"mod-setting-description.mir-debug-scripted-effects"}
   })
 
   local cloned = {}
   for _, spec in ipairs(out) do
-    local requirements = { requires_features = {}, required_effect_types = {} }
-    if spec.name == "mir-pipeline-extent-multiplier" then
-      requirements.requires_features = {"pipeline_extent"}
-    elseif spec.name == M.import_setting_name then
-      requirements.requires_features = {"settings_profiles"}
-    elseif spec.name == prototype_limit_settings.unrestricted_modules_setting_name then
-      requirements.requires_features = {"module_permissions"}
-    elseif spec.name == "mir-debug-scripted-effects" then
-      requirements.requires_features = {"scripted_techs"}
-    elseif spec.name:find("^mir%-prototype%-")
-      or spec.name == prototype_limit_settings.recycling_return_setting_name
-      or spec.name == prototype_limit_settings.self_recycling_scope_setting_name then
-      requirements.requires_features = {"prototype_limits"}
-    end
-    local declared = apply_declaration_defaults(spec, requirements)
+    local declared = apply_declaration_defaults(spec, spec.targets)
     if target_line.setting_supported(declared) then
       table.insert(cloned, declared)
     end

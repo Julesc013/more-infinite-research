@@ -18,6 +18,8 @@ local governed_stream_keys = {
   "research_agricultural_growth_speed",
   "research_air_scrubbing_clean_filter",
   "research_armor_components",
+  "research_auto_assembling_machine",
+  "research_auto_lab",
   "research_artificial_soil",
   "research_ash_separation",
   "research_bacteria_cultivation",
@@ -94,11 +96,6 @@ local stream_setting_patterns = {
   "ips-research-time-%s"
 }
 
-local target_line_omitted_stream_keys = {
-  research_cargo_bay_unloading_distance = true,
-  research_cargo_landing_pad_count = true
-}
-
 local function startup_setting_exists(name)
   return settings and settings.startup and settings.startup[name] ~= nil
 end
@@ -122,7 +119,7 @@ local base_setting_patterns = {
 
 for _, stream_key in ipairs(governed_stream_keys) do
   local enable_name = string.format("ips-enable-%s", stream_key)
-  if not target_line_omitted_stream_keys[stream_key] or startup_setting_exists(enable_name) then
+  if startup_setting_exists(enable_name) then
     for _, setting_pattern in ipairs(stream_setting_patterns) do
       assert_startup_setting_readable(string.format(setting_pattern, stream_key))
     end

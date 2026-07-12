@@ -1,4 +1,5 @@
-local science_pack_type = data.raw.tool and data.raw.tool["automation-science-pack"] and "tool" or "item"
+local target_profile = require("__more-infinite-research__.prototypes.mir.platform.factorio.target_profiles").current()
+local science_pack_type = target_profile.prototype_shapes.science_pack_prototype_kinds[1]
 
 local pack = {
   type = science_pack_type,

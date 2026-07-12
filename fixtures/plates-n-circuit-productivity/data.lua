@@ -76,3 +76,44 @@ dependent.effects = {}
 dependent.prerequisites = {"basic-plate-productivity"}
 
 data:extend({prefix_owner, dependent})
+
+data:extend({
+  {
+    type = "mod-data",
+    name = "more-infinite-research-compatibility-pack",
+    data = {
+      packs = {
+        ["plates-n-circuit-fixture"] = {
+          schema = 2,
+          id = "plates-n-circuit-fixture",
+          applicability = {
+            mods = {{id = "plates-n-circuit-productivity", version = "fixture"}}
+          },
+          aliases = {},
+          exact = {includes = {}, excludes = {}},
+          family_hints = {},
+          science_roles = {},
+          owner_claims = {
+            known_competing_productivity = {
+              tech_patterns = {
+                "^basic%-plate%-productivity$",
+                "^plate%-productivity$",
+                "^electric%-circuit%-productivity$",
+                "^electronic%-circuit%-productivity$",
+                "^advanced%-circuit%-productivity$"
+              }
+            }
+          },
+          risk_overrides = {},
+          targets = {factorio_lines = {"2.1"}},
+          evidence = {
+            fixtures = {"plates-n-circuit-productivity"},
+            real_mod = {}
+          },
+          claim = {level = "fixture-only", public = false},
+          expected_decisions = {"replace-exact-or-preserve-owner"}
+        }
+      }
+    }
+  }
+})
