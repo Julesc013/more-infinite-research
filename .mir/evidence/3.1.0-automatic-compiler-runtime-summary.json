@@ -4,19 +4,20 @@
   "release": "3.1.0",
   "publication_status": "unreleased",
   "generated_at": "2026-07-12T11:00:56.6091352Z",
-  "source_commit": "81e73eabf356e054aa9d2277d8f7d68255c726ff",
+  "source_commit": "4cdb8595de94316b45169e1722d623684d9086a1",
+  "package_source_commit": "81e73eabf356e054aa9d2277d8f7d68255c726ff",
   "source_tree_dirty": false,
   "factorio_line": "2.1",
   "factorio_binary_version": "2.1.9",
   "runtime_validation": {
-    "run_id": "51ad8319-3ea7-48f7-90a4-d147d234304e",
+    "run_id": "a4c065c2-da93-4350-86ca-c4f27eaea1b7",
     "result": "passed",
     "scenario_count": 86,
-    "duration_seconds": 757.102,
+    "duration_seconds": 757.368,
     "required_groups_skipped": 0,
-    "validation_harness_sha256": "D7B1C82B0D829CD709F539A190C6F6C38490C920ABEE536ACC73EB3AF7552DD6",
+    "validation_harness_sha256": "EA7CC332C12AE871B8F078C2CE5A204C7F611CC1C9F3411D54917878F8BBF3FC",
     "scenario_manifest_sha256": "2F1E608A1E1374A3B859724264FCB4408FBC068437AC199528351313F91E271D",
-    "target_profile_sha256": "4AE6FCC2DAB5BE2F960B03CED800738E8F42BA51B69928899D7EB4962F404C3C",
+    "target_profile_sha256": "C584A745225E7CAD7A245A1A039064F9878E7DC951D3012AD92809CE00A9DAF6",
     "package_source_sha256": "689BBB236E96177FB45254711C1FF0ECAAEFC556A923633F783D7345B418F247",
     "validation_package_sha256": "7CC222EC860F21EBAA5C3E72F2C42BD97BF7A8DA8AE938AFA57D83994991676D",
     "exact_package_base": "passed",
@@ -25,7 +26,7 @@
   "synthetic_scale_gate": {
     "scenario_id": "synthetic-scale-graph",
     "result": "passed",
-    "duration_seconds": 7.955,
+    "duration_seconds": 8.6,
     "budget_seconds": 30.0,
     "recipe_count": 1000,
     "technology_count": 1000,
@@ -40,7 +41,7 @@
   "compiler_contract_gate": {
     "scenario_id": "compiler-contracts",
     "result": "passed",
-    "duration_seconds": 5.705,
+    "duration_seconds": 5.98,
     "assertions": [
       "schema-rejection",
       "stable-sorting",
@@ -61,5 +62,5 @@
       "max-level"
     ]
   },
-  "claim_boundary": "Automated development-candidate evidence only. Upgrade, interactive, independent campaign, freshness, and publication gates remain separate."
+  "claim_boundary": "Automated release-candidate evidence. Exact upgrade and eight available-ecosystem load scenarios pass; interactive acceptance, unavailable dependency closures, and publication remain separate."
 }

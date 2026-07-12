@@ -123,21 +123,25 @@ waves:
     pre_renumber_core_ecosystem_load_characterization: .mir/evidence/pre-3.1-renumber-core-ecosystems-load-campaign.json
     pre_renumber_aai_load_characterization: .mir/evidence/pre-3.1-renumber-aai-load-campaign.json
     automatic_compiler_runtime_summary: .mir/evidence/3.1.0-automatic-compiler-runtime-summary.json
-    runtime_source_commit: 81e73eabf356e054aa9d2277d8f7d68255c726ff
-    runtime_run_id: 51ad8319-3ea7-48f7-90a4-d147d234304e
+    runtime_source_commit: 4cdb8595de94316b45169e1722d623684d9086a1
+    package_source_commit: 81e73eabf356e054aa9d2277d8f7d68255c726ff
+    runtime_run_id: a4c065c2-da93-4350-86ca-c4f27eaea1b7
     runtime_scenario_count: 86
     runtime_package_sha256: 7CC222EC860F21EBAA5C3E72F2C42BD97BF7A8DA8AE938AFA57D83994991676D
     runtime_package_content_sha256: 689BBB236E96177FB45254711C1FF0ECAAEFC556A923633F783D7345B418F247
-    upgrade_evidence: .mir/evidence/3.1.0-automatic-compiler-upgrade-proof.json
-    available_ecosystem_load_evidence: .mir/evidence/3.1.0-automatic-compiler-load-campaign.json
-    available_ecosystem_dependency_lock_sha256: 011CDB1CCF23C23A6383B9AE645C4D06D8D37F8DA36353558F5198E75920A121
+    structured_validation_evidence: .mir/evidence/3.1.0-rc2-validation-summary.json
+    upgrade_evidence: .mir/evidence/3.1.0-rc2-upgrade-proof.json
+    available_ecosystem_load_evidence: .mir/evidence/3.1.0-rc2-ecosystem-campaign.json
+    available_ecosystem_dependency_lock_sha256: 2F5255AC993B5B95FFD6142AB00BAD1D0BF99AB44E6C22575C692E42FF65ACF6
+    interactive_evidence: .mir/evidence/3.1.0-rc2-interactive-review.json
     available_ecosystem_load_gate: 8-passed-zero-dependency-failures-load-claims-only
     current_archive_ecosystem_load_gate: passed
     renumbered_static_gate: passed
     renumbered_runtime_gate: passed
     exact_package_gate: passed-base-and-space-age
     upgrade_from_3_0_5: passed-exact-archives-retained-settings-levels-storage-and-scripted-effects
-    interactive_gate: pending
+    candidate_freshness_gate: awaiting-clean-tree-verification
+    interactive_gate: pending-identity-bound-packet-created
     publication_status: unreleased
     status: in-development
 

@@ -17,7 +17,7 @@ superseded_by: []
 | Target | MIR version | Branch | Source | Archive SHA-256 | Binary state | Status | Blocker |
 | --- | ---: | --- | --- | --- | --- | --- | --- |
 | Factorio 2.1 | 3.0.5 | `main` published baseline | `89d7764` | `40AF95C3...0E5C5` | Published characterization and runtime gates passed | Published and frozen | None |
-| Factorio 2.1 | 3.1.0 | `dev` | `81e73ea` package source | `7CC222EC...676D` tested archive | 86 scenarios, exact-package base/Space Age, 3.0.5 upgrade, performance, and eight available-ecosystem loads passed | Awaiting final candidate | GUI review, candidate freshness, and unavailable ecosystem closures |
+| Factorio 2.1 | 3.1.0 | `dev` | `4cdb859` validation / `81e73ea` package source | `7CC222EC...676D` tested archive | 86 scenarios, exact-package base/Space Age, 3.0.5 upgrade, performance, and eight available-ecosystem loads passed | Candidate awaiting manual review | GUI review and unavailable ecosystem closures |
 | Factorio 2.0 | 2.3.5 | `legacy` published baseline | `861565d` source / `9eabc54` promotion | `97B3DC9B...68DE` | 71 scenarios, targeted gate, exact-dist base/Space Age, and upgrade passed | Published and frozen | None |
 | Factorio 2.0 | 2.4.0 | `tmp/2.0` | Must be re-derived from accepted 3.1.0 | Pending | Preserved pre-acceptance work is non-authoritative | Blocked | Accepted 3.1.0 source |
 | Factorio 1.1 | 1.9.4 | `tmp/1.1` | `4f3962f` qualified candidate | `431CD5B0...A46E` | Factorio 1.1.110 reduced full gate, exact dist, reload, and upgrade passed | Candidate qualified | Publication gate |
