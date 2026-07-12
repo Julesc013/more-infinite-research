@@ -1437,3 +1437,11 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - modpack-campaign-evidence-contract
+  - path: docs/reference/reports/coverage-report.md
+    title: "Coverage Report"
+    status: current
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - recipe-coverage-accounting-contract

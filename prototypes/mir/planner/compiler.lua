@@ -184,6 +184,7 @@ function M.emit()
   emit_loop_risks(registry)
   emit_generated_technology_decisions(registry)
   capabilities.emit(registry)
+  require("prototypes.mir.report.coverage").emit()
 end
 
 return M

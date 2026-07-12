@@ -194,4 +194,14 @@ function A.mod_data_payload()
   }
 end
 
+function A.snapshot()
+  local out = {}
+  for _, entry in ipairs(adopted_productivity_family_recipes) do
+    local copy = {}
+    for key, value in pairs(entry) do copy[key] = value end
+    table.insert(out, copy)
+  end
+  return out
+end
+
 return A

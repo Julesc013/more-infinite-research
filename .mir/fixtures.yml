@@ -284,3 +284,5 @@ fixtures:
       - arbitrary-name-assembling-machine-generation
       - arbitrary-name-lab-generation
       - predeclared-settings-stage-mode
+      - full-recipe-coverage-accounting
+      - coverage-artifact-fingerprint

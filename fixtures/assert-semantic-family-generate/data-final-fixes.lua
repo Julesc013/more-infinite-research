@@ -21,3 +21,23 @@ for technology_name, recipe_name in pairs(expected) do
   end
   if not found then fail(recipe_name .. " is absent from " .. technology_name) end
 end
+
+local coverage = data.raw["mod-data"] and data.raw["mod-data"]["more-infinite-research-coverage-report"]
+if not (coverage and coverage.data and coverage.data.summary) then
+  fail("missing coverage report artifact")
+end
+local summary = coverage.data.summary
+if summary.accounted_recipes ~= summary.total_recipes then
+  fail("coverage accounting dropped recipes")
+end
+if summary.dangling_effects ~= 0 then fail("coverage found dangling effects") end
+
+local rows = {}
+for _, row in ipairs(coverage.data.rows or {}) do rows[row.recipe] = row end
+for _, recipe_name in pairs(expected) do
+  local row = rows[recipe_name]
+  if not row then fail("coverage omitted " .. recipe_name) end
+  if row.category ~= "generated_family_covered" or row.reason ~= "reviewed_generic_family" then
+    fail(recipe_name .. " has wrong coverage classification " .. tostring(row.category) .. "/" .. tostring(row.reason))
+  end
+end

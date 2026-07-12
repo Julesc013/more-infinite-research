@@ -105,6 +105,14 @@ function D.lab_matrix(row)
   append("lab_matrix", row)
 end
 
+function D.coverage(row)
+  append("coverage", row)
+end
+
+function D.coverage_recipe(row)
+  append("coverage_recipe", row)
+end
+
 function D.recipe_matches(key, buckets)
   if not D.recipe_matches_enabled() then return end
   for _, bucket in ipairs(buckets or {}) do
