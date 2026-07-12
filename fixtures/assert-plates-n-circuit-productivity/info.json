@@ -4,9 +4,9 @@
   "title": "MIR Fixture - Assert Plates n Circuit Productivity Compatibility",
   "author": "Julesc013",
   "description": "Validation fixture that asserts known competing plate and circuit productivity technologies are replaced by MIR.",
-  "factorio_version": "2.1",
+  "factorio_version": "0.15",
   "dependencies": [
-    "base >= 2.1.8",
+    "base >= 0.15",
     "? space-age >= 2.1.8",
     "mir-fixture-plates-n-circuit-productivity",
     "more-infinite-research"

@@ -96,13 +96,13 @@ table.insert(
       {type = "unlock-recipe", recipe = "atan-nutrients-from-ash"},
       {type = "unlock-recipe", recipe = "atan-foundation-from-ash"}
     },
-    prerequisites = {"chemical-science-pack"},
+    prerequisites = {"science-pack-3"},
     unit = {
       count = 100,
       ingredients = {
-        {"automation-science-pack", 1},
-        {"logistic-science-pack", 1},
-        {"chemical-science-pack", 1}
+        {"science-pack-1", 1},
+        {"science-pack-2", 1},
+        {"science-pack-3", 1}
       },
       time = 30
     }

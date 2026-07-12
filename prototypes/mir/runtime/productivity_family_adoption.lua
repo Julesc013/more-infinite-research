@@ -1,11 +1,10 @@
 local M = {}
+local runtime_state = require("prototypes.mir.runtime.state")
 
 local ADOPTION_DATA_NAME = "more-infinite-research-productivity-family-adoption"
 
 local function ensure_state()
-  storage.mir = storage.mir or {}
-  storage.mir.productivity_family_adoption = storage.mir.productivity_family_adoption or {}
-  return storage.mir.productivity_family_adoption
+  return runtime_state.bucket("productivity_family_adoption")
 end
 
 local function adoption_data()

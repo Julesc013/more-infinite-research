@@ -14,7 +14,7 @@ tech.max_level = nil
 tech.prerequisites = {"research-speed-6"}
 tech.unit = {
   count = 777,
-  ingredients = {{"automation-science-pack", 1}},
+  ingredients = {{"science-pack-1", 1}},
   time = 77
 }
 

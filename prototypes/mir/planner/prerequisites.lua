@@ -81,6 +81,14 @@ function M.build_for(key, ingredients)
   for _, tech_name in ipairs(spec.required_technologies or {}) do
     add(tech_name)
   end
+  for _, candidates in ipairs(spec.required_technology_candidates or {}) do
+    for _, tech_name in ipairs(candidates or {}) do
+      if lookup.technology_exists(tech_name) then
+        add(tech_name)
+        break
+      end
+    end
+  end
   if spec.prerequisites == "derive-from-unlocks" then
     for _, recipe_name in ipairs(stream_recipe_names(spec)) do
       for _, tech_name in ipairs(recipe_unlock_techs(recipe_name)) do

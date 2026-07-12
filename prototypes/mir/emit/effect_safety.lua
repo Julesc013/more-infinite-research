@@ -35,6 +35,17 @@ function S.register_generated_technology(name)
   end
 end
 
+function S.contains_generated_technology(name)
+  return generated_technology_names[name] == true
+end
+
+function S.sorted_generated_technology_names()
+  local names = {}
+  for name, _ in pairs(generated_technology_names) do table.insert(names, name) end
+  table.sort(names)
+  return names
+end
+
 function S.assert_registered_technology_effects()
   for name, _ in pairs(generated_technology_names) do
     local tech = data_raw.technology(name)

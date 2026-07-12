@@ -4,9 +4,9 @@
   "title": "MIR Fixture - Assert Vanilla Family Owner Prepatched",
   "author": "Julesc013",
   "description": "Validation fixture that asserts prepatched family owner effects are not duplicated.",
-  "factorio_version": "2.1",
+  "factorio_version": "0.15",
   "dependencies": [
-    "base >= 2.1.8",
+    "base >= 0.15",
     "space-age >= 2.1.8",
     "mir-fixture-vanilla-family-owner-prepatched",
     "more-infinite-research"

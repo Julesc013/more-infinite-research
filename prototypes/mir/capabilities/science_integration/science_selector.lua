@@ -201,14 +201,14 @@ function M.pick_science_for_stream(spec, key)
   elseif key == "research_science_pack_productivity" then
     for _, p in ipairs(science.pack_list_all()) do add_if_science_pack_exists(packs, p) end
   else
-    for _, p in ipairs({"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack"}) do
+    for _, p in ipairs({"science-pack-1", "science-pack-2", "science-pack-3", "production-science-pack"}) do
       add_if_science_pack_exists(packs, p)
     end
     for _, p in ipairs(STREAM_EXTRA_PACKS[key] or {}) do add_if_science_pack_exists(packs, p) end
   end
 
   if desired == "derive-from-unlocks" and #packs == 0 then
-    for _, p in ipairs({"automation-science-pack", "logistic-science-pack", "chemical-science-pack"}) do
+    for _, p in ipairs({"science-pack-1", "science-pack-2", "science-pack-3"}) do
       add_if_science_pack_exists(packs, p)
     end
   end
