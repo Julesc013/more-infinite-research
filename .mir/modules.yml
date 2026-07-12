@@ -341,9 +341,11 @@ validation_tooling:
     settings_overrides: scripts/validation/SettingsOverrides.ps1
     scenario_registry: scripts/validation/ScenarioRegistry.ps1
     golden_plans: scripts/Test-MIRGoldenPlans.ps1
+    campaign_scenarios: scripts/Test-MIRScenarioManifests.ps1
   rules:
     - the facade preserves its public parameters and structured result schema
     - process launch and copied-mod filesystem safety are reusable modules
     - settings overrides are declarative and isolated from scenario orchestration
     - every executed scenario resolves through a target-bound declaration record
+    - compatibility campaign records own setup roots settings expectations timeout and claim level
     - scenarios retain stable names and explicit groups while decomposition proceeds

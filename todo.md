@@ -36,7 +36,7 @@ This is the executable release queue. `.mir/release-wave.yml` is the machine-rea
 
 ### Required Before Candidate Freeze
 
-- [ ] Finish scenario schema 2 ownership: setup, roots, settings, expected plan, timeout, and claim level must be data, not duplicated PowerShell call arguments.
+- [x] Finish campaign scenario schema 2 ownership: target, setup, roots, settings, expected plan, timeout, and claim level are validated data rather than duplicated PowerShell call arguments.
 - [ ] Add pure schema and algorithm tests for invalid FamilyRules, invalid CompatibilityPacks, conflict merging, precedence, target filtering, stable IDs, and deterministic fingerprints.
 - [ ] Move remaining prototype mutation bodies out of `policy/` into `pipeline/mutations/` or `emit/transactions/`; policy stays pure.
 - [ ] Replace remaining hybrid target denylists with positive feature and shape declarations where target evidence exists.

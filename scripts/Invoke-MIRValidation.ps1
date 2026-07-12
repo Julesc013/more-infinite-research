@@ -464,6 +464,10 @@ Invoke-RepoCheck "PowerShell scripts parse and avoid duplicate parameters" {
   & (Join-Path $repo "scripts\Test-MIRPowerShellQuality.ps1") -RepoRoot $repo
 }
 
+Invoke-RepoCheck "scenario schema 2 manifests own complete execution records" {
+  & (Join-Path $repo "scripts\Test-MIRScenarioManifests.ps1") -RepoRoot $repo
+}
+
 Invoke-RepoCheck "compatibility dependency declarations preserve full mod names" {
   & (Join-Path $repo "scripts\Test-MIRDependencyResolver.ps1") -RepoRoot $repo
 }

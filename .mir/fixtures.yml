@@ -7,7 +7,20 @@ scenario_manifest:
 
 local_campaign_manifest:
   path: fixtures/compat-matrix/local-library-scenarios.json
-  schema: 1
+  factorio_2_0_path: fixtures/compat-matrix/local-library-scenarios-2.0.json
+  shared_manual_path: fixtures/compat-matrix/manual-scenarios.json
+  schema: 2
+  validator: scripts/Test-MIRScenarioManifests.ps1
+  record_owns:
+    - targets
+    - kind
+    - group
+    - setup
+    - roots
+    - settings
+    - expected_plan
+    - timeout_seconds
+    - claim_level
   independent_aai_scenarios:
     - local-2-1-aai-loaders
     - local-2-1-aai-industry

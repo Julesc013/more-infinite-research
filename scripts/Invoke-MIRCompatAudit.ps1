@@ -270,6 +270,10 @@ function New-MIRScenario {
     [object[]]$LockEntries = @(),
     [object[]]$Failures = @(),
     [string]$ClaimLevel = "loads",
+    [int]$TimeoutSeconds = $ScenarioTimeoutSeconds,
+    $Settings = $null,
+    $ExpectedPlan = $null,
+    [string]$SourceManifest = "",
     [string]$Notes = ""
   )
 
@@ -283,6 +287,10 @@ function New-MIRScenario {
     lock_entries = @($LockEntries | Sort-Object name, version -Unique)
     dependency_failures = @($Failures)
     claim_level = $ClaimLevel
+    timeout_seconds = $TimeoutSeconds
+    settings = if ($null -eq $Settings) { [pscustomobject]@{} } else { $Settings }
+    expected_plan = if ($null -eq $ExpectedPlan) { [pscustomobject]@{} } else { $ExpectedPlan }
+    source_manifest = $SourceManifest
     notes = $Notes
   }
 }
@@ -722,9 +730,30 @@ $exclusions = Read-MIRJsonFile -Path $KnownExclusions -Fallback ([pscustomobject
   mod_names = @()
   categories = @("localizations", "internal")
 })
-$manual = Read-MIRJsonFile -Path $ManualScenariosPath -Fallback ([pscustomobject]@{
-  scenarios = @()
-})
+$manualScenarioPaths = @($ManualScenariosPath)
+if (-not $PSBoundParameters.ContainsKey("ManualScenariosPath")) {
+  $lineManifest = if ($FactorioLine -eq "2.0") {
+    Join-Path $PSScriptRoot "..\fixtures\compat-matrix\local-library-scenarios-2.0.json"
+  } else {
+    Join-Path $PSScriptRoot "..\fixtures\compat-matrix\local-library-scenarios.json"
+  }
+  $manualScenarioPaths += $lineManifest
+}
+
+$manualScenarios = @()
+foreach ($scenarioManifestPath in @($manualScenarioPaths | Select-Object -Unique)) {
+  $manifest = Read-MIRJsonFile -Path $scenarioManifestPath -Fallback ([pscustomobject]@{ schema = 0; scenarios = @() })
+  if ([int](Get-MIRObjectProperty -Object $manifest -Name "schema" -Default 0) -ne 2) {
+    throw "Scenario manifest must use schema 2: $scenarioManifestPath"
+  }
+  foreach ($scenario in @($manifest.scenarios)) {
+    $targets = @((Get-MIRObjectProperty -Object $scenario -Name "targets" -Default @()) | ForEach-Object { [string]$_ })
+    if ($targets.Count -gt 0 -and $FactorioLine -notin $targets) { continue }
+    $scenario | Add-Member -NotePropertyName "_source_manifest" -NotePropertyValue $scenarioManifestPath -Force
+    $manualScenarios += $scenario
+  }
+}
+$manual = [pscustomobject]@{ scenarios = @($manualScenarios) }
 
 $fullCache = @{}
 function Get-FullCached {
@@ -748,6 +777,10 @@ function Resolve-MIRPortalScenario {
     [string[]]$RequestedMods = @(),
     [bool]$EnableSpaceAgeBundle,
     [string]$ClaimLevel = "loads",
+    [int]$TimeoutSeconds = $ScenarioTimeoutSeconds,
+    $Settings = $null,
+    $ExpectedPlan = $null,
+    [string]$SourceManifest = "",
     [string]$Notes = ""
   )
 
@@ -829,6 +862,10 @@ function Resolve-MIRPortalScenario {
     -LockEntries $scenarioLockEntries `
     -Failures $scenarioFailures `
     -ClaimLevel $ClaimLevel `
+    -TimeoutSeconds $TimeoutSeconds `
+    -Settings $Settings `
+    -ExpectedPlan $ExpectedPlan `
+    -SourceManifest $SourceManifest `
     -Notes $Notes
 }
 
@@ -895,7 +932,7 @@ function Invoke-MIRScenarioLoad {
       dependency_failures = $dependencyFailures
       exit_code = $null
       timed_out = $false
-      timeout_seconds = $ScenarioTimeoutSeconds
+      timeout_seconds = [int](Get-MIRObjectProperty -Object $Scenario -Name "timeout_seconds" -Default $ScenarioTimeoutSeconds)
       skipped = $true
       skip_reason = "dependency_resolution_failure"
       passed = $false
@@ -919,7 +956,8 @@ function Invoke-MIRScenarioLoad {
   $enabledMods = @("more-infinite-research") + @($Scenario.resolved_mods) + @($Scenario.official_mods)
   Write-MIRModList -ModsDir $modsDir -EnabledMods $enabledMods -OfficialBuiltinMods $officialBuiltinMods
 
-  $result = Invoke-MIRFactorioLoadCheck -FactorioBin $FactorioBin -UserDataDir $userData -ScenarioName $Scenario.name -ScenarioTimeoutSeconds $ScenarioTimeoutSeconds
+  $scenarioTimeout = [int](Get-MIRObjectProperty -Object $Scenario -Name "timeout_seconds" -Default $ScenarioTimeoutSeconds)
+  $result = Invoke-MIRFactorioLoadCheck -FactorioBin $FactorioBin -UserDataDir $userData -ScenarioName $Scenario.name -ScenarioTimeoutSeconds $scenarioTimeout
   [pscustomobject]@{
     scenario = $Scenario.name
     type = $Scenario.type
@@ -969,7 +1007,8 @@ if (-not [string]::IsNullOrWhiteSpace($FromLockfile)) {
       -EnableSpaceAgeBundle ([bool]$IncludeSpaceAge -or [bool]$lock.include_space_age)
   }
 } else {
-  if ($Offline -and ($CandidateNames.Count -gt 0 -or $MaxCandidates -gt 0)) {
+  $nonCatalogModeRequested = [bool]($RunManualScenarios -or $RunLocalModZips -or $RunGeneratedLocalScenarios)
+  if ($Offline -and ($CandidateNames.Count -gt 0 -or ($MaxCandidates -gt 0 -and -not $nonCatalogModeRequested))) {
     throw "Offline mode cannot resolve catalog or named catalog candidates. Use -RunLocalModZips, -RunManualScenarios with local libraries, or -FromLockfile with cached/local archives."
   }
 
@@ -978,7 +1017,7 @@ if (-not [string]::IsNullOrWhiteSpace($FromLockfile)) {
     $catalogCandidates = @($CandidateNames | ForEach-Object {
       [pscustomobject]@{ name = [string]$_; downloads_count = 0; category = ""; tags = @() }
     })
-  } elseif ($MaxCandidates -gt 0) {
+  } elseif ($MaxCandidates -gt 0 -and -not ($Offline -and $nonCatalogModeRequested)) {
     Write-Host "[compat-audit] querying mod portal catalog"
     $catalog = @(Get-MIRModPortalCatalog -MaxPages $CatalogPages)
     $catalogCandidates = @(
@@ -1019,8 +1058,9 @@ if ($RunManualScenarios) {
       throw "Manual scenario is missing a non-empty name in $ManualScenariosPath."
     }
     Write-Host "[compat-audit] inspecting manual scenario $scenarioName"
-    $scenarioMods = @((Get-MIRObjectProperty -Object $scenario -Name "mods" -Default @()) | ForEach-Object { [string]$_ })
-    $includeBundle = [bool](Get-MIRObjectProperty -Object $scenario -Name "include_space_age" -Default $false)
+    $scenarioMods = @((Get-MIRObjectProperty -Object $scenario -Name "roots" -Default @()) | ForEach-Object { [string]$_ })
+    $setup = Get-MIRObjectProperty -Object $scenario -Name "setup" -Default ([pscustomobject]@{})
+    $includeBundle = [bool](Get-MIRObjectProperty -Object $setup -Name "include_space_age" -Default $false)
     if ($scenarioMods -contains "space-age") { $includeBundle = $true }
     $selectedScenarios += Resolve-MIRPortalScenario `
       -Name $scenarioName `
@@ -1028,6 +1068,10 @@ if ($RunManualScenarios) {
       -RequestedMods $scenarioMods `
       -EnableSpaceAgeBundle $includeBundle `
       -ClaimLevel ([string](Get-MIRObjectProperty -Object $scenario -Name "claim_level" -Default "loads")) `
+      -TimeoutSeconds ([int](Get-MIRObjectProperty -Object $scenario -Name "timeout_seconds" -Default $ScenarioTimeoutSeconds)) `
+      -Settings (Get-MIRObjectProperty -Object $scenario -Name "settings" -Default ([pscustomobject]@{})) `
+      -ExpectedPlan (Get-MIRObjectProperty -Object $scenario -Name "expected_plan" -Default ([pscustomobject]@{})) `
+      -SourceManifest ([string](Get-MIRObjectProperty -Object $scenario -Name "_source_manifest" -Default "")) `
       -Notes ([string](Get-MIRObjectProperty -Object $scenario -Name "notes" -Default ""))
   }
 }
@@ -1156,6 +1200,10 @@ $scenarioSummaries = @($selectedScenarios | ForEach-Object {
     official_mods = @($_.official_mods)
     dependency_failures = @($_.dependency_failures)
     claim_level = [string](Get-MIRObjectProperty -Object $_ -Name "claim_level" -Default "loads")
+    timeout_seconds = [int](Get-MIRObjectProperty -Object $_ -Name "timeout_seconds" -Default $ScenarioTimeoutSeconds)
+    settings = Get-MIRObjectProperty -Object $_ -Name "settings" -Default ([pscustomobject]@{})
+    expected_plan = Get-MIRObjectProperty -Object $_ -Name "expected_plan" -Default ([pscustomobject]@{})
+    source_manifest = [string](Get-MIRObjectProperty -Object $_ -Name "source_manifest" -Default "")
     notes = $_.notes
   }
 })
@@ -1315,6 +1363,10 @@ if ($RunLoadTests) {
         result = if ($result.passed -eq $true) { "passed" } elseif ($result.skipped -eq $true) { "skipped" } else { "failed" }
         exit_code = $result.exit_code
         timed_out = [bool]$result.timed_out
+        timeout_seconds = [int](Get-MIRObjectProperty -Object $scenario -Name "timeout_seconds" -Default $ScenarioTimeoutSeconds)
+        settings = Get-MIRObjectProperty -Object $scenario -Name "settings" -Default ([pscustomobject]@{})
+        expected_plan = Get-MIRObjectProperty -Object $scenario -Name "expected_plan" -Default ([pscustomobject]@{})
+        source_manifest = [string](Get-MIRObjectProperty -Object $scenario -Name "source_manifest" -Default "")
         claim_level = [string](Get-MIRObjectProperty -Object $scenario -Name "claim_level" -Default "loads")
       }
     }
