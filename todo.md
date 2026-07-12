@@ -55,6 +55,8 @@ This is the executable release queue. `.mir/release-wave.yml` is the machine-rea
 - [x] Exact 3.1.0 development archive base and Space Age loads from an isolated normal mods directory; rerun if package-visible source changes.
 - [x] Final-version performance evidence with recipe, technology, effect, edge, candidate, and scan counts; rerun if package-visible source changes.
 - [ ] Independent exact-archive campaigns for AAI, BZ, Bob, Angel, Krastorio/K2SO, Space Exploration, Pyanodon, and representative planet mods where complete dependency closures are available.
+- [x] Final-version exact-archive `loads` campaigns for all currently complete local closures: AAI, BZ, Bob, Krastorio base, and K2SO (`8/8`, zero dependency failures).
+- [ ] Acquire complete Angel, Space Exploration, Pyanodon, and representative planet dependency closures, then run their independent exact-archive campaigns.
 - [ ] Preserve `loads`, `observed`, `cooperates`, partial-family, and full-family claim boundaries; inventory never counts as proof.
 - [ ] Interactive settings, locale, icon, technology-tree, save-load, and balance review on the exact candidate.
 - [ ] Candidate freshness, deterministic package, release notes, migration guide, validation summary, and final archive hashes from one clean commit.

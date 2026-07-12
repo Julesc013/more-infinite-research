@@ -128,6 +128,9 @@ waves:
     runtime_scenario_count: 85
     runtime_package_sha256: D71B6EA227B39A69AB8DA8D17BE5EF1242DF7386D39EC2C134E39A624745DC3A
     runtime_package_content_sha256: 18EB49BB714FADF3B48D361A1ED696980AEE8750CC41DCD542E126AE48698246
+    available_ecosystem_load_evidence: .mir/evidence/3.1.0-automatic-compiler-load-campaign.json
+    available_ecosystem_dependency_lock_sha256: 1EC7AC252BE87094674B4311E12C175899580F22DC3A42CAFB1A385F47679CF5
+    available_ecosystem_load_gate: 8-passed-zero-dependency-failures
     renumbered_static_gate: passed
     renumbered_runtime_gate: passed
     exact_package_gate: passed-base-and-space-age
