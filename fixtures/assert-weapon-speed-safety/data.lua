@@ -8,7 +8,7 @@ data:extend({
       {type = "gun-speed", ammo_category = "cannon-shell", modifier = 0.25},
       {type = "gun-speed", ammo_category = "rocket", modifier = 0.25}
     },
-    prerequisites = {"rocketry", "tank"},
+    prerequisites = {"rocketry", "tanks"},
     unit = {
       count_formula = "1000*(L-6)",
       ingredients = {
