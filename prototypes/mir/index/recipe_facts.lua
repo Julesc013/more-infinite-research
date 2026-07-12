@@ -16,6 +16,13 @@ local function amount_of(entry)
   return tonumber(entry.amount or entry[2] or entry.amount_max or entry.amount_min) or 1
 end
 
+local function productive_amount(entry)
+  if type(entry) ~= "table" then return 1 end
+  local maximum = tonumber(entry.amount_max or entry.amount or entry[2] or entry.amount_min) or 1
+  local ignored = tonumber(entry.ignored_by_productivity or 0) or 0
+  return math.max(0, maximum - ignored)
+end
+
 local function normalized_entry(entry)
   if type(entry) == "string" then
     return {type = "item", name = entry, amount = 1, probability = 1}
@@ -148,6 +155,21 @@ local function variant_facts(recipe)
   return out
 end
 
+local function productive_result_names(recipe)
+  local seen, out = {}, {}
+  for _, variant in ipairs(variants(recipe)) do
+    for _, entry in pairs(entries_for(variant.value, "results")) do
+      local name = name_of(entry)
+      if name and productive_amount(entry) > 0 and not seen[name] then
+        seen[name] = true
+        table.insert(out, name)
+      end
+    end
+  end
+  table.sort(out)
+  return out
+end
+
 local function categories_for(recipe)
   local seen, out = {}, {}
   local function add(category)
@@ -209,12 +231,13 @@ local function build()
   if canonical then return canonical end
   build_scan_count = build_scan_count + 1
   local facts = {}
-  local by_output, by_ingredient, by_category, names = {}, {}, {}, {}
+  local by_output, by_productive_output, by_ingredient, by_category, names = {}, {}, {}, {}, {}
   for recipe_name, recipe in pairs(data_raw.prototypes("recipe")) do
     local ingredients, ingredient_names = aggregate_io(recipe, "ingredients")
     local results, result_names = aggregate_io(recipe, "results")
     local categories = categories_for(recipe)
     local is_hidden = hidden(recipe)
+    local productive_outputs = productive_result_names(recipe)
     facts[recipe_name] = {
       schema = SCHEMA,
       name = recipe_name,
@@ -224,6 +247,7 @@ local function build()
       ingredient_names = ingredient_names,
       results = results,
       result_names = result_names,
+      productive_result_names = productive_outputs,
       main_product = main_product(recipe, result_names),
       hidden = is_hidden,
       enabled_without_research = enabled_without_research(recipe),
@@ -236,11 +260,12 @@ local function build()
     }
     table.insert(names, recipe_name)
     for _, output_name in ipairs(result_names) do append_index(by_output, output_name, recipe_name) end
+    for _, output_name in ipairs(productive_outputs) do append_index(by_productive_output, output_name, recipe_name) end
     for _, ingredient_name in ipairs(ingredient_names) do append_index(by_ingredient, ingredient_name, recipe_name) end
     for _, category in ipairs(categories) do append_index(by_category, category, recipe_name) end
   end
   table.sort(names)
-  for _, index in pairs({by_output, by_ingredient, by_category}) do
+  for _, index in pairs({by_output, by_productive_output, by_ingredient, by_category}) do
     for _, recipe_names in pairs(index) do table.sort(recipe_names) end
   end
   canonical = {
@@ -248,6 +273,7 @@ local function build()
     facts = facts,
     names = names,
     by_output = by_output,
+    by_productive_output = by_productive_output,
     by_ingredient = by_ingredient,
     by_category = by_category
   }
@@ -267,7 +293,7 @@ function M.candidate_names(outputs, categories, name_patterns)
   local index, selected = build(), {}
   for output_name, wanted in pairs(outputs or {}) do
     if wanted then
-      for _, recipe_name in ipairs(index.by_output[output_name] or {}) do selected[recipe_name] = true end
+      for _, recipe_name in ipairs(index.by_productive_output[output_name] or {}) do selected[recipe_name] = true end
     end
   end
   for _, category in ipairs(categories or {}) do

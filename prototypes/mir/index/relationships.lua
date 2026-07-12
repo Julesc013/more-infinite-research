@@ -47,7 +47,7 @@ local function build()
   local recipe_index = recipe_facts.snapshot()
   local out = {
     schema = 1,
-    recipes_by_output = recipe_index.by_output,
+    recipes_by_output = recipe_index.by_productive_output,
     recipes_by_ingredient = recipe_index.by_ingredient,
     recipes_by_category = recipe_index.by_category,
     items = {},

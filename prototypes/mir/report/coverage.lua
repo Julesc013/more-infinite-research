@@ -70,13 +70,21 @@ local function base_skip(fact)
   return nil, nil
 end
 
-local function has_shared_input_output(fact)
-  local ingredients = {}
-  for _, entry in ipairs(fact.ingredients or {}) do ingredients[entry.name] = true end
-  for _, entry in ipairs(fact.results or {}) do
-    if ingredients[entry.name] then return true end
+local function shared_input_output_state(fact)
+  local any_shared = false
+  for _, variant in ipairs(fact.variants or {}) do
+    local ingredients = {}
+    for _, entry in ipairs(variant.ingredients or {}) do ingredients[entry.name] = true end
+    for _, entry in ipairs(variant.results or {}) do
+      if ingredients[entry.name] then
+        any_shared = true
+        local maximum = tonumber(entry.amount_max or entry.amount or entry.amount_min) or 1
+        local ignored = tonumber(entry.ignored_by_productivity or 0) or 0
+        if maximum - ignored > 0 then return "productive" end
+      end
+    end
   end
-  return false
+  return any_shared and "ignored" or nil
 end
 
 local function classify(recipe_name, fact, owners, attached, decisions, adopted)
@@ -85,8 +93,12 @@ local function classify(recipe_name, fact, owners, attached, decisions, adopted)
   end
   local category, reason = base_skip(fact)
   if category then return category, reason end
-  if #owners == 0 and has_shared_input_output(fact) then
+  local shared_state = shared_input_output_state(fact)
+  if #owners == 0 and shared_state == "productive" then
     return "unsafe_skip", "shared_input_output_loop_risk"
+  end
+  if #owners == 0 and shared_state == "ignored" then
+    return "unsafe_skip", "catalyst_or_nonproductive_return_requires_review"
   end
   if #owners > 1 then return "ambiguous", "multiple_recipe_productivity_owners" end
   if #owners == 1 then
@@ -122,7 +134,7 @@ function M.build()
     local owners = owners_by_recipe[recipe_name] or {}
     if not fact.hidden then visible = visible + 1 end
     local skip_category = base_skip(fact)
-    if not skip_category and #owners == 0 and has_shared_input_output(fact) then
+    if not skip_category and #owners == 0 and shared_input_output_state(fact) then
       skip_category = "unsafe_skip"
     end
     if not skip_category and target_line.feature_enabled("recipe_productivity") then eligible = eligible + 1 end

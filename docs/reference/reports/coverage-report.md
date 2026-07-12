@@ -23,3 +23,5 @@ Release interpretation is stricter than load success. Accounted recipes must equ
 The report does not claim that every recipe should receive productivity. `safe_skip` and `unsafe_skip` are valid accounted outcomes when their reason is stable and safety remains fail-closed.
 
 Recipes that return any input as an output are ineligible for automatic fixed-stream and family matching. Coverage records unowned rows as `unsafe_skip/shared_input_output_loop_risk`; a name, output match, or confidence score cannot override that veto. A canonical stream may opt in only for an exact reviewed process family, such as the declared coal-liquefaction oil-processing recipes.
+
+RecipeFactV2 preserves all results but indexes productive outputs separately. A returned catalyst or container fully covered by `ignored_by_productivity` cannot make its recipe a candidate for that returned item or fluid. An otherwise unowned recipe with such a return remains `unsafe_skip/catalyst_or_nonproductive_return_requires_review` until a generic rule or pack proves its intended productive family.
