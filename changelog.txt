@@ -6,8 +6,8 @@ Date: 2026-07-12
 
     - Ported the accepted 3.2.0 plan-first automatic compiler contracts to the maintained Factorio 2.0 line.
     - Preserved published 2.4.0 technology IDs, setting IDs, runtime namespaces, and save-compatible behavior.
-    - Added RecipeFactV2, shared relationship indexes, schema-2 family rules and compatibility packs, and complete coverage accounting.
-    - Applied Factorio 2.0 target-declared stream, effect, setting, fixture, and recipe-shape cuts without renaming shared identities.
+    - Added RecipeFactV2, shared relationship indexes, schema-2 family rules, compatibility packs, and coverage accounting.
+    - Applied Factorio 2.0 target-declared stream, effect, setting, fixture, recipe-shape, and emitter cuts.
     - Retained whole-plan validation, deterministic packaging, and exact-owner safety gates from the modern source.
 
 ---------------------------------------------------------------------------------------------------
