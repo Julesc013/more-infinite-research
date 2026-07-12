@@ -149,6 +149,7 @@ modules:
   planner:
     - prototypes/mir/planner/compiler.lua
     - prototypes/mir/planner/stream_compiler.lua
+    - prototypes/mir/planner/generation_plan.lua
     - prototypes/mir/planner/costs.lua
     - prototypes/mir/planner/direct_effects.lua
     - prototypes/mir/planner/native_modifiers.lua

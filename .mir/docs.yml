@@ -146,6 +146,14 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - automatic-family-compiler
+  - path: docs/reference/schemas/generation-plan.md
+    title: "GenerationPlan Schema"
+    status: current
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - generation-plan-schema
   - path: docs/architecture/README.md
     title: "Architecture"
     status: current

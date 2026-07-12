@@ -255,6 +255,7 @@ $requiredMirFiles = @(
   "prototypes/mir/capabilities/science_integration/science_selector.lua",
   "prototypes/mir/planner/compiler.lua",
   "prototypes/mir/planner/stream_compiler.lua",
+  "prototypes/mir/planner/generation_plan.lua",
   "prototypes/mir/planner/costs.lua",
   "prototypes/mir/planner/direct_effects.lua",
   "prototypes/mir/planner/native_modifiers.lua",
@@ -398,6 +399,12 @@ $streamCompilerText = Read-MIRFile -RelativePath "prototypes/mir/planner/stream_
 Assert-MIRContains -RelativePath "prototypes/mir/planner/stream_compiler.lua" -Text $streamCompilerText -Needle 'require("prototypes.mir.streams.registry")'
 Assert-MIRContains -RelativePath "prototypes/mir/planner/stream_compiler.lua" -Text $streamCompilerText -Needle 'require("prototypes.mir.emit.stream_spec_adapter")'
 Assert-MIRContains -RelativePath "prototypes/mir/planner/stream_compiler.lua" -Text $streamCompilerText -Needle "function M.run()"
+Assert-MIRContains -RelativePath "prototypes/mir/planner/stream_compiler.lua" -Text $streamCompilerText -Needle "function M.compile()"
+Assert-MIRContains -RelativePath "prototypes/mir/planner/stream_compiler.lua" -Text $streamCompilerText -Needle "function M.apply(plan)"
+
+$generationPlanText = Read-MIRFile -RelativePath "prototypes/mir/planner/generation_plan.lua"
+Assert-MIRContains -RelativePath "prototypes/mir/planner/generation_plan.lua" -Text $generationPlanText -Needle "function Plan:finalize()"
+Assert-MIRContains -RelativePath "prototypes/mir/planner/generation_plan.lua" -Text $generationPlanText -Needle "duplicate technology name"
 
 $settingsProfileText = Read-MIRFile -RelativePath "prototypes/mir/runtime/settings_profile.lua"
 Assert-MIRContains -RelativePath "prototypes/mir/runtime/settings_profile.lua" -Text $settingsProfileText -Needle '"mir-settings-export"'
