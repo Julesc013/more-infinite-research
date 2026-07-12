@@ -87,7 +87,10 @@ data:extend({
           schema = 2,
           id = "plates-n-circuit-fixture",
           applicability = {
-            mods = {{id = "plates-n-circuit-productivity", version = "fixture"}}
+            mods = {
+              {id = "plates-n-circuit-productivity", version = "fixture"},
+              {id = "mir-fixture-plates-n-circuit-productivity", version = "0.1.0"}
+            }
           },
           aliases = {},
           exact = {includes = {}, excludes = {}},
@@ -105,6 +108,8 @@ data:extend({
             }
           },
           risk_overrides = {},
+          family_authorizations = {},
+          candidate_seeds = {},
           targets = {factorio_lines = {"2.1"}},
           evidence = {
             fixtures = {"plates-n-circuit-productivity"},
