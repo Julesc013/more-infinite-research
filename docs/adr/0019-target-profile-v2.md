@@ -16,11 +16,11 @@ superseded_by: []
 
 `.mir/targets.json` schema 2 is the target capability authority. Every profile declares positive prototype shapes, runtime state, available emitters, asset policy, expected stream count, feature capabilities, and required validation groups. The checked-in Lua view is generated deterministically from that manifest.
 
-Compiler rules and fixtures consume capabilities and shapes, not Factorio-version branches. A target declaration unsupported by the selected profile fails closed. Historical reduced profiles may retain transitional negative compatibility fields until their independent binary refresh, but new behavior may not depend on those fields.
+Compiler rules and fixtures consume capabilities and shapes, not Factorio-version branches. A target declaration unsupported by the selected profile fails closed. Every profile is positive-only: absent features, mod namespaces, effect types, emitters, or prototype shapes are unsupported. Negative stream, mod, effect, and setting lists are rejected by validation.
 
 ## Consequences
 
 - Target-specific source forks are adapters rather than separate compiler implementations.
 - Cross-target fixtures derive science-pack kind and stream count from the profile.
-- Factorio 2.1 and 2.0 remain positive-only for required mods and technology effects.
+- Every Factorio line is positive-only for required mods and technology effects; reduced and planned profiles use empty allowlists where no target proof exists.
 - The 0.16 and 0.15 profile shapes are plans, not support claims, until matching binary evidence passes.

@@ -69,7 +69,6 @@ local M = {
         "max-cargo-bay-unloading-distance",
         "worker-robot-battery"
       },
-      omitted_global_settings = {},
       required_validation_groups = {
         "static",
         "package",
@@ -146,7 +145,6 @@ local M = {
         "laboratory-productivity",
         "worker-robot-battery"
       },
-      omitted_global_settings = {},
       required_validation_groups = {
         "static",
         "package",
@@ -202,37 +200,6 @@ local M = {
         technology_constant_overlays = false,
         productivity_family_adoption = false
       },
-      unsupported_streams = {
-        "research_agricultural_growth_speed",
-        "research_cargo_bay_unloading_distance",
-        "research_cargo_landing_pad_count",
-        "research_spoilage_preservation"
-      },
-      unsupported_required_mods = {
-        "elevated-rails",
-        "quality",
-        "recycler",
-        "space-age"
-      },
-      unsupported_effect_types = {
-        "cargo-landing-pad-count",
-        "max-cargo-bay-unloading-distance"
-      },
-      omitted_global_settings = {
-        "mir-pipeline-extent-multiplier",
-        "mir-prototype-productivity-cap",
-        "mir-prototype-efficiency-cap",
-        "mir-prototype-pollution-cap",
-        "mir-prototype-speed-cap",
-        "mir-prototype-speed-floor",
-        "mir-prototype-quality-cap",
-        "mir-prototype-positive-power-floor",
-        "mir-productivity-cap-self-recycling-only",
-        "mir-recycling-return-chance",
-        "mir-unrestricted-modules",
-        "mir-settings-profile-import",
-        "mir-use-installed-space-age-icons"
-      },
       required_validation_groups = {
         "static",
         "package",
@@ -285,37 +252,6 @@ local M = {
         scripted_techs = false,
         technology_constant_overlays = false,
         productivity_family_adoption = false
-      },
-      unsupported_streams = {
-        "research_agricultural_growth_speed",
-        "research_cargo_bay_unloading_distance",
-        "research_cargo_landing_pad_count",
-        "research_spoilage_preservation"
-      },
-      unsupported_required_mods = {
-        "elevated-rails",
-        "quality",
-        "recycler",
-        "space-age"
-      },
-      unsupported_effect_types = {
-        "cargo-landing-pad-count",
-        "max-cargo-bay-unloading-distance"
-      },
-      omitted_global_settings = {
-        "mir-pipeline-extent-multiplier",
-        "mir-prototype-productivity-cap",
-        "mir-prototype-efficiency-cap",
-        "mir-prototype-pollution-cap",
-        "mir-prototype-speed-cap",
-        "mir-prototype-speed-floor",
-        "mir-prototype-quality-cap",
-        "mir-prototype-positive-power-floor",
-        "mir-productivity-cap-self-recycling-only",
-        "mir-recycling-return-chance",
-        "mir-unrestricted-modules",
-        "mir-settings-profile-import",
-        "mir-use-installed-space-age-icons"
       },
       required_validation_groups = {
         "static",
@@ -370,37 +306,6 @@ local M = {
         technology_constant_overlays = false,
         productivity_family_adoption = false
       },
-      unsupported_streams = {
-        "research_agricultural_growth_speed",
-        "research_cargo_bay_unloading_distance",
-        "research_cargo_landing_pad_count",
-        "research_spoilage_preservation"
-      },
-      unsupported_required_mods = {
-        "elevated-rails",
-        "quality",
-        "recycler",
-        "space-age"
-      },
-      unsupported_effect_types = {
-        "cargo-landing-pad-count",
-        "max-cargo-bay-unloading-distance"
-      },
-      omitted_global_settings = {
-        "mir-pipeline-extent-multiplier",
-        "mir-prototype-productivity-cap",
-        "mir-prototype-efficiency-cap",
-        "mir-prototype-pollution-cap",
-        "mir-prototype-speed-cap",
-        "mir-prototype-speed-floor",
-        "mir-prototype-quality-cap",
-        "mir-prototype-positive-power-floor",
-        "mir-productivity-cap-self-recycling-only",
-        "mir-recycling-return-chance",
-        "mir-unrestricted-modules",
-        "mir-settings-profile-import",
-        "mir-use-installed-space-age-icons"
-      },
       required_validation_groups = {
         "static",
         "package",
@@ -453,37 +358,6 @@ local M = {
         scripted_techs = false,
         technology_constant_overlays = false,
         productivity_family_adoption = false
-      },
-      unsupported_streams = {
-        "research_agricultural_growth_speed",
-        "research_cargo_bay_unloading_distance",
-        "research_cargo_landing_pad_count",
-        "research_spoilage_preservation"
-      },
-      unsupported_required_mods = {
-        "elevated-rails",
-        "quality",
-        "recycler",
-        "space-age"
-      },
-      unsupported_effect_types = {
-        "cargo-landing-pad-count",
-        "max-cargo-bay-unloading-distance"
-      },
-      omitted_global_settings = {
-        "mir-pipeline-extent-multiplier",
-        "mir-prototype-productivity-cap",
-        "mir-prototype-efficiency-cap",
-        "mir-prototype-pollution-cap",
-        "mir-prototype-speed-cap",
-        "mir-prototype-speed-floor",
-        "mir-prototype-quality-cap",
-        "mir-prototype-positive-power-floor",
-        "mir-productivity-cap-self-recycling-only",
-        "mir-recycling-return-chance",
-        "mir-unrestricted-modules",
-        "mir-settings-profile-import",
-        "mir-use-installed-space-age-icons"
       },
       required_validation_groups = {
         "static",
@@ -538,37 +412,6 @@ local M = {
         technology_constant_overlays = false,
         productivity_family_adoption = false
       },
-      unsupported_streams = {
-        "research_agricultural_growth_speed",
-        "research_cargo_bay_unloading_distance",
-        "research_cargo_landing_pad_count",
-        "research_spoilage_preservation"
-      },
-      unsupported_required_mods = {
-        "elevated-rails",
-        "quality",
-        "recycler",
-        "space-age"
-      },
-      unsupported_effect_types = {
-        "cargo-landing-pad-count",
-        "max-cargo-bay-unloading-distance"
-      },
-      omitted_global_settings = {
-        "mir-pipeline-extent-multiplier",
-        "mir-prototype-productivity-cap",
-        "mir-prototype-efficiency-cap",
-        "mir-prototype-pollution-cap",
-        "mir-prototype-speed-cap",
-        "mir-prototype-speed-floor",
-        "mir-prototype-quality-cap",
-        "mir-prototype-positive-power-floor",
-        "mir-productivity-cap-self-recycling-only",
-        "mir-recycling-return-chance",
-        "mir-unrestricted-modules",
-        "mir-settings-profile-import",
-        "mir-use-installed-space-age-icons"
-      },
       required_validation_groups = {
         "static",
         "package",
@@ -622,37 +465,6 @@ local M = {
         scripted_techs = false,
         technology_constant_overlays = false,
         productivity_family_adoption = false
-      },
-      unsupported_streams = {
-        "research_agricultural_growth_speed",
-        "research_cargo_bay_unloading_distance",
-        "research_cargo_landing_pad_count",
-        "research_spoilage_preservation"
-      },
-      unsupported_required_mods = {
-        "elevated-rails",
-        "quality",
-        "recycler",
-        "space-age"
-      },
-      unsupported_effect_types = {
-        "cargo-landing-pad-count",
-        "max-cargo-bay-unloading-distance"
-      },
-      omitted_global_settings = {
-        "mir-pipeline-extent-multiplier",
-        "mir-prototype-productivity-cap",
-        "mir-prototype-efficiency-cap",
-        "mir-prototype-pollution-cap",
-        "mir-prototype-speed-cap",
-        "mir-prototype-speed-floor",
-        "mir-prototype-quality-cap",
-        "mir-prototype-positive-power-floor",
-        "mir-productivity-cap-self-recycling-only",
-        "mir-recycling-return-chance",
-        "mir-unrestricted-modules",
-        "mir-settings-profile-import",
-        "mir-use-installed-space-age-icons"
       },
       required_validation_groups = {
         "static",
