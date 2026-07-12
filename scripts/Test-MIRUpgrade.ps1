@@ -35,6 +35,7 @@ $to = Resolve-MIRUpgradePath -Path $ToZip
 $fixture = Resolve-MIRUpgradePath -Path (Join-Path $RepoRoot "fixtures\$FixtureName")
 $fixtureInfo = Get-Content -Raw -LiteralPath (Join-Path $fixture "info.json") | ConvertFrom-Json
 $fixtureModName = [string]$fixtureInfo.name
+$proofSuffix = if ($FixtureName -like "*-automatic-compiler") { " automatic compiler" } else { "" }
 if ([string]::IsNullOrWhiteSpace($OutputPath)) {
   $OutputPath = ".mir\evidence\$ToVersion-upgrade-proof.json"
 }
@@ -77,7 +78,7 @@ if ($createExitCode -ne 0 -or -not (Test-Path -LiteralPath $save)) {
   throw "MIR $FromVersion upgrade source save creation failed with exit code $createExitCode."
 }
 $createText = Get-Content -Raw -LiteralPath $log
-if (-not $createText.Contains("[mir-fixture] $FromVersion upgrade source proof complete")) {
+if (-not $createText.Contains("[mir-fixture] $FromVersion$proofSuffix upgrade source proof complete")) {
   throw "MIR $FromVersion upgrade source proof marker is missing."
 }
 $createEvidence = Join-Path $outputParent "$ToVersion-upgrade-from-$FromVersion-create.txt"
@@ -92,7 +93,7 @@ $loadArgs = @(
 $loadExitCode = Invoke-FactorioProcess -FilePath $factorio -Arguments $loadArgs
 if ($loadExitCode -ne 0) { throw "MIR $ToVersion upgrade load failed with exit code $loadExitCode." }
 $loadText = Get-Content -Raw -LiteralPath $log
-if (-not $loadText.Contains("[mir-fixture] $FromVersion to $ToVersion upgrade proof complete")) {
+if (-not $loadText.Contains("[mir-fixture] $FromVersion to $ToVersion$proofSuffix upgrade proof complete")) {
   throw "MIR $ToVersion upgrade proof marker is missing."
 }
 $loadEvidence = Join-Path $outputParent "$ToVersion-upgrade-from-$FromVersion-load.txt"

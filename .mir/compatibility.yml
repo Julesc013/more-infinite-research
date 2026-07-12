@@ -28,8 +28,11 @@ campaigns:
     - .mir/evidence/pre-3.1-renumber-aai-load-campaign.json
   final_3_1_0_load_evidence:
     available_ecosystems: .mir/evidence/3.1.0-automatic-compiler-load-campaign.json
-    status: superseded-by-package-visible-compiler-contract-change
-    current_archive_status: pending-rerun
+    status: 8-passed-load-claims
+    current_archive_status: passed
+    source_commit: 81e73eabf356e054aa9d2277d8f7d68255c726ff
+    archive_sha256: 7CC222EC860F21EBAA5C3E72F2C42BD97BF7A8DA8AE938AFA57D83994991676D
+    dependency_lock_sha256: 011CDB1CCF23C23A6383B9AE645C4D06D8D37F8DA36353558F5198E75920A121
     missing_dependency_closures:
       - angels
       - space-exploration

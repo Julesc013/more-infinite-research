@@ -49,16 +49,16 @@ This is the executable release queue. `.mir/release-wave.yml` is the machine-rea
 
 ### Final 3.1.0 Evidence
 
-- [x] Clean static validation after version/governance reconciliation, compiler contracts, and mutation-boundary work at source `c6f2a57`.
-- [x] Complete Factorio 2.1.9 declared runtime matrix with no skipped required group at source `c6f2a57` (`86/86`).
-- [ ] Exact 3.0.5-to-final-3.1.0 save upgrade with non-default settings, research levels, storage, and scripted effects retained.
+- [x] Clean static validation after all completed pre-freeze refactor work at source `81e73ea`.
+- [x] Complete Factorio 2.1.9 declared runtime matrix with no skipped required group at source `81e73ea` (`86/86`).
+- [x] Exact 3.0.5-to-3.1.0 save upgrade with non-default settings, research levels, storage, and scripted effects retained against archive `7CC222EC...676D`.
 - [x] Exact 3.1.0 development archive base and Space Age loads from an isolated normal mods directory; rerun if package-visible source changes.
 - [x] Final-version performance evidence with recipe, technology, effect, edge, candidate, and scan counts; rerun if package-visible source changes.
 - [ ] Independent exact-archive campaigns for AAI, BZ, Bob, Angel, Krastorio/K2SO, Space Exploration, Pyanodon, and representative planet mods where complete dependency closures are available.
 - [x] Characterize the earlier final-version archive across all currently complete local closures: AAI, BZ, Bob, Krastorio base, and K2SO (`8/8`, zero dependency failures).
-- [ ] Rerun those eight exact-archive `loads` scenarios after the package-visible compiler-contract change.
+- [x] Rerun those eight exact-archive `loads` scenarios against source `81e73ea` (`8/8`, zero dependency failures).
 - [ ] Acquire complete Angel, Space Exploration, Pyanodon, and representative planet dependency closures, then run their independent exact-archive campaigns.
-- [ ] Preserve `loads`, `observed`, `cooperates`, partial-family, and full-family claim boundaries; inventory never counts as proof.
+- [x] Preserve `loads`, `observed`, `cooperates`, partial-family, and full-family claim boundaries; inventory never counts as proof.
 - [ ] Interactive settings, locale, icon, technology-tree, save-load, and balance review on the exact candidate.
 - [ ] Candidate freshness, deterministic package, release notes, migration guide, validation summary, and final archive hashes from one clean commit.
 - [ ] Push accepted `dev` to `main`, create the real 3.1.0 tag, publish exact validated bytes, then mark immutable.

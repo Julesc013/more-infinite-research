@@ -1,18 +1,18 @@
 {
   "schema": 1,
   "kind": "mir-modpack-campaign-evidence",
-  "generated_at": "2026-07-12T11:09:51.2888479Z",
+  "generated_at": "2026-07-12T09:27:18.3570840Z",
   "factorio_line": "2.1",
   "factorio_binary": "C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\bin\\x64\\factorio.exe",
   "mir_archive": {
     "path": "C:\\Projects\\Factorio\\more-infinite-research\\build\\validation-dist\\more-infinite-research_3.1.0.zip",
-    "sha256": "7CC222EC860F21EBAA5C3E72F2C42BD97BF7A8DA8AE938AFA57D83994991676D",
-    "source_commit": "81e73eabf356e054aa9d2277d8f7d68255c726ff",
+    "sha256": "D71B6EA227B39A69AB8DA8D17BE5EF1242DF7386D39EC2C134E39A624745DC3A",
+    "source_commit": "1b91c401936e0f403c92ec02703fc42c93e47308",
     "source_commit_binding": "declared"
   },
   "dependency_lock": {
-    "path": "C:\\Projects\\Factorio\\more-infinite-research\\artifacts\\campaigns\\3.1.0-final-available-ecosystems-81e73ea-bound\\compat-candidates.lock.json",
-    "sha256": "011CDB1CCF23C23A6383B9AE645C4D06D8D37F8DA36353558F5198E75920A121"
+    "path": "C:\\Projects\\Factorio\\more-infinite-research\\artifacts\\campaigns\\3.1.0-available-ecosystems-1b91c40-final3\\compat-candidates.lock.json",
+    "sha256": "1EC7AC252BE87094674B4311E12C175899580F22DC3A42CAFB1A385F47679CF5"
   },
   "scenarios": [
     {
@@ -39,14 +39,6 @@
       "result": "passed",
       "exit_code": 0,
       "timed_out": false,
-      "timeout_seconds": 900,
-      "settings": {},
-      "expected_plan": {
-        "mode": "load-only",
-        "required_result": "passed",
-        "maximum_dependency_failures": 0
-      },
-      "source_manifest": "C:\\Projects\\Factorio\\more-infinite-research\\scripts\\..\\fixtures\\compat-matrix\\local-library-scenarios.json",
       "claim_level": "loads"
     },
     {
@@ -73,14 +65,6 @@
       "result": "passed",
       "exit_code": 0,
       "timed_out": false,
-      "timeout_seconds": 900,
-      "settings": {},
-      "expected_plan": {
-        "mode": "load-only",
-        "required_result": "passed",
-        "maximum_dependency_failures": 0
-      },
-      "source_manifest": "C:\\Projects\\Factorio\\more-infinite-research\\scripts\\..\\fixtures\\compat-matrix\\local-library-scenarios.json",
       "claim_level": "loads"
     },
     {
@@ -116,14 +100,6 @@
       "result": "passed",
       "exit_code": 0,
       "timed_out": false,
-      "timeout_seconds": 900,
-      "settings": {},
-      "expected_plan": {
-        "mode": "load-only",
-        "required_result": "passed",
-        "maximum_dependency_failures": 0
-      },
-      "source_manifest": "C:\\Projects\\Factorio\\more-infinite-research\\scripts\\..\\fixtures\\compat-matrix\\local-library-scenarios.json",
       "claim_level": "loads"
     },
     {
@@ -168,14 +144,6 @@
       "result": "passed",
       "exit_code": 0,
       "timed_out": false,
-      "timeout_seconds": 900,
-      "settings": {},
-      "expected_plan": {
-        "mode": "load-only",
-        "required_result": "passed",
-        "maximum_dependency_failures": 0
-      },
-      "source_manifest": "C:\\Projects\\Factorio\\more-infinite-research\\scripts\\..\\fixtures\\compat-matrix\\local-library-scenarios.json",
       "claim_level": "loads"
     },
     {
@@ -252,14 +220,6 @@
       "result": "passed",
       "exit_code": 0,
       "timed_out": false,
-      "timeout_seconds": 900,
-      "settings": {},
-      "expected_plan": {
-        "mode": "load-only",
-        "required_result": "passed",
-        "maximum_dependency_failures": 0
-      },
-      "source_manifest": "C:\\Projects\\Factorio\\more-infinite-research\\scripts\\..\\fixtures\\compat-matrix\\local-library-scenarios.json",
       "claim_level": "loads"
     },
     {
@@ -335,14 +295,6 @@
       "result": "passed",
       "exit_code": 0,
       "timed_out": false,
-      "timeout_seconds": 900,
-      "settings": {},
-      "expected_plan": {
-        "mode": "load-only",
-        "required_result": "passed",
-        "maximum_dependency_failures": 0
-      },
-      "source_manifest": "C:\\Projects\\Factorio\\more-infinite-research\\scripts\\..\\fixtures\\compat-matrix\\local-library-scenarios.json",
       "claim_level": "loads"
     },
     {
@@ -408,14 +360,6 @@
       "result": "passed",
       "exit_code": 0,
       "timed_out": false,
-      "timeout_seconds": 900,
-      "settings": {},
-      "expected_plan": {
-        "mode": "load-only",
-        "required_result": "passed",
-        "maximum_dependency_failures": 0
-      },
-      "source_manifest": "C:\\Projects\\Factorio\\more-infinite-research\\scripts\\..\\fixtures\\compat-matrix\\local-library-scenarios.json",
       "claim_level": "loads"
     },
     {
@@ -557,14 +501,6 @@
       "result": "passed",
       "exit_code": 0,
       "timed_out": false,
-      "timeout_seconds": 900,
-      "settings": {},
-      "expected_plan": {
-        "mode": "load-only",
-        "required_result": "passed",
-        "maximum_dependency_failures": 0
-      },
-      "source_manifest": "C:\\Projects\\Factorio\\more-infinite-research\\scripts\\..\\fixtures\\compat-matrix\\local-library-scenarios.json",
       "claim_level": "loads"
     }
   ]
