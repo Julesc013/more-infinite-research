@@ -26,7 +26,7 @@ branches:
       - validation
 
   legacy:
-    purpose: Factorio 2.0.x backport branch
+    purpose: frozen Factorio 2.0 2.3.x stable baseline
     factorio_version: "2.0"
     accepts:
       - safety-fix
@@ -38,6 +38,20 @@ branches:
       - schema-breaking-change
       - generated-id-rename
       - broad-new-generation
+
+  tmp/2.0:
+    purpose: maintained Factorio 2.0 release and semantic companion branch
+    factorio_version: "2.0"
+    accepts:
+      - platform-compatible-backport
+      - target-profile-adapter
+      - 2.0-fixture
+      - release-evidence
+      - docs-correction
+    rejects:
+      - 2.1-only-metadata
+      - generated-id-rename
+      - unproven-feature-parity
 
   factorio-2.0-lane:
     purpose: planned Space Exploration and other 2.0-only campaign lane
@@ -268,6 +282,24 @@ release_artifacts:
       forbidden_entries: 0
       publication_scope: mod-portal-and-github-release
       status: published
+    mir_1_9_4:
+      version: "1.9.4"
+      branch: tmp/1.1
+      target_factorio: "1.1"
+      source_anchor: mir_1_9_3
+      source_commit: 498408854170e893a0fa13bdbd11930197892b1d
+      artifact: dist/more-infinite-research_1.9.4.zip
+      sha256: 431CD5B011B678B089BB4F9B04B22EB5DD32A3411EDB8E7E453E02D920E3A46E
+      size_bytes: 302312
+      entries: 124
+      forbidden_entries: 0
+      automated_gate: passed
+      exact_dist_base: passed
+      fresh_create: passed
+      fresh_reload: passed
+      upgrade_from_1_9_3: passed
+      publication_scope: unreleased
+      status: candidate-qualified
     mir_1_8_0:
       version: "1.8.0"
       branch: tmp/0.18
@@ -309,6 +341,15 @@ release_artifacts:
       publication_scope: github-release
       mod_portal_visibility: not-visible-from-downloads-page-as-of-2026-07-10
       status: published
+    mir_1_8_2:
+      version: "1.8.2"
+      branch: tmp/1.0
+      target_factorio: "1.0"
+      source_anchor: mir_1_8_1
+      staged_commit: aeb14831132572037c4288b595b22978fdda6646
+      artifact: dist/more-infinite-research_1.8.2.zip
+      automated_gate: pending-runtime-proof
+      status: staged-unqualified
     mir_1_7_0:
       version: "1.7.0"
       branch: tmp/0.17
@@ -352,7 +393,7 @@ release_artifacts:
       target_factorio: "2.1"
       purpose: plan-first automatic family compiler development from the immutable 3.1.0 behavior baseline
     factorio_1_1_port:
-      version: "1.9.3"
+      version: "1.9.4"
       branch: tmp/1.1
       target_factorio: "1.1"
     factorio_0_18_bridge:
@@ -361,7 +402,7 @@ release_artifacts:
       target_factorio: "0.18"
       purpose: published bridge/archive package from the MIR 3 source anchor plus portable 2.3.0 and 1.9.3 lessons
     factorio_1_0_port:
-      version: "1.8.1"
+      version: "1.8.2"
       branch: tmp/1.0
       target_factorio: "1.0"
       purpose: maintained Factorio 1.0 support line after the 0.18 bridge proof; future 1.0 maintenance stays on 1.8.x
@@ -403,11 +444,11 @@ target_lines:
       - factorio_0.18
       - factorio_1.0_same_zip
   factorio_1_0:
-    version: "1.8.1"
+    version: "1.8.2"
     branch: tmp/1.0
     target_factorio: "1.0"
     support_class: compatibility-port
-    source: mir_1_9_3_plus_mir_1_8_0_bridge_lessons_plus_dev_portable_fixes
+    source: mir_1_8_1_plus_current_portable_fixes
     publish_policy: maintained
     future_maintenance: "1.8.x"
     required_binary_proof:

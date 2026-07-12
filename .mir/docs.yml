@@ -1397,3 +1397,19 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - canonical-stream-descriptor-contract
+  - path: docs/releases/1.6.0-plan.md
+    title: "MIR 1.6.0 Factorio 0.16 Plan"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-1.6.0-factorio-0.16-plan
+  - path: docs/releases/1.5.0-plan.md
+    title: "MIR 1.5.0 Factorio 0.15 Plan"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-1.5.0-factorio-0.15-plan

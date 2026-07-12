@@ -36,11 +36,14 @@ waves:
     factorio_1_1:
       branch: tmp/1.1
       next_version: "1.9.4"
-      status: refresh-pending
+      source_commit: 498408854170e893a0fa13bdbd11930197892b1d
+      archive_sha256: 431CD5B011B678B089BB4F9B04B22EB5DD32A3411EDB8E7E453E02D920E3A46E
+      status: candidate-qualified-unreleased
     factorio_1_0:
       branch: tmp/1.0
       next_version: "1.8.2"
-      status: refresh-pending
+      staged_commit: aeb14831132572037c4288b595b22978fdda6646
+      status: staged-unqualified
     factorio_0_18:
       branch: tmp/0.18
       version: "1.8.0"

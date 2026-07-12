@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: release-manager
 doc_type: release-plan
 owner: mir-maintainers
-last_reviewed: 2026-07-08
+last_reviewed: 2026-07-12
 supersedes: []
 superseded_by: []
 ---
@@ -14,7 +14,7 @@ superseded_by: []
 
 Release docs are version-specific plans, migration guides, risk registers, checklists, and validation records.
 
-MIR 3.0.5 is the published immutable behavior baseline. The 2.3.5 backport plan and backport-wave dashboard govern the active Factorio 2.0 release gate. The 3.1 plan and checklist govern the next modern feature line after 2.3.5 is published and frozen. The 3.0.0 records remain the published architecture baseline and historical evidence.
+MIR 3.1.0 and 2.4.0 are published immutable behavior baselines. The 3.2.0 development summary and backport-wave dashboard govern the automatic compiler campaign. The 1.6.0 and 1.5.0 plans are the current plans for Factorio 0.16 and 0.15; archived older-number plans remain historical evidence.
 
 - [3.0.0 plan](3.0.0-plan.md)
 - [3.0.0 regression baseline](3.0.0-regression-baseline.md)
@@ -39,6 +39,9 @@ MIR 3.0.5 is the published immutable behavior baseline. The 2.3.5 backport plan 
 - [3.1.0 migration guide](3.1.0-migration-guide.md)
 - [3.1.0 validation summary](3.1.0-validation-summary.md)
 - [3.1.0 roadmap](3.1.0-roadmap.md)
+- [3.2.0 development summary](3.2.0-development-summary.md)
+- [1.6.0 Factorio 0.16 plan](1.6.0-plan.md)
+- [1.5.0 Factorio 0.15 plan](1.5.0-plan.md)
 - [2.2.0 validation record](2.2.0-validation-record.md)
 
 Historical player-facing release notes are collected in the [release-notes directory](notes/).
