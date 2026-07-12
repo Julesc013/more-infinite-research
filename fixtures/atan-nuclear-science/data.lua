@@ -1,4 +1,4 @@
-local science_icon = "__base__/graphics/icons/utility-science-pack.png"
+local science_icon = "__base__/graphics/icons/alien-science-pack.png"
 
 data:extend({
   {
@@ -65,9 +65,9 @@ data:extend({
     unit = {
       count = 100,
       ingredients = {
-        {"automation-science-pack", 1},
-        {"logistic-science-pack", 1},
-        {"chemical-science-pack", 1}
+        {"science-pack-1", 1},
+        {"science-pack-2", 1},
+        {"science-pack-3", 1}
       },
       time = 30
     }

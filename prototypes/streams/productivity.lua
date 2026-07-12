@@ -608,19 +608,19 @@ return {
     icon_candidates={
       {technology="research-productivity", required_mod="space-age"},
       {icon="__space-age__/graphics/technology/research-productivity.png", icon_size=256, inactive_mod_asset="space-age"},
-      {technology="space-science-pack"},
-      {item="automation-science-pack"}
+      {technology="alien-science-pack"},
+      {item="science-pack-1"}
     },
     dynamic_items_from_lab_inputs = true,
     groups = {
     { change=0.10, items={
-      "automation-science-pack",
-      "logistic-science-pack",
-      "chemical-science-pack",
-      "production-science-pack",
-      "military-science-pack",
-      "utility-science-pack",
-      "space-science-pack",
+      "science-pack-1",
+      "science-pack-2",
+      "science-pack-3",
+      "alien-science-pack",
+      "alien-science-pack",
+      "alien-science-pack",
+      "alien-science-pack",
       "agricultural-science-pack",
       "metallurgic-science-pack",
       "electromagnetic-science-pack",

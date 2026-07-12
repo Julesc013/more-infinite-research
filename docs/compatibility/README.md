@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: modpack-author
 doc_type: explanation
 owner: mir-maintainers
-last_reviewed: 2026-07-07
+last_reviewed: 2026-07-10
 supersedes: []
 superseded_by: []
 ---
@@ -32,8 +32,10 @@ Release-line summary:
 | `3.x.x` | `2.1.x` | canonical modern line starting at `3.0.0`; MIR compiler architecture |
 | `2.x.x` | `2.0.x` | maintained Factorio `2.0` line starting at `2.3.0`; first post-3.0 architecture port |
 | `1.9.3+` | `1.1.x` | compatibility port; `1.9.0` through `1.9.2` remain transition exceptions for Factorio `2.0` |
-| `1.8.x` | `1.0.x` | compatibility port; Factorio `0.18` bridge policy still needs recording |
-| `1.7.x` / `1.6.x` / `1.5.x` | `0.17.x` / `0.16.x` / `0.15.x` | reduced native-infinite editions |
+| `1.8.0` | `0.18.x` bridge | published bridge/archive package that also passed Factorio `1.0` bridge-load validation |
+| `1.8.1+` | `1.0.x` | maintained Factorio `1.0` compatibility port line |
+| `1.7.x` | `0.17.x` | reduced native-infinite edition using modern non-Space-Age science names |
+| `1.6.x` / `1.5.x` | `0.16.x` / `0.15.x` | old-science and minimal native-infinite editions |
 | `1.4.x` / `1.3.x` / `0.12.x` | `0.14.x` / `0.13.x` / `0.12.x` | archive finite-ladder reconstructions |
 | `0.11.x` through `0.6.x` | `0.11.x` through `0.6.x` | museum/discovery builds |
 
@@ -56,7 +58,7 @@ clear support boundaries outrank the calendar.
 - Science packs are discovered from `data.raw.lab[*].inputs` and resolved through generic item prototype lookup.
 - Science-pack productivity starts with the vanilla and Space Age target list, then appends active lab inputs so custom science packs can receive productivity effects when their recipes are visible.
 - A generated technology must have at least one lab that accepts its complete science-pack set. If no lab accepts the full set, `mir-lab-incompatibility-policy` controls whether the mod tries the largest deterministic lab-compatible subset (`reduce`, default) or skips the technology (`skip`). If no subset exists, the stream is skipped and logged.
-- `ips-require-space-gate` adds an end-game science unlock prerequisite only. `mir-science-pack-ingredient-policy` controls whether generated technologies keep their configured ingredients, add fixed late-game packs, infer missing official or modded progression packs from selected packs, add all official base and Space Age science packs, or add every active lab science pack including compatible modded packs.
+- `ips-require-space-gate` adds an end-game science unlock prerequisite only. `mir-science-pack-ingredient-policy` controls whether generated technologies keep their configured ingredients, add fixed late-game packs, infer missing official or modded progression packs from selected packs, add all official base and Space Age science packs, or add every active lab science pack including compatible modded packs. Already-enabled pack recipes need no unlock prerequisite, and disabled technologies are excluded from inferred progression gates.
 - Recipe matching supports both `recipe.category` and Factorio 2.1 `recipe.categories`, and can match visible item or fluid recipe outputs.
 - Recipe-productivity generation skips recipe effects already owned by another infinite recipe-productivity technology. In Space Age this prevents parallel MIR technologies for vanilla `processing-unit-productivity`, `low-density-structure-productivity`, `plastic-bar-productivity`, and `rocket-fuel-productivity`.
 - Recipe-productivity ownership is validated by exact recipe ID, not by similar technology icons. Base-only green, red, and blue circuit recipes are MIR-owned; with Space Age enabled, green and red circuits remain MIR-owned while vanilla `processing-unit-productivity` is the single infinite owner for the `processing-unit` recipe.
@@ -462,7 +464,7 @@ Set `$env:FACTORIO_LOG` or pass `-FactorioLog` when the Factorio log is not at t
 
 The runtime check copies this repo and the fixture mods into isolated temporary user-data mod directories, adds test-only dependencies from the copied mod to the fixture mods for deterministic load order, writes fixture `mod-list.json` files, and asks Factorio to create saves. It is intentionally a load/prototype validation harness, not a gameplay test.
 
-The runtime fixture run enables the generation diagnostics report in the copied mod and covers both lab incompatibility policies. The default `reduce` scenario asserts that science-pack productivity generated with the custom item-based fixture science pack included. The `skip` scenario forces the copied setting default to `skip` and asserts that the intentionally incompatible science-pack productivity stream is skipped instead of reduced. Additional runtime scenarios force the science-pack ingredient policies, require the end-game prerequisite gate, verify checkbox-enabled and checkbox-disabled stream/base-extension behavior, keep cargo landing pad count default-on while proving it skips without Space Age, assert Space Age cargo logistics effect shape with default cargo settings, add a fixture finite vanilla-chain level before MIR to prove existing levels are preserved while MIR extends after them, assert broad generation integrity in both base-only and Space Age runs, enable the normally disabled inserter-capacity continuation in both base-only and Space Age runs, assert weapon shooting speed overlap handling preserves finite vanilla tank cannon speed, assert AAI-style loader recipes receive belt productivity, assert standalone big-mining-drill recipes receive mining drill productivity, assert ATAN-style Nuclear Science packs receive science-pack productivity with lab-compatible science, and assert Omega-style drill recipes receive mining drill productivity. The diagnostics report also emits compiler rows for typed fact summaries, generated-technology decisions, lab matrices, loop-risk flags, rule surfaces, and useful cap estimates. The expected Factorio log file is part of the validation evidence; if it is missing, runtime validation fails.
+The runtime fixture run enables the generation diagnostics report in the copied mod and covers both lab incompatibility policies. The default `reduce` scenario asserts that science-pack productivity generated with the custom item-based fixture science pack included. The `skip` scenario forces the copied setting default to `skip` and asserts that the intentionally incompatible science-pack productivity stream is skipped instead of reduced. Additional runtime scenarios force the science-pack ingredient policies, require the end-game prerequisite gate, reject disabled prerequisites on generated streams, verify checkbox-enabled and checkbox-disabled stream/base-extension behavior, keep cargo landing pad count default-on while proving it skips without Space Age, assert Space Age cargo logistics effect shape with default cargo settings, add a fixture finite vanilla-chain level before MIR to prove existing levels are preserved while MIR extends after them, assert broad generation integrity in both base-only and Space Age runs, enable the normally disabled inserter-capacity continuation in both base-only and Space Age runs, assert weapon shooting speed overlap handling preserves finite vanilla tank cannon speed, assert AAI-style loader recipes receive belt productivity, assert standalone big-mining-drill recipes receive mining drill productivity, assert ATAN-style Nuclear Science packs receive science-pack productivity with lab-compatible science, and assert Omega-style drill recipes receive mining drill productivity. The diagnostics report also emits compiler rows for typed fact summaries, generated-technology decisions, lab matrices, loop-risk flags, rule surfaces, and useful cap estimates. The expected Factorio log file is part of the validation evidence; if it is missing, runtime validation fails.
 
 Static validation builds an ignored validation archive from the current source tree based on `info.json`. The package must use the matching `<name>_<version>/` root, contain matching `info.json` metadata, include locale, top-level data-stage and control-stage files, core prototype modules, migrations, README, changelog, license, and thumbnail, match the repository contents for packaged source and locale files, and avoid developer docs, build output, fixtures, scripts, Git, and temporary/editor artifacts. The committed `dist/` archive is the upload artifact, not the live source-parity fixture for every documentation-only commit.
 
@@ -478,6 +480,19 @@ Create a local test mod that:
 - Unlocks that recipe from a technology.
 
 Expected result: `mir-fixture-science-pack` can be discovered as a science pack, ordered after known vanilla packs, mapped to its unlock prerequisite when used, and included in science-pack productivity.
+
+### Generated Prerequisite Safety Fixture
+
+Create a post-MIR assertion fixture that:
+
+- Inspects every generated `recipe-prod-research_*` technology.
+- Resolves each prerequisite technology.
+- Fails loading when any prerequisite has `enabled = false`.
+- Runs `research_all_technologies()` in the isolated test save and fails when a
+  generated stream still has an unmet or disabled prerequisite.
+
+Expected result: enabled science-pack recipes add no artificial unlock gate, and
+disabled tutorial or scenario technologies never block generated research.
 
 ### Custom Lab Fixture
 
@@ -615,8 +630,9 @@ Create a local test mod that:
 - Enables the weapon-speed overlap adjustment scenario.
 - Fails loading if finite vanilla `weapon-shooting-speed-5` or `weapon-shooting-speed-6` loses `cannon-shell` speed effects.
 - Fails loading if MIR's generated weapon shooting speed continuation keeps `rocket` or `cannon-shell` overlap effects when the dedicated replacement techs are active.
+- Fails loading if dedicated rocket, cannon, flamethrower, or electric shooting speed research is missing its target-era unlock prerequisite.
 
-Expected result: vanilla tank cannon fire rate is preserved while MIR avoids duplicate infinite rocket/cannon-shell speed scaling in its generated continuation.
+Expected result: vanilla tank cannon fire rate is preserved while MIR avoids duplicate infinite rocket/cannon-shell speed scaling in its generated continuation and keeps dedicated shooting speed research on reachable target-era branches.
 
 ## Release Checklist
 

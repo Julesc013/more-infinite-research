@@ -261,6 +261,7 @@ for _, group in ipairs(technology_setting_groups) do
   else
     local spec = group.spec
     local defaults_spec = group.defaults_spec
+    local locale_key = defaults_spec.locale_key or defaults_spec.chain_key or spec.locale_key or spec.key
     local enabled_default = group.enabled
     local base_default = tonumber(defaults_spec.base_cost) or 0
     if base_default < 0 then base_default = 0 end
@@ -279,7 +280,7 @@ for _, group in ipairs(technology_setting_groups) do
         max_level_default = math.floor(num + 0.5)
       end
     end
-    local locale = {"technology-name."..spec.key}
+    local locale = {"technology-name."..locale_key}
     add_technology_setting(group, {
       type = "bool-setting",
       name = "mir-enable-"..spec.key,

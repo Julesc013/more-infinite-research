@@ -82,7 +82,7 @@ for _, prerequisite in ipairs({"atan-pollution-scrubbing", "atan-spore-scrubbing
 end
 
 local science = ingredient_names(tech)
-for _, pack in ipairs({"automation-science-pack", "logistic-science-pack", "chemical-science-pack"}) do
+for _, pack in ipairs({"science-pack-1", "science-pack-2", "science-pack-3"}) do
   if not science[pack] then fail(tech_name .. " is missing derived science pack " .. pack .. ".") end
 end
 if not lab_accepts_all(science) then

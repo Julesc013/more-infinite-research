@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "status": "passed",
+  "version": "1.5.0",
+  "branch": "tmp/0.15",
+  "source_commit": "d4167875b97c45b460131ef3436e16ee21774c14",
+  "factorio_version": "0.15.40",
+  "factorio_binary_sha256": "A1C87043244BEAE8E5903FB7D4A96E7920189C6339F00E3A2398988B9C8E7DD6",
+  "artifact": "dist/more-infinite-research_1.5.0.zip",
+  "artifact_sha256": "2EB2E9650FD77485E064869F8CDC578801A97EF0FF237ABFB3C46224604A5817",
+  "artifact_size_bytes": 302975,
+  "artifact_entries": 122,
+  "forbidden_entries": 0,
+  "static_gate": "passed",
+  "runtime_scenarios": 4,
+  "fresh_create": "passed",
+  "fresh_reload": "passed-server-load",
+  "public_release": false,
+  "evidence": [
+    ".mir/evidence/1.5.0-fresh-create.log",
+    ".mir/evidence/1.5.0-fresh-reload.log"
+  ]
+}

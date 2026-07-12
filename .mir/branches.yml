@@ -47,6 +47,19 @@ branches:
       - 2.0-fixture
       - no-2.1-only-prototype-assumption
 
+  port/1.1-to-0.18:
+    purpose: short-lived Factorio 0.18 bridge/archive package branch seeded from the validated 1.9.3 source point
+    factorio_version: "0.18"
+    accepts:
+      - bridge-proof
+      - target-metadata
+      - binary-validation
+      - release-docs
+    rejects:
+      - long-lived-0.18-maintenance
+      - feature-expansion
+      - target-line-waterfall-inheritance
+
 backport_rules:
   pure_classifier_fix:
     from: dev
@@ -90,7 +103,157 @@ release_artifacts:
       size_bytes: 296124
       entries: 119
       forbidden_entries: 0
-      status: release-ready
+      status: published
+    mir_1_9_3:
+      version: "1.9.3"
+      branch: tmp/1.1
+      target_factorio: "1.1"
+      source_anchor: mir_3_0_0
+      commit: c1bb2a6b05bb5d9ed782e010d0ab08f21c16af9c
+      tag: "1.9.3"
+      artifact: dist/more-infinite-research_1.9.3.zip
+      sha256: 1723C10FEDD9A12003052991CC7574F1F6BF4E4ABC506F0323571DF680C0444B
+      size_bytes: 298759
+      entries: 121
+      forbidden_entries: 0
+      publication_scope: mod-portal-and-github-release
+      status: published
+    mir_1_8_0:
+      version: "1.8.0"
+      branch: tmp/0.18
+      target_factorio: "0.18"
+      source_anchor: mir_1_9_3
+      commit: 5662c66c372e6aca025eab9f446de55a5cc6c1c9
+      evidence_commit: e75823366f49dc4afede6d43a03f982a9a072043
+      tag: "1.8.0"
+      artifact: dist/more-infinite-research_1.8.0.zip
+      sha256: D785E6EBE7A72E6E9F01A3F89774A6AA30479430410447F603FEF1E0B9BD7B24
+      size_bytes: 300620
+      entries: 121
+      forbidden_entries: 0
+      validation_content_matches_dist: true
+      factorio_0_18_validation: passed
+      factorio_1_0_bridge_validation: passed
+      publication_scope: github-release
+      mod_portal_visibility: not-visible-from-downloads-page-as-of-2026-07-10
+      status: published
+    mir_1_8_1:
+      version: "1.8.1"
+      branch: tmp/1.0
+      target_factorio: "1.0"
+      source_anchor: mir_1_9_3
+      source_lessons:
+        - mir_1_8_0_bridge_evidence
+        - dev_portable_fixes
+      commit: 33b6bb2cc6fe069aa1cb2226e82b14975756f6a2
+      tag: "1.8.1"
+      artifact: dist/more-infinite-research_1.8.1.zip
+      sha256: B1622AB0BC6D72265842D698781DBE21B7286662E29FB6992057FBCFF87D8E29
+      size_bytes: 300526
+      entries: 116
+      forbidden_entries: 0
+      validation_content_matches_dist: true
+      static_validation: passed
+      factorio_1_0_validation: passed
+      factorio_1_0_binary: D:\Programs\Factorio\1.0\bin\x64\factorio.exe
+      publication_scope: github-release
+      mod_portal_visibility: not-visible-from-downloads-page-as-of-2026-07-10
+      status: published
+    mir_1_7_0:
+      version: "1.7.0"
+      branch: tmp/0.17
+      target_factorio: "0.17"
+      source_anchor: mir_1_8_1
+      source_lessons:
+        - mir_1_8_0_bridge_evidence
+        - mir_1_8_1_factorio_1_0_port
+        - dev_portable_fixes
+      artifact: dist/more-infinite-research_1.7.0.zip
+      sha256: 3FA9419253C3E79572305E983B0443CC657683CC761DA3F4292FBF798B8C613C
+      size_bytes: 301428
+      entries: 121
+      forbidden_entries: 0
+      validation_content_matches_dist: true
+      static_validation: passed
+      factorio_0_17_validation: passed
+      weapon_speed_unlock_validation: passed
+      generated_prerequisite_validation: passed
+      unlock_all_technology_validation: passed
+      factorio_0_17_binary: D:\Programs\Factorio\0.17\bin\x64\factorio.exe
+      status: release-candidate
+    mir_1_7_1:
+      version: "1.7.1"
+      branch: tmp/0.17
+      target_factorio: "0.17"
+      source_anchor: mir_1_7_0
+      source_commit: efb5d0af347bd8f0ad8966425dfcc7dea75217f2
+      artifact: dist/more-infinite-research_1.7.1.zip
+      sha256: CC112180F3D099C1C75AD230061A4B9123AE2F30F8585838D3053BD309771BFA
+      size_bytes: 302684
+      entries: 122
+      forbidden_entries: 0
+      automated_gate: passed
+      exact_dist_base: passed
+      fresh_create: passed
+      fresh_reload: passed
+      upgrade_from_1_7_0: passed
+      structured_summary_path: .mir/evidence/1.7.1-candidate-summary.json
+      public_release: false
+      status: candidate-qualified
+    mir_1_6_0:
+      version: "1.6.0"
+      branch: tmp/0.16
+      target_factorio: "0.16"
+      source_anchor: mir_1_7_1
+      source_commit: 2dfb1a716441e3f73c33b776f374938702a622ec
+      artifact: dist/more-infinite-research_1.6.0.zip
+      sha256: 6EE5FF574C4681D5E33B971EA2CD646100B8E862544C4BCB4581BDAEEB246BAB
+      size_bytes: 302815
+      entries: 122
+      forbidden_entries: 0
+      automated_gate: passed
+      exact_dist_base: passed
+      fresh_create: passed
+      fresh_reload: passed-server-load
+      structured_summary_path: .mir/evidence/1.6.0-candidate-summary.json
+      public_release: false
+      status: candidate-qualified
+    mir_1_5_0:
+      version: "1.5.0"
+      branch: tmp/0.15
+      target_factorio: "0.15"
+      source_anchor: mir_1_6_0
+      source_commit: d4167875b97c45b460131ef3436e16ee21774c14
+      artifact: dist/more-infinite-research_1.5.0.zip
+      sha256: 2EB2E9650FD77485E064869F8CDC578801A97EF0FF237ABFB3C46224604A5817
+      size_bytes: 302975
+      entries: 122
+      forbidden_entries: 0
+      automated_gate: passed
+      exact_dist_base: passed
+      fresh_create: passed
+      fresh_reload: passed-server-load
+      structured_summary_path: .mir/evidence/1.5.0-candidate-summary.json
+      public_release: false
+      status: candidate-qualified
+    mir_1_4_0:
+      version: "1.4.0"
+      branch: tmp/0.14
+      target_factorio: "0.14"
+      source_anchor: mir_1_5_0
+      source_commit: fa3b532fa158ed506f474f5ad3796e032332f012
+      artifact: dist/more-infinite-research_1.4.0.zip
+      sha256: F6E90F291C838A8DAB80AE1E340D897ADFC14E8A7657B2D01D93C18B476DCBD6
+      size_bytes: 303250
+      entries: 122
+      forbidden_entries: 0
+      automated_gate: passed
+      exact_dist_base: passed
+      fresh_create: passed
+      fresh_reload: passed-server-load
+      structured_summary_path: .mir/evidence/1.4.0-candidate-summary.json
+      public_release: false
+      status: candidate-qualified
   closed_versions:
     - version: "2.2.0"
       branch: main
@@ -108,14 +271,35 @@ release_artifacts:
       branch: dev
       target_factorio: "2.1"
       purpose: accumulated portable fixes, compatibility lessons, tooling updates, docs corrections, and community feedback after the 3.0.0 backport rings
-    factorio_2_0_backport:
-      version: "2.3.0"
-      branch: legacy
-      target_factorio: "2.0"
     factorio_1_1_port:
       version: "1.9.3"
       branch: tmp/1.1
       target_factorio: "1.1"
+    factorio_0_18_bridge:
+      version: "1.8.0"
+      branch: tmp/0.18
+      target_factorio: "0.18"
+      purpose: published bridge/archive package from the MIR 3 source anchor plus portable 2.3.0 and 1.9.3 lessons
+    factorio_1_0_port:
+      version: "1.8.1"
+      branch: tmp/1.0
+      target_factorio: "1.0"
+      purpose: maintained Factorio 1.0 support line after the 0.18 bridge proof; future 1.0 maintenance stays on 1.8.x
+    factorio_0_17_port:
+      version: "1.7.1"
+      branch: tmp/0.17
+      target_factorio: "0.17"
+      purpose: first old-line native-infinite proof after 1.8.x release synthesis
+    factorio_0_16_port:
+      version: "1.6.0"
+      branch: tmp/0.16
+      target_factorio: "0.16"
+      purpose: old-science native-infinite proof after 0.17 binary lessons
+    factorio_0_15_port:
+      version: "1.5.0"
+      branch: tmp/0.15
+      target_factorio: "0.15"
+      purpose: earliest plausible native-infinite floor after old-science proof
     current_line_feature:
       version: "3.1.0"
       branch: dev
@@ -125,3 +309,74 @@ release_artifacts:
     only build or refresh dist archives for an unpublished target version;
     never refresh already-published archives as part of architecture or
     backport preparation
+
+target_lines:
+  factorio_0_18_bridge:
+    version: "1.8.0"
+    branch: tmp/0.18
+    target_factorio: "0.18"
+    support_class: bridge-archive
+    source: mir_1_9_3
+    publish_policy: one_time_bridge
+    future_maintenance: frozen_except_severe_package_or_load_defect
+    required_binary_proof:
+      - factorio_0.18
+      - factorio_1.0_same_zip
+  factorio_1_0:
+    version: "1.8.1"
+    branch: tmp/1.0
+    target_factorio: "1.0"
+    support_class: compatibility-port
+    source: mir_1_9_3_plus_mir_1_8_0_bridge_lessons_plus_dev_portable_fixes
+    publish_policy: maintained
+    future_maintenance: "1.8.x"
+    required_binary_proof:
+      - factorio_1.0
+  factorio_0_17:
+    version: "1.7.1"
+    branch: tmp/0.17
+    target_factorio: "0.17"
+    support_class: reduced-native-infinite
+    source: mir_1_8_1_plus_dev_portable_lessons
+    publish_policy: binary_proof_required
+    required_binary_proof:
+      - factorio_0.17
+  factorio_0_16:
+    version: "1.6.0"
+    branch: tmp/0.16
+    target_factorio: "0.16"
+    support_class: old-science-native-infinite
+    source: mir_1_7_0_plus_old_science_map
+    publish_policy: binary_proof_required
+    required_binary_proof:
+      - factorio_0.16
+  factorio_0_15:
+    version: "1.5.0"
+    branch: tmp/0.15
+    target_factorio: "0.15"
+    support_class: minimal-native-infinite
+    source: mir_1_6_0_plus_target_effect_proof
+    publish_policy: binary_proof_required
+    required_binary_proof:
+      - factorio_0.15
+  factorio_0_14:
+    version: "1.4.0"
+    branch: tmp/0.14
+    target_factorio: "0.14"
+    support_class: archive-finite-ladder
+    source: target_binary_and_base_file_discovery
+    publish_policy: binary_proof_required
+  factorio_0_13:
+    version: "1.3.0"
+    branch: tmp/0.13
+    target_factorio: "0.13"
+    support_class: archive-finite-ladder
+    source: target_binary_and_base_file_discovery
+    publish_policy: binary_proof_required
+  factorio_0_12:
+    version: "0.12.0"
+    branch: tmp/0.12
+    target_factorio: "0.12"
+    support_class: archive-experiment
+    source: target_binary_and_base_file_discovery
+    publish_policy: binary_proof_required

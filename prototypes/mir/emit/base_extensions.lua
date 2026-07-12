@@ -12,6 +12,7 @@ local planner_prerequisites = require("prototypes.mir.planner.prerequisites")
 local science_packs = require("prototypes.mir.capabilities.science_integration.science_packs")
 local science_selector = require("prototypes.mir.capabilities.science_integration.science_selector")
 local effective_settings = require("prototypes.mir.settings.effective")
+local target_line = require("prototypes.mir.platform.factorio.target_line")
 
 local M = {}
 
@@ -259,12 +260,15 @@ local SPECIALS = {
 
 local function extend_chain(key)
   local spec = base_defaults[key] or {}
+  local chain_key = spec.chain_key or key
+  local generated_key = spec.generated_key or chain_key
+  local locale_key = spec.locale_key or chain_key
   if not is_enabled(key, spec) then
     D.extension(D.extension_fields(key, "skipped", "disabled"))
     return
   end
 
-  local pattern = "^" .. escape_pattern(key) .. "%-(%d+)$"
+  local pattern = "^" .. escape_pattern(chain_key) .. "%-(%d+)$"
   local levels, by_level = {}, {}
   local has_infinite = false
 
@@ -316,7 +320,7 @@ local function extend_chain(key)
   -- Allow anchoring when the base tech exists; vanilla-derived cost inference
   -- still requires numeric unit.count values.
 
-  local new_name = key .. "-" .. desired_new_level
+  local new_name = generated_key .. "-" .. desired_new_level
   -- Never replace an existing vanilla or modded continuation level.
   if data_raw.technology(new_name) then
     D.extension(D.extension_fields(key, "skipped", "target_exists"))
@@ -426,9 +430,9 @@ local function extend_chain(key)
 
   local new = deepcopy(base_tech)
   new.name = new_name
-  new.localised_name = base_tech.localised_name
-  new.localised_description = base_tech.localised_description
-  new.prerequisites = build_prerequisites(key .. "-" .. base_level, base_tech.prerequisites)
+  new.localised_name = spec.localised_name or base_tech.localised_name or {"technology-name." .. locale_key}
+  new.localised_description = spec.localised_description or base_tech.localised_description or {"technology-description." .. locale_key}
+  new.prerequisites = build_prerequisites(chain_key .. "-" .. base_level, base_tech.prerequisites)
   new.level = desired_new_level
 
   local special = SPECIALS[key]
@@ -440,14 +444,14 @@ local function extend_chain(key)
   end
   effect_safety.assert_effects_allowed(desired_effects, "base extension " .. key)
   if not prefer_this_mod_for_competing_techs() then
-    local other_choice = find_any_infinite_extension(key .. "-" .. base_level, new_name)
+    local other_choice = find_any_infinite_extension(chain_key .. "-" .. base_level, new_name)
     if other_choice then
       log("[more-infinite-research] Skipping extension for " .. key .. ": competing infinite tech kept from other mod (" .. other_choice .. ").")
       D.extension(D.extension_fields(key, "skipped", "competing_infinite_kept"))
       return
     end
   end
-  local existing = find_equivalent_infinite_extension(key .. "-" .. base_level, desired_effects)
+  local existing = find_equivalent_infinite_extension(chain_key .. "-" .. base_level, desired_effects)
   if existing then
     log("[more-infinite-research] Skipping extension for " .. key .. ": equivalent infinite tech already exists (" .. existing .. ").")
     D.extension(D.extension_fields(key, "skipped", "equivalent_infinite_exists"))
@@ -455,7 +459,11 @@ local function extend_chain(key)
   end
   new.effects = desired_effects
 
-  new.max_level = max_level_value
+  if target_line.supports_native_infinite_technology() then
+    new.max_level = max_level_value
+  else
+    new.max_level = nil
+  end
   new.upgrade = true
 
   local research_setting = sanitize_number(startup_setting("mir-research-time-" .. key))
@@ -480,10 +488,14 @@ local function extend_chain(key)
     return
   end
   new.unit = {
-    count_formula = format_number(base_value) .. " * " .. format_number(growth) .. "^(L-1)",
     ingredients = resolved_ingredients,
     time = research_time
   }
+  if target_line.supports_native_infinite_technology() then
+    new.unit.count_formula = format_number(base_value) .. "*" .. format_number(growth) .. "^(L-1)"
+  else
+    new.unit.count = math.max(1, math.floor((last_count or base_value) * growth + 0.5))
+  end
   new.prerequisites = planner_prerequisites.append_end_game_gate_prerequisite(append_pack_prerequisites(new.prerequisites, resolved_ingredients))
 
   if special and special.on_extend then

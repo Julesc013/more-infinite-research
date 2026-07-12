@@ -1,6 +1,70 @@
 schema: 1
 
 docs:
+  - path: docs/releases/1.4.0-validation-summary.md
+    title: "MIR 1.4.0 Validation Summary"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-1.4.0-validation
+  - path: docs/releases/release-notes-1.4.0.md
+    title: "MIR 1.4.0 Candidate Notes"
+    status: current
+    audience: player
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-1.4.0-release-notes
+  - path: docs/releases/1.5.0-validation-summary.md
+    title: "MIR 1.5.0 Validation Summary"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-1.5.0-validation
+  - path: docs/releases/release-notes-1.5.0.md
+    title: "MIR 1.5.0 Candidate Notes"
+    status: current
+    audience: player
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-1.5.0-release-notes
+  - path: docs/releases/1.6.0-validation-summary.md
+    title: "MIR 1.6.0 Validation Summary"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-1.6.0-validation
+  - path: docs/releases/release-notes-1.6.0.md
+    title: "MIR 1.6.0 Candidate Notes"
+    status: current
+    audience: player
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-1.6.0-release-notes
+  - path: docs/releases/1.7.1-validation-summary.md
+    title: "MIR 1.7.1 Validation Summary"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-1.7.1-validation
+  - path: docs/releases/release-notes-1.7.1.md
+    title: "MIR 1.7.1 Candidate Notes"
+    status: current
+    audience: player
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-1.7.1-release-notes
   - path: docs/adr/0001-mir-3-compatibility-compiler-architecture.md
     title: "ADR 0001: MIR 3.0 Compatibility Compiler Architecture"
     status: current
@@ -215,6 +279,62 @@ docs:
     doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
+  - path: docs/archive/2.x/rc-plan-factorio-0.14.md
+    title: "Factorio 0.14 RC Planning Report"
+    status: archived
+    audience: maintainer
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/archive/2.x/rc-plan-factorio-0.15.md
+    title: "Factorio 0.15 RC Planning Report"
+    status: archived
+    audience: maintainer
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/archive/2.x/rc-plan-factorio-0.16.md
+    title: "Factorio 0.16 RC Planning Report"
+    status: archived
+    audience: maintainer
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/archive/2.x/rc-plan-factorio-0.17.md
+    title: "Factorio 0.17 RC Planning Report"
+    status: archived
+    audience: maintainer
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/archive/2.x/technology-audit-factorio-0.17.md
+    title: "Factorio 0.17 Technology Availability Audit"
+    status: archived
+    audience: maintainer
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/archive/2.x/rc-plan-factorio-0.18.md
+    title: "Factorio 0.18 Bridge Planning Report"
+    status: archived
+    audience: maintainer
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/archive/2.x/rc-plan-factorio-1.0.md
+    title: "Factorio 1.0 RC Planning Report"
+    status: archived
+    audience: maintainer
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/archive/2.x/rc-plan-factorio-1.1.md
+    title: "Factorio 1.1 RC Planning Report"
+    status: archived
+    audience: maintainer
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
   - path: docs/archive/2.x/README.md
     title: "2.x Archive"
     status: archived
@@ -238,6 +358,34 @@ docs:
     source_of_truth_for: []
   - path: docs/archive/2.x/release-notes-1.9.2.md
     title: "More Infinite Research 1.9.2 Release Notes"
+    status: archived
+    audience: maintainer
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/archive/2.x/release-notes-1.9.3.md
+    title: "More Infinite Research 1.9.3 Release Notes"
+    status: archived
+    audience: maintainer
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/archive/2.x/release-notes-1.8.0.md
+    title: "More Infinite Research 1.8.0 Release Notes"
+    status: archived
+    audience: maintainer
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/archive/2.x/release-notes-1.8.1.md
+    title: "More Infinite Research 1.8.1 Release Notes"
+    status: archived
+    audience: maintainer
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/archive/2.x/release-notes-1.7.0.md
+    title: "More Infinite Research 1.7.0 Release Notes"
     status: archived
     audience: maintainer
     doc_type: archive

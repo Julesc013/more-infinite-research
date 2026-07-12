@@ -6,13 +6,13 @@ local effective_settings = require("prototypes.mir.settings.effective")
 local S = {}
 
 local VANILLA_PACK_ORDER = {
-  "automation-science-pack",
-  "logistic-science-pack",
-  "chemical-science-pack",
-  "production-science-pack",
-  "military-science-pack",
-  "utility-science-pack",
-  "space-science-pack",
+  "science-pack-1",
+  "science-pack-2",
+  "science-pack-3",
+  "alien-science-pack",
+  "alien-science-pack",
+  "alien-science-pack",
+  "alien-science-pack",
   "agricultural-science-pack",
   "metallurgic-science-pack",
   "electromagnetic-science-pack",
@@ -28,75 +28,75 @@ local SPACE_AGE_PLANET_PACKS = {
 }
 
 local OFFICIAL_PROGRESSION_STEPS = {
-  ["automation-science-pack"] = {"automation-science-pack"},
-  ["logistic-science-pack"] = {"automation-science-pack", "logistic-science-pack"},
-  ["chemical-science-pack"] = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack"},
-  ["production-science-pack"] = {
-    "automation-science-pack",
-    "logistic-science-pack",
-    "chemical-science-pack",
-    "production-science-pack"
+  ["science-pack-1"] = {"science-pack-1"},
+  ["science-pack-2"] = {"science-pack-1", "science-pack-2"},
+  ["science-pack-3"] = {"science-pack-1", "science-pack-2", "science-pack-3"},
+  ["alien-science-pack"] = {
+    "science-pack-1",
+    "science-pack-2",
+    "science-pack-3",
+    "alien-science-pack"
   },
-  ["military-science-pack"] = {"automation-science-pack", "logistic-science-pack", "military-science-pack"},
-  ["utility-science-pack"] = {
-    "automation-science-pack",
-    "logistic-science-pack",
-    "chemical-science-pack",
-    "production-science-pack",
-    "utility-science-pack"
+  ["alien-science-pack"] = {"science-pack-1", "science-pack-2", "alien-science-pack"},
+  ["alien-science-pack"] = {
+    "science-pack-1",
+    "science-pack-2",
+    "science-pack-3",
+    "alien-science-pack",
+    "alien-science-pack"
   },
-  ["space-science-pack"] = {
-    "automation-science-pack",
-    "logistic-science-pack",
-    "chemical-science-pack",
-    "production-science-pack",
-    "utility-science-pack",
-    "space-science-pack"
+  ["alien-science-pack"] = {
+    "science-pack-1",
+    "science-pack-2",
+    "science-pack-3",
+    "alien-science-pack",
+    "alien-science-pack",
+    "alien-science-pack"
   },
   ["agricultural-science-pack"] = {
-    "automation-science-pack",
-    "logistic-science-pack",
-    "chemical-science-pack",
-    "production-science-pack",
-    "utility-science-pack",
-    "space-science-pack",
+    "science-pack-1",
+    "science-pack-2",
+    "science-pack-3",
+    "alien-science-pack",
+    "alien-science-pack",
+    "alien-science-pack",
     "agricultural-science-pack"
   },
   ["metallurgic-science-pack"] = {
-    "automation-science-pack",
-    "logistic-science-pack",
-    "chemical-science-pack",
-    "production-science-pack",
-    "utility-science-pack",
-    "space-science-pack",
+    "science-pack-1",
+    "science-pack-2",
+    "science-pack-3",
+    "alien-science-pack",
+    "alien-science-pack",
+    "alien-science-pack",
     "metallurgic-science-pack"
   },
   ["electromagnetic-science-pack"] = {
-    "automation-science-pack",
-    "logistic-science-pack",
-    "chemical-science-pack",
-    "production-science-pack",
-    "utility-science-pack",
-    "space-science-pack",
+    "science-pack-1",
+    "science-pack-2",
+    "science-pack-3",
+    "alien-science-pack",
+    "alien-science-pack",
+    "alien-science-pack",
     "electromagnetic-science-pack"
   },
   ["cryogenic-science-pack"] = {
-    "automation-science-pack",
-    "logistic-science-pack",
-    "chemical-science-pack",
-    "production-science-pack",
-    "utility-science-pack",
-    "space-science-pack",
+    "science-pack-1",
+    "science-pack-2",
+    "science-pack-3",
+    "alien-science-pack",
+    "alien-science-pack",
+    "alien-science-pack",
     "cryogenic-science-pack"
   },
   ["promethium-science-pack"] = {
-    "automation-science-pack",
-    "logistic-science-pack",
-    "chemical-science-pack",
-    "production-science-pack",
-    "military-science-pack",
-    "utility-science-pack",
-    "space-science-pack",
+    "science-pack-1",
+    "science-pack-2",
+    "science-pack-3",
+    "alien-science-pack",
+    "alien-science-pack",
+    "alien-science-pack",
+    "alien-science-pack",
     "agricultural-science-pack",
     "metallurgic-science-pack",
     "electromagnetic-science-pack",
@@ -107,80 +107,81 @@ local OFFICIAL_PROGRESSION_STEPS = {
 
 local EXTENSION_PACKS = {
   ["braking-force"] = {
-    "automation-science-pack",
-    "logistic-science-pack",
-    "chemical-science-pack",
-    "production-science-pack",
-    "space-science-pack"
+    "science-pack-1",
+    "science-pack-2",
+    "science-pack-3",
+    "alien-science-pack",
+    "alien-science-pack"
   },
   ["research-speed"] = "all",
   ["worker-robots-storage"] = {
-    "automation-science-pack",
-    "logistic-science-pack",
-    "chemical-science-pack",
-    "production-science-pack",
-    "utility-science-pack",
+    "science-pack-1",
+    "science-pack-2",
+    "science-pack-3",
+    "alien-science-pack",
+    "alien-science-pack",
     "electromagnetic-science-pack"
   },
   ["inserter-capacity-bonus"] = {
-    "automation-science-pack",
-    "logistic-science-pack",
-    "chemical-science-pack",
-    "production-science-pack",
+    "science-pack-1",
+    "science-pack-2",
+    "science-pack-3",
+    "alien-science-pack",
     "agricultural-science-pack"
   },
   ["weapon-shooting-speed"] = {
-    "automation-science-pack",
-    "logistic-science-pack",
-    "chemical-science-pack",
-    "production-science-pack",
-    "military-science-pack",
-    "space-science-pack"
+    "science-pack-1",
+    "science-pack-2",
+    "science-pack-3",
+    "alien-science-pack",
+    "alien-science-pack",
+    "alien-science-pack"
   },
   ["laser-shooting-speed"] = {
-    "automation-science-pack",
-    "logistic-science-pack",
-    "chemical-science-pack",
-    "production-science-pack",
-    "military-science-pack",
-    "space-science-pack"
+    "science-pack-1",
+    "science-pack-2",
+    "science-pack-3",
+    "alien-science-pack",
+    "alien-science-pack",
+    "alien-science-pack"
   },
   research_electric_shooting_speed = {
-    "automation-science-pack",
-    "logistic-science-pack",
-    "chemical-science-pack",
-    "production-science-pack",
-    "military-science-pack",
+    "science-pack-1",
+    "science-pack-2",
+    "science-pack-3",
+    "alien-science-pack",
+    "alien-science-pack",
     "electromagnetic-science-pack"
   },
   research_flamethrower_shooting_speed = {
-    "automation-science-pack",
-    "logistic-science-pack",
-    "chemical-science-pack",
-    "production-science-pack",
-    "military-science-pack",
-    "space-science-pack"
+    "science-pack-1",
+    "science-pack-2",
+    "science-pack-3",
+    "alien-science-pack",
+    "alien-science-pack",
+    "alien-science-pack"
   },
   research_rocket_shooting_speed = {
-    "automation-science-pack",
-    "logistic-science-pack",
-    "chemical-science-pack",
-    "production-science-pack",
-    "military-science-pack",
+    "science-pack-1",
+    "science-pack-2",
+    "science-pack-3",
+    "alien-science-pack",
+    "alien-science-pack",
     "electromagnetic-science-pack"
   },
   research_cannon_shooting_speed = {
-    "automation-science-pack",
-    "logistic-science-pack",
-    "chemical-science-pack",
-    "production-science-pack",
-    "military-science-pack",
+    "science-pack-1",
+    "science-pack-2",
+    "science-pack-3",
+    "alien-science-pack",
+    "alien-science-pack",
     "electromagnetic-science-pack"
   }
 }
 
 local lab_inputs_cache = nil
 local science_pack_unlock_cache = nil
+local science_pack_initial_availability_cache = nil
 local mod_progression_cache = {}
 
 local function ingredient_name(ingredient)
@@ -205,7 +206,7 @@ local function lab_incompatibility_policy()
 end
 
 local function science_packs_require_tool_prototypes()
-  local automation_pack = lookup.item_prototype("automation-science-pack")
+  local automation_pack = lookup.item_prototype("science-pack-1")
   return automation_pack and automation_pack.type == "tool"
 end
 
@@ -411,7 +412,7 @@ function S.space_age_progression_packs_for(selected_packs)
   end
 
   local out = {}
-  if has_space_age_pack then table.insert(out, "space-science-pack") end
+  if has_space_age_pack then table.insert(out, "alien-science-pack") end
   if selected["promethium-science-pack"] then
     for _, pack in ipairs(SPACE_AGE_PLANET_PACKS) do table.insert(out, pack) end
     table.insert(out, "promethium-science-pack")
@@ -482,8 +483,8 @@ function S.end_game_science_pack()
   if lookup.is_space_age() and S.science_pack_exists("promethium-science-pack") then
     return "promethium-science-pack"
   end
-  if S.science_pack_exists("space-science-pack") then
-    return "space-science-pack"
+  if S.science_pack_exists("alien-science-pack") then
+    return "alien-science-pack"
   end
   return nil
 end
@@ -522,6 +523,41 @@ local function recipe_outputs_item(recipe, item_name)
   return scan(recipe)
 end
 
+local function recipe_enabled_without_research(recipe)
+  if not recipe or recipe.hidden == true or recipe.enabled == false then return false end
+
+  local variants = {}
+  if recipe.normal then table.insert(variants, recipe.normal) end
+  if recipe.expensive then table.insert(variants, recipe.expensive) end
+  for _, variant in ipairs(variants) do
+    if variant.enabled == false then return false end
+  end
+
+  return true
+end
+
+local function build_science_pack_initial_availability_cache()
+  if science_pack_initial_availability_cache then return science_pack_initial_availability_cache end
+
+  science_pack_initial_availability_cache = {}
+  local lab_inputs = S.all_lab_inputs()
+  for _, recipe in pairs(data_raw.prototypes("recipe")) do
+    if recipe_enabled_without_research(recipe) then
+      for _, pack_name in ipairs(lab_inputs) do
+        if recipe_outputs_item(recipe, pack_name) then
+          science_pack_initial_availability_cache[pack_name] = true
+        end
+      end
+    end
+  end
+
+  return science_pack_initial_availability_cache
+end
+
+local function pack_recipe_enabled_without_research(pack_name)
+  return build_science_pack_initial_availability_cache()[pack_name] == true
+end
+
 local function build_science_pack_unlock_cache()
   if science_pack_unlock_cache then return science_pack_unlock_cache end
   science_pack_unlock_cache = {}
@@ -533,13 +569,15 @@ local function build_science_pack_unlock_cache()
   table.sort(technology_names)
   for _, tech_name in ipairs(technology_names) do
     local tech = data_raw.technology(tech_name)
-    for _, effect in ipairs(tech.effects or {}) do
-      if effect.type == "unlock-recipe" and effect.recipe then
-        local recipe = data_raw.prototype("recipe", effect.recipe)
-        if recipe then
-          for _, pack_name in ipairs(lab_inputs) do
-            if recipe_outputs_item(recipe, pack_name) and not science_pack_unlock_cache[pack_name] then
-              science_pack_unlock_cache[pack_name] = tech_name
+    if tech and tech.enabled ~= false then
+      for _, effect in ipairs(tech.effects or {}) do
+        if effect.type == "unlock-recipe" and effect.recipe then
+          local recipe = data_raw.prototype("recipe", effect.recipe)
+          if recipe then
+            for _, pack_name in ipairs(lab_inputs) do
+              if recipe_outputs_item(recipe, pack_name) and not science_pack_unlock_cache[pack_name] then
+                science_pack_unlock_cache[pack_name] = tech_name
+              end
             end
           end
         end
@@ -550,7 +588,11 @@ local function build_science_pack_unlock_cache()
 end
 
 function S.prereq_tech_for_science_pack(pack_name)
-  if lookup.technology_exists(pack_name) then return pack_name end
+  if pack_recipe_enabled_without_research(pack_name) then return nil end
+
+  local named_technology = data_raw.technology(pack_name)
+  if named_technology and named_technology.enabled ~= false then return pack_name end
+
   local cache = build_science_pack_unlock_cache()
   local tech_name = cache[pack_name]
   if tech_name and lookup.technology_exists(tech_name) then return tech_name end

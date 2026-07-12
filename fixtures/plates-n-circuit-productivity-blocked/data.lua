@@ -7,8 +7,8 @@ data:extend({
     max_level = "infinite",
     unit = {
       ingredients = {
-        {"automation-science-pack", 1},
-        {"logistic-science-pack", 1}
+        {"science-pack-1", 1},
+        {"science-pack-2", 1}
       },
       count_formula = "2500+2500*(L-1)",
       time = 30
@@ -27,8 +27,8 @@ data:extend({
     max_level = "infinite",
     unit = {
       ingredients = {
-        {"automation-science-pack", 1},
-        {"logistic-science-pack", 1}
+        {"science-pack-1", 1},
+        {"science-pack-2", 1}
       },
       count_formula = "2500+2500*(L-1)",
       time = 30
