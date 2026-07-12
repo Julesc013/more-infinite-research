@@ -2852,7 +2852,7 @@ function Assert-SpaceAgeVanillaOwnedProductivityStreamsSkipped {
 function Assert-BaseCoreProductivityStreamsGenerated {
   param([string]$Context)
 
-  foreach ($stream in @(
+  $reducedDirectEffectStreams = @(
     "research_electronic_circuit",
     "research_advanced_circuit",
     "research_processing_unit",
@@ -2980,7 +2980,11 @@ if ($isReducedLegacyLine) {
     "research_lab_productivity",
     "research_robot_battery",
     "research_rocket_shooting_speed"
-  )) {
+  )
+  if ($isFactorio016Line) {
+    $reducedDirectEffectStreams = @($reducedDirectEffectStreams | Where-Object { $_ -ne "research_cannon_shooting_speed" })
+  }
+  foreach ($stream in $reducedDirectEffectStreams) {
     $line = Get-LastStreamReportLine -Key $stream
     Assert-ReportLineGenerated -Line $line -Context "$reducedLineLabel direct-effect stream $stream"
   }
