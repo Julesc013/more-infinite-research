@@ -3024,7 +3024,12 @@ if ($isReducedLegacyLine) {
     "research_robot_battery",
     "research_rocket_shooting_speed"
   )
-  if ($isFactorio014Line -or $isFactorio015Line) {
+  if ($isFactorio014Line) {
+    $reducedDirectEffectStreams = @(
+      "research_electric_shooting_speed",
+      "research_rocket_shooting_speed"
+    )
+  } elseif ($isFactorio015Line) {
     $reducedDirectEffectStreams = @(
       "research_electric_shooting_speed",
       "research_flamethrower_shooting_speed",

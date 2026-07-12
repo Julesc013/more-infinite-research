@@ -2,7 +2,6 @@ local techs = data.raw.technology or {}
 
 local direct_effect_technologies = {
   "recipe-prod-research_electric_shooting_speed-1",
-  "recipe-prod-research_flamethrower_shooting_speed-1",
   "recipe-prod-research_rocket_shooting_speed-1"
 }
 
