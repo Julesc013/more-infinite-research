@@ -891,6 +891,8 @@ streams:
       generated_technology: recipe-prod-research_oil_processing_productivity-1
       stream_key: research_oil_processing_productivity
       migration_policy: stable
+      reviewed_risk_exceptions:
+        - exact-coal-liquefaction-shared-input-output
       targets:
         - stream:research_oil_processing_productivity
       evidence:

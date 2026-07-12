@@ -67,12 +67,16 @@ local function base_skip(fact)
   if fact.source_class == "recycling" then return "safe_skip", "recycling_recipe" end
   if fact.allow_productivity == false then return "safe_skip", "recipe_productivity_not_allowed" end
   if tonumber(fact.maximum_productivity) == 0 then return "safe_skip", "zero_productivity_cap" end
+  return nil, nil
+end
+
+local function has_shared_input_output(fact)
   local ingredients = {}
   for _, entry in ipairs(fact.ingredients or {}) do ingredients[entry.name] = true end
   for _, entry in ipairs(fact.results or {}) do
-    if ingredients[entry.name] then return "unsafe_skip", "shared_input_output_loop_risk" end
+    if ingredients[entry.name] then return true end
   end
-  return nil, nil
+  return false
 end
 
 local function classify(recipe_name, fact, owners, attached, decisions, adopted)
@@ -81,6 +85,9 @@ local function classify(recipe_name, fact, owners, attached, decisions, adopted)
   end
   local category, reason = base_skip(fact)
   if category then return category, reason end
+  if #owners == 0 and has_shared_input_output(fact) then
+    return "unsafe_skip", "shared_input_output_loop_risk"
+  end
   if #owners > 1 then return "ambiguous", "multiple_recipe_productivity_owners" end
   if #owners == 1 then
     local owner = owners[1]
@@ -115,6 +122,9 @@ function M.build()
     local owners = owners_by_recipe[recipe_name] or {}
     if not fact.hidden then visible = visible + 1 end
     local skip_category = base_skip(fact)
+    if not skip_category and #owners == 0 and has_shared_input_output(fact) then
+      skip_category = "unsafe_skip"
+    end
     if not skip_category and target_line.feature_enabled("recipe_productivity") then eligible = eligible + 1 end
     if #owners > 1 then duplicate = duplicate + 1 end
     local category, reason = classify(recipe_name, fact, owners, attached, decisions, adopted)

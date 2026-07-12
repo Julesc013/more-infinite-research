@@ -82,7 +82,7 @@ local function should_skip_recipe(recipe_name, recipe, options)
   if recipe_is_hidden(recipe) and not options.include_hidden then
     return true
   end
-  if has_shared_input_output(recipe) then return true end
+  if has_shared_input_output(recipe) and not options.allow_shared_input_output then return true end
   if not options.include_recycling then
     for _, category in ipairs(recipe_categories(recipe)) do
       if DEFAULT_SKIP_CATEGORIES[category] then return true end
@@ -190,6 +190,7 @@ function R.recipes_for_stream(spec, per_level_default)
         exclude_ingredient_patterns = merge_lists(spec.exclude_ingredient_patterns, g.exclude_ingredient_patterns),
         include_hidden = spec.include_hidden or g.include_hidden,
         include_recycling = spec.include_recycling or g.include_recycling,
+        allow_shared_input_output = spec.allow_shared_input_output or g.allow_shared_input_output,
         module_tiers = g.module_tiers,
         module_tier_min = g.module_tier_min,
         module_tier_max = g.module_tier_max,
@@ -221,6 +222,7 @@ function R.recipes_for_stream(spec, per_level_default)
     exclude_ingredient_patterns = spec.exclude_ingredient_patterns,
     include_hidden = spec.include_hidden,
     include_recycling = spec.include_recycling,
+    allow_shared_input_output = spec.allow_shared_input_output,
     module_tiers = spec.module_tiers,
     module_tier_min = spec.module_tier_min,
     module_tier_max = spec.module_tier_max,

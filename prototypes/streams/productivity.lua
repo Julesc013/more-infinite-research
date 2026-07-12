@@ -137,6 +137,7 @@ return {
 
   research_oil_processing_productivity = {
     localised_name = {"technology-name.more-infinite-research.research_oil_processing_productivity"},
+    allow_shared_input_output = true,
     recipe_patterns = {
       "^basic%-oil%-processing$",
       "^advanced%-oil%-processing$",
