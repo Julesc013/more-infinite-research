@@ -61,7 +61,7 @@ function Get-MIRCandidateEvidenceJson {
 function Assert-MIRCandidateBoundEvidence {
   param(
     [Parameter(Mandatory)]$Fields,
-    [Parameter(Mandatory)][string]$SourceCommit,
+    [Parameter(Mandatory)][string]$PackageSourceCommit,
     [Parameter(Mandatory)][string]$ArchiveSha256,
     [Parameter(Mandatory)][string]$PackageContentSha256,
     [Parameter(Mandatory)][string]$PackageSourceSha256,
@@ -73,7 +73,7 @@ function Assert-MIRCandidateBoundEvidence {
   if ([int]$upgrade.schema -ne 1 -or [string]$upgrade.status -ne "passed") {
     throw "Upgrade evidence must be schema 1 with status passed."
   }
-  if ([string]$upgrade.git_commit -ne $SourceCommit -or [string]$upgrade.to.version -ne $Version -or [string]$upgrade.to.sha256 -ne $ArchiveSha256) {
+  if ([string]$upgrade.git_commit -ne $PackageSourceCommit -or [string]$upgrade.to.version -ne $Version -or [string]$upgrade.to.sha256 -ne $ArchiveSha256) {
     throw "Upgrade evidence is not bound to the active candidate source, version, and archive."
   }
 
@@ -81,7 +81,7 @@ function Assert-MIRCandidateBoundEvidence {
   if ([int]$campaign.schema -ne 1 -or [string]$campaign.kind -ne "mir-modpack-campaign-evidence") {
     throw "Ecosystem campaign evidence must be schema 1 mir-modpack-campaign-evidence."
   }
-  if ([string]$campaign.mir_archive.source_commit -ne $SourceCommit -or [string]$campaign.mir_archive.sha256 -ne $ArchiveSha256) {
+  if ([string]$campaign.mir_archive.source_commit -ne $PackageSourceCommit -or [string]$campaign.mir_archive.sha256 -ne $ArchiveSha256) {
     throw "Ecosystem campaign evidence is not bound to the active candidate source and archive."
   }
   $failedCampaignRows = @($campaign.scenarios | Where-Object {
@@ -99,7 +99,7 @@ function Assert-MIRCandidateBoundEvidence {
   foreach ($binding in ([ordered]@{
     status = $InteractiveStatus
     version = $Version
-    source_commit = $SourceCommit
+    source_commit = $PackageSourceCommit
     archive_sha256 = $ArchiveSha256
     package_content_sha256 = $PackageContentSha256
     package_source_sha256 = $PackageSourceSha256
@@ -170,6 +170,14 @@ if ($sourceCommit -notmatch '^[0-9a-f]{40}$') {
 if ($LASTEXITCODE -ne 0) {
   throw "Active release candidate source commit is not available locally: $sourceCommit"
 }
+$packageSourceCommit = Get-MIRRequiredCandidateField -Fields $candidate -Name "package_source_commit"
+if ($packageSourceCommit -notmatch '^[0-9a-f]{40}$') {
+  throw "Active release candidate package_source_commit must be a full lowercase Git object ID."
+}
+& git -C $repo cat-file -e "$packageSourceCommit^{commit}" 2>$null
+if ($LASTEXITCODE -ne 0) {
+  throw "Active release candidate package source commit is not available locally: $packageSourceCommit"
+}
 
 if (Test-MIRPackageSourceGitDirty -RepoRoot $repo) {
   throw "Package-visible working-tree changes make the active release candidate stale."
@@ -204,7 +212,7 @@ if ($status -eq "published") {
   }
   Assert-MIRCandidateBoundEvidence `
     -Fields $candidate `
-    -SourceCommit $sourceCommit `
+    -PackageSourceCommit $packageSourceCommit `
     -ArchiveSha256 (Get-MIRRequiredCandidateField -Fields $candidate -Name "sha256") `
     -PackageContentSha256 (Get-MIRRequiredCandidateField -Fields $candidate -Name "package_content_sha256") `
     -PackageSourceSha256 (Get-MIRRequiredCandidateField -Fields $candidate -Name "package_source_sha256") `
@@ -255,18 +263,22 @@ if ($status -eq "published") {
   if ($LASTEXITCODE -ne 0) {
     throw "Published release commit does not contain the validated source commit."
   }
+  & git -C $repo merge-base --is-ancestor $packageSourceCommit $releaseCommit
+  if ($LASTEXITCODE -ne 0) {
+    throw "Published release commit does not contain the package source commit."
+  }
 
   Write-Host "[ok] MIR published release archive, tag, and recorded validation evidence are immutable and consistent."
   exit 0
 }
 
 $packageRoots = @(Get-MIRPackageSourceRoots)
-$changedPackagePaths = @(& git -C $repo diff --name-only $sourceCommit HEAD -- @packageRoots)
+$changedPackagePaths = @(& git -C $repo diff --name-only $packageSourceCommit HEAD -- @packageRoots)
 if ($LASTEXITCODE -ne 0) {
   throw "Unable to compare active candidate source against HEAD."
 }
 if ($changedPackagePaths.Count -gt 0) {
-  throw "Package-visible paths changed after the active candidate source commit: $($changedPackagePaths -join ', ')"
+  throw "Package-visible paths changed after the active candidate package source commit: $($changedPackagePaths -join ', ')"
 }
 
 $artifactRelative = Get-MIRRequiredCandidateField -Fields $candidate -Name "artifact"
@@ -302,7 +314,7 @@ if ((Get-MIRRequiredCandidateField -Fields $candidate -Name "manual_gate") -ne $
 }
 Assert-MIRCandidateBoundEvidence `
   -Fields $candidate `
-  -SourceCommit $sourceCommit `
+  -PackageSourceCommit $packageSourceCommit `
   -ArchiveSha256 $checks.sha256 `
   -PackageContentSha256 $checks.package_content_sha256 `
   -PackageSourceSha256 $checks.package_source_sha256 `
