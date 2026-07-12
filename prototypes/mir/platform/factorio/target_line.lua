@@ -32,6 +32,19 @@ local unsupported_effect_types = {
   ["max-cargo-bay-unloading-distance"] = true
 }
 
+local supported_effect_types = {
+  ["ammo-damage"] = true,
+  ["gun-speed"] = true,
+  ["inserter-stack-size-bonus"] = true,
+  ["laboratory-speed"] = true,
+  ["mining-drill-productivity-bonus"] = true,
+  ["stack-inserter-capacity-bonus"] = true,
+  ["train-braking-force-bonus"] = true,
+  ["turret-attack"] = true,
+  ["worker-robot-speed"] = true,
+  ["worker-robot-storage"] = true
+}
+
 local omitted_global_settings = {
   ["mir-pipeline-extent-multiplier"] = true,
   ["mir-prototype-productivity-cap"] = true,
@@ -62,7 +75,7 @@ end
 
 function M.effect_supported(effect)
   local effect_type = effect and effect.type
-  return effect_type ~= nil and not unsupported_effect_types[effect_type]
+  return effect_type ~= nil and supported_effect_types[effect_type] == true and not unsupported_effect_types[effect_type]
 end
 
 function M.global_setting_supported(name)

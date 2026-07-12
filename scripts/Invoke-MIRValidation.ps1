@@ -2998,7 +2998,13 @@ if ($isReducedLegacyLine) {
     "research_robot_battery",
     "research_rocket_shooting_speed"
   )
-  if ($isFactorio015Line -or $isFactorio016Line) {
+  if ($isFactorio015Line) {
+    $reducedDirectEffectStreams = @(
+      "research_electric_shooting_speed",
+      "research_flamethrower_shooting_speed",
+      "research_rocket_shooting_speed"
+    )
+  } elseif ($isFactorio016Line) {
     $reducedDirectEffectStreams = @($reducedDirectEffectStreams | Where-Object { $_ -ne "research_cannon_shooting_speed" })
   }
   foreach ($stream in $reducedDirectEffectStreams) {
@@ -3008,6 +3014,42 @@ if ($isReducedLegacyLine) {
   Assert-NoStreamReportLine -Key "research_science_pack_productivity" -Context "$reducedLineLabel recipe-productivity cut"
   Assert-NoStreamReportLine -Key "research_gears" -Context "$reducedLineLabel recipe-productivity cut"
   Assert-DefaultBaseExtensionDiagnostics -Context "$reducedLineLabel base-extension scenario"
+
+  if ($isFactorio015Line) {
+    foreach ($unsupportedStream in @(
+        "research_character_crafting_speed",
+        "research_character_mining_speed",
+        "research_character_reach",
+        "research_character_walking_speed",
+        "research_inventory_capacity",
+        "research_lab_productivity",
+        "research_robot_battery"
+      )) {
+      $unsupportedLine = Get-LastStreamReportLine -Key $unsupportedStream
+      if ($unsupportedLine -notmatch "status=skipped" -or $unsupportedLine -notmatch "no_supported_effects") {
+        throw "$reducedLineLabel unsupported direct effect did not skip cleanly: $unsupportedLine"
+      }
+    }
+
+    Invoke-RuntimeScenario -ScenarioName "checkbox-enabled-default-off-features" -EnabledFixtureNames @() `
+      -EnabledBaseExtensionKeys @("inserter-capacity-bonus")
+    $checkboxEnabledInserterLine = Get-LastExtensionReportLine -Key "inserter-capacity-bonus"
+    Assert-ReportLineGenerated -Line $checkboxEnabledInserterLine -Context "$reducedLineLabel checkbox-enabled base extension scenario"
+
+    Invoke-RuntimeScenario -ScenarioName "checkbox-disabled-default-on-features" -EnabledFixtureNames @() `
+      -DisabledBaseExtensionKeys @("research-speed")
+    $checkboxDisabledResearchSpeedLine = Get-LastExtensionReportLine -Key "research-speed"
+    if ($checkboxDisabledResearchSpeedLine -notmatch "status=skipped" -or $checkboxDisabledResearchSpeedLine -notmatch "disabled") {
+      throw "Disabled base extension checkbox should skip generated continuation: $checkboxDisabledResearchSpeedLine"
+    }
+
+    if ($usesGeneratedUserDataDir -and (Test-Path -LiteralPath $validationRoot)) {
+      Remove-Item -LiteralPath $validationRoot -Recurse -Force
+    }
+    Write-Host "[ok] Validation completed."
+    $global:LASTEXITCODE = 0
+    return
+  }
 
   Invoke-RuntimeScenario -ScenarioName "lab-productivity-owner-skip" -EnabledFixtureNames @(
     "mir-fixture-lab-productivity-owner",
