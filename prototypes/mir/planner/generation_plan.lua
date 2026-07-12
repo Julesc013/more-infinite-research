@@ -37,6 +37,15 @@ local function effect_identity(effect)
   return table.concat(fields, ";")
 end
 
+local function effect_signature(effect)
+  if not effect or effect.type == nil or effect.type == "nothing" then return "" end
+  local normalized = {}
+  for key, value in pairs(effect) do
+    if key ~= "icon" and key ~= "icons" then normalized[key] = deepcopy(value) end
+  end
+  return fingerprint.canonical(normalized)
+end
+
 local function validate_gate(row, gate_name)
   local gate = row.gates[gate_name]
   if type(gate) ~= "table" or type(gate.passed) ~= "boolean"
@@ -214,6 +223,10 @@ end
 
 function M.effect_identity(effect)
   return effect_identity(effect)
+end
+
+function M.effect_signature(effect)
+  return effect_signature(effect)
 end
 
 return M

@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "generation_plan_gates": [
+    "target_supported", "effect_valid", "owner_conflict_free", "science_compatible", "lab_compatible",
+    "prerequisites_acyclic", "loop_safe", "progression_safe", "migration_safe", "output_identity_safe"
+  ],
+  "actions": ["emit", "adopt", "skip", "emit_base_extension"],
+  "family_strategies": ["attach-existing", "tier-table", "fixed"],
+  "compatibility_pack_fields": [
+    "mods_any", "mods_all", "mods_none", "aliases", "exact.includes", "exact.excludes", "family_hints",
+    "science_roles", "owner_claims", "risk_overrides", "family_authorizations", "candidate_seeds", "evidence", "claim"
+  ],
+  "automatic_modes": ["off", "report", "safe-attach", "safe-generate", "exact-pack"],
+  "mutation_sentinels": [
+    "hard-safety", "owner-conflict", "missing-prerequisite", "target-filter", "output-value-parity", "pack-applicability"
+  ],
+  "positive_negative_required": true,
+  "runtime_fixture": "fixtures/assert-compiler-contracts/data-final-fixes.lua"
+}

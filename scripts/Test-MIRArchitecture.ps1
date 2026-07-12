@@ -352,7 +352,7 @@ foreach ($needle in @(
   'require("prototypes.mir.pipeline.mutations.weapon_speed").apply()',
   'require("prototypes.mir.pipeline.mutations.max_level").apply()',
   'require("prototypes.mir.compatibility.planner").emit()',
-  'require("prototypes.mir.planner.stream_compiler").assert_output()',
+  'require("prototypes.mir.planner.compilation_plan").assert_output()',
   'require("prototypes.mir.emit.effect_safety").assert_registered_technology_effects()',
   'require("prototypes.mir.emit.technology_graph_safety").assert_registered_technologies()',
   'require("prototypes.mir.report.diagnostics_sink").flush()'

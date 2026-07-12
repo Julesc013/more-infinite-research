@@ -1,6 +1,6 @@
 ---------------------------------------------------------------------------------------------------
 Version: 3.1.0
-Date: 2026-07-12
+Date: 2026-07-13
 
   Changes:
 
@@ -9,12 +9,17 @@ Date: 2026-07-12
     - Added conservative automatic modes ranging from reporting only through reviewed generic family generation.
     - Preserved existing technology names, setting names, defaults, profiles, and saved-game state.
     - Added whole-plan safety checks before any generated technology or adopted effect is applied.
+    - Prevented compatibility-pack data from overriding hard productivity, recycling, probability, catalyst, and owner safety facts.
+    - Made exact-pack mode generate only families authorized by an exact-version compatibility record with named evidence.
+    - Added reviewed exact candidate seeding for recipes outside generic structural discovery without adding technology IDs.
+    - Unified stream, adoption, and base-extension operations in one fingerprinted compilation plan with full output-value parity.
     - Preserved recipe variants, fluids, probabilities, catalysts, surfaces, and productivity exclusions during discovery.
     - Rejected recycling, self-return, catalyst, voiding, transmutation, ambiguous-owner, and unsafe multi-output loops.
     - Preferred an exact existing productivity owner instead of creating duplicate infinite research.
     - Added complete recipe accounting with stable reasons for covered, external, safe-skip, unsafe, and unresolved recipes.
     - Added positive target capabilities so unsupported effects, settings, and prototype shapes fail closed.
     - Made generated outputs and archive construction deterministic.
+    - Made every runtime scenario test one exact archive, with setup reuse, focused selection, and bounded parallel workers.
     - Improved science-pack, lab, prerequisite, and technology reachability decisions.
     - Added independent compatibility load coverage for AAI, BZ, Bob, Krastorio, and Krastorio Spaced Out.
     - Kept complex chemistry, recovery, recycling, catalysts, and byproduct loops conservative unless explicitly proven safe.

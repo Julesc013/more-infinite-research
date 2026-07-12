@@ -14,7 +14,9 @@ superseded_by: []
 
 `GenerationPlan` is the side-effect-free boundary between stream planning and prototype emission. The compiler creates every row, validates the complete set, and only then passes the finalized snapshot to mutation code.
 
-The exported stream plan artifact is schema 3. It contains a deterministic plan fingerprint, fingerprints for facts, rules, active compatibility packs, and the target profile, the complete row set, and a validation summary with action and reason counts. A compilation-plan envelope is assembled before emission and also carries the validated base-extension operations, so base continuations do not rediscover their decisions during apply.
+The exported stream plan artifact is schema 3. It contains a deterministic plan fingerprint, fingerprints for facts, rules, active compatibility packs, and the target profile, the complete row set, and a validation summary with action and reason counts.
+
+`CompilationPlan` schema 2 globally finalizes materializing stream, adoption, and base-extension operations before the first emission. It adds a base-operation source fingerprint, stable operation ordering, a global fingerprint and validation summary, and rejects cross-part technology names, manifests, direct-effect identities, missing prerequisite targets, and unsupported effects.
 
 Every schema-3 row contains:
 
@@ -34,4 +36,4 @@ An `emit` row also contains the stable technology name and all fields required b
 
 Each gate records `passed`, a `passed`, `failed`, or `not-applicable` status, stable evidence IDs, and an optional reason. Materializing rows must pass every gate. Skip rows record the failed or inapplicable proof directly instead of encoding gate state in a reason string.
 
-Whole-plan validation rejects duplicate stream keys, emitted manifest IDs, technology names, owner/recipe adoption identities, duplicate semantic effect identities across emission and adoption, and any materializing row whose proof gate fails. After all mutations, the output validator proves that every planned technology/effect exists and that every planned infinite recipe-productivity effect has exactly the expected final owner. A finalized plan is immutable to consumers because `snapshot()` and `artifact()` return deep copies.
+Whole-plan validation rejects duplicate stream keys, emitted manifest IDs, technology names, owner/recipe adoption identities, duplicate semantic effect identities across emission and adoption, and any materializing row whose proof gate fails. After all mutations, the compilation output validator compares full normalized effect values with a declared tolerance plus prerequisites, science ingredients, count formula, research time, maximum level, enabled/hidden/upgrade state when declared, and generated-registry records. Stream adoption is checked as an exact expected-effect subset; emitted stream and base-extension technologies require exact planned shapes. Snapshots are deep copies.

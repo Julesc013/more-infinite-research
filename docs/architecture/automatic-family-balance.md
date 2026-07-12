@@ -35,6 +35,6 @@ These values intentionally match the conservative end of their destination strea
 - Beacon manufacturing remains diagnostic-only: a stable destination identity and fixture-backed progression policy are not yet defined.
 - Rail/support, ammunition, armor, battery, circuit, plate, and structural-component content remains under existing fixed streams and exact recipe matching. No new broad semantic FamilyRule is added in 3.1.0.
 - Fluid processes, chemistry, catalyst/recovery chains, voiding, transmutation, recycling, probabilistic output, and multi-output loops remain report-only. Placeability or a high confidence score cannot make these loop-safe.
-- CompatibilityPack reviewed overrides may refine exact evidence, but cannot bypass target, ownership, science, lab, prerequisite, or whole-plan validation.
+- CompatibilityPack reviewed overrides may refine only exact soft signals. Effective productivity permission, caps, parameterization, recycling, self-return, stochastic products, catalysts, exclusions, and blocking infinite owners are hard facts and cannot be overridden by pack data.
 
 The 3.1.0 objective is complete accounting and safe attachment, not maximum automatic productivity. New automatic families require a separate stable ID decision, schema-2 rule, arbitrary-name structural fixture, negative/decoy fixture, exact modpack campaign, balance review, and migration record.

@@ -118,7 +118,7 @@ local commands = {
     kind = "assertion",
     requires_features = {},
     implementation = "prototypes/mir/planner/output_validator.lua",
-    apply = function() require("prototypes.mir.planner.stream_compiler").assert_output() end
+    apply = function() require("prototypes.mir.planner.compilation_plan").assert_output() end
   },
   ["flush-diagnostics"] = {
     kind = "report",

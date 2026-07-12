@@ -110,6 +110,43 @@ function M.active_count()
   return #snapshot()
 end
 
+function M.blocker_is_reviewable(blocker)
+  return schema.is_reviewable_risk(blocker)
+end
+
+function M.authorizes_family_stream(stream_key, family, active_packs)
+  for _, pack in ipairs(active_packs or snapshot()) do
+    for _, row in ipairs(pack.family_authorizations or {}) do
+      if row.action == "generate"
+        and (row.stream == nil or row.stream == stream_key)
+        and (family == nil or row.family == nil or row.family == family) then
+        local out = deepcopy(row)
+        out.pack = pack.id
+        return out
+      end
+    end
+  end
+  return nil
+end
+
+function M.candidate_seeds(active_packs)
+  local out = {}
+  for _, pack in ipairs(active_packs or snapshot()) do
+    for _, row in ipairs(pack.candidate_seeds or {}) do
+      local seed = deepcopy(row)
+      seed.pack = pack.id
+      table.insert(out, seed)
+    end
+  end
+  table.sort(out, function(a, b)
+    if a.family ~= b.family then return a.family < b.family end
+    if a.stream ~= b.stream then return a.stream < b.stream end
+    if a.recipe ~= b.recipe then return a.recipe < b.recipe end
+    return a.pack < b.pack
+  end)
+  return out
+end
+
 function M.active_known_competing_productivity_profiles()
   local out = {}
   for _, pack in ipairs(snapshot()) do
@@ -166,13 +203,14 @@ function M.resolve_candidate(context, active_packs)
       end
     end
     for _, override in ipairs(pack.risk_overrides or {}) do
-      if context.blocker == override.risk and selector_matches(override, context) then
+      if schema.is_reviewable_risk(context.blocker)
+        and context.blocker == override.risk and selector_matches(override, context) then
         local kind = override.action == "allow-reviewed" and "exact-reviewed" or "exact-deny"
         table.insert(signals, {
           kind = kind, id = pack.id .. ":risk:" .. override.risk,
           action = override.action == "allow-reviewed" and "attach" or "diagnose",
           reason = override.risk, overrides_reason = override.action == "allow-reviewed" and override.risk or nil,
-          change = override.change
+          change = override.change, pack = pack.id, evidence = deepcopy(override.evidence)
         })
       end
     end

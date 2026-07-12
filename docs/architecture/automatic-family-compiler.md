@@ -21,15 +21,16 @@ final prototype state
 -> RecipeFactV2 and shared indexes
 -> data-only FamilyRule registry
 -> capability candidates and decisions
--> pure GenerationPlan
--> whole-plan validation
+-> pure GenerationPlan schema 3
+-> globally finalized CompilationPlan schema 2
 -> emission
+-> full output-shape parity
 -> diagnostics and golden-plan evidence
 ```
 
 Planning is side-effect free. Only modules under `prototypes/mir/emit/` may create or mutate generated technology prototypes. Reporting materializes decisions; it is not an alternative mutation path.
 
-`GenerationPlan` is the common intermediate representation for every fixed and automatic stream. Schema 3 records stable stream identity, technology identity, effects, science, prerequisites, cost, migration policy, evidence, blockers, risks, source provenance, evidence-bearing proof gates, source fingerprints, and a deterministic plan fingerprint. The compilation-plan envelope adds prevalidated base-extension operations. All rows and operations are validated before the first generated prototype is emitted, and final output parity is asserted after mutation.
+`GenerationPlan` is the stream intermediate representation. Schema 3 records stable stream identity, technology identity, effects, science, prerequisites, cost, migration policy, evidence, blockers, risks, source provenance, evidence-bearing proof gates, source fingerprints, and a deterministic plan fingerprint. `CompilationPlan` schema 2 then unifies materializing stream, adoption, and base-extension operations, applies reviewed cross-operation policy such as weapon-effect ownership, rejects global collisions, and fingerprints the finalized envelope before the first generated prototype is emitted. Final parity checks numeric effects and full technology shape.
 
 `DecisionRecordV2` keeps typed evidence classes instead of treating a formatted confidence string as authority. Confidence ranks review evidence; hard safety gates remain independent pass/fail records and cannot be averaged into an emission decision.
 
@@ -39,7 +40,9 @@ Planning is side-effect free. Only modules under `prototypes/mir/emit/` may crea
 - First automatic behavior is attach-only: high-confidence recipes may join an existing stable stream. It creates no per-recipe technology IDs.
 - Predeclared family technologies require an explicit manifest row and migration review before emission is enabled.
 - Ambiguous, risky, loop-forming, hidden, or externally owned candidates remain proposal-only or diagnostic-only.
-- Compatibility packs contain selectors, policy, expected decisions, and claim metadata. They do not read `data.raw` or mutate prototypes.
+- Compatibility packs contain selectors, policy, expected decisions, and claim metadata. They do not read `data.raw` or mutate prototypes. Hard safety facts are never data-overridable.
+- `exact-pack` emits only a family named by an active exact-version, fixture-backed generation authorization.
+- A reviewed candidate seed may add one exact recipe to an existing FamilyRule and stable stream; every hard gate still applies.
 - Fixture-only profiles belong to fixture data, not the production profile registry.
 
 ## Delivery Gates

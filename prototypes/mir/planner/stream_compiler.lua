@@ -221,9 +221,9 @@ local function plan_stream(key, raw_spec)
     if mode ~= "safe-generate" and mode ~= "exact-pack" then
       return skip_row(key, raw_spec, "automatic_family_mode_" .. tostring(mode))
     end
-    if mode == "exact-pack" and compatibility_packs.active_count() == 0 then
-      return skip_row(key, raw_spec, "exact_pack_requires_active_compatibility_pack", nil, nil, nil, nil, {
-        target_supported = {evidence = "compatibility-pack-registry:empty", reason = "exact_pack_requires_active_compatibility_pack"}
+    if mode == "exact-pack" and not compatibility_packs.authorizes_family_stream(key) then
+      return skip_row(key, raw_spec, "exact_pack_requires_family_authorization", nil, nil, nil, nil, {
+        target_supported = {evidence = "compatibility-pack-registry:no-family-authorization", reason = "exact_pack_requires_family_authorization"}
       })
     end
   end

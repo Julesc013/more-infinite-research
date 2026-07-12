@@ -24,7 +24,16 @@ compatibility_packs:
     - science-roles
     - owner-claims
     - reviewed-risk-overrides
+    - exact-family-generation-authorizations
+    - exact-candidate-seeds
     - deterministic-precedence
+  hard_safety:
+    compatibility_pack_overridable: false
+    reviewable_signals_require_exact_recipe_version_and_fixture: true
+  exact_pack:
+    unrelated_active_pack_enables_generation: false
+    authorization_query: compatibility_packs.authorizes_family_stream
+    baseline: safe-attachment
 
 campaigns:
   evidence_contract: mir-modpack-campaign-evidence-v1

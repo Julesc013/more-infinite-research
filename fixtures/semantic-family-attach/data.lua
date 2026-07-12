@@ -1,5 +1,9 @@
 local prototypes = {}
 
+if not (data.raw["recipe-category"] and data.raw["recipe-category"].recycling) then
+  table.insert(prototypes, {type = "recipe-category", name = "recycling"})
+end
+
 local function clone_entity(prototype_type, source_name, name, result)
   local source = data.raw[prototype_type] and data.raw[prototype_type][source_name]
   if not source then return end
@@ -23,15 +27,16 @@ local function add_item(name, icon, subgroup, place_result)
   })
 end
 
-local function add_recipe(name, result, ingredient)
+local function add_recipe(name, result, ingredient, options)
+  options = options or {}
   table.insert(prototypes, {
     type = "recipe",
     name = name,
-    categories = {"crafting"},
+    categories = {options.category or "crafting"},
     enabled = true,
     ingredients = {{type = "item", name = ingredient or "iron-plate", amount = 1}},
     results = {{type = "item", name = result, amount = 1}},
-    allow_productivity = true
+    allow_productivity = options.allow_productivity ~= false
   })
 end
 
@@ -67,6 +72,25 @@ clone_entity("assembling-machine", "assembling-machine-2", "opaque-fabrication-d
 add_item("opaque-fabrication-device", "__base__/graphics/icons/assembling-machine-2.png", "production-machine", "opaque-fabrication-device")
 add_recipe("assemble-theta", "opaque-fabrication-device", "electronic-circuit")
 
+table.insert(prototypes, {
+  type = "item",
+  name = "opaque-pack-component",
+  icon = "__base__/graphics/icons/iron-gear-wheel.png",
+  icon_size = 64,
+  subgroup = "intermediate-product",
+  order = "mir-semantic-pack-component",
+  stack_size = 100
+})
+add_recipe("pack-only-recipe", "opaque-pack-component", "iron-gear-wheel")
+
+clone_entity("assembling-machine", "assembling-machine-1", "opaque-hard-false-machine", "opaque-hard-false-machine")
+add_item("opaque-hard-false-machine", "__base__/graphics/icons/assembling-machine-1.png", "production-machine", "opaque-hard-false-machine")
+add_recipe("pack-hard-productivity-false", "opaque-hard-false-machine", "iron-plate", {allow_productivity = false})
+
+clone_entity("assembling-machine", "assembling-machine-1", "opaque-recycling-machine", "opaque-recycling-machine")
+add_item("opaque-recycling-machine", "__base__/graphics/icons/assembling-machine-1.png", "production-machine", "opaque-recycling-machine")
+add_recipe("pack-hard-recycling", "opaque-recycling-machine", "iron-plate", {category = "recycling"})
+
 local source_module = data.raw.module and data.raw.module["speed-module"]
 if source_module then
   local module = table.deepcopy(source_module)
@@ -76,5 +100,55 @@ if source_module then
   table.insert(prototypes, module)
   add_recipe("assemble-eta", "opaque-enhancer", "speed-module")
 end
+
+table.insert(prototypes, {
+  type = "technology",
+  name = "mir-fixture-finite-family-owner",
+  icon = "__base__/graphics/technology/automation.png",
+  icon_size = 256,
+  max_level = 1,
+  effects = {{type = "change-recipe-productivity", recipe = "assemble-alpha", change = 0.1}},
+  prerequisites = {"automation"},
+  unit = {count = 10, time = 5, ingredients = {{"automation-science-pack", 1}}}
+})
+
+table.insert(prototypes, {
+  type = "mod-data",
+  name = "more-infinite-research-compatibility-pack",
+  data = {packs = {
+    ["semantic-family-fixture"] = {
+      schema = 2,
+      id = "semantic-family-fixture",
+      applicability = {mods = {{id = "mir-fixture-semantic-family-attach", version = "= 0.1.0"}}},
+      aliases = {},
+      exact = {includes = {
+        {recipe = "pack-hard-productivity-false", family = "assembling-machine-manufacturing"},
+        {recipe = "pack-hard-recycling", family = "assembling-machine-manufacturing"}
+      }, excludes = {}},
+      family_hints = {},
+      science_roles = {},
+      owner_claims = {},
+      risk_overrides = {},
+      family_authorizations = {{
+        family = "assembling-machine-manufacturing",
+        stream = "research_auto_assembling_machine",
+        action = "generate",
+        evidence = {"semantic-family-attach"},
+        claim_boundary = "fixture-only"
+      }},
+      candidate_seeds = {{
+        recipe = "pack-only-recipe",
+        item = "opaque-pack-component",
+        family = "logistics-manufacturing",
+        stream = "research_belts",
+        change = 0.01,
+        evidence = {"semantic-family-attach"}
+      }},
+      targets = {factorio_lines = {"2.1"}},
+      evidence = {fixtures = {"semantic-family-attach"}, real_mod = {}},
+      claim = {level = "fixture-only", public = false}
+    }
+  }}
+})
 
 data:extend(prototypes)

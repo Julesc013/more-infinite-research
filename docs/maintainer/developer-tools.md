@@ -131,6 +131,8 @@ scripts/New-MIRCompatibilityPack.ps1
 
 `Export-MIRPlannerSnapshot.ps1` converts one or more MIR audit logs into a deterministic target/source/archive-bound JSON snapshot with separate plan and coverage rows. `Compare-MIRPlannerSnapshots.ps1` reports added, removed, and changed plan identities and can require different target profiles for a target-plan diff. `Minimize-MIRPlannerSnapshot.ps1` extracts the rows tied to named recipes, streams, rules, capabilities, or subjects for a focused fixture packet. `New-MIRCompatibilityPack.ps1` creates a non-public, review-required schema-2 pack scaffold and refuses to overwrite an existing file. Static validation runs `Test-MIRPlannerTools.ps1` against all five workflows.
 
+`Invoke-MIRValidation.ps1` builds MIR once and uses that exact ZIP for every runtime scenario. Schema-3 scenario records own fixtures, settings, source mode, timeouts, tags, isolation, and assertion contracts. Use `-List`, `-Scenario`, `-Group`, or `-Tag` for focused work; `-Tier smoke` for the mandatory smoke set; and `-ChangedSince <commit> -Tier impacted` for `.mir/test-impact.yml` selection plus the exact-package baseline. `-MaxParallel 2` or `4` runs selected runtime scenarios in isolated write-data directories with longest-duration-first scheduling while result rows remain name ordered. Full release runs remain complete and do not reuse outcomes.
+
 Example target-plan workflow:
 
 ```powershell

@@ -1,3 +1,27 @@
+function Initialize-MIRSettingsOverrideMod {
+  param([Parameter(Mandatory)][string]$ModsDir)
+
+  $path = Join-Path $ModsDir "mir-validation-settings-overrides"
+  New-Item -ItemType Directory -Force -Path $path | Out-Null
+  @{
+    name = "mir-validation-settings-overrides"
+    version = "0.1.0"
+    title = "MIR Validation Settings Overrides"
+    author = "MIR validation harness"
+    factorio_version = "2.1"
+    dependencies = @("more-infinite-research")
+  } | ConvertTo-Json -Depth 4 | Set-Content -LiteralPath (Join-Path $path "info.json") -Encoding UTF8
+  @'
+local function override(name, value)
+  for _, prototype_type in ipairs({"bool-setting", "string-setting", "int-setting", "double-setting"}) do
+    local prototype = data.raw[prototype_type] and data.raw[prototype_type][name]
+    if prototype then prototype.default_value = value; return end
+  end
+  error("MIR validation override references missing startup setting " .. name)
+end
+'@ | Set-Content -LiteralPath (Join-Path $path "settings-updates.lua") -Encoding UTF8
+}
+
 function Enable-CopiedDiagnostics {
   param([string]$ModsDir)
   Set-CopiedStartupSettingDefault -ModsDir $ModsDir -Name "mir-debug-generation-report" -ValueLiteral "true"
@@ -15,18 +39,12 @@ function Set-CopiedStartupSettingDefault {
     [string]$ValueLiteral
   )
 
-  $overridePath = Join-Path $ModsDir "more-infinite-research\prototypes\mir\settings\test_overrides.lua"
+  $overridePath = Join-Path $ModsDir "mir-validation-settings-overrides\settings-updates.lua"
   if (-not (Test-Path -LiteralPath $overridePath -PathType Leaf)) {
-    throw "Unable to find declarative settings override module."
+    throw "Unable to find validation settings override fixture."
   }
   $escapedNameLiteral = $Name.Replace("\", "\\").Replace('"', '\"')
-  $declaration = "overrides[`"$escapedNameLiteral`"] = $ValueLiteral`r`n"
-  $text = Get-Content -Raw -LiteralPath $overridePath
-  if (-not $text.Contains("return overrides")) {
-    throw "Declarative settings override module is missing its return marker."
-  }
-  $text = $text.Replace("return overrides", $declaration + "return overrides")
-  Set-Content -LiteralPath $overridePath -Value $text -Encoding UTF8
+  Add-Content -LiteralPath $overridePath -Value "override(`"$escapedNameLiteral`", $ValueLiteral)" -Encoding UTF8
 }
 
 function Set-CopiedGeneratedStartupSettingDefault {

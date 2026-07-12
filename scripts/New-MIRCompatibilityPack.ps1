@@ -19,6 +19,8 @@ $pack = [ordered]@{
   science_roles = @()
   owner_claims = [ordered]@{}
   risk_overrides = @()
+  family_authorizations = @()
+  candidate_seeds = @()
   targets = [ordered]@{ factorio_lines = @($FactorioLines | Sort-Object -Unique) }
   evidence = [ordered]@{ fixtures = @(); real_mod = @() }
   claim = [ordered]@{ level = "diagnostic-only"; public = $false }

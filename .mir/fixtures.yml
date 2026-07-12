@@ -2,8 +2,27 @@ schema: 1
 
 scenario_manifest:
   path: fixtures/compat-matrix/expected-scenarios.json
-  schema: 2
+  schema: 3
   declarations: full-records
+  record_owns:
+    - fixtures
+    - settings
+    - source_mode
+    - timeout_seconds
+    - tags
+    - isolation
+    - assertions
+
+test_impact_manifest:
+  path: .mir/test-impact.yml
+  schema: 1
+  baseline: exact-package-smoke
+  selector: scripts/Invoke-MIRValidation.ps1
+
+compiler_contract_coverage:
+  path: .mir/compiler-contract-coverage.yml
+  schema: 1
+  validator: scripts/Test-MIRCompilerContractCoverage.ps1
 
 local_campaign_manifest:
   path: fixtures/compat-matrix/local-library-scenarios.json
@@ -301,6 +320,11 @@ fixtures:
       - module-tier-attachment
       - existing-stable-stream-only
       - safe-generate-gated-lab-manufacturing
+      - finite-owner-does-not-block-auto-attach
+      - pack-hard-gate-cannot-override-productivity-false
+      - pack-hard-gate-cannot-override-recycling
+      - compatibility-pack-production-integration
+      - reviewed-candidate-seeding
 
   compiler-contracts:
     requires_features: [recipe_productivity]
@@ -315,9 +339,15 @@ fixtures:
       - compatibility-pack-any-all-none-and-version-range-filtering
       - compatibility-pack-refinement-consumption
       - compatibility-pack-science-role-consumption
+      - pack-reviewed-override-requires-exact-selector
+      - pack-evidence-id-must-exist
+      - exact-pack-family-authorization
       - stable-generation-plan-identities
       - evidence-bearing-generation-plan-gates
       - duplicate-materialized-effect-rejection
+      - compilation-plan-cross-collision
+      - output-effect-value-parity
+      - base-extension-output-parity
       - final-plan-output-owner-parity
       - insertion-order-independent-plan-fingerprints
       - cyclic-fingerprint-rejection
@@ -333,6 +363,19 @@ fixtures:
       - predeclared-settings-stage-mode
       - full-recipe-coverage-accounting
       - coverage-artifact-fingerprint
+
+  semantic-family-modes:
+    requires_features: [recipe_productivity]
+    path: fixtures/semantic-family-attach
+    assertion_paths:
+      - fixtures/assert-semantic-family-off
+      - fixtures/assert-semantic-family-report
+      - fixtures/assert-semantic-family-exact-pack
+    validates:
+      - all-automatic-modes
+      - exact-pack-family-authorization
+      - exact-pack-safe-attachment-baseline
+      - unrelated-pack-family-remains-disabled
 
   synthetic-scale-graph:
     requires_features: [recipe_productivity]

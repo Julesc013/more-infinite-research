@@ -25,6 +25,7 @@ This is the executable release queue. `.mir/release-wave.yml` is the machine-rea
 - [x] Positive TargetProfileV2 and declaration-owned setting requirements.
 - [x] FamilyRule schema 2 with structural selectors, hard safety requirements, risk denials, ownership, science, prerequisites, targets, and claims.
 - [x] CompatibilityPack schema 2 with operational applicability groups, aliases, exact selectors, family hints, science roles, owner claims, reviewed-risk boundaries, and precedence.
+- [x] Non-overridable hard CompatibilityPack blockers, explicit family/stream authorization for exact recipes, and provenance-bound candidate seeding.
 - [x] Structural attachment for modules, loaders, belts, drills, inserters, furnaces, assembling machines, labs, and solar/storage families.
 - [x] Reviewed stable generic assembler and lab identities behind `safe-generate`; default remains `safe-attach`.
 - [x] Stable generated-ID manifest and golden checks for 70 existing plus two reviewed family identities.
@@ -33,6 +34,8 @@ This is the executable release queue. `.mir/release-wave.yml` is the machine-rea
 - [x] Auditable scale counts and a real 1,000-recipe, 1,000-technology, 10,000-effect synthetic gate.
 - [x] Dependency-ordered command graph and deterministic package construction.
 - [x] Command-DAG orchestration, pre-emission base-continuation planning, duplicate semantic-effect rejection, and final plan/output owner parity.
+- [x] CompilationPlan schema 2 global finalization with source/base/operation fingerprints and numeric, effect, prerequisite, science, generated-registry, and base-mutation output parity.
+- [x] Runtime scenario schema 3 with exact-package reuse, scenario/group/tag/tier/impact selection, isolated parallel execution, structured assertions, and failure packets.
 - [x] Exact-archive load characterization for AAI, BZ, Bob, Krastorio base, and K2SO at `loads` claim level only.
 
 ### Required Before Candidate Freeze
@@ -67,7 +70,7 @@ This is the executable release queue. `.mir/release-wave.yml` is the machine-rea
 - [x] Preserve `loads`, `observed`, `cooperates`, partial-family, and full-family claim boundaries; inventory never counts as proof.
 - [ ] Interactive settings, locale, icon, technology-tree, save-load, and balance review on the exact candidate.
 - [x] Preserve the superseded RC2-RC5 archives, release notes, migration guide, validation summaries, upgrade proof, campaign lock/evidence, and pending identity-bound GUI packet as historical evidence.
-- [ ] Bind a clean RC6 candidate commit, package, validation summary, upgrade proof, ecosystem campaign, and fresh pending-interactive packet.
+- [ ] Bind a clean hardened candidate commit, package, `89/89` validation summary, upgrade proof, ecosystem campaign, and fresh interactive decision packet.
 - [ ] Complete and bind the GUI review without rebuilding the archive.
 - [x] Revalidate the unchanged planet-safe package after campaign evidence is hardened so unresolved roots cannot report a passing claim row.
 - [x] Rebuild and requalify after the representative planet cluster exposed a generated base extension anchored to a disabled prerequisite chain.

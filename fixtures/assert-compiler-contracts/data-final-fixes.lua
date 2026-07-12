@@ -5,6 +5,8 @@ local pack_schema = require("__more-infinite-research__.prototypes.mir.compatibi
 local pack_registry = require("__more-infinite-research__.prototypes.mir.compatibility.packs.registry")
 local precedence = require("__more-infinite-research__.prototypes.mir.compatibility.packs.precedence")
 local generation_plan = require("__more-infinite-research__.prototypes.mir.planner.generation_plan")
+local compilation_plan = require("__more-infinite-research__.prototypes.mir.planner.compilation_plan")
+local output_validator = require("__more-infinite-research__.prototypes.mir.planner.output_validator")
 
 local function fail(message)
   error("MIR compiler contract validation failed: " .. message)
@@ -29,6 +31,8 @@ local function valid_pack(id, line, mod_id, version)
     science_roles = {},
     owner_claims = {},
     risk_overrides = {},
+    family_authorizations = {},
+    candidate_seeds = {},
     targets = {factorio_lines = {line}},
     evidence = {fixtures = {"assert-compiler-contracts"}, real_mod = {}},
     claim = {level = "fixture-only", public = false}
@@ -85,8 +89,14 @@ local public_fixture_pack = deepcopy(base_pack)
 public_fixture_pack.claim.public = true
 expect_error("public fixture-only CompatibilityPack", "fixture-only packs cannot publish a claim", function() pack_schema.validate(public_fixture_pack) end)
 local unsafe_override_pack = deepcopy(base_pack)
-unsafe_override_pack.risk_overrides = {{risk = "recycling_loop", action = "allow-reviewed", evidence = {}}}
-expect_error("unreviewed CompatibilityPack override", "allow-reviewed risk overrides require named evidence", function() pack_schema.validate(unsafe_override_pack) end)
+unsafe_override_pack.risk_overrides = {{recipe = "recycle-x", risk = "recycling_recipe", action = "allow-reviewed", evidence = {"assert-compiler-contracts"}}}
+expect_error("hard CompatibilityPack override", "allow-reviewed cannot override hard risk", function() pack_schema.validate(unsafe_override_pack) end)
+local broad_override_pack = deepcopy(base_pack)
+broad_override_pack.risk_overrides = {{risk = "hidden_recipe", action = "allow-reviewed", evidence = {"assert-compiler-contracts"}}}
+expect_error("broad CompatibilityPack override", "require an exact recipe selector", function() pack_schema.validate(broad_override_pack) end)
+local unknown_evidence_pack = deepcopy(base_pack)
+unknown_evidence_pack.risk_overrides = {{recipe = "hidden-x", risk = "hidden_recipe", action = "allow-reviewed", evidence = {"missing-proof"}}}
+expect_error("unknown CompatibilityPack evidence", "references unknown evidence", function() pack_schema.validate(unknown_evidence_pack) end)
 
 local compiled = pack_registry.compile({
   ["pack-z"] = valid_pack("pack-z", "2.1", "test-mod", "1.0.0"),
@@ -106,20 +116,32 @@ local ranged = pack_registry.compile({[ranged_pack.id] = ranged_pack}, {
 })
 if #ranged ~= 1 then fail("CompatibilityPack mods_all/mods_none or version-range applicability failed") end
 
-local operational_pack = valid_pack("pack-operational", "2.1", "test-mod", "1.0.0")
+local operational_pack = valid_pack("pack-operational", "2.1", "test-mod", "= 1.0.0")
 operational_pack.exact.excludes = {{recipe = "blocked-recipe", reason = "reviewed-deny"}}
 operational_pack.exact.includes = {{recipe = "included-recipe", family = "assembler", change = 0.03}}
 operational_pack.aliases = {['aliased-item'] = {family = "assembler", change = 0.02}}
 operational_pack.family_hints = {{recipe = "hinted-recipe", family = "assembler", change = 0.04}}
 operational_pack.science_roles = {{stream = "research_auto_assembling_machine", pack = "automation-science-pack", role = "include"}}
-operational_pack.risk_overrides = {{recipe = "reviewed-recipe", risk = "recycling_recipe", action = "allow-reviewed", evidence = {"compiler-contracts"}}}
+operational_pack.risk_overrides = {{recipe = "reviewed-recipe", risk = "hidden_recipe", action = "allow-reviewed", evidence = {"assert-compiler-contracts"}}}
+operational_pack.family_authorizations = {{family = "assembling-machine-manufacturing", stream = "research_auto_assembling_machine", action = "generate", evidence = {"assert-compiler-contracts"}, claim_boundary = "fixture-only"}}
+operational_pack.candidate_seeds = {{recipe = "seeded-recipe", item = "seeded-item", family = "assembling-machine-manufacturing", stream = "research_auto_assembling_machine", change = 0.02, evidence = {"assert-compiler-contracts"}}}
 local active_operational = {pack_schema.validate(operational_pack)}
 local excluded = pack_registry.resolve_candidate({recipe = "blocked-recipe", item = "x", family = "assembler", stream = "s"}, active_operational)
 if excluded.action ~= "diagnose" then fail("CompatibilityPack exact exclude did not affect candidate resolution") end
 local included = pack_registry.resolve_candidate({recipe = "included-recipe", item = "x", family = "assembler", stream = "s"}, active_operational)
 if included.action ~= "attach" or included.change ~= 0.03 then fail("CompatibilityPack exact include did not affect candidate resolution") end
-local reviewed = pack_registry.resolve_candidate({recipe = "reviewed-recipe", item = "x", family = "assembler", stream = "s", blocker = "recycling_recipe"}, active_operational)
+local reviewed = pack_registry.resolve_candidate({recipe = "reviewed-recipe", item = "x", family = "assembler", stream = "s", blocker = "hidden_recipe"}, active_operational)
 if reviewed.action ~= "attach" then fail("CompatibilityPack reviewed risk override did not affect candidate resolution") end
+local hard_denied = pack_registry.resolve_candidate({recipe = "reviewed-recipe", item = "x", family = "assembler", stream = "s", blocker = "recycling_recipe"}, active_operational)
+if hard_denied.action ~= "diagnose" then fail("CompatibilityPack bypassed a hard blocker") end
+local malicious_pack = deepcopy(operational_pack)
+malicious_pack.risk_overrides = {{recipe = "reviewed-recipe", risk = "recycling_recipe", action = "allow-reviewed", evidence = {"assert-compiler-contracts"}}}
+local malicious_denied = pack_registry.resolve_candidate({recipe = "reviewed-recipe", item = "x", family = "assembler", stream = "s", blocker = "recycling_recipe"}, {malicious_pack})
+if malicious_denied.action ~= "diagnose" then fail("registry hard-safety sentinel accepted unvalidated malicious pack data") end
+local authorization = pack_registry.authorizes_family_stream("research_auto_assembling_machine", "assembling-machine-manufacturing", active_operational)
+if not authorization or authorization.pack ~= "pack-operational" then fail("exact-pack family authorization was not resolved") end
+local seeds = pack_registry.candidate_seeds(active_operational)
+if #seeds ~= 1 or seeds[1].recipe ~= "seeded-recipe" then fail("CompatibilityPack candidate seed was not resolved") end
 local roles = pack_registry.science_roles_for_stream("research_auto_assembling_machine", active_operational)
 if #roles ~= 1 or roles[1].pack ~= "automation-science-pack" then fail("CompatibilityPack science role was not consumed") end
 expect_error("CompatibilityPack transport identity", "transport key must match pack id", function()
@@ -158,6 +180,21 @@ plan_b:add(skip_row("a-stream", "a-id"))
 plan_b:add(skip_row("z-stream", "z-id"))
 plan_b:finalize()
 if plan_a.plan_fingerprint ~= plan_b.plan_fingerprint then fail("GenerationPlan fingerprint depends on insertion or map order") end
+for seed = 1, 8 do
+  local rows = {skip_row("property-a", "property-a"), skip_row("property-b", "property-b"), skip_row("property-c", "property-c")}
+  for index = #rows, 2, -1 do
+    local target = ((seed * 17 + index * 13) % index) + 1
+    rows[index], rows[target] = rows[target], rows[index]
+  end
+  local property_plan = generation_plan.new({source_fingerprints = {facts = "f", rules = "r"}})
+  for _, row in ipairs(rows) do property_plan:add(row) end
+  property_plan:finalize()
+  if seed == 1 then
+    plan_a.property_fingerprint = property_plan.plan_fingerprint
+  elseif plan_a.property_fingerprint ~= property_plan.plan_fingerprint then
+    fail("property test found insertion-order-dependent plan fingerprint")
+  end
+end
 if plan_a:snapshot()[1].stream_key ~= "a-stream" then fail("GenerationPlan rows are not stably sorted") end
 local duplicate_plan = generation_plan.new()
 duplicate_plan:add(skip_row("same", "id-a"))
@@ -180,6 +217,43 @@ local duplicate_effect_plan = generation_plan.new()
 duplicate_effect_plan:add(emitted_row("effect-a", "effect-tech-a"))
 duplicate_effect_plan:add(emitted_row("effect-b", "effect-tech-b"))
 expect_error("duplicate materialized effect", "duplicate materialized effect identity", function() duplicate_effect_plan:finalize() end)
+
+local collision_plan = generation_plan.new()
+collision_plan:add(emitted_row("collision-stream", "collision-tech"))
+collision_plan:finalize()
+expect_error("CompilationPlan cross collision", "technology-name collision", function()
+  compilation_plan.finalize(collision_plan, {{
+    operation = "emit_base_extension",
+    key = "collision-base",
+    technology_name = "collision-tech",
+    technology = {name = "collision-tech", effects = {}, prerequisites = {}, unit = {ingredients = {}, count_formula = "1", time = 1}, max_level = "infinite"}
+  }})
+end)
+expect_error("CompilationPlan missing prerequisite sentinel", "prerequisite target is missing", function()
+  compilation_plan.finalize(generation_plan.new():finalize(), {{
+    operation = "emit_base_extension",
+    key = "missing-prerequisite",
+    technology_name = "missing-prerequisite-tech",
+    technology = {name = "missing-prerequisite-tech", effects = {}, prerequisites = {"definitely-missing-technology"}, unit = {ingredients = {}, count_formula = "1", time = 1}, max_level = "infinite"}
+  }})
+end)
+
+expect_error("output effect numeric parity", "numeric effect value differs", function()
+  output_validator.assert_effects(
+    {{type = "change-recipe-productivity", recipe = "iron-gear-wheel", change = 0.02}},
+    {{type = "change-recipe-productivity", recipe = "iron-gear-wheel", change = 0.01}},
+    "numeric-parity-test",
+    true
+  )
+end)
+
+expect_error("base extension output parity", "prerequisites differs", function()
+  output_validator.assert_technology_shape(
+    {effects = {}, prerequisites = {"automation"}, unit = {ingredients = {{"automation-science-pack", 1}}, count_formula = "100", time = 30}, max_level = "infinite", upgrade = true},
+    {effects = {}, prerequisites = {}, unit = {ingredients = {{"automation-science-pack", 1}}, count_formula = "100", time = 30}, max_level = "infinite", upgrade = true},
+    "base-parity-test"
+  )
+end)
 
 if fingerprint.of({b = 2, a = 1}) ~= fingerprint.of({a = 1, b = 2}) then fail("map fingerprint is iteration-order dependent") end
 local cyclic = {}; cyclic.self = cyclic
