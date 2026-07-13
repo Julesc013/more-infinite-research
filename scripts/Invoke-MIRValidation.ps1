@@ -2914,13 +2914,13 @@ function Assert-DefaultBaseExtensionDiagnostics {
   }
 }
 
-function Assert-SpaceAgeVanillaOwnedProductivityStreamsSkipped {
+function Assert-SpaceAgeVanillaOwnedProductivityStreamsBound {
   param([string]$Context)
 
   foreach ($vanillaOwnedStream in $spaceAgeVanillaOwnedProductivityStreams) {
     $vanillaOwnedLine = Get-LastStreamReportLine -Key $vanillaOwnedStream
-    if ($vanillaOwnedLine -notmatch "status=skipped" -or $vanillaOwnedLine -notmatch "covered_by_existing_infinite_recipe_productivity") {
-      throw "$Context should skip vanilla-owned productivity instead of generating a parallel MIR technology: $vanillaOwnedLine"
+    if ($vanillaOwnedLine -notmatch "status=adopted" -or $vanillaOwnedLine -notmatch "reason=preserve_native_owner") {
+      throw "$Context should preserve the vanilla owner instead of generating a parallel MIR technology: $vanillaOwnedLine"
     }
   }
 }
@@ -3950,7 +3950,7 @@ Invoke-RuntimeScenario -ScenarioName "space-age-generation-integrity" -EnabledFi
   "mir-fixture-assert-generation-integrity",
   "mir-fixture-assert-hidden-setting-readability"
 ) -EnableSpaceAge
-Assert-SpaceAgeVanillaOwnedProductivityStreamsSkipped -Context "Space Age generation integrity scenario"
+Assert-SpaceAgeVanillaOwnedProductivityStreamsBound -Context "Space Age generation integrity scenario"
 Assert-DefaultBaseExtensionDiagnostics -Context "Space Age generation integrity scenario"
 $spaceAgeRailsLine = Get-LastStreamReportLine -Key "research_rails"
 Assert-ReportLineContains -Line $spaceAgeRailsLine -Expected "effects=3" -Context "Space Age Elevated Rails productivity scenario"
@@ -4099,7 +4099,7 @@ Invoke-RuntimeScenario -ScenarioName "space-age-generation-integrity-inserter-en
 ) -EnabledBaseExtensionKeys @(
   "inserter-capacity-bonus"
 ) -EnableSpaceAge
-Assert-SpaceAgeVanillaOwnedProductivityStreamsSkipped -Context "Space Age generation integrity with inserter enabled scenario"
+Assert-SpaceAgeVanillaOwnedProductivityStreamsBound -Context "Space Age generation integrity with inserter enabled scenario"
 Assert-DefaultBaseExtensionDiagnostics -Context "Space Age generation integrity with inserter enabled scenario" -InserterCapacityEnabled
 
 Invoke-RuntimeScenario -ScenarioName "space-age-space-promethium-pack-policy" -EnabledFixtureNames @() -SciencePackIngredientPolicy "space-and-promethium" -EnableSpaceAge
