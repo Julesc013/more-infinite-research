@@ -1109,3 +1109,10 @@ docs:
     doc_type: how-to
     owner: mir-maintainers
     source_of_truth_for: []
+  - path: docs/releases/0.7.0-release-packet.md
+    title: "MIR 0.7.0 Release Packet"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for: [mir-0.7.0-release-packet]
