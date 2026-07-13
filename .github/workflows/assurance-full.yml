@@ -13,6 +13,11 @@ on:
       prior_release:
         description: "Trusted runner path to the exact prior-release archive"
         required: true
+      force_rerun:
+        description: "Ignore reusable evidence and execute every full-profile lane"
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -26,16 +31,52 @@ jobs:
         with:
           ref: ${{ inputs.candidate_sha }}
           fetch-depth: 0
+
       - name: Reject dirty or mismatched source
         shell: pwsh
         run: |
           if ((git rev-parse HEAD).Trim() -ne '${{ inputs.candidate_sha }}') { throw 'Candidate commit mismatch.' }
           if (git status --porcelain --untracked-files=all) { throw 'Candidate checkout is dirty.' }
+
+      - name: Prepare assurance cache directories
+        shell: pwsh
+        run: New-Item -ItemType Directory -Force artifacts/assurance/evidence, artifacts/assurance/builds | Out-Null
+
+      - name: Restore trusted exact-input evidence
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            artifacts/assurance/evidence
+            artifacts/assurance/builds
+          key: mir-assurance-v2-runtime-${{ inputs.target }}-${{ runner.os }}-${{ inputs.candidate_sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: |
+            mir-assurance-v2-runtime-${{ inputs.target }}-${{ runner.os }}-
+
       - name: Qualify one exact artifact
         shell: pwsh
         env:
           FACTORIO_BIN: ${{ secrets.FACTORIO_BIN }}
-        run: ./scripts/mir.ps1 assurance qualify --target '${{ inputs.target }}' --profile full --factorio $env:FACTORIO_BIN --prior '${{ inputs.prior_release }}' --output artifacts/assurance/qualification-summary.json
+        run: |
+          $arguments = @(
+            "assurance", "qualify",
+            "--target", "${{ inputs.target }}",
+            "--profile", "full",
+            "--factorio", $env:FACTORIO_BIN,
+            "--prior", "${{ inputs.prior_release }}",
+            "--output", "artifacts/assurance/qualification-summary.json"
+          )
+          if ("${{ inputs.force_rerun }}" -eq "true") { $arguments += "--no-reuse" }
+          & ./scripts/mir.ps1 @arguments
+
+      - name: Save successful and partial trusted evidence
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            artifacts/assurance/evidence
+            artifacts/assurance/builds
+          key: mir-assurance-v2-runtime-${{ inputs.target }}-${{ runner.os }}-${{ inputs.candidate_sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+
       - uses: actions/upload-artifact@v4
         if: always()
         with:

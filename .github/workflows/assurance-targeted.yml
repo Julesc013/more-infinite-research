@@ -13,6 +13,10 @@ on:
         description: "Factorio target line"
         required: true
         default: "2.0"
+      rerun_test:
+        description: "Optional stable test ID to force while reusing every other valid lane"
+        required: false
+        default: ""
 
 permissions:
   contents: read
@@ -26,17 +30,56 @@ jobs:
         with:
           ref: ${{ inputs.candidate_sha }}
           fetch-depth: 0
-      - name: Build exact candidate once
+
+      - name: Prepare assurance cache directories
+        shell: pwsh
+        run: New-Item -ItemType Directory -Force artifacts/assurance/evidence, artifacts/assurance/builds | Out-Null
+
+      - name: Restore trusted exact-input evidence
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            artifacts/assurance/evidence
+            artifacts/assurance/builds
+          key: mir-assurance-v2-runtime-${{ inputs.target }}-${{ runner.os }}-${{ inputs.candidate_sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: |
+            mir-assurance-v2-runtime-${{ inputs.target }}-${{ runner.os }}-
+
+      - name: Build or reuse the exact candidate
         shell: pwsh
         run: ./scripts/mir.ps1 assurance build --target '${{ inputs.target }}' --output artifacts/assurance/build.json
+
       - name: Create impact-selected plan
         shell: pwsh
         run: ./scripts/mir.ps1 assurance plan --target '${{ inputs.target }}' --baseline '${{ inputs.baseline_sha }}' --profile targeted --output artifacts/assurance/plan.json
-      - name: Run selected trusted target gate
+
+      - name: Run invalidated lanes and reuse exact matches
         shell: pwsh
         env:
           FACTORIO_BIN: ${{ secrets.FACTORIO_BIN }}
-        run: ./scripts/mir.ps1 assurance verify --target '${{ inputs.target }}' --baseline '${{ inputs.baseline_sha }}' --profile targeted --factorio $env:FACTORIO_BIN --output artifacts/assurance/verify-summary.json
+        run: |
+          $arguments = @(
+            "assurance", "verify",
+            "--target", "${{ inputs.target }}",
+            "--baseline", "${{ inputs.baseline_sha }}",
+            "--profile", "targeted",
+            "--factorio", $env:FACTORIO_BIN,
+            "--output", "artifacts/assurance/verify-summary.json"
+          )
+          if (-not [string]::IsNullOrWhiteSpace("${{ inputs.rerun_test }}")) {
+            $arguments += @("--rerun", "${{ inputs.rerun_test }}")
+          }
+          & ./scripts/mir.ps1 @arguments
+
+      - name: Save successful and partial trusted evidence
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            artifacts/assurance/evidence
+            artifacts/assurance/builds
+          key: mir-assurance-v2-runtime-${{ inputs.target }}-${{ runner.os }}-${{ inputs.candidate_sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+
       - uses: actions/upload-artifact@v4
         if: always()
         with:
