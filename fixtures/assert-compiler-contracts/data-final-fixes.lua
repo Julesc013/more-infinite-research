@@ -8,6 +8,7 @@ local generation_plan = require("__more-infinite-research__.prototypes.mir.plann
 local compilation_plan = require("__more-infinite-research__.prototypes.mir.planner.compilation_plan")
 local output_validator = require("__more-infinite-research__.prototypes.mir.planner.output_validator")
 local effect_ownership = require("__more-infinite-research__.prototypes.mir.planner.effect_ownership")
+local automatic_compiler_contract = require("__more-infinite-research__.prototypes.mir.settings.automatic_compiler_contract")
 
 local function fail(message)
   error("MIR compiler contract validation failed: " .. message)
@@ -65,6 +66,60 @@ local function skip_row(stream_key, manifest_id)
     }
   }
 end
+
+local function expect_policy(label, values, expected)
+  local actual = automatic_compiler_contract.resolve(values)
+  for field, value in pairs(expected) do
+    if actual[field] ~= value then
+      fail(label .. " expected " .. field .. "=" .. tostring(value) .. " but received " .. tostring(actual[field]))
+    end
+  end
+  return actual
+end
+
+expect_policy("default automatic controls", {}, {
+  action = "apply", create_research = false, require_reviewed_data = true,
+  apply_changes = true, preview = false, source = "controls-v2"
+})
+expect_policy("disabled automatic controls", {action = "disabled"}, {
+  action = "disabled", discover = false, apply_changes = false, source = "controls-v2"
+})
+expect_policy("preview automatic controls", {action = "preview"}, {
+  action = "preview", discover = true, preview = true, apply_changes = false, source = "controls-v2"
+})
+expect_policy("new automatic controls override legacy", {
+  action = "preview", create_research = true, require_reviewed_data = false, legacy_mode = "off"
+}, {
+  action = "preview", create_research = true, require_reviewed_data = false, source = "controls-v2"
+})
+
+local legacy_expectations = {
+  off = {action = "disabled", create_research = false, require_reviewed_data = true},
+  report = {action = "preview", create_research = false, require_reviewed_data = true},
+  ["safe-attach"] = {action = "apply", create_research = false, require_reviewed_data = true},
+  ["exact-pack"] = {action = "apply", create_research = true, require_reviewed_data = true},
+  ["safe-generate"] = {action = "apply", create_research = true, require_reviewed_data = false}
+}
+for mode, expected in pairs(legacy_expectations) do
+  local values = {legacy_mode = mode}
+  if mode == "safe-attach" then values = {} end
+  local policy = expect_policy("legacy automatic mode " .. mode, values, expected)
+  if mode ~= "safe-attach" and policy.source ~= "legacy:" .. mode then
+    fail("legacy automatic mode " .. mode .. " did not use the migration bridge")
+  end
+end
+
+local denied, denied_reason = automatic_compiler_contract.generation_decision(
+  automatic_compiler_contract.resolve({create_research = true}), false)
+if denied or denied_reason ~= "reviewed_compatibility_data_required" then
+  fail("reviewed-data generation gate did not fail closed")
+end
+local approved = automatic_compiler_contract.generation_decision(
+  automatic_compiler_contract.resolve({create_research = true}), true)
+if not approved then fail("reviewed-data generation gate rejected named authorization") end
+local generic = automatic_compiler_contract.generation_decision(
+  automatic_compiler_contract.resolve({create_research = true, require_reviewed_data = false}), false)
+if not generic then fail("registered family module generation was not independently configurable") end
 
 local rules = family_registry.snapshot()
 local reversed = {schema = 2, rules = {}}

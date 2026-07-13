@@ -2,6 +2,7 @@ local D = {}
 local icons = require("prototypes.mir.emit.icon_builder")
 local schema = require("prototypes.mir.core.schema")
 local effective_settings = require("prototypes.mir.settings.effective")
+local automatic_compiler_policy = require("prototypes.mir.settings.automatic_compiler_policy")
 local decision_record = require("prototypes.mir.domain.decisions.decision_record")
 
 local rows = {}
@@ -15,7 +16,7 @@ end
 
 function D.enabled()
   return startup_setting("mir-debug-generation-report") == true
-    or startup_setting("mir-automatic-compiler-mode") == "report"
+    or automatic_compiler_policy.current().preview
 end
 
 function D.recipe_matches_enabled()

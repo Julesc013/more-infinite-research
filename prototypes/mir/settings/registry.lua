@@ -36,8 +36,20 @@ return {
       ui_visibility = { mode = "always" }
     },
     {
-      key = "mir-automatic-compiler-mode",
+      key = "mir-automatic-productivity-action",
       ui_visibility = { mode = "always" }
+    },
+    {
+      key = "mir-automatic-create-research",
+      ui_visibility = { mode = "always" }
+    },
+    {
+      key = "mir-automatic-require-reviewed-data",
+      ui_visibility = { mode = "always" }
+    },
+    {
+      key = "mir-automatic-compiler-mode",
+      ui_visibility = { mode = "hidden" }
     },
     {
       key = "mir-pipeline-extent-multiplier",

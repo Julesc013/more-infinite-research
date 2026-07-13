@@ -2,4 +2,4 @@ local create_research = data.raw["bool-setting"] and data.raw["bool-setting"]["m
 local require_reviewed = data.raw["bool-setting"] and data.raw["bool-setting"]["mir-automatic-require-reviewed-data"]
 if not create_research or not require_reviewed then error("missing automatic research controls") end
 create_research.default_value = true
-require_reviewed.default_value = false
+require_reviewed.default_value = true

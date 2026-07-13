@@ -3,6 +3,7 @@ local defaults = require("prototypes.mir.settings.defaults")
 local pipeline_extent_settings = require("prototypes.mir.settings.pipeline_extent")
 local prototype_limit_settings = require("prototypes.mir.settings.prototype_limits")
 local effect_contracts = require("prototypes.mir.settings.effect_contracts")
+local automatic_compiler_contract = require("prototypes.mir.settings.automatic_compiler_contract")
 local setting_order = require("prototypes.mir.settings.order")
 local target_line = require("prototypes.mir.platform.factorio.target_line")
 local deepcopy = require("prototypes.mir.core.deepcopy")
@@ -144,17 +145,6 @@ function M.global_setting_prototypes()
       localised_description = {"mod-setting-description.mir-lab-incompatibility-policy"}
     },
     {
-      type = "string-setting",
-      name = "mir-automatic-compiler-mode",
-      setting_type = "startup",
-      default_value = "safe-attach",
-      allowed_values = {"off", "report", "safe-attach", "exact-pack", "safe-generate"},
-      order = setting_order.global("main", 35),
-      targets = {requires_features = {"recipe_productivity"}, required_effect_types = {}},
-      localised_name = {"mod-setting-name.mir-automatic-compiler-mode"},
-      localised_description = {"mod-setting-description.mir-automatic-compiler-mode"}
-    },
-    {
       type = "bool-setting",
       name = "mir-prefer-this-mod-for-competing-techs",
       setting_type = "startup",
@@ -195,6 +185,15 @@ function M.global_setting_prototypes()
       localised_description = {"mod-setting-description.mir-pipeline-extent-multiplier"}
     }
   }
+
+  for _, setting in ipairs(automatic_compiler_contract.setting_specs({
+    action = setting_order.global("main", 32),
+    create_research = setting_order.global("main", 34),
+    require_reviewed_data = setting_order.global("main", 36),
+    legacy_mode = setting_order.global("main", 38)
+  })) do
+    table.insert(out, setting)
+  end
 
   for _, setting in ipairs(prototype_limit_settings.setting_prototypes()) do
     table.insert(out, setting)

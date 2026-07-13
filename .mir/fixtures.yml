@@ -100,6 +100,7 @@ fixtures:
     validates:
       - hidden-setting-readability
       - stable-setting-ids
+      - hidden-legacy-automatic-compiler-setting
 
   prototype-limits:
     requires_features: [prototype_limits]
@@ -216,6 +217,8 @@ fixtures:
       - all-default-effect-settings-compact-omission
       - effect-setting-numeric-bound-rejection
       - settings-catalog-copy-isolation
+      - automatic-controls-profile-roundtrip
+      - hidden-legacy-automatic-mode-profile-roundtrip
 
   reduced-settings-surface:
     requires_features: []
@@ -307,6 +310,60 @@ fixtures:
       - module-tier-attachment
       - existing-stable-stream-only
       - safe-generate-gated-lab-manufacturing
+      - finite-owner-does-not-block-auto-attach
+      - pack-hard-gate-cannot-override-productivity-false
+      - pack-hard-gate-cannot-override-recycling
+      - compatibility-pack-production-integration
+      - reviewed-candidate-seeding
+
+  compiler-contracts:
+    requires_features: [recipe_productivity]
+    assertion_path: fixtures/assert-compiler-contracts
+    validates:
+      - invalid-family-rule-rejection
+      - invalid-compatibility-pack-rejection
+      - stable-rule-and-pack-sorting
+      - deterministic-rule-precedence
+      - equal-precedence-conflict-rejection
+      - compatibility-pack-target-and-applicability-filtering
+      - compatibility-pack-any-all-none-and-version-range-filtering
+      - compatibility-pack-refinement-consumption
+      - compatibility-pack-science-role-consumption
+      - pack-reviewed-override-requires-exact-selector
+      - pack-evidence-id-must-exist
+      - exact-pack-family-authorization
+      - stable-generation-plan-identities
+      - evidence-bearing-generation-plan-gates
+      - duplicate-materialized-effect-rejection
+      - deterministic-cross-stream-effect-arbitration
+      - same-stream-duplicate-effect-rejection-after-arbitration
+      - adoption-wins-over-generated-effect-claim
+      - partial-loser-retains-unique-effects
+      - insertion-order-independent-effect-ownership
+      - compilation-plan-cross-collision
+      - output-effect-value-parity
+      - base-extension-output-parity
+      - final-plan-output-owner-parity
+      - insertion-order-independent-plan-fingerprints
+      - cyclic-fingerprint-rejection
+      - automatic-control-schema-2-defaults
+      - automatic-action-disabled-preview-apply
+      - independent-research-creation-control
+      - independent-reviewed-data-control
+      - all-legacy-mode-policy-mappings
+      - explicit-new-controls-win-over-legacy
+      - reviewed-data-generation-fails-closed
+      - registered-family-generation-remains-extensible
+
+  space-age-galore-effect-ownership:
+    requires_features: [recipe_productivity]
+    path: fixtures/space-age-galore-overlap
+    validates:
+      - vgal-coal-crushing-multi-output-shape
+      - carbon-and-sulfur-cross-stream-claim
+      - exactly-one-materialized-effect-owner
+      - stable-owner-selection
+      - no-settings-reset-required
 
   semantic-family-generate:
     requires_features: [recipe_productivity]
@@ -319,6 +376,20 @@ fixtures:
       - predeclared-settings-stage-mode
       - full-recipe-coverage-accounting
       - coverage-artifact-fingerprint
+
+  semantic-family-modes:
+    requires_features: [recipe_productivity]
+    path: fixtures/semantic-family-attach
+    assertion_paths:
+      - fixtures/assert-semantic-family-off
+      - fixtures/assert-semantic-family-report
+      - fixtures/assert-semantic-family-exact-pack
+    validates:
+      - all-automatic-actions
+      - independent-creation-and-review-controls
+      - reviewed-data-family-authorization
+      - reviewed-data-safe-attachment-baseline
+      - unrelated-pack-family-remains-disabled
 
   synthetic-scale-graph:
     requires_features: [recipe_productivity]

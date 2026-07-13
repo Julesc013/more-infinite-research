@@ -45,6 +45,6 @@ for _, technology_name in ipairs({
   "mir-auto-prod-manufacturing-lab-1"
 }) do
   if data.raw.technology and data.raw.technology[technology_name] then
-    fail("safe-attach default emitted generated family technology " .. technology_name)
+    fail("attachment-only default emitted generated family technology " .. technology_name)
   end
 end

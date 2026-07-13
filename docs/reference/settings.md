@@ -29,7 +29,7 @@ ips-research-time-<stream>
 ips-effect-per-level-<stream>
 ```
 
-MIR uses `hidden = true` only for provider-specific or unsupported stream settings. It does not use `forced_value` for those settings, because the user's saved value should return if the relevant mod or expansion is enabled again.
+MIR uses `hidden = true` for provider-specific or unsupported stream settings and for retained migration-only setting IDs. It does not use `forced_value` for those settings, because saved and imported values must remain readable.
 
 MIR also registers the global startup setting:
 
@@ -39,7 +39,17 @@ mir-settings-profile-import
 
 This setting accepts a portable MIR settings profile string. It is always registered and stays out of profile exports so importing one profile never nests another profile inside it.
 
-`mir-automatic-compiler-mode` is displayed as Mod Recipe Productivity Coverage. It retains the released setting ID, default `safe-attach`, and stable stored values `off`, `report`, `safe-attach`, `exact-pack`, and `safe-generate`. They are presented in that conservative-to-broad order as Disabled, Preview Only, Existing Research (Recommended), Existing + Approved Packs, and Existing + Assembler/Lab. This is an ordered list of mutually exclusive compiler policies, not a numeric strength or experimental-level scale. Preview and disabled modes make no research changes; preview enables decision projection. Existing Research attaches safety-proven family candidates without creating automatic-family technologies. Existing + Approved Packs retains safe attachment and materializes only a family named by active reviewed exact-version pack authorization; an unrelated active pack enables nothing. Existing + Assembler/Lab retains safe attachment and may materialize only the two predeclared manifest-owned generic families. The setting and every dropdown option have outcome-first locale descriptions.
+Automatic productivity support is governed by `prototypes/mir/settings/automatic_compiler_contract.lua`, a pure schema-2 contract with no Factorio-global reads and no mod, recipe, technology, or version names. The visible settings are:
+
+| Setting ID | Type | Default | Contract |
+| --- | --- | --- | --- |
+| `mir-automatic-productivity-action` | string | `apply` | `disabled`, `preview`, or `apply`; ordered by whether changes are made, not by strength or maturity |
+| `mir-automatic-create-research` | boolean | `false` | Allows registered manifest-owned family modules to create stable generic research |
+| `mir-automatic-require-reviewed-data` | boolean | `true` | When creation is enabled, also requires applicable exact-version evidence-backed family authorization |
+
+`apply` attaches only safety-proven family candidates to compatible existing streams. `preview` enables decision projection without attaching or creating. Creation remains independent of action and can materialize only predeclared family identities after every hard gate passes. Disabling the reviewed-data requirement authorizes registered generic family modules; it does not authorize arbitrary technology IDs or bypass target, ownership, productivity, recycling, stochastic-output, catalyst, science, lab, prerequisite, progression, identity, or cycle checks.
+
+The released `mir-automatic-compiler-mode` setting remains registered and hidden with default `safe-attach` and values `off`, `report`, `safe-attach`, `exact-pack`, and `safe-generate`. If all new controls are still at their defaults, a non-default legacy value maps to its equivalent schema-2 policy. Any explicit non-default new control wins. The hidden setting remains profile-exportable and importable so older profiles are not silently discarded.
 
 ## Visibility
 

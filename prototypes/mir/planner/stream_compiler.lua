@@ -24,7 +24,7 @@ local family_registry = require("prototypes.mir.families.registry")
 local fingerprint = require("prototypes.mir.core.fingerprint")
 local recipe_facts = require("prototypes.mir.index.recipe_facts")
 local target_profiles = require("prototypes.mir.platform.factorio.target_profiles")
-local effective_settings = require("prototypes.mir.settings.effective")
+local automatic_compiler_policy = require("prototypes.mir.settings.automatic_compiler_policy")
 local compatibility_packs = require("prototypes.mir.compatibility.packs.registry")
 local effect_ownership = require("prototypes.mir.planner.effect_ownership")
 
@@ -190,8 +190,8 @@ local function skip_row(key, spec, reason, ingredients, effects, lab_status, ext
 end
 
 local function attach_family_recipes(key, buckets)
-  local mode = effective_settings.get("mir-automatic-compiler-mode") or "safe-attach"
-  if mode == "off" or mode == "report" then return buckets end
+  local policy = automatic_compiler_policy.current()
+  if not policy.apply_changes then return buckets end
   local attachments = family_resolver.attachments_for_stream(key)
   if #attachments == 0 then return buckets end
 
@@ -218,13 +218,11 @@ end
 
 local function plan_stream(key, raw_spec)
   if raw_spec.automatic_family then
-    local mode = effective_settings.get("mir-automatic-compiler-mode") or "safe-attach"
-    if mode ~= "safe-generate" and mode ~= "exact-pack" then
-      return skip_row(key, raw_spec, "automatic_family_mode_" .. tostring(mode))
-    end
-    if mode == "exact-pack" and not compatibility_packs.authorizes_family_stream(key) then
-      return skip_row(key, raw_spec, "exact_pack_requires_family_authorization", nil, nil, nil, nil, {
-        target_supported = {evidence = "compatibility-pack-registry:no-family-authorization", reason = "exact_pack_requires_family_authorization"}
+    local authorization = compatibility_packs.authorizes_family_stream(key)
+    local allowed, reason = automatic_compiler_policy.generation_decision(authorization)
+    if not allowed then
+      return skip_row(key, raw_spec, reason, nil, nil, nil, nil, {
+        target_supported = {evidence = "automatic-compiler-policy:" .. reason, reason = reason}
       })
     end
   end

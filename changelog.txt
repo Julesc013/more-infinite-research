@@ -11,6 +11,10 @@ Date: 2026-07-12
     - Retained whole-plan safety checks, deterministic results, and exact-owner protections from the modern source.
     - Fixed the Muluna and Astroponics cycle by removing only Astroponics' circular Space Science prerequisite.
     - Switched prerequisite checks to an iterative graph walk so deep modded technology trees remain safe.
+    - Replaced the automatic compiler preset with separate action and research-creation controls.
+    - Added an independent reviewed-data requirement and outcome-first tooltips.
+    - Added a generic schema-2 automatic compiler policy contract for future registered family modules.
+    - Preserved old automatic compiler profiles through a hidden legacy-policy bridge.
 
 ---------------------------------------------------------------------------------------------------
 Version: 3.1.0
