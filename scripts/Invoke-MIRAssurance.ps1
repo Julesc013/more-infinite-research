@@ -131,7 +131,7 @@ function Get-MIRAssuranceChangedPaths {
 }
 
 function Get-MIRAssuranceClassification {
-  param([Parameter(Mandatory)][string[]]$Paths, [Parameter(Mandatory)]$Config)
+  param([Parameter(Mandatory)][AllowEmptyCollection()][string[]]$Paths, [Parameter(Mandatory)]$Config)
   $classes = @()
   $tests = @()
   $unknown = @()
@@ -166,11 +166,23 @@ function Get-MIRAssurancePlan {
   $classification = Get-MIRAssuranceClassification -Paths $paths -Config $Context.config
   $profile = Get-MIRAssuranceOption -Name "--profile" -Default "auto"
   $profileTests = @($Context.config.profiles.PSObject.Properties[$profile].Value)
-  $testIds = if ($profile -eq "auto") { @($classification.tests) } else { @($profileTests | ForEach-Object { [string]$_ }) }
+  $testIds = @()
+  if ($profile -eq "auto") {
+    $testIds = @($classification.tests)
+  } else {
+    $seenTestIds = @{}
+    foreach ($profileTest in $profileTests) {
+      $profileTestId = [string]$profileTest
+      if (-not $seenTestIds.ContainsKey($profileTestId)) {
+        $seenTestIds[$profileTestId] = $true
+        $testIds += $profileTestId
+      }
+    }
+  }
   $catalogById = @{}
   foreach ($test in $Context.catalog.tests) { $catalogById[[string]$test.id] = $test }
   $expanded = @()
-  foreach ($id in @($testIds | Sort-Object -Unique)) {
+  foreach ($id in $testIds) {
     if ($id -eq "static.full") {
       $expanded += $catalogById[$id]
       continue
