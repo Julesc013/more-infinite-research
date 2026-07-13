@@ -1,10 +1,13 @@
 schema: 1
-updated_at: 2026-07-12
+updated_at: 2026-07-14
 policy:
   published_archives_are_immutable: true
   target_lines_use_independent_binary_evidence: true
   target_local_metadata_never_returns_to_dev: true
   graph_intelligence_starts_after_3_1_and_2_4_are_stable: true
+  native_owner_contract_moves_only_after_preceding_release: true
+  native_owner_backport_ledger: docs/compatibility/native-owner-backport-ledger.md
+  native_owner_forward_port: docs/releases/3.2.0-native-owner-forward-port.md
 
 waves:
   mir_3_0_5:
@@ -121,6 +124,8 @@ waves:
     source_anchor_required: published-3.1.5
     source_anchor_commit: c8bf4a742910cec9d6d3dee305c83deba1aa49eb
     source_commit: pending-native-owner-settings-repair
+    implementation_checkpoint: d1ad340
+    native_owner_balance_authority: .mir/native-owner-cost-models.json
     archive: dist/more-infinite-research_2.4.0.zip
     superseded_pre_native_owner_candidate_commit: a853f88fd2fae19b45a16553e3273a2015283452
     superseded_pre_native_owner_package_source_commit: 5963445b1b72efffc18b232f5367a7da640061e8

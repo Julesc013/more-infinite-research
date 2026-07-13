@@ -32,7 +32,7 @@
     },
     {
       "id": "balance",
-      "patterns": ["^prototypes/mir/planner/costs\\.lua$", "^prototypes/streams/", "^\\.mir/performance-budgets\\.json$"],
+      "patterns": ["^prototypes/mir/planner/costs\\.lua$", "^prototypes/streams/", "^prototypes/mir/domain/native_owner/", "^prototypes/mir/planner/native_owner_binding\\.lua$", "^prototypes/mir/emit/transactions/productivity_family_adoption\\.lua$", "^\\.mir/native-owner-cost-models\\.json$", "^\\.mir/performance-budgets\\.json$"],
       "tests": ["static.balance", "static.compiler", "runtime.affected", "runtime.exact-zip"]
     },
     {

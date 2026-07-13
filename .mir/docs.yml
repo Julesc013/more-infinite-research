@@ -1551,3 +1551,27 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - recipe-coverage-accounting-contract
+  - path: docs/architecture/native-owner-binding.md
+    title: "Native Owner Binding"
+    status: current
+    audience: maintainer
+    doc_type: explanation
+    owner: mir-maintainers
+    source_of_truth_for:
+      - native-owner-binding-contract
+  - path: docs/compatibility/native-owner-backport-ledger.md
+    title: "Native Owner Backport Ledger"
+    status: current
+    audience: release-manager
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - native-owner-backport-sequence
+  - path: docs/releases/3.2.0-native-owner-forward-port.md
+    title: "MIR 3.2.0 Native Owner Forward-Port"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - native-owner-3.2.0-forward-port

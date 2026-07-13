@@ -93,6 +93,27 @@ backport_rules:
       - fixture-update
       - release-note
 
+  native_owner_settings_contract:
+    from: tmp/2.0
+    sequence:
+      - tmp/1.1
+      - tmp/1.0
+      - tmp/0.17
+      - tmp/0.16
+      - tmp/0.15
+      - tmp/0.14
+      - tmp/0.13
+      - tmp/0.12-through-0.6
+      - dev
+    requires:
+      - preceding-target-tagged-and-released
+      - target-owner-discovery
+      - stable-setting-id-review
+      - target-binary-evidence
+      - target-specific-candidate-seal
+    ledger: docs/compatibility/native-owner-backport-ledger.md
+    forward_port: docs/releases/3.2.0-native-owner-forward-port.md
+
   docs_only:
     requires:
       - docs-lint

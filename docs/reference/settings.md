@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: developer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-07-13
+last_reviewed: 2026-07-14
 supersedes: [docs/reference/settings-reference.md]
 superseded_by: []
 ---
@@ -132,7 +132,15 @@ Portable profiles may supply a JSON number instead of a dropdown enum for the nu
 
 The module productivity stream resolves recipe outputs from final `ModulePrototype.tier` values. Tier ranges live in stream data: tier 1 is 10%, tier 2 is 5%, tier 3 is 2%, and tier 4 or later is 1% per research level.
 
-Every generated stream and base continuation also has an `ips-effect-per-level-<stream>` or `mir-effect-per-level-<extension>` setting. The selected value is an anchor, and MIR scales only the numeric effects it emits from the primary/base-tier canonical anchor. Later tiers retain their declared ratios and cannot lower the displayed default merely by being present in the stream contract. Ownership, adoption, and equivalence decisions use unscaled canonical effects; external technologies and adopted owner values are not rewritten.
+Every generated stream and base continuation also has an `ips-effect-per-level-<stream>` or `mir-effect-per-level-<extension>` setting. The selected value is an anchor, and MIR scales only the numeric effects it emits from the primary/base-tier canonical anchor. Later tiers retain their declared ratios and cannot lower the displayed default merely by being present in the stream contract. General ownership, adoption, and equivalence decisions use unscaled canonical effects. Only a declared native-owner binding may configure an external owner, and only under the contract below.
+
+## Native Owner Bindings
+
+The Factorio 2.0 streams `research_processing_unit`, `research_plastic`, `research_low_density_structure`, and `research_rocket_fuel` bind to `processing-unit-productivity`, `plastic-bar-productivity`, `low-density-structure-productivity`, and `rocket-fuel-productivity`. Generated, adopted, already-covered, and fallback outcomes keep the same six `ips-*` setting IDs.
+
+An unchanged setting group produces `preserve_native_owner` and retains the final owner snapshot exactly; MIR's catalog defaults are not applied over a native or modded balance. `ips-enable-<stream> = false` skips owner planning and performs no external mutation. Explicit non-default cost, growth, time, maximum-level, or effect values produce a configuration plan only for a recognized infinite, reachable owner. Effect overrides touch only relevant `change-recipe-productivity` rows and preserve unrelated effects.
+
+Recognized cost shapes are `growth^L*base`, `base*growth^(L-1)`, and fixed count for base-only changes. An unknown formula remains valid for default preservation but rejects explicit cost changes. Plans carry immutable input and expected-output fingerprints, whole-plan validation rejects duplicate owner bindings, and emission verifies the input before applying one transaction. See [native owner binding](../architecture/native-owner-binding.md) and `.mir/native-owner-cost-models.json`.
 
 Scripted multiplier streams use a typed runtime-delta descriptor. Their selected percentage is converted to a delta and added to one, so 2% becomes `1.02` per level rather than multiplying the full canonical `1.01` multiplier.
 

@@ -28,6 +28,7 @@ Usage:
   .\scripts\mir.ps1 audit top25 --space-age
   .\scripts\mir.ps1 package build
   .\scripts\mir.ps1 assurance <doctor|inventory|impact|plan|build|verify|qualify|seal|check-seal|locale|balance|backport|explain>
+  .\scripts\mir.ps1 verify <plan|explain|run|qualify>
   .\scripts\mir.ps1 report latest
   .\scripts\mir.ps1 report missing-deps --run <path>
   .\scripts\mir.ps1 report observations --run <path>
@@ -355,6 +356,18 @@ $area = $Args[0]
 $verb = if ($Args.Count -gt 1) { $Args[1] } else { "" }
 
 switch ($area) {
+  "verify" {
+    $verifyCommand = switch ($verb) {
+      "plan" { "plan" }
+      "explain" { "explain" }
+      "run" { "verify" }
+      "qualify" { "qualify" }
+      default { throw "Unknown verify command: $verb" }
+    }
+    $verifyArgs = @($verifyCommand)
+    if ($Args.Count -gt 2) { $verifyArgs += @($Args[2..($Args.Count - 1)]) }
+    & (Join-Path $scriptRoot "Invoke-MIRAssurance.ps1") @verifyArgs
+  }
   "assurance" {
     $assuranceArgs = if ($Args.Count -gt 1) { @($Args[1..($Args.Count - 1)]) } else { @("help") }
     & (Join-Path $scriptRoot "Invoke-MIRAssurance.ps1") @assuranceArgs

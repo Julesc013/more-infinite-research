@@ -469,12 +469,18 @@ switch ($command) {
     if ($LASTEXITCODE -ne 0) { throw "Locale assurance failed." }
   }
   "balance" {
+    & (Join-Path $repo "scripts\Test-MIRNativeOwnerCostModels.ps1") -RepoRoot $repo
+    if ($LASTEXITCODE -ne 0) { throw "Native-owner balance contract validation failed." }
     $snapshot = [ordered]@{
       schema=1; target=$context.target; version=[string]$context.info.version
       streams_sha256=Get-MIRAssuranceSha256 -Path (Join-Path $repo ".mir\streams.yml")
       generated_stream_manifest_sha256=Get-MIRAssuranceSha256 -Path (Join-Path $repo "prototypes\mir\streams\generated_stream_manifest.json")
       settings_sha256=Get-MIRAssuranceSha256 -Path (Join-Path $repo ".mir\settings.yml")
       planner_costs_sha256=Get-MIRAssuranceSha256 -Path (Join-Path $repo "prototypes\mir\planner\costs.lua")
+      native_owner_cost_models_sha256=Get-MIRAssuranceSha256 -Path (Join-Path $repo ".mir\native-owner-cost-models.json")
+      native_owner_contract_sha256=Get-MIRAssuranceSha256 -Path (Join-Path $repo "prototypes\mir\domain\native_owner\contract.lua")
+      native_owner_formula_adapter_sha256=Get-MIRAssuranceSha256 -Path (Join-Path $repo "prototypes\mir\domain\native_owner\cost_model.lua")
+      native_owner_binding_sha256=Get-MIRAssuranceSha256 -Path (Join-Path $repo "prototypes\mir\planner\native_owner_binding.lua")
     }
     $snapshot.fingerprint = Get-MIRAssuranceTextHash -Text (($snapshot.Values | ForEach-Object { [string]$_ }) -join "`n")
     Write-MIRAssuranceJson -Value $snapshot -DefaultPath "artifacts/assurance/balance-snapshot.json"

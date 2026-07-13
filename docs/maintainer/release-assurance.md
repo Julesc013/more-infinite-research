@@ -23,11 +23,11 @@ MIR release assurance uses an immutable qualified-candidate seal plus dependency
 | Evidence store | Retain complete content-addressed proof | Artifact, binary, harness, fixtures, settings | Evidence capsules | None |
 | Candidate seal | Freeze qualified bytes and proof | Exact ZIP and qualification summary | `SEALED-RC` record | None |
 | Locale validator | Validate catalogs and placeholders | Locale and setting descriptors | Locale evidence | None unless locale is packaged |
-| Balance workbench | Fingerprint progression authorities | Stream, setting, and cost descriptors | Balance snapshot | None |
+| Balance workbench | Fingerprint progression authorities | Stream, setting, cost, and native-owner descriptors | Balance snapshot | None |
 | Runtime harness | Exercise the exact ZIP | Factorio binary, ZIP, fixtures | Runtime evidence | None |
 | CI orchestration | Share one plan across jobs | Assurance plan | Aggregated evidence | None |
 
-The command implementation is `scripts/Invoke-MIRAssurance.ps1`, exposed through `scripts/mir.ps1 assurance`. `.mir/assurance.json` owns change classes and profiles. `.mir/test-catalog.json` owns test IDs, commands, and declared inputs. These tools, manifests, evidence, docs, fixtures, workflows, and candidate seals are excluded from the Factorio release ZIP.
+The command implementation is `scripts/Invoke-MIRAssurance.ps1`, exposed through `scripts/mir.ps1 assurance`. The shorter `scripts/mir.ps1 verify` surface maps `plan`, `explain`, `run`, and `qualify` onto the same assurance implementation and evidence graph; it does not create a second verifier. `.mir/assurance.json` owns change classes and profiles. `.mir/test-catalog.json` owns test IDs, commands, and declared inputs. These tools, manifests, evidence, docs, fixtures, workflows, and candidate seals are excluded from the Factorio release ZIP.
 
 ## Required Runbook
 
@@ -37,7 +37,7 @@ Start every release or backport with:
 ./scripts/mir.ps1 assurance doctor --target 2.0 --factorio 'D:\Programs\Factorio\2.0\bin\x64\factorio.exe'
 ./scripts/mir.ps1 assurance inventory --output artifacts/assurance/inventory.json
 ./scripts/mir.ps1 assurance impact --baseline <qualified-commit> --json
-./scripts/mir.ps1 assurance plan --baseline <qualified-commit> --profile auto --output artifacts/assurance/plan.json
+./scripts/mir.ps1 verify plan --baseline <qualified-commit> --profile auto --output artifacts/assurance/plan.json
 ```
 
 Inspect the plan before executing expensive jobs. Run the plan through `verify`, or use `qualify --profile full` for a release candidate. Recalculate impact after every source change. Rebuild only when a package input changes. Never hand-edit an evidence capsule or seal to green.
@@ -72,7 +72,7 @@ Use `./scripts/mir.ps1 assurance locale` during editing. Candidate qualification
 
 ## Balance Workflow
 
-Use `./scripts/mir.ps1 assurance balance --output artifacts/assurance/balance-snapshot.json` before and after balance work. Review the stream, generated-manifest, setting, and cost fingerprints. An undeclared fingerprint change blocks promotion until the affected streams, scenarios, release notes, and reviewed balance intent agree. Static formula checks speed the loop; they do not replace target runtime evidence or human progression judgment.
+Use `./scripts/mir.ps1 assurance balance --output artifacts/assurance/balance-snapshot.json` before and after balance work. Review the stream, generated-manifest, setting, generated-cost, native-owner source, formula-adapter, binding, and transaction fingerprints. `.mir/native-owner-cost-models.json` records the reviewed Factorio source digest and native values that default-preservation fixtures protect. An undeclared fingerprint change blocks promotion until the affected streams, scenarios, release notes, and reviewed balance intent agree. Static formula checks speed the loop; they do not replace target runtime evidence or human progression judgment.
 
 ## Refactors And Hotfixes
 
@@ -101,7 +101,7 @@ Add a test by assigning a permanent ID in `.mir/test-catalog.json`, declaring it
 
 ## CI And Security
 
-Fast validation runs static and impact-selected checks on trusted pushes and pull requests. Targeted and full qualification jobs require trusted runners with the matching Factorio binary. Scheduled breadth checks detect fixture and environment drift. Promotion jobs only verify seals. Backport jobs keep per-target artifacts and evidence isolated.
+The always-running `MIR Verify / verify` workflow materializes the change-aware plan and runs the fast static gate on trusted pushes and pull requests. Targeted and full qualification jobs require trusted runners with the matching Factorio binary. Scheduled breadth checks detect fixture and environment drift. Promotion jobs only verify seals. Backport jobs keep per-target artifacts and evidence isolated.
 
 Self-hosted runners containing Factorio binaries or proprietary mods must never execute untrusted fork code. Do not use `pull_request_target` to run submitted source. Use least-privilege read permissions, explicit trusted dispatch for runtime work, content-addressed caches, isolated user-data directories, scrubbed logs, and no publishing credentials in validation workflows. A cache key named `latest`, mutable green status, missing evidence manifest, or hash mismatch is invalid and must be discarded.
 

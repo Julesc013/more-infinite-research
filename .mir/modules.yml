@@ -373,6 +373,7 @@ validation_tooling:
   modules:
     assurance: scripts/Invoke-MIRAssurance.ps1
     assurance_tests: scripts/Test-MIRAssurance.ps1
+    native_owner_balance_tests: scripts/Test-MIRNativeOwnerCostModels.ps1
     package_identity: scripts/validation/PackageIdentity.ps1
     target_metadata: scripts/validation/TargetProfiles.ps1
     scenario_groups: scripts/validation/ScenarioGroups.ps1
@@ -386,6 +387,7 @@ validation_tooling:
     compiler_schema_drift: scripts/Test-MIRCompilerSchemaDrift.ps1
   rules:
     - assurance plans use stable test IDs and complete content-addressed evidence inputs
+    - native-owner balance snapshots bind reviewed source values formula adapters planner bindings and emission transactions
     - unknown changes conservatively select the full relevant target gate
     - candidate seals verify exact artifacts and never publish
     - the facade preserves its public parameters and structured result schema

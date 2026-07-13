@@ -500,6 +500,10 @@ Invoke-RepoCheck "assurance classifier and evidence invalidation contracts are c
   & (Join-Path $repo "scripts\Test-MIRAssurance.ps1") -RepoRoot $repo
 }
 
+Invoke-RepoCheck "native-owner balance source and setting bindings do not drift" {
+  & (Join-Path $repo "scripts\Test-MIRNativeOwnerCostModels.ps1") -RepoRoot $repo
+}
+
 Invoke-RepoCheck "compatibility dependency declarations preserve full mod names" {
   & (Join-Path $repo "scripts\Test-MIRDependencyResolver.ps1") -RepoRoot $repo
 }

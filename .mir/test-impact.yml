@@ -7,6 +7,21 @@
   ],
   "paths": [
     {
+      "pattern": "prototypes/mir/domain/native_owner/**",
+      "groups": ["space-age"],
+      "scenarios": ["compiler-contracts", "space-age-native-owner-settings-default", "space-age-native-owner-settings-disabled", "space-age-native-owner-settings-cost-base", "space-age-native-owner-settings-cost-growth", "space-age-native-owner-settings-research-time", "space-age-native-owner-settings-max-level", "space-age-native-owner-settings-effect", "space-age-native-owner-settings-combined", "space-age-native-owner-settings-unrecognized-default", "space-age-native-owner-settings-unrecognized-override", "space-age-native-owner-settings-config-change", "space-age-vanilla-family-adoption", "space-age-vanilla-family-adoption-config-change", "space-age-vanilla-family-owner-prepatched", "space-age-vanilla-family-exact-owner", "space-age-vanilla-family-mixed-owner"]
+    },
+    {
+      "pattern": "prototypes/mir/planner/native_owner_binding.lua",
+      "groups": ["space-age"],
+      "scenarios": ["compiler-contracts", "space-age-native-owner-settings-default", "space-age-native-owner-settings-disabled", "space-age-native-owner-settings-cost-base", "space-age-native-owner-settings-cost-growth", "space-age-native-owner-settings-research-time", "space-age-native-owner-settings-max-level", "space-age-native-owner-settings-effect", "space-age-native-owner-settings-combined", "space-age-native-owner-settings-unrecognized-default", "space-age-native-owner-settings-unrecognized-override", "space-age-native-owner-settings-config-change", "space-age-vanilla-family-adoption", "space-age-vanilla-family-adoption-config-change", "space-age-vanilla-family-owner-prepatched", "space-age-vanilla-family-exact-owner", "space-age-vanilla-family-mixed-owner"]
+    },
+    {
+      "pattern": "prototypes/mir/emit/transactions/productivity_family_adoption.lua",
+      "groups": ["space-age"],
+      "scenarios": ["compiler-contracts", "space-age-native-owner-settings-default", "space-age-native-owner-settings-disabled", "space-age-native-owner-settings-cost-base", "space-age-native-owner-settings-cost-growth", "space-age-native-owner-settings-research-time", "space-age-native-owner-settings-max-level", "space-age-native-owner-settings-effect", "space-age-native-owner-settings-combined", "space-age-native-owner-settings-unrecognized-default", "space-age-native-owner-settings-unrecognized-override", "space-age-native-owner-settings-config-change", "space-age-vanilla-family-adoption", "space-age-vanilla-family-adoption-config-change", "space-age-vanilla-family-owner-prepatched", "space-age-vanilla-family-exact-owner", "space-age-vanilla-family-mixed-owner"]
+    },
+    {
       "pattern": "prototypes/mir/settings/automatic_compiler_*.lua",
       "groups": ["automatic-compiler"],
       "scenarios": ["compiler-contracts", "semantic-family-off", "semantic-family-report", "semantic-family-attach", "semantic-family-generate", "semantic-family-exact-pack"]

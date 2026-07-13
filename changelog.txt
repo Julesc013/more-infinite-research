@@ -22,12 +22,17 @@ Date: 2026-07-14
     - Standardized automatic-recipe dropdown labels, tooltip structure, capitalization, and locale parity.
     - Preserved old automatic compiler profiles through a hidden legacy-policy bridge.
     - Added content-addressed assurance plans, evidence capsules, exact candidate seals, and promotion-only verification.
+    - Added one change-aware verification command and an aggregate fast CI plan artifact.
+    - Made processing unit, plastic, low density structure, and rocket fuel owner research use existing stream settings.
 
   Bugfixes:
 
     - Preserved iterative prerequisite-cycle repair and strict generated-graph safety checks.
     - Published compiled generation plans only after authoritative safety checks complete.
     - Preserved the exact 2.3.5-to-2.4.0 settings and saved-runtime upgrade contract.
+    - Preserved final native or modded owner balance under defaults and when its MIR stream is disabled.
+    - Rejected unsafe cost overrides for unrecognized external formulas instead of guessing their semantics.
+    - Applied recognized owner cost, time, level, and relevant effect changes as one fingerprint-checked transaction.
 
 ---------------------------------------------------------------------------------------------------
 Version: 3.1.0

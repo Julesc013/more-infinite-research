@@ -23,9 +23,10 @@ MIR 2.4.0 brings the supported 3.1 compiler improvements to the maintained Facto
 - Automatic recipe-family coverage is modular, disabled by default, and restricted to reviewed providers or explicit experimental opt-in.
 - Unavailable Factorio 2.1-only technology controls are hidden on Factorio 2.0; no unsupported modern feature parity is claimed.
 - Release assurance classifies changes, plans the affected evidence set, records content-addressed evidence capsules, and seals the exact qualified candidate.
+- Processing-unit, plastic, low-density-structure, and rocket-fuel productivity owners now honor their existing MIR enable, cost, growth, level, time, and effect settings.
 
 ## Compatibility
 
 MIR 2.4.0 deliberately omits the two Factorio 2.1-only cargo technology modifiers. Compatibility remains opportunistic and evidence-based: unsupported or unsafe streams are skipped with diagnostics rather than forcing broad overhaul claims.
 
-The automated release gate passed all 82 declared Factorio 2.0 scenarios. It covers the exact 2.3.5 upgrade path, generated IDs, settings and research-state retention, deterministic packaging, exact archive base and Space Age loads, and named local-ecosystem checks.
+Default native-owner settings preserve the final Factorio or modded technology values exactly, disabled streams leave external owners untouched, and unsafe formula overrides are rejected instead of guessed. Final automated qualification is still pending for these changed package bytes; the earlier 82-scenario result is a superseded regression baseline.
