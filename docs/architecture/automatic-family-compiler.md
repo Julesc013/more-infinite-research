@@ -12,6 +12,14 @@ superseded_by: []
 
 # Automatic Family Compiler
 
+## Modular Provider Boundary
+
+MIR 3.1.5 defines `CompilerProvider` schema 1 as the extension boundary above FamilyRule. Built-in machine, logistics, mining, module, laboratory, furnace, and power families are registered through the same sorted data-only registry that future families use. Each row declares its source kinds, final-fact discovery indexes, positive capabilities, normalization and semantic identity, policy and setting references, validation hooks, planning adapter, runtime requirement, migration identity, diagnostic codes, and fixtures.
+
+Providers cannot mutate prototypes. Their adapter produces planner input; FamilyRule resolution produces declarative candidate and attachment records; GenerationPlan and CompilationPlan arbitrate ownership and validate identities; emission alone materializes technologies. Duplicate provider IDs, behavioral descriptors, registry-order drift, direct mutation claims, and provider/family identity mismatches fail before planning.
+
+The semantic stages are discovery, normalization, identity, capability classification, policy, planning, graph construction, validation, emission, runtime registration, and diagnostics/evidence. Runtime registration is absent unless a provider explicitly uses a separately governed handler. Candidate records retain the provider ID, source key and prototype identity, family, final state, capabilities, recipe/item target, policy scope, stable identity seed, diagnostic provenance, target support, and emission ownership.
+
 MIR 3.0.5 is the published immutable behavior baseline. MIR 3.1.0 turns its fixed declarative stream compiler into a plan-first semantic family compiler on `dev`. Earlier 3.1.0 candidate artifacts and tags are superseded development evidence, not published release authority.
 
 ## Pipeline Contract

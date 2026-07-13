@@ -11,12 +11,16 @@ Date: 2026-07-13
     - Replaced the automatic compiler preset with separate action and research-creation controls.
     - Added an independent reviewed-data requirement and outcome-first tooltips.
     - Added a generic schema-2 automatic compiler policy contract for future registered family modules.
+    - Added a sorted data-only CompilerProvider registry for extending recipe-family discovery and planning.
+    - Added canonical setting descriptors and exact Conservative, Safe, Expansive, and Custom policy expansions.
+    - Added stable automatic-compiler and provider diagnostic codes.
     - Preserved old automatic compiler profiles through a hidden legacy-policy bridge.
 
   Bugfixes:
 
     - Preserved the 3.1.2 iterative prerequisite-cycle repair and strict generated-graph safety checks.
     - Published compiled generation plans only after authoritative safety checks complete.
+    - Added exact 3.1.2-to-3.1.5 upgrade coverage for legacy automatic-compiler settings and saved runtime state.
 
 ---------------------------------------------------------------------------------------------------
 Version: 3.1.2

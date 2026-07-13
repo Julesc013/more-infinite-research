@@ -51,6 +51,10 @@ Automatic productivity support is governed by `prototypes/mir/settings/automatic
 
 The released `mir-automatic-compiler-mode` setting remains registered and hidden with default `safe-attach` and values `off`, `report`, `safe-attach`, `exact-pack`, and `safe-generate`. If all new controls are still at their defaults, a non-default legacy value maps to its equivalent schema-2 policy. Any explicit non-default new control wins. The hidden setting remains profile-exportable and importable so older profiles are not silently discarded.
 
+The contract names four policy profiles for documentation, tests, and portable tooling. `conservative` expands to Preview/creation off/review required; `safe` expands to Apply/creation off/review required and is the default; `expansive` expands to Apply/creation on/review not required; `custom` requires all three values explicitly. Profiles use the same policy path as direct controls and are deliberately not registered as a second dropdown.
+
+`automatic_compiler_contract.descriptors()` is the canonical metadata source. Each descriptor binds its Factorio prototype to player consequence, compatibility consequence, profile membership, migration behavior, tests, and documentation. `setting_specs()` derives isolated registration-safe prototype copies from those descriptors, preventing UI registration, defaults, profile behavior, migration, tests, and docs from acquiring separate policy definitions.
+
 ## Visibility
 
 Stream visibility is declared with `ui_visibility` metadata. The settings stage may evaluate active mods and static metadata only; it must not inspect `data.raw` recipes, items, fluids, technologies, labs, or machines.

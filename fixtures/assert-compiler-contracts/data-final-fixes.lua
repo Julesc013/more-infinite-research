@@ -1,6 +1,8 @@
 local deepcopy = require("__more-infinite-research__.prototypes.mir.core.deepcopy")
 local fingerprint = require("__more-infinite-research__.prototypes.mir.core.fingerprint")
 local family_registry = require("__more-infinite-research__.prototypes.mir.families.registry")
+local provider_registry = require("__more-infinite-research__.prototypes.mir.providers.registry")
+local diagnostic_codes = require("__more-infinite-research__.prototypes.mir.domain.diagnostics.codes")
 local pack_schema = require("__more-infinite-research__.prototypes.mir.compatibility.packs.schema")
 local pack_registry = require("__more-infinite-research__.prototypes.mir.compatibility.packs.registry")
 local precedence = require("__more-infinite-research__.prototypes.mir.compatibility.packs.precedence")
@@ -79,7 +81,7 @@ end
 
 expect_policy("default automatic controls", {}, {
   action = "apply", create_research = false, require_reviewed_data = true,
-  apply_changes = true, preview = false, source = "controls-v2"
+  apply_changes = true, preview = false, source = "controls-v2", preset = "safe"
 })
 expect_policy("disabled automatic controls", {action = "disabled"}, {
   action = "disabled", discover = false, apply_changes = false, source = "controls-v2"
@@ -120,6 +122,81 @@ if not approved then fail("reviewed-data generation gate rejected named authoriz
 local generic = automatic_compiler_contract.generation_decision(
   automatic_compiler_contract.resolve({create_research = true, require_reviewed_data = false}), false)
 if not generic then fail("registered family module generation was not independently configurable") end
+
+for _, preset_name in ipairs(automatic_compiler_contract.preset_names) do
+  local custom = preset_name == "custom" and {
+    action = "disabled", create_research = true, require_reviewed_data = false
+  } or nil
+  local preset = automatic_compiler_contract.resolve_preset(preset_name, custom)
+  if preset.preset ~= preset_name then fail("automatic preset did not expand deterministically: " .. preset_name) end
+  if preset_name ~= "custom" and automatic_compiler_contract.classify_preset(preset) ~= preset_name then
+    fail("automatic preset did not round-trip: " .. preset_name)
+  end
+end
+expect_error("custom preset without explicit controls", "requires explicit control values", function()
+  automatic_compiler_contract.resolve_preset("custom")
+end)
+
+local descriptors = automatic_compiler_contract.descriptors()
+if #descriptors ~= 4 then fail("automatic setting descriptor count changed unexpectedly") end
+for _, descriptor in ipairs(descriptors) do
+  if descriptor.schema ~= 1 or descriptor.id ~= descriptor.prototype.name
+    or not descriptor.consequence or not descriptor.compatibility_consequence
+    or #(descriptor.tests or {}) == 0 or #(descriptor.documentation or {}) == 0
+  then
+    fail("automatic setting descriptor is incomplete: " .. tostring(descriptor.id))
+  end
+end
+local specs = automatic_compiler_contract.setting_specs()
+descriptors[1].prototype.default_value = "disabled"
+if specs[1].default_value ~= "apply" then fail("automatic setting specs are not isolated from descriptor mutation") end
+
+local _, _, denied_code = automatic_compiler_contract.generation_decision(
+  automatic_compiler_contract.resolve({create_research = true}), false)
+if denied_code ~= diagnostic_codes.get("reviewed_compatibility_data_required") then
+  fail("automatic generation decision omitted its stable diagnostic code")
+end
+if #diagnostic_codes.all() ~= 10 then fail("automatic/provider diagnostic registry is incomplete") end
+
+local providers = provider_registry.snapshot()
+if #providers.providers ~= 9 then fail("built-in CompilerProvider count changed unexpectedly") end
+for index, provider in ipairs(providers.providers) do
+  if index > 1 and providers.providers[index - 1].id >= provider.id then
+    fail("CompilerProvider sorting is unstable")
+  end
+  if provider.family_rule.provider_id ~= provider.id
+    or provider.emission_adapter.mutates_prototypes ~= false
+    or provider.runtime_handler.required ~= false
+  then
+    fail("CompilerProvider contract metadata is incomplete: " .. provider.id)
+  end
+end
+local reversed_providers = {schema = 1, providers = {}}
+for index = #providers.providers, 1, -1 do table.insert(reversed_providers.providers, providers.providers[index]) end
+local normalized_providers = provider_registry.validate(reversed_providers)
+if fingerprint.of(normalized_providers) ~= fingerprint.of(providers) then
+  fail("CompilerProvider normalization depends on registration order")
+end
+local duplicate_providers = deepcopy(providers)
+table.insert(duplicate_providers.providers, deepcopy(duplicate_providers.providers[1]))
+expect_error("duplicate CompilerProvider id", "Duplicate CompilerProvider id", function()
+  provider_registry.validate(duplicate_providers)
+end)
+local behavioral_provider = deepcopy(providers)
+behavioral_provider.providers[1].callback = function() end
+expect_error("behavioral CompilerProvider", "CompilerProvider must be data-only", function()
+  provider_registry.validate(behavioral_provider)
+end)
+local mutating_provider = deepcopy(providers)
+mutating_provider.providers[1].emission_adapter.mutates_prototypes = true
+expect_error("mutating CompilerProvider", "must be planning-only", function()
+  provider_registry.validate(mutating_provider)
+end)
+local isolated_providers = provider_registry.snapshot()
+isolated_providers.providers[1].family = "mutated"
+if provider_registry.snapshot().providers[1].family == "mutated" then
+  fail("CompilerProvider snapshots are not isolated")
+end
 
 local rules = family_registry.snapshot()
 local reversed = {schema = 2, rules = {}}

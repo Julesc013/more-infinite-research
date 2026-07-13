@@ -21,6 +21,7 @@ local effect_scaling = require("prototypes.mir.settings.effect_scaling")
 local generation_plan = require("prototypes.mir.planner.generation_plan")
 local family_resolver = require("prototypes.mir.families.resolver")
 local family_registry = require("prototypes.mir.families.registry")
+local provider_registry = require("prototypes.mir.providers.registry")
 local fingerprint = require("prototypes.mir.core.fingerprint")
 local recipe_facts = require("prototypes.mir.index.recipe_facts")
 local target_profiles = require("prototypes.mir.platform.factorio.target_profiles")
@@ -165,6 +166,7 @@ local function plan_row(key, spec, action, reason, diagnostics, extra)
     action = action,
     reason = reason,
     source = spec.automatic_family and "family-rule" or "fixed-stream",
+    provider_ids = family_resolver.provider_ids_for_stream(key),
     spec = spec,
     diagnostics = diagnostics,
     gates = proof_gates(action, extra.failed_gates)
@@ -375,6 +377,7 @@ function M.compile()
     source_fingerprints = {
       facts = fingerprint.of(recipe_facts.snapshot()),
       rules = fingerprint.of({streams = streams, families = family_registry.snapshot()}),
+      providers = provider_registry.fingerprint(),
       compatibility_packs = fingerprint.of(compatibility_packs.snapshot()),
       target_profile = fingerprint.of(target_profiles.current())
     }

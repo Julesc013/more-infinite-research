@@ -2,7 +2,7 @@ param([string]$RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")))
 $ErrorActionPreference = "Stop"
 $manifest = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\compiler-contract-coverage.yml") | ConvertFrom-Json
 if ($manifest.schema -ne 1 -or -not $manifest.positive_negative_required) { throw "Compiler contract coverage manifest is invalid." }
-foreach ($field in @("generation_plan_gates", "actions", "family_strategies", "compatibility_pack_fields", "automatic_actions", "automatic_generation_controls", "legacy_automatic_modes", "mutation_sentinels")) {
+foreach ($field in @("generation_plan_gates", "actions", "family_strategies", "compatibility_pack_fields", "automatic_actions", "automatic_generation_controls", "automatic_policy_presets", "compiler_provider_fields", "diagnostic_code_namespaces", "legacy_automatic_modes", "mutation_sentinels")) {
   if (@($manifest.$field).Count -eq 0) { throw "Compiler contract coverage omits $field." }
 }
 $expectedActions = @("disabled", "preview", "apply")
@@ -16,6 +16,16 @@ foreach ($snippet in @(
   'require_reviewed_data = "mir-automatic-require-reviewed-data"'
 )) {
   if (-not $contract.Contains($snippet)) { throw "Automatic compiler contract is missing: $snippet" }
+}
+$expectedPresets = @("conservative", "safe", "expansive", "custom")
+if (($expectedPresets -join "|") -ne (@($manifest.automatic_policy_presets) -join "|")) { throw "Automatic policy presets are incomplete or out of order." }
+$providerContract = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "prototypes\mir\providers\contract.lua")
+foreach ($field in @($manifest.compiler_provider_fields)) {
+  if (-not $providerContract.Contains($field)) { throw "CompilerProvider contract is missing field: $field" }
+}
+$diagnostics = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "prototypes\mir\domain\diagnostics\codes.lua")
+foreach ($namespace in @($manifest.diagnostic_code_namespaces)) {
+  if (-not $diagnostics.Contains($namespace)) { throw "Compiler diagnostic registry is missing namespace: $namespace" }
 }
 $fixture = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot $manifest.runtime_fixture)
 foreach ($sentinel in @("hard-safety sentinel", "duplicate materialized effect", "missing prerequisite sentinel", "numeric effect value")) {

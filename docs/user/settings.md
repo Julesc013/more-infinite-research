@@ -34,6 +34,17 @@ The settings do not encode current mod names, technology names, or a closed list
 
 The released `mir-automatic-compiler-mode` setting remains hidden as a migration bridge. A non-default legacy value is translated to the equivalent new policy while all three new controls remain at their defaults. As soon as any new control differs from its default, the new controls take precedence. This preserves old profiles without keeping the old five-way preset in the player-facing UI.
 
+For documentation and portable policy exchange, the three controls also have four named profiles. These are exact expansions, not another setting or a scale:
+
+| Profile | Action | Create research | Require reviewed data |
+| --- | --- | --- | --- |
+| Conservative | Preview Changes | Off | On |
+| Safe (default) | Apply Safe Changes | Off | On |
+| Expansive | Apply Safe Changes | On | Off |
+| Custom | Whatever explicit combination the three controls contain | Explicit | Explicit |
+
+The order describes increasing automatic action, not increasing safety or quality. Safe remains the default because it attaches eligible mod recipes to existing compatible research without authorizing new technologies. Expansive is intentionally opt-in; hard safety, ownership, science, graph, identity, and progression gates remain mandatory in every profile.
+
 Generated technology settings are ordered so default-off or experimental rows come first, enabled special rows come next, and ordinary enabled rows come last. Breeding, agricultural growth speed, cargo bay range/count, and character reach are enabled by default but remain in the special row group. Inserter capacity stays disabled by default because larger hand sizes can change circuit behavior and inserter performance assumptions.
 
 ## Prototype Limit Settings

@@ -226,6 +226,18 @@ fixtures:
       - runtime-state-effect-retention
       - exact-3-1-0-automatic-compiler-candidate-normal-mod-directory-load
 
+  upgrade-3-1-2-to-3-1-5-automatic-compiler:
+    requires_features: [scripted_techs, recipe_productivity]
+    assertion_path: fixtures/assert-upgrade-3-1-2-to-3-1-5-automatic-compiler
+    validates:
+      - exact-3-1-2-source-archive
+      - hidden-legacy-safe-generate-setting-retention
+      - new-safe-control-defaults
+      - non-default-startup-setting-retention
+      - scripted-technology-level-retention
+      - runtime-state-effect-retention
+      - exact-3-1-5-automatic-compiler-candidate-normal-mod-directory-load
+
   competing-productivity-transaction:
     requires_features: [recipe_productivity]
     path: fixtures/plates-n-circuit-productivity
@@ -392,6 +404,14 @@ fixtures:
       - explicit-new-controls-win-over-legacy
       - reviewed-data-generation-fails-closed
       - registered-family-generation-remains-extensible
+      - data-only-compiler-provider-contract
+      - stable-provider-order-and-fingerprint
+      - duplicate-provider-id-rejection
+      - provider-snapshot-copy-isolation
+      - planning-only-provider-emission-adapters
+      - declarative-automatic-setting-descriptors
+      - conservative-safe-expansive-custom-policy-expansion
+      - stable-automatic-and-provider-diagnostic-codes
 
   space-age-galore-effect-ownership:
     requires_features: [recipe_productivity]

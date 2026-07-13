@@ -5,6 +5,7 @@ S.recipe_fact = 2
 S.relationship_index = 1
 S.family_rule = 2
 S.family_decision = 2
+S.compiler_provider = 1
 S.compatibility_pack = 2
 S.capability_resolver = 2
 S.capability_policy = 1

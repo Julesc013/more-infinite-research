@@ -132,6 +132,7 @@ modules:
     - prototypes/mir/domain/streams/stream_spec.lua
     - prototypes/mir/domain/streams/raw_catalog.lua
     - prototypes/mir/domain/streams/descriptor.lua
+    - prototypes/mir/domain/diagnostics/codes.lua
   policy:
     - prototypes/mir/policy/adoption_policy.lua
     - prototypes/mir/policy/owner_policy.lua
@@ -160,6 +161,10 @@ modules:
     - prototypes/mir/families/rules.lua
     - prototypes/mir/families/registry.lua
     - prototypes/mir/families/resolver.lua
+  providers:
+    - prototypes/mir/providers/contract.lua
+    - prototypes/mir/providers/builtins.lua
+    - prototypes/mir/providers/registry.lua
   planner:
     - prototypes/mir/planner/compiler.lua
     - prototypes/mir/planner/compilation_plan.lua
@@ -306,12 +311,20 @@ target_layers:
     may_require:
       - core
       - index
+      - providers
+    may_mutate_data_raw: false
+  providers:
+    path: prototypes/mir/providers
+    may_require:
+      - core
+      - domain
     may_mutate_data_raw: false
   planner:
     path: prototypes/mir/planner
     may_require:
       - capabilities
       - families
+      - providers
       - policy
       - domain
     may_mutate_data_raw: false
@@ -349,7 +362,8 @@ rules:
   - Report modules do not mutate prototypes.
   - Target and convergence policy live in machine-readable .mir manifests.
   - Historical branches provide behavior evidence and do not define a parallel core.
-  - Public extension framework work is outside the 3.0.5 convergence boundary.
+  - CompilerProvider schema 1 is the stable data-only family extension boundary in 3.1.5.
+  - Providers may discover and normalize candidates but remain planning-only; emission owns generated prototype mutation.
   - Top-level MIR Lua module dependencies must remain acyclic.
 
 validation_tooling:
