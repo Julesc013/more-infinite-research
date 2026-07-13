@@ -30,6 +30,15 @@
     {"factorio": "0.7", "mir": "0.7.0", "branch": "tmp/0.7", "planning_commit": "7e964b4705e15ff2365a06a9e00901fae751c0c7", "requested_patch": "0.7.5", "installed_patch": "0.7.5", "binary_sha256": "EA52123915ECFB14658591876327490B094996ADE64D837929765147C4556FE8", "input_status": "available"},
     {"factorio": "0.6", "mir": "0.6.0", "branch": "tmp/0.6", "planning_commit": "20a94c4dc5abffd7b36d0590f253162afd428645", "requested_patch": "0.6.4", "installed_patch": "0.6.4", "binary_sha256": "8D2F7208503B88A578FE558184C87092830554FEC5AB66BCD57CBAE2F0E5A1FB", "input_status": "available"}
   ],
+  "runtime_policy": {
+    "0.12": {"package_mode": "zip-native", "proof": "fresh-create-and-bounded-server-reload"},
+    "0.11": {"package_mode": "zip-native", "proof": "two-bounded-log-proven-startups"},
+    "0.10": {"package_mode": "zip-native", "proof": "two-bounded-log-proven-startups", "configuration_isolation": "transactional-config-path-restored"},
+    "0.9": {"package_mode": "zip-native", "proof": "two-regenerated-crop-cache-mod-markers", "configuration_isolation": "transactional-config-path-restored"},
+    "0.8": {"package_mode": "extract-required", "proof": "exact-zip-extracted-then-two-regenerated-crop-cache-mod-markers", "configuration_isolation": "transactional-config-path-restored"},
+    "0.7": {"package_mode": "extract-required", "proof": "exact-zip-extracted-then-two-regenerated-crop-cache-mod-markers", "configuration_isolation": "transactional-config-path-restored"},
+    "0.6": {"package_mode": "extract-required", "proof": "exact-zip-extracted-then-two-regenerated-crop-cache-mod-markers", "configuration_isolation": "transactional-config-path-restored"}
+  },
   "safety_refs": [
     "safety/pre-museum-wave/0.12-acfba01",
     "safety/pre-museum-wave/0.11-03ac230",
@@ -40,5 +49,5 @@
     "safety/pre-museum-wave/0.6-20a94c4",
     "safety/pre-3.1.9/dev-c8bf4a7"
   ],
-  "status": "baseline_frozen_binary_audit_in_progress"
+  "status": "museum_compiler_and_runtime_policy_proven"
 }

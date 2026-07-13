@@ -445,6 +445,8 @@ First tasks:
 
 Do not block `3.0.5` on the full museum ladder unless the archive work is moving quickly. Lessons from `0.14` and older can feed a later `3.0.6` patch or the `3.1.0` tooling and compatibility infrastructure campaign.
 
+Museum package deployment is target evidence, not a modern default. Factorio `0.12` through `0.9` load the versioned release ZIP directly. Factorio `0.8` through `0.6` require that exact ZIP to be extracted into the mods directory. Record `zip-native` or `extract-required` in the target manifest and release packet, and test the exact distribution archive by the recorded route.
+
 ## Release Wording Classes
 
 Use these public wording classes:
