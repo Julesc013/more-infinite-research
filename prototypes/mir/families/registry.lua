@@ -45,6 +45,9 @@ local function validate(source)
     if type(rule.id) ~= "string" or rule.id == "" then error("FamilyRule id is required", 2) end
     if ids[rule.id] then error("Duplicate FamilyRule id: " .. rule.id, 2) end
     if rule.schema ~= 2 then error("FamilyRule schema must be 2: " .. rule.id, 2) end
+    if type(rule.provider_id) ~= "string" or rule.provider_id == "" then
+      error("FamilyRule provider_id is required: " .. rule.id, 2)
+    end
     if rule.capability ~= "recipe-productivity" then
       error("Unsupported FamilyRule capability: " .. tostring(rule.capability), 2)
     end

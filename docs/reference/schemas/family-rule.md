@@ -14,7 +14,7 @@ superseded_by: []
 
 A schema-2 `FamilyRule` is inert data consumed by the semantic family resolver. It cannot contain functions, prototype tables, mod names, version gates, or mutation callbacks.
 
-Every rule owns a stable ID, family and capability, structural output selector, required evidence, hard recipe requirements, risk denials, grouping and tier strategies, effect table, exact-owner policy, science and prerequisite strategy, positive target features, default action, and support-claim boundary. The registry rejects duplicate IDs, incomplete hard requirements, missing core risk denials, non-structural selectors, missing effect policy, non-positive target requirements, or a public structural claim.
+Every rule owns a stable ID, CompilerProvider ID, family and capability, structural output selector, required evidence, hard recipe requirements, risk denials, grouping and tier strategies, effect table, exact-owner policy, science and prerequisite strategy, positive target features, default action, and support-claim boundary. The registry rejects missing provider identity, duplicate IDs, incomplete hard requirements, missing core risk denials, non-structural selectors, missing effect policy, non-positive target requirements, or a public structural claim.
 
 The initial selectors are entity types reached through item `place_result` relationships and item prototype types such as modules. Recipe names are evidence labels, not classification inputs. All rules require RecipeFactV2 plus shared place-result and effect-owner indexes.
 

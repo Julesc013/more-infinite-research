@@ -52,6 +52,11 @@ rules:
   automatic_compiler_hard_safety_gates_are_not_user_overridable: true
   automatic_compiler_legacy_setting_id_and_values_remain_hidden_and_importable: true
   automatic_compiler_legacy_nondefault_values_map_to_equivalent_policy_until_new_controls_change: true
+  automatic_compiler_settings_have_declarative_consequence_migration_test_and_documentation_metadata: true
+  automatic_compiler_named_policy_profiles_expand_to_the_same_independent_controls: true
+  automatic_compiler_named_policy_profiles_are_not_a_second_player_facing_dropdown: true
+  automatic_compiler_safe_profile_is_the_default: true
+  automatic_compiler_defaults_have_declared_safety_rationales: true
 
 profiles:
   schema: 1

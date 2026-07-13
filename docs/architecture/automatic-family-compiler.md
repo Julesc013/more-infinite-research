@@ -12,7 +12,15 @@ superseded_by: []
 
 # Automatic Family Compiler
 
-MIR 3.1.0 is the immutable released behavior baseline. Development after that release turns its fixed declarative stream compiler into a plan-first semantic family compiler. This work originates on `dev`; it does not rebuild, retag, or change the published 3.1.0 archive.
+## Modular Provider Boundary
+
+The final MIR 3.1.5 source defines `CompilerProvider` schema 1 as the extension boundary above FamilyRule. MIR 2.4.0 adapts that boundary to Factorio 2.0. Built-in machine, logistics, mining, module, laboratory, furnace, and power families are registered through the same sorted data-only registry that future families use. Each row declares its source kinds, final-fact discovery indexes, positive capabilities, normalization and semantic identity, policy and setting references, validation hooks, planning adapter, runtime requirement, migration identity, diagnostic codes, and fixtures.
+
+Providers cannot mutate prototypes. Their adapter produces planner input; FamilyRule resolution produces declarative candidate and attachment records; GenerationPlan and CompilationPlan arbitrate ownership and validate identities; emission alone materializes technologies. Duplicate provider IDs, behavioral descriptors, registry-order drift, direct mutation claims, and provider/family identity mismatches fail before planning.
+
+The semantic stages are discovery, normalization, identity, capability classification, policy, planning, graph construction, validation, emission, runtime registration, and diagnostics/evidence. Runtime registration is absent unless a provider explicitly uses a separately governed handler. Candidate records retain the provider ID, source key and prototype identity, family, final state, capabilities, recipe/item target, policy scope, stable identity seed, diagnostic provenance, target support, and emission ownership.
+
+MIR 2.3.5 is the published Factorio 2.0 upgrade baseline. MIR 2.4.0 carries the plan-first semantic family compiler without importing Factorio 2.1-only prototype capabilities.
 
 ## Pipeline Contract
 

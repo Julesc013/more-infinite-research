@@ -25,7 +25,7 @@ Existing 3.1.0 IDs remain in the immutable released-ID golden. New family IDs us
 
 ## Consequences
 
-- The default Apply Safe Changes action creates no new automatic-family technologies because `Create research when needed` defaults off.
+- The default Apply Safe Changes action creates no new automatic-family technologies because `Allow new research creation` defaults off.
 - Creation may emit only registered, predeclared family IDs; reviewed-data policy decides whether an exact compatibility authorization is also required.
 - One technology per discovered recipe is forbidden.
 - Future sharding must use a fixed predeclared shard set and deterministic subject assignment.

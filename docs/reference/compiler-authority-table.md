@@ -20,6 +20,7 @@ This table names one machine authority, validator, and reference contract for ea
 | Stable generated streams | 1 | `prototypes/mir/streams/generated_stream_manifest.json` | `scripts/Test-MIRGoldenPlans.ps1` | stream registry and migration policy |
 | Canonical StreamSpec descriptor | 1 | `prototypes/mir/domain/streams/descriptor.lua` | `scripts/Test-MIRArchitecture.ps1` | settings and GenerationPlan compilation |
 | FamilyRule | 2 | `prototypes/mir/families/rules.lua` | `prototypes/mir/families/registry.lua` | structural family resolver |
+| CompilerProvider | 1 | `prototypes/mir/providers/contract.lua` | `prototypes/mir/providers/registry.lua` and compiler-contract fixture | normalized FamilyRule provider adapter |
 | CompatibilityPack | 2 | `prototypes/mir/compatibility/packs/schema.lua` | `prototypes/mir/compatibility/packs/registry.lua` | pack filtering, precedence, ownership policy |
 | GenerationPlan | 3 | `prototypes/mir/planner/generation_plan.lua` | whole-plan finalization, output validation, and compiler-contract fixture | transaction and emission layers |
 | CompilationPlan | 2 | `prototypes/mir/planner/compilation_plan.lua` | global operation finalization and output parity | governed stream and base-extension emission |
