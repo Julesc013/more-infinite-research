@@ -29,4 +29,4 @@ MIR 2.4.0 brings the supported 3.1 compiler improvements to the maintained Facto
 
 MIR 2.4.0 deliberately omits the two Factorio 2.1-only cargo technology modifiers. Compatibility remains opportunistic and evidence-based: unsupported or unsafe streams are skipped with diagnostics rather than forcing broad overhaul claims.
 
-Default native-owner settings preserve the final Factorio or modded technology values exactly, disabled streams leave external owners untouched, and unsafe formula overrides are rejected instead of guessed. Final automated qualification is still pending for these changed package bytes; the earlier 82-scenario result is a superseded regression baseline.
+Default native-owner settings preserve the final Factorio or modded technology values exactly, disabled streams leave external owners untouched, and unsafe formula overrides are rejected instead of guessed. Change-aware qualification retained the passing 82-scenario baseline for unaffected behavior, reran every invalidated native-owner and configuration-change case, loaded the exact archive with base and Space Age, and passed the exact 2.3.5 upgrade.

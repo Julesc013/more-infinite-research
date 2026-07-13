@@ -1,8 +1,8 @@
 {
   "schema": 1,
   "status": "passed",
-  "generated_at": "2026-07-13T16:37:03.6431824Z",
-  "git_commit": "5963445b1b72efffc18b232f5367a7da640061e8",
+  "generated_at": "2026-07-13T18:16:45.9520333Z",
+  "git_commit": "7a5a17c2cf5eb12703e2e0228e9624759a7b1604",
   "factorio_binary_version": "2.0.77.84539",
   "from": {
     "version": "2.3.5",
@@ -11,8 +11,8 @@
   },
   "to": {
     "version": "2.4.0",
-    "path": "C:\\Projects\\Factorio\\more-infinite-research-tmp-2.0\\dist\\more-infinite-research_2.4.0.zip",
-    "sha256": "5E1D16CEA5C8F43E8C257B73A3A5A728CE6DFB9ADA18B0CACDDB49DE3C5226E1"
+    "path": "dist\\more-infinite-research_2.4.0.zip",
+    "sha256": "4BA19EA071E6359BC25C58CCD8F65CAF81B4AA675496E2F53175A996C791470C"
   },
   "assertions": [
     "startup-setting-retained",
@@ -20,6 +20,8 @@
     "technology-level-retained",
     "fixture-storage-retained",
     "scripted-runtime-effect-retained",
+    "native-owner-setting-ids-retained",
+    "native-owner-technology-levels-retained",
     "exact-candidate-normal-mod-directory-load"
   ],
   "create_log": "2.4.0-upgrade-from-2.3.5-create.txt",
