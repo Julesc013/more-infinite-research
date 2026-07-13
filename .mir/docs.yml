@@ -482,7 +482,7 @@ docs:
     source_of_truth_for: []
   - path: docs/capabilities/logistics-manufacturing.md
     title: "Logistics Manufacturing Capability"
-    status: draft
+      status: current
     audience: developer
     doc_type: explanation
     owner: mir-maintainers
