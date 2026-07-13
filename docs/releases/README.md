@@ -14,7 +14,7 @@ superseded_by: []
 
 Release docs are version-specific plans, migration guides, risk registers, checklists, and validation records.
 
-MIR 3.1.1 and 2.3.5 are the published immutable behavior baselines. The untagged 3.1.2 technology-cycle hotfix is qualified on `main`, and the descending 2.5.0, 1.9.4, 1.8.2, 1.7.1, 1.6.0, 1.5.0, 1.4.0, and 1.3.0 candidates are qualified on their target branches. MIR 3.1.5 on `dev` is the portable-return synthesis candidate; no candidate in this wave is tagged or released by the qualification work.
+MIR 3.1.1 and 2.3.5 are the published immutable behavior baselines. The untagged 3.1.5 portable-return synthesis candidate is automated-qualified for synchronized `main` and `dev`, and the descending 2.5.0, 1.9.4, 1.8.2, 1.7.1, 1.6.0, 1.5.0, 1.4.0, and 1.3.0 candidates are qualified on their target branches. No candidate in this wave is tagged or released by the qualification work.
 
 - [3.0.0 plan](3.0.0-plan.md)
 - [3.0.0 regression baseline](3.0.0-regression-baseline.md)

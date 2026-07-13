@@ -18,7 +18,7 @@ superseded_by: []
 | --- | ---: | --- | --- | --- | --- | --- | --- |
 | Factorio 2.1 | 3.1.1 | `main` published baseline | `e91963c` | `FAAA6AA3...C7EB9` | Published emergency Galore ownership hotfix | Published and frozen | None |
 | Factorio 2.1 | 3.1.2 | `main` | `b36996a` source / `4d74514` evidence | `D5BFA665...25F5` | 91 scenarios, exact upgrade, ecosystem 9/9, and exact dist passed | Candidate qualified | Manual release decision |
-| Factorio 2.1 | 3.1.5 | `dev` | final source pending | rebuilding | Final UI copy and experimental-family maturity policy passed focused validation; full requalification pending | Rebuilding candidate | Complete release gate, then promote to `main` |
+| Factorio 2.1 | 3.1.5 | `main` / `dev` | `f870c92` source | `3DDDFB2C...5A3C` | 91 scenarios, both exact upgrades, ecosystem 9/9, and exact dist passed | Candidate qualified | Identity-bound interactive review and manual release decision |
 | Factorio 2.0 | 2.3.5 | `legacy` published baseline | `861565d` source / `9eabc54` promotion | `97B3DC9B...68DE` | 71 scenarios, targeted gate, exact-dist base/Space Age, and upgrade passed | Published and frozen | None |
 | Factorio 2.0 | 2.5.0 | `tmp/2.0` | `f5c58f5` qualified source | `0BE57ED4...CBFD` | Factorio 2.0.77 full 82-scenario gate and exact dist passed | Candidate qualified | Publication gate; 2.4.0 bytes remain immutable |
 | Factorio 1.1 | 1.9.4 | `tmp/1.1` | `30ef8c7` qualified source | `9184524A...A35` | Factorio 1.1.110 10 scenarios, exact fresh/reload, and 1.9.3 upgrade passed | Candidate qualified | Publication gate |
@@ -37,7 +37,7 @@ The 3.1.2 technology-cycle hotfix and every requested descending target are cand
 
 ## Next Executable Sequence
 
-1. Freeze the qualified portable-return and modular compiler-control candidate as untagged MIR 3.1.5 on `dev`.
+1. Keep the qualified portable-return and modular compiler-control candidate synchronized on `main` and `dev` as untagged MIR 3.1.5.
 2. Complete the pending identity-bound interactive in-game review.
-3. Keep `main` on the exact 3.1.2 candidate until a human chooses which candidate to tag and publish.
-4. Tag or release only in a separate explicitly authorized publication turn.
+3. Tag or release only in a separate explicitly authorized publication turn.
+4. Begin 2.4.0 only after the requested post-release pause closes.

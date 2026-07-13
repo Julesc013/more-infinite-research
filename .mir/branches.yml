@@ -243,15 +243,26 @@ release_artifacts:
       status: release-candidate-awaiting-manual-review
     mir_3_1_5:
       version: "3.1.5"
-      branch: dev
+      branch: main
+      development_branch: dev
       target_factorio: "2.1"
       source_anchor: mir_3_1_2
-      source_commit: pending
+      source_commit: f870c929dcf1442716ed7554f09ef8cdb5a6f7e0
       artifact: dist/more-infinite-research_3.1.5.zip
-      automated_gate: pending
-      release_gate: rebuilding-after-package-visible-change
+      sha256: 3DDDFB2C899E57B9BB9962F67F3902B4B3D7663110A2B2306F0A09A6CCF35A3C
+      size_bytes: 399512
+      entries: 166
+      forbidden_entries: 0
+      automated_gate: passed
+      scenario_count: 91
+      exact_upgrade_from_3_0_5: passed
+      exact_upgrade_from_3_1_2: passed
+      ecosystem_loads: 9/9
+      structured_summary_path: .mir/evidence/3.1.5-rc4-validation-summary.json
+      structured_summary_run_id: a139707f-0c3a-4bab-8332-027d0eecf7ab
+      release_gate: automated-passed-manual-pending
       publication_status: unreleased
-      status: rebuilding-after-package-visible-change
+      status: release-candidate-awaiting-manual-review
     mir_2_5_0:
       version: "2.5.0"
       branch: tmp/2.0

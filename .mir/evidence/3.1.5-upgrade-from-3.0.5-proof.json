@@ -1,8 +1,8 @@
 {
   "schema": 1,
   "status": "passed",
-  "generated_at": "2026-07-13T11:59:14.2254633Z",
-  "git_commit": "4c2bbc5daa4c36d268945e45714bd2db8e2517eb",
+  "generated_at": "2026-07-13T13:20:24.9451242Z",
+  "git_commit": "f870c929dcf1442716ed7554f09ef8cdb5a6f7e0",
   "factorio_binary_version": "2.1.9.86829",
   "from": {
     "version": "3.0.5",
@@ -12,7 +12,7 @@
   "to": {
     "version": "3.1.5",
     "path": "dist\\more-infinite-research_3.1.5.zip",
-    "sha256": "EB6FFA0DAAF5B0AB48058F08D3861970845A0FD36A1D093CF366F1ECB311DB8E"
+    "sha256": "3DDDFB2C899E57B9BB9962F67F3902B4B3D7663110A2B2306F0A09A6CCF35A3C"
   },
   "assertions": [
     "startup-setting-retained",

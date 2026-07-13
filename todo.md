@@ -7,7 +7,7 @@ This is the executable release queue. `.mir/release-wave.yml` is the machine-rea
 ## Current Truth
 
 - MIR 3.1.1 for Factorio 2.1 and MIR 2.3.5 for Factorio 2.0 are the published immutable baselines.
-- MIR 3.1.5 is the untagged, automated-qualified Factorio 2.1 release candidate on `dev`; interactive review and human publication remain pending.
+- MIR 3.1.5 is the untagged, automated-qualified Factorio 2.1 release candidate prepared for synchronized `main` and `dev`; interactive review and human publication remain pending.
 - MIR 2.4.0 is unreleased and begins only after the human 3.1.5 release pause closes.
 - Earlier local 3.1.0 and 2.4.0 tags, commits, archives, and validation packets are superseded candidate evidence, not publication authority.
 - Work temporarily labeled 3.2.0 has been preserved as 3.1.0 implementation or honest pre-renumber characterization. Work temporarily labeled 2.5.0 is preserved but non-authoritative until it is re-derived as 2.4.0.
@@ -20,9 +20,9 @@ This is the executable release queue. `.mir/release-wave.yml` is the machine-rea
 - [x] Keep action, research creation, and reviewed-data requirements as independent controls with explicit safe defaults.
 - [x] Remove the long recommendation suffix and make checkbox labels and tooltips state their exact consequences.
 - [x] Keep assembler and lab family technologies experimental and outside the reviewed-data creation lane while retaining explicit broad opt-in testing.
-- [ ] Requalify the complete 91-scenario Factorio 2.1 matrix and deterministic exact-package gates after the final UI and maturity change.
-- [ ] Re-run exact 3.0.5 and 3.1.2 upgrades against the final 3.1.5 archive.
-- [ ] Re-run all nine available exact-archive ecosystem loads against the final archive.
+- [x] Requalify the complete 91-scenario Factorio 2.1 matrix and deterministic exact-package gates after the final UI and maturity change.
+- [x] Re-run exact 3.0.5 and 3.1.2 upgrades against the final 3.1.5 archive.
+- [x] Re-run all nine available exact-archive ecosystem loads against the final archive.
 - [ ] Complete the identity-bound interactive settings, technology-tree, save-load, locale, icon, and balance review.
 - [ ] Tag and publish only in the explicitly separate human-authorized release step.
 - [ ] Start the 2.4.0 backport only after the requested release pause.
