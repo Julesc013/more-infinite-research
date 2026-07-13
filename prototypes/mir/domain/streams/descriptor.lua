@@ -199,6 +199,15 @@ function M.normalize(key, raw_spec)
   end
 
   local spec = deepcopy(raw_spec)
+  local automatic_family = spec.automatic_family
+  if spec.ui_visibility == nil
+      and type(automatic_family) == "table"
+      and automatic_family.creation_maturity == "experimental" then
+    spec.ui_visibility = {
+      mode = "hidden",
+      hidden_reason = "experimental-family-hidden-until-reviewed"
+    }
+  end
   if spec.technology_name ~= nil and (type(spec.technology_name) ~= "string" or spec.technology_name == "") then
     error("Raw MIR stream " .. key .. " has invalid technology_name.", 2)
   end

@@ -12,6 +12,11 @@
       "scenarios": ["compiler-contracts", "semantic-family-off", "semantic-family-report", "semantic-family-attach", "semantic-family-generate", "semantic-family-exact-pack"]
     },
     {
+      "pattern": "prototypes/mir/settings/**",
+      "groups": ["base-load", "settings-codec", "space-age"],
+      "scenarios": ["base-generation-integrity", "settings-profile-roundtrip", "space-age-generation-integrity"]
+    },
+    {
       "pattern": "prototypes/mir/families/**",
       "scenarios": ["semantic-family-off", "semantic-family-report", "semantic-family-attach", "semantic-family-generate", "semantic-family-exact-pack"]
     },

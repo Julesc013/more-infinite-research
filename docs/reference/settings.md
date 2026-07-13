@@ -16,7 +16,7 @@ This page is the maintainer-level reference for MIR startup settings. Player gui
 
 ## Contract
 
-MIR keeps every released setting prototype registered. MIR-owned official technology settings stay visible across base and Space Age so players get a stable settings surface. Exact third-party provider settings may be hidden when the provider mod is absent, but MIR must not delete setting IDs because an optional provider mod is absent.
+MIR keeps every released setting prototype registered. Official-DLC and exact-provider setting groups may be hidden while their required mod is inactive, and experimental automatic-family groups remain hidden until reviewed. MIR does not delete those setting IDs: saved values, profiles, and data-stage reads remain compatible while the player-facing surface shows only relevant controls.
 
 Governed technology settings preserve the same keys:
 
@@ -61,9 +61,9 @@ Stream visibility is declared with `ui_visibility` metadata. The settings stage 
 
 Supported visibility modes:
 
-- `always`: show the setting group. Use this for MIR-owned official streams, including Space Age-shaped streams whose generation may skip in base games.
+- `always`: show the setting group. Use this for base-visible MIR streams.
 - `hidden`: hide the setting group by policy.
-- `visible-if-mods-any`: show when any named provider mod is enabled.
+- `visible-if-mods-any`: show when any named provider or official-DLC mod is enabled.
 - `visible-if-mods-all`: show when every named provider mod is enabled.
 - `visible-if-mods-any-or-always-on-base`: show for base-visible streams or when any named provider mod is enabled.
 
@@ -76,6 +76,8 @@ ui_visibility = {
   hidden_reason = "requires-atan-air-scrubbing"
 }
 ```
+
+Space Age-only groups use `visible-if-mods-any` with `space-age`. The experimental automatic-family maturity default supplies `hidden` visibility unless a future reviewed declaration explicitly replaces it. Visibility is presentation metadata only: hidden setting prototypes and values stay registered, and data-stage generation still uses final prototype evidence.
 
 ## Ordering
 
@@ -91,11 +93,13 @@ Global startup settings use visible section prefixes and stable `a-*` order rang
 
 The visible prefixes may use Factorio rich text for color and bold emphasis, but the plain section words remain part of the label. Do not add fake divider settings for 3.0.0.
 
-Generated technology settings use three `b-*` buckets:
+Visible generated technology settings use three `b-*` buckets:
 
 - `b-000`: disabled-by-default or experimental rows;
 - `b-050`: enabled special, unusual, balance-sensitive, or vanilla-continuation rows;
 - `b-100`: ordinary enabled rows.
+
+Unreviewed automatic-family tuning groups are hidden before ordering, so they do not look enabled merely because their preserved internal setting value authorizes broad experimental testing.
 
 Breeding productivity, agricultural growth speed, cargo bay unloading distance, cargo landing pad count, and character reach are enabled by default but remain in the special bucket. Inserter capacity bonus remains disabled by default and therefore stays in the first bucket.
 

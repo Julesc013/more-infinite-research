@@ -17,6 +17,14 @@ local function exact_recipe_patterns(recipes)
   return out
 end
 
+local function space_age_setting_visibility()
+  return {
+    mode = "visible-if-mods-any",
+    mods_any = {"space-age"},
+    hidden_reason = "space-age-not-active"
+  }
+end
+
 return {
   research_copper = { items={"copper-plate"}, icon_item="copper-plate" },
   research_iron   = { items={"iron-plate"}, icon_item="iron-plate" },
@@ -99,10 +107,7 @@ return {
 
   research_thruster_fuel_productivity = {
     localised_name = {"technology-name.more-infinite-research.research_thruster_fuel_productivity"},
-    ui_visibility = {
-      mode = "always",
-      reason = "official-stream-settings-visible"
-    },
+    ui_visibility = space_age_setting_visibility(),
     generation_requirements = {
       require_any_fluid = {"thruster-fuel"}
     },
@@ -118,10 +123,7 @@ return {
 
   research_thruster_oxidizer_productivity = {
     localised_name = {"technology-name.more-infinite-research.research_thruster_oxidizer_productivity"},
-    ui_visibility = {
-      mode = "always",
-      reason = "official-stream-settings-visible"
-    },
+    ui_visibility = space_age_setting_visibility(),
     generation_requirements = {
       require_any_fluid = {"thruster-oxidizer"}
     },
@@ -259,10 +261,7 @@ return {
   },
 
   research_tungsten = {
-    ui_visibility = {
-      mode = "always",
-      reason = "official-stream-settings-visible"
-    },
+    ui_visibility = space_age_setting_visibility(),
     generation_requirements = {
       require_any_item = {"tungsten-plate", "tungsten-carbide"}
     },
@@ -271,10 +270,7 @@ return {
     icon_tech="tungsten-processing"
   },
   research_lithium = {
-    ui_visibility = {
-      mode = "always",
-      reason = "official-stream-settings-visible"
-    },
+    ui_visibility = space_age_setting_visibility(),
     generation_requirements = {
       require_any_item = {"lithium-plate", "lithium"}
     },
@@ -284,10 +280,7 @@ return {
     { change = 0.05, items = { "lithium" }, recipe_patterns = { "^lithium$" } }
   } },
   research_holmium = {
-    ui_visibility = {
-      mode = "always",
-      reason = "official-stream-settings-visible"
-    },
+    ui_visibility = space_age_setting_visibility(),
     generation_requirements = {
       require_any_item = {"holmium-plate"}
     },
@@ -295,10 +288,7 @@ return {
     icon_tech="holmium-processing"
   },
   research_supercapacitor = {
-    ui_visibility = {
-      mode = "always",
-      reason = "official-stream-settings-visible"
-    },
+    ui_visibility = space_age_setting_visibility(),
     generation_requirements = {
       require_any_item = {"supercapacitor"}
     },
@@ -306,10 +296,7 @@ return {
     icon_tech="supercapacitor"
   },
   research_superconductor = {
-    ui_visibility = {
-      mode = "always",
-      reason = "official-stream-settings-visible"
-    },
+    ui_visibility = space_age_setting_visibility(),
     generation_requirements = {
       require_any_item = {"superconductor"}
     },
@@ -317,10 +304,7 @@ return {
     icon_tech="superconductor"
   },
   research_quantum_processor = {
-    ui_visibility = {
-      mode = "always",
-      reason = "official-stream-settings-visible"
-    },
+    ui_visibility = space_age_setting_visibility(),
     generation_requirements = {
       require_any_item = {"quantum-processor"}
     },
@@ -328,10 +312,7 @@ return {
     icon_tech="quantum-processor"
   },
   research_carbon = {
-    ui_visibility = {
-      mode = "always",
-      reason = "official-stream-settings-visible"
-    },
+    ui_visibility = space_age_setting_visibility(),
     generation_requirements = {
       require_any_item = {"carbon"}
     },
@@ -346,10 +327,7 @@ return {
     { change = 0.02, recipe_patterns = { "^coal%-synthesis$" } }
   } },
   research_carbon_fiber = {
-    ui_visibility = {
-      mode = "always",
-      reason = "official-stream-settings-visible"
-    },
+    ui_visibility = space_age_setting_visibility(),
     generation_requirements = {
       require_any_item = {"carbon-fiber"}
     },
@@ -357,10 +335,7 @@ return {
     icon_tech="carbon-fiber"
   },
   research_ice = {
-    ui_visibility = {
-      mode = "always",
-      reason = "official-stream-settings-visible"
-    },
+    ui_visibility = space_age_setting_visibility(),
     generation_requirements = {
       require_any_item = {"ice"}
     },
@@ -372,10 +347,7 @@ return {
   } },
 
   research_bioflux = {
-    ui_visibility = {
-      mode = "always",
-      reason = "official-stream-settings-visible"
-    },
+    ui_visibility = space_age_setting_visibility(),
     generation_requirements = {
       require_any_item = {"bioflux"}
     },
@@ -384,10 +356,7 @@ return {
   },
   research_bacteria_cultivation = {
     allow_shared_input_output = true,
-    ui_visibility = {
-      mode = "always",
-      reason = "official-stream-settings-visible"
-    },
+    ui_visibility = space_age_setting_visibility(),
     generation_requirements = {
       require_any_recipe = {"iron-bacteria-cultivation", "copper-bacteria-cultivation"}
     },
@@ -397,10 +366,7 @@ return {
     "^copper%-bacteria%-cultivation$"
   } },
   research_breeding = {
-    ui_visibility = {
-      mode = "always",
-      reason = "official-stream-settings-visible"
-    },
+    ui_visibility = space_age_setting_visibility(),
     generation_requirements = {
       require_any_item = {"raw-fish", "biter-egg", "pentapod-egg"}
     },
@@ -435,10 +401,7 @@ return {
   }, exclude_ingredient_patterns={"scrap"} },
 
   research_artificial_soil = {
-    ui_visibility = {
-      mode = "always",
-      reason = "official-stream-settings-visible"
-    },
+    ui_visibility = space_age_setting_visibility(),
     generation_requirements = {
       require_any_item_family = {"artificial-soil", "overgrowth-soil"}
     },
@@ -449,10 +412,7 @@ return {
   } },
 
   research_molten_metals = {
-    ui_visibility = {
-      mode = "always",
-      reason = "official-stream-settings-visible"
-    },
+    ui_visibility = space_age_setting_visibility(),
     generation_requirements = {
       require_any_recipe = {"molten-iron-from-lava", "molten-copper-from-lava", "iron-ore-melting", "copper-ore-melting"}
     },

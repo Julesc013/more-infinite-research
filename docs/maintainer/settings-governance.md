@@ -17,7 +17,8 @@ Settings are compatibility surface. Treat a released setting ID like a public co
 ## Rules
 
 - Keep released setting IDs registered.
-- Keep MIR-owned official technology settings visible across base and Space Age, even when the current active mod set cannot generate that technology.
+- Keep official-DLC setting IDs registered, but hide their groups while the required DLC is inactive.
+- Hide experimental automatic-family tuning groups until the family is reviewed; retain their setting IDs and values for broad compiler testing and portable profiles.
 - Hide exact third-party provider stream settings when the provider mod is not active instead of deleting them.
 - Do not use `forced_value` for normal unavailable technology streams.
 - Keep settings-stage visibility based on `ui_visibility` metadata and active mods only. It must not inspect final prototype facts.
@@ -45,14 +46,16 @@ Settings are compatibility surface. Treat a released setting ID like a public co
 
 1. Add or confirm the stream ID.
 2. Keep the generated setting names stable: `ips-enable-<stream>`, `ips-cost-base-<stream>`, `ips-cost-growth-<stream>`, `ips-max-level-<stream>`, and `ips-research-time-<stream>`.
-3. Use `ui_visibility = { mode = "always" }` for MIR-owned official streams, including Space Age-shaped streams. Add provider-gated `ui_visibility` only when the setting is useful only with a specific third-party mod.
+3. Use active-mod `ui_visibility` for official-DLC streams, `hidden` for unreviewed automatic families, and `always` for base-visible MIR streams. Add provider-gated visibility when a setting is useful only with a specific optional mod.
 4. Add `generation_requirements` for the data-stage intent.
 5. Add or update the row in `.mir/settings.yml`.
-6. Add fixture or static validation if the stream should be hidden without its provider, or if the stream must remain visible across base and Space Age.
+6. Add settings-stage fixture coverage for both the hidden and visible states whenever availability depends on an active mod.
 
 ## Provider Visibility
 
-Use `always` for official or MIR-owned technology rows, including rows that will only generate when Space Age prototypes are active. Data-stage generation still skips unavailable candidates with clear diagnostics.
+Use `visible-if-mods-any` for official-DLC rows so Space Age-only groups are hidden in base-only settings screens and reappear when `space-age` is active. The prototypes and saved values remain registered while hidden. Data-stage generation remains independent and still validates final prototype facts, so a hidden default can continue to support structurally compatible modded content.
+
+Use `hidden` for experimental automatic-family tuning rows until their family maturity is promoted to reviewed. This prevents a checked low-level stream setting from looking like an active or accepted technology. The global broad experimental combination can still exercise those stable family identities, and portable profiles retain their hidden values.
 
 Use this pattern for exact optional-provider streams:
 
@@ -78,7 +81,7 @@ Global startup settings use the order helper in `prototypes/mir/settings/order.l
 
 Use these visible prefixes instead of fake section rows. Fake dividers are real settings, can be clicked, and make the settings UI noisier.
 
-Use the `settings_priority = "top"` stream or base-extension default for enabled technologies that are unusual, balance-sensitive, scripted, or important enough to keep above the ordinary generated technology list. Disabled or experimental rows still sort above that middle bucket because players should see opt-in risk first.
+Use the `settings_priority = "top"` stream or base-extension default for enabled technologies that are unusual, balance-sensitive, scripted, or important enough to keep above the ordinary generated technology list. Visible disabled rows still sort above that middle bucket so players see opt-in risk first. Experimental automatic-family rows remain hidden until reviewed.
 
 In 3.0.0, breeding productivity, agricultural growth speed, cargo bay unloading distance, cargo landing pad count, and character reach are enabled by default but stay in the special bucket. Inserter capacity bonus also stays near the top but remains disabled by default because larger inserter hand sizes can break circuit-controlled inserters and reduce engine optimization assumptions.
 
