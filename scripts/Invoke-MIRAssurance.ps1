@@ -36,13 +36,29 @@ function Get-MIRAssuranceTextHash {
   finally { $sha.Dispose() }
 }
 
+function Get-MIRAssuranceRepositoryBlobId {
+  param([Parameter(Mandatory)][string]$Path)
+  $full = if ([IO.Path]::IsPathRooted($Path)) { $Path } else { Join-Path $repo $Path }
+  $relative = [IO.Path]::GetRelativePath($repo, $full).Replace("\", "/")
+  $blob = @(& git -C $repo hash-object "--path=$relative" -- $full)
+  if ($LASTEXITCODE -ne 0 -or $blob.Count -ne 1) { throw "Unable to calculate canonical Git blob identity for $relative." }
+  return ([string]$blob[0]).Trim()
+}
+
+function Get-MIRAssuranceRepositoryFileHash {
+  param([Parameter(Mandatory)][string]$Path)
+  $full = if ([IO.Path]::IsPathRooted($Path)) { $Path } else { Join-Path $repo $Path }
+  $relative = [IO.Path]::GetRelativePath($repo, $full).Replace("\", "/")
+  return Get-MIRAssuranceTextHash -Text "$relative`t$(Get-MIRAssuranceRepositoryBlobId -Path $full)"
+}
+
 function Get-MIRAssuranceTreeHash {
   param([Parameter(Mandatory)][string[]]$Paths)
   $rows = foreach ($path in @($Paths | Sort-Object -Unique)) {
     $full = if ([IO.Path]::IsPathRooted($path)) { $path } else { Join-Path $repo $path }
     if (Test-Path -LiteralPath $full -PathType Leaf) {
       $relative = [IO.Path]::GetRelativePath($repo, $full).Replace("\", "/")
-      "$relative`t$(Get-MIRAssuranceSha256 -Path $full)"
+      "$relative`t$(Get-MIRAssuranceRepositoryBlobId -Path $full)"
     }
   }
   return Get-MIRAssuranceTextHash -Text (($rows | Sort-Object) -join "`n")
@@ -201,7 +217,7 @@ function Get-MIRAssurancePlan {
     tests=@($expanded)
     requires_factorio=(@($expanded | Where-Object { $_.requires_factorio }).Count -gt 0)
     package_source_sha256=(Get-MIRAssuranceTreeHash -Paths (Get-MIRAssurancePackageFiles))
-    test_catalog_sha256=(Get-MIRAssuranceSha256 -Path $catalogPath)
+    test_catalog_sha256=(Get-MIRAssuranceRepositoryFileHash -Path $catalogPath)
     validation_harness_sha256=(Get-MIRAssuranceTreeHash -Paths (Get-MIRAssuranceHarnessFiles))
   }
 }
@@ -314,12 +330,12 @@ function Invoke-MIRAssuranceSeal {
     candidate_sha256=(Get-MIRAssuranceSha256 -Path $Context.candidate)
     candidate_content_sha256=(Get-MIRAssuranceZipContentHash -Path $Context.candidate)
     package_source_sha256=(Get-MIRAssuranceTreeHash -Paths (Get-MIRAssurancePackageFiles))
-    target_profile_sha256=(Get-MIRAssuranceSha256 -Path (Join-Path $repo ".mir\targets.json"))
-    test_catalog_sha256=(Get-MIRAssuranceSha256 -Path $catalogPath)
+    target_profile_sha256=(Get-MIRAssuranceRepositoryFileHash -Path (Join-Path $repo ".mir\targets.json"))
+    test_catalog_sha256=(Get-MIRAssuranceRepositoryFileHash -Path $catalogPath)
     validation_harness_sha256=(Get-MIRAssuranceTreeHash -Paths (Get-MIRAssuranceHarnessFiles))
     factorio_binary=$Context.factorio; factorio_sha256=$factorioHash
     qualification_summary=[IO.Path]::GetRelativePath($repo, (Resolve-Path $summaryPath).Path).Replace("\", "/")
-    qualification_summary_sha256=(Get-MIRAssuranceSha256 -Path $summaryPath)
+    qualification_summary_sha256=(Get-MIRAssuranceRepositoryFileHash -Path $summaryPath)
     sealed_at=(Get-Date).ToUniversalTime().ToString("o")
   }
   $default = ".mir/evidence/candidate-seals/mir-$($Context.info.version)-factorio-$($Context.target).json"
@@ -349,13 +365,13 @@ function Invoke-MIRAssuranceCheckSeal {
     $checks.candidate_content_sha256=((Get-MIRAssuranceZipContentHash -Path $candidate) -eq [string]$seal.candidate_content_sha256)
   }
   $checks.package_source_sha256=((Get-MIRAssuranceTreeHash -Paths (Get-MIRAssurancePackageFiles)) -eq [string]$seal.package_source_sha256)
-  $checks.target_profile_sha256=((Get-MIRAssuranceSha256 -Path (Join-Path $repo ".mir\targets.json")) -eq [string]$seal.target_profile_sha256)
-  $checks.test_catalog_sha256=((Get-MIRAssuranceSha256 -Path $catalogPath) -eq [string]$seal.test_catalog_sha256)
+  $checks.target_profile_sha256=((Get-MIRAssuranceRepositoryFileHash -Path (Join-Path $repo ".mir\targets.json")) -eq [string]$seal.target_profile_sha256)
+  $checks.test_catalog_sha256=((Get-MIRAssuranceRepositoryFileHash -Path $catalogPath) -eq [string]$seal.test_catalog_sha256)
   $checks.validation_harness_sha256=((Get-MIRAssuranceTreeHash -Paths (Get-MIRAssuranceHarnessFiles)) -eq [string]$seal.validation_harness_sha256)
   & git -C $repo merge-base --is-ancestor ([string]$seal.source_commit) HEAD
   $checks.source_is_ancestor=($LASTEXITCODE -eq 0)
   $summaryPath = Join-Path $repo ([string]$seal.qualification_summary)
-  $checks.evidence_sha256=((Test-Path -LiteralPath $summaryPath) -and ((Get-MIRAssuranceSha256 -Path $summaryPath) -eq [string]$seal.qualification_summary_sha256))
+  $checks.evidence_sha256=((Test-Path -LiteralPath $summaryPath) -and ((Get-MIRAssuranceRepositoryFileHash -Path $summaryPath) -eq [string]$seal.qualification_summary_sha256))
   $passed = @($checks.Values | Where-Object { -not $_ }).Count -eq 0
   $result = [ordered]@{ schema=1; status=if ($passed) { "passed" } else { "failed" }; seal=$sealPath; checks=$checks }
   Write-MIRAssuranceJson -Value $result
