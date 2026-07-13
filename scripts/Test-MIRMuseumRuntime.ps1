@@ -29,15 +29,31 @@ $modsDir = Join-Path $userDir "mods"
 New-Item -ItemType Directory -Force -Path $modsDir, $userDir | Out-Null
 
 $packageName = "$($catalog.mod_name)_$($target.version)"
+$runtimeDeploymentMode = "directory"
+$runtimeDeploymentPath = ""
+$runtimePackagePath = ""
 if ($PackageMode -eq "zip") {
   if ([string]::IsNullOrWhiteSpace($PackagePath)) {
     $built = New-MIRMuseumPackage -Catalog $catalog -Target $target -RepoRoot $repo -OutputDir "build\museum-runtime\packages"
     $PackagePath = $built.path
   }
   if (-not (Test-Path -LiteralPath $PackagePath -PathType Leaf)) { throw "Package not found: $PackagePath" }
-  Copy-Item -LiteralPath $PackagePath -Destination (Join-Path $modsDir "$packageName.zip")
+  if ([string]$target.package_mode -eq "extract-required") {
+    $runtimePackagePath = Join-Path $EvidenceRoot "$packageName.zip"
+    Copy-Item -LiteralPath $PackagePath -Destination $runtimePackagePath
+    Expand-Archive -LiteralPath $runtimePackagePath -DestinationPath $modsDir -Force
+    $runtimeDeploymentMode = "exact-zip-extracted"
+    $runtimeDeploymentPath = Join-Path $modsDir $packageName
+    if (-not (Test-Path -LiteralPath $runtimeDeploymentPath -PathType Container)) { throw "Extracted package root not found: $runtimeDeploymentPath" }
+  } else {
+    $runtimePackagePath = Join-Path $modsDir "$packageName.zip"
+    Copy-Item -LiteralPath $PackagePath -Destination $runtimePackagePath
+    $runtimeDeploymentMode = "zip-native"
+    $runtimeDeploymentPath = $runtimePackagePath
+  }
 } else {
   $modRoot = Join-Path $modsDir $packageName
+  $runtimeDeploymentPath = $modRoot
   New-MIRMuseumTargetSource -Catalog $catalog -Target $target -OutputRoot $modRoot | Out-Null
   Remove-Item -LiteralPath (Join-Path $modsDir "stream-manifest.json"), (Join-Path $modsDir "balance.json") -Force -ErrorAction SilentlyContinue
   if ($OneTechnology) {
@@ -70,9 +86,176 @@ locale=en
 enable-steam-networking=false
 "@
 Set-MIRUtf8Text -Path $configPath -Text ($configText + "`n")
+$binary = ([string]$target.binary).Replace('/', '\')
+
+# Factorio 0.11 and earlier predate the --create/--start-server CLI used by the
+# 0.12 proof. Prove those releases through two bounded GUI startups instead:
+# the exact executable must discover the candidate ZIP, finish its data-stage
+# load without an error, and remain healthy at the main menu until the harness
+# terminates it. Old releases also require an explicit mod-list.json.
+if ($FactorioVersion -ne "0.12") {
+  $modList = [ordered]@{
+    mods = @(
+      [ordered]@{ name = "base"; enabled = "true" },
+      [ordered]@{ name = [string]$catalog.mod_name; enabled = "true" }
+    )
+  }
+  Set-MIRUtf8Text -Path (Join-Path $modsDir "mod-list.json") -Text (($modList | ConvertTo-Json -Depth 5) + "`n")
+  $versionProofPath = Join-Path $EvidenceRoot "binary-version.txt"
+  $versionCommand = '"{0}" --version > "{1}" 2>&1' -f $binary, $versionProofPath
+  & $env:ComSpec /d /c $versionCommand
+  $versionExitCode = $LASTEXITCODE
+  $versionOutput = if (Test-Path -LiteralPath $versionProofPath) { Get-Content -Raw -LiteralPath $versionProofPath } else { "" }
+  if ($versionExitCode -ne 0 -or $versionOutput -notmatch [regex]::Escape("Version: $($target.exact_patch)")) {
+    throw "The target executable does not report exact Factorio patch $($target.exact_patch)."
+  }
+  Set-MIRUtf8Text -Path $versionProofPath -Text ($versionOutput + "`n")
+  $usesLogProof = @("0.11", "0.10") -contains $FactorioVersion
+  $startupArguments = @("--config", $configPath)
+  $configurationIsolation = "cli-config"
+  $installedConfigPath = ""
+  $installedConfigPathOriginal = $null
+  $installedConfigPathOriginalSha256 = ""
+  if ($FactorioVersion -ne "0.11") {
+    if (Get-Process -Name Factorio -ErrorAction SilentlyContinue) {
+      throw "A Factorio process is already running; cannot transactionally isolate the pre-0.11 config path."
+    }
+    $installRoot = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $binary))
+    $installedConfigPath = Join-Path $installRoot "config-path.cfg"
+    if (-not (Test-Path -LiteralPath $installedConfigPath -PathType Leaf)) { throw "Missing target config-path.cfg: $installedConfigPath" }
+    $installedConfigPathOriginal = [IO.File]::ReadAllBytes($installedConfigPath)
+    $installedConfigPathOriginalSha256 = Get-MIRSha256 $installedConfigPath
+    $targetConfigDir = Join-Path $EvidenceRoot "target-config"
+    New-Item -ItemType Directory -Force -Path $targetConfigDir | Out-Null
+    $configPath = Join-Path $targetConfigDir "config.ini"
+    Set-MIRUtf8Text -Path $configPath -Text ($configText + "`n")
+    $guardText = "config-path=$($targetConfigDir.Replace('\', '/'))`nuse-system-read-write-data-directories=true`n"
+    [IO.File]::WriteAllText($installedConfigPath, $guardText, [Text.UTF8Encoding]::new($false))
+    $startupArguments = @()
+    $configurationIsolation = "transactional-config-path-restored"
+  }
+
+  function Invoke-MIRLegacyStartup {
+    param([Parameter(Mandatory)][string]$Name)
+    $currentLog = Join-Path $userDir "factorio-current.log"
+    $cropCache = Join-Path $userDir "crop-cache.dat"
+    if ($usesLogProof) { Remove-Item -LiteralPath $currentLog -Force -ErrorAction SilentlyContinue }
+    else { Remove-Item -LiteralPath $cropCache -Force -ErrorAction SilentlyContinue }
+    $started = Get-Date
+    $processInfo = [Diagnostics.ProcessStartInfo]::new()
+    $processInfo.FileName = $binary
+    $processInfo.UseShellExecute = $false
+    $processInfo.CreateNoWindow = $true
+    $processInfo.WindowStyle = [Diagnostics.ProcessWindowStyle]::Hidden
+    foreach ($argument in $startupArguments) { [void]$processInfo.ArgumentList.Add($argument) }
+    $process = [Diagnostics.Process]::Start($processInfo)
+    $deadline = (Get-Date).AddSeconds($TimeoutSeconds)
+    $loadedAt = $null
+    $lastObservedWrite = $null
+    $quietSince = $null
+    $logText = ""
+    $markerOffset = -1
+    while ((Get-Date) -lt $deadline) {
+      Start-Sleep -Milliseconds 200
+      $liveProofPath = if ($usesLogProof) { $currentLog } else { $cropCache }
+      if (Test-Path -LiteralPath $liveProofPath -PathType Leaf) {
+        $item = Get-Item -LiteralPath $liveProofPath
+        if ($lastObservedWrite -ne $item.LastWriteTimeUtc) {
+          $lastObservedWrite = $item.LastWriteTimeUtc
+          $quietSince = Get-Date
+          if ($usesLogProof) {
+            $logText = Get-Content -Raw -LiteralPath $currentLog
+            $markerOffset = $logText.IndexOf("Loading mod $($catalog.mod_name) $($target.version)", [StringComparison]::Ordinal)
+          } else {
+            $cacheText = [Text.Encoding]::GetEncoding(28591).GetString([IO.File]::ReadAllBytes($cropCache))
+            $markerOffset = $cacheText.IndexOf([string]$catalog.mod_name, [StringComparison]::Ordinal)
+          }
+        }
+        if (-not $loadedAt -and $markerOffset -ge 0) {
+          $loadedAt = Get-Date
+        }
+        if ($usesLogProof -and $logText -match '(?im)(^|\s)(Error|Failed to load mods|Failed to load mod|Invalid Mod|Couldn.t load|stack traceback)') {
+          if (-not $process.HasExited) { try { $process.Kill($true) } catch { $process.Kill() } }
+          throw "Factorio $FactorioVersion $Name log contains a load failure. Log: $currentLog"
+        }
+        if ($loadedAt -and $quietSince -and ((Get-Date) - $quietSince).TotalSeconds -ge 2 -and -not $process.HasExited) { break }
+      }
+      if ($process.HasExited) {
+        throw "Factorio $FactorioVersion $Name exited before reaching a proven loaded startup state (exit $($process.ExitCode)). Log: $currentLog"
+      }
+    }
+    if (-not $loadedAt -or $process.HasExited) {
+      if (-not $process.HasExited) { try { $process.Kill($true) } catch { $process.Kill() } }
+      throw "Factorio $FactorioVersion $Name did not reach a proven loaded startup state within $TimeoutSeconds seconds. Log: $currentLog"
+    }
+    if ($usesLogProof) { $logText = Get-Content -Raw -LiteralPath $currentLog }
+    if ($usesLogProof -and $logText -notmatch [regex]::Escape("Factorio $($target.exact_patch)")) {
+      try { $process.Kill($true) } catch { $process.Kill() }
+      throw "Runtime log does not prove exact Factorio patch $($target.exact_patch). Log: $currentLog"
+    }
+    try { $process.Kill($true) } catch { $process.Kill() }
+    [void]$process.WaitForExit(10000)
+    $proofExtension = if ($usesLogProof) { "log" } else { "crop-cache.dat" }
+    $proofKind = if ($usesLogProof) { "factorio-log-mod-load" } else { "regenerated-crop-cache-mod-marker" }
+    $proofPath = Join-Path $EvidenceRoot "$Name.$proofExtension"
+    $liveProofPath = if ($usesLogProof) { $currentLog } else { $cropCache }
+    Copy-Item -LiteralPath $liveProofPath -Destination $proofPath -Force
+    return [pscustomobject][ordered]@{
+      status = if ($usesLogProof) { "passed-bounded-startup-load" } else { "passed-bounded-crop-cache-load" }
+      duration_seconds = [math]::Round(((Get-Date) - $started).TotalSeconds, 3)
+      command = @($binary) + @($startupArguments)
+      terminated_after_proof = $true
+      process_exit_code = $process.ExitCode
+      proof_kind = $proofKind
+      proof_path = (Resolve-Path -LiteralPath $proofPath).Path
+      proof_sha256 = Get-MIRSha256 $proofPath
+      mod_marker = [string]$catalog.mod_name
+      mod_marker_offset = $markerOffset
+    }
+  }
+
+  try {
+    $first = Invoke-MIRLegacyStartup -Name "fresh-start"
+    $second = if ($Reload) { Invoke-MIRLegacyStartup -Name "second-start" } else { $null }
+  } finally {
+    if ($installedConfigPathOriginal) {
+      [IO.File]::WriteAllBytes($installedConfigPath, $installedConfigPathOriginal)
+    }
+  }
+  if ($installedConfigPathOriginalSha256 -and (Get-MIRSha256 $installedConfigPath) -ne $installedConfigPathOriginalSha256) {
+    throw "Target config-path.cfg was not restored byte-for-byte after the runtime proof."
+  }
+  $record = [ordered]@{
+    schema = 1
+    status = "passed"
+    factorio = $FactorioVersion
+    exact_patch = [string]$target.exact_patch
+    binary = (Resolve-Path -LiteralPath $binary).Path
+    binary_sha256 = Get-MIRSha256 $binary
+    binary_architecture = "win64-x64"
+    package_mode = $PackageMode
+    package_path = if ($PackageMode -eq "zip") { (Resolve-Path -LiteralPath $runtimePackagePath).Path } else { (Resolve-Path -LiteralPath $runtimeDeploymentPath).Path }
+    runtime_deployment_mode = $runtimeDeploymentMode
+    runtime_deployment_path = (Resolve-Path -LiteralPath $runtimeDeploymentPath).Path
+    one_technology = [bool]$OneTechnology
+    runtime_mode = "bounded-gui-startup-load"
+    configuration_isolation = $configurationIsolation
+    config_path_restored_sha256 = $installedConfigPathOriginalSha256
+    binary_version_proof_path = (Resolve-Path -LiteralPath $versionProofPath).Path
+    binary_version_proof_sha256 = Get-MIRSha256 $versionProofPath
+    fresh_start = $first
+    second_start = $second
+    reload = if ($second) { "passed-bounded-second-startup" } else { "not_run" }
+    save_proof = "not_available_on_target_cli"
+  }
+  $recordPath = Join-Path $EvidenceRoot "runtime-proof.json"
+  Set-MIRUtf8Text -Path $recordPath -Text (($record | ConvertTo-Json -Depth 10) + "`n")
+  $record | ConvertTo-Json -Depth 10
+  return
+}
+
 $saveName = "fresh-create"
 $savePath = Join-Path $userDir "saves\$saveName.zip"
-$binary = ([string]$target.binary).Replace('/', '\')
 $arguments = @("--config", $configPath, "--create", $saveName)
 $started = Get-Date
 $processInfo = [Diagnostics.ProcessStartInfo]::new()

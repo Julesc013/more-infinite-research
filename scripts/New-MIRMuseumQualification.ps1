@@ -25,7 +25,21 @@ if ([string]$runtime.status -ne "passed" -or [string]$runtime.factorio -ne $Fact
 if ([string]$runtime.exact_patch -ne [string]$target.exact_patch) { throw "Runtime proof patch mismatch." }
 if ([string]$runtime.binary_sha256 -ne (Get-MIRSha256 ([string]$target.binary).Replace('/', '\'))) { throw "Runtime proof binary mismatch." }
 if ([string]$runtime.package_mode -ne "zip") { throw "Qualification requires exact ZIP runtime proof." }
-if ([string]$runtime.fresh_create -ne "passed" -or [string]$runtime.reload -notlike "passed*") { throw "Qualification requires fresh create and reload proof." }
+$expectedDeploymentMode = if ([string]$target.package_mode -eq "extract-required") { "exact-zip-extracted" } else { "zip-native" }
+if ($FactorioVersion -ne "0.12" -and [string]$runtime.runtime_deployment_mode -ne $expectedDeploymentMode) {
+  throw "Runtime proof deployment mode does not match target package policy $($target.package_mode)."
+}
+$legacyStartupProof = $FactorioVersion -ne "0.12"
+if ($legacyStartupProof) {
+  if ([string]$runtime.runtime_mode -ne "bounded-gui-startup-load" -or
+      [string]$runtime.fresh_start.status -notlike "passed*" -or
+      [string]$runtime.second_start.status -notlike "passed*" -or
+      [string]$runtime.reload -notlike "passed*") {
+    throw "Qualification requires two passed bounded startup/load proofs on pre-0.12 targets."
+  }
+} elseif ([string]$runtime.fresh_create -ne "passed" -or [string]$runtime.reload -notlike "passed*") {
+  throw "Qualification requires fresh create and reload proof."
+}
 $identity = Get-MIRMuseumZipIdentity -Path $PackagePath
 if ($identity.entries -ne 4) { throw "Museum package must contain exactly four files." }
 
@@ -45,7 +59,7 @@ $record = [ordered]@{
   }
   package = [ordered]@{
     path = (Resolve-Path -LiteralPath $PackagePath).Path.Substring($repo.Path.Length + 1).Replace('\', '/')
-    mode = "zip-native"
+    mode = [string]$target.package_mode
     size_bytes = $identity.size
     entries = $identity.entries
     sha256 = $identity.sha256
@@ -65,8 +79,10 @@ $record = [ordered]@{
     twenty_five_negative_cases = "passed"
     deterministic_clean_builds = "passed"
     package_hygiene = "passed"
-    exact_zip_fresh_create = [string]$runtime.fresh_create
-    exact_zip_reload = [string]$runtime.reload
+    exact_zip_initial_load = if ($legacyStartupProof) { [string]$runtime.fresh_start.status } else { [string]$runtime.fresh_create }
+    exact_zip_second_load = [string]$runtime.reload
+    target_cli_save_proof = if ($legacyStartupProof) { "not-available-pre-0.12" } else { "passed" }
+    runtime_deployment = if ($legacyStartupProof) { [string]$runtime.runtime_deployment_mode } else { "zip-native" }
     locale_parser_and_load = "passed"
     balance_invariants = "passed"
     upgrade = "not-applicable-first-release"
