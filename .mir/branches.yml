@@ -241,19 +241,25 @@ release_artifacts:
       branch: tmp/0.14
       target_factorio: "0.14"
       source_anchor: mir_1_5_0
-      source_commit: fa3b532fa158ed506f474f5ad3796e032332f012
+      source_commit: 154de2ab9bb98e2081592851b15e23b4b658f330
       artifact: dist/more-infinite-research_1.4.0.zip
-      sha256: F6E90F291C838A8DAB80AE1E340D897ADFC14E8A7657B2D01D93C18B476DCBD6
-      size_bytes: 303250
-      entries: 122
+      sha256: 39EDE9BA8DA7BDD632828B0B1F055A8681FC1DAB48D7D1B9348D707BB0AF0B93
+      size_bytes: 301270
+      entries: 117
       forbidden_entries: 0
       automated_gate: passed
       exact_dist_base: passed
+      deterministic_rebuild: passed
       fresh_create: passed
       fresh_reload: passed-server-load
-      structured_summary_path: .mir/evidence/1.4.0-candidate-summary.json
+      structured_summary_path: .mir/evidence/1.4.0-qualification-summary.json
+      candidate_seal_path: .mir/evidence/1.4.0-candidate-seal.json
+      supersedes_candidate_sha256: F6E90F291C838A8DAB80AE1E340D897ADFC14E8A7657B2D01D93C18B476DCBD6
+      prior_upgrade: not-applicable-no-legitimate-prior-release
+      capability_mode: finite-reconstruction
       public_release: false
-      status: candidate-qualified
+      tag: not-run
+      status: release-ready-candidate
   closed_versions:
     - version: "2.2.0"
       branch: main
