@@ -3,6 +3,7 @@ local defaults = require("prototypes.mir.settings.defaults")
 local settings_catalog = require("prototypes.mir.settings.catalog")
 local settings_adapter = require("prototypes.mir.settings.stage_adapter")
 local setting_order = require("prototypes.mir.settings.order")
+local target_line = require("prototypes.mir.platform.factorio.target_line")
 
 local settings_data = {}
 local settings_context = settings_adapter.context()
@@ -159,15 +160,17 @@ end
 local technology_setting_groups = {}
 
 for key, stream in pairs(C.streams) do
-  table.insert(technology_setting_groups, {
-    kind = "stream",
-    key = key,
-    stream = stream,
-    sort_name = stream_sort_name(key),
-    enabled = default_enabled(key, stream),
-    settings_priority = lookup_default(key, "settings_priority", stream, nil),
-    ui_visibility = settings_adapter.visibility_for_stream(stream, settings_context)
-  })
+  if target_line.stream_supported(key, stream) then
+    table.insert(technology_setting_groups, {
+      kind = "stream",
+      key = key,
+      stream = stream,
+      sort_name = stream_sort_name(key),
+      enabled = default_enabled(key, stream),
+      settings_priority = lookup_default(key, "settings_priority", stream, nil),
+      ui_visibility = settings_adapter.visibility_for_stream(stream, settings_context)
+    })
+  end
 end
 
 for _, spec in ipairs(base_extension_specs) do

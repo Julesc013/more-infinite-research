@@ -27,6 +27,7 @@ Usage:
   .\scripts\mir.ps1 audit local [--profile <name>]
   .\scripts\mir.ps1 audit top25 --space-age
   .\scripts\mir.ps1 package build
+  .\scripts\mir.ps1 assurance <qualify|seal|check-seal> [--factorio <path>] [--candidate <zip>] [--prior <zip>] [--static-only]
   .\scripts\mir.ps1 report latest
   .\scripts\mir.ps1 report missing-deps --run <path>
   .\scripts\mir.ps1 report observations --run <path>
@@ -354,6 +355,19 @@ $area = $Args[0]
 $verb = if ($Args.Count -gt 1) { $Args[1] } else { "" }
 
 switch ($area) {
+  "assurance" {
+    if ($verb -notin @("qualify", "seal", "check-seal")) { throw "Unknown assurance command: $verb" }
+    $params = @{ Action = $verb }
+    $factorio = Get-MIRArgValue -Items $Args -Name "--factorio"
+    $candidate = Get-MIRArgValue -Items $Args -Name "--candidate"
+    $prior = Get-MIRArgValue -Items $Args -Name "--prior"
+    if (-not [string]::IsNullOrWhiteSpace($factorio)) { $params.FactorioBin = $factorio }
+    if (-not [string]::IsNullOrWhiteSpace($candidate)) { $params.CandidateZip = $candidate }
+    if (-not [string]::IsNullOrWhiteSpace($prior)) { $params.PriorZip = $prior }
+    if (Test-MIRArgSwitch -Items $Args -Name "--static-only") { $params.StaticOnly = $true }
+    if (Test-MIRArgSwitch -Items $Args -Name "--runtime-only") { $params.RuntimeOnly = $true }
+    & (Join-Path $scriptRoot "Invoke-MIRBackportQualification.ps1") @params
+  }
   "docs" {
     if ($verb -ne "check") { throw "Unknown docs command: $verb" }
     & (Join-Path $scriptRoot "Invoke-MIRValidation.ps1") -DocsOnly

@@ -11,6 +11,7 @@ Date: 2026-07-12
     - Preserved external infinite weapon-speed continuations as target-owned compatibility authorities.
     - Replaced recursive technology-graph traversal with a deterministic iterative walk.
     - Large modpacks can no longer exhaust the Lua call stack while MIR validates prerequisites.
+    - Omitted recipe-productivity settings that Factorio 1.1 cannot apply, instead of exposing inert controls.
 
   Changes:
 
