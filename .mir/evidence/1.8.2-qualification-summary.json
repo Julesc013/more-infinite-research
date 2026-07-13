@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "status": "passed",
+  "branch": "tmp/1.0",
+  "release": "1.8.2",
+  "target_factorio": "1.0",
+  "candidate": {
+    "path": "dist/more-infinite-research_1.8.2.zip",
+    "sha256": "740F439060031B6C64925B2CBAC038912703A39F7CC2030775DEFE60C93CADD5",
+    "size_bytes": 302549
+  },
+  "factorio": {
+    "version": "1.0.0",
+    "binary_sha256": "99F1CE207A04296EF7D797E4A98AA98DDE4F02EE653C9DF736AC33A676FD4F70"
+  },
+  "capability_classification": "passed",
+  "deterministic_rebuild": "passed",
+  "static_gate": "passed",
+  "exact_candidate_runtime": "passed",
+  "fresh_create_reload_and_prior_retention": "passed",
+  "runtime_scenario_baseline": 10,
+  "ecosystem": "fixture-and-named-scenario evidence only; no broader public claim added",
+  "public_release": false,
+  "tag": "not-run"
+}
