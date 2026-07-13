@@ -13,6 +13,15 @@ local function assert_startup_setting_readable(name)
   end
 end
 
+for _, name in ipairs({
+  "mir-automatic-productivity-action",
+  "mir-automatic-create-research",
+  "mir-automatic-require-reviewed-data",
+  "mir-automatic-compiler-mode"
+}) do
+  assert_startup_setting_readable(name)
+end
+
 local governed_stream_keys = {
   "research_advanced_circuit",
   "research_agricultural_growth_speed",

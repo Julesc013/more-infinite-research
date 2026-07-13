@@ -1,11 +1,11 @@
 ---
 title: "Automatic Family Compiler"
 status: current
-applies_to: "3.1.0 dev"
+applies_to: "3.1.0+"
 audience: maintainer
 doc_type: explanation
 owner: mir-maintainers
-last_reviewed: 2026-07-12
+last_reviewed: 2026-07-13
 supersedes: []
 superseded_by: []
 ---
@@ -41,7 +41,8 @@ Planning is side-effect free. Only modules under `prototypes/mir/emit/` may crea
 - Predeclared family technologies require an explicit manifest row and migration review before emission is enabled.
 - Ambiguous, risky, loop-forming, hidden, or externally owned candidates remain proposal-only or diagnostic-only.
 - Compatibility packs contain selectors, policy, expected decisions, and claim metadata. They do not read `data.raw` or mutate prototypes. Hard safety facts are never data-overridable.
-- `exact-pack` emits only a family named by an active exact-version, fixture-backed generation authorization.
+- The schema-2 automatic compiler policy separates action (`disabled`, `preview`, or `apply`) from research creation and reviewed-data requirements. The policy names no mods, recipes, technologies, or Factorio versions.
+- When reviewed compatibility data is required, emission needs an active exact-version, fixture-backed generation authorization for that registered family.
 - A reviewed candidate seed may add one exact recipe to an existing FamilyRule and stable stream; every hard gate still applies.
 - Fixture-only profiles belong to fixture data, not the production profile registry.
 
@@ -51,6 +52,8 @@ Planning is side-effect free. Only modules under `prototypes/mir/emit/` may crea
 2. Fact consolidation: RecipeFactV2 and shared indexes replace parallel partial recipe models.
 3. Attach-only automation: structural family rules attach safe loader, mining drill, module, logistics, furnace, lab, and power recipes to existing streams.
 4. Reviewed expansion: only fixture-backed manifest-declared family emission or compatibility packs may add new behavior.
+
+Family modules are open-ended data declarations behind one stable policy contract. Adding a family requires a manifest row, stable identity, positive and negative structural fixtures, balance and migration review, and target capability evidence; it does not require another player-facing compiler mode. Compatibility packs refine exact ecosystems but cannot mutate prototypes or weaken hard gates.
 
 Each gate requires focused pure tests, static validation, deterministic plan evidence, a generated-ID parity check, and target runtime validation before it can become a release candidate.
 

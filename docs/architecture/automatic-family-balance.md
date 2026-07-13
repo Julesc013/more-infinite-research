@@ -5,7 +5,7 @@ applies_to: "3.1.0"
 audience: maintainer
 doc_type: explanation
 owner: mir-maintainers
-last_reviewed: 2026-07-12
+last_reviewed: 2026-07-13
 supersedes: []
 superseded_by: []
 ---
@@ -18,8 +18,8 @@ MIR 3.1.0 ships structural attachment conservatively. Confidence ranks evidence 
 
 | FamilyRule | Destination | Change per level | Science and prerequisites | 3.1 action |
 | --- | --- | ---: | --- | --- |
-| Assembling-machine manufacturing | reviewed generic identity | 2% | automation, logistic, chemical, production; prerequisite frontier derived from those packs | `safe-generate` only |
-| Lab manufacturing | reviewed generic identity | 2% | automation, logistic, chemical, production; prerequisite frontier derived from those packs | `safe-generate` only |
+| Assembling-machine manufacturing | reviewed generic identity | 2% | automation, logistic, chemical, production; prerequisite frontier derived from those packs | creation enabled through registered family module |
+| Lab manufacturing | reviewed generic identity | 2% | automation, logistic, chemical, production; prerequisite frontier derived from those packs | creation enabled through registered family module |
 | Furnace manufacturing | existing furnace stream | 2% | inherit target stream | safe attach |
 | Inserter manufacturing | existing inserter stream | 1% | inherit target stream | safe attach |
 | Loader manufacturing | existing belt stream | 1% | inherit target stream | safe attach |
@@ -38,3 +38,5 @@ These values intentionally match the conservative end of their destination strea
 - CompatibilityPack reviewed overrides may refine only exact soft signals. Effective productivity permission, caps, parameterization, recycling, self-return, stochastic products, catalysts, exclusions, and blocking infinite owners are hard facts and cannot be overridden by pack data.
 
 The 3.1.0 objective is complete accounting and safe attachment, not maximum automatic productivity. New automatic families require a separate stable ID decision, schema-2 rule, arbitrary-name structural fixture, negative/decoy fixture, exact modpack campaign, balance review, and migration record.
+
+These are the currently registered family modules, not a closed compiler list or player-facing setting taxonomy. Later reviewed families plug into the same generic action, creation, authorization, plan, and emission contracts.

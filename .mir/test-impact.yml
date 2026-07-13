@@ -7,6 +7,11 @@
   ],
   "paths": [
     {
+      "pattern": "prototypes/mir/settings/automatic_compiler_*.lua",
+      "groups": ["automatic-compiler"],
+      "scenarios": ["compiler-contracts", "semantic-family-off", "semantic-family-report", "semantic-family-attach", "semantic-family-generate", "semantic-family-exact-pack"]
+    },
+    {
       "pattern": "prototypes/mir/families/**",
       "scenarios": ["semantic-family-off", "semantic-family-report", "semantic-family-attach", "semantic-family-generate", "semantic-family-exact-pack"]
     },

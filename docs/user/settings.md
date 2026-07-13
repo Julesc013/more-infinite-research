@@ -20,17 +20,19 @@ Use the in-game setting descriptions for exact defaults. Use [settings reference
 
 Global settings are grouped with visible prefixes: Main, Compatibility, Limits, Advanced, and Diagnostics. Some prefixes are color-emphasized in-game for faster scanning, but the label text is still the structure.
 
-Mod Recipe Productivity Coverage controls how MIR adds infinite productivity support for recipes from other mods. It is a set of complete presets, not a strength or experimental-level scale. The menu is ordered from no automatic changes to the broadest general coverage:
+Automatic productivity support is a small set of independent controls for recipes discovered in installed mods. The dropdown chooses an action, not a strength or experimental level:
 
-| Choice | Automatic behavior |
+| Action | Behavior |
 | --- | --- |
-| Disabled | Makes no automatic changes. MIR's fixed research still works. |
-| Preview Only | Analyzes candidates and records accepted and rejected decisions in the Factorio log without changing research. |
-| Existing Research (Recommended) | Adds safety-proven mod recipes to compatible existing MIR productivity technologies and creates no new automatic technology lines. |
-| Existing + Approved Packs | Also permits a new productivity technology when an active MIR compatibility pack matches the exact installed mod version and explicitly approves that family. |
-| Existing + Assembler/Lab | Also permits MIR's predeclared Assembling Machine Manufacturing and Lab Manufacturing productivity lines when every safety check passes. This is the broadest general preset. |
+| Disabled | Performs no automatic discovery or changes. MIR's fixed research still works. |
+| Preview Changes | Classifies candidates and writes accepted and skipped decisions to the Factorio log without changing research. |
+| Apply Safe Changes (Recommended) | Attaches only safety-proven recipes to compatible existing MIR research. |
 
-The setting remains one dropdown because the choices are mutually exclusive compiler policies. Separate checkboxes would allow contradictory combinations such as previewing changes while also applying them. Stored setting values remain stable for profiles and saves, every choice has an outcome-first in-game tooltip, fixed research streams are unaffected, and missing hard safety proof always blocks a change.
+`Create research when needed` is a separate, default-off checkbox. It lets registered family modules create stable generic research when eligible recipes do not fit an existing MIR stream. It never creates one technology per mod or recipe. `Require reviewed compatibility data` applies only to that creation path: enabled requires an applicable exact-version compatibility record with named evidence; disabled allows registered built-in family modules to use generic structural evidence.
+
+The settings do not encode current mod names, technology names, or a closed list of future families. New compiler family modules use the same action and creation contract. Every path still passes target, productivity-permission, ownership, recycling, probability, catalyst, science, lab, prerequisite, progression, identity, and technology-cycle gates. Unsafe or ambiguous candidates are skipped and diagnosed; no setting or compatibility pack can override a hard gate.
+
+The released `mir-automatic-compiler-mode` setting remains hidden as a migration bridge. A non-default legacy value is translated to the equivalent new policy while all three new controls remain at their defaults. As soon as any new control differs from its default, the new controls take precedence. This preserves old profiles without keeping the old five-way preset in the player-facing UI.
 
 Generated technology settings are ordered so default-off or experimental rows come first, enabled special rows come next, and ordinary enabled rows come last. Breeding, agricultural growth speed, cargo bay range/count, and character reach are enabled by default but remain in the special row group. Inserter capacity stays disabled by default because larger hand sizes can change circuit behavior and inserter performance assumptions.
 

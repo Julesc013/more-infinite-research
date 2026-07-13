@@ -10,7 +10,9 @@
     "mods_any", "mods_all", "mods_none", "aliases", "exact.includes", "exact.excludes", "family_hints",
     "science_roles", "owner_claims", "risk_overrides", "family_authorizations", "candidate_seeds", "evidence", "claim"
   ],
-  "automatic_modes": ["off", "report", "safe-attach", "exact-pack", "safe-generate"],
+  "automatic_actions": ["disabled", "preview", "apply"],
+  "automatic_generation_controls": ["create_research", "require_reviewed_data"],
+  "legacy_automatic_modes": ["off", "report", "safe-attach", "exact-pack", "safe-generate"],
   "mutation_sentinels": [
     "hard-safety", "owner-conflict", "cross-stream-effect-arbitration", "missing-prerequisite", "target-filter", "output-value-parity", "pack-applicability"
   ],

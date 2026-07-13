@@ -8,7 +8,10 @@ Date: 2026-07-13
     - Improved configuration-change reliability across supported Factorio lines.
     - Standardized generated research formulas on compact syntax accepted across historical and current Factorio parsers.
     - Improved compatibility across maintained and archive targets from Factorio 2.0 through 0.13.
-    - Clarified mod-recipe productivity presets with conservative-to-broad ordering and outcome-first tooltips.
+    - Replaced the automatic compiler preset with separate action and research-creation controls.
+    - Added an independent reviewed-data requirement and outcome-first tooltips.
+    - Added a generic schema-2 automatic compiler policy contract for future registered family modules.
+    - Preserved old automatic compiler profiles through a hidden legacy-policy bridge.
 
   Bugfixes:
 

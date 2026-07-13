@@ -106,7 +106,11 @@ local valid_profile = {
     ["mir-prototype-pollution-cap"] = -91.125,
     ["mir-prototype-speed-cap"] = 1234.5,
     ["mir-prototype-quality-cap"] = 678.9,
-    ["mir-prototype-positive-power-floor"] = true
+    ["mir-prototype-positive-power-floor"] = true,
+    ["mir-automatic-productivity-action"] = "preview",
+    ["mir-automatic-create-research"] = true,
+    ["mir-automatic-require-reviewed-data"] = false,
+    ["mir-automatic-compiler-mode"] = "exact-pack"
   }
 }
 
@@ -124,9 +128,13 @@ assert_equal("decoded custom recycler percentage", decoded.settings["mir-recycli
 assert_equal("decoded custom efficiency percentage", decoded.settings["mir-prototype-efficiency-cap"], -83.25)
 assert_equal("decoded custom pollution percentage", decoded.settings["mir-prototype-pollution-cap"], -91.125)
 assert_equal("decoded hidden provider setting", decoded.settings["ips-enable-research_air_scrubbing_clean_filter"], false)
+assert_equal("decoded automatic productivity action", decoded.settings["mir-automatic-productivity-action"], "preview")
+assert_equal("decoded automatic research creation", decoded.settings["mir-automatic-create-research"], true)
+assert_equal("decoded automatic reviewed-data requirement", decoded.settings["mir-automatic-require-reviewed-data"], false)
+assert_equal("decoded hidden legacy automatic mode", decoded.settings["mir-automatic-compiler-mode"], "exact-pack")
 
 local recognized, unknown, invalid = profile_codec.count_recognized_settings(decoded)
-assert_equal("recognized valid profile settings", recognized, 10)
+assert_equal("recognized valid profile settings", recognized, 14)
 assert_equal("unknown valid profile settings", unknown, 0)
 assert_equal("invalid valid profile settings", invalid, 0)
 

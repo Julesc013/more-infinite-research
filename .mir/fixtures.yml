@@ -124,6 +124,7 @@ fixtures:
     validates:
       - hidden-setting-readability
       - stable-setting-ids
+      - hidden-legacy-automatic-compiler-setting
 
   prototype-limits:
     requires_features: [prototype_limits]
@@ -254,6 +255,8 @@ fixtures:
       - all-default-effect-settings-compact-omission
       - effect-setting-numeric-bound-rejection
       - settings-catalog-copy-isolation
+      - automatic-controls-profile-roundtrip
+      - hidden-legacy-automatic-mode-profile-roundtrip
 
   reduced-settings-surface:
     requires_features: []
@@ -381,6 +384,14 @@ fixtures:
       - final-plan-output-owner-parity
       - insertion-order-independent-plan-fingerprints
       - cyclic-fingerprint-rejection
+      - automatic-control-schema-2-defaults
+      - automatic-action-disabled-preview-apply
+      - independent-research-creation-control
+      - independent-reviewed-data-control
+      - all-legacy-mode-policy-mappings
+      - explicit-new-controls-win-over-legacy
+      - reviewed-data-generation-fails-closed
+      - registered-family-generation-remains-extensible
 
   space-age-galore-effect-ownership:
     requires_features: [recipe_productivity]
@@ -412,9 +423,10 @@ fixtures:
       - fixtures/assert-semantic-family-report
       - fixtures/assert-semantic-family-exact-pack
     validates:
-      - all-automatic-modes
-      - exact-pack-family-authorization
-      - exact-pack-safe-attachment-baseline
+      - all-automatic-actions
+      - independent-creation-and-review-controls
+      - reviewed-data-family-authorization
+      - reviewed-data-safe-attachment-baseline
       - unrelated-pack-family-remains-disabled
 
   synthetic-scale-graph:

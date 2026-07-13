@@ -56,8 +56,8 @@ $packet = [ordered]@{
     "locale-and-help-text",
     "technology-visibility-icons-costs-and-effects",
     "science-and-prerequisite-reachability",
-    "default-safe-attach-boundary",
-    "opt-in-safe-generate-assembler-and-lab-boundary",
+    "default-attachment-only-boundary",
+    "opt-in-registered-family-generation-boundary",
     "balance-review"
   )
   reviewer = $null
