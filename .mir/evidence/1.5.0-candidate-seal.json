@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "kind": "mir-qualified-candidate-seal",
+  "branch": "tmp/0.15",
+  "release": "1.5.0",
+  "target_factorio": "0.15",
+  "source_commit": "21c970339abb40636a44842b19b2be362a5f8c9a",
+  "candidate": {
+    "path": "dist/more-infinite-research_1.5.0.zip",
+    "sha256": "3F8D78ECEC9DCCCCF2DD14279DC7E3BD696212F33C3FDD87A924B905223ACBCF",
+    "size_bytes": 301024,
+    "content_fingerprint": "80AED552D7833B8B4D50B7CD150B63F42DC9EF6D8C85A317FC8B3A98552385D9",
+    "package_source_fingerprint": "D1C6726EC00D4D96F4A7087C6BD57569728DF70DDDA908ECBB8E0A50EA0F85FE"
+  },
+  "target_profile_sha256": "778C7A98CA8EAE0ED75298DD0D804FD6F651FC53925E5CD3305A1E97AF3C0A3F",
+  "validation_harness_fingerprint": "DE31D640D8106FE7246E17C389AA76D91D80641D0CF6AE9768BC0AEEC12DAC15",
+  "factorio_binary_sha256": "A1C87043244BEAE8E5903FB7D4A96E7920189C6339F00E3A2398988B9C8E7DD6",
+  "qualification_summary_sha256": "4B0E3735DEA0B7F892385D6868B91812285C8EE909C4D3E9EFD2A181FD697FC7",
+  "release_actions": "not-run-maintainer-only"
+}
