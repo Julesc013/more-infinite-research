@@ -680,7 +680,7 @@ target_lines:
     support_class: museum-finite-ladder
     source: declarative_museum_manifest_and_matching_base_files
     publish_policy: binary_proof_required
-    candidate_source_commit: fe9696d5aa7959b1274330890d401fa613a6e57b
+    candidate_source_commit: 292edea6e8ebbea268fc81fe91d5c65ef2a76755
     artifact: dist/more-infinite-research_0.11.0.zip
     sha256: C628FBFA4FC2A811869C5D33245BCBA0D37AA5EE2074ADEC7155874C2081B748
     size_bytes: 2514
