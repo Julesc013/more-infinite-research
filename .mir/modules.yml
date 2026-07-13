@@ -386,6 +386,9 @@ validation_tooling:
     museum_build: scripts/Build-MIRMuseumTarget.ps1
     museum_static_gate: scripts/Test-MIRMuseumCompiler.ps1
     museum_runtime_gate: scripts/Test-MIRMuseumRuntime.ps1
+    museum_qualification: scripts/New-MIRMuseumQualification.ps1
+    museum_seal_writer: scripts/New-MIRMuseumSeal.ps1
+    museum_seal_check: scripts/Test-MIRMuseumSeal.ps1
   rules:
     - the facade preserves its public parameters and structured result schema
     - process launch and copied-mod filesystem safety are reusable modules

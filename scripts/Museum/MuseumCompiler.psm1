@@ -320,6 +320,37 @@ function Test-MIRMuseumRenderedSource {
   return $true
 }
 
+function Get-MIRMuseumZipIdentity {
+  param([Parameter(Mandatory)][string]$Path)
+
+  Add-Type -AssemblyName System.IO.Compression
+  Add-Type -AssemblyName System.IO.Compression.FileSystem
+  $resolved = (Resolve-Path -LiteralPath $Path).Path
+  $zip = [IO.Compression.ZipFile]::OpenRead($resolved)
+  try {
+    $entries = @($zip.Entries | Where-Object { -not [string]::IsNullOrEmpty($_.Name) } | Sort-Object FullName)
+    $contentLines = @()
+    foreach ($entry in $entries) {
+      $entryStream = $entry.Open()
+      try {
+        $memory = [IO.MemoryStream]::new()
+        $entryStream.CopyTo($memory)
+        $hash = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($memory.ToArray()))
+        $contentLines += "$($entry.FullName)|$hash"
+      } finally { $entryStream.Dispose() }
+    }
+  } finally { $zip.Dispose() }
+  $contentBytes = [Text.UTF8Encoding]::new($false).GetBytes(($contentLines -join "`n") + "`n")
+  $contentHash = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($contentBytes))
+  return [pscustomobject][ordered]@{
+    path = $resolved
+    size = (Get-Item -LiteralPath $resolved).Length
+    entries = $entries.Count
+    sha256 = Get-MIRSha256 $resolved
+    package_content_sha256 = $contentHash
+  }
+}
+
 function New-MIRMuseumPackage {
   param(
     [Parameter(Mandatory)]$Catalog,
@@ -368,33 +399,18 @@ function New-MIRMuseumPackage {
     Move-Item -LiteralPath $temporary -Destination $zipPath
   }
 
-  $zip = [IO.Compression.ZipFile]::OpenRead($zipPath)
-  try {
-    $entries = @($zip.Entries | Where-Object { -not [string]::IsNullOrEmpty($_.Name) } | Sort-Object FullName)
-    $contentLines = @()
-    foreach ($entry in $entries) {
-      $entryStream = $entry.Open()
-      try {
-        $memory = [IO.MemoryStream]::new()
-        $entryStream.CopyTo($memory)
-        $hash = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($memory.ToArray()))
-        $contentLines += "$($entry.FullName)|$hash"
-      } finally { $entryStream.Dispose() }
-    }
-  } finally { $zip.Dispose() }
-  $contentBytes = [Text.UTF8Encoding]::new($false).GetBytes(($contentLines -join "`n") + "`n")
-  $contentHash = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($contentBytes))
+  $identity = Get-MIRMuseumZipIdentity -Path $zipPath
 
   return [pscustomobject][ordered]@{
     target = [string]$Target.factorio
     version = [string]$Target.version
-    path = (Resolve-Path -LiteralPath $zipPath).Path
-    size = (Get-Item -LiteralPath $zipPath).Length
-    entries = $entries.Count
-    sha256 = Get-MIRSha256 $zipPath
-    package_content_sha256 = $contentHash
+    path = $identity.path
+    size = $identity.size
+    entries = $identity.entries
+    sha256 = $identity.sha256
+    package_content_sha256 = $identity.package_content_sha256
     generated_count = @(Get-MIRMuseumExpandedRows -Target $Target).Count
   }
 }
 
-Export-ModuleMember -Function Get-MIRMuseumCatalog, Get-MIRMuseumTarget, Get-MIRSha256, Get-MIRMuseumExpandedRows, Test-MIRMuseumTarget, New-MIRMuseumTargetSource, Test-MIRMuseumRenderedSource, New-MIRMuseumPackage, Set-MIRUtf8Text
+Export-ModuleMember -Function Get-MIRMuseumCatalog, Get-MIRMuseumTarget, Get-MIRSha256, Get-MIRMuseumExpandedRows, Test-MIRMuseumTarget, New-MIRMuseumTargetSource, Test-MIRMuseumRenderedSource, Get-MIRMuseumZipIdentity, New-MIRMuseumPackage, Set-MIRUtf8Text
