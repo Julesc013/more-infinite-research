@@ -6,7 +6,7 @@
   "exact_patch": "0.11.22",
   "mir_version": "0.11.0",
   "branch": "tmp/0.11",
-  "source_commit": "d153516c64ee133625bf93c060bb527aadfe1074",
+  "source_commit": "d307b26305cd2b0421f30069d2724dca00b90e6b",
   "binary": {
     "path": "D:\\Programs\\Factorio\\0.11\\bin\\x64\\Factorio.exe",
     "architecture": "win64-x64",
@@ -81,6 +81,7 @@
     "exact_zip_initial_load": "passed-bounded-startup-load",
     "exact_zip_second_load": "passed-bounded-second-startup",
     "target_cli_save_proof": "not-available-pre-0.12",
+    "runtime_deployment": "zip-native",
     "locale_parser_and_load": "passed",
     "balance_invariants": "passed",
     "upgrade": "not-applicable-first-release",
