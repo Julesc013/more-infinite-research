@@ -120,7 +120,8 @@ waves:
 
   mir_2_4_0:
     version: "2.4.0"
-    branch: tmp/2.0
+    branch: legacy
+    development_branch: tmp/2.0
     source_anchor_required: published-3.1.5
     source_anchor_commit: c8bf4a742910cec9d6d3dee305c83deba1aa49eb
     source_commit: 01efb39a7476cc5e5f7e173edbb244e70f7a8e96
@@ -143,10 +144,12 @@ waves:
     package_content_sha256: F681FF5C331FC45EAFF31823BC9D9441A100C75FD5D412DE1C37DC828DE00775
     structured_summary: .mir/evidence/2.4.0-change-aware-qualification-final.json
     automated_gate: passed-change-aware
-    assurance_seal: pending-regeneration
+    assurance_seal: .mir/evidence/candidate-seals/mir-2.4.0-factorio-2.0.json
+    seal_source_commit: f6a5dfeb4dea18ee70bbaa17acbd4433f1396e6e
+    promotion_commit: da84121fadcda7144b54692718801ec2c2d93ec4
     interactive_gate: pending-on-exact-final-archive
     publication_status: unreleased
-    status: qualified-awaiting-seal-and-promotion
+    status: promoted-awaiting-manual-review-and-release
 
   mir_3_2_0:
     version: "3.2.0"
