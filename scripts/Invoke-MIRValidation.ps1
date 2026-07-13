@@ -3194,6 +3194,11 @@ if ($selectionActive) {
           $parameters[$property.Name] = $property.Value
         }
         Invoke-RuntimeScenario @parameters
+        if ($declaration.name -eq "space-age-generation-integrity") {
+          Assert-SpaceAgeVanillaOwnedProductivityStreamsBound -Context "Space Age generation integrity scenario"
+        } elseif ($declaration.name -eq "space-age-generation-integrity-inserter-enabled") {
+          Assert-SpaceAgeVanillaOwnedProductivityStreamsBound -Context "Space Age generation integrity with inserter enabled scenario"
+        }
       } elseif ($declaration.kind -eq "configuration-change") {
         switch ($declaration.name) {
           "space-age-native-owner-settings-config-change" {
