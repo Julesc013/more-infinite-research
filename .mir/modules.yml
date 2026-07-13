@@ -381,6 +381,11 @@ validation_tooling:
     campaign_scenarios: scripts/Test-MIRScenarioManifests.ps1
     planner_artifacts: scripts/Test-MIRPlannerTools.ps1
     compiler_schema_drift: scripts/Test-MIRCompilerSchemaDrift.ps1
+    museum_catalog: .mir/museum-targets.json
+    museum_compiler: scripts/Museum/MuseumCompiler.psm1
+    museum_build: scripts/Build-MIRMuseumTarget.ps1
+    museum_static_gate: scripts/Test-MIRMuseumCompiler.ps1
+    museum_runtime_gate: scripts/Test-MIRMuseumRuntime.ps1
   rules:
     - the facade preserves its public parameters and structured result schema
     - process launch and copied-mod filesystem safety are reusable modules
@@ -388,3 +393,6 @@ validation_tooling:
     - every executed scenario resolves through a target-bound declaration record
     - compatibility campaign records own setup roots settings expectations timeout and claim level
     - scenarios retain stable names and explicit groups while decomposition proceeds
+    - museum compilation runs only in the development environment and emits finite target-era Lua
+    - museum target packages contain no compiler tooling manifests evidence fixtures or modern runtime source
+    - each museum technology is emitted from a stable manifest row and a matching-base effect proof

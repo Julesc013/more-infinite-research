@@ -1,0 +1,16 @@
+   0.001 2026-07-14 06:59:08; Factorio 0.12.35 (Build 18124, win64, alpha)
+   0.001 Operating system: Windows 10 
+   0.002 Program arguments: "D:\Programs\Factorio\0.12\bin\x64\Factorio.exe" "--config" "C:\Projects\Factorio\more-infinite-research-museum-wave\build\museum-runtime\0.12\20260714-065908-directory\factorio-config.ini" "--create" "fresh-create" 
+   0.002 Read data path: D:/Programs/Factorio/0.12/data
+   0.003 Write data path: C:/Projects/Factorio/more-infinite-research-museum-wave/build/museum-runtime/0.12/20260714-065908-directory/user
+   0.003 Binaries path: D:/Programs/Factorio/0.12/bin
+   0.017 Running in headless mode
+   0.021 Loading mod core 0.0.0 (data.lua)
+   0.025 Loading mod base 0.12.35 (data.lua)
+   0.085 Loading mod more-infinite-research 0.12.0 (data.lua)
+   0.122 Checksum for core: 3711505753
+   0.122 Checksum for mod base: 2829195351
+   0.122 Checksum for mod more-infinite-research: 3317696548
+   0.359 Factorio initialised
+   3.964 Info Scenario.cpp:124: Map version 0.12.35-0
+   4.012 Checksum for script C:/Projects/Factorio/more-infinite-research-museum-wave/build/museum-runtime/0.12/20260714-065908-directory/user/temp/currently-playing/control.lua: 393467729

@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "status": "passed",
+  "factorio": "0.12",
+  "exact_patch": "0.12.35",
+  "binary": "D:\\Programs\\Factorio\\0.12\\bin\\x64\\Factorio.exe",
+  "binary_sha256": "AEC54627B873E4636FC2254293F01D73401CB652F373CEEE2DABEAD2B09EB774",
+  "binary_architecture": "win64-x64",
+  "package_mode": "directory",
+  "package_path": "C:\\Projects\\Factorio\\more-infinite-research-museum-wave\\build\\museum-runtime\\0.12\\20260714-065908-directory\\user\\mods\\more-infinite-research_0.12.0",
+  "one_technology": true,
+  "command": [
+    "D:\\Programs\\Factorio\\0.12\\bin\\x64\\Factorio.exe",
+    "--config",
+    "C:\\Projects\\Factorio\\more-infinite-research-museum-wave\\build\\museum-runtime\\0.12\\20260714-065908-directory\\factorio-config.ini",
+    "--create",
+    "fresh-create"
+  ],
+  "exit_code": 0,
+  "stdout_sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+  "stderr_sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+  "duration_seconds": 4.295,
+  "save_path": "C:\\Projects\\Factorio\\more-infinite-research-museum-wave\\build\\museum-runtime\\0.12\\20260714-065908-directory\\user\\saves\\fresh-create.zip",
+  "save_sha256": "9808E09CB078DD7555F8A3292E6A1EA2357DCE6F6F7DDDB5B76CEEA79F84C5D5",
+  "log_path": "C:\\Projects\\Factorio\\more-infinite-research-museum-wave\\build\\museum-runtime\\0.12\\20260714-065908-directory\\user\\factorio-current.log",
+  "log_sha256": "4A011B62FACA9FE7111BC0F546C7EAA28A74B2F4C10EFC3B18FF1214066B8E77",
+  "fresh_create": "passed",
+  "reload": "not_run"
+}

@@ -26,6 +26,48 @@ branches:
       - refactors
       - validation
 
+  tmp/3.1.9-synthesis:
+    purpose: isolated final MIR 3.1 patch synthesis based directly on released 3.1.5
+    factorio_version: "2.1"
+    accepts:
+      - portable-correctness-fix
+      - release-assurance
+      - museum-development-tooling
+      - validation
+      - release-evidence
+    rejects:
+      - target-era-runtime-source
+      - museum-defaults
+      - broad-3.2-feature-work
+
+  tmp/museum-wave-and-3.1.9-handoff:
+    purpose: aggregate evidence and shared build-time tooling for the 0.12-through-0.6 museum wave and 3.1.9 handoff
+    factorio_version: development-only
+    accepts:
+      - museum-target-manifest
+      - build-time-compiler
+      - validation-tooling
+      - aggregate-release-evidence
+    rejects:
+      - public-release-action
+      - target-runtime-waterfall-inheritance
+
+  tmp/0.12-through-0.6:
+    purpose: independent museum release branches generated from target capability manifests and matching base data
+    factorio_version: "0.12-0.6"
+    accepts:
+      - finite-numbered-technology
+      - target-era-metadata
+      - target-era-locale
+      - loaded-config-lua
+      - matching-binary-evidence
+      - deterministic-package
+    rejects:
+      - native-infinite-fields
+      - modern-settings
+      - recipe-productivity-without-proof
+      - lower-target-source-inheritance
+
   legacy:
     purpose: frozen Factorio 2.0 2.3.x stable baseline
     factorio_version: "2.0"
@@ -628,6 +670,48 @@ target_lines:
     version: "0.12.0"
     branch: tmp/0.12
     target_factorio: "0.12"
-    support_class: archive-experiment
-    source: target_binary_and_base_file_discovery
+    support_class: museum-finite-ladder
+    source: declarative_museum_manifest_and_matching_base_files
+    publish_policy: binary_proof_required
+  factorio_0_11:
+    version: "0.11.0"
+    branch: tmp/0.11
+    target_factorio: "0.11"
+    support_class: museum-finite-ladder
+    source: declarative_museum_manifest_and_matching_base_files
+    publish_policy: exact_0_11_23_binary_proof_required
+  factorio_0_10:
+    version: "0.10.0"
+    branch: tmp/0.10
+    target_factorio: "0.10"
+    support_class: museum-finite-ladder
+    source: declarative_museum_manifest_and_matching_base_files
+    publish_policy: binary_proof_required
+  factorio_0_9:
+    version: "0.9.0"
+    branch: tmp/0.9
+    target_factorio: "0.9"
+    support_class: museum-finite-ladder
+    source: declarative_museum_manifest_and_matching_base_files
+    publish_policy: binary_proof_required
+  factorio_0_8:
+    version: "0.8.0"
+    branch: tmp/0.8
+    target_factorio: "0.8"
+    support_class: museum-finite-ladder
+    source: declarative_museum_manifest_and_matching_base_files
+    publish_policy: binary_proof_required
+  factorio_0_7:
+    version: "0.7.0"
+    branch: tmp/0.7
+    target_factorio: "0.7"
+    support_class: museum-finite-ladder
+    source: declarative_museum_manifest_and_matching_base_files
+    publish_policy: binary_proof_required
+  factorio_0_6:
+    version: "0.6.0"
+    branch: tmp/0.6
+    target_factorio: "0.6"
+    support_class: museum-finite-ladder-minimal
+    source: declarative_museum_manifest_and_matching_base_files
     publish_policy: binary_proof_required
