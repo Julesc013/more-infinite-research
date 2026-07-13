@@ -8,11 +8,17 @@
   "binary_architecture": "win64-x64",
   "package_mode": "zip",
   "package_path": "C:\\Projects\\Factorio\\more-infinite-research-museum-0.11\\build\\museum-runtime\\candidate-0.11\\user\\mods\\more-infinite-research_0.11.0.zip",
+  "runtime_deployment_mode": "zip-native",
+  "runtime_deployment_path": "C:\\Projects\\Factorio\\more-infinite-research-museum-0.11\\build\\museum-runtime\\candidate-0.11\\user\\mods\\more-infinite-research_0.11.0.zip",
   "one_technology": false,
   "runtime_mode": "bounded-gui-startup-load",
+  "configuration_isolation": "cli-config",
+  "config_path_restored_sha256": "",
+  "binary_version_proof_path": "C:\\Projects\\Factorio\\more-infinite-research-museum-0.11\\build\\museum-runtime\\candidate-0.11\\binary-version.txt",
+  "binary_version_proof_sha256": "751F99CCEB0519C07160B844C6C1FF55F770D6A3C6E593F1F4A290985C49E1C9",
   "fresh_start": {
     "status": "passed-bounded-startup-load",
-    "duration_seconds": 4.381,
+    "duration_seconds": 4.332,
     "command": [
       "D:\\Programs\\Factorio\\0.11\\bin\\x64\\Factorio.exe",
       "--config",
@@ -20,12 +26,15 @@
     ],
     "terminated_after_proof": true,
     "process_exit_code": -1,
-    "log_path": "C:\\Projects\\Factorio\\more-infinite-research-museum-0.11\\build\\museum-runtime\\candidate-0.11\\fresh-start.log",
-    "log_sha256": "5AA6F618704773B18750A01BDA58FA9E906C8D048C9FB06A5C7AEE9661239E1E"
+    "proof_kind": "factorio-log-mod-load",
+    "proof_path": "C:\\Projects\\Factorio\\more-infinite-research-museum-0.11\\build\\museum-runtime\\candidate-0.11\\fresh-start.log",
+    "proof_sha256": "C764A71A1AE5F2A645022E34847A8572F3E25F1CB4B52995098CFB842A4FA4E5",
+    "mod_marker": "more-infinite-research",
+    "mod_marker_offset": 657
   },
   "second_start": {
     "status": "passed-bounded-startup-load",
-    "duration_seconds": 3.226,
+    "duration_seconds": 3.431,
     "command": [
       "D:\\Programs\\Factorio\\0.11\\bin\\x64\\Factorio.exe",
       "--config",
@@ -33,8 +42,11 @@
     ],
     "terminated_after_proof": true,
     "process_exit_code": -1,
-    "log_path": "C:\\Projects\\Factorio\\more-infinite-research-museum-0.11\\build\\museum-runtime\\candidate-0.11\\second-start.log",
-    "log_sha256": "FEF666B1AF3304FB211D324D96054C36E9F7679822FB72B11855A4AD6868141E"
+    "proof_kind": "factorio-log-mod-load",
+    "proof_path": "C:\\Projects\\Factorio\\more-infinite-research-museum-0.11\\build\\museum-runtime\\candidate-0.11\\second-start.log",
+    "proof_sha256": "4B5663E6AAF5E41D56BB4B997BD578D5A6DECF9C11DD3B8883A0CC2CACFFA7C0",
+    "mod_marker": "more-infinite-research",
+    "mod_marker_offset": 657
   },
   "reload": "passed-bounded-second-startup",
   "save_proof": "not_available_on_target_cli"
