@@ -1575,3 +1575,11 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - native-owner-3.2.0-forward-port
+  - path: docs/releases/backport-wave-2.4.0-handoff.md
+    title: "MIR 2.4.0 Legacy Backport Wave Handoff"
+    status: draft
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-2.4.0-legacy-backport-wave
