@@ -687,6 +687,17 @@ target_lines:
     support_class: museum-finite-ladder
     source: declarative_museum_manifest_and_matching_base_files
     publish_policy: binary_proof_required
+    candidate_source_commit: 372800a5f06c79c631d0552029935872fc73efff
+    artifact: dist/more-infinite-research_0.10.0.zip
+    sha256: 845CBB69195ED03AF604685137D356E826B29D0570A4A4AFD6C0941E4B23C04F
+    size_bytes: 2514
+    entries: 4
+    package_mode: zip-native
+    exact_binary: Factorio 0.10.12 build 10773 win64
+    exact_binary_sha256: 7D8C1D11A86603C8462D1B58A1D174C83132A89E0F524BE4C0DCA97FFC1FEBB1
+    automated_gate: passed
+    manual_gate: pending-maintainer
+    status: candidate-qualified
   factorio_0_9:
     version: "0.9.0"
     branch: tmp/0.9
