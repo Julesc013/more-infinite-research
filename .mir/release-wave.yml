@@ -176,25 +176,25 @@ waves:
     branch: main
     development_branch: dev
     source_anchor_required: qualified-3.1.2-plus-complete-portable-return
-    source_commit: pending
-    package_source_commit: pending
+    source_commit: 3cd6a95a6e22ce2d4cdbc231ad79d8110ad75e2f
+    package_source_commit: 3cd6a95a6e22ce2d4cdbc231ad79d8110ad75e2f
     automatic_compiler_control_schema: 2
     compiler_provider_schema: 1
     reviewed_generic_family_id_count: 0
     experimental_generic_family_id_count: 2
-    runtime_scenario_count: pending
-    runtime_run_id: pending
-    runtime_package_sha256: pending
-    structured_validation_evidence: pending
-    upgrade_evidence: pending
-    additional_upgrade_evidence: pending
-    available_ecosystem_load_evidence: pending
-    available_ecosystem_load_gate: pending
-    exact_package_gate: pending
-    candidate_freshness_gate: rebuilding-after-package-visible-change
+    runtime_scenario_count: 91
+    runtime_run_id: 9d8a4f7b-e0bc-4245-8dcc-2c6338709aaa
+    runtime_package_sha256: 8861E25FAAC472EDE9F32FE1C051A623A59177F5E092A3B1DC0B9FF2B3D47C50
+    structured_validation_evidence: .mir/evidence/3.1.5-rc5-validation-summary.json
+    upgrade_evidence: .mir/evidence/3.1.5-upgrade-from-3.1.2-automatic-compiler-proof.json
+    additional_upgrade_evidence: .mir/evidence/3.1.5-upgrade-from-3.0.5-proof.json
+    available_ecosystem_load_evidence: .mir/evidence/3.1.5-rc5-ecosystem/campaign-evidence.json
+    available_ecosystem_load_gate: 9-passed-zero-dependency-failures-load-claims-only
+    exact_package_gate: passed-base-space-age-deterministic-and-forbidden-entry-check
+    candidate_freshness_gate: passed
     interactive_gate: pending
     publication_status: unreleased
-    status: rebuilding-after-package-visible-change
+    status: release-candidate-awaiting-manual-review
 
   mir_2_4_0:
     version: "2.4.0"
