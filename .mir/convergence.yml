@@ -126,7 +126,7 @@ candidate:
   validation_package_sha256: 990DB595FE36891406648D258204F233EEEF768218486B2F623B04A436F9C96A
   validation_package_content_sha256: B0A8A95C75A394CFD8AB4CCBADA343DB1C3B03436F0F5DFDDC16C40135D8C63D
   structured_summary_path: .mir/evidence/3.1.5-rc1-validation-summary.json
-  structured_summary_run_id: c4a80d18-6cc1-497f-9425-9ac933858d21
+  structured_summary_run_id: 03dbeaa4-3b94-4534-bdc7-434c6ee6c929
   upgrade_evidence_path: .mir/evidence/3.1.5-rc1/upgrade-proof.json
   ecosystem_evidence_path: .mir/evidence/3.1.5-rc1-ecosystem/campaign-evidence.json
   interactive_evidence_path: .mir/evidence/3.1.5-rc1-interactive-review.json
