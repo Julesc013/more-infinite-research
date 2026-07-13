@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "state": "SEALED-RC",
+  "release_status": "NOT RELEASED",
+  "version": "3.1.9",
+  "factorio_target": "2.1",
+  "branch": "tmp/3.1.9-synthesis",
+  "source_commit": "3100148a21df9db6a3a705eb365796b236660d4e",
+  "source_clean": true,
+  "candidate": "dist/more-infinite-research_3.1.9.zip",
+  "candidate_sha256": "DE99BC1B51810EE0262120B4B7A12F5F8BE913E083B07ED0B5DA0E23C760224B",
+  "candidate_content_sha256": "3DBCBBBA24F110F003E61649CC1E6A3038DD10CACC42DCC66EFEA8CBF5C19E45",
+  "package_source_sha256": "07D331C2F87205DF46BBBB325D652667CBB9F706E02073647B62964C7E7DB7E5",
+  "target_profile_sha256": "1B9FDD388F54BC5904025F6FA4890A030E41EE473944042D2BBD197F17116165",
+  "test_catalog_sha256": "B3FAAE053D53E8AB697B738CBBAD7D70BBBC5729BBEEF37BD364DFBB8A2503E0",
+  "validation_harness_sha256": "04227303A47060B3C97AD95F876C81DD69D638A574B119E6E978757447786EA8",
+  "factorio_binary": "C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\bin\\x64\\factorio.exe",
+  "factorio_sha256": "DA4CA713FADBA1728904A2B47C2D73D2E07E8EB3AA2FAEED9AEE0FA6B417BAC3",
+  "qualification_summary": ".mir/evidence/3.1.9/qualification-summary.json",
+  "qualification_summary_sha256": "F9B9857B8B4AB95FC1F93C239F685664296449CA6DB62A6C794146710397EAEB",
+  "sealed_at": "2026-07-13T23:26:05.5605346Z"
+}
