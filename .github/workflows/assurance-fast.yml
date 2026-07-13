@@ -44,7 +44,14 @@ jobs:
 
       - name: Validate planner, fingerprints, and evidence reuse
         shell: pwsh
-        run: ./scripts/Test-MIRAssurance.ps1
+        run: |
+          $log = "artifacts/assurance/self-test.log"
+          try {
+            & ./scripts/Test-MIRAssurance.ps1 *>&1 | Tee-Object -FilePath $log
+          } catch {
+            ($_ | Format-List * -Force | Out-String) | Tee-Object -FilePath $log -Append | Write-Host
+            throw
+          }
 
       - name: Run or reuse the fast gate
         shell: pwsh
