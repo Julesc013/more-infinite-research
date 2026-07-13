@@ -1,35 +1,16 @@
 # More Infinite Research
 
-[![Factorio Mod Portal downloads](https://img.shields.io/factorio-mod-portal/dt/more-infinite-research?style=flat-square&label=downloads)](https://mods.factorio.com/mod/more-infinite-research)
-[![Factorio Mod Portal version](https://img.shields.io/factorio-mod-portal/v/more-infinite-research?style=flat-square&label=mod%20version)](https://mods.factorio.com/mod/more-infinite-research)
-[![Factorio version](https://img.shields.io/factorio-mod-portal/factorio-version/more-infinite-research?style=flat-square&label=Factorio)](https://mods.factorio.com/mod/more-infinite-research)
-[![Last updated](https://img.shields.io/factorio-mod-portal/last-updated/more-infinite-research?style=flat-square)](https://mods.factorio.com/mod/more-infinite-research)
-[![Issues](https://img.shields.io/github/issues/Julesc013/more-infinite-research?style=flat-square)](https://github.com/Julesc013/more-infinite-research/issues)
-[![Validate](https://img.shields.io/github/actions/workflow/status/Julesc013/more-infinite-research/validate.yml?branch=main&style=flat-square&label=validate)](https://github.com/Julesc013/more-infinite-research/actions/workflows/validate.yml)
+[![Factorio Mod Portal downloads](https://img.shields.io/factorio-mod-portal/dt/more-infinite-research?style=flat-square&label=downloads)](https://mods.factorio.com/mod/more-infinite-research) [![Factorio Mod Portal version](https://img.shields.io/factorio-mod-portal/v/more-infinite-research?style=flat-square&label=mod%20version)](https://mods.factorio.com/mod/more-infinite-research) [![Factorio version](https://img.shields.io/factorio-mod-portal/factorio-version/more-infinite-research?style=flat-square&label=Factorio)](https://mods.factorio.com/mod/more-infinite-research) [![Last updated](https://img.shields.io/factorio-mod-portal/last-updated/more-infinite-research?style=flat-square)](https://mods.factorio.com/mod/more-infinite-research) [![Issues](https://img.shields.io/github/issues/Julesc013/more-infinite-research?style=flat-square)](https://github.com/Julesc013/more-infinite-research/issues) [![Validate](https://img.shields.io/github/actions/workflow/status/Julesc013/more-infinite-research/validate.yml?branch=main&style=flat-square&label=validate)](https://github.com/Julesc013/more-infinite-research/actions/workflows/validate.yml)
 
 *Trickle down economics bring productivity gains to all industries.*
 
 More Infinite Research adds **configurable infinite productivity** and **bonus research** for intermediate items, logistics chains, combat bonuses, player bonuses, and Space Age gaps that vanilla Factorio does not cover on supported modern target lines.
 
-**MIR `1.8.0`** targets **Factorio `0.18`** as a bridge/archive compatibility package. It keeps the reduced direct-effect bonuses and base technology continuations that the older target can support, but does not include recipe productivity, Space Age, Quality, Recycler, Elevated Rails, cargo logistics, prototype cap settings, pipeline extent settings, settings profiles, or newer technology badge overlays.
+**MIR `3.x.x`** targets **Factorio `2.1`** and requires `base >= 2.1.8`.
 
-**MIR `1.8.1+`** targets **Factorio `1.0`** as the maintained compatibility port line. It is derived from the validated Factorio `1.1` port and the Factorio `0.18` bridge lessons, with Factorio `1.0` metadata, validation, and target-supported behavior restored where proven. It is not a metadata bump of `1.8.0`.
+**MIR `2.x.x`** targets **Factorio `2.0`** starting with **`2.3.0`**.
 
-**MIR `1.9.3+`** targets **Factorio `1.1`** as a reduced compatibility port. It keeps supported direct-effect bonuses and base technology continuations, but does not include recipe productivity, Space Age, Quality, Recycler, Elevated Rails, cargo logistics, prototype cap settings, pipeline extent settings, or settings profiles.
-
-**MIR `2.x.x`** targets **Factorio `2.0`** *(starting with **`2.3.0`**)*.
-This `2.3.5` package is the maintained Factorio 2.0 port of the 3.0.5
-compatibility-hardening source. It uses `base >= 2.0`, optional Quality, and
-optional Space Age without 2.1 dependency floors. Factorio 2.1-only cargo bay
-range and landing pad count modifiers are intentionally excluded.
-
-**MIR `3.x.x`** targets **Factorio `2.1`** and requires:
-
-- `base >= 2.1.8`
-- optional `space-age >= 2.1.8`
-- optional `recycler >= 2.1.8`
-- hidden optional `quality`
-- hidden optional `elevated-rails`
+**MIR `1.x.x`** targets **Factorio `1.1`** and earlier as reduced backports.
 
 The mod is built around **graceful compatibility**: it discovers recipes, science packs, labs, and optional prototypes from the active mod set, validates the candidate research, generates technologies late in **`data-final-fixes.lua`**, and *skips unsafe or unavailable streams* instead of requiring compatibility mods on the mod portal page.
 
@@ -37,7 +18,7 @@ The mod is built around **graceful compatibility**: it discovers recipes, scienc
 
 - **Recipe productivity:** adds infinite research for intermediate, logistics, combat, infrastructure, science-pack, and Space Age production chains.
 - **Fluid-output productivity:** adds process-family recipe productivity for oil processing, oil cracking, lubricant, sulfuric acid, acid neutralization, and Space Age thruster propellant fluids where those recipes exist.
-- **Direct-effect bonuses:** adds infinite research for weapon speed, character bonuses, combined character inventory/trash slots, and worker robot battery. Cargo logistics modifiers are available only on Factorio 2.1.
+- **Direct-effect bonuses:** adds infinite research for cargo logistics, weapon speed, character bonuses, combined character inventory/trash slots, and worker robot battery.
 - **Fluid and prototype tuning:** includes opt-in startup-only pipeline extent, recipe productivity, energy-use, pollution, speed, and quality limit controls.
 - **Settings profiles:** exports full MIR startup profiles by default, with optional compact export that omits unchanged defaults.
 - **Vanilla continuations:** extends selected finite vanilla technology chains into infinite continuations.
@@ -45,14 +26,13 @@ The mod is built around **graceful compatibility**: it discovers recipes, scienc
 - **Lab validation:** checks generated research ingredients against real labs so technologies stay researchable.
 - **MIR compiler architecture:** keeps active generation under `prototypes/mir/`, with declarative stream data in `prototypes/streams/`.
 - **Compiler diagnostics:** indexes typed prototype facts, compiler decisions, lab matrices, loop risks, rule surfaces, and cap estimates for audits.
-- **Modern recipe schemas:** supports Factorio 2.1 recipe `categories` and the Factorio 2.0 legacy single `category` field.
+- **Factorio 2.1 recipes:** supports recipe `categories` as well as legacy single `category`.
 - **Optional DLC:** keeps official DLC mods optional and gates DLC-shaped research behind concrete prototype checks.
 - **Scripted Space Age scaling:** bounded event-driven spoilage preservation remains opt-in, while agricultural growth speed is enabled as a special Space Age technology for newly planted tower crops; broader existing-save claims still require the named manual save matrix.
 - **Clean mod portal metadata:** keeps third-party compatibility-mod dependencies out of `info.json`.
 - **Save compatibility:** preserves existing generated prototype IDs across the MIR `3.0.0` architecture move. Scripted runtime storage is namespaced and must be validated before the scripted features are enabled by default or described with measured runtime behavior.
 
-Recipe productivity researches are infinite, but **Factorio's recipe productivity cap still applies**.
-*Additional levels can eventually have no practical effect after a recipe reaches its cap.*
+Recipe productivity researches are infinite, and this mod allows you to modify Factorio's recipe productivity cap/limit.
 
 ## New Design
 
@@ -87,9 +67,7 @@ The repository has **three permanent branches** on `origin`:
 - **`dev`**: experimental and development branch for the **Factorio `2.1` main line**.
 - **`legacy`**: backport branch for **Factorio `2.0`** players.
 
-Normal development should target **`dev`** first. Release-ready hotfixes can target **`main`**.
-Backports that must remain compatible with Factorio `2.0.x` belong on **`legacy`**.
-Legacy releases are snapshot ports of tested current-line releases with unsupported newer Factorio surfaces removed, not commit-by-commit rebuilds of old development history.
+Normal development should target **`dev`** first. Release-ready hotfixes can target **`main`**. Backports that must remain compatible with Factorio `2.0.x` belong on **`legacy`**. Legacy releases are snapshot ports of tested current-line releases with unsupported newer Factorio surfaces removed, not commit-by-commit rebuilds of old development history.
 
 See **`CONTRIBUTING.md`** for pull request expectations, branch routing, and validation commands.
 
@@ -112,8 +90,7 @@ More Infinite Research mutates and generates prototypes in **`data-final-fixes.l
 
 This gives the mod a **late view** of recipes, items, labs, science packs, ammo categories, and technologies created by other mods.
 
-*No mod can see another mod's later `data-final-fixes.lua` mutations unless load order makes that possible.*
-If a mod creates or mutates relevant recipes after MIR has already scanned, explicit load-order compatibility may still be needed.
+*No mod can see another mod's later `data-final-fixes.lua` mutations unless load order makes that possible.* If a mod creates or mutates relevant recipes after MIR has already scanned, explicit load-order compatibility may still be needed.
 
 ## Cost Model
 
@@ -135,8 +112,7 @@ where `L` is the research level.
 | Max level | `0` (infinite) |
 | Research unit time | `60` seconds |
 
-**Base-technology extensions** use the same formula, but their first generated level starts after the vanilla chain.
-A setting value of **`0`** for base cost, growth factor, or research unit time means *derive this from the vanilla chain*.
+**Base-technology extensions** use the same formula, but their first generated level starts after the vanilla chain. A setting value of **`0`** for base cost, growth factor, or research unit time means *derive this from the vanilla chain*.
 
 If a positive base-extension max level is below the first generated continuation level, MIR **skips that extension** instead of creating an impossible capped technology.
 
@@ -150,18 +126,14 @@ Factorio 2.1 changed science packs to ordinary item prototypes. MIR therefore tr
 - **Modded inputs:** appends modded lab inputs alphabetically.
 - **Researchability:** validates the final ingredient set against real lab input sets.
 
-If no lab accepts the full selected science-pack set, MIR follows **`mir-lab-incompatibility-policy`**.
-The default **`reduce`** mode chooses the largest deterministic lab-compatible subset.
-The **`skip`** mode skips the technology instead.
-If no valid subset exists, MIR skips the generated technology and logs the reason.
+If no lab accepts the full selected science-pack set, MIR follows **`mir-lab-incompatibility-policy`**. The default **`reduce`** mode chooses the largest deterministic lab-compatible subset. The **`skip`** mode skips the technology instead. If no valid subset exists, MIR skips the generated technology and logs the reason.
 
 Two startup settings control late-game progression and global science-pack pressure:
 
 - **`ips-require-space-gate`** is **disabled by default**. When enabled, generated technologies require the end-game science unlock as a prerequisite, but their science-pack ingredients are not changed.
 - **Science packs for generated technologies** (`mir-science-pack-ingredient-policy`) is **`configured` by default**. It can instead add fixed late-game packs, infer missing official or modded progression packs from the selected science packs, add every official base and Space Age science pack, or add every active lab science pack including compatible modded science packs. Options are ordered from conservative to broad.
 
-For the end-game science gate, MIR uses **promethium science** in Space Age when available.
-Otherwise it uses **space science** when available.
+For the end-game science gate, MIR uses **promethium science** in Space Age when available. Otherwise it uses **space science** when available.
 
 ## Generated Prototype Names
 
@@ -282,8 +254,7 @@ These extend selected finite vanilla chains into infinite continuations.
 
 ## Startup Settings
 
-All settings are **startup settings**.
-Changing them requires a restart and affects all players in multiplayer.
+All settings are **startup settings**. Changing them requires a restart and affects all players in multiplayer.
 
 ### Settings Guide
 
@@ -489,11 +460,7 @@ Generic competing recipe-productivity cleanup is intentionally limited to **know
 | `prototypes/mir/policy/competing_productivity.lua` | Known competing recipe-productivity cleanup. |
 | `prototypes/mir/policy/competing_base_extensions.lua` | Known competing base-extension cleanup. |
 
-The shipped MIR 3 layout intentionally has no `prototypes/compat/`,
-`prototypes/lib/`, `prototypes/mir/legacy/`, root `defaults.lua`, or broad
-root helper shims such as `prototypes/util.lua`, `prototypes/config.lua`,
-`prototypes/diagnostics.lua`, or `prototypes/tech-gen.lua`. Factorio root
-entrypoints remain as required one-line lifecycle wrappers.
+The shipped MIR 3 layout intentionally has no `prototypes/compat/`, `prototypes/lib/`, `prototypes/mir/legacy/`, root `defaults.lua`, or broad root helper shims such as `prototypes/util.lua`, `prototypes/config.lua`, `prototypes/diagnostics.lua`, or `prototypes/tech-gen.lua`. Factorio root entrypoints remain as required one-line lifecycle wrappers.
 
 ### Stream Schema
 
@@ -549,18 +516,13 @@ Enable `mir-debug-generation-report` to log rows like:
 
 Use diagnostics when reporting compatibility issues. It tells whether a stream generated, skipped, reduced science packs, or found no matching recipes. For direct-effect technologies, the report also includes non-blocking `native_modifier_overlap` rows when another infinite non-MIR technology already has the same native modifier target. Compatibility audits also capture planner rows, recipe-cap rows, typed fact summaries, compiler decisions, lab matrices, loop risks, and rule-surface observations in `compat-observations.*`.
 
-MIR 3 compatibility claims are intentionally narrow. A target page can claim
-that a named recipe family is supported, that a mod has been observed, or that
-MIR deliberately avoids a conflict. It should not be read as full overhaul
-support unless a compatibility page and claim record explicitly say so.
+MIR 3 compatibility claims are intentionally narrow. A target page can claim that a named recipe family is supported, that a mod has been observed, or that MIR deliberately avoids a conflict. It should not be read as full overhaul support unless a compatibility page and claim record explicitly say so.
 
 Known 3.0.0 publication notes:
 
-- portal-backed full-catalog checks were not run in this environment because
-  `FACTORIO_TOKEN` was not set;
+- portal-backed full-catalog checks were not run in this environment because `FACTORIO_TOKEN` was not set;
 - local supported-zip isolation still finds `atan-ash_2.2.1` and `atan-nuclear-science_0.3.3` failing without MIR on the tested Factorio `2.1` setup, but MIR `3.0.0` applies exact-version loader-schema repairs when those zips are loaded with MIR;
-- MIR's ATAN claims remain the narrow ash separation and nuclear-science-pack
-  recipe productivity behavior documented under `docs/compatibility/targets/`.
+- MIR's ATAN claims remain the narrow ash separation and nuclear-science-pack recipe productivity behavior documented under `docs/compatibility/targets/`.
 
 Enable `mir-debug-recipe-matches` to log matched recipe rows like:
 
@@ -703,17 +665,17 @@ The validation script checks:
 - **`docs/reference/factorio-api-proof-points.md`:** API claims, proof status, and open in-game verification questions.
 - **`docs/compatibility/README.md`:** compatibility model, known integrations, manual test matrix, fixture designs, and release checklist.
 - **`docs/maintainer/developer-tools.md`:** preferred developer commands, run profiles, script roles, and PowerShell tooling checks.
-- **`docs/releases/3.0.5-convergence-plan.md`:** active compatibility-hardening scope, architecture boundaries, and release gates.
-- **`docs/releases/3.0.5-release-checklist.md`:** active automated, candidate, manual, and publication gates.
-- **`docs/releases/3.0.5-release-notes.md`:** current player-facing compatibility changes.
-- **`docs/releases/3.0.5-validation-summary.md`:** current candidate identity and validation evidence; the 3.0.0 records remain historical baseline evidence.
+- **`docs/releases/2.4.0-roadmap.md`:** Factorio 2.0 port scope, target cuts, and sequencing.
+- **`docs/releases/2.4.0-checklist.md`:** active Factorio 2.0 automated, candidate, manual, and publication gates.
+- **`docs/releases/notes/release-notes-2.4.0.md`:** current player-facing Factorio 2.0 changes.
+- **`docs/releases/2.4.0-validation-summary.md`:** current Factorio 2.0 candidate identity and validation evidence.
 - **`docs/releases/2.2.0-validation-record.md`:** local release validation evidence.
 - **`docs/maintainer/manual-test-plan.md`:** named manual saves/scenarios for release validation.
 - **`docs/releases/mod-portal-page.md`:** mod-portal-ready public description, technology catalog, settings summary, compatibility notes, and troubleshooting text.
-- **`docs/archive/2.x/release-plan-2.1.0.md`:** detailed release-gated implementation plan for the Factorio `2.1` feature wave. Summarize durable future tasks back into `todo.md`.
-- **`docs/archive/2.x/post-2.0-feature-plan.md`:** post-v2.0.0 feature triage, MIR scope boundaries, Reddit feedback, and staged implementation archive. Summarize durable future tasks back into `todo.md`.
-- **`docs/archive/2.x/release-notes-2.1.0.md`:** simplified player-facing `2.1.0` release-note summary derived from the detailed changelog.
-- **`docs/archive/2.x/`:** historical release notes and pre-manual reports. `changelog.txt` remains the authoritative past-change ledger.
+- **`docs/archive/superseded/release-plan-2.1.0.md`:** historical release-gated implementation plan for the Factorio `2.1` feature wave.
+- **`docs/archive/superseded/post-2.0-feature-plan.md`:** historical post-v2.0.0 feature triage and staged implementation archive.
+- **`docs/releases/notes/release-notes-2.1.0.md`:** player-facing `2.1.0` release-note summary derived from the detailed changelog.
+- **`docs/archive/superseded/`:** superseded plans and reports retained as historical context. `changelog.txt` remains the authoritative past-change ledger.
 - **`CONTRIBUTING.md`:** branch policy, pull request expectations, validation commands, and mod portal changelog rules.
 - **`changelog.txt`:** release history and user-facing changes.
 
@@ -744,8 +706,7 @@ If a generated technology is unresearchable:
 
 No generated prototype IDs were renamed for **`v3.0.5`**. The convergence work preserves existing generated IDs and persisted-state schemas and does not require a new migration.
 
-No generated prototype IDs were renamed for **`v2.0.0`**.
-**No migration is required** from `v1.2.9`.
+No generated prototype IDs were renamed for **`v2.0.0`**. **No migration is required** from `v1.2.9`.
 
 `v2.0.5` includes a JSON migration from `recipe-prod-research_character_trash_slots-1` to `recipe-prod-research_inventory_capacity-1` so old trash-slot progress moves into the *combined inventory/trash research*.
 

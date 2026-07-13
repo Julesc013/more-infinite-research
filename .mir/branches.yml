@@ -9,6 +9,7 @@ branches:
       - docs-correction
       - fixture-correction
       - unpublished-version-package-build
+      - validated-release-candidate-promotion
     rejects:
       - broad-new-generation
       - schema-breaking-report-changes
@@ -26,18 +27,33 @@ branches:
       - validation
 
   legacy:
-    purpose: Factorio 2.0.x backport branch
+    purpose: stable Factorio 2.0 release branch receiving validated MIR 2.4.0 promotion
     factorio_version: "2.0"
     accepts:
       - safety-fix
       - compatibility-diagnostic-fix
       - docs-correction
       - exact-policy-fix
+      - validated-release-candidate-promotion
     rejects:
       - 3.0-directory-reorg
       - schema-breaking-change
       - generated-id-rename
       - broad-new-generation
+
+  tmp/2.0:
+    purpose: maintained Factorio 2.0 release and semantic companion branch
+    factorio_version: "2.0"
+    accepts:
+      - platform-compatible-backport
+      - target-profile-adapter
+      - 2.0-fixture
+      - release-evidence
+      - docs-correction
+    rejects:
+      - 2.1-only-metadata
+      - generated-id-rename
+      - unproven-feature-parity
 
   factorio-2.0-lane:
     purpose: planned Space Exploration and other 2.0-only campaign lane
@@ -77,6 +93,27 @@ backport_rules:
       - fixture-update
       - release-note
 
+  native_owner_settings_contract:
+    from: tmp/2.0
+    sequence:
+      - tmp/1.1
+      - tmp/1.0
+      - tmp/0.17
+      - tmp/0.16
+      - tmp/0.15
+      - tmp/0.14
+      - tmp/0.13
+      - tmp/0.12-through-0.6
+      - dev
+    requires:
+      - preceding-target-tagged-and-released
+      - target-owner-discovery
+      - stable-setting-id-review
+      - target-binary-evidence
+      - target-specific-candidate-seal
+    ledger: docs/compatibility/native-owner-backport-ledger.md
+    forward_port: docs/releases/3.2.0-native-owner-forward-port.md
+
   docs_only:
     requires:
       - docs-lint
@@ -113,33 +150,169 @@ release_artifacts:
           files: 121
           reason: BP-015 science reachability and BP-016 weapon ownership changed package-visible source
           status: superseded-unpublished-candidate
-      candidate_commit: 302cccdff22490cfd84ca8fee3eda1e759b7cee5
+        - candidate_commit: 302cccdff22490cfd84ca8fee3eda1e759b7cee5
+          sha256: 57AF0E55EB92035452B154AEFF3A6F15EE149A671E3E27EEDF460CD7ABFE1BC9
+          size_bytes: 309930
+          entries: 127
+          files: 122
+          reason: BP-018 rejects external owners with unrecognized research ingredients
+          status: superseded-unpublished-candidate
+        - candidate_commit: 27b7ffab867eb50faa60faf072b1092e53edb0b4
+          sha256: AA1A057E7960474E4D5A2B45DE7FB0A6754FFC97E0F7DBC2408107339053BFFE
+          size_bytes: 322365
+          entries: 132
+          files: 127
+          reason: retained non-default base effect settings could load an incomplete descriptor
+          status: superseded-unpublished-candidate
+        - candidate_commit: a2974d68775fbc30b1b25eb61e638145cce65f9b
+          sha256: 1B496195CA13B4F7C6AF5A59856086A802FE950CA9DED1C84EE61ECC85464217
+          size_bytes: 336460
+          entries: 132
+          files: 127
+          reason: later inverse-threshold and recycler-setting interaction fixes changed package-visible source
+          status: superseded-unpublished-candidate
+        - candidate_commit: 3d1c70fa37137b962abbbdfab069a3ba70547642
+          sha256: C1FCF5E4045EF9D3AF74758CD508719CD2A49D2F0B565E940A0B045DAAAEF2E7
+          size_bytes: 337017
+          entries: 132
+          files: 127
+          reason: recycler and productivity cap controls required stricter ownership and combination fixtures
+          status: superseded-unpublished-candidate
+        - candidate_commit: ff2aea90a4b9b6530601da40474bdf1dd783ccff
+          sha256: 12F4C14EE408EFA6D2F6116320F8C424B2F357E69477397F922A54568D6442B0
+          size_bytes: 337551
+          entries: 132
+          files: 127
+          reason: documentation reorganization changed packaged README content and the validation harness
+          status: superseded-unpublished-candidate
+        - candidate_commit: 8891d675062416764d181b27497a6fa1ef42e070
+          sha256: 40AF95C3F4411DDF6C24C98897489D696339A1B85B0439FA4A3BDFEDDDF0E5C5
+          size_bytes: 337527
+          entries: 132
+          files: 127
+          reason: raw text fingerprints differed between local CRLF and GitHub Actions LF checkouts
+          status: superseded-unpublished-candidate
+        - candidate_commit: b1a8a76fac549fd8164a8910f77b1c665c69589f
+          sha256: 40AF95C3F4411DDF6C24C98897489D696339A1B85B0439FA4A3BDFEDDDF0E5C5
+          size_bytes: 337527
+          entries: 132
+          files: 127
+          reason: expected scenario manifest still used a raw checkout-line-ending-dependent hash
+          status: superseded-unpublished-candidate
+      candidate_commit: b93808c54946f3913cea1244a6df89a154abd98e
       artifact: dist/more-infinite-research_3.0.5.zip
-      sha256: 57AF0E55EB92035452B154AEFF3A6F15EE149A671E3E27EEDF460CD7ABFE1BC9
-      size_bytes: 309930
-      entries: 127
-      files: 122
+      sha256: 40AF95C3F4411DDF6C24C98897489D696339A1B85B0439FA4A3BDFEDDDF0E5C5
+      size_bytes: 337527
+      entries: 132
+      files: 127
       forbidden_entries: 0
-      package_content_sha256: 8AABB2F1B18BA5D2E45A235E1E39A6BECC195304ADBD34047BE4AE2A000D16A4
-      package_source_sha256: 8AABB2F1B18BA5D2E45A235E1E39A6BECC195304ADBD34047BE4AE2A000D16A4
-      target_profile_sha256: 8FAFF43EAA1BC93A8819E2E0EAAC168A97A26AB394FE5238EED299B448E30B24
+      package_content_sha256: 17752E868FA9DD697F99B8C8621A34B60BF9039C2A0604C309FBA7D606AD65F1
+      package_source_sha256: 17752E868FA9DD697F99B8C8621A34B60BF9039C2A0604C309FBA7D606AD65F1
+      target_profile_sha256: E1EF758114CECB4B896F5E3365B214E95EC2794A64364492BF174AFE710B3E8F
       required_groups_sha256: 57A1DF87A8FB594B2B51C7E230D775E88028F23D52DF9D5D7DA1336F9271C78A
-      validation_package_sha256: 4E8CBAA4E9C431AD053F1F56296966702F39F57DEC2A5BB52E5966D3E3C7B8C4
-      validation_package_content_sha256: 8AABB2F1B18BA5D2E45A235E1E39A6BECC195304ADBD34047BE4AE2A000D16A4
-      structured_summary_path: .mir/evidence/3.0.5-rc2-validation-summary.json
-      structured_summary_run_id: b136b69e-0e47-497c-9266-6278126ef094
+      validation_harness_sha256: BF71EA1679551F052F240C9B7C6AF222FEAB496365DB6D85AA038613CA0E6F5D
+      expected_scenarios_sha256: 293639DC393025C47D186CB932C584D77958AAC6F916F952D176AADE26E9EB8D
+      validation_package_sha256: 526E2EFA9B0F0CAA5BE785A3D06D548FF3B11B95121BCD3E6D4131F34E4F4988
+      validation_package_content_sha256: 17752E868FA9DD697F99B8C8621A34B60BF9039C2A0604C309FBA7D606AD65F1
+      structured_summary_path: .mir/evidence/3.0.5-rc15-validation-summary.json
+      structured_summary_run_id: 0bbb9c0b-8a19-43e4-abed-206d9ded162c
       structured_summary_status: passed
-      structured_summary_duration_seconds: 441.368
+      structured_summary_duration_seconds: 532.575
+      scenario_count: 79
       validation_content_matches_dist: true
       static_validation: passed
       factorio_2_1_validation: passed
-      factorio_2_1_binary: Factorio 2.1.9 build 86829 win64 steam
+      factorio_2_1_binary: Factorio 2.1.9 win64 steam
       exact_dist_base_smoke: passed
       exact_dist_space_age_smoke: passed
       factorio_2_1_crucible_rigor_exact_dist: passed
+      factorio_2_1_modules_t4_finite_exact_dist: passed
+      retained_base_effect_settings: passed
       automated_gate: passed
+      manual_gate: accepted-for-publication
+      release_commit: 89d7764c4f0f5b67f7b2a2ca0a3827006e3a63d7
+      tag: "3.0.5"
+      published_at: 2026-07-11T16:51:53Z
+      github_release: https://github.com/Julesc013/more-infinite-research/releases/tag/3.0.5
+      status: published
+    mir_3_1_0:
+      version: "3.1.0"
+      branch: main
+      target_factorio: "2.1"
+      source_anchor: mir_3_0_5
+      source_commit: 0dd8d7f27d9bbbbb728a70ef00b7c955af48cbb7
+      release_commit: 6272cb67c96855c574c96032cb27dfcf0721aa74
+      tag: "3.1.0"
+      artifact: dist/more-infinite-research_3.1.0.zip
+      sha256: 0244D40A9971C450274FE1FD7EA142FA5D23E4A2271A0191F31F395589267C1A
+      size_bytes: 345134
+      entries: 138
+      forbidden_entries: 0
+      package_content_sha256: 5D5162EEAF13E87E2FB1A5A2A31B5EC14ABDCCD2308CFAF8E70C20297C56E82F
+      package_source_sha256: 5D5162EEAF13E87E2FB1A5A2A31B5EC14ABDCCD2308CFAF8E70C20297C56E82F
+      target_profile_sha256: EFC9454504E73010B50A9A68DC9AD56E533EDFD4FDBDE0D1F6467E2A19AE04B0
+      required_groups_sha256: 57A1DF87A8FB594B2B51C7E230D775E88028F23D52DF9D5D7DA1336F9271C78A
+      validation_harness_sha256: E9094E4B7D8B0C990BCCE8927A3F51D04862A24110D0095806F4F83FDB5EBC9E
+      expected_scenarios_sha256: A4198544BE15EE20F228D18DC6990ABE179D84A53EB3C30AEF4A9FF3DBE195C7
+      validation_package_sha256: 6E241687B13F99561D24E18A7D0F1EFC4DFE5B2FCD3D7A084EE83B85D67865FD
+      validation_package_content_sha256: 5D5162EEAF13E87E2FB1A5A2A31B5EC14ABDCCD2308CFAF8E70C20297C56E82F
+      structured_summary_path: .mir/evidence/3.1.0-rc1-validation-summary.json
+      structured_summary_run_id: a961b15a-a018-4ebe-9799-f6bafc8bc2ed
+      scenario_count: 82
+      automated_gate: passed
+      manual_gate: accepted-for-publication
+      published_at: 2026-07-11T22:33:10Z
+      publication_scope: github-release
+      github_release: https://github.com/Julesc013/more-infinite-research/releases/tag/3.1.0
+      mod_portal_upload: blocked-missing-mod-upload-api-key
+      status: published
+    mir_3_1_5:
+      version: "3.1.5"
+      branch: main
+      target_factorio: "2.1"
+      source_anchor: mir_3_1_0-plus-backport-synthesis
+      package_source_commit: 3cd6a95a6e22ce2d4cdbc231ad79d8110ad75e2f
+      release_commit: c8bf4a742910cec9d6d3dee305c83deba1aa49eb
+      tag: "3.1.5"
+      artifact: dist/more-infinite-research_3.1.5.zip
+      sha256: 8861E25FAAC472EDE9F32FE1C051A623A59177F5E092A3B1DC0B9FF2B3D47C50
+      size_bytes: 399761
+      entries: 166
+      forbidden_entries: 0
+      automated_gate: passed
+      scenario_count: 91
+      exact_upgrade_from_3_0_5: passed
+      exact_upgrade_from_3_1_2: passed
+      ecosystem_loads: 9/9
+      structured_summary_path: .mir/evidence/3.1.5-rc5-validation-summary.json
+      structured_summary_run_id: 9d8a4f7b-e0bc-4245-8dcc-2c6338709aaa
+      publication_scope: github-release
+      status: published
+    mir_2_4_0:
+      version: "2.4.0"
+      branch: tmp/2.0
+      target_factorio: "2.0"
+      source_anchor: mir_3_1_5
+      source_anchor_commit: c8bf4a742910cec9d6d3dee305c83deba1aa49eb
+      source_commit: 01efb39a7476cc5e5f7e173edbb244e70f7a8e96
+      artifact: dist/more-infinite-research_2.4.0.zip
+      superseded_pre_native_owner_candidate_commit: a853f88fd2fae19b45a16553e3273a2015283452
+      superseded_pre_native_owner_package_source_commit: 5963445b1b72efffc18b232f5367a7da640061e8
+      superseded_pre_native_owner_sha256: 5E1D16CEA5C8F43E8C257B73A3A5A728CE6DFB9ADA18B0CACDDB49DE3C5226E1
+      superseded_pre_native_owner_seal: .mir/evidence/candidate-seals/mir-2.4.0-factorio-2.0-pre-native-owner.json
+      superseded_pre_native_owner_evidence: .mir/evidence/2.4.0-pre-native-owner-supersession.md
+      superseded_pre_native_owner_status: superseded-unreleased-by-settings-defect
+      previous_candidate_commit: 575fc4f5ae4a52205d1e72604934ead35e69c99e
+      previous_candidate_sha256: 8618CAF031EF24EB83641DB03566F2390DD29AD98D2099A80D596EEB527EDA12
+      previous_candidate_status: superseded-unreleased-candidate
+      superseded_2_5_candidate_commit: 4f7c9d18d5491e6e6fcafa5364f9b832cabac233
+      superseded_2_5_candidate_sha256: 0BE57ED4C51DDF08F80AB4CFB2D5762DF2714B17AB26DB58CA9980289350CBFD
+      superseded_2_5_candidate_evidence: .mir/evidence/2.5.0-supersession-ledger.md
+      automated_gate: passed-change-aware
       manual_gate: pending
-      status: release-candidate-awaiting-manual-review
+      assurance_seal: pending-regeneration
+      publication_scope: unreleased
+      status: qualified-awaiting-seal-and-promotion
     mir_2_3_0:
       version: "2.3.0"
       branch: legacy
@@ -151,67 +324,6 @@ release_artifacts:
       entries: 119
       forbidden_entries: 0
       status: published
-    mir_2_3_5:
-      version: "2.3.5"
-      branch: legacy
-      target_factorio: "2.0"
-      source_anchor: mir_3_0_5
-      superseded_candidates:
-        - candidate_commit: 1a81a30
-          sha256: A2A3BA644D646B2A836CBA8C31FB1C71549C157AB36DCD19CE35509749529F4A
-          size_bytes: 321145
-          reason: scripted effect-per-level descriptors were omitted during the Factorio 2.0 conflict resolution
-          status: superseded-unpublished-candidate
-        - candidate_commit: dd0cfd4a4bf3743d1e88b84a228feb7b8fddc992
-          sha256: 95A52BFBE1C161CA3D34AC177FABF9868F2D8587AFD88A29BF0D5A03DDEA50EB
-          size_bytes: 321227
-          reason: retained non-default base effect settings could load an incomplete descriptor
-          status: superseded-unpublished-candidate
-        - candidate_commit: 2d1eb296f15b71ef538d0547147ce42ac03098a0
-          sha256: 65A1575CF6C31B64D46FD1DD43E355036DFB704843E4DF3D85461371E6C74C2E
-          size_bytes: 321314
-          entries: 132
-          package_content_sha256: 46D99E946675A9899E44503802D7F8FEB55D4F9967828F89A0FFCEA4EF51CEE7
-          validation_summary: .mir/evidence/2.3.5-rc4-validation-summary.json
-          validation_run_id: c63ad6cd-1b1e-4314-acd1-53d859728c77
-          scenario_count: 67
-          reason: final released 3.0.5 expanded settings and recycler interaction contract had not yet been ported
-          status: superseded-unpublished-candidate
-      artifact: dist/more-infinite-research_2.3.5.zip
-      candidate_commit: 861565d3e898166eca8920e6eade6887b7db087d
-      sha256: 97B3DC9B6E352C6C4B8FF76D77020333FAAFFE93BD89EDB6B8F3370405ED68DE
-      size_bytes: 336718
-      entries: 132
-      files: 127
-      forbidden_entries: 0
-      package_content_sha256: 5B1BAFFF4A6D26C2CFB704705F224CFE562724230F054B2F16FEAC90E08F56D6
-      package_source_sha256: 5B1BAFFF4A6D26C2CFB704705F224CFE562724230F054B2F16FEAC90E08F56D6
-      target_profile_sha256: 9D8EC1B8813609DD855023FF81D73F307BB2A348B7B8E41AA4D10AEC268A6E18
-      required_groups_sha256: 57A1DF87A8FB594B2B51C7E230D775E88028F23D52DF9D5D7DA1336F9271C78A
-      validation_harness_sha256: A3962103F3713E1DCA219A20F2355B2359CC896E059122E3AB1B94DC5C58D54B
-      expected_scenarios_sha256: C06163A3C3AEF3D85328B413F45E7E3C9CABDFF2882BF56151285ADD0B075561
-      validation_package_sha256: 77DA0151C97DFAB823730B25AA8670E5C5DE21BBB40B8D093C0DCA4F5EA7871D
-      validation_package_content_sha256: 5B1BAFFF4A6D26C2CFB704705F224CFE562724230F054B2F16FEAC90E08F56D6
-      structured_summary_path: .mir/evidence/2.3.5-rc5-validation-summary.json
-      structured_summary_run_id: 74543fb0-1a55-429c-9f23-68d1407fec8f
-      structured_summary_status: passed
-      structured_summary_duration_seconds: 400.594
-      scenario_count: 71
-      release_targeted_summary_path: .mir/evidence/2.3.5-release-targeted-summary.json
-      validation_content_matches_dist: true
-      static_validation: passed
-      factorio_2_0_validation: passed
-      factorio_2_0_binary: Factorio 2.0.77 build 84539 win64
-      exact_dist_base_smoke: passed
-      exact_dist_space_age_smoke: passed
-      upgrade_from_2_3_0: passed
-      automated_gate: passed
-      manual_gate: accepted-by-maintainer-directive
-      interactive_ui_observation: not-independently-performed
-      acceptance_date: "2026-07-12"
-      acceptance_basis: maintainer-directed-continuation-after-automated-and-exact-archive-gates
-      promotion_authorized: true
-      status: release-candidate-awaiting-manual-review
     mir_1_9_3:
       version: "1.9.3"
       branch: tmp/1.1
@@ -226,6 +338,24 @@ release_artifacts:
       forbidden_entries: 0
       publication_scope: mod-portal-and-github-release
       status: published
+    mir_1_9_4:
+      version: "1.9.4"
+      branch: tmp/1.1
+      target_factorio: "1.1"
+      source_anchor: mir_1_9_3
+      source_commit: 498408854170e893a0fa13bdbd11930197892b1d
+      artifact: dist/more-infinite-research_1.9.4.zip
+      sha256: 431CD5B011B678B089BB4F9B04B22EB5DD32A3411EDB8E7E453E02D920E3A46E
+      size_bytes: 302312
+      entries: 124
+      forbidden_entries: 0
+      automated_gate: passed
+      exact_dist_base: passed
+      fresh_create: passed
+      fresh_reload: passed
+      upgrade_from_1_9_3: passed
+      publication_scope: unreleased
+      status: candidate-qualified
     mir_1_8_0:
       version: "1.8.0"
       branch: tmp/0.18
@@ -267,6 +397,15 @@ release_artifacts:
       publication_scope: github-release
       mod_portal_visibility: not-visible-from-downloads-page-as-of-2026-07-10
       status: published
+    mir_1_8_2:
+      version: "1.8.2"
+      branch: tmp/1.0
+      target_factorio: "1.0"
+      source_anchor: mir_1_8_1
+      staged_commit: aeb14831132572037c4288b595b22978fdda6646
+      artifact: dist/more-infinite-research_1.8.2.zip
+      automated_gate: pending-runtime-proof
+      status: staged-unqualified
     mir_1_7_0:
       version: "1.7.0"
       branch: tmp/0.17
@@ -305,12 +444,29 @@ release_artifacts:
       status: published
   next_release_targets:
     current_line:
-      version: "3.0.5"
-      branch: dev
+      version: "3.1.5"
+      branch: main
       target_factorio: "2.1"
-      purpose: accumulated portable fixes, compatibility lessons, tooling updates, docs corrections, and community feedback after the 3.0.0 backport rings
+      release_commit: c8bf4a742910cec9d6d3dee305c83deba1aa49eb
+      status: published
+      purpose: released canonical source anchor for the current Factorio 2.0 backport
+    factorio_2_0_companion:
+      version: "2.4.0"
+      branch: tmp/2.0
+      target_factorio: "2.0"
+      source_anchor: mir_3_1_5
+      source_anchor_commit: c8bf4a742910cec9d6d3dee305c83deba1aa49eb
+      artifact: dist/more-infinite-research_2.4.0.zip
+      source_commit: 01efb39a7476cc5e5f7e173edbb244e70f7a8e96
+      superseded_candidate_commit: 4f7c9d18d5491e6e6fcafa5364f9b832cabac233
+      superseded_candidate_version: "2.5.0"
+      superseded_candidate_sha256: 0BE57ED4C51DDF08F80AB4CFB2D5762DF2714B17AB26DB58CA9980289350CBFD
+      validation_status: passed-change-aware
+      assurance_seal: pending-regeneration
+      status: qualified-awaiting-seal-and-promotion
+      purpose: final Factorio 2.0 companion folding the portable 3.1.5 compiler into the 2.4.0 release identity
     factorio_1_1_port:
-      version: "1.9.3"
+      version: "1.9.4"
       branch: tmp/1.1
       target_factorio: "1.1"
     factorio_0_18_bridge:
@@ -319,7 +475,7 @@ release_artifacts:
       target_factorio: "0.18"
       purpose: published bridge/archive package from the MIR 3 source anchor plus portable 2.3.0 and 1.9.3 lessons
     factorio_1_0_port:
-      version: "1.8.1"
+      version: "1.8.2"
       branch: tmp/1.0
       target_factorio: "1.0"
       purpose: maintained Factorio 1.0 support line after the 0.18 bridge proof; future 1.0 maintenance stays on 1.8.x
@@ -339,10 +495,10 @@ release_artifacts:
       target_factorio: "0.15"
       purpose: earliest plausible native-infinite floor after old-science proof
     current_line_feature:
-      version: "3.1.0"
+      version: "3.2.0"
       branch: dev
       target_factorio: "2.1"
-      purpose: fixture-backed overhaul compatibility support campaign after the 3.0.5 patch
+      purpose: whole-plan validation, consolidated facts, attach-only family automation, and reviewed compatibility packs
   package_refresh_rule: >-
     only build or refresh dist archives for an unpublished target version;
     never refresh already-published archives as part of architecture or
@@ -361,11 +517,11 @@ target_lines:
       - factorio_0.18
       - factorio_1.0_same_zip
   factorio_1_0:
-    version: "1.8.1"
+    version: "1.8.2"
     branch: tmp/1.0
     target_factorio: "1.0"
     support_class: compatibility-port
-    source: mir_1_9_3_plus_mir_1_8_0_bridge_lessons_plus_dev_portable_fixes
+    source: mir_1_8_1_plus_current_portable_fixes
     publish_policy: maintained
     future_maintenance: "1.8.x"
     required_binary_proof:

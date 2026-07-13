@@ -5,6 +5,38 @@ canonical_support_lanes: fixtures/compat-matrix/support-lanes.json
 lua_report_registry: prototypes/mir/compatibility/claim_registry.lua
 target_docs_root: docs/compatibility/targets
 
+compatibility_packs:
+  schema: 2
+  validator: prototypes/mir/compatibility/packs/schema.lua
+  registry: prototypes/mir/compatibility/packs/registry.lua
+  external_transport: more-infinite-research-compatibility-pack
+  fixture_only_profiles_allowed_in_production_registry: false
+
+technology_prerequisite_cycle_repairs:
+  - id: muluna-astroponics-space-science-cycle
+    required_mods:
+      - astroponics
+      - planet-muluna
+    trigger: astroponics-requires-space-science-and-space-science-transitively-requires-astroponics
+    mutation: remove-only-astroponics-to-space-science-prerequisite
+    implementation: prototypes/mir/compatibility/repairs/technology_prerequisite_cycles.lua
+    fixture: fixtures/external-technology-cycle
+    claim_level: diagnostic-only
+    public_scope: bounded startup-cycle interoperability repair only
+
+campaigns:
+  evidence_contract: mir-modpack-campaign-evidence-v1
+  exact_mir_archive_sha256_required: true
+  exact_mir_source_commit_required: true
+  dependency_lock_sha256_required: true
+  actual_executed_roots_required: true
+  root_versions_required: true
+  resolved_archive_sha256_required: true
+  result_and_claim_level_required: true
+  mega_smash_qualifies_individual_ecosystems: false
+  current_load_evidence:
+    - .mir/evidence/3.2.0-bz-bob-load-campaign-summary.json
+
 claims:
   allowed_levels:
     - loads

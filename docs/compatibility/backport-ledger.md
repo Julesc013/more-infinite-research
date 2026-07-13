@@ -12,9 +12,7 @@ superseded_by: []
 
 # 3.0.5 Backport Behavior Ledger
 
-This ledger translates historical branch work into observable contracts. The
-machine-readable authority is `.mir/convergence.yml`. Historical commit order
-does not grant implementation authority; `dev` remains canonical.
+This ledger translates historical branch work into observable contracts. The machine-readable authority is `.mir/convergence.yml`. Historical commit order does not grant implementation authority; `dev` remains canonical.
 
 | ID | Source | Observable contract | Class | Decision | Evidence | Status |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -35,6 +33,7 @@ does not grant implementation authority; `dev` remains canonical.
 | BP-015 | Factorio 0.17 prerequisite lesson + dev hardening | Recipe unlock facts have one authority; disabled, unreachable, science-self-locked, and cyclic unlockers are rejected before planning | C | Centralize unlock facts and researchability | generated-prerequisite safety | Complete |
 | BP-016 | Factorio 0.17 weapon overlap + dev hardening | Cleanup mutates only MIR-generated continuations; external owners count only with researchable exact effect coverage | C | Restrict to generated registry and prove external coverage | weapon-speed safety matrix | Complete |
 | BP-017 | stale 3.0.5 candidate review | Candidate evidence identifies exact source, target profile, required groups, package source, archive content, binary, and structured summary | B | Enforce candidate freshness | candidate-freshness gate | Complete |
+| BP-018 | `tmp/2.0@9689f22` | External research owners with unrecognized science ingredients are rejected as replacement coverage | B | Reuse canonical science researchability authority | weapon-speed-safety-matrix | Complete |
 
 ## Classification Rules
 
@@ -46,6 +45,4 @@ does not grant implementation authority; `dev` remains canonical.
 - F: behavior changes the public contract or belongs to a future target/release.
 - G: behavior is unknown and cannot be integrated until investigated.
 
-Every accepted row must end with one canonical implementation and named
-evidence. Target metadata, dependency floors, science IDs, assets, and disabled
-modern surfaces never qualify as portable behavior by themselves.
+Every accepted row must end with one canonical implementation and named evidence. Target metadata, dependency floors, science IDs, assets, and disabled modern surfaces never qualify as portable behavior by themselves.

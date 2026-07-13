@@ -1,44 +1,12 @@
 local deepcopy = require("prototypes.mir.core.deepcopy")
+local effect_metadata = require("prototypes.mir.domain.effects.metadata")
 
 -- Pure setting/effect descriptors shared by the settings stage and emitters.
 -- This module must not read Factorio settings: catalog/profile loading depends
 -- on it before effective startup settings can safely be resolved.
 local M = {}
 
-local percentage_effects = {
-  ["braking-force"] = true,
-  ["character-crafting-speed"] = true,
-  ["character-mining-speed"] = true,
-  ["character-running-speed"] = true,
-  ["gun-speed"] = true,
-  ["laboratory-productivity"] = true,
-  ["laboratory-speed"] = true,
-  ["worker-robot-battery"] = true
-}
-
-local whole_number_effects = {
-  ["bulk-inserter-capacity-bonus"] = true,
-  ["cargo-landing-pad-count"] = true,
-  ["character-build-distance"] = true,
-  ["character-inventory-slots-bonus"] = true,
-  ["character-item-drop-distance"] = true,
-  ["character-logistic-trash-slots"] = true,
-  ["character-reach-distance"] = true,
-  ["character-resource-reach-distance"] = true,
-  ["inserter-stack-size-bonus"] = true,
-  ["max-cargo-bay-unloading-distance"] = true,
-  ["stack-inserter-capacity-bonus"] = true,
-  ["worker-robot-storage"] = true
-}
-
-local identity_fields = {
-  "type",
-  "recipe",
-  "ammo_category",
-  "turret_id",
-  "fluid",
-  "item"
-}
+local identity_fields = effect_metadata.identity_fields()
 
 local base_default_anchors = {
   ["braking-force"] = { unit = "percent", canonical_anchor = 0.15 },
@@ -54,18 +22,7 @@ local function close_to_integer(value)
 end
 
 function M.numeric_effect_descriptor(effect)
-  if type(effect) ~= "table" then return nil end
-  if effect.type == "change-recipe-productivity" and type(effect.change) == "number" then
-    return { field = "change", unit = "percent", display_multiplier = 100, value = effect.change }
-  end
-  if type(effect.modifier) ~= "number" then return nil end
-  if percentage_effects[effect.type] then
-    return { field = "modifier", unit = "percent", display_multiplier = 100, value = effect.modifier }
-  end
-  if whole_number_effects[effect.type] then
-    return { field = "modifier", unit = "native", display_multiplier = 1, value = effect.modifier }
-  end
-  return nil
+  return effect_metadata.numeric_descriptor(effect)
 end
 
 function M.effect_identity(effect)
@@ -113,8 +70,6 @@ function M.descriptor_from_effects(effects)
     if descriptor and (descriptor.field ~= candidate.field or descriptor.unit ~= candidate.unit) then
       return nil
     end
-    -- Effect arrays are ordered declarations. The first effect is the
-    -- player-facing primary/base effect; later effects keep their ratios to it.
     if not descriptor then
       descriptor = {
         field = candidate.field,
@@ -123,56 +78,20 @@ function M.descriptor_from_effects(effects)
         canonical_anchor = candidate.value,
         whole_number = candidate.unit == "native" and close_to_integer(candidate.value)
       }
+    elseif candidate.value > descriptor.canonical_anchor then
+      descriptor.canonical_anchor = candidate.value
+      descriptor.whole_number = candidate.unit == "native" and close_to_integer(candidate.value)
     end
   end
   return descriptor
 end
 
-local function productivity_descriptor(spec)
-  -- Productivity groups are declared from the primary/base tier outward.
-  -- Optional late tiers may have much smaller bonuses, but must not change the
-  -- displayed default when their target prototypes are absent or present.
-  local anchor = nil
-  for _, group in ipairs((spec and spec.groups) or {}) do
-    local change = tonumber(group.change)
-    if change and change > 0 then
-      anchor = change
-      break
-    end
-  end
-  if not anchor then anchor = 0.10 end
-  return {
-    field = "change",
-    unit = "percent",
-    display_multiplier = 100,
-    canonical_anchor = anchor,
-    whole_number = false
-  }
-end
-
-local function explicit_descriptor(spec)
-  local descriptor = spec and spec.effect_per_level
-  if type(descriptor) ~= "table" then return nil end
-  local anchor = tonumber(descriptor.canonical_anchor)
-  if not anchor or anchor <= 0 then return nil end
-  local unit = descriptor.unit == "native" and "native" or "percent"
-  return {
-    field = descriptor.field or "modifier",
-    unit = unit,
-    display_multiplier = tonumber(descriptor.display_multiplier) or (unit == "percent" and 100 or 1),
-    canonical_anchor = anchor,
-    whole_number = descriptor.whole_number == true,
-    runtime_multiplier_delta = descriptor.runtime_multiplier_delta == true
-  }
-end
-
 function M.stream_descriptor(spec)
-  local explicit = explicit_descriptor(spec)
-  if explicit then return explicit end
-  if spec and spec.direct_effects then
-    return M.descriptor_from_effects(spec.direct_effects)
+  local source = spec and spec.descriptor and spec.descriptor.effect
+  if type(source) ~= "table" then
+    error("MIR stream is missing its canonical typed effect descriptor.", 2)
   end
-  return productivity_descriptor(spec)
+  return deepcopy(source)
 end
 
 function M.stream_setting_name(key)

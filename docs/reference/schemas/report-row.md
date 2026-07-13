@@ -12,8 +12,7 @@ superseded_by: []
 
 # Report Row Schema
 
-Report rows are parser-friendly diagnostics emitted through logs and consumed by
-compatibility audit tooling.
+Report rows are parser-friendly diagnostics emitted through logs and consumed by compatibility audit tooling.
 
 Common fields:
 

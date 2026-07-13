@@ -87,6 +87,81 @@ if (Test-MIRPackageSourceGitDirty -RepoRoot $repo) {
 if (Test-MIRRepositoryGitDirty -RepoRoot $repo) {
   throw "The entire repository working tree must be clean before candidate promotion."
 }
+
+if ($status -eq "published") {
+  if ((Get-MIRRequiredCandidateField -Fields $candidate -Name "automated_gate") -ne "passed") {
+    throw "A published candidate must retain automated_gate: passed."
+  }
+  if ((Get-MIRRequiredCandidateField -Fields $candidate -Name "manual_gate") -ne "accepted-for-publication") {
+    throw "A published candidate must record manual_gate: accepted-for-publication."
+  }
+
+  $artifactRelative = Get-MIRRequiredCandidateField -Fields $candidate -Name "artifact"
+  $artifactPath = Join-Path $repo $artifactRelative
+  if (-not (Test-Path -LiteralPath $artifactPath -PathType Leaf)) {
+    throw "Published release artifact is missing: $artifactRelative"
+  }
+  foreach ($field in @("sha256", "package_content_sha256")) {
+    $actual = if ($field -eq "sha256") {
+      Get-MIRFileSha256 -Path $artifactPath
+    } else {
+      Get-MIRZipContentFingerprint -Path $artifactPath
+    }
+    $expected = Get-MIRRequiredCandidateField -Fields $candidate -Name $field
+    if ($actual -ne $expected) {
+      throw "Published release artifact $field changed: expected $expected, current $actual."
+    }
+  }
+
+  $summaryRelative = Get-MIRRequiredCandidateField -Fields $candidate -Name "structured_summary_path"
+  $summaryPath = Join-Path $repo $summaryRelative
+  if (-not (Test-Path -LiteralPath $summaryPath -PathType Leaf)) {
+    throw "Published candidate structured summary is missing: $summaryRelative"
+  }
+  $summary = Get-Content -Raw -LiteralPath $summaryPath | ConvertFrom-Json
+  $publishedSummaryExpectations = [ordered]@{
+    schema = 2
+    status = "passed"
+    run_id = Get-MIRRequiredCandidateField -Fields $candidate -Name "structured_summary_run_id"
+    git_commit = $sourceCommit
+    target_profile_sha256 = Get-MIRRequiredCandidateField -Fields $candidate -Name "target_profile_sha256"
+    required_groups_sha256 = Get-MIRRequiredCandidateField -Fields $candidate -Name "required_groups_sha256"
+    package_source_sha256 = Get-MIRRequiredCandidateField -Fields $candidate -Name "package_source_sha256"
+    validation_package_sha256 = Get-MIRRequiredCandidateField -Fields $candidate -Name "validation_package_sha256"
+    validation_package_content_sha256 = Get-MIRRequiredCandidateField -Fields $candidate -Name "validation_package_content_sha256"
+    validation_harness_sha256 = Get-MIRRequiredCandidateField -Fields $candidate -Name "validation_harness_sha256"
+    expected_scenarios_sha256 = Get-MIRRequiredCandidateField -Fields $candidate -Name "expected_scenarios_sha256"
+  }
+  foreach ($field in $publishedSummaryExpectations.Keys) {
+    if ([string]$summary.$field -ne [string]$publishedSummaryExpectations[$field]) {
+      throw "Published structured summary $field does not match recorded candidate evidence."
+    }
+  }
+  if ([bool]$summary.package_source_git_dirty -or [bool]$summary.validation_harness_git_dirty) {
+    throw "Published structured summary must come from clean package-source and validation-harness state."
+  }
+  $failedRequiredGroups = @($summary.groups | Where-Object { [bool]$_.required -and $_.status -ne "passed" })
+  if ($failedRequiredGroups.Count -gt 0) {
+    throw "Published structured summary contains a required group that did not pass."
+  }
+
+  $releaseCommit = Get-MIRRequiredCandidateField -Fields $candidate -Name "release_commit"
+  $releaseTag = Get-MIRRequiredCandidateField -Fields $candidate -Name "release_tag"
+  & git -C $repo cat-file -e "$releaseCommit^{commit}" 2>$null
+  if ($LASTEXITCODE -ne 0) { throw "Published release commit is not available locally: $releaseCommit" }
+  $tagCommit = (& git -C $repo rev-parse "$releaseTag^{commit}" 2>$null)
+  if ($LASTEXITCODE -ne 0 -or ([string]$tagCommit).Trim() -ne $releaseCommit) {
+    throw "Published release tag $releaseTag does not resolve to $releaseCommit."
+  }
+  & git -C $repo merge-base --is-ancestor $sourceCommit $releaseCommit
+  if ($LASTEXITCODE -ne 0) {
+    throw "Published release commit does not contain the validated source commit."
+  }
+
+  Write-Host "[ok] MIR published release archive, tag, and recorded validation evidence are immutable and consistent."
+  exit 0
+}
+
 $packageRoots = @(Get-MIRPackageSourceRoots)
 $changedPackagePaths = @(& git -C $repo diff --name-only $sourceCommit HEAD -- @packageRoots)
 if ($LASTEXITCODE -ne 0) {

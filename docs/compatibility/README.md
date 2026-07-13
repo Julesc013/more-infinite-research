@@ -38,18 +38,11 @@ Release-line summary:
 | `1.4.x` / `1.3.x` / `0.12.x` | `0.14.x` / `0.13.x` / `0.12.x` | archive finite-ladder reconstructions |
 | `0.11.x` through `0.6.x` | `0.11.x` through `0.6.x` | museum/discovery builds |
 
-Post-transition versioning starts after the `1.9.2` backport. From that point,
-public MIR version lines encode the target Factorio generation. Lower lines do
-not imply feature parity; every target-line archive must load under its matching
-Factorio binary before any release candidate wording is honest.
+Post-transition versioning starts after the `1.9.2` backport. From that point, public MIR version lines encode the target Factorio generation. Lower lines do not imply feature parity; every target-line archive must load under its matching Factorio binary before any release candidate wording is honest.
 
 The release goal is graceful compatibility without mod-page dependency clutter: compatible mods should work when their prototypes are visible, absent mods should be skipped cleanly, and no compatibility mod should be required for this mod to load.
 
-The current maintainer-authorized cadence is tentative but intentional: ship
-validated Factorio `2.1` current-line updates weekly through December 2026 where
-safe candidates exist, then run a daily older-line backport celebration from the
-week before Factorio `2.1` release through the week after it. Validation and
-clear support boundaries outrank the calendar.
+The current maintainer-authorized cadence is tentative but intentional: ship validated Factorio `2.1` current-line updates weekly through December 2026 where safe candidates exist, then run a daily older-line backport celebration from the week before Factorio `2.1` release through the week after it. Validation and clear support boundaries outrank the calendar.
 
 ## Compatibility Model
 
@@ -159,6 +152,8 @@ Manual scenarios can now be executed with `-RunManualScenarios`:
   -OutputDir .\artifacts\compat-audit-manual
 ```
 
+Exact release campaigns should also pass `-ModUnderTestZip` and `-ModUnderTestSourceCommit`. A load-tested run then writes `campaign-evidence.json` with the candidate SHA-256, dependency-lock fingerprint, actual roots, closure versions and SHA-256 values, result, timeout state, and claim level. See [modpack campaigns](../maintainer/modpack-campaigns.md).
+
 Sharded or resumed audits can use `-FromLockfile`, `-StartIndex`, `-Count`, and `-CandidateNames`:
 
 ```powershell
@@ -232,10 +227,7 @@ The default smoke mods and representative scenario are ordinary parameters, so f
 
 `Start-MIROvernightLocalSweep.ps1` is the preferred bedtime command for the local `2.1` library. It removes one-line paste hazards, starts a transcript log, writes `run-manifest.json`, `events.jsonl`, `artifact-index.json`, and `index.html`, runs the strict release gate, then runs the local sweep with `-CollectAll`. The underlying prioritized local sweep covers curated combinations from `fixtures/compat-matrix/local-library-scenarios.json`, generated all-local/cluster stress scenarios, and then each individual local root zip. Missing dependencies and impossible mod combinations are expected to appear as grouped failures; they are still useful evidence because they distinguish "not testable with this local library" from actual MIR generation regressions. `compat-observations.md/json/csv` records diagnostics-only planner rows and cap warnings. `Show-MIROvernightSummary.ps1` summarizes the next-morning triage views across the whole output tree.
 
-Use `Test-MIRLocalModLibraryCatalog.ps1` before a local sweep when you need a
-metadata-only gate. It reads local zip `info.json` files, catalogs available mod
-names, and fails if committed local-library scenario roots are missing from the
-library.
+Use `Test-MIRLocalModLibraryCatalog.ps1` before a local sweep when you need a metadata-only gate. It reads local zip `info.json` files, catalogs available mod names, and fails if committed local-library scenario roots are missing from the library.
 
 `GeneratedLocalScenarios` creates scenarios from local zip metadata: one all-local mega scenario, cluster scenarios for planet/Space Age content, BZ/resource chains, Bob, Krastorio/K2SO, production/fluid/casting/resource-flow mods, and logistics/transport mods. Add `-IncludeGeneratedLocalPairwise -GeneratedLocalPairwiseLimit 40` to the wrapper when you want a capped pairwise pass inside high-risk local clusters. `LocalModZips` can be sharded with `-ShardLocalModZips -StartIndex N -ShardSize M`; without `-ShardLocalModZips`, it tests every local root.
 
@@ -307,11 +299,9 @@ Do not publish a compatibility-heavy archive from static validation alone. After
 
 The Factorio `2.0` legacy release More Infinite Research `v1.9.0` was released from the `legacy` branch, backported from the tested More Infinite Research `v2.0.5` Factorio `2.1` quick-patch codebase. `v1.9.1` follows the same snapshot-port model from the tested More Infinite Research `v2.1.0` source point. The next transition port is `v1.9.2` from the tested `v2.2.0` source point. The older planned `v1.9.7`, `v1.9.8`, and `v1.9.9` Factorio `2.0` ladder is superseded by the locked post-`1.9.2` target-line policy unless the maintainer explicitly revives it.
 
-The expanded older-line ladder for Factorio `1.1` through `0.6` lives in `docs/archive/2.x/legacy-backport-cadence.md`. Those ports should be treated as separate target-line compatibility, archive, or museum releases, not as automatic feature-parity claims.
+The historical expanded older-line ladder for Factorio `1.1` through `0.6` lives in `docs/archive/superseded/legacy-backport-cadence.md`. Those ports should be treated as separate target-line compatibility, archive, or museum releases, not as automatic feature-parity claims.
 
-The daily celebration cadence does not change the compatibility model: each
-archive still needs target-line metadata, unsupported-surface guards, package
-evidence, and target-line validation or an explicit release-note caveat.
+The daily celebration cadence does not change the compatibility model: each archive still needs target-line metadata, unsupported-surface guards, package evidence, and target-line validation or an explicit release-note caveat.
 
 Legacy should not be reconstructed commit-by-commit from older release history. `v1.9.0` ported the tested `v2.0.5` snapshot: current MIR generator, diagnostics, recipe matching, science-pack handling, compatibility cleanup, docs structure, locale, and validation infrastructure with Factorio `2.1`-only surface area removed or guarded.
 
@@ -370,11 +360,7 @@ Large mod packs and utility mods such as Alien Biomes, Informatron, Jetpack, AAI
 
 MIR can add and test support for mods that currently advertise an older Factorio line. Upstream Factorio-version metadata is not a reason to avoid implementing safe output-based or fixture-backed support, because the same support may be useful when the external mod updates and when MIR backports behavior to a Factorio `2.0` branch.
 
-Machine-readable support data lives in `fixtures/compat-matrix/support-lanes.json`
-and `fixtures/compat-matrix/claims.json`. Static validation lints those files so
-current fixture-backed claims list fixtures, generated streams have manifest
-rows, and public text stays narrower than "full support" unless a separate
-external load profile proves that claim.
+Machine-readable support data lives in `fixtures/compat-matrix/support-lanes.json` and `fixtures/compat-matrix/claims.json`. Static validation lints those files so current fixture-backed claims list fixtures, generated streams have manifest rows, and public text stays narrower than "full support" unless a separate external load profile proves that claim.
 
 Claims must stay precise:
 
@@ -436,10 +422,7 @@ For each case, verify:
 - Factorio reaches the main menu without prototype errors.
 - Generated technologies have non-empty science-pack ingredients.
 - At least one lab accepts each generated technology's full science-pack set.
-- Default base-only runs do not load direct DLC asset paths. The
-  `mir-use-installed-space-age-icons` startup setting is an explicit opt-in for
-  players who have official DLC icon files installed but disabled and want MIR
-  to reference those local icon files.
+- Default base-only runs do not load direct DLC asset paths. The `mir-use-installed-space-age-icons` startup setting is an explicit opt-in for players who have official DLC icon files installed but disabled and want MIR to reference those local icon files.
 - Logs show skipped or reduced streams clearly and do not show stack traces.
 - Finite vanilla weapon shooting speed effects are preserved even when the overlap adjustment setting is enabled. The setting only affects MIR's generated continuation.
 
@@ -616,27 +599,15 @@ Expected result: the startup-only pipeline multiplier mutates common fluid boxes
 Create a local test mod that:
 
 - Runs after More Infinite Research.
-- Runs `off`, conditional, and `always` with dedicated coverage both present
-  and absent.
+- Runs `off`, conditional, and `always` with dedicated coverage both present and absent.
 - Fails loading if finite vanilla `weapon-shooting-speed-5` or `weapon-shooting-speed-6` loses `cannon-shell` speed effects.
-- Fails loading if MIR's generated continuation removes an effect without
-  accepted replacement coverage or retains an overlap when policy requires
-  removal.
-- Adds an exact external infinite owner while preferring external competing
-  technologies, then verifies MIR suppresses its dedicated rocket/cannon
-  streams and still removes overlap from the general continuation.
+- Fails loading if MIR's generated continuation removes an effect without accepted replacement coverage or retains an overlap when policy requires removal.
+- Adds an exact external infinite owner while preferring external competing technologies, then verifies MIR suppresses its dedicated rocket/cannon streams and still removes overlap from the general continuation.
 - Fails loading if dedicated rocket, cannon, flamethrower, or electric shooting speed research is missing its target-era unlock prerequisite.
 
-Replacement coverage requires an enabled, structurally reachable infinite
-technology with the same effect type, ammo category, and modifier. Hidden
-technology is not rejected merely for being hidden. A finite, disabled,
-unreachable, differently scaled, or general continuation technology cannot
-justify removal. External coverage is accepted only when the existing
-competition setting prefers the external owner.
+Replacement coverage requires an enabled, structurally reachable infinite technology with the same effect type, ammo category, and modifier. Hidden technology is not rejected merely for being hidden. A finite, disabled, unreachable, differently scaled, or general continuation technology cannot justify removal. External coverage is accepted only when the existing competition setting prefers the external owner.
 
-Expected result: vanilla tank cannon fire rate is preserved while MIR avoids
-duplicate infinite rocket/cannon-shell scaling without creating an ownership
-gap.
+Expected result: vanilla tank cannon fire rate is preserved while MIR avoids duplicate infinite rocket/cannon-shell scaling without creating an ownership gap.
 
 ## Release Checklist
 

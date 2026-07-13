@@ -1,0 +1,13 @@
+{
+  "name": "mir-fixture-assert-semantic-family-attach",
+  "version": "0.1.0",
+  "title": "MIR Fixture - Assert Semantic Family Attach",
+  "author": "Julesc013",
+  "description": "Asserts structural family rules attach opaque recipes only to existing stable streams.",
+  "factorio_version": "2.0",
+  "dependencies": [
+    "base >= 2.0.76",
+    "more-infinite-research",
+    "mir-fixture-semantic-family-attach"
+  ]
+}

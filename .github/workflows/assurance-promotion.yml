@@ -1,0 +1,27 @@
+name: Assurance Promotion Check
+
+on:
+  workflow_dispatch:
+    inputs:
+      candidate_sha:
+        description: "Sealed source commit"
+        required: true
+      seal_path:
+        description: "Tracked candidate seal path"
+        required: true
+        default: ".mir/evidence/candidate-seals/mir-2.4.0-factorio-2.0.json"
+
+permissions:
+  contents: read
+
+jobs:
+  verify-seal:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.candidate_sha }}
+          fetch-depth: 0
+      - name: Verify sealed bytes and evidence only
+        shell: pwsh
+        run: ./scripts/mir.ps1 assurance check-seal --seal '${{ inputs.seal_path }}' --json

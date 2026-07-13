@@ -1,15 +1,23 @@
 schema: 1
 
 release:
-  version: "2.3.5"
-  branch: legacy
+  version: "2.4.0"
+  branch: tmp/2.0
   factorio_version: "2.0"
-  baseline_commit: b93808c54946f3913cea1244a6df89a154abd98e
-  baseline_tag: "3.0.5"
+  baseline_commit: 9eabc5439d3743be10c6f76d5ee36d9804a60f25
+  baseline_tag: "2.3.5"
   objective: target-port-behavioral-subset
-  public_contract_change: patch-compatible
+  public_contract_change: minor-compatible
 
 superseded_candidates:
+  - source_commit: 4f7c9d18d5491e6e6fcafa5364f9b832cabac233
+    historical_artifact_identity: dist/more-infinite-research_2.5.0.zip
+    sha256: 0BE57ED4C51DDF08F80AB4CFB2D5762DF2714B17AB26DB58CA9980289350CBFD
+    size_bytes: 387662
+    entries: 160
+    forbidden_entries: 0
+    reason: maintainer selected 2.4.0 as the first public final-3.1.5 Factorio 2.0 companion release
+    status: superseded-unpublished-candidate
   - source_commit: da961e542dbcbaeb14c0ba15555cd25f5f162944
     artifact: dist/more-infinite-research_3.0.5.zip
     sha256: 5BA004917B30C553C927B8D20DA18466194875BA443CC641583A41CBCEC2D44E
@@ -26,65 +34,86 @@ superseded_candidates:
     forbidden_entries: 0
     reason: BP-015 science reachability and BP-016 weapon ownership changed package-visible source
     status: superseded-unpublished-candidate
-  - source_commit: 1a81a30
-    artifact: dist/more-infinite-research_2.3.5.zip
-    sha256: A2A3BA644D646B2A836CBA8C31FB1C71549C157AB36DCD19CE35509749529F4A
-    size_bytes: 321145
-    reason: scripted effect-per-level descriptors were omitted during the Factorio 2.0 conflict resolution
+  - source_commit: 302cccdff22490cfd84ca8fee3eda1e759b7cee5
+    artifact: dist/more-infinite-research_3.0.5.zip
+    sha256: 57AF0E55EB92035452B154AEFF3A6F15EE149A671E3E27EEDF460CD7ABFE1BC9
+    size_bytes: 309930
+    entries: 127
+    forbidden_entries: 0
+    reason: BP-018 rejects external owners with unrecognized research ingredients
     status: superseded-unpublished-candidate
-  - source_commit: dd0cfd4a4bf3743d1e88b84a228feb7b8fddc992
-    artifact: dist/more-infinite-research_2.3.5.zip
-    sha256: 95A52BFBE1C161CA3D34AC177FABF9868F2D8587AFD88A29BF0D5A03DDEA50EB
-    size_bytes: 321227
+  - source_commit: 27b7ffab867eb50faa60faf072b1092e53edb0b4
+    artifact: dist/more-infinite-research_3.0.5.zip
+    sha256: AA1A057E7960474E4D5A2B45DE7FB0A6754FFC97E0F7DBC2408107339053BFFE
+    size_bytes: 322365
+    entries: 132
+    forbidden_entries: 0
     reason: retained non-default base effect settings could load an incomplete descriptor
     status: superseded-unpublished-candidate
-  - source_commit: 2d1eb296f15b71ef538d0547147ce42ac03098a0
-    artifact: dist/more-infinite-research_2.3.5.zip
-    sha256: 65A1575CF6C31B64D46FD1DD43E355036DFB704843E4DF3D85461371E6C74C2E
-    size_bytes: 321314
+  - source_commit: 85f5b6e89b047184fa77cf9d6f7c2d458e5ea27a
+    artifact: dist/more-infinite-research_3.0.5.zip
+    sha256: 1EDC9DA1693EB032FDBB02D0DFDB4F37E525ECFB58F1BFC647A762744EAD3A4D
+    size_bytes: 322439
     entries: 132
-    package_content_sha256: 46D99E946675A9899E44503802D7F8FEB55D4F9967828F89A0FFCEA4EF51CEE7
-    validation_summary: .mir/evidence/2.3.5-rc4-validation-summary.json
-    validation_run_id: c63ad6cd-1b1e-4314-acd1-53d859728c77
-    scenario_count: 67
-    reason: final released 3.0.5 expanded settings and recycler interaction contract had not yet been ported
+    forbidden_entries: 0
+    reason: feedback RC adds recycler returns, negative speed floors, and modded module tier discovery
+    status: superseded-unpublished-candidate
+  - source_commit: dcd616cc9fc1355cea59bd9add1fe8ac4cade0a9
+    artifact: dist/more-infinite-research_3.0.5.zip
+    sha256: 94B32E04A3486E850F559BAF776027E9644ED319624F0B80BEEDFE24D98AD436
+    size_bytes: 336413
+    entries: 132
+    forbidden_entries: 0
+    reason: duplicate fixed 25 percent recycler row removed from the final UI
+    status: superseded-unpublished-candidate
+  - source_commit: 3d1c70fa37137b962abbbdfab069a3ba70547642
+    artifact: dist/more-infinite-research_3.0.5.zip
+    sha256: C1FCF5E4045EF9D3AF74758CD508719CD2A49D2F0B565E940A0B045DAAAEF2E7
+    size_bytes: 337017
+    entries: 132
+    forbidden_entries: 0
+    reason: recycler and productivity cap controls required stricter ownership and combination fixtures
+    status: superseded-unpublished-candidate
+  - source_commit: ff2aea90a4b9b6530601da40474bdf1dd783ccff
+    artifact: dist/more-infinite-research_3.0.5.zip
+    sha256: 12F4C14EE408EFA6D2F6116320F8C424B2F357E69477397F922A54568D6442B0
+    size_bytes: 337551
+    entries: 132
+    forbidden_entries: 0
+    reason: documentation reorganization changed packaged README content and the validation harness
+    status: superseded-unpublished-candidate
+  - source_commit: 8891d675062416764d181b27497a6fa1ef42e070
+    artifact: dist/more-infinite-research_3.0.5.zip
+    sha256: 40AF95C3F4411DDF6C24C98897489D696339A1B85B0439FA4A3BDFEDDDF0E5C5
+    size_bytes: 337527
+    entries: 132
+    forbidden_entries: 0
+    reason: raw text fingerprints differed between local CRLF and GitHub Actions LF checkouts
+    status: superseded-unpublished-candidate
+  - source_commit: b1a8a76fac549fd8164a8910f77b1c665c69589f
+    artifact: dist/more-infinite-research_3.0.5.zip
+    sha256: 40AF95C3F4411DDF6C24C98897489D696339A1B85B0439FA4A3BDFEDDDF0E5C5
+    size_bytes: 337527
+    entries: 132
+    forbidden_entries: 0
+    reason: expected scenario manifest still used a raw checkout-line-ending-dependent hash
     status: superseded-unpublished-candidate
 
 candidate:
-  artifact: dist/more-infinite-research_2.3.5.zip
-  source_commit: 861565d3e898166eca8920e6eade6887b7db087d
-  sha256: 97B3DC9B6E352C6C4B8FF76D77020333FAAFFE93BD89EDB6B8F3370405ED68DE
-  size_bytes: 336718
-  entries: 132
-  files: 127
-  forbidden_entries: 0
-  package_content_sha256: 5B1BAFFF4A6D26C2CFB704705F224CFE562724230F054B2F16FEAC90E08F56D6
-  package_source_sha256: 5B1BAFFF4A6D26C2CFB704705F224CFE562724230F054B2F16FEAC90E08F56D6
-  target_profile_sha256: 9D8EC1B8813609DD855023FF81D73F307BB2A348B7B8E41AA4D10AEC268A6E18
+  artifact: dist/more-infinite-research_2.4.0.zip
+  source_commit: 01efb39a7476cc5e5f7e173edbb244e70f7a8e96
+  sha256: 4BA19EA071E6359BC25C58CCD8F65CAF81B4AA675496E2F53175A996C791470C
+  package_content_sha256: F681FF5C331FC45EAFF31823BC9D9441A100C75FD5D412DE1C37DC828DE00775
+  package_source_sha256: F681FF5C331FC45EAFF31823BC9D9441A100C75FD5D412DE1C37DC828DE00775
+  target_profile_sha256: E4955F0415FAFB69C21DA32BA535C761740C270D6972955170CA5A2BE95D514A
   required_groups_sha256: 57A1DF87A8FB594B2B51C7E230D775E88028F23D52DF9D5D7DA1336F9271C78A
-  validation_harness_sha256: A3962103F3713E1DCA219A20F2355B2359CC896E059122E3AB1B94DC5C58D54B
-  expected_scenarios_sha256: C06163A3C3AEF3D85328B413F45E7E3C9CABDFF2882BF56151285ADD0B075561
-  validation_package_sha256: 77DA0151C97DFAB823730B25AA8670E5C5DE21BBB40B8D093C0DCA4F5EA7871D
-  validation_package_content_sha256: 5B1BAFFF4A6D26C2CFB704705F224CFE562724230F054B2F16FEAC90E08F56D6
-  structured_summary_path: .mir/evidence/2.3.5-rc5-validation-summary.json
-  structured_summary_run_id: 74543fb0-1a55-429c-9f23-68d1407fec8f
-  structured_summary_status: passed
-  structured_summary_duration_seconds: 400.594
-  scenario_count: 71
-  release_targeted_summary_path: .mir/evidence/2.3.5-release-targeted-summary.json
-  exact_dist_base_log: .mir/evidence/2.3.5-exact-dist-base.txt
-  exact_dist_space_age_log: .mir/evidence/2.3.5-exact-dist-space-age.txt
-  upgrade_from_2_3_0_log: .mir/evidence/2.3.5-upgrade-2.3.5-load.txt
-  validation_content_matches_dist: true
-  exact_dist_base_smoke: passed
-  exact_dist_space_age_smoke: passed
-  upgrade_from_2_3_0: passed
+  validation_harness_sha256: 269681E043D2AF9B385F04A094A5633B409993BE383F6C54CFB0E63285DC16C3
+  validation_package_sha256: 4BA19EA071E6359BC25C58CCD8F65CAF81B4AA675496E2F53175A996C791470C
+  expected_scenarios_sha256: 6098644CA24561ECEB1E62B7D5C26708337FA0DF5F3250F0919868A11FAEC12E
+  structured_summary_path: .mir/evidence/2.4.0-change-aware-qualification-final.json
+  structured_summary_run_id: 58758361-accf-40eb-9d15-c720af9a0620
   automated_gate: passed
-  manual_gate: accepted-by-maintainer-directive
-  interactive_ui_observation: not-independently-performed
-  acceptance_date: "2026-07-12"
-  acceptance_basis: maintainer-directed-continuation-after-automated-and-exact-archive-gates
-  promotion_authorized: true
+  manual_gate: pending
   status: release-candidate-awaiting-manual-review
 
 rules:
@@ -232,11 +261,27 @@ behaviors:
     impact: release-governance
     evidence: candidate-freshness
     status: complete
+  BP-018:
+    source: tmp/2.0@9689f22
+    behavior: external research owners with unrecognized science ingredients are not valid replacement coverage
+    class: B-missing-and-compatible
+    decision: reuse-canonical-science-researchability-authority
+    impact: external-owner-coverage
+    evidence: weapon-speed-safety-matrix
+    status: complete
+  BP-019:
+    source: 3.0.5-community-recycler-setting-review
+    behavior: recycler returns and production productivity caps remain independent across every checkbox and dropdown combination
+    class: B-missing-and-compatible
+    decision: isolate-recycling-recipes-and-prove-inverse-threshold-boundaries
+    impact: prototype-limits
+    evidence: prototype-limits
+    status: complete
 
 release_gates:
   - static-validation
-  - factorio-2.0-base-runtime
-  - factorio-2.0-space-age-runtime
+  - factorio-2.1-base-runtime
+  - factorio-2.1-space-age-runtime
   - generated-prerequisite-safety
   - weapon-overlap-policy-matrix
   - settings-profile-codec
@@ -245,3 +290,4 @@ release_gates:
   - exact-dist-package-validation
   - complete-structured-validation-summary
   - rigor-late-recipe-removal
+  - prototype-limit-combination-boundaries

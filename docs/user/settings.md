@@ -5,40 +5,61 @@ applies_to: "3.0.0+"
 audience: player
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-07-12
+last_reviewed: 2026-07-14
 supersedes: []
 superseded_by: []
 ---
 
 # Settings
 
-MIR uses startup settings for generated technology enablement, costs, caps,
-science-pack policy, diagnostics, and prototype-stage options. Startup settings
-are read during Factorio's prototype loading stages, so most generation choices
-require a restart after changing them.
+MIR uses startup settings for generated technology enablement, costs, caps, science-pack policy, diagnostics, and prototype-stage options. Startup settings are read during Factorio's prototype loading stages, so most generation choices require a restart after changing them.
 
-MIR-owned technology settings stay visible across base and Space Age so the
-settings page is stable when toggling official DLC. Some exact third-party
-provider settings may be hidden when their required provider mod is not
-enabled. MIR still defines those setting keys internally so copied settings,
-existing saves, and target-line backports can keep stable values. If the
-relevant provider mod is enabled later, the setting can become visible again
-with the saved value still available.
+Space Age-only technology settings are hidden while the DLC is inactive, then reappear with their stored values when `space-age` is enabled. Some exact third-party provider settings follow the same rule when their provider mod is absent. MIR still registers hidden setting keys internally so copied settings, existing saves, portable profiles, and target-line backports keep stable values.
 
-Use the in-game setting descriptions for exact defaults. Use
-[settings reference](../reference/settings.md) for the canonical
-technical contract once a setting needs maintainer-level detail.
+Experimental automatic-family tuning settings are hidden until their family is reviewed. This avoids presenting low-level enable and cost controls for technologies that the reviewed creation lane will not emit. The explicit broad experimental combination still exercises the stable family identities; hiding their tuning rows does not delete or silently force their saved values.
 
-Global settings are grouped with visible prefixes: Main, Compatibility,
-Limits, Advanced, and Diagnostics. Some prefixes are color-emphasized
-in-game for faster scanning, but the label text is still the structure.
+Use the in-game setting descriptions for exact defaults. Use [settings reference](../reference/settings.md) for the canonical technical contract once a setting needs maintainer-level detail.
 
-Generated technology settings are ordered so default-off or experimental rows
-come first, enabled special rows come next, and ordinary enabled rows come last.
-Breeding, agricultural growth speed, cargo bay range/count, and character reach
-are enabled by default but remain in the special row group. Inserter capacity
-stays disabled by default because larger hand sizes can change circuit behavior
-and inserter performance assumptions.
+Global settings are grouped with visible prefixes: Main, Compatibility, Limits, Advanced, and Diagnostics. Some prefixes are color-emphasized in-game for faster scanning, but the label text is still the structure.
+
+Automatic recipe support uses three independent controls for productivity opportunities discovered in installed-mod recipes. The dropdown chooses an action, not a strength or experimental level:
+
+| Action | Behavior |
+| --- | --- |
+| Disabled | Performs no automatic discovery or changes. MIR's fixed research still works. |
+| Preview changes | Classifies candidates and writes accepted and skipped decisions to the Factorio log without changing research. |
+| Apply safe changes | Attaches only safety-proven recipes to compatible existing MIR research. This is the default. |
+
+`Allow new research creation` is a separate, default-off checkbox. Off means attachment-only: recipes without a compatible existing stream are skipped and reported. On lets registered providers create one stable generic research technology for an eligible family when no existing stream fits; it never creates one technology per mod or recipe.
+
+`Require reviewed data for new research` defaults on and matters only when creation is allowed. On restricts creation to provider families that are both marked reviewed and backed by an applicable exact-version compatibility record with named evidence. Experimental families are skipped. Off opens registered experimental providers using generic structural evidence. It never blocks safe existing-stream attachment, and neither value can bypass hard safety gates.
+
+The assembling-machine and laboratory manufacturing families are experimental in 3.1.5, so their individual tuning rows are intentionally hidden. To test their generated technologies, select `Apply safe changes`, enable `Allow new research creation`, and disable `Require reviewed data for new research`. They still appear only when discovery finds safe matching recipes and every hard gate passes.
+
+The settings do not encode current mod names, technology names, or a closed list of future families. New compiler family modules use the same action and creation contract. Every path still passes target, productivity-permission, ownership, recycling, probability, catalyst, science, lab, prerequisite, progression, identity, and technology-cycle gates. Unsafe or ambiguous candidates are skipped and diagnosed; no setting or compatibility pack can override a hard gate.
+
+The released `mir-automatic-compiler-mode` setting remains hidden as a migration bridge. A non-default legacy value is translated to the equivalent new policy while all three new controls remain at their defaults. As soon as any new control differs from its default, the new controls take precedence. This preserves old profiles without keeping the old five-way preset in the player-facing UI.
+
+For documentation and portable policy exchange, the three controls also have four named profiles. These are exact expansions, not another setting or a scale:
+
+| Profile | Action | Create research | Require reviewed data |
+| --- | --- | --- | --- |
+| Conservative | Preview changes | Off | On |
+| Safe (default) | Apply safe changes | Off | On |
+| Expansive | Apply safe changes | On | Off |
+| Custom | Whatever explicit combination the three controls contain | Explicit | Explicit |
+
+The order describes increasing automatic action, not increasing safety or quality. Safe remains the default because it attaches eligible mod recipes to existing compatible research without authorizing new technologies. Expansive is intentionally opt-in; hard safety, ownership, science, graph, identity, and progression gates remain mandatory in every profile.
+
+## Existing Infinite Research Owners
+
+Processing units, plastic, low-density structures, and rocket fuel can already be covered by infinite productivity technologies supplied by Space Age or another mod. MIR 2.4.0 binds those recognized owners to the same visible stream controls used when MIR has to generate a technology: Enable, base cost, cost growth, maximum level, research time, and effect per level.
+
+Leaving the settings at their defaults preserves the final existing technology exactly, including values changed by another mod. Turning Enable off also leaves the external technology untouched. A deliberate non-default value configures the recognized existing owner instead of silently ignoring the setting. Effect values use percentage points and change only recipe-productivity effects in that stream's product family; unrelated technology effects remain intact. Maximum level `0` means infinite.
+
+MIR preserves recognized native and MIR exponential formula styles when applying cost changes. If another mod supplies a formula MIR cannot safely interpret, defaults still preserve it, but an explicit base-cost or growth override is rejected and reported rather than approximated. Changes are startup settings and require a restart.
+
+Visible generated technology settings are ordered so default-off rows come first, enabled special rows come next, and ordinary enabled rows come last. Breeding, agricultural growth speed, cargo bay range/count, and character reach are enabled by default but remain in the special row group when Space Age is active. Inserter capacity stays disabled by default because larger hand sizes can change circuit behavior and inserter performance assumptions.
 
 ## Prototype Limit Settings
 
@@ -52,110 +73,43 @@ MIR includes startup-only prototype limit settings:
 - Speed effect cap
 - Quality effect cap
 
-The default-off `mir-productivity-cap-self-recycling-only` checkbox derives an
-unrestricted productivity threshold from the effective recycler return using
-`1 / return - 1`. With 25% returns the threshold is +300%; with 10% returns it
-is +900%. Above that threshold, only recipes with a proven non-generative
-self-recycling path receive the selected higher cap. Other recipes are capped
-at the derived threshold. At or below the threshold, the checkbox has no effect
-on the selected productivity cap. Recycling-category recipes are never changed
-by this cap setting. When recycler returns are left unchanged, the guard uses
-Factorio's normal 25% return as its conservative +300% threshold baseline.
+The default-off `mir-productivity-cap-self-recycling-only` checkbox derives an unrestricted productivity threshold from the effective recycler return using `1 / return - 1`. With 25% returns the threshold is +300%; with 10% returns it is +900%. Above that threshold, only recipes with a proven non-generative self-recycling path receive the selected higher cap. Other recipes are capped at the derived threshold. At or below the threshold, the checkbox has no effect on the selected productivity cap. Recycling-category recipes are never changed by this cap setting. When recycler returns are left unchanged, the guard uses Factorio's normal 25% return as its conservative +300% threshold baseline.
 
-The `mir-recycling-return-chance` dropdown is a separate balance control for
-hidden generated recycling recipes. `Match productivity cap` uses the
-inverse of total capped output, `1 / (1 + bonus)`, and never raises the normal
-25% return. That means +400% productivity uses a 20% recycler return and
-+1000% uses about 9.09%. Fixed 20%, 15%, 12.5%, 10%, 7.5%, 5%, 2.5%,
-1%, 0.5%, and 0.1% choices are also available. Visible processes such as scrap recycling are intentionally
-excluded.
+The `mir-recycling-return-chance` dropdown is a separate balance control for hidden generated recycling recipes. `Match productivity cap` uses the inverse of total capped output, `1 / (1 + bonus)`, and never raises the normal 25% return. That means +400% productivity uses a 20% recycler return and +1000% uses about 9.09%. Fixed 20%, 15%, 12.5%, 10%, 7.5%, 5%, 2.5%, 1%, 0.5%, and 0.1% choices are also available. Visible processes such as scrap recycling are intentionally excluded.
 
-The fixed 25% menu entry is intentionally omitted because the unchanged option
-already displays the normal 25% return. Existing profiles that contain the
-older `percent-25` enum remain accepted, and advanced profiles can import the
-numeric value `25`.
+The fixed 25% menu entry is intentionally omitted because the unchanged option already displays the normal 25% return. Existing profiles that contain the older `percent-25` enum remain accepted, and advanced profiles can import the numeric value `25`.
 
-The experimental `mir-unrestricted-modules` Compatibility setting opens all
-five module effect types and every discovered module category on recipes and
-existing module receivers that already have slots, including beacons. It does
-not add slots or change module prototypes and can create severe productivity,
-quality, and modded-module balance exploits.
+The experimental `mir-unrestricted-modules` Compatibility setting opens all five module effect types and every discovered module category on recipes and existing module receivers that already have slots, including beacons. It does not add slots or change module prototypes and can create severe productivity, quality, and modded-module balance exploits.
 
-Every dropdown has a neutral option that bypasses its optional transformation.
-The prototype-limit entries are value-first labels: `+300% (unchanged)` for
-recipe productivity, `-80% (unchanged)` for energy and pollution reductions,
-and `+100000% (unchanged)` for speed and quality. Science-pack `configured`,
-weapon-speed cleanup `off`, pipeline `100%`, and lab compatibility
-`engine-default` are the other neutral paths. Those unchanged entries leave the
-relevant Factorio prototype fields alone. Non-default values are explicit global
-balance overrides for long-running infinite research saves or modpacks that want
-stricter or broader module-effect ceilings.
+Every dropdown has a neutral option that bypasses its optional transformation. The prototype-limit entries are value-first labels: `+300% (unchanged)` for recipe productivity, `-80% (unchanged)` for energy and pollution reductions, and `+100000% (unchanged)` for speed and quality. Science-pack `configured`, weapon-speed cleanup `off`, pipeline `100%`, and lab compatibility `engine-default` are the other neutral paths. Those unchanged entries leave the relevant Factorio prototype fields alone. Non-default values are explicit global balance overrides for long-running infinite research saves or modpacks that want stricter or broader module-effect ceilings.
 
-Minimum machine speed is independent from the positive speed-effect cap. Its
-unchanged value is -80%; the dropdown spans -25%, -50%, -75%, and deeper floors
-as far as -99.99%,
-which is a near-stop but not zero or negative crafting speed.
+Minimum machine speed is independent from the positive speed-effect cap. Its unchanged value is -80%; the dropdown spans -25%, -50%, -75%, and deeper floors as far as -99.99%, which is a near-stop but not zero or negative crafting speed.
 
-The consistent broad ladders reach 1000% for pipeline extent, +100000% for
-productivity, +25000% as an explicit speed or quality override (with the engine's
-+100000% ceiling available through unchanged), and -99.99% for negative effect
-limits. Existing option IDs remain valid for imported profiles and backports.
+The consistent broad ladders reach 1000% for pipeline extent, +100000% for productivity, +25000% as an explicit speed or quality override (with the engine's +100000% ceiling available through unchanged), and -99.99% for negative effect limits. Existing option IDs remain valid for imported profiles and backports.
 
-Advanced portable profiles can use any valid decimal percentage within the
-setting's safe bounds even when that value is not listed in the dropdown. Use a
-JSON number in displayed percentage units, such as `123.45` or `-83.25`; invalid
-or out-of-range values are ignored. The in-game dropdown remains curated for
-easy selection.
+Advanced portable profiles can use any valid decimal percentage within the setting's safe bounds even when that value is not listed in the dropdown. Use a JSON number in displayed percentage units, such as `123.45` or `-83.25`; invalid or out-of-range values are ignored. The in-game dropdown remains curated for easy selection.
 
-For the exact option list and a count of every checkbox, dropdown, numeric field,
-and text setting in 3.0.5, see the
-[3.0.5 settings inventory](../releases/3.0.5-settings-inventory.md).
+For the exact option list and a count of every checkbox, dropdown, numeric field, and text setting in 3.0.5, see the [3.0.5 settings inventory](../releases/3.0.5-settings-inventory.md).
 
-Module productivity discovers final `module` prototypes by their declared
-tier. Tiers 1, 2, and 3 keep the existing +10%, +5%, and +2% per-level values;
-tier 4 and later module recipes receive +1% per level. This includes modded
-module categories without requiring name patterns or a per-mod checkbox.
+Module productivity discovers final `module` prototypes by their declared tier. Tiers 1, 2, and 3 keep the existing +10%, +5%, and +2% per-level values; tier 4 and later module recipes receive +1% per level. This includes modded module categories without requiring name patterns or a per-mod checkbox.
 
-Use the energy savings cap when a modpack's beacon, module, or quality effects
-can push machines toward near-zero active power draw. The pollution reduction
-cap is separate because efficiency modules can reduce both energy use and
-pollution, while modpacks may want different floors for each effect.
+Use the energy savings cap when a modpack's beacon, module, or quality effects can push machines toward near-zero active power draw. The pollution reduction cap is separate because efficiency modules can reduce both energy use and pollution, while modpacks may want different floors for each effect.
 
-The strongest selectable reduction is `-99.99%`. Factorio's effect receiver
-prototype bounds do not allow a literal `-100%` effect limit.
+The strongest selectable reduction is `-99.99%`. Factorio's effect receiver prototype bounds do not allow a literal `-100%` effect limit.
 
-The Non-zero power floor is a separate Compatibility setting, not a Limits
-cap. Use it only when a modpack has explicit `0W` active-use entity prototypes
-that create unwanted low-power warning icons. When enabled, MIR changes those
-explicit `0W` `energy_usage` prototypes to `1W` during prototype loading.
-Leave it off to preserve zero-power prototypes exactly.
+The Non-zero power floor is a separate Compatibility setting, not a Limits cap. Use it only when a modpack has explicit `0W` active-use entity prototypes that create unwanted low-power warning icons. When enabled, MIR changes those explicit `0W` `energy_usage` prototypes to `1W` during prototype loading. Leave it off to preserve zero-power prototypes exactly.
 
 ## Generated Technology Effect Settings
 
-Each generated technology has an `Effect per level` setting beside
-its cost and level controls. Its default is MIR's lowest-tier baseline. Changing
-it scales all related tiers and effects proportionally, preserving ratios such
-as a technology with +10%, +5%, and +2% effects. Percentage effects use
-percentage points; slots, counts, and distances use their native units. The
-enable checkbox remains the way to disable a technology—zero is not a disable
-value.
+Each generated technology has an `Effect per level` setting beside its cost and level controls. Its default is the primary, base-tier effect—the first tier shown by MIR's technology contract. Changing it scales all related tiers and effects proportionally, preserving ratios such as a technology with +10%, +5%, and +2% effects. Optional later tiers no longer make the displayed default unexpectedly small. Percentage effects use percentage points; slots, counts, and distances use their native units. The enable checkbox remains the way to disable a technology—zero is not a disable value.
 
-For scripted multiplier technologies, such as spoilage preservation and
-agricultural growth speed, the setting scales the per-level delta. A selected
-2% effect therefore becomes a `1.02` multiplier per level; MIR never multiplies
-the full canonical `1.01` value.
+For scripted multiplier technologies, such as spoilage preservation and agricultural growth speed, the setting scales the per-level delta. A selected 2% effect therefore becomes a `1.02` multiplier per level; MIR never multiplies the full canonical `1.01` value.
 
-These settings require a restart after changing them. Numeric prototype effects
-are applied during prototype loading; existing bounded scripted handlers read
-their selected delta at runtime. The quality cap changes only the
-machine quality-effect ceiling; it does not change quality-tier probabilities.
+These settings require a restart after changing them. Numeric prototype effects are applied during prototype loading; existing bounded scripted handlers read their selected delta at runtime. The quality cap changes only the machine quality-effect ceiling; it does not change quality-tier probabilities.
 
 ## Portable Settings Profiles
 
-MIR can export a portable settings profile for the current effective MIR startup
-settings. Use this when you are changing modpacks, removing an overhaul,
-temporarily disabling Space Age, testing a backport branch, or moving settings
-between saves.
+MIR can export a portable settings profile for the current effective MIR startup settings. Use this when you are changing modpacks, removing an overhaul, temporarily disabling Space Age, testing a backport branch, or moving settings between saves.
 
 From an active save, run:
 
@@ -181,10 +135,7 @@ To import a profile, paste the exported string into the startup setting:
 mir-settings-profile-import
 ```
 
-then restart Factorio so MIR can apply the profile during prototype generation.
-The imported profile is an override layer for MIR's own startup-setting reads;
-it does not delete the normal setting prototypes or rewrite Factorio's
-`mod-settings.dat`.
+then restart Factorio so MIR can apply the profile during prototype generation. The imported profile is an override layer for MIR's own startup-setting reads; it does not delete the normal setting prototypes or rewrite Factorio's `mod-settings.dat`.
 
 You can validate a pasted profile before using it:
 
@@ -192,11 +143,7 @@ You can validate a pasted profile before using it:
 /mir-settings-import-check <profile-string>
 ```
 
-The validation command reports how many setting IDs are recognized by the
-current branch, how many values are invalid, and how many IDs are unavailable
-or ignored. Unknown settings remain inside the profile string, so the same
-profile can still be useful when you reenable a provider mod or move back to a
-branch that knows those setting IDs.
+The validation command reports how many setting IDs are recognized by the current branch, how many values are invalid, and how many IDs are unavailable or ignored. Unknown settings remain inside the profile string, so the same profile can still be useful when you reenable a provider mod or move back to a branch that knows those setting IDs.
 
 For shorter strings, run:
 
@@ -204,9 +151,6 @@ For shorter strings, run:
 /mir-settings-export --compact my-pack-name
 ```
 
-Compact export omits settings that still equal MIR's catalog default. Full
-export remains the default because it is easier to audit.
+Compact export omits settings that still equal MIR's catalog default. Full export remains the default because it is easier to audit.
 
-MIR does not use a direct OS clipboard or arbitrary file-import API. Factorio
-runtime code can write export files under `script-output`, while import happens
-through the stable startup setting above.
+MIR does not use a direct OS clipboard or arbitrary file-import API. Factorio runtime code can write export files under `script-output`, while import happens through the stable startup setting above.

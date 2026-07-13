@@ -1,3 +1,11 @@
+local function space_age_setting_visibility()
+  return {
+    mode = "visible-if-mods-any",
+    mods_any = {"space-age"},
+    hidden_reason = "space-age-not-active"
+  }
+end
+
 return {
   research_spoilage_preservation = {
     effect_per_level = {
@@ -6,10 +14,7 @@ return {
       canonical_anchor = 0.01,
       runtime_multiplier_delta = true
     },
-    ui_visibility = {
-      mode = "always",
-      reason = "official-stream-settings-visible"
-    },
+    ui_visibility = space_age_setting_visibility(),
     generation_requirements = {
       require_any_item = {"spoilage", "agricultural-science-pack"}
     },
@@ -42,10 +47,7 @@ return {
       canonical_anchor = 0.01,
       runtime_multiplier_delta = true
     },
-    ui_visibility = {
-      mode = "always",
-      reason = "official-stream-settings-visible"
-    },
+    ui_visibility = space_age_setting_visibility(),
     generation_requirements = {
       require_any_item = {"agricultural-science-pack"}
     },

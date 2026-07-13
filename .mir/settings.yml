@@ -17,7 +17,8 @@ rules:
   runtime_export_writes_script_output_only: true
   import_requires_restart: true
   technology_settings_sort_by_visibility_then_player_name: true
-  official_and_mir_owned_technology_settings_stay_visible: true
+  inactive_official_dlc_technology_settings_are_hidden_but_registered: true
+  experimental_automatic_family_settings_are_hidden_until_reviewed: true
   technology_settings_use_three_attention_buckets: true
   canonical_settings_catalog_required: true
   profile_import_validates_catalog_constraints: true
@@ -31,7 +32,7 @@ rules:
   unrestricted_modules_is_opt_in_and_does_not_add_slots: true
   unrestricted_modules_requires_module_permissions_target_capability: true
   effect_per_level_settings_are_per_technology: true
-  effect_per_level_defaults_use_lowest_canonical_tier: true
+  effect_per_level_defaults_use_primary_base_tier: true
   scripted_multiplier_effects_scale_delta_not_full_multiplier: true
   energy_and_pollution_caps_are_separate: true
   positive_speed_cap_and_negative_speed_floor_are_separate: true
@@ -40,6 +41,31 @@ rules:
   global_settings_use_visible_section_prefixes: true
   rich_text_section_prefixes_are_optional_enhancement: true
   fake_divider_settings_are_disallowed: true
+  every_setting_declares_positive_target_requirements: true
+  catalog_specs_are_returned_as_deep_copies: true
+  technology_sort_names_come_from_canonical_descriptors: true
+  validation_overrides_are_declarative_not_source_rewrites: true
+  automatic_compiler_controls_are_predeclared_and_default_to_safe_attachment: true
+  automatic_compiler_action_has_player_facing_name_and_per_option_descriptions: true
+  automatic_compiler_action_is_not_a_strength_or_experimental_scale: true
+  automatic_compiler_creation_and_review_requirements_are_independent_booleans: true
+  automatic_compiler_controls_do_not_name_mods_recipes_technologies_or_versions: true
+  automatic_compiler_hard_safety_gates_are_not_user_overridable: true
+  automatic_compiler_legacy_setting_id_and_values_remain_hidden_and_importable: true
+  automatic_compiler_legacy_nondefault_values_map_to_equivalent_policy_until_new_controls_change: true
+  automatic_compiler_settings_have_declarative_consequence_migration_test_and_documentation_metadata: true
+  automatic_compiler_named_policy_profiles_expand_to_the_same_independent_controls: true
+  automatic_compiler_named_policy_profiles_are_not_a_second_player_facing_dropdown: true
+  automatic_compiler_safe_profile_is_the_default: true
+  automatic_compiler_defaults_have_declared_safety_rationales: true
+  automatic_compiler_reviewed_creation_rejects_experimental_families: true
+  automatic_compiler_experimental_creation_requires_explicit_review_relaxation: true
+  native_owner_settings_share_stable_stream_ids: true
+  native_owner_unchanged_defaults_preserve_final_prototype: true
+  native_owner_disable_is_no_touch: true
+  native_owner_cost_override_requires_recognized_formula: true
+  native_owner_effect_override_is_relevant_effects_only: true
+  native_owner_binding_is_startup_only_and_restart_required: true
 
 profiles:
   schema: 1
@@ -116,6 +142,34 @@ groups:
       effect_per_level: ips-effect-per-level-%s
 
 streams:
+  research_processing_unit:
+    native_owner_binding: processing-unit-productivity
+    fallback: generate-eligible
+    unchanged_defaults: preserve-owner
+    backport:
+      keep_setting_ids: true
+
+  research_plastic:
+    native_owner_binding: plastic-bar-productivity
+    fallback: generate-eligible
+    unchanged_defaults: preserve-owner
+    backport:
+      keep_setting_ids: true
+
+  research_low_density_structure:
+    native_owner_binding: low-density-structure-productivity
+    fallback: generate-eligible
+    unchanged_defaults: preserve-owner
+    backport:
+      keep_setting_ids: true
+
+  research_rocket_fuel:
+    native_owner_binding: rocket-fuel-productivity
+    fallback: generate-eligible
+    unchanged_defaults: preserve-owner
+    backport:
+      keep_setting_ids: true
+
   research_air_scrubbing_clean_filter:
     manifest: mir-prod-air-scrubbing-clean-filter
     ui_visibility:
@@ -138,114 +192,130 @@ streams:
     backport:
       keep_setting_ids: true
 
+  research_auto_assembling_machine:
+    creation_maturity: experimental
+    ui_visibility: &experimental_family_hidden
+      mode: hidden
+      reason: experimental family tuning stays profile-compatible but is not player-facing until reviewed
+    hidden_when_unavailable: true
+    forced_when_hidden: null
+
+  research_auto_lab:
+    creation_maturity: experimental
+    ui_visibility: *experimental_family_hidden
+    hidden_when_unavailable: true
+    forced_when_hidden: null
+
   research_thruster_fuel_productivity:
-    ui_visibility: &official_visible
-      mode: always
-      reason: official and MIR-owned technology settings stay visible across base and Space Age; generation still validates active prototypes
-    hidden_when_unavailable: false
+    ui_visibility: &space_age_visible
+      mode: visible-if-mods-any
+      mods_any:
+        - space-age
+      reason: Space Age setting groups stay registered but are shown only while the DLC is active
+    hidden_when_unavailable: true
     forced_when_hidden: null
 
   research_thruster_oxidizer_productivity:
-    ui_visibility: *official_visible
-    hidden_when_unavailable: false
+    ui_visibility: *space_age_visible
+    hidden_when_unavailable: true
     forced_when_hidden: null
 
   research_tungsten:
-    ui_visibility: *official_visible
-    hidden_when_unavailable: false
+    ui_visibility: *space_age_visible
+    hidden_when_unavailable: true
     forced_when_hidden: null
 
   research_lithium:
-    ui_visibility: *official_visible
-    hidden_when_unavailable: false
+    ui_visibility: *space_age_visible
+    hidden_when_unavailable: true
     forced_when_hidden: null
 
   research_holmium:
-    ui_visibility: *official_visible
-    hidden_when_unavailable: false
+    ui_visibility: *space_age_visible
+    hidden_when_unavailable: true
     forced_when_hidden: null
 
   research_supercapacitor:
-    ui_visibility: *official_visible
-    hidden_when_unavailable: false
+    ui_visibility: *space_age_visible
+    hidden_when_unavailable: true
     forced_when_hidden: null
 
   research_superconductor:
-    ui_visibility: *official_visible
-    hidden_when_unavailable: false
+    ui_visibility: *space_age_visible
+    hidden_when_unavailable: true
     forced_when_hidden: null
 
   research_quantum_processor:
-    ui_visibility: *official_visible
-    hidden_when_unavailable: false
+    ui_visibility: *space_age_visible
+    hidden_when_unavailable: true
     forced_when_hidden: null
 
   research_carbon:
-    ui_visibility: *official_visible
-    hidden_when_unavailable: false
+    ui_visibility: *space_age_visible
+    hidden_when_unavailable: true
     forced_when_hidden: null
 
   research_carbon_fiber:
-    ui_visibility: *official_visible
-    hidden_when_unavailable: false
+    ui_visibility: *space_age_visible
+    hidden_when_unavailable: true
     forced_when_hidden: null
 
   research_ice:
-    ui_visibility: *official_visible
-    hidden_when_unavailable: false
+    ui_visibility: *space_age_visible
+    hidden_when_unavailable: true
     forced_when_hidden: null
 
   research_bioflux:
-    ui_visibility: *official_visible
-    hidden_when_unavailable: false
+    ui_visibility: *space_age_visible
+    hidden_when_unavailable: true
     forced_when_hidden: null
 
   research_bacteria_cultivation:
-    ui_visibility: *official_visible
-    hidden_when_unavailable: false
+    ui_visibility: *space_age_visible
+    hidden_when_unavailable: true
     forced_when_hidden: null
 
   research_breeding:
-    ui_visibility: *official_visible
+    ui_visibility: *space_age_visible
     default_enabled: true
     settings_priority: top
-    hidden_when_unavailable: false
+    hidden_when_unavailable: true
     forced_when_hidden: null
 
   research_artificial_soil:
-    ui_visibility: *official_visible
-    hidden_when_unavailable: false
+    ui_visibility: *space_age_visible
+    hidden_when_unavailable: true
     forced_when_hidden: null
 
   research_molten_metals:
-    ui_visibility: *official_visible
-    hidden_when_unavailable: false
+    ui_visibility: *space_age_visible
+    hidden_when_unavailable: true
     forced_when_hidden: null
 
   research_spoilage_preservation:
-    ui_visibility: *official_visible
-    hidden_when_unavailable: false
+    ui_visibility: *space_age_visible
+    hidden_when_unavailable: true
     forced_when_hidden: null
 
   research_agricultural_growth_speed:
-    ui_visibility: *official_visible
+    ui_visibility: *space_age_visible
     default_enabled: true
     settings_priority: top
-    hidden_when_unavailable: false
+    hidden_when_unavailable: true
     forced_when_hidden: null
 
   research_cargo_bay_unloading_distance:
-    ui_visibility: *official_visible
+    ui_visibility: *space_age_visible
     default_enabled: true
     settings_priority: top
-    hidden_when_unavailable: false
+    hidden_when_unavailable: true
     forced_when_hidden: null
 
   research_cargo_landing_pad_count:
-    ui_visibility: *official_visible
+    ui_visibility: *space_age_visible
     default_enabled: true
     settings_priority: top
-    hidden_when_unavailable: false
+    hidden_when_unavailable: true
     forced_when_hidden: null
 
   research_character_reach:

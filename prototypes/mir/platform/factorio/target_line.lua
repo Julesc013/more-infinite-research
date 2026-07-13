@@ -12,10 +12,8 @@ local function to_set(values)
   return out
 end
 
-local unsupported_streams = to_set(profile.unsupported_streams)
-local unsupported_required_mods = to_set(profile.unsupported_required_mods)
-local unsupported_effect_types = to_set(profile.unsupported_effect_types)
-local omitted_global_settings = to_set(profile.omitted_global_settings)
+local supported_required_mods = to_set(profile.supported_required_mods)
+local supported_effect_types = to_set(profile.supported_effect_types)
 
 local legacy_technology_overlay_layers = {
   ["laboratory-productivity"] = "__core__/graphics/icons/technology/constants/constant-mining-productivity.png",
@@ -35,14 +33,26 @@ local legacy_technology_overlay_layers = {
 
 local function has_unsupported_required_mod(spec)
   for _, mod_name in ipairs((spec and spec.required_mods) or {}) do
-    if unsupported_required_mods[mod_name] then return true end
+    if not supported_required_mods[mod_name] then return true end
+  end
+  return false
+end
+
+local function has_missing_positive_requirement(spec)
+  local requirements = spec and spec.descriptor and spec.descriptor.targets
+  if type(requirements) ~= "table" then return true end
+  for _, feature in ipairs(requirements.requires_features or {}) do
+    if not M.feature_enabled(feature) then return true end
+  end
+  for _, effect_type in ipairs(requirements.required_effect_types or {}) do
+    if not supported_effect_types[effect_type] then return true end
   end
   return false
 end
 
 function M.stream_supported(key, spec)
-  if unsupported_streams[key] then return false end
   if has_unsupported_required_mod(spec) then return false end
+  if has_missing_positive_requirement(spec) then return false end
   if not (spec and spec.direct_effects) then
     return M.feature_enabled("recipe_productivity")
   end
@@ -51,11 +61,25 @@ end
 
 function M.effect_supported(effect)
   local effect_type = effect and effect.type
-  return effect_type ~= nil and not unsupported_effect_types[effect_type]
+  if effect_type == nil then return false end
+  if effect_type == "nothing" then return true end
+  return supported_effect_types[effect_type] == true
 end
 
 function M.global_setting_supported(name)
-  return not omitted_global_settings[name]
+  return type(name) == "string" and name ~= ""
+end
+
+function M.setting_supported(spec)
+  if not spec or not M.global_setting_supported(spec.name) then return false end
+  local requirements = spec.targets or {}
+  for _, feature in ipairs(requirements.requires_features or {}) do
+    if not M.feature_enabled(feature) then return false end
+  end
+  for _, effect_type in ipairs(requirements.required_effect_types or {}) do
+    if not supported_effect_types[effect_type] then return false end
+  end
+  return true
 end
 
 function M.feature_enabled(name)
@@ -68,6 +92,21 @@ end
 
 function M.science_family()
   return profile.science_family
+end
+
+function M.prototype_shapes()
+  return profile.prototype_shapes
+end
+
+function M.expected_stream_count()
+  return profile.expected_stream_count
+end
+
+function M.emitter_supported(name)
+  for _, emitter in ipairs(profile.emitter_families or {}) do
+    if emitter == name then return true end
+  end
+  return false
 end
 
 function M.weapon_overlap_default()

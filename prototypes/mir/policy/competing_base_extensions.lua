@@ -1,5 +1,4 @@
 local defaults = require("prototypes.mir.settings.defaults")
-local replacement = require("prototypes.mir.emit.technology_replacement")
 local generated_registry = require("prototypes.mir.domain.facts.generated_technology_registry")
 local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 local settings_resolver = require("prototypes.mir.settings.resolver")
@@ -101,24 +100,19 @@ function M.ignores_existing_owner(name)
   return false
 end
 
-function M.apply()
+function M.replacement_plan()
+  local plan = {}
   for _, entry in ipairs(prepared_replacements or {}) do
     local replacements = generated_registry.sorted_names({ kind = "base_extension", key = entry.key })
     local replacement_name = replacements[1]
-    if replacement_name then
-      local replaced, reason = replacement.replace_technology(entry.name, replacement_name)
-      if replaced then
-        log("[more-infinite-research] Replaced competing base extension technology from "
-          .. entry.mod_name .. " for " .. entry.key .. ": " .. entry.name .. " -> " .. replacement_name)
-      else
-        log("[more-infinite-research] Retained competing base extension technology because replacement was unsafe: "
-          .. entry.name .. " reason=" .. tostring(reason))
-      end
-    else
-      log("[more-infinite-research] Retained competing base extension technology because MIR emitted no replacement: "
-        .. entry.name)
-    end
+    table.insert(plan, {
+      technology = entry.name,
+      replacement = replacement_name,
+      mod = entry.mod_name,
+      key = entry.key
+    })
   end
+  return plan
 end
 
 return M

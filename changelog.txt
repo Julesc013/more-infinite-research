@@ -1,27 +1,65 @@
 ---------------------------------------------------------------------------------------------------
-Version: 2.3.5
-Date: 2026-07-11
-
-  Compatibility:
-
-    - Ported the MIR 3.0.5 compatibility hardening source to Factorio 2.0.
-    - Kept Factorio 2.0 metadata, dependencies, runtime storage, settings profiles, and supported Space Age surfaces.
-    - Kept Factorio 2.1-only cargo bay range and landing pad count modifiers out of this target.
-    - Fixed science unlock inference, disabled prerequisites, science self-locks, and unreachable required technologies.
-    - Kept incineration sinks out of breeding productivity across the dependent late-removal lifecycle.
-    - Limited weapon overlap cleanup to MIR-generated continuations with semantic, positive replacement coverage.
-    - Made competing technology replacement transactional and graph-safe.
-    - Rewired dependent prerequisites only after MIR emitted complete replacement coverage.
-    - Isolated unrestricted module-permission arrays per prototype.
-    - Made scripted effect tooltips display the selected per-level value.
-    - Preserved retained non-default base effect settings during upgrades instead of failing on an incomplete scaling descriptor.
+Version: 2.4.0
+Date: 2026-07-14
 
   Changes:
 
-    - Reused canonical target profiles, grouped run summaries, and exact stale-package checks.
-    - Added Factorio 2.0 safeguards for generated prerequisites, recipe targets, and weapon overlap ownership.
-    - Added the default-off above-300% self-recycling cap scope and unrestricted module-permission settings.
-    - Added per-generated-technology effect-per-level controls that preserve mixed-tier ratios for MIR-emitted effects.
+    - Ported the released 3.1.5 automatic compiler contracts to the maintained Factorio 2.0 line.
+    - Preserved 2.3.5 technology IDs, setting IDs, runtime namespaces, and save-compatible behavior.
+    - Added RecipeFactV2, shared relationship indexes, schema-2 family rules, compatibility packs, and coverage accounting.
+    - Applied Factorio 2.0 target-declared stream, effect, setting, recipe-shape, and emitter cuts.
+    - Retained whole-plan safety checks, deterministic results, and exact-owner protections from the modern source.
+    - Fixed the Muluna and Astroponics cycle by removing only Astroponics' circular Space Science prerequisite.
+    - Switched prerequisite checks to an iterative graph walk so deep modded technology trees remain safe.
+    - Replaced the automatic compiler preset with separate action and research-creation controls.
+    - Added an independent reviewed-data requirement and outcome-first tooltips.
+    - Added a generic schema-2 automatic compiler policy contract for future registered family modules.
+    - Added a sorted data-only CompilerProvider registry for extending recipe-family discovery and planning.
+    - Added canonical setting descriptors and exact Conservative, Safe, Expansive, and Custom policy expansions.
+    - Added stable automatic-compiler and provider diagnostic codes.
+    - Kept experimental assembler and lab family technologies out of reviewed-data creation.
+    - Preserved explicit broad opt-in testing for experimental automatic family technologies.
+    - Standardized automatic-recipe dropdown labels, tooltip structure, capitalization, and locale parity.
+    - Preserved old automatic compiler profiles through a hidden legacy-policy bridge.
+    - Added content-addressed assurance plans, evidence capsules, exact candidate seals, and promotion-only verification.
+    - Added one change-aware verification command and an aggregate fast CI plan artifact.
+    - Made processing unit, plastic, low density structure, and rocket fuel owner research use existing stream settings.
+
+  Bugfixes:
+
+    - Preserved iterative prerequisite-cycle repair and strict generated-graph safety checks.
+    - Published compiled generation plans only after authoritative safety checks complete.
+    - Preserved the exact 2.3.5-to-2.4.0 settings and saved-runtime upgrade contract.
+    - Preserved final native or modded owner balance under defaults and when its MIR stream is disabled.
+    - Rejected unsafe cost overrides for unrecognized external formulas instead of guessing their semantics.
+    - Applied recognized owner cost, time, level, and relevant effect changes as one fingerprint-checked transaction.
+
+---------------------------------------------------------------------------------------------------
+Version: 3.1.0
+Date: 2026-07-12
+
+  Changes:
+
+    - Started the bounded 3.1 contract modernization from the immutable 3.0.5 behavior baseline.
+    - Preserved released generated IDs, setting IDs and defaults, profile schema, and runtime namespaces as protected contracts.
+    - Recorded exact 3.0.5 package, target, settings, stream, runtime, and diagnostic characterization evidence.
+    - Normalized every stream into a typed canonical descriptor shared by settings and planning.
+    - Made effect defaults invariant under declaration order and isolated canonical descriptors from require-cache mutation.
+    - Made duplicate stream IDs, unknown overlay streams, and overlay descriptor injection fail closed.
+    - Split science integration into pack registry, lab compatibility, recipe unlock facts, and technology researchability.
+    - Separated pack production reachability and science selection policy from shared facts.
+    - Preserved the public science facade and existing deterministic rejection reason codes while isolating fact caches.
+    - Added immutable build-once recipe facts and indexes for stream matching and science reachability.
+    - Replaced maintained 2.1 and 2.0 stream/effect denylists with positive mod and effect support declarations.
+    - Made package ZIP entry order, timestamps, attributes, and compression inputs deterministic.
+    - Routed data-final-fixes passes through named commands with owned implementations and positive target requirements.
+    - Made settings catalog snapshots immutable, target-positive, and descriptor-ordered.
+    - Added conservative recycler-loop handling for ambiguous paths, byproducts, fluids, variants, and conversion cycles.
+    - Routed loader, mining-drill, and native-owner capability diagnostics through a validated lifecycle.
+    - Covered scripted effects across level reversal, force changes, save reloads, settings toggles, and baseline restoration.
+    - Split developer load tooling into reusable process, setting, target, grouping, package, and result modules.
+    - Added target-explicit scenario declarations and budgets for base, Space Age, caps, diagnostics, local packs, and full runs.
+    - Proved exact 3.0.5 upgrades retain non-default settings, research levels, persisted state, and scripted effects.
 
 ---------------------------------------------------------------------------------------------------
 Version: 3.0.5
@@ -29,15 +67,16 @@ Date: 2026-07-12
 
   Compatibility:
 
-    - Kept the modern Factorio 2.1 compiler, dependencies, generated technology IDs, and feature surface unchanged.
+    - Kept the canonical MIR 3 compiler, generated technology IDs, and existing default behavior stable.
     - Fixed generated research that could inherit an unavailable tutorial technology from an already-enabled science recipe.
     - Kept disabled or cyclic technology prerequisites out of generated research while preserving legitimate progression gates.
     - Rejected self-locked, cyclic, or non-researchable science recipe unlocks.
     - Skipped generated streams whose required technologies are disabled or unreachable instead of emitting a fatal graph edge.
     - Made science recipe unlock selection deterministic when multiple reachable technologies provide the same recipe.
-    - Made rocket and cannon overlap cleanup conditional on exact reachable infinite replacement coverage for new configurations.
+    - Made rocket and cannon overlap cleanup use semantic effect identity and positive emitted coverage for new configurations.
     - Preserved finite vanilla weapon speed bonuses and existing stored overlap-mode choices.
     - Limited weapon overlap cleanup to MIR-generated continuations and required external owners to use obtainable science.
+    - Rejected external research owners that use unrecognized science ingredients.
     - Kept incineration sink recipes out of breeding productivity research so later recipe removal cannot leave invalid effects.
     - Made opt-in productivity scoping derive its unrestricted threshold from the inverse effective recycler return.
     - Kept recycling-category recipe productivity caps outside both the global production cap and scoped-cap passes.
@@ -77,7 +116,8 @@ Date: 2026-07-12
     - Consolidated generated setting registration through the canonical catalog and aligned controls with generated effects.
     - Kept visible recycling processes such as scrap recycling outside MIR's generated-recycler balance pass.
     - Added recycler combination coverage for unchanged, fixed, and cap-matched modes and independent recipe caps.
-    - Corrected recycling safety indexing for Factorio 2.0 product probability fields.
+    - Corrected recycling safety indexing for Factorio 2.1 independent and shared product probabilities.
+    - Added a complete 3.0.5 inventory for all 477 dropdown, checkbox, numeric, and profile-import settings.
 
 ---------------------------------------------------------------------------------------------------
 Version: 1.7.0
@@ -194,7 +234,7 @@ Date: 2026-07-09
     - Removed Factorio 2.1-only cargo bay unloading distance research from the Factorio 2.0 package.
     - Removed Factorio 2.1-only cargo landing pad count research from the Factorio 2.0 package.
     - Kept generated technology IDs stable for streams that remain available on the Factorio 2.0 line.
-    - Kept exact ATAN loader-schema repairs scoped to Factorio 2.1+ so Factorio 2.0 keeps its native recipe category fields.
+    - Kept exact ATAN loader-schema repairs scoped to Factorio 2.1+ so Factorio 2.0 keeps its native fields.
     - Fixed ATAN Ash 2.2.1 with Space Age on Factorio 2.0 by keeping foundation crafting in `crafting-with-fluid`.
     - Kept Factorio 2.0 science-pack handling on the older tool prototype model during compatibility checks.
     - Classified reviewed Factorio 2.0 local zip issues that reproduce without MIR as external local-library issues.

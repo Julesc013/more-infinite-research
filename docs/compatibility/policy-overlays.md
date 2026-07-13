@@ -13,9 +13,7 @@ superseded_by: []
 
 Updated: 2026-07-07
 
-Policy overlays are declarative compatibility rules. They say what MIR is
-allowed to do when a prototype set or known mod is present. They should not
-build technologies directly.
+Policy overlays are declarative compatibility rules. They say what MIR is allowed to do when a prototype set or known mod is present. They should not build technologies directly. Reviewed or fixture-supplied grouped policy can instead use the schema-2 `CompatibilityPack` contract; fixture-only identities must not be added to the production profile table.
 
 ## Boundary
 
@@ -69,9 +67,7 @@ register_policy_overlay({
 })
 ```
 
-The overlay describes selectors, policy, risks, science, and claim intent. The
-compiler still discovers facts, classifies candidates, validates the plan, and
-emits only through `StreamSpec`.
+The overlay describes selectors, policy, risks, science, and claim intent. The compiler still discovers facts, classifies candidates, validates the plan, and emits only through `StreamSpec`.
 
 ## Policy Modes
 

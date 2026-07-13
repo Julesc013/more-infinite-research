@@ -1,0 +1,336 @@
+schema: 1
+updated_at: 2026-07-13
+source_baseline:
+  release: "3.0.5"
+  tag: "3.0.5"
+  package_source_commit: b93808c54946f3913cea1244a6df89a154abd98e
+
+classifications:
+  - portable-shared-fix
+  - portable-tooling
+  - portable-fixture
+  - portable-docs
+  - portable-target-profile
+  - target-local-schema
+  - target-local-feature-cut
+  - target-local-asset
+  - obsolete-workaround
+  - deferred
+
+lessons:
+  PL-001:
+    source_target: factorio-2.0
+    source_branch: tmp/2.0
+    source_commit: 2d1eb296f15b71ef538d0547147ce42ac03098a0
+    observable_issue: the stale 2.3.5 RC4 did not include the final released 3.0.5 expanded settings and recycler interaction contract
+    classification: portable-target-profile
+    affected_targets: ["2.0"]
+    modern_decision: keep the released 3.0.5 implementation authoritative
+    target_local_decision: replay the final settings and recycler contract through the Factorio 2.0 profile
+    fixture_evidence:
+      - prototype-limit-self-recycling-and-unrestricted-modules
+      - prototype-limit-scope-inert-at-fixed-threshold
+      - prototype-limit-scope-engine-unchanged-baseline
+      - prototype-limit-scope-inert-at-matched-threshold
+    dev_commit: b93808c54946f3913cea1244a6df89a154abd98e
+    replayed_target_commits:
+      - e9f4f3a
+      - 903e7ca
+    release_impact: 2.3.5 candidate rebuilt and fully requalified
+    status: complete
+
+  PL-002:
+    source_target: factorio-2.0
+    source_branch: tmp/2.0
+    source_commit: 903e7ca
+    observable_issue: the final cap pass called the reusable classifier builder while the target branch still exposed the older per-recipe classifier API
+    classification: portable-shared-fix
+    affected_targets: ["2.1", "2.0"]
+    modern_decision: retain the immutable recycling index and build-once classifier already present in released 3.0.5
+    target_local_decision: port the same pure fact and policy boundary without changing Factorio 2.0 metadata
+    fixture_evidence:
+      - prototype-limit-self-recycling-and-unrestricted-modules
+    dev_commit: 762ac23
+    replayed_target_commits:
+      - 8fd3fac
+    release_impact: fixes a Factorio 2.0 data-final-fixes load error
+    status: complete
+
+  PL-003:
+    source_target: factorio-2.0
+    source_branch: tmp/2.0
+    source_commit: 8fd3fac
+    observable_issue: four executed 2.0 scenarios were absent from the target expected-scenario manifest
+    classification: portable-tooling
+    affected_targets: ["2.1", "2.0", "future-targets"]
+    modern_decision: 3.1 validation decomposition must make every scenario declaration target-explicit and completeness-checked before runtime
+    target_local_decision: register the missing 2.0 scenarios immediately
+    fixture_evidence:
+      - lab-policy-engine-default
+      - prototype-limit-scope-inert-at-fixed-threshold
+      - prototype-limit-scope-engine-unchanged-baseline
+      - prototype-limit-scope-inert-at-matched-threshold
+    dev_commit: 5840cf5
+    replayed_target_commits:
+      - 8dabd2d
+    release_impact: 71 of 71 scenarios pass with exact manifest equality
+    status: complete
+
+  PL-004:
+    source_target: factorio-2.0
+    source_branch: tmp/2.0
+    source_commit: 5b06805
+    observable_issue: candidate fingerprints must be checkout-line-ending invariant on Windows and CI
+    classification: portable-tooling
+    affected_targets: ["all"]
+    modern_decision: retain normalized text and scenario-manifest identities
+    target_local_decision: replay the final 3.0.5 identity implementation before qualification
+    fixture_evidence:
+      - package-identity-line-ending-invariance
+    dev_commit: b93808c54946f3913cea1244a6df89a154abd98e
+    replayed_target_commits:
+      - 64140c0
+      - 5b06805
+    release_impact: candidate freshness passes from a clean checkout
+    status: complete
+
+  PL-005:
+    source_target: factorio-2.0
+    source_branch: tmp/2.0
+    source_commit: 7588eadc18f49f60d17d145ce366b5a777d9be43
+    observable_issue: content equality does not replace direct loading of the exact frozen distribution archive
+    classification: portable-tooling
+    affected_targets: ["all-release-targets"]
+    modern_decision: add exact-dist base, expansion, upgrade, and clean targeted-gate records to the release-wave contract
+    target_local_decision: preserve the direct 2.3.5 logs and structured proof under .mir/evidence
+    fixture_evidence:
+      - .mir/evidence/2.3.5-exact-dist-and-upgrade-proof.json
+    dev_commit: 4c2fe44
+    replayed_target_commits:
+      - 7588eadc18f49f60d17d145ce366b5a777d9be43
+    release_impact: exact 2.3.5 base, Space Age, and 2.3.0 upgrade loads pass
+    status: complete
+
+  PL-006:
+    source_target: factorio-2.0
+    source_branch: tmp/2.0
+    source_commit: 7588eadc18f49f60d17d145ce366b5a777d9be43
+    observable_issue: Factorio 2.1 cargo modifiers and dependency floors are not valid Factorio 2.0 defaults
+    classification: target-local-feature-cut
+    affected_targets: ["2.0"]
+    modern_decision: reject the target metadata and feature cuts from dev
+    target_local_decision: keep cargo streams absent and retain the Factorio 2.0 dependency profile
+    fixture_evidence:
+      - target-profile-drift-check
+      - exact-dist-space-age
+    dev_commit: none-target-local
+    replayed_target_commits:
+      - 7588eadc18f49f60d17d145ce366b5a777d9be43
+    release_impact: intentional target-only shipped diff
+    status: complete
+
+  PL-007:
+    source_target: factorio-2.0
+    source_branch: tmp/2.0
+    source_commit: a94460b16dbc09970a0482f268e7651a59cba412
+    observable_issue: runtime validation dispatch used a hard-coded Factorio line instead of positive target capabilities
+    classification: portable-tooling
+    affected_targets: ["all-multi-target-validation"]
+    modern_decision: replace version-line dispatch with capability-driven scenario dispatch in the next development line
+    target_local_decision: execute every positively declared Factorio 2.0 runtime gate
+    fixture_evidence:
+      - .mir/evidence/2.4.0-rc3-validation-summary.json
+    dev_commit: d8a6483
+    replayed_target_commits:
+      - a94460b16dbc09970a0482f268e7651a59cba412
+    release_impact: all 78 target-declared scenarios execute on Factorio 2.0
+    status: complete
+
+  PL-008:
+    source_target: factorio-2.0
+    source_branch: tmp/2.0
+    source_commit: 25a68446a9d6a7172b0b5ce35afd58b915d6fb1d
+    observable_issue: cross-version fixtures assumed Factorio 2.1 science, recycler, and setting shapes
+    classification: portable-fixture
+    affected_targets: ["2.1", "2.0", "future-targets"]
+    modern_decision: derive shared fixture assertions from positive target capabilities
+    target_local_decision: derive science, recycler, stream count, and omitted settings from the 2.0 target profile
+    fixture_evidence:
+      - item-science-pack-progression
+      - custom-lab-policy
+      - reduced-settings-surface
+      - recycler-boundary
+    dev_commit: d8a6483
+    replayed_target_commits:
+      - 25a68446a9d6a7172b0b5ce35afd58b915d6fb1d
+    release_impact: target-shaped fixtures pass without weakening shared contracts
+    status: complete
+
+  PL-009:
+    source_target: factorio-2.0
+    source_branch: tmp/2.0
+    source_commit: 5d63e8b29f1575ee0066dfb6e3205212256edd31
+    observable_issue: the upgrade harness encoded one release pair instead of explicit prior current and fixture identities
+    classification: portable-tooling
+    affected_targets: ["all-release-targets"]
+    modern_decision: carry the parameterized upgrade harness into the next development line
+    target_local_decision: prove the exact 2.3.5 to 2.4.0 transition
+    fixture_evidence:
+      - .mir/evidence/2.4.0-upgrade-proof.json
+    dev_commit: d8a6483
+    replayed_target_commits:
+      - 5d63e8b29f1575ee0066dfb6e3205212256edd31
+    release_impact: prior-release upgrades are reproducible without a one-off harness
+    status: complete
+
+  PL-010:
+    source_target: factorio-0.16
+    source_branch: tmp/0.16
+    source_commit: ff2eeda
+    observable_issue: historical parsers reject otherwise equivalent generated count formulas containing optional whitespace
+    classification: portable-shared-fix
+    affected_targets: ["all"]
+    modern_decision: emit compact whitespace-free formulas without changing their mathematical curve
+    target_local_decision: retain the same syntax on every qualified backport
+    fixture_evidence:
+      - generated-count-formula-parser-compatibility
+    dev_commit: d8a6483
+    replayed_target_commits:
+      - ff2eeda
+    release_impact: one canonical formula representation now spans modern and historical parsers
+    status: complete
+
+  PL-011:
+    source_target: factorio-0.17
+    source_branch: tmp/0.17
+    source_commit: 817b2f0
+    observable_issue: weapon-speed continuation prerequisites differ by target and cannot be selected from one modern hard-coded technology name
+    classification: portable-target-profile
+    affected_targets: ["2.1", "2.0", "1.1", "1.0", "0.17"]
+    modern_decision: keep ordered target-declared prerequisite candidates and resolve the first valid researchable chain
+    target_local_decision: declare only target-era candidates without weakening reachability checks
+    fixture_evidence:
+      - dedicated-weapon-prerequisites
+      - external-owner-science-reachability
+    dev_commit: 817b2f0
+    replayed_target_commits:
+      - 8571830
+      - 817b2f0
+    release_impact: target-era prerequisite differences no longer require planner forks
+    status: complete
+
+  PL-012:
+    source_target: multi-target
+    source_branch: tmp/1.1,tmp/1.0,tmp/0.17
+    source_commit: 30ef8c7,0b06b9b,efb5d0a
+    observable_issue: recursive technology graph traversal can overflow on deep modded graphs while reporting a valid external cycle
+    classification: portable-shared-fix
+    affected_targets: ["all"]
+    modern_decision: retain the iterative deterministic graph walk and the narrow named Muluna Astroponics repair from 3.1.2
+    target_local_decision: replay the graph walk without importing modern prototype assumptions
+    fixture_evidence:
+      - iterative-deep-technology-graph-walk
+      - deterministic-cycle-identity
+      - muluna-astroponics-mutual-path-reproduction
+    dev_commit: b36996a
+    replayed_target_commits:
+      - 30ef8c7
+      - 0b06b9b
+      - efb5d0a
+    release_impact: deep arbitrary mod graphs fail deterministically instead of exhausting Lua recursion
+    status: complete
+
+  PL-013:
+    source_target: factorio-2.0
+    source_branch: tmp/2.0
+    source_commit: 9248b81
+    observable_issue: the latest compiled plan could be published before authoritative compilation-plan validation completed
+    classification: portable-shared-fix
+    affected_targets: ["all-plan-first-targets"]
+    modern_decision: publish only the validated accepted plan artifact at the authoritative boundary
+    target_local_decision: use the same acceptance order on the 2.0 compiler
+    fixture_evidence:
+      - final-plan-output-owner-parity
+      - stable-generation-plan-identities
+    dev_commit: d8a6483
+    replayed_target_commits:
+      - 9248b81
+    release_impact: diagnostics and downstream checks cannot observe an unaccepted plan
+    status: complete
+
+  PL-014:
+    source_target: factorio-2.0
+    source_branch: tmp/2.0
+    source_commit: db071aa
+    observable_issue: selected configuration-change scenarios could be declared without executing their second load phase
+    classification: portable-tooling
+    affected_targets: ["all-release-targets"]
+    modern_decision: route every selected configuration-change declaration through the actual two-phase executor
+    target_local_decision: preserve exact initial and changed mod sets in result evidence
+    fixture_evidence:
+      - selected-configuration-change-actual-load
+      - adoption-configuration-change-signature
+    dev_commit: d8a6483
+    replayed_target_commits:
+      - db071aa
+    release_impact: selected upgrade and configuration-change checks can no longer pass by declaration alone
+    status: complete
+
+  PL-015:
+    source_target: factorio-2.0
+    source_branch: tmp/2.0
+    source_commit: 817cdb8
+    observable_issue: validation-generated setting override mods inherited a hard-coded current Factorio version
+    classification: portable-tooling
+    affected_targets: ["all-release-targets"]
+    modern_decision: derive override fixture metadata from the selected target profile
+    target_local_decision: write target-valid fixture metadata before runtime execution
+    fixture_evidence:
+      - target-aware-settings-override-helper
+    dev_commit: be52b66
+    replayed_target_commits:
+      - 817cdb8
+    release_impact: shared validation helpers no longer create a wrong-target fixture mod
+    status: complete
+
+  PL-016:
+    source_target: factorio-0.14
+    source_branch: tmp/0.14
+    source_commit: 1e45000,fa3b532
+    observable_issue: pre-audio-switch engines reject modern CLI flags and cannot execute startup-setting scenarios whose setting surface does not exist
+    classification: portable-tooling
+    affected_targets: ["archive-validation"]
+    modern_decision: keep scenario dispatch capability-driven and record engine CLI support in target-owned validation code rather than application source
+    target_local_decision: omit unsupported audio flags and stop after the last positively supported runtime scenario
+    fixture_evidence:
+      - exact-dist-factorio-0.14
+      - supported-settings-runtime-boundary
+    dev_commit: docs-and-ledger-3.1.5
+    replayed_target_commits:
+      - 1e45000
+      - fa3b532
+    release_impact: ancient-engine runner differences remain explicit target validation capabilities and do not leak into the modern package
+    status: complete
+
+return_sweep:
+  completed_at: 2026-07-13
+  authority_for_candidate_archives: .mir/branches.yml
+  archives_copied_into_modern_release: false
+  archive_policy: target distributions remain immutable target-owned artifacts; dev records their commit hashes evidence and portable lessons
+  audited_branches:
+    - {target: "2.0", branch: tmp/2.0, audited_head: 4f7c9d1, qualified_source: f5c58f5, disposition: portable-lessons-returned-target-archive-referenced}
+    - {target: "1.1", branch: tmp/1.1, audited_head: 16879c8, qualified_source: 30ef8c7, disposition: portable-lessons-returned-target-archive-referenced}
+    - {target: "1.0", branch: tmp/1.0, audited_head: fdc9e37, qualified_source: 0b06b9b, disposition: portable-lessons-returned-target-archive-referenced}
+    - {target: "0.17", branch: tmp/0.17, audited_head: bb12acb, qualified_source: efb5d0a, disposition: portable-lessons-returned-target-archive-referenced}
+    - {target: "0.16", branch: tmp/0.16, audited_head: 1429b02, qualified_source: 2dfb1a7, disposition: portable-lessons-returned-target-archive-referenced}
+    - {target: "0.15", branch: tmp/0.15, audited_head: b3647fa, qualified_source: d416787, disposition: target-only-effect-science-and-asset-cuts-rejected}
+    - {target: "0.14", branch: tmp/0.14, audited_head: 42aa2ea, qualified_source: fa3b532, disposition: target-only-finite-compiler-and-runner-cuts-rejected}
+    - {target: "0.13", branch: tmp/0.13, audited_head: 4269281, qualified_source: 095264d, disposition: target-only-finite-compiler-cuts-rejected}
+
+fixed_point:
+  last_completed_sweep: 2026-07-13
+  zero_new_portable_compiler_fixes: true
+  zero_new_reusable_validation_fixes: true
+  zero_new_higher-target-profile_corrections: true
+  zero_new_package_governance_fixes: true
+  status: reached-after-full-2.0-through-0.13-audit

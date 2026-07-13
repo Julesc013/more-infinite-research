@@ -12,8 +12,6 @@ superseded_by: []
 
 # Rule Surfaces Capability
 
-Rule-surface observation records mods that alter productivity caps, module
-permissions, beacon behavior, recycler behavior, lab behavior, or other balance
-rules that can change how generated technologies behave.
+Rule-surface observation records mods that alter productivity caps, module permissions, beacon behavior, recycler behavior, lab behavior, or other balance rules that can change how generated technologies behave.
 
 Default posture is diagnostic-only.

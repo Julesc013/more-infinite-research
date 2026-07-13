@@ -113,6 +113,7 @@ function Initialize-MIRValidationResult {
     groups = @()
     scenarios = [System.Collections.ArrayList]::new()
     error = $null
+    assertions_executed = 0
   }
   Write-MIRValidationResult
   return $script:MIRValidationResultState
@@ -153,7 +154,8 @@ function Complete-MIRValidationScenario {
     [Parameter(Mandatory)]$Record,
     [ValidateSet("passed", "failed", "skipped", "incomplete")]
     [string]$Status = "passed",
-    [string]$ErrorMessage = ""
+    [string]$ErrorMessage = "",
+    [int]$AssertionsExecuted = 0
   )
 
   $completedAt = [DateTime]::UtcNow
@@ -162,6 +164,29 @@ function Complete-MIRValidationScenario {
   $Record.completed_at = $completedAt.ToString("o")
   $Record.duration_seconds = [Math]::Round(($completedAt - $startedAt).TotalSeconds, 3)
   $Record.error = if ([string]::IsNullOrWhiteSpace($ErrorMessage)) { $null } else { $ErrorMessage }
+  $Record.assertions_executed = $AssertionsExecuted
+  if ($Status -eq "failed" -and -not [string]::IsNullOrWhiteSpace($script:MIRValidationSummaryPath)) {
+    $packetRoot = Join-Path (Split-Path -Parent $script:MIRValidationSummaryPath) "failure-packets"
+    New-Item -ItemType Directory -Force -Path $packetRoot | Out-Null
+    $safeName = ([string]$Record.name) -replace '[^a-zA-Z0-9._-]', '-'
+    $packetPath = Join-Path $packetRoot "$safeName.json"
+    [ordered]@{
+      schema = 1
+      run_id = $script:MIRValidationResultState.run_id
+      scenario = $Record.name
+      kind = $Record.kind
+      group = $Record.group
+      error = $Record.error
+      started_at = $Record.started_at
+      completed_at = $Record.completed_at
+      duration_seconds = $Record.duration_seconds
+      assertions_executed = $Record.assertions_executed
+      evidence_paths = @($Record.evidence_paths)
+      package_sha256 = $script:MIRValidationResultState.validation_package_sha256
+      source_commit = $script:MIRValidationResultState.git_commit
+    } | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $packetPath -Encoding UTF8
+    $Record.evidence_paths = @($Record.evidence_paths) + @($packetPath)
+  }
   if ($script:MIRValidationResultState.current_scenario -eq $Record.id) {
     $script:MIRValidationResultState.current_scenario = $null
   }
@@ -177,7 +202,7 @@ function Add-MIRValidationCompletedScenario {
   )
 
   $record = Start-MIRValidationScenario -Name $Name -Kind $Kind -Group $Group -EvidencePaths $EvidencePaths
-  Complete-MIRValidationScenario -Record $record -Status "passed"
+  Complete-MIRValidationScenario -Record $record -Status "passed" -AssertionsExecuted 1
 }
 
 function Fail-MIRValidationRun {
@@ -207,11 +232,13 @@ function Complete-MIRValidationRun {
     $duplicates = @($actual | Group-Object | Where-Object Count -ne 1 | ForEach-Object Name)
     $difference = @(Compare-Object -ReferenceObject @($expected | Sort-Object) -DifferenceObject @($actual | Sort-Object))
     $nonPassed = @($script:MIRValidationResultState.scenarios | Where-Object status -ne "passed" | ForEach-Object name)
-    if ($duplicates.Count -gt 0 -or $difference.Count -gt 0 -or $nonPassed.Count -gt 0) {
+    $zeroAssertions = @($script:MIRValidationResultState.scenarios | Where-Object { $_.kind -ne "gate" -and $_.assertions_executed -le 0 } | ForEach-Object name)
+    if ($duplicates.Count -gt 0 -or $difference.Count -gt 0 -or $nonPassed.Count -gt 0 -or $zeroAssertions.Count -gt 0) {
       $message = "Validation scenario completeness failed."
       if ($duplicates.Count -gt 0) { $message += " Duplicate scenarios: $($duplicates -join ',')." }
       if ($difference.Count -gt 0) { $message += " Manifest/result difference: $($difference.InputObject -join ',')." }
       if ($nonPassed.Count -gt 0) { $message += " Required scenarios not passed: $($nonPassed -join ',')." }
+      if ($zeroAssertions.Count -gt 0) { $message += " Scenarios executed zero assertions: $($zeroAssertions -join ',')." }
       Fail-MIRValidationRun -ErrorMessage $message
       throw $message
     }

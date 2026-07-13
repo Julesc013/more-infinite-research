@@ -11,6 +11,7 @@ end
 
 local base_lab = data.raw.lab and data.raw.lab.lab
 if base_lab then
+  local target_profile = require("__more-infinite-research__.prototypes.mir.platform.factorio.target_profiles").current()
   local custom = deepcopy(base_lab)
   custom.name = "mir-fixture-custom-lab"
   custom.minable = custom.minable and deepcopy(custom.minable) or nil
@@ -31,19 +32,22 @@ if base_lab then
     stack_size = 10
   }
 
+  local science_pack_type = target_profile.prototype_shapes.science_pack_prototype_kinds[1]
   local pack = {
-    type = "tool",
+    type = science_pack_type,
     name = "mir-custom-only-science-pack",
     icon = "__base__/graphics/icons/logistic-science-pack.png",
     icon_size = 64,
     subgroup = "science-pack",
     order = "z[mir-custom-only-science-pack]",
-    stack_size = 200,
-    durability = 1,
-    durability_description_key = "description.science-pack-remaining-amount-key",
-    factoriopedia_durability_description_key = "description.factoriopedia-science-pack-remaining-amount-key",
-    durability_description_value = "description.science-pack-remaining-amount-value"
+    stack_size = 200
   }
+  if science_pack_type == "tool" then
+    pack.durability = 1
+    pack.durability_description_key = "description.science-pack-remaining-amount-key"
+    pack.factoriopedia_durability_description_key = "description.factoriopedia-science-pack-remaining-amount-key"
+    pack.durability_description_value = "description.science-pack-remaining-amount-value"
+  end
 
   data:extend({item, pack, custom})
 end

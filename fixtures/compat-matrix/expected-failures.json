@@ -70,6 +70,12 @@
       "notes": "Reviewed Factorio 2.0 local zip sweep dependency closure was incomplete or had no compatible local release; not a MIR regression."
     },
     {
+      "scenario_pattern": "^(aai-containers|aai-industry|aai-loaders|big-mining-drill|equipment-gantry|FluidMustFlow|jetpack|robot_attrition)$",
+      "kind": "^dependency_resolution_failure$",
+      "reason_pattern": "^(release-selection|load_skipped)$",
+      "notes": "Reviewed Factorio 2.0 local zip library under Factorio 2.1: these archived local zips advertise no 2.1-compatible release; updated 2.1-compatible zips remain covered by the normal 2.1 smoke set."
+    },
+    {
       "scenario_pattern": "^(Accumulator-V2|all-the-overhaul-modpack|angelsrefining|asphalt-productivity|cargo-ships|cargo-ships-graphics|cerys-lunaponics|Cerys-Moon-of-Fulgora|crushing-industry-productivity-research|everything-fish|more-quality-scaling|Nexus|no-minimap-on-platforms|Prod-Beacon|productivity_weight_fix|py_productivity|rubia-assets|science-bottles|space-exploration|space-exploration-spaceproductivity-2|Spaghetorio|Water-Friendly-Walls)$",
       "kind": "^load_failure$",
       "reason_pattern": "^exit_code=(-1073740940|1)$",
@@ -81,6 +87,20 @@
       "kind": "^invalid_science_pack$",
       "reason_pattern": "^no_lab_compatible_science$",
       "notes": "Reviewed Factorio 2.0 local zip sweep: active nauv-so labs accept only Space Age or mod-specific packs for these streams, so MIR skips instead of generating unresearchable research."
+    },
+    {
+      "scenario": "^local-2-1-krastorio-spaced-out$",
+      "mod": "^Krastorio2-spaced-out$",
+      "kind": "^invalid_science_pack$",
+      "reason_pattern": "^no_lab_compatible_science$",
+      "notes": "K2SO is a load/performance observation, not a support claim. MIR conservatively skips streams when the active overhaul labs accept none of their selected science packs."
+    },
+    {
+      "scenario": "^local-2-1-krastorio-spaced-out$",
+      "mod": "^Krastorio2-spaced-out$",
+      "kind": "^missing_prerequisite$",
+      "reason_pattern": "^unresearchable required technology .+-no-accepting-lab\\)$",
+      "notes": "K2SO is a load/performance observation, not a support claim. MIR conservatively skips direct-effect streams whose required overhaul prerequisite chain is not researchable in an accepting lab."
     }
   ]
 }

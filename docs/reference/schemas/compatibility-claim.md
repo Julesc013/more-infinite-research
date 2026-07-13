@@ -12,8 +12,7 @@ superseded_by: []
 
 # Compatibility Claim Schema
 
-The canonical machine record is `fixtures/compat-matrix/claims.json`, routed by
-`.mir/compatibility.yml`.
+The canonical machine record is `fixtures/compat-matrix/claims.json`, routed by `.mir/compatibility.yml`.
 
 Required fields:
 

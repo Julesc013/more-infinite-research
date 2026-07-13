@@ -1,0 +1,93 @@
+{
+  "schema": 2,
+  "status": "passed",
+  "run_id": "58758361-accf-40eb-9d15-c720af9a0620",
+  "qualification_mode": "change-aware-baseline-plus-affected-rerun",
+  "mir_version": "2.4.0",
+  "factorio_version": "2.0",
+  "factorio_binary_version": "2.0.77",
+  "git_commit": "01efb39a7476cc5e5f7e173edbb244e70f7a8e96",
+  "package_source_git_dirty": false,
+  "validation_harness_git_dirty": false,
+  "candidate": "dist/more-infinite-research_2.4.0.zip",
+  "candidate_size_bytes": 404828,
+  "validation_package_sha256": "4BA19EA071E6359BC25C58CCD8F65CAF81B4AA675496E2F53175A996C791470C",
+  "validation_package_content_sha256": "F681FF5C331FC45EAFF31823BC9D9441A100C75FD5D412DE1C37DC828DE00775",
+  "package_source_sha256": "F681FF5C331FC45EAFF31823BC9D9441A100C75FD5D412DE1C37DC828DE00775",
+  "validation_harness_sha256": "269681E043D2AF9B385F04A094A5633B409993BE383F6C54CFB0E63285DC16C3",
+  "target_profile_sha256": "E4955F0415FAFB69C21DA32BA535C761740C270D6972955170CA5A2BE95D514A",
+  "required_groups_sha256": "57A1DF87A8FB594B2B51C7E230D775E88028F23D52DF9D5D7DA1336F9271C78A",
+  "expected_scenarios_sha256": "6098644CA24561ECEB1E62B7D5C26708337FA0DF5F3250F0919868A11FAEC12E",
+  "declared_scenario_count": 94,
+  "required_groups": [
+    "base-load",
+    "direct-effects",
+    "exact-dist",
+    "package",
+    "recipe-target-integrity",
+    "runtime-state",
+    "science-prerequisites",
+    "settings-codec",
+    "space-age",
+    "static",
+    "weapon-overlap"
+  ],
+  "groups": [
+    {"name": "base-load", "required": true, "status": "passed", "evidence_mode": "retained-baseline-plus-exact-dist-canary"},
+    {"name": "direct-effects", "required": true, "status": "passed", "evidence_mode": "retained-82-scenario-baseline"},
+    {"name": "exact-dist", "required": true, "status": "passed", "evidence_mode": "exact-candidate-rerun"},
+    {"name": "package", "required": true, "status": "passed", "evidence_mode": "deterministic-exact-candidate-rerun"},
+    {"name": "recipe-target-integrity", "required": true, "status": "passed", "evidence_mode": "retained-82-scenario-baseline"},
+    {"name": "runtime-state", "required": true, "status": "passed", "evidence_mode": "affected-configuration-change-rerun"},
+    {"name": "science-prerequisites", "required": true, "status": "passed", "evidence_mode": "retained-baseline-plus-exact-dist-canary"},
+    {"name": "settings-codec", "required": true, "status": "passed", "evidence_mode": "affected-settings-rerun-plus-upgrade"},
+    {"name": "space-age", "required": true, "status": "passed", "evidence_mode": "affected-native-owner-rerun-plus-exact-dist"},
+    {"name": "static", "required": true, "status": "passed", "evidence_mode": "current-source-rerun"},
+    {"name": "weapon-overlap", "required": true, "status": "passed", "evidence_mode": "retained-82-scenario-baseline"}
+  ],
+  "evidence": {
+    "retained_regression_baseline": {
+      "status": "passed",
+      "source_commit": "5963445b1b72efffc18b232f5367a7da640061e8",
+      "run_id": "29480972-467a-40ed-9a9e-5d11a52ac03c",
+      "result": "82/82",
+      "scope": "unaffected behavior only"
+    },
+    "native_owner_runtime": {
+      "status": "passed",
+      "source_commit": "d1ad34096e235c07f47488b7f97c247dd3d7a3bd",
+      "run_id": "14162872-9db4-4b29-a785-4c96e3dd6891",
+      "result": "18/18",
+      "covers": "all setting profiles, formula safety, adoption, prepatched, exact, mixed, and compiler contracts"
+    },
+    "native_owner_configuration_change": {
+      "status": "passed",
+      "source_commit": "d1ad34096e235c07f47488b7f97c247dd3d7a3bd",
+      "run_id": "e5ce37fc-f764-4423-9b32-45e434d348d4",
+      "result": "5/5",
+      "covers": "configuration signature reset and adoption signature reset"
+    },
+    "exact_candidate_smoke": {
+      "status": "passed",
+      "source_commit": "01efb39a7476cc5e5f7e173edbb244e70f7a8e96",
+      "run_id": "d88b636a-d7c5-41e0-a826-a85b6986a0e3",
+      "result": "11/11",
+      "summary": ".mir/evidence/2.4.0-exact-dist-smoke-final.json"
+    },
+    "corrected_preserve_binding_canary": {
+      "status": "passed",
+      "source_commit": "01efb39a7476cc5e5f7e173edbb244e70f7a8e96",
+      "run_id": "debe7ff0-2066-4a10-a8ee-4f07a10133e5",
+      "result": "4/4",
+      "summary": ".mir/evidence/2.4.0-native-owner-integrity-final.json"
+    },
+    "upgrade": {
+      "status": "passed",
+      "source_commit": "7a5a17c2cf5eb12703e2e0228e9624759a7b1604",
+      "from_sha256": "97B3DC9B6E352C6C4B8FF76D77020333FAAFFE93BD89EDB6B8F3370405ED68DE",
+      "to_sha256": "4BA19EA071E6359BC25C58CCD8F65CAF81B4AA675496E2F53175A996C791470C",
+      "summary": ".mir/evidence/2.4.0-upgrade-proof-final.json"
+    }
+  },
+  "completed_at": "2026-07-13T18:22:38.2561759Z"
+}

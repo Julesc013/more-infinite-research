@@ -262,6 +262,7 @@ function S.setting_prototypes()
       default_value = spec.default_value,
       allowed_values = spec.allowed_values,
       order = spec.order,
+      targets = {requires_features = {"prototype_limits"}, required_effect_types = {}},
       localised_name = {"mod-setting-name." .. spec.name},
       localised_description = {"mod-setting-description." .. spec.name}
     })

@@ -1,0 +1,9 @@
+MIR 2.4.0 candidate freshness
+checked_at_utc=2026-07-12T00:26:15Z
+result=passed
+source_commit=b9172ab1ab3fc75ba0c1dec79cc9f2c3ae6063c3
+artifact=dist/more-infinite-research_2.4.0.zip
+artifact_sha256=8618CAF031EF24EB83641DB03566F2390DD29AD98D2099A80D596EEB527EDA12
+structured_summary=.mir/evidence/2.4.0-rc3-validation-summary.json
+structured_summary_run_id=99895145-6529-4d99-be33-62484856b685
+checker_output=[ok] MIR release candidate evidence matches source, profile, package, and structured validation summary.

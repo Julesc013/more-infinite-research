@@ -4,6 +4,7 @@ local runtime_state = require("prototypes.mir.runtime.state")
 
 M.technology_name = "recipe-prod-research_spoilage_preservation-1"
 M.stream_key = "research_spoilage_preservation"
+M.requires_features = {"scripted_techs"}
 
 local MIN_MODIFIER = 0.01
 local MAX_MODIFIER = 100

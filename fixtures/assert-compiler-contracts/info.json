@@ -1,0 +1,12 @@
+{
+  "name": "mir-fixture-assert-compiler-contracts",
+  "version": "0.1.0",
+  "title": "MIR Fixture - Assert Compiler Contracts",
+  "author": "Julesc013",
+  "description": "Pure data-stage assertions for compiler schemas, precedence, target filtering, stable sorting, IDs, and fingerprints.",
+  "factorio_version": "2.0",
+  "dependencies": [
+    "base >= 2.0",
+    "more-infinite-research"
+  ]
+}
