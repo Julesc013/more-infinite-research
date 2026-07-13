@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "campaign": "museum-wave-and-3.1.9-convergence",
-  "status": "QUALIFYING",
+  "status": "AUTOMATED-GREEN-MANUAL-PENDING",
   "source_anchor": {
     "version": "3.1.5",
     "commit": "c8bf4a742910cec9d6d3dee305c83deba1aa49eb",
@@ -36,6 +36,9 @@
     {"class": "PORTABLE-GRAPH", "origin": "tmp/1.1", "fix": "iterative deep technology graph walk", "regression": "4096-node external graph scenario", "candidate_invalidation": "none", "modern_disposition": "already present in released 3.1.5"},
     {"class": "PORTABLE-GENERATOR", "origin": "museum wave", "fix": "manifest-driven finite museum compiler with duplicate and capability rejection", "regression": "seven deterministic builds and 25 negative cases", "candidate_invalidation": "none", "modern_disposition": "development tooling only"},
     {"class": "PORTABLE-HARNESS", "origin": "museum wave", "fix": "target-owned CLI and zip-native or extract-required package deployment", "regression": "matching-binary runtime and seal checks on all museum targets", "candidate_invalidation": "none", "modern_disposition": "development tooling only"}
+    ,{"class": "PORTABLE-HARNESS", "origin": "3.1.9 qualification", "fix": "selected Space Age integrity runs enforce native-owner post-load assertions", "regression": "two selected native-owner integrity scenarios", "candidate_invalidation": "superseded prequalification 3.1.9 bytes only", "modern_disposition": "implemented"}
+    ,{"class": "PORTABLE-SETTINGS", "origin": "3.1.9 qualification", "fix": "cost base and growth activate as one visible cost-model pair", "regression": "native-owner cost-base, cost-growth, combined, and compiler contract cases", "candidate_invalidation": "superseded prequalification 3.1.9 bytes only", "modern_disposition": "implemented"}
+    ,{"class": "PORTABLE-SETTINGS", "origin": "3.1.9 upgrade proof", "fix": "preserve current native-owner research progress across recognized cost-model changes using Factorio-floored unit counts", "regression": "exact 3.1.5 to 3.1.9 level, current research, and 0.42 progress retention", "candidate_invalidation": "superseded prequalification 3.1.9 bytes only", "modern_disposition": "implemented"}
   ],
   "already_present_from_3_1_5": [
     "accepted-plan publication boundary",
@@ -59,9 +62,9 @@
     "unclassified_package_files": 0
   },
   "candidate": {
-    "source_commit": "pending-final-qualification",
+    "source_commit": "f65dacbbbfa9e5bac891de090c54a5bb36a9ef1f",
     "archive": "dist/more-infinite-research_3.1.9.zip",
-    "archive_sha256": "pending-final-qualification",
+    "archive_sha256": "DE99BC1B51810EE0262120B4B7A12F5F8BE913E083B07ED0B5DA0E23C760224B",
     "seal": ".mir/evidence/candidate-seals/mir-3.1.9-factorio-2.1.json"
   }
 }

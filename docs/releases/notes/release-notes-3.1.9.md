@@ -21,6 +21,8 @@ MIR 3.1.9 is the final Factorio 2.1 patch in the 3.1 line. It keeps the released
 - Disabling one of these streams leaves its external technology untouched.
 - Explicit effect changes update only recipe-productivity effects whose recipes produce the stream's product; unrelated effects are preserved.
 - Recognized native and MIR exponential cost formulas retain their mathematical style. MIR rejects explicit cost changes to unknown formulas instead of approximating them.
+- Cost base and growth act as one displayed model when either value is customized, matching generated-stream settings behavior.
+- Existing saves retain the current native-owner research, level, and fractional progress when a recognized cost model changes.
 - Owner updates are planned and applied as one fingerprint-checked transaction; unsafe or unavailable owners retain the existing fallback-generation path without duplicate coverage.
 
 ## Maintainer Tooling
