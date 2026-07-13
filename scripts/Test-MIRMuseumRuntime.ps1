@@ -165,13 +165,13 @@ if ($FactorioVersion -ne "0.12") {
           $quietSince = Get-Date
           if ($usesLogProof) {
             $logText = Get-Content -Raw -LiteralPath $currentLog
+            $markerOffset = $logText.IndexOf("Loading mod $($catalog.mod_name) $($target.version)", [StringComparison]::Ordinal)
           } else {
             $cacheText = [Text.Encoding]::GetEncoding(28591).GetString([IO.File]::ReadAllBytes($cropCache))
             $markerOffset = $cacheText.IndexOf([string]$catalog.mod_name, [StringComparison]::Ordinal)
           }
         }
-        if (-not $loadedAt -and (($usesLogProof -and $logText -match [regex]::Escape("Loading mod $($catalog.mod_name) $($target.version)")) -or
-            (-not $usesLogProof -and $markerOffset -ge 0))) {
+        if (-not $loadedAt -and $markerOffset -ge 0) {
           $loadedAt = Get-Date
         }
         if ($usesLogProof -and $logText -match '(?im)(^|\s)(Error|Failed to load mods|Failed to load mod|Invalid Mod|Couldn.t load|stack traceback)') {
