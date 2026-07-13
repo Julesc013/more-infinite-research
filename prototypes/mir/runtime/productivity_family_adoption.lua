@@ -45,12 +45,12 @@ end
 
 local function research_unit_count(unit, level)
   if type(unit) ~= "table" then return nil end
-  if type(unit.count) == "number" then return unit.count end
+  if type(unit.count) == "number" then return math.floor(unit.count) end
   local formula = compact(unit.count_formula)
   local growth, base = formula:match("^([%d%.]+)%^L%*([%d%.]+)$")
-  if growth and base then return tonumber(growth) ^ level * tonumber(base) end
+  if growth and base then return math.floor(tonumber(growth) ^ level * tonumber(base)) end
   base, growth = formula:match("^([%d%.]+)%*([%d%.]+)%^%(L%-1%)$")
-  if base and growth then return tonumber(base) * tonumber(growth) ^ (level - 1) end
+  if base and growth then return math.floor(tonumber(base) * tonumber(growth) ^ (level - 1)) end
   return nil
 end
 
