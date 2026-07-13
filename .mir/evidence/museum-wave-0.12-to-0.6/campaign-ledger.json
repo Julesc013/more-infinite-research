@@ -1,0 +1,44 @@
+{
+  "schema": 1,
+  "campaign": "museum-wave-0.12-to-0.6-and-3.1.9",
+  "internal_execution_label": "Codex 5.6 Sol Extra High",
+  "started_at": "2026-07-14T00:00:00+10:00",
+  "release_actions_authorized": false,
+  "baseline": {
+    "main": "c8bf4a742910cec9d6d3dee305c83deba1aa49eb",
+    "dev": "c8bf4a742910cec9d6d3dee305c83deba1aa49eb",
+    "legacy": "584b398f98d3e317fac31cba63edcb11360a5bb1",
+    "released_3_1_5_sha256": "8861E25FAAC472EDE9F32FE1C051A623A59177F5E092A3B1DC0B9FF2B3D47C50",
+    "released_2_4_0_sha256": "4BA19EA071E6359BC25C58CCD8F65CAF81B4AA675496E2F53175A996C791470C",
+    "tag_count": 31
+  },
+  "frozen_candidates": [
+    {"version": "1.9.4", "branch": "tmp/1.1", "commit": "dc6414e21585e8f565947be1c3b59ebe6bf750b8", "zip_sha256": "E350F7433F4613DE075F703435EC23FC8000ADF74FCE4F69ACEAC2DD1478BB5D"},
+    {"version": "1.8.2", "branch": "tmp/1.0", "commit": "b2855c7bbcf5adc69644820491eb8ebc17bcf362", "zip_sha256": "740F439060031B6C64925B2CBAC038912703A39F7CC2030775DEFE60C93CADD5"},
+    {"version": "1.7.1", "branch": "tmp/0.17", "commit": "c59140c1808575bd26bf4156f9a6891d3cf90945", "zip_sha256": "E6BA58D6BAAD774712ED175E14361D130A82D7DB6DD881D5B17A3FE6E48CCCC5"},
+    {"version": "1.6.0", "branch": "tmp/0.16", "commit": "41283b13037fd8b39c875d0d8cdc39ad1e978b23", "zip_sha256": "FA1D23E5BBAF466DD609314159A4C61B588EF189630A2422ADCC70D1A16243AD"},
+    {"version": "1.5.0", "branch": "tmp/0.15", "commit": "c55cba5253f82bc93733522736fa303eda5acfa7", "zip_sha256": "3F8D78ECEC9DCCCCF2DD14279DC7E3BD696212F33C3FDD87A924B905223ACBCF"},
+    {"version": "1.4.0", "branch": "tmp/0.14", "commit": "2e9eab88e3b6ec6ad84460c1d75d8177441182d6", "zip_sha256": "39EDE9BA8DA7BDD632828B0B1F055A8681FC1DAB48D7D1B9348D707BB0AF0B93"},
+    {"version": "1.3.0", "branch": "tmp/0.13", "commit": "9037ed01e04961b0b370f082ccafa5ef0b3a34f9", "zip_sha256": "36EC72C5D217CE6120C5073A374B6C344BA76DF254480E9A010AA80F6B55C4CC"}
+  ],
+  "museum_targets": [
+    {"factorio": "0.12", "mir": "0.12.0", "branch": "tmp/0.12", "planning_commit": "acfba01036a7955128750b2ae67edbfef3dcf13a", "requested_patch": "0.12.35", "installed_patch": "0.12.35", "binary_sha256": "AEC54627B873E4636FC2254293F01D73401CB652F373CEEE2DABEAD2B09EB774", "input_status": "available"},
+    {"factorio": "0.11", "mir": "0.11.0", "branch": "tmp/0.11", "planning_commit": "03ac230c3d20f229dadfaa6e0ccf71135bb0bc10", "requested_patch": "0.11.23", "installed_patch": "0.11.22", "binary_sha256": "968A6B8EDA5244F41AFB8249C7DE004C644BA4692DD38DF5BC00F26F1CE2E085", "input_status": "exact_patch_missing"},
+    {"factorio": "0.10", "mir": "0.10.0", "branch": "tmp/0.10", "planning_commit": "3c39b428f82c6a422402f0eadf379e7a9ec806d9", "requested_patch": "0.10.12", "installed_patch": "0.10.12", "binary_sha256": "7D8C1D11A86603C8462D1B58A1D174C83132A89E0F524BE4C0DCA97FFC1FEBB1", "input_status": "available"},
+    {"factorio": "0.9", "mir": "0.9.0", "branch": "tmp/0.9", "planning_commit": "d86dfd656f4e83cf34e7100e3657688123aef5e0", "requested_patch": "0.9.8", "installed_patch": "0.9.8", "binary_sha256": "B76D1F8058C8EB4D3F2A0B14F5DD87356B8E1068F37F85306A834AAFA611FE23", "input_status": "available"},
+    {"factorio": "0.8", "mir": "0.8.0", "branch": "tmp/0.8", "planning_commit": "41c2c4f842548ddbc7c3513795acd3e12bef4dc3", "requested_patch": "0.8.8", "installed_patch": "0.8.8", "binary_sha256": "A4226859DA746314A59D49937444F37A64828A7ABEC46AB3FC05E836C3F4C096", "input_status": "available"},
+    {"factorio": "0.7", "mir": "0.7.0", "branch": "tmp/0.7", "planning_commit": "7e964b4705e15ff2365a06a9e00901fae751c0c7", "requested_patch": "0.7.5", "installed_patch": "0.7.5", "binary_sha256": "EA52123915ECFB14658591876327490B094996ADE64D837929765147C4556FE8", "input_status": "available"},
+    {"factorio": "0.6", "mir": "0.6.0", "branch": "tmp/0.6", "planning_commit": "20a94c4dc5abffd7b36d0590f253162afd428645", "requested_patch": "0.6.4", "installed_patch": "0.6.4", "binary_sha256": "8D2F7208503B88A578FE558184C87092830554FEC5AB66BCD57CBAE2F0E5A1FB", "input_status": "available"}
+  ],
+  "safety_refs": [
+    "safety/pre-museum-wave/0.12-acfba01",
+    "safety/pre-museum-wave/0.11-03ac230",
+    "safety/pre-museum-wave/0.10-3c39b42",
+    "safety/pre-museum-wave/0.9-d86dfd6",
+    "safety/pre-museum-wave/0.8-41c2c4f",
+    "safety/pre-museum-wave/0.7-7e964b4",
+    "safety/pre-museum-wave/0.6-20a94c4",
+    "safety/pre-3.1.9/dev-c8bf4a7"
+  ],
+  "status": "baseline_frozen_binary_audit_in_progress"
+}
