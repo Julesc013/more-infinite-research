@@ -219,6 +219,16 @@ fixtures:
       - runtime-state-effect-retention
       - exact-3-1-5-candidate-normal-mod-directory-load
 
+  upgrade-3-0-5-to-3-1-9:
+    requires_features: [scripted_techs]
+    assertion_path: fixtures/assert-upgrade-3-0-5-to-3-1-9
+    validates:
+      - exact-3-0-5-source-archive
+      - non-default-startup-setting-retention
+      - scripted-technology-level-retention
+      - runtime-state-effect-retention
+      - exact-3-1-9-candidate-normal-mod-directory-load
+
   upgrade-3-0-5-to-3-1-0-automatic-compiler:
     requires_features: [scripted_techs]
     assertion_path: fixtures/assert-upgrade-3-0-5-to-3-1-0-automatic-compiler
@@ -240,6 +250,28 @@ fixtures:
       - scripted-technology-level-retention
       - runtime-state-effect-retention
       - exact-3-1-5-automatic-compiler-candidate-normal-mod-directory-load
+
+  upgrade-3-1-2-to-3-1-9-automatic-compiler:
+    requires_features: [scripted_techs, recipe_productivity]
+    assertion_path: fixtures/assert-upgrade-3-1-2-to-3-1-9-automatic-compiler
+    validates:
+      - exact-3-1-2-source-archive
+      - hidden-legacy-safe-generate-setting-retention
+      - new-safe-control-defaults
+      - non-default-startup-setting-retention
+      - scripted-technology-level-retention
+      - runtime-state-effect-retention
+      - exact-3-1-9-automatic-compiler-candidate-normal-mod-directory-load
+
+  upgrade-3-1-5-to-3-1-9:
+    requires_features: [recipe_productivity]
+    assertion_path: fixtures/assert-upgrade-3-1-5-to-3-1-9
+    validates:
+      - exact-3-1-5-source-archive
+      - native-owner-setting-retention
+      - native-owner-technology-level-retention
+      - native-owner-research-progress-retention
+      - exact-3-1-9-candidate-normal-mod-directory-load
 
   competing-productivity-transaction:
     requires_features: [recipe_productivity]

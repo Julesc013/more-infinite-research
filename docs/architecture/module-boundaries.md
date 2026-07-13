@@ -631,6 +631,14 @@ Instrument mode is a development tool, not a shipped MIR package feature.
 
 The process module owns hidden process launch, timeout termination, safe copied-mod replacement, and release-shaped source copying. The settings-override module owns deterministic edits to the copied mod's declarative test override table. The scenario registry imports one target profile from the expected-scenario manifest, rejects duplicate or undeclared names, and resolves every gate, runtime, configuration-change, and package invocation through a target-bound declaration record. Scenario orchestration may call these modules but must not reimplement their operations inline.
 
+## Museum Build Compiler Boundary
+
+Factorio 0.12 through 0.6 use a development-time compiler under `scripts/Museum/`, driven by `.mir/museum-targets.json`. The compiler executes in the maintainer's current PowerShell environment; it does not ship in, or execute inside, an old Factorio runtime. It emits only finite numbered technology prototypes, target-era `info.json`, a loaded `config.lua`, English CFG locale rows, stable stream-manifest rows, and balance evidence.
+
+Museum compatibility data is declarative and cannot mutate prototypes. The PowerShell emitter is the only museum component allowed to create target technology source. Each target branch materializes its own output directly from the shared catalog and matching base files; no lower target branch supplies source to another target. Release archives contain only `info.json`, `config.lua`, `data.lua`, and `locale/en/more-infinite-research.cfg` beneath the versioned mod directory.
+
+The museum runtime harness uses the target's isolated write-data directory and actual legacy CLI surface. The campaign first proves one generated technology from a directory package. Factorio 0.12 then proves the exact deterministic ZIP by fresh create and bounded server reload. Factorio 0.11 and 0.10 prove two bounded GUI startup loads from the exact ZIP through target logs. Factorio 0.9 proves two cache-regenerating startup loads from the exact ZIP. Factorio 0.8 through 0.6 do not discover ZIP mods, so the harness copies and extracts the exact deterministic ZIP before two cache-regenerating startup loads. Pre-0.11 installer config-path changes are transactional and must be restored byte-for-byte. A patch mismatch remains an input failure and cannot be waived by static evidence from a nearby binary.
+
 ## Architecture Lints
 
 Static validation should eventually fail when:

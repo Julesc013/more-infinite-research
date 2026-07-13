@@ -1,19 +1,30 @@
 # M.I.R. TODO
 
-Updated: 2026-07-13
+Updated: 2026-07-14
 
 This is the executable release queue. `.mir/release-wave.yml` is the machine-readable status authority. Detailed architecture and acceptance criteria live in the linked governed records.
 
 ## Current Truth
 
-- MIR 3.1.1 for Factorio 2.1 and MIR 2.3.5 for Factorio 2.0 are the published immutable baselines.
-- MIR 3.1.5 is the untagged, automated-qualified Factorio 2.1 release candidate prepared for synchronized `main` and `dev`; interactive review and human publication remain pending.
-- MIR 2.4.0 is unreleased and begins only after the human 3.1.5 release pause closes.
+- MIR 3.1.5 for Factorio 2.1 and MIR 2.4.0 for Factorio 2.0 are the published immutable baselines.
+- MIR 1.9.4 through 1.3.0 and the finite museum MIR 0.12.0 through 0.6.0 distributions are sealed, independently qualified candidates awaiting maintainer publication.
+- MIR 3.1.9 is the final 3.1 patch synthesis on Factorio 2.1; it must finish qualification and advance `dev` without moving `main`.
 - Earlier local 3.1.0 and 2.4.0 tags, commits, archives, and validation packets are superseded candidate evidence, not publication authority.
 - Work temporarily labeled 3.2.0 has been preserved as 3.1.0 implementation or honest pre-renumber characterization. Work temporarily labeled 2.5.0 is preserved but non-authoritative until it is re-derived as 2.4.0.
-- MIR 3.2.0 does not open on `dev` until 3.1.5, 2.4.0, and the descending backport distributions are stable and their portable lessons return.
+- MIR 3.2.0 does not open on `dev` until the complete backport and museum release set is published and MIR 3.1.9 has returned every portable lesson.
 
-## 3.1.5 Modern Compiler Candidate
+## 3.1.9 Final Patch Candidate
+
+- [x] Base directly on released 3.1.5 and preserve released main, legacy, distributions, and tags.
+- [x] Configure recognized existing processing-unit, plastic, low-density-structure, and rocket-fuel infinite research owners through the standard settings.
+- [x] Preserve default and disabled owners, reject unsafe formulas, and apply updates transactionally.
+- [x] Add native-owner settings, formula, transaction, configuration-change, and upgrade regressions.
+- [x] Return content-addressed release assurance and the finite museum compiler as non-package development tooling.
+- [ ] Pass the consolidated exact Factorio 2.1 gate, three upgrade anchors, ecosystem campaigns, deterministic candidate, freshness, and seal checks.
+- [ ] Complete maintainer visual, technology-tree, locale-fit, icon, save-UI, and balance review.
+- [ ] Tag and publish only in the separate maintainer release step.
+
+## 3.1.5 Modern Compiler Release
 
 - [x] Return and classify portable lessons from every requested target branch without importing target-specific feature cuts.
 - [x] Add the data-only CompilerProvider schema, deterministic registry, stable diagnostics, and declarative setting descriptors.
@@ -25,9 +36,9 @@ This is the executable release queue. `.mir/release-wave.yml` is the machine-rea
 - [x] Requalify the complete 91-scenario Factorio 2.1 matrix and deterministic exact-package gates after the final settings-availability correction.
 - [x] Re-run exact 3.0.5 and 3.1.2 upgrades against the corrected final 3.1.5 archive.
 - [x] Re-run all nine available exact-archive ecosystem loads against the corrected final archive.
-- [ ] Complete the identity-bound interactive settings, technology-tree, save-load, locale, icon, and balance review.
-- [ ] Tag and publish only in the explicitly separate human-authorized release step.
-- [ ] Start the 2.4.0 backport only after the requested release pause.
+- [x] Complete the maintainer release review.
+- [x] Tag and publish in the explicitly separate human-authorized release step.
+- [x] Start and publish the 2.4.0 backport after the requested release pause.
 
 ## 3.1.2 Automatic Compiler Hotfix Foundation
 

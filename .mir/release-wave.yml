@@ -1,5 +1,5 @@
 schema: 1
-updated_at: 2026-07-12
+updated_at: 2026-07-14
 policy:
   published_archives_are_immutable: true
   target_lines_use_independent_binary_evidence: true
@@ -174,10 +174,9 @@ waves:
   mir_3_1_5:
     version: "3.1.5"
     branch: main
-    development_branch: dev
     source_anchor_required: qualified-3.1.2-plus-complete-portable-return
-    source_commit: 3cd6a95a6e22ce2d4cdbc231ad79d8110ad75e2f
-    package_source_commit: 3cd6a95a6e22ce2d4cdbc231ad79d8110ad75e2f
+    source_commit: c8bf4a742910cec9d6d3dee305c83deba1aa49eb
+    package_source_commit: c8bf4a742910cec9d6d3dee305c83deba1aa49eb
     automatic_compiler_control_schema: 2
     compiler_provider_schema: 1
     reviewed_generic_family_id_count: 0
@@ -192,18 +191,43 @@ waves:
     available_ecosystem_load_gate: 9-passed-zero-dependency-failures-load-claims-only
     exact_package_gate: passed-base-space-age-deterministic-and-forbidden-entry-check
     candidate_freshness_gate: passed
-    interactive_gate: pending
+    interactive_gate: accepted-for-publication
+    publication_status: published
+    tag: "3.1.5"
+    status: published-frozen
+
+  mir_3_1_9:
+    version: "3.1.9"
+    branch: dev
+    synthesis_branch: tmp/3.1.9-synthesis
+    source_anchor_required: released-3.1.5-plus-complete-portable-return
+    source_commit: pending-final-qualification
+    package_source_commit: pending-final-qualification
+    native_owner_binding_schema: 2
+    assurance_evidence_schema: 2
+    museum_compiler_schema: 1
+    runtime_scenario_count: 102
+    runtime_package_sha256: pending-final-qualification
+    structured_validation_evidence: .mir/evidence/3.1.9/qualification-summary.json
+    upgrade_evidence: .mir/evidence/3.1.9/upgrade-from-3.1.5-proof.json
+    additional_upgrade_evidence:
+      - .mir/evidence/3.1.9/upgrade-from-3.1.2-proof.json
+      - .mir/evidence/3.1.9/upgrade-from-3.0.5-proof.json
+    exact_package_gate: pending-final-qualification
+    candidate_freshness_gate: pending-final-qualification
+    interactive_gate: pending-maintainer
     publication_status: unreleased
-    status: release-candidate-awaiting-manual-review
+    status: qualifying
 
   mir_2_4_0:
     version: "2.4.0"
-    branch: tmp/2.0
-    source_anchor_required: accepted-3.1.2
-    source_commit: pending-accepted-3.1.2
-    previous_candidate_commit: 575fc4f5ae4a52205d1e72604934ead35e69c99e
-    previous_candidate_archive: dist/more-infinite-research_2.4.0.zip
-    previous_candidate_sha256: 8618CAF031EF24EB83641DB03566F2390DD29AD98D2099A80D596EEB527EDA12
-    previous_candidate_status: superseded-unreleased-candidate
-    publication_status: unreleased
-    status: blocked-on-accepted-3.1.2
+    branch: legacy
+    package_source_commit: 01efb39a7476cc5e5f7e173edbb244e70f7a8e96
+    seal_source_commit: f6a5dfeb4dea18ee70bbaa17acbd4433f1396e6e
+    promotion_commit: 584b398f98d3e317fac31cba63edcb11360a5bb1
+    archive: dist/more-infinite-research_2.4.0.zip
+    sha256: 4BA19EA071E6359BC25C58CCD8F65CAF81B4AA675496E2F53175A996C791470C
+    package_content_sha256: F681FF5C331FC45EAFF31823BC9D9441A100C75FD5D412DE1C37DC828DE00775
+    publication_status: published
+    tag: "2.4.0"
+    status: published-frozen

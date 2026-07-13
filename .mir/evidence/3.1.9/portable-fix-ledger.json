@@ -1,0 +1,67 @@
+{
+  "schema": 1,
+  "campaign": "museum-wave-and-3.1.9-convergence",
+  "status": "QUALIFYING",
+  "source_anchor": {
+    "version": "3.1.5",
+    "commit": "c8bf4a742910cec9d6d3dee305c83deba1aa49eb",
+    "archive_sha256": "8861E25FAAC472EDE9F32FE1C051A623A59177F5E092A3B1DC0B9FF2B3D47C50"
+  },
+  "branch_dispositions": [
+    {"branch": "legacy", "disposition": "AUDITED", "portable": ["release promotion boundaries"], "excluded": ["Factorio 2.0 metadata and runtime adapters"]},
+    {"branch": "tmp/2.0", "disposition": "INTEGRATED-PORTABLE-ONLY", "portable": ["native-owner configuration", "change-aware assurance", "content-addressed evidence", "exact candidate seals", "canonical repository identities"], "excluded": ["Factorio 2.0 metadata", "2.0 fixtures", "2.4.0 release identity"]},
+    {"branch": "tmp/1.1", "disposition": "ALREADY-PRESENT", "portable": ["iterative technology graph traversal"], "excluded": ["Factorio 1.1 settings and effect cuts"]},
+    {"branch": "tmp/1.0", "disposition": "TARGET-SPECIFIC", "portable": [], "excluded": ["Factorio 1.0 metadata and runtime-state adapter"]},
+    {"branch": "tmp/0.17", "disposition": "TARGET-SPECIFIC", "portable": [], "excluded": ["Factorio 0.17 science and runtime-state adapter"]},
+    {"branch": "tmp/0.16", "disposition": "TARGET-SPECIFIC", "portable": [], "excluded": ["Factorio 0.16 science mapping"]},
+    {"branch": "tmp/0.15", "disposition": "TARGET-SPECIFIC", "portable": [], "excluded": ["Factorio 0.15 science mapping"]},
+    {"branch": "tmp/0.14", "disposition": "TARGET-SPECIFIC", "portable": [], "excluded": ["finite old-engine reconstruction"]},
+    {"branch": "tmp/0.13", "disposition": "TARGET-SPECIFIC", "portable": [], "excluded": ["finite old-engine reconstruction"]},
+    {"branch": "tmp/0.12", "disposition": "TOOLING-INTEGRATED", "portable": ["museum compiler catalog and deterministic packaging"], "excluded": ["finite technology source", "target-era config and locale"]},
+    {"branch": "tmp/0.11", "disposition": "TOOLING-INTEGRATED", "portable": ["exact final-patch authority and bounded startup evidence"], "excluded": ["finite technology source", "target-era config and locale"]},
+    {"branch": "tmp/0.10", "disposition": "TOOLING-INTEGRATED", "portable": ["transactional installer config isolation"], "excluded": ["finite technology source", "target-era config and locale"]},
+    {"branch": "tmp/0.9", "disposition": "TOOLING-INTEGRATED", "portable": ["cache-regeneration runtime proof"], "excluded": ["finite technology source", "target-era config and locale"]},
+    {"branch": "tmp/0.8", "disposition": "TOOLING-INTEGRATED", "portable": ["extract-required package capability"], "excluded": ["finite technology source", "target-era config and locale"]},
+    {"branch": "tmp/0.7", "disposition": "TOOLING-INTEGRATED", "portable": ["extract-required package capability"], "excluded": ["finite technology source", "target-era config and locale"]},
+    {"branch": "tmp/0.6", "disposition": "TOOLING-INTEGRATED", "portable": ["effect allowlist and minimal finite compiler proof"], "excluded": ["finite technology source", "target-era config and locale"]},
+    {"branch": "tmp/backport-wave-2.4.0", "disposition": "AUDITED", "portable": ["candidate identity and no-release handoff rules"], "excluded": ["target release packets"]},
+    {"branch": "tmp/museum-wave-and-3.1.9-handoff", "disposition": "TOOLING-INTEGRATED", "portable": ["museum catalog", "compiler", "runtime adapters", "qualification and seal tooling"], "excluded": ["candidate evidence logs and museum distributions"]}
+  ],
+  "portable_fixes": [
+    {"class": "PORTABLE-SETTINGS", "origin": "tmp/2.0", "fix": "recognized native infinite owners honor stable stream settings", "regression": "11 native-owner scenarios plus compiler contracts and 3.1.5 upgrade fixture", "candidate_invalidation": "none; released and sealed historical bytes remain immutable", "modern_disposition": "implemented"},
+    {"class": "PORTABLE-COMPILER", "origin": "tmp/2.0", "fix": "immutable owner input and output fingerprints with one emission transaction", "regression": "compiler contract transaction and duplicate binding cases", "candidate_invalidation": "none", "modern_disposition": "implemented"},
+    {"class": "PORTABLE-BALANCE", "origin": "tmp/2.0", "fix": "preserve defaults and reject explicit changes to unknown formulas", "regression": "native-owner balance manifest and runtime formula scenarios", "candidate_invalidation": "none", "modern_disposition": "rebound to Factorio 2.1.10 source"},
+    {"class": "PORTABLE-EVIDENCE", "origin": "tmp/2.0", "fix": "gate-ordered impact plans and exact-input evidence reuse", "regression": "assurance self-test", "candidate_invalidation": "none", "modern_disposition": "implemented"},
+    {"class": "PORTABLE-PACKAGING", "origin": "tmp/2.0", "fix": "build once and validate the exact candidate archive", "regression": "candidate parameter and seal identity checks", "candidate_invalidation": "none", "modern_disposition": "implemented"},
+    {"class": "PORTABLE-GRAPH", "origin": "tmp/1.1", "fix": "iterative deep technology graph walk", "regression": "4096-node external graph scenario", "candidate_invalidation": "none", "modern_disposition": "already present in released 3.1.5"},
+    {"class": "PORTABLE-GENERATOR", "origin": "museum wave", "fix": "manifest-driven finite museum compiler with duplicate and capability rejection", "regression": "seven deterministic builds and 25 negative cases", "candidate_invalidation": "none", "modern_disposition": "development tooling only"},
+    {"class": "PORTABLE-HARNESS", "origin": "museum wave", "fix": "target-owned CLI and zip-native or extract-required package deployment", "regression": "matching-binary runtime and seal checks on all museum targets", "candidate_invalidation": "none", "modern_disposition": "development tooling only"}
+  ],
+  "already_present_from_3_1_5": [
+    "accepted-plan publication boundary",
+    "duplicate generated and effect identity rejection",
+    "target-filter and provider ordering contracts",
+    "target-aware settings fixtures",
+    "configuration-change load execution",
+    "deterministic package fingerprints",
+    "locale parity and placeholder validation"
+  ],
+  "fixed_point": {
+    "portable_compiler": 0,
+    "portable_generator": 0,
+    "graph": 0,
+    "settings": 0,
+    "locale": 0,
+    "balance": 0,
+    "packaging": 0,
+    "harness": 0,
+    "stale_seals": 0,
+    "unclassified_package_files": 0
+  },
+  "candidate": {
+    "source_commit": "pending-final-qualification",
+    "archive": "dist/more-infinite-research_3.1.9.zip",
+    "archive_sha256": "pending-final-qualification",
+    "seal": ".mir/evidence/candidate-seals/mir-3.1.9-factorio-2.1.json"
+  }
+}

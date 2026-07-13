@@ -1,11 +1,11 @@
 schema: 1
 
 release:
-  version: "3.1.5"
+  version: "3.1.9"
   branch: dev
   factorio_version: "2.1"
-  baseline_commit: 4d7451400fecfb464dd9f34092f41c6c9a729b53
-  baseline_tag: null
+  baseline_commit: c8bf4a742910cec9d6d3dee305c83deba1aa49eb
+  baseline_tag: "3.1.5"
   objective: bounded-correctness-and-contract-modernization
   public_contract_change: patch-compatible
 

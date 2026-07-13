@@ -363,7 +363,7 @@ rules:
   - Report modules do not mutate prototypes.
   - Target and convergence policy live in machine-readable .mir manifests.
   - Historical branches provide behavior evidence and do not define a parallel core.
-  - CompilerProvider schema 1 is the stable data-only family extension boundary in 3.1.5.
+  - CompilerProvider schema 1 is the stable data-only family extension boundary in 3.1.9.
   - Providers may discover and normalize candidates but remain planning-only; emission owns generated prototype mutation.
   - Automatic family creation maturity is declarative; reviewed creation cannot promote experimental providers.
   - Top-level MIR Lua module dependencies must remain acyclic.
@@ -371,6 +371,21 @@ rules:
 validation_tooling:
   facade: scripts/Invoke-MIRValidation.ps1
   modules:
+    assurance: scripts/Invoke-MIRAssurance.ps1
+    assurance_core: scripts/MIRAssurance/Core.ps1
+    assurance_evidence: scripts/MIRAssurance/Evidence.ps1
+    assurance_hashing: scripts/MIRAssurance/Hashing.ps1
+    assurance_release: scripts/MIRAssurance/Release.ps1
+    assurance_tests: scripts/Test-MIRAssurance.ps1
+    native_owner_balance_tests: scripts/Test-MIRNativeOwnerCostModels.ps1
+    museum_catalog: .mir/museum-targets.json
+    museum_compiler: scripts/Museum/MuseumCompiler.psm1
+    museum_build: scripts/Build-MIRMuseumTarget.ps1
+    museum_static_gate: scripts/Test-MIRMuseumCompiler.ps1
+    museum_runtime_gate: scripts/Test-MIRMuseumRuntime.ps1
+    museum_qualification: scripts/New-MIRMuseumQualification.ps1
+    museum_seal_writer: scripts/New-MIRMuseumSeal.ps1
+    museum_seal_check: scripts/Test-MIRMuseumSeal.ps1
     package_identity: scripts/validation/PackageIdentity.ps1
     target_metadata: scripts/validation/TargetProfiles.ps1
     scenario_groups: scripts/validation/ScenarioGroups.ps1
@@ -383,6 +398,13 @@ validation_tooling:
     planner_artifacts: scripts/Test-MIRPlannerTools.ps1
     compiler_schema_drift: scripts/Test-MIRCompilerSchemaDrift.ps1
   rules:
+    - assurance plans use stable test IDs complete content-addressed evidence inputs and gate-ordered profiles
+    - passing evidence is reusable only under exact per-test fingerprints while failed and blocked lanes rerun
+    - candidate seals bind exact qualified bytes and canonical repository identities without publishing
+    - native-owner balance snapshots bind reviewed source values formula adapters planner bindings and emission transactions
+    - museum compilation runs only in the development environment and emits finite target-era Lua
+    - museum target packages contain no compiler tooling manifests evidence fixtures or modern runtime source
+    - each museum technology is emitted from a stable manifest row and a matching-base effect proof
     - the facade preserves its public parameters and structured result schema
     - process launch and copied-mod filesystem safety are reusable modules
     - settings overrides are declarative and isolated from scenario orchestration

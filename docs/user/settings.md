@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: player
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-07-13
+last_reviewed: 2026-07-14
 supersedes: []
 superseded_by: []
 ---
@@ -50,6 +50,14 @@ For documentation and portable policy exchange, the three controls also have fou
 | Custom | Whatever explicit combination the three controls contain | Explicit | Explicit |
 
 The order describes increasing automatic action, not increasing safety or quality. Safe remains the default because it attaches eligible mod recipes to existing compatible research without authorizing new technologies. Expansive is intentionally opt-in; hard safety, ownership, science, graph, identity, and progression gates remain mandatory in every profile.
+
+## Existing Infinite Research Owners
+
+Processing units, plastic, low-density structures, and rocket fuel can already be covered by infinite productivity technologies supplied by Space Age or another mod. MIR 3.1.9 binds those recognized owners to the same visible stream controls used when MIR has to generate a technology: Enable, base cost, cost growth, maximum level, research time, and effect per level.
+
+Leaving the settings at their defaults preserves the final existing technology exactly, including values changed by another mod. Turning Enable off also leaves the external technology untouched. A deliberate non-default value configures the recognized existing owner instead of silently ignoring the setting. Effect values use percentage points and change only recipe-productivity effects in that stream's product family; unrelated technology effects remain intact. Maximum level `0` means infinite.
+
+MIR preserves recognized native and MIR exponential formula styles when applying cost changes. If another mod supplies a formula MIR cannot safely interpret, defaults still preserve it, but an explicit base-cost or growth override is rejected and reported rather than approximated. Changes are startup settings and require a restart.
 
 Visible generated technology settings are ordered so default-off rows come first, enabled special rows come next, and ordinary enabled rows come last. Breeding, agricultural growth speed, cargo bay range/count, and character reach are enabled by default but remain in the special row group when Space Age is active. Inserter capacity stays disabled by default because larger hand sizes can change circuit behavior and inserter performance assumptions.
 

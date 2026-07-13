@@ -2,7 +2,7 @@ schema: 1
 
 branches:
   main:
-    purpose: stable Factorio 2.1 line receiving the validated MIR 3.1.5 release candidate
+    purpose: frozen stable Factorio 2.1 line at released MIR 3.1.5
     factorio_version: "2.1"
     accepts:
       - release-hotfix
@@ -16,7 +16,7 @@ branches:
       - large-architecture-rewrite
 
   dev:
-    purpose: canonical MIR 3.1.5 post-backport synthesis and future Factorio 2.1 development
+    purpose: canonical MIR 3.1.9 final-patch synthesis and future Factorio 2.1 development
     factorio_version: "2.1"
     accepts:
       - architecture
@@ -27,7 +27,7 @@ branches:
       - validation
 
   legacy:
-    purpose: frozen Factorio 2.0 2.3.x stable baseline
+    purpose: frozen Factorio 2.0 line at released MIR 2.4.0
     factorio_version: "2.0"
     accepts:
       - safety-fix
@@ -244,10 +244,9 @@ release_artifacts:
     mir_3_1_5:
       version: "3.1.5"
       branch: main
-      development_branch: dev
       target_factorio: "2.1"
       source_anchor: mir_3_1_2
-      source_commit: 3cd6a95a6e22ce2d4cdbc231ad79d8110ad75e2f
+      source_commit: c8bf4a742910cec9d6d3dee305c83deba1aa49eb
       artifact: dist/more-infinite-research_3.1.5.zip
       sha256: 8861E25FAAC472EDE9F32FE1C051A623A59177F5E092A3B1DC0B9FF2B3D47C50
       size_bytes: 399761
@@ -260,9 +259,24 @@ release_artifacts:
       ecosystem_loads: 9/9
       structured_summary_path: .mir/evidence/3.1.5-rc5-validation-summary.json
       structured_summary_run_id: 9d8a4f7b-e0bc-4245-8dcc-2c6338709aaa
-      release_gate: automated-passed-manual-pending
+      release_gate: published
+      publication_status: published
+      tag: "3.1.5"
+      status: published-frozen
+    mir_3_1_9:
+      version: "3.1.9"
+      branch: dev
+      synthesis_branch: tmp/3.1.9-synthesis
+      target_factorio: "2.1"
+      source_anchor: mir_3_1_5
+      source_commit: pending-final-qualification
+      artifact: dist/more-infinite-research_3.1.9.zip
+      native_owner_binding_schema: 2
+      assurance_evidence_schema: 2
+      scenario_count: 102
+      release_gate: qualifying
       publication_status: unreleased
-      status: release-candidate-awaiting-manual-review
+      status: qualifying
     mir_2_5_0:
       version: "2.5.0"
       branch: tmp/2.0
@@ -281,16 +295,18 @@ release_artifacts:
       status: candidate-qualified
     mir_2_4_0:
       version: "2.4.0"
-      branch: tmp/2.0
+      branch: legacy
       target_factorio: "2.0"
-      source_anchor: mir_3_1_2
-      source_commit: pending-accepted-3.1.2
-      previous_candidate_commit: 575fc4f5ae4a52205d1e72604934ead35e69c99e
-      previous_candidate_artifact: dist/more-infinite-research_2.4.0.zip
-      previous_candidate_sha256: 8618CAF031EF24EB83641DB03566F2390DD29AD98D2099A80D596EEB527EDA12
-      previous_candidate_status: superseded-unreleased-candidate
-      publication_status: unreleased
-      status: blocked-on-accepted-3.1.2
+      package_source_commit: 01efb39a7476cc5e5f7e173edbb244e70f7a8e96
+      seal_source_commit: f6a5dfeb4dea18ee70bbaa17acbd4433f1396e6e
+      promotion_commit: 584b398f98d3e317fac31cba63edcb11360a5bb1
+      artifact: dist/more-infinite-research_2.4.0.zip
+      sha256: 4BA19EA071E6359BC25C58CCD8F65CAF81B4AA675496E2F53175A996C791470C
+      package_content_sha256: F681FF5C331FC45EAFF31823BC9D9441A100C75FD5D412DE1C37DC828DE00775
+      release_gate: published
+      publication_status: published
+      tag: "2.4.0"
+      status: published-frozen
     mir_2_3_0:
       version: "2.3.0"
       branch: legacy
