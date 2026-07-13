@@ -20,19 +20,32 @@ Use the in-game setting descriptions for exact defaults. Use [settings reference
 
 Global settings are grouped with visible prefixes: Main, Compatibility, Limits, Advanced, and Diagnostics. Some prefixes are color-emphasized in-game for faster scanning, but the label text is still the structure.
 
-Automatic productivity support is a small set of independent controls for recipes discovered in installed mods. The dropdown chooses an action, not a strength or experimental level:
+Automatic mod recipe support uses three independent controls for productivity opportunities discovered in installed-mod recipes. The dropdown chooses an action, not a strength or experimental level:
 
 | Action | Behavior |
 | --- | --- |
 | Disabled | Performs no automatic discovery or changes. MIR's fixed research still works. |
 | Preview Changes | Classifies candidates and writes accepted and skipped decisions to the Factorio log without changing research. |
-| Apply Safe Changes (Recommended) | Attaches only safety-proven recipes to compatible existing MIR research. |
+| Apply Safe Changes | Attaches only safety-proven recipes to compatible existing MIR research. This is the default. |
 
-`Create research when needed` is a separate, default-off checkbox. It lets registered family modules create stable generic research when eligible recipes do not fit an existing MIR stream. It never creates one technology per mod or recipe. `Require reviewed compatibility data` applies only to that creation path: enabled requires an applicable exact-version compatibility record with named evidence; disabled allows registered built-in family modules to use generic structural evidence.
+`Allow new research creation` is a separate, default-off checkbox. Off means attachment-only: recipes without a compatible existing stream are skipped and reported. On lets registered providers create one stable generic research technology for an eligible family when no existing stream fits; it never creates one technology per mod or recipe.
+
+`Require reviewed data for new research` defaults on and matters only when creation is allowed. On requires an applicable exact-version compatibility record with named evidence. Off permits registered providers to create from generic structural evidence. It never blocks safe existing-stream attachment, and neither value can bypass hard safety gates.
 
 The settings do not encode current mod names, technology names, or a closed list of future families. New compiler family modules use the same action and creation contract. Every path still passes target, productivity-permission, ownership, recycling, probability, catalyst, science, lab, prerequisite, progression, identity, and technology-cycle gates. Unsafe or ambiguous candidates are skipped and diagnosed; no setting or compatibility pack can override a hard gate.
 
 The released `mir-automatic-compiler-mode` setting remains hidden as a migration bridge. A non-default legacy value is translated to the equivalent new policy while all three new controls remain at their defaults. As soon as any new control differs from its default, the new controls take precedence. This preserves old profiles without keeping the old five-way preset in the player-facing UI.
+
+For documentation and portable policy exchange, the three controls also have four named profiles. These are exact expansions, not another setting or a scale:
+
+| Profile | Action | Create research | Require reviewed data |
+| --- | --- | --- | --- |
+| Conservative | Preview Changes | Off | On |
+| Safe (default) | Apply Safe Changes | Off | On |
+| Expansive | Apply Safe Changes | On | Off |
+| Custom | Whatever explicit combination the three controls contain | Explicit | Explicit |
+
+The order describes increasing automatic action, not increasing safety or quality. Safe remains the default because it attaches eligible mod recipes to existing compatible research without authorizing new technologies. Expansive is intentionally opt-in; hard safety, ownership, science, graph, identity, and progression gates remain mandatory in every profile.
 
 Generated technology settings are ordered so default-off or experimental rows come first, enabled special rows come next, and ordinary enabled rows come last. Breeding, agricultural growth speed, cargo bay range/count, and character reach are enabled by default but remain in the special row group. Inserter capacity stays disabled by default because larger hand sizes can change circuit behavior and inserter performance assumptions.
 

@@ -236,14 +236,25 @@ local function build()
         if not eligible then decision = "diagnose" end
         table.insert(decisions, {
           schema = 2,
+          provider_id = rule.provider_id,
           rule = rule.id,
+          source_key = "recipe:" .. recipe_name,
+          prototype_type = "recipe",
+          prototype_name = recipe_name,
           capability = rule.capability,
+          candidate_family = rule.family,
           recipe = recipe_name,
           item = item_name,
           target_stream = rule.grouping.stream,
+          final_state = decision,
           decision = decision,
           blocker = blocker or rule.blocker,
           change = change,
+          policy_scope = "automatic-productivity",
+          identity_seed = rule.provider_id .. "\0" .. recipe_name .. "\0" .. item_name,
+          diagnostic_provenance = {provider = rule.provider_id, evidence = deepcopy(rule.required_evidence)},
+          target_support = deepcopy(rule.targets),
+          emission = {adapter = "generation-plan-family-rule", mutates_prototypes = false},
           candidate_source = candidate.source,
           compatibility_pack = candidate.pack or pack_decision.pack,
           evidence = candidate.evidence or pack_decision.evidence
@@ -259,7 +270,8 @@ local function build()
           table.insert(attachments[rule.grouping.stream], {
             recipe = recipe_name,
             change = change,
-            rule = rule.id
+            rule = rule.id,
+            provider_id = rule.provider_id
           })
         end
     end
@@ -281,6 +293,18 @@ end
 
 function M.attachments_for_stream(stream_key)
   return deepcopy(build().attachments[stream_key] or {})
+end
+
+function M.provider_ids_for_stream(stream_key)
+  local ids, seen = {}, {}
+  for _, attachment in ipairs(build().attachments[stream_key] or {}) do
+    if not seen[attachment.provider_id] then
+      seen[attachment.provider_id] = true
+      table.insert(ids, attachment.provider_id)
+    end
+  end
+  table.sort(ids)
+  return ids
 end
 
 function M.snapshot()
