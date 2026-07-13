@@ -154,6 +154,7 @@ candidate:
   upgrade_evidence_path: .mir/evidence/3.1.9/upgrade-from-3.1.5-proof.json
   ecosystem_evidence_path: .mir/evidence/3.1.9/ecosystem-campaign/campaign-evidence.json
   interactive_evidence_path: .mir/evidence/3.1.9/interactive-review.json
+  seal_path: .mir/evidence/candidate-seals/mir-3.1.9-factorio-2.1.json
   automated_gate: passed
   manual_gate: pending
   status: release-candidate-awaiting-manual-review

@@ -65,6 +65,8 @@
     "source_commit": "f65dacbbbfa9e5bac891de090c54a5bb36a9ef1f",
     "archive": "dist/more-infinite-research_3.1.9.zip",
     "archive_sha256": "DE99BC1B51810EE0262120B4B7A12F5F8BE913E083B07ED0B5DA0E23C760224B",
+    "seal_source_commit": "3100148a21df9db6a3a705eb365796b236660d4e",
+    "seal_commit": "9dd72af1d6831041b66a83232c768663a0ac99b5",
     "seal": ".mir/evidence/candidate-seals/mir-3.1.9-factorio-2.1.json"
   }
 }
