@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "status": "passed",
+  "factorio": "0.6",
+  "exact_patch": "0.6.4",
+  "binary": "D:\\Programs\\Factorio\\0.6\\bin\\x64\\Factorio.exe",
+  "binary_sha256": "8D2F7208503B88A578FE558184C87092830554FEC5AB66BCD57CBAE2F0E5A1FB",
+  "binary_architecture": "win64-x64",
+  "package_mode": "zip",
+  "package_path": "C:\\Projects\\Factorio\\more-infinite-research-museum-0.6\\build\\museum-runtime\\candidate-0.6\\more-infinite-research_0.6.0.zip",
+  "runtime_deployment_mode": "exact-zip-extracted",
+  "runtime_deployment_path": "C:\\Projects\\Factorio\\more-infinite-research-museum-0.6\\build\\museum-runtime\\candidate-0.6\\user\\mods\\more-infinite-research_0.6.0",
+  "one_technology": false,
+  "runtime_mode": "bounded-gui-startup-load",
+  "configuration_isolation": "transactional-config-path-restored",
+  "config_path_restored_sha256": "D2D9E9A4DF8E6BD19F31772EF903346B40F7C798D7E0800DC58FA923D5283F64",
+  "binary_version_proof_path": "C:\\Projects\\Factorio\\more-infinite-research-museum-0.6\\build\\museum-runtime\\candidate-0.6\\binary-version.txt",
+  "binary_version_proof_sha256": "132CB1B6DC52C8A787A31E49FE4FD8ABAF8AC299B6EBF4C985C719CB5A30B536",
+  "fresh_start": {
+    "status": "passed-bounded-crop-cache-load",
+    "duration_seconds": 6.281,
+    "command": [
+      "D:\\Programs\\Factorio\\0.6\\bin\\x64\\Factorio.exe"
+    ],
+    "terminated_after_proof": true,
+    "process_exit_code": -1,
+    "proof_kind": "regenerated-crop-cache-mod-marker",
+    "proof_path": "C:\\Projects\\Factorio\\more-infinite-research-museum-0.6\\build\\museum-runtime\\candidate-0.6\\fresh-start.crop-cache.dat",
+    "proof_sha256": "61CEE9AF442D07040841CC0BEB83784F91363D802FD732811D1CF6569C3BD704",
+    "mod_marker": "more-infinite-research",
+    "mod_marker_offset": 153619
+  },
+  "second_start": {
+    "status": "passed-bounded-crop-cache-load",
+    "duration_seconds": 5.241,
+    "command": [
+      "D:\\Programs\\Factorio\\0.6\\bin\\x64\\Factorio.exe"
+    ],
+    "terminated_after_proof": true,
+    "process_exit_code": -1,
+    "proof_kind": "regenerated-crop-cache-mod-marker",
+    "proof_path": "C:\\Projects\\Factorio\\more-infinite-research-museum-0.6\\build\\museum-runtime\\candidate-0.6\\second-start.crop-cache.dat",
+    "proof_sha256": "61CEE9AF442D07040841CC0BEB83784F91363D802FD732811D1CF6569C3BD704",
+    "mod_marker": "more-infinite-research",
+    "mod_marker_offset": 153619
+  },
+  "reload": "passed-bounded-second-startup",
+  "save_proof": "not_available_on_target_cli"
+}
