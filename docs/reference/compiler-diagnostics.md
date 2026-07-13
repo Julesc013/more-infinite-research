@@ -16,7 +16,7 @@ Automatic compiler decisions keep their durable machine-facing reason keys and a
 
 | Namespace | Meaning |
 | --- | --- |
-| `MIR-AUTO-001` through `MIR-AUTO-006` | Disabled, preview, creation, reviewed-data, and provider-authorization policy outcomes. |
+| `MIR-AUTO-001` through `MIR-AUTO-007` | Disabled, preview, creation, reviewed-data, creation-maturity, and provider-authorization policy outcomes. |
 | `MIR-PROVIDER-001` through `MIR-PROVIDER-004` | Provider discovery, rejection, attachment, and planned-generation lifecycle outcomes. |
 
 Codes are append-only identifiers. Wording may improve without changing automation. Provider records name every code they can emit, and the registry rejects duplicate code values. Reports should include the code, reason key, provider ID, source prototype identity, final state, and evidence where those fields apply.

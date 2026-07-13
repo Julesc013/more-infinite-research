@@ -2,13 +2,14 @@ schema: 1
 
 branches:
   main:
-    purpose: stable Factorio 2.1 line receiving the validated MIR 3.1.2 hotfix
+    purpose: stable Factorio 2.1 line receiving the validated MIR 3.1.5 release candidate
     factorio_version: "2.1"
     accepts:
       - release-hotfix
       - docs-correction
       - fixture-correction
       - unpublished-version-package-build
+      - validated-release-candidate-promotion
     rejects:
       - broad-new-generation
       - schema-breaking-report-changes
@@ -245,22 +246,12 @@ release_artifacts:
       branch: dev
       target_factorio: "2.1"
       source_anchor: mir_3_1_2
-      source_commit: 4c2bbc5daa4c36d268945e45714bd2db8e2517eb
+      source_commit: pending
       artifact: dist/more-infinite-research_3.1.5.zip
-      sha256: EB6FFA0DAAF5B0AB48058F08D3861970845A0FD36A1D093CF366F1ECB311DB8E
-      size_bytes: 399065
-      entries: 166
-      forbidden_entries: 0
-      automated_gate: passed
-      scenario_count: 91
-      exact_upgrade_from_3_0_5: passed
-      exact_upgrade_from_3_1_2: passed
-      ecosystem_loads: 9/9
-      structured_summary_path: .mir/evidence/3.1.5-rc3-validation-summary.json
-      structured_summary_run_id: c2b633a2-d26e-4dcb-84b7-057b2247addf
-      release_gate: automated-passed-manual-pending
+      automated_gate: pending
+      release_gate: rebuilding-after-package-visible-change
       publication_status: unreleased
-      status: release-candidate-awaiting-manual-review
+      status: rebuilding-after-package-visible-change
     mir_2_5_0:
       version: "2.5.0"
       branch: tmp/2.0

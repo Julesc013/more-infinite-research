@@ -14,6 +14,9 @@ Date: 2026-07-13
     - Added a sorted data-only CompilerProvider registry for extending recipe-family discovery and planning.
     - Added canonical setting descriptors and exact Conservative, Safe, Expansive, and Custom policy expansions.
     - Added stable automatic-compiler and provider diagnostic codes.
+    - Kept experimental assembler and lab family technologies out of reviewed-data creation.
+    - Preserved explicit broad opt-in testing for experimental automatic family technologies.
+    - Standardized automatic-recipe dropdown labels, tooltip structure, capitalization, and locale parity.
     - Preserved old automatic compiler profiles through a hidden legacy-policy bridge.
 
   Bugfixes:
@@ -53,7 +56,7 @@ Date: 2026-07-13
 
     - Added automatic structural coverage for loaders, belts, drills, inserters, furnaces, machines, labs, and modules.
     - Added structural coverage for solar generation and power storage equipment.
-    - Added conservative automatic modes ranging from reporting only through reviewed generic family generation.
+    - Added conservative automatic modes ranging from reporting only through opt-in generic family generation.
     - Preserved existing technology names, setting names, defaults, profiles, and saved-game state.
     - Added whole-plan safety checks before any generated technology or adopted effect is applied.
     - Prevented compatibility-pack data from overriding hard productivity, recycling, probability, catalyst, and owner safety facts.

@@ -19,9 +19,10 @@ This is the executable release queue. `.mir/release-wave.yml` is the machine-rea
 - [x] Add the data-only CompilerProvider schema, deterministic registry, stable diagnostics, and declarative setting descriptors.
 - [x] Keep action, research creation, and reviewed-data requirements as independent controls with explicit safe defaults.
 - [x] Remove the long recommendation suffix and make checkbox labels and tooltips state their exact consequences.
-- [x] Pass the complete 91-scenario Factorio 2.1 matrix and deterministic exact-package gates.
-- [x] Pass exact 3.0.5 and 3.1.2 upgrades to the final 3.1.5 archive.
-- [x] Pass all nine available exact-archive ecosystem loads with zero dependency failures and timeouts.
+- [x] Keep assembler and lab family technologies experimental and outside the reviewed-data creation lane while retaining explicit broad opt-in testing.
+- [ ] Requalify the complete 91-scenario Factorio 2.1 matrix and deterministic exact-package gates after the final UI and maturity change.
+- [ ] Re-run exact 3.0.5 and 3.1.2 upgrades against the final 3.1.5 archive.
+- [ ] Re-run all nine available exact-archive ecosystem loads against the final archive.
 - [ ] Complete the identity-bound interactive settings, technology-tree, save-load, locale, icon, and balance review.
 - [ ] Tag and publish only in the explicitly separate human-authorized release step.
 - [ ] Start the 2.4.0 backport only after the requested release pause.

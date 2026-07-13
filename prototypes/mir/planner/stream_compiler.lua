@@ -221,7 +221,10 @@ end
 local function plan_stream(key, raw_spec)
   if raw_spec.automatic_family then
     local authorization = compatibility_packs.authorizes_family_stream(key)
-    local allowed, reason = automatic_compiler_policy.generation_decision(authorization)
+    local maturity = type(raw_spec.automatic_family) == "table"
+      and raw_spec.automatic_family.creation_maturity
+      or "reviewed"
+    local allowed, reason = automatic_compiler_policy.generation_decision(authorization, maturity)
     if not allowed then
       return skip_row(key, raw_spec, reason, nil, nil, nil, nil, {
         target_supported = {evidence = "automatic-compiler-policy:" .. reason, reason = reason}

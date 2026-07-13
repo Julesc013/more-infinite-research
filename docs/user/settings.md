@@ -20,17 +20,17 @@ Use the in-game setting descriptions for exact defaults. Use [settings reference
 
 Global settings are grouped with visible prefixes: Main, Compatibility, Limits, Advanced, and Diagnostics. Some prefixes are color-emphasized in-game for faster scanning, but the label text is still the structure.
 
-Automatic mod recipe support uses three independent controls for productivity opportunities discovered in installed-mod recipes. The dropdown chooses an action, not a strength or experimental level:
+Automatic recipe support uses three independent controls for productivity opportunities discovered in installed-mod recipes. The dropdown chooses an action, not a strength or experimental level:
 
 | Action | Behavior |
 | --- | --- |
 | Disabled | Performs no automatic discovery or changes. MIR's fixed research still works. |
-| Preview Changes | Classifies candidates and writes accepted and skipped decisions to the Factorio log without changing research. |
-| Apply Safe Changes | Attaches only safety-proven recipes to compatible existing MIR research. This is the default. |
+| Preview changes | Classifies candidates and writes accepted and skipped decisions to the Factorio log without changing research. |
+| Apply safe changes | Attaches only safety-proven recipes to compatible existing MIR research. This is the default. |
 
 `Allow new research creation` is a separate, default-off checkbox. Off means attachment-only: recipes without a compatible existing stream are skipped and reported. On lets registered providers create one stable generic research technology for an eligible family when no existing stream fits; it never creates one technology per mod or recipe.
 
-`Require reviewed data for new research` defaults on and matters only when creation is allowed. On requires an applicable exact-version compatibility record with named evidence. Off permits registered providers to create from generic structural evidence. It never blocks safe existing-stream attachment, and neither value can bypass hard safety gates.
+`Require reviewed data for new research` defaults on and matters only when creation is allowed. On restricts creation to provider families that are both marked reviewed and backed by an applicable exact-version compatibility record with named evidence. Experimental families are skipped. Off opens registered experimental providers using generic structural evidence. It never blocks safe existing-stream attachment, and neither value can bypass hard safety gates.
 
 The settings do not encode current mod names, technology names, or a closed list of future families. New compiler family modules use the same action and creation contract. Every path still passes target, productivity-permission, ownership, recycling, probability, catalyst, science, lab, prerequisite, progression, identity, and technology-cycle gates. Unsafe or ambiguous candidates are skipped and diagnosed; no setting or compatibility pack can override a hard gate.
 
@@ -40,9 +40,9 @@ For documentation and portable policy exchange, the three controls also have fou
 
 | Profile | Action | Create research | Require reviewed data |
 | --- | --- | --- | --- |
-| Conservative | Preview Changes | Off | On |
-| Safe (default) | Apply Safe Changes | Off | On |
-| Expansive | Apply Safe Changes | On | Off |
+| Conservative | Preview changes | Off | On |
+| Safe (default) | Apply safe changes | Off | On |
+| Expansive | Apply safe changes | On | Off |
 | Custom | Whatever explicit combination the three controls contain | Explicit | Explicit |
 
 The order describes increasing automatic action, not increasing safety or quality. Safe remains the default because it attaches eligible mod recipes to existing compatible research without authorizing new technologies. Expansive is intentionally opt-in; hard safety, ownership, science, graph, identity, and progression gates remain mandatory in every profile.

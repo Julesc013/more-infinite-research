@@ -26,7 +26,7 @@ if ($automatic.schema -ne 1 -or $automatic.release -ne "3.1.0") {
 $automaticIds = @($automatic.technology_ids | ForEach-Object { [string]$_ } | Sort-Object)
 $combined = @($expected + $automaticIds | Sort-Object -Unique)
 if ($actual.Count -ne $combined.Count -or ($actual -join "`n") -ne ($combined -join "`n")) {
-  throw "Generated technology identities differ from the immutable plus reviewed automatic-family golden plans."
+  throw "Generated technology identities differ from the immutable plus predeclared automatic-family golden plans."
 }
 
-Write-Host "[ok] MIR golden plans preserve 70 baseline and $($automaticIds.Count) reviewed 3.1 automatic-family identities."
+Write-Host "[ok] MIR golden plans preserve 70 baseline and $($automaticIds.Count) predeclared 3.1 automatic-family identities."

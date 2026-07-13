@@ -107,7 +107,8 @@ waves:
     source_commit: e91963cf5f20b7f8c785196840a6ebcae8e8dd66
     architecture_contract: docs/architecture/automatic-family-compiler.md
     stable_technology_id_count: 70
-    reviewed_generic_family_id_count: 2
+    reviewed_generic_family_id_count: 0
+    experimental_generic_family_id_count: 2
     family_rule_schema: 2
     compatibility_pack_schema: 2
     generation_plan_schema: 3
@@ -174,23 +175,23 @@ waves:
     version: "3.1.5"
     branch: dev
     source_anchor_required: qualified-3.1.2-plus-complete-portable-return
-    source_commit: 4c2bbc5daa4c36d268945e45714bd2db8e2517eb
-    package_source_commit: 4c2bbc5daa4c36d268945e45714bd2db8e2517eb
+    source_commit: pending
+    package_source_commit: pending
     automatic_compiler_control_schema: 2
     compiler_provider_schema: 1
-    runtime_scenario_count: 91
-    runtime_run_id: c2b633a2-d26e-4dcb-84b7-057b2247addf
-    runtime_package_sha256: EB6FFA0DAAF5B0AB48058F08D3861970845A0FD36A1D093CF366F1ECB311DB8E
-    structured_validation_evidence: .mir/evidence/3.1.5-rc3-validation-summary.json
-    upgrade_evidence: .mir/evidence/3.1.5-upgrade-from-3.1.2-automatic-compiler-proof.json
-    additional_upgrade_evidence: .mir/evidence/3.1.5-upgrade-from-3.0.5-proof.json
-    available_ecosystem_load_evidence: .mir/evidence/3.1.5-rc3-ecosystem/campaign-evidence.json
-    available_ecosystem_load_gate: 9-passed-zero-dependency-failures-load-claims-only
-    exact_package_gate: passed-base-space-age-deterministic-and-forbidden-entry-check
-    candidate_freshness_gate: passed
+    runtime_scenario_count: pending
+    runtime_run_id: pending
+    runtime_package_sha256: pending
+    structured_validation_evidence: pending
+    upgrade_evidence: pending
+    additional_upgrade_evidence: pending
+    available_ecosystem_load_evidence: pending
+    available_ecosystem_load_gate: pending
+    exact_package_gate: pending
+    candidate_freshness_gate: pending
     interactive_gate: pending
     publication_status: unreleased
-    status: release-candidate-awaiting-manual-review
+    status: rebuilding-after-package-visible-change
 
   mir_2_4_0:
     version: "2.4.0"

@@ -12,6 +12,7 @@
   ],
   "automatic_actions": ["disabled", "preview", "apply"],
   "automatic_generation_controls": ["create_research", "require_reviewed_data"],
+  "automatic_creation_maturities": ["experimental", "reviewed"],
   "automatic_policy_presets": ["conservative", "safe", "expansive", "custom"],
   "compiler_provider_fields": [
     "id", "source_kinds", "discovery", "positive_capabilities", "family", "normalization",

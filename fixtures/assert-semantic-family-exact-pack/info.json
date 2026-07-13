@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "title": "MIR Fixture - Assert Exact Pack Family Authorization",
   "author": "Julesc013",
-  "description": "Asserts exact-pack emits only the explicitly authorized family.",
+  "description": "Asserts reviewed-data mode does not promote experimental family technologies.",
   "factorio_version": "2.1",
   "dependencies": [
     "base >= 2.1.8",

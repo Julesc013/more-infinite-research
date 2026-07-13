@@ -50,7 +50,7 @@ Planning is side-effect free. Only modules under `prototypes/mir/emit/` may crea
 - Ambiguous, risky, loop-forming, hidden, or externally owned candidates remain proposal-only or diagnostic-only.
 - Compatibility packs contain selectors, policy, expected decisions, and claim metadata. They do not read `data.raw` or mutate prototypes. Hard safety facts are never data-overridable.
 - The schema-2 automatic compiler policy separates action (`disabled`, `preview`, or `apply`) from research creation and reviewed-data requirements. The policy names no mods, recipes, technologies, or Factorio versions.
-- When reviewed compatibility data is required, emission needs an active exact-version, fixture-backed generation authorization for that registered family.
+- Every generatable family declares a creation maturity. Reviewed mode accepts only reviewed families with active exact-version, fixture-backed authorization; experimental families remain available only through the explicit broad opt-in lane.
 - A reviewed candidate seed may add one exact recipe to an existing FamilyRule and stable stream; every hard gate still applies.
 - Fixture-only profiles belong to fixture data, not the production profile registry.
 

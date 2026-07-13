@@ -364,6 +364,7 @@ rules:
   - Historical branches provide behavior evidence and do not define a parallel core.
   - CompilerProvider schema 1 is the stable data-only family extension boundary in 3.1.5.
   - Providers may discover and normalize candidates but remain planning-only; emission owns generated prototype mutation.
+  - Automatic family creation maturity is declarative; reviewed creation cannot promote experimental providers.
   - Top-level MIR Lua module dependencies must remain acyclic.
 
 validation_tooling:

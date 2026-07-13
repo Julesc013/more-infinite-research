@@ -20,6 +20,7 @@ M.defaults = {
 }
 
 M.actions = {"disabled", "preview", "apply"}
+M.creation_maturities = {"experimental", "reviewed"}
 M.legacy_modes = {"off", "report", "safe-attach", "exact-pack", "safe-generate"}
 M.preset_names = {"conservative", "safe", "expansive", "custom"}
 
@@ -110,7 +111,7 @@ function M.descriptors(orders)
     {
       schema = 1, id = M.setting_names.create_research, category = "automatic-productivity",
       consequence = "Allows registered family providers to plan stable generic research when no existing MIR stream fits.",
-      compatibility_consequence = "Off attaches to existing research only; on still requires every generation gate.",
+      compatibility_consequence = "Off attaches to existing research only; on still requires maturity policy and every generation gate.",
       default_rationale = "Keep new technology creation off until the player or modpack author explicitly enables it.",
       presets = {conservative = false, safe = false, expansive = true},
       migration = {from = M.setting_names.legacy_mode, strategy = "legacy-policy-expansion"},
@@ -125,9 +126,9 @@ function M.descriptors(orders)
     },
     {
       schema = 1, id = M.setting_names.require_reviewed_data, category = "automatic-productivity",
-      consequence = "Requires named reviewed compatibility evidence before a provider may create research.",
-      compatibility_consequence = "Affects creation only; safe existing-stream attachment remains available.",
-      default_rationale = "If creation is enabled, require reviewed exact-version evidence unless explicitly relaxed.",
+      consequence = "Restricts creation to reviewed provider families with named exact-version compatibility evidence.",
+      compatibility_consequence = "Affects creation only; experimental providers are skipped while safe existing-stream attachment remains available.",
+      default_rationale = "If creation is enabled, keep experimental provider generation behind an explicit opt-in.",
       presets = {conservative = true, safe = true, expansive = false},
       migration = {from = M.setting_names.legacy_mode, strategy = "legacy-policy-expansion"},
       tests = {"compiler-contracts", "semantic-family-modes", "settings-profile-roundtrip"},
@@ -195,8 +196,12 @@ function M.resolve(values)
   return policy
 end
 
-function M.generation_decision(policy, reviewed_authorization)
+function M.generation_decision(policy, reviewed_authorization, creation_maturity)
   policy = policy or M.resolve()
+  creation_maturity = creation_maturity or "reviewed"
+  if not contains(M.creation_maturities, creation_maturity) then
+    error("Unknown automatic family creation maturity: " .. tostring(creation_maturity), 2)
+  end
   if policy.action == "disabled" then
     return false, "automatic_productivity_disabled", diagnostic_codes.get("automatic_productivity_disabled")
   end
@@ -205,6 +210,9 @@ function M.generation_decision(policy, reviewed_authorization)
   end
   if not policy.create_research then
     return false, "automatic_research_creation_disabled", diagnostic_codes.get("automatic_research_creation_disabled")
+  end
+  if policy.require_reviewed_data and creation_maturity ~= "reviewed" then
+    return false, "automatic_family_not_reviewed", diagnostic_codes.get("automatic_family_not_reviewed")
   end
   if policy.require_reviewed_data and not reviewed_authorization then
     return false, "reviewed_compatibility_data_required", diagnostic_codes.get("reviewed_compatibility_data_required")

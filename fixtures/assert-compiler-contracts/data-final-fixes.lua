@@ -116,11 +116,21 @@ local denied, denied_reason = automatic_compiler_contract.generation_decision(
 if denied or denied_reason ~= "reviewed_compatibility_data_required" then
   fail("reviewed-data generation gate did not fail closed")
 end
+local experimental, experimental_reason, experimental_code = automatic_compiler_contract.generation_decision(
+  automatic_compiler_contract.resolve({create_research = true}), true, "experimental")
+if experimental or experimental_reason ~= "automatic_family_not_reviewed"
+  or experimental_code ~= diagnostic_codes.get("automatic_family_not_reviewed") then
+  fail("experimental family was accepted by the reviewed-data creation lane")
+end
+expect_error("unknown automatic family creation maturity", "Unknown automatic family creation maturity", function()
+  automatic_compiler_contract.generation_decision(
+    automatic_compiler_contract.resolve({create_research = true, require_reviewed_data = false}), false, "unknown")
+end)
 local approved = automatic_compiler_contract.generation_decision(
-  automatic_compiler_contract.resolve({create_research = true}), true)
+  automatic_compiler_contract.resolve({create_research = true}), true, "reviewed")
 if not approved then fail("reviewed-data generation gate rejected named authorization") end
 local generic = automatic_compiler_contract.generation_decision(
-  automatic_compiler_contract.resolve({create_research = true, require_reviewed_data = false}), false)
+  automatic_compiler_contract.resolve({create_research = true, require_reviewed_data = false}), false, "experimental")
 if not generic then fail("registered family module generation was not independently configurable") end
 
 for _, preset_name in ipairs(automatic_compiler_contract.preset_names) do
@@ -157,7 +167,7 @@ local _, _, denied_code = automatic_compiler_contract.generation_decision(
 if denied_code ~= diagnostic_codes.get("reviewed_compatibility_data_required") then
   fail("automatic generation decision omitted its stable diagnostic code")
 end
-if #diagnostic_codes.all() ~= 10 then fail("automatic/provider diagnostic registry is incomplete") end
+if #diagnostic_codes.all() ~= 11 then fail("automatic/provider diagnostic registry is incomplete") end
 
 local providers = provider_registry.snapshot()
 if #providers.providers ~= 9 then fail("built-in CompilerProvider count changed unexpectedly") end

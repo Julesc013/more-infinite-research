@@ -44,10 +44,10 @@ Automatic productivity support is governed by `prototypes/mir/settings/automatic
 | Setting ID | Type | Default | Contract |
 | --- | --- | --- | --- |
 | `mir-automatic-productivity-action` | string | `apply` | `disabled`, `preview`, or `apply`; ordered by whether changes are made, not by strength or maturity |
-| `mir-automatic-create-research` | boolean | `false` | Allows registered manifest-owned family modules to create stable generic research |
-| `mir-automatic-require-reviewed-data` | boolean | `true` | When creation is enabled, also requires applicable exact-version evidence-backed family authorization |
+| `mir-automatic-create-research` | boolean | `false` | Allows eligible manifest-owned family providers to create stable generic research |
+| `mir-automatic-require-reviewed-data` | boolean | `true` | Restricts creation to reviewed families with applicable exact-version evidence-backed authorization |
 
-`apply` attaches only safety-proven family candidates to compatible existing streams. `preview` enables decision projection without attaching or creating. Creation remains independent of action and can materialize only predeclared family identities after every hard gate passes. Disabling the reviewed-data requirement authorizes registered generic family modules; it does not authorize arbitrary technology IDs or bypass target, ownership, productivity, recycling, stochastic-output, catalyst, science, lab, prerequisite, progression, identity, or cycle checks.
+`apply` attaches only safety-proven family candidates to compatible existing streams. `preview` enables decision projection without attaching or creating. Creation remains independent of action and can materialize only predeclared family identities after every hard gate passes. With the reviewed-data requirement on, experimental families are skipped even when a compatibility pack requests generation. Disabling the requirement opens the registered experimental lane; it does not authorize arbitrary technology IDs or bypass target, ownership, productivity, recycling, stochastic-output, catalyst, science, lab, prerequisite, progression, identity, or cycle checks.
 
 The released `mir-automatic-compiler-mode` setting remains registered and hidden with default `safe-attach` and values `off`, `report`, `safe-attach`, `exact-pack`, and `safe-generate`. If all new controls are still at their defaults, a non-default legacy value maps to its equivalent schema-2 policy. Any explicit non-default new control wins. The hidden setting remains profile-exportable and importable so older profiles are not silently discarded.
 

@@ -57,6 +57,8 @@ rules:
   automatic_compiler_named_policy_profiles_are_not_a_second_player_facing_dropdown: true
   automatic_compiler_safe_profile_is_the_default: true
   automatic_compiler_defaults_have_declared_safety_rationales: true
+  automatic_compiler_reviewed_creation_rejects_experimental_families: true
+  automatic_compiler_experimental_creation_requires_explicit_review_relaxation: true
 
 profiles:
   schema: 1

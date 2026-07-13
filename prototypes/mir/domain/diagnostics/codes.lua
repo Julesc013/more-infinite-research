@@ -9,6 +9,7 @@ M.codes = {
   reviewed_compatibility_data_required = "MIR-AUTO-004",
   reviewed_compatibility_data_authorized = "MIR-AUTO-005",
   registered_family_module_authorized = "MIR-AUTO-006",
+  automatic_family_not_reviewed = "MIR-AUTO-007",
   provider_candidate_discovered = "MIR-PROVIDER-001",
   provider_candidate_rejected = "MIR-PROVIDER-002",
   provider_candidate_attached = "MIR-PROVIDER-003",
