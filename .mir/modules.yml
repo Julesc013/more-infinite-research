@@ -1,5 +1,20 @@
 schema: 1
 
+museum_target_override:
+  factorio: "0.11"
+  mir_version: "0.11.0"
+  root_files:
+    - config.lua
+    - data.lua
+    - info.json
+  emitted_by: scripts/Museum/MuseumCompiler.psm1
+  only_emitter_creates_technology_prototypes: true
+  release_package_files:
+    - config.lua
+    - data.lua
+    - info.json
+    - locale/en/more-infinite-research.cfg
+
 current_roots:
   factorio_shell:
     root_files:

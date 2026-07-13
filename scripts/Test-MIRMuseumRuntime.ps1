@@ -70,9 +70,113 @@ locale=en
 enable-steam-networking=false
 "@
 Set-MIRUtf8Text -Path $configPath -Text ($configText + "`n")
+$binary = ([string]$target.binary).Replace('/', '\')
+
+# Factorio 0.11 and earlier predate the --create/--start-server CLI used by the
+# 0.12 proof. Prove those releases through two bounded GUI startups instead:
+# the exact executable must discover the candidate ZIP, finish its data-stage
+# load without an error, and remain healthy at the main menu until the harness
+# terminates it. Old releases also require an explicit mod-list.json.
+if ($FactorioVersion -ne "0.12") {
+  $modList = [ordered]@{
+    mods = @(
+      [ordered]@{ name = "base"; enabled = "true" },
+      [ordered]@{ name = [string]$catalog.mod_name; enabled = "true" }
+    )
+  }
+  Set-MIRUtf8Text -Path (Join-Path $modsDir "mod-list.json") -Text (($modList | ConvertTo-Json -Depth 5) + "`n")
+
+  function Invoke-MIRLegacyStartup {
+    param([Parameter(Mandatory)][string]$Name)
+    $currentLog = Join-Path $userDir "factorio-current.log"
+    Remove-Item -LiteralPath $currentLog -Force -ErrorAction SilentlyContinue
+    $started = Get-Date
+    $processInfo = [Diagnostics.ProcessStartInfo]::new()
+    $processInfo.FileName = $binary
+    $processInfo.UseShellExecute = $false
+    $processInfo.CreateNoWindow = $true
+    $processInfo.WindowStyle = [Diagnostics.ProcessWindowStyle]::Hidden
+    [void]$processInfo.ArgumentList.Add("--config")
+    [void]$processInfo.ArgumentList.Add($configPath)
+    $process = [Diagnostics.Process]::Start($processInfo)
+    $deadline = (Get-Date).AddSeconds($TimeoutSeconds)
+    $loadedAt = $null
+    $lastObservedWrite = $null
+    $quietSince = $null
+    $logText = ""
+    while ((Get-Date) -lt $deadline) {
+      Start-Sleep -Milliseconds 200
+      if (Test-Path -LiteralPath $currentLog -PathType Leaf) {
+        $item = Get-Item -LiteralPath $currentLog
+        if ($lastObservedWrite -ne $item.LastWriteTimeUtc) {
+          $lastObservedWrite = $item.LastWriteTimeUtc
+          $quietSince = Get-Date
+          $logText = Get-Content -Raw -LiteralPath $currentLog
+        }
+        if (-not $loadedAt -and $logText -match [regex]::Escape("Loading mod $($catalog.mod_name) $($target.version) (data.lua)")) {
+          $loadedAt = Get-Date
+        }
+        if ($logText -match '(?im)(^|\s)(Error|Failed to load mods|Failed to load mod|Invalid Mod|Couldn.t load|stack traceback)') {
+          if (-not $process.HasExited) { try { $process.Kill($true) } catch { $process.Kill() } }
+          throw "Factorio $FactorioVersion $Name log contains a load failure. Log: $currentLog"
+        }
+        if ($loadedAt -and $quietSince -and ((Get-Date) - $quietSince).TotalSeconds -ge 2 -and -not $process.HasExited) { break }
+      }
+      if ($process.HasExited) {
+        throw "Factorio $FactorioVersion $Name exited before reaching a proven loaded startup state (exit $($process.ExitCode)). Log: $currentLog"
+      }
+    }
+    if (-not $loadedAt -or $process.HasExited) {
+      if (-not $process.HasExited) { try { $process.Kill($true) } catch { $process.Kill() } }
+      throw "Factorio $FactorioVersion $Name did not reach a proven loaded startup state within $TimeoutSeconds seconds. Log: $currentLog"
+    }
+    $logText = Get-Content -Raw -LiteralPath $currentLog
+    if ($logText -notmatch [regex]::Escape("Factorio $($target.exact_patch)")) {
+      try { $process.Kill($true) } catch { $process.Kill() }
+      throw "Runtime log does not prove exact Factorio patch $($target.exact_patch). Log: $currentLog"
+    }
+    try { $process.Kill($true) } catch { $process.Kill() }
+    [void]$process.WaitForExit(10000)
+    $proofLog = Join-Path $EvidenceRoot "$Name.log"
+    Copy-Item -LiteralPath $currentLog -Destination $proofLog -Force
+    return [pscustomobject][ordered]@{
+      status = "passed-bounded-startup-load"
+      duration_seconds = [math]::Round(((Get-Date) - $started).TotalSeconds, 3)
+      command = @($binary, "--config", $configPath)
+      terminated_after_proof = $true
+      process_exit_code = $process.ExitCode
+      log_path = (Resolve-Path -LiteralPath $proofLog).Path
+      log_sha256 = Get-MIRSha256 $proofLog
+    }
+  }
+
+  $first = Invoke-MIRLegacyStartup -Name "fresh-start"
+  $second = if ($Reload) { Invoke-MIRLegacyStartup -Name "second-start" } else { $null }
+  $record = [ordered]@{
+    schema = 1
+    status = "passed"
+    factorio = $FactorioVersion
+    exact_patch = [string]$target.exact_patch
+    binary = (Resolve-Path -LiteralPath $binary).Path
+    binary_sha256 = Get-MIRSha256 $binary
+    binary_architecture = "win64-x64"
+    package_mode = $PackageMode
+    package_path = if ($PackageMode -eq "zip") { (Resolve-Path -LiteralPath (Join-Path $modsDir "$packageName.zip")).Path } else { (Resolve-Path -LiteralPath (Join-Path $modsDir $packageName)).Path }
+    one_technology = [bool]$OneTechnology
+    runtime_mode = "bounded-gui-startup-load"
+    fresh_start = $first
+    second_start = $second
+    reload = if ($second) { "passed-bounded-second-startup" } else { "not_run" }
+    save_proof = "not_available_on_target_cli"
+  }
+  $recordPath = Join-Path $EvidenceRoot "runtime-proof.json"
+  Set-MIRUtf8Text -Path $recordPath -Text (($record | ConvertTo-Json -Depth 10) + "`n")
+  $record | ConvertTo-Json -Depth 10
+  return
+}
+
 $saveName = "fresh-create"
 $savePath = Join-Path $userDir "saves\$saveName.zip"
-$binary = ([string]$target.binary).Replace('/', '\')
 $arguments = @("--config", $configPath, "--create", $saveName)
 $started = Get-Date
 $processInfo = [Diagnostics.ProcessStartInfo]::new()

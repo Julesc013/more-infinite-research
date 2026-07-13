@@ -1,0 +1,11 @@
+   0.001 2026-07-14 07:16:59; Factorio 0.11.22 (Build 14011, win64)
+   0.001 Operating system: Windows 8 
+   0.001 Read data path: D:/Programs/Factorio/0.11/data
+   0.001 Write data path: C:/Projects/Factorio/more-infinite-research-museum-0.11/build/museum-runtime/candidate-0.11/user
+   0.001 Binaries path: D:/Programs/Factorio/0.11/bin
+   0.342 Initialised video: NVIDIA GeForce GTX 1070 with Max-Q Design
+   0.459 Graphics options: [FullScreen: false] [VSync: true] [UIScale: 125%] [MultiSampling: OFF] [Graphics quality: normal] [Video memory usage: all]
+   0.562 Loading mod core 0.0.0 (data.lua)
+   0.576 Loading mod base 0.11.22 (data.lua)
+   0.792 Loading mod more-infinite-research 0.11.0 (data.lua)
+   0.978 Loading mod base 0.11.22 (data-updates.lua)
