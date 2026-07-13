@@ -299,7 +299,7 @@ release_artifacts:
       superseded_pre_native_owner_candidate_commit: a853f88fd2fae19b45a16553e3273a2015283452
       superseded_pre_native_owner_package_source_commit: 5963445b1b72efffc18b232f5367a7da640061e8
       superseded_pre_native_owner_sha256: 5E1D16CEA5C8F43E8C257B73A3A5A728CE6DFB9ADA18B0CACDDB49DE3C5226E1
-      superseded_pre_native_owner_seal: .mir/evidence/candidate-seals/mir-2.4.0-factorio-2.0.json
+      superseded_pre_native_owner_seal: .mir/evidence/candidate-seals/mir-2.4.0-factorio-2.0-pre-native-owner.json
       superseded_pre_native_owner_evidence: .mir/evidence/2.4.0-pre-native-owner-supersession.md
       superseded_pre_native_owner_status: superseded-unreleased-by-settings-defect
       previous_candidate_commit: 575fc4f5ae4a52205d1e72604934ead35e69c99e
