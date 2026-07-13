@@ -9,6 +9,7 @@ Date: 2026-07-12
     - Rejected disabled, cyclic, self-locked, and unrecognized science paths when selecting generated prerequisites.
     - Restricted weapon-speed cleanup to technologies registered as MIR-generated.
     - Preserved external infinite weapon-speed continuations and the target-era tanks prerequisite.
+    - Omitted recipe-productivity settings that Factorio 1.0 cannot apply, instead of exposing inert controls.
 
   Changes:
 

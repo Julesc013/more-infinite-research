@@ -1,0 +1,38 @@
+{
+  "schema": 1,
+  "branch": "tmp/1.0",
+  "release": "1.8.2",
+  "factorio": {
+    "line": "1.0",
+    "qualified_version": "1.0.0",
+    "binary_sha256": "99F1CE207A04296EF7D797E4A98AA98DDE4F02EE653C9DF736AC33A676FD4F70",
+    "baseline_runtime_scenarios": 10
+  },
+  "prior_release": {
+    "version": "1.8.1",
+    "archive": "dist/more-infinite-research_1.8.1.zip",
+    "sha256": "B1622AB0BC6D72265842D698781DBE21B7286662E29FB6992057FBCFF87D8E29"
+  },
+  "classification": {
+    "native": [
+      "supported direct-effect streams",
+      "stable stream and setting identifiers",
+      "existing migrations"
+    ],
+    "adapted": [
+      "iterative prerequisite graph traversal",
+      "target-filtered settings and stream emission",
+      "legacy technology icon overlays",
+      "deterministic packaging and exact-candidate qualification"
+    ],
+    "generated_fallback": [],
+    "finite_reconstruction": [],
+    "omitted_by_capability": [
+      "all change-recipe-productivity streams and settings",
+      "2.x native recipe-productivity owner adoption and repair",
+      "Space Age, quality, elevated-rails, recycler, scripted and cargo-only capabilities"
+    ]
+  },
+  "settings_policy": "Do not expose settings whose effect type cannot exist on this target.",
+  "release_actions": "maintainer-only"
+}

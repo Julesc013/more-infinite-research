@@ -5,7 +5,7 @@ applies_to: "1.8.2"
 audience: player
 doc_type: release-plan
 owner: mir-maintainers
-last_reviewed: 2026-07-13
+last_reviewed: 2026-07-14
 supersedes: []
 superseded_by: []
 ---
@@ -19,5 +19,6 @@ MIR 1.8.2 is a maintenance candidate for Factorio 1.0. It preserves the intentio
 - Generated technology prerequisites avoid disabled, cyclic, self-locked, or unrecognized science paths.
 - Weapon-speed overlap cleanup is restricted to MIR-generated continuations, preserving external infinite technologies.
 - Target-era science packs and the `tanks` technology remain authoritative.
+- Settings for recipe-productivity effects that Factorio 1.0 cannot represent are no longer displayed as inert controls.
 
 This RC does not add features from newer Factorio engines.
