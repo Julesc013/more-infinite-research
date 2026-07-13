@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "branch": "tmp/0.16",
+  "release": "1.6.0",
+  "factorio": {
+    "line": "0.16",
+    "qualified_version": "0.16.51",
+    "binary_sha256": "ACBA4D8B766C8CB61CBB564E0D5041439DF32D93C86127DCC3887EB329630966",
+    "baseline_runtime_scenarios": 8
+  },
+  "prior_release": {
+    "status": "not-applicable-no-legitimate-prior-release"
+  },
+  "classification": {
+    "native": [
+      "supported direct-effect streams",
+      "stable stream and setting identifiers",
+      "existing migrations"
+    ],
+    "adapted": [
+      "iterative prerequisite graph traversal",
+      "target-filtered settings and stream emission",
+      "legacy technology icon overlays",
+      "deterministic packaging and exact-candidate qualification"
+    ],
+    "generated_fallback": [],
+    "finite_reconstruction": [],
+    "omitted_by_capability": [
+      "all change-recipe-productivity streams and settings",
+      "2.x native recipe-productivity owner adoption and repair",
+      "Space Age, quality, elevated-rails, recycler, scripted and cargo-only capabilities"
+    ]
+  },
+  "settings_policy": "Do not expose settings whose effect type cannot exist on this target.",
+  "release_actions": "maintainer-only"
+}

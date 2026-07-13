@@ -2,6 +2,7 @@ param(
   [string]$FactorioBin = $env:FACTORIO_BIN,
   [string]$FactorioLog = $env:FACTORIO_LOG,
   [string]$UserDataDir = $env:FACTORIO_USERDATA,
+  [string]$CandidateZip,
   [switch]$DocsOnly,
   [switch]$ManifestsOnly,
   [switch]$ArchitectureOnly,
@@ -1739,12 +1740,19 @@ Invoke-RepoCheck "generated package archive matches metadata" {
 
   $info = Get-Content -Raw (Join-Path $repo "info.json") | ConvertFrom-Json
   $packageName = "$($info.name)_$($info.version)"
-  $validationOutputDir = "build/validation-dist"
-  & (Join-Path $repo "scripts\Build-MIRPackage.ps1") -OutputDir $validationOutputDir -CompressionLevel "Fastest" | Out-Host
-
-  $zipPath = Join-Path $repo "$validationOutputDir\$packageName.zip"
-  if (-not (Test-Path -LiteralPath $zipPath)) {
-    throw "Validation package not found after build: $zipPath"
+  if ([string]::IsNullOrWhiteSpace($CandidateZip)) {
+    $validationOutputDir = "build/validation-dist"
+    & (Join-Path $repo "scripts\Build-MIRPackage.ps1") -OutputDir $validationOutputDir -CompressionLevel "Optimal" | Out-Host
+    $zipPath = Join-Path $repo "$validationOutputDir\$packageName.zip"
+    if (-not (Test-Path -LiteralPath $zipPath)) {
+      throw "Validation package not found after build: $zipPath"
+    }
+  } else {
+    $zipPath = [System.IO.Path]::GetFullPath($CandidateZip)
+    if (-not (Test-Path -LiteralPath $zipPath -PathType Leaf)) {
+      throw "Qualified candidate package not found: $zipPath"
+    }
+    Write-Host "[candidate] validating exact archive $zipPath"
   }
   $script:ValidationPackageZipPath = (Resolve-Path -LiteralPath $zipPath).Path
 

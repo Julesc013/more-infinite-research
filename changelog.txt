@@ -11,6 +11,7 @@ Date: 2026-07-13
 
     - Kept only target-supported direct effects and base technology continuations.
     - Kept Factorio 0.17+, 1.x, 2.x, and DLC-only behavior out of this package.
+    - Omitted recipe-productivity settings that Factorio 0.16 cannot apply, instead of exposing inert controls.
 
 ---------------------------------------------------------------------------------------------------
 Version: 1.7.1
