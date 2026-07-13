@@ -20,6 +20,7 @@ MIR 3.1.5 is the post-backport Factorio 2.1 development candidate. It keeps the 
 - Selected configuration-change scenarios execute their actual load phase.
 - Settings override fixtures target the selected Factorio version instead of assuming the current line.
 - Generated count formulas use compact parser-compatible syntax without changing their mathematical cost curves.
+- The mod-recipe productivity menu now uses conservative-to-broad preset ordering, outcome-based names, and clearer tooltips while preserving its setting ID, stored values, default, and compiler behavior.
 - The complete Factorio 2.0 through 0.13 candidate wave is recorded in governance and release documentation.
 
 No target-specific metadata, science-pack substitutions, finite-research emulation, or effect cuts were returned to the Factorio 2.1 implementation.

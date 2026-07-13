@@ -148,7 +148,7 @@ function M.global_setting_prototypes()
       name = "mir-automatic-compiler-mode",
       setting_type = "startup",
       default_value = "safe-attach",
-      allowed_values = {"off", "report", "safe-attach", "safe-generate", "exact-pack"},
+      allowed_values = {"off", "report", "safe-attach", "exact-pack", "safe-generate"},
       order = setting_order.global("main", 35),
       targets = {requires_features = {"recipe_productivity"}, required_effect_types = {}},
       localised_name = {"mod-setting-name.mir-automatic-compiler-mode"},

@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: developer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-07-12
+last_reviewed: 2026-07-13
 supersedes: [docs/reference/settings-reference.md]
 superseded_by: []
 ---
@@ -39,7 +39,7 @@ mir-settings-profile-import
 
 This setting accepts a portable MIR settings profile string. It is always registered and stays out of profile exports so importing one profile never nests another profile inside it.
 
-`mir-automatic-compiler-mode` is displayed as Automatic Research Coverage. It retains the stable stored values `off`, `report`, `safe-attach`, `safe-generate`, and `exact-pack`, presented as Disabled, Preview Only, Extend Existing Research, Add Reviewed Research, and Approved Packs Only. Its default remains `safe-attach`. Preview and disabled modes do not attach family candidates; preview enables the decision projection. Add Reviewed Research materializes only the two predeclared manifest-owned generic families. Approved Packs Only retains safe attachment and materializes only a family named by active reviewed exact-version pack authorization; an unrelated active pack enables nothing. The setting and every dropdown option have explicit locale descriptions.
+`mir-automatic-compiler-mode` is displayed as Mod Recipe Productivity Coverage. It retains the released setting ID, default `safe-attach`, and stable stored values `off`, `report`, `safe-attach`, `exact-pack`, and `safe-generate`. They are presented in that conservative-to-broad order as Disabled, Preview Only, Existing Research (Recommended), Existing + Approved Packs, and Existing + Assembler/Lab. This is an ordered list of mutually exclusive compiler policies, not a numeric strength or experimental-level scale. Preview and disabled modes make no research changes; preview enables decision projection. Existing Research attaches safety-proven family candidates without creating automatic-family technologies. Existing + Approved Packs retains safe attachment and materializes only a family named by active reviewed exact-version pack authorization; an unrelated active pack enables nothing. Existing + Assembler/Lab retains safe attachment and may materialize only the two predeclared manifest-owned generic families. The setting and every dropdown option have outcome-first locale descriptions.
 
 ## Visibility
 

@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: player
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-07-12
+last_reviewed: 2026-07-13
 supersedes: []
 superseded_by: []
 ---
@@ -20,7 +20,17 @@ Use the in-game setting descriptions for exact defaults. Use [settings reference
 
 Global settings are grouped with visible prefixes: Main, Compatibility, Limits, Advanced, and Diagnostics. Some prefixes are color-emphasized in-game for faster scanning, but the label text is still the structure.
 
-Automatic Research Coverage controls structural family handling. Its player-facing choices are Disabled, Preview Only, Extend Existing Research, Add Reviewed Research, and Approved Packs Only. Extend Existing Research is the recommended default and may attach structurally proven recipes to an existing stable MIR technology. Add Reviewed Research also enables the predeclared generic assembling-machine and lab technology families. Preview Only records decisions without attaching or generating, while Disabled turns family handling off. Approved Packs Only keeps the safe attachment baseline and generates only a family explicitly authorized by an active exact-version compatibility record. Every option has an in-game tooltip, the stored setting values remain stable for profiles and saves, fixed research streams are unaffected, and missing hard safety proof always blocks generation.
+Mod Recipe Productivity Coverage controls how MIR adds infinite productivity support for recipes from other mods. It is a set of complete presets, not a strength or experimental-level scale. The menu is ordered from no automatic changes to the broadest general coverage:
+
+| Choice | Automatic behavior |
+| --- | --- |
+| Disabled | Makes no automatic changes. MIR's fixed research still works. |
+| Preview Only | Analyzes candidates and records accepted and rejected decisions in the Factorio log without changing research. |
+| Existing Research (Recommended) | Adds safety-proven mod recipes to compatible existing MIR productivity technologies and creates no new automatic technology lines. |
+| Existing + Approved Packs | Also permits a new productivity technology when an active MIR compatibility pack matches the exact installed mod version and explicitly approves that family. |
+| Existing + Assembler/Lab | Also permits MIR's predeclared Assembling Machine Manufacturing and Lab Manufacturing productivity lines when every safety check passes. This is the broadest general preset. |
+
+The setting remains one dropdown because the choices are mutually exclusive compiler policies. Separate checkboxes would allow contradictory combinations such as previewing changes while also applying them. Stored setting values remain stable for profiles and saves, every choice has an outcome-first in-game tooltip, fixed research streams are unaffected, and missing hard safety proof always blocks a change.
 
 Generated technology settings are ordered so default-off or experimental rows come first, enabled special rows come next, and ordinary enabled rows come last. Breeding, agricultural growth speed, cargo bay range/count, and character reach are enabled by default but remain in the special row group. Inserter capacity stays disabled by default because larger hand sizes can change circuit behavior and inserter performance assumptions.
 
