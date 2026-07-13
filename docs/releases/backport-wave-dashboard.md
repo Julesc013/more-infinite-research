@@ -1,11 +1,11 @@
 ---
 title: "Backport Wave Dashboard"
 status: current
-applies_to: "3.0.5+"
+applies_to: "3.1.5+"
 audience: release-manager
 doc_type: release-plan
 owner: mir-maintainers
-last_reviewed: 2026-07-13
+last_reviewed: 2026-07-14
 supersedes: []
 superseded_by: []
 ---
@@ -16,26 +16,21 @@ superseded_by: []
 
 | Target | MIR version | Branch | Source | Archive SHA-256 | Binary state | Status | Blocker |
 | --- | ---: | --- | --- | --- | --- | --- | --- |
-| Factorio 2.1 | 3.1.0 | `main` | `0dd8d7f` package source / `6272cb6` release | `0244D40A...7C1A` | 82 scenarios, exact upgrade, performance budgets, and interactive review passed | GitHub published and frozen | Mod Portal upload API key |
-| Factorio 2.0 | 2.3.5 | `legacy` frozen baseline | `861565d` source / `9eabc54` promotion | `97B3DC9B...68DE` | 71 scenarios, targeted gate, exact-dist base/Space Age, and upgrade passed | Tagged and frozen | External upload credentials |
-| Factorio 2.0 | 2.4.0 | `tmp/2.0` | `b9172ab` source / `575fc4f` release | `8618CAF0...A12` | 78 scenarios, exact-dist base/Space Age, upgrade, performance, and interactive review passed | GitHub published and frozen | Mod Portal upload API key |
-| Factorio 2.0 | 2.5.0 RC | `tmp/2.0` | `f5c58f5` validated source | `0BE57ED4...CBFD` | 82/82 Factorio 2.0 scenarios, exact-dist, compiler contracts, upgrade paths, and compatibility packs passed | Candidate qualified | Interactive release review |
-| Factorio 1.1 | 1.9.4 | `tmp/1.1` | `4f3962f` qualified candidate | `431CD5B0...A46E` | Factorio 1.1.110 reduced full gate, exact dist, reload, and upgrade passed | Candidate qualified | Publication gate |
-| Factorio 1.0 | 1.8.2 staged | `tmp/1.0` | `aeb1483` staged candidate | `4ED750E5...0D3C` | Static package staging only; prior exact-save automation did not load MIR | Unqualified | Correct Factorio 1.0 runtime proof |
-| Factorio 0.18 | 1.8.0 | `tmp/0.18` | Published frozen evidence | `D785E6EB...7B24` | 0.18 and 1.0 bridge passed | Frozen verified | None |
-| Factorio 0.17 | 1.7.1 planned | `tmp/0.17` | Pending replay | Pending | Binary available | Refresh pending | Final portable patch set |
-| Factorio 0.16 | 1.6.0 planned | `tmp/0.16` | Pending proof | Pending | Binary available | Discovery | Old-science adapter proof |
-| Factorio 0.15 | 1.5.0 planned | `tmp/0.15` | Pending proof | Pending | Binary available | Discovery | Independent native-infinite proof |
-| Factorio 0.14 through 0.12 | Planned finite ladders | matching `tmp/*` | Pending | Pending | Unresolved | Discovery | Matching binary and schema proof |
-| Factorio 0.11 through 0.6 | Museum versions | matching `tmp/*` | Pending | Pending | Unresolved | Discovery | Binary and base-file acquisition |
+| Factorio 2.1 | 3.1.5 | `main` | `3cd6a95` package source / `c8bf4a7` release | `8861E25F...7C50` | 91 scenarios, two exact upgrades, and 9 named ecosystem loads passed | Published canonical anchor | None for this backport |
+| Factorio 2.0 | 2.3.5 | `legacy` baseline | `861565d` source / `9eabc54` promotion | `97B3DC9B...68DE` | 71 scenarios, targeted gate, exact-dist base/Space Age, and upgrade passed | Published predecessor | Exact 2.4 promotion pending |
+| Factorio 2.0 | 2.4.0 | `tmp/2.0`, then `legacy` | released 3.1.5 plus target-declared cuts | Pending qualification | Factorio 2.0.77 full matrix, exact upgrade, ecosystem checks, and seal pending | Rebuilding unreleased candidate | Automated qualification and maintainer interactive/tag/release gates |
+| Factorio 2.0 | 2.5.0 internal candidate | safety identity `4f7c9d1` | preserved ledger | `0BE57ED4...CBFD` | 82-scenario historical evidence | Superseded; archive removed from release branch | None; not a release target |
+| Factorio 1.1 | 1.9.4 | `tmp/1.1` | Existing qualified candidate | `431CD5B0...A46E` | Existing Factorio 1.1 proof retained | Paused and untouched | Wait for 2.4.0 tag and release |
+| Factorio 1.0 and older | Existing target branches | matching `tmp/*` | Existing records | Existing or pending | No work authorized in this gate | Paused | Wait for 2.4.0 tag and release |
 
 ## Immediate Gate
 
-MIR 3.1.0, 2.3.5, and 2.4.0 are immutable anchors. Continue the plan-first automatic family compiler on `dev` from the released 3.1.0 behavior baseline. Do not merge Factorio 2.0 metadata or feature cuts upward.
+Finish one exact MIR 2.4.0 Factorio 2.0 candidate from the released 3.1.5 source. Older 2.4 and 2.5 evidence cannot qualify changed package bytes. The internal 2.5 candidate remains identifiable by commit and digest only; release-facing identity and archive output are 2.4.0.
 
 ## Next Executable Sequence
 
-1. Preserve the qualified MIR 2.5.0 Factorio 2.0 archive and its exact validation evidence without changing published 2.4.0 bytes.
-2. Return portable compiler, validation, and fixture lessons to `dev` without importing Factorio 2.0 metadata.
-3. Finish independently qualified old-target candidates in descending target order.
-4. Close the portable-return fixed-point sweep on `dev` after the older-target wave.
+1. Complete static, runtime, upgrade, ecosystem, deterministic-package, freshness, and assurance-seal gates on `tmp/2.0`.
+2. Promote the exact qualified commit to `legacy` without rebuilding the archive.
+3. Verify the seal and archive again from `legacy`.
+4. Push only the non-release branches, then stop for maintainer interactive review, tag, and publication.
+5. Do not proceed to `tmp/1.1` or any older target in this run.

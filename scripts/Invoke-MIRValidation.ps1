@@ -496,6 +496,10 @@ Invoke-RepoCheck "compiler contract coverage and mutation sentinels are complete
   & (Join-Path $repo "scripts\Test-MIRCompilerContractCoverage.ps1") -RepoRoot $repo
 }
 
+Invoke-RepoCheck "assurance classifier and evidence invalidation contracts are complete" {
+  & (Join-Path $repo "scripts\Test-MIRAssurance.ps1") -RepoRoot $repo
+}
+
 Invoke-RepoCheck "compatibility dependency declarations preserve full mod names" {
   & (Join-Path $repo "scripts\Test-MIRDependencyResolver.ps1") -RepoRoot $repo
 }

@@ -4,9 +4,9 @@
   "title": "MIR Fixture - Assert Exact Pack Family Authorization",
   "author": "Julesc013",
   "description": "Asserts reviewed-data mode does not promote experimental family technologies.",
-  "factorio_version": "2.1",
+  "factorio_version": "2.0",
   "dependencies": [
-    "base >= 2.1.8",
+    "base >= 2.0",
     "more-infinite-research",
     "mir-fixture-semantic-family-attach"
   ]

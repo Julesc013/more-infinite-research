@@ -1,0 +1,26 @@
+name: Assurance Fast Validation
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  static:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Diagnose assurance environment
+        shell: pwsh
+        run: ./scripts/mir.ps1 assurance doctor --target 2.0 --json
+      - name: Validate planner and evidence invalidation
+        shell: pwsh
+        run: ./scripts/Test-MIRAssurance.ps1
+      - name: Run static gate
+        shell: pwsh
+        run: ./scripts/Invoke-MIRValidation.ps1 -StaticOnly

@@ -181,27 +181,15 @@ fixtures:
       - runtime-state-effect-retention
       - exact-3-1-0-candidate-normal-mod-directory-load
 
-  upgrade-2-4-0-to-2-5-0:
+  upgrade-2-3-5-to-2-4-0:
     requires_features: [scripted_techs]
-    assertion_path: fixtures/assert-upgrade-2-4-0-to-2-5-0
+    assertion_path: fixtures/assert-upgrade-2-3-5-to-2-4-0
     validates:
-      - exact-2-4-0-source-archive
+      - exact-2-3-5-source-archive
       - non-default-startup-setting-retention
       - scripted-technology-level-retention
       - runtime-state-effect-retention
-      - exact-2-5-0-candidate-normal-mod-directory-load
-
-  upgrade-3-1-2-to-3-1-5-automatic-compiler:
-    requires_features: [scripted_techs, recipe_productivity]
-    assertion_path: fixtures/assert-upgrade-3-1-2-to-3-1-5-automatic-compiler
-    validates:
-      - exact-3-1-2-source-archive
-      - hidden-legacy-safe-generate-setting-retention
-      - new-safe-control-defaults
-      - non-default-startup-setting-retention
-      - scripted-technology-level-retention
-      - runtime-state-effect-retention
-      - exact-3-1-5-automatic-compiler-candidate-normal-mod-directory-load
+      - exact-2-4-0-candidate-normal-mod-directory-load
 
   competing-productivity-transaction:
     requires_features: [recipe_productivity]
@@ -379,16 +367,6 @@ fixtures:
       - declarative-automatic-setting-descriptors
       - conservative-safe-expansive-custom-policy-expansion
       - stable-automatic-and-provider-diagnostic-codes
-
-  space-age-galore-effect-ownership:
-    requires_features: [recipe_productivity]
-    path: fixtures/space-age-galore-overlap
-    validates:
-      - vgal-coal-crushing-multi-output-shape
-      - carbon-and-sulfur-cross-stream-claim
-      - exactly-one-materialized-effect-owner
-      - stable-owner-selection
-      - no-settings-reset-required
 
   semantic-family-generate:
     requires_features: [recipe_productivity]

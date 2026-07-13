@@ -1,17 +1,18 @@
 ---
 title: "MIR 2.5.0 Release Notes"
-status: current
+status: archived
 applies_to: "2.5.0"
-audience: player
-doc_type: release-plan
+audience: maintainer
+doc_type: archive
 owner: mir-maintainers
 last_reviewed: 2026-07-13
 supersedes: []
-superseded_by: []
+superseded_by:
+  - docs/releases/notes/release-notes-2.4.0.md
 ---
 # MIR 2.5.0
 
-MIR 2.5.0 is the unpublished Factorio 2.0 semantic companion to the automatic compiler line. It preserves the published 2.4.0 IDs and save-facing contracts while carrying only target-supported behavior.
+MIR 2.5.0 was an unpublished internal Factorio 2.0 candidate. Its applicable fixes were folded into MIR 2.4.0; this page is retained only as superseded evidence.
 
 ## Compatibility hotfix
 

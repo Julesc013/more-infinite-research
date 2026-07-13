@@ -370,6 +370,8 @@ rules:
 validation_tooling:
   facade: scripts/Invoke-MIRValidation.ps1
   modules:
+    assurance: scripts/Invoke-MIRAssurance.ps1
+    assurance_tests: scripts/Test-MIRAssurance.ps1
     package_identity: scripts/validation/PackageIdentity.ps1
     target_metadata: scripts/validation/TargetProfiles.ps1
     scenario_groups: scripts/validation/ScenarioGroups.ps1
@@ -382,6 +384,9 @@ validation_tooling:
     planner_artifacts: scripts/Test-MIRPlannerTools.ps1
     compiler_schema_drift: scripts/Test-MIRCompilerSchemaDrift.ps1
   rules:
+    - assurance plans use stable test IDs and complete content-addressed evidence inputs
+    - unknown changes conservatively select the full relevant target gate
+    - candidate seals verify exact artifacts and never publish
     - the facade preserves its public parameters and structured result schema
     - process launch and copied-mod filesystem safety are reusable modules
     - settings overrides are declarative and isolated from scenario orchestration

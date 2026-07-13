@@ -118,25 +118,21 @@ waves:
   mir_2_4_0:
     version: "2.4.0"
     branch: tmp/2.0
-    source_anchor_required: accepted-3.1.0
-    source_commit: b9172ab1ab3fc75ba0c1dec79cc9f2c3ae6063c3
-    release_commit: 575fc4f5ae4a52205d1e72604934ead35e69c99e
-    tag: "2.4.0"
+    source_anchor_required: published-3.1.5
+    source_anchor_commit: c8bf4a742910cec9d6d3dee305c83deba1aa49eb
+    source_commit: pending-qualified-candidate
     archive: dist/more-infinite-research_2.4.0.zip
-    sha256: 8618CAF031EF24EB83641DB03566F2390DD29AD98D2099A80D596EEB527EDA12
-    size_bytes: 344995
-    scenario_count: 78
-    exact_dist_base: passed
-    exact_dist_space_age: passed
-    upgrade_from_2_3_5: passed
-    release_targeted_gate: passed
-    automated_gate: passed
-    interactive_gate: passed
-    published_at: 2026-07-12T01:02:42Z
-    github_release: https://github.com/Julesc013/more-infinite-research/releases/tag/2.4.0
-    publication_evidence: .mir/evidence/2.4.0-publication.md
-    mod_portal_upload: blocked-missing-mod-upload-api-key
-    status: published-frozen
+    previous_candidate_commit: 575fc4f5ae4a52205d1e72604934ead35e69c99e
+    previous_candidate_sha256: 8618CAF031EF24EB83641DB03566F2390DD29AD98D2099A80D596EEB527EDA12
+    previous_candidate_status: superseded-unreleased-candidate
+    superseded_2_5_candidate_commit: 4f7c9d18d5491e6e6fcafa5364f9b832cabac233
+    superseded_2_5_candidate_sha256: 0BE57ED4C51DDF08F80AB4CFB2D5762DF2714B17AB26DB58CA9980289350CBFD
+    superseded_2_5_candidate_evidence: .mir/evidence/2.5.0-supersession-ledger.md
+    automated_gate: pending
+    assurance_seal: pending
+    interactive_gate: pending-on-exact-final-archive
+    publication_status: unreleased
+    status: rebuilding-from-published-3.1.5
 
   mir_3_2_0:
     version: "3.2.0"
@@ -179,19 +175,19 @@ waves:
     bz_coverage_scan_count: 2
     status: integration-validated
 
-  mir_2_5_0:
+  mir_2_5_0_superseded_candidate:
     version: "2.5.0"
     branch: tmp/2.0
     target_factorio: "2.0"
     source_anchor_required: accepted-3.2.0-compiler-source
     source_anchor_commit: bae27f521070bd62a13ec54689818cd8394b3554
-    behavior_baseline: immutable-2.4.0
+    behavior_baseline: internal-unreleased-2.5-candidate
     architecture_contract: docs/architecture/automatic-family-compiler.md
     target_profile_schema: 2
     family_rule_schema: 2
     compatibility_pack_schema: 2
     candidate_source_commit: f5c58f5358291c9a65326388c60702dc9878b9d7
-    archive: dist/more-infinite-research_2.5.0.zip
+    archived_artifact_removed_from_release_branch: dist/more-infinite-research_2.5.0.zip
     sha256: 0BE57ED4C51DDF08F80AB4CFB2D5762DF2714B17AB26DB58CA9980289350CBFD
     validation_evidence: .mir/evidence/2.5.0-rc1-validation-summary.json
     validation_run_id: 5bbedb9b-cf3c-4f91-ae5a-f6bf274ad172
@@ -199,5 +195,7 @@ waves:
     exact_dist_gate: passed
     factorio_2_0_gate: passed
     validation_status: passed
-    interactive_gate: pending-release-review
-    status: release-candidate
+    interactive_gate: not-applicable-superseded
+    supersession_evidence: .mir/evidence/2.5.0-supersession-ledger.md
+    publication_status: never-published
+    status: superseded-unpublished-candidate

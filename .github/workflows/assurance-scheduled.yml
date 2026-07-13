@@ -1,0 +1,30 @@
+name: Assurance Scheduled Breadth
+
+on:
+  schedule:
+    - cron: "17 3 * * 2"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  factorio-2-0:
+    runs-on: [self-hosted, Windows]
+    environment: release-candidate
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Run breadth qualification without publishing
+        shell: pwsh
+        env:
+          FACTORIO_BIN: ${{ secrets.FACTORIO_BIN }}
+          MIR_PRIOR_RELEASE: ${{ secrets.MIR_PRIOR_RELEASE_2_3_5 }}
+        run: ./scripts/mir.ps1 assurance qualify --target 2.0 --profile full --factorio $env:FACTORIO_BIN --prior $env:MIR_PRIOR_RELEASE --output artifacts/assurance/scheduled-summary.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: assurance-scheduled-2.0-${{ github.sha }}
+          path: artifacts/assurance/**
+          if-no-files-found: error

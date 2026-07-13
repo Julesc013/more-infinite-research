@@ -1,11 +1,11 @@
 ---------------------------------------------------------------------------------------------------
-Version: 2.5.0
-Date: 2026-07-12
+Version: 2.4.0
+Date: 2026-07-14
 
   Changes:
 
-    - Ported the accepted 3.2.0 plan-first automatic compiler contracts to the maintained Factorio 2.0 line.
-    - Preserved published 2.4.0 technology IDs, setting IDs, runtime namespaces, and save-compatible behavior.
+    - Ported the released 3.1.5 automatic compiler contracts to the maintained Factorio 2.0 line.
+    - Preserved 2.3.5 technology IDs, setting IDs, runtime namespaces, and save-compatible behavior.
     - Added RecipeFactV2, shared relationship indexes, schema-2 family rules, compatibility packs, and coverage accounting.
     - Applied Factorio 2.0 target-declared stream, effect, setting, recipe-shape, and emitter cuts.
     - Retained whole-plan safety checks, deterministic results, and exact-owner protections from the modern source.
@@ -21,6 +21,7 @@ Date: 2026-07-12
     - Preserved explicit broad opt-in testing for experimental automatic family technologies.
     - Standardized automatic-recipe dropdown labels, tooltip structure, capitalization, and locale parity.
     - Preserved old automatic compiler profiles through a hidden legacy-policy bridge.
+    - Added content-addressed assurance plans, evidence capsules, exact candidate seals, and promotion-only verification.
 
   Bugfixes:
 

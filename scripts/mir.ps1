@@ -27,6 +27,7 @@ Usage:
   .\scripts\mir.ps1 audit local [--profile <name>]
   .\scripts\mir.ps1 audit top25 --space-age
   .\scripts\mir.ps1 package build
+  .\scripts\mir.ps1 assurance <doctor|inventory|impact|plan|build|verify|qualify|seal|check-seal|locale|balance|backport|explain>
   .\scripts\mir.ps1 report latest
   .\scripts\mir.ps1 report missing-deps --run <path>
   .\scripts\mir.ps1 report observations --run <path>
@@ -354,6 +355,10 @@ $area = $Args[0]
 $verb = if ($Args.Count -gt 1) { $Args[1] } else { "" }
 
 switch ($area) {
+  "assurance" {
+    $assuranceArgs = if ($Args.Count -gt 1) { @($Args[1..($Args.Count - 1)]) } else { @("help") }
+    & (Join-Path $scriptRoot "Invoke-MIRAssurance.ps1") @assuranceArgs
+  }
   "docs" {
     if ($verb -ne "check") { throw "Unknown docs command: $verb" }
     & (Join-Path $scriptRoot "Invoke-MIRValidation.ps1") -DocsOnly

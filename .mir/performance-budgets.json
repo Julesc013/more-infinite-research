@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "release": "2.5.0",
+  "release": "2.4.0",
   "factorio_line": "2.0",
   "budgets": [
     { "id": "base", "source": "validation_scenario", "key": "base-generation-integrity", "max_seconds": 8.0 },

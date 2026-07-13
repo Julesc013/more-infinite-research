@@ -146,6 +146,14 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - automatic-family-compiler
+  - path: docs/architecture/automatic-family-balance.md
+    title: "Automatic Family Balance And Scope"
+    status: current
+    audience: maintainer
+    doc_type: explanation
+    owner: mir-maintainers
+    source_of_truth_for:
+      - automatic-family-balance
   - path: docs/reference/schemas/generation-plan.md
     title: "GenerationPlan Schema"
     status: current
@@ -789,6 +797,16 @@ docs:
     doc_type: how-to
     owner: mir-maintainers
     source_of_truth_for: []
+  - path: docs/maintainer/release-assurance.md
+    title: "Release Assurance And Candidate Sealing"
+    status: current
+    audience: release-manager
+    doc_type: how-to
+    owner: mir-maintainers
+    source_of_truth_for:
+      - release-assurance
+      - candidate-sealing
+      - evidence-invalidation
   - path: docs/maintainer/documentation-governance.md
     title: "Documentation Governance"
     status: current
@@ -1391,14 +1409,13 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - post-3.1-automatic-compiler-result
-  - path: docs/releases/2.5.0-development-summary.md
-    title: "MIR 2.5.0 Automatic Compiler Development Summary"
-    status: current
-    audience: release-manager
-    doc_type: release-plan
+  - path: docs/archive/superseded/2.5.0-internal-candidate-development-summary.md
+    title: "MIR 2.5.0 Internal Candidate Development Summary"
+    status: archived
+    audience: maintainer
+    doc_type: archive
     owner: mir-maintainers
-    source_of_truth_for:
-      - mir-2.5.0-development
+    source_of_truth_for: []
   - path: docs/releases/3.1.0-checklist.md
     title: "MIR 3.1.0 Release Checklist"
     status: current
@@ -1471,14 +1488,13 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - mir-2.4.0-release-notes
-  - path: docs/releases/notes/release-notes-2.5.0.md
-    title: "MIR 2.5.0 Release Notes"
-    status: current
-    audience: player
-    doc_type: release-plan
+  - path: docs/archive/superseded/release-notes-2.5.0-internal-candidate.md
+    title: "MIR 2.5.0 Internal Candidate Notes"
+    status: archived
+    audience: maintainer
+    doc_type: archive
     owner: mir-maintainers
-    source_of_truth_for:
-      - mir-2.5.0-release-notes
+    source_of_truth_for: []
   - path: docs/adr/0015-canonical-stream-descriptors.md
     title: "ADR-0015: Canonical Stream Descriptors"
     status: current

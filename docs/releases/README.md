@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: release-manager
 doc_type: release-plan
 owner: mir-maintainers
-last_reviewed: 2026-07-12
+last_reviewed: 2026-07-14
 supersedes: []
 superseded_by: []
 ---
@@ -14,7 +14,7 @@ superseded_by: []
 
 Release docs are version-specific plans, migration guides, risk registers, checklists, and validation records.
 
-MIR 3.1.0 and 2.4.0 are published immutable behavior baselines. The 3.2.0 development summary and backport-wave dashboard govern the automatic compiler campaign. The 1.6.0 and 1.5.0 plans are the current plans for Factorio 0.16 and 0.15; archived older-number plans remain historical evidence.
+MIR 3.1.5 is the published canonical Factorio 2.1 anchor. MIR 2.4.0 is the active unreleased Factorio 2.0 backport; its checklist, validation summary, assurance seal, and backport-wave dashboard govern candidate qualification. The internal MIR 2.5.0 candidate is superseded evidence and is not a release artifact. Older target work remains paused until the maintainer tags and publishes 2.4.0.
 
 - [3.0.0 plan](3.0.0-plan.md)
 - [3.0.0 regression baseline](3.0.0-regression-baseline.md)

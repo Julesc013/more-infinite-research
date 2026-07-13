@@ -1,9 +1,9 @@
 schema: 1
 
-release: 2.5.0
+release: 2.4.0
 factorio_line: "2.0"
 budget_manifest: .mir/performance-budgets.json
-accepted_evidence: pending-2.5.0-factorio-2.0-runtime-gate
+accepted_evidence: pending-2.4.0-factorio-2.0-runtime-gate
 
 measurement_policy:
   - Budgets are set before performance optimization and include host-load headroom.
