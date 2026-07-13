@@ -57,12 +57,14 @@
       "requires_factorio": false,
       "inputs": [
         "scripts/Test-MIRCompiler.ps1",
-        "scripts/validation/**",
+        "scripts/Test-MIRCompilerSchemaDrift.ps1",
+        "scripts/Test-MIRCompilerContractCoverage.ps1",
+        ".mir/compiler-contract-coverage.yml",
         "prototypes/mir/**",
-        ".mir/modules.yml",
-        ".mir/streams.yml",
-        ".mir/capabilities.yml",
-        "fixtures/compat-matrix/**"
+        "fixtures/compat-matrix/expected-scenarios.json",
+        "fixtures/assert-compiler-contracts/**",
+        "docs/reference/compiler-authority-table.md",
+        "docs/reference/schemas/**"
       ]
     },
     {
