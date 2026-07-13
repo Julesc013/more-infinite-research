@@ -32,6 +32,8 @@ The cost adapter preserves either Factorio's `growth^L*base` formula style, MIR'
 
 Planning records immutable input and expected output snapshots plus fingerprints. Whole-plan validation rejects duplicate owner bindings. The emission transaction verifies the input fingerprint immediately before applying one prevalidated owner update, and output validation verifies the resulting fingerprint. The default preserve operation performs no assignment, retaining exact table identity and final external balance.
 
+The emitted binding artifact also carries the recognized input and output research-unit models. On a configuration change, runtime state compares the previous output model with the new output model and compensates Factorio's normalized-progress rescaling for a currently researched bound owner. This preserves the player's level, current research selection, and fractional progress while startup cost settings change or an older save first adopts native-owner configuration.
+
 If the owner is absent, finite, unreachable, malformed, or unsafe to configure, eligible recipes fall back to MIR generation. Recipes already covered by an existing owner are excluded from fallback generation so MIR never creates duplicate productivity coverage. Only emission code may apply the planned transaction or create the fallback technology.
 
 ## Evidence

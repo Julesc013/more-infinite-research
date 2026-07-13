@@ -5,7 +5,9 @@ Date: 2026-07-14
   Bugfixes:
 
     - Made the standard settings configure recognized existing Space Age infinite productivity owners.
+    - Applied cost base and growth together as the displayed cost model when either value is customized.
     - Preserved final native or modded owner values when settings stay at their defaults.
+    - Preserved current native-owner research level, selection, and fractional progress across cost changes.
     - Left external owners untouched when their MIR stream is disabled.
     - Rejected explicit cost changes for unrecognized external formulas instead of guessing.
     - Retained safe fallback generation and transactional owner updates.

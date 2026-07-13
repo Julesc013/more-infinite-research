@@ -44,8 +44,9 @@ script.on_init(function()
   assert_settings()
   local force = game.forces.player
   local tech = technology()
+  force.research_all_technologies()
   tech.level = 5
-  force.current_research = tech
+  if not force.add_research(tech) then fail("could not queue native-owner research") end
   force.research_progress = expected_progress
   storage.mir_upgrade_fixture = {
     technology_level = tech.level,
