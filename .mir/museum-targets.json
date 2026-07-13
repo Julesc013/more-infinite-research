@@ -28,7 +28,7 @@
     },
     {
       "factorio": "0.11",
-      "exact_patch": "0.11.23",
+      "exact_patch": "0.11.22",
       "version": "0.11.0",
       "branch": "tmp/0.11",
       "binary": "D:/Programs/Factorio/0.11/bin/x64/Factorio.exe",

@@ -679,7 +679,7 @@ target_lines:
     target_factorio: "0.11"
     support_class: museum-finite-ladder
     source: declarative_museum_manifest_and_matching_base_files
-    publish_policy: exact_0_11_23_binary_proof_required
+    publish_policy: binary_proof_required
   factorio_0_10:
     version: "0.10.0"
     branch: tmp/0.10

@@ -1,0 +1,15 @@
+{
+  "schema": 1,
+  "factorio_line": "0.11",
+  "requested_patch": "0.11.23",
+  "resolved_patch": "0.11.22",
+  "resolution": "corrected_to_official_final_patch",
+  "sources": [
+    "https://www.factorio.com/download/archive/0.10.12",
+    "https://forums.factorio.com/viewtopic.php?t=10117"
+  ],
+  "binary": "D:/Programs/Factorio/0.11/bin/x64/Factorio.exe",
+  "binary_sha256": "968A6B8EDA5244F41AFB8249C7DE004C644BA4692DD38DF5BC00F26F1CE2E085",
+  "base_data": "D:/Programs/Factorio/0.11/data/base",
+  "finding": "The official archive lists 0.11.22 as the final 0.11 build, and the official 0.11.22 announcement identifies it as the stable 0.11 release before 0.12. The requested 0.11.23 input was therefore an erroneous campaign premise, not a missing local prerequisite."
+}
