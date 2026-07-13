@@ -2,14 +2,6 @@
 Version: 3.1.9
 Date: 2026-07-14
 
-  Changes:
-
-    - Added change-aware release assurance with content-addressed evidence reuse and exact candidate seals.
-    - Added non-publishing verification workflows.
-    - Added the finite museum build compiler and target capability catalog as development tooling.
-    - Kept historical runtime code out of the modern package.
-    - Added reviewed Factorio 2.1 native-owner balance snapshots and three exact upgrade fixtures.
-
   Bugfixes:
 
     - Made the standard settings configure recognized existing Space Age infinite productivity owners.
@@ -17,8 +9,6 @@ Date: 2026-07-14
     - Left external owners untouched when their MIR stream is disabled.
     - Rejected explicit cost changes for unrecognized external formulas instead of guessing.
     - Retained safe fallback generation and transactional owner updates.
-    - Added exact-candidate validation without rebuilding the sealed archive.
-    - Kept package, harness, and evidence identities canonical across Git line-ending conversions.
 
 ---------------------------------------------------------------------------------------------------
 Version: 3.1.5
