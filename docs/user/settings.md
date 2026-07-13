@@ -14,7 +14,9 @@ superseded_by: []
 
 MIR uses startup settings for generated technology enablement, costs, caps, science-pack policy, diagnostics, and prototype-stage options. Startup settings are read during Factorio's prototype loading stages, so most generation choices require a restart after changing them.
 
-MIR-owned technology settings stay visible across base and Space Age so the settings page is stable when toggling official DLC. Some exact third-party provider settings may be hidden when their required provider mod is not enabled. MIR still defines those setting keys internally so copied settings, existing saves, and target-line backports can keep stable values. If the relevant provider mod is enabled later, the setting can become visible again with the saved value still available.
+Space Age-only technology settings are hidden while the DLC is inactive, then reappear with their stored values when `space-age` is enabled. Some exact third-party provider settings follow the same rule when their provider mod is absent. MIR still registers hidden setting keys internally so copied settings, existing saves, portable profiles, and target-line backports keep stable values.
+
+Experimental automatic-family tuning settings are hidden until their family is reviewed. This avoids presenting low-level enable and cost controls for technologies that the reviewed creation lane will not emit. The explicit broad experimental combination still exercises the stable family identities; hiding their tuning rows does not delete or silently force their saved values.
 
 Use the in-game setting descriptions for exact defaults. Use [settings reference](../reference/settings.md) for the canonical technical contract once a setting needs maintainer-level detail.
 
@@ -32,6 +34,8 @@ Automatic recipe support uses three independent controls for productivity opport
 
 `Require reviewed data for new research` defaults on and matters only when creation is allowed. On restricts creation to provider families that are both marked reviewed and backed by an applicable exact-version compatibility record with named evidence. Experimental families are skipped. Off opens registered experimental providers using generic structural evidence. It never blocks safe existing-stream attachment, and neither value can bypass hard safety gates.
 
+The assembling-machine and laboratory manufacturing families are experimental in 3.1.5, so their individual tuning rows are intentionally hidden. To test their generated technologies, select `Apply safe changes`, enable `Allow new research creation`, and disable `Require reviewed data for new research`. They still appear only when discovery finds safe matching recipes and every hard gate passes.
+
 The settings do not encode current mod names, technology names, or a closed list of future families. New compiler family modules use the same action and creation contract. Every path still passes target, productivity-permission, ownership, recycling, probability, catalyst, science, lab, prerequisite, progression, identity, and technology-cycle gates. Unsafe or ambiguous candidates are skipped and diagnosed; no setting or compatibility pack can override a hard gate.
 
 The released `mir-automatic-compiler-mode` setting remains hidden as a migration bridge. A non-default legacy value is translated to the equivalent new policy while all three new controls remain at their defaults. As soon as any new control differs from its default, the new controls take precedence. This preserves old profiles without keeping the old five-way preset in the player-facing UI.
@@ -47,7 +51,7 @@ For documentation and portable policy exchange, the three controls also have fou
 
 The order describes increasing automatic action, not increasing safety or quality. Safe remains the default because it attaches eligible mod recipes to existing compatible research without authorizing new technologies. Expansive is intentionally opt-in; hard safety, ownership, science, graph, identity, and progression gates remain mandatory in every profile.
 
-Generated technology settings are ordered so default-off or experimental rows come first, enabled special rows come next, and ordinary enabled rows come last. Breeding, agricultural growth speed, cargo bay range/count, and character reach are enabled by default but remain in the special row group. Inserter capacity stays disabled by default because larger hand sizes can change circuit behavior and inserter performance assumptions.
+Visible generated technology settings are ordered so default-off rows come first, enabled special rows come next, and ordinary enabled rows come last. Breeding, agricultural growth speed, cargo bay range/count, and character reach are enabled by default but remain in the special row group when Space Age is active. Inserter capacity stays disabled by default because larger hand sizes can change circuit behavior and inserter performance assumptions.
 
 ## Prototype Limit Settings
 

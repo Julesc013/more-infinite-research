@@ -1,3 +1,11 @@
+local function space_age_setting_visibility()
+  return {
+    mode = "visible-if-mods-any",
+    mods_any = {"space-age"},
+    hidden_reason = "space-age-not-active"
+  }
+end
+
 return {
   research_spoilage_preservation = {
     effect_per_level = {
@@ -6,10 +14,7 @@ return {
       canonical_anchor = 0.01,
       runtime_multiplier_delta = true
     },
-    ui_visibility = {
-      mode = "always",
-      reason = "official-stream-settings-visible"
-    },
+    ui_visibility = space_age_setting_visibility(),
     generation_requirements = {
       require_any_item = {"spoilage", "agricultural-science-pack"}
     },
@@ -42,10 +47,7 @@ return {
       canonical_anchor = 0.01,
       runtime_multiplier_delta = true
     },
-    ui_visibility = {
-      mode = "always",
-      reason = "official-stream-settings-visible"
-    },
+    ui_visibility = space_age_setting_visibility(),
     generation_requirements = {
       require_any_item = {"agricultural-science-pack"}
     },
@@ -127,10 +129,7 @@ return {
   research_cargo_bay_unloading_distance = {
     -- Cargo logistics modifiers are Space Age behavior even if another mod
     -- exposes similarly named cargo prototypes in a base-only run.
-    ui_visibility = {
-      mode = "always",
-      reason = "official-stream-settings-visible"
-    },
+    ui_visibility = space_age_setting_visibility(),
     generation_requirements = {
       require_any_item = {"landing-pad-unloading-bay"},
       require_any_technology = {"landing-pad-unloading-bay"}
@@ -148,12 +147,9 @@ return {
   },
 
   research_cargo_landing_pad_count = {
-    -- The setting remains visible across base and Space Age; generation is
-    -- still Space Age-only through required_mods and prototype checks.
-    ui_visibility = {
-      mode = "always",
-      reason = "official-stream-settings-visible"
-    },
+    -- The setting stays registered across base and Space Age, but the settings
+    -- UI shows it only while Space Age is active.
+    ui_visibility = space_age_setting_visibility(),
     generation_requirements = {
       require_any_item = {"cargo-landing-pad"},
       require_any_technology = {"rocket-silo"}

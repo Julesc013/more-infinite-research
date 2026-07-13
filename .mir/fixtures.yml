@@ -125,6 +125,9 @@ fixtures:
       - hidden-setting-readability
       - stable-setting-ids
       - hidden-legacy-automatic-compiler-setting
+      - inactive-space-age-setting-groups-hidden-in-base
+      - space-age-setting-groups-visible-with-dlc
+      - experimental-automatic-family-setting-groups-hidden-until-reviewed
 
   prototype-limits:
     requires_features: [prototype_limits]

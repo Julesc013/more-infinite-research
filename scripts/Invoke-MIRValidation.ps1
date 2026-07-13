@@ -759,8 +759,10 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'manifest_id = atan_ash_capability.stream.id' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'exact_recipe_patterns(atan_ash_capability.exact_recipes)' },
     @{ File = "prototypes\mir\compatibility\overlays\atan_ash.lua"; Text = (Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\compatibility\overlays\atan_ash.lua")); Snippet = '"mir-prod-atan-ash-separation"' },
-    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'reason = "official-stream-settings-visible"' },
-    @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'reason = "official-stream-settings-visible"' },
+    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'local function space_age_setting_visibility()' },
+    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'hidden_reason = "space-age-not-active"' },
+    @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'local function space_age_setting_visibility()' },
+    @{ File = "prototypes\streams\direct-effects.lua"; Text = $directEffectsText; Snippet = 'hidden_reason = "space-age-not-active"' },
     @{ File = "settings.lua"; Text = $settingsText; Snippet = 'research_ash_separation = "Ash separation productivity"' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = '"aai-turbo-loader"' },
     @{ File = "prototypes\mir\capabilities\science_integration\science_selector.lua"; Text = $scienceSelectorText; Snippet = 'desired == "derive-from-unlocks"' },
@@ -966,7 +968,8 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
         -not (
           $_.File -eq "prototypes\streams\direct-effects.lua" -and
           $_.Snippet -in @(
-            'reason = "official-stream-settings-visible"',
+            'local function space_age_setting_visibility()',
+            'hidden_reason = "space-age-not-active"',
             "ui_visibility = {",
             "generation_requirements = {",
             '{technology = "electric-weapons-damage-1", required_mod = "space-age"}',

@@ -25,6 +25,8 @@ MIR 3.1.5 is the post-backport Factorio 2.1 development candidate. It keeps the 
 - Compiler policy is a pure schema-2 contract that registered family modules can reuse without adding mod-, recipe-, technology-, or version-specific settings.
 - Built-in automatic families now use a sorted, data-only CompilerProvider schema with stable diagnostics, migration metadata, validation hooks, and planning-only emission adapters.
 - Assembling-machine and lab manufacturing creation remains experimental: reviewed-data mode skips both, while the explicit broad opt-in lane retains them for testing ahead of the 3.2.0 compiler work.
+- Hid the two experimental automatic-family tuning groups until review, without deleting their stable settings or broad opt-in generation path.
+- Hid Space Age-only technology setting groups in base-only configurations; they reappear with preserved values when the DLC is active.
 - Existing profiles keep working through the hidden legacy setting bridge; explicit new controls take precedence.
 - Hard target, ownership, productivity, recycling, stochastic-output, catalyst, science, lab, prerequisite, identity, and cycle gates remain non-overridable.
 - The complete Factorio 2.0 through 0.13 candidate wave is recorded in governance and release documentation.

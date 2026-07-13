@@ -18,6 +18,8 @@ Date: 2026-07-13
     - Preserved explicit broad opt-in testing for experimental automatic family technologies.
     - Standardized automatic-recipe dropdown labels, tooltip structure, capitalization, and locale parity.
     - Preserved old automatic compiler profiles through a hidden legacy-policy bridge.
+    - Hid unreviewed automatic-family tuning settings while preserving broad opt-in testing and profile compatibility.
+    - Hid Space Age-only technology settings when the DLC is inactive while retaining their registered values.
 
   Bugfixes:
 
