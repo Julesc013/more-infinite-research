@@ -17,6 +17,9 @@ Date: 2026-07-12
     - Added a sorted data-only CompilerProvider registry for extending recipe-family discovery and planning.
     - Added canonical setting descriptors and exact Conservative, Safe, Expansive, and Custom policy expansions.
     - Added stable automatic-compiler and provider diagnostic codes.
+    - Kept experimental assembler and lab family technologies out of reviewed-data creation.
+    - Preserved explicit broad opt-in testing for experimental automatic family technologies.
+    - Standardized automatic-recipe dropdown labels, tooltip structure, capitalization, and locale parity.
     - Preserved old automatic compiler profiles through a hidden legacy-policy bridge.
 
   Bugfixes:

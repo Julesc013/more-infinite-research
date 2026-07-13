@@ -9,6 +9,7 @@ branches:
       - docs-correction
       - fixture-correction
       - unpublished-version-package-build
+      - validated-release-candidate-promotion
     rejects:
       - broad-new-generation
       - schema-breaking-report-changes

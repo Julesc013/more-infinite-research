@@ -365,6 +365,8 @@ fixtures:
       - all-legacy-mode-policy-mappings
       - explicit-new-controls-win-over-legacy
       - reviewed-data-generation-fails-closed
+      - experimental-family-rejected-by-reviewed-data-lane
+      - experimental-family-enabled-by-expansive-lane
       - registered-family-generation-remains-extensible
       - data-only-compiler-provider-contract
       - stable-provider-order-and-fingerprint
@@ -407,7 +409,7 @@ fixtures:
     validates:
       - all-automatic-actions
       - independent-creation-and-review-controls
-      - reviewed-data-family-authorization
+      - reviewed-data-rejects-experimental-family-authorization
       - reviewed-data-safe-attachment-baseline
       - unrelated-pack-family-remains-disabled
 

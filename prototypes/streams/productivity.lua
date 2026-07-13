@@ -615,7 +615,7 @@ return {
   research_auto_assembling_machine = {
     manifest_id = "mir-auto-prod-manufacturing-assembling-machine-1",
     technology_name = "mir-auto-prod-manufacturing-assembling-machine-1",
-    automatic_family = true,
+    automatic_family = {creation_maturity = "experimental"},
     localised_name = {"", "Assembling machine manufacturing productivity"},
     icon_item = "assembling-machine-3",
     groups = {{change = 0.02, items = {}}}
@@ -624,7 +624,7 @@ return {
   research_auto_lab = {
     manifest_id = "mir-auto-prod-manufacturing-lab-1",
     technology_name = "mir-auto-prod-manufacturing-lab-1",
-    automatic_family = true,
+    automatic_family = {creation_maturity = "experimental"},
     localised_name = {"", "Lab manufacturing productivity"},
     icon_item = "lab",
     groups = {{change = 0.02, items = {}}}

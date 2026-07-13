@@ -12,8 +12,8 @@ function M.current()
   })
 end
 
-function M.generation_decision(reviewed_authorization)
-  return contract.generation_decision(M.current(), reviewed_authorization)
+function M.generation_decision(reviewed_authorization, creation_maturity)
+  return contract.generation_decision(M.current(), reviewed_authorization, creation_maturity)
 end
 
 return M

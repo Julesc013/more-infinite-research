@@ -14,12 +14,12 @@ superseded_by: []
 
 MIR 3.1.0 ships structural attachment conservatively. Confidence ranks evidence but never overrides a failed safety, ownership, target, science, lab, prerequisite, or loop gate.
 
-## Reviewed Rules
+## Registered Rules
 
 | FamilyRule | Destination | Change per level | Science and prerequisites | 3.1 action |
 | --- | --- | ---: | --- | --- |
-| Assembling-machine manufacturing | reviewed generic identity | 2% | automation, logistic, chemical, production; prerequisite frontier derived from those packs | creation enabled through registered family module |
-| Lab manufacturing | reviewed generic identity | 2% | automation, logistic, chemical, production; prerequisite frontier derived from those packs | creation enabled through registered family module |
+| Assembling-machine manufacturing | experimental generic identity | 2% | automation, logistic, chemical, production; prerequisite frontier derived from those packs | broad opt-in creation only |
+| Lab manufacturing | experimental generic identity | 2% | automation, logistic, chemical, production; prerequisite frontier derived from those packs | broad opt-in creation only |
 | Furnace manufacturing | existing furnace stream | 2% | inherit target stream | safe attach |
 | Inserter manufacturing | existing inserter stream | 1% | inherit target stream | safe attach |
 | Loader manufacturing | existing belt stream | 1% | inherit target stream | safe attach |
@@ -30,6 +30,8 @@ MIR 3.1.0 ships structural attachment conservatively. Confidence ranks evidence 
 
 These values intentionally match the conservative end of their destination stream tiers. Automatic recipes never receive a larger change merely because a name suggests a high tier. Owner adoption wins over MIR emission, and every emitted or adopted effect keeps exact recipe identity.
 
+The two predeclared generic identities remain experimental in 3.1.5. Enabling research creation while retaining the reviewed-data requirement does not emit them, even if an exact compatibility pack requests generation. They remain available for explicit testing when research creation is enabled and the reviewed-data requirement is disabled. This preserves the implementation and stable IDs without presenting their current grouping, balance, or progression as accepted.
+
 ## Reviewed Deferrals
 
 - Beacon manufacturing remains diagnostic-only: a stable destination identity and fixture-backed progression policy are not yet defined.
@@ -39,4 +41,4 @@ These values intentionally match the conservative end of their destination strea
 
 The 3.1.0 objective is complete accounting and safe attachment, not maximum automatic productivity. New automatic families require a separate stable ID decision, schema-2 rule, arbitrary-name structural fixture, negative/decoy fixture, exact modpack campaign, balance review, and migration record.
 
-These are the currently registered family modules, not a closed compiler list or player-facing setting taxonomy. Later reviewed families plug into the same generic action, creation, authorization, plan, and emission contracts.
+These are the currently registered family modules, not a closed compiler list or player-facing setting taxonomy. Later experimental or reviewed families plug into the same generic action, maturity, creation, authorization, plan, and emission contracts.
