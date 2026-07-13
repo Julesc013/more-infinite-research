@@ -99,9 +99,10 @@ local function build_plan(key, spec, owner, binding, buckets)
   local effect_value = selected(effect_contracts.stream_setting_name(key))
 
   local model = cost_model.classify(owner.unit, binding.cost_model)
+  local cost_changed = base.changed or growth.changed
   local configured_cost, cost_reason = cost_model.configure(model, {
-    base = base.changed and base.value or nil,
-    growth = growth.changed and growth.value or nil
+    base = cost_changed and base.value or nil,
+    growth = cost_changed and growth.value or nil
   })
   if not configured_cost then return nil, cost_reason end
 
