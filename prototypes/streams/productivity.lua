@@ -25,6 +25,31 @@ local function space_age_setting_visibility()
   }
 end
 
+local function native_owner_binding(owner, products)
+  return {
+    owner = owner,
+    eligibility = {
+      require_infinite = true,
+      require_existing_recipe_productivity_effects = true
+    },
+    effect_scope = {
+      type = "change-recipe-productivity",
+      products = products
+    },
+    settings_ownership = "stream",
+    default_preservation = "preserve-owner",
+    override_policy = "recognized-cost-model",
+    fallback_policy = "generate-eligible",
+    cost_model = {
+      target_native_formulas = {"1.5^L*1000"}
+    }
+  }
+end
+
+local native_owner_settings_note = {
+  "mod-setting-description.mir-note-native-owner-managed-stream"
+}
+
 return {
   research_copper = { items={"copper-plate"}, icon_item="copper-plate" },
   research_iron   = { items={"iron-plate"}, icon_item="iron-plate" },
@@ -41,13 +66,8 @@ return {
       {technology="processing-unit"},
       {technology="advanced-electronics-2"}
     },
-    adopt_into_existing_productivity_tech = {
-      tech = "processing-unit-productivity",
-      products = {"processing-unit"},
-      require_infinite = true,
-      require_existing_recipe_productivity_effects = true,
-      change_policy = "copy-owner"
-    }
+    native_owner_binding = native_owner_binding("processing-unit-productivity", {"processing-unit"}),
+    settings_note = native_owner_settings_note
   },
 
   research_plastic = {
@@ -56,13 +76,8 @@ return {
       {icon="__space-age__/graphics/technology/plastics-productivity.png", icon_size=256, inactive_mod_asset="space-age"},
       {technology="plastics"}
     },
-    adopt_into_existing_productivity_tech = {
-      tech = "plastic-bar-productivity",
-      products = {"plastic-bar"},
-      require_infinite = true,
-      require_existing_recipe_productivity_effects = true,
-      change_policy = "copy-owner"
-    }
+    native_owner_binding = native_owner_binding("plastic-bar-productivity", {"plastic-bar"}),
+    settings_note = native_owner_settings_note
   },
   research_sulfur  = { items={"sulfur"}, icon_tech="sulfur-processing", exclude_ingredient_patterns={"asteroid"} },
   research_batteries = { items={"battery"}, icon_tech="battery", exclude_ingredient_patterns={"scrap"} },
@@ -82,13 +97,8 @@ return {
       },
       {technology="low-density-structure"}
     },
-    adopt_into_existing_productivity_tech = {
-      tech = "low-density-structure-productivity",
-      products = {"low-density-structure"},
-      require_infinite = true,
-      require_existing_recipe_productivity_effects = true,
-      change_policy = "copy-owner"
-    }
+    native_owner_binding = native_owner_binding("low-density-structure-productivity", {"low-density-structure"}),
+    settings_note = native_owner_settings_note
   },
   research_rocket_fuel = {
     items={"rocket-fuel"},
@@ -96,13 +106,8 @@ return {
       {icon="__space-age__/graphics/technology/rocket-fuel-productivity.png", icon_size=256, inactive_mod_asset="space-age"},
       {technology="rocket-fuel"}
     },
-    adopt_into_existing_productivity_tech = {
-      tech = "rocket-fuel-productivity",
-      products = {"rocket-fuel"},
-      require_infinite = true,
-      require_existing_recipe_productivity_effects = true,
-      change_policy = "copy-owner"
-    }
+    native_owner_binding = native_owner_binding("rocket-fuel-productivity", {"rocket-fuel"}),
+    settings_note = native_owner_settings_note
   },
 
   research_thruster_fuel_productivity = {

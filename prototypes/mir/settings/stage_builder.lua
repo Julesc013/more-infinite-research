@@ -179,9 +179,7 @@ for _, group in ipairs(technology_setting_groups) do
     local settings_note = lookup_default(key, "settings_note", stream, nil)
     for _, spec in ipairs(settings_catalog.stream_setting_specs(key, stream)) do
       local setting = decorate_stream_setting(spec, tech_locale, order_prefix)
-      if string.find(setting.name, "^ips%-enable%-") then
-        setting.localised_description = append_note(setting.localised_description, settings_note)
-      end
+      setting.localised_description = append_note(setting.localised_description, settings_note)
       add_technology_setting(group, setting)
     end
   else

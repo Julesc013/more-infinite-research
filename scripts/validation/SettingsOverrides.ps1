@@ -50,6 +50,36 @@ function Set-CopiedStartupSettingDefault {
   Add-Content -LiteralPath $overridePath -Value "override(`"$escapedNameLiteral`", $ValueLiteral)" -Encoding UTF8
 }
 
+function ConvertTo-MIRLuaLiteral {
+  param([Parameter(Mandatory)]$Value)
+
+  if ($Value -is [bool]) { return $(if ($Value) { "true" } else { "false" }) }
+  if ($Value -is [string]) {
+    $escaped = $Value.Replace("\", "\\").Replace('"', '\"')
+    return '"' + $escaped + '"'
+  }
+  if ($Value -is [byte] -or $Value -is [sbyte] -or $Value -is [int16] -or $Value -is [uint16] `
+      -or $Value -is [int32] -or $Value -is [uint32] -or $Value -is [int64] -or $Value -is [uint64] `
+      -or $Value -is [single] -or $Value -is [double] -or $Value -is [decimal]) {
+    return ([System.Convert]::ToString($Value, [System.Globalization.CultureInfo]::InvariantCulture))
+  }
+  throw "Unsupported MIR startup-setting override value type: $($Value.GetType().FullName)"
+}
+
+function Set-CopiedStartupSettingDefaults {
+  param(
+    [Parameter(Mandatory)][string]$ModsDir,
+    [hashtable]$Overrides = @{}
+  )
+
+  foreach ($name in @($Overrides.Keys | Sort-Object)) {
+    Set-CopiedStartupSettingDefault `
+      -ModsDir $ModsDir `
+      -Name $name `
+      -ValueLiteral (ConvertTo-MIRLuaLiteral -Value $Overrides[$name])
+  }
+}
+
 function Set-CopiedGeneratedStartupSettingDefault {
   param(
     [string]$ModsDir,

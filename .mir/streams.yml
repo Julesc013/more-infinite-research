@@ -795,7 +795,7 @@ streams:
       source: legacy_stream_table:productivity
       capability: recipe-productivity
       family: low_density_structure
-      policy: legacy.recipe-productivity-stream
+      policy: native-owner-binding-or-generated-stream
       generated_technology: recipe-prod-research_low_density_structure-1
       stream_key: research_low_density_structure
       migration_policy: stable
@@ -804,6 +804,7 @@ streams:
       evidence:
         fixtures:
           - fixtures/assert-generation-integrity
+          - fixtures/assert-native-owner-settings
 
     recipe-prod-research_lubricant_productivity-1:
       canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_lubricant_productivity-1
@@ -911,7 +912,7 @@ streams:
       source: legacy_stream_table:productivity
       capability: recipe-productivity
       family: plastic
-      policy: legacy.recipe-productivity-stream
+      policy: native-owner-binding-or-generated-stream
       generated_technology: recipe-prod-research_plastic-1
       stream_key: research_plastic
       migration_policy: stable
@@ -920,6 +921,7 @@ streams:
       evidence:
         fixtures:
           - fixtures/assert-generation-integrity
+          - fixtures/assert-native-owner-settings
 
     recipe-prod-research_processing_unit-1:
       canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_processing_unit-1
@@ -927,7 +929,7 @@ streams:
       source: legacy_stream_table:productivity
       capability: recipe-productivity
       family: processing_unit
-      policy: legacy.recipe-productivity-stream
+      policy: native-owner-binding-or-generated-stream
       generated_technology: recipe-prod-research_processing_unit-1
       stream_key: research_processing_unit
       migration_policy: stable
@@ -936,6 +938,7 @@ streams:
       evidence:
         fixtures:
           - fixtures/assert-generation-integrity
+          - fixtures/assert-native-owner-settings
 
     recipe-prod-research_quantum_processor-1:
       canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_quantum_processor-1
@@ -991,7 +994,7 @@ streams:
       source: legacy_stream_table:productivity
       capability: recipe-productivity
       family: rocket_fuel
-      policy: legacy.recipe-productivity-stream
+      policy: native-owner-binding-or-generated-stream
       generated_technology: recipe-prod-research_rocket_fuel-1
       stream_key: research_rocket_fuel
       migration_policy: stable
@@ -1000,6 +1003,7 @@ streams:
       evidence:
         fixtures:
           - fixtures/assert-generation-integrity
+          - fixtures/assert-native-owner-settings
 
     recipe-prod-research_rocket_shooting_speed-1:
       canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_rocket_shooting_speed-1

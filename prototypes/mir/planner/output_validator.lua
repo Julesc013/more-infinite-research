@@ -1,6 +1,7 @@
 local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 local generation_plan = require("prototypes.mir.planner.generation_plan")
 local generated_registry = require("prototypes.mir.domain.facts.generated_technology_registry")
+local native_owner_contract = require("prototypes.mir.domain.native_owner.contract")
 
 local M = {}
 local NUMERIC_TOLERANCE = 0.000000001
@@ -90,6 +91,7 @@ function M.assert_technology_shape(expected, actual, context)
   local expected_unit, actual_unit = expected.unit or {}, actual.unit or {}
   assert_equal(context, "science ingredients", normalized_ingredients(expected_unit.ingredients), normalized_ingredients(actual_unit.ingredients))
   assert_equal(context, "count formula", expected_unit.count_formula, actual_unit.count_formula)
+  assert_equal(context, "fixed count", expected_unit.count, actual_unit.count)
   if expected_unit.time ~= nil and not close(expected_unit.time, actual_unit.time) then
     fail(context, "research time differs expected=" .. tostring(expected_unit.time) .. " actual=" .. tostring(actual_unit.time))
   end
@@ -117,9 +119,13 @@ function M.assert_compilation_artifact(artifact)
       M.assert_technology_shape(operation.technology, technology, operation.technology_name)
       assert_registry(operation)
       checked = checked + 1
-    elseif operation.operation == "adopt_stream" then
+    elseif operation.operation == "native_owner_binding" then
       if not technology then fail(operation.technology_name, "adoption owner is missing") end
-      M.assert_effects(operation.effects, technology.effects, operation.technology_name, false)
+      local actual_snapshot = native_owner_contract.snapshot(technology)
+      local actual_fingerprint = native_owner_contract.fingerprint(actual_snapshot)
+      assert_equal(operation.technology_name, "native-owner output fingerprint", operation.output_fingerprint, actual_fingerprint)
+      assert_equal(operation.technology_name, "planned native-owner snapshot fingerprint",
+        operation.output_fingerprint, native_owner_contract.fingerprint(operation.expected_snapshot))
       checked = checked + 1
     else
       error("Unsupported CompilationPlan output operation: " .. tostring(operation.operation), 2)
@@ -145,7 +151,12 @@ function M.assert_artifact(artifact)
         }
       })
     elseif row.action == "adopt" then
-      table.insert(operations, {operation = "adopt_stream", technology_name = row.adoption.owner, effects = row.adoption.effects})
+      table.insert(operations, {
+        operation = "native_owner_binding",
+        technology_name = row.adoption.owner,
+        output_fingerprint = row.adoption.output_fingerprint,
+        expected_snapshot = row.adoption.expected_snapshot
+      })
     end
   end
   return M.assert_compilation_artifact({schema = 2, operations = operations})
