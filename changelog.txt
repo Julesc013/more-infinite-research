@@ -11,6 +11,7 @@ Date: 2026-07-13
 
     - Replaced native infinite formulas with target-supported fixed research counts.
     - Kept only target-proven technology effects and omitted all later game and DLC surfaces.
+    - Omitted recipe-productivity settings that Factorio 0.14 cannot apply, instead of exposing inert controls.
 
 ---------------------------------------------------------------------------------------------------
 Version: 1.5.0
