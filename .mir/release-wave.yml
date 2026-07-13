@@ -174,15 +174,17 @@ waves:
     version: "3.1.5"
     branch: dev
     source_anchor_required: qualified-3.1.2-plus-complete-portable-return
-    source_commit: bbc6b499ac3c2218fb9c1abdd8a4cf57e1fdd3db
-    package_source_commit: bbc6b499ac3c2218fb9c1abdd8a4cf57e1fdd3db
+    source_commit: 4c2bbc5daa4c36d268945e45714bd2db8e2517eb
+    package_source_commit: 4c2bbc5daa4c36d268945e45714bd2db8e2517eb
     automatic_compiler_control_schema: 2
+    compiler_provider_schema: 1
     runtime_scenario_count: 91
-    runtime_run_id: 7d034b8a-ede1-4aa6-bbc8-10ae7cf510a4
-    runtime_package_sha256: 493F6EE2303FF087AB76D983DAFF872F10EC28D04FC816A13434C188613C59EA
-    structured_validation_evidence: .mir/evidence/3.1.5-rc2-validation-summary.json
-    upgrade_evidence: .mir/evidence/3.1.5-upgrade-proof.json
-    available_ecosystem_load_evidence: .mir/evidence/3.1.5-rc2-ecosystem/campaign-evidence.json
+    runtime_run_id: c2b633a2-d26e-4dcb-84b7-057b2247addf
+    runtime_package_sha256: EB6FFA0DAAF5B0AB48058F08D3861970845A0FD36A1D093CF366F1ECB311DB8E
+    structured_validation_evidence: .mir/evidence/3.1.5-rc3-validation-summary.json
+    upgrade_evidence: .mir/evidence/3.1.5-upgrade-from-3.1.2-automatic-compiler-proof.json
+    additional_upgrade_evidence: .mir/evidence/3.1.5-upgrade-from-3.0.5-proof.json
+    available_ecosystem_load_evidence: .mir/evidence/3.1.5-rc3-ecosystem/campaign-evidence.json
     available_ecosystem_load_gate: 9-passed-zero-dependency-failures-load-claims-only
     exact_package_gate: passed-base-space-age-deterministic-and-forbidden-entry-check
     candidate_freshness_gate: passed

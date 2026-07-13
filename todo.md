@@ -7,13 +7,26 @@ This is the executable release queue. `.mir/release-wave.yml` is the machine-rea
 ## Current Truth
 
 - MIR 3.1.1 for Factorio 2.1 and MIR 2.3.5 for Factorio 2.0 are the published immutable baselines.
-- MIR 3.1.2 is the untagged emergency technology-cycle hotfix under validation on `dev`.
-- MIR 2.4.0 is unreleased and begins from the accepted 3.1.2 source only after the modern gate closes.
+- MIR 3.1.5 is the untagged, automated-qualified Factorio 2.1 release candidate on `dev`; interactive review and human publication remain pending.
+- MIR 2.4.0 is unreleased and begins only after the human 3.1.5 release pause closes.
 - Earlier local 3.1.0 and 2.4.0 tags, commits, archives, and validation packets are superseded candidate evidence, not publication authority.
 - Work temporarily labeled 3.2.0 has been preserved as 3.1.0 implementation or honest pre-renumber characterization. Work temporarily labeled 2.5.0 is preserved but non-authoritative until it is re-derived as 2.4.0.
-- MIR 3.2.0 does not open on `dev` until 3.1.2, 2.4.0, and the descending backport distributions are stable and their portable lessons return.
+- MIR 3.2.0 does not open on `dev` until 3.1.5, 2.4.0, and the descending backport distributions are stable and their portable lessons return.
 
-## 3.1.2 Automatic Compiler Hotfix
+## 3.1.5 Modern Compiler Candidate
+
+- [x] Return and classify portable lessons from every requested target branch without importing target-specific feature cuts.
+- [x] Add the data-only CompilerProvider schema, deterministic registry, stable diagnostics, and declarative setting descriptors.
+- [x] Keep action, research creation, and reviewed-data requirements as independent controls with explicit safe defaults.
+- [x] Remove the long recommendation suffix and make checkbox labels and tooltips state their exact consequences.
+- [x] Pass the complete 91-scenario Factorio 2.1 matrix and deterministic exact-package gates.
+- [x] Pass exact 3.0.5 and 3.1.2 upgrades to the final 3.1.5 archive.
+- [x] Pass all nine available exact-archive ecosystem loads with zero dependency failures and timeouts.
+- [ ] Complete the identity-bound interactive settings, technology-tree, save-load, locale, icon, and balance review.
+- [ ] Tag and publish only in the explicitly separate human-authorized release step.
+- [ ] Start the 2.4.0 backport only after the requested release pause.
+
+## 3.1.2 Automatic Compiler Hotfix Foundation
 
 ### Technology Cycle Repair
 
