@@ -259,7 +259,7 @@ function Invoke-MIRAssurancePlan {
     $status = "passed"
     $message = ""
     try {
-      Invoke-MIRAssuranceCommandText -Command ([string]$test.command) -Context $Context
+      Invoke-MIRAssuranceCommandText -Command ([string]$test.command) -Context $Context | Out-Host
       if ($id -eq "runtime.full") { $runtimeFullExecuted = $true }
     } catch {
       $status = "failed"
