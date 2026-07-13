@@ -11,6 +11,7 @@ Date: 2026-07-13
 
     - Limited generated effects and technology fields to surfaces proved by the Factorio 0.13 data and binary.
     - Added target-era package and save compatibility for the archive candidate.
+    - Omitted recipe-productivity settings that Factorio 0.13 cannot apply, instead of exposing inert controls.
 
 ---------------------------------------------------------------------------------------------------
 Version: 1.4.0
