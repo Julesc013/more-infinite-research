@@ -8,6 +8,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: mir-verify-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   verify:
     runs-on: windows-latest
@@ -15,21 +19,50 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: Prepare assurance cache directories
+        shell: pwsh
+        run: New-Item -ItemType Directory -Force artifacts/assurance/evidence, artifacts/assurance/builds | Out-Null
+
+      - name: Restore exact-input assurance evidence
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            artifacts/assurance/evidence
+            artifacts/assurance/builds
+          key: mir-assurance-v2-fast-${{ runner.os }}-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: |
+            mir-assurance-v2-fast-${{ runner.os }}-
+
       - name: Diagnose assurance environment
         shell: pwsh
         run: ./scripts/mir.ps1 assurance doctor --target 2.0 --json
+
       - name: Materialize change-aware verification plan
         shell: pwsh
         run: ./scripts/mir.ps1 verify plan --target 2.0 --profile fast --output artifacts/assurance/plan.json
-      - name: Validate planner and evidence invalidation
+
+      - name: Validate planner, fingerprints, and evidence reuse
         shell: pwsh
         run: ./scripts/Test-MIRAssurance.ps1
-      - name: Run static gate
+
+      - name: Run or reuse the fast gate
         shell: pwsh
-        run: ./scripts/Invoke-MIRValidation.ps1 -StaticOnly
-      - name: Upload verification plan
+        run: ./scripts/mir.ps1 verify run --target 2.0 --profile fast --output artifacts/assurance/verify-summary.json
+
+      - name: Save successful and partial assurance evidence
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            artifacts/assurance/evidence
+            artifacts/assurance/builds
+          key: mir-assurance-v2-fast-${{ runner.os }}-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+
+      - name: Upload verification plan and summary
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: mir-verification-plan
-          path: artifacts/assurance/plan.json
+          name: mir-verification-${{ github.sha }}
+          path: artifacts/assurance/**
+          if-no-files-found: error
