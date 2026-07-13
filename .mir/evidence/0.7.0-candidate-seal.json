@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "kind": "mir-qualified-candidate-seal",
+  "branch": "tmp/0.7",
+  "release": "0.7.0",
+  "target_factorio": "0.7",
+  "source_commit": "fe0b7208db99617fe64b2345efc4bce470ca9940",
+  "candidate": {
+    "path": "dist/more-infinite-research_0.7.0.zip",
+    "sha256": "8495146889655FA46233A7B0416F4C67B4E2BF93E984E01F5F8234C9CA6F570F",
+    "size_bytes": 2505,
+    "entries": 4,
+    "content_fingerprint": "69DA64132D4FEE440EFDC2531048F421E264FFD0A60A9BB8DF29E160079E4123",
+    "package_source_fingerprint": "CAEB308A4F56CF11D3E6E8153D9C777418E739CC8FCE648AD50938198C01DF71"
+  },
+  "target_profile_sha256": "0442D4631A859EF5F06512AD1F3280F93AE6FE6D8C6E30D42689DBCC7ED355F4",
+  "validation_harness_fingerprint": "25649668102A2166A51E4E7175E65C7C4BC03D2F8C62E77D6FDC94CC16B05B07",
+  "factorio_binary_sha256": "EA52123915ECFB14658591876327490B094996ADE64D837929765147C4556FE8",
+  "qualification_summary_sha256": "C287406822ECEEE40955DAC55A9BF42A8344120226498F7A6726D73F7469C34F",
+  "release_actions": "not-run-maintainer-only"
+}
