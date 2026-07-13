@@ -2,6 +2,7 @@ param(
   [string]$FactorioBin = $env:FACTORIO_BIN,
   [string]$FactorioLog = $env:FACTORIO_LOG,
   [string]$UserDataDir = $env:FACTORIO_USERDATA,
+  [string]$CandidateZip = "",
   [switch]$DocsOnly,
   [switch]$ManifestsOnly,
   [switch]$ArchitectureOnly,
@@ -1964,6 +1965,14 @@ Invoke-RepoCheck "generated package archive matches metadata" {
   & (Join-Path $repo "scripts\Build-MIRPackage.ps1") -OutputDir $validationOutputDir -CompressionLevel "Fastest" | Out-Host
 
   $zipPath = Join-Path $repo "$validationOutputDir\$packageName.zip"
+  if (-not [string]::IsNullOrWhiteSpace($CandidateZip)) {
+    $candidatePath = if ([System.IO.Path]::IsPathRooted($CandidateZip)) { $CandidateZip } else { Join-Path $repo $CandidateZip }
+    if (-not (Test-Path -LiteralPath $candidatePath -PathType Leaf)) {
+      throw "Candidate package not found: $CandidateZip"
+    }
+    $zipPath = (Resolve-Path -LiteralPath $candidatePath).Path
+    Write-Host "[check] validating exact candidate package $zipPath"
+  }
   if (-not (Test-Path -LiteralPath $zipPath)) {
     throw "Validation package not found after build: $zipPath"
   }
