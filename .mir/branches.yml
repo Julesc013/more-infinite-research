@@ -310,9 +310,11 @@ release_artifacts:
       superseded_2_5_candidate_evidence: .mir/evidence/2.5.0-supersession-ledger.md
       automated_gate: passed
       manual_gate: pending
-      assurance_seal: pending
+      assurance_seal: .mir/evidence/candidate-seals/mir-2.4.0-factorio-2.0.json
+      assurance_seal_source_commit: 9b381ab23d80e2a754d34e263a42ae7db0a3c8e0
+      assurance_seal_status: passed
       publication_scope: unreleased
-      status: candidate-qualified-awaiting-seal
+      status: sealed-candidate-awaiting-legacy-promotion
     mir_2_3_0:
       version: "2.3.0"
       branch: legacy
@@ -463,8 +465,9 @@ release_artifacts:
       superseded_candidate_version: "2.5.0"
       superseded_candidate_sha256: 0BE57ED4C51DDF08F80AB4CFB2D5762DF2714B17AB26DB58CA9980289350CBFD
       validation_status: passed
-      assurance_seal: pending
-      status: candidate-qualified-awaiting-seal
+      assurance_seal: .mir/evidence/candidate-seals/mir-2.4.0-factorio-2.0.json
+      assurance_seal_status: passed
+      status: sealed-candidate-awaiting-legacy-promotion
       purpose: final Factorio 2.0 companion folding the portable 3.1.5 compiler into the 2.4.0 release identity
     factorio_1_1_port:
       version: "1.9.4"

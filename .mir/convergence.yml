@@ -121,6 +121,9 @@ candidate:
   scenario_count: 82
   assurance_qualification_path: .mir/evidence/2.4.0-assurance-qualification.json
   assurance_qualification_status: passed
+  assurance_seal_path: .mir/evidence/candidate-seals/mir-2.4.0-factorio-2.0.json
+  assurance_seal_source_commit: 9b381ab23d80e2a754d34e263a42ae7db0a3c8e0
+  assurance_seal_status: passed
   automated_gate: passed
   manual_gate: pending
   status: release-candidate-awaiting-manual-review

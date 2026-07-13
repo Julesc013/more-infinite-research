@@ -21,10 +21,9 @@ This file is the concise executable queue. Detailed scope, decisions, evidence, 
 
 ## Current Gate
 
-1. Commit the final evidence and seal the exact 2.4.0 candidate on `tmp/2.0`.
-2. Promote that same commit and archive to `legacy`; verify without rebuilding.
-3. Push the non-release branches and stop.
-4. Leave interactive review, the existing local tag collision, final tag creation, and publication to the maintainer.
+1. Promote the sealed 2.4.0 candidate and exact archive to `legacy`; verify without rebuilding.
+2. Push the non-release branches and stop.
+3. Leave interactive review, the existing local tag collision, final tag creation, and publication to the maintainer.
 
 ## Recurring Release Gate
 
