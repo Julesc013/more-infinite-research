@@ -113,6 +113,8 @@ Copy-MIRUpgradeLogEvidence -Source $log -Destination $loadEvidence
     "technology-level-retained",
     "fixture-storage-retained",
     "scripted-runtime-effect-retained",
+    "native-owner-setting-ids-retained",
+    "native-owner-technology-levels-retained",
     "exact-candidate-normal-mod-directory-load"
   )
   create_log = (Split-Path -Leaf $createEvidence)
