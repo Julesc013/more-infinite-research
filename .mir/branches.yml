@@ -273,18 +273,46 @@ release_artifacts:
       target_factorio: "2.0"
       source_anchor: mir_3_1_5
       source_anchor_commit: c8bf4a742910cec9d6d3dee305c83deba1aa49eb
-      source_commit: pending-qualified-candidate
+      source_commit: 5963445b1b72efffc18b232f5367a7da640061e8
       artifact: dist/more-infinite-research_2.4.0.zip
+      sha256: 5E1D16CEA5C8F43E8C257B73A3A5A728CE6DFB9ADA18B0CACDDB49DE3C5226E1
+      size_bytes: 399197
+      entries: 166
+      files: 166
+      forbidden_entries: 0
+      package_content_sha256: 6D0DED50982C9F7EDF339268BA9972D348F51B15DB566158C25E0DC043122EF9
+      assurance_content_sha256: 88EEE8CE1CBB38C92C379B111B3C56921F22BBD97B2AC80AFE2B19456497BC8B
+      package_source_sha256: 6D0DED50982C9F7EDF339268BA9972D348F51B15DB566158C25E0DC043122EF9
+      target_profile_sha256: E4955F0415FAFB69C21DA32BA535C761740C270D6972955170CA5A2BE95D514A
+      required_groups_sha256: 57A1DF87A8FB594B2B51C7E230D775E88028F23D52DF9D5D7DA1336F9271C78A
+      validation_harness_sha256: 3BA4187248429D9BF964279EDCBB979B4F6ED6222074B2E82ED06CD8566DE369
+      expected_scenarios_sha256: B5DAAD0F8615F39DA75E784EC4EEF2715711AE4A944A23F8DF990F629828A414
+      validation_package_sha256: F1C7A87588A9089181AC59FE2750F7168817C1E4AEBF6CD3775886776D925669
+      validation_package_content_sha256: 6D0DED50982C9F7EDF339268BA9972D348F51B15DB566158C25E0DC043122EF9
+      structured_summary_path: .mir/evidence/2.4.0-rc-final-validation-summary.json
+      structured_summary_run_id: 29480972-467a-40ed-9a9e-5d11a52ac03c
+      structured_summary_status: passed
+      structured_summary_duration_seconds: 1136.78
+      scenario_count: 82
+      exact_dist_base: passed
+      exact_dist_space_age: passed
+      exact_upgrade_from_2_3_5: passed
+      upgrade_evidence: .mir/evidence/2.4.0-upgrade-proof-final.json
+      release_targeted_gate: passed
+      release_targeted_evidence: .mir/evidence/2.4.0-release-targeted-final-summary.json
+      assurance_qualification: .mir/evidence/2.4.0-assurance-qualification.json
+      assurance_qualification_status: passed
       previous_candidate_commit: 575fc4f5ae4a52205d1e72604934ead35e69c99e
       previous_candidate_sha256: 8618CAF031EF24EB83641DB03566F2390DD29AD98D2099A80D596EEB527EDA12
       previous_candidate_status: superseded-unreleased-candidate
       superseded_2_5_candidate_commit: 4f7c9d18d5491e6e6fcafa5364f9b832cabac233
       superseded_2_5_candidate_sha256: 0BE57ED4C51DDF08F80AB4CFB2D5762DF2714B17AB26DB58CA9980289350CBFD
       superseded_2_5_candidate_evidence: .mir/evidence/2.5.0-supersession-ledger.md
-      automated_gate: pending
+      automated_gate: passed
+      manual_gate: pending
       assurance_seal: pending
       publication_scope: unreleased
-      status: rebuilding-from-published-3.1.5
+      status: candidate-qualified-awaiting-seal
     mir_2_3_0:
       version: "2.3.0"
       branch: legacy
@@ -429,11 +457,14 @@ release_artifacts:
       source_anchor: mir_3_1_5
       source_anchor_commit: c8bf4a742910cec9d6d3dee305c83deba1aa49eb
       artifact: dist/more-infinite-research_2.4.0.zip
+      source_commit: 5963445b1b72efffc18b232f5367a7da640061e8
+      sha256: 5E1D16CEA5C8F43E8C257B73A3A5A728CE6DFB9ADA18B0CACDDB49DE3C5226E1
       superseded_candidate_commit: 4f7c9d18d5491e6e6fcafa5364f9b832cabac233
       superseded_candidate_version: "2.5.0"
       superseded_candidate_sha256: 0BE57ED4C51DDF08F80AB4CFB2D5762DF2714B17AB26DB58CA9980289350CBFD
-      validation_status: pending
-      status: rebuilding
+      validation_status: passed
+      assurance_seal: pending
+      status: candidate-qualified-awaiting-seal
       purpose: final Factorio 2.0 companion folding the portable 3.1.5 compiler into the 2.4.0 release identity
     factorio_1_1_port:
       version: "1.9.4"

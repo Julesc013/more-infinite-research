@@ -28,4 +28,4 @@ MIR 2.4.0 brings the supported 3.1 compiler improvements to the maintained Facto
 
 MIR 2.4.0 deliberately omits the two Factorio 2.1-only cargo technology modifiers. Compatibility remains opportunistic and evidence-based: unsupported or unsafe streams are skipped with diagnostics rather than forcing broad overhaul claims.
 
-The release gate covers the exact 2.3.5 upgrade path, generated IDs, settings and research-state retention, deterministic packaging, base and Space Age loads, and named local-ecosystem checks.
+The automated release gate passed all 82 declared Factorio 2.0 scenarios. It covers the exact 2.3.5 upgrade path, generated IDs, settings and research-state retention, deterministic packaging, exact archive base and Space Age loads, and named local-ecosystem checks.

@@ -1,0 +1,143 @@
+{
+  "schema": 1,
+  "status": "passed",
+  "state": "RUNTIME-QUALIFIED",
+  "release_status": "NOT RELEASED",
+  "target": "2.0",
+  "version": "2.4.0",
+  "source_commit": "5963445b1b72efffc18b232f5367a7da640061e8",
+  "build": {
+    "candidate": "C:\\Projects\\Factorio\\more-infinite-research-tmp-2.0\\dist\\more-infinite-research_2.4.0.zip",
+    "sha256": "5E1D16CEA5C8F43E8C257B73A3A5A728CE6DFB9ADA18B0CACDDB49DE3C5226E1",
+    "content_sha256": "88EEE8CE1CBB38C92C379B111B3C56921F22BBD97B2AC80AFE2B19456497BC8B",
+    "size_bytes": 399197
+  },
+  "plan": {
+    "schema": 1,
+    "generated_at": "2026-07-13T16:18:57.0688131Z",
+    "target": "2.0",
+    "profile": "full",
+    "baseline": "",
+    "candidate": "C:\\Projects\\Factorio\\more-infinite-research-tmp-2.0\\dist\\more-infinite-research_2.4.0.zip",
+    "classification": {
+      "paths": [],
+      "classes": [],
+      "tests": [],
+      "unknown_paths": [],
+      "escalated": false
+    },
+    "tests": [
+      {
+        "id": "static.full",
+        "kind": "static",
+        "command": "./scripts/Invoke-MIRValidation.ps1 -StaticOnly",
+        "requires_factorio": false,
+        "inputs": [
+          "repository",
+          "test-catalog",
+          "target-profile"
+        ]
+      },
+      {
+        "id": "runtime.full",
+        "kind": "runtime",
+        "command": "./scripts/Invoke-MIRValidation.ps1 -FactorioBin <factorio>",
+        "requires_factorio": true,
+        "inputs": [
+          "candidate",
+          "factorio",
+          "required-scenarios",
+          "harness",
+          "fixtures",
+          "settings"
+        ]
+      },
+      {
+        "id": "runtime.upgrade",
+        "kind": "runtime",
+        "command": "./scripts/Test-MIRUpgrade.ps1 -FactorioBin <factorio> -FromZip <prior-release> -ToZip <candidate> -FromVersion 2.3.5 -ToVersion 2.4.0 -FixtureName assert-upgrade-2-3-5-to-2-4-0 -OutputPath artifacts/assurance/2.4.0-upgrade-proof.json",
+        "requires_factorio": true,
+        "inputs": [
+          "candidate",
+          "prior-release",
+          "factorio",
+          "upgrade-fixture",
+          "harness",
+          "settings"
+        ]
+      },
+      {
+        "id": "runtime.ecosystem",
+        "kind": "runtime",
+        "command": "./scripts/mir.ps1 release gate --profile release-targeted-2.0 --factorio <factorio> --no-git-pull",
+        "requires_factorio": true,
+        "inputs": [
+          "candidate",
+          "factorio",
+          "mod-lock",
+          "ecosystem-profile",
+          "harness"
+        ]
+      }
+    ],
+    "requires_factorio": true,
+    "package_source_sha256": "E9E3FBB722A1E0E40E6AB4F61728045166C80CB50A5473674BBAF6C3D662879F",
+    "test_catalog_sha256": "A5153A040CE8C9E1159F76E2E579270B050760E2B2A973E3DA6D9F0DCFBCC567",
+    "validation_harness_sha256": "4099359D3C38E4D39DB2E0FC5489F6311261754876D30C27F144B9408A10AD75"
+  },
+  "evidence": [
+    {
+      "schema": 1,
+      "test_id": "static.full",
+      "status": "passed",
+      "input_key": "A30DB26B333AF6CBAEF552AFBABA823119CD7ADE611AC4AD2D6053D76B3E7CAB",
+      "target": "2.0",
+      "candidate_sha256": "5E1D16CEA5C8F43E8C257B73A3A5A728CE6DFB9ADA18B0CACDDB49DE3C5226E1",
+      "factorio_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+      "command": "./scripts/Invoke-MIRValidation.ps1 -StaticOnly",
+      "started_at": "2026-07-13T16:18:57.7733857Z",
+      "duration_seconds": 15.342,
+      "message": ""
+    },
+    {
+      "schema": 1,
+      "test_id": "runtime.full",
+      "status": "passed",
+      "input_key": "279EE27602D2EE6126AD75B47F2D3D466AB2D83C6AE29EC929ABA5C473B79874",
+      "target": "2.0",
+      "candidate_sha256": "5E1D16CEA5C8F43E8C257B73A3A5A728CE6DFB9ADA18B0CACDDB49DE3C5226E1",
+      "factorio_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+      "command": "./scripts/Invoke-MIRValidation.ps1 -FactorioBin <factorio>",
+      "started_at": "2026-07-13T16:19:13.4591077Z",
+      "duration_seconds": 1052.683,
+      "message": ""
+    },
+    {
+      "schema": 1,
+      "test_id": "runtime.upgrade",
+      "status": "passed",
+      "input_key": "F251B5191CDBC5FAF5F88EE5C3EFA75654EDAF616367434D4EF660A409BEACAF",
+      "target": "2.0",
+      "candidate_sha256": "5E1D16CEA5C8F43E8C257B73A3A5A728CE6DFB9ADA18B0CACDDB49DE3C5226E1",
+      "factorio_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+      "command": "./scripts/Test-MIRUpgrade.ps1 -FactorioBin <factorio> -FromZip <prior-release> -ToZip <candidate> -FromVersion 2.3.5 -ToVersion 2.4.0 -FixtureName assert-upgrade-2-3-5-to-2-4-0 -OutputPath artifacts/assurance/2.4.0-upgrade-proof.json",
+      "started_at": "2026-07-13T16:36:46.4489452Z",
+      "duration_seconds": 17.316,
+      "message": ""
+    },
+    {
+      "schema": 1,
+      "test_id": "runtime.ecosystem",
+      "status": "passed",
+      "input_key": "BB524B0D118F0D0B4408D9428F09AAF1DB86E32632F677447DED82BCFEE1C196",
+      "target": "2.0",
+      "candidate_sha256": "5E1D16CEA5C8F43E8C257B73A3A5A728CE6DFB9ADA18B0CACDDB49DE3C5226E1",
+      "factorio_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+      "command": "./scripts/mir.ps1 release gate --profile release-targeted-2.0 --factorio <factorio> --no-git-pull",
+      "started_at": "2026-07-13T16:37:04.1316175Z",
+      "duration_seconds": 1225.659,
+      "message": ""
+    }
+  ],
+  "completed_at": "2026-07-13T16:57:30.1981715Z"
+}

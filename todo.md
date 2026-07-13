@@ -8,7 +8,7 @@ This file is the concise executable queue. Detailed scope, decisions, evidence, 
 
 - MIR 3.1.5 is the published canonical Factorio 2.1 anchor at release commit `c8bf4a742910cec9d6d3dee305c83deba1aa49eb`.
 - MIR 2.3.5 is the published Factorio 2.0 predecessor on `legacy`.
-- MIR 2.4.0 is being rebuilt on `tmp/2.0` as the final Factorio 2.0 release identity for the portable 3.1.5 compiler work. It is not tagged or published.
+- MIR 2.4.0 is runtime-qualified on `tmp/2.0` as the final Factorio 2.0 release identity for the portable 3.1.5 compiler work. It is not tagged or published.
 - The internal MIR 2.5.0 candidate is superseded. Its commit and digest are preserved as safety evidence; its archive and release-facing fixture are removed.
 - `tmp/1.1` and every older target remain untouched until the maintainer tags and publishes 2.4.0.
 
@@ -21,7 +21,7 @@ This file is the concise executable queue. Detailed scope, decisions, evidence, 
 
 ## Current Gate
 
-1. Finish and seal the exact 2.4.0 candidate on `tmp/2.0`.
+1. Commit the final evidence and seal the exact 2.4.0 candidate on `tmp/2.0`.
 2. Promote that same commit and archive to `legacy`; verify without rebuilding.
 3. Push the non-release branches and stop.
 4. Leave interactive review, the existing local tag collision, final tag creation, and publication to the maintainer.
