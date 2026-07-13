@@ -1,5 +1,6 @@
 local deepcopy = require("prototypes.mir.core.deepcopy")
 local generation_plan = require("prototypes.mir.planner.generation_plan")
+local native_owner_contract = require("prototypes.mir.domain.native_owner.contract")
 
 local M = {}
 
@@ -134,9 +135,11 @@ function M.resolve(raw_rows)
       row.effect_ownership = {won = won, lost = lost}
     end
     if row.action == "emit" and row.fields then row.fields.effects = kept end
-    if row.action == "adopt" and row.adoption then row.adoption.effects = kept end
+    if row.action == "adopt" and row.adoption then
+      row.adoption = native_owner_contract.refresh_effects(row.adoption, kept)
+    end
     if row.diagnostics and materializing_counts[row_index] > 0 then row.diagnostics.effects = tostring(#kept) end
-    if materializing_counts[row_index] > 0 and #kept == 0 then
+    if row.action ~= "adopt" and materializing_counts[row_index] > 0 and #kept == 0 then
       convert_empty_row_to_skip(row, lost[1] and lost[1].identity or "none")
     end
   end

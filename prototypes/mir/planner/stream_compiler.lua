@@ -2,7 +2,7 @@ local C = require("prototypes.mir.streams.registry")
 local D = require("prototypes.mir.report.diagnostics_sink")
 local deepcopy = require("prototypes.mir.core.deepcopy")
 local table_utils = require("prototypes.mir.core.table")
-local adoption_policy = require("prototypes.mir.policy.adoption_policy")
+local native_owner_binding = require("prototypes.mir.planner.native_owner_binding")
 local adoption_transaction = require("prototypes.mir.emit.transactions.productivity_family_adoption")
 local costs = require("prototypes.mir.planner.costs")
 local icon_builder = require("prototypes.mir.emit.icon_builder")
@@ -28,6 +28,8 @@ local target_profiles = require("prototypes.mir.platform.factorio.target_profile
 local automatic_compiler_policy = require("prototypes.mir.settings.automatic_compiler_policy")
 local compatibility_packs = require("prototypes.mir.compatibility.packs.registry")
 local effect_ownership = require("prototypes.mir.planner.effect_ownership")
+local native_owner_contract = require("prototypes.mir.domain.native_owner.contract")
+local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 
 local M = {}
 local latest_plan = nil
@@ -316,10 +318,10 @@ local function plan_stream(key, raw_spec)
   local covered_by_existing
   buckets, covered_by_existing = owner_policy.filter_existing_recipe_productivity(key, spec, buckets)
   local adopted_effects, family_blocked, adoption_owner_name, adoption
-  buckets, adopted_effects, family_blocked, adoption_owner_name, adoption = adoption_policy.plan_recipe_productivity_family(key, spec, buckets)
-  if adopted_effects and #adopted_effects > 0 then
-    return plan_row(key, spec, "adopt", "adopted_into_existing_productivity_family",
-      D.stream_fields(key, spec, "adopted", "adopted_into_existing_productivity_family", ingredients, nil, adopted_effects, lab_status, {
+  buckets, adopted_effects, family_blocked, adoption_owner_name, adoption = native_owner_binding.plan(key, spec, buckets)
+  if adoption then
+    return plan_row(key, spec, "adopt", adoption.operation,
+      D.stream_fields(key, spec, "adopted", adoption.operation, ingredients, nil, adopted_effects, lab_status, {
         owners = adoption_owner_name,
         recipes = owner_policy.recipe_names_from_effects(adopted_effects)
       }), {
@@ -328,7 +330,7 @@ local function plan_stream(key, raw_spec)
   end
   local effects = recipe_productivity_planner.effects_from_buckets(key, buckets)
   if #effects == 0 then
-    if adopted_effects and #adopted_effects > 0 then
+    if adoption then
       error("GenerationPlan adoption row was not created for stream " .. key)
     end
     local reason = "no_matching_recipes"
@@ -376,13 +378,23 @@ end
 
 function M.compile()
   local streams = C.snapshot()
+  local native_owner_inputs = {}
+  for key, spec in pairs(streams) do
+    local binding = spec.native_owner_binding
+    if binding and binding.owner then
+      local owner = data_raw.technology(binding.owner)
+      native_owner_inputs[key] = owner and native_owner_contract.snapshot(owner)
+        or {name = binding.owner, missing = true}
+    end
+  end
   local plan = generation_plan.new({
     source_fingerprints = {
       facts = fingerprint.of(recipe_facts.snapshot()),
       rules = fingerprint.of({streams = streams, families = family_registry.snapshot()}),
       providers = provider_registry.fingerprint(),
       compatibility_packs = fingerprint.of(compatibility_packs.snapshot()),
-      target_profile = fingerprint.of(target_profiles.current())
+      target_profile = fingerprint.of(target_profiles.current()),
+      native_owners = fingerprint.of(native_owner_inputs)
     }
   })
   local rows = {}

@@ -1,50 +1,92 @@
+local deepcopy = require("prototypes.mir.core.deepcopy")
 local data_raw = require("prototypes.mir.platform.factorio.data_raw")
-local productivity_owners = require("prototypes.mir.index.productivity_owners")
+local native_owner_contract = require("prototypes.mir.domain.native_owner.contract")
 local mod_data = require("prototypes.mir.emit.mod_data")
 
 local M = {}
 local MOD_DATA_NAME = "more-infinite-research-productivity-family-adoption"
-local VERSION = 1
+local VERSION = 2
+local bindings = {}
 local adopted_productivity_family_recipes = {}
 
-local function record(plan, effect)
-  table.insert(adopted_productivity_family_recipes, {
+local function same(left, right)
+  return tostring(left or "") == tostring(right or "")
+end
+
+local function record(plan)
+  table.insert(bindings, {
     key = plan.key,
     owner = plan.owner,
-    recipe = effect.recipe,
-    change = effect.change
+    operation = plan.operation,
+    configured_fields = deepcopy(plan.configured_fields or {}),
+    input_fingerprint = plan.input_fingerprint,
+    output_fingerprint = plan.output_fingerprint,
+    effect_count = #(plan.effects or {})
   })
+  for _, effect in ipairs(plan.effects or {}) do
+    table.insert(adopted_productivity_family_recipes, {
+      key = plan.key,
+      owner = plan.owner,
+      recipe = effect.recipe,
+      change = effect.change
+    })
+  end
 end
 
 function M.apply(plan)
   if not plan then return {} end
   local owner = data_raw.technology(plan.owner)
   if not owner then
-    error("Planned productivity-family adoption owner disappeared: " .. tostring(plan.owner), 2)
+    error("Planned native-owner binding target disappeared: " .. tostring(plan.owner), 2)
   end
 
-  local adopted = {}
-  owner.effects = owner.effects or {}
-  for _, effect in ipairs(plan.effects or {}) do
-    if not productivity_owners.has_recipe_productivity_effect(owner, effect.recipe) then
-      table.insert(owner.effects, effect)
-      table.insert(adopted, effect)
-      record(plan, effect)
-      log("[more-infinite-research] Adopted productivity-family recipe for "
-        .. plan.key .. " recipe=" .. effect.recipe .. " into " .. plan.owner .. ".")
-    end
+  local current = native_owner_contract.snapshot(owner)
+  local current_fingerprint = native_owner_contract.fingerprint(current)
+  if not same(current_fingerprint, plan.input_fingerprint) then
+    error("Native-owner binding input changed after planning for " .. tostring(plan.owner)
+      .. " expected=" .. tostring(plan.input_fingerprint)
+      .. " actual=" .. tostring(current_fingerprint), 2)
   end
-  return adopted
+  if not same(native_owner_contract.fingerprint(plan.expected_snapshot), plan.output_fingerprint) then
+    error("Native-owner binding output fingerprint is invalid for " .. tostring(plan.owner), 2)
+  end
+
+  if current_fingerprint ~= plan.output_fingerprint then
+    -- Every fallible check happens above. These assignments are the single
+    -- emission transaction for the already-validated owner snapshot.
+    local staged = deepcopy(plan.expected_snapshot)
+    owner.unit = staged.unit
+    owner.max_level = staged.max_level
+    owner.effects = staged.effects
+  end
+
+  local actual_fingerprint = native_owner_contract.fingerprint(native_owner_contract.snapshot(owner))
+  if not same(actual_fingerprint, plan.output_fingerprint) then
+    error("Native-owner binding transaction produced an unexpected output for " .. tostring(plan.owner)
+      .. " expected=" .. tostring(plan.output_fingerprint)
+      .. " actual=" .. tostring(actual_fingerprint), 2)
+  end
+
+  record(plan)
+  log("[more-infinite-research] Applied native-owner binding for " .. tostring(plan.key)
+    .. " owner=" .. tostring(plan.owner)
+    .. " operation=" .. tostring(plan.operation)
+    .. " configured=" .. table.concat(plan.configured_fields or {}, ",")
+    .. " adopted-effects=" .. tostring(#(plan.effects or {})) .. ".")
+  return deepcopy(plan.effects or {})
 end
 
 local function signature()
   local entries = {}
-  for _, entry in ipairs(adopted_productivity_family_recipes) do
+  for _, entry in ipairs(bindings) do
     table.insert(entries,
       "schema=" .. tostring(VERSION)
+      .. "|stream=" .. tostring(entry.key)
       .. "|owner=" .. tostring(entry.owner)
-      .. "|recipe=" .. tostring(entry.recipe)
-      .. "|change=" .. tostring(entry.change))
+      .. "|operation=" .. tostring(entry.operation)
+      .. "|configured=" .. table.concat(entry.configured_fields or {}, ",")
+      .. "|effects=" .. tostring(entry.effect_count)
+      .. "|output=" .. tostring(entry.output_fingerprint))
   end
   table.sort(entries)
   return table.concat(entries, ";")
@@ -58,19 +100,18 @@ function M.emit_mod_data()
       version = VERSION,
       adopted = #adopted_productivity_family_recipes > 0,
       adopted_count = #adopted_productivity_family_recipes,
+      binding_count = #bindings,
       signature = signature()
     }
   })
 end
 
 function M.snapshot()
-  local out = {}
-  for _, entry in ipairs(adopted_productivity_family_recipes) do
-    local copy = {}
-    for key, value in pairs(entry) do copy[key] = value end
-    table.insert(out, copy)
-  end
-  return out
+  return deepcopy({
+    version = VERSION,
+    bindings = bindings,
+    adopted_recipes = adopted_productivity_family_recipes
+  })
 end
 
 return M

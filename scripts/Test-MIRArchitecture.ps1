@@ -235,11 +235,9 @@ $requiredMirFiles = @(
   "prototypes/mir/streams/registry.lua",
   "prototypes/mir/pipeline/commands.lua",
   "prototypes/mir/pipeline/extent.lua",
-  "prototypes/mir/policy/adoption_policy.lua",
   "prototypes/mir/policy/owner_policy.lua",
   "prototypes/mir/policy/competing_productivity.lua",
   "prototypes/mir/policy/competing_base_extensions.lua",
-  "prototypes/mir/policy/productivity_family_adoption.lua",
   "prototypes/mir/policy/max_level.lua",
   "prototypes/mir/policy/weapon_speed.lua",
   "prototypes/mir/policy/capabilities.lua",
@@ -250,6 +248,8 @@ $requiredMirFiles = @(
   "prototypes/mir/domain/facts/registry.lua",
   "prototypes/mir/domain/facts/recipe_semantics.lua",
   "prototypes/mir/domain/effects/metadata.lua",
+  "prototypes/mir/domain/native_owner/contract.lua",
+  "prototypes/mir/domain/native_owner/cost_model.lua",
   "prototypes/mir/domain/facts/generated_technology_registry.lua",
   "prototypes/mir/capabilities/contract.lua",
   "prototypes/mir/capabilities/registry.lua",
@@ -268,6 +268,7 @@ $requiredMirFiles = @(
   "prototypes/mir/planner/costs.lua",
   "prototypes/mir/planner/direct_effects.lua",
   "prototypes/mir/planner/native_modifiers.lua",
+  "prototypes/mir/planner/native_owner_binding.lua",
   "prototypes/mir/planner/prerequisites.lua",
   "prototypes/mir/planner/requirements.lua",
   "prototypes/mir/planner/science.lua",
@@ -429,7 +430,6 @@ Assert-MIRContains -RelativePath "prototypes/mir/families/registry.lua" -Text $f
 foreach ($relativePath in @(
   "prototypes/mir/policy/competing_productivity.lua",
   "prototypes/mir/policy/competing_base_extensions.lua",
-  "prototypes/mir/policy/productivity_family_adoption.lua",
   "prototypes/mir/policy/weapon_speed.lua",
   "prototypes/mir/policy/max_level.lua"
 )) {
@@ -440,7 +440,8 @@ foreach ($relativePath in @(
 }
 
 $adoptionTransactionText = Read-MIRFile -RelativePath "prototypes/mir/emit/transactions/productivity_family_adoption.lua"
-Assert-MIRContains -RelativePath "prototypes/mir/emit/transactions/productivity_family_adoption.lua" -Text $adoptionTransactionText -Needle "table.insert(owner.effects, effect)"
+Assert-MIRContains -RelativePath "prototypes/mir/emit/transactions/productivity_family_adoption.lua" -Text $adoptionTransactionText -Needle "owner.effects = staged.effects"
+Assert-MIRContains -RelativePath "prototypes/mir/emit/transactions/productivity_family_adoption.lua" -Text $adoptionTransactionText -Needle "plan.input_fingerprint"
 
 $settingsProfileText = Read-MIRFile -RelativePath "prototypes/mir/runtime/settings_profile.lua"
 Assert-MIRContains -RelativePath "prototypes/mir/runtime/settings_profile.lua" -Text $settingsProfileText -Needle '"mir-settings-export"'

@@ -250,6 +250,38 @@ fixtures:
       - external-recipe-productivity-prefix-owner
       - technology-prerequisite-rewire
 
+  native-owner-settings:
+    requires_features: [recipe_productivity]
+    path: fixtures/native-owner-settings-source
+    assertion_path: fixtures/assert-native-owner-settings
+    supplemental_paths:
+      - fixtures/native-owner-unrecognized-formula
+    validates:
+      - all-four-native-owner-setting-groups-visible
+      - unchanged-defaults-preserve-final-owner-snapshots
+      - enable-false-leaves-external-owners-untouched
+      - base-cost-override
+      - cost-growth-override
+      - research-time-override
+      - finite-max-level-override
+      - infinite-max-level-default
+      - effect-per-level-override
+      - combined-owner-override
+      - relevant-effects-only
+      - unrelated-effects-preserved
+      - processing-unit-native-owner
+      - plastic-bar-native-owner
+      - low-density-structure-native-owner
+      - rocket-fuel-native-owner
+      - fully-covered-owner-still-produces-binding-row
+      - target-native-formula-classification
+      - unrecognized-modded-formula-default-preservation
+      - unsafe-unrecognized-formula-override-rejection
+      - input-output-fingerprint-transaction
+      - duplicate-native-owner-binding-rejection
+      - configuration-change-signature-reset
+      - settings-profile-compatible-stable-ids
+
   competing-base-extension-transaction:
     requires_features: []
     path: fixtures/better-robots-extended-competitor

@@ -38,11 +38,16 @@ local function materialized_stream_operations(artifact)
     elseif row.action == "adopt" then
       table.insert(out, {
         schema = 2,
-        operation = "adopt_stream",
+        operation = "native_owner_binding",
+        binding_operation = row.adoption.operation,
         stream_key = row.stream_key,
         manifest_id = row.manifest_id,
         technology_name = row.adoption.owner,
-        effects = deepcopy(row.adoption.effects)
+        effects = deepcopy(row.adoption.effects),
+        configured_fields = deepcopy(row.adoption.configured_fields),
+        input_fingerprint = row.adoption.input_fingerprint,
+        output_fingerprint = row.adoption.output_fingerprint,
+        expected_snapshot = deepcopy(row.adoption.expected_snapshot)
       })
     end
   end

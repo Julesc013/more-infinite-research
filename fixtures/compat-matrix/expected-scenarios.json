@@ -1957,7 +1957,10 @@
         "required_features": [
           "recipe_productivity"
         ],
-        "fixtures": [],
+        "fixtures": [
+          "mir-fixture-vanilla-family-adoption-recipes",
+          "mir-fixture-assert-vanilla-family-adoption"
+        ],
         "settings": {},
         "source_mode": "exact-package",
         "timeout_seconds": 180,
@@ -1973,6 +1976,171 @@
             "type": "factorio-load-and-assertion-fixtures-pass"
           }
         ]
+      },
+      {
+        "name": "space-age-native-owner-settings-default",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": ["recipe_productivity"],
+        "fixtures": ["mir-fixture-native-owner-settings-source", "mir-fixture-assert-native-owner-settings"],
+        "settings": {"NativeOwnerSettingsProfile": "default"},
+        "source_mode": "exact-package",
+        "timeout_seconds": 180,
+        "tags": ["full", "native-owner-settings", "runtime", "space-age"],
+        "isolation": "fresh-data-stage",
+        "assertions": [{"id": "native-owner-default-preservation", "type": "factorio-load-and-assertion-fixtures-pass"}]
+      },
+      {
+        "name": "space-age-native-owner-settings-disabled",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": ["recipe_productivity"],
+        "fixtures": ["mir-fixture-native-owner-settings-source", "mir-fixture-assert-native-owner-settings"],
+        "settings": {"NativeOwnerSettingsProfile": "disabled"},
+        "source_mode": "exact-package",
+        "timeout_seconds": 180,
+        "tags": ["full", "native-owner-settings", "runtime", "space-age"],
+        "isolation": "fresh-data-stage",
+        "assertions": [{"id": "native-owner-disabled-no-touch", "type": "factorio-load-and-assertion-fixtures-pass"}]
+      },
+      {
+        "name": "space-age-native-owner-settings-cost-base",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": ["recipe_productivity"],
+        "fixtures": ["mir-fixture-native-owner-settings-source", "mir-fixture-assert-native-owner-settings"],
+        "settings": {"NativeOwnerSettingsProfile": "cost-base"},
+        "source_mode": "exact-package",
+        "timeout_seconds": 180,
+        "tags": ["full", "native-owner-settings", "runtime", "space-age"],
+        "isolation": "fresh-data-stage",
+        "assertions": [{"id": "native-owner-cost-base-override", "type": "factorio-load-and-assertion-fixtures-pass"}]
+      },
+      {
+        "name": "space-age-native-owner-settings-cost-growth",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": ["recipe_productivity"],
+        "fixtures": ["mir-fixture-native-owner-settings-source", "mir-fixture-assert-native-owner-settings"],
+        "settings": {"NativeOwnerSettingsProfile": "cost-growth"},
+        "source_mode": "exact-package",
+        "timeout_seconds": 180,
+        "tags": ["full", "native-owner-settings", "runtime", "space-age"],
+        "isolation": "fresh-data-stage",
+        "assertions": [{"id": "native-owner-cost-growth-override", "type": "factorio-load-and-assertion-fixtures-pass"}]
+      },
+      {
+        "name": "space-age-native-owner-settings-research-time",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": ["recipe_productivity"],
+        "fixtures": ["mir-fixture-native-owner-settings-source", "mir-fixture-assert-native-owner-settings"],
+        "settings": {"NativeOwnerSettingsProfile": "research-time"},
+        "source_mode": "exact-package",
+        "timeout_seconds": 180,
+        "tags": ["full", "native-owner-settings", "runtime", "space-age"],
+        "isolation": "fresh-data-stage",
+        "assertions": [{"id": "native-owner-research-time-override", "type": "factorio-load-and-assertion-fixtures-pass"}]
+      },
+      {
+        "name": "space-age-native-owner-settings-max-level",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": ["recipe_productivity"],
+        "fixtures": ["mir-fixture-native-owner-settings-source", "mir-fixture-assert-native-owner-settings"],
+        "settings": {"NativeOwnerSettingsProfile": "max-level"},
+        "source_mode": "exact-package",
+        "timeout_seconds": 180,
+        "tags": ["full", "native-owner-settings", "runtime", "space-age"],
+        "isolation": "fresh-data-stage",
+        "assertions": [{"id": "native-owner-max-level-override", "type": "factorio-load-and-assertion-fixtures-pass"}]
+      },
+      {
+        "name": "space-age-native-owner-settings-effect",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": ["recipe_productivity"],
+        "fixtures": ["mir-fixture-native-owner-settings-source", "mir-fixture-assert-native-owner-settings"],
+        "settings": {"NativeOwnerSettingsProfile": "effect"},
+        "source_mode": "exact-package",
+        "timeout_seconds": 180,
+        "tags": ["full", "native-owner-settings", "runtime", "space-age"],
+        "isolation": "fresh-data-stage",
+        "assertions": [{"id": "native-owner-effect-override", "type": "factorio-load-and-assertion-fixtures-pass"}]
+      },
+      {
+        "name": "space-age-native-owner-settings-combined",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": ["recipe_productivity"],
+        "fixtures": ["mir-fixture-native-owner-settings-source", "mir-fixture-assert-native-owner-settings"],
+        "settings": {"NativeOwnerSettingsProfile": "combined"},
+        "source_mode": "exact-package",
+        "timeout_seconds": 180,
+        "tags": ["full", "native-owner-settings", "runtime", "space-age"],
+        "isolation": "fresh-data-stage",
+        "assertions": [{"id": "native-owner-combined-override", "type": "factorio-load-and-assertion-fixtures-pass"}]
+      },
+      {
+        "name": "space-age-native-owner-settings-unrecognized-default",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": ["recipe_productivity"],
+        "fixtures": ["mir-fixture-native-owner-settings-source", "mir-fixture-native-owner-unrecognized-formula", "mir-fixture-assert-native-owner-settings"],
+        "settings": {"NativeOwnerSettingsProfile": "unrecognized-default"},
+        "source_mode": "exact-package",
+        "timeout_seconds": 180,
+        "tags": ["full", "native-owner-settings", "runtime", "space-age"],
+        "isolation": "fresh-data-stage",
+        "assertions": [{"id": "native-owner-unrecognized-default-preserved", "type": "factorio-load-and-assertion-fixtures-pass"}]
+      },
+      {
+        "name": "space-age-native-owner-settings-unrecognized-override",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": ["recipe_productivity"],
+        "fixtures": ["mir-fixture-native-owner-settings-source", "mir-fixture-native-owner-unrecognized-formula", "mir-fixture-assert-native-owner-settings"],
+        "settings": {"NativeOwnerSettingsProfile": "unrecognized-override"},
+        "source_mode": "exact-package",
+        "timeout_seconds": 180,
+        "tags": ["full", "native-owner-settings", "runtime", "space-age"],
+        "isolation": "fresh-data-stage",
+        "assertions": [{"id": "native-owner-unsafe-cost-override-rejected", "type": "factorio-load-and-assertion-fixtures-pass"}]
+      },
+      {
+        "name": "space-age-native-owner-settings-config-change",
+        "target_profile": "2.1",
+        "kind": "configuration-change",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": ["recipe_productivity"],
+        "fixtures": [],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 300,
+        "tags": ["configuration-change", "full", "native-owner-settings", "space-age"],
+        "isolation": "fresh-data-stage",
+        "assertions": [{"id": "native-owner-settings-signature-reset", "type": "factorio-load-and-assertion-fixtures-pass"}]
       },
       {
         "name": "space-age-vanilla-family-adoption-config-change",
@@ -2009,7 +2177,10 @@
         "required_features": [
           "recipe_productivity"
         ],
-        "fixtures": [],
+        "fixtures": [
+          "mir-fixture-vanilla-family-exact-owner",
+          "mir-fixture-assert-vanilla-family-exact-owner"
+        ],
         "settings": {},
         "source_mode": "exact-package",
         "timeout_seconds": 180,
@@ -2035,7 +2206,10 @@
         "required_features": [
           "recipe_productivity"
         ],
-        "fixtures": [],
+        "fixtures": [
+          "mir-fixture-vanilla-family-mixed-owner",
+          "mir-fixture-assert-vanilla-family-mixed-owner"
+        ],
         "settings": {},
         "source_mode": "exact-package",
         "timeout_seconds": 180,
@@ -2061,7 +2235,10 @@
         "required_features": [
           "recipe_productivity"
         ],
-        "fixtures": [],
+        "fixtures": [
+          "mir-fixture-vanilla-family-owner-prepatched",
+          "mir-fixture-assert-vanilla-family-owner-prepatched"
+        ],
         "settings": {},
         "source_mode": "exact-package",
         "timeout_seconds": 180,

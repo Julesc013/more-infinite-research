@@ -2273,6 +2273,9 @@ function Initialize-RuntimeScenario {
     [hashtable]$EffectPerLevelOverrides = @{},
     [hashtable]$BaseEffectPerLevelOverrides = @{},
     [hashtable]$BaseMaxLevelOverrides = @{},
+    [hashtable]$StartupSettingOverrides = @{},
+    [ValidateSet("", "default", "disabled", "cost-base", "cost-growth", "research-time", "max-level", "effect", "combined", "unrecognized-default", "unrecognized-override")]
+    [string]$NativeOwnerSettingsProfile = "",
     [switch]$LabPolicySkip,
     [switch]$LabPolicyEngineDefault,
     [ValidateSet("configured", "space", "space-and-promethium", "space-age-progression", "official-progression", "mod-progression", "all-official", "all")]
@@ -2382,6 +2385,37 @@ function Initialize-RuntimeScenario {
   foreach ($key in $BaseMaxLevelOverrides.Keys) {
     Set-CopiedBaseExtensionMaxLevel -ModsDir $modsDir -BaseExtensionKey $key -MaxLevel ([int]$BaseMaxLevelOverrides[$key])
   }
+  $nativeOwnerOverrides = @{}
+  $nativeOwnerStreamKeys = @(
+    "research_processing_unit",
+    "research_plastic",
+    "research_low_density_structure",
+    "research_rocket_fuel"
+  )
+  foreach ($key in $nativeOwnerStreamKeys) {
+    switch ($NativeOwnerSettingsProfile) {
+      "disabled" { $nativeOwnerOverrides["ips-enable-$key"] = $false }
+      "cost-base" { $nativeOwnerOverrides["ips-cost-base-$key"] = 2000 }
+      "cost-growth" { $nativeOwnerOverrides["ips-cost-growth-$key"] = 1.25 }
+      "research-time" { $nativeOwnerOverrides["ips-research-time-$key"] = 90 }
+      "max-level" { $nativeOwnerOverrides["ips-max-level-$key"] = 7 }
+      "effect" { $nativeOwnerOverrides["ips-effect-per-level-$key"] = 25 }
+      "combined" {
+        $nativeOwnerOverrides["ips-cost-base-$key"] = 2000
+        $nativeOwnerOverrides["ips-cost-growth-$key"] = 1.25
+        $nativeOwnerOverrides["ips-research-time-$key"] = 90
+        $nativeOwnerOverrides["ips-max-level-$key"] = 7
+        $nativeOwnerOverrides["ips-effect-per-level-$key"] = 25
+      }
+    }
+  }
+  if ($NativeOwnerSettingsProfile -eq "unrecognized-override") {
+    $nativeOwnerOverrides["ips-cost-base-research_processing_unit"] = 2000
+  }
+  foreach ($name in $StartupSettingOverrides.Keys) {
+    $nativeOwnerOverrides[$name] = $StartupSettingOverrides[$name]
+  }
+  Set-CopiedStartupSettingDefaults -ModsDir $modsDir -Overrides $nativeOwnerOverrides
 
   $mods = @(
     @{ name = "base"; enabled = $true },
@@ -2448,6 +2482,9 @@ function Invoke-RuntimeScenario {
     [hashtable]$EffectPerLevelOverrides = @{},
     [hashtable]$BaseEffectPerLevelOverrides = @{},
     [hashtable]$BaseMaxLevelOverrides = @{},
+    [hashtable]$StartupSettingOverrides = @{},
+    [ValidateSet("", "default", "disabled", "cost-base", "cost-growth", "research-time", "max-level", "effect", "combined", "unrecognized-default", "unrecognized-override")]
+    [string]$NativeOwnerSettingsProfile = "",
     [switch]$LabPolicySkip,
     [switch]$LabPolicyEngineDefault,
     [ValidateSet("configured", "space", "space-and-promethium", "space-age-progression", "official-progression", "mod-progression", "all-official", "all")]
@@ -2498,6 +2535,8 @@ function Invoke-RuntimeScenario {
       -EffectPerLevelOverrides $EffectPerLevelOverrides `
       -BaseEffectPerLevelOverrides $BaseEffectPerLevelOverrides `
       -BaseMaxLevelOverrides $BaseMaxLevelOverrides `
+      -StartupSettingOverrides $StartupSettingOverrides `
+      -NativeOwnerSettingsProfile $NativeOwnerSettingsProfile `
       -LabPolicySkip:$LabPolicySkip `
       -LabPolicyEngineDefault:$LabPolicyEngineDefault `
       -SciencePackIngredientPolicy $SciencePackIngredientPolicy `
@@ -2561,6 +2600,12 @@ function Invoke-RuntimeConfigurationChangeScenario {
     [string[]]$InitialDisabledStreamKeys = @(),
     [string[]]$ChangedDisabledStreamKeys = @(),
     [hashtable]$EffectPerLevelOverrides = @{},
+    [hashtable]$InitialStartupSettingOverrides = @{},
+    [hashtable]$ChangedStartupSettingOverrides = @{},
+    [ValidateSet("", "default", "disabled", "cost-base", "cost-growth", "research-time", "max-level", "effect", "combined", "unrecognized-default", "unrecognized-override")]
+    [string]$InitialNativeOwnerSettingsProfile = "",
+    [ValidateSet("", "default", "disabled", "cost-base", "cost-growth", "research-time", "max-level", "effect", "combined", "unrecognized-default", "unrecognized-override")]
+    [string]$ChangedNativeOwnerSettingsProfile = "",
     [switch]$ScriptedDiagnostics,
     [switch]$EnableSpaceAge
   )
@@ -2580,6 +2625,8 @@ function Invoke-RuntimeConfigurationChangeScenario {
       -EnabledStreamKeys @($EnabledStreamKeys + $InitialEnabledStreamKeys) `
       -DisabledStreamKeys $InitialDisabledStreamKeys `
       -EffectPerLevelOverrides $EffectPerLevelOverrides `
+      -StartupSettingOverrides $InitialStartupSettingOverrides `
+      -NativeOwnerSettingsProfile $InitialNativeOwnerSettingsProfile `
       -ScriptedDiagnostics:$ScriptedDiagnostics `
       -EnableSpaceAge:$EnableSpaceAge
     if (Test-Path -LiteralPath $initialScenario.SavePath) {
@@ -2614,6 +2661,8 @@ function Invoke-RuntimeConfigurationChangeScenario {
       -EnabledStreamKeys @($EnabledStreamKeys + $ChangedEnabledStreamKeys) `
       -DisabledStreamKeys $ChangedDisabledStreamKeys `
       -EffectPerLevelOverrides $EffectPerLevelOverrides `
+      -StartupSettingOverrides $ChangedStartupSettingOverrides `
+      -NativeOwnerSettingsProfile $ChangedNativeOwnerSettingsProfile `
       -ScriptedDiagnostics:$ScriptedDiagnostics `
       -EnableSpaceAge:$EnableSpaceAge
 
@@ -3134,13 +3183,30 @@ if ($selectionActive) {
         Invoke-RuntimeScenario @parameters
       } elseif ($declaration.kind -eq "configuration-change") {
         switch ($declaration.name) {
+          "space-age-native-owner-settings-config-change" {
+            Invoke-RuntimeConfigurationChangeScenario `
+              -ScenarioName $declaration.name `
+              -InitialFixtureNames @(
+                "mir-fixture-native-owner-settings-source",
+                "mir-fixture-assert-native-owner-settings"
+              ) `
+              -ChangedFixtureNames @(
+                "mir-fixture-native-owner-settings-source",
+                "mir-fixture-assert-native-owner-settings"
+              ) `
+              -InitialNativeOwnerSettingsProfile "default" `
+              -ChangedNativeOwnerSettingsProfile "combined" `
+              -EnableSpaceAge
+            Assert-LogContains -Expected "Reset technology effects for productivity family adoption signature change" -Context $declaration.name
+            Assert-LogContains -Expected "schema=2|stream=research_rocket_fuel|owner=rocket-fuel-productivity|operation=configure_native_owner|configured=cost_model,effect_per_level,max_level,research_time|effects=0|output=" -Context $declaration.name
+          }
           "space-age-vanilla-family-adoption-config-change" {
             Invoke-RuntimeConfigurationChangeScenario `
               -ScenarioName $declaration.name `
               -ChangedFixtureNames @("mir-fixture-vanilla-family-adoption-recipes") `
               -EnableSpaceAge
             Assert-LogContains -Expected "Reset technology effects for productivity family adoption signature change" -Context $declaration.name
-            Assert-LogContains -Expected "schema=1|owner=rocket-fuel-productivity|recipe=mir-fixture-adopt-rocket-fuel|change=0.1" -Context $declaration.name
+            Assert-LogContains -Expected "schema=2|stream=research_rocket_fuel|owner=rocket-fuel-productivity|operation=adopt_native_owner_effects|configured=|effects=1|output=" -Context $declaration.name
           }
           "space-age-scripted-runtime-lifecycle" {
             Invoke-RuntimeConfigurationChangeScenario `
@@ -3966,25 +4032,23 @@ Invoke-RuntimeConfigurationChangeScenario -ScenarioName "space-age-vanilla-famil
   ) `
   -EnableSpaceAge
 Assert-LogContains -Expected "Reset technology effects for productivity family adoption signature change" -Context "Space Age vanilla family adoption configuration-change reset scenario"
-Assert-LogContains -Expected "schema=1|owner=rocket-fuel-productivity|recipe=mir-fixture-adopt-rocket-fuel|change=0.1" -Context "Space Age vanilla family adoption configuration-change signature scenario"
+Assert-LogContains -Expected "schema=2|stream=research_rocket_fuel|owner=rocket-fuel-productivity|operation=adopt_native_owner_effects|configured=|effects=1|output=" -Context "Space Age vanilla family adoption configuration-change signature scenario"
 
 Invoke-RuntimeScenario -ScenarioName "space-age-vanilla-family-owner-prepatched" -EnabledFixtureNames @(
   "mir-fixture-vanilla-family-owner-prepatched",
   "mir-fixture-assert-vanilla-family-owner-prepatched"
 ) -EnableSpaceAge
 $prepatchedRocketFuelLine = Get-LastStreamReportLine -Key "research_rocket_fuel"
-if ($prepatchedRocketFuelLine -notmatch "status=skipped" -or $prepatchedRocketFuelLine -notmatch "covered_by_existing_infinite_recipe_productivity") {
-  throw "Prepatched family owner should skip residual MIR rocket fuel generation: $prepatchedRocketFuelLine"
-}
+Assert-ReportLineAdopted -Line $prepatchedRocketFuelLine -Context "Prepatched family owner preserve binding"
+Assert-ReportLineContains -Line $prepatchedRocketFuelLine -Expected "reason=preserve_native_owner" -Context "Prepatched family owner preserve binding"
 
 Invoke-RuntimeScenario -ScenarioName "space-age-vanilla-family-exact-owner" -EnabledFixtureNames @(
   "mir-fixture-vanilla-family-exact-owner",
   "mir-fixture-assert-vanilla-family-exact-owner"
 ) -EnableSpaceAge
 $exactOwnerRocketFuelLine = Get-LastStreamReportLine -Key "research_rocket_fuel"
-if ($exactOwnerRocketFuelLine -notmatch "status=skipped" -or $exactOwnerRocketFuelLine -notmatch "covered_by_existing_infinite_recipe_productivity") {
-  throw "External exact family owner should skip residual MIR rocket fuel generation: $exactOwnerRocketFuelLine"
-}
+Assert-ReportLineAdopted -Line $exactOwnerRocketFuelLine -Context "External exact owner plus native preserve binding"
+Assert-ReportLineContains -Line $exactOwnerRocketFuelLine -Expected "reason=preserve_native_owner" -Context "External exact owner plus native preserve binding"
 
 Invoke-RuntimeScenario -ScenarioName "space-age-vanilla-family-mixed-owner" -EnabledFixtureNames @(
   "mir-fixture-vanilla-family-mixed-owner",

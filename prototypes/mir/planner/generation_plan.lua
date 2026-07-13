@@ -94,8 +94,21 @@ local function validate_row(row)
     required(row.fields, "max_level")
   elseif row.action == "adopt" then
     required(row, "adoption")
+    if row.adoption.schema ~= 2 then error("GenerationPlan native-owner binding schema must be 2", 3) end
     required(row.adoption, "owner")
+    required(row.adoption, "operation")
+    required(row.adoption, "configured_fields")
     required(row.adoption, "effects")
+    required(row.adoption, "input_snapshot")
+    required(row.adoption, "expected_snapshot")
+    required(row.adoption, "input_fingerprint")
+    required(row.adoption, "output_fingerprint")
+    if fingerprint.of(row.adoption.input_snapshot) ~= row.adoption.input_fingerprint then
+      error("GenerationPlan native-owner input fingerprint differs: " .. row.stream_key, 3)
+    end
+    if fingerprint.of(row.adoption.expected_snapshot) ~= row.adoption.output_fingerprint then
+      error("GenerationPlan native-owner output fingerprint differs: " .. row.stream_key, 3)
+    end
   else
     required(row, "reason")
   end
@@ -131,6 +144,7 @@ function Plan:finalize()
   local manifest_ids = {}
   local technology_names = {}
   local adopted_recipes = {}
+  local adopted_owners = {}
   local materialized_effects = {}
   for _, row in ipairs(self.rows) do
     validate_row(row)
@@ -158,6 +172,10 @@ function Plan:finalize()
         end
       end
     elseif row.action == "adopt" then
+      if adopted_owners[row.adoption.owner] then
+        error("GenerationPlan contains duplicate native-owner binding: " .. row.adoption.owner, 2)
+      end
+      adopted_owners[row.adoption.owner] = row.stream_key
       for _, effect in ipairs(row.adoption.effects) do
         local identity = row.adoption.owner .. "\0" .. tostring(effect.recipe)
         if adopted_recipes[identity] then

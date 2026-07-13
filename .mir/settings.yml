@@ -60,6 +60,12 @@ rules:
   automatic_compiler_defaults_have_declared_safety_rationales: true
   automatic_compiler_reviewed_creation_rejects_experimental_families: true
   automatic_compiler_experimental_creation_requires_explicit_review_relaxation: true
+  native_owner_settings_share_stable_stream_ids: true
+  native_owner_unchanged_defaults_preserve_final_prototype: true
+  native_owner_disable_is_no_touch: true
+  native_owner_cost_override_requires_recognized_formula: true
+  native_owner_effect_override_is_relevant_effects_only: true
+  native_owner_binding_is_startup_only_and_restart_required: true
 
 profiles:
   schema: 1
@@ -136,6 +142,34 @@ groups:
       effect_per_level: ips-effect-per-level-%s
 
 streams:
+  research_processing_unit:
+    native_owner_binding: processing-unit-productivity
+    fallback: generate-eligible
+    unchanged_defaults: preserve-owner
+    backport:
+      keep_setting_ids: true
+
+  research_plastic:
+    native_owner_binding: plastic-bar-productivity
+    fallback: generate-eligible
+    unchanged_defaults: preserve-owner
+    backport:
+      keep_setting_ids: true
+
+  research_low_density_structure:
+    native_owner_binding: low-density-structure-productivity
+    fallback: generate-eligible
+    unchanged_defaults: preserve-owner
+    backport:
+      keep_setting_ids: true
+
+  research_rocket_fuel:
+    native_owner_binding: rocket-fuel-productivity
+    fallback: generate-eligible
+    unchanged_defaults: preserve-owner
+    backport:
+      keep_setting_ids: true
+
   research_air_scrubbing_clean_filter:
     manifest: mir-prod-air-scrubbing-clean-filter
     ui_visibility:

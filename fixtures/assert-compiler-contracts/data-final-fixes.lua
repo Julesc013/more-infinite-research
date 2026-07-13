@@ -11,6 +11,7 @@ local compilation_plan = require("__more-infinite-research__.prototypes.mir.plan
 local output_validator = require("__more-infinite-research__.prototypes.mir.planner.output_validator")
 local effect_ownership = require("__more-infinite-research__.prototypes.mir.planner.effect_ownership")
 local automatic_compiler_contract = require("__more-infinite-research__.prototypes.mir.settings.automatic_compiler_contract")
+local native_owner_cost_model = require("__more-infinite-research__.prototypes.mir.domain.native_owner.cost_model")
 
 local function fail(message)
   error("MIR compiler contract validation failed: " .. message)
@@ -357,6 +358,36 @@ local function emitted_row(stream_key, technology_name)
   for _, proof in pairs(row.gates) do proof.status = "passed" end
   return row
 end
+
+local function native_owner_row(stream_key, owner, recipe)
+  local row = emitted_row(stream_key, "unused")
+  local input = {
+    name = owner,
+    max_level = "infinite",
+    prerequisites = {},
+    unit = {ingredients = {{"automation-science-pack", 1}}, count_formula = "1.5^L*1000", time = 60},
+    effects = {}
+  }
+  local expected = deepcopy(input)
+  local effect = {type = "change-recipe-productivity", recipe = recipe, change = 0.03}
+  table.insert(expected.effects, deepcopy(effect))
+  row.action = "adopt"
+  row.technology_name = nil
+  row.fields = nil
+  row.adoption = {
+    schema = 2,
+    key = stream_key,
+    owner = owner,
+    operation = "adopt_native_owner_effects",
+    configured_fields = {},
+    effects = {effect},
+    input_snapshot = input,
+    expected_snapshot = expected,
+    input_fingerprint = fingerprint.of(input),
+    output_fingerprint = fingerprint.of(expected)
+  }
+  return row
+end
 local duplicate_effect_plan = generation_plan.new()
 duplicate_effect_plan:add(emitted_row("effect-a", "effect-tech-a"))
 duplicate_effect_plan:add(emitted_row("effect-b", "effect-tech-b"))
@@ -404,15 +435,45 @@ if partial_rows[2].action ~= "emit" or #partial_rows[2].fields.effects ~= 1
   fail("effect ownership removed a losing stream instead of retaining its unique effects")
 end
 
-local adoption = emitted_row("research_adopted", "unused")
-adoption.action = "adopt"
-adoption.technology_name = nil
-adoption.fields = nil
-adoption.adoption = {owner = "existing-productivity-owner", effects = {{type = "change-recipe-productivity", recipe = "shared-recipe", change = 0.03}}}
+local adoption = native_owner_row("research_adopted", "existing-productivity-owner", "shared-recipe")
 local adoption_rows = effect_ownership.resolve({emitted_row("research_emitted", "effect-tech-emitted"), adoption})
 if adoption_rows[1].stream_key ~= "research_adopted" or adoption_rows[1].action ~= "adopt"
   or adoption_rows[2].action ~= "skip" then
   fail("existing adopted effect ownership did not win over generated ownership")
+end
+
+
+local duplicate_owner_plan = generation_plan.new()
+duplicate_owner_plan:add(native_owner_row("native-owner-a", "shared-native-owner", "native-owner-recipe-a"))
+duplicate_owner_plan:add(native_owner_row("native-owner-b", "shared-native-owner", "native-owner-recipe-b"))
+expect_error("duplicate native-owner binding", "duplicate native-owner binding", function()
+  duplicate_owner_plan:finalize()
+end)
+
+local native_model = native_owner_cost_model.classify(
+  {count_formula = "1.5^L*1000"},
+  {target_native_formulas = {"1.5^L*1000"}}
+)
+if native_model.kind ~= "target-native-exponential" or native_model.base ~= 1000 or native_model.growth ~= 1.5 then
+  fail("target native cost formula was not classified")
+end
+local configured_native = native_owner_cost_model.configure(native_model, {base = 2000, growth = 1.25})
+if not configured_native or configured_native.count_formula ~= "1.25^L*2000" then
+  fail("target native cost formula was not configured deterministically")
+end
+local mir_model = native_owner_cost_model.classify({count_formula = "8000 * 2^(L-1)"}, {})
+local configured_mir = native_owner_cost_model.configure(mir_model, {growth = 1.1})
+if not configured_mir or configured_mir.count_formula ~= "8000*1.1^(L-1)" then
+  fail("MIR exponential cost formula was not configured deterministically")
+end
+local unrecognized_model = native_owner_cost_model.classify({count_formula = "1000 + 100 * L"}, {})
+local preserved_unrecognized = native_owner_cost_model.configure(unrecognized_model, {})
+if not preserved_unrecognized or preserved_unrecognized.changed then
+  fail("unrecognized cost formula was not preserved by default")
+end
+local rejected_unrecognized, rejected_reason = native_owner_cost_model.configure(unrecognized_model, {base = 2000})
+if rejected_unrecognized or rejected_reason ~= "unrecognized_cost_formula" then
+  fail("unsafe unrecognized cost formula override did not fail closed")
 end
 
 local collision_plan = generation_plan.new()
