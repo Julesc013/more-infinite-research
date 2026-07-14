@@ -1,12 +1,717 @@
 ---------------------------------------------------------------------------------------------------
-Version: 0.9.0
+Version: 3.1.9
 Date: 2026-07-14
+
+  Bugfixes:
+
+    - Kept generated research loadable when mods disable automation science technology but leave its recipe initially available.
+    - Skipped finite anchors and prerequisite chains that transitively depend on disabled technologies.
+    - Made the standard settings configure recognized existing Space Age infinite productivity owners.
+    - Applied cost base and growth together as the displayed cost model when either value is customized.
+    - Preserved final native or modded owner values when settings stay at their defaults.
+    - Preserved current native-owner research level, selection, and fractional progress across cost changes.
+    - Left external owners untouched when their MIR stream is disabled.
+    - Rejected explicit cost changes for unrecognized external formulas instead of guessing.
+    - Retained safe fallback generation and transactional owner updates.
+
+---------------------------------------------------------------------------------------------------
+Version: 3.1.5
+Date: 2026-07-13
+
+  Changes:
+
+    - Returned portable compiler-plan and settings-override improvements from historical Factorio support work.
+    - Improved configuration-change reliability across supported Factorio lines.
+    - Standardized generated research formulas on compact syntax accepted across historical and current Factorio parsers.
+    - Improved compatibility across maintained and archive targets from Factorio 2.0 through 0.13.
+    - Replaced the automatic compiler preset with separate action and research-creation controls.
+    - Added an independent reviewed-data requirement and outcome-first tooltips.
+    - Added a generic schema-2 automatic compiler policy contract for future registered family modules.
+    - Added a sorted data-only CompilerProvider registry for extending recipe-family discovery and planning.
+    - Added canonical setting descriptors and exact Conservative, Safe, Expansive, and Custom policy expansions.
+    - Added stable automatic-compiler and provider diagnostic codes.
+    - Kept experimental assembler and lab family technologies out of reviewed-data creation.
+    - Preserved explicit broad opt-in testing for experimental automatic family technologies.
+    - Standardized automatic-recipe dropdown labels, tooltip structure, capitalization, and locale parity.
+    - Preserved old automatic compiler profiles through a hidden legacy-policy bridge.
+    - Hid unreviewed automatic-family tuning settings while preserving broad opt-in testing and profile compatibility.
+    - Hid Space Age-only technology settings when the DLC is inactive while retaining their registered values.
+
+  Bugfixes:
+
+    - Preserved the 3.1.2 iterative prerequisite-cycle repair and strict generated-graph safety checks.
+    - Published compiled generation plans only after authoritative safety checks complete.
+    - Added exact 3.1.2-to-3.1.5 upgrade coverage for legacy automatic-compiler settings and saved runtime state.
+
+---------------------------------------------------------------------------------------------------
+Version: 3.1.2
+Date: 2026-07-13
+
+  Bugfixes:
+
+    - Fixed a startup crash when Muluna and Astroponics formed a mutual prerequisite path through space science.
+    - Removed only Astroponics' redundant space-science prerequisite when both named mods create that exact cycle.
+    - Kept missing, disabled, and MIR-created technology prerequisite failures strict.
+    - Made deep technology graph checks iterative so very large modpacks cannot exhaust the Lua call stack.
+
+---------------------------------------------------------------------------------------------------
+Version: 3.1.1
+Date: 2026-07-13
+
+  Bugfixes:
+
+    - Fixed a startup crash when one multi-output recipe matched more than one generated productivity research stream.
+    - Made overlapping recipe effects choose one stable owner while preserving every non-overlapping effect.
+    - Preferred compatible existing productivity research when it already owns an overlapping recipe effect.
+    - Kept a final duplicate-effect safety check after overlapping ownership is resolved.
+    - Added regression coverage for Space Age Galore's coal-crushing recipe shape and related ownership cases.
+
+---------------------------------------------------------------------------------------------------
+Version: 3.1.0
+Date: 2026-07-13
+
+  Changes:
+
+    - Added automatic structural coverage for loaders, belts, drills, inserters, furnaces, machines, labs, and modules.
+    - Added structural coverage for solar generation and power storage equipment.
+    - Added conservative automatic modes ranging from reporting only through opt-in generic family generation.
+    - Preserved existing technology names, setting names, defaults, profiles, and saved-game state.
+    - Added whole-plan safety checks before any generated technology or adopted effect is applied.
+    - Prevented compatibility-pack data from overriding hard productivity, recycling, probability, catalyst, and owner safety facts.
+    - Made exact-pack mode generate only families authorized by an exact-version compatibility record with named evidence.
+    - Added reviewed exact candidate seeding for recipes outside generic structural discovery without adding technology IDs.
+    - Unified stream, adoption, and base-extension operations in one fingerprinted compilation plan with full output-value parity.
+    - Preserved recipe variants, fluids, probabilities, catalysts, surfaces, and productivity exclusions during discovery.
+    - Rejected recycling, self-return, catalyst, voiding, transmutation, ambiguous-owner, and unsafe multi-output loops.
+    - Preferred an exact existing productivity owner instead of creating duplicate infinite research.
+    - Added complete recipe accounting with stable reasons for covered, external, safe-skip, unsafe, and unresolved recipes.
+    - Added positive target capabilities so unsupported effects, settings, and prototype shapes fail closed.
+    - Made generated outputs and archive construction deterministic.
+    - Made every runtime scenario test one exact archive, with setup reuse, focused selection, and bounded parallel workers.
+    - Renamed Automatic Research Coverage options and added detailed setting and per-option tooltips.
+    - Improved science-pack, lab, prerequisite, and technology reachability decisions.
+    - Added independent compatibility load coverage for AAI, BZ, Bob, Krastorio, and Krastorio Spaced Out.
+    - Kept complex chemistry, recovery, recycling, catalysts, and byproduct loops conservative unless explicitly proven safe.
+    - Preserved non-default settings, research levels, saved state, and scripted effects when upgrading from 3.0.5.
+
+---------------------------------------------------------------------------------------------------
+Version: 3.0.5
+Date: 2026-07-12
+
+  Compatibility:
+
+    - Kept the canonical MIR 3 compiler, generated technology IDs, and existing default behavior stable.
+    - Fixed generated research that could inherit an unavailable tutorial technology from an already-enabled science recipe.
+    - Kept disabled or cyclic technology prerequisites out of generated research while preserving legitimate progression gates.
+    - Rejected self-locked, cyclic, or non-researchable science recipe unlocks.
+    - Skipped generated streams whose required technologies are disabled or unreachable instead of emitting a fatal graph edge.
+    - Made science recipe unlock selection deterministic when multiple reachable technologies provide the same recipe.
+    - Made rocket and cannon overlap cleanup use semantic effect identity and positive emitted coverage for new configurations.
+    - Preserved finite vanilla weapon speed bonuses and existing stored overlap-mode choices.
+    - Limited weapon overlap cleanup to MIR-generated continuations and required external owners to use obtainable science.
+    - Rejected external research owners that use unrecognized science ingredients.
+    - Kept incineration sink recipes out of breeding productivity research so later recipe removal cannot leave invalid effects.
+    - Made opt-in productivity scoping derive its unrestricted threshold from the inverse effective recycler return.
+    - Kept recycling-category recipe productivity caps outside both the global production cap and scoped-cap passes.
+    - Made the scope checkbox inert at or below the inverse threshold, including cap-matched boundaries.
+    - Defined engine-unchanged recycling as a conservative 25% threshold baseline without changing recycler returns.
+    - Added a recycler-return dropdown with unchanged, cap-matched, and fixed choices from 20% down to 0.1%.
+    - Hid the redundant fixed 25% recycler row while retaining legacy profile compatibility for that enum.
+    - Cap-matched recycling uses total output: +400% gives 20% returns and +1000% about 9.09%, never above vanilla 25%.
+    - Added a separate negative speed-floor dropdown down to -99.99% while keeping the positive speed cap independent.
+    - Expanded the numeric dropdown ladders from quarter-scale values through high-end megabase and modpack values.
+    - Gave every dropdown an explicit unchanged/bypass option while retaining all existing enum IDs.
+    - Allowed portable profiles to use validated custom decimal percentages beyond the curated dropdown steps.
+    - Added an engine-unchanged lab policy that bypasses MIR reachability, reduction, and skip intervention.
+    - Made module productivity discover recipes through final module prototype tiers, including tier 4 and later modded modules.
+    - Cooperated with Finite Productivity Technologies 0.1.1's hidden load-after dependency for final cap conversion.
+    - Added opt-in unrestricted module permissions across existing recipe, machine, and beacon slots.
+    - Added per-generated-technology effect-per-level controls while preserving canonical mixed-tier ratios.
+    - Fixed a settings-stage circular import that prevented 3.0.5 from loading.
+    - Made effect controls display each technology's primary base-tier value while preserving later-tier ratios.
+    - Kept scripted effect controls scaling multiplier deltas instead of full multipliers.
+    - Made competing technology replacement transactional.
+    - Rewired dependent prerequisites only after MIR emitted graph-safe coverage.
+    - Isolated unrestricted module-permission arrays per prototype and gave the pass its own target capability.
+    - Made scripted effect tooltips display the selected per-level value.
+    - Preserved retained non-default base effect settings during upgrades instead of failing on an incomplete scaling descriptor.
+
+  Changes:
+
+    - Centralized target capabilities so the mod and developer tools consume the same Factorio-line profile.
+    - Made the runtime persistence backend an explicit target choice: storage on Factorio 2.x and global on older lines.
+    - Added final generated-technology checks for enabled prerequisites, cycles, science production, labs, and reachability.
+    - Separated reduced target setting visibility from modern settings profile encoding behavior.
+    - Added durable grouped developer-run summaries with passed, failed, skipped, and incomplete outcomes.
+    - Bound release evidence to exact source, target-profile, required-group, package-content, and runtime-summary fingerprints.
+    - Allowed exact external rocket or cannon speed owners when the existing competition preference keeps external research.
+    - Added classifier-boundary, late recipe-removal, and exact Planet Crucible plus Rigor Module regression gates.
+    - Consolidated generated setting registration through the canonical catalog and aligned controls with generated effects.
+    - Kept visible recycling processes such as scrap recycling outside MIR's generated-recycler balance pass.
+    - Added recycler combination coverage for unchanged, fixed, and cap-matched modes and independent recipe caps.
+    - Corrected recycling safety indexing for Factorio 2.1 independent and shared product probabilities.
+    - Added a complete 3.0.5 inventory for all 477 dropdown, checkbox, numeric, and profile-import settings.
+
+---------------------------------------------------------------------------------------------------
+Version: 1.7.0
+Date: 2026-07-10
+
+  Compatibility:
+
+    - Ported the first reduced native-infinite edition to Factorio 0.17 from the 1.8.x old-line lessons.
+    - Included current dev portable fixes without restoring 2.x-only surfaces.
+    - Retargeted package metadata to Factorio 0.17 with `base >= 0.17`.
+    - Kept modern non-Space-Age science pack names for the target line.
+    - Kept only target-probed direct-effect infinite researches and base technology continuations.
+    - Kept recipe productivity, Space Age, Quality, Recycler, Elevated Rails, and cargo logistics out of 0.17.
+    - Kept spoilage and agriculture out of 0.17.
+    - Kept prototype cap settings, pipeline extent settings, settings profiles, and newer technology badge overlays out of 0.17.
+
+  Changes:
+
+    - Reused the older-line `global` runtime state adapter.
+    - Reused target-era technology art without newer badge overlays or unsupported native modifier icon metadata.
+    - Added Factorio 0.17 metadata, settings visibility, and reduced-line runtime support.
+    - Anchored dedicated rocket, cannon, flamethrower, and electric shooting speed research to target-era unlocks.
+    - Kept MIR's generated weapon shooting speed continuation from duplicating rocket and cannon-shell speed ownership by default.
+    - Stopped enabled science-pack recipes from inheriting disabled tutorial technology prerequisites.
+    - Kept generated infinite research available after normal prerequisite completion and unlock-all commands.
+    - Documented 1.7.0 as the first old-line native-infinite edition and the next ring after 1.8.x.
+
+---------------------------------------------------------------------------------------------------
+Version: 1.8.1
+Date: 2026-07-10
+
+  Compatibility:
+
+    - Ported the maintained Factorio 1.0 line from the 1.9.3 reduced source posture plus proven 1.8.0 bridge lessons.
+    - Retargeted package metadata to Factorio 1.0 with `base >= 1.0`.
+    - Kept supported direct-effect infinite researches and base technology continuations.
+    - Kept recipe productivity, Space Age, Quality, Recycler, Elevated Rails, cargo logistics, spoilage, and agriculture out of 1.0.
+    - Kept prototype cap settings, pipeline extent settings, settings profiles, and newer technology badge overlays out of 1.0.
+    - Preserved the old-line runtime state adapter so Factorio 1.0 uses `global` instead of the Factorio 2.x `storage` table.
+
+  Changes:
+
+    - Removed 2.x DLC dependencies and newer science-pack names from generated direct-effect and base-extension defaults.
+    - Reused the 1.8.0 target-era icon policy: generated direct-effect technologies use base technology art only.
+    - Kept unsupported native modifier icon metadata out of generated old-line direct-effect technologies.
+    - Carried the older `laser-turret-speed` base technology chain adapter into the maintained 1.0 line.
+    - Added a Factorio 1.0 runtime check that rejects unavailable newer badge paths and synthetic old-line badge overlays.
+    - Extended the Factorio 1.0 runtime check to reject unsupported native modifier icon metadata.
+    - Retargeted branch-local support mod metadata to Factorio 1.0 for the reduced-line release gate.
+    - Documented 1.8.1 as a maintained Factorio 1.0 compatibility port, not a metadata bump of the 0.18 bridge package.
+    - Documented that 1.8.1 is not a feature-parity backport of the modern line.
+
+---------------------------------------------------------------------------------------------------
+Version: 1.9.3
+Date: 2026-07-10
+
+  Compatibility:
+
+    - Ported the MIR 3 compatibility compiler architecture to Factorio 1.1 as a reduced compatibility port.
+    - Synthesized the 3.0.0 source anchor with portable lessons from the 2.3.0 Factorio 2.0 port.
+    - Retargeted package metadata to Factorio 1.1 with a base-only dependency floor.
+    - Removed Factorio 2.x DLC dependency surfaces from the 1.1 package target.
+    - Removed Space Age, Quality, Recycler, Elevated Rails, cargo logistics, spoilage, and agriculture streams.
+    - Removed recipe-productivity streams from the 1.1 target because Factorio 1.1.110 rejects the modifier type.
+    - Kept only target-supported direct-effect and base-extension research candidates for the first 1.1 release line.
+    - Added a target-line adapter for unsupported streams, direct effects, prototype caps, repairs, and runtime handlers.
+    - Disabled unsupported 2.x behavior before it can emit 1.1-invalid prototypes.
+    - Replaced direct runtime persistence access with a state adapter for global on Factorio 1.1 and storage on Factorio 2.x.
+    - Used stock high-resolution target-era technology constant badges on Factorio 1.1.
+
+  Changes:
+
+    - Removed unsupported 2.x startup settings from the 1.1 settings catalog and settings profile surface.
+    - Hid settings-profile import and export on Factorio 1.1 because the target API lacks the MIRSET1 string codec.
+    - Ensured Factorio 1.1 direct-effect technologies use stock tile badges without copied newer graphics.
+    - Retargeted branch-local support mod metadata to Factorio 1.1.
+    - Made release tooling target-aware for 1.1 metadata, dependency floors, and cargo modifiers.
+    - Updated settings visibility checks for the reduced 1.1 settings surface.
+    - Documented the release as a compatibility port, not a feature-parity backport of the Factorio 2.x releases.
+
+---------------------------------------------------------------------------------------------------
+Version: 1.8.0
+Date: 2026-07-10
+
+  Compatibility:
+
+    - Ported the reduced MIR 3 compatibility compiler architecture to Factorio 0.18 as the bridge/archive package for 1.0.
+    - Synthesized the 3.0.0 source anchor with portable 2.3.0 and 1.9.3 backport lessons.
+    - Retargeted package metadata to Factorio 0.18 with `base >= 0.18`.
+    - Kept the reduced direct-effect and base-extension surface, with recipe productivity and Factorio 2.x DLC surfaces disabled.
+    - Removed unavailable 1.1 technology constant badge overlays from the 0.18 bridge.
+    - Used target-era base technology art only instead of packaging or simulating newer Factorio graphics.
+
+  Changes:
+
+    - Updated Research productivity icon selection to prefer stock military science technology art.
+    - Extended metadata, settings visibility, and reduced-line runtime checks for the Factorio 0.18 bridge target.
+    - Removed unavailable newer badge paths and synthetic badge overlays from the 0.18 bridge.
+    - Added explicit target-era names and descriptions to generated vanilla continuations to avoid unresolved locale keys.
+    - Added old-line modifier descriptions for character, lab, inventory, and robot direct-effect tooltips.
+    - Removed unsupported native modifier icon metadata after Factorio 1.0 ignored those fields.
+    - Character, range, and weapon speed technologies use target-era main textures and localized text instead of fake badges.
+    - Documented 1.8.0 as a bridge/archive compatibility port, not a feature-parity backport of 1.1, 2.0, or 2.1.
+
+---------------------------------------------------------------------------------------------------
+Version: 2.3.0
+Date: 2026-07-09
+
+  Compatibility:
+
+    - Ported the MIR 3 compatibility compiler architecture to the Factorio 2.0 release line.
+    - Retargeted package metadata to Factorio 2.0 with `base >= 2.0`.
+    - Kept Quality hidden and optional, and kept Space Age optional without a Factorio 2.1 dependency floor.
+    - Removed Factorio 2.1-only cargo bay unloading distance research from the Factorio 2.0 package.
+    - Removed Factorio 2.1-only cargo landing pad count research from the Factorio 2.0 package.
+    - Kept generated technology IDs stable for streams that remain available on the Factorio 2.0 line.
+    - Kept exact ATAN loader-schema repairs scoped to Factorio 2.1+ so Factorio 2.0 keeps its native fields.
+    - Fixed ATAN Ash 2.2.1 with Space Age on Factorio 2.0 by keeping foundation crafting in `crafting-with-fluid`.
+    - Kept Factorio 2.0 science-pack handling on the older tool prototype model during compatibility checks.
+    - Classified reviewed Factorio 2.0 local zip issues that reproduce without MIR as external local-library issues.
+
+  Changes:
+
+    - Backported the canonical settings catalog, deterministic MIRSET1 profiles, strict import checks, and compact export.
+    - Backported prototype cap dropdowns for recipe productivity, energy-use, pollution, speed, and quality caps.
+    - Backported signed high-to-low prototype cap labels, including +300% productivity and -80% savings defaults.
+    - Split energy-use and pollution cap settings because efficiency effects can reduce both.
+    - Added the default-off Compatibility setting for the opt-in positive power floor on explicit 0W active energy use.
+    - Kept Factorio 2.0 cargo logistics exclusions while preserving the shared settings and profile code.
+
+  Checks:
+
+    - Package metadata and base dependency floors now match the Factorio 2.0 line.
+    - The Factorio 2.0 package no longer contains 2.1-only cargo direct-effect modifier strings.
+    - Runtime and local mod-library checks target the matching Factorio 2.0 binary and mod library.
+    - Factorio 2.0 runtime checks passed across base, Space Age, science-pack, lab, ATAN, AAI, and drill scenarios.
+    - Factorio 2.0 runtime checks passed for prototype limits and settings profile round trips.
+    - Targeted local zip checks passed for AAI, Big Mining Drill, Equipment Gantry, Fluid Must Flow, Jetpack, and robots.
+    - The local Factorio 2.0 BZ suite passed with zero grouped failures.
+    - The full Factorio 2.0 local zip sweep covered 314 roots with zero MIR-owned unexpected failure groups.
+
+---------------------------------------------------------------------------------------------------
+Version: 3.0.0
+Date: 2026-07-08
+
+  Compatibility:
+
+    - Reworked MIR around the MIR 3 compatibility compiler for Factorio 2.1 while preserving generated technology IDs.
+    - No new migration is required for the architecture move; the shipped 2.0.5 and 2.1.0 migrations remain included.
+    - Space Age remains optional; Quality, Recycler, and Elevated Rails remain optional or hidden optional dependencies.
+    - Generated research is gated by active recipes, items, fluids, technologies, ammo categories, labs, and science packs.
+    - Unsafe or unavailable candidates are skipped or reported instead of forced into invalid mod sets.
+    - Compatibility overlays remain declarative: selectors, claims, denials, and policy data only; no prototype mutation.
+    - Air Scrubbing support is limited to clean-filter recipe families; scrubbing and recovery recipes stay excluded.
+    - ATAN Ash support is limited to ash separation; landfill, brick, nutrient, foundation, tile, and recovery sinks stay excluded.
+    - Added exact Factorio 2.1 loader-schema repairs for atan-ash 2.2.1 and atan-nuclear-science 0.3.3.
+    - ATAN repairs normalize known category and probability fields only, without changing ingredients, unlocks, science, or balance.
+    - AAI loaders route through belt productivity, and big mining drills route through mining productivity.
+    - ATAN Nuclear Science routes through science-pack productivity.
+    - Fluid Must Flow, Robot Attrition, Jetpack, Equipment Gantry, AAI Containers, and AAI Industry stay scoped.
+    - Public compatibility claims remain narrow and evidence-backed; this is not a full overhaul-support claim.
+    - Generated output stayed stable against recorded 2.2 comparison lanes.
+
+  Changes:
+
+    - Made MIR 3.0.0 an architecture/compiler release rather than a broad new gameplay-content wave.
+    - Moved active implementation under prototypes/mir and made the Factorio root lifecycle files thin stage wrappers.
+    - The prototypes/streams directory remains declarative stream data.
+    - MIR planner, policy, emit, and report modules now handle generation behavior.
+    - Made data-final-fixes ordering explicit so exact compatibility repairs run before prototype limit passes and MIR planning.
+    - Moved scripted technology runtime handlers under prototypes/mir/runtime.
+    - Added a canonical settings catalog for registration, effective reads, profile export/import, docs, and tests.
+    - Added deterministic MIRSET1 settings profiles with full export by default and optional compact export.
+    - Settings profile imports now ignore unknown IDs, wrong types, invalid choices, and out-of-range numbers.
+    - Added visible Main, Compatibility, Limits, Advanced, and Diagnostics prefixes to global startup settings.
+    - Generated technology settings now use technology-name-first labels and stable attention buckets.
+    - MIR-owned official technology settings stay visible across base and Space Age.
+    - Hidden unavailable settings keep readable IDs and do not force values.
+    - Added startup dropdowns for recipe productivity, energy-use, pollution, speed, and quality prototype caps.
+    - Prototype cap dropdowns leave engine defaults unchanged unless explicitly changed.
+    - Prototype cap dropdowns use signed labels and high-to-low numeric order with unchanged defaults in numeric position.
+    - Recipe productivity default labels show +300%; energy and pollution savings defaults show -80%.
+    - Split energy-use and pollution cap settings because efficiency effects can reduce both.
+    - Added a default-off Compatibility setting that changes explicit 0W active energy_usage prototypes to 1W only when enabled.
+    - Shortened rocket/cannon speed cleanup text to "Only if dedicated tech exists".
+    - Enabled breeding, agricultural growth speed, cargo bay range/count, and character reach by default.
+    - Inserter capacity bonus remains disabled because larger hand sizes can affect circuits and engine optimization assumptions.
+    - Updated README, user docs, maintainer docs, reference docs, release notes, Mod Portal copy, and result summaries.
+
+  Internal:
+
+    - Added and updated .mir manifests for branch policy, module boundaries, streams, claims, docs, settings, and capabilities.
+    - Added generated stream manifest coverage and required every emitted stable stream to have a manifest row.
+    - Added DecisionRecord and StreamSpec records plus a compatibility claim registry.
+    - Added Factorio data.raw and mods adapters so prototype reads and settings-stage mod checks stay behind boundaries.
+    - Added focused MIR modules for indexing, planning, policy, emission, reporting, overlays, exact repairs, settings, and runtime.
+    - Added load-check coverage for hidden settings, prototype limits, settings profile round trips, and accepted legacy imports.
+    - Profile round-trip coverage checks defaults, hidden provider settings, unknown IDs, wrong types, and invalid choices.
+    - Added or extended architecture, docs, settings visibility, policy, claim, changelog, package, and runtime checks.
+    - Added local mod library catalog checks and legacy inventory reporting tools.
+    - Fixed compatibility-audit staging so local load-test mod copies exclude repo-only development and ignored output paths.
+    - Fixed release archive packaging so the shipped zip opens cleanly from the mods folder.
+    - Added release evidence docs for the MIR 3 summary, checklist, migration guide, local library gate, and risk register.
+    - Package hygiene rejects docs, sample mods, scripts, tests, .mir, .codex, .github, build output, and dist output.
+    - Package hygiene rejects AGENTS.md, CONTRIBUTING.md, and the root work ledger.
+
+  Removed:
+
+    - Removed old shipped paths for prototypes/compat/air-scrubbing.lua, prototypes/tech-gen.lua, and max-level-control.lua.
+    - Removed the old generated-stream manifest location in favor of the MIR manifest path.
+    - Removed shipped control-folder runtime module paths; runtime handlers now live under prototypes/mir/runtime.
+    - Removed broad root-helper ownership for defaults, config, diagnostics, settings, pipeline extent, utilities, and cleanup.
+    - Removed broad root-helper ownership for effect safety and weapon speed.
+    - Removed direct Air Scrubbing and ATAN Ash behavior scripts; declarative overlays now feed policy and diagnostics.
+    - Removed old-path imports that pointed at compat, lib, legacy, planner, control-folder, and broad root-helper modules.
+    - Removed direct prototype mutation responsibility from compatibility policy overlays.
+
+  Checks:
+
+    - Legacy inventory passed with zero old shipped shim paths, old imports, root helper files, and control-folder runtime Lua.
+    - Legacy inventory passed with zero direct prototype access outside allowed layers and zero streams without manifest rows.
+    - Static checks passed docs governance, MIR manifests, architecture boundaries, settings visibility, policy, and claims.
+    - Static checks passed changelog syntax, package hygiene, and git whitespace checks.
+    - Runtime load checks passed on the target Factorio 2.1 binary in packaged zip, base-only, and Space Age modes.
+    - Prototype limit checks passed in base-only and Space Age modes, including split energy/pollution caps and opt-in power floor.
+    - Settings profile round-trip checks passed for deterministic encoding, compact export, hidden settings, and unknown IDs.
+    - Settings profile round-trip checks passed for wrong types, invalid choices, and accepted legacy import values.
+    - Local isolation confirmed atan-ash 2.2.1 and atan-nuclear-science 0.3.3 fail without MIR and load with MIR.
+    - Local isolation confirmed Air Scrubbing and all tested ATAN zips load together with MIR after exact schema repair.
+    - Selected local zip checks passed for advertised and recently repaired compatibility targets.
+    - The targeted release gate passed using the recorded local Factorio 2.1 mod library scenario set.
+    - The final package contains 119 entries and zero forbidden repository-only paths.
+    - Portal-backed full-catalog checks were not run in the release environment because FACTORIO_TOKEN was not set.
+    - Full release evidence is recorded in the 3.0.0 checklist, release notes, result summary, and targeted gate artifacts.
+
+---------------------------------------------------------------------------------------------------
+Version: 1.9.2
+Date: 2026-07-07
+
+  Compatibility:
+
+    - Backported the tested More Infinite Research 2.2.0 source snapshot to Factorio 2.0.
+    - Legacy metadata targets Factorio 2.0 with `base >= 2.0`.
+    - Kept Quality hidden and optional, and kept Space Age optional without a Factorio 2.1 dependency floor.
+    - Removed Factorio 2.1-only cargo logistics technology modifiers from legacy.
+    - Added compatible Air Scrubbing clean-filter productivity support.
+    - Added compatible ATAN Ash separation productivity support.
+    - Added compatible AAI-style loader, big mining drill, and ATAN-style nuclear science support.
+    - Added progression-aware official and modded science-pack ingredient policies.
+
+  Internal:
+
+    - Backported typed prototype facts, capability diagnostics, loop-risk reports, and lab-matrix reports.
+    - Backported generated-stream manifests, compatibility claim data, and report diff tooling.
+
+---------------------------------------------------------------------------------------------------
+Version: 2.2.0
+Date: 2026-07-07
+
+  Compatibility:
+
+    - Added a typed prototype fact registry for recipes, technologies, machines, labs, owners, and rule surfaces.
+    - Added compiler decision rows for generated technologies, rejected loop risks, and observed rule surfaces.
+    - Added loop-risk reports for recycling, cleaning, voiding, barrel/container, transmutation, and self-return recipes.
+    - Added lab-matrix reports so each generated technology can be checked against labs that accept its science set.
+    - Added useful-level estimates to recipe productivity cap reports.
+    - Added Air Scrubbing clean-filter productivity for exact pollution and spore filter crafting recipes.
+    - Kept Air Scrubbing scrubbing, cleaning, recovery, and environmental-removal recipes diagnostic-only.
+    - Added ATAN Ash separation productivity for the exact ash separation recipe.
+    - Kept ATAN Ash landfill, brick, nutrient, foundation, tile, and recovery-style ash sinks outside MIR streams.
+    - Added AAI-style loader recipe coverage to transport belt productivity.
+    - Added Big Mining Drill coverage through mining drill productivity.
+    - Added ATAN-style Nuclear Science coverage through science-pack productivity.
+    - Added compatibility coverage for Fluid Must Flow, Robot Attrition, Jetpack, and Equipment Gantry.
+    - Added compatibility coverage for AAI Containers and AAI Industry.
+    - Added capability diagnostics for entity-backed loader crafting recipes.
+    - Added capability diagnostics for entity-backed mining-drill crafting recipes.
+    - Added native modifier ownership diagnostics for selected lab, mining, logistics, and robot modifiers.
+    - Added negative capability coverage for loop risks, hidden recipes, cap-zero recipes, and loader/drill structural decoys.
+
+  Internal:
+
+    - Kept the new compiler path report-only so broad unknown mod behavior remains observed before it is emitted.
+    - Added compatibility safeguards for AAI-style loaders, standalone big mining drills, and ATAN-style nuclear science packs.
+    - Added progression-aware science-pack ingredient policies for official and modded science-pack chains.
+    - Extended compatibility observation output with compiler, decision, capability, loop-risk, rule-surface, and lab-matrix rows.
+    - Added schema helpers, a resolver contract, capability policy, and compatibility claims.
+    - Added generated-stream manifest linting and planner report diff tooling.
+
+---------------------------------------------------------------------------------------------------
+Version: 2.1.5
+Date: 2026-07-05
+
+  Compatibility:
+
+    - Added known-competitor profiles for exact recipe-productivity overlaps found in the local idea-mod audit.
+    - Skipped MIR lab productivity when a matching infinite native laboratory-productivity owner is active.
+    - Skipped MIR worker robot battery when Better Bot Battery-style infinite native robot battery owner is active.
+    - Added diagnostics-only compatibility planner rows for active audit roles and deliberate non-actions.
+    - Added recipe productivity cap diagnostics for non-default recipe maximum productivity values.
+
+  Internal:
+
+    - Fixed local audits so official built-ins include required official dependencies such as Recycler for Quality.
+    - Fixed offline dependency closure for Factorio `~` dependencies such as Mini Machines' shared settings mod.
+    - Kept generated local scenarios rooted in configured root zips instead of dependency-only library zips.
+    - Allowed generated and baseline local audit scenarios with no root mods.
+    - Shortened audit user-data paths to avoid Windows path-length false negatives.
+    - Added optional hardlink and symlink staging for local compatibility audit mod zips.
+    - Added reviewed expected-failure rules for external 2.1 local-library stress failures.
+    - Added downloaded dependency-cache support to local 2.1 audit profiles.
+    - Tightened load-failure grouping to classify Factorio error excerpts instead of MIR audit-row text.
+    - Made mir.ps1 profile-driven for release, overnight, and local-audit commands with simple path overrides.
+    - Added compatibility observation artifacts and a report command for planner and recipe-cap diagnostics.
+    - Added PowerShell script checks for parsing, duplicate parameters, ignored outputs, and secret-output guards.
+    - Added Factorio 2.0 and 2.1 run profiles for release gates, overnight sweeps, and local audits.
+    - Made compatibility audits select Factorio line, local scenario defaults, and available official built-ins.
+    - Added a docs-only release check command for release-note and documentation refreshes after a clean full gate.
+    - Trimmed release archives so extra repository files are not shipped in the mod zip.
+
+---------------------------------------------------------------------------------------------------
+Version: 1.9.1
+Date: 2026-07-05
+
+  Compatibility:
+
+    - Backported the tested More Infinite Research 2.1.0 source snapshot to Factorio 2.0.
+    - Kept Quality hidden and optional, and kept Space Age optional without a Factorio 2.1 dependency floor.
+    - Removed Factorio 2.1-only cargo logistics technology modifiers from legacy.
+    - Kept compatible 2.1.0 recipe-productivity ownership safeguards.
+    - Kept compatible vanilla productivity-family adoption and fluid-output productivity streams.
+
+  Internal:
+
+    - Fixed local audits so official built-ins include required official dependencies such as Recycler for Quality.
+    - Tightened load-failure grouping to classify Factorio error excerpts.
+
+---------------------------------------------------------------------------------------------------
+Version: 2.1.0
+Date: 2026-07-03
 
   Features:
 
-    - Added configurable finite numbered continuations for five Factorio 0.9 research families.
+    - Added fluid productivity research for oil processing, cracking, lubricant, sulfuric acid, acid neutralization, and thrusters.
+    - Added Space Age material productivity research for landfill, artificial soil, molten metals, carbon, ice, and bacteria.
+    - Added lithium-from-brine productivity coverage to Lithium Productivity.
+    - Rail Productivity now covers Elevated Rails supports and ramps when Elevated Rails is active.
+    - Split Stone Product Productivity into Landfill, Artificial Soil, and Molten Metals research lines.
+    - Updated Space Age science-pack requirements for fluid, agriculture, bacteria, breeding, and shooting-speed research.
+    - Updated cargo logistics technology icons to better match their Space Age unlocks.
+    - Added an opt-in pipeline extent startup multiplier; default 100% leaves prototypes unchanged.
 
-  Validation:
+  Compatibility:
 
-    - Passed static, deterministic package, exact-binary ZIP discovery, and two regenerated-cache load proofs.
-    - Interactive visual, locale-fit, and balance review remains pending maintainer acceptance.
+    - Vanilla Space Age productivity technologies can adopt safe residual recipes from compatible planet-style mods.
+    - Existing saves refresh technology effects when adopted vanilla-family recipe signatures change.
+    - Known competing productivity technologies are replaced only when MIR fully matches their recipes and effect values.
+    - Unknown external recipe-productivity owners make MIR suppress matching effects instead of duplicating ownership.
+    - Elevated Rails and Quality remain hidden load-order dependencies without separate visible requirements.
+
+  Migration:
+
+    - Retired Stone Product Productivity progress migrates into Landfill Productivity.
+    - Artificial Soil Productivity and Molten Metals Productivity start as new separate research lines.
+
+---------------------------------------------------------------------------------------------------
+Version: 1.9.0
+Date: 2026-07-02
+
+  Compatibility:
+
+    - Published the Factorio 2.0 legacy backport from the tested More Infinite Research 2.0.5 source snapshot.
+    - Legacy metadata targets Factorio 2.0 with `base >= 2.0`.
+    - Quality remains a hidden optional dependency, and Quality module recipes can still be discovered when active.
+    - Removed Factorio 2.1-only cargo logistics research from legacy.
+
+---------------------------------------------------------------------------------------------------
+Version: 2.0.5
+Date: 2026-07-01
+
+  Features:
+
+    - Expanded Electric Shooting Speed to cover base electric weapons and Space Age Tesla weapons.
+    - Mining Drill Productivity now covers Omega Drill-style and broader modded mining-drill recipes.
+    - Kept Spoilage Preservation disabled and enabled Agricultural Growth Speed for newly planted tower crops.
+    - Agricultural Growth Speed affects newly planted tower crops and does not rescan existing crops.
+    - Combined Character Logistic Trash Slot bonuses into Character Inventory Slot research.
+    - Renamed Heavy Ammunition Productivity to Cannon Shell Productivity and broadened shell/ammo coverage.
+    - Added base-game Research Productivity using the native laboratory productivity modifier.
+    - Refreshed generated technology icons, effect badges, settings labels, and localized descriptions.
+    - Added diagnostic overlap reporting for generated direct-effect technologies.
+
+  Compatibility:
+
+    - Improved generated weapon-speed ownership so vanilla finite rocket, cannon, and tank bonuses stay intact.
+    - Improved recipe-productivity ownership detection so MIR does not duplicate other infinite productivity techs.
+    - Space Age keeps vanilla productivity ownership for processing units, low-density structures, plastic, and rocket fuel.
+    - Quality module productivity recipes can be discovered when Quality is active without a visible dependency.
+
+  Migration:
+
+    - Existing trash-slot progress now moves into the combined Character Inventory Slot technology.
+    - No other existing generated technology IDs were renamed.
+
+---------------------------------------------------------------------------------------------------
+Version: 2.0.0
+Date: 2026-06-30
+
+  Features:
+
+    - Updated More Infinite Research for Factorio 2.1.
+    - Added Space Age cargo logistics research for unloading distance and optional landing pad count.
+    - Added lab-compatible science-pack selection for generated technologies.
+    - Added flexible science-pack policies for configured, space, promethium, official, and active lab packs.
+    - Added startup diagnostics for generated and skipped streams, recipe matches, and base extensions.
+    - Added Factorio 2.1 recipe-category support and late data-final-fixes generation.
+    - Added layered icons, effect badges, localized descriptions, and normal effect text for generated research.
+    - Added startup settings for optional vanilla weapon shooting speed cleanup.
+
+  Generator changes:
+
+    - Improved science-pack inheritance, prerequisites, max-level, availability, and continuation checks.
+    - Improved recipe matching for hidden, recycling, lab-input, biochamber, and modded science-pack recipes.
+    - Improved base-technology extension generation so vanilla and other-mod technologies remain unchanged.
+    - Added compatibility profile support for stream items, patterns, exclusions, and groups.
+
+  Compatibility:
+
+    - Raised the base dependency to Factorio 2.1.8 or newer.
+    - Added optional official DLC ordering floors for Elevated Rails, Recycler, Quality, and Space Age.
+    - Added cleanup for compatible competing base extensions and recipe-productivity technologies.
+    - Added Better Robots Extended compatibility for competing worker robot storage research.
+    - Added a startup setting to prefer MIR over selected competing infinite technologies.
+    - Added opportunistic compatibility for several popular productivity and recipe mods.
+    - Improved optional Space Age behavior, including Space Age installs without Quality.
+
+  Locale:
+
+    - Replaced placeholder text in German, Spanish, French, Italian, Polish, Brazilian Portuguese, and Simplified Chinese.
+    - Updated Russian localization coverage and terminology to match current English locale keys.
+    - Updated in-game descriptions for productivity, direct-effect, and Space Age cargo logistics research.
+    - Moved Spanish localization to Factorio's supported es-ES locale code.
+    - Removed empty placeholder locale folders so only complete locale packs are shipped.
+
+  Migration:
+
+    - No existing prototype IDs were renamed. No migration is required.
+
+---------------------------------------------------------------------------------------------------
+Version: 1.2.9
+Date: 2025-10-30
+
+  Changes:
+
+    - Enabled Character Logistic Trash Slot research by default.
+    - Disabled Character Reach research by default.
+    - Character Reach research no longer grants item pickup distance.
+    - Character Reach research still grants reach, build distance, resource reach, and item drop distance.
+    - Increased the default Inserter Capacity extension curve.
+    - The optional Inserter Capacity infinite continuation is now more expensive.
+
+---------------------------------------------------------------------------------------------------
+Version: 1.2.5
+Date: 2025-10-29
+
+  Features:
+
+    - Added direct-effect infinite research for character mining speed, crafting speed, walking speed, reach, and build distance.
+    - Added direct-effect infinite research for character logistic trash slots.
+    - Added per-stream research time startup settings.
+    - Added max-level startup settings for generated base-tech extensions.
+    - Added support for stream-provided custom icons and icon tinting.
+
+  Changes:
+
+    - Character Inventory Slot research now uses explicit utility, military, and agricultural science packs.
+    - Character Logistic Trash Slot research was introduced disabled by default.
+    - Base-tech extension research time settings now allow 0 to reuse the configured default.
+
+---------------------------------------------------------------------------------------------------
+Version: 1.2.0
+Date: 2025-10-28
+
+  Features:
+
+    - Added infinite extensions for braking force, research speed, worker robot storage, inserter capacity, and weapon speed.
+    - Added startup settings for enabling and tuning base-tech extensions.
+    - Added direct-effect rocket, cannon-shell, flamethrower, and electric weapon shooting speed research.
+    - Added max-level enforcement for generated infinite stream technologies.
+    - Added vanilla weapon shooting speed adjustment support.
+    - Dedicated generated speed researches can own selected vanilla weapon speed bonuses.
+
+  Changes:
+
+    - Added default cost and science-pack profiles for each generated base-tech extension.
+    - Added dedicated locale keys and setting descriptions for base-tech extension settings.
+    - Corrected the promethium science pack spelling in English locale text.
+
+---------------------------------------------------------------------------------------------------
+Version: 1.1.5
+Date: 2025-10-27
+
+  Features:
+
+    - Added per-stream base cost, growth factor, and max-level defaults and startup settings.
+    - Added English locale support for mod name, mod description, technology names, and setting text.
+    - Added locale files for German, Spanish, French, Italian, Polish, Brazilian Portuguese, Russian, and Simplified Chinese.
+    - Added direct-effect Character Inventory Slot and Worker Robot Battery research.
+    - Added broad productivity coverage for science packs, infrastructure, weapons, intermediates, and Space Age materials.
+    - Added grouped productivity streams for modules, belts, inserters, bullets, and rockets.
+
+  Changes:
+
+    - Added item prototype lookup for modules and science packs when selecting icons and matching outputs.
+    - Added recipe exclusions for common unwanted scrap and asteroid byproducts.
+    - Added Quality module coverage to Module Productivity.
+    - Refined belt tiers to cover turbo and hyper transport belt families.
+    - Rail Productivity now avoids unrelated rail-like outputs.
+    - Added a startup gate setting for holding generated technologies behind space or promethium science.
+
+---------------------------------------------------------------------------------------------------
+Version: 1.1.0
+Date: 2025-10-25
+
+  Features:
+
+    - Added support for hiding generated productivity research when Space Age provides the vanilla equivalent.
+    - Added direct-effect technology generation support for non-productivity infinite bonuses.
+    - Added early Character Inventory Slot and Worker Robot Battery infinite research.
+    - Added early Science Pack, Wall, Grenade, Rail, Electric Energy, Concrete, Furnace, and Drill productivity.
+
+  Changes:
+
+    - Expanded item lookup for generated icons and recipe matching.
+    - Item lookup can use ammo, capsules, modules, and science pack prototypes where appropriate.
+    - Added Space Age-aware science-pack selection with optional promethium or space-science gating.
+
+---------------------------------------------------------------------------------------------------
+Version: 1.0.0
+Date: 2025-10-25
+
+  Features:
+
+    - Initial public release for Factorio 2.0 with optional Space Age support.
+    - Added generated infinite recipe productivity technologies for many intermediate items and resources.
+    - Generated productivity technologies cover resources not covered by vanilla productivity research.
+    - Added per-technology startup enable switches for every generated research stream.
+    - Added automatic recipe scanning for covered outputs and generation of matching productivity effects.
+    - Added conflict trimming so recipes already covered by existing productivity technologies are skipped.
+    - Added Space Age-aware science-pack selection and prerequisites for generated technologies.
+    - Added a default infinite research cost curve of `8000 * 2^(L-1)` with 60-second research units.
+
+  Initial research coverage:
+
+    - Added productivity streams for vanilla intermediates, infrastructure, ammunition, and science packs.
+    - Added Space Age and overhaul-oriented productivity streams for advanced materials.
+    - Added grouped productivity streams for modules, belts, inserters, bullets, and rockets.
+    - Grouped productivity streams use lower per-level gains for higher-tier items inside those groups.
+
+  Notes:
+
+    - The technologies are intentionally infinite, but Factorio's recipe productivity cap still applies.
+    - The mod was created to make megabasing easier on lower-end hardware.
+    - The mod still preserves Factorio's normal production and logistics constraints.

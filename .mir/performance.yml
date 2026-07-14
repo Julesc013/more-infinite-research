@@ -1,0 +1,26 @@
+schema: 1
+
+release: 3.1.0
+factorio_line: "2.1"
+budget_manifest: .mir/performance-budgets.json
+accepted_evidence: .mir/evidence/3.1.0-automatic-compiler-runtime-summary.json
+
+measurement_policy:
+  - Budgets are set before performance optimization and include host-load headroom.
+  - Runtime scenario timings include Factorio process startup and save creation.
+  - Local-pack timings include dependency resolution, load, diagnostics parsing, and report conversion.
+  - A skipped load never counts as performance evidence.
+  - Load-only overhaul observations do not create compatibility support claims.
+  - Source-instrumented coverage measurements do not create archive compatibility claims.
+
+required_surfaces:
+  - base
+  - space-age
+  - scoped-caps-off
+  - scoped-caps-on
+  - diagnostics-off
+  - diagnostics-on
+  - medium-pack
+  - large-pack
+  - large-synthetic-graph
+  - full-matrix

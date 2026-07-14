@@ -17,10 +17,8 @@ Date: 2026-07-07
 
 ## Decision
 
-Generated technologies must be researchable by at least one lab. Added science
-packs are included only through science/lab validation, not by mod name alone.
+Generated technologies must be researchable by at least one lab. Added science packs are included only through science/lab validation, not by mod name alone.
 
 ## Consequences
 
-Science pack integration is a hard gate for generated research, not optional
-diagnostics.
+Science pack integration is a hard gate for generated research, not optional diagnostics.

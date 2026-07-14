@@ -12,7 +12,6 @@ superseded_by: []
 
 # Adding A Compatibility Fixture
 
-Compatibility fixtures should be small, named, and tied to a claim or risk.
-Prefer positive and negative assertions for family-support claims.
+Compatibility fixtures should be small, named, and tied to a claim or risk. Prefer positive and negative assertions for family-support claims.
 
 Register durable fixtures in `.mir/fixtures.yml`.

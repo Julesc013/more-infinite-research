@@ -5,13 +5,13 @@ applies_to: "3.0.0+"
 audience: developer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-07-09
+last_reviewed: 2026-07-10
 supersedes: []
 superseded_by: []
 ---
 # API Proof Points
 
-Updated: 2026-07-09
+Updated: 2026-07-10
 
 This ledger records API claims that affect release planning. Use it to avoid turning Reddit ideas or memory into implementation assumptions.
 
@@ -62,7 +62,11 @@ Latest official API docs checked on 2026-07-06: `2.1.9`. Local runtime validatio
 | Labs expose accepted science inputs on `LabPrototype` | Factorio `LabPrototype` docs plus runtime custom-lab fixtures | Verified | Added science packs should be validated against labs instead of hard-coded by mod name |
 | `change-recipe-productivity` is an official technology modifier type | Factorio modifier docs plus runtime fluid-productivity fixtures | Verified | Fluid-output productivity should stay native recipe productivity instead of runtime fluid scripting |
 | `change-recipe-productivity` is scoped by explicit recipe ID and `change`, not by output item family | Factorio `ChangeRecipeProductivityModifier` docs | Verified | Vanilla family adoption must append exact recipe effects to an existing owner technology |
-| `mod-data` prototypes can carry arbitrary prototype-stage data and are readable at runtime through `prototypes.mod_data` | Factorio `ModData` docs | Verified | The data stage can publish the productivity-family adoption signature for runtime migration handling |
+| Factorio `1.1.110` rejects `change-recipe-productivity` | Disposable local proof mod loaded with `D:\Programs\Factorio\1.1\bin\x64\factorio.exe --dump-data`; load failed with `Unknown modifier type "change-recipe-productivity"` | Locally disproven for `1.1` | Keep recipe-productivity streams disabled on the `1.1` target line and document missing item/intermediate/science-pack productivity as an engine-surface exclusion |
+| Factorio `1.1` generated direct-effect technologies can use target-era high-resolution core `constants/*` art as technology tile badges | Runtime fixture `mir-fixture-assert-legacy-effect-icons` in the `factorio-1.1-direct-effects` validation scenario | Locally proven for `1.9.3` | Older rings should define target-line overlay mappings instead of bundling newer core graphics or using effect-row sprites as tile badges |
+| Factorio `0.18`/`1.0` lacks separate technology constant/control icon assets and does not document native modifier icon fields for normal effects | Local Factorio `1.0` install scan plus `doc-html/Concepts.html` modifier schema review | Locally disproven for badge simulation | The `1.8.0` bridge uses main technology textures and locale text instead of synthetic badge overlays or native modifier icon metadata |
+| Factorio `0.17.79` includes disabled tutorial technologies, and normal `LuaForce.research_all_technologies()` behavior leaves disabled prototypes out | Local `0.17.79` prototypes, bundled API docs, exact 1.7.0 package probe, and generated-prerequisite fixture | Locally proven | Science prerequisite inference excludes disabled unlockers and validates generated graph reachability |
+| On target profiles that support `mod-data`, prototypes can carry arbitrary prototype-stage data and are readable at runtime through `prototypes.mod_data` | Factorio `ModData` docs and exact-version load gates | Verified for Factorio 2.x; unavailable on 1.x | The data stage publishes compiler artifacts only when the current target profile declares the prototype family |
 | `LuaForce.reset_technology_effects()` reapplies research effects while preserving technology research state | Factorio `LuaForce` docs | Verified | Existing saves can refresh newly adopted recipe effects, but the reset must be signature-guarded because custom force-state changes are lost |
 | `script.on_configuration_changed` runs when mod versions, mod lists, startup settings, prototypes, or migrations change | Factorio `LuaBootstrap` docs | Verified | Adding or removing a planet mod can trigger the adoption-signature refresh path |
 | `settings.startup` exposes startup mod settings as a read table | Factorio `LuaSettings` docs | Verified | MIR can read startup settings during prototype loading but should not rely on runtime code to rewrite startup generation choices |

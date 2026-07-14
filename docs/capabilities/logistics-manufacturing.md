@@ -12,7 +12,4 @@ superseded_by: []
 
 # Logistics Manufacturing Capability
 
-Logistics manufacturing covers crafting productivity for belts, undergrounds,
-splitters, loaders, and adjacent logistics items. It does not change logistics
-throughput or native stack-size modifiers unless an explicit native capability
-owns that behavior.
+Logistics manufacturing covers crafting productivity for belts, undergrounds, splitters, loaders, and adjacent logistics items. It does not change logistics throughput or native stack-size modifiers unless an explicit native capability owns that behavior.

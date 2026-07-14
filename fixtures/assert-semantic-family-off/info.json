@@ -1,0 +1,9 @@
+{
+  "name": "mir-fixture-assert-semantic-family-off",
+  "version": "0.1.0",
+  "title": "MIR Fixture - Assert Automatic Compiler Off",
+  "author": "Julesc013",
+  "description": "Asserts off mode performs no automatic attachment or family generation.",
+  "factorio_version": "2.1",
+  "dependencies": ["base >= 2.1.8", "more-infinite-research", "mir-fixture-semantic-family-attach"]
+}

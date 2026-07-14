@@ -32,3 +32,4 @@ if (-not [string]::IsNullOrWhiteSpace($MaterializeRoot)) {
 }
 
 $result | ConvertTo-Json -Depth 10
+

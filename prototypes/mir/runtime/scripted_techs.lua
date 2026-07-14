@@ -2,8 +2,10 @@ local spoilage = require("prototypes.mir.runtime.effects.spoilage_preservation")
 local agricultural_growth = require("prototypes.mir.runtime.effects.agricultural_growth_speed")
 local productivity_family_adoption = require("prototypes.mir.runtime.productivity_family_adoption")
 local effective_settings = require("prototypes.mir.settings.effective")
+local runtime_state = require("prototypes.mir.runtime.state")
 
 local M = {}
+M.requires_features = {"scripted_techs", "productivity_family_adoption"}
 
 local features = {
   spoilage,
@@ -11,10 +13,14 @@ local features = {
   productivity_family_adoption
 }
 
+for _, feature in ipairs(features) do
+  if type(feature.requires_features) ~= "table" then
+    error("MIR runtime handler is missing positive target requirements.", 2)
+  end
+end
+
 local function ensure_storage()
-  storage.mir = storage.mir or {}
-  storage.mir.scripted_techs = storage.mir.scripted_techs or {}
-  return storage.mir.scripted_techs
+  return runtime_state.bucket("scripted_techs")
 end
 
 local function debug_enabled()

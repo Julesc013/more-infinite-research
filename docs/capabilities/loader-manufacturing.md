@@ -12,8 +12,7 @@ superseded_by: []
 
 # Loader Manufacturing Capability
 
-Loader manufacturing identifies recipes that craft loader-like logistics
-entities. It is about crafting productivity, not loader throughput.
+Loader manufacturing identifies recipes that craft loader-like logistics entities. It is about crafting productivity, not loader throughput.
 
 Evidence:
 
