@@ -14,7 +14,7 @@ superseded_by: []
 
 MIR 1.7.1 is an unreleased Factorio 0.17 safety backport. It keeps the reduced native-infinite feature set from 1.7.0.
 
-This candidate is an independent canonical MIR 3.1.9-derived target projection from `DEV_LOWER_WAVE_ANCHOR` commit `dc5bfa99249af6c9508201a4c4667063bc8e021c`. The earlier `tmp/0.17` candidate remains `SUPERSEDED-UNRELEASED` characterization evidence and is not the source ancestry of this reconstruction.
+This candidate is an independent canonical MIR 3.1.9-derived target projection from `DEV_LOWER_WAVE_ANCHOR` commit `d6c1feab9e268d590b60e8d2338af68a4c0b7b83`. The earlier `tmp/0.17` candidate remains `SUPERSEDED-UNRELEASED` characterization evidence and is not the source ancestry of this reconstruction.
 
 - MIR now validates every generated technology's complete reachable prerequisite graph.
 - The validator rejects missing, disabled, or cyclic prerequisite paths with a deterministic diagnostic.
