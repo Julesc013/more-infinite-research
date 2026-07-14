@@ -34,9 +34,21 @@ function Invoke-MIRRetentionRun {
   $configPath = Join-Path $runRoot "config.ini"
   [System.IO.File]::WriteAllText($configPath, $config, [System.Text.UTF8Encoding]::new($false))
   $log = Join-Path $runRoot "$Name.log"
-  $arguments = @("--config", $configPath, "--no-log-rotation", "--disable-audio", "--mod-directory", $mods)
-  if ($Mode -eq "create") { $arguments += @("--create", $MapPath) }
-  else { $arguments += @("--benchmark", $MapPath, "--benchmark-ticks", "1", "--benchmark-runs", "1") }
+  $arguments = @("--config", $configPath, "--no-log-rotation", "--mod-directory", $mods)
+  if ([string]$profile.factorio.line -notin @("0.13", "0.14")) { $arguments += "--disable-audio" }
+  if ($Mode -eq "create") {
+    $arguments += @("--create", $MapPath)
+  } else {
+    $benchmarkMap = $MapPath
+    if ([string]$profile.factorio.line -eq "0.13") {
+      $saves = Join-Path $user "saves"
+      New-Item -ItemType Directory -Force -Path $saves | Out-Null
+      $benchmarkMap = [IO.Path]::GetFileNameWithoutExtension($MapPath)
+      Copy-Item -LiteralPath $MapPath -Destination (Join-Path $saves "$benchmarkMap.zip") -Force
+    }
+    $arguments += @("--benchmark", $benchmarkMap, "--benchmark-ticks", "1")
+    if ([string]$profile.factorio.line -eq "0.17") { $arguments += @("--benchmark-runs", "1") }
+  }
 
   $processInfo = [Diagnostics.ProcessStartInfo]::new()
   $processInfo.FileName = $FactorioBin
@@ -61,10 +73,25 @@ function Invoke-MIRRetentionRun {
     if (-not [string]::IsNullOrEmpty($text) -and -not $text.EndsWith("`n")) { $text += "`n" }
     $text += $stderr
   }
-  [System.IO.File]::WriteAllText($log, $text, [System.Text.UTF8Encoding]::new($false))
+  $factorioLogPath = Join-Path $user "factorio-current.log"
+  $proofText = if (Test-Path -LiteralPath $factorioLogPath -PathType Leaf) {
+    Get-Content -Raw -LiteralPath $factorioLogPath
+  } else {
+    $text
+  }
+  [System.IO.File]::WriteAllText($log, $proofText, [System.Text.UTF8Encoding]::new($false))
   if ($process.ExitCode -ne 0) { throw "Factorio $Name failed with exit code $($process.ExitCode); see $log" }
-  if ($text -notmatch "Loading mod more-infinite-research $([regex]::Escape(([IO.Path]::GetFileNameWithoutExtension($ModZip) -replace '^more-infinite-research_','')))" -or $text -match '(?im)^.*Error ') {
+  $fatalPattern = '(?im)(Failed to load mods|Failed to load mod|Invalid Mod|Couldn.t load|stack traceback|Error Util\.cpp|Error ModManager)'
+  if ($proofText -notmatch "Loading mod more-infinite-research $([regex]::Escape(([IO.Path]::GetFileNameWithoutExtension($ModZip) -replace '^more-infinite-research_','')))" -or $proofText -match $fatalPattern) {
     throw "Factorio $Name did not load the expected MIR archive cleanly; see $log"
+  }
+  if ($Mode -eq "create" -and -not (Test-Path -LiteralPath $MapPath -PathType Leaf)) {
+    throw "Factorio $Name exited without creating the expected save; see $log"
+  }
+  $requiresGoodbye = [string]$profile.factorio.line -notin @("0.13", "0.14")
+  if ($Mode -ne "create" -and ($proofText -notmatch '(?im)Loading map ' -or
+      $proofText -notmatch '(?im)Map version ' -or ($requiresGoodbye -and $proofText -notmatch '(?im)Goodbye'))) {
+    throw "Factorio $Name exited without benchmarked loaded-map proof; see $log"
   }
   return $log
 }

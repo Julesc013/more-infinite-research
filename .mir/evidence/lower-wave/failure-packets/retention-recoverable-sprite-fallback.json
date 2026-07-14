@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "status": "resolved-portable-defect",
+  "failed_gate": "Factorio 0.16 exact-candidate retention fresh reload verdict",
+  "exit_code": 0,
+  "harness_error": "Factorio fresh-reload did not load the expected MIR archive cleanly",
+  "engine_diagnostic": "Parallel sprite loading Failed: Failed to load sprite: loading bitmap failed: OutOfMemory. Falling back to normal sprite loading.",
+  "positive_proof": [
+    "Loading mod more-infinite-research 1.6.0",
+    "Loading map",
+    "Performed 1 updates",
+    "Goodbye",
+    "process exit code 0",
+    "zero surviving Factorio processes"
+  ],
+  "target_branch": "rebuild/0.16",
+  "factorio_binary_version": "0.16.51",
+  "target_candidate_sha256": "18EAE70A7FEE1FD50099D15985C4E5BE7DB018592EC3EFFC792950A920714544",
+  "root_cause_classification": "portable-retention-verdict-classification",
+  "root_cause": "The retention harness treated every line containing Error as fatal even when Factorio recovered through normal sprite loading, loaded the candidate and save, completed the benchmark, and exited successfully.",
+  "fix": "Require successful process exit, exact MIR load, save creation or benchmarked map-load proof, and absence of fatal mod-load or stack errors; do not classify the recoverable ParallelSpriteLoader fallback as a failed candidate.",
+  "regression": "Test-MIRPowerShellQuality rejects the former generic Error-line verdict."
+}
