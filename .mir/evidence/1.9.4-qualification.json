@@ -1,0 +1,437 @@
+{
+  "schema": 2,
+  "run_id": "4a1259dd-440f-49b5-a969-225fa9c2556f",
+  "mir_version": "1.9.4",
+  "factorio_version": "1.1",
+  "factorio_binary_version": "1.1.110",
+  "git_commit": "b7b506d4eb3f2a83bebac0e588eaa5e83124f527",
+  "package_source_git_dirty": false,
+  "validation_harness_sha256": "96F2F375776E0634C588CC1BDC03977728FF6DB502AAEBA06F5B080A9DD3F99B",
+  "validation_harness_git_dirty": false,
+  "expected_scenarios_sha256": "53104E7F8FF7D312DACC512A46BA7D4B32F21FD3DC70848B3D65F953922F0221",
+  "expected_scenarios": [
+    "better-bot-battery-owner-skip",
+    "character-inventory-merged-effects",
+    "checkbox-disabled-default-on-features",
+    "checkbox-enabled-default-off-features",
+    "factorio-1.1-direct-effects",
+    "lab-productivity-owner-skip",
+    "package-build",
+    "package-zip-base",
+    "reduced-settings-surface",
+    "runtime-state-contract",
+    "scaled-weapon-overlap",
+    "static-validation",
+    "weapon-overlap-always-coverage-absent",
+    "weapon-overlap-always-coverage-present",
+    "weapon-overlap-conditional-coverage-absent",
+    "weapon-overlap-conditional-coverage-present",
+    "weapon-overlap-conditional-external-owner",
+    "weapon-overlap-off-coverage-absent",
+    "weapon-overlap-off-coverage-present"
+  ],
+  "target_profile_sha256": "45D4C41125EB97ACBFAD830875A06F99EFF8BCD690B094920414719DB37E28B8",
+  "required_groups_sha256": "9ED58F126B451A8E0AD0F96831E6473A60982CBC17EA83B7CB8E4C55FFAE973B",
+  "package_source_sha256": "732D363A8D8A8CB3A9899973ED5F0222EF99C15224B5C628A3AF824B403D5054",
+  "validation_package_sha256": "74BA83E1F02FABBC52C09AC6144A409B243066663A6D132A47334459C2665BFB",
+  "validation_package_content_sha256": "732D363A8D8A8CB3A9899973ED5F0222EF99C15224B5C628A3AF824B403D5054",
+  "status": "passed",
+  "started_at": "2026-07-14T16:26:00.4049452Z",
+  "completed_at": "2026-07-14T16:27:14.5307454Z",
+  "duration_seconds": 74.126,
+  "current_scenario": null,
+  "required_groups": [
+    "base-load",
+    "direct-effects",
+    "exact-dist",
+    "package",
+    "reduced-settings-surface",
+    "runtime-state",
+    "science-prerequisites",
+    "static",
+    "weapon-overlap"
+  ],
+  "groups": [
+    {
+      "name": "base-load",
+      "required": true,
+      "status": "passed",
+      "duration_seconds": 14.825,
+      "scenarios": [
+        "lab-productivity-owner-skip",
+        "checkbox-enabled-default-off-features",
+        "checkbox-disabled-default-on-features"
+      ]
+    },
+    {
+      "name": "direct-effects",
+      "required": true,
+      "status": "passed",
+      "duration_seconds": 8.988,
+      "scenarios": [
+        "better-bot-battery-owner-skip",
+        "character-inventory-merged-effects"
+      ]
+    },
+    {
+      "name": "exact-dist",
+      "required": true,
+      "status": "passed",
+      "duration_seconds": 2.995,
+      "scenarios": [
+        "package-zip-base"
+      ]
+    },
+    {
+      "name": "package",
+      "required": true,
+      "status": "passed",
+      "duration_seconds": 0.01,
+      "scenarios": [
+        "package-build"
+      ]
+    },
+    {
+      "name": "reduced-settings-surface",
+      "required": true,
+      "status": "passed",
+      "duration_seconds": 4.52,
+      "scenarios": [
+        "reduced-settings-surface"
+      ]
+    },
+    {
+      "name": "runtime-state",
+      "required": true,
+      "status": "passed",
+      "duration_seconds": 0.011,
+      "scenarios": [
+        "runtime-state-contract"
+      ]
+    },
+    {
+      "name": "science-prerequisites",
+      "required": true,
+      "status": "passed",
+      "duration_seconds": 5.439,
+      "scenarios": [
+        "factorio-1.1-direct-effects"
+      ]
+    },
+    {
+      "name": "static",
+      "required": true,
+      "status": "passed",
+      "duration_seconds": 0.014,
+      "scenarios": [
+        "static-validation"
+      ]
+    },
+    {
+      "name": "weapon-overlap",
+      "required": true,
+      "status": "passed",
+      "duration_seconds": 36.974,
+      "scenarios": [
+        "weapon-overlap-off-coverage-absent",
+        "weapon-overlap-off-coverage-present",
+        "weapon-overlap-conditional-coverage-absent",
+        "weapon-overlap-conditional-coverage-present",
+        "weapon-overlap-always-coverage-absent",
+        "weapon-overlap-always-coverage-present",
+        "scaled-weapon-overlap",
+        "weapon-overlap-conditional-external-owner"
+      ]
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "b11012eb-3d6e-4fe0-95a2-c7e765e3b7b9",
+      "name": "static-validation",
+      "kind": "gate",
+      "group": "static",
+      "status": "passed",
+      "started_at": "2026-07-14T16:26:00.4111854Z",
+      "completed_at": "2026-07-14T16:26:00.4254657Z",
+      "duration_seconds": 0.014,
+      "evidence_paths": [
+        "scripts/Invoke-MIRValidation.ps1"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "19bf93fb-eb5d-4939-a8ee-4ecad60aa533",
+      "name": "package-build",
+      "kind": "gate",
+      "group": "package",
+      "status": "passed",
+      "started_at": "2026-07-14T16:26:00.4323770Z",
+      "completed_at": "2026-07-14T16:26:00.4426302Z",
+      "duration_seconds": 0.01,
+      "evidence_paths": [
+        "build/validation-dist"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "2bba20ac-1f4c-4539-ba44-764098c15d7c",
+      "name": "runtime-state-contract",
+      "kind": "gate",
+      "group": "runtime-state",
+      "status": "passed",
+      "started_at": "2026-07-14T16:26:00.4535459Z",
+      "completed_at": "2026-07-14T16:26:00.4649994Z",
+      "duration_seconds": 0.011,
+      "evidence_paths": [
+        "prototypes/mir/platform/factorio/runtime_state.lua"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "9250ae26-30b1-467f-9a98-cc1e5cb7be7a",
+      "name": "package-zip-base",
+      "kind": "package",
+      "group": "exact-dist",
+      "status": "passed",
+      "started_at": "2026-07-14T16:26:00.4899411Z",
+      "completed_at": "2026-07-14T16:26:03.4844504Z",
+      "duration_seconds": 2.995,
+      "evidence_paths": [
+        "C:\\Projects\\Factorio\\more-infinite-research-rebuild-1.1\\dist\\more-infinite-research_1.9.4.zip",
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-ed652c8648c1415987a14a42acb93724\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "9367de84-4e9c-4f5f-9fa2-01066f82810f",
+      "name": "factorio-1.1-direct-effects",
+      "kind": "runtime",
+      "group": "science-prerequisites",
+      "status": "passed",
+      "started_at": "2026-07-14T16:26:03.5141711Z",
+      "completed_at": "2026-07-14T16:26:08.9533054Z",
+      "duration_seconds": 5.439,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-ed652c8648c1415987a14a42acb93724\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "69995f06-827e-4939-a441-f017bc9dd5ca",
+      "name": "lab-productivity-owner-skip",
+      "kind": "runtime",
+      "group": "base-load",
+      "status": "passed",
+      "started_at": "2026-07-14T16:26:09.0423742Z",
+      "completed_at": "2026-07-14T16:26:13.8992097Z",
+      "duration_seconds": 4.857,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-ed652c8648c1415987a14a42acb93724\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "1df43aef-75d0-4a72-a8e9-e96f93fb98dc",
+      "name": "better-bot-battery-owner-skip",
+      "kind": "runtime",
+      "group": "direct-effects",
+      "status": "passed",
+      "started_at": "2026-07-14T16:26:13.9158643Z",
+      "completed_at": "2026-07-14T16:26:18.4333866Z",
+      "duration_seconds": 4.518,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-ed652c8648c1415987a14a42acb93724\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "c47d8c9a-d3b3-4f68-af00-cfe62fee9634",
+      "name": "character-inventory-merged-effects",
+      "kind": "runtime",
+      "group": "direct-effects",
+      "status": "passed",
+      "started_at": "2026-07-14T16:26:18.4490209Z",
+      "completed_at": "2026-07-14T16:26:22.9188838Z",
+      "duration_seconds": 4.47,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-ed652c8648c1415987a14a42acb93724\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "b185309f-066d-4a62-8950-5ac2727e2785",
+      "name": "reduced-settings-surface",
+      "kind": "runtime",
+      "group": "reduced-settings-surface",
+      "status": "passed",
+      "started_at": "2026-07-14T16:26:22.9352321Z",
+      "completed_at": "2026-07-14T16:26:27.4550663Z",
+      "duration_seconds": 4.52,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-ed652c8648c1415987a14a42acb93724\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "670f52bd-4239-4d2c-b542-383a11b80944",
+      "name": "checkbox-enabled-default-off-features",
+      "kind": "runtime",
+      "group": "base-load",
+      "status": "passed",
+      "started_at": "2026-07-14T16:26:27.4610807Z",
+      "completed_at": "2026-07-14T16:26:32.1781459Z",
+      "duration_seconds": 4.717,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-ed652c8648c1415987a14a42acb93724\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "6040302d-bba6-4dae-8428-8ad8f7d53d2d",
+      "name": "checkbox-disabled-default-on-features",
+      "kind": "runtime",
+      "group": "base-load",
+      "status": "passed",
+      "started_at": "2026-07-14T16:26:32.1919017Z",
+      "completed_at": "2026-07-14T16:26:37.4428451Z",
+      "duration_seconds": 5.251,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-ed652c8648c1415987a14a42acb93724\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "6ffa007d-9b84-43bd-9f75-d32c03f05742",
+      "name": "weapon-overlap-off-coverage-absent",
+      "kind": "runtime",
+      "group": "weapon-overlap",
+      "status": "passed",
+      "started_at": "2026-07-14T16:26:37.4595647Z",
+      "completed_at": "2026-07-14T16:26:42.0241278Z",
+      "duration_seconds": 4.565,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-ed652c8648c1415987a14a42acb93724\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "465e774d-73e1-4ba9-9d48-85beb2228f60",
+      "name": "weapon-overlap-off-coverage-present",
+      "kind": "runtime",
+      "group": "weapon-overlap",
+      "status": "passed",
+      "started_at": "2026-07-14T16:26:42.0345478Z",
+      "completed_at": "2026-07-14T16:26:46.7520813Z",
+      "duration_seconds": 4.718,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-ed652c8648c1415987a14a42acb93724\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "7e20fe8f-856e-400f-9ee0-1d837319b694",
+      "name": "weapon-overlap-conditional-coverage-absent",
+      "kind": "runtime",
+      "group": "weapon-overlap",
+      "status": "passed",
+      "started_at": "2026-07-14T16:26:46.7636089Z",
+      "completed_at": "2026-07-14T16:26:51.3696497Z",
+      "duration_seconds": 4.606,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-ed652c8648c1415987a14a42acb93724\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "a9fc9da9-8529-4eb4-9e96-25e72957205c",
+      "name": "weapon-overlap-conditional-coverage-present",
+      "kind": "runtime",
+      "group": "weapon-overlap",
+      "status": "passed",
+      "started_at": "2026-07-14T16:26:51.3809312Z",
+      "completed_at": "2026-07-14T16:26:55.8368868Z",
+      "duration_seconds": 4.456,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-ed652c8648c1415987a14a42acb93724\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "3cf31625-25b0-4a35-b853-e8b287791aac",
+      "name": "weapon-overlap-always-coverage-absent",
+      "kind": "runtime",
+      "group": "weapon-overlap",
+      "status": "passed",
+      "started_at": "2026-07-14T16:26:55.8477496Z",
+      "completed_at": "2026-07-14T16:27:00.3053318Z",
+      "duration_seconds": 4.458,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-ed652c8648c1415987a14a42acb93724\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "b3c12288-5e57-4fc7-9c02-9ff3baee6be4",
+      "name": "weapon-overlap-always-coverage-present",
+      "kind": "runtime",
+      "group": "weapon-overlap",
+      "status": "passed",
+      "started_at": "2026-07-14T16:27:00.3191729Z",
+      "completed_at": "2026-07-14T16:27:04.8087826Z",
+      "duration_seconds": 4.49,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-ed652c8648c1415987a14a42acb93724\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "1fd97992-e48b-4ffa-b3cf-031d7d209800",
+      "name": "scaled-weapon-overlap",
+      "kind": "runtime",
+      "group": "weapon-overlap",
+      "status": "passed",
+      "started_at": "2026-07-14T16:27:04.8183691Z",
+      "completed_at": "2026-07-14T16:27:09.4578303Z",
+      "duration_seconds": 4.639,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-ed652c8648c1415987a14a42acb93724\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "8963e717-b178-47f0-9b99-8f3b66fcc684",
+      "name": "weapon-overlap-conditional-external-owner",
+      "kind": "runtime",
+      "group": "weapon-overlap",
+      "status": "passed",
+      "started_at": "2026-07-14T16:27:09.4661036Z",
+      "completed_at": "2026-07-14T16:27:14.5083686Z",
+      "duration_seconds": 5.042,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-ed652c8648c1415987a14a42acb93724\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    }
+  ],
+  "error": null,
+  "assertions_executed": 0
+}

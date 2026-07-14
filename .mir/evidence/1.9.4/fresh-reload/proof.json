@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "status": "passed",
+  "version": "1.9.4",
+  "factorio": "1.1",
+  "git_commit": "b7b506d4eb3f2a83bebac0e588eaa5e83124f527",
+  "candidate_sha256": "74BA83E1F02FABBC52C09AC6144A409B243066663A6D132A47334459C2665BFB",
+  "factorio_binary_sha256": "B7B4B834FCA2E32AFA9D3476EB42CC09B02F1205BE97F688DC6FC6ACE7BA8FE1",
+  "create_exit_code": 0,
+  "reload_exit_code": 0,
+  "save_created": true,
+  "logs": [
+    "fresh-create.log",
+    "fresh-reload.log"
+  ],
+  "generated_at": "2026-07-14T16:29:43.7899978Z"
+}
