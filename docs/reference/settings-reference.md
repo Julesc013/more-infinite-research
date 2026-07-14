@@ -12,5 +12,4 @@ superseded_by: [docs/reference/settings.md]
 
 # Settings Reference
 
-This historical page has been replaced by
-[settings reference](settings.md).
+This historical page has been replaced by [settings reference](settings.md).

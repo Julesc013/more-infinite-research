@@ -4,13 +4,18 @@ param(
   [string]$CandidateZip,
   [string]$PriorZip,
   [switch]$StaticOnly,
-  [switch]$RuntimeOnly
+  [switch]$RuntimeOnly,
+  [switch]$UseExistingCandidate
 )
 
 $ErrorActionPreference = "Stop"
 $repo = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
-$profilePath = Join-Path $repo ".mir\targets.json"
+$profilePath = Join-Path $repo ".mir\target-reconstruction.json"
 $profile = Get-Content -Raw -LiteralPath $profilePath | ConvertFrom-Json
+$canonicalProfilePath = Join-Path $repo ".mir\targets.json"
+$sourceLockPath = Join-Path $repo ".mir\backport-source-lock.json"
+$canonicalFeatureModelPath = Join-Path $repo ".mir\canonical-lower-features.json"
+$testCatalogPath = Join-Path $repo ".mir\test-catalog.json"
 $info = Get-Content -Raw -LiteralPath (Join-Path $repo "info.json") | ConvertFrom-Json
 if ([string]::IsNullOrWhiteSpace($CandidateZip)) {
   $CandidateZip = Join-Path $repo "dist\$($info.name)_$($info.version).zip"
@@ -86,6 +91,17 @@ function Get-MIRHarnessFingerprint {
   return Get-MIRStringSha256 ($rows -join "`n")
 }
 
+function Get-MIRRepositoryTextSha256([string]$Path) {
+  $text = [IO.File]::ReadAllText($Path).Replace("`r`n", "`n").Replace("`r", "`n")
+  return Get-MIRStringSha256 $text
+}
+
+function Get-MIRFixtureFingerprint {
+  $rows = @(& git -C $repo ls-files -s -- fixtures | Sort-Object)
+  if ($LASTEXITCODE -ne 0) { throw "Cannot inventory target fixtures." }
+  return Get-MIRStringSha256 ($rows -join "`n")
+}
+
 function Assert-MIRSealableState {
   $status = @(& git -C $repo status --porcelain --untracked-files=all -- changelog.txt control.lua data-final-fixes.lua data-updates.lua data.lua info.json LICENSE README.md settings.lua thumbnail.png locale migrations prototypes scripts fixtures .mir |
     Where-Object { $_ -notmatch '[\\/]\.mir[\\/]evidence[\\/]' -and $_ -notmatch '\.mir/evidence/' })
@@ -99,13 +115,23 @@ function Get-MIRSealValues {
     $binaryHash = Get-MIRSha256 (Resolve-Path -LiteralPath $FactorioBin).Path
     if ($binaryHash -ne $profile.factorio.binary_sha256) { throw "Factorio binary hash does not match target profile." }
   } else { $binaryHash = $profile.factorio.binary_sha256 }
+  $sourceLock = Get-Content -Raw -LiteralPath $sourceLockPath | ConvertFrom-Json
+  & git -C $repo merge-base --is-ancestor ([string]$sourceLock.canonical_dev_anchor) HEAD
+  if ($LASTEXITCODE -ne 0) { throw "Canonical development anchor is not in target ancestry." }
   return [ordered]@{
     schema = 1
     kind = "mir-qualified-candidate-seal"
     branch = $profile.branch
     release = $profile.release
+    mir_version = $profile.release
     target_factorio = $profile.factorio.line
+    target = $profile.factorio.line
     source_commit = (& git -C $repo rev-parse HEAD).Trim()
+    source_clean = $true
+    canonical_dev_anchor = [string]$sourceLock.canonical_dev_anchor
+    canonical_anchor_is_ancestor = $true
+    backport_source_lock_sha256 = Get-MIRRepositoryTextSha256 $sourceLockPath
+    canonical_feature_model_sha256 = Get-MIRRepositoryTextSha256 $canonicalFeatureModelPath
     candidate = [ordered]@{
       path = [IO.Path]::GetRelativePath($repo, $candidate).Replace("\", "/")
       sha256 = Get-MIRSha256 $candidate
@@ -113,17 +139,25 @@ function Get-MIRSealValues {
       content_fingerprint = Get-MIRZipContentFingerprint $candidate
       package_source_fingerprint = Get-MIRPackageSourceFingerprint
     }
-    target_profile_sha256 = Get-MIRSha256 $profilePath
+    target_profile_sha256 = [string]$sourceLock.target_profile_sha256
+    target_reconstruction_profile_sha256 = Get-MIRRepositoryTextSha256 $profilePath
+    canonical_target_catalog_sha256 = Get-MIRRepositoryTextSha256 $canonicalProfilePath
+    test_catalog_sha256 = Get-MIRRepositoryTextSha256 $testCatalogPath
+    fixtures_fingerprint = Get-MIRFixtureFingerprint
     validation_harness_fingerprint = Get-MIRHarnessFingerprint
     factorio_binary_sha256 = $binaryHash
-    qualification_summary_sha256 = Get-MIRSha256 $summaryPath
+    qualification_summary_sha256 = Get-MIRRepositoryTextSha256 $summaryPath
     release_actions = "not-run-maintainer-only"
   }
 }
 
 if ($Action -eq "qualify") {
   if (-not $RuntimeOnly) {
-    & (Join-Path $PSScriptRoot "Build-MIRPackage.ps1") -OutputDir dist -CompressionLevel Optimal | Out-Host
+    if (-not $UseExistingCandidate) {
+      & (Join-Path $PSScriptRoot "Build-MIRPackage.ps1") -OutputDir dist -CompressionLevel Optimal | Out-Host
+    } elseif (-not (Test-Path -LiteralPath $CandidateZip -PathType Leaf)) {
+      throw "UseExistingCandidate requires an existing exact candidate ZIP."
+    }
     $CandidateZip = (Resolve-Path -LiteralPath $CandidateZip).Path
     & (Join-Path $PSScriptRoot "Test-MIRBackportCapabilities.ps1") | Out-Host
     & (Join-Path $PSScriptRoot "Test-MIRSettingsVisibility.ps1") | Out-Host
@@ -192,7 +226,7 @@ if ($Action -eq "seal") {
 
 $stored = Get-Content -Raw -LiteralPath $sealPath | ConvertFrom-Json
 $current = Get-MIRSealValues
-foreach ($field in @("branch", "release", "target_factorio", "target_profile_sha256", "validation_harness_fingerprint", "factorio_binary_sha256", "qualification_summary_sha256")) {
+foreach ($field in @("branch", "release", "mir_version", "target_factorio", "target", "source_clean", "canonical_dev_anchor", "canonical_anchor_is_ancestor", "backport_source_lock_sha256", "canonical_feature_model_sha256", "target_profile_sha256", "target_reconstruction_profile_sha256", "canonical_target_catalog_sha256", "test_catalog_sha256", "fixtures_fingerprint", "validation_harness_fingerprint", "factorio_binary_sha256", "qualification_summary_sha256")) {
   if ([string]$stored.$field -ne [string]$current.$field) { throw "Seal mismatch: $field" }
 }
 foreach ($field in @("path", "sha256", "size_bytes", "content_fingerprint", "package_source_fingerprint")) {

@@ -12,8 +12,7 @@ superseded_by: []
 
 # AAI Loaders Compatibility
 
-Claim: MIR covers visible AAI-style loader crafting recipes through existing
-belt productivity behavior.
+Claim: MIR covers visible AAI-style loader crafting recipes through existing belt productivity behavior.
 
 Evidence:
 
