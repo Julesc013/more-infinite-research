@@ -1,0 +1,92 @@
+{
+  "schema": 1,
+  "kind": "mir-museum-qualification-summary",
+  "status": "passed",
+  "factorio": "0.10",
+  "exact_patch": "0.10.12",
+  "mir_version": "0.10.0",
+  "branch": "tmp/0.10",
+  "source_commit": "60db5542705ebab084e8ef22d9f13492ff783e75",
+  "binary": {
+    "path": "D:\\Programs\\Factorio\\0.10\\bin\\x64\\Factorio.exe",
+    "architecture": "win64-x64",
+    "sha256": "7D8C1D11A86603C8462D1B58A1D174C83132A89E0F524BE4C0DCA97FFC1FEBB1"
+  },
+  "package": {
+    "path": "dist/more-infinite-research_0.10.0.zip",
+    "mode": "zip-native",
+    "size_bytes": 2514,
+    "entries": 4,
+    "sha256": "845CBB69195ED03AF604685137D356E826B29D0570A4A4AFD6C0941E4B23C04F",
+    "package_content_sha256": "72B988B7449F2F243353ED2E0E9007919D1B987CE5AB55B7EFD27B7A6F912F9E",
+    "forbidden_entries": 0
+  },
+  "capabilities": {
+    "effects": [
+      "inserter-stack-size-bonus",
+      "turret-attack",
+      "gun-speed",
+      "ammo-damage",
+      "num-quick-bars"
+    ],
+    "science": [
+      "science-pack-1",
+      "science-pack-2",
+      "science-pack-3",
+      "alien-science-pack"
+    ],
+    "configuration": "loaded-config-lua",
+    "locale_format": "cfg-sections",
+    "finite_families": [
+      {
+        "id": "inserter-capacity",
+        "levels": 5,
+        "effect": "inserter-stack-size-bonus"
+      },
+      {
+        "id": "gun-turret-damage",
+        "levels": 5,
+        "effect": "turret-attack"
+      },
+      {
+        "id": "bullet-shooting-speed",
+        "levels": 5,
+        "effect": "gun-speed"
+      },
+      {
+        "id": "bullet-damage",
+        "levels": 5,
+        "effect": "ammo-damage"
+      },
+      {
+        "id": "toolbelt",
+        "levels": 3,
+        "effect": "num-quick-bars"
+      }
+    ],
+    "explicit_omissions": [
+      "native-infinite-fields",
+      "count-formula",
+      "recipe-productivity",
+      "mining-productivity",
+      "modern-settings",
+      "scripted-simulation"
+    ]
+  },
+  "gates": {
+    "manifest_and_base_evidence": "passed",
+    "negative_cases": "passed-26",
+    "deterministic_clean_builds": "passed",
+    "package_hygiene": "passed",
+    "exact_zip_initial_load": "passed-bounded-startup-load",
+    "exact_zip_second_load": "passed-bounded-second-startup",
+    "target_cli_save_proof": "not-available-pre-0.12",
+    "runtime_deployment": "zip-native",
+    "locale_parser_and_load": "passed",
+    "balance_invariants": "passed",
+    "upgrade": "not-applicable-first-release",
+    "manual_visual_and_balance_review": "PENDING-MAINTAINER"
+  },
+  "runtime_proof_path": ".mir/evidence/0.10.0-runtime/runtime-proof.json",
+  "release_actions": "not-run-maintainer-only"
+}
