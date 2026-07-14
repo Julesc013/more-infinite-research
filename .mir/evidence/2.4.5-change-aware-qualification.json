@@ -1,0 +1,98 @@
+{
+  "schema": 2,
+  "status": "passed",
+  "run_id": "c6995a88-6838-4b14-9448-c959303f542a",
+  "qualification_mode": "retained-94-scenario-behavior-proof-plus-fresh-version-sensitive-candidate-checks",
+  "mir_version": "2.4.5",
+  "factorio_version": "2.0",
+  "factorio_binary_version": "2.0.77",
+  "git_commit": "47bcc80c8a70b41dbbb4f8d80b2b9433d0a10d3f",
+  "package_source_git_dirty": false,
+  "validation_harness_git_dirty": false,
+  "candidate": "dist/more-infinite-research_2.4.5.zip",
+  "candidate_size_bytes": 406238,
+  "candidate_entry_count": 167,
+  "candidate_forbidden_entry_count": 0,
+  "validation_package_sha256": "7649824B72247AA38F05661422DFDEE7C729B21CC73A0A35D2455443B45D39F8",
+  "validation_package_content_sha256": "5B8E21077CAC99CDB0733EBE8B34D10D0F375B2EAB2D42E60A73677860783FED",
+  "package_source_sha256": "5B8E21077CAC99CDB0733EBE8B34D10D0F375B2EAB2D42E60A73677860783FED",
+  "validation_harness_sha256": "1993213F340FE4C61B93AA1E90335AFFF4043B7EC48D591E52F9FBA7DEC723F6",
+  "target_profile_sha256": "E4955F0415FAFB69C21DA32BA535C761740C270D6972955170CA5A2BE95D514A",
+  "required_groups_sha256": "57A1DF87A8FB594B2B51C7E230D775E88028F23D52DF9D5D7DA1336F9271C78A",
+  "expected_scenarios_sha256": "33C299B4394AB97BBE379D01E6AAC06894883F239A45CA5F55B0D2C0AE63488C",
+  "declared_scenario_count": 94,
+  "covered_scenario_count": 94,
+  "fresh_version_sensitive_scenario_count": 6,
+  "missing_scenarios": [],
+  "required_groups": [
+    "base-load",
+    "direct-effects",
+    "exact-dist",
+    "package",
+    "recipe-target-integrity",
+    "runtime-state",
+    "science-prerequisites",
+    "settings-codec",
+    "space-age",
+    "static",
+    "weapon-overlap"
+  ],
+  "groups": [
+    {"name": "base-load", "required": true, "status": "passed", "evidence_mode": "retained-2.4.1-behavior-plus-fresh-exact-base-zip"},
+    {"name": "direct-effects", "required": true, "status": "passed", "evidence_mode": "retained-runtime-semantics-unchanged"},
+    {"name": "exact-dist", "required": true, "status": "passed", "evidence_mode": "fresh-2.4.5-base-and-space-age-zip"},
+    {"name": "package", "required": true, "status": "passed", "evidence_mode": "fresh-deterministic-exact-candidate"},
+    {"name": "recipe-target-integrity", "required": true, "status": "passed", "evidence_mode": "retained-runtime-semantics-unchanged"},
+    {"name": "runtime-state", "required": true, "status": "passed", "evidence_mode": "retained-contract-plus-fresh-upgrade"},
+    {"name": "science-prerequisites", "required": true, "status": "passed", "evidence_mode": "retained-disabled-prerequisite-regression"},
+    {"name": "settings-codec", "required": true, "status": "passed", "evidence_mode": "retained-settings-matrix-plus-fresh-upgrade"},
+    {"name": "space-age", "required": true, "status": "passed", "evidence_mode": "retained-native-owner-matrix-plus-fresh-config-change-and-space-age-zip"},
+    {"name": "static", "required": true, "status": "passed", "evidence_mode": "fresh-version-sensitive-static-facade"},
+    {"name": "weapon-overlap", "required": true, "status": "passed", "evidence_mode": "retained-runtime-semantics-unchanged"}
+  ],
+  "evidence": {
+    "retained_behavior_qualification": {
+      "status": "passed-and-superseded-by-version-only-renumber",
+      "result": "94/94 unique declared scenarios passed",
+      "summary": ".mir/evidence/2.4.1-change-aware-qualification.json",
+      "seal": ".mir/evidence/candidate-seals/mir-2.4.1-factorio-2.0.json"
+    },
+    "archive_diff": {
+      "status": "passed",
+      "changed_path_count": 4,
+      "runtime_semantic_change": false,
+      "summary": ".mir/evidence/2.4.5-archive-diff-from-2.4.1.json"
+    },
+    "version_sensitive_validation": {
+      "status": "passed",
+      "source_commit": "0a132376f55a5df7caf4905d38ddec3d86327258",
+      "run_id": "01498e23-3527-46a2-8d5e-9bb8fef79b6d",
+      "result": "6/6 selected records passed",
+      "summary": ".mir/evidence/2.4.5-version-sensitive-validation.json",
+      "covers": "static facade, deterministic package, runtime-state contract, exact base ZIP, exact Space Age ZIP, and native-owner configuration-change progress"
+    },
+    "upgrade": {
+      "status": "passed",
+      "source_commit": "171c9aa4f3165d31997704aad407bf2330286c1b",
+      "from_sha256": "4BA19EA071E6359BC25C58CCD8F65CAF81B4AA675496E2F53175A996C791470C",
+      "to_sha256": "7649824B72247AA38F05661422DFDEE7C729B21CC73A0A35D2455443B45D39F8",
+      "summary": ".mir/evidence/2.4.5-upgrade-proof-final.json"
+    },
+    "ecosystem": {
+      "status": "passed",
+      "source_commit": "47bcc80c8a70b41dbbb4f8d80b2b9433d0a10d3f",
+      "scenario": "local-2-0-base-baseline",
+      "local_library_zip_count": 357,
+      "summary": ".mir/evidence/2.4.5-release-targeted-summary.json",
+      "campaign": ".mir/evidence/2.4.5-ecosystem-campaign-evidence.json"
+    },
+    "source_lock": {
+      "status": "passed",
+      "canonical_source_commit": "9c8f40038e42fda378b855bb8132fd98a180b6a5",
+      "canonical_package_source_commit": "79df29b50ea9b855b8665d6c9a3d8295806acde0",
+      "sha256": "ED5B81EB282C04A0FBF5DF839D8A949252F98181852F3735DF20AEFB3095F54D",
+      "declared_target_adaptations": 10
+    }
+  },
+  "completed_at": "2026-07-14T11:02:58.4639166Z"
+}

@@ -357,7 +357,13 @@ release_artifacts:
       upgrade_predecessor_commit: 584b398f98d3e317fac31cba63edcb11360a5bb1
       source_lock: .mir/backport-source-lock.json
       artifact: dist/more-infinite-research_2.4.5.zip
-      structured_summary: pending-version-sensitive-requalification
+      source_commit: 47bcc80c8a70b41dbbb4f8d80b2b9433d0a10d3f
+      sha256: 7649824B72247AA38F05661422DFDEE7C729B21CC73A0A35D2455443B45D39F8
+      package_content_sha256: 5B8E21077CAC99CDB0733EBE8B34D10D0F375B2EAB2D42E60A73677860783FED
+      size_bytes: 406238
+      entries: 167
+      forbidden_entries: 0
+      structured_summary: .mir/evidence/2.4.5-change-aware-qualification.json
       superseded_candidate_source_commit: f42b45d1a9e5b6c61a14729a5d386eb6b88bf952
       superseded_candidate_sha256: 7931E97D9C5CFAB173B48976F1B7EF5A6E7956809D6EA98BF42CD8761C1AAC3D
       superseded_candidate_package_content_sha256: 621D26B40D36C52C9F556D1B2490E7FA266F1E022778EAEA15940CEA4522509D
@@ -366,12 +372,12 @@ release_artifacts:
       qualified_2_4_1_candidate_sha256: 479F57587AB841060187561D6FFEE65B275E2C89832E142E5F3F315713F3FB30
       qualified_2_4_1_seal: .mir/evidence/candidate-seals/mir-2.4.1-factorio-2.0.json
       qualified_2_4_1_supersession_reason: maintainer-directed-release-renumber-to-2.4.5
-      automated_gate: pending-version-sensitive-requalification
+      automated_gate: passed-change-aware
       manual_gate: pending
       assurance_seal: .mir/evidence/candidate-seals/mir-2.4.5-factorio-2.0.json
-      seal_source_commit: 8e98d46ff677b26665db4b506fa3e60b14c42391
+      seal_source_commit: pending-final-evidence-commit
       publication_scope: unreleased
-      status: rebuilding-after-version-renumber
+      status: qualified-awaiting-seal
     mir_2_3_0:
       version: "2.3.0"
       branch: legacy
@@ -517,9 +523,10 @@ release_artifacts:
       source_anchor_commit: 9c8f40038e42fda378b855bb8132fd98a180b6a5
       upgrade_predecessor: mir_2_4_0
       artifact: dist/more-infinite-research_2.4.5.zip
-      validation_status: pending-version-sensitive-requalification
+      sha256: 7649824B72247AA38F05661422DFDEE7C729B21CC73A0A35D2455443B45D39F8
+      validation_status: passed-change-aware
       assurance_seal: .mir/evidence/candidate-seals/mir-2.4.5-factorio-2.0.json
-      status: rebuilding-after-version-renumber
+      status: qualified-awaiting-seal
       purpose: complete Factorio 2.0 projection of the sealed MIR 3.1.9 portable behavior set
     factorio_1_1_port:
       version: "1.9.4"

@@ -188,17 +188,24 @@ waves:
     upgrade_predecessor_commit: 584b398f98d3e317fac31cba63edcb11360a5bb1
     source_lock: .mir/backport-source-lock.json
     archive: dist/more-infinite-research_2.4.5.zip
+    source_commit: 47bcc80c8a70b41dbbb4f8d80b2b9433d0a10d3f
+    sha256: 7649824B72247AA38F05661422DFDEE7C729B21CC73A0A35D2455443B45D39F8
+    package_content_sha256: 5B8E21077CAC99CDB0733EBE8B34D10D0F375B2EAB2D42E60A73677860783FED
+    size_bytes: 406238
+    entries: 167
+    forbidden_entries: 0
     superseded_candidate_source_commit: f42b45d1a9e5b6c61a14729a5d386eb6b88bf952
     superseded_candidate_sha256: 7931E97D9C5CFAB173B48976F1B7EF5A6E7956809D6EA98BF42CD8761C1AAC3D
     superseded_candidate_reason: incomplete-six-scenario-hotfix-not-a-complete-3.1.9-projection
-    structured_summary: pending-version-sensitive-requalification
+    structured_summary: .mir/evidence/2.4.5-change-aware-qualification.json
     qualified_2_4_1_candidate_sha256: 479F57587AB841060187561D6FFEE65B275E2C89832E142E5F3F315713F3FB30
     qualified_2_4_1_seal: .mir/evidence/candidate-seals/mir-2.4.1-factorio-2.0.json
-    automated_gate: pending-version-sensitive-requalification
+    automated_gate: passed-change-aware
     assurance_seal: .mir/evidence/candidate-seals/mir-2.4.5-factorio-2.0.json
+    seal_source_commit: pending-final-evidence-commit
     interactive_gate: pending
     publication_status: unreleased
-    status: rebuilding-after-version-renumber
+    status: qualified-awaiting-seal
 
   mir_3_2_0:
     version: "3.2.0"
