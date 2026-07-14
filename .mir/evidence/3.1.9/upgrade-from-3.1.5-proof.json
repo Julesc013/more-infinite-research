@@ -1,25 +1,25 @@
 {
   "schema": 1,
   "status": "passed",
-  "generated_at": "2026-07-13T23:06:19.4733820Z",
-  "git_commit": "f65dacbbbfa9e5bac891de090c54a5bb36a9ef1f",
+  "generated_at": "2026-07-14T11:21:08.1052753Z",
+  "git_commit": "8ff6fc48123812529dec8f2781710d374d78d2b5",
   "factorio_binary_version": "2.1.10.86940",
   "from": {
     "version": "3.1.5",
-    "path": "dist\\more-infinite-research_3.1.5.zip",
+    "path": ".\\dist\\more-infinite-research_3.1.5.zip",
     "sha256": "8861E25FAAC472EDE9F32FE1C051A623A59177F5E092A3B1DC0B9FF2B3D47C50"
   },
   "to": {
     "version": "3.1.9",
-    "path": "dist\\more-infinite-research_3.1.9.zip",
-    "sha256": "DE99BC1B51810EE0262120B4B7A12F5F8BE913E083B07ED0B5DA0E23C760224B"
+    "path": ".\\dist\\more-infinite-research_3.1.9.zip",
+    "sha256": "D77B3A78DA40CD4FDD4C829A01B5030E59FB593F3387124EF5C438F6A9E8DFCD"
   },
   "assertions": [
-    "startup-setting-retained",
-    "effect-setting-retained",
-    "technology-level-retained",
+    "startup-settings-retained",
+    "native-owner-technology-level-retained",
+    "native-owner-current-research-retained",
+    "native-owner-fractional-progress-retained",
     "fixture-storage-retained",
-    "scripted-runtime-effect-retained",
     "exact-candidate-normal-mod-directory-load"
   ],
   "create_log": "3.1.9-upgrade-from-3.1.5-create.txt",
