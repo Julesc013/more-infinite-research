@@ -2,7 +2,7 @@
   "schema": 1,
   "target": "0.17",
   "mir_version": "1.7.1",
-  "canonical_dev_anchor": "7ca81bbc98f02cfaf2d40012096d94e261e74d98",
+  "canonical_dev_anchor": "6ac377389d7ffc3576fb39576dab4ace6efaec51",
   "claim": "canonical MIR 3.1.9-derived target projection; feature-complete for positively supported Factorio 0.17 capabilities",
   "features": [
     {"feature_id":"compiler-core","classification":"adapted","positive_requirement":"Factorio 0.17 can load the reduced compiler stages","target_result":"graph-safe reduced compiler emitted target-valid technologies","implementation_path":"prototypes/mir/planner/compiler.lua","test":"scripts/Invoke-MIRValidation.ps1 exact ZIP scenarios","documentation_consequence":"Describe an adapted compiler, not modern parity."},
