@@ -1,11 +1,11 @@
-   0.001 2026-07-15 07:16:09; Factorio 0.11.22 (Build 14011, win64)
+   0.001 2026-07-15 09:34:54; Factorio 0.11.22 (Build 14011, win64)
    0.001 Operating system: Windows 8 
    0.001 Read data path: D:/Programs/Factorio/0.11/data
    0.001 Write data path: C:/Projects/Factorio/more-infinite-research-rebuild-0.11/.mir/evidence/0.11.0-runtime/user
    0.001 Binaries path: D:/Programs/Factorio/0.11/bin
-   0.363 Initialised video: NVIDIA GeForce GTX 1070 with Max-Q Design
-   0.491 Graphics options: [FullScreen: false] [VSync: true] [UIScale: 125%] [MultiSampling: OFF] [Graphics quality: normal] [Video memory usage: all]
-   0.596 Loading mod core 0.0.0 (data.lua)
-   0.610 Loading mod base 0.11.22 (data.lua)
-   0.846 Loading mod more-infinite-research 0.11.0 (data.lua)
-   1.051 Loading mod base 0.11.22 (data-updates.lua)
+   0.362 Initialised video: NVIDIA GeForce GTX 1070 with Max-Q Design
+   0.512 Graphics options: [FullScreen: false] [VSync: true] [UIScale: 125%] [MultiSampling: OFF] [Graphics quality: normal] [Video memory usage: all]
+   0.614 Loading mod core 0.0.0 (data.lua)
+   0.640 Loading mod base 0.11.22 (data.lua)
+   0.985 Loading mod more-infinite-research 0.11.0 (data.lua)
+   1.195 Loading mod base 0.11.22 (data-updates.lua)
