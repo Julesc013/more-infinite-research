@@ -11,13 +11,24 @@ function Invoke-MIRAssuranceSeal {
   $branch = (& git -C $repo branch --show-current).Trim()
   $status = @(& git -C $repo status --porcelain --untracked-files=all)
   if ($status.Count -ne 0) { throw "Refusing to seal a dirty source tree. Commit the exact candidate and tracked qualification summary first." }
+  $sourceLockPath = Join-Path $repo ".mir\backport-source-lock.json"
+  $canonicalDevAnchor = $commit
+  if (Test-Path -LiteralPath $sourceLockPath -PathType Leaf) {
+    $sourceLock = Get-Content -Raw -LiteralPath $sourceLockPath | ConvertFrom-Json
+    if (-not [string]::IsNullOrWhiteSpace([string]$sourceLock.canonical_dev_anchor)) {
+      $canonicalDevAnchor = [string]$sourceLock.canonical_dev_anchor
+    }
+  }
   $factorioHash = if ($Context.factorio -and (Test-Path -LiteralPath $Context.factorio -PathType Leaf)) { Get-MIRAssuranceSha256 -Path $Context.factorio } else { "none" }
   $seal = [ordered]@{
     schema=1
     state="SEALED-RC"
     release_status="NOT RELEASED"
     version=[string]$Context.info.version
+    mir_version=[string]$Context.info.version
     factorio_target=$Context.target
+    target=$Context.target
+    canonical_dev_anchor=$canonicalDevAnchor
     branch=$branch
     source_commit=$commit
     source_clean=($status.Count -eq 0)
