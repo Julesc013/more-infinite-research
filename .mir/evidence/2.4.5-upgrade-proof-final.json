@@ -1,8 +1,8 @@
 {
   "schema": 1,
   "status": "passed",
-  "generated_at": "2026-07-14T10:51:19.5846302Z",
-  "git_commit": "0a132376f55a5df7caf4905d38ddec3d86327258",
+  "generated_at": "2026-07-14T10:57:35.9855234Z",
+  "git_commit": "171c9aa4f3165d31997704aad407bf2330286c1b",
   "factorio_binary_version": "2.0.77.84539",
   "from": {
     "version": "2.4.0",
@@ -15,13 +15,12 @@
     "sha256": "7649824B72247AA38F05661422DFDEE7C729B21CC73A0A35D2455443B45D39F8"
   },
   "assertions": [
-    "startup-setting-retained",
-    "effect-setting-retained",
-    "technology-level-retained",
+    "startup-settings-retained",
+    "native-owner-technology-level-retained",
+    "native-owner-current-research-retained",
+    "native-owner-fractional-progress-retained",
+    "legacy-independent-cost-model-migrated-to-paired-cost-model",
     "fixture-storage-retained",
-    "scripted-runtime-effect-retained",
-    "native-owner-setting-ids-retained",
-    "native-owner-technology-levels-retained",
     "exact-candidate-normal-mod-directory-load"
   ],
   "create_log": "2.4.5-upgrade-from-2.4.0-create.txt",
