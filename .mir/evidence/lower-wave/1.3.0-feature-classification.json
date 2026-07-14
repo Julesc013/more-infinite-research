@@ -2,7 +2,7 @@
   "schema": 1,
   "target": "0.13",
   "mir_version": "1.3.0",
-  "canonical_dev_anchor": "7ca81bbc98f02cfaf2d40012096d94e261e74d98",
+  "canonical_dev_anchor": "6ac377389d7ffc3576fb39576dab4ace6efaec51",
   "claim": "canonical MIR 3.1.9-derived finite target projection; feature-complete for positively supported Factorio 0.13 capabilities without native-infinite parity",
   "features": [
     {"feature_id":"compiler-core","classification":"finite-reconstruction","positive_requirement":"Factorio 0.13 can load finite generated technology stages","target_result":"graph-safe finite compiler emitted target-valid technologies","implementation_path":"prototypes/mir/planner/compiler.lua","test":"scripts/Invoke-MIRValidation.ps1 exact ZIP scenarios","documentation_consequence":"Describe finite reconstruction, not native-infinite or modern parity."},
