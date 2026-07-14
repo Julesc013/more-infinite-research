@@ -1,4 +1,14 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.4.1
+Date: 2026-07-14
+
+  Bugfixes:
+
+    - Prevented generated research from inheriting a disabled Automation science technology.
+    - Kept initially available science recipes usable when their former unlock technology is disabled.
+    - Skipped finite anchors and prerequisite chains that transitively depend on disabled technologies.
+
+---------------------------------------------------------------------------------------------------
 Version: 2.4.0
 Date: 2026-07-14
 

@@ -147,9 +147,27 @@ waves:
     assurance_seal: .mir/evidence/candidate-seals/mir-2.4.0-factorio-2.0.json
     seal_source_commit: f6a5dfeb4dea18ee70bbaa17acbd4433f1396e6e
     promotion_commit: da84121fadcda7144b54692718801ec2c2d93ec4
-    interactive_gate: pending-on-exact-final-archive
+    release_commit: 584b398f98d3e317fac31cba63edcb11360a5bb1
+    tag: "2.4.0"
+    interactive_gate: accepted-for-publication
+    publication_scope: mod-portal-and-github-release
+    publication_status: published
+    status: published-frozen
+
+  mir_2_4_1:
+    version: "2.4.1"
+    branch: tmp/2.0
+    target_factorio: "2.0"
+    source_anchor_required: published-2.4.0
+    source_anchor_commit: 584b398f98d3e317fac31cba63edcb11360a5bb1
+    portable_regression_source: 79df29b50ea9b855b8665d6c9a3d8295806acde0
+    archive: dist/more-infinite-research_2.4.1.zip
+    structured_summary: pending
+    automated_gate: pending
+    assurance_seal: pending
+    interactive_gate: pending
     publication_status: unreleased
-    status: promoted-awaiting-manual-review-and-release
+    status: rebuilding-after-package-visible-change
 
   mir_3_2_0:
     version: "3.2.0"

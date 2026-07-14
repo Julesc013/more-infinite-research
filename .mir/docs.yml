@@ -1488,6 +1488,30 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - mir-2.4.0-release-notes
+  - path: docs/releases/2.4.1-checklist.md
+    title: "MIR 2.4.1 Release Checklist"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-2.4.1-release-gate
+  - path: docs/releases/2.4.1-validation-summary.md
+    title: "MIR 2.4.1 Validation Summary"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-2.4.1-validation-result
+  - path: docs/releases/notes/release-notes-2.4.1.md
+    title: "MIR 2.4.1 Release Notes"
+    status: current
+    audience: player
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-2.4.1-release-notes
   - path: docs/archive/superseded/release-notes-2.5.0-internal-candidate.md
     title: "MIR 2.5.0 Internal Candidate Notes"
     status: archived
