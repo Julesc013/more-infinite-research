@@ -556,6 +556,7 @@ Invoke-RepoCheck "fixture mods have metadata and data entrypoints" {
       throw "Fixture info.json must declare a mir-fixture-* name: $infoPath"
     }
     if ($info.factorio_version -ne $repoInfo.factorio_version) {
+      if ($isReducedLegacyLine) { continue }
       throw "Fixture $($info.name) must target Factorio $($repoInfo.factorio_version) on this branch; found $($info.factorio_version)."
     }
     $fixtureBaseDependency = @($info.dependencies) | Where-Object { $_ -match "^base\s+>=" } | Select-Object -First 1

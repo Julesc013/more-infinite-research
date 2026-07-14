@@ -19,7 +19,12 @@ function Assert-MIRSourceLockCommit {
 function Get-MIRSourceLockMapNames {
   param([Parameter(Mandatory)]$Value, [Parameter(Mandatory)][string]$Name)
   if ($null -eq $Value -or $Value -isnot [pscustomobject]) { throw "$Name must be a JSON object." }
-  return @($Value.PSObject.Properties.Name | ForEach-Object { ([string]$_).Replace("\", "/") } | Sort-Object -Unique)
+  return @(
+    $Value.PSObject.Properties.Name |
+      ForEach-Object { ([string]$_).Replace("\", "/") } |
+      Where-Object { -not [string]::IsNullOrWhiteSpace($_) } |
+      Sort-Object -Unique
+  )
 }
 
 $lock = Get-Content -Raw -LiteralPath $lockPath | ConvertFrom-Json
@@ -70,9 +75,9 @@ if ($targetHash -ne [string]$lock.target_profile_sha256) { throw "Target profile
 & (Join-Path $RepoRoot "scripts\Sync-MIRTargetProfiles.ps1") -RepoRoot $RepoRoot -Check
 if ($LASTEXITCODE -ne 0) { throw "Generated target profile source is stale." }
 
-$portablePaths = Get-MIRSourceLockMapNames -Value $lock.portable_modules -Name "portable_modules"
-$adaptedPaths = Get-MIRSourceLockMapNames -Value $lock.adapted_modules -Name "adapted_modules"
-$targetSpecificPaths = Get-MIRSourceLockMapNames -Value $lock.target_specific_modules -Name "target_specific_modules"
+$portablePaths = @(Get-MIRSourceLockMapNames -Value $lock.portable_modules -Name "portable_modules")
+$adaptedPaths = @(Get-MIRSourceLockMapNames -Value $lock.adapted_modules -Name "adapted_modules")
+$targetSpecificPaths = @(Get-MIRSourceLockMapNames -Value $lock.target_specific_modules -Name "target_specific_modules")
 $declaredChangedPaths = @($adaptedPaths + $targetSpecificPaths | Sort-Object -Unique)
 $roots = @(Get-MIRPackageSourceRoots)
 $changedPaths = @(& git -C $RepoRoot diff --name-only ([string]$lock.canonical_dev_anchor) -- @roots)

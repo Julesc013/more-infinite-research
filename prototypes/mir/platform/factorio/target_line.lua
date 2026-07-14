@@ -98,6 +98,10 @@ function M.prototype_shapes()
   return profile.prototype_shapes
 end
 
+function M.mod_data_supported()
+  return profile.prototype_shapes.mod_data == true
+end
+
 function M.expected_stream_count()
   return profile.expected_stream_count
 end
