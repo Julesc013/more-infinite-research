@@ -14,7 +14,7 @@
     {"id":"runtime.exact-zip","kind":"runtime","command":"./scripts/Invoke-MIRValidation.ps1 -FactorioBin <factorio> -CandidateZip <candidate> -Tier smoke","requires_factorio":true,"inputs":["candidate","factorio","exact-dist-scenarios","harness"]},
     {"id":"runtime.full","kind":"runtime","command":"./scripts/Invoke-MIRValidation.ps1 -FactorioBin <factorio> -CandidateZip <candidate> -MaxParallel 4","requires_factorio":true,"inputs":["candidate","factorio","required-scenarios","harness","fixtures","settings"]},
     {"id":"runtime.upgrade","kind":"runtime","command":"./scripts/Test-MIRUpgrade.ps1 -FactorioBin <factorio> -FromZip <prior-release> -ToZip <candidate> -FromVersion 2.4.0 -ToVersion 2.4.1 -FixtureName assert-upgrade-2-4-0-to-2-4-1 -OutputPath artifacts/assurance/2.4.1-upgrade-proof.json","requires_factorio":true,"inputs":["candidate","prior-release","factorio","upgrade-fixture","harness","settings"]},
-    {"id":"runtime.ecosystem","kind":"runtime","command":"./scripts/mir.ps1 release gate --profile release-targeted-2.0 --factorio <factorio> --no-git-pull","requires_factorio":true,"inputs":["candidate","factorio","mod-lock","ecosystem-profile","harness"]},
+    {"id":"runtime.ecosystem","kind":"runtime","command":"./scripts/mir.ps1 release gate --profile release-targeted-2.0 --factorio <factorio> --no-git-pull --skip-strict-gate","requires_factorio":true,"inputs":["candidate","factorio","mod-lock","ecosystem-profile","harness","runtime.full"]},
     {"id":"seal.verify","kind":"promotion","command":"./scripts/mir.ps1 assurance check-seal --seal <seal>","requires_factorio":false,"inputs":["candidate-seal","candidate","package-source","catalog","harness","evidence"]}
   ]
 }

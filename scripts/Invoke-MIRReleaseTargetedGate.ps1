@@ -14,6 +14,7 @@ param(
   [string]$PackageOutputDir = "",
   [int]$ScenarioTimeoutSeconds = 900,
   [switch]$SkipBuild,
+  [switch]$SkipStrictGate,
   [switch]$SkipRepairSmokes,
   [Alias("SkipRepresentativeScenario")]
   [switch]$SkipBZSuite,
@@ -162,6 +163,7 @@ function Write-MIRReleaseGateSummary {
     factorio_line = $FactorioLine
     scenario_timeout_seconds = $ScenarioTimeoutSeconds
     skip_build = [bool]$SkipBuild
+    skip_strict_gate = [bool]$SkipStrictGate
     skip_repair_smokes = [bool]$SkipRepairSmokes
     skip_representative_scenario = [bool]$SkipBZSuite
     no_git_pull = [bool]$NoGitPull
@@ -293,14 +295,16 @@ try {
     }
   }
 
-  Invoke-MIRReleaseGateStep -Name "strict-current-commit-gate" -Action {
-    & (Join-Path $repo "scripts\Invoke-MIRExtendedTests.ps1") `
-      -Tier Static,Runtime,AuditSmoke `
-      -FactorioBin $script:resolvedFactorioBin `
-      -FactorioLine $FactorioLine `
-      -FailFast `
-      -FailOnAuditFailures `
-      -OutputRoot (Join-Path $script:resolvedOutputRoot "strict-gate")
+  if (-not $SkipStrictGate) {
+    Invoke-MIRReleaseGateStep -Name "strict-current-commit-gate" -Action {
+      & (Join-Path $repo "scripts\Invoke-MIRExtendedTests.ps1") `
+        -Tier Static,Runtime,AuditSmoke `
+        -FactorioBin $script:resolvedFactorioBin `
+        -FactorioLine $FactorioLine `
+        -FailFast `
+        -FailOnAuditFailures `
+        -OutputRoot (Join-Path $script:resolvedOutputRoot "strict-gate")
+    }
   }
 
   if (-not $SkipRepairSmokes) {
