@@ -91,6 +91,11 @@ function Get-MIRHarnessFingerprint {
   return Get-MIRStringSha256 ($rows -join "`n")
 }
 
+function Get-MIRRepositoryTextSha256([string]$Path) {
+  $text = [IO.File]::ReadAllText($Path).Replace("`r`n", "`n").Replace("`r", "`n")
+  return Get-MIRStringSha256 $text
+}
+
 function Get-MIRFixtureFingerprint {
   $rows = @(& git -C $repo ls-files -s -- fixtures | Sort-Object)
   if ($LASTEXITCODE -ne 0) { throw "Cannot inventory target fixtures." }
@@ -125,8 +130,8 @@ function Get-MIRSealValues {
     source_clean = $true
     canonical_dev_anchor = [string]$sourceLock.canonical_dev_anchor
     canonical_anchor_is_ancestor = $true
-    backport_source_lock_sha256 = Get-MIRSha256 $sourceLockPath
-    canonical_feature_model_sha256 = Get-MIRSha256 $canonicalFeatureModelPath
+    backport_source_lock_sha256 = Get-MIRRepositoryTextSha256 $sourceLockPath
+    canonical_feature_model_sha256 = Get-MIRRepositoryTextSha256 $canonicalFeatureModelPath
     candidate = [ordered]@{
       path = [IO.Path]::GetRelativePath($repo, $candidate).Replace("\", "/")
       sha256 = Get-MIRSha256 $candidate
@@ -135,13 +140,13 @@ function Get-MIRSealValues {
       package_source_fingerprint = Get-MIRPackageSourceFingerprint
     }
     target_profile_sha256 = [string]$sourceLock.target_profile_sha256
-    target_reconstruction_profile_sha256 = Get-MIRSha256 $profilePath
-    canonical_target_catalog_sha256 = Get-MIRSha256 $canonicalProfilePath
-    test_catalog_sha256 = Get-MIRSha256 $testCatalogPath
+    target_reconstruction_profile_sha256 = Get-MIRRepositoryTextSha256 $profilePath
+    canonical_target_catalog_sha256 = Get-MIRRepositoryTextSha256 $canonicalProfilePath
+    test_catalog_sha256 = Get-MIRRepositoryTextSha256 $testCatalogPath
     fixtures_fingerprint = Get-MIRFixtureFingerprint
     validation_harness_fingerprint = Get-MIRHarnessFingerprint
     factorio_binary_sha256 = $binaryHash
-    qualification_summary_sha256 = Get-MIRSha256 $summaryPath
+    qualification_summary_sha256 = Get-MIRRepositoryTextSha256 $summaryPath
     release_actions = "not-run-maintainer-only"
   }
 }
