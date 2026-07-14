@@ -195,7 +195,7 @@ fixtures:
 
   upgrade-2-4-0-to-2-4-1:
     requires_features: [productivity_family_adoption]
-    assertion_path: fixtures/assert-upgrade-2-4-0-to-2-4-1
+    assertion_path: fixtures/assert-upgrade-2-4-0-to-2-4-5
     validates:
       - exact-2-4-0-source-archive
       - native-owner-setting-retention

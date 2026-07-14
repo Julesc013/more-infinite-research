@@ -9,8 +9,8 @@ if ([int]$lock.schema -ne 1 -or [int]$lock.projection_schema -ne 1) {
   throw "Unsupported MIR backport source-lock schema."
 }
 if ([string]$lock.canonical_version -ne "3.1.9" -or [string]$lock.target -ne "2.0" `
-    -or [string]$lock.mir_version -ne "2.4.1") {
-  throw "The source lock must bind MIR 2.4.1 for Factorio 2.0 to canonical MIR 3.1.9."
+    -or [string]$lock.mir_version -ne "2.4.5") {
+  throw "The source lock must bind MIR 2.4.5 for Factorio 2.0 to canonical MIR 3.1.9."
 }
 
 $anchor = [string]$lock.canonical_anchor
@@ -60,4 +60,4 @@ foreach ($unsupported in @("cargo-landing-pad-count", "max-cargo-bay-unloading-d
   }
 }
 
-Write-Host "[ok] MIR 2.4.1 is a declared Factorio 2.0 projection of canonical 3.1.9 with $($changed.Count) target-adapted package paths."
+Write-Host "[ok] MIR 2.4.5 is a declared Factorio 2.0 projection of canonical 3.1.9 with $($changed.Count) target-adapted package paths."

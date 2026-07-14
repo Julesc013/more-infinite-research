@@ -1,5 +1,5 @@
 ---------------------------------------------------------------------------------------------------
-Version: 2.4.1
+Version: 2.4.5
 Date: 2026-07-14
 
   Bugfixes:
@@ -15,7 +15,7 @@ Date: 2026-07-14
 
   Changes:
 
-    - Rebuilt 2.4.1 as the complete Factorio 2.0 projection of the sealed 3.1.9 portable behavior set.
+    - Rebuilt 2.4.5 as the complete Factorio 2.0 projection of the sealed 3.1.9 portable behavior set.
     - Declared explicit science-pack inputs for the opt-in experimental assembler and lab research families.
 
 ---------------------------------------------------------------------------------------------------

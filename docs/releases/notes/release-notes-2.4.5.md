@@ -1,7 +1,7 @@
 ---
-title: "MIR 2.4.1 Release Notes"
+title: "MIR 2.4.5 Release Notes"
 status: current
-applies_to: "2.4.1"
+applies_to: "2.4.5"
 audience: player
 doc_type: release-plan
 owner: mir-maintainers
@@ -10,9 +10,9 @@ supersedes: []
 superseded_by: []
 ---
 
-# MIR 2.4.1 Release Notes
+# MIR 2.4.5 Release Notes
 
-MIR 2.4.1 is the complete Factorio 2.0 projection of the sealed MIR 3.1.9 portable behavior set, with 2.4.0 retained as its save-upgrade predecessor.
+MIR 2.4.5 is the complete Factorio 2.0 projection of the sealed MIR 3.1.9 portable behavior set, with 2.4.0 retained as its save-upgrade predecessor.
 
 ## Fixed
 

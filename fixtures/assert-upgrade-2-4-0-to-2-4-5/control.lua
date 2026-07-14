@@ -12,7 +12,7 @@ local setting_values = {
 }
 
 local function fail(message)
-  error("MIR 2.4.0 to 2.4.1 native-owner upgrade validation failed: " .. message)
+  error("MIR 2.4.0 to 2.4.5 native-owner upgrade validation failed: " .. message)
 end
 
 local function assert_close(label, actual, expected)
@@ -56,8 +56,8 @@ script.on_init(function()
 end)
 
 script.on_configuration_changed(function()
-  if script.active_mods["more-infinite-research"] ~= "2.4.1" then
-    fail("upgraded save did not use MIR 2.4.1")
+  if script.active_mods["more-infinite-research"] ~= "2.4.5" then
+    fail("upgraded save did not use MIR 2.4.5")
   end
   assert_settings()
   local state = storage.mir_upgrade_fixture_2_4_1
@@ -71,5 +71,5 @@ script.on_configuration_changed(function()
     fail("current native-owner research did not survive upgrade")
   end
   assert_close("native-owner research progress", force.research_progress, state.research_progress)
-  log("[mir-fixture] 2.4.0 to 2.4.1 upgrade proof complete")
+  log("[mir-fixture] 2.4.0 to 2.4.5 upgrade proof complete")
 end)

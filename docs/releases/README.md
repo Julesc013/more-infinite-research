@@ -14,7 +14,7 @@ superseded_by: []
 
 Release docs are version-specific plans, migration guides, risk registers, checklists, and validation records.
 
-MIR 3.1.9 is the sealed Factorio 2.1 release candidate on `main`. MIR 2.4.0 is the published Factorio 2.0 release and exact save-upgrade predecessor; MIR 2.4.1 is the active complete 3.1.9 projection on `tmp/2.0`. Its source lock, checklist, validation summary, candidate seal, and backport-wave dashboard govern qualification. The earlier six-scenario 2.4.1 archive and the internal MIR 2.5.0 candidate are superseded evidence, not release artifacts.
+MIR 3.1.9 is the sealed Factorio 2.1 release candidate on `main`. MIR 2.4.0 is the published Factorio 2.0 release and exact save-upgrade predecessor; MIR 2.4.5 is the active complete 3.1.9 projection on `tmp/2.0`. Its source lock, checklist, validation summary, candidate seal, and backport-wave dashboard govern qualification. Both unshipped 2.4.1 archives and the internal MIR 2.5.0 candidate are superseded evidence, not release artifacts.
 
 - [3.0.0 plan](3.0.0-plan.md)
 - [3.0.0 regression baseline](3.0.0-regression-baseline.md)
@@ -32,9 +32,9 @@ MIR 3.1.9 is the sealed Factorio 2.1 release candidate on `main`. MIR 2.4.0 is t
 - [3.0.5 release notes](notes/release-notes-3.0.5.md)
 - [3.0.5 validation summary](3.0.5-validation-summary.md)
 - [2.3.5 backport plan](2.3.5-backport-plan.md)
-- [2.4.1 release checklist](2.4.1-checklist.md)
-- [2.4.1 release notes](notes/release-notes-2.4.1.md)
-- [2.4.1 validation summary](2.4.1-validation-summary.md)
+- [2.4.5 release checklist](2.4.5-checklist.md)
+- [2.4.5 release notes](notes/release-notes-2.4.5.md)
+- [2.4.5 validation summary](2.4.5-validation-summary.md)
 - [Backport wave dashboard](backport-wave-dashboard.md)
 - [3.1.0 plan](3.1.0-plan.md)
 - [3.1.0 release checklist](3.1.0-checklist.md)

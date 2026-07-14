@@ -177,8 +177,8 @@ waves:
     publication_status: unreleased
     status: release-candidate-on-main
 
-  mir_2_4_1:
-    version: "2.4.1"
+  mir_2_4_5:
+    version: "2.4.5"
     branch: tmp/2.0
     target_factorio: "2.0"
     source_anchor_required: sealed-3.1.9-complete-portable-projection
@@ -187,25 +187,18 @@ waves:
     upgrade_predecessor: "2.4.0"
     upgrade_predecessor_commit: 584b398f98d3e317fac31cba63edcb11360a5bb1
     source_lock: .mir/backport-source-lock.json
-    archive: dist/more-infinite-research_2.4.1.zip
+    archive: dist/more-infinite-research_2.4.5.zip
     superseded_candidate_source_commit: f42b45d1a9e5b6c61a14729a5d386eb6b88bf952
     superseded_candidate_sha256: 7931E97D9C5CFAB173B48976F1B7EF5A6E7956809D6EA98BF42CD8761C1AAC3D
     superseded_candidate_reason: incomplete-six-scenario-hotfix-not-a-complete-3.1.9-projection
-    structured_summary: .mir/evidence/2.4.1-change-aware-qualification.json
-    structured_summary_run_id: 7f6d0e2e-75ff-4145-962e-bdf93204de80
-    candidate_source_commit: b197e93b0e34149a4d38777e59ca69113036377b
-    sha256: 479F57587AB841060187561D6FFEE65B275E2C89832E142E5F3F315713F3FB30
-    package_content_sha256: EC246D3FAA87062B8519427252E11612791D9AE5322DDD793E27AE552D13BAE9
-    package_source_sha256: EC246D3FAA87062B8519427252E11612791D9AE5322DDD793E27AE552D13BAE9
-    runtime_scenario_result: 94/94
-    upgrade_result: passed
-    ecosystem_result: passed
-    automated_gate: passed
-    assurance_seal: .mir/evidence/candidate-seals/mir-2.4.1-factorio-2.0.json
-    seal_source_commit: 8e98d46ff677b26665db4b506fa3e60b14c42391
+    structured_summary: pending-version-sensitive-requalification
+    qualified_2_4_1_candidate_sha256: 479F57587AB841060187561D6FFEE65B275E2C89832E142E5F3F315713F3FB30
+    qualified_2_4_1_seal: .mir/evidence/candidate-seals/mir-2.4.1-factorio-2.0.json
+    automated_gate: pending-version-sensitive-requalification
+    assurance_seal: .mir/evidence/candidate-seals/mir-2.4.5-factorio-2.0.json
     interactive_gate: pending
     publication_status: unreleased
-    status: release-candidate-awaiting-manual-review
+    status: rebuilding-after-version-renumber
 
   mir_3_2_0:
     version: "3.2.0"

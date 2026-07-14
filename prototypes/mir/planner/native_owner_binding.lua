@@ -128,7 +128,7 @@ local function build_plan(key, spec, owner, binding, buckets)
     configured.cost_model = true
 
     -- MIR 2.4.0 applied base and growth overrides independently. Keep the
-    -- exact former unit model in the 2.4.1 binding artifact so an in-progress
+    -- exact former unit model in the 2.4.5 binding artifact so an in-progress
     -- native-owner research can be restored while upgrading to paired costs.
     local legacy_cost = assert(cost_model.configure(model, {
       base = base.changed and base.value or nil,

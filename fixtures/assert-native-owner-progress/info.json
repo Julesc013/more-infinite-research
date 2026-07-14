@@ -7,6 +7,6 @@
   "dependencies": [
     "base >= 2.0",
     "space-age >= 2.0",
-    "more-infinite-research >= 2.4.1"
+    "more-infinite-research >= 2.4.5"
   ]
 }
