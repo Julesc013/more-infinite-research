@@ -19,7 +19,12 @@ function Assert-MIRSourceLockCommit {
 function Get-MIRSourceLockMapNames {
   param([Parameter(Mandatory)]$Value, [Parameter(Mandatory)][string]$Name)
   if ($null -eq $Value -or $Value -isnot [pscustomobject]) { throw "$Name must be a JSON object." }
-  return @($Value.PSObject.Properties.Name | ForEach-Object { ([string]$_).Replace("\", "/") } | Sort-Object -Unique)
+  return @(
+    $Value.PSObject.Properties.Name |
+      ForEach-Object { ([string]$_).Replace("\", "/") } |
+      Where-Object { -not [string]::IsNullOrWhiteSpace($_) } |
+      Sort-Object -Unique
+  )
 }
 
 $lock = Get-Content -Raw -LiteralPath $lockPath | ConvertFrom-Json

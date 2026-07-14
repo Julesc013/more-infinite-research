@@ -55,7 +55,7 @@ function Get-MIRTargetProfile {
   if ($profile.profile_schema -ne 2) {
     throw "Factorio $FactorioVersion target profile schema must be 2."
   }
-  foreach ($shapeField in @("recipe_category", "science_pack_prototype_kinds", "product_probability_fields", "technology_formula", "quality", "surface_conditions")) {
+  foreach ($shapeField in @("recipe_category", "science_pack_prototype_kinds", "product_probability_fields", "technology_formula", "quality", "surface_conditions", "mod_data")) {
     if ($null -eq $profile.prototype_shapes.$shapeField) {
       throw "Factorio $FactorioVersion target profile is missing prototype shape $shapeField."
     }
