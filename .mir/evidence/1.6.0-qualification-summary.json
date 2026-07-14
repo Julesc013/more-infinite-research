@@ -7,15 +7,11 @@
   "candidate": {
     "path": "dist/more-infinite-research_1.6.0.zip",
     "sha256": "18EAE70A7FEE1FD50099D15985C4E5BE7DB018592EC3EFFC792950A920714544",
-    "size_bytes": 373521,
-    "entries": 170,
-    "package_content_sha256": "391A64639EEDDDA3C358E458E66379F7586A28B4FCCBB23D537AD894CA796677"
+    "size_bytes": 373521
   },
   "factorio": {
     "version": "0.16.51",
-    "binary_sha256": "ACBA4D8B766C8CB61CBB564E0D5041439DF32D93C86127DCC3887EB329630966",
-    "exact_binary_version": "0.16.51.36654",
-    "binary_path": "D:/Programs/Factorio/0.16/bin/x64/factorio.exe"
+    "binary_sha256": "ACBA4D8B766C8CB61CBB564E0D5041439DF32D93C86127DCC3887EB329630966"
   },
   "capability_classification": "passed",
   "deterministic_rebuild": "passed",
@@ -25,38 +21,5 @@
   "runtime_scenario_baseline": 8,
   "ecosystem": "fixture-and-named-scenario evidence only; no broader public claim added",
   "public_release": false,
-  "tag": "not-run",
-  "qualified_source_commit": "a46e10be152246e929526efd734c6e65ec204834",
-  "canonical_dev_anchor": "d6c1feab9e268d590b60e8d2338af68a4c0b7b83",
-  "gates": {
-    "source_lock": "passed",
-    "feature_classification": "passed",
-    "static": "passed",
-    "capabilities": "passed",
-    "old_science_reachability": "passed",
-    "settings_retention": "passed",
-    "research_retention": "passed",
-    "global_runtime_state_retention": "passed",
-    "locale_catalogs": "passed-9",
-    "balance": "passed-automated",
-    "package_hygiene": "passed-zero-forbidden",
-    "deterministic_rebuild": "passed-byte-identical",
-    "exact_zip_fresh_load": "passed",
-    "exact_zip_reload": "passed",
-    "first_release_retention": "passed",
-    "upgrade": "not-applicable-no-legitimate-predecessor",
-    "manual_visual_and_balance_review": "PENDING-MAINTAINER"
-  },
-  "attempts": [
-    {
-      "attempt": 1,
-      "status": "passed",
-      "disposition": "complete exact-binary and first-release retention qualification"
-    }
-  ],
-  "superseded_candidate": {
-    "state": "SUPERSEDED-UNRELEASED",
-    "commit": "41283b13037fd8b39c875d0d8cdc39ad1e978b23",
-    "sha256": "FA1D23E5BBAF466DD609314159A4C61B588EF189630A2422ADCC70D1A16243AD"
-  }
+  "tag": "not-run"
 }
