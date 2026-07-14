@@ -4077,7 +4077,7 @@ Invoke-RuntimeScenario -ScenarioName "space-age-vanilla-family-mixed-owner" -Ena
 ) -EnableSpaceAge
 $mixedOwnerRocketFuelLine = Get-LastStreamReportLine -Key "research_rocket_fuel"
 Assert-ReportLineGenerated -Line $mixedOwnerRocketFuelLine -Context "Mixed owner change fallback scenario"
-Assert-LogContains -Expected "owner_mixed_change_values; falling back to MIR generation for eligible recipes" -Context "Mixed owner change fallback scenario"
+Assert-LogContains -Expected "owner_mixed_change_values; eligible recipes fall back to MIR generation." -Context "Mixed owner change fallback scenario"
 
 Invoke-RuntimeScenario -ScenarioName "space-age-fluid-productivity" -EnabledFixtureNames @(
   "mir-fixture-assert-fluid-productivity"
