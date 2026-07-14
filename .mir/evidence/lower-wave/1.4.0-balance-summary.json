@@ -3,7 +3,7 @@
   "status": "passed",
   "target": "0.14",
   "mir_version": "1.4.0",
-  "canonical_dev_anchor": "7ca81bbc98f02cfaf2d40012096d94e261e74d98",
+  "canonical_dev_anchor": "6ac377389d7ffc3576fb39576dab4ace6efaec51",
   "canonical_feature_model_sha256": "FD882872A6EF19AA29F3CDDA75F2C79EBD2D448395FE000485C8D0700AE6DDC6",
   "candidate_sha256": "69B7FC86E798937D44DF60E5E6DDC1FA636A10643B2E1BF54A79F5255CF984C1",
   "expected_stream_count": 11,
