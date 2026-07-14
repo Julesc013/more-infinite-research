@@ -1,0 +1,80 @@
+{
+  "schema": 1,
+  "kind": "mir-museum-qualification-summary",
+  "status": "passed",
+  "factorio": "0.6",
+  "exact_patch": "0.6.4",
+  "mir_version": "0.6.0",
+  "branch": "tmp/0.6",
+  "source_commit": "ed1cabec0615728daf873160c8357667bc738ea3",
+  "binary": {
+    "path": "D:\\Programs\\Factorio\\0.6\\bin\\x64\\Factorio.exe",
+    "architecture": "win64-x64",
+    "sha256": "8D2F7208503B88A578FE558184C87092830554FEC5AB66BCD57CBAE2F0E5A1FB"
+  },
+  "package": {
+    "path": "dist/more-infinite-research_0.6.0.zip",
+    "mode": "extract-required",
+    "size_bytes": 2160,
+    "entries": 4,
+    "sha256": "40EC4F7B07EF4219E74259DA0AA30C8095D8CEA003BDECE90E857D4379DB1C2C",
+    "package_content_sha256": "6FF58FA7BE7184B1AA2F1FCB37F353181B4FB118CC268CE3B993ADB29E498506",
+    "forbidden_entries": 0
+  },
+  "capabilities": {
+    "effects": [
+      "inserter-stack-size-bonus",
+      "gun-speed",
+      "ammo-damage"
+    ],
+    "science": [
+      "science-pack-1",
+      "science-pack-2",
+      "science-pack-3",
+      "alien-science-pack"
+    ],
+    "configuration": "loaded-config-lua",
+    "locale_format": "cfg-sections",
+    "finite_families": [
+      {
+        "id": "inserter-capacity",
+        "levels": 5,
+        "effect": "inserter-stack-size-bonus"
+      },
+      {
+        "id": "rocket-shooting-speed",
+        "levels": 5,
+        "effect": "gun-speed"
+      },
+      {
+        "id": "rocket-damage",
+        "levels": 5,
+        "effect": "ammo-damage"
+      }
+    ],
+    "explicit_omissions": [
+      "native-infinite-fields",
+      "count-formula",
+      "recipe-productivity",
+      "mining-productivity",
+      "modern-settings",
+      "scripted-simulation"
+    ]
+  },
+  "gates": {
+    "manifest_and_base_evidence": "passed",
+    "negative_cases": "passed-26",
+    "deterministic_clean_builds": "passed",
+    "package_hygiene": "passed",
+    "exact_zip_initial_load": "passed-bounded-crop-cache-load",
+    "exact_zip_second_load": "passed-bounded-second-startup",
+    "target_cli_save_proof": "not-available-pre-0.12",
+    "runtime_deployment": "exact-zip-extracted",
+    "locale_parser_and_load": "passed",
+    "balance_invariants": "passed",
+    "upgrade": "not-applicable-first-release",
+    "manual_visual_and_balance_review": "PENDING-MAINTAINER"
+  },
+  "runtime_proof_path": ".mir/evidence/0.6.0-runtime/runtime-proof.json",
+  "release_actions": "not-run-maintainer-only"
+}
