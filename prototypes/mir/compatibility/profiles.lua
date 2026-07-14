@@ -53,12 +53,7 @@ end
 local function apply_profile(config, profile)
   if profile.streams then
     for key, patch in pairs(profile.streams) do
-      if config.streams[key] == nil then
-        error("MIR compatibility profile attempted to recreate unknown or filtered stream " .. tostring(key) .. ".", 3)
-      end
-      if patch.descriptor ~= nil then
-        error("MIR compatibility profile must not replace canonical descriptor for stream " .. tostring(key) .. ".", 3)
-      end
+      config.streams[key] = config.streams[key] or {}
       patch_stream(config.streams[key], patch)
     end
   end
@@ -115,6 +110,42 @@ local PROFILES = {
     "^fish%-breeding%-productivity$"
   }),
 
+  ["mir-fixture-plates-n-circuit-productivity"] = {
+    known_competing_productivity = {
+      tech_patterns = {
+        "^basic%-plate%-productivity$",
+        "^plate%-productivity$",
+        "^electric%-circuit%-productivity$",
+        "^electronic%-circuit%-productivity$",
+        "^advanced%-circuit%-productivity$"
+      }
+    }
+  },
+
+  ["mir-fixture-plates-n-circuit-productivity-blocked"] = {
+    known_competing_productivity = {
+      tech_patterns = {
+        "^basic%-plate%-productivity$",
+        "^plate%-productivity$",
+        "^electric%-circuit%-productivity$",
+        "^electronic%-circuit%-productivity$",
+        "^advanced%-circuit%-productivity$"
+      }
+    }
+  },
+
+  ["mir-fixture-plates-n-circuit-productivity-change-mismatch"] = {
+    known_competing_productivity = {
+      tech_patterns = {
+        "^basic%-plate%-productivity$",
+        "^plate%-productivity$",
+        "^electric%-circuit%-productivity$",
+        "^electronic%-circuit%-productivity$",
+        "^advanced%-circuit%-productivity$"
+      }
+    }
+  },
+
   ["ProductivityResearch"] = known_competing_productivity_profile(SEM_PRFE_PRODUCTIVITY_TECH_PATTERNS),
 
   ["ProductivityResearchForEveryone"] = known_competing_productivity_profile(SEM_PRFE_PRODUCTIVITY_TECH_PATTERNS),
@@ -158,10 +189,6 @@ function P.active_known_competing_productivity_profiles()
         policy = entry.profile.known_competing_productivity
       })
     end
-  end
-  local pack_registry = require("prototypes.mir.compatibility.packs.registry")
-  for _, entry in ipairs(pack_registry.active_known_competing_productivity_profiles()) do
-    table.insert(active, entry)
   end
   return active
 end

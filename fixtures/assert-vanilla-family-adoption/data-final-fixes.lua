@@ -78,17 +78,16 @@ local adoption_data = data.raw["mod-data"]
   and data.raw["mod-data"]["more-infinite-research-productivity-family-adoption"]
   and data.raw["mod-data"]["more-infinite-research-productivity-family-adoption"].data
 
-if not (adoption_data and adoption_data.version == 2 and adoption_data.binding_count == 4
-    and adoption_data.adopted == true and adoption_data.adopted_count >= 4) then
+if not (adoption_data and adoption_data.adopted == true and adoption_data.adopted_count >= 4) then
   fail("expected adoption mod-data to report at least four adopted recipes.")
 end
 
 local signature = tostring(adoption_data.signature or "")
 for _, fragment in ipairs({
-  "schema=2|stream=research_rocket_fuel|owner=rocket-fuel-productivity|operation=adopt_native_owner_effects|configured=|effects=1|output=",
-  "schema=2|stream=research_low_density_structure|owner=low-density-structure-productivity|operation=adopt_native_owner_effects|configured=|effects=1|output=",
-  "schema=2|stream=research_plastic|owner=plastic-bar-productivity|operation=adopt_native_owner_effects|configured=|effects=1|output=",
-  "schema=2|stream=research_processing_unit|owner=processing-unit-productivity|operation=adopt_native_owner_effects|configured=|effects=1|output="
+  "schema=1|owner=rocket-fuel-productivity|recipe=mir-fixture-adopt-rocket-fuel|change=0.1",
+  "schema=1|owner=low-density-structure-productivity|recipe=mir-fixture-adopt-low-density-structure|change=0.1",
+  "schema=1|owner=plastic-bar-productivity|recipe=mir-fixture-adopt-plastic-bar|change=0.1",
+  "schema=1|owner=processing-unit-productivity|recipe=mir-fixture-adopt-processing-unit|change=0.1"
 }) do
   if not string.find(signature, fragment, 1, true) then
     fail("expected adoption signature to include " .. fragment .. "; got " .. signature)

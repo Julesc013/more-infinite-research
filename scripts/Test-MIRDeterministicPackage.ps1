@@ -1,53 +1,39 @@
-param(
-  [string]$RepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "..")).Path
-)
+param([string]$CandidateZip)
 
 $ErrorActionPreference = "Stop"
-$repo = (Resolve-Path -LiteralPath $RepoRoot).Path
-. (Join-Path $repo "scripts\validation\PackageIdentity.ps1")
-
+$repo = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 $info = Get-Content -Raw -LiteralPath (Join-Path $repo "info.json") | ConvertFrom-Json
 $archiveName = "$($info.name)_$($info.version).zip"
-$relativeRoots = @("build\deterministic-package-a", "build\deterministic-package-b")
-$absoluteRoots = @($relativeRoots | ForEach-Object { Join-Path $repo $_ })
+$roots = @("build\deterministic-package-a", "build\deterministic-package-b")
 
-foreach ($path in $absoluteRoots) {
-  $full = [System.IO.Path]::GetFullPath($path)
-  $buildRoot = [System.IO.Path]::GetFullPath((Join-Path $repo "build")) + [System.IO.Path]::DirectorySeparatorChar
-  if (-not $full.StartsWith($buildRoot, [StringComparison]::OrdinalIgnoreCase)) {
-    throw "Deterministic package output escaped the repository build directory: $full"
-  }
-  if (Test-Path -LiteralPath $full) { Remove-Item -LiteralPath $full -Recurse -Force }
+foreach ($root in $roots) {
+  $path = Join-Path $repo $root
+  if (Test-Path -LiteralPath $path) { Remove-Item -LiteralPath $path -Recurse -Force }
+  & (Join-Path $PSScriptRoot "Build-MIRPackage.ps1") -OutputDir $root -CompressionLevel Optimal | Out-Host
 }
 
-foreach ($relativeRoot in $relativeRoots) {
-  & (Join-Path $repo "scripts\Build-MIRPackage.ps1") -OutputDir $relativeRoot -CompressionLevel Optimal | Out-Host
-}
-
-$left = Join-Path $absoluteRoots[0] $archiveName
-$right = Join-Path $absoluteRoots[1] $archiveName
-$leftHash = Get-MIRFileSha256 -Path $left
-$rightHash = Get-MIRFileSha256 -Path $right
-if ($leftHash -ne $rightHash) {
-  throw "MIR package builds are not byte-identical: $leftHash != $rightHash"
+$left = Join-Path (Join-Path $repo $roots[0]) $archiveName
+$right = Join-Path (Join-Path $repo $roots[1]) $archiveName
+$leftHash = (Get-FileHash -LiteralPath $left -Algorithm SHA256).Hash
+$rightHash = (Get-FileHash -LiteralPath $right -Algorithm SHA256).Hash
+if ($leftHash -ne $rightHash) { throw "Package rebuilds differ: $leftHash != $rightHash" }
+if (-not [string]::IsNullOrWhiteSpace($CandidateZip)) {
+  $candidateHash = (Get-FileHash -LiteralPath $CandidateZip -Algorithm SHA256).Hash
+  if ($candidateHash -ne $leftHash) { throw "Candidate differs from deterministic rebuild: $candidateHash != $leftHash" }
 }
 
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 $zip = [System.IO.Compression.ZipFile]::OpenRead($left)
 try {
-  $names = @($zip.Entries | ForEach-Object { $_.FullName })
-  $sortedNames = @($names | Sort-Object)
-  if (($names -join "`n") -ne ($sortedNames -join "`n")) {
-    throw "MIR deterministic package entries are not in canonical path order."
+  $entries = @($zip.Entries)
+  $names = @($entries | ForEach-Object FullName)
+  if (($names -join "`n") -ne (@($names | Sort-Object) -join "`n")) { throw "Archive paths are not canonically ordered." }
+  if (@($entries | Where-Object { $_.LastWriteTime.DateTime -ne [DateTime]::new(1980,1,1,0,0,0) }).Count) {
+    throw "Archive contains non-canonical timestamps."
   }
-  $unexpectedTimestamp = @($zip.Entries | Where-Object {
-    $_.LastWriteTime.DateTime -ne [DateTime]::new(1980, 1, 1, 0, 0, 0)
-  })
-  if ($unexpectedTimestamp.Count -gt 0) {
-    throw "MIR deterministic package contains non-canonical entry timestamps."
-  }
-} finally {
-  $zip.Dispose()
-}
+  $forbidden = '(?i)(^|/)(docs|fixtures|scripts|tests|\.mir|\.codex|\.github|build|dist)(/|$)|(^|/)(AGENTS\.md|CONTRIBUTING\.md|todo\.md)$'
+  $bad = @($names | Where-Object { $_ -match $forbidden })
+  if ($bad.Count) { throw "Archive includes forbidden files: $($bad -join ', ')" }
+} finally { $zip.Dispose() }
 
-Write-Host "[ok] MIR deterministic package SHA-256 $leftHash"
+Write-Host "[ok] deterministic package SHA-256 $leftHash"

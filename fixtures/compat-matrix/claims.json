@@ -98,43 +98,6 @@
       "public_text": "MIR covers visible ATAN-style nuclear science pack recipes when the science pack is an active lab input; atom forge crafting remains outside this claim."
     },
     {
-      "mod": "modules-t4",
-      "claim_level": "module recipe productivity by final prototype tier",
-      "capabilities": {
-        "recipe-productivity": "generated-through-existing-stream",
-        "dynamic-module-effect-research": "not-owned"
-      },
-      "tested_factorio": "2.1.9",
-      "tested_mod_versions": [
-        "modules-t4_2.2.2"
-      ],
-      "generated_streams": [],
-      "fixtures": [
-        "mir-fixture-assert-prototype-limits",
-        "modules-t4_2.2.2 source archive load check"
-      ],
-      "diagnostic_only": false,
-      "public_text": "MIR covers Tier 4 Modules recipes through module prototype tiers; it does not rewrite module effects or add dynamic module-effect research."
-    },
-    {
-      "mod": "finite_prod_techs",
-      "claim_level": "load-after finite productivity cap cooperation",
-      "capabilities": {
-        "finite-productivity-post-processing": "external-owner",
-        "finite-level-formula": "not-owned"
-      },
-      "tested_factorio": "2.1.9",
-      "tested_mod_versions": [
-        "finite_prod_techs_0.1.1"
-      ],
-      "generated_streams": [],
-      "fixtures": [
-        "finite_prod_techs_0.1.1 source archive load check"
-      ],
-      "diagnostic_only": false,
-      "public_text": "MIR cooperates with Finite Productivity Technologies 0.1.1+ through its hidden load-after dependency; MIR does not own the finite-level formula."
-    },
-    {
       "mod": "FluidMustFlow",
       "claim_level": "pipeline coexistence only",
       "capabilities": {

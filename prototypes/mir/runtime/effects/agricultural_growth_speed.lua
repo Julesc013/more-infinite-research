@@ -4,17 +4,12 @@ local runtime_state = require("prototypes.mir.runtime.state")
 
 M.technology_name = "recipe-prod-research_agricultural_growth_speed-1"
 M.stream_key = "research_agricultural_growth_speed"
-M.requires_features = {"scripted_techs"}
 
-local CANONICAL_PER_LEVEL_DELTA = 0.01
+local PER_LEVEL = 1.01
 local MAX_MULTIPLIER = 10
 
 local function feature_enabled()
   return settings_resolver.stream_enabled(M.stream_key)
-end
-
-local function per_level_multiplier()
-  return settings_resolver.stream_runtime_multiplier(M.stream_key, CANONICAL_PER_LEVEL_DELTA)
 end
 
 local function state()
@@ -32,7 +27,7 @@ local function multiplier_for_force(force)
   if not feature_enabled() then return 1, 0 end
   local level = completed_levels(force)
   if level <= 0 then return 1, 0 end
-  return math.min(MAX_MULTIPLIER, per_level_multiplier() ^ level), level
+  return math.min(MAX_MULTIPLIER, PER_LEVEL ^ level), level
 end
 
 local function refresh_force_state(log_debug)
@@ -50,8 +45,7 @@ local function refresh_force_state(log_debug)
   end
 
   if log_debug then
-    log_debug("agricultural growth speed force state refreshed enabled=" .. tostring(enabled)
-      .. " per_level_multiplier=" .. tostring(per_level_multiplier()))
+    log_debug("agricultural growth speed force state refreshed enabled=" .. tostring(enabled))
   end
 end
 

@@ -1,8 +1,13 @@
 local M = {}
-local runtime_state = require("prototypes.mir.platform.factorio.runtime_state")
+
+local function root()
+  if type(global) == "table" then return global end
+  if type(storage) == "table" then return storage end
+  error("MIR runtime state is unavailable in this Factorio runtime.", 2)
+end
 
 function M.namespace()
-  local state_root = runtime_state.root()
+  local state_root = root()
   state_root.mir = state_root.mir or {}
   return state_root.mir
 end

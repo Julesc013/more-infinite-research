@@ -17,48 +17,6 @@ function M.format_confidence(parts)
   return table.concat(out, ",")
 end
 
-local function evidence_class(value)
-  if type(value) == "string" then return value end
-  value = tonumber(value) or 0
-  if value >= 0.999 then return "exact" end
-  if value >= 0.90 then return "structural" end
-  if value >= 0.70 then return "inferred" end
-  return "heuristic"
-end
-
-function M.confidence(parts)
-  parts = parts or {}
-  local total = tonumber(parts.total) or 0
-  return {
-    identity = evidence_class(parts.identity or parts.family or total),
-    family = evidence_class(parts.family or total),
-    tier = evidence_class(parts.tier or parts.family or total),
-    owner = evidence_class(parts.owner or total),
-    science = evidence_class(parts.science or total),
-    lab = evidence_class(parts.lab or total),
-    loop_safety = evidence_class(parts.loop_safety or total),
-    total = total,
-    scores = {
-      identity = tonumber(parts.identity),
-      family = tonumber(parts.family),
-      tier = tonumber(parts.tier),
-      owner = tonumber(parts.owner),
-      science = tonumber(parts.science),
-      lab = tonumber(parts.lab),
-      loop_safety = tonumber(parts.loop_safety)
-    }
-  }
-end
-
-function M.format_typed_confidence(confidence)
-  if type(confidence) ~= "table" then return tostring(confidence or "") end
-  local out = {}
-  for _, key in ipairs({"identity", "family", "tier", "owner", "science", "lab", "loop_safety", "total"}) do
-    if confidence[key] ~= nil then table.insert(out, key .. "=" .. tostring(confidence[key])) end
-  end
-  return table.concat(out, ",")
-end
-
 function M.generated_technology(record)
   required(record, "technology_name")
   required(record, "lab_compatible")
@@ -72,7 +30,7 @@ function M.generated_technology(record)
     subject_type = "technology",
     subject = record.technology_name,
     family = record.family or "explicit_stream",
-    confidence = M.confidence({
+    confidence = M.format_confidence({
       family = 1.0,
       science = 1.0,
       lab = lab_compatible and 1.0 or 0.0,

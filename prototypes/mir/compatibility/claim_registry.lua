@@ -123,45 +123,6 @@ M.claims = {
     }
   },
   {
-    id = "modules-t4",
-    mod = "modules-t4",
-    doc = "docs/compatibility/targets/modules-t4.md",
-    claim_level = "partial-support",
-    public_claim = "module recipe productivity by final prototype tier",
-    capabilities = {
-      ["recipe-productivity"] = "generated-through-existing-stream",
-      ["dynamic-module-effect-research"] = "not-owned"
-    },
-    generated_through_existing_stream = "research_modules",
-    fixtures = {
-      "fixtures/assert-prototype-limits"
-    },
-    named_load_checks = {
-      "modules-t4_2.2.2 source archive on Factorio 2.1.9"
-    },
-    diagnostic_only = {
-      "dynamic-module-effect-research",
-      "module-effect-mutation"
-    }
-  },
-  {
-    id = "finite-prod-techs",
-    mod = "finite_prod_techs",
-    doc = "docs/compatibility/targets/finite-prod-techs.md",
-    claim_level = "cooperates",
-    public_claim = "load-after finite productivity cap post-processing",
-    capabilities = {
-      ["finite-productivity-post-processing"] = "external-owner",
-      ["finite-level-formula"] = "not-owned"
-    },
-    named_load_checks = {
-      "finite_prod_techs_0.1.1 source archive on Factorio 2.1.9"
-    },
-    diagnostic_only = {
-      "finite-level-formula-ownership"
-    }
-  },
-  {
     id = "fluid-must-flow",
     mod = "FluidMustFlow",
     doc = "docs/compatibility/targets/fluid-must-flow.md",
