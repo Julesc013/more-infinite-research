@@ -9,51 +9,11 @@ local defaults = {
   },
   -- Per-stream overrides. Add, remove, or modify entries as needed.
   streams = {
-    research_spoilage_preservation = {
-      enabled = false,
-      base_cost = 50000,
-      growth_factor = 1.5,
-      research_time = 120,
-      max_level = 0,
-      settings_note = {
-        "mod-setting-description.mir-note-experimental-spoilage"
-      }
-    },
-    research_agricultural_growth_speed = {
-      enabled = true,
-      base_cost = 40000,
-      growth_factor = 1.5,
-      research_time = 90,
-      max_level = 0,
-      settings_priority = "top",
-      settings_note = {
-        "mod-setting-description.mir-note-agriculture-growth"
-      }
-    },
     research_inventory_capacity = { growth_factor = 1.10 },
     research_robot_battery = { growth_factor = 1.2 },
     research_breeding = {
       enabled = true,
       settings_priority = "top"
-    },
-    research_cargo_bay_unloading_distance = {
-      enabled = true,
-      base_cost = 100000,
-      growth_factor = 3,
-      research_time = 120,
-      max_level = 0,
-      settings_priority = "top"
-    },
-    research_cargo_landing_pad_count = {
-      enabled = true,
-      base_cost = 1000000,
-      growth_factor = 10,
-      research_time = 240,
-      max_level = 0,
-      settings_priority = "top",
-      settings_note = {
-        "mod-setting-description.mir-note-cargo-pad-count"
-      }
     },
     research_lab_productivity = {
       base_cost = 1000,
