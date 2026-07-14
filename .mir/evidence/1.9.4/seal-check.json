@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "status": "passed",
+  "seal": "C:\\Projects\\Factorio\\more-infinite-research-rebuild-1.1\\.mir\\evidence\\candidate-seals\\mir-1.9.4-factorio-1.1.json",
+  "checks": {
+    "candidate_exists": true,
+    "candidate_sha256": true,
+    "candidate_content_sha256": true,
+    "package_source_sha256": true,
+    "target_profile_sha256": true,
+    "test_catalog_sha256": true,
+    "validation_harness_sha256": true,
+    "source_is_ancestor": true,
+    "evidence_sha256": true
+  }
+}
