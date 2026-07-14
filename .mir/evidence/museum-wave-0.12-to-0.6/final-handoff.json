@@ -1,0 +1,110 @@
+{
+  "schema": 2,
+  "campaign": "museum-wave-0.12-to-0.6-and-3.1.9",
+  "status": "AUTOMATED-GREEN-MANUAL-PENDING",
+  "completed_at": "2026-07-13T23:46:25.3537716Z",
+  "release_actions": "NOT-RUN",
+  "fixed_point": {
+    "portable_compiler_fixes": 0,
+    "portable_generator_fixes": 0,
+    "graph_fixes": 0,
+    "settings_or_config_fixes": 0,
+    "locale_fixes": 0,
+    "balance_fixes": 0,
+    "packaging_fixes": 0,
+    "harness_fixes": 0,
+    "stale_candidate_seals": 0,
+    "unclassified_package_files": 0,
+    "candidate_branch_remote_mismatches": 0
+  },
+  "published_anchors": {
+    "3.1.5": {"branch": "main", "commit": "c8bf4a742910cec9d6d3dee305c83deba1aa49eb", "sha256": "8861E25FAAC472EDE9F32FE1C051A623A59177F5E092A3B1DC0B9FF2B3D47C50", "status": "PUBLISHED-FROZEN"},
+    "2.4.0": {"branch": "legacy", "commit": "584b398f98d3e317fac31cba63edcb11360a5bb1", "sha256": "4BA19EA071E6359BC25C58CCD8F65CAF81B4AA675496E2F53175A996C791470C", "status": "PUBLISHED-FROZEN"}
+  },
+  "candidates": [
+    {
+      "order": 1, "factorio": "1.1", "factorio_binary_version": "1.1.110", "factorio_binary_sha256": "B7B4B834FCA2E32AFA9D3476EB42CC09B02F1205BE97F688DC6FC6ACE7BA8FE1", "version": "1.9.4", "branch": "tmp/1.1", "commit": "dc6414e21585e8f565947be1c3b59ebe6bf750b8", "remote_commit": "dc6414e21585e8f565947be1c3b59ebe6bf750b8", "archive": "dist/more-infinite-research_1.9.4.zip", "size_bytes": 300744, "entries": 119, "sha256": "E350F7433F4613DE075F703435EC23FC8000ADF74FCE4F69ACEAC2DD1478BB5D", "package_content_sha256": "D17E86017F7FEFD85D6C9C839B35E4330BDEC08F42565FD6BD591E3413922DD5", "package_source_sha256": "5D4A421A699F891957030A2F7DA8002361B49FB57DC9AD97911961B5BD685CEE", "package_mode": "zip-native", "capability_mode": "adapted-native-direct-effects", "runtime_scenarios": 10, "upgrade": "1.9.3-to-1.9.4-passed", "retention": "settings-and-research-passed", "seal": ".mir/evidence/1.9.4-candidate-seal.json", "seal_source_commit": "d88c19fbb21366881560df3380f1c612961aca6f", "release_notes": "docs/releases/release-notes-1.9.4.md", "release_checklist": "docs/releases/1.9.4-checklist.md", "validation_summary": "docs/releases/1.9.4-validation-summary.md", "publication": "PORTAL-SCHEMA-ELIGIBLE-NOT-UPLOADED"
+    },
+    {
+      "order": 2, "factorio": "1.0", "factorio_binary_version": "1.0.0", "factorio_binary_sha256": "99F1CE207A04296EF7D797E4A98AA98DDE4F02EE653C9DF736AC33A676FD4F70", "version": "1.8.2", "branch": "tmp/1.0", "commit": "b2855c7bbcf5adc69644820491eb8ebc17bcf362", "remote_commit": "b2855c7bbcf5adc69644820491eb8ebc17bcf362", "archive": "dist/more-infinite-research_1.8.2.zip", "size_bytes": 302549, "entries": 119, "sha256": "740F439060031B6C64925B2CBAC038912703A39F7CC2030775DEFE60C93CADD5", "package_content_sha256": "1C7EEF541E92339AD22A20E6846FCAA2B3B2FC3B5899FEC2F470F4E4996D657C", "package_source_sha256": "85E610E853F3E248B44A4425A244D611B19A75582A9FC62CAF243BB7E5417EE8", "package_mode": "zip-native", "capability_mode": "adapted-native-direct-effects", "runtime_scenarios": 10, "upgrade": "1.8.1-to-1.8.2-passed", "retention": "settings-and-research-passed", "seal": ".mir/evidence/1.8.2-candidate-seal.json", "seal_source_commit": "2e7d6c5495205377d682ccae857ce376786f4c93", "release_notes": "docs/releases/release-notes-1.8.2.md", "release_checklist": "docs/releases/1.8.2-checklist.md", "validation_summary": "docs/releases/1.8.2-validation-summary.md", "publication": "PORTAL-SCHEMA-ELIGIBLE-NOT-UPLOADED"
+    },
+    {
+      "order": 3, "factorio": "0.17", "factorio_binary_version": "0.17.79", "factorio_binary_sha256": "E699D376D100A428B95243507FDBB39C372921577C6D7593203EDF07CAA12D06", "version": "1.7.1", "branch": "tmp/0.17", "commit": "c59140c1808575bd26bf4156f9a6891d3cf90945", "remote_commit": "c59140c1808575bd26bf4156f9a6891d3cf90945", "archive": "dist/more-infinite-research_1.7.1.zip", "size_bytes": 300744, "entries": 117, "sha256": "E6BA58D6BAAD774712ED175E14361D130A82D7DB6DD881D5B17A3FE6E48CCCC5", "package_content_sha256": "4F0AC814FB3FDD433777971F7DE73BF8B78C239BBD928B1A2A49C950B9E355D3", "package_source_sha256": "A0249C3DB2EDD0520D43E1B1C137361B64C63B7DF3E16C1A708A46AF0CA63791", "package_mode": "zip-native", "capability_mode": "adapted-native-direct-effects", "runtime_scenarios": 9, "upgrade": "1.7.0-to-1.7.1-passed", "retention": "settings-and-research-passed", "seal": ".mir/evidence/1.7.1-candidate-seal.json", "seal_source_commit": "39bb00026fb6481a7fc8963ba9a99fe898967468", "release_notes": "docs/releases/release-notes-1.7.1.md", "release_checklist": "docs/releases/museum-wave-handoff.md#manual-gates", "validation_summary": "docs/releases/1.7.1-validation-summary.md", "publication": "PORTAL-SCHEMA-ELIGIBLE-NOT-UPLOADED"
+    },
+    {
+      "order": 4, "factorio": "0.16", "factorio_binary_version": "0.16.51", "factorio_binary_sha256": "ACBA4D8B766C8CB61CBB564E0D5041439DF32D93C86127DCC3887EB329630966", "version": "1.6.0", "branch": "tmp/0.16", "commit": "41283b13037fd8b39c875d0d8cdc39ad1e978b23", "remote_commit": "41283b13037fd8b39c875d0d8cdc39ad1e978b23", "archive": "dist/more-infinite-research_1.6.0.zip", "size_bytes": 300854, "entries": 117, "sha256": "FA1D23E5BBAF466DD609314159A4C61B588EF189630A2422ADCC70D1A16243AD", "package_content_sha256": "8DC2ADDF14F73CE1257682FDD3C97D2CD9299F1E190AD51621C300751438272E", "package_source_sha256": "42F2B1D0520E6BBAAAE6D6BB159F44C4A16A7818E605890B85D69232F321094E", "package_mode": "zip-native", "capability_mode": "adapted-native-direct-effects", "runtime_scenarios": 8, "upgrade": "NOT-APPLICABLE-WITH-EVIDENCE-no-legitimate-prior", "retention": "fresh-create-and-server-reload-passed", "seal": ".mir/evidence/1.6.0-candidate-seal.json", "seal_source_commit": "5dc85bc9307489b17a9410c8f4ee5fceb8b71ee2", "release_notes": "docs/releases/release-notes-1.6.0.md", "release_checklist": "docs/releases/museum-wave-handoff.md#manual-gates", "validation_summary": "docs/releases/1.6.0-validation-summary.md", "publication": "PORTAL-SCHEMA-ELIGIBLE-NOT-UPLOADED"
+    },
+    {
+      "order": 5, "factorio": "0.15", "factorio_binary_version": "0.15.40", "factorio_binary_sha256": "A1C87043244BEAE8E5903FB7D4A96E7920189C6339F00E3A2398988B9C8E7DD6", "version": "1.5.0", "branch": "tmp/0.15", "commit": "c55cba5253f82bc93733522736fa303eda5acfa7", "remote_commit": "c55cba5253f82bc93733522736fa303eda5acfa7", "archive": "dist/more-infinite-research_1.5.0.zip", "size_bytes": 301024, "entries": 117, "sha256": "3F8D78ECEC9DCCCCF2DD14279DC7E3BD696212F33C3FDD87A924B905223ACBCF", "package_content_sha256": "80AED552D7833B8B4D50B7CD150B63F42DC9EF6D8C85A317FC8B3A98552385D9", "package_source_sha256": "D1C6726EC00D4D96F4A7087C6BD57569728DF70DDDA908ECBB8E0A50EA0F85FE", "package_mode": "zip-native", "capability_mode": "adapted-native-direct-effects", "runtime_scenarios": 4, "upgrade": "NOT-APPLICABLE-WITH-EVIDENCE-no-legitimate-prior", "retention": "fresh-create-and-server-reload-passed", "seal": ".mir/evidence/1.5.0-candidate-seal.json", "seal_source_commit": "21c970339abb40636a44842b19b2be362a5f8c9a", "release_notes": "docs/releases/release-notes-1.5.0.md", "release_checklist": "docs/releases/museum-wave-handoff.md#manual-gates", "validation_summary": "docs/releases/1.5.0-validation-summary.md", "publication": "PORTAL-SCHEMA-ELIGIBLE-NOT-UPLOADED"
+    },
+    {
+      "order": 6, "factorio": "0.14", "factorio_binary_version": "0.14.23", "factorio_binary_sha256": "A2B7DC0FBC1D6D68CF4D71EB71D42952FBB3B0CF35EEC6BF8B4BA16B9F79715F", "version": "1.4.0", "branch": "tmp/0.14", "commit": "2e9eab88e3b6ec6ad84460c1d75d8177441182d6", "remote_commit": "2e9eab88e3b6ec6ad84460c1d75d8177441182d6", "archive": "dist/more-infinite-research_1.4.0.zip", "size_bytes": 301270, "entries": 117, "sha256": "39EDE9BA8DA7BDD632828B0B1F055A8681FC1DAB48D7D1B9348D707BB0AF0B93", "package_content_sha256": "797CC502872D2B65ABEDF808208768173841B45AD9557408764AF700E6C3D331", "package_source_sha256": "AC388B80CFC7FBEF5B8CE30F5BE90304648233EDE7AB7153C443E0D38D06D816", "package_mode": "zip-native", "capability_mode": "finite-reconstruction", "runtime_scenarios": 2, "upgrade": "NOT-APPLICABLE-WITH-EVIDENCE-no-legitimate-prior", "retention": "fresh-create-and-server-reload-passed", "seal": ".mir/evidence/1.4.0-candidate-seal.json", "seal_source_commit": "d8f2d2fa63fa228e4f25743f6ef3aaa7eb54903b", "release_notes": "docs/releases/release-notes-1.4.0.md", "release_checklist": "docs/releases/museum-wave-handoff.md#manual-gates", "validation_summary": "docs/releases/1.4.0-validation-summary.md", "publication": "PORTAL-SCHEMA-ELIGIBLE-NOT-UPLOADED"
+    },
+    {
+      "order": 7, "factorio": "0.13", "factorio_binary_version": "0.13.20", "factorio_binary_sha256": "F12C0DF5A5EF0D72F50A24BD76E077DFC9CBEAB4B31EE9EF0951A4A9C086B856", "version": "1.3.0", "branch": "tmp/0.13", "commit": "9037ed01e04961b0b370f082ccafa5ef0b3a34f9", "remote_commit": "9037ed01e04961b0b370f082ccafa5ef0b3a34f9", "archive": "dist/more-infinite-research_1.3.0.zip", "size_bytes": 301358, "entries": 117, "sha256": "36EC72C5D217CE6120C5073A374B6C344BA76DF254480E9A010AA80F6B55C4CC", "package_content_sha256": "EA6F995FBC0D9266561995C19B40FE320E6840F91F92B0E7021532F56D00FB8C", "package_source_sha256": "3845C246CC6A39492BFA349A6CB491557667E8CBF795C85988CB15855B793F45", "package_mode": "zip-native", "capability_mode": "finite-reconstruction", "runtime_scenarios": 2, "upgrade": "NOT-APPLICABLE-WITH-EVIDENCE-no-legitimate-prior", "retention": "fresh-create-and-server-reload-passed", "seal": ".mir/evidence/1.3.0-candidate-seal.json", "seal_source_commit": "0c4995c0d9c86b6b0571416f202501158b07e3c8", "release_notes": "docs/releases/release-notes-1.3.0.md", "release_checklist": "docs/releases/museum-wave-handoff.md#manual-gates", "validation_summary": "docs/releases/1.3.0-validation-summary.md", "publication": "PORTAL-SCHEMA-ELIGIBLE-NOT-UPLOADED"
+    },
+    {
+      "order": 8, "factorio": "0.12", "factorio_binary_version": "0.12.35 build 18124", "factorio_binary_sha256": "AEC54627B873E4636FC2254293F01D73401CB652F373CEEE2DABEAD2B09EB774", "version": "0.12.0", "branch": "tmp/0.12", "commit": "cd06a0123292756ab569fca6d2702da72b966999", "remote_commit": "cd06a0123292756ab569fca6d2702da72b966999", "archive": "dist/more-infinite-research_0.12.0.zip", "size_bytes": 2688, "entries": 4, "sha256": "C98EBB436DD1BA1C4C0C230EB51C637EE42904000C9C7A82C7E7A33F6F5461EF", "package_content_sha256": "E50226D03EC8D3A81EB5642F10DB743A07FA59C323D2C6492F588B939634E3AA", "package_source_sha256": "BE6F9A15FB7EBED86F88A7A7DF4FB31739ECE3B709715E696819ABDC589F5540", "package_mode": "zip-native", "capability_mode": "museum-finite-ladder", "runtime_scenarios": 2, "upgrade": "NOT-APPLICABLE-WITH-EVIDENCE-first-release", "retention": "fresh-create-and-bounded-server-reload-passed", "seal": ".mir/evidence/0.12.0-candidate-seal.json", "seal_source_commit": "59b78be97e2c3e5c8bdc1ac535f8252b971bc7d7", "release_notes": "docs/releases/0.12.0-release-packet.md", "release_checklist": "docs/releases/0.12.0-release-packet.md#release-checklist", "validation_summary": ".mir/evidence/0.12.0-qualification-summary.json", "publication": "GITHUB-ARCHIVE-ONLY"
+    },
+    {
+      "order": 9, "factorio": "0.11", "factorio_binary_version": "0.11.22 build 14011", "factorio_binary_sha256": "968A6B8EDA5244F41AFB8249C7DE004C644BA4692DD38DF5BC00F26F1CE2E085", "version": "0.11.0", "branch": "tmp/0.11", "commit": "5117b8ac9ae374bbce651f26e793cef9721e0da3", "remote_commit": "5117b8ac9ae374bbce651f26e793cef9721e0da3", "archive": "dist/more-infinite-research_0.11.0.zip", "size_bytes": 2514, "entries": 4, "sha256": "C628FBFA4FC2A811869C5D33245BCBA0D37AA5EE2074ADEC7155874C2081B748", "package_content_sha256": "15428701292DBAC7037A8A82161F7EE3FF15F920B40F7CF74F59DE2EA39F88B1", "package_source_sha256": "077CC17F62AA484D8110744E9A97B9216E4C0C158E063DCFCA7D7F67F699DFCA", "package_mode": "zip-native", "capability_mode": "museum-finite-ladder", "runtime_scenarios": 2, "upgrade": "NOT-APPLICABLE-WITH-EVIDENCE-first-release", "retention": "two-bounded-startups-passed-save-proof-unavailable", "seal": ".mir/evidence/0.11.0-candidate-seal.json", "seal_source_commit": "292edea6e8ebbea268fc81fe91d5c65ef2a76755", "release_notes": "docs/releases/0.11.0-release-packet.md", "release_checklist": "docs/releases/0.11.0-release-packet.md#release-checklist", "validation_summary": ".mir/evidence/0.11.0-qualification-summary.json", "publication": "GITHUB-ARCHIVE-ONLY"
+    },
+    {
+      "order": 10, "factorio": "0.10", "factorio_binary_version": "0.10.12 build 10773", "factorio_binary_sha256": "7D8C1D11A86603C8462D1B58A1D174C83132A89E0F524BE4C0DCA97FFC1FEBB1", "version": "0.10.0", "branch": "tmp/0.10", "commit": "d5346cf7ac65fd0eb0d23e50c12102d5b9eb7ca7", "remote_commit": "d5346cf7ac65fd0eb0d23e50c12102d5b9eb7ca7", "archive": "dist/more-infinite-research_0.10.0.zip", "size_bytes": 2514, "entries": 4, "sha256": "845CBB69195ED03AF604685137D356E826B29D0570A4A4AFD6C0941E4B23C04F", "package_content_sha256": "72B988B7449F2F243353ED2E0E9007919D1B987CE5AB55B7EFD27B7A6F912F9E", "package_source_sha256": "313C71F162AF7A0E45EB1115BF38FF2CECF3684E212DA2682C27F9DE2B126C6C", "package_mode": "zip-native", "capability_mode": "museum-finite-ladder", "runtime_scenarios": 2, "upgrade": "NOT-APPLICABLE-WITH-EVIDENCE-first-release", "retention": "two-bounded-startups-and-config-isolation-passed", "seal": ".mir/evidence/0.10.0-candidate-seal.json", "seal_source_commit": "372800a5f06c79c631d0552029935872fc73efff", "release_notes": "docs/releases/0.10.0-release-packet.md", "release_checklist": "docs/releases/museum-wave-handoff.md#manual-gates", "validation_summary": ".mir/evidence/0.10.0-qualification-summary.json", "publication": "GITHUB-ARCHIVE-ONLY"
+    },
+    {
+      "order": 11, "factorio": "0.9", "factorio_binary_version": "0.9.8 build 9400", "factorio_binary_sha256": "B76D1F8058C8EB4D3F2A0B14F5DD87356B8E1068F37F85306A834AAFA611FE23", "version": "0.9.0", "branch": "tmp/0.9", "commit": "a767c93e36e7f32c5e12f0b675ae5315d782ebbd", "remote_commit": "a767c93e36e7f32c5e12f0b675ae5315d782ebbd", "archive": "dist/more-infinite-research_0.9.0.zip", "size_bytes": 2505, "entries": 4, "sha256": "9FE3117CE3415858506FBA319A2F025F170771590A23C2E160D710F4447A05F1", "package_content_sha256": "9B2CD61CF15D343345BADF0A421CCA38972947DFB055FE39D30C62B79BE772FD", "package_source_sha256": "FCAFA61CF34EF01EE4EDAEE1CC9EF38EB95DF810AF1E7793D1AE9979ECADC276", "package_mode": "zip-native", "capability_mode": "museum-finite-ladder", "runtime_scenarios": 2, "upgrade": "NOT-APPLICABLE-WITH-EVIDENCE-first-release", "retention": "two-regenerated-cache-proofs-and-config-isolation-passed", "seal": ".mir/evidence/0.9.0-candidate-seal.json", "seal_source_commit": "8c4b75058aa9529cbdf8a0e0b3c31051b498ccf4", "release_notes": "docs/releases/0.9.0-release-packet.md", "release_checklist": "docs/releases/museum-wave-handoff.md#manual-gates", "validation_summary": ".mir/evidence/0.9.0-qualification-summary.json", "publication": "GITHUB-ARCHIVE-ONLY"
+    },
+    {
+      "order": 12, "factorio": "0.8", "factorio_binary_version": "0.8.8 build 8138", "factorio_binary_sha256": "A4226859DA746314A59D49937444F37A64828A7ABEC46AB3FC05E836C3F4C096", "version": "0.8.0", "branch": "tmp/0.8", "commit": "548a880ee1fe5ed83dddd2d18844772b0e5b6a19", "remote_commit": "548a880ee1fe5ed83dddd2d18844772b0e5b6a19", "archive": "dist/more-infinite-research_0.8.0.zip", "size_bytes": 2505, "entries": 4, "sha256": "6832B00783657F60D8AE967552CA354D1F73C988A0DFE023999AE81533267D8E", "package_content_sha256": "7A7FE34173403CF8A70D0CA95157F63B28DFB045961FAA97D9760DAE861D456B", "package_source_sha256": "F0CB1F76965784634DDD5BEDD71280E8834C58A042946DC846A4BD6B416476CC", "package_mode": "extract-required", "capability_mode": "museum-finite-ladder", "runtime_scenarios": 2, "upgrade": "NOT-APPLICABLE-WITH-EVIDENCE-first-release", "retention": "two-extracted-cache-proofs-and-config-isolation-passed", "seal": ".mir/evidence/0.8.0-candidate-seal.json", "seal_source_commit": "0c9ecbfdce1defb14c87d51bc133fd60fa058936", "release_notes": "docs/releases/0.8.0-release-packet.md", "release_checklist": "docs/releases/museum-wave-handoff.md#manual-gates", "validation_summary": ".mir/evidence/0.8.0-qualification-summary.json", "publication": "GITHUB-ARCHIVE-ONLY"
+    },
+    {
+      "order": 13, "factorio": "0.7", "factorio_binary_version": "0.7.5 build 7026", "factorio_binary_sha256": "EA52123915ECFB14658591876327490B094996ADE64D837929765147C4556FE8", "version": "0.7.0", "branch": "tmp/0.7", "commit": "d870255cc6810ad6491fa0c58f03aa9a9d2ffe0d", "remote_commit": "d870255cc6810ad6491fa0c58f03aa9a9d2ffe0d", "archive": "dist/more-infinite-research_0.7.0.zip", "size_bytes": 2505, "entries": 4, "sha256": "8495146889655FA46233A7B0416F4C67B4E2BF93E984E01F5F8234C9CA6F570F", "package_content_sha256": "69DA64132D4FEE440EFDC2531048F421E264FFD0A60A9BB8DF29E160079E4123", "package_source_sha256": "CAEB308A4F56CF11D3E6E8153D9C777418E739CC8FCE648AD50938198C01DF71", "package_mode": "extract-required", "capability_mode": "museum-finite-ladder", "runtime_scenarios": 2, "upgrade": "NOT-APPLICABLE-WITH-EVIDENCE-first-release", "retention": "two-extracted-cache-proofs-and-config-isolation-passed", "seal": ".mir/evidence/0.7.0-candidate-seal.json", "seal_source_commit": "fe0b7208db99617fe64b2345efc4bce470ca9940", "release_notes": "docs/releases/0.7.0-release-packet.md", "release_checklist": "docs/releases/museum-wave-handoff.md#manual-gates", "validation_summary": ".mir/evidence/0.7.0-qualification-summary.json", "publication": "GITHUB-ARCHIVE-ONLY"
+    },
+    {
+      "order": 14, "factorio": "0.6", "factorio_binary_version": "0.6.4 build 5945", "factorio_binary_sha256": "8D2F7208503B88A578FE558184C87092830554FEC5AB66BCD57CBAE2F0E5A1FB", "version": "0.6.0", "branch": "tmp/0.6", "commit": "a9fb146f401187ea7b9a429be179c0c043b09858", "remote_commit": "a9fb146f401187ea7b9a429be179c0c043b09858", "archive": "dist/more-infinite-research_0.6.0.zip", "size_bytes": 2160, "entries": 4, "sha256": "40EC4F7B07EF4219E74259DA0AA30C8095D8CEA003BDECE90E857D4379DB1C2C", "package_content_sha256": "6FF58FA7BE7184B1AA2F1FCB37F353181B4FB118CC268CE3B993ADB29E498506", "package_source_sha256": "253417C173E26F0226BD40E8381F3F5FFC5EC3A402B90E579D8253521FE8B440", "package_mode": "extract-required", "capability_mode": "museum-finite-ladder-minimal", "runtime_scenarios": 2, "upgrade": "NOT-APPLICABLE-WITH-EVIDENCE-first-release", "retention": "two-extracted-cache-proofs-and-config-isolation-passed", "seal": ".mir/evidence/0.6.0-candidate-seal.json", "seal_source_commit": "fc745f9621cbc29ff89e3b0335869faaeb8b2a11", "release_notes": "docs/releases/0.6.0-release-packet.md", "release_checklist": "docs/releases/museum-wave-handoff.md#manual-gates", "validation_summary": ".mir/evidence/0.6.0-qualification-summary.json", "publication": "GITHUB-ARCHIVE-ONLY"
+    },
+    {
+      "order": 15, "factorio": "2.1", "factorio_binary_version": "2.1.10.86940", "factorio_binary_sha256": "DA4CA713FADBA1728904A2B47C2D73D2E07E8EB3AA2FAEED9AEE0FA6B417BAC3", "version": "3.1.9", "branch": "tmp/3.1.9-synthesis", "development_branch": "dev", "commit": "8ab20f7e0dbf33c16ed44fac09f0dee7b3b6de5e", "remote_commit": "8ab20f7e0dbf33c16ed44fac09f0dee7b3b6de5e", "archive": "dist/more-infinite-research_3.1.9.zip", "size_bytes": 406023, "entries": 167, "sha256": "DE99BC1B51810EE0262120B4B7A12F5F8BE913E083B07ED0B5DA0E23C760224B", "package_content_sha256": "3DBCBBBA24F110F003E61649CC1E6A3038DD10CACC42DCC66EFEA8CBF5C19E45", "package_source_sha256": "07D331C2F87205DF46BBBB325D652667CBB9F706E02073647B62964C7E7DB7E5", "package_mode": "zip-native", "capability_mode": "canonical-modern-compiler", "runtime_scenarios": 102, "mandatory_groups": 11, "upgrade": "3.1.5-3.1.2-and-3.0.5-to-3.1.9-passed", "retention": "settings-level-current-research-runtime-state-and-exact-0.42-progress-passed", "ecosystem": "9-of-9-loads-and-46-mod-planet-closure-passed", "seal": ".mir/evidence/candidate-seals/mir-3.1.9-factorio-2.1.json", "seal_source_commit": "3100148a21df9db6a3a705eb365796b236660d4e", "seal_commit": "9dd72af1d6831041b66a83232c768663a0ac99b5", "release_notes": "docs/releases/notes/release-notes-3.1.9.md", "release_checklist": "docs/releases/3.1.9-checklist.md", "validation_summary": "docs/releases/3.1.9-validation-summary.md", "publication": "PORTAL-SCHEMA-ELIGIBLE-NOT-UPLOADED"
+    }
+  ],
+  "common_automated_gates": {
+    "static": "passed",
+    "matching_binary_runtime": "passed",
+    "locale": "passed-static-parser-and-matching-binary-load",
+    "balance": "passed-machine-invariants-human-judgment-pending",
+    "deterministic_build": "passed",
+    "package_root": "passed-single-versioned-root",
+    "forbidden_entries": 0,
+    "candidate_seal": "passed",
+    "manual_review": "PENDING-MAINTAINER"
+  },
+  "portable_fix_ledger": "tmp/3.1.9-synthesis:.mir/evidence/3.1.9/portable-fix-ledger.json",
+  "publication_channel_audit": ".mir/evidence/museum-wave-0.12-to-0.6/publication-channel-audit.json",
+  "blocked_inputs": [],
+  "no_release_audit": {
+    "tag_count_before": 31,
+    "tag_count_after": 31,
+    "tag_names_sha256": "4F2F8F97E7674AF03DADC8E57147F999C9A48F1E11E6FCAE5B302543B01AEA28",
+    "tag_name_and_object_sha256": "753A89FE4B8BC511D8BAA71A51CCCA650635FB8A053B96D1BCCAD5B9426E5761",
+    "tracked_initial_and_final_tag_snapshot_sha256": "608B8AE5B82D1D31841E047C382249B46D0C5508BD5ECE92389BE86AB80B2FFA",
+    "tag_created_moved_or_deleted": false,
+    "github_release_created_or_modified": false,
+    "mod_portal_upload": false,
+    "force_push": false,
+    "main_unchanged": true,
+    "legacy_unchanged": true,
+    "released_3_1_5_bytes_unchanged": true,
+    "released_2_4_0_bytes_unchanged": true,
+    "mir_3_2_0_started": false
+  },
+  "manual_gates": [
+    "visual-locale-fit-and-truncation",
+    "icon-review",
+    "technology-tree-review",
+    "human-balance-judgment",
+    "save-ui-review",
+    "github-release-presentation",
+    "mod-portal-presentation-for-supported-targets"
+  ]
+}

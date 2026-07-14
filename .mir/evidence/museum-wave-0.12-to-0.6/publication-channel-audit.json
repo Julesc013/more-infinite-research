@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "observed_at": "2026-07-13T23:46:25.3537716Z",
+  "release_actions": "NOT-RUN",
+  "method": "Unauthenticated GET requests to the public Factorio Mod Portal API version filter; no upload endpoint was invoked.",
+  "api_template": "https://mods.factorio.com/api/mods?version=<factorio-major>&page_size=1",
+  "official_sources": [
+    "https://mods.factorio.com/api/mods",
+    "https://wiki.factorio.com/Mod_portal_API",
+    "https://wiki.factorio.com/Mod_upload_API",
+    "https://lua-api.factorio.com/latest/auxiliary/mod-structure.html",
+    "https://forums.factorio.com/viewtopic.php?t=28484"
+  ],
+  "results": [
+    {"factorio": "0.6", "http_status": 400, "portal_version_filter": "rejected", "release_channel": "GITHUB-ARCHIVE-ONLY"},
+    {"factorio": "0.7", "http_status": 400, "portal_version_filter": "rejected", "release_channel": "GITHUB-ARCHIVE-ONLY"},
+    {"factorio": "0.8", "http_status": 400, "portal_version_filter": "rejected", "release_channel": "GITHUB-ARCHIVE-ONLY"},
+    {"factorio": "0.9", "http_status": 400, "portal_version_filter": "rejected", "release_channel": "GITHUB-ARCHIVE-ONLY"},
+    {"factorio": "0.10", "http_status": 400, "portal_version_filter": "rejected", "release_channel": "GITHUB-ARCHIVE-ONLY"},
+    {"factorio": "0.11", "http_status": 400, "portal_version_filter": "rejected", "release_channel": "GITHUB-ARCHIVE-ONLY"},
+    {"factorio": "0.12", "http_status": 400, "portal_version_filter": "rejected", "release_channel": "GITHUB-ARCHIVE-ONLY"},
+    {"factorio": "0.13", "http_status": 200, "portal_version_filter": "accepted", "release_channel": "PORTAL-SCHEMA-ELIGIBLE-NOT-UPLOADED"},
+    {"factorio": "0.14", "http_status": 200, "portal_version_filter": "accepted", "release_channel": "PORTAL-SCHEMA-ELIGIBLE-NOT-UPLOADED"},
+    {"factorio": "0.15", "http_status": 200, "portal_version_filter": "accepted", "release_channel": "PORTAL-SCHEMA-ELIGIBLE-NOT-UPLOADED"},
+    {"factorio": "0.16", "http_status": 200, "portal_version_filter": "accepted", "release_channel": "PORTAL-SCHEMA-ELIGIBLE-NOT-UPLOADED"},
+    {"factorio": "0.17", "http_status": 200, "portal_version_filter": "accepted", "release_channel": "PORTAL-SCHEMA-ELIGIBLE-NOT-UPLOADED"},
+    {"factorio": "1.0", "http_status": 200, "portal_version_filter": "accepted", "release_channel": "PORTAL-SCHEMA-ELIGIBLE-NOT-UPLOADED"},
+    {"factorio": "1.1", "http_status": 200, "portal_version_filter": "accepted", "release_channel": "PORTAL-SCHEMA-ELIGIBLE-NOT-UPLOADED"},
+    {"factorio": "2.0", "http_status": 200, "portal_version_filter": "accepted", "release_channel": "PORTAL-SCHEMA-ELIGIBLE-NOT-UPLOADED"},
+    {"factorio": "2.1", "http_status": 200, "portal_version_filter": "accepted", "release_channel": "PORTAL-SCHEMA-ELIGIBLE-NOT-UPLOADED"}
+  ],
+  "interpretation": {
+    "pre_0_13": "The current portal filter rejects these target identities and the official historical record says the portal was introduced with Factorio 0.13; publish only as GitHub/archive assets.",
+    "0_13_and_newer": "The current public API accepts the target identity. Exact upload acceptance and presentation remain PENDING-MAINTAINER because upload was forbidden and not attempted.",
+    "package_structure": "Every candidate has one correctly named versioned root, a ZIP filename matching the mod/version identity, and zero forbidden release entries."
+  }
+}

@@ -3,6 +3,7 @@
   "campaign": "museum-wave-0.12-to-0.6-and-3.1.9",
   "internal_execution_label": "Codex 5.6 Sol Extra High",
   "started_at": "2026-07-14T00:00:00+10:00",
+  "completed_at": "2026-07-13T23:46:25.3537716Z",
   "release_actions_authorized": false,
   "baseline": {
     "main": "c8bf4a742910cec9d6d3dee305c83deba1aa49eb",
@@ -49,5 +50,19 @@
     "safety/pre-museum-wave/0.6-20a94c4",
     "safety/pre-3.1.9/dev-c8bf4a7"
   ],
-  "status": "museum_compiler_and_runtime_policy_proven"
+  "final_handoff": {
+    "status": "AUTOMATED-GREEN-MANUAL-PENDING",
+    "candidate_count": 15,
+    "candidate_record": ".mir/evidence/museum-wave-0.12-to-0.6/final-handoff.json",
+    "publication_channel_audit": ".mir/evidence/museum-wave-0.12-to-0.6/publication-channel-audit.json",
+    "human_handoff": "docs/releases/museum-wave-handoff.md",
+    "modern_candidate_commit": "8ab20f7e0dbf33c16ed44fac09f0dee7b3b6de5e",
+    "modern_candidate_sha256": "DE99BC1B51810EE0262120B4B7A12F5F8BE913E083B07ED0B5DA0E23C760224B",
+    "dev_advanced": true,
+    "main_unchanged": true,
+    "legacy_unchanged": true,
+    "tags_unchanged": true,
+    "public_release_actions": "NOT-RUN"
+  },
+  "status": "AUTOMATED-GREEN-MANUAL-PENDING"
 }

@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: release-manager
 doc_type: release-plan
 owner: mir-maintainers
-last_reviewed: 2026-07-12
+last_reviewed: 2026-07-14
 supersedes: []
 superseded_by: []
 ---
@@ -14,7 +14,7 @@ superseded_by: []
 
 Release docs are version-specific plans, migration guides, risk registers, checklists, and validation records.
 
-MIR 3.1.1 and 2.3.5 are the published immutable behavior baselines. The untagged 3.1.5 portable-return synthesis candidate is automated-qualified for synchronized `main` and `dev`, and the descending 2.5.0, 1.9.4, 1.8.2, 1.7.1, 1.6.0, 1.5.0, 1.4.0, and 1.3.0 candidates are qualified on their target branches. No candidate in this wave is tagged or released by the qualification work.
+MIR 3.1.5 and 2.4.0 are the published immutable modern anchors. Fifteen subsequent candidates, from MIR 1.9.4 through the finite museum floor at 0.6.0 and the final modern 3.1 patch at 3.1.9, have completed their declared automated gates. They remain untagged and unpublished while visual, presentation, and human balance gates await maintainer review.
 
 - [3.0.0 plan](3.0.0-plan.md)
 - [3.0.0 regression baseline](3.0.0-regression-baseline.md)
@@ -33,6 +33,7 @@ MIR 3.1.1 and 2.3.5 are the published immutable behavior baselines. The untagged
 - [3.0.5 validation summary](3.0.5-validation-summary.md)
 - [2.3.5 backport plan](2.3.5-backport-plan.md)
 - [Backport wave dashboard](backport-wave-dashboard.md)
+- [Fifteen-candidate museum wave and 3.1.9 handoff](museum-wave-handoff.md)
 - [3.1.0 plan](3.1.0-plan.md)
 - [3.1.0 release checklist](3.1.0-checklist.md)
 - [3.1.0 release notes](notes/release-notes-3.1.0.md)

@@ -1241,6 +1241,14 @@ docs:
     doc_type: release-plan
     owner: mir-maintainers
     source_of_truth_for: []
+  - path: docs/releases/museum-wave-handoff.md
+    title: "MIR Fifteen-Candidate Museum Wave And 3.1.9 Handoff"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-legacy-museum-and-3.1.9-release-handoff
   - path: docs/releases/README.md
     title: "Releases"
     status: current

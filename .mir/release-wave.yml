@@ -1,5 +1,5 @@
 schema: 1
-updated_at: 2026-07-12
+updated_at: 2026-07-14
 policy:
   published_archives_are_immutable: true
   target_lines_use_independent_binary_evidence: true
@@ -35,67 +35,99 @@ waves:
   old_targets:
     factorio_1_1:
       branch: tmp/1.1
-      next_version: "1.9.4"
-      source_commit: 498408854170e893a0fa13bdbd11930197892b1d
-      archive_sha256: 431CD5B011B678B089BB4F9B04B22EB5DD32A3411EDB8E7E453E02D920E3A46E
-      status: candidate-qualified-unreleased
+      version: "1.9.4"
+      candidate_commit: dc6414e21585e8f565947be1c3b59ebe6bf750b8
+      archive_sha256: E350F7433F4613DE075F703435EC23FC8000ADF74FCE4F69ACEAC2DD1478BB5D
+      status: automated-green-manual-pending
     factorio_1_0:
       branch: tmp/1.0
-      next_version: "1.8.2"
-      staged_commit: aeb14831132572037c4288b595b22978fdda6646
-      status: staged-unqualified
+      version: "1.8.2"
+      candidate_commit: b2855c7bbcf5adc69644820491eb8ebc17bcf362
+      archive_sha256: 740F439060031B6C64925B2CBAC038912703A39F7CC2030775DEFE60C93CADD5
+      status: automated-green-manual-pending
     factorio_0_18:
       branch: tmp/0.18
       version: "1.8.0"
       status: frozen-verified
     factorio_0_17:
       branch: tmp/0.17
-      next_version: "1.7.1"
-      status: refresh-pending
+      version: "1.7.1"
+      candidate_commit: c59140c1808575bd26bf4156f9a6891d3cf90945
+      archive_sha256: E6BA58D6BAAD774712ED175E14361D130A82D7DB6DD881D5B17A3FE6E48CCCC5
+      status: automated-green-manual-pending
     factorio_0_16:
       branch: tmp/0.16
-      next_version: "1.6.0"
-      status: binary-available-proof-pending
+      version: "1.6.0"
+      candidate_commit: 41283b13037fd8b39c875d0d8cdc39ad1e978b23
+      archive_sha256: FA1D23E5BBAF466DD609314159A4C61B588EF189630A2422ADCC70D1A16243AD
+      status: automated-green-manual-pending
     factorio_0_15:
       branch: tmp/0.15
-      next_version: "1.5.0"
-      status: binary-available-proof-pending
+      version: "1.5.0"
+      candidate_commit: c55cba5253f82bc93733522736fa303eda5acfa7
+      archive_sha256: 3F8D78ECEC9DCCCCF2DD14279DC7E3BD696212F33C3FDD87A924B905223ACBCF
+      status: automated-green-manual-pending
     factorio_0_14:
       branch: tmp/0.14
-      next_version: "1.4.0"
-      status: discovery-pending
+      version: "1.4.0"
+      candidate_commit: 2e9eab88e3b6ec6ad84460c1d75d8177441182d6
+      archive_sha256: 39EDE9BA8DA7BDD632828B0B1F055A8681FC1DAB48D7D1B9348D707BB0AF0B93
+      status: automated-green-manual-pending
     factorio_0_13:
       branch: tmp/0.13
-      next_version: "1.3.0"
-      status: discovery-pending
+      version: "1.3.0"
+      candidate_commit: 9037ed01e04961b0b370f082ccafa5ef0b3a34f9
+      archive_sha256: 36EC72C5D217CE6120C5073A374B6C344BA76DF254480E9A010AA80F6B55C4CC
+      status: automated-green-manual-pending
     factorio_0_12:
       branch: tmp/0.12
-      next_version: "0.12.0"
-      status: discovery-pending
+      version: "0.12.0"
+      candidate_commit: cd06a0123292756ab569fca6d2702da72b966999
+      archive_sha256: C98EBB436DD1BA1C4C0C230EB51C637EE42904000C9C7A82C7E7A33F6F5461EF
+      package_mode: zip-native
+      status: automated-green-manual-pending
     factorio_0_11:
       branch: tmp/0.11
-      next_version: "0.11.0"
-      status: discovery-pending
+      version: "0.11.0"
+      candidate_commit: 5117b8ac9ae374bbce651f26e793cef9721e0da3
+      archive_sha256: C628FBFA4FC2A811869C5D33245BCBA0D37AA5EE2074ADEC7155874C2081B748
+      package_mode: zip-native
+      status: automated-green-manual-pending
     factorio_0_10:
       branch: tmp/0.10
-      next_version: "0.10.0"
-      status: discovery-pending
+      version: "0.10.0"
+      candidate_commit: d5346cf7ac65fd0eb0d23e50c12102d5b9eb7ca7
+      archive_sha256: 845CBB69195ED03AF604685137D356E826B29D0570A4A4AFD6C0941E4B23C04F
+      package_mode: zip-native
+      status: automated-green-manual-pending
     factorio_0_9:
       branch: tmp/0.9
-      next_version: "0.9.0"
-      status: discovery-pending
+      version: "0.9.0"
+      candidate_commit: a767c93e36e7f32c5e12f0b675ae5315d782ebbd
+      archive_sha256: 9FE3117CE3415858506FBA319A2F025F170771590A23C2E160D710F4447A05F1
+      package_mode: zip-native
+      status: automated-green-manual-pending
     factorio_0_8:
       branch: tmp/0.8
-      next_version: "0.8.0"
-      status: discovery-pending
+      version: "0.8.0"
+      candidate_commit: 548a880ee1fe5ed83dddd2d18844772b0e5b6a19
+      archive_sha256: 6832B00783657F60D8AE967552CA354D1F73C988A0DFE023999AE81533267D8E
+      package_mode: extract-required
+      status: automated-green-manual-pending
     factorio_0_7:
       branch: tmp/0.7
-      next_version: "0.7.0"
-      status: discovery-pending
+      version: "0.7.0"
+      candidate_commit: d870255cc6810ad6491fa0c58f03aa9a9d2ffe0d
+      archive_sha256: 8495146889655FA46233A7B0416F4C67B4E2BF93E984E01F5F8234C9CA6F570F
+      package_mode: extract-required
+      status: automated-green-manual-pending
     factorio_0_6:
       branch: tmp/0.6
-      next_version: "0.6.0"
-      status: discovery-pending
+      version: "0.6.0"
+      candidate_commit: a9fb146f401187ea7b9a429be179c0c043b09858
+      archive_sha256: 40EC4F7B07EF4219E74259DA0AA30C8095D8CEA003BDECE90E857D4379DB1C2C
+      package_mode: extract-required
+      status: automated-green-manual-pending
 
   mir_3_1_1:
     version: "3.1.1"
@@ -192,18 +224,54 @@ waves:
     available_ecosystem_load_gate: 9-passed-zero-dependency-failures-load-claims-only
     exact_package_gate: passed-base-space-age-deterministic-and-forbidden-entry-check
     candidate_freshness_gate: passed
+    interactive_gate: accepted-for-publication
+    publication_status: published
+    release_commit: c8bf4a742910cec9d6d3dee305c83deba1aa49eb
+    status: published-frozen
+
+  mir_3_1_9:
+    version: "3.1.9"
+    branch: dev
+    synthesis_branch: tmp/3.1.9-synthesis
+    source_anchor_required: published-3.1.5-plus-portable-backport-and-museum-lessons
+    source_commit: f65dacbbbfa9e5bac891de090c54a5bb36a9ef1f
+    seal_source_commit: 3100148a21df9db6a3a705eb365796b236660d4e
+    candidate_commit: 8ab20f7e0dbf33c16ed44fac09f0dee7b3b6de5e
+    archive: dist/more-infinite-research_3.1.9.zip
+    archive_sha256: DE99BC1B51810EE0262120B4B7A12F5F8BE913E083B07ED0B5DA0E23C760224B
+    archive_size_bytes: 406023
+    archive_entries: 167
+    forbidden_entries: 0
+    runtime_scenario_count: 102
+    mandatory_group_count: 11
+    exact_upgrade_from_3_1_5: passed
+    exact_upgrade_from_3_1_2: passed
+    exact_upgrade_from_3_0_5: passed
+    ecosystem_loads: 9/9
+    planet_cluster_resolved_mods: 46
+    candidate_freshness_gate: passed
+    candidate_seal_gate: passed
     interactive_gate: pending
     publication_status: unreleased
-    status: release-candidate-awaiting-manual-review
+    status: automated-green-manual-pending
 
   mir_2_4_0:
     version: "2.4.0"
-    branch: tmp/2.0
-    source_anchor_required: accepted-3.1.2
-    source_commit: pending-accepted-3.1.2
-    previous_candidate_commit: 575fc4f5ae4a52205d1e72604934ead35e69c99e
-    previous_candidate_archive: dist/more-infinite-research_2.4.0.zip
-    previous_candidate_sha256: 8618CAF031EF24EB83641DB03566F2390DD29AD98D2099A80D596EEB527EDA12
-    previous_candidate_status: superseded-unreleased-candidate
-    publication_status: unreleased
-    status: blocked-on-accepted-3.1.2
+    branch: legacy
+    promotion_commit: 584b398f98d3e317fac31cba63edcb11360a5bb1
+    package_source_commit: 01efb39a7476cc5e5f7e173edbb244e70f7a8e96
+    seal_source_commit: f6a5dfeb4dea18ee70bbaa17acbd4433f1396e6e
+    archive: dist/more-infinite-research_2.4.0.zip
+    archive_sha256: 4BA19EA071E6359BC25C58CCD8F65CAF81B4AA675496E2F53175A996C791470C
+    publication_status: published
+    status: published-frozen
+
+  final_museum_and_3_1_9_handoff:
+    aggregate_branch: tmp/museum-wave-and-3.1.9-handoff
+    candidate_count: 15
+    machine_record: .mir/evidence/museum-wave-0.12-to-0.6/final-handoff.json
+    human_record: docs/releases/museum-wave-handoff.md
+    automated_gate: passed
+    interactive_gate: pending
+    tags_and_publication: not-run
+    status: automated-green-manual-pending
