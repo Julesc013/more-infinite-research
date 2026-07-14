@@ -114,7 +114,9 @@ candidate:
   structured_summary_run_id: e76152a8-0e31-419e-a22a-063dc8de1827
   automated_gate: passed-change-aware
   manual_gate: pending
-  status: runtime-qualified-awaiting-seal
+  assurance_seal: .mir/evidence/candidate-seals/mir-2.4.1-factorio-2.0.json
+  seal_source_commit: e70d93994511145bb71bf935123d0bac8faedd56
+  status: release-candidate-awaiting-manual-review
 
 rules:
   - dev-remains-the-canonical-modern-implementation

@@ -24,8 +24,8 @@ This file is the concise executable queue. Detailed scope, decisions, evidence, 
 
 1. [x] Prove the disabled Automation science technology regression on Factorio 2.0.
 2. [x] Run the affected validation, exact-archive smokes, and deterministic package checks for 2.4.1.
-3. [ ] Seal and push the exact candidate on `tmp/2.0`.
-4. [ ] Stop before interactive review, tag creation, or publication.
+3. [x] Seal and push the exact candidate on `tmp/2.0`.
+4. [x] Stop before interactive review, tag creation, or publication.
 
 ## Recurring Release Gate
 

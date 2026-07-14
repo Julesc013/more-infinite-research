@@ -338,8 +338,10 @@ release_artifacts:
       structured_summary: .mir/evidence/2.4.1-change-aware-qualification.json
       automated_gate: passed-change-aware
       manual_gate: pending
+      assurance_seal: .mir/evidence/candidate-seals/mir-2.4.1-factorio-2.0.json
+      seal_source_commit: e70d93994511145bb71bf935123d0bac8faedd56
       publication_scope: unreleased
-      status: runtime-qualified-awaiting-seal
+      status: release-candidate-awaiting-manual-review
     mir_2_3_0:
       version: "2.3.0"
       branch: legacy
@@ -487,7 +489,9 @@ release_artifacts:
       source_commit: f42b45d1a9e5b6c61a14729a5d386eb6b88bf952
       sha256: 7931E97D9C5CFAB173B48976F1B7EF5A6E7956809D6EA98BF42CD8761C1AAC3D
       validation_status: passed-change-aware
-      status: runtime-qualified-awaiting-seal
+      assurance_seal: .mir/evidence/candidate-seals/mir-2.4.1-factorio-2.0.json
+      seal_source_commit: e70d93994511145bb71bf935123d0bac8faedd56
+      status: release-candidate-awaiting-manual-review
       purpose: patch release proving disabled vanilla science technologies cannot leak into generated prerequisite paths
     factorio_1_1_port:
       version: "1.9.4"
