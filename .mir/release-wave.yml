@@ -202,10 +202,10 @@ waves:
     qualified_2_4_1_seal: .mir/evidence/candidate-seals/mir-2.4.1-factorio-2.0.json
     automated_gate: passed-change-aware
     assurance_seal: .mir/evidence/candidate-seals/mir-2.4.5-factorio-2.0.json
-    seal_source_commit: pending-final-evidence-commit
+    seal_source_commit: 9cfa77c33a635c24f0d4ea458d317cddfa9e325f
     interactive_gate: pending
     publication_status: unreleased
-    status: qualified-awaiting-seal
+    status: release-candidate-awaiting-maintainer-review
 
   mir_3_2_0:
     version: "3.2.0"

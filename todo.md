@@ -24,7 +24,7 @@ This file is the concise executable queue. Detailed scope, decisions, evidence, 
 
 1. [x] Prove the disabled Automation science technology regression on Factorio 2.0.
 2. [x] Rebuild and rerun version-sensitive exact-archive, upgrade, determinism, and ecosystem checks for 2.4.5.
-3. [ ] Seal and push the exact candidate on `tmp/2.0`, then promote the same commit to `legacy` without rebuilding.
+3. [ ] Push the sealed exact candidate on `tmp/2.0`, then promote the same commit to `legacy` without rebuilding.
 4. [ ] Refresh and validate the 3.1.9 harness and exact dist on `main`, then push `main`.
 5. [ ] Stop before interactive review, tag creation, publication, `dev` integration, or `tmp/1.1` work.
 

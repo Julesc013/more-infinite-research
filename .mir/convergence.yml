@@ -134,6 +134,7 @@ candidate:
   structured_summary_path: .mir/evidence/2.4.5-change-aware-qualification.json
   structured_summary_run_id: c6995a88-6838-4b14-9448-c959303f542a
   assurance_seal: .mir/evidence/candidate-seals/mir-2.4.5-factorio-2.0.json
+  seal_source_commit: 9cfa77c33a635c24f0d4ea458d317cddfa9e325f
   automated_gate: passed
   manual_gate: pending
   status: release-candidate-awaiting-manual-review
