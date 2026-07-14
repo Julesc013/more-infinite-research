@@ -12,8 +12,7 @@ superseded_by: []
 
 # Reference
 
-Reference docs hold exact contracts, schemas, generated IDs, settings details,
-and report fields.
+Reference docs hold exact contracts, schemas, generated IDs, settings details, and report fields.
 
 - [Generated ID reference](generated-id-reference.md)
 - [Settings reference](settings.md)

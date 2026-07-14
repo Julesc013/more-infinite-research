@@ -87,6 +87,20 @@
       "kind": "^invalid_science_pack$",
       "reason_pattern": "^no_lab_compatible_science$",
       "notes": "Reviewed Factorio 2.0 local zip sweep: active nauv-so labs accept only Space Age or mod-specific packs for these streams, so MIR skips instead of generating unresearchable research."
+    },
+    {
+      "scenario": "^local-2-1-krastorio-spaced-out$",
+      "mod": "^Krastorio2-spaced-out$",
+      "kind": "^invalid_science_pack$",
+      "reason_pattern": "^no_lab_compatible_science$",
+      "notes": "K2SO is a load/performance observation, not a support claim. MIR conservatively skips streams when the active overhaul labs accept none of their selected science packs."
+    },
+    {
+      "scenario": "^local-2-1-krastorio-spaced-out$",
+      "mod": "^Krastorio2-spaced-out$",
+      "kind": "^missing_prerequisite$",
+      "reason_pattern": "^unresearchable required technology .+-no-accepting-lab\\)$",
+      "notes": "K2SO is a load/performance observation, not a support claim. MIR conservatively skips direct-effect streams whose required overhaul prerequisite chain is not researchable in an accepting lab."
     }
   ]
 }

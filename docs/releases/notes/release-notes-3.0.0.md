@@ -1,0 +1,218 @@
+---
+title: "More Infinite Research 3.0.0 Release Notes"
+status: current
+applies_to: "3.0.0"
+audience: release-manager
+doc_type: release-plan
+owner: mir-maintainers
+last_reviewed: 2026-07-09
+supersedes: []
+superseded_by: []
+---
+
+# More Infinite Research 3.0.0 Release Notes
+
+MIR 3.0.0 is the Factorio `2.1` compatibility compiler architecture release. These notes are intentionally written for three audiences:
+
+- GitHub release readers who need a concise publish body;
+- end users who need to know what changes in their saves and mod lists;
+- developers and maintainers who need the detailed refactor, addition, and removal record.
+
+The short version: generated technology IDs are preserved, no new migration is required solely because of the architecture move, and the release turns the existing 2.2 compiler work into an enforceable MIR-owned module boundary.
+
+## GitHub Release Copy
+
+Recommended title:
+
+```text
+More Infinite Research 3.0.0
+```
+
+Recommended GitHub body:
+
+```markdown
+MIR 3.0.0 is the compatibility compiler architecture release for Factorio 2.1.
+
+This release moves active implementation under the `prototypes/mir` compiler namespace, keeps generated technology IDs stable, removes old shipped helper paths, and keeps generated-output behavior stable against the recorded 2.2 comparison lanes.
+
+### Player highlights
+
+- Existing generated technology IDs are preserved.
+- No new migration is required solely because of the MIR 3 architecture move.
+- Existing `2.0.5` and `2.1.0` migrations remain shipped.
+- Space Age remains optional.
+- Quality, Recycler, and Elevated Rails remain optional or hidden optional dependencies as recorded in `info.json`.
+- Exact loader-schema repairs let `atan-ash_2.2.1` and `atan-nuclear-science_0.3.3` load with MIR on Factorio `2.1`.
+- Science-pack and lab-compatibility startup settings use clearer player-facing labels while preserving the same internal setting values.
+- Startup settings use visible Main, Compatibility, Limits, Advanced, and Diagnostics prefixes, with color emphasis where Factorio renders rich text.
+- MIR-owned official technology settings stay visible across base and Space Age, even when the current active mod set will skip generation.
+- Optional prototype-limit dropdowns default to signed value-labelled unchanged choices and only mutate recipe productivity, energy-use, pollution, speed, or quality caps when explicitly changed.
+- Portable settings profiles use a canonical catalog, strict import validation, deterministic encoding, and optional compact export.
+- Agricultural growth speed is enabled by default as a special Space Age technology; spoilage preservation remains a disabled-by-default experimental candidate.
+- Compatibility claims remain narrow and evidence-backed; this is not a full overhaul-support claim.
+
+### Developer highlights
+
+- Factorio root lifecycle files are now thin wrappers over MIR stage modules.
+- Active shipped Lua lives under `prototypes/mir`, with `prototypes/streams` kept as declarative stream data.
+- Generated technologies emit through `StreamSpec` adapters and the MIR technology builder.
+- Compatibility overlays register policy and diagnostics instead of mutating prototypes.
+- Exact-version compatibility repairs normalize known upstream loader schemas before MIR planning.
+- The old compat/lib/control/planner/root-helper shipped paths were removed or moved behind MIR layers.
+- Static validation now checks docs governance, MIR manifests, architecture boundaries, settings visibility, policy lints, claim lints, changelog syntax, and package hygiene.
+
+### Package and validation
+
+- Archive: `dist/more-infinite-research_3.0.0.zip`
+- Package size: `295803` bytes
+- SHA-256: `E9A644468217D6B8B07F30E92179BE7BB2DFE951A14F211C1E924A5A505ECCDC`
+- Final package hygiene check found 119 entries and zero forbidden repository-only paths.
+- Runtime fixture validation passed on Factorio 2.1.
+- Targeted local ATAN release-dist isolation reproduced upstream-only schema failures without MIR and passed with MIR for `atan-ash_2.2.1`, `atan-nuclear-science_0.3.3`, `atan-air-scrubbing_0.2.8`, and all three together with Space Age.
+- The targeted release gate passed against the recorded local 2.1 mod-library scenarios.
+```
+
+## End-User Notes
+
+### What Changes For Players
+
+- The mod still adds configurable infinite productivity and bonus research for Factorio `2.1`, Space Age, and compatible modded production chains.
+- Existing generated technology names and IDs stay stable across the 3.0.0 architecture move.
+- Existing saves receive the already shipped `2.0.5` and `2.1.0` migrations when needed.
+- No new migration is required solely because the implementation moved into the MIR compiler namespace.
+- Space Age remains optional. If Space Age, Quality, Recycler, or Elevated Rails are not active, MIR keeps Space Age-shaped content gated behind real prototype checks.
+- The mod continues to skip unsafe, missing, or unresearchable streams instead of creating broken technologies.
+- Science-pack and lab-compatibility setting labels are clearer in the Factorio settings UI, with the same stored setting IDs and values as before.
+- Global startup settings are grouped with visible Main, Compatibility, Limits, Advanced, and Diagnostics prefixes. Generated technology tuning rows now put the technology name first, such as `Agricultural growth speed - base cost`.
+- Official MIR technology settings remain visible when toggling Space Age or base-only mode, so saved preferences do not disappear from the UI.
+- Recipe productivity research remains infinite, but Factorio's own recipe productivity cap still applies.
+- The new prototype-limit dropdowns can explicitly raise or lower recipe productivity, energy-use, pollution, speed, and quality caps. Productivity choices are shown as positive bonuses such as `+300%`; energy and pollution reduction choices are shown as negative reductions such as `-80%`. They add no runtime processing and do not change quality-tier probabilities.
+- The non-zero power floor is a separate default-off Compatibility setting. When enabled, it changes explicit `0W` active-use prototypes to `1W` to avoid unwanted low-power warning icons in affected packs.
+- Breeding, agricultural growth speed, cargo bay range/count, and character reach are enabled by default but remain grouped above ordinary technologies.
+- Spoilage preservation remains disabled by default.
+
+### What Does Not Change For Players
+
+- MIR 3.0.0 does not rename the existing generated technology IDs.
+- MIR 3.0.0 does not require Space Age for the base mod to load.
+- MIR 3.0.0 does not claim universal compatibility with every overhaul.
+- MIR 3.0.0 does not make declarative compatibility policy files mutate prototypes directly.
+- MIR 3.0.0 does not ship docs, fixtures, scripts, tests, build outputs, or distribution outputs inside the release zip.
+
+### Compatibility Scope
+
+The release keeps the current public claims narrow:
+
+- Air Scrubbing support remains limited to exact clean-filter recipe families.
+- Air Scrubbing scrubbing, cleaning, recovery, and environmental-removal recipes remain diagnostic-only or excluded.
+- ATAN Ash support remains limited to exact ash separation recipe families.
+- ATAN Ash landfill, brick, nutrient, foundation, tile, and recovery-style ash sinks remain outside generated productivity streams.
+- MIR applies an exact `atan-ash_2.2.1` loader-schema repair for known Factorio `2.1` recipe category and result probability fields.
+- AAI-style loader recipes are routed through transport belt productivity where the evidence supports that behavior.
+- Standalone big mining drill recipes are routed through mining drill productivity where the evidence supports that behavior.
+- ATAN-style Nuclear Science packs are routed through science-pack productivity where the evidence supports that behavior.
+- MIR applies an exact `atan-nuclear-science_0.3.3` loader-schema repair for known Factorio `2.1` recipe category fields.
+- Fluid Must Flow, Robot Attrition, Jetpack, Equipment Gantry, AAI Containers, and AAI Industry remain scoped to recorded coexistence or diagnostic evidence.
+
+### Known Publication Notes
+
+- Portal-backed full-catalog checks were not run in the release environment because `FACTORIO_TOKEN` was not set.
+- `atan-ash_2.2.1` and `atan-nuclear-science_0.3.3` still fail without MIR on the tested Factorio `2.1` setup.
+- MIR `3.0.0` repairs the exact known recipe schema breaks for those versions when they are loaded with MIR.
+
+## Developer And Maintainer Notes
+
+### Refactor Intent
+
+MIR 3.0.0 is not just a folder shuffle. The refactor establishes boundaries that can be validated:
+
+- Factorio root files stay thin.
+- Active shipped implementation lives under `prototypes/mir`.
+- `prototypes/streams` remains declarative stream data for this release.
+- Platform adapters read Factorio state and expose narrow mutation ports.
+- Planner and capability code produce analytical records.
+- Emit code owns generated technology prototype mutation.
+- Compatibility overlays register policy, claims, selectors, diagnostics, and denials; they do not generate technologies directly.
+- Reports explain generated, skipped, rejected, and observed behavior.
+
+### Additions
+
+- Added `.mir` governance manifests for docs, branch policy, module boundaries, streams, compatibility claims, fixtures, settings, capabilities, and agent routing.
+- Added `prototypes/mir/stage` entrypoints for Factorio lifecycle wrappers.
+- Added `prototypes/mir/platform/factorio/data_raw.lua` as the Factorio prototype access and mutation adapter.
+- Added `prototypes/mir/platform/factorio/mods.lua` for settings-stage active-mod visibility checks.
+- Added MIR domain records for `DecisionRecord` and `StreamSpec`.
+- Added MIR index modules for recipe, technology, lab, owner, rule-surface, and productivity-owner facts.
+- Added MIR planner modules for stream compilation, costs, prerequisites, technology requirements, direct effects, native modifiers, and science selection.
+- Added MIR capability modules for recipe-productivity planning, recipe matching, and science integration.
+- Added MIR policy modules for owner filtering, adoption decisions, capability policy, competing productivity, competing base extensions, max-level handling, technology cleanup, and weapon-speed cleanup.
+- Added MIR emit modules for technology building, StreamSpec adaptation, base extensions, effect safety, icon building, and mod-data emission.
+- Added MIR report modules for diagnostics, compatibility rows, and decision export.
+- Added MIR compatibility modules for overlay loading, claim registration, profiles, exact-recipe diagnostics, Air Scrubbing diagnostics, and ATAN Ash diagnostics.
+- Added a MIR compatibility repair module for exact Factorio `2.1` upstream recipe schema normalization.
+- Added MIR runtime modules for scripted technology handlers, runtime settings resolution, settings profiles, productivity-family adoption, spoilage preservation, and agricultural growth speed.
+- Added MIR settings modules for registry metadata, visibility, stage building, defaults, effective settings, profile encoding, and pipeline extent settings.
+- Added `prototypes/mir/streams/generated_stream_manifest.json` for stable generated stream manifest coverage.
+- Added validation scripts for architecture checks, governance checks, local mod library catalog checks, settings visibility checks, and legacy inventory reporting.
+- Added fixture coverage for hidden-setting readability, including every generated stream setting and every base-extension setting.
+- Added versioned release evidence for validation, local-library gates, regression baselines, migration guidance, risk, and publish-candidate status.
+
+### Removals
+
+- Removed the old `prototypes/compat/air-scrubbing.lua` shipped implementation path.
+- Removed the old `prototypes/tech-gen.lua` root generator path.
+- Removed the old `prototypes/max-level-control.lua` root helper path.
+- Removed the old `prototypes/planner/generated-stream-manifest.json` manifest location.
+- Removed shipped runtime modules from the old `control/` folder path.
+- Removed active shipped ownership from broad `prototypes/lib` helper roots.
+- Removed broad root-helper ownership for defaults, config, diagnostics, settings resolution, pipeline extent, utilities, effect safety, technology cleanup, and weapon-speed adjustment.
+- Removed direct prototype mutation responsibility from compatibility policy overlays.
+- Removed old compat/lib/legacy/planner/control/root-helper imports from the active shipped path.
+
+### Refactor Movement
+
+- Root `settings.lua` now delegates to the MIR settings stage.
+- Root `data.lua`, `data-updates.lua`, `data-final-fixes.lua`, and `control.lua` now delegate to MIR stage modules.
+- Stream emission now moves through `StreamSpec -> stream_spec_adapter -> technology_builder`.
+- Base technology continuations now live behind the MIR emit layer.
+- Icon construction now lives behind the MIR emit layer.
+- Effect safety assertions now live behind the MIR emit layer.
+- Settings visibility and effective setting resolution now live behind MIR settings modules.
+- Generated-technology setting rows keep disabled, risky, special, and vanilla-continuation groups easier to find before the ordinary enabled alphabetical list.
+- Recipe-productivity matching now lives under MIR recipe-productivity capability code.
+- Science-pack selection now lives under MIR science-integration and planner code.
+- Owner filtering and family adoption now live under MIR policy.
+- Native modifier diagnostics now live under MIR planner/report boundaries.
+- Exact recipe diagnostics now live under MIR compatibility diagnostics.
+- Runtime scripted effects now live under MIR runtime modules.
+
+### Validation Record
+
+The release evidence is summarized in `docs/releases/3.0.0-validation-summary.md`.
+
+Recorded results:
+
+- legacy inventory passed with zero old shipped shim paths and zero old imports;
+- static validation passed;
+- Factorio `2.1` runtime fixture validation passed;
+- targeted local ATAN release-dist isolation reproduced the upstream-only ATAN schema failures and passed with MIR for the exact repaired supported zips;
+- targeted release gate passed;
+- package hygiene passed with zero forbidden repository-only paths;
+- packaged release-zip smokes passed in base-only and Space Age modes;
+- strict audit smoke stayed `814 -> 814` rows with unchanged hash and zero unexpected failures;
+- repair smokes stayed `1820 -> 1820` rows with unchanged hash and zero unexpected failures;
+- representative local scenario stayed `924 -> 924` rows with unchanged hash and zero unexpected failures.
+
+### Suggested Mod Portal Summary
+
+```text
+MIR 3.0.0 is the compatibility compiler architecture release for Factorio 2.1.
+
+It moves active implementation under the MIR compiler namespace, removes old
+shipped compatibility/library/runtime/helper paths, preserves generated
+technology IDs, keeps compatibility overlays declarative, and keeps generated
+output stable against the recorded 2.2 comparison lanes.
+
+Existing generated technology IDs are preserved and no new migration is required
+solely for the architecture move.
+```

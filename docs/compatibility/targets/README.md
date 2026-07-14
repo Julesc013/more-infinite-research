@@ -12,5 +12,4 @@ superseded_by: []
 
 # Compatibility Targets
 
-Each page records the public claim, evidence, generated streams, and known
-non-goals for one external mod, ecosystem, campaign, or load profile.
+Each page records the public claim, evidence, generated streams, and known non-goals for one external mod, ecosystem, campaign, or load profile.

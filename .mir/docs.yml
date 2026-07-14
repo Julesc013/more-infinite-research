@@ -1,6 +1,14 @@
 schema: 1
 
 docs:
+  - path: docs/releases/0.10.0-release-packet.md
+    title: "MIR 0.10.0 Release Packet"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-0.10.0-release-packet
   - path: docs/adr/0001-mir-3-compatibility-compiler-architecture.md
     title: "ADR 0001: MIR 3.0 Compatibility Compiler Architecture"
     status: current
@@ -115,6 +123,14 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - module-boundaries
+  - path: docs/architecture/target-profiles.md
+    title: "Target Capability Profiles"
+    status: current
+    audience: developer
+    doc_type: explanation
+    owner: mir-maintainers
+    source_of_truth_for:
+      - target-capability-profiles
   - path: docs/architecture/factorio-lifecycle.md
     title: "Factorio Lifecycle Boundaries"
     status: current
@@ -130,6 +146,98 @@ docs:
     doc_type: explanation
     owner: mir-maintainers
     source_of_truth_for: []
+  - path: docs/architecture/automatic-family-compiler.md
+    title: "Automatic Family Compiler"
+    status: current
+    audience: maintainer
+    doc_type: explanation
+    owner: mir-maintainers
+    source_of_truth_for:
+      - automatic-family-compiler
+  - path: docs/reference/schemas/generation-plan.md
+    title: "GenerationPlan Schema"
+    status: current
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - generation-plan-schema
+  - path: docs/reference/schemas/recipe-fact-v2.md
+    title: "RecipeFactV2 And Relationship Indexes"
+    status: current
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - recipe-fact-v2
+      - relationship-indexes
+  - path: docs/reference/schemas/family-rule.md
+    title: "FamilyRule Schema"
+    status: current
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - family-rule-schema
+  - path: docs/reference/schemas/compiler-provider.md
+    title: "CompilerProvider Schema"
+    status: current
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - compiler-provider-schema
+      - compiler-provider-extension-contract
+  - path: docs/reference/compiler-diagnostics.md
+    title: "Compiler Diagnostic Codes"
+    status: current
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - compiler-diagnostic-codes
+  - path: docs/reference/schemas/compatibility-pack.md
+    title: "CompatibilityPack Schema"
+    status: current
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - compatibility-pack-schema
+  - path: docs/reference/compiler-authority-table.md
+    title: "Compiler Authority Table"
+    status: current
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - compiler-schema-authorities
+      - compiler-schema-drift-policy
+  - path: docs/architecture/automatic-family-balance.md
+    title: "Automatic Family Balance And Scope"
+    status: current
+    audience: maintainer
+    doc_type: explanation
+    owner: mir-maintainers
+    source_of_truth_for:
+      - automatic-family-balance
+      - automatic-family-release-scope
+  - path: docs/architecture/recipe-variant-plan.md
+    title: "RecipeVariantPlan Design"
+    status: draft
+    audience: maintainer
+    doc_type: explanation
+    owner: mir-maintainers
+    source_of_truth_for:
+      - recipe-variant-plan-design
+  - path: docs/reference/schemas/scenario-manifest.md
+    title: "Scenario Manifest Schema"
+    status: current
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - scenario-manifest-schema
   - path: docs/architecture/README.md
     title: "Architecture"
     status: current
@@ -138,154 +246,211 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - architecture-overview
-  - path: docs/archive/2.x/2.2.0-feature-intake.md
+  - path: docs/archive/superseded/2.2.0-feature-intake.md
     title: "2.2.0 Feature Intake From The July 2026 Suggestion Transcript"
     status: archived
     audience: maintainer
     doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
-  - path: docs/archive/2.x/completed-task-ledger.md
+  - path: docs/archive/superseded/completed-task-ledger.md
     title: "2.x Completed Task Ledger"
     status: archived
     audience: maintainer
     doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
-  - path: docs/archive/2.x/legacy-backport-cadence.md
+  - path: docs/archive/superseded/legacy-backport-cadence.md
     title: "Legacy Backport Cadence"
     status: archived
     audience: maintainer
     doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
-  - path: docs/archive/2.x/legacy-backport-capabilities.md
+  - path: docs/archive/superseded/legacy-backport-capabilities.md
     title: "Legacy Backport Capability Matrix"
     status: archived
     audience: maintainer
     doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
-  - path: docs/archive/2.x/legacy-backport-plan.md
+  - path: docs/archive/superseded/legacy-backport-plan.md
     title: "Legacy Backport Plan"
     status: archived
     audience: maintainer
     doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
-  - path: docs/archive/2.x/mod-ideas-audit.md
+  - path: docs/archive/superseded/mod-ideas-audit.md
     title: "Local Idea Mods Audit And Release Plan - 2026-07-05"
     status: archived
     audience: maintainer
     doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
-  - path: docs/archive/2.x/mod-ideas-features.md
+  - path: docs/archive/superseded/mod-ideas-features.md
     title: "Idea Mods Feature Audit - 2026-07-05"
     status: archived
     audience: maintainer
     doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
-  - path: docs/archive/2.x/post-2.0-feature-plan.md
+  - path: docs/archive/superseded/post-2.0-feature-plan.md
     title: "Post-2.0 Feature Plan"
     status: archived
     audience: maintainer
     doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
-  - path: docs/archive/2.x/pre-manual-2.0.5-report.md
+  - path: docs/archive/superseded/pre-manual-2.0.5-report.md
     title: "v2.0.5 Pre-Manual Readiness Report"
     status: archived
     audience: maintainer
     doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
-  - path: docs/archive/2.x/rc-plan-factorio-2.0.md
+  - path: docs/archive/superseded/rc-plan-factorio-2.0.md
     title: "Factorio 2.0 RC Planning Report"
     status: archived
     audience: maintainer
     doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
-  - path: docs/archive/2.x/rc-plan-factorio-0.10.md
-    title: "Factorio 0.10 RC Planning Report"
+  - path: docs/archive/superseded/rc-plan-factorio-0.18.md
+    title: "Factorio 0.18 Bridge Planning Report"
     status: archived
     audience: maintainer
     doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
-  - path: docs/archive/2.x/README.md
-    title: "2.x Archive"
+  - path: docs/adr/0014-3.0.5-convergence.md
+    title: "ADR 0014: MIR 3.0.5 Convergence"
+    status: current
+    audience: maintainer
+    doc_type: adr
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-3.0.5-convergence-decision
+  - path: docs/archive/superseded/rc-plan-factorio-0.17.md
+    title: "Factorio 0.17 RC Planning Report"
     status: archived
     audience: maintainer
     doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
-  - path: docs/archive/2.x/release-notes-1.9.0.md
+  - path: docs/archive/superseded/rc-plan-factorio-1.0.md
+    title: "Factorio 1.0 RC Planning Report"
+    status: archived
+    audience: maintainer
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/archive/superseded/rc-plan-factorio-1.1.md
+    title: "Factorio 1.1 RC Planning Report"
+    status: archived
+    audience: maintainer
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/releases/notes/release-notes-1.9.0.md
     title: "More Infinite Research 1.9.0 Release Notes"
     status: archived
     audience: maintainer
     doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
-  - path: docs/archive/2.x/release-notes-1.9.1.md
+  - path: docs/releases/notes/release-notes-1.9.1.md
     title: "More Infinite Research 1.9.1 Release Notes"
     status: archived
     audience: maintainer
     doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
-  - path: docs/archive/2.x/release-notes-1.9.2.md
+  - path: docs/releases/notes/release-notes-1.9.2.md
     title: "More Infinite Research 1.9.2 Release Notes"
     status: archived
     audience: maintainer
     doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
-  - path: docs/archive/2.x/release-notes-2.0.5.md
+  - path: docs/releases/notes/release-notes-1.9.3.md
+    title: "More Infinite Research 1.9.3 Release Notes"
+    status: archived
+    audience: maintainer
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/releases/notes/release-notes-1.8.0.md
+    title: "More Infinite Research 1.8.0 Release Notes"
+    status: archived
+    audience: maintainer
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/releases/notes/release-notes-1.8.1.md
+    title: "More Infinite Research 1.8.1 Release Notes"
+    status: archived
+    audience: maintainer
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/releases/notes/release-notes-1.7.0.md
+    title: "More Infinite Research 1.7.0 Release Notes"
+    status: archived
+    audience: maintainer
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/archive/superseded/technology-audit-factorio-0.17.md
+    title: "Factorio 0.17 Technology Availability Audit"
+    status: archived
+    audience: maintainer
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/releases/notes/release-notes-2.0.5.md
     title: "More Infinite Research 2.0.5 Release Notes"
     status: archived
     audience: maintainer
     doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
-  - path: docs/archive/2.x/release-notes-2.1.0.md
+  - path: docs/releases/notes/release-notes-2.1.0.md
     title: "More Infinite Research 2.1.0 Release Notes"
     status: archived
     audience: maintainer
     doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
-  - path: docs/archive/2.x/release-notes-2.1.5.md
+  - path: docs/releases/notes/release-notes-2.1.5.md
     title: "More Infinite Research 2.1.5 Release Notes"
     status: archived
     audience: maintainer
     doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
-  - path: docs/archive/2.x/release-notes-2.2.0.md
+  - path: docs/releases/notes/release-notes-2.2.0.md
     title: "2.2.0 Release Notes"
     status: archived
     audience: maintainer
     doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
-  - path: docs/archive/2.x/release-notes-2.3.0.md
+  - path: docs/releases/notes/release-notes-2.3.0.md
     title: "More Infinite Research 2.3.0 Release Notes"
     status: archived
     audience: maintainer
     doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
-  - path: docs/archive/2.x/release-notes-legacy.md
+  - path: docs/archive/superseded/release-notes-legacy.md
     title: "More Infinite Research 1.9.0 Release Notes"
     status: archived
     audience: maintainer
     doc_type: archive
     owner: mir-maintainers
     source_of_truth_for: []
-  - path: docs/archive/2.x/release-plan-2.1.0.md
+  - path: docs/archive/superseded/release-plan-2.1.0.md
     title: "More Infinite Research 2.1.0 Release-Gated Plan"
     status: archived
     audience: maintainer
@@ -519,6 +684,20 @@ docs:
     doc_type: reference
     owner: mir-maintainers
     source_of_truth_for: []
+  - path: docs/compatibility/targets/modules-t4.md
+    title: "Tier 4 Modules Compatibility"
+    status: current
+    audience: modpack-author
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for: []
+  - path: docs/compatibility/targets/finite-prod-techs.md
+    title: "Finite Productivity Technologies Compatibility"
+    status: current
+    audience: modpack-author
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for: []
   - path: docs/compatibility/targets/fluid-must-flow.md
     title: "Fluid Must Flow Compatibility"
     status: current
@@ -563,6 +742,14 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - compatibility-model
+  - path: docs/compatibility/backport-ledger.md
+    title: "3.0.5 Backport Behavior Ledger"
+    status: current
+    audience: maintainer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-3.0.5-backport-ledger
   - path: docs/compatibility/support-lanes.md
     title: "MIR Compatibility Program"
     status: current
@@ -584,6 +771,22 @@ docs:
     doc_type: how-to
     owner: mir-maintainers
     source_of_truth_for: []
+  - path: docs/maintainer/adding-a-compatibility-pack.md
+    title: "Adding A Compatibility Pack"
+    status: current
+    audience: developer
+    doc_type: how-to
+    owner: mir-maintainers
+    source_of_truth_for:
+      - compatibility-pack-workflow
+  - path: docs/maintainer/adding-a-family-rule.md
+    title: "Adding A Family Rule"
+    status: current
+    audience: developer
+    doc_type: how-to
+    owner: mir-maintainers
+    source_of_truth_for:
+      - family-rule-workflow
   - path: docs/maintainer/adding-a-generated-stream.md
     title: "Adding A Generated Stream"
     status: current
@@ -947,7 +1150,7 @@ docs:
     doc_type: release-plan
     owner: mir-maintainers
     source_of_truth_for: []
-  - path: docs/releases/3.0.0-release-notes.md
+  - path: docs/releases/notes/release-notes-3.0.0.md
     title: "More Infinite Research 3.0.0 Release Notes"
     status: current
     audience: release-manager
@@ -977,15 +1180,71 @@ docs:
     owner: mir-maintainers
     source_of_truth_for: []
   - path: docs/releases/3.1.0-roadmap.md
-    title: "3.1.0 Roadmap"
-    status: draft
+    title: "MIR 3.1.0 Automatic Compiler Roadmap"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - validation-result-summary
+  - path: docs/releases/3.0.5-convergence-plan.md
+    title: "MIR 3.0.5 Convergence Plan"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-3.0.5-release-plan
+  - path: docs/releases/3.0.5-convergence-review.md
+    title: "MIR 3.0.5 Convergence Review"
+    status: current
+    audience: maintainer
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-3.0.5-convergence-review
+  - path: docs/releases/3.0.5-release-checklist.md
+    title: "MIR 3.0.5 Release Checklist"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-3.0.5-release-checklist
+  - path: docs/releases/notes/release-notes-3.0.5.md
+    title: "MIR 3.0.5 Release Notes"
+    status: current
+    audience: player
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-3.0.5-release-notes
+  - path: docs/releases/3.0.5-settings-inventory.md
+    title: "MIR 3.0.5 Settings Inventory"
+    status: current
+    audience: player
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-3.0.5-settings-inventory
+  - path: docs/releases/3.0.5-validation-summary.md
+    title: "MIR 3.0.5 Validation Summary"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-3.0.5-validation-summary
+  - path: docs/releases/mod-portal-page.md
+    title: "More Infinite Research"
+    status: current
     audience: release-manager
     doc_type: release-plan
     owner: mir-maintainers
     source_of_truth_for: []
-  - path: docs/releases/mod-portal-page.md
-    title: "More Infinite Research"
-    status: current
+  - path: docs/releases/2.4.0-roadmap.md
+    title: "2.4.0 Roadmap"
+    status: draft
     audience: release-manager
     doc_type: release-plan
     owner: mir-maintainers
@@ -997,6 +1256,14 @@ docs:
     doc_type: release-plan
     owner: mir-maintainers
     source_of_truth_for: []
+  - path: docs/releases/notes/README.md
+    title: "Release Notes"
+    status: current
+    audience: player
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - release-notes-index
   - path: docs/templates/adr-template.md
     title: "ADR Template"
     status: current
@@ -1109,10 +1376,227 @@ docs:
     doc_type: how-to
     owner: mir-maintainers
     source_of_truth_for: []
-  - path: docs/releases/0.10.0-release-packet.md
-    title: "MIR 0.10.0 Release Packet"
+  - path: docs/compatibility/portable-return-ledger.md
+    title: "Portable Return Ledger"
+    status: current
+    audience: maintainer
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - portable-return-ledger
+  - path: docs/releases/backport-wave-dashboard.md
+    title: "Backport Wave Dashboard"
     status: current
     audience: release-manager
     doc_type: release-plan
     owner: mir-maintainers
-    source_of_truth_for: [mir-0.10.0-release-packet]
+    source_of_truth_for:
+      - backport-wave-status
+  - path: docs/releases/2.3.5-backport-plan.md
+    title: "MIR 2.3.5 Backport Plan"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-2.3.5-backport-plan
+  - path: docs/releases/3.1.0-plan.md
+    title: "MIR 3.1.0 Plan"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-3.1.0-plan
+  - path: docs/releases/3.1.0-automatic-compiler-development-summary.md
+    title: "MIR 3.1.0 Automatic Compiler Development Summary"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-3.1.0-automatic-compiler-result
+  - path: docs/releases/3.1.0-checklist.md
+    title: "MIR 3.1.0 Release Checklist"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-3.1.0-release-gate
+  - path: docs/releases/3.1.0-characterization.md
+    title: "MIR 3.1.0 Baseline Characterization"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-3.1.0-protected-baseline
+  - path: docs/releases/3.1.0-validation-summary.md
+    title: "MIR 3.1.0 Superseded Candidate Validation Summary"
+    status: archived
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-3.1.0-validation-result
+  - path: docs/releases/3.1.0-migration-guide.md
+    title: "MIR 3.1.0 Migration Guide"
+    status: current
+    audience: player
+    doc_type: how-to
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-3.1.0-migration
+  - path: docs/releases/notes/release-notes-3.1.0.md
+    title: "MIR 3.1.0 Release Notes"
+    status: archived
+    audience: player
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-3.1.0-release-notes
+  - path: docs/releases/notes/release-notes-3.1.1.md
+    title: "MIR 3.1.1 Release Notes"
+    status: current
+    audience: player
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-3.1.1-release-notes
+  - path: docs/releases/notes/release-notes-3.1.2.md
+    title: "MIR 3.1.2 Release Notes"
+    status: current
+    audience: player
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-3.1.2-release-notes
+  - path: docs/releases/notes/release-notes-3.1.5.md
+    title: "MIR 3.1.5 Candidate Notes"
+    status: current
+    audience: player
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-3.1.5-release-notes
+  - path: docs/releases/3.1.5-validation-summary.md
+    title: "MIR 3.1.5 Validation Summary"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-3.1.5-validation
+  - path: docs/adr/0015-canonical-stream-descriptors.md
+    title: "ADR-0015: Canonical Stream Descriptors"
+    status: current
+    audience: maintainer
+    doc_type: adr
+    owner: mir-maintainers
+    source_of_truth_for:
+      - canonical-stream-descriptor-contract
+  - path: docs/releases/1.6.0-plan.md
+    title: "MIR 1.6.0 Factorio 0.16 Plan"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-1.6.0-factorio-0.16-plan
+  - path: docs/releases/1.5.0-plan.md
+    title: "MIR 1.5.0 Factorio 0.15 Plan"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-1.5.0-factorio-0.15-plan
+  - path: docs/adr/0019-target-profile-v2.md
+    title: "ADR 0019: TargetProfileV2"
+    status: current
+    audience: maintainer
+    doc_type: adr
+    owner: mir-maintainers
+    source_of_truth_for:
+      - target-profile-v2
+  - path: docs/adr/0018-automatic-generated-id-policy.md
+    title: "ADR 0018: Automatic Generated ID Policy"
+    status: current
+    audience: maintainer
+    doc_type: adr
+    owner: mir-maintainers
+    source_of_truth_for:
+      - automatic-generated-id-policy
+  - path: docs/maintainer/modpack-campaigns.md
+    title: "Modpack Campaigns"
+    status: current
+    audience: release-manager
+    doc_type: how-to
+    owner: mir-maintainers
+    source_of_truth_for:
+      - modpack-campaign-evidence-contract
+  - path: docs/reference/reports/coverage-report.md
+    title: "Coverage Report"
+    status: current
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - recipe-coverage-accounting-contract
+  - path: docs/architecture/native-owner-binding.md
+    title: "Native Owner Binding"
+    status: current
+    audience: maintainer
+    doc_type: explanation
+    owner: mir-maintainers
+    source_of_truth_for:
+      - native-owner-binding-contract
+  - path: docs/maintainer/release-assurance.md
+    title: "Release Assurance And Candidate Sealing"
+    status: current
+    audience: release-manager
+    doc_type: how-to
+    owner: mir-maintainers
+    source_of_truth_for:
+      - release-assurance-contract
+  - path: docs/releases/notes/release-notes-3.1.9.md
+    title: "MIR 3.1.9 Release Notes"
+    status: current
+    audience: player
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-3.1.9-release-notes
+  - path: docs/releases/3.1.9-migration-guide.md
+    title: "MIR 3.1.9 Migration Guide"
+    status: current
+    audience: player
+    doc_type: how-to
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-3.1.9-migration
+  - path: docs/releases/3.1.9-checklist.md
+    title: "MIR 3.1.9 Release Checklist"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-3.1.9-release-checklist
+  - path: docs/releases/3.1.9-validation-summary.md
+    title: "MIR 3.1.9 Validation Summary"
+    status: current
+    audience: release-manager
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-3.1.9-validation
+  - path: docs/releases/3.1.9-post-2.4.5-ring-synthesis.md
+    title: "MIR 3.1.9 And 2.4.5 Post-Release Ring Synthesis"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-3.1.9-2.4.5-ring-synthesis

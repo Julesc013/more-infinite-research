@@ -370,3 +370,4 @@ $record = [ordered]@{
 $recordPath = Join-Path $EvidenceRoot "runtime-proof.json"
 Set-MIRUtf8Text -Path $recordPath -Text (($record | ConvertTo-Json -Depth 10) + "`n")
 $record | ConvertTo-Json -Depth 10
+

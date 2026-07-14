@@ -19,7 +19,7 @@ This document defines named manual saves and scenarios. Runtime fixture validati
 
 Use these scenario names in `docs/releases/2.2.0-validation-record.md` so release evidence is comparable across runs.
 
-For the archived `v2.0.5` pre-manual status, see `docs/archive/2.x/pre-manual-2.0.5-report.md`.
+For the archived `v2.0.5` pre-manual status, see `docs/archive/superseded/pre-manual-2.0.5-report.md`.
 
 ## v2.0.5 Quick Feedback Patch
 
@@ -111,13 +111,12 @@ Required on the `legacy` branch with a Factorio `2.0.x` binary:
 | `legacy-1.9.2-runtime-2.0` | Validate the tested `v2.2.0 -> v1.9.2` transition port |
 | `target-2.3.0-runtime-2.0` | Validate the first Factorio `2.0` port of the MIR 3 architecture |
 | `target-1.9.3-runtime-1.1` | Validate the first Factorio `1.1` compatibility port under the locked mapping |
-| `target-1.8.0-runtime-1.0` | Validate the first Factorio `1.0` compatibility port after the `0.18` bridge policy is recorded |
+| `target-1.8.0-runtime-0.18` | Validate the Factorio `0.18` bridge/archive package in a matching `0.18` binary |
+| `target-1.8.0-bridge-runtime-1.0` | Validate the exact same `1.8.0` zip in Factorio `1.0` before bridge publication |
+| `target-1.8.1-runtime-1.0` | Validate the first maintained Factorio `1.0` compatibility port |
 | `legacy-space-age` | Confirm any optional Space Age subset supported by Factorio `2.0.x` |
 | `legacy-generated-tech-ids` | Compare generated technology names against expected legacy snapshot |
 
 Do not validate the legacy port with the Steam-updated Factorio `2.1.x` binary.
 
-For the expanded Factorio `1.1` through `0.6` backport ladder, use
-`docs/archive/2.x/legacy-backport-cadence.md` as the release matrix. Each target line
-needs its own binary smoke check when a compatible binary is available, and
-release notes must identify any target-line validation that could not be run.
+For the expanded Factorio `1.1` through `0.6` backport ladder, use `docs/archive/superseded/legacy-backport-cadence.md` as historical context for the release matrix. Each target line needs its own binary smoke check when a compatible binary is available, and release notes must identify any target-line validation that could not be run.

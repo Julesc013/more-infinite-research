@@ -12,5 +12,4 @@ superseded_by: []
 
 # Compatibility Campaigns
 
-Campaign docs group fixture, local-library, and release-line proof work by
-validation lane.
+Campaign docs group fixture, local-library, and release-line proof work by validation lane.
