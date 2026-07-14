@@ -2,7 +2,8 @@ param(
   [Parameter(Mandatory)][string]$FactorioBin,
   [Parameter(Mandatory)][string]$CandidateZip,
   [string]$PriorZip,
-  [string]$OutputRoot
+  [string]$OutputRoot,
+  [int]$TimeoutSeconds = 180
 )
 
 $ErrorActionPreference = "Stop"
@@ -33,12 +34,35 @@ function Invoke-MIRRetentionRun {
   $configPath = Join-Path $runRoot "config.ini"
   [System.IO.File]::WriteAllText($configPath, $config, [System.Text.UTF8Encoding]::new($false))
   $log = Join-Path $runRoot "$Name.log"
-  $args = @("--config", $configPath, "--no-log-rotation", "--disable-audio", "--mod-directory", $mods)
-  if ($Mode -eq "create") { $args += @("--create", $MapPath) }
-  else { $args += @("--benchmark", $MapPath, "--benchmark-ticks", "1", "--benchmark-runs", "1") }
-  & $FactorioBin @args *> $log
-  if ($LASTEXITCODE -ne 0) { throw "Factorio $Name failed; see $log" }
-  $text = Get-Content -Raw -LiteralPath $log
+  $arguments = @("--config", $configPath, "--no-log-rotation", "--disable-audio", "--mod-directory", $mods)
+  if ($Mode -eq "create") { $arguments += @("--create", $MapPath) }
+  else { $arguments += @("--benchmark", $MapPath, "--benchmark-ticks", "1", "--benchmark-runs", "1") }
+
+  $processInfo = [Diagnostics.ProcessStartInfo]::new()
+  $processInfo.FileName = $FactorioBin
+  $processInfo.UseShellExecute = $false
+  $processInfo.CreateNoWindow = $true
+  $processInfo.WindowStyle = [Diagnostics.ProcessWindowStyle]::Hidden
+  $processInfo.RedirectStandardOutput = $true
+  $processInfo.RedirectStandardError = $true
+  foreach ($argument in $arguments) { [void]$processInfo.ArgumentList.Add($argument) }
+  $process = [Diagnostics.Process]::Start($processInfo)
+  $stdoutTask = $process.StandardOutput.ReadToEndAsync()
+  $stderrTask = $process.StandardError.ReadToEndAsync()
+  if (-not $process.WaitForExit($TimeoutSeconds * 1000)) {
+    try { $process.Kill($true) } catch { $process.Kill() }
+    [void]$process.WaitForExit(10000)
+    throw "Factorio $Name timed out after $TimeoutSeconds seconds; see $log"
+  }
+  $stdout = $stdoutTask.GetAwaiter().GetResult()
+  $stderr = $stderrTask.GetAwaiter().GetResult()
+  $text = $stdout
+  if (-not [string]::IsNullOrEmpty($stderr)) {
+    if (-not [string]::IsNullOrEmpty($text) -and -not $text.EndsWith("`n")) { $text += "`n" }
+    $text += $stderr
+  }
+  [System.IO.File]::WriteAllText($log, $text, [System.Text.UTF8Encoding]::new($false))
+  if ($process.ExitCode -ne 0) { throw "Factorio $Name failed with exit code $($process.ExitCode); see $log" }
   if ($text -notmatch "Loading mod more-infinite-research $([regex]::Escape(([IO.Path]::GetFileNameWithoutExtension($ModZip) -replace '^more-infinite-research_','')))" -or $text -match '(?im)^.*Error ') {
     throw "Factorio $Name did not load the expected MIR archive cleanly; see $log"
   }
