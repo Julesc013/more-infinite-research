@@ -274,6 +274,26 @@ fixtures:
       - native-owner-research-progress-retention
       - exact-3-1-9-candidate-normal-mod-directory-load
 
+  upgrade-1-8-1-to-1-8-2-off:
+    assertion_path: fixtures/assert-upgrade-1-8-1-to-1-8-2-off
+    validates:
+      - exact-1-8-1-source-archive
+      - explicit-off-setting-retention
+      - generated-technology-level-retention
+      - current-research-retention
+      - fractional-progress-retention
+      - global-runtime-state-retention
+
+  upgrade-1-8-1-to-1-8-2-always:
+    assertion_path: fixtures/assert-upgrade-1-8-1-to-1-8-2-always
+    validates:
+      - exact-1-8-1-source-archive
+      - explicit-always-setting-retention
+      - generated-technology-level-retention
+      - current-research-retention
+      - fractional-progress-retention
+      - global-runtime-state-retention
+
   competing-productivity-transaction:
     requires_features: [recipe_productivity]
     path: fixtures/plates-n-circuit-productivity

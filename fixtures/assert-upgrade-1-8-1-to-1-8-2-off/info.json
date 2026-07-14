@@ -1,0 +1,11 @@
+{
+  "name": "mir-fixture-assert-upgrade-1-8-1-to-1-8-2-off",
+  "version": "0.1.0",
+  "title": "MIR Fixture - Assert 1.8.1 to 1.8.2 Off Retention",
+  "author": "MIR maintainers",
+  "factorio_version": "1.0",
+  "dependencies": [
+    "base >= 1.0",
+    "more-infinite-research >= 1.8.1"
+  ]
+}
