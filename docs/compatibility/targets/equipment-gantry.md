@@ -12,8 +12,7 @@ superseded_by: []
 
 # Equipment Gantry Compatibility
 
-Claim: MIR load-checks Equipment Gantry as adjacent equipment-grid automation
-content.
+Claim: MIR load-checks Equipment Gantry as adjacent equipment-grid automation content.
 
 Evidence: release-targeted local repair check.
 

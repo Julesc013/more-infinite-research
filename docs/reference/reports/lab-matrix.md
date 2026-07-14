@@ -12,5 +12,4 @@ superseded_by: []
 
 # Lab Matrix
 
-Lab matrix rows explain which labs can research a proposed science pack set and
-why a generated technology was accepted, reduced, or skipped.
+Lab matrix rows explain which labs can research a proposed science pack set and why a generated technology was accepted, reduced, or skipped.

@@ -21,6 +21,8 @@ param(
   [string[]]$LocalModLibraryDirs = @(),
   [string[]]$LocalModLibraryZips = @(),
   [string[]]$LocalModNames = @(),
+  [string]$ModUnderTestZip = "",
+  [string]$ModUnderTestSourceCommit = "",
   [switch]$DownloadMods,
   [switch]$RunLoadTests,
   [switch]$RunManualScenarios,
@@ -51,6 +53,14 @@ $moduleRoot = Join-Path $PSScriptRoot "MIRCompatAudit"
 . (Join-Path $moduleRoot "DependencyResolver.ps1")
 . (Join-Path $moduleRoot "DiagnosticsParser.ps1")
 . (Join-Path $moduleRoot "FactorioRunner.ps1")
+
+$resolvedModUnderTestZip = ""
+if (-not [string]::IsNullOrWhiteSpace($ModUnderTestZip)) {
+  $resolvedModUnderTestZip = (Resolve-Path -LiteralPath $ModUnderTestZip).Path
+}
+if (-not [string]::IsNullOrWhiteSpace($ModUnderTestSourceCommit) -and $ModUnderTestSourceCommit -notmatch '^[0-9a-fA-F]{40}$') {
+  throw "ModUnderTestSourceCommit must be a full 40-character git commit."
+}
 
 if ([string]::IsNullOrWhiteSpace($FactorioLine)) {
   $lineCandidates = @($FactorioVersions | Where-Object { $_ -in @("2.0", "2.1") } | Select-Object -Unique)
@@ -142,6 +152,7 @@ function ConvertTo-MIRLockEntry {
     owner = [string]$FullMod.owner
     file_name = [string]$Release.file_name
     sha1 = [string]$Release.sha1
+    sha256 = [string](Get-MIRObjectProperty -Object $Release -Name "sha256" -Default "")
     download_url = [string]$Release.download_url
     source = ""
     source_path = ""
@@ -195,6 +206,7 @@ function ConvertTo-MIRLocalFullMod {
   })
   $file = Get-Item -LiteralPath $resolvedZip
   $sha1 = (Get-FileHash -Algorithm SHA1 -LiteralPath $resolvedZip).Hash.ToLowerInvariant()
+  $sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $resolvedZip).Hash.ToLowerInvariant()
 
   [pscustomobject]@{
     name = [string]$info.name
@@ -207,6 +219,7 @@ function ConvertTo-MIRLocalFullMod {
         version = [string]$info.version
         file_name = $file.Name
         sha1 = $sha1
+        sha256 = $sha256
         download_url = ""
         source_path = $resolvedZip
         source = "local_zip"
@@ -256,6 +269,11 @@ function New-MIRScenario {
     [string[]]$OfficialMods = @(),
     [object[]]$LockEntries = @(),
     [object[]]$Failures = @(),
+    [string]$ClaimLevel = "loads",
+    [int]$TimeoutSeconds = $ScenarioTimeoutSeconds,
+    $Settings = $null,
+    $ExpectedPlan = $null,
+    [string]$SourceManifest = "",
     [string]$Notes = ""
   )
 
@@ -268,6 +286,11 @@ function New-MIRScenario {
     official_mods = @($OfficialMods | Sort-Object -Unique)
     lock_entries = @($LockEntries | Sort-Object name, version -Unique)
     dependency_failures = @($Failures)
+    claim_level = $ClaimLevel
+    timeout_seconds = $TimeoutSeconds
+    settings = if ($null -eq $Settings) { [pscustomobject]@{} } else { $Settings }
+    expected_plan = if ($null -eq $ExpectedPlan) { [pscustomobject]@{} } else { $ExpectedPlan }
+    source_manifest = $SourceManifest
     notes = $Notes
   }
 }
@@ -707,9 +730,30 @@ $exclusions = Read-MIRJsonFile -Path $KnownExclusions -Fallback ([pscustomobject
   mod_names = @()
   categories = @("localizations", "internal")
 })
-$manual = Read-MIRJsonFile -Path $ManualScenariosPath -Fallback ([pscustomobject]@{
-  scenarios = @()
-})
+$manualScenarioPaths = @($ManualScenariosPath)
+if (-not $PSBoundParameters.ContainsKey("ManualScenariosPath")) {
+  $lineManifest = if ($FactorioLine -eq "2.0") {
+    Join-Path $PSScriptRoot "..\fixtures\compat-matrix\local-library-scenarios-2.0.json"
+  } else {
+    Join-Path $PSScriptRoot "..\fixtures\compat-matrix\local-library-scenarios.json"
+  }
+  $manualScenarioPaths += $lineManifest
+}
+
+$manualScenarios = @()
+foreach ($scenarioManifestPath in @($manualScenarioPaths | Select-Object -Unique)) {
+  $manifest = Read-MIRJsonFile -Path $scenarioManifestPath -Fallback ([pscustomobject]@{ schema = 0; scenarios = @() })
+  if ([int](Get-MIRObjectProperty -Object $manifest -Name "schema" -Default 0) -ne 2) {
+    throw "Scenario manifest must use schema 2: $scenarioManifestPath"
+  }
+  foreach ($scenario in @($manifest.scenarios)) {
+    $targets = @((Get-MIRObjectProperty -Object $scenario -Name "targets" -Default @()) | ForEach-Object { [string]$_ })
+    if ($targets.Count -gt 0 -and $FactorioLine -notin $targets) { continue }
+    $scenario | Add-Member -NotePropertyName "_source_manifest" -NotePropertyValue $scenarioManifestPath -Force
+    $manualScenarios += $scenario
+  }
+}
+$manual = [pscustomobject]@{ scenarios = @($manualScenarios) }
 
 $fullCache = @{}
 function Get-FullCached {
@@ -732,6 +776,11 @@ function Resolve-MIRPortalScenario {
     [Parameter(Mandatory)][string]$Type,
     [string[]]$RequestedMods = @(),
     [bool]$EnableSpaceAgeBundle,
+    [string]$ClaimLevel = "loads",
+    [int]$TimeoutSeconds = $ScenarioTimeoutSeconds,
+    $Settings = $null,
+    $ExpectedPlan = $null,
+    [string]$SourceManifest = "",
     [string]$Notes = ""
   )
 
@@ -812,6 +861,11 @@ function Resolve-MIRPortalScenario {
     -OfficialMods $officialMods `
     -LockEntries $scenarioLockEntries `
     -Failures $scenarioFailures `
+    -ClaimLevel $ClaimLevel `
+    -TimeoutSeconds $TimeoutSeconds `
+    -Settings $Settings `
+    -ExpectedPlan $ExpectedPlan `
+    -SourceManifest $SourceManifest `
     -Notes $Notes
 }
 
@@ -878,7 +932,7 @@ function Invoke-MIRScenarioLoad {
       dependency_failures = $dependencyFailures
       exit_code = $null
       timed_out = $false
-      timeout_seconds = $ScenarioTimeoutSeconds
+      timeout_seconds = [int](Get-MIRObjectProperty -Object $Scenario -Name "timeout_seconds" -Default $ScenarioTimeoutSeconds)
       skipped = $true
       skip_reason = "dependency_resolution_failure"
       passed = $false
@@ -892,15 +946,18 @@ function Invoke-MIRScenarioLoad {
 
   $userData = New-MIRCompatUserDataDir -Root $runRoot
   $modsDir = Join-Path $userData "mods"
-  $null = Copy-MIRModUnderTest -RepoRoot $repo.Path -ModsDir $modsDir
-  Enable-MIRCopiedGenerationReport -ModsDir $modsDir
+  $null = Copy-MIRModUnderTest -RepoRoot $repo.Path -ModsDir $modsDir -ZipPath $resolvedModUnderTestZip
+  if ([string]::IsNullOrWhiteSpace($resolvedModUnderTestZip)) {
+    Enable-MIRCopiedGenerationReport -ModsDir $modsDir
+  }
 
   Copy-MIRCachedModZips -CacheDir $resolvedCacheDir -ModsDir $modsDir -LockEntries $Scenario.lock_entries -LinkMode $LinkMode
 
   $enabledMods = @("more-infinite-research") + @($Scenario.resolved_mods) + @($Scenario.official_mods)
   Write-MIRModList -ModsDir $modsDir -EnabledMods $enabledMods -OfficialBuiltinMods $officialBuiltinMods
 
-  $result = Invoke-MIRFactorioLoadCheck -FactorioBin $FactorioBin -UserDataDir $userData -ScenarioName $Scenario.name -ScenarioTimeoutSeconds $ScenarioTimeoutSeconds
+  $scenarioTimeout = [int](Get-MIRObjectProperty -Object $Scenario -Name "timeout_seconds" -Default $ScenarioTimeoutSeconds)
+  $result = Invoke-MIRFactorioLoadCheck -FactorioBin $FactorioBin -UserDataDir $userData -ScenarioName $Scenario.name -ScenarioTimeoutSeconds $scenarioTimeout
   [pscustomobject]@{
     scenario = $Scenario.name
     type = $Scenario.type
@@ -950,7 +1007,8 @@ if (-not [string]::IsNullOrWhiteSpace($FromLockfile)) {
       -EnableSpaceAgeBundle ([bool]$IncludeSpaceAge -or [bool]$lock.include_space_age)
   }
 } else {
-  if ($Offline -and ($CandidateNames.Count -gt 0 -or $MaxCandidates -gt 0)) {
+  $nonCatalogModeRequested = [bool]($RunManualScenarios -or $RunLocalModZips -or $RunGeneratedLocalScenarios)
+  if ($Offline -and ($CandidateNames.Count -gt 0 -or ($MaxCandidates -gt 0 -and -not $nonCatalogModeRequested))) {
     throw "Offline mode cannot resolve catalog or named catalog candidates. Use -RunLocalModZips, -RunManualScenarios with local libraries, or -FromLockfile with cached/local archives."
   }
 
@@ -959,7 +1017,7 @@ if (-not [string]::IsNullOrWhiteSpace($FromLockfile)) {
     $catalogCandidates = @($CandidateNames | ForEach-Object {
       [pscustomobject]@{ name = [string]$_; downloads_count = 0; category = ""; tags = @() }
     })
-  } elseif ($MaxCandidates -gt 0) {
+  } elseif ($MaxCandidates -gt 0 -and -not ($Offline -and $nonCatalogModeRequested)) {
     Write-Host "[compat-audit] querying mod portal catalog"
     $catalog = @(Get-MIRModPortalCatalog -MaxPages $CatalogPages)
     $catalogCandidates = @(
@@ -1000,14 +1058,20 @@ if ($RunManualScenarios) {
       throw "Manual scenario is missing a non-empty name in $ManualScenariosPath."
     }
     Write-Host "[compat-audit] inspecting manual scenario $scenarioName"
-    $scenarioMods = @((Get-MIRObjectProperty -Object $scenario -Name "mods" -Default @()) | ForEach-Object { [string]$_ })
-    $includeBundle = [bool](Get-MIRObjectProperty -Object $scenario -Name "include_space_age" -Default $false)
+    $scenarioMods = @((Get-MIRObjectProperty -Object $scenario -Name "roots" -Default @()) | ForEach-Object { [string]$_ })
+    $setup = Get-MIRObjectProperty -Object $scenario -Name "setup" -Default ([pscustomobject]@{})
+    $includeBundle = [bool](Get-MIRObjectProperty -Object $setup -Name "include_space_age" -Default $false)
     if ($scenarioMods -contains "space-age") { $includeBundle = $true }
     $selectedScenarios += Resolve-MIRPortalScenario `
       -Name $scenarioName `
       -Type "manual" `
       -RequestedMods $scenarioMods `
       -EnableSpaceAgeBundle $includeBundle `
+      -ClaimLevel ([string](Get-MIRObjectProperty -Object $scenario -Name "claim_level" -Default "loads")) `
+      -TimeoutSeconds ([int](Get-MIRObjectProperty -Object $scenario -Name "timeout_seconds" -Default $ScenarioTimeoutSeconds)) `
+      -Settings (Get-MIRObjectProperty -Object $scenario -Name "settings" -Default ([pscustomobject]@{})) `
+      -ExpectedPlan (Get-MIRObjectProperty -Object $scenario -Name "expected_plan" -Default ([pscustomobject]@{})) `
+      -SourceManifest ([string](Get-MIRObjectProperty -Object $scenario -Name "_source_manifest" -Default "")) `
       -Notes ([string](Get-MIRObjectProperty -Object $scenario -Name "notes" -Default ""))
   }
 }
@@ -1106,6 +1170,9 @@ $lock = [ordered]@{
   local_mod_zips = @($LocalModZips)
   local_mod_library_dirs = @($LocalModLibraryDirs)
   local_mod_library_zips = @($LocalModLibraryZips)
+  mod_under_test_zip = $resolvedModUnderTestZip
+  mod_under_test_sha256 = if ($resolvedModUnderTestZip) { (Get-FileHash -Algorithm SHA256 -LiteralPath $resolvedModUnderTestZip).Hash.ToUpperInvariant() } else { "" }
+  mod_under_test_source_commit = $ModUnderTestSourceCommit
   link_mode = $LinkMode
   local_root_zip_count = $localRootZipPaths.Count
   local_library_zip_count = $localLibraryZipPaths.Count
@@ -1132,6 +1199,11 @@ $scenarioSummaries = @($selectedScenarios | ForEach-Object {
     resolved_mods = @($_.resolved_mods)
     official_mods = @($_.official_mods)
     dependency_failures = @($_.dependency_failures)
+    claim_level = [string](Get-MIRObjectProperty -Object $_ -Name "claim_level" -Default "loads")
+    timeout_seconds = [int](Get-MIRObjectProperty -Object $_ -Name "timeout_seconds" -Default $ScenarioTimeoutSeconds)
+    settings = Get-MIRObjectProperty -Object $_ -Name "settings" -Default ([pscustomobject]@{})
+    expected_plan = Get-MIRObjectProperty -Object $_ -Name "expected_plan" -Default ([pscustomobject]@{})
+    source_manifest = [string](Get-MIRObjectProperty -Object $_ -Name "source_manifest" -Default "")
     notes = $_.notes
   }
 })
@@ -1225,13 +1297,13 @@ if (($DownloadMods -or ($RunLoadTests -and -not $UseCachedDownloads)) -and $down
   }
 }
 
+$results = @()
 if ($RunLoadTests) {
   if ([string]::IsNullOrWhiteSpace($FactorioBin)) {
     throw "Load tests require -FactorioBin or FACTORIO_BIN."
   }
 
   $runRoot = New-MIRDirectory -Path (Join-Path $resolvedOutputDir "runs")
-  $results = @()
   $loadResultsPath = Join-Path $resolvedOutputDir "load-results.json"
   $manualResultsPath = Join-Path $resolvedOutputDir "manual-results.json"
   $scenarioList = @($selectedScenarios)
@@ -1260,9 +1332,81 @@ if ($RunLoadTests) {
   if ($manualResults.Count -gt 0) {
     $manualResults | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $manualResultsPath -Encoding UTF8
   }
+
+  $lockSha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $lockPath).Hash.ToUpperInvariant()
+  $resultByScenario = @{}
+  foreach ($result in $results) { $resultByScenario[[string]$result.scenario] = $result }
+  $campaignScenarios = @(
+    foreach ($scenario in $selectedScenarios) {
+      $result = $resultByScenario[[string]$scenario.name]
+      $dependencyFailureCount = @($scenario.dependency_failures).Count
+      $expectedPlan = Get-MIRObjectProperty -Object $scenario -Name "expected_plan" -Default ([pscustomobject]@{})
+      $maximumDependencyFailures = [int](Get-MIRObjectProperty -Object $expectedPlan -Name "maximum_dependency_failures" -Default 0)
+      $processResult = if ($result.passed -eq $true) { "passed" } elseif ($result.skipped -eq $true) { "skipped" } else { "failed" }
+      $claimGateResult = if ($processResult -eq "passed" -and $dependencyFailureCount -le $maximumDependencyFailures) {
+        "passed"
+      } elseif ($processResult -eq "skipped") {
+        "skipped"
+      } else {
+        "failed"
+      }
+      $closure = @(
+        foreach ($entry in @($scenario.lock_entries | Sort-Object name, version -Unique)) {
+          if ([string]::IsNullOrWhiteSpace([string]$entry.sha256)) {
+            throw "Campaign evidence requires SHA-256 for resolved mod $($entry.name) $($entry.version)."
+          }
+          [ordered]@{
+            name = [string]$entry.name
+            version = [string]$entry.version
+            sha256 = [string]$entry.sha256
+            source = [string]$entry.source
+          }
+        }
+      )
+      [ordered]@{
+        scenario_id = [string]$scenario.name
+        requested_roots = @($scenario.requested_mods)
+        actual_executed_roots = @($scenario.root_mods)
+        resolved_mods = @($scenario.resolved_mods)
+        official_mods = @($scenario.official_mods)
+        dependency_closure = $closure
+        dependency_failure_count = $dependencyFailureCount
+        process_result = $processResult
+        result = $claimGateResult
+        exit_code = $result.exit_code
+        timed_out = [bool]$result.timed_out
+        timeout_seconds = [int](Get-MIRObjectProperty -Object $scenario -Name "timeout_seconds" -Default $ScenarioTimeoutSeconds)
+        settings = Get-MIRObjectProperty -Object $scenario -Name "settings" -Default ([pscustomobject]@{})
+        expected_plan = $expectedPlan
+        source_manifest = [string](Get-MIRObjectProperty -Object $scenario -Name "source_manifest" -Default "")
+        claim_level = [string](Get-MIRObjectProperty -Object $scenario -Name "claim_level" -Default "loads")
+      }
+    }
+  )
+  $campaignEvidence = [ordered]@{
+    schema = 1
+    kind = "mir-modpack-campaign-evidence"
+    generated_at = (Get-Date).ToUniversalTime().ToString("o")
+    factorio_line = $FactorioLine
+    factorio_binary = (Resolve-Path -LiteralPath $FactorioBin).Path
+    mir_archive = [ordered]@{
+      path = $resolvedModUnderTestZip
+      sha256 = $lock.mod_under_test_sha256
+      source_commit = $ModUnderTestSourceCommit
+      source_commit_binding = if ([string]::IsNullOrWhiteSpace($ModUnderTestSourceCommit)) { "unbound" } else { "declared" }
+    }
+    dependency_lock = [ordered]@{
+      path = $lockPath
+      sha256 = $lockSha256
+    }
+    scenarios = $campaignScenarios
+  }
+  $campaignEvidencePath = Join-Path $resolvedOutputDir "campaign-evidence.json"
+  $campaignEvidence | ConvertTo-Json -Depth 30 | Set-Content -LiteralPath $campaignEvidencePath -Encoding UTF8
 }
 
 Write-Host "[compat-audit] wrote $lockPath"
 Write-Host "[compat-audit] wrote $reportPath"
 Write-Host "[compat-audit] wrote $jsonReportPath"
 Write-Host "[compat-audit] wrote $failureCsvPath"
+if ($RunLoadTests) { Write-Host "[compat-audit] wrote $campaignEvidencePath" }

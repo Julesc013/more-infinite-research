@@ -11,8 +11,7 @@ superseded_by: []
 ---
 # Localization Maintenance
 
-`locale/en/more-infinite-research.cfg` is the source locale. When English keys change, update every translated
-`more-infinite-research.cfg` file to keep the same sections, keys, and placeholders.
+`locale/en/more-infinite-research.cfg` is the source locale. When English keys change, update every translated `more-infinite-research.cfg` file to keep the same sections, keys, and placeholders.
 
 Factorio locale rules that matter for this mod:
 
@@ -30,5 +29,4 @@ Run this after any locale or English string change:
 .\scripts\Invoke-MIRValidation.ps1 -StaticOnly
 ```
 
-The first command verifies key parity with English, placeholder parity, supported Factorio locale codes, and empty
-placeholder directory cleanup. The second command runs the repository static validation bundle.
+The first command verifies key parity with English, placeholder parity, supported Factorio locale codes, and empty placeholder directory cleanup. The second command runs the repository static validation bundle.

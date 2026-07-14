@@ -13,33 +13,21 @@ superseded_by: []
 
 Updated: 2026-07-09
 
-This guide describes the intended 3.0 workflow for adding compatibility without
-copying generator logic into per-mod files.
+This guide describes the intended 3.0 workflow for adding compatibility without copying generator logic into per-mod files.
 
-Use `docs/architecture/module-boundaries.md` for where new files belong.
-New shipped Lua should go under `prototypes/mir/` unless it is a thin Factorio
-root entrypoint, locale, migration, or graphics asset.
-Development-only docs, scripts, fixtures, tests, build output, task ledgers, and
-release archives stay outside the shipped package.
+Use `docs/architecture/module-boundaries.md` for where new files belong. New shipped Lua should go under `prototypes/mir/` unless it is a thin Factorio root entrypoint, locale, migration, or graphics asset. Development-only docs, scripts, fixtures, tests, build output, task ledgers, and release archives stay outside the shipped package.
 
-Use [settings governance](settings-governance.md) for startup setting IDs,
-visibility metadata, provider-gated settings, visible official technology
-settings, and backport behavior.
+Use [settings governance](settings-governance.md) for startup setting IDs, visibility metadata, provider-gated settings, visible official technology settings, and backport behavior.
 
 ## Adding Or Moving Shipped Lua
 
 1. Keep the root Factorio file as a stage wrapper.
 2. Put Factorio global access behind `prototypes/mir/platform/`.
 3. Put plain compiler records under `prototypes/mir/domain/`.
-4. Put indexing, graphing, classification, policy, capability, planning,
-   emission, and reporting code in their matching layer.
-5. Put compatibility rules in `prototypes/mir/compatibility/` as declarative
-   policy overlays.
-6. Do not reintroduce old implementation paths such as `prototypes/compat/`,
-   `prototypes/lib/`, `prototypes/mir/legacy/`, root `defaults.lua`, or broad
-   root helper shims.
-7. If a backport requires a temporary compatibility surface, document it in the
-   branch policy and keep it off the MIR 3 main line.
+4. Put indexing, graphing, classification, policy, capability, planning, emission, and reporting code in their matching layer.
+5. Put compatibility rules in `prototypes/mir/compatibility/` as declarative policy overlays.
+6. Do not reintroduce old implementation paths such as `prototypes/compat/`, `prototypes/lib/`, `prototypes/mir/legacy/`, root `defaults.lua`, or broad root helper shims.
+7. If a backport requires a temporary compatibility surface, document it in the branch policy and keep it off the MIR 3 main line.
 
 ## Adding A New Capability
 
@@ -87,5 +75,4 @@ Convert every bug report into one of:
 - a migration rule;
 - a rejected/deferred scope note.
 
-Do not fix compatibility bugs by adding unexplained `if mods[...]` generation
-branches.
+Do not fix compatibility bugs by adding unexplained `if mods[...]` generation branches.
