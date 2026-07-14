@@ -12,9 +12,6 @@ superseded_by: []
 
 # Adding A Policy Overlay
 
-Policy overlays are declarative. They select capability modes, thresholds,
-selectors, and claim text. They do not call `data:extend` or create generated
-technologies directly.
+Policy overlays are declarative. They select capability modes, thresholds, selectors, and claim text. They do not call `data:extend` or create generated technologies directly.
 
-Update the compatibility docs and claim evidence when an overlay changes public
-behavior.
+Update the compatibility docs and claim evidence when an overlay changes public behavior.

@@ -17,8 +17,7 @@ If a technology is missing:
 1. Enable `mir-debug-generation-report`.
 2. Restart or load a controlled test map.
 3. Search `factorio-current.log` for the stream key.
-4. Check for `skipped`, `no_matching_recipes`, `missing required`, or
-   `no_lab_compatible_science`.
+4. Check for `skipped`, `no_matching_recipes`, `missing required`, or `no_lab_compatible_science`.
 
 If a recipe did not receive productivity:
 

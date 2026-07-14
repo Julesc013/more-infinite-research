@@ -2,8 +2,8 @@ param([string]$RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path)
 
 $ErrorActionPreference = "Stop"
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
-$profilePath = Join-Path $repo ".mir\targets.json"
-if (-not (Test-Path -LiteralPath $profilePath)) { throw "Missing target capability profile: .mir/targets.json" }
+$profilePath = Join-Path $repo ".mir\target-reconstruction.json"
+if (-not (Test-Path -LiteralPath $profilePath)) { throw "Missing target reconstruction profile: .mir/target-reconstruction.json" }
 $profile = Get-Content -Raw -LiteralPath $profilePath | ConvertFrom-Json
 $info = Get-Content -Raw -LiteralPath (Join-Path $repo "info.json") | ConvertFrom-Json
 if ($profile.release -ne $info.version -or $profile.factorio.line -ne $info.factorio_version) {

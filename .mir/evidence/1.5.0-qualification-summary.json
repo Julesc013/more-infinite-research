@@ -6,12 +6,16 @@
   "target_factorio": "0.15",
   "candidate": {
     "path": "dist/more-infinite-research_1.5.0.zip",
-    "sha256": "3F8D78ECEC9DCCCCF2DD14279DC7E3BD696212F33C3FDD87A924B905223ACBCF",
-    "size_bytes": 301024
+    "sha256": "131162AA1A62C05E2C395C3F9D2495178742CD8C5324B058C42995C17F65B4DB",
+    "size_bytes": 373689,
+    "entries": 170,
+    "package_content_sha256": "5372102D72AB4733863056FCE46028AA4C833E977014DA27F381E98CC290DAC0"
   },
   "factorio": {
     "version": "0.15.40",
-    "binary_sha256": "A1C87043244BEAE8E5903FB7D4A96E7920189C6339F00E3A2398988B9C8E7DD6"
+    "binary_sha256": "A1C87043244BEAE8E5903FB7D4A96E7920189C6339F00E3A2398988B9C8E7DD6",
+    "exact_binary_version": "0.15.40.30950",
+    "binary_path": "D:/Programs/Factorio/0.15/bin/x64/factorio.exe"
   },
   "capability_classification": "passed",
   "deterministic_rebuild": "passed",
@@ -21,5 +25,38 @@
   "runtime_scenario_baseline": 4,
   "ecosystem": "fixture-and-named-scenario evidence only; no broader public claim added",
   "public_release": false,
-  "tag": "not-run"
+  "tag": "not-run",
+  "qualified_source_commit": "bc0e566479ecfda2f8a854698e4b0f7f7f25168a",
+  "canonical_dev_anchor": "dc5bfa99249af6c9508201a4c4667063bc8e021c",
+  "gates": {
+    "source_lock": "passed",
+    "feature_classification": "passed",
+    "static": "passed",
+    "capabilities": "passed",
+    "target_science_reachability": "passed",
+    "settings_retention": "passed",
+    "research_retention": "passed",
+    "global_runtime_state_retention": "passed",
+    "locale_catalogs": "passed-9",
+    "balance": "passed-automated",
+    "package_hygiene": "passed-zero-forbidden",
+    "deterministic_rebuild": "passed-byte-identical",
+    "exact_zip_fresh_load": "passed",
+    "exact_zip_reload": "passed",
+    "first_release_retention": "passed",
+    "upgrade": "not-applicable-no-legitimate-predecessor",
+    "manual_visual_and_balance_review": "PENDING-MAINTAINER"
+  },
+  "attempts": [
+    {
+      "attempt": 1,
+      "status": "passed",
+      "disposition": "complete exact-binary and first-release retention qualification"
+    }
+  ],
+  "superseded_candidate": {
+    "state": "SUPERSEDED-UNRELEASED",
+    "commit": "c55cba5253f82bc93733522736fa303eda5acfa7",
+    "sha256": "3F8D78ECEC9DCCCCF2DD14279DC7E3BD696212F33C3FDD87A924B905223ACBCF"
+  }
 }

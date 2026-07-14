@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "status": "passed",
+  "target": "0.15",
+  "mir_version": "1.5.0",
+  "canonical_dev_anchor": "dc5bfa99249af6c9508201a4c4667063bc8e021c",
+  "canonical_feature_model_sha256": "FD882872A6EF19AA29F3CDDA75F2C79EBD2D448395FE000485C8D0700AE6DDC6",
+  "candidate_sha256": "131162AA1A62C05E2C395C3F9D2495178742CD8C5324B058C42995C17F65B4DB",
+  "expected_stream_count": 11,
+  "native_modifier_candidates": 15,
+  "invariants": {
+    "positive_costs": "passed",
+    "positive_research_time": "passed",
+    "valid_level_bounds": "passed",
+    "target_supported_effects_only": "passed",
+    "target_science_reachability": "passed",
+    "compact_formula_serialization": "passed",
+    "conditional_weapon_ownership": "passed",
+    "unsupported_settings_absent": "passed"
+  },
+  "manual_balance_review": "PENDING-MAINTAINER"
+}

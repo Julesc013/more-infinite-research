@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "kind": "mir-interactive-review",
+  "status": "pending",
+  "version": "3.1.5",
+  "factorio_version": "2.1",
+  "source_commit": "3cd6a95a6e22ce2d4cdbc231ad79d8110ad75e2f",
+  "archive_path": "dist/more-infinite-research_3.1.5.zip",
+  "archive_sha256": "8861E25FAAC472EDE9F32FE1C051A623A59177F5E092A3B1DC0B9FF2B3D47C50",
+  "package_content_sha256": "ED2D9C45B2DE4708EB4E1E715E4364EE6F26CF03AE3C15F30562F9135B9C7680",
+  "package_source_sha256": "ED2D9C45B2DE4708EB4E1E715E4364EE6F26CF03AE3C15F30562F9135B9C7680",
+  "required_checks": [
+    "isolated-normal-mod-directory-load",
+    "base-and-space-age-save-load",
+    "base-hides-space-age-technology-setting-groups",
+    "space-age-restores-dlc-technology-setting-groups",
+    "experimental-family-tuning-settings-remain-hidden",
+    "automatic-recipe-support-controls-and-help-text",
+    "locale-capitalization-spacing-and-dropdown-width",
+    "technology-visibility-icons-costs-and-effects",
+    "science-and-prerequisite-reachability",
+    "default-attachment-only-boundary",
+    "reviewed-creation-excludes-experimental-families",
+    "broad-opt-in-retains-experimental-families",
+    "balance-review"
+  ],
+  "reviewer": null,
+  "reviewed_at": null,
+  "captures": [],
+  "notes": [
+    "This pending packet is identity-bound preparation, not evidence that GUI review passed.",
+    "Confirm Space Age technology settings disappear in a base-only run and reappear with stored values when Space Age is active.",
+    "Confirm experimental assembling-machine and laboratory tuning rows stay hidden while broad opt-in generation remains available.",
+    "Record at least settings, technology-tree, and loaded-save captures before acceptance."
+  ]
+}

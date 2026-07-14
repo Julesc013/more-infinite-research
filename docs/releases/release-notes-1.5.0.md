@@ -12,6 +12,8 @@ superseded_by: []
 
 # MIR 1.5.0 Candidate Notes
 
+MIR 1.5.0 is an independent canonical MIR 3.1.9-derived target projection from `DEV_LOWER_WAVE_ANCHOR` commit `dc5bfa99249af6c9508201a4c4667063bc8e021c`. The earlier `tmp/0.15` candidate remains `SUPERSEDED-UNRELEASED` characterization evidence and is not this reconstruction's source ancestry.
+
 MIR 1.5.0 is an unreleased Factorio 0.15 old-science native-infinite port.
 
 - Generated technologies use Factorio 0.15's science pack identifiers and formula grammar.
