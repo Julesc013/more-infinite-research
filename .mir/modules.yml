@@ -386,6 +386,7 @@ validation_tooling:
     museum_qualification: scripts/New-MIRMuseumQualification.ps1
     museum_seal_writer: scripts/New-MIRMuseumSeal.ps1
     museum_seal_check: scripts/Test-MIRMuseumSeal.ps1
+    backport_source_lock: scripts/Test-MIRBackportSourceLock.ps1
     package_identity: scripts/validation/PackageIdentity.ps1
     target_metadata: scripts/validation/TargetProfiles.ps1
     scenario_groups: scripts/validation/ScenarioGroups.ps1

@@ -173,6 +173,10 @@ Invoke-RepoCheck "target profile views match canonical manifest" {
   & (Join-Path $repo "scripts\Sync-MIRTargetProfiles.ps1") -RepoRoot $repo -Check
 }
 
+Invoke-RepoCheck "backport source lock is current when present" {
+  & (Join-Path $repo "scripts\Test-MIRBackportSourceLock.ps1") -RepoRoot $repo
+}
+
 Invoke-RepoCheck "release candidate evidence is fresh or explicitly rebuilding" {
   & (Join-Path $repo "scripts\Test-MIRCandidateFreshness.ps1") -RepoRoot $repo
 }

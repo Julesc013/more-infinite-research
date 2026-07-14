@@ -1584,3 +1584,11 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - mir-3.1.9-validation
+  - path: docs/releases/3.1.9-post-2.4.5-ring-synthesis.md
+    title: "MIR 3.1.9 And 2.4.5 Post-Release Ring Synthesis"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-3.1.9-2.4.5-ring-synthesis
