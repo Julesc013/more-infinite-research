@@ -60,4 +60,13 @@ foreach ($unsupported in @("cargo-landing-pad-count", "max-cargo-bay-unloading-d
   }
 }
 
+$targetProfileText = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "prototypes\mir\platform\factorio\target_profiles.lua")
+if ($targetProfileText -notmatch '(?s)\["2\.0"\].*?mod_data\s*=\s*false') {
+  throw "Factorio 2.0 target profile must explicitly disable mod-data prototypes."
+}
+$modDataEmitterText = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "prototypes\mir\emit\mod_data.lua")
+if (-not $modDataEmitterText.Contains("target_line.mod_data_supported()")) {
+  throw "The mod-data emitter is not guarded by the target capability."
+}
+
 Write-Host "[ok] MIR 2.4.5 is a declared Factorio 2.0 projection of canonical 3.1.9 with $($changed.Count) target-adapted package paths."

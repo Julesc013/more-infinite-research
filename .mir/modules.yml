@@ -356,7 +356,8 @@ rules:
   - No old compat/lib/legacy/control/planner shim directories are allowed.
   - No broad root helper shims are allowed.
   - Only settings/stage_builder.lua may register setting prototypes directly.
-  - Generated technologies and mod-data prototypes emit through prototypes/mir/emit.
+  - Generated technologies and target-supported mod-data prototypes emit through prototypes/mir/emit.
+  - Prototype-family emission must consult the current target profile before calling the Factorio data adapter.
   - Compatibility overlays register policy only.
   - Compatibility repairs may normalize exact-version upstream loader schemas or remove one topology-proven cross-mod cycle edge.
   - Domain modules do not read Factorio globals.

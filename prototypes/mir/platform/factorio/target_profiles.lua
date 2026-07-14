@@ -42,7 +42,8 @@ local M = {
         },
         technology_formula = true,
         quality = true,
-        surface_conditions = true
+        surface_conditions = true,
+        mod_data = true
       },
       emitter_families = {
         "technology",
@@ -126,7 +127,8 @@ local M = {
         },
         technology_formula = true,
         quality = true,
-        surface_conditions = true
+        surface_conditions = true,
+        mod_data = true
       },
       emitter_families = {
         "technology",
@@ -201,7 +203,8 @@ local M = {
         },
         technology_formula = true,
         quality = false,
-        surface_conditions = false
+        surface_conditions = false,
+        mod_data = false
       },
       emitter_families = {
         "technology"
@@ -254,7 +257,8 @@ local M = {
         },
         technology_formula = true,
         quality = false,
-        surface_conditions = false
+        surface_conditions = false,
+        mod_data = false
       },
       emitter_families = {
         "technology"
@@ -307,7 +311,8 @@ local M = {
         },
         technology_formula = true,
         quality = false,
-        surface_conditions = false
+        surface_conditions = false,
+        mod_data = false
       },
       emitter_families = {
         "technology"
@@ -360,7 +365,8 @@ local M = {
         },
         technology_formula = true,
         quality = false,
-        surface_conditions = false
+        surface_conditions = false,
+        mod_data = false
       },
       emitter_families = {
         "technology"
@@ -413,7 +419,8 @@ local M = {
         },
         technology_formula = true,
         quality = false,
-        surface_conditions = false
+        surface_conditions = false,
+        mod_data = false
       },
       emitter_families = {
         "technology"
@@ -467,7 +474,8 @@ local M = {
         },
         technology_formula = true,
         quality = false,
-        surface_conditions = false
+        surface_conditions = false,
+        mod_data = false
       },
       emitter_families = {
         "technology"
