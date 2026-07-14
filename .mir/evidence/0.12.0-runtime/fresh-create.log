@@ -1,0 +1,16 @@
+   0.001 2026-07-15 07:12:57; Factorio 0.12.35 (Build 18124, win64, alpha)
+   0.001 Operating system: Windows 10 
+   0.001 Program arguments: "D:\Programs\Factorio\0.12\bin\x64\Factorio.exe" "--config" "C:\Projects\Factorio\more-infinite-research-rebuild-0.12\.\.mir\evidence\0.12.0-runtime\factorio-config.ini" "--create" "fresh-create" 
+   0.001 Read data path: D:/Programs/Factorio/0.12/data
+   0.002 Write data path: C:/Projects/Factorio/more-infinite-research-rebuild-0.12/.mir/evidence/0.12.0-runtime/user
+   0.002 Binaries path: D:/Programs/Factorio/0.12/bin
+   0.018 Running in headless mode
+   0.024 Loading mod core 0.0.0 (data.lua)
+   0.028 Loading mod base 0.12.35 (data.lua)
+   0.089 Loading mod more-infinite-research 0.12.0 (data.lua)
+   0.133 Checksum for core: 3711505753
+   0.133 Checksum for mod base: 2829195351
+   0.134 Checksum for mod more-infinite-research: 2229290403
+   0.408 Factorio initialised
+   3.587 Info Scenario.cpp:124: Map version 0.12.35-0
+   3.627 Checksum for script C:/Projects/Factorio/more-infinite-research-rebuild-0.12/.mir/evidence/0.12.0-runtime/user/temp/currently-playing/control.lua: 393467729
