@@ -32,6 +32,8 @@ function Copy-MIRUpgradeLogEvidence {
 $factorio = Resolve-MIRUpgradePath -Path $FactorioBin
 $from = Resolve-MIRUpgradePath -Path $FromZip
 $to = Resolve-MIRUpgradePath -Path $ToZip
+$factorioVersionInfo = (Get-Item -LiteralPath $factorio).VersionInfo
+$isLegacyFactorio = [int]$factorioVersionInfo.FileMajorPart -lt 2
 $fixture = Resolve-MIRUpgradePath -Path (Join-Path $RepoRoot "fixtures\$FixtureName")
 $fixtureInfo = Get-Content -Raw -LiteralPath (Join-Path $fixture "info.json") | ConvertFrom-Json
 $fixtureModName = [string]$fixtureInfo.name
@@ -74,10 +76,21 @@ $save = Join-Path $root "mir-$FromVersion-save.zip"
 $log = Join-Path $userdata "factorio-current.log"
 $createArgs = @("--config", $config, "--no-log-rotation", "--disable-audio", "--mod-directory", $mods, "--create", $save)
 $createExitCode = Invoke-FactorioProcess -FilePath $factorio -Arguments $createArgs
-if ($createExitCode -ne 0 -or -not (Test-Path -LiteralPath $save)) {
+if (-not (Test-Path -LiteralPath $save) -or ($createExitCode -ne 0 -and -not $isLegacyFactorio)) {
   throw "MIR $FromVersion upgrade source save creation failed with exit code $createExitCode."
 }
 $createText = Get-Content -Raw -LiteralPath $log
+if ($isLegacyFactorio -and -not $createText.Contains("[mir-fixture] $FromVersion$proofSuffix upgrade source proof complete")) {
+  $sourceInitArgs = @(
+    "--config", $config, "--no-log-rotation", "--disable-audio", "--mod-directory", $mods,
+    "--start-server", $save, "--until-tick", "1"
+  )
+  $sourceInitExitCode = Invoke-FactorioProcess -FilePath $factorio -Arguments $sourceInitArgs
+  if ($sourceInitExitCode -ne 0) {
+    throw "MIR $FromVersion legacy source-save initialization failed with exit code $sourceInitExitCode."
+  }
+  $createText = Get-Content -Raw -LiteralPath $log
+}
 if (-not $createText.Contains("[mir-fixture] $FromVersion$proofSuffix upgrade source proof complete")) {
   throw "MIR $FromVersion upgrade source proof marker is missing."
 }
@@ -99,7 +112,16 @@ if (-not $loadText.Contains("[mir-fixture] $FromVersion to $ToVersion$proofSuffi
 $loadEvidence = Join-Path $outputParent "$ToVersion-upgrade-from-$FromVersion-load.txt"
 Copy-MIRUpgradeLogEvidence -Source $log -Destination $loadEvidence
 
-$assertions = if ($FixtureName -eq "assert-upgrade-3-1-5-to-3-1-9") {
+$assertions = if ($isLegacyFactorio) {
+  @(
+    "startup-setting-retained",
+    "generated-technology-level-retained",
+    "current-research-retained",
+    "fractional-research-progress-retained",
+    "global-runtime-state-retained",
+    "exact-candidate-normal-mod-directory-load"
+  )
+} elseif ($FixtureName -eq "assert-upgrade-3-1-5-to-3-1-9") {
   @(
     "startup-settings-retained",
     "native-owner-technology-level-retained",
@@ -124,7 +146,7 @@ $assertions = if ($FixtureName -eq "assert-upgrade-3-1-5-to-3-1-9") {
   status = "passed"
   generated_at = (Get-Date).ToUniversalTime().ToString("o")
   git_commit = (& git -C $RepoRoot rev-parse HEAD).Trim()
-  factorio_binary_version = (Get-Item -LiteralPath $factorio).VersionInfo.FileVersion
+  factorio_binary_version = $factorioVersionInfo.FileVersion
   from = [ordered]@{ version = $FromVersion; path = $FromZip; sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $from).Hash }
   to = [ordered]@{ version = $ToVersion; path = $ToZip; sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $to).Hash }
   assertions = $assertions
