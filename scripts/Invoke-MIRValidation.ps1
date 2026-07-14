@@ -13,6 +13,8 @@ param(
   [ValidateSet("", "pure", "static", "smoke", "impacted", "full")]
   [string]$Tier = "",
   [string]$ChangedSince = "",
+  [ValidateSet("", "space-age-vanilla-family-mixed-owner")]
+  [string]$StartAtScenario = "",
   [ValidateRange(1, 4)][int]$MaxParallel = 1,
   [switch]$List,
   [string]$ValidationSummaryPath = $env:MIR_VALIDATION_SUMMARY
@@ -2146,6 +2148,37 @@ if (-not [string]::IsNullOrWhiteSpace($ChangedSince)) {
   $Group = @($Group | Sort-Object -Unique)
   $Tag = @($Tag | Sort-Object -Unique)
 }
+$checkpointActive = -not [string]::IsNullOrWhiteSpace($StartAtScenario)
+if ($checkpointActive) {
+  if ($Scenario.Count -gt 0 -or $Group.Count -gt 0 -or $Tag.Count -gt 0) {
+    throw "-StartAtScenario cannot be combined with -Scenario, -Group, or -Tag."
+  }
+  $Scenario = @(
+    "static-validation",
+    "package-build",
+    "runtime-state-contract",
+    "space-age-vanilla-family-mixed-owner",
+    "space-age-fluid-productivity",
+    "space-age-generation-integrity-inserter-enabled",
+    "space-age-space-promethium-pack-policy",
+    "all-official-pack-policy",
+    "all-pack-policy",
+    "base-extension-boundary-policy",
+    "base-effect-setting-retention",
+    "weapon-overlap-off-coverage-absent",
+    "weapon-overlap-off-coverage-present",
+    "weapon-overlap-conditional-coverage-absent",
+    "weapon-overlap-conditional-coverage-present",
+    "weapon-overlap-always-coverage-absent",
+    "weapon-overlap-always-coverage-present",
+    "scaled-weapon-overlap",
+    "weapon-overlap-conditional-external-owner",
+    "omega-drill-productivity",
+    "base-competitor-rollback",
+    "technology-prerequisite-rewire",
+    "end-game-prerequisite-gate"
+  )
+}
 $scenarioRegistry = Import-MIRScenarioRegistry -Path $expectedScenariosPath -TargetProfile $repoInfo.factorio_version
 $selectionActive = $Scenario.Count -gt 0 -or $Group.Count -gt 0 -or $Tag.Count -gt 0
 $scenarioRegistry = Select-MIRScenarioRegistry -Registry $scenarioRegistry -Scenario $Scenario -Group $Group -Tag $Tag
@@ -3098,7 +3131,7 @@ function Invoke-WeaponSpeedPolicyMatrix {
   }
 }
 
-if ($selectionActive) {
+if ($selectionActive -and -not $checkpointActive) {
   try {
     $selectedExecutable = @($scenarioRegistry.records | Where-Object kind -ne "gate" | Sort-Object name)
     if ($MaxParallel -gt 1 -and @($selectedExecutable | Where-Object kind -ne "runtime").Count -eq 0) {
@@ -3284,6 +3317,7 @@ if ($selectionActive) {
 }
 
 try {
+if (-not $checkpointActive) {
 Invoke-PackageZipSmokeScenario -ScenarioName "package-zip-base"
 if ([bool]$targetProfile.supports_space_age) {
   Invoke-PackageZipSmokeScenario -ScenarioName "package-zip-space-age" -EnableSpaceAge
@@ -4067,6 +4101,9 @@ Invoke-RuntimeScenario -ScenarioName "space-age-vanilla-family-exact-owner" -Ena
 $exactOwnerRocketFuelLine = Get-LastStreamReportLine -Key "research_rocket_fuel"
 Assert-ReportLineAdopted -Line $exactOwnerRocketFuelLine -Context "External exact owner plus native preserve binding"
 Assert-ReportLineContains -Line $exactOwnerRocketFuelLine -Expected "reason=preserve_native_owner" -Context "External exact owner plus native preserve binding"
+} else {
+  Write-Host "[resume] Starting full-assertion validation at $StartAtScenario."
+}
 
 Invoke-RuntimeScenario -ScenarioName "space-age-vanilla-family-mixed-owner" -EnabledFixtureNames @(
   "mir-fixture-vanilla-family-mixed-owner",
