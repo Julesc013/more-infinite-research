@@ -12,9 +12,6 @@ superseded_by: []
 
 # Lab Compatibility Capability
 
-Lab compatibility proves that at least one active lab can research a generated
-technology's science pack set. MIR treats labs as the science authority and does
-not rely on old `data.raw.tool` science-pack assumptions.
+Lab compatibility proves that at least one active lab can research a generated technology's science pack set. MIR treats labs as the science authority and does not rely on old `data.raw.tool` science-pack assumptions.
 
-The capability may accept, reduce, or reject proposed ingredients according to
-the configured policy and observed lab inputs.
+The capability may accept, reduce, or reject proposed ingredients according to the configured policy and observed lab inputs.

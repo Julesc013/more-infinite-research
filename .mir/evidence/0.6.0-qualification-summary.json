@@ -6,7 +6,7 @@
   "exact_patch": "0.6.4",
   "mir_version": "0.6.0",
   "branch": "tmp/0.6",
-  "source_commit": "0ab54507562b881da1dd4b48479d265d10fb53d0",
+  "source_commit": "ed1cabec0615728daf873160c8357667bc738ea3",
   "binary": {
     "path": "D:\\Programs\\Factorio\\0.6\\bin\\x64\\Factorio.exe",
     "architecture": "win64-x64",
@@ -63,7 +63,7 @@
   },
   "gates": {
     "manifest_and_base_evidence": "passed",
-    "twenty_five_negative_cases": "passed",
+    "negative_cases": "passed-26",
     "deterministic_clean_builds": "passed",
     "package_hygiene": "passed",
     "exact_zip_initial_load": "passed-bounded-crop-cache-load",

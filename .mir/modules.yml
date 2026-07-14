@@ -1,13 +1,5 @@
 schema: 1
 
-museum_target_override:
-  factorio: "0.6"
-  mir_version: "0.6.0"
-  root_files: [config.lua, data.lua, info.json]
-  emitted_by: scripts/Museum/MuseumCompiler.psm1
-  only_emitter_creates_technology_prototypes: true
-  release_package_files: [config.lua, data.lua, info.json, locale/en/more-infinite-research.cfg]
-
 current_roots:
   factorio_shell:
     root_files:
@@ -137,16 +129,16 @@ modules:
     - prototypes/mir/domain/facts/generated_technology_registry.lua
     - prototypes/mir/domain/decisions/decision_record.lua
     - prototypes/mir/domain/effects/metadata.lua
+    - prototypes/mir/domain/native_owner/contract.lua
+    - prototypes/mir/domain/native_owner/cost_model.lua
     - prototypes/mir/domain/streams/stream_spec.lua
     - prototypes/mir/domain/streams/raw_catalog.lua
     - prototypes/mir/domain/streams/descriptor.lua
     - prototypes/mir/domain/diagnostics/codes.lua
   policy:
-    - prototypes/mir/policy/adoption_policy.lua
     - prototypes/mir/policy/owner_policy.lua
     - prototypes/mir/policy/competing_productivity.lua
     - prototypes/mir/policy/competing_base_extensions.lua
-    - prototypes/mir/policy/productivity_family_adoption.lua
     - prototypes/mir/policy/max_level.lua
     - prototypes/mir/policy/weapon_speed.lua
     - prototypes/mir/policy/native_effect_coverage.lua
@@ -182,6 +174,7 @@ modules:
     - prototypes/mir/planner/costs.lua
     - prototypes/mir/planner/direct_effects.lua
     - prototypes/mir/planner/native_modifiers.lua
+    - prototypes/mir/planner/native_owner_binding.lua
     - prototypes/mir/planner/prerequisites.lua
     - prototypes/mir/planner/requirements.lua
     - prototypes/mir/planner/technology_requirements.lua
@@ -363,14 +356,15 @@ rules:
   - No old compat/lib/legacy/control/planner shim directories are allowed.
   - No broad root helper shims are allowed.
   - Only settings/stage_builder.lua may register setting prototypes directly.
-  - Generated technologies and mod-data prototypes emit through prototypes/mir/emit.
+  - Generated technologies and target-supported mod-data prototypes emit through prototypes/mir/emit.
+  - Prototype-family emission must consult the current target profile before calling the Factorio data adapter.
   - Compatibility overlays register policy only.
   - Compatibility repairs may normalize exact-version upstream loader schemas or remove one topology-proven cross-mod cycle edge.
   - Domain modules do not read Factorio globals.
   - Report modules do not mutate prototypes.
   - Target and convergence policy live in machine-readable .mir manifests.
   - Historical branches provide behavior evidence and do not define a parallel core.
-  - CompilerProvider schema 1 is the stable data-only family extension boundary in 3.1.5.
+  - CompilerProvider schema 1 is the stable data-only family extension boundary in 3.1.9.
   - Providers may discover and normalize candidates but remain planning-only; emission owns generated prototype mutation.
   - Automatic family creation maturity is declarative; reviewed creation cannot promote experimental providers.
   - Top-level MIR Lua module dependencies must remain acyclic.
@@ -378,6 +372,23 @@ rules:
 validation_tooling:
   facade: scripts/Invoke-MIRValidation.ps1
   modules:
+    assurance: scripts/Invoke-MIRAssurance.ps1
+    assurance_core: scripts/MIRAssurance/Core.ps1
+    assurance_evidence: scripts/MIRAssurance/Evidence.ps1
+    assurance_hashing: scripts/MIRAssurance/Hashing.ps1
+    assurance_release: scripts/MIRAssurance/Release.ps1
+    assurance_tests: scripts/Test-MIRAssurance.ps1
+    native_owner_balance_tests: scripts/Test-MIRNativeOwnerCostModels.ps1
+    canonical_lower_feature_model: .mir/canonical-lower-features.json
+    museum_catalog: .mir/museum-targets.json
+    museum_compiler: scripts/Museum/MuseumCompiler.psm1
+    museum_build: scripts/Build-MIRMuseumTarget.ps1
+    museum_static_gate: scripts/Test-MIRMuseumCompiler.ps1
+    museum_runtime_gate: scripts/Test-MIRMuseumRuntime.ps1
+    museum_qualification: scripts/New-MIRMuseumQualification.ps1
+    museum_seal_writer: scripts/New-MIRMuseumSeal.ps1
+    museum_seal_check: scripts/Test-MIRMuseumSeal.ps1
+    backport_source_lock: scripts/Test-MIRBackportSourceLock.ps1
     package_identity: scripts/validation/PackageIdentity.ps1
     target_metadata: scripts/validation/TargetProfiles.ps1
     scenario_groups: scripts/validation/ScenarioGroups.ps1
@@ -389,21 +400,18 @@ validation_tooling:
     campaign_scenarios: scripts/Test-MIRScenarioManifests.ps1
     planner_artifacts: scripts/Test-MIRPlannerTools.ps1
     compiler_schema_drift: scripts/Test-MIRCompilerSchemaDrift.ps1
-    museum_catalog: .mir/museum-targets.json
-    museum_compiler: scripts/Museum/MuseumCompiler.psm1
-    museum_build: scripts/Build-MIRMuseumTarget.ps1
-    museum_static_gate: scripts/Test-MIRMuseumCompiler.ps1
-    museum_runtime_gate: scripts/Test-MIRMuseumRuntime.ps1
-    museum_qualification: scripts/New-MIRMuseumQualification.ps1
-    museum_seal_writer: scripts/New-MIRMuseumSeal.ps1
-    museum_seal_check: scripts/Test-MIRMuseumSeal.ps1
   rules:
+    - assurance plans use stable test IDs complete content-addressed evidence inputs and gate-ordered profiles
+    - passing evidence is reusable only under exact per-test fingerprints while failed and blocked lanes rerun
+    - candidate seals bind exact qualified bytes and canonical repository identities without publishing
+    - native-owner balance snapshots bind reviewed source values formula adapters planner bindings and emission transactions
+    - museum compilation runs only in the development environment and emits finite target-era Lua
+    - museum target selection resolves canonical feature IDs from .mir/canonical-lower-features.json and cannot own an independent feature list
+    - museum target packages contain no compiler tooling manifests evidence fixtures or modern runtime source
+    - each museum technology is emitted from a stable manifest row and a matching-base effect proof
     - the facade preserves its public parameters and structured result schema
     - process launch and copied-mod filesystem safety are reusable modules
     - settings overrides are declarative and isolated from scenario orchestration
     - every executed scenario resolves through a target-bound declaration record
     - compatibility campaign records own setup roots settings expectations timeout and claim level
     - scenarios retain stable names and explicit groups while decomposition proceeds
-    - museum compilation runs only in the development environment and emits finite target-era Lua
-    - museum target packages contain no compiler tooling manifests evidence fixtures or modern runtime source
-    - each museum technology is emitted from a stable manifest row and a matching-base effect proof

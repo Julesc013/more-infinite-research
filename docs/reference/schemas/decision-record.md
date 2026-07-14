@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: developer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-07-07
+last_reviewed: 2026-07-12
 supersedes: []
 superseded_by: []
 ---
@@ -13,22 +13,17 @@ superseded_by: []
 
 Updated: 2026-07-07
 
-Decision records are the audit trail for the MIR compatibility compiler. They
-explain why a candidate generated, skipped, rejected, or remained diagnostic.
+Decision records are the audit trail for the MIR compatibility compiler. They explain why a candidate generated, skipped, rejected, or remained diagnostic.
 
-Current generated-technology rows are normalized by
-`prototypes/mir/domain/decisions/decision_record.lua` before
-`prototypes/mir/planner/compiler.lua` passes them to diagnostics. This keeps the
-legacy planner output stable while moving row construction behind the MIR 3
-domain boundary.
+Current generated-technology rows are normalized by `prototypes/mir/domain/decisions/decision_record.lua` before `prototypes/mir/planner/compiler.lua` passes them to diagnostics. This keeps the legacy planner output stable while moving row construction behind the MIR 3 domain boundary.
 
-## DecisionRecord V1
+## DecisionRecord V2
 
 Minimum shape:
 
 ```lua
 DecisionRecord = {
-  schema = 1,
+  schema = 2,
   subject_type = "recipe",
   subject = "atan-pollution-filter",
   capability = "recipe-productivity.clean-filter",
@@ -36,14 +31,15 @@ DecisionRecord = {
   subfamily = "air-scrubbing",
   decision = "generate_stream",
   confidence = {
-    identity = 1.0,
-    family = 1.0,
-    science = 1.0,
-    lab = 1.0,
-    owner = 1.0,
-    loop_safety = 1.0,
-    cap = 1.0,
+    identity = "exact",
+    family = "exact",
+    tier = "exact",
+    science = "exact",
+    lab = "exact",
+    owner = "exact",
+    loop_safety = "exact",
     total = 1.0,
+    scores = {},
   },
   emitted = true,
   source = "compat_policy:air-scrubbing",
@@ -59,14 +55,21 @@ For a rejected loop:
 
 ```lua
 DecisionRecord = {
-  schema = 1,
+  schema = 2,
   subject_type = "recipe",
   subject = "atan-clean-pollution-filter",
   capability = "recipe-productivity.clean-filter",
   family = "cleaning_recovery",
   decision = "diagnose_only",
   confidence = {
-    total = 0.95,
+    identity = "structural",
+    family = "structural",
+    tier = "heuristic",
+    science = "inferred",
+    lab = "inferred",
+    owner = "inferred",
+    loop_safety = "heuristic",
+    total = 0.25,
   },
   emitted = false,
   reason = "recovery loop; productivity could duplicate returned filters or recovery outputs",
@@ -76,6 +79,8 @@ DecisionRecord = {
 ```
 
 ## Decision Values
+
+Confidence evidence classes are `exact`, `structural`, `inferred`, and `heuristic`. The numeric `total` ranks review priority only. It never overrides target, effect, owner, science, lab, prerequisite, or loop-safety gates.
 
 Use stable values:
 
@@ -130,5 +135,4 @@ Decision output must be stable:
 - avoid run-specific hashes in exact curated stream IDs;
 - keep JSON key ordering stable where scripts can control it.
 
-Stable rows make fixture diffs meaningful and save compatibility review
-possible.
+Stable rows make fixture diffs meaningful and save compatibility review possible.

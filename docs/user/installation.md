@@ -12,8 +12,7 @@ superseded_by: []
 
 # Installation
 
-Install More Infinite Research from the Factorio mod portal or place the release
-zip in the Factorio mods directory.
+Install More Infinite Research from the Factorio mod portal or place the release zip in the Factorio mods directory.
 
 Packaged archives are named:
 
@@ -21,7 +20,4 @@ Packaged archives are named:
 more-infinite-research_<version>.zip
 ```
 
-The release zip contains the Factorio runtime files only: metadata, settings,
-data-stage entrypoints, control code when needed, locale, migrations, thumbnail,
-and shipped prototype source. Repository docs, fixtures, scripts, tests, build
-artifacts, and `.mir/` governance files are not shipped.
+The release zip contains the Factorio runtime files only: metadata, settings, data-stage entrypoints, control code when needed, locale, migrations, thumbnail, and shipped prototype source. Repository docs, fixtures, scripts, tests, build artifacts, and `.mir/` governance files are not shipped.

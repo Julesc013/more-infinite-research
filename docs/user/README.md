@@ -22,5 +22,4 @@ These pages explain MIR from the player and modpack-author point of view.
 - [Troubleshooting](troubleshooting.md)
 - [FAQ](faq.md)
 
-Architecture debates, release plans, and schema details belong outside this
-section.
+Architecture debates, release plans, and schema details belong outside this section.

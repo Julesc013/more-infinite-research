@@ -12,7 +12,4 @@ superseded_by: []
 
 # Machine Manufacturing Capability
 
-Machine manufacturing is the future capability lane for assemblers, furnaces,
-mining drills, labs, and other placeable machines. New behavior should start as
-report-first classification, then gain generation only after fixtures prove
-owner, science, cap, and loop-risk gates.
+Machine manufacturing is the future capability lane for assemblers, furnaces, mining drills, labs, and other placeable machines. New behavior should start as report-first classification, then gain generation only after fixtures prove owner, science, cap, and loop-risk gates.
