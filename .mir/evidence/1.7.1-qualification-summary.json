@@ -26,7 +26,7 @@
   "ecosystem": "fixture-and-named-scenario evidence only; no broader public claim added",
   "public_release": false,
   "tag": "not-run",
-  "qualified_source_commit": "f535ee76c45f565000bbfeaf480c5b7f59994860",
+  "qualified_source_commit": "2f9ae5714b0693ef298b2510a1f86c3c5f2aa1bc",
   "canonical_dev_anchor": "dc5bfa99249af6c9508201a4c4667063bc8e021c",
   "gates": {
     "source_lock": "passed",
@@ -68,6 +68,11 @@
       "attempt": 4,
       "status": "passed",
       "disposition": "complete rerun after canonical seal identity alias fix"
+    },
+    {
+      "attempt": 5,
+      "status": "passed",
+      "disposition": "complete rerun after cross-worktree normalized seal binding fix"
     }
   ],
   "superseded_candidate": {
