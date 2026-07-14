@@ -4,7 +4,8 @@ param(
   [string]$CandidateZip,
   [string]$PriorZip,
   [switch]$StaticOnly,
-  [switch]$RuntimeOnly
+  [switch]$RuntimeOnly,
+  [switch]$UseExistingCandidate
 )
 
 $ErrorActionPreference = "Stop"
@@ -132,7 +133,11 @@ function Get-MIRSealValues {
 
 if ($Action -eq "qualify") {
   if (-not $RuntimeOnly) {
-    & (Join-Path $PSScriptRoot "Build-MIRPackage.ps1") -OutputDir dist -CompressionLevel Optimal | Out-Host
+    if (-not $UseExistingCandidate) {
+      & (Join-Path $PSScriptRoot "Build-MIRPackage.ps1") -OutputDir dist -CompressionLevel Optimal | Out-Host
+    } elseif (-not (Test-Path -LiteralPath $CandidateZip -PathType Leaf)) {
+      throw "UseExistingCandidate requires an existing exact candidate ZIP."
+    }
     $CandidateZip = (Resolve-Path -LiteralPath $CandidateZip).Path
     & (Join-Path $PSScriptRoot "Test-MIRBackportCapabilities.ps1") | Out-Host
     & (Join-Path $PSScriptRoot "Test-MIRSettingsVisibility.ps1") | Out-Host
