@@ -31,8 +31,12 @@ if ([string]$sourceLock.target -ne $FactorioVersion -or [string]$sourceLock.mir_
 function Get-StringSha256([string]$Text) {
   return [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData([Text.UTF8Encoding]::new($false).GetBytes($Text)))
 }
+function Get-RepositoryTextSha256([string]$Path) {
+  $text = [IO.File]::ReadAllText($Path).Replace("`r`n", "`n").Replace("`r", "`n")
+  return Get-StringSha256 $text
+}
 function Get-FileSetFingerprint([string[]]$RelativePaths) {
-  $lines = @($RelativePaths | Sort-Object | ForEach-Object { "$($_.Replace('\', '/'))|$(Get-MIRSha256 (Join-Path $repo $_))" })
+  $lines = @($RelativePaths | Sort-Object | ForEach-Object { "$($_.Replace('\', '/'))|$(Get-RepositoryTextSha256 (Join-Path $repo $_))" })
   return Get-StringSha256 (($lines -join "`n") + "`n")
 }
 
@@ -58,8 +62,8 @@ $record = [ordered]@{
   mir_version = [string]$target.version
   target = $FactorioVersion
   canonical_dev_anchor = [string]$sourceLock.canonical_dev_anchor
-  backport_source_lock_sha256 = Get-MIRSha256 $sourceLockPath
-  canonical_feature_model_sha256 = Get-MIRSha256 (Join-Path $repo ".mir\canonical-lower-features.json")
+  backport_source_lock_sha256 = Get-RepositoryTextSha256 $sourceLockPath
+  canonical_feature_model_sha256 = Get-RepositoryTextSha256 (Join-Path $repo ".mir\canonical-lower-features.json")
   source_commit = (& git -C $repo rev-parse HEAD).Trim()
   candidate = [ordered]@{
     path = (Resolve-Path -LiteralPath $PackagePath).Path.Substring($repo.Path.Length + 1).Replace('\', '/')
@@ -72,7 +76,7 @@ $record = [ordered]@{
   target_profile_sha256 = Get-StringSha256 ($profileText + "`n")
   validation_harness_fingerprint = Get-FileSetFingerprint $harnessPaths
   factorio_binary_sha256 = Get-MIRSha256 ([string]$target.binary).Replace('/', '\')
-  qualification_summary_sha256 = Get-MIRSha256 $QualificationSummaryPath
+  qualification_summary_sha256 = Get-RepositoryTextSha256 $QualificationSummaryPath
   release_actions = "not-run-maintainer-only"
 }
 Set-MIRUtf8Text -Path $OutputPath -Text (($record | ConvertTo-Json -Depth 20) + "`n")

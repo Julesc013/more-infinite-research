@@ -63,7 +63,18 @@ if ($LASTEXITCODE -ne 0 -or [string]$anchorRefCommit -ne [string]$lock.canonical
 if ($LASTEXITCODE -ne 0) { throw "Target history does not contain the canonical development anchor." }
 
 $info = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "info.json") | ConvertFrom-Json
-if ([string]$info.version -ne [string]$lock.mir_version -or [string]$info.factorio_version -ne [string]$lock.target) {
+$infoTarget = [string]$info.factorio_version
+if ([string]::IsNullOrWhiteSpace($infoTarget)) {
+  $identityCatalogPath = Join-Path $RepoRoot ".mir\museum-targets.json"
+  if (Test-Path -LiteralPath $identityCatalogPath -PathType Leaf) {
+    $identityCatalog = Get-Content -Raw -LiteralPath $identityCatalogPath | ConvertFrom-Json
+    $identityMuseumTarget = @($identityCatalog.targets | Where-Object { [string]$_.factorio -eq [string]$lock.target }) | Select-Object -First 1
+    if ($null -ne $identityMuseumTarget -and [string]$identityMuseumTarget.version -eq [string]$info.version) {
+      $infoTarget = [string]$identityMuseumTarget.factorio
+    }
+  }
+}
+if ([string]$info.version -ne [string]$lock.mir_version -or $infoTarget -ne [string]$lock.target) {
   throw "Source-lock target identity disagrees with info.json."
 }
 
