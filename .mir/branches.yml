@@ -358,15 +358,21 @@ release_artifacts:
       source_lock: .mir/backport-source-lock.json
       artifact: dist/more-infinite-research_2.4.1.zip
       structured_summary: .mir/evidence/2.4.1-change-aware-qualification.json
+      structured_summary_run_id: 7f6d0e2e-75ff-4145-962e-bdf93204de80
+      candidate_source_commit: b197e93b0e34149a4d38777e59ca69113036377b
+      sha256: 479F57587AB841060187561D6FFEE65B275E2C89832E142E5F3F315713F3FB30
+      package_content_sha256: EC246D3FAA87062B8519427252E11612791D9AE5322DDD793E27AE552D13BAE9
+      package_source_sha256: EC246D3FAA87062B8519427252E11612791D9AE5322DDD793E27AE552D13BAE9
+      scenario_result: 94/94
       superseded_candidate_source_commit: f42b45d1a9e5b6c61a14729a5d386eb6b88bf952
       superseded_candidate_sha256: 7931E97D9C5CFAB173B48976F1B7EF5A6E7956809D6EA98BF42CD8761C1AAC3D
       superseded_candidate_package_content_sha256: 621D26B40D36C52C9F556D1B2490E7FA266F1E022778EAEA15940CEA4522509D
       superseded_candidate_reason: incomplete-six-scenario-hotfix-not-a-complete-3.1.9-projection
-      automated_gate: pending-requalification
+      automated_gate: passed
       manual_gate: pending
       assurance_seal: .mir/evidence/candidate-seals/mir-2.4.1-factorio-2.0.json
       publication_scope: unreleased
-      status: reconstruction-in-progress
+      status: release-candidate-awaiting-manual-review
     mir_2_3_0:
       version: "2.3.0"
       branch: legacy
@@ -512,9 +518,9 @@ release_artifacts:
       source_anchor_commit: 9c8f40038e42fda378b855bb8132fd98a180b6a5
       upgrade_predecessor: mir_2_4_0
       artifact: dist/more-infinite-research_2.4.1.zip
-      validation_status: pending-requalification
+      validation_status: passed-94-of-94
       assurance_seal: .mir/evidence/candidate-seals/mir-2.4.1-factorio-2.0.json
-      status: reconstruction-in-progress
+      status: release-candidate-awaiting-manual-review
       purpose: complete Factorio 2.0 projection of the sealed MIR 3.1.9 portable behavior set
     factorio_1_1_port:
       version: "1.9.4"

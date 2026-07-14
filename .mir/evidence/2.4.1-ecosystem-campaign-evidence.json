@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "kind": "mir-modpack-campaign-evidence",
+  "generated_at": "2026-07-14T10:36:11.9139247Z",
+  "factorio_line": "2.0",
+  "factorio_binary": "D:\\Programs\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+  "mir_archive": {
+    "path": "",
+    "sha256": "",
+    "source_commit": "",
+    "source_commit_binding": "unbound"
+  },
+  "dependency_lock": {
+    "path": "C:\\Projects\\Factorio\\more-infinite-research-tmp-2.0\\artifacts\\release-targeted-2.4.1-seal-harness\\representative-local-scenario\\compat-candidates.lock.json",
+    "sha256": "7C17BA00DF229BD0FC62FDE0ECA650BC8D875C2945FE2509F48C2CD9DF02CCF2"
+  },
+  "scenarios": [
+    {
+      "scenario_id": "local-2-0-base-baseline",
+      "requested_roots": [],
+      "actual_executed_roots": [],
+      "resolved_mods": [],
+      "official_mods": [],
+      "dependency_closure": [],
+      "dependency_failure_count": 0,
+      "process_result": "passed",
+      "result": "passed",
+      "exit_code": 0,
+      "timed_out": false,
+      "timeout_seconds": 900,
+      "settings": {},
+      "expected_plan": {
+        "mode": "load-only",
+        "required_result": "passed",
+        "maximum_dependency_failures": 0
+      },
+      "source_manifest": "C:\\Projects\\Factorio\\more-infinite-research-tmp-2.0\\fixtures\\compat-matrix\\local-library-scenarios-2.0.json",
+      "claim_level": "loads"
+    }
+  ]
+}

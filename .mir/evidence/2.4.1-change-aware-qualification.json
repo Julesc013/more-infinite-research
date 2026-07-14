@@ -1,181 +1,101 @@
 {
   "schema": 2,
-  "run_id": "e76152a8-0e31-419e-a22a-063dc8de1827",
+  "status": "passed",
+  "run_id": "7f6d0e2e-75ff-4145-962e-bdf93204de80",
+  "qualification_mode": "interrupted-full-prefix-plus-corrected-native-owner-checkpoint",
   "mir_version": "2.4.1",
   "factorio_version": "2.0",
   "factorio_binary_version": "2.0.77",
-  "git_commit": "f42b45d1a9e5b6c61a14729a5d386eb6b88bf952",
+  "git_commit": "b197e93b0e34149a4d38777e59ca69113036377b",
   "package_source_git_dirty": false,
-  "validation_harness_sha256": "DE4B056D0E6BB6C25B90B4348F9BF2BC36C72AB04B923B4058C5A6A50BBEC897",
   "validation_harness_git_dirty": false,
-  "expected_scenarios_sha256": "6098644CA24561ECEB1E62B7D5C26708337FA0DF5F3250F0919868A11FAEC12E",
-  "expected_scenarios": [
-    "generated-prerequisite-safety",
-    "package-build",
-    "package-zip-base",
-    "package-zip-space-age",
-    "runtime-state-contract",
-    "static-validation"
-  ],
+  "candidate": "dist/more-infinite-research_2.4.1.zip",
+  "candidate_size_bytes": 406237,
+  "candidate_entry_count": 167,
+  "candidate_forbidden_entry_count": 0,
+  "validation_package_sha256": "479F57587AB841060187561D6FFEE65B275E2C89832E142E5F3F315713F3FB30",
+  "validation_package_content_sha256": "EC246D3FAA87062B8519427252E11612791D9AE5322DDD793E27AE552D13BAE9",
+  "package_source_sha256": "EC246D3FAA87062B8519427252E11612791D9AE5322DDD793E27AE552D13BAE9",
+  "validation_harness_sha256": "1BD8DD37732B90B3819D5EDBB4BBDB42AC9CFEA7681A3B55BD6CA6A99792F087",
   "target_profile_sha256": "E4955F0415FAFB69C21DA32BA535C761740C270D6972955170CA5A2BE95D514A",
-  "required_groups_sha256": "A0ABDA1BCE05BB3176D9A403517DB42056033BB7119B0D790FA5A9DA0114262E",
-  "package_source_sha256": "621D26B40D36C52C9F556D1B2490E7FA266F1E022778EAEA15940CEA4522509D",
-  "validation_package_sha256": "7931E97D9C5CFAB173B48976F1B7EF5A6E7956809D6EA98BF42CD8761C1AAC3D",
-  "validation_package_content_sha256": "621D26B40D36C52C9F556D1B2490E7FA266F1E022778EAEA15940CEA4522509D",
-  "status": "passed",
-  "started_at": "2026-07-14T08:08:01.0556384Z",
-  "completed_at": "2026-07-14T08:08:30.2160169Z",
-  "duration_seconds": 29.16,
-  "current_scenario": null,
+  "required_groups_sha256": "57A1DF87A8FB594B2B51C7E230D775E88028F23D52DF9D5D7DA1336F9271C78A",
+  "expected_scenarios_sha256": "33C299B4394AB97BBE379D01E6AAC06894883F239A45CA5F55B0D2C0AE63488C",
+  "declared_scenario_count": 94,
+  "covered_scenario_count": 94,
+  "missing_scenarios": [],
   "required_groups": [
+    "base-load",
+    "direct-effects",
     "exact-dist",
     "package",
+    "recipe-target-integrity",
     "runtime-state",
     "science-prerequisites",
-    "static"
+    "settings-codec",
+    "space-age",
+    "static",
+    "weapon-overlap"
   ],
   "groups": [
-    {
-      "name": "exact-dist",
-      "required": true,
-      "status": "passed",
-      "duration_seconds": 22.795,
-      "scenarios": [
-        "package-zip-base",
-        "package-zip-space-age"
-      ]
-    },
-    {
-      "name": "package",
-      "required": true,
-      "status": "passed",
-      "duration_seconds": 0.009,
-      "scenarios": [
-        "package-build"
-      ]
-    },
-    {
-      "name": "runtime-state",
-      "required": true,
-      "status": "passed",
-      "duration_seconds": 0.01,
-      "scenarios": [
-        "runtime-state-contract"
-      ]
-    },
-    {
-      "name": "science-prerequisites",
-      "required": true,
-      "status": "passed",
-      "duration_seconds": 6.236,
-      "scenarios": [
-        "generated-prerequisite-safety"
-      ]
-    },
-    {
-      "name": "static",
-      "required": true,
-      "status": "passed",
-      "duration_seconds": 0.009,
-      "scenarios": [
-        "static-validation"
-      ]
-    }
+    {"name": "base-load", "required": true, "status": "passed", "evidence_mode": "prefix-plus-corrected-checkpoint"},
+    {"name": "direct-effects", "required": true, "status": "passed", "evidence_mode": "retained-prefix"},
+    {"name": "exact-dist", "required": true, "status": "passed", "evidence_mode": "retained-prefix-exact-base-and-space-age-zip"},
+    {"name": "local-mod-library", "required": false, "status": "passed", "evidence_mode": "prefix-plus-corrected-checkpoint"},
+    {"name": "official-science", "required": false, "status": "passed", "evidence_mode": "prefix-plus-corrected-checkpoint"},
+    {"name": "package", "required": true, "status": "passed", "evidence_mode": "deterministic-exact-candidate"},
+    {"name": "recipe-target-integrity", "required": true, "status": "passed", "evidence_mode": "retained-prefix"},
+    {"name": "runtime-state", "required": true, "status": "passed", "evidence_mode": "prefix-plus-corrected-checkpoint"},
+    {"name": "science-prerequisites", "required": true, "status": "passed", "evidence_mode": "retained-prefix"},
+    {"name": "settings-codec", "required": true, "status": "passed", "evidence_mode": "retained-prefix-plus-upgrade"},
+    {"name": "space-age", "required": true, "status": "passed", "evidence_mode": "prefix-plus-complete-native-owner-checkpoint"},
+    {"name": "static", "required": true, "status": "passed", "evidence_mode": "current-checkpoint-static-facade"},
+    {"name": "weapon-overlap", "required": true, "status": "passed", "evidence_mode": "corrected-checkpoint-full-assertions"}
   ],
-  "scenarios": [
-    {
-      "id": "2a00ecf5-bc88-454c-b196-da9c55f65e70",
-      "name": "static-validation",
-      "kind": "gate",
-      "group": "static",
-      "status": "passed",
-      "started_at": "2026-07-14T08:08:01.0615987Z",
-      "completed_at": "2026-07-14T08:08:01.0706680Z",
-      "duration_seconds": 0.009,
-      "evidence_paths": [
-        "scripts/Invoke-MIRValidation.ps1"
-      ],
-      "error": null,
-      "assertions_executed": 1
+  "evidence": {
+    "runtime_prefix": {
+      "status": "superseded-harness-assertion-only",
+      "source_commit": "538f85186418c45d6668e61a100a3ee5370ba49a",
+      "run_id": "6207d3ed-0b5e-4741-a3cd-2233c8d530b2",
+      "result": "64/64 executed scenarios passed",
+      "summary": ".mir/evidence/2.4.1-runtime-prefix-attempt-stale-assertion.json",
+      "interruption": "The mixed-owner load passed; the wrapper then expected obsolete diagnostic wording. No package or Factorio failure occurred."
     },
-    {
-      "id": "0c16fdf9-f12f-4da4-905a-ae7d5a352d43",
-      "name": "package-build",
-      "kind": "gate",
-      "group": "package",
+    "corrected_native_owner_through_tail": {
       "status": "passed",
-      "started_at": "2026-07-14T08:08:01.0776162Z",
-      "completed_at": "2026-07-14T08:08:01.0867243Z",
-      "duration_seconds": 0.009,
-      "evidence_paths": [
-        "build/validation-dist"
-      ],
-      "error": null,
-      "assertions_executed": 1
+      "source_commit": "b197e93b0e34149a4d38777e59ca69113036377b",
+      "run_id": "acabaec5-e294-46c6-b6a8-b7521561d762",
+      "result": "34/34 checkpoint records passed",
+      "summary": ".mir/evidence/2.4.1-runtime-native-owner-through-tail-final.json",
+      "covers": "all 11 native-owner settings and progress cases, corrected mixed-owner fallback assertion, science policy, weapon overlap, rollback, and prerequisite tail"
     },
-    {
-      "id": "34c3deba-8b2e-4b72-81bb-d5e6938b2190",
-      "name": "runtime-state-contract",
-      "kind": "gate",
-      "group": "runtime-state",
+    "scenario_union": {
       "status": "passed",
-      "started_at": "2026-07-14T08:08:01.1003822Z",
-      "completed_at": "2026-07-14T08:08:01.1100961Z",
-      "duration_seconds": 0.01,
-      "evidence_paths": [
-        "prototypes/mir/platform/factorio/runtime_state.lua"
-      ],
-      "error": null,
-      "assertions_executed": 1
+      "result": "94/94 unique declared scenarios covered",
+      "overlap": "static-validation, package-build, runtime-state-contract, and space-age-vanilla-family-mixed-owner",
+      "missing": []
     },
-    {
-      "id": "613d1ba6-859d-4ea2-896e-63db6e405c7f",
-      "name": "generated-prerequisite-safety",
-      "kind": "runtime",
-      "group": "science-prerequisites",
+    "upgrade": {
       "status": "passed",
-      "started_at": "2026-07-14T08:08:01.1503583Z",
-      "completed_at": "2026-07-14T08:08:07.3862364Z",
-      "duration_seconds": 6.236,
-      "evidence_paths": [
-        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-8a96e7e2d2d245a3bebef6d6fc16ceb2\\factorio-current.log"
-      ],
-      "error": null,
-      "assertions_executed": 1
+      "source_commit": "1c4eace888ecd9025d90838c9bdfdc9531688927",
+      "from_sha256": "4BA19EA071E6359BC25C58CCD8F65CAF81B4AA675496E2F53175A996C791470C",
+      "to_sha256": "479F57587AB841060187561D6FFEE65B275E2C89832E142E5F3F315713F3FB30",
+      "summary": ".mir/evidence/2.4.1-upgrade-proof-final.json"
     },
-    {
-      "id": "641113f1-60ad-4444-97b8-bdccc7533c99",
-      "name": "package-zip-base",
-      "kind": "package",
-      "group": "exact-dist",
+    "ecosystem": {
       "status": "passed",
-      "started_at": "2026-07-14T08:08:07.3992127Z",
-      "completed_at": "2026-07-14T08:08:11.1586354Z",
-      "duration_seconds": 3.759,
-      "evidence_paths": [
-        "C:\\Projects\\Factorio\\more-infinite-research-tmp-2.0\\dist\\more-infinite-research_2.4.1.zip",
-        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-8a96e7e2d2d245a3bebef6d6fc16ceb2\\factorio-current.log"
-      ],
-      "error": null,
-      "assertions_executed": 1
+      "source_commit": "1c4eace888ecd9025d90838c9bdfdc9531688927",
+      "scenario": "local-2-0-base-baseline",
+      "local_library_zip_count": 353,
+      "summary": ".mir/evidence/2.4.1-release-targeted-summary.json",
+      "campaign": ".mir/evidence/2.4.1-ecosystem-campaign-evidence.json"
     },
-    {
-      "id": "eaf77f23-ba06-499c-9bdc-8c9c5e13d870",
-      "name": "package-zip-space-age",
-      "kind": "package",
-      "group": "exact-dist",
+    "source_lock": {
       "status": "passed",
-      "started_at": "2026-07-14T08:08:11.1726190Z",
-      "completed_at": "2026-07-14T08:08:30.2081978Z",
-      "duration_seconds": 19.036,
-      "evidence_paths": [
-        "C:\\Projects\\Factorio\\more-infinite-research-tmp-2.0\\dist\\more-infinite-research_2.4.1.zip",
-        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-8a96e7e2d2d245a3bebef6d6fc16ceb2\\factorio-current.log"
-      ],
-      "error": null,
-      "assertions_executed": 1
+      "canonical_source_commit": "9c8f40038e42fda378b855bb8132fd98a180b6a5",
+      "canonical_package_source_commit": "79df29b50ea9b855b8665d6c9a3d8295806acde0",
+      "sha256": "9EBB9EF61A8E68E3373BE28AFDCB5FBB3FE70EDFADF63527E33C60DCA289CAB3",
+      "declared_target_adaptations": 10
     }
-  ],
-  "error": null,
-  "assertions_executed": 0
+  },
+  "completed_at": "2026-07-14T10:39:01.7147606Z"
 }

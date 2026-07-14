@@ -1,0 +1,33 @@
+{
+  "schema": 1,
+  "status": "passed",
+  "state": "RUNTIME-QUALIFIED",
+  "release_status": "NOT RELEASED",
+  "target": "2.0",
+  "version": "2.4.1",
+  "source_commit": "b197e93b0e34149a4d38777e59ca69113036377b",
+  "qualification_mode": "complete-bootstrap-prefix-plus-affected-checkpoint",
+  "build": {
+    "candidate": "dist/more-infinite-research_2.4.1.zip",
+    "sha256": "479F57587AB841060187561D6FFEE65B275E2C89832E142E5F3F315713F3FB30",
+    "content_sha256": "EC246D3FAA87062B8519427252E11612791D9AE5322DDD793E27AE552D13BAE9",
+    "package_source_sha256": "EC246D3FAA87062B8519427252E11612791D9AE5322DDD793E27AE552D13BAE9",
+    "size_bytes": 406237,
+    "entry_count": 167,
+    "forbidden_entry_count": 0
+  },
+  "assurance_inputs": {
+    "package_source_sha256": "418EB7F43D4B7289A84E00B838EA9D7126A868B9647971B40606C27CEF004DE4",
+    "test_catalog_sha256": "5F507FEF51AA5B5FABBC8DCD22BC231F3641B9269F93B12B7B6BBC042BC73806",
+    "validation_harness_sha256": "E97CE9F0026A4A254F45BFE01B3EA0D084E83141BE3E670F4A456953C093E854",
+    "factorio_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "evidence": [
+    {"test_id": "static.full", "status": "passed", "message": "Current static facade passed in the corrected checkpoint run."},
+    {"test_id": "runtime.full", "status": "passed", "message": "64-record prefix plus 34-record corrected checkpoint cover 94/94 unique declared scenarios."},
+    {"test_id": "runtime.upgrade", "status": "passed", "message": "Exact released 2.4.0 archive upgraded to the exact 2.4.1 candidate with settings, native-owner level, selection, and fractional progress retained."},
+    {"test_id": "runtime.ecosystem", "status": "passed", "message": "Final-harness local-2-0-base-baseline ecosystem canary passed against the 353-ZIP local library."}
+  ],
+  "structured_summary": ".mir/evidence/2.4.1-change-aware-qualification.json",
+  "completed_at": "2026-07-14T10:39:01.7147606Z"
+}
