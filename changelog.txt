@@ -1,4 +1,15 @@
 ---------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
+Version: 1.8.2
+Date: 2026-07-15
+
+  Changes:
+
+    - Reconstructed the Factorio 1.0 release from the qualified 3.1.9 development anchor.
+    - Retained the stable reduced stream set and legacy science-pack discovery path.
+    - Added source-lock, deterministic-package, exact-binary, and upgrade evidence gates.
+
+---------------------------------------------------------------------------------------------------
 Version: 3.1.9
 Date: 2026-07-14
 

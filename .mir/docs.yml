@@ -1592,3 +1592,11 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - mir-3.1.9-2.4.5-ring-synthesis
+  - path: docs/releases/1.8.2.md
+    title: "MIR 1.8.2 Factorio 1.0 Release Record"
+    status: current
+    audience: release-manager
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-1.8.2-release
