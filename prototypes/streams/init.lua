@@ -1,6 +1,12 @@
-local raw_catalog = require("prototypes.mir.domain.streams.raw_catalog")
+local streams = {}
 
-return raw_catalog.merge_unique({
-  { name = "productivity", streams = require("prototypes.streams.productivity") },
-  { name = "direct-effects", streams = require("prototypes.streams.direct-effects") }
-})
+local function merge(source)
+  for key, spec in pairs(source) do
+    streams[key] = spec
+  end
+end
+
+merge(require("prototypes.streams.productivity"))
+merge(require("prototypes.streams.direct-effects"))
+
+return streams

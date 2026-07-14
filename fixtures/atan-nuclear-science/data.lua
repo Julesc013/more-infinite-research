@@ -1,24 +1,15 @@
-local science_icon = "__base__/graphics/icons/utility-science-pack.png"
-local target_profile = require("__more-infinite-research__.prototypes.mir.platform.factorio.target_profiles").current()
-local science_pack_type = target_profile.prototype_shapes.science_pack_prototype_kinds[1]
-local science_pack = {
-  type = science_pack_type,
-  name = "nuclear-science-pack",
-  icon = science_icon,
-  icon_size = 64,
-  subgroup = "science-pack",
-  order = "mir-nuclear-science-pack",
-  stack_size = 200
-}
-if science_pack_type == "tool" then
-  science_pack.durability = 1
-  science_pack.durability_description_key = "description.science-pack-remaining-amount-key"
-  science_pack.factoriopedia_durability_description_key = "description.factoriopedia-science-pack-remaining-amount-key"
-  science_pack.durability_description_value = "description.science-pack-remaining-amount-value"
-end
+local science_icon = "__base__/graphics/icons/alien-science-pack.png"
 
 data:extend({
-  science_pack,
+  {
+    type = "item",
+    name = "nuclear-science-pack",
+    icon = science_icon,
+    icon_size = 64,
+    subgroup = "science-pack",
+    order = "mir-nuclear-science-pack",
+    stack_size = 200
+  },
   {
     type = "item",
     name = "atan-atom-forge",
@@ -74,9 +65,9 @@ data:extend({
     unit = {
       count = 100,
       ingredients = {
-        {"automation-science-pack", 1},
-        {"logistic-science-pack", 1},
-        {"chemical-science-pack", 1}
+        {"science-pack-1", 1},
+        {"science-pack-2", 1},
+        {"science-pack-3", 1}
       },
       time = 30
     }

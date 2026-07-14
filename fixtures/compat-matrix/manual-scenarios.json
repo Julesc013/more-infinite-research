@@ -1,102 +1,28 @@
 {
-  "schema": 2,
+  "schema": 1,
   "scenarios": [
     {
       "name": "base-baseline",
-      "targets": [
-        "2.0",
-        "2.1"
-      ],
-      "kind": "modpack-load",
-      "group": "compatibility-campaign",
-      "setup": {
-        "mode": "portal-or-local",
-        "include_space_age": false,
-        "offline": false,
-        "exact_mir_archive": true
-      },
-      "roots": [
-        "more-infinite-research"
-      ],
-      "settings": {},
-      "expected_plan": {
-        "mode": "load-only",
-        "required_result": "passed",
-        "maximum_dependency_failures": 0
-      },
-      "timeout_seconds": 900,
-      "claim_level": "loads",
+      "include_space_age": false,
+      "mods": ["more-infinite-research"],
       "notes": "Base-only audit smoke scenario for line-aware release gates."
     },
     {
       "name": "space-age-baseline",
-      "targets": [
-        "2.0",
-        "2.1"
-      ],
-      "kind": "modpack-load",
-      "group": "compatibility-campaign",
-      "setup": {
-        "mode": "portal-or-local",
-        "include_space_age": true,
-        "offline": false,
-        "exact_mir_archive": true
-      },
-      "roots": [
-        "more-infinite-research"
-      ],
-      "settings": {},
-      "expected_plan": {
-        "mode": "load-only",
-        "required_result": "passed",
-        "maximum_dependency_failures": 0
-      },
-      "timeout_seconds": 900,
-      "claim_level": "loads",
+      "include_space_age": true,
+      "mods": ["more-infinite-research"],
       "notes": "Baseline official Space Age bundle surface."
     },
     {
       "name": "space-age-circuit-competitor",
-      "targets": [
-        "2.0",
-        "2.1"
-      ],
-      "kind": "modpack-load",
-      "group": "compatibility-campaign",
-      "setup": {
-        "mode": "portal-or-local",
-        "include_space_age": true,
-        "offline": false,
-        "exact_mir_archive": true
-      },
-      "roots": [
-        "plates-n-circuit-productivity"
-      ],
-      "settings": {},
-      "expected_plan": {
-        "mode": "load-only",
-        "required_result": "passed",
-        "maximum_dependency_failures": 0
-      },
-      "timeout_seconds": 900,
-      "claim_level": "loads",
+      "include_space_age": true,
+      "mods": ["plates-n-circuit-productivity"],
       "notes": "Known fully replaceable plate and circuit productivity competitor."
     },
     {
       "name": "space-age-planet-cluster",
-      "targets": [
-        "2.0",
-        "2.1"
-      ],
-      "kind": "modpack-load",
-      "group": "compatibility-campaign",
-      "setup": {
-        "mode": "portal-or-local",
-        "include_space_age": true,
-        "offline": false,
-        "exact_mir_archive": true
-      },
-      "roots": [
+      "include_space_age": true,
+      "mods": [
         "maraxsis",
         "Cerys-Moon-of-Fulgora",
         "corrundum",
@@ -108,175 +34,42 @@
         "cubium",
         "tenebris-prime"
       ],
-      "settings": {},
-      "expected_plan": {
-        "mode": "load-only",
-        "required_result": "passed",
-        "maximum_dependency_failures": 0
-      },
-      "timeout_seconds": 900,
-      "claim_level": "loads",
       "notes": "High-risk Space Age planet-pack cluster for productivity-family adoption and residual recipe ownership."
     },
     {
       "name": "bz-suite-space-age",
-      "targets": [
-        "2.0",
-        "2.1"
-      ],
-      "kind": "modpack-load",
-      "group": "compatibility-campaign",
-      "setup": {
-        "mode": "portal-or-local",
-        "include_space_age": true,
-        "offline": false,
-        "exact_mir_archive": true
-      },
-      "roots": [
-        "bztitanium",
-        "bzcarbon",
-        "bztin",
-        "bzzirconium"
-      ],
-      "settings": {},
-      "expected_plan": {
-        "mode": "load-only",
-        "required_result": "passed",
-        "maximum_dependency_failures": 0
-      },
-      "timeout_seconds": 900,
-      "claim_level": "loads",
+      "include_space_age": true,
+      "mods": ["bztitanium", "bzcarbon", "bztin", "bzzirconium"],
       "notes": "Resource and intermediate-chain coverage with the official Space Age bundle."
     },
     {
       "name": "krastorio2-spaced-out",
-      "targets": [
-        "2.0",
-        "2.1"
-      ],
-      "kind": "modpack-load",
-      "group": "compatibility-campaign",
-      "setup": {
-        "mode": "portal-or-local",
-        "include_space_age": true,
-        "offline": false,
-        "exact_mir_archive": true
-      },
-      "roots": [
-        "Krastorio2-spaced-out"
-      ],
-      "settings": {},
-      "expected_plan": {
-        "mode": "load-only",
-        "required_result": "passed",
-        "maximum_dependency_failures": 0
-      },
-      "timeout_seconds": 900,
-      "claim_level": "loads",
+      "include_space_age": true,
+      "mods": ["Krastorio2-spaced-out"],
       "notes": "High-priority Space Age overhaul scenario."
     },
     {
       "name": "exotic-space-industries",
-      "targets": [
-        "2.0",
-        "2.1"
-      ],
-      "kind": "modpack-load",
-      "group": "compatibility-campaign",
-      "setup": {
-        "mode": "portal-or-local",
-        "include_space_age": true,
-        "offline": false,
-        "exact_mir_archive": true
-      },
-      "roots": [
-        "exotic-space-industries-remembrance"
-      ],
-      "settings": {},
-      "expected_plan": {
-        "mode": "load-only",
-        "required_result": "passed",
-        "maximum_dependency_failures": 0
-      },
-      "timeout_seconds": 900,
-      "claim_level": "loads",
+      "include_space_age": true,
+      "mods": ["exotic-space-industries-remembrance"],
       "notes": "Large Space Age overhaul-style scenario."
     },
     {
       "name": "bob-core-suite",
-      "targets": [
-        "2.0",
-        "2.1"
-      ],
-      "kind": "modpack-load",
-      "group": "compatibility-campaign",
-      "setup": {
-        "mode": "portal-or-local",
-        "include_space_age": false,
-        "offline": false,
-        "exact_mir_archive": true
-      },
-      "roots": [
-        "boblibrary",
-        "bobplates",
-        "bobelectronics",
-        "bobtech"
-      ],
-      "settings": {},
-      "expected_plan": {
-        "mode": "load-only",
-        "required_result": "passed",
-        "maximum_dependency_failures": 0
-      },
-      "timeout_seconds": 900,
-      "claim_level": "loads",
+      "include_space_age": false,
+      "mods": ["boblibrary", "bobplates", "bobelectronics", "bobtech"],
       "notes": "Circuit, plate, and science progression stress scenario."
     },
     {
       "name": "angels-core-suite",
-      "targets": [
-        "2.0",
-        "2.1"
-      ],
-      "kind": "modpack-load",
-      "group": "compatibility-campaign",
-      "setup": {
-        "mode": "portal-or-local",
-        "include_space_age": false,
-        "offline": false,
-        "exact_mir_archive": true
-      },
-      "roots": [
-        "angelsrefining",
-        "angelssmelting",
-        "angelspetrochem",
-        "angelsindustries"
-      ],
-      "settings": {},
-      "expected_plan": {
-        "mode": "load-only",
-        "required_result": "passed",
-        "maximum_dependency_failures": 0
-      },
-      "timeout_seconds": 900,
-      "claim_level": "loads",
+      "include_space_age": false,
+      "mods": ["angelsrefining", "angelssmelting", "angelspetrochem", "angelsindustries"],
       "notes": "Angel core chain compatibility surface."
     },
     {
       "name": "bob-angels",
-      "targets": [
-        "2.0",
-        "2.1"
-      ],
-      "kind": "modpack-load",
-      "group": "compatibility-campaign",
-      "setup": {
-        "mode": "portal-or-local",
-        "include_space_age": false,
-        "offline": false,
-        "exact_mir_archive": true
-      },
-      "roots": [
+      "include_space_age": false,
+      "mods": [
         "boblibrary",
         "bobplates",
         "bobelectronics",
@@ -286,149 +79,36 @@
         "angelspetrochem",
         "angelsindustries"
       ],
-      "settings": {},
-      "expected_plan": {
-        "mode": "load-only",
-        "required_result": "passed",
-        "maximum_dependency_failures": 0
-      },
-      "timeout_seconds": 900,
-      "claim_level": "loads",
       "notes": "Classic Angel/Bob combined overhaul surface."
     },
     {
       "name": "krastorio2",
-      "targets": [
-        "2.0",
-        "2.1"
-      ],
-      "kind": "modpack-load",
-      "group": "compatibility-campaign",
-      "setup": {
-        "mode": "portal-or-local",
-        "include_space_age": false,
-        "offline": false,
-        "exact_mir_archive": true
-      },
-      "roots": [
-        "Krastorio2"
-      ],
-      "settings": {},
-      "expected_plan": {
-        "mode": "load-only",
-        "required_result": "passed",
-        "maximum_dependency_failures": 0
-      },
-      "timeout_seconds": 900,
-      "claim_level": "loads",
+      "include_space_age": false,
+      "mods": ["Krastorio2"],
       "notes": "Non-Space-Age K2 scenario for recipe and science progression checks."
     },
     {
       "name": "space-exploration",
-      "targets": [
-        "2.0",
-        "2.1"
-      ],
-      "kind": "modpack-load",
-      "group": "compatibility-campaign",
-      "setup": {
-        "mode": "portal-or-local",
-        "include_space_age": false,
-        "offline": false,
-        "exact_mir_archive": true
-      },
-      "roots": [
-        "space-exploration"
-      ],
-      "settings": {},
-      "expected_plan": {
-        "mode": "load-only",
-        "required_result": "passed",
-        "maximum_dependency_failures": 0
-      },
-      "timeout_seconds": 900,
-      "claim_level": "loads",
+      "include_space_age": false,
+      "mods": ["space-exploration"],
       "notes": "Large pre-Space-Age overhaul scenario."
     },
     {
       "name": "pymodpack",
-      "targets": [
-        "2.0",
-        "2.1"
-      ],
-      "kind": "modpack-load",
-      "group": "compatibility-campaign",
-      "setup": {
-        "mode": "portal-or-local",
-        "include_space_age": false,
-        "offline": false,
-        "exact_mir_archive": true
-      },
-      "roots": [
-        "pymodpack"
-      ],
-      "settings": {},
-      "expected_plan": {
-        "mode": "load-only",
-        "required_result": "passed",
-        "maximum_dependency_failures": 0
-      },
-      "timeout_seconds": 900,
-      "claim_level": "loads",
+      "include_space_age": false,
+      "mods": ["pymodpack"],
       "notes": "pY modpack entry point; expected to surface dependency and overhaul policy issues."
     },
     {
       "name": "nullius",
-      "targets": [
-        "2.0",
-        "2.1"
-      ],
-      "kind": "modpack-load",
-      "group": "compatibility-campaign",
-      "setup": {
-        "mode": "portal-or-local",
-        "include_space_age": false,
-        "offline": false,
-        "exact_mir_archive": true
-      },
-      "roots": [
-        "nullius"
-      ],
-      "settings": {},
-      "expected_plan": {
-        "mode": "load-only",
-        "required_result": "passed",
-        "maximum_dependency_failures": 0
-      },
-      "timeout_seconds": 900,
-      "claim_level": "loads",
+      "include_space_age": false,
+      "mods": ["nullius"],
       "notes": "Total overhaul; unknown external productivity owners should win by default."
     },
     {
       "name": "ultracube",
-      "targets": [
-        "2.0",
-        "2.1"
-      ],
-      "kind": "modpack-load",
-      "group": "compatibility-campaign",
-      "setup": {
-        "mode": "portal-or-local",
-        "include_space_age": false,
-        "offline": false,
-        "exact_mir_archive": true
-      },
-      "roots": [
-        "Ultracube"
-      ],
-      "settings": {},
-      "expected_plan": {
-        "mode": "load-only",
-        "required_result": "passed",
-        "maximum_dependency_failures": 0
-      },
-      "timeout_seconds": 900,
-      "claim_level": "loads",
+      "include_space_age": false,
+      "mods": ["Ultracube"],
       "notes": "Run without Space Age or Quality."
     }
   ]

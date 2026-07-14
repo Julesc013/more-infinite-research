@@ -3,7 +3,6 @@ local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 local P = {}
 
 local DEFAULT_PIPELINE_EXTENT = 320
-local MAX_PIPELINE_EXTENT = 4294967295
 
 local FLUID_BOX_FIELDS = {
   fluid_box = true,
@@ -17,7 +16,6 @@ local function scaled_extent(current, multiplier)
   local base = tonumber(current) or DEFAULT_PIPELINE_EXTENT
   local scaled = math.floor((base * multiplier) + 0.5)
   if scaled < 1 then return 1 end
-  if scaled > MAX_PIPELINE_EXTENT then return MAX_PIPELINE_EXTENT end
   return scaled
 end
 

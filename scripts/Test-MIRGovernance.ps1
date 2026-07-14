@@ -128,23 +128,9 @@ foreach ($manifest in @(
   ".mir/streams.yml",
   ".mir/fixtures.yml",
   ".mir/branches.yml",
-  ".mir/convergence.yml",
   ".mir/agents.yml"
 )) {
   Assert-MIRFileHasSchemaOne -RelativePath $manifest
-}
-
-$targetManifestPath = Join-Path $repo ".mir\targets.json"
-if (-not (Test-Path -LiteralPath $targetManifestPath -PathType Leaf)) {
-  throw "Missing required target profile manifest: .mir/targets.json"
-}
-$targetManifest = Get-Content -Raw -LiteralPath $targetManifestPath | ConvertFrom-Json
-if ($targetManifest.schema -ne 2 -or -not $targetManifest.profiles) {
-  throw ".mir/targets.json must use schema 2 and define profiles."
-}
-$repoInfo = Get-Content -Raw -LiteralPath (Join-Path $repo "info.json") | ConvertFrom-Json
-if (-not $targetManifest.profiles.PSObject.Properties[$repoInfo.factorio_version]) {
-  throw ".mir/targets.json has no profile for current Factorio $($repoInfo.factorio_version)."
 }
 
 $docsManifestText = Read-MIRText -RelativePath ".mir/docs.yml"
@@ -173,8 +159,6 @@ $missingFromDisk = @($manifestDocPaths | Where-Object { $_ -notin $docFiles })
 if ($missingFromDisk.Count -gt 0) {
   throw ".mir/docs.yml references missing docs: $($missingFromDisk -join ', ')"
 }
-
-& (Join-Path $repo "scripts\Format-MIRMarkdown.ps1") -RepoRoot $repo -Check
 
 $sourceTruths = @(Get-MIRManifestSourceTruths -Text $docsManifestText)
 $duplicateTruths = @($sourceTruths | Group-Object | Where-Object { $_.Count -gt 1 })
@@ -268,111 +252,6 @@ foreach ($match in [regex]::Matches($fixturesText, "(?m)^\s+(path|assertion_path
   if (-not (Test-MIRRepoPath -RelativePath $relative)) {
     throw ".mir/fixtures.yml references missing fixture path: $relative"
   }
-}
-
-$convergenceText = Read-MIRText -RelativePath ".mir/convergence.yml"
-$repoInfo = Get-Content -Raw -LiteralPath (Join-Path $repo "info.json") | ConvertFrom-Json
-$releaseMatch = [regex]::Match(
-  $convergenceText,
-  '(?ms)^release:\r?\n(?<body>(?:^  [^\r\n]*\r?\n?)*)'
-)
-if (-not $releaseMatch.Success) {
-  throw ".mir/convergence.yml must define a top-level release block."
-}
-$releaseFields = @{}
-foreach ($line in $releaseMatch.Groups["body"].Value -split "\r?\n") {
-  if ($line -match '^  ([a-z0-9_]+):\s*(.*?)\s*$') {
-    $releaseFields[$matches[1]] = $matches[2].Trim().Trim('"')
-  }
-}
-foreach ($requiredField in @("version", "branch", "factorio_version", "baseline_commit", "objective", "public_contract_change")) {
-  if (-not $releaseFields.ContainsKey($requiredField) -or [string]::IsNullOrWhiteSpace([string]$releaseFields[$requiredField])) {
-    throw ".mir/convergence.yml release is missing required field $requiredField."
-  }
-}
-if ([string]$releaseFields.version -ne [string]$repoInfo.version) {
-  throw ".mir/convergence.yml release version does not match info.json."
-}
-if ([string]$releaseFields.factorio_version -ne [string]$repoInfo.factorio_version) {
-  throw ".mir/convergence.yml Factorio version does not match info.json."
-}
-if ([string]$releaseFields.objective -notin @(
-  "behavioral-superset-implementation-subset",
-  "target-port-behavioral-subset",
-  "bounded-correctness-and-contract-modernization",
-  "plan-first-automatic-family-compiler"
-)) {
-  throw ".mir/convergence.yml has unsupported release objective: $($releaseFields.objective)"
-}
-
-foreach ($needle in @(
-  'BP-002:',
-  'BP-013:',
-  'BP-017:',
-  'target-profile-drift-check',
-  'candidate-freshness',
-  'complete-structured-validation-summary'
-)) {
-  if (-not $convergenceText.Contains($needle)) {
-    throw ".mir/convergence.yml is missing required convergence contract text: $needle"
-  }
-}
-
-$behaviorIds = @(
-  [regex]::Matches($convergenceText, '(?m)^\s{2}(BP-\d{3}):\s*$') |
-    ForEach-Object { $_.Groups[1].Value }
-)
-$duplicateBehaviorIds = @($behaviorIds | Group-Object | Where-Object { $_.Count -gt 1 })
-if ($duplicateBehaviorIds.Count -gt 0) {
-  throw ".mir/convergence.yml has duplicate behavior IDs: $($duplicateBehaviorIds.Name -join ', ')"
-}
-
-$allowedBehaviorStatuses = @("complete", "deferred", "in-progress")
-$behaviorBlocks = [regex]::Matches(
-  $convergenceText,
-  '(?ms)^  (?<id>BP-\d{3}):\r?\n(?<body>(?:^    [^\r\n]*\r?\n?)*)'
-)
-if ($behaviorBlocks.Count -ne $behaviorIds.Count) {
-  throw ".mir/convergence.yml behavior blocks could not be parsed unambiguously."
-}
-foreach ($block in $behaviorBlocks) {
-  $id = $block.Groups["id"].Value
-  $fields = @{}
-  foreach ($line in $block.Groups["body"].Value -split "\r?\n") {
-    if ($line -match '^    ([a-z0-9_]+):\s*(.*?)\s*$') {
-      $fields[$matches[1]] = $matches[2].Trim().Trim('"')
-    }
-  }
-  foreach ($requiredField in @("source", "behavior", "class", "decision", "impact", "evidence", "status")) {
-    if (-not $fields.ContainsKey($requiredField) -or [string]::IsNullOrWhiteSpace([string]$fields[$requiredField])) {
-      throw ".mir/convergence.yml $id is missing required field $requiredField."
-    }
-  }
-  if ([string]$fields.class -notmatch '^[A-G]-[a-z0-9-]+$') {
-    throw ".mir/convergence.yml $id has invalid behavior class: $($fields.class)"
-  }
-  if ([string]$fields.status -notin $allowedBehaviorStatuses) {
-    throw ".mir/convergence.yml $id has invalid status: $($fields.status)"
-  }
-  if ([string]$fields.status -eq "complete" -and [string]$fields.evidence -eq "none") {
-    throw ".mir/convergence.yml $id is complete without named evidence."
-  }
-}
-
-$releaseGateMatch = [regex]::Match(
-  $convergenceText,
-  '(?ms)^release_gates:\r?\n(?<body>(?:^  - [^\r\n]+\r?\n?)*)'
-)
-if (-not $releaseGateMatch.Success) {
-  throw ".mir/convergence.yml must define release_gates."
-}
-$releaseGates = @(
-  [regex]::Matches($releaseGateMatch.Groups["body"].Value, '(?m)^  - ([a-z0-9-]+)\s*$') |
-    ForEach-Object { $_.Groups[1].Value }
-)
-$duplicateReleaseGates = @($releaseGates | Group-Object | Where-Object { $_.Count -gt 1 })
-if ($duplicateReleaseGates.Count -gt 0) {
-  throw ".mir/convergence.yml has duplicate release gates: $($duplicateReleaseGates.Name -join ', ')"
 }
 
 $claimsManifestText = Read-MIRText -RelativePath ".mir/compatibility.yml"

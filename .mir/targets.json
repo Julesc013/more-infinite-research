@@ -503,6 +503,75 @@
         "old-science-map",
         "exact-dist"
       ]
+    },
+    "0.14": {
+      "factorio_version": "0.14",
+      "support_class": "finite-reconstruction",
+      "validation_status": "qualified-lower-wave-candidate",
+      "runtime_state_backend": "global",
+      "science_family": "legacy-0.14",
+      "reduced_legacy": true,
+      "legacy_factorio_2_0": false,
+      "supports_space_age": false,
+      "weapon_overlap_default": "only-when-dedicated-tech-enabled",
+      "technology_overlay_policy": "none",
+      "profile_schema": 2,
+      "prototype_shapes": {
+        "recipe_category": "category",
+        "science_pack_prototype_kinds": [
+          "tool"
+        ],
+        "product_probability_fields": [
+          "probability"
+        ],
+        "technology_formula": false,
+        "quality": false,
+        "surface_conditions": false,
+        "mod_data": false
+      },
+      "emitter_families": [
+        "technology"
+      ],
+      "asset_policy": "factorio-0.14-icons",
+      "expected_stream_count": 11,
+      "features": {
+        "compatibility_repairs": false,
+        "pipeline_extent": false,
+        "prototype_limits": false,
+        "module_permissions": false,
+        "recipe_productivity": false,
+        "settings_profiles": false,
+        "scripted_techs": false,
+        "technology_constant_overlays": false,
+        "productivity_family_adoption": false
+      },
+      "supported_required_mods": [],
+      "supported_effect_types": [
+        "character-build-distance",
+        "character-crafting-speed",
+        "character-inventory-slots-bonus",
+        "character-item-drop-distance",
+        "character-logistic-trash-slots",
+        "character-mining-speed",
+        "character-reach-distance",
+        "character-resource-reach-distance",
+        "character-running-speed",
+        "gun-speed",
+        "laboratory-productivity",
+        "worker-robot-battery"
+      ],
+      "required_validation_groups": [
+        "static",
+        "package",
+        "base-load",
+        "science-prerequisites",
+        "direct-effects",
+        "weapon-overlap",
+        "reduced-settings-surface",
+        "runtime-state",
+        "finite-progression",
+        "exact-dist"
+      ]
     }
   }
 }

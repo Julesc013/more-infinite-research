@@ -11,12 +11,12 @@ data:extend({
     unit = {
       count_formula = "2500*(L-3)",
       ingredients = {
-        {"automation-science-pack", 1},
-        {"logistic-science-pack", 1},
-        {"chemical-science-pack", 1},
-        {"production-science-pack", 1},
-        {"utility-science-pack", 1},
-        {"space-science-pack", 1}
+        {"science-pack-1", 1},
+        {"science-pack-2", 1},
+        {"science-pack-3", 1},
+        {"alien-science-pack", 1},
+        {"alien-science-pack", 1},
+        {"alien-science-pack", 1}
       },
       time = 60
     },

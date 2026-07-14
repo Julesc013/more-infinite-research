@@ -1,8 +1,6 @@
 local productivity_owners = require("prototypes.mir.index.productivity_owners")
-local canonical_recipe_facts = require("prototypes.mir.index.recipe_facts")
 local schema = require("prototypes.mir.core.schema")
 local data_raw = require("prototypes.mir.platform.factorio.data_raw")
-local relationships = require("prototypes.mir.index.relationships")
 
 local R = {}
 
@@ -54,6 +52,82 @@ local function prototype_name(entry)
   if not entry then return nil end
   if type(entry) == "string" then return entry end
   return entry.name or entry[1]
+end
+
+local function prototype_amount(entry)
+  if not entry or type(entry) == "string" then return 1 end
+  return entry.amount or entry[2] or 1
+end
+
+local function scan_recipe_variants(recipe, callback)
+  if not recipe then return end
+  if type(recipe.normal) == "table" or type(recipe.expensive) == "table" then
+    if type(recipe.normal) == "table" then callback(recipe.normal, "normal") end
+    if type(recipe.expensive) == "table" then callback(recipe.expensive, "expensive") end
+    return
+  end
+  callback(recipe, "default")
+end
+
+local function recipe_categories(recipe)
+  if recipe and recipe.categories then return recipe.categories end
+  if recipe and recipe.category then return {recipe.category} end
+  return {"crafting"}
+end
+
+local function recipe_hidden(recipe)
+  if not recipe then return false end
+  if recipe.hidden then return true end
+  if type(recipe.normal) == "table" and recipe.normal.hidden then return true end
+  if type(recipe.expensive) == "table" and recipe.expensive.hidden then return true end
+  return false
+end
+
+local function recipe_enabled(recipe)
+  if not recipe then return false end
+  if recipe.enabled ~= nil then return recipe.enabled == true end
+  if type(recipe.normal) == "table" and recipe.normal.enabled ~= nil then return recipe.normal.enabled == true end
+  if type(recipe.expensive) == "table" and recipe.expensive.enabled ~= nil then return recipe.expensive.enabled == true end
+  return false
+end
+
+local function collect_recipe_io(recipe, field)
+  local by_name = {}
+  scan_recipe_variants(recipe, function(def)
+    local entries = def[field]
+    if field == "results" and not entries and def.result then
+      entries = {{name = def.result, amount = def.result_count or 1}}
+    end
+    for _, entry in pairs(entries or {}) do
+      local name = prototype_name(entry)
+      if name then
+        local existing = by_name[name] or 0
+        by_name[name] = existing + prototype_amount(entry)
+      end
+    end
+  end)
+
+  local out = {}
+  for _, name in ipairs(sorted_keys(by_name)) do
+    table.insert(out, {
+      name = name,
+      amount = by_name[name]
+    })
+  end
+  return out
+end
+
+local function main_product(recipe, results)
+  if not recipe then return nil end
+  if recipe.main_product then return recipe.main_product end
+  local found = nil
+  scan_recipe_variants(recipe, function(def)
+    if def.main_product and not found then found = def.main_product end
+    if def.result and not found then found = def.result end
+  end)
+  if found then return found end
+  if #results == 1 then return results[1].name end
+  return nil
 end
 
 local function collect_unlock_techs()
@@ -126,9 +200,12 @@ end
 
 local function build_recipe_facts(unlocks)
   local facts = {}
-  for _, name in ipairs(canonical_recipe_facts.all_names()) do
-    local recipe = canonical_recipe_facts.get(name)
-    local owner_records = productivity_owners.external_recipe_productivity_owner_records(name, {snapshot_phase = "output"})
+  local recipes = data_raw.prototypes("recipe")
+  for _, name in ipairs(sorted_keys(recipes)) do
+    local recipe = recipes[name]
+    local ingredients = collect_recipe_io(recipe, "ingredients")
+    local results = collect_recipe_io(recipe, "results")
+    local owner_records = productivity_owners.external_recipe_productivity_owner_records(name)
     local owner_names = {}
     for _, owner in ipairs(owner_records) do
       table.insert(owner_names, owner.tech)
@@ -136,21 +213,18 @@ local function build_recipe_facts(unlocks)
     table.sort(owner_names)
 
     facts[name] = {
-      schema = recipe.schema,
       name = name,
-      variants = recipe.variants,
-      categories = recipe.categories,
-      ingredients = recipe.ingredients,
-      results = recipe.results,
-      main_product = recipe.main_product,
+      categories = recipe_categories(recipe),
+      ingredients = ingredients,
+      results = results,
+      main_product = main_product(recipe, results),
       allow_productivity = productivity_owners.recipe_allows_productivity(name),
       maximum_productivity = recipe.maximum_productivity,
       allow_quality = recipe.allow_quality,
-      hidden = recipe.hidden,
-      enabled = recipe.enabled_without_research,
+      hidden = recipe_hidden(recipe),
+      enabled = recipe_enabled(recipe),
       unlock_techs = unlocks[name] or {},
       surface_conditions = recipe.surface_conditions,
-      source_class = recipe.source_class,
       owners = owner_names
     }
   end
@@ -471,7 +545,6 @@ function R.build()
     owners = owners,
     rule_mutations = rule_mutations,
     loop_risks = loop_risks,
-    indexes = relationships.snapshot("output"),
     summary = {
       recipes = table_count(recipes),
       technologies = table_count(technologies),
