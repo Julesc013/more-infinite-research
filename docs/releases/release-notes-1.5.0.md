@@ -12,7 +12,7 @@ superseded_by: []
 
 # MIR 1.5.0 Candidate Notes
 
-MIR 1.5.0 is an independent canonical MIR 3.1.9-derived target projection from `DEV_LOWER_WAVE_ANCHOR` commit `d6c1feab9e268d590b60e8d2338af68a4c0b7b83`. The earlier `tmp/0.15` candidate remains `SUPERSEDED-UNRELEASED` characterization evidence and is not this reconstruction's source ancestry.
+MIR 1.5.0 is an independent canonical MIR 3.1.9-derived target projection from `DEV_LOWER_WAVE_ANCHOR` commit `7ca81bbc98f02cfaf2d40012096d94e261e74d98`. The earlier `tmp/0.15` candidate remains `SUPERSEDED-UNRELEASED` characterization evidence and is not this reconstruction's source ancestry.
 
 MIR 1.5.0 is an unreleased Factorio 0.15 old-science native-infinite port.
 

@@ -66,6 +66,21 @@ foreach ($file in $scriptFiles) {
   }
 }
 
+$retentionHarnessPath = Join-Path $scriptRoot "Test-MIRCandidateRetention.ps1"
+if (-not (Test-Path -LiteralPath $retentionHarnessPath)) {
+  Add-MIRPowerShellQualityFailure -File "scripts/Test-MIRCandidateRetention.ps1" -Message "missing portable retention harness"
+} else {
+  $retentionHarnessText = Get-Content -Raw -LiteralPath $retentionHarnessPath
+  foreach ($requiredToken in @("Diagnostics.ProcessStartInfo", "WaitForExit", "Kill(`$true)")) {
+    if (-not $retentionHarnessText.Contains($requiredToken)) {
+      Add-MIRPowerShellQualityFailure -File "scripts/Test-MIRCandidateRetention.ps1" -Message "retention process lifecycle is missing $requiredToken"
+    }
+  }
+  if ($retentionHarnessText -match '(?m)^\s*&\s+\$FactorioBin\s+@') {
+    Add-MIRPowerShellQualityFailure -File "scripts/Test-MIRCandidateRetention.ps1" -Message "retention harness must wait on an owned process instead of invoking Factorio as a detached GUI application"
+  }
+}
+
 $gitignorePath = Join-Path $RepoRoot ".gitignore"
 if (-not (Test-Path -LiteralPath $gitignorePath)) {
   Add-MIRPowerShellQualityFailure -File ".gitignore" -Message "missing .gitignore"
