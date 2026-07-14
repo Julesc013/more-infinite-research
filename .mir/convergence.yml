@@ -163,10 +163,11 @@ candidate:
   broad_qualification_evidence_path: .mir/evidence/3.1.9/qualification-summary.json
   upgrade_evidence_path: .mir/evidence/3.1.9/upgrade-from-3.1.5-proof.json
   ecosystem_evidence_path: .mir/evidence/3.1.9/ecosystem-campaign/campaign-evidence.json
-  seal_path: pending-reseal
+  seal_path: .mir/evidence/candidate-seals/mir-3.1.9-factorio-2.1.json
+  seal_source_commit: c711602b1c43ce552faa4ec90acd72c3b4ebc856
   automated_gate: passed-change-aware
   manual_gate: pending
-  status: runtime-qualified-awaiting-reseal
+  status: release-candidate-awaiting-manual-review
 
 rules:
   - dev-remains-the-canonical-modern-implementation

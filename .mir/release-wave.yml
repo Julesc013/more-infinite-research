@@ -217,10 +217,12 @@ waves:
     available_ecosystem_load_evidence: .mir/evidence/3.1.9/ecosystem-campaign/campaign-evidence.json
     available_ecosystem_load_gate: 9-passed-zero-dependency-failures-load-claims-only
     exact_package_gate: passed-disabled-science-regression-base-space-age-deterministic-and-forbidden-entry-check
-    candidate_freshness_gate: runtime-qualified-awaiting-reseal
+    assurance_seal: .mir/evidence/candidate-seals/mir-3.1.9-factorio-2.1.json
+    seal_source_commit: c711602b1c43ce552faa4ec90acd72c3b4ebc856
+    candidate_freshness_gate: passed
     interactive_gate: pending-maintainer
     publication_status: unreleased
-    status: runtime-qualified-awaiting-reseal
+    status: release-candidate-awaiting-manual-review
 
   mir_2_4_0:
     version: "2.4.0"

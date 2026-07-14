@@ -278,9 +278,11 @@ release_artifacts:
       scenario_count: 102
       structured_summary: .mir/evidence/3.1.9/disabled-automation-science-final-qualification.json
       broad_qualification_evidence: .mir/evidence/3.1.9/qualification-summary.json
-      release_gate: runtime-qualified-awaiting-reseal
+      assurance_seal: .mir/evidence/candidate-seals/mir-3.1.9-factorio-2.1.json
+      seal_source_commit: c711602b1c43ce552faa4ec90acd72c3b4ebc856
+      release_gate: release-candidate-awaiting-manual-review
       publication_status: unreleased
-      status: runtime-qualified-awaiting-reseal
+      status: release-candidate-awaiting-manual-review
     mir_2_5_0:
       version: "2.5.0"
       branch: tmp/2.0
