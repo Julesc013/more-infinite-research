@@ -4,9 +4,9 @@
   "title": "MIR Fixture - Assert Reduced Settings Surface",
   "author": "Julesc013",
   "description": "Validation fixture for the settings intentionally present or absent on reduced target lines.",
-  "factorio_version": "2.1",
+  "factorio_version": "1.0",
   "dependencies": [
-    "base >= 2.1.8",
+    "base >= 1.0",
     "more-infinite-research"
   ]
 }

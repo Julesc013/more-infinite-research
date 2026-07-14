@@ -349,6 +349,13 @@ fixtures:
       - modern-only-settings-are-omitted
       - reduced-continuation-locales-are-explicit
 
+  legacy-effect-icons:
+    requires_features: []
+    assertion_path: fixtures/assert-legacy-effect-icons
+    validates:
+      - target-era-core-constant-effect-icons
+      - no-space-age-effect-icon-dependencies
+
   weapon-speed-safety:
     requires_features: []
     path: fixtures/weapon-speed-external-owner
