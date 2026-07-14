@@ -1,8 +1,10 @@
 local C = require("prototypes.mir.streams.registry")
+local deepcopy = require("prototypes.mir.core.deepcopy")
 local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 local science = require("prototypes.mir.capabilities.science_integration.science_packs")
 local recipes = require("prototypes.mir.capabilities.recipe_productivity.recipe_matching")
 local effective_settings = require("prototypes.mir.settings.effective")
+local compatibility_packs = require("prototypes.mir.compatibility.packs.registry")
 
 local M = {}
 
@@ -120,9 +122,15 @@ local function science_from_unlocks(spec)
 end
 
 function M.apply_science_pack_ingredient_policy(ingredients)
+  local policy = startup_setting("mir-science-pack-ingredient-policy") or "configured"
+  if policy == "configured" then
+    -- Neutral/bypass option: preserve the stream's configured ingredients
+    -- without loading any of the optional ingredient expansion policies.
+    return deepcopy(ingredients or {})
+  end
+
   local out, seen = {}, {}
   local selected_packs = {}
-  local policy = startup_setting("mir-science-pack-ingredient-policy") or "configured"
   for _, ingredient in ipairs(ingredients or {}) do
     local name = ingredient_name(ingredient)
     if name then table.insert(selected_packs, name) end
@@ -186,6 +194,14 @@ function M.pick_science_for_stream(spec, key)
     for _, p in ipairs(STREAM_EXTRA_PACKS[key] or {}) do add_if_science_pack_exists(packs, p) end
   end
 
+  local denied = {}
+  for _, role in ipairs(compatibility_packs.science_roles_for_stream(key)) do
+    if role.role == "exclude" then denied[role.pack] = true end
+  end
+  for _, role in ipairs(compatibility_packs.science_roles_for_stream(key)) do
+    if role.role ~= "exclude" and not denied[role.pack] then add_if_science_pack_exists(packs, role.pack) end
+  end
+
   if desired == "derive-from-unlocks" and #packs == 0 then
     for _, p in ipairs({"automation-science-pack", "logistic-science-pack", "chemical-science-pack"}) do
       add_if_science_pack_exists(packs, p)
@@ -194,7 +210,7 @@ function M.pick_science_for_stream(spec, key)
 
   local out, seen = {}, {}
   for _, name in ipairs(packs) do
-    if not seen[name] then
+    if not seen[name] and not denied[name] then
       seen[name] = true
       table.insert(out, {name, 1})
     end

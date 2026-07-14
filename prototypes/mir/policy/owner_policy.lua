@@ -9,10 +9,10 @@ function M.recipe_names_from_effects(effects)
 end
 
 function M.existing_infinite_recipe_productivity_owner_records(recipe_name, spec)
-  local adoption = spec and spec.adopt_into_existing_productivity_tech
+  local adoption = spec and spec.native_owner_binding
   return productivity_owners.blocking_recipe_productivity_owner_records(recipe_name, {
     ignore_owner = competing_productivity.ignores_existing_owner,
-    adoption_tech = adoption and adoption.tech
+    adoption_tech = adoption and adoption.owner
   })
 end
 

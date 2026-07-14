@@ -12,6 +12,4 @@ superseded_by: []
 
 # Ore Processing Capability
 
-Ore processing covers crushing, sorting, washing, smelting, casting, alloys, and
-similar material-family transformations. Unknown overhaul chains start as
-diagnostic-only until ownership, loop-risk, and balance policy are explicit.
+Ore processing covers crushing, sorting, washing, smelting, casting, alloys, and similar material-family transformations. Unknown overhaul chains start as diagnostic-only until ownership, loop-risk, and balance policy are explicit.

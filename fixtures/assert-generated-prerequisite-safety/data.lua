@@ -5,16 +5,23 @@ local self_lock_pack_name = "mir-fixture-self-lock-science-pack"
 local cycle_pack_a_name = "mir-fixture-cycle-science-pack-a"
 local cycle_pack_b_name = "mir-fixture-cycle-science-pack-b"
 
+local science_pack_type = data.raw.tool and data.raw.tool["automation-science-pack"] and "tool" or "item"
+
 local pack = {
-  type = "tool",
+  type = science_pack_type,
   name = pack_name,
   icon = "__base__/graphics/icons/automation-science-pack.png",
   icon_size = 64,
   subgroup = "science-pack",
   order = "z[mir-fixture-prerequisite-science-pack]",
-  stack_size = 200,
-  durability = 1
+  stack_size = 200
 }
+if science_pack_type == "tool" then
+  pack.durability = 1
+  pack.durability_description_key = "description.science-pack-remaining-amount-key"
+  pack.factoriopedia_durability_description_key = "description.factoriopedia-science-pack-remaining-amount-key"
+  pack.durability_description_value = "description.science-pack-remaining-amount-value"
+end
 
 local recipe = {
   type = "recipe",

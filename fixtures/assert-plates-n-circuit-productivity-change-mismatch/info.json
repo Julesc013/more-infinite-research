@@ -4,9 +4,9 @@
   "title": "MIR Fixture - Assert Plates n Circuit Productivity Change Mismatch",
   "author": "Julesc013",
   "description": "Validation fixture that asserts MIR does not replace a known competitor when productivity change values differ.",
-  "factorio_version": "1.1",
+  "factorio_version": "2.1",
   "dependencies": [
-    "base >= 1.1",
+    "base >= 2.1.8",
     "more-infinite-research",
     "mir-fixture-plates-n-circuit-productivity-change-mismatch"
   ]

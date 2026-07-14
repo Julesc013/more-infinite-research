@@ -11,13 +11,9 @@ superseded_by: []
 ---
 # MIR Compatibility Program
 
-This document defines how More Infinite Research turns external mod signals into
-supported behavior. It is deliberately stricter than a feature backlog: a mod can
-be useful evidence without becoming MIR-owned behavior.
+This document defines how More Infinite Research turns external mod signals into supported behavior. It is deliberately stricter than a feature backlog: a mod can be useful evidence without becoming MIR-owned behavior.
 
-The goal is not to absorb every productivity-related mod. The goal is to decide
-what role MIR should take for each mod, prove that role with fixtures or load
-evidence, and keep public claims narrower than the evidence.
+The goal is not to absorb every productivity-related mod. The goal is to decide what role MIR should take for each mod, prove that role with fixtures or load evidence, and keep public claims narrower than the evidence.
 
 ## Role Taxonomy
 
@@ -49,8 +45,7 @@ Can MIR replace this mod?
 
 Replacement and cooperation are different products.
 
-Replacement is only valid when MIR proves equivalent or intentionally designed
-behavior. The current `2.1.5` known-competitor cleanup is the model:
+Replacement is only valid when MIR proves equivalent or intentionally designed behavior. The current `2.1.5` known-competitor cleanup is the model:
 
 - the external technology is active and infinite;
 - every effect is `change-recipe-productivity`;
@@ -59,10 +54,7 @@ behavior. The current `2.1.5` known-competitor cleanup is the model:
 - replacement science is lab-compatible;
 - no blocking external owner remains.
 
-Cooperation is different. For example, `Research_Productivity` creates an
-infinite `laboratory-productivity-4` owner. MIR does not replace that mod. MIR
-skips its own lab-productivity stream when that exact technology has the expected
-native `laboratory-productivity` effect.
+Cooperation is different. For example, `Research_Productivity` creates an infinite `laboratory-productivity-4` owner. MIR does not replace that mod. MIR skips its own lab-productivity stream when that exact technology has the expected native `laboratory-productivity` effect.
 
 Public wording must preserve this distinction:
 
@@ -72,14 +64,11 @@ MIR cooperates with X and avoids duplicate infinite productivity where exact ove
 MIR does not replace X's beacon, module, runtime, cap, or rule-mutation behavior.
 ```
 
-Avoid saying "fully replaces X" unless MIR covers every relevant behavior:
-settings, startup behavior, runtime scripts, migrations, research costs, unlocks,
-dependencies, edge cases, and save behavior.
+Avoid saying "fully replaces X" unless MIR covers every relevant behavior: settings, startup behavior, runtime scripts, migrations, research costs, unlocks, dependencies, edge cases, and save behavior.
 
 ## Outdated Does Not Mean Replaceable
 
-A Factorio `2.0`-only mod can be outdated for several different reasons. The
-MIR response depends on the behavior, not on the age of the mod.
+A Factorio `2.0`-only mod can be outdated for several different reasons. The MIR response depends on the behavior, not on the age of the mod.
 
 | External behavior | MIR implication |
 | --- | --- |
@@ -108,8 +97,7 @@ This rule applies equally to abandoned, outdated, and Factorio `2.0`-only mods.
 
 ## Save-Compatibility Questions
 
-Any replacement, skip, or cleanup policy must answer these questions before it is
-claimed as supported:
+Any replacement, skip, or cleanup policy must answer these questions before it is claimed as supported:
 
 | Question | Why it matters |
 | --- | --- |
@@ -119,15 +107,11 @@ claimed as supported:
 | What if both mods stay enabled? | MIR needs cleanup, skip, warning, or coexist behavior. |
 | What if the external mod has startup settings? | Exact replacement may stop being exact. |
 
-For `2.1.5`, exact cleanup is safe because it is narrow and guarded. The
-diagnostics-only planner rows added in the same line do not change save behavior.
-For `2.2.0+`, save behavior should be a required row in every compatibility
-campaign.
+For `2.1.5`, exact cleanup is safe because it is narrow and guarded. The diagnostics-only planner rows added in the same line do not change save behavior. For `2.2.0+`, save behavior should be a required row in every compatibility campaign.
 
 ## Test Matrix Model
 
-An all-mods folder load is useful as a non-blocking smoke test, but it is not the
-main validation strategy. Many idea mods intentionally conflict in concept.
+An all-mods folder load is useful as a non-blocking smoke test, but it is not the main validation strategy. Many idea mods intentionally conflict in concept.
 
 Use this order:
 
@@ -139,14 +123,11 @@ MIR + representative overhaul stack
 MIR + full chaos folder as non-blocking smoke test
 ```
 
-Failures from a full folder load should be triaged as evidence. They should not
-automatically block a release unless they identify a MIR regression or a public
-claim that is no longer true.
+Failures from a full folder load should be triaged as evidence. They should not automatically block a release unless they identify a MIR regression or a public claim that is no longer true.
 
 ## One-Archive Audit Template
 
-Each archive in `C:\Projects\Factorio\ideamods_mix` should eventually have a
-structured row with these fields:
+Each archive in `C:\Projects\Factorio\ideamods_mix` should eventually have a structured row with these fields:
 
 | Field | Purpose |
 | --- | --- |
@@ -236,8 +217,7 @@ ResearchProductivity_Rebalance
 solar-productivity
 ```
 
-These mostly feed cap-aware diagnostics, native-overlap policy, or compatibility
-warnings.
+These mostly feed cap-aware diagnostics, native-overlap policy, or compatibility warnings.
 
 ### Lane D: Companion Territory
 
@@ -256,9 +236,7 @@ UnlimitedProductivityFork
 space-exploration-spaceproductivity-2
 ```
 
-These change allowed effects, recipes, machines, modules, beacons, or overhaul
-rules. They should not be MIR core unless a companion design deliberately adopts
-that product boundary.
+These change allowed effects, recipes, machines, modules, beacons, or overhaul rules. They should not be MIR core unless a companion design deliberately adopts that product boundary.
 
 ### Lane E: Runtime Systems
 
@@ -270,9 +248,7 @@ productivity-through-science
 solar-productivity
 ```
 
-These are interesting but require runtime state or entity/stat behavior. They
-are rejected from MIR core by default unless a bounded event-driven design proves
-performance and save behavior.
+These are interesting but require runtime state or entity/stat behavior. They are rejected from MIR core by default unless a bounded event-driven design proves performance and save behavior.
 
 ### Lane F: Utilities, Cost Tools, And UI
 
@@ -301,8 +277,7 @@ The compatibility architecture should grow in six layers.
 
 ### 1. Stream Definitions
 
-Streams describe what MIR owns. They own generated effects, not external mod
-behavior.
+Streams describe what MIR owns. They own generated effects, not external mod behavior.
 
 Example shape:
 
@@ -346,13 +321,11 @@ Recipe discovery should be explicit and reusable:
 - tile and surface resolvers;
 - overhaul-family resolvers.
 
-Default to exact IDs for compatibility work. Broad name matching should be rare
-and heavily guarded.
+Default to exact IDs for compatibility work. Broad name matching should be rare and heavily guarded.
 
 ### 3. Competitor Profiles
 
-Competitor profiles identify possible external owners. They do not decide
-removal.
+Competitor profiles identify possible external owners. They do not decide removal.
 
 Example shape:
 
@@ -421,9 +394,7 @@ Every integration should have a fixture or load scenario.
 
 ## Compatibility Planner Output
 
-`2.1.5` starts the compatibility planner as diagnostics-only audit rows. `2.2.0`
-extends that into a report-only compiler spine that can emit a structured
-summary when diagnostics are enabled:
+`2.1.5` starts the compatibility planner as diagnostics-only audit rows. `2.2.0` extends that into a report-only compiler spine that can emit a structured summary when diagnostics are enabled:
 
 ```text
 MIR Compatibility Planner
@@ -444,56 +415,26 @@ Non-actions:
 - Not changing beacons or modules.
 ```
 
-The `2.2.0` compiler rows are typed around recipe, technology, machine, lab,
-owner, and rule-surface facts. They also emit decision rows, lab-matrix rows,
-loop-risk rows, rule-surface rows, owner summaries, and useful cap estimates.
-These rows are evidence for future policy gates; they are not broad automatic
-support claims.
+The `2.2.0` compiler rows are typed around recipe, technology, machine, lab, owner, and rule-surface facts. They also emit decision rows, lab-matrix rows, loop-risk rows, rule-surface rows, owner summaries, and useful cap estimates. These rows are evidence for future policy gates; they are not broad automatic support claims.
 
-The procedural compatibility kernel is documented in
-`docs/architecture/procedural-compatibility-kernel.md`. Its first capability resolvers are
-report-first:
+The procedural compatibility kernel is documented in `docs/architecture/procedural-compatibility-kernel.md`. Its first capability resolvers are report-first:
 
-- `logistics-loader-manufacturing` classifies loader crafting recipes from item,
-  placed entity, and recipe-output evidence, then reports whether the existing
-  belt productivity stream emitted them.
-- `mining-drill-manufacturing` classifies drill crafting recipes from item,
-  placed entity, and recipe-output evidence, then reports whether the existing
-  mining-drill productivity stream emitted them.
-- `native-modifier-ownership` reports owners for selected native modifiers,
-  including lab productivity, mining yield, logistics stack size, and robot
-  bonuses, without stacking or replacing them broadly.
+- `logistics-loader-manufacturing` classifies loader crafting recipes from item, placed entity, and recipe-output evidence, then reports whether the existing belt productivity stream emitted them.
+- `mining-drill-manufacturing` classifies drill crafting recipes from item, placed entity, and recipe-output evidence, then reports whether the existing mining-drill productivity stream emitted them.
+- `native-modifier-ownership` reports owners for selected native modifiers, including lab productivity, mining yield, logistics stack size, and robot bonuses, without stacking or replacing them broadly.
 
-The resolver contract is `discover -> classify -> propose -> validate -> emit
--> diagnose`. In the current implementation, "emit" means "observe the stream or
-policy that already emitted". A future resolver can create new technologies only
-after it has stable stream IDs, fixture coverage, owner checks, lab checks, cap
-diagnostics, and loop-risk denials.
+The resolver contract is `discover -> classify -> propose -> validate -> materialize -> result`. Materialization records the decision or existing stable-stream ownership and cannot create prototypes. New technologies require a separate validated `GenerationPlan`, stable manifest identity, fixture coverage, owner checks, lab checks, cap diagnostics, and loop-risk denials.
 
 The compatibility platform now has committed machine-readable policy surfaces:
 
 - `prototypes/mir/policy/capabilities.lua` for capability-specific policy;
-- `prototypes/mir/streams/generated_stream_manifest.json` for stable generated IDs
-  and migration policy;
-- `fixtures/compat-matrix/claims.json` for public claim text, capability status,
-  generated stream references, and backing fixtures;
-- `scripts/Test-MIRPolicyLints.ps1` to reject missing schema fields, generated
-  streams without manifest rows, current fixture-backed claims without fixtures,
-  and broad public wording.
+- `prototypes/mir/streams/generated_stream_manifest.json` for stable generated IDs and migration policy;
+- `fixtures/compat-matrix/claims.json` for public claim text, capability status, generated stream references, and backing fixtures;
+- `scripts/Test-MIRPolicyLints.ps1` to reject missing schema fields, generated streams without manifest rows, current fixture-backed claims without fixtures, and broad public wording.
 
-Negative fixtures are mandatory for capability work that introduces a new
-automatic target class. The first negative fixture covers self-return, barrel
-return, cleaning, voiding, transmutation, hidden recipe, zero-cap, loader-like
-non-loader, and drill-like non-drill cases.
+Negative fixtures are mandatory for capability work that introduces a new automatic target class. The first negative fixture covers self-return, barrel return, cleaning, voiding, transmutation, hidden recipe, zero-cap, loader-like non-loader, and drill-like non-drill cases.
 
-The `3.0.0` line promotes this program into the compatibility compiler
-architecture documented in
-`docs/architecture/compatibility-compiler-charter.md`. The supporting subsystem
-docs are `docs/capabilities/README.md`, `docs/compatibility/policy-overlays.md`,
-`docs/reference/schemas/decision-record.md`, `docs/reference/schemas/stream-manifest.md`,
-`docs/compatibility/claim-levels.md`, `docs/maintainer/testing.md`,
-`docs/releases/3.0.0-migration-guide.md`, `docs/maintainer/README.md`, and
-`docs/adr/`.
+The `3.0.0` line promotes this program into the compatibility compiler architecture documented in `docs/architecture/compatibility-compiler-charter.md`. The supporting subsystem docs are `docs/capabilities/README.md`, `docs/compatibility/policy-overlays.md`, `docs/reference/schemas/decision-record.md`, `docs/reference/schemas/stream-manifest.md`, `docs/compatibility/claim-levels.md`, `docs/maintainer/testing.md`, `docs/releases/3.0.0-migration-guide.md`, `docs/maintainer/README.md`, and `docs/adr/`.
 
 The long-term data-stage shape should be:
 
@@ -508,8 +449,7 @@ discover facts
 
 ## Compatibility Modes
 
-If a startup setting is added later, prefer one broad compatibility mode over
-many per-mod settings:
+If a startup setting is added later, prefer one broad compatibility mode over many per-mod settings:
 
 | Mode | Meaning |
 | --- | --- |
@@ -521,17 +461,9 @@ many per-mod settings:
 
 The default should be `auto-safe`.
 
-Do not turn compatibility modes into separate product names. MIR should remain
-one mod with one settings page. If future settings expose balance-changing
-compatibility behavior, use plain feature-family labels and keep the default
-conservative. Source-mod names belong in audit rows and compatibility docs, not
-as one-off settings.
+Do not turn compatibility modes into separate product names. MIR should remain one mod with one settings page. If future settings expose balance-changing compatibility behavior, use plain feature-family labels and keep the default conservative. Source-mod names belong in audit rows and compatibility docs, not as one-off settings.
 
-For prototype mutation features, disabled must mean no mutation and no broad
-scan. Prefer the existing pipeline-extent pattern: default unchanged, the pass
-exits early, and diagnostics explain what happened only when the user asks for
-reports. Runtime settings should be reserved for real runtime logic with
-performance, migration, and uninstall proof.
+For prototype mutation features, disabled must mean no mutation and no broad scan. Prefer the existing pipeline-extent pattern: default unchanged, the pass exits early, and diagnostics explain what happened only when the user asks for reports. Runtime settings should be reserved for real runtime logic with performance, migration, and uninstall proof.
 
 ## Audited Zip Reproducibility
 
@@ -541,8 +473,7 @@ For each compatibility campaign, create a checksum record such as:
 docs/audited-zips-YYYY-MM-DD.json
 ```
 
-The current July 5, 2026 idea-mod ledger is
-`docs/archive/2.x/audited-zips-2026-07-05.json`.
+The current July 5, 2026 idea-mod ledger is `docs/archive/superseded/audited-zips-2026-07-05.json`.
 
 Recommended fields:
 
@@ -557,5 +488,4 @@ Recommended fields:
 }
 ```
 
-This prevents future Mod Portal updates from silently changing what the audit
-proved.
+This prevents future Mod Portal updates from silently changing what the audit proved.

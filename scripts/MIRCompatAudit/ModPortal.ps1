@@ -136,8 +136,15 @@ function ConvertFrom-MIRDependencyString {
     $text = $text.Substring(1).Trim()
   }
 
-  $nameMatch = [regex]::Match($text, "^\s*([^\s<>=]+)")
-  $name = if ($nameMatch.Success) { $nameMatch.Groups[1].Value } else { ($text -split "\s+")[0] }
+  $constraintMatch = [regex]::Match($text, "\s+(?:>=|<=|=|>|<)\s*\d")
+  $name = if ($constraintMatch.Success) {
+    $text.Substring(0, $constraintMatch.Index).Trim()
+  } else {
+    $text.Trim()
+  }
+  if ([string]::IsNullOrWhiteSpace($name)) {
+    throw "Dependency declaration has no mod name: '$Dependency'."
+  }
   [pscustomobject]@{
     raw = $Dependency
     name = $name

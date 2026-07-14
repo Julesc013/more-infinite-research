@@ -1,0 +1,2601 @@
+{
+  "schema": 3,
+  "profiles": {
+    "1.1": [
+      {"name":"static-validation","target_profile":"1.1","kind":"gate","group":"static","surface":"base","required_features":[],"fixtures":[],"settings":{},"source_mode":"gate","timeout_seconds":120,"tags":["base","full","gate","static"],"isolation":"process","assertions":[{"id":"gate-passes","type":"gate-passes"}]},
+      {"name":"package-build","target_profile":"1.1","kind":"gate","group":"package","surface":"base","required_features":[],"fixtures":[],"settings":{},"source_mode":"gate","timeout_seconds":120,"tags":["base","full","gate","package"],"isolation":"process","assertions":[{"id":"gate-passes","type":"gate-passes"}]},
+      {"name":"runtime-state-contract","target_profile":"1.1","kind":"gate","group":"runtime-state","surface":"base","required_features":[],"fixtures":[],"settings":{},"source_mode":"gate","timeout_seconds":120,"tags":["base","full","gate","runtime-state"],"isolation":"process","assertions":[{"id":"gate-passes","type":"gate-passes"}]},
+      {"name":"package-zip-base","target_profile":"1.1","kind":"package","group":"exact-dist","surface":"base","required_features":[],"fixtures":[],"settings":{},"source_mode":"exact-package","timeout_seconds":120,"tags":["base","exact-dist","full","package","smoke"],"isolation":"fresh-data-stage","assertions":[{"id":"factorio-load-and-assertion-fixtures-pass","type":"factorio-load-and-assertion-fixtures-pass"}]},
+      {"name":"factorio-1.1-direct-effects","target_profile":"1.1","kind":"runtime","group":"science-prerequisites","surface":"base","required_features":[],"fixtures":["mir-fixture-assert-legacy-effect-icons"],"settings":{},"source_mode":"exact-package","timeout_seconds":120,"tags":["base","full","runtime","science-prerequisites"],"isolation":"fresh-data-stage","assertions":[{"id":"legacy-direct-effects-and-science-progression","type":"factorio-load-and-assertion-fixtures-pass"}]},
+      {"name":"lab-productivity-owner-skip","target_profile":"1.1","kind":"runtime","group":"base-load","surface":"base","required_features":[],"fixtures":["mir-fixture-lab-productivity-owner","mir-fixture-assert-lab-productivity-owner-skip"],"settings":{},"source_mode":"exact-package","timeout_seconds":120,"tags":["base","base-load","full","runtime"],"isolation":"fresh-data-stage","assertions":[{"id":"lab-owner-skip","type":"factorio-load-and-assertion-fixtures-pass"}]},
+      {"name":"better-bot-battery-owner-skip","target_profile":"1.1","kind":"runtime","group":"direct-effects","surface":"base","required_features":[],"fixtures":["mir-fixture-better-bot-battery-owner","mir-fixture-assert-better-bot-battery-skip"],"settings":{},"source_mode":"exact-package","timeout_seconds":120,"tags":["base","direct-effects","full","runtime"],"isolation":"fresh-data-stage","assertions":[{"id":"battery-owner-skip","type":"factorio-load-and-assertion-fixtures-pass"}]},
+      {"name":"character-inventory-merged-effects","target_profile":"1.1","kind":"runtime","group":"direct-effects","surface":"base","required_features":[],"fixtures":[],"settings":{},"source_mode":"exact-package","timeout_seconds":120,"tags":["base","direct-effects","full","runtime"],"isolation":"fresh-data-stage","assertions":[{"id":"merged-inventory-effects","type":"factorio-load-and-assertion-fixtures-pass"}]},
+      {"name":"reduced-settings-surface","target_profile":"1.1","kind":"runtime","group":"reduced-settings-surface","surface":"base","required_features":[],"fixtures":["mir-fixture-assert-reduced-settings-surface"],"settings":{},"source_mode":"exact-package","timeout_seconds":120,"tags":["base","full","reduced-settings-surface","runtime"],"isolation":"fresh-data-stage","assertions":[{"id":"reduced-settings-surface","type":"factorio-load-and-assertion-fixtures-pass"}]},
+      {"name":"checkbox-enabled-default-off-features","target_profile":"1.1","kind":"runtime","group":"base-load","surface":"base","required_features":[],"fixtures":[],"settings":{},"source_mode":"exact-package","timeout_seconds":120,"tags":["base","base-load","full","runtime"],"isolation":"fresh-data-stage","assertions":[{"id":"enabled-checkbox","type":"factorio-load-and-assertion-fixtures-pass"}]},
+      {"name":"checkbox-disabled-default-on-features","target_profile":"1.1","kind":"runtime","group":"base-load","surface":"base","required_features":[],"fixtures":[],"settings":{},"source_mode":"exact-package","timeout_seconds":120,"tags":["base","base-load","full","runtime"],"isolation":"fresh-data-stage","assertions":[{"id":"disabled-checkbox","type":"factorio-load-and-assertion-fixtures-pass"}]},
+      {"name":"weapon-overlap-off-coverage-absent","target_profile":"1.1","kind":"runtime","group":"weapon-overlap","surface":"base","required_features":[],"fixtures":["mir-fixture-assert-weapon-speed-safety"],"settings":{},"source_mode":"exact-package","timeout_seconds":120,"tags":["base","full","runtime","weapon-overlap"],"isolation":"fresh-data-stage","assertions":[{"id":"weapon-overlap-matrix","type":"factorio-load-and-assertion-fixtures-pass"}]},
+      {"name":"weapon-overlap-off-coverage-present","target_profile":"1.1","kind":"runtime","group":"weapon-overlap","surface":"base","required_features":[],"fixtures":["mir-fixture-assert-weapon-speed-safety"],"settings":{},"source_mode":"exact-package","timeout_seconds":120,"tags":["base","full","runtime","weapon-overlap"],"isolation":"fresh-data-stage","assertions":[{"id":"weapon-overlap-matrix","type":"factorio-load-and-assertion-fixtures-pass"}]},
+      {"name":"weapon-overlap-conditional-coverage-absent","target_profile":"1.1","kind":"runtime","group":"weapon-overlap","surface":"base","required_features":[],"fixtures":["mir-fixture-assert-weapon-speed-safety"],"settings":{},"source_mode":"exact-package","timeout_seconds":120,"tags":["base","full","runtime","weapon-overlap"],"isolation":"fresh-data-stage","assertions":[{"id":"weapon-overlap-matrix","type":"factorio-load-and-assertion-fixtures-pass"}]},
+      {"name":"weapon-overlap-conditional-coverage-present","target_profile":"1.1","kind":"runtime","group":"weapon-overlap","surface":"base","required_features":[],"fixtures":["mir-fixture-assert-weapon-speed-safety"],"settings":{},"source_mode":"exact-package","timeout_seconds":120,"tags":["base","full","runtime","weapon-overlap"],"isolation":"fresh-data-stage","assertions":[{"id":"weapon-overlap-matrix","type":"factorio-load-and-assertion-fixtures-pass"}]},
+      {"name":"weapon-overlap-always-coverage-absent","target_profile":"1.1","kind":"runtime","group":"weapon-overlap","surface":"base","required_features":[],"fixtures":["mir-fixture-assert-weapon-speed-safety"],"settings":{},"source_mode":"exact-package","timeout_seconds":120,"tags":["base","full","runtime","weapon-overlap"],"isolation":"fresh-data-stage","assertions":[{"id":"weapon-overlap-matrix","type":"factorio-load-and-assertion-fixtures-pass"}]},
+      {"name":"weapon-overlap-always-coverage-present","target_profile":"1.1","kind":"runtime","group":"weapon-overlap","surface":"base","required_features":[],"fixtures":["mir-fixture-assert-weapon-speed-safety"],"settings":{},"source_mode":"exact-package","timeout_seconds":120,"tags":["base","full","runtime","weapon-overlap"],"isolation":"fresh-data-stage","assertions":[{"id":"weapon-overlap-matrix","type":"factorio-load-and-assertion-fixtures-pass"}]},
+      {"name":"scaled-weapon-overlap","target_profile":"1.1","kind":"runtime","group":"weapon-overlap","surface":"base","required_features":[],"fixtures":["mir-fixture-assert-weapon-speed-safety"],"settings":{},"source_mode":"exact-package","timeout_seconds":120,"tags":["base","full","runtime","weapon-overlap"],"isolation":"fresh-data-stage","assertions":[{"id":"scaled-weapon-overlap","type":"factorio-load-and-assertion-fixtures-pass"}]},
+      {"name":"weapon-overlap-conditional-external-owner","target_profile":"1.1","kind":"runtime","group":"weapon-overlap","surface":"base","required_features":[],"fixtures":["mir-fixture-weapon-speed-external-owner","mir-fixture-assert-weapon-speed-safety"],"settings":{},"source_mode":"exact-package","timeout_seconds":120,"tags":["base","full","runtime","weapon-overlap"],"isolation":"fresh-data-stage","assertions":[{"id":"external-weapon-owner","type":"factorio-load-and-assertion-fixtures-pass"}]}
+    ],
+    "2.1": [
+      {
+        "name": "aai-loader-belt-productivity",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "local-mod-library",
+        "surface": "base",
+        "required_features": [
+          "recipe_productivity"
+        ],
+        "fixtures": [],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 120,
+        "tags": [
+          "base",
+          "full",
+          "local-mod-library",
+          "runtime"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "air-scrubbing-clean-filter",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "local-mod-library",
+        "surface": "base",
+        "required_features": [],
+        "fixtures": [],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 120,
+        "tags": [
+          "base",
+          "full",
+          "local-mod-library",
+          "runtime"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "all-official-pack-policy",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "official-science",
+        "surface": "base",
+        "required_features": [],
+        "fixtures": [],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 120,
+        "tags": [
+          "base",
+          "full",
+          "official-science",
+          "runtime"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "all-pack-policy",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "official-science",
+        "surface": "base",
+        "required_features": [],
+        "fixtures": [],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 120,
+        "tags": [
+          "base",
+          "full",
+          "official-science",
+          "runtime"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "atan-ash-separation",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "local-mod-library",
+        "surface": "base",
+        "required_features": [],
+        "fixtures": [],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 120,
+        "tags": [
+          "base",
+          "full",
+          "local-mod-library",
+          "runtime"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "atan-nuclear-science-productivity",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "official-science",
+        "surface": "base",
+        "required_features": [
+          "recipe_productivity"
+        ],
+        "fixtures": [],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 120,
+        "tags": [
+          "base",
+          "full",
+          "official-science",
+          "runtime"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "base-cargo-space-age-gate",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": [],
+        "fixtures": [],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 180,
+        "tags": [
+          "full",
+          "runtime",
+          "space-age"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "base-competitor-rollback",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "local-mod-library",
+        "surface": "base",
+        "required_features": [
+          "recipe_productivity"
+        ],
+        "fixtures": [],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 120,
+        "tags": [
+          "base",
+          "full",
+          "local-mod-library",
+          "runtime"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "base-effect-setting-retention",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "local-mod-library",
+        "surface": "base",
+        "required_features": [],
+        "fixtures": [],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 120,
+        "tags": [
+          "base",
+          "full",
+          "local-mod-library",
+          "runtime"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "base-extension-boundary-policy",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "base-load",
+        "surface": "base",
+        "required_features": [],
+        "fixtures": [],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 120,
+        "tags": [
+          "base",
+          "base-load",
+          "full",
+          "runtime"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "base-fluid-productivity",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "local-mod-library",
+        "surface": "base",
+        "required_features": [
+          "recipe_productivity"
+        ],
+        "fixtures": [],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 120,
+        "tags": [
+          "base",
+          "full",
+          "local-mod-library",
+          "runtime"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "base-generation-integrity",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "base-load",
+        "surface": "base",
+        "required_features": [
+          "recipe_productivity"
+        ],
+        "fixtures": [
+          "mir-fixture-assert-generation-integrity",
+          "mir-fixture-assert-hidden-setting-readability"
+        ],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 120,
+        "tags": [
+          "base",
+          "base-load",
+          "full",
+          "runtime",
+          "smoke"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "base-generation-integrity-inserter-enabled",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "base-load",
+        "surface": "base",
+        "required_features": [
+          "recipe_productivity"
+        ],
+        "fixtures": [],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 120,
+        "tags": [
+          "base",
+          "base-load",
+          "full",
+          "runtime"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "base-installed-space-age-icon-assets",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "local-mod-library",
+        "surface": "base",
+        "required_features": [],
+        "fixtures": [],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 120,
+        "tags": [
+          "base",
+          "full",
+          "local-mod-library",
+          "runtime"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "base-scripted-candidates-enabled",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "local-mod-library",
+        "surface": "base",
+        "required_features": [],
+        "fixtures": [],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 120,
+        "tags": [
+          "base",
+          "full",
+          "local-mod-library",
+          "runtime"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "base-space-promethium-pack-policy",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": [],
+        "fixtures": [],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 180,
+        "tags": [
+          "full",
+          "runtime",
+          "space-age"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "better-bot-battery-owner-skip",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "direct-effects",
+        "surface": "base",
+        "required_features": [
+          "recipe_productivity"
+        ],
+        "fixtures": [],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 120,
+        "tags": [
+          "base",
+          "direct-effects",
+          "full",
+          "runtime"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "big-mining-drill-productivity",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "local-mod-library",
+        "surface": "base",
+        "required_features": [
+          "recipe_productivity"
+        ],
+        "fixtures": [],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 120,
+        "tags": [
+          "base",
+          "full",
+          "local-mod-library",
+          "runtime"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "capability-negative-cases",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "local-mod-library",
+        "surface": "base",
+        "required_features": [],
+        "fixtures": [],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 120,
+        "tags": [
+          "base",
+          "full",
+          "local-mod-library",
+          "runtime"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "character-inventory-merged-effects",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "direct-effects",
+        "surface": "base",
+        "required_features": [],
+        "fixtures": [],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 120,
+        "tags": [
+          "base",
+          "direct-effects",
+          "full",
+          "runtime"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "checkbox-disabled-default-on-features",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "base-load",
+        "surface": "base",
+        "required_features": [],
+        "fixtures": [],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 120,
+        "tags": [
+          "base",
+          "base-load",
+          "full",
+          "runtime"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "checkbox-enabled-default-off-features",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "base-load",
+        "surface": "base",
+        "required_features": [],
+        "fixtures": [],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 120,
+        "tags": [
+          "base",
+          "base-load",
+          "full",
+          "runtime"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "compiler-contracts",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "local-mod-library",
+        "surface": "base",
+        "required_features": [],
+        "fixtures": [
+          "mir-fixture-assert-compiler-contracts"
+        ],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 120,
+        "tags": [
+          "base",
+          "full",
+          "local-mod-library",
+          "runtime",
+          "smoke"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "effect-scaling-mixed-tier",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "local-mod-library",
+        "surface": "base",
+        "required_features": [],
+        "fixtures": [],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 120,
+        "tags": [
+          "base",
+          "full",
+          "local-mod-library",
+          "runtime"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "space-age-galore-effect-ownership",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "automatic-compiler",
+        "surface": "space-age",
+        "required_features": [
+          "recipe_productivity"
+        ],
+        "fixtures": [
+          "mir-fixture-space-age-galore-overlap"
+        ],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 180,
+        "tags": [
+          "automatic-compiler",
+          "full",
+          "runtime",
+          "smoke",
+          "space-age"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "single-deterministic-owner-for-multi-output-recipe",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "end-game-prerequisite-gate",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "local-mod-library",
+        "surface": "base",
+        "required_features": [
+          "recipe_productivity"
+        ],
+        "fixtures": [],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 120,
+        "tags": [
+          "base",
+          "full",
+          "local-mod-library",
+          "runtime"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "generated-prerequisite-safety",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "science-prerequisites",
+        "surface": "base",
+        "required_features": [
+          "recipe_productivity"
+        ],
+        "fixtures": [
+          "mir-fixture-assert-generated-prerequisite-safety"
+        ],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 120,
+        "tags": [
+          "base",
+          "full",
+          "runtime",
+          "science-prerequisites"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "external-technology-cycle",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "science-prerequisites",
+        "surface": "base",
+        "required_features": [],
+        "fixtures": [
+          "mir-fixture-external-technology-cycle"
+        ],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 120,
+        "tags": [
+          "base",
+          "full",
+          "runtime",
+          "science-prerequisites",
+          "smoke"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "external-cycle-diagnosed-with-generated-cycle-safety-retained",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "lab-policy-engine-default",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "local-mod-library",
+        "surface": "base",
+        "required_features": [],
+        "fixtures": [],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 120,
+        "tags": [
+          "base",
+          "full",
+          "local-mod-library",
+          "runtime"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "lab-productivity-owner-skip",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "direct-effects",
+        "surface": "base",
+        "required_features": [
+          "recipe_productivity"
+        ],
+        "fixtures": [],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 120,
+        "tags": [
+          "base",
+          "direct-effects",
+          "full",
+          "runtime"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "mod-progression-pack-policy",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "official-science",
+        "surface": "base",
+        "required_features": [],
+        "fixtures": [],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 120,
+        "tags": [
+          "base",
+          "full",
+          "official-science",
+          "runtime"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "official-progression-pack-policy",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": [],
+        "fixtures": [],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 180,
+        "tags": [
+          "full",
+          "runtime",
+          "space-age"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "omega-drill-productivity",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "local-mod-library",
+        "surface": "base",
+        "required_features": [
+          "recipe_productivity"
+        ],
+        "fixtures": [],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 120,
+        "tags": [
+          "base",
+          "full",
+          "local-mod-library",
+          "runtime"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "package-build",
+        "target_profile": "2.1",
+        "kind": "gate",
+        "group": "package",
+        "surface": "base",
+        "required_features": [],
+        "fixtures": [],
+        "settings": {},
+        "source_mode": "gate",
+        "timeout_seconds": 120,
+        "tags": [
+          "base",
+          "full",
+          "gate",
+          "package"
+        ],
+        "isolation": "process",
+        "assertions": [
+          {
+            "id": "gate-passes",
+            "type": "gate-passes"
+          }
+        ]
+      },
+      {
+        "name": "package-zip-base",
+        "target_profile": "2.1",
+        "kind": "package",
+        "group": "exact-dist",
+        "surface": "base",
+        "required_features": [],
+        "fixtures": [],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 120,
+        "tags": [
+          "base",
+          "exact-dist",
+          "full",
+          "package",
+          "smoke"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "package-zip-space-age",
+        "target_profile": "2.1",
+        "kind": "package",
+        "group": "exact-dist",
+        "surface": "space-age",
+        "required_features": [],
+        "fixtures": [],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 180,
+        "tags": [
+          "exact-dist",
+          "full",
+          "package",
+          "smoke",
+          "space-age"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "pipeline-extent-multiplier",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "local-mod-library",
+        "surface": "base",
+        "required_features": [],
+        "fixtures": [],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 120,
+        "tags": [
+          "base",
+          "full",
+          "local-mod-library",
+          "runtime"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "pipeline-extent-multiplier-50",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "local-mod-library",
+        "surface": "base",
+        "required_features": [],
+        "fixtures": [],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 120,
+        "tags": [
+          "base",
+          "full",
+          "local-mod-library",
+          "runtime"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "prototype-limit-overrides-base",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "local-mod-library",
+        "surface": "base",
+        "required_features": [],
+        "fixtures": [],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 120,
+        "tags": [
+          "base",
+          "full",
+          "local-mod-library",
+          "runtime"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "prototype-limit-overrides-space-age",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": [],
+        "fixtures": [],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 180,
+        "tags": [
+          "full",
+          "runtime",
+          "space-age"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "prototype-limit-scope-engine-unchanged-baseline",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "local-mod-library",
+        "surface": "base",
+        "required_features": [],
+        "fixtures": [],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 120,
+        "tags": [
+          "base",
+          "full",
+          "local-mod-library",
+          "runtime"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "prototype-limit-scope-inert-at-fixed-threshold",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "local-mod-library",
+        "surface": "base",
+        "required_features": [],
+        "fixtures": [],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 120,
+        "tags": [
+          "base",
+          "full",
+          "local-mod-library",
+          "runtime"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "prototype-limit-scope-inert-at-matched-threshold",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "local-mod-library",
+        "surface": "base",
+        "required_features": [],
+        "fixtures": [],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 120,
+        "tags": [
+          "base",
+          "full",
+          "local-mod-library",
+          "runtime"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "prototype-limit-self-recycling-and-unrestricted-modules",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "local-mod-library",
+        "surface": "base",
+        "required_features": [],
+        "fixtures": [],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 120,
+        "tags": [
+          "base",
+          "full",
+          "local-mod-library",
+          "runtime"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "recipe-cap-diagnostics",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "local-mod-library",
+        "surface": "base",
+        "required_features": [
+          "recipe_productivity"
+        ],
+        "fixtures": [],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 120,
+        "tags": [
+          "base",
+          "full",
+          "local-mod-library",
+          "runtime"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "reduce-policy",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "local-mod-library",
+        "surface": "base",
+        "required_features": [],
+        "fixtures": [],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 120,
+        "tags": [
+          "base",
+          "full",
+          "local-mod-library",
+          "runtime"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "rigor-late-recipe-removal",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "recipe-target-integrity",
+        "surface": "base",
+        "required_features": [
+          "recipe_productivity"
+        ],
+        "fixtures": [],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 120,
+        "tags": [
+          "base",
+          "full",
+          "recipe-target-integrity",
+          "runtime"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "runtime-state-contract",
+        "target_profile": "2.1",
+        "kind": "gate",
+        "group": "runtime-state",
+        "surface": "base",
+        "required_features": [],
+        "fixtures": [],
+        "settings": {},
+        "source_mode": "gate",
+        "timeout_seconds": 120,
+        "tags": [
+          "base",
+          "full",
+          "gate",
+          "runtime-state"
+        ],
+        "isolation": "process",
+        "assertions": [
+          {
+            "id": "gate-passes",
+            "type": "gate-passes"
+          }
+        ]
+      },
+      {
+        "name": "scaled-known-productivity-competitor",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": [
+          "recipe_productivity"
+        ],
+        "fixtures": [],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 180,
+        "tags": [
+          "full",
+          "runtime",
+          "space-age"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "scaled-weapon-overlap",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "weapon-overlap",
+        "surface": "base",
+        "required_features": [],
+        "fixtures": [],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 120,
+        "tags": [
+          "base",
+          "full",
+          "runtime",
+          "weapon-overlap"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "semantic-family-attach",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "local-mod-library",
+        "surface": "base",
+        "required_features": [
+          "recipe_productivity"
+        ],
+        "fixtures": [
+          "mir-fixture-semantic-family-attach",
+          "mir-fixture-assert-semantic-family-attach"
+        ],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 120,
+        "tags": [
+          "base",
+          "full",
+          "local-mod-library",
+          "runtime",
+          "smoke"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "semantic-family-exact-pack",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "automatic-compiler",
+        "surface": "base",
+        "required_features": [
+          "recipe_productivity"
+        ],
+        "fixtures": [
+          "mir-fixture-semantic-family-attach",
+          "mir-fixture-assert-semantic-family-exact-pack"
+        ],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 120,
+        "tags": [
+          "automatic-compiler",
+          "base",
+          "full",
+          "runtime",
+          "smoke"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "automatic-mode-characterization",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "semantic-family-generate",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "local-mod-library",
+        "surface": "base",
+        "required_features": [
+          "recipe_productivity"
+        ],
+        "fixtures": [
+          "mir-fixture-semantic-family-attach",
+          "mir-fixture-assert-semantic-family-generate"
+        ],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 120,
+        "tags": [
+          "base",
+          "full",
+          "local-mod-library",
+          "runtime",
+          "smoke"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "semantic-family-off",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "automatic-compiler",
+        "surface": "base",
+        "required_features": [
+          "recipe_productivity"
+        ],
+        "fixtures": [
+          "mir-fixture-semantic-family-attach",
+          "mir-fixture-assert-semantic-family-off"
+        ],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 120,
+        "tags": [
+          "automatic-compiler",
+          "base",
+          "full",
+          "runtime",
+          "smoke"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "automatic-mode-characterization",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "semantic-family-report",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "automatic-compiler",
+        "surface": "base",
+        "required_features": [
+          "recipe_productivity"
+        ],
+        "fixtures": [
+          "mir-fixture-semantic-family-attach",
+          "mir-fixture-assert-semantic-family-report"
+        ],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 120,
+        "tags": [
+          "automatic-compiler",
+          "base",
+          "full",
+          "runtime",
+          "smoke"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "automatic-mode-characterization",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "settings-profile-roundtrip",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "settings-codec",
+        "surface": "base",
+        "required_features": [],
+        "fixtures": [],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 120,
+        "tags": [
+          "base",
+          "full",
+          "runtime",
+          "settings-codec"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "skip-policy",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "local-mod-library",
+        "surface": "base",
+        "required_features": [],
+        "fixtures": [],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 120,
+        "tags": [
+          "base",
+          "full",
+          "local-mod-library",
+          "runtime"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "space-age-cargo-logistics-shape",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": [],
+        "fixtures": [],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 180,
+        "tags": [
+          "full",
+          "runtime",
+          "space-age"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "space-age-cargo-pad-enabled",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": [],
+        "fixtures": [],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 180,
+        "tags": [
+          "full",
+          "runtime",
+          "space-age"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "space-age-duplicate-cargo-diagnostics",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": [],
+        "fixtures": [],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 180,
+        "tags": [
+          "full",
+          "runtime",
+          "space-age"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "space-age-fluid-productivity",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": [
+          "recipe_productivity"
+        ],
+        "fixtures": [],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 180,
+        "tags": [
+          "full",
+          "runtime",
+          "space-age"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "space-age-generation-integrity",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": [
+          "recipe_productivity"
+        ],
+        "fixtures": [],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 180,
+        "tags": [
+          "full",
+          "runtime",
+          "smoke",
+          "space-age"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "space-age-generation-integrity-inserter-enabled",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": [
+          "recipe_productivity"
+        ],
+        "fixtures": [],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 180,
+        "tags": [
+          "full",
+          "runtime",
+          "space-age"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "space-age-plates-n-circuit-productivity-blocked-owner",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": [
+          "recipe_productivity"
+        ],
+        "fixtures": [],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 180,
+        "tags": [
+          "full",
+          "runtime",
+          "space-age"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "space-age-plates-n-circuit-productivity-change-mismatch",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": [
+          "recipe_productivity"
+        ],
+        "fixtures": [],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 180,
+        "tags": [
+          "full",
+          "runtime",
+          "space-age"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "space-age-plates-n-circuit-productivity-compat",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": [
+          "recipe_productivity"
+        ],
+        "fixtures": [],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 180,
+        "tags": [
+          "full",
+          "runtime",
+          "space-age"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "space-age-plates-n-circuit-productivity-partial-coverage",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": [
+          "recipe_productivity"
+        ],
+        "fixtures": [],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 180,
+        "tags": [
+          "full",
+          "runtime",
+          "space-age"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "space-age-progression-pack-policy",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": [],
+        "fixtures": [],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 180,
+        "tags": [
+          "full",
+          "runtime",
+          "space-age"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "space-age-scripted-candidates-disabled",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": [],
+        "fixtures": [],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 180,
+        "tags": [
+          "full",
+          "runtime",
+          "space-age"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "space-age-scripted-candidates-enabled",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": [],
+        "fixtures": [],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 180,
+        "tags": [
+          "full",
+          "runtime",
+          "space-age"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "space-age-scripted-runtime-disable-restoration",
+        "target_profile": "2.1",
+        "kind": "configuration-change",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": [],
+        "fixtures": [],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 300,
+        "tags": [
+          "configuration-change",
+          "full",
+          "space-age"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "space-age-scripted-runtime-lifecycle",
+        "target_profile": "2.1",
+        "kind": "configuration-change",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": [],
+        "fixtures": [],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 300,
+        "tags": [
+          "configuration-change",
+          "full",
+          "space-age"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "space-age-scripted-runtime-reenable",
+        "target_profile": "2.1",
+        "kind": "configuration-change",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": [],
+        "fixtures": [],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 300,
+        "tags": [
+          "configuration-change",
+          "full",
+          "space-age"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "space-age-space-pack-policy",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": [],
+        "fixtures": [],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 180,
+        "tags": [
+          "full",
+          "runtime",
+          "space-age"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "space-age-space-promethium-pack-policy",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": [],
+        "fixtures": [],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 180,
+        "tags": [
+          "full",
+          "runtime",
+          "space-age"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "space-age-vanilla-family-adoption",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": [
+          "recipe_productivity"
+        ],
+        "fixtures": [
+          "mir-fixture-vanilla-family-adoption-recipes",
+          "mir-fixture-assert-vanilla-family-adoption"
+        ],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 180,
+        "tags": [
+          "full",
+          "runtime",
+          "space-age"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "space-age-native-owner-settings-default",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": ["recipe_productivity"],
+        "fixtures": ["mir-fixture-native-owner-settings-source", "mir-fixture-assert-native-owner-settings"],
+        "settings": {"NativeOwnerSettingsProfile": "default"},
+        "source_mode": "exact-package",
+        "timeout_seconds": 180,
+        "tags": ["full", "native-owner-settings", "runtime", "space-age"],
+        "isolation": "fresh-data-stage",
+        "assertions": [{"id": "native-owner-default-preservation", "type": "factorio-load-and-assertion-fixtures-pass"}]
+      },
+      {
+        "name": "space-age-native-owner-settings-disabled",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": ["recipe_productivity"],
+        "fixtures": ["mir-fixture-native-owner-settings-source", "mir-fixture-assert-native-owner-settings"],
+        "settings": {"NativeOwnerSettingsProfile": "disabled"},
+        "source_mode": "exact-package",
+        "timeout_seconds": 180,
+        "tags": ["full", "native-owner-settings", "runtime", "space-age"],
+        "isolation": "fresh-data-stage",
+        "assertions": [{"id": "native-owner-disabled-no-touch", "type": "factorio-load-and-assertion-fixtures-pass"}]
+      },
+      {
+        "name": "space-age-native-owner-settings-cost-base",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": ["recipe_productivity"],
+        "fixtures": ["mir-fixture-native-owner-settings-source", "mir-fixture-assert-native-owner-settings"],
+        "settings": {"NativeOwnerSettingsProfile": "cost-base"},
+        "source_mode": "exact-package",
+        "timeout_seconds": 180,
+        "tags": ["full", "native-owner-settings", "runtime", "space-age"],
+        "isolation": "fresh-data-stage",
+        "assertions": [{"id": "native-owner-cost-base-override", "type": "factorio-load-and-assertion-fixtures-pass"}]
+      },
+      {
+        "name": "space-age-native-owner-settings-cost-growth",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": ["recipe_productivity"],
+        "fixtures": ["mir-fixture-native-owner-settings-source", "mir-fixture-assert-native-owner-settings"],
+        "settings": {"NativeOwnerSettingsProfile": "cost-growth"},
+        "source_mode": "exact-package",
+        "timeout_seconds": 180,
+        "tags": ["full", "native-owner-settings", "runtime", "space-age"],
+        "isolation": "fresh-data-stage",
+        "assertions": [{"id": "native-owner-cost-growth-override", "type": "factorio-load-and-assertion-fixtures-pass"}]
+      },
+      {
+        "name": "space-age-native-owner-settings-research-time",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": ["recipe_productivity"],
+        "fixtures": ["mir-fixture-native-owner-settings-source", "mir-fixture-assert-native-owner-settings"],
+        "settings": {"NativeOwnerSettingsProfile": "research-time"},
+        "source_mode": "exact-package",
+        "timeout_seconds": 180,
+        "tags": ["full", "native-owner-settings", "runtime", "space-age"],
+        "isolation": "fresh-data-stage",
+        "assertions": [{"id": "native-owner-research-time-override", "type": "factorio-load-and-assertion-fixtures-pass"}]
+      },
+      {
+        "name": "space-age-native-owner-settings-max-level",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": ["recipe_productivity"],
+        "fixtures": ["mir-fixture-native-owner-settings-source", "mir-fixture-assert-native-owner-settings"],
+        "settings": {"NativeOwnerSettingsProfile": "max-level"},
+        "source_mode": "exact-package",
+        "timeout_seconds": 180,
+        "tags": ["full", "native-owner-settings", "runtime", "space-age"],
+        "isolation": "fresh-data-stage",
+        "assertions": [{"id": "native-owner-max-level-override", "type": "factorio-load-and-assertion-fixtures-pass"}]
+      },
+      {
+        "name": "space-age-native-owner-settings-effect",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": ["recipe_productivity"],
+        "fixtures": ["mir-fixture-native-owner-settings-source", "mir-fixture-assert-native-owner-settings"],
+        "settings": {"NativeOwnerSettingsProfile": "effect"},
+        "source_mode": "exact-package",
+        "timeout_seconds": 180,
+        "tags": ["full", "native-owner-settings", "runtime", "space-age"],
+        "isolation": "fresh-data-stage",
+        "assertions": [{"id": "native-owner-effect-override", "type": "factorio-load-and-assertion-fixtures-pass"}]
+      },
+      {
+        "name": "space-age-native-owner-settings-combined",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": ["recipe_productivity"],
+        "fixtures": ["mir-fixture-native-owner-settings-source", "mir-fixture-assert-native-owner-settings"],
+        "settings": {"NativeOwnerSettingsProfile": "combined"},
+        "source_mode": "exact-package",
+        "timeout_seconds": 180,
+        "tags": ["full", "native-owner-settings", "runtime", "space-age"],
+        "isolation": "fresh-data-stage",
+        "assertions": [{"id": "native-owner-combined-override", "type": "factorio-load-and-assertion-fixtures-pass"}]
+      },
+      {
+        "name": "space-age-native-owner-settings-unrecognized-default",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": ["recipe_productivity"],
+        "fixtures": ["mir-fixture-native-owner-settings-source", "mir-fixture-native-owner-unrecognized-formula", "mir-fixture-assert-native-owner-settings"],
+        "settings": {"NativeOwnerSettingsProfile": "unrecognized-default"},
+        "source_mode": "exact-package",
+        "timeout_seconds": 180,
+        "tags": ["full", "native-owner-settings", "runtime", "space-age"],
+        "isolation": "fresh-data-stage",
+        "assertions": [{"id": "native-owner-unrecognized-default-preserved", "type": "factorio-load-and-assertion-fixtures-pass"}]
+      },
+      {
+        "name": "space-age-native-owner-settings-unrecognized-override",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": ["recipe_productivity"],
+        "fixtures": ["mir-fixture-native-owner-settings-source", "mir-fixture-native-owner-unrecognized-formula", "mir-fixture-assert-native-owner-settings"],
+        "settings": {"NativeOwnerSettingsProfile": "unrecognized-override"},
+        "source_mode": "exact-package",
+        "timeout_seconds": 180,
+        "tags": ["full", "native-owner-settings", "runtime", "space-age"],
+        "isolation": "fresh-data-stage",
+        "assertions": [{"id": "native-owner-unsafe-cost-override-rejected", "type": "factorio-load-and-assertion-fixtures-pass"}]
+      },
+      {
+        "name": "space-age-native-owner-settings-config-change",
+        "target_profile": "2.1",
+        "kind": "configuration-change",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": ["recipe_productivity"],
+        "fixtures": [],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 300,
+        "tags": ["configuration-change", "full", "native-owner-settings", "space-age"],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {"id": "native-owner-settings-signature-reset", "type": "factorio-load-and-assertion-fixtures-pass"},
+          {"id": "native-owner-current-research-progress-retained", "type": "factorio-load-and-assertion-fixtures-pass"}
+        ]
+      },
+      {
+        "name": "space-age-vanilla-family-adoption-config-change",
+        "target_profile": "2.1",
+        "kind": "configuration-change",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": [
+          "recipe_productivity"
+        ],
+        "fixtures": [],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 300,
+        "tags": [
+          "configuration-change",
+          "full",
+          "space-age"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "space-age-vanilla-family-exact-owner",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": [
+          "recipe_productivity"
+        ],
+        "fixtures": [
+          "mir-fixture-vanilla-family-exact-owner",
+          "mir-fixture-assert-vanilla-family-exact-owner"
+        ],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 180,
+        "tags": [
+          "full",
+          "runtime",
+          "space-age"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "space-age-vanilla-family-mixed-owner",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": [
+          "recipe_productivity"
+        ],
+        "fixtures": [
+          "mir-fixture-vanilla-family-mixed-owner",
+          "mir-fixture-assert-vanilla-family-mixed-owner"
+        ],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 180,
+        "tags": [
+          "full",
+          "runtime",
+          "space-age"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "space-age-vanilla-family-owner-prepatched",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": [
+          "recipe_productivity"
+        ],
+        "fixtures": [
+          "mir-fixture-vanilla-family-owner-prepatched",
+          "mir-fixture-assert-vanilla-family-owner-prepatched"
+        ],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 180,
+        "tags": [
+          "full",
+          "runtime",
+          "space-age"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "space-pack-policy",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "official-science",
+        "surface": "base",
+        "required_features": [],
+        "fixtures": [],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 120,
+        "tags": [
+          "base",
+          "full",
+          "official-science",
+          "runtime"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "static-validation",
+        "target_profile": "2.1",
+        "kind": "gate",
+        "group": "static",
+        "surface": "base",
+        "required_features": [],
+        "fixtures": [],
+        "settings": {},
+        "source_mode": "gate",
+        "timeout_seconds": 120,
+        "tags": [
+          "base",
+          "full",
+          "gate",
+          "static"
+        ],
+        "isolation": "process",
+        "assertions": [
+          {
+            "id": "gate-passes",
+            "type": "gate-passes"
+          }
+        ]
+      },
+      {
+        "name": "synthetic-scale-graph",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "local-mod-library",
+        "surface": "base",
+        "required_features": [
+          "recipe_productivity"
+        ],
+        "fixtures": [],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 120,
+        "tags": [
+          "base",
+          "full",
+          "local-mod-library",
+          "runtime"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "technology-prerequisite-rewire",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "local-mod-library",
+        "surface": "base",
+        "required_features": [
+          "recipe_productivity"
+        ],
+        "fixtures": [],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 120,
+        "tags": [
+          "base",
+          "full",
+          "local-mod-library",
+          "runtime"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "weapon-overlap-always-coverage-absent",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "weapon-overlap",
+        "surface": "base",
+        "required_features": [],
+        "fixtures": [
+          "mir-fixture-assert-weapon-speed-safety"
+        ],
+        "settings": {
+          "WeaponSpeedAdjustmentMode": "always",
+          "DisabledStreamKeys": [
+            "research_rocket_shooting_speed",
+            "research_cannon_shooting_speed"
+          ]
+        },
+        "source_mode": "exact-package",
+        "timeout_seconds": 120,
+        "tags": [
+          "base",
+          "full",
+          "runtime",
+          "weapon-overlap"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "weapon-overlap-always-coverage-present",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "weapon-overlap",
+        "surface": "base",
+        "required_features": [],
+        "fixtures": [
+          "mir-fixture-assert-weapon-speed-safety"
+        ],
+        "settings": {
+          "WeaponSpeedAdjustmentMode": "always"
+        },
+        "source_mode": "exact-package",
+        "timeout_seconds": 120,
+        "tags": [
+          "base",
+          "full",
+          "runtime",
+          "weapon-overlap"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "weapon-overlap-conditional-coverage-absent",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "weapon-overlap",
+        "surface": "base",
+        "required_features": [],
+        "fixtures": [
+          "mir-fixture-assert-weapon-speed-safety"
+        ],
+        "settings": {
+          "WeaponSpeedAdjustmentMode": "only-when-dedicated-tech-enabled",
+          "DisabledStreamKeys": [
+            "research_rocket_shooting_speed",
+            "research_cannon_shooting_speed"
+          ]
+        },
+        "source_mode": "exact-package",
+        "timeout_seconds": 120,
+        "tags": [
+          "base",
+          "full",
+          "runtime",
+          "weapon-overlap"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "weapon-overlap-conditional-coverage-present",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "weapon-overlap",
+        "surface": "base",
+        "required_features": [],
+        "fixtures": [
+          "mir-fixture-assert-weapon-speed-safety"
+        ],
+        "settings": {
+          "WeaponSpeedAdjustmentMode": "only-when-dedicated-tech-enabled"
+        },
+        "source_mode": "exact-package",
+        "timeout_seconds": 120,
+        "tags": [
+          "base",
+          "full",
+          "runtime",
+          "weapon-overlap"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "weapon-overlap-conditional-external-owner",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "weapon-overlap",
+        "surface": "base",
+        "required_features": [
+          "recipe_productivity"
+        ],
+        "fixtures": [],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 120,
+        "tags": [
+          "base",
+          "full",
+          "runtime",
+          "weapon-overlap"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "weapon-overlap-off-coverage-absent",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "weapon-overlap",
+        "surface": "base",
+        "required_features": [],
+        "fixtures": [
+          "mir-fixture-assert-weapon-speed-safety"
+        ],
+        "settings": {
+          "WeaponSpeedAdjustmentMode": "off",
+          "DisabledStreamKeys": [
+            "research_rocket_shooting_speed",
+            "research_cannon_shooting_speed"
+          ]
+        },
+        "source_mode": "exact-package",
+        "timeout_seconds": 120,
+        "tags": [
+          "base",
+          "full",
+          "runtime",
+          "weapon-overlap"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "weapon-overlap-off-coverage-present",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "weapon-overlap",
+        "surface": "base",
+        "required_features": [],
+        "fixtures": [
+          "mir-fixture-assert-weapon-speed-safety"
+        ],
+        "settings": {
+          "WeaponSpeedAdjustmentMode": "off"
+        },
+        "source_mode": "exact-package",
+        "timeout_seconds": 120,
+        "tags": [
+          "base",
+          "full",
+          "runtime",
+          "weapon-overlap"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      }
+    ]
+  }
+}

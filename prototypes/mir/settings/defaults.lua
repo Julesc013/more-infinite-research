@@ -11,6 +11,10 @@ local defaults = {
   streams = {
     research_inventory_capacity = { growth_factor = 1.10 },
     research_robot_battery = { growth_factor = 1.2 },
+    research_breeding = {
+      enabled = true,
+      settings_priority = "top"
+    },
     research_lab_productivity = {
       base_cost = 1000,
       growth_factor = 1.2,
@@ -36,8 +40,7 @@ local defaults = {
         "logistic-science-pack",
         "chemical-science-pack",
         "production-science-pack",
-        "military-science-pack",
-        "electromagnetic-science-pack"
+        "military-science-pack"
       }
     },
     research_cannon_shooting_speed = {
@@ -48,8 +51,7 @@ local defaults = {
         "logistic-science-pack",
         "chemical-science-pack",
         "production-science-pack",
-        "military-science-pack",
-        "electromagnetic-science-pack"
+        "military-science-pack"
       }
     },
     research_flamethrower_shooting_speed = {
@@ -72,8 +74,7 @@ local defaults = {
         "logistic-science-pack",
         "chemical-science-pack",
         "production-science-pack",
-        "military-science-pack",
-        "electromagnetic-science-pack"
+        "military-science-pack"
       }
     }
   },

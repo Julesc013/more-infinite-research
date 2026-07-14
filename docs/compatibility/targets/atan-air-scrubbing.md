@@ -12,8 +12,7 @@ superseded_by: []
 
 # ATAN Air Scrubbing Compatibility
 
-Claim: MIR adds productivity to clean pollution and spore filter crafting
-recipes only.
+Claim: MIR adds productivity to clean pollution and spore filter crafting recipes only.
 
 Evidence:
 
@@ -21,5 +20,4 @@ Evidence:
 - `mir-fixture-assert-air-scrubbing-clean-filter`
 - Stream `mir-prod-air-scrubbing-clean-filter`
 
-Non-goals: scrubbing, cleaning, recovery, and environmental-removal recipes stay
-diagnostic-only.
+Non-goals: scrubbing, cleaning, recovery, and environmental-removal recipes stay diagnostic-only.

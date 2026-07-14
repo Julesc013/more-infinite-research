@@ -1,0 +1,571 @@
+{
+  "schema": 1,
+  "kind": "mir-modpack-campaign-evidence",
+  "generated_at": "2026-07-12T11:09:51.2888479Z",
+  "factorio_line": "2.1",
+  "factorio_binary": "C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\bin\\x64\\factorio.exe",
+  "mir_archive": {
+    "path": "C:\\Projects\\Factorio\\more-infinite-research\\build\\validation-dist\\more-infinite-research_3.1.0.zip",
+    "sha256": "7CC222EC860F21EBAA5C3E72F2C42BD97BF7A8DA8AE938AFA57D83994991676D",
+    "source_commit": "81e73eabf356e054aa9d2277d8f7d68255c726ff",
+    "source_commit_binding": "declared"
+  },
+  "dependency_lock": {
+    "path": "C:\\Projects\\Factorio\\more-infinite-research\\artifacts\\campaigns\\3.1.0-final-available-ecosystems-81e73ea-bound\\compat-candidates.lock.json",
+    "sha256": "011CDB1CCF23C23A6383B9AE645C4D06D8D37F8DA36353558F5198E75920A121"
+  },
+  "scenarios": [
+    {
+      "scenario_id": "local-2-1-aai-loaders",
+      "requested_roots": [
+        "aai-loaders"
+      ],
+      "actual_executed_roots": [
+        "aai-loaders"
+      ],
+      "resolved_mods": [
+        "aai-loaders"
+      ],
+      "official_mods": [],
+      "dependency_closure": [
+        {
+          "name": "aai-loaders",
+          "version": "0.3.0",
+          "sha256": "1236800ae998367aae1a26d3ac3728484088d051f89c66c6c860ba1fe195c85e",
+          "source": "local_zip"
+        }
+      ],
+      "dependency_failure_count": 0,
+      "result": "passed",
+      "exit_code": 0,
+      "timed_out": false,
+      "timeout_seconds": 900,
+      "settings": {},
+      "expected_plan": {
+        "mode": "load-only",
+        "required_result": "passed",
+        "maximum_dependency_failures": 0
+      },
+      "source_manifest": "C:\\Projects\\Factorio\\more-infinite-research\\scripts\\..\\fixtures\\compat-matrix\\local-library-scenarios.json",
+      "claim_level": "loads"
+    },
+    {
+      "scenario_id": "local-2-1-aai-industry",
+      "requested_roots": [
+        "aai-industry"
+      ],
+      "actual_executed_roots": [
+        "aai-industry"
+      ],
+      "resolved_mods": [
+        "aai-industry"
+      ],
+      "official_mods": [],
+      "dependency_closure": [
+        {
+          "name": "aai-industry",
+          "version": "0.7.0",
+          "sha256": "8be588f276d9835b21ac4874113dd107b182692301487b6f7f6c542c4b1f75ac",
+          "source": "local_zip"
+        }
+      ],
+      "dependency_failure_count": 0,
+      "result": "passed",
+      "exit_code": 0,
+      "timed_out": false,
+      "timeout_seconds": 900,
+      "settings": {},
+      "expected_plan": {
+        "mode": "load-only",
+        "required_result": "passed",
+        "maximum_dependency_failures": 0
+      },
+      "source_manifest": "C:\\Projects\\Factorio\\more-infinite-research\\scripts\\..\\fixtures\\compat-matrix\\local-library-scenarios.json",
+      "claim_level": "loads"
+    },
+    {
+      "scenario_id": "local-2-1-aai-loaders-industry",
+      "requested_roots": [
+        "aai-industry",
+        "aai-loaders"
+      ],
+      "actual_executed_roots": [
+        "aai-industry",
+        "aai-loaders"
+      ],
+      "resolved_mods": [
+        "aai-industry",
+        "aai-loaders"
+      ],
+      "official_mods": [],
+      "dependency_closure": [
+        {
+          "name": "aai-industry",
+          "version": "0.7.0",
+          "sha256": "8be588f276d9835b21ac4874113dd107b182692301487b6f7f6c542c4b1f75ac",
+          "source": "local_zip"
+        },
+        {
+          "name": "aai-loaders",
+          "version": "0.3.0",
+          "sha256": "1236800ae998367aae1a26d3ac3728484088d051f89c66c6c860ba1fe195c85e",
+          "source": "local_zip"
+        }
+      ],
+      "dependency_failure_count": 0,
+      "result": "passed",
+      "exit_code": 0,
+      "timed_out": false,
+      "timeout_seconds": 900,
+      "settings": {},
+      "expected_plan": {
+        "mode": "load-only",
+        "required_result": "passed",
+        "maximum_dependency_failures": 0
+      },
+      "source_manifest": "C:\\Projects\\Factorio\\more-infinite-research\\scripts\\..\\fixtures\\compat-matrix\\local-library-scenarios.json",
+      "claim_level": "loads"
+    },
+    {
+      "scenario_id": "local-2-1-aai-representative-extensions",
+      "requested_roots": [
+        "aai-containers",
+        "aai-industry",
+        "aai-loaders"
+      ],
+      "actual_executed_roots": [
+        "aai-containers",
+        "aai-industry",
+        "aai-loaders"
+      ],
+      "resolved_mods": [
+        "aai-containers",
+        "aai-industry",
+        "aai-loaders"
+      ],
+      "official_mods": [],
+      "dependency_closure": [
+        {
+          "name": "aai-containers",
+          "version": "0.4.0",
+          "sha256": "e353a4108f98b7a0b59c9324095575b195e81512c41fa87347b29d717346f47c",
+          "source": "local_zip"
+        },
+        {
+          "name": "aai-industry",
+          "version": "0.7.0",
+          "sha256": "8be588f276d9835b21ac4874113dd107b182692301487b6f7f6c542c4b1f75ac",
+          "source": "local_zip"
+        },
+        {
+          "name": "aai-loaders",
+          "version": "0.3.0",
+          "sha256": "1236800ae998367aae1a26d3ac3728484088d051f89c66c6c860ba1fe195c85e",
+          "source": "local_zip"
+        }
+      ],
+      "dependency_failure_count": 0,
+      "result": "passed",
+      "exit_code": 0,
+      "timed_out": false,
+      "timeout_seconds": 900,
+      "settings": {},
+      "expected_plan": {
+        "mode": "load-only",
+        "required_result": "passed",
+        "maximum_dependency_failures": 0
+      },
+      "source_manifest": "C:\\Projects\\Factorio\\more-infinite-research\\scripts\\..\\fixtures\\compat-matrix\\local-library-scenarios.json",
+      "claim_level": "loads"
+    },
+    {
+      "scenario_id": "local-2-1-bz-suite-space-age",
+      "requested_roots": [
+        "bzcarbon",
+        "bzlead",
+        "bzsilicon",
+        "bztin",
+        "bztitanium",
+        "bzzirconium"
+      ],
+      "actual_executed_roots": [
+        "bzcarbon",
+        "bzlead",
+        "bzsilicon",
+        "bztin",
+        "bztitanium",
+        "bzzirconium"
+      ],
+      "resolved_mods": [
+        "bzcarbon",
+        "bzlead",
+        "bzsilicon",
+        "bztin",
+        "bztitanium",
+        "bzzirconium"
+      ],
+      "official_mods": [
+        "elevated-rails",
+        "quality",
+        "recycler",
+        "space-age"
+      ],
+      "dependency_closure": [
+        {
+          "name": "bzcarbon",
+          "version": "2.0.23",
+          "sha256": "97fd7defc9b7a3cd7ed4be5e9180ca69576536e17a207fe62b8fe39c886aa19f",
+          "source": "local_zip"
+        },
+        {
+          "name": "bzlead",
+          "version": "2.0.29",
+          "sha256": "956df1ac308af33c4fde8f9b2b94ae9d79aa7b350fa76e15d98709c904ed77fb",
+          "source": "local_zip"
+        },
+        {
+          "name": "bzsilicon",
+          "version": "2.0.19",
+          "sha256": "d405b90c531c478f6f48d954751aa487a61caf59dc09fddf87bfd371ffe4de40",
+          "source": "local_zip"
+        },
+        {
+          "name": "bztin",
+          "version": "2.1.16",
+          "sha256": "eac78322c9edad0e618245f0602b7ca7479e91690fcac4b3bc2b3d2c4adfe4de",
+          "source": "local_zip"
+        },
+        {
+          "name": "bztitanium",
+          "version": "2.0.27",
+          "sha256": "074d430bc67a3a19dfd2d6df47ca44952f4db5ae2ded208f9f555607ffe4c94b",
+          "source": "local_zip"
+        },
+        {
+          "name": "bzzirconium",
+          "version": "2.1.14",
+          "sha256": "cc2b262cd4c042198317bf8bd2982d10bffb9a736db3a8b7137ed1922138080e",
+          "source": "local_zip"
+        }
+      ],
+      "dependency_failure_count": 0,
+      "result": "passed",
+      "exit_code": 0,
+      "timed_out": false,
+      "timeout_seconds": 900,
+      "settings": {},
+      "expected_plan": {
+        "mode": "load-only",
+        "required_result": "passed",
+        "maximum_dependency_failures": 0
+      },
+      "source_manifest": "C:\\Projects\\Factorio\\more-infinite-research\\scripts\\..\\fixtures\\compat-matrix\\local-library-scenarios.json",
+      "claim_level": "loads"
+    },
+    {
+      "scenario_id": "local-2-1-krastorio-spaced-out",
+      "requested_roots": [
+        "Krastorio2-spaced-out",
+        "xy-k2so-enhancements-nulls-fork"
+      ],
+      "actual_executed_roots": [
+        "Krastorio2-spaced-out",
+        "xy-k2so-enhancements-nulls-fork"
+      ],
+      "resolved_mods": [
+        "flib",
+        "k2so-assets",
+        "Krastorio2",
+        "Krastorio2-spaced-out",
+        "Krastorio2Assets",
+        "Krastorio2MenuSimulations",
+        "xy-k2so-enhancements-nulls-fork"
+      ],
+      "official_mods": [
+        "elevated-rails",
+        "quality",
+        "recycler",
+        "space-age"
+      ],
+      "dependency_closure": [
+        {
+          "name": "flib",
+          "version": "0.17.2",
+          "sha256": "0a48c15dc0fc6c13bb3fe8293ba6cb35a07f3b0f37d37acb50ab30e32e8e019d",
+          "source": "local_zip"
+        },
+        {
+          "name": "k2so-assets",
+          "version": "1.0.7",
+          "sha256": "c3e11214407b08120b2ee717405d3b0398f533647695ab2e6ef6df9267d62017",
+          "source": "local_zip"
+        },
+        {
+          "name": "Krastorio2",
+          "version": "2.1.2",
+          "sha256": "89989e60784ea3e94345289e063c64abfce5f35693db7b9a69d656a163620f43",
+          "source": "local_zip"
+        },
+        {
+          "name": "Krastorio2-spaced-out",
+          "version": "2.0.13",
+          "sha256": "a2eeb2e5a6119c4117bd3653979d40d305d17539e184bfa6f4ed53ef12a5f242",
+          "source": "local_zip"
+        },
+        {
+          "name": "Krastorio2Assets",
+          "version": "2.1.0",
+          "sha256": "39ef950ec8b21a40357dd0240ef8389501ee75cca82717f2773b98554da46e29",
+          "source": "local_zip"
+        },
+        {
+          "name": "Krastorio2MenuSimulations",
+          "version": "2.1.0",
+          "sha256": "3a485b449b356dc4b3eb4233de4e803b3a001259fbc251bdc9f9d9120b3c53a7",
+          "source": "local_zip"
+        },
+        {
+          "name": "xy-k2so-enhancements-nulls-fork",
+          "version": "0.8.3",
+          "sha256": "930f43b96b04012fef090c40d8b16a6b3f259d1713c86cf59dff3e9a5a97e2be",
+          "source": "local_zip"
+        }
+      ],
+      "dependency_failure_count": 0,
+      "result": "passed",
+      "exit_code": 0,
+      "timed_out": false,
+      "timeout_seconds": 900,
+      "settings": {},
+      "expected_plan": {
+        "mode": "load-only",
+        "required_result": "passed",
+        "maximum_dependency_failures": 0
+      },
+      "source_manifest": "C:\\Projects\\Factorio\\more-infinite-research\\scripts\\..\\fixtures\\compat-matrix\\local-library-scenarios.json",
+      "claim_level": "loads"
+    },
+    {
+      "scenario_id": "local-2-1-krastorio-base",
+      "requested_roots": [
+        "Krastorio2",
+        "krastorio2_extended_endgame",
+        "Krastorio2RFAC"
+      ],
+      "actual_executed_roots": [
+        "Krastorio2",
+        "krastorio2_extended_endgame",
+        "Krastorio2RFAC"
+      ],
+      "resolved_mods": [
+        "flib",
+        "Krastorio2",
+        "krastorio2_extended_endgame",
+        "Krastorio2Assets",
+        "Krastorio2MenuSimulations",
+        "Krastorio2RFAC"
+      ],
+      "official_mods": [],
+      "dependency_closure": [
+        {
+          "name": "flib",
+          "version": "0.17.2",
+          "sha256": "0a48c15dc0fc6c13bb3fe8293ba6cb35a07f3b0f37d37acb50ab30e32e8e019d",
+          "source": "local_zip"
+        },
+        {
+          "name": "Krastorio2",
+          "version": "2.1.2",
+          "sha256": "89989e60784ea3e94345289e063c64abfce5f35693db7b9a69d656a163620f43",
+          "source": "local_zip"
+        },
+        {
+          "name": "krastorio2_extended_endgame",
+          "version": "2.1.0",
+          "sha256": "ba7bf5f369269fa3dc9a86145e53097b0242ba9071c81c26c75962487634c3b7",
+          "source": "local_zip"
+        },
+        {
+          "name": "Krastorio2Assets",
+          "version": "2.1.0",
+          "sha256": "39ef950ec8b21a40357dd0240ef8389501ee75cca82717f2773b98554da46e29",
+          "source": "local_zip"
+        },
+        {
+          "name": "Krastorio2MenuSimulations",
+          "version": "2.1.0",
+          "sha256": "3a485b449b356dc4b3eb4233de4e803b3a001259fbc251bdc9f9d9120b3c53a7",
+          "source": "local_zip"
+        },
+        {
+          "name": "Krastorio2RFAC",
+          "version": "3.5.1",
+          "sha256": "f566af94a5881f0b346d6f91ce45198ae9c3f7d02a7569accd47c1965c22c402",
+          "source": "local_zip"
+        }
+      ],
+      "dependency_failure_count": 0,
+      "result": "passed",
+      "exit_code": 0,
+      "timed_out": false,
+      "timeout_seconds": 900,
+      "settings": {},
+      "expected_plan": {
+        "mode": "load-only",
+        "required_result": "passed",
+        "maximum_dependency_failures": 0
+      },
+      "source_manifest": "C:\\Projects\\Factorio\\more-infinite-research\\scripts\\..\\fixtures\\compat-matrix\\local-library-scenarios.json",
+      "claim_level": "loads"
+    },
+    {
+      "scenario_id": "local-2-1-bob-suite",
+      "requested_roots": [
+        "bobassembly",
+        "bobelectronics",
+        "bobenemies",
+        "bobequipment",
+        "boblogistics",
+        "bobmining",
+        "bobmodules",
+        "bobores",
+        "bobplates",
+        "bobpower",
+        "bobrevamp",
+        "bobtech",
+        "bobwarfare"
+      ],
+      "actual_executed_roots": [
+        "bobassembly",
+        "bobelectronics",
+        "bobenemies",
+        "bobequipment",
+        "boblogistics",
+        "bobmining",
+        "bobmodules",
+        "bobores",
+        "bobplates",
+        "bobpower",
+        "bobrevamp",
+        "bobtech",
+        "bobwarfare"
+      ],
+      "resolved_mods": [
+        "bobassembly",
+        "bobelectronics",
+        "bobenemies",
+        "bobequipment",
+        "boblibrary",
+        "boblogistics",
+        "bobmining",
+        "bobmodules",
+        "bobores",
+        "bobplates",
+        "bobpower",
+        "bobrevamp",
+        "bobtech",
+        "bobwarfare"
+      ],
+      "official_mods": [],
+      "dependency_closure": [
+        {
+          "name": "bobassembly",
+          "version": "3.0.1",
+          "sha256": "52c1f487015f1cfa0329a90faeed4ced7ef4d875a6d91cedad011ba3e483f5d6",
+          "source": "local_zip"
+        },
+        {
+          "name": "bobelectronics",
+          "version": "3.0.0",
+          "sha256": "6328d0d4bf27308a18165fd994a44904d83ed51e6c72a2b3d5b341c1e8741b3a",
+          "source": "local_zip"
+        },
+        {
+          "name": "bobenemies",
+          "version": "3.0.0",
+          "sha256": "7477d5c37d2945b7280ab43ab50a375535e87d23b44b19995da10e0edb7514de",
+          "source": "local_zip"
+        },
+        {
+          "name": "bobequipment",
+          "version": "3.0.0",
+          "sha256": "608205c0b7fedb7a400c6111e5857bf33ee14ba10dadbe5ad2b78e203fe8b5ed",
+          "source": "local_zip"
+        },
+        {
+          "name": "boblibrary",
+          "version": "3.0.0",
+          "sha256": "49eae2d4d8e58ebd28bafdb7e71d5307cbce2077e0642440ed7ec527d466ffc4",
+          "source": "local_zip"
+        },
+        {
+          "name": "boblogistics",
+          "version": "3.0.0",
+          "sha256": "476ae28e79c1da2d698bcaa272b032981fceb23b4ae962ef591fa778c7a67cea",
+          "source": "local_zip"
+        },
+        {
+          "name": "bobmining",
+          "version": "3.0.0",
+          "sha256": "93ac125a01e1608a27dd2080e7bae5cae3a895ae8e3859e1155deb894ca17463",
+          "source": "local_zip"
+        },
+        {
+          "name": "bobmodules",
+          "version": "3.0.0",
+          "sha256": "4f6404b65db281ecb2c16fb5cb918e64f995035b6e5b8719813f486fb98b0f7e",
+          "source": "local_zip"
+        },
+        {
+          "name": "bobores",
+          "version": "3.0.0",
+          "sha256": "7f8e33e35f59bb3f2cd72e3ab2fed30d1c2ae9c117e3731324ac307d9965082b",
+          "source": "local_zip"
+        },
+        {
+          "name": "bobplates",
+          "version": "3.0.0",
+          "sha256": "9c18ed29c614e5c96039c2cd0093e21b163e9ba4fe70a776eab9bf7d37d7a1fe",
+          "source": "local_zip"
+        },
+        {
+          "name": "bobpower",
+          "version": "3.0.0",
+          "sha256": "c33c7b521bec061adf695a14bf3a218259fc0548b5f5ab512e74eceaeda39831",
+          "source": "local_zip"
+        },
+        {
+          "name": "bobrevamp",
+          "version": "3.0.0",
+          "sha256": "aefac11f71aa82b2385d92fbac1c22fd6caef12e751a85ca63472ae8a4dc5703",
+          "source": "local_zip"
+        },
+        {
+          "name": "bobtech",
+          "version": "3.0.0",
+          "sha256": "397d979976316c3ce082d2ad29a046ccbaa147e412a0aeb727230bdecf665e5b",
+          "source": "local_zip"
+        },
+        {
+          "name": "bobwarfare",
+          "version": "3.0.0",
+          "sha256": "f5fead69eb876759547180612086b69add8e2ee28145c1c2b2d8198911be1073",
+          "source": "local_zip"
+        }
+      ],
+      "dependency_failure_count": 0,
+      "result": "passed",
+      "exit_code": 0,
+      "timed_out": false,
+      "timeout_seconds": 900,
+      "settings": {},
+      "expected_plan": {
+        "mode": "load-only",
+        "required_result": "passed",
+        "maximum_dependency_failures": 0
+      },
+      "source_manifest": "C:\\Projects\\Factorio\\more-infinite-research\\scripts\\..\\fixtures\\compat-matrix\\local-library-scenarios.json",
+      "claim_level": "loads"
+    }
+  ]
+}

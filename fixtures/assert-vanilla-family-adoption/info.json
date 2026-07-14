@@ -4,10 +4,10 @@
   "title": "MIR Fixture - Assert Vanilla Family Adoption",
   "author": "Julesc013",
   "description": "Validation fixture that asserts residual Space Age family recipes are adopted into vanilla productivity techs.",
-  "factorio_version": "1.1",
+  "factorio_version": "2.1",
   "dependencies": [
-    "base >= 1.1",
-    "space-age >= 1.1",
+    "base >= 2.1.8",
+    "space-age >= 2.1.8",
     "mir-fixture-vanilla-family-adoption-recipes",
     "more-infinite-research"
   ]
