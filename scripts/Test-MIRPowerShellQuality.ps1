@@ -66,6 +66,39 @@ foreach ($file in $scriptFiles) {
   }
 }
 
+$retentionHarnessPath = Join-Path $scriptRoot "Test-MIRCandidateRetention.ps1"
+if (-not (Test-Path -LiteralPath $retentionHarnessPath)) {
+  Add-MIRPowerShellQualityFailure -File "scripts/Test-MIRCandidateRetention.ps1" -Message "missing portable retention harness"
+} else {
+  $retentionHarnessText = Get-Content -Raw -LiteralPath $retentionHarnessPath
+  foreach ($requiredToken in @("Diagnostics.ProcessStartInfo", "WaitForExit", "Kill(`$true)")) {
+    if (-not $retentionHarnessText.Contains($requiredToken)) {
+      Add-MIRPowerShellQualityFailure -File "scripts/Test-MIRCandidateRetention.ps1" -Message "retention process lifecycle is missing $requiredToken"
+    }
+  }
+  if ($retentionHarnessText -match '(?m)^\s*&\s+\$FactorioBin\s+@') {
+    Add-MIRPowerShellQualityFailure -File "scripts/Test-MIRCandidateRetention.ps1" -Message "retention harness must wait on an owned process instead of invoking Factorio as a detached GUI application"
+  }
+  if ($retentionHarnessText -notmatch '\$profile\.factorio\.line\s+-eq\s+"0\.17"') {
+    Add-MIRPowerShellQualityFailure -File "scripts/Test-MIRCandidateRetention.ps1" -Message "benchmark-runs must be capability-gated to Factorio 0.17"
+  }
+  if ($retentionHarnessText.Contains("(?im)^.*Error ")) {
+    Add-MIRPowerShellQualityFailure -File "scripts/Test-MIRCandidateRetention.ps1" -Message "retention verdict must distinguish recoverable engine fallbacks from fatal mod-load errors"
+  }
+  if (-not $retentionHarnessText.Contains('factorio-current.log')) {
+    Add-MIRPowerShellQualityFailure -File "scripts/Test-MIRCandidateRetention.ps1" -Message "retention proof must consume the authoritative Factorio log when console output is absent"
+  }
+  if ($retentionHarnessText -notmatch '\$profile\.factorio\.line\s+-notin\s+@\("0\.13",\s*"0\.14"\)') {
+    Add-MIRPowerShellQualityFailure -File "scripts/Test-MIRCandidateRetention.ps1" -Message "disable-audio must be omitted for Factorio 0.13 and 0.14"
+  }
+  if (-not $retentionHarnessText.Contains('$requiresGoodbye')) {
+    Add-MIRPowerShellQualityFailure -File "scripts/Test-MIRCandidateRetention.ps1" -Message "loaded-map proof must account for finite archive lines that predate the Goodbye marker"
+  }
+  if (-not $retentionHarnessText.Contains('$benchmarkMap') -or $retentionHarnessText -notmatch '\$profile\.factorio\.line\s+-eq\s+"0\.13"') {
+    Add-MIRPowerShellQualityFailure -File "scripts/Test-MIRCandidateRetention.ps1" -Message "Factorio 0.13 benchmark reload must stage and address the save by basename"
+  }
+}
+
 $gitignorePath = Join-Path $RepoRoot ".gitignore"
 if (-not (Test-Path -LiteralPath $gitignorePath)) {
   Add-MIRPowerShellQualityFailure -File ".gitignore" -Message "missing .gitignore"
