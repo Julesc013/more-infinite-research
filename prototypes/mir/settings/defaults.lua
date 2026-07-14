@@ -40,8 +40,7 @@ local defaults = {
         "logistic-science-pack",
         "chemical-science-pack",
         "production-science-pack",
-        "military-science-pack",
-        "electromagnetic-science-pack"
+        "military-science-pack"
       }
     },
     research_cannon_shooting_speed = {
@@ -52,8 +51,7 @@ local defaults = {
         "logistic-science-pack",
         "chemical-science-pack",
         "production-science-pack",
-        "military-science-pack",
-        "electromagnetic-science-pack"
+        "military-science-pack"
       }
     },
     research_flamethrower_shooting_speed = {
@@ -76,8 +74,7 @@ local defaults = {
         "logistic-science-pack",
         "chemical-science-pack",
         "production-science-pack",
-        "military-science-pack",
-        "electromagnetic-science-pack"
+        "military-science-pack"
       }
     }
   },
