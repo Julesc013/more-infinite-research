@@ -1684,7 +1684,8 @@
         "tags": ["configuration-change", "full", "native-owner-settings", "space-age"],
         "isolation": "fresh-data-stage",
         "assertions": [
-          {"id": "native-owner-settings-signature-reset", "type": "factorio-load-and-assertion-fixtures-pass"}
+          {"id": "native-owner-settings-signature-reset", "type": "factorio-load-and-assertion-fixtures-pass"},
+          {"id": "native-owner-current-research-progress-retained", "type": "factorio-load-and-assertion-fixtures-pass"}
         ]
       },
       {

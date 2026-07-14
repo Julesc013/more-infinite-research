@@ -99,9 +99,10 @@ local function build_plan(key, spec, owner, binding, buckets)
   local effect_value = selected(effect_contracts.stream_setting_name(key))
 
   local model = cost_model.classify(owner.unit, binding.cost_model)
+  local cost_changed = base.changed or growth.changed
   local configured_cost, cost_reason = cost_model.configure(model, {
-    base = base.changed and base.value or nil,
-    growth = growth.changed and growth.value or nil
+    base = cost_changed and base.value or nil,
+    growth = cost_changed and growth.value or nil
   })
   if not configured_cost then return nil, cost_reason end
 
@@ -118,12 +119,23 @@ local function build_plan(key, spec, owner, binding, buckets)
 
   local input = contract.snapshot(owner)
   local expected = deepcopy(input)
+  local legacy_output_unit = deepcopy(input.unit)
   local configured = {}
 
   if configured_cost.changed then
     expected.unit.count = configured_cost.count
     expected.unit.count_formula = configured_cost.count_formula
     configured.cost_model = true
+
+    -- MIR 2.4.0 applied base and growth overrides independently. Keep the
+    -- exact former unit model in the 2.4.1 binding artifact so an in-progress
+    -- native-owner research can be restored while upgrading to paired costs.
+    local legacy_cost = assert(cost_model.configure(model, {
+      base = base.changed and base.value or nil,
+      growth = growth.changed and growth.value or nil
+    }))
+    legacy_output_unit.count = legacy_cost.count
+    legacy_output_unit.count_formula = legacy_cost.count_formula
   end
   if research_time.changed and research_time.value > 0 then
     expected.unit.time = research_time.value
@@ -175,6 +187,7 @@ local function build_plan(key, spec, owner, binding, buckets)
     end)(),
     input_snapshot = input,
     expected_snapshot = expected,
+    legacy_output_unit = legacy_output_unit,
     input_fingerprint = contract.fingerprint(input),
     output_fingerprint = contract.fingerprint(expected)
   }

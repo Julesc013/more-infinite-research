@@ -7,6 +7,16 @@ Date: 2026-07-14
     - Prevented generated research from inheriting a disabled Automation science technology.
     - Kept initially available science recipes usable when their former unlock technology is disabled.
     - Skipped finite anchors and prerequisite chains that transitively depend on disabled technologies.
+    - Made the standard settings configure recognized existing Space Age infinite productivity owners.
+    - Applied cost base and growth together as one displayed cost model when either value is customized.
+    - Preserved current native-owner research level, selection, and fractional progress across cost changes and 2.4.0 upgrades.
+    - Preserved final native or modded owner values at defaults, left disabled streams untouched, and rejected unknown cost formulas safely.
+    - Kept native-owner adoption transactional and retained safe generated-stream fallback.
+
+  Changes:
+
+    - Rebuilt 2.4.1 as the complete Factorio 2.0 projection of the sealed 3.1.9 portable behavior set.
+    - Declared explicit science-pack inputs for the opt-in experimental assembler and lab research families.
 
 ---------------------------------------------------------------------------------------------------
 Version: 2.4.0

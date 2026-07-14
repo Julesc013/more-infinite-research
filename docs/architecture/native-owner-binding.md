@@ -1,7 +1,7 @@
 ---
 title: "Native Owner Binding"
 status: current
-applies_to: "2.4.0+"
+applies_to: "2.4.1+"
 audience: maintainer
 doc_type: explanation
 owner: mir-maintainers
@@ -31,6 +31,8 @@ The cost adapter preserves either Factorio's `growth^L*base` formula style, MIR'
 ## Transaction And Fallback
 
 Planning records immutable input and expected output snapshots plus fingerprints. Whole-plan validation rejects duplicate owner bindings. The emission transaction verifies the input fingerprint immediately before applying one prevalidated owner update, and output validation verifies the resulting fingerprint. The default preserve operation performs no assignment, retaining exact table identity and final external balance.
+
+The emitted binding artifact also carries recognized input and output research-unit models. On a configuration change, runtime compares the former and current unit counts and compensates Factorio's normalized-progress rescaling for a currently researched bound owner. This preserves the player's level, current research selection, and fractional progress. The Factorio 2.0 projection includes a legacy output model that reconstructs 2.4.0's independently applied base and growth settings so existing saves migrate to 2.4.1's paired cost semantics without losing progress.
 
 If the owner is absent, finite, unreachable, malformed, or unsafe to configure, eligible recipes fall back to MIR generation. Recipes already covered by an existing owner are excluded from fallback generation so MIR never creates duplicate productivity coverage. Only emission code may apply the planned transaction or create the fallback technology.
 

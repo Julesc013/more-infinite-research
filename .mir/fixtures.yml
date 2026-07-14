@@ -193,6 +193,18 @@ fixtures:
       - runtime-state-effect-retention
       - exact-2-4-0-candidate-normal-mod-directory-load
 
+  upgrade-2-4-0-to-2-4-1:
+    requires_features: [productivity_family_adoption]
+    assertion_path: fixtures/assert-upgrade-2-4-0-to-2-4-1
+    validates:
+      - exact-2-4-0-source-archive
+      - native-owner-setting-retention
+      - native-owner-technology-level-retention
+      - native-owner-current-research-selection-retention
+      - native-owner-fractional-progress-retention
+      - legacy-independent-cost-model-to-paired-cost-model-migration
+      - exact-2-4-1-candidate-normal-mod-directory-load
+
   competing-productivity-transaction:
     requires_features: [recipe_productivity]
     path: fixtures/plates-n-circuit-productivity
@@ -208,6 +220,7 @@ fixtures:
     assertion_path: fixtures/assert-native-owner-settings
     supplemental_paths:
       - fixtures/native-owner-unrecognized-formula
+      - fixtures/assert-native-owner-progress
     validates:
       - all-four-native-owner-setting-groups-visible
       - unchanged-defaults-preserve-final-owner-snapshots
@@ -232,6 +245,8 @@ fixtures:
       - input-output-fingerprint-transaction
       - duplicate-native-owner-binding-rejection
       - configuration-change-signature-reset
+      - configuration-change-current-research-progress-retention
+      - paired-base-growth-setting-semantics
       - settings-profile-compatible-stable-ids
 
   competing-base-extension-transaction:

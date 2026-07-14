@@ -99,15 +99,18 @@ if (-not $loadText.Contains("[mir-fixture] $FromVersion to $ToVersion$proofSuffi
 $loadEvidence = Join-Path $outputParent "$ToVersion-upgrade-from-$FromVersion-load.txt"
 Copy-MIRUpgradeLogEvidence -Source $log -Destination $loadEvidence
 
-[ordered]@{
-  schema = 1
-  status = "passed"
-  generated_at = (Get-Date).ToUniversalTime().ToString("o")
-  git_commit = (& git -C $RepoRoot rev-parse HEAD).Trim()
-  factorio_binary_version = (Get-Item -LiteralPath $factorio).VersionInfo.FileVersion
-  from = [ordered]@{ version = $FromVersion; path = $FromZip; sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $from).Hash }
-  to = [ordered]@{ version = $ToVersion; path = $ToZip; sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $to).Hash }
-  assertions = @(
+$assertions = if ($FixtureName -eq "assert-upgrade-2-4-0-to-2-4-1") {
+  @(
+    "startup-settings-retained",
+    "native-owner-technology-level-retained",
+    "native-owner-current-research-retained",
+    "native-owner-fractional-progress-retained",
+    "legacy-independent-cost-model-migrated-to-paired-cost-model",
+    "fixture-storage-retained",
+    "exact-candidate-normal-mod-directory-load"
+  )
+} else {
+  @(
     "startup-setting-retained",
     "effect-setting-retained",
     "technology-level-retained",
@@ -117,6 +120,17 @@ Copy-MIRUpgradeLogEvidence -Source $log -Destination $loadEvidence
     "native-owner-technology-levels-retained",
     "exact-candidate-normal-mod-directory-load"
   )
+}
+
+[ordered]@{
+  schema = 1
+  status = "passed"
+  generated_at = (Get-Date).ToUniversalTime().ToString("o")
+  git_commit = (& git -C $RepoRoot rev-parse HEAD).Trim()
+  factorio_binary_version = (Get-Item -LiteralPath $factorio).VersionInfo.FileVersion
+  from = [ordered]@{ version = $FromVersion; path = $FromZip; sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $from).Hash }
+  to = [ordered]@{ version = $ToVersion; path = $ToZip; sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $to).Hash }
+  assertions = $assertions
   create_log = (Split-Path -Leaf $createEvidence)
   load_log = (Split-Path -Leaf $loadEvidence)
 } | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $output -Encoding UTF8

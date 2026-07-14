@@ -374,6 +374,7 @@ validation_tooling:
     assurance: scripts/Invoke-MIRAssurance.ps1
     assurance_tests: scripts/Test-MIRAssurance.ps1
     native_owner_balance_tests: scripts/Test-MIRNativeOwnerCostModels.ps1
+    backport_source_lock: scripts/Test-MIRBackportSourceLock.ps1
     package_identity: scripts/validation/PackageIdentity.ps1
     target_metadata: scripts/validation/TargetProfiles.ps1
     scenario_groups: scripts/validation/ScenarioGroups.ps1
@@ -388,6 +389,8 @@ validation_tooling:
   rules:
     - assurance plans use stable test IDs and complete content-addressed evidence inputs
     - native-owner balance snapshots bind reviewed source values formula adapters planner bindings and emission transactions
+    - backport source locks bind each target projection to its canonical modern package source and enumerate every target-specific package adaptation
+    - native-owner transactions publish recognized input output and legacy output unit models for configuration-change progress preservation
     - unknown changes conservatively select the full relevant target gate
     - candidate seals verify exact artifacts and never publish
     - the facade preserves its public parameters and structured result schema

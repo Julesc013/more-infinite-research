@@ -288,6 +288,28 @@ release_artifacts:
       structured_summary_run_id: 9d8a4f7b-e0bc-4245-8dcc-2c6338709aaa
       publication_scope: github-release
       status: published
+    mir_3_1_9:
+      version: "3.1.9"
+      branch: main
+      development_branch: dev
+      synthesis_branch: tmp/3.1.9-synthesis
+      target_factorio: "2.1"
+      source_anchor: mir_3_1_5
+      package_source_commit: 79df29b50ea9b855b8665d6c9a3d8295806acde0
+      release_candidate_commit: 9c8f40038e42fda378b855bb8132fd98a180b6a5
+      artifact: dist/more-infinite-research_3.1.9.zip
+      sha256: D77B3A78DA40CD4FDD4C829A01B5030E59FB593F3387124EF5C438F6A9E8DFCD
+      package_content_sha256: 1D905CD5F394C3ABFC2ABEFFEB0249AC9D8D5C5FC4ADA0F5A5BA368B17548229
+      native_owner_binding_schema: 2
+      assurance_evidence_schema: 2
+      scenario_count: 102
+      structured_summary: .mir/evidence/3.1.9/disabled-automation-science-final-qualification.json
+      broad_qualification_evidence: .mir/evidence/3.1.9/qualification-summary.json
+      assurance_seal: .mir/evidence/candidate-seals/mir-3.1.9-factorio-2.1.json
+      seal_source_commit: c711602b1c43ce552faa4ec90acd72c3b4ebc856
+      release_gate: release-candidate-awaiting-maintainer-tag
+      publication_status: unreleased
+      status: release-candidate-on-main
     mir_2_4_0:
       version: "2.4.0"
       branch: legacy
@@ -328,20 +350,23 @@ release_artifacts:
       version: "2.4.1"
       branch: tmp/2.0
       target_factorio: "2.0"
-      source_anchor: mir_2_4_0
-      source_anchor_commit: 584b398f98d3e317fac31cba63edcb11360a5bb1
-      portable_regression_source: 79df29b50ea9b855b8665d6c9a3d8295806acde0
+      source_anchor: mir_3_1_9
+      source_anchor_commit: 9c8f40038e42fda378b855bb8132fd98a180b6a5
+      canonical_package_source_commit: 79df29b50ea9b855b8665d6c9a3d8295806acde0
+      upgrade_predecessor: mir_2_4_0
+      upgrade_predecessor_commit: 584b398f98d3e317fac31cba63edcb11360a5bb1
+      source_lock: .mir/backport-source-lock.json
       artifact: dist/more-infinite-research_2.4.1.zip
-      source_commit: f42b45d1a9e5b6c61a14729a5d386eb6b88bf952
-      sha256: 7931E97D9C5CFAB173B48976F1B7EF5A6E7956809D6EA98BF42CD8761C1AAC3D
-      package_content_sha256: 621D26B40D36C52C9F556D1B2490E7FA266F1E022778EAEA15940CEA4522509D
       structured_summary: .mir/evidence/2.4.1-change-aware-qualification.json
-      automated_gate: passed-change-aware
+      superseded_candidate_source_commit: f42b45d1a9e5b6c61a14729a5d386eb6b88bf952
+      superseded_candidate_sha256: 7931E97D9C5CFAB173B48976F1B7EF5A6E7956809D6EA98BF42CD8761C1AAC3D
+      superseded_candidate_package_content_sha256: 621D26B40D36C52C9F556D1B2490E7FA266F1E022778EAEA15940CEA4522509D
+      superseded_candidate_reason: incomplete-six-scenario-hotfix-not-a-complete-3.1.9-projection
+      automated_gate: pending-requalification
       manual_gate: pending
       assurance_seal: .mir/evidence/candidate-seals/mir-2.4.1-factorio-2.0.json
-      seal_source_commit: e70d93994511145bb71bf935123d0bac8faedd56
       publication_scope: unreleased
-      status: release-candidate-awaiting-manual-review
+      status: reconstruction-in-progress
     mir_2_3_0:
       version: "2.3.0"
       branch: legacy
@@ -473,26 +498,24 @@ release_artifacts:
       status: published
   next_release_targets:
     current_line:
-      version: "3.1.5"
+      version: "3.1.9"
       branch: main
       target_factorio: "2.1"
-      release_commit: c8bf4a742910cec9d6d3dee305c83deba1aa49eb
-      status: published
-      purpose: released canonical source anchor for the current Factorio 2.0 backport
+      release_commit: 9c8f40038e42fda378b855bb8132fd98a180b6a5
+      status: release-candidate-awaiting-maintainer-tag
+      purpose: sealed canonical source anchor for the current Factorio 2.0 projection
     factorio_2_0_companion:
       version: "2.4.1"
       branch: tmp/2.0
       target_factorio: "2.0"
-      source_anchor: mir_2_4_0
-      source_anchor_commit: 584b398f98d3e317fac31cba63edcb11360a5bb1
+      source_anchor: mir_3_1_9
+      source_anchor_commit: 9c8f40038e42fda378b855bb8132fd98a180b6a5
+      upgrade_predecessor: mir_2_4_0
       artifact: dist/more-infinite-research_2.4.1.zip
-      source_commit: f42b45d1a9e5b6c61a14729a5d386eb6b88bf952
-      sha256: 7931E97D9C5CFAB173B48976F1B7EF5A6E7956809D6EA98BF42CD8761C1AAC3D
-      validation_status: passed-change-aware
+      validation_status: pending-requalification
       assurance_seal: .mir/evidence/candidate-seals/mir-2.4.1-factorio-2.0.json
-      seal_source_commit: e70d93994511145bb71bf935123d0bac8faedd56
-      status: release-candidate-awaiting-manual-review
-      purpose: patch release proving disabled vanilla science technologies cannot leak into generated prerequisite paths
+      status: reconstruction-in-progress
+      purpose: complete Factorio 2.0 projection of the sealed MIR 3.1.9 portable behavior set
     factorio_1_1_port:
       version: "1.9.4"
       branch: tmp/1.1

@@ -304,6 +304,10 @@ Invoke-RepoCheck "settings visibility policy is linted" {
   & (Join-Path $repo "scripts\Test-MIRSettingsVisibility.ps1") -RepoRoot $repo
 }
 
+Invoke-RepoCheck "Factorio 2.0 source lock matches canonical MIR 3.1.9" {
+  & (Join-Path $repo "scripts\Test-MIRBackportSourceLock.ps1") -RepoRoot $repo
+}
+
 Invoke-RepoCheck "legacy inventory thresholds pass" {
   & (Join-Path $repo "scripts\Get-MIRLegacyInventory.ps1") -RepoRoot $repo -CheckThresholds
 }
@@ -3198,16 +3202,20 @@ if ($selectionActive) {
               -ScenarioName $declaration.name `
               -InitialFixtureNames @(
                 "mir-fixture-native-owner-settings-source",
-                "mir-fixture-assert-native-owner-settings"
+                "mir-fixture-assert-native-owner-settings",
+                "mir-fixture-assert-native-owner-progress"
               ) `
               -ChangedFixtureNames @(
                 "mir-fixture-native-owner-settings-source",
-                "mir-fixture-assert-native-owner-settings"
+                "mir-fixture-assert-native-owner-settings",
+                "mir-fixture-assert-native-owner-progress"
               ) `
               -InitialNativeOwnerSettingsProfile "default" `
               -ChangedNativeOwnerSettingsProfile "combined" `
               -EnableSpaceAge
             Assert-LogContains -Expected "Reset technology effects for productivity family adoption signature change" -Context $declaration.name
+            Assert-LogContains -Expected "Preserved current research progress for native owner low-density-structure-productivity" -Context $declaration.name
+            Assert-LogContains -Expected "[mir-fixture] native-owner progress configuration-change proof complete" -Context $declaration.name
             Assert-LogContains -Expected "schema=2|stream=research_rocket_fuel|owner=rocket-fuel-productivity|operation=configure_native_owner|configured=cost_model,effect_per_level,max_level,research_time|effects=0|output=" -Context $declaration.name
           }
           "space-age-vanilla-family-adoption-config-change" {

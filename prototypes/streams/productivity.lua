@@ -583,6 +583,7 @@ return {
     automatic_family = {creation_maturity = "experimental"},
     localised_name = {"", "Assembling machine manufacturing productivity"},
     icon_item = "assembling-machine-3",
+    science_packs = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack"},
     groups = {{change = 0.02, items = {}}}
   },
 
@@ -592,6 +593,7 @@ return {
     automatic_family = {creation_maturity = "experimental"},
     localised_name = {"", "Lab manufacturing productivity"},
     icon_item = "lab",
+    science_packs = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack"},
     groups = {{change = 0.02, items = {}}}
   },
 

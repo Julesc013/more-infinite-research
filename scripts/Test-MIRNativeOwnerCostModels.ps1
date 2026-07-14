@@ -22,6 +22,7 @@ if ($contracts.Count -ne $expected.Count) { throw "Expected exactly four native-
 $streamSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "prototypes\streams\productivity.lua")
 $settingsManifest = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\settings.yml")
 $costModelSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "prototypes\mir\domain\native_owner\cost_model.lua")
+$bindingSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "prototypes\mir\planner\native_owner_binding.lua")
 
 foreach ($contract in $contracts) {
   $stream = [string]$contract.stream
@@ -55,6 +56,12 @@ foreach ($prefix in @("ips-enable-%s", "ips-cost-base-%s", "ips-cost-growth-%s",
 }
 foreach ($adapter in @('growth-to-level-times-base', 'base-times-growth-to-level-minus-one', 'recognized-fixed-count', 'unrecognized-external-formula')) {
   if ($costModelSource -notmatch [regex]::Escape($adapter)) { throw "Native-owner formula adapter missing: $adapter" }
+}
+$costPairIsAtomic = $bindingSource -match 'local cost_changed = base\.changed or growth\.changed' -and
+  $bindingSource -match 'base = cost_changed and base\.value or nil' -and
+  $bindingSource -match 'growth = cost_changed and growth\.value or nil'
+if (-not $costPairIsAtomic) {
+  throw "Native-owner cost settings must activate the complete visible base/growth pair."
 }
 
 Write-Host "[ok] four Factorio 2.0 native-owner balance contracts and safe formula adapters passed."

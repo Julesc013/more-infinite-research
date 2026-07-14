@@ -299,6 +299,7 @@ if ([string]$releaseFields.factorio_version -ne [string]$repoInfo.factorio_versi
 if ([string]$releaseFields.objective -notin @(
   "behavioral-superset-implementation-subset",
   "target-port-behavioral-subset",
+  "canonical-3.1.9-derived-factorio-2.0-projection",
   "bounded-correctness-and-contract-modernization",
   "plan-first-automatic-family-compiler"
 )) {

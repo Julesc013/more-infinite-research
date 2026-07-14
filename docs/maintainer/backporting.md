@@ -15,9 +15,11 @@ Updated: 2026-07-14
 
 ## Current Post-3.1 Release Roles
 
-Published MIR `3.1.5` on `main` is the current canonical Factorio 2.1 source anchor. MIR `2.4.0` is the active, unreleased Factorio 2.0 backport on `tmp/2.0`; it folds the portable compiler work from the internal `2.5.0` candidate and final `3.1.5` source into one release identity. The exact `2.5.0` candidate commit and digest remain historical safety evidence, but no `2.5.0` archive or public release is carried forward.
+Sealed MIR `3.1.9` on `main` is the current canonical Factorio 2.1 source anchor awaiting maintainer tag and publication. MIR `2.4.0` is the published Factorio 2.0 release and exact save-upgrade predecessor. MIR `2.4.1` on `tmp/2.0` is rebuilt as a complete target projection of the final 3.1.9 portable package source, with every legitimate 2.0 package adaptation enumerated in `.mir/backport-source-lock.json`.
 
-After the exact `2.4.0` candidate passes its target gates, promote that same commit to `legacy` and stop for maintainer tag and publication review. This is an explicit release-manager override of the older frozen-`2.3.x` branch role. Do not start `tmp/1.1` or any lower target during this gate.
+After the exact `2.4.1` candidate passes its target gates, stop for maintainer review, tag, and publication. Do not promote it to `legacy` or start `tmp/1.1` or any lower target during this gate unless the maintainer explicitly opens that next release step.
+
+Every rebuilt target projection must descend from its declared modern source anchor and pass `scripts/Test-MIRBackportSourceLock.ps1`. The lock binds the canonical release-candidate commit, canonical package-source commit, target manifest hash, and exact set of target-specific package paths. Published predecessor archives remain immutable upgrade inputs; they are not substitutes for direct canonical ancestry.
 
 The current older-target state is MIR `1.9.4` qualified but unreleased on `tmp/1.1`, MIR `1.8.2` staged but runtime-unqualified on `tmp/1.0`, MIR `1.7.1` planned on `tmp/0.17`, MIR `1.6.0` planned on `tmp/0.16`, and MIR `1.5.0` planned on `tmp/0.15`. Archived plans retain their historical version numbers; current 0.16 and 0.15 work follows the new 1.6.0 and 1.5.0 plans.
 
@@ -80,8 +82,8 @@ Use these branch roles during the transition:
 | --- | --- | ---: |
 | `main` | Stable canonical Factorio `2.1` line after gates. | `3.x.x` after `3.0.0` |
 | `dev` | Development canonical Factorio `2.1` line. | `3.x.x` after `3.0.0` |
-| `legacy` | Stable Factorio `2.0` release branch; retains `2.3.5` until the exact validated `2.4.0` candidate is promoted. | Validated `2.4.0` promotion only in the current gate. |
-| `tmp/2.0` | Factorio `2.0` staging and qualification branch. | Unreleased `2.4.0`; internal `2.5.0` candidate is superseded evidence only. |
+| `legacy` | Stable Factorio `2.0` release branch frozen at published `2.4.0` during the current gate. | No promotion until the maintainer completes the 2.4.1 release step. |
+| `tmp/2.0` | Factorio `2.0` staging and qualification branch. | Complete, unreleased `2.4.1` projection of sealed 3.1.9; earlier six-scenario candidate is superseded. |
 | `tmp/1.1` | Working Factorio `1.1` port branch or worktree. | `1.9.x` starting at `1.9.3` |
 | `port/1.1-to-0.18` | Short-lived Factorio `0.18` bridge branch seeded from the validated `1.9.3` source point. | `1.8.0` only |
 | `tmp/1.0` | Working Factorio `1.0` port branch or worktree after the `0.18` bridge proof. | `1.8.1+` |

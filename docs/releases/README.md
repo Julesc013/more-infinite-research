@@ -14,7 +14,7 @@ superseded_by: []
 
 Release docs are version-specific plans, migration guides, risk registers, checklists, and validation records.
 
-MIR 3.1.5 is the published canonical Factorio 2.1 anchor. MIR 2.4.0 is the published Factorio 2.0 release, and MIR 2.4.1 is the active startup-safety hotfix on `tmp/2.0`. Its checklist, validation summary, candidate seal, and backport-wave dashboard govern qualification. The internal MIR 2.5.0 candidate remains superseded evidence and is not a release artifact.
+MIR 3.1.9 is the sealed Factorio 2.1 release candidate on `main`. MIR 2.4.0 is the published Factorio 2.0 release and exact save-upgrade predecessor; MIR 2.4.1 is the active complete 3.1.9 projection on `tmp/2.0`. Its source lock, checklist, validation summary, candidate seal, and backport-wave dashboard govern qualification. The earlier six-scenario 2.4.1 archive and the internal MIR 2.5.0 candidate are superseded evidence, not release artifacts.
 
 - [3.0.0 plan](3.0.0-plan.md)
 - [3.0.0 regression baseline](3.0.0-regression-baseline.md)

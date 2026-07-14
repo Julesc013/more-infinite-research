@@ -154,23 +154,49 @@ waves:
     publication_status: published
     status: published-frozen
 
+  mir_3_1_9:
+    version: "3.1.9"
+    branch: main
+    development_branch: dev
+    synthesis_branch: tmp/3.1.9-synthesis
+    target_factorio: "2.1"
+    source_anchor_required: released-3.1.5-plus-complete-portable-return
+    source_commit: 79df29b50ea9b855b8665d6c9a3d8295806acde0
+    package_source_commit: 79df29b50ea9b855b8665d6c9a3d8295806acde0
+    release_candidate_commit: 9c8f40038e42fda378b855bb8132fd98a180b6a5
+    native_owner_binding_schema: 2
+    assurance_evidence_schema: 2
+    runtime_scenario_count: 102
+    runtime_package_sha256: D77B3A78DA40CD4FDD4C829A01B5030E59FB593F3387124EF5C438F6A9E8DFCD
+    structured_validation_evidence: .mir/evidence/3.1.9/disabled-automation-science-final-qualification.json
+    broad_qualification_evidence: .mir/evidence/3.1.9/qualification-summary.json
+    assurance_seal: .mir/evidence/candidate-seals/mir-3.1.9-factorio-2.1.json
+    seal_source_commit: c711602b1c43ce552faa4ec90acd72c3b4ebc856
+    candidate_freshness_gate: passed
+    interactive_gate: pending-maintainer
+    publication_status: unreleased
+    status: release-candidate-on-main
+
   mir_2_4_1:
     version: "2.4.1"
     branch: tmp/2.0
     target_factorio: "2.0"
-    source_anchor_required: published-2.4.0
-    source_anchor_commit: 584b398f98d3e317fac31cba63edcb11360a5bb1
-    portable_regression_source: 79df29b50ea9b855b8665d6c9a3d8295806acde0
+    source_anchor_required: sealed-3.1.9-complete-portable-projection
+    source_anchor_commit: 9c8f40038e42fda378b855bb8132fd98a180b6a5
+    canonical_package_source_commit: 79df29b50ea9b855b8665d6c9a3d8295806acde0
+    upgrade_predecessor: "2.4.0"
+    upgrade_predecessor_commit: 584b398f98d3e317fac31cba63edcb11360a5bb1
+    source_lock: .mir/backport-source-lock.json
     archive: dist/more-infinite-research_2.4.1.zip
-    source_commit: f42b45d1a9e5b6c61a14729a5d386eb6b88bf952
-    archive_sha256: 7931E97D9C5CFAB173B48976F1B7EF5A6E7956809D6EA98BF42CD8761C1AAC3D
+    superseded_candidate_source_commit: f42b45d1a9e5b6c61a14729a5d386eb6b88bf952
+    superseded_candidate_sha256: 7931E97D9C5CFAB173B48976F1B7EF5A6E7956809D6EA98BF42CD8761C1AAC3D
+    superseded_candidate_reason: incomplete-six-scenario-hotfix-not-a-complete-3.1.9-projection
     structured_summary: .mir/evidence/2.4.1-change-aware-qualification.json
-    automated_gate: passed-change-aware
+    automated_gate: pending-requalification
     assurance_seal: .mir/evidence/candidate-seals/mir-2.4.1-factorio-2.0.json
-    seal_source_commit: e70d93994511145bb71bf935123d0bac8faedd56
     interactive_gate: pending
     publication_status: unreleased
-    status: release-candidate-awaiting-manual-review
+    status: reconstruction-in-progress
 
   mir_3_2_0:
     version: "3.2.0"

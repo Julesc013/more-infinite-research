@@ -114,6 +114,8 @@ where `L` is the research level.
 
 **Base-technology extensions** use the same formula, but their first generated level starts after the vanilla chain. A setting value of **`0`** for base cost, growth factor, or research unit time means *derive this from the vanilla chain*.
 
+When Space Age or another mod already owns a recognized infinite productivity technology, MIR keeps the same stream settings instead of hiding them. Default values preserve the final external owner exactly; disabling the stream leaves it untouched. Changing either cost base or growth applies both displayed values as one cost model, and changing startup costs preserves the currently researched owner, its level, and fractional progress. Explicit cost changes are rejected for unknown formulas instead of guessing, while safe MIR generation remains the fallback when no eligible owner exists.
+
 If a positive base-extension max level is below the first generated continuation level, MIR **skips that extension** instead of creating an impossible capped technology.
 
 ## Science Packs and Labs
