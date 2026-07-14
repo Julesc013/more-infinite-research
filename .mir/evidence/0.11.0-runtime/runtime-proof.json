@@ -18,33 +18,33 @@
   "binary_version_proof_sha256": "751F99CCEB0519C07160B844C6C1FF55F770D6A3C6E593F1F4A290985C49E1C9",
   "fresh_start": {
     "status": "passed-bounded-startup-load",
-    "duration_seconds": 5.233,
+    "duration_seconds": 4.376,
     "command": [
       "D:\\Programs\\Factorio\\0.11\\bin\\x64\\Factorio.exe",
       "--config",
-      "C:\\Projects\\Factorio\\more-infinite-research-rebuild-0.11\\.\\.mir\\evidence\\0.11.0-runtime\\factorio-config.ini"
+      "C:\\Projects\\Factorio\\more-infinite-research-rebuild-0.11\\.mir\\evidence\\0.11.0-runtime\\factorio-config.ini"
     ],
     "terminated_after_proof": true,
     "process_exit_code": -1,
     "proof_kind": "factorio-log-mod-load",
     "proof_path": "C:\\Projects\\Factorio\\more-infinite-research-rebuild-0.11\\.mir\\evidence\\0.11.0-runtime\\fresh-start.log",
-    "proof_sha256": "A88700BF6673E740E6A1F524DEA25D2B7502E988CC1B9292BB0644DD86A1C9E7",
+    "proof_sha256": "45898AE67A37E4E5AC55F9BDFBF7D8D26AFB082936C624FB3A919A8DAEBF4AFC",
     "mod_marker": "more-infinite-research",
     "mod_marker_offset": 651
   },
   "second_start": {
     "status": "passed-bounded-startup-load",
-    "duration_seconds": 3.402,
+    "duration_seconds": 3.45,
     "command": [
       "D:\\Programs\\Factorio\\0.11\\bin\\x64\\Factorio.exe",
       "--config",
-      "C:\\Projects\\Factorio\\more-infinite-research-rebuild-0.11\\.\\.mir\\evidence\\0.11.0-runtime\\factorio-config.ini"
+      "C:\\Projects\\Factorio\\more-infinite-research-rebuild-0.11\\.mir\\evidence\\0.11.0-runtime\\factorio-config.ini"
     ],
     "terminated_after_proof": true,
     "process_exit_code": -1,
     "proof_kind": "factorio-log-mod-load",
     "proof_path": "C:\\Projects\\Factorio\\more-infinite-research-rebuild-0.11\\.mir\\evidence\\0.11.0-runtime\\second-start.log",
-    "proof_sha256": "C7B030B44AD597D3A0B827A8AD810B9730739324FF1E96BFB26A7DD4390CEEB8",
+    "proof_sha256": "1CD059A9B7F14D7116F198E9B515E6FD05C9ACBBA79EE20363308C170500CFBC",
     "mod_marker": "more-infinite-research",
     "mod_marker_offset": 651
   },
