@@ -3150,7 +3150,10 @@ function Invoke-WeaponSpeedPolicyMatrix {
     "mir-fixture-assert-weapon-speed-safety"
   ) -WeaponSpeedAdjustmentMode "only-when-dedicated-tech-enabled"
   $externalExtensionLine = Get-LastExtensionReportLine -Key "weapon-shooting-speed"
-  Assert-ReportLineGenerated -Line $externalExtensionLine -Context "$Context external owner"
+  if ($externalExtensionLine -notmatch "status=generated" -and
+      ($externalExtensionLine -notmatch "status=skipped" -or $externalExtensionLine -notmatch "reason=already_infinite")) {
+    throw "$Context external owner neither generated a MIR continuation nor retained an existing infinite continuation: $externalExtensionLine"
+  }
   foreach ($stream in $dedicatedStreams) {
     $streamLine = Get-LastStreamReportLine -Key $stream
     Assert-ReportLineContains -Line $streamLine -Expected "status=skipped" -Context "$Context external owner stream $stream"

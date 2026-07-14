@@ -7,7 +7,8 @@ local owner = table.deepcopy(source)
 owner.name = "mir-fixture-external-weapon-speed-owner"
 owner.localised_name = "MIR fixture external weapon speed owner"
 owner.localised_description = "Exact external replacement coverage used by MIR validation."
-owner.prerequisites = {"rocketry", "tank"}
+local tank_technology = data.raw.technology["tank"] and "tank" or "tanks"
+owner.prerequisites = {"rocketry", tank_technology}
 owner.effects = {
   {type = "gun-speed", ammo_category = "rocket", modifier = 0.1},
   {type = "gun-speed", ammo_category = "cannon-shell", modifier = 0.1}
