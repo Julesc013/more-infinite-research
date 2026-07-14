@@ -13,7 +13,7 @@ param(
   [ValidateSet("", "pure", "static", "smoke", "impacted", "full")]
   [string]$Tier = "",
   [string]$ChangedSince = "",
-  [ValidateSet("", "space-age-vanilla-family-mixed-owner")]
+  [ValidateSet("", "space-age-native-owner-settings-default", "space-age-vanilla-family-mixed-owner")]
   [string]$StartAtScenario = "",
   [ValidateRange(1, 4)][int]$MaxParallel = 1,
   [switch]$List,
@@ -2153,7 +2153,7 @@ if ($checkpointActive) {
   if ($Scenario.Count -gt 0 -or $Group.Count -gt 0 -or $Tag.Count -gt 0) {
     throw "-StartAtScenario cannot be combined with -Scenario, -Group, or -Tag."
   }
-  $Scenario = @(
+  $checkpointTailScenarios = @(
     "static-validation",
     "package-build",
     "runtime-state-contract",
@@ -2178,6 +2178,24 @@ if ($checkpointActive) {
     "technology-prerequisite-rewire",
     "end-game-prerequisite-gate"
   )
+  $nativeOwnerSettingsScenarios = @(
+    "space-age-native-owner-settings-default",
+    "space-age-native-owner-settings-disabled",
+    "space-age-native-owner-settings-cost-base",
+    "space-age-native-owner-settings-cost-growth",
+    "space-age-native-owner-settings-research-time",
+    "space-age-native-owner-settings-max-level",
+    "space-age-native-owner-settings-effect",
+    "space-age-native-owner-settings-combined",
+    "space-age-native-owner-settings-unrecognized-default",
+    "space-age-native-owner-settings-unrecognized-override",
+    "space-age-native-owner-settings-config-change"
+  )
+  $Scenario = if ($StartAtScenario -eq "space-age-native-owner-settings-default") {
+    @(@($checkpointTailScenarios + $nativeOwnerSettingsScenarios) | Sort-Object -Unique)
+  } else {
+    $checkpointTailScenarios
+  }
 }
 $scenarioRegistry = Import-MIRScenarioRegistry -Path $expectedScenariosPath -TargetProfile $repoInfo.factorio_version
 $selectionActive = $Scenario.Count -gt 0 -or $Group.Count -gt 0 -or $Tag.Count -gt 0
@@ -4103,6 +4121,53 @@ Assert-ReportLineAdopted -Line $exactOwnerRocketFuelLine -Context "External exac
 Assert-ReportLineContains -Line $exactOwnerRocketFuelLine -Expected "reason=preserve_native_owner" -Context "External exact owner plus native preserve binding"
 } else {
   Write-Host "[resume] Starting full-assertion validation at $StartAtScenario."
+}
+
+if ($StartAtScenario -ne "space-age-vanilla-family-mixed-owner") {
+  $nativeOwnerRuntimeCases = @(
+    "space-age-native-owner-settings-default",
+    "space-age-native-owner-settings-disabled",
+    "space-age-native-owner-settings-cost-base",
+    "space-age-native-owner-settings-cost-growth",
+    "space-age-native-owner-settings-research-time",
+    "space-age-native-owner-settings-max-level",
+    "space-age-native-owner-settings-effect",
+    "space-age-native-owner-settings-combined",
+    "space-age-native-owner-settings-unrecognized-default",
+    "space-age-native-owner-settings-unrecognized-override"
+  )
+  foreach ($scenarioName in $nativeOwnerRuntimeCases) {
+    $declaration = Resolve-MIRScenarioDeclaration -Registry $scenarioRegistry -ScenarioName $scenarioName -Kind "runtime" -EnableSpaceAge
+    $parameters = @{
+      ScenarioName = $declaration.name
+      EnabledFixtureNames = @($declaration.fixtures)
+      EnableSpaceAge = $true
+    }
+    foreach ($property in $declaration.settings.PSObject.Properties) {
+      $parameters[$property.Name] = $property.Value
+    }
+    Invoke-RuntimeScenario @parameters
+  }
+
+  Invoke-RuntimeConfigurationChangeScenario `
+    -ScenarioName "space-age-native-owner-settings-config-change" `
+    -InitialFixtureNames @(
+      "mir-fixture-native-owner-settings-source",
+      "mir-fixture-assert-native-owner-settings",
+      "mir-fixture-assert-native-owner-progress"
+    ) `
+    -ChangedFixtureNames @(
+      "mir-fixture-native-owner-settings-source",
+      "mir-fixture-assert-native-owner-settings",
+      "mir-fixture-assert-native-owner-progress"
+    ) `
+    -InitialNativeOwnerSettingsProfile "default" `
+    -ChangedNativeOwnerSettingsProfile "combined" `
+    -EnableSpaceAge
+  Assert-LogContains -Expected "Reset technology effects for productivity family adoption signature change" -Context "space-age-native-owner-settings-config-change"
+  Assert-LogContains -Expected "Preserved current research progress for native owner low-density-structure-productivity" -Context "space-age-native-owner-settings-config-change"
+  Assert-LogContains -Expected "[mir-fixture] native-owner progress configuration-change proof complete" -Context "space-age-native-owner-settings-config-change"
+  Assert-LogContains -Expected "schema=2|stream=research_rocket_fuel|owner=rocket-fuel-productivity|operation=configure_native_owner|configured=cost_model,effect_per_level,max_level,research_time|effects=0|output=" -Context "space-age-native-owner-settings-config-change"
 }
 
 Invoke-RuntimeScenario -ScenarioName "space-age-vanilla-family-mixed-owner" -EnabledFixtureNames @(
