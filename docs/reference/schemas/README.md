@@ -12,8 +12,7 @@ superseded_by: []
 
 # Schemas
 
-Schema docs hold exact field contracts. Architecture rationale belongs in
-`docs/architecture/`.
+Schema docs hold exact field contracts. Architecture rationale belongs in `docs/architecture/`.
 
 - [DecisionRecord](decision-record.md)
 - [StreamSpec](stream-spec.md)

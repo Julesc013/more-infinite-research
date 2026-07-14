@@ -17,17 +17,11 @@ Date: 2026-07-07
 
 ## Context
 
-`2.2.0` proved a bounded procedural kernel with typed facts, capability
-diagnostics, DecisionRecord-style rows, stream manifest metadata, compatibility
-claims, negative fixtures, and report diff tooling. Future mod support will not
-scale if every pack becomes a new generation branch.
+`2.2.0` proved a bounded procedural kernel with typed facts, capability diagnostics, DecisionRecord-style rows, stream manifest metadata, compatibility claims, negative fixtures, and report diff tooling. Future mod support will not scale if every pack becomes a new generation branch.
 
 ## Decision
 
-`3.0.0` is the compatibility compiler release. MIR will separate facts,
-capabilities, classification, policy, planning, emission, reports, fixtures, and
-migrations. Prototype mutation belongs only in the emission layer and only from
-validated `StreamSpec` records.
+`3.0.0` is the compatibility compiler release. MIR will separate facts, capabilities, classification, policy, planning, emission, reports, fixtures, and migrations. Prototype mutation belongs only in the emission layer and only from validated `StreamSpec` records.
 
 ## Consequences
 

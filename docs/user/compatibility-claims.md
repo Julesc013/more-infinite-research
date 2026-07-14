@@ -12,9 +12,6 @@ superseded_by: []
 
 # Compatibility Claims
 
-MIR compatibility claims are narrow and evidence-bound. A page can claim a
-specific recipe family, load profile, or diagnostic behavior only when the
-matching fixture or named load-check evidence exists.
+MIR compatibility claims are narrow and evidence-bound. A page can claim a specific recipe family, load profile, or diagnostic behavior only when the matching fixture or named load-check evidence exists.
 
-Claim levels and public wording rules are maintained in
-[claim levels](../compatibility/claim-levels.md).
+Claim levels and public wording rules are maintained in [claim levels](../compatibility/claim-levels.md).

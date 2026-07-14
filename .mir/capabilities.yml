@@ -44,11 +44,18 @@ capabilities:
     owner_policy_required: true
 
   lab-compatibility:
-    current_path: prototypes/mir/capabilities/science_integration/science_packs.lua
-    target_path: prototypes/mir/capabilities/science_integration/lab_matrix.lua
+    current_path: prototypes/mir/capabilities/science_integration/lab_compatibility.lua
+    target_path: prototypes/mir/capabilities/science_integration/lab_compatibility.lua
     doc: docs/capabilities/lab-compatibility.md
     emits: []
     default_mode: hard-gate
+    prerequisite_policy:
+      already_enabled_pack_recipe: no_prerequisite
+      inferred_unlock_technology: enabled_reachable_and_recipe_proven
+      multiple_unlockers: stable_technology_name_order
+      no_valid_unlocker: reduce_or_skip_science_pack
+    required_fixtures:
+      - generated-prerequisite-safety
 
   rule-surfaces:
     current_path: prototypes/mir/planner/compiler.lua

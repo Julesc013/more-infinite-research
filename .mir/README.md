@@ -1,9 +1,6 @@
 # MIR Governance Manifests
 
-The `.mir/` directory contains repo-governance records for the 3.x line. These
-files are not part of the shipped Factorio mod; they make documentation,
-compatibility claims, generated streams, module boundaries, fixtures, branch
-policy, and Codex routing lintable.
+The `.mir/` directory contains repo-governance records for the 3.x line. These files are not part of the shipped Factorio mod; they make documentation, compatibility claims, generated streams, module boundaries, fixtures, branch policy, and Codex routing lintable.
 
 The operating rule is:
 

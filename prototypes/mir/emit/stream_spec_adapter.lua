@@ -1,4 +1,4 @@
-local effect_safety = require("prototypes.mir.emit.effect_safety")
+local generated_registry = require("prototypes.mir.domain.facts.generated_technology_registry")
 local stream_spec = require("prototypes.mir.domain.streams.stream_spec")
 local technology_builder = require("prototypes.mir.emit.technology_builder")
 
@@ -8,7 +8,7 @@ function M.emit(key, spec, fields)
   local stream = stream_spec.from_stream_record({
     manifest_id = spec.manifest_id,
     stream_key = key,
-    technology_name = "recipe-prod-" .. key .. "-1",
+    technology_name = spec.technology_name or ("recipe-prod-" .. key .. "-1"),
     localised_name = fields.localised_name,
     localised_description = fields.localised_description,
     icons = fields.icons,
@@ -25,7 +25,7 @@ function M.emit(key, spec, fields)
   })
 
   local technology = technology_builder.emit(stream)
-  effect_safety.register_generated_technology(technology.name)
+  generated_registry.register(technology.name, { kind = "stream", key = key })
   return technology
 end
 
