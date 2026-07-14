@@ -3,8 +3,10 @@
   "kind": "mir-qualified-candidate-seal",
   "branch": "tmp/0.17",
   "release": "1.7.1",
+  "mir_version": "1.7.1",
   "target_factorio": "0.17",
-  "source_commit": "b1f574ad1f5d13a01f5181d09f4ca073f2b21cb0",
+  "target": "0.17",
+  "source_commit": "c1dd866018f8c0f8524f0d91a53e8b076078c4df",
   "source_clean": true,
   "canonical_dev_anchor": "dc5bfa99249af6c9508201a4c4667063bc8e021c",
   "canonical_anchor_is_ancestor": true,
@@ -22,8 +24,8 @@
   "canonical_target_catalog_sha256": "8185DFC4CC86247E5F1A5E24F9C6B08EB70C1366F28E7D54C8D033700B5338BE",
   "test_catalog_sha256": "C92C7914CF423C2ADCC1836FBAFC673F20746A622F9559567D22A199551FCE0F",
   "fixtures_fingerprint": "05421686D57770C73672137F992CE01A848A6EAC8F6F9904490CF5D4ED9DEE4D",
-  "validation_harness_fingerprint": "75D2251068D6C54FEECC6710A119E978742834A9FDF0A23880091BBBF7CB9FF5",
+  "validation_harness_fingerprint": "FEEE41FFF52A0A627A875FEDEA0FCC17079D8BE9084CD1BA8D03EF93D9BFA7A8",
   "factorio_binary_sha256": "E699D376D100A428B95243507FDBB39C372921577C6D7593203EDF07CAA12D06",
-  "qualification_summary_sha256": "46E47100B5731E9D000C0E609249C8EE3AA5CF05CFE16A1D47FBBB09B00CDCA8",
+  "qualification_summary_sha256": "93F85C8D46AE7FA2A32E6A93B28F2A1A374B497B4FA9D992B0D8BB62F951A145",
   "release_actions": "not-run-maintainer-only"
 }
