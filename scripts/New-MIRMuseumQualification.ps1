@@ -76,7 +76,7 @@ $record = [ordered]@{
   }
   gates = [ordered]@{
     manifest_and_base_evidence = "passed"
-    twenty_five_negative_cases = "passed"
+    negative_cases = "passed-26"
     deterministic_clean_builds = "passed"
     package_hygiene = "passed"
     exact_zip_initial_load = if ($legacyStartupProof) { [string]$runtime.fresh_start.status } else { [string]$runtime.fresh_create }

@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "status": "passed",
+  "generated_at": "2026-07-11T21:53:25.1900972Z",
+  "git_commit": "c3d841485be36a20968ef12494c9fa2b61b83eff",
+  "factorio_binary_version": "2.1.9.86829",
+  "from": {
+    "version": "3.0.5",
+    "path": "dist\\more-infinite-research_3.0.5.zip",
+    "sha256": "40AF95C3F4411DDF6C24C98897489D696339A1B85B0439FA4A3BDFEDDDF0E5C5"
+  },
+  "to": {
+    "version": "3.1.0",
+    "path": "build\\upgrade-candidate-3.1.0\\more-infinite-research_3.1.0.zip",
+    "sha256": "20A6970A4FBD5CEE0F8F03800A9AC3AB9D0225917FD48A3E77FEE3C0B18A2C14"
+  },
+  "assertions": [
+    "startup-setting-retained",
+    "effect-setting-retained",
+    "technology-level-retained",
+    "fixture-storage-retained",
+    "scripted-runtime-effect-retained",
+    "exact-candidate-normal-mod-directory-load"
+  ],
+  "create_log": "3.1.0-upgrade-from-3.0.5-create.txt",
+  "load_log": "3.1.0-upgrade-from-3.0.5-load.txt"
+}

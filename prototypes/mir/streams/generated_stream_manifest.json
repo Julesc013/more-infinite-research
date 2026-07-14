@@ -1,6 +1,32 @@
 {
   "schema": 1,
   "streams": {
+    "mir-auto-prod-manufacturing-assembling-machine-1": {
+      "introduced_in": "3.1.0",
+      "source": "family-rule:assembling-machine-manufacturing",
+      "capability": "recipe-productivity",
+      "family": "manufacturing_assembling_machine",
+      "policy": "automatic.experimental-family-generation",
+      "creation_maturity": "experimental",
+      "stable": true,
+      "generated_technology": "mir-auto-prod-manufacturing-assembling-machine-1",
+      "stream_key": "research_auto_assembling_machine",
+      "migration_policy": "stable",
+      "targets": ["family:assembling-machine"]
+    },
+    "mir-auto-prod-manufacturing-lab-1": {
+      "introduced_in": "3.1.0",
+      "source": "family-rule:lab-manufacturing",
+      "capability": "recipe-productivity",
+      "family": "manufacturing_lab",
+      "policy": "automatic.experimental-family-generation",
+      "creation_maturity": "experimental",
+      "stable": true,
+      "generated_technology": "mir-auto-prod-manufacturing-lab-1",
+      "stream_key": "research_auto_lab",
+      "migration_policy": "stable",
+      "targets": ["family:lab"]
+    },
     "recipe-prod-research_advanced_circuit-1": {
       "introduced_in": "pre-2.2.0",
       "source": "legacy_stream_table:productivity",
@@ -96,6 +122,9 @@
       "generated_technology": "recipe-prod-research_bacteria_cultivation-1",
       "stream_key": "research_bacteria_cultivation",
       "migration_policy": "stable",
+      "reviewed_risk_exceptions": [
+        "exact-bacteria-cultivation-autocatalytic-family"
+      ],
       "targets": [
         "stream:research_bacteria_cultivation"
       ]
@@ -119,7 +148,7 @@
       "source": "legacy_stream_table:productivity",
       "capability": "recipe-productivity",
       "family": "belts",
-      "policy": "legacy.recipe-productivity-stream",
+      "policy": "fixed-plus-family-rule.attach-existing",
       "stable": true,
       "generated_technology": "recipe-prod-research_belts-1",
       "stream_key": "research_belts",
@@ -343,7 +372,7 @@
       "source": "legacy_stream_table:productivity",
       "capability": "recipe-productivity",
       "family": "electric_energy",
-      "policy": "legacy.recipe-productivity-stream",
+      "policy": "fixed-plus-family-rule.attach-existing",
       "stable": true,
       "generated_technology": "recipe-prod-research_electric_energy-1",
       "stream_key": "research_electric_energy",
@@ -455,7 +484,7 @@
       "source": "legacy_stream_table:productivity",
       "capability": "recipe-productivity",
       "family": "furnace",
-      "policy": "legacy.recipe-productivity-stream",
+      "policy": "fixed-plus-family-rule.attach-existing",
       "stable": true,
       "generated_technology": "recipe-prod-research_furnace-1",
       "stream_key": "research_furnace",
@@ -539,7 +568,7 @@
       "source": "legacy_stream_table:productivity",
       "capability": "recipe-productivity",
       "family": "inserters",
-      "policy": "legacy.recipe-productivity-stream",
+      "policy": "fixed-plus-family-rule.attach-existing",
       "stable": true,
       "generated_technology": "recipe-prod-research_inserters-1",
       "stream_key": "research_inserters",
@@ -665,7 +694,7 @@
       "source": "legacy_stream_table:productivity",
       "capability": "recipe-productivity",
       "family": "mining_drill",
-      "policy": "legacy.recipe-productivity-stream",
+      "policy": "fixed-plus-family-rule.attach-existing",
       "stable": true,
       "generated_technology": "recipe-prod-research_mining_drill-1",
       "stream_key": "research_mining_drill",
@@ -679,7 +708,7 @@
       "source": "legacy_stream_table:productivity",
       "capability": "recipe-productivity",
       "family": "modules",
-      "policy": "legacy.recipe-productivity-stream",
+      "policy": "fixed-plus-family-rule.attach-existing",
       "stable": true,
       "generated_technology": "recipe-prod-research_modules-1",
       "stream_key": "research_modules",
@@ -726,6 +755,9 @@
       "generated_technology": "recipe-prod-research_oil_processing_productivity-1",
       "stream_key": "research_oil_processing_productivity",
       "migration_policy": "stable",
+      "reviewed_risk_exceptions": [
+        "exact-coal-liquefaction-shared-input-output"
+      ],
       "targets": [
         "stream:research_oil_processing_productivity"
       ]

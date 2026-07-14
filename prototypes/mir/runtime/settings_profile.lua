@@ -2,6 +2,7 @@ local profile_codec = require("prototypes.mir.settings.profile_codec")
 local effective_settings = require("prototypes.mir.settings.effective")
 
 local M = {}
+M.requires_features = {"settings_profiles"}
 
 local function player_for(command)
   if command and command.player_index then

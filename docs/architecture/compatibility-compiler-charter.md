@@ -13,10 +13,7 @@ superseded_by: []
 
 Updated: 2026-07-07
 
-This note records the intended shape of `3.0.0` after the `2.2.0` current-line
-release and the `1.9.2` Factorio `2.0` transition backport. It is an
-architecture charter, not a promise to add every requested productivity idea in
-one release.
+This note records the intended shape of `3.0.0` after the `2.2.0` current-line release and the `1.9.2` Factorio `2.0` transition backport. It is an architecture charter, not a promise to add every requested productivity idea in one release.
 
 The short version:
 
@@ -46,16 +43,9 @@ observe unknowns
 fixture-test decisions
 ```
 
-The `2.2.0` kernel proves this with typed facts, capability diagnostics,
-DecisionRecord-style rows, stream manifest linting, compatibility claims,
-negative fixtures, and report drift tooling.
+The `2.2.0` kernel proves this with typed facts, capability diagnostics, DecisionRecord-style rows, stream manifest linting, compatibility claims, negative fixtures, and report drift tooling.
 
-`3.0.0` should turn that proven kernel into the public architecture contract.
-That means stable module boundaries, schema-versioned intermediate records,
-policy overlays, generated-ID migration rules, fixture-backed claims, and
-maintainer workflows that can scale to K2, Bob's, Angel's, Space Exploration,
-Pyanodons, AAI, and other large mod sets without becoming a pile of
-mod-specific generation scripts.
+`3.0.0` should turn that proven kernel into the public architecture contract. That means stable module boundaries, schema-versioned intermediate records, policy overlays, generated-ID migration rules, fixture-backed claims, and maintainer workflows that can scale to K2, Bob's, Angel's, Space Exploration, Pyanodons, AAI, and other large mod sets without becoming a pile of mod-specific generation scripts.
 
 ## Release Charter
 
@@ -73,10 +63,7 @@ It separates:
 - fixtures;
 - migrations.
 
-It preserves conservative behavior. MIR auto-emits only high-confidence,
-policy-approved, lab-compatible, ownership-safe, loop-safe technologies.
-Everything else becomes diagnostics, policy stubs, fixture work, or explicit
-future scope.
+It preserves conservative behavior. MIR auto-emits only high-confidence, policy-approved, lab-compatible, ownership-safe, loop-safe technologies. Everything else becomes diagnostics, policy stubs, fixture work, or explicit future scope.
 
 The key rule:
 
@@ -131,17 +118,11 @@ compat/ may register policies, but may not build technologies directly.
 fixtures/ may assert outputs, but may not define runtime behavior.
 ```
 
-This boundary is the difference between a maintainable compiler and a growing
-set of special-case compatibility files.
+This boundary is the difference between a maintainable compiler and a growing set of special-case compatibility files.
 
 ## Proposed Module Layout
 
-The concrete repository-structure target is
-`docs/architecture/module-boundaries.md`. That note is the active source for
-the Factorio shell, `prototypes/mir/` compiler namespace, platform adapter,
-development workspace, no-shim shipped layout, and architecture lint rules. The summary
-below is the older high-level shape and should be read as conceptual, not as the
-complete migration checklist.
+The concrete repository-structure target is `docs/architecture/module-boundaries.md`. That note is the active source for the Factorio shell, `prototypes/mir/` compiler namespace, platform adapter, development workspace, no-shim shipped layout, and architecture lint rules. The summary below is the older high-level shape and should be read as conceptual, not as the complete migration checklist.
 
 The long-term layout should move toward:
 
@@ -255,9 +236,7 @@ compat/
   pyanodons.lua
 ```
 
-These overlays register selectors, exact IDs, denylists, policy overrides,
-claim text, and fixture expectations. They should not build technologies
-directly.
+These overlays register selectors, exact IDs, denylists, policy overrides, claim text, and fixture expectations. They should not build technologies directly.
 
 ## 3.0 Invariants
 
@@ -330,26 +309,21 @@ Do not ship these as automatic 3.0 behavior:
 - automatic tile/foundation high-value productivity;
 - external owner replacement without exact proof.
 
-3.0 may observe these surfaces, report them, fixture-test them, and create
-policy stubs for future review. That is not the same as emitting gameplay
-changes.
+3.0 may observe these surfaces, report them, fixture-test them, and create policy stubs for future review. That is not the same as emitting gameplay changes.
 
 ## Content Boundary
 
 3.0 should include only enough behavior to prove the architecture:
 
 - existing explicit MIR streams migrated behind `StreamSpec`;
-- existing Air Scrubbing clean-filter support migrated through the capability
-  and policy path;
+- existing Air Scrubbing clean-filter support migrated through the capability and policy path;
 - loader manufacturing as report-first structural candidates;
 - mining-drill manufacturing as report-first structural candidates;
 - native modifier owner observations;
 - ATAN Nuclear Science as a science/lab fixture;
 - one ore-crushing stream only if the full safety stack passes.
 
-It should not be the release for broad K2, Bob's, Angel's, Space Exploration,
-Pyanodons, native mining-yield emission, tile/foundation productivity, beacon
-changes, module-rule changes, or runtime productivity systems.
+It should not be the release for broad K2, Bob's, Angel's, Space Exploration, Pyanodons, native mining-yield emission, tile/foundation productivity, beacon changes, module-rule changes, or runtime productivity systems.
 
 ## Suggested Release Ladder
 
@@ -375,8 +349,7 @@ changes, module-rule changes, or runtime productivity systems.
 
 ### `3.0.0-alpha.3`: Fact Registry V2
 
-- Expand facts for items, entities, resources, modules, labs, machines, owners,
-  and rule surfaces.
+- Expand facts for items, entities, resources, modules, labs, machines, owners, and rule surfaces.
 - Add entity-backed item and recipe links.
 - Add loader and mining-drill facts.
 - Add machine base productivity facts.
@@ -387,8 +360,7 @@ changes, module-rule changes, or runtime productivity systems.
 - Recipe productivity capability.
 - Machine manufacturing capability.
 - Loader manufacturing capability, report-only unless an existing stream owns it.
-- Mining-drill manufacturing capability, report-only unless an existing stream
-  owns it.
+- Mining-drill manufacturing capability, report-only unless an existing stream owns it.
 - Native modifier capability, observe-only.
 - Science/lab integration capability.
 
@@ -435,16 +407,14 @@ Before `3.0.0` can release:
 
 - `.\scripts\Invoke-MIRValidation.ps1 -StaticOnly` passes.
 - Factorio `2.1` runtime validation passes.
-- `.\scripts\mir.ps1 release gate --profile release-targeted-2.1 --no-git-pull`
-  passes.
+- `.\scripts\mir.ps1 release gate --profile release-targeted-2.1 --no-git-pull` passes.
 - Policy lints pass.
 - Manifest lints pass.
 - Claim lints pass.
 - Negative fixtures pass.
 - Report diff for the final candidate is reviewed.
 - Public docs make no unbacked "full support" claims.
-- The release archive excludes docs, fixtures, scripts, task ledgers, and
-  other developer-only payloads.
+- The release archive excludes docs, fixtures, scripts, task ledgers, and other developer-only payloads.
 
 ## Backport Boundary
 
@@ -457,21 +427,17 @@ Backport 3.0 only after the Factorio `2.1` line is stable:
 5. Bring portable fixes back to `dev`.
 6. Publish only target lines that pass their own gates.
 
-If an older Factorio line cannot support a surface, disable or remove that
-surface and document the exclusion. Do not simulate feature parity.
+If an older Factorio line cannot support a surface, disable or remove that surface and document the exclusion. Do not simulate feature parity.
 
 ## Reference API Surfaces
 
 The compiler design depends on these Factorio prototype concepts:
 
 - technology effects are `Modifier` records;
-- technologies support `effects`, `unit`, prerequisites, hidden state, and
-  `max_level = "infinite"`;
-- recipes expose productivity-related fields such as `allow_productivity` and
-  `maximum_productivity`;
+- technologies support `effects`, `unit`, prerequisites, hidden state, and `max_level = "infinite"`;
+- recipes expose productivity-related fields such as `allow_productivity` and `maximum_productivity`;
 - labs declare accepted science pack inputs;
 - loader and mining-drill prototypes give structural entity facts;
-- mod loading separates data-stage prototype construction, control-stage
-  runtime scripting, and migrations.
+- mod loading separates data-stage prototype construction, control-stage runtime scripting, and migrations.
 
 Keep `docs/reference/factorio-api-proof-points.md` current when any of these assumptions changes.
