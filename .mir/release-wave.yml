@@ -201,23 +201,26 @@ waves:
     branch: dev
     synthesis_branch: tmp/3.1.9-synthesis
     source_anchor_required: released-3.1.5-plus-complete-portable-return
-    source_commit: pending
-    package_source_commit: pending
+    source_commit: 79df29b50ea9b855b8665d6c9a3d8295806acde0
+    package_source_commit: 79df29b50ea9b855b8665d6c9a3d8295806acde0
     native_owner_binding_schema: 2
     assurance_evidence_schema: 2
     museum_compiler_schema: 1
     runtime_scenario_count: 102
-    runtime_package_sha256: pending
-    structured_validation_evidence: pending-requalification
-    upgrade_evidence: pending-requalification
-    additional_upgrade_evidence: pending-requalification
-    available_ecosystem_load_evidence: pending-requalification
-    available_ecosystem_load_gate: pending-requalification
-    exact_package_gate: pending-requalification
-    candidate_freshness_gate: rebuilding-after-package-visible-change
+    runtime_package_sha256: D77B3A78DA40CD4FDD4C829A01B5030E59FB593F3387124EF5C438F6A9E8DFCD
+    structured_validation_evidence: .mir/evidence/3.1.9/disabled-automation-science-final-qualification.json
+    broad_qualification_evidence: .mir/evidence/3.1.9/qualification-summary.json
+    upgrade_evidence: .mir/evidence/3.1.9/upgrade-from-3.1.5-proof.json
+    additional_upgrade_evidence:
+      - .mir/evidence/3.1.9/upgrade-from-3.1.2-proof.json
+      - .mir/evidence/3.1.9/upgrade-from-3.0.5-proof.json
+    available_ecosystem_load_evidence: .mir/evidence/3.1.9/ecosystem-campaign/campaign-evidence.json
+    available_ecosystem_load_gate: 9-passed-zero-dependency-failures-load-claims-only
+    exact_package_gate: passed-disabled-science-regression-base-space-age-deterministic-and-forbidden-entry-check
+    candidate_freshness_gate: runtime-qualified-awaiting-reseal
     interactive_gate: pending-maintainer
     publication_status: unreleased
-    status: rebuilding-after-package-visible-change
+    status: runtime-qualified-awaiting-reseal
 
   mir_2_4_0:
     version: "2.4.0"
