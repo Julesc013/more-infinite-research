@@ -2,7 +2,7 @@ schema: 1
 
 branches:
   main:
-    purpose: stable Factorio 2.1 line receiving the validated MIR 3.1.5 release candidate
+    purpose: frozen stable Factorio 2.1 line at released MIR 3.1.5
     factorio_version: "2.1"
     accepts:
       - release-hotfix
@@ -16,7 +16,7 @@ branches:
       - large-architecture-rewrite
 
   dev:
-    purpose: canonical MIR 3.1.5 post-backport synthesis and future Factorio 2.1 development
+    purpose: canonical MIR 3.1.9 final-patch synthesis and future Factorio 2.1 development
     factorio_version: "2.1"
     accepts:
       - architecture
@@ -26,50 +26,8 @@ branches:
       - refactors
       - validation
 
-  tmp/3.1.9-synthesis:
-    purpose: isolated final MIR 3.1 patch synthesis based directly on released 3.1.5
-    factorio_version: "2.1"
-    accepts:
-      - portable-correctness-fix
-      - release-assurance
-      - museum-development-tooling
-      - validation
-      - release-evidence
-    rejects:
-      - target-era-runtime-source
-      - museum-defaults
-      - broad-3.2-feature-work
-
-  tmp/museum-wave-and-3.1.9-handoff:
-    purpose: aggregate evidence and shared build-time tooling for the 0.12-through-0.6 museum wave and 3.1.9 handoff
-    factorio_version: development-only
-    accepts:
-      - museum-target-manifest
-      - build-time-compiler
-      - validation-tooling
-      - aggregate-release-evidence
-    rejects:
-      - public-release-action
-      - target-runtime-waterfall-inheritance
-
-  tmp/0.12-through-0.6:
-    purpose: independent museum release branches generated from target capability manifests and matching base data
-    factorio_version: "0.12-0.6"
-    accepts:
-      - finite-numbered-technology
-      - target-era-metadata
-      - target-era-locale
-      - loaded-config-lua
-      - matching-binary-evidence
-      - deterministic-package
-    rejects:
-      - native-infinite-fields
-      - modern-settings
-      - recipe-productivity-without-proof
-      - lower-target-source-inheritance
-
   legacy:
-    purpose: frozen Factorio 2.0 2.3.x stable baseline
+    purpose: frozen Factorio 2.0 line at released MIR 2.4.0
     factorio_version: "2.0"
     accepts:
       - safety-fix
@@ -286,10 +244,9 @@ release_artifacts:
     mir_3_1_5:
       version: "3.1.5"
       branch: main
-      development_branch: dev
       target_factorio: "2.1"
       source_anchor: mir_3_1_2
-      source_commit: 3cd6a95a6e22ce2d4cdbc231ad79d8110ad75e2f
+      source_commit: c8bf4a742910cec9d6d3dee305c83deba1aa49eb
       artifact: dist/more-infinite-research_3.1.5.zip
       sha256: 8861E25FAAC472EDE9F32FE1C051A623A59177F5E092A3B1DC0B9FF2B3D47C50
       size_bytes: 399761
@@ -302,7 +259,32 @@ release_artifacts:
       ecosystem_loads: 9/9
       structured_summary_path: .mir/evidence/3.1.5-rc5-validation-summary.json
       structured_summary_run_id: 9d8a4f7b-e0bc-4245-8dcc-2c6338709aaa
-      release_gate: automated-passed-manual-pending
+      release_gate: published
+      publication_status: published
+      tag: "3.1.5"
+      status: published-frozen
+    mir_3_1_9:
+      version: "3.1.9"
+      branch: main
+      development_branch: dev
+      synthesis_branch: tmp/3.1.9-synthesis
+      target_factorio: "2.1"
+      source_anchor: mir_3_1_5
+      source_commit: 79df29b50ea9b855b8665d6c9a3d8295806acde0
+      release_candidate_commit: f81af94c9a16666be8f5902bb5653aeea57033ba
+      artifact: dist/more-infinite-research_3.1.9.zip
+      sha256: D77B3A78DA40CD4FDD4C829A01B5030E59FB593F3387124EF5C438F6A9E8DFCD
+      package_content_sha256: 1D905CD5F394C3ABFC2ABEFFEB0249AC9D8D5C5FC4ADA0F5A5BA368B17548229
+      native_owner_binding_schema: 2
+      assurance_evidence_schema: 2
+      scenario_count: 102
+      structured_summary: .mir/evidence/3.1.9/final-release-qualification.json
+      broad_qualification_evidence: .mir/evidence/3.1.9/qualification-summary.json
+      harness_refresh_evidence: .mir/evidence/3.1.9/harness-refresh-validation.json
+      exact_ecosystem_evidence: .mir/evidence/3.1.9/harness-refresh-exact-ecosystem-campaign.json
+      assurance_seal: .mir/evidence/candidate-seals/mir-3.1.9-factorio-2.1.json
+      seal_source_commit: f81af94c9a16666be8f5902bb5653aeea57033ba
+      release_gate: release-candidate-awaiting-manual-review
       publication_status: unreleased
       status: release-candidate-awaiting-manual-review
     mir_2_5_0:
@@ -323,16 +305,38 @@ release_artifacts:
       status: candidate-qualified
     mir_2_4_0:
       version: "2.4.0"
-      branch: tmp/2.0
+      branch: legacy
       target_factorio: "2.0"
-      source_anchor: mir_3_1_2
-      source_commit: pending-accepted-3.1.2
-      previous_candidate_commit: 575fc4f5ae4a52205d1e72604934ead35e69c99e
-      previous_candidate_artifact: dist/more-infinite-research_2.4.0.zip
-      previous_candidate_sha256: 8618CAF031EF24EB83641DB03566F2390DD29AD98D2099A80D596EEB527EDA12
-      previous_candidate_status: superseded-unreleased-candidate
+      package_source_commit: 01efb39a7476cc5e5f7e173edbb244e70f7a8e96
+      seal_source_commit: f6a5dfeb4dea18ee70bbaa17acbd4433f1396e6e
+      promotion_commit: 584b398f98d3e317fac31cba63edcb11360a5bb1
+      artifact: dist/more-infinite-research_2.4.0.zip
+      sha256: 4BA19EA071E6359BC25C58CCD8F65CAF81B4AA675496E2F53175A996C791470C
+      package_content_sha256: F681FF5C331FC45EAFF31823BC9D9441A100C75FD5D412DE1C37DC828DE00775
+      release_gate: published
+      publication_status: published
+      tag: "2.4.0"
+      status: published-frozen
+    mir_2_4_5:
+      version: "2.4.5"
+      branch: legacy
+      development_branch: tmp/2.0
+      target_factorio: "2.0"
+      release_candidate_commit: 7e4b6c530cfcc5b2e1429c4e9f4ccb0d6d3b42a4
+      source_commit: 47bcc80c8a70b41dbbb4f8d80b2b9433d0a10d3f
+      artifact_location: "legacy:dist/more-infinite-research_2.4.5.zip"
+      sha256: 7649824B72247AA38F05661422DFDEE7C729B21CC73A0A35D2455443B45D39F8
+      package_content_sha256: 5B8E21077CAC99CDB0733EBE8B34D10D0F375B2EAB2D42E60A73677860783FED
+      size_bytes: 406238
+      entries: 167
+      forbidden_entries: 0
+      evidence_location: "legacy:.mir/evidence/2.4.5-change-aware-qualification.json"
+      seal_location: "legacy:.mir/evidence/candidate-seals/mir-2.4.5-factorio-2.0.json"
+      seal_source_commit: 9cfa77c33a635c24f0d4ea458d317cddfa9e325f
+      release_gate: passed-change-aware
+      manual_gate: pending-maintainer
       publication_status: unreleased
-      status: blocked-on-accepted-3.1.2
+      status: sealed-release-candidate-on-legacy
     mir_2_3_0:
       version: "2.3.0"
       branch: legacy
@@ -362,20 +366,33 @@ release_artifacts:
       version: "1.9.4"
       branch: tmp/1.1
       target_factorio: "1.1"
-      source_anchor: mir_1_9_3
-      source_commit: 30ef8c7cab3c049aa0bb5efa0d74dd12e9c1ec40
+      source_anchor: DEV_RING_1_1_1_0_ANCHOR
+      canonical_dev_anchor: 53090c6f860bf9cb9aaf10140cbfe3924ef59c6c
+      source_commit: a5a08072f92e9742ae3323fbf4873ebfb58f6531
+      sealed_reconstruction_commit: 2dee595135444ad72c7aa32710ae10f5d6cf09cb
+      tag_commit: 426d6d48c6578a786ea7de0f224282baff9d342b
+      post_publication_commit: 1e461ecb0785ee34905ab69b1c0e8791135cf98a
+      tag: "1.9.4"
       artifact: dist/more-infinite-research_1.9.4.zip
-      sha256: 9184524A2E37115F6D30830191054F70AE556142306E226CDAE4308DC7285A35
-      size_bytes: 302681
-      entries: 124
+      sha256: 74BA83E1F02FABBC52C09AC6144A409B243066663A6D132A47334459C2665BFB
+      package_content_sha256: 732D363A8D8A8CB3A9899973ED5F0222EF99C15224B5C628A3AF824B403D5054
+      size_bytes: 386303
+      entries: 167
       forbidden_entries: 0
       automated_gate: passed
       exact_dist_base: passed
       fresh_create: passed
       fresh_reload: passed
       upgrade_from_1_9_3: passed
-      publication_scope: unreleased
-      status: candidate-qualified
+      runtime_scenarios: 19
+      factorio_binary: D:\Programs\Factorio\1.1\bin\x64\factorio.exe
+      factorio_binary_sha256: B7B4B834FCA2E32AFA9D3476EB42CC09B02F1205BE97F688DC6FC6ACE7BA8FE1
+      publication_scope: github-release
+      github_release: https://github.com/Julesc013/more-infinite-research/releases/tag/1.9.4
+      public_hash_verification: passed
+      mod_portal_status: blocked-missing-upload-api-key
+      manual_visual_review: pending-maintainer
+      status: published-github-portal-blocked
     mir_1_8_0:
       version: "1.8.0"
       branch: tmp/0.18
@@ -421,19 +438,33 @@ release_artifacts:
       version: "1.8.2"
       branch: tmp/1.0
       target_factorio: "1.0"
-      source_anchor: mir_1_8_1
-      source_commit: 0b06b9b0420e1fec38959adbc5cdef91e88a9ea0
+      source_anchor: DEV_RING_1_1_1_0_ANCHOR
+      canonical_dev_anchor: 53090c6f860bf9cb9aaf10140cbfe3924ef59c6c
+      source_commit: 3a54a5935faeecf3466fd250e05d15d36bb12dee
+      sealed_reconstruction_commit: e5b4b578d8475968da49d8c1261c1ca568dc307b
+      tag_commit: 0a192c27674a6b13847e2f5e1b2b530e62419ee8
+      post_publication_commit: b4e0b3de2fd87683d0c0de5bedaa8e94c6c74fe2
+      tag: "1.8.2"
       artifact: dist/more-infinite-research_1.8.2.zip
-      sha256: 1D474CF4CEEB4F1D8F9CFA1494BE98D2E903C5A511871AE01FBB83682DF1EDF6
-      size_bytes: 304509
-      entries: 124
+      sha256: 676927ECF801114CA8F7B9EFD6D139906432BCC60BE26B8CA5C08842E3686EFE
+      package_content_sha256: F8B4B919CAFEA3BF2734FE048B6603B932CDA36637014EF5F756B6041135792D
+      size_bytes: 386302
+      entries: 167
       forbidden_entries: 0
       automated_gate: passed
       exact_dist_base: passed
       fresh_create: passed
       fresh_reload: passed
       upgrade_from_1_8_1: passed
-      status: candidate-qualified
+      runtime_scenarios: 19
+      factorio_binary: D:\Programs\Factorio\1.0\bin\x64\factorio.exe
+      factorio_binary_sha256: 99F1CE207A04296EF7D797E4A98AA98DDE4F02EE653C9DF736AC33A676FD4F70
+      publication_scope: github-release
+      github_release: https://github.com/Julesc013/more-infinite-research/releases/tag/1.8.2
+      public_hash_verification: passed
+      mod_portal_status: blocked-missing-upload-api-key
+      manual_visual_review: pending-maintainer
+      status: published-github-portal-blocked
     mir_1_7_0:
       version: "1.7.0"
       branch: tmp/0.17
@@ -670,59 +701,6 @@ target_lines:
     version: "0.12.0"
     branch: tmp/0.12
     target_factorio: "0.12"
-    support_class: museum-finite-ladder
-    source: declarative_museum_manifest_and_matching_base_files
-    publish_policy: binary_proof_required
-  factorio_0_11:
-    version: "0.11.0"
-    branch: tmp/0.11
-    target_factorio: "0.11"
-    support_class: museum-finite-ladder
-    source: declarative_museum_manifest_and_matching_base_files
-    publish_policy: binary_proof_required
-    candidate_source_commit: 292edea6e8ebbea268fc81fe91d5c65ef2a76755
-    artifact: dist/more-infinite-research_0.11.0.zip
-    sha256: C628FBFA4FC2A811869C5D33245BCBA0D37AA5EE2074ADEC7155874C2081B748
-    size_bytes: 2514
-    entries: 4
-    package_mode: zip-native
-    exact_binary: Factorio 0.11.22 build 14011 win64
-    exact_binary_sha256: 968A6B8EDA5244F41AFB8249C7DE004C644BA4692DD38DF5BC00F26F1CE2E085
-    automated_gate: passed
-    manual_gate: pending-maintainer
-    status: candidate-qualified
-  factorio_0_10:
-    version: "0.10.0"
-    branch: tmp/0.10
-    target_factorio: "0.10"
-    support_class: museum-finite-ladder
-    source: declarative_museum_manifest_and_matching_base_files
-    publish_policy: binary_proof_required
-  factorio_0_9:
-    version: "0.9.0"
-    branch: tmp/0.9
-    target_factorio: "0.9"
-    support_class: museum-finite-ladder
-    source: declarative_museum_manifest_and_matching_base_files
-    publish_policy: binary_proof_required
-  factorio_0_8:
-    version: "0.8.0"
-    branch: tmp/0.8
-    target_factorio: "0.8"
-    support_class: museum-finite-ladder
-    source: declarative_museum_manifest_and_matching_base_files
-    publish_policy: binary_proof_required
-  factorio_0_7:
-    version: "0.7.0"
-    branch: tmp/0.7
-    target_factorio: "0.7"
-    support_class: museum-finite-ladder
-    source: declarative_museum_manifest_and_matching_base_files
-    publish_policy: binary_proof_required
-  factorio_0_6:
-    version: "0.6.0"
-    branch: tmp/0.6
-    target_factorio: "0.6"
-    support_class: museum-finite-ladder-minimal
-    source: declarative_museum_manifest_and_matching_base_files
+    support_class: archive-experiment
+    source: target_binary_and_base_file_discovery
     publish_policy: binary_proof_required

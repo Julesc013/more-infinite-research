@@ -17,10 +17,8 @@ Date: 2026-07-07
 
 ## Decision
 
-Named compatibility files register declarative policy overlays. They do not
-construct technologies directly.
+Named compatibility files register declarative policy overlays. They do not construct technologies directly.
 
 ## Consequences
 
-Compat files can provide selectors, exact IDs, denylists, claims, and fixture
-expectations while the compiler remains responsible for validation and emission.
+Compat files can provide selectors, exact IDs, denylists, claims, and fixture expectations while the compiler remains responsible for validation and emission.

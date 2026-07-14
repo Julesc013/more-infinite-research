@@ -12,5 +12,4 @@ superseded_by: []
 
 # Rule Surfaces
 
-Rule-surface reports describe mods that alter caps, modules, allowed effects,
-beacons, recyclers, labs, or related balance rules.
+Rule-surface reports describe mods that alter caps, modules, allowed effects, beacons, recyclers, labs, or related balance rules.

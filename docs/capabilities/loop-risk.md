@@ -12,6 +12,4 @@ superseded_by: []
 
 # Loop Risk Capability
 
-Loop-risk detection blocks or reports recipes involving self-return, recovery,
-recycling, catalyst cycles, voiding, or transmutation. The default is
-diagnostic-only unless a narrow stream explicitly proves safety.
+Loop-risk detection blocks or reports recipes involving self-return, recovery, recycling, catalyst cycles, voiding, or transmutation. The default is diagnostic-only unless a narrow stream explicitly proves safety.
