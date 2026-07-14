@@ -353,7 +353,7 @@ fixtures:
     requires_features: []
     assertion_path: fixtures/assert-legacy-effect-icons
     validates:
-      - target-era-core-constant-effect-icons
+      - target-era-effect-icons-without-newer-overlays
       - no-space-age-effect-icon-dependencies
 
   weapon-speed-safety:
