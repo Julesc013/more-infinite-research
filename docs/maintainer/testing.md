@@ -13,9 +13,7 @@ superseded_by: []
 
 Updated: 2026-07-07
 
-The 3.0 compatibility compiler needs tests for both positive emission and
-negative safety. The goal is not only "the mod loads." The goal is proving that
-MIR emits, skips, rejects, and reports exactly what the policy says.
+The 3.0 compatibility compiler needs tests for both positive emission and negative safety. The goal is not only "the mod loads." The goal is proving that MIR emits, skips, rejects, and reports exactly what the policy says.
 
 ## Test Pyramid
 
@@ -128,5 +126,4 @@ For 3.0 release candidates, require:
 git diff --check
 ```
 
-Any generated report changes must be explained by source changes or restored if
-they are only local run churn.
+Any generated report changes must be explained by source changes or restored if they are only local run churn.

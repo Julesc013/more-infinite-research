@@ -12,6 +12,4 @@ superseded_by: []
 
 # Tile Surfaces Capability
 
-Tile-surface classification covers landfill, artificial soil, foundation,
-concrete, asphalt, and adjacent surface recipes. Balance and recovery-loop risks
-make this lane conservative by default.
+Tile-surface classification covers landfill, artificial soil, foundation, concrete, asphalt, and adjacent surface recipes. Balance and recovery-loop risks make this lane conservative by default.

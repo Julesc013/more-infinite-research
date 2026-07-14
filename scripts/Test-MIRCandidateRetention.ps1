@@ -7,7 +7,7 @@ param(
 
 $ErrorActionPreference = "Stop"
 $repo = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
-$profile = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir\targets.json") | ConvertFrom-Json
+$profile = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir\target-reconstruction.json") | ConvertFrom-Json
 if ((Get-FileHash -LiteralPath $FactorioBin -Algorithm SHA256).Hash -ne $profile.factorio.binary_sha256) {
   throw "Factorio binary hash does not match the qualified target profile."
 }

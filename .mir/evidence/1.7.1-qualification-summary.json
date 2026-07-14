@@ -6,12 +6,16 @@
   "target_factorio": "0.17",
   "candidate": {
     "path": "dist/more-infinite-research_1.7.1.zip",
-    "sha256": "E6BA58D6BAAD774712ED175E14361D130A82D7DB6DD881D5B17A3FE6E48CCCC5",
-    "size_bytes": 300744
+    "sha256": "2B2A395F014BF1C0C08596602A723E51F14199A9196B192858335FFE8ED9B25B",
+    "size_bytes": 373387,
+    "entries": 170,
+    "package_content_sha256": "A1BFCD4A62F8C02059E697510399D54F324408B879A0FCF7240840DBC5AF9E17"
   },
   "factorio": {
     "version": "0.17.79",
-    "binary_sha256": "E699D376D100A428B95243507FDBB39C372921577C6D7593203EDF07CAA12D06"
+    "binary_sha256": "E699D376D100A428B95243507FDBB39C372921577C6D7593203EDF07CAA12D06",
+    "exact_binary_version": "0.17.79.47865",
+    "binary_path": "D:/Programs/Factorio/0.17/bin/x64/factorio.exe"
   },
   "capability_classification": "passed",
   "deterministic_rebuild": "passed",
@@ -21,5 +25,54 @@
   "runtime_scenario_baseline": 9,
   "ecosystem": "fixture-and-named-scenario evidence only; no broader public claim added",
   "public_release": false,
-  "tag": "not-run"
+  "tag": "not-run",
+  "qualified_source_commit": "f535ee76c45f565000bbfeaf480c5b7f59994860",
+  "canonical_dev_anchor": "dc5bfa99249af6c9508201a4c4667063bc8e021c",
+  "gates": {
+    "source_lock": "passed",
+    "feature_classification": "passed",
+    "static": "passed",
+    "capabilities": "passed",
+    "settings_retention": "passed",
+    "technology_level_retention": "passed",
+    "current_research_retention": "passed",
+    "fractional_progress": "passed-where-supported",
+    "global_runtime_state_retention": "passed",
+    "locale_catalogs": "passed-9",
+    "balance": "passed-automated",
+    "package_hygiene": "passed-zero-forbidden",
+    "deterministic_rebuild": "passed-byte-identical",
+    "exact_zip_fresh_load": "passed",
+    "exact_zip_reload": "passed",
+    "exact_1_7_0_upgrade": "passed",
+    "named_ecosystem_canaries": "fixture-and-named-scenario-only",
+    "manual_visual_and_balance_review": "PENDING-MAINTAINER"
+  },
+  "attempts": [
+    {
+      "attempt": 1,
+      "status": "infrastructure-timeout",
+      "disposition": "wrapper timeout during first packaged-ZIP smoke; no target assertion failed; rerun unchanged bytes"
+    },
+    {
+      "attempt": 2,
+      "status": "passed",
+      "disposition": "complete matching-binary and retention qualification"
+    },
+    {
+      "attempt": 3,
+      "status": "passed",
+      "disposition": "complete rerun after full seal-input binding"
+    },
+    {
+      "attempt": 4,
+      "status": "passed",
+      "disposition": "complete rerun after canonical seal identity alias fix"
+    }
+  ],
+  "superseded_candidate": {
+    "state": "SUPERSEDED-UNRELEASED",
+    "commit": "c59140c1808575bd26bf4156f9a6891d3cf90945",
+    "sha256": "E6BA58D6BAAD774712ED175E14361D130A82D7DB6DD881D5B17A3FE6E48CCCC5"
+  }
 }

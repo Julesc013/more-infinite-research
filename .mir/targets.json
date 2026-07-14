@@ -1,38 +1,523 @@
 {
-  "schema": 1,
-  "branch": "tmp/0.17",
-  "release": "1.7.1",
-  "factorio": {
-    "line": "0.17",
-    "qualified_version": "0.17.79",
-    "binary_sha256": "E699D376D100A428B95243507FDBB39C372921577C6D7593203EDF07CAA12D06",
-    "baseline_runtime_scenarios": 9
-  },
-  "prior_release": {
-    "version": "1.7.0",
-    "archive": "dist/more-infinite-research_1.7.0.zip",
-    "sha256": "3FA9419253C3E79572305E983B0443CC657683CC761DA3F4292FBF798B8C613C"
-  },
-  "classification": {
-    "native": [
-      "supported direct-effect streams",
-      "stable stream and setting identifiers",
-      "existing migrations"
-    ],
-    "adapted": [
-      "iterative prerequisite graph traversal",
-      "target-filtered settings and stream emission",
-      "legacy technology icon overlays",
-      "deterministic packaging and exact-candidate qualification"
-    ],
-    "generated_fallback": [],
-    "finite_reconstruction": [],
-    "omitted_by_capability": [
-      "all change-recipe-productivity streams and settings",
-      "2.x native recipe-productivity owner adoption and repair",
-      "Space Age, quality, elevated-rails, recycler, scripted and cargo-only capabilities"
-    ]
-  },
-  "settings_policy": "Do not expose settings whose effect type cannot exist on this target.",
-  "release_actions": "maintainer-only"
+  "schema": 2,
+  "current_target_source": "info.json.factorio_version",
+  "profiles": {
+    "2.1": {
+      "factorio_version": "2.1",
+      "support_class": "canonical-modern",
+      "validation_status": "validated",
+      "runtime_state_backend": "storage",
+      "science_family": "modern-space-age-capable",
+      "reduced_legacy": false,
+      "legacy_factorio_2_0": false,
+      "supports_space_age": true,
+      "weapon_overlap_default": "only-when-dedicated-tech-enabled",
+      "technology_overlay_policy": "modern",
+      "profile_schema": 2,
+      "prototype_shapes": {
+        "recipe_category": "categories-or-category",
+        "science_pack_prototype_kinds": [
+          "item"
+        ],
+        "product_probability_fields": [
+          "independent_probability",
+          "shared_probability",
+          "extra_count_fraction",
+          "ignored_by_productivity",
+          "ignored_by_stats",
+          "percent_spoiled",
+          "always_fresh",
+          "reset_freshness_on_craft",
+          "quality_min",
+          "quality_max",
+          "quality_change",
+          "affected_by_quality"
+        ],
+        "recipe_property_defaults": {
+          "allow_productivity": false,
+          "allow_quality": true,
+          "maximum_productivity": 3.0
+        },
+        "technology_formula": true,
+        "quality": true,
+        "surface_conditions": true,
+        "mod_data": true
+      },
+      "emitter_families": [
+        "technology",
+        "adoption",
+        "replacement",
+        "scripted-effect"
+      ],
+      "asset_policy": "modern-optional-dlc",
+      "expected_stream_count": 72,
+      "features": {
+        "compatibility_repairs": true,
+        "pipeline_extent": true,
+        "prototype_limits": true,
+        "module_permissions": true,
+        "recipe_productivity": true,
+        "settings_profiles": true,
+        "scripted_techs": true,
+        "technology_constant_overlays": true,
+        "productivity_family_adoption": true
+      },
+      "supported_required_mods": [
+        "space-age"
+      ],
+      "supported_effect_types": [
+        "cargo-landing-pad-count",
+        "character-build-distance",
+        "character-crafting-speed",
+        "character-inventory-slots-bonus",
+        "character-item-drop-distance",
+        "character-logistic-trash-slots",
+        "character-mining-speed",
+        "character-reach-distance",
+        "character-resource-reach-distance",
+        "character-running-speed",
+        "gun-speed",
+        "laboratory-productivity",
+        "max-cargo-bay-unloading-distance",
+        "worker-robot-battery"
+      ],
+      "required_validation_groups": [
+        "static",
+        "package",
+        "base-load",
+        "science-prerequisites",
+        "recipe-target-integrity",
+        "direct-effects",
+        "weapon-overlap",
+        "settings-codec",
+        "runtime-state",
+        "space-age",
+        "exact-dist"
+      ]
+    },
+    "2.0": {
+      "factorio_version": "2.0",
+      "support_class": "maintained-modern-port",
+      "validation_status": "validated-historical-release",
+      "runtime_state_backend": "storage",
+      "science_family": "modern-space-age-capable",
+      "reduced_legacy": false,
+      "legacy_factorio_2_0": true,
+      "supports_space_age": true,
+      "weapon_overlap_default": "only-when-dedicated-tech-enabled",
+      "technology_overlay_policy": "modern",
+      "profile_schema": 2,
+      "prototype_shapes": {
+        "recipe_category": "category-or-categories",
+        "science_pack_prototype_kinds": [
+          "tool"
+        ],
+        "product_probability_fields": [
+          "probability",
+          "extra_count_fraction",
+          "ignored_by_productivity",
+          "ignored_by_stats"
+        ],
+        "recipe_property_defaults": {
+          "allow_productivity": false,
+          "allow_quality": true,
+          "maximum_productivity": 3.0
+        },
+        "technology_formula": true,
+        "quality": true,
+        "surface_conditions": true,
+        "mod_data": true
+      },
+      "emitter_families": [
+        "technology",
+        "adoption",
+        "replacement",
+        "scripted-effect"
+      ],
+      "asset_policy": "factorio-2.0-dlc",
+      "expected_stream_count": 70,
+      "features": {
+        "compatibility_repairs": true,
+        "pipeline_extent": true,
+        "prototype_limits": true,
+        "module_permissions": true,
+        "recipe_productivity": true,
+        "settings_profiles": true,
+        "scripted_techs": true,
+        "technology_constant_overlays": true,
+        "productivity_family_adoption": true
+      },
+      "supported_required_mods": [
+        "space-age"
+      ],
+      "supported_effect_types": [
+        "character-build-distance",
+        "character-crafting-speed",
+        "character-inventory-slots-bonus",
+        "character-item-drop-distance",
+        "character-logistic-trash-slots",
+        "character-mining-speed",
+        "character-reach-distance",
+        "character-resource-reach-distance",
+        "character-running-speed",
+        "gun-speed",
+        "laboratory-productivity",
+        "worker-robot-battery"
+      ],
+      "required_validation_groups": [
+        "static",
+        "package",
+        "base-load",
+        "science-prerequisites",
+        "recipe-target-integrity",
+        "direct-effects",
+        "weapon-overlap",
+        "settings-codec",
+        "runtime-state",
+        "space-age",
+        "exact-dist"
+      ]
+    },
+    "1.1": {
+      "factorio_version": "1.1",
+      "support_class": "reduced-compatibility-port",
+      "validation_status": "validated-historical-release",
+      "runtime_state_backend": "global",
+      "science_family": "modern-pre-space-age",
+      "reduced_legacy": true,
+      "legacy_factorio_2_0": false,
+      "supports_space_age": false,
+      "weapon_overlap_default": "only-when-dedicated-tech-enabled",
+      "technology_overlay_policy": "legacy-1.1",
+      "profile_schema": 2,
+      "prototype_shapes": {
+        "recipe_category": "category",
+        "science_pack_prototype_kinds": [
+          "tool"
+        ],
+        "product_probability_fields": [
+          "probability",
+          "catalyst_amount"
+        ],
+        "technology_formula": true,
+        "quality": false,
+        "surface_conditions": false,
+        "mod_data": false
+      },
+      "emitter_families": [
+        "technology"
+      ],
+      "asset_policy": "legacy-modern-icons",
+      "expected_stream_count": 11,
+      "features": {
+        "compatibility_repairs": false,
+        "pipeline_extent": false,
+        "prototype_limits": false,
+        "module_permissions": false,
+        "recipe_productivity": false,
+        "settings_profiles": false,
+        "scripted_techs": false,
+        "technology_constant_overlays": false,
+        "productivity_family_adoption": false
+      },
+      "required_validation_groups": [
+        "static",
+        "package",
+        "base-load",
+        "science-prerequisites",
+        "direct-effects",
+        "weapon-overlap",
+        "reduced-settings-surface",
+        "runtime-state",
+        "exact-dist"
+      ]
+    },
+    "1.0": {
+      "factorio_version": "1.0",
+      "support_class": "reduced-compatibility-port",
+      "validation_status": "validated-historical-release",
+      "runtime_state_backend": "global",
+      "science_family": "modern-pre-space-age",
+      "reduced_legacy": true,
+      "legacy_factorio_2_0": false,
+      "supports_space_age": false,
+      "weapon_overlap_default": "only-when-dedicated-tech-enabled",
+      "technology_overlay_policy": "none",
+      "profile_schema": 2,
+      "prototype_shapes": {
+        "recipe_category": "category",
+        "science_pack_prototype_kinds": [
+          "tool"
+        ],
+        "product_probability_fields": [
+          "probability",
+          "catalyst_amount"
+        ],
+        "technology_formula": true,
+        "quality": false,
+        "surface_conditions": false,
+        "mod_data": false
+      },
+      "emitter_families": [
+        "technology"
+      ],
+      "asset_policy": "legacy-modern-icons",
+      "expected_stream_count": 11,
+      "features": {
+        "compatibility_repairs": false,
+        "pipeline_extent": false,
+        "prototype_limits": false,
+        "module_permissions": false,
+        "recipe_productivity": false,
+        "settings_profiles": false,
+        "scripted_techs": false,
+        "technology_constant_overlays": false,
+        "productivity_family_adoption": false
+      },
+      "required_validation_groups": [
+        "static",
+        "package",
+        "base-load",
+        "science-prerequisites",
+        "direct-effects",
+        "weapon-overlap",
+        "reduced-settings-surface",
+        "runtime-state",
+        "exact-dist"
+      ]
+    },
+    "0.18": {
+      "factorio_version": "0.18",
+      "support_class": "bridge-archive",
+      "validation_status": "validated-historical-release",
+      "runtime_state_backend": "global",
+      "science_family": "modern-pre-space-age",
+      "reduced_legacy": true,
+      "legacy_factorio_2_0": false,
+      "supports_space_age": false,
+      "weapon_overlap_default": "only-when-dedicated-tech-enabled",
+      "technology_overlay_policy": "none",
+      "profile_schema": 2,
+      "prototype_shapes": {
+        "recipe_category": "category",
+        "science_pack_prototype_kinds": [
+          "tool"
+        ],
+        "product_probability_fields": [
+          "probability",
+          "catalyst_amount"
+        ],
+        "technology_formula": true,
+        "quality": false,
+        "surface_conditions": false,
+        "mod_data": false
+      },
+      "emitter_families": [
+        "technology"
+      ],
+      "asset_policy": "legacy-modern-icons",
+      "expected_stream_count": 11,
+      "features": {
+        "compatibility_repairs": false,
+        "pipeline_extent": false,
+        "prototype_limits": false,
+        "module_permissions": false,
+        "recipe_productivity": false,
+        "settings_profiles": false,
+        "scripted_techs": false,
+        "technology_constant_overlays": false,
+        "productivity_family_adoption": false
+      },
+      "required_validation_groups": [
+        "static",
+        "package",
+        "base-load",
+        "science-prerequisites",
+        "direct-effects",
+        "weapon-overlap",
+        "reduced-settings-surface",
+        "runtime-state",
+        "exact-dist"
+      ]
+    },
+    "0.17": {
+      "factorio_version": "0.17",
+      "support_class": "reduced-native-infinite",
+      "validation_status": "validated-historical-release",
+      "runtime_state_backend": "global",
+      "science_family": "modern-pre-space-age",
+      "reduced_legacy": true,
+      "legacy_factorio_2_0": false,
+      "supports_space_age": false,
+      "weapon_overlap_default": "only-when-dedicated-tech-enabled",
+      "technology_overlay_policy": "none",
+      "profile_schema": 2,
+      "prototype_shapes": {
+        "recipe_category": "category",
+        "science_pack_prototype_kinds": [
+          "tool"
+        ],
+        "product_probability_fields": [
+          "probability",
+          "catalyst_amount"
+        ],
+        "technology_formula": true,
+        "quality": false,
+        "surface_conditions": false,
+        "mod_data": false
+      },
+      "emitter_families": [
+        "technology"
+      ],
+      "asset_policy": "factorio-0.17-icons",
+      "expected_stream_count": 11,
+      "features": {
+        "compatibility_repairs": false,
+        "pipeline_extent": false,
+        "prototype_limits": false,
+        "module_permissions": false,
+        "recipe_productivity": false,
+        "settings_profiles": false,
+        "scripted_techs": false,
+        "technology_constant_overlays": false,
+        "productivity_family_adoption": false
+      },
+      "supported_required_mods": [],
+      "supported_effect_types": [
+        "character-build-distance",
+        "character-crafting-speed",
+        "character-inventory-slots-bonus",
+        "character-item-drop-distance",
+        "character-logistic-trash-slots",
+        "character-mining-speed",
+        "character-reach-distance",
+        "character-resource-reach-distance",
+        "character-running-speed",
+        "gun-speed",
+        "laboratory-productivity",
+        "worker-robot-battery"
+      ],
+      "required_validation_groups": [
+        "static",
+        "package",
+        "base-load",
+        "science-prerequisites",
+        "direct-effects",
+        "weapon-overlap",
+        "reduced-settings-surface",
+        "runtime-state",
+        "exact-dist"
+      ]
+    },
+    "0.16": {
+      "factorio_version": "0.16",
+      "support_class": "old-science-native-infinite",
+      "validation_status": "planned-binary-proof-required",
+      "runtime_state_backend": "global",
+      "science_family": "legacy-0.16",
+      "reduced_legacy": true,
+      "legacy_factorio_2_0": false,
+      "supports_space_age": false,
+      "weapon_overlap_default": "only-when-dedicated-tech-enabled",
+      "technology_overlay_policy": "none",
+      "profile_schema": 2,
+      "prototype_shapes": {
+        "recipe_category": "category",
+        "science_pack_prototype_kinds": [
+          "tool"
+        ],
+        "product_probability_fields": [
+          "probability",
+          "catalyst_amount"
+        ],
+        "technology_formula": true,
+        "quality": false,
+        "surface_conditions": false,
+        "mod_data": false
+      },
+      "emitter_families": [
+        "technology"
+      ],
+      "asset_policy": "factorio-0.16-icons",
+      "expected_stream_count": 11,
+      "features": {
+        "compatibility_repairs": false,
+        "pipeline_extent": false,
+        "prototype_limits": false,
+        "module_permissions": false,
+        "recipe_productivity": false,
+        "settings_profiles": false,
+        "scripted_techs": false,
+        "technology_constant_overlays": false,
+        "productivity_family_adoption": false
+      },
+      "required_validation_groups": [
+        "static",
+        "package",
+        "base-load",
+        "science-prerequisites",
+        "direct-effects",
+        "weapon-overlap",
+        "reduced-settings-surface",
+        "runtime-state",
+        "old-science-map",
+        "exact-dist"
+      ]
+    },
+    "0.15": {
+      "factorio_version": "0.15",
+      "support_class": "minimal-native-infinite",
+      "validation_status": "planned-binary-proof-required",
+      "runtime_state_backend": "global",
+      "science_family": "legacy-0.15",
+      "reduced_legacy": true,
+      "legacy_factorio_2_0": false,
+      "supports_space_age": false,
+      "weapon_overlap_default": "only-when-dedicated-tech-enabled",
+      "technology_overlay_policy": "none",
+      "profile_schema": 2,
+      "prototype_shapes": {
+        "recipe_category": "category",
+        "science_pack_prototype_kinds": [
+          "tool"
+        ],
+        "product_probability_fields": [
+          "probability",
+          "catalyst_amount"
+        ],
+        "technology_formula": true,
+        "quality": false,
+        "surface_conditions": false,
+        "mod_data": false
+      },
+      "emitter_families": [
+        "technology"
+      ],
+      "asset_policy": "factorio-0.15-icons",
+      "expected_stream_count": 11,
+      "features": {
+        "compatibility_repairs": false,
+        "pipeline_extent": false,
+        "prototype_limits": false,
+        "module_permissions": false,
+        "recipe_productivity": false,
+        "settings_profiles": false,
+        "scripted_techs": false,
+        "technology_constant_overlays": false,
+        "productivity_family_adoption": false
+      },
+      "required_validation_groups": [
+        "static",
+        "package",
+        "base-load",
+        "science-prerequisites",
+        "direct-effects",
+        "weapon-overlap",
+        "reduced-settings-surface",
+        "runtime-state",
+        "old-science-map",
+        "exact-dist"
+      ]
+    }
+  }
 }

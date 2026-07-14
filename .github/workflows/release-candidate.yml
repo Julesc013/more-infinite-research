@@ -1,0 +1,69 @@
+name: Release Candidate Gate
+
+on:
+  workflow_dispatch:
+    inputs:
+      candidate_sha:
+        description: "Full source commit SHA to validate"
+        required: true
+      archive_sha256:
+        description: "Expected SHA-256 of the exact release archive"
+        required: true
+      release_profile:
+        description: "Release-targeted run profile"
+        required: true
+        default: "release-targeted-2.1"
+
+jobs:
+  exact-candidate:
+    runs-on: [self-hosted, Windows]
+    environment: release-candidate
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.candidate_sha }}
+          fetch-depth: 0
+
+      - name: Verify immutable source identity
+        shell: pwsh
+        run: |
+          if ((git rev-parse HEAD).Trim() -ne '${{ inputs.candidate_sha }}') {
+            throw 'Checked-out source does not match candidate_sha.'
+          }
+          if (git status --porcelain --untracked-files=all) {
+            throw 'Release-candidate checkout is not clean.'
+          }
+
+      - name: Build and verify exact archive
+        shell: pwsh
+        run: |
+          ./scripts/Build-MIRPackage.ps1
+          $info = Get-Content info.json -Raw | ConvertFrom-Json
+          $archive = "dist/more-infinite-research_$($info.version).zip"
+          $actual = (Get-FileHash $archive -Algorithm SHA256).Hash
+          if ($actual -ne '${{ inputs.archive_sha256 }}') {
+            throw "Archive SHA mismatch: expected ${{ inputs.archive_sha256 }}, got $actual"
+          }
+
+      - name: Run complete exact-dist validation
+        shell: pwsh
+        env:
+          FACTORIO_BIN: ${{ secrets.FACTORIO_BIN }}
+        run: ./scripts/Invoke-MIRValidation.ps1 -FactorioBin $env:FACTORIO_BIN
+
+      - name: Run strict targeted compatibility gate
+        shell: pwsh
+        env:
+          FACTORIO_BIN: ${{ secrets.FACTORIO_BIN }}
+        run: ./scripts/mir.ps1 release gate --profile '${{ inputs.release_profile }}' --no-git-pull
+
+      - name: Upload exact candidate evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-candidate-${{ inputs.candidate_sha }}
+          path: |
+            dist/*.zip
+            artifacts/validation/*.json
+            artifacts/release-gate/**
+          if-no-files-found: error
