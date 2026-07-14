@@ -44,6 +44,7 @@ Common overrides:
   --output <path>     Output artifact directory
   --timeout <seconds> Per-scenario timeout
   --link-mode <mode>  Copy, Hardlink, or Symlink local zips into scenario mod dirs
+  --skip-strict-gate  Reuse an already completed strict gate in a composed assurance run
 "@
 }
 
@@ -112,6 +113,9 @@ function New-MIRProfileOverrides {
   }
   if (Test-MIRArgSwitch -Items $Items -Name "--no-git-pull") {
     $overrides.no_git_pull = $true
+  }
+  if (Test-MIRArgSwitch -Items $Items -Name "--skip-strict-gate") {
+    $overrides.skip_strict_gate = $true
   }
 
   return $overrides
@@ -215,6 +219,7 @@ function Invoke-MIRRunProfile {
       if ($auditFactorioVersions) { $params.AuditFactorioVersions = @($auditFactorioVersions | ForEach-Object { [string]$_ }) }
       if ($timeout) { $params.ScenarioTimeoutSeconds = [int]$timeout }
       if (Test-MIRProfileOrOverrideFlag -Object $profileData -Overrides $Overrides -Name "no_git_pull") { $params.NoGitPull = $true }
+      if (Test-MIRProfileOrOverrideFlag -Object $profileData -Overrides $Overrides -Name "skip_strict_gate") { $params.SkipStrictGate = $true }
       if (Test-MIRProfileOrOverrideFlag -Object $profileData -Overrides $Overrides -Name "skip_repair_smokes") { $params.SkipRepairSmokes = $true }
       if (Test-MIRProfileOrOverrideFlag -Object $profileData -Overrides $Overrides -Name "skip_representative_scenario") { $params.SkipRepresentativeScenario = $true }
       if (Test-MIRProfileOrOverrideFlag -Object $profileData -Overrides $Overrides -Name "skip_build") { $params.SkipBuild = $true }
