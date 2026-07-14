@@ -12,7 +12,7 @@ superseded_by: []
 
 # MIR 1.3.0 Candidate Notes
 
-MIR 1.3.0 is an independent canonical MIR 3.1.9-derived Factorio 0.13 finite-continuation reconstruction from `DEV_LOWER_WAVE_ANCHOR` commit `dc5bfa99249af6c9508201a4c4667063bc8e021c`. The earlier `tmp/0.13` candidate remains `SUPERSEDED-UNRELEASED` characterization evidence and is not this reconstruction's source ancestry.
+MIR 1.3.0 is an independent canonical MIR 3.1.9-derived Factorio 0.13 finite-continuation reconstruction from `DEV_LOWER_WAVE_ANCHOR` commit `d6c1feab9e268d590b60e8d2338af68a4c0b7b83`. The earlier `tmp/0.13` candidate remains `SUPERSEDED-UNRELEASED` characterization evidence and is not this reconstruction's source ancestry.
 
 - Generated technologies use science-pack-1, science-pack-2, science-pack-3, and alien science.
 - Research uses fixed target-supported counts; unsupported native infinite fields are not emitted.
