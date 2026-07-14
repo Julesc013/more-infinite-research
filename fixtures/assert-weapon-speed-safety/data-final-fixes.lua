@@ -2,27 +2,11 @@ local function fail(message)
   error("MIR weapon speed validation failed: " .. message)
 end
 
-local generated_registry = require("__more-infinite-research__.prototypes.mir.domain.facts.generated_technology_registry")
-local native_effect_coverage = require("__more-infinite-research__.prototypes.mir.policy.native_effect_coverage")
-local weapon_speed_mutation = require("__more-infinite-research__.prototypes.mir.pipeline.mutations.weapon_speed")
+local techs = data.raw.technology or {}
 
 local function has_gun_speed(tech, ammo_category)
   for _, effect in ipairs((tech and tech.effects) or {}) do
-    if effect.type == "gun-speed" and effect.ammo_category == ammo_category then
-      return true
-    end
-  end
-  return false
-end
-
-local function has_exact_gun_speed(tech, ammo_category)
-  for _, effect in ipairs((tech and tech.effects) or {}) do
-    if effect.type == "gun-speed"
-      and effect.ammo_category == ammo_category
-      and effect.modifier == 0.1
-    then
-      return true
-    end
+    if effect.type == "gun-speed" and effect.ammo_category == ammo_category then return true end
   end
   return false
 end
@@ -43,14 +27,60 @@ local function has_prerequisite(tech, prerequisite)
   return false
 end
 
-local techs = data.raw.technology or {}
+local function recipe_outputs(recipe, item_name)
+  if recipe.result == item_name then return true end
+  for _, result in ipairs(recipe.results or {}) do
+    if (result.name or result[1]) == item_name then return true end
+  end
+  return false
+end
+
+local function recipe_is_unlocked(recipe_name)
+  for _, technology in pairs(techs) do
+    if technology.enabled ~= false then
+      for _, effect in ipairs(technology.effects or {}) do
+        if effect.type == "unlock-recipe" and effect.recipe == recipe_name then return true end
+      end
+    end
+  end
+  return false
+end
+
+local function pack_has_crafting_path(pack_name)
+  for recipe_name, recipe in pairs(data.raw.recipe or {}) do
+    if recipe_outputs(recipe, pack_name)
+      and (recipe.enabled ~= false or recipe_is_unlocked(recipe_name))
+    then
+      return true
+    end
+  end
+  return false
+end
+
+local function lab_accepts(pack_name)
+  for _, lab in pairs(data.raw.lab or {}) do
+    for _, input in ipairs(lab.inputs or {}) do
+      if input == pack_name then return true end
+    end
+  end
+  return false
+end
+
+local function technology_is_researchable_infinite(technology)
+  if not technology or technology.enabled == false or technology.max_level ~= "infinite" then return false end
+  if not technology.unit or not technology.unit.ingredients or #technology.unit.ingredients == 0 then return false end
+  if technology.unit.count == nil and technology.unit.count_formula == nil then return false end
+  for _, ingredient in ipairs(technology.unit.ingredients) do
+    local pack_name = ingredient.name or ingredient[1]
+    if not lab_accepts(pack_name) or not pack_has_crafting_path(pack_name) then return false end
+  end
+  return true
+end
 
 local function exact_infinite_owner(name, category)
-  return native_effect_coverage.technology_has_exact_effect(name, {
-    type = "gun-speed",
-    ammo_category = category,
-    modifier = 0.1
-  })
+  local technology = techs[name]
+  return technology_is_researchable_infinite(technology)
+    and gun_speed_modifier(technology, category) == 0.1
 end
 
 local dedicated_names = {
@@ -62,12 +92,10 @@ local prefer_mir_setting = settings.startup["mir-prefer-this-mod-for-competing-t
 local prefer_mir = not prefer_mir_setting or prefer_mir_setting.value ~= false
 
 local function replacement_coverage(category)
-  if native_effect_coverage.technology_has_effect_identity(dedicated_names[category], {
-    type = "gun-speed",
-    ammo_category = category
-  }, { positive_numeric_value = true }) then return true end
+  local dedicated = techs[dedicated_names[category]]
+  local dedicated_modifier = gun_speed_modifier(dedicated, category)
+  if technology_is_researchable_infinite(dedicated) and dedicated_modifier and dedicated_modifier > 0 then return true end
   if prefer_mir then return false end
-
   for name, _ in pairs(techs) do
     if not string.match(name, "^recipe%-prod%-")
       and not string.match(name, "^weapon%-shooting%-speed%-%d+$")
@@ -78,7 +106,6 @@ local function replacement_coverage(category)
   end
   return false
 end
-
 
 for category, tech_name in pairs(dedicated_names) do
   local technology = techs[tech_name]
@@ -103,25 +130,12 @@ end
 local mode_setting = settings.startup["mir-adjust-vanilla-weapon-speed-techs"]
 local mode = mode_setting and mode_setting.value or "only-when-dedicated-tech-enabled"
 local generated_count = 0
-local generated_names = generated_registry.sorted_names()
-local registry_visible = #generated_names > 0
-if not registry_visible then
-  -- Factorio 2.0 isolates cross-mod require state. Inspect final prototypes for
-  -- assertions while MIR itself continues to use its private registry.
-  for name, tech in pairs(techs) do
-    if string.match(name, "^weapon%-shooting%-speed%-%d+$")
-      and tech.unit
-      and tech.unit.count_formula
-    then
-      table.insert(generated_names, name)
-    end
-  end
-  table.sort(generated_names)
-end
-
-for _, name in ipairs(generated_names) do
-  local tech = techs[name]
-  if string.match(name, "^weapon%-shooting%-speed%-%d+$") and tech.unit and tech.unit.count_formula then
+for name, tech in pairs(techs) do
+  if name ~= "weapon-shooting-speed-99"
+    and string.match(name, "^weapon%-shooting%-speed%-%d+$")
+    and tech.unit
+    and tech.unit.count_formula
+  then
     generated_count = generated_count + 1
     for _, category in ipairs({"rocket", "cannon-shell"}) do
       local should_strip = mode == "always"
@@ -135,9 +149,7 @@ for _, name in ipairs(generated_names) do
     end
   end
 end
-if generated_count == 0 then
-  fail("generated weapon shooting speed continuation was not found")
-end
+if generated_count == 0 then fail("generated weapon shooting speed continuation was not found") end
 
 local expected_prerequisites = {
   ["recipe-prod-research_rocket_shooting_speed-1"] = {{"rocketry"}},
@@ -152,14 +164,9 @@ for tech_name, prerequisite_groups in pairs(expected_prerequisites) do
     for _, candidates in ipairs(prerequisite_groups) do
       local found = false
       for _, prerequisite in ipairs(candidates) do
-        if has_prerequisite(tech, prerequisite) then
-          found = true
-          break
-        end
+        if has_prerequisite(tech, prerequisite) then found = true break end
       end
-      if not found then
-        fail(tech_name .. " is missing prerequisite candidate " .. table.concat(candidates, ","))
-      end
+      if not found then fail(tech_name .. " is missing prerequisite candidate " .. table.concat(candidates, ",")) end
     end
   end
 end
@@ -175,31 +182,12 @@ if external_owner then
   then
     fail("external owner does not provide exact reachable infinite replacement coverage")
   end
-
-  if native_effect_coverage.technology_is_researchable_infinite(
-    "mir-fixture-unreachable-weapon-speed-owner"
-  ) then
+  if technology_is_researchable_infinite(techs["mir-fixture-unreachable-weapon-speed-owner"]) then
     fail("science-unreachable external owner was accepted as replacement coverage")
   end
-
-  if registry_visible then
-    local external_continuation = table.deepcopy(external_owner)
-    external_continuation.name = "weapon-shooting-speed-99"
-    external_continuation.localised_name = "MIR fixture external weapon speed continuation"
-    data:extend({external_continuation})
-
-    -- Re-run the cleanup after the external continuation exists. Old broad
-    -- name scanning would mutate it; registry-scoped cleanup must not.
-    weapon_speed_mutation.apply()
-
-    if not has_gun_speed(techs["weapon-shooting-speed-99"], "rocket")
-      or not has_gun_speed(techs["weapon-shooting-speed-99"], "cannon-shell")
-    then
-      fail("external weapon shooting speed continuation was mutated")
-    end
-
-    -- Factorio forbids a numbered level after an infinite continuation. The
-    -- transient prototype exists only long enough to exercise policy scope.
-    techs["weapon-shooting-speed-99"] = nil
+  local continuation = techs["weapon-shooting-speed-99"]
+  if not has_gun_speed(continuation, "rocket") or not has_gun_speed(continuation, "cannon-shell") then
+    fail("external numbered weapon shooting speed continuation was mutated")
   end
+  techs["weapon-shooting-speed-99"] = nil
 end
