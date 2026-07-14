@@ -18,7 +18,7 @@
   "binary_version_proof_sha256": "03CB10ADA0097C61DF558DC14C4BA38E4525A88F6AB3CF40F72306C3F8205A02",
   "fresh_start": {
     "status": "passed-bounded-startup-load",
-    "duration_seconds": 4.348,
+    "duration_seconds": 4.114,
     "command": [
       "D:\\Programs\\Factorio\\0.10\\bin\\x64\\Factorio.exe"
     ],
@@ -26,13 +26,13 @@
     "process_exit_code": -1,
     "proof_kind": "factorio-log-mod-load",
     "proof_path": "C:\\Projects\\Factorio\\more-infinite-research-rebuild-0.10\\.mir\\evidence\\0.10.0-runtime\\fresh-start.log",
-    "proof_sha256": "105B201109DE265FD0312C2B18B5CED745135A8CC9926E9F36114483054467CE",
+    "proof_sha256": "32E1DBEAAA645EA1237BB20746AA0F3D2B79EA1CD1471F49CD59AE0805ECADDC",
     "mod_marker": "more-infinite-research",
     "mod_marker_offset": 180
   },
   "second_start": {
     "status": "passed-bounded-startup-load",
-    "duration_seconds": 2.977,
+    "duration_seconds": 2.982,
     "command": [
       "D:\\Programs\\Factorio\\0.10\\bin\\x64\\Factorio.exe"
     ],
@@ -40,7 +40,7 @@
     "process_exit_code": -1,
     "proof_kind": "factorio-log-mod-load",
     "proof_path": "C:\\Projects\\Factorio\\more-infinite-research-rebuild-0.10\\.mir\\evidence\\0.10.0-runtime\\second-start.log",
-    "proof_sha256": "C9E5FA5169E24F960B03D72DA489EA1DC41370FA42B829A1C207EDC316E0F6C2",
+    "proof_sha256": "96738E418431C8EF5CF9F6D193696C46F065903219D407CB072359386D971ED0",
     "mod_marker": "more-infinite-research",
     "mod_marker_offset": 180
   },
