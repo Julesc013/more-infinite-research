@@ -12,5 +12,4 @@ superseded_by: []
 
 # Factorio 2.1 Lane
 
-The 2.1 lane is the current mainline validation target for `dev` and stable
-release work.
+The 2.1 lane is the current mainline validation target for `dev` and stable release work.

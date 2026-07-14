@@ -1,0 +1,45 @@
+name: Assurance Targeted Runtime
+
+on:
+  workflow_dispatch:
+    inputs:
+      candidate_sha:
+        description: "Trusted full source commit"
+        required: true
+      baseline_sha:
+        description: "Qualified comparison commit"
+        required: true
+      target:
+        description: "Factorio target line"
+        required: true
+        default: "2.1"
+
+permissions:
+  contents: read
+
+jobs:
+  targeted:
+    runs-on: [self-hosted, Windows]
+    environment: release-candidate
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.candidate_sha }}
+          fetch-depth: 0
+      - name: Build exact candidate once
+        shell: pwsh
+        run: ./scripts/mir.ps1 assurance build --target '${{ inputs.target }}' --output artifacts/assurance/build.json
+      - name: Create impact-selected plan
+        shell: pwsh
+        run: ./scripts/mir.ps1 assurance plan --target '${{ inputs.target }}' --baseline '${{ inputs.baseline_sha }}' --profile targeted --output artifacts/assurance/plan.json
+      - name: Run selected trusted target gate
+        shell: pwsh
+        env:
+          FACTORIO_BIN: ${{ secrets.FACTORIO_BIN }}
+        run: ./scripts/mir.ps1 assurance verify --target '${{ inputs.target }}' --baseline '${{ inputs.baseline_sha }}' --profile targeted --factorio $env:FACTORIO_BIN --output artifacts/assurance/verify-summary.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: assurance-targeted-${{ inputs.target }}-${{ inputs.candidate_sha }}
+          path: artifacts/assurance/**
+          if-no-files-found: error

@@ -12,8 +12,7 @@ superseded_by: []
 
 # ATAN Nuclear Science Compatibility
 
-Claim: MIR covers visible ATAN-style nuclear science pack recipes when the
-science pack is an active lab input.
+Claim: MIR covers visible ATAN-style nuclear science pack recipes when the science pack is an active lab input.
 
 Evidence:
 

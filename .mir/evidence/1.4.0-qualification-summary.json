@@ -6,12 +6,16 @@
   "target_factorio": "0.14",
   "candidate": {
     "path": "dist/more-infinite-research_1.4.0.zip",
-    "sha256": "39EDE9BA8DA7BDD632828B0B1F055A8681FC1DAB48D7D1B9348D707BB0AF0B93",
-    "size_bytes": 301270
+    "sha256": "69B7FC86E798937D44DF60E5E6DDC1FA636A10643B2E1BF54A79F5255CF984C1",
+    "size_bytes": 374016,
+    "entries": 170,
+    "package_content_sha256": "6F13FF35905A2C4F429C4770E2B733B7124F37050A86E181C94B639622158643"
   },
   "factorio": {
     "version": "0.14.23",
-    "binary_sha256": "A2B7DC0FBC1D6D68CF4D71EB71D42952FBB3B0CF35EEC6BF8B4BA16B9F79715F"
+    "binary_sha256": "A2B7DC0FBC1D6D68CF4D71EB71D42952FBB3B0CF35EEC6BF8B4BA16B9F79715F",
+    "exact_binary_version": "0.14.23.25374",
+    "binary_path": "D:/Programs/Factorio/0.14/bin/x64/factorio.exe"
   },
   "capability_classification": "passed",
   "deterministic_rebuild": "passed",
@@ -21,5 +25,39 @@
   "runtime_scenario_baseline": 2,
   "ecosystem": "fixture-and-named-scenario evidence only; no broader public claim added",
   "public_release": false,
-  "tag": "not-run"
+  "tag": "not-run",
+  "qualified_source_commit": "ad8974c978e7466a29c42c52de20551bf7969c0e",
+  "canonical_dev_anchor": "dc5bfa99249af6c9508201a4c4667063bc8e021c",
+  "gates": {
+    "source_lock": "passed",
+    "feature_classification": "passed",
+    "static": "passed",
+    "capabilities": "passed",
+    "target_science_reachability": "passed",
+    "settings_retention": "passed",
+    "research_retention": "passed",
+    "global_runtime_state_retention": "passed",
+    "finite_progression": "passed-no-native-infinite-parity-claim",
+    "locale_catalogs": "passed-9",
+    "balance": "passed-automated",
+    "package_hygiene": "passed-zero-forbidden",
+    "deterministic_rebuild": "passed-byte-identical",
+    "exact_zip_fresh_load": "passed",
+    "exact_zip_reload": "passed",
+    "first_release_retention": "passed",
+    "upgrade": "not-applicable-no-legitimate-predecessor",
+    "manual_visual_and_balance_review": "PENDING-MAINTAINER"
+  },
+  "attempts": [
+    {
+      "attempt": 1,
+      "status": "passed",
+      "disposition": "complete exact-binary finite-reconstruction and first-release retention qualification"
+    }
+  ],
+  "superseded_candidate": {
+    "state": "SUPERSEDED-UNRELEASED",
+    "commit": "2e9eab88e3b6ec6ad84460c1d75d8177441182d6",
+    "sha256": "39EDE9BA8DA7BDD632828B0B1F055A8681FC1DAB48D7D1B9348D707BB0AF0B93"
+  }
 }

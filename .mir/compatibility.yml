@@ -5,6 +5,75 @@ canonical_support_lanes: fixtures/compat-matrix/support-lanes.json
 lua_report_registry: prototypes/mir/compatibility/claim_registry.lua
 target_docs_root: docs/compatibility/targets
 
+compatibility_packs:
+  schema: 2
+  validator: prototypes/mir/compatibility/packs/schema.lua
+  registry: prototypes/mir/compatibility/packs/registry.lua
+  external_transport: more-infinite-research-compatibility-pack
+  fixture_only_profiles_allowed_in_production_registry: false
+  applicability:
+    any_field: mods_any
+    all_field: mods_all
+    none_field: mods_none
+    legacy_any_field: mods
+    version_constraints: comma-separated-comparators
+  production_consumers:
+    - exact-includes-excludes
+    - aliases
+    - family-hints
+    - science-roles
+    - owner-claims
+    - reviewed-risk-overrides
+    - exact-family-generation-authorizations
+    - exact-candidate-seeds
+    - deterministic-precedence
+  hard_safety:
+    compatibility_pack_overridable: false
+    reviewable_signals_require_exact_recipe_version_and_fixture: true
+  exact_pack:
+    unrelated_active_pack_enables_generation: false
+    authorization_query: compatibility_packs.authorizes_family_stream
+    baseline: safe-attachment
+
+technology_prerequisite_cycle_repairs:
+  - id: muluna-astroponics-space-science-cycle
+    required_mods:
+      - astroponics
+      - planet-muluna
+    trigger: astroponics-requires-space-science-and-space-science-transitively-requires-astroponics
+    mutation: remove-only-astroponics-to-space-science-prerequisite
+    implementation: prototypes/mir/compatibility/repairs/technology_prerequisite_cycles.lua
+    fixture: fixtures/external-technology-cycle
+    claim_level: diagnostic-only
+    public_scope: bounded startup-cycle interoperability repair only
+
+campaigns:
+  evidence_contract: mir-modpack-campaign-evidence-v1
+  exact_mir_archive_sha256_required: true
+  exact_mir_source_commit_required: true
+  dependency_lock_sha256_required: true
+  actual_executed_roots_required: true
+  root_versions_required: true
+  resolved_archive_sha256_required: true
+  result_and_claim_level_required: true
+  mega_smash_qualifies_individual_ecosystems: false
+  pre_renumber_load_characterization:
+    - .mir/evidence/pre-3.1-renumber-bz-bob-load-campaign-summary.json
+    - .mir/evidence/pre-3.1-renumber-core-ecosystems-load-campaign.json
+    - .mir/evidence/pre-3.1-renumber-aai-load-campaign.json
+  final_3_1_0_load_evidence:
+    available_ecosystems: .mir/evidence/3.1.0-rc5-ecosystem-campaign.json
+    status: 9-passed-load-claims-including-planet-cluster
+    current_archive_status: passed
+    source_commit: 3699fecb021ee64e0fcdeaf741e32b1b89cf27b3
+    archive_sha256: BD89A34D1EACA6C7FD93412072FFC1434F38DE90FA7E1156B75CE23DC07DDDA3
+    dependency_lock_sha256: 225E28FB37626A52AC224B5A1275B01AC7C2101C3A806984208646B00E143AC4
+    missing_dependency_closures:
+      - angels
+      - space-exploration
+      - pyanodon
+    missing_dependency_evidence: .mir/evidence/3.1.0-rc4-missing-overhaul-closures.json
+
 claims:
   allowed_levels:
     - loads
@@ -96,6 +165,32 @@ targets:
       generated_through_existing_stream: research_mining_drill
       diagnostic_only:
         - native-mining-yield-productivity
+
+    modules-t4:
+      mod: modules-t4
+      doc: docs/compatibility/targets/modules-t4.md
+      claim_level: partial-support
+      public_claim: module recipe productivity by final prototype tier
+      fixtures:
+        - fixtures/assert-prototype-limits
+      named_load_checks:
+        - modules-t4_2.2.2 source archive on Factorio 2.1.9
+      streams: []
+      generated_through_existing_stream: research_modules
+      diagnostic_only:
+        - dynamic-module-effect-research
+        - module-effect-mutation
+
+    finite-prod-techs:
+      mod: finite_prod_techs
+      doc: docs/compatibility/targets/finite-prod-techs.md
+      claim_level: cooperates
+      public_claim: load-after finite productivity cap post-processing
+      named_load_checks:
+        - finite_prod_techs_0.1.1 source archive on Factorio 2.1.9
+      streams: []
+      diagnostic_only:
+        - finite-level-formula-ownership
 
     fluid-must-flow:
       mod: FluidMustFlow
