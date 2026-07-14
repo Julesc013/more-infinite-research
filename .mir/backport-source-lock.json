@@ -1,0 +1,33 @@
+{
+  "schema": 1,
+  "projection_schema": 1,
+  "canonical_release": "3.1.9",
+  "canonical_release_tag_commit": "1b9c6f32fc2bb53c413a593534e103a6043b4be3",
+  "canonical_dev_anchor": "1947613596cfa4db6e9c68d901da7b51edd3b930",
+  "canonical_anchor_ref": "refs/heads/DEV_RING_1_1_1_0_ANCHOR",
+  "canonical_package_source_commit": "79df29b50ea9b855b8665d6c9a3d8295806acde0",
+  "released_2_0_reference": "2.4.5",
+  "released_2_0_tag_commit": "7e4b6c530cfcc5b2e1429c4e9f4ccb0d6d3b42a4",
+  "target": "1.1",
+  "mir_version": "1.9.4",
+  "target_profile_sha256": "832760BBA9F805BCF2A4AC2B64076CF3EE548E2D35B9DF273D4D867ADC508B77",
+  "portable_modules": {"scripts/Build-MIRPackage.ps1":"canonical deterministic package builder","scripts/Invoke-MIRValidation.ps1":"canonical validation orchestrator"},
+  "adapted_modules": {"changelog.txt":"MIR 1.9.4 target release history","info.json":"Factorio 1.1 and MIR 1.9.4 identity"},
+  "target_specific_modules": {"prototypes/mir/platform/factorio/target_profiles.lua":"generated Factorio 1.1 current-profile selection"},
+  "canonical_features": ["compiler-core","stable-stream-manifest","legacy-science-discovery","lab-researchability","direct-effect-bonuses","weapon-overlap-policy","reduced-startup-settings","runtime-state-backend","deterministic-release-package","compatibility-repairs","pipeline-extent","prototype-limits","module-permissions","recipe-productivity","settings-profiles","scripted-techs","technology-constant-overlays","productivity-family-adoption"],
+  "omitted_features": {
+    "compatibility-repairs":{"positive_requirement":"named Factorio 1.1 fixture and exact-version failure","target_result":"no qualified modern repair"},
+    "pipeline-extent":{"positive_requirement":"validated pipeline-extent prototype fields","target_result":"surface absent from the target profile"},
+    "prototype-limits":{"positive_requirement":"validated modern limit fields","target_result":"surface absent from the target profile"},
+    "module-permissions":{"positive_requirement":"validated modern module-permission model","target_result":"surface absent from the target profile"},
+    "recipe-productivity":{"positive_requirement":"recipe-productivity technology effect","target_result":"effect absent in Factorio 1.1"},
+    "settings-profiles":{"positive_requirement":"qualified target codec and lifecycle","target_result":"codec not qualified for Factorio 1.1"},
+    "scripted-techs":{"positive_requirement":"Space Age runtime entities and events","target_result":"Space Age surface absent"},
+    "technology-constant-overlays":{"positive_requirement":"qualified modern constant-overlay shape","target_result":"surface not enabled by target profile"},
+    "productivity-family-adoption":{"positive_requirement":"native recipe-productivity owner families","target_result":"native owners absent in Factorio 1.1"}
+  },
+  "feature_classification": ".mir/evidence/1.9.4-feature-classification.json",
+  "release_notes": "docs/releases/1.9.4.md",
+  "validation_summary": ".mir/evidence/1.9.4-qualification.json",
+  "candidate_seal": ".mir/evidence/candidate-seals/mir-1.9.4-factorio-1.1.json"
+}
