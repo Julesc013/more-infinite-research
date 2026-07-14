@@ -12,7 +12,7 @@ superseded_by: []
 
 # MIR 1.6.0 Candidate Notes
 
-MIR 1.6.0 is an independent canonical MIR 3.1.9-derived target projection from `DEV_LOWER_WAVE_ANCHOR` commit `7ca81bbc98f02cfaf2d40012096d94e261e74d98`. The earlier `tmp/0.16` candidate remains `SUPERSEDED-UNRELEASED` characterization evidence and is not this reconstruction's source ancestry.
+MIR 1.6.0 is an independent canonical MIR 3.1.9-derived target projection from `DEV_LOWER_WAVE_ANCHOR` commit `6ac377389d7ffc3576fb39576dab4ace6efaec51`. The earlier `tmp/0.16` candidate remains `SUPERSEDED-UNRELEASED` characterization evidence and is not this reconstruction's source ancestry.
 
 MIR 1.6.0 is an unreleased Factorio 0.16 old-science port of the reduced native-infinite edition.
 
