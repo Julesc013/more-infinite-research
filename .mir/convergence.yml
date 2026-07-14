@@ -164,6 +164,8 @@ candidate:
   upgrade_evidence_path: .mir/evidence/3.1.9/upgrade-from-3.1.5-proof.json
   ecosystem_evidence_path: .mir/evidence/3.1.9/harness-refresh-exact-ecosystem-campaign.json
   interactive_evidence_path: .mir/evidence/3.1.9/interactive-review.json
+  seal_path: .mir/evidence/candidate-seals/mir-3.1.9-factorio-2.1.json
+  seal_source_commit: f81af94c9a16666be8f5902bb5653aeea57033ba
   automated_gate: passed
   manual_gate: pending
   status: release-candidate-awaiting-manual-review

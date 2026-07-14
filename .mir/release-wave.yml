@@ -198,27 +198,30 @@ waves:
 
   mir_3_1_9:
     version: "3.1.9"
-    branch: dev
+    branch: main
+    development_branch: dev
     synthesis_branch: tmp/3.1.9-synthesis
     source_anchor_required: released-3.1.5-plus-complete-portable-return
     source_commit: 79df29b50ea9b855b8665d6c9a3d8295806acde0
     package_source_commit: 79df29b50ea9b855b8665d6c9a3d8295806acde0
+    release_candidate_commit: f81af94c9a16666be8f5902bb5653aeea57033ba
     native_owner_binding_schema: 2
     assurance_evidence_schema: 2
     museum_compiler_schema: 1
     runtime_scenario_count: 102
     runtime_package_sha256: D77B3A78DA40CD4FDD4C829A01B5030E59FB593F3387124EF5C438F6A9E8DFCD
-    structured_validation_evidence: .mir/evidence/3.1.9/disabled-automation-science-final-qualification.json
+    structured_validation_evidence: .mir/evidence/3.1.9/final-release-qualification.json
     broad_qualification_evidence: .mir/evidence/3.1.9/qualification-summary.json
+    harness_refresh_evidence: .mir/evidence/3.1.9/harness-refresh-validation.json
     upgrade_evidence: .mir/evidence/3.1.9/upgrade-from-3.1.5-proof.json
     additional_upgrade_evidence:
       - .mir/evidence/3.1.9/upgrade-from-3.1.2-proof.json
       - .mir/evidence/3.1.9/upgrade-from-3.0.5-proof.json
-    available_ecosystem_load_evidence: .mir/evidence/3.1.9/ecosystem-campaign/campaign-evidence.json
-    available_ecosystem_load_gate: 9-passed-zero-dependency-failures-load-claims-only
+    available_ecosystem_load_evidence: .mir/evidence/3.1.9/harness-refresh-exact-ecosystem-campaign.json
+    available_ecosystem_load_gate: exact-final-archive-bz-suite-passed-plus-retained-9-scenario-campaign
     exact_package_gate: passed-disabled-science-regression-base-space-age-deterministic-and-forbidden-entry-check
     assurance_seal: .mir/evidence/candidate-seals/mir-3.1.9-factorio-2.1.json
-    seal_source_commit: c711602b1c43ce552faa4ec90acd72c3b4ebc856
+    seal_source_commit: f81af94c9a16666be8f5902bb5653aeea57033ba
     candidate_freshness_gate: passed
     interactive_gate: pending-maintainer
     publication_status: unreleased
@@ -236,3 +239,24 @@ waves:
     publication_status: published
     tag: "2.4.0"
     status: published-frozen
+
+  mir_2_4_5:
+    version: "2.4.5"
+    branch: legacy
+    development_branch: tmp/2.0
+    target_factorio: "2.0"
+    release_candidate_commit: 7e4b6c530cfcc5b2e1429c4e9f4ccb0d6d3b42a4
+    source_commit: 47bcc80c8a70b41dbbb4f8d80b2b9433d0a10d3f
+    archive_location: "legacy:dist/more-infinite-research_2.4.5.zip"
+    sha256: 7649824B72247AA38F05661422DFDEE7C729B21CC73A0A35D2455443B45D39F8
+    package_content_sha256: 5B8E21077CAC99CDB0733EBE8B34D10D0F375B2EAB2D42E60A73677860783FED
+    size_bytes: 406238
+    entries: 167
+    forbidden_entries: 0
+    evidence_location: "legacy:.mir/evidence/2.4.5-change-aware-qualification.json"
+    seal_location: "legacy:.mir/evidence/candidate-seals/mir-2.4.5-factorio-2.0.json"
+    seal_source_commit: 9cfa77c33a635c24f0d4ea458d317cddfa9e325f
+    automated_gate: passed-change-aware
+    interactive_gate: pending-maintainer
+    publication_status: unreleased
+    status: sealed-release-candidate-on-legacy

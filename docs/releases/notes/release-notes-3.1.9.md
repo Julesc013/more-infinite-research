@@ -30,4 +30,6 @@ MIR 3.1.9 is the final Factorio 2.1 patch in the 3.1 line. It keeps the released
 
 The repository now includes change-aware, content-addressed release assurance and the finite museum compiler used to reconstruct Factorio 0.12 through 0.6. Neither tooling surface, its manifests, fixtures, evidence, nor historical target source is included in the Factorio 2.1 release ZIP.
 
+The final release harness also runs the complete native-owner settings matrix during an ordinary full gate, proves current-research progress through configuration changes, supports named checkpoint recovery, binds upgrade evidence to package ancestry, and avoids repeating static or strict ecosystem gates inside composed assurance runs.
+
 Interactive settings layout, technology-tree presentation, icon fit, locale fit, and human balance judgment remain maintainer review gates.

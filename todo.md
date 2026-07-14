@@ -7,10 +7,11 @@ This is the executable release queue. `.mir/release-wave.yml` is the machine-rea
 ## Current Truth
 
 - MIR 3.1.5 for Factorio 2.1 and MIR 2.4.0 for Factorio 2.0 are the published immutable baselines.
-- MIR 1.9.4 through 1.3.0 and the finite museum MIR 0.12.0 through 0.6.0 distributions are sealed, independently qualified candidates awaiting maintainer publication.
-- MIR 3.1.9 is the final 3.1 patch synthesis on Factorio 2.1; it must finish qualification and advance `dev` without moving `main`.
+- MIR 1.9.4 through 1.3.0 and the finite museum MIR 0.12.0 through 0.6.0 distributions are existing qualified baselines; each must receive and requalify the portable 2.4.5/3.1.9 requirements before publication.
+- MIR 3.1.9 is sealed on `main` as the final 3.1 patch candidate for Factorio 2.1; package bytes remain `D77B3A78...DFCD` after the harness refresh.
+- MIR 2.4.5 is sealed and pushed as the exact same commit on `tmp/2.0` and `legacy`; it awaits maintainer testing, tagging, and publication.
 - Earlier local 3.1.0 and 2.4.0 tags, commits, archives, and validation packets are superseded candidate evidence, not publication authority.
-- Work temporarily labeled 3.2.0 has been preserved as 3.1.0 implementation or honest pre-renumber characterization. Work temporarily labeled 2.5.0 is preserved but non-authoritative until it is re-derived as 2.4.0.
+- Work temporarily labeled 3.2.0 has been preserved as 3.1.0 implementation or honest pre-renumber characterization. Work temporarily labeled 2.5.0 was re-derived and qualified as 2.4.5; the original candidate remains non-authoritative historical evidence.
 - MIR 3.2.0 does not open on `dev` until the complete backport and museum release set is published and MIR 3.1.9 has returned every portable lesson.
 
 ## 3.1.9 Final Patch Candidate
@@ -20,7 +21,8 @@ This is the executable release queue. `.mir/release-wave.yml` is the machine-rea
 - [x] Preserve default and disabled owners, reject unsafe formulas, and apply updates transactionally.
 - [x] Add native-owner settings, formula, transaction, configuration-change, and upgrade regressions.
 - [x] Return content-addressed release assurance and the finite museum compiler as non-package development tooling.
-- [ ] Pass the consolidated exact Factorio 2.1 gate, three upgrade anchors, ecosystem campaigns, deterministic candidate, freshness, and seal checks.
+- [x] Pass the consolidated exact Factorio 2.1 gate, three upgrade anchors, ecosystem campaigns, deterministic candidate, freshness, and seal checks.
+- [x] Wire the native-owner matrix into the ordinary full gate and remove duplicate composed-gate execution.
 - [ ] Complete maintainer visual, technology-tree, locale-fit, icon, save-UI, and balance review.
 - [ ] Tag and publish only in the separate maintainer release step.
 

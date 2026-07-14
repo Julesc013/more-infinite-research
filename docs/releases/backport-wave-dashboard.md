@@ -1,11 +1,11 @@
 ---
 title: "Backport Wave Dashboard"
 status: current
-applies_to: "3.0.5+"
+applies_to: "3.1.9+"
 audience: release-manager
 doc_type: release-plan
 owner: mir-maintainers
-last_reviewed: 2026-07-13
+last_reviewed: 2026-07-14
 supersedes: []
 superseded_by: []
 ---
@@ -16,28 +16,20 @@ superseded_by: []
 
 | Target | MIR version | Branch | Source | Archive SHA-256 | Binary state | Status | Blocker |
 | --- | ---: | --- | --- | --- | --- | --- | --- |
-| Factorio 2.1 | 3.1.1 | `main` published baseline | `e91963c` | `FAAA6AA3...C7EB9` | Published emergency Galore ownership hotfix | Published and frozen | None |
-| Factorio 2.1 | 3.1.2 | `main` | `b36996a` source / `4d74514` evidence | `D5BFA665...25F5` | 91 scenarios, exact upgrade, ecosystem 9/9, and exact dist passed | Candidate qualified | Manual release decision |
-| Factorio 2.1 | 3.1.5 | `main` / `dev` | `3cd6a95` source | `8861E25F...47C50` | 91 scenarios, both exact upgrades, ecosystem 9/9, and exact dist passed | Candidate qualified | Identity-bound interactive review and manual release decision |
-| Factorio 2.0 | 2.3.5 | `legacy` published baseline | `861565d` source / `9eabc54` promotion | `97B3DC9B...68DE` | 71 scenarios, targeted gate, exact-dist base/Space Age, and upgrade passed | Published and frozen | None |
-| Factorio 2.0 | 2.5.0 | `tmp/2.0` | `f5c58f5` qualified source | `0BE57ED4...CBFD` | Factorio 2.0.77 full 82-scenario gate and exact dist passed | Candidate qualified | Publication gate; 2.4.0 bytes remain immutable |
-| Factorio 1.1 | 1.9.4 | `tmp/1.1` | `30ef8c7` qualified source | `9184524A...A35` | Factorio 1.1.110 10 scenarios, exact fresh/reload, and 1.9.3 upgrade passed | Candidate qualified | Publication gate |
-| Factorio 1.0 | 1.8.2 | `tmp/1.0` | `0b06b9b` qualified source | `1D474CF4...EDF6` | Factorio 1.0.0 10 scenarios, exact fresh/reload, and genuine 1.8.1 upgrade passed | Candidate qualified | Publication gate |
-| Factorio 0.18 | 1.8.0 bridge | `tmp/0.18` | Historical bridge evidence | `D785E6EB...7B24` | 0.18 and 1.0 bridge passed | Evidence only | 1.8.2 Factorio 1.0 qualification |
-| Factorio 0.17 | 1.7.1 | `tmp/0.17` | `efb5d0a` qualified source | `CC112180...1BFA` | Factorio 0.17.79 9 scenarios, exact fresh/reload, and 1.7.0 upgrade passed | Candidate qualified | Publication gate |
-| Factorio 0.16 | 1.6.0 | `tmp/0.16` | `2dfb1a7` qualified source | `6EE5FF57...6BAB` | Factorio 0.16.51 8 scenarios, exact package/fresh, and server reload passed | Candidate qualified | Publication gate |
-| Factorio 0.15 | 1.5.0 | `tmp/0.15` | `d416787` qualified source | `2EB2E965...817` | Factorio 0.15.40 4 target scenarios, exact package/fresh, and server reload passed | Candidate qualified | Publication gate |
-| Factorio 0.14 | 1.4.0 | `tmp/0.14` | `fa3b532` qualified source | `F6E90F29...CBD6` | Factorio 0.14.23 2 target scenarios, exact package/fresh, and server reload passed | Candidate qualified | Publication gate |
-| Factorio 0.13 | 1.3.0 | `tmp/0.13` | `095264d` qualified source | `3061783F...80AF` | Factorio 0.13.20 2 target scenarios, exact package/fresh, and server reload passed | Candidate qualified | Publication gate |
-| Factorio 0.11 through 0.6 | Museum versions | matching `tmp/*` | Pending | Pending | Unresolved | Discovery | Binary and base-file acquisition |
+| Factorio 2.1 | 3.1.9 | `main` | `79df29b` package source / `f81af94` seal source | `D77B3A78...DFCD` | 102-scenario composite plus fresh progress, exact-ZIP, upgrade, and exact BZ canary; final seal verified | Sealed candidate on `main` awaiting maintainer tag | Maintainer review, tag, and release |
+| Factorio 2.0 | 2.3.5 | historical `legacy` baseline | `861565d` source / `9eabc54` promotion | `97B3DC9B...68DE` | 71 scenarios, targeted gate, exact-dist base/Space Age, and upgrade passed | Published predecessor | None |
+| Factorio 2.0 | 2.4.0 | `legacy` | `01efb39` package source / `584b398` release | `4BA19EA0...470C` | Change-aware qualification, exact-dist base/Space Age, and upgrade passed | Published | None |
+| Factorio 2.0 | 2.4.5 | `tmp/2.0` / `legacy` | Direct projection of `9c8f400` / canonical package source `79df29b` | `7649824B...D39F8` | Retained 94/94 behavior proof plus fresh exact-ZIP, upgrade, configuration-change, deterministic-build, ecosystem, and seal checks on Factorio 2.0.77 | Exact sealed tree pushed to both branches | Maintainer review, tag, and release |
+| Factorio 2.0 | 2.5.0 internal candidate | safety identity `4f7c9d1` | preserved ledger | `0BE57ED4...CBFD` | 82-scenario historical evidence | Superseded; archive removed from release branch | None; not a release target |
+| Factorio 1.1 | 1.9.4 | `tmp/1.1` | Existing qualified candidate | `431CD5B0...A46E` | Existing Factorio 1.1 proof retained | Paused and untouched | Outside the 2.4.5 hotfix run |
+| Factorio 1.0 and older | Existing target branches | matching `tmp/*` | Existing records | Existing or pending | No work authorized in this gate | Paused | Outside the 2.4.5 hotfix run |
 
-## Completed Wave
+## Immediate Gate
 
-The 3.1.2 technology-cycle hotfix and every requested descending target are candidate-qualified and pushed without tags or releases. MIR 2.5.0 is used for Factorio 2.0 because the earlier 2.4.0 archive is immutable. Target metadata, finite-research emulation, old science names, effect whitelists, and engine-specific runtime cuts remain isolated on their target branches.
+MIR 2.4.5 and 3.1.9 are sealed on `legacy` and `main` respectively. Stop for maintainer review, tags, and publication.
 
 ## Next Executable Sequence
 
-1. Keep the qualified settings-availability correction synchronized on `main` and `dev` as untagged MIR 3.1.5.
-2. Complete the pending identity-bound interactive in-game review.
-3. Tag or release only in a separate explicitly authorized publication turn.
-4. Begin 2.4.0 only after the requested post-release pause closes.
+1. Maintainer tests, tags, and publishes MIR 2.4.5 from `legacy`.
+2. Maintainer tests, tags, and publishes MIR 3.1.9 from `main`.
+3. Only after both release pauses close, return the portable harness lessons through `dev` and begin the 1.9.4 work on `tmp/1.1`.
