@@ -1,6 +1,14 @@
 schema: 1
 
 docs:
+  - path: docs/releases/0.10.0-release-packet.md
+    title: "MIR 0.10.0 Release Packet"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-0.10.0-release-packet
   - path: docs/adr/0001-mir-3-compatibility-compiler-architecture.md
     title: "ADR 0001: MIR 3.0 Compatibility Compiler Architecture"
     status: current

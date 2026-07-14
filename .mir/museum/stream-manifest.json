@@ -1,0 +1,168 @@
+{
+  "schema": 1,
+  "factorio": "0.10",
+  "mir_version": "0.10.0",
+  "rows": [
+    {
+      "technology_id": "mir-inserter-capacity-1",
+      "family": "inserter-capacity",
+      "level": 1,
+      "effect": "inserter-stack-size-bonus",
+      "prerequisite": "inserter-stack-size-bonus-4"
+    },
+    {
+      "technology_id": "mir-inserter-capacity-2",
+      "family": "inserter-capacity",
+      "level": 2,
+      "effect": "inserter-stack-size-bonus",
+      "prerequisite": "mir-inserter-capacity-1"
+    },
+    {
+      "technology_id": "mir-inserter-capacity-3",
+      "family": "inserter-capacity",
+      "level": 3,
+      "effect": "inserter-stack-size-bonus",
+      "prerequisite": "mir-inserter-capacity-2"
+    },
+    {
+      "technology_id": "mir-inserter-capacity-4",
+      "family": "inserter-capacity",
+      "level": 4,
+      "effect": "inserter-stack-size-bonus",
+      "prerequisite": "mir-inserter-capacity-3"
+    },
+    {
+      "technology_id": "mir-inserter-capacity-5",
+      "family": "inserter-capacity",
+      "level": 5,
+      "effect": "inserter-stack-size-bonus",
+      "prerequisite": "mir-inserter-capacity-4"
+    },
+    {
+      "technology_id": "mir-gun-turret-damage-1",
+      "family": "gun-turret-damage",
+      "level": 1,
+      "effect": "turret-attack",
+      "prerequisite": "gun-turret-damage-6"
+    },
+    {
+      "technology_id": "mir-gun-turret-damage-2",
+      "family": "gun-turret-damage",
+      "level": 2,
+      "effect": "turret-attack",
+      "prerequisite": "mir-gun-turret-damage-1"
+    },
+    {
+      "technology_id": "mir-gun-turret-damage-3",
+      "family": "gun-turret-damage",
+      "level": 3,
+      "effect": "turret-attack",
+      "prerequisite": "mir-gun-turret-damage-2"
+    },
+    {
+      "technology_id": "mir-gun-turret-damage-4",
+      "family": "gun-turret-damage",
+      "level": 4,
+      "effect": "turret-attack",
+      "prerequisite": "mir-gun-turret-damage-3"
+    },
+    {
+      "technology_id": "mir-gun-turret-damage-5",
+      "family": "gun-turret-damage",
+      "level": 5,
+      "effect": "turret-attack",
+      "prerequisite": "mir-gun-turret-damage-4"
+    },
+    {
+      "technology_id": "mir-bullet-shooting-speed-1",
+      "family": "bullet-shooting-speed",
+      "level": 1,
+      "effect": "gun-speed",
+      "prerequisite": "bullet-speed-6"
+    },
+    {
+      "technology_id": "mir-bullet-shooting-speed-2",
+      "family": "bullet-shooting-speed",
+      "level": 2,
+      "effect": "gun-speed",
+      "prerequisite": "mir-bullet-shooting-speed-1"
+    },
+    {
+      "technology_id": "mir-bullet-shooting-speed-3",
+      "family": "bullet-shooting-speed",
+      "level": 3,
+      "effect": "gun-speed",
+      "prerequisite": "mir-bullet-shooting-speed-2"
+    },
+    {
+      "technology_id": "mir-bullet-shooting-speed-4",
+      "family": "bullet-shooting-speed",
+      "level": 4,
+      "effect": "gun-speed",
+      "prerequisite": "mir-bullet-shooting-speed-3"
+    },
+    {
+      "technology_id": "mir-bullet-shooting-speed-5",
+      "family": "bullet-shooting-speed",
+      "level": 5,
+      "effect": "gun-speed",
+      "prerequisite": "mir-bullet-shooting-speed-4"
+    },
+    {
+      "technology_id": "mir-bullet-damage-1",
+      "family": "bullet-damage",
+      "level": 1,
+      "effect": "ammo-damage",
+      "prerequisite": "bullet-damage-6"
+    },
+    {
+      "technology_id": "mir-bullet-damage-2",
+      "family": "bullet-damage",
+      "level": 2,
+      "effect": "ammo-damage",
+      "prerequisite": "mir-bullet-damage-1"
+    },
+    {
+      "technology_id": "mir-bullet-damage-3",
+      "family": "bullet-damage",
+      "level": 3,
+      "effect": "ammo-damage",
+      "prerequisite": "mir-bullet-damage-2"
+    },
+    {
+      "technology_id": "mir-bullet-damage-4",
+      "family": "bullet-damage",
+      "level": 4,
+      "effect": "ammo-damage",
+      "prerequisite": "mir-bullet-damage-3"
+    },
+    {
+      "technology_id": "mir-bullet-damage-5",
+      "family": "bullet-damage",
+      "level": 5,
+      "effect": "ammo-damage",
+      "prerequisite": "mir-bullet-damage-4"
+    },
+    {
+      "technology_id": "mir-toolbelt-1",
+      "family": "toolbelt",
+      "level": 1,
+      "effect": "num-quick-bars",
+      "prerequisite": "toolbelt"
+    },
+    {
+      "technology_id": "mir-toolbelt-2",
+      "family": "toolbelt",
+      "level": 2,
+      "effect": "num-quick-bars",
+      "prerequisite": "mir-toolbelt-1"
+    },
+    {
+      "technology_id": "mir-toolbelt-3",
+      "family": "toolbelt",
+      "level": 3,
+      "effect": "num-quick-bars",
+      "prerequisite": "mir-toolbelt-2"
+    }
+  ]
+}
