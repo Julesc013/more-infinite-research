@@ -371,6 +371,7 @@ release_artifacts:
       automated_gate: passed
       manual_gate: pending
       assurance_seal: .mir/evidence/candidate-seals/mir-2.4.1-factorio-2.0.json
+      seal_source_commit: 8e98d46ff677b26665db4b506fa3e60b14c42391
       publication_scope: unreleased
       status: release-candidate-awaiting-manual-review
     mir_2_3_0:
@@ -520,6 +521,7 @@ release_artifacts:
       artifact: dist/more-infinite-research_2.4.1.zip
       validation_status: passed-94-of-94
       assurance_seal: .mir/evidence/candidate-seals/mir-2.4.1-factorio-2.0.json
+      seal_source_commit: 8e98d46ff677b26665db4b506fa3e60b14c42391
       status: release-candidate-awaiting-manual-review
       purpose: complete Factorio 2.0 projection of the sealed MIR 3.1.9 portable behavior set
     factorio_1_1_port:

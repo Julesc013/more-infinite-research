@@ -128,6 +128,7 @@ candidate:
   automated_gate: passed
   manual_gate: pending
   assurance_seal: .mir/evidence/candidate-seals/mir-2.4.1-factorio-2.0.json
+  seal_source_commit: 8e98d46ff677b26665db4b506fa3e60b14c42391
   status: release-candidate-awaiting-manual-review
 
 rules:

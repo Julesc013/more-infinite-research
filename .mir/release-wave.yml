@@ -202,6 +202,7 @@ waves:
     ecosystem_result: passed
     automated_gate: passed
     assurance_seal: .mir/evidence/candidate-seals/mir-2.4.1-factorio-2.0.json
+    seal_source_commit: 8e98d46ff677b26665db4b506fa3e60b14c42391
     interactive_gate: pending
     publication_status: unreleased
     status: release-candidate-awaiting-manual-review
