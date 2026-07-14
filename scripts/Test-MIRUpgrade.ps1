@@ -99,7 +99,10 @@ if (-not $loadText.Contains("[mir-fixture] $FromVersion to $ToVersion$proofSuffi
 $loadEvidence = Join-Path $outputParent "$ToVersion-upgrade-from-$FromVersion-load.txt"
 Copy-MIRUpgradeLogEvidence -Source $log -Destination $loadEvidence
 
-$assertions = if ($FixtureName -eq "assert-upgrade-2-4-0-to-2-4-1") {
+$assertions = if ($FixtureName -in @(
+    "assert-upgrade-2-4-0-to-2-4-1",
+    "assert-upgrade-2-4-0-to-2-4-5"
+  )) {
   @(
     "startup-settings-retained",
     "native-owner-technology-level-retained",
