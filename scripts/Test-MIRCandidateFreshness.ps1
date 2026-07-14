@@ -45,11 +45,25 @@ $candidate = Get-MIRCandidateFields -Text $manifestText
 $status = Get-MIRRequiredCandidateField -Fields $candidate -Name "status"
 $allowedStatuses = @(
   "rebuilding-after-package-visible-change",
+  "reconstruction-in-progress",
   "release-candidate-awaiting-manual-review",
   "published"
 )
 if ($status -notin $allowedStatuses) {
-  throw "Unsupported 3.0.5 candidate status: $status"
+  throw "Unsupported MIR candidate status: $status"
+}
+
+if ($status -eq "reconstruction-in-progress") {
+  if ((Get-MIRRequiredCandidateField -Fields $candidate -Name "automated_gate") -ne "pending-requalification") {
+    throw "A reconstructed target projection must use automated_gate: pending-requalification."
+  }
+  foreach ($staleField in @("source_commit", "sha256", "package_content_sha256", "package_source_sha256", "structured_summary_run_id", "seal_source_commit")) {
+    if ($candidate.ContainsKey($staleField)) {
+      throw "A reconstructed target projection must not retain obsolete candidate field $staleField."
+    }
+  }
+  Write-Host "[ok] MIR target projection is explicitly reconstructing; superseded candidate bytes cannot be promoted."
+  exit 0
 }
 
 if ($status -eq "rebuilding-after-package-visible-change") {
