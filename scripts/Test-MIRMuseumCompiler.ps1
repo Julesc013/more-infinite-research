@@ -52,6 +52,7 @@ if (-not $SkipNegativeCases) {
   Assert-Rejected "unsupported-science" { param($t) $t.science[0] = "automation-science-pack" }
   Assert-Rejected "duplicate-science" { param($t) $t.science[1] = $t.science[0] }
   Assert-Rejected "duplicate-family-id" { param($t) $t.families[1].id = $t.families[0].id }
+  Assert-Rejected "unknown-canonical-feature" { param($t) $t.families[0].canonical_feature_id = "missing-feature" }
   Assert-Rejected "invalid-family-id" { param($t) $t.families[0].id = "Bad Family" }
   Assert-Rejected "zero-levels" { param($t) $t.families[0].levels = 0 }
   Assert-Rejected "unbounded-levels" { param($t) $t.families[0].levels = 999 }
@@ -69,7 +70,7 @@ if (-not $SkipNegativeCases) {
   Assert-Rejected "missing-icon" { param($t) $t.families[0].icon = "missing.png" }
   Assert-Rejected "generated-id-collision" { param($t) $t.families[1].id = $t.families[0].id; $t.families[1].prerequisite = $t.families[0].prerequisite }
 
-  if ($negativeResults.Count -ne 25) { throw "Expected 25 negative cases; ran $($negativeResults.Count)." }
+  if ($negativeResults.Count -ne 26) { throw "Expected 26 negative cases; ran $($negativeResults.Count)." }
 }
 
 [pscustomobject][ordered]@{
@@ -79,4 +80,3 @@ if (-not $SkipNegativeCases) {
   negative_case_count = $negativeResults.Count
   negative_cases = $negativeResults
 } | ConvertTo-Json -Depth 20
-

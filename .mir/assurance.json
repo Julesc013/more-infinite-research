@@ -57,7 +57,7 @@
     },
     {
       "id": "museum-tooling",
-      "patterns": ["^\\.mir/museum-targets\\.json$", "^scripts/(Build-MIRMuseumTarget|New-MIRMuseum|Test-MIRMuseum)", "^scripts/Museum/"],
+      "patterns": ["^\\.mir/(canonical-lower-features|museum-targets)\\.json$", "^scripts/(Build-MIRMuseumTarget|New-MIRMuseum|Test-MIRMuseum)", "^scripts/Museum/"],
       "tests": ["static.museum"]
     },
     {

@@ -23,6 +23,10 @@ if (@(& git -C $repo status --short).Count -ne 0) { throw "Commit qualification 
 $summary = Get-Content -Raw -LiteralPath $QualificationSummaryPath | ConvertFrom-Json
 if ([string]$summary.status -ne "passed" -or [string]$summary.factorio -ne $FactorioVersion) { throw "Qualification summary is not passed for $FactorioVersion." }
 $identity = Get-MIRMuseumZipIdentity -Path $PackagePath
+$sourceLockPath = Join-Path $repo ".mir\backport-source-lock.json"
+if (-not (Test-Path -LiteralPath $sourceLockPath -PathType Leaf)) { throw "Museum sealing requires a validated backport source lock." }
+$sourceLock = Get-Content -Raw -LiteralPath $sourceLockPath | ConvertFrom-Json
+if ([string]$sourceLock.target -ne $FactorioVersion -or [string]$sourceLock.mir_version -ne [string]$target.version) { throw "Museum source-lock identity mismatch." }
 
 function Get-StringSha256([string]$Text) {
   return [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData([Text.UTF8Encoding]::new($false).GetBytes($Text)))
@@ -34,6 +38,7 @@ function Get-FileSetFingerprint([string[]]$RelativePaths) {
 
 $profileText = ($target | ConvertTo-Json -Depth 30 -Compress)
 $harnessPaths = @(
+  ".mir\canonical-lower-features.json",
   ".mir\museum-targets.json",
   "scripts\Museum\MuseumCompiler.psm1",
   "scripts\Build-MIRMuseumTarget.ps1",
@@ -50,6 +55,11 @@ $record = [ordered]@{
   branch = [string]$target.branch
   release = [string]$target.version
   target_factorio = $FactorioVersion
+  mir_version = [string]$target.version
+  target = $FactorioVersion
+  canonical_dev_anchor = [string]$sourceLock.canonical_dev_anchor
+  backport_source_lock_sha256 = Get-MIRSha256 $sourceLockPath
+  canonical_feature_model_sha256 = Get-MIRSha256 (Join-Path $repo ".mir\canonical-lower-features.json")
   source_commit = (& git -C $repo rev-parse HEAD).Trim()
   candidate = [ordered]@{
     path = (Resolve-Path -LiteralPath $PackagePath).Path.Substring($repo.Path.Length + 1).Replace('\', '/')
@@ -67,4 +77,3 @@ $record = [ordered]@{
 }
 Set-MIRUtf8Text -Path $OutputPath -Text (($record | ConvertTo-Json -Depth 20) + "`n")
 $record | ConvertTo-Json -Depth 20
-

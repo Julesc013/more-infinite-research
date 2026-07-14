@@ -4,16 +4,45 @@ $ErrorActionPreference = "Stop"
 function Get-MIRMuseumCatalog {
   param([Parameter(Mandatory)][string]$Path)
 
-  $catalog = Get-Content -Raw -LiteralPath $Path | ConvertFrom-Json
+  $catalogPath = (Resolve-Path -LiteralPath $Path).Path
+  $repoRoot = Split-Path -Parent (Split-Path -Parent $catalogPath)
+  $catalog = Get-Content -Raw -LiteralPath $catalogPath | ConvertFrom-Json
   if ([int]$catalog.schema -ne 1) { throw "Unsupported museum catalog schema '$($catalog.schema)'." }
+  if ([string]::IsNullOrWhiteSpace([string]$catalog.canonical_feature_model)) { throw "Museum catalog does not name the canonical feature model." }
+  $modelPath = if ([IO.Path]::IsPathRooted([string]$catalog.canonical_feature_model)) {
+    [string]$catalog.canonical_feature_model
+  } else {
+    Join-Path $repoRoot ([string]$catalog.canonical_feature_model).Replace('/', '\')
+  }
+  $model = Get-Content -Raw -LiteralPath $modelPath | ConvertFrom-Json
+  if ([int]$model.schema -ne 1 -or [string]$model.kind -ne "mir-canonical-lower-feature-model") { throw "Unsupported canonical lower-feature model." }
+  $catalog | Add-Member -NotePropertyName canonical_model -NotePropertyValue $model -Force
 
   foreach ($target in @($catalog.targets)) {
-    if ($target.PSObject.Properties.Name -contains "families_template") {
-      $templateName = [string]$target.families_template
-      $template = $catalog.family_templates.PSObject.Properties[$templateName]
-      if ($null -eq $template) { throw "Unknown family template '$templateName' for Factorio $($target.factorio)." }
-      $target | Add-Member -NotePropertyName families -NotePropertyValue @($template.Value | ConvertTo-Json -Depth 20 | ConvertFrom-Json) -Force
+    $projectionName = [string]$target.feature_projection
+    $projection = $model.projections.PSObject.Properties[$projectionName]
+    if ($null -eq $projection) { throw "Unknown canonical feature projection '$projectionName' for Factorio $($target.factorio)." }
+    $families = @()
+    foreach ($featureId in @($projection.Value)) {
+      $feature = $model.features.PSObject.Properties[[string]$featureId]
+      if ($null -eq $feature) { throw "Projection '$projectionName' names unknown canonical feature '$featureId'." }
+      $spec = $feature.Value
+      $families += [pscustomobject][ordered]@{
+        canonical_feature_id = [string]$featureId
+        stream_id = [string]$spec.stream_id
+        id = [string]$featureId
+        label = [string]$spec.label
+        levels = [int]$spec.maximum_level
+        base_count = [int]$spec.cost_model.base_count
+        count_step = [int]$spec.cost_model.count_step
+        time = [int]$spec.research_time
+        icon = [string]$spec.finite_reconstruction.icon
+        prerequisite = [string]$spec.finite_reconstruction.prerequisite
+        evidence_file = [string]$spec.finite_reconstruction.evidence_file
+        effect = ($spec.per_level_effect | ConvertTo-Json -Depth 10 | ConvertFrom-Json)
+      }
     }
+    $target | Add-Member -NotePropertyName families -NotePropertyValue $families -Force
   }
 
   return $catalog
@@ -122,6 +151,26 @@ function Test-MIRMuseumTarget {
   $familyIds = @($Target.families | ForEach-Object { [string]$_.id })
   if ($familyIds.Count -ne ($familyIds | Sort-Object -Unique).Count) { $errors.Add("Duplicate family ID in target $factorio.") }
   foreach ($family in @($Target.families)) {
+    $canonicalId = [string]$family.canonical_feature_id
+    $canonical = $Catalog.canonical_model.features.PSObject.Properties[$canonicalId]
+    if ($null -eq $canonical) {
+      $errors.Add("Unknown canonical feature '$canonicalId' in target $factorio.")
+    } else {
+      $spec = $canonical.Value
+      if ([string]$family.stream_id -ne [string]$spec.stream_id -or
+          [string]$family.id -ne $canonicalId -or
+          [string]$family.label -ne [string]$spec.label -or
+          [int]$family.levels -ne [int]$spec.maximum_level -or
+          [int]$family.base_count -ne [int]$spec.cost_model.base_count -or
+          [int]$family.count_step -ne [int]$spec.cost_model.count_step -or
+          [int]$family.time -ne [int]$spec.research_time -or
+          [string]$family.icon -ne [string]$spec.finite_reconstruction.icon -or
+          [string]$family.prerequisite -ne [string]$spec.finite_reconstruction.prerequisite -or
+          [string]$family.evidence_file -ne [string]$spec.finite_reconstruction.evidence_file -or
+          ($family.effect | ConvertTo-Json -Depth 10 -Compress) -ne ($spec.per_level_effect | ConvertTo-Json -Depth 10 -Compress)) {
+        $errors.Add("Canonical feature projection drifted for '$canonicalId'.")
+      }
+    }
     if ([string]$family.id -notmatch '^[a-z0-9]+(?:-[a-z0-9]+)*$') { $errors.Add("Invalid family ID '$($family.id)'.") }
     if ([int]$family.levels -lt 1 -or [int]$family.levels -gt 20) { $errors.Add("Family '$($family.id)' must have 1-20 finite levels.") }
     if ([int]$family.base_count -le 0 -or [int]$family.count_step -lt 0) { $errors.Add("Family '$($family.id)' has invalid research counts.") }
@@ -414,4 +463,3 @@ function New-MIRMuseumPackage {
 }
 
 Export-ModuleMember -Function Get-MIRMuseumCatalog, Get-MIRMuseumTarget, Get-MIRSha256, Get-MIRMuseumExpandedRows, Test-MIRMuseumTarget, New-MIRMuseumTargetSource, Test-MIRMuseumRenderedSource, Get-MIRMuseumZipIdentity, New-MIRMuseumPackage, Set-MIRUtf8Text
-

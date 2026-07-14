@@ -69,11 +69,25 @@ if ([string]$info.version -ne [string]$lock.mir_version -or [string]$info.factor
 
 . (Join-Path $RepoRoot "scripts\validation\PackageIdentity.ps1")
 . (Join-Path $RepoRoot "scripts\validation\TargetProfiles.ps1")
-$profile = Get-MIRTargetProfile -RepoRoot $RepoRoot -FactorioVersion ([string]$lock.target)
-$targetHash = Get-MIRTargetProfileFingerprint -Profile $profile
+$museumCatalogPath = Join-Path $RepoRoot ".mir\museum-targets.json"
+$museumTarget = $null
+if (Test-Path -LiteralPath $museumCatalogPath -PathType Leaf) {
+  Import-Module (Join-Path $RepoRoot "scripts\Museum\MuseumCompiler.psm1") -Force
+  $museumCatalog = Get-MIRMuseumCatalog -Path $museumCatalogPath
+  $museumTarget = @($museumCatalog.targets | Where-Object { [string]$_.factorio -eq [string]$lock.target }) | Select-Object -First 1
+}
+if ($null -ne $museumTarget) {
+  $profileText = $museumTarget | ConvertTo-Json -Depth 30 -Compress
+  $targetHash = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData([Text.UTF8Encoding]::new($false).GetBytes($profileText + "`n")))
+} else {
+  $profile = Get-MIRTargetProfile -RepoRoot $RepoRoot -FactorioVersion ([string]$lock.target)
+  $targetHash = Get-MIRTargetProfileFingerprint -Profile $profile
+}
 if ($targetHash -ne [string]$lock.target_profile_sha256) { throw "Target profile fingerprint drifted from the backport source lock." }
-& (Join-Path $RepoRoot "scripts\Sync-MIRTargetProfiles.ps1") -RepoRoot $RepoRoot -Check
-if ($LASTEXITCODE -ne 0) { throw "Generated target profile source is stale." }
+if ($null -eq $museumTarget) {
+  & (Join-Path $RepoRoot "scripts\Sync-MIRTargetProfiles.ps1") -RepoRoot $RepoRoot -Check
+  if ($LASTEXITCODE -ne 0) { throw "Generated target profile source is stale." }
+}
 
 $portablePaths = @(Get-MIRSourceLockMapNames -Value $lock.portable_modules -Name "portable_modules")
 $adaptedPaths = @(Get-MIRSourceLockMapNames -Value $lock.adapted_modules -Name "adapted_modules")
@@ -100,7 +114,7 @@ if ([int]$featureRecord.schema -ne 1 -or [string]$featureRecord.target -ne [stri
     -or [string]$featureRecord.canonical_dev_anchor -ne [string]$lock.canonical_dev_anchor) {
   throw "Target feature classification identity disagrees with the source lock."
 }
-$allowedClassifications = @("native", "adapted", "generated-fallback", "omitted-by-capability")
+$allowedClassifications = @("native", "adapted", "generated-fallback", "finite-reconstruction", "omitted-by-capability")
 $featureIds = @{}
 foreach ($feature in @($featureRecord.features)) {
   $id = [string]$feature.feature_id
