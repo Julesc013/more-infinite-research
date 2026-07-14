@@ -18,5 +18,11 @@ foreach ($required in @("static.full", "runtime.full", "runtime.upgrade", "runti
   if ($ids -notcontains $required) { throw "Missing release-blocking assurance test ID: $required" }
 }
 
-Write-Host "[ok] MIR assurance manifests and stable test catalog passed."
+$releaseAssurance = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\MIRAssurance\Release.ps1")
+foreach ($requiredSealField in @("mir_version", "target", "canonical_dev_anchor")) {
+  if ($releaseAssurance -notmatch ("(?m)^\s+" + [regex]::Escape($requiredSealField) + "=")) {
+    throw "Candidate seal schema omits the backport source-lock field: $requiredSealField"
+  }
+}
 
+Write-Host "[ok] MIR assurance manifests and stable test catalog passed."
