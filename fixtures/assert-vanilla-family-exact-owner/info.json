@@ -4,9 +4,10 @@
   "title": "MIR Fixture - Assert Vanilla Family Exact Owner",
   "author": "Julesc013",
   "description": "Validation fixture that asserts exact non-MIR owners block family adoption.",
-  "factorio_version": "1.0",
+  "factorio_version": "2.1",
   "dependencies": [
-    "base >= 1.0",
+    "base >= 2.1.8",
+    "space-age >= 2.1.8",
     "mir-fixture-vanilla-family-exact-owner",
     "more-infinite-research"
   ]

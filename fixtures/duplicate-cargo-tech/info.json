@@ -4,8 +4,9 @@
   "title": "MIR Fixture - Duplicate Cargo Tech",
   "author": "Julesc013",
   "description": "Validation fixture that adds Maraxis-like infinite cargo logistics technologies before MIR generation.",
-  "factorio_version": "1.0",
+  "factorio_version": "2.1",
   "dependencies": [
-    "base >= 1.0"
+    "base >= 2.1.8",
+    "space-age"
   ]
 }

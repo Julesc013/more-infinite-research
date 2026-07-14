@@ -12,6 +12,4 @@ superseded_by: []
 
 # Loop Risk
 
-Loop-risk rows identify recovery, recycling, self-return, voiding, or
-transmutation signals that should block automatic generation unless a narrow
-policy explicitly allows it.
+Loop-risk rows identify recovery, recycling, self-return, voiding, or transmutation signals that should block automatic generation unless a narrow policy explicitly allows it.

@@ -4,9 +4,9 @@
   "title": "MIR Fixture - Assert Plates n Circuit Productivity Blocked",
   "author": "Julesc013",
   "description": "Validation fixture that asserts MIR does not prepare a known competitor when another external owner blocks one of its recipes.",
-  "factorio_version": "1.0",
+  "factorio_version": "2.1",
   "dependencies": [
-    "base >= 1.0",
+    "base >= 2.1.8",
     "more-infinite-research",
     "mir-fixture-plates-n-circuit-productivity-blocked"
   ]

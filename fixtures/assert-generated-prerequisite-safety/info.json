@@ -4,9 +4,9 @@
   "title": "MIR Fixture - Assert Generated Prerequisite Safety",
   "author": "Julesc013",
   "description": "Validates deterministic science unlock inference and generated technology graph reachability.",
-  "factorio_version": "1.0",
+  "factorio_version": "2.1",
   "dependencies": [
-    "base >= 1.0",
+    "base >= 2.1.8",
     "more-infinite-research"
   ]
 }

@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: release-manager
 doc_type: release-plan
 owner: mir-maintainers
-last_reviewed: 2026-07-10
+last_reviewed: 2026-07-12
 supersedes: []
 superseded_by: []
 ---
@@ -25,29 +25,17 @@ It is built for players who want more *long-term scaling for late-game megabases
 - Adopts safe mod-added recipes into configured vanilla Space Age productivity families instead of creating parallel research.
 - Uses MIR 3 compiler diagnostics to explain generated, skipped, observed, and rejected research decisions.
 
-**MIR `1.8.0`** targets **Factorio `0.18`** as a bridge/archive compatibility
-package. It keeps reduced direct-effect bonuses and base technology
-continuations only, and does not include recipe productivity, Factorio 2.x DLC
-surfaces, prototype cap settings, pipeline extent settings, settings profiles,
-newer technology badge overlays, or synthetic old-line badge overlays.
+**MIR `1.8.0`** targets **Factorio `0.18`** as a bridge/archive compatibility package. It keeps reduced direct-effect bonuses and base technology continuations only, and does not include recipe productivity, Factorio 2.x DLC surfaces, prototype cap settings, pipeline extent settings, settings profiles, newer technology badge overlays, or synthetic old-line badge overlays.
 
-**MIR `1.8.1+`** targets **Factorio `1.0`** as the maintained compatibility
-port line. It is derived from the validated Factorio `1.1` port and the
-Factorio `0.18` bridge lessons, with Factorio `1.0` metadata, validation, and
-target-supported behavior restored where proven.
+**MIR `1.8.1+`** targets **Factorio `1.0`** as the maintained compatibility port line. It is derived from the validated Factorio `1.1` port and the Factorio `0.18` bridge lessons, with Factorio `1.0` metadata, validation, and target-supported behavior restored where proven.
 
-**MIR `1.9.3+`** targets **Factorio `1.1`** as a reduced compatibility port:
-supported direct-effect bonuses and base technology continuations only, with
-no recipe productivity, Space Age, Quality, Recycler, Elevated Rails, cargo
-logistics, prototype cap settings, pipeline extent settings, or settings
-profiles.
+**MIR `1.9.3+`** targets **Factorio `1.1`** as a reduced compatibility port: supported direct-effect bonuses and base technology continuations only, with no recipe productivity, Space Age, Quality, Recycler, Elevated Rails, cargo logistics, prototype cap settings, pipeline extent settings, or settings profiles.
 
 **MIR `2.x.x`** targets **Factorio `2.0`** *(starting with **`2.3.0`**)*.
 
 **MIR `3.x.x`** targets **Factorio `2.1`** and requires `base >= 2.1.8`. Space Age is optional.
 
-*Recipe productivity researches are infinite, but Factorio's recipe productivity cap still applies.*
-***This cap can now be modified*** *under the "limits" section of the* ***startup setttings.***
+*Recipe productivity researches are infinite, but each recipe's Factorio `maximum_productivity` cap still applies. MIR leaves the engine's +300% recipe default unchanged unless you explicitly select another value under startup settings > Limits. Explicit productivity caps do not rewrite recycling-category recipes; recycler returns have their own separate control. The separate non-zero power floor is also off by default.*
 
 ## Main Features
 
@@ -84,8 +72,7 @@ Several vanilla technology chains can continue past their normal final level:
 
 ## Technology Catalog
 
-Technologies are generated only when their recipes, items, technologies, ammo categories, labs, and science packs exist in the active mod set.
-"On" means enabled by default when the required prototypes exist. "Off" means available as an opt-in startup setting.
+Technologies are generated only when their recipes, items, technologies, ammo categories, labs, and science packs exist in the active mod set. "On" means enabled by default when the required prototypes exist. "Off" means available as an opt-in startup setting.
 
 ### Recipe Productivity
 
@@ -219,12 +206,9 @@ This helps it work with:
 
 When this mod is set to prefer its own overlapping research, it only removes known competing infinite technologies that are fully covered by generated More Infinite Research effects. Finite upgrade chains from other mods are left alone. Vanilla Space Age productivity families remain authoritative where safe, so mod-added rocket fuel or low density structure recipes can be appended to the vanilla infinite technology instead of receiving duplicate-looking MIR research.
 
-Compatibility is broad, but not guaranteed for every overhaul. Mods that change recipes or labs very late in loading may still need load-order compatibility.
-MIR 3 public claims are deliberately narrow: a page may claim a named recipe
-family, a diagnostic observation, or coexistence behavior, but not full overhaul
-support unless that claim is explicitly recorded.
+Compatibility is broad, but not guaranteed for every overhaul. Mods that change recipes or labs very late in loading may still need load-order compatibility. MIR 3 public claims are deliberately narrow: a page may claim a named recipe family, a diagnostic observation, or coexistence behavior, but not full overhaul support unless that claim is explicitly recorded.
 
-For maintainers and pack authors, the repository includes an extended local audit workflow. With a Factorio binary and Mod Portal credentials, it can run top-download audits; with read-only local mod zip libraries, it can also run offline individual-root, curated-combination, and generated local-library stress sweeps. The workflow supports curated overhaul scenarios, local modpack zip roots, safe unattended local sweep and morning summary helpers, parsed MIR diagnostics, checkpointed load results, missing-dependency summaries, grouped expected/unexpected failure reports, explcit official-DLC mod-list isolation, blank-log-line-tolerant audit parsing, and review-only compatibility profile stubs. Exploratory runs collect all scenarios for triage; strict runs can fail on unexpected grouped failures. These tools are for evidence collection; they do not automatically enable new compatibility profiles.
+For maintainers and pack authors, the repository includes an extended local audit workflow. With a Factorio binary and Mod Portal credentials, it can run top-download audits; with read-only local mod zip libraries, it can also run offline individual-root, curated-combination, and generated local-library stress sweeps. The workflow supports curated overhaul scenarios, local modpack zip roots, safe unattended local sweep and morning summary helpers, parsed MIR diagnostics, checkpointed load results, missing-dependency summaries, grouped expected/unexpected failure reports, explicit official-DLC mod-list isolation, blank-log-line-tolerant audit parsing, and review-only compatibility profile stubs. Exploratory runs collect all scenarios for triage; strict runs can fail on unexpected grouped failures. These tools are for evidence collection; they do not automatically enable new compatibility profiles.
 
 ## Troubleshooting
 
@@ -245,7 +229,11 @@ If a recipe did not receive productivity:
 
 ## Save Compatibility
 
-Version `3.0.0` preserves generated technology IDs through the MIR architecture move and does not need a new migration.
+Version `3.0.5` preserves the MIR 3 generated technology IDs and persisted-state schemas and does not need a new migration.
+
+It also excludes incineration sink recipes from breeding productivity and checks every emitted recipe-productivity target before MIR finishes loading.
+
+Existing stored weapon overlap choices remain authoritative. The safer conditional coverage mode is the default only for configurations without a stored value.
 
 Agricultural growth speed is enabled by default in `3.0.0`; spoilage preservation remains disabled by default.
 

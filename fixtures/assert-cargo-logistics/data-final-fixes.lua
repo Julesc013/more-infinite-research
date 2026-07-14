@@ -147,13 +147,13 @@ local function assert_common(tech, expected_formula, expected_time)
 end
 
 local distance = technology("recipe-prod-research_cargo_bay_unloading_distance-1")
-assert_common(distance, "100000 * 3^(L-1)", 120)
+assert_common(distance, "100000*3^(L-1)", 120)
 assert_has_effect(distance, "max-cargo-bay-unloading-distance", 10)
 assert_has_prerequisite(distance, "landing-pad-unloading-bay")
 assert_uses_technology_icon(distance, "landing-pad-unloading-bay")
 
 local count = technology("recipe-prod-research_cargo_landing_pad_count-1")
-assert_common(count, "1000000 * 10^(L-1)", 240)
+assert_common(count, "1000000*10^(L-1)", 240)
 assert_has_effect(count, "cargo-landing-pad-count", 1)
 assert_has_prerequisite(count, "rocket-silo")
 assert_uses_technology_icon(count, "space-platform")

@@ -27,7 +27,8 @@ Usage:
   .\scripts\mir.ps1 audit local [--profile <name>]
   .\scripts\mir.ps1 audit top25 --space-age
   .\scripts\mir.ps1 package build
-  .\scripts\mir.ps1 assurance <qualify|seal|check-seal> [--factorio <path>] [--candidate <zip>] [--prior <zip>] [--static-only]
+  .\scripts\mir.ps1 assurance <doctor|inventory|impact|plan|build|verify|qualify|seal|check-seal|locale|balance|backport|explain>
+  .\scripts\mir.ps1 verify <plan|explain|run|qualify>
   .\scripts\mir.ps1 report latest
   .\scripts\mir.ps1 report missing-deps --run <path>
   .\scripts\mir.ps1 report observations --run <path>
@@ -43,6 +44,7 @@ Common overrides:
   --output <path>     Output artifact directory
   --timeout <seconds> Per-scenario timeout
   --link-mode <mode>  Copy, Hardlink, or Symlink local zips into scenario mod dirs
+  --skip-strict-gate  Reuse an already completed strict gate in a composed assurance run
 "@
 }
 
@@ -111,6 +113,9 @@ function New-MIRProfileOverrides {
   }
   if (Test-MIRArgSwitch -Items $Items -Name "--no-git-pull") {
     $overrides.no_git_pull = $true
+  }
+  if (Test-MIRArgSwitch -Items $Items -Name "--skip-strict-gate") {
+    $overrides.skip_strict_gate = $true
   }
 
   return $overrides
@@ -214,6 +219,7 @@ function Invoke-MIRRunProfile {
       if ($auditFactorioVersions) { $params.AuditFactorioVersions = @($auditFactorioVersions | ForEach-Object { [string]$_ }) }
       if ($timeout) { $params.ScenarioTimeoutSeconds = [int]$timeout }
       if (Test-MIRProfileOrOverrideFlag -Object $profileData -Overrides $Overrides -Name "no_git_pull") { $params.NoGitPull = $true }
+      if (Test-MIRProfileOrOverrideFlag -Object $profileData -Overrides $Overrides -Name "skip_strict_gate") { $params.SkipStrictGate = $true }
       if (Test-MIRProfileOrOverrideFlag -Object $profileData -Overrides $Overrides -Name "skip_repair_smokes") { $params.SkipRepairSmokes = $true }
       if (Test-MIRProfileOrOverrideFlag -Object $profileData -Overrides $Overrides -Name "skip_representative_scenario") { $params.SkipRepresentativeScenario = $true }
       if (Test-MIRProfileOrOverrideFlag -Object $profileData -Overrides $Overrides -Name "skip_build") { $params.SkipBuild = $true }
@@ -355,18 +361,21 @@ $area = $Args[0]
 $verb = if ($Args.Count -gt 1) { $Args[1] } else { "" }
 
 switch ($area) {
+  "verify" {
+    $verifyCommand = switch ($verb) {
+      "plan" { "plan" }
+      "explain" { "explain" }
+      "run" { "verify" }
+      "qualify" { "qualify" }
+      default { throw "Unknown verify command: $verb" }
+    }
+    $verifyArgs = @($verifyCommand)
+    if ($Args.Count -gt 2) { $verifyArgs += @($Args[2..($Args.Count - 1)]) }
+    & (Join-Path $scriptRoot "Invoke-MIRAssurance.ps1") @verifyArgs
+  }
   "assurance" {
-    if ($verb -notin @("qualify", "seal", "check-seal")) { throw "Unknown assurance command: $verb" }
-    $params = @{ Action = $verb }
-    $factorio = Get-MIRArgValue -Items $Args -Name "--factorio"
-    $candidate = Get-MIRArgValue -Items $Args -Name "--candidate"
-    $prior = Get-MIRArgValue -Items $Args -Name "--prior"
-    if (-not [string]::IsNullOrWhiteSpace($factorio)) { $params.FactorioBin = $factorio }
-    if (-not [string]::IsNullOrWhiteSpace($candidate)) { $params.CandidateZip = $candidate }
-    if (-not [string]::IsNullOrWhiteSpace($prior)) { $params.PriorZip = $prior }
-    if (Test-MIRArgSwitch -Items $Args -Name "--static-only") { $params.StaticOnly = $true }
-    if (Test-MIRArgSwitch -Items $Args -Name "--runtime-only") { $params.RuntimeOnly = $true }
-    & (Join-Path $scriptRoot "Invoke-MIRBackportQualification.ps1") @params
+    $assuranceArgs = if ($Args.Count -gt 1) { @($Args[1..($Args.Count - 1)]) } else { @("help") }
+    & (Join-Path $scriptRoot "Invoke-MIRAssurance.ps1") @assuranceArgs
   }
   "docs" {
     if ($verb -ne "check") { throw "Unknown docs command: $verb" }

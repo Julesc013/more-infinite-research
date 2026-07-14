@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "title": "MIR Fixture - Assert Legacy Effect Icons",
   "author": "Julesc013",
-  "description": "Validation fixture that asserts old-line direct-effect technologies avoid unavailable newer badge icons and unsupported native modifier icon metadata.",
+  "description": "Asserts that Factorio 1.0 direct-effect technologies use only target-era icon assets without 1.1 badge overlays.",
   "factorio_version": "1.0",
   "dependencies": [
     "base >= 1.0",

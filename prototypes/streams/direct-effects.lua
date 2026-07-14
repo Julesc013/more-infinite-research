@@ -23,8 +23,7 @@ return {
   },
 
   research_lab_productivity = {
-    -- Cooperate with another old-line mod that already owns an infinite
-    -- native lab productivity chain.
+    -- Space Age and Research_Productivity already own native lab productivity.
     skip_if_technology_effects = {
       { technology = "research-productivity", type = "laboratory-productivity", max_level = "infinite" },
       { technology = "laboratory-productivity-4", type = "laboratory-productivity", modifier = 0.10, max_level = "infinite" }
@@ -53,6 +52,8 @@ return {
 
   research_rocket_shooting_speed = {
     icon_tech = "rocketry",
+    required_technologies = {"rocketry"},
+    adopt_exact_native_effect_owner = true,
     science_packs = {
       "automation-science-pack","logistic-science-pack","chemical-science-pack",
       "production-science-pack","military-science-pack"
@@ -68,6 +69,9 @@ return {
       {technology = "physical-projectile-damage-2"},
       {item = "cannon-shell"}
     },
+    required_technologies = {"weapon-shooting-speed-5"},
+    required_technology_candidates = {{"tank", "tanks"}},
+    adopt_exact_native_effect_owner = true,
     science_packs = {
       "automation-science-pack","logistic-science-pack","chemical-science-pack",
       "production-science-pack","military-science-pack"
@@ -80,6 +84,7 @@ return {
   research_flamethrower_shooting_speed = {
     icon_tech = "flamethrower",
     localised_description = {"technology-description.more-infinite-research.flamethrower_shooting_speed"},
+    required_technologies = {"flamethrower"},
     science_packs = {
       "automation-science-pack","logistic-science-pack","chemical-science-pack",
       "production-science-pack","military-science-pack","space-science-pack"

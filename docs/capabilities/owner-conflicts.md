@@ -12,6 +12,4 @@ superseded_by: []
 
 # Owner Conflicts Capability
 
-Owner-conflict checks preserve existing recipe-productivity and native modifier
-owners unless MIR can prove exact replacement, safe coexistence, or intentional
-adoption.
+Owner-conflict checks preserve existing recipe-productivity and native modifier owners unless MIR can prove exact replacement, safe coexistence, or intentional adoption.

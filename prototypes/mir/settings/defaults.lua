@@ -11,6 +11,10 @@ local defaults = {
   streams = {
     research_inventory_capacity = { growth_factor = 1.10 },
     research_robot_battery = { growth_factor = 1.2 },
+    research_breeding = {
+      enabled = true,
+      settings_priority = "top"
+    },
     research_lab_productivity = {
       base_cost = 1000,
       growth_factor = 1.2,
@@ -105,7 +109,10 @@ local defaults = {
       base_cost = 200,
       growth_factor = 1.5,
       research_time = 60,
-      science_packs = "inherit"
+      science_packs = "inherit",
+      add_science_packs = {
+        "electromagnetic-science-pack"
+      }
     },
     ["inserter-capacity-bonus"] = {
       enabled = false,
@@ -120,7 +127,9 @@ local defaults = {
         "mod-setting-description.mir-note-inserter-capacity"
       },
       science_packs = "inherit",
-      add_science_packs = {}
+      add_science_packs = {
+        "agricultural-science-pack"
+      }
     },
     ["weapon-shooting-speed"] = {
       enabled = true,
@@ -138,8 +147,6 @@ local defaults = {
     ["laser-shooting-speed"] = {
       enabled = true,
       settings_priority = "top",
-      chain_key = "laser-turret-speed",
-      generated_key = "laser-turret-speed",
       max_level = 0,
       base_cost = 60,
       growth_factor = 1.5,

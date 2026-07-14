@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "generated_at": "2026-07-14T21:29:04+10:00",
+  "audit_dir": "C:\\Projects\\Factorio\\more-infinite-research\\artifacts\\release-targeted-3.1.9-exact-bound-canary",
+  "group_count": 1,
+  "unexpected_count": 1,
+  "expected_count": 0,
+  "groups": [
+    {
+      "id": "FG0001",
+      "kind": "no_audit_rows",
+      "scenario": "local-2-1-bz-suite-space-age",
+      "mod": "bzcarbon",
+      "stream": "",
+      "recipe": "",
+      "reason": "audit_rows_empty",
+      "evidence": "C:\\Projects\\Factorio\\more-infinite-research\\artifacts\\release-targeted-3.1.9-exact-bound-canary\\runs\\u-212afbcc3d4a\\local-2-1-bz-suite-space-age.log",
+      "likely_remediation": "Confirm the copied MIR diagnostics patch was applied and the Factorio log was captured.",
+      "expected": false,
+      "expectation": ""
+    }
+  ]
+}

@@ -6,6 +6,15 @@ local use_installed_space_age_icons =
   and settings.startup
   and settings.startup["mir-use-installed-space-age-icons"]
   and settings.startup["mir-use-installed-space-age-icons"].value == true
+local stream_registry = require("__more-infinite-research__.prototypes.mir.streams.registry")
+local stream_descriptor = require("__more-infinite-research__.prototypes.mir.domain.streams.descriptor")
+local raw_stream_catalog = require("__more-infinite-research__.prototypes.mir.domain.streams.raw_catalog")
+local canonical_recipe_facts = require("__more-infinite-research__.prototypes.mir.index.recipe_facts")
+local pipeline_commands = require("__more-infinite-research__.prototypes.mir.pipeline.commands")
+local capability_registry = require("__more-infinite-research__.prototypes.mir.capabilities.registry")
+local stream_compiler = require("__more-infinite-research__.prototypes.mir.planner.stream_compiler")
+local target_profile = require("__more-infinite-research__.prototypes.mir.platform.factorio.target_profiles").current()
+local recipe_semantics = require("__more-infinite-research__.prototypes.mir.domain.facts.recipe_semantics")
 
 local function fail(message)
   error("MIR validation failed: " .. message)
@@ -25,6 +34,222 @@ local function assert_no_blocked_pickup_effects()
     end
   end
 end
+
+local function assert_generation_plan_v3()
+  local plan = stream_compiler.latest_artifact()
+  if not plan or plan.schema ~= 3 or not plan.validation_summary or plan.validation_summary.valid ~= true then
+    fail("missing accepted GenerationPlan schema 3 artifact")
+  end
+  if type(plan.plan_fingerprint) ~= "string" or not plan.plan_fingerprint:match("^mir32%-") then
+    fail("GenerationPlan schema 3 fingerprint is missing")
+  end
+  for _, source in ipairs({"facts", "rules", "compatibility_packs", "target_profile"}) do
+    if type(plan.source_fingerprints[source]) ~= "string" then
+      fail("GenerationPlan source fingerprint is missing: " .. source)
+    end
+  end
+  for _, row in ipairs(plan.rows or {}) do
+    for _, gate in ipairs({"target_supported", "effect_valid", "owner_conflict_free", "science_compatible", "lab_compatible", "prerequisites_acyclic", "loop_safe", "progression_safe", "migration_safe", "output_identity_safe"}) do
+      local proof = row.gates and row.gates[gate]
+      if type(proof) ~= "table" or type(proof.passed) ~= "boolean"
+        or type(proof.status) ~= "string" or type(proof.evidence) ~= "table" then
+        fail("GenerationPlan row is missing evidence gate " .. gate)
+      end
+    end
+  end
+end
+
+local function assert_decision_record_v2()
+  local decision_record = require("__more-infinite-research__.prototypes.mir.domain.decisions.decision_record")
+  local confidence = decision_record.confidence({identity = 1, family = 0.95, loop_safety = 0.25, total = 0.75})
+  if confidence.identity ~= "exact" or confidence.family ~= "structural"
+    or confidence.loop_safety ~= "heuristic" or confidence.total ~= 0.75 then
+    fail("DecisionRecordV2 typed confidence contract changed")
+  end
+end
+
+local function assert_setting_target_ownership()
+  local settings_catalog = require("__more-infinite-research__.prototypes.mir.settings.catalog")
+  local expected = {
+    ["mir-pipeline-extent-multiplier"] = "pipeline_extent",
+    ["mir-prototype-productivity-cap"] = "prototype_limits",
+    ["mir-settings-profile-import"] = "settings_profiles",
+    ["mir-unrestricted-modules"] = "module_permissions",
+    ["mir-debug-scripted-effects"] = "scripted_techs"
+  }
+  for setting_name, feature in pairs(expected) do
+    local spec = settings_catalog.spec(setting_name)
+    if not spec or not spec.targets or spec.targets.requires_features[1] ~= feature then
+      fail("setting declaration does not own target requirement: " .. setting_name)
+    end
+  end
+end
+
+local function assert_descriptor_contracts()
+  local snapshot = stream_registry.snapshot()
+  local count = 0
+  for key, spec in pairs(snapshot) do
+    count = count + 1
+    local descriptor = spec.descriptor
+    if not descriptor or descriptor.schema ~= 1 or descriptor.id ~= key then
+      fail("stream " .. key .. " is missing its canonical descriptor identity")
+    end
+    if descriptor.kind ~= "recipe-productivity" and descriptor.kind ~= "direct-effect" then
+      fail("stream " .. key .. " has invalid descriptor kind")
+    end
+    if not descriptor.effect or not descriptor.effect.canonical_anchor
+      or descriptor.effect.canonical_anchor <= 0 then
+      fail("stream " .. key .. " is missing its typed positive effect contract")
+    end
+    if not descriptor.targets or type(descriptor.targets.requires_features) ~= "table"
+      or type(descriptor.targets.required_effect_types) ~= "table" then
+      fail("stream " .. key .. " is missing positive target requirements")
+    end
+  end
+  if count ~= target_profile.expected_stream_count then
+    fail("canonical descriptor catalog expected " .. tostring(target_profile.expected_stream_count) .. " streams, got " .. tostring(count))
+  end
+
+  local first = stream_registry.get("research_copper")
+  first.descriptor.effect.canonical_anchor = 999
+  first.items[1] = "mutated-through-copy"
+  local second = stream_registry.get("research_copper")
+  if second.descriptor.effect.canonical_anchor == 999 or second.items[1] == "mutated-through-copy" then
+    fail("registry copies can mutate the require-cached canonical descriptor")
+  end
+
+  local productivity_a = stream_descriptor.normalize("order-productivity", {
+    groups = {{change = 0.05}, {change = 0.10}}
+  })
+  local productivity_b = stream_descriptor.normalize("order-productivity", {
+    groups = {{change = 0.10}, {change = 0.05}}
+  })
+  if productivity_a.descriptor.effect.canonical_anchor ~= productivity_b.descriptor.effect.canonical_anchor then
+    fail("productivity effect contract depends on declaration order")
+  end
+
+  local direct_a = stream_descriptor.normalize("order-direct", {
+    direct_effects = {
+      {type = "gun-speed", ammo_category = "rocket", modifier = 0.1},
+      {type = "gun-speed", ammo_category = "cannon-shell", modifier = 0.2}
+    }
+  })
+  local direct_b = stream_descriptor.normalize("order-direct", {
+    direct_effects = {
+      {type = "gun-speed", ammo_category = "cannon-shell", modifier = 0.2},
+      {type = "gun-speed", ammo_category = "rocket", modifier = 0.1}
+    }
+  })
+  if direct_a.descriptor.effect.canonical_anchor ~= direct_b.descriptor.effect.canonical_anchor then
+    fail("direct effect contract depends on declaration order")
+  end
+
+  local unique_ok = pcall(raw_stream_catalog.merge_unique, {
+    {name = "one", streams = {duplicate = {}}},
+    {name = "two", streams = {duplicate = {}}}
+  })
+  if unique_ok then fail("duplicate stream ids did not fail closed") end
+
+  local overlay_ok = pcall(stream_descriptor.normalize, "overlay-injection", {
+    descriptor = {},
+    groups = {{change = 0.1}}
+  })
+  if overlay_ok then fail("overlay descriptor injection did not fail closed") end
+end
+
+assert_descriptor_contracts()
+
+local function assert_recipe_fact_contracts()
+  if canonical_recipe_facts.scan_count() ~= 1 then
+    fail("canonical recipe facts scanned recipe prototypes more than once")
+  end
+  local first = canonical_recipe_facts.get("iron-gear-wheel")
+  if not first or #first.result_names == 0 then fail("canonical iron gear recipe fact is missing") end
+  first.result_names[1] = "mutated-through-copy"
+  local second = canonical_recipe_facts.get("iron-gear-wheel")
+  if second.result_names[1] == "mutated-through-copy" then
+    fail("recipe fact consumer mutated the canonical require-cached fact")
+  end
+  local synthetic_names = canonical_recipe_facts.candidate_names({
+    ["mir-fixture-synthetic-item-1000"] = true
+  }, {}, {})
+  if #synthetic_names ~= 1 or synthetic_names[1] ~= "mir-fixture-synthetic-recipe-1000" then
+    fail("large synthetic recipe index did not return the exact terminal recipe")
+  end
+  if canonical_recipe_facts.scan_count() ~= 1 then
+    fail("large synthetic recipe queries triggered a repeated full recipe scan")
+  end
+
+  local default_policy = canonical_recipe_facts.get("mir-fixture-default-productivity-policy")
+  if not default_policy or default_policy.declared_allow_productivity ~= nil
+    or default_policy.effective_allow_productivity ~= false then
+    fail("omitted allow_productivity did not resolve to the Factorio 2.1 false default")
+  end
+
+  local complete_shape = canonical_recipe_facts.get("mir-fixture-complete-product-shape")
+  local product = complete_shape and complete_shape.variants[1] and complete_shape.variants[1].results[1]
+  if not product or product.independent_probability ~= 0.5 or product.extra_count_fraction ~= 0.25
+    or product.percent_spoiled ~= 0.1 or product.always_fresh ~= true
+    or product.reset_freshness_on_craft ~= true or product.quality_min ~= "normal"
+    or product.quality_max ~= "normal" or product.quality_change ~= 0
+    or product.affected_by_quality ~= false then
+    fail("RecipeFactV2 did not preserve the complete Factorio 2.1 product shape")
+  end
+
+  local inherited = recipe_semantics.resolve(
+    {allow_productivity = true, maximum_productivity = 2.5},
+    {allow_quality = false},
+    target_profile
+  )
+  if inherited.effective_allow_productivity ~= true or inherited.effective_allow_quality ~= false
+    or inherited.effective_maximum_productivity ~= 2.5 then
+    fail("recipe variant policy did not inherit root declarations")
+  end
+
+  local probability_fields = {}
+  for _, field in ipairs(target_profile.prototype_shapes.product_probability_fields or {}) do
+    probability_fields[field] = true
+  end
+  for _, field in ipairs({"independent_probability", "shared_probability", "extra_count_fraction", "quality_min", "quality_max"}) do
+    if not probability_fields[field] then fail("target profile omits product field " .. field) end
+  end
+end
+
+assert_recipe_fact_contracts()
+
+local function assert_pipeline_command_contracts()
+  local catalog = pipeline_commands.snapshot()
+  local count = 0
+  local allowed_kinds = {mutation = true, emission = true, plan = true, assertion = true, report = true}
+  for id, command in pairs(catalog) do
+    count = count + 1
+    if command.id ~= id or not allowed_kinds[command.kind] then
+      fail("pipeline command " .. tostring(id) .. " has invalid identity or kind")
+    end
+    if type(command.requires_features) ~= "table" or type(command.implementation) ~= "string"
+      or type(command.phase) ~= "number" or type(command.dependencies) ~= "table" then
+      fail("pipeline command " .. id .. " is missing requirements, ordering, or implementation ownership")
+    end
+  end
+  if count ~= 19 then fail("expected 19 governed pipeline commands, got " .. tostring(count)) end
+end
+
+assert_pipeline_command_contracts()
+
+local function assert_capability_lifecycle_contracts()
+  local resolvers = capability_registry.resolvers()
+  if #resolvers ~= 3 then fail("expected three governed capability resolvers") end
+  for _, resolver in ipairs(resolvers) do
+    local functions = {}
+    for _, stage in ipairs({"discover", "classify", "propose", "validate", "materialize", "result"}) do
+      if type(resolver[stage]) ~= "function" then fail(resolver.id .. " is missing lifecycle stage " .. stage) end
+      if functions[resolver[stage]] then fail(resolver.id .. " aliases lifecycle stage " .. stage) end
+      functions[resolver[stage]] = true
+    end
+  end
+end
+
+assert_capability_lifecycle_contracts()
 
 local function escape_pattern(text)
   return text:gsub("([^%w])", "%%%1")
@@ -130,6 +355,9 @@ local base_extension_defaults = {
 }
 
 assert_no_blocked_pickup_effects()
+assert_generation_plan_v3()
+assert_decision_record_v2()
+assert_setting_target_ownership()
 
 for key, default_enabled in pairs(base_extension_defaults) do
   if effective_base_extension_enabled(key, default_enabled) then
@@ -139,6 +367,36 @@ for key, default_enabled in pairs(base_extension_defaults) do
   end
 end
 
+local function startup_setting_number(name)
+  local setting = settings and settings.startup and settings.startup[name]
+  return setting and tonumber(setting.value) or nil
+end
+
+local function assert_base_effect_value(key, effect_type, expected)
+  local _, infinite = chain_levels(key)
+  if #infinite ~= 1 then
+    fail("cannot inspect retained effect setting for " .. key .. ": expected one infinite continuation.")
+  end
+  for _, effect in ipairs(infinite[1].tech.effects or {}) do
+    if effect.type == effect_type then
+      local actual = tonumber(effect.modifier)
+      if not actual or math.abs(actual - expected) > 0.000001 then
+        fail("retained effect setting for " .. key .. " emitted " .. tostring(actual)
+          .. ", expected " .. tostring(expected) .. ".")
+      end
+      return
+    end
+  end
+  fail("retained effect setting for " .. key .. " could not find effect " .. effect_type .. ".")
+end
+
+if startup_setting_number("mir-effect-per-level-research-speed") == 120 then
+  assert_base_effect_value("research-speed", "laboratory-speed", 1.2)
+end
+if startup_setting_number("mir-effect-per-level-worker-robots-storage") == 2 then
+  assert_base_effect_value("worker-robots-storage", "worker-robot-storage", 2)
+end
+
 local function has_recipe_productivity_effect(tech, recipe_name)
   for _, effect in ipairs((tech and tech.effects) or {}) do
     if effect.type == "change-recipe-productivity" and effect.recipe == recipe_name then
@@ -146,6 +404,38 @@ local function has_recipe_productivity_effect(tech, recipe_name)
     end
   end
   return false
+end
+
+local function recipe_productivity_change(tech, recipe_name)
+  for _, effect in ipairs((tech and tech.effects) or {}) do
+    if effect.type == "change-recipe-productivity" and effect.recipe == recipe_name then
+      return effect.change
+    end
+  end
+  return nil
+end
+
+local furnace_effect_setting = settings
+  and settings.startup
+  and settings.startup["ips-effect-per-level-research_furnace"]
+local furnace_anchor = furnace_effect_setting and furnace_effect_setting.value or nil
+if furnace_anchor ~= 20 and furnace_anchor ~= 40 then
+  fail("furnace effect-per-level anchor should default to the primary 20% tier; got " .. tostring(furnace_anchor) .. ".")
+end
+if furnace_anchor == 40 then
+  local furnace_technology = techs["recipe-prod-research_furnace-1"]
+  if not furnace_technology then fail("missing furnace technology for mixed-tier effect scaling check.") end
+  for recipe_name, expected in pairs({
+    ["stone-furnace"] = 0.40,
+    ["steel-furnace"] = 0.20,
+    ["electric-furnace"] = 0.10
+  }) do
+    local actual = recipe_productivity_change(furnace_technology, recipe_name)
+    if not actual or math.abs(actual - expected) > 0.000001 then
+      fail("scaled furnace effect for " .. recipe_name .. " was " .. tostring(actual)
+        .. ", expected " .. tostring(expected) .. ".")
+    end
+  end
 end
 
 local function recipe_productivity_owners(recipe_name)
@@ -443,6 +733,20 @@ end
 if is_space_age then
   if techs["recipe-prod-research_agricultural_growth_speed-1"] then
     assert_tech_uses_technology_icon("recipe-prod-research_agricultural_growth_speed-1", "agriculture")
+  end
+
+  for _, key in ipairs({"research_spoilage_preservation", "research_agricultural_growth_speed"}) do
+    local technology = techs["recipe-prod-" .. key .. "-1"]
+    if technology then
+      local effect = technology.effects and technology.effects[1]
+      local selected = settings.startup["ips-effect-per-level-" .. key]
+      if not effect or effect.type ~= "nothing" or type(effect.effect_description) ~= "table" then
+        fail(key .. " scripted effect description is missing")
+      end
+      if not selected or tonumber(effect.effect_description[2]) ~= tonumber(selected.value) then
+        fail(key .. " scripted effect description does not carry selected value")
+      end
+    end
   end
 
   for _, tech_name in ipairs({

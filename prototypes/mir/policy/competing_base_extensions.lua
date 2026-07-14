@@ -1,10 +1,11 @@
 local defaults = require("prototypes.mir.settings.defaults")
-local cleanup = require("prototypes.mir.policy.technology_cleanup")
+local generated_registry = require("prototypes.mir.domain.facts.generated_technology_registry")
 local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 local settings_resolver = require("prototypes.mir.settings.resolver")
 local effective_settings = require("prototypes.mir.settings.effective")
 
 local M = {}
+local prepared_replacements = nil
 
 local COMPETING_BASE_EXTENSIONS = {
   ["Better_Robots_Extended"] = {
@@ -62,18 +63,18 @@ local function should_remove_base_extension(name, tech, spec)
   return true
 end
 
-function M.apply()
+function M.prepare()
+  prepared_replacements = {}
   if not prefer_this_mod_for_competing_techs() then return end
   if not mods then return end
 
-  local to_remove = {}
   for mod_name, extensions in pairs(COMPETING_BASE_EXTENSIONS) do
     if mods[mod_name] then
       for key, spec in pairs(extensions) do
         if base_extension_enabled(key) then
           for name, tech in pairs(data_raw.prototypes("technology")) do
             if should_remove_base_extension(name, tech, spec) then
-              table.insert(to_remove, {
+              table.insert(prepared_replacements, {
                 name = name,
                 key = key,
                 mod_name = mod_name
@@ -85,12 +86,33 @@ function M.apply()
     end
   end
 
-  table.sort(to_remove, function(a, b) return a.name < b.name end)
-  for _, entry in ipairs(to_remove) do
-    cleanup.remove_technology_and_prereq_refs(entry.name)
-    log("[more-infinite-research] Removed competing base extension technology from "
+  table.sort(prepared_replacements, function(a, b) return a.name < b.name end)
+  for _, entry in ipairs(prepared_replacements) do
+    log("[more-infinite-research] Prepared competing base extension for transactional replacement from "
       .. entry.mod_name .. " for " .. entry.key .. ": " .. entry.name)
   end
+end
+
+function M.ignores_existing_owner(name)
+  for _, entry in ipairs(prepared_replacements or {}) do
+    if entry.name == name then return true end
+  end
+  return false
+end
+
+function M.replacement_plan()
+  local plan = {}
+  for _, entry in ipairs(prepared_replacements or {}) do
+    local replacements = generated_registry.sorted_names({ kind = "base_extension", key = entry.key })
+    local replacement_name = replacements[1]
+    table.insert(plan, {
+      technology = entry.name,
+      replacement = replacement_name,
+      mod = entry.mod_name,
+      key = entry.key
+    })
+  end
+  return plan
 end
 
 return M

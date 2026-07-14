@@ -12,8 +12,7 @@ superseded_by: []
 
 # Big Mining Drill Compatibility
 
-Claim: MIR covers visible Big Mining Drill-style crafting recipes through mining
-drill productivity.
+Claim: MIR covers visible Big Mining Drill-style crafting recipes through mining drill productivity.
 
 Evidence:
 
