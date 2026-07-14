@@ -2,8 +2,6 @@ local D = {}
 local icons = require("prototypes.mir.emit.icon_builder")
 local schema = require("prototypes.mir.core.schema")
 local effective_settings = require("prototypes.mir.settings.effective")
-local automatic_compiler_policy = require("prototypes.mir.settings.automatic_compiler_policy")
-local decision_record = require("prototypes.mir.domain.decisions.decision_record")
 
 local rows = {}
 local audit_rows = {}
@@ -16,7 +14,6 @@ end
 
 function D.enabled()
   return startup_setting("mir-debug-generation-report") == true
-    or automatic_compiler_policy.current().preview
 end
 
 function D.recipe_matches_enabled()
@@ -88,10 +85,7 @@ end
 
 function D.decision(row)
   schema.decision(row)
-  local projected = {}
-  for field, value in pairs(row) do projected[field] = value end
-  projected.confidence = decision_record.format_typed_confidence(row.confidence)
-  append("decision", projected)
+  append("decision", row)
 end
 
 function D.rule_mutation(row)
@@ -104,14 +98,6 @@ end
 
 function D.lab_matrix(row)
   append("lab_matrix", row)
-end
-
-function D.coverage(row)
-  append("coverage", row)
-end
-
-function D.coverage_recipe(row)
-  append("coverage_recipe", row)
 end
 
 function D.recipe_matches(key, buckets)
@@ -262,20 +248,7 @@ function D.flush()
         .. " module_slots=" .. tostring(row.module_slots or "")
         .. " allowed_effects=" .. tostring(row.allowed_effects or "")
         .. " shared_inputs_outputs=" .. tostring(row.shared_inputs_outputs or "")
-        .. " evidence=" .. tostring(row.evidence or "")
-        .. " category=" .. tostring(row.category or "")
-        .. " visible=" .. tostring(row.visible or "")
-        .. " productivity_eligible=" .. tostring(row.productivity_eligible or "")
-        .. " accounted=" .. tostring(row.accounted or "")
-        .. " eligible=" .. tostring(row.eligible or "")
-        .. " recipe_count=" .. tostring(row.recipe_count or "")
-        .. " technology_count=" .. tostring(row.technology_count or "")
-        .. " effect_count=" .. tostring(row.effect_count or "")
-        .. " graph_edge_count=" .. tostring(row.graph_edge_count or "")
-        .. " candidate_count=" .. tostring(row.candidate_count or "")
-        .. " scan_count=" .. tostring(row.scan_count or "")
-        .. " dangling_effects=" .. tostring(row.dangling_effects or "")
-        .. " duplicate_owners=" .. tostring(row.duplicate_owners or ""))
+        .. " evidence=" .. tostring(row.evidence or ""))
     end
     log("[more-infinite-research] Generation report end")
   end

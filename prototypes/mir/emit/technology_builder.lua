@@ -1,5 +1,6 @@
 local M = {}
 local data_raw = require("prototypes.mir.platform.factorio.data_raw")
+local target_line = require("prototypes.mir.platform.factorio.target_line")
 
 local function require_field(spec, field)
   if spec[field] == nil then
@@ -23,24 +24,35 @@ end
 function M.prototype(spec)
   validate(spec)
 
-  return {
+  local unit = {
+    ingredients = spec.science,
+    time = spec.research_time
+  }
+  if target_line.supports_native_infinite_technology() then
+    unit.count_formula = spec.count_formula
+  else
+    unit.count = target_line.finite_research_count(spec.count_formula)
+  end
+
+  local technology = {
     type = "technology",
     name = spec.technology_name,
     localised_name = spec.localised_name,
     localised_description = spec.localised_description,
-    icons = spec.icons,
     effects = spec.effects,
     prerequisites = spec.prerequisites,
-    unit = {
-      count_formula = spec.count_formula,
-      ingredients = spec.science,
-      time = spec.research_time
-    },
+    unit = unit,
     upgrade = spec.upgrade ~= false,
-    max_level = spec.max_level,
     order = spec.order,
     level = spec.level or 1
   }
+  if target_line.supports_native_infinite_technology() then
+    technology.icons = spec.icons
+    technology.max_level = spec.max_level
+  elseif spec.icons and spec.icons[1] then
+    technology.icon = spec.icons[1].icon
+  end
+  return technology
 end
 
 function M.emit(spec)

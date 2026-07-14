@@ -25,16 +25,4 @@ function R.stream_enabled(key)
   return fallback
 end
 
-function R.stream_runtime_multiplier(key, canonical_delta)
-  local selected = startup_setting("ips-effect-per-level-" .. key)
-  local delta = tonumber(selected)
-  if delta then
-    delta = delta / 100
-  else
-    delta = tonumber(canonical_delta) or 0
-  end
-  if delta < 0 then delta = 0 end
-  return 1 + delta
-end
-
 return R

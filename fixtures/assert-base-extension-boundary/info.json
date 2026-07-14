@@ -4,9 +4,9 @@
   "title": "MIR Fixture - Assert Base Extension Boundary",
   "author": "Julesc013",
   "description": "Validation fixture that asserts MIR extends after an existing finite vanilla-chain level without mutating it.",
-  "factorio_version": "2.1",
+  "factorio_version": "0.13",
   "dependencies": [
-    "base >= 2.1.8",
+    "base >= 0.13",
     "more-infinite-research",
     "mir-fixture-finite-base-extension-level",
     "mir-fixture-item-science-pack"

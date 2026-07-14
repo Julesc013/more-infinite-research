@@ -5,19 +5,12 @@ local effective_settings = require("prototypes.mir.settings.effective")
 local runtime_state = require("prototypes.mir.runtime.state")
 
 local M = {}
-M.requires_features = {"scripted_techs", "productivity_family_adoption"}
 
 local features = {
   spoilage,
   agricultural_growth,
   productivity_family_adoption
 }
-
-for _, feature in ipairs(features) do
-  if type(feature.requires_features) ~= "table" then
-    error("MIR runtime handler is missing positive target requirements.", 2)
-  end
-end
 
 local function ensure_storage()
   return runtime_state.bucket("scripted_techs")

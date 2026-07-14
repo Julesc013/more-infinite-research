@@ -1,40 +1,38 @@
 local C = require("prototypes.mir.streams.registry")
-local deepcopy = require("prototypes.mir.core.deepcopy")
 local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 local science = require("prototypes.mir.capabilities.science_integration.science_packs")
 local recipes = require("prototypes.mir.capabilities.recipe_productivity.recipe_matching")
 local effective_settings = require("prototypes.mir.settings.effective")
-local compatibility_packs = require("prototypes.mir.compatibility.packs.registry")
 
 local M = {}
 
 local STREAM_EXTRA_PACKS = {
-  research_concrete = {"space-science-pack"},
+  research_concrete = {"alien-science-pack"},
   research_furnace = {"metallurgic-science-pack"},
-  research_landfill = {"metallurgic-science-pack", "space-science-pack"},
-  research_artificial_soil = {"agricultural-science-pack", "space-science-pack"},
+  research_landfill = {"metallurgic-science-pack", "alien-science-pack"},
+  research_artificial_soil = {"agricultural-science-pack", "alien-science-pack"},
   research_molten_metals = {"metallurgic-science-pack"},
   research_mining_drill = {"metallurgic-science-pack"},
-  research_walls = {"military-science-pack", "space-science-pack"},
-  research_grenades = {"military-science-pack", "space-science-pack"},
-  research_rails = {"space-science-pack"},
+  research_walls = {"alien-science-pack", "alien-science-pack"},
+  research_grenades = {"alien-science-pack", "alien-science-pack"},
+  research_rails = {"alien-science-pack"},
   research_electric_energy = {"electromagnetic-science-pack"},
 
   research_breeding = {"agricultural-science-pack", "cryogenic-science-pack"},
   research_plastic = {"agricultural-science-pack"},
   research_rocket_fuel = {"agricultural-science-pack"},
-  research_thruster_fuel_productivity = {"space-science-pack", "agricultural-science-pack"},
-  research_thruster_oxidizer_productivity = {"space-science-pack", "agricultural-science-pack"},
+  research_thruster_fuel_productivity = {"alien-science-pack", "agricultural-science-pack"},
+  research_thruster_oxidizer_productivity = {"alien-science-pack", "agricultural-science-pack"},
   research_oil_processing_productivity = {"cryogenic-science-pack"},
   research_oil_cracking_productivity = {"agricultural-science-pack"},
   research_lubricant_productivity = {"electromagnetic-science-pack"},
   research_sulfuric_acid_productivity = {"metallurgic-science-pack"},
   research_bacteria_cultivation = {"agricultural-science-pack", "cryogenic-science-pack"},
   research_bioflux = {"agricultural-science-pack"},
-  research_carbon = {"space-science-pack"},
+  research_carbon = {"alien-science-pack"},
   research_carbon_fiber = {"agricultural-science-pack"},
-  research_ice = {"space-science-pack"},
-  research_rockets = {"agricultural-science-pack", "military-science-pack"},
+  research_ice = {"alien-science-pack"},
+  research_rockets = {"agricultural-science-pack", "alien-science-pack"},
 
   research_sulfur = {"metallurgic-science-pack"},
   research_explosives = {"metallurgic-science-pack"},
@@ -56,14 +54,14 @@ local STREAM_EXTRA_PACKS = {
   research_quantum_processor = {"cryogenic-science-pack"},
   research_modules = {"cryogenic-science-pack"},
 
-  research_belts = {"space-science-pack"},
-  research_inserters = {"space-science-pack"},
-  research_bullets = {"military-science-pack", "space-science-pack"},
-  research_heavy_ammo = {"military-science-pack", "metallurgic-science-pack", "space-science-pack"},
-  research_armor_components = {"military-science-pack", "metallurgic-science-pack", "space-science-pack"},
+  research_belts = {"alien-science-pack"},
+  research_inserters = {"alien-science-pack"},
+  research_bullets = {"alien-science-pack", "alien-science-pack"},
+  research_heavy_ammo = {"alien-science-pack", "metallurgic-science-pack", "alien-science-pack"},
+  research_armor_components = {"alien-science-pack", "metallurgic-science-pack", "alien-science-pack"},
 
   research_inventory_capacity = {"agricultural-science-pack"},
-  research_robot_battery = {"space-science-pack"},
+  research_robot_battery = {"alien-science-pack"},
   research_science_pack_productivity = {}
 }
 
@@ -93,6 +91,27 @@ local function append_ingredient(out, seen, name, amount)
   end
 end
 
+local function sorted_keys(tbl)
+  local keys = {}
+  for key, _ in pairs(tbl or {}) do table.insert(keys, key) end
+  table.sort(keys)
+  return keys
+end
+
+local function recipe_unlock_techs(recipe_name)
+  local out = {}
+  for _, tech_name in ipairs(sorted_keys(data_raw.prototypes("technology"))) do
+    local tech = data_raw.technology(tech_name)
+    for _, effect in ipairs((tech and tech.effects) or {}) do
+      if effect.type == "unlock-recipe" and effect.recipe == recipe_name then
+        table.insert(out, tech_name)
+        break
+      end
+    end
+  end
+  return out
+end
+
 local function stream_recipe_names(spec)
   local seen = {}
   local out = {}
@@ -111,7 +130,7 @@ end
 local function science_from_unlocks(spec)
   local out, seen = {}, {}
   for _, recipe_name in ipairs(stream_recipe_names(spec)) do
-    for _, tech_name in ipairs(science.researchable_unlockers_for_recipe(recipe_name)) do
+    for _, tech_name in ipairs(recipe_unlock_techs(recipe_name)) do
       local tech = data_raw.technology(tech_name)
       for _, ingredient in ipairs(((tech and tech.unit) and tech.unit.ingredients) or {}) do
         append_ingredient(out, seen, ingredient_name(ingredient), ingredient_amount(ingredient))
@@ -122,15 +141,9 @@ local function science_from_unlocks(spec)
 end
 
 function M.apply_science_pack_ingredient_policy(ingredients)
-  local policy = startup_setting("mir-science-pack-ingredient-policy") or "configured"
-  if policy == "configured" then
-    -- Neutral/bypass option: preserve the stream's configured ingredients
-    -- without loading any of the optional ingredient expansion policies.
-    return deepcopy(ingredients or {})
-  end
-
   local out, seen = {}, {}
   local selected_packs = {}
+  local policy = startup_setting("mir-science-pack-ingredient-policy") or "configured"
   for _, ingredient in ipairs(ingredients or {}) do
     local name = ingredient_name(ingredient)
     if name then table.insert(selected_packs, name) end
@@ -142,9 +155,9 @@ function M.apply_science_pack_ingredient_policy(ingredients)
   -- This setting intentionally changes only research ingredients. The
   -- finish-game prerequisite gate is handled separately in prerequisites.
   if policy == "space" then
-    append_ingredient(out, seen, "space-science-pack", 1)
+    append_ingredient(out, seen, "alien-science-pack", 1)
   elseif policy == "space-and-promethium" then
-    append_ingredient(out, seen, "space-science-pack", 1)
+    append_ingredient(out, seen, "alien-science-pack", 1)
     append_ingredient(out, seen, "promethium-science-pack", 1)
   elseif policy == "space-age-progression" then
     for _, pack in ipairs(science.space_age_progression_packs_for(selected_packs)) do
@@ -188,29 +201,21 @@ function M.pick_science_for_stream(spec, key)
   elseif key == "research_science_pack_productivity" then
     for _, p in ipairs(science.pack_list_all()) do add_if_science_pack_exists(packs, p) end
   else
-    for _, p in ipairs({"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack"}) do
+    for _, p in ipairs({"science-pack-1", "science-pack-2", "science-pack-3", "alien-science-pack"}) do
       add_if_science_pack_exists(packs, p)
     end
     for _, p in ipairs(STREAM_EXTRA_PACKS[key] or {}) do add_if_science_pack_exists(packs, p) end
   end
 
-  local denied = {}
-  for _, role in ipairs(compatibility_packs.science_roles_for_stream(key)) do
-    if role.role == "exclude" then denied[role.pack] = true end
-  end
-  for _, role in ipairs(compatibility_packs.science_roles_for_stream(key)) do
-    if role.role ~= "exclude" and not denied[role.pack] then add_if_science_pack_exists(packs, role.pack) end
-  end
-
   if desired == "derive-from-unlocks" and #packs == 0 then
-    for _, p in ipairs({"automation-science-pack", "logistic-science-pack", "chemical-science-pack"}) do
+    for _, p in ipairs({"science-pack-1", "science-pack-2", "science-pack-3"}) do
       add_if_science_pack_exists(packs, p)
     end
   end
 
   local out, seen = {}, {}
   for _, name in ipairs(packs) do
-    if not seen[name] and not denied[name] then
+    if not seen[name] then
       seen[name] = true
       table.insert(out, {name, 1})
     end

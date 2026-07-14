@@ -1,13 +1,10 @@
 local profiles = require("prototypes.mir.compatibility.profiles")
 local data_raw = require("prototypes.mir.platform.factorio.data_raw")
-local generated_registry = require("prototypes.mir.domain.facts.generated_technology_registry")
-local recipe_facts = require("prototypes.mir.index.recipe_facts")
-local relationships = require("prototypes.mir.index.relationships")
 
 local O = {}
 
 function O.is_mir_recipe_productivity_tech(tech_name)
-  return generated_registry.contains(tech_name)
+  return tech_name and string.find(tech_name, "^recipe%-prod%-") ~= nil
 end
 
 function O.recipe_productivity_effects(tech)
@@ -42,12 +39,21 @@ function O.has_recipe_productivity_effect(tech, recipe_name)
 end
 
 function O.recipe_allows_productivity(recipe_name)
-  local fact = recipe_facts.get(recipe_name)
-  if not fact or fact.allow_productivity ~= true then return false end
-  for _, variant in ipairs(fact.variants or {}) do
-    if variant.effective_allow_productivity ~= true then return false end
+  local recipe = data_raw.prototype("recipe", recipe_name)
+  if not recipe then return false end
+
+  local function explicit_allow(def)
+    if def and def.allow_productivity ~= nil then
+      return def.allow_productivity == true
+    end
+    return nil
   end
-  return true
+
+  local normal = explicit_allow(recipe.normal)
+  local expensive = explicit_allow(recipe.expensive)
+  if normal == true or expensive == true then return true end
+  if normal == false or expensive == false then return false end
+  return recipe.allow_productivity == true
 end
 
 function O.recipe_outputs_any_product(recipe_name, products)
@@ -141,19 +147,21 @@ end
 
 function O.external_recipe_productivity_owner_records(recipe_name, options)
   local records = {}
-  local snapshot_phase = options and options.snapshot_phase or "input"
-  local owner_names = relationships.snapshot(snapshot_phase).technologies_by_recipe_effect[recipe_name] or {}
-  for _, tech_name in ipairs(owner_names) do
-    local tech = data_raw.technology(tech_name)
+  for tech_name, tech in pairs(data_raw.prototypes("technology")) do
     if tech.max_level == "infinite" and not O.is_mir_recipe_productivity_tech(tech_name) then
-      local classification = O.classify_recipe_productivity_owner(tech_name, tech, options)
-      table.insert(records, {
-        tech = tech_name,
-        kind = classification.kind,
-        action = classification.action,
-        profile = classification.profile,
-        reason = classification.reason
-      })
+      for _, effect in ipairs(tech.effects or {}) do
+        if effect.type == "change-recipe-productivity" and effect.recipe == recipe_name then
+          local classification = O.classify_recipe_productivity_owner(tech_name, tech, options)
+          table.insert(records, {
+            tech = tech_name,
+            kind = classification.kind,
+            action = classification.action,
+            profile = classification.profile,
+            reason = classification.reason
+          })
+          break
+        end
+      end
     end
   end
 

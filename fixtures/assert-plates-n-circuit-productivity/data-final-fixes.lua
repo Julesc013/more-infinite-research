@@ -62,17 +62,3 @@ for _, expectation in ipairs({
 }) do
   assert_recipe_owner(expectation.recipe, expectation.owner)
 end
-
-assert_recipe_owner("iron-gear-wheel", "recipe-prod-external-prefix-owner")
-
-local dependent = techs["mir-fixture-productivity-dependent"]
-if not dependent then fail("missing productivity replacement dependent") end
-local prerequisites = {}
-for _, name in ipairs(dependent.prerequisites or {}) do prerequisites[name] = true end
-if prerequisites["basic-plate-productivity"] then
-  fail("dependent retained removed competing productivity prerequisite")
-end
-if not prerequisites["recipe-prod-research_copper-1"]
-  or not prerequisites["recipe-prod-research_iron-1"] then
-  fail("dependent was not rewired to all MIR productivity replacements")
-end

@@ -112,7 +112,7 @@ local function emit_rule_mutations(registry)
       subject_type = fact.subject_type,
       subject = fact.subject,
       family = "rule_mutation",
-      confidence = decision_record.confidence({total = fact.confidence or 0.7}),
+      confidence = decision_record.format_confidence({total = fact.confidence or 0.7}),
       source = "compiler:rule-mutation",
       policy = "diagnose_only",
       decision = "diagnose_only",
@@ -143,7 +143,7 @@ local function emit_loop_risks(registry)
       subject_type = fact.subject_type,
       subject = fact.subject,
       family = "recipe_graph_risk",
-      confidence = decision_record.confidence({loop_safety = 0.25, total = 0.25}),
+      confidence = decision_record.format_confidence({loop_safety = 0.25, total = 0.25}),
       source = "compiler:loop-risk",
       policy = "diagnose_only",
       decision = "diagnose_only",
@@ -184,7 +184,6 @@ function M.emit()
   emit_loop_risks(registry)
   emit_generated_technology_decisions(registry)
   capabilities.emit(registry)
-  require("prototypes.mir.report.coverage").emit()
 end
 
 return M

@@ -13,22 +13,11 @@ local function assert_startup_setting_readable(name)
   end
 end
 
-for _, name in ipairs({
-  "mir-automatic-productivity-action",
-  "mir-automatic-create-research",
-  "mir-automatic-require-reviewed-data",
-  "mir-automatic-compiler-mode"
-}) do
-  assert_startup_setting_readable(name)
-end
-
 local governed_stream_keys = {
   "research_advanced_circuit",
   "research_agricultural_growth_speed",
   "research_air_scrubbing_clean_filter",
   "research_armor_components",
-  "research_auto_assembling_machine",
-  "research_auto_lab",
   "research_artificial_soil",
   "research_ash_separation",
   "research_bacteria_cultivation",
@@ -105,10 +94,6 @@ local stream_setting_patterns = {
   "ips-research-time-%s"
 }
 
-local function startup_setting_exists(name)
-  return settings and settings.startup and settings.startup[name] ~= nil
-end
-
 local base_extension_keys = {
   "braking-force",
   "inserter-capacity-bonus",
@@ -127,11 +112,8 @@ local base_setting_patterns = {
 }
 
 for _, stream_key in ipairs(governed_stream_keys) do
-  local enable_name = string.format("ips-enable-%s", stream_key)
-  if startup_setting_exists(enable_name) then
-    for _, setting_pattern in ipairs(stream_setting_patterns) do
-      assert_startup_setting_readable(string.format(setting_pattern, stream_key))
-    end
+  for _, setting_pattern in ipairs(stream_setting_patterns) do
+    assert_startup_setting_readable(string.format(setting_pattern, stream_key))
   end
 end
 
