@@ -4,6 +4,8 @@ Date: 2026-07-14
 
   Bugfixes:
 
+    - Kept generated research loadable when mods disable automation science technology but leave its recipe initially available.
+    - Skipped finite anchors and prerequisite chains that transitively depend on disabled technologies.
     - Made the standard settings configure recognized existing Space Age infinite productivity owners.
     - Applied cost base and growth together as the displayed cost model when either value is customized.
     - Preserved final native or modded owner values when settings stay at their defaults.

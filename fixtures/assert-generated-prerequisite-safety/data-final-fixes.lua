@@ -10,6 +10,12 @@ end
 if data.raw.technology["worker-robots-storage-3"].enabled ~= false then
   fail("disabled base-extension anchor was unexpectedly re-enabled.")
 end
+if data.raw.technology["automation-science-pack"].enabled ~= false then
+  fail("disabled vanilla automation-science-pack technology was unexpectedly re-enabled.")
+end
+if data.raw.recipe["automation-science-pack"].enabled ~= true then
+  fail("initially available automation-science-pack recipe was unexpectedly disabled.")
+end
 
 local initial_status, initial_prerequisite = science.pack_production_status("mir-fixture-initial-science-pack")
 if initial_status ~= "initial" or initial_prerequisite ~= nil then

@@ -16,6 +16,7 @@ MIR 3.1.9 is the final Factorio 2.1 patch in the 3.1 line. It keeps the released
 
 ## Fixed
 
+- Generated research remains loadable when another mod disables the vanilla Automation science technology while making its recipe initially available. MIR does not inherit that disabled gate, and it skips finite anchors or prerequisite chains that are no longer researchable.
 - Processing-unit, plastic, low-density-structure, and rocket-fuel productivity owners now honor the normal MIR Enable, base cost, cost growth, maximum level, research time, and effect-per-level controls.
 - Default values preserve the final existing owner exactly, including changes made by another mod.
 - Disabling one of these streams leaves its external technology untouched.

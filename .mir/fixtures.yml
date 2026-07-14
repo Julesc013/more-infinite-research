@@ -90,6 +90,7 @@ fixtures:
       - generated-stream-prerequisites-exist-and-are-enabled
       - generated-stream-prerequisites-are-acyclic-and-reachable
       - disabled-base-extension-anchor-is-skipped-before-emission
+      - disabled-vanilla-science-technology-does-not-block-generated-streams
       - already-enabled-science-pack-recipe-needs-no-unlock
       - disabled-technology-unlocker-exclusion
       - deterministic-multiple-unlocker-selection
