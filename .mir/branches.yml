@@ -366,20 +366,33 @@ release_artifacts:
       version: "1.9.4"
       branch: tmp/1.1
       target_factorio: "1.1"
-      source_anchor: mir_1_9_3
-      source_commit: 30ef8c7cab3c049aa0bb5efa0d74dd12e9c1ec40
+      source_anchor: DEV_RING_1_1_1_0_ANCHOR
+      canonical_dev_anchor: 53090c6f860bf9cb9aaf10140cbfe3924ef59c6c
+      source_commit: a5a08072f92e9742ae3323fbf4873ebfb58f6531
+      sealed_reconstruction_commit: 2dee595135444ad72c7aa32710ae10f5d6cf09cb
+      tag_commit: 426d6d48c6578a786ea7de0f224282baff9d342b
+      post_publication_commit: 1e461ecb0785ee34905ab69b1c0e8791135cf98a
+      tag: "1.9.4"
       artifact: dist/more-infinite-research_1.9.4.zip
-      sha256: 9184524A2E37115F6D30830191054F70AE556142306E226CDAE4308DC7285A35
-      size_bytes: 302681
-      entries: 124
+      sha256: 74BA83E1F02FABBC52C09AC6144A409B243066663A6D132A47334459C2665BFB
+      package_content_sha256: 732D363A8D8A8CB3A9899973ED5F0222EF99C15224B5C628A3AF824B403D5054
+      size_bytes: 386303
+      entries: 167
       forbidden_entries: 0
       automated_gate: passed
       exact_dist_base: passed
       fresh_create: passed
       fresh_reload: passed
       upgrade_from_1_9_3: passed
-      publication_scope: unreleased
-      status: candidate-qualified
+      runtime_scenarios: 19
+      factorio_binary: D:\Programs\Factorio\1.1\bin\x64\factorio.exe
+      factorio_binary_sha256: B7B4B834FCA2E32AFA9D3476EB42CC09B02F1205BE97F688DC6FC6ACE7BA8FE1
+      publication_scope: github-release
+      github_release: https://github.com/Julesc013/more-infinite-research/releases/tag/1.9.4
+      public_hash_verification: passed
+      mod_portal_status: blocked-missing-upload-api-key
+      manual_visual_review: pending-maintainer
+      status: published-github-portal-blocked
     mir_1_8_0:
       version: "1.8.0"
       branch: tmp/0.18
@@ -425,19 +438,33 @@ release_artifacts:
       version: "1.8.2"
       branch: tmp/1.0
       target_factorio: "1.0"
-      source_anchor: mir_1_8_1
-      source_commit: 0b06b9b0420e1fec38959adbc5cdef91e88a9ea0
+      source_anchor: DEV_RING_1_1_1_0_ANCHOR
+      canonical_dev_anchor: 53090c6f860bf9cb9aaf10140cbfe3924ef59c6c
+      source_commit: 3a54a5935faeecf3466fd250e05d15d36bb12dee
+      sealed_reconstruction_commit: e5b4b578d8475968da49d8c1261c1ca568dc307b
+      tag_commit: 0a192c27674a6b13847e2f5e1b2b530e62419ee8
+      post_publication_commit: b4e0b3de2fd87683d0c0de5bedaa8e94c6c74fe2
+      tag: "1.8.2"
       artifact: dist/more-infinite-research_1.8.2.zip
-      sha256: 1D474CF4CEEB4F1D8F9CFA1494BE98D2E903C5A511871AE01FBB83682DF1EDF6
-      size_bytes: 304509
-      entries: 124
+      sha256: 676927ECF801114CA8F7B9EFD6D139906432BCC60BE26B8CA5C08842E3686EFE
+      package_content_sha256: F8B4B919CAFEA3BF2734FE048B6603B932CDA36637014EF5F756B6041135792D
+      size_bytes: 386302
+      entries: 167
       forbidden_entries: 0
       automated_gate: passed
       exact_dist_base: passed
       fresh_create: passed
       fresh_reload: passed
       upgrade_from_1_8_1: passed
-      status: candidate-qualified
+      runtime_scenarios: 19
+      factorio_binary: D:\Programs\Factorio\1.0\bin\x64\factorio.exe
+      factorio_binary_sha256: 99F1CE207A04296EF7D797E4A98AA98DDE4F02EE653C9DF736AC33A676FD4F70
+      publication_scope: github-release
+      github_release: https://github.com/Julesc013/more-infinite-research/releases/tag/1.8.2
+      public_hash_verification: passed
+      mod_portal_status: blocked-missing-upload-api-key
+      manual_visual_review: pending-maintainer
+      status: published-github-portal-blocked
     mir_1_7_0:
       version: "1.7.0"
       branch: tmp/0.17

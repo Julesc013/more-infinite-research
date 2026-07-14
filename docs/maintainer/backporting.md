@@ -5,19 +5,19 @@ applies_to: "3.0.0+"
 audience: maintainer
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-07-12
+last_reviewed: 2026-07-14
 supersedes: []
 superseded_by: []
 ---
 # Target-Line Versioning And Backports
 
-Updated: 2026-07-12
+Updated: 2026-07-14
 
 ## Current 3.1 Release Roles
 
-Published MIR `3.0.5` on the Factorio 2.1 line and MIR `2.3.5` on `legacy` are immutable. Automatic-compiler work is unreleased MIR `3.1.0` on `dev`; its Factorio 2.0 semantic companion will be unreleased MIR `2.4.0` on `tmp/2.0` only after the modern implementation passes. Earlier 3.1.0 and 2.4.0 candidate commits, tags, and archives are superseded development evidence and are not publication authority.
+Published MIR `3.1.9` on the Factorio 2.1 line and MIR `2.4.5` on `legacy` are immutable. The complete released 3.1.9 state and portable 2.4.5 lessons are synthesized on `dev`; Factorio 2.0 metadata, API adapters, reduced defaults, fixtures, and distribution bytes remain isolated from the modern line.
 
-The current older-target state is MIR `1.9.4` qualified but unreleased on `tmp/1.1`, MIR `1.8.2` staged but runtime-unqualified on `tmp/1.0`, MIR `1.7.1` planned on `tmp/0.17`, MIR `1.6.0` planned on `tmp/0.16`, and MIR `1.5.0` planned on `tmp/0.15`. Archived plans retain their historical version numbers; current 0.16 and 0.15 work follows the new 1.6.0 and 1.5.0 plans.
+MIR `1.9.4` on `tmp/1.1` and MIR `1.8.2` on `tmp/1.0` are tagged, GitHub-published, and publicly byte-verified from exact sealed archives. Their Factorio Mod Portal uploads are blocked by the absent upload API key and must not be described as published there. MIR `1.7.1` on `tmp/0.17` and MIR `1.6.0` on `tmp/0.16` are next-ring prerequisites only; no 0.17-or-lower implementation was begun during the 1.1/1.0 ring.
 
 This note records the locked maintainer policy for separating MIR release numbers by Factorio target line after the `2.2.0` compatibility-platform release. It is a release-operations note, not a feature-parity promise. Every target line still needs its own source branch, metadata, package build, Factorio binary, mod library, validation artifacts, and public release notes before it can be published.
 

@@ -14,7 +14,7 @@ superseded_by: []
 
 Release docs are version-specific plans, migration guides, risk registers, checklists, and validation records.
 
-MIR 3.1.5 and 2.4.0 are the published immutable modern baselines. MIR 3.1.9 is the final 3.1 patch candidate on Factorio 2.1. The descending 1.9.4 through 1.3.0 candidates and the finite museum 0.12.0 through 0.6.0 candidates are independently sealed on their target branches. Qualification does not tag or publish any candidate.
+MIR 3.1.9 and 2.4.5 are the published immutable modern baselines. MIR 1.9.4 for Factorio 1.1 and MIR 1.8.2 for Factorio 1.0 were published and byte-verified on GitHub on 2026-07-14; their Factorio Mod Portal uploads remain externally blocked by the missing upload API key. Older target candidates remain independently qualified evidence only until a separate ring grants execution and publication authority.
 
 - [3.0.0 plan](3.0.0-plan.md)
 - [3.0.0 regression baseline](3.0.0-regression-baseline.md)

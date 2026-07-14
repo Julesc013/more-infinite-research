@@ -35,15 +35,22 @@ waves:
   old_targets:
     factorio_1_1:
       branch: tmp/1.1
-      next_version: "1.9.4"
-      source_commit: 498408854170e893a0fa13bdbd11930197892b1d
-      archive_sha256: 431CD5B011B678B089BB4F9B04B22EB5DD32A3411EDB8E7E453E02D920E3A46E
-      status: candidate-qualified-unreleased
+      version: "1.9.4"
+      tag_commit: 426d6d48c6578a786ea7de0f224282baff9d342b
+      post_publication_commit: 1e461ecb0785ee34905ab69b1c0e8791135cf98a
+      archive_sha256: 74BA83E1F02FABBC52C09AC6144A409B243066663A6D132A47334459C2665BFB
+      github_status: published-and-verified
+      mod_portal_status: blocked-missing-upload-api-key
+      status: published-github-portal-blocked
     factorio_1_0:
       branch: tmp/1.0
-      next_version: "1.8.2"
-      staged_commit: aeb14831132572037c4288b595b22978fdda6646
-      status: staged-unqualified
+      version: "1.8.2"
+      tag_commit: 0a192c27674a6b13847e2f5e1b2b530e62419ee8
+      post_publication_commit: b4e0b3de2fd87683d0c0de5bedaa8e94c6c74fe2
+      archive_sha256: 676927ECF801114CA8F7B9EFD6D139906432BCC60BE26B8CA5C08842E3686EFE
+      github_status: published-and-verified
+      mod_portal_status: blocked-missing-upload-api-key
+      status: published-github-portal-blocked
     factorio_0_18:
       branch: tmp/0.18
       version: "1.8.0"
@@ -51,11 +58,15 @@ waves:
     factorio_0_17:
       branch: tmp/0.17
       next_version: "1.7.1"
-      status: refresh-pending
+      predecessor_version: "1.7.0"
+      predecessor_commit: 1a9b5a7b1162f8dca8125ef7bb792f57a9ae282b
+      canonical_source_anchor: 53090c6f860bf9cb9aaf10140cbfe3924ef59c6c
+      status: documented-not-started-authority-required
     factorio_0_16:
       branch: tmp/0.16
       next_version: "1.6.0"
-      status: binary-available-proof-pending
+      canonical_source_anchor: 53090c6f860bf9cb9aaf10140cbfe3924ef59c6c
+      status: documented-not-started-after-0.17
     factorio_0_15:
       branch: tmp/0.15
       next_version: "1.5.0"
