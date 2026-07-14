@@ -1,10 +1,9 @@
 local S = {}
 
 S.default_value = "100"
-S.allowed_values = {"1000", "750", "500", "400", "300", "250", "200", "150", "125", "100", "75", "50", "25"}
+S.allowed_values = {"500", "400", "300", "250", "200", "150", "125", "100", "75", "50"}
 
 local multiplier_by_value = {
-  ["25"] = 0.25,
   ["50"] = 0.5,
   ["75"] = 0.75,
   ["100"] = 1,
@@ -14,9 +13,7 @@ local multiplier_by_value = {
   ["250"] = 2.5,
   ["300"] = 3,
   ["400"] = 4,
-  ["500"] = 5,
-  ["750"] = 7.5,
-  ["1000"] = 10
+  ["500"] = 5
 }
 
 local function startup_setting(name)
@@ -26,10 +23,6 @@ end
 
 function S.parse(value)
   if value == nil then return 1 end
-
-  -- Portable profiles may provide a validated numeric percentage outside the
-  -- curated dropdown. Factorio's registered string setting remains a dropdown.
-  if type(value) == "number" then return value / 100 end
 
   local key = tostring(value)
   if multiplier_by_value[key] then return multiplier_by_value[key] end

@@ -4,9 +4,9 @@
   "title": "MIR Fixture - Assert Lab Skip Policy",
   "author": "Julesc013",
   "description": "Validation fixture that asserts MIR skips an incompatible lab science-pack set when the skip policy is active.",
-  "factorio_version": "2.1",
+  "factorio_version": "0.16",
   "dependencies": [
-    "base >= 2.1.8",
+    "base >= 0.16",
     "more-infinite-research",
     "mir-fixture-custom-lab",
     "mir-fixture-item-science-pack"

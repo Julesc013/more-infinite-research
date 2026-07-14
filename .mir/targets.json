@@ -397,7 +397,7 @@
     "0.16": {
       "factorio_version": "0.16",
       "support_class": "old-science-native-infinite",
-      "validation_status": "planned-binary-proof-required",
+      "validation_status": "qualified-lower-wave-candidate",
       "runtime_state_backend": "global",
       "science_family": "legacy-0.16",
       "reduced_legacy": true,
@@ -436,6 +436,21 @@
         "technology_constant_overlays": false,
         "productivity_family_adoption": false
       },
+      "supported_required_mods": [],
+      "supported_effect_types": [
+        "character-build-distance",
+        "character-crafting-speed",
+        "character-inventory-slots-bonus",
+        "character-item-drop-distance",
+        "character-logistic-trash-slots",
+        "character-mining-speed",
+        "character-reach-distance",
+        "character-resource-reach-distance",
+        "character-running-speed",
+        "gun-speed",
+        "laboratory-productivity",
+        "worker-robot-battery"
+      ],
       "required_validation_groups": [
         "static",
         "package",

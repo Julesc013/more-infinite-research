@@ -254,7 +254,7 @@ local function add_constant_overlay(base_icons, overlay)
   if #out == 0 then
     out = {{
       icon = "__base__/graphics/technology/mining-productivity.png",
-      icon_size = 256
+      icon_size = target_line.fallback_technology_icon_size()
     }}
   end
   if overlay == false then return out end
@@ -292,7 +292,7 @@ function I.effect_icons_for_stream(stream)
   if base and #base > 0 then return base end
   return {{
     icon = "__base__/graphics/technology/mining-productivity.png",
-    icon_size = 256
+    icon_size = target_line.fallback_technology_icon_size()
   }}
 end
 

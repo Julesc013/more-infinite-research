@@ -3,10 +3,10 @@
   "version": "0.1.0",
   "title": "MIR Fixture - Assert Hidden Setting Readability",
   "author": "Julesc013",
-  "description": "Validation fixture that asserts unavailable MIR settings are hidden without deleting their registered, readable values.",
-  "factorio_version": "2.1",
+  "description": "Validation fixture that asserts governed MIR stream startup settings stay registered and readable during the data stage.",
+  "factorio_version": "0.16",
   "dependencies": [
-    "base >= 2.1.8",
+    "base >= 0.16",
     "more-infinite-research"
   ]
 }
