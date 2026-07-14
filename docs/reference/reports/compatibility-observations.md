@@ -12,6 +12,4 @@ superseded_by: []
 
 # Compatibility Observations
 
-Compatibility observations are non-blocking diagnostics collected during
-compatibility audit runs. They explain interesting mod behavior without turning
-it into a failure by default.
+Compatibility observations are non-blocking diagnostics collected during compatibility audit runs. They explain interesting mod behavior without turning it into a failure by default.

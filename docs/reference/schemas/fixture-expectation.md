@@ -12,8 +12,7 @@ superseded_by: []
 
 # Fixture Expectation Schema
 
-Fixture expectations describe what a test fixture proves and which claim or
-capability it protects.
+Fixture expectations describe what a test fixture proves and which claim or capability it protects.
 
 Minimum fields:
 

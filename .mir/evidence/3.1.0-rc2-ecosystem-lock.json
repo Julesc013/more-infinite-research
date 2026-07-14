@@ -1,0 +1,2012 @@
+{
+  "schema": 1,
+  "generated_at": "2026-07-12T21:38:15+10:00",
+  "min_downloads": 10000,
+  "factorio_line": "2.1",
+  "factorio_versions": [
+    "2.1"
+  ],
+  "include_space_age": false,
+  "scenario_timeout_seconds": 900,
+  "continue_on_dependency_failure": true,
+  "include_recommended_dependencies": false,
+  "max_candidates": 50,
+  "catalog_pages": 0,
+  "from_lockfile": "",
+  "start_index": 0,
+  "count": 0,
+  "offline": true,
+  "local_mod_zip_dirs": [],
+  "local_mod_zips": [],
+  "local_mod_library_dirs": [
+    "C:\\Projects\\Factorio\\testmods_2.1"
+  ],
+  "local_mod_library_zips": [],
+  "mod_under_test_zip": "C:\\Projects\\Factorio\\more-infinite-research\\build\\validation-dist\\more-infinite-research_3.1.0.zip",
+  "mod_under_test_sha256": "7CC222EC860F21EBAA5C3E72F2C42BD97BF7A8DA8AE938AFA57D83994991676D",
+  "mod_under_test_source_commit": "4cdb8595de94316b45169e1722d623684d9086a1",
+  "link_mode": "Copy",
+  "local_root_zip_count": 0,
+  "local_library_zip_count": 594,
+  "candidates_selected": [],
+  "manual_scenarios_selected": [
+    "local-2-1-aai-loaders",
+    "local-2-1-aai-industry",
+    "local-2-1-aai-loaders-industry",
+    "local-2-1-aai-representative-extensions",
+    "local-2-1-bz-suite-space-age",
+    "local-2-1-krastorio-spaced-out",
+    "local-2-1-krastorio-base",
+    "local-2-1-bob-suite"
+  ],
+  "generated_local_scenarios_selected": [],
+  "local_zip_scenarios_selected": [],
+  "mods": [
+    {
+      "name": "aai-containers",
+      "title": "AAI Containers & Warehouses",
+      "version": "0.4.0",
+      "factorio_version": "2.1",
+      "downloads_count": 0,
+      "category": "local",
+      "owner": "local",
+      "file_name": "aai-containers_0.4.0.zip",
+      "sha1": "61add69db9376ee603ebd5226083b7c10ef5ebe5",
+      "sha256": "e353a4108f98b7a0b59c9324095575b195e81512c41fa87347b29d717346f47c",
+      "download_url": "",
+      "source": "local_zip",
+      "source_path": "C:\\Projects\\Factorio\\testmods_2.1\\aai-containers_0.4.0.zip",
+      "dependencies": [
+        {
+          "name": "base",
+          "kind": "required",
+          "required": true,
+          "raw": "base >= 2.1.7"
+        },
+        {
+          "name": "space-age",
+          "kind": "hidden_optional",
+          "required": false,
+          "raw": "(?) space-age >= 2.1.0"
+        }
+      ]
+    },
+    {
+      "name": "aai-industry",
+      "title": "AAI Industry",
+      "version": "0.7.0",
+      "factorio_version": "2.1",
+      "downloads_count": 0,
+      "category": "local",
+      "owner": "local",
+      "file_name": "aai-industry_0.7.0.zip",
+      "sha1": "2541e09962caf0a6ec9cfbefb210d5ed403dcd1f",
+      "sha256": "8be588f276d9835b21ac4874113dd107b182692301487b6f7f6c542c4b1f75ac",
+      "download_url": "",
+      "source": "local_zip",
+      "source_path": "C:\\Projects\\Factorio\\testmods_2.1\\aai-industry_0.7.0.zip",
+      "dependencies": [
+        {
+          "name": "base",
+          "kind": "required",
+          "required": true,
+          "raw": "base >= 2.1.7"
+        },
+        {
+          "name": "space-age",
+          "kind": "optional",
+          "required": false,
+          "raw": "? space-age >= 2.1.0"
+        },
+        {
+          "name": "aai-containers",
+          "kind": "optional",
+          "required": false,
+          "raw": "? aai-containers >= 0.4.0"
+        },
+        {
+          "name": "InserterFuelLeech",
+          "kind": "optional",
+          "required": false,
+          "raw": "? InserterFuelLeech >= 0.2.6"
+        },
+        {
+          "name": "Krastorio2",
+          "kind": "hidden_optional",
+          "required": false,
+          "raw": "(?) Krastorio2 >= 2.0.6"
+        },
+        {
+          "name": "angelsrefining",
+          "kind": "hidden_optional",
+          "required": false,
+          "raw": "(?) angelsrefining"
+        },
+        {
+          "name": "bobelectronics",
+          "kind": "hidden_optional",
+          "required": false,
+          "raw": "(?) bobelectronics"
+        }
+      ]
+    },
+    {
+      "name": "aai-loaders",
+      "title": "AAI Loaders",
+      "version": "0.3.0",
+      "factorio_version": "2.1",
+      "downloads_count": 0,
+      "category": "local",
+      "owner": "local",
+      "file_name": "aai-loaders_0.3.0.zip",
+      "sha1": "ca213a948e5efb3da0647272e98701262dc59120",
+      "sha256": "1236800ae998367aae1a26d3ac3728484088d051f89c66c6c860ba1fe195c85e",
+      "download_url": "",
+      "source": "local_zip",
+      "source_path": "C:\\Projects\\Factorio\\testmods_2.1\\aai-loaders_0.3.0.zip",
+      "dependencies": [
+        {
+          "name": "base",
+          "kind": "required",
+          "required": true,
+          "raw": "base >= 2.1.6"
+        },
+        {
+          "name": "space-age",
+          "kind": "optional",
+          "required": false,
+          "raw": "? space-age >= 2.1.0"
+        }
+      ]
+    },
+    {
+      "name": "bobassembly",
+      "title": "Bob's Assembling machines mod",
+      "version": "3.0.1",
+      "factorio_version": "2.1",
+      "downloads_count": 0,
+      "category": "local",
+      "owner": "local",
+      "file_name": "bobassembly_3.0.1.zip",
+      "sha1": "34cf3b51af59303cdfb0db9615b52307075e79dd",
+      "sha256": "52c1f487015f1cfa0329a90faeed4ced7ef4d875a6d91cedad011ba3e483f5d6",
+      "download_url": "",
+      "source": "local_zip",
+      "source_path": "C:\\Projects\\Factorio\\testmods_2.1\\bobassembly_3.0.1.zip",
+      "dependencies": [
+        {
+          "name": "base",
+          "kind": "required",
+          "required": true,
+          "raw": "base >= 2.1.0"
+        },
+        {
+          "name": "boblibrary",
+          "kind": "required",
+          "required": true,
+          "raw": "boblibrary >= 3.0.0"
+        },
+        {
+          "name": "bobplates",
+          "kind": "optional",
+          "required": false,
+          "raw": "? bobplates >= 3.0.0"
+        },
+        {
+          "name": "space-age",
+          "kind": "optional",
+          "required": false,
+          "raw": "? space-age >= 2.1.0"
+        }
+      ]
+    },
+    {
+      "name": "bobelectronics",
+      "title": "Bob's Electronics mod",
+      "version": "3.0.0",
+      "factorio_version": "2.1",
+      "downloads_count": 0,
+      "category": "local",
+      "owner": "local",
+      "file_name": "bobelectronics_3.0.0.zip",
+      "sha1": "a15fdaecb93024ce50d1bf650ce8cf7587121f9a",
+      "sha256": "6328d0d4bf27308a18165fd994a44904d83ed51e6c72a2b3d5b341c1e8741b3a",
+      "download_url": "",
+      "source": "local_zip",
+      "source_path": "C:\\Projects\\Factorio\\testmods_2.1\\bobelectronics_3.0.0.zip",
+      "dependencies": [
+        {
+          "name": "base",
+          "kind": "required",
+          "required": true,
+          "raw": "base >= 2.1.0"
+        },
+        {
+          "name": "boblibrary",
+          "kind": "required",
+          "required": true,
+          "raw": "boblibrary >= 3.0.0"
+        },
+        {
+          "name": "bobplates",
+          "kind": "optional",
+          "required": false,
+          "raw": "? bobplates >= 3.0.0"
+        }
+      ]
+    },
+    {
+      "name": "bobenemies",
+      "title": "Bob's Enemies mod",
+      "version": "3.0.0",
+      "factorio_version": "2.1",
+      "downloads_count": 0,
+      "category": "local",
+      "owner": "local",
+      "file_name": "bobenemies_3.0.0.zip",
+      "sha1": "b680a1968116ca084a7f0517d6e7d0b4072f54fa",
+      "sha256": "7477d5c37d2945b7280ab43ab50a375535e87d23b44b19995da10e0edb7514de",
+      "download_url": "",
+      "source": "local_zip",
+      "source_path": "C:\\Projects\\Factorio\\testmods_2.1\\bobenemies_3.0.0.zip",
+      "dependencies": [
+        {
+          "name": "base",
+          "kind": "required",
+          "required": true,
+          "raw": "base >= 2.1.0"
+        },
+        {
+          "name": "boblibrary",
+          "kind": "required",
+          "required": true,
+          "raw": "boblibrary >= 3.0.0"
+        },
+        {
+          "name": "space-age",
+          "kind": "optional",
+          "required": false,
+          "raw": "? space-age >= 2.1.0"
+        },
+        {
+          "name": "combat-mechanics-overhaul",
+          "kind": "hidden_optional",
+          "required": false,
+          "raw": "(?) combat-mechanics-overhaul"
+        }
+      ]
+    },
+    {
+      "name": "bobequipment",
+      "title": "Bob's Personal Equipment mod",
+      "version": "3.0.0",
+      "factorio_version": "2.1",
+      "downloads_count": 0,
+      "category": "local",
+      "owner": "local",
+      "file_name": "bobequipment_3.0.0.zip",
+      "sha1": "b338ec0c16a8a241a07051266ca97313063d1563",
+      "sha256": "608205c0b7fedb7a400c6111e5857bf33ee14ba10dadbe5ad2b78e203fe8b5ed",
+      "download_url": "",
+      "source": "local_zip",
+      "source_path": "C:\\Projects\\Factorio\\testmods_2.1\\bobequipment_3.0.0.zip",
+      "dependencies": [
+        {
+          "name": "base",
+          "kind": "required",
+          "required": true,
+          "raw": "base >= 2.1.0"
+        },
+        {
+          "name": "boblibrary",
+          "kind": "required",
+          "required": true,
+          "raw": "boblibrary >= 3.0.0"
+        },
+        {
+          "name": "bobenemies",
+          "kind": "optional",
+          "required": false,
+          "raw": "? bobenemies >= 3.0.0"
+        },
+        {
+          "name": "bobplates",
+          "kind": "optional",
+          "required": false,
+          "raw": "? bobplates >= 3.0.0"
+        },
+        {
+          "name": "boblogistics",
+          "kind": "optional",
+          "required": false,
+          "raw": "? boblogistics >= 3.0.0"
+        },
+        {
+          "name": "space-age",
+          "kind": "hidden_optional",
+          "required": false,
+          "raw": "(?) space-age"
+        }
+      ]
+    },
+    {
+      "name": "boblibrary",
+      "title": "Bob's Functions Library mod",
+      "version": "3.0.0",
+      "factorio_version": "2.1",
+      "downloads_count": 0,
+      "category": "local",
+      "owner": "local",
+      "file_name": "boblibrary_3.0.0.zip",
+      "sha1": "3461f86a59d34badfe8f04338b12b6df0458a330",
+      "sha256": "49eae2d4d8e58ebd28bafdb7e71d5307cbce2077e0642440ed7ec527d466ffc4",
+      "download_url": "",
+      "source": "local_zip",
+      "source_path": "C:\\Projects\\Factorio\\testmods_2.1\\boblibrary_3.0.0.zip",
+      "dependencies": [
+        {
+          "name": "base",
+          "kind": "required",
+          "required": true,
+          "raw": "base >= 2.1.0"
+        }
+      ]
+    },
+    {
+      "name": "boblogistics",
+      "title": "Bob's Logistics mod",
+      "version": "3.0.0",
+      "factorio_version": "2.1",
+      "downloads_count": 0,
+      "category": "local",
+      "owner": "local",
+      "file_name": "boblogistics_3.0.0.zip",
+      "sha1": "7781b6f29f80cfbc61bfa2ab8445a7a18e19a414",
+      "sha256": "476ae28e79c1da2d698bcaa272b032981fceb23b4ae962ef591fa778c7a67cea",
+      "download_url": "",
+      "source": "local_zip",
+      "source_path": "C:\\Projects\\Factorio\\testmods_2.1\\boblogistics_3.0.0.zip",
+      "dependencies": [
+        {
+          "name": "base",
+          "kind": "required",
+          "required": true,
+          "raw": "base >= 2.1.0"
+        },
+        {
+          "name": "boblibrary",
+          "kind": "required",
+          "required": true,
+          "raw": "boblibrary >= 3.0.0"
+        },
+        {
+          "name": "bobplates",
+          "kind": "optional",
+          "required": false,
+          "raw": "? bobplates >= 3.0.0"
+        },
+        {
+          "name": "bobinserters",
+          "kind": "optional",
+          "required": false,
+          "raw": "? bobinserters >= 3.0.0"
+        },
+        {
+          "name": "space-age",
+          "kind": "optional",
+          "required": false,
+          "raw": "? space-age >= 2.1.0"
+        },
+        {
+          "name": "valves",
+          "kind": "optional",
+          "required": false,
+          "raw": "? valves"
+        },
+        {
+          "name": "Krastorio2",
+          "kind": "hidden_optional",
+          "required": false,
+          "raw": "(?) Krastorio2"
+        },
+        {
+          "name": "aai-loaders",
+          "kind": "hidden_optional",
+          "required": false,
+          "raw": "(?) aai-loaders"
+        }
+      ]
+    },
+    {
+      "name": "bobmining",
+      "title": "Bob's Mining mod",
+      "version": "3.0.0",
+      "factorio_version": "2.1",
+      "downloads_count": 0,
+      "category": "local",
+      "owner": "local",
+      "file_name": "bobmining_3.0.0.zip",
+      "sha1": "177f3bb23de9fa381342a94d7ee5b31b70b17ee1",
+      "sha256": "93ac125a01e1608a27dd2080e7bae5cae3a895ae8e3859e1155deb894ca17463",
+      "download_url": "",
+      "source": "local_zip",
+      "source_path": "C:\\Projects\\Factorio\\testmods_2.1\\bobmining_3.0.0.zip",
+      "dependencies": [
+        {
+          "name": "base",
+          "kind": "required",
+          "required": true,
+          "raw": "base >= 2.1.0"
+        },
+        {
+          "name": "boblibrary",
+          "kind": "required",
+          "required": true,
+          "raw": "boblibrary >= 3.0.0"
+        },
+        {
+          "name": "bobores",
+          "kind": "optional",
+          "required": false,
+          "raw": "? bobores >= 3.0.0"
+        },
+        {
+          "name": "bobplates",
+          "kind": "optional",
+          "required": false,
+          "raw": "? bobplates >= 3.0.0"
+        }
+      ]
+    },
+    {
+      "name": "bobmodules",
+      "title": "Bob's Modules mod",
+      "version": "3.0.0",
+      "factorio_version": "2.1",
+      "downloads_count": 0,
+      "category": "local",
+      "owner": "local",
+      "file_name": "bobmodules_3.0.0.zip",
+      "sha1": "bf137063db105345ac6e4a30c9e4baa5c241e397",
+      "sha256": "4f6404b65db281ecb2c16fb5cb918e64f995035b6e5b8719813f486fb98b0f7e",
+      "download_url": "",
+      "source": "local_zip",
+      "source_path": "C:\\Projects\\Factorio\\testmods_2.1\\bobmodules_3.0.0.zip",
+      "dependencies": [
+        {
+          "name": "base",
+          "kind": "required",
+          "required": true,
+          "raw": "base >= 2.1.0"
+        },
+        {
+          "name": "boblibrary",
+          "kind": "required",
+          "required": true,
+          "raw": "boblibrary >= 3.0.0"
+        },
+        {
+          "name": "bobplates",
+          "kind": "optional",
+          "required": false,
+          "raw": "? bobplates >= 3.0.0"
+        },
+        {
+          "name": "bobelectronics",
+          "kind": "optional",
+          "required": false,
+          "raw": "? bobelectronics >= 3.0.0"
+        },
+        {
+          "name": "DiscoScience",
+          "kind": "optional",
+          "required": false,
+          "raw": "? DiscoScience"
+        }
+      ]
+    },
+    {
+      "name": "bobores",
+      "title": "Bob's Ores mod",
+      "version": "3.0.0",
+      "factorio_version": "2.1",
+      "downloads_count": 0,
+      "category": "local",
+      "owner": "local",
+      "file_name": "bobores_3.0.0.zip",
+      "sha1": "c6be7b4f054fb23ca417bb947c7c3419843134c2",
+      "sha256": "7f8e33e35f59bb3f2cd72e3ab2fed30d1c2ae9c117e3731324ac307d9965082b",
+      "download_url": "",
+      "source": "local_zip",
+      "source_path": "C:\\Projects\\Factorio\\testmods_2.1\\bobores_3.0.0.zip",
+      "dependencies": [
+        {
+          "name": "base",
+          "kind": "required",
+          "required": true,
+          "raw": "base >= 2.1.0"
+        },
+        {
+          "name": "boblibrary",
+          "kind": "required",
+          "required": true,
+          "raw": "boblibrary >= 3.0.0"
+        }
+      ]
+    },
+    {
+      "name": "bobplates",
+      "title": "Bob's Metals, Chemicals and Intermediates mod",
+      "version": "3.0.0",
+      "factorio_version": "2.1",
+      "downloads_count": 0,
+      "category": "local",
+      "owner": "local",
+      "file_name": "bobplates_3.0.0.zip",
+      "sha1": "8ad6c9c9a273bcb7b33929747734fb4eafe13c7a",
+      "sha256": "9c18ed29c614e5c96039c2cd0093e21b163e9ba4fe70a776eab9bf7d37d7a1fe",
+      "download_url": "",
+      "source": "local_zip",
+      "source_path": "C:\\Projects\\Factorio\\testmods_2.1\\bobplates_3.0.0.zip",
+      "dependencies": [
+        {
+          "name": "base",
+          "kind": "required",
+          "required": true,
+          "raw": "base >= 2.1.0"
+        },
+        {
+          "name": "boblibrary",
+          "kind": "required",
+          "required": true,
+          "raw": "boblibrary >= 3.0.0"
+        },
+        {
+          "name": "bobores",
+          "kind": "required",
+          "required": true,
+          "raw": "bobores >= 3.0.0"
+        },
+        {
+          "name": "bobenemies",
+          "kind": "optional",
+          "required": false,
+          "raw": "? bobenemies >= 3.0.0"
+        },
+        {
+          "name": "space-age",
+          "kind": "optional",
+          "required": false,
+          "raw": "? space-age >= 2.1.0"
+        }
+      ]
+    },
+    {
+      "name": "bobpower",
+      "title": "Bob's Power mod",
+      "version": "3.0.0",
+      "factorio_version": "2.1",
+      "downloads_count": 0,
+      "category": "local",
+      "owner": "local",
+      "file_name": "bobpower_3.0.0.zip",
+      "sha1": "ab00d4043c9b56e8621d041b4956a1ae5799c589",
+      "sha256": "c33c7b521bec061adf695a14bf3a218259fc0548b5f5ab512e74eceaeda39831",
+      "download_url": "",
+      "source": "local_zip",
+      "source_path": "C:\\Projects\\Factorio\\testmods_2.1\\bobpower_3.0.0.zip",
+      "dependencies": [
+        {
+          "name": "base",
+          "kind": "required",
+          "required": true,
+          "raw": "base >= 2.1.0"
+        },
+        {
+          "name": "boblibrary",
+          "kind": "required",
+          "required": true,
+          "raw": "boblibrary >= 3.0.0"
+        },
+        {
+          "name": "bobplates",
+          "kind": "optional",
+          "required": false,
+          "raw": "? bobplates >= 3.0.0"
+        }
+      ]
+    },
+    {
+      "name": "bobrevamp",
+      "title": "Bob's Revamp mod",
+      "version": "3.0.0",
+      "factorio_version": "2.1",
+      "downloads_count": 0,
+      "category": "local",
+      "owner": "local",
+      "file_name": "bobrevamp_3.0.0.zip",
+      "sha1": "3a889c50c745b2f69d3f3e3bed5b7d3c81e75a78",
+      "sha256": "aefac11f71aa82b2385d92fbac1c22fd6caef12e751a85ca63472ae8a4dc5703",
+      "download_url": "",
+      "source": "local_zip",
+      "source_path": "C:\\Projects\\Factorio\\testmods_2.1\\bobrevamp_3.0.0.zip",
+      "dependencies": [
+        {
+          "name": "base",
+          "kind": "required",
+          "required": true,
+          "raw": "base >= 2.1.0"
+        },
+        {
+          "name": "boblibrary",
+          "kind": "required",
+          "required": true,
+          "raw": "boblibrary >= 3.0.0"
+        },
+        {
+          "name": "bobplates",
+          "kind": "optional",
+          "required": false,
+          "raw": "? bobplates >= 3.0.0"
+        }
+      ]
+    },
+    {
+      "name": "bobtech",
+      "title": "Bob's Technology mod",
+      "version": "3.0.0",
+      "factorio_version": "2.1",
+      "downloads_count": 0,
+      "category": "local",
+      "owner": "local",
+      "file_name": "bobtech_3.0.0.zip",
+      "sha1": "0f53f10a1f1336f722d8b47bf9c954befa635b75",
+      "sha256": "397d979976316c3ce082d2ad29a046ccbaa147e412a0aeb727230bdecf665e5b",
+      "download_url": "",
+      "source": "local_zip",
+      "source_path": "C:\\Projects\\Factorio\\testmods_2.1\\bobtech_3.0.0.zip",
+      "dependencies": [
+        {
+          "name": "base",
+          "kind": "required",
+          "required": true,
+          "raw": "base >= 2.1.0"
+        },
+        {
+          "name": "boblibrary",
+          "kind": "required",
+          "required": true,
+          "raw": "boblibrary >= 3.0.0"
+        },
+        {
+          "name": "bobenemies",
+          "kind": "optional",
+          "required": false,
+          "raw": "? bobenemies >= 3.0.0"
+        },
+        {
+          "name": "bobplates",
+          "kind": "optional",
+          "required": false,
+          "raw": "? bobplates >= 3.0.0"
+        },
+        {
+          "name": "space-age",
+          "kind": "optional",
+          "required": false,
+          "raw": "? space-age >= 2.1.0"
+        },
+        {
+          "name": "DiscoScience",
+          "kind": "optional",
+          "required": false,
+          "raw": "? DiscoScience"
+        }
+      ]
+    },
+    {
+      "name": "bobwarfare",
+      "title": "Bob's Warfare mod",
+      "version": "3.0.0",
+      "factorio_version": "2.1",
+      "downloads_count": 0,
+      "category": "local",
+      "owner": "local",
+      "file_name": "bobwarfare_3.0.0.zip",
+      "sha1": "f9b7c0d74cb7cadfeaa2983227030ffb4e34cfa7",
+      "sha256": "f5fead69eb876759547180612086b69add8e2ee28145c1c2b2d8198911be1073",
+      "download_url": "",
+      "source": "local_zip",
+      "source_path": "C:\\Projects\\Factorio\\testmods_2.1\\bobwarfare_3.0.0.zip",
+      "dependencies": [
+        {
+          "name": "base",
+          "kind": "required",
+          "required": true,
+          "raw": "base >= 2.1.0"
+        },
+        {
+          "name": "boblibrary",
+          "kind": "required",
+          "required": true,
+          "raw": "boblibrary >= 3.0.0"
+        },
+        {
+          "name": "bobplates",
+          "kind": "optional",
+          "required": false,
+          "raw": "? bobplates >= 3.0.0"
+        },
+        {
+          "name": "bobenemies",
+          "kind": "optional",
+          "required": false,
+          "raw": "? bobenemies >= 3.0.0"
+        },
+        {
+          "name": "aai-programmable-vehicles",
+          "kind": "hidden_optional",
+          "required": false,
+          "raw": "(?) aai-programmable-vehicles"
+        }
+      ]
+    },
+    {
+      "name": "bzcarbon",
+      "title": "Graphite & Diamonds",
+      "version": "2.0.23",
+      "factorio_version": "2.1",
+      "downloads_count": 0,
+      "category": "local",
+      "owner": "local",
+      "file_name": "bzcarbon_2.0.23.zip",
+      "sha1": "a73f4b63d6fbe357d6e1c76488dd2bb1ede60fbf",
+      "sha256": "97fd7defc9b7a3cd7ed4be5e9180ca69576536e17a207fe62b8fe39c886aa19f",
+      "download_url": "",
+      "source": "local_zip",
+      "source_path": "C:\\Projects\\Factorio\\testmods_2.1\\bzcarbon_2.0.23.zip",
+      "dependencies": [
+        {
+          "name": "base",
+          "kind": "required",
+          "required": true,
+          "raw": "base >= 2.0.42"
+        },
+        {
+          "name": "space-age",
+          "kind": "optional",
+          "required": false,
+          "raw": "? space-age"
+        },
+        {
+          "name": "bztitanium",
+          "kind": "optional",
+          "required": false,
+          "raw": "? bztitanium"
+        },
+        {
+          "name": "bzsilicon",
+          "kind": "optional",
+          "required": false,
+          "raw": "? bzsilicon"
+        },
+        {
+          "name": "bzzirconium",
+          "kind": "optional",
+          "required": false,
+          "raw": "? bzzirconium"
+        },
+        {
+          "name": "bzfoundry",
+          "kind": "optional",
+          "required": false,
+          "raw": "? bzfoundry"
+        },
+        {
+          "name": "space-exploration",
+          "kind": "optional",
+          "required": false,
+          "raw": "? space-exploration"
+        },
+        {
+          "name": "aai-industry",
+          "kind": "optional",
+          "required": false,
+          "raw": "? aai-industry"
+        },
+        {
+          "name": "Krastorio2",
+          "kind": "optional",
+          "required": false,
+          "raw": "? Krastorio2"
+        },
+        {
+          "name": "Krastorio2-spaced-out",
+          "kind": "optional",
+          "required": false,
+          "raw": "? Krastorio2-spaced-out"
+        },
+        {
+          "name": "248k",
+          "kind": "optional",
+          "required": false,
+          "raw": "? 248k"
+        },
+        {
+          "name": "modmashsplintersubspacelogistics",
+          "kind": "hidden_optional",
+          "required": false,
+          "raw": "(?) modmashsplintersubspacelogistics"
+        },
+        {
+          "name": "deadlock-beltboxes-loaders",
+          "kind": "optional",
+          "required": false,
+          "raw": "? deadlock-beltboxes-loaders"
+        },
+        {
+          "name": "DeadlockCrating",
+          "kind": "optional",
+          "required": false,
+          "raw": "? DeadlockCrating"
+        }
+      ]
+    },
+    {
+      "name": "bzlead",
+      "title": "Lead",
+      "version": "2.0.29",
+      "factorio_version": "2.1",
+      "downloads_count": 0,
+      "category": "local",
+      "owner": "local",
+      "file_name": "bzlead_2.0.29.zip",
+      "sha1": "aeb0861aff66bab8998b521b1965127e65b99e9c",
+      "sha256": "956df1ac308af33c4fde8f9b2b94ae9d79aa7b350fa76e15d98709c904ed77fb",
+      "download_url": "",
+      "source": "local_zip",
+      "source_path": "C:\\Projects\\Factorio\\testmods_2.1\\bzlead_2.0.29.zip",
+      "dependencies": [
+        {
+          "name": "base",
+          "kind": "required",
+          "required": true,
+          "raw": "base >= 1.1.0"
+        },
+        {
+          "name": "space-age",
+          "kind": "optional",
+          "required": false,
+          "raw": "? space-age"
+        },
+        {
+          "name": "bzsilicon",
+          "kind": "optional",
+          "required": false,
+          "raw": "? bzsilicon"
+        },
+        {
+          "name": "hot-metals",
+          "kind": "optional",
+          "required": false,
+          "raw": "? hot-metals"
+        },
+        {
+          "name": "space-exploration",
+          "kind": "optional",
+          "required": false,
+          "raw": "? space-exploration"
+        },
+        {
+          "name": "Krastorio2",
+          "kind": "optional",
+          "required": false,
+          "raw": "? Krastorio2"
+        },
+        {
+          "name": "Krastorio2-spaced-out",
+          "kind": "optional",
+          "required": false,
+          "raw": "? Krastorio2-spaced-out"
+        },
+        {
+          "name": "Rich-Rocks-Requiem",
+          "kind": "optional",
+          "required": false,
+          "raw": "? Rich-Rocks-Requiem"
+        },
+        {
+          "name": "248k",
+          "kind": "optional",
+          "required": false,
+          "raw": "? 248k"
+        },
+        {
+          "name": "tenebris",
+          "kind": "optional",
+          "required": false,
+          "raw": "? tenebris"
+        },
+        {
+          "name": "deadlock-beltboxes-loaders",
+          "kind": "optional",
+          "required": false,
+          "raw": "? deadlock-beltboxes-loaders"
+        },
+        {
+          "name": "DeadlockCrating",
+          "kind": "optional",
+          "required": false,
+          "raw": "? DeadlockCrating"
+        }
+      ]
+    },
+    {
+      "name": "bzsilicon",
+      "title": "Silica & Silicon",
+      "version": "2.0.19",
+      "factorio_version": "2.1",
+      "downloads_count": 0,
+      "category": "local",
+      "owner": "local",
+      "file_name": "bzsilicon_2.0.19.zip",
+      "sha1": "523af6d39917d6aa9729f3f7720b5cf4f41c54e4",
+      "sha256": "d405b90c531c478f6f48d954751aa487a61caf59dc09fddf87bfd371ffe4de40",
+      "download_url": "",
+      "source": "local_zip",
+      "source_path": "C:\\Projects\\Factorio\\testmods_2.1\\bzsilicon_2.0.19.zip",
+      "dependencies": [
+        {
+          "name": "space-age",
+          "kind": "optional",
+          "required": false,
+          "raw": "? space-age"
+        },
+        {
+          "name": "Krastorio2",
+          "kind": "optional",
+          "required": false,
+          "raw": "? Krastorio2"
+        },
+        {
+          "name": "Krastorio2-spaced-out",
+          "kind": "optional",
+          "required": false,
+          "raw": "? Krastorio2-spaced-out"
+        },
+        {
+          "name": "space-exploration",
+          "kind": "optional",
+          "required": false,
+          "raw": "? space-exploration"
+        },
+        {
+          "name": "248k",
+          "kind": "optional",
+          "required": false,
+          "raw": "? 248k"
+        },
+        {
+          "name": "aai-industry",
+          "kind": "optional",
+          "required": false,
+          "raw": "? aai-industry"
+        },
+        {
+          "name": "modmashsplinterelectronics",
+          "kind": "optional",
+          "required": false,
+          "raw": "? modmashsplinterelectronics"
+        },
+        {
+          "name": "bztitanium",
+          "kind": "optional",
+          "required": false,
+          "raw": "? bztitanium"
+        },
+        {
+          "name": "IndustrialRevolution",
+          "kind": "hidden_optional",
+          "required": false,
+          "raw": "(?) IndustrialRevolution"
+        },
+        {
+          "name": "base",
+          "kind": "required",
+          "required": true,
+          "raw": "base"
+        }
+      ]
+    },
+    {
+      "name": "bztin",
+      "title": "Tin",
+      "version": "2.1.16",
+      "factorio_version": "2.1",
+      "downloads_count": 0,
+      "category": "local",
+      "owner": "local",
+      "file_name": "bztin_2.1.16.zip",
+      "sha1": "ad65d55a2a4b5765167ca7db729307d99bac2f76",
+      "sha256": "eac78322c9edad0e618245f0602b7ca7479e91690fcac4b3bc2b3d2c4adfe4de",
+      "download_url": "",
+      "source": "local_zip",
+      "source_path": "C:\\Projects\\Factorio\\testmods_2.1\\bztin_2.1.16.zip",
+      "dependencies": [
+        {
+          "name": "base",
+          "kind": "required",
+          "required": true,
+          "raw": "base >= 1.1.0"
+        },
+        {
+          "name": "bzfoundry",
+          "kind": "optional",
+          "required": false,
+          "raw": "? bzfoundry >= 0.2.1"
+        },
+        {
+          "name": "bztitanium",
+          "kind": "optional",
+          "required": false,
+          "raw": "? bztitanium >= 1.2.0"
+        },
+        {
+          "name": "bzlead",
+          "kind": "optional",
+          "required": false,
+          "raw": "? bzlead >= 1.2.0"
+        },
+        {
+          "name": "bzzirconium",
+          "kind": "optional",
+          "required": false,
+          "raw": "? bzzirconium >= 0.6.0"
+        },
+        {
+          "name": "bztungsten",
+          "kind": "optional",
+          "required": false,
+          "raw": "? bztungsten >= 0.6.0"
+        },
+        {
+          "name": "bzcarbon",
+          "kind": "optional",
+          "required": false,
+          "raw": "? bzcarbon >= 0.5.5"
+        },
+        {
+          "name": "bzaluminum",
+          "kind": "optional",
+          "required": false,
+          "raw": "? bzaluminum >= 0.4.9"
+        },
+        {
+          "name": "space-exploration",
+          "kind": "optional",
+          "required": false,
+          "raw": "? space-exploration >= 0.5.100"
+        },
+        {
+          "name": "aai-industry",
+          "kind": "hidden_optional",
+          "required": false,
+          "raw": "(?) aai-industry"
+        },
+        {
+          "name": "aai-industry",
+          "kind": "optional",
+          "required": false,
+          "raw": "? aai-industry"
+        },
+        {
+          "name": "hot-metals",
+          "kind": "optional",
+          "required": false,
+          "raw": "? hot-metals"
+        },
+        {
+          "name": "Krastorio2",
+          "kind": "optional",
+          "required": false,
+          "raw": "? Krastorio2"
+        },
+        {
+          "name": "Krastorio2-spaced-out",
+          "kind": "optional",
+          "required": false,
+          "raw": "? Krastorio2-spaced-out"
+        },
+        {
+          "name": "sand-and-glass",
+          "kind": "optional",
+          "required": false,
+          "raw": "? sand-and-glass"
+        },
+        {
+          "name": "deadlock-beltboxes-loaders",
+          "kind": "optional",
+          "required": false,
+          "raw": "? deadlock-beltboxes-loaders"
+        },
+        {
+          "name": "DeadlockCrating",
+          "kind": "optional",
+          "required": false,
+          "raw": "? DeadlockCrating"
+        },
+        {
+          "name": "space-age",
+          "kind": "optional",
+          "required": false,
+          "raw": "? space-age"
+        },
+        {
+          "name": "RenaiTransportation",
+          "kind": "hidden_optional",
+          "required": false,
+          "raw": "(?) RenaiTransportation"
+        }
+      ]
+    },
+    {
+      "name": "bztitanium",
+      "title": "Titanium",
+      "version": "2.0.27",
+      "factorio_version": "2.1",
+      "downloads_count": 0,
+      "category": "local",
+      "owner": "local",
+      "file_name": "bztitanium_2.0.27.zip",
+      "sha1": "7690bc0b3d153584bc0b7436cb214d8edd72c8f8",
+      "sha256": "074d430bc67a3a19dfd2d6df47ca44952f4db5ae2ded208f9f555607ffe4c94b",
+      "download_url": "",
+      "source": "local_zip",
+      "source_path": "C:\\Projects\\Factorio\\testmods_2.1\\bztitanium_2.0.27.zip",
+      "dependencies": [
+        {
+          "name": "base",
+          "kind": "required",
+          "required": true,
+          "raw": "base >= 1.0.0"
+        },
+        {
+          "name": "aai-industry",
+          "kind": "optional",
+          "required": false,
+          "raw": "? aai-industry"
+        },
+        {
+          "name": "space-exploration",
+          "kind": "optional",
+          "required": false,
+          "raw": "? space-exploration"
+        },
+        {
+          "name": "Krastorio2",
+          "kind": "optional",
+          "required": false,
+          "raw": "? Krastorio2"
+        },
+        {
+          "name": "Krastorio2-spaced-out",
+          "kind": "optional",
+          "required": false,
+          "raw": "? Krastorio2-spaced-out"
+        },
+        {
+          "name": "Rich-Rocks-Requiem",
+          "kind": "optional",
+          "required": false,
+          "raw": "? Rich-Rocks-Requiem"
+        },
+        {
+          "name": "FactorioExtended-Plus-Core",
+          "kind": "optional",
+          "required": false,
+          "raw": "? FactorioExtended-Plus-Core"
+        },
+        {
+          "name": "Pre0-17-60Oil",
+          "kind": "optional",
+          "required": false,
+          "raw": "? Pre0-17-60Oil"
+        },
+        {
+          "name": "Deadlock-SE-bridge",
+          "kind": "optional",
+          "required": false,
+          "raw": "? Deadlock-SE-bridge"
+        },
+        {
+          "name": "deadlock-beltboxes-loaders",
+          "kind": "optional",
+          "required": false,
+          "raw": "? deadlock-beltboxes-loaders"
+        },
+        {
+          "name": "DeadlockCrating",
+          "kind": "optional",
+          "required": false,
+          "raw": "? DeadlockCrating"
+        },
+        {
+          "name": "modmashsplinterresources",
+          "kind": "optional",
+          "required": false,
+          "raw": "? modmashsplinterresources"
+        },
+        {
+          "name": "EndgameCombat",
+          "kind": "optional",
+          "required": false,
+          "raw": "? EndgameCombat"
+        },
+        {
+          "name": "Power Armor MK3",
+          "kind": "hidden_optional",
+          "required": false,
+          "raw": "(?) Power Armor MK3"
+        },
+        {
+          "name": "248k",
+          "kind": "optional",
+          "required": false,
+          "raw": "? 248k"
+        },
+        {
+          "name": "tenebris",
+          "kind": "optional",
+          "required": false,
+          "raw": "? tenebris"
+        },
+        {
+          "name": "Cerys-Moon-of-Fulgora",
+          "kind": "optional",
+          "required": false,
+          "raw": "? Cerys-Moon-of-Fulgora"
+        },
+        {
+          "name": "atan-nuclear-science",
+          "kind": "hidden_optional",
+          "required": false,
+          "raw": "(?) atan-nuclear-science"
+        },
+        {
+          "name": "casting",
+          "kind": "hidden_optional",
+          "required": false,
+          "raw": "(?) casting"
+        },
+        {
+          "name": "hot-metals",
+          "kind": "optional",
+          "required": false,
+          "raw": "? hot-metals"
+        },
+        {
+          "name": "nullius",
+          "kind": "incompatible",
+          "required": false,
+          "raw": "! nullius"
+        }
+      ]
+    },
+    {
+      "name": "bzzirconium",
+      "title": "Zirconium",
+      "version": "2.1.14",
+      "factorio_version": "2.1",
+      "downloads_count": 0,
+      "category": "local",
+      "owner": "local",
+      "file_name": "bzzirconium_2.1.14.zip",
+      "sha1": "529c379384b1ec4548c23678b9d9684d8ee95059",
+      "sha256": "cc2b262cd4c042198317bf8bd2982d10bffb9a736db3a8b7137ed1922138080e",
+      "download_url": "",
+      "source": "local_zip",
+      "source_path": "C:\\Projects\\Factorio\\testmods_2.1\\bzzirconium_2.1.14.zip",
+      "dependencies": [
+        {
+          "name": "base",
+          "kind": "required",
+          "required": true,
+          "raw": "base >= 1.1.0"
+        },
+        {
+          "name": "space-age",
+          "kind": "optional",
+          "required": false,
+          "raw": "? space-age"
+        },
+        {
+          "name": "space-exploration",
+          "kind": "optional",
+          "required": false,
+          "raw": "? space-exploration"
+        },
+        {
+          "name": "aai-industry",
+          "kind": "optional",
+          "required": false,
+          "raw": "? aai-industry"
+        },
+        {
+          "name": "Krastorio2",
+          "kind": "optional",
+          "required": false,
+          "raw": "? Krastorio2"
+        },
+        {
+          "name": "Krastorio2-spaced-out",
+          "kind": "optional",
+          "required": false,
+          "raw": "? Krastorio2-spaced-out"
+        },
+        {
+          "name": "deadlock-beltboxes-loaders",
+          "kind": "optional",
+          "required": false,
+          "raw": "? deadlock-beltboxes-loaders"
+        },
+        {
+          "name": "DeadlockCrating",
+          "kind": "optional",
+          "required": false,
+          "raw": "? DeadlockCrating"
+        },
+        {
+          "name": "omnimatter",
+          "kind": "optional",
+          "required": false,
+          "raw": "? omnimatter"
+        },
+        {
+          "name": "bzsilicon",
+          "kind": "optional",
+          "required": false,
+          "raw": "? bzsilicon"
+        },
+        {
+          "name": "bzlead",
+          "kind": "optional",
+          "required": false,
+          "raw": "? bzlead"
+        },
+        {
+          "name": "bztitanium",
+          "kind": "optional",
+          "required": false,
+          "raw": "? bztitanium >= 0.12.4"
+        },
+        {
+          "name": "bztungsten",
+          "kind": "optional",
+          "required": false,
+          "raw": "? bztungsten >= 0.5.0"
+        }
+      ]
+    },
+    {
+      "name": "flib",
+      "title": "Factorio Library",
+      "version": "0.17.2",
+      "factorio_version": "2.1",
+      "downloads_count": 0,
+      "category": "local",
+      "owner": "local",
+      "file_name": "flib_0.17.2.zip",
+      "sha1": "6c7cedeefbdce89348d1e979a24e5706fd5a4311",
+      "sha256": "0a48c15dc0fc6c13bb3fe8293ba6cb35a07f3b0f37d37acb50ab30e32e8e019d",
+      "download_url": "",
+      "source": "local_zip",
+      "source_path": "C:\\Projects\\Factorio\\testmods_2.1\\flib_0.17.2.zip",
+      "dependencies": [
+        {
+          "name": "base",
+          "kind": "required",
+          "required": true,
+          "raw": "base >= 2.1.0"
+        }
+      ]
+    },
+    {
+      "name": "k2so-assets",
+      "title": "Krastorio 2 Spaced Out Assets",
+      "version": "1.0.7",
+      "factorio_version": "2.1",
+      "downloads_count": 0,
+      "category": "local",
+      "owner": "local",
+      "file_name": "k2so-assets_1.0.7.zip",
+      "sha1": "94df2729880ed27df14918fd28ed37f448778d14",
+      "sha256": "c3e11214407b08120b2ee717405d3b0398f533647695ab2e6ef6df9267d62017",
+      "download_url": "",
+      "source": "local_zip",
+      "source_path": "C:\\Projects\\Factorio\\testmods_2.1\\k2so-assets_1.0.7.zip",
+      "dependencies": [
+        {
+          "name": "base",
+          "kind": "required",
+          "required": true,
+          "raw": "base >= 2.1.0"
+        }
+      ]
+    },
+    {
+      "name": "Krastorio2",
+      "title": "Krastorio 2",
+      "version": "2.1.2",
+      "factorio_version": "2.1",
+      "downloads_count": 0,
+      "category": "local",
+      "owner": "local",
+      "file_name": "Krastorio2_2.1.2.zip",
+      "sha1": "6ed03661f3887fc39d8615f9063116d41d53c427",
+      "sha256": "89989e60784ea3e94345289e063c64abfce5f35693db7b9a69d656a163620f43",
+      "download_url": "",
+      "source": "local_zip",
+      "source_path": "C:\\Projects\\Factorio\\testmods_2.1\\Krastorio2_2.1.2.zip",
+      "dependencies": [
+        {
+          "name": "base",
+          "kind": "required",
+          "required": true,
+          "raw": "base >= 2.1.7"
+        },
+        {
+          "name": "Krastorio2Assets",
+          "kind": "required",
+          "required": true,
+          "raw": "Krastorio2Assets >= 2.1.0"
+        },
+        {
+          "name": "Krastorio2MenuSimulations",
+          "kind": "required",
+          "required": true,
+          "raw": "Krastorio2MenuSimulations >= 2.1.0"
+        },
+        {
+          "name": "ChangeInserterDropLane",
+          "kind": "recommended",
+          "required": false,
+          "raw": "+ ChangeInserterDropLane >= 1.3.0"
+        },
+        {
+          "name": "flib",
+          "kind": "required",
+          "required": true,
+          "raw": "flib >= 0.16.2"
+        },
+        {
+          "name": "aai-vehicles-chaingunner",
+          "kind": "hidden_optional",
+          "required": false,
+          "raw": "(?) aai-vehicles-chaingunner >= 0.5.2"
+        },
+        {
+          "name": "Aircraft",
+          "kind": "hidden_optional",
+          "required": false,
+          "raw": "(?) Aircraft >= 1.6.6"
+        },
+        {
+          "name": "angelsindustries",
+          "kind": "hidden_optional",
+          "required": false,
+          "raw": "(?) angelsindustries >= 0.4.3"
+        },
+        {
+          "name": "angelspetrochem",
+          "kind": "hidden_optional",
+          "required": false,
+          "raw": "(?) angelspetrochem >= 0.9.11"
+        },
+        {
+          "name": "bobenemies",
+          "kind": "hidden_optional",
+          "required": false,
+          "raw": "(?) bobenemies >= 0.17.6"
+        },
+        {
+          "name": "bullet-trails",
+          "kind": "hidden_optional",
+          "required": false,
+          "raw": "(?) bullet-trails >= 0.4.1"
+        },
+        {
+          "name": "ElectricTrain",
+          "kind": "hidden_optional",
+          "required": false,
+          "raw": "(?) ElectricTrain"
+        },
+        {
+          "name": "deadlock-beltboxes-loaders",
+          "kind": "hidden_optional",
+          "required": false,
+          "raw": "(?) deadlock-beltboxes-loaders >= 2.1.13"
+        },
+        {
+          "name": "DeadlockLargerLamp",
+          "kind": "hidden_optional",
+          "required": false,
+          "raw": "(?) DeadlockLargerLamp >= 1.3.1"
+        },
+        {
+          "name": "Dectorio",
+          "kind": "hidden_optional",
+          "required": false,
+          "raw": "(?) Dectorio >= 0.10.5"
+        },
+        {
+          "name": "DiscoScience",
+          "kind": "hidden_optional",
+          "required": false,
+          "raw": "(?) DiscoScience >= 1.0.0"
+        },
+        {
+          "name": "Flow Control",
+          "kind": "hidden_optional",
+          "required": false,
+          "raw": "(?) Flow Control >= 3.0.5"
+        },
+        {
+          "name": "rso-mod",
+          "kind": "hidden_optional",
+          "required": false,
+          "raw": "(?) rso-mod >= 6.0.6"
+        },
+        {
+          "name": "Tral_robot_tree_farm",
+          "kind": "hidden_optional",
+          "required": false,
+          "raw": "(?) Tral_robot_tree_farm >= 1.2.5"
+        },
+        {
+          "name": "vtk-armor-plating",
+          "kind": "hidden_optional",
+          "required": false,
+          "raw": "(?) vtk-armor-plating >= 0.8.0"
+        },
+        {
+          "name": "WaterAsAResource",
+          "kind": "hidden_optional",
+          "required": false,
+          "raw": "(?) WaterAsAResource >= 0.7.8"
+        },
+        {
+          "name": "better-victory-screen",
+          "kind": "hidden_optional",
+          "required": false,
+          "raw": "(?) better-victory-screen >= 0.2.10"
+        },
+        {
+          "name": "quality",
+          "kind": "hidden_optional",
+          "required": false,
+          "raw": "(?) quality"
+        },
+        {
+          "name": "space-age",
+          "kind": "hidden_optional",
+          "required": false,
+          "raw": "(?) space-age"
+        },
+        {
+          "name": "Annotorio",
+          "kind": "incompatible",
+          "required": false,
+          "raw": "! Annotorio"
+        },
+        {
+          "name": "brave-new-world",
+          "kind": "incompatible",
+          "required": false,
+          "raw": "! brave-new-world"
+        },
+        {
+          "name": "Clowns-Nuclear",
+          "kind": "incompatible",
+          "required": false,
+          "raw": "! Clowns-Nuclear"
+        },
+        {
+          "name": "HdProcessedMetal",
+          "kind": "incompatible",
+          "required": false,
+          "raw": "! HdProcessedMetal"
+        },
+        {
+          "name": "KS_Power",
+          "kind": "incompatible",
+          "required": false,
+          "raw": "! KS_Power"
+        },
+        {
+          "name": "Krastorio",
+          "kind": "incompatible",
+          "required": false,
+          "raw": "! Krastorio"
+        },
+        {
+          "name": "Krastorio-graphics",
+          "kind": "incompatible",
+          "required": false,
+          "raw": "! Krastorio-graphics"
+        },
+        {
+          "name": "KS_Combat",
+          "kind": "incompatible",
+          "required": false,
+          "raw": "! KS_Combat"
+        },
+        {
+          "name": "ModularLife",
+          "kind": "incompatible",
+          "required": false,
+          "raw": "! ModularLife"
+        },
+        {
+          "name": "Power Armor MK3",
+          "kind": "incompatible",
+          "required": false,
+          "raw": "! Power Armor MK3"
+        },
+        {
+          "name": "PowerAndArmor",
+          "kind": "incompatible",
+          "required": false,
+          "raw": "! PowerAndArmor"
+        },
+        {
+          "name": "SimpleSilicon",
+          "kind": "incompatible",
+          "required": false,
+          "raw": "! SimpleSilicon"
+        },
+        {
+          "name": "bobequipment",
+          "kind": "incompatible",
+          "required": false,
+          "raw": "! bobequipment"
+        },
+        {
+          "name": "bobvehicleequipment",
+          "kind": "incompatible",
+          "required": false,
+          "raw": "! bobvehicleequipment"
+        },
+        {
+          "name": "custom_power_armor_fix",
+          "kind": "incompatible",
+          "required": false,
+          "raw": "! custom_power_armor_fix"
+        },
+        {
+          "name": "laborat",
+          "kind": "incompatible",
+          "required": false,
+          "raw": "! laborat"
+        }
+      ]
+    },
+    {
+      "name": "krastorio2_extended_endgame",
+      "title": "Krastorio2 Extended Endgame",
+      "version": "2.1.0",
+      "factorio_version": "2.1",
+      "downloads_count": 0,
+      "category": "local",
+      "owner": "local",
+      "file_name": "krastorio2_extended_endgame_2.1.0.zip",
+      "sha1": "29d8bfc07460410cfcfd55ef1af3961dd07c32c1",
+      "sha256": "ba7bf5f369269fa3dc9a86145e53097b0242ba9071c81c26c75962487634c3b7",
+      "download_url": "",
+      "source": "local_zip",
+      "source_path": "C:\\Projects\\Factorio\\testmods_2.1\\krastorio2_extended_endgame_2.1.0.zip",
+      "dependencies": [
+        {
+          "name": "base",
+          "kind": "required",
+          "required": true,
+          "raw": "base >= 2.1.0"
+        },
+        {
+          "name": "Krastorio2",
+          "kind": "required",
+          "required": true,
+          "raw": "Krastorio2 >= 2.1.0"
+        },
+        {
+          "name": "Krastorio2Assets",
+          "kind": "required",
+          "required": true,
+          "raw": "Krastorio2Assets >= 2.0.0"
+        }
+      ]
+    },
+    {
+      "name": "Krastorio2-spaced-out",
+      "title": "Krastorio 2 Spaced Out",
+      "version": "2.0.13",
+      "factorio_version": "2.1",
+      "downloads_count": 0,
+      "category": "local",
+      "owner": "local",
+      "file_name": "Krastorio2-spaced-out_2.0.13.zip",
+      "sha1": "b8633540afb7f970538183bc26ea9112100ebe45",
+      "sha256": "a2eeb2e5a6119c4117bd3653979d40d305d17539e184bfa6f4ed53ef12a5f242",
+      "download_url": "",
+      "source": "local_zip",
+      "source_path": "C:\\Projects\\Factorio\\testmods_2.1\\Krastorio2-spaced-out_2.0.13.zip",
+      "dependencies": [
+        {
+          "name": "base",
+          "kind": "required",
+          "required": true,
+          "raw": "base >= 2.1.0"
+        },
+        {
+          "name": "space-age",
+          "kind": "required",
+          "required": true,
+          "raw": "space-age >= 2.1.0"
+        },
+        {
+          "name": "Krastorio2",
+          "kind": "required",
+          "required": true,
+          "raw": "Krastorio2"
+        },
+        {
+          "name": "k2so-assets",
+          "kind": "required",
+          "required": true,
+          "raw": "k2so-assets >= 1.0.7"
+        },
+        {
+          "name": "factorioplus",
+          "kind": "incompatible",
+          "required": false,
+          "raw": "! factorioplus"
+        }
+      ]
+    },
+    {
+      "name": "Krastorio2Assets",
+      "title": "Krastorio 2 Assets",
+      "version": "2.1.0",
+      "factorio_version": "2.1",
+      "downloads_count": 0,
+      "category": "local",
+      "owner": "local",
+      "file_name": "Krastorio2Assets_2.1.0.zip",
+      "sha1": "754e187664fd45a4bcfce016366f0029f093a249",
+      "sha256": "39ef950ec8b21a40357dd0240ef8389501ee75cca82717f2773b98554da46e29",
+      "download_url": "",
+      "source": "local_zip",
+      "source_path": "C:\\Projects\\Factorio\\testmods_2.1\\Krastorio2Assets_2.1.0.zip",
+      "dependencies": [
+        {
+          "name": "base",
+          "kind": "required",
+          "required": true,
+          "raw": "base >= 2.1.7"
+        }
+      ]
+    },
+    {
+      "name": "Krastorio2MenuSimulations",
+      "title": "Krastorio 2 Menu Simulations",
+      "version": "2.1.0",
+      "factorio_version": "2.1",
+      "downloads_count": 0,
+      "category": "local",
+      "owner": "local",
+      "file_name": "Krastorio2MenuSimulations_2.1.0.zip",
+      "sha1": "ead8df6d63241e8cb6f0f0def3894d5efa1de3b2",
+      "sha256": "3a485b449b356dc4b3eb4233de4e803b3a001259fbc251bdc9f9d9120b3c53a7",
+      "download_url": "",
+      "source": "local_zip",
+      "source_path": "C:\\Projects\\Factorio\\testmods_2.1\\Krastorio2MenuSimulations_2.1.0.zip",
+      "dependencies": [
+        {
+          "name": "base",
+          "kind": "required",
+          "required": true,
+          "raw": "base >= 2.1.7"
+        },
+        {
+          "name": "space-age",
+          "kind": "optional",
+          "required": false,
+          "raw": "? space-age"
+        }
+      ]
+    },
+    {
+      "name": "Krastorio2RFAC",
+      "title": "Krastorio 2 Rocket Fuel in Advanced Chemical Plant",
+      "version": "3.5.1",
+      "factorio_version": "2.1",
+      "downloads_count": 0,
+      "category": "local",
+      "owner": "local",
+      "file_name": "Krastorio2RFAC_3.5.1.zip",
+      "sha1": "afd5284adadcaa0fe26b02044d43db3a0a84fa2b",
+      "sha256": "f566af94a5881f0b346d6f91ce45198ae9c3f7d02a7569accd47c1965c22c402",
+      "download_url": "",
+      "source": "local_zip",
+      "source_path": "C:\\Projects\\Factorio\\testmods_2.1\\Krastorio2RFAC_3.5.1.zip",
+      "dependencies": [
+        {
+          "name": "base",
+          "kind": "required",
+          "required": true,
+          "raw": "base >= 2.1.0"
+        },
+        {
+          "name": "Krastorio2",
+          "kind": "required",
+          "required": true,
+          "raw": "Krastorio2 >= 2.1.0"
+        }
+      ]
+    },
+    {
+      "name": "xy-k2so-enhancements-nulls-fork",
+      "title": "xyrc's K2SO Enhancements (Null's Fork)",
+      "version": "0.8.3",
+      "factorio_version": "2.1",
+      "downloads_count": 0,
+      "category": "local",
+      "owner": "local",
+      "file_name": "xy-k2so-enhancements-nulls-fork_0.8.3.zip",
+      "sha1": "338a7e2ff2eb1a1be6e744470babb4f0cc15f437",
+      "sha256": "930f43b96b04012fef090c40d8b16a6b3f259d1713c86cf59dff3e9a5a97e2be",
+      "download_url": "",
+      "source": "local_zip",
+      "source_path": "C:\\Projects\\Factorio\\testmods_2.1\\xy-k2so-enhancements-nulls-fork_0.8.3.zip",
+      "dependencies": [
+        {
+          "name": "base",
+          "kind": "required",
+          "required": true,
+          "raw": "base >= 2.1.7"
+        },
+        {
+          "name": "Krastorio2-spaced-out",
+          "kind": "required",
+          "required": true,
+          "raw": "Krastorio2-spaced-out >= 2.0.0"
+        },
+        {
+          "name": "nulls-k2so-tweaks",
+          "kind": "optional",
+          "required": false,
+          "raw": "? nulls-k2so-tweaks"
+        },
+        {
+          "name": "castra",
+          "kind": "optional",
+          "required": false,
+          "raw": "? castra"
+        },
+        {
+          "name": "corrundum",
+          "kind": "optional",
+          "required": false,
+          "raw": "? corrundum"
+        },
+        {
+          "name": "maraxsis",
+          "kind": "optional",
+          "required": false,
+          "raw": "? maraxsis"
+        },
+        {
+          "name": "Moshine",
+          "kind": "optional",
+          "required": false,
+          "raw": "? Moshine"
+        },
+        {
+          "name": "planet-muluna",
+          "kind": "optional",
+          "required": false,
+          "raw": "? planet-muluna"
+        },
+        {
+          "name": "Paracelsin",
+          "kind": "optional",
+          "required": false,
+          "raw": "? Paracelsin"
+        },
+        {
+          "name": "rubia",
+          "kind": "optional",
+          "required": false,
+          "raw": "? rubia"
+        },
+        {
+          "name": "secretas",
+          "kind": "optional",
+          "required": false,
+          "raw": "? secretas"
+        },
+        {
+          "name": "outer-rim",
+          "kind": "optional",
+          "required": false,
+          "raw": "? outer-rim"
+        },
+        {
+          "name": "slp-dyson-sphere-reworked",
+          "kind": "optional",
+          "required": false,
+          "raw": "? slp-dyson-sphere-reworked"
+        },
+        {
+          "name": "se-space-trains",
+          "kind": "optional",
+          "required": false,
+          "raw": "? se-space-trains"
+        },
+        {
+          "name": "science-tab",
+          "kind": "optional",
+          "required": false,
+          "raw": "? science-tab"
+        },
+        {
+          "name": "particle-physics",
+          "kind": "optional",
+          "required": false,
+          "raw": "? particle-physics"
+        },
+        {
+          "name": "workshop-science",
+          "kind": "optional",
+          "required": false,
+          "raw": "? workshop-science"
+        },
+        {
+          "name": "atan-nuclear-science",
+          "kind": "optional",
+          "required": false,
+          "raw": "? atan-nuclear-science"
+        },
+        {
+          "name": "pelagos",
+          "kind": "optional",
+          "required": false,
+          "raw": "? pelagos"
+        },
+        {
+          "name": "planetaris-arig",
+          "kind": "optional",
+          "required": false,
+          "raw": "? planetaris-arig"
+        },
+        {
+          "name": "skewer_planet_vesta",
+          "kind": "optional",
+          "required": false,
+          "raw": "? skewer_planet_vesta"
+        },
+        {
+          "name": "apia",
+          "kind": "optional",
+          "required": false,
+          "raw": "? apia"
+        },
+        {
+          "name": "xy-k2so-enhancements",
+          "kind": "incompatible",
+          "required": false,
+          "raw": "! xy-k2so-enhancements"
+        }
+      ]
+    }
+  ]
+}
