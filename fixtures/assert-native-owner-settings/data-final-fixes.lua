@@ -101,8 +101,8 @@ for _, stream in ipairs(streams) do
         fail("default settings did not preserve unrecognized formula for " .. stream.owner)
       end
     else
-      local expected_base = base_changed and base or 1000
-      local expected_growth = growth_changed and growth or 1.5
+      local expected_base = cost_changed and base or 1000
+      local expected_growth = cost_changed and growth or 1.5
       local expected_formula = number_text(expected_growth) .. "^L*" .. number_text(expected_base)
       if owner.unit.count_formula ~= expected_formula then
         fail(stream.owner .. " formula differs; expected " .. expected_formula
