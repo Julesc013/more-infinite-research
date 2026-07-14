@@ -140,6 +140,13 @@ function Assert-MIRCandidateBoundEvidence {
   }
 }
 
+$sourceLockPath = Join-Path $repo ".mir\backport-source-lock.json"
+if (Test-Path -LiteralPath $sourceLockPath -PathType Leaf) {
+  & (Join-Path $repo "scripts\Test-MIRBackportSourceLock.ps1") -RepoRoot $repo
+  Write-Host "[ok] MIR target-line freshness is governed by the validated backport source lock."
+  exit 0
+}
+
 $manifestPath = Join-Path $repo ".mir\convergence.yml"
 $manifestText = Get-Content -Raw -LiteralPath $manifestPath
 $candidate = Get-MIRCandidateFields -Text $manifestText
