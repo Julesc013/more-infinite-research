@@ -409,6 +409,7 @@ Assert-MIRContains -RelativePath "prototypes/mir/emit/technology_graph_safety.lu
 
 $modDataText = Read-MIRFile -RelativePath "prototypes/mir/emit/mod_data.lua"
 Assert-MIRContains -RelativePath "prototypes/mir/emit/mod_data.lua" -Text $modDataText -Needle 'require("prototypes.mir.platform.factorio.data_raw")'
+Assert-MIRContains -RelativePath "prototypes/mir/emit/mod_data.lua" -Text $modDataText -Needle 'target_line.mod_data_supported()'
 Assert-MIRContains -RelativePath "prototypes/mir/emit/mod_data.lua" -Text $modDataText -Needle "data_raw.extend({"
 
 $streamCompilerText = Read-MIRFile -RelativePath "prototypes/mir/planner/stream_compiler.lua"
