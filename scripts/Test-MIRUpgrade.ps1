@@ -99,6 +99,26 @@ if (-not $loadText.Contains("[mir-fixture] $FromVersion to $ToVersion$proofSuffi
 $loadEvidence = Join-Path $outputParent "$ToVersion-upgrade-from-$FromVersion-load.txt"
 Copy-MIRUpgradeLogEvidence -Source $log -Destination $loadEvidence
 
+$assertions = if ($FixtureName -eq "assert-upgrade-3-1-5-to-3-1-9") {
+  @(
+    "startup-settings-retained",
+    "native-owner-technology-level-retained",
+    "native-owner-current-research-retained",
+    "native-owner-fractional-progress-retained",
+    "fixture-storage-retained",
+    "exact-candidate-normal-mod-directory-load"
+  )
+} else {
+  @(
+    "startup-setting-retained",
+    "effect-setting-retained",
+    "technology-level-retained",
+    "fixture-storage-retained",
+    "scripted-runtime-effect-retained",
+    "exact-candidate-normal-mod-directory-load"
+  )
+}
+
 [ordered]@{
   schema = 1
   status = "passed"
@@ -107,14 +127,7 @@ Copy-MIRUpgradeLogEvidence -Source $log -Destination $loadEvidence
   factorio_binary_version = (Get-Item -LiteralPath $factorio).VersionInfo.FileVersion
   from = [ordered]@{ version = $FromVersion; path = $FromZip; sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $from).Hash }
   to = [ordered]@{ version = $ToVersion; path = $ToZip; sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $to).Hash }
-  assertions = @(
-    "startup-setting-retained",
-    "effect-setting-retained",
-    "technology-level-retained",
-    "fixture-storage-retained",
-    "scripted-runtime-effect-retained",
-    "exact-candidate-normal-mod-directory-load"
-  )
+  assertions = $assertions
   create_log = (Split-Path -Leaf $createEvidence)
   load_log = (Split-Path -Leaf $loadEvidence)
 } | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $output -Encoding UTF8

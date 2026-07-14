@@ -38,4 +38,4 @@ If the owner is absent, finite, unreachable, malformed, or unsafe to configure, 
 
 ## Evidence
 
-The native-owner settings matrix covers defaults, disabled streams, each individual setting, combined settings, relevant-effects-only behavior, unrelated-effect preservation, fully covered owners, recognized and unrecognized formulas, transaction fingerprints, duplicate bindings, settings profiles, and configuration-change resets. Target-specific runtime evidence remains mandatory for every backport line.
+The native-owner settings matrix covers defaults, disabled streams, each individual setting, combined settings, relevant-effects-only behavior, unrelated-effect preservation, fully covered owners, recognized and unrecognized formulas, transaction fingerprints, duplicate bindings, settings profiles, configuration-change resets, current research selection, and fractional progress. Target-specific runtime evidence remains mandatory for every backport line.

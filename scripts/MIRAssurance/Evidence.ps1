@@ -272,6 +272,7 @@ function Invoke-MIRAssurancePlan {
   New-Item -ItemType Directory -Force -Path $evidenceRoot | Out-Null
   $results = @()
   $runtimeFullCompleted = $false
+  $runtimeFullPlanned = @($Plan.tests | Where-Object { [string]$_.id -eq "runtime.full" }).Count -gt 0
   foreach ($test in @($Plan.tests)) {
     $id = [string]$test.id
     if ($runtimeFullCompleted -and $id -in @("runtime.affected", "runtime.exact-zip")) {
@@ -308,7 +309,12 @@ function Invoke-MIRAssurancePlan {
     $message = ""
     $resolvedCommand = ""
     try {
-      $resolvedCommand = Invoke-MIRAssuranceCommandText -Command ([string]$test.command) -Context $Context -Plan $Plan | Select-Object -Last 1
+      if ($id -eq "static.full" -and $runtimeFullPlanned) {
+        $message = "covered by runtime.full, which executes the complete static facade before runtime scenarios"
+        $resolvedCommand = $message
+      } else {
+        $resolvedCommand = Invoke-MIRAssuranceCommandText -Command ([string]$test.command) -Context $Context -Plan $Plan | Select-Object -Last 1
+      }
     } catch {
       $status = "failed"
       $message = $_.Exception.Message

@@ -289,6 +289,7 @@ fixtures:
     assertion_path: fixtures/assert-native-owner-settings
     supplemental_paths:
       - fixtures/native-owner-unrecognized-formula
+      - fixtures/assert-native-owner-progress
     validates:
       - all-four-native-owner-setting-groups-visible
       - unchanged-defaults-preserve-final-owner-snapshots
@@ -313,6 +314,8 @@ fixtures:
       - input-output-fingerprint-transaction
       - duplicate-native-owner-binding-rejection
       - configuration-change-signature-reset
+      - configuration-change-current-research-progress-retention
+      - paired-base-growth-setting-semantics
       - settings-profile-compatible-stable-ids
 
   competing-base-extension-transaction:

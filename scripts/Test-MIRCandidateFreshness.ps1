@@ -134,6 +134,7 @@ $candidate = Get-MIRCandidateFields -Text $manifestText
 $status = Get-MIRRequiredCandidateField -Fields $candidate -Name "status"
 $allowedStatuses = @(
   "rebuilding-after-package-visible-change",
+  "requalifying-after-validation-harness-change",
   "release-candidate-awaiting-manual-review",
   "release-candidate-accepted",
   "published"
@@ -155,6 +156,33 @@ if ($status -eq "rebuilding-after-package-visible-change") {
     throw "A rebuilding candidate must not retain obsolete pass/hash fields: $($staleFields -join ', ')."
   }
   Write-Host "[ok] MIR release evidence is explicitly rebuilding; stale candidate bytes cannot be promoted."
+  exit 0
+}
+
+if ($status -eq "requalifying-after-validation-harness-change") {
+  if ((Get-MIRRequiredCandidateField -Fields $candidate -Name "source_commit") -ne "pending") {
+    throw "A harness-requalifying candidate must use source_commit: pending."
+  }
+  $packageSourceCommit = Get-MIRRequiredCandidateField -Fields $candidate -Name "package_source_commit"
+  if ($packageSourceCommit -notmatch '^[0-9a-f]{40}$') {
+    throw "A harness-requalifying candidate must retain a full package_source_commit."
+  }
+  & git -C $repo cat-file -e "$packageSourceCommit^{commit}" 2>$null
+  if ($LASTEXITCODE -ne 0) {
+    throw "Harness-requalifying package source commit is unavailable: $packageSourceCommit"
+  }
+  if ((Get-MIRRequiredCandidateField -Fields $candidate -Name "automated_gate") -ne "pending-requalification") {
+    throw "A harness-requalifying candidate must use automated_gate: pending-requalification."
+  }
+  $allowedFields = @("artifact", "source_commit", "package_source_commit", "automated_gate", "manual_gate", "status")
+  $staleFields = @($candidate.Keys | Where-Object { $_ -notin $allowedFields })
+  if ($staleFields.Count -gt 0) {
+    throw "A harness-requalifying candidate must not retain obsolete pass/hash fields: $($staleFields -join ', ')."
+  }
+  if (Test-MIRPackageSourceGitDirty -RepoRoot $repo) {
+    throw "Package-visible working-tree changes are not allowed during harness-only requalification."
+  }
+  Write-Host "[ok] MIR release evidence is explicitly requalifying after a validation-harness change; stale evidence cannot be promoted."
   exit 0
 }
 
