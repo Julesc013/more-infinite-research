@@ -12,7 +12,7 @@
   "mir_version": "1.8.2",
   "target_profile_sha256": "69E92D706D3F42667CE04E951D255EE2A02C1A85ECAB1449324E79451F824F63",
   "portable_modules": {"scripts/Build-MIRPackage.ps1":"canonical deterministic package builder","scripts/Invoke-MIRValidation.ps1":"canonical validation orchestrator"},
-  "adapted_modules": {"changelog.txt":"MIR 1.8.2 target release history","info.json":"Factorio 1.0 and MIR 1.8.2 identity"},
+  "adapted_modules": {"changelog.txt":"MIR 1.8.2 target release history","info.json":"Factorio 1.0 and MIR 1.8.2 identity","prototypes/mir/settings/defaults.lua":"remove settings defaults for target-omitted Space Age streams"},
   "target_specific_modules": {"prototypes/mir/platform/factorio/target_profiles.lua":"generated Factorio 1.0 current-profile selection"},
   "canonical_features": ["compiler-core","stable-stream-manifest","legacy-science-discovery","lab-researchability","direct-effect-bonuses","weapon-overlap-policy","reduced-startup-settings","runtime-state-backend","deterministic-release-package","compatibility-repairs","pipeline-extent","prototype-limits","module-permissions","recipe-productivity","settings-profiles","scripted-techs","technology-constant-overlays","productivity-family-adoption"],
   "omitted_features": {
