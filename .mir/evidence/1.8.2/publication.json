@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "version": "1.8.2",
+  "target": "1.0",
+  "tag_commit": "0a192c27674a6b13847e2f5e1b2b530e62419ee8",
+  "archive": "dist/more-infinite-research_1.8.2.zip",
+  "archive_sha256": "676927ECF801114CA8F7B9EFD6D139906432BCC60BE26B8CA5C08842E3686EFE",
+  "github": {
+    "status": "published-and-verified",
+    "release_id": 353939194,
+    "asset_id": 476926853,
+    "url": "https://github.com/Julesc013/more-infinite-research/releases/tag/1.8.2",
+    "asset_digest": "sha256:676927ecf801114ca8f7b9efd6d139906432bcc60be26b8ca5c08842e3686efe",
+    "redownload_sha256": "676927ECF801114CA8F7B9EFD6D139906432BCC60BE26B8CA5C08842E3686EFE",
+    "published_at": "2026-07-14T16:50:40Z"
+  },
+  "mod_portal": {
+    "status": "blocked-missing-upload-api-key",
+    "release_count_at_verification": 0,
+    "verified_at": "2026-07-14T16:50:40Z",
+    "init_upload": "https://mods.factorio.com/api/v2/mods/releases/init_upload",
+    "upload_command": "$init = Invoke-RestMethod -Method Post -Uri 'https://mods.factorio.com/api/v2/mods/releases/init_upload' -Headers @{ Authorization = \"Bearer $env:MOD_UPLOAD_API_KEY\" } -Form @{ mod = 'more-infinite-research' }; Invoke-RestMethod -Method Post -Uri $init.upload_url -Form @{ file = Get-Item 'dist/more-infinite-research_1.8.2.zip' }"
+  },
+  "manual_visual_review": "PENDING-MAINTAINER"
+}
