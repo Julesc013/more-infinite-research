@@ -34,7 +34,7 @@ script.on_init(function()
   force.research_all_technologies()
   local tech = technology()
   tech.level = 5
-  force.current_research = tech
+  if not force.add_research(tech) then fail("could not queue lab-productivity research") end
   force.research_progress = expected_progress
   global.mir = global.mir or {}
   global.mir.target_upgrade_fixture = {
