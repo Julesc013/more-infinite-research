@@ -2,7 +2,7 @@
   "schema": 1,
   "target": "0.6",
   "mir_version": "0.6.0",
-  "canonical_dev_anchor": "dc5bfa99249af6c9508201a4c4667063bc8e021c",
+  "canonical_dev_anchor": "d6c1feab9e268d590b60e8d2338af68a4c0b7b83",
   "claim": "canonical finite museum reconstruction for positively proven Factorio 0.6 capabilities; no native-infinite or modern parity claim",
   "features": [
     {"feature_id":"compiler-core","classification":"finite-reconstruction","positive_requirement":"offline compiler can project exact target-valid technology tables","target_result":"15 finite technologies are synthesized from the canonical model","implementation_path":"scripts/Museum/MuseumCompiler.psm1","test":"scripts/Test-MIRMuseumCompiler.ps1","documentation_consequence":"Describe source synthesis, not an in-package compiler."},
