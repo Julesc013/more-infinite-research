@@ -10,7 +10,7 @@ Date: 2026-07-14
     - Made the standard settings configure recognized existing Space Age infinite productivity owners.
     - Applied cost base and growth together as one displayed cost model when either value is customized.
     - Preserved current native-owner research level, selection, and fractional progress across cost changes and 2.4.0 upgrades.
-    - Preserved final native or modded owner values at defaults, left disabled streams untouched, and rejected unknown cost formulas safely.
+    - Preserved native or modded owner defaults, left disabled streams untouched, and safely rejected unknown cost formulas.
     - Kept native-owner adoption transactional and retained safe generated-stream fallback.
 
   Changes:
