@@ -1,6 +1,5 @@
 local D = require("prototypes.mir.report.diagnostics_sink")
 local data_raw = require("prototypes.mir.platform.factorio.data_raw")
-local recipe_facts = require("prototypes.mir.index.recipe_facts")
 local overlay_loader = require("prototypes.mir.compatibility.overlay_loader")
 local report = require("prototypes.mir.report.compatibility_diagnostics")
 
@@ -166,11 +165,9 @@ function M.emit(config)
   if not D.enabled() then return end
 
   local ctx = build_context(config or {})
-  local recipe_names = recipe_facts.all_names()
-  local recipes = {}
-  for _, recipe_name in ipairs(recipe_names) do recipes[recipe_name] = true end
+  local recipes = data_raw.prototypes("recipe")
   local active = false
-  for _, recipe_name in ipairs(recipe_names) do
+  for recipe_name, _ in pairs(recipes) do
     if classify_recipe(ctx, recipe_name) then
       active = true
       break
@@ -193,7 +190,7 @@ function M.emit(config)
   end
 
   local related = {}
-  for _, recipe_name in ipairs(recipe_names) do
+  for recipe_name, _ in pairs(recipes) do
     if not ctx.allowed[recipe_name] then
       local classification = classify_recipe(ctx, recipe_name)
       if classification then

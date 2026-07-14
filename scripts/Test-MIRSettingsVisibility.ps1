@@ -5,10 +5,8 @@ param(
 $ErrorActionPreference = "Stop"
 
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
-. (Join-Path $repo "scripts\validation\TargetProfiles.ps1")
 $repoInfo = Get-Content -Raw -LiteralPath (Join-Path $repo "info.json") | ConvertFrom-Json
-$targetProfile = Get-MIRTargetProfile -RepoRoot $repo -FactorioVersion $repoInfo.factorio_version
-$isReducedLegacyLine = [bool]$targetProfile.reduced_legacy
+$isReducedLegacyLine = $repoInfo.factorio_version -in @("0.15", "0.16", "0.17", "0.18", "1.0", "1.1")
 
 function Read-MIRText {
   param([Parameter(Mandatory)][string]$RelativePath)
@@ -90,7 +88,6 @@ function Assert-NoPatternInTree {
 
 $settingsManifestText = Read-MIRText -RelativePath ".mir/settings.yml"
 $stageBuilderText = Read-MIRText -RelativePath "prototypes/mir/settings/stage_builder.lua"
-$streamDescriptorText = Read-MIRText -RelativePath "prototypes/mir/domain/streams/descriptor.lua"
 $catalogText = Read-MIRText -RelativePath "prototypes/mir/settings/catalog.lua"
 $settingOrderText = Read-MIRText -RelativePath "prototypes/mir/settings/order.lua"
 $prototypeLimitSettingsText = Read-MIRText -RelativePath "prototypes/mir/settings/prototype_limits.lua"
@@ -101,8 +98,6 @@ $adapterText = Read-MIRText -RelativePath "prototypes/mir/settings/stage_adapter
 $profileCodecText = Read-MIRText -RelativePath "prototypes/mir/settings/profile_codec.lua"
 $effectiveSettingsText = Read-MIRText -RelativePath "prototypes/mir/settings/effective.lua"
 $runtimeSettingsProfileText = Read-MIRText -RelativePath "prototypes/mir/runtime/settings_profile.lua"
-$testOverridesText = Read-MIRText -RelativePath "prototypes/mir/settings/test_overrides.lua"
-$validationRunnerText = Read-MIRText -RelativePath "scripts/Invoke-MIRValidation.ps1"
 $userSettingsDocText = Read-MIRText -RelativePath "docs/user/settings.md"
 $referenceSettingsDocText = Read-MIRText -RelativePath "docs/reference/settings.md"
 $settingsGovernanceDocText = Read-MIRText -RelativePath "docs/maintainer/settings-governance.md"
@@ -110,7 +105,6 @@ $defaultsText = Read-MIRText -RelativePath "prototypes/mir/settings/defaults.lua
 $productivityText = Read-MIRText -RelativePath "prototypes/streams/productivity.lua"
 $directEffectsText = Read-MIRText -RelativePath "prototypes/streams/direct-effects.lua"
 $fixtureText = Read-MIRText -RelativePath "fixtures/assert-hidden-setting-readability/data-final-fixes.lua"
-$fixtureSettingsText = Read-MIRText -RelativePath "fixtures/assert-hidden-setting-readability/settings-final-fixes.lua"
 $fixtureInfoText = Read-MIRText -RelativePath "fixtures/assert-hidden-setting-readability/info.json"
 $streamKeys = @(
   Get-RegexValues -Text $productivityText -Pattern '(?m)^\s*(research_[A-Za-z0-9_]+)\s*='
@@ -134,8 +128,7 @@ Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -N
 Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -Needle "profile_import_is_effective_override_not_runtime_mutation: true"
 Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -Needle "settings_profiles_exclude_import_setting: true"
 Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -Needle "runtime_export_writes_script_output_only: true"
-Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -Needle "inactive_official_dlc_technology_settings_are_hidden_but_registered: true"
-Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -Needle "experimental_automatic_family_settings_are_hidden_until_reviewed: true"
+Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -Needle "official_and_mir_owned_technology_settings_stay_visible: true"
 Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -Needle "technology_settings_use_three_attention_buckets: true"
 Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -Needle "canonical_settings_catalog_required: true"
 Assert-Contains -RelativePath ".mir/settings.yml" -Text $settingsManifestText -Needle "profile_import_validates_catalog_constraints: true"
@@ -166,12 +159,6 @@ Assert-Contains -RelativePath "prototypes/mir/settings/catalog.lua" -Text $catal
 Assert-Contains -RelativePath "prototypes/mir/settings/catalog.lua" -Text $catalogText -Needle 'order = setting_order.global("compatibility", 40)'
 Assert-Contains -RelativePath "prototypes/mir/settings/catalog.lua" -Text $catalogText -Needle "function M.stream_setting_specs(key, stream)"
 Assert-Contains -RelativePath "prototypes/mir/settings/catalog.lua" -Text $catalogText -Needle "function M.base_extension_setting_specs(key)"
-Assert-Contains -RelativePath "prototypes/mir/settings/catalog.lua" -Text $catalogText -Needle 'require("prototypes.mir.settings.test_overrides")'
-Assert-Contains -RelativePath "prototypes/mir/settings/catalog.lua" -Text $catalogText -Needle "return deepcopy(canonical_spec_by_name())"
-Assert-Contains -RelativePath "prototypes/mir/settings/catalog.lua" -Text $catalogText -Needle "return deepcopy(canonical_spec_by_name()[name])"
-Assert-Contains -RelativePath "prototypes/mir/settings/catalog.lua" -Text $catalogText -Needle "out.targets.requires_features"
-Assert-Contains -RelativePath "prototypes/mir/settings/test_overrides.lua" -Text $testOverridesText -Needle "local overrides = {}"
-Assert-Contains -RelativePath "prototypes/mir/settings/stage_builder.lua" -Text $stageBuilderText -Needle "stream.descriptor.ui.sort_name"
 Assert-Contains -RelativePath "prototypes/mir/settings/registry.lua" -Text $registryText -Needle 'enable = "ips-enable-%s"'
 Assert-Contains -RelativePath "prototypes/mir/settings/registry.lua" -Text $registryText -Needle 'key = "mir-settings-profile-import"'
 Assert-Contains -RelativePath "prototypes/mir/settings/visibility.lua" -Text $visibilityText -Needle "function M.evaluate(spec, ctx)"
@@ -239,17 +226,13 @@ Assert-Matches -RelativePath "prototypes/mir/settings/defaults.lua" -Text $defau
 Assert-Contains -RelativePath "prototypes/streams/productivity.lua" -Text $productivityText -Needle "ui_visibility = {"
 Assert-Contains -RelativePath "prototypes/streams/productivity.lua" -Text $productivityText -Needle 'mods_any = air_scrubbing_overlay.applies_when.mods'
 Assert-Contains -RelativePath "prototypes/streams/productivity.lua" -Text $productivityText -Needle 'mods_any = atan_ash_overlay.applies_when.mods'
-Assert-Contains -RelativePath "prototypes/streams/productivity.lua" -Text $productivityText -Needle "local function space_age_setting_visibility()"
-Assert-Contains -RelativePath "prototypes/streams/productivity.lua" -Text $productivityText -Needle 'hidden_reason = "space-age-not-active"'
+Assert-Contains -RelativePath "prototypes/streams/productivity.lua" -Text $productivityText -Needle 'reason = "official-stream-settings-visible"'
 if (-not $isReducedLegacyLine) {
-  Assert-Contains -RelativePath "prototypes/streams/direct-effects.lua" -Text $directEffectsText -Needle "local function space_age_setting_visibility()"
-  Assert-Contains -RelativePath "prototypes/streams/direct-effects.lua" -Text $directEffectsText -Needle 'hidden_reason = "space-age-not-active"'
+  Assert-Contains -RelativePath "prototypes/streams/direct-effects.lua" -Text $directEffectsText -Needle 'reason = "official-stream-settings-visible"'
 }
-Assert-Contains -RelativePath "prototypes/mir/domain/streams/descriptor.lua" -Text $streamDescriptorText -Needle 'automatic_family.creation_maturity == "experimental"'
-Assert-Contains -RelativePath "prototypes/mir/domain/streams/descriptor.lua" -Text $streamDescriptorText -Needle 'hidden_reason = "experimental-family-hidden-until-reviewed"'
 Assert-Contains -RelativePath "prototypes/streams/productivity.lua" -Text $productivityText -Needle "generation_requirements = {"
 if (-not $isReducedLegacyLine) {
-  Assert-Contains -RelativePath "prototypes/streams/direct-effects.lua" -Text $directEffectsText -Needle "ui_visibility = space_age_setting_visibility()"
+  Assert-Contains -RelativePath "prototypes/streams/direct-effects.lua" -Text $directEffectsText -Needle "ui_visibility = {"
   Assert-Contains -RelativePath "prototypes/streams/direct-effects.lua" -Text $directEffectsText -Needle "generation_requirements = {"
 }
 
@@ -267,13 +250,9 @@ Assert-Contains -RelativePath "fixtures/assert-hidden-setting-readability/data-f
 Assert-Contains -RelativePath "fixtures/assert-hidden-setting-readability/data-final-fixes.lua" -Text $fixtureText -Needle "base_extension_keys"
 Assert-Contains -RelativePath "fixtures/assert-hidden-setting-readability/data-final-fixes.lua" -Text $fixtureText -Needle '"worker-robots-storage"'
 Assert-Contains -RelativePath "fixtures/assert-hidden-setting-readability/data-final-fixes.lua" -Text $fixtureText -Needle '"mir-enable-%s"'
-Assert-Contains -RelativePath "fixtures/assert-hidden-setting-readability/settings-final-fixes.lua" -Text $fixtureSettingsText -Needle "assert_stream_hidden"
-Assert-Contains -RelativePath "fixtures/assert-hidden-setting-readability/settings-final-fixes.lua" -Text $fixtureSettingsText -Needle '"research_auto_assembling_machine"'
-Assert-Contains -RelativePath "fixtures/assert-hidden-setting-readability/settings-final-fixes.lua" -Text $fixtureSettingsText -Needle '"research_auto_lab"'
-Assert-Contains -RelativePath "fixtures/assert-hidden-setting-readability/settings-final-fixes.lua" -Text $fixtureSettingsText -Needle 'mods["space-age"]'
 
 foreach ($streamKey in $streamKeys) {
-  Assert-Contains -RelativePath "prototypes/mir/domain/streams/descriptor.lua" -Text $streamDescriptorText -Needle "$streamKey ="
+  Assert-Contains -RelativePath "prototypes/mir/settings/stage_builder.lua" -Text $stageBuilderText -Needle "$streamKey ="
   Assert-Contains -RelativePath "fixtures/assert-hidden-setting-readability/data-final-fixes.lua" -Text $fixtureText -Needle "`"$streamKey`""
 }
 
@@ -285,8 +264,6 @@ Assert-Contains -RelativePath "docs/user/settings.md" -Text $userSettingsDocText
 Assert-Contains -RelativePath "docs/user/settings.md" -Text $userSettingsDocText -Needle "/mir-settings-export --compact"
 Assert-Contains -RelativePath "docs/user/settings.md" -Text $userSettingsDocText -Needle "mir-settings-profile-import"
 Assert-Contains -RelativePath "docs/user/settings.md" -Text $userSettingsDocText -Needle "Unknown settings remain"
-Assert-Contains -RelativePath "docs/user/settings.md" -Text $userSettingsDocText -Needle "Space Age-only technology settings are hidden"
-Assert-Contains -RelativePath "docs/user/settings.md" -Text $userSettingsDocText -Needle "Experimental automatic-family tuning settings are hidden"
 Assert-Contains -RelativePath "docs/reference/settings.md" -Text $referenceSettingsDocText -Needle "MIRSET1:<encoded-json>"
 Assert-Contains -RelativePath "docs/reference/settings.md" -Text $referenceSettingsDocText -Needle "Unknown setting IDs, wrong value types, invalid enum values, and out-of-range"
 Assert-Contains -RelativePath "docs/maintainer/settings-governance.md" -Text $settingsGovernanceDocText -Needle "Portable Profiles"
@@ -295,10 +272,8 @@ Assert-Contains -RelativePath "docs/maintainer/settings-governance.md" -Text $se
 Assert-NoPattern -RelativePath "prototypes/mir/settings/visibility.lua" -Text $visibilityText -Pattern "\bdata\.raw\b|data:extend|settings\.startup"
 Assert-NoPattern -RelativePath "prototypes/mir/settings/builder.lua" -Text $builderText -Pattern "forced_value"
 Assert-NoPattern -RelativePath "prototypes/mir/settings/stage_builder.lua" -Text $stageBuilderText -Pattern "forced_value"
-Assert-NoPattern -RelativePath "scripts/Invoke-MIRValidation.ps1" -Text $validationRunnerText -Pattern '\$copied(Settings|Defaults|Diagnostics)\s*=.*-replace'
-Assert-NoPattern -RelativePath "scripts/Invoke-MIRValidation.ps1" -Text $validationRunnerText -Pattern 'data:extend\\\(settings_data\\\).*setting.default_value'
-Assert-NoPattern -RelativePath "prototypes/streams/productivity.lua" -Text $productivityText -Pattern 'official-stream-settings-visible'
-Assert-NoPattern -RelativePath "prototypes/streams/direct-effects.lua" -Text $directEffectsText -Pattern 'official-stream-settings-visible'
+Assert-NoPattern -RelativePath "prototypes/streams/productivity.lua" -Text $productivityText -Pattern 'mods_any = \{"space-age"\}'
+Assert-NoPattern -RelativePath "prototypes/streams/direct-effects.lua" -Text $directEffectsText -Pattern 'mods_any = \{"space-age"\}'
 
 Assert-NoPatternInTree `
   -RelativeRoot "prototypes" `

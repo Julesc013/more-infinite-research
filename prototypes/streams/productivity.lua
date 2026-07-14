@@ -17,39 +17,6 @@ local function exact_recipe_patterns(recipes)
   return out
 end
 
-local function space_age_setting_visibility()
-  return {
-    mode = "visible-if-mods-any",
-    mods_any = {"space-age"},
-    hidden_reason = "space-age-not-active"
-  }
-end
-
-local function native_owner_binding(owner, products)
-  return {
-    owner = owner,
-    eligibility = {
-      require_infinite = true,
-      require_existing_recipe_productivity_effects = true
-    },
-    effect_scope = {
-      type = "change-recipe-productivity",
-      products = products
-    },
-    settings_ownership = "stream",
-    default_preservation = "preserve-owner",
-    override_policy = "recognized-cost-model",
-    fallback_policy = "generate-eligible",
-    cost_model = {
-      target_native_formulas = {"1.5^L*1000"}
-    }
-  }
-end
-
-local native_owner_settings_note = {
-  "mod-setting-description.mir-note-native-owner-managed-stream"
-}
-
 return {
   research_copper = { items={"copper-plate"}, icon_item="copper-plate" },
   research_iron   = { items={"iron-plate"}, icon_item="iron-plate" },
@@ -66,8 +33,13 @@ return {
       {technology="processing-unit"},
       {technology="advanced-electronics-2"}
     },
-    native_owner_binding = native_owner_binding("processing-unit-productivity", {"processing-unit"}),
-    settings_note = native_owner_settings_note
+    adopt_into_existing_productivity_tech = {
+      tech = "processing-unit-productivity",
+      products = {"processing-unit"},
+      require_infinite = true,
+      require_existing_recipe_productivity_effects = true,
+      change_policy = "copy-owner"
+    }
   },
 
   research_plastic = {
@@ -76,8 +48,13 @@ return {
       {icon="__space-age__/graphics/technology/plastics-productivity.png", icon_size=256, inactive_mod_asset="space-age"},
       {technology="plastics"}
     },
-    native_owner_binding = native_owner_binding("plastic-bar-productivity", {"plastic-bar"}),
-    settings_note = native_owner_settings_note
+    adopt_into_existing_productivity_tech = {
+      tech = "plastic-bar-productivity",
+      products = {"plastic-bar"},
+      require_infinite = true,
+      require_existing_recipe_productivity_effects = true,
+      change_policy = "copy-owner"
+    }
   },
   research_sulfur  = { items={"sulfur"}, icon_tech="sulfur-processing", exclude_ingredient_patterns={"asteroid"} },
   research_batteries = { items={"battery"}, icon_tech="battery", exclude_ingredient_patterns={"scrap"} },
@@ -97,8 +74,13 @@ return {
       },
       {technology="low-density-structure"}
     },
-    native_owner_binding = native_owner_binding("low-density-structure-productivity", {"low-density-structure"}),
-    settings_note = native_owner_settings_note
+    adopt_into_existing_productivity_tech = {
+      tech = "low-density-structure-productivity",
+      products = {"low-density-structure"},
+      require_infinite = true,
+      require_existing_recipe_productivity_effects = true,
+      change_policy = "copy-owner"
+    }
   },
   research_rocket_fuel = {
     items={"rocket-fuel"},
@@ -106,13 +88,21 @@ return {
       {icon="__space-age__/graphics/technology/rocket-fuel-productivity.png", icon_size=256, inactive_mod_asset="space-age"},
       {technology="rocket-fuel"}
     },
-    native_owner_binding = native_owner_binding("rocket-fuel-productivity", {"rocket-fuel"}),
-    settings_note = native_owner_settings_note
+    adopt_into_existing_productivity_tech = {
+      tech = "rocket-fuel-productivity",
+      products = {"rocket-fuel"},
+      require_infinite = true,
+      require_existing_recipe_productivity_effects = true,
+      change_policy = "copy-owner"
+    }
   },
 
   research_thruster_fuel_productivity = {
     localised_name = {"technology-name.more-infinite-research.research_thruster_fuel_productivity"},
-    ui_visibility = space_age_setting_visibility(),
+    ui_visibility = {
+      mode = "always",
+      reason = "official-stream-settings-visible"
+    },
     generation_requirements = {
       require_any_fluid = {"thruster-fuel"}
     },
@@ -128,7 +118,10 @@ return {
 
   research_thruster_oxidizer_productivity = {
     localised_name = {"technology-name.more-infinite-research.research_thruster_oxidizer_productivity"},
-    ui_visibility = space_age_setting_visibility(),
+    ui_visibility = {
+      mode = "always",
+      reason = "official-stream-settings-visible"
+    },
     generation_requirements = {
       require_any_fluid = {"thruster-oxidizer"}
     },
@@ -144,7 +137,6 @@ return {
 
   research_oil_processing_productivity = {
     localised_name = {"technology-name.more-infinite-research.research_oil_processing_productivity"},
-    allow_shared_input_output = true,
     recipe_patterns = {
       "^basic%-oil%-processing$",
       "^advanced%-oil%-processing$",
@@ -266,7 +258,10 @@ return {
   },
 
   research_tungsten = {
-    ui_visibility = space_age_setting_visibility(),
+    ui_visibility = {
+      mode = "always",
+      reason = "official-stream-settings-visible"
+    },
     generation_requirements = {
       require_any_item = {"tungsten-plate", "tungsten-carbide"}
     },
@@ -275,7 +270,10 @@ return {
     icon_tech="tungsten-processing"
   },
   research_lithium = {
-    ui_visibility = space_age_setting_visibility(),
+    ui_visibility = {
+      mode = "always",
+      reason = "official-stream-settings-visible"
+    },
     generation_requirements = {
       require_any_item = {"lithium-plate", "lithium"}
     },
@@ -285,7 +283,10 @@ return {
     { change = 0.05, items = { "lithium" }, recipe_patterns = { "^lithium$" } }
   } },
   research_holmium = {
-    ui_visibility = space_age_setting_visibility(),
+    ui_visibility = {
+      mode = "always",
+      reason = "official-stream-settings-visible"
+    },
     generation_requirements = {
       require_any_item = {"holmium-plate"}
     },
@@ -293,7 +294,10 @@ return {
     icon_tech="holmium-processing"
   },
   research_supercapacitor = {
-    ui_visibility = space_age_setting_visibility(),
+    ui_visibility = {
+      mode = "always",
+      reason = "official-stream-settings-visible"
+    },
     generation_requirements = {
       require_any_item = {"supercapacitor"}
     },
@@ -301,7 +305,10 @@ return {
     icon_tech="supercapacitor"
   },
   research_superconductor = {
-    ui_visibility = space_age_setting_visibility(),
+    ui_visibility = {
+      mode = "always",
+      reason = "official-stream-settings-visible"
+    },
     generation_requirements = {
       require_any_item = {"superconductor"}
     },
@@ -309,7 +316,10 @@ return {
     icon_tech="superconductor"
   },
   research_quantum_processor = {
-    ui_visibility = space_age_setting_visibility(),
+    ui_visibility = {
+      mode = "always",
+      reason = "official-stream-settings-visible"
+    },
     generation_requirements = {
       require_any_item = {"quantum-processor"}
     },
@@ -317,7 +327,10 @@ return {
     icon_tech="quantum-processor"
   },
   research_carbon = {
-    ui_visibility = space_age_setting_visibility(),
+    ui_visibility = {
+      mode = "always",
+      reason = "official-stream-settings-visible"
+    },
     generation_requirements = {
       require_any_item = {"carbon"}
     },
@@ -332,7 +345,10 @@ return {
     { change = 0.02, recipe_patterns = { "^coal%-synthesis$" } }
   } },
   research_carbon_fiber = {
-    ui_visibility = space_age_setting_visibility(),
+    ui_visibility = {
+      mode = "always",
+      reason = "official-stream-settings-visible"
+    },
     generation_requirements = {
       require_any_item = {"carbon-fiber"}
     },
@@ -340,7 +356,10 @@ return {
     icon_tech="carbon-fiber"
   },
   research_ice = {
-    ui_visibility = space_age_setting_visibility(),
+    ui_visibility = {
+      mode = "always",
+      reason = "official-stream-settings-visible"
+    },
     generation_requirements = {
       require_any_item = {"ice"}
     },
@@ -352,7 +371,10 @@ return {
   } },
 
   research_bioflux = {
-    ui_visibility = space_age_setting_visibility(),
+    ui_visibility = {
+      mode = "always",
+      reason = "official-stream-settings-visible"
+    },
     generation_requirements = {
       require_any_item = {"bioflux"}
     },
@@ -360,8 +382,10 @@ return {
     icon_tech="bioflux"
   },
   research_bacteria_cultivation = {
-    allow_shared_input_output = true,
-    ui_visibility = space_age_setting_visibility(),
+    ui_visibility = {
+      mode = "always",
+      reason = "official-stream-settings-visible"
+    },
     generation_requirements = {
       require_any_recipe = {"iron-bacteria-cultivation", "copper-bacteria-cultivation"}
     },
@@ -371,19 +395,17 @@ return {
     "^copper%-bacteria%-cultivation$"
   } },
   research_breeding = {
-    ui_visibility = space_age_setting_visibility(),
+    ui_visibility = {
+      mode = "always",
+      reason = "official-stream-settings-visible"
+    },
     generation_requirements = {
       require_any_item = {"raw-fish", "biter-egg", "pentapod-egg"}
     },
     items = {"raw-fish","biter-egg","pentapod-egg"},
     mode = "by_category_or_match",
     match = { name_patterns={"cultivation","culture","breeding"} },
-    exclude_recipe_patterns = {
-      "^iron%-bacteria%-cultivation$",
-      "^copper%-bacteria%-cultivation$",
-      "%-incineration$",
-      "%-incinerate$"
-    },
+    exclude_recipe_patterns = {"^iron%-bacteria%-cultivation$", "^copper%-bacteria%-cultivation$"},
     icon_tech = "fish-breeding"
   },
 
@@ -406,7 +428,10 @@ return {
   }, exclude_ingredient_patterns={"scrap"} },
 
   research_artificial_soil = {
-    ui_visibility = space_age_setting_visibility(),
+    ui_visibility = {
+      mode = "always",
+      reason = "official-stream-settings-visible"
+    },
     generation_requirements = {
       require_any_item_family = {"artificial-soil", "overgrowth-soil"}
     },
@@ -417,7 +442,10 @@ return {
   } },
 
   research_molten_metals = {
-    ui_visibility = space_age_setting_visibility(),
+    ui_visibility = {
+      mode = "always",
+      reason = "official-stream-settings-visible"
+    },
     generation_requirements = {
       require_any_recipe = {"molten-iron-from-lava", "molten-copper-from-lava", "iron-ore-melting", "copper-ore-melting"}
     },
@@ -508,10 +536,9 @@ return {
   }},
 
   research_modules = { icon_tech="modules", groups = {
-    { change=0.10, module_tiers={1} },
-    { change=0.05, module_tiers={2} },
-    { change=0.02, module_tiers={3} },
-    { change=0.01, module_tier_min=4 }
+    { change=0.10, items={"productivity-module","speed-module","efficiency-module","quality-module"} },
+    { change=0.05, items={"productivity-module-2","speed-module-2","efficiency-module-2","quality-module-2"} },
+    { change=0.02, items={"productivity-module-3","speed-module-3","efficiency-module-3","quality-module-3"} }
   }},
 
   research_belts = { icon_tech="logistics", groups = {
@@ -577,42 +604,22 @@ return {
     { change=0.01, items={"stack-inserter"}, item_patterns={"stack%-inserter"} }
   }},
 
-  research_auto_assembling_machine = {
-    manifest_id = "mir-auto-prod-manufacturing-assembling-machine-1",
-    technology_name = "mir-auto-prod-manufacturing-assembling-machine-1",
-    automatic_family = {creation_maturity = "experimental"},
-    localised_name = {"", "Assembling machine manufacturing productivity"},
-    icon_item = "assembling-machine-3",
-    science_packs = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack"},
-    groups = {{change = 0.02, items = {}}}
-  },
-
-  research_auto_lab = {
-    manifest_id = "mir-auto-prod-manufacturing-lab-1",
-    technology_name = "mir-auto-prod-manufacturing-lab-1",
-    automatic_family = {creation_maturity = "experimental"},
-    localised_name = {"", "Lab manufacturing productivity"},
-    icon_item = "lab",
-    science_packs = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack"},
-    groups = {{change = 0.02, items = {}}}
-  },
-
   research_science_pack_productivity = {
     icon_candidates={
       {technology="research-productivity", required_mod="space-age"},
       {icon="__space-age__/graphics/technology/research-productivity.png", icon_size=256, inactive_mod_asset="space-age"},
       {technology="space-science-pack"},
-      {item="automation-science-pack"}
+      {item="science-pack-1"}
     },
     dynamic_items_from_lab_inputs = true,
     groups = {
     { change=0.10, items={
-      "automation-science-pack",
-      "logistic-science-pack",
-      "chemical-science-pack",
+      "science-pack-1",
+      "science-pack-2",
+      "science-pack-3",
       "production-science-pack",
       "military-science-pack",
-      "utility-science-pack",
+      "high-tech-science-pack",
       "space-science-pack",
       "agricultural-science-pack",
       "metallurgic-science-pack",

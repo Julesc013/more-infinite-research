@@ -10,12 +10,12 @@ local modifiers = {
 local technologies = {}
 for level = 1, 6 do
   local ingredients = {
-    {"automation-science-pack", 1},
-    {"logistic-science-pack", 1},
-    {"chemical-science-pack", 1}
+    {"science-pack-1", 1},
+    {"science-pack-2", 1},
+    {"science-pack-3", 1}
   }
   if level >= 3 then
-    table.insert(ingredients, {"utility-science-pack", 1})
+    table.insert(ingredients, {"high-tech-science-pack", 1})
   end
   if level >= 5 then
     table.insert(ingredients, {"production-science-pack", 1})

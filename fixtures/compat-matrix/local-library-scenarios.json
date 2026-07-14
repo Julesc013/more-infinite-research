@@ -1,47 +1,10 @@
 {
-  "schema": 2,
+  "schema": 1,
   "scenarios": [
     {
-      "name": "local-2-1-crucible-rigor-exact-dist",
-      "targets": [
-        "2.1"
-      ],
-      "kind": "modpack-load",
-      "group": "compatibility-campaign",
-      "setup": {
-        "mode": "local-library",
-        "include_space_age": true,
-        "offline": true,
-        "exact_mir_archive": true
-      },
-      "roots": [
-        "planet-crucible",
-        "rigor-module"
-      ],
-      "settings": {},
-      "expected_plan": {
-        "mode": "load-only",
-        "required_result": "passed",
-        "maximum_dependency_failures": 0
-      },
-      "timeout_seconds": 900,
-      "claim_level": "loads",
-      "notes": "Required 3.0.5 compatibility gate for Planet Crucible and Rigor Module using the exact MIR candidate archive."
-    },
-    {
       "name": "local-2-1-space-age-planet-cluster",
-      "targets": [
-        "2.1"
-      ],
-      "kind": "modpack-load",
-      "group": "compatibility-campaign",
-      "setup": {
-        "mode": "local-library",
-        "include_space_age": true,
-        "offline": true,
-        "exact_mir_archive": true
-      },
-      "roots": [
+      "include_space_age": true,
+      "mods": [
         "Cerys-Moon-of-Fulgora",
         "corrundum",
         "cubium",
@@ -53,165 +16,12 @@
         "rubia",
         "secretas"
       ],
-      "settings": {},
-      "expected_plan": {
-        "mode": "load-only",
-        "required_result": "passed",
-        "maximum_dependency_failures": 0
-      },
-      "timeout_seconds": 900,
-      "claim_level": "loads",
       "notes": "Locally available Factorio 2.1 Space Age planet cluster. Missing asset/library dependencies are reported as dependency-resolution failures until the local library is filled."
     },
     {
-      "name": "local-2-1-muluna-secretas-astroponics-cycle",
-      "targets": [
-        "2.1"
-      ],
-      "kind": "modpack-load",
-      "group": "compatibility-campaign",
-      "setup": {
-        "mode": "local-library",
-        "include_space_age": true,
-        "offline": true,
-        "exact_mir_archive": true
-      },
-      "roots": [
-        "astroponics",
-        "planet-muluna",
-        "secretas"
-      ],
-      "settings": {},
-      "expected_plan": {
-        "mode": "load-only",
-        "required_result": "passed",
-        "maximum_dependency_failures": 0
-      },
-      "timeout_seconds": 900,
-      "claim_level": "loads",
-      "notes": "Exact local regression for the Muluna and Astroponics mutual space-science prerequisite cycle reached through Secretas robot-storage levels."
-    },
-    {
-      "name": "local-2-1-aai-loaders",
-      "targets": [
-        "2.1"
-      ],
-      "kind": "modpack-load",
-      "group": "compatibility-campaign",
-      "setup": {
-        "mode": "local-library",
-        "include_space_age": false,
-        "offline": true,
-        "exact_mir_archive": true
-      },
-      "roots": [
-        "aai-loaders"
-      ],
-      "settings": {},
-      "expected_plan": {
-        "mode": "load-only",
-        "required_result": "passed",
-        "maximum_dependency_failures": 0
-      },
-      "timeout_seconds": 900,
-      "claim_level": "loads",
-      "notes": "Independent AAI Loaders archive gate. This is a load claim; structural loader behavior remains fixture-gated separately."
-    },
-    {
-      "name": "local-2-1-aai-industry",
-      "targets": [
-        "2.1"
-      ],
-      "kind": "modpack-load",
-      "group": "compatibility-campaign",
-      "setup": {
-        "mode": "local-library",
-        "include_space_age": false,
-        "offline": true,
-        "exact_mir_archive": true
-      },
-      "roots": [
-        "aai-industry"
-      ],
-      "settings": {},
-      "expected_plan": {
-        "mode": "load-only",
-        "required_result": "passed",
-        "maximum_dependency_failures": 0
-      },
-      "timeout_seconds": 900,
-      "claim_level": "loads",
-      "notes": "Independent AAI Industry archive gate without opportunistic optional roots."
-    },
-    {
-      "name": "local-2-1-aai-loaders-industry",
-      "targets": [
-        "2.1"
-      ],
-      "kind": "modpack-load",
-      "group": "compatibility-campaign",
-      "setup": {
-        "mode": "local-library",
-        "include_space_age": false,
-        "offline": true,
-        "exact_mir_archive": true
-      },
-      "roots": [
-        "aai-industry",
-        "aai-loaders"
-      ],
-      "settings": {},
-      "expected_plan": {
-        "mode": "load-only",
-        "required_result": "passed",
-        "maximum_dependency_failures": 0
-      },
-      "timeout_seconds": 900,
-      "claim_level": "loads",
-      "notes": "Independent combined AAI Industry and AAI Loaders archive gate."
-    },
-    {
-      "name": "local-2-1-aai-representative-extensions",
-      "targets": [
-        "2.1"
-      ],
-      "kind": "modpack-load",
-      "group": "compatibility-campaign",
-      "setup": {
-        "mode": "local-library",
-        "include_space_age": false,
-        "offline": true,
-        "exact_mir_archive": true
-      },
-      "roots": [
-        "aai-containers",
-        "aai-industry",
-        "aai-loaders"
-      ],
-      "settings": {},
-      "expected_plan": {
-        "mode": "load-only",
-        "required_result": "passed",
-        "maximum_dependency_failures": 0
-      },
-      "timeout_seconds": 900,
-      "claim_level": "loads",
-      "notes": "Representative AAI container, transport, and Industry machine gate without using a mega-smash as ecosystem proof. Big Mining Drill is intentionally separate because its archive declares AAI Industry incompatible."
-    },
-    {
       "name": "local-2-1-space-age-mega-smash",
-      "targets": [
-        "2.1"
-      ],
-      "kind": "modpack-load",
-      "group": "compatibility-campaign",
-      "setup": {
-        "mode": "local-library",
-        "include_space_age": true,
-        "offline": true,
-        "exact_mir_archive": true
-      },
-      "roots": [
+      "include_space_age": true,
+      "mods": [
         "aai-industry",
         "aai-loaders",
         "big-mining-drill",
@@ -237,30 +47,12 @@
         "SimpleSeablock",
         "Small-Space-Age"
       ],
-      "settings": {},
-      "expected_plan": {
-        "mode": "load-only",
-        "required_result": "passed",
-        "maximum_dependency_failures": 0
-      },
-      "timeout_seconds": 900,
-      "claim_level": "loads",
       "notes": "Deliberately aggressive Space Age smash test from locally collected 2.1 archives. It is expected to expose incompatibilities or missing dependency zips; grouped reports decide what is MIR-relevant."
     },
     {
       "name": "local-2-1-space-age-mega-smash-with-resource-overhauls",
-      "targets": [
-        "2.1"
-      ],
-      "kind": "modpack-load",
-      "group": "compatibility-campaign",
-      "setup": {
-        "mode": "local-library",
-        "include_space_age": true,
-        "offline": true,
-        "exact_mir_archive": true
-      },
-      "roots": [
+      "include_space_age": true,
+      "mods": [
         "bzcarbon",
         "bzlead",
         "bzsilicon",
@@ -274,30 +66,12 @@
         "solar-productivity",
         "xander-mod-shemp"
       ],
-      "settings": {},
-      "expected_plan": {
-        "mode": "load-only",
-        "required_result": "passed",
-        "maximum_dependency_failures": 0
-      },
-      "timeout_seconds": 900,
-      "claim_level": "loads",
       "notes": "Aggressive recipe/resource ownership stress scenario. Some listed mods may intentionally conflict with Space Age and should be classified rather than hand-waived."
     },
     {
       "name": "local-2-1-bz-suite-space-age",
-      "targets": [
-        "2.1"
-      ],
-      "kind": "modpack-load",
-      "group": "compatibility-campaign",
-      "setup": {
-        "mode": "local-library",
-        "include_space_age": true,
-        "offline": true,
-        "exact_mir_archive": true
-      },
-      "roots": [
+      "include_space_age": true,
+      "mods": [
         "bzcarbon",
         "bzlead",
         "bzsilicon",
@@ -305,85 +79,31 @@
         "bztitanium",
         "bzzirconium"
       ],
-      "settings": {},
-      "expected_plan": {
-        "mode": "load-only",
-        "required_result": "passed",
-        "maximum_dependency_failures": 0
-      },
-      "timeout_seconds": 900,
-      "claim_level": "loads",
       "notes": "Locally available BZ resource suite against the official Space Age bundle."
     },
     {
       "name": "local-2-1-krastorio-spaced-out",
-      "targets": [
-        "2.1"
-      ],
-      "kind": "modpack-load",
-      "group": "compatibility-campaign",
-      "setup": {
-        "mode": "local-library",
-        "include_space_age": true,
-        "offline": true,
-        "exact_mir_archive": true
-      },
-      "roots": [
+      "include_space_age": true,
+      "mods": [
         "Krastorio2-spaced-out",
         "xy-k2so-enhancements-nulls-fork"
       ],
-      "settings": {},
-      "expected_plan": {
-        "mode": "load-only",
-        "required_result": "passed",
-        "maximum_dependency_failures": 0
-      },
-      "timeout_seconds": 900,
-      "claim_level": "loads",
       "notes": "Local Krastorio 2 Spaced Out stack. The local library must include Krastorio2 assets and any required companion dependencies for this to load."
     },
     {
       "name": "local-2-1-krastorio-base",
-      "targets": [
-        "2.1"
-      ],
-      "kind": "modpack-load",
-      "group": "compatibility-campaign",
-      "setup": {
-        "mode": "local-library",
-        "include_space_age": false,
-        "offline": true,
-        "exact_mir_archive": true
-      },
-      "roots": [
+      "include_space_age": false,
+      "mods": [
         "Krastorio2",
         "Krastorio2RFAC",
         "krastorio2_extended_endgame"
       ],
-      "settings": {},
-      "expected_plan": {
-        "mode": "load-only",
-        "required_result": "passed",
-        "maximum_dependency_failures": 0
-      },
-      "timeout_seconds": 900,
-      "claim_level": "loads",
       "notes": "Local Krastorio 2 base stack without Space Age."
     },
     {
       "name": "local-2-1-bob-suite",
-      "targets": [
-        "2.1"
-      ],
-      "kind": "modpack-load",
-      "group": "compatibility-campaign",
-      "setup": {
-        "mode": "local-library",
-        "include_space_age": false,
-        "offline": true,
-        "exact_mir_archive": true
-      },
-      "roots": [
+      "include_space_age": false,
+      "mods": [
         "bobassembly",
         "bobelectronics",
         "bobenemies",
@@ -398,196 +118,62 @@
         "bobtech",
         "bobwarfare"
       ],
-      "settings": {},
-      "expected_plan": {
-        "mode": "load-only",
-        "required_result": "passed",
-        "maximum_dependency_failures": 0
-      },
-      "timeout_seconds": 900,
-      "claim_level": "loads",
       "notes": "Local Bob 3.0 suite. Requires boblibrary in the local library or online resolution."
     },
     {
       "name": "local-2-1-planet-pack-wrapper-full",
-      "targets": [
-        "2.1"
-      ],
-      "kind": "modpack-load",
-      "group": "compatibility-campaign",
-      "setup": {
-        "mode": "local-library",
-        "include_space_age": true,
-        "offline": true,
-        "exact_mir_archive": true
-      },
-      "roots": [
+      "include_space_age": true,
+      "mods": [
         "kry-all-planet-mods"
       ],
-      "settings": {},
-      "expected_plan": {
-        "mode": "load-only",
-        "required_result": "passed",
-        "maximum_dependency_failures": 0
-      },
-      "timeout_seconds": 900,
-      "claim_level": "loads",
       "notes": "Local planet-pack wrapper. Recommended dependencies are included by the extended LocalLibraryScenarios tier."
     },
     {
       "name": "local-2-1-planet-pack-wrapper-lite",
-      "targets": [
-        "2.1"
-      ],
-      "kind": "modpack-load",
-      "group": "compatibility-campaign",
-      "setup": {
-        "mode": "local-library",
-        "include_space_age": true,
-        "offline": true,
-        "exact_mir_archive": true
-      },
-      "roots": [
+      "include_space_age": true,
+      "mods": [
         "kry-planet-mods-lite"
       ],
-      "settings": {},
-      "expected_plan": {
-        "mode": "load-only",
-        "required_result": "passed",
-        "maximum_dependency_failures": 0
-      },
-      "timeout_seconds": 900,
-      "claim_level": "loads",
       "notes": "Local lite planet-pack wrapper. Recommended dependencies are included by the extended LocalLibraryScenarios tier."
     },
     {
       "name": "local-2-1-factorioplus-space-age",
-      "targets": [
-        "2.1"
-      ],
-      "kind": "modpack-load",
-      "group": "compatibility-campaign",
-      "setup": {
-        "mode": "local-library",
-        "include_space_age": true,
-        "offline": true,
-        "exact_mir_archive": true
-      },
-      "roots": [
+      "include_space_age": true,
+      "mods": [
         "factorioplus"
       ],
-      "settings": {},
-      "expected_plan": {
-        "mode": "load-only",
-        "required_result": "passed",
-        "maximum_dependency_failures": 0
-      },
-      "timeout_seconds": 900,
-      "claim_level": "loads",
       "notes": "Large locally available content overhaul against the official Space Age bundle."
     },
     {
       "name": "local-2-1-ev-refining-space-age",
-      "targets": [
-        "2.1"
-      ],
-      "kind": "modpack-load",
-      "group": "compatibility-campaign",
-      "setup": {
-        "mode": "local-library",
-        "include_space_age": true,
-        "offline": true,
-        "exact_mir_archive": true
-      },
-      "roots": [
+      "include_space_age": true,
+      "mods": [
         "ev-refining"
       ],
-      "settings": {},
-      "expected_plan": {
-        "mode": "load-only",
-        "required_result": "passed",
-        "maximum_dependency_failures": 0
-      },
-      "timeout_seconds": 900,
-      "claim_level": "loads",
       "notes": "Local refining/content scenario with Space Age enabled."
     },
     {
       "name": "local-2-1-mineral-chemistry-space-age",
-      "targets": [
-        "2.1"
-      ],
-      "kind": "modpack-load",
-      "group": "compatibility-campaign",
-      "setup": {
-        "mode": "local-library",
-        "include_space_age": true,
-        "offline": true,
-        "exact_mir_archive": true
-      },
-      "roots": [
+      "include_space_age": true,
+      "mods": [
         "mineral-chemistry"
       ],
-      "settings": {},
-      "expected_plan": {
-        "mode": "load-only",
-        "required_result": "passed",
-        "maximum_dependency_failures": 0
-      },
-      "timeout_seconds": 900,
-      "claim_level": "loads",
       "notes": "Local mineral chemistry scenario for recipe and productivity ownership checks."
     },
     {
       "name": "local-2-1-simple-seablock-space-age",
-      "targets": [
-        "2.1"
-      ],
-      "kind": "modpack-load",
-      "group": "compatibility-campaign",
-      "setup": {
-        "mode": "local-library",
-        "include_space_age": true,
-        "offline": true,
-        "exact_mir_archive": true
-      },
-      "roots": [
+      "include_space_age": true,
+      "mods": [
         "SimpleSeablock"
       ],
-      "settings": {},
-      "expected_plan": {
-        "mode": "load-only",
-        "required_result": "passed",
-        "maximum_dependency_failures": 0
-      },
-      "timeout_seconds": 900,
-      "claim_level": "loads",
       "notes": "Local SimpleSeablock scenario with Space Age enabled."
     },
     {
       "name": "local-2-1-xander-base",
-      "targets": [
-        "2.1"
-      ],
-      "kind": "modpack-load",
-      "group": "compatibility-campaign",
-      "setup": {
-        "mode": "local-library",
-        "include_space_age": false,
-        "offline": true,
-        "exact_mir_archive": true
-      },
-      "roots": [
+      "include_space_age": false,
+      "mods": [
         "xander-mod-shemp"
       ],
-      "settings": {},
-      "expected_plan": {
-        "mode": "load-only",
-        "required_result": "passed",
-        "maximum_dependency_failures": 0
-      },
-      "timeout_seconds": 900,
-      "claim_level": "loads",
       "notes": "Local Xander scenario without Space Age because the mod declares a Space Age incompatibility."
     }
   ]
