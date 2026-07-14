@@ -6,7 +6,7 @@
   "exact_patch": "0.8.8",
   "mir_version": "0.8.0",
   "branch": "tmp/0.8",
-  "source_commit": "75ab3a37c3f7ec995a250c16bb1a318fa193a433",
+  "source_commit": "db1854cf99b1dfa56f911230979a298dec7af7f0",
   "binary": {
     "path": "D:\\Programs\\Factorio\\0.8\\bin\\x64\\Factorio.exe",
     "architecture": "win64-x64",
