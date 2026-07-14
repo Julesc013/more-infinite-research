@@ -101,10 +101,20 @@ superseded_candidates:
 
 candidate:
   artifact: dist/more-infinite-research_2.4.1.zip
-  source_commit: pending
-  automated_gate: pending
+  source_commit: f42b45d1a9e5b6c61a14729a5d386eb6b88bf952
+  sha256: 7931E97D9C5CFAB173B48976F1B7EF5A6E7956809D6EA98BF42CD8761C1AAC3D
+  package_content_sha256: 621D26B40D36C52C9F556D1B2490E7FA266F1E022778EAEA15940CEA4522509D
+  package_source_sha256: 621D26B40D36C52C9F556D1B2490E7FA266F1E022778EAEA15940CEA4522509D
+  target_profile_sha256: E4955F0415FAFB69C21DA32BA535C761740C270D6972955170CA5A2BE95D514A
+  required_groups_sha256: A0ABDA1BCE05BB3176D9A403517DB42056033BB7119B0D790FA5A9DA0114262E
+  validation_harness_sha256: DE4B056D0E6BB6C25B90B4348F9BF2BC36C72AB04B923B4058C5A6A50BBEC897
+  validation_package_sha256: 7931E97D9C5CFAB173B48976F1B7EF5A6E7956809D6EA98BF42CD8761C1AAC3D
+  expected_scenarios_sha256: 6098644CA24561ECEB1E62B7D5C26708337FA0DF5F3250F0919868A11FAEC12E
+  structured_summary_path: .mir/evidence/2.4.1-change-aware-qualification.json
+  structured_summary_run_id: e76152a8-0e31-419e-a22a-063dc8de1827
+  automated_gate: passed-change-aware
   manual_gate: pending
-  status: rebuilding-after-package-visible-change
+  status: runtime-qualified-awaiting-seal
 
 rules:
   - dev-remains-the-canonical-modern-implementation

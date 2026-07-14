@@ -332,10 +332,14 @@ release_artifacts:
       source_anchor_commit: 584b398f98d3e317fac31cba63edcb11360a5bb1
       portable_regression_source: 79df29b50ea9b855b8665d6c9a3d8295806acde0
       artifact: dist/more-infinite-research_2.4.1.zip
-      automated_gate: pending
+      source_commit: f42b45d1a9e5b6c61a14729a5d386eb6b88bf952
+      sha256: 7931E97D9C5CFAB173B48976F1B7EF5A6E7956809D6EA98BF42CD8761C1AAC3D
+      package_content_sha256: 621D26B40D36C52C9F556D1B2490E7FA266F1E022778EAEA15940CEA4522509D
+      structured_summary: .mir/evidence/2.4.1-change-aware-qualification.json
+      automated_gate: passed-change-aware
       manual_gate: pending
       publication_scope: unreleased
-      status: rebuilding-after-package-visible-change
+      status: runtime-qualified-awaiting-seal
     mir_2_3_0:
       version: "2.3.0"
       branch: legacy
@@ -480,8 +484,10 @@ release_artifacts:
       source_anchor: mir_2_4_0
       source_anchor_commit: 584b398f98d3e317fac31cba63edcb11360a5bb1
       artifact: dist/more-infinite-research_2.4.1.zip
-      validation_status: pending
-      status: rebuilding-after-package-visible-change
+      source_commit: f42b45d1a9e5b6c61a14729a5d386eb6b88bf952
+      sha256: 7931E97D9C5CFAB173B48976F1B7EF5A6E7956809D6EA98BF42CD8761C1AAC3D
+      validation_status: passed-change-aware
+      status: runtime-qualified-awaiting-seal
       purpose: patch release proving disabled vanilla science technologies cannot leak into generated prerequisite paths
     factorio_1_1_port:
       version: "1.9.4"
