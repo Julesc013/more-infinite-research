@@ -3,9 +3,12 @@
   "state": "SEALED-RC",
   "release_status": "NOT RELEASED",
   "version": "1.9.4",
+  "mir_version": "1.9.4",
   "factorio_target": "1.1",
+  "target": "1.1",
+  "canonical_dev_anchor": "53090c6f860bf9cb9aaf10140cbfe3924ef59c6c",
   "branch": "rebuild/1.1",
-  "source_commit": "e49280aebde64c4c3fe6f8775066705082b7a1ae",
+  "source_commit": "a5a08072f92e9742ae3323fbf4873ebfb58f6531",
   "source_clean": true,
   "candidate": "dist/more-infinite-research_1.9.4.zip",
   "candidate_sha256": "74BA83E1F02FABBC52C09AC6144A409B243066663A6D132A47334459C2665BFB",
@@ -13,10 +16,10 @@
   "package_source_sha256": "4577E02DAEE659E8D7FAD17E70EFAF8DCE03BCEA3B77BD9DF9C3D9D00DDBD055",
   "target_profile_sha256": "4C0D68C7F4252D83E6D7F456399BE29A1573DB12595EF3EC5A832E15B3F6EE58",
   "test_catalog_sha256": "2C209657103C52B51479EEF7B9C04B550D2FE34DDF69D0BB5EB011808509ED37",
-  "validation_harness_sha256": "061E36DF47A645D7C8ECC24EECD775620E2539CC6B65CFC828CB628E6E43BB72",
+  "validation_harness_sha256": "830363C8B5AFE3AA73A1B9551F6D4C6AB06E480B90508A8BEAF0DD210C22C717",
   "factorio_binary": "D:\\Programs\\Factorio\\1.1\\bin\\x64\\factorio.exe",
   "factorio_sha256": "B7B4B834FCA2E32AFA9D3476EB42CC09B02F1205BE97F688DC6FC6ACE7BA8FE1",
   "qualification_summary": ".mir/evidence/1.9.4-qualification.json",
-  "qualification_summary_sha256": "980ED8F1F738BC2776D0001CB7B9281BC792F142189C0D6A3634501C363D1D31",
-  "sealed_at": "2026-07-14T16:34:51.5431905Z"
+  "qualification_summary_sha256": "B973D8F74C5628BCC1CE514C1F8CBB9C444B78C417B167C51B250E9A1EA33ED7",
+  "sealed_at": "2026-07-14T16:45:15.1946802Z"
 }
