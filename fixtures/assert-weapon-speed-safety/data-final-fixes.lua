@@ -149,7 +149,9 @@ for name, tech in pairs(techs) do
     end
   end
 end
-if generated_count == 0 then fail("generated weapon shooting speed continuation was not found") end
+if generated_count == 0 and not techs["mir-fixture-external-weapon-speed-owner"] then
+  fail("generated weapon shooting speed continuation was not found")
+end
 
 local expected_prerequisites = {
   ["recipe-prod-research_rocket_shooting_speed-1"] = {{"rocketry"}},
