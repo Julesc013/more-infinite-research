@@ -73,8 +73,20 @@ function Assert-MIRCandidateBoundEvidence {
   if ([int]$upgrade.schema -ne 1 -or [string]$upgrade.status -ne "passed") {
     throw "Upgrade evidence must be schema 1 with status passed."
   }
-  if ([string]$upgrade.git_commit -ne $PackageSourceCommit -or [string]$upgrade.to.version -ne $Version -or [string]$upgrade.to.sha256 -ne $ArchiveSha256) {
-    throw "Upgrade evidence is not bound to the active candidate source, version, and archive."
+  if ([string]$upgrade.to.version -ne $Version -or [string]$upgrade.to.sha256 -ne $ArchiveSha256) {
+    throw "Upgrade evidence is not bound to the active candidate version and archive."
+  }
+  $upgradeCommit = [string]$upgrade.git_commit
+  if ($upgradeCommit -notmatch '^[0-9a-f]{40}$') {
+    throw "Upgrade evidence must identify the full harness commit that produced it."
+  }
+  & git -C $repo cat-file -e "$upgradeCommit^{commit}" 2>$null
+  if ($LASTEXITCODE -ne 0) {
+    throw "Upgrade evidence commit is unavailable: $upgradeCommit"
+  }
+  & git -C $repo merge-base --is-ancestor $PackageSourceCommit $upgradeCommit
+  if ($LASTEXITCODE -ne 0) {
+    throw "Upgrade evidence was produced before the active package source commit."
   }
 
   $campaign = Get-MIRCandidateEvidenceJson -Fields $Fields -Field "ecosystem_evidence_path" -Label "Ecosystem campaign"
