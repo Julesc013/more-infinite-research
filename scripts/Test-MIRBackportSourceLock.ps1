@@ -70,9 +70,9 @@ if ($targetHash -ne [string]$lock.target_profile_sha256) { throw "Target profile
 & (Join-Path $RepoRoot "scripts\Sync-MIRTargetProfiles.ps1") -RepoRoot $RepoRoot -Check
 if ($LASTEXITCODE -ne 0) { throw "Generated target profile source is stale." }
 
-$portablePaths = Get-MIRSourceLockMapNames -Value $lock.portable_modules -Name "portable_modules"
-$adaptedPaths = Get-MIRSourceLockMapNames -Value $lock.adapted_modules -Name "adapted_modules"
-$targetSpecificPaths = Get-MIRSourceLockMapNames -Value $lock.target_specific_modules -Name "target_specific_modules"
+$portablePaths = @(Get-MIRSourceLockMapNames -Value $lock.portable_modules -Name "portable_modules")
+$adaptedPaths = @(Get-MIRSourceLockMapNames -Value $lock.adapted_modules -Name "adapted_modules")
+$targetSpecificPaths = @(Get-MIRSourceLockMapNames -Value $lock.target_specific_modules -Name "target_specific_modules")
 $declaredChangedPaths = @($adaptedPaths + $targetSpecificPaths | Sort-Object -Unique)
 $roots = @(Get-MIRPackageSourceRoots)
 $changedPaths = @(& git -C $RepoRoot diff --name-only ([string]$lock.canonical_dev_anchor) -- @roots)
