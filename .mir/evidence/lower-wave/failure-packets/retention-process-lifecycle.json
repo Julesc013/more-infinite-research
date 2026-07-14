@@ -1,0 +1,34 @@
+{
+  "schema": 1,
+  "status": "resolved-portable-defect",
+  "failed_gate": "Factorio 0.10 museum runtime preflight",
+  "failed_command": ".\\scripts\\Test-MIRMuseumRuntime.ps1 -FactorioVersion 0.10 -PackageMode zip -PackagePath dist\\more-infinite-research_0.10.0.zip -Reload",
+  "exit_code": 1,
+  "error": "A Factorio process is already running; cannot transactionally isolate the pre-0.11 config path.",
+  "target_branch": "rebuild/0.10",
+  "target_candidate_sha256": "845CBB69195ED03AF604685137D356E826B29D0570A4A4AFD6C0941E4B23C04F",
+  "blocking_process_source_branch": "rebuild/0.17",
+  "blocking_process_binary": "D:\\Programs\\Factorio\\0.17\\bin\\x64\\factorio.exe",
+  "blocking_process_binary_sha256": "E699D376D100A428B95243507FDBB39C372921577C6D7593203EDF07CAA12D06",
+  "blocking_process_ids": [
+    2704,
+    19152
+  ],
+  "blocking_process_scenarios": [
+    "fresh-reload",
+    "upgrade-load-candidate"
+  ],
+  "root_cause_classification": "portable-retention-harness-process-lifecycle",
+  "root_cause": "PowerShell invocation of the Factorio GUI executable returned after proof output without synchronously owning the process through exit, leaving two 0.17 retention processes alive.",
+  "fix": "Run Factorio through System.Diagnostics.Process with redirected output, an explicit timeout, WaitForExit, and owned-process-tree termination on timeout.",
+  "regression": "Test-MIRPowerShellQuality requires the portable retention harness and its explicit process lifecycle primitives.",
+  "affected_targets": [
+    "0.17",
+    "0.16",
+    "0.15",
+    "0.14",
+    "0.13"
+  ],
+  "candidate_implication": "All richer lower-target candidates require requalification and resealing from the advanced final dev anchor; no published version is affected.",
+  "cleanup_result": "Stopped exactly the two workspace-owned 0.17 retention processes after command-line verification."
+}
