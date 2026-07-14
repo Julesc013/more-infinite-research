@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "status": "passed",
+  "version": "1.8.2",
+  "archive_sha256": "676927ECF801114CA8F7B9EFD6D139906432BCC60BE26B8CA5C08842E3686EFE",
+  "package_content_sha256": "F8B4B919CAFEA3BF2734FE048B6603B932CDA36637014EF5F756B6041135792D",
+  "entry_count": 167,
+  "package_root": "more-infinite-research_1.8.2/",
+  "deterministic_build_sha256": "676927ECF801114CA8F7B9EFD6D139906432BCC60BE26B8CA5C08842E3686EFE",
+  "forbidden_entry_count": 0,
+  "forbidden_entries": [],
+  "checks": [
+    "single correct root",
+    "no repository control files",
+    "no scripts fixtures tests build or dist",
+    "target metadata exact",
+    "deterministic entry order and timestamp builder gate"
+  ]
+}
