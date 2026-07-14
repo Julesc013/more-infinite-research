@@ -2,7 +2,7 @@
   "schema": 1,
   "target": "1.0",
   "mir_version": "1.8.2",
-  "canonical_dev_anchor": "59752d8218752abf0ab48f789bf08a20be024216",
+  "canonical_dev_anchor": "93972f4ea980d69652df89ebafea94828dcf0113",
   "features": [
     {"feature_id":"compiler-core","classification":"adapted","positive_requirement":"Factorio 1.0 must load the reduced compiler and emit only declared technologies.","target_result":"Retained through the legacy target adapter.","implementation_path":"prototypes/mir/planner/stream_compiler.lua","test":"base-generation-integrity","documentation_consequence":"Documented as a reduced compiler surface."},
     {"feature_id":"stable-stream-manifest","classification":"adapted","positive_requirement":"Every emitted technology must keep a stable manifest row.","target_result":"Eleven target streams are required.","implementation_path":"prototypes/mir/streams/generated_stream_manifest.json","test":"base-generation-integrity","documentation_consequence":"Release notes state the eleven-stream boundary."},

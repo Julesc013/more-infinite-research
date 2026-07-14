@@ -4,7 +4,7 @@ release:
   version: "1.8.2"
   branch: tmp/1.0
   factorio_version: "1.0"
-  baseline_commit: 59752d8218752abf0ab48f789bf08a20be024216
+  baseline_commit: 93972f4ea980d69652df89ebafea94828dcf0113
   baseline_tag: "3.1.9"
   objective: target-port-behavioral-subset
   public_contract_change: patch-compatible
