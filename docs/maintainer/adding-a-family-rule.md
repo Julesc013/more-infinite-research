@@ -1,7 +1,7 @@
 ---
 title: "Adding A Family Rule"
 status: current
-applies_to: "3.1.0+"
+applies_to: "3.2.0+"
 audience: developer
 doc_type: how-to
 owner: mir-maintainers

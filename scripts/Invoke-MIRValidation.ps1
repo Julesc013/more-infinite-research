@@ -304,6 +304,10 @@ Invoke-RepoCheck "settings visibility policy is linted" {
   & (Join-Path $repo "scripts\Test-MIRSettingsVisibility.ps1") -RepoRoot $repo
 }
 
+Invoke-RepoCheck "Factorio 2.0 source lock matches canonical MIR 3.1.9" {
+  & (Join-Path $repo "scripts\Test-MIRBackportSourceLock.ps1") -RepoRoot $repo
+}
+
 Invoke-RepoCheck "legacy inventory thresholds pass" {
   & (Join-Path $repo "scripts\Get-MIRLegacyInventory.ps1") -RepoRoot $repo -CheckThresholds
 }
@@ -313,17 +317,6 @@ Invoke-RepoCheck "no old tool-based science pack authority remains" {
   if ($matches.Count -gt 0) {
     $matches | Write-Host
     throw "Old science-pack authority references remain."
-  }
-}
-
-Invoke-RepoCheck "generated count formulas use compact cross-version syntax" {
-  $streamCompilerText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\planner\stream_compiler.lua")
-  $baseExtensionsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\emit\base_extensions.lua")
-  if ($streamCompilerText -notmatch 'tostring\(base_cost\) \.\. "\*" \.\. tostring\(growth_factor\)') {
-    throw "Stream compiler count formulas must use compact multiplication syntax."
-  }
-  if ($baseExtensionsText -notmatch 'format_number\(base_value\) \.\. "\*" \.\. format_number\(growth\)') {
-    throw "Base extension count formulas must use compact multiplication syntax."
   }
 }
 
@@ -506,6 +499,14 @@ Invoke-RepoCheck "compiler schema authorities and reference docs do not drift" {
 
 Invoke-RepoCheck "compiler contract coverage and mutation sentinels are complete" {
   & (Join-Path $repo "scripts\Test-MIRCompilerContractCoverage.ps1") -RepoRoot $repo
+}
+
+Invoke-RepoCheck "assurance classifier and evidence invalidation contracts are complete" {
+  & (Join-Path $repo "scripts\Test-MIRAssurance.ps1") -RepoRoot $repo
+}
+
+Invoke-RepoCheck "native-owner balance source and setting bindings do not drift" {
+  & (Join-Path $repo "scripts\Test-MIRNativeOwnerCostModels.ps1") -RepoRoot $repo
 }
 
 Invoke-RepoCheck "compatibility dependency declarations preserve full mod names" {
@@ -1967,11 +1968,11 @@ Invoke-RepoCheck "generated package archive matches metadata" {
 
   $info = Get-Content -Raw (Join-Path $repo "info.json") | ConvertFrom-Json
   $packageName = "$($info.name)_$($info.version)"
-  if ([string]::IsNullOrWhiteSpace($CandidateZip)) {
-    $validationOutputDir = "build/validation-dist"
-    & (Join-Path $repo "scripts\Build-MIRPackage.ps1") -OutputDir $validationOutputDir -CompressionLevel "Fastest" | Out-Host
-    $zipPath = Join-Path $repo "$validationOutputDir\$packageName.zip"
-  } else {
+  $validationOutputDir = "build/validation-dist"
+  & (Join-Path $repo "scripts\Build-MIRPackage.ps1") -OutputDir $validationOutputDir -CompressionLevel "Fastest" | Out-Host
+
+  $zipPath = Join-Path $repo "$validationOutputDir\$packageName.zip"
+  if (-not [string]::IsNullOrWhiteSpace($CandidateZip)) {
     $candidatePath = if ([System.IO.Path]::IsPathRooted($CandidateZip)) { $CandidateZip } else { Join-Path $repo $CandidateZip }
     if (-not (Test-Path -LiteralPath $candidatePath -PathType Leaf)) {
       throw "Candidate package not found: $CandidateZip"
@@ -1980,7 +1981,7 @@ Invoke-RepoCheck "generated package archive matches metadata" {
     Write-Host "[check] validating exact candidate package $zipPath"
   }
   if (-not (Test-Path -LiteralPath $zipPath)) {
-    throw "Validation package not found: $zipPath"
+    throw "Validation package not found after build: $zipPath"
   }
   $script:ValidationPackageZipPath = (Resolve-Path -LiteralPath $zipPath).Path
 
@@ -2099,11 +2100,7 @@ Invoke-RepoCheck "generated package archive matches metadata" {
 }
 
 Invoke-RepoCheck "package construction is byte deterministic" {
-  if ([string]::IsNullOrWhiteSpace($CandidateZip)) {
-    & (Join-Path $repo "scripts\Test-MIRDeterministicPackage.ps1") -RepoRoot $repo | Out-Host
-  } else {
-    Write-Host "[skip] exact candidate lane reuses separate deterministic-package evidence"
-  }
+  & (Join-Path $repo "scripts\Test-MIRDeterministicPackage.ps1") -RepoRoot $repo | Out-Host
 }
 
 Invoke-RepoCheck "git whitespace check" {
@@ -2886,12 +2883,12 @@ $defaultEnabledBaseExtensionKeys = @(
   "laser-shooting-speed"
 )
 
-$spaceAgeVanillaOwnedProductivityStreams = @(
-  "research_low_density_structure",
-  "research_plastic",
-  "research_processing_unit",
-  "research_rocket_fuel"
-)
+$spaceAgeVanillaOwnedProductivityStreams = [ordered]@{
+  research_low_density_structure = "low-density-structure-productivity"
+  research_plastic = "plastic-bar-productivity"
+  research_processing_unit = "processing-unit-productivity"
+  research_rocket_fuel = "rocket-fuel-productivity"
+}
 
 function Assert-DefaultBaseExtensionDiagnostics {
   param(
@@ -2920,10 +2917,11 @@ function Assert-DefaultBaseExtensionDiagnostics {
 function Assert-SpaceAgeVanillaOwnedProductivityStreamsBound {
   param([string]$Context)
 
-  foreach ($vanillaOwnedStream in $spaceAgeVanillaOwnedProductivityStreams) {
-    $vanillaOwnedLine = Get-LastStreamReportLine -Key $vanillaOwnedStream
-    if ($vanillaOwnedLine -notmatch "status=adopted" -or $vanillaOwnedLine -notmatch "reason=preserve_native_owner") {
-      throw "$Context should preserve the vanilla owner instead of generating a parallel MIR technology: $vanillaOwnedLine"
+  foreach ($entry in $spaceAgeVanillaOwnedProductivityStreams.GetEnumerator()) {
+    $vanillaOwnedLine = Get-LastStreamReportLine -Key $entry.Key
+    if ($vanillaOwnedLine -notmatch "status=adopted" -or $vanillaOwnedLine -notmatch "reason=preserve_native_owner" `
+        -or $vanillaOwnedLine -notmatch "effects=0" -or $vanillaOwnedLine -notmatch ("owners=" + [regex]::Escape($entry.Value))) {
+      throw "$Context should preserve and bind vanilla-owned productivity instead of generating a parallel MIR technology: $vanillaOwnedLine"
     }
   }
 }
@@ -3197,11 +3195,6 @@ if ($selectionActive) {
           $parameters[$property.Name] = $property.Value
         }
         Invoke-RuntimeScenario @parameters
-        if ($declaration.name -eq "space-age-generation-integrity") {
-          Assert-SpaceAgeVanillaOwnedProductivityStreamsBound -Context "Space Age generation integrity scenario"
-        } elseif ($declaration.name -eq "space-age-generation-integrity-inserter-enabled") {
-          Assert-SpaceAgeVanillaOwnedProductivityStreamsBound -Context "Space Age generation integrity with inserter enabled scenario"
-        }
       } elseif ($declaration.kind -eq "configuration-change") {
         switch ($declaration.name) {
           "space-age-native-owner-settings-config-change" {
@@ -3209,16 +3202,20 @@ if ($selectionActive) {
               -ScenarioName $declaration.name `
               -InitialFixtureNames @(
                 "mir-fixture-native-owner-settings-source",
-                "mir-fixture-assert-native-owner-settings"
+                "mir-fixture-assert-native-owner-settings",
+                "mir-fixture-assert-native-owner-progress"
               ) `
               -ChangedFixtureNames @(
                 "mir-fixture-native-owner-settings-source",
-                "mir-fixture-assert-native-owner-settings"
+                "mir-fixture-assert-native-owner-settings",
+                "mir-fixture-assert-native-owner-progress"
               ) `
               -InitialNativeOwnerSettingsProfile "default" `
               -ChangedNativeOwnerSettingsProfile "combined" `
               -EnableSpaceAge
             Assert-LogContains -Expected "Reset technology effects for productivity family adoption signature change" -Context $declaration.name
+            Assert-LogContains -Expected "Preserved current research progress for native owner low-density-structure-productivity" -Context $declaration.name
+            Assert-LogContains -Expected "[mir-fixture] native-owner progress configuration-change proof complete" -Context $declaration.name
             Assert-LogContains -Expected "schema=2|stream=research_rocket_fuel|owner=rocket-fuel-productivity|operation=configure_native_owner|configured=cost_model,effect_per_level,max_level,research_time|effects=0|output=" -Context $declaration.name
           }
           "space-age-vanilla-family-adoption-config-change" {

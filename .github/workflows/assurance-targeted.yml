@@ -12,7 +12,7 @@ on:
       target:
         description: "Factorio target line"
         required: true
-        default: "2.1"
+        default: "2.0"
 
 permissions:
   contents: read

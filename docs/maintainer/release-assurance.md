@@ -1,7 +1,7 @@
 ---
 title: "Release Assurance And Candidate Sealing"
 status: current
-applies_to: "3.1.9+"
+applies_to: "2.4.0+"
 audience: release-manager
 doc_type: how-to
 owner: mir-maintainers
@@ -34,7 +34,7 @@ The command implementation is `scripts/Invoke-MIRAssurance.ps1`, exposed through
 Start every release or backport with:
 
 ```powershell
-./scripts/mir.ps1 assurance doctor --target 2.1 --factorio 'C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe'
+./scripts/mir.ps1 assurance doctor --target 2.0 --factorio 'D:\Programs\Factorio\2.0\bin\x64\factorio.exe'
 ./scripts/mir.ps1 assurance inventory --output artifacts/assurance/inventory.json
 ./scripts/mir.ps1 assurance impact --baseline <qualified-commit> --json
 ./scripts/mir.ps1 verify plan --baseline <qualified-commit> --profile auto --output artifacts/assurance/plan.json
@@ -83,10 +83,10 @@ For a behavior-preserving refactor, use `--profile refactor-equivalence`, compar
 Build the exact candidate once and pass the same bytes to every downstream check:
 
 ```powershell
-./scripts/mir.ps1 assurance qualify --target 2.1 --profile full --factorio 'C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe' --prior '.\dist\more-infinite-research_3.1.5.zip' --output .mir/evidence/3.1.9-assurance-qualification.json
+./scripts/mir.ps1 assurance qualify --target 2.0 --profile full --factorio 'D:\Programs\Factorio\2.0\bin\x64\factorio.exe' --prior 'C:\path\to\more-infinite-research_2.3.5.zip' --output .mir/evidence/2.4.0-assurance-qualification.json
 # Review and commit the exact candidate archive and qualification summary before sealing.
-./scripts/mir.ps1 assurance seal --target 2.1 --factorio 'C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe' --evidence .mir/evidence/3.1.9-assurance-qualification.json
-./scripts/mir.ps1 assurance check-seal --seal .mir/evidence/candidate-seals/mir-3.1.9-factorio-2.1.json
+./scripts/mir.ps1 assurance seal --target 2.0 --factorio 'D:\Programs\Factorio\2.0\bin\x64\factorio.exe' --evidence .mir/evidence/2.4.0-assurance-qualification.json
+./scripts/mir.ps1 assurance check-seal --seal .mir/evidence/candidate-seals/mir-2.4.0-factorio-2.0.json
 ```
 
 The promotion check verifies the seal, exact ZIP, package source, target profile, test catalog, harness, evidence hash, and source ancestry. It cannot tag, push a tag, create a GitHub release, or upload to the Mod Portal.

@@ -6,8 +6,8 @@ if (-not $RepoRoot) { $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).
 $manifestPath = Join-Path $RepoRoot ".mir\native-owner-cost-models.json"
 $manifest = Get-Content -Raw -LiteralPath $manifestPath | ConvertFrom-Json
 if ([int]$manifest.schema -ne 1) { throw "Unsupported native-owner cost-model schema." }
-if ([string]$manifest.target -ne "2.1") { throw "Native-owner balance authority must target Factorio 2.1." }
-if ([string]$manifest.source.factorio_version -ne "2.1.10") { throw "Native-owner source version drifted from the qualified Factorio binary." }
+if ([string]$manifest.target -ne "2.0") { throw "Native-owner balance authority must target Factorio 2.0." }
+if ([string]$manifest.source.factorio_version -ne "2.0.77") { throw "Native-owner source version drifted from the qualified Factorio binary." }
 if ([string]$manifest.source.sha256 -notmatch '^[0-9A-F]{64}$') { throw "Native-owner source SHA-256 is malformed." }
 
 $expected = [ordered]@{
@@ -34,7 +34,7 @@ foreach ($contract in $contracts) {
   if ([string]$contract.native.count_formula -ne "1.5^L*1000" -or [double]$contract.native.base -ne 1000 `
       -or [double]$contract.native.growth -ne 1.5 -or [double]$contract.native.research_time -ne 60 `
       -or [string]$contract.native.max_level -ne "infinite" -or [double]$contract.native.effect_per_level -ne 0.1) {
-    throw "Native Factorio 2.1 balance values drifted for $stream."
+    throw "Native Factorio 2.0 balance values drifted for $stream."
   }
   if ([double]$contract.mir_catalog_defaults.base -ne 8000 -or [double]$contract.mir_catalog_defaults.growth -ne 2 `
       -or [double]$contract.mir_catalog_defaults.research_time -ne 60 -or [double]$contract.mir_catalog_defaults.max_level -ne 0 `
@@ -46,7 +46,7 @@ foreach ($contract in $contracts) {
   }
   $binding = 'native_owner_binding\("' + [regex]::Escape($row.owner) + '", \{"' + [regex]::Escape($row.product) + '"\}\)'
   if ($streamSource -notmatch $binding) { throw "Stream declaration is missing the governed native-owner binding for $stream." }
-  if ($settingsManifest -notmatch "(?m)^  $([regex]::Escape($stream)):\r?\n    native_owner_binding: $([regex]::Escape($row.owner))\r?$") {
+  if ($settingsManifest -notmatch "(?m)^  $([regex]::Escape($stream)):\r?\n    native_owner_binding: $([regex]::Escape($row.owner))$") {
     throw "Settings manifest is missing the native-owner mapping for $stream."
   }
 }
@@ -64,4 +64,4 @@ if (-not $costPairIsAtomic) {
   throw "Native-owner cost settings must activate the complete visible base/growth pair."
 }
 
-Write-Host "[ok] four Factorio 2.1 native-owner balance contracts and safe formula adapters passed."
+Write-Host "[ok] four Factorio 2.0 native-owner balance contracts and safe formula adapters passed."

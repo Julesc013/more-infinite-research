@@ -11,29 +11,6 @@ compatibility_packs:
   registry: prototypes/mir/compatibility/packs/registry.lua
   external_transport: more-infinite-research-compatibility-pack
   fixture_only_profiles_allowed_in_production_registry: false
-  applicability:
-    any_field: mods_any
-    all_field: mods_all
-    none_field: mods_none
-    legacy_any_field: mods
-    version_constraints: comma-separated-comparators
-  production_consumers:
-    - exact-includes-excludes
-    - aliases
-    - family-hints
-    - science-roles
-    - owner-claims
-    - reviewed-risk-overrides
-    - exact-family-generation-authorizations
-    - exact-candidate-seeds
-    - deterministic-precedence
-  hard_safety:
-    compatibility_pack_overridable: false
-    reviewable_signals_require_exact_recipe_version_and_fixture: true
-  exact_pack:
-    unrelated_active_pack_enables_generation: false
-    authorization_query: compatibility_packs.authorizes_family_stream
-    baseline: safe-attachment
 
 technology_prerequisite_cycle_repairs:
   - id: muluna-astroponics-space-science-cycle
@@ -57,22 +34,8 @@ campaigns:
   resolved_archive_sha256_required: true
   result_and_claim_level_required: true
   mega_smash_qualifies_individual_ecosystems: false
-  pre_renumber_load_characterization:
-    - .mir/evidence/pre-3.1-renumber-bz-bob-load-campaign-summary.json
-    - .mir/evidence/pre-3.1-renumber-core-ecosystems-load-campaign.json
-    - .mir/evidence/pre-3.1-renumber-aai-load-campaign.json
-  final_3_1_0_load_evidence:
-    available_ecosystems: .mir/evidence/3.1.0-rc5-ecosystem-campaign.json
-    status: 9-passed-load-claims-including-planet-cluster
-    current_archive_status: passed
-    source_commit: 3699fecb021ee64e0fcdeaf741e32b1b89cf27b3
-    archive_sha256: BD89A34D1EACA6C7FD93412072FFC1434F38DE90FA7E1156B75CE23DC07DDDA3
-    dependency_lock_sha256: 225E28FB37626A52AC224B5A1275B01AC7C2101C3A806984208646B00E143AC4
-    missing_dependency_closures:
-      - angels
-      - space-exploration
-      - pyanodon
-    missing_dependency_evidence: .mir/evidence/3.1.0-rc4-missing-overhaul-closures.json
+  current_load_evidence:
+    - .mir/evidence/3.2.0-bz-bob-load-campaign-summary.json
 
 claims:
   allowed_levels:

@@ -2,12 +2,6 @@ local expected = {
   ["mir-auto-prod-manufacturing-assembling-machine-1"] = "assemble-theta",
   ["mir-auto-prod-manufacturing-lab-1"] = "assemble-zeta"
 }
-local expected_science = {
-  ["automation-science-pack"] = true,
-  ["logistic-science-pack"] = true,
-  ["chemical-science-pack"] = true,
-  ["production-science-pack"] = true
-}
 
 local function fail(message)
   error("MIR semantic family generation validation failed: " .. message)
@@ -26,17 +20,6 @@ for technology_name, recipe_name in pairs(expected) do
     end
   end
   if not found then fail(recipe_name .. " is absent from " .. technology_name) end
-  local actual_science = {}
-  for _, ingredient in ipairs((technology.unit and technology.unit.ingredients) or {}) do
-    actual_science[ingredient.name or ingredient[1]] = true
-  end
-  for pack_name, _ in pairs(expected_science) do
-    if not actual_science[pack_name] then fail(technology_name .. " is missing reviewed science pack " .. pack_name) end
-  end
-  for pack_name, _ in pairs(actual_science) do
-    if not expected_science[pack_name] then fail(technology_name .. " gained unreviewed science pack " .. pack_name) end
-  end
-  if #(technology.prerequisites or {}) == 0 then fail(technology_name .. " has no reachable science prerequisite frontier") end
 end
 
 local coverage = data.raw["mod-data"] and data.raw["mod-data"]["more-infinite-research-coverage-report"]

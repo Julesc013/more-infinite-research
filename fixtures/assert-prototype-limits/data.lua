@@ -52,11 +52,11 @@ if module_source then
 end
 
 if safe_item and unsafe_item and ignored_item and nonstandard_item then
+  local target_profile = require("__more-infinite-research__.prototypes.mir.platform.factorio.target_profiles").current()
   local function boundary_recipe(name, ingredients, results, extra)
     local recipe = {
       type = "recipe",
       name = name,
-      categories = {"crafting"},
       enabled = true,
       allow_productivity = true,
       icon = "__base__/graphics/icons/iron-plate.png",
@@ -64,7 +64,18 @@ if safe_item and unsafe_item and ignored_item and nonstandard_item then
       ingredients = ingredients,
       results = results
     }
-    for key, value in pairs(extra or {}) do recipe[key] = value end
+    if target_profile.legacy_factorio_2_0 then
+      recipe.category = "crafting"
+    else
+      recipe.categories = {"crafting"}
+    end
+    for key, value in pairs(extra or {}) do
+      if target_profile.legacy_factorio_2_0 and key == "categories" then
+        recipe.category = value[1]
+      else
+        recipe[key] = value
+      end
+    end
     table.insert(fixture_prototypes, recipe)
   end
 

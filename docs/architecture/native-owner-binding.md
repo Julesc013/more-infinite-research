@@ -1,7 +1,7 @@
 ---
 title: "Native Owner Binding"
 status: current
-applies_to: "3.1.9+"
+applies_to: "2.4.1+"
 audience: maintainer
 doc_type: explanation
 owner: mir-maintainers
@@ -18,7 +18,7 @@ A stream with a recognized infinite technology owned by Factorio or another mod 
 
 `prototypes/streams/productivity.lua` may declare a `native_owner_binding` with one owner technology, an effect-product scope, eligibility requirements, recognized cost formulas, default preservation, and fallback policy. The declaration is data only. Compatibility overlays cannot configure or mutate the owner.
 
-The initial Factorio 2.1 bindings are processing units to `processing-unit-productivity`, plastic to `plastic-bar-productivity`, low-density structures to `low-density-structure-productivity`, and rocket fuel to `rocket-fuel-productivity`. Their reviewed source values and source-file digest live in `.mir/native-owner-cost-models.json`.
+The initial Factorio 2.0 bindings are processing units to `processing-unit-productivity`, plastic to `plastic-bar-productivity`, low-density structures to `low-density-structure-productivity`, and rocket fuel to `rocket-fuel-productivity`. Their reviewed source values and source-file digest live in `.mir/native-owner-cost-models.json`.
 
 ## Planning
 
@@ -32,7 +32,7 @@ The cost adapter preserves either Factorio's `growth^L*base` formula style, MIR'
 
 Planning records immutable input and expected output snapshots plus fingerprints. Whole-plan validation rejects duplicate owner bindings. The emission transaction verifies the input fingerprint immediately before applying one prevalidated owner update, and output validation verifies the resulting fingerprint. The default preserve operation performs no assignment, retaining exact table identity and final external balance.
 
-The emitted binding artifact also carries the recognized input and output research-unit models. On a configuration change, runtime state compares the previous output model with the new output model and compensates Factorio's normalized-progress rescaling for a currently researched bound owner. This preserves the player's level, current research selection, and fractional progress while startup cost settings change or an older save first adopts native-owner configuration.
+The emitted binding artifact also carries recognized input and output research-unit models. On a configuration change, runtime compares the former and current unit counts and compensates Factorio's normalized-progress rescaling for a currently researched bound owner. This preserves the player's level, current research selection, and fractional progress. The Factorio 2.0 projection includes a legacy output model that reconstructs 2.4.0's independently applied base and growth settings so existing saves migrate to 2.4.1's paired cost semantics without losing progress.
 
 If the owner is absent, finite, unreachable, malformed, or unsafe to configure, eligible recipes fall back to MIR generation. Recipes already covered by an existing owner are excluded from fallback generation so MIR never creates duplicate productivity coverage. Only emission code may apply the planned transaction or create the fallback technology.
 

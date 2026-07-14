@@ -53,7 +53,7 @@ The order describes increasing automatic action, not increasing safety or qualit
 
 ## Existing Infinite Research Owners
 
-Processing units, plastic, low-density structures, and rocket fuel can already be covered by infinite productivity technologies supplied by Space Age or another mod. MIR 3.1.9 binds those recognized owners to the same visible stream controls used when MIR has to generate a technology: Enable, base cost, cost growth, maximum level, research time, and effect per level.
+Processing units, plastic, low-density structures, and rocket fuel can already be covered by infinite productivity technologies supplied by Space Age or another mod. MIR 2.4.0 binds those recognized owners to the same visible stream controls used when MIR has to generate a technology: Enable, base cost, cost growth, maximum level, research time, and effect per level.
 
 Leaving the settings at their defaults preserves the final existing technology exactly, including values changed by another mod. Turning Enable off also leaves the external technology untouched. A deliberate non-default value configures the recognized existing owner instead of silently ignoring the setting. Effect values use percentage points and change only recipe-productivity effects in that stream's product family; unrelated technology effects remain intact. Maximum level `0` means infinite.
 

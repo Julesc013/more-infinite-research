@@ -1,17 +1,17 @@
 {
   "schema": 1,
-  "default_target": "2.1",
+  "default_target": "2.0",
   "profiles": {
     "edit": ["static.architecture", "static.compiler"],
-    "fast": ["tooling.self-test", "static.architecture", "static.compiler", "static.settings", "static.balance", "static.museum", "static.package"],
+    "fast": ["static.architecture", "static.compiler", "static.settings", "static.package"],
     "auto": [],
     "locale": ["static.locales", "runtime.exact-zip"],
     "balance": ["static.balance", "runtime.affected"],
     "refactor-equivalence": ["static.compiler", "static.package", "runtime.exact-zip"],
     "hotfix": ["static.full", "runtime.affected", "runtime.exact-zip"],
     "targeted": ["static.full", "runtime.affected", "runtime.exact-zip"],
-    "full": ["tooling.self-test", "static.balance", "static.museum", "runtime.full", "runtime.exact-zip", "runtime.upgrade", "runtime.ecosystem"],
-    "backport": ["tooling.self-test", "static.balance", "static.museum", "runtime.full", "runtime.exact-zip", "runtime.upgrade", "runtime.ecosystem"],
+    "full": ["static.full", "runtime.full", "runtime.upgrade", "runtime.ecosystem"],
+    "backport": ["static.full", "runtime.full", "runtime.upgrade", "runtime.ecosystem"],
     "promotion-check": ["seal.verify"]
   },
   "classes": [
@@ -54,11 +54,6 @@
       "id": "test-harness",
       "patterns": ["^scripts/", "^fixtures/", "^\\.mir/test", "^\\.github/workflows/"],
       "tests": ["tooling.self-test", "static.full", "runtime.affected"]
-    },
-    {
-      "id": "museum-tooling",
-      "patterns": ["^\\.mir/museum-targets\\.json$", "^scripts/(Build-MIRMuseumTarget|New-MIRMuseum|Test-MIRMuseum)", "^scripts/Museum/"],
-      "tests": ["static.museum"]
     },
     {
       "id": "repository-docs",

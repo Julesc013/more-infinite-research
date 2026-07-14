@@ -5,17 +5,21 @@ applies_to: "3.0.0+"
 audience: maintainer
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-07-12
+last_reviewed: 2026-07-14
 supersedes: []
 superseded_by: []
 ---
 # Target-Line Versioning And Backports
 
-Updated: 2026-07-12
+Updated: 2026-07-14
 
-## Current 3.1 Release Roles
+## Current Post-3.1 Release Roles
 
-Published MIR `3.0.5` on the Factorio 2.1 line and MIR `2.3.5` on `legacy` are immutable. Automatic-compiler work is unreleased MIR `3.1.0` on `dev`; its Factorio 2.0 semantic companion will be unreleased MIR `2.4.0` on `tmp/2.0` only after the modern implementation passes. Earlier 3.1.0 and 2.4.0 candidate commits, tags, and archives are superseded development evidence and are not publication authority.
+Sealed MIR `3.1.9` on `main` is the current canonical Factorio 2.1 source anchor awaiting maintainer tag and publication. MIR `2.4.0` is the published Factorio 2.0 release and exact save-upgrade predecessor. MIR `2.4.1` on `tmp/2.0` is rebuilt as a complete target projection of the final 3.1.9 portable package source, with every legitimate 2.0 package adaptation enumerated in `.mir/backport-source-lock.json`.
+
+After the exact `2.4.1` candidate passes its target gates, stop for maintainer review, tag, and publication. Do not promote it to `legacy` or start `tmp/1.1` or any lower target during this gate unless the maintainer explicitly opens that next release step.
+
+Every rebuilt target projection must descend from its declared modern source anchor and pass `scripts/Test-MIRBackportSourceLock.ps1`. The lock binds the canonical release-candidate commit, canonical package-source commit, target manifest hash, and exact set of target-specific package paths. Published predecessor archives remain immutable upgrade inputs; they are not substitutes for direct canonical ancestry.
 
 The current older-target state is MIR `1.9.4` qualified but unreleased on `tmp/1.1`, MIR `1.8.2` staged but runtime-unqualified on `tmp/1.0`, MIR `1.7.1` planned on `tmp/0.17`, MIR `1.6.0` planned on `tmp/0.16`, and MIR `1.5.0` planned on `tmp/0.15`. Archived plans retain their historical version numbers; current 0.16 and 0.15 work follows the new 1.6.0 and 1.5.0 plans.
 
@@ -78,8 +82,8 @@ Use these branch roles during the transition:
 | --- | --- | ---: |
 | `main` | Stable canonical Factorio `2.1` line after gates. | `3.x.x` after `3.0.0` |
 | `dev` | Development canonical Factorio `2.1` line. | `3.x.x` after `3.0.0` |
-| `legacy` | Frozen Factorio `2.0` MIR `2.3.x` stable baseline. | No new feature releases. |
-| `tmp/2.0` | Maintained Factorio `2.0` semantic companion branch after 3.1.0 acceptance. | Unreleased `2.4.0` from frozen `2.3.5`. |
+| `legacy` | Stable Factorio `2.0` release branch frozen at published `2.4.0` during the current gate. | No promotion until the maintainer completes the 2.4.1 release step. |
+| `tmp/2.0` | Factorio `2.0` staging and qualification branch. | Complete, unreleased `2.4.1` projection of sealed 3.1.9; earlier six-scenario candidate is superseded. |
 | `tmp/1.1` | Working Factorio `1.1` port branch or worktree. | `1.9.x` starting at `1.9.3` |
 | `port/1.1-to-0.18` | Short-lived Factorio `0.18` bridge branch seeded from the validated `1.9.3` source point. | `1.8.0` only |
 | `tmp/1.0` | Working Factorio `1.0` port branch or worktree after the `0.18` bridge proof. | `1.8.1+` |
@@ -444,8 +448,6 @@ First tasks:
 - only then define the actual feature set.
 
 Do not block `3.0.5` on the full museum ladder unless the archive work is moving quickly. Lessons from `0.14` and older can feed a later `3.0.6` patch or the `3.1.0` tooling and compatibility infrastructure campaign.
-
-Museum package deployment is target evidence, not a modern default. Factorio `0.12` through `0.9` load the versioned release ZIP directly. Factorio `0.8` through `0.6` require that exact ZIP to be extracted into the mods directory. Record `zip-native` or `extract-required` in the target manifest and release packet, and test the exact distribution archive by the recorded route.
 
 ## Release Wording Classes
 

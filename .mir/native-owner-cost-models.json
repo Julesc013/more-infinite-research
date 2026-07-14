@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "target": "2.1",
+  "target": "2.0",
   "source": {
-    "factorio_version": "2.1.10",
+    "factorio_version": "2.0.77",
     "mod": "space-age",
     "path": "space-age/prototypes/technology.lua",
-    "sha256": "27AD51385EE1A90DBBC90E68B3F7868768888C78DF99355D2E081AF42A66D5EB"
+    "sha256": "64FF6FC1A01270B646E4A61D2470C2C52C6B78A378D3DDAA0059BD3418CC4EA5"
   },
   "contracts": [
     {

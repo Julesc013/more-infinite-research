@@ -305,7 +305,7 @@ lessons:
     fixture_evidence:
       - exact-dist-factorio-0.14
       - supported-settings-runtime-boundary
-    dev_commit: bbc6b49
+    dev_commit: docs-and-ledger-3.1.5
     replayed_target_commits:
       - 1e45000
       - fa3b532

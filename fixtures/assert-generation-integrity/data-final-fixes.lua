@@ -14,7 +14,6 @@ local pipeline_commands = require("__more-infinite-research__.prototypes.mir.pip
 local capability_registry = require("__more-infinite-research__.prototypes.mir.capabilities.registry")
 local stream_compiler = require("__more-infinite-research__.prototypes.mir.planner.stream_compiler")
 local target_profile = require("__more-infinite-research__.prototypes.mir.platform.factorio.target_profiles").current()
-local recipe_semantics = require("__more-infinite-research__.prototypes.mir.domain.facts.recipe_semantics")
 
 local function fail(message)
   error("MIR validation failed: " .. message)
@@ -36,7 +35,8 @@ local function assert_no_blocked_pickup_effects()
 end
 
 local function assert_generation_plan_v3()
-  local plan = stream_compiler.latest_artifact()
+  local prototype = (data.raw["mod-data"] or {})["more-infinite-research-generation-plan"]
+  local plan = (prototype and prototype.data) or stream_compiler.latest_artifact()
   if not plan or plan.schema ~= 3 or not plan.validation_summary or plan.validation_summary.valid ~= true then
     fail("missing accepted GenerationPlan schema 3 artifact")
   end
@@ -178,40 +178,6 @@ local function assert_recipe_fact_contracts()
   end
   if canonical_recipe_facts.scan_count() ~= 1 then
     fail("large synthetic recipe queries triggered a repeated full recipe scan")
-  end
-
-  local default_policy = canonical_recipe_facts.get("mir-fixture-default-productivity-policy")
-  if not default_policy or default_policy.declared_allow_productivity ~= nil
-    or default_policy.effective_allow_productivity ~= false then
-    fail("omitted allow_productivity did not resolve to the Factorio 2.1 false default")
-  end
-
-  local complete_shape = canonical_recipe_facts.get("mir-fixture-complete-product-shape")
-  local product = complete_shape and complete_shape.variants[1] and complete_shape.variants[1].results[1]
-  if not product or product.independent_probability ~= 0.5 or product.extra_count_fraction ~= 0.25
-    or product.percent_spoiled ~= 0.1 or product.always_fresh ~= true
-    or product.reset_freshness_on_craft ~= true or product.quality_min ~= "normal"
-    or product.quality_max ~= "normal" or product.quality_change ~= 0
-    or product.affected_by_quality ~= false then
-    fail("RecipeFactV2 did not preserve the complete Factorio 2.1 product shape")
-  end
-
-  local inherited = recipe_semantics.resolve(
-    {allow_productivity = true, maximum_productivity = 2.5},
-    {allow_quality = false},
-    target_profile
-  )
-  if inherited.effective_allow_productivity ~= true or inherited.effective_allow_quality ~= false
-    or inherited.effective_maximum_productivity ~= 2.5 then
-    fail("recipe variant policy did not inherit root declarations")
-  end
-
-  local probability_fields = {}
-  for _, field in ipairs(target_profile.prototype_shapes.product_probability_fields or {}) do
-    probability_fields[field] = true
-  end
-  for _, field in ipairs({"independent_probability", "shared_probability", "extra_count_fraction", "quality_min", "quality_max"}) do
-    if not probability_fields[field] then fail("target profile omits product field " .. field) end
   end
 end
 

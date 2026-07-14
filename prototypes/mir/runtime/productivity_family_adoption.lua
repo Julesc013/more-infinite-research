@@ -28,7 +28,8 @@ local function current_adoption_state()
   for _, binding in ipairs(data.bindings or {}) do
     bindings[tostring(binding.owner)] = {
       input_unit = binding.input_unit or {},
-      output_unit = binding.output_unit or {}
+      output_unit = binding.output_unit or {},
+      legacy_output_unit = binding.legacy_output_unit
     }
   end
   return {
@@ -59,7 +60,8 @@ local function restore_current_research_progress(previous_bindings, current_bind
     local technology = force.current_research
     local current = technology and current_bindings[technology.name]
     if current then
-      local previous = previous_bindings[technology.name] or {output_unit = current.input_unit}
+      local previous = previous_bindings[technology.name]
+        or {output_unit = current.legacy_output_unit or current.input_unit}
       local previous_count = research_unit_count(previous.output_unit, technology.level)
       local current_count = research_unit_count(current.output_unit, technology.level)
       if previous_count and current_count and previous_count > 0 and current_count > 0

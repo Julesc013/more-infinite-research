@@ -17,10 +17,10 @@ jobs:
           fetch-depth: 0
       - name: Diagnose assurance environment
         shell: pwsh
-        run: ./scripts/mir.ps1 assurance doctor --target 2.1 --json
+        run: ./scripts/mir.ps1 assurance doctor --target 2.0 --json
       - name: Materialize change-aware verification plan
         shell: pwsh
-        run: ./scripts/mir.ps1 verify plan --target 2.1 --profile fast --output artifacts/assurance/plan.json
+        run: ./scripts/mir.ps1 verify plan --target 2.0 --profile fast --output artifacts/assurance/plan.json
       - name: Validate planner and evidence invalidation
         shell: pwsh
         run: ./scripts/Test-MIRAssurance.ps1

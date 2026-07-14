@@ -14,7 +14,7 @@ superseded_by: []
 
 Release docs are version-specific plans, migration guides, risk registers, checklists, and validation records.
 
-MIR 3.1.5 and 2.4.0 are the published immutable modern baselines. MIR 3.1.9 is the final 3.1 patch candidate on Factorio 2.1. The descending 1.9.4 through 1.3.0 candidates and the finite museum 0.12.0 through 0.6.0 candidates are independently sealed on their target branches. Qualification does not tag or publish any candidate.
+MIR 3.1.9 is the sealed Factorio 2.1 release candidate on `main`. MIR 2.4.0 is the published Factorio 2.0 release and exact save-upgrade predecessor; MIR 2.4.1 is the active complete 3.1.9 projection on `tmp/2.0`. Its source lock, checklist, validation summary, candidate seal, and backport-wave dashboard govern qualification. The earlier six-scenario 2.4.1 archive and the internal MIR 2.5.0 candidate are superseded evidence, not release artifacts.
 
 - [3.0.0 plan](3.0.0-plan.md)
 - [3.0.0 regression baseline](3.0.0-regression-baseline.md)
@@ -32,22 +32,17 @@ MIR 3.1.5 and 2.4.0 are the published immutable modern baselines. MIR 3.1.9 is t
 - [3.0.5 release notes](notes/release-notes-3.0.5.md)
 - [3.0.5 validation summary](3.0.5-validation-summary.md)
 - [2.3.5 backport plan](2.3.5-backport-plan.md)
+- [2.4.1 release checklist](2.4.1-checklist.md)
+- [2.4.1 release notes](notes/release-notes-2.4.1.md)
+- [2.4.1 validation summary](2.4.1-validation-summary.md)
 - [Backport wave dashboard](backport-wave-dashboard.md)
 - [3.1.0 plan](3.1.0-plan.md)
 - [3.1.0 release checklist](3.1.0-checklist.md)
 - [3.1.0 release notes](notes/release-notes-3.1.0.md)
-- [3.1.1 release notes](notes/release-notes-3.1.1.md)
-- [3.1.2 release notes](notes/release-notes-3.1.2.md)
-- [3.1.5 candidate notes](notes/release-notes-3.1.5.md)
-- [3.1.5 validation summary](3.1.5-validation-summary.md)
-- [3.1.9 release notes](notes/release-notes-3.1.9.md)
-- [3.1.9 migration guide](3.1.9-migration-guide.md)
-- [3.1.9 release checklist](3.1.9-checklist.md)
-- [3.1.9 validation summary](3.1.9-validation-summary.md)
 - [3.1.0 migration guide](3.1.0-migration-guide.md)
 - [3.1.0 validation summary](3.1.0-validation-summary.md)
 - [3.1.0 roadmap](3.1.0-roadmap.md)
-- [3.1.0 automatic compiler development summary](3.1.0-automatic-compiler-development-summary.md)
+- [3.2.0 development summary](3.2.0-development-summary.md)
 - [1.6.0 Factorio 0.16 plan](1.6.0-plan.md)
 - [1.5.0 Factorio 0.15 plan](1.5.0-plan.md)
 - [2.2.0 validation record](2.2.0-validation-record.md)

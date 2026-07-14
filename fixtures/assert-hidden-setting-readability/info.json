@@ -4,9 +4,9 @@
   "title": "MIR Fixture - Assert Hidden Setting Readability",
   "author": "Julesc013",
   "description": "Validation fixture that asserts unavailable MIR settings are hidden without deleting their registered, readable values.",
-  "factorio_version": "2.1",
+  "factorio_version": "2.0",
   "dependencies": [
-    "base >= 2.1.8",
+    "base >= 2.0",
     "more-infinite-research"
   ]
 }

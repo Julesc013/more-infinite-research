@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "release": "3.1.0",
-  "factorio_line": "2.1",
+  "release": "2.4.0",
+  "factorio_line": "2.0",
   "budgets": [
     { "id": "base", "source": "validation_scenario", "key": "base-generation-integrity", "max_seconds": 8.0 },
     { "id": "space-age", "source": "validation_scenario", "key": "space-age-generation-integrity", "max_seconds": 18.0 },

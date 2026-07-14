@@ -110,7 +110,7 @@ data:extend({
           risk_overrides = {},
           family_authorizations = {},
           candidate_seeds = {},
-          targets = {factorio_lines = {"2.1"}},
+          targets = {factorio_lines = {"2.0", "2.1"}},
           evidence = {
             fixtures = {"plates-n-circuit-productivity"},
             real_mod = {}

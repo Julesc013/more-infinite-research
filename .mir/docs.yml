@@ -146,6 +146,14 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - automatic-family-compiler
+  - path: docs/architecture/automatic-family-balance.md
+    title: "Automatic Family Balance And Scope"
+    status: current
+    audience: maintainer
+    doc_type: explanation
+    owner: mir-maintainers
+    source_of_truth_for:
+      - automatic-family-balance
   - path: docs/reference/schemas/generation-plan.md
     title: "GenerationPlan Schema"
     status: current
@@ -196,32 +204,6 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - compatibility-pack-schema
-  - path: docs/reference/compiler-authority-table.md
-    title: "Compiler Authority Table"
-    status: current
-    audience: developer
-    doc_type: reference
-    owner: mir-maintainers
-    source_of_truth_for:
-      - compiler-schema-authorities
-      - compiler-schema-drift-policy
-  - path: docs/architecture/automatic-family-balance.md
-    title: "Automatic Family Balance And Scope"
-    status: current
-    audience: maintainer
-    doc_type: explanation
-    owner: mir-maintainers
-    source_of_truth_for:
-      - automatic-family-balance
-      - automatic-family-release-scope
-  - path: docs/architecture/recipe-variant-plan.md
-    title: "RecipeVariantPlan Design"
-    status: draft
-    audience: maintainer
-    doc_type: explanation
-    owner: mir-maintainers
-    source_of_truth_for:
-      - recipe-variant-plan-design
   - path: docs/reference/schemas/scenario-manifest.md
     title: "Scenario Manifest Schema"
     status: current
@@ -815,6 +797,16 @@ docs:
     doc_type: how-to
     owner: mir-maintainers
     source_of_truth_for: []
+  - path: docs/maintainer/release-assurance.md
+    title: "Release Assurance And Candidate Sealing"
+    status: current
+    audience: release-manager
+    doc_type: how-to
+    owner: mir-maintainers
+    source_of_truth_for:
+      - release-assurance
+      - candidate-sealing
+      - evidence-invalidation
   - path: docs/maintainer/documentation-governance.md
     title: "Documentation Governance"
     status: current
@@ -922,6 +914,15 @@ docs:
     doc_type: reference
     owner: mir-maintainers
     source_of_truth_for: []
+  - path: docs/reference/compiler-authority-table.md
+    title: "Compiler Authority Table"
+    status: current
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - compiler-schema-authorities
+      - compiler-schema-drift-policy
   - path: docs/reference/generated-id-reference.md
     title: "Generated ID Reference"
     status: current
@@ -1172,8 +1173,8 @@ docs:
     owner: mir-maintainers
     source_of_truth_for: []
   - path: docs/releases/3.1.0-roadmap.md
-    title: "MIR 3.1.0 Automatic Compiler Roadmap"
-    status: current
+    title: "3.1.0 Roadmap"
+    status: draft
     audience: release-manager
     doc_type: release-plan
     owner: mir-maintainers
@@ -1400,14 +1401,21 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - mir-3.1.0-plan
-  - path: docs/releases/3.1.0-automatic-compiler-development-summary.md
-    title: "MIR 3.1.0 Automatic Compiler Development Summary"
+  - path: docs/releases/3.2.0-development-summary.md
+    title: "Post-3.1 Automatic Compiler Development Summary"
     status: current
     audience: release-manager
     doc_type: release-plan
     owner: mir-maintainers
     source_of_truth_for:
-      - mir-3.1.0-automatic-compiler-result
+      - post-3.1-automatic-compiler-result
+  - path: docs/archive/superseded/2.5.0-internal-candidate-development-summary.md
+    title: "MIR 2.5.0 Internal Candidate Development Summary"
+    status: archived
+    audience: maintainer
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
   - path: docs/releases/3.1.0-checklist.md
     title: "MIR 3.1.0 Release Checklist"
     status: current
@@ -1425,8 +1433,8 @@ docs:
     source_of_truth_for:
       - mir-3.1.0-protected-baseline
   - path: docs/releases/3.1.0-validation-summary.md
-    title: "MIR 3.1.0 Superseded Candidate Validation Summary"
-    status: archived
+    title: "MIR 3.1.0 Validation Summary"
+    status: current
     audience: release-manager
     doc_type: release-plan
     owner: mir-maintainers
@@ -1442,44 +1450,75 @@ docs:
       - mir-3.1.0-migration
   - path: docs/releases/notes/release-notes-3.1.0.md
     title: "MIR 3.1.0 Release Notes"
-    status: archived
+    status: current
     audience: player
     doc_type: release-plan
     owner: mir-maintainers
     source_of_truth_for:
       - mir-3.1.0-release-notes
-  - path: docs/releases/notes/release-notes-3.1.1.md
-    title: "MIR 3.1.1 Release Notes"
-    status: current
-    audience: player
-    doc_type: release-plan
-    owner: mir-maintainers
-    source_of_truth_for:
-      - mir-3.1.1-release-notes
-  - path: docs/releases/notes/release-notes-3.1.2.md
-    title: "MIR 3.1.2 Release Notes"
-    status: current
-    audience: player
-    doc_type: release-plan
-    owner: mir-maintainers
-    source_of_truth_for:
-      - mir-3.1.2-release-notes
-  - path: docs/releases/notes/release-notes-3.1.5.md
-    title: "MIR 3.1.5 Candidate Notes"
-    status: current
-    audience: player
-    doc_type: release-plan
-    owner: mir-maintainers
-    source_of_truth_for:
-      - mir-3.1.5-release-notes
-  - path: docs/releases/3.1.5-validation-summary.md
-    title: "MIR 3.1.5 Validation Summary"
+  - path: docs/releases/2.4.0-checklist.md
+    title: "MIR 2.4.0 Release Checklist"
     status: current
     audience: release-manager
     doc_type: release-plan
     owner: mir-maintainers
     source_of_truth_for:
-      - mir-3.1.5-validation
+      - mir-2.4.0-release-gate
+  - path: docs/releases/2.4.0-validation-summary.md
+    title: "MIR 2.4.0 Validation Summary"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-2.4.0-validation-result
+  - path: docs/releases/2.4.0-migration-guide.md
+    title: "MIR 2.4.0 Migration Guide"
+    status: current
+    audience: player
+    doc_type: how-to
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-2.4.0-migration
+  - path: docs/releases/notes/release-notes-2.4.0.md
+    title: "MIR 2.4.0 Release Notes"
+    status: current
+    audience: player
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-2.4.0-release-notes
+  - path: docs/releases/2.4.1-checklist.md
+    title: "MIR 2.4.1 Release Checklist"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-2.4.1-release-gate
+  - path: docs/releases/2.4.1-validation-summary.md
+    title: "MIR 2.4.1 Validation Summary"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-2.4.1-validation-result
+  - path: docs/releases/notes/release-notes-2.4.1.md
+    title: "MIR 2.4.1 Release Notes"
+    status: current
+    audience: player
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-2.4.1-release-notes
+  - path: docs/archive/superseded/release-notes-2.5.0-internal-candidate.md
+    title: "MIR 2.5.0 Internal Candidate Notes"
+    status: archived
+    audience: maintainer
+    doc_type: archive
+    owner: mir-maintainers
+    source_of_truth_for: []
   - path: docs/adr/0015-canonical-stream-descriptors.md
     title: "ADR-0015: Canonical Stream Descriptors"
     status: current
@@ -1544,43 +1583,19 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - native-owner-binding-contract
-  - path: docs/maintainer/release-assurance.md
-    title: "Release Assurance And Candidate Sealing"
-    status: current
-    audience: release-manager
-    doc_type: how-to
-    owner: mir-maintainers
-    source_of_truth_for:
-      - release-assurance-contract
-  - path: docs/releases/notes/release-notes-3.1.9.md
-    title: "MIR 3.1.9 Release Notes"
-    status: current
-    audience: player
-    doc_type: release-plan
-    owner: mir-maintainers
-    source_of_truth_for:
-      - mir-3.1.9-release-notes
-  - path: docs/releases/3.1.9-migration-guide.md
-    title: "MIR 3.1.9 Migration Guide"
-    status: current
-    audience: player
-    doc_type: how-to
-    owner: mir-maintainers
-    source_of_truth_for:
-      - mir-3.1.9-migration
-  - path: docs/releases/3.1.9-checklist.md
-    title: "MIR 3.1.9 Release Checklist"
-    status: current
-    audience: release-manager
-    doc_type: release-plan
-    owner: mir-maintainers
-    source_of_truth_for:
-      - mir-3.1.9-release-checklist
-  - path: docs/releases/3.1.9-validation-summary.md
-    title: "MIR 3.1.9 Validation Summary"
+  - path: docs/compatibility/native-owner-backport-ledger.md
+    title: "Native Owner Backport Ledger"
     status: current
     audience: release-manager
     doc_type: reference
     owner: mir-maintainers
     source_of_truth_for:
-      - mir-3.1.9-validation
+      - native-owner-backport-sequence
+  - path: docs/releases/3.2.0-native-owner-forward-port.md
+    title: "MIR 3.2.0 Native Owner Forward-Port"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - native-owner-3.2.0-forward-port

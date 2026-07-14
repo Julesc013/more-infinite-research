@@ -4,57 +4,16 @@ scenario_manifest:
   path: fixtures/compat-matrix/expected-scenarios.json
   schema: 3
   declarations: full-records
-  record_owns:
-    - fixtures
-    - settings
-    - source_mode
-    - timeout_seconds
-    - tags
-    - isolation
-    - assertions
-
-test_impact_manifest:
-  path: .mir/test-impact.yml
-  schema: 1
-  baseline: exact-package-smoke
-  selector: scripts/Invoke-MIRValidation.ps1
-
-compiler_contract_coverage:
-  path: .mir/compiler-contract-coverage.yml
-  schema: 1
-  validator: scripts/Test-MIRCompilerContractCoverage.ps1
-
-local_campaign_manifest:
-  path: fixtures/compat-matrix/local-library-scenarios.json
-  factorio_2_0_path: fixtures/compat-matrix/local-library-scenarios-2.0.json
-  shared_manual_path: fixtures/compat-matrix/manual-scenarios.json
-  schema: 2
-  validator: scripts/Test-MIRScenarioManifests.ps1
-  record_owns:
-    - targets
-    - kind
-    - group
-    - setup
-    - roots
-    - settings
-    - expected_plan
-    - timeout_seconds
-    - claim_level
-  independent_aai_scenarios:
-    - local-2-1-aai-loaders
-    - local-2-1-aai-industry
-    - local-2-1-aai-loaders-industry
-    - local-2-1-aai-representative-extensions
 
 golden_plans:
   stable_technology_ids:
     path: fixtures/golden-plans/stable-technology-ids.json
-    baseline: published-3.0.5
+    baseline: immutable-3.1.0
     expected_count: 70
     validator: scripts/Test-MIRGoldenPlans.ps1
   automatic_family_technology_ids:
     path: fixtures/golden-plans/automatic-family-technology-ids.json
-    release: "3.1.0"
+    release: "3.2.0"
     expected_count: 2
     validator: scripts/Test-MIRGoldenPlans.ps1
 
@@ -74,6 +33,24 @@ real_mod_gates:
     status: required
 
 fixtures:
+  compiler-contracts:
+    requires_features: [recipe_productivity]
+    assertion_path: fixtures/assert-compiler-contracts
+    validates:
+      - invalid-family-rule-rejection
+      - invalid-compatibility-pack-rejection
+      - stable-rule-and-pack-sorting
+      - deterministic-rule-precedence
+      - equal-precedence-conflict-rejection
+      - compatibility-pack-target-and-applicability-filtering
+      - stable-generation-plan-identities
+      - evidence-bearing-generation-plan-gates
+      - deterministic-cross-stream-effect-arbitration
+      - compilation-plan-cross-collision
+      - final-plan-output-owner-parity
+      - insertion-order-independent-plan-fingerprints
+      - cyclic-fingerprint-rejection
+
   rigor-late-recipe-removal:
     requires_features: [recipe_productivity]
     path: fixtures/rigor-late-recipe-removal
@@ -177,10 +154,6 @@ fixtures:
       - positive-stream-target-requirements
       - canonical-recipe-fact-single-scan
       - canonical-recipe-fact-copy-isolation
-      - effective-recipe-property-defaults
-      - root-variant-recipe-property-inheritance
-      - complete-factorio-2-1-product-normalization
-      - target-declared-product-probability-fields
       - governed-pipeline-command-catalog
       - pipeline-command-positive-target-requirements
       - large-synthetic-recipe-index
@@ -210,69 +183,27 @@ fixtures:
       - runtime-state-effect-retention
       - exact-3-1-0-candidate-normal-mod-directory-load
 
-  upgrade-3-0-5-to-3-1-5:
+  upgrade-2-3-5-to-2-4-0:
     requires_features: [scripted_techs]
-    assertion_path: fixtures/assert-upgrade-3-0-5-to-3-1-5
+    assertion_path: fixtures/assert-upgrade-2-3-5-to-2-4-0
     validates:
-      - exact-3-0-5-source-archive
+      - exact-2-3-5-source-archive
       - non-default-startup-setting-retention
       - scripted-technology-level-retention
       - runtime-state-effect-retention
-      - exact-3-1-5-candidate-normal-mod-directory-load
+      - exact-2-4-0-candidate-normal-mod-directory-load
 
-  upgrade-3-0-5-to-3-1-9:
-    requires_features: [scripted_techs]
-    assertion_path: fixtures/assert-upgrade-3-0-5-to-3-1-9
+  upgrade-2-4-0-to-2-4-1:
+    requires_features: [productivity_family_adoption]
+    assertion_path: fixtures/assert-upgrade-2-4-0-to-2-4-1
     validates:
-      - exact-3-0-5-source-archive
-      - non-default-startup-setting-retention
-      - scripted-technology-level-retention
-      - runtime-state-effect-retention
-      - exact-3-1-9-candidate-normal-mod-directory-load
-
-  upgrade-3-0-5-to-3-1-0-automatic-compiler:
-    requires_features: [scripted_techs]
-    assertion_path: fixtures/assert-upgrade-3-0-5-to-3-1-0-automatic-compiler
-    validates:
-      - exact-3-0-5-source-archive
-      - non-default-startup-setting-retention
-      - scripted-technology-level-retention
-      - runtime-state-effect-retention
-      - exact-3-1-0-automatic-compiler-candidate-normal-mod-directory-load
-
-  upgrade-3-1-2-to-3-1-5-automatic-compiler:
-    requires_features: [scripted_techs, recipe_productivity]
-    assertion_path: fixtures/assert-upgrade-3-1-2-to-3-1-5-automatic-compiler
-    validates:
-      - exact-3-1-2-source-archive
-      - hidden-legacy-safe-generate-setting-retention
-      - new-safe-control-defaults
-      - non-default-startup-setting-retention
-      - scripted-technology-level-retention
-      - runtime-state-effect-retention
-      - exact-3-1-5-automatic-compiler-candidate-normal-mod-directory-load
-
-  upgrade-3-1-2-to-3-1-9-automatic-compiler:
-    requires_features: [scripted_techs, recipe_productivity]
-    assertion_path: fixtures/assert-upgrade-3-1-2-to-3-1-9-automatic-compiler
-    validates:
-      - exact-3-1-2-source-archive
-      - hidden-legacy-safe-generate-setting-retention
-      - new-safe-control-defaults
-      - non-default-startup-setting-retention
-      - scripted-technology-level-retention
-      - runtime-state-effect-retention
-      - exact-3-1-9-automatic-compiler-candidate-normal-mod-directory-load
-
-  upgrade-3-1-5-to-3-1-9:
-    requires_features: [recipe_productivity]
-    assertion_path: fixtures/assert-upgrade-3-1-5-to-3-1-9
-    validates:
-      - exact-3-1-5-source-archive
+      - exact-2-4-0-source-archive
       - native-owner-setting-retention
       - native-owner-technology-level-retention
-      - native-owner-research-progress-retention
-      - exact-3-1-9-candidate-normal-mod-directory-load
+      - native-owner-current-research-selection-retention
+      - native-owner-fractional-progress-retention
+      - legacy-independent-cost-model-to-paired-cost-model-migration
+      - exact-2-4-1-candidate-normal-mod-directory-load
 
   competing-productivity-transaction:
     requires_features: [recipe_productivity]
@@ -289,6 +220,7 @@ fixtures:
     assertion_path: fixtures/assert-native-owner-settings
     supplemental_paths:
       - fixtures/native-owner-unrecognized-formula
+      - fixtures/assert-native-owner-progress
     validates:
       - all-four-native-owner-setting-groups-visible
       - unchanged-defaults-preserve-final-owner-snapshots
@@ -313,6 +245,8 @@ fixtures:
       - input-output-fingerprint-transaction
       - duplicate-native-owner-binding-rejection
       - configuration-change-signature-reset
+      - configuration-change-current-research-progress-retention
+      - paired-base-growth-setting-semantics
       - settings-profile-compatible-stable-ids
 
   competing-base-extension-transaction:
@@ -482,16 +416,6 @@ fixtures:
       - declarative-automatic-setting-descriptors
       - conservative-safe-expansive-custom-policy-expansion
       - stable-automatic-and-provider-diagnostic-codes
-
-  space-age-galore-effect-ownership:
-    requires_features: [recipe_productivity]
-    path: fixtures/space-age-galore-overlap
-    validates:
-      - vgal-coal-crushing-multi-output-shape
-      - carbon-and-sulfur-cross-stream-claim
-      - exactly-one-materialized-effect-owner
-      - stable-owner-selection
-      - no-settings-reset-required
 
   semantic-family-generate:
     requires_features: [recipe_productivity]

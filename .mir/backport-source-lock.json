@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "canonical_version": "3.1.9",
+  "canonical_anchor": "9c8f40038e42fda378b855bb8132fd98a180b6a5",
+  "canonical_package_source_commit": "79df29b50ea9b855b8665d6c9a3d8295806acde0",
+  "canonical_package_source_sha256": "5F980245B3D89E60DE0FEE125BED2134D1C1FDBA1F420A53FF2965D87C2739F6",
+  "projection_schema": 1,
+  "target": "2.0",
+  "mir_version": "2.4.1",
+  "target_profile_sha256": "FD17E1CAA0C08A8AA06AFF9FB4C5AAB0C881626E6C65DB8E2FD8F258CBEB0F1C",
+  "adapted_package_paths": {
+    "README.md": "Factorio 2.0 release positioning and supported-surface documentation",
+    "changelog.txt": "MIR 2.4.1 release identity and target-specific history",
+    "info.json": "Factorio 2.0 dependency and MIR 2.4.1 metadata",
+    "prototypes/mir/emit/base_extensions.lua": "compact count formula required by the Factorio 2.0 parser",
+    "prototypes/mir/emit/transactions/productivity_family_adoption.lua": "records the MIR 2.4.0 legacy unit model for exact progress migration",
+    "prototypes/mir/planner/native_owner_binding.lua": "lowers the paired 3.1.9 cost contract with a 2.4.0 migration snapshot",
+    "prototypes/mir/planner/stream_compiler.lua": "compact count formula required by the Factorio 2.0 parser",
+    "prototypes/mir/platform/factorio/target_profiles.lua": "generated Factorio 2.0 current-target selection",
+    "prototypes/mir/runtime/productivity_family_adoption.lua": "restores 2.4.0 progress using the target migration snapshot",
+    "prototypes/streams/direct-effects.lua": "omits the two Factorio 2.1-only cargo technology modifiers"
+  },
+  "omitted_features": {
+    "cargo-landing-pad-count": "unsupported Factorio 2.1-only technology modifier",
+    "max-cargo-bay-unloading-distance": "unsupported Factorio 2.1-only technology modifier"
+  },
+  "validation_summary": ".mir/evidence/2.4.1-final-qualification.json",
+  "candidate_seal": ".mir/evidence/candidate-seals/mir-2.4.1-factorio-2.0.json"
+}

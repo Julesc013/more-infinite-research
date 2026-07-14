@@ -8,7 +8,7 @@ More Infinite Research adds **configurable infinite productivity** and **bonus r
 
 **MIR `3.x.x`** targets **Factorio `2.1`** and requires `base >= 2.1.8`.
 
-**MIR `2.x.x`** targets **Factorio `2.0`** and requires `base >= 2.0`.
+**MIR `2.x.x`** targets **Factorio `2.0`** starting with **`2.3.0`**.
 
 **MIR `1.x.x`** targets **Factorio `1.1`** and earlier as reduced backports.
 
@@ -113,6 +113,8 @@ where `L` is the research level.
 | Research unit time | `60` seconds |
 
 **Base-technology extensions** use the same formula, but their first generated level starts after the vanilla chain. A setting value of **`0`** for base cost, growth factor, or research unit time means *derive this from the vanilla chain*.
+
+When Space Age or another mod already owns a recognized infinite productivity technology, MIR keeps the same stream settings instead of hiding them. Default values preserve the final external owner exactly; disabling the stream leaves it untouched. Changing either cost base or growth applies both displayed values as one cost model, and changing startup costs preserves the currently researched owner, its level, and fractional progress. Explicit cost changes are rejected for unknown formulas instead of guessing, while safe MIR generation remains the fallback when no eligible owner exists.
 
 If a positive base-extension max level is below the first generated continuation level, MIR **skips that extension** instead of creating an impossible capped technology.
 
@@ -665,10 +667,10 @@ The validation script checks:
 - **`docs/reference/factorio-api-proof-points.md`:** API claims, proof status, and open in-game verification questions.
 - **`docs/compatibility/README.md`:** compatibility model, known integrations, manual test matrix, fixture designs, and release checklist.
 - **`docs/maintainer/developer-tools.md`:** preferred developer commands, run profiles, script roles, and PowerShell tooling checks.
-- **`docs/releases/3.0.5-convergence-plan.md`:** active compatibility-hardening scope, architecture boundaries, and release gates.
-- **`docs/releases/3.0.5-release-checklist.md`:** active automated, candidate, manual, and publication gates.
-- **`docs/releases/notes/release-notes-3.0.5.md`:** current player-facing compatibility changes.
-- **`docs/releases/3.0.5-validation-summary.md`:** current candidate identity and validation evidence; the 3.0.0 records remain historical baseline evidence.
+- **`docs/releases/2.4.0-roadmap.md`:** published Factorio 2.0 port scope, target cuts, and sequencing.
+- **`docs/releases/2.4.1-checklist.md`:** active Factorio 2.0 hotfix automated, candidate, manual, and publication gates.
+- **`docs/releases/notes/release-notes-2.4.1.md`:** current player-facing Factorio 2.0 hotfix changes.
+- **`docs/releases/2.4.1-validation-summary.md`:** current Factorio 2.0 candidate identity and validation evidence.
 - **`docs/releases/2.2.0-validation-record.md`:** local release validation evidence.
 - **`docs/maintainer/manual-test-plan.md`:** named manual saves/scenarios for release validation.
 - **`docs/releases/mod-portal-page.md`:** mod-portal-ready public description, technology catalog, settings summary, compatibility notes, and troubleshooting text.

@@ -1,7 +1,7 @@
 ---
 title: "Modpack Campaigns"
 status: current
-applies_to: "3.1.0+"
+applies_to: "3.2.0+"
 audience: release-manager
 doc_type: how-to
 owner: mir-maintainers
@@ -27,7 +27,7 @@ Use an exact MIR candidate archive and bind it to the source commit that produce
   -FactorioLine 2.1 `
   -FactorioVersions 2.1 `
   -FactorioBin $env:FACTORIO_BIN `
-  -ModUnderTestZip .\build\validation-dist\more-infinite-research_3.1.0.zip `
+  -ModUnderTestZip .\build\validation-dist\more-infinite-research_3.2.0.zip `
   -ModUnderTestSourceCommit <full-commit> `
   -RunLoadTests `
   -OutputDir .\artifacts\campaigns\bz

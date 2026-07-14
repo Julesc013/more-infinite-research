@@ -1,15 +1,33 @@
 schema: 1
 
 release:
-  version: "3.1.9"
-  branch: dev
-  factorio_version: "2.1"
-  baseline_commit: c8bf4a742910cec9d6d3dee305c83deba1aa49eb
-  baseline_tag: "3.1.5"
-  objective: bounded-correctness-and-contract-modernization
+  version: "2.4.1"
+  branch: tmp/2.0
+  factorio_version: "2.0"
+  baseline_commit: 584b398f98d3e317fac31cba63edcb11360a5bb1
+  baseline_tag: "2.4.0"
+  canonical_source_version: "3.1.9"
+  canonical_source_commit: 9c8f40038e42fda378b855bb8132fd98a180b6a5
+  canonical_package_source_commit: 79df29b50ea9b855b8665d6c9a3d8295806acde0
+  source_lock: .mir/backport-source-lock.json
+  objective: canonical-3.1.9-derived-factorio-2.0-projection
   public_contract_change: patch-compatible
 
 superseded_candidates:
+  - source_commit: f42b45d1a9e5b6c61a14729a5d386eb6b88bf952
+    artifact: dist/more-infinite-research_2.4.1.zip
+    sha256: 7931E97D9C5CFAB173B48976F1B7EF5A6E7956809D6EA98BF42CD8761C1AAC3D
+    package_content_sha256: 621D26B40D36C52C9F556D1B2490E7FA266F1E022778EAEA15940CEA4522509D
+    reason: incomplete six-scenario startup hotfix omitted final 3.1.9 native-owner and assurance parity
+    status: superseded-unreleased-candidate
+  - source_commit: 4f7c9d18d5491e6e6fcafa5364f9b832cabac233
+    historical_artifact_identity: dist/more-infinite-research_2.5.0.zip
+    sha256: 0BE57ED4C51DDF08F80AB4CFB2D5762DF2714B17AB26DB58CA9980289350CBFD
+    size_bytes: 387662
+    entries: 160
+    forbidden_entries: 0
+    reason: maintainer selected 2.4.0 as the first public final-3.1.5 Factorio 2.0 companion release
+    status: superseded-unpublished-candidate
   - source_commit: da961e542dbcbaeb14c0ba15555cd25f5f162944
     artifact: dist/more-infinite-research_3.0.5.zip
     sha256: 5BA004917B30C553C927B8D20DA18466194875BA443CC641583A41CBCEC2D44E
@@ -91,83 +109,16 @@ superseded_candidates:
     reason: expected scenario manifest still used a raw checkout-line-ending-dependent hash
     status: superseded-unpublished-candidate
 
-  - source_commit: 37985c7b4fe59ccd01645d1662b5fdd607661d23
-    artifact: dist/more-infinite-research_3.1.0.zip
-    sha256: BD89A34D1EACA6C7FD93412072FFC1434F38DE90FA7E1156B75CE23DC07DDDA3
-    size_bytes: 474992
-    entries: 154
-    forbidden_entries: 0
-    reason: RC6 compiler correctness closure changed package-visible source and invalidated RC5 evidence
-    status: superseded-unpublished-candidate
-
-  - source_commit: b9293df08f0db2863e9dbe8a5b48503b705b2630
-    artifact: dist/more-infinite-research_3.1.0.zip
-    sha256: 25B166D56712FB85037437B073F9AC59C500EDD0A404949F94BB4A1F9637DAB3
-    size_bytes: 383525
-    entries: 157
-    forbidden_entries: 0
-    reason: RC8 exposed a cross-stream duplicate recipe effect during Space Age Galore startup
-    status: superseded-unpublished-candidate
-
-  - source_commit: bbc6b499ac3c2218fb9c1abdd8a4cf57e1fdd3db
-    artifact: dist/more-infinite-research_3.1.5.zip
-    sha256: 493F6EE2303FF087AB76D983DAFF872F10EC28D04FC816A13434C188613C59EA
-    size_bytes: 392530
-    entries: 162
-    forbidden_entries: 0
-    reason: final provider contract, exact 3.1.2 upgrade proof, and clearer automatic-recipe-support UI changed package-visible source
-    status: superseded-unpublished-candidate
-
-  - source_commit: 4c2bbc5daa4c36d268945e45714bd2db8e2517eb
-    artifact: dist/more-infinite-research_3.1.5.zip
-    sha256: EB6FFA0DAAF5B0AB48058F08D3861970845A0FD36A1D093CF366F1ECB311DB8E
-    size_bytes: 399065
-    entries: 166
-    forbidden_entries: 0
-    reason: final UI normalization and experimental family creation maturity changed package-visible source
-    status: superseded-unpublished-candidate
-
-  - source_commit: f870c929dcf1442716ed7554f09ef8cdb5a6f7e0
-    artifact: dist/more-infinite-research_3.1.5.zip
-    sha256: 3DDDFB2C899E57B9BB9962F67F3902B4B3D7663110A2B2306F0A09A6CCF35A3C
-    size_bytes: 399512
-    entries: 166
-    forbidden_entries: 0
-    reason: final settings availability policy changed package-visible source
-    status: superseded-unpublished-candidate
-
-  - source_commit: f65dacbbbfa9e5bac891de090c54a5bb36a9ef1f
-    artifact: dist/more-infinite-research_3.1.9.zip
-    sha256: DE99BC1B51810EE0262120B4B7A12F5F8BE913E083B07ED0B5DA0E23C760224B
-    size_bytes: 406023
-    entries: 167
-    forbidden_entries: 0
-    reason: exact disabled vanilla science technology regression changed package documentation and validation evidence
-    status: superseded-unpublished-candidate
-
 candidate:
-  artifact: dist/more-infinite-research_3.1.9.zip
-  source_commit: 79df29b50ea9b855b8665d6c9a3d8295806acde0
-  package_source_commit: 79df29b50ea9b855b8665d6c9a3d8295806acde0
-  sha256: D77B3A78DA40CD4FDD4C829A01B5030E59FB593F3387124EF5C438F6A9E8DFCD
-  package_content_sha256: 1D905CD5F394C3ABFC2ABEFFEB0249AC9D8D5C5FC4ADA0F5A5BA368B17548229
-  package_source_sha256: 1D905CD5F394C3ABFC2ABEFFEB0249AC9D8D5C5FC4ADA0F5A5BA368B17548229
-  target_profile_sha256: F415D66E21D47DC95B7465A63CF45788CA00BE2BE9984EA28238D1FD2C739F91
-  required_groups_sha256: A0ABDA1BCE05BB3176D9A403517DB42056033BB7119B0D790FA5A9DA0114262E
-  validation_harness_sha256: C054820BB972214051A235C8EFBF1033A8F0D5822ED0A0520858286485469322
-  expected_scenarios_sha256: D70C414B8291FBB0B09E273B1ACCA54AFC994218206C35BEFE7737C2B33CBA34
-  validation_package_sha256: D77B3A78DA40CD4FDD4C829A01B5030E59FB593F3387124EF5C438F6A9E8DFCD
-  validation_package_content_sha256: 1D905CD5F394C3ABFC2ABEFFEB0249AC9D8D5C5FC4ADA0F5A5BA368B17548229
-  structured_summary_path: .mir/evidence/3.1.9/disabled-automation-science-final-qualification.json
-  structured_summary_run_id: df6b802a-9f4a-4b3d-89f3-ec3266f09ef8
-  broad_qualification_evidence_path: .mir/evidence/3.1.9/qualification-summary.json
-  upgrade_evidence_path: .mir/evidence/3.1.9/upgrade-from-3.1.5-proof.json
-  ecosystem_evidence_path: .mir/evidence/3.1.9/ecosystem-campaign/campaign-evidence.json
-  seal_path: .mir/evidence/candidate-seals/mir-3.1.9-factorio-2.1.json
-  seal_source_commit: c711602b1c43ce552faa4ec90acd72c3b4ebc856
-  automated_gate: passed-change-aware
+  artifact: dist/more-infinite-research_2.4.1.zip
+  canonical_source_commit: 9c8f40038e42fda378b855bb8132fd98a180b6a5
+  canonical_package_source_commit: 79df29b50ea9b855b8665d6c9a3d8295806acde0
+  source_lock: .mir/backport-source-lock.json
+  structured_summary_path: .mir/evidence/2.4.1-change-aware-qualification.json
+  automated_gate: pending-requalification
   manual_gate: pending
-  status: release-candidate-awaiting-manual-review
+  assurance_seal: .mir/evidence/candidate-seals/mir-2.4.1-factorio-2.0.json
+  status: reconstruction-in-progress
 
 rules:
   - dev-remains-the-canonical-modern-implementation
@@ -330,11 +281,19 @@ behaviors:
     impact: prototype-limits
     evidence: prototype-limits
     status: complete
+  BP-020:
+    source: dev@79df29b50ea9b855b8665d6c9a3d8295806acde0
+    behavior: disabled Automation science technology does not become a generated prerequisite when its recipe is initially available
+    class: B-missing-exact-regression
+    decision: retain-existing-reachability-fix-and-backport-exact-fixture
+    impact: validation-and-release-documentation
+    evidence: disabled-automation-science-regression
+    status: complete
 
 release_gates:
   - static-validation
-  - factorio-2.1-base-runtime
-  - factorio-2.1-space-age-runtime
+  - factorio-2.0-base-runtime
+  - factorio-2.0-space-age-runtime
   - generated-prerequisite-safety
   - weapon-overlap-policy-matrix
   - settings-profile-codec

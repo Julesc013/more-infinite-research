@@ -64,6 +64,8 @@ rules:
   native_owner_unchanged_defaults_preserve_final_prototype: true
   native_owner_disable_is_no_touch: true
   native_owner_cost_override_requires_recognized_formula: true
+  native_owner_cost_base_and_growth_apply_as_one_pair: true
+  native_owner_cost_changes_preserve_current_research_level_selection_and_fractional_progress: true
   native_owner_effect_override_is_relevant_effects_only: true
   native_owner_binding_is_startup_only_and_restart_required: true
 

@@ -23,33 +23,4 @@ for index = 1, 1000 do
   previous = item_name
 end
 
-table.insert(prototypes, {
-  type = "recipe",
-  name = "mir-fixture-default-productivity-policy",
-  enabled = true,
-  ingredients = {{type = "item", name = "iron-plate", amount = 1}},
-  results = {{type = "item", name = "iron-gear-wheel", amount = 1}}
-})
-table.insert(prototypes, {
-  type = "recipe",
-  name = "mir-fixture-complete-product-shape",
-  enabled = true,
-  allow_productivity = true,
-  ingredients = {{type = "item", name = "iron-plate", amount = 1}},
-  results = {{
-    type = "item",
-    name = "copper-plate",
-    amount = 1,
-    independent_probability = 0.5,
-    extra_count_fraction = 0.25,
-    percent_spoiled = 0.1,
-    always_fresh = true,
-    reset_freshness_on_craft = true,
-    quality_min = "normal",
-    quality_max = "normal",
-    quality_change = 0,
-    affected_by_quality = false
-  }}
-})
-
 data:extend(prototypes)

@@ -9,11 +9,16 @@ local setting_types = {
   "string-setting"
 }
 
-local function setting_prototype(name)
+local function find_setting_prototype(name)
   for _, prototype_type in ipairs(setting_types) do
     local prototype = data.raw[prototype_type] and data.raw[prototype_type][name]
     if prototype then return prototype end
   end
+end
+
+local function setting_prototype(name)
+  local prototype = find_setting_prototype(name)
+  if prototype then return prototype end
   fail("missing registered setting prototype " .. name .. ".")
 end
 
@@ -38,6 +43,15 @@ local function assert_stream_hidden(stream_key, expected_hidden)
   end
 end
 
+local function assert_stream_absent(stream_key)
+  for _, pattern in ipairs(stream_setting_patterns) do
+    local name = string.format(pattern, stream_key)
+    if find_setting_prototype(name) then
+      fail(name .. " must be omitted from the Factorio 2.0 settings surface.")
+    end
+  end
+end
+
 for _, stream_key in ipairs({
   "research_auto_assembling_machine",
   "research_auto_lab"
@@ -54,8 +68,6 @@ for _, stream_key in ipairs({
   "research_breeding",
   "research_carbon",
   "research_carbon_fiber",
-  "research_cargo_bay_unloading_distance",
-  "research_cargo_landing_pad_count",
   "research_holmium",
   "research_ice",
   "research_lithium",
@@ -69,4 +81,11 @@ for _, stream_key in ipairs({
   "research_tungsten"
 }) do
   assert_stream_hidden(stream_key, not space_age_active)
+end
+
+for _, stream_key in ipairs({
+  "research_cargo_bay_unloading_distance",
+  "research_cargo_landing_pad_count"
+}) do
+  assert_stream_absent(stream_key)
 end

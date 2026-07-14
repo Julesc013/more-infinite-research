@@ -21,6 +21,7 @@ local function record(plan)
     configured_fields = deepcopy(plan.configured_fields or {}),
     input_unit = deepcopy((plan.input_snapshot and plan.input_snapshot.unit) or {}),
     output_unit = deepcopy((plan.expected_snapshot and plan.expected_snapshot.unit) or {}),
+    legacy_output_unit = deepcopy(plan.legacy_output_unit or {}),
     input_fingerprint = plan.input_fingerprint,
     output_fingerprint = plan.output_fingerprint,
     effect_count = #(plan.effects or {})

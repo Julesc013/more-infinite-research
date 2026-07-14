@@ -19,4 +19,3 @@ foreach ($required in @("static.full", "runtime.full", "runtime.upgrade", "runti
 }
 
 Write-Host "[ok] MIR assurance manifests and stable test catalog passed."
-

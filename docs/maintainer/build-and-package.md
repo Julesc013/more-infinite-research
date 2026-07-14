@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: maintainer
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-07-12
+last_reviewed: 2026-07-14
 supersedes: []
 superseded_by: []
 ---
@@ -37,7 +37,7 @@ Do not refresh these archives during later architecture or backport work:
 - `dist/more-infinite-research_2.2.0.zip`;
 - `dist/more-infinite-research_1.9.2.zip` on `legacy` after upload.
 
-The current development line targets `3.1.0`; its next maintained Factorio 2.0 port is `2.4.0`. Build or refresh `dist/<mod>_<version>.zip` only for the unpublished target version being released.
+The current canonical line is released MIR `3.1.5`; its maintained Factorio 2.0 port is the unreleased `2.4.0` candidate. Build or refresh `dist/<mod>_<version>.zip` only for the unpublished target version being qualified.
 
 For regression or architecture work before the version bump, prefer validation archives under `build/validation-dist/` and restore any accidental published archive rebuilds before committing.
 

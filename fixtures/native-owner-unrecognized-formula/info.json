@@ -4,9 +4,9 @@
   "title": "MIR Fixture - Native Owner Unrecognized Formula",
   "author": "Julesc013",
   "description": "Replaces one Space Age native owner cost formula with an intentionally unsupported modded formula.",
-  "factorio_version": "2.1",
+  "factorio_version": "2.0",
   "dependencies": [
-    "base >= 2.1.8",
-    "space-age >= 2.1.8"
+    "base >= 2.0",
+    "space-age >= 2.0"
   ]
 }
