@@ -118,7 +118,9 @@ function Get-MIRSealValues {
     kind = "mir-qualified-candidate-seal"
     branch = $profile.branch
     release = $profile.release
+    mir_version = $profile.release
     target_factorio = $profile.factorio.line
+    target = $profile.factorio.line
     source_commit = (& git -C $repo rev-parse HEAD).Trim()
     source_clean = $true
     canonical_dev_anchor = [string]$sourceLock.canonical_dev_anchor
@@ -219,7 +221,7 @@ if ($Action -eq "seal") {
 
 $stored = Get-Content -Raw -LiteralPath $sealPath | ConvertFrom-Json
 $current = Get-MIRSealValues
-foreach ($field in @("branch", "release", "target_factorio", "source_clean", "canonical_dev_anchor", "canonical_anchor_is_ancestor", "backport_source_lock_sha256", "canonical_feature_model_sha256", "target_profile_sha256", "target_reconstruction_profile_sha256", "canonical_target_catalog_sha256", "test_catalog_sha256", "fixtures_fingerprint", "validation_harness_fingerprint", "factorio_binary_sha256", "qualification_summary_sha256")) {
+foreach ($field in @("branch", "release", "mir_version", "target_factorio", "target", "source_clean", "canonical_dev_anchor", "canonical_anchor_is_ancestor", "backport_source_lock_sha256", "canonical_feature_model_sha256", "target_profile_sha256", "target_reconstruction_profile_sha256", "canonical_target_catalog_sha256", "test_catalog_sha256", "fixtures_fingerprint", "validation_harness_fingerprint", "factorio_binary_sha256", "qualification_summary_sha256")) {
   if ([string]$stored.$field -ne [string]$current.$field) { throw "Seal mismatch: $field" }
 }
 foreach ($field in @("path", "sha256", "size_bytes", "content_fingerprint", "package_source_fingerprint")) {
