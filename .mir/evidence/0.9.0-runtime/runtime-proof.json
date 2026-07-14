@@ -18,7 +18,7 @@
   "binary_version_proof_sha256": "F777E39DA276D01268410B68D2E6C7098604F5A2B8C66293A8AD38744EA8EC5A",
   "fresh_start": {
     "status": "passed-bounded-crop-cache-load",
-    "duration_seconds": 21.137,
+    "duration_seconds": 11.75,
     "command": [
       "D:\\Programs\\Factorio\\0.9\\bin\\x64\\Factorio.exe"
     ],
@@ -32,7 +32,7 @@
   },
   "second_start": {
     "status": "passed-bounded-crop-cache-load",
-    "duration_seconds": 9.322,
+    "duration_seconds": 9.374,
     "command": [
       "D:\\Programs\\Factorio\\0.9\\bin\\x64\\Factorio.exe"
     ],
