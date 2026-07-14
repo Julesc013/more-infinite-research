@@ -2,7 +2,8 @@ param(
   [Parameter(Mandatory)][string]$FactorioBin,
   [Parameter(Mandatory)][string]$CandidateZip,
   [string]$PriorZip,
-  [string]$OutputRoot
+  [string]$OutputRoot,
+  [int]$TimeoutSeconds = 180
 )
 
 $ErrorActionPreference = "Stop"
@@ -33,40 +34,64 @@ function Invoke-MIRRetentionRun {
   $configPath = Join-Path $runRoot "config.ini"
   [System.IO.File]::WriteAllText($configPath, $config, [System.Text.UTF8Encoding]::new($false))
   $log = Join-Path $runRoot "$Name.log"
-  $args = @("--config", $configPath, "--no-log-rotation")
-  if ([version]$profile.factorio.line -ge [version]"0.15") { $args += "--disable-audio" }
-  $args += @("--mod-directory", $mods)
-  if ([version]$profile.factorio.line -lt [version]"0.17") {
-    if ($Mode -eq "create") { $args += @("--create", $MapPath) }
-    else { $args += @("--start-server", $MapPath) }
-    $process = Start-Process -FilePath $FactorioBin -ArgumentList $args -PassThru -WindowStyle Hidden
-    $factorioLog = Join-Path $user "factorio-current.log"
-    if ($Mode -eq "create") {
-      if (-not $process.WaitForExit(30000)) { $process.Kill(); $process.WaitForExit(); throw "Factorio $Name timed out while creating the retention map." }
-      if ($process.ExitCode -ne 0) { throw "Factorio $Name failed with exit code $($process.ExitCode)." }
-    } else {
-      $hosting = $false
-      for ($attempt = 0; $attempt -lt 150 -and -not $process.HasExited; $attempt++) {
-        if ((Test-Path -LiteralPath $factorioLog) -and (Get-Content -Raw -LiteralPath $factorioLog) -match "Hosting game") { $hosting = $true; break }
-        $process.WaitForExit(100) | Out-Null
-      }
-      if (-not $process.HasExited) { $process.Kill(); $process.WaitForExit() }
-      if (-not $hosting) { throw "Factorio $Name did not reach the target-era running server state." }
-    }
-    if (-not (Test-Path -LiteralPath $factorioLog)) { throw "Factorio $Name did not produce a log." }
-    Copy-Item -LiteralPath $factorioLog -Destination $log
+  $arguments = @("--config", $configPath, "--no-log-rotation", "--mod-directory", $mods)
+  if ([string]$profile.factorio.line -notin @("0.13", "0.14")) { $arguments += "--disable-audio" }
+  if ($Mode -eq "create") {
+    $arguments += @("--create", $MapPath)
   } else {
-    if ($Mode -eq "create") { $args += @("--create", $MapPath) }
-    else { $args += @("--benchmark", $MapPath, "--benchmark-ticks", "1", "--benchmark-runs", "1") }
-    & $FactorioBin @args *> $log
-    if ($LASTEXITCODE -ne 0) { throw "Factorio $Name failed; see $log" }
+    $benchmarkMap = $MapPath
+    if ([string]$profile.factorio.line -eq "0.13") {
+      $saves = Join-Path $user "saves"
+      New-Item -ItemType Directory -Force -Path $saves | Out-Null
+      $benchmarkMap = [IO.Path]::GetFileNameWithoutExtension($MapPath)
+      Copy-Item -LiteralPath $MapPath -Destination (Join-Path $saves "$benchmarkMap.zip") -Force
+    }
+    $arguments += @("--benchmark", $benchmarkMap, "--benchmark-ticks", "1")
+    if ([string]$profile.factorio.line -eq "0.17") { $arguments += @("--benchmark-runs", "1") }
   }
-  $text = Get-Content -Raw -LiteralPath $log
-  if ($text -notmatch "Loading mod more-infinite-research $([regex]::Escape(([IO.Path]::GetFileNameWithoutExtension($ModZip) -replace '^more-infinite-research_','')))" -or $text -match '(?im)^.*Error ') {
+
+  $processInfo = [Diagnostics.ProcessStartInfo]::new()
+  $processInfo.FileName = $FactorioBin
+  $processInfo.UseShellExecute = $false
+  $processInfo.CreateNoWindow = $true
+  $processInfo.WindowStyle = [Diagnostics.ProcessWindowStyle]::Hidden
+  $processInfo.RedirectStandardOutput = $true
+  $processInfo.RedirectStandardError = $true
+  foreach ($argument in $arguments) { [void]$processInfo.ArgumentList.Add($argument) }
+  $process = [Diagnostics.Process]::Start($processInfo)
+  $stdoutTask = $process.StandardOutput.ReadToEndAsync()
+  $stderrTask = $process.StandardError.ReadToEndAsync()
+  if (-not $process.WaitForExit($TimeoutSeconds * 1000)) {
+    try { $process.Kill($true) } catch { $process.Kill() }
+    [void]$process.WaitForExit(10000)
+    throw "Factorio $Name timed out after $TimeoutSeconds seconds; see $log"
+  }
+  $stdout = $stdoutTask.GetAwaiter().GetResult()
+  $stderr = $stderrTask.GetAwaiter().GetResult()
+  $text = $stdout
+  if (-not [string]::IsNullOrEmpty($stderr)) {
+    if (-not [string]::IsNullOrEmpty($text) -and -not $text.EndsWith("`n")) { $text += "`n" }
+    $text += $stderr
+  }
+  $factorioLogPath = Join-Path $user "factorio-current.log"
+  $proofText = if (Test-Path -LiteralPath $factorioLogPath -PathType Leaf) {
+    Get-Content -Raw -LiteralPath $factorioLogPath
+  } else {
+    $text
+  }
+  [System.IO.File]::WriteAllText($log, $proofText, [System.Text.UTF8Encoding]::new($false))
+  if ($process.ExitCode -ne 0) { throw "Factorio $Name failed with exit code $($process.ExitCode); see $log" }
+  $fatalPattern = '(?im)(Failed to load mods|Failed to load mod|Invalid Mod|Couldn.t load|stack traceback|Error Util\.cpp|Error ModManager)'
+  if ($proofText -notmatch "Loading mod more-infinite-research $([regex]::Escape(([IO.Path]::GetFileNameWithoutExtension($ModZip) -replace '^more-infinite-research_','')))" -or $proofText -match $fatalPattern) {
     throw "Factorio $Name did not load the expected MIR archive cleanly; see $log"
   }
-  if ($Mode -eq "load" -and [version]$profile.factorio.line -lt [version]"0.17" -and $text -notmatch "Hosting game") {
-    throw "Factorio $Name did not reach the target-era running server state; see $log"
+  if ($Mode -eq "create" -and -not (Test-Path -LiteralPath $MapPath -PathType Leaf)) {
+    throw "Factorio $Name exited without creating the expected save; see $log"
+  }
+  $requiresGoodbye = [string]$profile.factorio.line -notin @("0.13", "0.14")
+  if ($Mode -ne "create" -and ($proofText -notmatch '(?im)Loading map ' -or
+      $proofText -notmatch '(?im)Map version ' -or ($requiresGoodbye -and $proofText -notmatch '(?im)Goodbye'))) {
+    throw "Factorio $Name exited without benchmarked loaded-map proof; see $log"
   }
   return $log
 }
