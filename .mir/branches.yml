@@ -608,106 +608,106 @@ release_artifacts:
       branch: tmp/0.12
       target_factorio: "0.12"
       source_anchor: 6ac377389d7ffc3576fb39576dab4ace6efaec51
-      source_commit: d7c6145bee27c5ae8d17a30dd548889c22e1c10d
-      tag_commit: d3681bc202938e06fb965531ddfa764f71ca38ce
-      post_publication_head: f9bce733e9ac78934a827b8a3ce71f5dd570b8ab
+      source_commit: 63b39962f1951e824884f6ae4b48a142027591c4
+      tag_commit: 82a349bd8137abe21145b321be4edb1e43e1e9e1
+      post_publication_head: 3fa4b5584e10c20c35cc2d0882fad6c7ca1757e2
       artifact: dist/more-infinite-research_0.12.0.zip
-      sha256: C98EBB436DD1BA1C4C0C230EB51C637EE42904000C9C7A82C7E7A33F6F5461EF
+      sha256: 5171CD073A632AA30769FD9567F44AD2331BB5E7B852EC9F8576798398816612
       github_release: https://github.com/Julesc013/more-infinite-research/releases/tag/0.12.0
       public_hash_verification: passed
-      mod_portal_status: archive-only-not-attempted
+      mod_portal_status: maintainer-upload-pending
       manual_visual_review: pending-maintainer
-      status: published-github-historical-archive
+      status: published-github-maintainer-portal-pending
     mir_0_11_0:
       version: "0.11.0"
       branch: tmp/0.11
       target_factorio: "0.11"
       source_anchor: 6ac377389d7ffc3576fb39576dab4ace6efaec51
-      source_commit: 0a63fdb364ae582eff32509b08405cebbd629133
-      tag_commit: e83648f8f9b75f8545e913a9a5288423dbb9ebfa
-      post_publication_head: 2f71e78b2bd2cdadc55654cd1349b3858a75fed4
+      source_commit: adeedc3a21f69c3803c19a9e62115255068a90db
+      tag_commit: 679774c94bafdaa4d5432b793b8684ee4e43c257
+      post_publication_head: 3d1862c3d4c1cf8bf381f6d46f6aa3751349cdc6
       artifact: dist/more-infinite-research_0.11.0.zip
-      sha256: C628FBFA4FC2A811869C5D33245BCBA0D37AA5EE2074ADEC7155874C2081B748
+      sha256: 38B9DFB72CE5EB0554CF2C9514D9B3D917B322DE5AC955A085A2A1BAADED2DEE
       github_release: https://github.com/Julesc013/more-infinite-research/releases/tag/0.11.0
       public_hash_verification: passed
-      mod_portal_status: archive-only-not-attempted
+      mod_portal_status: maintainer-upload-pending
       manual_visual_review: pending-maintainer
-      status: published-github-historical-archive
+      status: published-github-maintainer-portal-pending
     mir_0_10_0:
       version: "0.10.0"
       branch: tmp/0.10
       target_factorio: "0.10"
       source_anchor: 6ac377389d7ffc3576fb39576dab4ace6efaec51
-      source_commit: b414934c303a5e4a2ddc6f8a598fa11ac8ec7d83
-      tag_commit: 732ec117f187ccf77325e85023999f869520be9e
-      post_publication_head: c88838b891e4091ea9e549c14cd630c5ee43d950
+      source_commit: a760eba9e2e4b1b27be557f3baf8f4570f373af7
+      tag_commit: 3377f835243c0cf9e7d2c2e76641c2c471341975
+      post_publication_head: 7dd2d289a19a59fa75565efa7db90d625500ec39
       artifact: dist/more-infinite-research_0.10.0.zip
-      sha256: 845CBB69195ED03AF604685137D356E826B29D0570A4A4AFD6C0941E4B23C04F
+      sha256: C2E42E9AE23E4A146F755B60D40009738724E7A0D3670D3B672D2068AE80912E
       github_release: https://github.com/Julesc013/more-infinite-research/releases/tag/0.10.0
       public_hash_verification: passed
-      mod_portal_status: archive-only-not-attempted
+      mod_portal_status: maintainer-upload-pending
       manual_visual_review: pending-maintainer
-      status: published-github-historical-archive
+      status: published-github-maintainer-portal-pending
     mir_0_9_0:
       version: "0.9.0"
       branch: tmp/0.9
       target_factorio: "0.9"
       source_anchor: 6ac377389d7ffc3576fb39576dab4ace6efaec51
-      source_commit: 4631f1425523f7aa0f8f5a8e596fb7f73c13306c
-      tag_commit: 210a4556b12a3a40a64337c3535da307c86137e5
-      post_publication_head: 13764da44d971dd1fca6053315f5fcbe996b4ac4
+      source_commit: 95ab3d6efeab3ff0c36a19c54aee64680f54d729
+      tag_commit: 9325e744f1dd36baa33372dab6e7d9528ccfbab8
+      post_publication_head: f3257dafb3c16a9616c9acc9d4a7bbbac9cd231c
       artifact: dist/more-infinite-research_0.9.0.zip
-      sha256: 9FE3117CE3415858506FBA319A2F025F170771590A23C2E160D710F4447A05F1
+      sha256: 2114D67493C6B1076B1A71F27DC5197C8789C956570FD274507B8FD807C27D84
       github_release: https://github.com/Julesc013/more-infinite-research/releases/tag/0.9.0
       public_hash_verification: passed
-      mod_portal_status: archive-only-not-attempted
+      mod_portal_status: maintainer-upload-pending
       manual_visual_review: pending-maintainer
-      status: published-github-historical-archive
+      status: published-github-maintainer-portal-pending
     mir_0_8_0:
       version: "0.8.0"
       branch: tmp/0.8
       target_factorio: "0.8"
       source_anchor: 6ac377389d7ffc3576fb39576dab4ace6efaec51
-      source_commit: 4bc0edf779b2e1e47de75423dc1c485776ae5688
-      tag_commit: e0e297cd0bcc4a38f54d5b2e4b7bc54335785ee3
-      post_publication_head: 7086ee27486ae4177bbb310245fa24c4a2a3f18e
+      source_commit: 854415ae2f758055208c32d2e5bc4d21d8f42ef1
+      tag_commit: 080fa92ea38b4b40156f26429bc7cba54948aef0
+      post_publication_head: 732223297ce3e88f84f467f7b2ce16bacbda5b0e
       artifact: dist/more-infinite-research_0.8.0.zip
-      sha256: 6832B00783657F60D8AE967552CA354D1F73C988A0DFE023999AE81533267D8E
+      sha256: 60BA156874CC3EE0C93B93C032BDEC6D8432B5F692009A3277C1890E6D9BF3E6
       github_release: https://github.com/Julesc013/more-infinite-research/releases/tag/0.8.0
       public_hash_verification: passed
-      mod_portal_status: archive-only-not-attempted
+      mod_portal_status: maintainer-upload-pending
       manual_visual_review: pending-maintainer
-      status: published-github-historical-archive
+      status: published-github-maintainer-portal-pending
     mir_0_7_0:
       version: "0.7.0"
       branch: tmp/0.7
       target_factorio: "0.7"
       source_anchor: 6ac377389d7ffc3576fb39576dab4ace6efaec51
-      source_commit: 7bc8b1e823aea7c8cbe895af01cc0bf1dbab1e6b
-      tag_commit: 085d529f52b3f3b2ddf06a682475d2d7124210b7
-      post_publication_head: e44ee8afaa957797431c3f350e9566e0512b7b1c
+      source_commit: e0bc735c4808ab12c1b6b5045937878ae144be2e
+      tag_commit: cb2991e3ea67b0413076c0e6d0dacf29d7f784b6
+      post_publication_head: de01ee19beeee6c793d164bd228bef902643fd62
       artifact: dist/more-infinite-research_0.7.0.zip
-      sha256: 8495146889655FA46233A7B0416F4C67B4E2BF93E984E01F5F8234C9CA6F570F
+      sha256: AA328AFF81F3133BAC3F432ADC7AF52CC49EFF43E40D04EAD99DCFBA92542749
       github_release: https://github.com/Julesc013/more-infinite-research/releases/tag/0.7.0
       public_hash_verification: passed
-      mod_portal_status: archive-only-not-attempted
+      mod_portal_status: maintainer-upload-pending
       manual_visual_review: pending-maintainer
-      status: published-github-historical-archive
+      status: published-github-maintainer-portal-pending
     mir_0_6_0:
       version: "0.6.0"
       branch: tmp/0.6
       target_factorio: "0.6"
       source_anchor: 6ac377389d7ffc3576fb39576dab4ace6efaec51
-      source_commit: 716819440dfe45464908d0855cf6cc265c8701aa
-      tag_commit: a4f82673278f1414eff06f8094ed460851fc112b
-      post_publication_head: 26886b6eeef6638801268821ee2aa5c1caf94a60
+      source_commit: 653a9da87d4e5b6f8743a236b72cbdccfdafe216
+      tag_commit: 12a5683c2aaed745f35e1261b437930a9a1476bc
+      post_publication_head: faa2443afc986ffeae632642d743ba43e8490872
       artifact: dist/more-infinite-research_0.6.0.zip
-      sha256: 40EC4F7B07EF4219E74259DA0AA30C8095D8CEA003BDECE90E857D4379DB1C2C
+      sha256: 0C53F30AFF4FCC3090323D3B319FAF6DD763D696983F60947BB07AB53617288A
       github_release: https://github.com/Julesc013/more-infinite-research/releases/tag/0.6.0
       public_hash_verification: passed
-      mod_portal_status: archive-only-not-attempted
+      mod_portal_status: maintainer-upload-pending
       manual_visual_review: pending-maintainer
-      status: published-github-historical-archive
+      status: published-github-maintainer-portal-pending
   closed_versions:
     - version: "2.2.0"
       branch: main
@@ -840,46 +840,46 @@ target_lines:
     target_factorio: "0.12"
     support_class: archive-museum
     source: final_lower_wave_dev_anchor_6ac377389d7ffc3576fb39576dab4ace6efaec51
-    publish_policy: published-github-archive-only
+    publish_policy: published-github-portal-maintainer-pending
   factorio_0_11:
     version: "0.11.0"
     branch: tmp/0.11
     target_factorio: "0.11"
     support_class: museum
     source: final_lower_wave_dev_anchor_6ac377389d7ffc3576fb39576dab4ace6efaec51
-    publish_policy: published-github-archive-only
+    publish_policy: published-github-portal-maintainer-pending
   factorio_0_10:
     version: "0.10.0"
     branch: tmp/0.10
     target_factorio: "0.10"
     support_class: museum
     source: final_lower_wave_dev_anchor_6ac377389d7ffc3576fb39576dab4ace6efaec51
-    publish_policy: published-github-archive-only
+    publish_policy: published-github-portal-maintainer-pending
   factorio_0_9:
     version: "0.9.0"
     branch: tmp/0.9
     target_factorio: "0.9"
     support_class: museum
     source: final_lower_wave_dev_anchor_6ac377389d7ffc3576fb39576dab4ace6efaec51
-    publish_policy: published-github-archive-only
+    publish_policy: published-github-portal-maintainer-pending
   factorio_0_8:
     version: "0.8.0"
     branch: tmp/0.8
     target_factorio: "0.8"
     support_class: museum-extract-required
     source: final_lower_wave_dev_anchor_6ac377389d7ffc3576fb39576dab4ace6efaec51
-    publish_policy: published-github-archive-only
+    publish_policy: published-github-portal-maintainer-pending
   factorio_0_7:
     version: "0.7.0"
     branch: tmp/0.7
     target_factorio: "0.7"
     support_class: museum-extract-required
     source: final_lower_wave_dev_anchor_6ac377389d7ffc3576fb39576dab4ace6efaec51
-    publish_policy: published-github-archive-only
+    publish_policy: published-github-portal-maintainer-pending
   factorio_0_6:
     version: "0.6.0"
     branch: tmp/0.6
     target_factorio: "0.6"
     support_class: museum-extract-required
     source: final_lower_wave_dev_anchor_6ac377389d7ffc3576fb39576dab4ace6efaec51
-    publish_policy: published-github-archive-only
+    publish_policy: published-github-portal-maintainer-pending

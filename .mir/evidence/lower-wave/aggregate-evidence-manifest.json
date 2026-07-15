@@ -1,113 +1,248 @@
 {
   "schema": 1,
-  "status": "all-copied-and-referenced-evidence-rehashed",
-  "generated_at": "2026-07-15T00:57:09.1534666Z",
-  "entry_count": 75,
+  "status": "metadata-correction-evidence-consolidated-and-rehashed",
+  "generated_at": "2026-07-16",
+  "entry_count": 102,
   "entries": [
     {
       "path": ".mir/evidence/0.10.0-candidate-seal.json",
-      "sha256": "544B5DA5D1268A9CF0D19535AFF365C0D7BC62E4DFC2E05C71DE1BF51247068F",
-      "size_bytes": 1388
+      "sha256": "F0AB739C15D95F206C951BC42B3363779A5DA181ECDE1E2F5839C5DAF2871241",
+      "size_bytes": 1362
     },
     {
       "path": ".mir/evidence/0.10.0-qualification-summary.json",
-      "sha256": "0DADC431C8799D6A01176FB3426A786620380B1E7524DFB227E9858979A8F002",
-      "size_bytes": 2727
+      "sha256": "09B31122224BAA084917E63C86E1CB2080B4181E92A78FEC3117915E25C6A53E",
+      "size_bytes": 2635
+    },
+    {
+      "path": ".mir/evidence/0.10.0-runtime/binary-version.txt",
+      "sha256": "03CB10ADA0097C61DF558DC14C4BA38E4525A88F6AB3CF40F72306C3F8205A02",
+      "size_bytes": 115
+    },
+    {
+      "path": ".mir/evidence/0.10.0-runtime/fresh-start.log",
+      "sha256": "B5724A40D467DD1440D5F096610CDDDA5E1E555AAFCBB0BAC78DBB7A155403E7",
+      "size_bytes": 223
+    },
+    {
+      "path": ".mir/evidence/0.10.0-runtime/runtime-proof.json",
+      "sha256": "04AB0FDEDE400B2CCE564B93C75AE032078A7382727F936B37A04CBA405FCE4C",
+      "size_bytes": 2422
+    },
+    {
+      "path": ".mir/evidence/0.10.0-runtime/second-start.log",
+      "sha256": "8B723996EF1C1F6780FC8AC548E0E2622FC81F51B9D0673C8E10F152058A1614",
+      "size_bytes": 223
     },
     {
       "path": ".mir/evidence/0.10.0/publication.json",
-      "sha256": "3FCB70DA2B63E8C2027315049CF053CFADDAF2BA4655C2A12FFB0FDD6BE5B7E8",
-      "size_bytes": 1041
+      "sha256": "86358125D041C8FDB75A910CA0E1DB1273C8462BB156C9E9AD536F4969E7E57F",
+      "size_bytes": 1010
     },
     {
       "path": ".mir/evidence/0.11.0-candidate-seal.json",
-      "sha256": "E8E6B115B33746E30D196CC68E8CD11DAB09A5E89C198A064D0B3981293488C2",
-      "size_bytes": 1388
+      "sha256": "85162CADC2BA7037C4F6FEFD956ED6B4CFB486E74054B3D1F7ED71A267A55AF2",
+      "size_bytes": 1362
     },
     {
       "path": ".mir/evidence/0.11.0-qualification-summary.json",
-      "sha256": "82F3A9E155D8139054A51068168F09E918755530D37FF92ADF45A231EB623A01",
-      "size_bytes": 2727
+      "sha256": "2E18C7687EE78144341CD644B7B705655F0BF38C6BA71572CF9684616A9536C7",
+      "size_bytes": 2635
+    },
+    {
+      "path": ".mir/evidence/0.11.0-runtime/binary-version.txt",
+      "sha256": "751F99CCEB0519C07160B844C6C1FF55F770D6A3C6E593F1F4A290985C49E1C9",
+      "size_bytes": 115
+    },
+    {
+      "path": ".mir/evidence/0.11.0-runtime/fresh-start.log",
+      "sha256": "D71A645DD6616E35E153648BE8E88BF7B0779ABB2A3681DF27B0A2089CB95006",
+      "size_bytes": 755
+    },
+    {
+      "path": ".mir/evidence/0.11.0-runtime/runtime-proof.json",
+      "sha256": "5B06C225EF7C3D6D96BC96A0B5D2C3C46480715484F4B044A1ABED71445DE15A",
+      "size_bytes": 2610
+    },
+    {
+      "path": ".mir/evidence/0.11.0-runtime/second-start.log",
+      "sha256": "E60C9A870ECBE29B862EC4F70D7B3874E2387AE734C50573471534F7502586A8",
+      "size_bytes": 755
     },
     {
       "path": ".mir/evidence/0.11.0/publication.json",
-      "sha256": "40706E0B29673B4E4B00896E717FC4A317A5E3717D85317E31A38F2B17166898",
-      "size_bytes": 1041
+      "sha256": "51FCCA251325CE7FAEE108929641D57A26BFFACE2817B8AF444B360E206D40D9",
+      "size_bytes": 1010
     },
     {
       "path": ".mir/evidence/0.12.0-candidate-seal.json",
-      "sha256": "80D9F75318F6036DBFE908EE56650E9C25CDB4CBBD2D802F5F5EE600D1ACAED8",
-      "size_bytes": 1388
+      "sha256": "BC93B130A58DE1D678AB1466320F643FB6C03BB3222829213569D5D6FA6D2AE7",
+      "size_bytes": 1362
     },
     {
       "path": ".mir/evidence/0.12.0-qualification-summary.json",
-      "sha256": "92BCF62BE224D56E797F1F303BF56DD30618D184FF456763DA4E73F2E178C3B9",
-      "size_bytes": 2860
+      "sha256": "3E59D8DCE23F57FCE8FCAD3DC4FE92E5831089E0AF781B9ABBB5F3F836C08499",
+      "size_bytes": 2762
+    },
+    {
+      "path": ".mir/evidence/0.12.0-runtime/fresh-create.log",
+      "sha256": "F4A0E65A34F539CBF19900267C3E4C45741744923A97AEF2CA9FD69399C2C547",
+      "size_bytes": 1135
+    },
+    {
+      "path": ".mir/evidence/0.12.0-runtime/fresh-reload.log",
+      "sha256": "5DCC1A5A1DE6E0447CA0007D2D723A6CD5C2B5BDD171D7FDA1A42EE652C317EF",
+      "size_bytes": 2694
+    },
+    {
+      "path": ".mir/evidence/0.12.0-runtime/runtime-proof.json",
+      "sha256": "172CEFE30CDDD20AC31F453A3B72FF9811E7B8E52EE55EDEAFEF9B2DE82FD3F6",
+      "size_bytes": 1689
     },
     {
       "path": ".mir/evidence/0.12.0/publication.json",
-      "sha256": "48D65FB8CD1D3FAFBCC200B705E5F58CAC2CC13F75648E61DF635CCE7FAF683F",
-      "size_bytes": 1041
+      "sha256": "F66645508761008999707065918DED6B9EC21F58572041103E597460BF1BD295",
+      "size_bytes": 1010
     },
     {
       "path": ".mir/evidence/0.6.0-candidate-seal.json",
-      "sha256": "31547936E5839C006C81A904C077F6386D568488C33694320BB0BCB850F7F5F4",
-      "size_bytes": 1382
+      "sha256": "840FF20AE7B9982ED67317BD47EDE6B751821855CF9FDD9F7612D46C10E8EF75",
+      "size_bytes": 1356
     },
     {
       "path": ".mir/evidence/0.6.0-qualification-summary.json",
-      "sha256": "B8FFAA9CFDB6367DF8B6532063695ED109E5C3A34283397EAEEC819A22968DDE",
-      "size_bytes": 2472
+      "sha256": "F0B974DDCA9100A2785A84006AF249836E786124FBF209FDC91D7977CF7929D1",
+      "size_bytes": 2392
+    },
+    {
+      "path": ".mir/evidence/0.6.0-runtime/binary-version.txt",
+      "sha256": "132CB1B6DC52C8A787A31E49FE4FD8ABAF8AC299B6EBF4C985C719CB5A30B536",
+      "size_bytes": 111
+    },
+    {
+      "path": ".mir/evidence/0.6.0-runtime/fresh-start.crop-cache.dat",
+      "sha256": "61CEE9AF442D07040841CC0BEB83784F91363D802FD732811D1CF6569C3BD704",
+      "size_bytes": 153647
+    },
+    {
+      "path": ".mir/evidence/0.6.0-runtime/runtime-proof.json",
+      "sha256": "6C25A503FFF31B9773DBB76D7A45CA6E03F870BEA93DA854E41CFC328DD4AB35",
+      "size_bytes": 2455
+    },
+    {
+      "path": ".mir/evidence/0.6.0-runtime/second-start.crop-cache.dat",
+      "sha256": "61CEE9AF442D07040841CC0BEB83784F91363D802FD732811D1CF6569C3BD704",
+      "size_bytes": 153647
     },
     {
       "path": ".mir/evidence/0.6.0/publication.json",
-      "sha256": "4D1535A17A9584EA7C83BF0E4904A13FCBFAA3EB74B508CD4D9B4A1AC01B9E8C",
-      "size_bytes": 1037
+      "sha256": "20FF513E10C5E9E4BD9C7993F346F7D6D03B7782C0828B2750F4AB88737D1460",
+      "size_bytes": 1006
     },
     {
       "path": ".mir/evidence/0.7.0-candidate-seal.json",
-      "sha256": "6A6953AC5604199355F75C8C7C27ECA547820F85B7BC79F0E0BB04D025470C3E",
-      "size_bytes": 1382
+      "sha256": "8534ECEDCA6A50EDE301837F95C2166FC9D0D72CA2ABF87DC40023633A3B2401",
+      "size_bytes": 1356
     },
     {
       "path": ".mir/evidence/0.7.0-qualification-summary.json",
-      "sha256": "FC45AF16C5A7D8160D3E9FA6E6181C6837309E6A8947E5FB76AC7FDABFD9F003",
-      "size_bytes": 2737
+      "sha256": "C71203E726AD534F7E2EE2C35642774C069B5277D297B22293EC7A9C79A0A0BC",
+      "size_bytes": 2645
+    },
+    {
+      "path": ".mir/evidence/0.7.0-runtime/binary-version.txt",
+      "sha256": "DD8CBB702AE976A4B09F400282BC46FFBE69C2452A1B8A5E480ED494AA32FA49",
+      "size_bytes": 110
+    },
+    {
+      "path": ".mir/evidence/0.7.0-runtime/fresh-start.crop-cache.dat",
+      "sha256": "A5ABDD1CDB71EBF4BA95E609A605683951D7F6B9B8DE4266A9708972C2A17CF9",
+      "size_bytes": 207334
+    },
+    {
+      "path": ".mir/evidence/0.7.0-runtime/runtime-proof.json",
+      "sha256": "B30CE5EC5C18CCEC1E17AF118B6A0F0A01E28AE22D6F2B5B943726747B848125",
+      "size_bytes": 2455
+    },
+    {
+      "path": ".mir/evidence/0.7.0-runtime/second-start.crop-cache.dat",
+      "sha256": "A5ABDD1CDB71EBF4BA95E609A605683951D7F6B9B8DE4266A9708972C2A17CF9",
+      "size_bytes": 207334
     },
     {
       "path": ".mir/evidence/0.7.0/publication.json",
-      "sha256": "BEE5CF6F8271551A88D18A30645CC4B3ED6BBC619FC6AD64351EEDED3C587A9D",
-      "size_bytes": 1037
+      "sha256": "A315C767499F276238CFCCBFAC8D31842BB779FFDEFD3CF28CFA7CBEA845C283",
+      "size_bytes": 1006
     },
     {
       "path": ".mir/evidence/0.8.0-candidate-seal.json",
-      "sha256": "1502B3AC49B049B8C6026E6657CB6718B7801C0E48257A9D30BEC06D44800605",
-      "size_bytes": 1382
+      "sha256": "87EA470D7D0F6FC274C1AB948881FC4DF62248AB2359149421002D631933E17F",
+      "size_bytes": 1356
     },
     {
       "path": ".mir/evidence/0.8.0-qualification-summary.json",
-      "sha256": "7D4E9233A2733714EF581C117B0975C20E6E1032384021C5DE9659762EBB4C3A",
-      "size_bytes": 2737
+      "sha256": "82E59B6EB634F6DB5A7AB102F616C710B8A112AB82ED276651D2F0E1E3A86F43",
+      "size_bytes": 2645
+    },
+    {
+      "path": ".mir/evidence/0.8.0-runtime/binary-version.txt",
+      "sha256": "A6C79B56A1A0CA6F2626E4BC12E0978533BE3A791BCB9D5DE0DACDDEBAFA025B",
+      "size_bytes": 110
+    },
+    {
+      "path": ".mir/evidence/0.8.0-runtime/fresh-start.crop-cache.dat",
+      "sha256": "0333D44A855F0A7D145C41C926388D17EB22701F1D2EAE8016779F1A5C7E4A85",
+      "size_bytes": 235629
+    },
+    {
+      "path": ".mir/evidence/0.8.0-runtime/runtime-proof.json",
+      "sha256": "741A1434B44205C176136CD09DD6ADE522D7C6398E8E5CC237C3176B72354426",
+      "size_bytes": 2455
+    },
+    {
+      "path": ".mir/evidence/0.8.0-runtime/second-start.crop-cache.dat",
+      "sha256": "0333D44A855F0A7D145C41C926388D17EB22701F1D2EAE8016779F1A5C7E4A85",
+      "size_bytes": 235629
     },
     {
       "path": ".mir/evidence/0.8.0/publication.json",
-      "sha256": "162149A0B9CD331DCCEDEF9229E4BA798A60ADA1C45F9299137F74972192E691",
-      "size_bytes": 1037
+      "sha256": "24EFFD913FBCE1205C6E041DDC61A6D7153B4110AFEE9CF3E8D4661A64E0EBD9",
+      "size_bytes": 1006
     },
     {
       "path": ".mir/evidence/0.9.0-candidate-seal.json",
-      "sha256": "E4B88EB5111DBC6F20B21C52BDFA1FC31BAA8160A65BF6091F1E3891DE13F564",
-      "size_bytes": 1382
+      "sha256": "678D65BF0004DC6FF83449AC29AEE2C7D98EAAD9B65BCFFA49AAF2349FACEB25",
+      "size_bytes": 1356
     },
     {
       "path": ".mir/evidence/0.9.0-qualification-summary.json",
-      "sha256": "3C9E7C63A7D02CBA9472A76AEC51C81B10C4E0CB68ED1AFAB52072D804931843",
-      "size_bytes": 2722
+      "sha256": "2030239C52330847C86D046080149FB0DFA88EB54F3DF52299F1497AD453894F",
+      "size_bytes": 2630
+    },
+    {
+      "path": ".mir/evidence/0.9.0-runtime/binary-version.txt",
+      "sha256": "F777E39DA276D01268410B68D2E6C7098604F5A2B8C66293A8AD38744EA8EC5A",
+      "size_bytes": 110
+    },
+    {
+      "path": ".mir/evidence/0.9.0-runtime/fresh-start.crop-cache.dat",
+      "sha256": "E9D6C27A12F471894164DCF83F66633AEAB2EB6A716BB527DF8B988F4C1E276D",
+      "size_bytes": 270969
+    },
+    {
+      "path": ".mir/evidence/0.9.0-runtime/runtime-proof.json",
+      "sha256": "2307398F317A93113DBFA86F666980A573DF18715652F0E18D6BB5C3AC2BEB99",
+      "size_bytes": 2462
+    },
+    {
+      "path": ".mir/evidence/0.9.0-runtime/second-start.crop-cache.dat",
+      "sha256": "E9D6C27A12F471894164DCF83F66633AEAB2EB6A716BB527DF8B988F4C1E276D",
+      "size_bytes": 270969
     },
     {
       "path": ".mir/evidence/0.9.0/publication.json",
-      "sha256": "4CA1E28F24DADDA0013366B430D399DBC2C36E0CA41AAFDDBC7C00A6EB8513FC",
-      "size_bytes": 1037
+      "sha256": "BB32DAD933408143F519C1AB9350B55D3C41D9E62F78EFC5F4FBD5231EA98DBC",
+      "size_bytes": 1006
     },
     {
       "path": ".mir/evidence/1.3.0-candidate-seal.json",
@@ -121,8 +256,8 @@
     },
     {
       "path": ".mir/evidence/1.3.0/publication.json",
-      "sha256": "302518A18C9B19442B718D7ECEABF99AD2EA14C5435C72B8564725D1867E0064",
-      "size_bytes": 1357
+      "sha256": "E5C16406B09DCFC322FC45AB157DB6682DA470AD4B516239DAABE7BD5119780F",
+      "size_bytes": 1382
     },
     {
       "path": ".mir/evidence/1.4.0-candidate-seal.json",
@@ -136,8 +271,8 @@
     },
     {
       "path": ".mir/evidence/1.4.0/publication.json",
-      "sha256": "19D43BFAE8BAD413C375C191F234CC2B53364882126ECE058D89DA284762F011",
-      "size_bytes": 1357
+      "sha256": "924F51E4476FEE368BBAC9DB95851A9CF2995548B5959451D6B98C571FF2A091",
+      "size_bytes": 1382
     },
     {
       "path": ".mir/evidence/1.5.0-candidate-seal.json",
@@ -151,8 +286,8 @@
     },
     {
       "path": ".mir/evidence/1.5.0/publication.json",
-      "sha256": "D966E039DAD8CC5B1125EC442FDA8F1A8BE46DF4C031EEE64A876ED3342C55D9",
-      "size_bytes": 1357
+      "sha256": "6FB2EFC5FEB2043537DC2F82D04F1358DCE03BB2B243A875D280E8BA7F9FCC10",
+      "size_bytes": 1382
     },
     {
       "path": ".mir/evidence/1.6.0-candidate-seal.json",
@@ -166,8 +301,8 @@
     },
     {
       "path": ".mir/evidence/1.6.0/publication.json",
-      "sha256": "B787889E633B0FC15E1A0EABF3293CEB96AE60FDF63F77DCA19C7CB7F70EC645",
-      "size_bytes": 1357
+      "sha256": "C4813CE1F75F67ADA10F777DCB6F21BACCDB1040EBED27B55218B418CCF1CE24",
+      "size_bytes": 1382
     },
     {
       "path": ".mir/evidence/1.7.1-candidate-seal.json",
@@ -181,8 +316,8 @@
     },
     {
       "path": ".mir/evidence/1.7.1/publication.json",
-      "sha256": "8161A782E25BBD0D71A4187E28E314152275C2C352D732C41E298FC69B72F517",
-      "size_bytes": 1357
+      "sha256": "363AD2492692E7039D5E3338FCF4F30DFE7A907B4D111854E83C09076738FE73",
+      "size_bytes": 1382
     },
     {
       "path": ".mir/evidence/lower-wave/0.10.0-feature-classification.json",
@@ -270,14 +405,29 @@
       "size_bytes": 7774
     },
     {
+      "path": ".mir/evidence/lower-wave/aggregate-branch-origin-snapshot.json",
+      "sha256": "ADEA72B2BC24FC275029EF7C2A5BB489AEBB5C858729294423313C07D726B90B",
+      "size_bytes": 25096
+    },
+    {
       "path": ".mir/evidence/lower-wave/aggregate-feature-matrix.json",
       "sha256": "99B0D71CA5104C823FECB833737E7BE1536A41DA45ED1343C438726110684CC1",
       "size_bytes": 17432
     },
     {
+      "path": ".mir/evidence/lower-wave/failure-packets/post-publication-full-validation-timebox.json",
+      "sha256": "845DEC43B38F53C67DC0B4C86C70E61227F20C825A51F3F1F2F5C441742EC5B6",
+      "size_bytes": 3787
+    },
+    {
       "path": ".mir/evidence/lower-wave/final-release-ledger.json",
-      "sha256": "3C8EF6E3BFF6EF67625315D64E509BC44853E615ADFDDBC05424F01C51A14F50",
-      "size_bytes": 24743
+      "sha256": "62F0B43795C5E8D3772375BEDB37E6B69BD6D6B818368911163D9C34EAD9558A",
+      "size_bytes": 25127
+    },
+    {
+      "path": ".mir/evidence/lower-wave/post-publication-dev-requalification.json",
+      "sha256": "181BD91723D0183A2AE70F4A8905ACB81184901DD5BBF7E67BE1C1CE5801C756",
+      "size_bytes": 7730
     },
     {
       "path": ".mir/evidence/lower-wave/targets/0.10.0/source-lock.json",
@@ -363,21 +513,6 @@
       "path": ".mir/evidence/lower-wave/targets/1.7.1/target-reconstruction.json",
       "sha256": "074C0E642AA6E0A5230E48ED1480BD7BAD4B54C0EC0AB652F9671F32BC66993B",
       "size_bytes": 1401
-    },
-    {
-      "path": ".mir/evidence/lower-wave/failure-packets/post-publication-full-validation-timebox.json",
-      "sha256": "845DEC43B38F53C67DC0B4C86C70E61227F20C825A51F3F1F2F5C441742EC5B6",
-      "size_bytes": 3787
-    },
-    {
-      "path": ".mir/evidence/lower-wave/post-publication-dev-requalification.json",
-      "sha256": "181BD91723D0183A2AE70F4A8905ACB81184901DD5BBF7E67BE1C1CE5801C756",
-      "size_bytes": 7730
-    },
-    {
-      "path": ".mir/evidence/lower-wave/aggregate-branch-origin-snapshot.json",
-      "sha256": "ADEA72B2BC24FC275029EF7C2A5BB489AEBB5C858729294423313C07D726B90B",
-      "size_bytes": 25096
     }
   ]
 }

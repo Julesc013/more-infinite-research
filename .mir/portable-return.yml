@@ -360,8 +360,34 @@ lessons:
     release_impact: all affected candidates were independently requalified and resealed before publication; no published version was altered
     status: complete
 
+  PL-019:
+    title: Explicit target-matching museum package metadata
+    source_targets: ["0.12", "0.11", "0.10", "0.9", "0.8", "0.7", "0.6"]
+    observable_issue: the shared museum generator emitted the MIR version but omitted factorio_version, so external metadata validation rejected every otherwise qualified archive
+    classification: portable-package-governance
+    affected_targets: ["0.12", "0.11", "0.10", "0.9", "0.8", "0.7", "0.6"]
+    modern_decision: require generated package metadata to include the explicit target compatibility version and reject both missing and mismatched values
+    target_local_decision: preserve each target's exact patch floor, finite feature projection, deployment route, and historical runtime proof
+    fixture_evidence:
+      - museum-rendered-info-factorio-version
+      - museum-deterministic-build
+      - museum-negative-invariants
+      - exact-corrected-archive-runtime
+      - github-asset-digest
+    dev_commit: 2e8b762dcbe8ebcb440eeeadaadfb0199d2a2665
+    replayed_target_commits:
+      - ab9f51d853602687f34059e1b04a67a82b17ea82
+      - 36e4e2e2b8b5a940814c6f79ca57d6b507df66ba
+      - 892f09ac5f8da1cecf8e031a8bed48bd30753104
+      - e6d666549ce8107a483f392fe5f9e732ea6b8e71
+      - 22a5520bf57fbb33b950c6c4b8d8f75ac8c52b72
+      - 1fe4b7426dad56ea81c88a50a4d360322a7b24b3
+      - 061401e4554a1cd16f765312235ccea5aa485248
+    release_impact: all seven museum archives were rebuilt, exact-binary requalified, resealed, retagged, republished, and byte-verified
+    status: complete
+
 return_sweep:
-  completed_at: 2026-07-15
+  completed_at: 2026-07-16
   authority_for_candidate_archives: .mir/branches.yml
   archives_copied_into_modern_release: false
   archive_policy: target distributions remain immutable target-owned artifacts; dev records their commit hashes evidence and portable lessons
@@ -374,16 +400,16 @@ return_sweep:
     - {target: "0.15", branch: tmp/0.15, audited_head: 3e44e19190236d03dc15e50d714b4a7347e05220, qualified_source: d95d5da2d0750708f0bb222b75eabe216d9f41ec, disposition: published-target-specific-cuts-rejected}
     - {target: "0.14", branch: tmp/0.14, audited_head: f8251df29a70dd402de12874c231e071bd47bd5b, qualified_source: 5defb9ee02bf7b2138a75e60a4d77d77b5218b28, disposition: published-target-specific-finite-cuts-rejected}
     - {target: "0.13", branch: tmp/0.13, audited_head: 262e94b39bf30b8bbf4f17f6cbf14dd507f696ba, qualified_source: 3c90a7aa0895553aae3326a42ba3bd20d7553d7c, disposition: published-target-specific-finite-cuts-rejected}
-    - {target: "0.12", branch: tmp/0.12, audited_head: f9bce733e9ac78934a827b8a3ce71f5dd570b8ab, qualified_source: d7c6145bee27c5ae8d17a30dd548889c22e1c10d, disposition: published-museum-target-source-rejected}
-    - {target: "0.11", branch: tmp/0.11, audited_head: 2f71e78b2bd2cdadc55654cd1349b3858a75fed4, qualified_source: 0a63fdb364ae582eff32509b08405cebbd629133, disposition: published-museum-target-source-rejected}
-    - {target: "0.10", branch: tmp/0.10, audited_head: c88838b891e4091ea9e549c14cd630c5ee43d950, qualified_source: b414934c303a5e4a2ddc6f8a598fa11ac8ec7d83, disposition: published-museum-target-source-rejected}
-    - {target: "0.9", branch: tmp/0.9, audited_head: 13764da44d971dd1fca6053315f5fcbe996b4ac4, qualified_source: 4631f1425523f7aa0f8f5a8e596fb7f73c13306c, disposition: published-museum-target-source-rejected}
-    - {target: "0.8", branch: tmp/0.8, audited_head: 7086ee27486ae4177bbb310245fa24c4a2a3f18e, qualified_source: 4bc0edf779b2e1e47de75423dc1c485776ae5688, disposition: published-museum-target-source-rejected}
-    - {target: "0.7", branch: tmp/0.7, audited_head: e44ee8afaa957797431c3f350e9566e0512b7b1c, qualified_source: 7bc8b1e823aea7c8cbe895af01cc0bf1dbab1e6b, disposition: published-museum-target-source-rejected}
-    - {target: "0.6", branch: tmp/0.6, audited_head: 26886b6eeef6638801268821ee2aa5c1caf94a60, qualified_source: 716819440dfe45464908d0855cf6cc265c8701aa, disposition: published-museum-target-source-rejected}
+    - {target: "0.12", branch: tmp/0.12, audited_head: 3fa4b5584e10c20c35cc2d0882fad6c7ca1757e2, qualified_source: 63b39962f1951e824884f6ae4b48a142027591c4, disposition: republished-metadata-corrected-museum-target-source-rejected}
+    - {target: "0.11", branch: tmp/0.11, audited_head: 3d1862c3d4c1cf8bf381f6d46f6aa3751349cdc6, qualified_source: adeedc3a21f69c3803c19a9e62115255068a90db, disposition: republished-metadata-corrected-museum-target-source-rejected}
+    - {target: "0.10", branch: tmp/0.10, audited_head: 7dd2d289a19a59fa75565efa7db90d625500ec39, qualified_source: a760eba9e2e4b1b27be557f3baf8f4570f373af7, disposition: republished-metadata-corrected-museum-target-source-rejected}
+    - {target: "0.9", branch: tmp/0.9, audited_head: f3257dafb3c16a9616c9acc9d4a7bbbac9cd231c, qualified_source: 95ab3d6efeab3ff0c36a19c54aee64680f54d729, disposition: republished-metadata-corrected-museum-target-source-rejected}
+    - {target: "0.8", branch: tmp/0.8, audited_head: 732223297ce3e88f84f467f7b2ce16bacbda5b0e, qualified_source: 854415ae2f758055208c32d2e5bc4d21d8f42ef1, disposition: republished-metadata-corrected-museum-target-source-rejected}
+    - {target: "0.7", branch: tmp/0.7, audited_head: de01ee19beeee6c793d164bd228bef902643fd62, qualified_source: e0bc735c4808ab12c1b6b5045937878ae144be2e, disposition: republished-metadata-corrected-museum-target-source-rejected}
+    - {target: "0.6", branch: tmp/0.6, audited_head: faa2443afc986ffeae632642d743ba43e8490872, qualified_source: 653a9da87d4e5b6f8743a236b72cbdccfdafe216, disposition: republished-metadata-corrected-museum-target-source-rejected}
 
 fixed_point:
-  last_completed_sweep: 2026-07-15
+  last_completed_sweep: 2026-07-16
   zero_new_portable_compiler_fixes: true
   zero_new_reusable_validation_fixes: true
   zero_new_higher-target-profile_corrections: true

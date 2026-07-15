@@ -5,14 +5,14 @@ applies_to: "1.7.1 through 0.6.0"
 audience: release-manager
 doc_type: release-plan
 owner: mir-maintainers
-last_reviewed: 2026-07-15
+last_reviewed: 2026-07-16
 supersedes: []
 superseded_by: []
 ---
 
 # MIR Lower-Wave 0.17 To 0.6 Release Synthesis
 
-The twelve independently reconstructed lower targets were qualified from final canonical development anchor `6ac377389d7ffc3576fb39576dab4ace6efaec51`, published in descending target order, publicly re-downloaded, and verified byte-for-byte. The machine-readable authority is `.mir/evidence/lower-wave/final-release-ledger.json`.
+The twelve independently reconstructed lower targets were qualified from final canonical development anchor `6ac377389d7ffc3576fb39576dab4ace6efaec51`, published in descending target order, publicly re-downloaded, and verified byte-for-byte. On 2026-07-16, the seven museum archives were rebuilt and republished after the shared generator was corrected to emit explicit target-matching `factorio_version` metadata. The machine-readable authority is `.mir/evidence/lower-wave/final-release-ledger.json`.
 
 ## Outcome
 
@@ -23,13 +23,13 @@ The twelve independently reconstructed lower targets were qualified from final c
 | 1.5.0 | 0.15.40 | `c2b526fd6dde81be7703daef53b075a1fd773e09` | `131162AA1A62C05E2C395C3F9D2495178742CD8C5324B058C42995C17F65B4DB` | published and byte-verified | `blocked-missing-MOD_UPLOAD_API_KEY` |
 | 1.4.0 | 0.14.23 | `fa192796ab274dd590c65b96d0f3f6a0f35cb155` | `69B7FC86E798937D44DF60E5E6DDC1FA636A10643B2E1BF54A79F5255CF984C1` | published and byte-verified | `blocked-missing-MOD_UPLOAD_API_KEY` |
 | 1.3.0 | 0.13.20 | `a33b99c1f39e1e779986a12a558a79ea97e69239` | `B07136627C913BA50C36B4F9453D972047F4FD3666BB9B8A79AB0EEFC9CA1749` | published and byte-verified | `blocked-missing-MOD_UPLOAD_API_KEY` |
-| 0.12.0 | 0.12.35 | `d3681bc202938e06fb965531ddfa764f71ca38ce` | `C98EBB436DD1BA1C4C0C230EB51C637EE42904000C9C7A82C7E7A33F6F5461EF` | historical archive published and byte-verified | archive-only |
-| 0.11.0 | 0.11.22 | `e83648f8f9b75f8545e913a9a5288423dbb9ebfa` | `C628FBFA4FC2A811869C5D33245BCBA0D37AA5EE2074ADEC7155874C2081B748` | historical archive published and byte-verified | archive-only |
-| 0.10.0 | 0.10.12 | `732ec117f187ccf77325e85023999f869520be9e` | `845CBB69195ED03AF604685137D356E826B29D0570A4A4AFD6C0941E4B23C04F` | historical archive published and byte-verified | archive-only |
-| 0.9.0 | 0.9.8 | `210a4556b12a3a40a64337c3535da307c86137e5` | `9FE3117CE3415858506FBA319A2F025F170771590A23C2E160D710F4447A05F1` | historical archive published and byte-verified | archive-only |
-| 0.8.0 | 0.8.8 | `e0e297cd0bcc4a38f54d5b2e4b7bc54335785ee3` | `6832B00783657F60D8AE967552CA354D1F73C988A0DFE023999AE81533267D8E` | historical archive published and byte-verified | archive-only |
-| 0.7.0 | 0.7.5 | `085d529f52b3f3b2ddf06a682475d2d7124210b7` | `8495146889655FA46233A7B0416F4C67B4E2BF93E984E01F5F8234C9CA6F570F` | historical archive published and byte-verified | archive-only |
-| 0.6.0 | 0.6.4 | `a4f82673278f1414eff06f8094ed460851fc112b` | `40EC4F7B07EF4219E74259DA0AA30C8095D8CEA003BDECE90E857D4379DB1C2C` | historical archive published and byte-verified | archive-only |
+| 0.12.0 | 0.12.35 | `82a349bd8137abe21145b321be4edb1e43e1e9e1` | `5171CD073A632AA30769FD9567F44AD2331BB5E7B852EC9F8576798398816612` | corrected archive published and byte-verified | maintainer upload pending |
+| 0.11.0 | 0.11.22 | `679774c94bafdaa4d5432b793b8684ee4e43c257` | `38B9DFB72CE5EB0554CF2C9514D9B3D917B322DE5AC955A085A2A1BAADED2DEE` | corrected archive published and byte-verified | maintainer upload pending |
+| 0.10.0 | 0.10.12 | `3377f835243c0cf9e7d2c2e76641c2c471341975` | `C2E42E9AE23E4A146F755B60D40009738724E7A0D3670D3B672D2068AE80912E` | corrected archive published and byte-verified | maintainer upload pending |
+| 0.9.0 | 0.9.8 | `9325e744f1dd36baa33372dab6e7d9528ccfbab8` | `2114D67493C6B1076B1A71F27DC5197C8789C956570FD274507B8FD807C27D84` | corrected archive published and byte-verified | maintainer upload pending |
+| 0.8.0 | 0.8.8 | `080fa92ea38b4b40156f26429bc7cba54948aef0` | `60BA156874CC3EE0C93B93C032BDEC6D8432B5F692009A3277C1890E6D9BF3E6` | corrected archive published and byte-verified | maintainer upload pending |
+| 0.7.0 | 0.7.5 | `cb2991e3ea67b0413076c0e6d0dacf29d7f784b6` | `AA328AFF81F3133BAC3F432ADC7AF52CC49EFF43E40D04EAD99DCFBA92542749` | corrected archive published and byte-verified | maintainer upload pending |
+| 0.6.0 | 0.6.4 | `12a5683c2aaed745f35e1261b437930a9a1476bc` | `0C53F30AFF4FCC3090323D3B319FAF6DD763D696983F60947BB07AB53617288A` | corrected archive published and byte-verified | maintainer upload pending |
 
 ## Boundaries
 

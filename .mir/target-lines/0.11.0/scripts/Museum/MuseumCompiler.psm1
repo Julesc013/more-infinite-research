@@ -303,6 +303,7 @@ function New-MIRMuseumTargetSource {
   $info = [ordered]@{
     name = [string]$Catalog.mod_name
     version = [string]$Target.version
+    factorio_version = [string]$Target.factorio
     title = [string]$Catalog.title
     author = [string]$Catalog.author
     description = [string]$Catalog.description
@@ -365,7 +366,7 @@ function Test-MIRMuseumRenderedSource {
   }
   $info = Get-Content -Raw -LiteralPath (Join-Path $SourceRoot "info.json") | ConvertFrom-Json
   if ([string]$info.version -ne [string]$Target.version) { throw "Rendered info.json version mismatch." }
-  if ($info.PSObject.Properties.Name -contains "factorio_version") { throw "Museum metadata must not leak the modern factorio_version field." }
+  if ([string]$info.factorio_version -ne [string]$Target.factorio) { throw "Rendered info.json factorio_version mismatch." }
   return $true
 }
 

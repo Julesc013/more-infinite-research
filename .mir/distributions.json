@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "status": "complete-root-dist-inventory",
-  "generated_at": "2026-07-15",
+  "generated_at": "2026-07-16",
   "distribution_count": 46,
   "policy": {
     "tagged_archives_are_immutable": true,
@@ -9,13 +9,13 @@
     "release_packager_must_exclude": "dist"
   },
   "distributions": [
-    {"version":"0.6.0","path":"dist/more-infinite-research_0.6.0.zip","bytes":2160,"sha256":"40EC4F7B07EF4219E74259DA0AA30C8095D8CEA003BDECE90E857D4379DB1C2C","kind":"tagged","source_ref":"0.6.0"},
-    {"version":"0.7.0","path":"dist/more-infinite-research_0.7.0.zip","bytes":2505,"sha256":"8495146889655FA46233A7B0416F4C67B4E2BF93E984E01F5F8234C9CA6F570F","kind":"tagged","source_ref":"0.7.0"},
-    {"version":"0.8.0","path":"dist/more-infinite-research_0.8.0.zip","bytes":2505,"sha256":"6832B00783657F60D8AE967552CA354D1F73C988A0DFE023999AE81533267D8E","kind":"tagged","source_ref":"0.8.0"},
-    {"version":"0.9.0","path":"dist/more-infinite-research_0.9.0.zip","bytes":2505,"sha256":"9FE3117CE3415858506FBA319A2F025F170771590A23C2E160D710F4447A05F1","kind":"tagged","source_ref":"0.9.0"},
-    {"version":"0.10.0","path":"dist/more-infinite-research_0.10.0.zip","bytes":2514,"sha256":"845CBB69195ED03AF604685137D356E826B29D0570A4A4AFD6C0941E4B23C04F","kind":"tagged","source_ref":"0.10.0"},
-    {"version":"0.11.0","path":"dist/more-infinite-research_0.11.0.zip","bytes":2514,"sha256":"C628FBFA4FC2A811869C5D33245BCBA0D37AA5EE2074ADEC7155874C2081B748","kind":"tagged","source_ref":"0.11.0"},
-    {"version":"0.12.0","path":"dist/more-infinite-research_0.12.0.zip","bytes":2688,"sha256":"C98EBB436DD1BA1C4C0C230EB51C637EE42904000C9C7A82C7E7A33F6F5461EF","kind":"tagged","source_ref":"0.12.0"},
+    {"version":"0.6.0","path":"dist/more-infinite-research_0.6.0.zip","bytes":2167,"sha256":"0C53F30AFF4FCC3090323D3B319FAF6DD763D696983F60947BB07AB53617288A","kind":"tagged","source_ref":"0.6.0"},
+    {"version":"0.7.0","path":"dist/more-infinite-research_0.7.0.zip","bytes":2512,"sha256":"AA328AFF81F3133BAC3F432ADC7AF52CC49EFF43E40D04EAD99DCFBA92542749","kind":"tagged","source_ref":"0.7.0"},
+    {"version":"0.8.0","path":"dist/more-infinite-research_0.8.0.zip","bytes":2512,"sha256":"60BA156874CC3EE0C93B93C032BDEC6D8432B5F692009A3277C1890E6D9BF3E6","kind":"tagged","source_ref":"0.8.0"},
+    {"version":"0.9.0","path":"dist/more-infinite-research_0.9.0.zip","bytes":2512,"sha256":"2114D67493C6B1076B1A71F27DC5197C8789C956570FD274507B8FD807C27D84","kind":"tagged","source_ref":"0.9.0"},
+    {"version":"0.10.0","path":"dist/more-infinite-research_0.10.0.zip","bytes":2522,"sha256":"C2E42E9AE23E4A146F755B60D40009738724E7A0D3670D3B672D2068AE80912E","kind":"tagged","source_ref":"0.10.0"},
+    {"version":"0.11.0","path":"dist/more-infinite-research_0.11.0.zip","bytes":2522,"sha256":"38B9DFB72CE5EB0554CF2C9514D9B3D917B322DE5AC955A085A2A1BAADED2DEE","kind":"tagged","source_ref":"0.11.0"},
+    {"version":"0.12.0","path":"dist/more-infinite-research_0.12.0.zip","bytes":2696,"sha256":"5171CD073A632AA30769FD9567F44AD2331BB5E7B852EC9F8576798398816612","kind":"tagged","source_ref":"0.12.0"},
     {"version":"1.0.0","path":"dist/more-infinite-research_1.0.0.zip","bytes":61208,"sha256":"C328D8F958BEC2A44297E94E83B1A956D76BEA5E333601A42FDDE60F4155472F","kind":"tagged","source_ref":"1.0.0"},
     {"version":"1.1.0","path":"dist/more-infinite-research_1.1.0.zip","bytes":60927,"sha256":"6395C4A5A0F74C67729746D0FBF6162329978B47C5C29D54CC0045F2977C7E44","kind":"tagged","source_ref":"1.1.0"},
     {"version":"1.1.5","path":"dist/more-infinite-research_1.1.5.zip","bytes":88543,"sha256":"E967AABF3CCB8E41ECC3D6F68945CF7F99482F9B64C41D78BDAD21CC31F1876D","kind":"tagged","source_ref":"1.1.5"},

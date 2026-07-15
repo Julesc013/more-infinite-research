@@ -1,6 +1,6 @@
 # M.I.R. TODO
 
-Updated: 2026-07-15
+Updated: 2026-07-16
 
 This is the current executable queue for `dev`. Historical pre-consolidation queue text is preserved at `.mir/evidence/lower-wave/todo-2026-07-14-pre-consolidation.md`. `.mir/release-wave.yml`, `.mir/branches.yml`, and the release ledgers remain machine-readable authorities.
 
@@ -9,7 +9,7 @@ This is the current executable queue for `dev`. Historical pre-consolidation que
 - MIR 3.1.9 is the immutable Factorio 2.1 release; MIR 2.4.5 is the immutable Factorio 2.0 companion.
 - MIR 1.9.4 and 1.8.2 are the immutable Factorio 1.1 and 1.0 releases.
 - MIR 1.7.1 through 1.3.0 are published reduced or finite target projections for Factorio 0.17 through 0.13.
-- MIR 0.12.0 through 0.6.0 are published finite archive or museum reconstructions.
+- MIR 0.12.0 through 0.6.0 are published finite archive or museum reconstructions whose corrected packages now include explicit target-matching `factorio_version` metadata.
 - The modern `dev` root contains every accepted portable code, data, fixture, validation, documentation, determinism, process-lifecycle, and package-governance return from those target lines.
 - Complete immutable source snapshots for all sixteen published campaign versions live under `.mir/target-lines/<version>/`.
 - All 46 historical distribution paths live under `dist/` and are bound by `.mir/distributions.json`; the 16 final campaign archives are also bound to complete source snapshots by `.mir/target-lines/index.json`.
@@ -27,6 +27,7 @@ This is the current executable queue for `dev`. Historical pre-consolidation que
 - [x] Complete the copy-ready release, feature, test, lesson, reliability, optimization, and follow-up document.
 - [x] Validate every snapshot tree and all 46 root distributions against their immutable or explicitly classified source and recorded hash.
 - [x] Run docs governance, manifest, static, deterministic-package, and forbidden-entry validation.
+- [x] Correct the shared museum metadata generator, rebuild and exact-binary requalify all seven 0.x archives, replace their GitHub tags/releases, and refresh the `dev` snapshots and distribution inventory.
 - [ ] Rerun the Factorio 2.1 runtime catalog against the changelog-updated development package when a Factorio 2.1 binary is available. The released 3.1.9 ZIP retains accepted 102-of-102 evidence, but that is not a new exact-package run.
 - [x] Commit and push the complete consolidation to `dev`.
 
@@ -34,7 +35,7 @@ This is the current executable queue for `dev`. Historical pre-consolidation que
 
 - [ ] Perform maintainer visual technology-tree, icon, locale-fit, save-UI, and balance review for 1.7.1 through 0.6.0. Automated locale and balance gates passed; manual review remains `PENDING-MAINTAINER`.
 - [ ] Upload 1.9.4, 1.8.2, and 1.7.1 through 1.3.0 to the Factorio Mod Portal when `MOD_UPLOAD_API_KEY` is available. Do not convert missing credentials into a passing status.
-- [ ] Keep 0.12.0 through 0.6.0 GitHub archive-only unless a separately authorized historical portal policy says otherwise.
+- [ ] Upload the corrected 0.12.0 through 0.6.0 archives to the Factorio Mod Portal and record the service's acceptance or rejection without treating GitHub publication as portal proof.
 - [ ] Acquire complete Angel, Space Exploration, and Pyanodon dependency closures before making stronger compatibility claims. Inventory or a zero-root load is not evidence.
 
 ## Reliability And Robustness Backlog

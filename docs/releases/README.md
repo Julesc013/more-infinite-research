@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: release-manager
 doc_type: release-plan
 owner: mir-maintainers
-last_reviewed: 2026-07-15
+last_reviewed: 2026-07-16
 supersedes: []
 superseded_by: []
 ---
@@ -14,7 +14,7 @@ superseded_by: []
 
 Release docs are version-specific plans, migration guides, risk registers, checklists, and validation records.
 
-MIR 3.1.9 through 0.6.0 are published, byte-verified, and frozen. Factorio Mod Portal uploads for 1.9.4, 1.8.2, and 1.7.1 through 1.3.0 remain externally blocked by the missing upload API key. Museum versions 0.12.0 through 0.6.0 are intentionally GitHub archive releases. Complete tagged source snapshots and exact distributions are consolidated on `dev` without changing the modern Factorio 2.1 root.
+MIR 3.1.9 through 0.6.0 are published and byte-verified on GitHub. The 0.12.0 through 0.6.0 archives were metadata-corrected, requalified, retagged, and republished on 2026-07-16 after their shared generator omitted `factorio_version`. Mod Portal upload and acceptance remain external maintainer actions. Complete tagged source snapshots and exact distributions are consolidated on `dev` without changing the modern Factorio 2.1 root.
 
 - [3.0.0 plan](3.0.0-plan.md)
 - [3.0.0 regression baseline](3.0.0-regression-baseline.md)
@@ -44,6 +44,14 @@ MIR 3.1.9 through 0.6.0 are published, byte-verified, and frozen. Factorio Mod P
 - [3.1.9 migration guide](3.1.9-migration-guide.md)
 - [3.1.9 release checklist](3.1.9-checklist.md)
 - [3.1.9 validation summary](3.1.9-validation-summary.md)
+- [0.x Factorio version metadata correction](0.x-factorio-version-metadata-correction.md)
+- [0.12.0 release notes](notes/release-notes-0.12.0.md)
+- [0.11.0 release notes](notes/release-notes-0.11.0.md)
+- [0.10.0 release notes](notes/release-notes-0.10.0.md)
+- [0.9.0 release notes](notes/release-notes-0.9.0.md)
+- [0.8.0 release notes](notes/release-notes-0.8.0.md)
+- [0.7.0 release notes](notes/release-notes-0.7.0.md)
+- [0.6.0 release notes](notes/release-notes-0.6.0.md)
 - [3.1.9 and 2.4.5 post-release synthesis](3.1.9-post-2.4.5-ring-synthesis.md)
 - [0.17 through 0.6 lower-wave synthesis](lower-wave-0.17-to-0.6-synthesis.md)
 - [Published lines development copy pack](lower-wave-development-copy-pack.md)

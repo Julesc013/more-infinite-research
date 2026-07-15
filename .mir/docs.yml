@@ -1608,3 +1608,67 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - mir-published-lines-development-copy-pack
+  - path: docs/releases/0.x-factorio-version-metadata-correction.md
+    title: "MIR 0.x Factorio Version Metadata Correction"
+    status: current
+    audience: release-manager
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-0.x-factorio-version-metadata-correction
+  - path: docs/releases/notes/release-notes-0.12.0.md
+    title: "More Infinite Research 0.12.0 Release Notes"
+    status: current
+    audience: player
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-0.12.0-release-notes
+  - path: docs/releases/notes/release-notes-0.11.0.md
+    title: "More Infinite Research 0.11.0 Release Notes"
+    status: current
+    audience: player
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-0.11.0-release-notes
+  - path: docs/releases/notes/release-notes-0.10.0.md
+    title: "More Infinite Research 0.10.0 Release Notes"
+    status: current
+    audience: player
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-0.10.0-release-notes
+  - path: docs/releases/notes/release-notes-0.9.0.md
+    title: "More Infinite Research 0.9.0 Release Notes"
+    status: current
+    audience: player
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-0.9.0-release-notes
+  - path: docs/releases/notes/release-notes-0.8.0.md
+    title: "More Infinite Research 0.8.0 Release Notes"
+    status: current
+    audience: player
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-0.8.0-release-notes
+  - path: docs/releases/notes/release-notes-0.7.0.md
+    title: "More Infinite Research 0.7.0 Release Notes"
+    status: current
+    audience: player
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-0.7.0-release-notes
+  - path: docs/releases/notes/release-notes-0.6.0.md
+    title: "More Infinite Research 0.6.0 Release Notes"
+    status: current
+    audience: player
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-0.6.0-release-notes
