@@ -2,7 +2,7 @@ schema: 1
 
 docs:
   - path: docs/releases/0.7.0-release-packet.md
-    title: "MIR 0.7.0 Release Packet"
+    title: "More Infinite Research 0.7.0 Release Notes"
     status: current
     audience: release-manager
     doc_type: release-plan
