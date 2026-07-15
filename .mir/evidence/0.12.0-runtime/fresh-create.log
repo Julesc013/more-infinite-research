@@ -1,16 +1,16 @@
-   0.001 2026-07-15 09:33:02; Factorio 0.12.35 (Build 18124, win64, alpha)
-   0.001 Operating system: Windows 10 
-   0.001 Program arguments: "D:\Programs\Factorio\0.12\bin\x64\Factorio.exe" "--config" "C:\Projects\Factorio\more-infinite-research-rebuild-0.12\.mir\evidence\0.12.0-runtime\factorio-config.ini" "--create" "fresh-create" 
-   0.002 Read data path: D:/Programs/Factorio/0.12/data
-   0.002 Write data path: C:/Projects/Factorio/more-infinite-research-rebuild-0.12/.mir/evidence/0.12.0-runtime/user
+   0.001 2026-07-16 01:35:52; Factorio 0.12.35 (Build 18124, win64, alpha)
+   0.002 Operating system: Windows 10 
+   0.002 Program arguments: "D:\Programs\Factorio\0.12\bin\x64\Factorio.exe" "--config" "C:\Projects\Factorio\more-infinite-research-lower-0.12\.mir\evidence\0.12.0-runtime\factorio-config.ini" "--create" "fresh-create" 
+   0.003 Read data path: D:/Programs/Factorio/0.12/data
+   0.003 Write data path: C:/Projects/Factorio/more-infinite-research-lower-0.12/.mir/evidence/0.12.0-runtime/user
    0.003 Binaries path: D:/Programs/Factorio/0.12/bin
-   0.025 Running in headless mode
-   0.029 Loading mod core 0.0.0 (data.lua)
-   0.032 Loading mod base 0.12.35 (data.lua)
-   0.095 Loading mod more-infinite-research 0.12.0 (data.lua)
-   0.133 Checksum for core: 3711505753
-   0.134 Checksum for mod base: 2829195351
-   0.134 Checksum for mod more-infinite-research: 2229290403
-   0.413 Factorio initialised
-   4.500 Info Scenario.cpp:124: Map version 0.12.35-0
-   4.559 Checksum for script C:/Projects/Factorio/more-infinite-research-rebuild-0.12/.mir/evidence/0.12.0-runtime/user/temp/currently-playing/control.lua: 393467729
+   0.018 Running in headless mode
+   0.023 Loading mod core 0.0.0 (data.lua)
+   0.026 Loading mod base 0.12.35 (data.lua)
+   0.091 Loading mod more-infinite-research 0.12.0 (data.lua)
+   0.127 Checksum for core: 3711505753
+   0.127 Checksum for mod base: 2829195351
+   0.127 Checksum for mod more-infinite-research: 2229290403
+   0.370 Factorio initialised
+   4.090 Info Scenario.cpp:124: Map version 0.12.35-0
+   4.136 Checksum for script C:/Projects/Factorio/more-infinite-research-lower-0.12/.mir/evidence/0.12.0-runtime/user/temp/currently-playing/control.lua: 393467729
