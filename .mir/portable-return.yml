@@ -1,5 +1,5 @@
 schema: 1
-updated_at: 2026-07-13
+updated_at: 2026-07-15
 source_baseline:
   release: "3.0.5"
   tag: "3.0.5"
@@ -312,8 +312,56 @@ lessons:
     release_impact: ancient-engine runner differences remain explicit target validation capabilities and do not leak into the modern package
     status: complete
 
+  PL-017:
+    source_target: factorio-0.17
+    source_branch: rebuild/0.17
+    source_commit: 7ca81bbc98f02cfaf2d40012096d94e261e74d98
+    observable_issue: GUI process invocation could return before owned Factorio retention processes exited and block later transactional target runs
+    classification: portable-tooling
+    affected_targets: ["0.17", "0.16", "0.15", "0.14", "0.13"]
+    modern_decision: own every retention process through explicit timeout, WaitForExit, and process-tree termination
+    target_local_decision: preserve target-owned command-line and proof grammar while sharing lifecycle ownership
+    fixture_evidence:
+      - retention-process-lifecycle
+      - zero-surviving-factorio-processes
+    dev_commit: 7ca81bbc98f02cfaf2d40012096d94e261e74d98
+    replayed_target_commits:
+      - 624d5ce876545bb18adf298576b894dc751e515f
+      - fe1fde90494456b7e710f279ee8e06fd4c22f2ba
+      - 4774ac9e6fe450722846e223424c10cfed98237b
+      - 5a26a18a970401ff012bde9789bfa0b9a89ae842
+      - 8b712bb4929e283e1aa886574b19371060563f4b
+    release_impact: all affected candidates were independently requalified and resealed before publication; no earlier published release was rewritten
+    status: complete
+
+  PL-018:
+    source_target: factorio-0.16-through-0.13
+    source_branch: rebuild/0.16,rebuild/0.15,rebuild/0.14,rebuild/0.13
+    source_commit: 6ac377389d7ffc3576fb39576dab4ace6efaec51
+    observable_issue: shared retention verdicts assumed newer benchmark flags console output fatal-line grammar loaded-map markers exit markers and save addressing
+    classification: portable-tooling
+    affected_targets: ["0.16", "0.15", "0.14", "0.13"]
+    modern_decision: keep version-sensitive proof behavior in declared target capability adapters with explicit automated regressions
+    target_local_decision: use target-valid benchmark flags authoritative factorio-current.log recoverable diagnostics version-stable map markers optional Goodbye and 0.13 save-name staging
+    fixture_evidence:
+      - retention-benchmark-runs-capability
+      - retention-authoritative-log-source
+      - retention-recoverable-sprite-fallback
+      - retention-loaded-map-proof-grammar
+      - retention-disable-audio-capability
+      - retention-finite-archive-exit-marker
+      - retention-0.13-save-addressing
+    dev_commit: 6ac377389d7ffc3576fb39576dab4ace6efaec51
+    replayed_target_commits:
+      - fe1fde90494456b7e710f279ee8e06fd4c22f2ba
+      - 4774ac9e6fe450722846e223424c10cfed98237b
+      - 5a26a18a970401ff012bde9789bfa0b9a89ae842
+      - 8b712bb4929e283e1aa886574b19371060563f4b
+    release_impact: all affected candidates were independently requalified and resealed before publication; no published version was altered
+    status: complete
+
 return_sweep:
-  completed_at: 2026-07-13
+  completed_at: 2026-07-15
   authority_for_candidate_archives: .mir/branches.yml
   archives_copied_into_modern_release: false
   archive_policy: target distributions remain immutable target-owned artifacts; dev records their commit hashes evidence and portable lessons
@@ -321,16 +369,23 @@ return_sweep:
     - {target: "2.0", branch: tmp/2.0, audited_head: 4f7c9d1, qualified_source: f5c58f5, disposition: portable-lessons-returned-target-archive-referenced}
     - {target: "1.1", branch: tmp/1.1, audited_head: 16879c8, qualified_source: 30ef8c7, disposition: portable-lessons-returned-target-archive-referenced}
     - {target: "1.0", branch: tmp/1.0, audited_head: fdc9e37, qualified_source: 0b06b9b, disposition: portable-lessons-returned-target-archive-referenced}
-    - {target: "0.17", branch: tmp/0.17, audited_head: bb12acb, qualified_source: efb5d0a, disposition: portable-lessons-returned-target-archive-referenced}
-    - {target: "0.16", branch: tmp/0.16, audited_head: 1429b02, qualified_source: 2dfb1a7, disposition: portable-lessons-returned-target-archive-referenced}
-    - {target: "0.15", branch: tmp/0.15, audited_head: b3647fa, qualified_source: d416787, disposition: target-only-effect-science-and-asset-cuts-rejected}
-    - {target: "0.14", branch: tmp/0.14, audited_head: 42aa2ea, qualified_source: fa3b532, disposition: target-only-finite-compiler-and-runner-cuts-rejected}
-    - {target: "0.13", branch: tmp/0.13, audited_head: 4269281, qualified_source: 095264d, disposition: target-only-finite-compiler-cuts-rejected}
+    - {target: "0.17", branch: tmp/0.17, audited_head: 828a7359af014105d0aa681722585c26766583e6, qualified_source: 2d5af37fc5bf710f6034e94c6892782fa5a17dc0, disposition: published-portable-lessons-returned-target-archive-referenced}
+    - {target: "0.16", branch: tmp/0.16, audited_head: b392624d38dbb8ef6c42c8efa20aeb9b6a9c97c9, qualified_source: b834136197f9b39e20b2c530f718d167be1a7685, disposition: published-portable-lessons-returned-target-archive-referenced}
+    - {target: "0.15", branch: tmp/0.15, audited_head: 3e44e19190236d03dc15e50d714b4a7347e05220, qualified_source: d95d5da2d0750708f0bb222b75eabe216d9f41ec, disposition: published-target-specific-cuts-rejected}
+    - {target: "0.14", branch: tmp/0.14, audited_head: f8251df29a70dd402de12874c231e071bd47bd5b, qualified_source: 5defb9ee02bf7b2138a75e60a4d77d77b5218b28, disposition: published-target-specific-finite-cuts-rejected}
+    - {target: "0.13", branch: tmp/0.13, audited_head: 262e94b39bf30b8bbf4f17f6cbf14dd507f696ba, qualified_source: 3c90a7aa0895553aae3326a42ba3bd20d7553d7c, disposition: published-target-specific-finite-cuts-rejected}
+    - {target: "0.12", branch: tmp/0.12, audited_head: f9bce733e9ac78934a827b8a3ce71f5dd570b8ab, qualified_source: d7c6145bee27c5ae8d17a30dd548889c22e1c10d, disposition: published-museum-target-source-rejected}
+    - {target: "0.11", branch: tmp/0.11, audited_head: 2f71e78b2bd2cdadc55654cd1349b3858a75fed4, qualified_source: 0a63fdb364ae582eff32509b08405cebbd629133, disposition: published-museum-target-source-rejected}
+    - {target: "0.10", branch: tmp/0.10, audited_head: c88838b891e4091ea9e549c14cd630c5ee43d950, qualified_source: b414934c303a5e4a2ddc6f8a598fa11ac8ec7d83, disposition: published-museum-target-source-rejected}
+    - {target: "0.9", branch: tmp/0.9, audited_head: 13764da44d971dd1fca6053315f5fcbe996b4ac4, qualified_source: 4631f1425523f7aa0f8f5a8e596fb7f73c13306c, disposition: published-museum-target-source-rejected}
+    - {target: "0.8", branch: tmp/0.8, audited_head: 7086ee27486ae4177bbb310245fa24c4a2a3f18e, qualified_source: 4bc0edf779b2e1e47de75423dc1c485776ae5688, disposition: published-museum-target-source-rejected}
+    - {target: "0.7", branch: tmp/0.7, audited_head: e44ee8afaa957797431c3f350e9566e0512b7b1c, qualified_source: 7bc8b1e823aea7c8cbe895af01cc0bf1dbab1e6b, disposition: published-museum-target-source-rejected}
+    - {target: "0.6", branch: tmp/0.6, audited_head: 26886b6eeef6638801268821ee2aa5c1caf94a60, qualified_source: 716819440dfe45464908d0855cf6cc265c8701aa, disposition: published-museum-target-source-rejected}
 
 fixed_point:
-  last_completed_sweep: 2026-07-13
+  last_completed_sweep: 2026-07-15
   zero_new_portable_compiler_fixes: true
   zero_new_reusable_validation_fixes: true
   zero_new_higher-target-profile_corrections: true
   zero_new_package_governance_fixes: true
-  status: reached-after-full-2.0-through-0.13-audit
+  status: reached-after-full-0.17-through-0.6-publication-audit

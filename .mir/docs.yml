@@ -1592,3 +1592,11 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - mir-3.1.9-2.4.5-ring-synthesis
+  - path: docs/releases/lower-wave-0.17-to-0.6-synthesis.md
+    title: "MIR Lower-Wave 0.17 To 0.6 Release Synthesis"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-lower-wave-0.17-to-0.6-release-synthesis
