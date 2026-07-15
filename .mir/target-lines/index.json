@@ -1,12 +1,13 @@
 {
   "schema": 1,
   "status": "complete-published-source-snapshots",
-  "generated_at": "2026-07-15",
+  "generated_at": "2026-07-16",
   "policy": {
     "modern_root_is_authoritative": true,
     "snapshots_are_runtime_inert": true,
     "release_packager_must_exclude": ".mir/target-lines",
-    "exact_distributions_root": "dist"
+    "exact_distributions_root": "dist",
+    "current_publication_truth": ".mir/evidence/<version>/publication.json"
   },
   "versions": [
     {
