@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "kind": "mir-interactive-review",
+  "status": "pending",
+  "version": "3.1.5",
+  "factorio_version": "2.1",
+  "source_commit": "d8a64834e09bb3a1729d521c7c1e9e2ab1721e57",
+  "archive_path": "dist/more-infinite-research_3.1.5.zip",
+  "archive_sha256": "456550A837993D3F6D9DE5CDD3E8F6271ED52B66A131E918A6B0F04C841BF1F6",
+  "package_content_sha256": "B0A8A95C75A394CFD8AB4CCBADA343DB1C3B03436F0F5DFDDC16C40135D8C63D",
+  "package_source_sha256": "B0A8A95C75A394CFD8AB4CCBADA343DB1C3B03436F0F5DFDDC16C40135D8C63D",
+  "required_checks": [
+    "isolated-normal-mod-directory-load",
+    "base-and-space-age-save-load",
+    "muluna-astroponics-cycle-repair-log",
+    "technology-tree-reachability",
+    "startup-settings-and-automatic-compiler-modes",
+    "locale-and-help-text"
+  ],
+  "reviewer": null,
+  "reviewed_at": null,
+  "captures": [],
+  "notes": [
+    "This pending packet is identity-bound preparation, not evidence that GUI review passed.",
+    "Do not tag or publish this RC from the current turn."
+  ]
+}

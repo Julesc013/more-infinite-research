@@ -1,0 +1,11 @@
+{
+  "name": "mir-fixture-omega-drill",
+  "version": "0.1.0",
+  "title": "MIR Fixture - Omega Drill",
+  "author": "Julesc013",
+  "description": "Validation fixture that adds Omega-style drill recipes for MIR mining drill productivity matching.",
+  "factorio_version": "0.13",
+  "dependencies": [
+    "base >= 0.13"
+  ]
+}

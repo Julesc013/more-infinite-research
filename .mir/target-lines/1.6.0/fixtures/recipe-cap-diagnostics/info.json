@@ -1,0 +1,11 @@
+{
+  "name": "mir-fixture-recipe-cap-diagnostics",
+  "version": "0.1.0",
+  "title": "MIR Fixture - Recipe Cap Diagnostics",
+  "author": "Julesc013",
+  "description": "Validation fixture that adjusts recipe maximum productivity values before MIR diagnostics run.",
+  "factorio_version": "0.16",
+  "dependencies": [
+    "base >= 0.16"
+  ]
+}

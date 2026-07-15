@@ -1,0 +1,80 @@
+{
+  "schema": 1,
+  "kind": "mir-coverage-performance-runtime-summary",
+  "generated_at": "2026-07-12T08:03:21.7131631Z",
+  "release": "3.2.0",
+  "factorio_line": "2.1",
+  "source_commit": "9abf5ba12d3c3eb5b68ed371d0a7eef07756a7c8",
+  "runtime_validation": {
+    "run_id": "f16daf45-d092-40b6-8e86-922219ec3228",
+    "result": "passed",
+    "scenario_count": 85,
+    "duration_seconds": 665.078,
+    "factorio_version": "2.1.9",
+    "source_tree_dirty": false,
+    "validation_harness_sha256": "92F7E2750B86357DFBCD236534E530BA01E72142536DE0043917B4FF5FE98416",
+    "scenario_manifest_sha256": "A9E9A1E6C36B3E0A3C0D377D93D41E20113AC0950F36A6A3BC7E62A25B468ED2",
+    "target_profile_sha256": "4AE6FCC2DAB5BE2F960B03CED800738E8F42BA51B69928899D7EB4962F404C3C",
+    "package_source_sha256": "F19BAEA490B16C78CC00E778602CBEF5FCF273466A0B8BFAE65D48B884F6D31D",
+    "validation_package_sha256": "F1A218A56959EAF26C329BDE6044CF8699496E3FE20674257867F10DF9EB6D77",
+    "deterministic_package_byte_sha256": "7F0AD53E1DEBCF7DAF35CB8265DF2A15CFD18A3750EF127C3D98165C3D40F001"
+  },
+  "synthetic_scale_gate": {
+    "scenario_id": "synthetic-scale-graph",
+    "result": "passed",
+    "duration_seconds": 7.258,
+    "budget_seconds": 30.0,
+    "fixture_inputs": {
+      "recipe_count": 1000,
+      "technology_count": 1000,
+      "effect_count": 10000,
+      "graph_edge_count": 999
+    },
+    "assertions": {
+      "candidate_count_minimum": 1000,
+      "scan_count": 2,
+      "complete_recipe_accounting": true,
+      "dangling_effect_count": 0,
+      "duplicate_owner_count": 0
+    }
+  },
+  "bz_source_instrumented_coverage": {
+    "scenario_id": "local-2-1-bz-suite-space-age",
+    "result": "passed",
+    "claim_boundary": "source-instrumented-measurement-not-archive-compatibility-claim",
+    "dependency_lock_sha256": "00113F30E38CDC97C09EBEEDD87CAB3B79E3E6DB93CCD4EFD247C94AAE83C556",
+    "actual_executed_roots": [
+      "bzcarbon@2.0.23",
+      "bzlead@2.0.29",
+      "bzsilicon@2.0.19",
+      "bztin@2.1.16",
+      "bztitanium@2.0.27",
+      "bzzirconium@2.1.14"
+    ],
+    "coverage_fingerprint": "mir32-140045fb",
+    "recipe_count": 769,
+    "accounted_recipe_count": 769,
+    "visible_recipe_count": 407,
+    "eligible_recipe_count": 379,
+    "technology_count": 359,
+    "effect_count": 1608,
+    "graph_edge_count": 923,
+    "candidate_count": 80,
+    "scan_count": 2,
+    "dangling_effect_count": 0,
+    "duplicate_owner_count": 0,
+    "categories": {
+      "auto_attached": 41,
+      "external_exact_owner": 20,
+      "generated_family_covered": 100,
+      "safe_skip": 384,
+      "unsafe_skip": 6,
+      "unclassified": 218
+    },
+    "safety_characterization": {
+      "recipe": "nanotubes",
+      "category": "unsafe_skip",
+      "reason": "catalyst_or_nonproductive_return_requires_review"
+    }
+  }
+}

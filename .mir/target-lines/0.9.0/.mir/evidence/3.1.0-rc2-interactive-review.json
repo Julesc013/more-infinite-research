@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "kind": "mir-interactive-review",
+  "status": "pending",
+  "version": "3.1.0",
+  "factorio_version": "2.1",
+  "source_commit": "4cdb8595de94316b45169e1722d623684d9086a1",
+  "archive_path": "dist/more-infinite-research_3.1.0.zip",
+  "archive_sha256": "7CC222EC860F21EBAA5C3E72F2C42BD97BF7A8DA8AE938AFA57D83994991676D",
+  "package_content_sha256": "689BBB236E96177FB45254711C1FF0ECAAEFC556A923633F783D7345B418F247",
+  "package_source_sha256": "689BBB236E96177FB45254711C1FF0ECAAEFC556A923633F783D7345B418F247",
+  "required_checks": [
+    "isolated-normal-mod-directory-load",
+    "base-and-space-age-save-load",
+    "startup-settings-and-automatic-compiler-modes",
+    "locale-and-help-text",
+    "technology-visibility-icons-costs-and-effects",
+    "science-and-prerequisite-reachability",
+    "default-safe-attach-boundary",
+    "opt-in-safe-generate-assembler-and-lab-boundary",
+    "balance-review"
+  ],
+  "reviewer": null,
+  "reviewed_at": null,
+  "captures": [],
+  "notes": [
+    "This pending packet is identity-bound preparation, not evidence that GUI review passed.",
+    "Record at least settings, technology-tree, and loaded-save captures before acceptance."
+  ]
+}

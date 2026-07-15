@@ -1,0 +1,117 @@
+{
+  "schema": 1,
+  "status": "failed",
+  "state": "BUILT",
+  "release_status": "NOT RELEASED",
+  "target": "2.0",
+  "version": "2.4.0",
+  "source_commit": "333046ef64a2508dcfd21845aed9388331a62916",
+  "build": {
+    "candidate": "C:\\Projects\\Factorio\\more-infinite-research-tmp-2.0\\dist\\more-infinite-research_2.4.0.zip",
+    "sha256": "5E1D16CEA5C8F43E8C257B73A3A5A728CE6DFB9ADA18B0CACDDB49DE3C5226E1",
+    "content_sha256": "88EEE8CE1CBB38C92C379B111B3C56921F22BBD97B2AC80AFE2B19456497BC8B",
+    "size_bytes": 399197
+  },
+  "plan": {
+    "schema": 1,
+    "generated_at": "2026-07-13T15:38:37.7836531Z",
+    "target": "2.0",
+    "profile": "full",
+    "baseline": "",
+    "candidate": "C:\\Projects\\Factorio\\more-infinite-research-tmp-2.0\\dist\\more-infinite-research_2.4.0.zip",
+    "classification": {
+      "paths": [],
+      "classes": [],
+      "tests": [],
+      "unknown_paths": [],
+      "escalated": false
+    },
+    "tests": [
+      {
+        "id": "static.full",
+        "kind": "static",
+        "command": "./scripts/Invoke-MIRValidation.ps1 -StaticOnly",
+        "requires_factorio": false,
+        "inputs": [
+          "repository",
+          "test-catalog",
+          "target-profile"
+        ]
+      },
+      {
+        "id": "runtime.full",
+        "kind": "runtime",
+        "command": "./scripts/Invoke-MIRValidation.ps1 -FactorioBin <factorio>",
+        "requires_factorio": true,
+        "inputs": [
+          "candidate",
+          "factorio",
+          "required-scenarios",
+          "harness",
+          "fixtures",
+          "settings"
+        ]
+      },
+      {
+        "id": "runtime.upgrade",
+        "kind": "runtime",
+        "command": "./scripts/Test-MIRUpgrade.ps1 -FactorioBin <factorio> -FromZip <prior-release> -ToZip <candidate> -FromVersion 2.3.5 -ToVersion 2.4.0 -FixtureName assert-upgrade-2-3-5-to-2-4-0 -OutputPath artifacts/assurance/2.4.0-upgrade-proof.json",
+        "requires_factorio": true,
+        "inputs": [
+          "candidate",
+          "prior-release",
+          "factorio",
+          "upgrade-fixture",
+          "harness",
+          "settings"
+        ]
+      },
+      {
+        "id": "runtime.ecosystem",
+        "kind": "runtime",
+        "command": "./scripts/mir.ps1 release gate --profile release-targeted-2.0 --factorio <factorio> --no-git-pull",
+        "requires_factorio": true,
+        "inputs": [
+          "candidate",
+          "factorio",
+          "mod-lock",
+          "ecosystem-profile",
+          "harness"
+        ]
+      }
+    ],
+    "requires_factorio": true,
+    "package_source_sha256": "E9E3FBB722A1E0E40E6AB4F61728045166C80CB50A5473674BBAF6C3D662879F",
+    "test_catalog_sha256": "A5153A040CE8C9E1159F76E2E579270B050760E2B2A973E3DA6D9F0DCFBCC567",
+    "validation_harness_sha256": "CA2FAD69D3C8A3C8577395C933AD57345E1622A99C5B3CAE051D8532F7F98F39"
+  },
+  "evidence": [
+    {
+      "schema": 1,
+      "test_id": "static.full",
+      "status": "passed",
+      "input_key": "FD369DD723B96147E6E50B7D0C197E0C19A422B4743AB8E4A49349C9D0037035",
+      "target": "2.0",
+      "candidate_sha256": "5E1D16CEA5C8F43E8C257B73A3A5A728CE6DFB9ADA18B0CACDDB49DE3C5226E1",
+      "factorio_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+      "command": "./scripts/Invoke-MIRValidation.ps1 -StaticOnly",
+      "started_at": "2026-07-13T15:38:38.4678021Z",
+      "duration_seconds": 15.82,
+      "message": ""
+    },
+    {
+      "schema": 1,
+      "test_id": "runtime.full",
+      "status": "failed",
+      "input_key": "C94C51073EBF002DE532C8EFE2EE2B4B916DC843AB616D83AE4FEA2C1C1203D0",
+      "target": "2.0",
+      "candidate_sha256": "5E1D16CEA5C8F43E8C257B73A3A5A728CE6DFB9ADA18B0CACDDB49DE3C5226E1",
+      "factorio_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+      "command": "./scripts/Invoke-MIRValidation.ps1 -FactorioBin <factorio>",
+      "started_at": "2026-07-13T15:38:54.5974584Z",
+      "duration_seconds": 108.371,
+      "message": "Factorio runtime validation scenario base-generation-integrity exited with code 1"
+    }
+  ],
+  "completed_at": "2026-07-13T15:40:43.3274991Z"
+}

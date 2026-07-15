@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "status": "passed",
+  "state": "RUNTIME-QUALIFIED",
+  "release_status": "NOT RELEASED",
+  "target": "2.0",
+  "version": "2.4.0",
+  "source_commit": "01efb39a7476cc5e5f7e173edbb244e70f7a8e96",
+  "qualification_mode": "change-aware-baseline-plus-affected-rerun",
+  "build": {
+    "candidate": "dist/more-infinite-research_2.4.0.zip",
+    "sha256": "4BA19EA071E6359BC25C58CCD8F65CAF81B4AA675496E2F53175A996C791470C",
+    "content_sha256": "EF6EAE634154A752CE2ED7FA20FF205FC33A7A92E6E0D79F41815B573A6ED104",
+    "package_source_sha256": "F681FF5C331FC45EAFF31823BC9D9441A100C75FD5D412DE1C37DC828DE00775",
+    "size_bytes": 404828
+  },
+  "structured_summary": ".mir/evidence/2.4.0-change-aware-qualification-final.json",
+  "exact_dist_summary": ".mir/evidence/2.4.0-exact-dist-smoke-final.json",
+  "upgrade_summary": ".mir/evidence/2.4.0-upgrade-proof-final.json",
+  "completed_at": "2026-07-13T18:22:38.2561759Z"
+}

@@ -1,0 +1,78 @@
+   0.001 2026-07-14 19:51:10; Factorio 2.0.77 (build 84539, win64, full, space-age)
+   0.001 Operating system: Windows 10 (build 19045)
+   0.002 Not rotating logs.
+   0.002 Program arguments: "D:\Programs\Factorio\2.0\bin\x64\factorio.exe" "--config" "C:\Users\Jules\AppData\Local\Temp\mir-upgrade-2.4.0-to-2.4.1-6ce04c5ad2144297aa6634640b23cbb4\config.ini" "--no-log-rotation" "--disable-audio" "--mod-directory" "C:\Users\Jules\AppData\Local\Temp\mir-upgrade-2.4.0-to-2.4.1-6ce04c5ad2144297aa6634640b23cbb4\mods" "--create" "C:\Users\Jules\AppData\Local\Temp\mir-upgrade-2.4.0-to-2.4.1-6ce04c5ad2144297aa6634640b23cbb4\mir-2.4.0-save.zip"
+   0.002 Config path: C:/Users/Jules/AppData/Local/Temp/mir-upgrade-2.4.0-to-2.4.1-6ce04c5ad2144297aa6634640b23cbb4/config.ini
+   0.002 Read data path: D:/Programs/Factorio/2.0/data
+   0.002 Write data path: C:/Users/Jules/AppData/Local/Temp/mir-upgrade-2.4.0-to-2.4.1-6ce04c5ad2144297aa6634640b23cbb4/userdata [14790/450559MB]
+   0.002 Binaries path: D:/Programs/Factorio/2.0/bin
+   0.014 System info: [CPU: Intel(R) Core(TM) i7-7700HQ CPU @ 2.80GHz, 8 cores, RAM: 10636/16257 MB, page: 17475/21662 MB, virtual: 4269/134217727 MB, extended virtual: 0 MB]
+   0.031 Memory info:
+   0.031  [0]: 066D TN48G24S817-VHA/R 8192 MB 2400 MHz 1.2 v 64|64
+   0.031  [1]: 066D TN48G24S817-VHA/R 8192 MB 2400 MHz 1.2 v 64|64
+   0.059 Running in headless mode
+   0.060 Audio is disabled
+   0.062 Info ModManager.cpp:449: FeatureFlag expansion-shaders = true
+   0.062 Info ModManager.cpp:449: FeatureFlag freezing = true
+   0.062 Info ModManager.cpp:449: FeatureFlag quality = true
+   0.062 Info ModManager.cpp:449: FeatureFlag rail-bridges = true
+   0.062 Info ModManager.cpp:449: FeatureFlag segmented-units = true
+   0.062 Info ModManager.cpp:449: FeatureFlag space-travel = true
+   0.062 Info ModManager.cpp:449: FeatureFlag spoiling = true
+   0.065 Loading mod settings more-infinite-research 2.4.0 (settings.lua)
+   0.091 Loading mod settings mir-fixture-assert-upgrade-2-4-0-to-2-4-1 0.1.0 (settings-updates.lua)
+   0.112 Loading mod core 0.0.0 (data.lua)
+   0.129 Loading mod base 2.0.77 (data.lua)
+   0.389 Loading mod elevated-rails 2.0.77 (data.lua)
+   0.424 Loading mod quality 2.0.77 (data.lua)
+   0.447 Loading mod space-age 2.0.77 (data.lua)
+   0.804 Loading mod more-infinite-research 2.4.0 (data.lua)
+   0.824 Loading mod mir-fixture-assert-upgrade-2-4-0-to-2-4-1 0.1.0 (data.lua)
+   0.845 Loading mod base 2.0.77 (data-updates.lua)
+   0.862 Loading mod quality 2.0.77 (data-updates.lua)
+   0.887 Loading mod space-age 2.0.77 (data-updates.lua)
+   0.901 Loading mod more-infinite-research 2.4.0 (data-updates.lua)
+   0.916 Loading mod more-infinite-research 2.4.0 (data-final-fixes.lua)
+   3.993 Script @__more-infinite-research__/prototypes/mir/policy/owner_policy.lua:56: [more-infinite-research] Skipping recipe productivity effect for research_ice recipe=scrap-recycling because existing infinite technology already owns it: scrap-recycling-productivity
+   4.203 Script @__more-infinite-research__/prototypes/mir/policy/owner_policy.lua:56: [more-infinite-research] Skipping recipe productivity effect for research_low_density_structure recipe=casting-low-density-structure because existing infinite technology already owns it: low-density-structure-productivity
+   4.203 Script @__more-infinite-research__/prototypes/mir/policy/owner_policy.lua:56: [more-infinite-research] Skipping recipe productivity effect for research_low_density_structure recipe=low-density-structure because existing infinite technology already owns it: low-density-structure-productivity
+   4.203 Script @__more-infinite-research__/prototypes/mir/policy/owner_policy.lua:56: [more-infinite-research] Skipping recipe productivity effect for research_low_density_structure recipe=scrap-recycling because existing infinite technology already owns it: scrap-recycling-productivity
+   4.621 Script @__more-infinite-research__/prototypes/mir/policy/owner_policy.lua:56: [more-infinite-research] Skipping recipe productivity effect for research_plastic recipe=bioplastic because existing infinite technology already owns it: plastic-bar-productivity
+   4.621 Script @__more-infinite-research__/prototypes/mir/policy/owner_policy.lua:56: [more-infinite-research] Skipping recipe productivity effect for research_plastic recipe=plastic-bar because existing infinite technology already owns it: plastic-bar-productivity
+   4.631 Script @__more-infinite-research__/prototypes/mir/policy/owner_policy.lua:56: [more-infinite-research] Skipping recipe productivity effect for research_processing_unit recipe=processing-unit because existing infinite technology already owns it: processing-unit-productivity
+   4.632 Script @__more-infinite-research__/prototypes/mir/policy/owner_policy.lua:56: [more-infinite-research] Skipping recipe productivity effect for research_processing_unit recipe=scrap-recycling because existing infinite technology already owns it: scrap-recycling-productivity
+   4.763 Script @__more-infinite-research__/prototypes/mir/policy/owner_policy.lua:56: [more-infinite-research] Skipping recipe productivity effect for research_rocket_fuel recipe=ammonia-rocket-fuel because existing infinite technology already owns it: rocket-fuel-productivity
+   4.763 Script @__more-infinite-research__/prototypes/mir/policy/owner_policy.lua:56: [more-infinite-research] Skipping recipe productivity effect for research_rocket_fuel recipe=rocket-fuel because existing infinite technology already owns it: rocket-fuel-productivity
+   4.763 Script @__more-infinite-research__/prototypes/mir/policy/owner_policy.lua:56: [more-infinite-research] Skipping recipe productivity effect for research_rocket_fuel recipe=rocket-fuel-from-jelly because existing infinite technology already owns it: rocket-fuel-productivity
+   6.249 Script @__more-infinite-research__/prototypes/mir/planner/stream_compiler.lua:433: [more-infinite-research] Skipping stream research_air_scrubbing_clean_filter because no_matching_recipes.
+   6.250 Script @__more-infinite-research__/prototypes/mir/planner/stream_compiler.lua:433: [more-infinite-research] Skipping stream research_armor_components because no_matching_recipes.
+   6.250 Script @__more-infinite-research__/prototypes/mir/planner/stream_compiler.lua:433: [more-infinite-research] Skipping stream research_ash_separation because no_matching_recipes.
+   6.250 Script @__more-infinite-research__/prototypes/mir/planner/stream_compiler.lua:433: [more-infinite-research] Skipping stream research_auto_assembling_machine because automatic_research_creation_disabled.
+   6.250 Script @__more-infinite-research__/prototypes/mir/planner/stream_compiler.lua:433: [more-infinite-research] Skipping stream research_auto_lab because automatic_research_creation_disabled.
+   6.253 Script @__more-infinite-research__/prototypes/mir/planner/stream_compiler.lua:433: [more-infinite-research] Skipping stream research_lab_productivity because existing technology effect research-productivity laboratory-productivity.
+   6.253 Script @__more-infinite-research__/prototypes/mir/emit/transactions/productivity_family_adoption.lua:71: [more-infinite-research] Applied native-owner binding for research_low_density_structure owner=low-density-structure-productivity operation=configure_native_owner configured=cost_model adopted-effects=0.
+   6.254 Script @__more-infinite-research__/prototypes/mir/emit/transactions/productivity_family_adoption.lua:71: [more-infinite-research] Applied native-owner binding for research_plastic owner=plastic-bar-productivity operation=preserve_native_owner configured= adopted-effects=0.
+   6.255 Script @__more-infinite-research__/prototypes/mir/emit/transactions/productivity_family_adoption.lua:71: [more-infinite-research] Applied native-owner binding for research_processing_unit owner=processing-unit-productivity operation=preserve_native_owner configured= adopted-effects=0.
+   6.256 Script @__more-infinite-research__/prototypes/mir/emit/transactions/productivity_family_adoption.lua:71: [more-infinite-research] Applied native-owner binding for research_rocket_fuel owner=rocket-fuel-productivity operation=preserve_native_owner configured= adopted-effects=0.
+   6.414 Checksum for core: 4187927925
+   6.414 Checksum of base: 1879415942
+   6.414 Checksum of elevated-rails: 70351106
+   6.414 Checksum of quality: 1142589254
+   6.415 Checksum of space-age: 1510664043
+   6.415 Checksum of more-infinite-research: 3589952876
+   6.415 Checksum of mir-fixture-assert-upgrade-2-4-0-to-2-4-1: 2980047016
+   6.919 Prototype list checksum: 3481797686
+   7.064 Info PlayerData.cpp:66: Local player-data.json unavailable
+   7.064 Info PlayerData.cpp:71: Cloud player-data.json unavailable
+   7.066 Info GlobalContext.cpp:1300: Resetting config.
+   7.066 Factorio initialised
+   7.067 Info Create.cpp:31: Creating new map C:\Users\Jules\AppData\Local\Temp\mir-upgrade-2.4.0-to-2.4.1-6ce04c5ad2144297aa6634640b23cbb4\mir-2.4.0-save.zip
+   7.076 Blueprint storage "blueprint-storage-2.dat" was not found, trying to load previous version storage "blueprint-storage.dat"
+   8.704 Loading level.dat: 1013948 bytes.
+   8.704 Info Scenario.cpp:154: Map version 2.0.77-0
+   8.728 Blueprint storage "blueprint-storage-2.dat" was not found, trying to load previous version storage "blueprint-storage.dat"
+   8.735 Checksum for script __level__/control.lua: 2722821277
+   8.748 Checksum for script __more-infinite-research__/control.lua: 33911049
+   8.759 Checksum for script __mir-fixture-assert-upgrade-2-4-0-to-2-4-1__/control.lua: 2016504305
+   8.762 Script @__mir-fixture-assert-upgrade-2-4-0-to-2-4-1__/control.lua:55: [mir-fixture] 2.4.0 upgrade source proof complete
+   9.017 Goodbye

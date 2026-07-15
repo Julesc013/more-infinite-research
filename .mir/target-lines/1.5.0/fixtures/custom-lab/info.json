@@ -1,0 +1,11 @@
+{
+  "name": "mir-fixture-custom-lab",
+  "version": "0.1.0",
+  "title": "MIR Fixture - Custom Lab",
+  "author": "Julesc013",
+  "description": "Test fixture that adds a custom lab with a deliberately narrow input set.",
+  "factorio_version": "0.15",
+  "dependencies": [
+    "base >= 0.15"
+  ]
+}

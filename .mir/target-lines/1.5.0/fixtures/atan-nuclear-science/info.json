@@ -1,0 +1,11 @@
+{
+  "name": "mir-fixture-atan-nuclear-science",
+  "version": "0.1.0",
+  "title": "MIR Fixture - ATAN Nuclear Science",
+  "author": "Julesc013",
+  "description": "Validation fixture that adds an ATAN-style nuclear science pack and atom forge surface for MIR science-pack productivity matching.",
+  "factorio_version": "0.15",
+  "dependencies": [
+    "base >= 0.15"
+  ]
+}

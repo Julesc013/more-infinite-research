@@ -1,0 +1,57 @@
+{
+  "schema": 1,
+  "kind": "mir-modpack-campaign-summary",
+  "generated_at": "2026-07-12T06:46:25.7314628Z",
+  "factorio_line": "2.1",
+  "mir_archive_sha256": "F30B5C3DD83B5396DA26A47EA3C2FCB14BFA1BF69CAB6EB44C4086E5636C3A11",
+  "mir_source_commit": "acd782023db8c88eb78287e778a911df2dcc0707",
+  "dependency_lock_sha256": "B77E8BA3A2EBEAD351799ACF3E1707100CC91A72D1110C53EBDEE0FF7468D545",
+  "claim_boundary": "loads",
+  "scenarios": [
+    {
+      "scenario_id": "local-2-1-bz-suite-space-age",
+      "actual_executed_roots": [
+        "bzcarbon@2.0.23",
+        "bzlead@2.0.29",
+        "bzsilicon@2.0.19",
+        "bztin@2.1.16",
+        "bztitanium@2.0.27",
+        "bzzirconium@2.1.14"
+      ],
+      "official_roots": ["elevated-rails", "quality", "recycler", "space-age"],
+      "resolved_mod_count": 6,
+      "dependency_failure_count": 0,
+      "result": "passed",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_seconds": 21.38,
+      "claim_level": "loads"
+    },
+    {
+      "scenario_id": "local-2-1-bob-suite",
+      "actual_executed_roots": [
+        "bobassembly@3.0.1",
+        "bobelectronics@3.0.0",
+        "bobenemies@3.0.0",
+        "bobequipment@3.0.0",
+        "boblogistics@3.0.0",
+        "bobmining@3.0.0",
+        "bobmodules@3.0.0",
+        "bobores@3.0.0",
+        "bobplates@3.0.0",
+        "bobpower@3.0.0",
+        "bobrevamp@3.0.0",
+        "bobtech@3.0.0",
+        "bobwarfare@3.0.0"
+      ],
+      "resolved_dependencies": ["boblibrary@3.0.0"],
+      "resolved_mod_count": 14,
+      "dependency_failure_count": 0,
+      "result": "passed",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_seconds": 41.48,
+      "claim_level": "loads"
+    }
+  ]
+}

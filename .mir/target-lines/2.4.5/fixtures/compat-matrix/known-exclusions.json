@@ -1,0 +1,18 @@
+{
+  "schema": 1,
+  "categories": [
+    "localizations",
+    "internal"
+  ],
+  "mod_names": [
+    "base",
+    "quality",
+    "elevated-rails",
+    "recycler",
+    "space-age"
+  ],
+  "notes": [
+    "Official DLC mods are tested through explicit scenarios, not as portal candidates.",
+    "Internal and localization mods are included only when required as dependencies."
+  ]
+}

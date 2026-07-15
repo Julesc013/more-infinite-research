@@ -1,0 +1,9 @@
+status=passed
+checked_at=2026-07-12T08:09:21+10:00
+candidate_source_commit=0dd8d7f27d9bbbbb728a70ef00b7c955af48cbb7
+candidate_archive=dist/more-infinite-research_3.1.0.zip
+candidate_sha256=0244D40A9971C450274FE1FD7EA142FA5D23E4A2271A0191F31F395589267C1A
+package_content_sha256=5D5162EEAF13E87E2FB1A5A2A31B5EC14ABDCCD2308CFAF8E70C20297C56E82F
+structured_summary=.mir/evidence/3.1.0-rc1-validation-summary.json
+structured_summary_run_id=a961b15a-a018-4ebe-9799-f6bafc8bc2ed
+result=MIR release candidate evidence matches source, profile, package, and structured validation summary.

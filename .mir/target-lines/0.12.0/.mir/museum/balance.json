@@ -1,0 +1,412 @@
+{
+  "schema": 1,
+  "factorio": "0.12",
+  "mir_version": "0.12.0",
+  "rows": [
+    {
+      "technology_id": "mir-inserter-capacity-1",
+      "count": 400,
+      "time": 45,
+      "science": [
+        "science-pack-1",
+        "science-pack-2",
+        "science-pack-3",
+        "alien-science-pack"
+      ],
+      "effect": {
+        "type": "inserter-stack-size-bonus",
+        "modifier": 1
+      }
+    },
+    {
+      "technology_id": "mir-inserter-capacity-2",
+      "count": 600,
+      "time": 45,
+      "science": [
+        "science-pack-1",
+        "science-pack-2",
+        "science-pack-3",
+        "alien-science-pack"
+      ],
+      "effect": {
+        "type": "inserter-stack-size-bonus",
+        "modifier": 1
+      }
+    },
+    {
+      "technology_id": "mir-inserter-capacity-3",
+      "count": 800,
+      "time": 45,
+      "science": [
+        "science-pack-1",
+        "science-pack-2",
+        "science-pack-3",
+        "alien-science-pack"
+      ],
+      "effect": {
+        "type": "inserter-stack-size-bonus",
+        "modifier": 1
+      }
+    },
+    {
+      "technology_id": "mir-inserter-capacity-4",
+      "count": 1000,
+      "time": 45,
+      "science": [
+        "science-pack-1",
+        "science-pack-2",
+        "science-pack-3",
+        "alien-science-pack"
+      ],
+      "effect": {
+        "type": "inserter-stack-size-bonus",
+        "modifier": 1
+      }
+    },
+    {
+      "technology_id": "mir-inserter-capacity-5",
+      "count": 1200,
+      "time": 45,
+      "science": [
+        "science-pack-1",
+        "science-pack-2",
+        "science-pack-3",
+        "alien-science-pack"
+      ],
+      "effect": {
+        "type": "inserter-stack-size-bonus",
+        "modifier": 1
+      }
+    },
+    {
+      "technology_id": "mir-gun-turret-damage-1",
+      "count": 500,
+      "time": 60,
+      "science": [
+        "science-pack-1",
+        "science-pack-2",
+        "science-pack-3",
+        "alien-science-pack"
+      ],
+      "effect": {
+        "type": "turret-attack",
+        "turret_id": "gun-turret",
+        "modifier": 0.2
+      }
+    },
+    {
+      "technology_id": "mir-gun-turret-damage-2",
+      "count": 750,
+      "time": 60,
+      "science": [
+        "science-pack-1",
+        "science-pack-2",
+        "science-pack-3",
+        "alien-science-pack"
+      ],
+      "effect": {
+        "type": "turret-attack",
+        "turret_id": "gun-turret",
+        "modifier": 0.2
+      }
+    },
+    {
+      "technology_id": "mir-gun-turret-damage-3",
+      "count": 1000,
+      "time": 60,
+      "science": [
+        "science-pack-1",
+        "science-pack-2",
+        "science-pack-3",
+        "alien-science-pack"
+      ],
+      "effect": {
+        "type": "turret-attack",
+        "turret_id": "gun-turret",
+        "modifier": 0.2
+      }
+    },
+    {
+      "technology_id": "mir-gun-turret-damage-4",
+      "count": 1250,
+      "time": 60,
+      "science": [
+        "science-pack-1",
+        "science-pack-2",
+        "science-pack-3",
+        "alien-science-pack"
+      ],
+      "effect": {
+        "type": "turret-attack",
+        "turret_id": "gun-turret",
+        "modifier": 0.2
+      }
+    },
+    {
+      "technology_id": "mir-gun-turret-damage-5",
+      "count": 1500,
+      "time": 60,
+      "science": [
+        "science-pack-1",
+        "science-pack-2",
+        "science-pack-3",
+        "alien-science-pack"
+      ],
+      "effect": {
+        "type": "turret-attack",
+        "turret_id": "gun-turret",
+        "modifier": 0.2
+      }
+    },
+    {
+      "technology_id": "mir-bullet-shooting-speed-1",
+      "count": 500,
+      "time": 60,
+      "science": [
+        "science-pack-1",
+        "science-pack-2",
+        "science-pack-3",
+        "alien-science-pack"
+      ],
+      "effect": {
+        "type": "gun-speed",
+        "ammo_category": "bullet",
+        "modifier": 0.15
+      }
+    },
+    {
+      "technology_id": "mir-bullet-shooting-speed-2",
+      "count": 750,
+      "time": 60,
+      "science": [
+        "science-pack-1",
+        "science-pack-2",
+        "science-pack-3",
+        "alien-science-pack"
+      ],
+      "effect": {
+        "type": "gun-speed",
+        "ammo_category": "bullet",
+        "modifier": 0.15
+      }
+    },
+    {
+      "technology_id": "mir-bullet-shooting-speed-3",
+      "count": 1000,
+      "time": 60,
+      "science": [
+        "science-pack-1",
+        "science-pack-2",
+        "science-pack-3",
+        "alien-science-pack"
+      ],
+      "effect": {
+        "type": "gun-speed",
+        "ammo_category": "bullet",
+        "modifier": 0.15
+      }
+    },
+    {
+      "technology_id": "mir-bullet-shooting-speed-4",
+      "count": 1250,
+      "time": 60,
+      "science": [
+        "science-pack-1",
+        "science-pack-2",
+        "science-pack-3",
+        "alien-science-pack"
+      ],
+      "effect": {
+        "type": "gun-speed",
+        "ammo_category": "bullet",
+        "modifier": 0.15
+      }
+    },
+    {
+      "technology_id": "mir-bullet-shooting-speed-5",
+      "count": 1500,
+      "time": 60,
+      "science": [
+        "science-pack-1",
+        "science-pack-2",
+        "science-pack-3",
+        "alien-science-pack"
+      ],
+      "effect": {
+        "type": "gun-speed",
+        "ammo_category": "bullet",
+        "modifier": 0.15
+      }
+    },
+    {
+      "technology_id": "mir-bullet-damage-1",
+      "count": 500,
+      "time": 60,
+      "science": [
+        "science-pack-1",
+        "science-pack-2",
+        "science-pack-3",
+        "alien-science-pack"
+      ],
+      "effect": {
+        "type": "ammo-damage",
+        "ammo_category": "bullet",
+        "modifier": 0.2
+      }
+    },
+    {
+      "technology_id": "mir-bullet-damage-2",
+      "count": 750,
+      "time": 60,
+      "science": [
+        "science-pack-1",
+        "science-pack-2",
+        "science-pack-3",
+        "alien-science-pack"
+      ],
+      "effect": {
+        "type": "ammo-damage",
+        "ammo_category": "bullet",
+        "modifier": 0.2
+      }
+    },
+    {
+      "technology_id": "mir-bullet-damage-3",
+      "count": 1000,
+      "time": 60,
+      "science": [
+        "science-pack-1",
+        "science-pack-2",
+        "science-pack-3",
+        "alien-science-pack"
+      ],
+      "effect": {
+        "type": "ammo-damage",
+        "ammo_category": "bullet",
+        "modifier": 0.2
+      }
+    },
+    {
+      "technology_id": "mir-bullet-damage-4",
+      "count": 1250,
+      "time": 60,
+      "science": [
+        "science-pack-1",
+        "science-pack-2",
+        "science-pack-3",
+        "alien-science-pack"
+      ],
+      "effect": {
+        "type": "ammo-damage",
+        "ammo_category": "bullet",
+        "modifier": 0.2
+      }
+    },
+    {
+      "technology_id": "mir-bullet-damage-5",
+      "count": 1500,
+      "time": 60,
+      "science": [
+        "science-pack-1",
+        "science-pack-2",
+        "science-pack-3",
+        "alien-science-pack"
+      ],
+      "effect": {
+        "type": "ammo-damage",
+        "ammo_category": "bullet",
+        "modifier": 0.2
+      }
+    },
+    {
+      "technology_id": "mir-toolbelt-1",
+      "count": 600,
+      "time": 45,
+      "science": [
+        "science-pack-1",
+        "science-pack-2",
+        "science-pack-3",
+        "alien-science-pack"
+      ],
+      "effect": {
+        "type": "num-quick-bars",
+        "modifier": 1
+      }
+    },
+    {
+      "technology_id": "mir-toolbelt-2",
+      "count": 900,
+      "time": 45,
+      "science": [
+        "science-pack-1",
+        "science-pack-2",
+        "science-pack-3",
+        "alien-science-pack"
+      ],
+      "effect": {
+        "type": "num-quick-bars",
+        "modifier": 1
+      }
+    },
+    {
+      "technology_id": "mir-toolbelt-3",
+      "count": 1200,
+      "time": 45,
+      "science": [
+        "science-pack-1",
+        "science-pack-2",
+        "science-pack-3",
+        "alien-science-pack"
+      ],
+      "effect": {
+        "type": "num-quick-bars",
+        "modifier": 1
+      }
+    },
+    {
+      "technology_id": "mir-logistic-trash-slots-1",
+      "count": 600,
+      "time": 45,
+      "science": [
+        "science-pack-1",
+        "science-pack-2",
+        "science-pack-3",
+        "alien-science-pack"
+      ],
+      "effect": {
+        "type": "character-logistic-trash-slots",
+        "modifier": 5
+      }
+    },
+    {
+      "technology_id": "mir-logistic-trash-slots-2",
+      "count": 900,
+      "time": 45,
+      "science": [
+        "science-pack-1",
+        "science-pack-2",
+        "science-pack-3",
+        "alien-science-pack"
+      ],
+      "effect": {
+        "type": "character-logistic-trash-slots",
+        "modifier": 5
+      }
+    },
+    {
+      "technology_id": "mir-logistic-trash-slots-3",
+      "count": 1200,
+      "time": 45,
+      "science": [
+        "science-pack-1",
+        "science-pack-2",
+        "science-pack-3",
+        "alien-science-pack"
+      ],
+      "effect": {
+        "type": "character-logistic-trash-slots",
+        "modifier": 5
+      }
+    }
+  ]
+}

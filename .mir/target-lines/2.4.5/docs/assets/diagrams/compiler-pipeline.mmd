@@ -1,0 +1,16 @@
+flowchart LR
+    A[Factorio data stage] --> B[platform adapter]
+    B --> C[index fact registry]
+    C --> D[graph]
+    C --> E[classify]
+    C --> F[policy]
+    D --> G[capabilities]
+    E --> G
+    F --> G
+    G --> H[planner]
+    H --> I{decision}
+    I -->|generate| J[StreamSpec]
+    I -->|observe reject skip| K[DecisionRecord]
+    J --> L[emit]
+    L --> M[data.raw technology mutation]
+    K --> N[report]

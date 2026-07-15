@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: release-manager
 doc_type: release-plan
 owner: mir-maintainers
-last_reviewed: 2026-07-14
+last_reviewed: 2026-07-15
 supersedes: []
 superseded_by: []
 ---
@@ -14,7 +14,7 @@ superseded_by: []
 
 Release docs are version-specific plans, migration guides, risk registers, checklists, and validation records.
 
-MIR 3.1.9 and 2.4.5 are the published immutable modern baselines. MIR 1.9.4 for Factorio 1.1 and MIR 1.8.2 for Factorio 1.0 were published and byte-verified on GitHub on 2026-07-14; their Factorio Mod Portal uploads remain externally blocked by the missing upload API key. Older target candidates remain independently qualified evidence only until a separate ring grants execution and publication authority.
+MIR 3.1.9 through 0.6.0 are published, byte-verified, and frozen. Factorio Mod Portal uploads for 1.9.4, 1.8.2, and 1.7.1 through 1.3.0 remain externally blocked by the missing upload API key. Museum versions 0.12.0 through 0.6.0 are intentionally GitHub archive releases. Complete tagged source snapshots and exact distributions are consolidated on `dev` without changing the modern Factorio 2.1 root.
 
 - [3.0.0 plan](3.0.0-plan.md)
 - [3.0.0 regression baseline](3.0.0-regression-baseline.md)
@@ -44,6 +44,9 @@ MIR 3.1.9 and 2.4.5 are the published immutable modern baselines. MIR 1.9.4 for 
 - [3.1.9 migration guide](3.1.9-migration-guide.md)
 - [3.1.9 release checklist](3.1.9-checklist.md)
 - [3.1.9 validation summary](3.1.9-validation-summary.md)
+- [3.1.9 and 2.4.5 post-release synthesis](3.1.9-post-2.4.5-ring-synthesis.md)
+- [0.17 through 0.6 lower-wave synthesis](lower-wave-0.17-to-0.6-synthesis.md)
+- [Published lines development copy pack](lower-wave-development-copy-pack.md)
 - [3.1.0 migration guide](3.1.0-migration-guide.md)
 - [3.1.0 validation summary](3.1.0-validation-summary.md)
 - [3.1.0 roadmap](3.1.0-roadmap.md)

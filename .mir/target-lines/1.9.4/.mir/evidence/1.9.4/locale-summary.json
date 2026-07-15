@@ -1,0 +1,33 @@
+{
+  "schema": 1,
+  "status": "passed",
+  "version": "1.9.4",
+  "target": "1.1",
+  "encoding": "UTF-8",
+  "languages": [
+    "de",
+    "en",
+    "es-ES",
+    "fr",
+    "it",
+    "pl",
+    "pt-BR",
+    "ru",
+    "zh-CN"
+  ],
+  "checks": [
+    "target-era syntax",
+    "duplicate sections",
+    "duplicate keys",
+    "missing required keys",
+    "orphaned settings locale",
+    "placeholders",
+    "formatting tokens",
+    "setting names and descriptions",
+    "technology names and descriptions",
+    "exact ZIP parse via matching binary"
+  ],
+  "exact_zip_scenario": "package-zip-base",
+  "manual_visual_review": "PENDING-MAINTAINER",
+  "qualification_run_id": "a79b69c9-204f-4913-b40e-26737b661a77"
+}

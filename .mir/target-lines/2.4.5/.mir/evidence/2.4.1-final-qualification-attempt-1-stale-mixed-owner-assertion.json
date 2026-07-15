@@ -1,0 +1,127 @@
+{
+  "schema": 1,
+  "status": "failed",
+  "state": "BUILT",
+  "release_status": "NOT RELEASED",
+  "target": "2.0",
+  "version": "2.4.1",
+  "source_commit": "538f85186418c45d6668e61a100a3ee5370ba49a",
+  "build": {
+    "candidate": "C:\\Projects\\Factorio\\more-infinite-research-tmp-2.0\\.\\dist\\more-infinite-research_2.4.1.zip",
+    "sha256": "479F57587AB841060187561D6FFEE65B275E2C89832E142E5F3F315713F3FB30",
+    "content_sha256": "9370E0C2EF7EACA54D3095119FF3ADF5EA51A7DAE1D46F30D6D2F5EFD1A4AC97",
+    "size_bytes": 406237
+  },
+  "plan": {
+    "schema": 1,
+    "generated_at": "2026-07-14T09:53:10.6615741Z",
+    "target": "2.0",
+    "profile": "full",
+    "baseline": "",
+    "candidate": "C:\\Projects\\Factorio\\more-infinite-research-tmp-2.0\\.\\dist\\more-infinite-research_2.4.1.zip",
+    "classification": {
+      "paths": [
+        ".mir/evidence/2.4.1-targeted-changed-features.json",
+        ".mir/evidence/2.4.1-upgrade-from-2.4.0-create.txt",
+        ".mir/evidence/2.4.1-upgrade-from-2.4.0-load.txt",
+        ".mir/evidence/2.4.1-upgrade-proof.json",
+        "dist/more-infinite-research_2.4.1.zip"
+      ],
+      "classes": [
+        "release-evidence"
+      ],
+      "tests": [
+        "seal.verify"
+      ],
+      "unknown_paths": [],
+      "escalated": false
+    },
+    "tests": [
+      {
+        "id": "static.full",
+        "kind": "static",
+        "command": "./scripts/Invoke-MIRValidation.ps1 -StaticOnly",
+        "requires_factorio": false,
+        "inputs": [
+          "repository",
+          "test-catalog",
+          "target-profile"
+        ]
+      },
+      {
+        "id": "runtime.full",
+        "kind": "runtime",
+        "command": "./scripts/Invoke-MIRValidation.ps1 -FactorioBin <factorio> -CandidateZip <candidate> -MaxParallel 4",
+        "requires_factorio": true,
+        "inputs": [
+          "candidate",
+          "factorio",
+          "required-scenarios",
+          "harness",
+          "fixtures",
+          "settings"
+        ]
+      },
+      {
+        "id": "runtime.upgrade",
+        "kind": "runtime",
+        "command": "./scripts/Test-MIRUpgrade.ps1 -FactorioBin <factorio> -FromZip <prior-release> -ToZip <candidate> -FromVersion 2.4.0 -ToVersion 2.4.1 -FixtureName assert-upgrade-2-4-0-to-2-4-1 -OutputPath artifacts/assurance/2.4.1-upgrade-proof.json",
+        "requires_factorio": true,
+        "inputs": [
+          "candidate",
+          "prior-release",
+          "factorio",
+          "upgrade-fixture",
+          "harness",
+          "settings"
+        ]
+      },
+      {
+        "id": "runtime.ecosystem",
+        "kind": "runtime",
+        "command": "./scripts/mir.ps1 release gate --profile release-targeted-2.0 --factorio <factorio> --no-git-pull",
+        "requires_factorio": true,
+        "inputs": [
+          "candidate",
+          "factorio",
+          "mod-lock",
+          "ecosystem-profile",
+          "harness"
+        ]
+      }
+    ],
+    "requires_factorio": true,
+    "package_source_sha256": "418EB7F43D4B7289A84E00B838EA9D7126A868B9647971B40606C27CEF004DE4",
+    "test_catalog_sha256": "300D42D191EB8B4F1C63E69E817744C213ED72F777154566A5ED57828F04F658",
+    "validation_harness_sha256": "BAF97C8AD460FA13E7BE6DA3923560D9A1DDA0CF93D07C21E498224B040F6E78"
+  },
+  "evidence": [
+    {
+      "schema": 1,
+      "test_id": "static.full",
+      "status": "passed",
+      "input_key": "D5A04AFC1BB0BD0872E479B031AC2209D27EAA7BCDE2B8DC8B762395A8D5E93B",
+      "target": "2.0",
+      "candidate_sha256": "479F57587AB841060187561D6FFEE65B275E2C89832E142E5F3F315713F3FB30",
+      "factorio_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+      "command": "./scripts/Invoke-MIRValidation.ps1 -StaticOnly",
+      "started_at": "2026-07-14T09:53:38.5416383Z",
+      "duration_seconds": 0.001,
+      "message": "covered by runtime.full, which executes the complete static facade before runtime scenarios"
+    },
+    {
+      "schema": 1,
+      "test_id": "runtime.full",
+      "status": "failed",
+      "input_key": "C20B5D02623F91CDD05F95E32DC8064F5A53789EC54A331D8363A2AED1F1E578",
+      "target": "2.0",
+      "candidate_sha256": "479F57587AB841060187561D6FFEE65B275E2C89832E142E5F3F315713F3FB30",
+      "factorio_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+      "command": "./scripts/Invoke-MIRValidation.ps1 -FactorioBin <factorio> -CandidateZip <candidate> -MaxParallel 4",
+      "started_at": "2026-07-14T09:53:38.8177845Z",
+      "duration_seconds": 723.646,
+      "message": "Mixed owner change fallback scenario missing expected runtime log text 'owner_mixed_change_values; falling back to MIR generation for eligible recipes'."
+    }
+  ],
+  "completed_at": "2026-07-14T10:05:42.7802184Z"
+}

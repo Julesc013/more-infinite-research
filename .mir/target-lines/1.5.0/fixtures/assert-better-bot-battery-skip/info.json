@@ -1,0 +1,13 @@
+{
+  "name": "mir-fixture-assert-better-bot-battery-skip",
+  "version": "0.1.0",
+  "title": "MIR Fixture - Assert Better Bot Battery Skip",
+  "author": "Julesc013",
+  "description": "Validation fixture that asserts MIR skips robot battery when Better Bot Battery owns the infinite native effect.",
+  "factorio_version": "0.15",
+  "dependencies": [
+    "base >= 0.15",
+    "more-infinite-research",
+    "mir-fixture-better-bot-battery-owner"
+  ]
+}

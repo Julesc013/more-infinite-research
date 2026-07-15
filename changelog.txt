@@ -153,6 +153,336 @@ Date: 2026-07-12
     - Added a complete 3.0.5 inventory for all 477 dropdown, checkbox, numeric, and profile-import settings.
 
 ---------------------------------------------------------------------------------------------------
+Version: 2.5.0
+Date: 2026-07-12
+
+  Internal:
+
+    - Retained as a superseded internal candidate archive; this version was not published.
+
+  Changes:
+
+    - Ported the accepted 3.2.0 plan-first automatic compiler contracts to the maintained Factorio 2.0 line.
+    - Preserved published 2.4.0 technology IDs, setting IDs, runtime namespaces, and save-compatible behavior.
+    - Added RecipeFactV2, shared relationship indexes, schema-2 family rules, compatibility packs, and coverage accounting.
+    - Applied Factorio 2.0 target-declared stream, effect, setting, recipe-shape, and emitter cuts.
+    - Retained whole-plan safety checks, deterministic results, and exact-owner protections from the modern source.
+    - Fixed the Muluna and Astroponics cycle by removing only Astroponics' circular Space Science prerequisite.
+    - Switched prerequisite checks to an iterative graph walk so deep modded technology trees remain safe.
+    - Replaced the automatic compiler preset with separate action and research-creation controls.
+    - Added an independent reviewed-data requirement and outcome-first tooltips.
+    - Added a generic schema-2 automatic compiler policy contract for future registered family modules.
+    - Added a sorted data-only CompilerProvider registry for extending recipe-family discovery and planning.
+    - Added canonical setting descriptors and exact Conservative, Safe, Expansive, and Custom policy expansions.
+    - Added stable automatic-compiler and provider diagnostic codes.
+    - Kept experimental assembler and lab family technologies out of reviewed-data creation.
+    - Preserved explicit broad opt-in testing for experimental automatic family technologies.
+    - Standardized automatic-recipe dropdown labels, tooltip structure, capitalization, and locale parity.
+    - Preserved old automatic compiler profiles through a hidden legacy-policy bridge.
+
+  Bugfixes:
+
+    - Preserved iterative prerequisite-cycle repair and strict generated-graph safety checks.
+    - Published compiled generation plans only after authoritative safety checks complete.
+    - Preserved the exact 2.3.5-to-2.4.0 settings and saved-runtime upgrade contract.
+
+---------------------------------------------------------------------------------------------------
+Version: 2.4.5
+Date: 2026-07-14
+
+  Bugfixes:
+
+    - Prevented generated research from inheriting a disabled Automation science technology.
+    - Kept initially available science recipes usable when their former unlock technology is disabled.
+    - Skipped finite anchors and prerequisite chains that transitively depend on disabled technologies.
+    - Made the standard settings configure recognized existing Space Age infinite productivity owners.
+    - Applied cost base and growth together as one displayed cost model when either value is customized.
+    - Preserved current native-owner research level, selection, and fractional progress across cost changes and 2.4.0 upgrades.
+    - Preserved native or modded owner defaults, left disabled streams untouched, and safely rejected unknown cost formulas.
+    - Kept native-owner adoption transactional and retained safe generated-stream fallback.
+
+  Changes:
+
+    - Rebuilt 2.4.5 as the complete Factorio 2.0 projection of the sealed 3.1.9 portable behavior set.
+    - Declared explicit science-pack inputs for the opt-in experimental assembler and lab research families.
+
+---------------------------------------------------------------------------------------------------
+Version: 2.4.1
+Date: 2026-07-14
+
+  Internal:
+
+    - Retained as the qualified superseded candidate that was renumbered and requalified as 2.4.5.
+
+  Bugfixes:
+
+    - Prevented generated research from inheriting a disabled Automation science technology.
+    - Kept initially available science recipes usable when their former unlock technology is disabled.
+    - Skipped finite anchors and prerequisite chains that transitively depend on disabled technologies.
+    - Made the standard settings configure recognized existing Space Age infinite productivity owners.
+    - Applied cost base and growth together as one displayed cost model when either value is customized.
+    - Preserved current native-owner research level, selection, and fractional progress across cost changes and 2.4.0 upgrades.
+    - Preserved native or modded owner defaults, left disabled streams untouched, and rejected unknown formulas safely.
+    - Kept native-owner adoption transactional and retained safe generated-stream fallback.
+
+  Changes:
+
+    - Rebuilt 2.4.1 as the complete Factorio 2.0 projection of the sealed 3.1.9 portable behavior set.
+    - Declared explicit science-pack inputs for the opt-in experimental assembler and lab research families.
+
+---------------------------------------------------------------------------------------------------
+Version: 2.4.0
+Date: 2026-07-14
+
+  Changes:
+
+    - Ported the released 3.1.5 automatic compiler contracts to the maintained Factorio 2.0 line.
+    - Preserved 2.3.5 technology IDs, setting IDs, runtime namespaces, and save-compatible behavior.
+    - Added RecipeFactV2, shared relationship indexes, schema-2 family rules, compatibility packs, and coverage accounting.
+    - Applied Factorio 2.0 target-declared stream, effect, setting, recipe-shape, and emitter cuts.
+    - Retained whole-plan safety checks, deterministic results, and exact-owner protections from the modern source.
+    - Fixed the Muluna and Astroponics cycle by removing only Astroponics' circular Space Science prerequisite.
+    - Switched prerequisite checks to an iterative graph walk so deep modded technology trees remain safe.
+    - Replaced the automatic compiler preset with separate action and research-creation controls.
+    - Added an independent reviewed-data requirement and outcome-first tooltips.
+    - Added a generic schema-2 automatic compiler policy contract for future registered family modules.
+    - Added a sorted data-only CompilerProvider registry for extending recipe-family discovery and planning.
+    - Added canonical setting descriptors and exact Conservative, Safe, Expansive, and Custom policy expansions.
+    - Added stable automatic-compiler and provider diagnostic codes.
+    - Kept experimental assembler and lab family technologies out of reviewed-data creation.
+    - Preserved explicit broad opt-in testing for experimental automatic family technologies.
+    - Standardized automatic-recipe dropdown labels, tooltip structure, capitalization, and locale parity.
+    - Preserved old automatic compiler profiles through a hidden legacy-policy bridge.
+    - Added content-addressed assurance plans, evidence capsules, exact candidate seals, and promotion-only verification.
+    - Added one change-aware verification command and an aggregate fast CI plan artifact.
+    - Made processing unit, plastic, low density structure, and rocket fuel owner research use existing stream settings.
+
+  Bugfixes:
+
+    - Preserved iterative prerequisite-cycle repair and strict generated-graph safety checks.
+    - Published compiled generation plans only after authoritative safety checks complete.
+    - Preserved the exact 2.3.5-to-2.4.0 settings and saved-runtime upgrade contract.
+    - Preserved final native or modded owner balance under defaults and when its MIR stream is disabled.
+    - Rejected unsafe cost overrides for unrecognized external formulas instead of guessing their semantics.
+    - Applied recognized owner cost, time, level, and relevant effect changes as one fingerprint-checked transaction.
+
+---------------------------------------------------------------------------------------------------
+Version: 2.3.5
+Date: 2026-07-11
+
+  Compatibility:
+
+    - Ported the MIR 3.0.5 compatibility hardening source to Factorio 2.0.
+    - Kept Factorio 2.0 metadata, dependencies, runtime storage, settings profiles, and supported Space Age surfaces.
+    - Kept Factorio 2.1-only cargo bay range and landing pad count modifiers out of this target.
+    - Fixed science unlock inference, disabled prerequisites, science self-locks, and unreachable required technologies.
+    - Kept incineration sinks out of breeding productivity across the dependent late-removal lifecycle.
+    - Limited weapon overlap cleanup to MIR-generated continuations with semantic, positive replacement coverage.
+    - Made competing technology replacement transactional and graph-safe.
+    - Rewired dependent prerequisites only after MIR emitted complete replacement coverage.
+    - Isolated unrestricted module-permission arrays per prototype.
+    - Made scripted effect tooltips display the selected per-level value.
+    - Preserved retained non-default base effect settings during upgrades instead of failing on an incomplete scaling descriptor.
+
+  Changes:
+
+    - Reused canonical target profiles, grouped run summaries, and exact stale-package checks.
+    - Added Factorio 2.0 safeguards for generated prerequisites, recipe targets, and weapon overlap ownership.
+    - Added the default-off above-300% self-recycling cap scope and unrestricted module-permission settings.
+    - Added per-generated-technology effect-per-level controls that preserve mixed-tier ratios for MIR-emitted effects.
+
+---------------------------------------------------------------------------------------------------
+Version: 1.9.5
+Date: 2026-07-05
+
+  Compatibility:
+
+    - Backported the tested More Infinite Research 2.1.0 source snapshot to Factorio 2.0.
+    - Updated legacy metadata to target Factorio 2.0 with `base >= 2.0`.
+    - Kept Quality hidden and optional, and kept Space Age optional without a Factorio 2.1 dependency floor.
+    - Removed Factorio 2.1-only cargo logistics technology modifiers from legacy.
+    - Kept compatible 2.1.0 recipe-productivity ownership safeguards.
+    - Kept compatible vanilla productivity-family adoption and fluid-output productivity streams.
+
+  Internal:
+
+    - Fixed local audits so official built-ins include required official dependencies such as Recycler for Quality.
+    - Tightened load-failure grouping to classify Factorio error excerpts instead of MIR audit-row text.
+
+---------------------------------------------------------------------------------------------------
+Version: 1.9.4
+Date: 2026-07-15
+
+  Changes:
+
+    - Reconstructed the Factorio 1.1 release from the qualified 3.1.9 development anchor.
+    - Retained the stable reduced stream set and legacy science-pack discovery path.
+    - Added source-lock, deterministic-package, exact-binary, and upgrade evidence gates.
+
+---------------------------------------------------------------------------------------------------
+Version: 1.8.2
+Date: 2026-07-15
+
+  Changes:
+
+    - Reconstructed the Factorio 1.0 release from the qualified 3.1.9 development anchor.
+    - Retained the stable reduced stream set and legacy science-pack discovery path.
+    - Added source-lock, deterministic-package, exact-binary, and upgrade evidence gates.
+
+---------------------------------------------------------------------------------------------------
+Version: 1.7.1
+Date: 2026-07-15
+
+  Bugfixes:
+
+    - Added strict generated-technology prerequisite graph checks to the Factorio 0.17 line.
+    - Replaced recursive graph traversal with a deterministic iterative walk for deep technology trees.
+    - Preserved rejection of missing, disabled, and cyclic prerequisite paths without importing newer game features.
+    - Omitted recipe-productivity settings that Factorio 0.17 cannot apply instead of exposing inert controls.
+
+---------------------------------------------------------------------------------------------------
+Version: 1.6.0
+Date: 2026-07-15
+
+  Features:
+
+    - Ported the reduced native-infinite compiler and graph-safety guard to Factorio 0.16.
+    - Added the target-era science-pack map and target-supported direct-effect continuations.
+
+  Changes:
+
+    - Kept Factorio 0.17+, 1.x, 2.x, DLC-only behavior, and unsupported settings out of this package.
+
+---------------------------------------------------------------------------------------------------
+Version: 1.5.0
+Date: 2026-07-15
+
+  Features:
+
+    - Ported the old-science native-infinite compiler and iterative graph-safety guard to Factorio 0.15.
+
+  Changes:
+
+    - Kept target-era science, compact count formulas, exact effect allowlists, and supported settings only.
+
+---------------------------------------------------------------------------------------------------
+Version: 1.4.0
+Date: 2026-07-15
+
+  Features:
+
+    - Reconstructed a finite continuation edition for Factorio 0.14 and its alien-science era.
+    - Preserved iterative generated-technology graph checks without unsupported infinite prototype fields.
+
+  Changes:
+
+    - Replaced native infinite formulas with target-supported fixed research counts and exact effect allowlists.
+
+---------------------------------------------------------------------------------------------------
+Version: 1.3.0
+Date: 2026-07-15
+
+  Features:
+
+    - Reconstructed a finite continuation edition for Factorio 0.13 and its alien-science era.
+    - Retained generated-technology prerequisite safety on the earliest supported archive line.
+
+  Changes:
+
+    - Limited technology fields, effects, science, locale, settings, and packaging to binary-proven surfaces.
+
+---------------------------------------------------------------------------------------------------
+Version: 0.12.0
+Date: 2026-07-15
+
+  Features:
+
+    - Added a deterministic finite museum reconstruction for Factorio 0.12.35.
+    - Added six target-proven research families and loaded config.lua customization.
+
+  Changes:
+
+    - Kept native-infinite fields, recipe productivity, mining productivity, modern settings, and scripts absent.
+
+---------------------------------------------------------------------------------------------------
+Version: 0.11.0
+Date: 2026-07-15
+
+  Features:
+
+    - Added a deterministic finite museum reconstruction for Factorio 0.11.22.
+    - Added five target-proven research families and loaded config.lua customization.
+
+  Changes:
+
+    - Kept native-infinite fields and every unsupported modern surface absent.
+
+---------------------------------------------------------------------------------------------------
+Version: 0.10.0
+Date: 2026-07-15
+
+  Features:
+
+    - Added a deterministic finite museum reconstruction for Factorio 0.10.12.
+    - Added five target-proven research families and loaded config.lua customization.
+
+  Changes:
+
+    - Kept native-infinite fields and every unsupported modern surface absent.
+
+---------------------------------------------------------------------------------------------------
+Version: 0.9.0
+Date: 2026-07-15
+
+  Features:
+
+    - Added a deterministic finite museum reconstruction for Factorio 0.9.8.
+    - Added five target-proven research families and loaded config.lua customization.
+
+  Changes:
+
+    - Kept native-infinite fields and every unsupported modern surface absent.
+
+---------------------------------------------------------------------------------------------------
+Version: 0.8.0
+Date: 2026-07-15
+
+  Features:
+
+    - Added a deterministic extracted-directory museum reconstruction for Factorio 0.8.8.
+    - Added five target-proven research families and loaded config.lua customization.
+
+  Changes:
+
+    - Recorded extraction as the supported deployment route and kept unsupported modern surfaces absent.
+
+---------------------------------------------------------------------------------------------------
+Version: 0.7.0
+Date: 2026-07-15
+
+  Features:
+
+    - Added a deterministic extracted-directory museum reconstruction for Factorio 0.7.5.
+    - Added five target-proven research families and loaded config.lua customization.
+
+  Changes:
+
+    - Recorded extraction as the supported deployment route and kept unsupported modern surfaces absent.
+
+---------------------------------------------------------------------------------------------------
+Version: 0.6.0
+Date: 2026-07-15
+
+  Features:
+
+    - Added a deterministic extracted-directory museum reconstruction for Factorio 0.6.4.
+    - Added three target-proven finite research families and loaded config.lua customization.
+
+  Changes:
+
+    - Used only target-proven science, effects, locale syntax, package structure, and deployment behavior.
+
+---------------------------------------------------------------------------------------------------
 Version: 1.7.0
 Date: 2026-07-10
 

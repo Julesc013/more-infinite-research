@@ -1600,3 +1600,11 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - mir-lower-wave-0.17-to-0.6-release-synthesis
+  - path: docs/releases/lower-wave-development-copy-pack.md
+    title: "MIR Published Lines Development Copy Pack"
+    status: current
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-published-lines-development-copy-pack

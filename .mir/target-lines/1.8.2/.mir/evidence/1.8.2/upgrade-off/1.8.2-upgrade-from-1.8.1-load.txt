@@ -1,0 +1,34 @@
+   0.003 2026-07-15 02:42:53; Factorio 1.0.0 (build 54889, win64, alpha)
+   0.004 Operating system: Windows 10 (build 19045)
+   0.004 Program arguments: "D:\Programs\Factorio\1.0\bin\x64\factorio.exe" "--config" "C:\Users\Jules\AppData\Local\Temp\mir-upgrade-1.8.1-to-1.8.2-c2efa31dc01144d2939ad0601f11d2ec\config.ini" "--no-log-rotation" "--disable-audio" "--mod-directory" "C:\Users\Jules\AppData\Local\Temp\mir-upgrade-1.8.1-to-1.8.2-c2efa31dc01144d2939ad0601f11d2ec\mods" "--benchmark" "C:\Users\Jules\AppData\Local\Temp\mir-upgrade-1.8.1-to-1.8.2-c2efa31dc01144d2939ad0601f11d2ec\mir-1.8.1-save.zip" "--benchmark-ticks" "1" "--benchmark-runs" "1" "--benchmark-sanitize"
+   0.004 Read data path: D:/Programs/Factorio/1.0/data
+   0.004 Write data path: C:/Users/Jules/AppData/Local/Temp/mir-upgrade-1.8.1-to-1.8.2-c2efa31dc01144d2939ad0601f11d2ec/userdata [14944/450559MB]
+   0.004 Binaries path: D:/Programs/Factorio/1.0/bin
+   0.020 System info: [CPU: Intel(R) Core(TM) i7-7700HQ CPU @ 2.80GHz, 8 cores, RAM: 11188/16257 MB, page: 18918/22758 MB, virtual: 4251/134217727 MB, extended virtual: 0 MB]
+   0.020 Running in headless mode
+   0.058 Loading mod settings more-infinite-research 1.8.2 (settings.lua)
+   0.103 Loading mod core 0.0.0 (data.lua)
+   0.228 Loading mod base 1.0.0 (data.lua)
+   0.793 Loading mod more-infinite-research 1.8.2 (data.lua)
+   1.062 Loading mod mir-fixture-assert-upgrade-1-8-1-to-1-8-2-off 0.1.0 (data.lua)
+   1.331 Loading mod base 1.0.0 (data-updates.lua)
+   1.580 Loading mod more-infinite-research 1.8.2 (data-updates.lua)
+   1.864 Loading mod more-infinite-research 1.8.2 (data-final-fixes.lua)
+   2.903 Checksum for core: 2630831588
+   2.903 Checksum of base: 3509992273
+   2.903 Checksum of more-infinite-research: 3626272501
+   2.903 Checksum of mir-fixture-assert-upgrade-1-8-1-to-1-8-2-off: 2764879796
+   3.090 Prototype list checksum: 1813463279
+   3.176 Info PlayerData.cpp:68: Local player-data.json available, timestamp 1784047373
+   3.176 Info PlayerData.cpp:75: Cloud player-data.json unavailable
+   3.177 Info GlobalContext.cpp:1269: Resetting config.
+   3.178 Factorio initialised
+   3.179 Loading map C:\Users\Jules\AppData\Local\Temp\mir-upgrade-1.8.1-to-1.8.2-c2efa31dc01144d2939ad0601f11d2ec\mir-1.8.1-save.zip: 771351 bytes.
+   3.289 Loading level.dat: 1249616 bytes.
+   3.296 Info Scenario.cpp:187: Map version 1.0.0-0
+   3.363 Loading script.dat: 661 bytes.
+   3.368 Checksum for script C:/Users/Jules/AppData/Local/Temp/mir-upgrade-1.8.1-to-1.8.2-c2efa31dc01144d2939ad0601f11d2ec/userdata/temp/currently-playing/control.lua: 3931528263
+   3.371 Checksum for script __more-infinite-research__/control.lua: 1205417844
+   3.372 Checksum for script __mir-fixture-assert-upgrade-1-8-1-to-1-8-2-off__/control.lua: 3185417912
+   3.373 Script @__mir-fixture-assert-upgrade-1-8-1-to-1-8-2-off__/control.lua:65: [mir-fixture] 1.8.1 to 1.8.2 upgrade proof complete
+   3.466 Goodbye

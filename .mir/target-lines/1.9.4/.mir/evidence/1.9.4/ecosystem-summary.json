@@ -1,0 +1,26 @@
+{
+  "schema": 1,
+  "status": "passed",
+  "version": "1.9.4",
+  "target": "1.1",
+  "scope": "named compatible local fixture-mod canaries only",
+  "broad_compatibility_claim": false,
+  "canaries": [
+    {
+      "result": "passed",
+      "name": "lab-productivity-owner-skip",
+      "contract": "external infinite lab-productivity owner is not duplicated"
+    },
+    {
+      "result": "passed",
+      "name": "better-bot-battery-owner-skip",
+      "contract": "external worker-robot battery owner is not stacked"
+    },
+    {
+      "result": "passed",
+      "name": "weapon-overlap-conditional-external-owner",
+      "contract": "exact external weapon owner is preferred safely"
+    }
+  ],
+  "qualification_run_id": "a79b69c9-204f-4913-b40e-26737b661a77"
+}

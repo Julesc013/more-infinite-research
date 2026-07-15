@@ -1,0 +1,44 @@
+{
+  "schema": 1,
+  "target": "2.0",
+  "source": {
+    "factorio_version": "2.0.77",
+    "mod": "space-age",
+    "path": "space-age/prototypes/technology.lua",
+    "sha256": "64FF6FC1A01270B646E4A61D2470C2C52C6B78A378D3DDAA0059BD3418CC4EA5"
+  },
+  "contracts": [
+    {
+      "stream": "research_processing_unit",
+      "owner": "processing-unit-productivity",
+      "product": "processing-unit",
+      "native": {"count_formula": "1.5^L*1000", "base": 1000, "growth": 1.5, "research_time": 60, "max_level": "infinite", "effect_per_level": 0.1},
+      "mir_catalog_defaults": {"base": 8000, "growth": 2, "research_time": 60, "max_level": 0, "effect_percentage_points": 10},
+      "default_policy": "preserve-final-owner-snapshot"
+    },
+    {
+      "stream": "research_plastic",
+      "owner": "plastic-bar-productivity",
+      "product": "plastic-bar",
+      "native": {"count_formula": "1.5^L*1000", "base": 1000, "growth": 1.5, "research_time": 60, "max_level": "infinite", "effect_per_level": 0.1},
+      "mir_catalog_defaults": {"base": 8000, "growth": 2, "research_time": 60, "max_level": 0, "effect_percentage_points": 10},
+      "default_policy": "preserve-final-owner-snapshot"
+    },
+    {
+      "stream": "research_low_density_structure",
+      "owner": "low-density-structure-productivity",
+      "product": "low-density-structure",
+      "native": {"count_formula": "1.5^L*1000", "base": 1000, "growth": 1.5, "research_time": 60, "max_level": "infinite", "effect_per_level": 0.1},
+      "mir_catalog_defaults": {"base": 8000, "growth": 2, "research_time": 60, "max_level": 0, "effect_percentage_points": 10},
+      "default_policy": "preserve-final-owner-snapshot"
+    },
+    {
+      "stream": "research_rocket_fuel",
+      "owner": "rocket-fuel-productivity",
+      "product": "rocket-fuel",
+      "native": {"count_formula": "1.5^L*1000", "base": 1000, "growth": 1.5, "research_time": 60, "max_level": "infinite", "effect_per_level": 0.1},
+      "mir_catalog_defaults": {"base": 8000, "growth": 2, "research_time": 60, "max_level": 0, "effect_percentage_points": 10},
+      "default_policy": "preserve-final-owner-snapshot"
+    }
+  ]
+}

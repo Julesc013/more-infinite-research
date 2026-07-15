@@ -1,0 +1,1 @@
+-- Runtime-only validation fixture. The data-stage entrypoint is intentionally empty.

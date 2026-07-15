@@ -1,0 +1,13 @@
+{
+  "name": "mir-fixture-assert-upgrade-3-1-2-to-3-1-5-automatic-compiler",
+  "version": "0.1.0",
+  "title": "MIR Fixture - Assert 3.1.2 to 3.1.9 Automatic Compiler Upgrade",
+  "author": "MIR maintainers",
+  "factorio_version": "2.1",
+  "dependencies": [
+    "base >= 2.1.0",
+    "space-age >= 2.1.0",
+    "more-infinite-research >= 3.1.2"
+  ]
+}
+

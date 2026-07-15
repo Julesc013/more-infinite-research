@@ -1,0 +1,64 @@
+local M = {}
+local data_raw = require("prototypes.mir.platform.factorio.data_raw")
+local target_line = require("prototypes.mir.platform.factorio.target_line")
+
+local function require_field(spec, field)
+  if spec[field] == nil then
+    error("StreamSpec missing required emitter field: " .. field, 3)
+  end
+end
+
+local function validate(spec)
+  if type(spec) ~= "table" then error("StreamSpec must be a table", 3) end
+  if spec.schema ~= 1 then error("StreamSpec schema must be 1", 3) end
+
+  require_field(spec, "manifest_id")
+  require_field(spec, "stream_key")
+  require_field(spec, "technology_name")
+  require_field(spec, "effects")
+  require_field(spec, "science")
+  require_field(spec, "prerequisites")
+  require_field(spec, "migration_policy")
+end
+
+function M.prototype(spec)
+  validate(spec)
+
+  local unit = {
+    ingredients = spec.science,
+    time = spec.research_time
+  }
+  if target_line.supports_native_infinite_technology() then
+    unit.count_formula = spec.count_formula
+  else
+    unit.count = target_line.finite_research_count(spec.count_formula)
+  end
+
+  local technology = {
+    type = "technology",
+    name = spec.technology_name,
+    localised_name = spec.localised_name,
+    localised_description = spec.localised_description,
+    effects = spec.effects,
+    prerequisites = spec.prerequisites,
+    unit = unit,
+    upgrade = spec.upgrade ~= false,
+    order = spec.order,
+    level = spec.level or 1
+  }
+  if target_line.supports_native_infinite_technology() then
+    technology.icons = spec.icons
+    technology.max_level = spec.max_level
+  elseif spec.icons and spec.icons[1] then
+    technology.icon = spec.icons[1].icon
+  end
+  return technology
+end
+
+function M.emit(spec)
+  local technology = M.prototype(spec)
+  data_raw.extend({ technology })
+  return technology
+end
+
+return M

@@ -1,0 +1,173 @@
+{
+  "schema": 1,
+  "status": "complete-published-source-snapshots",
+  "generated_at": "2026-07-15",
+  "policy": {
+    "modern_root_is_authoritative": true,
+    "snapshots_are_runtime_inert": true,
+    "release_packager_must_exclude": ".mir/target-lines",
+    "exact_distributions_root": "dist"
+  },
+  "versions": [
+    {
+      "version": "3.1.9",
+      "commit": "1b9c6f32fc2bb53c413a593534e103a6043b4be3",
+      "tree": "122f20fa73170a3689974f6dbd3da05ea3270c55",
+      "snapshot": ".mir/target-lines/3.1.9",
+      "files": 914,
+      "bytes": 23658975,
+      "dist": "dist/more-infinite-research_3.1.9.zip",
+      "dist_sha256": "D77B3A78DA40CD4FDD4C829A01B5030E59FB593F3387124EF5C438F6A9E8DFCD"
+    },
+    {
+      "version": "2.4.5",
+      "commit": "7e4b6c530cfcc5b2e1429c4e9f4ccb0d6d3b42a4",
+      "tree": "b0cd011d9c36751b0e8bc2ea5b6c7b473498c6b4",
+      "snapshot": ".mir/target-lines/2.4.5",
+      "files": 823,
+      "bytes": 29354387,
+      "dist": "dist/more-infinite-research_2.4.5.zip",
+      "dist_sha256": "7649824B72247AA38F05661422DFDEE7C729B21CC73A0A35D2455443B45D39F8"
+    },
+    {
+      "version": "1.9.4",
+      "commit": "426d6d48c6578a786ea7de0f224282baff9d342b",
+      "tree": "18d77bb35af7267dba67b6689184a2a6cd7ddc71",
+      "snapshot": ".mir/target-lines/1.9.4",
+      "files": 953,
+      "bytes": 25041593,
+      "dist": "dist/more-infinite-research_1.9.4.zip",
+      "dist_sha256": "74BA83E1F02FABBC52C09AC6144A409B243066663A6D132A47334459C2665BFB"
+    },
+    {
+      "version": "1.8.2",
+      "commit": "0a192c27674a6b13847e2f5e1b2b530e62419ee8",
+      "tree": "9a9d84fc6303a156d291257dfe749c3f97c02df5",
+      "snapshot": ".mir/target-lines/1.8.2",
+      "files": 953,
+      "bytes": 25039188,
+      "dist": "dist/more-infinite-research_1.8.2.zip",
+      "dist_sha256": "676927ECF801114CA8F7B9EFD6D139906432BCC60BE26B8CA5C08842E3686EFE"
+    },
+    {
+      "version": "1.7.1",
+      "commit": "9d9095c92055aebe557a55a7ab99bb9588fe73fb",
+      "tree": "925b4b68d2404f5fc9adb058771e216a60cda37a",
+      "snapshot": ".mir/target-lines/1.7.1",
+      "files": 853,
+      "bytes": 24617461,
+      "dist": "dist/more-infinite-research_1.7.1.zip",
+      "dist_sha256": "2B2A395F014BF1C0C08596602A723E51F14199A9196B192858335FFE8ED9B25B"
+    },
+    {
+      "version": "1.6.0",
+      "commit": "a48509ed1dfbae8eba4b3dc7a701065063c12d5f",
+      "tree": "340244878fccad5387fac90169b66ca87d15f943",
+      "snapshot": ".mir/target-lines/1.6.0",
+      "files": 853,
+      "bytes": 24617295,
+      "dist": "dist/more-infinite-research_1.6.0.zip",
+      "dist_sha256": "18EAE70A7FEE1FD50099D15985C4E5BE7DB018592EC3EFFC792950A920714544"
+    },
+    {
+      "version": "1.5.0",
+      "commit": "c2b526fd6dde81be7703daef53b075a1fd773e09",
+      "tree": "73d9144a2dd2004116007ad0698e1c4c7f55d07e",
+      "snapshot": ".mir/target-lines/1.5.0",
+      "files": 853,
+      "bytes": 24620690,
+      "dist": "dist/more-infinite-research_1.5.0.zip",
+      "dist_sha256": "131162AA1A62C05E2C395C3F9D2495178742CD8C5324B058C42995C17F65B4DB"
+    },
+    {
+      "version": "1.4.0",
+      "commit": "fa192796ab274dd590c65b96d0f3f6a0f35cb155",
+      "tree": "a9573f5eb33aefdb4446d7f8cea4defd90d759fe",
+      "snapshot": ".mir/target-lines/1.4.0",
+      "files": 853,
+      "bytes": 24629032,
+      "dist": "dist/more-infinite-research_1.4.0.zip",
+      "dist_sha256": "69B7FC86E798937D44DF60E5E6DDC1FA636A10643B2E1BF54A79F5255CF984C1"
+    },
+    {
+      "version": "1.3.0",
+      "commit": "a33b99c1f39e1e779986a12a558a79ea97e69239",
+      "tree": "77feac3ed22abd251a6cb9953947e48af60ae09c",
+      "snapshot": ".mir/target-lines/1.3.0",
+      "files": 853,
+      "bytes": 24630471,
+      "dist": "dist/more-infinite-research_1.3.0.zip",
+      "dist_sha256": "B07136627C913BA50C36B4F9453D972047F4FD3666BB9B8A79AB0EEFC9CA1749"
+    },
+    {
+      "version": "0.12.0",
+      "commit": "d3681bc202938e06fb965531ddfa764f71ca38ce",
+      "tree": "7c350d6ad56c2086b58d949e8ffb2b8b76d4787a",
+      "snapshot": ".mir/target-lines/0.12.0",
+      "files": 941,
+      "bytes": 24794871,
+      "dist": "dist/more-infinite-research_0.12.0.zip",
+      "dist_sha256": "C98EBB436DD1BA1C4C0C230EB51C637EE42904000C9C7A82C7E7A33F6F5461EF"
+    },
+    {
+      "version": "0.11.0",
+      "commit": "e83648f8f9b75f8545e913a9a5288423dbb9ebfa",
+      "tree": "3425cdfa91671683c1d7cf91bd0221eaa9dbb178",
+      "snapshot": ".mir/target-lines/0.11.0",
+      "files": 942,
+      "bytes": 24789431,
+      "dist": "dist/more-infinite-research_0.11.0.zip",
+      "dist_sha256": "C628FBFA4FC2A811869C5D33245BCBA0D37AA5EE2074ADEC7155874C2081B748"
+    },
+    {
+      "version": "0.10.0",
+      "commit": "732ec117f187ccf77325e85023999f869520be9e",
+      "tree": "ff1e8021508372bed59cc063b6e550fc9a7d552e",
+      "snapshot": ".mir/target-lines/0.10.0",
+      "files": 942,
+      "bytes": 24787126,
+      "dist": "dist/more-infinite-research_0.10.0.zip",
+      "dist_sha256": "845CBB69195ED03AF604685137D356E826B29D0570A4A4AFD6C0941E4B23C04F"
+    },
+    {
+      "version": "0.9.0",
+      "commit": "210a4556b12a3a40a64337c3535da307c86137e5",
+      "tree": "c272df46dbe7b5e62efc85569c39ad961bf18457",
+      "snapshot": ".mir/target-lines/0.9.0",
+      "files": 942,
+      "bytes": 25328213,
+      "dist": "dist/more-infinite-research_0.9.0.zip",
+      "dist_sha256": "9FE3117CE3415858506FBA319A2F025F170771590A23C2E160D710F4447A05F1"
+    },
+    {
+      "version": "0.8.0",
+      "commit": "e0e297cd0bcc4a38f54d5b2e4b7bc54335785ee3",
+      "tree": "cb2d28a66c46712006d235f8227e2e4b2b9a57bf",
+      "snapshot": ".mir/target-lines/0.8.0",
+      "files": 942,
+      "bytes": 25257592,
+      "dist": "dist/more-infinite-research_0.8.0.zip",
+      "dist_sha256": "6832B00783657F60D8AE967552CA354D1F73C988A0DFE023999AE81533267D8E"
+    },
+    {
+      "version": "0.7.0",
+      "commit": "085d529f52b3f3b2ddf06a682475d2d7124210b7",
+      "tree": "daa93c6eda1d8f59e2d748e2dea9d59239ee816f",
+      "snapshot": ".mir/target-lines/0.7.0",
+      "files": 942,
+      "bytes": 25200929,
+      "dist": "dist/more-infinite-research_0.7.0.zip",
+      "dist_sha256": "8495146889655FA46233A7B0416F4C67B4E2BF93E984E01F5F8234C9CA6F570F"
+    },
+    {
+      "version": "0.6.0",
+      "commit": "a4f82673278f1414eff06f8094ed460851fc112b",
+      "tree": "9fd31f73e390bb63a1d28c733b65397e244e387d",
+      "snapshot": ".mir/target-lines/0.6.0",
+      "files": 942,
+      "bytes": 25082280,
+      "dist": "dist/more-infinite-research_0.6.0.zip",
+      "dist_sha256": "40EC4F7B07EF4219E74259DA0AA30C8095D8CEA003BDECE90E857D4379DB1C2C"
+    }
+  ]
+}

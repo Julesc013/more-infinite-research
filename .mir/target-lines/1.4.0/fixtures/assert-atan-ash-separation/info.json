@@ -1,0 +1,13 @@
+{
+  "name": "mir-fixture-assert-atan-ash-separation",
+  "version": "0.1.0",
+  "title": "MIR Fixture Assert - ATAN Ash Separation",
+  "author": "MIR Tests",
+  "description": "Validation fixture that asserts MIR only owns ATAN Ash separation productivity.",
+  "factorio_version": "0.14",
+  "dependencies": [
+    "base >= 0.14",
+    "mir-fixture-atan-ash",
+    "more-infinite-research"
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "name": "mir-fixture-assert-air-scrubbing-clean-filter",
+  "version": "0.1.0",
+  "title": "MIR Fixture - Assert Air Scrubbing Clean Filter",
+  "author": "Julesc013",
+  "description": "Validation fixture that asserts MIR only owns Air Scrubbing clean-filter crafting recipes.",
+  "factorio_version": "0.15",
+  "dependencies": [
+    "base >= 0.15",
+    "mir-fixture-air-scrubbing",
+    "more-infinite-research"
+  ]
+}

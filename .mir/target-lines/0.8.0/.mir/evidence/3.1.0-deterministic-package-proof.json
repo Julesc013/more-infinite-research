@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "version": "3.1.0",
+  "commit": "5412d8dd7b65f9b90e5bd64acbbd74b04aa3f750",
+  "status": "passed",
+  "worktrees": [
+    "dev",
+    "detached-clean"
+  ],
+  "checkout_line_endings": [
+    "crlf",
+    "lf"
+  ],
+  "compression_level": "Optimal",
+  "sha256": "B1EABCAFF4F802A104AF4D31CE7CE98A98DD0A59A3F5D7F60C97A2015A5FB81A",
+  "size_bytes": 342043,
+  "entries": 136,
+  "files": 136,
+  "entry_order": "ordinal-path-ascending",
+  "entry_timestamp": "1980-01-01T00:00:00",
+  "text_encoding": "utf-8-no-bom",
+  "text_line_endings": "lf",
+  "first_entry": "more-infinite-research_3.1.0/changelog.txt",
+  "last_entry": "more-infinite-research_3.1.0/thumbnail.png",
+  "initial_failure": {
+    "status": "remediated",
+    "reason": "working-tree CRLF versus LF bytes",
+    "repair": "canonicalize packaged text entries to UTF-8 LF before compression"
+  }
+}

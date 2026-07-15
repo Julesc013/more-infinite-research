@@ -1,0 +1,12 @@
+{
+  "name": "mir-fixture-external-technology-cycle",
+  "version": "0.1.0",
+  "title": "MIR Fixture - External Technology Cycle",
+  "author": "Julesc013",
+  "description": "Validates that MIR diagnoses external prerequisite cycles without weakening generated-cycle safety.",
+  "factorio_version": "2.0",
+  "dependencies": [
+    "base >= 2.0",
+    "more-infinite-research"
+  ]
+}

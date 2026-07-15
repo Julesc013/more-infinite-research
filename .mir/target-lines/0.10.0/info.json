@@ -1,0 +1,10 @@
+{
+  "name": "more-infinite-research",
+  "version": "0.10.0",
+  "title": "More Infinite Research",
+  "author": "Julesc013",
+  "description": "Adds configurable finite continuations of selected research bonus lines for museum Factorio releases.",
+  "dependencies": [
+    "base >= 0.10.12"
+  ]
+}

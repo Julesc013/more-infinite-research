@@ -1,0 +1,5 @@
+Version: 0.10.12 (Build 10773, win64)
+Binary version: 64
+Map input version: 0.6.0-0
+Map output version: 0.10.12-0
+

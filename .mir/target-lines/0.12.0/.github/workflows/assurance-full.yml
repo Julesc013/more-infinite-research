@@ -1,0 +1,46 @@
+name: Assurance Full Qualification
+
+on:
+  workflow_dispatch:
+    inputs:
+      candidate_sha:
+        description: "Trusted full source commit"
+        required: true
+      target:
+        description: "Factorio target line"
+        required: true
+        default: "2.1"
+      prior_release:
+        description: "Trusted runner path to the exact prior-release archive"
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  qualify:
+    runs-on: [self-hosted, Windows]
+    environment: release-candidate
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.candidate_sha }}
+          fetch-depth: 0
+      - name: Reject dirty or mismatched source
+        shell: pwsh
+        run: |
+          if ((git rev-parse HEAD).Trim() -ne '${{ inputs.candidate_sha }}') { throw 'Candidate commit mismatch.' }
+          if (git status --porcelain --untracked-files=all) { throw 'Candidate checkout is dirty.' }
+      - name: Qualify one exact artifact
+        shell: pwsh
+        env:
+          FACTORIO_BIN: ${{ secrets.FACTORIO_BIN }}
+        run: ./scripts/mir.ps1 assurance qualify --target '${{ inputs.target }}' --profile full --factorio $env:FACTORIO_BIN --prior '${{ inputs.prior_release }}' --output artifacts/assurance/qualification-summary.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: assurance-full-${{ inputs.target }}-${{ inputs.candidate_sha }}
+          path: |
+            dist/*.zip
+            artifacts/assurance/**
+          if-no-files-found: error

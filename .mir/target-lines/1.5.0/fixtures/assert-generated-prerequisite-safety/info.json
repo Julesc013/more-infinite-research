@@ -1,0 +1,12 @@
+{
+  "name": "mir-fixture-assert-generated-prerequisite-safety",
+  "version": "0.1.0",
+  "title": "MIR Fixture - Assert Generated Prerequisite Safety",
+  "author": "Julesc013",
+  "description": "Fails loading when an MIR-generated stream has a disabled or unlock-all-resistant prerequisite.",
+  "factorio_version": "0.15",
+  "dependencies": [
+    "base >= 0.15",
+    "more-infinite-research >= 1.5.0"
+  ]
+}

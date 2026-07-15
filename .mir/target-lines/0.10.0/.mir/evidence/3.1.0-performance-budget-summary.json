@@ -1,0 +1,105 @@
+{
+  "schema": 1,
+  "release": "3.1.0",
+  "factorio_line": "2.1",
+  "status": "passed",
+  "generated_at": "2026-07-11T21:50:14.0740531Z",
+  "git_commit": "fc808189149e60f12e8254d0a026793c92dc53ad",
+  "factorio_binary_version": "2.1.9",
+  "validation_run_id": "5a4fff79-9b89-4280-904b-f55ee4af016a",
+  "validation_source": ".mir\\evidence\\3.1.0-validation-decomposition-gate-summary.json",
+  "medium_pack": {
+    "scenario": "local-2-1-bz-suite-space-age",
+    "third_party_mods": 6,
+    "source": "artifacts\\release-targeted-3.1.0\\release-targeted-summary.json"
+  },
+  "large_pack": {
+    "scenario": "local-2-1-krastorio-spaced-out",
+    "third_party_mods": 8,
+    "audit_rows": 2654,
+    "compatibility_claim": "load-observation-only",
+    "source": "artifacts\\performance-k2so-pack-3.1.0-final\\extended-summary.json"
+  },
+  "results": [
+    {
+      "id": "base",
+      "source": "validation_scenario",
+      "key": "base-generation-integrity",
+      "actual_seconds": 5.763,
+      "max_seconds": 8.0,
+      "status": "passed"
+    },
+    {
+      "id": "space-age",
+      "source": "validation_scenario",
+      "key": "space-age-generation-integrity",
+      "actual_seconds": 12.355,
+      "max_seconds": 18.0,
+      "status": "passed"
+    },
+    {
+      "id": "scoped-caps-off",
+      "source": "validation_scenario",
+      "key": "base-generation-integrity",
+      "actual_seconds": 5.763,
+      "max_seconds": 8.0,
+      "status": "passed"
+    },
+    {
+      "id": "scoped-caps-on",
+      "source": "validation_scenario",
+      "key": "prototype-limit-overrides-base",
+      "actual_seconds": 5.065,
+      "max_seconds": 8.0,
+      "status": "passed"
+    },
+    {
+      "id": "diagnostics-off",
+      "source": "validation_scenario",
+      "key": "package-zip-base",
+      "actual_seconds": 3.492,
+      "max_seconds": 7.0,
+      "status": "passed"
+    },
+    {
+      "id": "diagnostics-on",
+      "source": "validation_scenario",
+      "key": "base-generation-integrity",
+      "actual_seconds": 5.763,
+      "max_seconds": 8.0,
+      "status": "passed"
+    },
+    {
+      "id": "medium-pack",
+      "source": "medium_pack_step",
+      "key": "representative-local-scenario",
+      "actual_seconds": 58.86,
+      "max_seconds": 90.0,
+      "status": "passed"
+    },
+    {
+      "id": "large-pack",
+      "source": "large_pack_step",
+      "key": "LocalLibraryScenarios",
+      "actual_seconds": 48.86,
+      "max_seconds": 90.0,
+      "status": "passed"
+    },
+    {
+      "id": "large-synthetic-graph",
+      "source": "validation_scenario",
+      "key": "capability-negative-cases",
+      "actual_seconds": 4.579,
+      "max_seconds": 8.0,
+      "status": "passed"
+    },
+    {
+      "id": "full-matrix",
+      "source": "validation_total",
+      "key": "all",
+      "actual_seconds": 578.211,
+      "max_seconds": 900.0,
+      "status": "passed"
+    }
+  ]
+}

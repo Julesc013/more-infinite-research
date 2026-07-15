@@ -1,0 +1,11 @@
+{
+  "name": "mir-fixture-aai-loaders",
+  "version": "0.1.0",
+  "title": "MIR Fixture - AAI Loaders",
+  "author": "Julesc013",
+  "description": "Validation fixture that adds AAI-style loader recipes for MIR belt productivity matching.",
+  "factorio_version": "0.13",
+  "dependencies": [
+    "base >= 0.13"
+  ]
+}

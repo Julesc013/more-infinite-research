@@ -1,0 +1,11 @@
+{
+  "name": "more-infinite-research",
+  "version": "1.5.0",
+  "title": "More Infinite Research",
+  "author": "Julesc013",
+  "description": "Adds configurable target-supported infinite bonus researches for logistics, combat, labs, player bonuses, and base technology continuations.",
+  "factorio_version": "0.15",
+  "dependencies": [
+    "base >= 0.15"
+  ]
+}

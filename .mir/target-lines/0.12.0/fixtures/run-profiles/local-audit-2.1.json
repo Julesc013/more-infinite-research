@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "kind": "extended",
+  "factorio_line": "2.1",
+  "tiers": [
+    "LocalLibraryScenarios",
+    "GeneratedLocalScenarios",
+    "LocalModZips"
+  ],
+  "factorio_bin": "auto",
+  "local_mod_zip_dirs": [
+    "C:\\Projects\\Factorio\\testmods_2.1"
+  ],
+  "local_mod_library_dirs": [
+    "C:\\Projects\\Factorio\\testmods_2.1"
+  ],
+  "offline": true,
+  "collect_all": true,
+  "link_mode": "Hardlink",
+  "include_generated_local_pairwise": true,
+  "generated_local_pairwise_limit": 40,
+  "scenario_timeout_seconds": 900
+}

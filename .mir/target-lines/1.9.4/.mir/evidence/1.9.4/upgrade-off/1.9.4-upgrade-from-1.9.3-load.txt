@@ -1,0 +1,38 @@
+   0.003 2026-07-15 02:42:52; Factorio 1.1.110 (build 62357, win64, full)
+   0.003 Operating system: Windows 10 (build 19045)
+   0.003 Program arguments: "D:\Programs\Factorio\1.1\bin\x64\factorio.exe" "--config" "C:\Users\Jules\AppData\Local\Temp\mir-upgrade-1.9.3-to-1.9.4-66f57544a85e4330832535a123f44249\config.ini" "--no-log-rotation" "--disable-audio" "--mod-directory" "C:\Users\Jules\AppData\Local\Temp\mir-upgrade-1.9.3-to-1.9.4-66f57544a85e4330832535a123f44249\mods" "--benchmark" "C:\Users\Jules\AppData\Local\Temp\mir-upgrade-1.9.3-to-1.9.4-66f57544a85e4330832535a123f44249\mir-1.9.3-save.zip" "--benchmark-ticks" "1" "--benchmark-runs" "1" "--benchmark-sanitize"
+   0.003 Config path: C:/Users/Jules/AppData/Local/Temp/mir-upgrade-1.9.3-to-1.9.4-66f57544a85e4330832535a123f44249/config.ini
+   0.004 Read data path: D:/Programs/Factorio/1.1/data
+   0.004 Write data path: C:/Users/Jules/AppData/Local/Temp/mir-upgrade-1.9.3-to-1.9.4-66f57544a85e4330832535a123f44249/userdata [14946/450559MB]
+   0.004 Binaries path: D:/Programs/Factorio/1.1/bin
+   0.021 System info: [CPU: Intel(R) Core(TM) i7-7700HQ CPU @ 2.80GHz, 8 cores, RAM: 11265/16257 MB, page: 19097/22758 MB, virtual: 4257/134217727 MB, extended virtual: 0 MB]
+   0.112 Memory info:
+   0.112  [0]: 066D TN48G24S817-VHA/R 8192 MB 2400 MHz 1.2 v
+   0.112  [1]: 066D TN48G24S817-VHA/R 8192 MB 2400 MHz 1.2 v
+   0.133 Running in headless mode
+   0.165 Loading mod settings more-infinite-research 1.9.4 (settings.lua)
+   0.195 Loading mod core 0.0.0 (data.lua)
+   0.257 Loading mod base 1.1.110 (data.lua)
+   0.641 Loading mod more-infinite-research 1.9.4 (data.lua)
+   0.681 Loading mod mir-fixture-assert-upgrade-1-9-3-to-1-9-4-off 0.1.0 (data.lua)
+   0.703 Loading mod base 1.1.110 (data-updates.lua)
+   0.728 Loading mod more-infinite-research 1.9.4 (data-updates.lua)
+   0.748 Loading mod more-infinite-research 1.9.4 (data-final-fixes.lua)
+   2.016 Checksum for core: 607699937
+   2.016 Checksum of base: 2464433227
+   2.016 Checksum of more-infinite-research: 3495744171
+   2.016 Checksum of mir-fixture-assert-upgrade-1-9-3-to-1-9-4-off: 2764879796
+   2.338 Prototype list checksum: 1221069375
+   2.445 Info PlayerData.cpp:76: Local player-data.json available, timestamp 1784047372
+   2.445 Info PlayerData.cpp:83: Cloud player-data.json unavailable
+   2.449 Info GlobalContext.cpp:1317: Resetting config.
+   2.450 Factorio initialised
+   2.450 Loading map C:\Users\Jules\AppData\Local\Temp\mir-upgrade-1.9.3-to-1.9.4-66f57544a85e4330832535a123f44249\mir-1.9.3-save.zip: 682875 bytes.
+   2.627 Loading level.dat: 1097634 bytes.
+   2.636 Info Scenario.cpp:204: Map version 1.1.110-0
+   2.730 Loading script.dat: 1416 bytes.
+   2.738 Checksum for script C:/Users/Jules/AppData/Local/Temp/mir-upgrade-1.9.3-to-1.9.4-66f57544a85e4330832535a123f44249/userdata/temp/currently-playing/control.lua: 3702463597
+   2.740 Checksum for script __more-infinite-research__/control.lua: 2309990842
+   2.741 Checksum for script __mir-fixture-assert-upgrade-1-9-3-to-1-9-4-off__/control.lua: 575097872
+   2.743 Script @__mir-fixture-assert-upgrade-1-9-3-to-1-9-4-off__/control.lua:65: [mir-fixture] 1.9.3 to 1.9.4 upgrade proof complete
+   2.854 Goodbye

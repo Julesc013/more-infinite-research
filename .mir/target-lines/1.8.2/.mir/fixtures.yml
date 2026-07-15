@@ -1,0 +1,563 @@
+schema: 1
+
+scenario_manifest:
+  path: fixtures/compat-matrix/expected-scenarios.json
+  schema: 3
+  declarations: full-records
+  record_owns:
+    - fixtures
+    - settings
+    - source_mode
+    - timeout_seconds
+    - tags
+    - isolation
+    - assertions
+
+test_impact_manifest:
+  path: .mir/test-impact.yml
+  schema: 1
+  baseline: exact-package-smoke
+  selector: scripts/Invoke-MIRValidation.ps1
+
+compiler_contract_coverage:
+  path: .mir/compiler-contract-coverage.yml
+  schema: 1
+  validator: scripts/Test-MIRCompilerContractCoverage.ps1
+
+local_campaign_manifest:
+  path: fixtures/compat-matrix/local-library-scenarios.json
+  factorio_2_0_path: fixtures/compat-matrix/local-library-scenarios-2.0.json
+  shared_manual_path: fixtures/compat-matrix/manual-scenarios.json
+  schema: 2
+  validator: scripts/Test-MIRScenarioManifests.ps1
+  record_owns:
+    - targets
+    - kind
+    - group
+    - setup
+    - roots
+    - settings
+    - expected_plan
+    - timeout_seconds
+    - claim_level
+  independent_aai_scenarios:
+    - local-2-1-aai-loaders
+    - local-2-1-aai-industry
+    - local-2-1-aai-loaders-industry
+    - local-2-1-aai-representative-extensions
+
+golden_plans:
+  stable_technology_ids:
+    path: fixtures/golden-plans/stable-technology-ids.json
+    baseline: published-3.0.5
+    expected_count: 70
+    validator: scripts/Test-MIRGoldenPlans.ps1
+  automatic_family_technology_ids:
+    path: fixtures/golden-plans/automatic-family-technology-ids.json
+    release: "3.1.0"
+    expected_count: 2
+    validator: scripts/Test-MIRGoldenPlans.ps1
+
+fixture_roots:
+  synthetic: fixtures
+  compatibility_matrix: fixtures/compat-matrix
+  run_profiles: fixtures/run-profiles
+
+real_mod_gates:
+  factorio-2.1-crucible-rigor:
+    scenario: local-2-1-crucible-rigor-exact-dist
+    roots:
+      - planet-crucible
+      - rigor-module
+    requires_exact_dist: true
+    requires_fresh_save: true
+    status: required
+
+fixtures:
+  rigor-late-recipe-removal:
+    requires_features: [recipe_productivity]
+    path: fixtures/rigor-late-recipe-removal
+    validates:
+      - incineration-sink-excluded-from-breeding
+      - breeding-classifier-positive-negative-matrix
+      - generated-recipe-target-integrity
+      - dependent-mod-late-recipe-removal
+
+  generated-prerequisite-safety:
+    requires_features: [recipe_productivity]
+    assertion_path: fixtures/assert-generated-prerequisite-safety
+    validates:
+      - generated-stream-prerequisites-exist-and-are-enabled
+      - generated-stream-prerequisites-are-acyclic-and-reachable
+      - disabled-base-extension-anchor-is-skipped-before-emission
+      - disabled-vanilla-science-technology-does-not-block-generated-streams
+      - already-enabled-science-pack-recipe-needs-no-unlock
+      - disabled-technology-unlocker-exclusion
+      - deterministic-multiple-unlocker-selection
+      - direct-science-self-lock-exclusion
+      - two-pack-science-cycle-exclusion
+      - missing-research-mechanism-exclusion
+      - shared-recipe-unlocker-index
+      - researchable-required-technology-policy
+      - unlock-all-generated-stream-reachability
+      - decomposed-science-authority-parity
+      - stable-science-rejection-reason-codes
+      - shared-pack-production-reachability-cache
+
+  external-technology-cycle:
+    requires_features: []
+    path: fixtures/external-technology-cycle
+    validates:
+      - muluna-astroponics-mutual-path-reproduction
+      - single-edge-bounded-cycle-repair
+      - inactive-without-both-named-mods
+      - inactive-without-mutual-prerequisite-path
+      - unknown-external-cycle-remains-fatal
+      - generated-node-cycle-remains-fatal
+      - missing-prerequisite-remains-fatal
+      - disabled-prerequisite-remains-fatal
+      - iterative-deep-technology-graph-walk
+      - deterministic-cycle-identity
+
+  settings-visibility:
+    requires_features: []
+    assertion_path: fixtures/assert-hidden-setting-readability
+    validates:
+      - hidden-setting-readability
+      - stable-setting-ids
+      - hidden-legacy-automatic-compiler-setting
+      - inactive-space-age-setting-groups-hidden-in-base
+      - space-age-setting-groups-visible-with-dlc
+      - experimental-automatic-family-setting-groups-hidden-until-reviewed
+
+  prototype-limits:
+    requires_features: [prototype_limits]
+    assertion_path: fixtures/assert-prototype-limits
+    validates:
+      - prototype-limit-startup-overrides
+      - recipe-maximum-productivity-cap
+      - inverse-recycler-threshold-self-recycling-scope
+      - productivity-scope-inert-at-or-below-threshold
+      - engine-unchanged-conservative-threshold
+      - cap-balanced-generated-recycling-return
+      - recycling-recipe-productivity-cap-exclusion
+      - visible-recycling-process-exclusion
+      - unrestricted-module-permissions
+      - recycler-multiple-return-path-rejection
+      - recycler-self-return-byproduct-rejection
+      - recycler-probabilistic-production-rejection
+      - recycler-partial-ignored-productivity-proof
+      - recycler-fluid-shape-rejection
+      - recycler-normal-expensive-variant-rejection
+      - recycler-conversion-to-input-rejection
+      - recycler-nonstandard-return-proof
+      - unrestricted-module-recycler-cross-policy-outcomes
+      - module-permission-array-isolation
+      - module-prototype-tier-recipe-discovery
+      - effect-receiver-limits
+      - separate-energy-and-pollution-limits
+      - separate-positive-speed-cap-and-negative-speed-floor
+      - positive-power-floor-opt-in
+
+  effect-scaling:
+    requires_features: []
+    assertion_path: fixtures/assert-generation-integrity
+    validates:
+      - primary-base-tier-default-anchor
+      - vanilla-continuation-default-anchors
+      - proportional-mixed-tier-scaling
+      - scripted-runtime-multiplier-delta
+      - scripted-effect-selected-description
+      - retained-non-default-base-effect-settings
+      - typed-stream-effect-contracts
+      - declaration-order-invariant-defaults
+      - canonical-descriptor-copy-isolation
+      - duplicate-stream-id-rejection
+      - overlay-descriptor-injection-rejection
+      - positive-stream-target-requirements
+      - canonical-recipe-fact-single-scan
+      - canonical-recipe-fact-copy-isolation
+      - effective-recipe-property-defaults
+      - root-variant-recipe-property-inheritance
+      - complete-factorio-2-1-product-normalization
+      - target-declared-product-probability-fields
+      - governed-pipeline-command-catalog
+      - pipeline-command-positive-target-requirements
+      - large-synthetic-recipe-index
+      - repeated-full-recipe-scan-rejection
+      - non-aliased-capability-lifecycle-stages
+
+  scripted-runtime-lifecycle:
+    requires_features: [scripted_techs]
+    assertion_path: fixtures/assert-scripted-runtime-lifecycle
+    validates:
+      - scripted-multiple-level-application
+      - scripted-reversal-and-reset
+      - scripted-force-create-and-merge
+      - scripted-external-baseline-rebase
+      - scripted-save-load-configuration-change
+      - scripted-final-restoration
+      - scripted-settings-disable-restoration
+      - scripted-settings-reenable
+
+  upgrade-3-0-5-to-3-1-0:
+    requires_features: [scripted_techs]
+    assertion_path: fixtures/assert-upgrade-3-0-5-to-3-1-0
+    validates:
+      - exact-3-0-5-source-archive
+      - non-default-startup-setting-retention
+      - scripted-technology-level-retention
+      - runtime-state-effect-retention
+      - exact-3-1-0-candidate-normal-mod-directory-load
+
+  upgrade-3-0-5-to-3-1-5:
+    requires_features: [scripted_techs]
+    assertion_path: fixtures/assert-upgrade-3-0-5-to-3-1-5
+    validates:
+      - exact-3-0-5-source-archive
+      - non-default-startup-setting-retention
+      - scripted-technology-level-retention
+      - runtime-state-effect-retention
+      - exact-3-1-5-candidate-normal-mod-directory-load
+
+  upgrade-3-0-5-to-3-1-9:
+    requires_features: [scripted_techs]
+    assertion_path: fixtures/assert-upgrade-3-0-5-to-3-1-9
+    validates:
+      - exact-3-0-5-source-archive
+      - non-default-startup-setting-retention
+      - scripted-technology-level-retention
+      - runtime-state-effect-retention
+      - exact-3-1-9-candidate-normal-mod-directory-load
+
+  upgrade-3-0-5-to-3-1-0-automatic-compiler:
+    requires_features: [scripted_techs]
+    assertion_path: fixtures/assert-upgrade-3-0-5-to-3-1-0-automatic-compiler
+    validates:
+      - exact-3-0-5-source-archive
+      - non-default-startup-setting-retention
+      - scripted-technology-level-retention
+      - runtime-state-effect-retention
+      - exact-3-1-0-automatic-compiler-candidate-normal-mod-directory-load
+
+  upgrade-3-1-2-to-3-1-5-automatic-compiler:
+    requires_features: [scripted_techs, recipe_productivity]
+    assertion_path: fixtures/assert-upgrade-3-1-2-to-3-1-5-automatic-compiler
+    validates:
+      - exact-3-1-2-source-archive
+      - hidden-legacy-safe-generate-setting-retention
+      - new-safe-control-defaults
+      - non-default-startup-setting-retention
+      - scripted-technology-level-retention
+      - runtime-state-effect-retention
+      - exact-3-1-5-automatic-compiler-candidate-normal-mod-directory-load
+
+  upgrade-3-1-2-to-3-1-9-automatic-compiler:
+    requires_features: [scripted_techs, recipe_productivity]
+    assertion_path: fixtures/assert-upgrade-3-1-2-to-3-1-9-automatic-compiler
+    validates:
+      - exact-3-1-2-source-archive
+      - hidden-legacy-safe-generate-setting-retention
+      - new-safe-control-defaults
+      - non-default-startup-setting-retention
+      - scripted-technology-level-retention
+      - runtime-state-effect-retention
+      - exact-3-1-9-automatic-compiler-candidate-normal-mod-directory-load
+
+  upgrade-3-1-5-to-3-1-9:
+    requires_features: [recipe_productivity]
+    assertion_path: fixtures/assert-upgrade-3-1-5-to-3-1-9
+    validates:
+      - exact-3-1-5-source-archive
+      - native-owner-setting-retention
+      - native-owner-technology-level-retention
+      - native-owner-research-progress-retention
+      - exact-3-1-9-candidate-normal-mod-directory-load
+
+  upgrade-1-8-1-to-1-8-2-off:
+    assertion_path: fixtures/assert-upgrade-1-8-1-to-1-8-2-off
+    validates:
+      - exact-1-8-1-source-archive
+      - explicit-off-setting-retention
+      - generated-technology-level-retention
+      - current-research-retention
+      - fractional-progress-retention
+      - global-runtime-state-retention
+
+  upgrade-1-8-1-to-1-8-2-always:
+    assertion_path: fixtures/assert-upgrade-1-8-1-to-1-8-2-always
+    validates:
+      - exact-1-8-1-source-archive
+      - explicit-always-setting-retention
+      - generated-technology-level-retention
+      - current-research-retention
+      - fractional-progress-retention
+      - global-runtime-state-retention
+
+  competing-productivity-transaction:
+    requires_features: [recipe_productivity]
+    path: fixtures/plates-n-circuit-productivity
+    assertion_path: fixtures/assert-plates-n-circuit-productivity
+    validates:
+      - scaled-known-productivity-competitor
+      - external-recipe-productivity-prefix-owner
+      - technology-prerequisite-rewire
+
+  native-owner-settings:
+    requires_features: [recipe_productivity]
+    path: fixtures/native-owner-settings-source
+    assertion_path: fixtures/assert-native-owner-settings
+    supplemental_paths:
+      - fixtures/native-owner-unrecognized-formula
+      - fixtures/assert-native-owner-progress
+    validates:
+      - all-four-native-owner-setting-groups-visible
+      - unchanged-defaults-preserve-final-owner-snapshots
+      - enable-false-leaves-external-owners-untouched
+      - base-cost-override
+      - cost-growth-override
+      - research-time-override
+      - finite-max-level-override
+      - infinite-max-level-default
+      - effect-per-level-override
+      - combined-owner-override
+      - relevant-effects-only
+      - unrelated-effects-preserved
+      - processing-unit-native-owner
+      - plastic-bar-native-owner
+      - low-density-structure-native-owner
+      - rocket-fuel-native-owner
+      - fully-covered-owner-still-produces-binding-row
+      - target-native-formula-classification
+      - unrecognized-modded-formula-default-preservation
+      - unsafe-unrecognized-formula-override-rejection
+      - input-output-fingerprint-transaction
+      - duplicate-native-owner-binding-rejection
+      - configuration-change-signature-reset
+      - configuration-change-current-research-progress-retention
+      - paired-base-growth-setting-semantics
+      - settings-profile-compatible-stable-ids
+
+  competing-base-extension-transaction:
+    requires_features: []
+    path: fixtures/better-robots-extended-competitor
+    assertion_path: fixtures/assert-base-competitor-transaction
+    validates:
+      - base-competitor-rollback
+      - technology-prerequisite-rewire
+
+  settings-profile-roundtrip:
+    requires_features: [settings_profiles]
+    assertion_path: fixtures/assert-settings-profile-roundtrip
+    validates:
+      - settings-profile-deterministic-encoding
+      - settings-profile-compact-export
+      - settings-profile-strict-import-validation
+      - hidden-provider-setting-profile-roundtrip
+      - every-effect-setting-profile-roundtrip
+      - all-default-effect-settings-compact-omission
+      - effect-setting-numeric-bound-rejection
+      - settings-catalog-copy-isolation
+      - automatic-controls-profile-roundtrip
+      - hidden-legacy-automatic-mode-profile-roundtrip
+
+  reduced-settings-surface:
+    requires_features: []
+    assertion_path: fixtures/assert-reduced-settings-surface
+    validates:
+      - reduced-supported-settings-remain-visible
+      - modern-only-settings-are-omitted
+      - reduced-continuation-locales-are-explicit
+
+  legacy-effect-icons:
+    requires_features: []
+    assertion_path: fixtures/assert-legacy-effect-icons
+    validates:
+      - target-era-effect-icons-without-newer-overlays
+      - no-space-age-effect-icon-dependencies
+
+  weapon-speed-safety:
+    requires_features: []
+    path: fixtures/weapon-speed-external-owner
+    assertion_path: fixtures/assert-weapon-speed-safety
+    validates:
+      - finite-vanilla-weapon-effects-preserved
+      - weapon-overlap-six-case-policy-matrix
+      - exact-infinite-replacement-coverage
+      - external-owner-science-reachability
+      - external-continuation-non-mutation
+      - external-owner-suppresses-dedicated-streams-when-preferred
+      - dedicated-weapon-prerequisites
+      - scaled-weapon-overlap
+
+  air-scrubbing:
+    requires_features: [recipe_productivity]
+    path: fixtures/air-scrubbing
+    assertion_path: fixtures/assert-air-scrubbing-clean-filter
+    claim: atan-air-scrubbing
+    validates:
+      - generated-streams
+      - loop-risk-rejections
+      - lab-compatibility
+      - package-hygiene
+
+  atan-ash:
+    requires_features: [recipe_productivity]
+    path: fixtures/atan-ash
+    assertion_path: fixtures/assert-atan-ash-separation
+    claim: atan-ash
+    validates:
+      - generated-streams
+      - excluded-ash-sinks
+      - loop-risk-rejections
+
+  atan-nuclear-science:
+    requires_features: [recipe_productivity]
+    path: fixtures/atan-nuclear-science
+    assertion_path: fixtures/assert-atan-nuclear-science-productivity
+    claim: atan-nuclear-science
+    validates:
+      - science-pack-integration
+      - lab-compatibility
+
+  aai-loaders:
+    requires_features: [recipe_productivity]
+    path: fixtures/aai-loaders
+    assertion_path: fixtures/assert-aai-loader-belt-productivity
+    claim: aai-loaders
+    validates:
+      - loader-entity-indexing
+      - loader-recipe-candidates
+      - belt-stream-coverage
+
+  big-mining-drill:
+    requires_features: [recipe_productivity]
+    path: fixtures/big-mining-drill
+    assertion_path: fixtures/assert-big-mining-drill-productivity
+    claim: big-mining-drill
+    validates:
+      - mining-drill-entity-indexing
+      - mining-drill-recipe-candidates
+      - native-mining-owner-observation
+
+  omega-drill:
+    requires_features: [recipe_productivity]
+    path: fixtures/omega-drill
+    assertion_path: fixtures/assert-omega-drill-productivity
+    validates:
+      - mining-drill-recipe-candidates
+      - effect-count
+
+  semantic-family-attach:
+    requires_features: [recipe_productivity]
+    path: fixtures/semantic-family-attach
+    assertion_path: fixtures/assert-semantic-family-attach
+    validates:
+      - data-only-family-rules
+      - structural-entity-backed-recipe-attachment
+      - module-tier-attachment
+      - existing-stable-stream-only
+      - safe-generate-gated-lab-manufacturing
+      - finite-owner-does-not-block-auto-attach
+      - pack-hard-gate-cannot-override-productivity-false
+      - pack-hard-gate-cannot-override-recycling
+      - compatibility-pack-production-integration
+      - reviewed-candidate-seeding
+
+  compiler-contracts:
+    requires_features: [recipe_productivity]
+    assertion_path: fixtures/assert-compiler-contracts
+    validates:
+      - invalid-family-rule-rejection
+      - invalid-compatibility-pack-rejection
+      - stable-rule-and-pack-sorting
+      - deterministic-rule-precedence
+      - equal-precedence-conflict-rejection
+      - compatibility-pack-target-and-applicability-filtering
+      - compatibility-pack-any-all-none-and-version-range-filtering
+      - compatibility-pack-refinement-consumption
+      - compatibility-pack-science-role-consumption
+      - pack-reviewed-override-requires-exact-selector
+      - pack-evidence-id-must-exist
+      - exact-pack-family-authorization
+      - stable-generation-plan-identities
+      - evidence-bearing-generation-plan-gates
+      - duplicate-materialized-effect-rejection
+      - deterministic-cross-stream-effect-arbitration
+      - same-stream-duplicate-effect-rejection-after-arbitration
+      - adoption-wins-over-generated-effect-claim
+      - partial-loser-retains-unique-effects
+      - insertion-order-independent-effect-ownership
+      - compilation-plan-cross-collision
+      - output-effect-value-parity
+      - base-extension-output-parity
+      - final-plan-output-owner-parity
+      - insertion-order-independent-plan-fingerprints
+      - cyclic-fingerprint-rejection
+      - automatic-control-schema-2-defaults
+      - automatic-action-disabled-preview-apply
+      - independent-research-creation-control
+      - independent-reviewed-data-control
+      - all-legacy-mode-policy-mappings
+      - explicit-new-controls-win-over-legacy
+      - reviewed-data-generation-fails-closed
+      - experimental-family-rejected-by-reviewed-data-lane
+      - experimental-family-enabled-by-expansive-lane
+      - registered-family-generation-remains-extensible
+      - data-only-compiler-provider-contract
+      - stable-provider-order-and-fingerprint
+      - duplicate-provider-id-rejection
+      - provider-snapshot-copy-isolation
+      - planning-only-provider-emission-adapters
+      - declarative-automatic-setting-descriptors
+      - conservative-safe-expansive-custom-policy-expansion
+      - stable-automatic-and-provider-diagnostic-codes
+
+  space-age-galore-effect-ownership:
+    requires_features: [recipe_productivity]
+    path: fixtures/space-age-galore-overlap
+    validates:
+      - vgal-coal-crushing-multi-output-shape
+      - carbon-and-sulfur-cross-stream-claim
+      - exactly-one-materialized-effect-owner
+      - stable-owner-selection
+      - no-settings-reset-required
+
+  semantic-family-generate:
+    requires_features: [recipe_productivity]
+    path: fixtures/semantic-family-attach
+    assertion_path: fixtures/assert-semantic-family-generate
+    validates:
+      - stable-generic-family-technology-ids
+      - arbitrary-name-assembling-machine-generation
+      - arbitrary-name-lab-generation
+      - predeclared-settings-stage-mode
+      - full-recipe-coverage-accounting
+      - coverage-artifact-fingerprint
+
+  semantic-family-modes:
+    requires_features: [recipe_productivity]
+    path: fixtures/semantic-family-attach
+    assertion_paths:
+      - fixtures/assert-semantic-family-off
+      - fixtures/assert-semantic-family-report
+      - fixtures/assert-semantic-family-exact-pack
+    validates:
+      - all-automatic-actions
+      - independent-creation-and-review-controls
+      - reviewed-data-rejects-experimental-family-authorization
+      - reviewed-data-safe-attachment-baseline
+      - unrelated-pack-family-remains-disabled
+
+  synthetic-scale-graph:
+    requires_features: [recipe_productivity]
+    path: fixtures/synthetic-scale-graph
+    assertion_path: fixtures/assert-synthetic-scale-graph
+    validates:
+      - 1000-explicit-recipes
+      - 1000-explicit-technologies
+      - 10000-explicit-technology-effects
+      - high-family-candidate-fanout
+      - single-recipe-fact-scan
+      - single-technology-coverage-scan
+      - complete-recipe-accounting

@@ -1,0 +1,13 @@
+{
+  "name": "mir-fixture-assert-settings-profile-roundtrip",
+  "version": "0.1.0",
+  "title": "MIR Fixture - Assert Settings Profile Round Trip",
+  "author": "Julesc013",
+  "description": "Validation fixture that asserts deterministic MIR settings profile encoding, compact export behavior, and strict import validation.",
+  "factorio_version": "0.14",
+  "dependencies": [
+    "base >= 0.14",
+    "? space-age >= 2.1.8",
+    "more-infinite-research"
+  ]
+}

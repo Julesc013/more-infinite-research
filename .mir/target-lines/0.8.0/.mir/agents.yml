@@ -1,0 +1,48 @@
+schema: 1
+
+guidance:
+  root: AGENTS.md
+  codex_config: .codex/config.toml
+
+context_sets:
+  docs-refactor:
+    read_first:
+      - AGENTS.md
+      - .mir/docs.yml
+      - docs/maintainer/documentation-governance.md
+    validate:
+      - powershell: .\scripts\Invoke-MIRValidation.ps1 -StaticOnly
+
+  architecture-refactor:
+    read_first:
+      - AGENTS.md
+      - .mir/modules.yml
+      - docs/architecture/module-boundaries.md
+    validate:
+      - powershell: .\scripts\mir.ps1 architecture check
+      - powershell: .\scripts\Invoke-MIRValidation.ps1 -StaticOnly
+
+  compatibility-change:
+    read_first:
+      - .mir/compatibility.yml
+      - .mir/streams.yml
+      - docs/compatibility/claim-levels.md
+      - docs/maintainer/adding-a-policy-overlay.md
+    validate:
+      - powershell: .\scripts\Invoke-MIRValidation.ps1 -StaticOnly
+
+  generated-stream-change:
+    read_first:
+      - .mir/streams.yml
+      - docs/reference/schemas/stream-spec.md
+      - docs/reference/generated-id-reference.md
+    validate:
+      - powershell: .\scripts\Invoke-MIRValidation.ps1 -StaticOnly
+
+  backport-change:
+    read_first:
+      - .mir/branches.yml
+      - docs/maintainer/backporting.md
+    validate:
+      - powershell: .\scripts\Test-MIRBranchPolicy.ps1 -SkipFetch
+

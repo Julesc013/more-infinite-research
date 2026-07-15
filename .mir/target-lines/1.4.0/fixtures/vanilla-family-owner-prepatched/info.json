@@ -1,0 +1,12 @@
+{
+  "name": "mir-fixture-vanilla-family-owner-prepatched",
+  "version": "0.1.0",
+  "title": "MIR Fixture - Vanilla Family Owner Prepatched",
+  "author": "Julesc013",
+  "description": "Validation fixture that pre-adds a family recipe effect to a vanilla Space Age productivity owner.",
+  "factorio_version": "0.14",
+  "dependencies": [
+    "base >= 0.14",
+    "space-age >= 2.1.8"
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "name": "mir-fixture-assert-generation-integrity",
+  "version": "0.1.0",
+  "title": "MIR Fixture - Assert Generation Integrity",
+  "author": "Julesc013",
+  "description": "Validation fixture that asserts MIR generated technologies form one serial chain and do not duplicate recipe-productivity ownership.",
+  "factorio_version": "0.16",
+  "dependencies": [
+    "base >= 0.16",
+    "? space-age >= 2.1.8",
+    "more-infinite-research"
+  ]
+}

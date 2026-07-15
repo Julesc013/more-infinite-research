@@ -1,0 +1,71 @@
+---
+title: "MIR 3.0.5 Release Notes"
+status: current
+applies_to: "3.0.5"
+audience: player
+doc_type: release-plan
+owner: mir-maintainers
+last_reviewed: 2026-07-12
+supersedes: []
+superseded_by: []
+---
+
+# MIR 3.0.5 Release Notes
+
+MIR 3.0.5 is a Factorio 2.1 compatibility-hardening release. It converges portable lessons from the published 2.0, 1.1, 1.0, 0.18, and 0.17 ports into the modern MIR 3 compiler without importing lower-target metadata or removing modern features.
+
+## Player-Facing Fixes
+
+- Generated technologies no longer become unavailable because an already-enabled science recipe also appears in a disabled tutorial technology's unlock effects.
+- Generated prerequisite graphs reject missing, disabled, cyclic, science-self-locked, or structurally unreachable gates while retaining legitimate progression.
+- Required technologies and recipe unlockers now use the same researchability authority, including labs and obtainable science packs.
+- External research owners with unrecognized science ingredients no longer count as replacement coverage.
+- Multiple valid recipe unlock technologies are selected deterministically.
+- Rocket and cannon shooting-speed overlap cleanup now defaults to conditional semantic replacement coverage for new configurations.
+- Conditional cleanup accepts a registered MIR replacement only when it is enabled, reachable, infinite, owns the same ammo category, and emits a positive selected value. External-owner adoption remains exact-value policy.
+- Finite vanilla weapon technologies are never stripped. A capped, disabled, unreachable, or non-positive replacement does not count as coverage.
+- Cleanup is restricted to MIR's generated continuation; a similarly named external infinite continuation is not mutated.
+- Existing stored `off`, conditional, or `always` startup choices are not rewritten.
+- Breeding productivity no longer treats incineration sink recipes as biological production merely because their names contain `culture`.
+- Generated recipe-productivity effects are checked for valid recipe targets before MIR finishes its data stage.
+- An opt-in scope guard derives the unrestricted productivity threshold from the effective recycler return. Above `1 / return - 1`, only production recipes with a proven non-generative self-return path receive the selected higher cap. At or below the threshold, the checkbox is inert.
+- A generated-recycler return dropdown can leave returns unchanged, select a fixed return from 20% down to 0.1%, or automatically match the selected productivity cap. Automatic mode uses the exploit-safe inverse of total output: +400% becomes 20%, and +1000% becomes about 9.09%.
+- The redundant fixed 25% recycler row is no longer shown beside the unchanged 25% default. Existing `percent-25` profiles remain compatible.
+- Recycler balancing is limited to hidden generated recycling recipes. Visible processes such as scrap recycling are not changed. Recycling-category recipe productivity caps are never rewritten by either control, keeping return-rate policy separate from production-recipe cap policy.
+- With recycler returns left unchanged, the scope guard uses Factorio's normal 25% generated-recycler return as its deterministic conservative baseline, so the unrestricted threshold is +300% without altering any recycler recipe.
+- The negative machine-speed floor is independently configurable from the positive speed cap, with options from -25% down to Factorio's -99.99% prototype limit.
+- Numeric dropdowns now use consistent broad ladders: pipeline extent reaches 1000%, prototype productivity reaches +100000%, and explicit speed/quality overrides reach +25000% while preserving the engine's unchanged ceiling.
+- Every dropdown includes a clearly labeled neutral option that leaves engine or configured behavior unchanged and bypasses its optional transformation. The new lab-policy bypass never rewrites ingredients and safely omits a generated technology when Factorio cannot research that exact set.
+- The release docs include a complete inventory of all 477 Factorio 2.1 startup settings: 11 dropdowns, 85 checkboxes, 380 numeric fields, and one profile import field.
+- Portable profiles can use validated decimal percentages between or beyond the curated numeric dropdown steps. The Factorio UI remains a safe fixed menu; malformed, non-finite, wrong-sign, and out-of-range imports are ignored.
+- Module productivity now discovers final module prototypes by tier. Tier 4 and later modded module recipes receive the maintained +1% high-tier effect, including Tier 4 Modules-style prototypes without name-specific adapters.
+- An opt-in unrestricted-module setting opens all discovered module categories and five module effect types on existing recipe and receiver slots without adding slots.
+- Each generated technology exposes an effect-per-level anchor that scales related tiers proportionally without rewriting external owners. The default is the primary base-tier effect, so optional later tiers cannot produce tiny or environment-dependent defaults; scripted multiplier effects scale their delta rather than the full multiplier.
+- Settings registration no longer enters a circular module import when loading the effect-per-level controls.
+- Known competing productivity and base-extension technologies are retained until MIR has emitted complete replacement coverage. Dependents are rewired to the MIR technology only when the resulting graph is acyclic.
+- Unrestricted module permissions copy category/effect arrays per prototype, preventing later mods from mutating unrelated prototypes through aliases.
+- Scripted technology tooltips now show the selected per-level value.
+- Existing non-default base-continuation effect settings now load and scale normally during upgrades; players do not need to reset mod settings.
+
+## Maintainer Hardening
+
+- `.mir/targets.json` is the target capability authority for both Lua and PowerShell, with a generated Lua view and drift check.
+- Runtime state uses an explicit target-selected backend instead of probing a fallback global.
+- Every emitted technology is registered for final graph, science-production, lab, and effect safety checks.
+- Runtime scenarios emit atomic grouped summaries. An interrupted run remains `incomplete` instead of being mislabeled as a Factorio failure.
+- Settings profile codec behavior and reduced-target setting visibility now have separate evidence.
+- Weapon overlap has a six-case mode/coverage matrix plus an exact hidden external-owner case, an unobtainable-science negative case, and an external continuation mutation guard.
+- A dependent late-removal fixture and an exact-archive Planet Crucible 1.1.4 plus Rigor Module 1.1.7 load gate cover the reported removal lifecycle.
+- Candidate evidence is bound to the exact Git source, package-visible source fingerprint, target profile, required groups, archive content, Factorio binary, and persistent validation summary.
+- Candidate evidence also fingerprints the validation harness and declarative expected-scenario manifest. Promotion requires a clean full repository and every applicable scenario exactly once and passed.
+- Recycling safety facts now read Factorio 2.1 independent and shared product probabilities, and fixtures keep visible recycling processes outside the generated-recipe override.
+- Combination fixtures prove fixed, cap-matched, and unchanged recycler modes; checkbox-on behavior below, at, and above the inverse threshold; preservation of recycling-recipe productivity caps; and replacement of pre-existing larger production caps when the checkbox is inactive.
+- Finite Productivity Technologies 0.1.1+ cooperates through its hidden load-after dependency on MIR, allowing its final data-stage pass to cap MIR's emitted productivity technologies after selected recipe caps are visible.
+
+## Compatibility
+
+Factorio target metadata and dependencies remain on the 2.1 line. Generated technology IDs and persisted-state schemas are unchanged, so 3.0.5 adds no save migration. Space Age remains optional, and current 2.1 recipe productivity, cargo, settings-profile, prototype-limit, and scripted surfaces remain available under their existing policies.
+
+This release does not add broad overhaul support, new research families, a public plugin API, or Factorio 0.16 science identifiers. Those are separate future work with their own compatibility and versioning gates.
+
+Dynamic infinite research that rewrites placed module effects remains out of scope: Factorio 2.1 exposes no native technology modifier or runtime entity API for that behavior, and MIR does not use prototype-per-level or invisible-beacon workarounds in this RC.

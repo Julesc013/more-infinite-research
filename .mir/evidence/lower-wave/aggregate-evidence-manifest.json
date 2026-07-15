@@ -1,8 +1,8 @@
 {
   "schema": 1,
   "status": "all-copied-and-referenced-evidence-rehashed",
-  "generated_at": "2026-07-15T00:16:26.9342043Z",
-  "entry_count": 73,
+  "generated_at": "2026-07-15T00:57:09.1534666Z",
+  "entry_count": 75,
   "entries": [
     {
       "path": ".mir/evidence/0.10.0-candidate-seal.json",
@@ -363,6 +363,16 @@
       "path": ".mir/evidence/lower-wave/targets/1.7.1/target-reconstruction.json",
       "sha256": "074C0E642AA6E0A5230E48ED1480BD7BAD4B54C0EC0AB652F9671F32BC66993B",
       "size_bytes": 1401
+    },
+    {
+      "path": ".mir/evidence/lower-wave/failure-packets/post-publication-full-validation-timebox.json",
+      "sha256": "845DEC43B38F53C67DC0B4C86C70E61227F20C825A51F3F1F2F5C441742EC5B6",
+      "size_bytes": 3787
+    },
+    {
+      "path": ".mir/evidence/lower-wave/post-publication-dev-requalification.json",
+      "sha256": "181BD91723D0183A2AE70F4A8905ACB81184901DD5BBF7E67BE1C1CE5801C756",
+      "size_bytes": 7730
     },
     {
       "path": ".mir/evidence/lower-wave/aggregate-branch-origin-snapshot.json",

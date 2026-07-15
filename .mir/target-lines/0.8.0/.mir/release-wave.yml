@@ -1,0 +1,273 @@
+schema: 1
+updated_at: 2026-07-14
+policy:
+  published_archives_are_immutable: true
+  target_lines_use_independent_binary_evidence: true
+  target_local_metadata_never_returns_to_dev: true
+  graph_intelligence_starts_after_3_1_and_2_4_are_stable: true
+
+waves:
+  mir_3_0_5:
+    version: "3.0.5"
+    branch: main
+    tag: "3.0.5"
+    archive: dist/more-infinite-research_3.0.5.zip
+    sha256: 40AF95C3F4411DDF6C24C98897489D696339A1B85B0439FA4A3BDFEDDDF0E5C5
+    status: published-frozen
+
+  mir_2_3_5:
+    version: "2.3.5"
+    branch: legacy
+    source_commit: 861565d3e898166eca8920e6eade6887b7db087d
+    evidence_commit: d9171893f55cdb46167b1710c5d53faf2df54856
+    promotion_commit: 9eabc5439d3743be10c6f76d5ee36d9804a60f25
+    tag: "2.3.5"
+    archive: dist/more-infinite-research_2.3.5.zip
+    sha256: 97B3DC9B6E352C6C4B8FF76D77020333FAAFFE93BD89EDB6B8F3370405ED68DE
+    automated_gate: passed
+    exact_dist_base: passed
+    exact_dist_space_age: passed
+    upgrade_from_2_3_0: passed
+    interactive_gate: accepted-by-maintainer-directive
+    interactive_ui_observation: not-independently-performed
+    status: published-frozen
+
+  old_targets:
+    factorio_1_1:
+      branch: tmp/1.1
+      version: "1.9.4"
+      tag_commit: 426d6d48c6578a786ea7de0f224282baff9d342b
+      post_publication_commit: 1e461ecb0785ee34905ab69b1c0e8791135cf98a
+      archive_sha256: 74BA83E1F02FABBC52C09AC6144A409B243066663A6D132A47334459C2665BFB
+      github_status: published-and-verified
+      mod_portal_status: blocked-missing-upload-api-key
+      status: published-github-portal-blocked
+    factorio_1_0:
+      branch: tmp/1.0
+      version: "1.8.2"
+      tag_commit: 0a192c27674a6b13847e2f5e1b2b530e62419ee8
+      post_publication_commit: b4e0b3de2fd87683d0c0de5bedaa8e94c6c74fe2
+      archive_sha256: 676927ECF801114CA8F7B9EFD6D139906432BCC60BE26B8CA5C08842E3686EFE
+      github_status: published-and-verified
+      mod_portal_status: blocked-missing-upload-api-key
+      status: published-github-portal-blocked
+    factorio_0_18:
+      branch: tmp/0.18
+      version: "1.8.0"
+      status: frozen-verified
+    factorio_0_17:
+      branch: tmp/0.17
+      next_version: "1.7.1"
+      predecessor_version: "1.7.0"
+      predecessor_commit: 1a9b5a7b1162f8dca8125ef7bb792f57a9ae282b
+      canonical_source_anchor: 53090c6f860bf9cb9aaf10140cbfe3924ef59c6c
+      status: documented-not-started-authority-required
+    factorio_0_16:
+      branch: tmp/0.16
+      next_version: "1.6.0"
+      canonical_source_anchor: 53090c6f860bf9cb9aaf10140cbfe3924ef59c6c
+      status: documented-not-started-after-0.17
+    factorio_0_15:
+      branch: tmp/0.15
+      next_version: "1.5.0"
+      status: binary-available-proof-pending
+    factorio_0_14:
+      branch: tmp/0.14
+      next_version: "1.4.0"
+      status: discovery-pending
+    factorio_0_13:
+      branch: tmp/0.13
+      next_version: "1.3.0"
+      status: discovery-pending
+    factorio_0_12:
+      branch: tmp/0.12
+      next_version: "0.12.0"
+      status: discovery-pending
+    factorio_0_11:
+      branch: tmp/0.11
+      next_version: "0.11.0"
+      status: discovery-pending
+    factorio_0_10:
+      branch: tmp/0.10
+      next_version: "0.10.0"
+      status: discovery-pending
+    factorio_0_9:
+      branch: tmp/0.9
+      next_version: "0.9.0"
+      status: discovery-pending
+    factorio_0_8:
+      branch: tmp/0.8
+      next_version: "0.8.0"
+      status: discovery-pending
+    factorio_0_7:
+      branch: tmp/0.7
+      next_version: "0.7.0"
+      status: discovery-pending
+    factorio_0_6:
+      branch: tmp/0.6
+      next_version: "0.6.0"
+      status: discovery-pending
+
+  mir_3_1_1:
+    version: "3.1.1"
+    branch: dev
+    source_anchor_required: published-3.0.5-plus-accepted-portable-return
+    baseline_tag: pre-3.1-modernization
+    baseline_commit: f3d3b6073166b5acdc2ae5636c0d68302b757f0f
+    implementation_gate: authorized-by-maintainer-directed-continuation
+    source_commit: e91963cf5f20b7f8c785196840a6ebcae8e8dd66
+    architecture_contract: docs/architecture/automatic-family-compiler.md
+    stable_technology_id_count: 70
+    reviewed_generic_family_id_count: 0
+    experimental_generic_family_id_count: 2
+    family_rule_schema: 2
+    compatibility_pack_schema: 2
+    generation_plan_schema: 3
+    previous_candidate_commit: b9293df08f0db2863e9dbe8a5b48503b705b2630
+    previous_candidate_archive: dist/more-infinite-research_3.1.0.zip
+    previous_candidate_sha256: 25B166D56712FB85037437B073F9AC59C500EDD0A404949F94BB4A1F9637DAB3
+    previous_candidate_status: superseded-unreleased-candidate
+    integration_summary_path: .mir/evidence/3.1.0-automatic-compiler-integration-gate-summary.json
+    pre_renumber_plan_v2_characterization: .mir/evidence/pre-3.1-renumber-plan-v2-gate-summary.json
+    pre_renumber_generic_family_characterization: .mir/evidence/pre-3.1-renumber-generic-family-runtime-gate-summary.json
+    pre_renumber_coverage_characterization: .mir/evidence/pre-3.1-renumber-coverage-performance-runtime-summary.json
+    pre_renumber_rule_pack_characterization: .mir/evidence/pre-3.1-renumber-rule-pack-schema-runtime-summary.json
+    pre_renumber_core_ecosystem_load_characterization: .mir/evidence/pre-3.1-renumber-core-ecosystems-load-campaign.json
+    pre_renumber_aai_load_characterization: .mir/evidence/pre-3.1-renumber-aai-load-campaign.json
+    automatic_compiler_runtime_summary: .mir/evidence/3.1.0-automatic-compiler-runtime-summary.json
+    runtime_source_commit: e91963cf5f20b7f8c785196840a6ebcae8e8dd66
+    package_evidence_commit: e91963cf5f20b7f8c785196840a6ebcae8e8dd66
+    package_source_commit: e91963cf5f20b7f8c785196840a6ebcae8e8dd66
+    runtime_scenario_count: 90
+    structured_validation_evidence: .mir/evidence/3.1.1-galore-hotfix-validation-summary.json
+    emergency_validation_basis: 89-existing-full-scenarios-passed-plus-separate-galore-hotfix-scenario-passed
+    upgrade_evidence: pending
+    available_ecosystem_load_evidence: pending
+    available_ecosystem_load_gate: pending-hotfix-recheck
+    runtime_package_sha256: FAAA6AA3DAC2206014E008E4BCB2F9329E050897585224251292F41DED1907B5
+    current_archive_ecosystem_load_gate: accepted-emergency-release-basis
+    renumbered_static_gate: passed-with-hotfix-summary
+    renumbered_runtime_gate: passed-89-existing-plus-1-hotfix
+    exact_package_gate: pending-hotfix-recheck
+    upgrade_from_3_0_5: pending-hotfix-recheck
+    candidate_freshness_gate: rebuilding-after-package-visible-change
+    interactive_gate: accepted-by-maintainer
+    publication_status: published
+    tag: "3.1.1"
+    status: published
+
+  mir_3_1_2:
+    version: "3.1.2"
+    branch: dev
+    source_anchor_required: published-3.1.1
+    baseline_tag: "3.1.1"
+    baseline_commit: e91963cf5f20b7f8c785196840a6ebcae8e8dd66
+    implementation_gate: emergency-hotfix-authorized-by-maintainer
+    source_commit: b36996a30bf2def7d163c2f70472f3cc68ad92f6
+    architecture_contract: docs/architecture/module-boundaries.md
+    stable_technology_id_count: 70
+    generation_plan_schema: 3
+    runtime_scenario_count: 91
+    runtime_source_commit: b36996a30bf2def7d163c2f70472f3cc68ad92f6
+    package_source_commit: b36996a30bf2def7d163c2f70472f3cc68ad92f6
+    runtime_run_id: e25e2985-9285-4aa7-9175-1b0f29ceb61f
+    runtime_package_sha256: D5BFA665DAF813718E4B6E948497FEC885B6A58F11E0C1FB6E1177807D9525F5
+    structured_validation_evidence: .mir/evidence/3.1.2-rc1-validation-summary.json
+    upgrade_evidence: .mir/evidence/3.1.2-rc1/upgrade-proof.json
+    available_ecosystem_load_evidence: .mir/evidence/3.1.2-rc1-ecosystem/campaign-evidence.json
+    available_ecosystem_load_gate: 9-passed-zero-dependency-failures-load-claims-only
+    exact_package_gate: passed-base-space-age-and-deterministic-archive
+    candidate_freshness_gate: passed
+    interactive_gate: pending
+    publication_status: unreleased
+    status: release-candidate-awaiting-manual-review
+
+  mir_3_1_5:
+    version: "3.1.5"
+    branch: main
+    source_anchor_required: qualified-3.1.2-plus-complete-portable-return
+    source_commit: c8bf4a742910cec9d6d3dee305c83deba1aa49eb
+    package_source_commit: c8bf4a742910cec9d6d3dee305c83deba1aa49eb
+    automatic_compiler_control_schema: 2
+    compiler_provider_schema: 1
+    reviewed_generic_family_id_count: 0
+    experimental_generic_family_id_count: 2
+    runtime_scenario_count: 91
+    runtime_run_id: 9d8a4f7b-e0bc-4245-8dcc-2c6338709aaa
+    runtime_package_sha256: 8861E25FAAC472EDE9F32FE1C051A623A59177F5E092A3B1DC0B9FF2B3D47C50
+    structured_validation_evidence: .mir/evidence/3.1.5-rc5-validation-summary.json
+    upgrade_evidence: .mir/evidence/3.1.5-upgrade-from-3.1.2-automatic-compiler-proof.json
+    additional_upgrade_evidence: .mir/evidence/3.1.5-upgrade-from-3.0.5-proof.json
+    available_ecosystem_load_evidence: .mir/evidence/3.1.5-rc5-ecosystem/campaign-evidence.json
+    available_ecosystem_load_gate: 9-passed-zero-dependency-failures-load-claims-only
+    exact_package_gate: passed-base-space-age-deterministic-and-forbidden-entry-check
+    candidate_freshness_gate: passed
+    interactive_gate: accepted-for-publication
+    publication_status: published
+    tag: "3.1.5"
+    status: published-frozen
+
+  mir_3_1_9:
+    version: "3.1.9"
+    branch: main
+    development_branch: dev
+    synthesis_branch: tmp/3.1.9-synthesis
+    source_anchor_required: released-3.1.5-plus-complete-portable-return
+    source_commit: 79df29b50ea9b855b8665d6c9a3d8295806acde0
+    package_source_commit: 79df29b50ea9b855b8665d6c9a3d8295806acde0
+    release_candidate_commit: f81af94c9a16666be8f5902bb5653aeea57033ba
+    native_owner_binding_schema: 2
+    assurance_evidence_schema: 2
+    museum_compiler_schema: 1
+    runtime_scenario_count: 102
+    runtime_package_sha256: D77B3A78DA40CD4FDD4C829A01B5030E59FB593F3387124EF5C438F6A9E8DFCD
+    structured_validation_evidence: .mir/evidence/3.1.9/final-release-qualification.json
+    broad_qualification_evidence: .mir/evidence/3.1.9/qualification-summary.json
+    harness_refresh_evidence: .mir/evidence/3.1.9/harness-refresh-validation.json
+    upgrade_evidence: .mir/evidence/3.1.9/upgrade-from-3.1.5-proof.json
+    additional_upgrade_evidence:
+      - .mir/evidence/3.1.9/upgrade-from-3.1.2-proof.json
+      - .mir/evidence/3.1.9/upgrade-from-3.0.5-proof.json
+    available_ecosystem_load_evidence: .mir/evidence/3.1.9/harness-refresh-exact-ecosystem-campaign.json
+    available_ecosystem_load_gate: exact-final-archive-bz-suite-passed-plus-retained-9-scenario-campaign
+    exact_package_gate: passed-disabled-science-regression-base-space-age-deterministic-and-forbidden-entry-check
+    assurance_seal: .mir/evidence/candidate-seals/mir-3.1.9-factorio-2.1.json
+    seal_source_commit: f81af94c9a16666be8f5902bb5653aeea57033ba
+    candidate_freshness_gate: passed
+    interactive_gate: pending-maintainer
+    publication_status: unreleased
+    status: release-candidate-awaiting-manual-review
+
+  mir_2_4_0:
+    version: "2.4.0"
+    branch: legacy
+    package_source_commit: 01efb39a7476cc5e5f7e173edbb244e70f7a8e96
+    seal_source_commit: f6a5dfeb4dea18ee70bbaa17acbd4433f1396e6e
+    promotion_commit: 584b398f98d3e317fac31cba63edcb11360a5bb1
+    archive: dist/more-infinite-research_2.4.0.zip
+    sha256: 4BA19EA071E6359BC25C58CCD8F65CAF81B4AA675496E2F53175A996C791470C
+    package_content_sha256: F681FF5C331FC45EAFF31823BC9D9441A100C75FD5D412DE1C37DC828DE00775
+    publication_status: published
+    tag: "2.4.0"
+    status: published-frozen
+
+  mir_2_4_5:
+    version: "2.4.5"
+    branch: legacy
+    development_branch: tmp/2.0
+    target_factorio: "2.0"
+    release_candidate_commit: 7e4b6c530cfcc5b2e1429c4e9f4ccb0d6d3b42a4
+    source_commit: 47bcc80c8a70b41dbbb4f8d80b2b9433d0a10d3f
+    archive_location: "legacy:dist/more-infinite-research_2.4.5.zip"
+    sha256: 7649824B72247AA38F05661422DFDEE7C729B21CC73A0A35D2455443B45D39F8
+    package_content_sha256: 5B8E21077CAC99CDB0733EBE8B34D10D0F375B2EAB2D42E60A73677860783FED
+    size_bytes: 406238
+    entries: 167
+    forbidden_entries: 0
+    evidence_location: "legacy:.mir/evidence/2.4.5-change-aware-qualification.json"
+    seal_location: "legacy:.mir/evidence/candidate-seals/mir-2.4.5-factorio-2.0.json"
+    seal_source_commit: 9cfa77c33a635c24f0d4ea458d317cddfa9e325f
+    automated_gate: passed-change-aware
+    interactive_gate: pending-maintainer
+    publication_status: unreleased
+    status: sealed-release-candidate-on-legacy

@@ -1,0 +1,4 @@
+# Project-scoped defaults for trusted local MIR work.
+
+[projects."."]
+trusted = true

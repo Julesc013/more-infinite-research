@@ -356,6 +356,7 @@ Invoke-RepoCheck "local image assets have source notes and do not bundle Space A
         $extension = $_.Extension.ToLowerInvariant()
         $imageExtensions -contains $extension `
           -and -not $relative.StartsWith(".git/") `
+          -and -not $relative.StartsWith(".mir/target-lines/") `
           -and -not $relative.StartsWith("artifacts/") `
           -and -not $relative.StartsWith("build/") `
           -and -not $relative.StartsWith("dist/") `

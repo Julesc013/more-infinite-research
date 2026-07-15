@@ -1,0 +1,13 @@
+{
+  "name": "mir-fixture-assert-lab-productivity-owner-skip",
+  "version": "0.1.0",
+  "title": "MIR Fixture - Assert Lab Productivity Owner Skip",
+  "author": "Julesc013",
+  "description": "Validation fixture that asserts MIR skips lab productivity when laboratory-productivity-4 has the expected native effect.",
+  "factorio_version": "0.14",
+  "dependencies": [
+    "base >= 0.14",
+    "more-infinite-research",
+    "mir-fixture-lab-productivity-owner"
+  ]
+}

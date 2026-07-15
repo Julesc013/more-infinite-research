@@ -1,0 +1,11 @@
+{
+  "name": "mir-fixture-lab-productivity-owner",
+  "version": "0.1.0",
+  "title": "MIR Fixture - Lab Productivity Owner",
+  "author": "Julesc013",
+  "description": "Validation fixture that creates an external infinite laboratory productivity owner.",
+  "factorio_version": "2.1",
+  "dependencies": [
+    "base >= 2.1.8"
+  ]
+}

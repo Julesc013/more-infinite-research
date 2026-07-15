@@ -1,0 +1,418 @@
+{
+  "schema": 1,
+  "kind": "mir-target-balance-report",
+  "version": "1.9.4",
+  "target": "1.1",
+  "status": "passed",
+  "stream_count": 11,
+  "invariants": {
+    "invalid_formula_count": 0,
+    "nonpositive_cost_count": 0,
+    "unexplained_default_change_count": 0,
+    "unreachable_prerequisite_count": 0,
+    "unavailable_science_count": 0,
+    "duplicate_effect_owner_count": 0
+  },
+  "rows": [
+    {
+      "stream_id": "research_inventory_capacity",
+      "technology_id": "recipe-prod-research_inventory_capacity-1",
+      "classification": "adapted",
+      "starting_level": 1,
+      "maximum_level": "infinite",
+      "cost_formula": "8000*1.1^(L-1)",
+      "research_time": 60,
+      "science_packs": [
+        "utility-science-pack",
+        "military-science-pack"
+      ],
+      "prerequisites": [
+        "target-discovered"
+      ],
+      "effect": "character inventory +1; logistic trash +1",
+      "setting_source": "prototypes/mir/settings/defaults.lua",
+      "previous_candidate_value": {
+        "numeric_formula": "8000*1.1^(L-1)",
+        "status": "superseded-unqualified-projection"
+      },
+      "new_candidate_value": {
+        "numeric_formula": "8000*1.1^(L-1)",
+        "science_packs": [
+          "utility-science-pack",
+          "military-science-pack"
+        ],
+        "prerequisites": [
+          "target-discovered"
+        ]
+      },
+      "change_rationale": "Retain reviewed numeric balance while applying target-valid science, prerequisites, effects, and ownership."
+    },
+    {
+      "stream_id": "research_robot_battery",
+      "technology_id": "recipe-prod-research_robot_battery-1",
+      "classification": "adapted",
+      "starting_level": 1,
+      "maximum_level": "infinite",
+      "cost_formula": "8000*1.2^(L-1)",
+      "research_time": 60,
+      "science_packs": [
+        "target-discovered"
+      ],
+      "prerequisites": [
+        "target-discovered"
+      ],
+      "effect": "worker robot battery +0.10",
+      "setting_source": "prototypes/mir/settings/defaults.lua",
+      "previous_candidate_value": {
+        "numeric_formula": "8000*1.2^(L-1)",
+        "status": "superseded-unqualified-projection"
+      },
+      "new_candidate_value": {
+        "numeric_formula": "8000*1.2^(L-1)",
+        "science_packs": [
+          "target-discovered"
+        ],
+        "prerequisites": [
+          "target-discovered"
+        ]
+      },
+      "change_rationale": "Retain reviewed numeric balance while applying target-valid science, prerequisites, effects, and ownership."
+    },
+    {
+      "stream_id": "research_lab_productivity",
+      "technology_id": "recipe-prod-research_lab_productivity-1",
+      "classification": "adapted",
+      "starting_level": 1,
+      "maximum_level": "infinite",
+      "cost_formula": "1000*1.2^(L-1)",
+      "research_time": 120,
+      "science_packs": [
+        "automation-science-pack",
+        "logistic-science-pack",
+        "military-science-pack",
+        "chemical-science-pack",
+        "production-science-pack",
+        "utility-science-pack",
+        "space-science-pack"
+      ],
+      "prerequisites": [
+        "target-discovered"
+      ],
+      "effect": "laboratory productivity +0.10",
+      "setting_source": "prototypes/mir/settings/defaults.lua",
+      "previous_candidate_value": {
+        "numeric_formula": "1000*1.2^(L-1)",
+        "status": "superseded-unqualified-projection"
+      },
+      "new_candidate_value": {
+        "numeric_formula": "1000*1.2^(L-1)",
+        "science_packs": [
+          "automation-science-pack",
+          "logistic-science-pack",
+          "military-science-pack",
+          "chemical-science-pack",
+          "production-science-pack",
+          "utility-science-pack",
+          "space-science-pack"
+        ],
+        "prerequisites": [
+          "target-discovered"
+        ]
+      },
+      "change_rationale": "Retain reviewed numeric balance while applying target-valid science, prerequisites, effects, and ownership."
+    },
+    {
+      "stream_id": "research_rocket_shooting_speed",
+      "technology_id": "recipe-prod-research_rocket_shooting_speed-1",
+      "classification": "adapted",
+      "starting_level": 1,
+      "maximum_level": "infinite",
+      "cost_formula": "60*1.5^(L-1)",
+      "research_time": 60,
+      "science_packs": [
+        "automation-science-pack",
+        "logistic-science-pack",
+        "chemical-science-pack",
+        "production-science-pack",
+        "military-science-pack"
+      ],
+      "prerequisites": [
+        "rocketry"
+      ],
+      "effect": "rocket gun speed +0.10",
+      "setting_source": "prototypes/mir/settings/defaults.lua",
+      "previous_candidate_value": {
+        "numeric_formula": "60*1.5^(L-1)",
+        "status": "superseded-unqualified-projection"
+      },
+      "new_candidate_value": {
+        "numeric_formula": "60*1.5^(L-1)",
+        "science_packs": [
+          "automation-science-pack",
+          "logistic-science-pack",
+          "chemical-science-pack",
+          "production-science-pack",
+          "military-science-pack"
+        ],
+        "prerequisites": [
+          "rocketry"
+        ]
+      },
+      "change_rationale": "Retain reviewed numeric balance while applying target-valid science, prerequisites, effects, and ownership."
+    },
+    {
+      "stream_id": "research_cannon_shooting_speed",
+      "technology_id": "recipe-prod-research_cannon_shooting_speed-1",
+      "classification": "adapted",
+      "starting_level": 1,
+      "maximum_level": "infinite",
+      "cost_formula": "60*1.5^(L-1)",
+      "research_time": 60,
+      "science_packs": [
+        "automation-science-pack",
+        "logistic-science-pack",
+        "chemical-science-pack",
+        "production-science-pack",
+        "military-science-pack"
+      ],
+      "prerequisites": [
+        "weapon-shooting-speed-5",
+        "tank|tanks"
+      ],
+      "effect": "cannon-shell gun speed +0.10",
+      "setting_source": "prototypes/mir/settings/defaults.lua",
+      "previous_candidate_value": {
+        "numeric_formula": "60*1.5^(L-1)",
+        "status": "superseded-unqualified-projection"
+      },
+      "new_candidate_value": {
+        "numeric_formula": "60*1.5^(L-1)",
+        "science_packs": [
+          "automation-science-pack",
+          "logistic-science-pack",
+          "chemical-science-pack",
+          "production-science-pack",
+          "military-science-pack"
+        ],
+        "prerequisites": [
+          "weapon-shooting-speed-5",
+          "tank|tanks"
+        ]
+      },
+      "change_rationale": "Retain reviewed numeric balance while applying target-valid science, prerequisites, effects, and ownership."
+    },
+    {
+      "stream_id": "research_flamethrower_shooting_speed",
+      "technology_id": "recipe-prod-research_flamethrower_shooting_speed-1",
+      "classification": "adapted",
+      "starting_level": 1,
+      "maximum_level": "infinite",
+      "cost_formula": "60*1.5^(L-1)",
+      "research_time": 60,
+      "science_packs": [
+        "automation-science-pack",
+        "logistic-science-pack",
+        "chemical-science-pack",
+        "production-science-pack",
+        "military-science-pack",
+        "space-science-pack"
+      ],
+      "prerequisites": [
+        "flamethrower"
+      ],
+      "effect": "flamethrower gun speed +0.10",
+      "setting_source": "prototypes/mir/settings/defaults.lua",
+      "previous_candidate_value": {
+        "numeric_formula": "60*1.5^(L-1)",
+        "status": "superseded-unqualified-projection"
+      },
+      "new_candidate_value": {
+        "numeric_formula": "60*1.5^(L-1)",
+        "science_packs": [
+          "automation-science-pack",
+          "logistic-science-pack",
+          "chemical-science-pack",
+          "production-science-pack",
+          "military-science-pack",
+          "space-science-pack"
+        ],
+        "prerequisites": [
+          "flamethrower"
+        ]
+      },
+      "change_rationale": "Retain reviewed numeric balance while applying target-valid science, prerequisites, effects, and ownership."
+    },
+    {
+      "stream_id": "research_electric_shooting_speed",
+      "technology_id": "recipe-prod-research_electric_shooting_speed-1",
+      "classification": "adapted",
+      "starting_level": 1,
+      "maximum_level": "infinite",
+      "cost_formula": "60*1.5^(L-1)",
+      "research_time": 60,
+      "science_packs": [
+        "automation-science-pack",
+        "logistic-science-pack",
+        "chemical-science-pack",
+        "production-science-pack",
+        "military-science-pack"
+      ],
+      "prerequisites": [
+        "discharge-defense-equipment"
+      ],
+      "effect": "electric gun speed +0.10",
+      "setting_source": "prototypes/mir/settings/defaults.lua",
+      "previous_candidate_value": {
+        "numeric_formula": "60*1.5^(L-1)",
+        "status": "superseded-unqualified-projection"
+      },
+      "new_candidate_value": {
+        "numeric_formula": "60*1.5^(L-1)",
+        "science_packs": [
+          "automation-science-pack",
+          "logistic-science-pack",
+          "chemical-science-pack",
+          "production-science-pack",
+          "military-science-pack"
+        ],
+        "prerequisites": [
+          "discharge-defense-equipment"
+        ]
+      },
+      "change_rationale": "Retain reviewed numeric balance while applying target-valid science, prerequisites, effects, and ownership."
+    },
+    {
+      "stream_id": "research_character_mining_speed",
+      "technology_id": "recipe-prod-research_character_mining_speed-1",
+      "classification": "adapted",
+      "starting_level": 1,
+      "maximum_level": "infinite",
+      "cost_formula": "8000*2^(L-1)",
+      "research_time": 60,
+      "science_packs": [
+        "utility-science-pack",
+        "military-science-pack"
+      ],
+      "prerequisites": [
+        "target-discovered"
+      ],
+      "effect": "character mining speed +0.05",
+      "setting_source": "prototypes/mir/settings/defaults.lua",
+      "previous_candidate_value": {
+        "numeric_formula": "8000*2^(L-1)",
+        "status": "superseded-unqualified-projection"
+      },
+      "new_candidate_value": {
+        "numeric_formula": "8000*2^(L-1)",
+        "science_packs": [
+          "utility-science-pack",
+          "military-science-pack"
+        ],
+        "prerequisites": [
+          "target-discovered"
+        ]
+      },
+      "change_rationale": "Retain reviewed numeric balance while applying target-valid science, prerequisites, effects, and ownership."
+    },
+    {
+      "stream_id": "research_character_crafting_speed",
+      "technology_id": "recipe-prod-research_character_crafting_speed-1",
+      "classification": "adapted",
+      "starting_level": 1,
+      "maximum_level": "infinite",
+      "cost_formula": "8000*2^(L-1)",
+      "research_time": 60,
+      "science_packs": [
+        "utility-science-pack",
+        "military-science-pack"
+      ],
+      "prerequisites": [
+        "target-discovered"
+      ],
+      "effect": "character crafting speed +0.05",
+      "setting_source": "prototypes/mir/settings/defaults.lua",
+      "previous_candidate_value": {
+        "numeric_formula": "8000*2^(L-1)",
+        "status": "superseded-unqualified-projection"
+      },
+      "new_candidate_value": {
+        "numeric_formula": "8000*2^(L-1)",
+        "science_packs": [
+          "utility-science-pack",
+          "military-science-pack"
+        ],
+        "prerequisites": [
+          "target-discovered"
+        ]
+      },
+      "change_rationale": "Retain reviewed numeric balance while applying target-valid science, prerequisites, effects, and ownership."
+    },
+    {
+      "stream_id": "research_character_walking_speed",
+      "technology_id": "recipe-prod-research_character_walking_speed-1",
+      "classification": "adapted",
+      "starting_level": 1,
+      "maximum_level": "infinite",
+      "cost_formula": "8000*2^(L-1)",
+      "research_time": 60,
+      "science_packs": [
+        "utility-science-pack",
+        "military-science-pack"
+      ],
+      "prerequisites": [
+        "target-discovered"
+      ],
+      "effect": "character running speed +0.05",
+      "setting_source": "prototypes/mir/settings/defaults.lua",
+      "previous_candidate_value": {
+        "numeric_formula": "8000*2^(L-1)",
+        "status": "superseded-unqualified-projection"
+      },
+      "new_candidate_value": {
+        "numeric_formula": "8000*2^(L-1)",
+        "science_packs": [
+          "utility-science-pack",
+          "military-science-pack"
+        ],
+        "prerequisites": [
+          "target-discovered"
+        ]
+      },
+      "change_rationale": "Retain reviewed numeric balance while applying target-valid science, prerequisites, effects, and ownership."
+    },
+    {
+      "stream_id": "research_character_reach",
+      "technology_id": "recipe-prod-research_character_reach-1",
+      "classification": "adapted",
+      "starting_level": 1,
+      "maximum_level": "infinite",
+      "cost_formula": "8000*2^(L-1)",
+      "research_time": 60,
+      "science_packs": [
+        "utility-science-pack",
+        "military-science-pack"
+      ],
+      "prerequisites": [
+        "target-discovered"
+      ],
+      "effect": "reach/build/resource/drop distance +10",
+      "setting_source": "prototypes/mir/settings/defaults.lua",
+      "previous_candidate_value": {
+        "numeric_formula": "8000*2^(L-1)",
+        "status": "superseded-unqualified-projection"
+      },
+      "new_candidate_value": {
+        "numeric_formula": "8000*2^(L-1)",
+        "science_packs": [
+          "utility-science-pack",
+          "military-science-pack"
+        ],
+        "prerequisites": [
+          "target-discovered"
+        ]
+      },
+      "change_rationale": "Retain reviewed numeric balance while applying target-valid science, prerequisites, effects, and ownership."
+    }
+  ],
+  "fingerprint_sha256": "C1C97F51E0E21E8E0D40F972EB0347E58CF425402711CB7DE9D22F5B111F7A96"
+}

@@ -1,0 +1,237 @@
+schema: 1
+
+canonical_machine_record: fixtures/compat-matrix/claims.json
+canonical_support_lanes: fixtures/compat-matrix/support-lanes.json
+lua_report_registry: prototypes/mir/compatibility/claim_registry.lua
+target_docs_root: docs/compatibility/targets
+
+compatibility_packs:
+  schema: 2
+  validator: prototypes/mir/compatibility/packs/schema.lua
+  registry: prototypes/mir/compatibility/packs/registry.lua
+  external_transport: more-infinite-research-compatibility-pack
+  fixture_only_profiles_allowed_in_production_registry: false
+
+technology_prerequisite_cycle_repairs:
+  - id: muluna-astroponics-space-science-cycle
+    required_mods:
+      - astroponics
+      - planet-muluna
+    trigger: astroponics-requires-space-science-and-space-science-transitively-requires-astroponics
+    mutation: remove-only-astroponics-to-space-science-prerequisite
+    implementation: prototypes/mir/compatibility/repairs/technology_prerequisite_cycles.lua
+    fixture: fixtures/external-technology-cycle
+    claim_level: diagnostic-only
+    public_scope: bounded startup-cycle interoperability repair only
+
+campaigns:
+  evidence_contract: mir-modpack-campaign-evidence-v1
+  exact_mir_archive_sha256_required: true
+  exact_mir_source_commit_required: true
+  dependency_lock_sha256_required: true
+  actual_executed_roots_required: true
+  root_versions_required: true
+  resolved_archive_sha256_required: true
+  result_and_claim_level_required: true
+  mega_smash_qualifies_individual_ecosystems: false
+  current_load_evidence:
+    - .mir/evidence/3.2.0-bz-bob-load-campaign-summary.json
+
+claims:
+  allowed_levels:
+    - loads
+    - observed
+    - cooperates
+    - diagnostic-only
+    - partial-support
+    - full-family-support
+    - full-pack-support
+
+targets:
+  docs_root: docs/compatibility/targets
+  records:
+    air-scrubbing:
+      mod: atan-air-scrubbing
+      doc: docs/compatibility/targets/atan-air-scrubbing.md
+      claim_level: full-family-support
+      public_claim: clean-filter crafting productivity only
+      fixtures:
+        - fixtures/air-scrubbing
+        - fixtures/assert-air-scrubbing-clean-filter
+      streams:
+        - mir-prod-air-scrubbing-clean-filter
+      generated:
+        - atan-pollution-filter
+        - atan-spore-filter
+      diagnostic_only:
+        - scrubbing-environmental
+        - cleaning-recovery
+
+    atan-ash:
+      mod: atan-ash
+      doc: docs/compatibility/targets/atan-ash.md
+      claim_level: full-family-support
+      public_claim: ash separation productivity only
+      fixtures:
+        - fixtures/atan-ash
+        - fixtures/assert-atan-ash-separation
+      streams:
+        - mir-prod-atan-ash-separation
+      generated:
+        - atan-ash-seperation
+      diagnostic_only:
+        - ash-sinks
+        - tile-surface
+        - resource-recovery
+      schema_repairs:
+        - factorio_2_1_recipe_schema:atan-ash_2.2.1
+
+    atan-nuclear-science:
+      mod: atan-nuclear-science
+      doc: docs/compatibility/targets/atan-nuclear-science.md
+      claim_level: partial-support
+      public_claim: science-pack recipe productivity only
+      fixtures:
+        - fixtures/atan-nuclear-science
+        - fixtures/assert-atan-nuclear-science-productivity
+      streams: []
+      generated_through_existing_stream: research_science_pack_productivity
+      diagnostic_only:
+        - atom-forge-crafting
+      schema_repairs:
+        - factorio_2_1_recipe_schema:atan-nuclear-science_0.3.3
+
+    aai-loaders:
+      mod: aai-loaders
+      doc: docs/compatibility/targets/aai-loaders.md
+      claim_level: partial-support
+      public_claim: loader crafting productivity only
+      fixtures:
+        - fixtures/aai-loaders
+        - fixtures/assert-aai-loader-belt-productivity
+      streams: []
+      generated_through_existing_stream: research_belts
+      diagnostic_only:
+        - loader-throughput
+        - loader-modes
+        - compatibility-hooks
+
+    big-mining-drill:
+      mod: big-mining-drill
+      doc: docs/compatibility/targets/big-mining-drill.md
+      claim_level: partial-support
+      public_claim: mining drill recipe productivity only
+      fixtures:
+        - fixtures/big-mining-drill
+        - fixtures/assert-big-mining-drill-productivity
+      streams: []
+      generated_through_existing_stream: research_mining_drill
+      diagnostic_only:
+        - native-mining-yield-productivity
+
+    modules-t4:
+      mod: modules-t4
+      doc: docs/compatibility/targets/modules-t4.md
+      claim_level: partial-support
+      public_claim: module recipe productivity by final prototype tier
+      fixtures:
+        - fixtures/assert-prototype-limits
+      named_load_checks:
+        - modules-t4_2.2.2 source archive on Factorio 2.1.9
+      streams: []
+      generated_through_existing_stream: research_modules
+      diagnostic_only:
+        - dynamic-module-effect-research
+        - module-effect-mutation
+
+    finite-prod-techs:
+      mod: finite_prod_techs
+      doc: docs/compatibility/targets/finite-prod-techs.md
+      claim_level: cooperates
+      public_claim: load-after finite productivity cap post-processing
+      named_load_checks:
+        - finite_prod_techs_0.1.1 source archive on Factorio 2.1.9
+      streams: []
+      diagnostic_only:
+        - finite-level-formula-ownership
+
+    fluid-must-flow:
+      mod: FluidMustFlow
+      doc: docs/compatibility/targets/fluid-must-flow.md
+      claim_level: diagnostic-only
+      public_claim: pipeline coexistence only
+      named_load_checks:
+        - release-targeted local repair check
+      streams: []
+      diagnostic_only:
+        - duct-behavior
+        - fluid-logistics
+
+    robot-attrition:
+      mod: robot_attrition
+      doc: docs/compatibility/targets/robot-attrition.md
+      claim_level: diagnostic-only
+      public_claim: runtime balance coexistence only
+      named_load_checks:
+        - release-targeted local repair check
+      streams: []
+      diagnostic_only:
+        - robot-crash-behavior
+        - attrition-behavior
+        - recovery-behavior
+
+    jetpack:
+      mod: jetpack
+      doc: docs/compatibility/targets/jetpack.md
+      claim_level: diagnostic-only
+      public_claim: equipment content coexistence only
+      named_load_checks:
+        - release-targeted local repair check
+      streams: []
+      diagnostic_only:
+        - runtime-movement
+        - fuel-behavior
+        - equipment-behavior
+
+    equipment-gantry:
+      mod: equipment-gantry
+      doc: docs/compatibility/targets/equipment-gantry.md
+      claim_level: diagnostic-only
+      public_claim: equipment-grid automation coexistence only
+      named_load_checks:
+        - release-targeted local repair check
+      streams: []
+      diagnostic_only:
+        - gantry-insertion
+        - gantry-removal
+        - item-grid-processing
+
+    aai-containers:
+      mod: aai-containers
+      doc: docs/compatibility/targets/aai-containers.md
+      claim_level: diagnostic-only
+      public_claim: storage content coexistence only
+      named_load_checks:
+        - release-targeted local repair check
+      streams: []
+      diagnostic_only:
+        - warehouse-productivity
+        - container-productivity
+
+    aai-industry:
+      mod: aai-industry
+      doc: docs/compatibility/targets/aai-industry.md
+      claim_level: observed
+      public_claim: mini-overhaul tuning profile
+      named_load_checks:
+        - release-targeted local repair check
+      streams: []
+      diagnostic_only:
+        - broad-aai-suite-support
+
+rules:
+  - every public compatibility claim has a compatibility page
+  - every generated stream in a claim exists in the stream manifest
+  - full-family support requires fixture evidence
+  - full-pack support requires a locked behavior matrix
+  - public text must describe the tested family, not broad external mod support

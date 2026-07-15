@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "status": "passed",
+  "generated_at": "2026-07-14T16:42:57.0118330Z",
+  "git_commit": "4ae05150bb1a67bb13ed9e8f121de5e655c7626a",
+  "factorio_binary_version": "1.0.0.54889",
+  "from": {
+    "version": "1.8.1",
+    "path": "dist\\more-infinite-research_1.8.1.zip",
+    "sha256": "B1622AB0BC6D72265842D698781DBE21B7286662E29FB6992057FBCFF87D8E29"
+  },
+  "to": {
+    "version": "1.8.2",
+    "path": "dist\\more-infinite-research_1.8.2.zip",
+    "sha256": "676927ECF801114CA8F7B9EFD6D139906432BCC60BE26B8CA5C08842E3686EFE"
+  },
+  "assertions": [
+    "startup-setting-retained",
+    "generated-technology-level-retained",
+    "current-research-retained",
+    "fractional-research-progress-retained",
+    "global-runtime-state-retained",
+    "exact-candidate-normal-mod-directory-load"
+  ],
+  "create_log": "1.8.2-upgrade-from-1.8.1-create.txt",
+  "load_log": "1.8.2-upgrade-from-1.8.1-load.txt"
+}

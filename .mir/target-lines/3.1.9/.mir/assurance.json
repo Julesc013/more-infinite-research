@@ -1,0 +1,88 @@
+{
+  "schema": 1,
+  "default_target": "2.1",
+  "profiles": {
+    "edit": ["static.architecture", "static.compiler"],
+    "fast": ["tooling.self-test", "static.architecture", "static.compiler", "static.settings", "static.balance", "static.museum", "static.package"],
+    "auto": [],
+    "locale": ["static.locales", "runtime.exact-zip"],
+    "balance": ["static.balance", "runtime.affected"],
+    "refactor-equivalence": ["static.compiler", "static.package", "runtime.exact-zip"],
+    "hotfix": ["static.full", "runtime.affected", "runtime.exact-zip"],
+    "targeted": ["static.full", "runtime.affected", "runtime.exact-zip"],
+    "full": ["tooling.self-test", "static.balance", "static.museum", "runtime.full", "runtime.exact-zip", "runtime.upgrade", "runtime.ecosystem"],
+    "backport": ["tooling.self-test", "static.balance", "static.museum", "runtime.full", "runtime.exact-zip", "runtime.upgrade", "runtime.ecosystem"],
+    "promotion-check": ["seal.verify"]
+  },
+  "classes": [
+    {
+      "id": "runtime-or-migration",
+      "patterns": ["^control\\.lua$", "^migrations/", "^prototypes/mir/runtime/", "^prototypes/mir/stage/control\\.lua$"],
+      "tests": ["static.full", "runtime.full", "runtime.upgrade"]
+    },
+    {
+      "id": "settings",
+      "patterns": ["^settings", "^prototypes/mir/settings/", "^\\.mir/settings\\.yml$"],
+      "tests": ["static.settings", "static.locales", "static.compiler", "runtime.affected", "runtime.upgrade", "runtime.exact-zip"]
+    },
+    {
+      "id": "compiler-data-stage",
+      "patterns": ["^data", "^prototypes/", "^\\.mir/(modules|streams|compatibility|capabilities)\\.yml$"],
+      "tests": ["static.compiler", "static.architecture", "static.package", "runtime.affected", "runtime.exact-zip"]
+    },
+    {
+      "id": "balance",
+      "patterns": ["^prototypes/mir/planner/costs\\.lua$", "^prototypes/streams/", "^prototypes/mir/domain/native_owner/", "^prototypes/mir/planner/native_owner_binding\\.lua$", "^prototypes/mir/emit/transactions/productivity_family_adoption\\.lua$", "^\\.mir/native-owner-cost-models\\.json$", "^\\.mir/performance-budgets\\.json$"],
+      "tests": ["static.balance", "static.compiler", "runtime.affected", "runtime.exact-zip"]
+    },
+    {
+      "id": "locale",
+      "patterns": ["^locale/"],
+      "tests": ["static.locales", "static.package", "runtime.exact-zip"]
+    },
+    {
+      "id": "metadata-dependencies",
+      "patterns": ["^info\\.json$"],
+      "tests": ["static.package", "runtime.full", "runtime.upgrade", "runtime.exact-zip"]
+    },
+    {
+      "id": "packaged-non-runtime",
+      "patterns": ["^(README\\.md|changelog\\.txt|thumbnail\\.png|LICENSE)$"],
+      "tests": ["static.package", "runtime.exact-zip"]
+    },
+    {
+      "id": "test-harness",
+      "patterns": ["^scripts/", "^fixtures/", "^\\.mir/test", "^\\.github/workflows/"],
+      "tests": ["tooling.self-test", "static.full", "runtime.affected"]
+    },
+    {
+      "id": "museum-tooling",
+      "patterns": ["^\\.mir/museum-targets\\.json$", "^scripts/(Build-MIRMuseumTarget|New-MIRMuseum|Test-MIRMuseum)", "^scripts/Museum/"],
+      "tests": ["static.museum"]
+    },
+    {
+      "id": "repository-docs",
+      "patterns": ["^docs/", "^CONTRIBUTING\\.md$", "^todo\\.md$", "^AGENTS\\.md$"],
+      "tests": ["docs.check", "seal.verify"]
+    },
+    {
+      "id": "release-evidence",
+      "patterns": ["^\\.mir/evidence/", "^dist/"],
+      "tests": ["seal.verify"]
+    }
+  ],
+  "unknown_policy": {
+    "tests": ["static.full", "runtime.full", "runtime.upgrade", "runtime.ecosystem"],
+    "reason": "Unclassified inputs conservatively invalidate the full target gate."
+  },
+  "fingerprints": {
+    "package_source": true,
+    "package_content": true,
+    "test_catalog": true,
+    "validation_harness": true,
+    "target_profile": true,
+    "settings": true,
+    "factorio_binary": true,
+    "fixture_inputs": true
+  }
+}

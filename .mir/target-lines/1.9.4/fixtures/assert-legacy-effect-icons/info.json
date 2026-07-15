@@ -1,0 +1,12 @@
+{
+  "name": "mir-fixture-assert-legacy-effect-icons",
+  "version": "0.1.0",
+  "title": "MIR Fixture - Assert Legacy Effect Icons",
+  "author": "Julesc013",
+  "description": "Asserts that Factorio 1.1 direct-effect technologies use target-era badge overlays only.",
+  "factorio_version": "1.1",
+  "dependencies": [
+    "base >= 1.1",
+    "more-infinite-research"
+  ]
+}

@@ -1,0 +1,2 @@
+-- The owner patch is intentionally applied during data-updates so every
+-- data-final-fixes planner observes it regardless of sibling mod order.

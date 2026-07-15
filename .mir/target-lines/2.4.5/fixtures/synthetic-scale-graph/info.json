@@ -1,0 +1,9 @@
+{
+  "name": "mir-fixture-synthetic-scale-graph",
+  "version": "0.1.0",
+  "title": "MIR Fixture - Synthetic Scale Graph",
+  "author": "MIR maintainers",
+  "description": "Creates auditable 1000-recipe, 1000-technology, 10000-effect compiler scale input.",
+  "factorio_version": "2.0",
+  "dependencies": ["base >= 2.0.76"]
+}

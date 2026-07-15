@@ -1,0 +1,13 @@
+{
+  "name": "mir-fixture-assert-aai-loader-belt-productivity",
+  "version": "0.1.0",
+  "title": "MIR Fixture - Assert AAI Loader Belt Productivity",
+  "author": "Julesc013",
+  "description": "Validation fixture that asserts AAI-style loader recipes receive MIR belt productivity.",
+  "factorio_version": "0.17",
+  "dependencies": [
+    "base >= 0.17",
+    "more-infinite-research",
+    "mir-fixture-aai-loaders"
+  ]
+}

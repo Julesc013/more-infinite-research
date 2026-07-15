@@ -1,0 +1,13 @@
+{
+  "name": "mir-fixture-assert-big-mining-drill-productivity",
+  "version": "0.1.0",
+  "title": "MIR Fixture - Assert Big Mining Drill Productivity",
+  "author": "Julesc013",
+  "description": "Validation fixture that asserts big-mining-drill receives MIR mining drill productivity.",
+  "factorio_version": "0.15",
+  "dependencies": [
+    "base >= 0.15",
+    "more-infinite-research",
+    "mir-fixture-big-mining-drill"
+  ]
+}

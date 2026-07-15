@@ -1,0 +1,306 @@
+{
+  "audit_date": "2026-07-05",
+  "source_library": "C:\\Projects\\Factorio\\ideamods_mix",
+  "archives": {
+    "5dim_mining_2.0.3.zip": {
+      "size": 61568625,
+      "sha256": "02f1400fca5ed0d84c3059c044c67aebfc598734a293919939fe4df6a3c3a4cf",
+      "decision": "MIR_DOCS_ONLY"
+    },
+    "all_around_research_0.0.2.zip": {
+      "size": 33358,
+      "sha256": "0f2da21e8c14d37d8537c35469a5cfbb0fa263943e7273567512882baf18b496",
+      "decision": "MIR_COMPAT_ADAPTER"
+    },
+    "asphalt-productivity_1.0.1.zip": {
+      "size": 44113,
+      "sha256": "e46137523f386ed0da1d720b97783b760a65d916cab32fa0825461d0840ba5c8",
+      "decision": "MIR_STREAM_CANDIDATE"
+    },
+    "base-prod_0.0.2.zip": {
+      "size": 63114,
+      "sha256": "e423ca5b4aedb9db02b909313402216e58ed64393d8c21586f105cc8bb18f75e",
+      "decision": "MIR_COMPANION_SCOPE"
+    },
+    "better-bot-battery2_1.2.0.zip": {
+      "size": 4351,
+      "sha256": "c53c0dd31c0260cac3119c0a2c787d48a40891fb6b660ffdac20d3353277282e",
+      "decision": "MIR_COMPAT_ADAPTER"
+    },
+    "big-brother_2.0.1.zip": {
+      "size": 6217712,
+      "sha256": "cc806087859495d18a538309853f286ec12977242d5b59117bb551eab87f7058",
+      "decision": "MIR_DOCS_ONLY"
+    },
+    "bioflux-productivity_0.1.0.zip": {
+      "size": 133525,
+      "sha256": "84b3a23218e596a4585ad405f8586e18dca9c8b493ea77ce8ee90584c180f1ae",
+      "decision": "MIR_REPLACE_EXACT"
+    },
+    "combatresearchtech_0.1.0.zip": {
+      "size": 341087,
+      "sha256": "f4925331c97298fc55f5828b715ad93bee77ef6b506582f7a08dba659f33eb6a",
+      "decision": "MIR_DOCS_ONLY"
+    },
+    "concrete-productivity_1.2.1.zip": {
+      "size": 328185,
+      "sha256": "5f9e0a66122b6a025b0e4be805b4a7c59cf207c85c7467734b782722cb918860",
+      "decision": "MIR_STREAM_CANDIDATE"
+    },
+    "ConfigurableResearchCost_1.1.3.zip": {
+      "size": 405128,
+      "sha256": "677a56c81c0812136f97c76e696d59590a4205a8e50dff3bfc0b45921fccd9d6",
+      "decision": "MIR_DOCS_ONLY"
+    },
+    "crafting-efficiency-2_0.3.0.zip": {
+      "size": 25640,
+      "sha256": "06ab1391722c54f3ad44277aa48c859453a303090005db3695874533e98f16ee",
+      "decision": "MIR_REPLACE_EXACT"
+    },
+    "crushing-industry-productivity-research_1.0.6.zip": {
+      "size": 98009,
+      "sha256": "4e0c46117775a2c128e6a8b0ba50f9c500f500d352d2e798fdca045156bc887b",
+      "decision": "MIR_STREAM_CANDIDATE"
+    },
+    "customresearchspeed_2.0.0.zip": {
+      "size": 61130,
+      "sha256": "2d5d500d306ea2125aa2af38d83cabbc9d9f8452d4c7c34b9d56c0705c6a444e",
+      "decision": "MIR_DOCS_ONLY"
+    },
+    "epic_mining_and_crafting_speed_research_10.0.0.zip": {
+      "size": 98023,
+      "sha256": "ec442f6cde233fe5015c0b7c365b1719020e7a4052f1862ea2fa9348759f9d0f",
+      "decision": "MIR_COMPAT_ADAPTER"
+    },
+    "ExpandedProductivityResearch_1.3.8.zip": {
+      "size": 37877,
+      "sha256": "181f8d1ab93b5abbbd81baf8931ac0a93639f263dfd4c8be9ee865d02ce442ef",
+      "decision": "MIR_REPLACE_EXACT"
+    },
+    "finite_prod_techs_0.1.0.zip": {
+      "size": 20472,
+      "sha256": "b7962792957dc83b99273055d57b37c1f849b7c81fba37191dd5f0ee6d518502",
+      "decision": "MIR_DIAGNOSTIC_ONLY"
+    },
+    "fish-productivity_1.0.0.zip": {
+      "size": 427073,
+      "sha256": "1b19c53c06a0bf0e9fe40c38c8755f3917b6beecebd3355439bd65980c45c1fb",
+      "decision": "MIR_REPLACE_EXACT"
+    },
+    "foundation-productivity_1.1.1.zip": {
+      "size": 23031,
+      "sha256": "c5ab151a77b3ec29b43ddf3b750ea7b433c532abef032f9a374ba8132ee7af26",
+      "decision": "MIR_STREAM_CANDIDATE"
+    },
+    "gleba-lab_1.0.1.zip": {
+      "size": 16584238,
+      "sha256": "55b5cbf54529aaa5280bc25b3413381b62c2f8c4f82632180747431fb9791051",
+      "decision": "MIR_DOCS_ONLY"
+    },
+    "landfill-productivity_1.0.2.zip": {
+      "size": 197469,
+      "sha256": "22682087c803e8ca99084d26759ca21d3e9444e9836a61ae0bffca9c73f55cd2",
+      "decision": "MIR_STREAM_CANDIDATE"
+    },
+    "mach-speed-logistics_1.1.3.zip": {
+      "size": 66584749,
+      "sha256": "0d10bad30f6b267baa52c63ec944183a9c3a201d770b718394d0f7f7a3273030",
+      "decision": "MIR_DOCS_ONLY"
+    },
+    "mach-speed-logistics_1.1.4.zip": {
+      "size": 66584781,
+      "sha256": "66786dc80aa3f8ab8daeb8a6835d64e70da7375dc147415e94f71311d5d2568e",
+      "decision": "MIR_DOCS_ONLY"
+    },
+    "miner-start_1.0.0.zip": {
+      "size": 58609,
+      "sha256": "c7108914eec085f6952c188a23921d981ea646720323f2a50d9a4854a7262c8e",
+      "decision": "MIR_DIAGNOSTIC_ONLY"
+    },
+    "mining-prod-0_1.0.2.zip": {
+      "size": 29747,
+      "sha256": "7f072de23a227c0cd3c866b99809df9bfd77a864ea9cc2a4d00cc8f3eea59e03",
+      "decision": "MIR_DIAGNOSTIC_ONLY"
+    },
+    "modified-productivity-cap_1.2.2.zip": {
+      "size": 3863,
+      "sha256": "aafc6805cb9dd7a46b77b6e03059412a549cc6beed34a6a072180fd667b1cf2e",
+      "decision": "MIR_DIAGNOSTIC_ONLY"
+    },
+    "more-productivity-research_1.0.1.zip": {
+      "size": 54054,
+      "sha256": "29e6e868c1b2f317cd7a70f8728791f428c20943fc42342aa044d9ad1107cad1",
+      "decision": "MIR_DOCS_ONLY"
+    },
+    "omniab-space-age-compat_1.3.7.zip": {
+      "size": 218177,
+      "sha256": "1afab69c907576410980e51fe5ceaea8b4df34d84fef25f28a7d557f368b8db6",
+      "decision": "MIR_DOCS_ONLY"
+    },
+    "player-count-based-research-speed_1.1.3.zip": {
+      "size": 339694,
+      "sha256": "5a132fddd00adf1a21b805321a727177689469f9244ab34e80728ea9dd45bfb4",
+      "decision": "MIR_COMPAT_ADAPTER"
+    },
+    "Prod-Beacon_1.0.3.zip": {
+      "size": 765266,
+      "sha256": "0069bf391f91aafb279b319b70fde7acf680fcf80b2cb272e710310519ffe317",
+      "decision": "MIR_COMPANION_SCOPE"
+    },
+    "prodforce_0.0.8.zip": {
+      "size": 3043,
+      "sha256": "916f908130909fb5d8921f5fb5c64bbb2b4a8ecb8b1dae95e14da0281f06f5a8",
+      "decision": "MIR_COMPANION_SCOPE"
+    },
+    "Productivity_2.0.5.zip": {
+      "size": 73176,
+      "sha256": "220b5078e4b2c0f036773a235831cf22eb936e9603a77fa330b61d19144063b2",
+      "decision": "MIR_COMPANION_SCOPE"
+    },
+    "productivity_fix_2.0.0.zip": {
+      "size": 1500368,
+      "sha256": "a1abeaab7dd5d360f96b35130a1b2d48c27247c21e7abbe04f727e0aa69ca12a",
+      "decision": "MIR_COMPANION_SCOPE"
+    },
+    "productivity_tech_modules_0.0.3.zip": {
+      "size": 223067,
+      "sha256": "a17d86eec6b835e5ad86098376d029568c25584271a6ab5ad3fc0f3342b2d52d",
+      "decision": "MIR_COMPAT_ADAPTER"
+    },
+    "productivity_weight_fix_0.0.2.zip": {
+      "size": 1502202,
+      "sha256": "b2302ed99b70acc925c7c3b0b22d6cb2e60848ca5025d054ec3d4107a87ccd3e",
+      "decision": "MIR_DOCS_ONLY"
+    },
+    "Productivity-config_0.1.1.zip": {
+      "size": 1088914,
+      "sha256": "0a6967233fd2c6b9e0be2a1305f0b2829242ae2c16e4df4b9b6b2911fe863d31",
+      "decision": "MIR_COMPANION_SCOPE"
+    },
+    "productivity-indicator_1.0.0.zip": {
+      "size": 12317,
+      "sha256": "650f47c7d0b2a2c13291cb086fdd1b0da08db5d19c8d4b898913ba00a45f7ac8",
+      "decision": "MIR_DOCS_ONLY"
+    },
+    "productivity-module-3-aquilo_1.0.4.zip": {
+      "size": 197888,
+      "sha256": "1b4f4b3989ebdddec3f6a8a5eb656d9b02d1b0a9b823bebd13286d545ac39183",
+      "decision": "MIR_DOCS_ONLY"
+    },
+    "productivity-technology-limit_0.0.2.zip": {
+      "size": 74873,
+      "sha256": "a547595d6dadd05ee4330ae070dc2ff99f2520c1de3f7f8ab4f242d0f6dcdc14",
+      "decision": "MIR_DIAGNOSTIC_ONLY"
+    },
+    "productivity-through-science_1.1.0.zip": {
+      "size": 2642324,
+      "sha256": "2cfb41d9740c83ca795c57c24d0243f36c620d2043dea60fe1b31bbf613b1c9b",
+      "decision": "MIR_REJECT_CORE"
+    },
+    "ProductivityResearch_2.1.0.zip": {
+      "size": 31438,
+      "sha256": "f578e9bdf3a9b69012f6bc765ce60d80658535bd4c56ec045d55eea4fd5913e5",
+      "decision": "MIR_REPLACE_EXACT"
+    },
+    "ProductivityResearchForEveryone_1.0.9.zip": {
+      "size": 25988,
+      "sha256": "bf5843b4dd7763ee352dc3d55fa59d650ac500c52690c56c4e5a157478411920",
+      "decision": "MIR_REPLACE_EXACT"
+    },
+    "ProductivityResearchForEveryoneFG_1.2.0.zip": {
+      "size": 26850,
+      "sha256": "5ff87277b4ce238931967792ba4030a9bbddea8a5489a04dfc6cb2d172f50739",
+      "decision": "MIR_REPLACE_EXACT"
+    },
+    "progressive-productivity_1.1.5.zip": {
+      "size": 77257,
+      "sha256": "5f03099ba31e0ffb28eabd05350b21b8c8653ec3b974f723284f3042053103c9",
+      "decision": "MIR_REJECT_CORE"
+    },
+    "py_productivity_1.3.0.zip": {
+      "size": 646210,
+      "sha256": "591f5958884b8f3c1b87986e3b5c4dcacf54464eec323e11eeae4fa030fdd0ca",
+      "decision": "MIR_STREAM_CANDIDATE"
+    },
+    "remove-productivity-cap_1.1.1.zip": {
+      "size": 23755,
+      "sha256": "d3819f57f88c7d3b6cc8a2127a79f9438222626a062f8bb5bd654f634efb53b7",
+      "decision": "MIR_DIAGNOSTIC_ONLY"
+    },
+    "Research_Productivity_1.1.3.zip": {
+      "size": 61735,
+      "sha256": "c15c537c737e0add88f33542da4944642d1d70bbadd90b2ef7a3d4991caf2822",
+      "decision": "MIR_COMPAT_ADAPTER"
+    },
+    "research-control-tower_1.3.1.zip": {
+      "size": 6861280,
+      "sha256": "23f264f72c020a7109a9e053fd25af42fe789728e337ca00f7039676bf762b1c",
+      "decision": "MIR_DOCS_ONLY"
+    },
+    "research-cost-curve_0.1.4.zip": {
+      "size": 17246,
+      "sha256": "8f9440acc23bb8598d83cec4c8733d73b3f4826deb91743a775f636556863fe2",
+      "decision": "MIR_DOCS_ONLY"
+    },
+    "research-fixer_1.0.6.zip": {
+      "size": 5875,
+      "sha256": "736f305451c49a68de9db5f11c7080ec1cf3dae34eda267c6b75cbfcd4d35b55",
+      "decision": "MIR_DOCS_ONLY"
+    },
+    "research-multipliers_0.2.0.zip": {
+      "size": 57391,
+      "sha256": "4299b1553a9b42cb8f51e0599ede16adb1a70e61cd7e04499b909ba7219ac777",
+      "decision": "MIR_DOCS_ONLY"
+    },
+    "research-skip_1.0.1.zip": {
+      "size": 33682,
+      "sha256": "b9a23dc20c048686d7cd987affba7f27b54feee7393f99a2ffc326b766bad167",
+      "decision": "MIR_DOCS_ONLY"
+    },
+    "ResearchProductivity_Rebalance_1.0.0.zip": {
+      "size": 750,
+      "sha256": "78e2be3103845a4f0084169d03b42bf3176697db2dd907c7ec18d8d386d939e3",
+      "decision": "MIR_COMPAT_ADAPTER"
+    },
+    "rosnok-productivity-quality-beacon_1.1.2.zip": {
+      "size": 94177,
+      "sha256": "263583841426d16c3b77f8ebfadeff54c3a5aca1d748e6d2140e821cb6a10435",
+      "decision": "MIR_COMPANION_SCOPE"
+    },
+    "SchallModules_2.0.0.zip": {
+      "size": 288023,
+      "sha256": "f19899fbfde514734b4fe7b629370402845f8d70f56023b1cae5d4441bea1b03",
+      "decision": "MIR_COMPANION_SCOPE"
+    },
+    "Science_packs_productivity_0.0.1.zip": {
+      "size": 27621,
+      "sha256": "5e77a37884000b0debcd690f3489c4e69ea80da4a924498940c34fd718af92ec",
+      "decision": "MIR_REPLACE_EXACT"
+    },
+    "show-missing-bottles-for-current-research_2.0.2.zip": {
+      "size": 11493,
+      "sha256": "9c012978a32770d3529eef94536208cbc09927a0c4ec4022bb3e308f3863c4e0",
+      "decision": "MIR_DOCS_ONLY"
+    },
+    "solar-productivity_3.0.0.zip": {
+      "size": 2217787,
+      "sha256": "8369cf370bd6e8dbd9d9a7a24a16db3e8dd502d5686e2410032643e622eb689a",
+      "decision": "MIR_REJECT_CORE"
+    },
+    "space-exploration-spaceproductivity-2_0.1.2.zip": {
+      "size": 41670,
+      "sha256": "b6a44696d0f3308134f47e989f2dc619d3a4813d9d46feadffc674d9ed8a8104",
+      "decision": "MIR_COMPANION_SCOPE"
+    },
+    "UnlimitedProductivityFork_2.1.0.zip": {
+      "size": 304290,
+      "sha256": "e590095f00ea58babe920493db3a44ed8d30b99626d5d51bbd2e4904ed9ecd85",
+      "decision": "MIR_COMPANION_SCOPE"
+    },
+    "zz-long-science_2.0.0.zip": {
+      "size": 4291,
+      "sha256": "3c4ec8f6391efb4f2268278beee085bb19ca69e0552ffccdcddfe3e97d9e3316",
+      "decision": "MIR_DOCS_ONLY"
+    }
+  }
+}

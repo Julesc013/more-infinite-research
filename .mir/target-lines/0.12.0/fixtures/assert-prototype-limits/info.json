@@ -1,0 +1,13 @@
+{
+  "name": "mir-fixture-assert-prototype-limits",
+  "version": "0.1.0",
+  "title": "MIR Fixture - Assert Prototype Limits",
+  "author": "Julesc013",
+  "description": "Validation fixture that asserts MIR's opt-in prototype limit settings mutate recipe and effect receiver caps.",
+  "factorio_version": "2.1",
+  "dependencies": [
+    "base >= 2.1.8",
+    "? space-age >= 2.1.8",
+    "more-infinite-research"
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "kind": "overnight-local",
+  "factorio_line": "2.0",
+  "factorio_bin": "auto",
+  "local_mod_dir": "C:\\Projects\\Factorio\\testmods_2.0",
+  "scenario_timeout_seconds": 900,
+  "generated_local_pairwise_limit": 40
+}

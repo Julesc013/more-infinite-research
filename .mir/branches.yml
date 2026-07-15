@@ -2,7 +2,7 @@ schema: 1
 
 branches:
   main:
-    purpose: frozen stable Factorio 2.1 line at released MIR 3.1.5
+    purpose: frozen stable Factorio 2.1 line at released MIR 3.1.9
     factorio_version: "2.1"
     accepts:
       - release-hotfix
@@ -16,7 +16,7 @@ branches:
       - large-architecture-rewrite
 
   dev:
-    purpose: canonical MIR 3.1.9 final-patch synthesis and future Factorio 2.1 development
+    purpose: consolidated published-line archive and canonical future Factorio 2.1 development
     factorio_version: "2.1"
     accepts:
       - architecture
@@ -27,7 +27,7 @@ branches:
       - validation
 
   legacy:
-    purpose: frozen Factorio 2.0 line at released MIR 2.4.0
+    purpose: frozen Factorio 2.0 line at released MIR 2.4.5
     factorio_version: "2.0"
     accepts:
       - safety-fix
@@ -284,9 +284,10 @@ release_artifacts:
       exact_ecosystem_evidence: .mir/evidence/3.1.9/harness-refresh-exact-ecosystem-campaign.json
       assurance_seal: .mir/evidence/candidate-seals/mir-3.1.9-factorio-2.1.json
       seal_source_commit: f81af94c9a16666be8f5902bb5653aeea57033ba
-      release_gate: release-candidate-awaiting-manual-review
-      publication_status: unreleased
-      status: release-candidate-awaiting-manual-review
+      release_gate: published
+      publication_status: published
+      tag: "3.1.9"
+      status: published-frozen
     mir_2_5_0:
       version: "2.5.0"
       branch: tmp/2.0
@@ -333,10 +334,11 @@ release_artifacts:
       evidence_location: "legacy:.mir/evidence/2.4.5-change-aware-qualification.json"
       seal_location: "legacy:.mir/evidence/candidate-seals/mir-2.4.5-factorio-2.0.json"
       seal_source_commit: 9cfa77c33a635c24f0d4ea458d317cddfa9e325f
-      release_gate: passed-change-aware
-      manual_gate: pending-maintainer
-      publication_status: unreleased
-      status: sealed-release-candidate-on-legacy
+      release_gate: published
+      manual_gate: accepted-for-publication
+      publication_status: published
+      tag: "2.4.5"
+      status: published-frozen
     mir_2_3_0:
       version: "2.3.0"
       branch: legacy

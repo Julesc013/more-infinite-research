@@ -1,0 +1,12 @@
+{
+  "name": "mir-fixture-vanilla-family-mixed-owner",
+  "version": "0.1.0",
+  "title": "MIR Fixture - Vanilla Family Mixed Owner",
+  "author": "Julesc013",
+  "description": "Validation fixture that gives a vanilla productivity family owner mixed change values before MIR generation.",
+  "factorio_version": "2.0",
+  "dependencies": [
+    "base >= 2.0",
+    "space-age >= 2.0"
+  ]
+}

@@ -1,0 +1,206 @@
+{
+  "schema": 1,
+  "status": "complete-with-external-channel-blocker",
+  "completed_at": "2026-07-14T16:50:40Z",
+  "scope": "post-3.1.9/2.4.5 synthesis and Factorio 1.1/1.0 release ring",
+  "immutable_released_inputs": {
+    "mir_3_1_9": {
+      "tag_commit": "1b9c6f32fc2bb53c413a593534e103a6043b4be3",
+      "main_head": "a32e7fd26de7d96fc27a440a456bc9165630ceca",
+      "package_source_commit": "79df29b50ea9b855b8665d6c9a3d8295806acde0",
+      "archive_sha256": "D77B3A78DA40CD4FDD4C829A01B5030E59FB593F3387124EF5C438F6A9E8DFCD",
+      "unchanged": true
+    },
+    "mir_2_4_5": {
+      "tag_and_legacy_commit": "7e4b6c530cfcc5b2e1429c4e9f4ccb0d6d3b42a4",
+      "package_source_commit": "47bcc80c8a70b41dbbb4f8d80b2b9433d0a10d3f",
+      "archive_sha256": "7649824B72247AA38F05661422DFDEE7C729B21CC73A0A35D2455443B45D39F8",
+      "unchanged": true
+    }
+  },
+  "source_synthesis": {
+    "pre_run_dev": "9c8f40038e42fda378b855bb8132fd98a180b6a5",
+    "released_main_integrated": "a32e7fd26de7d96fc27a440a456bc9165630ceca",
+    "canonical_ring_anchor": "53090c6f860bf9cb9aaf10140cbfe3924ef59c6c",
+    "anchor_ref": "DEV_RING_1_1_1_0_ANCHOR",
+    "modern_factorio": "2.1.10.86940",
+    "modern_factorio_binary_sha256": "DA4CA713FADBA1728904A2B47C2D73D2E07E8EB3AA2FAEED9AEE0FA6B417BAC3",
+    "modern_runtime_scenarios": 102,
+    "modern_required_groups": 11,
+    "modern_runtime_status": "passed",
+    "post_runtime_assurance_status": "Test-MIRAssurance and StaticOnly passed at the final anchor",
+    "portability_audit": ".mir/evidence/ring-1.1-1.0/legacy-2.4.5-portability-audit.json",
+    "modern_runtime_evidence": ".mir/evidence/ring-1.1-1.0/modern-2.1-anchor-requalification.json"
+  },
+  "portable_fix_series": [
+    {
+      "commit": "5a8339e",
+      "classification": "PORTABLE-HARNESS",
+      "problem": "2.4.5 source-lock verification was not available generically on dev",
+      "result": "generic backport source-lock validation returned to dev",
+      "targets": ["1.1", "1.0", "0.17", "0.16"]
+    },
+    {
+      "commit": "94b1755",
+      "classification": "PORTABLE-CAPABILITY",
+      "problem": "mod-data emission was not gated by a positive target capability",
+      "result": "unsupported 1.x prototype emission is prevented and covered by modern regression",
+      "targets": ["1.1", "1.0", "0.17", "0.16"]
+    },
+    {
+      "commit": "cf7d2ed",
+      "classification": "PORTABLE-HARNESS",
+      "problem": "extension validation assumed a newer baseline than Factorio 1.0",
+      "result": "target-aware extension validation accepts the exact 1.0 baseline",
+      "targets": ["1.0", "0.17", "0.16"]
+    },
+    {
+      "commit": "7657172",
+      "classification": "PORTABLE-ASSURANCE",
+      "problem": "weapon validation rejected a safe existing external continuation",
+      "result": "exact external ownership may continue without duplicate MIR ownership",
+      "targets": ["1.1", "1.0", "0.17", "0.16"]
+    },
+    {
+      "commit": "93972f4",
+      "classification": "PORTABLE-MIGRATION",
+      "problem": "legacy upgrade fixtures could queue research before force initialization completed",
+      "result": "upgrade initialization is queued safely and retention proofs pass",
+      "targets": ["1.1", "1.0", "0.17", "0.16"]
+    },
+    {
+      "commit": "53090c6",
+      "classification": "PORTABLE-ASSURANCE",
+      "problem": "candidate seals did not bind MIR version, target, and canonical dev anchor",
+      "result": "all backport identity fields are sealed and regression-tested",
+      "targets": ["1.1", "1.0", "0.17", "0.16"]
+    }
+  ],
+  "target_specific_exclusions": [
+    "Factorio 1.1 and 1.0 metadata and dependency floors",
+    "target-era prototype and API adapters",
+    "reduced target defaults and unsupported setting omissions",
+    "target fixtures, runtime logs, release wording, and distributions"
+  ],
+  "releases": [
+    {
+      "version": "1.9.4",
+      "factorio_version": "1.1.110.62357",
+      "factorio_binary": "D:\\Programs\\Factorio\\1.1\\bin\\x64\\factorio.exe",
+      "factorio_binary_sha256": "B7B4B834FCA2E32AFA9D3476EB42CC09B02F1205BE97F688DC6FC6ACE7BA8FE1",
+      "branch": "tmp/1.1",
+      "pre_run_branch_head": "dc6414e21585e8f565947be1c3b59ebe6bf750b8",
+      "reconstruction_branch": "rebuild/1.1",
+      "sealed_reconstruction_commit": "2dee595135444ad72c7aa32710ae10f5d6cf09cb",
+      "tag_commit": "426d6d48c6578a786ea7de0f224282baff9d342b",
+      "post_publication_branch_head": "1e461ecb0785ee34905ab69b1c0e8791135cf98a",
+      "tag": "1.9.4",
+      "tag_object": "519845ec01ca4cb840641281c6b63a19e7946e84",
+      "archive": "dist/more-infinite-research_1.9.4.zip",
+      "archive_sha256": "74BA83E1F02FABBC52C09AC6144A409B243066663A6D132A47334459C2665BFB",
+      "package_content_sha256": "732D363A8D8A8CB3A9899973ED5F0222EF99C15224B5C628A3AF824B403D5054",
+      "sealed_archive_content_sha256": "299D3DFA81DD5ACC2A5A02E290099DC2B666E36806F44A942DCF328C658FA6D4",
+      "size_bytes": 386303,
+      "entries": 167,
+      "forbidden_entries": 0,
+      "runtime_scenarios": 19,
+      "runtime_required_groups": 9,
+      "runtime_run_id": "a79b69c9-204f-4913-b40e-26737b661a77",
+      "static_gate": "passed",
+      "deterministic_rebuild": "passed-same-sha256",
+      "fresh_create_and_reload": "passed",
+      "upgrade_from": "1.9.3",
+      "upgrade_source_sha256": "1723C10FEDD9A12003052991CC7574F1F6BF4E4ABC506F0323571DF680C0444B",
+      "upgrade_modes": ["off", "always"],
+      "upgrade_retention": ["startup setting", "technology level", "current research", "fractional progress", "global runtime state"],
+      "weapon_cleanup": "passed",
+      "disabled_science_regression": "passed",
+      "locale": "passed-9-languages-exact-binary; manual visual review pending",
+      "balance": "passed-11-streams",
+      "ecosystem_canaries": "passed-3-named-fixtures-no-broad-claim",
+      "seal": ".mir/evidence/candidate-seals/mir-1.9.4-factorio-1.1.json",
+      "github_release": "https://github.com/Julesc013/more-infinite-research/releases/tag/1.9.4",
+      "github_release_id": 353938809,
+      "github_asset_id": 476926131,
+      "github_published_at": "2026-07-14T16:49:48Z",
+      "public_redownload_sha256": "74BA83E1F02FABBC52C09AC6144A409B243066663A6D132A47334459C2665BFB",
+      "mod_portal": "blocked-missing-MOD_UPLOAD_API_KEY",
+      "publication_ledger": "tmp/1.1:.mir/evidence/1.9.4/publication.json"
+    },
+    {
+      "version": "1.8.2",
+      "factorio_version": "1.0.0.54889",
+      "factorio_binary": "D:\\Programs\\Factorio\\1.0\\bin\\x64\\factorio.exe",
+      "factorio_binary_sha256": "99F1CE207A04296EF7D797E4A98AA98DDE4F02EE653C9DF736AC33A676FD4F70",
+      "branch": "tmp/1.0",
+      "pre_run_branch_head": "b2855c7bbcf5adc69644820491eb8ebc17bcf362",
+      "reconstruction_branch": "rebuild/1.0",
+      "sealed_reconstruction_commit": "e5b4b578d8475968da49d8c1261c1ca568dc307b",
+      "tag_commit": "0a192c27674a6b13847e2f5e1b2b530e62419ee8",
+      "post_publication_branch_head": "b4e0b3de2fd87683d0c0de5bedaa8e94c6c74fe2",
+      "tag": "1.8.2",
+      "tag_object": "0e60b0b6bf71959ab2873e5786822d9c1bcf66a0",
+      "archive": "dist/more-infinite-research_1.8.2.zip",
+      "archive_sha256": "676927ECF801114CA8F7B9EFD6D139906432BCC60BE26B8CA5C08842E3686EFE",
+      "package_content_sha256": "F8B4B919CAFEA3BF2734FE048B6603B932CDA36637014EF5F756B6041135792D",
+      "sealed_archive_content_sha256": "A58A1BBD8A4B28507874720760CAA997D65E8F8A521EA19659813DC4AE6F8980",
+      "size_bytes": 386302,
+      "entries": 167,
+      "forbidden_entries": 0,
+      "runtime_scenarios": 19,
+      "runtime_required_groups": 9,
+      "runtime_run_id": "55418612-58c1-46e1-bf24-ec0c41dde92a",
+      "static_gate": "passed",
+      "deterministic_rebuild": "passed-same-sha256",
+      "fresh_create_and_reload": "passed",
+      "upgrade_from": "1.8.1",
+      "upgrade_source_sha256": "B1622AB0BC6D72265842D698781DBE21B7286662E29FB6992057FBCFF87D8E29",
+      "upgrade_modes": ["off", "always"],
+      "upgrade_retention": ["startup setting", "technology level", "current research", "fractional progress", "global runtime state"],
+      "weapon_cleanup": "passed",
+      "disabled_science_regression": "passed",
+      "locale": "passed-9-languages-exact-binary; manual visual review pending",
+      "balance": "passed-11-streams",
+      "ecosystem_canaries": "passed-3-named-fixtures-no-broad-claim",
+      "seal": ".mir/evidence/candidate-seals/mir-1.8.2-factorio-1.0.json",
+      "github_release": "https://github.com/Julesc013/more-infinite-research/releases/tag/1.8.2",
+      "github_release_id": 353939194,
+      "github_asset_id": 476926853,
+      "github_published_at": "2026-07-14T16:50:40Z",
+      "public_redownload_sha256": "676927ECF801114CA8F7B9EFD6D139906432BCC60BE26B8CA5C08842E3686EFE",
+      "mod_portal": "blocked-missing-MOD_UPLOAD_API_KEY",
+      "publication_ledger": "tmp/1.0:.mir/evidence/1.8.2/publication.json"
+    }
+  ],
+  "next_ring_handoff": {
+    "status": "documented-not-started-authority-required",
+    "factorio_0_17_predecessor": {
+      "version": "1.7.0",
+      "tag_and_commit": "1a9b5a7b1162f8dca8125ef7bb792f57a9ae282b",
+      "archive_sha256": "3FA9419253C3E79572305E983B0443CC657683CC761DA3F4292FBF798B8C613C"
+    },
+    "factorio_0_17_binary": {
+      "version": "0.17.79.47865",
+      "path": "D:\\Programs\\Factorio\\0.17\\bin\\x64\\factorio.exe",
+      "sha256": "E699D376D100A428B95243507FDBB39C372921577C6D7593203EDF07CAA12D06"
+    },
+    "factorio_0_16_binary": {
+      "version": "0.16.51.36654",
+      "path": "D:\\Programs\\Factorio\\0.16\\bin\\x64\\factorio.exe",
+      "sha256": "ACBA4D8B766C8CB61CBB564E0D5041439DF32D93C86127DCC3887EB329630966"
+    },
+    "canonical_source_anchor": "53090c6f860bf9cb9aaf10140cbfe3924ef59c6c",
+    "portable_commits": ["5a8339e", "94b1755", "cf7d2ed", "7657172", "93972f4", "53090c6"],
+    "first_command": "git fetch --all --tags --prune"
+  },
+  "no_overreach": {
+    "created_release_tags": ["1.9.4", "1.8.2"],
+    "created_public_releases": ["1.9.4", "1.8.2"],
+    "force_pushes": 0,
+    "moved_existing_tags": 0,
+    "factorio_0_17_or_lower_implementation_started": false,
+    "manual_review_claimed_passed": false,
+    "proprietary_binaries_or_third_party_mods_committed": false,
+    "sealed_archives_rebuilt_after_publication": false
+  }
+}

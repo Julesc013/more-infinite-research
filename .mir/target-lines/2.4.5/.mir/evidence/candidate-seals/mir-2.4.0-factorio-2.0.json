@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "state": "SEALED-RC",
+  "release_status": "NOT RELEASED",
+  "version": "2.4.0",
+  "factorio_target": "2.0",
+  "branch": "tmp/2.0",
+  "source_commit": "f6a5dfeb4dea18ee70bbaa17acbd4433f1396e6e",
+  "source_clean": true,
+  "candidate": "dist/more-infinite-research_2.4.0.zip",
+  "candidate_sha256": "4BA19EA071E6359BC25C58CCD8F65CAF81B4AA675496E2F53175A996C791470C",
+  "candidate_content_sha256": "EF6EAE634154A752CE2ED7FA20FF205FC33A7A92E6E0D79F41815B573A6ED104",
+  "package_source_sha256": "124B66E5CE3B8A7039D81DF254BF7D72B9E5F3E937F561B4CA0DA132986E7814",
+  "target_profile_sha256": "1B9FDD388F54BC5904025F6FA4890A030E41EE473944042D2BBD197F17116165",
+  "test_catalog_sha256": "536AF8B2A7B2EBC82CDD8464A40A30E266D50BFE84B6261845D2A70DA746829A",
+  "validation_harness_sha256": "3390B4BBB2BD55D1B25974B56807C200481CB2DFE856DE000D4F1DBD94A35A9C",
+  "factorio_binary": "D:\\Programs\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+  "factorio_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+  "qualification_summary": ".mir/evidence/2.4.0-assurance-qualification.json",
+  "qualification_summary_sha256": "07306BC0A79DDDE301D05316BBD06D98EF9656BEF594CA3A864D4BCE81391058",
+  "sealed_at": "2026-07-13T18:32:31.5365682Z"
+}

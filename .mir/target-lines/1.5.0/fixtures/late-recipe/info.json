@@ -1,0 +1,11 @@
+{
+  "name": "mir-fixture-late-recipe",
+  "version": "0.1.0",
+  "title": "MIR Fixture - Late Recipe",
+  "author": "Julesc013",
+  "description": "Test fixture that adds a recipe in data-final-fixes to exercise load-order visibility.",
+  "factorio_version": "0.15",
+  "dependencies": [
+    "base >= 0.15"
+  ]
+}

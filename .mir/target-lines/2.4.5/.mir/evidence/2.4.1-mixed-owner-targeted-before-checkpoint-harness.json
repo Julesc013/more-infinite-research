@@ -1,0 +1,136 @@
+{
+  "schema": 2,
+  "run_id": "4a565e74-4472-45f1-8021-a03fdca016af",
+  "mir_version": "2.4.1",
+  "factorio_version": "2.0",
+  "factorio_binary_version": "2.0.77",
+  "git_commit": "69f06fadebf7d6ad66561885ac8522318dc79c1e",
+  "package_source_git_dirty": false,
+  "validation_harness_sha256": "933A509588756F105BFE514C4A7BFBCF5DCDB11D2C1230FAEEA294F4459905BD",
+  "validation_harness_git_dirty": false,
+  "expected_scenarios_sha256": "33C299B4394AB97BBE379D01E6AAC06894883F239A45CA5F55B0D2C0AE63488C",
+  "expected_scenarios": [
+    "package-build",
+    "runtime-state-contract",
+    "space-age-vanilla-family-mixed-owner",
+    "static-validation"
+  ],
+  "target_profile_sha256": "E4955F0415FAFB69C21DA32BA535C761740C270D6972955170CA5A2BE95D514A",
+  "required_groups_sha256": "3298C4D8D40054B8445B800616294BD2868E94A5A7556CFA9AAE9AF8BA042724",
+  "package_source_sha256": "EC246D3FAA87062B8519427252E11612791D9AE5322DDD793E27AE552D13BAE9",
+  "validation_package_sha256": "479F57587AB841060187561D6FFEE65B275E2C89832E142E5F3F315713F3FB30",
+  "validation_package_content_sha256": "EC246D3FAA87062B8519427252E11612791D9AE5322DDD793E27AE552D13BAE9",
+  "status": "passed",
+  "started_at": "2026-07-14T10:12:30.8831094Z",
+  "completed_at": "2026-07-14T10:12:46.0976493Z",
+  "duration_seconds": 15.215,
+  "current_scenario": null,
+  "required_groups": [
+    "package",
+    "runtime-state",
+    "space-age",
+    "static"
+  ],
+  "groups": [
+    {
+      "name": "package",
+      "required": true,
+      "status": "passed",
+      "duration_seconds": 0.011,
+      "scenarios": [
+        "package-build"
+      ]
+    },
+    {
+      "name": "runtime-state",
+      "required": true,
+      "status": "passed",
+      "duration_seconds": 0.01,
+      "scenarios": [
+        "runtime-state-contract"
+      ]
+    },
+    {
+      "name": "space-age",
+      "required": true,
+      "status": "passed",
+      "duration_seconds": 15.102,
+      "scenarios": [
+        "space-age-vanilla-family-mixed-owner"
+      ]
+    },
+    {
+      "name": "static",
+      "required": true,
+      "status": "passed",
+      "duration_seconds": 0.01,
+      "scenarios": [
+        "static-validation"
+      ]
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "da45a0b9-899a-42cb-9bf0-d353c46444da",
+      "name": "static-validation",
+      "kind": "gate",
+      "group": "static",
+      "status": "passed",
+      "started_at": "2026-07-14T10:12:30.8897553Z",
+      "completed_at": "2026-07-14T10:12:30.8997146Z",
+      "duration_seconds": 0.01,
+      "evidence_paths": [
+        "scripts/Invoke-MIRValidation.ps1"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "0f58ff66-ba45-4558-9b28-d11bd7017642",
+      "name": "package-build",
+      "kind": "gate",
+      "group": "package",
+      "status": "passed",
+      "started_at": "2026-07-14T10:12:30.9080171Z",
+      "completed_at": "2026-07-14T10:12:30.9193855Z",
+      "duration_seconds": 0.011,
+      "evidence_paths": [
+        "build/validation-dist"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "986d85a4-e6cc-4bed-a76a-e6c8b876040d",
+      "name": "runtime-state-contract",
+      "kind": "gate",
+      "group": "runtime-state",
+      "status": "passed",
+      "started_at": "2026-07-14T10:12:30.9256563Z",
+      "completed_at": "2026-07-14T10:12:30.9360565Z",
+      "duration_seconds": 0.01,
+      "evidence_paths": [
+        "prototypes/mir/platform/factorio/runtime_state.lua"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "13746ff3-f4a5-407c-97ce-c9c37a153da2",
+      "name": "space-age-vanilla-family-mixed-owner",
+      "kind": "runtime",
+      "group": "space-age",
+      "status": "passed",
+      "started_at": "2026-07-14T10:12:30.9866612Z",
+      "completed_at": "2026-07-14T10:12:46.0888959Z",
+      "duration_seconds": 15.102,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-c922959c8337473d96644c52134c02c5\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    }
+  ],
+  "error": null,
+  "assertions_executed": 0
+}

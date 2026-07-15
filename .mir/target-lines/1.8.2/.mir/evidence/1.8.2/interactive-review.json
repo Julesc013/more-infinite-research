@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "kind": "mir-target-interactive-review",
+  "status": "pending",
+  "version": "1.8.2",
+  "target": "1.0",
+  "source_commit": "4ae05150bb1a67bb13ed9e8f121de5e655c7626a",
+  "archive": "dist/more-infinite-research_1.8.2.zip",
+  "archive_sha256": "676927ECF801114CA8F7B9EFD6D139906432BCC60BE26B8CA5C08842E3686EFE",
+  "required_checks": [
+    "isolated normal mod-directory load",
+    "startup settings help text",
+    "technology visibility icons costs and effects",
+    "science and prerequisite reachability",
+    "locale visual review",
+    "balance and progression review"
+  ],
+  "reviewer": null,
+  "reviewed_at": null,
+  "captures": [],
+  "notes": [
+    "Identity-bound preparation only; automated gates do not establish GUI review.",
+    "Do not mark passed without maintainer captures and reviewer identity."
+  ]
+}

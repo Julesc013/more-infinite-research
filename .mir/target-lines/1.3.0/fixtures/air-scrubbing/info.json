@@ -1,0 +1,11 @@
+{
+  "name": "mir-fixture-air-scrubbing",
+  "version": "0.1.0",
+  "title": "MIR Fixture - Air Scrubbing Surface",
+  "author": "Julesc013",
+  "description": "Test fixture that creates Air Scrubbing-style clean filter, scrubbing, cleaning, and related recipes.",
+  "factorio_version": "0.13",
+  "dependencies": [
+    "base >= 0.13"
+  ]
+}

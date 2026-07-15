@@ -1,0 +1,1670 @@
+{
+  "schema": 2,
+  "run_id": "76604aa6-ae3c-4530-9b13-6e7e022177d1",
+  "mir_version": "3.1.0",
+  "factorio_version": "2.1",
+  "factorio_binary_version": "2.1.9",
+  "git_commit": "b9293df08f0db2863e9dbe8a5b48503b705b2630",
+  "package_source_git_dirty": false,
+  "validation_harness_sha256": "C9EC2BE636E1B1154FA1419CB134EBDE146479248BD8F788716053D1CF5086EB",
+  "validation_harness_git_dirty": false,
+  "expected_scenarios_sha256": "0C13E752B06CD6321DE4435A2CC88673B9896A3E3C1E9D3EC03C6DD595ECDBD9",
+  "expected_scenarios": [
+    "aai-loader-belt-productivity",
+    "air-scrubbing-clean-filter",
+    "all-official-pack-policy",
+    "all-pack-policy",
+    "atan-ash-separation",
+    "atan-nuclear-science-productivity",
+    "base-cargo-space-age-gate",
+    "base-competitor-rollback",
+    "base-effect-setting-retention",
+    "base-extension-boundary-policy",
+    "base-fluid-productivity",
+    "base-generation-integrity",
+    "base-generation-integrity-inserter-enabled",
+    "base-installed-space-age-icon-assets",
+    "base-scripted-candidates-enabled",
+    "base-space-promethium-pack-policy",
+    "better-bot-battery-owner-skip",
+    "big-mining-drill-productivity",
+    "capability-negative-cases",
+    "character-inventory-merged-effects",
+    "checkbox-disabled-default-on-features",
+    "checkbox-enabled-default-off-features",
+    "compiler-contracts",
+    "effect-scaling-mixed-tier",
+    "end-game-prerequisite-gate",
+    "generated-prerequisite-safety",
+    "lab-policy-engine-default",
+    "lab-productivity-owner-skip",
+    "mod-progression-pack-policy",
+    "official-progression-pack-policy",
+    "omega-drill-productivity",
+    "package-build",
+    "package-zip-base",
+    "package-zip-space-age",
+    "pipeline-extent-multiplier",
+    "pipeline-extent-multiplier-50",
+    "prototype-limit-overrides-base",
+    "prototype-limit-overrides-space-age",
+    "prototype-limit-scope-engine-unchanged-baseline",
+    "prototype-limit-scope-inert-at-fixed-threshold",
+    "prototype-limit-scope-inert-at-matched-threshold",
+    "prototype-limit-self-recycling-and-unrestricted-modules",
+    "recipe-cap-diagnostics",
+    "reduce-policy",
+    "rigor-late-recipe-removal",
+    "runtime-state-contract",
+    "scaled-known-productivity-competitor",
+    "scaled-weapon-overlap",
+    "semantic-family-attach",
+    "semantic-family-exact-pack",
+    "semantic-family-generate",
+    "semantic-family-off",
+    "semantic-family-report",
+    "settings-profile-roundtrip",
+    "skip-policy",
+    "space-age-cargo-logistics-shape",
+    "space-age-cargo-pad-enabled",
+    "space-age-duplicate-cargo-diagnostics",
+    "space-age-fluid-productivity",
+    "space-age-generation-integrity",
+    "space-age-generation-integrity-inserter-enabled",
+    "space-age-plates-n-circuit-productivity-blocked-owner",
+    "space-age-plates-n-circuit-productivity-change-mismatch",
+    "space-age-plates-n-circuit-productivity-compat",
+    "space-age-plates-n-circuit-productivity-partial-coverage",
+    "space-age-progression-pack-policy",
+    "space-age-scripted-candidates-disabled",
+    "space-age-scripted-candidates-enabled",
+    "space-age-scripted-runtime-disable-restoration",
+    "space-age-scripted-runtime-lifecycle",
+    "space-age-scripted-runtime-reenable",
+    "space-age-space-pack-policy",
+    "space-age-space-promethium-pack-policy",
+    "space-age-vanilla-family-adoption",
+    "space-age-vanilla-family-adoption-config-change",
+    "space-age-vanilla-family-exact-owner",
+    "space-age-vanilla-family-mixed-owner",
+    "space-age-vanilla-family-owner-prepatched",
+    "space-pack-policy",
+    "static-validation",
+    "synthetic-scale-graph",
+    "technology-prerequisite-rewire",
+    "weapon-overlap-always-coverage-absent",
+    "weapon-overlap-always-coverage-present",
+    "weapon-overlap-conditional-coverage-absent",
+    "weapon-overlap-conditional-coverage-present",
+    "weapon-overlap-conditional-external-owner",
+    "weapon-overlap-off-coverage-absent",
+    "weapon-overlap-off-coverage-present"
+  ],
+  "target_profile_sha256": "F415D66E21D47DC95B7465A63CF45788CA00BE2BE9984EA28238D1FD2C739F91",
+  "required_groups_sha256": "57A1DF87A8FB594B2B51C7E230D775E88028F23D52DF9D5D7DA1336F9271C78A",
+  "package_source_sha256": "13A63773AA39D36262C50D98908A9B54653562F62F7EA76B2E33B7D01441912B",
+  "validation_package_sha256": "A8D06BDF798138EDB5487CF9AC871E5DD5503F0422A4C32CAA951F1BA4608254",
+  "validation_package_content_sha256": "13A63773AA39D36262C50D98908A9B54653562F62F7EA76B2E33B7D01441912B",
+  "status": "passed",
+  "started_at": "2026-07-12T18:07:48.5769040Z",
+  "completed_at": "2026-07-12T18:32:09.4602930Z",
+  "duration_seconds": 1460.883,
+  "current_scenario": null,
+  "required_groups": [
+    "base-load",
+    "direct-effects",
+    "exact-dist",
+    "package",
+    "recipe-target-integrity",
+    "runtime-state",
+    "science-prerequisites",
+    "settings-codec",
+    "space-age",
+    "static",
+    "weapon-overlap"
+  ],
+  "groups": [
+    {
+      "name": "automatic-compiler",
+      "required": false,
+      "status": "passed",
+      "duration_seconds": 20.517,
+      "scenarios": [
+        "semantic-family-off",
+        "semantic-family-report",
+        "semantic-family-exact-pack"
+      ]
+    },
+    {
+      "name": "base-load",
+      "required": true,
+      "status": "passed",
+      "duration_seconds": 86.687,
+      "scenarios": [
+        "base-generation-integrity",
+        "base-generation-integrity-inserter-enabled",
+        "checkbox-enabled-default-off-features",
+        "checkbox-disabled-default-on-features",
+        "base-extension-boundary-policy"
+      ]
+    },
+    {
+      "name": "direct-effects",
+      "required": true,
+      "status": "passed",
+      "duration_seconds": 23.303,
+      "scenarios": [
+        "lab-productivity-owner-skip",
+        "better-bot-battery-owner-skip",
+        "character-inventory-merged-effects"
+      ]
+    },
+    {
+      "name": "exact-dist",
+      "required": true,
+      "status": "passed",
+      "duration_seconds": 20.34,
+      "scenarios": [
+        "package-zip-base",
+        "package-zip-space-age"
+      ]
+    },
+    {
+      "name": "local-mod-library",
+      "required": false,
+      "status": "passed",
+      "duration_seconds": 271.846,
+      "scenarios": [
+        "reduce-policy",
+        "recipe-cap-diagnostics",
+        "capability-negative-cases",
+        "synthetic-scale-graph",
+        "skip-policy",
+        "lab-policy-engine-default",
+        "base-fluid-productivity",
+        "aai-loader-belt-productivity",
+        "big-mining-drill-productivity",
+        "compiler-contracts",
+        "semantic-family-attach",
+        "semantic-family-generate",
+        "atan-ash-separation",
+        "air-scrubbing-clean-filter",
+        "pipeline-extent-multiplier",
+        "pipeline-extent-multiplier-50",
+        "prototype-limit-overrides-base",
+        "prototype-limit-self-recycling-and-unrestricted-modules",
+        "prototype-limit-scope-inert-at-fixed-threshold",
+        "prototype-limit-scope-engine-unchanged-baseline",
+        "prototype-limit-scope-inert-at-matched-threshold",
+        "effect-scaling-mixed-tier",
+        "base-installed-space-age-icon-assets",
+        "base-scripted-candidates-enabled",
+        "base-effect-setting-retention",
+        "omega-drill-productivity",
+        "base-competitor-rollback",
+        "technology-prerequisite-rewire",
+        "end-game-prerequisite-gate"
+      ]
+    },
+    {
+      "name": "official-science",
+      "required": false,
+      "status": "passed",
+      "duration_seconds": 41.587,
+      "scenarios": [
+        "space-pack-policy",
+        "atan-nuclear-science-productivity",
+        "mod-progression-pack-policy",
+        "all-official-pack-policy",
+        "all-pack-policy"
+      ]
+    },
+    {
+      "name": "package",
+      "required": true,
+      "status": "passed",
+      "duration_seconds": 0.012,
+      "scenarios": [
+        "package-build"
+      ]
+    },
+    {
+      "name": "recipe-target-integrity",
+      "required": true,
+      "status": "passed",
+      "duration_seconds": 8.187,
+      "scenarios": [
+        "rigor-late-recipe-removal"
+      ]
+    },
+    {
+      "name": "runtime-state",
+      "required": true,
+      "status": "passed",
+      "duration_seconds": 0.008,
+      "scenarios": [
+        "runtime-state-contract"
+      ]
+    },
+    {
+      "name": "science-prerequisites",
+      "required": true,
+      "status": "passed",
+      "duration_seconds": 9.657,
+      "scenarios": [
+        "generated-prerequisite-safety"
+      ]
+    },
+    {
+      "name": "settings-codec",
+      "required": true,
+      "status": "passed",
+      "duration_seconds": 6.328,
+      "scenarios": [
+        "settings-profile-roundtrip"
+      ]
+    },
+    {
+      "name": "space-age",
+      "required": true,
+      "status": "passed",
+      "duration_seconds": 913.029,
+      "scenarios": [
+        "prototype-limit-overrides-space-age",
+        "base-space-promethium-pack-policy",
+        "space-age-space-pack-policy",
+        "space-age-progression-pack-policy",
+        "official-progression-pack-policy",
+        "space-age-scripted-candidates-enabled",
+        "space-age-scripted-candidates-disabled",
+        "space-age-scripted-runtime-lifecycle",
+        "space-age-scripted-runtime-disable-restoration",
+        "space-age-scripted-runtime-reenable",
+        "space-age-generation-integrity",
+        "space-age-plates-n-circuit-productivity-compat",
+        "scaled-known-productivity-competitor",
+        "space-age-plates-n-circuit-productivity-partial-coverage",
+        "space-age-plates-n-circuit-productivity-change-mismatch",
+        "space-age-plates-n-circuit-productivity-blocked-owner",
+        "space-age-vanilla-family-adoption",
+        "space-age-vanilla-family-adoption-config-change",
+        "space-age-vanilla-family-owner-prepatched",
+        "space-age-vanilla-family-exact-owner",
+        "space-age-vanilla-family-mixed-owner",
+        "space-age-fluid-productivity",
+        "space-age-generation-integrity-inserter-enabled",
+        "space-age-space-promethium-pack-policy",
+        "base-cargo-space-age-gate",
+        "space-age-cargo-pad-enabled",
+        "space-age-cargo-logistics-shape",
+        "space-age-duplicate-cargo-diagnostics"
+      ]
+    },
+    {
+      "name": "static",
+      "required": true,
+      "status": "passed",
+      "duration_seconds": 0.009,
+      "scenarios": [
+        "static-validation"
+      ]
+    },
+    {
+      "name": "weapon-overlap",
+      "required": true,
+      "status": "passed",
+      "duration_seconds": 54.203,
+      "scenarios": [
+        "weapon-overlap-off-coverage-absent",
+        "weapon-overlap-off-coverage-present",
+        "weapon-overlap-conditional-coverage-absent",
+        "weapon-overlap-conditional-coverage-present",
+        "weapon-overlap-always-coverage-absent",
+        "weapon-overlap-always-coverage-present",
+        "scaled-weapon-overlap",
+        "weapon-overlap-conditional-external-owner"
+      ]
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "b59e2479-ff7c-49ce-a950-680a2dc14986",
+      "name": "static-validation",
+      "kind": "gate",
+      "group": "static",
+      "status": "passed",
+      "started_at": "2026-07-12T18:07:48.5918771Z",
+      "completed_at": "2026-07-12T18:07:48.6010952Z",
+      "duration_seconds": 0.009,
+      "evidence_paths": [
+        "scripts/Invoke-MIRValidation.ps1"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "5ac64dca-7807-4777-897c-78897f345b12",
+      "name": "package-build",
+      "kind": "gate",
+      "group": "package",
+      "status": "passed",
+      "started_at": "2026-07-12T18:07:48.6145502Z",
+      "completed_at": "2026-07-12T18:07:48.6266459Z",
+      "duration_seconds": 0.012,
+      "evidence_paths": [
+        "build/validation-dist"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "ddae85a0-e839-4baa-898e-8dd7e517e22a",
+      "name": "runtime-state-contract",
+      "kind": "gate",
+      "group": "runtime-state",
+      "status": "passed",
+      "started_at": "2026-07-12T18:07:48.6406068Z",
+      "completed_at": "2026-07-12T18:07:48.6490868Z",
+      "duration_seconds": 0.008,
+      "evidence_paths": [
+        "prototypes/mir/platform/factorio/runtime_state.lua"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "b88e61ba-0850-4642-84cd-bdf4c935134b",
+      "name": "package-zip-base",
+      "kind": "package",
+      "group": "exact-dist",
+      "status": "passed",
+      "started_at": "2026-07-12T18:07:48.6913893Z",
+      "completed_at": "2026-07-12T18:07:54.8568357Z",
+      "duration_seconds": 6.165,
+      "evidence_paths": [
+        "C:\\Projects\\Factorio\\more-infinite-research\\build\\validation-dist\\more-infinite-research_3.1.0.zip",
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "de6a01e4-bb55-4873-886d-19c238821f7b",
+      "name": "package-zip-space-age",
+      "kind": "package",
+      "group": "exact-dist",
+      "status": "passed",
+      "started_at": "2026-07-12T18:07:54.8793155Z",
+      "completed_at": "2026-07-12T18:08:09.0543206Z",
+      "duration_seconds": 14.175,
+      "evidence_paths": [
+        "C:\\Projects\\Factorio\\more-infinite-research\\build\\validation-dist\\more-infinite-research_3.1.0.zip",
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "e2e4ba02-4577-48dd-9eb6-f147fa12467c",
+      "name": "reduce-policy",
+      "kind": "runtime",
+      "group": "local-mod-library",
+      "status": "passed",
+      "started_at": "2026-07-12T18:08:09.0769507Z",
+      "completed_at": "2026-07-12T18:08:16.5476807Z",
+      "duration_seconds": 7.471,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "bd15f3eb-fd86-48a7-bcbb-6e76713ecf27",
+      "name": "recipe-cap-diagnostics",
+      "kind": "runtime",
+      "group": "local-mod-library",
+      "status": "passed",
+      "started_at": "2026-07-12T18:08:16.6305903Z",
+      "completed_at": "2026-07-12T18:08:23.2894252Z",
+      "duration_seconds": 6.659,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "dbf08fc2-f1fd-4b22-9b42-2720ee837f5c",
+      "name": "capability-negative-cases",
+      "kind": "runtime",
+      "group": "local-mod-library",
+      "status": "passed",
+      "started_at": "2026-07-12T18:08:23.3255490Z",
+      "completed_at": "2026-07-12T18:08:30.0768499Z",
+      "duration_seconds": 6.751,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "be073abd-75c0-45e6-a887-90397dce6110",
+      "name": "synthetic-scale-graph",
+      "kind": "runtime",
+      "group": "local-mod-library",
+      "status": "passed",
+      "started_at": "2026-07-12T18:08:30.1485452Z",
+      "completed_at": "2026-07-12T18:08:48.2065657Z",
+      "duration_seconds": 18.058,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "cf4b0c27-1c01-45b2-8435-5695717d7059",
+      "name": "lab-productivity-owner-skip",
+      "kind": "runtime",
+      "group": "direct-effects",
+      "status": "passed",
+      "started_at": "2026-07-12T18:08:48.2368440Z",
+      "completed_at": "2026-07-12T18:08:54.9694386Z",
+      "duration_seconds": 6.733,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "a7f3ff31-b27e-4d11-8000-b72afad13ab8",
+      "name": "better-bot-battery-owner-skip",
+      "kind": "runtime",
+      "group": "direct-effects",
+      "status": "passed",
+      "started_at": "2026-07-12T18:08:54.9830243Z",
+      "completed_at": "2026-07-12T18:09:02.1163369Z",
+      "duration_seconds": 7.133,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "e6ba6349-90ad-4570-a1e8-4cca19273643",
+      "name": "skip-policy",
+      "kind": "runtime",
+      "group": "local-mod-library",
+      "status": "passed",
+      "started_at": "2026-07-12T18:09:02.1273473Z",
+      "completed_at": "2026-07-12T18:09:09.8907561Z",
+      "duration_seconds": 7.763,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "fece2350-7661-4024-94a1-7a24b531fa96",
+      "name": "lab-policy-engine-default",
+      "kind": "runtime",
+      "group": "local-mod-library",
+      "status": "passed",
+      "started_at": "2026-07-12T18:09:09.9076610Z",
+      "completed_at": "2026-07-12T18:09:20.2500659Z",
+      "duration_seconds": 10.342,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "8ab122a6-a2aa-41ed-922b-7d80a7f28431",
+      "name": "space-pack-policy",
+      "kind": "runtime",
+      "group": "official-science",
+      "status": "passed",
+      "started_at": "2026-07-12T18:09:20.2677887Z",
+      "completed_at": "2026-07-12T18:09:31.0780609Z",
+      "duration_seconds": 10.81,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "bf549fed-e7fa-46ec-bb13-36f7aa8aaa95",
+      "name": "character-inventory-merged-effects",
+      "kind": "runtime",
+      "group": "direct-effects",
+      "status": "passed",
+      "started_at": "2026-07-12T18:09:31.1052210Z",
+      "completed_at": "2026-07-12T18:09:40.5417929Z",
+      "duration_seconds": 9.437,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "f67737de-ee0c-4726-b334-c83f15d58338",
+      "name": "base-generation-integrity",
+      "kind": "runtime",
+      "group": "base-load",
+      "status": "passed",
+      "started_at": "2026-07-12T18:09:40.5654932Z",
+      "completed_at": "2026-07-12T18:10:20.1088376Z",
+      "duration_seconds": 39.543,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "a5c55c67-c832-4a7d-9889-1ca586b0ef5e",
+      "name": "generated-prerequisite-safety",
+      "kind": "runtime",
+      "group": "science-prerequisites",
+      "status": "passed",
+      "started_at": "2026-07-12T18:10:20.4971697Z",
+      "completed_at": "2026-07-12T18:10:30.1543090Z",
+      "duration_seconds": 9.657,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "f708eb57-c9cb-48f5-9ad5-89a48fdb3817",
+      "name": "rigor-late-recipe-removal",
+      "kind": "runtime",
+      "group": "recipe-target-integrity",
+      "status": "passed",
+      "started_at": "2026-07-12T18:10:30.1630566Z",
+      "completed_at": "2026-07-12T18:10:38.3497624Z",
+      "duration_seconds": 8.187,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "1ae7540d-baca-4be8-a6f0-585fddade43c",
+      "name": "base-fluid-productivity",
+      "kind": "runtime",
+      "group": "local-mod-library",
+      "status": "passed",
+      "started_at": "2026-07-12T18:10:38.3599379Z",
+      "completed_at": "2026-07-12T18:10:46.3080918Z",
+      "duration_seconds": 7.948,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "9c9bb492-d334-4417-af4c-c01fb41a0df0",
+      "name": "aai-loader-belt-productivity",
+      "kind": "runtime",
+      "group": "local-mod-library",
+      "status": "passed",
+      "started_at": "2026-07-12T18:10:46.3432692Z",
+      "completed_at": "2026-07-12T18:10:53.3047677Z",
+      "duration_seconds": 6.961,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "211c3949-929d-4a56-bf3c-6b0cf19026e5",
+      "name": "big-mining-drill-productivity",
+      "kind": "runtime",
+      "group": "local-mod-library",
+      "status": "passed",
+      "started_at": "2026-07-12T18:10:53.3211364Z",
+      "completed_at": "2026-07-12T18:10:59.4531849Z",
+      "duration_seconds": 6.132,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "b8b190b0-aad2-4a2f-ab4a-510572ca27a4",
+      "name": "compiler-contracts",
+      "kind": "runtime",
+      "group": "local-mod-library",
+      "status": "passed",
+      "started_at": "2026-07-12T18:10:59.4724161Z",
+      "completed_at": "2026-07-12T18:11:05.7619724Z",
+      "duration_seconds": 6.29,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "e583f18b-24f4-4d82-982f-082801b9b117",
+      "name": "semantic-family-attach",
+      "kind": "runtime",
+      "group": "local-mod-library",
+      "status": "passed",
+      "started_at": "2026-07-12T18:11:05.7757273Z",
+      "completed_at": "2026-07-12T18:11:12.4818952Z",
+      "duration_seconds": 6.706,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "77d7c300-499f-43f5-a3aa-0d695f25312b",
+      "name": "semantic-family-generate",
+      "kind": "runtime",
+      "group": "local-mod-library",
+      "status": "passed",
+      "started_at": "2026-07-12T18:11:12.5073352Z",
+      "completed_at": "2026-07-12T18:11:18.9391422Z",
+      "duration_seconds": 6.432,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "bf92f1ef-89cd-4beb-a14c-25c327595d65",
+      "name": "semantic-family-off",
+      "kind": "runtime",
+      "group": "automatic-compiler",
+      "status": "passed",
+      "started_at": "2026-07-12T18:11:18.9544911Z",
+      "completed_at": "2026-07-12T18:11:25.9208955Z",
+      "duration_seconds": 6.966,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "631c8c16-7c6e-4c40-9063-54ae725cf209",
+      "name": "semantic-family-report",
+      "kind": "runtime",
+      "group": "automatic-compiler",
+      "status": "passed",
+      "started_at": "2026-07-12T18:11:25.9330019Z",
+      "completed_at": "2026-07-12T18:11:32.6395127Z",
+      "duration_seconds": 6.707,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "ebfe62e5-3b01-4254-8c30-ccad3743625c",
+      "name": "semantic-family-exact-pack",
+      "kind": "runtime",
+      "group": "automatic-compiler",
+      "status": "passed",
+      "started_at": "2026-07-12T18:11:32.6522598Z",
+      "completed_at": "2026-07-12T18:11:39.4964730Z",
+      "duration_seconds": 6.844,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "83abb130-f136-4049-b3fa-6c19618d53f6",
+      "name": "atan-nuclear-science-productivity",
+      "kind": "runtime",
+      "group": "official-science",
+      "status": "passed",
+      "started_at": "2026-07-12T18:11:39.5105756Z",
+      "completed_at": "2026-07-12T18:11:46.3492445Z",
+      "duration_seconds": 6.839,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "467c48f0-c394-4e02-b272-7e11fccb053b",
+      "name": "atan-ash-separation",
+      "kind": "runtime",
+      "group": "local-mod-library",
+      "status": "passed",
+      "started_at": "2026-07-12T18:11:46.3659462Z",
+      "completed_at": "2026-07-12T18:11:52.7915385Z",
+      "duration_seconds": 6.426,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "43cc6c11-bde2-4385-ab9a-68de012e28d5",
+      "name": "air-scrubbing-clean-filter",
+      "kind": "runtime",
+      "group": "local-mod-library",
+      "status": "passed",
+      "started_at": "2026-07-12T18:11:52.8307714Z",
+      "completed_at": "2026-07-12T18:11:59.2793396Z",
+      "duration_seconds": 6.449,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "2bc9fffa-fcae-4243-aebc-910f61798d97",
+      "name": "pipeline-extent-multiplier",
+      "kind": "runtime",
+      "group": "local-mod-library",
+      "status": "passed",
+      "started_at": "2026-07-12T18:11:59.3184885Z",
+      "completed_at": "2026-07-12T18:12:05.8674331Z",
+      "duration_seconds": 6.549,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "4dfa1be9-a335-4da6-97e3-8c28f1ac1d1f",
+      "name": "pipeline-extent-multiplier-50",
+      "kind": "runtime",
+      "group": "local-mod-library",
+      "status": "passed",
+      "started_at": "2026-07-12T18:12:05.8945339Z",
+      "completed_at": "2026-07-12T18:12:12.5889038Z",
+      "duration_seconds": 6.694,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "d126787b-4d7b-4fb9-ac85-159f904ce3cf",
+      "name": "prototype-limit-overrides-base",
+      "kind": "runtime",
+      "group": "local-mod-library",
+      "status": "passed",
+      "started_at": "2026-07-12T18:12:12.6063556Z",
+      "completed_at": "2026-07-12T18:12:19.5233541Z",
+      "duration_seconds": 6.917,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "eb526401-ec54-45f7-a01f-32865230eafd",
+      "name": "prototype-limit-overrides-space-age",
+      "kind": "runtime",
+      "group": "space-age",
+      "status": "passed",
+      "started_at": "2026-07-12T18:12:19.5482394Z",
+      "completed_at": "2026-07-12T18:12:40.8477200Z",
+      "duration_seconds": 21.299,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "115aac77-5a5e-424d-858c-1de2770acf56",
+      "name": "prototype-limit-self-recycling-and-unrestricted-modules",
+      "kind": "runtime",
+      "group": "local-mod-library",
+      "status": "passed",
+      "started_at": "2026-07-12T18:12:40.8876642Z",
+      "completed_at": "2026-07-12T18:12:48.3734424Z",
+      "duration_seconds": 7.486,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "84566487-17cc-4763-884d-914c387ec04e",
+      "name": "prototype-limit-scope-inert-at-fixed-threshold",
+      "kind": "runtime",
+      "group": "local-mod-library",
+      "status": "passed",
+      "started_at": "2026-07-12T18:12:48.4069311Z",
+      "completed_at": "2026-07-12T18:12:56.0703098Z",
+      "duration_seconds": 7.663,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "6068c561-786a-4e9c-bdeb-3eef653a1f90",
+      "name": "prototype-limit-scope-engine-unchanged-baseline",
+      "kind": "runtime",
+      "group": "local-mod-library",
+      "status": "passed",
+      "started_at": "2026-07-12T18:12:56.0809431Z",
+      "completed_at": "2026-07-12T18:13:02.8405246Z",
+      "duration_seconds": 6.76,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "1d9db64f-5de6-4a23-b265-37d538a08a3c",
+      "name": "prototype-limit-scope-inert-at-matched-threshold",
+      "kind": "runtime",
+      "group": "local-mod-library",
+      "status": "passed",
+      "started_at": "2026-07-12T18:13:02.8585827Z",
+      "completed_at": "2026-07-12T18:13:10.3769849Z",
+      "duration_seconds": 7.518,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "82f57789-ba24-488b-aa9e-c51e86693419",
+      "name": "effect-scaling-mixed-tier",
+      "kind": "runtime",
+      "group": "local-mod-library",
+      "status": "passed",
+      "started_at": "2026-07-12T18:13:10.3901741Z",
+      "completed_at": "2026-07-12T18:13:33.2612546Z",
+      "duration_seconds": 22.871,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "3a9811cb-7c68-434d-ae0c-f5c5ca211134",
+      "name": "settings-profile-roundtrip",
+      "kind": "runtime",
+      "group": "settings-codec",
+      "status": "passed",
+      "started_at": "2026-07-12T18:13:33.3664936Z",
+      "completed_at": "2026-07-12T18:13:39.6947729Z",
+      "duration_seconds": 6.328,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "636d7d8e-4576-4387-a29e-921a6b7f485e",
+      "name": "base-generation-integrity-inserter-enabled",
+      "kind": "runtime",
+      "group": "base-load",
+      "status": "passed",
+      "started_at": "2026-07-12T18:13:39.7076684Z",
+      "completed_at": "2026-07-12T18:14:03.5613996Z",
+      "duration_seconds": 23.854,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "917cb3a0-9278-4655-a749-4d8f89f5fc95",
+      "name": "base-installed-space-age-icon-assets",
+      "kind": "runtime",
+      "group": "local-mod-library",
+      "status": "passed",
+      "started_at": "2026-07-12T18:14:03.7515440Z",
+      "completed_at": "2026-07-12T18:14:33.8467805Z",
+      "duration_seconds": 30.095,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "43455fe2-58ef-45c0-87a5-51a332243578",
+      "name": "checkbox-enabled-default-off-features",
+      "kind": "runtime",
+      "group": "base-load",
+      "status": "passed",
+      "started_at": "2026-07-12T18:14:34.0629296Z",
+      "completed_at": "2026-07-12T18:14:41.8480465Z",
+      "duration_seconds": 7.785,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "2d10b640-5f50-46e3-a733-d8d427e27401",
+      "name": "checkbox-disabled-default-on-features",
+      "kind": "runtime",
+      "group": "base-load",
+      "status": "passed",
+      "started_at": "2026-07-12T18:14:41.8702110Z",
+      "completed_at": "2026-07-12T18:14:50.3750140Z",
+      "duration_seconds": 8.505,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "45a07ff4-94dd-4685-9e41-1dc33017c2f0",
+      "name": "base-space-promethium-pack-policy",
+      "kind": "runtime",
+      "group": "space-age",
+      "status": "passed",
+      "started_at": "2026-07-12T18:14:50.4045049Z",
+      "completed_at": "2026-07-12T18:14:58.9831967Z",
+      "duration_seconds": 8.579,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "f7e89c2e-bbca-4da9-a5d7-49dcd82338a8",
+      "name": "space-age-space-pack-policy",
+      "kind": "runtime",
+      "group": "space-age",
+      "status": "passed",
+      "started_at": "2026-07-12T18:14:59.0018519Z",
+      "completed_at": "2026-07-12T18:15:26.3890532Z",
+      "duration_seconds": 27.387,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "0e6aa505-0345-4604-8012-bf08dc524522",
+      "name": "space-age-progression-pack-policy",
+      "kind": "runtime",
+      "group": "space-age",
+      "status": "passed",
+      "started_at": "2026-07-12T18:15:26.4922870Z",
+      "completed_at": "2026-07-12T18:16:05.5332423Z",
+      "duration_seconds": 39.041,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "4b5c6e17-fb8b-4c6e-8189-66f88f7a1224",
+      "name": "official-progression-pack-policy",
+      "kind": "runtime",
+      "group": "space-age",
+      "status": "passed",
+      "started_at": "2026-07-12T18:16:05.5968234Z",
+      "completed_at": "2026-07-12T18:16:43.2321081Z",
+      "duration_seconds": 37.635,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "ff6ae385-b739-43aa-8b6e-61eebe50bf66",
+      "name": "mod-progression-pack-policy",
+      "kind": "runtime",
+      "group": "official-science",
+      "status": "passed",
+      "started_at": "2026-07-12T18:16:43.2634438Z",
+      "completed_at": "2026-07-12T18:16:52.7383265Z",
+      "duration_seconds": 9.475,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "940c09f1-658d-4cef-90ed-0fa9e67a3394",
+      "name": "base-scripted-candidates-enabled",
+      "kind": "runtime",
+      "group": "local-mod-library",
+      "status": "passed",
+      "started_at": "2026-07-12T18:16:52.7638796Z",
+      "completed_at": "2026-07-12T18:17:01.1280910Z",
+      "duration_seconds": 8.364,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "fe29871f-4c64-439f-9026-3941cffe025c",
+      "name": "space-age-scripted-candidates-enabled",
+      "kind": "runtime",
+      "group": "space-age",
+      "status": "passed",
+      "started_at": "2026-07-12T18:17:01.1555261Z",
+      "completed_at": "2026-07-12T18:18:34.5953104Z",
+      "duration_seconds": 93.44,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "11c3a2ef-2abe-4a13-b8d2-ab429e0c34f4",
+      "name": "space-age-scripted-candidates-disabled",
+      "kind": "runtime",
+      "group": "space-age",
+      "status": "passed",
+      "started_at": "2026-07-12T18:18:35.0063925Z",
+      "completed_at": "2026-07-12T18:18:55.7958537Z",
+      "duration_seconds": 20.789,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "0cff21a6-6b5d-4d42-b865-7ed31ee356b3",
+      "name": "space-age-scripted-runtime-lifecycle",
+      "kind": "configuration-change",
+      "group": "space-age",
+      "status": "passed",
+      "started_at": "2026-07-12T18:18:55.8837848Z",
+      "completed_at": "2026-07-12T18:19:38.1445684Z",
+      "duration_seconds": 42.261,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "24a452ef-31ab-4c7d-9b46-5bc9bb4f9fa6",
+      "name": "space-age-scripted-runtime-disable-restoration",
+      "kind": "configuration-change",
+      "group": "space-age",
+      "status": "passed",
+      "started_at": "2026-07-12T18:19:38.1827914Z",
+      "completed_at": "2026-07-12T18:20:19.2935248Z",
+      "duration_seconds": 41.111,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "fd3e22ae-ed3b-49f8-9a0e-bbb21e3397e6",
+      "name": "space-age-scripted-runtime-reenable",
+      "kind": "configuration-change",
+      "group": "space-age",
+      "status": "passed",
+      "started_at": "2026-07-12T18:20:19.3357806Z",
+      "completed_at": "2026-07-12T18:21:00.5849580Z",
+      "duration_seconds": 41.249,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "2dce59a9-7ec0-4445-8b04-e4939e41edb8",
+      "name": "space-age-generation-integrity",
+      "kind": "runtime",
+      "group": "space-age",
+      "status": "passed",
+      "started_at": "2026-07-12T18:21:00.6218615Z",
+      "completed_at": "2026-07-12T18:22:21.9668218Z",
+      "duration_seconds": 81.345,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "66d0b34e-83b6-4d76-833d-430a264bc7e0",
+      "name": "space-age-plates-n-circuit-productivity-compat",
+      "kind": "runtime",
+      "group": "space-age",
+      "status": "passed",
+      "started_at": "2026-07-12T18:22:22.5386727Z",
+      "completed_at": "2026-07-12T18:22:43.9863957Z",
+      "duration_seconds": 21.448,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "3337eab1-b360-4497-9055-d0a37a4ebf8e",
+      "name": "scaled-known-productivity-competitor",
+      "kind": "runtime",
+      "group": "space-age",
+      "status": "passed",
+      "started_at": "2026-07-12T18:22:44.0011149Z",
+      "completed_at": "2026-07-12T18:23:05.2694671Z",
+      "duration_seconds": 21.268,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "46279b80-2e28-4316-aee4-2acf4414e399",
+      "name": "space-age-plates-n-circuit-productivity-partial-coverage",
+      "kind": "runtime",
+      "group": "space-age",
+      "status": "passed",
+      "started_at": "2026-07-12T18:23:05.5337543Z",
+      "completed_at": "2026-07-12T18:23:26.4173098Z",
+      "duration_seconds": 20.884,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "e7d201b3-1552-465b-ab4f-92ba718219c6",
+      "name": "space-age-plates-n-circuit-productivity-change-mismatch",
+      "kind": "runtime",
+      "group": "space-age",
+      "status": "passed",
+      "started_at": "2026-07-12T18:23:26.4795784Z",
+      "completed_at": "2026-07-12T18:23:47.2594083Z",
+      "duration_seconds": 20.78,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "720a289c-2eee-46e1-a445-a87291adbd0c",
+      "name": "space-age-plates-n-circuit-productivity-blocked-owner",
+      "kind": "runtime",
+      "group": "space-age",
+      "status": "passed",
+      "started_at": "2026-07-12T18:23:47.3017851Z",
+      "completed_at": "2026-07-12T18:24:07.8803321Z",
+      "duration_seconds": 20.579,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "17053db3-f77a-4626-a3dc-2eec854137fc",
+      "name": "space-age-vanilla-family-adoption",
+      "kind": "runtime",
+      "group": "space-age",
+      "status": "passed",
+      "started_at": "2026-07-12T18:24:07.9440775Z",
+      "completed_at": "2026-07-12T18:24:29.3900735Z",
+      "duration_seconds": 21.446,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "b8c14aad-bb2b-4f81-b9cf-19555d6f0fd4",
+      "name": "space-age-vanilla-family-adoption-config-change",
+      "kind": "configuration-change",
+      "group": "space-age",
+      "status": "passed",
+      "started_at": "2026-07-12T18:24:29.4598238Z",
+      "completed_at": "2026-07-12T18:25:16.7020024Z",
+      "duration_seconds": 47.242,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "ff6e3e21-489b-4f07-bf6f-514d7003075f",
+      "name": "space-age-vanilla-family-owner-prepatched",
+      "kind": "runtime",
+      "group": "space-age",
+      "status": "passed",
+      "started_at": "2026-07-12T18:25:16.7691162Z",
+      "completed_at": "2026-07-12T18:25:45.1276842Z",
+      "duration_seconds": 28.359,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "efbdf8f8-68bb-42ce-bb75-56a465e5a1bf",
+      "name": "space-age-vanilla-family-exact-owner",
+      "kind": "runtime",
+      "group": "space-age",
+      "status": "passed",
+      "started_at": "2026-07-12T18:25:45.1658223Z",
+      "completed_at": "2026-07-12T18:26:09.6130053Z",
+      "duration_seconds": 24.447,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "694ce511-ca00-429e-b3ab-be0661a9b1bc",
+      "name": "space-age-vanilla-family-mixed-owner",
+      "kind": "runtime",
+      "group": "space-age",
+      "status": "passed",
+      "started_at": "2026-07-12T18:26:09.6442524Z",
+      "completed_at": "2026-07-12T18:26:32.6770185Z",
+      "duration_seconds": 23.033,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "b4844e15-aa48-4bbc-a62a-92333357f59e",
+      "name": "space-age-fluid-productivity",
+      "kind": "runtime",
+      "group": "space-age",
+      "status": "passed",
+      "started_at": "2026-07-12T18:26:32.7227841Z",
+      "completed_at": "2026-07-12T18:26:53.9014196Z",
+      "duration_seconds": 21.179,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "58d46397-6ddc-4cde-9d4a-585531e9194d",
+      "name": "space-age-generation-integrity-inserter-enabled",
+      "kind": "runtime",
+      "group": "space-age",
+      "status": "passed",
+      "started_at": "2026-07-12T18:26:54.0249658Z",
+      "completed_at": "2026-07-12T18:28:20.2169599Z",
+      "duration_seconds": 86.192,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "3ba23ccf-dba4-4f5f-964b-df3977a473dd",
+      "name": "space-age-space-promethium-pack-policy",
+      "kind": "runtime",
+      "group": "space-age",
+      "status": "passed",
+      "started_at": "2026-07-12T18:28:20.6282659Z",
+      "completed_at": "2026-07-12T18:28:57.8931915Z",
+      "duration_seconds": 37.265,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "ba83bb45-57b1-40bd-9db6-c5162ec6ab70",
+      "name": "all-official-pack-policy",
+      "kind": "runtime",
+      "group": "official-science",
+      "status": "passed",
+      "started_at": "2026-07-12T18:28:57.9197934Z",
+      "completed_at": "2026-07-12T18:29:05.0202662Z",
+      "duration_seconds": 7.1,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "5b785d87-6440-47e1-8a25-3360f5e7ff79",
+      "name": "all-pack-policy",
+      "kind": "runtime",
+      "group": "official-science",
+      "status": "passed",
+      "started_at": "2026-07-12T18:29:05.0418233Z",
+      "completed_at": "2026-07-12T18:29:12.4052755Z",
+      "duration_seconds": 7.363,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "405bdaf0-1979-4e48-90c4-29e752338c7d",
+      "name": "base-extension-boundary-policy",
+      "kind": "runtime",
+      "group": "base-load",
+      "status": "passed",
+      "started_at": "2026-07-12T18:29:12.4308072Z",
+      "completed_at": "2026-07-12T18:29:19.4303923Z",
+      "duration_seconds": 7.0,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "6767e168-7168-402e-8012-f8432cd9d8d8",
+      "name": "base-effect-setting-retention",
+      "kind": "runtime",
+      "group": "local-mod-library",
+      "status": "passed",
+      "started_at": "2026-07-12T18:29:19.4540582Z",
+      "completed_at": "2026-07-12T18:29:43.0044533Z",
+      "duration_seconds": 23.55,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "ddf55fb0-2943-4301-848c-63b16377b13f",
+      "name": "weapon-overlap-off-coverage-absent",
+      "kind": "runtime",
+      "group": "weapon-overlap",
+      "status": "passed",
+      "started_at": "2026-07-12T18:29:43.0281537Z",
+      "completed_at": "2026-07-12T18:29:49.5173931Z",
+      "duration_seconds": 6.489,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "fd0a8aad-dde2-4259-b793-f3d924573683",
+      "name": "weapon-overlap-off-coverage-present",
+      "kind": "runtime",
+      "group": "weapon-overlap",
+      "status": "passed",
+      "started_at": "2026-07-12T18:29:49.5386693Z",
+      "completed_at": "2026-07-12T18:29:56.1036998Z",
+      "duration_seconds": 6.565,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "12988f35-b84f-42ab-96e3-4c14a740c4c1",
+      "name": "weapon-overlap-conditional-coverage-absent",
+      "kind": "runtime",
+      "group": "weapon-overlap",
+      "status": "passed",
+      "started_at": "2026-07-12T18:29:56.1224841Z",
+      "completed_at": "2026-07-12T18:30:02.5447522Z",
+      "duration_seconds": 6.422,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "7b1e5bbd-8326-4a40-8113-06f5274e79aa",
+      "name": "weapon-overlap-conditional-coverage-present",
+      "kind": "runtime",
+      "group": "weapon-overlap",
+      "status": "passed",
+      "started_at": "2026-07-12T18:30:02.6136895Z",
+      "completed_at": "2026-07-12T18:30:08.9439022Z",
+      "duration_seconds": 6.33,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "bb67c61a-3123-44a7-bfa0-bd8f986d1dc7",
+      "name": "weapon-overlap-always-coverage-absent",
+      "kind": "runtime",
+      "group": "weapon-overlap",
+      "status": "passed",
+      "started_at": "2026-07-12T18:30:08.9624408Z",
+      "completed_at": "2026-07-12T18:30:16.1582358Z",
+      "duration_seconds": 7.196,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "3f3240b7-5651-4c52-93d5-d991effd7ee0",
+      "name": "weapon-overlap-always-coverage-present",
+      "kind": "runtime",
+      "group": "weapon-overlap",
+      "status": "passed",
+      "started_at": "2026-07-12T18:30:16.1769039Z",
+      "completed_at": "2026-07-12T18:30:23.4505223Z",
+      "duration_seconds": 7.274,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "a99f84de-34a5-44bc-b5bc-9150ee6156d4",
+      "name": "scaled-weapon-overlap",
+      "kind": "runtime",
+      "group": "weapon-overlap",
+      "status": "passed",
+      "started_at": "2026-07-12T18:30:23.4746243Z",
+      "completed_at": "2026-07-12T18:30:29.8777249Z",
+      "duration_seconds": 6.403,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "c6823a21-e9d0-4efd-985d-a76f6df43d08",
+      "name": "weapon-overlap-conditional-external-owner",
+      "kind": "runtime",
+      "group": "weapon-overlap",
+      "status": "passed",
+      "started_at": "2026-07-12T18:30:29.8985168Z",
+      "completed_at": "2026-07-12T18:30:37.4220594Z",
+      "duration_seconds": 7.524,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "6df67131-056a-4305-8f9d-043bec4decf7",
+      "name": "omega-drill-productivity",
+      "kind": "runtime",
+      "group": "local-mod-library",
+      "status": "passed",
+      "started_at": "2026-07-12T18:30:37.4505898Z",
+      "completed_at": "2026-07-12T18:30:44.0843491Z",
+      "duration_seconds": 6.634,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "39215047-6fbb-456e-8dab-db88563acbdf",
+      "name": "base-competitor-rollback",
+      "kind": "runtime",
+      "group": "local-mod-library",
+      "status": "passed",
+      "started_at": "2026-07-12T18:30:44.1085385Z",
+      "completed_at": "2026-07-12T18:30:50.5820639Z",
+      "duration_seconds": 6.474,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "26e8a87f-1b3a-44bb-89e0-69abf7176509",
+      "name": "technology-prerequisite-rewire",
+      "kind": "runtime",
+      "group": "local-mod-library",
+      "status": "passed",
+      "started_at": "2026-07-12T18:30:50.5992864Z",
+      "completed_at": "2026-07-12T18:30:57.1286846Z",
+      "duration_seconds": 6.529,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "e4c371fe-eb7e-407a-bb76-a0ca1beca84d",
+      "name": "end-game-prerequisite-gate",
+      "kind": "runtime",
+      "group": "local-mod-library",
+      "status": "passed",
+      "started_at": "2026-07-12T18:30:57.1472962Z",
+      "completed_at": "2026-07-12T18:31:04.5009549Z",
+      "duration_seconds": 7.354,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "2c6384d5-93af-46db-ad31-1af1714f7e1f",
+      "name": "base-cargo-space-age-gate",
+      "kind": "runtime",
+      "group": "space-age",
+      "status": "passed",
+      "started_at": "2026-07-12T18:31:04.5218381Z",
+      "completed_at": "2026-07-12T18:31:11.1897253Z",
+      "duration_seconds": 6.668,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "7e5017be-555d-49b5-be07-ac56bc6f9f3d",
+      "name": "space-age-cargo-pad-enabled",
+      "kind": "runtime",
+      "group": "space-age",
+      "status": "passed",
+      "started_at": "2026-07-12T18:31:11.2117405Z",
+      "completed_at": "2026-07-12T18:31:31.0944324Z",
+      "duration_seconds": 19.883,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "903bb804-3298-455f-a37e-b09b4d269e55",
+      "name": "space-age-cargo-logistics-shape",
+      "kind": "runtime",
+      "group": "space-age",
+      "status": "passed",
+      "started_at": "2026-07-12T18:31:31.1378310Z",
+      "completed_at": "2026-07-12T18:31:50.5441756Z",
+      "duration_seconds": 19.406,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "7ed4398b-2174-4f5a-afdb-f92b8fd0292f",
+      "name": "space-age-duplicate-cargo-diagnostics",
+      "kind": "runtime",
+      "group": "space-age",
+      "status": "passed",
+      "started_at": "2026-07-12T18:31:50.5791482Z",
+      "completed_at": "2026-07-12T18:32:09.3932347Z",
+      "duration_seconds": 18.814,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-0d171feb9404405b98794f7a26626933\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    }
+  ],
+  "error": null,
+  "assertions_executed": 0
+}

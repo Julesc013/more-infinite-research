@@ -1,0 +1,13 @@
+{
+  "name": "mir-fixture-assert-cargo-logistics",
+  "version": "0.1.0",
+  "title": "MIR Fixture - Assert Cargo Logistics",
+  "author": "Julesc013",
+  "description": "Validation fixture that asserts Space Age cargo logistics technologies use the intended effects, science packs, prerequisites, and costs.",
+  "factorio_version": "0.15",
+  "dependencies": [
+    "base >= 0.15",
+    "space-age",
+    "more-infinite-research"
+  ]
+}

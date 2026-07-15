@@ -1,0 +1,11 @@
+{
+  "name": "more-infinite-research",
+  "version": "1.3.0",
+  "title": "More Infinite Research",
+  "author": "Julesc013",
+  "description": "Adds configurable target-supported finite continuation research ladders for logistics, combat, labs, and base technologies.",
+  "factorio_version": "0.13",
+  "dependencies": [
+    "base >= 0.13"
+  ]
+}

@@ -1,0 +1,35 @@
+name: Assurance Backport Matrix
+
+on:
+  workflow_dispatch:
+    inputs:
+      candidate_sha:
+        description: "Trusted backport source commit"
+        required: true
+      baseline_sha:
+        description: "Published target baseline"
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  plan:
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        target: ["2.1", "2.0"]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.candidate_sha }}
+          fetch-depth: 0
+      - name: Materialize target plan
+        shell: pwsh
+        run: ./scripts/mir.ps1 assurance backport --target '${{ matrix.target }}' --baseline '${{ inputs.baseline_sha }}' --output artifacts/assurance/backport-${{ matrix.target }}.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: assurance-backport-plan-${{ matrix.target }}-${{ inputs.candidate_sha }}
+          path: artifacts/assurance/**
+          if-no-files-found: error

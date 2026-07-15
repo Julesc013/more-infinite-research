@@ -1,5 +1,5 @@
 schema: 1
-updated_at: 2026-07-14
+updated_at: 2026-07-15
 policy:
   published_archives_are_immutable: true
   target_lines_use_independent_binary_evidence: true
@@ -57,56 +57,112 @@ waves:
       status: frozen-verified
     factorio_0_17:
       branch: tmp/0.17
-      next_version: "1.7.1"
-      predecessor_version: "1.7.0"
-      predecessor_commit: 1a9b5a7b1162f8dca8125ef7bb792f57a9ae282b
-      canonical_source_anchor: 53090c6f860bf9cb9aaf10140cbfe3924ef59c6c
-      status: documented-not-started-authority-required
+      version: "1.7.1"
+      tag_commit: 9d9095c92055aebe557a55a7ab99bb9588fe73fb
+      post_publication_commit: 828a7359af014105d0aa681722585c26766583e6
+      archive_sha256: 2B2A395F014BF1C0C08596602A723E51F14199A9196B192858335FFE8ED9B25B
+      github_status: published-and-verified
+      mod_portal_status: blocked-missing-upload-api-key
+      status: published-github-portal-blocked
     factorio_0_16:
       branch: tmp/0.16
-      next_version: "1.6.0"
-      canonical_source_anchor: 53090c6f860bf9cb9aaf10140cbfe3924ef59c6c
-      status: documented-not-started-after-0.17
+      version: "1.6.0"
+      tag_commit: a48509ed1dfbae8eba4b3dc7a701065063c12d5f
+      post_publication_commit: b392624d38dbb8ef6c42c8efa20aeb9b6a9c97c9
+      archive_sha256: 18EAE70A7FEE1FD50099D15985C4E5BE7DB018592EC3EFFC792950A920714544
+      github_status: published-and-verified
+      mod_portal_status: blocked-missing-upload-api-key
+      status: published-github-portal-blocked
     factorio_0_15:
       branch: tmp/0.15
-      next_version: "1.5.0"
-      status: binary-available-proof-pending
+      version: "1.5.0"
+      tag_commit: c2b526fd6dde81be7703daef53b075a1fd773e09
+      post_publication_commit: 3e44e19190236d03dc15e50d714b4a7347e05220
+      archive_sha256: 131162AA1A62C05E2C395C3F9D2495178742CD8C5324B058C42995C17F65B4DB
+      github_status: published-and-verified
+      mod_portal_status: blocked-missing-upload-api-key
+      status: published-github-portal-blocked
     factorio_0_14:
       branch: tmp/0.14
-      next_version: "1.4.0"
-      status: discovery-pending
+      version: "1.4.0"
+      tag_commit: fa192796ab274dd590c65b96d0f3f6a0f35cb155
+      post_publication_commit: f8251df29a70dd402de12874c231e071bd47bd5b
+      archive_sha256: 69B7FC86E798937D44DF60E5E6DDC1FA636A10643B2E1BF54A79F5255CF984C1
+      github_status: published-and-verified
+      mod_portal_status: blocked-missing-upload-api-key
+      status: published-github-portal-blocked
     factorio_0_13:
       branch: tmp/0.13
-      next_version: "1.3.0"
-      status: discovery-pending
+      version: "1.3.0"
+      tag_commit: a33b99c1f39e1e779986a12a558a79ea97e69239
+      post_publication_commit: 262e94b39bf30b8bbf4f17f6cbf14dd507f696ba
+      archive_sha256: B07136627C913BA50C36B4F9453D972047F4FD3666BB9B8A79AB0EEFC9CA1749
+      github_status: published-and-verified
+      mod_portal_status: blocked-missing-upload-api-key
+      status: published-github-portal-blocked
     factorio_0_12:
       branch: tmp/0.12
-      next_version: "0.12.0"
-      status: discovery-pending
+      version: "0.12.0"
+      tag_commit: d3681bc202938e06fb965531ddfa764f71ca38ce
+      post_publication_commit: f9bce733e9ac78934a827b8a3ce71f5dd570b8ab
+      archive_sha256: C98EBB436DD1BA1C4C0C230EB51C637EE42904000C9C7A82C7E7A33F6F5461EF
+      github_status: published-and-verified
+      mod_portal_status: archive-only-not-attempted
+      status: published-github-historical-archive
     factorio_0_11:
       branch: tmp/0.11
-      next_version: "0.11.0"
-      status: discovery-pending
+      version: "0.11.0"
+      tag_commit: e83648f8f9b75f8545e913a9a5288423dbb9ebfa
+      post_publication_commit: 2f71e78b2bd2cdadc55654cd1349b3858a75fed4
+      archive_sha256: C628FBFA4FC2A811869C5D33245BCBA0D37AA5EE2074ADEC7155874C2081B748
+      github_status: published-and-verified
+      mod_portal_status: archive-only-not-attempted
+      status: published-github-historical-archive
     factorio_0_10:
       branch: tmp/0.10
-      next_version: "0.10.0"
-      status: discovery-pending
+      version: "0.10.0"
+      tag_commit: 732ec117f187ccf77325e85023999f869520be9e
+      post_publication_commit: c88838b891e4091ea9e549c14cd630c5ee43d950
+      archive_sha256: 845CBB69195ED03AF604685137D356E826B29D0570A4A4AFD6C0941E4B23C04F
+      github_status: published-and-verified
+      mod_portal_status: archive-only-not-attempted
+      status: published-github-historical-archive
     factorio_0_9:
       branch: tmp/0.9
-      next_version: "0.9.0"
-      status: discovery-pending
+      version: "0.9.0"
+      tag_commit: 210a4556b12a3a40a64337c3535da307c86137e5
+      post_publication_commit: 13764da44d971dd1fca6053315f5fcbe996b4ac4
+      archive_sha256: 9FE3117CE3415858506FBA319A2F025F170771590A23C2E160D710F4447A05F1
+      github_status: published-and-verified
+      mod_portal_status: archive-only-not-attempted
+      status: published-github-historical-archive
     factorio_0_8:
       branch: tmp/0.8
-      next_version: "0.8.0"
-      status: discovery-pending
+      version: "0.8.0"
+      tag_commit: e0e297cd0bcc4a38f54d5b2e4b7bc54335785ee3
+      post_publication_commit: 7086ee27486ae4177bbb310245fa24c4a2a3f18e
+      archive_sha256: 6832B00783657F60D8AE967552CA354D1F73C988A0DFE023999AE81533267D8E
+      github_status: published-and-verified
+      mod_portal_status: archive-only-not-attempted
+      status: published-github-historical-archive
     factorio_0_7:
       branch: tmp/0.7
-      next_version: "0.7.0"
-      status: discovery-pending
+      version: "0.7.0"
+      tag_commit: 085d529f52b3f3b2ddf06a682475d2d7124210b7
+      post_publication_commit: e44ee8afaa957797431c3f350e9566e0512b7b1c
+      archive_sha256: 8495146889655FA46233A7B0416F4C67B4E2BF93E984E01F5F8234C9CA6F570F
+      github_status: published-and-verified
+      mod_portal_status: archive-only-not-attempted
+      status: published-github-historical-archive
     factorio_0_6:
       branch: tmp/0.6
-      next_version: "0.6.0"
-      status: discovery-pending
+      version: "0.6.0"
+      tag_commit: a4f82673278f1414eff06f8094ed460851fc112b
+      post_publication_commit: 26886b6eeef6638801268821ee2aa5c1caf94a60
+      archive_sha256: 40EC4F7B07EF4219E74259DA0AA30C8095D8CEA003BDECE90E857D4379DB1C2C
+      github_status: published-and-verified
+      mod_portal_status: archive-only-not-attempted
+      status: published-github-historical-archive
 
   mir_3_1_1:
     version: "3.1.1"
@@ -234,9 +290,10 @@ waves:
     assurance_seal: .mir/evidence/candidate-seals/mir-3.1.9-factorio-2.1.json
     seal_source_commit: f81af94c9a16666be8f5902bb5653aeea57033ba
     candidate_freshness_gate: passed
-    interactive_gate: pending-maintainer
-    publication_status: unreleased
-    status: release-candidate-awaiting-manual-review
+    interactive_gate: accepted-for-publication
+    publication_status: published
+    tag: "3.1.9"
+    status: published-frozen
 
   mir_2_4_0:
     version: "2.4.0"
@@ -268,6 +325,7 @@ waves:
     seal_location: "legacy:.mir/evidence/candidate-seals/mir-2.4.5-factorio-2.0.json"
     seal_source_commit: 9cfa77c33a635c24f0d4ea458d317cddfa9e325f
     automated_gate: passed-change-aware
-    interactive_gate: pending-maintainer
-    publication_status: unreleased
-    status: sealed-release-candidate-on-legacy
+    interactive_gate: accepted-for-publication
+    publication_status: published
+    tag: "2.4.5"
+    status: published-frozen
