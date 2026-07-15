@@ -1,0 +1,54 @@
+{
+  "schema": 1,
+  "run_id": "54144e1e-cebd-4381-9370-636f029e85be",
+  "scenario": "post-publication-full-validation-catalog",
+  "kind": "orchestration",
+  "group": "validation",
+  "command": ".\\scripts\\Invoke-MIRValidation.ps1 -FactorioBin 'C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\bin\\x64\\factorio.exe' -Tier full -MaxParallel 1 -ValidationSummaryPath 'build\\post-publication-dev-requalification.json'",
+  "exit_code": 124,
+  "target_branch": "dev",
+  "source_commit": "804e7b7332513388ee3b3ef7575a394cea322394",
+  "factorio_binary": "C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\bin\\x64\\factorio.exe",
+  "factorio_binary_version": "2.1.10",
+  "factorio_binary_sha256": "DA4CA713FADBA1728904A2B47C2D73D2E07E8EB3AA2FAEED9AEE0FA6B417BAC3",
+  "error": "The outer shell command reached its 600-second execution ceiling while the structured validation summary had 56 passed, zero failed, and one running scenario.",
+  "running_scenario_at_timebox": "space-age-scripted-runtime-reenable",
+  "root_cause_classification": "outer-command-timebox",
+  "root_cause": "The complete 102-scenario runtime catalog requires more than the 600-second outer command allowance. The same boundary was observed with MaxParallel 1 and MaxParallel 4; neither structured run recorded a failed scenario.",
+  "repeat_observation": {
+    "run_id": "f96f2004-cf66-4a90-b107-af2d4e163a3e",
+    "command": ".\\scripts\\Invoke-MIRValidation.ps1 -FactorioBin 'C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\bin\\x64\\factorio.exe' -Tier full -MaxParallel 4 -ValidationSummaryPath 'build\\post-publication-dev-requalification-parallel.json'",
+    "exit_code": 124,
+    "structured_passed": 56,
+    "structured_failed": 0,
+    "structured_running": 1,
+    "running_scenario_at_timebox": "space-age-scripted-runtime-reenable",
+    "surviving_factorio_processes": 0
+  },
+  "corrective_action": "Run the 46 scenarios not completed by the first monolithic observation in four bounded explicit-scenario batches, then compare the union of passed scenario names with the exact expected catalog.",
+  "corrective_commands": [
+    ".\\scripts\\Invoke-MIRValidation.ps1 -FactorioBin 'C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\bin\\x64\\factorio.exe' -Scenario <batch-1-scenarios> -MaxParallel 4 -ValidationSummaryPath 'build\\post-publication-batch-1.json'",
+    ".\\scripts\\Invoke-MIRValidation.ps1 -FactorioBin 'C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\bin\\x64\\factorio.exe' -Scenario <batch-2-scenarios> -MaxParallel 4 -ValidationSummaryPath 'build\\post-publication-batch-2.json'",
+    ".\\scripts\\Invoke-MIRValidation.ps1 -FactorioBin 'C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\bin\\x64\\factorio.exe' -Scenario <batch-3-scenarios> -MaxParallel 4 -ValidationSummaryPath 'build\\post-publication-batch-3.json'",
+    ".\\scripts\\Invoke-MIRValidation.ps1 -FactorioBin 'C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\bin\\x64\\factorio.exe' -Scenario <batch-4-scenarios> -MaxParallel 4 -ValidationSummaryPath 'build\\post-publication-batch-4.json'"
+  ],
+  "corrective_result": {
+    "status": "passed-composite-bounded-batches",
+    "batch_results": [
+      "12/12",
+      "12/12",
+      "12/12",
+      "10/10"
+    ],
+    "expected_unique": 102,
+    "passed_unique": 102,
+    "missing": 0,
+    "unexpected": 0,
+    "failed": 0,
+    "surviving_factorio_processes": 0,
+    "evidence": ".mir/evidence/lower-wave/post-publication-dev-requalification.json"
+  },
+  "package_source_sha256": "964F4F06546486D2BB8EF5DDA5146C1BE1AC2B40C5ED9E2BE2065A14CFC45C2C",
+  "validation_package_sha256": "12E439451D69634A27E8C3817BA3F1D89B295F654EECADB16AA5FDEE74558888",
+  "release_byte_impact": "none"
+}
