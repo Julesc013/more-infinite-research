@@ -1,0 +1,368 @@
+{
+  "schema": 1,
+  "status": "all-copied-and-referenced-evidence-rehashed",
+  "generated_at": "2026-07-15T00:13:48.8586011Z",
+  "entry_count": 72,
+  "entries": [
+    {
+      "path": ".mir/evidence/0.10.0-candidate-seal.json",
+      "sha256": "544B5DA5D1268A9CF0D19535AFF365C0D7BC62E4DFC2E05C71DE1BF51247068F",
+      "size_bytes": 1388
+    },
+    {
+      "path": ".mir/evidence/0.10.0-qualification-summary.json",
+      "sha256": "0DADC431C8799D6A01176FB3426A786620380B1E7524DFB227E9858979A8F002",
+      "size_bytes": 2727
+    },
+    {
+      "path": ".mir/evidence/0.10.0/publication.json",
+      "sha256": "3FCB70DA2B63E8C2027315049CF053CFADDAF2BA4655C2A12FFB0FDD6BE5B7E8",
+      "size_bytes": 1041
+    },
+    {
+      "path": ".mir/evidence/0.11.0-candidate-seal.json",
+      "sha256": "E8E6B115B33746E30D196CC68E8CD11DAB09A5E89C198A064D0B3981293488C2",
+      "size_bytes": 1388
+    },
+    {
+      "path": ".mir/evidence/0.11.0-qualification-summary.json",
+      "sha256": "82F3A9E155D8139054A51068168F09E918755530D37FF92ADF45A231EB623A01",
+      "size_bytes": 2727
+    },
+    {
+      "path": ".mir/evidence/0.11.0/publication.json",
+      "sha256": "40706E0B29673B4E4B00896E717FC4A317A5E3717D85317E31A38F2B17166898",
+      "size_bytes": 1041
+    },
+    {
+      "path": ".mir/evidence/0.12.0-candidate-seal.json",
+      "sha256": "80D9F75318F6036DBFE908EE56650E9C25CDB4CBBD2D802F5F5EE600D1ACAED8",
+      "size_bytes": 1388
+    },
+    {
+      "path": ".mir/evidence/0.12.0-qualification-summary.json",
+      "sha256": "92BCF62BE224D56E797F1F303BF56DD30618D184FF456763DA4E73F2E178C3B9",
+      "size_bytes": 2860
+    },
+    {
+      "path": ".mir/evidence/0.12.0/publication.json",
+      "sha256": "48D65FB8CD1D3FAFBCC200B705E5F58CAC2CC13F75648E61DF635CCE7FAF683F",
+      "size_bytes": 1041
+    },
+    {
+      "path": ".mir/evidence/0.6.0-candidate-seal.json",
+      "sha256": "31547936E5839C006C81A904C077F6386D568488C33694320BB0BCB850F7F5F4",
+      "size_bytes": 1382
+    },
+    {
+      "path": ".mir/evidence/0.6.0-qualification-summary.json",
+      "sha256": "B8FFAA9CFDB6367DF8B6532063695ED109E5C3A34283397EAEEC819A22968DDE",
+      "size_bytes": 2472
+    },
+    {
+      "path": ".mir/evidence/0.6.0/publication.json",
+      "sha256": "4D1535A17A9584EA7C83BF0E4904A13FCBFAA3EB74B508CD4D9B4A1AC01B9E8C",
+      "size_bytes": 1037
+    },
+    {
+      "path": ".mir/evidence/0.7.0-candidate-seal.json",
+      "sha256": "6A6953AC5604199355F75C8C7C27ECA547820F85B7BC79F0E0BB04D025470C3E",
+      "size_bytes": 1382
+    },
+    {
+      "path": ".mir/evidence/0.7.0-qualification-summary.json",
+      "sha256": "FC45AF16C5A7D8160D3E9FA6E6181C6837309E6A8947E5FB76AC7FDABFD9F003",
+      "size_bytes": 2737
+    },
+    {
+      "path": ".mir/evidence/0.7.0/publication.json",
+      "sha256": "BEE5CF6F8271551A88D18A30645CC4B3ED6BBC619FC6AD64351EEDED3C587A9D",
+      "size_bytes": 1037
+    },
+    {
+      "path": ".mir/evidence/0.8.0-candidate-seal.json",
+      "sha256": "1502B3AC49B049B8C6026E6657CB6718B7801C0E48257A9D30BEC06D44800605",
+      "size_bytes": 1382
+    },
+    {
+      "path": ".mir/evidence/0.8.0-qualification-summary.json",
+      "sha256": "7D4E9233A2733714EF581C117B0975C20E6E1032384021C5DE9659762EBB4C3A",
+      "size_bytes": 2737
+    },
+    {
+      "path": ".mir/evidence/0.8.0/publication.json",
+      "sha256": "162149A0B9CD331DCCEDEF9229E4BA798A60ADA1C45F9299137F74972192E691",
+      "size_bytes": 1037
+    },
+    {
+      "path": ".mir/evidence/0.9.0-candidate-seal.json",
+      "sha256": "E4B88EB5111DBC6F20B21C52BDFA1FC31BAA8160A65BF6091F1E3891DE13F564",
+      "size_bytes": 1382
+    },
+    {
+      "path": ".mir/evidence/0.9.0-qualification-summary.json",
+      "sha256": "3C9E7C63A7D02CBA9472A76AEC51C81B10C4E0CB68ED1AFAB52072D804931843",
+      "size_bytes": 2722
+    },
+    {
+      "path": ".mir/evidence/0.9.0/publication.json",
+      "sha256": "4CA1E28F24DADDA0013366B430D399DBC2C36E0CA41AAFDDBC7C00A6EB8513FC",
+      "size_bytes": 1037
+    },
+    {
+      "path": ".mir/evidence/1.3.0-candidate-seal.json",
+      "sha256": "8B1C152010A10D1006D148FC5CB38B54156ACC2804432B9A69EB072E143290FF",
+      "size_bytes": 1840
+    },
+    {
+      "path": ".mir/evidence/1.3.0-qualification-summary.json",
+      "sha256": "0D7B76ADADFC0A6FFC8241AF08D97212D02AED6205BC6770728104A435B44514",
+      "size_bytes": 827
+    },
+    {
+      "path": ".mir/evidence/1.3.0/publication.json",
+      "sha256": "302518A18C9B19442B718D7ECEABF99AD2EA14C5435C72B8564725D1867E0064",
+      "size_bytes": 1357
+    },
+    {
+      "path": ".mir/evidence/1.4.0-candidate-seal.json",
+      "sha256": "0A37746D3511D19E43CF4BF6FE2A951E777842F1AD7DBD0366B9C2FF7665E44D",
+      "size_bytes": 1840
+    },
+    {
+      "path": ".mir/evidence/1.4.0-qualification-summary.json",
+      "sha256": "BB72F01D663DB7AF1A611B3CABBFAC2FC2AAE8D42BD77C632E58D7F2077CC853",
+      "size_bytes": 827
+    },
+    {
+      "path": ".mir/evidence/1.4.0/publication.json",
+      "sha256": "19D43BFAE8BAD413C375C191F234CC2B53364882126ECE058D89DA284762F011",
+      "size_bytes": 1357
+    },
+    {
+      "path": ".mir/evidence/1.5.0-candidate-seal.json",
+      "sha256": "64BD59E924EBF2E090E8FBF282B76397BB80ABFD028BA74F932AC74CE2A5D28F",
+      "size_bytes": 1840
+    },
+    {
+      "path": ".mir/evidence/1.5.0-qualification-summary.json",
+      "sha256": "70C769E1A8F8AA1CBA1DC0230F3DF1E0FC20567425EE3FDE673E8C684D380A5B",
+      "size_bytes": 827
+    },
+    {
+      "path": ".mir/evidence/1.5.0/publication.json",
+      "sha256": "D966E039DAD8CC5B1125EC442FDA8F1A8BE46DF4C031EEE64A876ED3342C55D9",
+      "size_bytes": 1357
+    },
+    {
+      "path": ".mir/evidence/1.6.0-candidate-seal.json",
+      "sha256": "091B79DFBE609FADD647781E3644959B874831CC142922D2FB4DA7E52A774F4F",
+      "size_bytes": 1840
+    },
+    {
+      "path": ".mir/evidence/1.6.0-qualification-summary.json",
+      "sha256": "F90E6ABD563290D166E2F79A83AF604C091E8E91769C9541B552934833817A72",
+      "size_bytes": 827
+    },
+    {
+      "path": ".mir/evidence/1.6.0/publication.json",
+      "sha256": "B787889E633B0FC15E1A0EABF3293CEB96AE60FDF63F77DCA19C7CB7F70EC645",
+      "size_bytes": 1357
+    },
+    {
+      "path": ".mir/evidence/1.7.1-candidate-seal.json",
+      "sha256": "08E4361F05578E1995CF2624C5C6CEDD0F126D4CCD018F01E1D563D50AC59A88",
+      "size_bytes": 1840
+    },
+    {
+      "path": ".mir/evidence/1.7.1-qualification-summary.json",
+      "sha256": "9108E887164919E1CD6CBD8D8D2537224714D98EF7659CA47248B0C9C8A41208",
+      "size_bytes": 827
+    },
+    {
+      "path": ".mir/evidence/1.7.1/publication.json",
+      "sha256": "8161A782E25BBD0D71A4187E28E314152275C2C352D732C41E298FC69B72F517",
+      "size_bytes": 1357
+    },
+    {
+      "path": ".mir/evidence/lower-wave/0.10.0-feature-classification.json",
+      "sha256": "21123C5AFFEF8BCF5EECF55A92420B6DD499AE5B6BEA861C7C3B9CDDF1F83415",
+      "size_bytes": 6477
+    },
+    {
+      "path": ".mir/evidence/lower-wave/0.11.0-feature-classification.json",
+      "sha256": "F9C51F5C25282BEB1635B17EC213E66D06076D788B0414D03B083FE68088D3F8",
+      "size_bytes": 6477
+    },
+    {
+      "path": ".mir/evidence/lower-wave/0.12.0-feature-classification.json",
+      "sha256": "6F6C02D94AB2378A357156C9C5932BDF7BD565C40AD3952293C555104D935599",
+      "size_bytes": 6476
+    },
+    {
+      "path": ".mir/evidence/lower-wave/0.6.0-feature-classification.json",
+      "sha256": "F1856915746CB6982A070874ED615F1900BB87B032E71857357F03541B44E326",
+      "size_bytes": 6474
+    },
+    {
+      "path": ".mir/evidence/lower-wave/0.7.0-feature-classification.json",
+      "sha256": "D5D4D72D40950CFD01E0F3A9A5FB22161373E35D16B1EDA92C44896ECA47C54B",
+      "size_bytes": 6473
+    },
+    {
+      "path": ".mir/evidence/lower-wave/0.8.0-feature-classification.json",
+      "sha256": "E3D2B79BA0C6AD03025A7EE308822D2473F9F5C1691C8B7BDEB61F1493A83CD0",
+      "size_bytes": 6473
+    },
+    {
+      "path": ".mir/evidence/lower-wave/0.9.0-feature-classification.json",
+      "sha256": "E4CE4A3BC0377A10DEED890B0D591A5705BD2C8F01C64A311382874C476D45B4",
+      "size_bytes": 6473
+    },
+    {
+      "path": ".mir/evidence/lower-wave/1.3.0-balance-summary.json",
+      "sha256": "90D33DB68D718588D6F11337716BDF97A779663F47A24373D256BE095C24DFDC",
+      "size_bytes": 895
+    },
+    {
+      "path": ".mir/evidence/lower-wave/1.3.0-feature-classification.json",
+      "sha256": "03BA27DF4E583ADCE496BDD9219BBB7F7D0F92ECF291A4D47B9B718C7AFAD28B",
+      "size_bytes": 7851
+    },
+    {
+      "path": ".mir/evidence/lower-wave/1.4.0-balance-summary.json",
+      "sha256": "73835B58D00524AFC7B2D9A8157902986B9E54DB4ABE1A80B1DA6E1E07D3EB4F",
+      "size_bytes": 895
+    },
+    {
+      "path": ".mir/evidence/lower-wave/1.4.0-feature-classification.json",
+      "sha256": "86F5F48FEE0CA06574E4B7FA284E71442D0AB35B122F39ABE0B25DD773870559",
+      "size_bytes": 7851
+    },
+    {
+      "path": ".mir/evidence/lower-wave/1.5.0-balance-summary.json",
+      "sha256": "25F9267C5062D1DEA3C0A43FE131BDAA1BC67034F0BB07448F3E78CC8A63A9F3",
+      "size_bytes": 848
+    },
+    {
+      "path": ".mir/evidence/lower-wave/1.5.0-feature-classification.json",
+      "sha256": "F6820212CD745CB1405F8A46F434D42810A538F1DD173DEAF5E24F349C699809",
+      "size_bytes": 7769
+    },
+    {
+      "path": ".mir/evidence/lower-wave/1.6.0-balance-summary.json",
+      "sha256": "A0EDF7D8520BF510F379399C93F11C52394548617FC9A4D5715868B14A15D18E",
+      "size_bytes": 859
+    },
+    {
+      "path": ".mir/evidence/lower-wave/1.6.0-feature-classification.json",
+      "sha256": "F9C8987B04DBE96604C2322170504748C074F9BD050DEBD64AE64F6461D1C4F2",
+      "size_bytes": 7768
+    },
+    {
+      "path": ".mir/evidence/lower-wave/1.7.1-balance-summary.json",
+      "sha256": "AA825B1EFBA59B6BE1DA8540C14E35E46FF063F76B8F649C821DCFBE20979FE5",
+      "size_bytes": 858
+    },
+    {
+      "path": ".mir/evidence/lower-wave/1.7.1-feature-classification.json",
+      "sha256": "2D89D3F7CF3B1517181B8340180CF0E9A05D746DE64062AA690E29B0DEB4D815",
+      "size_bytes": 7774
+    },
+    {
+      "path": ".mir/evidence/lower-wave/aggregate-feature-matrix.json",
+      "sha256": "99B0D71CA5104C823FECB833737E7BE1536A41DA45ED1343C438726110684CC1",
+      "size_bytes": 17432
+    },
+    {
+      "path": ".mir/evidence/lower-wave/final-release-ledger.json",
+      "sha256": "3C8EF6E3BFF6EF67625315D64E509BC44853E615ADFDDBC05424F01C51A14F50",
+      "size_bytes": 24743
+    },
+    {
+      "path": ".mir/evidence/lower-wave/targets/0.10.0/source-lock.json",
+      "sha256": "529E367CC7A1BC1A44C7AFE9E86CD4E71B5620D516CD26C3D8B7A7749FEB7BC4",
+      "size_bytes": 4410
+    },
+    {
+      "path": ".mir/evidence/lower-wave/targets/0.11.0/source-lock.json",
+      "sha256": "823C49D1AB5FCE28C62575E06A2B69D50D263A4F70E86867FD36F0D9DE3740EC",
+      "size_bytes": 4410
+    },
+    {
+      "path": ".mir/evidence/lower-wave/targets/0.12.0/source-lock.json",
+      "sha256": "4AD1A5FBA235B4792B779A6CBFB23409AED1D1F1E3179649B6A8AECCD544D7DC",
+      "size_bytes": 4410
+    },
+    {
+      "path": ".mir/evidence/lower-wave/targets/0.6.0/source-lock.json",
+      "sha256": "D18AC3765441B17410096E389FF2C24B18AA0A277B68DF60563BD74FB3E602C6",
+      "size_bytes": 4393
+    },
+    {
+      "path": ".mir/evidence/lower-wave/targets/0.7.0/source-lock.json",
+      "sha256": "27E9461140F315EAE5825DB46683290E7DFBFE09B0093B6D4D8FE0803D4B9191",
+      "size_bytes": 4393
+    },
+    {
+      "path": ".mir/evidence/lower-wave/targets/0.8.0/source-lock.json",
+      "sha256": "273A165237E45F7782FBF9D85244A7075B96ABF9A8D1C068F03E617AA5976950",
+      "size_bytes": 4393
+    },
+    {
+      "path": ".mir/evidence/lower-wave/targets/0.9.0/source-lock.json",
+      "sha256": "94248B458033433B15F806317910F894C75992C40E9800B2443AB235ECB0F8FC",
+      "size_bytes": 4393
+    },
+    {
+      "path": ".mir/evidence/lower-wave/targets/1.3.0/source-lock.json",
+      "sha256": "E9DF6F9CC624F3D74994C078A325F843C3BE56067D8A94C81BB3358C38CB7A3A",
+      "size_bytes": 12243
+    },
+    {
+      "path": ".mir/evidence/lower-wave/targets/1.3.0/target-reconstruction.json",
+      "sha256": "0B77ADE7DB651E403309D8FF74729EFCA283CFD90CA8D56E619E0689F656A118",
+      "size_bytes": 1215
+    },
+    {
+      "path": ".mir/evidence/lower-wave/targets/1.4.0/source-lock.json",
+      "sha256": "66BB251160FF9418D1DA82CE3A77B211C607F2A472A17A71C43AF73ED01BC379",
+      "size_bytes": 12243
+    },
+    {
+      "path": ".mir/evidence/lower-wave/targets/1.4.0/target-reconstruction.json",
+      "sha256": "14D0E883E846F9671425388DB8B74C8B0000621FE2D5FB0ACBE623FD42FB18E4",
+      "size_bytes": 1215
+    },
+    {
+      "path": ".mir/evidence/lower-wave/targets/1.5.0/source-lock.json",
+      "sha256": "F0F28B2068BDF9B0BF7D8A9D1BD133626E6033AE13B3E4D146A0B7FFB3D37040",
+      "size_bytes": 12118
+    },
+    {
+      "path": ".mir/evidence/lower-wave/targets/1.5.0/target-reconstruction.json",
+      "sha256": "C4036A94A62818EE2D1B8A398B2689E10825490D53CDB31F958281260D390910",
+      "size_bytes": 1150
+    },
+    {
+      "path": ".mir/evidence/lower-wave/targets/1.6.0/source-lock.json",
+      "sha256": "6B5F4A98486F8857320792C305E80A5DAEC5A8BD307361633ECAC105A702459E",
+      "size_bytes": 12118
+    },
+    {
+      "path": ".mir/evidence/lower-wave/targets/1.6.0/target-reconstruction.json",
+      "sha256": "94EBAD437B7F71C8BBA7C54DC090DC996F72FD4E9F95809FF6DC5C5203330B48",
+      "size_bytes": 1170
+    },
+    {
+      "path": ".mir/evidence/lower-wave/targets/1.7.1/source-lock.json",
+      "sha256": "E1D536624EA26B19E4C58B0018AA6A98955421BF88AF3F8795826CC10ED7FC56",
+      "size_bytes": 11999
+    },
+    {
+      "path": ".mir/evidence/lower-wave/targets/1.7.1/target-reconstruction.json",
+      "sha256": "074C0E642AA6E0A5230E48ED1480BD7BAD4B54C0EC0AB652F9671F32BC66993B",
+      "size_bytes": 1401
+    }
+  ]
+}

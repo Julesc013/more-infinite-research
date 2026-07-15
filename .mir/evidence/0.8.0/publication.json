@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "version": "0.8.0",
+  "target": "0.8",
+  "tag_commit": "e0e297cd0bcc4a38f54d5b2e4b7bc54335785ee3",
+  "tag_object": "d5d3bc8fd8df862125c5a43d8ee7cc12ff7ed870",
+  "archive": "dist/more-infinite-research_0.8.0.zip",
+  "archive_sha256": "6832B00783657F60D8AE967552CA354D1F73C988A0DFE023999AE81533267D8E",
+  "github": {
+    "status": "published-and-verified-historical-archive",
+    "release_id": 354133894,
+    "asset_id": 477313844,
+    "url": "https://github.com/Julesc013/more-infinite-research/releases/tag/0.8.0",
+    "asset_digest": "sha256:6832b00783657f60d8ae967552ca354d1f73c988a0dfe023999ae81533267d8e",
+    "redownload_sha256": "6832B00783657F60D8AE967552CA354D1F73C988A0DFE023999AE81533267D8E",
+    "published_at": "2026-07-14T23:57:26Z"
+  },
+  "mod_portal": {
+    "status": "archive-only-not-attempted",
+    "reason": "No fresh official audit established that this historical target/version is accepted; GitHub is the appropriate museum archive channel."
+  },
+  "manual_visual_review": "PENDING-MAINTAINER"
+}

@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "branch": "tmp/0.14",
+  "release": "1.4.0",
+  "factorio": {
+    "line": "0.14",
+    "qualified_version": "0.14.23",
+    "binary_sha256": "A2B7DC0FBC1D6D68CF4D71EB71D42952FBB3B0CF35EEC6BF8B4BA16B9F79715F",
+    "baseline_runtime_scenarios": 2
+  },
+  "prior_release": {"status": "not-applicable-no-legitimate-prior-release"},
+  "classification": {
+    "native": ["stable stream and setting identifiers", "existing migrations"],
+    "adapted": ["target-era science mapping", "iterative prerequisite graph traversal", "target-filtered settings and emission", "legacy technology icons", "deterministic package qualification"],
+    "generated_fallback": [],
+    "finite_reconstruction": ["target-supported finite continuation ladders", "finite direct-effect progression"],
+    "omitted_by_capability": ["native-infinite parity", "unproven direct-effect modifiers", "all change-recipe-productivity streams and settings", "2.x owner adoption and repair", "Space Age, quality, elevated-rails, recycler, scripted and cargo-only capabilities"]
+  },
+  "settings_policy": "Expose only settings backed by finite effects accepted by Factorio 0.14.",
+  "release_actions": "maintainer-only"
+}

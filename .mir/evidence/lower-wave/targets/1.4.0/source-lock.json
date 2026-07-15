@@ -1,0 +1,162 @@
+{
+  "schema": 1,
+  "projection_schema": 1,
+  "canonical_release": "3.1.9",
+  "canonical_release_tag_commit": "1b9c6f32fc2bb53c413a593534e103a6043b4be3",
+  "canonical_dev_anchor": "6ac377389d7ffc3576fb39576dab4ace6efaec51",
+  "canonical_anchor_ref": "refs/heads/FINAL_LOWER_WAVE_DEV_ANCHOR",
+  "canonical_package_source_commit": "79df29b50ea9b855b8665d6c9a3d8295806acde0",
+  "released_2_0_reference": "2.4.5",
+  "released_2_0_tag_commit": "7e4b6c530cfcc5b2e1429c4e9f4ccb0d6d3b42a4",
+  "completed_predecessor_ring": {
+    "1.9.4": "426d6d48c6578a786ea7de0f224282baff9d342b",
+    "1.8.2": "0a192c27674a6b13847e2f5e1b2b530e62419ee8"
+  },
+  "target": "0.14",
+  "version": "1.4.0",
+  "mir_version": "1.4.0",
+  "target_profile_sha256": "A74D7C6FAD29856DA5574B1F3BFD4955F478BA06B2352068AD3141C32790B8A5",
+  "canonical_feature_matrix_sha256": "FD882872A6EF19AA29F3CDDA75F2C79EBD2D448395FE000485C8D0700AE6DDC6",
+  "portable_modules": {
+    ".mir/canonical-lower-features.json": "canonical target-neutral feature authority",
+    "scripts/Build-MIRPackage.ps1": "canonical deterministic package builder",
+    "scripts/Test-MIRBackportSourceLock.ps1": "canonical source-lock verifier"
+  },
+  "adapted_modules": {
+    "changelog.txt": "Factorio 0.14 target projection from characterized target-valid source",
+    "info.json": "Factorio 0.14 target projection from characterized target-valid source",
+    "locale/de/more-infinite-research.cfg": "Factorio 0.14 target projection from characterized target-valid source",
+    "locale/en/more-infinite-research.cfg": "Factorio 0.14 target projection from characterized target-valid source",
+    "locale/es-ES/more-infinite-research.cfg": "Factorio 0.14 target projection from characterized target-valid source",
+    "locale/fr/more-infinite-research.cfg": "Factorio 0.14 target projection from characterized target-valid source",
+    "locale/it/more-infinite-research.cfg": "Factorio 0.14 target projection from characterized target-valid source",
+    "locale/pl/more-infinite-research.cfg": "Factorio 0.14 target projection from characterized target-valid source",
+    "locale/pt-BR/more-infinite-research.cfg": "Factorio 0.14 target projection from characterized target-valid source",
+    "locale/ru/more-infinite-research.cfg": "Factorio 0.14 target projection from characterized target-valid source",
+    "locale/zh-CN/more-infinite-research.cfg": "Factorio 0.14 target projection from characterized target-valid source",
+    "prototypes/mir/capabilities/contract.lua": "Factorio 0.14 target projection from characterized target-valid source",
+    "prototypes/mir/capabilities/recipe_productivity/recipe_matching.lua": "Factorio 0.14 target projection from characterized target-valid source",
+    "prototypes/mir/capabilities/registry.lua": "Factorio 0.14 target projection from characterized target-valid source",
+    "prototypes/mir/capabilities/science_integration/science_packs.lua": "Factorio 0.14 target projection from characterized target-valid source",
+    "prototypes/mir/capabilities/science_integration/science_selector.lua": "Factorio 0.14 target projection from characterized target-valid source",
+    "prototypes/mir/compatibility/claim_registry.lua": "Factorio 0.14 target projection from characterized target-valid source",
+    "prototypes/mir/compatibility/diagnostics/exact_recipe_policy.lua": "Factorio 0.14 target projection from characterized target-valid source",
+    "prototypes/mir/compatibility/profiles.lua": "Factorio 0.14 target projection from characterized target-valid source",
+    "prototypes/mir/core/schema.lua": "Factorio 0.14 target projection from characterized target-valid source",
+    "prototypes/mir/domain/decisions/decision_record.lua": "Factorio 0.14 target projection from characterized target-valid source",
+    "prototypes/mir/emit/base_extensions.lua": "Factorio 0.14 target projection from characterized target-valid source",
+    "prototypes/mir/emit/effect_safety.lua": "Factorio 0.14 target projection from characterized target-valid source",
+    "prototypes/mir/emit/icon_builder.lua": "Factorio 0.14 target projection from characterized target-valid source",
+    "prototypes/mir/emit/mod_data.lua": "Factorio 0.14 target projection from characterized target-valid source",
+    "prototypes/mir/emit/stream_spec_adapter.lua": "Factorio 0.14 target projection from characterized target-valid source",
+    "prototypes/mir/emit/technology_builder.lua": "Factorio 0.14 target projection from characterized target-valid source",
+    "prototypes/mir/emit/technology_graph_safety.lua": "Factorio 0.14 target projection from characterized target-valid source",
+    "prototypes/mir/index/productivity_owners.lua": "Factorio 0.14 target projection from characterized target-valid source",
+    "prototypes/mir/index/registry_builder.lua": "Factorio 0.14 target projection from characterized target-valid source",
+    "prototypes/mir/pipeline/extent.lua": "Factorio 0.14 target projection from characterized target-valid source",
+    "prototypes/mir/pipeline/prototype_limits.lua": "Factorio 0.14 target projection from characterized target-valid source",
+    "prototypes/mir/planner/compiler.lua": "Factorio 0.14 target projection from characterized target-valid source",
+    "prototypes/mir/planner/prerequisites.lua": "Factorio 0.14 target projection from characterized target-valid source",
+    "prototypes/mir/planner/requirements.lua": "Factorio 0.14 target projection from characterized target-valid source",
+    "prototypes/mir/planner/stream_compiler.lua": "Factorio 0.14 target projection from characterized target-valid source",
+    "prototypes/mir/platform/factorio/target_line.lua": "Factorio 0.14 target projection from characterized target-valid source",
+    "prototypes/mir/policy/adoption_policy.lua": "Factorio 0.14 target projection from characterized target-valid source",
+    "prototypes/mir/policy/competing_base_extensions.lua": "Factorio 0.14 target projection from characterized target-valid source",
+    "prototypes/mir/policy/competing_productivity.lua": "Factorio 0.14 target projection from characterized target-valid source",
+    "prototypes/mir/policy/max_level.lua": "Factorio 0.14 target projection from characterized target-valid source",
+    "prototypes/mir/policy/owner_policy.lua": "Factorio 0.14 target projection from characterized target-valid source",
+    "prototypes/mir/policy/productivity_family_adoption.lua": "Factorio 0.14 target projection from characterized target-valid source",
+    "prototypes/mir/policy/technology_cleanup.lua": "Factorio 0.14 target projection from characterized target-valid source",
+    "prototypes/mir/policy/weapon_speed.lua": "Factorio 0.14 target projection from characterized target-valid source",
+    "prototypes/mir/report/diagnostics_sink.lua": "Factorio 0.14 target projection from characterized target-valid source",
+    "prototypes/mir/runtime/effects/agricultural_growth_speed.lua": "Factorio 0.14 target projection from characterized target-valid source",
+    "prototypes/mir/runtime/effects/spoilage_preservation.lua": "Factorio 0.14 target projection from characterized target-valid source",
+    "prototypes/mir/runtime/productivity_family_adoption.lua": "Factorio 0.14 target projection from characterized target-valid source",
+    "prototypes/mir/runtime/scripted_techs.lua": "Factorio 0.14 target projection from characterized target-valid source",
+    "prototypes/mir/runtime/settings_profile.lua": "Factorio 0.14 target projection from characterized target-valid source",
+    "prototypes/mir/runtime/settings_resolver.lua": "Factorio 0.14 target projection from characterized target-valid source",
+    "prototypes/mir/runtime/state.lua": "Factorio 0.14 target projection from characterized target-valid source",
+    "prototypes/mir/settings/catalog.lua": "Factorio 0.14 target projection from characterized target-valid source",
+    "prototypes/mir/settings/defaults.lua": "Factorio 0.14 target projection from characterized target-valid source",
+    "prototypes/mir/settings/pipeline_extent.lua": "Factorio 0.14 target projection from characterized target-valid source",
+    "prototypes/mir/settings/prototype_limits.lua": "Factorio 0.14 target projection from characterized target-valid source",
+    "prototypes/mir/settings/registry.lua": "Factorio 0.14 target projection from characterized target-valid source",
+    "prototypes/mir/settings/stage_builder.lua": "Factorio 0.14 target projection from characterized target-valid source",
+    "prototypes/mir/stage/data_final_fixes_steps.lua": "Factorio 0.14 target projection from characterized target-valid source",
+    "prototypes/mir/stage/data_final_fixes.lua": "Factorio 0.14 target projection from characterized target-valid source",
+    "prototypes/mir/streams/generated_stream_manifest.json": "Factorio 0.14 target projection from characterized target-valid source",
+    "prototypes/mir/streams/registry.lua": "Factorio 0.14 target projection from characterized target-valid source",
+    "prototypes/streams/direct-effects.lua": "Factorio 0.14 target projection from characterized target-valid source",
+    "prototypes/streams/init.lua": "Factorio 0.14 target projection from characterized target-valid source",
+    "prototypes/streams/productivity.lua": "Factorio 0.14 target projection from characterized target-valid source",
+    "README.md": "Factorio 0.14 target projection from characterized target-valid source"
+  },
+  "target_specific_modules": {
+    "prototypes/mir/platform/factorio/target_profiles.lua": "generated current Factorio 0.14 profile view"
+  },
+  "generated_sources": {
+    "prototypes/mir/platform/factorio/target_profiles.lua": ".mir/targets.json profile 0.14"
+  },
+  "canonical_features": [
+    "compiler-core",
+    "stable-stream-manifest",
+    "legacy-science-discovery",
+    "lab-researchability",
+    "direct-effect-bonuses",
+    "weapon-overlap-policy",
+    "reduced-startup-settings",
+    "runtime-state-backend",
+    "deterministic-release-package",
+    "compatibility-repairs",
+    "pipeline-extent",
+    "prototype-limits",
+    "module-permissions",
+    "recipe-productivity",
+    "settings-profiles",
+    "scripted-techs",
+    "technology-constant-overlays",
+    "productivity-family-adoption"
+  ],
+  "omitted_features": {
+    "compatibility-repairs": {
+      "positive_requirement": "named Factorio 0.14 fixture and exact-version failure",
+      "target_result": "no qualified modern repair"
+    },
+    "pipeline-extent": {
+      "positive_requirement": "validated pipeline-extent prototype fields",
+      "target_result": "surface absent from target profile"
+    },
+    "prototype-limits": {
+      "positive_requirement": "validated modern limit fields",
+      "target_result": "surface absent from target profile"
+    },
+    "module-permissions": {
+      "positive_requirement": "validated modern module-permission model",
+      "target_result": "surface absent from target profile"
+    },
+    "recipe-productivity": {
+      "positive_requirement": "change-recipe-productivity effect",
+      "target_result": "effect absent in Factorio 0.14"
+    },
+    "settings-profiles": {
+      "positive_requirement": "qualified codec and lifecycle",
+      "target_result": "codec not qualified for Factorio 0.14"
+    },
+    "scripted-techs": {
+      "positive_requirement": "required modern entities and events",
+      "target_result": "modern scripted surface absent"
+    },
+    "technology-constant-overlays": {
+      "positive_requirement": "qualified modern constant-overlay shape",
+      "target_result": "surface disabled by target profile"
+    },
+    "productivity-family-adoption": {
+      "positive_requirement": "native recipe-productivity owner families",
+      "target_result": "native owners absent in Factorio 0.14"
+    }
+  },
+  "feature_classification": ".mir/evidence/lower-wave/1.4.0-feature-classification.json",
+  "release_notes": "docs/releases/release-notes-1.4.0.md",
+  "validation_summary": ".mir/evidence/1.4.0-qualification-summary.json",
+  "candidate_seal": ".mir/evidence/1.4.0-candidate-seal.json"
+}

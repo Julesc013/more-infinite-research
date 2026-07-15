@@ -1,0 +1,66 @@
+{
+  "schema": 1,
+  "projection_schema": 1,
+  "canonical_release": "3.1.9",
+  "canonical_release_tag_commit": "1b9c6f32fc2bb53c413a593534e103a6043b4be3",
+  "canonical_dev_anchor": "6ac377389d7ffc3576fb39576dab4ace6efaec51",
+  "canonical_anchor_ref": "refs/heads/FINAL_LOWER_WAVE_DEV_ANCHOR",
+  "canonical_package_source_commit": "79df29b50ea9b855b8665d6c9a3d8295806acde0",
+  "released_2_0_reference": "2.4.5",
+  "released_2_0_tag_commit": "7e4b6c530cfcc5b2e1429c4e9f4ccb0d6d3b42a4",
+  "completed_predecessor_ring": {
+    "1.9.4": "426d6d48c6578a786ea7de0f224282baff9d342b",
+    "1.8.2": "0a192c27674a6b13847e2f5e1b2b530e62419ee8"
+  },
+  "target": "0.7",
+  "version": "0.7.0",
+  "mir_version": "0.7.0",
+  "target_profile_sha256": "1B67E76742146AE69037E7282C388225F8398758058B302664817B348EEBC2F7",
+  "canonical_feature_matrix_sha256": "FD882872A6EF19AA29F3CDDA75F2C79EBD2D448395FE000485C8D0700AE6DDC6",
+  "portable_modules": {
+    ".mir/canonical-lower-features.json": "canonical target-neutral feature authority",
+    ".mir/museum-targets.json": "canonical museum target catalog",
+    "scripts/Museum/MuseumCompiler.psm1": "canonical finite reconstruction compiler",
+    "scripts/Build-MIRMuseumTarget.ps1": "canonical deterministic museum builder"
+  },
+  "adapted_modules": {
+    "data.lua": "generated Factorio 0.7 finite technology projection",
+    "info.json": "generated Factorio 0.7 museum metadata",
+    "locale/en/more-infinite-research.cfg": "generated Factorio 0.7 locale catalog"
+  },
+  "target_specific_modules": {
+    "config.lua": "generated Factorio 0.7 loaded configuration surface"
+  },
+  "generated_sources": {
+    "config.lua": ".mir/museum-targets.json profile 0.7",
+    "data.lua": ".mir/museum-targets.json profile 0.7",
+    "info.json": ".mir/museum-targets.json profile 0.7",
+    "locale/en/more-infinite-research.cfg": ".mir/museum-targets.json profile 0.7",
+    ".mir/museum/stream-manifest.json": ".mir/museum-targets.json profile 0.7",
+    ".mir/museum/balance.json": ".mir/museum-targets.json profile 0.7"
+  },
+  "canonical_features": [
+    "compiler-core", "stable-stream-manifest", "legacy-science-discovery", "lab-researchability",
+    "direct-effect-bonuses", "weapon-overlap-policy", "reduced-startup-settings", "runtime-state-backend",
+    "deterministic-release-package", "compatibility-repairs", "pipeline-extent", "prototype-limits",
+    "module-permissions", "recipe-productivity", "settings-profiles", "scripted-techs",
+    "technology-constant-overlays", "productivity-family-adoption"
+  ],
+  "omitted_features": {
+    "weapon-overlap-policy": {"positive_requirement": "runtime ownership discovery", "target_result": "offline finite projection has no runtime mutation policy"},
+    "runtime-state-backend": {"positive_requirement": "qualified persistent runtime state", "target_result": "museum package is data-stage only"},
+    "compatibility-repairs": {"positive_requirement": "named exact-version fixture failure", "target_result": "no compatibility repair is claimed"},
+    "pipeline-extent": {"positive_requirement": "validated target prototype fields", "target_result": "surface absent"},
+    "prototype-limits": {"positive_requirement": "validated target limit fields", "target_result": "surface absent"},
+    "module-permissions": {"positive_requirement": "validated module permission model", "target_result": "surface absent"},
+    "recipe-productivity": {"positive_requirement": "change-recipe-productivity effect", "target_result": "effect absent"},
+    "settings-profiles": {"positive_requirement": "qualified settings lifecycle", "target_result": "only loaded config.lua is supported"},
+    "scripted-techs": {"positive_requirement": "qualified runtime entities and events", "target_result": "scripted simulation omitted"},
+    "technology-constant-overlays": {"positive_requirement": "qualified overlay shape", "target_result": "surface absent"},
+    "productivity-family-adoption": {"positive_requirement": "native recipe productivity owners", "target_result": "surface absent"}
+  },
+  "feature_classification": ".mir/evidence/lower-wave/0.7.0-feature-classification.json",
+  "release_notes": "docs/releases/0.7.0-release-packet.md",
+  "validation_summary": ".mir/evidence/0.7.0-qualification-summary.json",
+  "candidate_seal": ".mir/evidence/0.7.0-candidate-seal.json"
+}
