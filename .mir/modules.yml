@@ -405,7 +405,7 @@ validation_tooling:
     - passing evidence is reusable only under exact per-test fingerprints while failed and blocked lanes rerun
     - candidate seals bind exact qualified bytes and canonical repository identities without publishing
     - native-owner balance snapshots bind reviewed source values formula adapters planner bindings and emission transactions
-    - museum compilation runs only in the development environment and emits finite target-era Lua
+    - museum compilation runs only in the development environment and emits finite target-era Lua with an explicit target-matching info.json factorio_version
     - museum target selection resolves canonical feature IDs from .mir/canonical-lower-features.json and cannot own an independent feature list
     - museum target packages contain no compiler tooling manifests evidence fixtures or modern runtime source
     - each museum technology is emitted from a stable manifest row and a matching-base effect proof
