@@ -6,7 +6,7 @@
   "exact_patch": "0.7.5",
   "mir_version": "0.7.0",
   "branch": "tmp/0.7",
-  "source_commit": "728d6ec7665a30fe0297d7b8e9feade8562ae216",
+  "source_commit": "bbc99fb6797947d3285c25e7e74fdc014c2ab70b",
   "binary": {
     "path": "D:\\Programs\\Factorio\\0.7\\bin\\x64\\Factorio.exe",
     "architecture": "win64-x64",
@@ -15,10 +15,10 @@
   "package": {
     "path": "dist/more-infinite-research_0.7.0.zip",
     "mode": "extract-required",
-    "size_bytes": 2505,
+    "size_bytes": 2512,
     "entries": 4,
-    "sha256": "8495146889655FA46233A7B0416F4C67B4E2BF93E984E01F5F8234C9CA6F570F",
-    "package_content_sha256": "69DA64132D4FEE440EFDC2531048F421E264FFD0A60A9BB8DF29E160079E4123",
+    "sha256": "AA328AFF81F3133BAC3F432ADC7AF52CC49EFF43E40D04EAD99DCFBA92542749",
+    "package_content_sha256": "F315C3916ED2A737F90914119DFD484A1A3ECD704D7F6B076647A609B79B6944",
     "forbidden_entries": 0
   },
   "capabilities": {
