@@ -28,7 +28,7 @@ This is the current executable queue for `dev`. Historical pre-consolidation que
 - [x] Validate every snapshot tree and all 46 root distributions against their immutable or explicitly classified source and recorded hash.
 - [x] Run docs governance, manifest, static, deterministic-package, and forbidden-entry validation.
 - [ ] Rerun the Factorio 2.1 runtime catalog against the changelog-updated development package when a Factorio 2.1 binary is available. The released 3.1.9 ZIP retains accepted 102-of-102 evidence, but that is not a new exact-package run.
-- [ ] Commit and push the complete consolidation to `dev`.
+- [x] Commit and push the complete consolidation to `dev`.
 
 ## Remaining Human And External Gates
 
