@@ -1,8 +1,8 @@
 {
   "schema": 1,
   "status": "all-copied-and-referenced-evidence-rehashed",
-  "generated_at": "2026-07-15T00:13:48.8586011Z",
-  "entry_count": 72,
+  "generated_at": "2026-07-15T00:16:26.9342043Z",
+  "entry_count": 73,
   "entries": [
     {
       "path": ".mir/evidence/0.10.0-candidate-seal.json",
@@ -363,6 +363,11 @@
       "path": ".mir/evidence/lower-wave/targets/1.7.1/target-reconstruction.json",
       "sha256": "074C0E642AA6E0A5230E48ED1480BD7BAD4B54C0EC0AB652F9671F32BC66993B",
       "size_bytes": 1401
+    },
+    {
+      "path": ".mir/evidence/lower-wave/aggregate-branch-origin-snapshot.json",
+      "sha256": "ADEA72B2BC24FC275029EF7C2A5BB489AEBB5C858729294423313C07D726B90B",
+      "size_bytes": 25096
     }
   ]
 }
