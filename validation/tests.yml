@@ -29,6 +29,8 @@
         ".mir/assurance.json",
         "validation/tests.yml",
         "validation/domains.yml",
+        "validation/trust.json",
+        "verification/schema/**",
         "validation/profiles/**"
       ]
     },
@@ -135,6 +137,19 @@
         "repository",
         "test-catalog",
         "target-profile"
+      ]
+    },
+    {
+      "id": "performance.static",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./scripts/Test-MIRPerformanceBudgets.ps1 -ValidateManifestOnly",
+      "requires_factorio": false,
+      "inputs": [
+        ".mir/performance.yml",
+        ".mir/performance-budgets.json",
+        "scripts/Test-MIRPerformanceBudgets.ps1",
+        "prototypes/mir/report/compiler_telemetry.lua"
       ]
     },
     {

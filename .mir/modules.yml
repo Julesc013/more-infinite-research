@@ -70,8 +70,15 @@ modules:
   core:
     - prototypes/mir/core/schema.lua
     - prototypes/mir/core/deepcopy.lua
-      - prototypes/mir/core/table.lua
-      - prototypes/mir/core/fingerprint.lua
+    - prototypes/mir/core/table.lua
+    - prototypes/mir/core/fingerprint.lua
+  stage:
+    - prototypes/mir/stage/settings.lua
+    - prototypes/mir/stage/data.lua
+    - prototypes/mir/stage/data_updates.lua
+    - prototypes/mir/stage/data_final_fixes.lua
+    - prototypes/mir/stage/data_final_fixes_steps.lua
+    - prototypes/mir/stage/control.lua
   platform:
     - prototypes/mir/platform/factorio/data_raw.lua
     - prototypes/mir/platform/factorio/mods.lua
@@ -100,6 +107,7 @@ modules:
     - prototypes/mir/settings/test_overrides.lua
   streams:
     - prototypes/mir/streams/registry.lua
+    - prototypes/streams/init.lua
     - prototypes/streams/productivity.lua
     - prototypes/streams/direct-effects.lua
   pipeline:
@@ -173,17 +181,23 @@ modules:
     - prototypes/mir/planner/output_validator.lua
     - prototypes/mir/planner/costs.lua
     - prototypes/mir/planner/direct_effects.lua
+    - prototypes/mir/planner/effect_ownership.lua
     - prototypes/mir/planner/native_modifiers.lua
     - prototypes/mir/planner/native_owner_binding.lua
     - prototypes/mir/planner/prerequisites.lua
     - prototypes/mir/planner/requirements.lua
     - prototypes/mir/planner/technology_requirements.lua
+    - prototypes/mir/planner/technology_graph.lua
     - prototypes/mir/planner/science.lua
+  integrity:
+    - prototypes/mir/integrity/effect_contracts.lua
   emit:
     - prototypes/mir/emit/technology_replacement.lua
     - prototypes/mir/emit/technology_graph_safety.lua
     - prototypes/mir/emit/technology_builder.lua
+    - prototypes/mir/emit/base_extension_builder.lua
     - prototypes/mir/emit/stream_spec_adapter.lua
+    - prototypes/mir/emit/stream_executor.lua
     - prototypes/mir/emit/base_extensions.lua
     - prototypes/mir/emit/effect_safety.lua
     - prototypes/mir/emit/icon_builder.lua
@@ -192,7 +206,9 @@ modules:
   report:
     - prototypes/mir/report/decision_export.lua
     - prototypes/mir/report/compatibility_diagnostics.lua
+    - prototypes/mir/report/coverage.lua
     - prototypes/mir/report/diagnostics_sink.lua
+    - prototypes/mir/report/compiler_telemetry.lua
   compatibility:
     - prototypes/mir/compatibility/registry.lua
     - prototypes/mir/compatibility/profiles.lua
@@ -231,7 +247,9 @@ mutation_commands:
     - mutation commands may change existing prototypes only through their listed implementation
     - CompilationPlan schema 2 globally finalizes stream adoption and base-extension operations before emission
     - output validation compares numeric effects technology shape and generated-registry identity
-    - final technology safety prunes missing recipe-productivity targets before asserting the remaining effects
+    - final technology safety uses target-aware effect contracts to prune impossible known references before asserting all remaining generated and external effects
+    - stream planning cannot import the stream executor or adoption mutation transaction
+    - stream emission and adoption mutation are applied only by the emission-owned stream executor
     - reviewed compatibility data cannot override hard prototype safety facts
     - exact-version compatibility repairs remain separately bounded
   ids:
@@ -253,6 +271,7 @@ mutation_commands:
     - emit-compiler-reports
     - emit-compatibility-planner
     - assert-plan-output
+    - publish-compiler-artifacts
     - flush-diagnostics
 
 target_layers:
@@ -380,6 +399,7 @@ validation_tooling:
     assurance_hashing: scripts/MIRAssurance/Hashing.ps1
     assurance_release: scripts/MIRAssurance/Release.ps1
     assurance_tests: scripts/Test-MIRAssurance.ps1
+    release_authority: scripts/Test-MIRReleaseAuthority.ps1
     native_owner_balance_tests: scripts/Test-MIRNativeOwnerCostModels.ps1
     canonical_lower_feature_model: .mir/canonical-lower-features.json
     museum_catalog: .mir/museum-targets.json
@@ -409,7 +429,8 @@ validation_tooling:
     verification_tool_entrypoint: tools/mir_verify/Invoke-MIRVerify.ps1
   rules:
     - assurance plans use stable test and matrix instance IDs complete effective inputs package domains and target profiles
-    - passing evidence is reusable only under exact trusted schema 3 fingerprints and result digests
+    - passing evidence is reusable only under exact trust-class-matched schema 4 fingerprints structured results artifact hashes and result digests
+    - canonical plan result capsule bundle and seal JSON schemas live under verification/schema and are bound into the verifier release fingerprint
     - matching workers are adopted through expiring running evidence and duplicate fingerprint work is never cancelled in progress
     - the aggregate verification gate requires exact evidence for every planned instance and never trusts mutable job status
     - Factorio gameplay scenarios depend on declared package domains while exact package load and upgrade lanes depend on exact archives

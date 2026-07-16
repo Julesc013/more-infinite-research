@@ -1,6 +1,18 @@
 {
   "schema": 2,
   "current_target_source": "info.json.factorio_version",
+  "feature_requirements": {
+    "productivity_family_adoption": {
+      "prototype_shapes": [
+        "mod_data"
+      ],
+      "emitter_families": [
+        "adoption"
+      ],
+      "runtime_consumer": "prototypes/mir/runtime/productivity_family_adoption.lua",
+      "data_stage_emitter": "prototypes/mir/emit/transactions/productivity_family_adoption.lua"
+    }
+  },
   "profiles": {
     "2.1": {
       "factorio_version": "2.1",
@@ -126,11 +138,10 @@
         "technology_formula": true,
         "quality": true,
         "surface_conditions": true,
-        "mod_data": true
+        "mod_data": false
       },
       "emitter_families": [
         "technology",
-        "adoption",
         "replacement",
         "scripted-effect"
       ],
@@ -145,7 +156,7 @@
         "settings_profiles": true,
         "scripted_techs": true,
         "technology_constant_overlays": true,
-        "productivity_family_adoption": true
+        "productivity_family_adoption": false
       },
       "supported_required_mods": [
         "space-age"

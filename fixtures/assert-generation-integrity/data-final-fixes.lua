@@ -13,6 +13,7 @@ local canonical_recipe_facts = require("__more-infinite-research__.prototypes.mi
 local pipeline_commands = require("__more-infinite-research__.prototypes.mir.pipeline.commands")
 local capability_registry = require("__more-infinite-research__.prototypes.mir.capabilities.registry")
 local stream_compiler = require("__more-infinite-research__.prototypes.mir.planner.stream_compiler")
+local compilation_plan = require("__more-infinite-research__.prototypes.mir.planner.compilation_plan")
 local target_profile = require("__more-infinite-research__.prototypes.mir.platform.factorio.target_profiles").current()
 local recipe_semantics = require("__more-infinite-research__.prototypes.mir.domain.facts.recipe_semantics")
 
@@ -55,6 +56,29 @@ local function assert_generation_plan_v3()
         or type(proof.status) ~= "string" or type(proof.evidence) ~= "table" then
         fail("GenerationPlan row is missing evidence gate " .. gate)
       end
+    end
+  end
+end
+
+local function assert_compiler_telemetry()
+  local telemetry = compilation_plan.snapshot().telemetry
+  if not telemetry or telemetry.schema ~= 1 or telemetry.witness_limit ~= 64 then
+    fail("compiler telemetry schema or witness limit changed")
+  end
+  for _, counter in ipairs({
+    "recipes", "technologies", "effects", "graph_edges", "graph_components", "cyclic_components",
+    "recipe_index_scans", "recipe_fact_copies", "candidate_operations", "accepted_operations",
+    "rejected_operations", "diagnostic_rows"
+  }) do
+    if type(telemetry.counters[counter]) ~= "number" then
+      fail("compiler telemetry counter is missing: " .. counter)
+    end
+  end
+  for _, phase in ipairs({"snapshot", "graph", "planning", "postconditions"}) do
+    local value = telemetry.phases[phase]
+    if type(value) ~= "table" or type(value.runs) ~= "number" or value.runs < 1
+      or type(value.seconds) ~= "number" then
+      fail("compiler telemetry phase is missing or incomplete: " .. phase)
     end
   end
 end
@@ -220,7 +244,14 @@ assert_recipe_fact_contracts()
 local function assert_pipeline_command_contracts()
   local catalog = pipeline_commands.snapshot()
   local count = 0
-  local allowed_kinds = {mutation = true, emission = true, plan = true, assertion = true, report = true}
+  local allowed_kinds = {
+    mutation = true,
+    emission = true,
+    plan = true,
+    assertion = true,
+    report = true,
+    publication = true
+  }
   for id, command in pairs(catalog) do
     count = count + 1
     if command.id ~= id or not allowed_kinds[command.kind] then
@@ -231,7 +262,7 @@ local function assert_pipeline_command_contracts()
       fail("pipeline command " .. id .. " is missing requirements, ordering, or implementation ownership")
     end
   end
-  if count ~= 19 then fail("expected 19 governed pipeline commands, got " .. tostring(count)) end
+  if count ~= 20 then fail("expected 20 governed pipeline commands, got " .. tostring(count)) end
 end
 
 assert_pipeline_command_contracts()
@@ -356,6 +387,7 @@ local base_extension_defaults = {
 
 assert_no_blocked_pickup_effects()
 assert_generation_plan_v3()
+assert_compiler_telemetry()
 assert_decision_record_v2()
 assert_setting_target_ownership()
 

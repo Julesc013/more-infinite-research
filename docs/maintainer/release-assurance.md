@@ -5,7 +5,7 @@ applies_to: "3.2.0+"
 audience: release-manager
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-07-16
+last_reviewed: 2026-07-17
 supersedes: []
 superseded_by: []
 ---
@@ -22,6 +22,8 @@ MIR release assurance is a persistent content-addressed evidence system. It plan
 | `validation/tests.yml` | Stable test IDs, commands, Factorio layers, scenario-matrix templates, declared input tokens |
 | `validation/domains.yml` | Package domains, scenario dependency sets, dependency-contract normalization, unknown-input fallback |
 | `validation/profiles/factorio-<target>.json` | Target policy, deterministic seed, evidence TTL, upgrade source and fixture |
+| `validation/trust.json` | Evidence trust classes and protected release producer requirements |
+| `verification/schema/*.schema.json` | Strict test, plan, result, capsule, bundle, and seal contracts |
 | `fixtures/compat-matrix/expected-scenarios.json` | Stable Factorio scenario records, fixtures, settings, assertions, groups, tags, isolation |
 | `scripts/Invoke-MIRAssurance.ps1` | Planner, fingerprinting, ledger, worker, aggregate gate, qualification, seal facade |
 | `artifacts/assurance/evidence` | Persistent local or CI-restored evidence ledger |
@@ -47,7 +49,7 @@ Each test has one disposition:
 
 | Disposition | Meaning |
 | --- | --- |
-| `REUSE` | A trusted schema-3 passing capsule exactly matches the current fingerprint |
+| `REUSE` | A same-trust-class schema-4 passing capsule exactly matches the current fingerprint and structured output |
 | `WAIT` | A non-expired `running.json` shows another worker owns the same fingerprint |
 | `RUN` | No exact evidence exists or reuse was disabled |
 | `INVALID` | Evidence material exists but is failed, blocked, malformed, untrusted, or digest-mismatched |
@@ -74,7 +76,7 @@ Factorio layers are:
 
 Evidence lives at `artifacts/assurance/evidence/<safe-test-id>/<fingerprint>/`. `running.json` is an expiring ownership marker. `attempts/*.json` are append-only execution records. `passed.json` is the reusable result for that exact fingerprint. `blocked.json` prevents a prior pass from being reused after a failed attempt against the same inputs.
 
-A schema-3 capsule binds the test ID, target, definition hash, full effective-input map, command, assertions, producer repository and run identity, timestamps, duration, log digest, conclusion, and result digest. A changed definition or input creates a different fingerprint instead of rewriting history.
+A schema-4 capsule binds the test ID, target, definition hash, full effective-input map, exact Factorio installation and resolved mod closure when applicable, trust-class-validated producer identity, exit code, structured `mir-test-result-v1`, assertion outcomes, artifact hashes, stdout and stderr hashes, timestamps, duration, and result digest. `passed.json` is only an atomic pointer to an immutable attempt capsule. Corrupt pointers are quarantined. A changed definition, verifier, policy, binary, mod archive, candidate, or other effective input creates a different fingerprint instead of rewriting history.
 
 ## Worker And Aggregate Gate
 
@@ -92,11 +94,11 @@ Evaluate the complete plan with:
 ./scripts/mir.ps1 verify gate --target 2.1 --plan out/verification-plan.json --output artifacts/assurance/evidence-bundle.json
 ```
 
-The gate recomputes the candidate domain manifest when runtime scenarios are present and requires trusted exact passing evidence for every planned fingerprint. Scheduled `--no-reuse` plans additionally require evidence produced after the plan and, in GitHub Actions, by the same workflow run.
+Every worker and the gate reconstruct the canonical schema-4 plan from the named profile and current authorities, reject missing, extra, duplicate, stale, or altered test entries, and compare the immutable plan-material digest. The gate recomputes the candidate domain manifest when runtime scenarios are present and requires trusted exact passing evidence for every planned fingerprint. Each forced test records its minimum completion time, run ID, and run attempt rather than inheriting plan-wide freshness only.
 
 ## CI
 
-The default workflow is named `MIR`; its aggregate required check is `MIR / verification-gate`. The plan job restores the latest evidence ledger and exports only non-reused work. Worker jobs use fingerprint concurrency with `cancel-in-progress: false`. The gate merges evidence, evaluates the plan, writes the evidence bundle, and saves a new immutable cache key.
+The default workflow is named `MIR`; its aggregate required check is `MIR / verification-gate`. The protected full workflow enforces the execution DAG `F0 -> F1 -> F2 -> F3 -> F4 -> gate -> seal`, including no-work sentinels for fully reused layers. The plan job restores the latest evidence ledger and exports only non-reused work. Worker jobs use fingerprint concurrency with `cancel-in-progress: false`. The gate merges evidence, evaluates the plan, writes the evidence bundle, and saves a new immutable cache key.
 
 Runtime, targeted, full, and scheduled workflows use trusted self-hosted Windows runners. They build one candidate, upload the same bytes to every worker, and never use `pull_request_target`. Self-hosted Factorio binaries, local proprietary mods, publishing credentials, and untrusted fork code must remain isolated.
 
@@ -114,7 +116,7 @@ For MIR 3.2.0:
 After reviewing and committing the exact candidate and qualification record, create and verify the seal:
 
 ```powershell
-./scripts/mir.ps1 assurance seal --target 2.1 --factorio 'C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe' --evidence .mir/evidence/3.2.0-assurance-qualification.json
+./scripts/mir.ps1 assurance seal --target 2.1 --factorio 'C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe' --prior '.\dist\more-infinite-research_3.1.9.zip' --plan out/verification-plan.json
 ./scripts/mir.ps1 assurance check-seal --seal .mir/evidence/candidate-seals/mir-3.2.0-factorio-2.1.json
 ```
 

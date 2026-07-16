@@ -14,6 +14,7 @@ function M.apply_competing_base_extensions() commands.run("apply-competing-base-
 function M.apply_weapon_speed_adjustments() commands.run("weapon-speed-adjustments") end
 function M.apply_max_level_control() commands.run("max-level-control") end
 function M.assert_registered_technology_safety() commands.run("assert-technology-safety") end
+function M.publish_compiler_artifacts() commands.run("publish-compiler-artifacts") end
 
 function M.emit_compatibility_planner()
   require("prototypes.mir.compatibility.planner").emit()

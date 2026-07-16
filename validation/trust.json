@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "policy_id": "mir-verification-trust-v1",
+  "classes": {
+    "untrusted-local": {
+      "release_eligible": false,
+      "reuse_scope": "same-class"
+    },
+    "untrusted-pr": {
+      "release_eligible": false,
+      "reuse_scope": "same-class"
+    },
+    "protected-integration": {
+      "release_eligible": false,
+      "reuse_scope": "same-class"
+    },
+    "protected-release": {
+      "release_eligible": true,
+      "reuse_scope": "same-class",
+      "repositories": [
+        "Julesc013/more-infinite-research"
+      ],
+      "workflows": [
+        "Assurance Full Qualification"
+      ],
+      "events": [
+        "workflow_dispatch"
+      ],
+      "refs": [
+        "refs/heads/dev",
+        "refs/heads/main",
+        "refs/heads/tmp/2.0"
+      ],
+      "environment": "release-candidate",
+      "runner_identity": "self-hosted-windows"
+    },
+    "maintainer-manual": {
+      "release_eligible": false,
+      "reuse_scope": "same-class"
+    }
+  }
+}

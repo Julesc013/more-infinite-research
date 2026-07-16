@@ -55,6 +55,7 @@ load_order_requirements:
     fixture: fixtures/space-exploration-recipe-removal
     assertion_fixture: fixtures/assert-final-recipe-effect-integrity
     reproduced_recipe: kr-copper-cable-from-copper-ore
+    integrity_contract: target-aware-generated-and-external-technology-effect-sanitation
     claim_level: diagnostic-only
     public_scope: startup integrity only; no broad Space Exploration support claim
 

@@ -1,5 +1,6 @@
 local deepcopy = require("prototypes.mir.core.deepcopy")
 local fingerprint = require("prototypes.mir.core.fingerprint")
+local effect_contracts = require("prototypes.mir.integrity.effect_contracts")
 
 local M = {}
 local Plan = {}
@@ -25,16 +26,7 @@ local REQUIRED_GATES = {
 }
 
 local function effect_identity(effect)
-  if not effect or effect.type == nil or effect.type == "nothing" then return "" end
-  local fields = {}
-  for key, value in pairs(effect or {}) do
-    if key ~= "change" and key ~= "modifier" and key ~= "icon" and key ~= "icons"
-      and (type(value) == "string" or type(value) == "number" or type(value) == "boolean") then
-      table.insert(fields, tostring(key) .. "=" .. tostring(value))
-    end
-  end
-  table.sort(fields)
-  return table.concat(fields, ";")
+  return effect_contracts.identity(effect)
 end
 
 local function effect_signature(effect)

@@ -175,6 +175,10 @@ Invoke-RepoCheck "target profile views match canonical manifest" {
   & (Join-Path $repo "scripts\Sync-MIRTargetProfiles.ps1") -RepoRoot $repo -Check
 }
 
+Invoke-RepoCheck "release authority views match the canonical ledger" {
+  & (Join-Path $repo "scripts\Test-MIRReleaseAuthority.ps1") -RepoRoot $repo
+}
+
 Invoke-RepoCheck "backport source lock is current when present" {
   & (Join-Path $repo "scripts\Test-MIRBackportSourceLock.ps1") -RepoRoot $repo
 }
@@ -432,6 +436,8 @@ Invoke-RepoCheck "unsafe pickup reach technology effects are blocked" {
   $streamAdapterText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\emit\stream_spec_adapter.lua")
   $baseExtensionsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\emit\base_extensions.lua")
   $graphSafetyText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\emit\technology_graph_safety.lua")
+  $pipelineCommandsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\pipeline\commands.lua")
+  $integrityContractsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\integrity\effect_contracts.lua")
   $dataFinalFixesText = Get-MIRDataFinalFixesSourceText
   $generationIntegrityFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-generation-integrity\data-final-fixes.lua")
 
@@ -447,8 +453,8 @@ Invoke-RepoCheck "unsafe pickup reach technology effects are blocked" {
     @{ File = "prototypes\mir\emit\base_extensions.lua"; Text = $baseExtensionsText; Snippet = 'effect_safety.assert_effects_allowed(desired_effects, "base extension " .. key)' },
     @{ File = "prototypes\mir\emit\base_extensions.lua"; Text = $baseExtensionsText; Snippet = 'generated_registry.register(operation.technology_name,' },
     @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'require("prototypes.mir.emit.effect_safety").assert_registered_technology_effects()' },
-    @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'require("prototypes.mir.emit.effect_safety").sanitize_registered_technology_effects()' },
-    @{ File = "prototypes\mir\emit\effect_safety.lua"; Text = $safetyText; Snippet = 'data_raw.prototype("recipe", recipe_name)' },
+    @{ File = "prototypes\mir\pipeline\commands.lua"; Text = $pipelineCommandsText; Snippet = 'require("prototypes.mir.emit.effect_safety").sanitize_all_technology_effects()' },
+    @{ File = "prototypes\mir\integrity\effect_contracts.lua"; Text = $integrityContractsText; Snippet = 'data_raw.prototype(contract.prototype_type, name)' },
     @{ File = "prototypes\mir\emit\technology_graph_safety.lua"; Text = $graphSafetyText; Snippet = 'generated_registry.sorted_names()' },
     @{ File = "prototypes\mir\emit\technology_graph_safety.lua"; Text = $graphSafetyText; Snippet = 'technology.enabled == false' },
     @{ File = "prototypes\mir\emit\technology_graph_safety.lua"; Text = $graphSafetyText; Snippet = 'science.pack_production_status(pack_name)' },

@@ -42,9 +42,17 @@ verification_manifests:
     targets:
       - factorio-2.0
       - factorio-2.1
+  trust:
+    path: validation/trust.json
+    schema: 1
+    owns:
+      - evidence-trust-classes
+      - release-producer-policy
+      - same-class-reuse
   evidence:
-    schema: 3
+    schema: 4
     root: artifacts/assurance/evidence
+    schemas: verification/schema
     dispositions:
       - REUSE
       - WAIT
@@ -118,6 +126,8 @@ fixtures:
       - every-final-recipe-productivity-effect-target-exists
       - valid-base-copper-cable-productivity-retained
       - final-dangling-effect-pruning-contract
+      - external-dangling-unlock-recipe-effect-pruned
+      - external-valid-unlock-recipe-effect-retained
 
   rigor-late-recipe-removal:
     requires_features: [recipe_productivity]
@@ -231,6 +241,7 @@ fixtures:
       - large-synthetic-recipe-index
       - repeated-full-recipe-scan-rejection
       - non-aliased-capability-lifecycle-stages
+      - complete-bounded-compiler-telemetry
 
   scripted-runtime-lifecycle:
     requires_features: [scripted_techs]

@@ -1,6 +1,7 @@
 param(
   [string]$RepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "..")).Path,
   [string]$BudgetsPath = ".mir\performance-budgets.json",
+  [string]$PerformancePolicyPath = ".mir\performance.yml",
   [string]$ValidationSummaryPath = "",
   [string]$MediumPackSummaryPath = "",
   [string]$LargePackSummaryPath = "",
@@ -17,6 +18,7 @@ function Resolve-MIRPerformancePath {
 }
 
 $resolvedBudgetsPath = Resolve-MIRPerformancePath -Path $BudgetsPath
+$resolvedPerformancePolicyPath = Resolve-MIRPerformancePath -Path $PerformancePolicyPath
 $manifest = Get-Content -Raw -LiteralPath $resolvedBudgetsPath | ConvertFrom-Json
 if ($manifest.schema -ne 1) { throw "Performance budget manifest must use schema 1." }
 $budgets = @($manifest.budgets)
@@ -38,8 +40,45 @@ foreach ($budget in $budgets) {
   if ([string]::IsNullOrWhiteSpace([string]$budget.key)) { throw "Performance budget '$($budget.id)' has no source key." }
 }
 
+$performancePolicy = Get-Content -Raw -LiteralPath $resolvedPerformancePolicyPath
+foreach ($requiredPolicySnippet in @(
+  'release: 3.2.0',
+  'qualified_baseline: "3.1.9"',
+  'maximum_regression_percent: 20',
+  'witness_node_limit: 64'
+)) {
+  if ($performancePolicy -notmatch [regex]::Escape($requiredPolicySnippet)) {
+    throw "Performance policy is missing '$requiredPolicySnippet'."
+  }
+}
+$requiredTelemetryCounters = @(
+  "recipes", "technologies", "effects", "graph_edges", "graph_components", "cyclic_components",
+  "recipe_index_scans", "recipe_fact_copies", "candidate_operations", "accepted_operations",
+  "rejected_operations", "diagnostic_rows"
+)
+$requiredTelemetryPhases = @("snapshot", "graph", "planning", "postconditions")
+foreach ($name in @($requiredTelemetryCounters + $requiredTelemetryPhases)) {
+  if ($performancePolicy -notmatch "(?m)^\s*-\s+$([regex]::Escape($name))\s*$") {
+    throw "Performance policy is missing required telemetry name '$name'."
+  }
+}
+$telemetrySource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "prototypes\mir\report\compiler_telemetry.lua")
+foreach ($name in $requiredTelemetryCounters) {
+  if ($telemetrySource -notmatch ('"' + [regex]::Escape($name) + '"')) {
+    throw "Compiler telemetry does not initialize required counter '$name'."
+  }
+}
+foreach ($name in $requiredTelemetryPhases) {
+  if ($telemetrySource -notmatch ('"' + [regex]::Escape($name) + '"')) {
+    throw "Compiler telemetry does not initialize required phase '$name'."
+  }
+}
+if ($telemetrySource -notmatch 'WITNESS_LIMIT\s*=\s*64') {
+  throw "Compiler telemetry witness limit differs from the governed performance policy."
+}
+
 if ($ValidateManifestOnly) {
-  Write-Host "[ok] MIR performance manifest declares $($budgets.Count) required budgets."
+  Write-Host "[ok] MIR performance manifest declares $($budgets.Count) budgets and complete bounded compiler telemetry."
   exit 0
 }
 

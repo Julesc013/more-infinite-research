@@ -295,6 +295,19 @@ waves:
     tag: "3.1.9"
     status: published-frozen
 
+  mir_3_2_0:
+    version: "3.2.0"
+    branch: dev
+    target_factorio: "2.1"
+    source_anchor: mir_3_1_9
+    canonical_ledger: .mir/releases.json
+    archive: dist/more-infinite-research_3.2.0.zip
+    archive_class: development-candidate
+    assurance_policy: mir-verification-v4
+    release_gate: verifier-and-integrity-refactor-in-progress
+    publication_status: unreleased
+    status: active-refactor
+
   mir_2_4_0:
     version: "2.4.0"
     branch: legacy
@@ -329,3 +342,16 @@ waves:
     publication_status: published
     tag: "2.4.5"
     status: published-frozen
+
+  mir_2_5_0:
+    version: "2.5.0"
+    branch: tmp/2.0
+    target_factorio: "2.0"
+    source_anchor: mir_3_2_0
+    prior_release: dist/more-infinite-research_2.4.5.zip
+    canonical_ledger: .mir/releases.json
+    archive: null
+    archive_class: not-built-from-final-source
+    release_gate: pending-canonical-3.2-source-freeze
+    publication_status: unreleased
+    status: planned-after-3.2-freeze

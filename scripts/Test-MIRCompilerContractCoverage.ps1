@@ -31,7 +31,13 @@ foreach ($namespace in @($manifest.diagnostic_code_namespaces)) {
   if (-not $diagnostics.Contains($namespace)) { throw "Compiler diagnostic registry is missing namespace: $namespace" }
 }
 $fixture = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot $manifest.runtime_fixture)
-foreach ($sentinel in @("hard-safety sentinel", "duplicate materialized effect", "missing prerequisite sentinel", "numeric effect value")) {
+foreach ($sentinel in @(
+  "hard-safety sentinel",
+  "duplicate materialized effect",
+  "withhold and classify a missing-prerequisite operation",
+  "withhold and classify the planned prerequisite SCC",
+  "numeric effect value"
+)) {
   if (-not $fixture.Contains($sentinel)) { throw "Compiler contract fixture is missing mutation sentinel: $sentinel" }
 }
 Write-Host "[ok] MIR compiler contract coverage and mutation sentinels are declared."

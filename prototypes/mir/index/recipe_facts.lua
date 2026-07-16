@@ -2,6 +2,7 @@ local deepcopy = require("prototypes.mir.core.deepcopy")
 local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 local recipe_semantics = require("prototypes.mir.domain.facts.recipe_semantics")
 local target_profiles = require("prototypes.mir.platform.factorio.target_profiles")
+local telemetry = require("prototypes.mir.report.compiler_telemetry")
 
 local M = {}
 local canonical = nil
@@ -258,6 +259,7 @@ end
 
 local function build()
   if canonical then return canonical end
+  telemetry.start_phase("snapshot")
   build_scan_count = build_scan_count + 1
   local facts = {}
   local by_output, by_productive_output, by_ingredient, by_category, names = {}, {}, {}, {}, {}
@@ -323,12 +325,27 @@ local function build()
     by_ingredient = by_ingredient,
     by_category = by_category
   }
+  telemetry.count("recipe_index_scans", 1)
+  telemetry.count("recipes", #names)
+  telemetry.finish_phase("snapshot")
   return canonical
 end
 
 function M.get(recipe_name)
   local fact = build().facts[recipe_name]
+  if fact then telemetry.count("recipe_fact_copies", 1) end
   return fact and deepcopy(fact) or nil
+end
+
+-- Internal compiler views avoid repeated deep copies during one immutable
+-- data-final-fixes planning pass. Callers must treat returned tables as
+-- read-only.
+function M.view(recipe_name)
+  return build().facts[recipe_name]
+end
+
+function M.recipes_by_output_view(name)
+  return build().by_output[name] or {}
 end
 
 function M.all_names()
@@ -371,7 +388,9 @@ function M.recipes_by_category(name)
 end
 
 function M.snapshot()
-  return deepcopy(build())
+  local index = build()
+  telemetry.count("recipe_fact_copies", #index.names)
+  return deepcopy(index)
 end
 
 function M.scan_count()

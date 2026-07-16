@@ -4,6 +4,7 @@ local schema = require("prototypes.mir.core.schema")
 local effective_settings = require("prototypes.mir.settings.effective")
 local automatic_compiler_policy = require("prototypes.mir.settings.automatic_compiler_policy")
 local decision_record = require("prototypes.mir.domain.decisions.decision_record")
+local telemetry = require("prototypes.mir.report.compiler_telemetry")
 
 local rows = {}
 local audit_rows = {}
@@ -46,6 +47,7 @@ local function append(kind, row)
   if not D.enabled() then return end
   row.kind = kind
   table.insert(rows, row)
+  telemetry.count("diagnostic_rows", 1)
 
   local audit_row = {schema = 1, kind = kind}
   for field, value in pairs(row) do

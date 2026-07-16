@@ -184,7 +184,6 @@ end
 
 function M.emit()
   local artifact = M.build()
-  mod_data.emit_coverage(artifact)
   diagnostics.coverage({
     key = "recipe_accounting",
     status = "diagnostic",
@@ -216,6 +215,11 @@ function M.emit()
     })
   end
   return artifact
+end
+
+function M.publish()
+  local artifact = latest or M.build()
+  return mod_data.emit_coverage(artifact)
 end
 
 function M.latest_artifact()

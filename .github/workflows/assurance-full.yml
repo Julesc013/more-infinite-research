@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       candidate_sha:
-        description: "Trusted full source commit"
+        description: "Trusted full source commit; must equal the selected ref head"
         required: true
       target:
         description: "Factorio target line"
@@ -17,23 +17,39 @@ on:
 permissions:
   contents: read
 
+env:
+  MIR_TRUST_CLASS: protected-release
+  MIR_PROTECTED_ENVIRONMENT: release-candidate
+  MIR_TRUSTED_RUNNER: self-hosted-windows
+
 jobs:
   plan:
     name: verification-plan
     runs-on: [self-hosted, Windows]
     environment: release-candidate
     outputs:
-      matrix: ${{ steps.matrix.outputs.matrix }}
+      f0: ${{ steps.matrices.outputs.f0 }}
+      f1: ${{ steps.matrices.outputs.f1 }}
+      f2: ${{ steps.matrices.outputs.f2 }}
+      f3: ${{ steps.matrices.outputs.f3 }}
+      f4: ${{ steps.matrices.outputs.f4 }}
     steps:
       - uses: actions/checkout@v4
         with:
           ref: ${{ inputs.candidate_sha }}
           fetch-depth: 0
-      - name: Reject dirty or mismatched source
+      - name: Reject dirty, detached, or mismatched source
         shell: pwsh
         run: |
-          if ((git rev-parse HEAD).Trim() -ne '${{ inputs.candidate_sha }}') { throw 'Candidate commit mismatch.' }
-          if (git status --porcelain --untracked-files=all) { throw 'Candidate checkout is dirty.' }
+          if ('${{ inputs.candidate_sha }}' -ne '${{ github.sha }}') {
+            throw 'candidate_sha must equal the selected workflow-dispatch ref head.'
+          }
+          if ((git rev-parse HEAD).Trim() -ne '${{ inputs.candidate_sha }}') {
+            throw 'Candidate commit mismatch.'
+          }
+          if (git status --porcelain --untracked-files=all) {
+            throw 'Candidate checkout is dirty.'
+          }
       - name: Restore persistent evidence ledger
         uses: actions/cache/restore@v4
         with:
@@ -49,11 +65,25 @@ jobs:
         env:
           FACTORIO_BIN: ${{ secrets.FACTORIO_BIN }}
         run: ./scripts/mir.ps1 verify plan --target '${{ inputs.target }}' --profile full --factorio $env:FACTORIO_BIN --prior '${{ inputs.prior_release }}' --output out/verification-plan.json
-      - id: matrix
+      - id: matrices
+        name: Split work into the enforced F0-F4 DAG
         shell: pwsh
         run: |
           $plan = Get-Content -Raw -LiteralPath out/verification-plan.json | ConvertFrom-Json
-          "matrix=$(@{ include = @($plan.work) } | ConvertTo-Json -Depth 10 -Compress)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+          foreach ($layer in @('F0', 'F1', 'F2', 'F3', 'F4')) {
+            $rows = @($plan.work | Where-Object { $_.layer -eq $layer })
+            if ($rows.Count -eq 0) {
+              $rows = @([ordered]@{
+                test_id = '__none__'
+                safe_test_id = "no-work-$layer"
+                fingerprint = 'none'
+                layer = $layer
+              })
+            }
+            $name = $layer.ToLowerInvariant()
+            "$name=$(@{ include = $rows } | ConvertTo-Json -Depth 10 -Compress)" |
+              Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+          }
       - uses: actions/upload-artifact@v4
         with:
           name: mir-full-plan-and-candidate
@@ -62,18 +92,18 @@ jobs:
             dist/*.zip
           if-no-files-found: error
 
-  tests:
-    name: ${{ matrix.test_id }}
+  f0:
+    name: F0 / ${{ matrix.test_id }}
     needs: plan
     runs-on: [self-hosted, Windows]
     environment: release-candidate
     strategy:
       fail-fast: false
-      matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
+      matrix: ${{ fromJSON(needs.plan.outputs.f0) }}
     concurrency:
       group: mir-${{ matrix.safe_test_id }}-${{ matrix.fingerprint }}
       cancel-in-progress: false
-    steps:
+    steps: &worker-steps
       - uses: actions/checkout@v4
         with:
           ref: ${{ inputs.candidate_sha }}
@@ -89,23 +119,74 @@ jobs:
           restore-keys: |
             mir-ledger-${{ runner.os }}-${{ inputs.target }}-
       - name: Reuse, adopt, or run exact test instance
+        if: matrix.test_id != '__none__'
         shell: pwsh
         env:
           FACTORIO_BIN: ${{ secrets.FACTORIO_BIN }}
         run: ./scripts/mir.ps1 verify run-one --target '${{ inputs.target }}' --plan out/verification-plan.json --test '${{ matrix.test_id }}' --fingerprint '${{ matrix.fingerprint }}' --factorio $env:FACTORIO_BIN --prior '${{ inputs.prior_release }}'
       - uses: actions/upload-artifact@v4
-        if: always()
+        if: always() && matrix.test_id != '__none__'
         with:
           name: mir-full-evidence-${{ matrix.safe_test_id }}
           path: artifacts/assurance/evidence
-          if-no-files-found: warn
+          if-no-files-found: error
+
+  f1:
+    name: F1 / ${{ matrix.test_id }}
+    needs: [plan, f0]
+    runs-on: [self-hosted, Windows]
+    environment: release-candidate
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.plan.outputs.f1) }}
+    concurrency:
+      group: mir-${{ matrix.safe_test_id }}-${{ matrix.fingerprint }}
+      cancel-in-progress: false
+    steps: *worker-steps
+
+  f2:
+    name: F2 / ${{ matrix.test_id }}
+    needs: [plan, f1]
+    runs-on: [self-hosted, Windows]
+    environment: release-candidate
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.plan.outputs.f2) }}
+    concurrency:
+      group: mir-${{ matrix.safe_test_id }}-${{ matrix.fingerprint }}
+      cancel-in-progress: false
+    steps: *worker-steps
+
+  f3:
+    name: F3 / ${{ matrix.test_id }}
+    needs: [plan, f2]
+    runs-on: [self-hosted, Windows]
+    environment: release-candidate
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.plan.outputs.f3) }}
+    concurrency:
+      group: mir-${{ matrix.safe_test_id }}-${{ matrix.fingerprint }}
+      cancel-in-progress: false
+    steps: *worker-steps
+
+  f4:
+    name: F4 / ${{ matrix.test_id }}
+    needs: [plan, f3]
+    runs-on: [self-hosted, Windows]
+    environment: release-candidate
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.plan.outputs.f4) }}
+    concurrency:
+      group: mir-${{ matrix.safe_test_id }}-${{ matrix.fingerprint }}
+      cancel-in-progress: false
+    steps: *worker-steps
 
   verification-gate:
     name: verification-gate
     if: always()
-    needs:
-      - plan
-      - tests
+    needs: [plan, f0, f1, f2, f3, f4]
     runs-on: [self-hosted, Windows]
     environment: release-candidate
     steps:
@@ -130,11 +211,16 @@ jobs:
           pattern: mir-full-evidence-*
           path: artifacts/assurance/evidence
           merge-multiple: true
-      - name: Aggregate qualification gate
+      - name: Aggregate canonical qualification gate
         shell: pwsh
         env:
           FACTORIO_BIN: ${{ secrets.FACTORIO_BIN }}
         run: ./scripts/mir.ps1 verify gate --target '${{ inputs.target }}' --plan out/verification-plan.json --factorio $env:FACTORIO_BIN --prior '${{ inputs.prior_release }}' --output artifacts/assurance/qualification-summary.json
+      - name: Create protected candidate seal
+        shell: pwsh
+        env:
+          FACTORIO_BIN: ${{ secrets.FACTORIO_BIN }}
+        run: ./scripts/mir.ps1 assurance seal --target '${{ inputs.target }}' --plan out/verification-plan.json --factorio $env:FACTORIO_BIN --prior '${{ inputs.prior_release }}'
       - uses: actions/cache/save@v4
         if: always()
         with:
@@ -149,4 +235,6 @@ jobs:
             out/verification-plan.json
             artifacts/assurance/evidence-bundle.json
             artifacts/assurance/qualification-summary.json
+            .mir/evidence/qualifications/**
+            .mir/evidence/candidate-seals/**
           if-no-files-found: warn

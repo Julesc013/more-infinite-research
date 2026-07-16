@@ -1,7 +1,7 @@
 local M = {}
 M.schema = 1
 
-local IDENTITY_FIELDS = {"type", "recipe", "ammo_category", "turret_id", "fluid", "item"}
+local IDENTITY_FIELDS = {"type", "recipe", "ammo_category", "turret_id", "fluid", "item", "space_location"}
 
 local PERCENTAGE_EFFECTS = {
   ["braking-force"] = true,

@@ -2,6 +2,7 @@ local deepcopy = require("prototypes.mir.core.deepcopy")
 local recipe_facts = require("prototypes.mir.index.recipe_facts")
 local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 local lookup = require("prototypes.mir.platform.factorio.prototype_lookup")
+local effect_contracts = require("prototypes.mir.integrity.effect_contracts")
 
 local M = {}
 local canonical = {}
@@ -34,11 +35,7 @@ local function sort_index(index)
 end
 
 local function effect_identity(effect)
-  local parts = {}
-  for _, field in ipairs({"type", "recipe", "ammo_category", "turret_id", "fluid", "item"}) do
-    if effect[field] ~= nil then table.insert(parts, field .. "=" .. tostring(effect[field])) end
-  end
-  return table.concat(parts, ";")
+  return effect_contracts.identity(effect)
 end
 
 local function build(phase)

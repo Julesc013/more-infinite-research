@@ -11,14 +11,21 @@ Date: 2026-07-17
     - Added explicit REUSE, WAIT, RUN, and INVALID planning with matching-worker adoption and non-cancelling concurrency.
     - Added isolated Factorio scenario workers and one aggregate verification gate for pull requests and release qualification.
     - Added target-specific verification profiles so Factorio 2.0 backports recalculate their own fingerprints.
+    - Added canonical schema-4 plans, structured test results, immutable attempt capsules, trust classes, and strict JSON schemas.
+    - Enforced protected F0 through F4 release layers and made candidate sealing invoke the canonical aggregate gate.
+    - Bound mod archives, the Factorio installation, verifier, policy, and producer trust to evidence reuse.
+    - Added iterative pre-emission SCC analysis that rejects cyclic technology operations.
+    - Replaced foreign technology cloning with an allowlisted builder and moved stream mutation into emission.
+    - Added bounded compiler telemetry and indexed science-pack recipe discovery.
     - Retained the portable target-capability guard that emits mod-data only on Factorio lines that support it.
     - Preserved stable settings, generated technology IDs, migrations, and runtime-state namespaces from MIR 3.1.9.
 
   Bugfixes:
 
     - Ordered MIR after Space Exploration so its final Krastorio recipe removals happen before productivity compilation.
-    - Pruned missing recipe-productivity targets before the final safety check to prevent dangling startup references.
-    - Added a regression for the removed kr-copper-cable-from-copper-ore recipe and retained base copper cable coverage.
+    - Pruned impossible known recipe targets from generated and external technology effects before final safety assertions.
+    - Added regressions for removed K2/SE recipes, dangling unlock effects, and retained valid effects.
+    - Replaced recursive researchability traversal and prevented fatal safety assertions from suppressing diagnostic flushing.
 
 ---------------------------------------------------------------------------------------------------
 Version: 3.1.9

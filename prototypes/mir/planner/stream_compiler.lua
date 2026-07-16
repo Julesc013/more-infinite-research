@@ -3,19 +3,16 @@ local D = require("prototypes.mir.report.diagnostics_sink")
 local deepcopy = require("prototypes.mir.core.deepcopy")
 local table_utils = require("prototypes.mir.core.table")
 local native_owner_binding = require("prototypes.mir.planner.native_owner_binding")
-local adoption_transaction = require("prototypes.mir.emit.transactions.productivity_family_adoption")
 local costs = require("prototypes.mir.planner.costs")
 local icon_builder = require("prototypes.mir.emit.icon_builder")
 local owner_policy = require("prototypes.mir.policy.owner_policy")
 local recipe_productivity_planner = require("prototypes.mir.capabilities.recipe_productivity.planner")
 local direct_effects_planner = require("prototypes.mir.planner.direct_effects")
-local native_modifiers = require("prototypes.mir.planner.native_modifiers")
 local native_effect_coverage = require("prototypes.mir.policy.native_effect_coverage")
 local planner_requirements = require("prototypes.mir.planner.requirements")
 local planner_prerequisites = require("prototypes.mir.planner.prerequisites")
 local planner_science = require("prototypes.mir.planner.science")
 local science_packs = require("prototypes.mir.capabilities.science_integration.science_packs")
-local stream_emitter = require("prototypes.mir.emit.stream_spec_adapter")
 local target_line = require("prototypes.mir.platform.factorio.target_line")
 local effect_scaling = require("prototypes.mir.settings.effect_scaling")
 local generation_plan = require("prototypes.mir.planner.generation_plan")
@@ -30,6 +27,7 @@ local compatibility_packs = require("prototypes.mir.compatibility.packs.registry
 local effect_ownership = require("prototypes.mir.planner.effect_ownership")
 local native_owner_contract = require("prototypes.mir.domain.native_owner.contract")
 local data_raw = require("prototypes.mir.platform.factorio.data_raw")
+local telemetry = require("prototypes.mir.report.compiler_telemetry")
 
 local M = {}
 local latest_plan = nil
@@ -95,10 +93,6 @@ local function ldesc(spec)
     return {"technology-description.more-infinite-research.direct_effect"}
   end
   return {"technology-description.more-infinite-research.recipe_productivity"}
-end
-
-local function emit_stream_technology(key, spec, fields)
-  return stream_emitter.emit(key, spec, fields)
 end
 
 local function append_unique_item(items, seen, item_name)
@@ -377,6 +371,7 @@ local function plan_stream(key, raw_spec)
 end
 
 function M.compile()
+  telemetry.start_phase("stream_compiler")
   local streams = C.snapshot()
   local native_owner_inputs = {}
   for key, spec in pairs(streams) do
@@ -405,46 +400,10 @@ function M.compile()
   for _, row in ipairs(rows) do
     plan:add(row)
   end
-  return plan:finalize()
-end
-
-function M.apply(plan)
-  for _, row in ipairs(plan:snapshot()) do
-    for _, conflict in ipairs((row.effect_ownership and row.effect_ownership.lost) or {}) do
-      D.recipe_owner({
-        recipe = conflict.recipe,
-        action = "planned-owner-won",
-        owners = conflict.winner_owner,
-        owner_actions = conflict.winner_stream,
-        warning_class = conflict.reason
-      })
-    end
-    if row.action == "emit" then
-      if row.direct_effects then
-        native_modifiers.record_overlaps(row.stream_key, row.overlap_effects)
-      end
-      local technology = emit_stream_technology(row.stream_key, row.spec, row.fields)
-      if D.enabled() and not row.direct_effects then
-        log("[more-infinite-research] Registered technology " .. technology.name)
-      end
-    elseif row.action == "adopt" then
-      adoption_transaction.apply(row.adoption)
-    elseif row.reason ~= "disabled" then
-      log("[more-infinite-research] Skipping stream " .. row.stream_key .. " because " .. row.reason .. ".")
-    end
-    D.stream(row.diagnostics)
-  end
-
-  if target_line.feature_enabled("recipe_productivity") then
-    adoption_transaction.emit_mod_data()
-  end
-end
-
-function M.run()
-  local plan = M.compile()
-  M.accept(plan)
-  M.apply(plan)
-  return plan
+  local finalized = plan:finalize()
+  telemetry.count("stream_rows", finalized:count())
+  telemetry.finish_phase("stream_compiler")
+  return finalized
 end
 
 function M.accept(plan)
@@ -452,7 +411,13 @@ function M.accept(plan)
 end
 
 function M.latest_artifact()
-  return latest_plan and latest_plan:artifact() or nil
+  if not latest_plan then return nil end
+  if type(latest_plan.artifact) == "function" then return latest_plan:artifact() end
+  return deepcopy(latest_plan)
+end
+
+function M.accept_artifact(artifact)
+  latest_plan = deepcopy(artifact)
 end
 
 function M.assert_output()

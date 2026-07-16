@@ -142,6 +142,14 @@ $targetManifest = Get-Content -Raw -LiteralPath $targetManifestPath | ConvertFro
 if ($targetManifest.schema -ne 2 -or -not $targetManifest.profiles) {
   throw ".mir/targets.json must use schema 2 and define profiles."
 }
+$releaseLedgerPath = Join-Path $repo ".mir\releases.json"
+if (-not (Test-Path -LiteralPath $releaseLedgerPath -PathType Leaf)) {
+  throw "Missing canonical release ledger: .mir/releases.json"
+}
+$releaseLedger = Get-Content -Raw -LiteralPath $releaseLedgerPath | ConvertFrom-Json
+if ($releaseLedger.schema -ne 1 -or [string]$releaseLedger.authority -ne "canonical-release-ledger") {
+  throw ".mir/releases.json must use canonical release-ledger schema 1."
+}
 $repoInfo = Get-Content -Raw -LiteralPath (Join-Path $repo "info.json") | ConvertFrom-Json
 if (-not $targetManifest.profiles.PSObject.Properties[$repoInfo.factorio_version]) {
   throw ".mir/targets.json has no profile for current Factorio $($repoInfo.factorio_version)."

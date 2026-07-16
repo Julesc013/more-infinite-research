@@ -1,15 +1,146 @@
 local deepcopy = require("prototypes.mir.core.deepcopy")
 local base_extensions = require("prototypes.mir.emit.base_extensions")
+local stream_executor = require("prototypes.mir.emit.stream_executor")
 local stream_compiler = require("prototypes.mir.planner.stream_compiler")
 local generation_plan = require("prototypes.mir.planner.generation_plan")
 local fingerprint = require("prototypes.mir.core.fingerprint")
-local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 local effect_safety = require("prototypes.mir.emit.effect_safety")
 local effective_settings = require("prototypes.mir.settings.effective")
 local target_line = require("prototypes.mir.platform.factorio.target_line")
+local technology_graph = require("prototypes.mir.planner.technology_graph")
+local telemetry = require("prototypes.mir.report.compiler_telemetry")
 
 local M = {}
 local latest = nil
+local normalized_base_operation
+
+local function rebuild_stream_artifact(stream_artifact, rows)
+  local plan = generation_plan.new({source_fingerprints = stream_artifact.source_fingerprints})
+  for _, row in ipairs(rows) do plan:add(row) end
+  return plan:finalize():artifact()
+end
+
+local function sanitize_stream_artifact(stream_artifact)
+  local rows, removed_count, skipped_count = {}, 0, 0
+  for _, source_row in ipairs(stream_artifact.rows or {}) do
+    local row = deepcopy(source_row)
+    if row.action == "emit" then
+      local kept, removed = effect_safety.sanitize_effects(
+        row.fields.effects,
+        "CompilationPlan " .. tostring(row.technology_name),
+        "generated"
+      )
+      row.fields.effects = kept
+      removed_count = removed_count + #removed
+      if #removed > 0 then
+        row.effect_integrity = {removed = removed, remaining_effect_count = #kept}
+        if #kept == 0 then
+          row.action = "skip"
+          row.reason = "no_valid_effect_targets"
+          row.gates.effect_valid = {
+            passed = false,
+            status = "failed",
+            evidence = {"effect-contracts:all-targets-missing"},
+            reason = "no_valid_effect_targets"
+          }
+          skipped_count = skipped_count + 1
+        else
+          row.gates.effect_valid = {
+            passed = true,
+            status = "passed",
+            evidence = {"effect-contracts:sanitized", "effect-contracts:remaining=" .. tostring(#kept)}
+          }
+        end
+      else
+        row.gates.effect_valid = {
+          passed = true,
+          status = "passed",
+          evidence = {"effect-contracts:all-targets-exist"}
+        }
+      end
+    end
+    table.insert(rows, row)
+  end
+  return rebuild_stream_artifact(stream_artifact, rows), {
+    removed_effect_count = removed_count,
+    skipped_stream_count = skipped_count
+  }
+end
+
+local function sanitize_base_operations(base_plan)
+  local operations, removed_count, skipped_count = {}, 0, 0
+  for _, source_operation in ipairs(base_plan or {}) do
+    local operation = normalized_base_operation(source_operation)
+    local kept, removed = effect_safety.sanitize_effects(
+      (operation.technology and operation.technology.effects) or {},
+      "CompilationPlan " .. tostring(operation.technology_name),
+      "generated"
+    )
+    removed_count = removed_count + #removed
+    if operation.technology then operation.technology.effects = kept end
+    if #kept > 0 or #removed == 0 then
+      table.insert(operations, operation)
+    else
+      skipped_count = skipped_count + 1
+    end
+  end
+  return operations, {
+    removed_effect_count = removed_count,
+    skipped_base_extension_count = skipped_count
+  }
+end
+
+local function apply_graph_decisions(stream_artifact, graph_summary)
+  local rows = deepcopy(stream_artifact.rows or {})
+  for _, row in ipairs(rows) do
+    if row.action == "emit" then
+      local rejection = graph_summary.rejected[row.technology_name]
+      if rejection then
+        row.action = "skip"
+        row.reason = rejection.code
+        row.graph_integrity = deepcopy(rejection)
+        if row.diagnostics then
+          row.diagnostics.status = "skipped"
+          row.diagnostics.reason = rejection.code
+        end
+        row.gates.prerequisites_acyclic = deepcopy(rejection)
+        row.gates.progression_safe = deepcopy(rejection)
+      else
+        row.gates.prerequisites_acyclic = graph_summary.proofs[row.technology_name] or {
+          passed = false,
+          status = "failed",
+          evidence = {"technology-graph:missing-proof"},
+          reason = "missing_graph_proof"
+        }
+      end
+    else
+      row.gates.prerequisites_acyclic = {
+        passed = true,
+        status = "not-applicable",
+        evidence = {"decision:non-materializing-row"}
+      }
+    end
+  end
+  return rebuild_stream_artifact(stream_artifact, rows)
+end
+
+local function apply_base_graph_decisions(base_operations, graph_summary)
+  local accepted, rejected = {}, {}
+  for _, operation in ipairs(base_operations or {}) do
+    local rejection = graph_summary.rejected[operation.technology_name]
+    if rejection then
+      table.insert(rejected, {
+        technology_name = operation.technology_name,
+        manifest_id = operation.manifest_id,
+        code = rejection.code,
+        evidence = deepcopy(rejection.evidence)
+      })
+    else
+      table.insert(accepted, operation)
+    end
+  end
+  return accepted, rejected
+end
 
 local function materialized_stream_operations(artifact)
   local out = {}
@@ -54,7 +185,7 @@ local function materialized_stream_operations(artifact)
   return out
 end
 
-local function normalized_base_operation(operation)
+normalized_base_operation = function(operation)
   local out = deepcopy(operation)
   out.schema = 2
   out.manifest_id = out.manifest_id or ("base-extension:" .. tostring(out.key) .. ":" .. tostring(out.technology_name))
@@ -107,14 +238,12 @@ end
 local function validate_operations(operations)
   local technology_names, manifest_ids, effects = {}, {}, {}
   local planned_overlaps = {}
-  local planned_technologies = {}
   for _, operation in ipairs(operations) do
     if operation.operation == "emit_stream" or operation.operation == "emit_base_extension" then
       if technology_names[operation.technology_name] then
         error("CompilationPlan contains technology-name collision: " .. operation.technology_name, 2)
       end
       technology_names[operation.technology_name] = operation.operation
-      planned_technologies[operation.technology_name] = true
       if manifest_ids[operation.manifest_id] then
         error("CompilationPlan contains manifest collision: " .. operation.manifest_id, 2)
       end
@@ -143,13 +272,6 @@ local function validate_operations(operations)
         effects[identity] = effects[identity] or operation
       end
     end
-    if operation.technology then
-      for _, prerequisite in ipairs(operation.technology.prerequisites or {}) do
-        if not planned_technologies[prerequisite] and not data_raw.technology(prerequisite) then
-          error("CompilationPlan prerequisite target is missing: " .. operation.technology_name .. " -> " .. prerequisite, 2)
-        end
-      end
-    end
   end
   return {
     valid = true,
@@ -165,13 +287,26 @@ end
 function M.finalize(stream_plan, base_plan)
   local stream_artifact = type(stream_plan.artifact) == "function" and stream_plan:artifact() or deepcopy(stream_plan)
   if not stream_artifact or stream_artifact.schema ~= 3 then error("CompilationPlan requires GenerationPlan schema 3", 2) end
+  local stream_effect_integrity
+  stream_artifact, stream_effect_integrity = sanitize_stream_artifact(stream_artifact)
   local operations = materialized_stream_operations(stream_artifact)
   local stream_operations = deepcopy(operations)
-  local normalized_base = {}
-  for _, operation in ipairs(base_plan or {}) do
-    local normalized = apply_weapon_overlap_policy(normalized_base_operation(operation), stream_operations, stream_artifact.rows)
-    table.insert(normalized_base, normalized)
+  local normalized_base, base_effect_integrity = sanitize_base_operations(base_plan)
+  local finalized_base = {}
+  for _, operation in ipairs(normalized_base) do
+    local normalized = apply_weapon_overlap_policy(operation, stream_operations, stream_artifact.rows)
+    table.insert(finalized_base, normalized)
     table.insert(operations, deepcopy(normalized))
+  end
+  normalized_base = finalized_base
+  validate_operations(operations)
+  local graph_summary = technology_graph.validate_operations(operations)
+  stream_artifact = apply_graph_decisions(stream_artifact, graph_summary)
+  local graph_rejected_base
+  normalized_base, graph_rejected_base = apply_base_graph_decisions(normalized_base, graph_summary)
+  operations = materialized_stream_operations(stream_artifact)
+  for _, operation in ipairs(normalized_base) do
+    table.insert(operations, deepcopy(operation))
   end
   table.sort(operations, function(a, b)
     if a.technology_name ~= b.technology_name then return a.technology_name < b.technology_name end
@@ -179,6 +314,18 @@ function M.finalize(stream_plan, base_plan)
     return tostring(a.manifest_id) < tostring(b.manifest_id)
   end)
   local validation_summary = validate_operations(operations)
+  local rejected_operations = stream_effect_integrity.skipped_stream_count
+    + base_effect_integrity.skipped_base_extension_count
+    + graph_summary.rejected_planned_technology_count
+  telemetry.count("candidate_operations", #operations + rejected_operations)
+  telemetry.count("accepted_operations", #operations)
+  telemetry.count("rejected_operations", rejected_operations)
+  validation_summary.effect_integrity = {
+    streams = stream_effect_integrity,
+    base_extensions = base_effect_integrity
+  }
+  graph_summary.rejected_base_extensions = graph_rejected_base
+  validation_summary.technology_graph = graph_summary
   local source_fingerprints = deepcopy(stream_artifact.source_fingerprints or {})
   source_fingerprints.base_extensions = fingerprint.of(normalized_base)
   local artifact = {
@@ -187,7 +334,8 @@ function M.finalize(stream_plan, base_plan)
     operations = operations,
     stream_plan = stream_artifact,
     base_extension_operations = normalized_base,
-    validation_summary = validation_summary
+    validation_summary = validation_summary,
+    telemetry = telemetry.snapshot()
   }
   artifact.fingerprint = fingerprint.of(artifact)
   return artifact
@@ -195,18 +343,28 @@ end
 
 function M.compile()
   if latest then return latest end
+  telemetry.start_phase("planning")
   local stream_plan = stream_compiler.compile()
   local base_plan = base_extensions.plan_all()
   latest = M.finalize(stream_plan, base_plan)
-  latest.stream_plan_object = stream_plan
-  stream_compiler.accept(stream_plan)
-  require("prototypes.mir.emit.mod_data").emit_generation_plan(latest.stream_plan)
+  stream_compiler.accept_artifact(latest.stream_plan)
+  telemetry.finish_phase("planning")
   return latest
 end
 
 function M.apply_streams()
   local plan = M.compile()
-  stream_compiler.apply(plan.stream_plan_object)
+  stream_executor.apply(plan.stream_plan)
+end
+
+function M.publish()
+  local plan = M.compile()
+  require("prototypes.mir.emit.mod_data").emit_generation_plan(plan.stream_plan)
+  if target_line.feature_enabled("productivity_family_adoption") then
+    require("prototypes.mir.emit.transactions.productivity_family_adoption").emit_mod_data()
+  end
+  require("prototypes.mir.report.coverage").publish()
+  return true
 end
 
 function M.apply_base_extensions()
@@ -223,7 +381,8 @@ function M.snapshot()
     operations = plan.operations,
     stream_plan = plan.stream_plan,
     base_extension_operations = plan.base_extension_operations,
-    validation_summary = plan.validation_summary
+    validation_summary = plan.validation_summary,
+    telemetry = telemetry.snapshot()
   })
 end
 

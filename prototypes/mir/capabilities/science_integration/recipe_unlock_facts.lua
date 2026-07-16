@@ -8,7 +8,7 @@ local science_pack_recipe_status_cache = nil
 
 function M.recipe_outputs_item(recipe, item_name)
   local recipe_name = type(recipe) == "table" and recipe.name or recipe
-  local fact = recipe_name and recipe_facts.get(recipe_name) or nil
+  local fact = recipe_name and recipe_facts.view(recipe_name) or nil
   if not fact then return false end
   for _, result_name in ipairs(fact.result_names or {}) do
     if result_name == item_name then return true end
@@ -18,7 +18,7 @@ end
 
 function M.recipe_enabled_without_research(recipe)
   local recipe_name = type(recipe) == "table" and recipe.name or recipe
-  local fact = recipe_name and recipe_facts.get(recipe_name) or nil
+  local fact = recipe_name and recipe_facts.view(recipe_name) or nil
   return fact ~= nil and fact.enabled_without_research == true
 end
 
@@ -34,14 +34,14 @@ local function build_science_pack_recipe_status_cache()
     }
   end
 
-  for _, recipe_name in ipairs(recipe_facts.all_names()) do
-    local recipe = recipe_facts.get(recipe_name)
-    for _, pack_name in ipairs(lab_inputs) do
-      if M.recipe_outputs_item(recipe, pack_name) then
-        local status = science_pack_recipe_status_cache[pack_name]
-        status.has_recipe = true
-        table.insert(status.recipes, recipe_name)
-        if M.recipe_enabled_without_research(recipe) then status.initially_available = true end
+  for _, pack_name in ipairs(lab_inputs) do
+    local status = science_pack_recipe_status_cache[pack_name]
+    for _, recipe_name in ipairs(recipe_facts.recipes_by_output_view(pack_name)) do
+      local recipe = recipe_facts.view(recipe_name)
+      status.has_recipe = true
+      table.insert(status.recipes, recipe_name)
+      if recipe and recipe.enabled_without_research == true then
+        status.initially_available = true
       end
     end
   end

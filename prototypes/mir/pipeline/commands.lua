@@ -1,5 +1,6 @@
 local deepcopy = require("prototypes.mir.core.deepcopy")
 local target_line = require("prototypes.mir.platform.factorio.target_line")
+local telemetry = require("prototypes.mir.report.compiler_telemetry")
 
 local M = {}
 
@@ -54,7 +55,7 @@ local commands = {
   ["emit-streams"] = {
     kind = "emission",
     requires_features = {},
-    implementation = "prototypes/mir/planner/stream_compiler.lua",
+    implementation = "prototypes/mir/emit/stream_executor.lua",
     apply = function() require("prototypes.mir.planner.compilation_plan").apply_streams() end
   },
   ["apply-competing-productivity"] = {
@@ -92,7 +93,7 @@ local commands = {
     requires_features = {},
     implementation = "prototypes/mir/emit/effect_safety.lua",
     apply = function()
-      require("prototypes.mir.emit.effect_safety").sanitize_registered_technology_effects()
+      require("prototypes.mir.emit.effect_safety").sanitize_all_technology_effects()
       require("prototypes.mir.emit.effect_safety").assert_registered_technology_effects()
       require("prototypes.mir.emit.technology_graph_safety").assert_registered_technologies()
     end
@@ -121,6 +122,12 @@ local commands = {
     implementation = "prototypes/mir/planner/output_validator.lua",
     apply = function() require("prototypes.mir.planner.compilation_plan").assert_output() end
   },
+  ["publish-compiler-artifacts"] = {
+    kind = "publication",
+    requires_features = {},
+    implementation = "prototypes/mir/planner/compilation_plan.lua",
+    apply = function() require("prototypes.mir.planner.compilation_plan").publish() end
+  },
   ["flush-diagnostics"] = {
     kind = "report",
     requires_features = {},
@@ -148,7 +155,8 @@ local ORDERING = {
   ["emit-compatibility-planner"] = {phase = 80, dependencies = {"emit-compiler-reports"}},
   ["assert-plan-output"] = {phase = 90, dependencies = {"emit-compatibility-planner"}},
   ["assert-technology-safety"] = {phase = 90, dependencies = {"assert-plan-output"}},
-  ["flush-diagnostics"] = {phase = 100, dependencies = {"assert-technology-safety"}}
+  ["publish-compiler-artifacts"] = {phase = 95, dependencies = {"assert-technology-safety"}},
+  ["flush-diagnostics"] = {phase = 100, dependencies = {"publish-compiler-artifacts"}}
 }
 
 
@@ -177,13 +185,25 @@ function M.run(id)
     end
   end
   if not supported(command) then completed[id] = "skipped"; return false end
-  command.apply()
+  telemetry.start_phase("pipeline:" .. id)
+  local summary_phase = id == "assert-technology-safety" and "postconditions" or nil
+  if summary_phase then telemetry.start_phase(summary_phase) end
+  local ok, result = pcall(command.apply)
+  if summary_phase then telemetry.finish_phase(summary_phase) end
+  telemetry.finish_phase("pipeline:" .. id)
+  if not ok then error(result, 2) end
   completed[id] = "applied"
   return true
 end
 
 function M.run_all()
-  for _, id in ipairs(M.order()) do M.run(id) end
+  local ok, result = pcall(function()
+    for _, id in ipairs(M.order()) do M.run(id) end
+  end)
+  if not ok then
+    pcall(function() require("prototypes.mir.report.diagnostics_sink").flush() end)
+    error(result, 2)
+  end
 end
 
 function M.order()

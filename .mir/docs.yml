@@ -1680,6 +1680,14 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - mir-3.2.0-verification-contract
+  - path: docs/releases/3.2.0-audit-remediation-report.md
+    title: "MIR 3.2.0 Audit Remediation Report"
+    status: current
+    audience: release-manager
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-3.2.0-audit-remediation
   - path: docs/releases/notes/release-notes-3.2.0.md
     title: "MIR 3.2.0 Release Notes"
     status: current

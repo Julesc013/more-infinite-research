@@ -22,7 +22,7 @@
   "diagnostic_code_namespaces": ["MIR-AUTO", "MIR-PROVIDER"],
   "legacy_automatic_modes": ["off", "report", "safe-attach", "exact-pack", "safe-generate"],
   "mutation_sentinels": [
-    "hard-safety", "owner-conflict", "cross-stream-effect-arbitration", "missing-prerequisite", "target-filter", "output-value-parity", "pack-applicability"
+    "hard-safety", "owner-conflict", "cross-stream-effect-arbitration", "typed-prerequisite-rejection", "typed-scc-rejection", "target-filter", "output-value-parity", "pack-applicability"
   ],
   "positive_negative_required": true,
   "runtime_fixture": "fixtures/assert-compiler-contracts/data-final-fixes.lua"

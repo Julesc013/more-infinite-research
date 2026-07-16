@@ -74,6 +74,8 @@ try {
     Write-MIRTestText -Path (Join-Path $lfRoot $relative) -Text "one`ntwo`n"
     Write-MIRTestText -Path (Join-Path $crlfRoot $relative) -Text "one`r`ntwo`r`n"
   }
+  Write-MIRTestText -Path (Join-Path $lfRoot ".mir/target-lines/3.1.9/source.lua") -Text "historical-one`n"
+  Write-MIRTestText -Path (Join-Path $crlfRoot ".mir/target-lines/3.1.9/source.lua") -Text "historical-two`n"
 
   $lfPackage = Get-MIRPackageSourceFingerprint -RepoRoot $lfRoot
   $crlfPackage = Get-MIRPackageSourceFingerprint -RepoRoot $crlfRoot
@@ -84,7 +86,7 @@ try {
   $lfHarness = Get-MIRValidationHarnessFingerprint -RepoRoot $lfRoot
   $crlfHarness = Get-MIRValidationHarnessFingerprint -RepoRoot $crlfRoot
   if ($lfHarness -ne $crlfHarness) {
-    throw "Validation-harness fingerprint differs between LF and CRLF checkouts."
+    throw "Validation-harness fingerprint differs between equivalent active checkouts or includes historical target-line snapshots."
   }
 
   $lfExpected = Get-MIRFileContentSha256 `

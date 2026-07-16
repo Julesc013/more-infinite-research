@@ -294,7 +294,7 @@ release_artifacts:
       target_factorio: "2.1"
       source_anchor: mir_3_1_9
       assurance_policy: mir-verification-v4
-      assurance_evidence_schema: 3
+      assurance_evidence_schema: 4
       verification_tests: validation/tests.yml
       verification_domains: validation/domains.yml
       verification_profile: validation/profiles/factorio-2.1.json
@@ -316,7 +316,7 @@ release_artifacts:
         structured_summary_run_id: 5bbedb9b-cf3c-4f91-ae5a-f6bf274ad172
         status: superseded-unpublished-candidate
       assurance_policy: mir-verification-v4
-      assurance_evidence_schema: 3
+      assurance_evidence_schema: 4
       verification_profile: validation/profiles/factorio-2.0.json
       prior_release: dist/more-infinite-research_2.4.5.zip
       release_gate: target-backport-and-qualification-pending

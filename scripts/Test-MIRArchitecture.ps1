@@ -6,6 +6,63 @@ $ErrorActionPreference = "Stop"
 
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
 
+function Assert-MIRModuleManifestSemantics {
+  $manifestPath = Join-Path $repo ".mir\modules.yml"
+  $lines = Get-Content -LiteralPath $manifestPath
+  $insideModules = $false
+  $currentGroup = ""
+  $listed = @{}
+  $groups = @{}
+
+  foreach ($line in $lines) {
+    if (-not $insideModules) {
+      if ($line -eq "modules:") { $insideModules = $true }
+      continue
+    }
+    if ($line -match '^\S' -and -not [string]::IsNullOrWhiteSpace($line)) { break }
+    if ([string]::IsNullOrWhiteSpace($line)) { continue }
+    if ($line -match '^  ([A-Za-z0-9_-]+):\s*$') {
+      $currentGroup = $Matches[1]
+      if ($groups.ContainsKey($currentGroup)) { throw "Duplicate module group: $currentGroup" }
+      $groups[$currentGroup] = @()
+      continue
+    }
+    if ($line -match '^\s{6,}-\s+') {
+      throw ".mir/modules.yml contains a nested or embedded list marker: $($line.Trim())"
+    }
+    if ($line -match '^    - (.+?)\s*$') {
+      if (-not $currentGroup) { throw "Module path appears before a module group: $line" }
+      $relative = [string]$Matches[1]
+      if ($relative -notmatch '^prototypes/[A-Za-z0-9_./-]+\.lua$' -or $relative -match '\s-\s') {
+        throw "Invalid module path scalar in .mir/modules.yml: $relative"
+      }
+      if (-not (Test-Path -LiteralPath (Join-Path $repo $relative) -PathType Leaf)) {
+        throw "Module manifest path does not exist: $relative"
+      }
+      if ($listed.ContainsKey($relative)) {
+        throw "Module is assigned more than once: $relative ($($listed[$relative]), $currentGroup)"
+      }
+      $listed[$relative] = $currentGroup
+      $groups[$currentGroup] += $relative
+      continue
+    }
+    throw "Unsupported modules.yml structure inside modules section: $line"
+  }
+
+  if ($groups.Count -eq 0) { throw ".mir/modules.yml contains no module groups." }
+  $shippedLua = @(
+    Get-ChildItem -LiteralPath (Join-Path $repo "prototypes\mir") -Recurse -File -Filter "*.lua"
+    Get-ChildItem -LiteralPath (Join-Path $repo "prototypes\streams") -File -Filter "*.lua"
+  ) | ForEach-Object { [IO.Path]::GetRelativePath($repo, $_.FullName).Replace("\", "/") } | Sort-Object -Unique
+  $missing = @($shippedLua | Where-Object { -not $listed.ContainsKey($_) })
+  $extra = @($listed.Keys | Where-Object { $shippedLua -notcontains $_ })
+  if ($missing.Count -gt 0 -or $extra.Count -gt 0) {
+    throw "Module manifest must assign every shipped Lua file exactly once. Missing: $($missing -join ', '). Extra: $($extra -join ', ')."
+  }
+}
+
+Assert-MIRModuleManifestSemantics
+
 function Get-MIRPath {
   param([Parameter(Mandatory)][string]$RelativePath)
   return Join-Path $repo $RelativePath
@@ -272,16 +329,21 @@ $requiredMirFiles = @(
   "prototypes/mir/planner/prerequisites.lua",
   "prototypes/mir/planner/requirements.lua",
   "prototypes/mir/planner/science.lua",
+  "prototypes/mir/integrity/effect_contracts.lua",
   "prototypes/mir/emit/stream_spec_adapter.lua",
+  "prototypes/mir/emit/stream_executor.lua",
   "prototypes/mir/emit/base_extensions.lua",
   "prototypes/mir/emit/icon_builder.lua",
   "prototypes/mir/emit/effect_safety.lua",
   "prototypes/mir/emit/mod_data.lua",
   "prototypes/mir/emit/technology_builder.lua",
+  "prototypes/mir/emit/base_extension_builder.lua",
   "prototypes/mir/emit/technology_replacement.lua",
   "prototypes/mir/report/decision_export.lua",
   "prototypes/mir/report/compatibility_diagnostics.lua",
   "prototypes/mir/report/diagnostics_sink.lua",
+  "prototypes/mir/report/compiler_telemetry.lua",
+  "prototypes/mir/planner/technology_graph.lua",
   "prototypes/mir/runtime/scripted_techs.lua",
   "prototypes/mir/runtime/settings_profile.lua",
   "prototypes/mir/runtime/settings_resolver.lua",
@@ -354,9 +416,10 @@ foreach ($needle in @(
   'require("prototypes.mir.pipeline.mutations.max_level").apply()',
   'require("prototypes.mir.compatibility.planner").emit()',
   'require("prototypes.mir.planner.compilation_plan").assert_output()',
-  'require("prototypes.mir.emit.effect_safety").sanitize_registered_technology_effects()',
+  'require("prototypes.mir.emit.effect_safety").sanitize_all_technology_effects()',
   'require("prototypes.mir.emit.effect_safety").assert_registered_technology_effects()',
   'require("prototypes.mir.emit.technology_graph_safety").assert_registered_technologies()',
+  'require("prototypes.mir.planner.compilation_plan").publish()',
   'require("prototypes.mir.report.diagnostics_sink").flush()'
 )) {
   Assert-MIRContains -RelativePath "prototypes/mir/stage/data_final_fixes_steps.lua" -Text $dataFinalFixesStepsText -Needle $needle
@@ -382,6 +445,7 @@ foreach ($commandId in @(
   "emit-compatibility-planner",
   "assert-plan-output",
   "assert-technology-safety",
+  "publish-compiler-artifacts",
   "flush-diagnostics"
 )) {
   Assert-MIRContains `
@@ -390,6 +454,30 @@ foreach ($commandId in @(
     -Needle ('["' + $commandId + '"]')
 }
 Assert-MIRContains -RelativePath "prototypes/mir/pipeline/commands.lua" -Text $commandCatalogText -Needle "function M.run_all()"
+Assert-MIRContains -RelativePath "prototypes/mir/pipeline/commands.lua" -Text $commandCatalogText -Needle 'pcall(function() require("prototypes.mir.report.diagnostics_sink").flush() end)'
+
+Assert-MIRNoPatternInLuaFile `
+  -RelativePath "prototypes/mir/emit/base_extensions.lua" `
+  -Pattern 'deepcopy\s*\(\s*base_tech\s*\)' `
+  -Message "Base extensions must use the explicit allowlisted builder instead of deep-copying foreign technologies."
+
+$compilationPlanText = Read-MIRFile -RelativePath "prototypes/mir/planner/compilation_plan.lua"
+$streamCompilerText = Read-MIRFile -RelativePath "prototypes/mir/planner/stream_compiler.lua"
+if ($streamCompilerText -match 'emit_mod_data\s*\(') {
+  throw "Stream application must not publish mod-data before postcondition checks."
+}
+foreach ($forbiddenPlannerDependency in @(
+  "prototypes.mir.emit.stream_spec_adapter",
+  "prototypes.mir.emit.transactions.productivity_family_adoption"
+)) {
+  if ($streamCompilerText -match [regex]::Escape($forbiddenPlannerDependency)) {
+    throw "Stream planning must not import emission dependency '$forbiddenPlannerDependency'."
+  }
+}
+Assert-MIRContains `
+  -RelativePath "prototypes/mir/planner/compilation_plan.lua" `
+  -Text $compilationPlanText `
+  -Needle "function M.publish()"
 
 $technologyBuilderText = Read-MIRFile -RelativePath "prototypes/mir/emit/technology_builder.lua"
 Assert-MIRContains -RelativePath "prototypes/mir/emit/technology_builder.lua" -Text $technologyBuilderText -Needle 'require("prototypes.mir.platform.factorio.data_raw")'
@@ -415,11 +503,24 @@ Assert-MIRContains -RelativePath "prototypes/mir/emit/mod_data.lua" -Text $modDa
 
 $streamCompilerText = Read-MIRFile -RelativePath "prototypes/mir/planner/stream_compiler.lua"
 Assert-MIRContains -RelativePath "prototypes/mir/planner/stream_compiler.lua" -Text $streamCompilerText -Needle 'require("prototypes.mir.streams.registry")'
-Assert-MIRContains -RelativePath "prototypes/mir/planner/stream_compiler.lua" -Text $streamCompilerText -Needle 'require("prototypes.mir.emit.stream_spec_adapter")'
-Assert-MIRContains -RelativePath "prototypes/mir/planner/stream_compiler.lua" -Text $streamCompilerText -Needle "function M.run()"
 Assert-MIRContains -RelativePath "prototypes/mir/planner/stream_compiler.lua" -Text $streamCompilerText -Needle 'require("prototypes.mir.families.resolver")'
 Assert-MIRContains -RelativePath "prototypes/mir/planner/stream_compiler.lua" -Text $streamCompilerText -Needle "function M.compile()"
-Assert-MIRContains -RelativePath "prototypes/mir/planner/stream_compiler.lua" -Text $streamCompilerText -Needle "function M.apply(plan)"
+
+$streamExecutorText = Read-MIRFile -RelativePath "prototypes/mir/emit/stream_executor.lua"
+Assert-MIRContains -RelativePath "prototypes/mir/emit/stream_executor.lua" -Text $streamExecutorText -Needle 'require("prototypes.mir.emit.stream_spec_adapter")'
+Assert-MIRContains -RelativePath "prototypes/mir/emit/stream_executor.lua" -Text $streamExecutorText -Needle 'require("prototypes.mir.emit.transactions.productivity_family_adoption")'
+Assert-MIRContains -RelativePath "prototypes/mir/emit/stream_executor.lua" -Text $streamExecutorText -Needle "function M.apply(artifact)"
+
+$integrityContractsText = Read-MIRFile -RelativePath "prototypes/mir/integrity/effect_contracts.lua"
+Assert-MIRContains -RelativePath "prototypes/mir/integrity/effect_contracts.lua" -Text $integrityContractsText -Needle "function M.identity(effect)"
+Assert-MIRContains -RelativePath "prototypes/mir/integrity/effect_contracts.lua" -Text $integrityContractsText -Needle "function M.target_status(effect)"
+foreach ($identityConsumer in @(
+  "prototypes/mir/planner/generation_plan.lua",
+  "prototypes/mir/index/relationships.lua"
+)) {
+  $identityConsumerText = Read-MIRFile -RelativePath $identityConsumer
+  Assert-MIRContains -RelativePath $identityConsumer -Text $identityConsumerText -Needle 'require("prototypes.mir.integrity.effect_contracts")'
+}
 
 $generationPlanText = Read-MIRFile -RelativePath "prototypes/mir/planner/generation_plan.lua"
 Assert-MIRContains -RelativePath "prototypes/mir/planner/generation_plan.lua" -Text $generationPlanText -Needle "function Plan:finalize()"

@@ -1,6 +1,6 @@
 schema: 1
 
-release: 3.1.0
+release: 3.2.0
 factorio_line: "2.1"
 budget_manifest: .mir/performance-budgets.json
 accepted_evidence: .mir/evidence/3.1.0-automatic-compiler-runtime-summary.json
@@ -24,3 +24,30 @@ required_surfaces:
   - large-pack
   - large-synthetic-graph
   - full-matrix
+
+compiler_telemetry:
+  schema: 1
+  required_counters:
+    - recipes
+    - technologies
+    - effects
+    - graph_edges
+    - graph_components
+    - cyclic_components
+    - recipe_index_scans
+    - recipe_fact_copies
+    - candidate_operations
+    - accepted_operations
+    - rejected_operations
+    - diagnostic_rows
+  required_phases:
+    - snapshot
+    - graph
+    - planning
+    - postconditions
+  witness_node_limit: 64
+
+regression_policy:
+  qualified_baseline: "3.1.9"
+  absolute_budgets: .mir/performance-budgets.json
+  maximum_regression_percent: 20

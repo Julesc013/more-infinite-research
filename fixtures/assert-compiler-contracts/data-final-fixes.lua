@@ -347,12 +347,16 @@ duplicate_plan:add(skip_row("same", "id-a"))
 duplicate_plan:add(skip_row("same", "id-b"))
 expect_error("duplicate GenerationPlan stream id", "duplicate stream key", function() duplicate_plan:finalize() end)
 
-local function emitted_row(stream_key, technology_name)
+local function emitted_row(stream_key, technology_name, recipe_name)
   local row = skip_row(stream_key, stream_key)
   row.action = "emit"
   row.technology_name = technology_name
   row.fields = {
-    effects = {{type = "change-recipe-productivity", recipe = "shared-recipe", change = 0.1}},
+    effects = {{
+      type = "change-recipe-productivity",
+      recipe = recipe_name or "iron-gear-wheel",
+      change = 0.1
+    }},
     ingredients = {{"automation-science-pack", 1}}, prerequisites = {},
     count_formula = "100", research_time = 30, max_level = "infinite"
   }
@@ -419,7 +423,7 @@ end
 
 local malformed_single_stream = emitted_row("malformed-single-stream", "malformed-single-stream-tech")
 table.insert(malformed_single_stream.fields.effects, {
-  type = "change-recipe-productivity", recipe = "shared-recipe", change = 0.1
+  type = "change-recipe-productivity", recipe = "iron-gear-wheel", change = 0.1
 })
 local malformed_rows = effect_ownership.resolve({malformed_single_stream})
 local malformed_plan = generation_plan.new()
@@ -436,7 +440,7 @@ if partial_rows[2].action ~= "emit" or #partial_rows[2].fields.effects ~= 1
   fail("effect ownership removed a losing stream instead of retaining its unique effects")
 end
 
-local adoption = native_owner_row("research_adopted", "existing-productivity-owner", "shared-recipe")
+local adoption = native_owner_row("research_adopted", "existing-productivity-owner", "iron-gear-wheel")
 local adoption_rows = effect_ownership.resolve({emitted_row("research_emitted", "effect-tech-emitted"), adoption})
 if adoption_rows[1].stream_key ~= "research_adopted" or adoption_rows[1].action ~= "adopt"
   or adoption_rows[2].action ~= "skip" then
@@ -488,14 +492,17 @@ expect_error("CompilationPlan cross collision", "technology-name collision", fun
     technology = {name = "collision-tech", effects = {}, prerequisites = {}, unit = {ingredients = {}, count_formula = "1", time = 1}, max_level = "infinite"}
   }})
 end)
-expect_error("CompilationPlan missing prerequisite sentinel", "prerequisite target is missing", function()
-  compilation_plan.finalize(generation_plan.new():finalize(), {{
+local missing_prerequisite_plan = compilation_plan.finalize(generation_plan.new():finalize(), {{
     operation = "emit_base_extension",
     key = "missing-prerequisite",
     technology_name = "missing-prerequisite-tech",
     technology = {name = "missing-prerequisite-tech", effects = {}, prerequisites = {"definitely-missing-technology"}, unit = {ingredients = {}, count_formula = "1", time = 1}, max_level = "infinite"}
   }})
-end)
+if #missing_prerequisite_plan.operations ~= 0
+  or missing_prerequisite_plan.validation_summary.technology_graph.rejected["missing-prerequisite-tech"].code
+    ~= "prerequisite_missing" then
+  fail("CompilationPlan did not withhold and classify a missing-prerequisite operation")
+end
 
 expect_error("output effect numeric parity", "numeric effect value differs", function()
   output_validator.assert_effects(
@@ -513,6 +520,40 @@ expect_error("base extension output parity", "prerequisites differs", function()
     "base-parity-test"
   )
 end)
+local cyclic_plan = compilation_plan.finalize(generation_plan.new():finalize(), {
+    {
+      operation = "emit_base_extension",
+      key = "cycle-a",
+      technology_name = "mir-planned-cycle-a",
+      technology = {
+        name = "mir-planned-cycle-a",
+        effects = {{type = "nothing"}},
+        prerequisites = {"mir-planned-cycle-b"},
+        unit = {ingredients = {{"automation-science-pack", 1}}, count_formula = "1", time = 1},
+        max_level = "infinite"
+      }
+    },
+    {
+      operation = "emit_base_extension",
+      key = "cycle-b",
+      technology_name = "mir-planned-cycle-b",
+      technology = {
+        name = "mir-planned-cycle-b",
+        effects = {{type = "nothing"}},
+        prerequisites = {"mir-planned-cycle-a"},
+        unit = {ingredients = {{"automation-science-pack", 1}}, count_formula = "1", time = 1},
+        max_level = "infinite"
+      }
+    }
+  })
+if #cyclic_plan.operations ~= 0
+  or cyclic_plan.validation_summary.technology_graph.rejected_planned_technology_count ~= 2
+  or cyclic_plan.validation_summary.technology_graph.rejected["mir-planned-cycle-a"].code
+    ~= "prerequisite_mir_cycle"
+  or cyclic_plan.validation_summary.technology_graph.rejected["mir-planned-cycle-b"].code
+    ~= "prerequisite_mir_cycle" then
+  fail("CompilationPlan did not withhold and classify the planned prerequisite SCC")
+end
 
 local dangling_effect_candidate = {
   effects = {
@@ -530,6 +571,22 @@ then
   fail("final effect safety did not prune only the missing recipe-productivity target")
 end
 effect_safety.assert_effects_allowed(dangling_effect_candidate.effects, "compiler-contract-dangling-effect")
+
+local generic_effect_candidate = {
+  effects = {
+    {type = "unlock-recipe", recipe = "iron-gear-wheel"},
+    {type = "unlock-recipe", recipe = "mir-fixture-definitely-missing-recipe"},
+    {type = "gun-speed", ammo_category = "bullet", modifier = 0.1},
+    {type = "gun-speed", ammo_category = "mir-fixture-definitely-missing-ammo-category", modifier = 0.1}
+  }
+}
+local kept_generic, removed_generic = effect_safety.sanitize_effects(
+  generic_effect_candidate.effects,
+  "compiler-contract-generic-effects",
+  "external")
+if #kept_generic ~= 2 or #removed_generic ~= 2 then
+  fail("generic effect contracts did not retain valid targets and prune missing targets")
+end
 
 if fingerprint.of({b = 2, a = 1}) ~= fingerprint.of({a = 1, b = 2}) then fail("map fingerprint is iteration-order dependent") end
 local cyclic = {}; cyclic.self = cyclic

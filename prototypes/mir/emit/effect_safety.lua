@@ -1,5 +1,7 @@
 local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 local generated_registry = require("prototypes.mir.domain.facts.generated_technology_registry")
+local effect_contracts = require("prototypes.mir.integrity.effect_contracts")
+local telemetry = require("prototypes.mir.report.compiler_telemetry")
 
 local S = {}
 
@@ -29,52 +31,66 @@ function S.assert_effects_allowed(effects, context)
 end
 
 local function assert_effect_target_exists(effect, technology_name)
-  if not effect or effect.type ~= "change-recipe-productivity" then return end
-
-  local recipe_name = effect.recipe
-  if type(recipe_name) ~= "string" or not data_raw.prototype("recipe", recipe_name) then
-    error("MIR generated technology "
-      .. tostring(technology_name)
-      .. " references missing recipe "
-      .. tostring(recipe_name)
-      .. ".")
-  end
-end
-
-local function missing_recipe_target(effect)
-  if not effect or effect.type ~= "change-recipe-productivity" then return nil end
-  local recipe_name = effect.recipe
-  if type(recipe_name) == "string" and data_raw.prototype("recipe", recipe_name) then return nil end
-  return recipe_name
-end
-
-local function log_pruned_effect(technology_name, recipe_name)
-  if type(log) ~= "function" then return end
-  log("[MIR] pruned dangling change-recipe-productivity effect from "
+  local valid, reason, target = effect_contracts.target_status(effect)
+  if valid then return end
+  error("Technology "
     .. tostring(technology_name)
-    .. ": missing recipe "
-    .. tostring(recipe_name))
+    .. " has invalid "
+    .. tostring(effect and effect.type)
+    .. " effect target "
+    .. tostring(target)
+    .. " ("
+    .. tostring(reason)
+    .. ").")
+end
+
+local function log_pruned_effect(technology_name, effect, reason, owner)
+  if type(log) ~= "function" then return end
+  log("[MIR] pruned dangling technology effect from "
+    .. tostring(technology_name)
+    .. ": owner="
+    .. tostring(owner)
+    .. " type="
+    .. tostring(effect and effect.type)
+    .. " target="
+    .. tostring(effect and (effect.recipe or effect.item or effect.space_location or effect.ammo_category))
+    .. " reason="
+    .. tostring(reason))
+end
+
+function S.sanitize_effects(effects, context, owner)
+  local kept, removed = {}, {}
+  for _, effect in ipairs(effects or {}) do
+    local valid, reason, target = effect_contracts.target_status(effect)
+    if valid then
+      table.insert(kept, effect)
+    else
+      table.insert(removed, {
+        type = effect and effect.type,
+        target = target,
+        reason = reason
+      })
+      log_pruned_effect(context, effect, reason, owner or "unknown")
+      telemetry.count("effects_pruned", 1)
+      telemetry.witness("pruned_effects", tostring(context) .. ":" .. tostring(effect and effect.type) .. ":" .. tostring(target))
+    end
+  end
+  return kept, removed
 end
 
 function S.prune_missing_recipe_effects(technology, technology_name)
   local effects = technology and technology.effects or {}
-  local kept, removed = {}, {}
-
-  for _, effect in ipairs(effects) do
-    local recipe_name = missing_recipe_target(effect)
-    if recipe_name ~= nil or (effect and effect.type == "change-recipe-productivity" and effect.recipe == nil) then
-      table.insert(removed, tostring(recipe_name))
-      log_pruned_effect(technology_name, recipe_name)
-    else
-      table.insert(kept, effect)
-    end
-  end
-
+  local kept, removed = S.sanitize_effects(effects, technology_name, "generated")
   if #removed > 0 then technology.effects = kept end
+  local removed_recipes = {}
+  for _, row in ipairs(removed) do
+    if row.type == "change-recipe-productivity" then table.insert(removed_recipes, tostring(row.target)) end
+  end
   return {
     pruned_effect_count = #removed,
     remaining_effect_count = #kept,
-    removed_recipes = removed
+    removed_recipes = removed_recipes,
+    removed_effects = removed
   }
 end
 
@@ -88,7 +104,12 @@ function S.sanitize_registered_technology_effects()
   for _, name in ipairs(generated_registry.sorted_names()) do
     local tech = data_raw.technology(name)
     if tech then
-      local result = S.prune_missing_recipe_effects(tech, name)
+      local kept, removed = S.sanitize_effects(tech.effects or {}, name, "generated")
+      if #removed > 0 then tech.effects = kept end
+      local result = {
+        pruned_effect_count = #removed,
+        remaining_effect_count = #kept
+      }
       if result.pruned_effect_count > 0 then
         summary.pruned_effect_count = summary.pruned_effect_count + result.pruned_effect_count
         summary.affected_technology_count = summary.affected_technology_count + 1
@@ -99,6 +120,32 @@ function S.sanitize_registered_technology_effects()
     end
   end
 
+  return summary
+end
+
+function S.sanitize_all_technology_effects()
+  local summary = {
+    pruned_effect_count = 0,
+    affected_technology_count = 0,
+    generated_technology_count = 0,
+    external_technology_count = 0,
+    emptied_technology_count = 0
+  }
+  local names = {}
+  for name, _ in pairs(data_raw.prototypes("technology")) do table.insert(names, name) end
+  table.sort(names)
+  for _, name in ipairs(names) do
+    local technology = data_raw.technology(name)
+    local owner = generated_registry.contains(name) and "generated" or "external"
+    local kept, removed = S.sanitize_effects((technology and technology.effects) or {}, name, owner)
+    if #removed > 0 then
+      technology.effects = kept
+      summary.pruned_effect_count = summary.pruned_effect_count + #removed
+      summary.affected_technology_count = summary.affected_technology_count + 1
+      summary[owner .. "_technology_count"] = summary[owner .. "_technology_count"] + 1
+      if #kept == 0 then summary.emptied_technology_count = summary.emptied_technology_count + 1 end
+    end
+  end
   return summary
 end
 

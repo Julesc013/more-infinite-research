@@ -1,0 +1,57 @@
+{
+  "schema": 1,
+  "authority": "canonical-release-ledger",
+  "updated_at": "2026-07-17",
+  "published_baselines": {
+    "factorio-2.1": {
+      "mir_version": "3.1.9",
+      "branch": "main",
+      "tag": "3.1.9",
+      "archive": "dist/more-infinite-research_3.1.9.zip",
+      "status": "published-frozen"
+    },
+    "factorio-2.0": {
+      "mir_version": "2.4.5",
+      "branch": "legacy",
+      "tag": "2.4.5",
+      "archive": "dist/more-infinite-research_2.4.5.zip",
+      "status": "published-frozen"
+    }
+  },
+  "development": {
+    "factorio-2.1": {
+      "mir_version": "3.2.0",
+      "branch": "dev",
+      "source_anchor": "3.1.9",
+      "archive": "dist/more-infinite-research_3.2.0.zip",
+      "archive_class": "development-candidate",
+      "qualification": "not-release-qualified",
+      "publication_status": "unreleased",
+      "status": "active-refactor"
+    },
+    "factorio-2.0": {
+      "mir_version": "2.5.0",
+      "branch": "tmp/2.0",
+      "source_anchor": "3.2.0-final-source-freeze",
+      "prior_release": "2.4.5",
+      "archive": null,
+      "archive_class": "not-built-from-final-source",
+      "qualification": "pending-canonical-backport",
+      "publication_status": "unreleased",
+      "status": "planned-after-3.2-freeze"
+    }
+  },
+  "views": {
+    "branch_policy": ".mir/branches.yml",
+    "release_wave": ".mir/release-wave.yml",
+    "distribution_inventory": ".mir/distributions.json",
+    "maintainer_queue": "todo.md",
+    "promotion_workflow": ".github/workflows/assurance-promotion.yml"
+  },
+  "rules": {
+    "published_archives_are_immutable": true,
+    "development_archives_are_not_releases": true,
+    "backports_start_after_canonical_source_freeze": true,
+    "manual_view_disagreement_fails_validation": true
+  }
+}

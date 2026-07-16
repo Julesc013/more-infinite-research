@@ -6,6 +6,7 @@ local settings_catalog = require("prototypes.mir.settings.catalog")
 local effect_contracts = require("prototypes.mir.settings.effect_contracts")
 local cost_model = require("prototypes.mir.domain.native_owner.cost_model")
 local contract = require("prototypes.mir.domain.native_owner.contract")
+local target_line = require("prototypes.mir.platform.factorio.target_line")
 
 local M = {}
 
@@ -184,6 +185,9 @@ end
 function M.plan(key, spec, buckets)
   local binding = spec and spec.native_owner_binding
   if not binding then return buckets, {}, {}, nil, nil end
+  if not target_line.feature_enabled("productivity_family_adoption") then
+    return buckets, {}, {}, nil, nil, "productivity_family_adoption_unsupported"
+  end
   if not binding.effect_scope or binding.effect_scope.type ~= "change-recipe-productivity"
       or type(binding.effect_scope.products) ~= "table" or #binding.effect_scope.products == 0 then
     error("Native-owner binding is missing a recipe-productivity effect scope for " .. tostring(key), 2)

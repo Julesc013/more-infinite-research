@@ -12,5 +12,20 @@ data:extend({
     results = {
       {type = "item", name = "copper-cable", amount = 2}
     }
+  },
+  {
+    type = "technology",
+    name = "mir-fixture-external-dangling-unlock",
+    icon = "__base__/graphics/technology/automation.png",
+    icon_size = 256,
+    effects = {
+      {type = "unlock-recipe", recipe = "copper-cable"},
+      {type = "unlock-recipe", recipe = "kr-copper-cable-from-copper-ore"}
+    },
+    unit = {
+      count = 1,
+      ingredients = {{"automation-science-pack", 1}},
+      time = 1
+    }
   }
 })

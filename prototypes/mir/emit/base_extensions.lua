@@ -15,6 +15,7 @@ local science_packs = require("prototypes.mir.capabilities.science_integration.s
 local science_selector = require("prototypes.mir.capabilities.science_integration.science_selector")
 local effective_settings = require("prototypes.mir.settings.effective")
 local effect_scaling = require("prototypes.mir.settings.effect_scaling")
+local base_extension_builder = require("prototypes.mir.emit.base_extension_builder")
 
 local M = {}
 
@@ -436,12 +437,17 @@ local function plan_chain(key)
     base_value = 1000
   end
 
-  local new = deepcopy(base_tech)
-  new.name = new_name
-  new.localised_name = spec.localised_name or base_tech.localised_name or {"technology-name." .. locale_key}
-  new.localised_description = spec.localised_description or base_tech.localised_description or {"technology-description." .. locale_key}
-  new.prerequisites = build_prerequisites(chain_key .. "-" .. base_level, base_tech.prerequisites)
-  new.level = desired_new_level
+  local new = base_extension_builder.continuation(base_tech, {
+    name = new_name,
+    localised_name = spec.localised_name or base_tech.localised_name or {"technology-name." .. locale_key},
+    localised_description = spec.localised_description or base_tech.localised_description or {"technology-description." .. locale_key},
+    prerequisites = build_prerequisites(chain_key .. "-" .. base_level, base_tech.prerequisites),
+    effects = {},
+    unit = {},
+    max_level = "infinite",
+    upgrade = true,
+    level = desired_new_level
+  })
 
   local special = SPECIALS[key]
   local desired_effects = nil
