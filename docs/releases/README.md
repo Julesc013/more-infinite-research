@@ -14,7 +14,10 @@ superseded_by: []
 
 Release docs are version-specific plans, migration guides, risk registers, checklists, and validation records.
 
-MIR 3.1.9 is the sealed Factorio 2.1 release candidate on `main`. MIR 2.4.0 is the published Factorio 2.0 release and exact save-upgrade predecessor; MIR 2.4.5 is the active complete 3.1.9 projection on `tmp/2.0`. Its source lock, checklist, validation summary, candidate seal, and backport-wave dashboard govern qualification. Both unshipped 2.4.1 archives and the internal MIR 2.5.0 candidate are superseded evidence, not release artifacts.
+MIR 2.5.0 is the active Factorio 2.0 candidate on `tmp/2.0`. It projects the accepted MIR 3.2.0 persistent-verification overhaul and target-capability guard from Dev, while recalculating every test fingerprint against the Factorio 2.0 package, binary, fixtures, dependencies, and scenario records.
+
+- [2.5.0 verification backport](2.5.0-verification-backport.md)
+- [2.5.0 release notes](notes/release-notes-2.5.0.md)
 
 - [3.0.0 plan](3.0.0-plan.md)
 - [3.0.0 regression baseline](3.0.0-regression-baseline.md)

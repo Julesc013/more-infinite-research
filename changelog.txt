@@ -1,4 +1,23 @@
 ---------------------------------------------------------------------------------------------------
+Version: 2.5.0
+Date: 2026-07-16
+
+  Bugfixes:
+
+    - Stopped Factorio 2.0 packages from emitting unsupported mod-data prototypes.
+
+  Changes:
+
+    - Added persistent content-addressed verification evidence with stable per-test and per-scenario identities.
+    - Split exact release-archive identity from gameplay, runtime, migration, settings, balance, and dependency domains.
+    - Added separate locale and asset domains so packaging-only changes do not invalidate unrelated gameplay evidence.
+    - Reused trusted passing evidence only when every declared effective input has the same fingerprint.
+    - Added explicit REUSE, WAIT, RUN, and INVALID planning with matching-worker adoption and non-cancelling concurrency.
+    - Added isolated Factorio scenario workers and one aggregate verification gate for pull requests and release qualification.
+    - Recalculated all fingerprints from the Factorio 2.0 package, binary, dependency contract, test data, and scenarios.
+    - Preserved stable settings, generated technology IDs, migrations, and runtime-state namespaces from MIR 2.4.5.
+
+---------------------------------------------------------------------------------------------------
 Version: 2.4.5
 Date: 2026-07-14
 

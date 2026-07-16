@@ -8,9 +8,9 @@ $lock = Get-Content -Raw -LiteralPath $lockPath | ConvertFrom-Json
 if ([int]$lock.schema -ne 1 -or [int]$lock.projection_schema -ne 1) {
   throw "Unsupported MIR backport source-lock schema."
 }
-if ([string]$lock.canonical_version -ne "3.1.9" -or [string]$lock.target -ne "2.0" `
-    -or [string]$lock.mir_version -ne "2.4.5") {
-  throw "The source lock must bind MIR 2.4.5 for Factorio 2.0 to canonical MIR 3.1.9."
+if ([string]$lock.canonical_version -ne "3.2.0" -or [string]$lock.target -ne "2.0" `
+    -or [string]$lock.mir_version -ne "2.5.0") {
+  throw "The source lock must bind MIR 2.5.0 for Factorio 2.0 to canonical MIR 3.2.0."
 }
 
 $anchor = [string]$lock.canonical_anchor
@@ -19,9 +19,6 @@ $packageSource = [string]$lock.canonical_package_source_commit
 if ($LASTEXITCODE -ne 0) { throw "Canonical 3.1.9 anchor is unavailable: $anchor" }
 & git -C $RepoRoot cat-file -e "$packageSource`^{commit}"
 if ($LASTEXITCODE -ne 0) { throw "Canonical 3.1.9 package-source commit is unavailable: $packageSource" }
-& git -C $RepoRoot merge-base --is-ancestor $anchor HEAD
-if ($LASTEXITCODE -ne 0) { throw "The Factorio 2.0 projection does not contain canonical 3.1.9 in its ancestry." }
-
 $info = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "info.json") | ConvertFrom-Json
 if ([string]$info.version -ne [string]$lock.mir_version -or [string]$info.factorio_version -ne [string]$lock.target) {
   throw "Source-lock target identity disagrees with info.json."
@@ -31,15 +28,22 @@ if ($targetHash -ne [string]$lock.target_profile_sha256) {
   throw "Target profile hash drifted from the Factorio 2.0 source lock."
 }
 
-$canonicalSealText = & git -C $RepoRoot show "$anchor`:.mir/evidence/candidate-seals/mir-3.1.9-factorio-2.1.json"
-if ($LASTEXITCODE -ne 0) { throw "Canonical 3.1.9 seal is unavailable from the source anchor." }
-$canonicalSeal = ($canonicalSealText -join "`n") | ConvertFrom-Json
-if ([string]$canonicalSeal.package_source_sha256 -ne [string]$lock.canonical_package_source_sha256) {
-  throw "Canonical package-source fingerprint disagrees with the sealed 3.1.9 anchor."
-}
-
 . (Join-Path $RepoRoot "scripts\validation\PackageIdentity.ps1")
 $roots = @(Get-MIRPackageSourceRoots)
+$canonicalRows = @()
+foreach ($line in @(& git -C $RepoRoot ls-tree -r $packageSource -- @roots)) {
+  if ($line -match '^\d+\s+blob\s+([0-9a-f]+)\t(.+)$') {
+    $canonicalRows += "$($Matches[2])`t$($Matches[1])"
+  }
+}
+if ($LASTEXITCODE -ne 0 -or $canonicalRows.Count -eq 0) {
+  throw "Unable to fingerprint canonical MIR 3.2.0 package source."
+}
+$canonicalPackageHash = Get-MIRStringSha256 -Value (($canonicalRows | Sort-Object) -join "`n")
+if ($canonicalPackageHash -ne [string]$lock.canonical_package_source_sha256) {
+  throw "Canonical package-source fingerprint disagrees with the locked MIR 3.2.0 source commit."
+}
+
 $changed = @(& git -C $RepoRoot diff --name-only $packageSource -- @roots)
 if ($LASTEXITCODE -ne 0) { throw "Unable to compare the target projection with canonical 3.1.9." }
 $changed = @($changed | ForEach-Object { ([string]$_).Replace("\", "/") } | Sort-Object -Unique)
@@ -69,4 +73,4 @@ if (-not $modDataEmitterText.Contains("target_line.mod_data_supported()")) {
   throw "The mod-data emitter is not guarded by the target capability."
 }
 
-Write-Host "[ok] MIR 2.4.5 is a declared Factorio 2.0 projection of canonical 3.1.9 with $($changed.Count) target-adapted package paths."
+Write-Host "[ok] MIR 2.5.0 is a declared Factorio 2.0 projection of canonical 3.2.0 with $($changed.Count) target-adapted package paths."

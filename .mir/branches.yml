@@ -2,7 +2,7 @@ schema: 1
 
 branches:
   main:
-    purpose: latest stable Factorio 2.1.x release line
+    purpose: frozen stable Factorio 2.1 line at released MIR 3.1.9
     factorio_version: "2.1"
     accepts:
       - release-hotfix
@@ -16,7 +16,7 @@ branches:
       - large-architecture-rewrite
 
   dev:
-    purpose: active 3.x and main-line 2.1 development
+    purpose: MIR 3.2.0 persistent-verification development and canonical future Factorio 2.1 integration
     factorio_version: "2.1"
     accepts:
       - architecture
@@ -27,14 +27,13 @@ branches:
       - validation
 
   legacy:
-    purpose: frozen Factorio 2.0 line at published MIR 2.4.0
+    purpose: frozen Factorio 2.0 line at released MIR 2.4.5
     factorio_version: "2.0"
     accepts:
       - safety-fix
       - compatibility-diagnostic-fix
       - docs-correction
       - exact-policy-fix
-      - validated-release-candidate-promotion
     rejects:
       - 3.0-directory-reorg
       - schema-breaking-change
@@ -42,7 +41,7 @@ branches:
       - broad-new-generation
 
   tmp/2.0:
-    purpose: maintained Factorio 2.0 hotfix branch preparing MIR 2.4.5
+    purpose: maintained Factorio 2.0 MIR 2.5.0 semantic companion and verification-overhaul backport branch
     factorio_version: "2.0"
     accepts:
       - platform-compatible-backport
@@ -92,27 +91,6 @@ backport_rules:
       - migration-review
       - fixture-update
       - release-note
-
-  native_owner_settings_contract:
-    from: tmp/2.0
-    sequence:
-      - tmp/1.1
-      - tmp/1.0
-      - tmp/0.17
-      - tmp/0.16
-      - tmp/0.15
-      - tmp/0.14
-      - tmp/0.13
-      - tmp/0.12-through-0.6
-      - dev
-    requires:
-      - preceding-target-tagged-and-released
-      - target-owner-discovery
-      - stable-setting-id-review
-      - target-binary-evidence
-      - target-specific-candidate-seal
-    ledger: docs/compatibility/native-owner-backport-ledger.md
-    forward_port: docs/releases/3.2.0-native-owner-forward-port.md
 
   docs_only:
     requires:
@@ -235,45 +213,40 @@ release_artifacts:
       published_at: 2026-07-11T16:51:53Z
       github_release: https://github.com/Julesc013/more-infinite-research/releases/tag/3.0.5
       status: published
-    mir_3_1_0:
-      version: "3.1.0"
-      branch: main
+    mir_3_1_1:
+      version: "3.1.1"
+      branch: dev
       target_factorio: "2.1"
       source_anchor: mir_3_0_5
-      source_commit: 0dd8d7f27d9bbbbb728a70ef00b7c955af48cbb7
-      release_commit: 6272cb67c96855c574c96032cb27dfcf0721aa74
-      tag: "3.1.0"
-      artifact: dist/more-infinite-research_3.1.0.zip
-      sha256: 0244D40A9971C450274FE1FD7EA142FA5D23E4A2271A0191F31F395589267C1A
-      size_bytes: 345134
-      entries: 138
-      forbidden_entries: 0
-      package_content_sha256: 5D5162EEAF13E87E2FB1A5A2A31B5EC14ABDCCD2308CFAF8E70C20297C56E82F
-      package_source_sha256: 5D5162EEAF13E87E2FB1A5A2A31B5EC14ABDCCD2308CFAF8E70C20297C56E82F
-      target_profile_sha256: EFC9454504E73010B50A9A68DC9AD56E533EDFD4FDBDE0D1F6467E2A19AE04B0
-      required_groups_sha256: 57A1DF87A8FB594B2B51C7E230D775E88028F23D52DF9D5D7DA1336F9271C78A
-      validation_harness_sha256: E9094E4B7D8B0C990BCCE8927A3F51D04862A24110D0095806F4F83FDB5EBC9E
-      expected_scenarios_sha256: A4198544BE15EE20F228D18DC6990ABE179D84A53EB3C30AEF4A9FF3DBE195C7
-      validation_package_sha256: 6E241687B13F99561D24E18A7D0F1EFC4DFE5B2FCD3D7A084EE83B85D67865FD
-      validation_package_content_sha256: 5D5162EEAF13E87E2FB1A5A2A31B5EC14ABDCCD2308CFAF8E70C20297C56E82F
-      structured_summary_path: .mir/evidence/3.1.0-rc1-validation-summary.json
-      structured_summary_run_id: a961b15a-a018-4ebe-9799-f6bafc8bc2ed
-      scenario_count: 82
-      automated_gate: passed
-      manual_gate: accepted-for-publication
-      published_at: 2026-07-11T22:33:10Z
-      publication_scope: github-release
-      github_release: https://github.com/Julesc013/more-infinite-research/releases/tag/3.1.0
-      mod_portal_upload: blocked-missing-mod-upload-api-key
+      source_commit: e91963cf5f20b7f8c785196840a6ebcae8e8dd66
+      previous_candidate_commit: b9293df08f0db2863e9dbe8a5b48503b705b2630
+      previous_candidate_artifact: dist/more-infinite-research_3.1.0.zip
+      previous_candidate_sha256: 25B166D56712FB85037437B073F9AC59C500EDD0A404949F94BB4A1F9637DAB3
+      previous_candidate_status: superseded-unreleased-candidate
+      architecture_contract: docs/architecture/automatic-family-compiler.md
+      release_gate: pending-hotfix-full-matrix
+      artifact: dist/more-infinite-research_3.1.1.zip
+      sha256: FAAA6AA3DAC2206014E008E4BCB2F9329E050897585224251292F41DED1907B5
+      tag: "3.1.1"
+      publication_status: published
       status: published
+    mir_3_1_2:
+      version: "3.1.2"
+      branch: dev
+      target_factorio: "2.1"
+      source_anchor: mir_3_1_1
+      source_commit: b36996a30bf2def7d163c2f70472f3cc68ad92f6
+      artifact: dist/more-infinite-research_3.1.2.zip
+      sha256: D5BFA665DAF813718E4B6E948497FEC885B6A58F11E0C1FB6E1177807D9525F5
+      release_gate: automated-passed-manual-pending
+      publication_status: unreleased
+      status: release-candidate-awaiting-manual-review
     mir_3_1_5:
       version: "3.1.5"
       branch: main
       target_factorio: "2.1"
-      source_anchor: mir_3_1_0-plus-backport-synthesis
-      package_source_commit: 3cd6a95a6e22ce2d4cdbc231ad79d8110ad75e2f
-      release_commit: c8bf4a742910cec9d6d3dee305c83deba1aa49eb
-      tag: "3.1.5"
+      source_anchor: mir_3_1_2
+      source_commit: c8bf4a742910cec9d6d3dee305c83deba1aa49eb
       artifact: dist/more-infinite-research_3.1.5.zip
       sha256: 8861E25FAAC472EDE9F32FE1C051A623A59177F5E092A3B1DC0B9FF2B3D47C50
       size_bytes: 399761
@@ -286,8 +259,10 @@ release_artifacts:
       ecosystem_loads: 9/9
       structured_summary_path: .mir/evidence/3.1.5-rc5-validation-summary.json
       structured_summary_run_id: 9d8a4f7b-e0bc-4245-8dcc-2c6338709aaa
-      publication_scope: github-release
-      status: published
+      release_gate: published
+      publication_status: published
+      tag: "3.1.5"
+      status: published-frozen
     mir_3_1_9:
       version: "3.1.9"
       branch: main
@@ -295,89 +270,93 @@ release_artifacts:
       synthesis_branch: tmp/3.1.9-synthesis
       target_factorio: "2.1"
       source_anchor: mir_3_1_5
-      package_source_commit: 79df29b50ea9b855b8665d6c9a3d8295806acde0
-      release_candidate_commit: 9c8f40038e42fda378b855bb8132fd98a180b6a5
+      source_commit: 79df29b50ea9b855b8665d6c9a3d8295806acde0
+      release_candidate_commit: f81af94c9a16666be8f5902bb5653aeea57033ba
       artifact: dist/more-infinite-research_3.1.9.zip
       sha256: D77B3A78DA40CD4FDD4C829A01B5030E59FB593F3387124EF5C438F6A9E8DFCD
       package_content_sha256: 1D905CD5F394C3ABFC2ABEFFEB0249AC9D8D5C5FC4ADA0F5A5BA368B17548229
       native_owner_binding_schema: 2
       assurance_evidence_schema: 2
       scenario_count: 102
-      structured_summary: .mir/evidence/3.1.9/disabled-automation-science-final-qualification.json
+      structured_summary: .mir/evidence/3.1.9/final-release-qualification.json
       broad_qualification_evidence: .mir/evidence/3.1.9/qualification-summary.json
+      harness_refresh_evidence: .mir/evidence/3.1.9/harness-refresh-validation.json
+      exact_ecosystem_evidence: .mir/evidence/3.1.9/harness-refresh-exact-ecosystem-campaign.json
       assurance_seal: .mir/evidence/candidate-seals/mir-3.1.9-factorio-2.1.json
-      seal_source_commit: c711602b1c43ce552faa4ec90acd72c3b4ebc856
-      release_gate: release-candidate-awaiting-maintainer-tag
+      seal_source_commit: f81af94c9a16666be8f5902bb5653aeea57033ba
+      release_gate: published
+      publication_status: published
+      tag: "3.1.9"
+      status: published-frozen
+    mir_3_2_0:
+      version: "3.2.0"
+      branch: dev
+      target_factorio: "2.1"
+      source_anchor: mir_3_1_9
+      assurance_policy: mir-verification-v4
+      assurance_evidence_schema: 3
+      verification_tests: validation/tests.yml
+      verification_domains: validation/domains.yml
+      verification_profile: validation/profiles/factorio-2.1.json
+      aggregate_gate: "MIR / verification-gate"
+      prior_release: dist/more-infinite-research_3.1.9.zip
+      release_gate: implementation-and-qualification-pending
       publication_status: unreleased
-      status: release-candidate-on-main
+      status: development-candidate
+    mir_2_5_0:
+      version: "2.5.0"
+      branch: tmp/2.0
+      target_factorio: "2.0"
+      source_anchor: mir_3_2_0
+      prior_candidate:
+        source_anchor: mir_3_1_2
+        source_commit: f5c58f5358291c9a65326388c60702dc9878b9d7
+        artifact: dist/more-infinite-research_2.5.0.zip
+        sha256: 0BE57ED4C51DDF08F80AB4CFB2D5762DF2714B17AB26DB58CA9980289350CBFD
+        structured_summary_run_id: 5bbedb9b-cf3c-4f91-ae5a-f6bf274ad172
+        status: superseded-unpublished-candidate
+      assurance_policy: mir-verification-v4
+      assurance_evidence_schema: 3
+      verification_profile: validation/profiles/factorio-2.0.json
+      prior_release: dist/more-infinite-research_2.4.5.zip
+      release_gate: target-backport-and-qualification-pending
+      publication_status: unreleased
+      status: development-candidate
     mir_2_4_0:
       version: "2.4.0"
       branch: legacy
-      development_branch: tmp/2.0
       target_factorio: "2.0"
-      source_anchor: mir_3_1_5
-      source_anchor_commit: c8bf4a742910cec9d6d3dee305c83deba1aa49eb
-      source_commit: 01efb39a7476cc5e5f7e173edbb244e70f7a8e96
+      package_source_commit: 01efb39a7476cc5e5f7e173edbb244e70f7a8e96
+      seal_source_commit: f6a5dfeb4dea18ee70bbaa17acbd4433f1396e6e
+      promotion_commit: 584b398f98d3e317fac31cba63edcb11360a5bb1
       artifact: dist/more-infinite-research_2.4.0.zip
       sha256: 4BA19EA071E6359BC25C58CCD8F65CAF81B4AA675496E2F53175A996C791470C
       package_content_sha256: F681FF5C331FC45EAFF31823BC9D9441A100C75FD5D412DE1C37DC828DE00775
-      superseded_pre_native_owner_candidate_commit: a853f88fd2fae19b45a16553e3273a2015283452
-      superseded_pre_native_owner_package_source_commit: 5963445b1b72efffc18b232f5367a7da640061e8
-      superseded_pre_native_owner_sha256: 5E1D16CEA5C8F43E8C257B73A3A5A728CE6DFB9ADA18B0CACDDB49DE3C5226E1
-      superseded_pre_native_owner_seal: .mir/evidence/candidate-seals/mir-2.4.0-factorio-2.0-pre-native-owner.json
-      superseded_pre_native_owner_evidence: .mir/evidence/2.4.0-pre-native-owner-supersession.md
-      superseded_pre_native_owner_status: superseded-unreleased-by-settings-defect
-      previous_candidate_commit: 575fc4f5ae4a52205d1e72604934ead35e69c99e
-      previous_candidate_sha256: 8618CAF031EF24EB83641DB03566F2390DD29AD98D2099A80D596EEB527EDA12
-      previous_candidate_status: superseded-unreleased-candidate
-      superseded_2_5_candidate_commit: 4f7c9d18d5491e6e6fcafa5364f9b832cabac233
-      superseded_2_5_candidate_sha256: 0BE57ED4C51DDF08F80AB4CFB2D5762DF2714B17AB26DB58CA9980289350CBFD
-      superseded_2_5_candidate_evidence: .mir/evidence/2.5.0-supersession-ledger.md
-      automated_gate: passed-change-aware
-      manual_gate: accepted-for-publication
-      assurance_seal: .mir/evidence/candidate-seals/mir-2.4.0-factorio-2.0.json
-      seal_source_commit: f6a5dfeb4dea18ee70bbaa17acbd4433f1396e6e
-      promotion_commit: da84121fadcda7144b54692718801ec2c2d93ec4
-      release_commit: 584b398f98d3e317fac31cba63edcb11360a5bb1
-      tag: "2.4.0"
-      github_release: https://github.com/Julesc013/more-infinite-research/releases/tag/2.4.0
-      github_published_at: 2026-07-13T18:46:21Z
-      mod_portal_published_at: 2026-07-14T07:37:31.095Z
-      publication_scope: mod-portal-and-github-release
+      release_gate: published
       publication_status: published
+      tag: "2.4.0"
       status: published-frozen
     mir_2_4_5:
       version: "2.4.5"
-      branch: tmp/2.0
+      branch: legacy
+      development_branch: tmp/2.0
       target_factorio: "2.0"
-      source_anchor: mir_3_1_9
-      source_anchor_commit: 9c8f40038e42fda378b855bb8132fd98a180b6a5
-      canonical_package_source_commit: 79df29b50ea9b855b8665d6c9a3d8295806acde0
-      upgrade_predecessor: mir_2_4_0
-      upgrade_predecessor_commit: 584b398f98d3e317fac31cba63edcb11360a5bb1
-      source_lock: .mir/backport-source-lock.json
-      artifact: dist/more-infinite-research_2.4.5.zip
+      release_candidate_commit: 7e4b6c530cfcc5b2e1429c4e9f4ccb0d6d3b42a4
       source_commit: 47bcc80c8a70b41dbbb4f8d80b2b9433d0a10d3f
+      artifact_location: "legacy:dist/more-infinite-research_2.4.5.zip"
       sha256: 7649824B72247AA38F05661422DFDEE7C729B21CC73A0A35D2455443B45D39F8
       package_content_sha256: 5B8E21077CAC99CDB0733EBE8B34D10D0F375B2EAB2D42E60A73677860783FED
       size_bytes: 406238
       entries: 167
       forbidden_entries: 0
-      structured_summary: .mir/evidence/2.4.5-change-aware-qualification.json
-      superseded_candidate_source_commit: f42b45d1a9e5b6c61a14729a5d386eb6b88bf952
-      superseded_candidate_sha256: 7931E97D9C5CFAB173B48976F1B7EF5A6E7956809D6EA98BF42CD8761C1AAC3D
-      superseded_candidate_package_content_sha256: 621D26B40D36C52C9F556D1B2490E7FA266F1E022778EAEA15940CEA4522509D
-      superseded_candidate_reason: incomplete-six-scenario-hotfix-not-a-complete-3.1.9-projection
-      qualified_2_4_1_candidate_source_commit: b197e93b0e34149a4d38777e59ca69113036377b
-      qualified_2_4_1_candidate_sha256: 479F57587AB841060187561D6FFEE65B275E2C89832E142E5F3F315713F3FB30
-      qualified_2_4_1_seal: .mir/evidence/candidate-seals/mir-2.4.1-factorio-2.0.json
-      qualified_2_4_1_supersession_reason: maintainer-directed-release-renumber-to-2.4.5
-      automated_gate: passed-change-aware
-      manual_gate: pending
-      assurance_seal: .mir/evidence/candidate-seals/mir-2.4.5-factorio-2.0.json
+      evidence_location: "legacy:.mir/evidence/2.4.5-change-aware-qualification.json"
+      seal_location: "legacy:.mir/evidence/candidate-seals/mir-2.4.5-factorio-2.0.json"
       seal_source_commit: 9cfa77c33a635c24f0d4ea458d317cddfa9e325f
-      publication_scope: unreleased
-      status: release-candidate-awaiting-maintainer-review
+      release_gate: published
+      manual_gate: accepted-for-publication
+      publication_status: published
+      tag: "2.4.5"
+      status: published-frozen
     mir_2_3_0:
       version: "2.3.0"
       branch: legacy
@@ -407,20 +386,33 @@ release_artifacts:
       version: "1.9.4"
       branch: tmp/1.1
       target_factorio: "1.1"
-      source_anchor: mir_1_9_3
-      source_commit: 498408854170e893a0fa13bdbd11930197892b1d
+      source_anchor: DEV_RING_1_1_1_0_ANCHOR
+      canonical_dev_anchor: 53090c6f860bf9cb9aaf10140cbfe3924ef59c6c
+      source_commit: a5a08072f92e9742ae3323fbf4873ebfb58f6531
+      sealed_reconstruction_commit: 2dee595135444ad72c7aa32710ae10f5d6cf09cb
+      tag_commit: 426d6d48c6578a786ea7de0f224282baff9d342b
+      post_publication_commit: 1e461ecb0785ee34905ab69b1c0e8791135cf98a
+      tag: "1.9.4"
       artifact: dist/more-infinite-research_1.9.4.zip
-      sha256: 431CD5B011B678B089BB4F9B04B22EB5DD32A3411EDB8E7E453E02D920E3A46E
-      size_bytes: 302312
-      entries: 124
+      sha256: 74BA83E1F02FABBC52C09AC6144A409B243066663A6D132A47334459C2665BFB
+      package_content_sha256: 732D363A8D8A8CB3A9899973ED5F0222EF99C15224B5C628A3AF824B403D5054
+      size_bytes: 386303
+      entries: 167
       forbidden_entries: 0
       automated_gate: passed
       exact_dist_base: passed
       fresh_create: passed
       fresh_reload: passed
       upgrade_from_1_9_3: passed
-      publication_scope: unreleased
-      status: candidate-qualified
+      runtime_scenarios: 19
+      factorio_binary: D:\Programs\Factorio\1.1\bin\x64\factorio.exe
+      factorio_binary_sha256: B7B4B834FCA2E32AFA9D3476EB42CC09B02F1205BE97F688DC6FC6ACE7BA8FE1
+      publication_scope: github-release
+      github_release: https://github.com/Julesc013/more-infinite-research/releases/tag/1.9.4
+      public_hash_verification: passed
+      mod_portal_status: blocked-missing-upload-api-key
+      manual_visual_review: pending-maintainer
+      status: published-github-portal-blocked
     mir_1_8_0:
       version: "1.8.0"
       branch: tmp/0.18
@@ -466,11 +458,33 @@ release_artifacts:
       version: "1.8.2"
       branch: tmp/1.0
       target_factorio: "1.0"
-      source_anchor: mir_1_8_1
-      staged_commit: aeb14831132572037c4288b595b22978fdda6646
+      source_anchor: DEV_RING_1_1_1_0_ANCHOR
+      canonical_dev_anchor: 53090c6f860bf9cb9aaf10140cbfe3924ef59c6c
+      source_commit: 3a54a5935faeecf3466fd250e05d15d36bb12dee
+      sealed_reconstruction_commit: e5b4b578d8475968da49d8c1261c1ca568dc307b
+      tag_commit: 0a192c27674a6b13847e2f5e1b2b530e62419ee8
+      post_publication_commit: b4e0b3de2fd87683d0c0de5bedaa8e94c6c74fe2
+      tag: "1.8.2"
       artifact: dist/more-infinite-research_1.8.2.zip
-      automated_gate: pending-runtime-proof
-      status: staged-unqualified
+      sha256: 676927ECF801114CA8F7B9EFD6D139906432BCC60BE26B8CA5C08842E3686EFE
+      package_content_sha256: F8B4B919CAFEA3BF2734FE048B6603B932CDA36637014EF5F756B6041135792D
+      size_bytes: 386302
+      entries: 167
+      forbidden_entries: 0
+      automated_gate: passed
+      exact_dist_base: passed
+      fresh_create: passed
+      fresh_reload: passed
+      upgrade_from_1_8_1: passed
+      runtime_scenarios: 19
+      factorio_binary: D:\Programs\Factorio\1.0\bin\x64\factorio.exe
+      factorio_binary_sha256: 99F1CE207A04296EF7D797E4A98AA98DDE4F02EE653C9DF736AC33A676FD4F70
+      publication_scope: github-release
+      github_release: https://github.com/Julesc013/more-infinite-research/releases/tag/1.8.2
+      public_hash_verification: passed
+      mod_portal_status: blocked-missing-upload-api-key
+      manual_visual_review: pending-maintainer
+      status: published-github-portal-blocked
     mir_1_7_0:
       version: "1.7.0"
       branch: tmp/0.17
@@ -496,6 +510,222 @@ release_artifacts:
       unlock_all_technology_validation: passed
       publication_scope: github-release
       status: published
+    mir_1_7_1:
+      version: "1.7.1"
+      branch: tmp/0.17
+      target_factorio: "0.17"
+      source_anchor: 6ac377389d7ffc3576fb39576dab4ace6efaec51
+      source_commit: 2d5af37fc5bf710f6034e94c6892782fa5a17dc0
+      tag_commit: 9d9095c92055aebe557a55a7ab99bb9588fe73fb
+      post_publication_head: 828a7359af014105d0aa681722585c26766583e6
+      artifact: dist/more-infinite-research_1.7.1.zip
+      sha256: 2B2A395F014BF1C0C08596602A723E51F14199A9196B192858335FFE8ED9B25B
+      size_bytes: 373387
+      entries: 170
+      forbidden_entries: 0
+      automated_gate: passed
+      runtime_scenarios: 9
+      fresh_create: passed
+      fresh_reload: passed
+      upgrade_from_1_7_0: passed
+      github_release: https://github.com/Julesc013/more-infinite-research/releases/tag/1.7.1
+      public_hash_verification: passed
+      mod_portal_status: blocked-missing-MOD_UPLOAD_API_KEY
+      manual_visual_review: pending-maintainer
+      status: published-github-portal-blocked
+    mir_1_6_0:
+      version: "1.6.0"
+      branch: tmp/0.16
+      target_factorio: "0.16"
+      source_anchor: 6ac377389d7ffc3576fb39576dab4ace6efaec51
+      source_commit: b834136197f9b39e20b2c530f718d167be1a7685
+      tag_commit: a48509ed1dfbae8eba4b3dc7a701065063c12d5f
+      post_publication_head: b392624d38dbb8ef6c42c8efa20aeb9b6a9c97c9
+      artifact: dist/more-infinite-research_1.6.0.zip
+      sha256: 18EAE70A7FEE1FD50099D15985C4E5BE7DB018592EC3EFFC792950A920714544
+      size_bytes: 373521
+      entries: 170
+      forbidden_entries: 0
+      automated_gate: passed
+      runtime_scenarios: 8
+      fresh_create: passed
+      fresh_reload: passed
+      github_release: https://github.com/Julesc013/more-infinite-research/releases/tag/1.6.0
+      public_hash_verification: passed
+      mod_portal_status: blocked-missing-MOD_UPLOAD_API_KEY
+      manual_visual_review: pending-maintainer
+      status: published-github-portal-blocked
+    mir_1_5_0:
+      version: "1.5.0"
+      branch: tmp/0.15
+      target_factorio: "0.15"
+      source_anchor: 6ac377389d7ffc3576fb39576dab4ace6efaec51
+      source_commit: d95d5da2d0750708f0bb222b75eabe216d9f41ec
+      tag_commit: c2b526fd6dde81be7703daef53b075a1fd773e09
+      post_publication_head: 3e44e19190236d03dc15e50d714b4a7347e05220
+      artifact: dist/more-infinite-research_1.5.0.zip
+      sha256: 131162AA1A62C05E2C395C3F9D2495178742CD8C5324B058C42995C17F65B4DB
+      size_bytes: 373689
+      entries: 170
+      forbidden_entries: 0
+      automated_gate: passed
+      runtime_scenarios: 4
+      fresh_create: passed
+      fresh_reload: passed
+      github_release: https://github.com/Julesc013/more-infinite-research/releases/tag/1.5.0
+      public_hash_verification: passed
+      mod_portal_status: blocked-missing-MOD_UPLOAD_API_KEY
+      manual_visual_review: pending-maintainer
+      status: published-github-portal-blocked
+    mir_1_4_0:
+      version: "1.4.0"
+      branch: tmp/0.14
+      target_factorio: "0.14"
+      source_anchor: 6ac377389d7ffc3576fb39576dab4ace6efaec51
+      source_commit: 5defb9ee02bf7b2138a75e60a4d77d77b5218b28
+      tag_commit: fa192796ab274dd590c65b96d0f3f6a0f35cb155
+      post_publication_head: f8251df29a70dd402de12874c231e071bd47bd5b
+      artifact: dist/more-infinite-research_1.4.0.zip
+      sha256: 69B7FC86E798937D44DF60E5E6DDC1FA636A10643B2E1BF54A79F5255CF984C1
+      size_bytes: 374016
+      entries: 170
+      forbidden_entries: 0
+      automated_gate: passed
+      runtime_scenarios: 2
+      fresh_create: passed
+      fresh_reload: passed
+      github_release: https://github.com/Julesc013/more-infinite-research/releases/tag/1.4.0
+      public_hash_verification: passed
+      mod_portal_status: blocked-missing-MOD_UPLOAD_API_KEY
+      manual_visual_review: pending-maintainer
+      status: published-github-portal-blocked
+    mir_1_3_0:
+      version: "1.3.0"
+      branch: tmp/0.13
+      target_factorio: "0.13"
+      source_anchor: 6ac377389d7ffc3576fb39576dab4ace6efaec51
+      source_commit: 3c90a7aa0895553aae3326a42ba3bd20d7553d7c
+      tag_commit: a33b99c1f39e1e779986a12a558a79ea97e69239
+      post_publication_head: 262e94b39bf30b8bbf4f17f6cbf14dd507f696ba
+      artifact: dist/more-infinite-research_1.3.0.zip
+      sha256: B07136627C913BA50C36B4F9453D972047F4FD3666BB9B8A79AB0EEFC9CA1749
+      size_bytes: 374104
+      entries: 170
+      forbidden_entries: 0
+      automated_gate: passed
+      runtime_scenarios: 2
+      fresh_create: passed
+      fresh_reload: passed
+      github_release: https://github.com/Julesc013/more-infinite-research/releases/tag/1.3.0
+      public_hash_verification: passed
+      mod_portal_status: blocked-missing-MOD_UPLOAD_API_KEY
+      manual_visual_review: pending-maintainer
+      status: published-github-portal-blocked
+    mir_0_12_0:
+      version: "0.12.0"
+      branch: tmp/0.12
+      target_factorio: "0.12"
+      source_anchor: 6ac377389d7ffc3576fb39576dab4ace6efaec51
+      source_commit: 63b39962f1951e824884f6ae4b48a142027591c4
+      tag_commit: 82a349bd8137abe21145b321be4edb1e43e1e9e1
+      post_publication_head: 3fa4b5584e10c20c35cc2d0882fad6c7ca1757e2
+      artifact: dist/more-infinite-research_0.12.0.zip
+      sha256: 5171CD073A632AA30769FD9567F44AD2331BB5E7B852EC9F8576798398816612
+      github_release: https://github.com/Julesc013/more-infinite-research/releases/tag/0.12.0
+      public_hash_verification: passed
+      mod_portal_status: maintainer-upload-pending
+      manual_visual_review: pending-maintainer
+      status: published-github-maintainer-portal-pending
+    mir_0_11_0:
+      version: "0.11.0"
+      branch: tmp/0.11
+      target_factorio: "0.11"
+      source_anchor: 6ac377389d7ffc3576fb39576dab4ace6efaec51
+      source_commit: adeedc3a21f69c3803c19a9e62115255068a90db
+      tag_commit: 679774c94bafdaa4d5432b793b8684ee4e43c257
+      post_publication_head: 3d1862c3d4c1cf8bf381f6d46f6aa3751349cdc6
+      artifact: dist/more-infinite-research_0.11.0.zip
+      sha256: 38B9DFB72CE5EB0554CF2C9514D9B3D917B322DE5AC955A085A2A1BAADED2DEE
+      github_release: https://github.com/Julesc013/more-infinite-research/releases/tag/0.11.0
+      public_hash_verification: passed
+      mod_portal_status: maintainer-upload-pending
+      manual_visual_review: pending-maintainer
+      status: published-github-maintainer-portal-pending
+    mir_0_10_0:
+      version: "0.10.0"
+      branch: tmp/0.10
+      target_factorio: "0.10"
+      source_anchor: 6ac377389d7ffc3576fb39576dab4ace6efaec51
+      source_commit: a760eba9e2e4b1b27be557f3baf8f4570f373af7
+      tag_commit: 3377f835243c0cf9e7d2c2e76641c2c471341975
+      post_publication_head: 7dd2d289a19a59fa75565efa7db90d625500ec39
+      artifact: dist/more-infinite-research_0.10.0.zip
+      sha256: C2E42E9AE23E4A146F755B60D40009738724E7A0D3670D3B672D2068AE80912E
+      github_release: https://github.com/Julesc013/more-infinite-research/releases/tag/0.10.0
+      public_hash_verification: passed
+      mod_portal_status: maintainer-upload-pending
+      manual_visual_review: pending-maintainer
+      status: published-github-maintainer-portal-pending
+    mir_0_9_0:
+      version: "0.9.0"
+      branch: tmp/0.9
+      target_factorio: "0.9"
+      source_anchor: 6ac377389d7ffc3576fb39576dab4ace6efaec51
+      source_commit: 95ab3d6efeab3ff0c36a19c54aee64680f54d729
+      tag_commit: 9325e744f1dd36baa33372dab6e7d9528ccfbab8
+      post_publication_head: f3257dafb3c16a9616c9acc9d4a7bbbac9cd231c
+      artifact: dist/more-infinite-research_0.9.0.zip
+      sha256: 2114D67493C6B1076B1A71F27DC5197C8789C956570FD274507B8FD807C27D84
+      github_release: https://github.com/Julesc013/more-infinite-research/releases/tag/0.9.0
+      public_hash_verification: passed
+      mod_portal_status: maintainer-upload-pending
+      manual_visual_review: pending-maintainer
+      status: published-github-maintainer-portal-pending
+    mir_0_8_0:
+      version: "0.8.0"
+      branch: tmp/0.8
+      target_factorio: "0.8"
+      source_anchor: 6ac377389d7ffc3576fb39576dab4ace6efaec51
+      source_commit: 854415ae2f758055208c32d2e5bc4d21d8f42ef1
+      tag_commit: 080fa92ea38b4b40156f26429bc7cba54948aef0
+      post_publication_head: 732223297ce3e88f84f467f7b2ce16bacbda5b0e
+      artifact: dist/more-infinite-research_0.8.0.zip
+      sha256: 60BA156874CC3EE0C93B93C032BDEC6D8432B5F692009A3277C1890E6D9BF3E6
+      github_release: https://github.com/Julesc013/more-infinite-research/releases/tag/0.8.0
+      public_hash_verification: passed
+      mod_portal_status: maintainer-upload-pending
+      manual_visual_review: pending-maintainer
+      status: published-github-maintainer-portal-pending
+    mir_0_7_0:
+      version: "0.7.0"
+      branch: tmp/0.7
+      target_factorio: "0.7"
+      source_anchor: 6ac377389d7ffc3576fb39576dab4ace6efaec51
+      source_commit: e0bc735c4808ab12c1b6b5045937878ae144be2e
+      tag_commit: cb2991e3ea67b0413076c0e6d0dacf29d7f784b6
+      post_publication_head: de01ee19beeee6c793d164bd228bef902643fd62
+      artifact: dist/more-infinite-research_0.7.0.zip
+      sha256: AA328AFF81F3133BAC3F432ADC7AF52CC49EFF43E40D04EAD99DCFBA92542749
+      github_release: https://github.com/Julesc013/more-infinite-research/releases/tag/0.7.0
+      public_hash_verification: passed
+      mod_portal_status: maintainer-upload-pending
+      manual_visual_review: pending-maintainer
+      status: published-github-maintainer-portal-pending
+    mir_0_6_0:
+      version: "0.6.0"
+      branch: tmp/0.6
+      target_factorio: "0.6"
+      source_anchor: 6ac377389d7ffc3576fb39576dab4ace6efaec51
+      source_commit: 653a9da87d4e5b6f8743a236b72cbdccfdafe216
+      tag_commit: 12a5683c2aaed745f35e1261b437930a9a1476bc
+      post_publication_head: faa2443afc986ffeae632642d743ba43e8490872
+      artifact: dist/more-infinite-research_0.6.0.zip
+      sha256: 0C53F30AFF4FCC3090323D3B319FAF6DD763D696983F60947BB07AB53617288A
+      github_release: https://github.com/Julesc013/more-infinite-research/releases/tag/0.6.0
+      public_hash_verification: passed
+      mod_portal_status: maintainer-upload-pending
+      manual_visual_review: pending-maintainer
+      status: published-github-maintainer-portal-pending
   closed_versions:
     - version: "2.2.0"
       branch: main
@@ -509,25 +739,15 @@ release_artifacts:
       status: published
   next_release_targets:
     current_line:
-      version: "3.1.9"
-      branch: main
+      version: "3.2.0"
+      branch: dev
       target_factorio: "2.1"
-      release_commit: 9c8f40038e42fda378b855bb8132fd98a180b6a5
-      status: release-candidate-awaiting-maintainer-tag
-      purpose: sealed canonical source anchor for the current Factorio 2.0 projection
+      purpose: persistent content-addressed verification overhaul from the published 3.1.9 behavior baseline
     factorio_2_0_companion:
-      version: "2.4.5"
+      version: "2.5.0"
       branch: tmp/2.0
       target_factorio: "2.0"
-      source_anchor: mir_3_1_9
-      source_anchor_commit: 9c8f40038e42fda378b855bb8132fd98a180b6a5
-      upgrade_predecessor: mir_2_4_0
-      artifact: dist/more-infinite-research_2.4.5.zip
-      sha256: 7649824B72247AA38F05661422DFDEE7C729B21CC73A0A35D2455443B45D39F8
-      validation_status: passed-change-aware
-      assurance_seal: .mir/evidence/candidate-seals/mir-2.4.5-factorio-2.0.json
-      status: release-candidate-awaiting-maintainer-review
-      purpose: complete Factorio 2.0 projection of the sealed MIR 3.1.9 portable behavior set
+      purpose: target-specific verification-overhaul backport from accepted MIR 3.2.0 tooling
     factorio_1_1_port:
       version: "1.9.4"
       branch: tmp/1.1
@@ -543,7 +763,7 @@ release_artifacts:
       target_factorio: "1.0"
       purpose: maintained Factorio 1.0 support line after the 0.18 bridge proof; future 1.0 maintenance stays on 1.8.x
     factorio_0_17_port:
-      version: "1.7.0"
+      version: "1.7.1"
       branch: tmp/0.17
       target_factorio: "0.17"
       purpose: first old-line native-infinite proof after 1.8.x release synthesis
@@ -561,7 +781,7 @@ release_artifacts:
       version: "3.2.0"
       branch: dev
       target_factorio: "2.1"
-      purpose: whole-plan validation, consolidated facts, attach-only family automation, and reviewed compatibility packs
+      purpose: persistent evidence ledger, dependency-domain invalidation, scenario workers, and one aggregate gate
   package_refresh_rule: >-
     only build or refresh dist archives for an unpublished target version;
     never refresh already-published archives as part of architecture or
@@ -590,14 +810,14 @@ target_lines:
     required_binary_proof:
       - factorio_1.0
   factorio_0_17:
-    version: "1.7.0"
+    version: "1.7.1"
     branch: tmp/0.17
     target_factorio: "0.17"
     support_class: reduced-native-infinite
-    source: mir_1_8_1_plus_dev_portable_lessons
+    source: final_lower_wave_dev_anchor_6ac377389d7ffc3576fb39576dab4ace6efaec51
     publish_policy: published
-    release_commit: 1a9b5a7b1162f8dca8125ef7bb792f57a9ae282b
-    release_tag: "1.7.0"
+    release_commit: 9d9095c92055aebe557a55a7ab99bb9588fe73fb
+    release_tag: "1.7.1"
     required_binary_proof:
       - factorio_0.17
   factorio_0_16:
@@ -605,8 +825,8 @@ target_lines:
     branch: tmp/0.16
     target_factorio: "0.16"
     support_class: old-science-native-infinite
-    source: mir_3_0_5_plus_synthesized_mir_1_7_0_lessons_plus_old_science_map
-    publish_policy: binary_proof_required
+    source: final_lower_wave_dev_anchor_6ac377389d7ffc3576fb39576dab4ace6efaec51
+    publish_policy: published
     required_binary_proof:
       - factorio_0.16
   factorio_0_15:
@@ -614,8 +834,8 @@ target_lines:
     branch: tmp/0.15
     target_factorio: "0.15"
     support_class: minimal-native-infinite
-    source: mir_1_6_0_plus_target_effect_proof
-    publish_policy: binary_proof_required
+    source: final_lower_wave_dev_anchor_6ac377389d7ffc3576fb39576dab4ace6efaec51
+    publish_policy: published
     required_binary_proof:
       - factorio_0.15
   factorio_0_14:
@@ -623,19 +843,61 @@ target_lines:
     branch: tmp/0.14
     target_factorio: "0.14"
     support_class: archive-finite-ladder
-    source: target_binary_and_base_file_discovery
-    publish_policy: binary_proof_required
+    source: final_lower_wave_dev_anchor_6ac377389d7ffc3576fb39576dab4ace6efaec51
+    publish_policy: published
   factorio_0_13:
     version: "1.3.0"
     branch: tmp/0.13
     target_factorio: "0.13"
     support_class: archive-finite-ladder
-    source: target_binary_and_base_file_discovery
-    publish_policy: binary_proof_required
+    source: final_lower_wave_dev_anchor_6ac377389d7ffc3576fb39576dab4ace6efaec51
+    publish_policy: published
   factorio_0_12:
     version: "0.12.0"
     branch: tmp/0.12
     target_factorio: "0.12"
-    support_class: archive-experiment
-    source: target_binary_and_base_file_discovery
-    publish_policy: binary_proof_required
+    support_class: archive-museum
+    source: final_lower_wave_dev_anchor_6ac377389d7ffc3576fb39576dab4ace6efaec51
+    publish_policy: published-github-portal-maintainer-pending
+  factorio_0_11:
+    version: "0.11.0"
+    branch: tmp/0.11
+    target_factorio: "0.11"
+    support_class: museum
+    source: final_lower_wave_dev_anchor_6ac377389d7ffc3576fb39576dab4ace6efaec51
+    publish_policy: published-github-portal-maintainer-pending
+  factorio_0_10:
+    version: "0.10.0"
+    branch: tmp/0.10
+    target_factorio: "0.10"
+    support_class: museum
+    source: final_lower_wave_dev_anchor_6ac377389d7ffc3576fb39576dab4ace6efaec51
+    publish_policy: published-github-portal-maintainer-pending
+  factorio_0_9:
+    version: "0.9.0"
+    branch: tmp/0.9
+    target_factorio: "0.9"
+    support_class: museum
+    source: final_lower_wave_dev_anchor_6ac377389d7ffc3576fb39576dab4ace6efaec51
+    publish_policy: published-github-portal-maintainer-pending
+  factorio_0_8:
+    version: "0.8.0"
+    branch: tmp/0.8
+    target_factorio: "0.8"
+    support_class: museum-extract-required
+    source: final_lower_wave_dev_anchor_6ac377389d7ffc3576fb39576dab4ace6efaec51
+    publish_policy: published-github-portal-maintainer-pending
+  factorio_0_7:
+    version: "0.7.0"
+    branch: tmp/0.7
+    target_factorio: "0.7"
+    support_class: museum-extract-required
+    source: final_lower_wave_dev_anchor_6ac377389d7ffc3576fb39576dab4ace6efaec51
+    publish_policy: published-github-portal-maintainer-pending
+  factorio_0_6:
+    version: "0.6.0"
+    branch: tmp/0.6
+    target_factorio: "0.6"
+    support_class: museum-extract-required
+    source: final_lower_wave_dev_anchor_6ac377389d7ffc3576fb39576dab4ace6efaec51
+    publish_policy: published-github-portal-maintainer-pending

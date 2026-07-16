@@ -1,114 +1,135 @@
 ---
 title: "Release Assurance And Candidate Sealing"
 status: current
-applies_to: "2.4.0+"
+applies_to: "2.5.0+"
 audience: release-manager
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-07-14
+last_reviewed: 2026-07-16
 supersedes: []
 superseded_by: []
 ---
 
 # Release Assurance And Candidate Sealing
 
-MIR release assurance uses an immutable qualified-candidate seal plus dependency-based evidence invalidation. The seal binds one exact ZIP to its package-source tree, content hash, target profile, test catalog, validation harness, Factorio binary, and qualification summary. A later promotion check verifies those identities; it never rebuilds or publishes the candidate.
+MIR release assurance is a persistent content-addressed evidence system. It plans stable test instances from effective inputs, reuses only trusted exact passing proof, adopts matching in-progress workers, and evaluates one aggregate gate. Candidate sealing remains a separate promotion step that binds one exact qualified ZIP and evidence bundle; sealing never rebuilds or publishes.
 
-## Architecture
+## Authorities
 
-| Component | Purpose | Inputs | Outputs | Package impact |
-| --- | --- | --- | --- | --- |
-| Impact engine | Select invalidated evidence conservatively | Git diff, ownership rules, package files | Classified paths and test plan | None |
-| Test catalog | Give release-blocking tests stable IDs and declared inputs | `.mir/test-catalog.json` | Dependency graph | None |
-| Evidence store | Retain complete content-addressed proof | Artifact, binary, harness, fixtures, settings | Evidence capsules | None |
-| Candidate seal | Freeze qualified bytes and proof | Exact ZIP and qualification summary | `SEALED-RC` record | None |
-| Locale validator | Validate catalogs and placeholders | Locale and setting descriptors | Locale evidence | None unless locale is packaged |
-| Balance workbench | Fingerprint progression authorities | Stream, setting, cost, and native-owner descriptors | Balance snapshot | None |
-| Runtime harness | Exercise the exact ZIP | Factorio binary, ZIP, fixtures | Runtime evidence | None |
-| CI orchestration | Share one plan across jobs | Assurance plan | Aggregated evidence | None |
+| Authority | Owns |
+| --- | --- |
+| `.mir/assurance.json` | Change classes, profiles, canonical verifier paths, aggregate gate name |
+| `validation/tests.yml` | Stable test IDs, commands, Factorio layers, scenario-matrix templates, declared input tokens |
+| `validation/domains.yml` | Package domains, scenario dependency sets, dependency-contract normalization, unknown-input fallback |
+| `validation/profiles/factorio-<target>.json` | Target policy, deterministic seed, evidence TTL, upgrade source and fixture |
+| `fixtures/compat-matrix/expected-scenarios.json` | Stable Factorio scenario records, fixtures, settings, assertions, groups, tags, isolation |
+| `scripts/Invoke-MIRAssurance.ps1` | Planner, fingerprinting, ledger, worker, aggregate gate, qualification, seal facade |
+| `artifacts/assurance/evidence` | Persistent local or CI-restored evidence ledger |
+| `out/verification-plan.json` | Reviewable plan for one candidate and target |
 
-The command implementation is `scripts/Invoke-MIRAssurance.ps1`, exposed through `scripts/mir.ps1 assurance`. The shorter `scripts/mir.ps1 verify` surface maps `plan`, `explain`, `run`, and `qualify` onto the same assurance implementation and evidence graph; it does not create a second verifier. `.mir/assurance.json` owns change classes and profiles. `.mir/test-catalog.json` owns test IDs, commands, and declared inputs. These tools, manifests, evidence, docs, fixtures, workflows, and candidate seals are excluded from the Factorio release ZIP.
+`tools/mir_verify/Invoke-MIRVerify.ps1` is only a forwarding entrypoint. It does not implement a second verifier.
 
-## Required Runbook
+## Operating Rule
 
-Start every release or backport with:
+Before running tests, materialize or inspect the verification plan. Run only the work listed by the plan unless a broader profile or `--no-reuse` was explicitly requested. Reuse a pass only when its stable test ID, target, definition, effective inputs, producer repository, and result digest match exactly. If another worker owns the same fingerprint, wait for and adopt its result; do not cancel it to start duplicate work. Never mark a mutable job status green in place of evidence.
+
+## Plan And Dispositions
+
+Use:
 
 ```powershell
 ./scripts/mir.ps1 assurance doctor --target 2.0 --factorio 'D:\Programs\Factorio\2.0\bin\x64\factorio.exe'
-./scripts/mir.ps1 assurance inventory --output artifacts/assurance/inventory.json
-./scripts/mir.ps1 assurance impact --baseline <qualified-commit> --json
-./scripts/mir.ps1 verify plan --baseline <qualified-commit> --profile auto --output artifacts/assurance/plan.json
+./scripts/mir.ps1 verify plan --target 2.0 --baseline <qualified-ref> --profile auto --output out/verification-plan.json
+./scripts/mir.ps1 verify explain --target 2.0 --plan out/verification-plan.json --test <stable-id>
 ```
 
-Inspect the plan before executing expensive jobs. Run the plan through `verify`, or use `qualify --profile full` for a release candidate. Recalculate impact after every source change. Rebuild only when a package input changes. Never hand-edit an evidence capsule or seal to green.
+Each test has one disposition:
 
-## Change Classes
+| Disposition | Meaning |
+| --- | --- |
+| `REUSE` | A trusted schema-3 passing capsule exactly matches the current fingerprint |
+| `WAIT` | A non-expired `running.json` shows another worker owns the same fingerprint |
+| `RUN` | No exact evidence exists or reuse was disabled |
+| `INVALID` | Evidence material exists but is failed, blocked, malformed, untrusted, or digest-mismatched |
 
-| Class | Fingerprints | Mandatory evidence | Factorio rule | Escalation |
-| --- | --- | --- | --- | --- |
-| Promotion only | Seal, ZIP, evidence, commit ancestry | `seal.verify` | None | Any identity mismatch blocks |
-| Repository docs | Package-source hash and docs governance | `docs.check`, seal verification | None while ZIP and package source are unchanged | Generated/package drift broadens |
-| Test or CI tooling | Catalog and harness hashes | Tool self-tests plus every changed dependent gate | Dependent runtime gates rerun | Unknown dependency broadens |
-| Packaged non-runtime | ZIP and content hashes | Deterministic package and exact-ZIP smoke | Exact ZIP load | Semantic drift broadens |
-| Locale | Locale catalog, placeholders, ZIP | Full locale audit, package check, exact-ZIP load | Exact ZIP load on affected target | Descriptor or setting drift broadens |
-| Metadata/dependencies | `info.json`, dependency closure, ZIP | Package and dependency validation, upgrade when version behavior changes | Full exact-ZIP load | Unknown dependency broadens |
-| Balance/prototype values | Stream, setting, cost, generated-manifest fingerprints | Balance snapshot, compiler checks, affected runtime scenarios | Required | Unexplained diff blocks |
-| Compiler/data stage | Package source, compiler plans, harness | Compiler and architecture gates, affected/full matrix, exact ZIP | Required | Failed equivalence or unknown impact selects full |
-| Settings | Settings descriptors, locale, profiles, migrations | Settings, locale, compiler, retention, upgrade, exact ZIP | Required | Missing migration/visibility proof selects full |
-| Runtime/migration | Runtime source, save fixtures, binary, harness | Complete runtime and upgrade matrix | Required | No non-runtime fast path |
-| Unknown | All available fingerprints | Full target qualification | Required | Always full |
+Unknown repository inputs escalate through `.mir/assurance.json`. Unknown packaged paths are included in every scenario dependency set, conservatively invalidating the scenario matrix.
 
-Path matching contributes to classification but never proves harmlessness. Package-source, ZIP-content, catalog, harness, target-profile, setting, fixture, and binary fingerprints decide whether prior evidence remains valid.
+## Fingerprint Model
 
-## Evidence Keys And Reuse
+The release artifact and gameplay proof are separate identities. `artifact.sha256` binds exact ZIP bytes. Package domains bind normalized groups of packaged files: `data`, `balance`, `settings`, `runtime`, `migrations`, `locale`, `assets`, `metadata`, `release-text`, and `unknown`. `dependency-contract` hashes the mod name, Factorio target, and dependency declarations while deliberately excluding the MIR version.
 
-Every evidence capsule includes the stable test ID, exact candidate hash, Factorio binary hash when applicable, test-catalog hash, harness hash, target, command, first result, duration, and message. Changing the test implementation, binary, fixture, settings, candidate, or relevant catalog input produces a different evidence key and invalidates reuse. A failure stays a failure; a diagnostic rerun is separate evidence and cannot erase the first result.
+This separation is intentional. A version-only change invalidates deterministic packaging, exact-ZIP loads, and upgrade proof because the artifact changed. It does not invalidate a gameplay scenario whose declared data, balance, settings, assets, dependency contract, fixture, harness, Factorio binary, and scenario record are unchanged.
 
-Repository-only documentation can reuse runtime evidence only when the package-source and candidate hashes remain exact. Locale changes require locale proof and an exact-ZIP load but may reuse gameplay simulation. Compiler refactors may reuse broad gameplay evidence only when canonical compiler outputs, package semantics, settings, runtime handlers, and migration inputs are identical and the explicit refactor-equivalence profile passes. Runtime and migration changes never use that route.
+Factorio layers are:
 
-## Locale Workflow
+| Layer | Scope |
+| --- | --- |
+| `F0` | Static validation and contract checks |
+| `F1` | Deterministic package construction |
+| `F2` | Exact archive load checks |
+| `F3` | Data-stage and gameplay scenarios keyed by declared domains |
+| `F4` | Configuration-change, upgrade, ecosystem, seal, and promotion evidence |
 
-Use `./scripts/mir.ps1 assurance locale` during editing. Candidate qualification runs the complete locale catalog and exact-ZIP load selected by the impact plan. Placeholder corruption, missing canonical keys, malformed sections, unavailable-setting visibility drift, and target-specific locale drift are blocking. Pseudo-locale screenshots and visual truncation remain human gates.
+## Evidence Ledger
 
-## Balance Workflow
+Evidence lives at `artifacts/assurance/evidence/<safe-test-id>/<fingerprint>/`. `running.json` is an expiring ownership marker. `attempts/*.json` are append-only execution records. `passed.json` is the reusable result for that exact fingerprint. `blocked.json` prevents a prior pass from being reused after a failed attempt against the same inputs.
 
-Use `./scripts/mir.ps1 assurance balance --output artifacts/assurance/balance-snapshot.json` before and after balance work. Review the stream, generated-manifest, setting, generated-cost, native-owner source, formula-adapter, binding, and transaction fingerprints. `.mir/native-owner-cost-models.json` records the reviewed Factorio source digest and native values that default-preservation fixtures protect. An undeclared fingerprint change blocks promotion until the affected streams, scenarios, release notes, and reviewed balance intent agree. Static formula checks speed the loop; they do not replace target runtime evidence or human progression judgment.
+A schema-3 capsule binds the test ID, target, definition hash, full effective-input map, command, assertions, producer repository and run identity, timestamps, duration, log digest, conclusion, and result digest. A changed definition or input creates a different fingerprint instead of rewriting history.
 
-## Refactors And Hotfixes
+## Worker And Aggregate Gate
 
-For a behavior-preserving refactor, use `--profile refactor-equivalence`, compare canonical plans and generated outputs, then run the exact ZIP. If any semantic fingerprint changes, use the compiler/data-stage route. For a hotfix, diff from the exact released source and ZIP, select the direct regression and neighboring tests, run breadth canaries, build once, run required load/reload or upgrade checks, and create a new seal. Unknown impact blocks promotion.
-
-## Full Qualification And Sealing
-
-Build the exact candidate once and pass the same bytes to every downstream check:
+Run one planned test with:
 
 ```powershell
-./scripts/mir.ps1 assurance qualify --target 2.0 --profile full --factorio 'D:\Programs\Factorio\2.0\bin\x64\factorio.exe' --prior 'C:\path\to\more-infinite-research_2.3.5.zip' --output .mir/evidence/2.4.0-assurance-qualification.json
-# Review and commit the exact candidate archive and qualification summary before sealing.
-./scripts/mir.ps1 assurance seal --target 2.0 --factorio 'D:\Programs\Factorio\2.0\bin\x64\factorio.exe' --evidence .mir/evidence/2.4.0-assurance-qualification.json
-./scripts/mir.ps1 assurance check-seal --seal .mir/evidence/candidate-seals/mir-2.4.0-factorio-2.0.json
+./scripts/mir.ps1 verify run-one --target 2.0 --plan out/verification-plan.json --test <stable-id> --fingerprint <sha256> --factorio <factorio.exe>
 ```
 
-The promotion check verifies the seal, exact ZIP, package source, target profile, test catalog, harness, evidence hash, and source ancestry. It cannot tag, push a tag, create a GitHub release, or upload to the Mod Portal.
+The worker rechecks the exact evidence before execution. If a matching worker is active, it waits and adopts the completed pass. Otherwise it writes `running.json`, executes the command, writes the attempt and pass or block capsule, and clears the marker.
 
-## Backport Qualification
+Evaluate the complete plan with:
 
-Each target is an independent implementation. Run `assurance backport --target <line> --baseline <source>` to produce the target plan, then qualify with the matching binary, target fixtures, exact prior release passed through `--prior`, settings-retention route, and ecosystem profile. Evidence from another Factorio line is never substituted. Tooling-only commits may share orchestration, but every target receives a new bootstrap qualification and target seal. Confirm the tooling commit does not change package-source or ZIP hashes.
+```powershell
+./scripts/mir.ps1 verify gate --target 2.0 --plan out/verification-plan.json --output artifacts/assurance/evidence-bundle.json
+```
 
-## Adding A Test, Compiler Module, Or Target
+The gate recomputes the candidate domain manifest when runtime scenarios are present and requires trusted exact passing evidence for every planned fingerprint. Scheduled `--no-reuse` plans additionally require evidence produced after the plan and, in GitHub Actions, by the same workflow run.
 
-Add a test by assigning a permanent ID in `.mir/test-catalog.json`, declaring its complete inputs, command, Factorio requirement, and every change class that selects it. Extend `Test-MIRAssurance.ps1` when a new invalidation boundary is introduced. Add a compiler module through the governed provider/family contracts, update `.mir/modules.yml`, declare positive and negative fixtures, update affected change classes, and preserve emission-only prototype mutation. Add a target through `.mir/targets.json`, synchronize generated target profiles, register its binary capabilities and run profile, add prior-version upgrade evidence, and require its own seal.
+## CI
 
-## CI And Security
+The default workflow is named `MIR`; its aggregate required check is `MIR / verification-gate`. The plan job restores the latest evidence ledger and exports only non-reused work. Worker jobs use fingerprint concurrency with `cancel-in-progress: false`. The gate merges evidence, evaluates the plan, writes the evidence bundle, and saves a new immutable cache key.
 
-The always-running `MIR Verify / verify` workflow materializes the change-aware plan and runs the fast static gate on trusted pushes and pull requests. Targeted and full qualification jobs require trusted runners with the matching Factorio binary. Scheduled breadth checks detect fixture and environment drift. Promotion jobs only verify seals. Backport jobs keep per-target artifacts and evidence isolated.
+Runtime, targeted, full, and scheduled workflows use trusted self-hosted Windows runners. They build one candidate, upload the same bytes to every worker, and never use `pull_request_target`. Self-hosted Factorio binaries, local proprietary mods, publishing credentials, and untrusted fork code must remain isolated.
 
-Self-hosted runners containing Factorio binaries or proprietary mods must never execute untrusted fork code. Do not use `pull_request_target` to run submitted source. Use least-privilege read permissions, explicit trusted dispatch for runtime work, content-addressed caches, isolated user-data directories, scrubbed logs, and no publishing credentials in validation workflows. A cache key named `latest`, mutable green status, missing evidence manifest, or hash mismatch is invalid and must be discarded.
+## Qualification And Sealing
 
-## Troubleshooting
+For MIR 2.5.0:
 
-An unexpected full gate normally means an unclassified path or a changed catalog/harness fingerprint. Run `assurance explain --baseline <ref> --json` and classify the input rather than overriding the plan downward. A seal mismatch reports the failed identity; restore the exact sealed bytes or requalify and issue a new seal. A test-harness change invalidates affected results even when the mod ZIP is unchanged. A Factorio binary replacement invalidates all evidence bound to the previous binary hash.
+```powershell
+./scripts/mir.ps1 assurance build --target 2.0
+./scripts/mir.ps1 verify plan --target 2.0 --profile full --factorio 'D:\Programs\Factorio\2.0\bin\x64\factorio.exe' --prior '.\dist\more-infinite-research_2.4.5.zip' --output out/verification-plan.json
+./scripts/mir.ps1 verify run --target 2.0 --plan out/verification-plan.json --factorio 'D:\Programs\Factorio\2.0\bin\x64\factorio.exe' --prior '.\dist\more-infinite-research_2.4.5.zip'
+./scripts/mir.ps1 verify gate --target 2.0 --plan out/verification-plan.json --output .mir/evidence/2.5.0-assurance-qualification.json
+```
+
+After reviewing and committing the exact candidate and qualification record, create and verify the seal:
+
+```powershell
+./scripts/mir.ps1 assurance seal --target 2.0 --factorio 'D:\Programs\Factorio\2.0\bin\x64\factorio.exe' --evidence .mir/evidence/2.5.0-assurance-qualification.json
+./scripts/mir.ps1 assurance check-seal --seal .mir/evidence/candidate-seals/mir-2.5.0-factorio-2.0.json
+```
+
+Promotion checks verify identities and ancestry only. They cannot tag, push, create a GitHub release, or upload to the Mod Portal.
+
+## Backports
+
+Backports recalculate every fingerprint on the target branch. MIR 2.5.0 uses the Factorio 2.0 candidate ZIP, Factorio 2.0 verification profile and binary, target scenario declarations, target fixtures and mod lock, target dependency contract, and exact MIR 2.4.5 prior release. Factorio 2.1 evidence cannot satisfy the Factorio 2.0 aggregate gate even if source files look similar.
+
+Tooling may be ported as one portable change, but target metadata, API adapters, reduced feature decisions, fixtures, archive bytes, and evidence remain target-local. Build the target candidate before planning any matrix that requires package domains.
+
+## Adding Tests Or Domains
+
+Add a permanent test or matrix template to `validation/tests.yml`, declare every effective input, and route it through the appropriate `.mir/assurance.json` change classes. Add package-domain rules or scenario dependencies to `validation/domains.yml`; unmatched package paths must remain conservative. Update `Test-MIRAssurance.ps1`, `.mir/fixtures.yml`, `.mir/modules.yml`, this document, and any affected target profile when the verification contract changes.
 
 ## Remaining Human Gates
 
-Interactive GUI locale review, visual truncation review, human balance judgment, Mod Portal presentation review, GitHub release presentation review, and any campaign step that lacks honest automation remain manual. Automated evidence may support these gates but must never mark them passed.
+Interactive GUI locale review, visual truncation review, human balance judgment, Mod Portal presentation review, GitHub release presentation review, and any compatibility campaign without honest automation remain manual. Automated evidence supports those decisions but does not mark them passed.

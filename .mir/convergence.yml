@@ -1,16 +1,16 @@
 schema: 1
 
 release:
-  version: "2.4.5"
+  version: "2.5.0"
   branch: tmp/2.0
   factorio_version: "2.0"
-  baseline_commit: 584b398f98d3e317fac31cba63edcb11360a5bb1
-  baseline_tag: "2.4.0"
-  canonical_source_version: "3.1.9"
-  canonical_source_commit: 9c8f40038e42fda378b855bb8132fd98a180b6a5
-  canonical_package_source_commit: 79df29b50ea9b855b8665d6c9a3d8295806acde0
+  baseline_commit: 7e4b6c530cfcc5b2e1429c4e9f4ccb0d6d3b42a4
+  baseline_tag: "2.4.5"
+  canonical_source_version: "3.2.0"
+  canonical_source_commit: bd828d1d21a1038abbc9f0ecbf2c1036e744180d
+  canonical_package_source_commit: bd828d1d21a1038abbc9f0ecbf2c1036e744180d
   source_lock: .mir/backport-source-lock.json
-  objective: canonical-3.1.9-derived-factorio-2.0-projection
+  objective: target-port-behavioral-subset
   public_contract_change: patch-compatible
 
 superseded_candidates:
@@ -120,24 +120,11 @@ superseded_candidates:
     status: superseded-unpublished-candidate
 
 candidate:
-  artifact: dist/more-infinite-research_2.4.5.zip
-  source_commit: 47bcc80c8a70b41dbbb4f8d80b2b9433d0a10d3f
-  sha256: 7649824B72247AA38F05661422DFDEE7C729B21CC73A0A35D2455443B45D39F8
-  package_content_sha256: 5B8E21077CAC99CDB0733EBE8B34D10D0F375B2EAB2D42E60A73677860783FED
-  package_source_sha256: 5B8E21077CAC99CDB0733EBE8B34D10D0F375B2EAB2D42E60A73677860783FED
-  validation_package_sha256: 7649824B72247AA38F05661422DFDEE7C729B21CC73A0A35D2455443B45D39F8
-  validation_package_content_sha256: 5B8E21077CAC99CDB0733EBE8B34D10D0F375B2EAB2D42E60A73677860783FED
-  target_profile_sha256: E4955F0415FAFB69C21DA32BA535C761740C270D6972955170CA5A2BE95D514A
-  required_groups_sha256: 57A1DF87A8FB594B2B51C7E230D775E88028F23D52DF9D5D7DA1336F9271C78A
-  validation_harness_sha256: 1993213F340FE4C61B93AA1E90335AFFF4043B7EC48D591E52F9FBA7DEC723F6
-  expected_scenarios_sha256: 33C299B4394AB97BBE379D01E6AAC06894883F239A45CA5F55B0D2C0AE63488C
-  structured_summary_path: .mir/evidence/2.4.5-change-aware-qualification.json
-  structured_summary_run_id: c6995a88-6838-4b14-9448-c959303f542a
-  assurance_seal: .mir/evidence/candidate-seals/mir-2.4.5-factorio-2.0.json
-  seal_source_commit: 9cfa77c33a635c24f0d4ea458d317cddfa9e325f
-  automated_gate: passed
+  artifact: dist/more-infinite-research_2.5.0.zip
+  source_commit: pending
+  automated_gate: pending
   manual_gate: pending
-  status: release-candidate-awaiting-manual-review
+  status: rebuilding-after-package-visible-change
 
 rules:
   - dev-remains-the-canonical-modern-implementation

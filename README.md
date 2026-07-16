@@ -668,9 +668,9 @@ The validation script checks:
 - **`docs/compatibility/README.md`:** compatibility model, known integrations, manual test matrix, fixture designs, and release checklist.
 - **`docs/maintainer/developer-tools.md`:** preferred developer commands, run profiles, script roles, and PowerShell tooling checks.
 - **`docs/releases/2.4.0-roadmap.md`:** published Factorio 2.0 port scope, target cuts, and sequencing.
-- **`docs/releases/2.4.5-checklist.md`:** active Factorio 2.0 hotfix automated, candidate, manual, and publication gates.
-- **`docs/releases/notes/release-notes-2.4.5.md`:** current player-facing Factorio 2.0 hotfix changes.
-- **`docs/releases/2.4.5-validation-summary.md`:** current Factorio 2.0 candidate identity and validation evidence.
+- **`docs/releases/2.5.0-verification-backport.md`:** active Factorio 2.0 content-addressed verification and backport gate.
+- **`docs/releases/notes/release-notes-2.5.0.md`:** current player-facing Factorio 2.0 release changes.
+- **`docs/releases/2.4.5-validation-summary.md`:** immutable prior-release identity and validation evidence.
 - **`docs/releases/2.2.0-validation-record.md`:** local release validation evidence.
 - **`docs/maintainer/manual-test-plan.md`:** named manual saves/scenarios for release validation.
 - **`docs/releases/mod-portal-page.md`:** mod-portal-ready public description, technology catalog, settings summary, compatibility notes, and troubleshooting text.

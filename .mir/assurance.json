@@ -1,17 +1,25 @@
 {
   "schema": 1,
   "default_target": "2.0",
+  "verification": {
+    "tests": "validation/tests.yml",
+    "domains": "validation/domains.yml",
+    "profiles": "validation/profiles",
+    "plan": "out/verification-plan.json",
+    "evidence": "artifacts/assurance/evidence",
+    "aggregate_gate": "MIR / verification-gate"
+  },
   "profiles": {
     "edit": ["static.architecture", "static.compiler"],
-    "fast": ["static.architecture", "static.compiler", "static.settings", "static.package"],
+    "fast": ["tooling.self-test", "static.architecture", "static.compiler", "static.settings", "static.balance", "static.package"],
     "auto": [],
     "locale": ["static.locales", "runtime.exact-zip"],
     "balance": ["static.balance", "runtime.affected"],
     "refactor-equivalence": ["static.compiler", "static.package", "runtime.exact-zip"],
     "hotfix": ["static.full", "runtime.affected", "runtime.exact-zip"],
     "targeted": ["static.full", "runtime.affected", "runtime.exact-zip"],
-    "full": ["static.full", "runtime.full", "runtime.upgrade", "runtime.ecosystem"],
-    "backport": ["static.full", "runtime.full", "runtime.upgrade", "runtime.ecosystem"],
+    "full": ["tooling.self-test", "static.balance", "runtime.full", "runtime.exact-zip", "runtime.upgrade", "runtime.ecosystem"],
+    "backport": ["tooling.self-test", "static.balance", "runtime.full", "runtime.exact-zip", "runtime.upgrade", "runtime.ecosystem"],
     "promotion-check": ["seal.verify"]
   },
   "classes": [
@@ -52,12 +60,17 @@
     },
     {
       "id": "test-harness",
-      "patterns": ["^scripts/", "^fixtures/", "^\\.mir/test", "^\\.github/workflows/"],
+      "patterns": ["^scripts/", "^fixtures/", "^validation/", "^tools/mir_verify/", "^\\.mir/(assurance|fixtures|test-impact|test-catalog)", "^\\.mir/backport-source-lock\\.json$", "^\\.github/workflows/", "^\\.gitignore$"],
       "tests": ["tooling.self-test", "static.full", "runtime.affected"]
     },
     {
+      "id": "museum-tooling",
+      "patterns": ["^\\.mir/(canonical-lower-features|museum-targets)\\.json$", "^scripts/(Build-MIRMuseumTarget|New-MIRMuseum|Test-MIRMuseum)", "^scripts/Museum/"],
+      "tests": ["static.museum"]
+    },
+    {
       "id": "repository-docs",
-      "patterns": ["^docs/", "^CONTRIBUTING\\.md$", "^todo\\.md$", "^AGENTS\\.md$"],
+      "patterns": ["^docs/", "^\\.mir/(branches|convergence|docs)\\.yml$", "^CONTRIBUTING\\.md$", "^todo\\.md$", "^AGENTS\\.md$"],
       "tests": ["docs.check", "seal.verify"]
     },
     {

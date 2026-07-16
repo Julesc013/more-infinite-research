@@ -373,6 +373,11 @@ validation_tooling:
   facade: scripts/Invoke-MIRValidation.ps1
   modules:
     assurance: scripts/Invoke-MIRAssurance.ps1
+    assurance_core: scripts/MIRAssurance/Core.ps1
+    assurance_domains: scripts/MIRAssurance/Domains.ps1
+    assurance_evidence: scripts/MIRAssurance/Evidence.ps1
+    assurance_hashing: scripts/MIRAssurance/Hashing.ps1
+    assurance_release: scripts/MIRAssurance/Release.ps1
     assurance_tests: scripts/Test-MIRAssurance.ps1
     native_owner_balance_tests: scripts/Test-MIRNativeOwnerCostModels.ps1
     backport_source_lock: scripts/Test-MIRBackportSourceLock.ps1
@@ -387,8 +392,17 @@ validation_tooling:
     campaign_scenarios: scripts/Test-MIRScenarioManifests.ps1
     planner_artifacts: scripts/Test-MIRPlannerTools.ps1
     compiler_schema_drift: scripts/Test-MIRCompilerSchemaDrift.ps1
+    compiler_gate: scripts/Test-MIRCompiler.ps1
+    verification_tests: validation/tests.yml
+    verification_domains: validation/domains.yml
+    verification_profiles: validation/profiles
+    verification_tool_entrypoint: tools/mir_verify/Invoke-MIRVerify.ps1
   rules:
-    - assurance plans use stable test IDs and complete content-addressed evidence inputs
+    - assurance plans use stable test and matrix instance IDs complete effective inputs package domains and target profiles
+    - passing evidence is reusable only under exact trusted schema 3 fingerprints and result digests
+    - matching workers are adopted through expiring running evidence and duplicate fingerprint work is never cancelled in progress
+    - the aggregate verification gate requires exact evidence for every planned instance and never trusts mutable job status
+    - Factorio gameplay scenarios depend on declared package domains while exact package load and upgrade lanes depend on exact archives
     - native-owner balance snapshots bind reviewed source values formula adapters planner bindings and emission transactions
     - backport source locks bind each target projection to its canonical modern package source and enumerate every target-specific package adaptation
     - native-owner transactions publish recognized input output and legacy output unit models for configuration-change progress preservation
