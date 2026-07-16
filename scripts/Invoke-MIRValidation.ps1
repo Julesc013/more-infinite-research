@@ -7,6 +7,7 @@ param(
   [switch]$ManifestsOnly,
   [switch]$ArchitectureOnly,
   [switch]$StaticOnly,
+  [switch]$ScenarioWorker,
   [string[]]$Scenario = @(),
   [string[]]$Group = @(),
   [string[]]$Tag = @(),
@@ -50,6 +51,7 @@ $script:ValidationPackageZipPath = $null
 
 function Invoke-RepoCheck {
   param([string]$Description, [scriptblock]$Script)
+  if ($ScenarioWorker) { return }
   Write-Host "[check] $Description"
   & $Script
 }
@@ -2121,6 +2123,20 @@ Invoke-RepoCheck "git whitespace check" {
   }
 }
 
+if ($ScenarioWorker) {
+  if ([string]::IsNullOrWhiteSpace($CandidateZip)) {
+    throw "-ScenarioWorker requires -CandidateZip with the exact candidate archive."
+  }
+  if ($Scenario.Count -ne 1 -or $Group.Count -gt 0 -or $Tag.Count -gt 0 -or $Tier) {
+    throw "-ScenarioWorker requires exactly one -Scenario and cannot be combined with -Group, -Tag, or -Tier."
+  }
+  $candidatePath = if ([IO.Path]::IsPathRooted($CandidateZip)) { $CandidateZip } else { Join-Path $repo $CandidateZip }
+  if (-not (Test-Path -LiteralPath $candidatePath -PathType Leaf)) {
+    throw "Scenario worker candidate package not found: $CandidateZip"
+  }
+  $script:ValidationPackageZipPath = (Resolve-Path -LiteralPath $candidatePath).Path
+}
+
 if ($StaticOnly -or [string]::IsNullOrWhiteSpace($FactorioBin)) {
   Write-Host "[skip] Factorio runtime validation skipped. Set FACTORIO_BIN or pass -FactorioBin to run load tests."
   exit 0
@@ -2209,6 +2225,16 @@ if ($checkpointActive) {
 $scenarioRegistry = Import-MIRScenarioRegistry -Path $expectedScenariosPath -TargetProfile $repoInfo.factorio_version
 $selectionActive = $Scenario.Count -gt 0 -or $Group.Count -gt 0 -or $Tag.Count -gt 0
 $scenarioRegistry = Select-MIRScenarioRegistry -Registry $scenarioRegistry -Scenario $Scenario -Group $Group -Tag $Tag
+if ($ScenarioWorker) {
+  $scenarioRegistry = [pscustomobject]@{
+    schema=3
+    target_profile=$scenarioRegistry.target_profile
+    records=@($scenarioRegistry.records | Where-Object kind -ne "gate")
+  }
+  if (@($scenarioRegistry.records).Count -ne 1) {
+    throw "Scenario worker selection did not resolve exactly one executable scenario."
+  }
+}
 $expectedScenarios = Get-MIRExpectedScenarioNames -Registry $scenarioRegistry
 $selectedScenarioNames = @{}
 foreach ($name in $expectedScenarios) { $selectedScenarioNames[$name] = $true }
@@ -2239,12 +2265,14 @@ Initialize-MIRValidationResult `
   -ValidationHarnessGitDirty (Test-MIRValidationHarnessGitDirty -RepoRoot $repo) `
   -ExpectedScenariosSha256 (Get-MIRFileContentSha256 -Path $expectedScenariosPath -RelativePath "fixtures/compat-matrix/expected-scenarios.json") `
   -ExpectedScenarios $expectedScenarios | Out-Null
-$staticDeclaration = Resolve-MIRScenarioDeclaration -Registry $scenarioRegistry -ScenarioName "static-validation" -Kind "gate"
-$packageBuildDeclaration = Resolve-MIRScenarioDeclaration -Registry $scenarioRegistry -ScenarioName "package-build" -Kind "gate"
-$runtimeStateDeclaration = Resolve-MIRScenarioDeclaration -Registry $scenarioRegistry -ScenarioName "runtime-state-contract" -Kind "gate"
-Add-MIRValidationCompletedScenario -Name $staticDeclaration.name -Group $staticDeclaration.group -EvidencePaths @("scripts/Invoke-MIRValidation.ps1")
-Add-MIRValidationCompletedScenario -Name $packageBuildDeclaration.name -Group $packageBuildDeclaration.group -EvidencePaths @("build/validation-dist")
-Add-MIRValidationCompletedScenario -Name $runtimeStateDeclaration.name -Group $runtimeStateDeclaration.group -EvidencePaths @("prototypes/mir/platform/factorio/runtime_state.lua")
+if (-not $ScenarioWorker) {
+  $staticDeclaration = Resolve-MIRScenarioDeclaration -Registry $scenarioRegistry -ScenarioName "static-validation" -Kind "gate"
+  $packageBuildDeclaration = Resolve-MIRScenarioDeclaration -Registry $scenarioRegistry -ScenarioName "package-build" -Kind "gate"
+  $runtimeStateDeclaration = Resolve-MIRScenarioDeclaration -Registry $scenarioRegistry -ScenarioName "runtime-state-contract" -Kind "gate"
+  Add-MIRValidationCompletedScenario -Name $staticDeclaration.name -Group $staticDeclaration.group -EvidencePaths @("scripts/Invoke-MIRValidation.ps1")
+  Add-MIRValidationCompletedScenario -Name $packageBuildDeclaration.name -Group $packageBuildDeclaration.group -EvidencePaths @("build/validation-dist")
+  Add-MIRValidationCompletedScenario -Name $runtimeStateDeclaration.name -Group $runtimeStateDeclaration.group -EvidencePaths @("prototypes/mir/platform/factorio/runtime_state.lua")
+}
 
 $usesGeneratedUserDataDir = [string]::IsNullOrWhiteSpace($UserDataDir)
 if ($usesGeneratedUserDataDir) {

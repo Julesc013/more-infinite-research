@@ -1,0 +1,111 @@
+{
+  "schema": 1,
+  "policy_id": "mir-verification-v4",
+  "unknown_policy": "invalidate-all-scenario-domains",
+  "domains": [
+    {
+      "id": "runtime",
+      "patterns": [
+        "control.lua",
+        "prototypes/mir/runtime/**",
+        "prototypes/mir/stage/control.lua"
+      ]
+    },
+    {
+      "id": "migrations",
+      "patterns": [
+        "migrations/**"
+      ]
+    },
+    {
+      "id": "settings",
+      "patterns": [
+        "settings.lua",
+        "settings-updates.lua",
+        "settings-final-fixes.lua",
+        "prototypes/mir/settings/**",
+        "prototypes/mir/stage/settings.lua"
+      ]
+    },
+    {
+      "id": "balance",
+      "patterns": [
+        "prototypes/streams/**",
+        "prototypes/mir/planner/costs.lua",
+        "prototypes/mir/domain/native_owner/**",
+        "prototypes/mir/planner/native_owner_binding.lua",
+        "prototypes/mir/emit/transactions/productivity_family_adoption.lua"
+      ]
+    },
+    {
+      "id": "data",
+      "patterns": [
+        "data.lua",
+        "data-updates.lua",
+        "data-final-fixes.lua",
+        "prototypes/**"
+      ]
+    },
+    {
+      "id": "locale",
+      "patterns": [
+        "locale/**"
+      ]
+    },
+    {
+      "id": "assets",
+      "patterns": [
+        "thumbnail.png",
+        "graphics/**",
+        "sounds/**"
+      ]
+    },
+    {
+      "id": "metadata",
+      "patterns": [
+        "info.json"
+      ]
+    },
+    {
+      "id": "release-text",
+      "patterns": [
+        "README.md",
+        "changelog.txt",
+        "LICENSE"
+      ]
+    }
+  ],
+  "scenario_dependencies": {
+    "package": [
+      "artifact"
+    ],
+    "runtime": [
+      "data",
+      "balance",
+      "settings",
+      "assets",
+      "dependency-contract"
+    ],
+    "configuration-change": [
+      "data",
+      "balance",
+      "settings",
+      "runtime",
+      "migrations",
+      "assets",
+      "dependency-contract"
+    ]
+  },
+  "always_include_unknown": true,
+  "dependency_contract": {
+    "source": "info.json",
+    "include": [
+      "name",
+      "factorio_version",
+      "dependencies"
+    ],
+    "exclude": [
+      "version"
+    ]
+  }
+}

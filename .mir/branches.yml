@@ -16,7 +16,7 @@ branches:
       - large-architecture-rewrite
 
   dev:
-    purpose: consolidated published-line archive and canonical future Factorio 2.1 development
+    purpose: MIR 3.2.0 persistent-verification development and canonical future Factorio 2.1 integration
     factorio_version: "2.1"
     accepts:
       - architecture
@@ -41,7 +41,7 @@ branches:
       - broad-new-generation
 
   tmp/2.0:
-    purpose: maintained Factorio 2.0 release and semantic companion branch
+    purpose: maintained Factorio 2.0 MIR 2.5.0 semantic companion and verification-overhaul backport branch
     factorio_version: "2.0"
     accepts:
       - platform-compatible-backport
@@ -288,22 +288,40 @@ release_artifacts:
       publication_status: published
       tag: "3.1.9"
       status: published-frozen
+    mir_3_2_0:
+      version: "3.2.0"
+      branch: dev
+      target_factorio: "2.1"
+      source_anchor: mir_3_1_9
+      assurance_policy: mir-verification-v4
+      assurance_evidence_schema: 3
+      verification_tests: validation/tests.yml
+      verification_domains: validation/domains.yml
+      verification_profile: validation/profiles/factorio-2.1.json
+      aggregate_gate: "MIR / verification-gate"
+      prior_release: dist/more-infinite-research_3.1.9.zip
+      release_gate: implementation-and-qualification-pending
+      publication_status: unreleased
+      status: development-candidate
     mir_2_5_0:
       version: "2.5.0"
       branch: tmp/2.0
       target_factorio: "2.0"
-      source_anchor: mir_3_1_2
-      source_commit: f5c58f5358291c9a65326388c60702dc9878b9d7
-      artifact: dist/more-infinite-research_2.5.0.zip
-      sha256: 0BE57ED4C51DDF08F80AB4CFB2D5762DF2714B17AB26DB58CA9980289350CBFD
-      size_bytes: 387662
-      entries: 160
-      forbidden_entries: 0
-      automated_gate: passed
-      scenario_count: 82
-      structured_summary_run_id: 5bbedb9b-cf3c-4f91-ae5a-f6bf274ad172
+      source_anchor: mir_3_2_0
+      prior_candidate:
+        source_anchor: mir_3_1_2
+        source_commit: f5c58f5358291c9a65326388c60702dc9878b9d7
+        artifact: dist/more-infinite-research_2.5.0.zip
+        sha256: 0BE57ED4C51DDF08F80AB4CFB2D5762DF2714B17AB26DB58CA9980289350CBFD
+        structured_summary_run_id: 5bbedb9b-cf3c-4f91-ae5a-f6bf274ad172
+        status: superseded-unpublished-candidate
+      assurance_policy: mir-verification-v4
+      assurance_evidence_schema: 3
+      verification_profile: validation/profiles/factorio-2.0.json
+      prior_release: dist/more-infinite-research_2.4.5.zip
+      release_gate: target-backport-and-qualification-pending
       publication_status: unreleased
-      status: candidate-qualified
+      status: development-candidate
     mir_2_4_0:
       version: "2.4.0"
       branch: legacy
@@ -721,15 +739,15 @@ release_artifacts:
       status: published
   next_release_targets:
     current_line:
-      version: "3.1.0"
+      version: "3.2.0"
       branch: dev
       target_factorio: "2.1"
-      purpose: plan-first automatic family compiler development from the published 3.0.5 behavior baseline
+      purpose: persistent content-addressed verification overhaul from the published 3.1.9 behavior baseline
     factorio_2_0_companion:
-      version: "2.4.0"
+      version: "2.5.0"
       branch: tmp/2.0
       target_factorio: "2.0"
-      purpose: semantic companion created only after 3.1.0 acceptance
+      purpose: target-specific verification-overhaul backport from accepted MIR 3.2.0 tooling
     factorio_1_1_port:
       version: "1.9.4"
       branch: tmp/1.1
@@ -760,10 +778,10 @@ release_artifacts:
       target_factorio: "0.15"
       purpose: earliest plausible native-infinite floor after old-science proof
     current_line_feature:
-      version: "3.1.0"
+      version: "3.2.0"
       branch: dev
       target_factorio: "2.1"
-      purpose: whole-plan validation, consolidated facts, attach-only family automation, and reviewed compatibility packs
+      purpose: persistent evidence ledger, dependency-domain invalidation, scenario workers, and one aggregate gate
   package_refresh_rule: >-
     only build or refresh dist archives for an unpublished target version;
     never refresh already-published archives as part of architecture or

@@ -121,7 +121,7 @@ $assertions = if ($isLegacyFactorio) {
     "global-runtime-state-retained",
     "exact-candidate-normal-mod-directory-load"
   )
-} elseif ($FixtureName -eq "assert-upgrade-3-1-5-to-3-1-9") {
+} elseif ($FixtureName -in @("assert-upgrade-3-1-5-to-3-1-9", "assert-upgrade-3-1-9-to-3-2-0")) {
   @(
     "startup-settings-retained",
     "native-owner-technology-level-retained",

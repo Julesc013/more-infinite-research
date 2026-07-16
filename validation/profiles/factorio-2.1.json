@@ -1,0 +1,15 @@
+{
+  "schema": 1,
+  "id": "factorio-2.1",
+  "target": "2.1",
+  "policy_id": "mir-verification-v4",
+  "runner": "factorio-headless",
+  "deterministic_seed": 320021,
+  "running_evidence_ttl_minutes": 360,
+  "trusted_repository": "self",
+  "upgrade": {
+    "from_version": "3.1.9",
+    "to_version": "3.2.0",
+    "fixture": "assert-upgrade-3-1-9-to-3-2-0"
+  }
+}

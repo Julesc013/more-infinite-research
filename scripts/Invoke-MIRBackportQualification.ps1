@@ -15,7 +15,7 @@ $profile = Get-Content -Raw -LiteralPath $profilePath | ConvertFrom-Json
 $canonicalProfilePath = Join-Path $repo ".mir\targets.json"
 $sourceLockPath = Join-Path $repo ".mir\backport-source-lock.json"
 $canonicalFeatureModelPath = Join-Path $repo ".mir\canonical-lower-features.json"
-$testCatalogPath = Join-Path $repo ".mir\test-catalog.json"
+$testCatalogPath = Join-Path $repo "validation\tests.yml"
 $info = Get-Content -Raw -LiteralPath (Join-Path $repo "info.json") | ConvertFrom-Json
 if ([string]::IsNullOrWhiteSpace($CandidateZip)) {
   $CandidateZip = Join-Path $repo "dist\$($info.name)_$($info.version).zip"

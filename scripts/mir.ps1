@@ -27,8 +27,8 @@ Usage:
   .\scripts\mir.ps1 audit local [--profile <name>]
   .\scripts\mir.ps1 audit top25 --space-age
   .\scripts\mir.ps1 package build
-  .\scripts\mir.ps1 assurance <doctor|inventory|impact|plan|build|verify|qualify|seal|check-seal|locale|balance|backport|explain>
-  .\scripts\mir.ps1 verify <plan|explain|run|qualify>
+  .\scripts\mir.ps1 assurance <doctor|inventory|impact|domains|plan|fingerprint|build|run-one|verify|gate|qualify|seal|check-seal|locale|balance|backport|explain>
+  .\scripts\mir.ps1 verify <plan|fingerprint|explain|run-one|run|gate|qualify>
   .\scripts\mir.ps1 report latest
   .\scripts\mir.ps1 report missing-deps --run <path>
   .\scripts\mir.ps1 report observations --run <path>
@@ -364,17 +364,20 @@ switch ($area) {
   "verify" {
     $verifyCommand = switch ($verb) {
       "plan" { "plan" }
+      "fingerprint" { "fingerprint" }
       "explain" { "explain" }
+      "run-one" { "run-one" }
       "run" { "verify" }
+      "gate" { "gate" }
       "qualify" { "qualify" }
       default { throw "Unknown verify command: $verb" }
     }
-    $verifyArgs = @($verifyCommand)
+    [string[]]$verifyArgs = @($verifyCommand)
     if ($Args.Count -gt 2) { $verifyArgs += @($Args[2..($Args.Count - 1)]) }
     & (Join-Path $scriptRoot "Invoke-MIRAssurance.ps1") @verifyArgs
   }
   "assurance" {
-    $assuranceArgs = if ($Args.Count -gt 1) { @($Args[1..($Args.Count - 1)]) } else { @("help") }
+    [string[]]$assuranceArgs = if ($Args.Count -gt 1) { @($Args[1..($Args.Count - 1)]) } else { @("help") }
     & (Join-Path $scriptRoot "Invoke-MIRAssurance.ps1") @assuranceArgs
   }
   "docs" {

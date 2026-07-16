@@ -1672,3 +1672,19 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - mir-0.6.0-release-notes
+  - path: docs/releases/3.2.0-verification-overhaul.md
+    title: "MIR 3.2.0 Persistent Verification Overhaul"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-3.2.0-verification-contract
+  - path: docs/releases/notes/release-notes-3.2.0.md
+    title: "MIR 3.2.0 Release Notes"
+    status: current
+    audience: player
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-3.2.0-release-notes

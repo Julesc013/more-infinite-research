@@ -6,18 +6,21 @@ param(
 $ErrorActionPreference = "Stop"
 $repo = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 $configPath = Join-Path $repo ".mir\assurance.json"
-$catalogPath = Join-Path $repo ".mir\test-catalog.json"
+$catalogPath = Join-Path $repo "validation\tests.yml"
+$domainsPath = Join-Path $repo "validation\domains.yml"
 $impactPath = Join-Path $repo ".mir\test-impact.yml"
 $targetsPath = Join-Path $repo ".mir\targets.json"
 $scenarioRegistryPath = Join-Path $repo "fixtures\compat-matrix\expected-scenarios.json"
 $artifactRoot = Join-Path $repo "artifacts\assurance"
 $evidenceRoot = Join-Path $artifactRoot "evidence"
 $buildRoot = Join-Path $artifactRoot "builds"
-$evidenceSchema = 2
+$outRoot = Join-Path $repo "out"
+$evidenceSchema = 3
 $buildReceiptSchema = 2
-$assuranceRunnerVersion = "2"
+$assuranceRunnerVersion = "3"
 
 . (Join-Path $PSScriptRoot "MIRAssurance\Core.ps1")
+. (Join-Path $PSScriptRoot "MIRAssurance\Domains.ps1")
 . (Join-Path $PSScriptRoot "MIRAssurance\Evidence.ps1")
 . (Join-Path $PSScriptRoot "MIRAssurance\Release.ps1")
 
@@ -26,17 +29,19 @@ function Show-MIRAssuranceHelp {
 MIR assurance
 
 Commands:
-  doctor | inventory | impact | plan | build | verify | qualify
-  seal | check-seal | locale | balance | backport | explain | self-test
+  doctor | inventory | impact | domains | plan | fingerprint | build | run-one | verify
+  gate | qualify | seal | check-seal | locale | balance | backport | explain
+  self-test
 
 Common options:
   --target <line> --candidate <zip> --baseline <ref-or-seal>
   --profile <name> --factorio <path> --prior <zip> --seal <path>
+  --plan <json> --test <stable-id> --fingerprint <sha256>
   --output <json> --json --rerun <test-id> --no-reuse
 
-Reuse is enabled by default. Passing evidence is reused only when the exact per-test
-fingerprint still matches. Failed or blocked lanes execute again; --rerun forces one
-lane and --no-reuse forces every selected lane.
+Reuse is enabled by default. The planner emits REUSE, WAIT, RUN, or INVALID for
+each stable test instance. Passing evidence is reused only when its exact effective
+input fingerprint and result digest still match trusted producer policy.
 "@
 }
 
@@ -60,6 +65,8 @@ switch ($command) {
       info_version=[string]$context.info.version
       config_exists=(Test-Path -LiteralPath $configPath -PathType Leaf)
       catalog_exists=(Test-Path -LiteralPath $catalogPath -PathType Leaf)
+      domains_exists=(Test-Path -LiteralPath $domainsPath -PathType Leaf)
+      verification_profile=(Get-MIRAssuranceVerificationProfilePath -Target $context.target)
       factorio=if ($factorioExists) { $context.factorio } else { "not-provided" }
       factorio_version=$factorioVersion
       factorio_matches_target=$factorioMatchesTarget
@@ -86,11 +93,32 @@ switch ($command) {
     Write-MIRAssuranceJson -Value $result
   }
   "impact" { Write-MIRAssuranceJson -Value (Get-MIRAssurancePlan -Context $context).classification }
-  "plan" { Write-MIRAssuranceJson -Value (Get-MIRAssurancePlan -Context $context) -DefaultPath "artifacts/assurance/plan.json" }
-  "explain" { Write-MIRAssuranceJson -Value (Get-MIRAssurancePlan -Context $context) }
+  "domains" { Write-MIRAssuranceJson -Value (Get-MIRAssuranceDomainManifest -Context $context -RequireCandidate) -DefaultPath "out/domain-manifest.json" }
+  "plan" { Write-MIRAssuranceJson -Value (Get-MIRAssurancePlan -Context $context) -DefaultPath "out/verification-plan.json" }
+  "fingerprint" {
+    $plan = Get-MIRAssurancePlanFromOption -Context $context
+    $test = Get-MIRAssurancePlannedTest -Plan $plan -TestId (Get-MIRAssuranceOption -Name "--test")
+    Write-MIRAssuranceJson -Value $test.fingerprint
+  }
+  "explain" {
+    $plan = Get-MIRAssurancePlanFromOption -Context $context
+    $testId = Get-MIRAssuranceOption -Name "--test"
+    if ($testId) { Write-MIRAssuranceJson -Value (Get-MIRAssurancePlannedTest -Plan $plan -TestId $testId) }
+    else { Write-MIRAssuranceJson -Value $plan }
+  }
   "build" { Write-MIRAssuranceJson -Value (Invoke-MIRAssuranceBuild -Context $context) }
+  "run-one" {
+    $plan = Get-MIRAssurancePlanFromOption -Context $context
+    $testId = Get-MIRAssuranceOption -Name "--test"
+    $test = Get-MIRAssurancePlannedTest -Plan $plan -TestId $testId
+    $expectedFingerprint = Get-MIRAssuranceOption -Name "--fingerprint"
+    if ($expectedFingerprint -and [string]$test.fingerprint.fingerprint_sha256 -ne $expectedFingerprint) {
+      throw "Planned fingerprint mismatch for $testId."
+    }
+    Write-MIRAssuranceJson -Value (Invoke-MIRAssuranceTest -Test $test -Plan $plan -Context $context) -DefaultPath "artifacts/assurance/workers/$($test.safe_test_id).json"
+  }
   "verify" {
-    $plan = Get-MIRAssurancePlan -Context $context
+    $plan = Get-MIRAssurancePlanFromOption -Context $context
     $results = Invoke-MIRAssurancePlan -Plan $plan -Context $context
     $counts = Get-MIRAssuranceResultCounts -Results $results
     $status = if ($counts.failed -eq 0) { "passed" } else { "failed" }
@@ -106,6 +134,10 @@ switch ($command) {
     }
     Write-MIRAssuranceJson -Value $summary -DefaultPath "artifacts/assurance/verify-summary.json"
     if ($status -ne "passed") { throw "Assurance verification failed." }
+  }
+  "gate" {
+    $plan = Get-MIRAssurancePlanFromOption -Context $context -RequirePlan
+    Invoke-MIRAssuranceGate -Plan $plan -Context $context
   }
   "qualify" {
     $build = Invoke-MIRAssuranceBuild -Context $context

@@ -1,17 +1,130 @@
-name: Validate
+name: MIR
 
 on:
   push:
   pull_request:
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
-  static:
+  plan:
+    name: verification-plan
+    runs-on: windows-latest
+    outputs:
+      matrix: ${{ steps.matrix.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Restore persistent evidence ledger
+        uses: actions/cache/restore@v4
+        with:
+          path: artifacts/assurance/evidence
+          key: mir-ledger-${{ runner.os }}-${{ github.ref_name }}-${{ github.run_id }}
+          restore-keys: |
+            mir-ledger-${{ runner.os }}-${{ github.ref_name }}-
+            mir-ledger-${{ runner.os }}-
+      - name: Diagnose verifier
+        shell: pwsh
+        run: ./scripts/mir.ps1 assurance doctor --target 2.1 --json
+      - name: Materialize content-addressed verification plan
+        shell: pwsh
+        run: ./scripts/mir.ps1 verify plan --target 2.1 --profile fast --output out/verification-plan.json
+      - id: matrix
+        name: Export required work
+        shell: pwsh
+        run: |
+          $plan = Get-Content -Raw -LiteralPath out/verification-plan.json | ConvertFrom-Json
+          $matrix = @{ include = @($plan.work) } | ConvertTo-Json -Depth 10 -Compress
+          "matrix=$matrix" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mir-verification-plan
+          path: out/verification-plan.json
+          if-no-files-found: error
+
+  tests:
+    name: ${{ matrix.test_id }}
+    needs: plan
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
+    concurrency:
+      group: mir-${{ matrix.safe_test_id }}-${{ matrix.fingerprint }}
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/download-artifact@v4
+        with:
+          name: mir-verification-plan
+          path: out
+      - name: Restore persistent evidence ledger
+        uses: actions/cache/restore@v4
+        with:
+          path: artifacts/assurance/evidence
+          key: mir-ledger-${{ runner.os }}-${{ github.ref_name }}-${{ github.run_id }}
+          restore-keys: |
+            mir-ledger-${{ runner.os }}-${{ github.ref_name }}-
+            mir-ledger-${{ runner.os }}-
+      - name: Reuse, adopt, or run exact test instance
+        shell: pwsh
+        run: ./scripts/mir.ps1 verify run-one --target 2.1 --plan out/verification-plan.json --test '${{ matrix.test_id }}' --fingerprint '${{ matrix.fingerprint }}'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mir-evidence-${{ matrix.safe_test_id }}
+          path: artifacts/assurance/evidence
+          if-no-files-found: warn
+
+  verification-gate:
+    name: verification-gate
+    if: always()
+    needs:
+      - plan
+      - tests
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Static validation and package checks
+      - uses: actions/download-artifact@v4
+        with:
+          name: mir-verification-plan
+          path: out
+      - name: Restore persistent evidence ledger
+        uses: actions/cache/restore@v4
+        with:
+          path: artifacts/assurance/evidence
+          key: mir-ledger-${{ runner.os }}-${{ github.ref_name }}-${{ github.run_id }}
+          restore-keys: |
+            mir-ledger-${{ runner.os }}-${{ github.ref_name }}-
+            mir-ledger-${{ runner.os }}-
+      - name: Merge worker evidence
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          pattern: mir-evidence-*
+          path: artifacts/assurance/evidence
+          merge-multiple: true
+      - name: Require exact trusted evidence for every planned instance
         shell: pwsh
-        run: .\scripts\Invoke-MIRValidation.ps1 -StaticOnly
+        run: ./scripts/mir.ps1 verify gate --target 2.1 --plan out/verification-plan.json --output artifacts/assurance/evidence-bundle.json
+      - name: Save updated persistent evidence ledger
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: artifacts/assurance/evidence
+          key: mir-ledger-${{ runner.os }}-${{ github.ref_name }}-${{ github.run_id }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mir-verification-evidence
+          path: |
+            out/verification-plan.json
+            artifacts/assurance/evidence-bundle.json
+          if-no-files-found: warn

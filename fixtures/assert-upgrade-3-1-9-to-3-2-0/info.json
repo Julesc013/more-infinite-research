@@ -1,0 +1,12 @@
+{
+  "name": "mir-fixture-assert-upgrade-3-1-9-to-3-2-0",
+  "version": "0.1.0",
+  "title": "MIR Fixture - Assert 3.1.9 to 3.2.0 Verification Overhaul Upgrade",
+  "author": "MIR maintainers",
+  "factorio_version": "2.1",
+  "dependencies": [
+    "base >= 2.1.8",
+    "space-age >= 2.1.8",
+    "more-infinite-research >= 3.1.9"
+  ]
+}

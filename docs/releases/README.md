@@ -14,8 +14,12 @@ superseded_by: []
 
 Release docs are version-specific plans, migration guides, risk registers, checklists, and validation records.
 
+MIR 3.2.0 is the active Factorio 2.1 development candidate. Its release gate is the persistent content-addressed verification architecture documented in [the 3.2.0 verification overhaul](3.2.0-verification-overhaul.md); no publication is claimed until the exact candidate completes the aggregate gate and remaining human review.
+
 MIR 3.1.9 through 0.6.0 are published and byte-verified on GitHub. The 0.12.0 through 0.6.0 archives were metadata-corrected, requalified, retagged, and republished on 2026-07-16 after their shared generator omitted `factorio_version`. Mod Portal upload and acceptance remain external maintainer actions. Complete tagged source snapshots and exact distributions are consolidated on `dev` without changing the modern Factorio 2.1 root.
 
+- [3.2.0 verification overhaul](3.2.0-verification-overhaul.md)
+- [3.2.0 release notes](notes/release-notes-3.2.0.md)
 - [3.0.0 plan](3.0.0-plan.md)
 - [3.0.0 regression baseline](3.0.0-regression-baseline.md)
 - [3.0.0 transition checkpoint 2](3.0.0-transition-checkpoint-2.md)

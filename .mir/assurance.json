@@ -1,6 +1,14 @@
 {
   "schema": 1,
   "default_target": "2.1",
+  "verification": {
+    "tests": "validation/tests.yml",
+    "domains": "validation/domains.yml",
+    "profiles": "validation/profiles",
+    "plan": "out/verification-plan.json",
+    "evidence": "artifacts/assurance/evidence",
+    "aggregate_gate": "MIR / verification-gate"
+  },
   "profiles": {
     "edit": ["static.architecture", "static.compiler"],
     "fast": ["tooling.self-test", "static.architecture", "static.compiler", "static.settings", "static.balance", "static.museum", "static.package"],
@@ -52,7 +60,7 @@
     },
     {
       "id": "test-harness",
-      "patterns": ["^scripts/", "^fixtures/", "^\\.mir/test", "^\\.github/workflows/"],
+      "patterns": ["^scripts/", "^fixtures/", "^validation/", "^tools/mir_verify/", "^\\.mir/(assurance|fixtures|test-impact|test-catalog)", "^\\.github/workflows/", "^\\.gitignore$"],
       "tests": ["tooling.self-test", "static.full", "runtime.affected"]
     },
     {
@@ -62,7 +70,7 @@
     },
     {
       "id": "repository-docs",
-      "patterns": ["^docs/", "^CONTRIBUTING\\.md$", "^todo\\.md$", "^AGENTS\\.md$"],
+      "patterns": ["^docs/", "^\\.mir/(branches|convergence|docs)\\.yml$", "^CONTRIBUTING\\.md$", "^todo\\.md$", "^AGENTS\\.md$"],
       "tests": ["docs.check", "seal.verify"]
     },
     {

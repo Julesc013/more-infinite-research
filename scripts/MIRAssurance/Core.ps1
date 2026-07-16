@@ -41,6 +41,25 @@ function Get-MIRAssuranceJsonHash {
   return Get-MIRAssuranceTextHash -Text ($Value | ConvertTo-Json -Depth 40 -Compress)
 }
 
+function ConvertTo-MIRAssuranceDateTimeOffset {
+  param([Parameter(Mandatory)]$Value)
+  if ($Value -is [DateTimeOffset]) { return [DateTimeOffset]$Value }
+  if ($Value -is [DateTime]) { return [DateTimeOffset]::new([DateTime]$Value) }
+  return [DateTimeOffset]::Parse(
+    [string]$Value,
+    [Globalization.CultureInfo]::InvariantCulture,
+    [Globalization.DateTimeStyles]::RoundtripKind
+  )
+}
+
+function ConvertTo-MIRAssuranceTimestampText {
+  param([Parameter(Mandatory)]$Value)
+  if ($Value -is [DateTimeOffset] -or $Value -is [DateTime]) {
+    return (ConvertTo-MIRAssuranceDateTimeOffset -Value $Value).ToUniversalTime().ToString("o")
+  }
+  return [string]$Value
+}
+
 function Get-MIRAssuranceRepoRelativePath {
   param([Parameter(Mandatory)][string]$Path)
   $full = if ([IO.Path]::IsPathRooted($Path)) { $Path } else { Join-Path $repo $Path }
@@ -48,16 +67,20 @@ function Get-MIRAssuranceRepoRelativePath {
 }
 
 function Get-MIRAssuranceRepositoryFiles {
+  if ($null -ne $script:MIRAssuranceRepositoryFilesCache) {
+    return @($script:MIRAssuranceRepositoryFilesCache)
+  }
   $files = @(& git -C $repo ls-files)
   if ($LASTEXITCODE -ne 0) { throw "Unable to enumerate tracked repository files." }
   $files += @(& git -C $repo ls-files --others --exclude-standard)
   if ($LASTEXITCODE -ne 0) { throw "Unable to enumerate untracked repository files." }
-  return @(
+  $script:MIRAssuranceRepositoryFilesCache = @(
     $files |
       ForEach-Object { ([string]$_).Replace("\", "/") } |
       Where-Object { $_ } |
       Sort-Object -Unique
   )
+  return @($script:MIRAssuranceRepositoryFilesCache)
 }
 
 function Test-MIRAssurancePathPattern {
@@ -116,13 +139,20 @@ function Get-MIRAssuranceExternalFileFingerprint {
     return [ordered]@{ kind="external-file"; state="missing"; sha256=(Get-MIRAssuranceTextHash -Text "MISSING:$MissingLabel") }
   }
   $item = Get-Item -LiteralPath $Path
-  return [ordered]@{
+  if ($null -eq $script:MIRAssuranceExternalFileFingerprintCache) { $script:MIRAssuranceExternalFileFingerprintCache = @{} }
+  $cacheKey = "$($item.FullName)|$($item.Length)|$($item.LastWriteTimeUtc.Ticks)"
+  if ($script:MIRAssuranceExternalFileFingerprintCache.ContainsKey($cacheKey)) {
+    return $script:MIRAssuranceExternalFileFingerprintCache[$cacheKey]
+  }
+  $fingerprint = [ordered]@{
     kind="external-file"
     state="present"
     name=$item.Name
     size_bytes=$item.Length
     sha256=(Get-MIRAssuranceSha256 -Path $Path)
   }
+  $script:MIRAssuranceExternalFileFingerprintCache[$cacheKey] = $fingerprint
+  return $fingerprint
 }
 
 function Get-MIRAssurancePackageFiles {
@@ -131,8 +161,10 @@ function Get-MIRAssurancePackageFiles {
 }
 
 function Get-MIRAssuranceRunnerHash {
+  if ($script:MIRAssuranceRunnerHashCache) { return $script:MIRAssuranceRunnerHashCache }
   $files = @(Resolve-MIRAssurancePatternFiles -Patterns @("scripts/Invoke-MIRAssurance.ps1", "scripts/MIRAssurance/**"))
-  return Get-MIRAssuranceTreeHash -Paths $files
+  $script:MIRAssuranceRunnerHashCache = Get-MIRAssuranceTreeHash -Paths $files
+  return $script:MIRAssuranceRunnerHashCache
 }
 
 function Get-MIRAssuranceHarnessFiles {
@@ -142,7 +174,10 @@ function Get-MIRAssuranceHarnessFiles {
     ".mir/test-impact.yml",
     ".mir/targets.json",
     ".mir/assurance.json",
-    ".mir/test-catalog.json"
+    "validation/tests.yml",
+    "validation/domains.yml",
+    "validation/profiles/**",
+    "tools/mir_verify/**"
   ))
 }
 
@@ -184,6 +219,7 @@ function Get-MIRAssuranceContext {
   $factorio = Resolve-MIRAssurancePath -Path (Get-MIRAssuranceOption -Name "--factorio" -Default ([string]$env:FACTORIO_BIN))
   $priorRelease = Resolve-MIRAssurancePath -Path (Get-MIRAssuranceOption -Name "--prior" -Default ([string]$env:MIR_PRIOR_RELEASE))
   $seal = Resolve-MIRAssurancePath -Path (Get-MIRAssuranceOption -Name "--seal")
+  $verificationProfile = Get-MIRAssuranceVerificationProfile -Target $target
   return [pscustomobject]@{
     config=$config
     catalog=$catalog
@@ -193,22 +229,31 @@ function Get-MIRAssuranceContext {
     factorio=$factorio
     prior_release=$priorRelease
     seal=$seal
+    verification_profile=$verificationProfile
     reuse_enabled=(-not (Test-MIRAssuranceSwitch -Name "--no-reuse"))
     rerun_tests=@(Get-MIRAssuranceOptionValues -Name "--rerun")
   }
+}
+
+function Write-MIRAssuranceJsonFile {
+  param(
+    [Parameter(Mandatory)]$Value,
+    [Parameter(Mandatory)][string]$Path
+  )
+  $json = $Value | ConvertTo-Json -Depth 40
+  $output = Resolve-MIRAssurancePath -Path $Path
+  $parent = Split-Path -Parent $output
+  if ($parent) { New-Item -ItemType Directory -Force -Path $parent | Out-Null }
+  [IO.File]::WriteAllText($output, $json + "`n", [Text.UTF8Encoding]::new($false))
+  Write-Host "Wrote $output"
+  return $output
 }
 
 function Write-MIRAssuranceJson {
   param([Parameter(Mandatory)]$Value, [string]$DefaultPath = "")
   $json = $Value | ConvertTo-Json -Depth 40
   $output = Get-MIRAssuranceOption -Name "--output" -Default $DefaultPath
-  if ($output) {
-    $output = Resolve-MIRAssurancePath -Path $output
-    $parent = Split-Path -Parent $output
-    if ($parent) { New-Item -ItemType Directory -Force -Path $parent | Out-Null }
-    [IO.File]::WriteAllText($output, $json + "`n", [Text.UTF8Encoding]::new($false))
-    Write-Host "Wrote $output"
-  }
+  if ($output) { $output = Write-MIRAssuranceJsonFile -Value $Value -Path $output }
   if ((Test-MIRAssuranceSwitch -Name "--json") -or -not $output) { $json | Write-Output }
 }
 
@@ -312,9 +357,9 @@ function Get-MIRAssuranceImpactSelection {
   }
   return [ordered]@{
     schema=1
-    scenarios=@($scenarios | Sort-Object -Unique)
-    groups=@($groups | Sort-Object -Unique)
-    tags=@($tags | Sort-Object -Unique)
+    scenarios=@($scenarios | Where-Object { -not [string]::IsNullOrWhiteSpace([string]$_) } | Sort-Object -Unique)
+    groups=@($groups | Where-Object { -not [string]::IsNullOrWhiteSpace([string]$_) } | Sort-Object -Unique)
+    tags=@($tags | Where-Object { -not [string]::IsNullOrWhiteSpace([string]$_) } | Sort-Object -Unique)
     mapped_paths=@($mapped | Sort-Object -Unique)
     unmapped_runtime_paths=@($unmappedRuntimePaths | Sort-Object -Unique)
     requires_full=($unmappedRuntimePaths.Count -gt 0)
@@ -359,13 +404,15 @@ function Get-MIRAssurancePlan {
   $testIds = $orderedTestIds
   $catalogById = @{}
   foreach ($test in $Context.catalog.tests) { $catalogById[[string]$test.id] = $test }
-  $expanded = @()
+  $selectedDefinitions = @()
   foreach ($id in $testIds) {
     if (-not $catalogById.ContainsKey($id)) { throw "Unknown assurance test ID: $id" }
-    $expanded += $catalogById[$id]
+    $selectedDefinitions += $catalogById[$id]
   }
-  return [ordered]@{
-    schema=2
+  $expanded = @(Expand-MIRAssuranceTests -Tests $selectedDefinitions -Context $Context -ImpactSelection $impactSelection)
+  $plan = [ordered]@{
+    schema=3
+    policy_id=[string]$Context.verification_profile.policy_id
     generated_at=(Get-Date).ToUniversalTime().ToString("o")
     target=$Context.target
     profile=$profile
@@ -380,6 +427,12 @@ function Get-MIRAssurancePlan {
     package_source_sha256=(Get-MIRAssuranceTreeHash -Paths (Get-MIRAssurancePackageFiles))
     test_catalog_sha256=(Get-MIRAssuranceSha256 -Path $catalogPath)
     validation_harness_sha256=(Get-MIRAssuranceTreeHash -Paths (Get-MIRAssuranceHarnessFiles))
+    verification_profile_sha256=(Get-MIRAssuranceSha256 -Path (Get-MIRAssuranceVerificationProfilePath -Target $Context.target))
+    domain_policy_sha256=(Get-MIRAssuranceSha256 -Path $domainsPath)
   }
+  if (@($expanded | Where-Object { $_.kind -eq "factorio-scenario" }).Count -gt 0) {
+    $plan["domain_manifest"] = Get-MIRAssuranceDomainManifest -Context $Context -RequireCandidate
+  }
+  return Add-MIRAssurancePlanDecisions -Plan $plan -Context $Context
 }
 

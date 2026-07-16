@@ -19,6 +19,38 @@ test_impact_manifest:
   baseline: exact-package-smoke
   selector: scripts/Invoke-MIRValidation.ps1
 
+verification_manifests:
+  tests:
+    path: validation/tests.yml
+    schema: 2
+    owns:
+      - stable-test-ids
+      - matrix-expansion
+      - factorio-layer
+      - declared-effective-inputs
+  domains:
+    path: validation/domains.yml
+    schema: 1
+    policy: mir-verification-v4
+    owns:
+      - package-domain-hashes
+      - scenario-domain-dependencies
+      - unknown-input-invalidation
+  profiles:
+    root: validation/profiles
+    schema: 1
+    targets:
+      - factorio-2.0
+      - factorio-2.1
+  evidence:
+    schema: 3
+    root: artifacts/assurance/evidence
+    dispositions:
+      - REUSE
+      - WAIT
+      - RUN
+      - INVALID
+
 compiler_contract_coverage:
   path: .mir/compiler-contract-coverage.yml
   schema: 1
@@ -273,6 +305,16 @@ fixtures:
       - native-owner-technology-level-retention
       - native-owner-research-progress-retention
       - exact-3-1-9-candidate-normal-mod-directory-load
+
+  upgrade-3-1-9-to-3-2-0:
+    requires_features: [recipe_productivity]
+    assertion_path: fixtures/assert-upgrade-3-1-9-to-3-2-0
+    validates:
+      - exact-3-1-9-source-archive
+      - native-owner-setting-retention
+      - native-owner-technology-level-retention
+      - native-owner-research-progress-retention
+      - exact-3-2-0-candidate-normal-mod-directory-load
 
   competing-productivity-transaction:
     requires_features: [recipe_productivity]

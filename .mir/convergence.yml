@@ -1,11 +1,11 @@
 schema: 1
 
 release:
-  version: "3.1.9"
+  version: "3.2.0"
   branch: dev
   factorio_version: "2.1"
-  baseline_commit: c8bf4a742910cec9d6d3dee305c83deba1aa49eb
-  baseline_tag: "3.1.5"
+  baseline_commit: 79df29b50ea9b855b8665d6c9a3d8295806acde0
+  baseline_tag: "3.1.9"
   objective: bounded-correctness-and-contract-modernization
   public_contract_change: patch-compatible
 
@@ -146,7 +146,7 @@ superseded_candidates:
     status: superseded-unpublished-candidate
 
 candidate:
-  artifact: dist/more-infinite-research_3.1.9.zip
+  artifact: dist/more-infinite-research_3.2.0.zip
   source_commit: pending
   automated_gate: pending
   manual_gate: pending

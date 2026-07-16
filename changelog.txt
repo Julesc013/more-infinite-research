@@ -1,4 +1,20 @@
 ---------------------------------------------------------------------------------------------------
+Version: 3.2.0
+Date: 2026-07-16
+
+  Changes:
+
+    - Added persistent content-addressed verification evidence with stable per-test and per-scenario identities.
+    - Split exact release-archive identity from gameplay, runtime, migration, settings, balance, and dependency domains.
+    - Added separate locale and asset domains so packaging-only changes do not invalidate unrelated gameplay evidence.
+    - Reused trusted passing evidence only when every declared effective input has the same fingerprint.
+    - Added explicit REUSE, WAIT, RUN, and INVALID planning with matching-worker adoption and non-cancelling concurrency.
+    - Added isolated Factorio scenario workers and one aggregate verification gate for pull requests and release qualification.
+    - Added target-specific verification profiles so Factorio 2.0 backports recalculate their own fingerprints.
+    - Retained the portable target-capability guard that emits mod-data only on Factorio lines that support it.
+    - Preserved stable settings, generated technology IDs, migrations, and runtime-state namespaces from MIR 3.1.9.
+
+---------------------------------------------------------------------------------------------------
 Version: 3.1.9
 Date: 2026-07-14
 

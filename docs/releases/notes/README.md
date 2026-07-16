@@ -14,6 +14,8 @@ superseded_by: []
 
 Player-facing release summaries are grouped here by MIR version. The root `changelog.txt` remains the authoritative detailed change history.
 
+- [3.2.0](release-notes-3.2.0.md)
+- [3.1.9](release-notes-3.1.9.md)
 - [3.0.5](release-notes-3.0.5.md)
 - [3.0.0](release-notes-3.0.0.md)
 - [2.3.0](release-notes-2.3.0.md)

@@ -18,7 +18,88 @@ permissions:
   contents: read
 
 jobs:
-  targeted:
+  plan:
+    name: verification-plan
+    runs-on: [self-hosted, Windows]
+    environment: release-candidate
+    outputs:
+      matrix: ${{ steps.matrix.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.candidate_sha }}
+          fetch-depth: 0
+      - uses: actions/cache/restore@v4
+        with:
+          path: artifacts/assurance/evidence
+          key: mir-ledger-${{ runner.os }}-${{ inputs.target }}-${{ github.run_id }}
+          restore-keys: |
+            mir-ledger-${{ runner.os }}-${{ inputs.target }}-
+      - name: Build exact candidate once
+        shell: pwsh
+        run: ./scripts/mir.ps1 assurance build --target '${{ inputs.target }}'
+      - name: Create impact-selected plan
+        shell: pwsh
+        env:
+          FACTORIO_BIN: ${{ secrets.FACTORIO_BIN }}
+        run: ./scripts/mir.ps1 verify plan --target '${{ inputs.target }}' --baseline '${{ inputs.baseline_sha }}' --profile targeted --factorio $env:FACTORIO_BIN --output out/verification-plan.json
+      - id: matrix
+        shell: pwsh
+        run: |
+          $plan = Get-Content -Raw -LiteralPath out/verification-plan.json | ConvertFrom-Json
+          "matrix=$(@{ include = @($plan.work) } | ConvertTo-Json -Depth 10 -Compress)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mir-targeted-plan-and-candidate
+          path: |
+            out/verification-plan.json
+            dist/*.zip
+          if-no-files-found: error
+
+  tests:
+    name: ${{ matrix.test_id }}
+    needs: plan
+    runs-on: [self-hosted, Windows]
+    environment: release-candidate
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
+    concurrency:
+      group: mir-${{ matrix.safe_test_id }}-${{ matrix.fingerprint }}
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.candidate_sha }}
+          fetch-depth: 0
+      - uses: actions/download-artifact@v4
+        with:
+          name: mir-targeted-plan-and-candidate
+          path: .
+      - uses: actions/cache/restore@v4
+        with:
+          path: artifacts/assurance/evidence
+          key: mir-ledger-${{ runner.os }}-${{ inputs.target }}-${{ github.run_id }}
+          restore-keys: |
+            mir-ledger-${{ runner.os }}-${{ inputs.target }}-
+      - name: Reuse, adopt, or run exact test instance
+        shell: pwsh
+        env:
+          FACTORIO_BIN: ${{ secrets.FACTORIO_BIN }}
+        run: ./scripts/mir.ps1 verify run-one --target '${{ inputs.target }}' --plan out/verification-plan.json --test '${{ matrix.test_id }}' --fingerprint '${{ matrix.fingerprint }}' --factorio $env:FACTORIO_BIN
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mir-targeted-evidence-${{ matrix.safe_test_id }}
+          path: artifacts/assurance/evidence
+          if-no-files-found: warn
+
+  verification-gate:
+    name: verification-gate
+    if: always()
+    needs:
+      - plan
+      - tests
     runs-on: [self-hosted, Windows]
     environment: release-candidate
     steps:
@@ -26,20 +107,39 @@ jobs:
         with:
           ref: ${{ inputs.candidate_sha }}
           fetch-depth: 0
-      - name: Build exact candidate once
-        shell: pwsh
-        run: ./scripts/mir.ps1 assurance build --target '${{ inputs.target }}' --output artifacts/assurance/build.json
-      - name: Create impact-selected plan
-        shell: pwsh
-        run: ./scripts/mir.ps1 assurance plan --target '${{ inputs.target }}' --baseline '${{ inputs.baseline_sha }}' --profile targeted --output artifacts/assurance/plan.json
-      - name: Run selected trusted target gate
+      - uses: actions/download-artifact@v4
+        with:
+          name: mir-targeted-plan-and-candidate
+          path: .
+      - uses: actions/cache/restore@v4
+        with:
+          path: artifacts/assurance/evidence
+          key: mir-ledger-${{ runner.os }}-${{ inputs.target }}-${{ github.run_id }}
+          restore-keys: |
+            mir-ledger-${{ runner.os }}-${{ inputs.target }}-
+      - name: Merge worker evidence
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          pattern: mir-targeted-evidence-*
+          path: artifacts/assurance/evidence
+          merge-multiple: true
+      - name: Aggregate targeted gate
         shell: pwsh
         env:
           FACTORIO_BIN: ${{ secrets.FACTORIO_BIN }}
-        run: ./scripts/mir.ps1 assurance verify --target '${{ inputs.target }}' --baseline '${{ inputs.baseline_sha }}' --profile targeted --factorio $env:FACTORIO_BIN --output artifacts/assurance/verify-summary.json
+        run: ./scripts/mir.ps1 verify gate --target '${{ inputs.target }}' --plan out/verification-plan.json --factorio $env:FACTORIO_BIN --output artifacts/assurance/targeted-summary.json
+      - uses: actions/cache/save@v4
+        if: always()
+        with:
+          path: artifacts/assurance/evidence
+          key: mir-ledger-${{ runner.os }}-${{ inputs.target }}-${{ github.run_id }}
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: assurance-targeted-${{ inputs.target }}-${{ inputs.candidate_sha }}
-          path: artifacts/assurance/**
-          if-no-files-found: error
+          path: |
+            out/verification-plan.json
+            artifacts/assurance/evidence-bundle.json
+            artifacts/assurance/targeted-summary.json
+          if-no-files-found: warn

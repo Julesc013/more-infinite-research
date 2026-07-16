@@ -20,8 +20,9 @@ function Invoke-MIRAssuranceSeal {
     }
   }
   $factorioHash = if ($Context.factorio -and (Test-Path -LiteralPath $Context.factorio -PathType Leaf)) { Get-MIRAssuranceSha256 -Path $Context.factorio } else { "none" }
+  $domainManifest = Get-MIRAssuranceDomainManifest -Context $Context -RequireCandidate
   $seal = [ordered]@{
-    schema=1
+    schema=2
     state="SEALED-RC"
     release_status="NOT RELEASED"
     version=[string]$Context.info.version
@@ -35,8 +36,11 @@ function Invoke-MIRAssuranceSeal {
     candidate=(Get-MIRAssuranceRepoRelativePath -Path $Context.candidate)
     candidate_sha256=(Get-MIRAssuranceSha256 -Path $Context.candidate)
     candidate_content_sha256=(Get-MIRAssuranceZipContentHash -Path $Context.candidate)
+    candidate_domain_manifest_sha256=[string]$domainManifest.manifest_sha256
     package_source_sha256=(Get-MIRAssuranceTreeHash -Paths (Get-MIRAssurancePackageFiles))
     target_profile_sha256=(Get-MIRAssuranceRepositoryFileHash -Path $targetsPath)
+    verification_profile_sha256=(Get-MIRAssuranceSha256 -Path (Get-MIRAssuranceVerificationProfilePath -Target $Context.target))
+    domain_policy_sha256=(Get-MIRAssuranceSha256 -Path $domainsPath)
     test_catalog_sha256=(Get-MIRAssuranceRepositoryFileHash -Path $catalogPath)
     validation_harness_sha256=(Get-MIRAssuranceTreeHash -Paths (Get-MIRAssuranceHarnessFiles))
     factorio_binary=$Context.factorio
@@ -59,8 +63,11 @@ function Invoke-MIRAssuranceCheckSeal {
     candidate_exists=(Test-Path -LiteralPath $candidate -PathType Leaf)
     candidate_sha256=$false
     candidate_content_sha256=$false
+    candidate_domain_manifest_sha256=$false
     package_source_sha256=$false
     target_profile_sha256=$false
+    verification_profile_sha256=$false
+    domain_policy_sha256=$false
     test_catalog_sha256=$false
     validation_harness_sha256=$false
     source_is_ancestor=$false
@@ -69,9 +76,14 @@ function Invoke-MIRAssuranceCheckSeal {
   if ($checks.candidate_exists) {
     $checks.candidate_sha256=((Get-MIRAssuranceSha256 -Path $candidate) -eq [string]$seal.candidate_sha256)
     $checks.candidate_content_sha256=((Get-MIRAssuranceZipContentHash -Path $candidate) -eq [string]$seal.candidate_content_sha256)
+    $sealContext = $Context.PSObject.Copy()
+    $sealContext.candidate = $candidate
+    $checks.candidate_domain_manifest_sha256=([string](Get-MIRAssuranceDomainManifest -Context $sealContext -RequireCandidate).manifest_sha256 -eq [string]$seal.candidate_domain_manifest_sha256)
   }
   $checks.package_source_sha256=((Get-MIRAssuranceTreeHash -Paths (Get-MIRAssurancePackageFiles)) -eq [string]$seal.package_source_sha256)
   $checks.target_profile_sha256=((Get-MIRAssuranceRepositoryFileHash -Path $targetsPath) -eq [string]$seal.target_profile_sha256)
+  $checks.verification_profile_sha256=((Get-MIRAssuranceSha256 -Path (Get-MIRAssuranceVerificationProfilePath -Target $Context.target)) -eq [string]$seal.verification_profile_sha256)
+  $checks.domain_policy_sha256=((Get-MIRAssuranceSha256 -Path $domainsPath) -eq [string]$seal.domain_policy_sha256)
   $checks.test_catalog_sha256=((Get-MIRAssuranceRepositoryFileHash -Path $catalogPath) -eq [string]$seal.test_catalog_sha256)
   $checks.validation_harness_sha256=((Get-MIRAssuranceTreeHash -Paths (Get-MIRAssuranceHarnessFiles)) -eq [string]$seal.validation_harness_sha256)
   & git -C $repo merge-base --is-ancestor ([string]$seal.source_commit) HEAD
@@ -107,6 +119,15 @@ function Invoke-MIRAssuranceSelfTest {
     $changed[$field] = "b"
     if ((Get-MIRAssuranceJsonHash -Value $changed) -eq $base) { throw "Evidence invalidation self-test failed for $field." }
   }
+  $dependencyA = Get-MIRAssuranceDependencyContract -Info ([pscustomobject]@{
+    name="more-infinite-research"; version="3.1.9"; factorio_version="2.1"; dependencies=@("base >= 2.1.8")
+  })
+  $dependencyB = Get-MIRAssuranceDependencyContract -Info ([pscustomobject]@{
+    name="more-infinite-research"; version="3.2.0"; factorio_version="2.1"; dependencies=@("base >= 2.1.8")
+  })
+  if ((Get-MIRAssuranceJsonHash -Value $dependencyA) -ne (Get-MIRAssuranceJsonHash -Value $dependencyB)) {
+    throw "Version-only metadata unexpectedly invalidated the dependency contract."
+  }
 
   $selfTestId = "self-test.synthetic"
   $selfTestKey = Get-MIRAssuranceTextHash -Text ([guid]::NewGuid().ToString("N"))
@@ -122,7 +143,8 @@ function Invoke-MIRAssuranceSelfTest {
     schema=$evidenceSchema
     test_id=$selfTestId
     status="passed"
-    disposition="executed"
+    conclusion="passed"
+    disposition="RUN"
     input_key=$selfTestKey
     fingerprint_sha256=$selfTestKey
     definition_sha256=$fingerprint.definition_sha256
@@ -130,21 +152,45 @@ function Invoke-MIRAssuranceSelfTest {
     command="synthetic"
     resolved_command="synthetic"
     inputs=[ordered]@{}
+    producer=(Get-MIRAssuranceProducer)
+    assertions=@("synthetic")
+    log_digest=(Get-MIRAssuranceTextHash -Text "")
     started_at=(Get-Date).ToUniversalTime().ToString("o")
     completed_at=(Get-Date).ToUniversalTime().ToString("o")
     duration_seconds=0
     message=""
   }
   $null = Write-MIRAssuranceAttempt -Capsule $capsule
-  if ($null -eq (Get-MIRAssuranceReusableEvidence -Fingerprint $fingerprint)) { throw "Passing exact-input evidence was not reusable." }
+  if ($null -eq (Get-MIRAssuranceReusableEvidence -Fingerprint $fingerprint -Context $Context)) { throw "Passing exact-input evidence was not reusable." }
   $paths = Get-MIRAssuranceEvidencePaths -TestId $selfTestId -InputKey $selfTestKey
   [IO.File]::WriteAllText($paths.blocked, "{}`n", [Text.UTF8Encoding]::new($false))
-  if ($null -ne (Get-MIRAssuranceReusableEvidence -Fingerprint $fingerprint)) { throw "Blocked evidence was incorrectly reusable." }
+  if ($null -ne (Get-MIRAssuranceReusableEvidence -Fingerprint $fingerprint -Context $Context)) { throw "Blocked evidence was incorrectly reusable." }
   Remove-Item -LiteralPath $paths.root -Recurse -Force
+
+  $runningKey = Get-MIRAssuranceTextHash -Text ([guid]::NewGuid().ToString("N"))
+  $runningFingerprint = [ordered]@{
+    schema=$evidenceSchema
+    test_id="self-test.running"
+    target=[string]$Context.target
+    input_key=$runningKey
+    fingerprint_sha256=$runningKey
+    definition_sha256=(Get-MIRAssuranceTextHash -Text "running-definition")
+  }
+  $running = Write-MIRAssuranceRunningEvidence -Fingerprint $runningFingerprint -Context $Context
+  if ($null -eq (Get-MIRAssuranceRunningEvidence -Fingerprint $runningFingerprint -Context $Context)) {
+    throw "Matching live worker evidence was not adoptable."
+  }
+  $running.process_id = [int]::MaxValue
+  $runningPaths = Get-MIRAssuranceEvidencePaths -TestId $runningFingerprint.test_id -InputKey $runningFingerprint.input_key
+  [IO.File]::WriteAllText($runningPaths.running, (($running | ConvertTo-Json -Depth 20) + "`n"), [Text.UTF8Encoding]::new($false))
+  if ($null -ne (Get-MIRAssuranceRunningEvidence -Fingerprint $runningFingerprint -Context $Context)) {
+    throw "Dead local worker evidence was incorrectly adoptable."
+  }
+  if (Test-Path -LiteralPath $runningPaths.root) { Remove-Item -LiteralPath $runningPaths.root -Recurse -Force }
 
   $plan = [ordered]@{baseline="abc123"}
   $resolved = Resolve-MIRAssuranceCommandText -Command "./scripts/Invoke-MIRValidation.ps1 -ChangedSince <baseline> -CandidateZip <candidate>" -Context $Context -Plan $plan
   if ($resolved -notmatch "abc123" -or $resolved -match "<baseline>") { throw "Baseline command propagation self-test failed." }
 
-  Write-Host "[ok] MIR assurance classifier, impact escalation, exact-input reuse, blocking, and invalidation tests passed."
+  Write-Host "[ok] MIR assurance classifier, domain invalidation, exact-input reuse, producer trust, blocking, and version-only reuse tests passed."
 }
