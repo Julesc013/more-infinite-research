@@ -41,6 +41,67 @@ local function assert_effect_target_exists(effect, technology_name)
   end
 end
 
+local function missing_recipe_target(effect)
+  if not effect or effect.type ~= "change-recipe-productivity" then return nil end
+  local recipe_name = effect.recipe
+  if type(recipe_name) == "string" and data_raw.prototype("recipe", recipe_name) then return nil end
+  return recipe_name
+end
+
+local function log_pruned_effect(technology_name, recipe_name)
+  if type(log) ~= "function" then return end
+  log("[MIR] pruned dangling change-recipe-productivity effect from "
+    .. tostring(technology_name)
+    .. ": missing recipe "
+    .. tostring(recipe_name))
+end
+
+function S.prune_missing_recipe_effects(technology, technology_name)
+  local effects = technology and technology.effects or {}
+  local kept, removed = {}, {}
+
+  for _, effect in ipairs(effects) do
+    local recipe_name = missing_recipe_target(effect)
+    if recipe_name ~= nil or (effect and effect.type == "change-recipe-productivity" and effect.recipe == nil) then
+      table.insert(removed, tostring(recipe_name))
+      log_pruned_effect(technology_name, recipe_name)
+    else
+      table.insert(kept, effect)
+    end
+  end
+
+  if #removed > 0 then technology.effects = kept end
+  return {
+    pruned_effect_count = #removed,
+    remaining_effect_count = #kept,
+    removed_recipes = removed
+  }
+end
+
+function S.sanitize_registered_technology_effects()
+  local summary = {
+    pruned_effect_count = 0,
+    affected_technology_count = 0,
+    emptied_technology_count = 0
+  }
+
+  for _, name in ipairs(generated_registry.sorted_names()) do
+    local tech = data_raw.technology(name)
+    if tech then
+      local result = S.prune_missing_recipe_effects(tech, name)
+      if result.pruned_effect_count > 0 then
+        summary.pruned_effect_count = summary.pruned_effect_count + result.pruned_effect_count
+        summary.affected_technology_count = summary.affected_technology_count + 1
+        if result.remaining_effect_count == 0 then
+          summary.emptied_technology_count = summary.emptied_technology_count + 1
+        end
+      end
+    end
+  end
+
+  return summary
+end
+
 function S.register_generated_technology(name)
   generated_registry.register(name)
 end

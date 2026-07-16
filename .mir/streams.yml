@@ -17,6 +17,7 @@ rules:
   - release notes mention generated stream changes
   - stream docs describe contracts, not release-specific plans
   - legacy stream-table rows may use stream:<stream_key> targets until exact capability targets are materialized
+  - recipe-productivity effects target finalized recipes; evidenced late recipe removers must run before MIR planning and emission
 
 streams:
   records:

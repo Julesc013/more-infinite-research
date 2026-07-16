@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: modpack-author
 doc_type: explanation
 owner: mir-maintainers
-last_reviewed: 2026-07-10
+last_reviewed: 2026-07-17
 supersedes: []
 superseded_by: []
 ---
@@ -53,7 +53,7 @@ The current maintainer-authorized cadence is tentative but intentional: ship val
 - `ips-require-space-gate` adds an end-game science unlock prerequisite only. `mir-science-pack-ingredient-policy` controls whether generated technologies keep their configured ingredients, add fixed late-game packs, infer missing official or modded progression packs from selected packs, add all official base and Space Age science packs, or add every active lab science pack including compatible modded packs.
 - Recipe matching supports both `recipe.category` and Factorio 2.1 `recipe.categories`, and can match visible item or fluid recipe outputs.
 - Broad breeding discovery excludes incineration suffixes before name matching. Incineration recipes are sinks, even when a longer word contains `culture`.
-- Every MIR-generated recipe-productivity effect must reference an existing recipe when MIR finishes. A dependent late-removal fixture and the Planet Crucible plus Rigor Module exact-archive gate cover the later-mod lifecycle that an internal final pass cannot observe.
+- Every MIR-generated recipe-productivity effect must reference an existing finalized recipe. MIR prunes missing targets before its final assertion, and evidenced mods that remove recipes during `data-final-fixes.lua` receive an explicit ordering edge plus an exact lifecycle fixture.
 - Recipe-productivity generation skips recipe effects already owned by another infinite recipe-productivity technology. In Space Age this prevents parallel MIR technologies for vanilla `processing-unit-productivity`, `low-density-structure-productivity`, `plastic-bar-productivity`, and `rocket-fuel-productivity`.
 - Recipe-productivity ownership is validated by exact recipe ID, not by similar technology icons. Base-only green, red, and blue circuit recipes are MIR-owned; with Space Age enabled, green and red circuits remain MIR-owned while vanilla `processing-unit-productivity` is the single infinite owner for the `processing-unit` recipe.
 - Fluid-output productivity is split by process family, not by every possible fluid name. Multi-output oil-processing recipes are owned by one oil-processing stream; cracking, lubricant, sulfuric acid and acid neutralization, and thruster propellant streams stay separate because they cover narrower conversion families.
@@ -72,7 +72,7 @@ The current maintainer-authorized cadence is tentative but intentional: ship val
 - Recipe-productivity ownership is classified through `prototypes/mir/index/productivity_owners.lua`, so generation, adoption, diagnostics, and known-competitor cleanup use the same owner vocabulary.
 - Compatibility cleanup that removes known competing technologies also removes dangling prerequisite references from remaining technologies.
 - Generic competing recipe-productivity cleanup prepares only known infinite technologies declared by active compatibility profiles whose recipe-productivity effects are all covered by enabled MIR streams with matching productivity `change` values, lab-compatible replacement science, and no other blocking external owner. MIR ignores only those prepared owners during exact-owner filtering and removes them only after generated MIR effects prove the same recipe and `change` replacement. Finite upgrade chains from other mods are left alone unless a future integration models them explicitly.
-- Release metadata declares optional ordering for official DLC mods, with hidden optional ordering for Elevated Rails and Quality. Elevated Rails is hidden because its Rail productivity coverage is opportunistic and should not present Elevated Rails as required or recommended; Quality is hidden so quality module recipes are visible before module productivity is generated without presenting Quality as a required or recommended dependency. Third-party compatibility remains opportunistic and avoids compatibility-mod dependencies.
+- Release metadata declares optional ordering for official DLC mods, with hidden optional ordering for Elevated Rails and Quality. Elevated Rails is hidden because its Rail productivity coverage is opportunistic; Quality is hidden so quality module recipes are visible before module productivity is generated. Space Exploration is also a hidden optional ordering dependency because it removes recipes during `data-final-fixes.lua`; MIR must compile after that finalized recipe set. This startup-integrity edge does not advertise any of those mods as required or recommended and is not a broad Space Exploration support claim. Other third-party compatibility remains opportunistic and avoids compatibility-mod dependencies.
 - Weapon shooting speed overlap handling only removes rocket and cannon-shell speed effects from MIR's generated weapon shooting speed continuation. Finite vanilla weapon shooting speed technologies keep their original rocket and cannon-shell bonuses so tank cannon fire rate is not reduced.
 - `mir-debug-generation-report` can be enabled to capture why each stream or base extension generated or skipped.
 - The generation report also emits parser-friendly `audit schema=1` rows for stream decisions, native modifier overlaps, recipe-owner skips, compatibility planner observations, and recipe-cap warnings.
@@ -373,8 +373,8 @@ Claims must stay precise:
 
 ## Known Limits
 
-- No mod can observe another mod's later `data-final-fixes.lua` mutations unless a user, modpack, or future targeted integration imposes a later load order.
-- A mod that removes a recipe after MIR runs must also avoid or repair dangling third-party technology effects. MIR filters evidenced sink classes and tests known combinations, but it cannot validate mutations that have not happened yet.
+- No mod can observe another mod's later `data-final-fixes.lua` mutations without a load-order edge. MIR adds hidden optional ordering for evidenced late recipe removers such as Space Exploration and requires a lifecycle fixture for each new case.
+- MIR's final safety pass prunes recipe-productivity effects whose targets disappeared before MIR finishes, then asserts every remaining target. A mod that is still ordered after MIR can invalidate prototypes afterward, so newly evidenced cases require metadata ordering rather than a recipe-name exception.
 - Lab validation prevents impossible research ingredients, but it cannot infer every overhaul mod's intended progression.
 - Recipe productivity technologies remain bounded by Factorio's recipe productivity cap even when research levels are infinite.
 - Vanilla Space Age productivity technologies remain authoritative for processing units, low density structures, plastic, and rocket fuel. Where those configured families have additional productivity-allowed recipes that are not exactly owned by another infinite technology, MIR adopts them into the existing vanilla infinite productivity technology instead of generating a parallel MIR technology.
@@ -618,7 +618,7 @@ Expected result: vanilla tank cannon fire rate is preserved while MIR avoids dup
 - Run `rg "icon_mipmaps" prototypes` and confirm generated icons do not add it.
 - Run `.\scripts\Invoke-MIRValidation.ps1 -StaticOnly`.
 - Confirm `changelog.txt` uses Factorio's 99-dash format and one-line bullets at or below 132 characters.
-- Confirm `info.json` declares `base >= 2.1.8`, hidden optional Elevated Rails and Quality ordering, and visible optional Recycler and Space Age ordering dependencies only.
+- Confirm `info.json` declares `base >= 2.1.8`, hidden optional Elevated Rails, Quality, and Space Exploration ordering, and visible optional Recycler and Space Age ordering dependencies only.
 - Confirm package validation reports the expected root, matching metadata, included runtime source, locale, migrations, README, changelog, license, thumbnail, and no forbidden artifacts for the archive built from the current source tree.
 - Confirm package validation reports packaged source and locale parity with the repository.
 - Confirm runtime fixture validation covers both the default `reduce` lab policy and forced `skip` lab policy.

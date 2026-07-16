@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: maintainer
 doc_type: explanation
 owner: mir-maintainers
-last_reviewed: 2026-07-09
+last_reviewed: 2026-07-17
 supersedes: []
 superseded_by: []
 ---
@@ -155,7 +155,7 @@ Generated recipe-productivity streams can set `dynamic_items_from_lab_inputs = t
 
 Fluid-output productivity streams use the same recipe-productivity generator as item streams. They should be split by recipe ownership/process family, not by every output fluid name. Multi-output recipes such as oil processing belong to one owner stream; conversion families such as oil cracking, lubricant, sulfuric acid and acid neutralization, and thruster fuel/oxidizer can be separate streams when their recipes do not overlap.
 
-Direct-effect stream and base-extension generation must pass through `prototypes/mir/emit/effect_safety.lua`. MIR must not add `character-item-pickup-distance` or `character-loot-pickup-distance` effects to any generated technology; large pickup radii can vacuum belt items into the player inventory and cause severe lag. The same final pass verifies that every registered `change-recipe-productivity` effect still names an existing recipe when MIR finishes. Later dependent mods can still mutate prototypes, so classifier policy and dependent final-fixes fixtures must cover evidenced late-removal cases.
+Direct-effect stream and base-extension generation must pass through `prototypes/mir/emit/effect_safety.lua`. MIR must not add `character-item-pickup-distance` or `character-loot-pickup-distance` effects to any generated technology; large pickup radii can vacuum belt items into the player inventory and cause severe lag. The final pass prunes registered `change-recipe-productivity` effects whose recipe target no longer exists, logs the affected technology and recipe, and then asserts every remaining effect. This is a defense against mutations visible before MIR finishes. An evidenced mod that removes recipes in its own `data-final-fixes.lua` must also receive a hidden optional ordering edge so MIR plans against the finalized recipe set; the Space Exploration plus Krastorio copper-cable removal fixture is the reference case.
 
 `mir-pipeline-extent-multiplier` is deliberately not research. It is a startup-only prototype pass in `prototypes/mir/pipeline/extent.lua` because `FluidBox.max_pipeline_extent` is resolved from prototypes during load. The dropdown values and parser live in `prototypes/mir/settings/pipeline_extent.lua`. The pass is loaded only when the parsed startup setting is not `100%`; at the default `100%`, MIR reads the setting gate and does not load the pipeline module, scan `data.raw`, log pipeline work, or mutate fluid boxes.
 

@@ -1221,6 +1221,33 @@
         ]
       },
       {
+        "name": "space-exploration-recipe-removal",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "recipe-target-integrity",
+        "surface": "base",
+        "required_features": [
+          "recipe_productivity"
+        ],
+        "fixtures": [],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 120,
+        "tags": [
+          "base",
+          "full",
+          "recipe-target-integrity",
+          "runtime"
+        ],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
         "name": "runtime-state-contract",
         "target_profile": "2.1",
         "kind": "gate",

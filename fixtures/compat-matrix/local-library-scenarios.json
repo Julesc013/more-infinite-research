@@ -371,6 +371,33 @@
       "notes": "Local Krastorio 2 base stack without Space Age."
     },
     {
+      "name": "local-2-1-krastorio-space-exploration",
+      "targets": [
+        "2.1"
+      ],
+      "kind": "modpack-load",
+      "group": "compatibility-campaign",
+      "setup": {
+        "mode": "local-library",
+        "include_space_age": false,
+        "offline": true,
+        "exact_mir_archive": true
+      },
+      "roots": [
+        "Krastorio2",
+        "space-exploration"
+      ],
+      "settings": {},
+      "expected_plan": {
+        "mode": "load-only",
+        "required_result": "passed",
+        "maximum_dependency_failures": 0
+      },
+      "timeout_seconds": 900,
+      "claim_level": "loads",
+      "notes": "Exact local regression for Space Exploration final recipe removals with Krastorio 2. A pass is a load claim only."
+    },
+    {
       "name": "local-2-1-bob-suite",
       "targets": [
         "2.1"

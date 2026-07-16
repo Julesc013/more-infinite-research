@@ -106,6 +106,19 @@ real_mod_gates:
     status: required
 
 fixtures:
+  space-exploration-recipe-removal:
+    requires_features: [recipe_productivity]
+    path: fixtures/space-exploration-recipe-removal
+    assertion_path: fixtures/assert-final-recipe-effect-integrity
+    external_mod_identity: space-exploration
+    validates:
+      - space-exploration-final-fixes-runs-before-mir
+      - krastorio-copper-cable-removal-reproduction
+      - removed-recipe-not-emitted-as-productivity-effect
+      - every-final-recipe-productivity-effect-target-exists
+      - valid-base-copper-cable-productivity-retained
+      - final-dangling-effect-pruning-contract
+
   rigor-late-recipe-removal:
     requires_features: [recipe_productivity]
     path: fixtures/rigor-late-recipe-removal
@@ -364,6 +377,7 @@ fixtures:
     requires_features: []
     path: fixtures/better-robots-extended-competitor
     assertion_path: fixtures/assert-base-competitor-transaction
+    external_mod_identity: Better_Robots_Extended
     validates:
       - base-competitor-rollback
       - technology-prerequisite-rewire

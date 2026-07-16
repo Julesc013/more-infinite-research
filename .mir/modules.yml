@@ -231,6 +231,7 @@ mutation_commands:
     - mutation commands may change existing prototypes only through their listed implementation
     - CompilationPlan schema 2 globally finalizes stream adoption and base-extension operations before emission
     - output validation compares numeric effects technology shape and generated-registry identity
+    - final technology safety prunes missing recipe-productivity targets before asserting the remaining effects
     - reviewed compatibility data cannot override hard prototype safety facts
     - exact-version compatibility repairs remain separately bounded
   ids:

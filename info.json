@@ -10,6 +10,7 @@
     "(?) elevated-rails",
     "? recycler >= 2.1.8",
     "(?) quality",
+    "(?) space-exploration",
     "? space-age >= 2.1.8"
   ]
 }

@@ -5,13 +5,13 @@ applies_to: "3.0.0+"
 audience: developer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-07-10
+last_reviewed: 2026-07-17
 supersedes: []
 superseded_by: []
 ---
 # API Proof Points
 
-Updated: 2026-07-10
+Updated: 2026-07-17
 
 This ledger records API claims that affect release planning. Use it to avoid turning Reddit ideas or memory into implementation assumptions.
 
@@ -33,6 +33,7 @@ Latest official API docs checked on 2026-07-06: `2.1.9`. Local runtime validatio
 | Base game locale does not provide every generated shooting-speed modifier string MIR needs | Local Factorio `2.1.8` base and Space Age locale files | Verified | MIR ships `flamethrower`, `electric`, and `tesla` shooting speed modifier descriptions |
 | Hidden optional dependencies use the `(?)` prefix and affect load order | Factorio mod structure docs | Verified | The main line declares `(?) quality` so module productivity can see Quality module recipes when Quality is active without adding a separate version gate |
 | Hidden optional official DLC dependencies can stay out of the user-facing optional list when support is opportunistic | Factorio mod structure docs plus local metadata validation | Verified | The main line declares `(?) elevated-rails` without a separate version gate; Rail productivity covers Elevated Rails support/ramp recipes when those prototypes are active |
+| Space Exploration `0.7.57` deletes `kr-copper-cable-from-copper-ore` during `data-final-fixes.lua` when Krastorio 2 compatibility is active | Local `space-exploration_0.7.57.zip` source plus the `space-exploration-recipe-removal` lifecycle fixture | Locally proven | The main line declares `(?) space-exploration` so MIR plans and emits only after Space Exploration finalizes recipe removals; this is startup-integrity ordering, not a broad support claim |
 | Quality module quality chance is stored on `ModulePrototype.effect.quality` | Factorio `ModulePrototype` and `Effect` docs plus local Quality prototypes | Verified | Quality module enrichment is prototype-stage, not a native infinite technology modifier |
 | Omega Drill style content adds the Omega Drill and Space Age Omega-Tau | Factorio mod portal page plus validation fixture | Locally covered by fixture | Mining drill productivity covers `omega-drill`, `omega-tau`, and broader visible modded drill recipe outputs |
 | Vanilla Space Age has infinite `processing-unit-productivity` | Local Factorio `2.1.8` Space Age prototypes | Verified | MIR skips parallel processing unit productivity in Space Age |

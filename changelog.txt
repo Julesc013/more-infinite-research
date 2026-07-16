@@ -1,6 +1,6 @@
 ---------------------------------------------------------------------------------------------------
 Version: 3.2.0
-Date: 2026-07-16
+Date: 2026-07-17
 
   Changes:
 
@@ -13,6 +13,12 @@ Date: 2026-07-16
     - Added target-specific verification profiles so Factorio 2.0 backports recalculate their own fingerprints.
     - Retained the portable target-capability guard that emits mod-data only on Factorio lines that support it.
     - Preserved stable settings, generated technology IDs, migrations, and runtime-state namespaces from MIR 3.1.9.
+
+  Bugfixes:
+
+    - Ordered MIR after Space Exploration so its final Krastorio recipe removals happen before productivity compilation.
+    - Pruned missing recipe-productivity targets before the final safety check to prevent dangling startup references.
+    - Added a regression for the removed kr-copper-cable-from-copper-ore recipe and retained base copper cable coverage.
 
 ---------------------------------------------------------------------------------------------------
 Version: 3.1.9

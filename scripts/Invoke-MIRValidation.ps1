@@ -237,6 +237,7 @@ Invoke-RepoCheck "release metadata matches Factorio line" {
       "(?) elevated-rails",
       "? recycler >= 2.1.8",
       "(?) quality",
+      "(?) space-exploration",
       "? space-age >= 2.1.8"
     )
     foreach ($requiredDep in $requiredDeps) {
@@ -250,7 +251,10 @@ Invoke-RepoCheck "release metadata matches Factorio line" {
     if ($deps | Where-Object { $_ -match "^\?\s+quality(\s|$)" }) {
       throw "Quality must be a hidden optional dependency so module productivity can see quality module recipes without advertising a visible dependency."
     }
-    $hiddenVersionFloors = @($deps | Where-Object { $_ -match "^\(\?\)\s+(elevated-rails|quality)\s+>=\s*2\.1" })
+    if ($deps | Where-Object { $_ -match "^\?\s+space-exploration(\s|$)" }) {
+      throw "Space Exploration must be a hidden optional dependency so its final recipe removals run before MIR without advertising broad support."
+    }
+    $hiddenVersionFloors = @($deps | Where-Object { $_ -match "^\(\?\)\s+(elevated-rails|quality|space-exploration)\s+>=" })
     if ($hiddenVersionFloors.Count -gt 0) {
       throw "Hidden optional dependency version floors should not gate graceful degradation: $($hiddenVersionFloors -join ', ')"
     }
@@ -443,6 +447,7 @@ Invoke-RepoCheck "unsafe pickup reach technology effects are blocked" {
     @{ File = "prototypes\mir\emit\base_extensions.lua"; Text = $baseExtensionsText; Snippet = 'effect_safety.assert_effects_allowed(desired_effects, "base extension " .. key)' },
     @{ File = "prototypes\mir\emit\base_extensions.lua"; Text = $baseExtensionsText; Snippet = 'generated_registry.register(operation.technology_name,' },
     @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'require("prototypes.mir.emit.effect_safety").assert_registered_technology_effects()' },
+    @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'require("prototypes.mir.emit.effect_safety").sanitize_registered_technology_effects()' },
     @{ File = "prototypes\mir\emit\effect_safety.lua"; Text = $safetyText; Snippet = 'data_raw.prototype("recipe", recipe_name)' },
     @{ File = "prototypes\mir\emit\technology_graph_safety.lua"; Text = $graphSafetyText; Snippet = 'generated_registry.sorted_names()' },
     @{ File = "prototypes\mir\emit\technology_graph_safety.lua"; Text = $graphSafetyText; Snippet = 'technology.enabled == false' },
@@ -553,10 +558,15 @@ Invoke-RepoCheck "fixture mods have metadata and data entrypoints" {
     }
 
     $info = Get-Content -Raw -LiteralPath $infoPath | ConvertFrom-Json
-    $allowedExternalIdentityFixtures = @("Better_Robots_Extended")
+    $externalIdentityFixtures = @{
+      "better-robots-extended-competitor" = "Better_Robots_Extended"
+      "space-exploration-recipe-removal" = "space-exploration"
+    }
+    $allowedExternalIdentity = $externalIdentityFixtures.ContainsKey($fixture.Name) -and
+      $externalIdentityFixtures[$fixture.Name] -eq $info.name
     if ([string]::IsNullOrWhiteSpace($info.name) -or
-      ($info.name -notmatch "^mir-fixture-" -and $info.name -notin $allowedExternalIdentityFixtures)) {
-      throw "Fixture info.json must declare a mir-fixture-* name: $infoPath"
+      ($info.name -notmatch "^mir-fixture-" -and -not $allowedExternalIdentity)) {
+      throw "Fixture info.json must declare a mir-fixture-* name or an explicitly mapped upstream identity: $infoPath"
     }
     if ($info.factorio_version -ne $repoInfo.factorio_version) {
       if ($isReducedLegacyLine) { continue }
@@ -652,6 +662,8 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
   $generatedPrerequisiteRuntimeText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-generated-prerequisite-safety\control.lua")
   $lateRecipeRemovalFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\rigor-late-recipe-removal\data-final-fixes.lua")
   $lateRecipeRemovalDataText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\rigor-late-recipe-removal\data.lua")
+  $spaceExplorationRemovalFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\space-exploration-recipe-removal\data-final-fixes.lua")
+  $finalRecipeEffectFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-final-recipe-effect-integrity\data-final-fixes.lua")
   $fluidProductivityFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-fluid-productivity\data-final-fixes.lua")
   $pipelineExtentFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-pipeline-extent\data-final-fixes.lua")
   $betterBotBatteryFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-better-bot-battery-skip\data-final-fixes.lua")
@@ -855,6 +867,10 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "fixtures\rigor-late-recipe-removal\data-final-fixes.lua"; Text = $lateRecipeRemovalFixtureText; Snippet = 'microculture-vat-breeding' },
     @{ File = "fixtures\rigor-late-recipe-removal\data-final-fixes.lua"; Text = $lateRecipeRemovalFixtureText; Snippet = 'example-culture-incinerate' },
     @{ File = "fixtures\rigor-late-recipe-removal\data.lua"; Text = $lateRecipeRemovalDataText; Snippet = 'mir-fixture-normal-crafting' },
+    @{ File = "fixtures\space-exploration-recipe-removal\data-final-fixes.lua"; Text = $spaceExplorationRemovalFixtureText; Snippet = 'kr-copper-cable-from-copper-ore' },
+    @{ File = "fixtures\space-exploration-recipe-removal\data-final-fixes.lua"; Text = $spaceExplorationRemovalFixtureText; Snippet = 'MIR loaded before Space Exploration finalized its recipe removals' },
+    @{ File = "fixtures\assert-final-recipe-effect-integrity\data-final-fixes.lua"; Text = $finalRecipeEffectFixtureText; Snippet = 'references missing recipe' },
+    @{ File = "fixtures\assert-final-recipe-effect-integrity\data-final-fixes.lua"; Text = $finalRecipeEffectFixtureText; Snippet = 'valid base copper cable productivity was not retained' },
     @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'mir-use-installed-space-age-icons' },
     @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'assert_tech_uses_icon_path("recipe-prod-research_electric_shooting_speed-1", "__space-age__/graphics/technology/electric-weapons-damage.png")' },
     @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'assert_tech_uses_item_icon("recipe-prod-research_heavy_ammo-1", "cannon-shell")' },
@@ -1433,6 +1449,7 @@ Invoke-RepoCheck "compat audit automation tooling is wired" {
     @{ File = "fixtures\compat-matrix\manual-scenarios.json"; Text = $manualScenariosText; Snippet = '"include_space_age"' },
     @{ File = "fixtures\compat-matrix\local-library-scenarios.json"; Text = $localLibraryScenariosText; Snippet = '"local-2-1-space-age-mega-smash"' },
     @{ File = "fixtures\compat-matrix\local-library-scenarios.json"; Text = $localLibraryScenariosText; Snippet = '"local-2-1-bz-suite-space-age"' },
+    @{ File = "fixtures\compat-matrix\local-library-scenarios.json"; Text = $localLibraryScenariosText; Snippet = '"local-2-1-krastorio-space-exploration"' },
     @{ File = "fixtures\compat-matrix\local-library-scenarios.json"; Text = $localLibraryScenariosText; Snippet = '"local-2-1-planet-pack-wrapper-full"' },
     @{ File = "fixtures\compat-matrix\local-library-scenarios-2.0.json"; Text = $localLibraryScenarios20Text; Snippet = '"local-2-0-base-baseline"' },
     @{ File = "fixtures\compat-matrix\local-library-scenarios-2.0.json"; Text = $localLibraryScenarios20Text; Snippet = '"local-2-0-bob-angels"' },
@@ -2323,6 +2340,7 @@ $postMirAssertionFixtures = @(
   "mir-fixture-assert-synthetic-scale-graph",
   "mir-fixture-assert-generation-integrity",
   "mir-fixture-assert-generated-prerequisite-safety",
+  "mir-fixture-assert-final-recipe-effect-integrity",
   "mir-fixture-external-technology-cycle",
   "mir-fixture-rigor-late-recipe-removal",
   "mir-fixture-assert-hidden-setting-readability",
@@ -3640,6 +3658,11 @@ Invoke-RuntimeScenario -ScenarioName "external-technology-cycle" -EnabledFixture
 
 Invoke-RuntimeScenario -ScenarioName "rigor-late-recipe-removal" -EnabledFixtureNames @(
   "mir-fixture-rigor-late-recipe-removal"
+)
+
+Invoke-RuntimeScenario -ScenarioName "space-exploration-recipe-removal" -EnabledFixtureNames @(
+  "space-exploration",
+  "mir-fixture-assert-final-recipe-effect-integrity"
 )
 
 Invoke-RuntimeScenario -ScenarioName "base-fluid-productivity" -EnabledFixtureNames @(

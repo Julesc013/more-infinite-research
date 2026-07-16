@@ -10,6 +10,7 @@ local generation_plan = require("__more-infinite-research__.prototypes.mir.plann
 local compilation_plan = require("__more-infinite-research__.prototypes.mir.planner.compilation_plan")
 local output_validator = require("__more-infinite-research__.prototypes.mir.planner.output_validator")
 local effect_ownership = require("__more-infinite-research__.prototypes.mir.planner.effect_ownership")
+local effect_safety = require("__more-infinite-research__.prototypes.mir.emit.effect_safety")
 local automatic_compiler_contract = require("__more-infinite-research__.prototypes.mir.settings.automatic_compiler_contract")
 local native_owner_cost_model = require("__more-infinite-research__.prototypes.mir.domain.native_owner.cost_model")
 
@@ -512,6 +513,23 @@ expect_error("base extension output parity", "prerequisites differs", function()
     "base-parity-test"
   )
 end)
+
+local dangling_effect_candidate = {
+  effects = {
+    {type = "change-recipe-productivity", recipe = "iron-gear-wheel", change = 0.01},
+    {type = "change-recipe-productivity", recipe = "mir-fixture-definitely-missing-recipe", change = 0.01}
+  }
+}
+local dangling_effect_result = effect_safety.prune_missing_recipe_effects(
+  dangling_effect_candidate,
+  "compiler-contract-dangling-effect")
+if dangling_effect_result.pruned_effect_count ~= 1
+  or dangling_effect_result.remaining_effect_count ~= 1
+  or dangling_effect_candidate.effects[1].recipe ~= "iron-gear-wheel"
+then
+  fail("final effect safety did not prune only the missing recipe-productivity target")
+end
+effect_safety.assert_effects_allowed(dangling_effect_candidate.effects, "compiler-contract-dangling-effect")
 
 if fingerprint.of({b = 2, a = 1}) ~= fingerprint.of({a = 1, b = 2}) then fail("map fingerprint is iteration-order dependent") end
 local cyclic = {}; cyclic.self = cyclic
