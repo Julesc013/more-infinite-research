@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "canonical_version": "3.2.0",
-  "canonical_anchor": "90a0abd7d18ae1412bb5bf12c7141e0d8fe4b81e",
+  "canonical_anchor": "e6d43ae18991ccc6abe8eb215ee2b684376a21fe",
   "canonical_package_source_commit": "bd828d1d21a1038abbc9f0ecbf2c1036e744180d",
   "canonical_package_source_sha256": "81E4075AC3F3B275AA344553E0AF1B6730A997DA0FCFED7F436152CC6B563F41",
   "projection_schema": 1,

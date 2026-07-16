@@ -7,7 +7,7 @@ release:
   baseline_commit: 7e4b6c530cfcc5b2e1429c4e9f4ccb0d6d3b42a4
   baseline_tag: "2.4.5"
   canonical_source_version: "3.2.0"
-  canonical_source_commit: 90a0abd7d18ae1412bb5bf12c7141e0d8fe4b81e
+  canonical_source_commit: e6d43ae18991ccc6abe8eb215ee2b684376a21fe
   canonical_package_source_commit: bd828d1d21a1038abbc9f0ecbf2c1036e744180d
   source_lock: .mir/backport-source-lock.json
   objective: target-port-behavioral-subset
