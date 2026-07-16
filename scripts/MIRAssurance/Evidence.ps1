@@ -329,6 +329,12 @@ function Get-MIRAssuranceEvidenceDecision {
     [Parameter(Mandatory)]$Context,
     [Parameter(Mandatory)][string]$TestId
   )
+  if (@($Context.rerun_tests | Where-Object { $_ -eq $TestId }).Count -gt 0) {
+    return [ordered]@{disposition="RUN"; reason="explicit-rerun"}
+  }
+  if (-not [bool]$Context.reuse_enabled) {
+    return [ordered]@{disposition="RUN"; reason="reuse-disabled"}
+  }
   if (Test-MIRAssuranceCanReuseTest -TestId $TestId -Context $Context) {
     $reused = Get-MIRAssuranceReusableEvidence -Fingerprint $Fingerprint -Context $Context
     if ($null -ne $reused) {
@@ -343,7 +349,7 @@ function Get-MIRAssuranceEvidenceDecision {
   if ((Test-Path -LiteralPath $paths.passed -PathType Leaf) -or (Test-Path -LiteralPath $paths.blocked -PathType Leaf)) {
     return [ordered]@{disposition="INVALID"; reason="stored-evidence-is-not-a-trusted-exact-pass"}
   }
-  return [ordered]@{disposition="RUN"; reason=if ($Context.reuse_enabled) { "no-exact-evidence" } else { "reuse-disabled" }}
+  return [ordered]@{disposition="RUN"; reason="no-exact-evidence"}
 }
 
 function Write-MIRAssuranceRunningEvidence {
