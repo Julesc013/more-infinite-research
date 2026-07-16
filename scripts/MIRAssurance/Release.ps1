@@ -165,6 +165,26 @@ function Invoke-MIRAssuranceSelfTest {
   $paths = Get-MIRAssuranceEvidencePaths -TestId $selfTestId -InputKey $selfTestKey
   [IO.File]::WriteAllText($paths.blocked, "{}`n", [Text.UTF8Encoding]::new($false))
   if ($null -ne (Get-MIRAssuranceReusableEvidence -Fingerprint $fingerprint -Context $Context)) { throw "Blocked evidence was incorrectly reusable." }
+  $blockedDecision = Get-MIRAssuranceEvidenceDecision -Fingerprint $fingerprint -Context $Context -TestId $selfTestId
+  if ($blockedDecision.disposition -ne "INVALID") { throw "Blocked evidence did not invalidate ordinary reuse." }
+  $originalRerunTests = @($Context.rerun_tests)
+  $originalReuseEnabled = [bool]$Context.reuse_enabled
+  try {
+    $Context.rerun_tests = @($selfTestId)
+    $rerunDecision = Get-MIRAssuranceEvidenceDecision -Fingerprint $fingerprint -Context $Context -TestId $selfTestId
+    if ($rerunDecision.disposition -ne "RUN" -or $rerunDecision.reason -ne "explicit-rerun") {
+      throw "Explicit rerun did not schedule fresh evidence."
+    }
+    $Context.rerun_tests = @()
+    $Context.reuse_enabled = $false
+    $noReuseDecision = Get-MIRAssuranceEvidenceDecision -Fingerprint $fingerprint -Context $Context -TestId $selfTestId
+    if ($noReuseDecision.disposition -ne "RUN" -or $noReuseDecision.reason -ne "reuse-disabled") {
+      throw "Reuse-disabled planning did not schedule fresh evidence."
+    }
+  } finally {
+    $Context.rerun_tests = $originalRerunTests
+    $Context.reuse_enabled = $originalReuseEnabled
+  }
   Remove-Item -LiteralPath $paths.root -Recurse -Force
 
   $runningKey = Get-MIRAssuranceTextHash -Text ([guid]::NewGuid().ToString("N"))
