@@ -22,8 +22,10 @@ Assert-MIRText "prototypes\mir\families\registry.lua" "FamilyRule registry schem
 Assert-MIRText "prototypes\mir\providers\contract.lua" "M.schema = 1"
 Assert-MIRText "prototypes\mir\providers\contract.lua" "Duplicate CompilerProvider id"
 Assert-MIRText "prototypes\mir\compatibility\packs\schema.lua" "CompatibilityPack schema must be 2"
+Assert-MIRText "prototypes\mir\domain\technology\technology_design.lua" "TechnologyDesign schema 1 record is required"
 Assert-MIRText "prototypes\mir\planner\generation_plan.lua" "GenerationPlan row schema must be 3"
 Assert-MIRText "prototypes\mir\planner\compilation_plan.lua" "schema = 2"
+Assert-MIRText "prototypes\mir\emit\mod_data.lua" "more-infinite-research.compiler-evidence"
 Assert-MIRText "prototypes\mir\settings\effect_contracts.lua" 'require("prototypes.mir.domain.effects.metadata")'
 
 $authorityTable = Read-MIRText "docs\reference\compiler-authority-table.md"
@@ -34,8 +36,10 @@ foreach ($row in @(
   "| FamilyRule | 2 |",
   "| CompilerProvider | 1 |",
   "| CompatibilityPack | 2 |",
+  "| TechnologyDesign | 1 |",
   "| GenerationPlan | 3 |",
   "| CompilationPlan | 2 |",
+  "| CompilerEvidence | 1 |",
   "| RecipeFactV2 | 2 |",
   "| Runtime scenario declaration | 3 |",
   "| Campaign scenario declaration | 2 |"
@@ -48,6 +52,8 @@ foreach ($docCheck in @(
   @{Path="docs\reference\schemas\compiler-provider.md"; Needle='`CompilerProvider` schema 1'},
   @{Path="docs\reference\schemas\compatibility-pack.md"; Needle='schema-2 `CompatibilityPack`'},
   @{Path="docs\reference\schemas\generation-plan.md"; Needle="schema 3"},
+  @{Path="docs\reference\schemas\technology-design.md"; Needle='`TechnologyDesign` schema 1'},
+  @{Path="docs\reference\schemas\compiler-evidence.md"; Needle='`CompilerEvidence` schema 1'},
   @{Path="docs\reference\schemas\recipe-fact-v2.md"; Needle="schema-2"},
   @{Path="docs\reference\schemas\scenario-manifest.md"; Needle="schema 3"}
 )) {

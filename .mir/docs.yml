@@ -107,6 +107,13 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - compatibility-compiler-charter
+  - path: docs/releases/3.2.0-technology-design-foundations-report.md
+    title: "3.2.0 Technology Design Foundations Report"
+    status: current
+    audience: maintainer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for: []
   - path: docs/architecture/module-boundaries.md
     title: "MIR 3.0.0 Repository Structure"
     status: current
@@ -154,6 +161,22 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - generation-plan-schema
+  - path: docs/reference/schemas/technology-design.md
+    title: "TechnologyDesign Schema"
+    status: current
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - technology-design-schema
+  - path: docs/reference/schemas/compiler-evidence.md
+    title: "CompilerEvidence Schema"
+    status: current
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - compiler-evidence-schema
   - path: docs/reference/schemas/recipe-fact-v2.md
     title: "RecipeFactV2 And Relationship Indexes"
     status: current

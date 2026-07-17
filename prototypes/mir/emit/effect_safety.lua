@@ -59,13 +59,15 @@ local function log_pruned_effect(technology_name, effect, reason, owner)
 end
 
 function S.sanitize_effects(effects, context, owner)
-  local kept, removed = {}, {}
-  for _, effect in ipairs(effects or {}) do
+  local kept, removed, retained_effect_order = {}, {}, {}
+  for effect_index, effect in ipairs(effects or {}) do
     local valid, reason, target = effect_contracts.target_status(effect)
     if valid then
       table.insert(kept, effect)
+      table.insert(retained_effect_order, effect_index)
     else
       table.insert(removed, {
+        original_effect_index = effect_index,
         type = effect and effect.type,
         target = target,
         reason = reason
@@ -75,7 +77,7 @@ function S.sanitize_effects(effects, context, owner)
       telemetry.witness("pruned_effects", tostring(context) .. ":" .. tostring(effect and effect.type) .. ":" .. tostring(target))
     end
   end
-  return kept, removed
+  return kept, removed, retained_effect_order
 end
 
 function S.prune_missing_recipe_effects(technology, technology_name)
@@ -123,27 +125,49 @@ function S.sanitize_registered_technology_effects()
   return summary
 end
 
-function S.sanitize_all_technology_effects()
+local function owner_record(name)
+  if generated_registry.contains(name) then
+    return "generated", "more-infinite-research", true
+  end
+  return "external", "<unknown>", false
+end
+
+function S.sanitize_all_technology_effects(options)
+  options = options or {}
   local summary = {
+    schema = 1,
+    pass = options.pass or "unspecified",
     pruned_effect_count = 0,
     affected_technology_count = 0,
     generated_technology_count = 0,
     external_technology_count = 0,
-    emptied_technology_count = 0
+    emptied_technology_count = 0,
+    technologies = {}
   }
   local names = {}
   for name, _ in pairs(data_raw.prototypes("technology")) do table.insert(names, name) end
   table.sort(names)
   for _, name in ipairs(names) do
     local technology = data_raw.technology(name)
-    local owner = generated_registry.contains(name) and "generated" or "external"
-    local kept, removed = S.sanitize_effects((technology and technology.effects) or {}, name, owner)
+    local owner, owning_mod, owning_mod_known = owner_record(name)
+    local original_effect_count = #((technology and technology.effects) or {})
+    local kept, removed, retained_effect_order = S.sanitize_effects(
+      (technology and technology.effects) or {}, name, owner)
     if #removed > 0 then
       technology.effects = kept
       summary.pruned_effect_count = summary.pruned_effect_count + #removed
       summary.affected_technology_count = summary.affected_technology_count + 1
       summary[owner .. "_technology_count"] = summary[owner .. "_technology_count"] + 1
       if #kept == 0 then summary.emptied_technology_count = summary.emptied_technology_count + 1 end
+      table.insert(summary.technologies, {
+        original_technology = name,
+        original_effect_count = original_effect_count,
+        owner_kind = owner,
+        owning_mod = owning_mod,
+        owning_mod_known = owning_mod_known,
+        removed_effects = removed,
+        retained_effect_order = retained_effect_order
+      })
     end
   end
   return summary

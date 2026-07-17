@@ -13,6 +13,8 @@ local effect_ownership = require("__more-infinite-research__.prototypes.mir.plan
 local effect_safety = require("__more-infinite-research__.prototypes.mir.emit.effect_safety")
 local automatic_compiler_contract = require("__more-infinite-research__.prototypes.mir.settings.automatic_compiler_contract")
 local native_owner_cost_model = require("__more-infinite-research__.prototypes.mir.domain.native_owner.cost_model")
+local technology_design = require("__more-infinite-research__.prototypes.mir.domain.technology.technology_design")
+local pipeline_commands = require("__more-infinite-research__.prototypes.mir.pipeline.commands")
 
 local function fail(message)
   error("MIR compiler contract validation failed: " .. message)
@@ -364,6 +366,28 @@ local function emitted_row(stream_key, technology_name, recipe_name)
   return row
 end
 
+local design_row = emitted_row("technology-design-contract", "technology-design-contract-tech")
+design_row.source = "fixed-stream"
+design_row.spec = {manifest_id = "technology-design-contract", migration_policy = "stable"}
+local normalized_design = technology_design.from_generation_row(design_row)
+local normalized_shape = technology_design.prototype_shape(normalized_design)
+if normalized_design.schema ~= 1
+  or normalized_design.candidate_id ~= "mir-candidate/recipe-productivity/technology-design-contract"
+  or normalized_design.technology_id ~= "technology-design-contract-tech"
+  or normalized_design.design.identity.locked ~= true
+  or normalized_design.design.progression.locked ~= false
+  or normalized_design.provenance.fields["identity.technology_id"].locked ~= true
+  or normalized_design.provenance.fields["presentation.icons"].locked ~= false
+  or normalized_shape.effects[1].recipe ~= "iron-gear-wheel"
+  or normalized_shape.unit.count_formula ~= "100"
+then
+  fail("TechnologyDesign did not preserve normalized fixed-stream semantics and independent field locks")
+end
+if normalized_design.semantic_fingerprint
+  ~= technology_design.from_generation_row(design_row).semantic_fingerprint then
+  fail("TechnologyDesign semantic fingerprint is not deterministic")
+end
+
 local function native_owner_row(stream_key, owner, recipe)
   local row = emitted_row(stream_key, "unused")
   local input = {
@@ -503,6 +527,15 @@ if #missing_prerequisite_plan.operations ~= 0
     ~= "prerequisite_missing" then
   fail("CompilationPlan did not withhold and classify a missing-prerequisite operation")
 end
+local missing_rejection = missing_prerequisite_plan.validation_summary.technology_graph
+  .rejected["missing-prerequisite-tech"]
+local saw_research_mechanism = false
+for _, reason in ipairs(missing_rejection.contributing or {}) do
+  if reason.code == "research_mechanism_missing" then saw_research_mechanism = true end
+end
+if missing_rejection.primary.code ~= "prerequisite_missing" or not saw_research_mechanism then
+  fail("semantic rejection priority did not preserve the subordinate research mechanism reason")
+end
 
 expect_error("output effect numeric parity", "numeric effect value differs", function()
   output_validator.assert_effects(
@@ -528,7 +561,7 @@ local cyclic_plan = compilation_plan.finalize(generation_plan.new():finalize(), 
       technology = {
         name = "mir-planned-cycle-a",
         effects = {{type = "nothing"}},
-        prerequisites = {"mir-planned-cycle-b"},
+        prerequisites = {"mir-planned-cycle-c"},
         unit = {ingredients = {{"automation-science-pack", 1}}, count_formula = "1", time = 1},
         max_level = "infinite"
       }
@@ -544,15 +577,55 @@ local cyclic_plan = compilation_plan.finalize(generation_plan.new():finalize(), 
         unit = {ingredients = {{"automation-science-pack", 1}}, count_formula = "1", time = 1},
         max_level = "infinite"
       }
+    },
+    {
+      operation = "emit_base_extension",
+      key = "cycle-c",
+      technology_name = "mir-planned-cycle-c",
+      technology = {
+        name = "mir-planned-cycle-c",
+        effects = {{type = "nothing"}},
+        prerequisites = {"mir-planned-cycle-b"},
+        unit = {ingredients = {{"automation-science-pack", 1}}, count_formula = "1", time = 1},
+        max_level = "infinite"
+      }
     }
   })
 if #cyclic_plan.operations ~= 0
-  or cyclic_plan.validation_summary.technology_graph.rejected_planned_technology_count ~= 2
+  or cyclic_plan.validation_summary.technology_graph.rejected_planned_technology_count ~= 3
   or cyclic_plan.validation_summary.technology_graph.rejected["mir-planned-cycle-a"].code
     ~= "prerequisite_mir_cycle"
   or cyclic_plan.validation_summary.technology_graph.rejected["mir-planned-cycle-b"].code
+    ~= "prerequisite_mir_cycle"
+  or cyclic_plan.validation_summary.technology_graph.rejected["mir-planned-cycle-c"].code
     ~= "prerequisite_mir_cycle" then
   fail("CompilationPlan did not withhold and classify the planned prerequisite SCC")
+end
+local component = cyclic_plan.validation_summary.technology_graph.cyclic_components[1]
+local witness = component and component.actual_cycle_witness or {}
+local actual_edges = {
+  ["mir-planned-cycle-a\0mir-planned-cycle-c"] = true,
+  ["mir-planned-cycle-c\0mir-planned-cycle-b"] = true,
+  ["mir-planned-cycle-b\0mir-planned-cycle-a"] = true
+}
+if not component or type(component.component_id) ~= "string" or #component.member_sample ~= 3
+  or #witness ~= 4 then
+  fail("technology SCC did not publish bounded component identity and actual cycle evidence")
+end
+for index = 1, #witness - 1 do
+  if not actual_edges[witness[index] .. "\0" .. witness[index + 1]] then
+    fail("technology SCC witness contains a nonexistent prerequisite edge")
+  end
+end
+
+local semantic_plan_a = compilation_plan.finalize(generation_plan.new():finalize(), {})
+local semantic_plan_b = compilation_plan.finalize(generation_plan.new():finalize(), {})
+if semantic_plan_a.semantic_fingerprint ~= semantic_plan_b.semantic_fingerprint
+  or semantic_plan_a.fingerprint ~= semantic_plan_a.semantic_fingerprint then
+  fail("CompilationPlan semantic fingerprint depends on operational telemetry")
+end
+if semantic_plan_a.telemetry_fingerprint == semantic_plan_b.telemetry_fingerprint then
+  fail("CompilationPlan did not separate changing run telemetry evidence")
 end
 
 local dangling_effect_candidate = {
@@ -580,12 +653,24 @@ local generic_effect_candidate = {
     {type = "gun-speed", ammo_category = "mir-fixture-definitely-missing-ammo-category", modifier = 0.1}
   }
 }
-local kept_generic, removed_generic = effect_safety.sanitize_effects(
+local kept_generic, removed_generic, retained_effect_order = effect_safety.sanitize_effects(
   generic_effect_candidate.effects,
   "compiler-contract-generic-effects",
   "external")
-if #kept_generic ~= 2 or #removed_generic ~= 2 then
+if #kept_generic ~= 2 or #removed_generic ~= 2
+  or removed_generic[1].original_effect_index ~= 2
+  or removed_generic[2].original_effect_index ~= 4
+  or retained_effect_order[1] ~= 1 or retained_effect_order[2] ~= 3 then
   fail("generic effect contracts did not retain valid targets and prune missing targets")
+end
+
+local command_positions = {}
+for index, id in ipairs(pipeline_commands.order()) do command_positions[id] = index end
+if not (command_positions["compatibility-repairs"] < command_positions["sanitize-input-technology-effects"]
+  and command_positions["sanitize-input-technology-effects"] < command_positions["module-permissions"]
+  and command_positions["assert-technology-safety"] < command_positions["emit-compatibility-diagnostics"]
+  and command_positions["assert-technology-safety"] < command_positions["assert-plan-output"]) then
+  fail("pipeline does not sanitize finalized input before indexes or output before reports and parity checks")
 end
 
 if fingerprint.of({b = 2, a = 1}) ~= fingerprint.of({a = 1, b = 2}) then fail("map fingerprint is iteration-order dependent") end

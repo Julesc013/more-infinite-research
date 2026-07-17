@@ -344,6 +344,8 @@ $requiredMirFiles = @(
   "prototypes/mir/report/diagnostics_sink.lua",
   "prototypes/mir/report/compiler_telemetry.lua",
   "prototypes/mir/planner/technology_graph.lua",
+  "prototypes/mir/pipeline/compiler_context.lua",
+  "prototypes/mir/domain/technology/technology_design.lua",
   "prototypes/mir/runtime/scripted_techs.lua",
   "prototypes/mir/runtime/settings_profile.lua",
   "prototypes/mir/runtime/settings_resolver.lua",
@@ -407,19 +409,20 @@ foreach ($needle in @(
   'require("prototypes.mir.settings.pipeline_extent").multiplier()',
   'require("prototypes.mir.pipeline.extent").apply(multiplier)',
   'require("prototypes.mir.policy.competing_productivity").prepare()',
-  'require("prototypes.mir.planner.compilation_plan").compile()',
-  'require("prototypes.mir.planner.compilation_plan").apply_streams()',
-  'require("prototypes.mir.planner.compilation_plan").apply_base_extensions()',
+  'require("prototypes.mir.planner.compilation_plan").compile(context)',
+  'require("prototypes.mir.planner.compilation_plan").apply_streams(context)',
+  'require("prototypes.mir.planner.compilation_plan").apply_base_extensions(context)',
   'require("prototypes.mir.pipeline.mutations.competing_productivity").apply()',
   'require("prototypes.mir.pipeline.mutations.competing_base_extensions").apply()',
   'require("prototypes.mir.pipeline.mutations.weapon_speed").apply()',
   'require("prototypes.mir.pipeline.mutations.max_level").apply()',
   'require("prototypes.mir.compatibility.planner").emit()',
-  'require("prototypes.mir.planner.compilation_plan").assert_output()',
-  'require("prototypes.mir.emit.effect_safety").sanitize_all_technology_effects()',
+  'require("prototypes.mir.planner.compilation_plan").assert_output(context)',
+  '.sanitize_all_technology_effects({pass = "input"})',
+  '.sanitize_all_technology_effects({pass = "output"})',
   'require("prototypes.mir.emit.effect_safety").assert_registered_technology_effects()',
   'require("prototypes.mir.emit.technology_graph_safety").assert_registered_technologies()',
-  'require("prototypes.mir.planner.compilation_plan").publish()',
+  'require("prototypes.mir.planner.compilation_plan").publish(context)',
   'require("prototypes.mir.report.diagnostics_sink").flush()'
 )) {
   Assert-MIRContains -RelativePath "prototypes/mir/stage/data_final_fixes_steps.lua" -Text $dataFinalFixesStepsText -Needle $needle
@@ -428,6 +431,7 @@ foreach ($needle in @(
 $commandCatalogText = Read-MIRFile -RelativePath "prototypes/mir/pipeline/commands.lua"
 foreach ($commandId in @(
   "compatibility-repairs",
+  "sanitize-input-technology-effects",
   "module-permissions",
   "prototype-limits",
   "pipeline-extent",
@@ -477,7 +481,7 @@ foreach ($forbiddenPlannerDependency in @(
 Assert-MIRContains `
   -RelativePath "prototypes/mir/planner/compilation_plan.lua" `
   -Text $compilationPlanText `
-  -Needle "function M.publish()"
+  -Needle "function M.publish(context)"
 
 $technologyBuilderText = Read-MIRFile -RelativePath "prototypes/mir/emit/technology_builder.lua"
 Assert-MIRContains -RelativePath "prototypes/mir/emit/technology_builder.lua" -Text $technologyBuilderText -Needle 'require("prototypes.mir.platform.factorio.data_raw")'
@@ -500,6 +504,7 @@ $modDataText = Read-MIRFile -RelativePath "prototypes/mir/emit/mod_data.lua"
 Assert-MIRContains -RelativePath "prototypes/mir/emit/mod_data.lua" -Text $modDataText -Needle 'require("prototypes.mir.platform.factorio.data_raw")'
 Assert-MIRContains -RelativePath "prototypes/mir/emit/mod_data.lua" -Text $modDataText -Needle 'target_line.mod_data_supported()'
 Assert-MIRContains -RelativePath "prototypes/mir/emit/mod_data.lua" -Text $modDataText -Needle "data_raw.extend({"
+Assert-MIRContains -RelativePath "prototypes/mir/emit/mod_data.lua" -Text $modDataText -Needle "more-infinite-research-compiler-evidence"
 
 $streamCompilerText = Read-MIRFile -RelativePath "prototypes/mir/planner/stream_compiler.lua"
 Assert-MIRContains -RelativePath "prototypes/mir/planner/stream_compiler.lua" -Text $streamCompilerText -Needle 'require("prototypes.mir.streams.registry")'

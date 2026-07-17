@@ -1,9 +1,22 @@
 local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 local science = require("prototypes.mir.capabilities.science_integration.science_packs")
 local telemetry = require("prototypes.mir.report.compiler_telemetry")
+local deepcopy = require("prototypes.mir.core.deepcopy")
+local fingerprint = require("prototypes.mir.core.fingerprint")
 
 local M = {}
 local WITNESS_NODE_LIMIT = 64
+local REJECTION_PRIORITY = {
+  prerequisite_missing = 10,
+  prerequisite_disabled = 20,
+  prerequisite_mir_cycle = 30,
+  prerequisite_mixed_cycle = 40,
+  prerequisite_external_cycle = 50,
+  effect_target_missing = 60,
+  research_mechanism_missing = 70,
+  research_lab_unavailable = 80,
+  research_science_unreachable = 90
+}
 
 local function sorted_keys(values)
   local out = {}
@@ -114,22 +127,57 @@ local function component_is_cycle(component, adjacency)
   return false
 end
 
-local function cycle_witness(component)
-  local out = {}
-  for index = 1, math.min(#component, WITNESS_NODE_LIMIT) do
-    table.insert(out, component[index])
-  end
-  if #component > WITNESS_NODE_LIMIT then table.insert(out, "...") end
-  table.insert(out, component[1])
-  return table.concat(out, " -> ")
-end
-
 local function bounded_component_nodes(component)
   local out = {}
   for index = 1, math.min(#component, WITNESS_NODE_LIMIT) do
     table.insert(out, component[index])
   end
   return out
+end
+
+local function find_actual_cycle(component, adjacency, maximum_nodes)
+  local component_set, state, parent = {}, {}, {}
+  for _, name in ipairs(component) do component_set[name] = true end
+
+  for _, root in ipairs(component) do
+    if not state[root] then
+      state[root] = "visiting"
+      local stack = {{name = root, next_index = 1}}
+      while #stack > 0 do
+        local frame = stack[#stack]
+        local edges = adjacency[frame.name] or {}
+        local next_name
+        while frame.next_index <= #edges and not next_name do
+          local candidate = edges[frame.next_index]
+          frame.next_index = frame.next_index + 1
+          if component_set[candidate] then next_name = candidate end
+        end
+        if not next_name then
+          state[frame.name] = "complete"
+          table.remove(stack)
+        elseif not state[next_name] then
+          parent[next_name] = frame.name
+          state[next_name] = "visiting"
+          table.insert(stack, {name = next_name, next_index = 1})
+        elseif state[next_name] == "visiting" then
+          local reverse_path, cursor = {}, frame.name
+          while cursor and cursor ~= next_name do
+            table.insert(reverse_path, cursor)
+            cursor = parent[cursor]
+          end
+          if cursor == next_name then
+            local path = {next_name}
+            for index = #reverse_path, 1, -1 do table.insert(path, reverse_path[index]) end
+            table.insert(path, next_name)
+            local bounded = {}
+            for index = 1, math.min(#path, maximum_nodes) do table.insert(bounded, path[index]) end
+            return bounded, #path > maximum_nodes
+          end
+        end
+      end
+    end
+  end
+  return {}, false
 end
 
 local function cycle_class(component, planned)
@@ -142,11 +190,32 @@ local function cycle_class(component, planned)
   return "external-only"
 end
 
-local function add_reason(reasons, name, code, evidence)
-  local existing = reasons[name]
-  if not existing or code < existing.code then
-    reasons[name] = {code = code, evidence = evidence}
+local function reason_less(left, right)
+  local left_priority = REJECTION_PRIORITY[left.code] or 1000
+  local right_priority = REJECTION_PRIORITY[right.code] or 1000
+  if left_priority ~= right_priority then return left_priority < right_priority end
+  if left.code ~= right.code then return left.code < right.code end
+  return tostring(left.evidence) < tostring(right.evidence)
+end
+
+local function add_reason(reasons, name, code, evidence, origin)
+  local bucket = reasons[name]
+  if not bucket then
+    bucket = {by_origin = {}, all = {}}
+    reasons[name] = bucket
   end
+  local reason = {
+    code = code,
+    evidence = evidence,
+    origin = origin or name,
+    priority = REJECTION_PRIORITY[code] or 1000
+  }
+  local identity = tostring(code) .. "\0" .. tostring(reason.origin) .. "\0" .. tostring(evidence)
+  if bucket.by_origin[identity] then return false end
+  bucket.by_origin[identity] = reason
+  table.insert(bucket.all, reason)
+  table.sort(bucket.all, reason_less)
+  return true
 end
 
 local function propagate_rejections(reasons, reverse)
@@ -156,16 +225,21 @@ local function propagate_rejections(reasons, reverse)
     local unsafe_name = queue[index]
     index = index + 1
     for _, dependent in ipairs(reverse[unsafe_name] or {}) do
-      local existing = reasons[dependent]
-      if not existing or reasons[unsafe_name].code < existing.code then
-        reasons[dependent] = {
-          code = reasons[unsafe_name].code,
-          evidence = reasons[unsafe_name].evidence
-        }
-        table.insert(queue, dependent)
+      local changed = false
+      for _, reason in ipairs(reasons[unsafe_name].all) do
+        changed = add_reason(
+          reasons, dependent, reason.code, reason.evidence, reason.origin) or changed
       end
+      if changed then table.insert(queue, dependent) end
     end
   end
+end
+
+local function resolved_reason(bucket)
+  local primary = deepcopy(bucket.all[1])
+  local contributing = {}
+  for index = 2, #bucket.all do table.insert(contributing, deepcopy(bucket.all[index])) end
+  return primary, contributing
 end
 
 function M.validate_operations(operations)
@@ -198,11 +272,19 @@ function M.validate_operations(operations)
     if component_is_cycle(component, adjacency) then
       cyclic_component_count = cyclic_component_count + 1
       local classification = cycle_class(component, planned)
-      local witness = cycle_witness(component)
+      local actual_cycle_witness, witness_truncated = find_actual_cycle(
+        component, adjacency, WITNESS_NODE_LIMIT)
+      local witness = table.concat(actual_cycle_witness, " -> ")
+      local member_sample = bounded_component_nodes(component)
+      local component_id = fingerprint.of(component)
       table.insert(cyclic_components, {
+        component_id = component_id,
         classification = classification,
         node_count = #component,
-        nodes = bounded_component_nodes(component),
+        member_sample = member_sample,
+        actual_cycle_witness = actual_cycle_witness,
+        actual_cycle_witness_truncated = witness_truncated,
+        nodes = member_sample,
         nodes_truncated = #component > WITNESS_NODE_LIMIT,
         witness = witness
       })
@@ -211,7 +293,7 @@ function M.validate_operations(operations)
         or classification == "mixed-mir-external" and "prerequisite_mixed_cycle"
         or "prerequisite_external_cycle"
       for _, name in ipairs(component) do
-        add_reason(rejection_reasons, name, code, witness)
+        add_reason(rejection_reasons, name, code, witness, "component:" .. component_id)
       end
     end
   end
@@ -220,9 +302,9 @@ function M.validate_operations(operations)
   for name, technology in pairs(planned) do
     local unit = technology.unit
     if not unit or type(unit.ingredients) ~= "table" or #unit.ingredients == 0 then
-      research_rejections[name] = {code = "research_ingredients_missing", evidence = tostring(name)}
+      research_rejections[name] = {code = "research_mechanism_missing", evidence = tostring(name) .. ":ingredients"}
     elseif unit.count == nil and unit.count_formula == nil then
-      research_rejections[name] = {code = "research_count_missing", evidence = tostring(name)}
+      research_rejections[name] = {code = "research_mechanism_missing", evidence = tostring(name) .. ":count"}
     elseif not science.valid_research_ingredients(unit.ingredients) then
       research_rejections[name] = {code = "research_lab_unavailable", evidence = tostring(name)}
     else
@@ -245,14 +327,17 @@ function M.validate_operations(operations)
 
   local rejected = {}
   for name, _ in pairs(planned) do
-    local reason = rejection_reasons[name]
-    if reason then
+    local reason_bucket = rejection_reasons[name]
+    if reason_bucket then
+      local primary, contributing = resolved_reason(reason_bucket)
       rejected[name] = {
         status = "failed",
         passed = false,
-        code = reason.code,
-        reason = reason.code,
-        evidence = {"technology-graph:" .. reason.code, reason.evidence}
+        code = primary.code,
+        reason = primary.code,
+        evidence = {"technology-graph:" .. primary.code, primary.evidence},
+        primary = primary,
+        contributing = contributing
       }
     else
       proofs[name] = {

@@ -40,4 +40,14 @@ function M.emit_generation_plan(artifact)
   })
 end
 
+function M.emit_compiler_evidence(artifact)
+  if not artifact then return end
+  return emit({
+    type = "mod-data",
+    name = "more-infinite-research-compiler-evidence",
+    data_type = "more-infinite-research.compiler-evidence",
+    data = artifact
+  })
+end
+
 return M

@@ -307,6 +307,19 @@ function M.provider_ids_for_stream(stream_key)
   return ids
 end
 
+function M.family_ids_for_stream(stream_key)
+  local ids, seen = {}, {}
+  for _, decision in ipairs(build().decisions or {}) do
+    if decision.target_stream == stream_key and decision.candidate_family
+      and not seen[decision.candidate_family] then
+      seen[decision.candidate_family] = true
+      table.insert(ids, decision.candidate_family)
+    end
+  end
+  table.sort(ids)
+  return ids
+end
+
 function M.snapshot()
   return deepcopy(build())
 end

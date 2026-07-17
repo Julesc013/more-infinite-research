@@ -28,6 +28,7 @@ local effect_ownership = require("prototypes.mir.planner.effect_ownership")
 local native_owner_contract = require("prototypes.mir.domain.native_owner.contract")
 local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 local telemetry = require("prototypes.mir.report.compiler_telemetry")
+local technology_design = require("prototypes.mir.domain.technology.technology_design")
 
 local M = {}
 local latest_plan = nil
@@ -163,6 +164,7 @@ local function plan_row(key, spec, action, reason, diagnostics, extra)
     reason = reason,
     source = spec.automatic_family and "family-rule" or "fixed-stream",
     provider_ids = family_resolver.provider_ids_for_stream(key),
+    family_ids = family_resolver.family_ids_for_stream(key),
     spec = spec,
     diagnostics = diagnostics,
     gates = proof_gates(action, extra.failed_gates)
@@ -398,6 +400,7 @@ function M.compile()
   end
   rows = effect_ownership.resolve(rows)
   for _, row in ipairs(rows) do
+    row.technology_design = technology_design.from_generation_row(row)
     plan:add(row)
   end
   local finalized = plan:finalize()

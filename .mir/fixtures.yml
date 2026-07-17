@@ -533,6 +533,17 @@ fixtures:
       - base-extension-output-parity
       - final-plan-output-owner-parity
       - insertion-order-independent-plan-fingerprints
+      - telemetry-independent-semantic-compilation-fingerprint
+      - separate-compilation-run-telemetry-fingerprint
+      - content-addressed-compiler-evidence-publication
+      - pre-index-and-post-emission-sanitation-order
+      - sanitation-retained-effect-order-ledger
+      - actual-scc-cycle-edge-witness
+      - explicit-semantic-rejection-priority
+      - contributing-rejection-reasons
+      - technology-design-schema-1-normalization
+      - technology-design-field-provenance-and-locks
+      - technology-design-semantic-fingerprint
       - cyclic-fingerprint-rejection
       - automatic-control-schema-2-defaults
       - automatic-action-disabled-preview-apply

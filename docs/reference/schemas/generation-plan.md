@@ -5,7 +5,7 @@ applies_to: "3.1.0+"
 audience: developer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-07-12
+last_reviewed: 2026-07-17
 supersedes: []
 superseded_by: []
 ---
@@ -16,7 +16,9 @@ superseded_by: []
 
 The exported stream plan artifact is schema 3. It contains a deterministic plan fingerprint, fingerprints for facts, rules, active compatibility packs, and the target profile, the complete row set, and a validation summary with action and reason counts.
 
-`CompilationPlan` schema 2 globally finalizes materializing stream, adoption, and base-extension operations before the first emission. It adds a base-operation source fingerprint, stable operation ordering, a global fingerprint and validation summary, and rejects cross-part technology names, manifests, direct-effect identities, missing prerequisite targets, and unsupported effects.
+`CompilationPlan` schema 2 globally finalizes materializing stream, adoption, and base-extension operations before the first emission. It adds a base-operation source fingerprint, stable operation ordering, a semantic fingerprint and validation summary, and rejects cross-part technology names, manifests, direct-effect identities, missing prerequisite targets, and unsupported effects. Operational telemetry has its own `telemetry_fingerprint` and never contributes to `semantic_fingerprint`; `fingerprint` remains a compatibility alias for the semantic value.
+
+After postconditions pass, `more-infinite-research-compiler-evidence` persists schema-1 run evidence as `mod-data`. It binds the semantic plan fingerprint, a separate telemetry fingerprint, deterministic pre-index and post-emission sanitation ledgers, individual ledger fingerprints, and an evidence-envelope fingerprint. Unknown external prototype ownership is recorded explicitly rather than guessed.
 
 Every schema-3 row contains:
 
@@ -31,6 +33,7 @@ Every schema-3 row contains:
 | `spec` | Canonical stream descriptor snapshot. |
 | `diagnostics` | Decision/report payload materialized after validation. |
 | `gates` | Evidence records for target, effect, owner, science, lab, prerequisites, loops, progression, migration, and output identity. |
+| `technology_design` | Schema-1 common design IR with per-field provenance, independent locks, candidate/released identity, and multi-axis maturity. |
 
 An `emit` row also contains the stable technology name and all fields required by `StreamSpec`: effects, science ingredients, prerequisites, cost formula, research time, and maximum level. An `adopt` row contains the existing owner and exact effects to attach. A `skip` row contains no mutation intent.
 

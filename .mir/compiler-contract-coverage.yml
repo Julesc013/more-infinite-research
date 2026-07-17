@@ -13,6 +13,20 @@
   "automatic_actions": ["disabled", "preview", "apply"],
   "automatic_generation_controls": ["create_research", "require_reviewed_data"],
   "automatic_creation_maturities": ["experimental", "reviewed"],
+  "technology_design_dimensions": [
+    "identity", "effects", "progression", "cost", "presentation", "ownership", "runtime_contracts"
+  ],
+  "technology_design_maturity_axes": [
+    "safety", "discovery_evidence", "design_maturity", "validation_evidence",
+    "applicability_scope", "identity_stability", "runtime_action", "public_claim"
+  ],
+  "technology_design_leaf_provenance": [
+    "identity.technology_id", "identity.candidate_id", "members", "effects",
+    "progression.prerequisites", "progression.science", "cost.count_formula", "cost.research_time",
+    "cost.max_level", "presentation.localised_name", "presentation.localised_description",
+    "presentation.icons", "presentation.order", "ownership.action", "ownership.migration_policy",
+    "runtime_contracts.upgrade"
+  ],
   "automatic_policy_presets": ["conservative", "safe", "expansive", "custom"],
   "compiler_provider_fields": [
     "id", "source_kinds", "discovery", "positive_capabilities", "family", "normalization",

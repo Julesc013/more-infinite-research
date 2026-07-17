@@ -83,6 +83,23 @@ local function assert_compiler_telemetry()
   end
 end
 
+local function assert_compiler_evidence()
+  local prototype = (data.raw["mod-data"] or {})["more-infinite-research-compiler-evidence"]
+  local evidence = prototype and prototype.data
+  local plan = compilation_plan.snapshot()
+  if not evidence or evidence.schema ~= 1
+    or evidence.semantic_fingerprint ~= plan.semantic_fingerprint
+    or type(evidence.telemetry_fingerprint) ~= "string"
+    or type(evidence.input_sanitation_fingerprint) ~= "string"
+    or type(evidence.output_sanitation_fingerprint) ~= "string"
+    or type(evidence.evidence_fingerprint) ~= "string"
+    or not evidence.input_sanitation_ledger or evidence.input_sanitation_ledger.pass ~= "input"
+    or not evidence.output_sanitation_ledger or evidence.output_sanitation_ledger.pass ~= "output"
+  then
+    fail("content-addressed compiler evidence or sanitation ledgers are missing")
+  end
+end
+
 local function assert_decision_record_v2()
   local decision_record = require("__more-infinite-research__.prototypes.mir.domain.decisions.decision_record")
   local confidence = decision_record.confidence({identity = 1, family = 0.95, loop_safety = 0.25, total = 0.75})
@@ -262,7 +279,7 @@ local function assert_pipeline_command_contracts()
       fail("pipeline command " .. id .. " is missing requirements, ordering, or implementation ownership")
     end
   end
-  if count ~= 20 then fail("expected 20 governed pipeline commands, got " .. tostring(count)) end
+  if count ~= 21 then fail("expected 21 governed pipeline commands, got " .. tostring(count)) end
 end
 
 assert_pipeline_command_contracts()
@@ -388,6 +405,7 @@ local base_extension_defaults = {
 assert_no_blocked_pickup_effects()
 assert_generation_plan_v3()
 assert_compiler_telemetry()
+assert_compiler_evidence()
 assert_decision_record_v2()
 assert_setting_target_ownership()
 

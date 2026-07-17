@@ -9,6 +9,7 @@ local effective_settings = require("prototypes.mir.settings.effective")
 local target_line = require("prototypes.mir.platform.factorio.target_line")
 local technology_graph = require("prototypes.mir.planner.technology_graph")
 local telemetry = require("prototypes.mir.report.compiler_telemetry")
+local technology_design = require("prototypes.mir.domain.technology.technology_design")
 
 local M = {}
 local latest = nil
@@ -16,7 +17,10 @@ local normalized_base_operation
 
 local function rebuild_stream_artifact(stream_artifact, rows)
   local plan = generation_plan.new({source_fingerprints = stream_artifact.source_fingerprints})
-  for _, row in ipairs(rows) do plan:add(row) end
+  for _, row in ipairs(rows) do
+    row.technology_design = technology_design.from_generation_row(row)
+    plan:add(row)
+  end
   return plan:finalize():artifact()
 end
 
@@ -146,24 +150,15 @@ local function materialized_stream_operations(artifact)
   local out = {}
   for _, row in ipairs(artifact.rows or {}) do
     if row.action == "emit" then
+      local design = row.technology_design or technology_design.from_generation_row(row)
       table.insert(out, {
         schema = 2,
         operation = "emit_stream",
         stream_key = row.stream_key,
         manifest_id = row.manifest_id,
         technology_name = row.technology_name,
-        technology = {
-          name = row.technology_name,
-          effects = deepcopy(row.fields.effects),
-          prerequisites = deepcopy(row.fields.prerequisites),
-          unit = {
-            ingredients = deepcopy(row.fields.ingredients),
-            count_formula = row.fields.count_formula,
-            time = row.fields.research_time
-          },
-          max_level = row.fields.max_level,
-          upgrade = true
-        },
+        technology_design = deepcopy(design),
+        technology = technology_design.prototype_shape(design),
         registry = {kind = "stream", key = row.stream_key}
       })
     elseif row.action == "adopt" then
@@ -284,7 +279,30 @@ local function validate_operations(operations)
   }
 end
 
-function M.finalize(stream_plan, base_plan)
+local function semantic_material(artifact)
+  return {
+    schema = artifact.schema,
+    source_fingerprints = artifact.source_fingerprints,
+    input_sanitation_ledger = artifact.input_sanitation_ledger,
+    operations = artifact.operations,
+    stream_plan = artifact.stream_plan,
+    base_extension_operations = artifact.base_extension_operations,
+    validation_summary = artifact.validation_summary
+  }
+end
+
+local function attach_run_evidence(artifact)
+  artifact.telemetry = telemetry.snapshot()
+  artifact.telemetry_fingerprint = fingerprint.of(artifact.telemetry)
+  artifact.run = {
+    schema = 1,
+    telemetry = deepcopy(artifact.telemetry),
+    telemetry_fingerprint = artifact.telemetry_fingerprint
+  }
+  return artifact
+end
+
+function M.finalize(stream_plan, base_plan, compiler_inputs)
   local stream_artifact = type(stream_plan.artifact) == "function" and stream_plan:artifact() or deepcopy(stream_plan)
   if not stream_artifact or stream_artifact.schema ~= 3 then error("CompilationPlan requires GenerationPlan schema 3", 2) end
   local stream_effect_integrity
@@ -331,35 +349,53 @@ function M.finalize(stream_plan, base_plan)
   local artifact = {
     schema = 2,
     source_fingerprints = source_fingerprints,
+    input_sanitation_ledger = deepcopy((compiler_inputs or {}).input_sanitation_ledger),
     operations = operations,
     stream_plan = stream_artifact,
     base_extension_operations = normalized_base,
-    validation_summary = validation_summary,
-    telemetry = telemetry.snapshot()
+    validation_summary = validation_summary
   }
-  artifact.fingerprint = fingerprint.of(artifact)
-  return artifact
+  artifact.semantic_fingerprint = fingerprint.of(semantic_material(artifact))
+  artifact.fingerprint = artifact.semantic_fingerprint
+  return attach_run_evidence(artifact)
 end
 
-function M.compile()
+function M.compile(context)
   if latest then return latest end
   telemetry.start_phase("planning")
   local stream_plan = stream_compiler.compile()
   local base_plan = base_extensions.plan_all()
-  latest = M.finalize(stream_plan, base_plan)
+  latest = M.finalize(stream_plan, base_plan, {
+    input_sanitation_ledger = context and context:artifact("input_sanitation_ledger") or nil
+  })
   stream_compiler.accept_artifact(latest.stream_plan)
   telemetry.finish_phase("planning")
   return latest
 end
 
-function M.apply_streams()
-  local plan = M.compile()
+function M.apply_streams(context)
+  local plan = M.compile(context)
   stream_executor.apply(plan.stream_plan)
 end
 
-function M.publish()
-  local plan = M.compile()
-  require("prototypes.mir.emit.mod_data").emit_generation_plan(plan.stream_plan)
+function M.publish(context)
+  local plan = M.compile(context)
+  local mod_data = require("prototypes.mir.emit.mod_data")
+  mod_data.emit_generation_plan(plan.stream_plan)
+  local input_ledger = deepcopy(plan.input_sanitation_ledger)
+  local output_ledger = context and context:artifact("output_sanitation_ledger") or nil
+  local evidence = {
+    schema = 1,
+    compilation_plan_schema = plan.schema,
+    semantic_fingerprint = plan.semantic_fingerprint,
+    telemetry_fingerprint = fingerprint.of(telemetry.snapshot()),
+    input_sanitation_ledger = input_ledger,
+    input_sanitation_fingerprint = fingerprint.of(input_ledger or {}),
+    output_sanitation_ledger = output_ledger,
+    output_sanitation_fingerprint = fingerprint.of(output_ledger or {})
+  }
+  evidence.evidence_fingerprint = fingerprint.of(evidence)
+  mod_data.emit_compiler_evidence(evidence)
   if target_line.feature_enabled("productivity_family_adoption") then
     require("prototypes.mir.emit.transactions.productivity_family_adoption").emit_mod_data()
   end
@@ -367,27 +403,30 @@ function M.publish()
   return true
 end
 
-function M.apply_base_extensions()
-  local plan = M.compile()
+function M.apply_base_extensions(context)
+  local plan = M.compile(context)
   base_extensions.apply_plan(plan.base_extension_operations)
 end
 
-function M.snapshot()
-  local plan = M.compile()
-  return deepcopy({
+function M.snapshot(context)
+  local plan = M.compile(context)
+  local snapshot = {
     schema = plan.schema,
     fingerprint = plan.fingerprint,
+    semantic_fingerprint = plan.semantic_fingerprint,
     source_fingerprints = plan.source_fingerprints,
+    input_sanitation_ledger = plan.input_sanitation_ledger,
     operations = plan.operations,
     stream_plan = plan.stream_plan,
     base_extension_operations = plan.base_extension_operations,
-    validation_summary = plan.validation_summary,
-    telemetry = telemetry.snapshot()
-  })
+    validation_summary = plan.validation_summary
+  }
+  attach_run_evidence(snapshot)
+  return deepcopy(snapshot)
 end
 
-function M.assert_output()
-  return require("prototypes.mir.planner.output_validator").assert_compilation_artifact(M.snapshot())
+function M.assert_output(context)
+  return require("prototypes.mir.planner.output_validator").assert_compilation_artifact(M.snapshot(context))
 end
 
 return M

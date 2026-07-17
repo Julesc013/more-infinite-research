@@ -112,6 +112,7 @@ modules:
     - prototypes/streams/direct-effects.lua
   pipeline:
     - prototypes/mir/pipeline/commands.lua
+    - prototypes/mir/pipeline/compiler_context.lua
     - prototypes/mir/pipeline/extent.lua
     - prototypes/mir/pipeline/prototype_limits.lua
     - prototypes/mir/pipeline/module_permissions.lua
@@ -143,6 +144,7 @@ modules:
     - prototypes/mir/domain/streams/raw_catalog.lua
     - prototypes/mir/domain/streams/descriptor.lua
     - prototypes/mir/domain/diagnostics/codes.lua
+    - prototypes/mir/domain/technology/technology_design.lua
   policy:
     - prototypes/mir/policy/owner_policy.lua
     - prototypes/mir/policy/competing_productivity.lua
@@ -247,13 +249,18 @@ mutation_commands:
     - mutation commands may change existing prototypes only through their listed implementation
     - CompilationPlan schema 2 globally finalizes stream adoption and base-extension operations before emission
     - output validation compares numeric effects technology shape and generated-registry identity
-    - final technology safety uses target-aware effect contracts to prune impossible known references before asserting all remaining generated and external effects
+    - input technology sanitation runs after compatibility repairs and before every index or planning pass and records deterministic retained effect order
+    - final technology safety reruns target-aware sanitation before reporting and output validation as a defensive postcondition
+    - CompilationPlan semantic fingerprints exclude operational telemetry and retain a separate telemetry fingerprint
+    - postcondition publication emits content-addressed compiler evidence with separate input and output sanitation ledgers
+    - stream planning and emission consume TechnologyDesign schema 1 without changing released technology identities
     - stream planning cannot import the stream executor or adoption mutation transaction
     - stream emission and adoption mutation are applied only by the emission-owned stream executor
     - reviewed compatibility data cannot override hard prototype safety facts
     - exact-version compatibility repairs remain separately bounded
   ids:
     - compatibility-repairs
+    - sanitize-input-technology-effects
     - module-permissions
     - prototype-limits
     - pipeline-extent
