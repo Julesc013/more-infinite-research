@@ -26,6 +26,7 @@
   ],
   "technology_design_lock_states": ["none", "partial", "all"],
   "technology_design_lock_policies": ["adaptive", "locked", "field-specific", "adaptive-within-envelope"],
+  "technology_design_materialization_kinds": ["create", "patch-existing", "continuation", "diagnose"],
   "technology_design_maturity_axes": [
     "safety", "discovery_evidence", "design_maturity", "validation_evidence",
     "applicability_scope", "identity_stability", "runtime_action", "public_claim"
@@ -34,7 +35,8 @@
     "identity.technology_id", "identity.candidate_id", "identity.identity_state", "subjects", "members", "effects",
     "progression.prerequisites", "progression.science", "cost.count_formula", "cost.research_time",
     "cost.count", "cost.max_level", "presentation.localised_name", "presentation.localised_description",
-    "presentation.icons", "presentation.order", "presentation.level", "presentation.enabled", "presentation.hidden",
+    "presentation.icon", "presentation.icon_size", "presentation.icons", "presentation.order", "presentation.level",
+    "presentation.enabled", "presentation.hidden",
     "ownership.action", "ownership.migration_policy",
     "runtime_contracts.upgrade"
   ],
@@ -47,7 +49,7 @@
   "diagnostic_code_namespaces": ["MIR-AUTO", "MIR-PROVIDER"],
   "legacy_automatic_modes": ["off", "report", "safe-attach", "exact-pack", "safe-generate"],
   "mutation_sentinels": [
-    "hard-safety", "owner-conflict", "cross-stream-effect-arbitration", "typed-prerequisite-rejection", "typed-scc-rejection", "target-filter", "output-value-parity", "pack-applicability", "context-state-isolation"
+    "hard-safety", "owner-conflict", "cross-stream-effect-arbitration", "typed-prerequisite-rejection", "typed-scc-rejection", "target-filter", "output-value-parity", "pack-applicability", "context-state-isolation", "base-continuation-design-authority"
   ],
   "compiler_context_schema": 2,
   "context_owned_state": [

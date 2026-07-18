@@ -12,9 +12,11 @@ superseded_by: []
 
 # TechnologyDesign Schema
 
-`TechnologyDesign` schema 2 is the normalized design boundary shared by fixed and automatic stream technologies. `prototypes/mir/domain/technology/technology_design.lua` is the machine authority for dimensions, typed subjects, maturity enums, evidence classes, lock states, lock policies, required leaf paths, cross-field invariants, canonical projections, and fingerprints.
+`TechnologyDesign` schema 2 is the normalized design boundary shared by fixed streams, automatic streams, and base-chain continuations. `prototypes/mir/domain/technology/technology_design.lua` is the machine authority for dimensions, typed subjects, materialization kinds, maturity enums, evidence classes, lock states, lock policies, required leaf paths, cross-field invariants, canonical projections, and fingerprints.
 
 The required design dimensions are `identity`, `effects`, `progression`, `cost`, `presentation`, `ownership`, and `runtime_contracts`. Every dimension and leaf provenance record declares `present`, `value`, `source`, `evidence_class`, `lock_state`, `locked`, and `lock_policy`. `locked` remains a compatibility boolean and is true only when `lock_state` is `all`; the authoritative states are `none`, `partial`, and `all`.
+
+`materialization.kind` is `create`, `patch-existing`, `continuation`, or `diagnose`. It is part of design identity. The common emitter accepts only `create` and `continuation`; patch operations require a transaction that verifies their input and output fingerprints.
 
 Leaf records remain authoritative. A dimension is `partial` when only some leaves are locked, such as a released technology ID with an adaptive candidate ID or reviewed localized text with fallback-derived icons. `adaptive-within-envelope` fields require a machine-readable envelope. `TechnologyDesign.diff`, `TechnologyDesign.assert_locks`, and `TechnologyDesign.merge` enforce locked paths and adaptive envelopes during policy composition.
 
@@ -35,7 +37,7 @@ Schema-2 records carry four distinct identities:
 
 `semantic_fingerprint` remains a compatibility alias for `qualification_fingerprint`; it is not a pure design identity.
 
-The canonical projections are `graph_projection`, `prototype_projection`, `presentation_projection`, and `save_identity_projection`. Output parity compares the full prototype projection, including localized name, localized description, icons, order, level, declared enabled and hidden state, and upgrade behavior.
+The canonical projections are `graph_projection`, `prototype_projection`, `presentation_projection`, and `save_identity_projection`. Output parity compares the full prototype projection, including localized name, localized description, single-icon or layered-icon fields, order, level, declared enabled and hidden state, and upgrade behavior.
 
 ## Identity authority and maturity
 
@@ -45,4 +47,6 @@ The design-maturity state machine is `proposed` to `experimental` to `automation
 
 ## GenerationPlan boundary
 
-Every schema-3 `emit` row must carry one validated schema-2 `TechnologyDesign`. The compatibility `fields` record is checked against the IR and cannot disagree with it. Compilation planning, stream emission, and output validation consume canonical projections from the IR. Native-owner adoption and base-extension migration to this IR remain separate follow-on work and must not be claimed complete by this stream-only invariant.
+Every schema-3 `emit` row must carry one validated schema-2 `TechnologyDesign`. The compatibility `fields` record is checked against the IR and cannot disagree with it. Compilation planning, stream emission, and output validation consume canonical projections from the IR.
+
+Every accepted base continuation is likewise rebuilt as a `continuation` design after sanitation and cross-operation policy. Its generated identity derives from the released chain pattern in the continuation manifest, and the same TechnologyDesign adapter that emits streams creates the final prototype. Native-owner adoption remains the next patch-existing migration boundary.

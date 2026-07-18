@@ -39,11 +39,13 @@ local SCHEMA = {
   },
   lock_states = {"none", "partial", "all"},
   lock_policies = {"adaptive", "locked", "field-specific", "adaptive-within-envelope"},
+  materialization_kinds = {"create", "patch-existing", "continuation", "diagnose"},
   required_paths = {
     "identity.technology_id", "identity.candidate_id", "identity.identity_state", "subjects", "members", "effects",
     "progression.prerequisites", "progression.science", "cost.count_formula", "cost.count",
     "cost.research_time", "cost.max_level", "presentation.localised_name",
-    "presentation.localised_description", "presentation.icons", "presentation.order", "presentation.level",
+    "presentation.localised_description", "presentation.icon", "presentation.icon_size", "presentation.icons",
+    "presentation.order", "presentation.level",
     "presentation.enabled", "presentation.hidden", "ownership.action", "ownership.migration_policy",
     "runtime_contracts.upgrade"
   },
@@ -64,7 +66,8 @@ local DIMENSION_PATHS = {
   progression = {"progression.prerequisites", "progression.science"},
   cost = {"cost.count_formula", "cost.count", "cost.research_time", "cost.max_level"},
   presentation = {
-    "presentation.localised_name", "presentation.localised_description", "presentation.icons",
+    "presentation.localised_name", "presentation.localised_description", "presentation.icon",
+    "presentation.icon_size", "presentation.icons",
     "presentation.order", "presentation.level", "presentation.enabled", "presentation.hidden"
   },
   ownership = {"ownership.action", "ownership.migration_policy"},
@@ -80,6 +83,7 @@ end
 local EVIDENCE_CLASSES = enum_set(SCHEMA.evidence_classes)
 local LOCK_STATES = enum_set(SCHEMA.lock_states)
 local LOCK_POLICIES = enum_set(SCHEMA.lock_policies)
+local MATERIALIZATION_KINDS = enum_set(SCHEMA.materialization_kinds)
 local MATURITY_ENUMS = {}
 for axis, values in pairs(SCHEMA.maturity_enums) do MATURITY_ENUMS[axis] = enum_set(values) end
 
@@ -144,6 +148,9 @@ local function dimension(value, source, evidence_class, paths, fields)
 end
 
 local function source_profile(row)
+  if row.source == "base-continuation" then
+    return "continuation-manifest:" .. tostring(row.stream_key), "legacy-fixed", true
+  end
   local automatic = type(row.spec) == "table" and row.spec.automatic_family ~= nil
   if automatic then
     return "family-rule:" .. tostring(row.stream_key), "generic-inferred", false
@@ -242,7 +249,12 @@ end
 local function design_material(design)
   local values = {}
   for _, name in ipairs(SCHEMA.dimensions) do values[name] = design.design[name].value end
-  return {schema = design.schema, candidate_id = design.candidate_id, values = values}
+  return {
+    schema = design.schema,
+    candidate_id = design.candidate_id,
+    materialization = design.materialization,
+    values = values
+  }
 end
 
 local function prototype_projection_unvalidated(design)
@@ -255,6 +267,8 @@ local function prototype_projection_unvalidated(design)
     name = identity.technology_name,
     localised_name = deepcopy(presentation.localised_name),
     localised_description = deepcopy(presentation.localised_description),
+    icon = presentation.icon,
+    icon_size = presentation.icon_size,
     icons = deepcopy(presentation.icons),
     effects = deepcopy(design.design.effects.value),
     prerequisites = deepcopy(progression.prerequisites),
@@ -339,6 +353,8 @@ local function expected_dimension_values(design)
     presentation = {
       localised_name = fields["presentation.localised_name"].value,
       localised_description = fields["presentation.localised_description"].value,
+      icon = fields["presentation.icon"].value,
+      icon_size = fields["presentation.icon_size"].value,
       icons = fields["presentation.icons"].value,
       order = fields["presentation.order"].value,
       level = fields["presentation.level"].value,
@@ -373,6 +389,10 @@ function M.validate(design)
     or type(design.semantic_identity.family) ~= "string" or design.semantic_identity.family == ""
     or type(design.semantic_identity.partition) ~= "string" or design.semantic_identity.partition == "" then
     error("TechnologyDesign semantic_identity is invalid.", 2)
+  end
+  if type(design.materialization) ~= "table"
+    or not MATERIALIZATION_KINDS[design.materialization.kind] then
+    error("TechnologyDesign materialization is invalid.", 2)
   end
   if type(design.subjects) ~= "table" then error("TechnologyDesign subjects are required.", 2) end
   for _, category in ipairs(SCHEMA.subject_categories) do
@@ -487,11 +507,17 @@ function M.from_generation_row(row)
   local candidate_id = "mir-candidate/" .. capability .. "/" .. tostring(row.stream_key)
   local automatic_family = type(row.spec) == "table" and row.spec.automatic_family or nil
   local identity_state, identity_authority = identity_state_for(row, technology_id, fixed)
+  identity_authority = row.identity_authority or identity_authority
   local design_maturity = automatic_family and
     (type(automatic_family) == "table" and automatic_family.creation_maturity or "experimental")
     or "released-canonical"
   if design_maturity == "reviewed" then design_maturity = "human-reviewed" end
-  local runtime_action = row.action == "skip" and "diagnose" or row.action
+  local materialization = deepcopy(row.materialization or {
+    kind = row.action == "adopt" and "patch-existing" or row.action == "skip" and "diagnose" or "create"
+  })
+  local runtime_action = materialization.kind == "continuation" and "continuation"
+    or materialization.kind == "patch-existing" and "patch-existing"
+    or row.action == "skip" and "diagnose" or row.action
   local identity_locked = fixed and technology_id ~= nil
   local progression = {
     prerequisites = deepcopy(fields.prerequisites or expected.prerequisites or {}),
@@ -503,11 +529,17 @@ function M.from_generation_row(row)
     research_time = fields.research_time or (expected.unit or {}).time,
     max_level = fields.max_level or expected.max_level
   }
+  local presentation_order = fields.order
+  if presentation_order == nil and materialization.kind ~= "continuation" then
+    presentation_order = "p[" .. tostring(row.stream_key) .. "]"
+  end
   local presentation = {
     localised_name = deepcopy(fields.localised_name),
     localised_description = deepcopy(fields.localised_description),
-    icons = deepcopy(fields.icons or {}),
-    order = fields.order or ("p[" .. tostring(row.stream_key) .. "]"),
+    icon = fields.icon,
+    icon_size = fields.icon_size,
+    icons = deepcopy(fields.icons),
+    order = presentation_order,
     level = fields.level or 1,
     enabled = fields.enabled,
     hidden = fields.hidden
@@ -533,6 +565,8 @@ function M.from_generation_row(row)
   record("cost.max_level", cost.max_level, "planner:cost", "planner", false)
   record("presentation.localised_name", presentation.localised_name, source, evidence_class, fixed)
   record("presentation.localised_description", presentation.localised_description, source, evidence_class, fixed)
+  record("presentation.icon", presentation.icon, "presentation:fallback-chain", "fallback", false)
+  record("presentation.icon_size", presentation.icon_size, "presentation:fallback-chain", "fallback", false)
   record("presentation.icons", presentation.icons, "presentation:fallback-chain", "fallback", false)
   record("presentation.order", presentation.order, source, evidence_class, fixed)
   record("presentation.level", presentation.level, source, evidence_class, fixed)
@@ -563,6 +597,7 @@ function M.from_generation_row(row)
     candidate_id = candidate_id,
     technology_id = technology_id,
     identity_authority = {source = identity_authority, state = identity_state},
+    materialization = materialization,
     semantic_identity = {
       capability = capability,
       family = (row.family_ids and row.family_ids[1]) or (row.spec and row.spec.family) or row.stream_key,
@@ -609,6 +644,54 @@ function M.from_generation_row(row)
   return result
 end
 
+function M.from_base_extension_operation(operation)
+  if type(operation) ~= "table" or type(operation.technology) ~= "table" then
+    error("TechnologyDesign base continuation operation is required.", 2)
+  end
+  local technology = operation.technology
+  return M.from_generation_row({
+    schema = 3,
+    action = "emit",
+    reason = "base_extension",
+    source = "base-continuation",
+    stream_key = "base-continuation/" .. tostring(operation.key),
+    manifest_id = operation.manifest_id or ("base-continuation/" .. tostring(operation.key)),
+    technology_name = technology.name,
+    identity_authority = "base-continuation-manifest",
+    materialization = {
+      kind = "continuation",
+      base_technology = operation.base_technology_name,
+      chain_key = operation.key
+    },
+    direct_effects = true,
+    fields = {
+      localised_name = deepcopy(technology.localised_name),
+      localised_description = deepcopy(technology.localised_description),
+      icon = technology.icon,
+      icon_size = technology.icon_size,
+      icons = deepcopy(technology.icons),
+      effects = deepcopy(technology.effects or {}),
+      prerequisites = deepcopy(technology.prerequisites or {}),
+      ingredients = deepcopy((technology.unit or {}).ingredients or {}),
+      count_formula = (technology.unit or {}).count_formula,
+      count = (technology.unit or {}).count,
+      research_time = (technology.unit or {}).time,
+      max_level = technology.max_level,
+      order = technology.order,
+      level = technology.level,
+      enabled = technology.enabled,
+      hidden = technology.hidden,
+      upgrade = technology.upgrade
+    },
+    spec = {
+      family = operation.key,
+      identity_state = "released",
+      migration_policy = "stable"
+    },
+    gates = operation.gates or {}
+  })
+end
+
 function M.graph_projection(design)
   M.validate(design)
   return deepcopy({
@@ -630,6 +713,8 @@ function M.presentation_projection(design)
     name = identity.technology_name,
     localised_name = presentation.localised_name,
     localised_description = presentation.localised_description,
+    icon = presentation.icon,
+    icon_size = presentation.icon_size,
     icons = presentation.icons,
     order = presentation.order,
     level = presentation.level,
@@ -747,7 +832,9 @@ function M.assert_generation_row(row)
   compare("max_level", legacy.max_level, projection.max_level)
   compare("localised_name", legacy.localised_name, projection.localised_name)
   compare("localised_description", legacy.localised_description, projection.localised_description)
-  compare("icons", legacy.icons or {}, projection.icons)
+  compare("icon", legacy.icon, projection.icon)
+  compare("icon_size", legacy.icon_size, projection.icon_size)
+  compare("icons", legacy.icons, projection.icons)
   compare("order", legacy.order or ("p[" .. tostring(row.stream_key) .. "]"), projection.order)
   compare("level", legacy.level or 1, projection.level)
   compare("enabled", legacy.enabled, projection.enabled)

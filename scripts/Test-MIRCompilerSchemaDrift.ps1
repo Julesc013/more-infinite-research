@@ -23,6 +23,7 @@ foreach ($value in @($contractCoverage.technology_design_dimensions) +
   @($contractCoverage.technology_design_fingerprints) +
   @($contractCoverage.technology_design_lock_states) +
   @($contractCoverage.technology_design_lock_policies) +
+  @($contractCoverage.technology_design_materialization_kinds) +
   @($contractCoverage.technology_design_leaf_provenance)) {
   if (-not $technologyDesignText.Contains('"' + [string]$value + '"')) {
     throw "TechnologyDesign Lua authority is missing governed semantic value: $value"

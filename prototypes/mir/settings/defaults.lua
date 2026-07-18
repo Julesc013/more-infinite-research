@@ -124,6 +124,7 @@ local defaults = {
   -- Extension overrides for base-game technologies.
   base_extensions = {
     ["braking-force"] = {
+      manifest_id = "base-continuation/braking-force",
       enabled = true,
       settings_priority = "top",
       max_level = 0,
@@ -136,6 +137,7 @@ local defaults = {
       }
     },
     ["research-speed"] = {
+      manifest_id = "base-continuation/research-speed",
       enabled = true,
       settings_priority = "top",
       max_level = 0,
@@ -146,6 +148,7 @@ local defaults = {
       add_science_packs = "all"
     },
     ["worker-robots-storage"] = {
+      manifest_id = "base-continuation/worker-robots-storage",
       enabled = true,
       settings_priority = "top",
       max_level = 0,
@@ -158,6 +161,7 @@ local defaults = {
       }
     },
     ["inserter-capacity-bonus"] = {
+      manifest_id = "base-continuation/inserter-capacity-bonus",
       enabled = false,
       settings_priority = "top",
       max_level = 0,
@@ -175,6 +179,7 @@ local defaults = {
       }
     },
     ["weapon-shooting-speed"] = {
+      manifest_id = "base-continuation/weapon-shooting-speed",
       enabled = true,
       settings_priority = "top",
       max_level = 0,
@@ -188,6 +193,7 @@ local defaults = {
       }
     },
     ["laser-shooting-speed"] = {
+      manifest_id = "base-continuation/laser-shooting-speed",
       enabled = true,
       settings_priority = "top",
       max_level = 0,

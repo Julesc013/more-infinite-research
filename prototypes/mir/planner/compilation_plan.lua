@@ -190,6 +190,9 @@ normalized_base_operation = function(operation)
   out.schema = 2
   out.manifest_id = out.manifest_id or ("base-extension:" .. tostring(out.key) .. ":" .. tostring(out.technology_name))
   out.registry = {kind = "base_extension", key = out.key}
+  out.technology_design = technology_design.from_base_extension_operation(out)
+  out.technology = technology_design.prototype_projection(out.technology_design)
+  out.technology.type = "technology"
   return out
 end
 
@@ -378,6 +381,7 @@ function M.finalize(stream_plan, base_plan, compiler_inputs)
   local finalized_base = {}
   for _, operation in ipairs(normalized_base) do
     local normalized = apply_weapon_overlap_policy(operation, stream_operations, stream_artifact.rows)
+    normalized = normalized_base_operation(normalized)
     table.insert(finalized_base, normalized)
     table.insert(operations, deepcopy(normalized))
   end

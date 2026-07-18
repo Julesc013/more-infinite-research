@@ -331,6 +331,7 @@ $requiredMirFiles = @(
   "prototypes/mir/planner/science.lua",
   "prototypes/mir/integrity/effect_contracts.lua",
   "prototypes/mir/emit/stream_spec_adapter.lua",
+  "prototypes/mir/emit/technology_design_adapter.lua",
   "prototypes/mir/emit/stream_executor.lua",
   "prototypes/mir/emit/base_extensions.lua",
   "prototypes/mir/emit/icon_builder.lua",
@@ -531,10 +532,17 @@ if ($technologyBuilderText -match "data:extend") {
 }
 
 $streamAdapterText = Read-MIRFile -RelativePath "prototypes/mir/emit/stream_spec_adapter.lua"
-Assert-MIRContains -RelativePath "prototypes/mir/emit/stream_spec_adapter.lua" -Text $streamAdapterText -Needle 'require("prototypes.mir.domain.streams.stream_spec")'
-Assert-MIRContains -RelativePath "prototypes/mir/emit/stream_spec_adapter.lua" -Text $streamAdapterText -Needle 'require("prototypes.mir.emit.technology_builder")'
-Assert-MIRContains -RelativePath "prototypes/mir/emit/stream_spec_adapter.lua" -Text $streamAdapterText -Needle "technology_builder.emit(stream)"
-Assert-MIRContains -RelativePath "prototypes/mir/emit/stream_spec_adapter.lua" -Text $streamAdapterText -Needle "generated_registry.register(technology.name,"
+Assert-MIRContains -RelativePath "prototypes/mir/emit/stream_spec_adapter.lua" -Text $streamAdapterText -Needle 'require("prototypes.mir.emit.technology_design_adapter")'
+Assert-MIRContains -RelativePath "prototypes/mir/emit/stream_spec_adapter.lua" -Text $streamAdapterText -Needle "technology_design_adapter.emit(design,"
+
+$technologyDesignAdapterText = Read-MIRFile -RelativePath "prototypes/mir/emit/technology_design_adapter.lua"
+Assert-MIRContains -RelativePath "prototypes/mir/emit/technology_design_adapter.lua" -Text $technologyDesignAdapterText -Needle "technology_design.prototype_projection(design)"
+Assert-MIRContains -RelativePath "prototypes/mir/emit/technology_design_adapter.lua" -Text $technologyDesignAdapterText -Needle "data_raw.extend({deepcopy(technology)})"
+Assert-MIRContains -RelativePath "prototypes/mir/emit/technology_design_adapter.lua" -Text $technologyDesignAdapterText -Needle "generated_registry.register(technology.name,"
+
+$baseExtensionsText = Read-MIRFile -RelativePath "prototypes/mir/emit/base_extensions.lua"
+Assert-MIRContains -RelativePath "prototypes/mir/emit/base_extensions.lua" -Text $baseExtensionsText -Needle "technology_design.from_base_extension_operation(operation)"
+Assert-MIRContains -RelativePath "prototypes/mir/emit/base_extensions.lua" -Text $baseExtensionsText -Needle "technology_design_adapter.emit(operation.technology_design,"
 
 $graphSafetyText = Read-MIRFile -RelativePath "prototypes/mir/emit/technology_graph_safety.lua"
 Assert-MIRContains -RelativePath "prototypes/mir/emit/technology_graph_safety.lua" -Text $graphSafetyText -Needle "generated_registry.sorted_names()"

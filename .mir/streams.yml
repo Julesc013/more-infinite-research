@@ -1,6 +1,7 @@
 schema: 1
 
 canonical_machine_record: prototypes/mir/streams/generated_stream_manifest.json
+canonical_continuation_machine_record: prototypes/mir/streams/generated_continuation_manifest.json
 stream_docs_root: docs/reference/schemas
 generated_id_doc: docs/reference/generated-id-reference.md
 
@@ -18,6 +19,45 @@ rules:
   - stream docs describe contracts, not release-specific plans
   - legacy stream-table rows may use stream:<stream_key> targets until exact capability targets are materialized
   - recipe-productivity effects target finalized recipes; evidenced late recipe removers must run before MIR planning and emission
+
+continuations:
+  records:
+    base-continuation/braking-force:
+      canonical_row: prototypes/mir/streams/generated_continuation_manifest.json#continuations.base-continuation/braking-force
+      chain_key: braking-force
+      identity_pattern: braking-force-{next-level}
+      identity_state: released
+      migration_policy: stable
+    base-continuation/inserter-capacity-bonus:
+      canonical_row: prototypes/mir/streams/generated_continuation_manifest.json#continuations.base-continuation/inserter-capacity-bonus
+      chain_key: inserter-capacity-bonus
+      identity_pattern: inserter-capacity-bonus-{next-level}
+      identity_state: released
+      migration_policy: stable
+    base-continuation/laser-shooting-speed:
+      canonical_row: prototypes/mir/streams/generated_continuation_manifest.json#continuations.base-continuation/laser-shooting-speed
+      chain_key: laser-shooting-speed
+      identity_pattern: laser-shooting-speed-{next-level}
+      identity_state: released
+      migration_policy: stable
+    base-continuation/research-speed:
+      canonical_row: prototypes/mir/streams/generated_continuation_manifest.json#continuations.base-continuation/research-speed
+      chain_key: research-speed
+      identity_pattern: research-speed-{next-level}
+      identity_state: released
+      migration_policy: stable
+    base-continuation/weapon-shooting-speed:
+      canonical_row: prototypes/mir/streams/generated_continuation_manifest.json#continuations.base-continuation/weapon-shooting-speed
+      chain_key: weapon-shooting-speed
+      identity_pattern: weapon-shooting-speed-{next-level}
+      identity_state: released
+      migration_policy: stable
+    base-continuation/worker-robots-storage:
+      canonical_row: prototypes/mir/streams/generated_continuation_manifest.json#continuations.base-continuation/worker-robots-storage
+      chain_key: worker-robots-storage
+      identity_pattern: worker-robots-storage-{next-level}
+      identity_state: released
+      migration_policy: stable
 
 streams:
   records:

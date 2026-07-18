@@ -552,6 +552,7 @@ fixtures:
       - compilation-plan-cross-collision
       - output-effect-value-parity
       - base-extension-output-parity
+      - base-continuation-technology-design-authority
       - final-plan-output-owner-parity
       - insertion-order-independent-plan-fingerprints
       - telemetry-independent-semantic-compilation-fingerprint

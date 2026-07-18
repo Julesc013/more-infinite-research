@@ -9,9 +9,9 @@
   },
   "current": {
     "version": "3.2.0",
-    "source_commit": "51d4204784b4e73b1ad7534ca2aa105450938b72",
-    "archive_sha256": "2FFFD9F7E11B28D5B77C5B821FAE178E22541E6F8457627961783517DDB16EF6",
-    "package_content_sha256": "512D414B2000A98FDA80C453E1EB932C1ABC6ED5A903A3DFB7DA9971887CF4A3"
+    "source_commit": "d2ed08631acd882aa86a97074907390fdf2282c8",
+    "archive_sha256": "7BA3D90307A7C62FB57B6E2D2791C9727E4A6CC4591CED31D70A6EB55099697B",
+    "package_content_sha256": "57F8E7E566C0D52B1435E61408D138B00ED63246C70534F2A9669880E9F51EA6"
   },
   "exporter": {
     "fixture": "fixtures/export-approved-delta",
@@ -32,7 +32,7 @@
     {
       "scenario": "approved-delta-automatic-family-controls",
       "baseline_fingerprint": "A0DB0DD54189C56E48103960CCF2173A5D86A48BD01C68D4F56C25E129C87270",
-      "current_fingerprint": "B4848992F429F9BD212645D899C979B4E81FF2D1914DF9F6891E8C92B199EC98",
+      "current_fingerprint": "53A9C6F55631D2D81794BD5F295F258BACC21D496D72EB75202CA6F53E00502C",
       "baseline_technology_count": 52,
       "current_technology_count": 52,
       "difference_count": 3,
@@ -41,7 +41,7 @@
     {
       "scenario": "approved-delta-base",
       "baseline_fingerprint": "FD2B5CD73270B04ACB134BEB6C983333F81126DED6733B387D6896EBBB61A37D",
-      "current_fingerprint": "D369476499568AA19A0F7BEDE8EFA6DC551EA2580CC7DED9F2864B9E69EBA753",
+      "current_fingerprint": "C4F5E7536F3D59DB0B22E37B6598830163886B7E2B1AE1B81E3601DAC9EDAC03",
       "baseline_technology_count": 52,
       "current_technology_count": 52,
       "difference_count": 3,
@@ -50,7 +50,7 @@
     {
       "scenario": "approved-delta-base-continuations",
       "baseline_fingerprint": "FD2B5CD73270B04ACB134BEB6C983333F81126DED6733B387D6896EBBB61A37D",
-      "current_fingerprint": "D369476499568AA19A0F7BEDE8EFA6DC551EA2580CC7DED9F2864B9E69EBA753",
+      "current_fingerprint": "C4F5E7536F3D59DB0B22E37B6598830163886B7E2B1AE1B81E3601DAC9EDAC03",
       "baseline_technology_count": 52,
       "current_technology_count": 52,
       "difference_count": 3,
@@ -59,7 +59,7 @@
     {
       "scenario": "approved-delta-compat-atan",
       "baseline_fingerprint": "976D6B46C1F36D029215B402A15D54511B0715081E2C8056D67113F18F1BBE49",
-      "current_fingerprint": "088CD87305891AC654B8D9492B2C09975B00D131C0DA9595E2881ACD23439DFF",
+      "current_fingerprint": "17712A1B19056D43110E6A9D4E4BD1EB9F483657E06A6F6BC37229E2A0993ADB",
       "baseline_technology_count": 52,
       "current_technology_count": 52,
       "difference_count": 3,
@@ -68,7 +68,7 @@
     {
       "scenario": "approved-delta-compat-space-age-galore",
       "baseline_fingerprint": "29F8EA6FD1DEDDE53F637F99A7A8606CFED10EE11DEBF88B7C58A78CE93AD19A",
-      "current_fingerprint": "B443F8ACC959B4289770CEF150F4BB121040BFE710FFDC9B59D63F4CF13F557C",
+      "current_fingerprint": "0D9B1DA5C2C07B3B479541A6927D23265955967E5DBA372C06F7C8F965E3D7C8",
       "baseline_technology_count": 70,
       "current_technology_count": 70,
       "difference_count": 3,
@@ -77,7 +77,7 @@
     {
       "scenario": "approved-delta-native-owner-adoption",
       "baseline_fingerprint": "EA19473230057EA1B004D186372A85A71717A1CFAEA392D62A94E9E9B83A7A07",
-      "current_fingerprint": "3659D13593B3624FC2D7756CC9B2EE5B560D8E15B1DB13FB62856C237BABB034",
+      "current_fingerprint": "23FEF3EE49C216F021CD26813B3A964AFCDCC4B6F97FAEDAB0FB8A621AB83C80",
       "baseline_technology_count": 70,
       "current_technology_count": 70,
       "difference_count": 3,
@@ -86,7 +86,7 @@
     {
       "scenario": "approved-delta-space-age",
       "baseline_fingerprint": "DC0982C08D71DC9BA347288413537AE39949519D48D115518510AB764CD2D8B2",
-      "current_fingerprint": "99F1C6AAE5D1A431779C8EDCB045B937FC13932E14E01E9FB76D09904D14E93D",
+      "current_fingerprint": "84D1203A9E6552DBDC3E5F67D0CD739D0C0FF5DC6BF1B2A0E7DED8DB69AB802A",
       "baseline_technology_count": 70,
       "current_technology_count": 70,
       "difference_count": 3,
@@ -97,7 +97,7 @@
     {
       "field": "package.archive_sha256",
       "before": "D77B3A78DA40CD4FDD4C829A01B5030E59FB593F3387124EF5C438F6A9E8DFCD",
-      "after": "2FFFD9F7E11B28D5B77C5B821FAE178E22541E6F8457627961783517DDB16EF6",
+      "after": "7BA3D90307A7C62FB57B6E2D2791C9727E4A6CC4591CED31D70A6EB55099697B",
       "reason": "Exact package identity and source fingerprint changed between the sealed 3.1.9 baseline and the 3.2 compiler branch.",
       "intentional": true,
       "migration_impact": "None by itself; semantic runtime and prototype contracts are compared separately.",
@@ -110,7 +110,20 @@
     {
       "field": "package.package_content_sha256",
       "before": "1D905CD5F394C3ABFC2ABEFFEB0249AC9D8D5C5FC4ADA0F5A5BA368B17548229",
-      "after": "512D414B2000A98FDA80C453E1EB932C1ABC6ED5A903A3DFB7DA9971887CF4A3",
+      "after": "57F8E7E566C0D52B1435E61408D138B00ED63246C70534F2A9669880E9F51EA6",
+      "reason": "Exact package identity and source fingerprint changed between the sealed 3.1.9 baseline and the 3.2 compiler branch.",
+      "intentional": true,
+      "migration_impact": "None by itself; semantic runtime and prototype contracts are compared separately.",
+      "required_evidence": [
+        "sealed 3.1.9 archive hash",
+        "deterministic current archive hash",
+        "static package contract export"
+      ]
+    },
+    {
+      "field": "package.settings_source_fingerprints.prototypes/mir/settings/defaults.lua",
+      "before": "E9133ABA322F748CBCF104D5C845CACEA514BFCD21A32FF494DEAEBBEAEC2F79",
+      "after": "82E81617764FACFD4518870FFCF2D389F783DF4633131A7BD8B88AB84E251255",
       "reason": "Exact package identity and source fingerprint changed between the sealed 3.1.9 baseline and the 3.2 compiler branch.",
       "intentional": true,
       "migration_impact": "None by itself; semantic runtime and prototype contracts are compared separately.",
@@ -323,8 +336,8 @@
             "string"
           ],
           "technology_design": [
-            "object{candidate_id,context,design,design_fingerprint,gates,identity_authority,maturity,members,prototype_fingerprint,provenance,qualification_fingerprint,schema,semantic_fingerprint,semantic_identity,subject_fingerprint,subjects,technology_id}",
-            "object{candidate_id,context,design,design_fingerprint,gates,identity_authority,maturity,members,prototype_fingerprint,provenance,qualification_fingerprint,schema,semantic_fingerprint,semantic_identity,subject_fingerprint,subjects}"
+            "object{candidate_id,context,design,design_fingerprint,gates,identity_authority,materialization,maturity,members,prototype_fingerprint,provenance,qualification_fingerprint,schema,semantic_fingerprint,semantic_identity,subject_fingerprint,subjects,technology_id}",
+            "object{candidate_id,context,design,design_fingerprint,gates,identity_authority,materialization,maturity,members,prototype_fingerprint,provenance,qualification_fingerprint,schema,semantic_fingerprint,semantic_identity,subject_fingerprint,subjects}"
           ],
           "technology_name": [
             "string"
@@ -532,8 +545,8 @@
             "string"
           ],
           "technology_design": [
-            "object{candidate_id,context,design,design_fingerprint,gates,identity_authority,maturity,members,prototype_fingerprint,provenance,qualification_fingerprint,schema,semantic_fingerprint,semantic_identity,subject_fingerprint,subjects,technology_id}",
-            "object{candidate_id,context,design,design_fingerprint,gates,identity_authority,maturity,members,prototype_fingerprint,provenance,qualification_fingerprint,schema,semantic_fingerprint,semantic_identity,subject_fingerprint,subjects}"
+            "object{candidate_id,context,design,design_fingerprint,gates,identity_authority,materialization,maturity,members,prototype_fingerprint,provenance,qualification_fingerprint,schema,semantic_fingerprint,semantic_identity,subject_fingerprint,subjects,technology_id}",
+            "object{candidate_id,context,design,design_fingerprint,gates,identity_authority,materialization,maturity,members,prototype_fingerprint,provenance,qualification_fingerprint,schema,semantic_fingerprint,semantic_identity,subject_fingerprint,subjects}"
           ],
           "technology_name": [
             "string"
@@ -741,8 +754,8 @@
             "string"
           ],
           "technology_design": [
-            "object{candidate_id,context,design,design_fingerprint,gates,identity_authority,maturity,members,prototype_fingerprint,provenance,qualification_fingerprint,schema,semantic_fingerprint,semantic_identity,subject_fingerprint,subjects,technology_id}",
-            "object{candidate_id,context,design,design_fingerprint,gates,identity_authority,maturity,members,prototype_fingerprint,provenance,qualification_fingerprint,schema,semantic_fingerprint,semantic_identity,subject_fingerprint,subjects}"
+            "object{candidate_id,context,design,design_fingerprint,gates,identity_authority,materialization,maturity,members,prototype_fingerprint,provenance,qualification_fingerprint,schema,semantic_fingerprint,semantic_identity,subject_fingerprint,subjects,technology_id}",
+            "object{candidate_id,context,design,design_fingerprint,gates,identity_authority,materialization,maturity,members,prototype_fingerprint,provenance,qualification_fingerprint,schema,semantic_fingerprint,semantic_identity,subject_fingerprint,subjects}"
           ],
           "technology_name": [
             "string"
@@ -950,8 +963,8 @@
             "string"
           ],
           "technology_design": [
-            "object{candidate_id,context,design,design_fingerprint,gates,identity_authority,maturity,members,prototype_fingerprint,provenance,qualification_fingerprint,schema,semantic_fingerprint,semantic_identity,subject_fingerprint,subjects,technology_id}",
-            "object{candidate_id,context,design,design_fingerprint,gates,identity_authority,maturity,members,prototype_fingerprint,provenance,qualification_fingerprint,schema,semantic_fingerprint,semantic_identity,subject_fingerprint,subjects}"
+            "object{candidate_id,context,design,design_fingerprint,gates,identity_authority,materialization,maturity,members,prototype_fingerprint,provenance,qualification_fingerprint,schema,semantic_fingerprint,semantic_identity,subject_fingerprint,subjects,technology_id}",
+            "object{candidate_id,context,design,design_fingerprint,gates,identity_authority,materialization,maturity,members,prototype_fingerprint,provenance,qualification_fingerprint,schema,semantic_fingerprint,semantic_identity,subject_fingerprint,subjects}"
           ],
           "technology_name": [
             "string"
@@ -1189,7 +1202,7 @@
             "string"
           ],
           "technology_design": [
-            "object{candidate_id,context,design,design_fingerprint,gates,identity_authority,maturity,members,prototype_fingerprint,provenance,qualification_fingerprint,schema,semantic_fingerprint,semantic_identity,subject_fingerprint,subjects,technology_id}"
+            "object{candidate_id,context,design,design_fingerprint,gates,identity_authority,materialization,maturity,members,prototype_fingerprint,provenance,qualification_fingerprint,schema,semantic_fingerprint,semantic_identity,subject_fingerprint,subjects,technology_id}"
           ],
           "technology_name": [
             "string"
@@ -1427,7 +1440,7 @@
             "string"
           ],
           "technology_design": [
-            "object{candidate_id,context,design,design_fingerprint,gates,identity_authority,maturity,members,prototype_fingerprint,provenance,qualification_fingerprint,schema,semantic_fingerprint,semantic_identity,subject_fingerprint,subjects,technology_id}"
+            "object{candidate_id,context,design,design_fingerprint,gates,identity_authority,materialization,maturity,members,prototype_fingerprint,provenance,qualification_fingerprint,schema,semantic_fingerprint,semantic_identity,subject_fingerprint,subjects,technology_id}"
           ],
           "technology_name": [
             "string"
@@ -1662,7 +1675,7 @@
             "string"
           ],
           "technology_design": [
-            "object{candidate_id,context,design,design_fingerprint,gates,identity_authority,maturity,members,prototype_fingerprint,provenance,qualification_fingerprint,schema,semantic_fingerprint,semantic_identity,subject_fingerprint,subjects,technology_id}"
+            "object{candidate_id,context,design,design_fingerprint,gates,identity_authority,materialization,maturity,members,prototype_fingerprint,provenance,qualification_fingerprint,schema,semantic_fingerprint,semantic_identity,subject_fingerprint,subjects,technology_id}"
           ],
           "technology_name": [
             "string"
@@ -1683,8 +1696,8 @@
     }
   ],
   "summary": {
-    "difference_count": 24,
-    "intentional_count": 24,
+    "difference_count": 25,
+    "intentional_count": 25,
     "unapproved_count": 0,
     "status": "approved"
   }

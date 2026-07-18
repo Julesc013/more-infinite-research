@@ -200,6 +200,7 @@ modules:
     - prototypes/mir/emit/technology_builder.lua
     - prototypes/mir/emit/base_extension_builder.lua
     - prototypes/mir/emit/stream_spec_adapter.lua
+    - prototypes/mir/emit/technology_design_adapter.lua
     - prototypes/mir/emit/stream_executor.lua
     - prototypes/mir/emit/base_extensions.lua
     - prototypes/mir/emit/effect_safety.lua

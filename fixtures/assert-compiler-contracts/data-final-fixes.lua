@@ -586,6 +586,33 @@ expect_error("base extension output parity", "prerequisites differs", function()
     "base-parity-test"
   )
 end)
+local continuation_design_plan = compilation_plan.finalize(generation_plan.new():finalize(), {{
+  operation = "emit_base_extension",
+  key = "compiler-contract-continuation",
+  manifest_id = "base-continuation/compiler-contract-continuation",
+  base_technology_name = "automation",
+  technology_name = "mir-compiler-contract-continuation",
+  technology = {
+    type = "technology",
+    name = "mir-compiler-contract-continuation",
+    localised_name = {"", "Compiler contract continuation"},
+    icon = "__base__/graphics/technology/automation.png",
+    icon_size = 256,
+    effects = {{type = "nothing"}},
+    prerequisites = {"automation"},
+    unit = {ingredients = {{"automation-science-pack", 1}}, count_formula = "1", time = 1},
+    max_level = "infinite",
+    upgrade = true
+  }
+}})
+local continuation_operation = continuation_design_plan.operations[1]
+if not continuation_operation or not continuation_operation.technology_design
+  or continuation_operation.technology_design.materialization.kind ~= "continuation"
+  or continuation_operation.technology_design.design.presentation.value.icon
+    ~= "__base__/graphics/technology/automation.png"
+  or continuation_operation.technology_design.identity_authority.source ~= "base-continuation-manifest" then
+  fail("base continuation did not use TechnologyDesign and continuation manifest authority")
+end
 expect_error("presentation output parity", "localized name differs", function()
   output_validator.assert_technology_shape(
     {effects = {}, prerequisites = {}, unit = {}, localised_name = {"", "Expected"}},

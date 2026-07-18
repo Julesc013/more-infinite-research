@@ -109,6 +109,8 @@ function M.assert_technology_shape(expected, actual, context)
   assert_equal(context, "max level", expected.max_level, actual.max_level)
   assert_structural(context, "localized name", expected.localised_name, actual.localised_name)
   assert_structural(context, "localized description", expected.localised_description, actual.localised_description)
+  assert_equal(context, "icon", expected.icon, actual.icon)
+  assert_equal(context, "icon size", expected.icon_size, actual.icon_size)
   assert_structural(context, "icons", expected.icons, actual.icons)
   assert_equal(context, "order", expected.order, actual.order)
   assert_equal(context, "level", expected.level, actual.level)
@@ -132,7 +134,14 @@ function M.assert_compilation_artifact(artifact)
   for _, operation in ipairs(artifact.operations or {}) do
     local technology = data_raw.technology(operation.technology_name)
     if operation.operation == "emit_stream" or operation.operation == "emit_base_extension" then
-      M.assert_technology_shape(operation.technology, technology, operation.technology_name)
+      if not operation.technology_design then
+        fail(operation.technology_name, "TechnologyDesign is missing")
+      end
+      technology_design.validate(operation.technology_design)
+      local expected = technology_design.prototype_projection(operation.technology_design)
+      M.assert_technology_shape(expected, operation.technology,
+        operation.technology_name .. " planned TechnologyDesign projection")
+      M.assert_technology_shape(expected, technology, operation.technology_name)
       assert_registry(operation)
       checked = checked + 1
     elseif operation.operation == "native_owner_binding" then

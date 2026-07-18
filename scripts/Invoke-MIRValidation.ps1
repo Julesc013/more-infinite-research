@@ -434,6 +434,7 @@ Invoke-RepoCheck "unsafe pickup reach technology effects are blocked" {
   $safetyText = Get-Content -Raw -LiteralPath $safetyPath
   $directEffectsPlannerText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\planner\direct_effects.lua")
   $streamAdapterText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\emit\stream_spec_adapter.lua")
+  $technologyDesignAdapterText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\emit\technology_design_adapter.lua")
   $baseExtensionsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\emit\base_extensions.lua")
   $graphSafetyText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\emit\technology_graph_safety.lua")
   $pipelineCommandsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\pipeline\commands.lua")
@@ -449,9 +450,9 @@ Invoke-RepoCheck "unsafe pickup reach technology effects are blocked" {
 
   $requiredGuardSnippets = @(
     @{ File = "prototypes\mir\planner\direct_effects.lua"; Text = $directEffectsPlannerText; Snippet = 'effect_safety.assert_effect_allowed(effect, "direct-effect stream " .. key)' },
-    @{ File = "prototypes\mir\emit\stream_spec_adapter.lua"; Text = $streamAdapterText; Snippet = 'generated_registry.register(technology.name,' },
+    @{ File = "prototypes\mir\emit\technology_design_adapter.lua"; Text = $technologyDesignAdapterText; Snippet = 'generated_registry.register(technology.name,' },
     @{ File = "prototypes\mir\emit\base_extensions.lua"; Text = $baseExtensionsText; Snippet = 'effect_safety.assert_effects_allowed(desired_effects, "base extension " .. key)' },
-    @{ File = "prototypes\mir\emit\base_extensions.lua"; Text = $baseExtensionsText; Snippet = 'generated_registry.register(operation.technology_name,' },
+    @{ File = "prototypes\mir\emit\base_extensions.lua"; Text = $baseExtensionsText; Snippet = 'technology_design_adapter.emit(operation.technology_design,' },
     @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'require("prototypes.mir.emit.effect_safety").assert_registered_technology_effects()' },
     @{ File = "prototypes\mir\pipeline\commands.lua"; Text = $pipelineCommandsText; Snippet = '.sanitize_all_technology_effects({pass = "input"})' },
     @{ File = "prototypes\mir\pipeline\commands.lua"; Text = $pipelineCommandsText; Snippet = '.sanitize_all_technology_effects({pass = "output"})' },

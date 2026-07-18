@@ -8,7 +8,6 @@ local settings_resolver = require("prototypes.mir.settings.resolver")
 local deepcopy = require("prototypes.mir.core.deepcopy")
 local table_utils = require("prototypes.mir.core.table")
 local effect_safety = require("prototypes.mir.emit.effect_safety")
-local generated_registry = require("prototypes.mir.domain.facts.generated_technology_registry")
 local competing_base_extensions = require("prototypes.mir.policy.competing_base_extensions")
 local planner_prerequisites = require("prototypes.mir.planner.prerequisites")
 local science_packs = require("prototypes.mir.capabilities.science_integration.science_packs")
@@ -16,6 +15,8 @@ local science_selector = require("prototypes.mir.capabilities.science_integratio
 local effective_settings = require("prototypes.mir.settings.effective")
 local effect_scaling = require("prototypes.mir.settings.effect_scaling")
 local base_extension_builder = require("prototypes.mir.emit.base_extension_builder")
+local technology_design = require("prototypes.mir.domain.technology.technology_design")
+local technology_design_adapter = require("prototypes.mir.emit.technology_design_adapter")
 
 local M = {}
 
@@ -516,14 +517,20 @@ local function plan_chain(key)
     special.on_extend(new, base_tech, spec)
   end
 
-  return {
+  local operation = {
     schema = 1,
     operation = "emit_base_extension",
     key = key,
+    manifest_id = spec.manifest_id or ("base-continuation/" .. key),
+    base_technology_name = chain_key .. "-" .. base_level,
     technology_name = new.name,
     technology = new,
     diagnostics = D.extension_fields(key, "generated", "base_extension", resolved_ingredients, new.prerequisites, new.effects, lab_status)
   }
+  operation.technology_design = technology_design.from_base_extension_operation(operation)
+  operation.technology = technology_design.prototype_projection(operation.technology_design)
+  operation.technology.type = "technology"
+  return operation
 end
 
 function M.plan_all()
@@ -549,8 +556,10 @@ function M.apply_plan(plan)
     if data_raw.technology(operation.technology_name) then
       error("Base extension output identity appeared after planning: " .. operation.technology_name, 2)
     end
-    data_raw.extend({deepcopy(operation.technology)})
-    generated_registry.register(operation.technology_name, {kind = "base_extension", key = operation.key})
+    if not operation.technology_design then
+      error("Base extension operation requires TechnologyDesign schema 2: " .. operation.technology_name, 2)
+    end
+    technology_design_adapter.emit(operation.technology_design, {kind = "base_extension", key = operation.key})
     D.extension(operation.diagnostics)
   end
 end
