@@ -534,6 +534,10 @@ Invoke-RepoCheck "compiler contract coverage and mutation sentinels are complete
   & (Join-Path $repo "scripts\Test-MIRCompilerContractCoverage.ps1") -RepoRoot $repo
 }
 
+Invoke-RepoCheck "technology lifecycle records and review tooling are schema-bound" {
+  & (Join-Path $repo "scripts\Test-MIRTechnologyLifecycle.ps1") -RepoRoot $repo
+}
+
 Invoke-RepoCheck "compatibility dependency declarations preserve full mod names" {
   & (Join-Path $repo "scripts\Test-MIRDependencyResolver.ps1") -RepoRoot $repo
 }

@@ -557,7 +557,16 @@ Assert-MIRContains -RelativePath "prototypes/mir/emit/mod_data.lua" -Text $modDa
 $streamCompilerText = Read-MIRFile -RelativePath "prototypes/mir/planner/stream_compiler.lua"
 Assert-MIRContains -RelativePath "prototypes/mir/planner/stream_compiler.lua" -Text $streamCompilerText -Needle 'require("prototypes.mir.streams.registry")'
 Assert-MIRContains -RelativePath "prototypes/mir/planner/stream_compiler.lua" -Text $streamCompilerText -Needle 'require("prototypes.mir.families.resolver")'
+Assert-MIRContains -RelativePath "prototypes/mir/planner/stream_compiler.lua" -Text $streamCompilerText -Needle 'require("prototypes.mir.planner.technology_catalog")'
 Assert-MIRContains -RelativePath "prototypes/mir/planner/stream_compiler.lua" -Text $streamCompilerText -Needle "function M.compile(context)"
+Assert-MIRContains -RelativePath "prototypes/mir/planner/stream_compiler.lua" -Text $streamCompilerText -Needle 'context:set_state("technology_candidate_catalog"'
+
+$technologyCatalogText = Read-MIRFile -RelativePath "prototypes/mir/planner/technology_catalog.lua"
+Assert-MIRContains -RelativePath "prototypes/mir/planner/technology_catalog.lua" -Text $technologyCatalogText -Needle "technology_candidate.from_design"
+Assert-MIRContains -RelativePath "prototypes/mir/planner/technology_catalog.lua" -Text $technologyCatalogText -Needle "technology_qualification.from_design"
+if ($technologyCatalogText -match 'data\.raw|data:extend|generated_registry|mod_data') {
+  throw "Technology candidate catalog must remain a non-publishing planning artifact."
+}
 
 $streamExecutorText = Read-MIRFile -RelativePath "prototypes/mir/emit/stream_executor.lua"
 Assert-MIRContains -RelativePath "prototypes/mir/emit/stream_executor.lua" -Text $streamExecutorText -Needle 'require("prototypes.mir.emit.stream_spec_adapter")'

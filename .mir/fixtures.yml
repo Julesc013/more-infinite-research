@@ -574,6 +574,12 @@ fixtures:
       - technology-design-cross-field-invariants
       - technology-design-executable-locks
       - technology-design-typed-subjects
+      - technology-candidate-schema-1-normalization
+      - technology-qualification-schema-1-hard-gates
+      - context-owned-candidate-and-qualification-catalogs
+      - technology-approval-exact-design-binding
+      - technology-promotion-state-transition-enforcement
+      - technology-migration-strategy-enforcement
       - emitted-row-technology-design-authority
       - full-technology-presentation-parity
       - cyclic-fingerprint-rejection

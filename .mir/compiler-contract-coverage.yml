@@ -27,6 +27,19 @@
   "technology_design_lock_states": ["none", "partial", "all"],
   "technology_design_lock_policies": ["adaptive", "locked", "field-specific", "adaptive-within-envelope"],
   "technology_design_materialization_kinds": ["create", "patch-existing", "continuation", "diagnose"],
+  "technology_lifecycle_schemas": {
+    "TechnologyCandidate": 1,
+    "TechnologyQualification": 1,
+    "TechnologyApproval": 1,
+    "TechnologyPromotion": 1,
+    "TechnologyMigration": 1,
+    "TechnologyCatalog": 1
+  },
+  "technology_approval_decisions": ["approved", "quarantined", "demoted"],
+  "technology_identity_transitions": [
+    "unassigned->provisional", "provisional->reserved", "reserved->stable-unreleased",
+    "stable-unreleased->released", "released->retired"
+  ],
   "technology_design_maturity_axes": [
     "safety", "discovery_evidence", "design_maturity", "validation_evidence",
     "applicability_scope", "identity_stability", "runtime_action", "public_claim"
@@ -54,7 +67,8 @@
   "compiler_context_schema": 2,
   "context_owned_state": [
     "recipe-index", "relationship-indexes", "active-compatibility-packs", "family-resolution",
-    "generation-plan", "compilation-plan", "generated-technology-registry", "productivity-family-adoption",
+    "technology-candidate-catalog", "technology-qualifications", "generation-plan", "compilation-plan",
+    "generated-technology-registry", "productivity-family-adoption",
     "coverage-report", "compiler-telemetry", "diagnostics"
   ],
   "positive_negative_required": true,

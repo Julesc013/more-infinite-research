@@ -14,6 +14,12 @@ local effect_safety = require("__more-infinite-research__.prototypes.mir.emit.ef
 local automatic_compiler_contract = require("__more-infinite-research__.prototypes.mir.settings.automatic_compiler_contract")
 local native_owner_cost_model = require("__more-infinite-research__.prototypes.mir.domain.native_owner.cost_model")
 local technology_design = require("__more-infinite-research__.prototypes.mir.domain.technology.technology_design")
+local technology_candidate = require("__more-infinite-research__.prototypes.mir.domain.technology.technology_candidate")
+local technology_qualification = require("__more-infinite-research__.prototypes.mir.domain.technology.technology_qualification")
+local technology_approval = require("__more-infinite-research__.prototypes.mir.domain.technology.technology_approval")
+local technology_promotion = require("__more-infinite-research__.prototypes.mir.domain.technology.technology_promotion")
+local technology_migration = require("__more-infinite-research__.prototypes.mir.domain.technology.technology_migration")
+local technology_catalog = require("__more-infinite-research__.prototypes.mir.planner.technology_catalog")
 local pipeline_commands = require("__more-infinite-research__.prototypes.mir.pipeline.commands")
 local compiler_context = require("__more-infinite-research__.prototypes.mir.pipeline.compiler_context")
 
@@ -420,6 +426,62 @@ if normalized_design.semantic_fingerprint
   ~= technology_design.from_generation_row(design_row).semantic_fingerprint then
   fail("TechnologyDesign semantic fingerprint is not deterministic")
 end
+local candidate = technology_candidate.from_design(normalized_design, design_row)
+local qualification = technology_qualification.from_design(normalized_design, design_row)
+local lifecycle_catalog = technology_catalog.from_generation_rows({design_row}, {fixture = "lifecycle"})
+technology_catalog.validate(lifecycle_catalog)
+if candidate.candidate_id ~= normalized_design.candidate_id
+  or candidate.semantic_identity.capability ~= "recipe-productivity"
+  or qualification.decision ~= "qualified"
+  or qualification.design_fingerprint ~= normalized_design.design_fingerprint
+  or #lifecycle_catalog.candidates ~= 1
+  or #lifecycle_catalog.candidates[1].alternatives ~= 1
+  or #lifecycle_catalog.qualifications ~= 1 then
+  fail("technology candidate catalog and qualification records are inconsistent")
+end
+local approval = technology_approval.new({
+  approval_id = "approval/compiler-contract/1",
+  decision = "approved",
+  candidate_selector = {candidate_id = candidate.candidate_id},
+  applicability = {exact_mods = {"base"}, structural_envelope = "fixture-v1"},
+  selected_alternative = lifecycle_catalog.candidates[1].alternatives[1].alternative_id,
+  approved_design_fingerprint = normalized_design.design_fingerprint,
+  qualification_fingerprint = qualification.qualification_fingerprint,
+  locked_fields = {"identity.technology_id", "presentation.localised_name"},
+  adaptive_envelopes = {},
+  required_evidence = {"positive-fixture", "negative-fixture"},
+  reviewer = "fixture-reviewer",
+  decided_at = "2026-07-18T00:00:00Z"
+})
+local promotion = technology_promotion.new({
+  promotion_id = "promotion/compiler-contract/1",
+  technology_id = normalized_design.technology_id,
+  candidate_id = candidate.candidate_id,
+  approval_id = approval.approval_id,
+  approved_design_fingerprint = normalized_design.design_fingerprint,
+  prior_identity_state = "reserved",
+  identity_state = "stable-unreleased",
+  migration_policy = "stable",
+  introduced_in = "3.2.0",
+  evidence = {qualification.qualification_fingerprint}
+})
+local migration = technology_migration.new({
+  migration_id = "migration/compiler-contract/1",
+  from_technology_id = "old-fixture-technology",
+  to_technology_id = normalized_design.technology_id,
+  strategy = "retain-hidden-alias",
+  save_behavior = "preserve researched state through an alias migration",
+  approval_id = approval.approval_id,
+  evidence = {promotion.promotion_fingerprint}
+})
+if type(approval.approval_fingerprint) ~= "string"
+  or type(promotion.promotion_fingerprint) ~= "string"
+  or type(migration.migration_fingerprint) ~= "string" then
+  fail("technology lifecycle records are not independently fingerprinted")
+end
+expect_error("TechnologyPromotion state regression", "transition is not permitted", function()
+  technology_promotion.assert_transition("released", "reserved")
+end)
 
 local function native_owner_row(stream_key, owner, recipe)
   local row = emitted_row(stream_key, "unused")
@@ -769,6 +831,13 @@ local cyclic = {}; cyclic.self = cyclic
 expect_error("cyclic fingerprint", "Cannot fingerprint cyclic table", function() fingerprint.of(cyclic) end)
 
 local production_context = compiler_context.current()
+local production_catalog = production_context:state_snapshot("technology_candidate_catalog")
+local production_qualifications = production_context:state_snapshot("technology_qualifications")
+if not production_catalog or not production_qualifications
+  or #production_catalog.candidates == 0
+  or #production_catalog.qualifications ~= #production_qualifications then
+  fail("CompilerContext does not own the technology candidate and qualification catalogs")
+end
 local first_context = compiler_context.new()
 first_context:set_state("fixture-derived-state", {value = 1})
 first_context:record_artifact("fixture-artifact", {value = 2})

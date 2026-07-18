@@ -144,7 +144,12 @@ modules:
     - prototypes/mir/domain/streams/raw_catalog.lua
     - prototypes/mir/domain/streams/descriptor.lua
     - prototypes/mir/domain/diagnostics/codes.lua
+    - prototypes/mir/domain/technology/technology_candidate.lua
     - prototypes/mir/domain/technology/technology_design.lua
+    - prototypes/mir/domain/technology/technology_qualification.lua
+    - prototypes/mir/domain/technology/technology_approval.lua
+    - prototypes/mir/domain/technology/technology_promotion.lua
+    - prototypes/mir/domain/technology/technology_migration.lua
     - prototypes/mir/domain/evidence/compiler_evidence.lua
   policy:
     - prototypes/mir/policy/owner_policy.lua
@@ -190,6 +195,7 @@ modules:
     - prototypes/mir/planner/prerequisites.lua
     - prototypes/mir/planner/requirements.lua
     - prototypes/mir/planner/technology_requirements.lua
+    - prototypes/mir/planner/technology_catalog.lua
     - prototypes/mir/planner/technology_graph.lua
     - prototypes/mir/planner/science.lua
   integrity:
@@ -260,6 +266,8 @@ mutation_commands:
     - stream planning and emission consume TechnologyDesign schema 2 without changing released technology identities
     - every emitted GenerationPlan row carries one validated TechnologyDesign and legacy fields are derived compatibility projections only
     - every adopted GenerationPlan row carries one patch-existing TechnologyDesign binding the immutable owner input and complete expected output
+    - candidate and qualification catalogs are context-owned compiler artifacts and do not publish or promote identities
+    - approval promotion demotion quarantine and migration records are independently fingerprinted governance decisions
     - stream planning cannot import the stream executor or adoption mutation transaction
     - stream emission and fingerprint-verified patch-existing adoption mutation are applied only by the emission-owned stream executor
     - reviewed compatibility data cannot override hard prototype safety facts

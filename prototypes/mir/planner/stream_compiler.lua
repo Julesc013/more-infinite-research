@@ -29,6 +29,7 @@ local native_owner_contract = require("prototypes.mir.domain.native_owner.contra
 local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 local telemetry = require("prototypes.mir.report.compiler_telemetry")
 local technology_design = require("prototypes.mir.domain.technology.technology_design")
+local technology_catalog = require("prototypes.mir.planner.technology_catalog")
 local compiler_context = require("prototypes.mir.pipeline.compiler_context")
 
 local M = {}
@@ -408,9 +409,14 @@ function M.compile(context)
     plan:add(row)
   end
   local finalized = plan:finalize()
+  local artifact = finalized:artifact()
+  local catalog = technology_catalog.from_generation_rows(artifact.rows, artifact.source_fingerprints)
+  technology_catalog.validate(catalog)
   telemetry.count("stream_rows", finalized:count())
   telemetry.finish_phase("stream_compiler")
-  context:set_state("generation_plan", finalized:artifact())
+  context:set_state("technology_candidate_catalog", technology_catalog.snapshot(catalog))
+  context:set_state("technology_qualifications", deepcopy(catalog.qualifications))
+  context:set_state("generation_plan", artifact)
   return finalized
 end
 

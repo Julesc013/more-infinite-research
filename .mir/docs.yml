@@ -153,6 +153,14 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - 3.2.0-native-owner-patch-design
+  - path: docs/releases/3.2.0-technology-lifecycle-report.md
+    title: "3.2.0 Technology Lifecycle Report"
+    status: current
+    audience: maintainer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - 3.2.0-technology-lifecycle-records
   - path: docs/architecture/module-boundaries.md
     title: "MIR 3.0.0 Repository Structure"
     status: current
@@ -208,6 +216,14 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - technology-design-schema
+  - path: docs/reference/schemas/technology-lifecycle.md
+    title: "Technology Lifecycle Schemas"
+    status: current
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - technology-lifecycle-schemas
   - path: docs/reference/schemas/compiler-evidence.md
     title: "CompilerEvidence Schema"
     status: current

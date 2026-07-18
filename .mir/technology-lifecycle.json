@@ -1,0 +1,39 @@
+{
+  "schema": 1,
+  "records": {
+    "TechnologyCandidate": 1,
+    "TechnologyDesign": 2,
+    "TechnologyQualification": 1,
+    "TechnologyApproval": 1,
+    "TechnologyPromotion": 1,
+    "TechnologyMigration": 1,
+    "TechnologyCatalog": 1
+  },
+  "approval_decisions": ["approved", "quarantined", "demoted"],
+  "identity_states": ["unassigned", "provisional", "reserved", "stable-unreleased", "released", "retired"],
+  "identity_transitions": {
+    "unassigned": ["provisional"],
+    "provisional": ["reserved"],
+    "reserved": ["stable-unreleased"],
+    "stable-unreleased": ["released"],
+    "released": ["retired"],
+    "retired": []
+  },
+  "migration_strategies": [
+    "retain-hidden-alias", "retain-visible-alias", "in-place-compatible", "retire-with-replacement"
+  ],
+  "rules": [
+    "qualification never promotes design identity or public claims",
+    "approval binds an exact candidate alternative design and qualification fingerprint",
+    "quarantine and demotion never silently delete or rename a released technology",
+    "released identity changes require a TechnologyMigration record",
+    "candidate and qualification catalogs are context-owned and non-publishing",
+    "offline governance records use canonical SHA-256 transport fingerprints"
+  ],
+  "tooling": {
+    "catalog_export": "scripts/Export-MIRTechnologyCatalog.ps1",
+    "design_diff": "scripts/Compare-MIRTechnologyDesigns.ps1",
+    "lifecycle_record": "scripts/New-MIRTechnologyLifecycleRecord.ps1",
+    "validation": "scripts/Test-MIRTechnologyLifecycle.ps1"
+  }
+}
