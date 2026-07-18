@@ -3,9 +3,9 @@ local recipe_facts = require("prototypes.mir.index.recipe_facts")
 local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 local lookup = require("prototypes.mir.platform.factorio.prototype_lookup")
 local effect_contracts = require("prototypes.mir.integrity.effect_contracts")
+local compiler_context = require("prototypes.mir.pipeline.compiler_context")
 
 local M = {}
-local canonical = {}
 
 local ENTITY_TYPES = {
   "accumulator", "ammo-turret", "assembling-machine", "beacon", "boiler",
@@ -41,6 +41,7 @@ end
 local function build(phase)
   phase = phase or "input"
   if phase ~= "input" and phase ~= "output" then error("Unknown relationship snapshot phase: " .. tostring(phase), 2) end
+  local canonical = compiler_context.current():state_view("relationship_indexes", function() return {} end)
   if canonical[phase] then return canonical[phase] end
 
   local recipe_index = recipe_facts.snapshot()

@@ -1,26 +1,30 @@
 local M = {}
+local compiler_context = require("prototypes.mir.pipeline.compiler_context")
 
-local entries = {}
+local function entries()
+  return compiler_context.current():state_view("generated_technology_registry", function() return {} end)
+end
 
 function M.register(name, metadata)
   if not name then return end
-  local entry = entries[name] or { name = name }
+  local registry = entries()
+  local entry = registry[name] or { name = name }
   for key, value in pairs(metadata or {}) do entry[key] = value end
-  entries[name] = entry
+  registry[name] = entry
 end
 
 function M.contains(name)
-  return entries[name] ~= nil
+  return entries()[name] ~= nil
 end
 
 function M.get(name)
-  return entries[name]
+  return entries()[name]
 end
 
 function M.sorted_names(options)
   options = options or {}
   local out = {}
-  for name, entry in pairs(entries) do
+  for name, entry in pairs(entries()) do
     local matches = true
     for key, value in pairs(options) do
       if entry[key] ~= value then

@@ -5,9 +5,9 @@ local rule_registry = require("prototypes.mir.families.registry")
 local compatibility_packs = require("prototypes.mir.compatibility.packs.registry")
 local productivity_owners = require("prototypes.mir.index.productivity_owners")
 local competing_productivity = require("prototypes.mir.policy.competing_productivity")
+local compiler_context = require("prototypes.mir.pipeline.compiler_context")
 
 local M = {}
-local canonical = nil
 
 local HARD_BLOCKERS = {
   recipe_fact_missing = true,
@@ -182,6 +182,8 @@ local function candidates_for_rule(rule, indexes, seeds)
 end
 
 local function build()
+  local context = compiler_context.current()
+  local canonical = context:state_view("family_resolution")
   if canonical then return canonical end
   local indexes = relationships.snapshot()
   local rules = rule_registry.snapshot().rules
@@ -288,7 +290,7 @@ local function build()
     return a.recipe < b.recipe
   end)
   canonical = {schema = 2, attachments = attachments, decisions = decisions}
-  return canonical
+  return context:set_state("family_resolution", canonical)
 end
 
 function M.attachments_for_stream(stream_key)

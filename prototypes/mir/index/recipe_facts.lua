@@ -3,10 +3,9 @@ local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 local recipe_semantics = require("prototypes.mir.domain.facts.recipe_semantics")
 local target_profiles = require("prototypes.mir.platform.factorio.target_profiles")
 local telemetry = require("prototypes.mir.report.compiler_telemetry")
+local compiler_context = require("prototypes.mir.pipeline.compiler_context")
 
 local M = {}
-local canonical = nil
-local build_scan_count = 0
 local SCHEMA = 2
 
 local function name_of(entry)
@@ -258,9 +257,12 @@ local function source_class(recipe, categories, is_hidden)
 end
 
 local function build()
-  if canonical then return canonical end
+  local context = compiler_context.current()
+  local cached = context:state_view("recipe_index")
+  if cached then return cached end
   telemetry.start_phase("snapshot")
-  build_scan_count = build_scan_count + 1
+  local metrics = context:state_view("recipe_index_metrics", function() return {scan_count = 0} end)
+  metrics.scan_count = metrics.scan_count + 1
   local facts = {}
   local by_output, by_productive_output, by_ingredient, by_category, names = {}, {}, {}, {}, {}
   for recipe_name, recipe in pairs(data_raw.prototypes("recipe")) do
@@ -316,7 +318,7 @@ local function build()
   for _, index in pairs({by_output, by_productive_output, by_ingredient, by_category}) do
     for _, recipe_names in pairs(index) do table.sort(recipe_names) end
   end
-  canonical = {
+  local canonical = {
     schema = SCHEMA,
     facts = facts,
     names = names,
@@ -328,7 +330,7 @@ local function build()
   telemetry.count("recipe_index_scans", 1)
   telemetry.count("recipes", #names)
   telemetry.finish_phase("snapshot")
-  return canonical
+  return context:set_state("recipe_index", canonical)
 end
 
 function M.get(recipe_name)
@@ -395,7 +397,7 @@ end
 
 function M.scan_count()
   build()
-  return build_scan_count
+  return compiler_context.current():state_view("recipe_index_metrics").scan_count
 end
 
 return M

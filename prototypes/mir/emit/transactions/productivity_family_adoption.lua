@@ -2,18 +2,24 @@ local deepcopy = require("prototypes.mir.core.deepcopy")
 local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 local native_owner_contract = require("prototypes.mir.domain.native_owner.contract")
 local mod_data = require("prototypes.mir.emit.mod_data")
+local compiler_context = require("prototypes.mir.pipeline.compiler_context")
 
 local M = {}
 local MOD_DATA_NAME = "more-infinite-research-productivity-family-adoption"
 local VERSION = 2
-local bindings = {}
-local adopted_productivity_family_recipes = {}
+local function state()
+  return compiler_context.current():state_view("productivity_family_adoption", function()
+    return {bindings = {}, adopted_recipes = {}}
+  end)
+end
 
 local function same(left, right)
   return tostring(left or "") == tostring(right or "")
 end
 
 local function record(plan)
+  local bindings = state().bindings
+  local adopted_productivity_family_recipes = state().adopted_recipes
   table.insert(bindings, {
     key = plan.key,
     owner = plan.owner,
@@ -80,7 +86,7 @@ end
 
 local function signature()
   local entries = {}
-  for _, entry in ipairs(bindings) do
+  for _, entry in ipairs(state().bindings) do
     table.insert(entries,
       "schema=" .. tostring(VERSION)
       .. "|stream=" .. tostring(entry.key)
@@ -95,6 +101,8 @@ local function signature()
 end
 
 function M.emit_mod_data()
+  local bindings = state().bindings
+  local adopted_productivity_family_recipes = state().adopted_recipes
   mod_data.emit_productivity_family_adoption({
     name = MOD_DATA_NAME,
     data_type = "more-infinite-research.productivity-family-adoption",
@@ -110,6 +118,8 @@ function M.emit_mod_data()
 end
 
 function M.snapshot()
+  local bindings = state().bindings
+  local adopted_productivity_family_recipes = state().adopted_recipes
   return deepcopy({
     version = VERSION,
     bindings = bindings,

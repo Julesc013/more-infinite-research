@@ -399,6 +399,27 @@ rules:
   - Providers may discover and normalize candidates but remain planning-only; emission owns generated prototype mutation.
   - Automatic family creation maturity is declarative; reviewed creation cannot promote experimental providers.
   - Top-level MIR Lua module dependencies must remain acyclic.
+  - Mutable state derived from prototypes settings active mods or a compilation pass is owned by CompilerContext schema 2.
+  - Only immutable built-in policy catalogs may retain process-wide canonical caches.
+
+compiler_context:
+  path: prototypes/mir/pipeline/compiler_context.lua
+  schema: 2
+  owns:
+    - recipe-index
+    - relationship-indexes
+    - active-compatibility-packs
+    - family-resolution
+    - generation-plan
+    - compilation-plan
+    - generated-technology-registry
+    - productivity-family-adoption
+    - coverage-report
+    - compiler-telemetry
+    - diagnostics
+  immutable_process_catalogs:
+    - prototypes/mir/providers/registry.lua
+    - prototypes/mir/families/registry.lua
 
 validation_tooling:
   facade: scripts/Invoke-MIRValidation.ps1

@@ -11,9 +11,9 @@ local technology_graph = require("prototypes.mir.planner.technology_graph")
 local telemetry = require("prototypes.mir.report.compiler_telemetry")
 local technology_design = require("prototypes.mir.domain.technology.technology_design")
 local compiler_evidence = require("prototypes.mir.domain.evidence.compiler_evidence")
+local compiler_context = require("prototypes.mir.pipeline.compiler_context")
 
 local M = {}
-local latest = nil
 local normalized_base_operation
 
 local function rebuild_stream_artifact(stream_artifact, rows)
@@ -428,14 +428,18 @@ function M.finalize(stream_plan, base_plan, compiler_inputs)
 end
 
 function M.compile(context)
+  context = context or compiler_context.current()
+  compiler_context.activate(context)
+  local latest = context:state_view("compilation_plan")
   if latest then return latest end
   telemetry.start_phase("planning")
-  local stream_plan = stream_compiler.compile()
+  local stream_plan = stream_compiler.compile(context)
   local base_plan = base_extensions.plan_all()
   latest = M.finalize(stream_plan, base_plan, {
-    input_sanitation_ledger = context and context:artifact("input_sanitation_ledger") or nil
+    input_sanitation_ledger = context:artifact("input_sanitation_ledger")
   })
-  stream_compiler.accept_artifact(latest.stream_plan)
+  context:set_state("compilation_plan", latest)
+  stream_compiler.accept_artifact(latest.stream_plan, context)
   telemetry.finish_phase("planning")
   return latest
 end

@@ -589,6 +589,7 @@ fixtures:
       - stable-provider-order-and-fingerprint
       - duplicate-provider-id-rejection
       - provider-snapshot-copy-isolation
+      - compiler-context-state-and-artifact-isolation
       - planning-only-provider-emission-adapters
       - declarative-automatic-setting-descriptors
       - conservative-safe-expansive-custom-policy-expansion

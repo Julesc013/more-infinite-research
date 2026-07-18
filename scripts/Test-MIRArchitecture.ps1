@@ -483,6 +483,46 @@ Assert-MIRContains `
   -Text $compilationPlanText `
   -Needle "function M.publish(context)"
 
+$compilerContextText = Read-MIRFile -RelativePath "prototypes/mir/pipeline/compiler_context.lua"
+foreach ($contextNeedle in @(
+  "schema = 2",
+  "function M.activate(context)",
+  "function M.current()",
+  "function Context:state_view(name, factory)",
+  "function Context:set_state(name, value)",
+  "function Context:state_snapshot(name)"
+)) {
+  Assert-MIRContains -RelativePath "prototypes/mir/pipeline/compiler_context.lua" -Text $compilerContextText -Needle $contextNeedle
+}
+foreach ($contextOwnedModule in @(
+  "prototypes/mir/index/recipe_facts.lua",
+  "prototypes/mir/index/relationships.lua",
+  "prototypes/mir/families/resolver.lua",
+  "prototypes/mir/compatibility/packs/registry.lua",
+  "prototypes/mir/planner/stream_compiler.lua",
+  "prototypes/mir/planner/compilation_plan.lua",
+  "prototypes/mir/report/compiler_telemetry.lua",
+  "prototypes/mir/report/diagnostics_sink.lua",
+  "prototypes/mir/report/coverage.lua",
+  "prototypes/mir/domain/facts/generated_technology_registry.lua",
+  "prototypes/mir/emit/transactions/productivity_family_adoption.lua"
+)) {
+  $contextOwnedText = Read-MIRFile -RelativePath $contextOwnedModule
+  Assert-MIRContains -RelativePath $contextOwnedModule -Text $contextOwnedText -Needle 'require("prototypes.mir.pipeline.compiler_context")'
+}
+foreach ($forbiddenContextCache in @(
+  @{ Path = "prototypes/mir/index/recipe_facts.lua"; Pattern = '(?m)^local\s+canonical\s*=' },
+  @{ Path = "prototypes/mir/index/relationships.lua"; Pattern = '(?m)^local\s+canonical\s*=' },
+  @{ Path = "prototypes/mir/families/resolver.lua"; Pattern = '(?m)^local\s+canonical\s*=' },
+  @{ Path = "prototypes/mir/compatibility/packs/registry.lua"; Pattern = '(?m)^local\s+canonical_snapshot\s*=' },
+  @{ Path = "prototypes/mir/planner/stream_compiler.lua"; Pattern = '(?m)^local\s+latest_plan\s*=' },
+  @{ Path = "prototypes/mir/planner/compilation_plan.lua"; Pattern = '(?m)^local\s+latest\s*=' },
+  @{ Path = "prototypes/mir/report/coverage.lua"; Pattern = '(?m)^local\s+latest\s*=' }
+)) {
+  Assert-MIRNoPatternInLuaFile -RelativePath $forbiddenContextCache.Path -Pattern $forbiddenContextCache.Pattern `
+    -Message "Data-derived compiler state must be owned by CompilerContext, not a module-level cache."
+}
+
 $technologyBuilderText = Read-MIRFile -RelativePath "prototypes/mir/emit/technology_builder.lua"
 Assert-MIRContains -RelativePath "prototypes/mir/emit/technology_builder.lua" -Text $technologyBuilderText -Needle 'require("prototypes.mir.platform.factorio.data_raw")'
 Assert-MIRContains -RelativePath "prototypes/mir/emit/technology_builder.lua" -Text $technologyBuilderText -Needle "data_raw.extend({ technology })"
@@ -509,7 +549,7 @@ Assert-MIRContains -RelativePath "prototypes/mir/emit/mod_data.lua" -Text $modDa
 $streamCompilerText = Read-MIRFile -RelativePath "prototypes/mir/planner/stream_compiler.lua"
 Assert-MIRContains -RelativePath "prototypes/mir/planner/stream_compiler.lua" -Text $streamCompilerText -Needle 'require("prototypes.mir.streams.registry")'
 Assert-MIRContains -RelativePath "prototypes/mir/planner/stream_compiler.lua" -Text $streamCompilerText -Needle 'require("prototypes.mir.families.resolver")'
-Assert-MIRContains -RelativePath "prototypes/mir/planner/stream_compiler.lua" -Text $streamCompilerText -Needle "function M.compile()"
+Assert-MIRContains -RelativePath "prototypes/mir/planner/stream_compiler.lua" -Text $streamCompilerText -Needle "function M.compile(context)"
 
 $streamExecutorText = Read-MIRFile -RelativePath "prototypes/mir/emit/stream_executor.lua"
 Assert-MIRContains -RelativePath "prototypes/mir/emit/stream_executor.lua" -Text $streamExecutorText -Needle 'require("prototypes.mir.emit.stream_spec_adapter")'

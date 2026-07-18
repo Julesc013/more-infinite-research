@@ -3,10 +3,10 @@ local schema = require("prototypes.mir.compatibility.packs.schema")
 local target_profiles = require("prototypes.mir.platform.factorio.target_profiles")
 local precedence = require("prototypes.mir.compatibility.packs.precedence")
 local deepcopy = require("prototypes.mir.core.deepcopy")
+local compiler_context = require("prototypes.mir.pipeline.compiler_context")
 
 local M = {}
 local PROTOTYPE_NAME = "more-infinite-research-compatibility-pack"
-local canonical_snapshot = nil
 
 local function contains(values, expected)
   for _, value in ipairs(values or {}) do
@@ -95,11 +95,13 @@ function M.compile(packs, context)
 end
 
 local function snapshot()
+  local context = compiler_context.current()
+  local canonical_snapshot = context:state_view("active_compatibility_packs")
   if canonical_snapshot then return canonical_snapshot end
   local prototype = data_raw.prototype("mod-data", PROTOTYPE_NAME)
   local packs = prototype and prototype.data and prototype.data.packs or {}
   canonical_snapshot = M.compile(packs)
-  return canonical_snapshot
+  return context:set_state("active_compatibility_packs", canonical_snapshot)
 end
 
 function M.snapshot()

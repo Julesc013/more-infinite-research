@@ -5,11 +5,13 @@ local effective_settings = require("prototypes.mir.settings.effective")
 local automatic_compiler_policy = require("prototypes.mir.settings.automatic_compiler_policy")
 local decision_record = require("prototypes.mir.domain.decisions.decision_record")
 local telemetry = require("prototypes.mir.report.compiler_telemetry")
+local compiler_context = require("prototypes.mir.pipeline.compiler_context")
 
-local rows = {}
-local audit_rows = {}
-local match_rows = {}
-local recipe_to_streams = {}
+local function state()
+  return compiler_context.current():state_view("diagnostics", function()
+    return {rows = {}, audit_rows = {}, match_rows = {}, recipe_to_streams = {}}
+  end)
+end
 
 local function startup_setting(name)
   return effective_settings.get(name)
@@ -45,15 +47,16 @@ end
 
 local function append(kind, row)
   if not D.enabled() then return end
+  local current = state()
   row.kind = kind
-  table.insert(rows, row)
+  table.insert(current.rows, row)
   telemetry.count("diagnostic_rows", 1)
 
   local audit_row = {schema = 1, kind = kind}
   for field, value in pairs(row) do
     audit_row[field] = value
   end
-  table.insert(audit_rows, audit_row)
+  table.insert(current.audit_rows, audit_row)
 end
 
 function D.stream(row)
@@ -118,6 +121,7 @@ end
 
 function D.recipe_matches(key, buckets)
   if not D.recipe_matches_enabled() then return end
+  local match_rows = state().match_rows
   for _, bucket in ipairs(buckets or {}) do
     table.insert(match_rows, {
       key = key,
@@ -129,6 +133,7 @@ end
 
 function D.record_recipe_match(key, recipe_name)
   if not key or not recipe_name then return end
+  local recipe_to_streams = state().recipe_to_streams
   recipe_to_streams[recipe_name] = recipe_to_streams[recipe_name] or {}
 
   for _, existing in ipairs(recipe_to_streams[recipe_name]) do
@@ -202,6 +207,11 @@ local function audit_fields(row)
 end
 
 function D.flush()
+  local current = state()
+  local rows = current.rows
+  local audit_rows = current.audit_rows
+  local match_rows = current.match_rows
+  local recipe_to_streams = current.recipe_to_streams
   if D.enabled() and #rows > 0 then
     table.sort(rows, row_sort)
     log("[more-infinite-research] Generation report start (" .. tostring(#rows) .. " rows)")

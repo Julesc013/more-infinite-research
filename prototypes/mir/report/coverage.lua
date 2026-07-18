@@ -8,9 +8,9 @@ local mod_data = require("prototypes.mir.emit.mod_data")
 local recipe_facts = require("prototypes.mir.index.recipe_facts")
 local target_line = require("prototypes.mir.platform.factorio.target_line")
 local adoption = require("prototypes.mir.emit.transactions.productivity_family_adoption")
+local compiler_context = require("prototypes.mir.pipeline.compiler_context")
 
 local M = {}
-local latest = nil
 
 local CATEGORIES = {
   "auto_attached",
@@ -120,7 +120,8 @@ local function classify(recipe_name, fact, owners, attached, decisions, adopted)
   return "unclassified", "no_family_candidate_or_owner"
 end
 
-function M.build()
+function M.build(context)
+  context = context or compiler_context.current()
   local facts = recipe_facts.snapshot()
   local owners_by_recipe, prototype_counts = owner_index()
   local attached, decisions, candidate_count = family_indexes()
@@ -178,12 +179,12 @@ function M.build()
     rows = rows
   }
   artifact.fingerprint = fingerprint.of(artifact)
-  latest = artifact
+  context:set_state("coverage_report", artifact)
   return deepcopy(artifact)
 end
 
-function M.emit()
-  local artifact = M.build()
+function M.emit(context)
+  local artifact = M.build(context)
   diagnostics.coverage({
     key = "recipe_accounting",
     status = "diagnostic",
@@ -217,13 +218,15 @@ function M.emit()
   return artifact
 end
 
-function M.publish()
-  local artifact = latest or M.build()
+function M.publish(context)
+  context = context or compiler_context.current()
+  local artifact = context:state_snapshot("coverage_report") or M.build(context)
   return mod_data.emit_coverage(artifact)
 end
 
-function M.latest_artifact()
-  return latest and deepcopy(latest) or nil
+function M.latest_artifact(context)
+  context = context or compiler_context.current()
+  return context:state_snapshot("coverage_report")
 end
 
 return M

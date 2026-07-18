@@ -15,6 +15,7 @@ local automatic_compiler_contract = require("__more-infinite-research__.prototyp
 local native_owner_cost_model = require("__more-infinite-research__.prototypes.mir.domain.native_owner.cost_model")
 local technology_design = require("__more-infinite-research__.prototypes.mir.domain.technology.technology_design")
 local pipeline_commands = require("__more-infinite-research__.prototypes.mir.pipeline.commands")
+local compiler_context = require("__more-infinite-research__.prototypes.mir.pipeline.compiler_context")
 
 local function fail(message)
   error("MIR compiler contract validation failed: " .. message)
@@ -720,3 +721,22 @@ end
 if fingerprint.of({b = 2, a = 1}) ~= fingerprint.of({a = 1, b = 2}) then fail("map fingerprint is iteration-order dependent") end
 local cyclic = {}; cyclic.self = cyclic
 expect_error("cyclic fingerprint", "Cannot fingerprint cyclic table", function() fingerprint.of(cyclic) end)
+
+local production_context = compiler_context.current()
+local first_context = compiler_context.new()
+first_context:set_state("fixture-derived-state", {value = 1})
+first_context:record_artifact("fixture-artifact", {value = 2})
+local second_context = compiler_context.new()
+if second_context:has_state("fixture-derived-state")
+  or second_context:artifact("fixture-artifact") ~= nil then
+  fail("CompilerContext instances leaked derived state or artifacts")
+end
+compiler_context.activate(first_context)
+local first_snapshot = first_context:snapshot()
+first_snapshot.state["fixture-derived-state"].value = 99
+first_snapshot.artifacts["fixture-artifact"].value = 99
+if first_context:state_view("fixture-derived-state").value ~= 1
+  or first_context:artifact("fixture-artifact").value ~= 2 then
+  fail("CompilerContext snapshot did not isolate owned state")
+end
+compiler_context.activate(production_context)

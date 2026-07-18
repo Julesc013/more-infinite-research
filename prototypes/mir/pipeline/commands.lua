@@ -192,6 +192,7 @@ end
 
 function M.run(id, context)
   if not context then error("MIR pipeline command requires a compiler context.", 2) end
+  compiler_context.activate(context)
   local command = commands[id]
   if not command then error("Unknown MIR pipeline command " .. tostring(id) .. ".", 2) end
   for _, dependency in ipairs(command.dependencies) do

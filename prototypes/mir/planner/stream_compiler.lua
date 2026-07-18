@@ -29,9 +29,9 @@ local native_owner_contract = require("prototypes.mir.domain.native_owner.contra
 local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 local telemetry = require("prototypes.mir.report.compiler_telemetry")
 local technology_design = require("prototypes.mir.domain.technology.technology_design")
+local compiler_context = require("prototypes.mir.pipeline.compiler_context")
 
 local M = {}
-local latest_plan = nil
 
 local GATE_EVIDENCE = {
   target_supported = "target-profile:positive-feature-contract",
@@ -372,7 +372,11 @@ local function plan_stream(key, raw_spec)
     })
 end
 
-function M.compile()
+function M.compile(context)
+  context = context or compiler_context.current()
+  compiler_context.activate(context)
+  local cached = context:state_view("generation_plan")
+  if cached then return deepcopy(cached) end
   telemetry.start_phase("stream_compiler")
   local streams = C.snapshot()
   local native_owner_inputs = {}
@@ -406,25 +410,28 @@ function M.compile()
   local finalized = plan:finalize()
   telemetry.count("stream_rows", finalized:count())
   telemetry.finish_phase("stream_compiler")
+  context:set_state("generation_plan", finalized:artifact())
   return finalized
 end
 
-function M.accept(plan)
-  latest_plan = plan
+function M.accept(plan, context)
+  context = context or compiler_context.current()
+  local artifact = type(plan.artifact) == "function" and plan:artifact() or deepcopy(plan)
+  context:set_state("generation_plan", artifact)
 end
 
-function M.latest_artifact()
-  if not latest_plan then return nil end
-  if type(latest_plan.artifact) == "function" then return latest_plan:artifact() end
-  return deepcopy(latest_plan)
+function M.latest_artifact(context)
+  context = context or compiler_context.current()
+  return context:state_snapshot("generation_plan")
 end
 
-function M.accept_artifact(artifact)
-  latest_plan = deepcopy(artifact)
+function M.accept_artifact(artifact, context)
+  context = context or compiler_context.current()
+  context:set_state("generation_plan", deepcopy(artifact))
 end
 
-function M.assert_output()
-  return require("prototypes.mir.planner.output_validator").assert_artifact(M.latest_artifact())
+function M.assert_output(context)
+  return require("prototypes.mir.planner.output_validator").assert_artifact(M.latest_artifact(context))
 end
 
 return M

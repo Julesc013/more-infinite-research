@@ -129,6 +129,14 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - 3.1.9-to-3.2.0-approved-delta
+  - path: docs/releases/3.2.0-compiler-context-ownership-report.md
+    title: "3.2.0 Compiler Context Ownership Report"
+    status: current
+    audience: maintainer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - 3.2.0-compiler-context-ownership
   - path: docs/architecture/module-boundaries.md
     title: "MIR 3.0.0 Repository Structure"
     status: current
