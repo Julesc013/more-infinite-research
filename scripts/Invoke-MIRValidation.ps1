@@ -542,6 +542,10 @@ Invoke-RepoCheck "technology policy corpora and applicability envelopes are gove
   & (Join-Path $repo "scripts\Test-MIRTechnologyPolicy.ps1") -RepoRoot $repo
 }
 
+Invoke-RepoCheck "offline family-rule synthesis is deterministic and review-only" {
+  & (Join-Path $repo "scripts\Test-MIRRuleSynthesis.ps1") -RepoRoot $repo
+}
+
 Invoke-RepoCheck "compatibility dependency declarations preserve full mod names" {
   & (Join-Path $repo "scripts\Test-MIRDependencyResolver.ps1") -RepoRoot $repo
 }

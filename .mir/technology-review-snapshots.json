@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "kind": "mir-reviewed-ecosystem-predicate-snapshots",
+  "snapshots": [
+    {
+      "snapshot_id": "semantic-family-attach-v1",
+      "factorio_line": "2.1",
+      "fixture": "semantic-family-attach",
+      "subjects": [
+        {"recipe": "name-only-mining-drill", "family": "mining-drill-manufacturing", "reviewed": false, "predicates": ["family.semantic-signature", "output.deterministic-single-item", "recipe.productivity-eligible", "recipe.visible", "risk.none"]},
+        {"recipe": "name-only-assembling-machine", "family": "assembling-machine-manufacturing", "reviewed": false, "predicates": ["family.semantic-signature", "output.deterministic-single-item", "recipe.productivity-eligible", "recipe.visible", "risk.none"]},
+        {"recipe": "unrelated-placeable", "family": "logistics-manufacturing", "reviewed": false, "predicates": ["output.deterministic-single-item", "recipe.productivity-eligible", "recipe.visible", "risk.none"]}
+      ]
+    }
+  ]
+}

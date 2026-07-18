@@ -170,6 +170,14 @@ docs:
     source_of_truth_for:
       - 3.2.0-compatibility-policy-authority
       - 3.2.0-family-operator-dsl
+  - path: docs/releases/3.2.0-offline-rule-synthesis-report.md
+    title: "3.2.0 Offline Rule Synthesis Report"
+    status: current
+    audience: maintainer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - 3.2.0-offline-rule-synthesis
   - path: docs/architecture/module-boundaries.md
     title: "MIR 3.0.0 Repository Structure"
     status: current
@@ -283,6 +291,14 @@ docs:
     source_of_truth_for:
       - compiler-provider-schema
       - compiler-provider-extension-contract
+  - path: docs/reference/offline-rule-synthesis.md
+    title: "Offline Family Rule Synthesis"
+    status: current
+    audience: maintainer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - offline-family-rule-synthesis
   - path: docs/reference/compiler-diagnostics.md
     title: "Compiler Diagnostic Codes"
     status: current

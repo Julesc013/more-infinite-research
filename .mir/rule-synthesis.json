@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "kind": "mir-offline-rule-synthesis-authority",
+  "allowed_predicates": [
+    "family.semantic-signature",
+    "output.deterministic-single-item",
+    "output.place-result-family",
+    "recipe.productivity-eligible",
+    "recipe.visible",
+    "risk.none"
+  ],
+  "mandatory_hard_predicates": [
+    "output.deterministic-single-item",
+    "recipe.productivity-eligible",
+    "recipe.visible",
+    "risk.none"
+  ],
+  "family_membership_predicates": [
+    "family.semantic-signature",
+    "output.place-result-family"
+  ],
+  "objective_order": [
+    "cover-all-reviewed-positives",
+    "reject-all-reviewed-negatives",
+    "preserve-mandatory-hard-predicates",
+    "minimize-new-unreviewed-matches",
+    "minimize-selected-predicate-count",
+    "lexicographic-tie-break"
+  ],
+  "production_entry_requirements": [
+    "human-approved-rule-diff",
+    "positive-fixtures",
+    "negative-fixtures",
+    "new-match-report",
+    "cross-ecosystem-counterexample-test"
+  ],
+  "rules": [
+    "synthesis is offline and deterministic",
+    "output is review-required policy data and cannot mutate production providers",
+    "opaque weights runtime learning and executable expressions are forbidden"
+  ]
+}

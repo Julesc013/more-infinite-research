@@ -64,6 +64,20 @@ compiler_contract_coverage:
   schema: 1
   validator: scripts/Test-MIRCompilerContractCoverage.ps1
 
+offline_rule_synthesis:
+  authority: .mir/rule-synthesis.json
+  corpus: .mir/technology-review-corpus.json
+  snapshots: .mir/technology-review-snapshots.json
+  synthesizer: scripts/Invoke-MIRRuleSynthesis.ps1
+  validator: scripts/Test-MIRRuleSynthesis.ps1
+  validates:
+    - all-positive-coverage
+    - all-negative-rejection
+    - mandatory-hard-predicate-retention
+    - minimized-new-unreviewed-matches
+    - deterministic-review-required-output
+    - no-production-mutation-authority
+
 local_campaign_manifest:
   path: fixtures/compat-matrix/local-library-scenarios.json
   factorio_2_0_path: fixtures/compat-matrix/local-library-scenarios-2.0.json

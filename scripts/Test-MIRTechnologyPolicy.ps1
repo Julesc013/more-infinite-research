@@ -6,6 +6,8 @@ $corpusPath = Join-Path $RepoRoot ".mir\technology-review-corpus.json"
 $lifecyclePath = Join-Path $RepoRoot ".mir\technology-lifecycle.json"
 $coveragePath = Join-Path $RepoRoot ".mir\compiler-contract-coverage.yml"
 $compatibilityPath = Join-Path $RepoRoot ".mir\compatibility.yml"
+$synthesisPath = Join-Path $RepoRoot ".mir\rule-synthesis.json"
+$snapshotsPath = Join-Path $RepoRoot ".mir\technology-review-snapshots.json"
 
 $corpus = Get-Content -Raw -LiteralPath $corpusPath | ConvertFrom-Json
 if ($corpus.schema -ne 1 -or @($corpus.families).Count -eq 0) {
@@ -27,6 +29,9 @@ foreach ($family in @($corpus.families)) {
     throw "Technology review corpus family $familyId requires positive and negative examples."
   }
   $labels = @{}
+  if (@($family.current_predicates).Count -eq 0) {
+    throw "Technology review corpus family $familyId omits its current predicate baseline."
+  }
   foreach ($entry in @($positive + $negative)) {
     foreach ($field in @("recipe", "fixture", "reason")) {
       if ([string]::IsNullOrWhiteSpace([string]$entry.$field)) {
@@ -39,11 +44,27 @@ foreach ($family in @($corpus.families)) {
       throw "Technology review corpus family $familyId labels recipe $label both include and exclude."
     }
     $labels[$label] = $polarity
+    if (@($entry.predicates).Count -eq 0) {
+      throw "Technology review corpus example $familyId/$label omits its predicate vector."
+    }
     $fixturePath = Join-Path $RepoRoot ("fixtures\" + [string]$entry.fixture)
     if (-not (Test-Path -LiteralPath $fixturePath -PathType Container)) {
       throw "Technology review corpus references missing fixture directory: $fixturePath"
     }
   }
+}
+
+$synthesis = Get-Content -Raw -LiteralPath $synthesisPath | ConvertFrom-Json
+$snapshots = Get-Content -Raw -LiteralPath $snapshotsPath | ConvertFrom-Json
+if ($synthesis.schema -ne 1 -or $synthesis.kind -ne "mir-offline-rule-synthesis-authority") {
+  throw "Offline rule synthesis authority is invalid."
+}
+if ($snapshots.schema -ne 1 -or @($snapshots.snapshots).Count -eq 0) {
+  throw "Reviewed ecosystem predicate snapshots are missing."
+}
+if (@($synthesis.production_entry_requirements).Count -ne 5 `
+    -or "human-approved-rule-diff" -notin @($synthesis.production_entry_requirements)) {
+  throw "Offline rule synthesis does not preserve its five review gates."
 }
 
 $lifecycle = Get-Content -Raw -LiteralPath $lifecyclePath | ConvertFrom-Json
