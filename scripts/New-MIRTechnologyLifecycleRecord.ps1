@@ -21,6 +21,62 @@ function Get-MIRJsonSha256 {
   return ([BitConverter]::ToString($hash)).Replace("-", "")
 }
 
+function ConvertTo-MIRApplicabilityEnvelope {
+  param($Envelope)
+  if (-not $Envelope) { throw "Approval record requires applicability.structural_envelope." }
+
+  $allowedPredicates = @(
+    "family.semantic-signature",
+    "output.deterministic-single-item",
+    "output.place-result-family",
+    "recipe.productivity-eligible",
+    "recipe.visible",
+    "risk.none"
+  )
+  $factorioLines = @($Envelope.factorio_lines | ForEach-Object { [string]$_ } | Where-Object { $_ } | Sort-Object -Unique)
+  $requiredFeatures = @($Envelope.required_features | ForEach-Object { [string]$_ } | Where-Object { $_ } | Sort-Object -Unique)
+  $positiveExamples = @($Envelope.positive_examples | ForEach-Object { [string]$_ } | Where-Object { $_ } | Sort-Object -Unique)
+  $negativeExamples = @($Envelope.negative_examples | ForEach-Object { [string]$_ } | Where-Object { $_ } | Sort-Object -Unique)
+  if ($factorioLines.Count -eq 0 -or $positiveExamples.Count -eq 0 -or $negativeExamples.Count -eq 0) {
+    throw "Approval applicability envelope requires Factorio lines, positive examples, and negative examples."
+  }
+
+  $requiredMods = @($Envelope.required_mods | ForEach-Object {
+    $id = [string]$_.id
+    if ([string]::IsNullOrWhiteSpace($id)) { throw "Approval applicability envelope contains an invalid required mod." }
+    $row = [ordered]@{id=$id}
+    if (-not [string]::IsNullOrWhiteSpace([string]$_.version)) { $row.version = [string]$_.version }
+    [pscustomobject]$row
+  } | Sort-Object id -Unique)
+  if ($requiredMods.Count -eq 0) { throw "Approval applicability envelope requires a mod closure." }
+
+  $structuralPredicates = @($Envelope.structural_predicates | ForEach-Object {
+    $predicate = [string]$_.predicate
+    if ($predicate -notin $allowedPredicates) {
+      throw "Approval applicability envelope contains an unsupported structural predicate: $predicate"
+    }
+    [pscustomobject][ordered]@{predicate=$predicate}
+  } | Sort-Object predicate -Unique)
+  if ($structuralPredicates.Count -eq 0) { throw "Approval applicability envelope requires structural predicates." }
+
+  $maximumNewMatches = if ($null -eq $Envelope.maximum_new_matches) { 0 } else { [int]$Envelope.maximum_new_matches }
+  if ($maximumNewMatches -lt 0) { throw "Approval applicability envelope maximum_new_matches cannot be negative." }
+  $record = [ordered]@{
+    schema = 1
+    envelope_id = [string]$Envelope.envelope_id
+    factorio_lines = $factorioLines
+    required_features = $requiredFeatures
+    required_mods = $requiredMods
+    structural_predicates = $structuralPredicates
+    positive_examples = $positiveExamples
+    negative_examples = $negativeExamples
+    maximum_new_matches = $maximumNewMatches
+  }
+  if ([string]::IsNullOrWhiteSpace($record.envelope_id)) { throw "Approval applicability envelope requires envelope_id." }
+  $record.envelope_fingerprint_sha256 = Get-MIRJsonSha256 $record
+  return [pscustomobject]$record
+}
+
 $request = Get-Content -Raw -LiteralPath (Resolve-Path -LiteralPath $InputPath) | ConvertFrom-Json
 $record = $null
 $fingerprintField = ""
@@ -47,6 +103,12 @@ if ($Kind -in @("Approval", "Quarantine", "Demotion")) {
   if ($decision -eq "approved") {
     foreach ($field in @("selected_alternative", "approved_design_fingerprint", "qualification_fingerprint")) {
       if ([string]::IsNullOrWhiteSpace([string]$record[$field])) { throw "Approval record requires $field." }
+    }
+    $exactMods = @($request.applicability.exact_mods | ForEach-Object { [string]$_ } | Where-Object { $_ } | Sort-Object -Unique)
+    if ($exactMods.Count -eq 0) { throw "Approval record requires applicability.exact_mods." }
+    $record.applicability = [ordered]@{
+      exact_mods = $exactMods
+      structural_envelope = ConvertTo-MIRApplicabilityEnvelope $request.applicability.structural_envelope
     }
   } elseif ([string]::IsNullOrWhiteSpace([string]$record.reason)) {
     throw "$Kind record requires reason."

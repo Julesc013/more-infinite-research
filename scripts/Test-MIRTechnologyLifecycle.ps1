@@ -6,7 +6,7 @@ $manifest = Get-Content -Raw -LiteralPath $manifestPath | ConvertFrom-Json
 if ($manifest.schema -ne 1) { throw "Technology lifecycle authority schema is invalid." }
 foreach ($record in @(
   "TechnologyCandidate", "TechnologyDesign", "TechnologyQualification", "TechnologyApproval",
-  "TechnologyPromotion", "TechnologyMigration", "TechnologyCatalog"
+  "TechnologyPromotion", "TechnologyMigration", "TechnologyCatalog", "TechnologyApplicabilityEnvelope"
 )) {
   if ([int]$manifest.records.$record -lt 1) { throw "Technology lifecycle authority omits $record." }
 }
@@ -83,7 +83,20 @@ try {
 
   $approvalRequest = [ordered]@{
     approval_id="approval/fixture/1"; candidate_id=$after.candidate_id
-    applicability=[ordered]@{exact_mods=@("base"); structural_envelope="fixture-v1"}
+    applicability=[ordered]@{
+      exact_mods=@("base")
+      structural_envelope=[ordered]@{
+        schema=1; envelope_id="fixture-v1"; factorio_lines=@("2.1")
+        required_features=@("recipe-productivity")
+        required_mods=@([ordered]@{id="base"})
+        structural_predicates=@(
+          [ordered]@{predicate="recipe.visible"},
+          [ordered]@{predicate="recipe.productivity-eligible"}
+        )
+        positive_examples=@("positive-fixture"); negative_examples=@("negative-fixture")
+        maximum_new_matches=0
+      }
+    }
     selected_alternative="create:mir-fixture-technology"
     approved_design_fingerprint=$after.design_fingerprint
     qualification_fingerprint=$catalog.qualifications[0].qualification_fingerprint_sha256
@@ -97,7 +110,8 @@ try {
   $approvalRequest | ConvertTo-Json -Depth 30 | Set-Content -LiteralPath $approvalRequestPath -Encoding UTF8
   & (Join-Path $RepoRoot "scripts\New-MIRTechnologyLifecycleRecord.ps1") -Kind Approval -InputPath $approvalRequestPath -OutputPath $approvalPath
   $approval = Get-Content -Raw -LiteralPath $approvalPath | ConvertFrom-Json
-  if ($approval.decision -ne "approved" -or [string]::IsNullOrWhiteSpace([string]$approval.approval_fingerprint_sha256)) {
+  if ($approval.decision -ne "approved" -or [string]::IsNullOrWhiteSpace([string]$approval.approval_fingerprint_sha256) `
+      -or [string]::IsNullOrWhiteSpace([string]$approval.applicability.structural_envelope.envelope_fingerprint_sha256)) {
     throw "Approval tooling did not bind an exact reviewed decision."
   }
 

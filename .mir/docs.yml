@@ -161,6 +161,15 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - 3.2.0-technology-lifecycle-records
+  - path: docs/releases/3.2.0-policy-operator-corpus-report.md
+    title: "3.2.0 Policy, Operator, And Review Corpus Report"
+    status: current
+    audience: maintainer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - 3.2.0-compatibility-policy-authority
+      - 3.2.0-family-operator-dsl
   - path: docs/architecture/module-boundaries.md
     title: "MIR 3.0.0 Repository Structure"
     status: current
@@ -224,6 +233,14 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - technology-lifecycle-schemas
+  - path: docs/reference/schemas/technology-applicability-envelope.md
+    title: "TechnologyApplicabilityEnvelope Schema"
+    status: current
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - technology-applicability-envelope-schema
   - path: docs/reference/schemas/compiler-evidence.md
     title: "CompilerEvidence Schema"
     status: current
@@ -249,6 +266,14 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - family-rule-schema
+  - path: docs/reference/schemas/family-operator-dsl.md
+    title: "Family Operator DSL"
+    status: current
+    audience: developer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - family-operator-dsl-schema
   - path: docs/reference/schemas/compiler-provider.md
     title: "CompilerProvider Schema"
     status: current

@@ -23,7 +23,7 @@ local fingerprint = require("prototypes.mir.core.fingerprint")
 local recipe_facts = require("prototypes.mir.index.recipe_facts")
 local target_profiles = require("prototypes.mir.platform.factorio.target_profiles")
 local automatic_compiler_policy = require("prototypes.mir.settings.automatic_compiler_policy")
-local compatibility_packs = require("prototypes.mir.compatibility.packs.registry")
+local compatibility_policy = require("prototypes.mir.compatibility.policy_authority")
 local effect_ownership = require("prototypes.mir.planner.effect_ownership")
 local native_owner_contract = require("prototypes.mir.domain.native_owner.contract")
 local data_raw = require("prototypes.mir.platform.factorio.data_raw")
@@ -219,7 +219,7 @@ end
 
 local function plan_stream(key, raw_spec)
   if raw_spec.automatic_family then
-    local authorization = compatibility_packs.authorizes_family_stream(key)
+    local authorization = compatibility_policy.authorizes_family_stream(key)
     local maturity = type(raw_spec.automatic_family) == "table"
       and raw_spec.automatic_family.creation_maturity
       or "reviewed"
@@ -394,7 +394,7 @@ function M.compile(context)
       facts = fingerprint.of(recipe_facts.snapshot()),
       rules = fingerprint.of({streams = streams, families = family_registry.snapshot()}),
       providers = provider_registry.fingerprint(),
-      compatibility_packs = fingerprint.of(compatibility_packs.snapshot()),
+      compatibility_packs = fingerprint.of(compatibility_policy.active_packs()),
       target_profile = fingerprint.of(target_profiles.current()),
       native_owners = fingerprint.of(native_owner_inputs)
     }

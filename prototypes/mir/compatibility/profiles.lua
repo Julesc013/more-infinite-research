@@ -159,8 +159,8 @@ function P.active_known_competing_productivity_profiles()
       })
     end
   end
-  local pack_registry = require("prototypes.mir.compatibility.packs.registry")
-  for _, entry in ipairs(pack_registry.active_known_competing_productivity_profiles()) do
+  local policy_authority = require("prototypes.mir.compatibility.policy_authority")
+  for _, entry in ipairs(policy_authority.active_known_competing_productivity_profiles()) do
     table.insert(active, entry)
   end
   return active

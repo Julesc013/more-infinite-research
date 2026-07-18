@@ -4,7 +4,7 @@ local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 local science = require("prototypes.mir.capabilities.science_integration.science_packs")
 local recipes = require("prototypes.mir.capabilities.recipe_productivity.recipe_matching")
 local effective_settings = require("prototypes.mir.settings.effective")
-local compatibility_packs = require("prototypes.mir.compatibility.packs.registry")
+local compatibility_policy = require("prototypes.mir.compatibility.policy_authority")
 
 local M = {}
 
@@ -195,10 +195,11 @@ function M.pick_science_for_stream(spec, key)
   end
 
   local denied = {}
-  for _, role in ipairs(compatibility_packs.science_roles_for_stream(key)) do
+  local policy_roles = compatibility_policy.science_roles_for_stream(key)
+  for _, role in ipairs(policy_roles) do
     if role.role == "exclude" then denied[role.pack] = true end
   end
-  for _, role in ipairs(compatibility_packs.science_roles_for_stream(key)) do
+  for _, role in ipairs(policy_roles) do
     if role.role ~= "exclude" and not denied[role.pack] then add_if_science_pack_exists(packs, role.pack) end
   end
 

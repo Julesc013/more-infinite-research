@@ -591,6 +591,42 @@ Assert-MIRContains -RelativePath "prototypes/mir/planner/generation_plan.lua" -T
 $familyRegistryText = Read-MIRFile -RelativePath "prototypes/mir/families/registry.lua"
 Assert-MIRContains -RelativePath "prototypes/mir/families/registry.lua" -Text $familyRegistryText -Needle "FamilyRule must be data-only"
 Assert-MIRContains -RelativePath "prototypes/mir/families/registry.lua" -Text $familyRegistryText -Needle "Duplicate FamilyRule id"
+Assert-MIRContains -RelativePath "prototypes/mir/families/registry.lua" -Text $familyRegistryText -Needle "operator_dsl.validate(rule.operators)"
+$familyResolverText = Read-MIRFile -RelativePath "prototypes/mir/families/resolver.lua"
+Assert-MIRContains -RelativePath "prototypes/mir/families/resolver.lua" -Text $familyResolverText -Needle "operator_dsl.candidate_items"
+Assert-MIRContains -RelativePath "prototypes/mir/families/resolver.lua" -Text $familyResolverText -Needle "operator_dsl.eligibility"
+foreach ($legacyResolverBranch in @("rule.effects.strategy", "rule.tier.strategy", "rule.selector.output_item")) {
+  if ($familyResolverText.Contains($legacyResolverBranch)) {
+    throw "Family resolver still dispatches a legacy strategy branch: $legacyResolverBranch"
+  }
+}
+
+$policyAuthorityPath = "prototypes/mir/compatibility/policy_authority.lua"
+$policyAuthorityText = Read-MIRFile -RelativePath $policyAuthorityPath
+foreach ($needle in @(
+  'context:state_view("compatibility_policy_authority")',
+  'context:set_state("compatibility_policy_authority"',
+  'require("prototypes.mir.compatibility.overlay_loader")',
+  'require("prototypes.mir.compatibility.claim_registry")',
+  'require("prototypes.mir.compatibility.packs.registry")'
+)) {
+  Assert-MIRContains -RelativePath $policyAuthorityPath -Text $policyAuthorityText -Needle $needle
+}
+if ($policyAuthorityText -match 'data\.raw|data:extend') {
+  throw "Compatibility policy authority must remain context-owned policy composition without prototype mutation."
+}
+foreach ($policyConsumer in @(
+  "prototypes/mir/families/resolver.lua",
+  "prototypes/mir/planner/stream_compiler.lua",
+  "prototypes/mir/capabilities/science_integration/science_selector.lua",
+  "prototypes/mir/compatibility/profiles.lua"
+)) {
+  $policyConsumerText = Read-MIRFile -RelativePath $policyConsumer
+  Assert-MIRContains -RelativePath $policyConsumer -Text $policyConsumerText -Needle "prototypes.mir.compatibility.policy_authority"
+  if ($policyConsumerText.Contains('prototypes.mir.compatibility.packs.registry')) {
+    throw "Planning consumer bypasses the compatibility policy authority: $policyConsumer"
+  }
+}
 
 foreach ($relativePath in @(
   "prototypes/mir/policy/competing_productivity.lua",

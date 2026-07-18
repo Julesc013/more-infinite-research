@@ -27,6 +27,46 @@ local function structural_rule(provider_id, row)
   row.targets = {requires_features = {"recipe_productivity"}}
   row.default_action = "attach-existing"
   row.support_claim = {level = "structural-attachment", public = false}
+  local discovery_selector
+  if row.selector.output_item.place_result_entity_types then
+    discovery_selector = {
+      operator = "output.place-result",
+      entity_types = row.selector.output_item.place_result_entity_types
+    }
+  else
+    discovery_selector = {
+      operator = "output.prototype-type",
+      prototype_type = row.selector.output_item.prototype_types[1]
+    }
+  end
+  row.operators = {
+    schema = 1,
+    selectors = {
+      {operator = "recipe.visible"},
+      {operator = "recipe.parameter-absent"},
+      {operator = "recipe.productivity-eligible"},
+      {operator = "output.deterministic-single-placeable"},
+      discovery_selector,
+      {operator = "risk.none", risks = COMMON_DENY_RISKS}
+    },
+    normalizers = {{operator = "candidate.recipe-item-entity"}},
+    partitioner = {operator = "partition.single"},
+    tier_resolver = {operator = row.tier.strategy == "item-prototype-tier"
+      and "tier.item-prototype" or "tier.structural-single"},
+    effect_model = row.effects.strategy == "tier-table" and {
+      operator = "effect.tier-table", tiers = row.effects.tiers, high_tier = row.effects.high_tier,
+      default = row.effects.default
+    } or {operator = "effect.fixed", change = row.effects.default},
+    science_model = {operator = "science.inherit-target-stream"},
+    prerequisite_model = {operator = "prerequisite.inherit-target-stream"},
+    cost_model = {operator = "cost.inherit-target-stream"},
+    presentation_model = {operator = "presentation.inherit-target-stream"},
+    ownership_policy = {operator = "ownership.prefer-existing-exact-owner"},
+    grouping = {
+      operator = row.grouping.strategy == "proposal-only" and "group.proposal-only" or "group.attach-existing",
+      stream = row.grouping.stream
+    }
+  }
   return row
 end
 

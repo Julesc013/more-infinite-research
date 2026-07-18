@@ -530,6 +530,8 @@ fixtures:
     assertion_path: fixtures/assert-compiler-contracts
     validates:
       - invalid-family-rule-rejection
+      - unknown-family-operator-rejection
+      - data-only-family-operator-composition
       - invalid-compatibility-pack-rejection
       - stable-rule-and-pack-sorting
       - deterministic-rule-precedence
@@ -578,6 +580,9 @@ fixtures:
       - technology-qualification-schema-1-hard-gates
       - context-owned-candidate-and-qualification-catalogs
       - technology-approval-exact-design-binding
+      - machine-readable-technology-applicability-envelope
+      - positive-negative-applicability-examples
+      - context-owned-compatibility-policy-authority
       - technology-promotion-state-transition-enforcement
       - technology-migration-strategy-enforcement
       - emitted-row-technology-design-authority

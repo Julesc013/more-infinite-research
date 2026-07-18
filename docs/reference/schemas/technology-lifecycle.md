@@ -22,6 +22,7 @@ MIR uses one governed record chain for fixed and procedural technology work. `.m
 | `TechnologyDesign` schema 2 | Describes one materialization alternative and its complete prototype projection. |
 | `TechnologyQualification` schema 1 | Evaluates one design in one exact context, preserving hard gates, quality metrics, primary rejection, contributing rejections, and validation evidence. |
 | `TechnologyApproval` schema 1 | Records an approved, quarantined, or demoted maintainer decision with applicability, exact selected alternative, field locks, adaptive envelopes, evidence, reviewer, and time. |
+| `TechnologyApplicabilityEnvelope` schema 1 | Binds approved scope to exact Factorio lines, features, mods, finite structural predicates, positive and negative examples, and a maximum count of newly matched subjects. |
 | `TechnologyPromotion` schema 1 | Advances an identity through one permitted transition and binds an approval plus exact design fingerprint. |
 | `TechnologyMigration` schema 1 | Governs released identity changes and their save behavior. |
 | `TechnologyCatalog` schema 1 | Collects candidates, alternatives, and qualifications for review without publishing them. |
@@ -63,3 +64,5 @@ Create deterministic approval, quarantine, demotion, promotion, or migration rec
 Exact approved design fingerprints return `APPROVED`. Unchanged designs return `UNCHANGED`; adaptive changes return `TARGETED_REVIEW`; unreviewed changes return `REVIEW_REQUIRED`; locked drift returns `REJECTED_LOCK_VIOLATION`.
 
 Passing hard safety gates never creates approval, advances identity, expands applicability, or raises a public compatibility claim.
+
+An approved decision must carry both a non-empty exact mod closure and a machine-readable applicability envelope. A label is not an envelope. The envelope is independently fingerprinted, requires positive and negative examples, and fails closed when its target line, feature set, mod closure, structural predicates, or `maximum_new_matches` bound is not satisfied. See [TechnologyApplicabilityEnvelope](technology-applicability-envelope.md).

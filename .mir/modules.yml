@@ -148,6 +148,7 @@ modules:
     - prototypes/mir/domain/technology/technology_design.lua
     - prototypes/mir/domain/technology/technology_qualification.lua
     - prototypes/mir/domain/technology/technology_approval.lua
+    - prototypes/mir/domain/technology/applicability_envelope.lua
     - prototypes/mir/domain/technology/technology_promotion.lua
     - prototypes/mir/domain/technology/technology_migration.lua
     - prototypes/mir/domain/evidence/compiler_evidence.lua
@@ -176,6 +177,7 @@ modules:
   families:
     - prototypes/mir/families/rules.lua
     - prototypes/mir/families/registry.lua
+    - prototypes/mir/families/operator_dsl.lua
     - prototypes/mir/families/resolver.lua
   providers:
     - prototypes/mir/providers/contract.lua
@@ -229,6 +231,7 @@ modules:
     - prototypes/mir/compatibility/planner.lua
     - prototypes/mir/compatibility/overlay_loader.lua
     - prototypes/mir/compatibility/claim_registry.lua
+    - prototypes/mir/compatibility/policy_authority.lua
     - prototypes/mir/compatibility/overlays/air_scrubbing.lua
     - prototypes/mir/compatibility/overlays/atan_ash.lua
     - prototypes/mir/compatibility/diagnostics/registry.lua
@@ -268,6 +271,9 @@ mutation_commands:
     - every adopted GenerationPlan row carries one patch-existing TechnologyDesign binding the immutable owner input and complete expected output
     - candidate and qualification catalogs are context-owned compiler artifacts and do not publish or promote identities
     - approval promotion demotion quarantine and migration records are independently fingerprinted governance decisions
+    - approved structural applicability is a fingerprinted data-only envelope with exact mods positive examples negative examples and bounded new matches
+    - family providers compose only registered data-only operators and the central resolver does not dispatch legacy strategies
+    - compatibility policy authority is the only planning facade that composes overlays active packs claims and policy fingerprints
     - stream planning cannot import the stream executor or adoption mutation transaction
     - stream emission and fingerprint-verified patch-existing adoption mutation are applied only by the emission-owned stream executor
     - reviewed compatibility data cannot override hard prototype safety facts
@@ -419,6 +425,7 @@ compiler_context:
     - recipe-index
     - relationship-indexes
     - active-compatibility-packs
+    - compatibility-policy-authority
     - family-resolution
     - generation-plan
     - compilation-plan

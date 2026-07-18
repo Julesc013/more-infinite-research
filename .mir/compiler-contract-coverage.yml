@@ -6,6 +6,11 @@
   ],
   "actions": ["emit", "adopt", "skip", "emit_base_extension"],
   "family_strategies": ["attach-existing", "tier-table", "fixed"],
+  "family_operator_categories": [
+    "selectors", "normalizers", "partitioner", "tier_resolver", "effect_model", "science_model",
+    "prerequisite_model", "cost_model", "presentation_model", "ownership_policy", "grouping"
+  ],
+  "family_operator_safety": ["data-only", "registered-only", "fail-closed", "no-prototype-mutation"],
   "compatibility_pack_fields": [
     "mods_any", "mods_all", "mods_none", "aliases", "exact.includes", "exact.excludes", "family_hints",
     "science_roles", "owner_claims", "risk_overrides", "family_authorizations", "candidate_seeds", "evidence", "claim"
@@ -33,8 +38,13 @@
     "TechnologyApproval": 1,
     "TechnologyPromotion": 1,
     "TechnologyMigration": 1,
-    "TechnologyCatalog": 1
+    "TechnologyCatalog": 1,
+    "TechnologyApplicabilityEnvelope": 1
   },
+  "technology_applicability_predicates": [
+    "family.semantic-signature", "output.deterministic-single-item", "output.place-result-family",
+    "recipe.productivity-eligible", "recipe.visible", "risk.none"
+  ],
   "technology_approval_decisions": ["approved", "quarantined", "demoted"],
   "technology_identity_transitions": [
     "unassigned->provisional", "provisional->reserved", "reserved->stable-unreleased",
@@ -66,7 +76,7 @@
   ],
   "compiler_context_schema": 2,
   "context_owned_state": [
-    "recipe-index", "relationship-indexes", "active-compatibility-packs", "family-resolution",
+    "recipe-index", "relationship-indexes", "active-compatibility-packs", "compatibility-policy-authority", "family-resolution",
     "technology-candidate-catalog", "technology-qualifications", "generation-plan", "compilation-plan",
     "generated-technology-registry", "productivity-family-adoption",
     "coverage-report", "compiler-telemetry", "diagnostics"

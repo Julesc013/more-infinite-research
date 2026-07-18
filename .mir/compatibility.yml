@@ -35,6 +35,25 @@ compatibility_packs:
     authorization_query: compatibility_packs.authorizes_family_stream
     baseline: safe-attachment
 
+generated_policy_authority:
+  schema: 1
+  implementation: prototypes/mir/compatibility/policy_authority.lua
+  context_state: compatibility_policy_authority
+  sources:
+    - prototypes/mir/compatibility/overlay_loader.lua
+    - prototypes/mir/compatibility/packs/registry.lua
+    - prototypes/mir/compatibility/claim_registry.lua
+  reviewed_corpus: .mir/technology-review-corpus.json
+  planning_consumers:
+    - prototypes/mir/families/resolver.lua
+    - prototypes/mir/planner/stream_compiler.lua
+    - prototypes/mir/capabilities/science_integration/science_selector.lua
+    - prototypes/mir/compatibility/profiles.lua
+  rules:
+    - only this facade composes overlays active packs claims and their policy fingerprint
+    - hard prototype safety remains non-overridable
+    - public claims remain separately governed and evidence-bound
+
 technology_prerequisite_cycle_repairs:
   - id: muluna-astroponics-space-science-cycle
     required_mods:

@@ -7,7 +7,8 @@
     "TechnologyApproval": 1,
     "TechnologyPromotion": 1,
     "TechnologyMigration": 1,
-    "TechnologyCatalog": 1
+    "TechnologyCatalog": 1,
+    "TechnologyApplicabilityEnvelope": 1
   },
   "approval_decisions": ["approved", "quarantined", "demoted"],
   "identity_states": ["unassigned", "provisional", "reserved", "stable-unreleased", "released", "retired"],
@@ -22,9 +23,18 @@
   "migration_strategies": [
     "retain-hidden-alias", "retain-visible-alias", "in-place-compatible", "retire-with-replacement"
   ],
+  "applicability_predicates": [
+    "family.semantic-signature",
+    "output.deterministic-single-item",
+    "output.place-result-family",
+    "recipe.productivity-eligible",
+    "recipe.visible",
+    "risk.none"
+  ],
   "rules": [
     "qualification never promotes design identity or public claims",
     "approval binds an exact candidate alternative design and qualification fingerprint",
+    "approved applicability requires exact mods plus a machine-readable structural envelope with positive and negative examples",
     "quarantine and demotion never silently delete or rename a released technology",
     "released identity changes require a TechnologyMigration record",
     "candidate and qualification catalogs are context-owned and non-publishing",

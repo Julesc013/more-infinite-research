@@ -1,10 +1,12 @@
 local deepcopy = require("__more-infinite-research__.prototypes.mir.core.deepcopy")
 local fingerprint = require("__more-infinite-research__.prototypes.mir.core.fingerprint")
 local family_registry = require("__more-infinite-research__.prototypes.mir.families.registry")
+local family_operator_dsl = require("__more-infinite-research__.prototypes.mir.families.operator_dsl")
 local provider_registry = require("__more-infinite-research__.prototypes.mir.providers.registry")
 local diagnostic_codes = require("__more-infinite-research__.prototypes.mir.domain.diagnostics.codes")
 local pack_schema = require("__more-infinite-research__.prototypes.mir.compatibility.packs.schema")
 local pack_registry = require("__more-infinite-research__.prototypes.mir.compatibility.packs.registry")
+local compatibility_policy = require("__more-infinite-research__.prototypes.mir.compatibility.policy_authority")
 local precedence = require("__more-infinite-research__.prototypes.mir.compatibility.packs.precedence")
 local generation_plan = require("__more-infinite-research__.prototypes.mir.planner.generation_plan")
 local compilation_plan = require("__more-infinite-research__.prototypes.mir.planner.compilation_plan")
@@ -17,6 +19,7 @@ local technology_design = require("__more-infinite-research__.prototypes.mir.dom
 local technology_candidate = require("__more-infinite-research__.prototypes.mir.domain.technology.technology_candidate")
 local technology_qualification = require("__more-infinite-research__.prototypes.mir.domain.technology.technology_qualification")
 local technology_approval = require("__more-infinite-research__.prototypes.mir.domain.technology.technology_approval")
+local applicability_envelope = require("__more-infinite-research__.prototypes.mir.domain.technology.applicability_envelope")
 local technology_promotion = require("__more-infinite-research__.prototypes.mir.domain.technology.technology_promotion")
 local technology_migration = require("__more-infinite-research__.prototypes.mir.domain.technology.technology_migration")
 local technology_catalog = require("__more-infinite-research__.prototypes.mir.planner.technology_catalog")
@@ -237,6 +240,17 @@ expect_error("incomplete FamilyRule safety requirements", "hard evidence require
 local behavioral_rule = deepcopy(rules)
 behavioral_rule.rules[1].callback = function() end
 expect_error("behavioral FamilyRule", "FamilyRule must be data-only", function() family_registry.validate(behavioral_rule) end)
+local operator_schema = family_operator_dsl.schema_authority()
+if operator_schema.schema ~= 1
+  or #operator_schema.operators.selectors < 6
+  or rules.rules[1].operators.effect_model.operator == nil then
+  fail("family operator DSL authority or provider composition is incomplete")
+end
+local unknown_operator_rule = deepcopy(rules)
+unknown_operator_rule.rules[1].operators.selectors[1].operator = "recipe.opaque-machine-learning"
+expect_error("unknown family operator", "unsupported selectors operator", function()
+  family_registry.validate(unknown_operator_rule)
+end)
 
 local base_pack = valid_pack("pack-a", "2.1", "test-mod", "= 1.0.0")
 pack_schema.validate(base_pack)
@@ -439,11 +453,47 @@ if candidate.candidate_id ~= normalized_design.candidate_id
   or #lifecycle_catalog.qualifications ~= 1 then
   fail("technology candidate catalog and qualification records are inconsistent")
 end
+local approval_envelope = applicability_envelope.new({
+  envelope_id = "compiler-contract-fixture-v1",
+  factorio_lines = {"2.1"},
+  required_features = {"recipe-productivity"},
+  required_mods = {{id = "base"}},
+  structural_predicates = {
+    {predicate = "recipe.visible"},
+    {predicate = "recipe.productivity-eligible"}
+  },
+  positive_examples = {"compiler-contract-positive"},
+  negative_examples = {"compiler-contract-negative"},
+  maximum_new_matches = 0
+})
+local envelope_matches = applicability_envelope.matches(approval_envelope, {
+  factorio_line = "2.1",
+  features = {["recipe-productivity"] = true},
+  active_mods = {base = true},
+  predicates = {["recipe.visible"] = true, ["recipe.productivity-eligible"] = true},
+  new_matches = 0
+})
+if not envelope_matches then fail("technology applicability envelope rejected its reviewed context") end
+local expansion_matches, expansion_reason = applicability_envelope.matches(approval_envelope, {
+  factorio_line = "2.1",
+  features = {["recipe-productivity"] = true},
+  active_mods = {base = true},
+  predicates = {["recipe.visible"] = true, ["recipe.productivity-eligible"] = true},
+  new_matches = 1
+})
+if expansion_matches or expansion_reason ~= "new-matches" then
+  fail("technology applicability envelope did not fail closed on an unreviewed match")
+end
+local policy_snapshot = compatibility_policy.snapshot()
+if policy_snapshot.schema ~= 1 or type(policy_snapshot.policy_fingerprint) ~= "string"
+  or type(policy_snapshot.active_packs) ~= "table" or type(policy_snapshot.claims) ~= "table" then
+  fail("context-owned compatibility policy authority is incomplete")
+end
 local approval = technology_approval.new({
   approval_id = "approval/compiler-contract/1",
   decision = "approved",
   candidate_selector = {candidate_id = candidate.candidate_id},
-  applicability = {exact_mods = {"base"}, structural_envelope = "fixture-v1"},
+  applicability = {exact_mods = {"base"}, structural_envelope = approval_envelope},
   selected_alternative = lifecycle_catalog.candidates[1].alternatives[1].alternative_id,
   approved_design_fingerprint = normalized_design.design_fingerprint,
   qualification_fingerprint = qualification.qualification_fingerprint,

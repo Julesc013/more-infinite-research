@@ -1,5 +1,6 @@
 local deepcopy = require("prototypes.mir.core.deepcopy")
 local raw = require("prototypes.mir.families.rules")
+local operator_dsl = require("prototypes.mir.families.operator_dsl")
 
 local M = {}
 local canonical = nil
@@ -86,6 +87,7 @@ local function validate(source)
     if type(rule.support_claim) ~= "table" or rule.support_claim.public ~= false then
       error("FamilyRule support claim boundary is required: " .. rule.id, 2)
     end
+    operator_dsl.validate(rule.operators)
     ids[rule.id] = true
     table.insert(rules, deepcopy(rule))
   end

@@ -1,0 +1,38 @@
+{
+  "schema": 1,
+  "families": [
+    {
+      "family": "mining-drill-manufacturing",
+      "structural_envelope": "mining-drill-place-result-v1",
+      "positive_examples": [
+        {"recipe": "big-mining-drill", "fixture": "big-mining-drill", "reason": "deterministic placeable mining drill"},
+        {"recipe": "assemble-beta", "fixture": "semantic-family-attach", "reason": "name-independent mining-drill place result"}
+      ],
+      "negative_examples": [
+        {"recipe": "pack-hard-recycling", "fixture": "semantic-family-attach", "reason": "recycling category is a hard loop risk"},
+        {"recipe": "pack-hard-productivity-false", "fixture": "semantic-family-attach", "reason": "recipe explicitly rejects productivity"}
+      ]
+    },
+    {
+      "family": "assembling-machine-manufacturing",
+      "structural_envelope": "assembling-machine-place-result-v1",
+      "positive_examples": [
+        {"recipe": "assemble-theta", "fixture": "semantic-family-attach", "reason": "deterministic placeable assembling machine"}
+      ],
+      "negative_examples": [
+        {"recipe": "pack-hard-recycling", "fixture": "semantic-family-attach", "reason": "hard recycling risk"},
+        {"recipe": "pack-hard-productivity-false", "fixture": "semantic-family-attach", "reason": "hard productivity prohibition"}
+      ]
+    },
+    {
+      "family": "logistics-manufacturing",
+      "structural_envelope": "logistics-place-result-v1",
+      "positive_examples": [
+        {"recipe": "assemble-alpha", "fixture": "semantic-family-attach", "reason": "deterministic loader place result"}
+      ],
+      "negative_examples": [
+        {"recipe": "pack-only-recipe", "fixture": "semantic-family-attach", "reason": "pack-seeded example is not structural evidence"}
+      ]
+    }
+  ]
+}

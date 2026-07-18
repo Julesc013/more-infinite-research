@@ -1,5 +1,6 @@
 local deepcopy = require("prototypes.mir.core.deepcopy")
 local fingerprint = require("prototypes.mir.core.fingerprint")
+local applicability_envelope = require("prototypes.mir.domain.technology.applicability_envelope")
 
 local M = {}
 local SCHEMA = 1
@@ -69,6 +70,11 @@ function M.validate(record)
       or type(record.qualification_fingerprint) ~= "string" or record.qualification_fingerprint == "" then
       error("Approved TechnologyApproval requires an exact alternative, design, and qualification.", 2)
     end
+    if type(record.applicability.exact_mods) ~= "table" or #record.applicability.exact_mods == 0 then
+      error("Approved TechnologyApproval requires an exact mod closure.", 2)
+    end
+    validate_strings(record.applicability.exact_mods, "applicability.exact_mods")
+    applicability_envelope.validate(record.applicability.structural_envelope)
   elseif type(record.reason) ~= "string" or record.reason == "" then
     error("Quarantined or demoted TechnologyApproval requires a reason.", 2)
   end
