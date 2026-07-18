@@ -1,0 +1,39 @@
+{
+  "schema": 1,
+  "release": "3.2.0-dev",
+  "recorded_at": "2026-07-18",
+  "candidate": {
+    "path": "dist/more-infinite-research_3.2.0.zip",
+    "bytes": 445393,
+    "sha256": "3976BCF18269FC2F11BCFF2A24D4D7830C75284FDAC6DD5C5FA57AC94C5FCA2C",
+    "content_sha256": "ED6F2EC6E83CE1661958D64912F984A23B2D7DEE944BF2A52049CD6E3FDB2321"
+  },
+  "local_qualification": {
+    "path": ".mir/evidence/3.2.0-assurance-qualification.json",
+    "file_sha256": "480CC078092536453CEC53BBD28C4E68CF249FD4E217B25F9AF9B039B5BE020F",
+    "status": "passed",
+    "checks": 125,
+    "plan_material_sha256": "C3EE203007671CF53A18C1D470D2BEFB9462D22F2680B9D4915AF482909984DB",
+    "required_test_set_sha256": "9DEC560E1AC0436C8A29E6CBCF904E16A746D25DC39DAD8C473E104F6FDD5D24",
+    "capsule_set_sha256": "72BDA8175BC654FD093573908E9F5D9FA22B6DE742A689EFE0ED901D42FF0E2D",
+    "bundle_sha256": "C1459E3AD156F48913B5DA244504619B5278314EA36623F141520FE42D669C16",
+    "trust_class": "untrusted-local",
+    "trust_class_check_count": 125
+  },
+  "seal_attempt": {
+    "status": "blocked-protected-release-required",
+    "error": "Release seal rejected evidence from a producer outside the protected-release trust policy: docs.check",
+    "seal_created": false,
+    "expected_seal_path": ".mir/evidence/candidate-seals/mir-3.2.0-factorio-2.1.json"
+  },
+  "required_protected_context": {
+    "repository": "Julesc013/more-infinite-research",
+    "workflow": "Assurance Full Qualification",
+    "event": "workflow_dispatch",
+    "environment": "release-candidate",
+    "runner_identity": "self-hosted-windows"
+  },
+  "runtime_performance_gate": "pending-qualified-3.1.9-baseline",
+  "manual_review": "pending-maintainer",
+  "release_qualified": false
+}

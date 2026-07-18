@@ -300,9 +300,14 @@ release_artifacts:
       verification_profile: validation/profiles/factorio-2.1.json
       aggregate_gate: "MIR / verification-gate"
       prior_release: dist/more-infinite-research_3.1.9.zip
-      release_gate: implementation-and-qualification-pending
+      archive: dist/more-infinite-research_3.2.0.zip
+      archive_bytes: 445393
+      archive_sha256: 3976BCF18269FC2F11BCFF2A24D4D7830C75284FDAC6DD5C5FA57AC94C5FCA2C
+      local_qualification_evidence: .mir/evidence/3.2.0-assurance-qualification.json
+      runtime_performance_gate: pending-qualified-3.1.9-baseline
+      release_gate: local-full-profile-passed-performance-protected-and-manual-gates-pending
       publication_status: unreleased
-      status: development-candidate
+      status: release-candidate-awaiting-performance-protected-and-manual-review
     mir_2_5_0:
       version: "2.5.0"
       branch: tmp/2.0

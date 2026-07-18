@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "authority": "canonical-release-ledger",
-  "updated_at": "2026-07-17",
+  "updated_at": "2026-07-18",
   "published_baselines": {
     "factorio-2.1": {
       "mir_version": "3.1.9",
@@ -27,7 +27,7 @@
       "archive_class": "development-candidate",
       "qualification": "not-release-qualified",
       "publication_status": "unreleased",
-      "status": "active-refactor"
+      "status": "release-candidate-awaiting-performance-protected-and-manual-review"
     },
     "factorio-2.0": {
       "mir_version": "2.5.0",

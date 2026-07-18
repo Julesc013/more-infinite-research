@@ -1,6 +1,6 @@
 # M.I.R. TODO
 
-Updated: 2026-07-17
+Updated: 2026-07-18
 
 This is the current executable queue for `dev`. Historical pre-consolidation queue text is preserved at `.mir/evidence/lower-wave/todo-2026-07-14-pre-consolidation.md`. `.mir/releases.json` is the canonical release ledger; branch, release-wave, distribution, queue, and promotion views must agree with it.
 
@@ -25,10 +25,10 @@ This is the current executable queue for `dev`. Historical pre-consolidation que
 - [x] Preserve the modern root as the only active Factorio 2.1 implementation.
 - [x] Consolidate one source-faithful changelog section for every real version in the 44-file distribution inventory.
 - [x] Complete the copy-ready release, feature, test, lesson, reliability, optimization, and follow-up document.
-- [x] Validate every snapshot tree and all 46 root distributions against their immutable or explicitly classified source and recorded hash.
+- [x] Validate every snapshot tree and all 44 root distributions against their immutable or explicitly classified source and recorded hash.
 - [x] Run docs governance, manifest, static, deterministic-package, and forbidden-entry validation.
 - [x] Correct the shared museum metadata generator, rebuild and exact-binary requalify all seven 0.x archives, replace their GitHub tags/releases, and refresh the `dev` snapshots and distribution inventory.
-- [ ] Rerun the Factorio 2.1 runtime catalog against the changelog-updated development package when a Factorio 2.1 binary is available. The released 3.1.9 ZIP retains accepted 102-of-102 evidence, but that is not a new exact-package run.
+- [x] Rerun the Factorio 2.1 runtime catalog against the exact 3.2.0 development package; the local full profile passed all 125 declared F0-F4 tests.
 - [x] Commit and push the complete consolidation to `dev`.
 
 ## Remaining Human And External Gates
@@ -59,9 +59,14 @@ This is the current executable queue for `dev`. Historical pre-consolidation que
 - [x] Harden plan, capsule, trust, freshness, closure, bundle, and seal verification before release qualification.
 - [x] Complete generic technology-effect integrity and whole-graph SCC planning before release qualification.
 - [x] Complete bounded performance telemetry and bind its static policy gate into the full profile.
-- [ ] Establish the 3.1.9 normalized behavior-equivalence export and approved-delta manifest before the final source freeze.
-- [ ] Raise the synthetic scale campaign from its current 1,000 recipes, 1,000 technologies, and 10,000 effects to the 100,000-node stress targets without weakening deterministic or diagnostic-size assertions.
-- [ ] Split remaining planning-time icon construction and hidden singleton indexes into an explicit snapshot-scoped compiler context.
+- [x] Establish the 3.1.9 normalized behavior-equivalence export and approved-delta manifest before the final source freeze.
+- [x] Raise the synthetic scale campaign to 100,000 canonical recipes, technologies, effects, and graph edges while preserving deterministic fingerprints and bounded diagnostics.
+- [x] Move compiler snapshots and indexes into explicit snapshot-scoped context ownership and complete the governed design, lifecycle, policy, synthesis, and interaction-campaign sequence.
+- [x] Prove the exact 3.1.9-to-3.2.0 upgrade and pass the local 125-test F0-F4 full profile against candidate SHA-256 `3976BCF18269FC2F11BCFF2A24D4D7830C75284FDAC6DD5C5FA57AC94C5FCA2C`.
+- [ ] Establish and bind the qualified 3.1.9 runtime performance regression baseline; the full profile currently proves the static performance policy and scale telemetry, not a baseline percentage comparison.
+- [ ] Run the protected-release full profile and create the release seal; local `untrusted-local` evidence is intentionally ineligible.
+- [ ] Complete maintainer technology-tree, icon, locale-fit, settings/save UX, balance, and public-presentation review.
+- [ ] Supply the missing exact Pyanodon and legacy Space Exploration dependency closures before strengthening those compatibility claims.
 - [ ] Freeze canonical 3.2 source before creating the final 2.5.0 backport candidate.
 - [ ] Begin any later campaign with `git fetch --all --tags --prune`.
 - [ ] Reconcile `dev`, `main`, release tags, `.mir/branches.yml`, `.mir/release-wave.yml`, and all open human gates before choosing new scope.

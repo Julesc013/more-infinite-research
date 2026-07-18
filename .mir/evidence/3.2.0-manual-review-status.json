@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "release": "3.2.0-dev",
+  "recorded_at": "2026-07-18",
+  "candidate": {
+    "path": "dist/more-infinite-research_3.2.0.zip",
+    "bytes": 445393,
+    "sha256": "3976BCF18269FC2F11BCFF2A24D4D7830C75284FDAC6DD5C5FA57AC94C5FCA2C"
+  },
+  "automated_evidence": {
+    "exact_package_loads": "passed-local",
+    "exact_upgrade": "passed-local",
+    "locale_structure": "passed-local",
+    "evidence": [
+      ".mir/evidence/3.2.0-assurance-qualification.json",
+      ".mir/evidence/3.2.0-upgrade-proof.json"
+    ]
+  },
+  "manual_items": [
+    {"id": "technology-tree-visual", "status": "pending-maintainer"},
+    {"id": "icon-visual", "status": "pending-maintainer"},
+    {"id": "locale-fit-and-truncation", "status": "pending-maintainer"},
+    {"id": "settings-ux", "status": "pending-maintainer"},
+    {"id": "save-ui", "status": "pending-maintainer"},
+    {"id": "human-balance", "status": "pending-maintainer"},
+    {"id": "portal-and-github-presentation", "status": "pending-maintainer"}
+  ],
+  "manual_gate": "pending-maintainer",
+  "release_gate": "blocked-performance-protected-and-manual-review",
+  "release_qualified": false
+}
