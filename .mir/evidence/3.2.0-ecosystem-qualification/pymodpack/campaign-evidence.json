@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "kind": "mir-modpack-campaign-evidence",
+  "generated_at": "2026-07-18T05:04:16.7904060Z",
+  "factorio_line": "2.1",
+  "factorio_binary": "C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\bin\\x64\\factorio.exe",
+  "mir_archive": {
+    "path": "C:\\Projects\\Factorio\\more-infinite-research\\build\\ecosystem-candidate\\more-infinite-research_3.2.0.zip",
+    "sha256": "3976BCF18269FC2F11BCFF2A24D4D7830C75284FDAC6DD5C5FA57AC94C5FCA2C",
+    "source_commit": "565e68398315762af653daf2ed6c1d40b93a4136",
+    "source_commit_binding": "declared"
+  },
+  "dependency_lock": {
+    "path": "C:\\Projects\\Factorio\\more-infinite-research\\artifacts\\ecosystem-qualification\\pymodpack\\compat-candidates.lock.json",
+    "sha256": "E716CBFB3BBE794C2ED5FAB3BC8BDFD489A0E73F86B992BE5C47B58B67E6E4EE"
+  },
+  "scenarios": [
+    {
+      "scenario_id": "pymodpack",
+      "requested_roots": [
+        "pymodpack"
+      ],
+      "actual_executed_roots": [
+        "pymodpack"
+      ],
+      "resolved_mods": [],
+      "official_mods": [],
+      "dependency_closure": [],
+      "dependency_failure_count": 1,
+      "process_result": "passed",
+      "result": "failed",
+      "exit_code": 0,
+      "timed_out": false,
+      "timeout_seconds": 900,
+      "settings": {},
+      "expected_plan": {
+        "mode": "load-only",
+        "required_result": "passed",
+        "maximum_dependency_failures": 0
+      },
+      "source_manifest": ".\\fixtures\\compat-matrix\\manual-scenarios.json",
+      "claim_level": "loads"
+    }
+  ]
+}

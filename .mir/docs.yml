@@ -194,6 +194,14 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - 3.2.0-scale-and-order-invariance
+  - path: docs/releases/3.2.0-ecosystem-qualification-report.md
+    title: "3.2.0 Ecosystem Qualification Report"
+    status: current
+    audience: maintainer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - 3.2.0-ecosystem-qualification
   - path: docs/architecture/module-boundaries.md
     title: "MIR 3.0.0 Repository Structure"
     status: current

@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "generated_at": "2026-07-18T15:16:12+10:00",
+  "audit_dir": "C:\\Projects\\Factorio\\more-infinite-research\\artifacts\\ecosystem-qualification\\available-closures",
+  "missing_dependency_count": 3,
+  "total_missing_dependency_rows": 3,
+  "missing_dependencies": [
+    {
+      "mod": "space-exploration-graphics-2",
+      "count": 1,
+      "phases": [
+        "dependency-resolution"
+      ],
+      "scenarios": [
+        "local-2-1-krastorio-space-exploration"
+      ],
+      "sample_error": "Offline mode is enabled and mod 'space-exploration-graphics-2' is not present in local mod zip roots or libraries."
+    },
+    {
+      "mod": "space-exploration-menu-simulations",
+      "count": 1,
+      "phases": [
+        "dependency-resolution"
+      ],
+      "scenarios": [
+        "local-2-1-krastorio-space-exploration"
+      ],
+      "sample_error": "Offline mode is enabled and mod 'space-exploration-menu-simulations' is not present in local mod zip roots or libraries."
+    },
+    {
+      "mod": "space-exploration-postprocess",
+      "count": 1,
+      "phases": [
+        "dependency-resolution"
+      ],
+      "scenarios": [
+        "local-2-1-krastorio-space-exploration"
+      ],
+      "sample_error": "Offline mode is enabled and mod 'space-exploration-postprocess' is not present in local mod zip roots or libraries."
+    }
+  ]
+}

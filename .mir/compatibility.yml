@@ -117,6 +117,20 @@ campaigns:
       - space-exploration
       - pyanodon
     missing_dependency_evidence: .mir/evidence/3.1.0-rc4-missing-overhaul-closures.json
+  development_3_2_0_qualification:
+    summary: .mir/evidence/3.2.0-ecosystem-qualification-summary.json
+    status: partial-development-qualification
+    source_commit: 565e68398315762af653daf2ed6c1d40b93a4136
+    archive_sha256: 3976BCF18269FC2F11BCFF2A24D4D7830C75284FDAC6DD5C5FA57AC94C5FCA2C
+    passed_load_claims: 7
+    campaign_evidence:
+      - .mir/evidence/3.2.0-ecosystem-qualification/available-closures/campaign-evidence.json
+      - .mir/evidence/3.2.0-ecosystem-qualification/krastorio-spaced-out/campaign-evidence.json
+      - .mir/evidence/3.2.0-ecosystem-qualification/pymodpack/campaign-evidence.json
+    blocked_missing_dependency_closures:
+      - pyanodon
+      - space-exploration
+    claim_boundary: exact-archive-load-claims-only-not-release-qualification
 
 claims:
   allowed_levels:
