@@ -178,6 +178,14 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - 3.2.0-offline-rule-synthesis
+  - path: docs/releases/3.2.0-mod-interaction-campaign-report.md
+    title: "3.2.0 Mod Interaction Campaign Report"
+    status: current
+    audience: maintainer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - 3.2.0-mod-interaction-campaigns
   - path: docs/architecture/module-boundaries.md
     title: "MIR 3.0.0 Repository Structure"
     status: current
@@ -299,6 +307,14 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - offline-family-rule-synthesis
+  - path: docs/reference/mod-interaction-graph.md
+    title: "Semantic Mod Interaction Graph"
+    status: current
+    audience: maintainer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - semantic-mod-interaction-graph
   - path: docs/reference/compiler-diagnostics.md
     title: "Compiler Diagnostic Codes"
     status: current

@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "kind": "mir-mod-combination-campaigns",
+  "campaigns": [
+    {
+      "campaign_id": "atan-ash-x-big-mining-drill-independent-v1",
+      "capsules": ["atan-ash", "big-mining-drill"],
+      "classification": "independent-composition-smoke",
+      "scenario": "combination-atan-ash-big-mining-drill",
+      "required_result": "PASS"
+    },
+    {
+      "campaign_id": "space-age-x-big-mining-drill-targeted-v1",
+      "capsules": ["big-mining-drill", "space-age"],
+      "classification": "targeted-interaction-campaign-with-narrow-delta",
+      "delta_policy": "space-age-x-big-mining-drill-v1",
+      "scenario": "combination-space-age-big-mining-drill",
+      "required_result": "PASS"
+    },
+    {
+      "campaign_id": "space-age-x-space-age-galore-targeted-v1",
+      "capsules": ["space-age", "space-age-galore"],
+      "classification": "targeted-interaction-campaign-with-narrow-delta",
+      "delta_policy": "space-age-x-space-age-galore-v1",
+      "scenario": "space-age-galore-effect-ownership",
+      "required_result": "PASS"
+    }
+  ]
+}

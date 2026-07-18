@@ -546,6 +546,10 @@ Invoke-RepoCheck "offline family-rule synthesis is deterministic and review-only
   & (Join-Path $repo "scripts\Test-MIRRuleSynthesis.ps1") -RepoRoot $repo
 }
 
+Invoke-RepoCheck "semantic mod interactions and combination campaigns are complete" {
+  & (Join-Path $repo "scripts\Test-MIRModInteractions.ps1") -RepoRoot $repo
+}
+
 Invoke-RepoCheck "compatibility dependency declarations preserve full mod names" {
   & (Join-Path $repo "scripts\Test-MIRDependencyResolver.ps1") -RepoRoot $repo
 }
@@ -3834,6 +3838,25 @@ $atanAshTileDecision = Get-DiagnosticReportLineContaining -Kind "decision" -Key 
 Assert-ReportLineContains -Line $atanAshTileDecision -Expected "decision=diagnose_only" -Context "ATAN Ash tile-surface deny decision scenario"
 $atanAshSinkDecision = Get-DiagnosticReportLineContaining -Kind "decision" -Key "atan-stone-brick-from-ash" -Expected "risks=ash_sink"
 Assert-ReportLineContains -Line $atanAshSinkDecision -Expected "decision=diagnose_only" -Context "ATAN Ash sink deny decision scenario"
+
+Invoke-RuntimeScenario -ScenarioName "combination-atan-ash-big-mining-drill" -EnabledFixtureNames @(
+  "mir-fixture-atan-ash",
+  "mir-fixture-assert-hidden-setting-readability",
+  "mir-fixture-assert-atan-ash-separation",
+  "mir-fixture-big-mining-drill",
+  "mir-fixture-assert-big-mining-drill-productivity"
+)
+$combinationAtanAshLine = Get-LastStreamReportLine -Key "research_ash_separation"
+Assert-ReportLineGenerated -Line $combinationAtanAshLine -Context "Independent ATAN Ash plus Big Mining Drill composition"
+$combinationBigDrillLine = Get-LastStreamReportLine -Key "research_mining_drill"
+Assert-ReportLineGenerated -Line $combinationBigDrillLine -Context "Independent Big Mining Drill plus ATAN Ash composition"
+
+Invoke-RuntimeScenario -ScenarioName "combination-space-age-big-mining-drill" -EnabledFixtureNames @(
+  "mir-fixture-big-mining-drill",
+  "mir-fixture-assert-big-mining-drill-productivity"
+) -EnableSpaceAge
+$combinationSpaceAgeDrillLine = Get-LastStreamReportLine -Key "research_mining_drill"
+Assert-ReportLineGenerated -Line $combinationSpaceAgeDrillLine -Context "Space Age plus Big Mining Drill targeted interaction"
 $atanAshTileRisk = Get-DiagnosticReportLineContaining -Kind "loop_risk" -Key "atan-landfill-from-ash" -Expected "risks=tile_surface"
 Assert-ReportLineContains -Line $atanAshTileRisk -Expected "risks=tile_surface" -Context "ATAN Ash tile-surface loop-risk scenario"
 $atanAshSinkRisk = Get-DiagnosticReportLineContaining -Kind "loop_risk" -Key "atan-stone-brick-from-ash" -Expected "risks=ash_sink"

@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "kind": "mir-mod-interaction-policy",
+  "capsules": ".mir/compatibility-capsules.json",
+  "delta_policies": ".mir/interaction-delta-policies.json",
+  "generated_graph": ".mir/mod-interaction-graph.json",
+  "campaigns": ".mir/combination-campaigns.json",
+  "footprint_dimensions": [
+    "data_final_fixes_replacements",
+    "prototype_targets",
+    "recipe_output_families",
+    "science_lab_families",
+    "surface_planet_gates",
+    "technology_effect_owners",
+    "technology_prerequisite_components"
+  ],
+  "independent_policy": "independent-composition-smoke",
+  "overlap_policy": "targeted-interaction-campaign-with-narrow-delta",
+  "rules": [
+    "single-mod qualification never proves a combination",
+    "overlapping footprints require a narrow pair delta policy and targeted campaign",
+    "independent footprints require a composition smoke",
+    "pair policies must not copy either complete support capsule"
+  ]
+}

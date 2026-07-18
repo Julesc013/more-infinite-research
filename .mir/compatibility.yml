@@ -54,6 +54,19 @@ generated_policy_authority:
     - hard prototype safety remains non-overridable
     - public claims remain separately governed and evidence-bound
 
+mod_interactions:
+  policy: .mir/mod-interaction-policy.json
+  support_capsules: .mir/compatibility-capsules.json
+  generated_graph: .mir/mod-interaction-graph.json
+  narrow_delta_policies: .mir/interaction-delta-policies.json
+  campaigns: .mir/combination-campaigns.json
+  generator: scripts/New-MIRModInteractionGraph.ps1
+  validator: scripts/Test-MIRModInteractions.ps1
+  rules:
+    - single-mod qualification never proves a combination
+    - independent pairs require composition smoke evidence
+    - overlapping pairs require a narrow pair delta and targeted campaign evidence
+
 technology_prerequisite_cycle_repairs:
   - id: muluna-astroponics-space-science-cycle
     required_mods:

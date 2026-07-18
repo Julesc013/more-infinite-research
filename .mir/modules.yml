@@ -472,6 +472,8 @@ validation_tooling:
     planner_artifacts: scripts/Test-MIRPlannerTools.ps1
     offline_rule_synthesis: scripts/Invoke-MIRRuleSynthesis.ps1
     offline_rule_synthesis_gate: scripts/Test-MIRRuleSynthesis.ps1
+    mod_interaction_graph: scripts/New-MIRModInteractionGraph.ps1
+    mod_interaction_gate: scripts/Test-MIRModInteractions.ps1
     approved_delta_exporter: scripts/Export-MIRApprovedDelta.ps1
     approved_delta_gate: scripts/Test-MIRApprovedDelta.ps1
     compiler_schema_drift: scripts/Test-MIRCompilerSchemaDrift.ps1
@@ -500,4 +502,5 @@ validation_tooling:
     - compatibility campaign records own setup roots settings expectations timeout and claim level
     - normalized approved deltas bind exact package and producer fingerprints and reject unclassified technology registry setting runtime namespace or migration drift
     - offline rule synthesis searches only the finite predicate authority and emits review-required non-production proposals
+    - semantic mod interaction graphs route independent pairs to composition smoke and overlapping pairs to narrow delta campaigns
     - scenarios retain stable names and explicit groups while decomposition proceeds

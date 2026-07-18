@@ -723,6 +723,55 @@
         ]
       },
       {
+        "name": "combination-atan-ash-big-mining-drill",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "local-mod-library",
+        "surface": "base",
+        "required_features": ["recipe_productivity"],
+        "fixtures": [
+          "mir-fixture-atan-ash",
+          "mir-fixture-assert-hidden-setting-readability",
+          "mir-fixture-assert-atan-ash-separation",
+          "mir-fixture-big-mining-drill",
+          "mir-fixture-assert-big-mining-drill-productivity"
+        ],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 120,
+        "tags": ["base", "combination", "full", "local-mod-library", "runtime", "smoke"],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "independent-support-capsules-compose",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "combination-space-age-big-mining-drill",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "automatic-compiler",
+        "surface": "space-age",
+        "required_features": ["recipe_productivity"],
+        "fixtures": [
+          "mir-fixture-big-mining-drill",
+          "mir-fixture-assert-big-mining-drill-productivity"
+        ],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 180,
+        "tags": ["automatic-compiler", "combination", "full", "runtime", "smoke", "space-age"],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "narrow-mining-drill-overlap-delta-passes",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
         "name": "compiler-contracts",
         "target_profile": "2.1",
         "kind": "runtime",

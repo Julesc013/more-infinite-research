@@ -78,6 +78,22 @@ offline_rule_synthesis:
     - deterministic-review-required-output
     - no-production-mutation-authority
 
+mod_interaction_campaigns:
+  policy: .mir/mod-interaction-policy.json
+  graph: .mir/mod-interaction-graph.json
+  campaigns: .mir/combination-campaigns.json
+  validator: scripts/Test-MIRModInteractions.ps1
+  runtime_scenarios:
+    - combination-atan-ash-big-mining-drill
+    - combination-space-age-big-mining-drill
+    - space-age-galore-effect-ownership
+  validates:
+    - semantic-footprint-intersection
+    - independent-composition-smoke-routing
+    - overlapping-targeted-campaign-routing
+    - narrow-pair-delta-policy
+    - zero-uncovered-overlapping-pairs
+
 local_campaign_manifest:
   path: fixtures/compat-matrix/local-library-scenarios.json
   factorio_2_0_path: fixtures/compat-matrix/local-library-scenarios-2.0.json
