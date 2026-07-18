@@ -553,6 +553,7 @@ fixtures:
       - output-effect-value-parity
       - base-extension-output-parity
       - base-continuation-technology-design-authority
+      - native-owner-patch-existing-technology-design-authority
       - final-plan-output-owner-parity
       - insertion-order-independent-plan-fingerprints
       - telemetry-independent-semantic-compilation-fingerprint

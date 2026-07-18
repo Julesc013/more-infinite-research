@@ -448,6 +448,7 @@ local function native_owner_row(stream_key, owner, recipe)
     input_fingerprint = fingerprint.of(input),
     output_fingerprint = fingerprint.of(expected)
   }
+  row.technology_design = technology_design.from_generation_row(row)
   return row
 end
 local duplicate_effect_plan = generation_plan.new()
@@ -498,6 +499,24 @@ if partial_rows[2].action ~= "emit" or #partial_rows[2].fields.effects ~= 1
 end
 
 local adoption = native_owner_row("research_adopted", "existing-productivity-owner", "iron-gear-wheel")
+if adoption.technology_design.materialization.kind ~= "patch-existing"
+  or adoption.technology_design.materialization.target ~= adoption.adoption.owner
+  or adoption.technology_design.prototype_fingerprint ~= adoption.adoption.output_fingerprint
+  or adoption.technology_design.context.patch_input_fingerprint ~= adoption.adoption.input_fingerprint then
+  fail("native-owner adoption did not bind a patch-existing TechnologyDesign")
+end
+local mismatched_patch_design = deepcopy(adoption)
+mismatched_patch_design.technology_design.materialization.target = "wrong-owner"
+technology_design.refresh_fingerprints(mismatched_patch_design.technology_design)
+expect_error("native-owner patch design parity", "projection differs from TechnologyDesign", function()
+  technology_design.assert_generation_row(mismatched_patch_design)
+end)
+local mismatched_patch_input = deepcopy(adoption)
+mismatched_patch_input.technology_design.context.patch_input_fingerprint = "tampered-input"
+technology_design.refresh_fingerprints(mismatched_patch_input.technology_design)
+expect_error("native-owner patch input authority", "projection differs from TechnologyDesign", function()
+  technology_design.assert_generation_row(mismatched_patch_input)
+end)
 local adoption_rows = effect_ownership.resolve({emitted_row("research_emitted", "effect-tech-emitted"), adoption})
 if adoption_rows[1].stream_key ~= "research_adopted" or adoption_rows[1].action ~= "adopt"
   or adoption_rows[2].action ~= "skip" then

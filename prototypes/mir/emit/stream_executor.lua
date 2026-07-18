@@ -35,7 +35,7 @@ function M.apply(artifact)
         log("[more-infinite-research] Registered technology " .. technology.name)
       end
     elseif row.action == "adopt" then
-      adoption_transaction.apply(row.adoption)
+      adoption_transaction.apply(row.adoption, row.technology_design)
     elseif row.reason ~= "disabled" then
       log("[more-infinite-research] Skipping stream " .. row.stream_key .. " because " .. row.reason .. ".")
     end

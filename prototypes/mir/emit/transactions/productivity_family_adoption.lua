@@ -3,6 +3,7 @@ local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 local native_owner_contract = require("prototypes.mir.domain.native_owner.contract")
 local mod_data = require("prototypes.mir.emit.mod_data")
 local compiler_context = require("prototypes.mir.pipeline.compiler_context")
+local technology_design = require("prototypes.mir.domain.technology.technology_design")
 
 local M = {}
 local MOD_DATA_NAME = "more-infinite-research-productivity-family-adoption"
@@ -41,8 +42,23 @@ local function record(plan)
   end
 end
 
-function M.apply(plan)
+function M.apply(plan, design)
   if not plan then return {} end
+  if not design then
+    error("Native-owner binding transaction requires TechnologyDesign schema 2.", 2)
+  end
+  technology_design.validate(design)
+  local projected = technology_design.prototype_projection(design)
+  if design.materialization.kind ~= "patch-existing"
+    or design.materialization.target ~= plan.owner
+    or design.materialization.operation ~= plan.operation
+    or native_owner_contract.fingerprint(design.materialization.configured_fields)
+      ~= native_owner_contract.fingerprint(plan.configured_fields or {})
+    or design.context.patch_input_fingerprint ~= plan.input_fingerprint
+    or design.context.patch_output_fingerprint ~= plan.output_fingerprint
+    or native_owner_contract.fingerprint(projected) ~= plan.output_fingerprint then
+    error("Native-owner binding TechnologyDesign differs from the planned patch for " .. tostring(plan.owner), 2)
+  end
   local owner = data_raw.technology(plan.owner)
   if not owner then
     error("Planned native-owner binding target disappeared: " .. tostring(plan.owner), 2)

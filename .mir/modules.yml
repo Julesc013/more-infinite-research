@@ -259,8 +259,9 @@ mutation_commands:
     - postcondition publication emits target-neutral content-addressed compiler evidence with mod-data and validation-log adapters
     - stream planning and emission consume TechnologyDesign schema 2 without changing released technology identities
     - every emitted GenerationPlan row carries one validated TechnologyDesign and legacy fields are derived compatibility projections only
+    - every adopted GenerationPlan row carries one patch-existing TechnologyDesign binding the immutable owner input and complete expected output
     - stream planning cannot import the stream executor or adoption mutation transaction
-    - stream emission and adoption mutation are applied only by the emission-owned stream executor
+    - stream emission and fingerprint-verified patch-existing adoption mutation are applied only by the emission-owned stream executor
     - reviewed compatibility data cannot override hard prototype safety facts
     - exact-version compatibility repairs remain separately bounded
   ids:

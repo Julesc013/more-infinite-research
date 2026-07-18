@@ -258,6 +258,9 @@ local function design_material(design)
 end
 
 local function prototype_projection_unvalidated(design)
+  if design.materialization.kind == "patch-existing" then
+    return deepcopy(design.materialization.expected_snapshot)
+  end
   local identity = design.design.identity.value
   local progression = design.design.progression.value
   local cost = design.design.cost.value
@@ -394,6 +397,13 @@ function M.validate(design)
     or not MATERIALIZATION_KINDS[design.materialization.kind] then
     error("TechnologyDesign materialization is invalid.", 2)
   end
+  if design.materialization.kind == "patch-existing" and
+    (type(design.materialization.target) ~= "string" or design.materialization.target == ""
+      or type(design.materialization.operation) ~= "string" or design.materialization.operation == ""
+      or type(design.materialization.configured_fields) ~= "table"
+      or type(design.materialization.expected_snapshot) ~= "table") then
+    error("TechnologyDesign patch-existing materialization is invalid.", 2)
+  end
   if type(design.subjects) ~= "table" then error("TechnologyDesign subjects are required.", 2) end
   for _, category in ipairs(SCHEMA.subject_categories) do
     if category == "effect_targets" then
@@ -501,7 +511,7 @@ function M.from_generation_row(row)
   local fields = row.fields or {}
   local adoption = row.adoption or {}
   local expected = adoption.expected_snapshot or {}
-  local effects = row.action == "adopt" and (adoption.effects or {}) or (fields.effects or {})
+  local effects = row.action == "adopt" and ((expected.effects) or adoption.effects or {}) or (fields.effects or {})
   local technology_id = row.technology_name or adoption.owner
   local capability = capability_for(row, effects)
   local candidate_id = "mir-candidate/" .. capability .. "/" .. tostring(row.stream_key)
@@ -512,9 +522,19 @@ function M.from_generation_row(row)
     (type(automatic_family) == "table" and automatic_family.creation_maturity or "experimental")
     or "released-canonical"
   if design_maturity == "reviewed" then design_maturity = "human-reviewed" end
-  local materialization = deepcopy(row.materialization or {
-    kind = row.action == "adopt" and "patch-existing" or row.action == "skip" and "diagnose" or "create"
-  })
+  local materialization = deepcopy(row.materialization)
+  if not materialization and row.action == "adopt" then
+    materialization = {
+      kind = "patch-existing",
+      target = adoption.owner,
+      operation = adoption.operation,
+      configured_fields = deepcopy(adoption.configured_fields or {}),
+      expected_snapshot = deepcopy(adoption.expected_snapshot or {})
+    }
+  end
+  materialization = materialization or {
+    kind = row.action == "skip" and "diagnose" or "create"
+  }
   local runtime_action = materialization.kind == "continuation" and "continuation"
     or materialization.kind == "patch-existing" and "patch-existing"
     or row.action == "skip" and "diagnose" or row.action
@@ -636,7 +656,9 @@ function M.from_generation_row(row)
       generation_plan_schema = row.schema,
       stream_key = row.stream_key,
       action_reason = row.reason,
-      target_profile_fingerprint = row.target_profile_fingerprint
+      target_profile_fingerprint = row.target_profile_fingerprint,
+      patch_input_fingerprint = adoption.input_fingerprint,
+      patch_output_fingerprint = adoption.output_fingerprint
     }
   }
   M.refresh_fingerprints(result)
@@ -810,13 +832,27 @@ function M.merge(base, overlay, authority)
 end
 
 function M.assert_generation_row(row)
-  if type(row) ~= "table" or row.action ~= "emit" then return true end
+  if type(row) ~= "table" or (row.action ~= "emit" and row.action ~= "adopt") then return true end
   if not row.technology_design then
-    error("GenerationPlan emitted row requires TechnologyDesign schema 2: " .. tostring(row.stream_key), 2)
+    error("GenerationPlan materializing row requires TechnologyDesign schema 2: " .. tostring(row.stream_key), 2)
   end
   M.validate(row.technology_design)
   local design = row.technology_design
   local projection = M.prototype_projection(design)
+  if row.action == "adopt" then
+    local adoption = row.adoption or {}
+    if design.materialization.kind ~= "patch-existing"
+      or design.materialization.target ~= adoption.owner
+      or design.materialization.operation ~= adoption.operation
+      or not same(design.materialization.configured_fields, adoption.configured_fields or {})
+      or not same(projection, adoption.expected_snapshot)
+      or design.prototype_fingerprint ~= adoption.output_fingerprint
+      or design.context.patch_input_fingerprint ~= adoption.input_fingerprint
+      or design.context.patch_output_fingerprint ~= adoption.output_fingerprint then
+      error("GenerationPlan patch-existing projection differs from TechnologyDesign: " .. tostring(row.stream_key), 2)
+    end
+    return true
+  end
   local legacy = row.fields or {}
   local mismatches = {}
   local function compare(path, left, right)

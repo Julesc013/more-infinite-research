@@ -146,6 +146,17 @@ function M.assert_compilation_artifact(artifact)
       checked = checked + 1
     elseif operation.operation == "native_owner_binding" then
       if not technology then fail(operation.technology_name, "adoption owner is missing") end
+      if not operation.technology_design then
+        fail(operation.technology_name, "patch-existing TechnologyDesign is missing")
+      end
+      technology_design.validate(operation.technology_design)
+      local design_projection = technology_design.prototype_projection(operation.technology_design)
+      if operation.technology_design.materialization.kind ~= "patch-existing"
+        or operation.technology_design.materialization.target ~= operation.technology_name then
+        fail(operation.technology_name, "patch-existing TechnologyDesign target differs")
+      end
+      assert_equal(operation.technology_name, "TechnologyDesign patch fingerprint",
+        operation.output_fingerprint, native_owner_contract.fingerprint(design_projection))
       local actual_snapshot = native_owner_contract.snapshot(technology)
       local actual_fingerprint = native_owner_contract.fingerprint(actual_snapshot)
       assert_equal(operation.technology_name, "native-owner output fingerprint", operation.output_fingerprint, actual_fingerprint)
@@ -171,9 +182,11 @@ function M.assert_artifact(artifact)
         technology = technology_design.prototype_projection(row.technology_design)
       })
     elseif row.action == "adopt" then
+      technology_design.assert_generation_row(row)
       table.insert(operations, {
         operation = "native_owner_binding",
         technology_name = row.adoption.owner,
+        technology_design = row.technology_design,
         output_fingerprint = row.adoption.output_fingerprint,
         expected_snapshot = row.adoption.expected_snapshot
       })

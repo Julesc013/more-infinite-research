@@ -89,6 +89,7 @@ local function validate_row(row)
     required(row.fields, "max_level")
   elseif row.action == "adopt" then
     required(row, "adoption")
+    required(row, "technology_design")
     if row.adoption.schema ~= 2 then error("GenerationPlan native-owner binding schema must be 2", 3) end
     required(row.adoption, "owner")
     required(row.adoption, "operation")
@@ -104,6 +105,7 @@ local function validate_row(row)
     if fingerprint.of(row.adoption.expected_snapshot) ~= row.adoption.output_fingerprint then
       error("GenerationPlan native-owner output fingerprint differs: " .. row.stream_key, 3)
     end
+    technology_design.assert_generation_row(row)
   else
     required(row, "reason")
   end

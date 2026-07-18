@@ -47,6 +47,8 @@ The design-maturity state machine is `proposed` to `experimental` to `automation
 
 ## GenerationPlan boundary
 
-Every schema-3 `emit` row must carry one validated schema-2 `TechnologyDesign`. The compatibility `fields` record is checked against the IR and cannot disagree with it. Compilation planning, stream emission, and output validation consume canonical projections from the IR.
+Every schema-3 `emit` or `adopt` row must carry one validated schema-2 `TechnologyDesign`. The compatibility `fields` record is checked against the IR and cannot disagree with it. Compilation planning, stream emission, adoption transactions, and output validation consume canonical projections from the IR.
 
-Every accepted base continuation is likewise rebuilt as a `continuation` design after sanitation and cross-operation policy. Its generated identity derives from the released chain pattern in the continuation manifest, and the same TechnologyDesign adapter that emits streams creates the final prototype. Native-owner adoption remains the next patch-existing migration boundary.
+Every accepted base continuation is likewise rebuilt as a `continuation` design after sanitation and cross-operation policy. Its generated identity derives from the released chain pattern in the continuation manifest, and the same TechnologyDesign adapter that emits streams creates the final prototype.
+
+A native-owner adoption row uses `materialization.kind = patch-existing`. Its target and operation must match the adoption plan, its configured-field list is explicit, and its canonical prototype projection is the complete expected owner snapshot after adoption. The design's context binds both transaction input and output fingerprints. GenerationPlan and CompilationPlan reject any mismatch, the emission-owned adoption transaction rechecks the projection and both fingerprints before touching the prototype, and output validation consumes the same design. Patch designs are compiler artifacts; they are not published into the generated-technology registry or runtime adoption namespace.

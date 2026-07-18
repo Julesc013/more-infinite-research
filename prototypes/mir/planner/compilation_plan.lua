@@ -167,6 +167,7 @@ local function materialized_stream_operations(artifact)
         registry = {kind = "stream", key = row.stream_key}
       })
     elseif row.action == "adopt" then
+      technology_design.assert_generation_row(row)
       table.insert(out, {
         schema = 2,
         operation = "native_owner_binding",
@@ -174,6 +175,7 @@ local function materialized_stream_operations(artifact)
         stream_key = row.stream_key,
         manifest_id = row.manifest_id,
         technology_name = row.adoption.owner,
+        technology_design = deepcopy(row.technology_design),
         effects = deepcopy(row.adoption.effects),
         configured_fields = deepcopy(row.adoption.configured_fields),
         input_fingerprint = row.adoption.input_fingerprint,
