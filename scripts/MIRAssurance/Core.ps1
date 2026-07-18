@@ -171,9 +171,18 @@ function Get-MIRAssuranceExternalTreeFingerprint {
   if ([string]::IsNullOrWhiteSpace($Root) -or -not (Test-Path -LiteralPath $Root -PathType Container)) {
     return [ordered]@{ kind="external-tree"; state="missing"; sha256=(Get-MIRAssuranceTextHash -Text "MISSING:$MissingLabel") }
   }
+  if ($null -eq $script:MIRAssuranceExternalTreeFingerprintCache) {
+    $script:MIRAssuranceExternalTreeFingerprintCache = @{}
+  }
+  $resolvedRoot = (Resolve-Path -LiteralPath $Root).Path
+  $normalizedRoots = @($RelativeRoots | ForEach-Object { ([string]$_).Replace("\", "/") } | Sort-Object -Unique)
+  $cacheKey = "$resolvedRoot`n$($normalizedRoots -join "`n")"
+  if ($script:MIRAssuranceExternalTreeFingerprintCache.ContainsKey($cacheKey)) {
+    return $script:MIRAssuranceExternalTreeFingerprintCache[$cacheKey]
+  }
   $files = @()
-  foreach ($relative in @($RelativeRoots)) {
-    $path = Join-Path $Root $relative
+  foreach ($relative in $normalizedRoots) {
+    $path = Join-Path $resolvedRoot $relative
     if (Test-Path -LiteralPath $path -PathType Leaf) {
       $files += Get-Item -LiteralPath $path
     } elseif (Test-Path -LiteralPath $path -PathType Container) {
@@ -186,13 +195,15 @@ function Get-MIRAssuranceExternalTreeFingerprint {
       "$relative`t$($file.Length)`t$(Get-MIRAssuranceSha256 -Path $file.FullName)"
     }
   )
-  return [ordered]@{
+  $fingerprint = [ordered]@{
     kind="external-tree"
     state="present"
-    root=$Root
+    root=$resolvedRoot
     file_count=$rows.Count
     sha256=(Get-MIRAssuranceTextHash -Text $(if ($rows.Count -gt 0) { $rows -join "`n" } else { "EMPTY:$MissingLabel" }))
   }
+  $script:MIRAssuranceExternalTreeFingerprintCache[$cacheKey] = $fingerprint
+  return $fingerprint
 }
 
 function Get-MIRAssuranceFactorioInstallationFingerprint {

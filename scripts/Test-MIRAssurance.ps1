@@ -53,6 +53,22 @@ if ($releaseAssurance -match 'Get-MIRAssuranceOption\s+-Name\s+"--evidence"') {
   throw "Candidate sealing still accepts an arbitrary evidence summary."
 }
 
+$coreScript = Join-Path $RepoRoot "scripts\MIRAssurance\Core.ps1"
+. $coreScript
+$externalTreeRoot = Join-Path ([IO.Path]::GetTempPath()) ("mir-assurance-tree-cache-" + [guid]::NewGuid().ToString("N"))
+try {
+  New-Item -ItemType Directory -Force -Path (Join-Path $externalTreeRoot "data") | Out-Null
+  Set-Content -LiteralPath (Join-Path $externalTreeRoot "data\sample.txt") -Value "stable" -Encoding UTF8
+  $script:MIRAssuranceExternalTreeFingerprintCache = @{}
+  $firstTreeFingerprint = Get-MIRAssuranceExternalTreeFingerprint -Root $externalTreeRoot -RelativeRoots @("data") -MissingLabel "test-tree"
+  $secondTreeFingerprint = Get-MIRAssuranceExternalTreeFingerprint -Root $externalTreeRoot -RelativeRoots @("data") -MissingLabel "test-tree"
+  if ($firstTreeFingerprint.sha256 -ne $secondTreeFingerprint.sha256 -or $script:MIRAssuranceExternalTreeFingerprintCache.Count -ne 1) {
+    throw "External-tree fingerprints are not reused within one assurance process."
+  }
+} finally {
+  if (Test-Path -LiteralPath $externalTreeRoot) { Remove-Item -LiteralPath $externalTreeRoot -Recurse -Force }
+}
+
 $workflow = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".github\workflows\assurance-full.yml")
 foreach ($requiredWorkflowSnippet in @(
   "MIR_TRUST_CLASS: protected-release",
