@@ -76,4 +76,20 @@ function M.snapshot()
   return out
 end
 
+function M.target_inventory()
+  local prototype_types = {}
+  for _, contract in pairs(contracts) do
+    if contract.prototype_type then prototype_types[contract.prototype_type] = true end
+  end
+  for _, type_name in ipairs(lookup.item_types()) do prototype_types[type_name] = true end
+  local inventory = {}
+  for type_name, _ in pairs(prototype_types) do
+    local names = {}
+    for name, _ in pairs(data_raw.prototypes(type_name)) do table.insert(names, name) end
+    table.sort(names)
+    inventory[type_name] = names
+  end
+  return inventory
+end
+
 return M

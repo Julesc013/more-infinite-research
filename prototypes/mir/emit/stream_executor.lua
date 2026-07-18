@@ -28,7 +28,7 @@ function M.apply(artifact)
         native_modifiers.record_overlaps(row.stream_key, row.overlap_effects)
       end
       if not row.technology_design then
-        error("Stream executor requires TechnologyDesign schema 1 for " .. tostring(row.stream_key) .. ".", 2)
+        error("Stream executor requires TechnologyDesign schema 2 for " .. tostring(row.stream_key) .. ".", 2)
       end
       local technology = stream_emitter.emit(row.technology_design)
       if D.enabled() and not row.direct_effects then

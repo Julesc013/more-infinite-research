@@ -87,14 +87,19 @@ local function assert_compiler_evidence()
   local prototype = (data.raw["mod-data"] or {})["more-infinite-research-compiler-evidence"]
   local evidence = prototype and prototype.data
   local plan = compilation_plan.snapshot()
-  if not evidence or evidence.schema ~= 1
+  if not evidence or evidence.schema ~= 2
     or evidence.semantic_fingerprint ~= plan.semantic_fingerprint
+    or evidence.compilation_fingerprint ~= plan.compilation_fingerprint
+    or evidence.qualification_fingerprint ~= plan.qualification_fingerprint
     or type(evidence.telemetry_fingerprint) ~= "string"
+    or type(evidence.run_fingerprint) ~= "string"
     or type(evidence.input_sanitation_fingerprint) ~= "string"
     or type(evidence.output_sanitation_fingerprint) ~= "string"
     or type(evidence.evidence_fingerprint) ~= "string"
     or not evidence.input_sanitation_ledger or evidence.input_sanitation_ledger.pass ~= "input"
     or not evidence.output_sanitation_ledger or evidence.output_sanitation_ledger.pass ~= "output"
+    or evidence.input_sanitation_ledger.sanitized_target_inventory_fingerprint
+      ~= evidence.output_sanitation_ledger.sanitized_target_inventory_fingerprint
   then
     fail("content-addressed compiler evidence or sanitation ledgers are missing")
   end
@@ -262,6 +267,7 @@ local function assert_pipeline_command_contracts()
   local catalog = pipeline_commands.snapshot()
   local count = 0
   local allowed_kinds = {
+    sanitation = true,
     mutation = true,
     emission = true,
     plan = true,

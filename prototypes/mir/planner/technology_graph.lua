@@ -6,6 +6,7 @@ local fingerprint = require("prototypes.mir.core.fingerprint")
 
 local M = {}
 local WITNESS_NODE_LIMIT = 64
+local CONTRIBUTING_SAMPLE_LIMIT = 16
 local REJECTION_PRIORITY = {
   prerequisite_missing = 10,
   prerequisite_disabled = 20,
@@ -135,6 +136,18 @@ local function bounded_component_nodes(component)
   return out
 end
 
+local function component_internal_edges(component, adjacency)
+  local members, edges = {}, {}
+  for _, name in ipairs(component) do members[name] = true end
+  for _, owner in ipairs(component) do
+    for _, prerequisite in ipairs(adjacency[owner] or {}) do
+      if members[prerequisite] then table.insert(edges, owner .. "\0" .. prerequisite) end
+    end
+  end
+  table.sort(edges)
+  return edges
+end
+
 local function find_actual_cycle(component, adjacency, maximum_nodes)
   local component_set, state, parent = {}, {}, {}
   for _, name in ipairs(component) do component_set[name] = true end
@@ -201,7 +214,7 @@ end
 local function add_reason(reasons, name, code, evidence, origin)
   local bucket = reasons[name]
   if not bucket then
-    bucket = {by_origin = {}, all = {}}
+    bucket = {local_by_identity = {}, local_reasons = {}, cause_links = {}, cause_link_set = {}}
     reasons[name] = bucket
   end
   local reason = {
@@ -211,10 +224,12 @@ local function add_reason(reasons, name, code, evidence, origin)
     priority = REJECTION_PRIORITY[code] or 1000
   }
   local identity = tostring(code) .. "\0" .. tostring(reason.origin) .. "\0" .. tostring(evidence)
-  if bucket.by_origin[identity] then return false end
-  bucket.by_origin[identity] = reason
-  table.insert(bucket.all, reason)
-  table.sort(bucket.all, reason_less)
+  if bucket.local_by_identity[identity] then return false end
+  reason.identity = fingerprint.of({code = code, origin = reason.origin, evidence = evidence})
+  bucket.local_by_identity[identity] = reason
+  table.insert(bucket.local_reasons, reason)
+  table.sort(bucket.local_reasons, reason_less)
+  if not bucket.primary or reason_less(reason, bucket.primary) then bucket.primary = reason end
   return true
 end
 
@@ -224,22 +239,51 @@ local function propagate_rejections(reasons, reverse)
   while index <= #queue do
     local unsafe_name = queue[index]
     index = index + 1
+    local unsafe_bucket = reasons[unsafe_name]
     for _, dependent in ipairs(reverse[unsafe_name] or {}) do
+      local bucket = reasons[dependent]
+      if not bucket then
+        bucket = {local_by_identity = {}, local_reasons = {}, cause_links = {}, cause_link_set = {}}
+        reasons[dependent] = bucket
+      end
       local changed = false
-      for _, reason in ipairs(reasons[unsafe_name].all) do
-        changed = add_reason(
-          reasons, dependent, reason.code, reason.evidence, reason.origin) or changed
+      if not bucket.cause_link_set[unsafe_name] then
+        bucket.cause_link_set[unsafe_name] = true
+        table.insert(bucket.cause_links, unsafe_name)
+        table.sort(bucket.cause_links)
+        changed = true
+      end
+      if unsafe_bucket.primary and (not bucket.primary or reason_less(unsafe_bucket.primary, bucket.primary)) then
+        bucket.primary = unsafe_bucket.primary
+        changed = true
       end
       if changed then table.insert(queue, dependent) end
     end
   end
 end
 
-local function resolved_reason(bucket)
-  local primary = deepcopy(bucket.all[1])
-  local contributing = {}
-  for index = 2, #bucket.all do table.insert(contributing, deepcopy(bucket.all[index])) end
-  return primary, contributing
+local function resolved_reason(name, bucket, reasons)
+  local primary = deepcopy(bucket.primary)
+  local contributing, seen = {}, {}
+  local function sample(reason)
+    if not reason or (primary and reason.identity == primary.identity) or seen[reason.identity] then return end
+    seen[reason.identity] = true
+    if #contributing < CONTRIBUTING_SAMPLE_LIMIT then table.insert(contributing, deepcopy(reason)) end
+  end
+  for _, reason in ipairs(bucket.local_reasons) do sample(reason) end
+  for _, upstream in ipairs(bucket.cause_links) do sample(reasons[upstream] and reasons[upstream].primary) end
+  table.sort(contributing, reason_less)
+  local local_origins = {}
+  for _, reason in ipairs(bucket.local_reasons) do table.insert(local_origins, reason.identity) end
+  table.sort(local_origins)
+  local contributing_count = #bucket.local_reasons + #bucket.cause_links
+  if primary then contributing_count = math.max(0, contributing_count - 1) end
+  return primary, contributing, {
+    contributing_count = contributing_count,
+    contributing_samples_truncated = contributing_count > #contributing,
+    contributing_origin_fingerprint = fingerprint.of({name = name, local_origins = local_origins, cause_links = bucket.cause_links}),
+    cause_links = deepcopy(bucket.cause_links)
+  }
 end
 
 function M.validate_operations(operations)
@@ -276,9 +320,14 @@ function M.validate_operations(operations)
         component, adjacency, WITNESS_NODE_LIMIT)
       local witness = table.concat(actual_cycle_witness, " -> ")
       local member_sample = bounded_component_nodes(component)
-      local component_id = fingerprint.of(component)
+      local internal_edges = component_internal_edges(component, adjacency)
+      local component_member_id = fingerprint.of(component)
+      local component_topology_fingerprint = fingerprint.of(internal_edges)
       table.insert(cyclic_components, {
-        component_id = component_id,
+        component_id = component_member_id,
+        component_member_id = component_member_id,
+        component_topology_fingerprint = component_topology_fingerprint,
+        internal_edge_count = #internal_edges,
         classification = classification,
         node_count = #component,
         member_sample = member_sample,
@@ -293,7 +342,8 @@ function M.validate_operations(operations)
         or classification == "mixed-mir-external" and "prerequisite_mixed_cycle"
         or "prerequisite_external_cycle"
       for _, name in ipairs(component) do
-        add_reason(rejection_reasons, name, code, witness, "component:" .. component_id)
+        add_reason(rejection_reasons, name, code, witness,
+          "component:" .. component_member_id .. ":" .. component_topology_fingerprint)
       end
     end
   end
@@ -325,11 +375,16 @@ function M.validate_operations(operations)
   end
   propagate_rejections(rejection_reasons, reverse)
 
-  local rejected = {}
+  local rejected, cause_graph = {}, {schema = 1, nodes = {}}
+  for name, bucket in pairs(rejection_reasons) do
+    local local_origins = {}
+    for _, reason in ipairs(bucket.local_reasons) do table.insert(local_origins, deepcopy(reason)) end
+    cause_graph.nodes[name] = {local_origins = local_origins, unsafe_prerequisites = deepcopy(bucket.cause_links)}
+  end
   for name, _ in pairs(planned) do
     local reason_bucket = rejection_reasons[name]
     if reason_bucket then
-      local primary, contributing = resolved_reason(reason_bucket)
+      local primary, contributing, cause_summary = resolved_reason(name, reason_bucket, rejection_reasons)
       rejected[name] = {
         status = "failed",
         passed = false,
@@ -337,7 +392,11 @@ function M.validate_operations(operations)
         reason = primary.code,
         evidence = {"technology-graph:" .. primary.code, primary.evidence},
         primary = primary,
-        contributing = contributing
+        contributing = contributing,
+        contributing_count = cause_summary.contributing_count,
+        contributing_samples_truncated = cause_summary.contributing_samples_truncated,
+        contributing_origin_fingerprint = cause_summary.contributing_origin_fingerprint,
+        cause_links = cause_summary.cause_links
       }
     else
       proofs[name] = {
@@ -368,7 +427,8 @@ function M.validate_operations(operations)
     accepted_planned_technology_count = #sorted_keys(proofs),
     rejected_planned_technology_count = #sorted_keys(rejected),
     proofs = proofs,
-    rejected = rejected
+    rejected = rejected,
+    cause_graph = cause_graph
   }
 end
 

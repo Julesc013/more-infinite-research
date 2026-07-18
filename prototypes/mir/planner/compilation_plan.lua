@@ -10,6 +10,7 @@ local target_line = require("prototypes.mir.platform.factorio.target_line")
 local technology_graph = require("prototypes.mir.planner.technology_graph")
 local telemetry = require("prototypes.mir.report.compiler_telemetry")
 local technology_design = require("prototypes.mir.domain.technology.technology_design")
+local compiler_evidence = require("prototypes.mir.domain.evidence.compiler_evidence")
 
 local M = {}
 local latest = nil
@@ -150,7 +151,11 @@ local function materialized_stream_operations(artifact)
   local out = {}
   for _, row in ipairs(artifact.rows or {}) do
     if row.action == "emit" then
-      local design = row.technology_design or technology_design.from_generation_row(row)
+      if not row.technology_design then
+        error("CompilationPlan emitted row lacks TechnologyDesign schema 2: " .. tostring(row.stream_key), 2)
+      end
+      local design = row.technology_design
+      technology_design.assert_generation_row(row)
       table.insert(out, {
         schema = 2,
         operation = "emit_stream",
@@ -279,14 +284,69 @@ local function validate_operations(operations)
   }
 end
 
-local function semantic_material(artifact)
+local function compilation_operation_material(operation)
+  if operation.operation == "emit_stream" then
+    return {
+      operation = operation.operation,
+      stream_key = operation.stream_key,
+      manifest_id = operation.manifest_id,
+      technology_name = operation.technology_name,
+      design_fingerprint = operation.technology_design.design_fingerprint,
+      prototype_fingerprint = operation.technology_design.prototype_fingerprint,
+      registry = operation.registry
+    }
+  end
+  if operation.operation == "native_owner_binding" then
+    return {
+      operation = operation.operation,
+      binding_operation = operation.binding_operation,
+      stream_key = operation.stream_key,
+      manifest_id = operation.manifest_id,
+      technology_name = operation.technology_name,
+      configured_fields = operation.configured_fields,
+      input_fingerprint = operation.input_fingerprint,
+      output_fingerprint = operation.output_fingerprint
+    }
+  end
+  return {
+    operation = operation.operation,
+    manifest_id = operation.manifest_id,
+    technology_name = operation.technology_name,
+    technology = operation.technology,
+    registry = operation.registry,
+    planned_policy = operation.planned_policy
+  }
+end
+
+local function compilation_material(artifact)
+  local operations, rejected = {}, {}
+  for _, operation in ipairs(artifact.operations or {}) do
+    table.insert(operations, compilation_operation_material(operation))
+  end
+  for _, row in ipairs((artifact.stream_plan and artifact.stream_plan.rows) or {}) do
+    if row.action == "skip" then
+      table.insert(rejected, {
+        stream_key = row.stream_key,
+        manifest_id = row.manifest_id,
+        reason = row.reason,
+        qualification_fingerprint = row.technology_design and row.technology_design.qualification_fingerprint
+      })
+    end
+  end
   return {
     schema = artifact.schema,
     source_fingerprints = artifact.source_fingerprints,
-    input_sanitation_ledger = artifact.input_sanitation_ledger,
-    operations = artifact.operations,
+    operations = operations,
+    rejected_operations = rejected
+  }
+end
+
+local function qualification_material(artifact)
+  return {
+    schema = artifact.schema,
+    compilation_fingerprint = artifact.compilation_fingerprint,
+    input_sanitation_fingerprint = fingerprint.of(artifact.input_sanitation_ledger or {}),
     stream_plan = artifact.stream_plan,
-    base_extension_operations = artifact.base_extension_operations,
     validation_summary = artifact.validation_summary
   }
 end
@@ -294,10 +354,15 @@ end
 local function attach_run_evidence(artifact)
   artifact.telemetry = telemetry.snapshot()
   artifact.telemetry_fingerprint = fingerprint.of(artifact.telemetry)
+  artifact.run_fingerprint = fingerprint.of({
+    qualification_fingerprint = artifact.qualification_fingerprint,
+    telemetry_fingerprint = artifact.telemetry_fingerprint
+  })
   artifact.run = {
     schema = 1,
     telemetry = deepcopy(artifact.telemetry),
-    telemetry_fingerprint = artifact.telemetry_fingerprint
+    telemetry_fingerprint = artifact.telemetry_fingerprint,
+    run_fingerprint = artifact.run_fingerprint
   }
   return artifact
 end
@@ -355,8 +420,10 @@ function M.finalize(stream_plan, base_plan, compiler_inputs)
     base_extension_operations = normalized_base,
     validation_summary = validation_summary
   }
-  artifact.semantic_fingerprint = fingerprint.of(semantic_material(artifact))
-  artifact.fingerprint = artifact.semantic_fingerprint
+  artifact.compilation_fingerprint = fingerprint.of(compilation_material(artifact))
+  artifact.qualification_fingerprint = fingerprint.of(qualification_material(artifact))
+  artifact.semantic_fingerprint = artifact.qualification_fingerprint
+  artifact.fingerprint = artifact.compilation_fingerprint
   return attach_run_evidence(artifact)
 end
 
@@ -384,18 +451,15 @@ function M.publish(context)
   mod_data.emit_generation_plan(plan.stream_plan)
   local input_ledger = deepcopy(plan.input_sanitation_ledger)
   local output_ledger = context and context:artifact("output_sanitation_ledger") or nil
-  local evidence = {
-    schema = 1,
+  local evidence = compiler_evidence.build({
     compilation_plan_schema = plan.schema,
-    semantic_fingerprint = plan.semantic_fingerprint,
-    telemetry_fingerprint = fingerprint.of(telemetry.snapshot()),
+    compilation_fingerprint = plan.compilation_fingerprint,
+    qualification_fingerprint = plan.qualification_fingerprint,
+    telemetry = telemetry.snapshot(),
     input_sanitation_ledger = input_ledger,
-    input_sanitation_fingerprint = fingerprint.of(input_ledger or {}),
-    output_sanitation_ledger = output_ledger,
-    output_sanitation_fingerprint = fingerprint.of(output_ledger or {})
-  }
-  evidence.evidence_fingerprint = fingerprint.of(evidence)
-  mod_data.emit_compiler_evidence(evidence)
+    output_sanitation_ledger = output_ledger
+  })
+  require("prototypes.mir.emit.compiler_evidence_adapter").publish(evidence)
   if target_line.feature_enabled("productivity_family_adoption") then
     require("prototypes.mir.emit.transactions.productivity_family_adoption").emit_mod_data()
   end
@@ -413,6 +477,8 @@ function M.snapshot(context)
   local snapshot = {
     schema = plan.schema,
     fingerprint = plan.fingerprint,
+    compilation_fingerprint = plan.compilation_fingerprint,
+    qualification_fingerprint = plan.qualification_fingerprint,
     semantic_fingerprint = plan.semantic_fingerprint,
     source_fingerprints = plan.source_fingerprints,
     input_sanitation_ledger = plan.input_sanitation_ledger,

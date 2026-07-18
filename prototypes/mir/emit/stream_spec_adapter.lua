@@ -30,7 +30,9 @@ function M.emit(design)
     upgrade = runtime_contracts.upgrade,
     max_level = cost.max_level,
     order = presentation.order,
-    level = identity.level,
+    level = presentation.level,
+    enabled = presentation.enabled,
+    hidden = presentation.hidden,
     migration_policy = ownership.migration_policy
   })
 

@@ -1,6 +1,7 @@
 local deepcopy = require("prototypes.mir.core.deepcopy")
 local generation_plan = require("prototypes.mir.planner.generation_plan")
 local native_owner_contract = require("prototypes.mir.domain.native_owner.contract")
+local technology_design = require("prototypes.mir.domain.technology.technology_design")
 
 local M = {}
 
@@ -149,6 +150,9 @@ function M.resolve(raw_rows)
     if a.action ~= b.action then return a.action < b.action end
     return tostring(a.manifest_id) < tostring(b.manifest_id)
   end)
+  for _, row in ipairs(rows) do
+    if row.action == "emit" then row.technology_design = technology_design.from_generation_row(row) end
+  end
   return rows, {conflict_count = conflict_count}
 end
 

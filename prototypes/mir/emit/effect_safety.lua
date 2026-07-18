@@ -2,6 +2,8 @@ local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 local generated_registry = require("prototypes.mir.domain.facts.generated_technology_registry")
 local effect_contracts = require("prototypes.mir.integrity.effect_contracts")
 local telemetry = require("prototypes.mir.report.compiler_telemetry")
+local fingerprint = require("prototypes.mir.core.fingerprint")
+local deepcopy = require("prototypes.mir.core.deepcopy")
 
 local S = {}
 
@@ -59,25 +61,28 @@ local function log_pruned_effect(technology_name, effect, reason, owner)
 end
 
 function S.sanitize_effects(effects, context, owner)
-  local kept, removed, retained_effect_order = {}, {}, {}
+  local kept, removed, retained_effect_order, retained_effect_identities = {}, {}, {}, {}
   for effect_index, effect in ipairs(effects or {}) do
     local valid, reason, target = effect_contracts.target_status(effect)
     if valid then
       table.insert(kept, effect)
       table.insert(retained_effect_order, effect_index)
+      local identity = effect_contracts.identity(effect)
+      table.insert(retained_effect_identities, identity ~= "" and identity or fingerprint.of(effect))
     else
       table.insert(removed, {
         original_effect_index = effect_index,
         type = effect and effect.type,
         target = target,
-        reason = reason
+        reason = reason,
+        removed_effect_fingerprint = fingerprint.of(effect or {})
       })
       log_pruned_effect(context, effect, reason, owner or "unknown")
       telemetry.count("effects_pruned", 1)
       telemetry.witness("pruned_effects", tostring(context) .. ":" .. tostring(effect and effect.type) .. ":" .. tostring(target))
     end
   end
-  return kept, removed, retained_effect_order
+  return kept, removed, retained_effect_order, retained_effect_identities
 end
 
 function S.prune_missing_recipe_effects(technology, technology_name)
@@ -142,7 +147,8 @@ function S.sanitize_all_technology_effects(options)
     generated_technology_count = 0,
     external_technology_count = 0,
     emptied_technology_count = 0,
-    technologies = {}
+    technologies = {},
+    sanitized_target_inventory_fingerprint = fingerprint.of(effect_contracts.target_inventory())
   }
   local names = {}
   for name, _ in pairs(data_raw.prototypes("technology")) do table.insert(names, name) end
@@ -150,9 +156,10 @@ function S.sanitize_all_technology_effects(options)
   for _, name in ipairs(names) do
     local technology = data_raw.technology(name)
     local owner, owning_mod, owning_mod_known = owner_record(name)
-    local original_effect_count = #((technology and technology.effects) or {})
-    local kept, removed, retained_effect_order = S.sanitize_effects(
-      (technology and technology.effects) or {}, name, owner)
+    local original_effects = deepcopy((technology and technology.effects) or {})
+    local original_effect_count = #original_effects
+    local kept, removed, retained_effect_order, retained_effect_identities = S.sanitize_effects(
+      original_effects, name, owner)
     if #removed > 0 then
       technology.effects = kept
       summary.pruned_effect_count = summary.pruned_effect_count + #removed
@@ -162,15 +169,28 @@ function S.sanitize_all_technology_effects(options)
       table.insert(summary.technologies, {
         original_technology = name,
         original_effect_count = original_effect_count,
+        original_effects_fingerprint = fingerprint.of(original_effects),
         owner_kind = owner,
         owning_mod = owning_mod,
         owning_mod_known = owning_mod_known,
         removed_effects = removed,
-        retained_effect_order = retained_effect_order
+        retained_effect_order = retained_effect_order,
+        retained_effect_identities = retained_effect_identities,
+        retained_effects_fingerprint = fingerprint.of(kept),
+        sanitized_effects_fingerprint = fingerprint.of(technology.effects or {})
       })
     end
   end
   return summary
+end
+
+function S.assert_target_inventory_unchanged(input_ledger, output_ledger)
+  local input_fingerprint = input_ledger and input_ledger.sanitized_target_inventory_fingerprint
+  local output_fingerprint = output_ledger and output_ledger.sanitized_target_inventory_fingerprint
+  if type(input_fingerprint) ~= "string" or input_fingerprint ~= output_fingerprint then
+    error("MIR created or removed a sanitation-covered target prototype after input sanitation.", 2)
+  end
+  return true
 end
 
 function S.register_generated_technology(name)

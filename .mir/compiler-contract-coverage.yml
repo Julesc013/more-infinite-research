@@ -16,15 +16,26 @@
   "technology_design_dimensions": [
     "identity", "effects", "progression", "cost", "presentation", "ownership", "runtime_contracts"
   ],
+  "technology_design_schema": 2,
+  "technology_design_subject_categories": [
+    "recipes", "products", "items", "fluids", "entities", "technologies", "effect_targets",
+    "science_packs", "surfaces"
+  ],
+  "technology_design_fingerprints": [
+    "subject_fingerprint", "design_fingerprint", "prototype_fingerprint", "qualification_fingerprint"
+  ],
+  "technology_design_lock_states": ["none", "partial", "all"],
+  "technology_design_lock_policies": ["adaptive", "locked", "field-specific", "adaptive-within-envelope"],
   "technology_design_maturity_axes": [
     "safety", "discovery_evidence", "design_maturity", "validation_evidence",
     "applicability_scope", "identity_stability", "runtime_action", "public_claim"
   ],
   "technology_design_leaf_provenance": [
-    "identity.technology_id", "identity.candidate_id", "members", "effects",
+    "identity.technology_id", "identity.candidate_id", "identity.identity_state", "subjects", "members", "effects",
     "progression.prerequisites", "progression.science", "cost.count_formula", "cost.research_time",
-    "cost.max_level", "presentation.localised_name", "presentation.localised_description",
-    "presentation.icons", "presentation.order", "ownership.action", "ownership.migration_policy",
+    "cost.count", "cost.max_level", "presentation.localised_name", "presentation.localised_description",
+    "presentation.icons", "presentation.order", "presentation.level", "presentation.enabled", "presentation.hidden",
+    "ownership.action", "ownership.migration_policy",
     "runtime_contracts.upgrade"
   ],
   "automatic_policy_presets": ["conservative", "safe", "expansive", "custom"],

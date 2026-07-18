@@ -1,6 +1,7 @@
 local deepcopy = require("prototypes.mir.core.deepcopy")
 local fingerprint = require("prototypes.mir.core.fingerprint")
 local effect_contracts = require("prototypes.mir.integrity.effect_contracts")
+local technology_design = require("prototypes.mir.domain.technology.technology_design")
 
 local M = {}
 local Plan = {}
@@ -77,6 +78,8 @@ local function validate_row(row)
   end
   if row.action == "emit" then
     required(row, "technology_name")
+    required(row, "technology_design")
+    technology_design.assert_generation_row(row)
     required(row, "fields")
     required(row.fields, "effects")
     required(row.fields, "ingredients")

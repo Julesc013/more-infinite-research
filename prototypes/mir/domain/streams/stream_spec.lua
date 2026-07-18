@@ -33,6 +33,8 @@ function M.from_stream_record(record)
     max_level = record.max_level,
     order = record.order,
     level = record.level or 1,
+    enabled = record.enabled,
+    hidden = record.hidden,
     migration_policy = record.migration_policy or "stable"
   }
 end

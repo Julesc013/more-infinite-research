@@ -49,6 +49,12 @@ function L.each_item_prototype(callback)
   end
 end
 
+function L.item_types()
+  local out = {}
+  for _, type_name in ipairs(ITEM_TYPES) do table.insert(out, type_name) end
+  return out
+end
+
 function L.each_fluid_prototype(callback)
   for name, prototype in pairs(data_raw.prototypes("fluid")) do
     callback(name, prototype, "fluid")

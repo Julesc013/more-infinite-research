@@ -362,7 +362,10 @@ local function emitted_row(stream_key, technology_name, recipe_name)
     ingredients = {{"automation-science-pack", 1}}, prerequisites = {},
     count_formula = "100", research_time = 30, max_level = "infinite"
   }
+  row.source = "fixed-stream"
+  row.spec = {manifest_id = stream_key, migration_policy = "stable"}
   for _, proof in pairs(row.gates) do proof.status = "passed" end
+  row.technology_design = technology_design.from_generation_row(row)
   return row
 end
 
@@ -371,18 +374,47 @@ design_row.source = "fixed-stream"
 design_row.spec = {manifest_id = "technology-design-contract", migration_policy = "stable"}
 local normalized_design = technology_design.from_generation_row(design_row)
 local normalized_shape = technology_design.prototype_shape(normalized_design)
-if normalized_design.schema ~= 1
+if normalized_design.schema ~= 2
   or normalized_design.candidate_id ~= "mir-candidate/recipe-productivity/technology-design-contract"
   or normalized_design.technology_id ~= "technology-design-contract-tech"
-  or normalized_design.design.identity.locked ~= true
+  or normalized_design.design.identity.lock_state ~= "partial"
   or normalized_design.design.progression.locked ~= false
   or normalized_design.provenance.fields["identity.technology_id"].locked ~= true
   or normalized_design.provenance.fields["presentation.icons"].locked ~= false
   or normalized_shape.effects[1].recipe ~= "iron-gear-wheel"
   or normalized_shape.unit.count_formula ~= "100"
+  or normalized_design.maturity.identity_stability ~= "released"
+  or type(normalized_design.subject_fingerprint) ~= "string"
+  or type(normalized_design.design_fingerprint) ~= "string"
+  or type(normalized_design.prototype_fingerprint) ~= "string"
+  or type(normalized_design.qualification_fingerprint) ~= "string"
 then
   fail("TechnologyDesign did not preserve normalized fixed-stream semantics and independent field locks")
 end
+local stale_design_row = emitted_row("stale-design-contract", "stale-design-contract-tech", "iron-gear-wheel")
+stale_design_row.fields.effects[1].change = 0.2
+expect_error("emitted row TechnologyDesign authority", "legacy projection differs", function()
+  generation_plan.new():add(stale_design_row)
+end)
+local unlocked_overlay = deepcopy(normalized_design)
+unlocked_overlay.design.progression.value.prerequisites = {"automation"}
+unlocked_overlay.provenance.fields["progression.prerequisites"].value = {"automation"}
+technology_design.refresh_fingerprints(unlocked_overlay)
+technology_design.merge(normalized_design, unlocked_overlay, {})
+local locked_overlay = deepcopy(normalized_design)
+locked_overlay.design.presentation.value.localised_name = {"", "Unauthorized rename"}
+locked_overlay.provenance.fields["presentation.localised_name"].value = {"", "Unauthorized rename"}
+locked_overlay.provenance.fields["presentation.localised_name"].present = true
+technology_design.refresh_fingerprints(locked_overlay)
+expect_error("TechnologyDesign locked field mutation", "locked field changed without authorization", function()
+  technology_design.merge(normalized_design, locked_overlay, {})
+end)
+local malformed_design = deepcopy(normalized_design)
+malformed_design.provenance.fields["identity.candidate_id"].value = "contradictory-candidate"
+technology_design.refresh_fingerprints(malformed_design)
+expect_error("TechnologyDesign cross-field invariant", "dimension differs from leaf provenance", function()
+  technology_design.validate(malformed_design)
+end)
 if normalized_design.semantic_fingerprint
   ~= technology_design.from_generation_row(design_row).semantic_fingerprint then
   fail("TechnologyDesign semantic fingerprint is not deterministic")
@@ -553,6 +585,13 @@ expect_error("base extension output parity", "prerequisites differs", function()
     "base-parity-test"
   )
 end)
+expect_error("presentation output parity", "localized name differs", function()
+  output_validator.assert_technology_shape(
+    {effects = {}, prerequisites = {}, unit = {}, localised_name = {"", "Expected"}},
+    {effects = {}, prerequisites = {}, unit = {}, localised_name = {"", "Actual"}},
+    "presentation-parity-test"
+  )
+end)
 local cyclic_plan = compilation_plan.finalize(generation_plan.new():finalize(), {
     {
       operation = "emit_base_extension",
@@ -608,7 +647,9 @@ local actual_edges = {
   ["mir-planned-cycle-c\0mir-planned-cycle-b"] = true,
   ["mir-planned-cycle-b\0mir-planned-cycle-a"] = true
 }
-if not component or type(component.component_id) ~= "string" or #component.member_sample ~= 3
+if not component or type(component.component_member_id) ~= "string"
+  or type(component.component_topology_fingerprint) ~= "string" or component.internal_edge_count ~= 3
+  or #component.member_sample ~= 3
   or #witness ~= 4 then
   fail("technology SCC did not publish bounded component identity and actual cycle evidence")
 end
@@ -621,7 +662,8 @@ end
 local semantic_plan_a = compilation_plan.finalize(generation_plan.new():finalize(), {})
 local semantic_plan_b = compilation_plan.finalize(generation_plan.new():finalize(), {})
 if semantic_plan_a.semantic_fingerprint ~= semantic_plan_b.semantic_fingerprint
-  or semantic_plan_a.fingerprint ~= semantic_plan_a.semantic_fingerprint then
+  or semantic_plan_a.fingerprint ~= semantic_plan_a.compilation_fingerprint
+  or semantic_plan_a.semantic_fingerprint ~= semantic_plan_a.qualification_fingerprint then
   fail("CompilationPlan semantic fingerprint depends on operational telemetry")
 end
 if semantic_plan_a.telemetry_fingerprint == semantic_plan_b.telemetry_fingerprint then
@@ -653,13 +695,15 @@ local generic_effect_candidate = {
     {type = "gun-speed", ammo_category = "mir-fixture-definitely-missing-ammo-category", modifier = 0.1}
   }
 }
-local kept_generic, removed_generic, retained_effect_order = effect_safety.sanitize_effects(
+local kept_generic, removed_generic, retained_effect_order, retained_effect_identities = effect_safety.sanitize_effects(
   generic_effect_candidate.effects,
   "compiler-contract-generic-effects",
   "external")
 if #kept_generic ~= 2 or #removed_generic ~= 2
   or removed_generic[1].original_effect_index ~= 2
   or removed_generic[2].original_effect_index ~= 4
+  or type(removed_generic[1].removed_effect_fingerprint) ~= "string"
+  or #retained_effect_identities ~= 2
   or retained_effect_order[1] ~= 1 or retained_effect_order[2] ~= 3 then
   fail("generic effect contracts did not retain valid targets and prune missing targets")
 end

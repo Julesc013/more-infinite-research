@@ -535,15 +535,24 @@ fixtures:
       - insertion-order-independent-plan-fingerprints
       - telemetry-independent-semantic-compilation-fingerprint
       - separate-compilation-run-telemetry-fingerprint
+      - split-subject-design-prototype-qualification-fingerprints
       - content-addressed-compiler-evidence-publication
       - pre-index-and-post-emission-sanitation-order
       - sanitation-retained-effect-order-ledger
+      - sanitation-content-fingerprints
+      - post-sanitation-target-prototype-invariant
       - actual-scc-cycle-edge-witness
+      - scc-member-and-topology-identities
       - explicit-semantic-rejection-priority
       - contributing-rejection-reasons
-      - technology-design-schema-1-normalization
+      - bounded-rejection-cause-graph
+      - technology-design-schema-2-normalization
       - technology-design-field-provenance-and-locks
-      - technology-design-semantic-fingerprint
+      - technology-design-cross-field-invariants
+      - technology-design-executable-locks
+      - technology-design-typed-subjects
+      - emitted-row-technology-design-authority
+      - full-technology-presentation-parity
       - cyclic-fingerprint-rejection
       - automatic-control-schema-2-defaults
       - automatic-action-disabled-preview-apply

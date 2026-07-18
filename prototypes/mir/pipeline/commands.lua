@@ -15,7 +15,7 @@ local commands = {
     end
   },
   ["sanitize-input-technology-effects"] = {
-    kind = "emission",
+    kind = "sanitation",
     requires_features = {},
     implementation = "prototypes/mir/emit/effect_safety.lua",
     apply = function(context)
@@ -106,6 +106,8 @@ local commands = {
     apply = function(context)
       local ledger = require("prototypes.mir.emit.effect_safety")
         .sanitize_all_technology_effects({pass = "output"})
+      require("prototypes.mir.emit.effect_safety").assert_target_inventory_unchanged(
+        context:artifact("input_sanitation_ledger"), ledger)
       context:record_artifact("output_sanitation_ledger", ledger)
       require("prototypes.mir.emit.effect_safety").assert_registered_technology_effects()
       require("prototypes.mir.emit.technology_graph_safety").assert_registered_technologies()

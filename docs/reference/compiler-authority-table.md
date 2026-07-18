@@ -22,10 +22,10 @@ This table names one machine authority, validator, and reference contract for ea
 | FamilyRule | 2 | `prototypes/mir/families/rules.lua` | `prototypes/mir/families/registry.lua` | structural family resolver |
 | CompilerProvider | 1 | `prototypes/mir/providers/contract.lua` | `prototypes/mir/providers/registry.lua` and compiler-contract fixture | normalized FamilyRule provider adapter |
 | CompatibilityPack | 2 | `prototypes/mir/compatibility/packs/schema.lua` | `prototypes/mir/compatibility/packs/registry.lua` | pack filtering, precedence, ownership policy |
-| TechnologyDesign | 1 | `prototypes/mir/domain/technology/technology_design.lua` | schema validator and compiler-contract fixture | normalized fixed and automatic stream planning and emission |
+| TechnologyDesign | 2 | `prototypes/mir/domain/technology/technology_design.lua` | schema validator, semantic schema-drift checks, and compiler-contract fixture | normalized fixed and automatic stream planning and emission |
 | GenerationPlan | 3 | `prototypes/mir/planner/generation_plan.lua` | whole-plan finalization, output validation, and compiler-contract fixture | transaction and emission layers |
 | CompilationPlan | 2 | `prototypes/mir/planner/compilation_plan.lua` | global operation finalization and output parity | governed stream and base-extension emission |
-| CompilerEvidence | 1 | `prototypes/mir/planner/compilation_plan.lua` | postcondition publication and content fingerprints | assurance evidence and sanitation review |
+| CompilerEvidence | 2 | `prototypes/mir/domain/evidence/compiler_evidence.lua` | postcondition publication, transport adapters, and content fingerprints | assurance evidence and sanitation review |
 | RecipeFactV2 | 2 | `prototypes/mir/index/recipe_facts.lua` | generation-integrity and compiler fixtures | rules, safety, coverage, ownership |
 | Runtime scenario declaration | 3 | `fixtures/compat-matrix/expected-scenarios.json` | `scripts/validation/ScenarioRegistry.ps1` | validation harness |
 | Campaign scenario declaration | 2 | `fixtures/compat-matrix/local-library-scenarios.json` | `scripts/Test-MIRScenarioManifests.ps1` | compatibility audit runner |

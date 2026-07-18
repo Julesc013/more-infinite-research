@@ -145,6 +145,7 @@ modules:
     - prototypes/mir/domain/streams/descriptor.lua
     - prototypes/mir/domain/diagnostics/codes.lua
     - prototypes/mir/domain/technology/technology_design.lua
+    - prototypes/mir/domain/evidence/compiler_evidence.lua
   policy:
     - prototypes/mir/policy/owner_policy.lua
     - prototypes/mir/policy/competing_productivity.lua
@@ -204,6 +205,7 @@ modules:
     - prototypes/mir/emit/effect_safety.lua
     - prototypes/mir/emit/icon_builder.lua
     - prototypes/mir/emit/mod_data.lua
+    - prototypes/mir/emit/compiler_evidence_adapter.lua
     - prototypes/mir/emit/transactions/productivity_family_adoption.lua
   report:
     - prototypes/mir/report/decision_export.lua
@@ -248,12 +250,14 @@ mutation_commands:
     - only emission commands may create generated technology prototypes
     - mutation commands may change existing prototypes only through their listed implementation
     - CompilationPlan schema 2 globally finalizes stream adoption and base-extension operations before emission
-    - output validation compares numeric effects technology shape and generated-registry identity
-    - input technology sanitation runs after compatibility repairs and before every index or planning pass and records deterministic retained effect order
+    - output validation compares numeric effects graph presentation save identity and generated-registry projections
+    - input technology sanitation runs after compatibility repairs and before every index or planning pass and records content-addressed original retained removed and sanitized effects
     - final technology safety reruns target-aware sanitation before reporting and output validation as a defensive postcondition
-    - CompilationPlan semantic fingerprints exclude operational telemetry and retain a separate telemetry fingerprint
-    - postcondition publication emits content-addressed compiler evidence with separate input and output sanitation ledgers
-    - stream planning and emission consume TechnologyDesign schema 1 without changing released technology identities
+    - no sanitation-covered target prototype family may be created or removed after input sanitation
+    - CompilationPlan separates compilation qualification and run fingerprints
+    - postcondition publication emits target-neutral content-addressed compiler evidence with mod-data and validation-log adapters
+    - stream planning and emission consume TechnologyDesign schema 2 without changing released technology identities
+    - every emitted GenerationPlan row carries one validated TechnologyDesign and legacy fields are derived compatibility projections only
     - stream planning cannot import the stream executor or adoption mutation transaction
     - stream emission and adoption mutation are applied only by the emission-owned stream executor
     - reviewed compatibility data cannot override hard prototype safety facts

@@ -211,6 +211,19 @@ function M.normalize(key, raw_spec)
   if spec.technology_name ~= nil and (type(spec.technology_name) ~= "string" or spec.technology_name == "") then
     error("Raw MIR stream " .. key .. " has invalid technology_name.", 2)
   end
+  if spec.identity_state ~= nil then
+    local allowed_identity_states = {
+      unassigned = true,
+      provisional = true,
+      reserved = true,
+      ["stable-unreleased"] = true,
+      released = true,
+      retired = true
+    }
+    if not allowed_identity_states[spec.identity_state] then
+      error("Raw MIR stream " .. key .. " has invalid identity_state.", 2)
+    end
+  end
   local kind = spec.direct_effects and "direct-effect" or "recipe-productivity"
   local effect = kind == "direct-effect"
     and direct_effect_contract(key, spec)

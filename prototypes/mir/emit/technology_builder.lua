@@ -23,7 +23,7 @@ end
 function M.prototype(spec)
   validate(spec)
 
-  return {
+  local technology = {
     type = "technology",
     name = spec.technology_name,
     localised_name = spec.localised_name,
@@ -41,6 +41,9 @@ function M.prototype(spec)
     order = spec.order,
     level = spec.level or 1
   }
+  if spec.enabled ~= nil then technology.enabled = spec.enabled end
+  if spec.hidden ~= nil then technology.hidden = spec.hidden end
+  return technology
 end
 
 function M.emit(spec)

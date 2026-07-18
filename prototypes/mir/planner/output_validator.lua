@@ -2,6 +2,8 @@ local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 local generation_plan = require("prototypes.mir.planner.generation_plan")
 local generated_registry = require("prototypes.mir.domain.facts.generated_technology_registry")
 local native_owner_contract = require("prototypes.mir.domain.native_owner.contract")
+local technology_design = require("prototypes.mir.domain.technology.technology_design")
+local fingerprint = require("prototypes.mir.core.fingerprint")
 
 local M = {}
 local NUMERIC_TOLERANCE = 0.000000001
@@ -84,8 +86,17 @@ local function assert_equal(context, field, expected, actual)
   end
 end
 
+local function assert_structural(context, field, expected, actual)
+  local expected_fingerprint = fingerprint.of({value = expected})
+  local actual_fingerprint = fingerprint.of({value = actual})
+  if expected_fingerprint ~= actual_fingerprint then
+    fail(context, field .. " differs expected=" .. expected_fingerprint .. " actual=" .. actual_fingerprint)
+  end
+end
+
 function M.assert_technology_shape(expected, actual, context)
   if not actual then fail(context, "technology is missing") end
+  if expected.name ~= nil then assert_equal(context, "name", expected.name, actual.name) end
   M.assert_effects(expected.effects, actual.effects, context, true)
   assert_equal(context, "prerequisites", normalized_names(expected.prerequisites), normalized_names(actual.prerequisites))
   local expected_unit, actual_unit = expected.unit or {}, actual.unit or {}
@@ -96,6 +107,11 @@ function M.assert_technology_shape(expected, actual, context)
     fail(context, "research time differs expected=" .. tostring(expected_unit.time) .. " actual=" .. tostring(actual_unit.time))
   end
   assert_equal(context, "max level", expected.max_level, actual.max_level)
+  assert_structural(context, "localized name", expected.localised_name, actual.localised_name)
+  assert_structural(context, "localized description", expected.localised_description, actual.localised_description)
+  assert_structural(context, "icons", expected.icons, actual.icons)
+  assert_equal(context, "order", expected.order, actual.order)
+  assert_equal(context, "level", expected.level, actual.level)
   for _, field in ipairs({"enabled", "hidden", "upgrade"}) do
     if expected[field] ~= nil then assert_equal(context, field, expected[field], actual[field]) end
   end
@@ -139,16 +155,11 @@ function M.assert_artifact(artifact)
   local operations = {}
   for _, row in ipairs(artifact.rows or {}) do
     if row.action == "emit" then
+      technology_design.assert_generation_row(row)
       table.insert(operations, {
         operation = "emit_stream",
         technology_name = row.technology_name,
-        technology = {
-          effects = row.fields.effects,
-          prerequisites = row.fields.prerequisites,
-          unit = {ingredients = row.fields.ingredients, count_formula = row.fields.count_formula, time = row.fields.research_time},
-          max_level = row.fields.max_level,
-          upgrade = true
-        }
+        technology = technology_design.prototype_projection(row.technology_design)
       })
     elseif row.action == "adopt" then
       table.insert(operations, {
