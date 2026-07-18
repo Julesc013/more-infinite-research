@@ -121,6 +121,14 @@ docs:
     doc_type: reference
     owner: mir-maintainers
     source_of_truth_for: []
+  - path: docs/releases/3.2.0-approved-delta-report.md
+    title: "3.2.0 Approved Delta Report"
+    status: current
+    audience: maintainer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - 3.1.9-to-3.2.0-approved-delta
   - path: docs/architecture/module-boundaries.md
     title: "MIR 3.0.0 Repository Structure"
     status: current

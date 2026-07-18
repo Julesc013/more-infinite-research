@@ -504,6 +504,27 @@ fixtures:
       - compatibility-pack-production-integration
       - reviewed-candidate-seeding
 
+  approved-delta-3.1.9-to-3.2.0:
+    requires_features: [recipe_productivity]
+    path: fixtures/export-approved-delta
+    artifact: approved-delta/3.1.9-to-3.2.0.json
+    producer: scripts/Export-MIRApprovedDelta.ps1
+    validator: scripts/Test-MIRApprovedDelta.ps1
+    exact_baseline_sha256: D77B3A78DA40CD4FDD4C829A01B5030E59FB593F3387124EF5C438F6A9E8DFCD
+    validates:
+      - base-normalized-technology-parity
+      - space-age-normalized-technology-parity
+      - automatic-family-control-parity
+      - native-owner-adoption-parity
+      - base-continuation-parity
+      - atan-compatibility-parity
+      - space-age-galore-effect-ownership-parity
+      - generated-registry-identity-parity
+      - startup-setting-value-parity
+      - runtime-namespace-parity
+      - migration-contract-parity
+      - governed-mod-data-schema-delta
+
   compiler-contracts:
     requires_features: [recipe_productivity]
     assertion_path: fixtures/assert-compiler-contracts

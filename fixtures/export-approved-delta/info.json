@@ -1,0 +1,12 @@
+{
+  "name": "mir-fixture-export-approved-delta",
+  "version": "0.1.0",
+  "title": "MIR Fixture - Export Approved Delta",
+  "author": "Julesc013",
+  "description": "Exports normalized MIR technology, registry, setting, and mod-data contracts for exact-package comparison.",
+  "factorio_version": "2.1",
+  "dependencies": [
+    "base >= 2.1.8",
+    "more-infinite-research"
+  ]
+}

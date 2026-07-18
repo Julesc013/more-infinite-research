@@ -521,6 +521,10 @@ Invoke-RepoCheck "planner artifact tools are deterministic and schema-bound" {
   & (Join-Path $repo "scripts\Test-MIRPlannerTools.ps1") -RepoRoot $repo
 }
 
+Invoke-RepoCheck "the normalized 3.1.9 approved delta is complete" {
+  & (Join-Path $repo "scripts\Test-MIRApprovedDelta.ps1")
+}
+
 Invoke-RepoCheck "compiler schema authorities and reference docs do not drift" {
   & (Join-Path $repo "scripts\Test-MIRCompilerSchemaDrift.ps1") -RepoRoot $repo
 }
@@ -3642,6 +3646,40 @@ $inventoryCapacityLine = Get-LastStreamReportLine -Key "research_inventory_capac
 Assert-ReportLineGenerated -Line $inventoryCapacityLine -Context "Merged character inventory/trash slot scenario"
 Assert-ReportLineContains -Line $inventoryCapacityLine -Expected "effects=2" -Context "Merged character inventory/trash slot scenario"
 Assert-NoStreamReportLine -Key "research_character_trash_slots" -Context "Merged character inventory/trash slot scenario"
+
+Invoke-RuntimeScenario -ScenarioName "approved-delta-automatic-family-controls" -EnabledFixtureNames @(
+  "mir-fixture-semantic-family-attach",
+  "mir-fixture-export-approved-delta"
+)
+
+Invoke-RuntimeScenario -ScenarioName "approved-delta-base" -EnabledFixtureNames @(
+  "mir-fixture-export-approved-delta"
+)
+
+Invoke-RuntimeScenario -ScenarioName "approved-delta-base-continuations" -EnabledFixtureNames @(
+  "mir-fixture-export-approved-delta"
+) -EnabledBaseExtensionKeys @(
+  "inserter-capacity-bonus"
+)
+
+Invoke-RuntimeScenario -ScenarioName "approved-delta-compat-space-age-galore" -EnabledFixtureNames @(
+  "mir-fixture-space-age-galore-overlap",
+  "mir-fixture-export-approved-delta"
+) -EnableSpaceAge
+
+Invoke-RuntimeScenario -ScenarioName "approved-delta-compat-atan" -EnabledFixtureNames @(
+  "mir-fixture-atan-nuclear-science",
+  "mir-fixture-export-approved-delta"
+)
+
+Invoke-RuntimeScenario -ScenarioName "approved-delta-native-owner-adoption" -EnabledFixtureNames @(
+  "mir-fixture-vanilla-family-adoption-recipes",
+  "mir-fixture-export-approved-delta"
+) -EnableSpaceAge
+
+Invoke-RuntimeScenario -ScenarioName "approved-delta-space-age" -EnabledFixtureNames @(
+  "mir-fixture-export-approved-delta"
+) -EnableSpaceAge
 
 Invoke-RuntimeScenario -ScenarioName "base-generation-integrity" -EnabledFixtureNames @(
   "mir-fixture-assert-generation-integrity",

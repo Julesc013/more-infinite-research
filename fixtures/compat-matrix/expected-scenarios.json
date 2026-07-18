@@ -105,6 +105,158 @@
         ]
       },
       {
+        "name": "approved-delta-automatic-family-controls",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "local-mod-library",
+        "surface": "base",
+        "required_features": ["recipe_productivity"],
+        "fixtures": [
+          "mir-fixture-semantic-family-attach",
+          "mir-fixture-export-approved-delta"
+        ],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 120,
+        "tags": ["approved-delta", "base", "full", "local-mod-library", "runtime"],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "normalized-approved-delta-export-produced",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "approved-delta-base",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "base-load",
+        "surface": "base",
+        "required_features": ["recipe_productivity"],
+        "fixtures": ["mir-fixture-export-approved-delta"],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 120,
+        "tags": ["approved-delta", "base", "base-load", "full", "runtime"],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "normalized-approved-delta-export-produced",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "approved-delta-base-continuations",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "base-load",
+        "surface": "base",
+        "required_features": [],
+        "fixtures": ["mir-fixture-export-approved-delta"],
+        "settings": {"enabled_base_extensions": ["inserter-capacity-bonus"]},
+        "source_mode": "exact-package",
+        "timeout_seconds": 120,
+        "tags": ["approved-delta", "base", "base-load", "full", "runtime"],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "normalized-approved-delta-export-produced",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "approved-delta-compat-space-age-galore",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "local-mod-library",
+        "surface": "space-age",
+        "required_features": ["recipe_productivity"],
+        "fixtures": [
+          "mir-fixture-space-age-galore-overlap",
+          "mir-fixture-export-approved-delta"
+        ],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 180,
+        "tags": ["approved-delta", "full", "local-mod-library", "runtime", "space-age"],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "normalized-approved-delta-export-produced",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "approved-delta-compat-atan",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "local-mod-library",
+        "surface": "base",
+        "required_features": ["recipe_productivity"],
+        "fixtures": [
+          "mir-fixture-atan-nuclear-science",
+          "mir-fixture-export-approved-delta"
+        ],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 120,
+        "tags": ["approved-delta", "base", "full", "local-mod-library", "runtime"],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "normalized-approved-delta-export-produced",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "approved-delta-native-owner-adoption",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": ["recipe_productivity"],
+        "fixtures": [
+          "mir-fixture-vanilla-family-adoption-recipes",
+          "mir-fixture-export-approved-delta"
+        ],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 180,
+        "tags": ["approved-delta", "full", "runtime", "space-age"],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "normalized-approved-delta-export-produced",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "approved-delta-space-age",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "space-age",
+        "surface": "space-age",
+        "required_features": ["recipe_productivity"],
+        "fixtures": ["mir-fixture-export-approved-delta"],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 180,
+        "tags": ["approved-delta", "full", "runtime", "space-age"],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "normalized-approved-delta-export-produced",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
         "name": "atan-ash-separation",
         "target_profile": "2.1",
         "kind": "runtime",
