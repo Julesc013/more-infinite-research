@@ -2366,6 +2366,7 @@ $postMirAssertionFixtures = @(
   "mir-fixture-assert-semantic-family-generate",
   "mir-fixture-assert-capability-negative-cases",
   "mir-fixture-assert-synthetic-scale-graph",
+  "mir-fixture-assert-synthetic-scale-recipes",
   "mir-fixture-assert-generation-integrity",
   "mir-fixture-assert-generated-prerequisite-safety",
   "mir-fixture-assert-final-recipe-effect-integrity",
@@ -3601,11 +3602,68 @@ Invoke-RuntimeScenario -ScenarioName "synthetic-scale-graph" -EnabledFixtureName
   "mir-fixture-synthetic-scale-graph",
   "mir-fixture-assert-synthetic-scale-graph"
 )
+$orderedScaleFingerprint = $null
+if (Test-MIRScenarioSelected -Name "synthetic-scale-graph") {
+  $orderedScaleMatch = [regex]::Match(
+    (Get-Content -Raw -LiteralPath $FactorioLog),
+    '\[mir-fixture\] synthetic-graph fingerprints (coverage=\S+ generation=\S+ compilation=\S+ in_memory=\S+)'
+  )
+  if (-not $orderedScaleMatch.Success) { throw "Ordered 100000-scale compiler fingerprints are missing." }
+  $orderedScaleFingerprint = $orderedScaleMatch.Groups[1].Value
+}
 $syntheticCoverageLine = Get-DiagnosticReportLineContaining -Kind "coverage" -Key "recipe_accounting" -Expected "recipe_count="
 Assert-ReportLineContains -Line $syntheticCoverageLine -Expected "candidate_count=" -Context "Synthetic graph candidate count"
 Assert-ReportLineContains -Line $syntheticCoverageLine -Expected "effect_count=" -Context "Synthetic graph effect count"
 Assert-ReportLineContains -Line $syntheticCoverageLine -Expected "graph_edge_count=" -Context "Synthetic graph edge count"
+
+Invoke-RuntimeScenario -ScenarioName "synthetic-scale-graph-random-order" -EnabledFixtureNames @(
+  "mir-fixture-synthetic-scale-graph",
+  "mir-fixture-synthetic-scale-random-order",
+  "mir-fixture-assert-synthetic-scale-graph"
+)
+if ($orderedScaleFingerprint -and (Test-MIRScenarioSelected -Name "synthetic-scale-graph-random-order")) {
+  $randomScaleMatch = [regex]::Match(
+    (Get-Content -Raw -LiteralPath $FactorioLog),
+    '\[mir-fixture\] synthetic-graph fingerprints (coverage=\S+ generation=\S+ compilation=\S+ in_memory=\S+)'
+  )
+  if (-not $randomScaleMatch.Success) { throw "Randomized 100000-scale compiler fingerprints are missing." }
+  if ($randomScaleMatch.Groups[1].Value -ne $orderedScaleFingerprint) {
+    throw "Randomized insertion changed 100000-scale compiler output: ordered=$orderedScaleFingerprint randomized=$($randomScaleMatch.Groups[1].Value)"
+  }
+  Write-Host "[ok] 100000-node graph order invariance: $orderedScaleFingerprint"
+}
 Assert-ReportLineContains -Line $syntheticCoverageLine -Expected "scan_count=2" -Context "Synthetic graph bounded scan count"
+
+Invoke-RuntimeScenario -ScenarioName "synthetic-scale-recipes" -EnabledFixtureNames @(
+  "mir-fixture-synthetic-scale-recipes",
+  "mir-fixture-assert-synthetic-scale-recipes"
+)
+$orderedRecipeScaleFingerprint = $null
+if (Test-MIRScenarioSelected -Name "synthetic-scale-recipes") {
+  $orderedRecipeScaleMatch = [regex]::Match(
+    (Get-Content -Raw -LiteralPath $FactorioLog),
+    '\[mir-fixture\] synthetic-recipes fingerprints (coverage=\S+ generation=\S+ compilation=\S+ in_memory=\S+)'
+  )
+  if (-not $orderedRecipeScaleMatch.Success) { throw "Ordered 100000-recipe compiler fingerprints are missing." }
+  $orderedRecipeScaleFingerprint = $orderedRecipeScaleMatch.Groups[1].Value
+}
+
+Invoke-RuntimeScenario -ScenarioName "synthetic-scale-recipes-random-order" -EnabledFixtureNames @(
+  "mir-fixture-synthetic-scale-recipes",
+  "mir-fixture-synthetic-scale-random-order",
+  "mir-fixture-assert-synthetic-scale-recipes"
+)
+if ($orderedRecipeScaleFingerprint -and (Test-MIRScenarioSelected -Name "synthetic-scale-recipes-random-order")) {
+  $randomRecipeScaleMatch = [regex]::Match(
+    (Get-Content -Raw -LiteralPath $FactorioLog),
+    '\[mir-fixture\] synthetic-recipes fingerprints (coverage=\S+ generation=\S+ compilation=\S+ in_memory=\S+)'
+  )
+  if (-not $randomRecipeScaleMatch.Success) { throw "Randomized 100000-recipe compiler fingerprints are missing." }
+  if ($randomRecipeScaleMatch.Groups[1].Value -ne $orderedRecipeScaleFingerprint) {
+    throw "Randomized insertion changed 100000-recipe compiler output: ordered=$orderedRecipeScaleFingerprint randomized=$($randomRecipeScaleMatch.Groups[1].Value)"
+  }
+  Write-Host "[ok] 100000-recipe order invariance: $orderedRecipeScaleFingerprint"
+}
 
 Invoke-RuntimeScenario -ScenarioName "lab-productivity-owner-skip" -EnabledFixtureNames @(
   "mir-fixture-lab-productivity-owner",

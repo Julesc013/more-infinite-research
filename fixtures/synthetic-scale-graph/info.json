@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "title": "MIR Fixture - Synthetic Scale Graph",
   "author": "MIR maintainers",
-  "description": "Creates auditable 1000-recipe, 1000-technology, 10000-effect compiler scale input.",
+  "description": "Creates a 60000-technology maximum-legal engine load; its assertion adds an auditable 100000-node in-memory compiler graph with a 25000-node SCC.",
   "factorio_version": "2.1",
   "dependencies": ["base >= 2.1.8"]
 }

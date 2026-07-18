@@ -2545,10 +2545,13 @@
         "required_features": [
           "recipe_productivity"
         ],
-        "fixtures": [],
+        "fixtures": [
+          "mir-fixture-synthetic-scale-graph",
+          "mir-fixture-assert-synthetic-scale-graph"
+        ],
         "settings": {},
         "source_mode": "exact-package",
-        "timeout_seconds": 120,
+        "timeout_seconds": 600,
         "tags": [
           "base",
           "full",
@@ -2559,6 +2562,77 @@
         "assertions": [
           {
             "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "synthetic-scale-graph-random-order",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "local-mod-library",
+        "surface": "base",
+        "required_features": ["recipe_productivity"],
+        "fixtures": [
+          "mir-fixture-synthetic-scale-graph",
+          "mir-fixture-synthetic-scale-random-order",
+          "mir-fixture-assert-synthetic-scale-graph"
+        ],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 600,
+        "tags": ["base", "full", "local-mod-library", "randomized-order", "runtime", "scale"],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "randomized-insertion-preserves-compiler-fingerprints",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "synthetic-scale-recipes",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "local-mod-library",
+        "surface": "base",
+        "required_features": ["recipe_productivity"],
+        "fixtures": [
+          "mir-fixture-synthetic-scale-recipes",
+          "mir-fixture-assert-synthetic-scale-recipes"
+        ],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 600,
+        "tags": ["base", "full", "local-mod-library", "runtime", "scale"],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "factorio-load-and-assertion-fixtures-pass",
+            "type": "factorio-load-and-assertion-fixtures-pass"
+          }
+        ]
+      },
+      {
+        "name": "synthetic-scale-recipes-random-order",
+        "target_profile": "2.1",
+        "kind": "runtime",
+        "group": "local-mod-library",
+        "surface": "base",
+        "required_features": ["recipe_productivity"],
+        "fixtures": [
+          "mir-fixture-synthetic-scale-recipes",
+          "mir-fixture-synthetic-scale-random-order",
+          "mir-fixture-assert-synthetic-scale-recipes"
+        ],
+        "settings": {},
+        "source_mode": "exact-package",
+        "timeout_seconds": 600,
+        "tags": ["base", "full", "local-mod-library", "randomized-order", "runtime", "scale"],
+        "isolation": "fresh-data-stage",
+        "assertions": [
+          {
+            "id": "randomized-insertion-preserves-compiler-fingerprints",
             "type": "factorio-load-and-assertion-fixtures-pass"
           }
         ]

@@ -12,6 +12,10 @@ measurement_policy:
   - A skipped load never counts as performance evidence.
   - Load-only overhaul observations do not create compatibility support claims.
   - Source-instrumented coverage measurements do not create archive compatibility claims.
+  - The split 100000-scale campaigns cover recipes technologies effects graph edges a 25000-node SCC and randomized insertion order without conflating independent stress domains.
+  - Factorio runtime materializes 60000 technologies below the engine hard limit of 65535 while the same compiler graph implementation validates 100000 in-memory planned technologies.
+  - The recipe engine fixture materializes 1000 structural candidates while MIR's production canonicalizer indexes and fingerprints 100000 in-memory recipe prototypes without crossing Factorio's prototype limit.
+  - Adversarial SCCs stay in MIR's iterative graph validator because Factorio's recursive post-load cycle checker cannot safely materialize the 25000-node cycle.
 
 required_surfaces:
   - base
@@ -23,6 +27,7 @@ required_surfaces:
   - medium-pack
   - large-pack
   - large-synthetic-graph
+  - large-synthetic-recipes
   - full-matrix
 
 compiler_telemetry:

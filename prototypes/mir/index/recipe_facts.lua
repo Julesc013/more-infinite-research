@@ -256,16 +256,10 @@ local function source_class(recipe, categories, is_hidden)
   return "ordinary"
 end
 
-local function build()
-  local context = compiler_context.current()
-  local cached = context:state_view("recipe_index")
-  if cached then return cached end
-  telemetry.start_phase("snapshot")
-  local metrics = context:state_view("recipe_index_metrics", function() return {scan_count = 0} end)
-  metrics.scan_count = metrics.scan_count + 1
+local function build_index(recipe_prototypes)
   local facts = {}
   local by_output, by_productive_output, by_ingredient, by_category, names = {}, {}, {}, {}, {}
-  for recipe_name, recipe in pairs(data_raw.prototypes("recipe")) do
+  for recipe_name, recipe in pairs(recipe_prototypes or {}) do
     local semantics = recipe_semantics.resolve(recipe, recipe, target_profiles.current())
     local normalized_variants = variant_facts(recipe)
     local all_variants_allow_productivity = #normalized_variants > 0
@@ -327,10 +321,31 @@ local function build()
     by_ingredient = by_ingredient,
     by_category = by_category
   }
+  return canonical
+end
+
+local function build()
+  local context = compiler_context.current()
+  local cached = context:state_view("recipe_index")
+  if cached then return cached end
+  telemetry.start_phase("snapshot")
+  local metrics = context:state_view("recipe_index_metrics", function() return {scan_count = 0} end)
+  metrics.scan_count = metrics.scan_count + 1
+  local canonical = build_index(data_raw.prototypes("recipe"))
   telemetry.count("recipe_index_scans", 1)
-  telemetry.count("recipes", #names)
+  telemetry.count("recipes", #canonical.names)
   telemetry.finish_phase("snapshot")
   return context:set_state("recipe_index", canonical)
+end
+
+-- Builds the same canonical index from an explicit prototype map.
+-- Offline review and scale tooling use this without mutating the prototype registry
+-- or the active CompilerContext.
+function M.index_prototypes(recipe_prototypes)
+  if type(recipe_prototypes) ~= "table" then
+    error("recipe_facts.index_prototypes expects a recipe prototype map", 2)
+  end
+  return build_index(recipe_prototypes)
 end
 
 function M.get(recipe_name)

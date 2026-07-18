@@ -1,0 +1,13 @@
+{
+  "name": "mir-fixture-synthetic-scale-random-order",
+  "version": "0.1.0",
+  "title": "MIR Fixture - Synthetic Scale Random Order",
+  "author": "MIR maintainers",
+  "description": "Selects deterministic permuted insertion order for the 100000-scale graph or recipe fixture.",
+  "factorio_version": "2.1",
+  "dependencies": [
+    "base >= 2.1.8",
+    "? mir-fixture-synthetic-scale-graph",
+    "? mir-fixture-synthetic-scale-recipes"
+  ]
+}

@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "title": "MIR Fixture - Assert Synthetic Scale Graph",
   "author": "MIR maintainers",
-  "description": "Asserts real compiler scale counts and bounded index passes.",
+  "description": "Asserts maximum-legal Factorio graph counts plus a 100000-node in-memory compiler graph and bounded diagnostics.",
   "factorio_version": "2.1",
   "dependencies": [
     "base >= 2.1.8",

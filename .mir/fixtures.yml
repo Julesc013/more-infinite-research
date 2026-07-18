@@ -677,12 +677,38 @@ fixtures:
   synthetic-scale-graph:
     requires_features: [recipe_productivity]
     path: fixtures/synthetic-scale-graph
+    randomized_order_selector: fixtures/synthetic-scale-random-order
     assertion_path: fixtures/assert-synthetic-scale-graph
     validates:
-      - 1000-explicit-recipes
-      - 1000-explicit-technologies
-      - 10000-explicit-technology-effects
+      - 1000-structural-family-candidate-recipes
+      - 60000-materialized-technologies-below-factorio-65535-engine-limit
+      - 60000-materialized-technology-effects
+      - 60000-materialized-technology-graph-edges
+      - shallow-acyclic-factorio-engine-graph
+      - 100000-in-memory-compiler-technologies
+      - 100000-in-memory-compiler-effects
+      - 100000-in-memory-compiler-graph-edges
+      - 25000-node-in-memory-strongly-connected-component
+      - 1000-small-in-memory-strongly-connected-components
+      - deterministic-randomized-insertion-order
+      - bounded-64-node-scc-diagnostics
       - high-family-candidate-fanout
       - single-recipe-fact-scan
       - single-technology-coverage-scan
       - complete-recipe-accounting
+
+  synthetic-scale-recipes:
+    requires_features: [recipe_productivity]
+    path: fixtures/synthetic-scale-recipes
+    randomized_order_selector: fixtures/synthetic-scale-random-order
+    assertion_path: fixtures/assert-synthetic-scale-recipes
+    validates:
+      - 1000-materialized-structural-family-candidate-recipes
+      - 100000-in-memory-canonical-recipe-facts
+      - 1000-structural-family-candidates
+      - deterministic-randomized-insertion-order
+      - high-family-candidate-fanout
+      - single-recipe-fact-scan
+      - single-technology-coverage-scan
+      - complete-recipe-accounting
+      - chunked-full-index-fingerprint

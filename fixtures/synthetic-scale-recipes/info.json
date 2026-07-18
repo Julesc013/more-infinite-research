@@ -1,0 +1,9 @@
+{
+  "name": "mir-fixture-synthetic-scale-recipes",
+  "version": "0.1.0",
+  "title": "MIR Fixture - Synthetic Scale Recipes",
+  "author": "MIR maintainers",
+  "description": "Creates 1000 structural family candidates; its assertion indexes 100000 in-memory recipes through MIR's production canonicalizer.",
+  "factorio_version": "2.1",
+  "dependencies": ["base >= 2.1.8"]
+}
