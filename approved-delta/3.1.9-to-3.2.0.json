@@ -9,9 +9,9 @@
   },
   "current": {
     "version": "3.2.0",
-    "source_commit": "1e31c080b3b8cde56a9156ca7ee6ed963d19edf2",
-    "archive_sha256": "A9AE21874C225B257D973C11D08CF811921B4D2F3E18496069BC7398FBCA2D89",
-    "package_content_sha256": "4E68EA6D0462937817706CE2C30BA3B5DAC18766C1E2F536AD022E1D6D5FC675"
+    "source_commit": "ed3e3ffa1ccbe7c7412ef2832db4a2faa2d1ad41",
+    "archive_sha256": "E7848ECF4273378B0E7FB5FFF095B4DF5B7FEDB35985ACE302CC0BB022FBCB5E",
+    "package_content_sha256": "BBFC74254A74C48E6C04C2AFE2E680C7F6D75966FCD0FE001D913C472464DB60"
   },
   "exporter": {
     "fixture": "fixtures/export-approved-delta",
@@ -97,7 +97,7 @@
     {
       "field": "package.archive_sha256",
       "before": "D77B3A78DA40CD4FDD4C829A01B5030E59FB593F3387124EF5C438F6A9E8DFCD",
-      "after": "A9AE21874C225B257D973C11D08CF811921B4D2F3E18496069BC7398FBCA2D89",
+      "after": "E7848ECF4273378B0E7FB5FFF095B4DF5B7FEDB35985ACE302CC0BB022FBCB5E",
       "reason": "Exact package identity and source fingerprint changed between the sealed 3.1.9 baseline and the 3.2 compiler branch.",
       "intentional": true,
       "migration_impact": "None by itself; semantic runtime and prototype contracts are compared separately.",
@@ -110,7 +110,7 @@
     {
       "field": "package.package_content_sha256",
       "before": "1D905CD5F394C3ABFC2ABEFFEB0249AC9D8D5C5FC4ADA0F5A5BA368B17548229",
-      "after": "4E68EA6D0462937817706CE2C30BA3B5DAC18766C1E2F536AD022E1D6D5FC675",
+      "after": "BBFC74254A74C48E6C04C2AFE2E680C7F6D75966FCD0FE001D913C472464DB60",
       "reason": "Exact package identity and source fingerprint changed between the sealed 3.1.9 baseline and the 3.2 compiler branch.",
       "intentional": true,
       "migration_impact": "None by itself; semantic runtime and prototype contracts are compared separately.",
