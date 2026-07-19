@@ -309,6 +309,10 @@ release_artifacts:
       target_factorio: "2.0"
       source_anchor: mir_2_4_5
       portable_fix_source_commit: 068b3a88bdb839e1807fe23cc4bf3ae0fb49d1e1
+      package_source_commit: 7619485699ac68a2491931aa4242efb146451694
+      artifact: dist/more-infinite-research_2.4.9.zip
+      sha256: B81C4DAF1E0B25CEFBB5D39DA61955BE2EF9C8B82F1259C0344E3588A23E1A8C
+      package_content_sha256: B26DCF015B3CDD10DB649E56D904BA69C211888EAE0270A2546F9584449E18DA
       prior_candidate:
         source_anchor: mir_3_2_0
         source_commit: fb606d296c933e2597c165c0c03e13afb12878f1
@@ -320,9 +324,9 @@ release_artifacts:
       verification_profile: validation/profiles/factorio-2.0.json
       prior_release: dist/more-infinite-research_2.4.5.zip
       approved_delta: approved-delta/2.4.5-to-2.4.9.json
-      release_gate: package-source-build-and-external-qualification-pending
+      release_gate: performance-manual-ecosystem-and-protected-qualification-pending
       publication_status: unreleased
-      status: release-candidate-rebuilding
+      status: release-candidate-awaiting-external-qualification
     mir_2_4_0:
       version: "2.4.0"
       branch: legacy

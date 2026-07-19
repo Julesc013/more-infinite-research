@@ -6,7 +6,7 @@
   "baseline_package_source_commit": "47bcc80c8a70b41dbbb4f8d80b2b9433d0a10d3f",
   "baseline_package_source_sha256": "F41388B5D77E6203D68D380EB4D1A61B5763DA335E15C120BD3C741906BE9DAC",
   "portable_fix_source_commit": "068b3a88bdb839e1807fe23cc4bf3ae0fb49d1e1",
-  "candidate_package_source_commit": "pending-package-source-commit",
+  "candidate_package_source_commit": "7619485699ac68a2491931aa4242efb146451694",
   "canonical_package_source_commit": "47bcc80c8a70b41dbbb4f8d80b2b9433d0a10d3f",
   "canonical_release_evidence_commit": "7e4b6c530cfcc5b2e1429c4e9f4ccb0d6d3b42a4",
   "projection_schema": 2,

@@ -121,10 +121,14 @@ superseded_candidates:
 
 candidate:
   artifact: dist/more-infinite-research_2.4.9.zip
-  source_commit: pending
-  automated_gate: pending
+  source_commit: 7619485699ac68a2491931aa4242efb146451694
+  sha256: B81C4DAF1E0B25CEFBB5D39DA61955BE2EF9C8B82F1259C0344E3588A23E1A8C
+  package_content_sha256: B26DCF015B3CDD10DB649E56D904BA69C211888EAE0270A2546F9584449E18DA
+  approved_delta: approved-delta/2.4.5-to-2.4.9.json
+  local_automated_gate: passed-static-runtime-upgrade
+  protected_automated_gate: pending
   manual_gate: pending
-  status: rebuilding-after-package-visible-change
+  status: awaiting-performance-manual-ecosystem-and-protected-qualification
 
 rules:
   - dev-remains-the-canonical-modern-implementation

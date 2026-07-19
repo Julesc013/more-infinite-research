@@ -1,0 +1,201 @@
+{
+  "schema": 2,
+  "kind": "mir-approved-package-delta",
+  "baseline": {
+    "version": "2.4.5",
+    "archive_sha256": "7649824B72247AA38F05661422DFDEE7C729B21CC73A0A35D2455443B45D39F8",
+    "package_content_sha256": "5B8E21077CAC99CDB0733EBE8B34D10D0F375B2EAB2D42E60A73677860783FED",
+    "source_commit": "47bcc80c8a70b41dbbb4f8d80b2b9433d0a10d3f"
+  },
+  "current": {
+    "version": "2.4.9",
+    "archive_sha256": "B81C4DAF1E0B25CEFBB5D39DA61955BE2EF9C8B82F1259C0344E3588A23E1A8C",
+    "package_content_sha256": "B26DCF015B3CDD10DB649E56D904BA69C211888EAE0270A2546F9584449E18DA",
+    "source_commit": "7619485699ac68a2491931aa4242efb146451694"
+  },
+  "invariants": {
+    "settings_paths_unchanged": true,
+    "migration_paths_unchanged": true,
+    "stream_paths_unchanged": true
+  },
+  "differences": [
+    {
+      "path": "changelog.txt",
+      "change": "changed",
+      "before_sha256": "3C6EE10D551339D450B68B87E23019AB27E4FFB53AD2B6ADD59647D63CC5A1F9",
+      "after_sha256": "6D59ED9DB20592CF22778A4689D791C18DC6614D09DD1250080252BFC9B1BD91",
+      "reason": "MIR 2.4.9 player-visible stability and safety history",
+      "intentional": true,
+      "migration_impact": "No generated ID, setting ID, migration, or runtime namespace change is authorized by this package-path delta.",
+      "required_evidence": [
+        "exact archive hashes",
+        "2.4.5-to-2.4.9 upgrade proof",
+        "Factorio 2.0 full qualification"
+      ]
+    },
+    {
+      "path": "info.json",
+      "change": "changed",
+      "before_sha256": "DB9C0588791B3101C36C1814779B0C3B02130C4D03B4FE2B2DEED1AD47DEC900",
+      "after_sha256": "00DAE4ADC30257C77577307143E04BE3415504E02DAF03F13130DECA2C58AD30",
+      "reason": "MIR 2.4.9 version and Factorio 2.0 dependency contract",
+      "intentional": true,
+      "migration_impact": "No generated ID, setting ID, migration, or runtime namespace change is authorized by this package-path delta.",
+      "required_evidence": [
+        "exact archive hashes",
+        "2.4.5-to-2.4.9 upgrade proof",
+        "Factorio 2.0 full qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/effects/metadata.lua",
+      "change": "changed",
+      "before_sha256": "F70E6290A590693D9FBF31D779D88F365DA78D0B79FDEE43CACD3103AF5F29A1",
+      "after_sha256": "88D4C918AD7479403B476EA04022F5279DF5482A5E534D0834D8AFA2873F6570",
+      "reason": "quality-aware effect identity",
+      "intentional": true,
+      "migration_impact": "No generated ID, setting ID, migration, or runtime namespace change is authorized by this package-path delta.",
+      "required_evidence": [
+        "exact archive hashes",
+        "2.4.5-to-2.4.9 upgrade proof",
+        "Factorio 2.0 full qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/emit/effect_safety.lua",
+      "change": "changed",
+      "before_sha256": "11013AF5487243157F1A1D43C0ECC1BE7A3DBC1A85721D5048337813EA14789B",
+      "after_sha256": "016DF24BD8C0235D0471DB32039856B938690A2F0933ED5AAA9D82AABD5911BD",
+      "reason": "generic target sanitation for generated and external technology effects",
+      "intentional": true,
+      "migration_impact": "No generated ID, setting ID, migration, or runtime namespace change is authorized by this package-path delta.",
+      "required_evidence": [
+        "exact archive hashes",
+        "2.4.5-to-2.4.9 upgrade proof",
+        "Factorio 2.0 full qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/emit/mod_data.lua",
+      "change": "changed",
+      "before_sha256": "C2FE4DBC9312D6EA69EA3DDC57D2EA84F8A25859EB4D59356B50114453529B8E",
+      "after_sha256": "D585ED81A87D17C8249FD742B0DC11614DADD23EE44848ADBC5F2DAD78873731",
+      "reason": "Factorio 2.0 mod-data capability guard",
+      "intentional": true,
+      "migration_impact": "No generated ID, setting ID, migration, or runtime namespace change is authorized by this package-path delta.",
+      "required_evidence": [
+        "exact archive hashes",
+        "2.4.5-to-2.4.9 upgrade proof",
+        "Factorio 2.0 full qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/integrity/effect_contracts.lua",
+      "change": "added",
+      "before_sha256": null,
+      "after_sha256": "8BC2D415F8883F3C96419B4DA1329BF27B9C7CC12E50EF99B80D68760D8F1A6D",
+      "reason": "single exhaustive technology-effect target authority",
+      "intentional": true,
+      "migration_impact": "No generated ID, setting ID, migration, or runtime namespace change is authorized by this package-path delta.",
+      "required_evidence": [
+        "exact archive hashes",
+        "2.4.5-to-2.4.9 upgrade proof",
+        "Factorio 2.0 full qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/pipeline/commands.lua",
+      "change": "changed",
+      "before_sha256": "58AFED365E35EF47AC47D30A10F2E94B43ED6608AAD767C373A8A03B5F44C377",
+      "after_sha256": "829D1BE8229C2E595791628A81031EC833E139251F42F3477B7CA79A5C97F0EA",
+      "reason": "pre-index technology-effect sanitation phase",
+      "intentional": true,
+      "migration_impact": "No generated ID, setting ID, migration, or runtime namespace change is authorized by this package-path delta.",
+      "required_evidence": [
+        "exact archive hashes",
+        "2.4.5-to-2.4.9 upgrade proof",
+        "Factorio 2.0 full qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/platform/factorio/prototype_lookup.lua",
+      "change": "changed",
+      "before_sha256": "CA79E3284393D8879024933870BE185192C419D6AFC9D4BBADE92728C915D8EC",
+      "after_sha256": "E1290727B0910CA3F13F03F472B240E53C562DD69A40C5AD886C749D581617E8",
+      "reason": "entity target resolver required by turret-attack",
+      "intentional": true,
+      "migration_impact": "No generated ID, setting ID, migration, or runtime namespace change is authorized by this package-path delta.",
+      "required_evidence": [
+        "exact archive hashes",
+        "2.4.5-to-2.4.9 upgrade proof",
+        "Factorio 2.0 full qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/platform/factorio/target_line.lua",
+      "change": "changed",
+      "before_sha256": "951122B7BC02AF1CEAE074157FBA096C607D3549B26FFA824983F81FC981BFE8",
+      "after_sha256": "77DFB871D503838A4733D7E4E7150E3B112144DA42F121E66CFC05B9C904AF85",
+      "reason": "target capability accessor for Factorio 2.0",
+      "intentional": true,
+      "migration_impact": "No generated ID, setting ID, migration, or runtime namespace change is authorized by this package-path delta.",
+      "required_evidence": [
+        "exact archive hashes",
+        "2.4.5-to-2.4.9 upgrade proof",
+        "Factorio 2.0 full qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/platform/factorio/target_profiles.lua",
+      "change": "changed",
+      "before_sha256": "9D3B44E4FCD8519FE7C3BC83C6C738C2F0BBF770C550B60D6402D73D5B529CB0",
+      "after_sha256": "0B9F8D4BA865330628429E9A457A9C3343459CA2377C046DA7F176D60CE1E19C",
+      "reason": "Factorio 2.0 mod-data capability declaration",
+      "intentional": true,
+      "migration_impact": "No generated ID, setting ID, migration, or runtime namespace change is authorized by this package-path delta.",
+      "required_evidence": [
+        "exact archive hashes",
+        "2.4.5-to-2.4.9 upgrade proof",
+        "Factorio 2.0 full qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/runtime/productivity_family_adoption.lua",
+      "change": "changed",
+      "before_sha256": "E99614D82A6614475784BE08DC5E6C527E12B5C8CD131F0FC38041BCD929EDE7",
+      "after_sha256": "3F70EACB41D175034BF3D042C2AD58E12242BAFCA94D1AD8E40F02B84B709CA6",
+      "reason": "remove the unproven global technology-effect reset",
+      "intentional": true,
+      "migration_impact": "No generated ID, setting ID, migration, or runtime namespace change is authorized by this package-path delta.",
+      "required_evidence": [
+        "exact archive hashes",
+        "2.4.5-to-2.4.9 upgrade proof",
+        "Factorio 2.0 full qualification"
+      ]
+    },
+    {
+      "path": "README.md",
+      "change": "changed",
+      "before_sha256": "97BB57E6AB23FED91EFCE764EF5DF088584CF478F372281A8A06981A7F0F126B",
+      "after_sha256": "1833C88645D8A7ACFEE2B3E679D28E5BF6F01FEF8F76C9AE5F7D497A3D3110FB",
+      "reason": "Factorio 2.0 release positioning for the 2.4.9 stability patch",
+      "intentional": true,
+      "migration_impact": "No generated ID, setting ID, migration, or runtime namespace change is authorized by this package-path delta.",
+      "required_evidence": [
+        "exact archive hashes",
+        "2.4.5-to-2.4.9 upgrade proof",
+        "Factorio 2.0 full qualification"
+      ]
+    }
+  ],
+  "summary": {
+    "difference_count": 12,
+    "intentional_count": 12,
+    "unapproved_count": 0,
+    "status": "approved"
+  },
+  "exporter": {
+    "generated_at": "2026-07-19T10:01:24.4468967Z",
+    "producer_sha256": "B216121570370EC1F0A894EDFBE0B86D07BE43D1971417169D4274614C24662E"
+  }
+}
