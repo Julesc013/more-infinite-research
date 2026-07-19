@@ -15,7 +15,7 @@ local contracts = {
   },
   ["unlock-space-location"] = {
     identity_fields = {"type", "space_location"},
-    targets = {{field = "space_location", prototype_type = "space-location", required = true}}
+    targets = {{field = "space_location", resolver = "space-location", required = true}}
   },
   ["give-item"] = {
     identity_fields = {"type", "item", "quality"},
@@ -45,6 +45,7 @@ local contracts = {
 local function target_exists(target, name)
   if target.resolver == "item" then return lookup.item_prototype(name) ~= nil end
   if target.resolver == "entity" then return lookup.entity_prototype(name) ~= nil end
+  if target.resolver == "space-location" then return lookup.space_location_prototype(name) ~= nil end
   return data_raw.prototype(target.prototype_type, name) ~= nil
 end
 

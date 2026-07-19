@@ -17,6 +17,6 @@
     { "type": "turret-attack", "targets": [{ "field": "turret_id", "resolver": "entity", "required": true }] },
     { "type": "unlock-quality", "targets": [{ "field": "quality", "prototype_type": "quality", "required": true }] },
     { "type": "unlock-recipe", "targets": [{ "field": "recipe", "prototype_type": "recipe", "required": true }] },
-    { "type": "unlock-space-location", "targets": [{ "field": "space_location", "prototype_type": "space-location", "required": true }] }
+    { "type": "unlock-space-location", "targets": [{ "field": "space_location", "resolver": "space-location", "required": true }] }
   ]
 }

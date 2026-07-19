@@ -853,6 +853,8 @@ local generic_effect_candidate = {
     {type = "unlock-recipe", recipe = "mir-fixture-definitely-missing-recipe"},
     {type = "gun-speed", ammo_category = "bullet", modifier = 0.1},
     {type = "gun-speed", ammo_category = "mir-fixture-definitely-missing-ammo-category", modifier = 0.1},
+    {type = "unlock-space-location", space_location = "nauvis"},
+    {type = "unlock-space-location", space_location = "mir-fixture-definitely-missing-space-location"},
     {type = "unlock-quality", quality = "normal"},
     {type = "unlock-quality", quality = "mir-fixture-definitely-missing-quality"},
     {type = "turret-attack", turret_id = "gun-turret", modifier = 0.1},
@@ -865,17 +867,18 @@ local kept_generic, removed_generic, retained_effect_order, retained_effect_iden
   generic_effect_candidate.effects,
   "compiler-contract-generic-effects",
   "external")
-if #kept_generic ~= 5 or #removed_generic ~= 5
+if #kept_generic ~= 6 or #removed_generic ~= 6
   or removed_generic[1].original_effect_index ~= 2
   or removed_generic[2].original_effect_index ~= 4
   or removed_generic[3].original_effect_index ~= 6
   or removed_generic[4].original_effect_index ~= 8
   or removed_generic[5].original_effect_index ~= 10
+  or removed_generic[6].original_effect_index ~= 12
   or type(removed_generic[1].removed_effect_fingerprint) ~= "string"
-  or #retained_effect_identities ~= 5
+  or #retained_effect_identities ~= 6
   or retained_effect_order[1] ~= 1 or retained_effect_order[2] ~= 3
   or retained_effect_order[3] ~= 5 or retained_effect_order[4] ~= 7
-  or retained_effect_order[5] ~= 9 then
+  or retained_effect_order[5] ~= 9 or retained_effect_order[6] ~= 11 then
   fail("generic effect contracts did not retain valid targets and prune missing targets")
 end
 local default_quality_identity = effect_contracts.identity({type = "give-item", item = "iron-plate"})

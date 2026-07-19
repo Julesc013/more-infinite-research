@@ -50,6 +50,11 @@ function L.fluid_prototype(name)
   return data_raw.prototype("fluid", name)
 end
 
+function L.space_location_prototype(name)
+  if not name then return nil end
+  return data_raw.prototype("space-location", name) or data_raw.prototype("planet", name)
+end
+
 function L.each_item_prototype(callback)
   for _, type_name in ipairs(ITEM_TYPES) do
     for name, prototype in pairs(data_raw.prototypes(type_name)) do
