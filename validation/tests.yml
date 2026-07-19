@@ -83,7 +83,11 @@
       "command": "./scripts/Test-MIRLocales.ps1 -AllowMissingSupportedLanguages",
       "requires_factorio": false,
       "inputs": [
+        ".mir/locales/**",
         "locale/**",
+        "scripts/localization/**",
+        "scripts/Update-MIRLocales.ps1",
+        "scripts/Test-MIRLocales.ps1",
         "prototypes/mir/settings/**",
         "prototypes/streams/**"
       ]

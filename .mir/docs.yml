@@ -815,15 +815,16 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - documentation-governance
-  - path: docs/maintainer/fixture-workflow.md
-    title: "Fixture Workflow"
+  - path: docs/maintainer/localization.md
+    title: "Localization Governance"
     status: current
     audience: maintainer
     doc_type: how-to
     owner: mir-maintainers
-    source_of_truth_for: []
-  - path: docs/maintainer/localization.md
-    title: "Localization Maintenance"
+    source_of_truth_for:
+      - localization-governance
+  - path: docs/maintainer/fixture-workflow.md
+    title: "Fixture Workflow"
     status: current
     audience: maintainer
     doc_type: how-to

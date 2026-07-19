@@ -46,7 +46,7 @@
     },
     {
       "id": "locale",
-      "patterns": ["^locale/"],
+      "patterns": ["^locale/", "^\\.mir/locales/", "^scripts/localization/", "^scripts/(Test|Update)-MIRLocales\\.ps1$"],
       "tests": ["static.locales", "static.package", "runtime.exact-zip"]
     },
     {

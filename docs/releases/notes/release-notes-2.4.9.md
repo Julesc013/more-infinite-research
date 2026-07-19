@@ -18,4 +18,6 @@ Configuration changes no longer trigger MIR's explicit force-wide technology-eff
 
 The update preserves MIR 2.4.5 settings, generated research IDs, migrations, runtime storage, and default generated technology set. It does not enable new automatic technology generation or make broader Pyanodon, Space Exploration, or Krastorio support claims.
 
+The package now includes complete, consistently generated locale files for all 50 languages supported by Factorio. Locale checks keep every language synchronized with English and protect formatting placeholders, rich text, compact UI labels, and translated prose from regression.
+
 Release qualification is bound to the exact 2.4.5 and 2.4.9 archives. Runtime performance and package-focused manual review are mandatory before the candidate can be sealed and published.

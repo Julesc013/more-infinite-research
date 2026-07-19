@@ -11,6 +11,7 @@ Date: 2026-07-19
 
   Changes:
 
+    - Completed all 50 Factorio-supported locales and added source-hash-bound generation and regression checks.
     - Added persistent content-addressed verification evidence with stable per-test and per-scenario identities.
     - Split exact release-archive identity from gameplay, runtime, migration, settings, balance, and dependency domains.
     - Added separate locale and asset domains so packaging-only changes do not invalidate unrelated gameplay evidence.

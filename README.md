@@ -634,7 +634,7 @@ The validation script checks:
 - **Docs policy:** docs match the opportunistic compatibility policy.
 - **Science-pack authority:** no old `data.raw.tool` science-pack authority remains.
 - **Icons:** generated icons do not use `icon_mipmaps`.
-- **Locale:** locale files match the English fallback.
+- **Locale:** all 50 Factorio-supported locale files have exact English-key parity, source-hash-bound translation memory, protected placeholders and rich text, UI prose budgets, and stale-English/script checks.
 - **PowerShell tooling:** scripts parse, duplicate parameters are rejected, generated output paths stay ignored, and obvious secret output is blocked.
 - **Changelog:** `changelog.txt` uses Factorio's 99-dash format with one-line bullets capped at 132 characters.
 - **Generated package:** validation builds an ignored archive from the current source tree and checks its root, metadata, load-critical files, and forbidden artifacts.

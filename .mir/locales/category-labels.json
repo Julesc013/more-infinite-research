@@ -1,0 +1,349 @@
+{
+  "schema": 1,
+  "source_locale": "en",
+  "locales": {
+    "af": {
+      "Main": "Hoof",
+      "Compatibility": "Verenigbaarheid",
+      "Limits": "Perke",
+      "Advanced": "Gevorderd",
+      "Diagnostics": "Diagnostiek"
+    },
+    "ar": {
+      "Main": "رئيسي",
+      "Compatibility": "التوافق",
+      "Limits": "حدود",
+      "Advanced": "متقدم",
+      "Diagnostics": "التشخيص"
+    },
+    "be": {
+      "Main": "Асноўны",
+      "Compatibility": "Сумяшчальнасць",
+      "Limits": "Межы",
+      "Advanced": "Пашыраны",
+      "Diagnostics": "Дыягностыка"
+    },
+    "bg": {
+      "Main": "Основен",
+      "Compatibility": "Съвместимост",
+      "Limits": "Ограничения",
+      "Advanced": "Разширено",
+      "Diagnostics": "Диагностика"
+    },
+    "ca": {
+      "Main": "Principal",
+      "Compatibility": "Compatibilitat",
+      "Limits": "Límits",
+      "Advanced": "Avançat",
+      "Diagnostics": "Diagnòstics"
+    },
+    "cs": {
+      "Main": "Hlavní",
+      "Compatibility": "Kompatibilita",
+      "Limits": "Limity",
+      "Advanced": "Moderní",
+      "Diagnostics": "Diagnostika"
+    },
+    "da": {
+      "Main": "Hoved",
+      "Compatibility": "Kompatibilitet",
+      "Limits": "Grænser",
+      "Advanced": "Fremskreden",
+      "Diagnostics": "Diagnostik"
+    },
+    "de": {
+      "Main": "Hauptsächlich",
+      "Compatibility": "Kompatibilität",
+      "Limits": "Grenzen",
+      "Advanced": "Fortschrittlich",
+      "Diagnostics": "Diagnose"
+    },
+    "el": {
+      "Main": "Κύριος",
+      "Compatibility": "Αρμονία",
+      "Limits": "Όρια",
+      "Advanced": "Προχωρημένος",
+      "Diagnostics": "Διαγνωστικά"
+    },
+    "eo": {
+      "Main": "Ĉefa",
+      "Compatibility": "Kongrueco",
+      "Limits": "Limoj",
+      "Advanced": "Altnivela",
+      "Diagnostics": "Diagnozo"
+    },
+    "es-ES": {
+      "Main": "Principal",
+      "Compatibility": "Compatibilidad",
+      "Limits": "Límites",
+      "Advanced": "Avanzado",
+      "Diagnostics": "Diagnóstico"
+    },
+    "et": {
+      "Main": "Peamine",
+      "Compatibility": "Ühilduvus",
+      "Limits": "Piirid",
+      "Advanced": "Täiustatud",
+      "Diagnostics": "Diagnostika"
+    },
+    "eu": {
+      "Main": "Nagusia",
+      "Compatibility": "Bateragarritasuna",
+      "Limits": "Mugak",
+      "Advanced": "Aurreratua",
+      "Diagnostics": "Diagnostikoak"
+    },
+    "fa": {
+      "Main": "اصلی",
+      "Compatibility": "سازگاری",
+      "Limits": "محدودیت ها",
+      "Advanced": "پیشرفته",
+      "Diagnostics": "تشخیص"
+    },
+    "fi": {
+      "Main": "Pääasiallinen",
+      "Compatibility": "Yhteensopivuus",
+      "Limits": "Rajoitukset",
+      "Advanced": "Edistynyt",
+      "Diagnostics": "Diagnostiikka"
+    },
+    "fil": {
+      "Main": "Pangunahing",
+      "Compatibility": "Pagkakatugma",
+      "Limits": "Mga limitasyon",
+      "Advanced": "Mas mataas na antas",
+      "Diagnostics": "Mga diagnostic"
+    },
+    "fr": {
+      "Main": "Principal",
+      "Compatibility": "Compatibilité",
+      "Limits": "Limites",
+      "Advanced": "Avancé",
+      "Diagnostics": "Diagnostic"
+    },
+    "fy-NL": {
+      "Main": "Foarnaamste",
+      "Compatibility": "Kompatibiliteit",
+      "Limits": "Beheiningen",
+      "Advanced": "Avansearre",
+      "Diagnostics": "Diagnostyk"
+    },
+    "ga-IE": {
+      "Main": "Príomh-",
+      "Compatibility": "Comhoiriúnacht",
+      "Limits": "Teorainneacha",
+      "Advanced": "Casta",
+      "Diagnostics": "Diagnóisic"
+    },
+    "he": {
+      "Main": "רָאשִׁי",
+      "Compatibility": "תְאִימוּת",
+      "Limits": "גבולות",
+      "Advanced": "מִתקַדֵם",
+      "Diagnostics": "אבחון"
+    },
+    "hr": {
+      "Main": "Glavni",
+      "Compatibility": "Kompatibilnost",
+      "Limits": "Ograničenja",
+      "Advanced": "Napredno",
+      "Diagnostics": "Dijagnostika"
+    },
+    "hu": {
+      "Main": "Fő",
+      "Compatibility": "Kompatibilitás",
+      "Limits": "Korlátok",
+      "Advanced": "Fejlett",
+      "Diagnostics": "Diagnosztika"
+    },
+    "id": {
+      "Main": "Utama",
+      "Compatibility": "Kesesuaian",
+      "Limits": "Batasan",
+      "Advanced": "Canggih",
+      "Diagnostics": "Diagnostik"
+    },
+    "is": {
+      "Main": "Aðal",
+      "Compatibility": "Samhæfni",
+      "Limits": "Takmörk",
+      "Advanced": "Ítarlegri",
+      "Diagnostics": "Greining"
+    },
+    "it": {
+      "Main": "Principale",
+      "Compatibility": "Compatibilità",
+      "Limits": "Limiti",
+      "Advanced": "Avanzato",
+      "Diagnostics": "Diagnostica"
+    },
+    "ja": {
+      "Main": "主要",
+      "Compatibility": "互換性",
+      "Limits": "限界",
+      "Advanced": "高度な",
+      "Diagnostics": "診断"
+    },
+    "ka": {
+      "Main": "მთავარი",
+      "Compatibility": "თავსებადობა",
+      "Limits": "ლიმიტები",
+      "Advanced": "გაფართოებული",
+      "Diagnostics": "დიაგნოსტიკა"
+    },
+    "kk": {
+      "Main": "Негізгі",
+      "Compatibility": "Үйлесімділік",
+      "Limits": "Шектеулер",
+      "Advanced": "Жетілдірілген",
+      "Diagnostics": "Диагностика"
+    },
+    "ko": {
+      "Main": "기본",
+      "Compatibility": "호환성",
+      "Limits": "제한",
+      "Advanced": "고급의",
+      "Diagnostics": "진단"
+    },
+    "lt": {
+      "Main": "Pagrindinis",
+      "Compatibility": "Suderinamumas",
+      "Limits": "Ribos",
+      "Advanced": "Išplėstinė",
+      "Diagnostics": "Diagnostika"
+    },
+    "lv": {
+      "Main": "Galvenā",
+      "Compatibility": "Saderība",
+      "Limits": "Ierobežojumi",
+      "Advanced": "Papildu",
+      "Diagnostics": "Diagnostika"
+    },
+    "nl": {
+      "Main": "Voornaamst",
+      "Compatibility": "Verenigbaarheid",
+      "Limits": "Grenzen",
+      "Advanced": "Geavanceerd",
+      "Diagnostics": "Diagnostiek"
+    },
+    "no": {
+      "Main": "Hoved",
+      "Compatibility": "Kompatibilitet",
+      "Limits": "Grenser",
+      "Advanced": "Avansert",
+      "Diagnostics": "Diagnostikk"
+    },
+    "pl": {
+      "Main": "Główny",
+      "Compatibility": "Zgodność",
+      "Limits": "Limity",
+      "Advanced": "Zaawansowany",
+      "Diagnostics": "Diagnostyka"
+    },
+    "pt-BR": {
+      "Main": "Principal",
+      "Compatibility": "Compatibilidade",
+      "Limits": "Limites",
+      "Advanced": "Avançado",
+      "Diagnostics": "Diagnóstico"
+    },
+    "pt-PT": {
+      "Main": "Principal",
+      "Compatibility": "Compatibilidade",
+      "Limits": "Limites",
+      "Advanced": "Avançado",
+      "Diagnostics": "Diagnóstico"
+    },
+    "ro": {
+      "Main": "Principal",
+      "Compatibility": "Compatibilitate",
+      "Limits": "Limite",
+      "Advanced": "Avansat",
+      "Diagnostics": "Diagnosticare"
+    },
+    "ru": {
+      "Main": "Основной",
+      "Compatibility": "Совместимость",
+      "Limits": "Пределы",
+      "Advanced": "Передовой",
+      "Diagnostics": "Диагностика"
+    },
+    "sk": {
+      "Main": "Hlavné",
+      "Compatibility": "Kompatibilita",
+      "Limits": "Limity",
+      "Advanced": "Pokročilé",
+      "Diagnostics": "Diagnostika"
+    },
+    "sl": {
+      "Main": "Glavni",
+      "Compatibility": "Združljivost",
+      "Limits": "Omejitve",
+      "Advanced": "Napredno",
+      "Diagnostics": "Diagnostika"
+    },
+    "sq": {
+      "Main": "Kryesor",
+      "Compatibility": "Përputhshmëria",
+      "Limits": "Limitet",
+      "Advanced": "E avancuar",
+      "Diagnostics": "Diagnostifikimi"
+    },
+    "sr": {
+      "Main": "Маин",
+      "Compatibility": "Компатибилност",
+      "Limits": "Ограничења",
+      "Advanced": "Напредно",
+      "Diagnostics": "Дијагностика"
+    },
+    "sv-SE": {
+      "Main": "Huvud",
+      "Compatibility": "Kompatibilitet",
+      "Limits": "Gränser",
+      "Advanced": "Avancerad",
+      "Diagnostics": "Diagnostik"
+    },
+    "th": {
+      "Main": "หลัก",
+      "Compatibility": "ความเข้ากันได้",
+      "Limits": "ขีดจำกัด",
+      "Advanced": "ขั้นสูง",
+      "Diagnostics": "การวินิจฉัย"
+    },
+    "tr": {
+      "Main": "Ana",
+      "Compatibility": "Uyumluluk",
+      "Limits": "Sınırlar",
+      "Advanced": "Gelişmiş",
+      "Diagnostics": "Teşhis"
+    },
+    "uk": {
+      "Main": "головний",
+      "Compatibility": "Сумісність",
+      "Limits": "Межі",
+      "Advanced": "Просунутий",
+      "Diagnostics": "діагностика"
+    },
+    "vi": {
+      "Main": "Chủ yếu",
+      "Compatibility": "Khả năng tương thích",
+      "Limits": "Giới hạn",
+      "Advanced": "Trình độ cao",
+      "Diagnostics": "Chẩn đoán"
+    },
+    "zh-CN": {
+      "Main": "主要的",
+      "Compatibility": "兼容性",
+      "Limits": "限制",
+      "Advanced": "先进的",
+      "Diagnostics": "诊断"
+    },
+    "zh-TW": {
+      "Main": "主要的",
+      "Compatibility": "相容性",
+      "Limits": "限制",
+      "Advanced": "先進的",
+      "Diagnostics": "診斷"
+    }
+  }
+}

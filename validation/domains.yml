@@ -49,7 +49,11 @@
     {
       "id": "locale",
       "patterns": [
-        "locale/**"
+        ".mir/locales/**",
+        "locale/**",
+        "scripts/localization/**",
+        "scripts/Test-MIRLocales.ps1",
+        "scripts/Update-MIRLocales.ps1"
       ]
     },
     {
