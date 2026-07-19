@@ -16,7 +16,6 @@ function Initialize-MIRAssuranceGitIdentityCache {
     $script:MIRAssuranceDirtyPaths[$path.Replace("\", "/")] = $true
   }
 }
-
 function Get-MIRAssuranceRepositoryBlobId {
   param([Parameter(Mandatory)][string]$Path)
   Initialize-MIRAssuranceGitIdentityCache
@@ -30,9 +29,9 @@ function Get-MIRAssuranceRepositoryBlobId {
     $script:MIRAssuranceBlobCache[$cacheKey] = [string]$script:MIRAssuranceGitIndexBlobs[$relative]
     return $script:MIRAssuranceBlobCache[$cacheKey]
   }
-  $blob = @(& git -C $repo hash-object "--path=$relative" -- $full)
-  if ($LASTEXITCODE -ne 0 -or $blob.Count -ne 1) { throw "Unable to calculate canonical Git blob identity for $relative." }
-  $script:MIRAssuranceBlobCache[$cacheKey] = ([string]$blob[0]).Trim()
+  # Dirty and untracked files are evidence inputs in their exact worktree byte
+  # form. Hash them in-process instead of spawning one git process per file.
+  $script:MIRAssuranceBlobCache[$cacheKey] = "worktree-sha256:" + (Get-MIRAssuranceSha256 -Path $full)
   return $script:MIRAssuranceBlobCache[$cacheKey]
 }
 

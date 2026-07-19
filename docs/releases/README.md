@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: release-manager
 doc_type: release-plan
 owner: mir-maintainers
-last_reviewed: 2026-07-14
+last_reviewed: 2026-07-19
 supersedes: []
 superseded_by: []
 ---
@@ -14,8 +14,10 @@ superseded_by: []
 
 Release docs are version-specific plans, migration guides, risk registers, checklists, and validation records.
 
-MIR 2.5.0 is the active Factorio 2.0 candidate on `tmp/2.0`. It projects the accepted MIR 3.2.0 persistent-verification overhaul and target-capability guard from Dev, while recalculating every test fingerprint against the Factorio 2.0 package, binary, fixtures, dependencies, and scenario records.
+MIR 2.4.9 is the active bounded Factorio 2.0 stability candidate on `tmp/2.0`. It starts from published MIR 2.4.5, carries only declared capability, effect-integrity, reset-safety, and release-boundary fixes, and requires fresh exact-package qualification. MIR 2.5.0 remains the planned broader compiler and verification backport after this release.
 
+- [2.4.9 stability backport](2.4.9-stability-backport.md)
+- [2.4.9 release notes](notes/release-notes-2.4.9.md)
 - [2.5.0 verification backport](2.5.0-verification-backport.md)
 - [2.5.0 release notes](notes/release-notes-2.5.0.md)
 

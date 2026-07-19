@@ -75,5 +75,27 @@ function Get-MIRTargetProfile {
     }
   }
 
+  foreach ($requirementProperty in @($manifest.feature_requirements.PSObject.Properties)) {
+    $feature = [string]$requirementProperty.Name
+    if ($profile.features.$feature -ne $true) { continue }
+    $requirements = $requirementProperty.Value
+    foreach ($shape in @($requirements.prototype_shapes | ForEach-Object { [string]$_ })) {
+      if ($profile.prototype_shapes.$shape -ne $true) {
+        throw "Factorio $FactorioVersion enables $feature but required prototype shape $shape is false."
+      }
+    }
+    foreach ($emitter in @($requirements.emitter_families | ForEach-Object { [string]$_ })) {
+      if (@($profile.emitter_families | Where-Object { [string]$_ -eq $emitter }).Count -ne 1) {
+        throw "Factorio $FactorioVersion enables $feature but required emitter $emitter is unavailable."
+      }
+    }
+    foreach ($implementation in @([string]$requirements.runtime_consumer, [string]$requirements.data_stage_emitter)) {
+      if ([string]::IsNullOrWhiteSpace($implementation) -or
+          -not (Test-Path -LiteralPath (Join-Path $RepoRoot $implementation) -PathType Leaf)) {
+        throw "Factorio $FactorioVersion feature $feature references a missing implementation: $implementation"
+      }
+    }
+  }
+
   return $profile
 }

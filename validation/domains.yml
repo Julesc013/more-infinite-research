@@ -83,6 +83,7 @@
       "data",
       "balance",
       "settings",
+      "runtime",
       "assets",
       "dependency-contract"
     ],

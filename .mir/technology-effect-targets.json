@@ -1,0 +1,15 @@
+{
+  "schema": 1,
+  "factorio_target": "2.0.77",
+  "authority": "Factorio 2.0 technology modifier prototype target fields",
+  "target_bearing_modifiers": [
+    { "type": "change-recipe-productivity", "targets": ["recipe"] },
+    { "type": "unlock-recipe", "targets": ["recipe"] },
+    { "type": "unlock-space-location", "targets": ["space_location"] },
+    { "type": "give-item", "targets": ["item", "quality"] },
+    { "type": "ammo-damage", "targets": ["ammo_category"] },
+    { "type": "gun-speed", "targets": ["ammo_category"] },
+    { "type": "unlock-quality", "targets": ["quality"] },
+    { "type": "turret-attack", "targets": ["turret_id"] }
+  ]
+}

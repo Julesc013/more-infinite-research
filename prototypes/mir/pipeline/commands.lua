@@ -12,6 +12,14 @@ local commands = {
       require("prototypes.mir.compatibility.repairs.registry").apply()
     end
   },
+  ["sanitize-input-technology-effects"] = {
+    kind = "mutation",
+    requires_features = {},
+    implementation = "prototypes/mir/emit/effect_safety.lua",
+    apply = function()
+      require("prototypes.mir.emit.effect_safety").sanitize_all_technology_effects()
+    end
+  },
   ["module-permissions"] = {
     kind = "mutation",
     requires_features = {"module_permissions"},
@@ -130,7 +138,8 @@ local commands = {
 
 local ORDERING = {
   ["compatibility-repairs"] = {phase = 10, dependencies = {}},
-  ["module-permissions"] = {phase = 20, dependencies = {"compatibility-repairs"}},
+  ["sanitize-input-technology-effects"] = {phase = 15, dependencies = {"compatibility-repairs"}},
+  ["module-permissions"] = {phase = 20, dependencies = {"sanitize-input-technology-effects"}},
   ["prototype-limits"] = {phase = 20, dependencies = {"compatibility-repairs", "module-permissions"}},
   ["pipeline-extent"] = {phase = 20, dependencies = {"compatibility-repairs", "prototype-limits"}},
   ["prepare-competing-productivity"] = {phase = 30, dependencies = {"pipeline-extent"}},

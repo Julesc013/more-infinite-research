@@ -9,7 +9,7 @@ on:
       seal_path:
         description: "Tracked candidate seal path"
         required: true
-        default: ".mir/evidence/candidate-seals/mir-2.4.0-factorio-2.0.json"
+        default: ".mir/evidence/candidate-seals/mir-3.2.0-factorio-2.1.json"
 
 permissions:
   contents: read

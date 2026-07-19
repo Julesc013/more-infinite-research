@@ -10,11 +10,31 @@ local generation_plan = require("__more-infinite-research__.prototypes.mir.plann
 local compilation_plan = require("__more-infinite-research__.prototypes.mir.planner.compilation_plan")
 local output_validator = require("__more-infinite-research__.prototypes.mir.planner.output_validator")
 local effect_ownership = require("__more-infinite-research__.prototypes.mir.planner.effect_ownership")
+local effect_contracts = require("__more-infinite-research__.prototypes.mir.integrity.effect_contracts")
 local automatic_compiler_contract = require("__more-infinite-research__.prototypes.mir.settings.automatic_compiler_contract")
 local native_owner_cost_model = require("__more-infinite-research__.prototypes.mir.domain.native_owner.cost_model")
 
 local function fail(message)
   error("MIR compiler contract validation failed: " .. message)
+end
+
+local function expect_effect_target(label, effect, expected)
+  local valid = effect_contracts.target_status(effect)
+  if valid ~= expected then fail(label) end
+end
+expect_effect_target("unlock-quality positive target", {type = "unlock-quality", quality = "normal"}, true)
+expect_effect_target("unlock-quality negative target", {type = "unlock-quality", quality = "mir-missing-quality"}, false)
+expect_effect_target("unlock-space-location planet target", {type = "unlock-space-location", space_location = "nauvis"}, true)
+expect_effect_target("unlock-space-location missing target", {
+  type = "unlock-space-location", space_location = "mir-missing-space-location"
+}, false)
+expect_effect_target("turret-attack positive target", {type = "turret-attack", turret_id = "gun-turret"}, true)
+expect_effect_target("turret-attack negative target", {type = "turret-attack", turret_id = "mir-missing-turret"}, false)
+expect_effect_target("give-item optional normal quality", {type = "give-item", item = "iron-plate"}, true)
+expect_effect_target("give-item negative quality", {type = "give-item", item = "iron-plate", quality = "mir-missing-quality"}, false)
+if effect_contracts.identity({type = "give-item", item = "iron-plate", quality = "normal"})
+    == effect_contracts.identity({type = "give-item", item = "iron-plate", quality = "uncommon"}) then
+  fail("give-item quality identity")
 end
 
 local function expect_error(label, expected, callback)

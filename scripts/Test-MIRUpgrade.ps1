@@ -6,6 +6,8 @@ param(
   [string]$FromVersion = "3.0.5",
   [string]$ToVersion = "3.1.0",
   [string]$FixtureName = "assert-upgrade-3-0-5-to-3-1-0",
+  [string[]]$CompanionFixtureNames = @(),
+  [string]$ExpectedSourceCommit = "",
   [string]$OutputPath = ""
 )
 
@@ -23,15 +25,28 @@ function Copy-MIRUpgradeLogEvidence {
     [Parameter(Mandatory)][string]$Source,
     [Parameter(Mandatory)][string]$Destination
   )
-  @(
+  $normalized = @(
     Get-Content -LiteralPath $Source |
-      ForEach-Object { $_.TrimEnd() }
-  ) | Set-Content -LiteralPath $Destination -Encoding UTF8
+      Where-Object { $_ -notmatch 'System info:|Memory info:|\s\[[0-9]+\]:\s' } |
+      ForEach-Object {
+        $_.TrimEnd() `
+          -replace '(?i)[A-Z]:\\Users\\[^\\]+\\AppData\\Local\\Temp\\mir-upgrade-[^\\\s"]+', '<temp-upgrade-root>' `
+          -replace '(?i)[A-Z]:/Users/[^/]+/AppData/Local/Temp/mir-upgrade-[^/\s"]+', '<temp-upgrade-root>'
+      }
+  )
+  $normalized | Set-Content -LiteralPath $Destination -Encoding UTF8
 }
 
 $factorio = Resolve-MIRUpgradePath -Path $FactorioBin
 $from = Resolve-MIRUpgradePath -Path $FromZip
 $to = Resolve-MIRUpgradePath -Path $ToZip
+$evidenceCommit = (& git -C $RepoRoot rev-parse HEAD).Trim()
+$packageSourceCommit = if ([string]::IsNullOrWhiteSpace($ExpectedSourceCommit)) { $evidenceCommit } else { $ExpectedSourceCommit.Trim() }
+if ($packageSourceCommit -notmatch '^[0-9a-fA-F]{40}$') {
+  throw "ExpectedSourceCommit must be a full 40-character Git commit."
+}
+& git -C $RepoRoot cat-file -e "$packageSourceCommit^{commit}" 2>$null
+if ($LASTEXITCODE -ne 0) { throw "ExpectedSourceCommit is not a commit in this repository: $packageSourceCommit" }
 $factorioVersionInfo = (Get-Item -LiteralPath $factorio).VersionInfo
 $isLegacyFactorio = [int]$factorioVersionInfo.FileMajorPart -lt 2
 $fixture = Resolve-MIRUpgradePath -Path (Join-Path $RepoRoot "fixtures\$FixtureName")
@@ -59,7 +74,7 @@ $config = Join-Path $root "config.ini"
   "check-updates=false"
 ) | Set-Content -LiteralPath $config -Encoding UTF8
 
-$modList = [ordered]@{ mods = @(
+$modRows = @(
   @{ name = "base"; enabled = $true },
   @{ name = "elevated-rails"; enabled = $true },
   @{ name = "quality"; enabled = $true },
@@ -67,7 +82,16 @@ $modList = [ordered]@{ mods = @(
   @{ name = "space-age"; enabled = $true },
   @{ name = "more-infinite-research"; enabled = $true },
   @{ name = $fixtureModName; enabled = $true }
-) }
+)
+foreach ($companionName in $CompanionFixtureNames) {
+  $companion = Resolve-MIRUpgradePath -Path (Join-Path $RepoRoot "fixtures\$companionName")
+  $companionInfo = Get-Content -Raw -LiteralPath (Join-Path $companion "info.json") | ConvertFrom-Json
+  $companionModName = [string]$companionInfo.name
+  if ([string]::IsNullOrWhiteSpace($companionModName)) { throw "Companion fixture $companionName has no mod name." }
+  Copy-Item -LiteralPath $companion -Destination (Join-Path $mods $companionModName) -Recurse
+  $modRows += @{ name = $companionModName; enabled = $true }
+}
+$modList = [ordered]@{ mods = $modRows }
 $modList | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath (Join-Path $mods "mod-list.json") -Encoding UTF8
 Copy-Item -LiteralPath $from -Destination (Join-Path $mods (Split-Path -Leaf $from))
 Copy-Item -LiteralPath $fixture -Destination (Join-Path $mods $fixtureModName) -Recurse
@@ -121,6 +145,17 @@ $assertions = if ($isLegacyFactorio) {
     "global-runtime-state-retained",
     "exact-candidate-normal-mod-directory-load"
   )
+} elseif ($FixtureName -eq "assert-upgrade-2-4-5-to-2-4-9") {
+  @(
+    "startup-settings-retained",
+    "native-owner-technology-level-retained",
+    "native-owner-current-research-retained",
+    "native-owner-fractional-progress-retained",
+    "fixture-storage-retained",
+    "post-reconciliation-custom-recipe-state-retained",
+    "post-reconciliation-custom-force-effect-retained",
+    "exact-candidate-normal-mod-directory-load"
+  )
 } elseif ($FixtureName -in @("assert-upgrade-3-1-5-to-3-1-9", "assert-upgrade-3-1-9-to-3-2-0")) {
   @(
     "startup-settings-retained",
@@ -142,16 +177,21 @@ $assertions = if ($isLegacyFactorio) {
 }
 
 [ordered]@{
-  schema = 1
+  schema = 2
   status = "passed"
   generated_at = (Get-Date).ToUniversalTime().ToString("o")
-  git_commit = (& git -C $RepoRoot rev-parse HEAD).Trim()
+  package_source_commit = $packageSourceCommit
+  evidence_commit = $evidenceCommit
   factorio_binary_version = $factorioVersionInfo.FileVersion
+  factorio_binary_sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $factorio).Hash
   from = [ordered]@{ version = $FromVersion; path = $FromZip; sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $from).Hash }
   to = [ordered]@{ version = $ToVersion; path = $ToZip; sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $to).Hash }
   assertions = $assertions
+  companion_fixtures = @($CompanionFixtureNames)
   create_log = (Split-Path -Leaf $createEvidence)
+  create_log_sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $createEvidence).Hash
   load_log = (Split-Path -Leaf $loadEvidence)
+  load_log_sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $loadEvidence).Hash
 } | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $output -Encoding UTF8
 
 Write-Host "[ok] MIR $FromVersion to $ToVersion upgrade proof: $output"

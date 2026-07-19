@@ -29,6 +29,8 @@
         ".mir/assurance.json",
         "validation/tests.yml",
         "validation/domains.yml",
+        "validation/trust.json",
+        "verification/schema/**",
         "validation/profiles/**"
       ]
     },
@@ -53,6 +55,7 @@
       "inputs": [
         "prototypes/mir/**",
         ".mir/compiler-contract-coverage.yml",
+        ".mir/technology-effect-targets.json",
         ".mir/compiler-schema-authority.json",
         "fixtures/assert-compiler-contracts/**",
         "scripts/Test-MIRCompiler.ps1",
@@ -138,6 +141,71 @@
       ]
     },
     {
+      "id": "performance.static",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./scripts/Test-MIRPerformanceBudgets.ps1 -ValidateManifestOnly",
+      "requires_factorio": false,
+      "inputs": [
+        ".mir/performance.yml",
+        ".mir/performance-budgets.json",
+        "scripts/Test-MIRPerformanceBudgets.ps1",
+        "scripts/Test-MIRPerformanceRegression.ps1",
+        "scripts/validation/ReleaseAttestations.ps1",
+        "prototypes/mir/report/compiler_telemetry.lua"
+      ]
+    },
+    {
+      "id": "release.approved-delta",
+      "kind": "release-evidence",
+      "layer": "F4",
+        "command": "./scripts/Test-MIRApprovedDelta.ps1 -Path approved-delta/2.4.5-to-2.4.9.json -Candidate <candidate> -Baseline <prior-release> -ExpectedSourceCommit <package-source-commit>",
+      "requires_factorio": false,
+      "inputs": [
+          "candidate",
+          ".mir/backport-source-lock.json",
+          "approved-delta/2.4.5-to-2.4.9.json",
+        "scripts/Test-MIRApprovedDelta.ps1",
+        "scripts/Export-MIRApprovedDelta.ps1",
+        "scripts/validation/PackageIdentity.ps1"
+      ]
+    },
+    {
+      "id": "runtime.performance-regression",
+      "kind": "runtime-evidence",
+      "layer": "F4",
+        "command": "./scripts/Test-MIRPerformanceRegression.ps1 -Candidate <candidate> -PriorRelease <prior-release> -FactorioBin <factorio> -ExpectedSourceCommit <package-source-commit> -ExpectedBaselineVersion <upgrade-from> -ExpectedFactorioVersion <qualification-factorio-version>",
+      "requires_factorio": true,
+      "inputs": [
+        "candidate",
+        "prior-release",
+        "factorio",
+        ".mir/evidence/*-performance-regression.json",
+        ".mir/performance.yml",
+        ".mir/performance-budgets.json",
+        "verification/schema/runtime-performance-evidence.schema.json",
+        "scripts/Test-MIRPerformanceRegression.ps1",
+        "scripts/validation/ReleaseAttestations.ps1",
+        "scripts/validation/PackageIdentity.ps1"
+      ]
+    },
+    {
+      "id": "manual.release-review",
+      "kind": "manual-evidence",
+      "layer": "F4",
+        "command": "./scripts/Test-MIRManualReleaseReview.ps1 -Candidate <candidate> -FactorioBin <factorio> -ExpectedSourceCommit <package-source-commit> -ExpectedFactorioVersion <qualification-factorio-version>",
+      "requires_factorio": true,
+      "inputs": [
+        "candidate",
+        "factorio",
+        ".mir/evidence/*-manual-review-attestation.json",
+        "verification/schema/manual-release-attestation.schema.json",
+        "scripts/Test-MIRManualReleaseReview.ps1",
+        "scripts/validation/ReleaseAttestations.ps1",
+        "scripts/validation/PackageIdentity.ps1"
+      ]
+    },
+    {
       "id": "runtime.affected",
       "kind": "matrix",
       "layer": "F3",
@@ -171,13 +239,17 @@
       "id": "runtime.upgrade",
       "kind": "runtime",
       "layer": "F4",
-      "command": "./scripts/Test-MIRUpgrade.ps1 -FactorioBin <factorio> -FromZip <prior-release> -ToZip <candidate> -FromVersion <upgrade-from> -ToVersion <upgrade-to> -FixtureName <upgrade-fixture> -OutputPath artifacts/assurance/<upgrade-to>-upgrade-proof.json",
+      "command": "./scripts/Test-MIRUpgrade.ps1 -FactorioBin <factorio> -FromZip <prior-release> -ToZip <candidate> -FromVersion <upgrade-from> -ToVersion <upgrade-to> -FixtureName <upgrade-fixture> -CompanionFixtureNames upgrade-reset-probe -ExpectedSourceCommit <package-source-commit> -OutputPath artifacts/assurance/<upgrade-to>-upgrade-proof.json",
       "requires_factorio": true,
       "inputs": [
         "candidate",
         "prior-release",
         "factorio",
         "upgrade-fixture",
+        "fixtures/upgrade-reset-probe/**",
+        "fixtures/upgrade-modset-source/**",
+        "scripts/Test-MIRUpgrade.ps1",
+        "verification/schema/upgrade-proof.schema.json",
         "scenario-harness",
         "settings"
       ]

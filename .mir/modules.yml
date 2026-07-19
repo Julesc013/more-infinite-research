@@ -135,6 +135,8 @@ modules:
     - prototypes/mir/domain/streams/raw_catalog.lua
     - prototypes/mir/domain/streams/descriptor.lua
     - prototypes/mir/domain/diagnostics/codes.lua
+  integrity:
+    - prototypes/mir/integrity/effect_contracts.lua
   policy:
     - prototypes/mir/policy/owner_policy.lua
     - prototypes/mir/policy/competing_productivity.lua

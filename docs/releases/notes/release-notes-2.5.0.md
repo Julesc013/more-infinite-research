@@ -1,6 +1,6 @@
 ---
 title: "MIR 2.5.0 Release Notes"
-status: current
+status: draft
 applies_to: "2.5.0"
 audience: player
 doc_type: release-plan
@@ -12,8 +12,6 @@ superseded_by: []
 
 # MIR 2.5.0 Release Notes
 
-MIR 2.5.0 updates the Factorio 2.0 line with the persistent content-addressed verification system developed for MIR 3.2.0. Release qualification can now reuse exact trusted proof for unchanged scenarios while rerunning only the package, gameplay, settings, migration, fixture, harness, binary, and dependency inputs that changed.
+MIR 2.5.0 is the planned Factorio 2.0 semantic compiler backport after the MIR 2.4.9 stability release. Its final player-facing scope will be written after 3.2's remaining compiler, compatibility, hardening, and documentation work is frozen for backport.
 
-The release also prevents Factorio 2.0 packages from emitting unsupported `mod-data` prototypes. Because that guard changes packaged data-stage source, the 2.5.0 candidate receives fresh Factorio 2.0 gameplay and upgrade qualification rather than borrowing the MIR 2.4.5 matrix.
-
-Public settings, generated technology IDs, migrations, and runtime-state namespaces remain stable from MIR 2.4.5.
+The unpublished earlier 2.5.0 candidate is not a release artifact and is superseded as an implementation checkpoint. MIR 2.4.9 owns the urgent Factorio 2.0 safety patch; MIR 2.5.0 remains the next feature/backport line.

@@ -1,17 +1,24 @@
 schema: 1
 
-release: 2.4.0
+release: 2.4.9
 factorio_line: "2.0"
 budget_manifest: .mir/performance-budgets.json
-accepted_evidence: pending-2.4.0-factorio-2.0-runtime-gate
+accepted_evidence: .mir/evidence/2.4.9-performance-regression.json
 
 measurement_policy:
   - Budgets are set before performance optimization and include host-load headroom.
+  - Release regression evidence uses the published 2.4.5 archive and the exact final 2.4.9 candidate on one Factorio 2.0.77 installation.
+  - At least five measured runs per package follow one warm-up and a paired balanced baseline-candidate order.
+  - Each lane passes when median regression is at most 20 percent or its absolute increase is within the declared noise allowance.
   - Runtime scenario timings include Factorio process startup and save creation.
   - Local-pack timings include dependency resolution, load, diagnostics parsing, and report conversion.
   - A skipped load never counts as performance evidence.
   - Load-only overhaul observations do not create compatibility support claims.
   - Source-instrumented coverage measurements do not create archive compatibility claims.
+  - The split 100000-scale campaigns cover recipes technologies effects graph edges a 25000-node SCC and randomized insertion order without conflating independent stress domains.
+  - Factorio runtime materializes 60000 technologies below the engine hard limit of 65535 while the same compiler graph implementation validates 100000 in-memory planned technologies.
+  - The recipe engine fixture materializes 1000 structural candidates while MIR's production canonicalizer indexes and fingerprints 100000 in-memory recipe prototypes without crossing Factorio's prototype limit.
+  - Adversarial SCCs stay in MIR's iterative graph validator because Factorio's recursive post-load cycle checker cannot safely materialize the 25000-node cycle.
 
 required_surfaces:
   - base
@@ -23,4 +30,10 @@ required_surfaces:
   - medium-pack
   - large-pack
   - large-synthetic-graph
+  - large-synthetic-recipes
   - full-matrix
+
+regression_policy:
+  qualified_baseline: "2.4.5"
+  absolute_budgets: .mir/performance-budgets.json
+  maximum_regression_percent: 20

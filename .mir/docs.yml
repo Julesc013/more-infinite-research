@@ -1601,7 +1601,7 @@ docs:
       - native-owner-3.2.0-forward-port
   - path: docs/releases/2.5.0-verification-backport.md
     title: "MIR 2.5.0 Persistent Verification Backport"
-    status: current
+    status: draft
     audience: release-manager
     doc_type: release-plan
     owner: mir-maintainers
@@ -1609,9 +1609,26 @@ docs:
       - mir-2.5.0-verification-contract
   - path: docs/releases/notes/release-notes-2.5.0.md
     title: "MIR 2.5.0 Release Notes"
-    status: current
+    status: draft
     audience: player
     doc_type: release-plan
     owner: mir-maintainers
     source_of_truth_for:
       - mir-2.5.0-release-notes
+  - path: docs/releases/2.4.9-stability-backport.md
+    title: "MIR 2.4.9 Stability Backport"
+    status: current
+    audience: release-manager
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-2.4.9-stability-backport
+      - mir-2.4.9-release-gates
+  - path: docs/releases/notes/release-notes-2.4.9.md
+    title: "MIR 2.4.9 Release Notes"
+    status: current
+    audience: player
+    doc_type: release-plan
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-2.4.9-release-notes

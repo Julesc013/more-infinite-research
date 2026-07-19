@@ -207,6 +207,28 @@ waves:
     publication_status: unreleased
     status: release-candidate-awaiting-maintainer-review
 
+  mir_2_4_9:
+    version: "2.4.9"
+    branch: tmp/2.0
+    target_factorio: "2.0.77"
+    source_anchor_required: published-2.4.5-plus-declared-dev-safety-fixes
+    baseline_release_commit: 7e4b6c530cfcc5b2e1429c4e9f4ccb0d6d3b42a4
+    baseline_package_source_commit: 47bcc80c8a70b41dbbb4f8d80b2b9433d0a10d3f
+    portable_fix_source_commit: 068b3a88bdb839e1807fe23cc4bf3ae0fb49d1e1
+    upgrade_predecessor: "2.4.5"
+    source_lock: .mir/backport-source-lock.json
+    archive: dist/more-infinite-research_2.4.9.zip
+    package_source_commit: pending
+    package_evidence_commit: pending
+    sha256: pending
+    package_content_sha256: pending
+    approved_delta: approved-delta/2.4.5-to-2.4.9.json
+    runtime_performance_gate: pending
+    manual_review: pending-maintainer
+    protected_seal: pending
+    publication_status: unreleased
+    status: release-candidate-rebuilding
+
   mir_3_2_0:
     version: "3.2.0"
     branch: dev

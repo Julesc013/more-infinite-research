@@ -232,7 +232,7 @@ function Get-MIRValidationHarnessRoots {
 function Test-MIRValidationHarnessEvidencePath {
   param([Parameter(Mandatory)][string]$RelativePath)
 
-  return $RelativePath -match '^\.mir/evidence/' -or $RelativePath -in @(
+  return $RelativePath -match '^\.mir/(evidence|target-lines)/' -or $RelativePath -in @(
     '.mir/branches.yml',
     '.mir/compatibility.yml',
     '.mir/convergence.yml',

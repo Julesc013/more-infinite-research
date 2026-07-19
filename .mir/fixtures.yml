@@ -256,16 +256,28 @@ fixtures:
       - legacy-independent-cost-model-to-paired-cost-model-migration
       - exact-2-4-1-candidate-normal-mod-directory-load
 
-  upgrade-2-4-5-to-2-5-0:
+  upgrade-2-4-5-to-2-4-9:
     requires_features: [productivity_family_adoption]
-    assertion_path: fixtures/assert-upgrade-2-4-5-to-2-5-0
+    assertion_path: fixtures/assert-upgrade-2-4-5-to-2-4-9
+    companion_paths: [fixtures/upgrade-reset-probe]
     validates:
       - exact-2-4-5-source-archive
       - native-owner-setting-retention
       - native-owner-technology-level-retention
       - native-owner-current-research-selection-retention
       - native-owner-fractional-progress-retention
-      - exact-2-5-0-candidate-normal-mod-directory-load
+      - external-give-item-technology-researched-before-upgrade
+      - post-factorio-reconciliation-custom-recipe-state-preserved-by-mir
+      - post-factorio-reconciliation-custom-force-effect-preserved-by-mir
+      - valid-planet-space-location-target-retained
+      - missing-space-location-target-pruned
+      - missing-unlock-quality-target-pruned
+      - valid-unlock-quality-target-retained
+      - missing-turret-entity-target-pruned
+      - valid-turret-entity-target-retained
+      - missing-give-item-quality-target-pruned
+      - give-item-quality-aware-effect-identity
+      - exact-2-4-9-candidate-normal-mod-directory-load
 
   competing-productivity-transaction:
     requires_features: [recipe_productivity]

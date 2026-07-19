@@ -34,4 +34,25 @@ $fixture = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot $manifest.runtime_
 foreach ($sentinel in @("hard-safety sentinel", "duplicate materialized effect", "missing prerequisite sentinel", "numeric effect value")) {
   if (-not $fixture.Contains($sentinel)) { throw "Compiler contract fixture is missing mutation sentinel: $sentinel" }
 }
-Write-Host "[ok] MIR compiler contract coverage and mutation sentinels are declared."
+$effectProfilePath = Join-Path $RepoRoot ([string]$manifest.technology_effect_target_profile)
+$effectProfile = Get-Content -Raw -LiteralPath $effectProfilePath | ConvertFrom-Json
+if ([int]$effectProfile.schema -ne 1 -or [string]$effectProfile.factorio_target -ne "2.0.77") {
+  throw "Technology-effect target profile must bind the qualified Factorio 2.0.77 target."
+}
+$effectContracts = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "prototypes\mir\integrity\effect_contracts.lua")
+foreach ($modifier in @($effectProfile.target_bearing_modifiers)) {
+  if (-not $effectContracts.Contains("[`"$([string]$modifier.type)`"]")) {
+    throw "Technology-effect target contract is missing modifier: $($modifier.type)"
+  }
+  foreach ($target in @($modifier.targets)) {
+    if (-not $effectContracts.Contains("field = `"$([string]$target)`"")) {
+      throw "Technology-effect target contract is missing $($modifier.type).$target"
+    }
+  }
+}
+foreach ($required in @("unlock-quality", "turret-attack", "give-item")) {
+  if (-not $fixture.Contains($required)) {
+    throw "Compiler contract fixture is missing technology-effect coverage sentinel: $required"
+  }
+}
+Write-Host "[ok] MIR compiler contracts, mutation sentinels, and Factorio 2.0 technology-effect targets are declared."

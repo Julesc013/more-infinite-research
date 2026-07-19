@@ -1,5 +1,8 @@
 local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 local generated_registry = require("prototypes.mir.domain.facts.generated_technology_registry")
+local effect_contracts = require("prototypes.mir.integrity.effect_contracts")
+local fingerprint = require("prototypes.mir.core.fingerprint")
+local deepcopy = require("prototypes.mir.core.deepcopy")
 
 local S = {}
 
@@ -29,16 +32,81 @@ function S.assert_effects_allowed(effects, context)
 end
 
 local function assert_effect_target_exists(effect, technology_name)
-  if not effect or effect.type ~= "change-recipe-productivity" then return end
-
-  local recipe_name = effect.recipe
-  if type(recipe_name) ~= "string" or not data_raw.prototype("recipe", recipe_name) then
-    error("MIR generated technology "
+  local valid, reason, target = effect_contracts.target_status(effect)
+  if not valid then
+    error("Technology "
       .. tostring(technology_name)
-      .. " references missing recipe "
-      .. tostring(recipe_name)
-      .. ".")
+      .. " has invalid "
+      .. tostring(effect and effect.type)
+      .. " effect target "
+      .. tostring(target)
+      .. " ("
+      .. tostring(reason)
+      .. ").")
   end
+end
+
+local function log_pruned_effect(technology_name, effect, reason, target, owner)
+  if type(log) ~= "function" then return end
+  log("[MIR] pruned dangling technology effect from "
+    .. tostring(technology_name)
+    .. ": owner=" .. tostring(owner)
+    .. " type=" .. tostring(effect and effect.type)
+    .. " target=" .. tostring(target)
+    .. " reason=" .. tostring(reason))
+end
+
+function S.sanitize_effects(effects, technology_name, owner)
+  local kept, removed = {}, {}
+  for effect_index, effect in ipairs(effects or {}) do
+    local valid, reason, target, target_field = effect_contracts.target_status(effect)
+    if valid then
+      table.insert(kept, effect)
+    else
+      table.insert(removed, {
+        original_effect_index = effect_index,
+        type = effect and effect.type,
+        target_field = target_field,
+        target = target,
+        reason = reason,
+        removed_effect_fingerprint = fingerprint.of(effect or {})
+      })
+      log_pruned_effect(technology_name, effect, reason, target, owner or "unknown")
+    end
+  end
+  return kept, removed
+end
+
+function S.sanitize_all_technology_effects()
+  local summary = {
+    schema = 1,
+    pruned_effect_count = 0,
+    affected_technology_count = 0,
+    emptied_technology_count = 0,
+    technologies = {}
+  }
+  local names = {}
+  for name, _ in pairs(data_raw.prototypes("technology")) do table.insert(names, name) end
+  table.sort(names)
+  for _, name in ipairs(names) do
+    local technology = data_raw.technology(name)
+    local original = deepcopy((technology and technology.effects) or {})
+    local kept, removed = S.sanitize_effects(
+      original, name, generated_registry.contains(name) and "generated" or "external")
+    if #removed > 0 then
+      technology.effects = kept
+      summary.pruned_effect_count = summary.pruned_effect_count + #removed
+      summary.affected_technology_count = summary.affected_technology_count + 1
+      if #kept == 0 then summary.emptied_technology_count = summary.emptied_technology_count + 1 end
+      table.insert(summary.technologies, {
+        technology = name,
+        original_effect_count = #original,
+        remaining_effect_count = #kept,
+        removed_effects = removed
+      })
+    end
+  end
+  return summary
 end
 
 function S.register_generated_technology(name)

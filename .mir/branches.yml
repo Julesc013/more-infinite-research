@@ -41,7 +41,7 @@ branches:
       - broad-new-generation
 
   tmp/2.0:
-    purpose: maintained Factorio 2.0 MIR 2.5.0 semantic companion and verification-overhaul backport branch
+    purpose: bounded MIR 2.4.9 Factorio 2.0 stability candidate; MIR 2.5 compiler backport remains planned
     factorio_version: "2.0"
     accepts:
       - platform-compatible-backport
@@ -303,25 +303,26 @@ release_artifacts:
       release_gate: implementation-and-qualification-pending
       publication_status: unreleased
       status: development-candidate
-    mir_2_5_0:
-      version: "2.5.0"
+    mir_2_4_9:
+      version: "2.4.9"
       branch: tmp/2.0
       target_factorio: "2.0"
-      source_anchor: mir_3_2_0
+      source_anchor: mir_2_4_5
+      portable_fix_source_commit: 068b3a88bdb839e1807fe23cc4bf3ae0fb49d1e1
       prior_candidate:
-        source_anchor: mir_3_1_2
-        source_commit: f5c58f5358291c9a65326388c60702dc9878b9d7
+        source_anchor: mir_3_2_0
+        source_commit: fb606d296c933e2597c165c0c03e13afb12878f1
         artifact: dist/more-infinite-research_2.5.0.zip
-        sha256: 0BE57ED4C51DDF08F80AB4CFB2D5762DF2714B17AB26DB58CA9980289350CBFD
-        structured_summary_run_id: 5bbedb9b-cf3c-4f91-ae5a-f6bf274ad172
+        sha256: 9FDF0F9E81A2DCD0F5EE6DA30BEF399D80470E3CC0C6E678FC19AE07433369AF
         status: superseded-unpublished-candidate
       assurance_policy: mir-verification-v4
-      assurance_evidence_schema: 3
+      assurance_evidence_schema: 4
       verification_profile: validation/profiles/factorio-2.0.json
       prior_release: dist/more-infinite-research_2.4.5.zip
-      release_gate: target-backport-and-qualification-pending
+      approved_delta: approved-delta/2.4.5-to-2.4.9.json
+      release_gate: package-source-build-and-external-qualification-pending
       publication_status: unreleased
-      status: development-candidate
+      status: release-candidate-rebuilding
     mir_2_4_0:
       version: "2.4.0"
       branch: legacy

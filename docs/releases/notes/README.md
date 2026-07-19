@@ -5,7 +5,7 @@ applies_to: "all releases"
 audience: player
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-07-12
+last_reviewed: 2026-07-19
 supersedes: []
 superseded_by: []
 ---
@@ -14,7 +14,8 @@ superseded_by: []
 
 Player-facing release summaries are grouped here by MIR version. The root `changelog.txt` remains the authoritative detailed change history.
 
-- [2.5.0](release-notes-2.5.0.md)
+- [2.4.9](release-notes-2.4.9.md)
+- [2.5.0 (planned)](release-notes-2.5.0.md)
 - [2.4.5](release-notes-2.4.5.md)
 - [2.4.0](release-notes-2.4.0.md)
 - [3.0.5](release-notes-3.0.5.md)

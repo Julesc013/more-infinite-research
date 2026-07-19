@@ -1,10 +1,13 @@
 ---------------------------------------------------------------------------------------------------
-Version: 2.5.0
-Date: 2026-07-16
+Version: 2.4.9
+Date: 2026-07-19
 
   Bugfixes:
 
     - Stopped Factorio 2.0 packages from emitting unsupported mod-data prototypes.
+    - Removed an unnecessary global technology-effect reset during configuration changes, preserving unrelated mod state.
+    - Removed dangling unlock-quality and turret-attack effects and invalid optional give-item quality targets.
+    - Distinguished give-item effects for the same item at different quality levels.
 
   Changes:
 
@@ -14,7 +17,8 @@ Date: 2026-07-16
     - Reused trusted passing evidence only when every declared effective input has the same fingerprint.
     - Added explicit REUSE, WAIT, RUN, and INVALID planning with matching-worker adoption and non-cancelling concurrency.
     - Added isolated Factorio scenario workers and one aggregate verification gate for pull requests and release qualification.
-    - Recalculated all fingerprints from the Factorio 2.0 package, binary, dependency contract, test data, and scenarios.
+    - Recalculated verification fingerprints from the Factorio 2.0 package, binary, dependency contract, test data, and scenarios.
+    - Made exact candidate equivalence, paired runtime performance, and package-focused manual review mandatory seal inputs.
     - Preserved stable settings, generated technology IDs, migrations, and runtime-state namespaces from MIR 2.4.5.
 
 ---------------------------------------------------------------------------------------------------

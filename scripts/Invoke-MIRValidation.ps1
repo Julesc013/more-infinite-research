@@ -431,7 +431,9 @@ Invoke-RepoCheck "unsafe pickup reach technology effects are blocked" {
     @{ File = "prototypes\mir\emit\base_extensions.lua"; Text = $baseExtensionsText; Snippet = 'effect_safety.assert_effects_allowed(desired_effects, "base extension " .. key)' },
     @{ File = "prototypes\mir\emit\base_extensions.lua"; Text = $baseExtensionsText; Snippet = 'generated_registry.register(operation.technology_name,' },
     @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'require("prototypes.mir.emit.effect_safety").assert_registered_technology_effects()' },
-    @{ File = "prototypes\mir\emit\effect_safety.lua"; Text = $safetyText; Snippet = 'data_raw.prototype("recipe", recipe_name)' },
+    @{ File = "prototypes\mir\emit\effect_safety.lua"; Text = $safetyText; Snippet = 'effect_contracts.target_status(effect)' },
+    @{ File = "prototypes\mir\integrity\effect_contracts.lua"; Text = (Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\integrity\effect_contracts.lua")); Snippet = '["unlock-quality"]' },
+    @{ File = "prototypes\mir\integrity\effect_contracts.lua"; Text = (Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\integrity\effect_contracts.lua")); Snippet = '["turret-attack"]' },
     @{ File = "prototypes\mir\emit\technology_graph_safety.lua"; Text = $graphSafetyText; Snippet = 'generated_registry.sorted_names()' },
     @{ File = "prototypes\mir\emit\technology_graph_safety.lua"; Text = $graphSafetyText; Snippet = 'technology.enabled == false' },
     @{ File = "prototypes\mir\emit\technology_graph_safety.lua"; Text = $graphSafetyText; Snippet = 'science.pack_production_status(pack_name)' },
@@ -3293,7 +3295,7 @@ if ($selectionActive -and -not $checkpointActive) {
               -InitialNativeOwnerSettingsProfile "default" `
               -ChangedNativeOwnerSettingsProfile "combined" `
               -EnableSpaceAge
-            Assert-LogContains -Expected "Reset technology effects for productivity family adoption signature change" -Context $declaration.name
+            Assert-LogContains -Expected "Preserved technology effects without a force-wide reset for productivity family adoption signature change" -Context $declaration.name
             Assert-LogContains -Expected "Preserved current research progress for native owner low-density-structure-productivity" -Context $declaration.name
             Assert-LogContains -Expected "[mir-fixture] native-owner progress configuration-change proof complete" -Context $declaration.name
             Assert-LogContains -Expected "schema=2|stream=research_rocket_fuel|owner=rocket-fuel-productivity|operation=configure_native_owner|configured=cost_model,effect_per_level,max_level,research_time|effects=0|output=" -Context $declaration.name
@@ -3303,7 +3305,7 @@ if ($selectionActive -and -not $checkpointActive) {
               -ScenarioName $declaration.name `
               -ChangedFixtureNames @("mir-fixture-vanilla-family-adoption-recipes") `
               -EnableSpaceAge
-            Assert-LogContains -Expected "Reset technology effects for productivity family adoption signature change" -Context $declaration.name
+            Assert-LogContains -Expected "Preserved technology effects without a force-wide reset for productivity family adoption signature change" -Context $declaration.name
             Assert-LogContains -Expected "schema=2|stream=research_rocket_fuel|owner=rocket-fuel-productivity|operation=adopt_native_owner_effects|configured=|effects=1|output=" -Context $declaration.name
           }
           "space-age-scripted-runtime-lifecycle" {
@@ -4130,7 +4132,7 @@ Invoke-RuntimeConfigurationChangeScenario -ScenarioName "space-age-vanilla-famil
     "mir-fixture-vanilla-family-adoption-recipes"
   ) `
   -EnableSpaceAge
-Assert-LogContains -Expected "Reset technology effects for productivity family adoption signature change" -Context "Space Age vanilla family adoption configuration-change reset scenario"
+Assert-LogContains -Expected "Preserved technology effects without a force-wide reset for productivity family adoption signature change" -Context "Space Age vanilla family adoption configuration-change preservation scenario"
 Assert-LogContains -Expected "schema=2|stream=research_rocket_fuel|owner=rocket-fuel-productivity|operation=adopt_native_owner_effects|configured=|effects=1|output=" -Context "Space Age vanilla family adoption configuration-change signature scenario"
 
 Invoke-RuntimeScenario -ScenarioName "space-age-vanilla-family-owner-prepatched" -EnabledFixtureNames @(
@@ -4193,7 +4195,7 @@ if ($StartAtScenario -ne "space-age-vanilla-family-mixed-owner") {
     -InitialNativeOwnerSettingsProfile "default" `
     -ChangedNativeOwnerSettingsProfile "combined" `
     -EnableSpaceAge
-  Assert-LogContains -Expected "Reset technology effects for productivity family adoption signature change" -Context "space-age-native-owner-settings-config-change"
+  Assert-LogContains -Expected "Preserved technology effects without a force-wide reset for productivity family adoption signature change" -Context "space-age-native-owner-settings-config-change"
   Assert-LogContains -Expected "Preserved current research progress for native owner low-density-structure-productivity" -Context "space-age-native-owner-settings-config-change"
   Assert-LogContains -Expected "[mir-fixture] native-owner progress configuration-change proof complete" -Context "space-age-native-owner-settings-config-change"
   Assert-LogContains -Expected "schema=2|stream=research_rocket_fuel|owner=rocket-fuel-productivity|operation=configure_native_owner|configured=cost_model,effect_per_level,max_level,research_time|effects=0|output=" -Context "space-age-native-owner-settings-config-change"

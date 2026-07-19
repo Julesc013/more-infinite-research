@@ -8,6 +8,7 @@ $repo = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 $configPath = Join-Path $repo ".mir\assurance.json"
 $catalogPath = Join-Path $repo "validation\tests.yml"
 $domainsPath = Join-Path $repo "validation\domains.yml"
+$trustPath = Join-Path $repo "validation\trust.json"
 $impactPath = Join-Path $repo ".mir\test-impact.yml"
 $targetsPath = Join-Path $repo ".mir\targets.json"
 $scenarioRegistryPath = Join-Path $repo "fixtures\compat-matrix\expected-scenarios.json"
@@ -15,9 +16,9 @@ $artifactRoot = Join-Path $repo "artifacts\assurance"
 $evidenceRoot = Join-Path $artifactRoot "evidence"
 $buildRoot = Join-Path $artifactRoot "builds"
 $outRoot = Join-Path $repo "out"
-$evidenceSchema = 3
+$evidenceSchema = 4
 $buildReceiptSchema = 2
-$assuranceRunnerVersion = "3"
+$assuranceRunnerVersion = "4"
 
 . (Join-Path $PSScriptRoot "MIRAssurance\Core.ps1")
 . (Join-Path $PSScriptRoot "MIRAssurance\Domains.ps1")
@@ -44,7 +45,6 @@ each stable test instance. Passing evidence is reused only when its exact effect
 input fingerprint and result digest still match trusted producer policy.
 "@
 }
-
 $context = Get-MIRAssuranceContext
 $command = if ($Args.Count -gt 0) { [string]$Args[0] } else { "help" }
 switch ($command) {

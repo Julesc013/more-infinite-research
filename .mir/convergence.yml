@@ -1,16 +1,16 @@
 schema: 1
 
 release:
-  version: "2.5.0"
+  version: "2.4.9"
   branch: tmp/2.0
   factorio_version: "2.0"
   baseline_commit: 7e4b6c530cfcc5b2e1429c4e9f4ccb0d6d3b42a4
   baseline_tag: "2.4.5"
-  canonical_source_version: "3.2.0"
-  canonical_source_commit: e6d43ae18991ccc6abe8eb215ee2b684376a21fe
-  canonical_package_source_commit: bd828d1d21a1038abbc9f0ecbf2c1036e744180d
+  portable_fix_source_version: "3.2.0"
+  portable_fix_source_commit: 068b3a88bdb839e1807fe23cc4bf3ae0fb49d1e1
+  baseline_package_source_commit: 47bcc80c8a70b41dbbb4f8d80b2b9433d0a10d3f
   source_lock: .mir/backport-source-lock.json
-  objective: target-port-behavioral-subset
+  objective: bounded-correctness-and-contract-modernization
   public_contract_change: patch-compatible
 
 superseded_candidates:
@@ -120,7 +120,7 @@ superseded_candidates:
     status: superseded-unpublished-candidate
 
 candidate:
-  artifact: dist/more-infinite-research_2.5.0.zip
+  artifact: dist/more-infinite-research_2.4.9.zip
   source_commit: pending
   automated_gate: pending
   manual_gate: pending
