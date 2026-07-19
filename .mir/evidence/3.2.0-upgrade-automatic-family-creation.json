@@ -1,0 +1,34 @@
+{
+  "schema": 2,
+  "status": "passed",
+  "generated_at": "2026-07-19T07:28:59.7584338Z",
+  "git_commit": "068b3a88bdb839e1807fe23cc4bf3ae0fb49d1e1",
+  "archetype": "automatic-family-creation",
+  "factorio_binary_version": "2.1.10.86940",
+  "factorio_binary_sha256": "DA4CA713FADBA1728904A2B47C2D73D2E07E8EB3AA2FAEED9AEE0FA6B417BAC3",
+  "from": {
+    "version": "3.1.9",
+    "path": "dist\\more-infinite-research_3.1.9.zip",
+    "sha256": "D77B3A78DA40CD4FDD4C829A01B5030E59FB593F3387124EF5C438F6A9E8DFCD"
+  },
+  "to": {
+    "version": "3.2.0",
+    "path": "dist\\more-infinite-research_3.2.0.zip",
+    "sha256": "32C6FAF8FCB224E3C3A93398B79C63D6CED91C0A86429524589AB3E26935465E"
+  },
+  "source_only_fixtures": [],
+  "assertions": [
+    "startup-profile-retained",
+    "technology-level-retained",
+    "current-research-retained",
+    "fractional-research-progress-retained",
+    "fixture-storage-retained",
+    "exact-candidate-normal-mod-directory-load",
+    "automatic-generated-family-retained",
+    "automatic-recipe-target-retained"
+  ],
+  "create_log": "3.2.0-upgrade-automatic-family-creation-from-3.1.9-create.txt",
+  "create_log_sha256": "94796F6EB6639E3DB5CDB064BFB92A1C3A16A984188955E11D542E3E3C86D13F",
+  "load_log": "3.2.0-upgrade-automatic-family-creation-from-3.1.9-load.txt",
+  "load_log_sha256": "4AA057D9321A00CE72E6C79923E221F93A28E07A58BB0190EC844A650618B89A"
+}

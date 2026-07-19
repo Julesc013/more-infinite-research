@@ -303,13 +303,17 @@ release_artifacts:
       archive: dist/more-infinite-research_3.2.0.zip
       archive_bytes: 446018
       archive_sha256: 32C6FAF8FCB224E3C3A93398B79C63D6CED91C0A86429524589AB3E26935465E
-      superseded_local_qualification_evidence: .mir/evidence/3.2.0-assurance-qualification.json
-      approved_delta_gate: pending-exact-replacement-candidate
+      package_source_commit: 068b3a88bdb839e1807fe23cc4bf3ae0fb49d1e1
+      superseded_local_qualification_file_sha256: 480CC078092536453CEC53BBD28C4E68CF249FD4E217B25F9AF9B039B5BE020F
+      approved_delta_evidence: approved-delta/3.1.9-to-3.2.0.json
+      approved_delta_gate: passed-local-factorio-2.1.10
+      upgrade_evidence: .mir/evidence/3.2.0-upgrade-proof.json
+      upgrade_gate: passed-local-factorio-2.1.10
       runtime_performance_gate: pending-qualified-3.1.9-baseline
       manual_attestation_gate: pending-exact-replacement-candidate
-      release_gate: rebuilding-after-package-visible-change
+      release_gate: awaiting-external-performance-manual-and-protected-qualification
       publication_status: unreleased
-      status: replacement-candidate-awaiting-requalification
+      status: replacement-candidate-awaiting-external-qualification
     mir_2_5_0:
       version: "2.5.0"
       branch: tmp/2.0

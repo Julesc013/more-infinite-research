@@ -9,14 +9,14 @@
   },
   "current": {
     "version": "3.2.0",
-    "source_commit": "c87199cb8053ceaa838608c1df0849611ba01540",
-    "archive_sha256": "FDC6AFA183AC384A72D1B2C6A5E15E1816C57675D56B4988AE4384E230E1FB78",
-    "package_content_sha256": "F1019A287967DABA0BFD131243CB90E721F43A2BF18B508E70E78516C9C5EFAC"
+    "source_commit": "068b3a88bdb839e1807fe23cc4bf3ae0fb49d1e1",
+    "archive_sha256": "32C6FAF8FCB224E3C3A93398B79C63D6CED91C0A86429524589AB3E26935465E",
+    "package_content_sha256": "D7F7B9622BB9A4BA0BE0C459B5BE09CECA1D00F0E4FB6BFDCC70F1B952D45A07"
   },
   "exporter": {
     "fixture": "fixtures/export-approved-delta",
     "script": "scripts/Export-MIRApprovedDelta.ps1",
-    "producer_sha256": "210E1892B90925B1311987310350BAFDCEA233553D346533ABE3FE59805999CA",
+    "producer_sha256": "80B5426D4DE6ADFF02DAAB35F98CD1E8F536D0557325857A462DE871EC75EFF5",
     "factorio_binary_version": "2.1.10.86940",
     "scenarios": [
       "approved-delta-automatic-family-controls",
@@ -97,7 +97,7 @@
     {
       "field": "package.archive_sha256",
       "before": "D77B3A78DA40CD4FDD4C829A01B5030E59FB593F3387124EF5C438F6A9E8DFCD",
-      "after": "FDC6AFA183AC384A72D1B2C6A5E15E1816C57675D56B4988AE4384E230E1FB78",
+      "after": "32C6FAF8FCB224E3C3A93398B79C63D6CED91C0A86429524589AB3E26935465E",
       "reason": "Exact package identity and source fingerprint changed between the sealed 3.1.9 baseline and the 3.2 compiler branch.",
       "intentional": true,
       "migration_impact": "None by itself; semantic runtime and prototype contracts are compared separately.",
@@ -110,7 +110,20 @@
     {
       "field": "package.package_content_sha256",
       "before": "1D905CD5F394C3ABFC2ABEFFEB0249AC9D8D5C5FC4ADA0F5A5BA368B17548229",
-      "after": "F1019A287967DABA0BFD131243CB90E721F43A2BF18B508E70E78516C9C5EFAC",
+      "after": "D7F7B9622BB9A4BA0BE0C459B5BE09CECA1D00F0E4FB6BFDCC70F1B952D45A07",
+      "reason": "Exact package identity and source fingerprint changed between the sealed 3.1.9 baseline and the 3.2 compiler branch.",
+      "intentional": true,
+      "migration_impact": "None by itself; semantic runtime and prototype contracts are compared separately.",
+      "required_evidence": [
+        "sealed 3.1.9 archive hash",
+        "deterministic current archive hash",
+        "static package contract export"
+      ]
+    },
+    {
+      "field": "package.runtime_source_fingerprints.prototypes/mir/runtime/productivity_family_adoption.lua",
+      "before": "13C00B21862357F0F5AE6434328F2AA8692326C131858E005F4F2C048CA8D20B",
+      "after": "54AA9DA1FA84ED4E75E5BA304D3D419BDFB04E2C264E20F74796B18498481F78",
       "reason": "Exact package identity and source fingerprint changed between the sealed 3.1.9 baseline and the 3.2 compiler branch.",
       "intentional": true,
       "migration_impact": "None by itself; semantic runtime and prototype contracts are compared separately.",
@@ -1696,8 +1709,8 @@
     }
   ],
   "summary": {
-    "difference_count": 25,
-    "intentional_count": 25,
+    "difference_count": 26,
+    "intentional_count": 26,
     "unapproved_count": 0,
     "status": "approved"
   }

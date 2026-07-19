@@ -163,6 +163,7 @@ $status = Get-MIRRequiredCandidateField -Fields $candidate -Name "status"
 $allowedStatuses = @(
   "rebuilding-after-package-visible-change",
   "requalifying-after-validation-harness-change",
+  "release-candidate-awaiting-external-qualification",
   "release-candidate-awaiting-manual-review",
   "release-candidate-accepted",
   "published"
@@ -211,6 +212,103 @@ if ($status -eq "requalifying-after-validation-harness-change") {
     throw "Package-visible working-tree changes are not allowed during harness-only requalification."
   }
   Write-Host "[ok] MIR release evidence is explicitly requalifying after a validation-harness change; stale evidence cannot be promoted."
+  exit 0
+}
+
+if ($status -eq "release-candidate-awaiting-external-qualification") {
+  if ((Get-MIRRequiredCandidateField -Fields $candidate -Name "source_commit") -ne "pending") {
+    throw "A candidate awaiting external qualification must use source_commit: pending until protected evidence is committed."
+  }
+  $packageSourceCommit = Get-MIRRequiredCandidateField -Fields $candidate -Name "package_source_commit"
+  if ($packageSourceCommit -notmatch '^[0-9a-f]{40}$') {
+    throw "A candidate awaiting external qualification must record a full package_source_commit."
+  }
+  & git -C $repo cat-file -e "$packageSourceCommit^{commit}" 2>$null
+  if ($LASTEXITCODE -ne 0) {
+    throw "Candidate package source commit is unavailable: $packageSourceCommit"
+  }
+  if ((Get-MIRRequiredCandidateField -Fields $candidate -Name "automated_gate") -ne "pending-external-qualification") {
+    throw "A candidate awaiting external qualification must use automated_gate: pending-external-qualification."
+  }
+  if ((Get-MIRRequiredCandidateField -Fields $candidate -Name "manual_gate") -ne "pending") {
+    throw "A candidate awaiting external qualification must use manual_gate: pending."
+  }
+  $allowedFields = @(
+    "artifact",
+    "source_commit",
+    "package_source_commit",
+    "sha256",
+    "package_content_sha256",
+    "approved_delta_evidence_path",
+    "approved_delta_sha256",
+    "upgrade_evidence_path",
+    "upgrade_evidence_sha256",
+    "automated_gate",
+    "manual_gate",
+    "status"
+  )
+  $staleFields = @($candidate.Keys | Where-Object { $_ -notin $allowedFields })
+  if ($staleFields.Count -gt 0) {
+    throw "A candidate awaiting external qualification contains unsupported fields: $($staleFields -join ', ')."
+  }
+  if (Test-MIRPackageSourceGitDirty -RepoRoot $repo) {
+    throw "Package-visible working-tree changes make the externally awaiting candidate stale."
+  }
+  $packageRoots = @(Get-MIRPackageSourceRoots)
+  $changedPackagePaths = @(& git -C $repo diff --name-only $packageSourceCommit HEAD -- @packageRoots)
+  if ($LASTEXITCODE -ne 0) {
+    throw "Unable to compare the candidate package source commit with HEAD."
+  }
+  if ($changedPackagePaths.Count -gt 0) {
+    throw "Package-visible paths changed after the candidate package source commit: $($changedPackagePaths -join ', ')"
+  }
+
+  $artifactRelative = Get-MIRRequiredCandidateField -Fields $candidate -Name "artifact"
+  $artifactPath = Join-Path $repo $artifactRelative
+  if (-not (Test-Path -LiteralPath $artifactPath -PathType Leaf)) {
+    throw "Candidate artifact is missing: $artifactRelative"
+  }
+  $archiveSha256 = Get-MIRFileSha256 -Path $artifactPath
+  $packageContentSha256 = Get-MIRZipContentFingerprint -Path $artifactPath
+  if ($archiveSha256 -ne (Get-MIRRequiredCandidateField -Fields $candidate -Name "sha256") -or
+      $packageContentSha256 -ne (Get-MIRRequiredCandidateField -Fields $candidate -Name "package_content_sha256")) {
+    throw "Candidate artifact bytes or normalized content changed after local qualification."
+  }
+
+  $approvedDeltaRelative = Get-MIRRequiredCandidateField -Fields $candidate -Name "approved_delta_evidence_path"
+  $approvedDeltaPath = Join-Path $repo $approvedDeltaRelative
+  if (-not (Test-Path -LiteralPath $approvedDeltaPath -PathType Leaf) -or
+      (Get-MIRFileSha256 -Path $approvedDeltaPath) -ne (Get-MIRRequiredCandidateField -Fields $candidate -Name "approved_delta_sha256")) {
+    throw "Approved-delta evidence is missing or its recorded hash is stale."
+  }
+  $approvedDelta = Get-Content -Raw -LiteralPath $approvedDeltaPath | ConvertFrom-Json
+  if ([int]$approvedDelta.schema -ne 1 -or [string]$approvedDelta.kind -ne "mir-approved-delta" -or
+      [string]$approvedDelta.summary.status -ne "approved" -or [int]$approvedDelta.summary.unapproved_count -ne 0 -or
+      [string]$approvedDelta.current.source_commit -ne $packageSourceCommit -or
+      [string]$approvedDelta.current.archive_sha256 -ne $archiveSha256 -or
+      [string]$approvedDelta.current.package_content_sha256 -ne $packageContentSha256) {
+    throw "Approved-delta evidence is not an exact passing binding for the candidate."
+  }
+
+  $upgradeRelative = Get-MIRRequiredCandidateField -Fields $candidate -Name "upgrade_evidence_path"
+  $upgradePath = Join-Path $repo $upgradeRelative
+  if (-not (Test-Path -LiteralPath $upgradePath -PathType Leaf) -or
+      (Get-MIRFileSha256 -Path $upgradePath) -ne (Get-MIRRequiredCandidateField -Fields $candidate -Name "upgrade_evidence_sha256")) {
+    throw "Upgrade-matrix evidence is missing or its recorded hash is stale."
+  }
+  $upgrade = Get-Content -Raw -LiteralPath $upgradePath | ConvertFrom-Json
+  $requiredArchetypes = @("base-default", "space-age-native-owner", "automatic-family-creation", "base-continuations", "mod-set-configuration-change")
+  $declaredArchetypes = @($upgrade.required_archetypes | ForEach-Object { [string]$_ } | Sort-Object -Unique)
+  $passingArchetypes = @($upgrade.rows | Where-Object status -eq "passed" | ForEach-Object { [string]$_.id } | Sort-Object -Unique)
+  if ([int]$upgrade.schema -ne 1 -or [string]$upgrade.kind -ne "mir-upgrade-matrix" -or
+      [string]$upgrade.status -ne "passed" -or [string]$upgrade.source_commit -ne $packageSourceCommit -or
+      [string]$upgrade.candidate.archive_sha256 -ne $archiveSha256 -or
+      @(Compare-Object $requiredArchetypes $declaredArchetypes).Count -ne 0 -or
+      @(Compare-Object $requiredArchetypes $passingArchetypes).Count -ne 0) {
+    throw "Upgrade-matrix evidence is not an exact five-archetype passing binding for the candidate."
+  }
+
+  Write-Host "[ok] MIR candidate bytes, approved delta, and upgrade matrix are fixed while external qualification remains pending."
   exit 0
 }
 

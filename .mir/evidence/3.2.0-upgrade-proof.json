@@ -1,0 +1,107 @@
+{
+  "schema": 1,
+  "kind": "mir-upgrade-matrix",
+  "status": "passed",
+  "generated_at": "2026-07-19T07:29:28.8938133Z",
+  "source_commit": "068b3a88bdb839e1807fe23cc4bf3ae0fb49d1e1",
+  "factorio": {
+    "version": "2.1.10.86940",
+    "binary_sha256": "DA4CA713FADBA1728904A2B47C2D73D2E07E8EB3AA2FAEED9AEE0FA6B417BAC3"
+  },
+  "baseline": {
+    "version": "3.1.9",
+    "archive": "more-infinite-research_3.1.9.zip",
+    "archive_sha256": "D77B3A78DA40CD4FDD4C829A01B5030E59FB593F3387124EF5C438F6A9E8DFCD"
+  },
+  "candidate": {
+    "version": "3.2.0",
+    "archive": "more-infinite-research_3.2.0.zip",
+    "archive_sha256": "32C6FAF8FCB224E3C3A93398B79C63D6CED91C0A86429524589AB3E26935465E"
+  },
+  "required_archetypes": [
+    "base-default",
+    "space-age-native-owner",
+    "automatic-family-creation",
+    "base-continuations",
+    "mod-set-configuration-change"
+  ],
+  "rows": [
+    {
+      "id": "base-default",
+      "status": "passed",
+      "result": ".mir/evidence/3.2.0-upgrade-base-default.json",
+      "result_sha256": "929DBFDA8DA75628386945BC4ABB85720A460D6FFC1A9DB5E001A7980C4F650C",
+      "assertions": [
+        "startup-profile-retained",
+        "technology-level-retained",
+        "current-research-retained",
+        "fractional-research-progress-retained",
+        "fixture-storage-retained",
+        "exact-candidate-normal-mod-directory-load",
+        "base-only-mod-set-retained"
+      ]
+    },
+    {
+      "id": "space-age-native-owner",
+      "status": "passed",
+      "result": ".mir/evidence/3.2.0-upgrade-space-age-native-owner.json",
+      "result_sha256": "757A099BE323636E38B1A2D1C415B4BAD1AC90E260BC57EDE7468148F35D80DD",
+      "assertions": [
+        "startup-profile-retained",
+        "technology-level-retained",
+        "current-research-retained",
+        "fractional-research-progress-retained",
+        "fixture-storage-retained",
+        "exact-candidate-normal-mod-directory-load",
+        "space-age-native-owner-retained"
+      ]
+    },
+    {
+      "id": "automatic-family-creation",
+      "status": "passed",
+      "result": ".mir/evidence/3.2.0-upgrade-automatic-family-creation.json",
+      "result_sha256": "85F6E5B342E80095581D2CBE2EFD0077966D39D2E093A6602BDC3882F146E91A",
+      "assertions": [
+        "startup-profile-retained",
+        "technology-level-retained",
+        "current-research-retained",
+        "fractional-research-progress-retained",
+        "fixture-storage-retained",
+        "exact-candidate-normal-mod-directory-load",
+        "automatic-generated-family-retained",
+        "automatic-recipe-target-retained"
+      ]
+    },
+    {
+      "id": "base-continuations",
+      "status": "passed",
+      "result": ".mir/evidence/3.2.0-upgrade-base-continuations.json",
+      "result_sha256": "9D1C83B99925048D85E596E8C9D84B00B4D38CDB6FB36EF94D3F000F836A279F",
+      "assertions": [
+        "startup-profile-retained",
+        "technology-level-retained",
+        "current-research-retained",
+        "fractional-research-progress-retained",
+        "fixture-storage-retained",
+        "exact-candidate-normal-mod-directory-load",
+        "base-continuation-retained"
+      ]
+    },
+    {
+      "id": "mod-set-configuration-change",
+      "status": "passed",
+      "result": ".mir/evidence/3.2.0-upgrade-mod-set-configuration-change.json",
+      "result_sha256": "9B09039821CC92CD2A327568E13CFDE88E6B3FAF75713AF29A5344AF11C6703B",
+      "assertions": [
+        "startup-profile-retained",
+        "technology-level-retained",
+        "current-research-retained",
+        "fractional-research-progress-retained",
+        "fixture-storage-retained",
+        "exact-candidate-normal-mod-directory-load",
+        "source-only-mod-removed",
+        "removed-recipe-target-sanitized"
+      ]
+    }
+  ]
+}

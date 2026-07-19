@@ -148,9 +148,16 @@ superseded_candidates:
 candidate:
   artifact: dist/more-infinite-research_3.2.0.zip
   source_commit: pending
-  automated_gate: pending
+  package_source_commit: 068b3a88bdb839e1807fe23cc4bf3ae0fb49d1e1
+  sha256: 32C6FAF8FCB224E3C3A93398B79C63D6CED91C0A86429524589AB3E26935465E
+  package_content_sha256: D7F7B9622BB9A4BA0BE0C459B5BE09CECA1D00F0E4FB6BFDCC70F1B952D45A07
+  approved_delta_evidence_path: approved-delta/3.1.9-to-3.2.0.json
+  approved_delta_sha256: DD94E8CB0959641F3736155CB5B1B34203077C026A313038E56366E9F69B5EDF
+  upgrade_evidence_path: .mir/evidence/3.2.0-upgrade-proof.json
+  upgrade_evidence_sha256: 3E7EF69536B03C341A47056353DAE093649FA93C093F43BB735B1BF3F34CC0B7
+  automated_gate: pending-external-qualification
   manual_gate: pending
-  status: rebuilding-after-package-visible-change
+  status: release-candidate-awaiting-external-qualification
 
 rules:
   - dev-remains-the-canonical-modern-implementation

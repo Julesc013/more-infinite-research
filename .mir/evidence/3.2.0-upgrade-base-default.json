@@ -1,0 +1,33 @@
+{
+  "schema": 2,
+  "status": "passed",
+  "generated_at": "2026-07-19T07:28:19.6906198Z",
+  "git_commit": "068b3a88bdb839e1807fe23cc4bf3ae0fb49d1e1",
+  "archetype": "base-default",
+  "factorio_binary_version": "2.1.10.86940",
+  "factorio_binary_sha256": "DA4CA713FADBA1728904A2B47C2D73D2E07E8EB3AA2FAEED9AEE0FA6B417BAC3",
+  "from": {
+    "version": "3.1.9",
+    "path": "dist\\more-infinite-research_3.1.9.zip",
+    "sha256": "D77B3A78DA40CD4FDD4C829A01B5030E59FB593F3387124EF5C438F6A9E8DFCD"
+  },
+  "to": {
+    "version": "3.2.0",
+    "path": "dist\\more-infinite-research_3.2.0.zip",
+    "sha256": "32C6FAF8FCB224E3C3A93398B79C63D6CED91C0A86429524589AB3E26935465E"
+  },
+  "source_only_fixtures": [],
+  "assertions": [
+    "startup-profile-retained",
+    "technology-level-retained",
+    "current-research-retained",
+    "fractional-research-progress-retained",
+    "fixture-storage-retained",
+    "exact-candidate-normal-mod-directory-load",
+    "base-only-mod-set-retained"
+  ],
+  "create_log": "3.2.0-upgrade-base-default-from-3.1.9-create.txt",
+  "create_log_sha256": "9EE21863F408E81AECD72BB65C8C41B9335229886EB246C4DEB2B466B40F6ABA",
+  "load_log": "3.2.0-upgrade-base-default-from-3.1.9-load.txt",
+  "load_log_sha256": "5B70FCEC8B3C5DE7D3B27618CBF2E4BDC15CA7DE483D8D8F30B912A104F9A732"
+}
