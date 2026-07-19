@@ -3,59 +3,86 @@
   "kind": "mir-local-automated-qualification",
   "release": "2.4.9",
   "target": "2.0",
-  "status": "passed-local-scope",
+  "status": "automated-runtime-passed-release-gates-pending",
   "release_eligible": false,
-  "package_source_commit": "7619485699ac68a2491931aa4242efb146451694",
-  "local_evidence_commit": "5e4a440cf9c64d7e308242a717102bbd038653fd",
+  "package_source_commit": "1d7e73bd71b6ad00dc297081363897637adab324",
+  "local_evidence_source_commit": "2e98d239b974723da8dcaec57ef6bf68156dc66d",
   "candidate": {
     "archive": "dist/more-infinite-research_2.4.9.zip",
-    "archive_sha256": "B81C4DAF1E0B25CEFBB5D39DA61955BE2EF9C8B82F1259C0344E3588A23E1A8C",
-    "package_content_sha256": "B26DCF015B3CDD10DB649E56D904BA69C211888EAE0270A2546F9584449E18DA"
+    "archive_bytes": 892183,
+    "archive_sha256": "52B93336AB24FAF2E626835EAF971310E6D919A99083994B6F777F45CEBCB162",
+    "package_content_sha256": "6792B8C47E314692E6D8CA6DD73C0D09C784A46AED4171E007616E36B0CA43C4"
   },
   "factorio": {
     "version": "2.0.77.84539",
     "binary_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
   },
   "plan": {
-    "path": "out/verification-plan-2.4.9-final-stable.json",
-    "artifact_sha256": "FD8A852BD6EEEDC444CDD6EC0D8AB88380405AA76D19F44573C6C42E904EC094",
-    "plan_material_sha256": "78686C511440B4D04C08BD6A4557D7C96FAE4CC2CB85AE8F35372335686BE492",
-    "required_test_set_sha256": "5143AA5A66C7CF0CAE256DE0D5601E023417273CA1FF046E85948EEED5EF9A7B",
-    "expected_test_count": 107
+    "path": "out/verification-plan-backport-2.4.9-final.json",
+    "artifact_sha256": "EBAFBAD01714BE00EF4DD230ACBF83256CF6A198809153665045FD53914B6584",
+    "plan_material_sha256": "E889456FFBF63362B52AD665A630764B5069B2DAEE66A5B59F77474B8CACD960",
+    "required_test_set_sha256": "D31D11501DAB2D9B8923EC95C120C59B116E0126D54306163220A89DE881EEAB",
+    "candidate_descriptor_sha256": "637DF39B248B3BEC57A8D6586709AA8921050397E74605C0798A0F68FC2330FD",
+    "validation_harness_sha256": "E03BED57DE4677C75EAB086395A8A64739A057D729AAF5C28DE14C4EE323A58E",
+    "expected_test_count": 106
+  },
+  "aggregate": {
+    "path": "artifacts/assurance/backport-2.4.9-local-verify-summary.json",
+    "sha256": "AF9FA8183C1E1551121CA42B4AC2F7630AC6F2F02016A1699A1290ED17B95763",
+    "status": "stopped-at-missing-performance-evidence",
+    "passed": 104,
+    "failed": 1,
+    "not_executed": 1
   },
   "checks": {
     "static_and_deterministic": {
       "status": "passed",
       "candidate_rebuild": "byte-identical"
     },
+    "localization": {
+      "status": "passed",
+      "locale_count": 50,
+      "value_count": 21200
+    },
     "full_runtime": {
       "status": "passed",
-      "summary": "artifacts/validation/2.4.9-full-runtime-final-clean.json",
-      "summary_sha256": "EA846A7208FC43BE5AA9B97D2F691C68B07D3AEAE7F0980329C740CEF4AA9D50",
-      "run_id": "c88e01f7-768d-4947-8a49-dc120933ae57",
-      "passed_scenarios": 94,
+      "scenario_count": 91,
+      "passed_scenarios": 91,
       "failed_scenarios": 0,
-      "duration_seconds": 913.626,
-      "validation_harness_sha256": "3CE6019B2B4E6D5760A5603B0ABAD9F93675E878599EB4C51E79D11CE1DA0379"
+      "duration_seconds": 1043.904
     },
     "exact_upgrade": {
       "status": "passed",
       "summary": "artifacts/assurance/2.4.9-upgrade-proof.json",
-      "summary_sha256": "F2B8594B53A949038CB13A049DFDF9694E6136F3AC1EC74E53FCBD605FAD16DD",
+      "summary_sha256": "229B9C8F2EC745984B3908F74F06286F8866AEC04B28EEB127E40405B9F4933B",
       "baseline_archive_sha256": "7649824B72247AA38F05661422DFDEE7C729B21CC73A0A35D2455443B45D39F8",
       "assertion_count": 8
     },
     "approved_delta": {
       "status": "passed",
       "artifact": "approved-delta/2.4.5-to-2.4.9.json",
-      "artifact_sha256": "093268DC089E6B4DD798344CFA1D7B18E2C7CB810349C4AA521BD4F17EA3C09F",
-      "declared_package_paths": 12,
+      "artifact_sha256": "64686B658E8BDBD262F9E100BEA7E637B8744F57CA93431CE265A150237C0BDC",
+      "declared_package_paths": 61,
       "unapproved_paths": 0
+    },
+    "targeted_ecosystem": {
+      "status": "passed",
+      "scope": "representative-local-scenario",
+      "summary": "artifacts/release-targeted-20260719-232430/release-targeted-summary.json",
+      "summary_sha256": "BF22EBC507140A473C30CD3003D54CF4643D279180DD1F1EA42E6030E9945CD5"
+    },
+    "runtime_performance": {
+      "status": "missing-required-evidence",
+      "required_path": ".mir/evidence/2.4.9-performance-regression.json"
+    },
+    "manual_review": {
+      "status": "missing-required-attestation",
+      "required_path": ".mir/evidence/2.4.9-manual-review-attestation.json"
     }
   },
   "remaining_release_blockers": [
     "paired 2.4.5-to-2.4.9 runtime performance evidence for all six governed lanes",
-    "exact medium and large ecosystem closure evidence",
+    "exact medium and large ecosystem closure evidence beyond the passing representative targeted scenario",
     "maintainer-authored schema-2 package review attestation",
     "protected full qualification and candidate seal"
   ]

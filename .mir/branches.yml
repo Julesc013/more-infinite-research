@@ -326,10 +326,10 @@ release_artifacts:
       verification_profile: validation/profiles/factorio-2.0.json
       prior_release: dist/more-infinite-research_2.4.5.zip
       approved_delta: approved-delta/2.4.5-to-2.4.9.json
-      approved_delta_gate: superseded-by-localization-complete-candidate
-      upgrade_gate: superseded-by-localization-complete-candidate
-      locale_gate: pending-exact-candidate-validation
-      local_automated_gate: pending-regeneration
+      approved_delta_gate: passed-local-exact-candidate
+      upgrade_gate: passed-local-factorio-2.0.77
+      locale_gate: passed-local-50-locales-21200-values
+      local_automated_gate: passed-static-91-runtime-upgrade-and-targeted-ecosystem
       release_gate: performance-manual-ecosystem-and-protected-qualification-pending
       publication_status: unreleased
       status: release-candidate-awaiting-external-qualification

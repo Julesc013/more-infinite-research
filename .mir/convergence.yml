@@ -125,10 +125,10 @@ candidate:
   sha256: 52B93336AB24FAF2E626835EAF971310E6D919A99083994B6F777F45CEBCB162
   package_content_sha256: 6792B8C47E314692E6D8CA6DD73C0D09C784A46AED4171E007616E36B0CA43C4
   approved_delta: approved-delta/2.4.5-to-2.4.9.json
-  approved_delta_gate: superseded-by-localization-complete-candidate
-  upgrade_gate: superseded-by-localization-complete-candidate
-  locale_gate: pending-exact-candidate-validation
-  local_automated_gate: pending-clean-full-runtime
+  approved_delta_gate: passed-local-exact-candidate
+  upgrade_gate: passed-local-factorio-2.0.77
+  locale_gate: passed-local-50-locales-21200-values
+  local_automated_gate: passed-static-runtime-upgrade
   protected_automated_gate: pending
   manual_gate: pending
   status: awaiting-performance-manual-ecosystem-and-protected-qualification
