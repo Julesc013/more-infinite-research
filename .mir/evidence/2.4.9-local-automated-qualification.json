@@ -6,7 +6,7 @@
   "status": "automated-runtime-and-performance-passed-manual-and-protected-gates-pending",
   "release_eligible": false,
   "package_source_commit": "1d7e73bd71b6ad00dc297081363897637adab324",
-  "local_evidence_source_commit": "7fb52c4c4947522b28e6f2f957b3047391ef1c49",
+  "local_evidence_source_commit": "3b23949386e2cc3b55650d77975b51ef6a472e88",
   "candidate": {
     "archive": "dist/more-infinite-research_2.4.9.zip",
     "archive_bytes": 892183,
@@ -18,12 +18,12 @@
     "binary_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
   },
   "plan": {
-    "path": "out/performance-campaign-plan-accepted.json",
-    "artifact_sha256": "29B211277641860F0E5E9B0E7EFD1E09F9946BC16E978E8BF70E8084889079B0",
-    "plan_material_sha256": "004B59D359F96AC7FE5FA6032E5EE004CA8909747F3E39ED0D1432DF2D004950",
+    "path": "out/performance-corrected-accepted-plan.json",
+    "artifact_sha256": "2980CA95E05835D0F558405292584FB57E72F8210B0EDAA60E79FD797747788B",
+    "plan_material_sha256": "AA9EEC5B84882C74278D32EFD6604C007595DAA905195219D689EA183DABAC7D",
     "required_test_set_sha256": "D31D11501DAB2D9B8923EC95C120C59B116E0126D54306163220A89DE881EEAB",
     "candidate_descriptor_sha256": "637DF39B248B3BEC57A8D6586709AA8921050397E74605C0798A0F68FC2330FD",
-    "validation_harness_sha256": "A54219FD9F98EE7206CB249503F8F4EF6E9816A568E703F90539DEC607FFA6CF",
+    "validation_harness_sha256": "C131C8CB3DF1A35C44E400A653DC96A6E4F366F56FDBB2D43247965F59D2F2A9",
     "expected_test_count": 106
   },
   "aggregate": {
@@ -74,12 +74,12 @@
     "runtime_performance": {
       "status": "passed",
       "evidence": ".mir/evidence/2.4.9-performance-regression.json",
-      "evidence_sha256": "1CF5CC4D8B21582AB75B72FB333054966ED2C3CCD192BB5B3D91CF29D3561944",
-      "measurement_harness_sha256": "46C52E536FE7E5621D86A5B76EC4178231C7803845F4BFF039BE5C5227EB378C",
-      "raw_campaign": "artifacts/performance/2.4.5-to-2.4.9-final-20260719-154404/campaign-result.json",
+      "evidence_sha256": "211A93DBDD1613284443193381D4D13D83AF96A8BA5742AC30D886BC95EDD32C",
+      "measurement_harness_sha256": "DBBAC018F3D35B3A0BF90C9542411AD32C94A899BB448631041680AAA7C64E8D",
+      "raw_campaign": "artifacts/performance/2.4.5-to-2.4.9-corrected-20260719-162236/campaign-result.json",
       "assurance_test_id": "runtime.performance-regression",
-      "assurance_fingerprint_sha256": "326D95819161A96D87FDAF04EC7DBF7B5BFC9E12EF879F7AE727926D7C2ED5D1",
-      "assurance_result_digest": "929DFFED31930D5774453BB443F54ED819EB53DCFC1B780DA116F1BC812D52A7",
+      "assurance_fingerprint_sha256": "96525F21E85C39D9688334564E1BDC3E3AA776453BB226638297A39F95F99E15",
+      "assurance_result_digest": "A8EEC0FCE01A48836BA75D85FE9EF901F1C9DB3A0A782679DC715FAD33F6A8A8",
       "assurance_producer": "untrusted-local",
       "baseline_version": "2.4.5",
       "warmup_runs_per_package_per_lane": 1,
