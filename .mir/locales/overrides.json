@@ -1,0 +1,26 @@
+{
+  "schema": 1,
+  "locales": {
+    "fil": {
+      "technology-name.more-infinite-research.research_lithium": "Produktibidad ng lithium",
+      "technology-name.more-infinite-research.research_rockets": "Produktibidad ng rocket",
+      "technology-name.more-infinite-research.research_cargo_bay_unloading_distance": "Distansya ng pagbababa ng cargo bay",
+      "mod-setting-name.ips-max-level-stream": "[font=default-bold]__1__[/font] — pinakamataas na antas",
+      "mod-setting-name.mir-max-level": "[font=default-bold]Walang-hanggang __1__[/font] — pinakamataas na antas",
+      "mod-setting-name.mir-pipeline-extent-multiplier": "[font=default-bold][color=cyan]Pagiging tugma:[/color][/font] Multiplier ng saklaw ng pipeline",
+      "mod-setting-name.mir-prototype-positive-power-floor": "[font=default-bold][color=cyan]Pagiging tugma:[/color][/font] Pinakamababang lakas na hindi sero"
+    },
+    "fy-NL": {
+      "modifier-description.character-logistic-trash-slots": "Logistike ôffalfakken fan it personaazje: +__1__",
+      "string-mod-setting.mir-science-pack-ingredient-policy-mod-progression": "Mod-oanpaste foarútgong"
+    },
+    "ja": {
+      "mod-setting-description.mir-prototype-efficiency-cap": "効率効果によって稼働中の機械のエネルギー消費量をどこまで削減できるかを設定します。-80%（変更なし）では既存のエネルギー消費制限を維持します。より大きな削減値では、汚染制限を変更せずに稼働時のエネルギー消費量をゼロ近くまで下げられます。",
+      "mod-setting-description.mir-prototype-pollution-cap": "汚染低減効果によって機械の汚染をどこまで削減できるかを設定します。-80%（変更なし）では既存の汚染制限を維持します。より大きな削減値では、エネルギー消費量を変更せずに汚染をゼロ近くまで下げられます。",
+      "mod-setting-description.mir-prototype-speed-cap": "MIR が機械の速度効果制限を変更しないか、新しい正の速度上限を設定するかを選択します。+100000%（変更なし）では既存の制限を維持し、低い値では非常に大きな速度ボーナスを意図的に制限します。"
+    },
+    "sq": {
+      "string-mod-setting.mir-adjust-vanilla-weapon-speed-techs-off": "Çaktivizuar"
+    }
+  }
+}

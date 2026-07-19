@@ -480,6 +480,11 @@ validation_tooling:
     approved_delta_gate: scripts/Test-MIRApprovedDelta.ps1
     runtime_performance_gate: scripts/Test-MIRPerformanceRegression.ps1
     manual_release_review_gate: scripts/Test-MIRManualReleaseReview.ps1
+    localization_policy: .mir/locales/manifest.json
+    localization_overrides: .mir/locales/overrides.json
+    localization_generator: scripts/Update-MIRLocales.ps1
+    localization_gate: scripts/Test-MIRLocales.ps1
+    localization_core: scripts/localization/MIRLocalization.psm1
     release_attestations: scripts/validation/ReleaseAttestations.ps1
     runtime_performance_evidence_schema: verification/schema/runtime-performance-evidence.schema.json
     manual_release_attestation_schema: verification/schema/manual-release-attestation.schema.json
@@ -510,6 +515,7 @@ validation_tooling:
     - compatibility campaign records own setup roots settings expectations timeout and claim level
     - normalized approved deltas bind exact package and producer fingerprints and reject unclassified technology registry setting runtime namespace or migration drift
     - full and backport seals require exact-candidate runtime performance evidence and package-focused manual review attestations
+    - every Factorio-supported locale is generated from source-hash-bound translation memory and must preserve placeholders rich-text order prose budgets and target-script expectations
     - offline rule synthesis searches only the finite predicate authority and emits review-required non-production proposals
     - semantic mod interaction graphs route independent pairs to composition smoke and overlapping pairs to narrow delta campaigns
     - scenarios retain stable names and explicit groups while decomposition proceeds
