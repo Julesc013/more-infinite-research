@@ -180,6 +180,7 @@
         "scripts/Invoke-MIRCompatAudit.ps1",
         "scripts/MIRCompatAudit/*.ps1",
         "scripts/validation/SettingsOverrides.ps1",
+        "scripts/validation/PerformanceCampaign.ps1",
         "scripts/validation/ReleaseAttestations.ps1",
         "scripts/validation/PackageIdentity.ps1"
       ]

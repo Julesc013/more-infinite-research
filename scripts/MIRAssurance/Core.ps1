@@ -92,6 +92,22 @@ function Get-MIRAssuranceRepositoryFiles {
   return @($script:MIRAssuranceRepositoryFilesCache)
 }
 
+function Get-MIRAssuranceEvidenceFiles {
+  # Evidence is deliberately excluded from the general repository and harness
+  # inventories to prevent self-invalidating fingerprints. Explicit evidence
+  # inputs must still resolve to their tracked or newly authored files.
+  $files = @(& git -C $repo ls-files -- .mir/evidence)
+  if ($LASTEXITCODE -ne 0) { throw "Unable to enumerate tracked release evidence files." }
+  $files += @(& git -C $repo ls-files --others --exclude-standard -- .mir/evidence)
+  if ($LASTEXITCODE -ne 0) { throw "Unable to enumerate untracked release evidence files." }
+  return @(
+    $files |
+      ForEach-Object { ([string]$_).Replace("\", "/") } |
+      Where-Object { $_ -like ".mir/evidence/*" } |
+      Sort-Object -Unique
+  )
+}
+
 function Test-MIRAssurancePathPattern {
   param([Parameter(Mandatory)][string]$Path, [Parameter(Mandatory)][string]$Pattern)
   $normalizedPath = $Path.Replace("\", "/")
@@ -102,10 +118,16 @@ function Test-MIRAssurancePathPattern {
 function Resolve-MIRAssurancePatternFiles {
   param([Parameter(Mandatory)][string[]]$Patterns)
   $allFiles = @(Get-MIRAssuranceRepositoryFiles)
+  $evidenceFiles = $null
   $matches = @()
   foreach ($patternValue in @($Patterns)) {
     $pattern = ([string]$patternValue).Replace("\", "/")
-    foreach ($file in $allFiles) {
+    $candidateFiles = $allFiles
+    if ($pattern -like ".mir/evidence/*") {
+      if ($null -eq $evidenceFiles) { $evidenceFiles = @(Get-MIRAssuranceEvidenceFiles) }
+      $candidateFiles = $evidenceFiles
+    }
+    foreach ($file in $candidateFiles) {
       if (Test-MIRAssurancePathPattern -Path $file -Pattern $pattern) { $matches += $file }
     }
     $direct = if ([IO.Path]::IsPathRooted($pattern)) { $pattern } else { Join-Path $repo $pattern }

@@ -64,6 +64,18 @@ if ($releaseAssurance -match 'Get-MIRAssuranceOption\s+-Name\s+"--evidence"') {
 $coreScript = Join-Path $RepoRoot "scripts\MIRAssurance\Core.ps1"
 . $coreScript
 . (Join-Path $RepoRoot "scripts\validation\PackageIdentity.ps1")
+$script:repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+$evidencePatternProbe = Join-Path $RepoRoot ".mir\evidence\.assurance-pattern-probe-$([guid]::NewGuid().ToString('N')).json"
+try {
+  [IO.File]::WriteAllText($evidencePatternProbe, "{}`n", [Text.UTF8Encoding]::new($false))
+  $resolvedEvidenceProbe = @(Resolve-MIRAssurancePatternFiles -Patterns @(".mir/evidence/.assurance-pattern-probe-*.json"))
+  if ($resolvedEvidenceProbe.Count -ne 1 -or
+      $resolvedEvidenceProbe[0] -ne (Get-MIRAssuranceRepoRelativePath -Path $evidencePatternProbe)) {
+    throw "Explicit release-evidence wildcard inputs do not bind their files."
+  }
+} finally {
+  if (Test-Path -LiteralPath $evidencePatternProbe) { Remove-Item -LiteralPath $evidencePatternProbe -Force }
+}
 $packageInfo = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "info.json") | ConvertFrom-Json
 $candidatePath = Join-Path $RepoRoot "dist\$($packageInfo.name)_$($packageInfo.version).zip"
 if ((Test-Path -LiteralPath $candidatePath -PathType Leaf) -and

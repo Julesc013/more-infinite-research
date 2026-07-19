@@ -1,4 +1,5 @@
 . (Join-Path $PSScriptRoot "PackageIdentity.ps1")
+. (Join-Path $PSScriptRoot "PerformanceCampaign.ps1")
 
 function Get-MIRReleaseSha256 {
   param([Parameter(Mandatory)][string]$Path)
@@ -138,6 +139,13 @@ function Test-MIRRuntimePerformanceEvidence {
     if ([string]$evidence.comparability.$field -notmatch '^[0-9A-Fa-f]{64}$') {
       throw "Runtime performance evidence lacks comparable-run authority: $field"
     }
+  }
+  $campaignPath = Join-Path $RepoRoot ".mir\performance-campaign.json"
+  $campaign = Get-Content -Raw -LiteralPath $campaignPath | ConvertFrom-Json
+  if ([string]$evidence.comparability.scenarios_sha256 -ne (Get-MIRReleaseSha256 -Path $campaignPath) -or
+      [string]$evidence.comparability.settings_sha256 -ne (Get-MIRPerformanceSettingsFingerprint -Campaign $campaign) -or
+      [string]$evidence.comparability.harness_sha256 -ne (Get-MIRPerformanceHarnessFingerprint -RepoRoot $RepoRoot)) {
+    throw "Runtime performance evidence does not bind the current campaign, settings, and measurement harness authorities."
   }
   $minimumRuns = [int]$evidence.run_policy.minimum_measured_runs_per_package
   if ($minimumRuns -lt 5 -or [int]$evidence.run_policy.warmup_runs -lt 1 -or

@@ -400,6 +400,7 @@ validation_tooling:
     localization_core: scripts/localization/MIRLocalization.psm1
     performance_campaign: .mir/performance-campaign.json
     performance_collector: scripts/Measure-MIRPerformanceRegression.ps1
+    performance_fingerprint: scripts/validation/PerformanceCampaign.ps1
     performance_validator: scripts/Test-MIRPerformanceRegression.ps1
     compiler_schema_drift: scripts/Test-MIRCompilerSchemaDrift.ps1
     compiler_gate: scripts/Test-MIRCompiler.ps1

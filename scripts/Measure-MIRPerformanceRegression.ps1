@@ -26,16 +26,6 @@ function Get-MIRCampaignSafeName {
   return ($Value -replace '[^A-Za-z0-9_.-]', '-').Trim('-')
 }
 
-function Get-MIRCampaignObjectMap {
-  param($Value)
-  $map = [ordered]@{}
-  if ($null -eq $Value) { return $map }
-  foreach ($property in @($Value.PSObject.Properties | Sort-Object Name)) {
-    $map[[string]$property.Name] = $property.Value
-  }
-  return $map
-}
-
 function Get-MIRCampaignTreeSha256 {
   param(
     [Parameter(Mandatory)][string]$Root,
@@ -391,15 +381,9 @@ $factorioRoot = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $scri
 $officialRoots = @("data\base", "data\elevated-rails", "data\quality", "data\space-age")
 $machineSha = Get-MIRCampaignMachineSha256
 $officialModsSha = Get-MIRCampaignTreeSha256 -Root $factorioRoot -RelativeRoots $officialRoots
-$settingsRows = @(
-  foreach ($lane in $lanes | Sort-Object id) {
-    $settingsJson = (Get-MIRCampaignObjectMap -Value $lane.settings) | ConvertTo-Json -Depth 10 -Compress
-    "$($lane.id)`t$settingsJson"
-  }
-)
-$settingsSha = Get-MIRStringSha256 -Value ($settingsRows -join "`n")
+$settingsSha = Get-MIRPerformanceSettingsFingerprint -Campaign $campaign
 $scenariosSha = Get-MIRFileSha256 -Path $campaignFile
-$harnessSha = Get-MIRValidationHarnessFingerprint -RepoRoot $RepoRoot
+$harnessSha = Get-MIRPerformanceHarnessFingerprint -RepoRoot $RepoRoot
 $factorioSha = Get-MIRFileSha256 -Path $script:FactorioPath
 
 $raw = [ordered]@{

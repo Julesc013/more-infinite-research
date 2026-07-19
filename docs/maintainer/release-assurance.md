@@ -26,6 +26,7 @@ MIR release assurance is a persistent content-addressed evidence system. It plan
 | `scripts/Invoke-MIRAssurance.ps1` | Planner, fingerprinting, ledger, worker, aggregate gate, qualification, seal facade |
 | `.mir/performance-campaign.json` | Exact paired-run lane, package, Factorio, settings, and ecosystem-scenario authority |
 | `scripts/Measure-MIRPerformanceRegression.ps1` | Exact-archive paired performance collector and raw run-capsule producer |
+| `scripts/validation/PerformanceCampaign.ps1` | Scoped measurement-harness and settings fingerprints shared by collection and validation |
 | `artifacts/assurance/evidence` | Persistent local or CI-restored evidence ledger |
 | `out/verification-plan.json` | Reviewable plan for one candidate and target |
 
@@ -140,4 +141,6 @@ Interactive GUI locale review, visual truncation review, human balance judgment,
 
 The release performance evidence is collected, not hand-authored. Materialize and inspect the release plan, then run `scripts/Measure-MIRPerformanceRegression.ps1` with the exact candidate, prior release, Factorio binary, package-source commit, and target-line local mod library. The campaign manifest fixes all six lane meanings. It alternates package order within each measured pair, uses an isolated user-data directory per run, and rejects archive, Factorio, diagnostic-setting, scenario, or resolved ecosystem-closure drift.
 
-Raw logs, saves, dependency locks, and per-run capsules remain under `artifacts/performance`. Only the portable schema-2 aggregate—with exact package, binary, comparability, run-order, and statistical identities—is tracked under `.mir/evidence`. Changing the collector, campaign manifest, compatibility runner, settings override logic, scenario manifest, or mod closure invalidates the campaign fingerprint.
+Raw logs, saves, dependency locks, and per-run capsules remain under `artifacts/performance`. Only the portable schema-2 aggregate—with exact package, binary, comparability, run-order, and statistical identities—is tracked under `.mir/evidence`. Collection and validation independently calculate the same scoped measurement-harness fingerprint. Changing the collector, campaign manifest, compatibility runner, settings override logic, scenario manifest, or mod closure invalidates the campaign fingerprint; unrelated assurance or documentation edits do not invalidate measured runtime evidence.
+
+Release evidence is excluded from generic repository fingerprints to avoid self-reference, but an explicit `.mir/evidence/...` test input is resolved and hashed. A performance or manual-review wildcard that matches no file therefore cannot masquerade as bound release evidence.
