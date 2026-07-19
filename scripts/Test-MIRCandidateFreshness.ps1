@@ -46,6 +46,7 @@ $status = Get-MIRRequiredCandidateField -Fields $candidate -Name "status"
 $allowedStatuses = @(
   "rebuilding-after-package-visible-change",
   "reconstruction-in-progress",
+  "awaiting-performance-manual-ecosystem-and-protected-qualification",
   "release-candidate-awaiting-manual-review",
   "published"
 )
@@ -189,6 +190,29 @@ $artifactRelative = Get-MIRRequiredCandidateField -Fields $candidate -Name "arti
 $artifactPath = Join-Path $repo $artifactRelative
 if (-not (Test-Path -LiteralPath $artifactPath -PathType Leaf)) {
   throw "Active release candidate artifact is missing: $artifactRelative"
+}
+
+if ($status -eq "awaiting-performance-manual-ecosystem-and-protected-qualification") {
+  $candidateSha = Get-MIRFileSha256 -Path $artifactPath
+  $candidateContentSha = Get-MIRZipContentFingerprint -Path $artifactPath
+  if ((Get-MIRRequiredCandidateField -Fields $candidate -Name "sha256") -ne $candidateSha -or
+      (Get-MIRRequiredCandidateField -Fields $candidate -Name "package_content_sha256") -ne $candidateContentSha) {
+    throw "Externally unqualified candidate bytes differ from their frozen identities."
+  }
+  if ((Get-MIRRequiredCandidateField -Fields $candidate -Name "protected_automated_gate") -ne "pending" -or
+      (Get-MIRRequiredCandidateField -Fields $candidate -Name "manual_gate") -ne "pending") {
+    throw "Externally unqualified candidate must keep protected automation and manual review pending."
+  }
+  $localGate = Get-MIRRequiredCandidateField -Fields $candidate -Name "local_automated_gate"
+  if ($localGate -notin @("pending-clean-full-runtime", "passed-static-runtime-upgrade")) {
+    throw "Externally unqualified candidate has an unsupported local gate state: $localGate"
+  }
+  $deltaRelative = Get-MIRRequiredCandidateField -Fields $candidate -Name "approved_delta"
+  if (-not (Test-Path -LiteralPath (Join-Path $repo $deltaRelative) -PathType Leaf)) {
+    throw "Externally unqualified candidate lacks its approved-delta artifact: $deltaRelative"
+  }
+  Write-Host "[ok] MIR candidate bytes are frozen while performance, ecosystem, protected qualification, and manual review remain pending."
+  exit 0
 }
 
 $checks = [ordered]@{
