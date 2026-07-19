@@ -1,0 +1,239 @@
+{
+  "schema": 2,
+  "kind": "mir-runtime-performance-regression",
+  "status": "passed",
+  "candidate": {
+    "version": "2.4.9",
+    "archive_sha256": "52B93336AB24FAF2E626835EAF971310E6D919A99083994B6F777F45CEBCB162",
+    "package_content_sha256": "6792B8C47E314692E6D8CA6DD73C0D09C784A46AED4171E007616E36B0CA43C4",
+    "source_commit": "1d7e73bd71b6ad00dc297081363897637adab324"
+  },
+  "baseline": {
+    "version": "2.4.5",
+    "archive_sha256": "7649824B72247AA38F05661422DFDEE7C729B21CC73A0A35D2455443B45D39F8",
+    "package_content_sha256": "5B8E21077CAC99CDB0733EBE8B34D10D0F375B2EAB2D42E60A73677860783FED"
+  },
+  "factorio": {
+    "version": "2.0.77",
+    "binary_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "comparability": {
+    "machine_sha256": "D267D3CEF075BA4B8554F9971E4EC41F795AA18D91F85072D59D47348F18D34F",
+    "official_mods_sha256": "95ACA219F2EDC3359E964218543A4600632D73C2B7B80252AAA491F1DA62CECD",
+    "third_party_closure_sha256": "9BE82CA87C6BAC44A2B96F86CFB39A9B78CD8B5F64E22F048D9FABD0E17305D0",
+    "settings_sha256": "DF8C6E11428401B7E3EFAE8275D465B8D8BC2691BBA572EE1A554AAC5F5CDB4C",
+    "scenarios_sha256": "048024714EBC12C091C33AA00648DD620DDEF6685EF3C186802BF838739C1231",
+    "harness_sha256": "34D00D1ACA037D3E8202194EB21CAE5736598103FE051A645059E1ECB6F55D28"
+  },
+  "run_policy": {
+    "warmup_runs": 1,
+    "minimum_measured_runs_per_package": 5,
+    "order": "paired-balanced"
+  },
+  "run_order": [
+    "baseline",
+    "candidate",
+    "candidate",
+    "baseline",
+    "baseline",
+    "candidate",
+    "candidate",
+    "baseline",
+    "baseline",
+    "candidate"
+  ],
+  "lanes": [
+    {
+      "id": "base.factorio-total",
+      "baseline": {
+        "runs_seconds": [
+          3.692247,
+          3.721867,
+          3.846979,
+          3.776494,
+          3.808489
+        ],
+        "median_seconds": 3.776494,
+        "p90_seconds": 3.846979,
+        "minimum_seconds": 3.692247,
+        "maximum_seconds": 3.846979
+      },
+      "candidate": {
+        "runs_seconds": [
+          3.877845,
+          3.698374,
+          4.224328,
+          3.84826,
+          3.902903
+        ],
+        "median_seconds": 3.877845,
+        "p90_seconds": 4.224328,
+        "minimum_seconds": 3.698374,
+        "maximum_seconds": 4.224328
+      },
+      "absolute_delta_seconds": 0.101351,
+      "percentage_delta": 2.683733,
+      "status": "passed"
+    },
+    {
+      "id": "space-age.factorio-total",
+      "baseline": {
+        "runs_seconds": [
+          8.950853,
+          9.450746,
+          9.330614,
+          9.492582,
+          9.528631
+        ],
+        "median_seconds": 9.450746,
+        "p90_seconds": 9.528631,
+        "minimum_seconds": 8.950853,
+        "maximum_seconds": 9.528631
+      },
+      "candidate": {
+        "runs_seconds": [
+          9.071276,
+          9.042717,
+          9.038003,
+          9.381347,
+          8.969809
+        ],
+        "median_seconds": 9.042717,
+        "p90_seconds": 9.381347,
+        "minimum_seconds": 8.969809,
+        "maximum_seconds": 9.381347
+      },
+      "absolute_delta_seconds": -0.408029,
+      "percentage_delta": -4.317426,
+      "status": "passed"
+    },
+    {
+      "id": "medium-ecosystem.factorio-total",
+      "baseline": {
+        "runs_seconds": [
+          40.91118,
+          40.653507,
+          40.288985,
+          41.660851,
+          41.047234
+        ],
+        "median_seconds": 40.91118,
+        "p90_seconds": 41.660851,
+        "minimum_seconds": 40.288985,
+        "maximum_seconds": 41.660851
+      },
+      "candidate": {
+        "runs_seconds": [
+          41.073002,
+          40.452898,
+          40.680131,
+          41.333925,
+          42.304331
+        ],
+        "median_seconds": 41.073002,
+        "p90_seconds": 42.304331,
+        "minimum_seconds": 40.452898,
+        "maximum_seconds": 42.304331
+      },
+      "absolute_delta_seconds": 0.161822,
+      "percentage_delta": 0.395545,
+      "status": "passed"
+    },
+    {
+      "id": "large-ecosystem.factorio-total",
+      "baseline": {
+        "runs_seconds": [
+          41.096095,
+          42.809204,
+          40.900873,
+          41.208854,
+          40.88607
+        ],
+        "median_seconds": 41.096095,
+        "p90_seconds": 42.809204,
+        "minimum_seconds": 40.88607,
+        "maximum_seconds": 42.809204
+      },
+      "candidate": {
+        "runs_seconds": [
+          41.200421,
+          40.785808,
+          41.249125,
+          40.916815,
+          40.911079
+        ],
+        "median_seconds": 40.916815,
+        "p90_seconds": 41.249125,
+        "minimum_seconds": 40.785808,
+        "maximum_seconds": 41.249125
+      },
+      "absolute_delta_seconds": -0.17928,
+      "percentage_delta": -0.436246,
+      "status": "passed"
+    },
+    {
+      "id": "diagnostics-off.factorio-total",
+      "baseline": {
+        "runs_seconds": [
+          3.809519,
+          3.746763,
+          4.030961,
+          3.93239,
+          4.072369
+        ],
+        "median_seconds": 3.93239,
+        "p90_seconds": 4.072369,
+        "minimum_seconds": 3.746763,
+        "maximum_seconds": 4.072369
+      },
+      "candidate": {
+        "runs_seconds": [
+          3.776973,
+          3.904691,
+          3.833545,
+          4.126914,
+          3.785793
+        ],
+        "median_seconds": 3.833545,
+        "p90_seconds": 4.126914,
+        "minimum_seconds": 3.776973,
+        "maximum_seconds": 4.126914
+      },
+      "absolute_delta_seconds": -0.098845,
+      "percentage_delta": -2.513611,
+      "status": "passed"
+    },
+    {
+      "id": "diagnostics-on.factorio-total",
+      "baseline": {
+        "runs_seconds": [
+          4.621275,
+          4.815354,
+          4.800375,
+          4.724022,
+          4.666525
+        ],
+        "median_seconds": 4.724022,
+        "p90_seconds": 4.815354,
+        "minimum_seconds": 4.621275,
+        "maximum_seconds": 4.815354
+      },
+      "candidate": {
+        "runs_seconds": [
+          4.551828,
+          4.713203,
+          4.682008,
+          4.869481,
+          4.692687
+        ],
+        "median_seconds": 4.692687,
+        "p90_seconds": 4.869481,
+        "minimum_seconds": 4.551828,
+        "maximum_seconds": 4.869481
+      },
+      "absolute_delta_seconds": -0.031335,
+      "percentage_delta": -0.663312,
+      "status": "passed"
+    }
+  ]
+}

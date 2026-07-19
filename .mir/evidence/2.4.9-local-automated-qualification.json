@@ -3,10 +3,10 @@
   "kind": "mir-local-automated-qualification",
   "release": "2.4.9",
   "target": "2.0",
-  "status": "automated-runtime-passed-release-gates-pending",
+  "status": "automated-runtime-and-performance-passed-manual-and-protected-gates-pending",
   "release_eligible": false,
   "package_source_commit": "1d7e73bd71b6ad00dc297081363897637adab324",
-  "local_evidence_source_commit": "2e98d239b974723da8dcaec57ef6bf68156dc66d",
+  "local_evidence_source_commit": "0de3967cc9907a761e17d972f39072b7533d8d27",
   "candidate": {
     "archive": "dist/more-infinite-research_2.4.9.zip",
     "archive_bytes": 892183,
@@ -29,7 +29,7 @@
   "aggregate": {
     "path": "artifacts/assurance/backport-2.4.9-local-verify-summary.json",
     "sha256": "AF9FA8183C1E1551121CA42B4AC2F7630AC6F2F02016A1699A1290ED17B95763",
-    "status": "stopped-at-missing-performance-evidence",
+    "status": "historical-stopped-before-performance-evidence",
     "passed": 104,
     "failed": 1,
     "not_executed": 1
@@ -72,8 +72,16 @@
       "summary_sha256": "BF22EBC507140A473C30CD3003D54CF4643D279180DD1F1EA42E6030E9945CD5"
     },
     "runtime_performance": {
-      "status": "missing-required-evidence",
-      "required_path": ".mir/evidence/2.4.9-performance-regression.json"
+      "status": "passed",
+      "evidence": ".mir/evidence/2.4.9-performance-regression.json",
+      "evidence_sha256": "492B698AB6962AAE99948E204D1533D39CF18AA2E6E303609F86F429EB3C6E14",
+      "baseline_version": "2.4.5",
+      "warmup_runs_per_package_per_lane": 1,
+      "measured_runs_per_package_per_lane": 5,
+      "lane_count": 6,
+      "medium_ecosystem_roots": 6,
+      "large_ecosystem_roots": 19,
+      "failed_lanes": 0
     },
     "manual_review": {
       "status": "missing-required-attestation",
@@ -81,8 +89,6 @@
     }
   },
   "remaining_release_blockers": [
-    "paired 2.4.5-to-2.4.9 runtime performance evidence for all six governed lanes",
-    "exact medium and large ecosystem closure evidence beyond the passing representative targeted scenario",
     "maintainer-authored schema-2 package review attestation",
     "protected full qualification and candidate seal"
   ]

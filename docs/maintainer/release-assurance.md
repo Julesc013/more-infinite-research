@@ -5,7 +5,7 @@ applies_to: "2.5.0+"
 audience: release-manager
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-07-16
+last_reviewed: 2026-07-20
 supersedes: []
 superseded_by: []
 ---
