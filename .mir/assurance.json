@@ -12,15 +12,15 @@
   },
   "profiles": {
     "edit": ["static.architecture", "static.compiler"],
-    "fast": ["tooling.self-test", "static.architecture", "static.compiler", "static.settings", "static.balance", "static.museum", "static.package"],
+    "fast": ["tooling.self-test", "static.architecture", "static.compiler", "static.settings", "static.balance", "static.package"],
     "auto": [],
     "locale": ["static.locales", "runtime.exact-zip"],
     "balance": ["static.balance", "runtime.affected"],
     "refactor-equivalence": ["static.compiler", "static.package", "runtime.exact-zip"],
     "hotfix": ["static.full", "runtime.affected", "runtime.exact-zip"],
     "targeted": ["static.full", "runtime.affected", "runtime.exact-zip"],
-    "full": ["docs.check", "tooling.self-test", "static.architecture", "static.compiler", "static.settings", "static.locales", "static.balance", "static.museum", "static.package", "static.full", "performance.static", "runtime.exact-zip", "runtime.full", "runtime.upgrade", "runtime.ecosystem", "release.approved-delta", "runtime.performance-regression", "manual.release-review"],
-    "backport": ["docs.check", "tooling.self-test", "static.architecture", "static.compiler", "static.settings", "static.locales", "static.balance", "static.museum", "static.package", "static.full", "performance.static", "runtime.exact-zip", "runtime.full", "runtime.upgrade", "runtime.ecosystem", "release.approved-delta", "runtime.performance-regression", "manual.release-review"],
+    "full": ["docs.check", "tooling.self-test", "static.architecture", "static.compiler", "static.settings", "static.locales", "static.balance", "static.package", "static.full", "performance.static", "runtime.exact-zip", "runtime.full", "runtime.upgrade", "runtime.ecosystem", "release.approved-delta", "runtime.performance-regression", "manual.release-review"],
+    "backport": ["docs.check", "tooling.self-test", "static.architecture", "static.compiler", "static.settings", "static.locales", "static.balance", "static.package", "static.full", "performance.static", "runtime.exact-zip", "runtime.full", "runtime.upgrade", "runtime.ecosystem", "release.approved-delta", "runtime.performance-regression", "manual.release-review"],
     "promotion-check": ["seal.verify"]
   },
   "classes": [
@@ -68,11 +68,6 @@
       "id": "release-governance",
       "patterns": ["^\\.mir/(branches|distributions|releases)\\.(json|yml)$", "^\\.mir/release-wave\\.yml$"],
       "tests": ["docs.check", "tooling.self-test", "static.package", "seal.verify"]
-    },
-    {
-      "id": "museum-tooling",
-      "patterns": ["^\\.mir/(canonical-lower-features|museum-targets)\\.json$", "^scripts/(Build-MIRMuseumTarget|New-MIRMuseum|Test-MIRMuseum)", "^scripts/Museum/"],
-      "tests": ["static.museum"]
     },
     {
       "id": "repository-docs",

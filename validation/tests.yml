@@ -106,20 +106,6 @@
       ]
     },
     {
-      "id": "static.museum",
-      "kind": "static",
-      "layer": "F0",
-      "command": "./scripts/Test-MIRMuseumCompiler.ps1",
-      "requires_factorio": false,
-      "inputs": [
-        ".mir/canonical-lower-features.json",
-        ".mir/museum-targets.json",
-        "scripts/Museum/**",
-        "scripts/Build-MIRMuseumTarget.ps1",
-        "scripts/Test-MIRMuseumCompiler.ps1"
-      ]
-    },
-    {
       "id": "static.package",
       "kind": "static",
       "layer": "F1",
