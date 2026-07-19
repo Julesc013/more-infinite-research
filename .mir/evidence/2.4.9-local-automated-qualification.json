@@ -6,7 +6,7 @@
   "status": "automated-runtime-and-performance-passed-manual-and-protected-gates-pending",
   "release_eligible": false,
   "package_source_commit": "1d7e73bd71b6ad00dc297081363897637adab324",
-  "local_evidence_source_commit": "0de3967cc9907a761e17d972f39072b7533d8d27",
+  "local_evidence_source_commit": "7fb52c4c4947522b28e6f2f957b3047391ef1c49",
   "candidate": {
     "archive": "dist/more-infinite-research_2.4.9.zip",
     "archive_bytes": 892183,
@@ -18,12 +18,12 @@
     "binary_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
   },
   "plan": {
-    "path": "out/verification-plan-backport-2.4.9-final.json",
-    "artifact_sha256": "EBAFBAD01714BE00EF4DD230ACBF83256CF6A198809153665045FD53914B6584",
-    "plan_material_sha256": "E889456FFBF63362B52AD665A630764B5069B2DAEE66A5B59F77474B8CACD960",
+    "path": "out/performance-campaign-plan-accepted.json",
+    "artifact_sha256": "29B211277641860F0E5E9B0E7EFD1E09F9946BC16E978E8BF70E8084889079B0",
+    "plan_material_sha256": "004B59D359F96AC7FE5FA6032E5EE004CA8909747F3E39ED0D1432DF2D004950",
     "required_test_set_sha256": "D31D11501DAB2D9B8923EC95C120C59B116E0126D54306163220A89DE881EEAB",
     "candidate_descriptor_sha256": "637DF39B248B3BEC57A8D6586709AA8921050397E74605C0798A0F68FC2330FD",
-    "validation_harness_sha256": "E03BED57DE4677C75EAB086395A8A64739A057D729AAF5C28DE14C4EE323A58E",
+    "validation_harness_sha256": "A54219FD9F98EE7206CB249503F8F4EF6E9816A568E703F90539DEC607FFA6CF",
     "expected_test_count": 106
   },
   "aggregate": {
@@ -74,10 +74,18 @@
     "runtime_performance": {
       "status": "passed",
       "evidence": ".mir/evidence/2.4.9-performance-regression.json",
-      "evidence_sha256": "492B698AB6962AAE99948E204D1533D39CF18AA2E6E303609F86F429EB3C6E14",
+      "evidence_sha256": "1CF5CC4D8B21582AB75B72FB333054966ED2C3CCD192BB5B3D91CF29D3561944",
+      "measurement_harness_sha256": "46C52E536FE7E5621D86A5B76EC4178231C7803845F4BFF039BE5C5227EB378C",
+      "raw_campaign": "artifacts/performance/2.4.5-to-2.4.9-final-20260719-154404/campaign-result.json",
+      "assurance_test_id": "runtime.performance-regression",
+      "assurance_fingerprint_sha256": "326D95819161A96D87FDAF04EC7DBF7B5BFC9E12EF879F7AE727926D7C2ED5D1",
+      "assurance_result_digest": "929DFFED31930D5774453BB443F54ED819EB53DCFC1B780DA116F1BC812D52A7",
+      "assurance_producer": "untrusted-local",
       "baseline_version": "2.4.5",
       "warmup_runs_per_package_per_lane": 1,
       "measured_runs_per_package_per_lane": 5,
+      "measured_execution_count": 60,
+      "total_execution_count": 72,
       "lane_count": 6,
       "medium_ecosystem_roots": 6,
       "large_ecosystem_roots": 19,
