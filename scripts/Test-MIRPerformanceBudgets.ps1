@@ -82,6 +82,12 @@ if ([int]$campaign.run_policy.warmup_runs -lt 1 -or
 if ([string]$campaign.baseline.archive_sha256 -ne "7649824B72247AA38F05661422DFDEE7C729B21CC73A0A35D2455443B45D39F8") {
   throw "Paired performance campaign does not bind the published MIR 2.4.5 baseline archive."
 }
+$collector = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\Measure-MIRPerformanceRegression.ps1")
+if ($collector -match 'Get-MIRCampaignObjectMap' -or
+    $collector -notmatch 'Get-MIRPerformanceSettingsFingerprint' -or
+    $collector -notmatch 'Get-MIRPerformanceHarnessFingerprint') {
+  throw "Paired performance collection is not bound to the shared settings and scoped-harness fingerprint authority."
+}
 
 $performancePolicy = Get-Content -Raw -LiteralPath $resolvedPerformancePolicyPath
 foreach ($requiredPolicySnippet in @(

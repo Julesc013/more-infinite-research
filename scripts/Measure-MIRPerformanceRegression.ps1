@@ -199,7 +199,7 @@ disable-blueprint-storage=true
   if ($logText.Contains("------------- Error -------------") -or $logText.Contains("Error Util.cpp")) {
     throw "Performance run log contains a fatal Factorio marker: $($Lane.id)"
   }
-  $settings = Get-MIRCampaignObjectMap -Value $Lane.settings
+  $settings = ConvertTo-MIRPerformanceSettingsMap -Value $Lane.settings
   if ($settings.Contains("mir-debug-generation-report")) {
     $reportPresent = $logText.Contains("[more-infinite-research] Generation report start")
     if ([bool]$settings["mir-debug-generation-report"] -ne $reportPresent) {
