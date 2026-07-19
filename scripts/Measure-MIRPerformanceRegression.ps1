@@ -259,23 +259,28 @@ function Invoke-MIRCompatPerformanceRun {
     ManualScenariosPath = $script:ManualScenariosPath
   }
   if ($PackageLabel -eq "candidate") { $parameters.ModUnderTestSourceCommit = $ExpectedSourceCommit }
-  $timer = [Diagnostics.Stopwatch]::StartNew()
+  $harnessTimer = [Diagnostics.Stopwatch]::StartNew()
   try {
     & $compatScript @parameters *> $logPath
   } catch {
-    $timer.Stop()
+    $harnessTimer.Stop()
     $tail = if (Test-Path -LiteralPath $logPath) { (Get-Content -LiteralPath $logPath -Tail 40) -join "`n" } else { "log absent" }
     throw "Compatibility performance run failed for $($Lane.id).`n$tail`n$($_.Exception.Message)"
   }
-  $timer.Stop()
+  $harnessTimer.Stop()
   $campaignEvidencePath = Join-Path $outputDir "campaign-evidence.json"
   if (-not (Test-Path -LiteralPath $campaignEvidencePath -PathType Leaf)) {
     throw "Compatibility performance run lacks campaign evidence for $($Lane.id)."
   }
   $campaignEvidence = Get-Content -Raw -LiteralPath $campaignEvidencePath | ConvertFrom-Json
   $closureRows = @(Get-MIRCampaignClosureRows -CampaignEvidence $campaignEvidence -LaneId ([string]$Lane.id))
+  $factorioSeconds = [double]$campaignEvidence.scenarios[0].duration_seconds
+  if ($factorioSeconds -le 0) {
+    throw "Compatibility performance run lacks a positive Factorio process duration for $($Lane.id)."
+  }
   return [pscustomobject][ordered]@{
-    seconds = [Math]::Round($timer.Elapsed.TotalSeconds, 6)
+    seconds = [Math]::Round($factorioSeconds, 6)
+    harness_seconds = [Math]::Round($harnessTimer.Elapsed.TotalSeconds, 6)
     closure_rows = $closureRows
     official_mods = @($campaignEvidence.scenarios[0].official_mods)
   }

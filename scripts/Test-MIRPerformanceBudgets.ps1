@@ -85,8 +85,15 @@ if ([string]$campaign.baseline.archive_sha256 -ne "7649824B72247AA38F05661422DFD
 $collector = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\Measure-MIRPerformanceRegression.ps1")
 if ($collector -match 'Get-MIRCampaignObjectMap' -or
     $collector -notmatch 'Get-MIRPerformanceSettingsFingerprint' -or
-    $collector -notmatch 'Get-MIRPerformanceHarnessFingerprint') {
+    $collector -notmatch 'Get-MIRPerformanceHarnessFingerprint' -or
+    $collector -notmatch '\$campaignEvidence\.scenarios\[0\]\.duration_seconds') {
   throw "Paired performance collection is not bound to the shared settings and scoped-harness fingerprint authority."
+}
+$factorioRunner = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\MIRCompatAudit\FactorioRunner.ps1")
+$compatAudit = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\Invoke-MIRCompatAudit.ps1")
+if ($factorioRunner -notmatch 'duration_seconds\s*=\s*\[Math\]::Round\(\$timer\.Elapsed\.TotalSeconds' -or
+    $compatAudit -notmatch 'duration_seconds\s*=\s*\[Math\]::Round\(\[double\]\$result\.duration_seconds') {
+  throw "Compatibility performance lanes do not propagate the isolated Factorio process duration."
 }
 
 $performancePolicy = Get-Content -Raw -LiteralPath $resolvedPerformancePolicyPath

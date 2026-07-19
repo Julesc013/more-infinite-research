@@ -934,6 +934,7 @@ function Invoke-MIRScenarioLoad {
       exit_code = $null
       timed_out = $false
       timeout_seconds = [int](Get-MIRObjectProperty -Object $Scenario -Name "timeout_seconds" -Default $ScenarioTimeoutSeconds)
+      duration_seconds = 0
       skipped = $true
       skip_reason = "dependency_resolution_failure"
       passed = $false
@@ -978,6 +979,7 @@ function Invoke-MIRScenarioLoad {
     exit_code = $result.exit_code
     timed_out = $result.timed_out
     timeout_seconds = $result.timeout_seconds
+    duration_seconds = $result.duration_seconds
     skipped = $false
     skip_reason = ""
     passed = $result.passed
@@ -1324,7 +1326,6 @@ if ($RunLoadTests) {
     $officialMods = @($scenario.official_mods) -join ","
     $dependencyFailureCount = @($scenario.dependency_failures).Count
     Write-Host ("[compat-audit] load {0}/{1} starting scenario={2} type={3} roots={4} resolved={5} official={6} dependency_failures={7}" -f $displayIndex, $scenarioList.Count, $scenario.name, $scenario.type, $rootMods, $resolvedCount, $officialMods, $dependencyFailureCount)
-    $scenarioStarted = Get-Date
     $result = Invoke-MIRScenarioLoad -Scenario $scenario
     $results += $result
     $results | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $loadResultsPath -Encoding UTF8
@@ -1332,7 +1333,7 @@ if ($RunLoadTests) {
     if ($manualResults.Count -gt 0) {
       $manualResults | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $manualResultsPath -Encoding UTF8
     }
-    $scenarioSeconds = [math]::Round(((Get-Date) - $scenarioStarted).TotalSeconds, 2)
+    $scenarioSeconds = [math]::Round([double]$result.duration_seconds, 2)
     Write-Host ("[compat-audit] load {0}/{1} result scenario={2} passed={3} skipped={4} timed_out={5} exit_code={6} audit_rows={7} seconds={8}" -f $displayIndex, $scenarioList.Count, $scenario.name, $result.passed, $result.skipped, $result.timed_out, $result.exit_code, @($result.audit_rows).Count, $scenarioSeconds)
     if ($FailFast -and $result.passed -ne $true) { throw "Load test failed for $($scenario.name)." }
   }
@@ -1385,6 +1386,7 @@ if ($RunLoadTests) {
         exit_code = $result.exit_code
         timed_out = [bool]$result.timed_out
         timeout_seconds = [int](Get-MIRObjectProperty -Object $scenario -Name "timeout_seconds" -Default $ScenarioTimeoutSeconds)
+        duration_seconds = [Math]::Round([double]$result.duration_seconds, 6)
         settings = Get-MIRObjectProperty -Object $scenario -Name "settings" -Default ([pscustomobject]@{})
         expected_plan = $expectedPlan
         source_manifest = [string](Get-MIRObjectProperty -Object $scenario -Name "source_manifest" -Default "")
