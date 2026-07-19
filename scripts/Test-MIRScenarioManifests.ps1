@@ -70,4 +70,21 @@ foreach ($relativePath in $manifestPaths) {
   }
 }
 
+$compatAuditText = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\Invoke-MIRCompatAudit.ps1")
+foreach ($requiredSnippet in @(
+  '. (Join-Path $PSScriptRoot "validation\SettingsOverrides.ps1")',
+  'Initialize-MIRSettingsOverrideMod -ModsDir $modsDir -FactorioVersion $FactorioLine',
+  'Set-CopiedStartupSettingDefaults -ModsDir $modsDir -Overrides $scenarioSettings',
+  '"mir-validation-settings-overrides"'
+)) {
+  if (-not $compatAuditText.Contains($requiredSnippet)) {
+    throw "Compatibility audit does not apply declared scenario settings through the isolated override mod: $requiredSnippet"
+  }
+}
+
+$runnerText = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\MIRCompatAudit\FactorioRunner.ps1")
+if (-not $runnerText.Contains("locale=en") -or $runnerText.Contains("locale=auto")) {
+  throw "Compatibility load scenarios must pin the Factorio locale to English for reproducible diagnostics."
+}
+
 Write-Host "[ok] MIR scenario schema 2 manifests own targets, setup, roots, settings, expected plans, timeouts, and claim levels."

@@ -212,7 +212,7 @@ read-data=$factorioReadData
 write-data=$UserDataDir
 
 [general]
-locale=auto
+locale=en
 
 [other]
 enable-steam-networking=false

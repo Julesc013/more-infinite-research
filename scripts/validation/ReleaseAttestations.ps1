@@ -123,6 +123,10 @@ function Test-MIRRuntimePerformanceEvidence {
       $baselineSha -ne "D77B3A78DA40CD4FDD4C829A01B5030E59FB593F3387124EF5C438F6A9E8DFCD") {
     throw "Runtime performance evidence did not use the sealed 3.1.9 baseline archive."
   }
+  if ([string]$priorInfo.version -eq "2.4.5" -and
+      $baselineSha -ne "7649824B72247AA38F05661422DFDEE7C729B21CC73A0A35D2455443B45D39F8") {
+    throw "Runtime performance evidence did not use the published 2.4.5 baseline archive."
+  }
   $factorioSha = Get-MIRReleaseSha256 -Path $FactorioBin
   $factorioVersion = [Diagnostics.FileVersionInfo]::GetVersionInfo($FactorioBin).FileVersion
   if ([string]$evidence.factorio.binary_sha256 -ne $factorioSha -or

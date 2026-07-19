@@ -2,6 +2,7 @@ param(
   [string]$RepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "..")).Path,
   [string]$BudgetsPath = ".mir\performance-budgets.json",
   [string]$PerformancePolicyPath = ".mir\performance.yml",
+  [string]$CampaignPath = ".mir\performance-campaign.json",
   [string]$ValidationSummaryPath = "",
   [string]$MediumPackSummaryPath = "",
   [string]$LargePackSummaryPath = "",
@@ -19,6 +20,7 @@ function Resolve-MIRPerformancePath {
 
 $resolvedBudgetsPath = Resolve-MIRPerformancePath -Path $BudgetsPath
 $resolvedPerformancePolicyPath = Resolve-MIRPerformancePath -Path $PerformancePolicyPath
+$resolvedCampaignPath = Resolve-MIRPerformancePath -Path $CampaignPath
 $manifest = Get-Content -Raw -LiteralPath $resolvedBudgetsPath | ConvertFrom-Json
 if ($manifest.schema -ne 2) { throw "Performance budget manifest must use schema 2." }
 $budgets = @($manifest.budgets)
@@ -48,6 +50,39 @@ foreach ($lane in $regressionLanes) {
   }
 }
 
+$campaign = Get-Content -Raw -LiteralPath $resolvedCampaignPath | ConvertFrom-Json
+if ([int]$campaign.schema -ne 1 -or [string]$campaign.release -ne "2.4.9" -or
+    [string]$campaign.factorio_line -ne "2.0" -or [string]$campaign.factorio_version -ne "2.0.77") {
+  throw "Paired performance campaign authority is not the governed MIR 2.4.9 Factorio 2.0.77 campaign."
+}
+$campaignLanes = @($campaign.lanes)
+if ((@($regressionLanes.id | Sort-Object) -join "`n") -ne (@($campaignLanes.id | Sort-Object) -join "`n")) {
+  throw "Paired performance campaign does not contain the exact governed regression lane set."
+}
+$expectedCampaignLanes = @{
+  "base.factorio-total" = @("exact-package-load", "base-default")
+  "space-age.factorio-total" = @("exact-package-load", "space-age-default")
+  "medium-ecosystem.factorio-total" = @("compat-audit", "local-2-0-bz-suite")
+  "large-ecosystem.factorio-total" = @("compat-audit", "local-2-0-performance-large")
+  "diagnostics-off.factorio-total" = @("exact-package-load", "base-diagnostics-off")
+  "diagnostics-on.factorio-total" = @("exact-package-load", "base-diagnostics-on")
+}
+foreach ($laneId in $expectedCampaignLanes.Keys) {
+  $row = @($campaignLanes | Where-Object id -eq $laneId)
+  if ($row.Count -ne 1 -or [string]$row[0].runner -ne $expectedCampaignLanes[$laneId][0] -or
+      [string]$row[0].scenario -ne $expectedCampaignLanes[$laneId][1]) {
+    throw "Paired performance campaign lane authority drifted: $laneId"
+  }
+}
+if ([int]$campaign.run_policy.warmup_runs -lt 1 -or
+    [int]$campaign.run_policy.minimum_measured_runs_per_package -lt 5 -or
+    [string]$campaign.run_policy.order -ne "paired-balanced") {
+  throw "Paired performance campaign run policy is below the governed minimum."
+}
+if ([string]$campaign.baseline.archive_sha256 -ne "7649824B72247AA38F05661422DFDEE7C729B21CC73A0A35D2455443B45D39F8") {
+  throw "Paired performance campaign does not bind the published MIR 2.4.5 baseline archive."
+}
+
 $performancePolicy = Get-Content -Raw -LiteralPath $resolvedPerformancePolicyPath
 foreach ($requiredPolicySnippet in @(
   'release: 2.4.9',
@@ -61,7 +96,7 @@ foreach ($requiredPolicySnippet in @(
 }
 
 if ($ValidateManifestOnly) {
-  Write-Host "[ok] MIR 2.4.9 performance manifest declares $($budgets.Count) absolute budgets and $($regressionLanes.Count) paired Factorio 2.0 lanes."
+  Write-Host "[ok] MIR 2.4.9 performance manifest declares $($budgets.Count) absolute budgets and $($regressionLanes.Count) exact paired Factorio 2.0 lanes."
   exit 0
 }
 

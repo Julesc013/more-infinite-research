@@ -3,6 +3,7 @@ schema: 1
 release: 2.4.9
 factorio_line: "2.0"
 budget_manifest: .mir/performance-budgets.json
+campaign_manifest: .mir/performance-campaign.json
 accepted_evidence: .mir/evidence/2.4.9-performance-regression.json
 
 measurement_policy:
@@ -12,6 +13,10 @@ measurement_policy:
   - Each lane passes when median regression is at most 20 percent or its absolute increase is within the declared noise allowance.
   - Runtime scenario timings include Factorio process startup and save creation.
   - Local-pack timings include dependency resolution, load, diagnostics parsing, and report conversion.
+  - The medium ecosystem lane is the exact local-2-0-bz-suite closure and the large ecosystem lane is the fixed 19-root local-2-0-performance-large stress closure.
+  - The large stress closure is diagnostic-only performance evidence and does not create public compatibility claims for its included mods.
+  - Diagnostics are applied by a separate settings-stage override mod so the published baseline and candidate archives remain byte-exact.
+  - Every ecosystem run must resolve to the same normalized name version and archive SHA-256 closure.
   - A skipped load never counts as performance evidence.
   - Load-only overhaul observations do not create compatibility support claims.
   - Source-instrumented coverage measurements do not create archive compatibility claims.

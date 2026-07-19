@@ -300,6 +300,50 @@
       "timeout_seconds": 900,
       "claim_level": "loads",
       "notes": "Ultracube legacy scenario, resolved from local archives if present."
+    },
+    {
+      "name": "local-2-0-performance-large",
+      "targets": [
+        "2.0"
+      ],
+      "kind": "modpack-load",
+      "group": "performance-campaign",
+      "setup": {
+        "mode": "local-library",
+        "include_space_age": false,
+        "offline": true,
+        "exact_mir_archive": true
+      },
+      "roots": [
+        "5dim_core",
+        "5dim_mining",
+        "5dim_trains",
+        "aai-containers",
+        "aai-industry",
+        "aai-loaders",
+        "atan-air-scrubbing",
+        "atan-ash",
+        "atan-fish",
+        "atan-null",
+        "atan-wood",
+        "bzcarbon",
+        "bzlead",
+        "bzsilicon",
+        "bztin",
+        "bztitanium",
+        "bzzirconium",
+        "Dectorio",
+        "Flow Control"
+      ],
+      "settings": {},
+      "expected_plan": {
+        "mode": "load-only",
+        "required_result": "passed",
+        "maximum_dependency_failures": 0
+      },
+      "timeout_seconds": 900,
+      "claim_level": "diagnostic-only",
+      "notes": "Fixed 19-root multi-family Factorio 2.0 performance stress closure. A passing load is performance evidence only and does not create support claims for the included mods."
     }
   ]
 }

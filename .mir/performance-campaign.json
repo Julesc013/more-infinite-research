@@ -1,0 +1,70 @@
+{
+  "schema": 1,
+  "release": "2.4.9",
+  "factorio_line": "2.0",
+  "factorio_version": "2.0.77",
+  "baseline": {
+    "version": "2.4.5",
+    "archive_sha256": "7649824B72247AA38F05661422DFDEE7C729B21CC73A0A35D2455443B45D39F8",
+    "package_content_sha256": "5B8E21077CAC99CDB0733EBE8B34D10D0F375B2EAB2D42E60A73677860783FED"
+  },
+  "candidate": {
+    "version": "2.4.9",
+    "archive_sha256": "52B93336AB24FAF2E626835EAF971310E6D919A99083994B6F777F45CEBCB162",
+    "package_content_sha256": "6792B8C47E314692E6D8CA6DD73C0D09C784A46AED4171E007616E36B0CA43C4"
+  },
+  "run_policy": {
+    "warmup_runs": 1,
+    "minimum_measured_runs_per_package": 5,
+    "order": "paired-balanced"
+  },
+  "manual_scenarios": "fixtures/compat-matrix/local-library-scenarios-2.0.json",
+  "lanes": [
+    {
+      "id": "base.factorio-total",
+      "runner": "exact-package-load",
+      "scenario": "base-default",
+      "official_mods": [],
+      "settings": {}
+    },
+    {
+      "id": "space-age.factorio-total",
+      "runner": "exact-package-load",
+      "scenario": "space-age-default",
+      "official_mods": ["elevated-rails", "quality", "space-age"],
+      "settings": {}
+    },
+    {
+      "id": "medium-ecosystem.factorio-total",
+      "runner": "compat-audit",
+      "scenario": "local-2-0-bz-suite",
+      "official_mods": [],
+      "settings": {}
+    },
+    {
+      "id": "large-ecosystem.factorio-total",
+      "runner": "compat-audit",
+      "scenario": "local-2-0-performance-large",
+      "official_mods": [],
+      "settings": {}
+    },
+    {
+      "id": "diagnostics-off.factorio-total",
+      "runner": "exact-package-load",
+      "scenario": "base-diagnostics-off",
+      "official_mods": [],
+      "settings": {
+        "mir-debug-generation-report": false
+      }
+    },
+    {
+      "id": "diagnostics-on.factorio-total",
+      "runner": "exact-package-load",
+      "scenario": "base-diagnostics-on",
+      "official_mods": [],
+      "settings": {
+        "mir-debug-generation-report": true
+      }
+    }
+  ]
+}

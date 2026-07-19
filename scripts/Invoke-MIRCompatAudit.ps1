@@ -53,6 +53,7 @@ $moduleRoot = Join-Path $PSScriptRoot "MIRCompatAudit"
 . (Join-Path $moduleRoot "DependencyResolver.ps1")
 . (Join-Path $moduleRoot "DiagnosticsParser.ps1")
 . (Join-Path $moduleRoot "FactorioRunner.ps1")
+. (Join-Path $PSScriptRoot "validation\SettingsOverrides.ps1")
 
 $resolvedModUnderTestZip = ""
 if (-not [string]::IsNullOrWhiteSpace($ModUnderTestZip)) {
@@ -951,9 +952,17 @@ function Invoke-MIRScenarioLoad {
     Enable-MIRCopiedGenerationReport -ModsDir $modsDir
   }
 
+  Initialize-MIRSettingsOverrideMod -ModsDir $modsDir -FactorioVersion $FactorioLine
+  $scenarioSettings = @{}
+  $settingsObject = Get-MIRObjectProperty -Object $Scenario -Name "settings" -Default ([pscustomobject]@{})
+  foreach ($property in @($settingsObject.PSObject.Properties)) {
+    $scenarioSettings[[string]$property.Name] = $property.Value
+  }
+  Set-CopiedStartupSettingDefaults -ModsDir $modsDir -Overrides $scenarioSettings
+
   Copy-MIRCachedModZips -CacheDir $resolvedCacheDir -ModsDir $modsDir -LockEntries $Scenario.lock_entries -LinkMode $LinkMode
 
-  $enabledMods = @("more-infinite-research") + @($Scenario.resolved_mods) + @($Scenario.official_mods)
+  $enabledMods = @("more-infinite-research", "mir-validation-settings-overrides") + @($Scenario.resolved_mods) + @($Scenario.official_mods)
   Write-MIRModList -ModsDir $modsDir -EnabledMods $enabledMods -OfficialBuiltinMods $officialBuiltinMods
 
   $scenarioTimeout = [int](Get-MIRObjectProperty -Object $Scenario -Name "timeout_seconds" -Default $ScenarioTimeoutSeconds)
