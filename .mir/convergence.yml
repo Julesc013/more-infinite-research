@@ -147,10 +147,14 @@ superseded_candidates:
 
 candidate:
   artifact: dist/more-infinite-research_3.2.0.zip
-  source_commit: pending
-  automated_gate: pending
+  source_commit: 2888012884fe046b6b6d92388ef4960815e79e0d
+  sha256: D9969CF427FB8FD16E989C610F48944770BE9578495149617C42DE056EEAAA6C
+  content_sha256: 978CB2C27F66FF3A8DFEE16C244826E84BD9CBC4F53E8F19DFD213FE05508256
+  locale_gate: passed-local
+  fast_static_gate: passed-local
+  automated_gate: pending-full-profile
   manual_gate: pending
-  status: rebuilding-after-package-visible-change
+  status: localization-complete-candidate-awaiting-full-release-qualification
 
 rules:
   - dev-remains-the-canonical-modern-implementation

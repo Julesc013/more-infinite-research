@@ -301,14 +301,19 @@ release_artifacts:
       aggregate_gate: "MIR / verification-gate"
       prior_release: dist/more-infinite-research_3.1.9.zip
       archive: dist/more-infinite-research_3.2.0.zip
-      archive_bytes: 446018
-      archive_sha256: 32C6FAF8FCB224E3C3A93398B79C63D6CED91C0A86429524589AB3E26935465E
-      package_source_commit: 068b3a88bdb839e1807fe23cc4bf3ae0fb49d1e1
+      archive_bytes: 929087
+      archive_sha256: D9969CF427FB8FD16E989C610F48944770BE9578495149617C42DE056EEAAA6C
+      package_content_sha256: 978CB2C27F66FF3A8DFEE16C244826E84BD9CBC4F53E8F19DFD213FE05508256
+      package_source_sha256: AB42DA8421DB8862A12740DFF55777B9A6926EEE831FA3226F8E374FCC5F84D0
+      package_source_commit: 2888012884fe046b6b6d92388ef4960815e79e0d
       superseded_local_qualification_file_sha256: 480CC078092536453CEC53BBD28C4E68CF249FD4E217B25F9AF9B039B5BE020F
       approved_delta_evidence: approved-delta/3.1.9-to-3.2.0.json
-      approved_delta_gate: passed-local-factorio-2.1.10
+      approved_delta_gate: superseded-by-localization-complete-candidate
       upgrade_evidence: .mir/evidence/3.2.0-upgrade-proof.json
-      upgrade_gate: passed-local-factorio-2.1.10
+      upgrade_gate: superseded-by-localization-complete-candidate
+      locale_gate: passed-local-50-locales-21200-values
+      locale_runtime_gate: passed-local-factorio-2.1
+      fast_static_gate: passed-local
       runtime_performance_gate: pending-qualified-3.1.9-baseline
       manual_attestation_gate: pending-exact-replacement-candidate
       release_gate: awaiting-external-performance-manual-and-protected-qualification

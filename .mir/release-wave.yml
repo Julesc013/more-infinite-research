@@ -303,16 +303,19 @@ waves:
     canonical_ledger: .mir/releases.json
     archive: dist/more-infinite-research_3.2.0.zip
     archive_class: development-candidate
-    archive_bytes: 446018
-    archive_sha256: 32C6FAF8FCB224E3C3A93398B79C63D6CED91C0A86429524589AB3E26935465E
-    package_source_commit: 068b3a88bdb839e1807fe23cc4bf3ae0fb49d1e1
+    archive_bytes: 929087
+    archive_sha256: D9969CF427FB8FD16E989C610F48944770BE9578495149617C42DE056EEAAA6C
+    package_content_sha256: 978CB2C27F66FF3A8DFEE16C244826E84BD9CBC4F53E8F19DFD213FE05508256
+    package_source_commit: 2888012884fe046b6b6d92388ef4960815e79e0d
     assurance_policy: mir-verification-v4
     superseded_local_qualification_file_sha256: 480CC078092536453CEC53BBD28C4E68CF249FD4E217B25F9AF9B039B5BE020F
     superseded_exact_upgrade_evidence: .mir/evidence/3.2.0-historical-3976-upgrade-proof.json
     exact_approved_delta_evidence: approved-delta/3.1.9-to-3.2.0.json
-    exact_approved_delta_gate: passed-local-factorio-2.1.10
+    exact_approved_delta_gate: superseded-by-localization-complete-candidate
     exact_upgrade_evidence: .mir/evidence/3.2.0-upgrade-proof.json
-    exact_upgrade_gate: passed-local-factorio-2.1.10
+    exact_upgrade_gate: superseded-by-localization-complete-candidate
+    locale_gate: passed-local-50-locales-21200-values
+    locale_runtime_gate: passed-local-factorio-2.1
     runtime_performance_gate: pending-qualified-3.1.9-baseline
     protected_release_gate: pending
     interactive_gate: pending-maintainer
