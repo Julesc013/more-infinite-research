@@ -93,6 +93,11 @@ load_order_requirements:
 
 campaigns:
   evidence_contract: mir-modpack-campaign-evidence-v1
+  sanitation_budget:
+    authority: .mir/sanitation-budgets.json
+    policy: mir-ecosystem-sanitation-budget-v1
+    maximum_unreviewed_external_prunes: 0
+    mismatch_disposition: REVIEW_REQUIRED
   exact_mir_archive_sha256_required: true
   exact_mir_source_commit_required: true
   dependency_lock_sha256_required: true
@@ -119,7 +124,7 @@ campaigns:
     missing_dependency_evidence: .mir/evidence/3.1.0-rc4-missing-overhaul-closures.json
   development_3_2_0_qualification:
     summary: .mir/evidence/3.2.0-ecosystem-qualification-summary.json
-    status: partial-development-qualification
+    status: superseded-development-qualification
     source_commit: 565e68398315762af653daf2ed6c1d40b93a4136
     archive_sha256: 3976BCF18269FC2F11BCFF2A24D4D7830C75284FDAC6DD5C5FA57AC94C5FCA2C
     passed_load_claims: 7
@@ -130,6 +135,7 @@ campaigns:
     blocked_missing_dependency_closures:
       - pyanodon
       - space-exploration
+    replacement_candidate_status: unqualified
     claim_boundary: exact-archive-load-claims-only-not-release-qualification
 
 claims:

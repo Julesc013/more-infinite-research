@@ -1,6 +1,5 @@
 ---------------------------------------------------------------------------------------------------
 Version: 3.2.0
-Date: 2026-07-17
 
   Changes:
 
@@ -19,12 +18,16 @@ Date: 2026-07-17
     - Added bounded compiler telemetry and indexed science-pack recipe discovery.
     - Retained the portable target-capability guard that emits mod-data only on Factorio lines that support it.
     - Preserved stable settings, generated technology IDs, migrations, and runtime-state namespaces from MIR 3.1.9.
+    - Kept additional automatic recipe-family generation disabled by default.
+    - Preserved the normalized MIR 3.1.9 technology surface while moving design and lifecycle handling behind common contracts.
 
   Bugfixes:
 
     - Ordered MIR after Space Exploration so its final Krastorio recipe removals happen before productivity compilation.
     - Pruned impossible known recipe targets from generated and external technology effects before final safety assertions.
     - Added regressions for removed K2/SE recipes, dangling unlock effects, and retained valid effects.
+    - Sanitized missing quality and entity targets and distinguished item grants by quality.
+    - Preserved unrelated force recipe state during MIR configuration changes without globally reapplying technology effects.
     - Replaced recursive researchability traversal and prevented fatal safety assertions from suppressing diagnostic flushing.
 
 ---------------------------------------------------------------------------------------------------

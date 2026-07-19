@@ -5,7 +5,7 @@ applies_to: "3.2.0+"
 audience: release-manager
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-07-17
+last_reviewed: 2026-07-18
 supersedes: []
 superseded_by: []
 ---
@@ -70,7 +70,7 @@ Factorio layers are:
 | `F1` | Deterministic package construction |
 | `F2` | Exact archive load checks |
 | `F3` | Data-stage and gameplay scenarios keyed by declared domains |
-| `F4` | Configuration-change, upgrade, ecosystem, seal, and promotion evidence |
+| `F4` | Configuration-change, upgrade, ecosystem, approved-delta, performance, manual-review, seal, and promotion evidence |
 
 ## Evidence Ledger
 
@@ -98,7 +98,7 @@ Every worker and the gate reconstruct the canonical schema-4 plan from the named
 
 ## CI
 
-The default workflow is named `MIR`; its aggregate required check is `MIR / verification-gate`. The protected full workflow enforces the execution DAG `F0 -> F1 -> F2 -> F3 -> F4 -> gate -> seal`, including no-work sentinels for fully reused layers. The plan job restores the latest evidence ledger and exports only non-reused work. Worker jobs use fingerprint concurrency with `cancel-in-progress: false`. The gate merges evidence, evaluates the plan, writes the evidence bundle, and saves a new immutable cache key.
+The default workflow is named `MIR`; its aggregate required check is `MIR / verification-gate`. The protected full workflow enforces the execution DAG `F0 -> F1 -> F2 -> F3 -> F4 -> gate -> seal`. Its plan is always fresh, uploads only the exact planned candidate, the verification plan, and the candidate descriptor, and never transfers historical distribution archives. Each worker starts without the shared ledger and uploads only its immutable fingerprint capsule plus any structured scenario result. The gate restores the reusable ledger once, merges those capsule deltas by exact fingerprint, evaluates the plan, writes the evidence bundle, and saves one updated immutable cache key.
 
 Runtime, targeted, full, and scheduled workflows use trusted self-hosted Windows runners. They build one candidate, upload the same bytes to every worker, and never use `pull_request_target`. Self-hosted Factorio binaries, local proprietary mods, publishing credentials, and untrusted fork code must remain isolated.
 
@@ -110,17 +110,29 @@ For MIR 3.2.0:
 ./scripts/mir.ps1 assurance build --target 2.1
 ./scripts/mir.ps1 verify plan --target 2.1 --profile full --factorio 'C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe' --prior '.\dist\more-infinite-research_3.1.9.zip' --output out/verification-plan.json
 ./scripts/mir.ps1 verify run --target 2.1 --plan out/verification-plan.json --factorio 'C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe' --prior '.\dist\more-infinite-research_3.1.9.zip'
-./scripts/mir.ps1 verify gate --target 2.1 --plan out/verification-plan.json --output .mir/evidence/3.2.0-assurance-qualification.json
+./scripts/mir.ps1 verify gate --target 2.1 --plan out/verification-plan.json --output artifacts/assurance/3.2.0-assurance-qualification.json
 ```
 
-After reviewing and committing the exact candidate and qualification record, create and verify the seal:
+The canonical full and backport profiles cannot pass F4 until all of these release authorities bind the exact candidate:
+
+- `release.approved-delta` checks both archive and package-content hashes plus package source authority;
+- `runtime.performance-regression` checks the paired qualified-baseline campaign in `.mir/evidence/<version>-performance-regression.json`;
+- `manual.release-review` checks the package-focused attestation in `.mir/evidence/<version>-manual-review-attestation.json`.
+
+Performance evidence must bind the exact prior release, candidate, source commit, Factorio binary, machine, mod closure, settings, scenarios, and harness. It uses at least one warm-up and five balanced measured pairs. Every governed lane must meet the 20 percent median ceiling or its small absolute-noise allowance, and any declared absolute ceiling.
+
+The manual attestation must be schema 2, passed, self-hashed, tied to the exact candidate bytes, package-content hash, source commit, and qualified Factorio binary, and contain reviewer, time, notes, and portable hashed artifacts for every package checklist item. After reviewing and committing the exact candidate and qualification record, create and verify the seal:
+
+`runtime.upgrade` is one F4 matrix result with five mandatory, independently hashed rows: base/default, Space Age native owner, automatic family creation, base continuation, and mod-set configuration change. The configuration-change row removes its source-only compatibility fixture before loading the candidate and proves current research, fractional progress, generated lifecycle state, and removal of only the dangling recipe target.
+
+Ecosystem evidence is also bounded by `.mir/sanitation-budgets.json`. A campaign passes only when its observed external prunes exactly include every reviewed prune and contain no more than the declared maximum unreviewed prunes. Release budgets use zero; a mismatch is `REVIEW_REQUIRED`, never a compatibility pass.
 
 ```powershell
 ./scripts/mir.ps1 assurance seal --target 2.1 --factorio 'C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe' --prior '.\dist\more-infinite-research_3.1.9.zip' --plan out/verification-plan.json
 ./scripts/mir.ps1 assurance check-seal --seal .mir/evidence/candidate-seals/mir-3.2.0-factorio-2.1.json
 ```
 
-Promotion checks verify identities and ancestry only. They cannot tag, push, create a GitHub release, or upload to the Mod Portal.
+Seal schema 4 binds the performance-evidence and manual-attestation paths, file hashes, and passed statuses. `check-seal` revalidates those bindings along with the candidate, plan, bundle, verifier, producer, and source identities. Promotion checks cannot tag, push, create a GitHub release, or upload to the Mod Portal.
 
 ## Backports
 
@@ -132,6 +144,8 @@ Tooling may be ported as one portable change, but target metadata, API adapters,
 
 Add a permanent test or matrix template to `validation/tests.yml`, declare every effective input, and route it through the appropriate `.mir/assurance.json` change classes. Add package-domain rules or scenario dependencies to `validation/domains.yml`; unmatched package paths must remain conservative. Update `Test-MIRAssurance.ps1`, `.mir/fixtures.yml`, `.mir/modules.yml`, this document, and any affected target profile when the verification contract changes.
 
-## Remaining Human Gates
+## Human Gate Boundary
 
-Interactive GUI locale review, visual truncation review, human balance judgment, Mod Portal presentation review, GitHub release presentation review, and any compatibility campaign without honest automation remain manual. Automated evidence supports those decisions but does not mark them passed.
+The pre-seal package review covers technology-tree layout, icons, locale fit and truncation, settings UX, save UI, and human balance judgment. It is a required F4 input and must be attested against the exact package candidate.
+
+GitHub release text, Mod Portal presentation, screenshots, links, and final public claims are a separate pre-publication review. They do not block creation of a sealed package candidate, but publication must not proceed while they remain pending. Any compatibility campaign without honest automation also remains manual and cannot be converted into a support claim by the package attestation.

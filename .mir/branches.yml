@@ -301,13 +301,15 @@ release_artifacts:
       aggregate_gate: "MIR / verification-gate"
       prior_release: dist/more-infinite-research_3.1.9.zip
       archive: dist/more-infinite-research_3.2.0.zip
-      archive_bytes: 445393
-      archive_sha256: 3976BCF18269FC2F11BCFF2A24D4D7830C75284FDAC6DD5C5FA57AC94C5FCA2C
-      local_qualification_evidence: .mir/evidence/3.2.0-assurance-qualification.json
+      archive_bytes: 446018
+      archive_sha256: 32C6FAF8FCB224E3C3A93398B79C63D6CED91C0A86429524589AB3E26935465E
+      superseded_local_qualification_evidence: .mir/evidence/3.2.0-assurance-qualification.json
+      approved_delta_gate: pending-exact-replacement-candidate
       runtime_performance_gate: pending-qualified-3.1.9-baseline
-      release_gate: local-full-profile-passed-performance-protected-and-manual-gates-pending
+      manual_attestation_gate: pending-exact-replacement-candidate
+      release_gate: rebuilding-after-package-visible-change
       publication_status: unreleased
-      status: release-candidate-awaiting-performance-protected-and-manual-review
+      status: replacement-candidate-awaiting-requalification
     mir_2_5_0:
       version: "2.5.0"
       branch: tmp/2.0

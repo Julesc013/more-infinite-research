@@ -456,7 +456,7 @@ Invoke-RepoCheck "unsafe pickup reach technology effects are blocked" {
     @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'require("prototypes.mir.emit.effect_safety").assert_registered_technology_effects()' },
     @{ File = "prototypes\mir\pipeline\commands.lua"; Text = $pipelineCommandsText; Snippet = '.sanitize_all_technology_effects({pass = "input"})' },
     @{ File = "prototypes\mir\pipeline\commands.lua"; Text = $pipelineCommandsText; Snippet = '.sanitize_all_technology_effects({pass = "output"})' },
-    @{ File = "prototypes\mir\integrity\effect_contracts.lua"; Text = $integrityContractsText; Snippet = 'data_raw.prototype(contract.prototype_type, name)' },
+    @{ File = "prototypes\mir\integrity\effect_contracts.lua"; Text = $integrityContractsText; Snippet = 'for _, target in ipairs(contract.targets or {}) do' },
     @{ File = "prototypes\mir\emit\technology_graph_safety.lua"; Text = $graphSafetyText; Snippet = 'generated_registry.sorted_names()' },
     @{ File = "prototypes\mir\emit\technology_graph_safety.lua"; Text = $graphSafetyText; Snippet = 'technology.enabled == false' },
     @{ File = "prototypes\mir\emit\technology_graph_safety.lua"; Text = $graphSafetyText; Snippet = 'science.pack_production_status(pack_name)' },
@@ -518,12 +518,20 @@ Invoke-RepoCheck "scenario schema 2 manifests own complete execution records" {
   & (Join-Path $repo "scripts\Test-MIRScenarioManifests.ps1") -RepoRoot $repo
 }
 
+Invoke-RepoCheck "ecosystem campaigns declare exact sanitation budgets" {
+  & (Join-Path $repo "scripts\Test-MIRSanitationBudgets.ps1") -RepoRoot $repo
+}
+
+Invoke-RepoCheck "active release evidence is portable and summary-oriented" {
+  & (Join-Path $repo "scripts\Test-MIREvidenceHygiene.ps1") -RepoRoot $repo
+}
+
 Invoke-RepoCheck "planner artifact tools are deterministic and schema-bound" {
   & (Join-Path $repo "scripts\Test-MIRPlannerTools.ps1") -RepoRoot $repo
 }
 
 Invoke-RepoCheck "the normalized 3.1.9 approved delta is complete" {
-  & (Join-Path $repo "scripts\Test-MIRApprovedDelta.ps1")
+  & (Join-Path $repo "scripts\Test-MIRApprovedDelta.ps1") -ValidateStructureOnly
 }
 
 Invoke-RepoCheck "compiler schema authorities and reference docs do not drift" {
@@ -3358,8 +3366,9 @@ if ($selectionActive -and -not $checkpointActive) {
               -InitialNativeOwnerSettingsProfile "default" `
               -ChangedNativeOwnerSettingsProfile "combined" `
               -EnableSpaceAge
-          Assert-LogContains -Expected "Reset technology effects for productivity family adoption signature change" -Context $declaration.name
+          Assert-LogContains -Expected "Preserved technology effects without a force-wide reset for productivity family adoption signature change" -Context $declaration.name
           Assert-LogContains -Expected "Preserved current research progress for native owner low-density-structure-productivity" -Context $declaration.name
+          Assert-LogContains -Expected "[mir-fixture] native-owner force-state preservation proof complete" -Context $declaration.name
           Assert-LogContains -Expected "[mir-fixture] native-owner progress configuration-change proof complete" -Context $declaration.name
           Assert-LogContains -Expected "schema=2|stream=research_rocket_fuel|owner=rocket-fuel-productivity|operation=configure_native_owner|configured=cost_model,effect_per_level,max_level,research_time|effects=0|output=" -Context $declaration.name
           }
@@ -3368,7 +3377,7 @@ if ($selectionActive -and -not $checkpointActive) {
               -ScenarioName $declaration.name `
               -ChangedFixtureNames @("mir-fixture-vanilla-family-adoption-recipes") `
               -EnableSpaceAge
-            Assert-LogContains -Expected "Reset technology effects for productivity family adoption signature change" -Context $declaration.name
+            Assert-LogContains -Expected "Preserved technology effects without a force-wide reset for productivity family adoption signature change" -Context $declaration.name
             Assert-LogContains -Expected "schema=2|stream=research_rocket_fuel|owner=rocket-fuel-productivity|operation=adopt_native_owner_effects|configured=|effects=1|output=" -Context $declaration.name
           }
           "space-age-scripted-runtime-lifecycle" {
@@ -4310,7 +4319,7 @@ Invoke-RuntimeConfigurationChangeScenario -ScenarioName "space-age-vanilla-famil
     "mir-fixture-vanilla-family-adoption-recipes"
   ) `
   -EnableSpaceAge
-Assert-LogContains -Expected "Reset technology effects for productivity family adoption signature change" -Context "Space Age vanilla family adoption configuration-change reset scenario"
+Assert-LogContains -Expected "Preserved technology effects without a force-wide reset for productivity family adoption signature change" -Context "Space Age vanilla family adoption configuration-change preservation scenario"
 Assert-LogContains -Expected "schema=2|stream=research_rocket_fuel|owner=rocket-fuel-productivity|operation=adopt_native_owner_effects|configured=|effects=1|output=" -Context "Space Age vanilla family adoption configuration-change signature scenario"
 
 Invoke-RuntimeScenario -ScenarioName "space-age-vanilla-family-owner-prepatched" -EnabledFixtureNames @(
@@ -4373,8 +4382,9 @@ if ($StartAtScenario -ne "space-age-vanilla-family-mixed-owner") {
     -InitialNativeOwnerSettingsProfile "default" `
     -ChangedNativeOwnerSettingsProfile "combined" `
     -EnableSpaceAge
-  Assert-LogContains -Expected "Reset technology effects for productivity family adoption signature change" -Context "space-age-native-owner-settings-config-change"
+  Assert-LogContains -Expected "Preserved technology effects without a force-wide reset for productivity family adoption signature change" -Context "space-age-native-owner-settings-config-change"
   Assert-LogContains -Expected "Preserved current research progress for native owner low-density-structure-productivity" -Context "space-age-native-owner-settings-config-change"
+  Assert-LogContains -Expected "[mir-fixture] native-owner force-state preservation proof complete" -Context "space-age-native-owner-settings-config-change"
   Assert-LogContains -Expected "[mir-fixture] native-owner progress configuration-change proof complete" -Context "space-age-native-owner-settings-config-change"
   Assert-LogContains -Expected "schema=2|stream=research_rocket_fuel|owner=rocket-fuel-productivity|operation=configure_native_owner|configured=cost_model,effect_per_level,max_level,research_time|effects=0|output=" -Context "space-age-native-owner-settings-config-change"
 }

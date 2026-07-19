@@ -11,6 +11,9 @@ $contracts = [ordered]@{
   "capsule.schema.json" = @("schema", "test_id", "status", "fingerprint_sha256", "producer", "result", "result_digest")
   "bundle.schema.json" = @("schema", "policy_id", "status", "plan_material_sha256", "capsule_set_sha256", "bundle_sha256")
   "seal.schema.json" = @("schema", "state", "mir_version", "target", "candidate_sha256", "plan_material_sha256", "capsule_set_sha256", "seal_sha256")
+  "runtime-performance-evidence.schema.json" = @("schema", "kind", "status", "candidate", "baseline", "factorio", "comparability", "run_policy", "run_order", "lanes")
+  "manual-release-attestation.schema.json" = @("schema", "kind", "candidate_sha256", "candidate_content_sha256", "source_commit", "checklist_version", "items", "status", "attestation_sha256")
+  "upgrade-matrix.schema.json" = @("schema", "kind", "status", "source_commit", "factorio", "baseline", "candidate", "required_archetypes", "rows")
 }
 
 foreach ($entry in $contracts.GetEnumerator()) {
@@ -50,7 +53,7 @@ if ($evidence -notmatch 'schema="mir-test-result-v1"' -or $evidence -notmatch 's
   throw "Assurance result or bundle schema differs from the governed JSON schemas."
 }
 $release = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "scripts\MIRAssurance\Release.ps1")
-if ($release -notmatch 'schema=3') {
+if ($release -notmatch 'schema=4') {
   throw "Assurance seal schema differs from seal.schema.json."
 }
 

@@ -2,6 +2,62 @@ param([string]$RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")))
 $ErrorActionPreference = "Stop"
 $manifest = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\compiler-contract-coverage.yml") | ConvertFrom-Json
 if ($manifest.schema -ne 1 -or -not $manifest.positive_negative_required) { throw "Compiler contract coverage manifest is invalid." }
+$targetProfilePath = Join-Path $RepoRoot ([string]$manifest.technology_effect_target_profile)
+$targetProfile = Get-Content -Raw -LiteralPath $targetProfilePath | ConvertFrom-Json
+if ([int]$targetProfile.schema -ne 1 -or [string]$targetProfile.factorio_target -ne "2.1" -or
+    [string]$targetProfile.factorio_api_version -ne "2.1.11") {
+  throw "Technology-effect target profile is not bound to the governed Factorio 2.1.11 API."
+}
+$effectContracts = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "prototypes\mir\integrity\effect_contracts.lua")
+$technologyDesign = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "prototypes\mir\domain\technology\technology_design.lua")
+$modifierTypes = @($targetProfile.target_bearing_modifiers | ForEach-Object { [string]$_.type })
+if (@($modifierTypes | Group-Object | Where-Object Count -gt 1).Count -gt 0) {
+  throw "Technology-effect target profile contains duplicate modifier contracts."
+}
+foreach ($modifier in @($targetProfile.target_bearing_modifiers)) {
+  $escapedType = [regex]::Escape([string]$modifier.type)
+  $contractMatch = [regex]::Match($effectContracts, '(?s)\["' + $escapedType + '"\]\s*=\s*\{(?<body>.*?)(?=\n\s*\["|\n\})')
+  if (-not $contractMatch.Success) {
+    throw "MIR effect contracts omit target-bearing modifier: $($modifier.type)"
+  }
+  $contractBody = $contractMatch.Groups['body'].Value
+  $targetFields = @($modifier.targets | ForEach-Object { [string]$_.field })
+  if (@($targetFields | Group-Object | Where-Object Count -gt 1).Count -gt 0) {
+    throw "Technology-effect target profile duplicates a target field for $($modifier.type)."
+  }
+  foreach ($target in @($modifier.targets)) {
+    $escapedField = [regex]::Escape([string]$target.field)
+    $targetMatch = [regex]::Match($contractBody, '\{field\s*=\s*"' + $escapedField + '"(?<body>[^}]*)\}')
+    if (-not $targetMatch.Success) {
+      throw "MIR effect contract omits $($modifier.type).$($target.field)."
+    }
+    $targetBody = $targetMatch.Groups['body'].Value
+    foreach ($binding in @("resolver", "prototype_type")) {
+      $expected = [string]$target.$binding
+      if (-not [string]::IsNullOrWhiteSpace($expected) -and
+          $targetBody -notmatch ([regex]::Escape($binding) + '\s*=\s*"' + [regex]::Escape($expected) + '"')) {
+        throw "MIR effect contract has the wrong $binding for $($modifier.type).$($target.field)."
+      }
+    }
+    $required = [bool]$target.required
+    if ($targetBody -notmatch ('required\s*=\s*' + $(if ($required) { 'true' } else { 'false' }))) {
+      throw "MIR effect contract has the wrong required policy for $($modifier.type).$($target.field)."
+    }
+    if ($null -ne $target.default -and
+        $targetBody -notmatch ('default\s*=\s*"' + [regex]::Escape([string]$target.default) + '"')) {
+      throw "MIR effect contract has the wrong default for $($modifier.type).$($target.field)."
+    }
+  }
+}
+if (-not $effectContracts.Contains("function M.targets(effect)")) {
+  throw "MIR effect contracts do not expose the shared target projection."
+}
+if (-not $technologyDesign.Contains("effect_contracts.targets(effect)")) {
+  throw "TechnologyDesign does not consume the shared effect-target authority."
+}
+if ($technologyDesign.Contains('"turret_id", "fluid", "item"')) {
+  throw "TechnologyDesign still carries a parallel effect-target field scanner."
+}
 foreach ($field in @("generation_plan_gates", "actions", "family_strategies", "compatibility_pack_fields", "automatic_actions", "automatic_generation_controls", "automatic_creation_maturities", "automatic_policy_presets", "compiler_provider_fields", "diagnostic_code_namespaces", "legacy_automatic_modes", "mutation_sentinels")) {
   if (@($manifest.$field).Count -eq 0) { throw "Compiler contract coverage omits $field." }
 }
@@ -40,4 +96,4 @@ foreach ($sentinel in @(
 )) {
   if (-not $fixture.Contains($sentinel)) { throw "Compiler contract fixture is missing mutation sentinel: $sentinel" }
 }
-Write-Host "[ok] MIR compiler contract coverage and mutation sentinels are declared."
+Write-Host "[ok] MIR compiler contract coverage, exhaustive target-bearing modifiers, and mutation sentinels are declared."

@@ -20,7 +20,11 @@ $ids = @($catalog.tests | ForEach-Object { [string]$_.id })
 $duplicates = @($ids | Group-Object | Where-Object Count -gt 1)
 if ($duplicates.Count -gt 0) { throw "Duplicate assurance test IDs: $($duplicates.Name -join ', ')" }
 
-foreach ($required in @("tooling.self-test", "static.full", "performance.static", "runtime.full", "runtime.upgrade", "runtime.exact-zip", "runtime.ecosystem", "seal.verify")) {
+foreach ($required in @(
+  "tooling.self-test", "static.full", "performance.static", "runtime.full", "runtime.upgrade",
+  "runtime.exact-zip", "runtime.ecosystem", "release.approved-delta",
+  "runtime.performance-regression", "manual.release-review", "seal.verify"
+)) {
   if ($ids -notcontains $required) { throw "Missing release-blocking assurance test ID: $required" }
 }
 
@@ -42,11 +46,15 @@ foreach ($requiredSealField in @(
   "required_test_set_sha256",
   "evidence_bundle_sha256",
   "capsule_set_sha256",
+  "performance_evidence_sha256",
+  "performance_status",
+  "manual_review_attestation_sha256",
+  "manual_review_status",
   "verifier_release_sha256",
   "producer_attestation"
 )) {
   if ($releaseAssurance -notmatch ("(?m)^\s+" + [regex]::Escape($requiredSealField) + "=")) {
-    throw "Candidate seal schema omits the backport source-lock field: $requiredSealField"
+    throw "Candidate seal implementation omits required field: $requiredSealField"
   }
 }
 if ($releaseAssurance -match 'Get-MIRAssuranceOption\s+-Name\s+"--evidence"') {
@@ -78,11 +86,20 @@ foreach ($requiredWorkflowSnippet in @(
   "needs: [plan, f2]",
   "needs: [plan, f3]",
   "needs: [plan, f0, f1, f2, f3, f4]",
+  "--no-reuse --output out/verification-plan.json",
+  "out/assurance-inputs",
+  "out/worker-delta",
+  "path: artifacts/assurance/evidence",
   "assurance seal"
 )) {
   if (-not $workflow.Contains($requiredWorkflowSnippet)) {
     throw "Full assurance workflow does not enforce the required protected F0-F4 chain: $requiredWorkflowSnippet"
   }
+}
+if ($workflow -match 'dist/\*\.zip' -or
+    ([regex]::Matches($workflow, 'actions/cache/restore@v4')).Count -ne 1 -or
+    -not $workflow.Contains('${{ needs.plan.outputs.candidate_path }}')) {
+  throw "Full assurance workflow must transfer the exact candidate, keep workers ledger-free, and restore the shared ledger only at the gate."
 }
 
 Write-Host "[ok] MIR assurance manifests, domain policy, target profiles, and stable test catalog passed."

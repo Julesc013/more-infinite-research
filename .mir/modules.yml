@@ -469,6 +469,8 @@ validation_tooling:
     scenario_registry: scripts/validation/ScenarioRegistry.ps1
     golden_plans: scripts/Test-MIRGoldenPlans.ps1
     campaign_scenarios: scripts/Test-MIRScenarioManifests.ps1
+    sanitation_budgets: scripts/Test-MIRSanitationBudgets.ps1
+    evidence_hygiene: scripts/Test-MIREvidenceHygiene.ps1
     planner_artifacts: scripts/Test-MIRPlannerTools.ps1
     offline_rule_synthesis: scripts/Invoke-MIRRuleSynthesis.ps1
     offline_rule_synthesis_gate: scripts/Test-MIRRuleSynthesis.ps1
@@ -476,7 +478,13 @@ validation_tooling:
     mod_interaction_gate: scripts/Test-MIRModInteractions.ps1
     approved_delta_exporter: scripts/Export-MIRApprovedDelta.ps1
     approved_delta_gate: scripts/Test-MIRApprovedDelta.ps1
+    runtime_performance_gate: scripts/Test-MIRPerformanceRegression.ps1
+    manual_release_review_gate: scripts/Test-MIRManualReleaseReview.ps1
+    release_attestations: scripts/validation/ReleaseAttestations.ps1
+    runtime_performance_evidence_schema: verification/schema/runtime-performance-evidence.schema.json
+    manual_release_attestation_schema: verification/schema/manual-release-attestation.schema.json
     compiler_schema_drift: scripts/Test-MIRCompilerSchemaDrift.ps1
+    technology_effect_target_contracts: .mir/technology-effect-targets.json
     compiler_gate: scripts/Test-MIRCompiler.ps1
     verification_tests: validation/tests.yml
     verification_domains: validation/domains.yml
@@ -501,6 +509,7 @@ validation_tooling:
     - every executed scenario resolves through a target-bound declaration record
     - compatibility campaign records own setup roots settings expectations timeout and claim level
     - normalized approved deltas bind exact package and producer fingerprints and reject unclassified technology registry setting runtime namespace or migration drift
+    - full and backport seals require exact-candidate runtime performance evidence and package-focused manual review attestations
     - offline rule synthesis searches only the finite predicate authority and emits review-required non-production proposals
     - semantic mod interaction graphs route independent pairs to composition smoke and overlapping pairs to narrow delta campaigns
     - scenarios retain stable names and explicit groups while decomposition proceeds

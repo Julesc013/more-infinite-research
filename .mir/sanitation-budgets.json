@@ -1,0 +1,63 @@
+{
+  "schema": 1,
+  "policy": "mir-ecosystem-sanitation-budget-v1",
+  "campaigns": {
+    "base-baseline": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
+    "space-age-baseline": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
+    "space-age-circuit-competitor": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
+    "space-age-planet-cluster": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
+    "bz-suite-space-age": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
+    "krastorio2-spaced-out": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
+    "exotic-space-industries": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
+    "bob-core-suite": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
+    "angels-core-suite": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
+    "bob-angels": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
+    "krastorio2": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
+    "space-exploration": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
+    "pymodpack": {
+      "expected_external_prunes": [
+        {"technology": "casting-mk02", "effect_type": "unlock-recipe", "target": "casting-gear"}
+      ],
+      "maximum_unreviewed_external_prunes": 0
+    },
+    "nullius": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
+    "ultracube": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
+    "local-2-1-crucible-rigor-exact-dist": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
+    "local-2-1-space-age-planet-cluster": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
+    "local-2-1-muluna-secretas-astroponics-cycle": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
+    "local-2-1-aai-loaders": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
+    "local-2-1-aai-industry": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
+    "local-2-1-aai-loaders-industry": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
+    "local-2-1-aai-representative-extensions": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
+    "local-2-1-space-age-mega-smash": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
+    "local-2-1-space-age-mega-smash-with-resource-overhauls": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
+    "local-2-1-bz-suite-space-age": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
+    "local-2-1-krastorio-spaced-out": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
+    "local-2-1-krastorio-base": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
+    "local-2-1-krastorio-space-exploration": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
+    "local-2-1-bob-suite": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
+    "local-2-1-planet-pack-wrapper-full": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
+    "local-2-1-planet-pack-wrapper-lite": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
+    "local-2-1-factorioplus-space-age": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
+    "local-2-1-ev-refining-space-age": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
+    "local-2-1-mineral-chemistry-space-age": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
+    "local-2-1-simple-seablock-space-age": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
+    "local-2-1-xander-base": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
+    "local-2-0-base-baseline": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
+    "local-2-0-space-age-baseline-if-installed": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
+    "local-2-0-bz-suite": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
+    "local-2-0-bob-core-suite": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
+    "local-2-0-angels-core-suite": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
+    "local-2-0-bob-angels": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
+    "local-2-0-krastorio2": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
+    "local-2-0-space-exploration": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
+    "local-2-0-pymodpack": {
+      "expected_external_prunes": [
+        {"technology": "casting-mk02", "effect_type": "unlock-recipe", "target": "casting-gear"}
+      ],
+      "maximum_unreviewed_external_prunes": 0
+    },
+    "local-2-0-nullius": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0},
+    "local-2-0-ultracube": {"expected_external_prunes": [], "maximum_unreviewed_external_prunes": 0}
+  }
+}

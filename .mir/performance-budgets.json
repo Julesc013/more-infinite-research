@@ -1,7 +1,19 @@
 {
-  "schema": 1,
+  "schema": 2,
   "release": "3.2.0",
   "factorio_line": "2.1",
+  "regression_lanes": [
+    { "id": "base.factorio-total", "maximum_regression_percent": 20, "absolute_noise_allowance_seconds": 0.10, "max_candidate_seconds": 8.0 },
+    { "id": "space-age.factorio-total", "maximum_regression_percent": 20, "absolute_noise_allowance_seconds": 0.15, "max_candidate_seconds": 18.0 },
+    { "id": "medium-ecosystem.factorio-total", "maximum_regression_percent": 20, "absolute_noise_allowance_seconds": 0.25, "max_candidate_seconds": 90.0 },
+    { "id": "large-ecosystem.factorio-total", "maximum_regression_percent": 20, "absolute_noise_allowance_seconds": 0.25, "max_candidate_seconds": 90.0 },
+    { "id": "diagnostics-off.factorio-total", "maximum_regression_percent": 20, "absolute_noise_allowance_seconds": 0.10, "max_candidate_seconds": 7.0 },
+    { "id": "diagnostics-on.factorio-total", "maximum_regression_percent": 20, "absolute_noise_allowance_seconds": 0.10, "max_candidate_seconds": 8.0 },
+    { "id": "compiler.snapshot", "maximum_regression_percent": 20, "absolute_noise_allowance_seconds": 0.01 },
+    { "id": "compiler.graph", "maximum_regression_percent": 20, "absolute_noise_allowance_seconds": 0.01 },
+    { "id": "compiler.planning", "maximum_regression_percent": 20, "absolute_noise_allowance_seconds": 0.01 },
+    { "id": "compiler.postconditions", "maximum_regression_percent": 20, "absolute_noise_allowance_seconds": 0.01 }
+  ],
   "budgets": [
     { "id": "base", "source": "validation_scenario", "key": "base-generation-integrity", "max_seconds": 8.0 },
     { "id": "space-age", "source": "validation_scenario", "key": "space-age-generation-integrity", "max_seconds": 18.0 },

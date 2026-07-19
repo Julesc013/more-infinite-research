@@ -158,23 +158,20 @@ local function source_profile(row)
   return "stream:" .. tostring(row.stream_key), "legacy-fixed", true
 end
 
-local function effect_target(effect)
-  if type(effect) ~= "table" or effect.type == nil or effect.type == "nothing" then return nil end
-  for _, field_name in ipairs({"recipe", "ammo_category", "turret_id", "fluid", "item", "space_location"}) do
-    if effect[field_name] ~= nil then
-      return {type = effect.type, target_type = field_name, name = tostring(effect[field_name])}
-    end
-  end
-  return {type = effect.type, target_type = "native-modifier", name = effect.type}
-end
-
 local function subjects_for(row, effects, progression)
   local recipes, effect_targets, science_packs, surfaces = {}, {}, {}, {}
   for _, effect in ipairs(effects or {}) do
-    if effect.recipe then table.insert(recipes, effect.recipe) end
-    local target = effect_target(effect)
-    if target and effect.type ~= "change-recipe-productivity" then table.insert(effect_targets, target) end
-    if effect.space_location then table.insert(surfaces, effect.space_location) end
+    local targets = effect_contracts.targets(effect)
+    for _, target in ipairs(targets) do
+      if target.target_type == "recipe" then table.insert(recipes, target.name) end
+      if target.target_type == "space_location" then table.insert(surfaces, target.name) end
+      if effect.type ~= "change-recipe-productivity" then
+        table.insert(effect_targets, {type = target.type, target_type = target.target_type, name = target.name})
+      end
+    end
+    if #targets == 0 and effect.type and effect.type ~= "nothing" then
+      table.insert(effect_targets, {type = effect.type, target_type = "native-modifier", name = effect.type})
+    end
   end
   for _, ingredient in ipairs((progression and progression.science) or {}) do
     table.insert(science_packs, ingredient.name or ingredient[1])

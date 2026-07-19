@@ -148,10 +148,9 @@ superseded_candidates:
 candidate:
   artifact: dist/more-infinite-research_3.2.0.zip
   source_commit: pending
-  package_source_commit: 767db0015772e5f8507f87f07e90798ffd3bf978
-  automated_gate: pending-requalification
+  automated_gate: pending
   manual_gate: pending
-  status: requalifying-after-validation-harness-change
+  status: rebuilding-after-package-visible-change
 
 rules:
   - dev-remains-the-canonical-modern-implementation

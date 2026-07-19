@@ -16,6 +16,7 @@ This is the current executable queue for `dev`. Historical pre-consolidation que
 - Target-era metadata, API cuts, finite compiler implementations, and museum code remain isolated inside their snapshots and target branches. They are not modern Factorio 2.1 defaults.
 - The lower-wave fixed-point audit found zero unreturned portable fixes, zero stale source locks, zero stale candidates, and zero branch divergence.
 - MIR 3.2.0 verifier hardening, integrity-kernel work, modularization, optimization, fixtures, tests, and documentation are authorized on `dev`. MIR 2.5.0 begins only after the canonical 3.2.0 source freezes.
+- The former `3976BC...` development package and its 125-test result are historical checkpoint evidence. The replacement 3.2.0 package is rebuilding and is not release-qualified.
 
 ## Consolidation Gate
 
@@ -37,6 +38,7 @@ This is the current executable queue for `dev`. Historical pre-consolidation que
 - [ ] Upload 1.9.4, 1.8.2, and 1.7.1 through 1.3.0 to the Factorio Mod Portal when `MOD_UPLOAD_API_KEY` is available. Do not convert missing credentials into a passing status.
 - [ ] Upload the corrected 0.12.0 through 0.6.0 archives to the Factorio Mod Portal and record the service's acceptance or rejection without treating GitHub publication as portal proof.
 - [ ] Acquire complete Angel, Space Exploration, and Pyanodon dependency closures before making stronger compatibility claims. Inventory or a zero-root load is not evidence.
+- [x] Enforce exact per-campaign sanitation budgets with zero unreviewed external prunes and `REVIEW_REQUIRED` mismatch handling.
 
 ## Reliability And Robustness Backlog
 
@@ -62,10 +64,13 @@ This is the current executable queue for `dev`. Historical pre-consolidation que
 - [x] Establish the 3.1.9 normalized behavior-equivalence export and approved-delta manifest before the final source freeze.
 - [x] Raise the synthetic scale campaign to 100,000 canonical recipes, technologies, effects, and graph edges while preserving deterministic fingerprints and bounded diagnostics.
 - [x] Move compiler snapshots and indexes into explicit snapshot-scoped context ownership and complete the governed design, lifecycle, policy, synthesis, and interaction-campaign sequence.
-- [x] Prove the exact 3.1.9-to-3.2.0 upgrade and pass the local 125-test F0-F4 full profile against candidate SHA-256 `3976BCF18269FC2F11BCFF2A24D4D7830C75284FDAC6DD5C5FA57AC94C5FCA2C`.
-- [ ] Establish and bind the qualified 3.1.9 runtime performance regression baseline; the full profile currently proves the static performance policy and scale telemetry, not a baseline percentage comparison.
+- [x] Record the historical exact 3.1.9-to-3.2.0 upgrade and local 125-test F0-F4 checkpoint against candidate SHA-256 `3976BCF18269FC2F11BCFF2A24D4D7830C75284FDAC6DD5C5FA57AC94C5FCA2C`.
+- [ ] Regenerate the seven-scenario approved delta and expanded upgrade/configuration-change evidence against the replacement candidate.
+- [ ] Establish and bind the qualified 3.1.9 runtime performance regression evidence required directly by the revised F4 profile.
+- [ ] Qualify Factorio 2.1.8 floor smoke and the final Factorio 2.1.11 protected profile, or raise the dependency floor.
+- [x] Expand the 3.1.9-to-3.2.0 upgrade harness across base, Space Age native-owner, automatic-family, base-continuation, and mod-set configuration-change archetypes.
 - [ ] Run the protected-release full profile and create the release seal; local `untrusted-local` evidence is intentionally ineligible.
-- [ ] Complete maintainer technology-tree, icon, locale-fit, settings/save UX, balance, and public-presentation review.
+- [ ] Complete the exact-candidate package manual attestation, then complete the separate public-presentation review.
 - [ ] Supply the missing exact Pyanodon and legacy Space Exploration dependency closures before strengthening those compatibility claims.
 - [ ] Freeze canonical 3.2 source before creating the final 2.5.0 backport candidate.
 - [ ] Begin any later campaign with `git fetch --all --tags --prune`.

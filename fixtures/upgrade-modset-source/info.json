@@ -1,0 +1,8 @@
+{
+  "name": "mir-fixture-upgrade-modset-source",
+  "version": "0.1.0",
+  "title": "MIR Fixture - Upgrade Mod-set Source",
+  "author": "MIR maintainers",
+  "factorio_version": "2.1",
+  "dependencies": ["base >= 2.1.8"]
+}

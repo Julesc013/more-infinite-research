@@ -27,7 +27,7 @@
       "archive_class": "development-candidate",
       "qualification": "not-release-qualified",
       "publication_status": "unreleased",
-      "status": "release-candidate-awaiting-performance-protected-and-manual-review"
+      "status": "rebuilding-after-package-visible-change"
     },
     "factorio-2.0": {
       "mir_version": "2.5.0",

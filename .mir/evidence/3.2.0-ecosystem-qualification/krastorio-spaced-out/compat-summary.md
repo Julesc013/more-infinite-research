@@ -1,6 +1,6 @@
 # MIR Compatibility Audit Summary
 
-- Audit dir: `C:\Projects\Factorio\more-infinite-research\artifacts\ecosystem-qualification\krastorio-spaced-out`
+- Audit dir: `<repo>\artifacts\ecosystem-qualification\krastorio-spaced-out`
 - Load results: 1
 - Manual results: 1
 - Failure groups: 1

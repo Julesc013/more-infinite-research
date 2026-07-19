@@ -1,5 +1,6 @@
 {
   "schema": 1,
+  "technology_effect_target_profile": ".mir/technology-effect-targets.json",
   "generation_plan_gates": [
     "target_supported", "effect_valid", "owner_conflict_free", "science_compatible", "lab_compatible",
     "prerequisites_acyclic", "loop_safe", "progression_safe", "migration_safe", "output_identity_safe"

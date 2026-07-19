@@ -240,8 +240,12 @@ disable-blueprint-storage=true
   }
 
   $auditRows = @()
+  $sanitationRows = @()
   if ((Test-Path -LiteralPath $logPath) -and (Get-Command Read-MIRAuditLog -ErrorAction SilentlyContinue)) {
     $auditRows = @(Read-MIRAuditLog -Path $logPath)
+  }
+  if ((Test-Path -LiteralPath $logPath) -and (Get-Command Read-MIRSanitationLog -ErrorAction SilentlyContinue)) {
+    $sanitationRows = @(Read-MIRSanitationLog -Path $logPath)
   }
 
   $exitCode = if ($timedOut) { -1 } else { $process.ExitCode }
@@ -254,6 +258,7 @@ disable-blueprint-storage=true
     stdout = $logPath
     stderr = "$logPath.err"
     audit_rows = $auditRows
+    sanitation_rows = $sanitationRows
     passed = (-not $timedOut) -and $exitCode -eq 0
   }
 }

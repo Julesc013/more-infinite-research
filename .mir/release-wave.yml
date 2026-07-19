@@ -303,18 +303,20 @@ waves:
     canonical_ledger: .mir/releases.json
     archive: dist/more-infinite-research_3.2.0.zip
     archive_class: development-candidate
-    archive_bytes: 445393
-    archive_sha256: 3976BCF18269FC2F11BCFF2A24D4D7830C75284FDAC6DD5C5FA57AC94C5FCA2C
+    archive_bytes: 446018
+    archive_sha256: 32C6FAF8FCB224E3C3A93398B79C63D6CED91C0A86429524589AB3E26935465E
     assurance_policy: mir-verification-v4
-    local_qualification_evidence: .mir/evidence/3.2.0-assurance-qualification.json
-    exact_upgrade_evidence: .mir/evidence/3.2.0-upgrade-proof.json
+    superseded_local_qualification_evidence: .mir/evidence/3.2.0-assurance-qualification.json
+    superseded_exact_upgrade_evidence: .mir/evidence/3.2.0-historical-3976-upgrade-proof.json
+    exact_approved_delta_gate: pending
+    exact_upgrade_gate: pending
     runtime_performance_gate: pending-qualified-3.1.9-baseline
     protected_release_gate: pending
     interactive_gate: pending-maintainer
     assurance_seal: pending
-    release_gate: local-full-profile-passed-performance-protected-and-manual-gates-pending
+    release_gate: rebuilding-after-package-visible-change
     publication_status: unreleased
-    status: release-candidate-awaiting-performance-protected-and-manual-review
+    status: replacement-candidate-awaiting-requalification
 
   mir_2_4_0:
     version: "2.4.0"

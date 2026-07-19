@@ -7,15 +7,6 @@ local compiler_context = require("prototypes.mir.pipeline.compiler_context")
 
 local M = {}
 
-local ENTITY_TYPES = {
-  "accumulator", "ammo-turret", "assembling-machine", "beacon", "boiler",
-  "burner-generator", "container", "electric-energy-interface", "electric-pole",
-  "furnace", "generator", "inserter", "lab", "loader", "loader-1x1",
-  "logistic-container", "mining-drill", "pipe", "pipe-to-ground", "pump",
-  "radar", "reactor", "rocket-silo", "roboport", "solar-panel", "splitter",
-  "storage-tank", "transport-belt", "underground-belt"
-}
-
 local function append(index, key, value)
   if key == nil or value == nil then return end
   index[key] = index[key] or {}
@@ -81,17 +72,15 @@ local function build(phase)
     end
   end)
 
-  for _, prototype_type in ipairs(ENTITY_TYPES) do
-    for name, entity in pairs(data_raw.prototypes(prototype_type)) do
-      append(out.entities_by_type, prototype_type, name)
-      out.entity_type_by_name[name] = prototype_type
-      append(out.entities_by_subgroup, entity.subgroup, name)
-      if entity.next_upgrade then out.next_upgrade[name] = entity.next_upgrade end
-      if entity.surface_conditions then
-        out.surface_conditions.entities[name] = deepcopy(entity.surface_conditions)
-      end
+  lookup.each_entity_prototype(function(name, entity, prototype_type)
+    append(out.entities_by_type, prototype_type, name)
+    out.entity_type_by_name[name] = prototype_type
+    append(out.entities_by_subgroup, entity.subgroup, name)
+    if entity.next_upgrade then out.next_upgrade[name] = entity.next_upgrade end
+    if entity.surface_conditions then
+      out.surface_conditions.entities[name] = deepcopy(entity.surface_conditions)
     end
-  end
+  end)
 
   for recipe_name, fact in pairs(recipe_index.facts) do
     if fact.surface_conditions then

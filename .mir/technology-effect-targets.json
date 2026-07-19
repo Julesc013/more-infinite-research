@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "factorio_target": "2.1",
+  "factorio_api_version": "2.1.11",
+  "source": "https://lua-api.factorio.com/latest/types/Modifier.html",
+  "target_bearing_modifiers": [
+    { "type": "ammo-damage", "targets": [{ "field": "ammo_category", "prototype_type": "ammo-category", "required": true }] },
+    { "type": "change-recipe-productivity", "targets": [{ "field": "recipe", "prototype_type": "recipe", "required": true }] },
+    {
+      "type": "give-item",
+      "targets": [
+        { "field": "item", "resolver": "item", "required": true },
+        { "field": "quality", "prototype_type": "quality", "required": false, "default": "normal" }
+      ]
+    },
+    { "type": "gun-speed", "targets": [{ "field": "ammo_category", "prototype_type": "ammo-category", "required": true }] },
+    { "type": "turret-attack", "targets": [{ "field": "turret_id", "resolver": "entity", "required": true }] },
+    { "type": "unlock-quality", "targets": [{ "field": "quality", "prototype_type": "quality", "required": true }] },
+    { "type": "unlock-recipe", "targets": [{ "field": "recipe", "prototype_type": "recipe", "required": true }] },
+    { "type": "unlock-space-location", "targets": [{ "field": "space_location", "prototype_type": "space-location", "required": true }] }
+  ]
+}

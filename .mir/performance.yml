@@ -3,10 +3,13 @@ schema: 1
 release: 3.2.0
 factorio_line: "2.1"
 budget_manifest: .mir/performance-budgets.json
-accepted_evidence: .mir/evidence/3.1.0-automatic-compiler-runtime-summary.json
+accepted_evidence: .mir/evidence/3.2.0-performance-regression.json
 
 measurement_policy:
   - Budgets are set before performance optimization and include host-load headroom.
+  - Release regression evidence uses the sealed 3.1.9 archive and the exact final 3.2.0 candidate on one Factorio 2.1.11 installation.
+  - At least five measured runs per package follow one warm-up and a paired balanced baseline-candidate order.
+  - Each lane passes when median regression is at most 20 percent or its absolute increase is within the declared noise allowance.
   - Runtime scenario timings include Factorio process startup and save creation.
   - Local-pack timings include dependency resolution, load, diagnostics parsing, and report conversion.
   - A skipped load never counts as performance evidence.

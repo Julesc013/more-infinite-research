@@ -42,6 +42,7 @@ param(
   [switch]$FailFast,
   [Alias("ManualScenarios")]
   [string]$ManualScenariosPath = (Join-Path $PSScriptRoot "..\fixtures\compat-matrix\manual-scenarios.json"),
+  [string]$SanitationBudgetPath = (Join-Path $PSScriptRoot "..\.mir\sanitation-budgets.json"),
   [string]$KnownExclusions = (Join-Path $PSScriptRoot "..\fixtures\compat-matrix\known-exclusions.json")
 )
 
@@ -53,6 +54,12 @@ $moduleRoot = Join-Path $PSScriptRoot "MIRCompatAudit"
 . (Join-Path $moduleRoot "DependencyResolver.ps1")
 . (Join-Path $moduleRoot "DiagnosticsParser.ps1")
 . (Join-Path $moduleRoot "FactorioRunner.ps1")
+
+$resolvedSanitationBudgetPath = (Resolve-Path -LiteralPath $SanitationBudgetPath).Path
+$sanitationPolicy = Get-Content -Raw -LiteralPath $resolvedSanitationBudgetPath | ConvertFrom-Json
+if ([int]$sanitationPolicy.schema -ne 1 -or [string]$sanitationPolicy.policy -ne "mir-ecosystem-sanitation-budget-v1") {
+  throw "Compatibility audit requires mir-ecosystem-sanitation-budget-v1 schema 1."
+}
 
 $resolvedModUnderTestZip = ""
 if (-not [string]::IsNullOrWhiteSpace($ModUnderTestZip)) {
@@ -940,6 +947,7 @@ function Invoke-MIRScenarioLoad {
       stdout = ""
       stderr = ""
       audit_rows = @()
+      sanitation_rows = @()
     }
     return
   }
@@ -976,6 +984,7 @@ function Invoke-MIRScenarioLoad {
     stdout = $result.stdout
     stderr = $result.stderr
     audit_rows = @($result.audit_rows)
+    sanitation_rows = @($result.sanitation_rows)
   }
 }
 
@@ -1342,8 +1351,27 @@ if ($RunLoadTests) {
       $dependencyFailureCount = @($scenario.dependency_failures).Count
       $expectedPlan = Get-MIRObjectProperty -Object $scenario -Name "expected_plan" -Default ([pscustomobject]@{})
       $maximumDependencyFailures = [int](Get-MIRObjectProperty -Object $expectedPlan -Name "maximum_dependency_failures" -Default 0)
+      $budgetProperty = $sanitationPolicy.campaigns.PSObject.Properties[[string]$scenario.name]
+      if ($null -eq $budgetProperty) { throw "Scenario $($scenario.name) has no governed sanitation budget." }
+      $sanitationBudget = $budgetProperty.Value
+      $expectedPrunes = @($sanitationBudget.expected_external_prunes)
+      $maximumUnreviewedPrunes = [int]$sanitationBudget.maximum_unreviewed_external_prunes
+      $observedPrunes = @($result.sanitation_rows | Where-Object { [string]$_.owner -eq "external" })
+      $expectedIdentities = @($expectedPrunes | ForEach-Object { "$($_.technology)|$($_.effect_type)|$($_.target)" } | Sort-Object -Unique)
+      $observedIdentities = @($observedPrunes | ForEach-Object { "$($_.technology)|$($_.effect_type)|$($_.target)" } | Sort-Object -Unique)
+      $missingExpectedPrunes = @(Compare-Object $expectedIdentities $observedIdentities | Where-Object SideIndicator -eq '<=' | ForEach-Object InputObject)
+      $unreviewedPrunes = @(Compare-Object $expectedIdentities $observedIdentities | Where-Object SideIndicator -eq '=>' | ForEach-Object InputObject)
       $processResult = if ($result.passed -eq $true) { "passed" } elseif ($result.skipped -eq $true) { "skipped" } else { "failed" }
-      $claimGateResult = if ($processResult -eq "passed" -and $dependencyFailureCount -le $maximumDependencyFailures) {
+      $sanitationResult = if ($processResult -eq "skipped") {
+        "skipped"
+      } elseif ($missingExpectedPrunes.Count -eq 0 -and $unreviewedPrunes.Count -le $maximumUnreviewedPrunes) {
+        "passed"
+      } else {
+        "REVIEW_REQUIRED"
+      }
+      $claimGateResult = if ($processResult -eq "passed" -and
+          $dependencyFailureCount -le $maximumDependencyFailures -and
+          $sanitationResult -eq "passed") {
         "passed"
       } elseif ($processResult -eq "skipped") {
         "skipped"
@@ -1378,6 +1406,14 @@ if ($RunLoadTests) {
         timeout_seconds = [int](Get-MIRObjectProperty -Object $scenario -Name "timeout_seconds" -Default $ScenarioTimeoutSeconds)
         settings = Get-MIRObjectProperty -Object $scenario -Name "settings" -Default ([pscustomobject]@{})
         expected_plan = $expectedPlan
+        sanitation_budget = [ordered]@{
+          expected_external_prunes = $expectedPrunes
+          maximum_unreviewed_external_prunes = $maximumUnreviewedPrunes
+        }
+        observed_external_prunes = $observedPrunes
+        missing_expected_prunes = $missingExpectedPrunes
+        unreviewed_external_prunes = $unreviewedPrunes
+        sanitation_result = $sanitationResult
         source_manifest = [string](Get-MIRObjectProperty -Object $scenario -Name "source_manifest" -Default "")
         claim_level = [string](Get-MIRObjectProperty -Object $scenario -Name "claim_level" -Default "loads")
       }
@@ -1388,16 +1424,25 @@ if ($RunLoadTests) {
     kind = "mir-modpack-campaign-evidence"
     generated_at = (Get-Date).ToUniversalTime().ToString("o")
     factorio_line = $FactorioLine
-    factorio_binary = (Resolve-Path -LiteralPath $FactorioBin).Path
+    factorio_binary = [ordered]@{
+      name = Split-Path -Leaf (Resolve-Path -LiteralPath $FactorioBin).Path
+      version = (Get-Item -LiteralPath (Resolve-Path -LiteralPath $FactorioBin).Path).VersionInfo.FileVersion
+      sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath (Resolve-Path -LiteralPath $FactorioBin).Path).Hash
+    }
     mir_archive = [ordered]@{
-      path = $resolvedModUnderTestZip
+      path = if ([string]::IsNullOrWhiteSpace($resolvedModUnderTestZip)) { "working-tree" } else { Split-Path -Leaf $resolvedModUnderTestZip }
       sha256 = $lock.mod_under_test_sha256
       source_commit = $ModUnderTestSourceCommit
       source_commit_binding = if ([string]::IsNullOrWhiteSpace($ModUnderTestSourceCommit)) { "unbound" } else { "declared" }
     }
     dependency_lock = [ordered]@{
-      path = $lockPath
+      path = Split-Path -Leaf $lockPath
       sha256 = $lockSha256
+    }
+    sanitation_budget = [ordered]@{
+      policy = [string]$sanitationPolicy.policy
+      path = ".mir/sanitation-budgets.json"
+      sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $resolvedSanitationBudgetPath).Hash
     }
     scenarios = $campaignScenarios
   }

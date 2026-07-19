@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://more-infinite-research.invalid/verification/upgrade-matrix.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "status", "generated_at", "source_commit", "factorio", "baseline", "candidate", "required_archetypes", "rows"],
+  "properties": {
+    "schema": {"const": 1},
+    "kind": {"const": "mir-upgrade-matrix"},
+    "status": {"const": "passed"},
+    "generated_at": {"type": "string", "format": "date-time"},
+    "source_commit": {"type": "string", "pattern": "^[0-9a-fA-F]{40}$"},
+    "factorio": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["version", "binary_sha256"],
+      "properties": {
+        "version": {"type": "string", "minLength": 1},
+        "binary_sha256": {"type": "string", "pattern": "^[0-9a-fA-F]{64}$"}
+      }
+    },
+    "baseline": {"$ref": "#/$defs/archive"},
+    "candidate": {"$ref": "#/$defs/archive"},
+    "required_archetypes": {
+      "type": "array",
+      "minItems": 5,
+      "maxItems": 5,
+      "uniqueItems": true,
+      "items": {"enum": ["base-default", "space-age-native-owner", "automatic-family-creation", "base-continuations", "mod-set-configuration-change"]}
+    },
+    "rows": {
+      "type": "array",
+      "minItems": 5,
+      "maxItems": 5,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "status", "result", "result_sha256", "assertions"],
+        "properties": {
+          "id": {"enum": ["base-default", "space-age-native-owner", "automatic-family-creation", "base-continuations", "mod-set-configuration-change"]},
+          "status": {"const": "passed"},
+          "result": {"type": "string", "minLength": 1},
+          "result_sha256": {"type": "string", "pattern": "^[0-9a-fA-F]{64}$"},
+          "assertions": {"type": "array", "minItems": 7, "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+        }
+      }
+    }
+  },
+  "$defs": {
+    "archive": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["version", "archive", "archive_sha256"],
+      "properties": {
+        "version": {"type": "string", "minLength": 1},
+        "archive": {"type": "string", "minLength": 1},
+        "archive_sha256": {"type": "string", "pattern": "^[0-9a-fA-F]{64}$"}
+      }
+    }
+  }
+}

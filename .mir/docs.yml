@@ -1002,7 +1002,8 @@ docs:
     audience: maintainer
     doc_type: how-to
     owner: mir-maintainers
-    source_of_truth_for: []
+    source_of_truth_for:
+      - manual-release-review-attestation
   - path: docs/maintainer/README.md
     title: "Maintainer Guide"
     status: current
@@ -1016,7 +1017,8 @@ docs:
     audience: release-manager
     doc_type: how-to
     owner: mir-maintainers
-    source_of_truth_for: []
+    source_of_truth_for:
+      - protected-release-sequence
   - path: docs/maintainer/settings-governance.md
     title: "Settings Governance"
     status: current
@@ -1711,6 +1713,8 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - release-assurance-contract
+      - runtime-performance-release-gate
+      - protected-release-capsule-transfer
   - path: docs/releases/notes/release-notes-3.1.9.md
     title: "MIR 3.1.9 Release Notes"
     status: current

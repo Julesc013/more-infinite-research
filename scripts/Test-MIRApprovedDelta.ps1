@@ -1,9 +1,13 @@
 param(
-  [string]$Path = "approved-delta\3.1.9-to-3.2.0.json"
+  [string]$Path = "approved-delta\3.1.9-to-3.2.0.json",
+  [string]$Candidate = "dist\more-infinite-research_3.2.0.zip",
+  [string]$ExpectedSourceCommit = "",
+  [switch]$ValidateStructureOnly
 )
 
 $ErrorActionPreference = "Stop"
 $repo = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
+. (Join-Path $repo "scripts\validation\PackageIdentity.ps1")
 $artifactPath = if ([IO.Path]::IsPathRooted($Path)) { $Path } else { Join-Path $repo $Path }
 if (-not (Test-Path -LiteralPath $artifactPath -PathType Leaf)) {
   throw "Approved-delta artifact is absent: $artifactPath"
@@ -18,6 +22,29 @@ if ($artifact.baseline.version -ne "3.1.9" -or $artifact.baseline.archive_sha256
 }
 if ($artifact.current.version -ne "3.2.0" -or [string]::IsNullOrWhiteSpace([string]$artifact.current.archive_sha256)) {
   throw "Approved-delta current side does not bind an exact 3.2.0 archive."
+}
+if (-not $ValidateStructureOnly) {
+  $candidatePath = if ([IO.Path]::IsPathRooted($Candidate)) { $Candidate } else { Join-Path $repo $Candidate }
+  if (-not (Test-Path -LiteralPath $candidatePath -PathType Leaf)) {
+    throw "Approved-delta candidate is absent: $candidatePath"
+  }
+  if ([string]::IsNullOrWhiteSpace($ExpectedSourceCommit)) {
+    throw "Approved-delta exact-candidate validation requires -ExpectedSourceCommit."
+  }
+  $currentCommit = (Get-MIRGitCommit -RepoRoot $repo)
+  if ($currentCommit -ne $ExpectedSourceCommit -or (Test-MIRPackageSourceGitDirty -RepoRoot $repo)) {
+    throw "Approved-delta exact-candidate validation requires the clean package source at ExpectedSourceCommit."
+  }
+  $candidateSha = (Get-FileHash -Algorithm SHA256 -LiteralPath $candidatePath).Hash
+  $candidateContentSha = Get-MIRZipContentFingerprint -Path $candidatePath
+  if ($candidateContentSha -ne (Get-MIRPackageSourceFingerprint -RepoRoot $repo)) {
+    throw "Approved-delta candidate content does not match the package source authority at ExpectedSourceCommit."
+  }
+  if ([string]$artifact.current.archive_sha256 -ne $candidateSha -or
+      [string]$artifact.current.package_content_sha256 -ne $candidateContentSha -or
+      [string]$artifact.current.source_commit -ne $ExpectedSourceCommit) {
+    throw "Approved-delta current side does not bind the exact candidate, package content, and source authority."
+  }
 }
 if ([string]::IsNullOrWhiteSpace([string]$artifact.exporter.producer_sha256)) {
   throw "Approved-delta exporter does not bind its exact producer fingerprint."
@@ -87,4 +114,5 @@ foreach ($scenario in $expectedScenarios) {
   }
 }
 
-Write-Host "[ok] MIR approved delta binds seven exact-package scenarios, $($differences.Count) intentional differences, and no technology drift."
+$binding = if ($ValidateStructureOnly) { "governed artifact structure" } else { "the exact active candidate" }
+Write-Host "[ok] MIR approved delta binds $binding, seven exact-package scenarios, $($differences.Count) intentional differences, and no technology drift."

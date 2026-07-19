@@ -46,7 +46,7 @@ local function assert_effect_target_exists(effect, technology_name)
     .. ").")
 end
 
-local function log_pruned_effect(technology_name, effect, reason, owner)
+local function log_pruned_effect(technology_name, effect, reason, target, owner)
   if type(log) ~= "function" then return end
   log("[MIR] pruned dangling technology effect from "
     .. tostring(technology_name)
@@ -55,7 +55,7 @@ local function log_pruned_effect(technology_name, effect, reason, owner)
     .. " type="
     .. tostring(effect and effect.type)
     .. " target="
-    .. tostring(effect and (effect.recipe or effect.item or effect.space_location or effect.ammo_category))
+    .. tostring(target)
     .. " reason="
     .. tostring(reason))
 end
@@ -77,7 +77,7 @@ function S.sanitize_effects(effects, context, owner)
         reason = reason,
         removed_effect_fingerprint = fingerprint.of(effect or {})
       })
-      log_pruned_effect(context, effect, reason, owner or "unknown")
+      log_pruned_effect(context, effect, reason, target, owner or "unknown")
       telemetry.count("effects_pruned", 1)
       telemetry.witness("pruned_effects", tostring(context) .. ":" .. tostring(effect and effect.type) .. ":" .. tostring(target))
     end

@@ -20,13 +20,15 @@ function Resolve-MIRPerformancePath {
 $resolvedBudgetsPath = Resolve-MIRPerformancePath -Path $BudgetsPath
 $resolvedPerformancePolicyPath = Resolve-MIRPerformancePath -Path $PerformancePolicyPath
 $manifest = Get-Content -Raw -LiteralPath $resolvedBudgetsPath | ConvertFrom-Json
-if ($manifest.schema -ne 1) { throw "Performance budget manifest must use schema 1." }
+if ($manifest.schema -ne 2) { throw "Performance budget manifest must use schema 2." }
 $budgets = @($manifest.budgets)
 if ($budgets.Count -eq 0) { throw "Performance budget manifest contains no budgets." }
+$regressionLanes = @($manifest.regression_lanes)
+if ($regressionLanes.Count -eq 0) { throw "Performance budget manifest contains no regression lanes." }
 
 $requiredIds = @(
   "base", "space-age", "scoped-caps-off", "scoped-caps-on", "diagnostics-off",
-  "diagnostics-on", "medium-pack", "large-pack", "large-synthetic-graph", "full-matrix"
+  "diagnostics-on", "medium-pack", "large-pack", "large-synthetic-graph", "large-synthetic-recipes", "full-matrix"
 )
 $duplicates = @($budgets | Group-Object id | Where-Object Count -gt 1 | Select-Object -ExpandProperty Name)
 if ($duplicates.Count -gt 0) { throw "Duplicate performance budget IDs: $($duplicates -join ', ')." }
@@ -38,6 +40,12 @@ foreach ($requiredId in $requiredIds) {
 foreach ($budget in $budgets) {
   if ([double]$budget.max_seconds -le 0) { throw "Performance budget '$($budget.id)' must be positive." }
   if ([string]::IsNullOrWhiteSpace([string]$budget.key)) { throw "Performance budget '$($budget.id)' has no source key." }
+}
+foreach ($lane in $regressionLanes) {
+  if ([string]::IsNullOrWhiteSpace([string]$lane.id) -or [double]$lane.maximum_regression_percent -ne 20 -or
+      [double]$lane.absolute_noise_allowance_seconds -lt 0) {
+    throw "Performance regression lane is invalid: $($lane.id)"
+  }
 }
 
 $performancePolicy = Get-Content -Raw -LiteralPath $resolvedPerformancePolicyPath

@@ -92,7 +92,13 @@ function Get-MIRAssuranceInputFingerprint {
     }
     "upgrade-fixture" {
       $fixture = [string]$Context.verification_profile.upgrade.fixture
-      return Get-MIRAssurancePatternFingerprint -Patterns @("fixtures/$fixture/**", "scripts/Test-MIRUpgrade.ps1")
+      return Get-MIRAssurancePatternFingerprint -Patterns @(
+        "fixtures/$fixture/**",
+        "fixtures/upgrade-modset-source/**",
+        "scripts/Test-MIRUpgrade.ps1",
+        "scripts/Test-MIRUpgradeMatrix.ps1",
+        "verification/schema/upgrade-matrix.schema.json"
+      )
     }
     "candidate-seal" {
       if ($Context.seal) { return Get-MIRAssuranceExternalFileFingerprint -Path $Context.seal -MissingLabel "candidate-seal" }
@@ -607,6 +613,8 @@ function Resolve-MIRAssuranceCommandText {
     "<upgrade-from>"=[string]$Context.verification_profile.upgrade.from_version
     "<upgrade-to>"=[string]$Context.verification_profile.upgrade.to_version
     "<upgrade-fixture>"=[string]$Context.verification_profile.upgrade.fixture
+    "<source-commit>"=[string]$Plan.source_commit
+    "<qualification-factorio-version>"=[string]$Context.verification_profile.qualification_factorio_version
   }
   $resolved = $Command
   foreach ($entry in $values.GetEnumerator()) {

@@ -1,6 +1,6 @@
 # MIR Compatibility Audit Summary
 
-- Audit dir: `C:\Projects\Factorio\more-infinite-research\artifacts\ecosystem-qualification\available-closures`
+- Audit dir: `<repo>\artifacts\ecosystem-qualification\available-closures`
 - Load results: 7
 - Manual results: 7
 - Failure groups: 10

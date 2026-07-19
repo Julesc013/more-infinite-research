@@ -5,15 +5,31 @@ applies_to: "3.0.0+"
 audience: maintainer
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-07-07
+last_reviewed: 2026-07-18
 supersedes: []
 superseded_by: []
 ---
 # Manual Test Plan
 
-Updated: 2026-07-04
+Updated: 2026-07-18
 
 This document defines named manual saves and scenarios. Runtime fixture validation is necessary, but it does not replace save-level gameplay validation.
+
+## 3.2.0 Release Attestation
+
+The pre-seal package review is evidence, not a pending-item list. Record it in `.mir/evidence/3.2.0-manual-review-attestation.json` with schema 2, checklist version `mir-manual-release-review-v1`, exact candidate archive and content hashes, package source commit, Factorio 2.1.11 binary hash, reviewer identity, UTC review time, passed item rows, notes, portable artifact paths and SHA-256 values, overall `passed` status, and the canonical attestation self-hash.
+
+The exact required package item IDs are:
+
+- `technology-tree-visual`;
+- `icon-visual`;
+- `locale-fit-and-truncation`;
+- `settings-ux`;
+- `save-ui`;
+- `human-balance`;
+- `configuration-change-give-item-safety` (with a connected player, research an external `give-item` technology, record inventory, trigger the MIR adoption-signature change, and prove no duplicate item or unrelated force-state loss).
+
+Waivers do not count as passed package review. If an item cannot pass, keep the attestation absent or failed and leave the F4 gate blocked. GitHub release text, Mod Portal presentation, screenshots, links, and final public claims belong to a separate pre-publication checklist; they do not prevent sealing unchanged package bytes, but they do prevent publication.
 
 ## Release Use
 

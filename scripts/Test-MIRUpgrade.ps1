@@ -6,6 +6,9 @@ param(
   [string]$FromVersion = "3.0.5",
   [string]$ToVersion = "3.1.0",
   [string]$FixtureName = "assert-upgrade-3-0-5-to-3-1-0",
+  [ValidateSet("", "base-default", "space-age-native-owner", "automatic-family-creation", "base-continuations", "mod-set-configuration-change")]
+  [string]$Archetype = "",
+  [string[]]$SourceOnlyFixtureNames = @(),
   [string]$OutputPath = ""
 )
 
@@ -23,10 +26,39 @@ function Copy-MIRUpgradeLogEvidence {
     [Parameter(Mandatory)][string]$Source,
     [Parameter(Mandatory)][string]$Destination
   )
-  @(
+  $normalized = @(
     Get-Content -LiteralPath $Source |
-      ForEach-Object { $_.TrimEnd() }
-  ) | Set-Content -LiteralPath $Destination -Encoding UTF8
+      Where-Object { $_ -notmatch 'System info:|Memory info:|\s\[[0-9]+\]:\s' } |
+      ForEach-Object {
+        $_.TrimEnd() `
+          -replace '(?i)[A-Z]:\\Program Files\\Steam\\steamapps\\common\\Factorio', '<factorio-install>' `
+          -replace '(?i)[A-Z]:/Program Files/Steam/steamapps/common/Factorio', '<factorio-install>' `
+          -replace '(?i)[A-Z]:\\Users\\[^\\]+\\AppData\\Local\\Temp\\mir-upgrade-[^\\\s"]+', '<temp-upgrade-root>' `
+          -replace '(?i)[A-Z]:/Users/[^/]+/AppData/Local/Temp/mir-upgrade-[^/\s"]+', '<temp-upgrade-root>'
+      }
+  )
+  $normalized | Set-Content -LiteralPath $Destination -Encoding UTF8
+}
+
+function Write-MIRUpgradeModList {
+  param(
+    [Parameter(Mandatory)][string]$Path,
+    [Parameter(Mandatory)][string]$FixtureModName,
+    [Parameter(Mandatory)][bool]$EnableDlc,
+    [string[]]$AdditionalModNames = @()
+  )
+  $rows = @(
+    @{ name = "base"; enabled = $true }
+    @{ name = "elevated-rails"; enabled = $EnableDlc }
+    @{ name = "quality"; enabled = $EnableDlc }
+    @{ name = "recycler"; enabled = $EnableDlc }
+    @{ name = "space-age"; enabled = $EnableDlc }
+    @{ name = "more-infinite-research"; enabled = $true }
+    @{ name = $FixtureModName; enabled = $true }
+  )
+  foreach ($name in $AdditionalModNames) { $rows += @{ name = $name; enabled = $true } }
+  [ordered]@{ mods = $rows } | ConvertTo-Json -Depth 5 |
+    Set-Content -LiteralPath $Path -Encoding UTF8
 }
 
 $factorio = Resolve-MIRUpgradePath -Path $FactorioBin
@@ -38,14 +70,16 @@ $fixture = Resolve-MIRUpgradePath -Path (Join-Path $RepoRoot "fixtures\$FixtureN
 $fixtureInfo = Get-Content -Raw -LiteralPath (Join-Path $fixture "info.json") | ConvertFrom-Json
 $fixtureModName = [string]$fixtureInfo.name
 $proofSuffix = if ($FixtureName -like "*-automatic-compiler") { " automatic compiler" } else { "" }
+$archetypeSuffix = if ($Archetype) { " archetype=$Archetype" } else { "" }
+$artifactSlug = if ($Archetype) { $Archetype } else { "default" }
 if ([string]::IsNullOrWhiteSpace($OutputPath)) {
-  $OutputPath = ".mir\evidence\$ToVersion-upgrade-proof.json"
+  $OutputPath = ".mir\evidence\$ToVersion-upgrade-$artifactSlug-proof.json"
 }
 $output = if ([System.IO.Path]::IsPathRooted($OutputPath)) { $OutputPath } else { Join-Path $RepoRoot $OutputPath }
 $outputParent = Split-Path -Parent $output
 if (-not (Test-Path -LiteralPath $outputParent)) { New-Item -ItemType Directory -Force -Path $outputParent | Out-Null }
 
-$upgradeSlug = (($FromVersion + "-to-" + $ToVersion) -replace '[^0-9A-Za-z.-]', '-')
+$upgradeSlug = (($FromVersion + "-to-" + $ToVersion + "-" + $artifactSlug) -replace '[^0-9A-Za-z.-]', '-')
 $root = Join-Path ([System.IO.Path]::GetTempPath()) ("mir-upgrade-$upgradeSlug-" + [guid]::NewGuid().ToString("N"))
 $mods = Join-Path $root "mods"
 $userdata = Join-Path $root "userdata"
@@ -59,60 +93,105 @@ $config = Join-Path $root "config.ini"
   "check-updates=false"
 ) | Set-Content -LiteralPath $config -Encoding UTF8
 
-$modList = [ordered]@{ mods = @(
-  @{ name = "base"; enabled = $true },
-  @{ name = "elevated-rails"; enabled = $true },
-  @{ name = "quality"; enabled = $true },
-  @{ name = "recycler"; enabled = $true },
-  @{ name = "space-age"; enabled = $true },
-  @{ name = "more-infinite-research"; enabled = $true },
-  @{ name = $fixtureModName; enabled = $true }
-) }
-$modList | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath (Join-Path $mods "mod-list.json") -Encoding UTF8
-Copy-Item -LiteralPath $from -Destination (Join-Path $mods (Split-Path -Leaf $from))
-Copy-Item -LiteralPath $fixture -Destination (Join-Path $mods $fixtureModName) -Recurse
+$enableDlc = -not $isLegacyFactorio
+if ($Archetype) { $enableDlc = $Archetype -eq "space-age-native-owner" }
+$sourceOnlyModNames = @()
+foreach ($sourceFixtureName in $SourceOnlyFixtureNames) {
+  $sourceFixture = Resolve-MIRUpgradePath -Path (Join-Path $RepoRoot "fixtures\$sourceFixtureName")
+  $sourceInfo = Get-Content -Raw -LiteralPath (Join-Path $sourceFixture "info.json") | ConvertFrom-Json
+  $sourceModName = [string]$sourceInfo.name
+  if ([string]::IsNullOrWhiteSpace($sourceModName)) { throw "Source-only fixture $sourceFixtureName has no mod name." }
+  Copy-Item -LiteralPath $sourceFixture -Destination (Join-Path $mods $sourceModName) -Recurse
+  $sourceOnlyModNames += $sourceModName
+}
 
-$save = Join-Path $root "mir-$FromVersion-save.zip"
+$modListPath = Join-Path $mods "mod-list.json"
+Write-MIRUpgradeModList -Path $modListPath -FixtureModName $fixtureModName -EnableDlc $enableDlc -AdditionalModNames $sourceOnlyModNames
+Copy-Item -LiteralPath $from -Destination (Join-Path $mods (Split-Path -Leaf $from))
+$stagedFixture = Join-Path $mods $fixtureModName
+Copy-Item -LiteralPath $fixture -Destination $stagedFixture -Recurse
+if ($Archetype) {
+  $settingsPath = Join-Path $stagedFixture "settings.lua"
+  if (-not (Test-Path -LiteralPath $settingsPath -PathType Leaf)) {
+    throw "Upgrade archetype selection requires fixture settings.lua: $settingsPath"
+  }
+  $settingsText = Get-Content -Raw -LiteralPath $settingsPath
+  $updatedSettingsText = $settingsText -replace 'default_value\s*=\s*"[^"]+"', ('default_value = "' + $Archetype + '"')
+  if ($updatedSettingsText -eq $settingsText -and $settingsText -notmatch ('default_value\s*=\s*"' + [regex]::Escape($Archetype) + '"')) {
+    throw "Could not select upgrade archetype $Archetype in $settingsPath"
+  }
+  Set-Content -LiteralPath $settingsPath -Value $updatedSettingsText -Encoding UTF8
+}
+
+$save = Join-Path $root "mir-$FromVersion-$artifactSlug-save.zip"
 $log = Join-Path $userdata "factorio-current.log"
 $createArgs = @("--config", $config, "--no-log-rotation", "--disable-audio", "--mod-directory", $mods, "--create", $save)
 $createExitCode = Invoke-FactorioProcess -FilePath $factorio -Arguments $createArgs
 if (-not (Test-Path -LiteralPath $save) -or ($createExitCode -ne 0 -and -not $isLegacyFactorio)) {
-  throw "MIR $FromVersion upgrade source save creation failed with exit code $createExitCode."
+  throw "MIR $FromVersion upgrade source save creation failed with exit code $createExitCode. Temporary root: $root"
 }
 $createText = Get-Content -Raw -LiteralPath $log
-if ($isLegacyFactorio -and -not $createText.Contains("[mir-fixture] $FromVersion$proofSuffix upgrade source proof complete")) {
+if ($isLegacyFactorio -and -not $createText.Contains("[mir-fixture] $FromVersion$proofSuffix upgrade source proof complete$archetypeSuffix")) {
   $sourceInitArgs = @(
     "--config", $config, "--no-log-rotation", "--disable-audio", "--mod-directory", $mods,
     "--start-server", $save, "--until-tick", "1"
   )
   $sourceInitExitCode = Invoke-FactorioProcess -FilePath $factorio -Arguments $sourceInitArgs
   if ($sourceInitExitCode -ne 0) {
-    throw "MIR $FromVersion legacy source-save initialization failed with exit code $sourceInitExitCode."
+    throw "MIR $FromVersion legacy source-save initialization failed with exit code $sourceInitExitCode. Temporary root: $root"
   }
   $createText = Get-Content -Raw -LiteralPath $log
 }
-if (-not $createText.Contains("[mir-fixture] $FromVersion$proofSuffix upgrade source proof complete")) {
-  throw "MIR $FromVersion upgrade source proof marker is missing."
+$sourceMarker = "[mir-fixture] $FromVersion$proofSuffix upgrade source proof complete$archetypeSuffix"
+if (-not $createText.Contains($sourceMarker)) {
+  throw "MIR $FromVersion upgrade source proof marker is missing: $sourceMarker. Temporary root: $root"
 }
-$createEvidence = Join-Path $outputParent "$ToVersion-upgrade-from-$FromVersion-create.txt"
+$createEvidence = Join-Path $outputParent "$ToVersion-upgrade-$artifactSlug-from-$FromVersion-create.txt"
 Copy-MIRUpgradeLogEvidence -Source $log -Destination $createEvidence
 
 Get-ChildItem -LiteralPath $mods -File -Filter "more-infinite-research_*.zip" | Remove-Item -Force
 Copy-Item -LiteralPath $to -Destination (Join-Path $mods (Split-Path -Leaf $to))
+foreach ($sourceModName in $sourceOnlyModNames) {
+  $sourcePath = Join-Path $mods $sourceModName
+  $resolvedSourcePath = (Resolve-Path -LiteralPath $sourcePath).Path
+  if (-not $resolvedSourcePath.StartsWith($mods, [StringComparison]::OrdinalIgnoreCase)) {
+    throw "Refusing to remove source-only fixture outside temporary mod directory: $resolvedSourcePath"
+  }
+  Remove-Item -LiteralPath $resolvedSourcePath -Recurse -Force
+}
+Write-MIRUpgradeModList -Path $modListPath -FixtureModName $fixtureModName -EnableDlc $enableDlc
+
 $loadArgs = @(
   "--config", $config, "--no-log-rotation", "--disable-audio", "--mod-directory", $mods,
   "--benchmark", $save, "--benchmark-ticks", "1", "--benchmark-runs", "1", "--benchmark-sanitize"
 )
 $loadExitCode = Invoke-FactorioProcess -FilePath $factorio -Arguments $loadArgs
-if ($loadExitCode -ne 0) { throw "MIR $ToVersion upgrade load failed with exit code $loadExitCode." }
+if ($loadExitCode -ne 0) { throw "MIR $ToVersion upgrade load failed with exit code $loadExitCode. Temporary root: $root" }
 $loadText = Get-Content -Raw -LiteralPath $log
-if (-not $loadText.Contains("[mir-fixture] $FromVersion to $ToVersion$proofSuffix upgrade proof complete")) {
-  throw "MIR $ToVersion upgrade proof marker is missing."
+$loadMarker = "[mir-fixture] $FromVersion to $ToVersion$proofSuffix upgrade proof complete$archetypeSuffix"
+if (-not $loadText.Contains($loadMarker)) {
+  throw "MIR $ToVersion upgrade proof marker is missing: $loadMarker. Temporary root: $root"
 }
-$loadEvidence = Join-Path $outputParent "$ToVersion-upgrade-from-$FromVersion-load.txt"
+$loadEvidence = Join-Path $outputParent "$ToVersion-upgrade-$artifactSlug-from-$FromVersion-load.txt"
 Copy-MIRUpgradeLogEvidence -Source $log -Destination $loadEvidence
 
-$assertions = if ($isLegacyFactorio) {
+$assertions = if ($Archetype) {
+  $common = @(
+    "startup-profile-retained",
+    "technology-level-retained",
+    "current-research-retained",
+    "fractional-research-progress-retained",
+    "fixture-storage-retained",
+    "exact-candidate-normal-mod-directory-load"
+  )
+  switch ($Archetype) {
+    "base-default" { $common + @("base-only-mod-set-retained") }
+    "space-age-native-owner" { $common + @("space-age-native-owner-retained") }
+    "automatic-family-creation" { $common + @("automatic-generated-family-retained", "automatic-recipe-target-retained") }
+    "base-continuations" { $common + @("base-continuation-retained") }
+    "mod-set-configuration-change" { $common + @("source-only-mod-removed", "removed-recipe-target-sanitized") }
+  }
+} elseif ($isLegacyFactorio) {
   @(
     "startup-setting-retained",
     "generated-technology-level-retained",
@@ -142,16 +221,21 @@ $assertions = if ($isLegacyFactorio) {
 }
 
 [ordered]@{
-  schema = 1
+  schema = 2
   status = "passed"
   generated_at = (Get-Date).ToUniversalTime().ToString("o")
   git_commit = (& git -C $RepoRoot rev-parse HEAD).Trim()
+  archetype = if ($Archetype) { $Archetype } else { "default" }
   factorio_binary_version = $factorioVersionInfo.FileVersion
+  factorio_binary_sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $factorio).Hash
   from = [ordered]@{ version = $FromVersion; path = $FromZip; sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $from).Hash }
   to = [ordered]@{ version = $ToVersion; path = $ToZip; sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $to).Hash }
+  source_only_fixtures = @($SourceOnlyFixtureNames)
   assertions = $assertions
   create_log = (Split-Path -Leaf $createEvidence)
+  create_log_sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $createEvidence).Hash
   load_log = (Split-Path -Leaf $loadEvidence)
+  load_log_sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $loadEvidence).Hash
 } | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $output -Encoding UTF8
 
-Write-Host "[ok] MIR $FromVersion to $ToVersion upgrade proof: $output"
+Write-Host "[ok] MIR $FromVersion to $ToVersion upgrade proof ($artifactSlug): $output"

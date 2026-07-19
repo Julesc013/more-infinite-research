@@ -5,14 +5,14 @@ applies_to: "3.0.0+"
 audience: release-manager
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-07-08
+last_reviewed: 2026-07-18
 supersedes: []
 superseded_by: []
 ---
 
 # Release Process
 
-Use the release checklist, static validation, runtime validation, package validation, changelog review, compatibility claim review, and package hash record before publishing.
+Use the canonical assurance plan, exact approved delta, static and runtime qualification, paired performance evidence, package-focused manual attestation, changelog and compatibility-claim review, protected seal, and package hash record before publishing.
 
 ## Release Freeze
 
@@ -37,24 +37,27 @@ Blocked before publish:
 
 ## Publish-Candidate Check
 
-Run the publish-candidate check from a clean `dev` checkout:
+Run the publish-candidate preflight from a clean `dev` checkout. Materialize the plan before executing tests:
 
 ```powershell
 git status
 git rev-parse HEAD
 
-.\scripts\mir.ps1 legacy inventory --check
-.\scripts\Invoke-MIRValidation.ps1 -ArchitectureOnly
-.\scripts\Invoke-MIRValidation.ps1 -StaticOnly
-.\scripts\Invoke-MIRValidation.ps1 -FactorioBin "C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe"
-.\scripts\Invoke-MIRReleaseTargetedGate.ps1 -FactorioBin "C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe" -FactorioLine "2.1" -LocalModDir "C:\Projects\Factorio\testmods_2.1" -NoGitPull
-.\scripts\Build-MIRPackage.ps1
-Get-FileHash .\dist\more-infinite-research_3.0.0.zip -Algorithm SHA256
+.\scripts\mir.ps1 assurance build --target 2.1
+.\scripts\mir.ps1 verify plan --target 2.1 --profile full --factorio <factorio-2.1.11.exe> --prior <mir-3.1.9.zip> --output out/verification-plan.json
+Get-Content -Raw .\out\verification-plan.json
+Get-FileHash .\dist\more-infinite-research_<version>.zip -Algorithm SHA256
 git diff --check
 git status
 ```
 
-If README, changelog, locale, or any other package-visible file changes, rebuild `dist/more-infinite-research_<version>.zip` and update the recorded size and SHA-256 before promotion.
+The full plan expands `runtime.upgrade` into five required archetypes in one schema-bound matrix result. Do not substitute the historical six-assertion native-owner proof. Ecosystem campaign rows must also pass their exact `.mir/sanitation-budgets.json` budget; `REVIEW_REQUIRED` is not a pass.
+
+If README, changelog, locale, or any other package-visible file changes, rebuild `dist/more-infinite-research_<version>.zip`, regenerate candidate-bound evidence, and update the recorded size and SHA-256 before promotion. Do not dispatch the protected workflow until the exact approved delta, runtime performance evidence, and package manual attestation can satisfy F4.
+
+The protected `Assurance Full Qualification` workflow builds once, uses a fresh full plan, runs F0 through F4, evaluates the aggregate gate, and creates a schema-4 seal. Download and inspect the candidate, descriptor, plan, qualification summary, performance evidence, manual attestation, and seal. Rebuild locally and require byte identity; do not publish rebuilt bytes.
+
+GitHub release text, Mod Portal presentation, screenshots, links, and public claims are reviewed after package sealing and before publication. They are not part of the package attestation unless their source is packaged.
 
 ## Backport Publication Freeze
 
@@ -71,7 +74,7 @@ Do not rebuild a published backport archive. A changed payload after upload must
 
 ## Main Promotion
 
-Promote `dev` to `main` only after the publish-candidate check passes.
+Promote `dev` to `main` only after the protected seal and promotion check pass against the same candidate bytes.
 
 Fast-forward flow:
 
@@ -92,7 +95,7 @@ merge only after the publish-candidate check is current
 tag after the final main commit is known
 ```
 
-Use an annotated tag for the published source point:
+Use an annotated tag only after the public candidate bytes match the seal:
 
 ```powershell
 git tag -a v3.0.0 -m "More Infinite Research 3.0.0"

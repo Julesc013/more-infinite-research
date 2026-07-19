@@ -70,13 +70,20 @@ function Assert-MIRCandidateBoundEvidence {
   )
 
   $upgrade = Get-MIRCandidateEvidenceJson -Fields $Fields -Field "upgrade_evidence_path" -Label "Upgrade"
-  if ([int]$upgrade.schema -ne 1 -or [string]$upgrade.status -ne "passed") {
-    throw "Upgrade evidence must be schema 1 with status passed."
+  if ([int]$upgrade.schema -ne 1 -or [string]$upgrade.kind -ne "mir-upgrade-matrix" -or [string]$upgrade.status -ne "passed") {
+    throw "Upgrade evidence must be a passing schema-1 mir-upgrade-matrix."
   }
-  if ([string]$upgrade.to.version -ne $Version -or [string]$upgrade.to.sha256 -ne $ArchiveSha256) {
-    throw "Upgrade evidence is not bound to the active candidate version and archive."
+  if ([string]$upgrade.candidate.version -ne $Version -or [string]$upgrade.candidate.archive_sha256 -ne $ArchiveSha256) {
+    throw "Upgrade matrix is not bound to the active candidate version and archive."
   }
-  $upgradeCommit = [string]$upgrade.git_commit
+  $requiredArchetypes = @("base-default", "space-age-native-owner", "automatic-family-creation", "base-continuations", "mod-set-configuration-change")
+  $declaredArchetypes = @($upgrade.required_archetypes | ForEach-Object { [string]$_ } | Sort-Object -Unique)
+  $passingArchetypes = @($upgrade.rows | Where-Object status -eq "passed" | ForEach-Object { [string]$_.id } | Sort-Object -Unique)
+  if (@(Compare-Object $requiredArchetypes $declaredArchetypes).Count -ne 0 -or
+      @(Compare-Object $requiredArchetypes $passingArchetypes).Count -ne 0) {
+    throw "Upgrade matrix does not contain exactly the five required passing archetypes."
+  }
+  $upgradeCommit = [string]$upgrade.source_commit
   if ($upgradeCommit -notmatch '^[0-9a-f]{40}$') {
     throw "Upgrade evidence must identify the full harness commit that produced it."
   }
@@ -98,7 +105,9 @@ function Assert-MIRCandidateBoundEvidence {
   }
   $failedCampaignRows = @($campaign.scenarios | Where-Object {
     [string]$_.result -ne "passed" -or [int]$_.dependency_failure_count -ne 0 -or
-    [string]$_.claim_level -notin @("loads", "observed", "cooperates", "partial-family", "full-family")
+    [string]$_.sanitation_result -ne "passed" -or @($_.missing_expected_prunes).Count -ne 0 -or
+    @($_.unreviewed_external_prunes).Count -ne 0 -or
+    [string]$_.claim_level -notin @("loads", "observed", "cooperates", "diagnostic-only", "partial-support", "full-family-support", "full-pack-support")
   })
   if (@($campaign.scenarios).Count -eq 0 -or $failedCampaignRows.Count -gt 0) {
     throw "Ecosystem campaign evidence contains no scenarios or a non-passing/malformed scenario."

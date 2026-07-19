@@ -110,6 +110,11 @@ local_campaign_manifest:
     - expected_plan
     - timeout_seconds
     - claim_level
+  sanitation_budget:
+    path: .mir/sanitation-budgets.json
+    policy: mir-ecosystem-sanitation-budget-v1
+    validator: scripts/Test-MIRSanitationBudgets.ps1
+    unknown_repair_disposition: REVIEW_REQUIRED
   independent_aai_scenarios:
     - local-2-1-aai-loaders
     - local-2-1-aai-industry
@@ -363,11 +368,26 @@ fixtures:
   upgrade-3-1-9-to-3-2-0:
     requires_features: [recipe_productivity]
     assertion_path: fixtures/assert-upgrade-3-1-9-to-3-2-0
+    supplemental_paths:
+      - fixtures/upgrade-modset-source
+    harness: scripts/Test-MIRUpgradeMatrix.ps1
+    archetypes:
+      - base-default
+      - space-age-native-owner
+      - automatic-family-creation
+      - base-continuations
+      - mod-set-configuration-change
     validates:
       - exact-3-1-9-source-archive
+      - base-default-profile-retention
       - native-owner-setting-retention
       - native-owner-technology-level-retention
       - native-owner-research-progress-retention
+      - automatic-family-generation-retention
+      - base-continuation-retention
+      - source-only-compatibility-mod-removal
+      - removed-recipe-target-sanitation
+      - independent-result-row-per-upgrade-archetype
       - exact-3-2-0-candidate-normal-mod-directory-load
 
   competing-productivity-transaction:
@@ -409,7 +429,9 @@ fixtures:
       - unsafe-unrecognized-formula-override-rejection
       - input-output-fingerprint-transaction
       - duplicate-native-owner-binding-rejection
-      - configuration-change-signature-reset
+      - configuration-change-signature-without-global-effect-reset
+      - external-give-item-connected-player-manual-review-surface
+      - other-mod-configuration-change-recipe-state-preserved
       - configuration-change-current-research-progress-retention
       - paired-base-growth-setting-semantics
       - settings-profile-compatible-stable-ids
@@ -596,6 +618,13 @@ fixtures:
       - sanitation-retained-effect-order-ledger
       - sanitation-content-fingerprints
       - post-sanitation-target-prototype-invariant
+      - missing-unlock-quality-target-pruned
+      - valid-unlock-quality-target-retained
+      - missing-turret-entity-target-pruned
+      - valid-turret-entity-target-retained
+      - missing-give-item-quality-target-pruned
+      - give-item-quality-aware-effect-identity
+      - exhaustive-factorio-2.1.11-target-bearing-modifier-contracts
       - actual-scc-cycle-edge-witness
       - scc-member-and-topology-identities
       - explicit-semantic-rejection-priority

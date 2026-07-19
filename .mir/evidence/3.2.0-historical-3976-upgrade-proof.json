@@ -6,12 +6,12 @@
   "factorio_binary_version": "2.1.10.86940",
   "from": {
     "version": "3.1.9",
-    "path": "dist\\more-infinite-research_3.1.9.zip",
+    "path": "dist/more-infinite-research_3.1.9.zip",
     "sha256": "D77B3A78DA40CD4FDD4C829A01B5030E59FB593F3387124EF5C438F6A9E8DFCD"
   },
   "to": {
     "version": "3.2.0",
-    "path": "build\\ecosystem-candidate\\more-infinite-research_3.2.0.zip",
+    "path": "more-infinite-research_3.2.0.zip",
     "sha256": "3976BCF18269FC2F11BCFF2A24D4D7830C75284FDAC6DD5C5FA57AC94C5FCA2C"
   },
   "assertions": [

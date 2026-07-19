@@ -1,4 +1,5 @@
 . (Join-Path $PSScriptRoot "Hashing.ps1")
+. (Join-Path (Split-Path -Parent $PSScriptRoot) "validation\ReleaseAttestations.ps1")
 
 function Invoke-MIRAssuranceSeal {
   param([Parameter(Mandatory)]$Context)
@@ -32,6 +33,20 @@ function Invoke-MIRAssuranceSeal {
   if ([string]$plan.candidate_descriptor_sha256 -ne [string](Get-MIRAssuranceCandidateDescriptor -Context $Context).descriptor_sha256) {
     throw "Verification plan candidate descriptor is not the current candidate."
   }
+  $performanceEvidence = Test-MIRRuntimePerformanceEvidence `
+    -RepoRoot $repo `
+    -Candidate $Context.candidate `
+    -PriorRelease $Context.prior_release `
+    -FactorioBin $Context.factorio `
+    -ExpectedSourceCommit $commit `
+    -ExpectedBaselineVersion ([string]$Context.verification_profile.upgrade.from_version) `
+    -ExpectedFactorioVersion ([string]$Context.verification_profile.qualification_factorio_version)
+  $manualReview = Test-MIRManualReleaseAttestation `
+    -RepoRoot $repo `
+    -Candidate $Context.candidate `
+    -FactorioBin $Context.factorio `
+    -ExpectedSourceCommit $commit `
+    -ExpectedFactorioVersion ([string]$Context.verification_profile.qualification_factorio_version)
   $sourceLockPath = Join-Path $repo ".mir\backport-source-lock.json"
   $canonicalDevAnchor = $commit
   if (Test-Path -LiteralPath $sourceLockPath -PathType Leaf) {
@@ -48,7 +63,7 @@ function Invoke-MIRAssuranceSeal {
   Write-MIRAssuranceAtomicJson -Value $plan -Path $planSnapshotPath
   Write-MIRAssuranceAtomicJson -Value $bundle -Path $bundleSnapshotPath
   $seal = [ordered]@{
-    schema=3
+    schema=4
     state="SEALED-RC"
     release_status="NOT RELEASED"
     version=[string]$Context.info.version
@@ -80,6 +95,12 @@ function Invoke-MIRAssuranceSeal {
     evidence_bundle_sha256=(Get-MIRAssuranceSha256 -Path $bundleSnapshotPath)
     evidence_bundle_digest=[string]$bundle.bundle_sha256
     capsule_set_sha256=[string]$bundle.capsule_set_sha256
+    performance_evidence=(Get-MIRAssuranceRepoRelativePath -Path $performanceEvidence.path)
+    performance_evidence_sha256=[string]$performanceEvidence.sha256
+    performance_status=[string]$performanceEvidence.status
+    manual_review_attestation=(Get-MIRAssuranceRepoRelativePath -Path $manualReview.path)
+    manual_review_attestation_sha256=[string]$manualReview.sha256
+    manual_review_status=[string]$manualReview.status
     verifier_release_sha256=(Get-MIRAssuranceRunnerHash)
     producer_attestation=$producer
     sealed_at=(Get-Date).ToUniversalTime().ToString("o")
@@ -94,10 +115,12 @@ function Invoke-MIRAssuranceCheckSeal {
   $sealPath = $Context.seal
   if (-not $sealPath -or -not (Test-Path -LiteralPath $sealPath -PathType Leaf)) { throw "check-seal requires --seal <path>." }
   $seal = Get-Content -Raw -LiteralPath $sealPath | ConvertFrom-Json
-  if ([int]$seal.schema -ne 3) { throw "Candidate seal schema must be 3." }
+  if ([int]$seal.schema -ne 4) { throw "Candidate seal schema must be 4." }
   $candidate = Resolve-MIRAssurancePath -Path ([string]$seal.candidate)
   $planPath = Resolve-MIRAssurancePath -Path ([string]$seal.verification_plan)
   $bundlePath = Resolve-MIRAssurancePath -Path ([string]$seal.evidence_bundle)
+  $performancePath = Resolve-MIRAssurancePath -Path ([string]$seal.performance_evidence)
+  $manualReviewPath = Resolve-MIRAssurancePath -Path ([string]$seal.manual_review_attestation)
   $checks = [ordered]@{
     seal_digest=$false
     candidate_exists=(Test-Path -LiteralPath $candidate -PathType Leaf)
@@ -120,6 +143,10 @@ function Invoke-MIRAssuranceCheckSeal {
     evidence_bundle_sha256=$false
     evidence_bundle_digest=$false
     capsule_set_sha256=$false
+    performance_evidence_sha256=$false
+    performance_status=$false
+    manual_review_attestation_sha256=$false
+    manual_review_status=$false
     verifier_release_sha256=$false
     producer_attestation=$false
   }
@@ -171,6 +198,40 @@ function Invoke-MIRAssuranceCheckSeal {
         $checks.capsule_set_sha256=(
           [string]$bundle.capsule_set_sha256 -eq [string]$seal.capsule_set_sha256 -and
           (Get-MIRAssuranceJsonHash -Value @($bundle.capsule_set)) -eq [string]$bundle.capsule_set_sha256
+        )
+      } catch {}
+    }
+  }
+  if (Test-Path -LiteralPath $performancePath -PathType Leaf) {
+    $checks.performance_evidence_sha256=((Get-MIRAssuranceSha256 -Path $performancePath) -eq [string]$seal.performance_evidence_sha256)
+    if ($checks.performance_evidence_sha256) {
+      try {
+        $performance = Get-Content -Raw -LiteralPath $performancePath | ConvertFrom-Json
+        $checks.performance_status=(
+          [string]$seal.performance_status -eq "passed" -and
+          [string]$performance.status -eq "passed" -and
+          [string]$performance.candidate.archive_sha256 -eq [string]$seal.candidate_sha256 -and
+          [string]$performance.candidate.package_content_sha256 -eq [string]$seal.candidate_content_sha256 -and
+          [string]$performance.candidate.source_commit -eq [string]$seal.source_commit
+        )
+      } catch {}
+    }
+  }
+  if (Test-Path -LiteralPath $manualReviewPath -PathType Leaf) {
+    $checks.manual_review_attestation_sha256=((Get-MIRAssuranceSha256 -Path $manualReviewPath) -eq [string]$seal.manual_review_attestation_sha256)
+    if ($checks.manual_review_attestation_sha256) {
+      try {
+        $manualReview = Get-Content -Raw -LiteralPath $manualReviewPath | ConvertFrom-Json
+        $manualMaterial = ConvertTo-MIRReleaseOrderedMap -Object $manualReview
+        $manualMaterial.Remove("attestation_sha256")
+        $manualSelfHash = Get-MIRReleaseTextSha256 -Text ($manualMaterial | ConvertTo-Json -Depth 40 -Compress)
+        $checks.manual_review_status=(
+          [string]$seal.manual_review_status -eq "passed" -and
+          [string]$manualReview.status -eq "passed" -and
+          [string]$manualReview.candidate_sha256 -eq [string]$seal.candidate_sha256 -and
+          [string]$manualReview.candidate_content_sha256 -eq [string]$seal.candidate_content_sha256 -and
+          [string]$manualReview.source_commit -eq [string]$seal.source_commit -and
+          [string]$manualReview.attestation_sha256 -eq $manualSelfHash
         )
       } catch {}
     }

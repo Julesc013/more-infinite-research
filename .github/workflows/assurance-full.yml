@@ -33,6 +33,7 @@ jobs:
       f2: ${{ steps.matrices.outputs.f2 }}
       f3: ${{ steps.matrices.outputs.f3 }}
       f4: ${{ steps.matrices.outputs.f4 }}
+      candidate_path: ${{ steps.matrices.outputs.candidate_path }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -50,13 +51,6 @@ jobs:
           if (git status --porcelain --untracked-files=all) {
             throw 'Candidate checkout is dirty.'
           }
-      - name: Restore persistent evidence ledger
-        uses: actions/cache/restore@v4
-        with:
-          path: artifacts/assurance/evidence
-          key: mir-ledger-${{ runner.os }}-${{ inputs.target }}-${{ github.run_id }}
-          restore-keys: |
-            mir-ledger-${{ runner.os }}-${{ inputs.target }}-
       - name: Build exact candidate once
         shell: pwsh
         run: ./scripts/mir.ps1 assurance build --target '${{ inputs.target }}'
@@ -64,12 +58,28 @@ jobs:
         shell: pwsh
         env:
           FACTORIO_BIN: ${{ secrets.FACTORIO_BIN }}
-        run: ./scripts/mir.ps1 verify plan --target '${{ inputs.target }}' --profile full --factorio $env:FACTORIO_BIN --prior '${{ inputs.prior_release }}' --output out/verification-plan.json
+        run: ./scripts/mir.ps1 verify plan --target '${{ inputs.target }}' --profile full --factorio $env:FACTORIO_BIN --prior '${{ inputs.prior_release }}' --no-reuse --output out/verification-plan.json
+      - name: Stage only the exact candidate and plan authority
+        shell: pwsh
+        run: |
+          $plan = Get-Content -Raw -LiteralPath out/verification-plan.json | ConvertFrom-Json
+          $stage = 'out/assurance-inputs'
+          New-Item -ItemType Directory -Force -Path "$stage/out", "$stage/dist" | Out-Null
+          Copy-Item -LiteralPath out/verification-plan.json -Destination "$stage/out/verification-plan.json"
+          $plan.candidate_descriptor | ConvertTo-Json -Depth 20 |
+            Set-Content -LiteralPath "$stage/out/candidate-descriptor.json" -Encoding utf8NoBOM
+          $candidate = [string]$plan.candidate_descriptor.path
+          if (-not (Test-Path -LiteralPath $candidate -PathType Leaf)) {
+            throw "Planned candidate does not exist: $candidate"
+          }
+          Copy-Item -LiteralPath $candidate -Destination (Join-Path "$stage/dist" (Split-Path -Leaf $candidate))
       - id: matrices
         name: Split work into the enforced F0-F4 DAG
         shell: pwsh
         run: |
           $plan = Get-Content -Raw -LiteralPath out/verification-plan.json | ConvertFrom-Json
+          "candidate_path=$([string]$plan.candidate_descriptor.path)" |
+            Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
           foreach ($layer in @('F0', 'F1', 'F2', 'F3', 'F4')) {
             $rows = @($plan.work | Where-Object { $_.layer -eq $layer })
             if ($rows.Count -eq 0) {
@@ -87,9 +97,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: mir-full-plan-and-candidate
-          path: |
-            out/verification-plan.json
-            dist/*.zip
+          path: out/assurance-inputs
           if-no-files-found: error
 
   f0:
@@ -112,23 +120,35 @@ jobs:
         with:
           name: mir-full-plan-and-candidate
           path: .
-      - uses: actions/cache/restore@v4
-        with:
-          path: artifacts/assurance/evidence
-          key: mir-ledger-${{ runner.os }}-${{ inputs.target }}-${{ github.run_id }}
-          restore-keys: |
-            mir-ledger-${{ runner.os }}-${{ inputs.target }}-
-      - name: Reuse, adopt, or run exact test instance
+      - name: Run exact fresh test instance
         if: matrix.test_id != '__none__'
         shell: pwsh
         env:
           FACTORIO_BIN: ${{ secrets.FACTORIO_BIN }}
         run: ./scripts/mir.ps1 verify run-one --target '${{ inputs.target }}' --plan out/verification-plan.json --test '${{ matrix.test_id }}' --fingerprint '${{ matrix.fingerprint }}' --factorio $env:FACTORIO_BIN --prior '${{ inputs.prior_release }}'
+      - name: Stage only this worker's immutable capsule and structured results
+        if: always() && matrix.test_id != '__none__'
+        shell: pwsh
+        run: |
+          $delta = 'out/worker-delta'
+          $capsule = "artifacts/assurance/evidence/${{ matrix.safe_test_id }}/${{ matrix.fingerprint }}"
+          if (-not (Test-Path -LiteralPath $capsule -PathType Container)) {
+            throw "Worker capsule directory is absent: $capsule"
+          }
+          $capsuleDestination = Join-Path $delta $capsule
+          New-Item -ItemType Directory -Force -Path (Split-Path -Parent $capsuleDestination) | Out-Null
+          Copy-Item -LiteralPath $capsule -Destination $capsuleDestination -Recurse
+          $scenarioResult = "artifacts/validation/${{ matrix.safe_test_id }}.json"
+          if (Test-Path -LiteralPath $scenarioResult -PathType Leaf) {
+            $resultDestination = Join-Path $delta $scenarioResult
+            New-Item -ItemType Directory -Force -Path (Split-Path -Parent $resultDestination) | Out-Null
+            Copy-Item -LiteralPath $scenarioResult -Destination $resultDestination
+          }
       - uses: actions/upload-artifact@v4
         if: always() && matrix.test_id != '__none__'
         with:
           name: mir-full-evidence-${{ matrix.safe_test_id }}
-          path: artifacts/assurance/evidence
+          path: out/worker-delta
           if-no-files-found: error
 
   f1:
@@ -209,7 +229,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           pattern: mir-full-evidence-*
-          path: artifacts/assurance/evidence
+          path: .
           merge-multiple: true
       - name: Aggregate canonical qualification gate
         shell: pwsh
@@ -231,10 +251,13 @@ jobs:
         with:
           name: assurance-full-${{ inputs.target }}-${{ inputs.candidate_sha }}
           path: |
-            dist/*.zip
+            out/candidate-descriptor.json
+            ${{ needs.plan.outputs.candidate_path }}
             out/verification-plan.json
             artifacts/assurance/evidence-bundle.json
             artifacts/assurance/qualification-summary.json
+            .mir/evidence/*-performance-regression.json
+            .mir/evidence/*-manual-review-attestation.json
             .mir/evidence/qualifications/**
             .mir/evidence/candidate-seals/**
           if-no-files-found: warn

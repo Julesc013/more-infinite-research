@@ -105,14 +105,11 @@ function M.on_configuration_changed()
   end
 
   restore_current_research_progress(previous_bindings, current.bindings)
-  for _, force in pairs(game.forces) do
-    force.reset_technology_effects()
-  end
   state.version = current.version
   state.adopted_count = current.count
   state.bindings = current.bindings
   state.signature = current.signature
-  log("[more-infinite-research] Reset technology effects for productivity family adoption signature change"
+  log("[more-infinite-research] Preserved technology effects without a force-wide reset for productivity family adoption signature change"
     .. " (adopted recipes: "
     .. tostring(current.count)
     .. ", signature: "

@@ -7,6 +7,7 @@
   "deterministic_seed": 250020,
   "running_evidence_ttl_minutes": 360,
   "trusted_repository": "self",
+  "qualification_factorio_version": "2.0",
   "upgrade": {
     "from_version": "2.4.5",
     "to_version": "2.5.0",

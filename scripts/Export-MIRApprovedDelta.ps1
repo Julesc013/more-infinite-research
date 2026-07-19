@@ -1,10 +1,11 @@
 param(
   [string]$BaselinePackage = "dist\more-infinite-research_3.1.9.zip",
-  [string]$CurrentPackage = "build\technology-design-hardening-candidate\more-infinite-research_3.2.0.zip",
+  [string]$CurrentPackage = "dist\more-infinite-research_3.2.0.zip",
   [string]$FactorioBin = $env:FACTORIO_BIN,
   [string]$OutputPath = "approved-delta\3.1.9-to-3.2.0.json",
   [string]$EvidenceRoot = "artifacts\approved-delta",
   [string]$ExpectedBaselineSha256 = "D77B3A78DA40CD4FDD4C829A01B5030E59FB593F3387124EF5C438F6A9E8DFCD",
+  [string]$ExpectedSourceCommit = "",
   [switch]$SkipExecution
 )
 
@@ -322,6 +323,13 @@ $actualBaselineSha = (Get-FileHash -Algorithm SHA256 -LiteralPath $baselinePath)
 if ($actualBaselineSha -ne $ExpectedBaselineSha256) {
   throw "Baseline archive hash differs. Expected $ExpectedBaselineSha256 actual $actualBaselineSha"
 }
+$currentSourceCommit = (& git -C $repo rev-parse HEAD).Trim()
+if ([string]::IsNullOrWhiteSpace($ExpectedSourceCommit)) {
+  throw "Approved-delta export requires -ExpectedSourceCommit for the candidate package source authority."
+}
+if ($currentSourceCommit -ne $ExpectedSourceCommit -or (Test-MIRPackageSourceGitDirty -RepoRoot $repo)) {
+  throw "Approved-delta exporter source differs. Expected $ExpectedSourceCommit actual $currentSourceCommit"
+}
 
 $scenarioNames = @(
   "approved-delta-automatic-family-controls",
@@ -358,6 +366,9 @@ foreach ($line in @(
 
 $baselineContract = Get-PackageContract -PackagePath $baselinePath
 $currentContract = Get-PackageContract -PackagePath $currentPath
+if ($currentContract.package_content_sha256 -ne (Get-MIRPackageSourceFingerprint -RepoRoot $repo)) {
+  throw "Approved-delta current package content does not match ExpectedSourceCommit package source."
+}
 $rawDifferences = [Collections.Generic.List[object]]::new()
 Add-ValueDifferences -Results $rawDifferences -Path "package" -Before $baselineContract -After $currentContract
 foreach ($scenario in $scenarioNames) {
@@ -414,7 +425,7 @@ $output = [pscustomobject][ordered]@{
   }
   current = [ordered]@{
     version = $currentContract.version
-    source_commit = (& git -C $repo rev-parse HEAD).Trim()
+    source_commit = $currentSourceCommit
     archive_sha256 = $currentContract.archive_sha256
     package_content_sha256 = $currentContract.package_content_sha256
   }

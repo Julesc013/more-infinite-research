@@ -31,6 +31,7 @@ The mod is built around **graceful compatibility**: it discovers recipes, scienc
 - **Scripted Space Age scaling:** bounded event-driven spoilage preservation remains opt-in, while agricultural growth speed is enabled as a special Space Age technology for newly planted tower crops; broader existing-save claims still require the named manual save matrix.
 - **Clean mod portal metadata:** keeps third-party compatibility-mod dependencies out of `info.json`.
 - **Save compatibility:** preserves existing generated prototype IDs across the MIR `3.0.0` architecture move. Scripted runtime storage is namespaced and must be validated before the scripted features are enabled by default or described with measured runtime behavior.
+- **Conservative 3.2 scope:** enables no additional automatic recipe-family generation by default; the compiler refactor preserves the established technology set while improving safety and compatibility.
 
 Recipe productivity researches are infinite, and this mod allows you to modify Factorio's recipe productivity cap/limit.
 

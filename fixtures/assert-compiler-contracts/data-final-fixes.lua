@@ -13,6 +13,7 @@ local compilation_plan = require("__more-infinite-research__.prototypes.mir.plan
 local output_validator = require("__more-infinite-research__.prototypes.mir.planner.output_validator")
 local effect_ownership = require("__more-infinite-research__.prototypes.mir.planner.effect_ownership")
 local effect_safety = require("__more-infinite-research__.prototypes.mir.emit.effect_safety")
+local effect_contracts = require("__more-infinite-research__.prototypes.mir.integrity.effect_contracts")
 local automatic_compiler_contract = require("__more-infinite-research__.prototypes.mir.settings.automatic_compiler_contract")
 local native_owner_cost_model = require("__more-infinite-research__.prototypes.mir.domain.native_owner.cost_model")
 local technology_design = require("__more-infinite-research__.prototypes.mir.domain.technology.technology_design")
@@ -851,20 +852,37 @@ local generic_effect_candidate = {
     {type = "unlock-recipe", recipe = "iron-gear-wheel"},
     {type = "unlock-recipe", recipe = "mir-fixture-definitely-missing-recipe"},
     {type = "gun-speed", ammo_category = "bullet", modifier = 0.1},
-    {type = "gun-speed", ammo_category = "mir-fixture-definitely-missing-ammo-category", modifier = 0.1}
+    {type = "gun-speed", ammo_category = "mir-fixture-definitely-missing-ammo-category", modifier = 0.1},
+    {type = "unlock-quality", quality = "normal"},
+    {type = "unlock-quality", quality = "mir-fixture-definitely-missing-quality"},
+    {type = "turret-attack", turret_id = "gun-turret", modifier = 0.1},
+    {type = "turret-attack", turret_id = "mir-fixture-definitely-missing-entity", modifier = 0.1},
+    {type = "give-item", item = "iron-plate", count = 1},
+    {type = "give-item", item = "iron-plate", quality = "mir-fixture-definitely-missing-quality", count = 1}
   }
 }
 local kept_generic, removed_generic, retained_effect_order, retained_effect_identities = effect_safety.sanitize_effects(
   generic_effect_candidate.effects,
   "compiler-contract-generic-effects",
   "external")
-if #kept_generic ~= 2 or #removed_generic ~= 2
+if #kept_generic ~= 5 or #removed_generic ~= 5
   or removed_generic[1].original_effect_index ~= 2
   or removed_generic[2].original_effect_index ~= 4
+  or removed_generic[3].original_effect_index ~= 6
+  or removed_generic[4].original_effect_index ~= 8
+  or removed_generic[5].original_effect_index ~= 10
   or type(removed_generic[1].removed_effect_fingerprint) ~= "string"
-  or #retained_effect_identities ~= 2
-  or retained_effect_order[1] ~= 1 or retained_effect_order[2] ~= 3 then
+  or #retained_effect_identities ~= 5
+  or retained_effect_order[1] ~= 1 or retained_effect_order[2] ~= 3
+  or retained_effect_order[3] ~= 5 or retained_effect_order[4] ~= 7
+  or retained_effect_order[5] ~= 9 then
   fail("generic effect contracts did not retain valid targets and prune missing targets")
+end
+local default_quality_identity = effect_contracts.identity({type = "give-item", item = "iron-plate"})
+local normal_quality_identity = effect_contracts.identity({type = "give-item", item = "iron-plate", quality = "normal"})
+local epic_quality_identity = effect_contracts.identity({type = "give-item", item = "iron-plate", quality = "epic"})
+if default_quality_identity ~= normal_quality_identity or normal_quality_identity == epic_quality_identity then
+  fail("give-item identities do not bind the effective quality target")
 end
 
 local command_positions = {}
