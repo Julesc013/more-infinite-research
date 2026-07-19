@@ -131,7 +131,7 @@ candidate:
   local_automated_gate: pending-regeneration
   protected_automated_gate: pending
   manual_gate: pending
-  status: localization-complete-candidate-awaiting-local-and-external-qualification
+  status: awaiting-performance-manual-ecosystem-and-protected-qualification
 
 rules:
   - dev-remains-the-canonical-modern-implementation
