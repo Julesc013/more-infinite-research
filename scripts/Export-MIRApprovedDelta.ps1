@@ -49,9 +49,14 @@ $candidatePath = Resolve-MIRDeltaPath $Candidate
 foreach ($path in @($baselinePath, $candidatePath)) {
   if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { throw "Approved-delta package is absent: $path" }
 }
-$head = (& git -C $repo rev-parse HEAD).Trim()
-if ($head -ne $ExpectedSourceCommit -or (Test-MIRPackageSourceGitDirty -RepoRoot $repo)) {
-  throw "Approved-delta export requires the clean candidate package source at ExpectedSourceCommit."
+& git -C $repo cat-file -e "$ExpectedSourceCommit`^{commit}"
+if ($LASTEXITCODE -ne 0) { throw "Approved-delta package-source commit is unavailable." }
+& git -C $repo merge-base --is-ancestor $ExpectedSourceCommit HEAD
+if ($LASTEXITCODE -ne 0) { throw "Approved-delta package-source commit is not an ancestor of HEAD." }
+$packageRoots = @(Get-MIRPackageSourceRoots)
+& git -C $repo diff --quiet $ExpectedSourceCommit HEAD -- @packageRoots
+if ($LASTEXITCODE -ne 0 -or (Test-MIRPackageSourceGitDirty -RepoRoot $repo)) {
+  throw "Package-visible source changed after the approved-delta package-source commit."
 }
 $lock = Get-Content -Raw -LiteralPath (Join-Path $repo ".mir\backport-source-lock.json") | ConvertFrom-Json
 $baselineInfo = Get-MIRDeltaInfo $baselinePath
