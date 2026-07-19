@@ -128,7 +128,7 @@ candidate:
   approved_delta_gate: superseded-by-localization-complete-candidate
   upgrade_gate: superseded-by-localization-complete-candidate
   locale_gate: pending-exact-candidate-validation
-  local_automated_gate: pending-regeneration
+  local_automated_gate: pending-clean-full-runtime
   protected_automated_gate: pending
   manual_gate: pending
   status: awaiting-performance-manual-ecosystem-and-protected-qualification
