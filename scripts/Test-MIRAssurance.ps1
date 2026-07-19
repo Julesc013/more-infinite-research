@@ -63,6 +63,13 @@ if ($releaseAssurance -match 'Get-MIRAssuranceOption\s+-Name\s+"--evidence"') {
 
 $coreScript = Join-Path $RepoRoot "scripts\MIRAssurance\Core.ps1"
 . $coreScript
+. (Join-Path $RepoRoot "scripts\validation\PackageIdentity.ps1")
+$packageInfo = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "info.json") | ConvertFrom-Json
+$candidatePath = Join-Path $RepoRoot "dist\$($packageInfo.name)_$($packageInfo.version).zip"
+if ((Test-Path -LiteralPath $candidatePath -PathType Leaf) -and
+    (Get-MIRAssuranceZipContentHash -Path $candidatePath) -ne (Get-MIRZipContentFingerprint -Path $candidatePath)) {
+  throw "Assurance and package validation disagree on the candidate content fingerprint."
+}
 $externalTreeRoot = Join-Path ([IO.Path]::GetTempPath()) ("mir-assurance-tree-cache-" + [guid]::NewGuid().ToString("N"))
 try {
   New-Item -ItemType Directory -Force -Path (Join-Path $externalTreeRoot "data") | Out-Null

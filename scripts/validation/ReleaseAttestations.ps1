@@ -41,23 +41,7 @@ function Get-MIRReleasePackageInfo {
 
 function Get-MIRReleaseArchiveContentSha256 {
   param([Parameter(Mandatory)][string]$Path)
-  Add-Type -AssemblyName System.IO.Compression.FileSystem
-  $archive = [IO.Compression.ZipFile]::OpenRead($Path)
-  try {
-    $rows = foreach ($entry in @($archive.Entries | Sort-Object FullName)) {
-      if ($entry.FullName.EndsWith("/")) { continue }
-      $stream = $entry.Open()
-      $sha = [Security.Cryptography.SHA256]::Create()
-      try {
-        $hash = ([BitConverter]::ToString($sha.ComputeHash($stream))).Replace("-", "")
-        "$($entry.FullName)`t$($entry.Length)`t$hash"
-      } finally {
-        $sha.Dispose()
-        $stream.Dispose()
-      }
-    }
-    return Get-MIRReleaseTextSha256 -Text (($rows | Sort-Object) -join "`n")
-  } finally { $archive.Dispose() }
+  return Get-MIRZipContentFingerprint -Path $Path
 }
 
 function Get-MIRReleasePercentile {

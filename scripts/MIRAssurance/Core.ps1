@@ -1,3 +1,5 @@
+. (Join-Path $PSScriptRoot "..\validation\PackageIdentity.ps1")
+
 function Get-MIRAssuranceOption {
   param([string]$Name, [string]$Default = "")
   for ($i = 0; $i -lt $script:Args.Count; $i++) {
@@ -330,24 +332,7 @@ function Get-MIRAssuranceHarnessFiles {
 
 function Get-MIRAssuranceZipContentHash {
   param([Parameter(Mandatory)][string]$Path)
-  Add-Type -AssemblyName System.IO.Compression
-  Add-Type -AssemblyName System.IO.Compression.FileSystem
-  $archive = [IO.Compression.ZipFile]::OpenRead($Path)
-  try {
-    $rows = foreach ($entry in @($archive.Entries | Sort-Object FullName)) {
-      if ($entry.FullName.EndsWith("/")) { continue }
-      $stream = $entry.Open()
-      $sha = [Security.Cryptography.SHA256]::Create()
-      try {
-        $hash = ([BitConverter]::ToString($sha.ComputeHash($stream))).Replace("-", "")
-        "$($entry.FullName)`t$($entry.Length)`t$hash"
-      } finally {
-        $sha.Dispose()
-        $stream.Dispose()
-      }
-    }
-    return Get-MIRAssuranceTextHash -Text (($rows | Sort-Object) -join "`n")
-  } finally { $archive.Dispose() }
+  return Get-MIRZipContentFingerprint -Path $Path
 }
 
 function Resolve-MIRAssurancePath {
