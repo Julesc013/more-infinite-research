@@ -1,0 +1,33 @@
+{
+  "schema": 1,
+  "status": "passed",
+  "state": "RUNTIME-QUALIFIED",
+  "release_status": "NOT RELEASED",
+  "target": "2.0",
+  "version": "2.4.5",
+  "source_commit": "47bcc80c8a70b41dbbb4f8d80b2b9433d0a10d3f",
+  "qualification_mode": "retained-complete-behavior-proof-plus-fresh-version-sensitive-candidate-checks",
+  "build": {
+    "candidate": "dist/more-infinite-research_2.4.5.zip",
+    "sha256": "7649824B72247AA38F05661422DFDEE7C729B21CC73A0A35D2455443B45D39F8",
+    "content_sha256": "5B8E21077CAC99CDB0733EBE8B34D10D0F375B2EAB2D42E60A73677860783FED",
+    "package_source_sha256": "5B8E21077CAC99CDB0733EBE8B34D10D0F375B2EAB2D42E60A73677860783FED",
+    "size_bytes": 406238,
+    "entry_count": 167,
+    "forbidden_entry_count": 0
+  },
+  "assurance_inputs": {
+    "package_source_sha256": "F41388B5D77E6203D68D380EB4D1A61B5763DA335E15C120BD3C741906BE9DAC",
+    "test_catalog_sha256": "C4937B287189CF59349CC14E9C9D45D06091776A90C100592EB125A7E9E1DDB8",
+    "validation_harness_sha256": "E13A29AB9F68E509A6640AAB6F25B3AA8BBB2B5E926C00F626F579E4B5F7E91B",
+    "factorio_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "evidence": [
+    {"test_id": "static.full", "status": "passed", "message": "Current static, governance, architecture, source-lock, locale, and package-hygiene checks passed."},
+    {"test_id": "runtime.full", "status": "passed", "message": "The sealed 2.4.1 qualification covers 94/94 declared scenarios; the 2.4.5 archive diff has no runtime-semantic change, and six fresh version-sensitive records passed."},
+    {"test_id": "runtime.upgrade", "status": "passed", "message": "The exact released 2.4.0 archive upgraded to the exact 2.4.5 candidate with native-owner settings, level, selection, fractional progress, and legacy cost-model migration retained."},
+    {"test_id": "runtime.ecosystem", "status": "passed", "message": "The final-harness local-2-0-base-baseline canary passed against the 357-ZIP local library, followed by an unchanged deterministic package build and clean-tree check."}
+  ],
+  "structured_summary": ".mir/evidence/2.4.5-change-aware-qualification.json",
+  "completed_at": "2026-07-14T11:02:58.4639166Z"
+}

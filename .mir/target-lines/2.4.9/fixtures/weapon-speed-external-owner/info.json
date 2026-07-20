@@ -1,0 +1,11 @@
+{
+  "name": "mir-fixture-weapon-speed-external-owner",
+  "version": "0.1.0",
+  "title": "MIR Fixture - External Weapon Speed Owner",
+  "author": "Julesc013",
+  "description": "Provides exact reachable infinite rocket and cannon shooting-speed ownership while preferring external competing technologies.",
+  "factorio_version": "2.0",
+  "dependencies": [
+    "base >= 2.0"
+  ]
+}

@@ -9,16 +9,81 @@ if ($LASTEXITCODE -ne 0) { throw "MIR assurance self-test failed." }
 if ($LASTEXITCODE -ne 0) { throw "MIR verification schema validation failed." }
 
 $config = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\assurance.json") | ConvertFrom-Json
+$impact = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\test-impact.yml") | ConvertFrom-Json
 $catalog = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "validation\tests.yml") | ConvertFrom-Json
 $domains = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "validation\domains.yml") | ConvertFrom-Json
 $trust = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "validation\trust.json") | ConvertFrom-Json
-if ([int]$config.schema -ne 1 -or [int]$catalog.schema -ne 2 -or [int]$domains.schema -ne 1 -or [int]$trust.schema -ne 1) {
+if ([int]$config.schema -ne 1 -or [int]$impact.schema -ne 1 -or [int]$catalog.schema -ne 2 -or [int]$domains.schema -ne 1 -or [int]$trust.schema -ne 1) {
   throw "Unsupported assurance manifest schema."
 }
 
 $ids = @($catalog.tests | ForEach-Object { [string]$_.id })
 $duplicates = @($ids | Group-Object | Where-Object Count -gt 1)
 if ($duplicates.Count -gt 0) { throw "Duplicate assurance test IDs: $($duplicates.Name -join ', ')" }
+
+$releaseHistoryClassificationCases = [ordered]@{
+  ".mir/portable-return.yml" = "release-governance"
+  ".mir/target-lines/index.json" = "release-evidence"
+  ".mir/target-lines/2.4.9/info.json" = "release-evidence"
+  ".mir/evidence/2.4.9/publication.json" = "release-evidence"
+  "approved-delta/2.4.5-to-2.4.9.json" = "release-evidence"
+  "dist/more-infinite-research_2.4.9.zip" = "release-evidence"
+}
+foreach ($case in $releaseHistoryClassificationCases.GetEnumerator()) {
+  $matchedClasses = @(
+    $config.classes | Where-Object {
+      $class = $_
+      @($class.patterns | Where-Object { [string]$case.Key -match [string]$_ }).Count -gt 0
+    } | ForEach-Object { [string]$_.id }
+  )
+  if ($matchedClasses -notcontains [string]$case.Value) {
+    throw "Release-history assurance classification is missing '$($case.Value)' for '$($case.Key)'."
+  }
+  if (@($matchedClasses | Where-Object { $_ -in @("runtime-or-migration", "settings", "compiler-data-stage", "balance", "metadata-dependencies", "test-harness") }).Count -gt 0) {
+    throw "Release-history path '$($case.Key)' incorrectly selects a runtime-impact assurance class: $($matchedClasses -join ', ')."
+  }
+}
+
+$assuranceToolingClassificationCases = @(
+  ".mir/assurance.json",
+  ".mir/test-impact.yml",
+  "scripts/Test-MIRAssurance.ps1",
+  "scripts/Test-MIRReleaseAuthority.ps1"
+)
+foreach ($path in $assuranceToolingClassificationCases) {
+  $matchedClasses = @(
+    $config.classes | Where-Object {
+      $class = $_
+      @($class.patterns | Where-Object { $path -match [string]$_ }).Count -gt 0
+    } | ForEach-Object { [string]$_.id }
+  )
+  if ($matchedClasses -notcontains "assurance-tooling" -or $matchedClasses -contains "test-harness") {
+    throw "Static assurance path '$path' must select assurance-tooling without selecting the Factorio test harness: $($matchedClasses -join ', ')."
+  }
+}
+
+$autoSealClasses = @($config.classes | Where-Object { @($_.tests) -contains "seal.verify" } | ForEach-Object { [string]$_.id })
+if ($autoSealClasses.Count -ne 0) {
+  throw "seal.verify must be reserved for explicit promotion checks, not auto-selected by change classes: $($autoSealClasses -join ', ')."
+}
+if (@($config.profiles.'promotion-check').Count -ne 1 -or [string]$config.profiles.'promotion-check'[0] -ne "seal.verify") {
+  throw "The promotion-check profile must contain exactly seal.verify."
+}
+
+foreach ($requiredStaticRoutingPath in @(
+  ".mir/assurance.json",
+  ".mir/test-impact.yml",
+  "scripts/Test-MIRAssurance.ps1",
+  "scripts/Test-MIRReleaseAuthority.ps1"
+)) {
+  $matchingRules = @($impact.paths | Where-Object { [string]$_.pattern -eq $requiredStaticRoutingPath })
+  if ($matchingRules.Count -ne 1) {
+    throw "Static assurance routing path '$requiredStaticRoutingPath' must have exactly one explicit impact rule."
+  }
+  if (@($matchingRules[0].groups).Count -ne 0 -or @($matchingRules[0].scenarios).Count -ne 0 -or @($matchingRules[0].tags).Count -ne 0) {
+    throw "Static assurance routing path '$requiredStaticRoutingPath' must not select unrelated runtime impact."
+  }
+}
 
 foreach ($required in @(
   "tooling.self-test", "static.full", "performance.static", "runtime.full", "runtime.upgrade",

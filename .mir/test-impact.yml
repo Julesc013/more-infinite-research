@@ -7,6 +7,30 @@
   ],
   "paths": [
     {
+      "pattern": ".mir/assurance.json",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": ".mir/test-impact.yml",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": "scripts/Test-MIRAssurance.ps1",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
+      "pattern": "scripts/Test-MIRReleaseAuthority.ps1",
+      "groups": [],
+      "scenarios": [],
+      "tags": []
+    },
+    {
       "pattern": "prototypes/mir/domain/native_owner/**",
       "groups": ["space-age"],
       "scenarios": ["compiler-contracts", "space-age-native-owner-settings-default", "space-age-native-owner-settings-disabled", "space-age-native-owner-settings-cost-base", "space-age-native-owner-settings-cost-growth", "space-age-native-owner-settings-research-time", "space-age-native-owner-settings-max-level", "space-age-native-owner-settings-effect", "space-age-native-owner-settings-combined", "space-age-native-owner-settings-unrecognized-default", "space-age-native-owner-settings-unrecognized-override", "space-age-native-owner-settings-config-change", "space-age-vanilla-family-adoption", "space-age-vanilla-family-adoption-config-change", "space-age-vanilla-family-owner-prepatched", "space-age-vanilla-family-exact-owner", "space-age-vanilla-family-mixed-owner"]

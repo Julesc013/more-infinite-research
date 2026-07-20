@@ -1,0 +1,12 @@
+{
+  "name": "mir-fixture-rigor-late-recipe-removal",
+  "version": "0.1.0",
+  "title": "MIR Fixture - Rigor Late Recipe Removal",
+  "author": "Julesc013",
+  "description": "Reproduces an incineration sink that exists during MIR generation and is removed by a dependent mod afterward.",
+  "factorio_version": "2.0",
+  "dependencies": [
+    "base >= 2.0",
+    "more-infinite-research"
+  ]
+}

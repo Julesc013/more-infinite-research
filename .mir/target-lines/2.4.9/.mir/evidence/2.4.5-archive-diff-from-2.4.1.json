@@ -1,0 +1,38 @@
+{
+  "schema": 1,
+  "status": "passed",
+  "baseline": {
+    "version": "2.4.1",
+    "path": "dist/more-infinite-research_2.4.1.zip",
+    "sha256": "479F57587AB841060187561D6FFEE65B275E2C89832E142E5F3F315713F3FB30",
+    "entry_count": 167
+  },
+  "candidate": {
+    "version": "2.4.5",
+    "path": "dist/more-infinite-research_2.4.5.zip",
+    "sha256": "7649824B72247AA38F05661422DFDEE7C729B21CC73A0A35D2455443B45D39F8",
+    "entry_count": 167
+  },
+  "added_paths": [],
+  "removed_paths": [],
+  "changed_paths": [
+    {
+      "path": "README.md",
+      "classification": "release-version-documentation"
+    },
+    {
+      "path": "changelog.txt",
+      "classification": "release-version-documentation"
+    },
+    {
+      "path": "info.json",
+      "classification": "release-version-metadata"
+    },
+    {
+      "path": "prototypes/mir/planner/native_owner_binding.lua",
+      "classification": "comment-only-version-label"
+    }
+  ],
+  "runtime_semantic_change": false,
+  "conclusion": "The 2.4.5 renumber changes release metadata and documentation only; the only Lua byte change is a comment label. Fresh exact-archive, configuration-change, upgrade, deterministic-build, and ecosystem checks bind the retained 2.4.1 behavior proof to the 2.4.5 bytes."
+}

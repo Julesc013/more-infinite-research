@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "technology_effect_target_profile": ".mir/technology-effect-targets.json",
+  "generation_plan_gates": [
+    "target_supported", "effect_valid", "owner_conflict_free", "science_compatible", "lab_compatible",
+    "prerequisites_acyclic", "loop_safe", "progression_safe", "migration_safe", "output_identity_safe"
+  ],
+  "actions": ["emit", "adopt", "skip", "emit_base_extension"],
+  "family_strategies": ["attach-existing", "tier-table", "fixed"],
+  "compatibility_pack_fields": [
+    "mods_any", "mods_all", "mods_none", "aliases", "exact.includes", "exact.excludes", "family_hints",
+    "science_roles", "owner_claims", "risk_overrides", "family_authorizations", "candidate_seeds", "evidence", "claim"
+  ],
+  "automatic_actions": ["disabled", "preview", "apply"],
+  "automatic_generation_controls": ["create_research", "require_reviewed_data"],
+  "automatic_creation_maturities": ["experimental", "reviewed"],
+  "automatic_policy_presets": ["conservative", "safe", "expansive", "custom"],
+  "compiler_provider_fields": [
+    "id", "source_kinds", "discovery", "positive_capabilities", "family", "normalization",
+    "semantic_signature", "default_policy", "setting_descriptors", "localization_descriptors",
+    "validation_hooks", "emission_adapter", "runtime_handler", "migration", "diagnostic_codes", "fixtures"
+  ],
+  "diagnostic_code_namespaces": ["MIR-AUTO", "MIR-PROVIDER"],
+  "legacy_automatic_modes": ["off", "report", "safe-attach", "exact-pack", "safe-generate"],
+  "mutation_sentinels": [
+    "hard-safety", "owner-conflict", "cross-stream-effect-arbitration", "missing-prerequisite", "target-filter", "output-value-parity", "pack-applicability"
+  ],
+  "positive_negative_required": true,
+  "runtime_fixture": "fixtures/assert-compiler-contracts/data-final-fixes.lua"
+}

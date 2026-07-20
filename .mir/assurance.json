@@ -60,14 +60,19 @@
       "tests": ["static.package", "runtime.exact-zip"]
     },
     {
+      "id": "assurance-tooling",
+      "patterns": ["^scripts/Test-MIR(?:Assurance|ReleaseAuthority)\\.ps1$", "^\\.mir/(assurance|test-impact)\\.(json|yml)$"],
+      "tests": ["tooling.self-test", "static.full"]
+    },
+    {
       "id": "test-harness",
-      "patterns": ["^scripts/", "^fixtures/", "^validation/", "^verification/", "^tools/mir_verify/", "^\\.mir/(assurance|fixtures|test-impact|test-catalog|targets|performance)", "^\\.github/workflows/", "^\\.gitignore$"],
+      "patterns": ["^scripts/(?!Test-MIR(?:Assurance|ReleaseAuthority)\\.ps1$)", "^fixtures/", "^validation/", "^verification/", "^tools/mir_verify/", "^\\.mir/(fixtures|test-catalog|targets|performance)", "^\\.github/workflows/", "^\\.gitignore$"],
       "tests": ["tooling.self-test", "static.full", "runtime.affected"]
     },
     {
       "id": "release-governance",
-      "patterns": ["^\\.mir/(branches|distributions|releases)\\.(json|yml)$", "^\\.mir/release-wave\\.yml$"],
-      "tests": ["docs.check", "tooling.self-test", "static.package", "seal.verify"]
+      "patterns": ["^\\.mir/(branches|distributions|releases)\\.(json|yml)$", "^\\.mir/(portable-return|release-wave)\\.yml$"],
+      "tests": ["docs.check", "tooling.self-test", "static.full", "static.package"]
     },
     {
       "id": "museum-tooling",
@@ -77,12 +82,12 @@
     {
       "id": "repository-docs",
       "patterns": ["^docs/", "^\\.mir/(branches|convergence|docs)\\.yml$", "^CONTRIBUTING\\.md$", "^todo\\.md$", "^AGENTS\\.md$"],
-      "tests": ["docs.check", "seal.verify"]
+      "tests": ["docs.check"]
     },
     {
       "id": "release-evidence",
-      "patterns": ["^\\.mir/evidence/", "^dist/"],
-      "tests": ["seal.verify"]
+      "patterns": ["^\\.mir/(evidence|target-lines)/", "^approved-delta/", "^dist/"],
+      "tests": ["tooling.self-test", "static.full", "static.package"]
     }
   ],
   "unknown_policy": {

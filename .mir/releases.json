@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "authority": "canonical-release-ledger",
-  "updated_at": "2026-07-19",
+  "updated_at": "2026-07-20",
   "published_baselines": {
     "factorio-2.1": {
       "mir_version": "3.1.9",
@@ -11,10 +11,13 @@
       "status": "published-frozen"
     },
     "factorio-2.0": {
-      "mir_version": "2.4.5",
+      "mir_version": "2.4.9",
       "branch": "legacy",
-      "tag": "2.4.5",
-      "archive": "dist/more-infinite-research_2.4.5.zip",
+      "tag": "2.4.9",
+      "tag_commit": "7ebe93029695bbf809a15a14c6540530738a9e62",
+      "archive": "dist/more-infinite-research_2.4.9.zip",
+      "archive_sha256": "B5503F94D04624F65462CC275FB6AA71A8CE93075F732DF498F6D73AD255F978",
+      "package_content_sha256": "23D992943090BFF487675E9DF8C5C12BFDB1F3018B0BF04C9928265E5DC95255",
       "status": "published-frozen"
     }
   },
@@ -36,7 +39,7 @@
       "mir_version": "2.5.0",
       "branch": "tmp/2.0",
       "source_anchor": "3.2.0-final-source-freeze",
-      "prior_release": "2.4.5",
+      "prior_release": "2.4.9",
       "archive": null,
       "archive_class": "not-built-from-final-source",
       "qualification": "pending-canonical-backport",

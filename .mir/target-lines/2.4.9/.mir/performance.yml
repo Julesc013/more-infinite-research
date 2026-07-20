@@ -1,0 +1,44 @@
+schema: 1
+
+release: 2.4.9
+factorio_line: "2.0"
+budget_manifest: .mir/performance-budgets.json
+campaign_manifest: .mir/performance-campaign.json
+accepted_evidence: .mir/evidence/2.4.9-performance-regression.json
+
+measurement_policy:
+  - Budgets are set before performance optimization and include host-load headroom.
+  - Release regression evidence uses the published 2.4.5 archive and the exact final 2.4.9 candidate on one Factorio 2.0.77 installation.
+  - At least five measured runs per package follow one warm-up and a paired balanced baseline-candidate order.
+  - Each lane passes when median regression is at most 20 percent or its absolute increase is within the declared noise allowance.
+  - Runtime scenario timings include Factorio process startup and save creation.
+  - Local-pack timings include dependency resolution, load, diagnostics parsing, and report conversion.
+  - The medium ecosystem lane is the exact local-2-0-bz-suite closure and the large ecosystem lane is the fixed 19-root local-2-0-performance-large stress closure.
+  - The large stress closure is diagnostic-only performance evidence and does not create public compatibility claims for its included mods.
+  - Diagnostics are applied by a separate settings-stage override mod so the published baseline and candidate archives remain byte-exact.
+  - Every ecosystem run must resolve to the same normalized name version and archive SHA-256 closure.
+  - A skipped load never counts as performance evidence.
+  - Load-only overhaul observations do not create compatibility support claims.
+  - Source-instrumented coverage measurements do not create archive compatibility claims.
+  - The split 100000-scale campaigns cover recipes technologies effects graph edges a 25000-node SCC and randomized insertion order without conflating independent stress domains.
+  - Factorio runtime materializes 60000 technologies below the engine hard limit of 65535 while the same compiler graph implementation validates 100000 in-memory planned technologies.
+  - The recipe engine fixture materializes 1000 structural candidates while MIR's production canonicalizer indexes and fingerprints 100000 in-memory recipe prototypes without crossing Factorio's prototype limit.
+  - Adversarial SCCs stay in MIR's iterative graph validator because Factorio's recursive post-load cycle checker cannot safely materialize the 25000-node cycle.
+
+required_surfaces:
+  - base
+  - space-age
+  - scoped-caps-off
+  - scoped-caps-on
+  - diagnostics-off
+  - diagnostics-on
+  - medium-pack
+  - large-pack
+  - large-synthetic-graph
+  - large-synthetic-recipes
+  - full-matrix
+
+regression_policy:
+  qualified_baseline: "2.4.5"
+  absolute_budgets: .mir/performance-budgets.json
+  maximum_regression_percent: 20

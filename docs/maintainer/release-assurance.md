@@ -5,7 +5,7 @@ applies_to: "3.2.0+"
 audience: release-manager
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-07-18
+last_reviewed: 2026-07-20
 supersedes: []
 superseded_by: []
 ---
@@ -136,7 +136,7 @@ Seal schema 4 binds the performance-evidence and manual-attestation paths, file 
 
 ## Backports
 
-Backports recalculate every fingerprint on the target branch. MIR 2.5.0 uses the Factorio 2.0 candidate ZIP, Factorio 2.0 verification profile and binary, target scenario declarations, target fixtures and mod lock, target dependency contract, and exact MIR 2.4.5 prior release. Factorio 2.1 evidence cannot satisfy the Factorio 2.0 aggregate gate even if source files look similar.
+Backports recalculate every fingerprint on the target branch. MIR 2.5.0 uses the Factorio 2.0 candidate ZIP, Factorio 2.0 verification profile and binary, target scenario declarations, target fixtures and mod lock, target dependency contract, and exact MIR 2.4.9 prior release. Factorio 2.1 evidence cannot satisfy the Factorio 2.0 aggregate gate even if source files look similar.
 
 Tooling may be ported as one portable change, but target metadata, API adapters, reduced feature decisions, fixtures, archive bytes, and evidence remain target-local. Build the target candidate before planning any matrix that requires package domains.
 

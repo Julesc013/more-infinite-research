@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://more-infinite-research.invalid/verification/test.schema.json",
+  "title": "MIR verification test definition",
+  "type": "object",
+  "required": ["id", "kind", "layer", "requires_factorio"],
+  "properties": {
+    "id": { "type": "string", "minLength": 1 },
+    "kind": { "enum": ["static", "matrix", "runtime"] },
+    "layer": { "enum": ["F0", "F1", "F2", "F3", "F4"] },
+    "command": { "type": "string", "minLength": 1 },
+    "matrix": { "type": "object" },
+    "requires_factorio": { "type": "boolean" },
+    "inputs": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "kind": { "const": "matrix" } }, "required": ["kind"] },
+      "then": { "required": ["matrix"] },
+      "else": { "required": ["command"] }
+    }
+  ],
+  "additionalProperties": false
+}

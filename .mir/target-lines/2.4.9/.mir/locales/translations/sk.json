@@ -1,0 +1,2558 @@
+{
+  "schema": 1,
+  "locale": "sk",
+  "language": "Slovak",
+  "source_locale": "en",
+  "entries": [
+    {
+      "key": "mod-name.more-infinite-research",
+      "source_sha256": "A923CD819778A8B674E084A16AC23815064EFC989FB84C8AA31E2748ED9A79F9",
+      "translation": "Viac nekonečného výskumu",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-description.more-infinite-research",
+      "source_sha256": "772F387ADBF95F126026436EE429AFC2E315477B0B844E808A6230A798492353",
+      "translation": "Pridáva konfigurovateľnú nekonečnú produktivitu a bonusové výskumy pre medziprodukty, logistiku, boj, bonusy pre hráčov a medzery vo vesmírnom veku.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "technology-name.more-infinite-research.research_breeding",
+      "source_sha256": "4F4CB82ABD37479345FCC5598FB94F5893673ACA23EC946D832451072BB1B0C5",
+      "translation": "Produktivita chovu",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "technology-name.more-infinite-research.research_spoilage_preservation",
+      "source_sha256": "464A89D31A57A8CF2CBF8C8F0E7C0ECFF4BBB0C575FDF5F70B63CD2CD94377A3",
+      "translation": "Zachovanie znehodnotenia",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "technology-name.more-infinite-research.research_agricultural_growth_speed",
+      "source_sha256": "FBAC5CF7ABA54F091C1872C0531EFC1574CBBF10BC6447027048FAA052BF8C8E",
+      "translation": "Rýchlosť rastu poľnohospodárstva",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "technology-name.more-infinite-research.research_holmium",
+      "source_sha256": "9795A17561BA9EB07EC90EB563220AB413F0CCFFC038FF7B9C0DE7B44EF9F26D",
+      "translation": "Produktivita Holmium",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "technology-name.more-infinite-research.research_supercapacitor",
+      "source_sha256": "7549F0CFD25268CC031ED0CCDC2EACF100AB8DA57FDDDF923107229B59C9875E",
+      "translation": "Produktivita superkondenzátora",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "technology-name.more-infinite-research.research_superconductor",
+      "source_sha256": "75AD48450A19B9522CC483DF9F3BD88574E62B57244A20A9074648BC96FA7564",
+      "translation": "Produktivita supravodičov",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "technology-name.more-infinite-research.research_bioflux",
+      "source_sha256": "35AD1A5CE83B4D4AD18BF64B03DBB935F9E102EB9BA8D6DBA6E3B740F4E99D96",
+      "translation": "Produktivita biofluxu",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "technology-name.more-infinite-research.research_quantum_processor",
+      "source_sha256": "C08EAED9BD3336E0D88CEBDDD82D4CF242676EC7184BFCB0F5C3F12A228ABF45",
+      "translation": "Produktivita kvantového procesora",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "technology-name.more-infinite-research.research_plastic",
+      "source_sha256": "19AA440A46C2A5D698C04434F1B29C01019D4822306026671D1275538D5B2E0B",
+      "translation": "Plastová produktivita",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "technology-name.more-infinite-research.research_sulfur",
+      "source_sha256": "894B5742D99D8D4F1AD3C5308B733F87ADFF3EA3AEF3CF87BB22605B014E57E0",
+      "translation": "Produktivita síry",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "technology-name.more-infinite-research.research_bacteria_cultivation",
+      "source_sha256": "A0DCA2DFC4C522206EFB40D36A5900952E9A4009DF45A03E5895511146A15825",
+      "translation": "Produktivita kultivácie baktérií",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "technology-name.more-infinite-research.research_batteries",
+      "source_sha256": "4CCEF35B1DF9BFC6A2CF6F0AB49384A7C4248EDBD13F06E360CE38BDA7DEBCE7",
+      "translation": "Produktivita batérie",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "technology-name.more-infinite-research.research_explosives",
+      "source_sha256": "6EDF669C4945A5F7D612FEE222E15AE2DE3D61B3F21907D1E37E818AFA463F39",
+      "translation": "Produktivita výbušnín",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "technology-name.more-infinite-research.research_gears",
+      "source_sha256": "27D65EA4934A8EC1C9072BC17F62B36DCE0D5FA4EEDDDACB6A4D56DE599DB38E",
+      "translation": "Produktivita železných ozubených kolies",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "technology-name.more-infinite-research.research_iron_sticks",
+      "source_sha256": "6AA00DA1C48790EBDDDC503B34DA201CB4921A4F3F5B28A6BEC6F826C73B22C6",
+      "translation": "Produktivita železnej tyče",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "technology-name.more-infinite-research.research_copper_cable",
+      "source_sha256": "48C71AF243B166958D151E0496B0417F89E1772460CDFF9339A3C0049881B867",
+      "translation": "Produktivita medených káblov",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "technology-name.more-infinite-research.research_electronic_circuit",
+      "source_sha256": "6851E85B11EEFB94F02F00159230D997D80EA681CAE86A82E2348FD5A3DABE3B",
+      "translation": "Produktivita elektronických obvodov",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "technology-name.more-infinite-research.research_advanced_circuit",
+      "source_sha256": "96D976B282AB5E7296355E5CFAAC886478181B90F9143B19BE56A7C401899CE1",
+      "translation": "Pokročilá produktivita obvodov",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "technology-name.more-infinite-research.research_processing_unit",
+      "source_sha256": "1B6CB9CFD66093A98CDB8991F948F06260B14307D56FA0AE0F22113474C96EFD",
+      "translation": "Produktivita spracovateľskej jednotky",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "technology-name.more-infinite-research.research_low_density_structure",
+      "source_sha256": "0F5506D9F3D12651A8C11AF755CE127586B6746E39BD7C8A432A2557DC363CF7",
+      "translation": "Produktivita štruktúry s nízkou hustotou",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "technology-name.more-infinite-research.research_rocket_fuel",
+      "source_sha256": "C09D5E7B17E8C1ECF28F0BDF285E7D3C21AA49C9AF40186C1D107A5DBFC155D9",
+      "translation": "Produktivita raketového paliva",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "technology-name.more-infinite-research.research_copper",
+      "source_sha256": "378CDC5A9281709215C18CFE90F3908A2A445EA9BA4AF5E1D05CAD4F162E04E1",
+      "translation": "Produktivita medených dosiek",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "technology-name.more-infinite-research.research_iron",
+      "source_sha256": "AB28A3F6600460A60F451054E5C44D68281127896D300286E89E8B848C190312",
+      "translation": "Produktivita železného plechu",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "technology-name.more-infinite-research.research_steel",
+      "source_sha256": "6DC96AF07713E679BA4799525BE809A6868A04A65348B730E002088E5788CCFE",
+      "translation": "Produktivita ocele",
+      "provenance": "preexisting"
+    },
+    {
+      "key": "technology-name.more-infinite-research.research_engine",
+      "source_sha256": "CE5616ADE6D3416DEAF3A9D7107F43F1C831F3B8507F4C2693D0E5DDB90465D2",
+      "translation": "Produktivita motorovej jednotky",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "technology-name.more-infinite-research.research_electric_engine",
+      "source_sha256": "15124D046621F5925BED1B8E5E4EB076B78A402DC24ED4575059700035465571",
+      "translation": "Produktivita jednotky elektrického motora",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "technology-name.more-infinite-research.research_flying_robot_frame",
+      "source_sha256": "0BD4D5E3DA21B11784A450A32151A066BC2D0B70FA40B2E4F9610743ED18AFA1",
+      "translation": "Produktivita rámu lietajúceho robota",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "technology-name.more-infinite-research.research_tungsten",
+      "source_sha256": "8219EB2663A8D82EEE4D07E55F5BCEACBD16B998E5F4FD923D0881C0A10E57D7",
+      "translation": "Produktivita volfrámu",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "technology-name.more-infinite-research.research_carbon",
+      "source_sha256": "BA5C45A3B6AC084372EB07CA645CEFCCEB8E1DCF6172E4EA205363312EA7EE53",
+      "translation": "Produktivita uhlíka",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "technology-name.more-infinite-research.research_carbon_fiber",
+      "source_sha256": "D55B5BA1366C9922D64763B2635948B9AD20C696810D03E68B880350A0146F63",
+      "translation": "Produktivita uhlíkových vlákien",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "technology-name.more-infinite-research.research_ice",
+      "source_sha256": "D661744B7D57BA8478030E8731773214EBDAF97CE857DF52419BFC9636DF5CC5",
+      "translation": "Produktivita ľadu",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "technology-name.more-infinite-research.research_lithium",
+      "source_sha256": "AEF367BD0A7F3F567BDDAAEF4E7E3C4565CBD32714B331483E925B9CA621C829",
+      "translation": "Produktivita lítia",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "technology-name.more-infinite-research.research_modules",
+      "source_sha256": "98D637436E0B5429A627D135F7385C3AC7DADDA601591A75697D54EC6F6C4DD2",
+      "translation": "Produktivita modulu",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "technology-name.more-infinite-research.research_belts",
+      "source_sha256": "1EE5E63DB158B9BE573FFA1B3533DDB910BC9910839E859B9DB8BDB61D186BBC",
+      "translation": "Produktivita prepravného pásu",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "technology-name.more-infinite-research.research_inserters",
+      "source_sha256": "13BC5ACA89BB789D5C19DBC92772CE563847D88F40D6B939D69905764D9BE97C",
+      "translation": "Produktivita vkladača",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "technology-name.more-infinite-research.research_bullets",
+      "source_sha256": "A0233DE2A00C39F466447FA7160F1E84A5B2721A0EB90792D2A86313C4353210",
+      "translation": "Kultová produktivita",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "technology-name.more-infinite-research.research_heavy_ammo",
+      "source_sha256": "D27733D39F982020DCE1C663D44ED5A8167C8EC45563F6349B7E9B7CD9563A91",
+      "translation": "Produktivita delového granátu",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "technology-name.more-infinite-research.research_rockets",
+      "source_sha256": "7A436CCF2499A8D924A8DC70C81B32E52AE8F7248F8C76A4A258E76C4438EC4D",
+      "translation": "Raketová produktivita",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "technology-name.more-infinite-research.research_armor_components",
+      "source_sha256": "5D9C2E964C5E2BCB5E3E090E07D97DA471AA99FDEBD3493F6248766AEEA37ED4",
+      "translation": "Produktivita komponentov brnenia",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "technology-name.more-infinite-research.research_walls",
+      "source_sha256": "F6E6CF18612C209464C256BD9363CA32735FD20E54D2B6CF12B613E5B7F54770",
+      "translation": "Produktivita steny",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "technology-name.more-infinite-research.research_grenades",
+      "source_sha256": "C5BA1A632B4F1E408AFA4125DC5D50959AD75DBDA32A14C3958BDA92DBA026D7",
+      "translation": "Produktivita granátov",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "technology-name.more-infinite-research.research_landfill",
+      "source_sha256": "177CB67AA0F59475F5B40403F524B2BD47B19943C88C2C606CB94F764B158CFD",
+      "translation": "Produktivita skládky",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "technology-name.more-infinite-research.research_artificial_soil",
+      "source_sha256": "D3EFCEAB620B07D0AEA342782F9D85CD91D825057B966175166D8BA602600EA6",
+      "translation": "Produktivita umelej pôdy",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "technology-name.more-infinite-research.research_molten_metals",
+      "source_sha256": "CC50E74B2EC40422BF4AE407AF2128AA1FB7804703548FB9CDE2ED2F6C365687",
+      "translation": "Produktivita roztavených kovov",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "technology-name.more-infinite-research.research_rails",
+      "source_sha256": "9111F5C2ED91F3D95C06A993764EB0A66D665D0E306C511B65843F42EBE7CAF4",
+      "translation": "Produktivita koľajníc",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "technology-name.more-infinite-research.research_concrete",
+      "source_sha256": "580A40CADF6C8D02E10BF6104A19B7AAD9E27D5AD408BDA24E610B0E233E738F",
+      "translation": "Produktivita betónu",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "technology-name.more-infinite-research.research_furnace",
+      "source_sha256": "CE4E9A726E8FDD9F22A95926E0847A5CCB0EEF5CDB31738B40E5F55C7F8420A3",
+      "translation": "Produktivita pece",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "technology-name.more-infinite-research.research_electric_energy",
+      "source_sha256": "648B90BF98A3D1E8018FD277FF51742AB350E33F834A0BE3683A3B3391F95CE4",
+      "translation": "Produktivita elektrickej energie",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "technology-name.more-infinite-research.research_science_pack_productivity",
+      "source_sha256": "90CDB40CDAA142AC529CF24C123617EE03231BDAC0E633C9DB01A86B2C422706",
+      "translation": "Produktivita vedeckého balíka",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "technology-name.more-infinite-research.research_mining_drill",
+      "source_sha256": "6FBDA5DBA1F31C73662E8843156FFD7AEA0B5536E18CF88225667DF3B802833B",
+      "translation": "Produktivita banských vrtákov",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "technology-name.more-infinite-research.research_rocket_shooting_speed",
+      "source_sha256": "10F9804EC00165EE8E3BBD133EECFCEB63D846CCA18039A0287645143932BA8F",
+      "translation": "Rýchlosť raketového streľby",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "technology-name.more-infinite-research.research_cannon_shooting_speed",
+      "source_sha256": "23B72658ABA7B34DC1DCC181956EAE455FB88434BFA25F1A404CC6EAE2D004F9",
+      "translation": "Rýchlosť streľby z dela",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "technology-name.more-infinite-research.research_flamethrower_shooting_speed",
+      "source_sha256": "7DEE563F45205E9EDCC8F39AC6279571BA2D07F9EC2B633C65BA62BE4366FF5B",
+      "translation": "Rýchlosť streľby z plameňometu",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "technology-name.more-infinite-research.research_electric_shooting_speed",
+      "source_sha256": "B352C093997FD643DEF3992FB50AE0ECF247D1946A8D7EB4A914416CE1377E17",
+      "translation": "Elektrická rýchlosť streľby",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "technology-name.more-infinite-research.research_character_mining_speed",
+      "source_sha256": "AD98179A7E10EE415D5EBD68D232F6BA741C63BE221E139300D6793595F2EF34",
+      "translation": "Rýchlosť ťažby znakov",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "technology-name.more-infinite-research.research_character_crafting_speed",
+      "source_sha256": "0E720D0FF389654D16A4F37A7857AD1A6931D96B2CABA7E70A4FAD9CAEEB9C63",
+      "translation": "Rýchlosť vytvárania postavy",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "technology-name.more-infinite-research.research_character_walking_speed",
+      "source_sha256": "2029D85814C698C513A5DB7D935D44D3332BBB00C3EAB84FE979E2C245AB5BD7",
+      "translation": "Rýchlosť chôdze postavy",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "technology-name.more-infinite-research.research_character_reach",
+      "source_sha256": "16079C20C761C6FD11E49B18D5BD2ACD03B11E1D6C8AAFFD5E31669147F5BA67",
+      "translation": "Bonus za dosiahnutie postavy",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "technology-name.more-infinite-research.research_inventory_capacity",
+      "source_sha256": "BFD2604474AEF907EE687994795D46F3440FEE3E5AD30C1B07B4CBC00DBA247C",
+      "translation": "Sloty na inventár postáv",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "technology-name.more-infinite-research.research_robot_battery",
+      "source_sha256": "1C7BF2CF262966E67BBCFD2C941B0C9750C1AD87B163FE689A42B9C247F48BA5",
+      "translation": "Batéria robotického robota",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "technology-name.more-infinite-research.research_lab_productivity",
+      "source_sha256": "492B72CC4D371B8AA96F03C0AA6EA1C111D8E2A669108DAE24C8350344168948",
+      "translation": "Produktivita výskumu",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "technology-name.more-infinite-research.research_cargo_bay_unloading_distance",
+      "source_sha256": "C63E03ACA0AC68B1132C746E30999001FEE0A49F1E761D25A96BD36282DFA867",
+      "translation": "Vykladacia vzdialenosť nákladného priestoru",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "technology-name.more-infinite-research.research_cargo_landing_pad_count",
+      "source_sha256": "A06FC062201F130641D85EA0B225A2477F6B1738D4E01F82ED00C6B1BC67E7F6",
+      "translation": "Počet pristávacích plôch pre náklad",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "technology-name.more-infinite-research.research_thruster_fuel_productivity",
+      "source_sha256": "11C8EB1F3708BAA5A6B63439FCE2646EE8B517C444FFC28863416EA36AF12B29",
+      "translation": "Produktivita paliva vrtule",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "technology-name.more-infinite-research.research_thruster_oxidizer_productivity",
+      "source_sha256": "FBF1926DC0ED8E0B4353596C2D1D26F13856C015DA0DA00883B1FF5F01A23510",
+      "translation": "Produktivita okysličovača trysky",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "technology-name.more-infinite-research.research_oil_processing_productivity",
+      "source_sha256": "504AA1614E6E51667F6370E255614E5BBE823C69B71EFB35A93CEE2F3A75B13D",
+      "translation": "Produktivita spracovania ropy",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "technology-name.more-infinite-research.research_oil_cracking_productivity",
+      "source_sha256": "E7EFA8AF18514218ED4CABF729DE10A86F070621011EA1AC5FE8C032021E2C91",
+      "translation": "Produktivita krakovania ropy",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "technology-name.more-infinite-research.research_lubricant_productivity",
+      "source_sha256": "A4331FBE7D5216CE2040CCDB3881ED83E7139AB8EB0C7DC37F0AA108B0DA830A",
+      "translation": "Produktivita maziva",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "technology-name.more-infinite-research.research_sulfuric_acid_productivity",
+      "source_sha256": "642A68C55C0A2D091CA9CA4D426AD5406CF13ECDAF71D376804676C60CB314AF",
+      "translation": "Produktivita kyseliny sírovej",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "technology-description.more-infinite-research.recipe_productivity",
+      "source_sha256": "CCEEF99B7C3FD560ABF1DC5AF1E97D2DF663217F56CAAD6BEDE54C583D5255B5",
+      "translation": "Zvyšuje produktivitu receptov pre vybrané recepty. Stále platí maximálny limit produktivity Factorio; ďalšie nekonečné úrovne nemusia mať žiadny praktický účinok, keď recept dosiahne svoj strop.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "technology-description.more-infinite-research.direct_effect",
+      "source_sha256": "7FFAEC448AF04EC815EEB63E53841F4924130559CECCC31049558C692FAC146F",
+      "translation": "Pridáva nekonečný opakovateľný bonus. Vedecké balíčky sa vyberajú z aktívnych laboratórií, takže technológia zostáva skúmateľná pomocou kompatibilných súprav modov.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "technology-description.more-infinite-research.cargo_bay_unloading_distance",
+      "source_sha256": "A5A7DC0CBDC15B11C3B145B53C6C653E5EE153AE6E6C7556139CDDF0A0BECFB8",
+      "translation": "Zväčšuje maximálnu vzdialenosť medzi pristávacou plochou pre náklad a pripojenými vykladacími priestormi.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "technology-description.more-infinite-research.cargo_landing_pad_count",
+      "source_sha256": "AE5718C6FBE9866ADF47B88AEBB23E14C770B4670947A44005BEE78857192A46",
+      "translation": "Zvyšuje počet pristávacích plôch, ktoré môže každá sila postaviť na povrchu.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "technology-description.more-infinite-research.flamethrower_shooting_speed",
+      "source_sha256": "0E16098E03338A421224F111DA64DA6AF3118CE44D3F7BB27AA6848E22C12E0C",
+      "translation": "Zvyšuje rýchlosť streľby pre plameňometné zbrane a plameňometné veže.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "technology-description.more-infinite-research.electric_shooting_speed",
+      "source_sha256": "43577FAA532CFAC448D7EBEAC3EBC9ACB12894B7BF0507104662748846F03E0B",
+      "translation": "Zvyšuje rýchlosť streľby pre elektrické zbrane. Vo vanilke to ovplyvňuje obranu proti vybíjaniu; s Space Age to ovplyvňuje aj zbrane Tesla, keď je k dispozícii kategória tesla munície.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "technology-description.more-infinite-research.spoilage_preservation",
+      "source_sha256": "48B298E08D2A2827C45FD9207203BE4868779C8164A898161D08D21F180687F1",
+      "translation": "Zvyšuje globálny modifikátor času pokazenia prostredníctvom ohraničeného skriptovaného efektu. Existujúce pokaziteľné položky si môžu ponechať svoje aktuálne termíny pokazenia, kým sa neotestujú v hre.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "technology-description.more-infinite-research.agricultural_growth_speed",
+      "source_sha256": "80F0EB437B4A0441DD186FAFDD245F2A9639C406DB012D2ED16ED14E3DA41F41",
+      "translation": "Skracuje zostávajúci čas rastu pre novovysadené poľnohospodárske vežové rastliny prostredníctvom ohraničeného skriptovaného efektu.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "technology-description.more-infinite-research.lab_productivity",
+      "source_sha256": "72C5EF82C9136BC537950B80C9D7CDE99D62EB44BB578E8A708A0F73C216451F",
+      "translation": "Zvyšuje pokrok vo výskume získaný z každého spotrebovaného vedeckého balíka pomocou modifikátora produktivity natívneho laboratórneho výskumu.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "modifier-description.cargo-landing-pad-count",
+      "source_sha256": "0461AA4A6CCDE370ED5C9CAAB7242FD804D509B0AAF335E8197675362F2A3202",
+      "translation": "Nákladné pristávacie plochy na plochu: +__1__",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "modifier-description.flamethrower-shooting-speed-bonus",
+      "source_sha256": "5862DF0C862780D1C8888B6230D7A122C385B6A25415D6FA8E38C208D7A0CD96",
+      "translation": "Rýchlosť streľby z plameňometu: +__1__",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "modifier-description.electric-shooting-speed-bonus",
+      "source_sha256": "1B74584107363C2C2A0BD443266717C36CCDE4EC46329625E0421CF7E613D28A",
+      "translation": "Rýchlosť elektrického snímania: +__1__",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "modifier-description.tesla-shooting-speed-bonus",
+      "source_sha256": "D3F3A96BDDB134D9B254B0CE921DAB53BDE1FF62E6EC467336B2A52F54C6AA07",
+      "translation": "Rýchlosť snímania Tesla: +__1__",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "modifier-description.laboratory-productivity",
+      "source_sha256": "0AA37C22FEAA237630978265B829C0890654427B4751FFACB62CD5EE4E028D79",
+      "translation": "Produktivita laboratórneho výskumu: +__1__",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "modifier-description.worker-robot-battery",
+      "source_sha256": "E792549083C46DEAFAEACBF36FA96E3EFB61A0499D37E0D62DCAAAA74BCF3C45",
+      "translation": "Batéria robotického robota: +__1__",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "modifier-description.character-inventory-slots-bonus",
+      "source_sha256": "D387D2A542AFFDB8B8DC9C55FE37F153EE978D96F31123EDE324C4BF1A1C89A3",
+      "translation": "Sloty pre inventár postáv: +__1__",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "modifier-description.character-logistic-trash-slots",
+      "source_sha256": "D950C349AE071FB653F420F74777227B73137ACDFCB044B7B7675CBDC50527E2",
+      "translation": "Logistické priehradky na odpadky postáv: +__1__",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "modifier-description.character-crafting-speed",
+      "source_sha256": "FBD733C874D859ED77B657B9D001B1DCD5E606E86248CA37DFC1E32590F055AA",
+      "translation": "Rýchlosť tvorby postavy: +__1__",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "modifier-description.character-mining-speed",
+      "source_sha256": "433AC3028FD0DC1736DFCB7E7893C67C0EEBF0E23BB1842DB28BF96BDF115D36",
+      "translation": "Rýchlosť ťažby znakov: +__1__",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "modifier-description.character-running-speed",
+      "source_sha256": "B65586DF7F4EAEE353A461E7AF221F61562BB3C111C208A29548300BC672864E",
+      "translation": "Rýchlosť chôdze znakov: +__1__",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "modifier-description.character-reach-distance",
+      "source_sha256": "7A152E02079C39624AD1FF9543B2E531F44539AE68D35403338CC04F9352A641",
+      "translation": "Vzdialenosť dosahu znakov: +__1__",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "modifier-description.character-build-distance",
+      "source_sha256": "7BC00E224C37022426F84E9B20277A785E05A3F198B20FE2148D2CF8BB3D18D1",
+      "translation": "Vzdialenosť pri zostavovaní postavy: +__1__",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "modifier-description.character-resource-reach-distance",
+      "source_sha256": "2778AAFCB7E609DF7F642B5CD58E8031AB94973E34F02704836AD1120D367E3E",
+      "translation": "Vzdialenosť dosahu zdroja postavy: +__1__",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "modifier-description.character-item-drop-distance",
+      "source_sha256": "78E881ACD2BEBDDA5C35A6479E2B64FCEB1168E613A62600A29C86FD42A21F91",
+      "translation": "Vzdialenosť medzi znakovými položkami: +__1__",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "modifier-description.more-infinite-research.spoilage_preservation",
+      "source_sha256": "60FDCC2164F9AC5E3025E7CEC6B9DF81B81F9D440E90D399D0B2521ED5CA9FCE",
+      "translation": "Čas znehodnotenia: +__1__% za úroveň",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "modifier-description.more-infinite-research.agricultural_growth_speed",
+      "source_sha256": "C1A015B1F60F49370935183F9B875513D490B0F782C8A1E2EF42A82337F25FC1",
+      "translation": "Rýchlosť rastu poľnohospodárstva: +__1__% na úroveň",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-name.ips-require-space-gate",
+      "source_sha256": "5560D558A0F750375707786BFC3046815B8E4B85B72943878A7E13F40F8C854D",
+      "translation": "[font=default-bold][color=green]Hlavné:[/color][/font] Pred generovaním technológií vyžadovať dokončenie hry",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-name.mir-science-pack-ingredient-policy",
+      "source_sha256": "8AB617092736817E030876363530ECE8119A2726FFA7AD79500B53E3FB1FA25C",
+      "translation": "[font=default-bold][color=green]Hlavné:[/color][/font] Vedecké balíčky pre generované technológie",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-name.mir-automatic-productivity-action",
+      "source_sha256": "7C7AE93FB5467D7C83359D34DD5327FAB87A46B21C31C4664B6DCFEBF915EA07",
+      "translation": "[font=default-bold][color=green]Hlavné:[/color][/font] Automatická podpora receptov",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-name.mir-automatic-create-research",
+      "source_sha256": "0BBDEB4A6C73B831F335F399F32066C60E365D3496B4C7D3619A986DCACB5A18",
+      "translation": "[font=default-bold][color=green]Hlavné:[/color][/font] Povoliť vytváranie nového výskumu",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-name.mir-automatic-require-reviewed-data",
+      "source_sha256": "5804AC0B598FD7833081B21B51A81EBCBBC2B6226DDD1AE22B62854B1FA49C07",
+      "translation": "[font=default-bold][color=green]Hlavné:[/color][/font] Vyžadovať skontrolované údaje pre nový výskum",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-name.mir-automatic-compiler-mode",
+      "source_sha256": "7361843404C84E40C78FB819E91BD27B56FF21584086D77E9C01C78262CE8092",
+      "translation": "Prednastavenie staršieho automatického kompilátora (iba migrácia)",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-name.ips-enable-stream",
+      "source_sha256": "BA798E6E8D1208B0C655696384F7D71D8564086DB6FA3E7C22023E28C8B0EBE1",
+      "translation": "[font=default-bold]__1__[/font] — povoliť",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-name.ips-cost-base-stream",
+      "source_sha256": "DDA399D87B0CE47EBE342D2EDB45289BB334B95F31A46C02C0342B8E289129C0",
+      "translation": "[font=default-bold]__1__[/font] — základná cena",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-name.ips-cost-growth-stream",
+      "source_sha256": "94B05CF1F0F5A96E14D88A47EE5B1F30C4DCB7F3FA98E68953EF4BE39BC9ABCB",
+      "translation": "[font=default-bold]__1__[/font] — rast nákladov",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-name.ips-max-level-stream",
+      "source_sha256": "3E072113B6431B2FFD05CF7EC9F84EB72FB6F695AE2182220905E7CC02B409FF",
+      "translation": "[font=default-bold]__1__[/font] — maximálna úroveň",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-name.ips-research-time-stream",
+      "source_sha256": "CC69D393062EC71921CA0196351BC036935DBC21A956E1F47E85942A1E273790",
+      "translation": "[font=default-bold]__1__[/font] — čas výskumu",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-name.mir-enable-base-tech",
+      "source_sha256": "4843462404C2ED87BAE15AADA76C773E793E73708F1F6F6D5786EC2AD94508D7",
+      "translation": "[font=default-bold]Nekonečné __1__[/font] — povoliť",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-name.mir-cost-base",
+      "source_sha256": "EF6D398C4C055E6B33639432573243CB6421584D5D483772E8FB19FE4C3F5FB7",
+      "translation": "[font=default-bold]Nekonečné __1__[/font] — základná cena",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-name.mir-cost-growth",
+      "source_sha256": "E99CF506DAC568F15C51B3CB0CA41A7E8CA52E04AB63AFA1D01EE7B2E40616D9",
+      "translation": "[font=default-bold]Nekonečné __1__[/font] — rast nákladov",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-name.mir-max-level",
+      "source_sha256": "3A6C60D3097AEA74F3C3E59CFB7D0C0A51DEE8CCD97322B5EAA09A939D80E53A",
+      "translation": "[font=default-bold]Nekonečné __1__[/font] — maximálna úroveň",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-name.mir-research-time",
+      "source_sha256": "F340F43116151DC7B683CF71A34F0443D23C2FB419990F7CA0F378D5ABCC62D5",
+      "translation": "[font=default-bold]Nekonečné __1__[/font] — čas na výskum",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-name.mir-prefer-this-mod-for-competing-techs",
+      "source_sha256": "C44227763E2F8839A92FC91B8FCBA5FD37C4542F34C90CCF18C62893445C3BC9",
+      "translation": "[font=default-bold][color=green]Hlavné:[/color][/font] Pre duplicitný nekonečný výskum uprednostňujte MIR",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-name.mir-adjust-vanilla-weapon-speed-techs",
+      "source_sha256": "661B1A030C27D11D9F36BCC9D66D51C149B2E62F335208ECE3C60C653182B604",
+      "translation": "[font=default-bold][color=cyan]Kompatibilita:[/color][/font] Čistenie rýchlosti rakety/dela",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-name.mir-use-installed-space-age-icons",
+      "source_sha256": "084C4EA798A726233DD1C00A4FA82F5C809C38FE901E29B3AAB720FD4AFB23F1",
+      "translation": "[font=default-bold][color=cyan]Kompatibilita:[/color][/font] Používajte nainštalované ikony DLC v základných hrách",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-name.mir-pipeline-extent-multiplier",
+      "source_sha256": "B8C8551191BEF94537133CE9B8404066835FA005CD36E665270F7A15DB4C241E",
+      "translation": "[font=default-bold][color=cyan]Kompatibilita:[/color][/font] Násobiteľ rozsahu potrubia",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-name.mir-unrestricted-modules",
+      "source_sha256": "089C85CB6CF29888C788674B8D3E5544FE40C313E09DD3D6FEEBF34CF35C1DC3",
+      "translation": "[font=default-bold][color=cyan]Kompatibilita:[/color][/font] Povoliť všetky moduly v existujúcich slotoch",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-name.mir-prototype-productivity-cap",
+      "source_sha256": "621C8B90C5D148800C78D9B3E12A9EC10A2030C8C3114339C600EF1E913B8344",
+      "translation": "[font=default-bold][color=orange]Limity:[/color][/font] Limit produktivity receptu",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-name.mir-recycling-return-chance",
+      "source_sha256": "2E71EC513EB8CD212F86C0390AF9EF5034AF051CEEB0F759DE4E76676CD4C192",
+      "translation": "[font=default-bold][color=orange]Obmedzenia:[/color][/font] Miera návratnosti recyklátora",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-name.mir-productivity-cap-self-recycling-only",
+      "source_sha256": "EE807F45D471DB50152943EBE0579629AE2A80336A490DF380E4BE2A5853F6E0",
+      "translation": "[font=default-bold][color=orange]Limity:[/color][/font] Obmedzte produktivitu nad bezpečnú hranicu pre recykláciu",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-name.mir-prototype-efficiency-cap",
+      "source_sha256": "5FBC7C6F9FBC153ECE7260F97D85A01A3E6336B984D79D121E226A2D74CF830A",
+      "translation": "[font=default-bold][color=orange]Limity:[/color][/font] Limit úspory energie",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-name.mir-prototype-pollution-cap",
+      "source_sha256": "113174B68C6D42B7BF010A9CD627F92CA98A0CC2C5CA94115D384396F768348B",
+      "translation": "[font=default-bold][color=orange]Limity:[/color][/font] Limit na zníženie znečistenia",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-name.mir-prototype-speed-floor",
+      "source_sha256": "E9950F57FECEF85F6FBECDB8FAC2CDF4D27CE0D45404BABF7CE93AFF682998AF",
+      "translation": "[font=default-bold][color=orange]Obmedzenia:[/color][/font] Minimálna rýchlosť stroja",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-name.mir-prototype-speed-cap",
+      "source_sha256": "92637E9919A45ACC6946A31F5D48426E77C048B7108B6313C0C197C2C5AB7B59",
+      "translation": "[font=default-bold][color=orange]Limity:[/color][/font] Obmedzenie účinku rýchlosti",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-name.mir-prototype-quality-cap",
+      "source_sha256": "ABE7C7C86164778825DC2554B8938AD1DB26453FB9526CF2C659DF8503629931",
+      "translation": "[font=default-bold][color=orange]Limity:[/color][/font] Obmedzenie efektu kvality",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-name.mir-prototype-positive-power-floor",
+      "source_sha256": "4CBA757F43B046B98ED4DD6602140793D01388F3EDFEC6ED90B7D4DB8FC24296",
+      "translation": "[font=default-bold][color=cyan]Kompatibilita:[/color][/font] Nenulový príkon",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-name.mir-settings-profile-import",
+      "source_sha256": "ABFF0680678F8816F97BF0FAF77C24DED84D9C211E31FA57DE07D5D268E16579",
+      "translation": "[font=default-bold][color=purple]Rozšírené:[/color][/font] Importovať profil nastavení MIR",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-name.mir-debug-generation-report",
+      "source_sha256": "88C6B9ADE6DCB836FAEE858F97FC056FB9610ECFAB45D3A18C1F8CC64E82F97B",
+      "translation": "[font=default-bold][color=yellow]Diagnostika:[/color][/font] Generované a preskočené technológie",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-name.mir-debug-recipe-matches",
+      "source_sha256": "829EB1A6C275C63EE69E4AA11FDE9BAC1877172414F0730AE4A5E0D73C66EC32",
+      "translation": "[font=default-bold][color=yellow]Diagnostika:[/color][/font] Zhodné recepty na produktivitu",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-name.mir-debug-scripted-effects",
+      "source_sha256": "7D329D6ECD21ACE838C7F7BF562920A3747C906D602593A03D590EF67A4F760E",
+      "translation": "[font=default-bold][color=yellow]Diagnostika:[/color][/font] Skriptované kazenie a poľnohospodárske účinky",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-name.mir-lab-incompatibility-policy",
+      "source_sha256": "A7102E64E1DFDE135D2791BA883DBEF200A1D132CB675F3812E5AC00642FA299",
+      "translation": "[font=default-bold][color=green]Hlavné:[/color][/font] Laboratórna kompatibilita pre generované technológie",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-name.ips-effect-per-level-stream",
+      "source_sha256": "146ABD92A1978FA015262D2C24AD409661CA85ACF5B7A1E7BB1432333B201710",
+      "translation": "[font=default-bold]__1__[/font] — účinok na úroveň",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-name.mir-effect-per-level",
+      "source_sha256": "626EB62B13D5D0444187D5F160C867E7040B043FAFD4FB11A4046D17CA95FA38",
+      "translation": "[font=default-bold]Nekonečné __1__[/font] — účinok na úroveň",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-description.ips-require-space-gate",
+      "source_sha256": "19E5285662BB6DA4B45446E514B7E6EB8288A7633136FD62F63F69F84CDC3AB1",
+      "translation": "Keď je aktivovaná, tieto technológie zostanú uzamknuté, kým sa vesmírna veda nebude skúmať vo vanilke alebo veda o prométiu vo vesmírnom veku.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-description.mir-science-pack-ingredient-policy",
+      "source_sha256": "4ADE9B8F378BC0E43157EC92B2C012B92ADE1F1113C769EB884B10F1BADFB420",
+      "translation": "Vyberá, ako MIR pridáva vedecké balíčky do generovaných technológií. Možnosti sú zoradené od konzervatívnych až po široké: predvolené balíčky, balíčky na neskoršiu hru, balíčky založené na postupe a potom všetky dostupné balíčky.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-description.mir-automatic-productivity-action",
+      "source_sha256": "213DE738B9EAEE652656E02682A39B17B31289AAC16B4206116438E335A8AB00",
+      "translation": "Vyberá, čo robí MIR s možnosťami bezpečnej produktivity, ktoré sa nachádzajú v receptoch s nainštalovaným režimom. Zakázané nevykonáva žiadne automatické zisťovanie. Ukážka záznamov zmien prijatých a preskočených kandidátov v denníku Factorio bez zmeny výskumu. Použiť bezpečné zmeny (predvolené) pridá vhodné recepty iba do kompatibilného existujúceho výskumu MIR. Toto riadi činnosť, nie silu alebo zrelosť; začiarkavacie políčka vytvorenia nižšie sú samostatné. Vždy platia kontroly vlastníctva, recyklácie, pravdepodobnosti, katalyzátora, vedy, laboratória, predpokladu, cieľa, identity, postupu a cyklu.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-description.mir-automatic-create-research",
+      "source_sha256": "413AC0A9C49C6D40EEF18F47615F07F8DBD4E6D6CA4148FBB082AE005289FFF9",
+      "translation": "Predvolené: vypnuté. Off limits Aplikujte bezpečné zmeny na kompatibilný existujúci výskum MIR; kandidáti bez vhodného streamu sú preskočení a nahlásení. On umožňuje oprávnenému registrovanému poskytovateľovi vytvoriť jednu stabilnú generickú technológiu nekonečnej produktivity, keď nevyhovuje žiadny existujúci výskum. Začiarkavacie políčko skontrolované údaje nižšie rozhoduje o tom, či sú experimentálni poskytovatelia oprávnení. MIR nikdy nevytvára jednu technológiu na mod alebo recept a stále platí každá tvrdá bezpečnosť, veda, vlastníctvo, identita, progresia a brána cyklu.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-description.mir-automatic-require-reviewed-data",
+      "source_sha256": "CF903749E79FAA72EB7839C03202ABD9957169E766CCE37EDDC62DC131CA1F15",
+      "translation": "Predvolené: zapnuté. Toto je dôležité iba vtedy, keď je zapnutá možnosť Povoliť vytváranie nového výskumu; nikdy neblokuje bezpečné pripojenie k existujúcemu výskumu. Na povoleniach sú iba rodiny poskytovateľov označené ako skontrolované a podložené príslušnými dôkazmi o presnej verzii, takže experimentálne rodiny sa vynechajú. Off umožňuje registrovaným experimentálnym poskytovateľom vytvárať zo všeobecných štrukturálnych dôkazov. Pre čo najširšie experimentálne správanie povoľte vytváranie výskumu a túto požiadavku vypnite. Žiadna hodnota nemôže obísť tvrdú bezpečnostnú bránu.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-description.mir-automatic-compiler-mode",
+      "source_sha256": "3EA62411BC01934C7BA49E02CE0A583AB6C9B9AC724080B1DD453CC940C627C0",
+      "translation": "Skrytý most kompatibility pre profily vytvorené pred rozdelením automatických ovládacích prvkov produktivity. Nepredvolená stará hodnota sa dodrží iba vtedy, keď všetky nové ovládacie prvky zostanú vo svojich predvolených nastaveniach. Zmeňte akýkoľvek nový ovládací prvok tak, aby prevzal explicitné ovládanie.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-description.ips-enable-stream",
+      "source_sha256": "A6DE4D114987B0B227B1D9632205D263CEA10E5D21D176BD37497D44A69F8FA8",
+      "translation": "Vytvorí vygenerovanú nekonečnú technológiu pre __1__, keď sú k dispozícii jej recepty, efekty, predpoklady a vedecké balíčky. Vypnite toto, aby ste zabránili MIR generovať túto technológiu.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-description.ips-cost-base-stream",
+      "source_sha256": "F74FEB07DC9C1E256DC03D25FA97004CB9FE2D43AB48AB6126A6EAB9A7FA2266",
+      "translation": "Výskumné jednotky potrebné pre prvú vygenerovanú úroveň __1__. Musí byť aspoň 1. Neskoršie úrovne sa vypočítajú z tejto hodnoty a faktora rastu nákladov.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-description.ips-cost-growth-stream",
+      "source_sha256": "5B3E1FDDD283CE3FEAD07A4CC9131335295A874CB06D0ADCC47F00348B864065",
+      "translation": "Násobiteľ použitý na každú neskoršiu úroveň __1__. Použite 1 pre paušálne náklady, 1,5 pre 50 % rast na úroveň alebo 2 pre zdvojnásobenie nákladov.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-description.ips-max-level-stream",
+      "source_sha256": "F8BD37714CC26F109CA9959895CDFD512FD8E485C3CE1137335403FF72C21AE0",
+      "translation": "Najvyššia vygenerovaná úroveň pre __1__. Nastavte na 0 pre nekonečné úrovne.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-description.ips-research-time-stream",
+      "source_sha256": "21AB2E490C23C2E0817E0A91192436275173600341FCD53A86023BA4F704C455",
+      "translation": "Sekundy na výskumnú jednotku za __1__. Ak chcete pre túto technológiu použiť predvolené nastavenie MIR, nastavte na 0. Toto nie je celkový čas výskumu; celkový čas závisí aj od nákladov na výskum, počtu laboratórií, rýchlosti laboratória a modulov.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-description.mir-enable-base-tech",
+      "source_sha256": "238D8396CA10F80559CB30BEFC3F08278D7F3559F0013CABA4C4CDD3D3813174",
+      "translation": "Umožňuje __1__ pokračovať cez svoj vanilkový uzáver ako nekonečnú technológiu. Vypnite túto možnosť, ak chcete, aby MIR pridal nové výskumné línie bez predĺženia tohto vanilkového reťazca.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-description.mir-cost-base",
+      "source_sha256": "45099219BC4DC287476BA4F0552B879698A37F383D7F596C2DE2646A40ADAD0A",
+      "translation": "Výskumné jednotky požadované pre prvú úroveň pokračovania MIR __1__. Ak je to možné, nastavte na 0, aby ste zdedili cenový vzor vanilkového reťazca.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-description.mir-cost-growth",
+      "source_sha256": "481061F346A54D75949349D6237D3A36D520EC1C6DB8B067B9EEB4AC7F1C68AE",
+      "translation": "Násobiteľ použitý na každú ďalšiu úroveň pokračovania MIR __1__. Ak je to možné, nastavte na 0, aby ste zdedili vzor rastu vanilkového reťazca.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-description.mir-max-level",
+      "source_sha256": "08E76F0812424D2ECDF70EBECE33780207679929933E721C596E4A5E879AC839",
+      "translation": "Najvyššia úroveň pokračovania MIR pre __1__. Nastavte na 0 pre nekonečné úrovne.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-description.mir-research-time",
+      "source_sha256": "0755F42CE800636AEF1B59E1AC0D506ADBA703A2A5FEAE2FD2488132DCB03D81",
+      "translation": "Sekundy na výskumnú jednotku pre pokračovanie MIR __1__. Ak je to možné, nastavte na 0, aby ste zdedili čas výskumnej jednotky vanilkového reťazca.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-description.mir-prefer-this-mod-for-competing-techs",
+      "source_sha256": "E0157DD88AA4ABE2918E1B8D791764A13935FA5E8510C8F9924E086CFF79840C",
+      "translation": "Keď je povolený, tento mod odstraňuje vybrané konkurenčné nekonečné rozšírenia a používa svoje vlastné verzie. Deaktivujte, ak chcete zachovať konkurenčné verzie z iných modov.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-description.mir-adjust-vanilla-weapon-speed-techs",
+      "source_sha256": "642F7B8B58121EC3E1A975E20D2C9B012DEBF78B4706E8338D2B22986AD94C2C",
+      "translation": "Kontroluje, či MIR odstráni bonusy za rýchlosť rakiet a kanónov z pokračovania rýchlosti streľby zo zbrane, keď je k dispozícii presné nekonečné pokrytie výmeny. Technológie rýchlosti streľby zbraní Finite vanilla si zachovávajú svoje pôvodné bonusy.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-description.mir-use-installed-space-age-icons",
+      "source_sha256": "0803D44035E4485C18BA0D0507A0F1BCBB6C62BA3792489D1E062D440131E02B",
+      "translation": "Keď je povolený, MIR môže odkazovať na nainštalované oficiálne súbory ikon DLC, vrátane Space Age a Elevated Rails, aj keď sú tieto mody zakázané pre spustenie základnej hry. Nechajte toto vypnuté, ak tieto súbory DLC nie sú nainštalované; Factorio sa nemôže elegantne zotaviť z chýbajúcich súborov ikon počas načítania prototypu.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-description.mir-pipeline-extent-multiplier",
+      "source_sha256": "69C751DC65D6D11CDE33F7A298C044BEE2B71981AE577F7C7A710187988CB67A",
+      "translation": "Rozbaľovací multiplikátor iba pri spustení pre rozpoznané polia rozsahu potrubia boxu tekutiny naprieč prototypmi, nielen entitami potrubia. 100% ponecháva prototypy nezmenené a nezaťažuje priechod potrubia ani skenovacie boxy s tekutinami. Hodnoty iné ako 100 % sú experimentálne a môžu ovplyvniť stroje, nádrže, trysky a modifikované prototypy, ktoré definujú kvapalinové boxy.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-description.mir-unrestricted-modules",
+      "source_sha256": "676E18182B6325C7A9B2538C5A725AF13B971EF4978637919361BEED7FF1A46C",
+      "translation": "Experimentálne a narúšajúce rovnováhu. Keď je aktivovaný, každý existujúci recept akceptuje všetkých päť modulových efektov a každý existujúci modulový prijímač so slotmi akceptuje každú objavenú kategóriu modulu. Toto nepridáva modulové sloty ani nemení prototypy modulov a môže umožniť produktivitu, kvalitu a slučky modifikovaných modulov.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-description.mir-prototype-productivity-cap",
+      "source_sha256": "A0A20C6499E64C841AF534CE451F68A630C3D7862FE4F17D99DFDF7C38CAAB0E",
+      "translation": "Vyberie, či MIR ponechá limity produktivity receptúry na pokoji, alebo zapíše limit pri spustení ku každému neparametrickému, nerecyklačnému receptu. +300 % (nezmenené) zachováva existujúce uzávery receptov; nižšie hodnoty skracujú škálovanie produktivity, zatiaľ čo vyššie hodnoty ju predlžujú.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-description.mir-recycling-return-chance",
+      "source_sha256": "C994BF61F92D23F98F01CD49C16719C13306935F1ED608BEF080A1EBECF64B10",
+      "translation": "Ovláda iba skryté generované recyklačné recepty. Automatický režim znižuje normálnu návratnosť materiálu o 25 % na maximálne 1 vydelenú násobiteľom celkového výstupu pri zvolenom limite produktivity. Pevné voľby priamo škálujú rovnaké generované výnosy. Viditeľné procesy a limity produktivity receptúr sa nikdy nemenia.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-description.mir-productivity-cap-self-recycling-only",
+      "source_sha256": "0E866EB9FD578FDE4A024C09D3154FC97B7FF5D7311AA36D24BE99368D94F3C6",
+      "translation": "Nad 1 / návratnosť recyklátora - 1, iba výrobné receptúry s preukázanou negeneratívnou cestou sebarecyklácie dostanú vybraný vyšší strop. Pri alebo pod touto hranicou nemá toto začiarkavacie políčko žiadny účinok. Nezmenený motor využíva normálnu návratnosť 25 % ako konzervatívny prah +300 % bez zmeny recyklačných receptúr.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-description.mir-prototype-efficiency-cap",
+      "source_sha256": "16B6CA7C8424DE6FD3234A6DDA4B28AF2A00F61B51EB71F175DA7C8711D3A3DA",
+      "translation": "Vyberá, do akej miery môžu efekty účinnosti znížiť spotrebu aktívnej energie stroja. -80 % (nezmenených) ponecháva existujúce limity spotreby energie samotné. Hlbšie zníženie sa môže priblížiť k nulovej spotrebe aktívnej energie bez zmeny limitov znečistenia.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-description.mir-prototype-pollution-cap",
+      "source_sha256": "4B6B286EE5A7BD31157D8FA9A62EF202A00B6C75C11DA0BF3742C1C3F712D359",
+      "translation": "Vyberá, do akej miery môžu účinky zníženia znečistenia znížiť znečistenie stroja. -80 % (nezmenených) ponecháva existujúce limity znečistenia samotné. Hlbšie zníženie sa môže priblížiť k nulovému znečisteniu bez zmeny spotreby energie.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-description.mir-prototype-speed-floor",
+      "source_sha256": "457D7694A5B0D58B248BC1764CF71225ED471BCB6583117C04A130625C031685",
+      "translation": "Vyberá, do akej miery môžu negatívne účinky rýchlosti spomaliť podporované počítače. -80 % (nezmenených) ponecháva existujúce limity na pokoji; hlbšie hodnoty odstránia normálnu podlahu až takmer na doraz na -99,99 %.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-description.mir-prototype-speed-cap",
+      "source_sha256": "17AAFA441B99AD119476B5F838BB3DAE15E88CACFCA80D64C092D1F1BBA61D47",
+      "translation": "Vyberie, či MIR ponechá limity rýchlosti stroja na pokoji alebo zapíše nový pozitívny limit rýchlosti. +100000 % (nezmenené) zachováva existujúce limity; nižšie hodnoty zámerne upínajú veľmi veľké rýchlostné bonusy.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-description.mir-prototype-quality-cap",
+      "source_sha256": "D71DA0B72A85AE07EB87796BA081F56F9675C9D13D65760297F8BCE584DFF693",
+      "translation": "Vyberie, či MIR ponechá limity kvality stroja na pokoji, alebo vytvorí nový pozitívny limit kvality. +100000 % (nezmenené) zachováva existujúce limity a nemení úrovne kvality ani vzorce pravdepodobnosti položiek.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-description.mir-prototype-positive-power-floor",
+      "source_sha256": "31547FA612ED3B2A1D7018ED0D44912D5FECF9787DC52CD5FE80088ACD3AB148",
+      "translation": "Predvolene vypnuté. Keď je povolená, MIR zmení explicitné prototypy aktívnej spotreby energie 0 W počas načítavania prototypu na 1 W, takže varovné ikony nízkej spotreby sa nezobrazujú na entitách, ktoré by mali čerpať malé nenulové množstvo. Ak chcete presne zachovať prototypy s nulovou spotrebou energie, vynechajte.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-description.mir-settings-profile-import",
+      "source_sha256": "DCC098BDB6CD1E4202AEBEA4139B04EEAC60ACBF0D8EC2656FD74B2821E56129",
+      "translation": "Sem vložte reťazec profilu nastavení MIR, aby ste počas generovania prototypu použili exportované hodnoty počiatočného nastavenia ako vrstvu prepísania. Pre normálne nastavenia nechajte prázdne. Exportujte pomocou /mir-settings-export z aktívneho uloženia a po zmene tejto hodnoty reštartujte.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-description.mir-debug-generation-report",
+      "source_sha256": "FCA59CEA50F314CF7DE5B8A971E76FD87EAEDAB1A48A1D2EDF144215ABDA095D",
+      "translation": "Keď je povolená, zapíše jeden riadok štruktúrovaného protokolu na vygenerovaný alebo preskočený stream a základné rozšírenie vrátane vedeckých balíčkov, predpokladov, počtu efektov, stavu kompatibility laboratória a zdroja ikon.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-description.mir-debug-recipe-matches",
+      "source_sha256": "D4EC5B63739ABD9F94DB84E2215828F87D23571C8D565245BE1AD4AB10596A7C",
+      "translation": "Keď je povolená, zapisuje zhodné názvy receptov pre každý generovaný tok produktivity. Vo veľkých balíkoch modulov to môže byť hlučné.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-description.mir-debug-scripted-effects",
+      "source_sha256": "A2770F25B4BECE651DD6B61A523825B4E55EB1AF129644781695AD071701CB4A",
+      "translation": "Keď je povolený, zapisuje záznamy runtime protokolu, keď skriptované technológie prepočítavajú globálne efekty alebo efekty riadené udalosťami.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-description.mir-lab-incompatibility-policy",
+      "source_sha256": "6179D6BF999F16B909B01F31ACC543BE6F7F6C49541F5B459CFE6A4AFB29B84D",
+      "translation": "Vyberie, čo urobí MIR, keď vybrané vedecké balíčky nemôže preskúmať žiadne aktívne laboratórium.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-description.ips-effect-per-level-stream",
+      "source_sha256": "89A774F790E45473874A383AF2B7372F89049E921C1B2BDD43A6117F5D116C46",
+      "translation": "Nastavuje primárny efekt základnej úrovne na úroveň pre __1__. Súvisiace neskoršie úrovne a efekty sú škálované proporcionálne. Percentuálne účinky používajú percentuálne body; efekty počtu a vzdialenosti využívajú svoje pôvodné jednotky.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-description.mir-effect-per-level",
+      "source_sha256": "67A03250B75321ECA6C66AF56BEBD643599A6A8BCBF7E021FB0AA8D977B52E96",
+      "translation": "Nastavuje kanonický efekt na úrovni pre nekonečné pokračovanie __1__. Súvisiace účinky sú odstupňované proporcionálne od konečnej vanilkovej základnej línie. Percentuálne účinky používajú percentuálne body; efekty počtu a vzdialenosti využívajú svoje pôvodné jednotky.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-description.mir-note-experimental-spoilage",
+      "source_sha256": "5634218521173FC10CAAC3C0699E9D12BA60EBE97FA400486543316EBDC64BE8",
+      "translation": "Experimentálne a predvolene vypnuté vo verzii 2.1.0. Toto je globálny/celomapový skriptovaný efekt. Existujúce správanie skaziteľného zásobníka nie je nárokované, kým nie je manuálne overené.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-description.mir-note-agriculture-growth",
+      "source_sha256": "0D32FFCE8337C607F8BABE5206A4EB4287083C48C81AD8138D5A44845B4C830B",
+      "translation": "Platí pre novovysadené poľnohospodárske vežové plodiny. Existujúce vysadené plodiny nie sú upravované.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-description.mir-note-cargo-pad-count",
+      "source_sha256": "93550E6C8223312B7F6FA7522E3BAA7D02A1E347DA80E44EF7993E5954A655B7",
+      "translation": "Logistický výskum špeciálneho vesmírneho veku. Zvyšuje pristávacie plochy pre náklad na každý povrch a môže podstatne zmeniť logistickú rovnováhu.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-description.mir-note-inserter-capacity",
+      "source_sha256": "2CB51FA6E13D29E3B396FA919BFD15841EC9976CE874F26A7FAC7251D391BC9A",
+      "translation": "Predvolene vypnuté. Extra kapacita vkladača môže prerušiť vkladače riadené okruhom a znížiť optimalizáciu motora.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "mod-setting-description.mir-note-native-owner-managed-stream",
+      "source_sha256": "B2B4A06065178028EA4EDF720CAAB10857D6B57E6E159F5F95BF539394D5A0E1",
+      "translation": "Ak nainštalovaná nekonečná technológia už vlastní túto skupinu výskumu, rovnaké nastavenia pri spustení nakonfigurujú tohto vlastníka namiesto vytvorenia duplikátu. Nezmenené predvolené hodnoty MIR presne zachovávajú konečný prototyp vlastníka. Explicitné prepísanie ceny, času, maximálnej úrovne a efektu sa použije len po bezpečnom zhode vlastníka; zakázaním streamu zostane externá technológia nedotknutá. Po zmene nastavení spustenia reštartujte Factorio. Maximálna úroveň 0 znamená nekonečno a hodnoty účinku sú percentuálne body na úroveň.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting.mir-automatic-productivity-action-disabled",
+      "source_sha256": "75081B593D15CF6E631971BC6768723F593B88B172477E40AE7D363E4829816D",
+      "translation": "Vypnuté",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting.mir-automatic-productivity-action-preview",
+      "source_sha256": "330C32C49A13AD2C7BD916FE57E5F2FECDEA0493730E421FE4C3156D48394FF5",
+      "translation": "Ukážka zmien",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting.mir-automatic-productivity-action-apply",
+      "source_sha256": "8E39C8D2DFE568E56970679BABFB1CC4C48F769A75B7D7229410068FCB49A07B",
+      "translation": "Použiť bezpečné zmeny",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting.mir-automatic-compiler-mode-off",
+      "source_sha256": "C4320C49F516468041993000BAE12271B5B9C3E135567C29861D6858B8542FDB",
+      "translation": "Zakázané (staršie)",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting.mir-automatic-compiler-mode-report",
+      "source_sha256": "6AC27C4F7F9A8E34EEB3A30D800FBC94B4EA12B34526DE3521A23352E5D8EDA6",
+      "translation": "Ukážka zmien (staršie)",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting.mir-automatic-compiler-mode-safe-attach",
+      "source_sha256": "462A932BE22C082A5A77F78BD0E28CE51E8D003C5CB8DDD8C9F60795A66A5B9A",
+      "translation": "Použiť bezpečné zmeny (staršie)",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting.mir-automatic-compiler-mode-exact-pack",
+      "source_sha256": "06C601D7712DE8200B6C3747112542C7BAF1FAE269ADFAC17C314650636BC26B",
+      "translation": "Vytvárajte s kontrolovanými údajmi (staršie)",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting.mir-automatic-compiler-mode-safe-generate",
+      "source_sha256": "E1D89954AC92184513900216E2D1E44BC705A5E07CA200C2E3ADBEEF2BB52E95",
+      "translation": "Vytvoriť od registrovaných poskytovateľov (staršie)",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting.mir-adjust-vanilla-weapon-speed-techs-off",
+      "source_sha256": "CA7981B46ECF2C1787B6D76D81D9FD7FA0CA95842E2FCC2A452869891A9334D1",
+      "translation": "Vyp",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting.mir-adjust-vanilla-weapon-speed-techs-only-when-dedicated-tech-enabled",
+      "source_sha256": "E20FC479DF499DEA7A89E8044FA37312A699E03D498B2AEE9837CCAD7994984F",
+      "translation": "Len s náhradným krytím",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting.mir-adjust-vanilla-weapon-speed-techs-always",
+      "source_sha256": "DE9F057A471CDB8D3B082719BDC7AD2031788D042947349723FA83C9D13A517A",
+      "translation": "Vždy",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting.mir-science-pack-ingredient-policy-configured",
+      "source_sha256": "DEC8A931215A6FC9DA9DA5DF0D57D4995B4A429B154E8CD8F9E523725BC56399",
+      "translation": "Nakonfigurované balíčky",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting.mir-science-pack-ingredient-policy-space",
+      "source_sha256": "0D1CB4747CEB36B2F1837E79B8F916F1897A96EB7EDE6BA56D96AAD4597D2348",
+      "translation": "Pridajte vesmírnu vedu",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting.mir-science-pack-ingredient-policy-space-and-promethium",
+      "source_sha256": "FAF2EF5433A9104F40118C9BB2252C872148FE73950EC4F2FBC642D3B9F28B8A",
+      "translation": "Pridajte priestor + promethium",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting.mir-science-pack-ingredient-policy-space-age-progression",
+      "source_sha256": "398C4B9A947006E50A8BB9A5C0C4839CB2C8C72BBD6A91D5879919BD8CB42875",
+      "translation": "Priebeh vesmírneho veku",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting.mir-science-pack-ingredient-policy-official-progression",
+      "source_sha256": "9CF098279E9D3A0A10A662C8A1E76962033EC1BB60AA0F788D5D0AFD7D32A37E",
+      "translation": "Oficiálny postup",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting.mir-science-pack-ingredient-policy-mod-progression",
+      "source_sha256": "ED597725F7D5F56AE027AFFD83C84306CBF3A40F02080E67E3198FE03F7B1DC8",
+      "translation": "Modifikovaný postup",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting.mir-science-pack-ingredient-policy-all-official",
+      "source_sha256": "F92632143CC3CD19CF66304AE6762719657EA8F771694B3113DD1F934A2D0399",
+      "translation": "Všetky oficiálne vedecké balíčky",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting.mir-science-pack-ingredient-policy-all",
+      "source_sha256": "0568DA64146867C7B763A7C0F0F362E89D5CBBD627CF7700A4C4A47FFF891F39",
+      "translation": "Všetky laboratórne vedecké balíčky",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting.mir-lab-incompatibility-policy-reduce",
+      "source_sha256": "4531F53960CC79CC3C5C9116740B55E4FE1B974EE64C96C96F8EC63E95F8616E",
+      "translation": "Používajte skúmateľné balíčky",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting.mir-lab-incompatibility-policy-skip",
+      "source_sha256": "AC17DC62DEFD12EFE12F5E1A40BB57A7A474B077C75C7CDD8B604E3905C478C2",
+      "translation": "Preskočte nepodporované technológie",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting.mir-lab-incompatibility-policy-engine-default",
+      "source_sha256": "5C488F678D8EC6AC824955436F6991515954C8E0D4A05F0DEE9AA7E46F1926E2",
+      "translation": "Žiadne nastavenie MIR",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting.mir-pipeline-extent-multiplier-50",
+      "source_sha256": "28FDAE8DEAE31D6EAFD18B70D878F6D8A3136F267CE273777C089A42AC590438",
+      "translation": "50%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-pipeline-extent-multiplier-25",
+      "source_sha256": "72DA55D317FD997B93138B8646A2238E806A4C4566D1E854277B5A583D8AEF23",
+      "translation": "25%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-pipeline-extent-multiplier-75",
+      "source_sha256": "10963AC2DB22B5B879EDCF195EAACD3866B19571110462807B83133C98182864",
+      "translation": "75%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-pipeline-extent-multiplier-100",
+      "source_sha256": "CB4DD7ACDAF1314C66CEF602FEAA235F0BD6F2227333FC1D43AB69D20639D393",
+      "translation": "100 % (nezmenené)",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting.mir-pipeline-extent-multiplier-125",
+      "source_sha256": "38CB31C410C629CF7FD83CD8CAD8DEAEE3E4A1D635A0D3DC6007E03F2F78781A",
+      "translation": "125%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-pipeline-extent-multiplier-150",
+      "source_sha256": "00A4E80C08C54E4D4BF449EF6E2E557B5134A0877CB6405E3C444A1948A0A783",
+      "translation": "150%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-pipeline-extent-multiplier-200",
+      "source_sha256": "2385950EF78023549701B5613E1850A1254A1E9239F17E666C3207AF607D99F8",
+      "translation": "200%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-pipeline-extent-multiplier-250",
+      "source_sha256": "2ADD444CF57BBF861E935FF80377D52A24B90428BA88BB31A6E7C630837D2D91",
+      "translation": "250%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-pipeline-extent-multiplier-300",
+      "source_sha256": "6013E9D465C64F3D046C29B5C2C3A2A0984AF8562DCA4EC57DD1B0FE5DA45A92",
+      "translation": "300%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-pipeline-extent-multiplier-400",
+      "source_sha256": "9639790D67DE0364D1C0882B778F85629F47EBC57941F53BBE0627CAF22F1C0C",
+      "translation": "400%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-pipeline-extent-multiplier-500",
+      "source_sha256": "E59323F9F4ECA3CB3E8E5B6620A03326280916AA5FB7FE33FF60CAB95B3B5581",
+      "translation": "500%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-pipeline-extent-multiplier-750",
+      "source_sha256": "8067178130D7EC6793417D3890FBB06033BAFBCC55E0532041BE8F3F4D244EEE",
+      "translation": "750%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-pipeline-extent-multiplier-1000",
+      "source_sha256": "35126BE28DE4349A6FE77CCA97BBF65482DBAD71823C31ABAA47A92DCCE7B7C9",
+      "translation": "1000%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-productivity-cap-engine-default",
+      "source_sha256": "B8CDEBC83CDD26B1D0980787728C314B6A9EE3613C6402641BD55BB35101B1D0",
+      "translation": "+300 % (nezmenené)",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-productivity-cap-percent-25",
+      "source_sha256": "B54B26CBA790498FFD7795B61DD1254A439D9CE0221736358EAA85A018771589",
+      "translation": "+25%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-productivity-cap-percent-50",
+      "source_sha256": "2F22E2D65E33569124BFF0B89FBDCE4CC382BC71967F087E8ACEC8EB5A2A63CE",
+      "translation": "+50%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-productivity-cap-percent-75",
+      "source_sha256": "478DFE4C136A72549135544C6423EA2A3C54D38DE0B117479238EFB77426E915",
+      "translation": "+75%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-productivity-cap-percent-100",
+      "source_sha256": "29BD159E68A459EAFE22677B6E8BE23149514E7DAEFA9268077B3BD240CA1AF6",
+      "translation": "+100%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-productivity-cap-percent-125",
+      "source_sha256": "4E7E9AC5D6FFCA91B1EE6BEF42514DC24F977A16DD36B3B846A657FDD1457823",
+      "translation": "+125%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-productivity-cap-percent-150",
+      "source_sha256": "0FCE9BCA2BBA9CC6DAA8D8E7B79262D83465941AB2ADEC812C003ADC4AADE4AA",
+      "translation": "+150%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-productivity-cap-percent-200",
+      "source_sha256": "B8D0520F1848ACD95B1C39A3179ED9DB387468ADDF23BB2FBADF7E443BF50DCE",
+      "translation": "+200%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-productivity-cap-percent-250",
+      "source_sha256": "190ABE9F260A9E4BC7070253ACBEA5A1ECAFF8C71293AAD8D5CE195C6C4F311F",
+      "translation": "+250%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-productivity-cap-percent-400",
+      "source_sha256": "7B5703DF4942C3995FDD5B9DA3263F739BC2EB13C6DF3B5DD24505DB5CF8CD71",
+      "translation": "+400%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-productivity-cap-percent-500",
+      "source_sha256": "F99E3D347521C62E904787B7C017115BAC68DF1FFE0BF1D5B76A6E3AD68E2B0A",
+      "translation": "+500%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-productivity-cap-percent-750",
+      "source_sha256": "DBAEF85F30E8D1EA7EF85F0949DECCDBD045597B96C01184DD098FD229DD9F68",
+      "translation": "+750%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-productivity-cap-percent-1000",
+      "source_sha256": "A4CA03BAA5845A21F5CD089098984012E3BF37FD5341ACB279B4D3DA8E022641",
+      "translation": "+1000%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-productivity-cap-percent-2500",
+      "source_sha256": "89100F2F7D43F3F5306458C697B6D9978152E78A09AA54A0FFE07EFBAD7A391D",
+      "translation": "+2500%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-productivity-cap-percent-5000",
+      "source_sha256": "269B1138EC6957F984BF6C1307907A0E03B9CEFBFD76BA261BD3DE8C8A916031",
+      "translation": "+5000%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-productivity-cap-percent-10000",
+      "source_sha256": "FF42D30F0A1F9922EACA4D9C1A1B94BC12EA0253C7D9DE055117492ED2A3DCA9",
+      "translation": "+10000%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-productivity-cap-percent-25000",
+      "source_sha256": "DF8D17D28FA682EF7403DB46FC31D632B578F120A4BEC99749A4A8AC7FC9F1B5",
+      "translation": "+25000%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-productivity-cap-percent-100000",
+      "source_sha256": "4FC8AB45A7F3A1FABFF5F85A23C5E5DCB15B72DE8916E643CFE3271B65A53CE7",
+      "translation": "+100000%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-recycling-return-chance-engine-default",
+      "source_sha256": "5A6175D3E09A8271341D1D27FE29C8AB1C9E89229370743CFA12455DEFCE7453",
+      "translation": "25 % (nezmenené)",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting.mir-recycling-return-chance-match-productivity-cap",
+      "source_sha256": "68473B2088531B3089520BE42761FD2B5AB34F88D9A7F2397E64258D47964C27",
+      "translation": "Dorovnajte limit produktivity",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting.mir-recycling-return-chance-percent-25",
+      "source_sha256": "72DA55D317FD997B93138B8646A2238E806A4C4566D1E854277B5A583D8AEF23",
+      "translation": "25%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-recycling-return-chance-percent-20",
+      "source_sha256": "DC934FE30A942BCA07B4C288B4B3E48AA79A717D6DB2B586553CD2416DC8B9B8",
+      "translation": "20%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-recycling-return-chance-percent-15",
+      "source_sha256": "B5F6DBAE04BD764B0C2F3CB796E404FFDF77FB4CAC171D72EC7FA6A2077DA252",
+      "translation": "15%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-recycling-return-chance-percent-12-5",
+      "source_sha256": "2894742F0540406421D3305D28E10770E3C807C17AB92671A25B2FE2A6C02D26",
+      "translation": "12.5%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-recycling-return-chance-percent-10",
+      "source_sha256": "3CCCE1F4DA948035FD36A399576A50A5248DDC02DD008F3C3668DF57C0AA75B5",
+      "translation": "10%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-recycling-return-chance-percent-7-5",
+      "source_sha256": "333BC93441B4C11D859D36D595DBBA0383201F461CF902D4494BF44834801D06",
+      "translation": "7.5%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-recycling-return-chance-percent-5",
+      "source_sha256": "D1CE334B6A7F364B1E97EBB9E661F6D4CF6E20AA741ABA4B8F198417AEA18326",
+      "translation": "5%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-recycling-return-chance-percent-2-5",
+      "source_sha256": "2E13DEDE283506E5EF730264AB340A25E17742F7859EC78E3D4FF6524E21F6E0",
+      "translation": "2.5%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-recycling-return-chance-percent-1",
+      "source_sha256": "0B410286768489843CB776EA40BB31603D6D76CF10684D9A9E9F15694D4D3C4A",
+      "translation": "1%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-recycling-return-chance-percent-0-5",
+      "source_sha256": "86FE72EE2A449F7928F4BB8615CB13E9D364F2B8E7D8037195C22749B3189842",
+      "translation": "0.5%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-recycling-return-chance-percent-0-1",
+      "source_sha256": "C8B27C2EE23C90034E6BF439E768BC950DDD06C3EF38848F3792AD27842457D6",
+      "translation": "0.1%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-efficiency-cap-engine-default",
+      "source_sha256": "5D9FE5236A404E25BA9A2C097E63C4884AC90DC8FD802A284017E6A3A943DF72",
+      "translation": "-80 % (nezmenené)",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-efficiency-cap-saving-25",
+      "source_sha256": "7F821315319A490CCACD6D15FBCD905B33C5D6810CD9446AD54A1A5DAACEC43A",
+      "translation": "-25%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-efficiency-cap-saving-50",
+      "source_sha256": "5B9A8181F7B63DAA46F2FA23D28D11D7EFD406CD193A66982CD436491C15D862",
+      "translation": "-50%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-efficiency-cap-saving-75",
+      "source_sha256": "F6FE9BE7D8C3AD46CB65831BDB6A2EA20C97F6E33F8F71D71645E6655CB57C08",
+      "translation": "-75%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-efficiency-cap-saving-90",
+      "source_sha256": "E1BBEA8DBB34A4C80E3B5BA3B13BA7211585BB461EAEE64CE731F9B144F18FE8",
+      "translation": "-90%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-efficiency-cap-saving-95",
+      "source_sha256": "EBA014F7267B633420D97B8333447E85FA2580F7FDE608663EB0DD486ADA7AC0",
+      "translation": "-95%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-efficiency-cap-saving-99",
+      "source_sha256": "C0064C20DD576EAA367A75F48B5730EA9F3C3EE5AC936420FC4C4147A7F93AE4",
+      "translation": "-99%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-efficiency-cap-saving-999",
+      "source_sha256": "886496F23156B00726B7604E30C88ADE5741B32919C22BA7F1F5F6BFAB268BFC",
+      "translation": "-99.9%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-efficiency-cap-saving-9999",
+      "source_sha256": "5756459D44E40876F05AE240653E52664F24585F23341D395D83AF76F16FA66F",
+      "translation": "-99.99%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-pollution-cap-engine-default",
+      "source_sha256": "5D9FE5236A404E25BA9A2C097E63C4884AC90DC8FD802A284017E6A3A943DF72",
+      "translation": "-80 % (nezmenené)",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-pollution-cap-saving-25",
+      "source_sha256": "7F821315319A490CCACD6D15FBCD905B33C5D6810CD9446AD54A1A5DAACEC43A",
+      "translation": "-25%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-pollution-cap-saving-50",
+      "source_sha256": "5B9A8181F7B63DAA46F2FA23D28D11D7EFD406CD193A66982CD436491C15D862",
+      "translation": "-50%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-pollution-cap-saving-75",
+      "source_sha256": "F6FE9BE7D8C3AD46CB65831BDB6A2EA20C97F6E33F8F71D71645E6655CB57C08",
+      "translation": "-75%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-pollution-cap-saving-90",
+      "source_sha256": "E1BBEA8DBB34A4C80E3B5BA3B13BA7211585BB461EAEE64CE731F9B144F18FE8",
+      "translation": "-90%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-pollution-cap-saving-95",
+      "source_sha256": "EBA014F7267B633420D97B8333447E85FA2580F7FDE608663EB0DD486ADA7AC0",
+      "translation": "-95%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-pollution-cap-saving-99",
+      "source_sha256": "C0064C20DD576EAA367A75F48B5730EA9F3C3EE5AC936420FC4C4147A7F93AE4",
+      "translation": "-99%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-pollution-cap-saving-999",
+      "source_sha256": "886496F23156B00726B7604E30C88ADE5741B32919C22BA7F1F5F6BFAB268BFC",
+      "translation": "-99.9%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-pollution-cap-saving-9999",
+      "source_sha256": "5756459D44E40876F05AE240653E52664F24585F23341D395D83AF76F16FA66F",
+      "translation": "-99.99%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-speed-floor-engine-default",
+      "source_sha256": "5D9FE5236A404E25BA9A2C097E63C4884AC90DC8FD802A284017E6A3A943DF72",
+      "translation": "-80 % (nezmenené)",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-speed-floor-saving-25",
+      "source_sha256": "7F821315319A490CCACD6D15FBCD905B33C5D6810CD9446AD54A1A5DAACEC43A",
+      "translation": "-25%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-speed-floor-saving-50",
+      "source_sha256": "5B9A8181F7B63DAA46F2FA23D28D11D7EFD406CD193A66982CD436491C15D862",
+      "translation": "-50%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-speed-floor-saving-75",
+      "source_sha256": "F6FE9BE7D8C3AD46CB65831BDB6A2EA20C97F6E33F8F71D71645E6655CB57C08",
+      "translation": "-75%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-speed-floor-saving-90",
+      "source_sha256": "E1BBEA8DBB34A4C80E3B5BA3B13BA7211585BB461EAEE64CE731F9B144F18FE8",
+      "translation": "-90%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-speed-floor-saving-95",
+      "source_sha256": "EBA014F7267B633420D97B8333447E85FA2580F7FDE608663EB0DD486ADA7AC0",
+      "translation": "-95%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-speed-floor-saving-99",
+      "source_sha256": "C0064C20DD576EAA367A75F48B5730EA9F3C3EE5AC936420FC4C4147A7F93AE4",
+      "translation": "-99%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-speed-floor-saving-999",
+      "source_sha256": "886496F23156B00726B7604E30C88ADE5741B32919C22BA7F1F5F6BFAB268BFC",
+      "translation": "-99.9%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-speed-floor-saving-9999",
+      "source_sha256": "5756459D44E40876F05AE240653E52664F24585F23341D395D83AF76F16FA66F",
+      "translation": "-99.99%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-speed-cap-engine-default",
+      "source_sha256": "25448913CBAF346E2964187FC9380B871225868E88D9269FE68BB807AEC09EB0",
+      "translation": "+100000 % (nezmenené)",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-speed-cap-bonus-25",
+      "source_sha256": "B54B26CBA790498FFD7795B61DD1254A439D9CE0221736358EAA85A018771589",
+      "translation": "+25%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-speed-cap-bonus-50",
+      "source_sha256": "2F22E2D65E33569124BFF0B89FBDCE4CC382BC71967F087E8ACEC8EB5A2A63CE",
+      "translation": "+50%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-speed-cap-bonus-75",
+      "source_sha256": "478DFE4C136A72549135544C6423EA2A3C54D38DE0B117479238EFB77426E915",
+      "translation": "+75%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-speed-cap-bonus-100",
+      "source_sha256": "29BD159E68A459EAFE22677B6E8BE23149514E7DAEFA9268077B3BD240CA1AF6",
+      "translation": "+100%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-speed-cap-bonus-125",
+      "source_sha256": "4E7E9AC5D6FFCA91B1EE6BEF42514DC24F977A16DD36B3B846A657FDD1457823",
+      "translation": "+125%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-speed-cap-bonus-150",
+      "source_sha256": "0FCE9BCA2BBA9CC6DAA8D8E7B79262D83465941AB2ADEC812C003ADC4AADE4AA",
+      "translation": "+150%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-speed-cap-bonus-200",
+      "source_sha256": "B8D0520F1848ACD95B1C39A3179ED9DB387468ADDF23BB2FBADF7E443BF50DCE",
+      "translation": "+200%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-speed-cap-bonus-250",
+      "source_sha256": "190ABE9F260A9E4BC7070253ACBEA5A1ECAFF8C71293AAD8D5CE195C6C4F311F",
+      "translation": "+250%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-speed-cap-bonus-300",
+      "source_sha256": "409098AD16388D01170C79EE01EB10EB2AD800C3E0CDCE2485085BB483ACED37",
+      "translation": "+300%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-speed-cap-bonus-400",
+      "source_sha256": "7B5703DF4942C3995FDD5B9DA3263F739BC2EB13C6DF3B5DD24505DB5CF8CD71",
+      "translation": "+400%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-speed-cap-bonus-500",
+      "source_sha256": "F99E3D347521C62E904787B7C017115BAC68DF1FFE0BF1D5B76A6E3AD68E2B0A",
+      "translation": "+500%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-speed-cap-bonus-750",
+      "source_sha256": "DBAEF85F30E8D1EA7EF85F0949DECCDBD045597B96C01184DD098FD229DD9F68",
+      "translation": "+750%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-speed-cap-bonus-1000",
+      "source_sha256": "A4CA03BAA5845A21F5CD089098984012E3BF37FD5341ACB279B4D3DA8E022641",
+      "translation": "+1000%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-speed-cap-bonus-2500",
+      "source_sha256": "89100F2F7D43F3F5306458C697B6D9978152E78A09AA54A0FFE07EFBAD7A391D",
+      "translation": "+2500%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-speed-cap-bonus-5000",
+      "source_sha256": "269B1138EC6957F984BF6C1307907A0E03B9CEFBFD76BA261BD3DE8C8A916031",
+      "translation": "+5000%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-speed-cap-bonus-10000",
+      "source_sha256": "FF42D30F0A1F9922EACA4D9C1A1B94BC12EA0253C7D9DE055117492ED2A3DCA9",
+      "translation": "+10000%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-speed-cap-bonus-25000",
+      "source_sha256": "DF8D17D28FA682EF7403DB46FC31D632B578F120A4BEC99749A4A8AC7FC9F1B5",
+      "translation": "+25000%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-speed-cap-bonus-100000",
+      "source_sha256": "4FC8AB45A7F3A1FABFF5F85A23C5E5DCB15B72DE8916E643CFE3271B65A53CE7",
+      "translation": "+100000%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-quality-cap-engine-default",
+      "source_sha256": "25448913CBAF346E2964187FC9380B871225868E88D9269FE68BB807AEC09EB0",
+      "translation": "+100000 % (nezmenené)",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-quality-cap-bonus-25",
+      "source_sha256": "B54B26CBA790498FFD7795B61DD1254A439D9CE0221736358EAA85A018771589",
+      "translation": "+25%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-quality-cap-bonus-50",
+      "source_sha256": "2F22E2D65E33569124BFF0B89FBDCE4CC382BC71967F087E8ACEC8EB5A2A63CE",
+      "translation": "+50%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-quality-cap-bonus-75",
+      "source_sha256": "478DFE4C136A72549135544C6423EA2A3C54D38DE0B117479238EFB77426E915",
+      "translation": "+75%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-quality-cap-bonus-100",
+      "source_sha256": "29BD159E68A459EAFE22677B6E8BE23149514E7DAEFA9268077B3BD240CA1AF6",
+      "translation": "+100%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-quality-cap-bonus-125",
+      "source_sha256": "4E7E9AC5D6FFCA91B1EE6BEF42514DC24F977A16DD36B3B846A657FDD1457823",
+      "translation": "+125%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-quality-cap-bonus-150",
+      "source_sha256": "0FCE9BCA2BBA9CC6DAA8D8E7B79262D83465941AB2ADEC812C003ADC4AADE4AA",
+      "translation": "+150%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-quality-cap-bonus-200",
+      "source_sha256": "B8D0520F1848ACD95B1C39A3179ED9DB387468ADDF23BB2FBADF7E443BF50DCE",
+      "translation": "+200%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-quality-cap-bonus-250",
+      "source_sha256": "190ABE9F260A9E4BC7070253ACBEA5A1ECAFF8C71293AAD8D5CE195C6C4F311F",
+      "translation": "+250%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-quality-cap-bonus-300",
+      "source_sha256": "409098AD16388D01170C79EE01EB10EB2AD800C3E0CDCE2485085BB483ACED37",
+      "translation": "+300%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-quality-cap-bonus-400",
+      "source_sha256": "7B5703DF4942C3995FDD5B9DA3263F739BC2EB13C6DF3B5DD24505DB5CF8CD71",
+      "translation": "+400%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-quality-cap-bonus-500",
+      "source_sha256": "F99E3D347521C62E904787B7C017115BAC68DF1FFE0BF1D5B76A6E3AD68E2B0A",
+      "translation": "+500%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-quality-cap-bonus-750",
+      "source_sha256": "DBAEF85F30E8D1EA7EF85F0949DECCDBD045597B96C01184DD098FD229DD9F68",
+      "translation": "+750%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-quality-cap-bonus-1000",
+      "source_sha256": "A4CA03BAA5845A21F5CD089098984012E3BF37FD5341ACB279B4D3DA8E022641",
+      "translation": "+1000%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-quality-cap-bonus-2500",
+      "source_sha256": "89100F2F7D43F3F5306458C697B6D9978152E78A09AA54A0FFE07EFBAD7A391D",
+      "translation": "+2500%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-quality-cap-bonus-5000",
+      "source_sha256": "269B1138EC6957F984BF6C1307907A0E03B9CEFBFD76BA261BD3DE8C8A916031",
+      "translation": "+5000%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-quality-cap-bonus-10000",
+      "source_sha256": "FF42D30F0A1F9922EACA4D9C1A1B94BC12EA0253C7D9DE055117492ED2A3DCA9",
+      "translation": "+10000%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-quality-cap-bonus-25000",
+      "source_sha256": "DF8D17D28FA682EF7403DB46FC31D632B578F120A4BEC99749A4A8AC7FC9F1B5",
+      "translation": "+25000%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting.mir-prototype-quality-cap-bonus-100000",
+      "source_sha256": "4FC8AB45A7F3A1FABFF5F85A23C5E5DCB15B72DE8916E643CFE3271B65A53CE7",
+      "translation": "+100000%",
+      "provenance": "format-invariant"
+    },
+    {
+      "key": "string-mod-setting-description.mir-automatic-productivity-action-disabled",
+      "source_sha256": "4E035A9B54AB5846DA84635F6164BCC3259A48096598EA0BE741557B49155DC3",
+      "translation": "Nevykonáva žiadne automatické zisťovanie, pripájanie ani vytváranie. Fixný výskum MIR zostáva nezmenený.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-automatic-productivity-action-preview",
+      "source_sha256": "38CC8112A8CA3FEFF40C1D934AA019993F00DC903ABD645468588296372DADAF",
+      "translation": "Objaví a klasifikuje kandidátov, potom zapíše prijaté a preskočené rozhodnutia do denníka Factorio. Nepripája recepty ani nevytvára výskum.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-automatic-productivity-action-apply",
+      "source_sha256": "92E11F848448324C3A8E53E69C9053E7965A1CC505DA0929FC30795B36E12B13",
+      "translation": "Predvolené. Objavuje kandidátov a ku kompatibilnému existujúcemu výskumu MIR pripája iba recepty overené bezpečnosťou. Nevytvára výskum sám o sebe; dve začiarkavacie políčka nižšie riadia tvorbu.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-automatic-compiler-mode-off",
+      "source_sha256": "1664E24C4CB58819303CA7A782B24A438749C3FE169375725EED8A5EFFC1FEC7",
+      "translation": "Starý ekvivalent funkcie Disabled.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-automatic-compiler-mode-report",
+      "source_sha256": "BB67AB90516554C09A2BC692C670E0FD14238D1582FA913BF5375195BDC072EF",
+      "translation": "Starý ekvivalent ukážok zmien.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-automatic-compiler-mode-safe-attach",
+      "source_sha256": "4C1E62F31CDA9862DAA04A776456646BEDFF2F93B078FD6E7D34735563D98F13",
+      "translation": "Starý ekvivalent aplikácie Použiť bezpečné zmeny so zakázaným vytváraním výskumu.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-automatic-compiler-mode-exact-pack",
+      "source_sha256": "D0CC8EF5B9C65CAC33E53F17BF8B52FE0A4C91F306C2DFDCFAB28CA07C4DC65F",
+      "translation": "Starý ekvivalent Použiť bezpečné zmeny s povoleným vytváraním výskumu a vyžadovanými skontrolovanými údajmi o kompatibilite.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-automatic-compiler-mode-safe-generate",
+      "source_sha256": "0B7084A57379B4C3EC97CF6EDFE16D822AEA4443246D648E4E4D84044EABD9CE",
+      "translation": "Starý ekvivalent aplikácie Použiť bezpečné zmeny s povoleným vytváraním výskumu pre registrovaných poskytovateľov experimentov.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-adjust-vanilla-weapon-speed-techs-off",
+      "source_sha256": "BFB2B6B9E024088E831BC1D5880997D1834902C9B78F2AE04F686FB52ED2C95D",
+      "translation": "Vypnite voliteľné čistenie bonusov pre prekrývajúce sa rakety/delá MIR.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-adjust-vanilla-weapon-speed-techs-only-when-dedicated-tech-enabled",
+      "source_sha256": "FD8D8B38D617392BEE7006ED681C9B31CA14A07FC0A9FA28C5E6D1C10345C807",
+      "translation": "Odstráňte prekrývajúce sa bonusy rakiet/kanónov MIR iba vtedy, keď povolená, dosiahnuteľná nekonečná technológia poskytuje presný efekt výmeny.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-adjust-vanilla-weapon-speed-techs-always",
+      "source_sha256": "D3762B9D6E7394F0E99F608ACA1160F2A60A984F8592281DC1D7AC6456A4E14A",
+      "translation": "Vždy odstráňte bonusy pre prekrývajúce sa rakety/delá MIR. Používajte iba vtedy, ak chcete prísne oddelenie.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-science-pack-ingredient-policy-configured",
+      "source_sha256": "C0AF027BF638C59B07E3C949339991C1D4B95B1B0147E72689D5F79F1AD09D6B",
+      "translation": "Použite konfigurované vedecké balíčky každej vygenerovanej technológie bez voliteľného rozšírenia prísad. Predvolená hodnota MIR.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-science-pack-ingredient-policy-space",
+      "source_sha256": "4A9F321404B550BC9B682BAEB3CC8213A52E5E7B1FF56F4914011DA0E3D6CE28",
+      "translation": "Pridajte vesmírnu vedu, ak je k dispozícii. Jednoduché zvýšenie obtiažnosti po rakete.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-science-pack-ingredient-policy-space-and-promethium",
+      "source_sha256": "FC40F348D71648D6BE5F44F85BFB2FEFAF7DC255576CD854EDE620C96E8B7A06",
+      "translation": "Pridajte priestor a vedu prométia, ak je k dispozícii. Najlepšie pre veľmi neskoré výskumné výlevky vesmírneho veku.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-science-pack-ingredient-policy-space-age-progression",
+      "source_sha256": "8D7AE1380C914408161F73DA44C7C4128F9072B245DFEDCE57523919322017F4",
+      "translation": "Pridajte iba balíčky na postup z vesmírneho veku, ktoré implikujú vybrané balíčky. Nepridáva nesúvisiace modifikované balíčky.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-science-pack-ingredient-policy-official-progression",
+      "source_sha256": "EED757F37E48AC1F15260E9B90DB1B07BE0D5CBAA96AB743710A193D1602196F",
+      "translation": "Pridajte chýbajúce oficiálne balíky v štýle nevyhnutných predpokladov, ktoré vyplývajú z najpokročilejšieho oficiálneho balíka, ktorý už bol vybratý.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-science-pack-ingredient-policy-mod-progression",
+      "source_sha256": "4282A281144366F07D7F7238EA2D1C2B5718C2E757238B785543B358D2D17260",
+      "translation": "Pridajte chýbajúce balíčky kompatibilné s laboratóriom odvodené z modifikovaného postupu vedeckého balíčka a odomknite predpoklady.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-science-pack-ingredient-policy-all-official",
+      "source_sha256": "46EA7B60ECEFA4A2359C4D88649FE5211CFC252CB904A8C56887D6B4AC687DF7",
+      "translation": "Použite každú oficiálnu základňu a vedecký balík z Vesmírneho veku, ktorý existuje v aktuálnej sade modov.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-science-pack-ingredient-policy-all",
+      "source_sha256": "09206A49ECE77CA67453150169CB27733E0F1F93AF0339F41D8AC0DD2AF284B5",
+      "translation": "Používajte každý aktívny vedecký balíček kompatibilný s laboratóriom, vrátane modifikovaných vedeckých balíčkov.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-lab-incompatibility-policy-reduce",
+      "source_sha256": "831925C5218ADA4C22408B8844C21FDDB1BBA5EF1DA629B0346D854C42818B46",
+      "translation": "Udržujte technológiu znížením jej vedeckých balíkov na najväčší súbor akceptovaný aktívnym laboratóriom. Najbezpečnejšie predvolené nastavenie pre balíčky modov.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-lab-incompatibility-policy-skip",
+      "source_sha256": "DCEA09504EE961D5296C2D1F9EA3C1639F469C6249A9F0DE51AE583EA0518EEE",
+      "translation": "Preskočte technológiu, ak žiadne aktívne laboratórium nemôže preskúmať svoju vybranú súpravu vedeckých balíkov. Prísnejšie a jednoduchšie na audit.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-lab-incompatibility-policy-engine-default",
+      "source_sha256": "AB822AB78DD4645D1A8560A862333F2B0BCCD847B1AD1A7317FBBCB9A11ABD2F",
+      "translation": "Nikdy neprepisujte vybranú sadu vedeckých balíčkov. MIR zachováva bezpečne skúmateľnú množinu nezmenenú a vynecháva vygenerovanú technológiu, keď Factorio nemôže túto presnú množinu preskúmať.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-productivity-cap-engine-default",
+      "source_sha256": "3FBA75F05D858FCB4A7B4A7C556BCB7149458E092BE28EBC08C9B3DCD08B7D6C",
+      "translation": "Ponechajte existujúci limit produktivity každého receptu tak. Recepty bez vlastného uzáveru využívajú bežný bonusový limit +300 % produktivity Factorio.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-productivity-cap-percent-25",
+      "source_sha256": "CCC2113CCF7C2D25D2FC367CEDE98B44BE1DF0B4D7132A0381BB1238D9A4F93C",
+      "translation": "Nastavte limity produktivity neparametrového receptu na +25%. Toto je prísny skorý strop.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-productivity-cap-percent-50",
+      "source_sha256": "078CCAA0B597761264D3250A31750E80C5247DC87966C376CD7F80B2B8D00066",
+      "translation": "Nastavte limity produktivity neparametrového receptu na +50 %. To je pod normálnou hranicou a výskum produktivity prestane pomáhať skôr.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-productivity-cap-percent-75",
+      "source_sha256": "0D802E040ADE4747EFAC454AA49D90A60B5CD3FD0094DE5A0256817A6274B731",
+      "translation": "Nastavte limity produktivity neparametrového receptu na +75%. To je pod normálnou hranicou a výskum produktivity prestane pomáhať skôr.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-productivity-cap-percent-100",
+      "source_sha256": "5EC64779314CE87CB08F2C0B15E3FA1C179C25EF38B240491360F7A91281338A",
+      "translation": "Nastavte limity produktivity neparametrového receptu na +100 %. To je pod normálnou hranicou a výskum produktivity prestane pomáhať skôr.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-productivity-cap-percent-125",
+      "source_sha256": "759CC11E8AA9311F2CAA284538BC382F2D4E0945B515DEA2978C453CB75081A5",
+      "translation": "Nastavte limity produktivity neparametrového receptu na +125%.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-productivity-cap-percent-150",
+      "source_sha256": "5C32A1D69BA37353EA845BDB92DBA0992C6AD479C1D09104E11FCA19A11A128A",
+      "translation": "Nastavte limity produktivity neparametrového receptu na +150 %.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-productivity-cap-percent-200",
+      "source_sha256": "783A6D9854F05EBADBCB0A104778DCC318B18EAC82358EA61382D85422AF2C68",
+      "translation": "Nastavte limity produktivity neparametrového receptu na +200 %. To je pod normálnou hranicou a výskum produktivity prestane pomáhať skôr.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-productivity-cap-percent-250",
+      "source_sha256": "D4E61177C69829679B2C13F19824C3DED0836A8DD5E8AF29EB00B08A8695BB1C",
+      "translation": "Nastavte limity produktivity neparametrového receptu na +250 %. To je mierne pod normálnou čiapočkou.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-productivity-cap-percent-400",
+      "source_sha256": "405E5A446E83649B72FC9B622F74F7FAF312415A7605FF8B337C2A17B16B4DF8",
+      "translation": "Nastavte limity produktivity neparametrového receptu na +400 %. To rozširuje škálovanie produktivity nad rámec bežného limitu.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-productivity-cap-percent-500",
+      "source_sha256": "AE86B03621A850CFAB12341D10A9FEE50645331CEE8061AF284EBD247654801F",
+      "translation": "Nastavte limity produktivity neparametrového receptu na +500 %. To rozširuje škálovanie produktivity nad rámec bežného limitu.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-productivity-cap-percent-750",
+      "source_sha256": "E3FC45E5EF10F3E2BA1AF9A1F95F0D84224D5A3E174CA5142BD12D11580B518D",
+      "translation": "Nastavte limity produktivity neparametrového receptu na +750 %.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-productivity-cap-percent-1000",
+      "source_sha256": "516E535895C6A84D8CA751D6E60E47BE1B9FD36361EB19E8766C08E5A77590A7",
+      "translation": "Nastavte limity produktivity neparametrového receptu na +1000%. Použite na dlhé uloženie, kde by malo záležať na výskume produktivity.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-productivity-cap-percent-2500",
+      "source_sha256": "878900FAE538A725F4C3E970598BF0D6D43BA849E406D2321B683ED968BE776B",
+      "translation": "Nastavte limity produktivity neparametrového receptu na +2500%. Použite na veľmi dlhé uloženie.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-productivity-cap-percent-5000",
+      "source_sha256": "12D87879DF9FD73694456ABFE160D94F75533E89ACD743049E6112F459541AFF",
+      "translation": "Nastavte limity produktivity neparametrového receptu na +5000%.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-productivity-cap-percent-10000",
+      "source_sha256": "01D6092988105612B1383857A398045EC0C0FAD60EDA009026E45CBF3C71761B",
+      "translation": "Nastavte limity produktivity neparametrového receptu na +10 000 %. Používajte len na extrémne dlhodobé škálovanie.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-productivity-cap-percent-25000",
+      "source_sha256": "5552D521C3C4A1030B27F5F873C003724B8EBA03A06864D8630EB23C2EF1722F",
+      "translation": "Nastavte limity produktivity neparametrového receptu na +25 000 %. Používajte len na extrémne dlhodobé škálovanie.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-productivity-cap-percent-100000",
+      "source_sha256": "B543A509ED36B183E214489E44B8EAFFDCEB75CD6CE42A236D11A98F07C4BFAA",
+      "translation": "Nastavte limity produktivity neparametrového receptu na +100000%. Toto je pre väčšinu uložených položiek efektívne bez obmedzenia.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-recycling-return-chance-engine-default",
+      "source_sha256": "AAEA7E808BE66AFC807CB9C1936F1E71B54D916080D32D2D115AE3A1D4859720",
+      "translation": "Nechajte každý recyklačný recept nezmenený.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-recycling-return-chance-match-productivity-cap",
+      "source_sha256": "C0E236A8F937BF359B9DD0C01EB1B204E5105DF9E1B352130777BD4EF20840A7",
+      "translation": "Bezpečná automatická redukcia pre skryté generované recepty na recykláciu. Používa 1 / (1 + bonus za produktivitu), obmedzený na normálnu návratnosť 25%: z +400% sa stane 20% a z +1000% bude približne 9,09%.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-recycling-return-chance-percent-25",
+      "source_sha256": "2DC2CC135C29BE29938A310055DDF5C5AD23E309221759F8368FAC78D1233CD3",
+      "translation": "Uchovajte skryté vygenerované recepty na recykláciu pri bežnej 25% návratnosti materiálu.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-recycling-return-chance-percent-20",
+      "source_sha256": "0C54CB14EA9B3148247D3484F61B43DA13E243D228160B4A1535CBAC772C511A",
+      "translation": "Škálujte skryté generované recepty na recykláciu na 20% návratnosť materiálu.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-recycling-return-chance-percent-15",
+      "source_sha256": "E5194B29D78CC5298E7A1A957D891417601415E9CA60B1B0B84A090F88431110",
+      "translation": "Škálujte skryté generované recepty na recykláciu na 15% návratnosť materiálu.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-recycling-return-chance-percent-12-5",
+      "source_sha256": "8E513417B79BE41CC5FD387A3E9E7F64C2905475B12C5AF256EB13F7F8309C5F",
+      "translation": "Rozšírte skryté generované recepty na recykláciu na 12,5% návratnosť materiálu.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-recycling-return-chance-percent-10",
+      "source_sha256": "8240156F23D151C00DA40530B84742BA3E50FC8CE192877565E347B12ED67B0C",
+      "translation": "Škálujte skryté generované recepty na recykláciu na 10% návratnosť materiálu.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-recycling-return-chance-percent-7-5",
+      "source_sha256": "82A93BDDCF949D3FF3116AE564717199E588613110E26A7AD6A717253F9F1378",
+      "translation": "Rozšírte skryté generované recepty na recykláciu na 7,5% návratnosť materiálu.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-recycling-return-chance-percent-5",
+      "source_sha256": "C305915C316E92EA11C413208D3EAD68CA584BE07DE02D9768174F8CE1FE13D4",
+      "translation": "Škálujte skryté generované recepty na recykláciu na 5% návratnosť materiálu.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-recycling-return-chance-percent-2-5",
+      "source_sha256": "AEFE19BBE761EE1287AE1B265A883F0ECB9390DEA13E36C04BB44C4E10E68575",
+      "translation": "Škálujte skryté generované recepty na recykláciu na 2,5% návratnosť materiálu.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-recycling-return-chance-percent-1",
+      "source_sha256": "91BA2ABEDCF15E083B3F365038B7D807615B9183EF3B37E52CE54CFE39459497",
+      "translation": "Škálujte skryté generované recepty na recykláciu na 1% návratnosť materiálu.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-recycling-return-chance-percent-0-5",
+      "source_sha256": "38FBD655C03FC9973833A4F420EA15EF9BB741A55FCD512F531F4E96BF946E54",
+      "translation": "Škálujte skryté generované recepty na recykláciu na 0,5% návratnosť materiálu.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-recycling-return-chance-percent-0-1",
+      "source_sha256": "958BCBF3DEC8DC139BE7D74EA2C60425230CE19D0313AB8F9EC81F1E6315A7F5",
+      "translation": "Škálujte skryté generované recepty na recykláciu na 0,1% návratnosť materiálu.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-efficiency-cap-engine-default",
+      "source_sha256": "80363B4B98FE31A498F6C64DEC8489940A0BA7781221EC2CA66DDF3ECEC1D5D4",
+      "translation": "Ponechajte limit spotreby energie každého stroja na pokoji. Stroje bez vlastného limitu používajú normálnu hranicu efektu spotreby energie Factorio -80 %, takže efekty nemôžu znížiť aktívne využitie pod 20 %.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-efficiency-cap-saving-25",
+      "source_sha256": "6C8EABA7C2007B2FEF8EA72D0690756993E17475C55469C2ADF8949D45D20F24",
+      "translation": "Napíšte limit spotreby energie -25 %. Aktívna spotreba energie zostáva po účinkoch spotreby energie na úrovni 75 % alebo viac.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-efficiency-cap-saving-50",
+      "source_sha256": "55B9011549013B019C376AD02F2F2E93A952B180B297FB5DCF9F9C4385E024E4",
+      "translation": "Napíšte limit spotreby energie -50 %. Aktívna spotreba energie zostáva na úrovni 50 % alebo viac po účinkoch spotreby energie na podporovaných strojoch.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-efficiency-cap-saving-75",
+      "source_sha256": "A238C13AFAA9D6827CCE139BAC9FCAC48CADC92FBC17F9D11005A9E4FC4A96D0",
+      "translation": "Napíšte limit spotreby energie -75 %. Aktívna spotreba energie zostáva na úrovni 25 % alebo viac po účinkoch spotreby energie na podporovaných strojoch.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-efficiency-cap-saving-90",
+      "source_sha256": "43ABA43B5B1C9E2D7AAD8C4BB1270B2112F950BDE656A75F137F133AB089F45C",
+      "translation": "Napíšte limit spotreby energie -90 %. Spotreba aktívnej energie môže klesnúť na 10 %, čo je pod bežnou hranicou 20 %.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-efficiency-cap-saving-95",
+      "source_sha256": "15DF46716E14D4EF8BC9BE705F061C1DB928D99CD439C44FC92D2861870D52D8",
+      "translation": "Napíšte limit spotreby energie -95 %. Aktívna spotreba energie môže klesnúť až na 5 %.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-efficiency-cap-saving-99",
+      "source_sha256": "423509F8CE7378E1FFEEC779F7B83CD381D3C09625A3917634AA5C8DA40D95BA",
+      "translation": "Napíšte limit spotreby energie -99 %. Aktívna spotreba energie môže klesnúť na 1 %.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-efficiency-cap-saving-999",
+      "source_sha256": "B2BD562339280891B0600D33631FABF597AECBF0F0417484301225266AF15C88",
+      "translation": "Napíšte limit spotreby energie -99,9 %. Aktívna spotreba energie môže klesnúť na 0,1 %.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-efficiency-cap-saving-9999",
+      "source_sha256": "8C39785269CE286A838EA5BE2FE40E44FB4A5AA24FB2C584C005680C47DFAF8E",
+      "translation": "Napíšte limit spotreby energie -99,99 %. Toto je takmer nulová spotreba aktívnej energie, nie prepis prototypu s nulovou spotrebou.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-pollution-cap-engine-default",
+      "source_sha256": "8032675226C03C6ABB5066CDC2A4D61064BEB7EC3F5663CCB7A606E6DB2203BC",
+      "translation": "Ponechajte limit vplyvu znečistenia každého zariadenia na pokoji. Stroje bez vlastného limitu používajú normálnu -80% limit znečistenia od spoločnosti Factorio.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-pollution-cap-saving-25",
+      "source_sha256": "FC10E43A1D03D13F89795553815AA316C268B9011EA765895AAC22F692136EC0",
+      "translation": "Napíšte limit znečistenia -25 %. Po účinkoch znečistenia zostáva znečistenie na úrovni 75 % alebo viac.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-pollution-cap-saving-50",
+      "source_sha256": "0D2312B2C5897499D3EB19D6391413701A1CE0372283C29EDF39A98CCBC3833C",
+      "translation": "Napíšte limit znečistenia -50 %. Po vplyve znečistenia na podporované stroje zostáva znečistenie na úrovni 50 % alebo viac.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-pollution-cap-saving-75",
+      "source_sha256": "9000A8DBA2F0C702BEFE0D1B7608A4D62D8085B83B27B08A5BAC1E3C7A57A46B",
+      "translation": "Napíšte limit znečistenia -75 %. Po účinkoch znečistenia na podporované stroje zostáva znečistenie na úrovni 25 % alebo viac.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-pollution-cap-saving-90",
+      "source_sha256": "B392398AB040E2E974C096EB8DD7E7F229F84403AA5754483F81EBF1F7A18ECB",
+      "translation": "Napíšte limit znečistenia -90 %. Znečistenie môže klesnúť až na 10 %, čo je pod normálnou hranicou 20 %.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-pollution-cap-saving-95",
+      "source_sha256": "B05BB296C390E32C6ECFF45E647A5752F5CF2FA572AAD803CA5584364473A5E3",
+      "translation": "Napíšte limit znečistenia -95 %. Znečistenie môže klesnúť až na 5 %.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-pollution-cap-saving-99",
+      "source_sha256": "5EC22CB6B04C4B7C7B05D693D88DAFBF3CC3EF65B4E7E8A790F6DBFC1802399B",
+      "translation": "Napíšte limit znečistenia -99 %. Znečistenie môže klesnúť až na 1 %.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-pollution-cap-saving-999",
+      "source_sha256": "B8EEAFE4781573506BCD45A3019381E979B5850C565CED70FE7704A9D39D9FC3",
+      "translation": "Napíšte limit znečistenia -99,9 %. Znečistenie môže klesnúť až na 0,1 %.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-pollution-cap-saving-9999",
+      "source_sha256": "F4BE000033335F0159EF336B4C56EF6AC88140B8724839D383680D84A00D5531",
+      "translation": "Napíšte limit znečistenia -99,99 %. Toto je takmer nulové znečistenie, nie skript znečistenia za behu.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-speed-floor-engine-default",
+      "source_sha256": "4ECE2E8B51E8285ADB03BAC183449C573E20FD2652661CAEC2A876D311684331",
+      "translation": "Ponechajte záporný rýchlostný limit každého stroja na pokoji. Stroje bez vlastného limitu používajú normálnu -80% podlahu Factorio a udržujú aspoň 20% rýchlosť.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-speed-floor-saving-25",
+      "source_sha256": "9C6364F3544667BCB043618CA2C1339DEE6BEBF3E4F30E28CB8FEBF7B28EF2ED",
+      "translation": "Negatívne účinky na rýchlosť upnutia pri -25 %, ponechajúc aspoň 75 % rýchlosti.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-speed-floor-saving-50",
+      "source_sha256": "0C2A25CC9D08148D98C22CA3E670BB3450AF9A31273112083E33612A8E94AF27",
+      "translation": "Negatívne účinky na rýchlosť upnutia pri -50%, ponechajúc aspoň 50% rýchlosti.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-speed-floor-saving-75",
+      "source_sha256": "7DB9B774B741CBC6E9718C5461615BFB21E1DA0574D672C19EBCA878E1A46FFA",
+      "translation": "Negatívne účinky na rýchlosť upnutia pri -75 %, ponechajúc aspoň 25 % rýchlosti.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-speed-floor-saving-90",
+      "source_sha256": "2AB5FD1A3F2803DD1EC4BE1930C9CC0DB6A8EE5690B454B1D2B23F29B85C2520",
+      "translation": "Povoľte negatívne efekty rýchlosti až do -90%, ponechajte aspoň 10% rýchlosti.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-speed-floor-saving-95",
+      "source_sha256": "5069AA4E1FADEE671FA80117C8F770F05A3905FEFE807CD979D0E852E0676526",
+      "translation": "Povoľte negatívne efekty rýchlosti až do -95%, ponechajte aspoň 5% rýchlosti.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-speed-floor-saving-99",
+      "source_sha256": "391D479AD0F64495F4BC85B9D2219E2F2540B3A30854BCC72524D229314EE34A",
+      "translation": "Povoľte negatívne efekty rýchlosti až na -99%, ponechajte aspoň 1% rýchlosti.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-speed-floor-saving-999",
+      "source_sha256": "CCD1D8AD1BEF32626B0806BAF55FC7844F6C4F4260FDB3AEB1A3156948382388",
+      "translation": "Povoľte negatívne efekty rýchlosti až na -99,9%, ponechajte aspoň 0,1% rýchlosti.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-speed-floor-saving-9999",
+      "source_sha256": "4852695DABCE0E3D4F31D0A5672DFA876E85CE092E80416E5F524A36F8F87390",
+      "translation": "Povoliť negatívne účinky na rýchlosť až do -99,99 %, čo je najnižší limit prototypu Factorio. Toto je takmer zastavenie, nie nulová alebo záporná rýchlosť tvorby.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-speed-cap-engine-default",
+      "source_sha256": "4730BE81AE45AEB659C0C004B08FEF6A6C4190451F35FD1AAB84C1844A1E921F",
+      "translation": "Ponechajte rýchlostný limit každého stroja na pokoji. Stroje bez vlastného limitu využívajú veľmi vysoký strop efektu rýchlosti +100 000 % od spoločnosti Factorio.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-speed-cap-bonus-25",
+      "source_sha256": "3BEA103A652205826AECA2F21D9B7CAB5BAAF8375AE3D6E67FFDFEE45C98B854",
+      "translation": "Pozitívne rýchlostné efekty upnutia pri +25%.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-speed-cap-bonus-50",
+      "source_sha256": "FC73948956227929B94F7D8C25F656DD09835A918D1AD53FCA3198EB988C4581",
+      "translation": "Pozitívne rýchlostné efekty upnutia pri +50%. Použite to na to, aby boli rýchlostné bonusy pevne ohraničené.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-speed-cap-bonus-75",
+      "source_sha256": "3503CA8046A3D86D320251B55D0B241E2F835BEA296A6562D4820FA10F1B8458",
+      "translation": "Pozitívne rýchlostné efekty upnutia pri +75%.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-speed-cap-bonus-100",
+      "source_sha256": "335F123E72054B0B0996B9646E5C5BE618BD1777B364F38889B452274BE395AC",
+      "translation": "Pozitívne rýchlostné efekty upnutia pri +100 %.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-speed-cap-bonus-125",
+      "source_sha256": "A978EEEDCD9AEF6AD4AB0A42B0672880E50CE5B40BCF1F24042ACF5AD36EAA79",
+      "translation": "Pozitívne rýchlostné efekty upnutia pri +125%.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-speed-cap-bonus-150",
+      "source_sha256": "FDC062F72C1AD1F2FB9FEBC26D3091D7500B93BB90D20DFD6F77E373FB7F121F",
+      "translation": "Pozitívne rýchlostné efekty upnutia pri +150%.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-speed-cap-bonus-200",
+      "source_sha256": "A86F6E7BF4CEAD79DD45542FC9794289C00AD8290CC6451F13C59834B8EFFD0F",
+      "translation": "Pozitívne rýchlostné efekty upnutia pri +200%.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-speed-cap-bonus-250",
+      "source_sha256": "B2CA613B9AE77693193C982BC2DC34085F94C0D3955093E3921F97C538A2F4E0",
+      "translation": "Pozitívne rýchlostné efekty upnutia pri +250%.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-speed-cap-bonus-300",
+      "source_sha256": "D3E1B3C47C11E8E7CB99F1975E251FA31C546BE7D20F42F0E98B0FDDF0FB9B6F",
+      "translation": "Pozitívne rýchlostné efekty upnutia pri +300 %.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-speed-cap-bonus-400",
+      "source_sha256": "4193D3A56D48CBA14A35672F3E9C9D75D5FEDF424FB3CE6D54731CDD3A0F87A7",
+      "translation": "Pozitívne rýchlostné efekty upnutia pri +400%.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-speed-cap-bonus-500",
+      "source_sha256": "49445DB0EB6857CA73E138A2DB450717AA5BC1F2A517C8DFD4310D571DE0D4EE",
+      "translation": "Pozitívne rýchlostné efekty upnutia pri +500%.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-speed-cap-bonus-750",
+      "source_sha256": "1745B581937303D7BE10C7F9C7A8A061E7208DC109AE9DF8ABCA97E4CE971E58",
+      "translation": "Pozitívne rýchlostné efekty upnutia pri +750 %.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-speed-cap-bonus-1000",
+      "source_sha256": "F9B20298A7320B7BA3795BA2F723EE13BCE7AD993798BFE284B9C48BDB5B1C5E",
+      "translation": "Pozitívne rýchlostné efekty upnutia pri +1000%.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-speed-cap-bonus-2500",
+      "source_sha256": "24D2F9DC69EFC7CF59697BB7F699060856DA58B33A7677D4206A9786B32D3C2C",
+      "translation": "Pozitívne rýchlostné efekty upnutia pri +2500%.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-speed-cap-bonus-5000",
+      "source_sha256": "5C56315B733C1B40115756E1FD30352DDEF8E3258567E2C2C189C59DDBC9C141",
+      "translation": "Pozitívne rýchlostné efekty upnutia pri +5000%.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-speed-cap-bonus-10000",
+      "source_sha256": "D25EA8C2AA4A47AE1BF3B98010BD51137857BA544D9DDA780914088D6872A058",
+      "translation": "Pozitívne rýchlostné efekty upnutia pri +10000%.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-speed-cap-bonus-25000",
+      "source_sha256": "9AFC55EC3CF192B9EDB972DF19770506860E460C460B735F94C55ED0DC54DBDC",
+      "translation": "Pozitívne rýchlostné efekty upnutia pri +25000%.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-speed-cap-bonus-100000",
+      "source_sha256": "1C136AF1BB5BEA72907892D6A59A3939A108622B054B6ADD3A9454E889B1C712",
+      "translation": "Explicitne napíšte strop maximálnej rýchlosti Factorio. Na rozdiel od nezmenených to prepíše vlastné spodné limity.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-quality-cap-engine-default",
+      "source_sha256": "E0B778C6C8C1E9270E9FDB32F6D1560C28FAC45B1156AE4DC3010301345F6169",
+      "translation": "Ponechajte limit kvality každého zariadenia na pokoji. Stroje bez vlastného limitu využívajú veľmi vysoký strop Factorio +100 000 % s efektom kvality.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-quality-cap-bonus-50",
+      "source_sha256": "4C4B37D5722DB118EB218DF8600B91C7A1607A7A9B066FC0E5D4027BEEE98524",
+      "translation": "Upevnenie pozitívnych efektov kvality pri +50%. To obmedzuje bonusové efekty kvality stroja, nie úrovne kvality alebo vzorce pravdepodobnosti položiek.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-quality-cap-bonus-25",
+      "source_sha256": "01BC2C76687ED9C278651236057AE4BA3B4760E688679FCE1967B12173EF6A3F",
+      "translation": "Pozitívne účinky na kvalitu upnutia pri +25%. Toto nemení úrovne kvality ani vzorce pravdepodobnosti položiek.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-quality-cap-bonus-75",
+      "source_sha256": "1B88B06CCDE0DEE06B55F61A76DBF11DE8B264BDA83B1C9B500F7BEB8857F4EA",
+      "translation": "Upevnenie pozitívnych efektov kvality na +75%. Toto nemení úrovne kvality ani vzorce pravdepodobnosti položiek.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-quality-cap-bonus-100",
+      "source_sha256": "152A0BBAE727C9A520E8B915342EE5B4C16F2749C0BB059C6E434A60C27BBF61",
+      "translation": "Pozitívny efekt kvality upnutia na +100%. Toto nemení úrovne kvality ani vzorce pravdepodobnosti položiek.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-quality-cap-bonus-125",
+      "source_sha256": "A9E38C10BD6144144085BAD505C6867FFA10D955AA3E40CC634185AFB7B15B93",
+      "translation": "Pozitívny efekt kvality upnutia na +125%. Toto nemení úrovne kvality ani vzorce pravdepodobnosti položiek.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-quality-cap-bonus-150",
+      "source_sha256": "DE4B4176F50985C99C426433FD35F0819045B1732E52471B0DB713EB3836778A",
+      "translation": "Pozitívny efekt kvality upnutia na +150%. Toto nemení úrovne kvality ani vzorce pravdepodobnosti položiek.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-quality-cap-bonus-200",
+      "source_sha256": "BA68F69B8A861B7E6983F9E23B430647993C60D1F0737194A6556CA7019818BF",
+      "translation": "Pozitívny efekt kvality upnutia na +200%. Toto nemení úrovne kvality ani vzorce pravdepodobnosti položiek.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-quality-cap-bonus-250",
+      "source_sha256": "EAB222E18E97BD4438236412F2AFBD20B9D9BFFFEA703B25E7D751C08FFD7DA0",
+      "translation": "Pozitívny efekt kvality upnutia na +250%. Toto nemení úrovne kvality ani vzorce pravdepodobnosti položiek.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-quality-cap-bonus-300",
+      "source_sha256": "68858FED99D8596063BB41992B1202DC70AEC44FCB60D0787BEFF23440BAAB91",
+      "translation": "Pozitívny efekt kvality upnutia na +300%. Toto nemení úrovne kvality ani vzorce pravdepodobnosti položiek.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-quality-cap-bonus-400",
+      "source_sha256": "A7F8551BCA80639B128FAD94F11493320342EEC7BC313D8BFB70A590CEA23D89",
+      "translation": "Pozitívny efekt kvality upnutia na +400%. Toto nemení úrovne kvality ani vzorce pravdepodobnosti položiek.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-quality-cap-bonus-500",
+      "source_sha256": "662327EBB1BEB01508BFD2E0361316BBA4199B709AAFED3C87C154D15DF61855",
+      "translation": "Upevnenie pozitívnych efektov kvality na +500%. Toto nemení úrovne kvality ani vzorce pravdepodobnosti položiek.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-quality-cap-bonus-750",
+      "source_sha256": "8925659A62DFA53E89CED1BF7E323DD846C218136166A593E24FD39FC6F1BF22",
+      "translation": "Pozitívny efekt kvality upnutia na +750%. Toto nemení úrovne kvality ani vzorce pravdepodobnosti položiek.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-quality-cap-bonus-1000",
+      "source_sha256": "75E62BF8FBA844B76DB69BD5DD1768A53880998F6745F2C264E4D3B2780BCDF0",
+      "translation": "Pozitívny efekt kvality upnutia na +1000%. Toto nemení úrovne kvality ani vzorce pravdepodobnosti položiek.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-quality-cap-bonus-2500",
+      "source_sha256": "C01CE0DFF5AD30F6AC172D46FA0C43672B46FABBAE3848779B6F3DF6AAD60C7F",
+      "translation": "Pozitívne účinky na kvalitu upnutia pri +2500%. Toto nemení úrovne kvality ani vzorce pravdepodobnosti položiek.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-quality-cap-bonus-5000",
+      "source_sha256": "97AB7CA94B98DBA5E0ECA6157B06061131788B5ABFF6F0BF97B62FC2A933189E",
+      "translation": "Pozitívne kvalitatívne účinky upnutia na +5000%. Toto nemení úrovne kvality ani vzorce pravdepodobnosti položiek.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-quality-cap-bonus-10000",
+      "source_sha256": "BA5D0DED6D761ED7EE9BFBE6171104EE82DCABF292C9F150EC89CD77246AE5F0",
+      "translation": "Pozitívne kvalitatívne účinky upnutia na +10000%. Toto nemení úrovne kvality ani vzorce pravdepodobnosti položiek.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-quality-cap-bonus-25000",
+      "source_sha256": "E38C95EA2E2265FBDC501D60DFF8A598FFD525E3A3F5ADC1961983D9F740872A",
+      "translation": "Pozitívne účinky na kvalitu upnutia pri +25000%. Toto nemení úrovne kvality ani vzorce pravdepodobnosti položiek.",
+      "provenance": "machine-assisted"
+    },
+    {
+      "key": "string-mod-setting-description.mir-prototype-quality-cap-bonus-100000",
+      "source_sha256": "CFDBF0233077ECA0D9FD02C1F6A1C7574534FF31A705FF73460DE6E62D700301",
+      "translation": "Explicitne napíšte strop maximálneho efektu kvality Factorio. Na rozdiel od nezmenených to prepíše vlastné spodné limity.",
+      "provenance": "machine-assisted"
+    }
+  ]
+}

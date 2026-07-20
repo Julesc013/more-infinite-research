@@ -1,36 +1,44 @@
 # M.I.R. TODO
 
-Updated: 2026-07-18
+Updated: 2026-07-20
 
 This is the current executable queue for `dev`. Historical pre-consolidation queue text is preserved at `.mir/evidence/lower-wave/todo-2026-07-14-pre-consolidation.md`. `.mir/releases.json` is the canonical release ledger; branch, release-wave, distribution, queue, and promotion views must agree with it.
 
 ## Current Truth
 
-- MIR 3.1.9 is the immutable Factorio 2.1 release; MIR 2.4.5 is the immutable Factorio 2.0 companion.
+- MIR 3.1.9 is the immutable Factorio 2.1 release; MIR 2.4.9 is the immutable Factorio 2.0 companion.
 - MIR 1.9.4 and 1.8.2 are the immutable Factorio 1.1 and 1.0 releases.
 - MIR 1.7.1 through 1.3.0 are published reduced or finite target projections for Factorio 0.17 through 0.13.
 - MIR 0.12.0 through 0.6.0 are published finite archive or museum reconstructions whose corrected packages now include explicit target-matching `factorio_version` metadata.
-- The modern `dev` root contains every accepted portable code, data, fixture, validation, documentation, determinism, process-lifecycle, and package-governance return from those target lines.
+- The modern `dev` root contains every accepted portable code, data, fixture, validation, documentation, determinism, process-lifecycle, and package-governance return from those target lines, including the completed 2.4.9 campaign.
 - Complete immutable source snapshots for published campaign versions remain under `.mir/target-lines/<version>/`, but active validation and assurance fingerprints exclude those archival trees unless the dedicated snapshot-integrity gate is running.
-- The 44 tracked root distribution paths are bound by `.mir/distributions.json`. MIR 3.2.0 is explicitly a development candidate; the nonexistent 1.9.5 and not-yet-built final 2.5.0 archives are not distribution entries.
+- The 45 tracked root distribution paths are bound by `.mir/distributions.json`: 44 tagged releases plus the MIR 3.2.0 development candidate. The nonexistent 1.9.5 and not-yet-built final 2.5.0 archives are not distribution entries.
 - Target-era metadata, API cuts, finite compiler implementations, and museum code remain isolated inside their snapshots and target branches. They are not modern Factorio 2.1 defaults.
 - The lower-wave fixed-point audit found zero unreturned portable fixes, zero stale source locks, zero stale candidates, and zero branch divergence.
-- MIR 3.2.0 verifier hardening, integrity-kernel work, modularization, optimization, fixtures, tests, and documentation are authorized on `dev`. MIR 2.5.0 begins only after the canonical 3.2.0 source freezes.
+- MIR 3.2.0 verifier hardening, integrity-kernel work, modularization, optimization, fixtures, tests, and documentation are authorized on `dev`. MIR 2.5.0 begins from the 2.4.9 baseline only after the canonical 3.2.0 source freezes.
 - The former `3976BC...` development package and its 125-test result are historical checkpoint evidence. The replacement 3.2.0 package is rebuilding and is not release-qualified.
 
 ## Consolidation Gate
 
 - [x] Import the aggregate feature, source-lock, qualification, seal, publication, balance, and branch evidence into `dev`.
-- [x] Reconcile the 44 real tracked distribution paths under `dist/`; remove nonexistent 1.9.5 and provisional 2.5.0 rows and classify 3.2.0 as a development candidate.
+- [x] Reconcile the 45 real tracked distribution paths under `dist/`; remove nonexistent 1.9.5 and provisional 2.5.0 rows and classify 3.2.0 as a development candidate.
 - [x] Export each published tag's complete tracked code, data, tests, scripts, notes, docs, manifests, and evidence under `.mir/target-lines/`.
 - [x] Preserve the modern root as the only active Factorio 2.1 implementation.
-- [x] Consolidate one source-faithful changelog section for every real version in the 44-file distribution inventory.
+- [x] Consolidate one source-faithful changelog section for every real version in the 45-file distribution inventory.
 - [x] Complete the copy-ready release, feature, test, lesson, reliability, optimization, and follow-up document.
-- [x] Validate every snapshot tree and all 44 root distributions against their immutable or explicitly classified source and recorded hash.
+- [x] Validate every snapshot tree and all 45 root distributions against their immutable or explicitly classified source and recorded hash.
 - [x] Run docs governance, manifest, static, deterministic-package, and forbidden-entry validation.
 - [x] Correct the shared museum metadata generator, rebuild and exact-binary requalify all seven 0.x archives, replace their GitHub tags/releases, and refresh the `dev` snapshots and distribution inventory.
 - [x] Rerun the Factorio 2.1 runtime catalog against the exact 3.2.0 development package; the local full profile passed all 125 declared F0-F4 tests.
 - [x] Commit and push the complete consolidation to `dev`.
+
+## MIR 2.4.x Closeout
+
+- [x] Publish MIR 2.4.9 from tag `7ebe93029695bbf809a15a14c6540530738a9e62` and freeze archive SHA-256 `B5503F94D04624F65462CC275FB6AA71A8CE93075F732DF498F6D73AD255F978`.
+- [x] Return the exact 2.4.9 distribution, approved delta, automated qualification, paired performance evidence, release notes, stability record, and complete tagged source snapshot to `dev`.
+- [x] Confirm that the portable technology-effect sanitation, Space Exploration removed-recipe fix, steel-productivity ownership, reset removal, locale system, and verification improvements already exist in the active 3.2 implementation.
+- [x] Keep Factorio 2.0 metadata, dependency floors, API cuts, and release wording inside the immutable snapshot and target branches rather than overlaying them onto the Factorio 2.1 root.
+- [x] Record that maintainer-directed publication occurred without a recorded package-focused manual attestation or protected qualification; do not represent those missing gates as passed.
 
 ## Remaining Human And External Gates
 

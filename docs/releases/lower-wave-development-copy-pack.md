@@ -1,18 +1,18 @@
 ---
 title: "MIR Published Lines Development Copy Pack"
 status: current
-applies_to: "dev after the 3.1.9 through 0.6.0 publication wave"
+applies_to: "dev after the 2.4.9 publication return"
 audience: developer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-07-16
+last_reviewed: 2026-07-20
 supersedes: []
 superseded_by: []
 ---
 
 # MIR Published Lines Development Copy Pack
 
-The `dev` branch is the consolidated development checkout for the completed MIR 3.1.9 through 0.6.0 release campaign. It contains the current Factorio 2.1 implementation, all portable fixes returned by the target lines, every published distribution, complete source snapshots for every published line, the aggregate feature matrix, qualification evidence, tests, notes, changelog, and the current TODO.
+The `dev` branch is the consolidated development checkout for the completed publication campaigns through MIR 2.4.9. It contains the current Factorio 2.1 implementation, all portable fixes returned by the target lines, every published distribution, complete source snapshots for every published campaign line, the aggregate feature matrix, qualification evidence, tests, notes, changelog, and the current TODO.
 
 The repository root remains the only active implementation. Historical source is intentionally stored under `.mir/target-lines/` so it can be copied or inspected without letting old Factorio APIs, metadata, settings, or feature cuts mutate the modern package.
 
@@ -38,15 +38,16 @@ Do not overlay an entire historical snapshot onto the repository root. Copy only
 
 ## Published Distributions And Source Snapshots
 
-The `dist/` directory contains all 46 ZIP paths found across repository history. The exact machine-readable inventory is `.mir/distributions.json`: 44 tagged archives plus the retained, clearly classified 2.4.1 and 2.5.0 superseded candidates. A superseded candidate is available for inspection and copying but is not a current or published release.
+The tracked `dist/` directory contains 45 ZIPs: 44 immutable tagged releases plus the clearly classified MIR 3.2.0 development candidate. The exact machine-readable inventory is `.mir/distributions.json`; nonexistent or superseded 1.9.5, 2.4.1, and 2.5.0 candidates are not root distribution entries.
 
-The complete version inventory is 0.6.0, 0.7.0, 0.8.0, 0.9.0, 0.10.0, 0.11.0, 0.12.0; 1.0.0, 1.1.0, 1.1.5, 1.2.0, 1.2.5, 1.2.9, 1.3.0, 1.4.0, 1.5.0, 1.6.0, 1.7.0, 1.7.1, 1.8.0, 1.8.1, 1.8.2, 1.9.0, 1.9.1, 1.9.2, 1.9.3, 1.9.4, 1.9.5; 2.0.0, 2.0.5, 2.1.0, 2.1.5, 2.2.0, 2.3.0, 2.3.5, 2.4.0, 2.4.1, 2.4.5, 2.5.0; and 3.0.0, 3.0.5, 3.1.0, 3.1.1, 3.1.2, 3.1.5, 3.1.9.
+The complete tracked version inventory is 0.6.0, 0.7.0, 0.8.0, 0.9.0, 0.10.0, 0.11.0, 0.12.0; 1.0.0, 1.1.0, 1.1.5, 1.2.0, 1.2.5, 1.2.9, 1.3.0, 1.4.0, 1.5.0, 1.6.0, 1.7.0, 1.7.1, 1.8.0, 1.8.1, 1.8.2, 1.9.0, 1.9.1, 1.9.2, 1.9.3, 1.9.4; 2.0.0, 2.0.5, 2.1.0, 2.1.5, 2.2.0, 2.3.0, 2.3.5, 2.4.0, 2.4.5, 2.4.9; and 3.0.0, 3.0.5, 3.1.0, 3.1.1, 3.1.2, 3.1.5, 3.1.9, and the 3.2.0 development candidate.
 
 Every row below is a final campaign version with both an exact ZIP in `dist/` and a complete tagged source tree in `.mir/target-lines/<version>/`.
 
 | MIR | Factorio | Runtime proof | Tagged source commit | Distribution SHA-256 |
 | --- | --- | --- | --- | --- |
 | 3.1.9 | 2.1.10 | 102 of 102 scenarios | `1b9c6f32fc2bb53c413a593534e103a6043b4be3` | `D77B3A78DA40CD4FDD4C829A01B5030E59FB593F3387124EF5C438F6A9E8DFCD` |
+| 2.4.9 | 2.0.77 | 106 machine checks and 92 runtime scenarios | `7ebe93029695bbf809a15a14c6540530738a9e62` | `B5503F94D04624F65462CC275FB6AA71A8CE93075F732DF498F6D73AD255F978` |
 | 2.4.5 | 2.0 | 82 scenarios | `7e4b6c530cfcc5b2e1429c4e9f4ccb0d6d3b42a4` | `7649824B72247AA38F05661422DFDEE7C729B21CC73A0A35D2455443B45D39F8` |
 | 1.9.4 | 1.1.110.62357 | 19 scenarios | `426d6d48c6578a786ea7de0f224282baff9d342b` | `74BA83E1F02FABBC52C09AC6144A409B243066663A6D132A47334459C2665BFB` |
 | 1.8.2 | 1.0.0.54889 | 19 scenarios | `0a192c27674a6b13847e2f5e1b2b530e62419ee8` | `676927ECF801114CA8F7B9EFD6D139906432BCC60BE26B8CA5C08842E3686EFE` |
@@ -110,7 +111,7 @@ The full records, source commits, fixtures, decisions, and replayed target commi
 
 ## Changelog, TODO, Notes, And Evidence
 
-`changelog.txt` now has one section for every version in the 46-file distribution inventory, with 2.4.1 and 2.5.0 explicitly marked as superseded candidates rather than releases. `todo.md` records completed consolidation and only the remaining manual, portal, reliability, and future-development gates. The exact earlier TODO is retained as lower-wave evidence so no plan or note was lost during cleanup.
+`changelog.txt` has a source-faithful section for every published line and the active 3.2.0 development candidate. `todo.md` records completed consolidation and only the remaining manual, portal, reliability, and future-development gates. The exact earlier TODO is retained as lower-wave evidence so no plan or note was lost during cleanup.
 
 The release synthesis documents explain decisions and limitations rather than duplicating raw ledgers:
 
@@ -125,11 +126,11 @@ The release synthesis documents explain decisions and limitations rather than du
 - Factorio Mod Portal publication for 1.9.4, 1.8.2, and 1.7.1 through 1.3.0 remains blocked until `MOD_UPLOAD_API_KEY` is available.
 - Maintainer manual gameplay and balance review remains pending where the release ledgers say `PENDING-MAINTAINER`; automated results do not claim that review was performed.
 - Mod Portal upload and acceptance for the metadata-corrected 0.12.0 through 0.6.0 archives remain maintainer actions; GitHub publication and exact-binary proof do not claim portal acceptance.
-- No Factorio 0.5 campaign, MIR 3.2 implementation, retag, force-push, or rewrite of a published archive is authorized by this consolidation.
+- No Factorio 0.5 campaign, retag, force-push, or rewrite of a published archive is authorized by this consolidation. MIR 3.2 implementation continues under its current governed development plan.
 
 ## Validation Boundary
 
-The source snapshots are complete tag exports, but they are not active validator inputs. Static validation deliberately excludes `.mir/target-lines/` from modern package asset ownership checks while continuing to enforce the active root. Snapshot integrity is separately proved by comparing each staged snapshot Git tree to its published tag root tree, hashing all 46 root archives against `.mir/distributions.json`, and binding the 16 final campaign archives to `.mir/target-lines/index.json`.
+The source snapshots are complete tag exports, but they are not active validator inputs. Static validation deliberately excludes `.mir/target-lines/` from modern package asset ownership checks while continuing to enforce the active root. Snapshot integrity is separately proved by comparing each staged snapshot Git tree to its published tag root tree, hashing all 45 tracked root archives against `.mir/distributions.json`, and binding the 17 final campaign archives to `.mir/target-lines/index.json`.
 
 The 2026-07-15 consolidation gate passed Markdown formatting, docs and governance manifests, architecture boundaries, settings visibility, locale checks, all 78 active PowerShell scripts, scenario manifests, deterministic planner tools, schema and contract coverage, package identity invariance, policy and claim lints, the 70 stable plus 2 predeclared golden identities, changelog format, package construction, and forbidden-entry hygiene. Two independent builds produced development-package SHA-256 `7105D01F3C0847FD6641728BDDE93FA90DC8D723945B89C7E30AB051109B50F5`.
 

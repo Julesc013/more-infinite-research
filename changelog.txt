@@ -34,6 +34,33 @@ Version: 3.2.0
     - Replaced recursive researchability traversal and prevented fatal safety assertions from suppressing diagnostic flushing.
 
 ---------------------------------------------------------------------------------------------------
+Version: 2.4.9
+Date: 2026-07-20
+
+  Bugfixes:
+
+    - Stopped Factorio 2.0 packages from emitting unsupported mod-data prototypes.
+    - Removed an unnecessary global technology-effect reset during configuration changes, preserving unrelated mod state.
+    - Removed dangling unlock-quality and turret-attack effects and invalid optional give-item quality targets.
+    - Distinguished give-item effects for the same item at different quality levels.
+    - Prevented Space Exploration's removed Krastorio copper-cable recipe from remaining in technology effects.
+    - Kept copper, iron, and steel productivity from claiming scrap-input recovery recipes.
+
+  Changes:
+
+    - Completed all 50 Factorio-supported locales and added source-hash-bound generation and regression checks.
+    - Added persistent content-addressed verification evidence with stable per-test and per-scenario identities.
+    - Split exact release-archive identity from gameplay, runtime, migration, settings, balance, and dependency domains.
+    - Added separate locale and asset domains so packaging-only changes do not invalidate unrelated gameplay evidence.
+    - Reused trusted passing evidence only when every declared effective input has the same fingerprint.
+    - Added explicit REUSE, WAIT, RUN, and INVALID planning with matching-worker adoption and non-cancelling concurrency.
+    - Added isolated Factorio scenario workers and one aggregate verification gate for release qualification.
+    - Recalculated verification fingerprints from the Factorio 2.0 package, binary, dependency contract, and scenarios.
+    - Made exact candidate equivalence, paired runtime performance, and package-focused manual review seal inputs.
+    - Preserved stable settings, generated technology IDs, migrations, and runtime-state namespaces from MIR 2.4.5.
+    - Added steel productivity for standard steel-plate recipes and adopted Space Age's native productivity owner.
+
+---------------------------------------------------------------------------------------------------
 Version: 3.1.9
 Date: 2026-07-14
 

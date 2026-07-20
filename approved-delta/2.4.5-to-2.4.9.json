@@ -1,0 +1,943 @@
+{
+  "schema": 2,
+  "kind": "mir-approved-package-delta",
+  "baseline": {
+    "version": "2.4.5",
+    "archive_sha256": "7649824B72247AA38F05661422DFDEE7C729B21CC73A0A35D2455443B45D39F8",
+    "package_content_sha256": "5B8E21077CAC99CDB0733EBE8B34D10D0F375B2EAB2D42E60A73677860783FED",
+    "source_commit": "47bcc80c8a70b41dbbb4f8d80b2b9433d0a10d3f"
+  },
+  "current": {
+    "version": "2.4.9",
+    "archive_sha256": "B5503F94D04624F65462CC275FB6AA71A8CE93075F732DF498F6D73AD255F978",
+    "package_content_sha256": "23D992943090BFF487675E9DF8C5C12BFDB1F3018B0BF04C9928265E5DC95255",
+    "source_commit": "ecd875bceda8f373c3dd8a9b3393e9626b5dec4c"
+  },
+  "invariants": {
+    "settings_paths_unchanged": true,
+    "migration_paths_unchanged": true,
+    "stream_paths_unchanged": false
+  },
+  "differences": [
+    {
+      "path": "changelog.txt",
+      "change": "changed",
+      "before_sha256": "3C6EE10D551339D450B68B87E23019AB27E4FFB53AD2B6ADD59647D63CC5A1F9",
+      "after_sha256": "1483114B1751746FD388FE253995E13D59A2F40C2BB7C65AB08D7F8021D5BD60",
+      "reason": "MIR 2.4.9 player-visible stability and safety history",
+      "intentional": true,
+      "migration_impact": "No generated ID, setting ID, migration, or runtime namespace change is authorized by this package-path delta.",
+      "required_evidence": [
+        "exact archive hashes",
+        "2.4.5-to-2.4.9 upgrade proof",
+        "Factorio 2.0 full qualification"
+      ]
+    },
+    {
+      "path": "info.json",
+      "change": "changed",
+      "before_sha256": "DB9C0588791B3101C36C1814779B0C3B02130C4D03B4FE2B2DEED1AD47DEC900",
+      "after_sha256": "00DAE4ADC30257C77577307143E04BE3415504E02DAF03F13130DECA2C58AD30",
+      "reason": "MIR 2.4.9 version and Factorio 2.0 dependency contract",
+      "intentional": true,
+      "migration_impact": "No generated ID, setting ID, migration, or runtime namespace change is authorized by this package-path delta.",
+      "required_evidence": [
+        "exact archive hashes",
+        "2.4.5-to-2.4.9 upgrade proof",
+        "Factorio 2.0 full qualification"
+      ]
+    },
+    {
+      "path": "locale/af/more-infinite-research.cfg",
+      "change": "added",
+      "before_sha256": null,
+      "after_sha256": "D569B3444FCE69B5277674E30F274A21AD6E56545B823D21D23FC30BB1029BB7",
+      "reason": "complete Afrikaans locale synchronized with the English authority",
+      "intentional": true,
+      "migration_impact": "No generated ID, setting ID, migration, or runtime namespace change is authorized by this package-path delta.",
+      "required_evidence": [
+        "exact archive hashes",
+        "2.4.5-to-2.4.9 upgrade proof",
+        "Factorio 2.0 full qualification"
+      ]
+    },
+    {
+      "path": "locale/ar/more-infinite-research.cfg",
+      "change": "added",
+      "before_sha256": null,
+      "after_sha256": "761AAB7A8AC7EBDA7FB01D30CE3115F7AFFB953A9201FB25C3539D6ACB53D5B8",
+      "reason": "complete Arabic locale synchronized with the English authority",
+      "intentional": true,
+      "migration_impact": "No generated ID, setting ID, migration, or runtime namespace change is authorized by this package-path delta.",
+      "required_evidence": [
+        "exact archive hashes",
+        "2.4.5-to-2.4.9 upgrade proof",
+        "Factorio 2.0 full qualification"
+      ]
+    },
+    {
+      "path": "locale/be/more-infinite-research.cfg",
+      "change": "added",
+      "before_sha256": null,
+      "after_sha256": "E630D0E8C07B77D76AC49DEB6CD24AC3AA488BB283E44242F325BA99DA0A0A91",
+      "reason": "complete Belarusian locale synchronized with the English authority",
+      "intentional": true,
+      "migration_impact": "No generated ID, setting ID, migration, or runtime namespace change is authorized by this package-path delta.",
+      "required_evidence": [
+        "exact archive hashes",
+        "2.4.5-to-2.4.9 upgrade proof",
+        "Factorio 2.0 full qualification"
+      ]
+    },
+    {
+      "path": "locale/bg/more-infinite-research.cfg",
+      "change": "added",
+      "before_sha256": null,
+      "after_sha256": "F114300C7D9C9969A67BDFEB5E2740BF7AD88CAED04AD71495BA12407BEEB2F6",
+      "reason": "complete Bulgarian locale synchronized with the English authority",
+      "intentional": true,
+      "migration_impact": "No generated ID, setting ID, migration, or runtime namespace change is authorized by this package-path delta.",
+      "required_evidence": [
+        "exact archive hashes",
+        "2.4.5-to-2.4.9 upgrade proof",
+        "Factorio 2.0 full qualification"
+      ]
+    },
+    {
+      "path": "locale/ca/more-infinite-research.cfg",
+      "change": "added",
+      "before_sha256": null,
+      "after_sha256": "39AC5F54EB609BB7B34BE347AABDDE27C831D0C7826E0EE8D53B8561C7CB6A52",
+      "reason": "complete Catalan locale synchronized with the English authority",
+      "intentional": true,
+      "migration_impact": "No generated ID, setting ID, migration, or runtime namespace change is authorized by this package-path delta.",
+      "required_evidence": [
+        "exact archive hashes",
+        "2.4.5-to-2.4.9 upgrade proof",
+        "Factorio 2.0 full qualification"
+      ]
+    },
+    {
+      "path": "locale/cs/more-infinite-research.cfg",
+      "change": "added",
+      "before_sha256": null,
+      "after_sha256": "51652A5652E2E514786D4736BFBAEF3C7452DF633667D19E311D25E28F0D10A2",
+      "reason": "complete Czech locale synchronized with the English authority",
+      "intentional": true,
+      "migration_impact": "No generated ID, setting ID, migration, or runtime namespace change is authorized by this package-path delta.",
+      "required_evidence": [
+        "exact archive hashes",
+        "2.4.5-to-2.4.9 upgrade proof",
+        "Factorio 2.0 full qualification"
+      ]
+    },
+    {
+      "path": "locale/da/more-infinite-research.cfg",
+      "change": "added",
+      "before_sha256": null,
+      "after_sha256": "F58B49CA3C8B72E7483E4BFABB5699534F17E7CF2031AE0B6DF43F876F61B338",
+      "reason": "complete Danish locale synchronized with the English authority",
+      "intentional": true,
+      "migration_impact": "No generated ID, setting ID, migration, or runtime namespace change is authorized by this package-path delta.",
+      "required_evidence": [
+        "exact archive hashes",
+        "2.4.5-to-2.4.9 upgrade proof",
+        "Factorio 2.0 full qualification"
+      ]
+    },
+    {
+      "path": "locale/de/more-infinite-research.cfg",
+      "change": "changed",
+      "before_sha256": "63963BACE7437F08FF797B80BE21F4BDC924640D5DA3718CA7BD4D8BD3379A4F",
+      "after_sha256": "FAE4273415018259093A25D9E42C6549295B06AC77BEE5E33D7E5FE6F11B40EC",
+      "reason": "complete German locale synchronized with the English authority",
+      "intentional": true,
+      "migration_impact": "No generated ID, setting ID, migration, or runtime namespace change is authorized by this package-path delta.",
+      "required_evidence": [
+        "exact archive hashes",
+        "2.4.5-to-2.4.9 upgrade proof",
+        "Factorio 2.0 full qualification"
+      ]
+    },
+    {
+      "path": "locale/el/more-infinite-research.cfg",
+      "change": "added",
+      "before_sha256": null,
+      "after_sha256": "D0A0A27C396AC16BE86DBB98CC7FF40B3B91B7F9A6EC18B8C540AA1D6D191C9E",
+      "reason": "complete Greek locale synchronized with the English authority",
+      "intentional": true,
+      "migration_impact": "No generated ID, setting ID, migration, or runtime namespace change is authorized by this package-path delta.",
+      "required_evidence": [
+        "exact archive hashes",
+        "2.4.5-to-2.4.9 upgrade proof",
+        "Factorio 2.0 full qualification"
+      ]
+    },
+    {
+      "path": "locale/en/more-infinite-research.cfg",
+      "change": "changed",
+      "before_sha256": "68F76C2B7075C2B7FBA2AE6D3C794AFD3A71037B2BBD95BAAC371B23112CBA5C",
+      "after_sha256": "E5932D530B894942E848A6A373D0FA209278DF998873B5726E4D18A6E7C667F3",
+      "reason": "English authority extended with steel plate productivity",
+      "intentional": true,
+      "migration_impact": "No generated ID, setting ID, migration, or runtime namespace change is authorized by this package-path delta.",
+      "required_evidence": [
+        "exact archive hashes",
+        "2.4.5-to-2.4.9 upgrade proof",
+        "Factorio 2.0 full qualification"
+      ]
+    },
+    {
+      "path": "locale/eo/more-infinite-research.cfg",
+      "change": "added",
+      "before_sha256": null,
+      "after_sha256": "F7167BC0FB805E28D683AB8C2396E5F06D10C9BEA57736F8E45DDB89318A5296",
+      "reason": "complete Esperanto locale synchronized with the English authority",
+      "intentional": true,
+      "migration_impact": "No generated ID, setting ID, migration, or runtime namespace change is authorized by this package-path delta.",
+      "required_evidence": [
+        "exact archive hashes",
+        "2.4.5-to-2.4.9 upgrade proof",
+        "Factorio 2.0 full qualification"
+      ]
+    },
+    {
+      "path": "locale/es-ES/more-infinite-research.cfg",
+      "change": "changed",
+      "before_sha256": "9BB86D0393B02FEBC64CB877B786A9C871575F0C750B469FB1D1A553DC888906",
+      "after_sha256": "069BF0C8CCE603D36B68B1B419276204593ADDE6BA6A5E6BCA85CF5A7ABD4EA9",
+      "reason": "complete Spanish locale synchronized with the English authority",
+      "intentional": true,
+      "migration_impact": "No generated ID, setting ID, migration, or runtime namespace change is authorized by this package-path delta.",
+      "required_evidence": [
+        "exact archive hashes",
+        "2.4.5-to-2.4.9 upgrade proof",
+        "Factorio 2.0 full qualification"
+      ]
+    },
+    {
+      "path": "locale/et/more-infinite-research.cfg",
+      "change": "added",
+      "before_sha256": null,
+      "after_sha256": "6992C90B399C0FA09EE435269C3446BFD41C4C1C0DD80C9DEFD9871D613E76C9",
+      "reason": "complete Estonian locale synchronized with the English authority",
+      "intentional": true,
+      "migration_impact": "No generated ID, setting ID, migration, or runtime namespace change is authorized by this package-path delta.",
+      "required_evidence": [
+        "exact archive hashes",
+        "2.4.5-to-2.4.9 upgrade proof",
+        "Factorio 2.0 full qualification"
+      ]
+    },
+    {
+      "path": "locale/eu/more-infinite-research.cfg",
+      "change": "added",
+      "before_sha256": null,
+      "after_sha256": "6C7A188AED23AF1D76FBA1F41B58D48A43D57E793B31570F80448058BF93D3E6",
+      "reason": "complete Basque locale synchronized with the English authority",
+      "intentional": true,
+      "migration_impact": "No generated ID, setting ID, migration, or runtime namespace change is authorized by this package-path delta.",
+      "required_evidence": [
+        "exact archive hashes",
+        "2.4.5-to-2.4.9 upgrade proof",
+        "Factorio 2.0 full qualification"
+      ]
+    },
+    {
+      "path": "locale/fa/more-infinite-research.cfg",
+      "change": "added",
+      "before_sha256": null,
+      "after_sha256": "77DB4BA37526D909377C26ED031F698DCF4D46EE3DD34B42FFFAE635DB5A01B1",
+      "reason": "complete Persian locale synchronized with the English authority",
+      "intentional": true,
+      "migration_impact": "No generated ID, setting ID, migration, or runtime namespace change is authorized by this package-path delta.",
+      "required_evidence": [
+        "exact archive hashes",
+        "2.4.5-to-2.4.9 upgrade proof",
+        "Factorio 2.0 full qualification"
+      ]
+    },
+    {
+      "path": "locale/fi/more-infinite-research.cfg",
+      "change": "added",
+      "before_sha256": null,
+      "after_sha256": "16BEB9D3B9B2C57C5C45384CE52EACD9D59DBC41F5D389956B1831A78E55B0C5",
+      "reason": "complete Finnish locale synchronized with the English authority",
+      "intentional": true,
+      "migration_impact": "No generated ID, setting ID, migration, or runtime namespace change is authorized by this package-path delta.",
+      "required_evidence": [
+        "exact archive hashes",
+        "2.4.5-to-2.4.9 upgrade proof",
+        "Factorio 2.0 full qualification"
+      ]
+    },
+    {
+      "path": "locale/fil/more-infinite-research.cfg",
+      "change": "added",
+      "before_sha256": null,
+      "after_sha256": "AC4F147ED4BAD04AEFF8691DC943D0635C57AD73ECA1F2AB74A403A342009638",
+      "reason": "complete Filipino locale synchronized with the English authority",
+      "intentional": true,
+      "migration_impact": "No generated ID, setting ID, migration, or runtime namespace change is authorized by this package-path delta.",
+      "required_evidence": [
+        "exact archive hashes",
+        "2.4.5-to-2.4.9 upgrade proof",
+        "Factorio 2.0 full qualification"
+      ]
+    },
+    {
+      "path": "locale/fr/more-infinite-research.cfg",
+      "change": "changed",
+      "before_sha256": "230DCB8F81A7C04C7A3C97A02A99854EE6E14521365D22E94E5E422435C074F5",
+      "after_sha256": "B01925DF59B32EC846FCBFBCB02C87601A5EE001542FD20AA268150A78919F66",
+      "reason": "complete French locale synchronized with the English authority",
+      "intentional": true,
+      "migration_impact": "No generated ID, setting ID, migration, or runtime namespace change is authorized by this package-path delta.",
+      "required_evidence": [
+        "exact archive hashes",
+        "2.4.5-to-2.4.9 upgrade proof",
+        "Factorio 2.0 full qualification"
+      ]
+    },
+    {
+      "path": "locale/fy-NL/more-infinite-research.cfg",
+      "change": "added",
+      "before_sha256": null,
+      "after_sha256": "549B219A789F4537A60B8F89A93EA41CAE621545BBF59DD1FB8CFFD9378FF793",
+      "reason": "complete West Frisian locale synchronized with the English authority",
+      "intentional": true,
+      "migration_impact": "No generated ID, setting ID, migration, or runtime namespace change is authorized by this package-path delta.",
+      "required_evidence": [
+        "exact archive hashes",
+        "2.4.5-to-2.4.9 upgrade proof",
+        "Factorio 2.0 full qualification"
+      ]
+    },
+    {
+      "path": "locale/ga-IE/more-infinite-research.cfg",
+      "change": "added",
+      "before_sha256": null,
+      "after_sha256": "2E24EB49BFFBF41BB811FC7D07670BFFC7B5285EE8E861CAB0921C1F1CEB9B65",
+      "reason": "complete Irish locale synchronized with the English authority",
+      "intentional": true,
+      "migration_impact": "No generated ID, setting ID, migration, or runtime namespace change is authorized by this package-path delta.",
+      "required_evidence": [
+        "exact archive hashes",
+        "2.4.5-to-2.4.9 upgrade proof",
+        "Factorio 2.0 full qualification"
+      ]
+    },
+    {
+      "path": "locale/he/more-infinite-research.cfg",
+      "change": "added",
+      "before_sha256": null,
+      "after_sha256": "A5F799F50AD7E8020E38321927B95E994FBB69EAFCC93E7763C6EE61A068FE79",
+      "reason": "complete Hebrew locale synchronized with the English authority",
+      "intentional": true,
+      "migration_impact": "No generated ID, setting ID, migration, or runtime namespace change is authorized by this package-path delta.",
+      "required_evidence": [
+        "exact archive hashes",
+        "2.4.5-to-2.4.9 upgrade proof",
+        "Factorio 2.0 full qualification"
+      ]
+    },
+    {
+      "path": "locale/hr/more-infinite-research.cfg",
+      "change": "added",
+      "before_sha256": null,
+      "after_sha256": "5C87010E847B6A57E9429FC56B4E436A0280F7B84433678DFA479564ACF80BFD",
+      "reason": "complete Croatian locale synchronized with the English authority",
+      "intentional": true,
+      "migration_impact": "No generated ID, setting ID, migration, or runtime namespace change is authorized by this package-path delta.",
+      "required_evidence": [
+        "exact archive hashes",
+        "2.4.5-to-2.4.9 upgrade proof",
+        "Factorio 2.0 full qualification"
+      ]
+    },
+    {
+      "path": "locale/hu/more-infinite-research.cfg",
+      "change": "added",
+      "before_sha256": null,
+      "after_sha256": "918B8AED4A9F2E909459AAA8B4E7632C8EEB6985A4611E41E90E8F602A0B5ACC",
+      "reason": "complete Hungarian locale synchronized with the English authority",
+      "intentional": true,
+      "migration_impact": "No generated ID, setting ID, migration, or runtime namespace change is authorized by this package-path delta.",
+      "required_evidence": [
+        "exact archive hashes",
+        "2.4.5-to-2.4.9 upgrade proof",
+        "Factorio 2.0 full qualification"
+      ]
+    },
+    {
+      "path": "locale/id/more-infinite-research.cfg",
+      "change": "added",
+      "before_sha256": null,
+      "after_sha256": "1EE7ED46293C3B6EDC3B34DAEDFB75E0E6340D6EBCF7C7957488FEABFBA90D86",
+      "reason": "complete Indonesian locale synchronized with the English authority",
+      "intentional": true,
+      "migration_impact": "No generated ID, setting ID, migration, or runtime namespace change is authorized by this package-path delta.",
+      "required_evidence": [
+        "exact archive hashes",
+        "2.4.5-to-2.4.9 upgrade proof",
+        "Factorio 2.0 full qualification"
+      ]
+    },
+    {
+      "path": "locale/is/more-infinite-research.cfg",
+      "change": "added",
+      "before_sha256": null,
+      "after_sha256": "A922D12BFD04AC864561F86422D02F63538CE969D713AE3D16C086A4DDF7BBE0",
+      "reason": "complete Icelandic locale synchronized with the English authority",
+      "intentional": true,
+      "migration_impact": "No generated ID, setting ID, migration, or runtime namespace change is authorized by this package-path delta.",
+      "required_evidence": [
+        "exact archive hashes",
+        "2.4.5-to-2.4.9 upgrade proof",
+        "Factorio 2.0 full qualification"
+      ]
+    },
+    {
+      "path": "locale/it/more-infinite-research.cfg",
+      "change": "changed",
+      "before_sha256": "9B789A10650F7DEC10070567F1EF0DB4A4919E194F5148AB0C2E2AE2105778C9",
+      "after_sha256": "217EE686D7864ADC6FC857A8562129A4FCEAE850C7855777C892D46EB7A902FB",
+      "reason": "complete Italian locale synchronized with the English authority",
+      "intentional": true,
+      "migration_impact": "No generated ID, setting ID, migration, or runtime namespace change is authorized by this package-path delta.",
+      "required_evidence": [
+        "exact archive hashes",
+        "2.4.5-to-2.4.9 upgrade proof",
+        "Factorio 2.0 full qualification"
+      ]
+    },
+    {
+      "path": "locale/ja/more-infinite-research.cfg",
+      "change": "added",
+      "before_sha256": null,
+      "after_sha256": "72FAC5BE8C8391F07B6C33261600B6D6CD9F54860E5DDFE517B1981D1991C3B3",
+      "reason": "complete Japanese locale synchronized with the English authority",
+      "intentional": true,
+      "migration_impact": "No generated ID, setting ID, migration, or runtime namespace change is authorized by this package-path delta.",
+      "required_evidence": [
+        "exact archive hashes",
+        "2.4.5-to-2.4.9 upgrade proof",
+        "Factorio 2.0 full qualification"
+      ]
+    },
+    {
+      "path": "locale/ka/more-infinite-research.cfg",
+      "change": "added",
+      "before_sha256": null,
+      "after_sha256": "B91625596323CC8B0B1A1B06C188B8D043B4A54FDD5A19464D581E9DDAB56513",
+      "reason": "complete Georgian locale synchronized with the English authority",
+      "intentional": true,
+      "migration_impact": "No generated ID, setting ID, migration, or runtime namespace change is authorized by this package-path delta.",
+      "required_evidence": [
+        "exact archive hashes",
+        "2.4.5-to-2.4.9 upgrade proof",
+        "Factorio 2.0 full qualification"
+      ]
+    },
+    {
+      "path": "locale/kk/more-infinite-research.cfg",
+      "change": "added",
+      "before_sha256": null,
+      "after_sha256": "AE4C8919F9ECD8D3EBF6679B236105214F1D3C0DC0702A015A473BDC36422056",
+      "reason": "complete Kazakh locale synchronized with the English authority",
+      "intentional": true,
+      "migration_impact": "No generated ID, setting ID, migration, or runtime namespace change is authorized by this package-path delta.",
+      "required_evidence": [
+        "exact archive hashes",
+        "2.4.5-to-2.4.9 upgrade proof",
+        "Factorio 2.0 full qualification"
+      ]
+    },
+    {
+      "path": "locale/ko/more-infinite-research.cfg",
+      "change": "added",
+      "before_sha256": null,
+      "after_sha256": "4C7F187D1EC20410030E0A56D0968527327540837A3EA385E6A9BAC434EE0A27",
+      "reason": "complete Korean locale synchronized with the English authority",
+      "intentional": true,
+      "migration_impact": "No generated ID, setting ID, migration, or runtime namespace change is authorized by this package-path delta.",
+      "required_evidence": [
+        "exact archive hashes",
+        "2.4.5-to-2.4.9 upgrade proof",
+        "Factorio 2.0 full qualification"
+      ]
+    },
+    {
+      "path": "locale/lt/more-infinite-research.cfg",
+      "change": "added",
+      "before_sha256": null,
+      "after_sha256": "1A517B833FC71AE92C5D2F7430535C0107588B6AD4C977FAB158FF15837D5517",
+      "reason": "complete Lithuanian locale synchronized with the English authority",
+      "intentional": true,
+      "migration_impact": "No generated ID, setting ID, migration, or runtime namespace change is authorized by this package-path delta.",
+      "required_evidence": [
+        "exact archive hashes",
+        "2.4.5-to-2.4.9 upgrade proof",
+        "Factorio 2.0 full qualification"
+      ]
+    },
+    {
+      "path": "locale/lv/more-infinite-research.cfg",
+      "change": "added",
+      "before_sha256": null,
+      "after_sha256": "86665014FC14596C24823938361D977BC797B005F51CEDF5DAB54A0DB83FE5D7",
+      "reason": "complete Latvian locale synchronized with the English authority",
+      "intentional": true,
+      "migration_impact": "No generated ID, setting ID, migration, or runtime namespace change is authorized by this package-path delta.",
+      "required_evidence": [
+        "exact archive hashes",
+        "2.4.5-to-2.4.9 upgrade proof",
+        "Factorio 2.0 full qualification"
+      ]
+    },
+    {
+      "path": "locale/nl/more-infinite-research.cfg",
+      "change": "added",
+      "before_sha256": null,
+      "after_sha256": "20E33931796327F21405A74BA9E9F48A20BC675D98FB8D983B3F759A62B1FB30",
+      "reason": "complete Dutch locale synchronized with the English authority",
+      "intentional": true,
+      "migration_impact": "No generated ID, setting ID, migration, or runtime namespace change is authorized by this package-path delta.",
+      "required_evidence": [
+        "exact archive hashes",
+        "2.4.5-to-2.4.9 upgrade proof",
+        "Factorio 2.0 full qualification"
+      ]
+    },
+    {
+      "path": "locale/no/more-infinite-research.cfg",
+      "change": "added",
+      "before_sha256": null,
+      "after_sha256": "77759AE0FF6299D38FB60E7795A65F6F81EFAA6F3B7277F23D2C2709A644E201",
+      "reason": "complete Norwegian locale synchronized with the English authority",
+      "intentional": true,
+      "migration_impact": "No generated ID, setting ID, migration, or runtime namespace change is authorized by this package-path delta.",
+      "required_evidence": [
+        "exact archive hashes",
+        "2.4.5-to-2.4.9 upgrade proof",
+        "Factorio 2.0 full qualification"
+      ]
+    },
+    {
+      "path": "locale/pl/more-infinite-research.cfg",
+      "change": "changed",
+      "before_sha256": "9FAA326160177ADF597D65CAD8E5C826C13E207069D5A8B5E1FA2F854583F0B5",
+      "after_sha256": "DC9F21DBFAD976603236D5DCBFB6B78143545126EA0C2B7E2FE343937A0A26FE",
+      "reason": "complete Polish locale synchronized with the English authority",
+      "intentional": true,
+      "migration_impact": "No generated ID, setting ID, migration, or runtime namespace change is authorized by this package-path delta.",
+      "required_evidence": [
+        "exact archive hashes",
+        "2.4.5-to-2.4.9 upgrade proof",
+        "Factorio 2.0 full qualification"
+      ]
+    },
+    {
+      "path": "locale/pt-BR/more-infinite-research.cfg",
+      "change": "changed",
+      "before_sha256": "96D103355FF7A2B08C00B0B3D41DCF818127D8833BB4F07F7E5C013D28ECC70D",
+      "after_sha256": "8377EDCEC094010AB362EA13745C3E0A868336081A6D1C9FFBA30EBFE0D309EB",
+      "reason": "complete Brazilian Portuguese locale synchronized with the English authority",
+      "intentional": true,
+      "migration_impact": "No generated ID, setting ID, migration, or runtime namespace change is authorized by this package-path delta.",
+      "required_evidence": [
+        "exact archive hashes",
+        "2.4.5-to-2.4.9 upgrade proof",
+        "Factorio 2.0 full qualification"
+      ]
+    },
+    {
+      "path": "locale/pt-PT/more-infinite-research.cfg",
+      "change": "added",
+      "before_sha256": null,
+      "after_sha256": "84DBE9A17698F69177F8BBD5769599AB2ACDACC02491842BA6DEB68ED39794C1",
+      "reason": "complete European Portuguese locale synchronized with the English authority",
+      "intentional": true,
+      "migration_impact": "No generated ID, setting ID, migration, or runtime namespace change is authorized by this package-path delta.",
+      "required_evidence": [
+        "exact archive hashes",
+        "2.4.5-to-2.4.9 upgrade proof",
+        "Factorio 2.0 full qualification"
+      ]
+    },
+    {
+      "path": "locale/ro/more-infinite-research.cfg",
+      "change": "added",
+      "before_sha256": null,
+      "after_sha256": "2AE9A8EBC386BBEB7822F739DE61B388BE6F60C63845C0FEBE44BC6EE24ADA34",
+      "reason": "complete Romanian locale synchronized with the English authority",
+      "intentional": true,
+      "migration_impact": "No generated ID, setting ID, migration, or runtime namespace change is authorized by this package-path delta.",
+      "required_evidence": [
+        "exact archive hashes",
+        "2.4.5-to-2.4.9 upgrade proof",
+        "Factorio 2.0 full qualification"
+      ]
+    },
+    {
+      "path": "locale/ru/more-infinite-research.cfg",
+      "change": "changed",
+      "before_sha256": "418F9988753E4B20C1684097761B53200F2E190A6F4D5F0905937BFCAB07387F",
+      "after_sha256": "EDC16BE186C5BE8625973E30B896965CBFCC3D963C1280B8B4061082A3C153FF",
+      "reason": "complete Russian locale synchronized with the English authority",
+      "intentional": true,
+      "migration_impact": "No generated ID, setting ID, migration, or runtime namespace change is authorized by this package-path delta.",
+      "required_evidence": [
+        "exact archive hashes",
+        "2.4.5-to-2.4.9 upgrade proof",
+        "Factorio 2.0 full qualification"
+      ]
+    },
+    {
+      "path": "locale/sk/more-infinite-research.cfg",
+      "change": "added",
+      "before_sha256": null,
+      "after_sha256": "03C03E03BCF07DF631BE3F4E015F2A5E3EF18589828726E3AAED2417F8BADBBA",
+      "reason": "complete Slovak locale synchronized with the English authority",
+      "intentional": true,
+      "migration_impact": "No generated ID, setting ID, migration, or runtime namespace change is authorized by this package-path delta.",
+      "required_evidence": [
+        "exact archive hashes",
+        "2.4.5-to-2.4.9 upgrade proof",
+        "Factorio 2.0 full qualification"
+      ]
+    },
+    {
+      "path": "locale/sl/more-infinite-research.cfg",
+      "change": "added",
+      "before_sha256": null,
+      "after_sha256": "AE2DF1DDA2C07205CD89A16D5EDCC8B515DCE7FC48BB2A1052606D2667213765",
+      "reason": "complete Slovenian locale synchronized with the English authority",
+      "intentional": true,
+      "migration_impact": "No generated ID, setting ID, migration, or runtime namespace change is authorized by this package-path delta.",
+      "required_evidence": [
+        "exact archive hashes",
+        "2.4.5-to-2.4.9 upgrade proof",
+        "Factorio 2.0 full qualification"
+      ]
+    },
+    {
+      "path": "locale/sq/more-infinite-research.cfg",
+      "change": "added",
+      "before_sha256": null,
+      "after_sha256": "3605DAD4CA7209C50525C898C892B61B526F08F800E0E50C9DCE3E8C535C533B",
+      "reason": "complete Albanian locale synchronized with the English authority",
+      "intentional": true,
+      "migration_impact": "No generated ID, setting ID, migration, or runtime namespace change is authorized by this package-path delta.",
+      "required_evidence": [
+        "exact archive hashes",
+        "2.4.5-to-2.4.9 upgrade proof",
+        "Factorio 2.0 full qualification"
+      ]
+    },
+    {
+      "path": "locale/sr/more-infinite-research.cfg",
+      "change": "added",
+      "before_sha256": null,
+      "after_sha256": "EB5FFACFDDBB54E309C3BBA2F015B7CB06D3DEBEF8DF944A41D239EE9C1FC3D4",
+      "reason": "complete Serbian locale synchronized with the English authority",
+      "intentional": true,
+      "migration_impact": "No generated ID, setting ID, migration, or runtime namespace change is authorized by this package-path delta.",
+      "required_evidence": [
+        "exact archive hashes",
+        "2.4.5-to-2.4.9 upgrade proof",
+        "Factorio 2.0 full qualification"
+      ]
+    },
+    {
+      "path": "locale/sv-SE/more-infinite-research.cfg",
+      "change": "added",
+      "before_sha256": null,
+      "after_sha256": "1E5585BAFD6D152A121F87344FF2950752E952DD85B520072D9254199B50C3CB",
+      "reason": "complete Swedish locale synchronized with the English authority",
+      "intentional": true,
+      "migration_impact": "No generated ID, setting ID, migration, or runtime namespace change is authorized by this package-path delta.",
+      "required_evidence": [
+        "exact archive hashes",
+        "2.4.5-to-2.4.9 upgrade proof",
+        "Factorio 2.0 full qualification"
+      ]
+    },
+    {
+      "path": "locale/th/more-infinite-research.cfg",
+      "change": "added",
+      "before_sha256": null,
+      "after_sha256": "ECFAE70358F8B56B5BAA5AF945A534F3A0956C32E758586B8B3E28EFFE5309ED",
+      "reason": "complete Thai locale synchronized with the English authority",
+      "intentional": true,
+      "migration_impact": "No generated ID, setting ID, migration, or runtime namespace change is authorized by this package-path delta.",
+      "required_evidence": [
+        "exact archive hashes",
+        "2.4.5-to-2.4.9 upgrade proof",
+        "Factorio 2.0 full qualification"
+      ]
+    },
+    {
+      "path": "locale/tr/more-infinite-research.cfg",
+      "change": "added",
+      "before_sha256": null,
+      "after_sha256": "04DA32659A7CB60F9A472A85CE4A8F537F4120582065CC454166D79B638A8615",
+      "reason": "complete Turkish locale synchronized with the English authority",
+      "intentional": true,
+      "migration_impact": "No generated ID, setting ID, migration, or runtime namespace change is authorized by this package-path delta.",
+      "required_evidence": [
+        "exact archive hashes",
+        "2.4.5-to-2.4.9 upgrade proof",
+        "Factorio 2.0 full qualification"
+      ]
+    },
+    {
+      "path": "locale/uk/more-infinite-research.cfg",
+      "change": "added",
+      "before_sha256": null,
+      "after_sha256": "7E7FECD8579BEAFE523125382E4D3C6B9DA2DC83954BCDFAFAC579AE2D7905C1",
+      "reason": "complete Ukrainian locale synchronized with the English authority",
+      "intentional": true,
+      "migration_impact": "No generated ID, setting ID, migration, or runtime namespace change is authorized by this package-path delta.",
+      "required_evidence": [
+        "exact archive hashes",
+        "2.4.5-to-2.4.9 upgrade proof",
+        "Factorio 2.0 full qualification"
+      ]
+    },
+    {
+      "path": "locale/vi/more-infinite-research.cfg",
+      "change": "added",
+      "before_sha256": null,
+      "after_sha256": "D0519636B2C460DCE47DD95535BB53DBAF49C8FF3E960771E92A7B569E591542",
+      "reason": "complete Vietnamese locale synchronized with the English authority",
+      "intentional": true,
+      "migration_impact": "No generated ID, setting ID, migration, or runtime namespace change is authorized by this package-path delta.",
+      "required_evidence": [
+        "exact archive hashes",
+        "2.4.5-to-2.4.9 upgrade proof",
+        "Factorio 2.0 full qualification"
+      ]
+    },
+    {
+      "path": "locale/zh-CN/more-infinite-research.cfg",
+      "change": "changed",
+      "before_sha256": "F763728D63B4F8722800E1220AD294958310D857FBC37CDDA850592B340DBCE9",
+      "after_sha256": "0CCFBC32BF75EC00DB19485F4DA4F4D2D2D920D121ABDD6B02557871B925FACD",
+      "reason": "complete Simplified Chinese locale synchronized with the English authority",
+      "intentional": true,
+      "migration_impact": "No generated ID, setting ID, migration, or runtime namespace change is authorized by this package-path delta.",
+      "required_evidence": [
+        "exact archive hashes",
+        "2.4.5-to-2.4.9 upgrade proof",
+        "Factorio 2.0 full qualification"
+      ]
+    },
+    {
+      "path": "locale/zh-TW/more-infinite-research.cfg",
+      "change": "added",
+      "before_sha256": null,
+      "after_sha256": "DC122D28A05E4AA8C50E0AFA5EA4104147DDE131E8947223C5F45A7A1827CB6F",
+      "reason": "complete Traditional Chinese locale synchronized with the English authority",
+      "intentional": true,
+      "migration_impact": "No generated ID, setting ID, migration, or runtime namespace change is authorized by this package-path delta.",
+      "required_evidence": [
+        "exact archive hashes",
+        "2.4.5-to-2.4.9 upgrade proof",
+        "Factorio 2.0 full qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/effects/metadata.lua",
+      "change": "changed",
+      "before_sha256": "F70E6290A590693D9FBF31D779D88F365DA78D0B79FDEE43CACD3103AF5F29A1",
+      "after_sha256": "88D4C918AD7479403B476EA04022F5279DF5482A5E534D0834D8AFA2873F6570",
+      "reason": "quality-aware effect identity",
+      "intentional": true,
+      "migration_impact": "No generated ID, setting ID, migration, or runtime namespace change is authorized by this package-path delta.",
+      "required_evidence": [
+        "exact archive hashes",
+        "2.4.5-to-2.4.9 upgrade proof",
+        "Factorio 2.0 full qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/domain/streams/descriptor.lua",
+      "change": "changed",
+      "before_sha256": "9CA7C7CC9D1618C9FBB8F5CE16521EDB7599D527BC3444DD1A9EFA4AAA0FC63E",
+      "after_sha256": "84E3CCA7F0F4F7B561355060E0447EBFFBC536FB64D3431754717BC643865AEA",
+      "reason": "stable steel-productivity stream display identity",
+      "intentional": true,
+      "migration_impact": "No generated ID, setting ID, migration, or runtime namespace change is authorized by this package-path delta.",
+      "required_evidence": [
+        "exact archive hashes",
+        "2.4.5-to-2.4.9 upgrade proof",
+        "Factorio 2.0 full qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/emit/effect_safety.lua",
+      "change": "changed",
+      "before_sha256": "11013AF5487243157F1A1D43C0ECC1BE7A3DBC1A85721D5048337813EA14789B",
+      "after_sha256": "016DF24BD8C0235D0471DB32039856B938690A2F0933ED5AAA9D82AABD5911BD",
+      "reason": "generic target sanitation for generated and external technology effects",
+      "intentional": true,
+      "migration_impact": "No generated ID, setting ID, migration, or runtime namespace change is authorized by this package-path delta.",
+      "required_evidence": [
+        "exact archive hashes",
+        "2.4.5-to-2.4.9 upgrade proof",
+        "Factorio 2.0 full qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/emit/mod_data.lua",
+      "change": "changed",
+      "before_sha256": "C2FE4DBC9312D6EA69EA3DDC57D2EA84F8A25859EB4D59356B50114453529B8E",
+      "after_sha256": "D585ED81A87D17C8249FD742B0DC11614DADD23EE44848ADBC5F2DAD78873731",
+      "reason": "Factorio 2.0 mod-data capability guard",
+      "intentional": true,
+      "migration_impact": "No generated ID, setting ID, migration, or runtime namespace change is authorized by this package-path delta.",
+      "required_evidence": [
+        "exact archive hashes",
+        "2.4.5-to-2.4.9 upgrade proof",
+        "Factorio 2.0 full qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/integrity/effect_contracts.lua",
+      "change": "added",
+      "before_sha256": null,
+      "after_sha256": "8BC2D415F8883F3C96419B4DA1329BF27B9C7CC12E50EF99B80D68760D8F1A6D",
+      "reason": "single exhaustive technology-effect target authority",
+      "intentional": true,
+      "migration_impact": "No generated ID, setting ID, migration, or runtime namespace change is authorized by this package-path delta.",
+      "required_evidence": [
+        "exact archive hashes",
+        "2.4.5-to-2.4.9 upgrade proof",
+        "Factorio 2.0 full qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/pipeline/commands.lua",
+      "change": "changed",
+      "before_sha256": "58AFED365E35EF47AC47D30A10F2E94B43ED6608AAD767C373A8A03B5F44C377",
+      "after_sha256": "9FB695A3246B9738BDE35BB90FB9050A5F6B4AA07F32129936C9057609F637D1",
+      "reason": "pre-index technology-effect sanitation phase",
+      "intentional": true,
+      "migration_impact": "No generated ID, setting ID, migration, or runtime namespace change is authorized by this package-path delta.",
+      "required_evidence": [
+        "exact archive hashes",
+        "2.4.5-to-2.4.9 upgrade proof",
+        "Factorio 2.0 full qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/platform/factorio/prototype_lookup.lua",
+      "change": "changed",
+      "before_sha256": "CA79E3284393D8879024933870BE185192C419D6AFC9D4BBADE92728C915D8EC",
+      "after_sha256": "E1290727B0910CA3F13F03F472B240E53C562DD69A40C5AD886C749D581617E8",
+      "reason": "entity target resolver required by turret-attack",
+      "intentional": true,
+      "migration_impact": "No generated ID, setting ID, migration, or runtime namespace change is authorized by this package-path delta.",
+      "required_evidence": [
+        "exact archive hashes",
+        "2.4.5-to-2.4.9 upgrade proof",
+        "Factorio 2.0 full qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/platform/factorio/target_line.lua",
+      "change": "changed",
+      "before_sha256": "951122B7BC02AF1CEAE074157FBA096C607D3549B26FFA824983F81FC981BFE8",
+      "after_sha256": "77DFB871D503838A4733D7E4E7150E3B112144DA42F121E66CFC05B9C904AF85",
+      "reason": "target capability accessor for Factorio 2.0",
+      "intentional": true,
+      "migration_impact": "No generated ID, setting ID, migration, or runtime namespace change is authorized by this package-path delta.",
+      "required_evidence": [
+        "exact archive hashes",
+        "2.4.5-to-2.4.9 upgrade proof",
+        "Factorio 2.0 full qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/platform/factorio/target_profiles.lua",
+      "change": "changed",
+      "before_sha256": "9D3B44E4FCD8519FE7C3BC83C6C738C2F0BBF770C550B60D6402D73D5B529CB0",
+      "after_sha256": "D227BD436B48956AC5E0B3FB0951EC4FFC436DE58B17A6D7A8CEFD037D86B194",
+      "reason": "Factorio 2.0 mod-data capability declaration",
+      "intentional": true,
+      "migration_impact": "No generated ID, setting ID, migration, or runtime namespace change is authorized by this package-path delta.",
+      "required_evidence": [
+        "exact archive hashes",
+        "2.4.5-to-2.4.9 upgrade proof",
+        "Factorio 2.0 full qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/runtime/productivity_family_adoption.lua",
+      "change": "changed",
+      "before_sha256": "E99614D82A6614475784BE08DC5E6C527E12B5C8CD131F0FC38041BCD929EDE7",
+      "after_sha256": "3F70EACB41D175034BF3D042C2AD58E12242BAFCA94D1AD8E40F02B84B709CA6",
+      "reason": "remove the unproven global technology-effect reset",
+      "intentional": true,
+      "migration_impact": "No generated ID, setting ID, migration, or runtime namespace change is authorized by this package-path delta.",
+      "required_evidence": [
+        "exact archive hashes",
+        "2.4.5-to-2.4.9 upgrade proof",
+        "Factorio 2.0 full qualification"
+      ]
+    },
+    {
+      "path": "prototypes/mir/streams/generated_stream_manifest.json",
+      "change": "changed",
+      "before_sha256": "3FD9206C2B6F3C2A0590C553E3CC794C0227F171165F3AC5CEF9435D58FF24D1",
+      "after_sha256": "3B310955222C9548EEF1C3ED949ED5BED3BD4D4068C96A64CECA8157B65BCBE5",
+      "reason": "stable 2.4.9 steel-productivity technology identity",
+      "intentional": true,
+      "migration_impact": "No generated ID, setting ID, migration, or runtime namespace change is authorized by this package-path delta.",
+      "required_evidence": [
+        "exact archive hashes",
+        "2.4.5-to-2.4.9 upgrade proof",
+        "Factorio 2.0 full qualification"
+      ]
+    },
+    {
+      "path": "prototypes/streams/productivity.lua",
+      "change": "changed",
+      "before_sha256": "0DFE2171604C92517C8F39421D4D13428B6CAFE19BF41AF248002B99D594FD25",
+      "after_sha256": "DAEE20F690E1D9FFC4F567A95108447C88BB8633092C99B426A13357C504480B",
+      "reason": "Factorio 2.0 copper, iron, and steel productivity streams with scrap-recovery safety and Space Age native-owner binding",
+      "intentional": true,
+      "migration_impact": "No generated ID, setting ID, migration, or runtime namespace change is authorized by this package-path delta.",
+      "required_evidence": [
+        "exact archive hashes",
+        "2.4.5-to-2.4.9 upgrade proof",
+        "Factorio 2.0 full qualification"
+      ]
+    },
+    {
+      "path": "README.md",
+      "change": "changed",
+      "before_sha256": "97BB57E6AB23FED91EFCE764EF5DF088584CF478F372281A8A06981A7F0F126B",
+      "after_sha256": "1F3A3BD2F16FB8596F0B98E2C9D60D7C594FF1AD4E0940741C4AA714F5E4EAD8",
+      "reason": "Factorio 2.0 release positioning for the 2.4.9 stability patch",
+      "intentional": true,
+      "migration_impact": "No generated ID, setting ID, migration, or runtime namespace change is authorized by this package-path delta.",
+      "required_evidence": [
+        "exact archive hashes",
+        "2.4.5-to-2.4.9 upgrade proof",
+        "Factorio 2.0 full qualification"
+      ]
+    }
+  ],
+  "summary": {
+    "difference_count": 65,
+    "intentional_count": 65,
+    "unapproved_count": 0,
+    "status": "approved"
+  },
+  "exporter": {
+    "generated_at": "2026-07-20T08:52:29.2829952Z",
+    "producer_sha256": "DAC892F656E8E47F971214A4E7C8629BF4360B421A44F77CEBAF1016A4D7B5CB"
+  }
+}

@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: release-manager
 doc_type: release-plan
 owner: mir-maintainers
-last_reviewed: 2026-07-16
+last_reviewed: 2026-07-20
 supersedes: []
 superseded_by: []
 ---
@@ -16,7 +16,7 @@ Release docs are version-specific plans, migration guides, risk registers, check
 
 MIR 3.2.0 is the active Factorio 2.1 development candidate. Its release gate is the persistent content-addressed verification architecture documented in [the 3.2.0 verification overhaul](3.2.0-verification-overhaul.md); no publication is claimed until the exact candidate completes the aggregate gate and remaining human review.
 
-MIR 3.1.9 through 0.6.0 are published and byte-verified on GitHub. The 0.12.0 through 0.6.0 archives were metadata-corrected, requalified, retagged, and republished on 2026-07-16 after their shared generator omitted `factorio_version`. Mod Portal upload and acceptance remain external maintainer actions. Complete tagged source snapshots and exact distributions are consolidated on `dev` without changing the modern Factorio 2.1 root.
+MIR 2.4.9 is the published Factorio 2.0 baseline and MIR 3.1.9 remains the published Factorio 2.1 baseline. The 0.12.0 through 0.6.0 archives were metadata-corrected, requalified, retagged, and republished on 2026-07-16 after their shared generator omitted `factorio_version`. Mod Portal upload and acceptance remain external maintainer actions. Complete tagged source snapshots and exact distributions are consolidated on `dev` without changing the modern Factorio 2.1 root.
 
 - [3.2.0 verification overhaul](3.2.0-verification-overhaul.md)
 - [3.2.0 release notes](notes/release-notes-3.2.0.md)
@@ -48,6 +48,8 @@ MIR 3.1.9 through 0.6.0 are published and byte-verified on GitHub. The 0.12.0 th
 - [3.1.9 migration guide](3.1.9-migration-guide.md)
 - [3.1.9 release checklist](3.1.9-checklist.md)
 - [3.1.9 validation summary](3.1.9-validation-summary.md)
+- [2.4.9 stability backport](2.4.9-stability-backport.md)
+- [2.4.9 release notes](notes/release-notes-2.4.9.md)
 - [0.x Factorio version metadata correction](0.x-factorio-version-metadata-correction.md)
 - [0.12.0 release notes](notes/release-notes-0.12.0.md)
 - [0.11.0 release notes](notes/release-notes-0.11.0.md)

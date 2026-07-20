@@ -1,0 +1,137 @@
+name: Assurance Scheduled Breadth
+
+on:
+  schedule:
+    - cron: "17 3 * * 2"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  plan:
+    name: verification-plan
+    runs-on: [self-hosted, Windows]
+    environment: release-candidate
+    outputs:
+      matrix: ${{ steps.matrix.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/cache/restore@v4
+        with:
+          path: artifacts/assurance/evidence
+          key: mir-ledger-${{ runner.os }}-2.0-${{ github.run_id }}
+          restore-keys: |
+            mir-ledger-${{ runner.os }}-2.0-
+      - name: Build exact candidate
+        shell: pwsh
+        run: ./scripts/mir.ps1 assurance build --target 2.0
+      - name: Materialize forced breadth plan
+        shell: pwsh
+        env:
+          FACTORIO_BIN: ${{ secrets.FACTORIO_BIN }}
+          MIR_PRIOR_RELEASE: ${{ secrets.MIR_PRIOR_RELEASE_2_4_5 }}
+        run: ./scripts/mir.ps1 verify plan --target 2.0 --profile full --factorio $env:FACTORIO_BIN --prior $env:MIR_PRIOR_RELEASE --no-reuse --output out/verification-plan.json
+      - id: matrix
+        shell: pwsh
+        run: |
+          $plan = Get-Content -Raw -LiteralPath out/verification-plan.json | ConvertFrom-Json
+          "matrix=$(@{ include = @($plan.work) } | ConvertTo-Json -Depth 10 -Compress)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mir-scheduled-plan-and-candidate
+          path: |
+            out/verification-plan.json
+            dist/*.zip
+          if-no-files-found: error
+
+  tests:
+    name: ${{ matrix.test_id }}
+    needs: plan
+    runs-on: [self-hosted, Windows]
+    environment: release-candidate
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
+    concurrency:
+      group: mir-${{ matrix.safe_test_id }}-${{ matrix.fingerprint }}
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/download-artifact@v4
+        with:
+          name: mir-scheduled-plan-and-candidate
+          path: .
+      - uses: actions/cache/restore@v4
+        with:
+          path: artifacts/assurance/evidence
+          key: mir-ledger-${{ runner.os }}-2.0-${{ github.run_id }}
+          restore-keys: |
+            mir-ledger-${{ runner.os }}-2.0-
+      - name: Force exact test instance
+        shell: pwsh
+        env:
+          FACTORIO_BIN: ${{ secrets.FACTORIO_BIN }}
+          MIR_PRIOR_RELEASE: ${{ secrets.MIR_PRIOR_RELEASE_2_4_5 }}
+        run: ./scripts/mir.ps1 verify run-one --target 2.0 --plan out/verification-plan.json --test '${{ matrix.test_id }}' --fingerprint '${{ matrix.fingerprint }}' --factorio $env:FACTORIO_BIN --prior $env:MIR_PRIOR_RELEASE --no-reuse
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mir-scheduled-evidence-${{ matrix.safe_test_id }}
+          path: artifacts/assurance/evidence
+          if-no-files-found: warn
+
+  verification-gate:
+    name: verification-gate
+    if: always()
+    needs:
+      - plan
+      - tests
+    runs-on: [self-hosted, Windows]
+    environment: release-candidate
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/download-artifact@v4
+        with:
+          name: mir-scheduled-plan-and-candidate
+          path: .
+      - uses: actions/cache/restore@v4
+        with:
+          path: artifacts/assurance/evidence
+          key: mir-ledger-${{ runner.os }}-2.0-${{ github.run_id }}
+          restore-keys: |
+            mir-ledger-${{ runner.os }}-2.0-
+      - name: Merge worker evidence
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          pattern: mir-scheduled-evidence-*
+          path: artifacts/assurance/evidence
+          merge-multiple: true
+      - name: Aggregate forced breadth gate
+        shell: pwsh
+        env:
+          FACTORIO_BIN: ${{ secrets.FACTORIO_BIN }}
+          MIR_PRIOR_RELEASE: ${{ secrets.MIR_PRIOR_RELEASE_2_4_5 }}
+        run: ./scripts/mir.ps1 verify gate --target 2.0 --plan out/verification-plan.json --factorio $env:FACTORIO_BIN --prior $env:MIR_PRIOR_RELEASE --output artifacts/assurance/scheduled-summary.json
+      - uses: actions/cache/save@v4
+        if: always()
+        with:
+          path: artifacts/assurance/evidence
+          key: mir-ledger-${{ runner.os }}-2.0-${{ github.run_id }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: assurance-scheduled-2.0-${{ github.sha }}
+          path: |
+            out/verification-plan.json
+            artifacts/assurance/evidence-bundle.json
+            artifacts/assurance/scheduled-summary.json
+          if-no-files-found: warn

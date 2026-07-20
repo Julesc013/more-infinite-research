@@ -1,0 +1,12 @@
+{
+  "name": "mir-fixture-plates-n-circuit-productivity",
+  "version": "0.1.0",
+  "title": "MIR Fixture - Plates n Circuit Productivity",
+  "author": "Julesc013",
+  "description": "Validation fixture that mirrors the competing Plates n Circuit Productivity technologies.",
+  "factorio_version": "2.0",
+  "dependencies": [
+    "base >= 2.0",
+    "? space-age"
+  ]
+}

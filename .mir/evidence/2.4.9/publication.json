@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "version": "2.4.9",
+  "target": "2.0",
+  "tag_commit": "7ebe93029695bbf809a15a14c6540530738a9e62",
+  "tag_type": "lightweight",
+  "package_source_commit": "ecd875bceda8f373c3dd8a9b3393e9626b5dec4c",
+  "release_evidence_commit": "26a18e2ac17171bdd75b2c1a75875b14fc71d0b4",
+  "archive": "dist/more-infinite-research_2.4.9.zip",
+  "archive_sha256": "B5503F94D04624F65462CC275FB6AA71A8CE93075F732DF498F6D73AD255F978",
+  "package_content_sha256": "23D992943090BFF487675E9DF8C5C12BFDB1F3018B0BF04C9928265E5DC95255",
+  "github": {
+    "status": "published",
+    "url": "https://github.com/Julesc013/more-infinite-research/releases/tag/2.4.9",
+    "release_page_verified_at": "2026-07-20",
+    "tag_commit_verified": true,
+    "asset_byte_verification": "not-independently-recorded"
+  },
+  "release_assurance": {
+    "automated": "passed-106-machine-verifiable-92-runtime",
+    "paired_performance": "passed-six-lanes-five-measured-runs-per-package",
+    "manual_review": "not-recorded-before-maintainer-publication",
+    "protected_qualification": "not-run-before-maintainer-publication",
+    "status": "published-with-recorded-assurance-exceptions"
+  },
+  "mod_portal": {
+    "status": "not-verified"
+  }
+}

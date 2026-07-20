@@ -1,0 +1,1 @@
+-- Runtime-only ordering probe. The assertion fixture owns the sentinel prototypes.

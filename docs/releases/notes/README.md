@@ -5,7 +5,7 @@ applies_to: "all releases"
 audience: player
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-07-12
+last_reviewed: 2026-07-20
 supersedes: []
 superseded_by: []
 ---
@@ -16,6 +16,7 @@ Player-facing release summaries are grouped here by MIR version. The root `chang
 
 - [3.2.0](release-notes-3.2.0.md)
 - [3.1.9](release-notes-3.1.9.md)
+- [2.4.9](release-notes-2.4.9.md)
 - [3.0.5](release-notes-3.0.5.md)
 - [3.0.0](release-notes-3.0.0.md)
 - [2.3.0](release-notes-2.3.0.md)

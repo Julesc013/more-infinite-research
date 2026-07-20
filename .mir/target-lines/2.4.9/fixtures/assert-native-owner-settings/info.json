@@ -1,0 +1,13 @@
+{
+  "name": "mir-fixture-assert-native-owner-settings",
+  "version": "0.1.0",
+  "title": "MIR Fixture - Assert Native Owner Settings",
+  "author": "Julesc013",
+  "description": "Asserts that MIR stream settings preserve, configure, disable, and safely reject Space Age native productivity owners.",
+  "factorio_version": "2.0",
+  "dependencies": [
+    "base >= 2.0",
+    "space-age >= 2.0",
+    "more-infinite-research"
+  ]
+}

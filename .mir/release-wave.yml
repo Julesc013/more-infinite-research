@@ -359,12 +359,38 @@ waves:
     tag: "2.4.5"
     status: published-frozen
 
+  mir_2_4_9:
+    version: "2.4.9"
+    branch: legacy
+    development_branch: tmp/2.0
+    target_factorio: "2.0"
+    package_source_commit: ecd875bceda8f373c3dd8a9b3393e9626b5dec4c
+    release_evidence_commit: 26a18e2ac17171bdd75b2c1a75875b14fc71d0b4
+    tag_commit: 7ebe93029695bbf809a15a14c6540530738a9e62
+    archive: dist/more-infinite-research_2.4.9.zip
+    sha256: B5503F94D04624F65462CC275FB6AA71A8CE93075F732DF498F6D73AD255F978
+    package_content_sha256: 23D992943090BFF487675E9DF8C5C12BFDB1F3018B0BF04C9928265E5DC95255
+    size_bytes: 893263
+    entries: 209
+    forbidden_entries: 0
+    approved_delta_evidence: approved-delta/2.4.5-to-2.4.9.json
+    automated_qualification: .mir/evidence/2.4.9-local-automated-qualification.json
+    runtime_performance_evidence: .mir/evidence/2.4.9-performance-regression.json
+    automated_gate: passed-106-machine-verifiable-92-runtime
+    interactive_gate: not-recorded-before-maintainer-publication
+    protected_release_gate: not-run-before-maintainer-publication
+    release_gate: maintainer-published-with-recorded-assurance-exceptions
+    publication_status: published
+    github_release: https://github.com/Julesc013/more-infinite-research/releases/tag/2.4.9
+    tag: "2.4.9"
+    status: published-frozen
+
   mir_2_5_0:
     version: "2.5.0"
     branch: tmp/2.0
     target_factorio: "2.0"
     source_anchor: mir_3_2_0
-    prior_release: dist/more-infinite-research_2.4.5.zip
+    prior_release: dist/more-infinite-research_2.4.9.zip
     canonical_ledger: .mir/releases.json
     archive: null
     archive_class: not-built-from-final-source

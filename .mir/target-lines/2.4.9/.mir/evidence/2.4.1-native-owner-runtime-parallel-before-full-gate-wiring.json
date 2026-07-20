@@ -1,0 +1,289 @@
+{
+  "schema": 2,
+  "run_id": "1f46ad94-3620-424b-b33e-d6458414e3a1",
+  "mir_version": "2.4.1",
+  "factorio_version": "2.0",
+  "factorio_binary_version": "2.0.77",
+  "git_commit": "f938f2d432efcf348c4071f5217b96819da2e3a5",
+  "package_source_git_dirty": false,
+  "validation_harness_sha256": "1352453DB3A5D787BD36CF0E3AB3397D3AE2F530EBE6DD56B4A6C2F83D7E3DAA",
+  "validation_harness_git_dirty": false,
+  "expected_scenarios_sha256": "33C299B4394AB97BBE379D01E6AAC06894883F239A45CA5F55B0D2C0AE63488C",
+  "expected_scenarios": [
+    "package-build",
+    "runtime-state-contract",
+    "space-age-native-owner-settings-combined",
+    "space-age-native-owner-settings-cost-base",
+    "space-age-native-owner-settings-cost-growth",
+    "space-age-native-owner-settings-default",
+    "space-age-native-owner-settings-disabled",
+    "space-age-native-owner-settings-effect",
+    "space-age-native-owner-settings-max-level",
+    "space-age-native-owner-settings-research-time",
+    "space-age-native-owner-settings-unrecognized-default",
+    "space-age-native-owner-settings-unrecognized-override",
+    "static-validation"
+  ],
+  "target_profile_sha256": "E4955F0415FAFB69C21DA32BA535C761740C270D6972955170CA5A2BE95D514A",
+  "required_groups_sha256": "3298C4D8D40054B8445B800616294BD2868E94A5A7556CFA9AAE9AF8BA042724",
+  "package_source_sha256": "EC246D3FAA87062B8519427252E11612791D9AE5322DDD793E27AE552D13BAE9",
+  "validation_package_sha256": "479F57587AB841060187561D6FFEE65B275E2C89832E142E5F3F315713F3FB30",
+  "validation_package_content_sha256": "EC246D3FAA87062B8519427252E11612791D9AE5322DDD793E27AE552D13BAE9",
+  "status": "passed",
+  "started_at": "2026-07-14T10:23:45.2261912Z",
+  "completed_at": "2026-07-14T10:24:44.8468587Z",
+  "duration_seconds": 59.621,
+  "current_scenario": null,
+  "required_groups": [
+    "package",
+    "runtime-state",
+    "space-age",
+    "static"
+  ],
+  "groups": [
+    {
+      "name": "package",
+      "required": true,
+      "status": "passed",
+      "duration_seconds": 0.007,
+      "scenarios": [
+        "package-build"
+      ]
+    },
+    {
+      "name": "runtime-state",
+      "required": true,
+      "status": "passed",
+      "duration_seconds": 0.007,
+      "scenarios": [
+        "runtime-state-contract"
+      ]
+    },
+    {
+      "name": "space-age",
+      "required": true,
+      "status": "passed",
+      "duration_seconds": 362.398,
+      "scenarios": [
+        "space-age-native-owner-settings-combined",
+        "space-age-native-owner-settings-cost-base",
+        "space-age-native-owner-settings-cost-growth",
+        "space-age-native-owner-settings-default",
+        "space-age-native-owner-settings-disabled",
+        "space-age-native-owner-settings-effect",
+        "space-age-native-owner-settings-max-level",
+        "space-age-native-owner-settings-research-time",
+        "space-age-native-owner-settings-unrecognized-default",
+        "space-age-native-owner-settings-unrecognized-override"
+      ]
+    },
+    {
+      "name": "static",
+      "required": true,
+      "status": "passed",
+      "duration_seconds": 0.01,
+      "scenarios": [
+        "static-validation"
+      ]
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "1d9985f6-fdf7-443d-be43-2477a7c30391",
+      "name": "static-validation",
+      "kind": "gate",
+      "group": "static",
+      "status": "passed",
+      "started_at": "2026-07-14T10:23:45.2318315Z",
+      "completed_at": "2026-07-14T10:23:45.2415433Z",
+      "duration_seconds": 0.01,
+      "evidence_paths": [
+        "scripts/Invoke-MIRValidation.ps1"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "c7cb860c-a38c-4c6d-a938-6ee7f571e819",
+      "name": "package-build",
+      "kind": "gate",
+      "group": "package",
+      "status": "passed",
+      "started_at": "2026-07-14T10:23:45.2482660Z",
+      "completed_at": "2026-07-14T10:23:45.2553210Z",
+      "duration_seconds": 0.007,
+      "evidence_paths": [
+        "build/validation-dist"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "0afa02c6-1f83-41d3-9054-bc4d5cc3836f",
+      "name": "runtime-state-contract",
+      "kind": "gate",
+      "group": "runtime-state",
+      "status": "passed",
+      "started_at": "2026-07-14T10:23:45.2621682Z",
+      "completed_at": "2026-07-14T10:23:45.2690020Z",
+      "duration_seconds": 0.007,
+      "evidence_paths": [
+        "prototypes/mir/platform/factorio/runtime_state.lua"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "59476ca9-ddc9-4945-a677-b58c8d1f0851",
+      "name": "space-age-native-owner-settings-combined",
+      "kind": "runtime",
+      "group": "space-age",
+      "status": "passed",
+      "started_at": "2026-07-14T10:23:46.1712032Z",
+      "completed_at": "2026-07-14T10:24:11.8386053Z",
+      "duration_seconds": 25.667,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-be1cd8b2684d41feb3111560e1237a2f\\space-age-native-owner-settings-combined\\userdata\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "7215c03c-59c7-488e-aabf-37ad7500978f",
+      "name": "space-age-native-owner-settings-cost-base",
+      "kind": "runtime",
+      "group": "space-age",
+      "status": "passed",
+      "started_at": "2026-07-14T10:23:46.9079397Z",
+      "completed_at": "2026-07-14T10:24:11.8785361Z",
+      "duration_seconds": 24.971,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-be1cd8b2684d41feb3111560e1237a2f\\space-age-native-owner-settings-cost-base\\userdata\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "de8ec7f0-8d70-4460-a207-473c99eeb02e",
+      "name": "space-age-native-owner-settings-cost-growth",
+      "kind": "runtime",
+      "group": "space-age",
+      "status": "passed",
+      "started_at": "2026-07-14T10:23:47.6558844Z",
+      "completed_at": "2026-07-14T10:24:12.1461690Z",
+      "duration_seconds": 24.49,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-be1cd8b2684d41feb3111560e1237a2f\\space-age-native-owner-settings-cost-growth\\userdata\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "3721ed4c-50f0-408f-b866-4e8c5c7f6a5b",
+      "name": "space-age-native-owner-settings-default",
+      "kind": "runtime",
+      "group": "space-age",
+      "status": "passed",
+      "started_at": "2026-07-14T10:23:48.4022148Z",
+      "completed_at": "2026-07-14T10:24:12.1851789Z",
+      "duration_seconds": 23.783,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-be1cd8b2684d41feb3111560e1237a2f\\space-age-native-owner-settings-default\\userdata\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "3ac17857-5999-48f2-9d9a-2967de4bf044",
+      "name": "space-age-native-owner-settings-disabled",
+      "kind": "runtime",
+      "group": "space-age",
+      "status": "passed",
+      "started_at": "2026-07-14T10:23:49.1608518Z",
+      "completed_at": "2026-07-14T10:24:29.6752454Z",
+      "duration_seconds": 40.514,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-be1cd8b2684d41feb3111560e1237a2f\\space-age-native-owner-settings-disabled\\userdata\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "5912c88d-79d3-47a6-90f6-bd265e7a7b0c",
+      "name": "space-age-native-owner-settings-effect",
+      "kind": "runtime",
+      "group": "space-age",
+      "status": "passed",
+      "started_at": "2026-07-14T10:23:49.8946976Z",
+      "completed_at": "2026-07-14T10:24:29.9313551Z",
+      "duration_seconds": 40.037,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-be1cd8b2684d41feb3111560e1237a2f\\space-age-native-owner-settings-effect\\userdata\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "e2091a69-84cf-43a3-968a-f0eadab718bb",
+      "name": "space-age-native-owner-settings-max-level",
+      "kind": "runtime",
+      "group": "space-age",
+      "status": "passed",
+      "started_at": "2026-07-14T10:23:50.5775576Z",
+      "completed_at": "2026-07-14T10:24:29.9683577Z",
+      "duration_seconds": 39.391,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-be1cd8b2684d41feb3111560e1237a2f\\space-age-native-owner-settings-max-level\\userdata\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "70374efe-b876-4d68-8463-b7e5810f134b",
+      "name": "space-age-native-owner-settings-research-time",
+      "kind": "runtime",
+      "group": "space-age",
+      "status": "passed",
+      "started_at": "2026-07-14T10:23:51.2822540Z",
+      "completed_at": "2026-07-14T10:24:30.2262342Z",
+      "duration_seconds": 38.944,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-be1cd8b2684d41feb3111560e1237a2f\\space-age-native-owner-settings-research-time\\userdata\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "7b3aa4f8-895b-408b-bb66-df42064c1445",
+      "name": "space-age-native-owner-settings-unrecognized-default",
+      "kind": "runtime",
+      "group": "space-age",
+      "status": "passed",
+      "started_at": "2026-07-14T10:23:51.9989412Z",
+      "completed_at": "2026-07-14T10:24:44.5952145Z",
+      "duration_seconds": 52.596,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-be1cd8b2684d41feb3111560e1237a2f\\space-age-native-owner-settings-unrecognized-default\\userdata\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    },
+    {
+      "id": "c2dd5a10-2b5d-44c2-b2c4-7f7d756fdd85",
+      "name": "space-age-native-owner-settings-unrecognized-override",
+      "kind": "runtime",
+      "group": "space-age",
+      "status": "passed",
+      "started_at": "2026-07-14T10:23:52.8312551Z",
+      "completed_at": "2026-07-14T10:24:44.8361649Z",
+      "duration_seconds": 52.005,
+      "evidence_paths": [
+        "C:\\Users\\Jules\\AppData\\Local\\Temp\\mir-factorio-userdata-be1cd8b2684d41feb3111560e1237a2f\\space-age-native-owner-settings-unrecognized-override\\userdata\\factorio-current.log"
+      ],
+      "error": null,
+      "assertions_executed": 1
+    }
+  ],
+  "error": null,
+  "assertions_executed": 0
+}

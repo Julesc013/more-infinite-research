@@ -1,5 +1,5 @@
 schema: 1
-updated_at: 2026-07-15
+updated_at: 2026-07-20
 source_baseline:
   release: "3.0.5"
   tag: "3.0.5"
@@ -386,13 +386,41 @@ lessons:
     release_impact: all seven museum archives were rebuilt, exact-binary requalified, resealed, retagged, republished, and byte-verified
     status: complete
 
+  PL-020:
+    title: MIR 2.4.9 stability and release return
+    source_target: factorio-2.0
+    source_branch: legacy
+    source_commit: 7ebe93029695bbf809a15a14c6540530738a9e62
+    observable_issue: the published 2.4.9 campaign contains portable integrity localization productivity and release-governance lessons that must return without its Factorio 2.0 metadata and API cuts
+    classification: portable-shared-fix
+    affected_targets: ["2.1", "2.0", "future-targets"]
+    modern_decision: retain the existing 3.2 implementations of technology-effect sanitation removed-recipe handling steel ownership reset avoidance localization and persistent verification
+    target_local_decision: preserve the exact 2.4.9 tag tree distribution approved delta performance evidence and public notes as an immutable development snapshot
+    fixture_evidence:
+      - space-exploration-recipe-removal
+      - final-recipe-effect-integrity
+      - vanilla-family-adoption
+      - vanilla-family-exact-owner
+      - upgrade-reset-probe
+      - paired-performance-six-lane
+      - locale-completeness-50
+    dev_equivalent_commits:
+      - d0bae36
+      - ce26512
+      - 068b3a8
+      - 2888012
+      - 17486e9
+      - ddc3f44
+    release_impact: MIR 2.4.9 is frozen as the Factorio 2.0 baseline and 3.2 resumes without importing lower-target defaults
+    status: complete-after-published-return
+
 return_sweep:
   completed_at: 2026-07-16
   authority_for_candidate_archives: .mir/branches.yml
   archives_copied_into_modern_release: false
   archive_policy: target distributions remain immutable target-owned artifacts; dev records their commit hashes evidence and portable lessons
   audited_branches:
-    - {target: "2.0", branch: tmp/2.0, audited_head: 4f7c9d1, qualified_source: f5c58f5, disposition: portable-lessons-returned-target-archive-referenced}
+    - {target: "2.0", branch: legacy, audited_head: 7ebe93029695bbf809a15a14c6540530738a9e62, qualified_source: ecd875bceda8f373c3dd8a9b3393e9626b5dec4c, disposition: published-2.4.9-portable-lessons-returned-target-archive-referenced}
     - {target: "1.1", branch: tmp/1.1, audited_head: 16879c8, qualified_source: 30ef8c7, disposition: portable-lessons-returned-target-archive-referenced}
     - {target: "1.0", branch: tmp/1.0, audited_head: fdc9e37, qualified_source: 0b06b9b, disposition: portable-lessons-returned-target-archive-referenced}
     - {target: "0.17", branch: tmp/0.17, audited_head: 828a7359af014105d0aa681722585c26766583e6, qualified_source: 2d5af37fc5bf710f6034e94c6892782fa5a17dc0, disposition: published-portable-lessons-returned-target-archive-referenced}
@@ -409,9 +437,9 @@ return_sweep:
     - {target: "0.6", branch: tmp/0.6, audited_head: faa2443afc986ffeae632642d743ba43e8490872, qualified_source: 653a9da87d4e5b6f8743a236b72cbdccfdafe216, disposition: republished-metadata-corrected-museum-target-source-rejected}
 
 fixed_point:
-  last_completed_sweep: 2026-07-16
+  last_completed_sweep: 2026-07-20
   zero_new_portable_compiler_fixes: true
   zero_new_reusable_validation_fixes: true
   zero_new_higher-target-profile_corrections: true
   zero_new_package_governance_fixes: true
-  status: reached-after-full-0.17-through-0.6-publication-audit
+  status: reached-after-2.4.9-publication-return

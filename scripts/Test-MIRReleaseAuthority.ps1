@@ -22,6 +22,17 @@ if ([int]$ledger.schema -ne 1 -or [string]$ledger.authority -ne "canonical-relea
 
 $modern = $ledger.development."factorio-2.1"
 $backport = $ledger.development."factorio-2.0"
+$publishedModern = $ledger.published_baselines."factorio-2.1"
+$publishedBackport = $ledger.published_baselines."factorio-2.0"
+if ([string]$publishedModern.mir_version -ne "3.1.9" -or [string]$publishedModern.tag -ne "3.1.9" -or
+    [string]$publishedModern.status -ne "published-frozen") {
+  throw "Canonical Factorio 2.1 published baseline must remain immutable MIR 3.1.9."
+}
+if ([string]$publishedBackport.mir_version -ne "2.4.9" -or [string]$publishedBackport.tag -ne "2.4.9" -or
+    [string]$publishedBackport.archive -ne "dist/more-infinite-research_2.4.9.zip" -or
+    [string]$publishedBackport.status -ne "published-frozen") {
+  throw "Canonical Factorio 2.0 published baseline must remain immutable MIR 2.4.9."
+}
 if ([string]$modern.mir_version -ne "3.2.0" -or [string]$modern.branch -ne "dev" -or
     [string]$modern.qualification -ne "not-release-qualified") {
   throw "Canonical modern development release must remain MIR 3.2.0 on dev and not release-qualified."

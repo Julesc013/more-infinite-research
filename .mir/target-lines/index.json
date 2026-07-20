@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "status": "complete-published-source-snapshots",
-  "generated_at": "2026-07-16",
+  "generated_at": "2026-07-20",
   "policy": {
     "modern_root_is_authoritative": true,
     "snapshots_are_runtime_inert": true,
@@ -19,6 +19,16 @@
       "bytes": 23658975,
       "dist": "dist/more-infinite-research_3.1.9.zip",
       "dist_sha256": "D77B3A78DA40CD4FDD4C829A01B5030E59FB593F3387124EF5C438F6A9E8DFCD"
+    },
+    {
+      "version": "2.4.9",
+      "commit": "7ebe93029695bbf809a15a14c6540530738a9e62",
+      "tree": "7d4750d3a8fd4e923f0477bacb3013c191904db4",
+      "snapshot": ".mir/target-lines/2.4.9",
+      "files": 978,
+      "bytes": 40640549,
+      "dist": "dist/more-infinite-research_2.4.9.zip",
+      "dist_sha256": "B5503F94D04624F65462CC275FB6AA71A8CE93075F732DF498F6D73AD255F978"
     },
     {
       "version": "2.4.5",
