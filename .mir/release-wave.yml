@@ -303,26 +303,27 @@ waves:
     canonical_ledger: .mir/releases.json
     archive: dist/more-infinite-research_3.2.0.zip
     archive_class: development-candidate
-    archive_bytes: 929087
-    archive_sha256: D9969CF427FB8FD16E989C610F48944770BE9578495149617C42DE056EEAAA6C
-    package_content_sha256: 978CB2C27F66FF3A8DFEE16C244826E84BD9CBC4F53E8F19DFD213FE05508256
-    package_source_commit: 2888012884fe046b6b6d92388ef4960815e79e0d
+    archive_bytes: 930297
+    archive_sha256: 5DC5DDEEE54EDF701589F85D0FD74922E8A121B0A59F2895C712E8C23F89120D
+    package_content_sha256: 49A6B62F9E620197672C81F382703A4AF6C03BBF5A0B73F38BC5C906901051D9
+    package_source_sha256: CB3C30F9CBB5A47C31C8BD1FD8BF7B9D508406954619132CA4644B8959987873
+    package_source_commit: 7d8204e49e8306679438d780b12a18ffb9027b78
     assurance_policy: mir-verification-v4
     superseded_local_qualification_file_sha256: 480CC078092536453CEC53BBD28C4E68CF249FD4E217B25F9AF9B039B5BE020F
     superseded_exact_upgrade_evidence: .mir/evidence/3.2.0-historical-3976-upgrade-proof.json
     exact_approved_delta_evidence: approved-delta/3.1.9-to-3.2.0.json
-    exact_approved_delta_gate: superseded-by-localization-complete-candidate
+    exact_approved_delta_gate: pending-exact-post-2.4.9-return-candidate
     exact_upgrade_evidence: .mir/evidence/3.2.0-upgrade-proof.json
-    exact_upgrade_gate: superseded-by-localization-complete-candidate
-    locale_gate: passed-local-50-locales-21200-values
-    locale_runtime_gate: passed-local-factorio-2.1
+    exact_upgrade_gate: pending-exact-post-2.4.9-return-candidate
+    locale_gate: passed-source-unchanged-50-locales-21250-values
+    locale_runtime_gate: pending-exact-post-2.4.9-return-candidate
     runtime_performance_gate: pending-qualified-3.1.9-baseline
     protected_release_gate: pending
-    interactive_gate: pending-maintainer
+    interactive_gate: pending-exact-post-2.4.9-return-candidate
     assurance_seal: pending
     release_gate: awaiting-external-performance-manual-and-protected-qualification
     publication_status: unreleased
-    status: replacement-candidate-awaiting-external-qualification
+    status: post-2.4.9-return-candidate-awaiting-external-qualification
 
   mir_2_4_0:
     version: "2.4.0"

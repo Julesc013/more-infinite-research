@@ -12,15 +12,15 @@
   },
   "profiles": {
     "edit": ["static.architecture", "static.compiler"],
-    "fast": ["tooling.self-test", "static.architecture", "static.compiler", "static.settings", "static.balance", "static.museum", "static.package"],
+    "fast": ["tooling.self-test", "static.architecture", "static.compiler", "static.settings", "static.balance", "static.museum", "static.release-history", "static.package"],
     "auto": [],
     "locale": ["static.locales", "runtime.exact-zip"],
     "balance": ["static.balance", "runtime.affected"],
     "refactor-equivalence": ["static.compiler", "static.package", "runtime.exact-zip"],
     "hotfix": ["static.full", "runtime.affected", "runtime.exact-zip"],
     "targeted": ["static.full", "runtime.affected", "runtime.exact-zip"],
-    "full": ["docs.check", "tooling.self-test", "static.architecture", "static.compiler", "static.settings", "static.locales", "static.balance", "static.museum", "static.package", "static.full", "performance.static", "runtime.exact-zip", "runtime.full", "runtime.upgrade", "runtime.ecosystem", "release.approved-delta", "runtime.performance-regression", "manual.release-review"],
-    "backport": ["docs.check", "tooling.self-test", "static.architecture", "static.compiler", "static.settings", "static.locales", "static.balance", "static.museum", "static.package", "static.full", "performance.static", "runtime.exact-zip", "runtime.full", "runtime.upgrade", "runtime.ecosystem", "runtime.performance-regression", "manual.release-review"],
+    "full": ["docs.check", "tooling.self-test", "static.architecture", "static.compiler", "static.settings", "static.locales", "static.balance", "static.museum", "static.release-history", "static.package", "static.full", "performance.static", "runtime.exact-zip", "runtime.full", "runtime.upgrade", "runtime.ecosystem", "release.approved-delta", "runtime.performance-regression", "manual.release-review"],
+    "backport": ["docs.check", "tooling.self-test", "static.architecture", "static.compiler", "static.settings", "static.locales", "static.balance", "static.museum", "static.release-history", "static.package", "static.full", "performance.static", "runtime.exact-zip", "runtime.full", "runtime.upgrade", "runtime.ecosystem", "runtime.performance-regression", "manual.release-review"],
     "promotion-check": ["seal.verify"]
   },
   "classes": [
@@ -61,18 +61,18 @@
     },
     {
       "id": "assurance-tooling",
-      "patterns": ["^scripts/Test-MIR(?:Assurance|ReleaseAuthority)\\.ps1$", "^\\.mir/(assurance|test-impact)\\.(json|yml)$"],
+      "patterns": ["^scripts/(?:Invoke-MIRAssurance|Test-MIR(?:Assurance|ReleaseAuthority))\\.ps1$", "^scripts/MIRAssurance/", "^validation/tests\\.yml$", "^\\.mir/(assurance|test-impact)\\.(json|yml)$"],
       "tests": ["tooling.self-test", "static.full"]
     },
     {
       "id": "test-harness",
-      "patterns": ["^scripts/(?!Test-MIR(?:Assurance|ReleaseAuthority)\\.ps1$)", "^fixtures/", "^validation/", "^verification/", "^tools/mir_verify/", "^\\.mir/(fixtures|test-catalog|targets|performance)", "^\\.github/workflows/", "^\\.gitignore$"],
+      "patterns": ["^scripts/(?!MIRAssurance/)(?!(?:Invoke-MIRAssurance|Test-MIR(?:Assurance|ReleaseAuthority))\\.ps1$)", "^fixtures/", "^validation/(?!tests\\.yml$)", "^verification/", "^tools/mir_verify/", "^\\.mir/(fixtures|test-catalog|targets|performance)", "^\\.github/workflows/", "^\\.gitignore$"],
       "tests": ["tooling.self-test", "static.full", "runtime.affected"]
     },
     {
       "id": "release-governance",
       "patterns": ["^\\.mir/(branches|distributions|releases)\\.(json|yml)$", "^\\.mir/(portable-return|release-wave)\\.yml$"],
-      "tests": ["docs.check", "tooling.self-test", "static.full", "static.package"]
+      "tests": ["docs.check", "tooling.self-test", "static.release-history", "static.full", "static.package"]
     },
     {
       "id": "museum-tooling",
@@ -87,7 +87,7 @@
     {
       "id": "release-evidence",
       "patterns": ["^\\.mir/(evidence|target-lines)/", "^approved-delta/", "^dist/"],
-      "tests": ["tooling.self-test", "static.full", "static.package"]
+      "tests": ["tooling.self-test", "static.release-history", "static.full", "static.package"]
     }
   ],
   "unknown_policy": {

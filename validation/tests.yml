@@ -133,6 +133,17 @@
       ]
     },
     {
+      "id": "static.release-history",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./scripts/Test-MIRPublishedSnapshotIntegrity.ps1 -Index",
+      "requires_factorio": false,
+      "inputs": [
+        "release-history",
+        "scripts/Test-MIRPublishedSnapshotIntegrity.ps1"
+      ]
+    },
+    {
       "id": "static.full",
       "kind": "static",
       "layer": "F0",

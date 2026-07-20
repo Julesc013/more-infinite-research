@@ -41,6 +41,27 @@ function Get-MIRAssuranceInputFingerprint {
       $files = @(Get-MIRAssuranceRepositoryFiles)
       return [ordered]@{ kind="repository"; file_count=$files.Count; sha256=(Get-MIRAssuranceTreeHash -Paths $files) }
     }
+    "release-history" {
+      $rootTree = (& git -C $repo write-tree).Trim()
+      if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($rootTree)) {
+        throw "Unable to materialize the staged repository tree for release-history fingerprinting."
+      }
+      $targetLinesTree = (& git -C $repo rev-parse "$rootTree`:.mir/target-lines" 2>$null).Trim()
+      if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($targetLinesTree)) {
+        throw "Unable to resolve the staged .mir/target-lines tree for release-history fingerprinting."
+      }
+      $inventory = Get-MIRAssurancePatternFingerprint -Patterns @(".mir/distributions.json", "dist/**")
+      $material = [ordered]@{
+        target_lines_tree=$targetLinesTree
+        inventory=$inventory
+      }
+      return [ordered]@{
+        kind="release-history"
+        target_lines_tree=$targetLinesTree
+        inventory=$inventory
+        sha256=(Get-MIRAssuranceJsonHash -Value $material)
+      }
+    }
     "test-catalog" { return [ordered]@{ kind="manifest"; path="validation/tests.yml"; sha256=(Get-MIRAssuranceSha256 -Path $catalogPath) } }
     "target-profile" {
       return Get-MIRAssurancePatternFingerprint -Patterns @(".mir/targets.json", "scripts/validation/TargetProfiles.ps1")

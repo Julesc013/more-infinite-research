@@ -47,8 +47,11 @@ foreach ($case in $releaseHistoryClassificationCases.GetEnumerator()) {
 $assuranceToolingClassificationCases = @(
   ".mir/assurance.json",
   ".mir/test-impact.yml",
+  "scripts/Invoke-MIRAssurance.ps1",
+  "scripts/MIRAssurance/Evidence.ps1",
   "scripts/Test-MIRAssurance.ps1",
-  "scripts/Test-MIRReleaseAuthority.ps1"
+  "scripts/Test-MIRReleaseAuthority.ps1",
+  "validation/tests.yml"
 )
 foreach ($path in $assuranceToolingClassificationCases) {
   $matchedClasses = @(
@@ -70,6 +73,18 @@ if (@($config.profiles.'promotion-check').Count -ne 1 -or [string]$config.profil
   throw "The promotion-check profile must contain exactly seal.verify."
 }
 
+$releaseHistoryTest = @($catalog.tests | Where-Object { [string]$_.id -eq "static.release-history" })
+if ($releaseHistoryTest.Count -ne 1 -or
+    [string]$releaseHistoryTest[0].command -ne "./scripts/Test-MIRPublishedSnapshotIntegrity.ps1 -Index" -or
+    @($releaseHistoryTest[0].inputs) -notcontains "release-history") {
+  throw "static.release-history must bind the staged release-history fingerprint and run indexed snapshot integrity."
+}
+foreach ($profileName in @("fast", "full", "backport")) {
+  if (@($config.profiles.$profileName) -notcontains "static.release-history") {
+    throw "The $profileName assurance profile must include static.release-history."
+  }
+}
+
 foreach ($requiredStaticRoutingPath in @(
   ".mir/assurance.json",
   ".mir/test-impact.yml",
@@ -87,7 +102,7 @@ foreach ($requiredStaticRoutingPath in @(
 
 foreach ($required in @(
   "tooling.self-test", "static.full", "performance.static", "runtime.full", "runtime.upgrade",
-  "runtime.exact-zip", "runtime.ecosystem", "release.approved-delta",
+  "static.release-history", "runtime.exact-zip", "runtime.ecosystem", "release.approved-delta",
   "runtime.performance-regression", "manual.release-review", "seal.verify"
 )) {
   if ($ids -notcontains $required) { throw "Missing release-blocking assurance test ID: $required" }
