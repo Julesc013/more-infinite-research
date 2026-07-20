@@ -3,101 +3,106 @@
   "kind": "mir-local-automated-qualification",
   "release": "2.4.9",
   "target": "2.0",
-  "status": "automated-runtime-and-performance-passed-manual-and-protected-gates-pending",
+  "status": "machine-verifiable-passed-manual-and-protected-gates-pending",
   "release_eligible": false,
-  "package_source_commit": "1d7e73bd71b6ad00dc297081363897637adab324",
-  "local_evidence_source_commit": "3b23949386e2cc3b55650d77975b51ef6a472e88",
+  "package_source_commit": "ecd875bceda8f373c3dd8a9b3393e9626b5dec4c",
+  "local_evidence_source_commit": "e4ed9a6859703d4193e351464358d0920eb0ec75",
   "candidate": {
     "archive": "dist/more-infinite-research_2.4.9.zip",
-    "archive_bytes": 892183,
-    "archive_sha256": "52B93336AB24FAF2E626835EAF971310E6D919A99083994B6F777F45CEBCB162",
-    "package_content_sha256": "6792B8C47E314692E6D8CA6DD73C0D09C784A46AED4171E007616E36B0CA43C4"
+    "archive_bytes": 893263,
+    "archive_sha256": "B5503F94D04624F65462CC275FB6AA71A8CE93075F732DF498F6D73AD255F978",
+    "package_content_sha256": "23D992943090BFF487675E9DF8C5C12BFDB1F3018B0BF04C9928265E5DC95255"
   },
   "factorio": {
     "version": "2.0.77.84539",
     "binary_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
   },
   "plan": {
-    "path": "out/performance-corrected-accepted-plan.json",
-    "artifact_sha256": "2980CA95E05835D0F558405292584FB57E72F8210B0EDAA60E79FD797747788B",
-    "plan_material_sha256": "AA9EEC5B84882C74278D32EFD6604C007595DAA905195219D689EA183DABAC7D",
-    "required_test_set_sha256": "D31D11501DAB2D9B8923EC95C120C59B116E0126D54306163220A89DE881EEAB",
-    "candidate_descriptor_sha256": "637DF39B248B3BEC57A8D6586709AA8921050397E74605C0798A0F68FC2330FD",
-    "validation_harness_sha256": "C131C8CB3DF1A35C44E400A653DC96A6E4F366F56FDBB2D43247965F59D2F2A9",
-    "expected_test_count": 106
+    "path": "out/plans/2.4.9-final-backport.json",
+    "artifact_sha256": "4AE8C57FD5E135B1BFDC42A6B70A55996B539E4418ACE13D7320A5E7D2ED0ED7",
+    "plan_material_sha256": "29414DFE9C8A5F664597D9C8AEC680173F20C766F1CFF60138F98A386072EB22",
+    "required_test_set_sha256": "947D728383733848A50459C559AC98F08F682BBB840717FD59A4AF6F68BD9707",
+    "candidate_descriptor_sha256": "131A91572B54E0B032F02EF824349BF7F3431BEB92851DB0AA62337FE36E222B",
+    "validation_harness_sha256": "87CBE1277613C6E66D0CC6270D27DCBB5744EC5424DD20329E14A68CCB3BDDD2",
+    "expected_test_count": 107,
+    "reuse_disabled": true
   },
   "aggregate": {
-    "path": "artifacts/assurance/backport-2.4.9-local-verify-summary.json",
-    "sha256": "AF9FA8183C1E1551121CA42B4AC2F7630AC6F2F02016A1699A1290ED17B95763",
-    "status": "historical-stopped-before-performance-evidence",
-    "passed": 104,
+    "path": "artifacts/assurance/2.4.9-final-local-verify-summary.json",
+    "sha256": "67AD5C7031D2005815D346747833375220834E40EDE209366070CFC95CB9A7CB",
+    "status": "machine-verifiable-passed-manual-attestation-absent",
+    "executed": 107,
+    "passed": 106,
     "failed": 1,
-    "not_executed": 1
+    "not_executed": 0,
+    "only_failure": "manual.release-review"
   },
   "checks": {
     "static_and_deterministic": {
       "status": "passed",
-      "candidate_rebuild": "byte-identical"
-    },
-    "localization": {
-      "status": "passed",
+      "candidate_rebuild": "byte-identical",
       "locale_count": 50,
-      "value_count": 21200
+      "locale_value_count": 21250,
+      "forbidden_package_entries": 0
     },
     "full_runtime": {
       "status": "passed",
-      "scenario_count": 91,
-      "passed_scenarios": 91,
+      "scenario_count": 92,
+      "passed_scenarios": 92,
       "failed_scenarios": 0,
-      "duration_seconds": 1043.904
+      "duration_seconds": 995.401
     },
     "exact_upgrade": {
       "status": "passed",
       "summary": "artifacts/assurance/2.4.9-upgrade-proof.json",
-      "summary_sha256": "229B9C8F2EC745984B3908F74F06286F8866AEC04B28EEB127E40405B9F4933B",
+      "summary_sha256": "61959BE68863939E8AB04887437E53FC38A89795188428A90E81A05255831242",
       "baseline_archive_sha256": "7649824B72247AA38F05661422DFDEE7C729B21CC73A0A35D2455443B45D39F8",
-      "assertion_count": 8
+      "assertion_count": 8,
+      "assurance_fingerprint_sha256": "FC1B48A4C049897669163EF345415297BD154540D8B19DC380F390FC2874E4B5",
+      "assurance_result_digest": "5214CA576DAC8960619B81D17B400EE371F2FD38D1F8712D04E79B450CFDDF33"
     },
     "approved_delta": {
       "status": "passed",
       "artifact": "approved-delta/2.4.5-to-2.4.9.json",
-      "artifact_sha256": "64686B658E8BDBD262F9E100BEA7E637B8744F57CA93431CE265A150237C0BDC",
-      "declared_package_paths": 61,
-      "unapproved_paths": 0
+      "artifact_sha256": "349A7701C529DB785AC8BE0FFD12367147FDE3CF0D3C3AE74CB0F349C7D9161C",
+      "declared_package_paths": 65,
+      "unapproved_paths": 0,
+      "assurance_fingerprint_sha256": "3CB83F388296BBF4CB7423422E86EB6FADA7FBABCE310C072A79E54282838AE8",
+      "assurance_result_digest": "2FB5911C82AFFED0AD14FD5B7C18FFF9661862A04075E843016ED1BDBC13981E"
     },
     "targeted_ecosystem": {
       "status": "passed",
-      "scope": "representative-local-scenario",
-      "summary": "artifacts/release-targeted-20260719-232430/release-targeted-summary.json",
-      "summary_sha256": "BF22EBC507140A473C30CD3003D54CF4643D279180DD1F1EA42E6030E9945CD5"
+      "scope": "representative-local-scenario-plus-exact-runtime-fixtures",
+      "summary": "artifacts/release-targeted-20260720-195656/release-targeted-summary.json",
+      "summary_sha256": "C8AABC663508EAF5562F7208B33E47D8F71410D73FCB040EA5DB6C7BB0FA0785",
+      "assurance_fingerprint_sha256": "5EAE08798A0059942F54FA9BCD7F28EF575CE3586E62E54CE3C2EC7551CB02D0",
+      "assurance_result_digest": "96BF400DD0A5A29AD33D771E0BDAE9575FFD31AA1B7D55E9AEB16D585F99B3DA"
     },
     "runtime_performance": {
       "status": "passed",
       "evidence": ".mir/evidence/2.4.9-performance-regression.json",
-      "evidence_sha256": "211A93DBDD1613284443193381D4D13D83AF96A8BA5742AC30D886BC95EDD32C",
-      "measurement_harness_sha256": "DBBAC018F3D35B3A0BF90C9542411AD32C94A899BB448631041680AAA7C64E8D",
-      "raw_campaign": "artifacts/performance/2.4.5-to-2.4.9-corrected-20260719-162236/campaign-result.json",
-      "assurance_test_id": "runtime.performance-regression",
-      "assurance_fingerprint_sha256": "96525F21E85C39D9688334564E1BDC3E3AA776453BB226638297A39F95F99E15",
-      "assurance_result_digest": "A8EEC0FCE01A48836BA75D85FE9EF901F1C9DB3A0A782679DC715FAD33F6A8A8",
-      "assurance_producer": "untrusted-local",
-      "baseline_version": "2.4.5",
+      "evidence_sha256": "9A2F39C59E6F37BA416920F8D550216F65206E81D2D5520FD3ED95A4781ABC37",
+      "raw_campaign": "artifacts/performance/2.4.5-to-2.4.9-final-20260720/campaign-result.json",
+      "measurement_harness_sha256": "F6462B0ED4CC956000FD2B75AD5F77BA5E08A879D4AB14A8845C6E06544E5F8F",
+      "assurance_fingerprint_sha256": "11828A68BE818FB4D749F8781CA9F9B31F1D9F9FA20F8BC3A12D8E8D00810133",
+      "assurance_result_digest": "7E3A888CE26CA136C951C6BEA58ABD986A858C99DC35B4E8B3A38DF80D4751DA",
       "warmup_runs_per_package_per_lane": 1,
       "measured_runs_per_package_per_lane": 5,
       "measured_execution_count": 60,
       "total_execution_count": 72,
       "lane_count": 6,
-      "medium_ecosystem_roots": 6,
-      "large_ecosystem_roots": 19,
       "failed_lanes": 0
     },
     "manual_review": {
       "status": "missing-required-attestation",
-      "required_path": ".mir/evidence/2.4.9-manual-review-attestation.json"
+      "required_path": ".mir/evidence/2.4.9-manual-review-attestation.json",
+      "assurance_test_id": "manual.release-review",
+      "assurance_fingerprint_sha256": "426F25C2EE183D35DF76BB98E76F59C869E2B9D261A36C574244A06551FFAC08"
     }
   },
   "remaining_release_blockers": [
-    "maintainer-authored schema-2 package review attestation",
-    "protected full qualification and candidate seal"
+    "maintainer-authored schema-2 package review attestation for the exact candidate",
+    "protected full qualification and candidate seal",
+    "fast-forward promotion to legacy after both gates pass"
   ]
 }

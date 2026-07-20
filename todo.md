@@ -23,8 +23,8 @@ This file is the concise executable queue. Detailed scope, decisions, evidence, 
 ## Current Gate
 
 1. [x] Backport and fixture the urgent Factorio 2.0 capability, effect-integrity, reset-safety, Space Exploration, steel-productivity, locale, and release-boundary fixes.
-2. [ ] Freeze the final package-source commit and build one deterministic MIR 2.4.9 archive.
-3. [ ] Regenerate the exact 2.4.5-to-2.4.9 approved delta and run the complete Factorio 2.0 backport plan, upgrade proof, ecosystem lanes, and six-lane paired performance campaign.
+2. [x] Freeze the final package-source commit and build one deterministic MIR 2.4.9 archive.
+3. [x] Regenerate the exact 2.4.5-to-2.4.9 approved delta and run all 106 machine-verifiable checks in the complete Factorio 2.0 backport plan, including 92 runtime scenarios, upgrade proof, ecosystem lanes, and six-lane paired performance campaign.
 4. [ ] Complete the maintainer-authored package review attestation against the exact final archive.
 5. [ ] Run protected qualification, create and inspect the candidate seal, then promote the same evidence commit to `legacy` without rebuilding.
 6. [ ] Tag and publish the sealed MIR 2.4.9 archive.

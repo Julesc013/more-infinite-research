@@ -48,6 +48,7 @@ $allowedStatuses = @(
   "reconstruction-in-progress",
   "awaiting-performance-manual-ecosystem-and-protected-qualification",
   "awaiting-runtime-manual-and-protected-qualification",
+  "awaiting-manual-and-protected-qualification",
   "release-candidate-awaiting-manual-review",
   "published"
 )
@@ -195,7 +196,8 @@ if (-not (Test-Path -LiteralPath $artifactPath -PathType Leaf)) {
 
 if ($status -in @(
   "awaiting-performance-manual-ecosystem-and-protected-qualification",
-  "awaiting-runtime-manual-and-protected-qualification"
+  "awaiting-runtime-manual-and-protected-qualification",
+  "awaiting-manual-and-protected-qualification"
 )) {
   $candidateSha = Get-MIRFileSha256 -Path $artifactPath
   $candidateContentSha = Get-MIRZipContentFingerprint -Path $artifactPath

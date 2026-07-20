@@ -22,4 +22,4 @@ The update preserves MIR 2.4.5 settings, existing generated research IDs, migrat
 
 The package now includes complete, consistently generated locale files for all 50 languages supported by Factorio. Locale checks keep every language synchronized with English and protect formatting placeholders, rich text, compact UI labels, and translated prose from regression.
 
-Release qualification is bound to the exact 2.4.5 and 2.4.9 archives. Runtime performance and package-focused manual review are mandatory before the candidate can be sealed and published.
+Release qualification is bound to the exact 2.4.5 and 2.4.9 archives. All 106 machine-verifiable local checks pass for the final candidate, including 92 runtime scenarios, exact upgrade, ecosystem, approved-delta, deterministic package, locale, and paired performance checks. Package-focused maintainer review and protected qualification remain mandatory before the candidate can be sealed and published.

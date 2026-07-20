@@ -327,13 +327,14 @@ release_artifacts:
       prior_release: dist/more-infinite-research_2.4.5.zip
       approved_delta: approved-delta/2.4.5-to-2.4.9.json
       approved_delta_gate: passed-local-exact-candidate
-      upgrade_gate: pending-final-candidate-validation
+      upgrade_gate: passed-local-factorio-2.0.77
       locale_gate: passed-local-50-locales-21250-values
-      local_automated_gate: pending-final-candidate-validation
+      ecosystem_gate: passed-local-representative-and-exact-fixtures
+      local_automated_gate: passed-106-machine-verifiable-tests-manual-pending
       runtime_performance_gate: passed-local-exact-candidate
-      release_gate: runtime-upgrade-ecosystem-manual-and-protected-qualification-pending
+      release_gate: manual-and-protected-qualification-pending
       publication_status: unreleased
-      status: release-candidate-awaiting-external-qualification
+      status: release-candidate-awaiting-manual-and-protected-qualification
     mir_2_4_0:
       version: "2.4.0"
       branch: legacy

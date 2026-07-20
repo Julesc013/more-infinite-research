@@ -5,19 +5,19 @@ applies_to: "3.0.0+"
 audience: maintainer
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-07-14
+last_reviewed: 2026-07-20
 supersedes: []
 superseded_by: []
 ---
 # Target-Line Versioning And Backports
 
-Updated: 2026-07-14
+Updated: 2026-07-20
 
 ## Current 3.2 Release Roles
 
-Published MIR `3.1.9` on the Factorio 2.1 line and MIR `2.4.5` on the Factorio 2.0 line are immutable. MIR `3.2.0` is the canonical Dev source for persistent content-addressed verification, and MIR `2.5.0` is its Factorio 2.0 projection on `tmp/2.0`. The portable verifier is shared, but every backport recalculates fingerprints from its own target ZIP, Factorio binary, profile, fixtures, dependency contract, scenario records, and prior release.
+Published MIR `3.1.9` on the Factorio 2.1 line and MIR `2.4.5` on the Factorio 2.0 line are immutable. MIR `3.2.0` is the canonical Dev source for persistent content-addressed verification. MIR `2.4.9` is the active bounded Factorio 2.0 stability candidate on `tmp/2.0`; MIR `2.5.0` is the later independent Factorio 2.0 compiler and verification projection. The portable verifier is shared, but every backport recalculates fingerprints from its own target ZIP, Factorio binary, profile, fixtures, dependency contract, scenario records, and prior release.
 
-After the exact `2.5.0` candidate passes its target gates, stop for maintainer review, tag, and publication. Do not promote it to `legacy` or start `tmp/1.1` or any lower target during this gate unless the maintainer explicitly opens that next release step.
+After an exact Factorio 2.0 candidate passes its target gates, stop for maintainer review, tag, and publication. Do not promote it to `legacy` or start a lower target during that gate unless the maintainer explicitly opens the next release step. For MIR 2.4.9, local machine-verifiable evidence does not replace the required maintainer attestation or protected seal.
 
 Every rebuilt target projection must descend from its declared modern source anchor and pass `scripts/Test-MIRBackportSourceLock.ps1`. The lock binds the canonical release-candidate commit, canonical package-source commit, target manifest hash, and exact set of target-specific package paths. Published predecessor archives remain immutable upgrade inputs; they are not substitutes for direct canonical ancestry.
 
@@ -82,8 +82,8 @@ Use these branch roles during the transition:
 | --- | --- | ---: |
 | `main` | Stable canonical Factorio `2.1` line after gates. | `3.x.x` after `3.0.0` |
 | `dev` | Development canonical Factorio `2.1` line. | `3.x.x` after `3.0.0` |
-| `legacy` | Stable Factorio `2.0` release branch frozen at published `2.4.5` during the current gate. | No promotion until the maintainer completes the 2.5.0 release step. |
-| `tmp/2.0` | Factorio `2.0` staging and qualification branch. | Unreleased `2.5.0` projection of the accepted Dev verification overhaul and target-capability guard. |
+| `legacy` | Stable Factorio `2.0` release branch frozen at published `2.4.5` during the current gate. | Promote the exact MIR `2.4.9` evidence commit only after manual and protected gates pass. |
+| `tmp/2.0` | Factorio `2.0` staging and qualification branch. | Active bounded MIR `2.4.9` stability candidate; MIR `2.5.0` follows as an independent backport. |
 | `tmp/1.1` | Working Factorio `1.1` port branch or worktree. | `1.9.x` starting at `1.9.3` |
 | `port/1.1-to-0.18` | Short-lived Factorio `0.18` bridge branch seeded from the validated `1.9.3` source point. | `1.8.0` only |
 | `tmp/1.0` | Working Factorio `1.0` port branch or worktree after the `0.18` bridge proof. | `1.8.1+` |

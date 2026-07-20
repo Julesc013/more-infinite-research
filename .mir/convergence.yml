@@ -125,13 +125,13 @@ candidate:
   archive_bytes: 893263
   sha256: B5503F94D04624F65462CC275FB6AA71A8CE93075F732DF498F6D73AD255F978
   package_content_sha256: 23D992943090BFF487675E9DF8C5C12BFDB1F3018B0BF04C9928265E5DC95255
-  automated_gate: pending
-  local_automated_gate: pending-clean-full-runtime
+  automated_gate: passed-local-machine-verifiable
+  local_automated_gate: passed-static-runtime-upgrade
   runtime_performance_gate: passed-local-exact-candidate
   protected_automated_gate: pending
   manual_gate: pending
   approved_delta: approved-delta/2.4.5-to-2.4.9.json
-  status: awaiting-runtime-manual-and-protected-qualification
+  status: awaiting-manual-and-protected-qualification
 
 rules:
   - dev-remains-the-canonical-modern-implementation
