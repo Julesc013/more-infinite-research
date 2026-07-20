@@ -13,7 +13,7 @@
   "projection_schema": 2,
   "target": "2.0",
   "mir_version": "2.4.9",
-  "target_profile_sha256": "A0B5FC6768ADB1834561949FC9024B3C2FB182C974A924CF4ABB7D2D5B27A465",
+  "target_profile_sha256": "6D15A6E36B7408845D990258C32C2DE96455E7D78C26C4AF38D160390DFDFF4D",
   "adapted_package_paths": {
     "README.md": "Factorio 2.0 release positioning for the 2.4.9 stability patch",
     "changelog.txt": "MIR 2.4.9 player-visible stability and safety history",
