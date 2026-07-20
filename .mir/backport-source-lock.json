@@ -7,7 +7,7 @@
   "baseline_package_source_sha256": "F41388B5D77E6203D68D380EB4D1A61B5763DA335E15C120BD3C741906BE9DAC",
   "portable_fix_source_commit": "ddc3f44a2dccfd6c0d4ec9a0e256d9f4be8766a7",
   "localization_source_commit": "2888012884fe046b6b6d92388ef4960815e79e0d",
-  "candidate_package_source_commit": "65ff8db4a2fdcd6502d466c871aae7a91d611e4b",
+  "candidate_package_source_commit": "ecd875bceda8f373c3dd8a9b3393e9626b5dec4c",
   "canonical_package_source_commit": "ddc3f44a2dccfd6c0d4ec9a0e256d9f4be8766a7",
   "canonical_release_evidence_commit": "5fa6c2b973408be152e2b2aa19246146d63b6a58",
   "projection_schema": 2,
