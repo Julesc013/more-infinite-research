@@ -162,6 +162,7 @@ These streams generate `change-recipe-productivity` effects for matching recipes
 | --- | --- | --- | --- | --- |
 | `research_copper` | Copper plate productivity | `copper-plate` | `+10%` | Excludes hidden and recycling recipes. |
 | `research_iron` | Iron plate productivity | `iron-plate` | `+10%` | Excludes hidden and recycling recipes. |
+| `research_steel` | Steel plate productivity | `steel-plate` | `+10%` | Generates a MIR owner for base-game steel smelting. With Space Age, vanilla `steel-plate-productivity` remains the sole owner for `steel-plate`, `casting-steel`, and safely adopted productivity-allowed steel recipes. |
 | `research_gears` | Iron gear wheel productivity | `iron-gear-wheel` | `+10%` | Excludes recipes with scrap ingredients. |
 | `research_iron_sticks` | Iron stick productivity | `iron-stick` | `+10%` | Excludes recipes with scrap ingredients. |
 | `research_copper_cable` | Copper cable productivity | `copper-cable` | `+10%` | Excludes recipes with scrap ingredients. |

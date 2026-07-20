@@ -15,10 +15,11 @@ $expected = [ordered]@{
   research_plastic = @{ owner = "plastic-bar-productivity"; product = "plastic-bar" }
   research_low_density_structure = @{ owner = "low-density-structure-productivity"; product = "low-density-structure" }
   research_rocket_fuel = @{ owner = "rocket-fuel-productivity"; product = "rocket-fuel" }
+  research_steel = @{ owner = "steel-plate-productivity"; product = "steel-plate" }
 }
 
 $contracts = @($manifest.contracts)
-if ($contracts.Count -ne $expected.Count) { throw "Expected exactly four native-owner balance contracts." }
+if ($contracts.Count -ne $expected.Count) { throw "Expected exactly five native-owner balance contracts." }
 $streamSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "prototypes\streams\productivity.lua")
 $settingsManifest = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot ".mir\settings.yml")
 $costModelSource = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "prototypes\mir\domain\native_owner\cost_model.lua")
@@ -64,4 +65,4 @@ if (-not $costPairIsAtomic) {
   throw "Native-owner cost settings must activate the complete visible base/growth pair."
 }
 
-Write-Host "[ok] four Factorio 2.1 native-owner balance contracts and safe formula adapters passed."
+Write-Host "[ok] five Factorio 2.1 native-owner balance contracts and safe formula adapters passed."

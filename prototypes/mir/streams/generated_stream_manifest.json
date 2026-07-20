@@ -904,6 +904,21 @@
         "stream:research_spoilage_preservation"
       ]
     },
+    "recipe-prod-research_steel-1": {
+      "introduced_in": "3.2.0",
+      "source": "stream_table:productivity",
+      "capability": "recipe-productivity",
+      "family": "steel",
+      "policy": "native-owner-binding-or-generated-stream",
+      "stable": true,
+      "identity_state": "stable-unreleased",
+      "generated_technology": "recipe-prod-research_steel-1",
+      "stream_key": "research_steel",
+      "migration_policy": "stable",
+      "targets": [
+        "stream:research_steel"
+      ]
+    },
     "recipe-prod-research_sulfur-1": {
       "introduced_in": "pre-2.2.0",
       "source": "legacy_stream_table:productivity",

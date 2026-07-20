@@ -792,6 +792,7 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'icon_candidates={' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'inactive_mod_asset="space-age"' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = '__space-age__/graphics/technology/processing-unit-productivity.png' },
+    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = '__space-age__/graphics/technology/steel-plate-productivity.png' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = '__space-age__/graphics/technology/low-density-structure-productivity.png' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = '__space-age__/graphics/technology/plastics-productivity.png' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = '__space-age__/graphics/technology/rocket-fuel-productivity.png' },
@@ -799,6 +800,7 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = '{technology="research-productivity", required_mod="space-age"}' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = '{technology="space-science-pack"}' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = '{technology="processing-unit"}' },
+    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'native_owner_binding("steel-plate-productivity", {"steel-plate"})' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'research_rocket_fuel = {' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'research_thruster_fuel_productivity = {' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'research_thruster_oxidizer_productivity = {' },
@@ -914,6 +916,7 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'assert_tech_uses_technology_icon("recipe-prod-research_walls-1", "gate")' },
     @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'assert_tech_uses_technology_icon("recipe-prod-research_lab_productivity-1", "military-science-pack")' },
     @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'assert_tech_uses_technology_icon("recipe-prod-research_rocket_fuel-1", "rocket-fuel")' },
+    @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'assert_tech_uses_technology_icon("recipe-prod-research_steel-1", "steel-processing")' },
     @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'effect_type == "laboratory-productivity"' },
     @{ File = "fixtures\assert-fluid-productivity\data-final-fixes.lua"; Text = $fluidProductivityFixtureText; Snippet = 'recipe-prod-research_oil_processing_productivity-1' },
     @{ File = "fixtures\assert-fluid-productivity\data-final-fixes.lua"; Text = $fluidProductivityFixtureText; Snippet = 'recipe-prod-research_thruster_fuel_productivity-1' },
@@ -2546,7 +2549,8 @@ function Initialize-RuntimeScenario {
     "research_processing_unit",
     "research_plastic",
     "research_low_density_structure",
-    "research_rocket_fuel"
+    "research_rocket_fuel",
+    "research_steel"
   )
   foreach ($key in $nativeOwnerStreamKeys) {
     switch ($NativeOwnerSettingsProfile) {
@@ -3033,7 +3037,8 @@ $spaceAgeVanillaOwnedProductivityStreams = @(
   "research_low_density_structure",
   "research_plastic",
   "research_processing_unit",
-  "research_rocket_fuel"
+  "research_rocket_fuel",
+  "research_steel"
 )
 
 function Assert-DefaultBaseExtensionDiagnostics {
@@ -3080,7 +3085,8 @@ function Assert-BaseCoreProductivityStreamsGenerated {
     "research_processing_unit",
     "research_low_density_structure",
     "research_plastic",
-    "research_rocket_fuel"
+    "research_rocket_fuel",
+    "research_steel"
   )) {
     $line = Get-LastStreamReportLine -Key $stream
     Assert-ReportLineGenerated -Line $line -Context "$Context stream $stream"
@@ -4305,7 +4311,8 @@ $adoptedFamilyExpectations = @{
   research_rocket_fuel = "owners=rocket-fuel-productivity";
   research_low_density_structure = "owners=low-density-structure-productivity";
   research_plastic = "owners=plastic-bar-productivity";
-  research_processing_unit = "owners=processing-unit-productivity"
+  research_processing_unit = "owners=processing-unit-productivity";
+  research_steel = "owners=steel-plate-productivity"
 }
 foreach ($entry in $adoptedFamilyExpectations.GetEnumerator()) {
   $line = Get-LastStreamReportLine -Key $entry.Key
@@ -4321,6 +4328,7 @@ Invoke-RuntimeConfigurationChangeScenario -ScenarioName "space-age-vanilla-famil
   -EnableSpaceAge
 Assert-LogContains -Expected "Preserved technology effects without a force-wide reset for productivity family adoption signature change" -Context "Space Age vanilla family adoption configuration-change preservation scenario"
 Assert-LogContains -Expected "schema=2|stream=research_rocket_fuel|owner=rocket-fuel-productivity|operation=adopt_native_owner_effects|configured=|effects=1|output=" -Context "Space Age vanilla family adoption configuration-change signature scenario"
+Assert-LogContains -Expected "schema=2|stream=research_steel|owner=steel-plate-productivity|operation=adopt_native_owner_effects|configured=|effects=1|output=" -Context "Space Age steel family adoption configuration-change signature scenario"
 
 Invoke-RuntimeScenario -ScenarioName "space-age-vanilla-family-owner-prepatched" -EnabledFixtureNames @(
   "mir-fixture-vanilla-family-owner-prepatched",
@@ -4387,6 +4395,7 @@ if ($StartAtScenario -ne "space-age-vanilla-family-mixed-owner") {
   Assert-LogContains -Expected "[mir-fixture] native-owner force-state preservation proof complete" -Context "space-age-native-owner-settings-config-change"
   Assert-LogContains -Expected "[mir-fixture] native-owner progress configuration-change proof complete" -Context "space-age-native-owner-settings-config-change"
   Assert-LogContains -Expected "schema=2|stream=research_rocket_fuel|owner=rocket-fuel-productivity|operation=configure_native_owner|configured=cost_model,effect_per_level,max_level,research_time|effects=0|output=" -Context "space-age-native-owner-settings-config-change"
+  Assert-LogContains -Expected "schema=2|stream=research_steel|owner=steel-plate-productivity|operation=configure_native_owner|configured=cost_model,effect_per_level,max_level,research_time|effects=0|output=" -Context "space-age-native-owner-settings-config-change"
 }
 
 Invoke-RuntimeScenario -ScenarioName "space-age-vanilla-family-mixed-owner" -EnabledFixtureNames @(

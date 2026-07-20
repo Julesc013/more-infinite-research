@@ -87,6 +87,7 @@ local governed_stream_keys = {
   "research_rockets",
   "research_science_pack_productivity",
   "research_spoilage_preservation",
+  "research_steel",
   "research_sulfur",
   "research_sulfuric_acid_productivity",
   "research_supercapacitor",

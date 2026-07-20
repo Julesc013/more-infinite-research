@@ -20,7 +20,8 @@ Version: 3.2.0
     - Retained the portable target-capability guard that emits mod-data only on Factorio lines that support it.
     - Preserved stable settings, generated technology IDs, migrations, and runtime-state namespaces from MIR 3.1.9.
     - Kept additional automatic recipe-family generation disabled by default.
-    - Preserved the normalized MIR 3.1.9 technology surface while moving design and lifecycle handling behind common contracts.
+    - Added steel plate productivity: base games receive one MIR chain, while Space Age keeps and extends its native owner.
+    - Preserved every MIR 3.1.9 technology while moving design and lifecycle handling behind common contracts.
 
   Bugfixes:
 

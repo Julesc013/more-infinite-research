@@ -717,6 +717,13 @@ if techs["recipe-prod-research_processing_unit-1"] then
     assert_tech_uses_technology_icon("recipe-prod-research_processing_unit-1", "processing-unit")
   end
 end
+if techs["recipe-prod-research_steel-1"] then
+  if use_installed_space_age_icons then
+    assert_tech_uses_icon_path("recipe-prod-research_steel-1", "__space-age__/graphics/technology/steel-plate-productivity.png")
+  else
+    assert_tech_uses_technology_icon("recipe-prod-research_steel-1", "steel-processing")
+  end
+end
 if techs["research-productivity"] then
   assert_tech_uses_technology_icon("recipe-prod-research_science_pack_productivity-1", "research-productivity")
 elseif use_installed_space_age_icons then
@@ -810,7 +817,8 @@ if is_space_age then
     "recipe-prod-research_processing_unit-1",
     "recipe-prod-research_low_density_structure-1",
     "recipe-prod-research_plastic-1",
-    "recipe-prod-research_rocket_fuel-1"
+    "recipe-prod-research_rocket_fuel-1",
+    "recipe-prod-research_steel-1"
   }) do
     if techs[tech_name] then
       fail("Space Age should not create parallel MIR productivity technology " .. tech_name .. ".")
@@ -825,7 +833,9 @@ if is_space_age then
     { recipe = "bioplastic", owner = "plastic-bar-productivity" },
     { recipe = "rocket-fuel", owner = "rocket-fuel-productivity" },
     { recipe = "rocket-fuel-from-jelly", owner = "rocket-fuel-productivity" },
-    { recipe = "ammonia-rocket-fuel", owner = "rocket-fuel-productivity" }
+    { recipe = "ammonia-rocket-fuel", owner = "rocket-fuel-productivity" },
+    { recipe = "steel-plate", owner = "steel-plate-productivity" },
+    { recipe = "casting-steel", owner = "steel-plate-productivity" }
   }) do
     assert_recipe_owner(expectation.recipe, expectation.owner)
   end
@@ -834,7 +844,8 @@ else
     { recipe = "processing-unit", owner = "recipe-prod-research_processing_unit-1" },
     { recipe = "low-density-structure", owner = "recipe-prod-research_low_density_structure-1" },
     { recipe = "plastic-bar", owner = "recipe-prod-research_plastic-1" },
-    { recipe = "rocket-fuel", owner = "recipe-prod-research_rocket_fuel-1" }
+    { recipe = "rocket-fuel", owner = "recipe-prod-research_rocket_fuel-1" },
+    { recipe = "steel-plate", owner = "recipe-prod-research_steel-1" }
   }) do
     assert_recipe_owner(expectation.recipe, expectation.owner)
   end

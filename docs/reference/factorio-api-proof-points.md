@@ -5,13 +5,13 @@ applies_to: "3.0.0+"
 audience: developer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-07-17
+last_reviewed: 2026-07-20
 supersedes: []
 superseded_by: []
 ---
 # API Proof Points
 
-Updated: 2026-07-17
+Updated: 2026-07-20
 
 This ledger records API claims that affect release planning. Use it to avoid turning Reddit ideas or memory into implementation assumptions.
 
@@ -40,6 +40,7 @@ Latest official API docs checked on 2026-07-06: `2.1.9`. Local runtime validatio
 | Vanilla Space Age has infinite `low-density-structure-productivity` | Local Factorio `2.1.8` Space Age prototypes | Verified | MIR skips covered LDS recipes in Space Age |
 | Vanilla Space Age has infinite `plastic-bar-productivity` | Local Factorio `2.1.8` Space Age prototypes | Verified | MIR skips covered plastic recipes in Space Age |
 | Vanilla Space Age has infinite `rocket-fuel-productivity` | Local Factorio `2.1.8` Space Age prototypes | Verified | MIR skips covered rocket fuel recipes in Space Age |
+| Vanilla Space Age has infinite `steel-plate-productivity` covering `steel-plate` and `casting-steel` | Local Factorio `2.1.10` Space Age prototypes | Verified | MIR binds the steel stream to the native owner and does not generate a parallel technology |
 | `NothingModifier` can display custom scripted effects in technology UI | Factorio `NothingModifier` docs | Verified | Scripted technologies should use visible `nothing` effects |
 | JSON migrations can rename technology prototypes before Lua migrations run | Factorio migrations and data lifecycle docs | Verified | Removed generated technology IDs need explicit migration coverage |
 | `DifficultySettings.spoil_time_modifier` is writable and bounded | Factorio `DifficultySettings` docs | Verified | Spoilage preservation can be global, bounded, and event-driven |

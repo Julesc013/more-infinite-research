@@ -1113,6 +1113,25 @@ streams:
         fixtures:
           - fixtures/assert-generation-integrity
 
+    recipe-prod-research_steel-1:
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_steel-1
+      introduced_in: "3.2.0"
+      source: stream_table:productivity
+      capability: recipe-productivity
+      family: steel
+      policy: native-owner-binding-or-generated-stream
+      identity_state: stable-unreleased
+      generated_technology: recipe-prod-research_steel-1
+      stream_key: research_steel
+      migration_policy: stable
+      targets:
+        - stream:research_steel
+      evidence:
+        fixtures:
+          - fixtures/assert-generation-integrity
+          - fixtures/assert-native-owner-settings
+          - fixtures/assert-vanilla-family-adoption
+
     recipe-prod-research_sulfur-1:
       canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_sulfur-1
       introduced_in: "pre-2.2.0"

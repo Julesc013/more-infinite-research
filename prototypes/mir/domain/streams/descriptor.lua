@@ -68,6 +68,7 @@ local settings_sort_names = {
   research_rockets = "Rocket productivity",
   research_science_pack_productivity = "Science pack productivity",
   research_spoilage_preservation = "Spoilage preservation",
+  research_steel = "Steel plate productivity",
   research_sulfur = "Sulfur productivity",
   research_sulfuric_acid_productivity = "Sulfuric acid productivity",
   research_supercapacitor = "Supercapacitor productivity",

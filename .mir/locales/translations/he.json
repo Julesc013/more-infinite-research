@@ -155,6 +155,12 @@
       "provenance": "machine-assisted"
     },
     {
+      "key": "technology-name.more-infinite-research.research_steel",
+      "source_sha256": "6DC96AF07713E679BA4799525BE809A6868A04A65348B730E002088E5788CCFE",
+      "translation": "הדלפ חול תויביטקודורפ",
+      "provenance": "maintainer-override"
+    },
+    {
       "key": "technology-name.more-infinite-research.research_engine",
       "source_sha256": "CE5616ADE6D3416DEAF3A9D7107F43F1C831F3B8507F4C2693D0E5DDB90465D2",
       "translation": "פרודוקטיביות יחידת המנוע",

@@ -37,6 +37,11 @@ local streams = {
     key = "research_rocket_fuel",
     owner = "rocket-fuel-productivity",
     product = "rocket-fuel"
+  },
+  {
+    key = "research_steel",
+    owner = "steel-plate-productivity",
+    product = "steel-plate"
   }
 }
 

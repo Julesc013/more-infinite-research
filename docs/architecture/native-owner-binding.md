@@ -5,7 +5,7 @@ applies_to: "3.1.9+"
 audience: maintainer
 doc_type: explanation
 owner: mir-maintainers
-last_reviewed: 2026-07-14
+last_reviewed: 2026-07-20
 supersedes: []
 superseded_by: []
 ---
@@ -18,7 +18,7 @@ A stream with a recognized infinite technology owned by Factorio or another mod 
 
 `prototypes/streams/productivity.lua` may declare a `native_owner_binding` with one owner technology, an effect-product scope, eligibility requirements, recognized cost formulas, default preservation, and fallback policy. The declaration is data only. Compatibility overlays cannot configure or mutate the owner.
 
-The initial Factorio 2.1 bindings are processing units to `processing-unit-productivity`, plastic to `plastic-bar-productivity`, low-density structures to `low-density-structure-productivity`, and rocket fuel to `rocket-fuel-productivity`. Their reviewed source values and source-file digest live in `.mir/native-owner-cost-models.json`.
+The Factorio 2.1 bindings are processing units to `processing-unit-productivity`, plastic to `plastic-bar-productivity`, low-density structures to `low-density-structure-productivity`, rocket fuel to `rocket-fuel-productivity`, and steel plate to `steel-plate-productivity`. Their reviewed source values and source-file digest live in `.mir/native-owner-cost-models.json`.
 
 ## Planning
 

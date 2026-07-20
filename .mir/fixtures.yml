@@ -132,6 +132,12 @@ golden_plans:
     release: "3.1.0"
     expected_count: 2
     validator: scripts/Test-MIRGoldenPlans.ps1
+  release_3_2_technology_ids:
+    path: fixtures/golden-plans/3.2.0-technology-ids.json
+    release: "3.2.0"
+    identity_state: stable-unreleased
+    expected_count: 1
+    validator: scripts/Test-MIRGoldenPlans.ps1
 
 fixture_roots:
   synthetic: fixtures
