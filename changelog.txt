@@ -9,6 +9,7 @@ Date: 2026-07-20
     - Removed dangling unlock-quality and turret-attack effects and invalid optional give-item quality targets.
     - Distinguished give-item effects for the same item at different quality levels.
     - Prevented Space Exploration's removed Krastorio copper-cable recipe from remaining in technology effects.
+    - Kept copper, iron, and steel productivity from claiming scrap-input recovery recipes.
 
   Changes:
 

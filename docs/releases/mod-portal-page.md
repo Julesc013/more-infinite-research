@@ -78,9 +78,9 @@ Technologies are generated only when their recipes, items, technologies, ammo ca
 
 | Technology | Effect per level | Default | Unique notes |
 | --- | --- | --- | --- |
-| Copper plate productivity | `+10%` productivity for copper plate recipes | On | Skips hidden and recycling recipes. |
-| Iron plate productivity | `+10%` productivity for iron plate recipes | On | Skips hidden and recycling recipes. |
-| Steel productivity | `+10%` productivity for steel plate recipes | On, native-owned in Space Age | Covers standard steel outputs. Space Age's vanilla technology owns `steel-plate` and `casting-steel`. |
+| Copper plate productivity | `+10%` productivity for copper plate recipes | On | Skips hidden, recycling, and scrap-input recovery recipes. |
+| Iron plate productivity | `+10%` productivity for iron plate recipes | On | Skips hidden, recycling, and scrap-input recovery recipes. |
+| Steel productivity | `+10%` productivity for steel plate recipes | On, native-owned in Space Age | Skips scrap-input recovery recipes. Space Age's vanilla technology owns `steel-plate` and `casting-steel`. |
 | Iron gear wheel productivity | `+10%` productivity for iron gear wheel recipes | On | Avoids scrap-input recipes. |
 | Iron stick productivity | `+10%` productivity for iron stick recipes | On | Avoids scrap-input recipes. |
 | Copper cable productivity | `+10%` productivity for copper cable recipes | On | Avoids scrap-input recipes. |
