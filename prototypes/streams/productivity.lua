@@ -51,8 +51,16 @@ local native_owner_settings_note = {
 }
 
 return {
-  research_copper = { items={"copper-plate"}, icon_item="copper-plate" },
-  research_iron   = { items={"iron-plate"}, icon_item="iron-plate" },
+  research_copper = {
+    items={"copper-plate"},
+    icon_item="copper-plate",
+    exclude_ingredient_patterns={"scrap"}
+  },
+  research_iron = {
+    items={"iron-plate"},
+    icon_item="iron-plate",
+    exclude_ingredient_patterns={"scrap"}
+  },
   research_steel = {
     items={"steel-plate"},
     icon_candidates={

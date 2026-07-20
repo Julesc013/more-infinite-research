@@ -65,6 +65,13 @@ for _, expectation in ipairs({
 end
 
 assert_recipe_has_no_infinite_owner("mir-fixture-no-productivity-rocket-fuel")
+for _, recipe_name in ipairs({
+  "mir-fixture-scrap-copper-plate-recovery",
+  "mir-fixture-scrap-iron-plate-recovery",
+  "mir-fixture-scrap-steel-plate-recovery"
+}) do
+  assert_recipe_has_no_infinite_owner(recipe_name)
+end
 
 for _, tech_name in ipairs({
   "recipe-prod-research_rocket_fuel-1",

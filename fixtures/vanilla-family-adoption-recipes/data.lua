@@ -90,5 +90,50 @@ data:extend({
     main_product = "rocket-fuel",
     allow_productivity = false,
     auto_recycle = false
+  },
+  {
+    type = "recipe",
+    name = "mir-fixture-scrap-copper-plate-recovery",
+    categories = {"crafting"},
+    enabled = false,
+    ingredients = {
+      {type = "item", name = "scrap", amount = 1}
+    },
+    results = {
+      {type = "item", name = "copper-plate", amount = 1}
+    },
+    main_product = "copper-plate",
+    allow_productivity = true,
+    auto_recycle = false
+  },
+  {
+    type = "recipe",
+    name = "mir-fixture-scrap-iron-plate-recovery",
+    categories = {"crafting"},
+    enabled = false,
+    ingredients = {
+      {type = "item", name = "scrap", amount = 1}
+    },
+    results = {
+      {type = "item", name = "iron-plate", amount = 1}
+    },
+    main_product = "iron-plate",
+    allow_productivity = true,
+    auto_recycle = false
+  },
+  {
+    type = "recipe",
+    name = "mir-fixture-scrap-steel-plate-recovery",
+    categories = {"crafting"},
+    enabled = false,
+    ingredients = {
+      {type = "item", name = "scrap", amount = 1}
+    },
+    results = {
+      {type = "item", name = "steel-plate", amount = 1}
+    },
+    main_product = "steel-plate",
+    allow_productivity = true,
+    auto_recycle = false
   }
 })
