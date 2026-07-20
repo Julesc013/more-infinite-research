@@ -691,6 +691,10 @@ for tech_name, tech in pairs(techs) do
     local owner_recipes = {}
     for _, effect in ipairs(tech.effects or {}) do
       if effect.type == "change-recipe-productivity" and effect.recipe then
+        if owner_recipes[effect.recipe] then
+          fail("infinite productivity owner " .. tech_name
+            .. " contains duplicate effects for recipe " .. effect.recipe .. ".")
+        end
         owner_recipes[effect.recipe] = true
       end
     end
@@ -783,6 +787,62 @@ local function assert_recipe_owner(recipe_name, expected_owner)
   end
 end
 
+local function assert_required_recipe_owner(recipe_name, expected_owner, expected_change)
+  if not recipes[recipe_name] then
+    fail("missing required vanilla recipe " .. recipe_name .. ".")
+  end
+  assert_recipe_owner(recipe_name, expected_owner)
+  if expected_change ~= nil then
+    local actual = recipe_productivity_change(techs[expected_owner], recipe_name)
+    if type(actual) ~= "number" or math.abs(actual - expected_change) > 0.000001 then
+      fail("recipe " .. recipe_name .. " owner " .. expected_owner .. " has change "
+        .. tostring(actual) .. ", expected " .. tostring(expected_change) .. ".")
+    end
+  end
+end
+
+local function assert_exact_owner_recipe_set(owner_name, expected_recipes, expected_change)
+  local owner = techs[owner_name]
+  if not owner or owner.max_level ~= "infinite" or owner.upgrade ~= true then
+    fail("missing governed infinite vanilla productivity owner " .. owner_name .. ".")
+  end
+
+  local expected = {}
+  for _, recipe_name in ipairs(expected_recipes) do expected[recipe_name] = true end
+  local actual = {}
+  local actual_count = 0
+  for _, effect in ipairs(owner.effects or {}) do
+    if effect.type == "change-recipe-productivity" and effect.recipe then
+      actual_count = actual_count + 1
+      if actual[effect.recipe] then
+        fail("vanilla productivity owner " .. owner_name
+          .. " contains duplicate effects for " .. effect.recipe .. ".")
+      end
+      actual[effect.recipe] = true
+      if type(effect.change) ~= "number" or math.abs(effect.change - expected_change) > 0.000001 then
+        fail("vanilla productivity owner " .. owner_name .. " effect for " .. effect.recipe
+          .. " has change " .. tostring(effect.change) .. ", expected " .. tostring(expected_change) .. ".")
+      end
+    end
+  end
+
+  if actual_count ~= #expected_recipes then
+    fail("vanilla productivity owner " .. owner_name .. " has " .. tostring(actual_count)
+      .. " recipe effects, expected " .. tostring(#expected_recipes) .. ".")
+  end
+  for _, recipe_name in ipairs(expected_recipes) do
+    if not actual[recipe_name] then
+      fail("vanilla productivity owner " .. owner_name .. " is missing recipe " .. recipe_name .. ".")
+    end
+    assert_required_recipe_owner(recipe_name, owner_name, expected_change)
+  end
+  for recipe_name in pairs(actual) do
+    if not expected[recipe_name] then
+      fail("vanilla productivity owner " .. owner_name .. " has unexpected recipe " .. recipe_name .. ".")
+    end
+  end
+end
+
 for _, expectation in ipairs({
   { recipe = "electronic-circuit", owner = "recipe-prod-research_electronic_circuit-1" },
   { recipe = "advanced-circuit", owner = "recipe-prod-research_advanced_circuit-1" },
@@ -791,6 +851,15 @@ for _, expectation in ipairs({
   { recipe = "rail-ramp", owner = "recipe-prod-research_rails-1" }
 }) do
   assert_recipe_owner(expectation.recipe, expectation.owner)
+end
+
+for _, expectation in ipairs({
+  { recipe = "copper-plate", owner = "recipe-prod-research_copper-1" },
+  { recipe = "iron-plate", owner = "recipe-prod-research_iron-1" },
+  { recipe = "copper-cable", owner = "recipe-prod-research_copper_cable-1" },
+  { recipe = "sulfur", owner = "recipe-prod-research_sulfur-1" }
+}) do
+  assert_required_recipe_owner(expectation.recipe, expectation.owner, 0.1)
 end
 
 if is_space_age then
@@ -838,6 +907,44 @@ if is_space_age then
     { recipe = "casting-steel", owner = "steel-plate-productivity" }
   }) do
     assert_recipe_owner(expectation.recipe, expectation.owner)
+  end
+
+  for _, expectation in ipairs({
+    { recipe = "casting-copper", owner = "recipe-prod-research_copper-1" },
+    { recipe = "casting-iron", owner = "recipe-prod-research_iron-1" },
+    { recipe = "casting-copper-cable", owner = "recipe-prod-research_copper_cable-1" },
+    { recipe = "biosulfur", owner = "recipe-prod-research_sulfur-1" },
+    { recipe = "tungsten-carbide", owner = "recipe-prod-research_tungsten-1" },
+    { recipe = "tungsten-plate", owner = "recipe-prod-research_tungsten-1" }
+  }) do
+    assert_required_recipe_owner(expectation.recipe, expectation.owner, 0.1)
+  end
+
+  for owner_name, expected_recipes in pairs({
+    ["asteroid-productivity"] = {
+      "carbonic-asteroid-crushing",
+      "oxide-asteroid-crushing",
+      "metallic-asteroid-crushing",
+      "advanced-carbonic-asteroid-crushing",
+      "advanced-oxide-asteroid-crushing",
+      "advanced-metallic-asteroid-crushing"
+    },
+    ["processing-unit-productivity"] = {"processing-unit"},
+    ["scrap-recycling-productivity"] = {"scrap-recycling"},
+    ["steel-plate-productivity"] = {"steel-plate", "casting-steel"},
+    ["low-density-structure-productivity"] = {
+      "low-density-structure",
+      "casting-low-density-structure"
+    },
+    ["plastic-bar-productivity"] = {"plastic-bar", "bioplastic"},
+    ["rocket-fuel-productivity"] = {
+      "rocket-fuel",
+      "rocket-fuel-from-jelly",
+      "ammonia-rocket-fuel"
+    },
+    ["rocket-part-productivity"] = {"rocket-part"}
+  }) do
+    assert_exact_owner_recipe_set(owner_name, expected_recipes, 0.1)
   end
 else
   for _, expectation in ipairs({

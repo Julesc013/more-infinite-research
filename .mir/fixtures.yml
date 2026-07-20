@@ -413,7 +413,7 @@ fixtures:
       - fixtures/native-owner-unrecognized-formula
       - fixtures/assert-native-owner-progress
     validates:
-      - all-four-native-owner-setting-groups-visible
+      - all-five-native-owner-setting-groups-visible
       - unchanged-defaults-preserve-final-owner-snapshots
       - enable-false-leaves-external-owners-untouched
       - base-cost-override
@@ -429,6 +429,7 @@ fixtures:
       - plastic-bar-native-owner
       - low-density-structure-native-owner
       - rocket-fuel-native-owner
+      - steel-plate-native-owner
       - fully-covered-owner-still-produces-binding-row
       - target-native-formula-classification
       - unrecognized-modded-formula-default-preservation
@@ -441,6 +442,25 @@ fixtures:
       - configuration-change-current-research-progress-retention
       - paired-base-growth-setting-semantics
       - settings-profile-compatible-stable-ids
+
+  vanilla-recipe-productivity-ownership:
+    requires_features: [recipe_productivity]
+    assertion_path: fixtures/assert-generation-integrity
+    supplemental_paths:
+      - fixtures/vanilla-family-adoption-recipes
+      - fixtures/assert-vanilla-family-adoption
+      - fixtures/vanilla-family-exact-owner
+      - fixtures/assert-vanilla-family-exact-owner
+    validates:
+      - exact-base-material-recipe-owners
+      - exact-space-age-native-recipe-owner-catalog
+      - all-eight-space-age-native-recipe-productivity-owners
+      - exact-space-age-material-recipe-owners
+      - no-cross-technology-duplicate-recipe-productivity-owners
+      - no-within-technology-duplicate-recipe-productivity-effects
+      - scrap-recovery-exclusion-for-copper-iron-and-steel
+      - modded-steel-native-owner-adoption
+      - external-steel-owner-conflict-preservation
 
   competing-base-extension-transaction:
     requires_features: []

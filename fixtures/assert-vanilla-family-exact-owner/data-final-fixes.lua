@@ -25,3 +25,16 @@ end
 if techs["recipe-prod-research_rocket_fuel-1"] then
   fail("exact-owned family recipe should not leave a residual MIR rocket fuel productivity technology.")
 end
+
+local steel_recipe_name = "mir-fixture-exact-owned-steel-plate"
+if not has_recipe_productivity_effect(techs["mir-fixture-exact-owned-steel-productivity"], steel_recipe_name) then
+  fail("expected fixture exact owner to keep " .. steel_recipe_name .. ".")
+end
+
+if has_recipe_productivity_effect(techs["steel-plate-productivity"], steel_recipe_name) then
+  fail("vanilla steel-plate-productivity should not adopt an exact-owned fixture recipe.")
+end
+
+if techs["recipe-prod-research_steel-1"] then
+  fail("exact-owned family recipe should not leave a residual MIR steel productivity technology.")
+end
