@@ -229,6 +229,18 @@ targets:
       diagnostic_only:
         - broad-aai-suite-support
 
+load_order_requirements:
+  - id: space-exploration-finalized-recipe-set
+    mod: space-exploration
+    dependency: "(?) space-exploration"
+    reason: Space Exploration removes recipes during data-final-fixes, so MIR must compile after those removals
+    fixture: fixtures/space-exploration-recipe-removal
+    assertion_fixture: fixtures/assert-final-recipe-effect-integrity
+    reproduced_recipe: kr-copper-cable-from-copper-ore
+    integrity_contract: target-aware-generated-and-external-technology-effect-sanitation
+    claim_level: diagnostic-only
+    public_scope: startup integrity only; no broad Space Exploration support claim
+
 rules:
   - every public compatibility claim has a compatibility page
   - every generated stream in a claim exists in the stream manifest

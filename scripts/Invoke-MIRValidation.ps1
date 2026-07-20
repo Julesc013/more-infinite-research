@@ -551,7 +551,7 @@ Invoke-RepoCheck "fixture mods have metadata and data entrypoints" {
     }
 
     $info = Get-Content -Raw -LiteralPath $infoPath | ConvertFrom-Json
-    $allowedExternalIdentityFixtures = @("Better_Robots_Extended")
+    $allowedExternalIdentityFixtures = @("Better_Robots_Extended", "space-exploration")
     if ([string]::IsNullOrWhiteSpace($info.name) -or
       ($info.name -notmatch "^mir-fixture-" -and $info.name -notin $allowedExternalIdentityFixtures)) {
       throw "Fixture info.json must declare a mir-fixture-* name: $infoPath"
@@ -650,6 +650,8 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
   $generatedPrerequisiteRuntimeText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-generated-prerequisite-safety\control.lua")
   $lateRecipeRemovalFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\rigor-late-recipe-removal\data-final-fixes.lua")
   $lateRecipeRemovalDataText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\rigor-late-recipe-removal\data.lua")
+  $spaceExplorationRemovalFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\space-exploration-recipe-removal\data-final-fixes.lua")
+  $finalRecipeEffectFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-final-recipe-effect-integrity\data-final-fixes.lua")
   $fluidProductivityFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-fluid-productivity\data-final-fixes.lua")
   $pipelineExtentFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-pipeline-extent\data-final-fixes.lua")
   $betterBotBatteryFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-better-bot-battery-skip\data-final-fixes.lua")
@@ -742,6 +744,7 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'icon_candidates={' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'inactive_mod_asset="space-age"' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = '__space-age__/graphics/technology/processing-unit-productivity.png' },
+    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = '__space-age__/graphics/technology/steel-plate-productivity.png' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = '__space-age__/graphics/technology/low-density-structure-productivity.png' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = '__space-age__/graphics/technology/plastics-productivity.png' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = '__space-age__/graphics/technology/rocket-fuel-productivity.png' },
@@ -749,6 +752,7 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = '{technology="research-productivity", required_mod="space-age"}' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = '{technology="space-science-pack"}' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = '{technology="processing-unit"}' },
+    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'native_owner_binding("steel-plate-productivity", {"steel-plate"})' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'research_rocket_fuel = {' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'research_thruster_fuel_productivity = {' },
     @{ File = "prototypes\streams\productivity.lua"; Text = $productivityText; Snippet = 'research_thruster_oxidizer_productivity = {' },
@@ -853,6 +857,12 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "fixtures\rigor-late-recipe-removal\data-final-fixes.lua"; Text = $lateRecipeRemovalFixtureText; Snippet = 'microculture-vat-breeding' },
     @{ File = "fixtures\rigor-late-recipe-removal\data-final-fixes.lua"; Text = $lateRecipeRemovalFixtureText; Snippet = 'example-culture-incinerate' },
     @{ File = "fixtures\rigor-late-recipe-removal\data.lua"; Text = $lateRecipeRemovalDataText; Snippet = 'mir-fixture-normal-crafting' },
+    @{ File = "fixtures\space-exploration-recipe-removal\data-final-fixes.lua"; Text = $spaceExplorationRemovalFixtureText; Snippet = 'kr-copper-cable-from-copper-ore' },
+    @{ File = "fixtures\space-exploration-recipe-removal\data-final-fixes.lua"; Text = $spaceExplorationRemovalFixtureText; Snippet = 'MIR loaded before Space Exploration finalized its recipe removals' },
+    @{ File = "fixtures\assert-final-recipe-effect-integrity\data-final-fixes.lua"; Text = $finalRecipeEffectFixtureText; Snippet = 'references missing recipe' },
+    @{ File = "fixtures\assert-final-recipe-effect-integrity\data-final-fixes.lua"; Text = $finalRecipeEffectFixtureText; Snippet = 'valid base copper cable productivity was not retained' },
+    @{ File = "prototypes\streams\productivity.lua"; Text = $productivityStreamsText; Snippet = 'native_owner_binding("steel-plate-productivity", {"steel-plate"})' },
+    @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = '{ recipe = "casting-steel", owner = "steel-plate-productivity" }' },
     @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'mir-use-installed-space-age-icons' },
     @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'assert_tech_uses_icon_path("recipe-prod-research_electric_shooting_speed-1", "__space-age__/graphics/technology/electric-weapons-damage.png")' },
     @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'assert_tech_uses_item_icon("recipe-prod-research_heavy_ammo-1", "cannon-shell")' },
@@ -860,6 +870,7 @@ Invoke-RepoCheck "science-pack progression settings are wired" {
     @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'assert_tech_uses_technology_icon("recipe-prod-research_walls-1", "gate")' },
     @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'assert_tech_uses_technology_icon("recipe-prod-research_lab_productivity-1", "military-science-pack")' },
     @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'assert_tech_uses_technology_icon("recipe-prod-research_rocket_fuel-1", "rocket-fuel")' },
+    @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'assert_tech_uses_technology_icon("recipe-prod-research_steel-1", "steel-processing")' },
     @{ File = "fixtures\assert-generation-integrity\data-final-fixes.lua"; Text = $generationIntegrityFixtureText; Snippet = 'effect_type == "laboratory-productivity"' },
     @{ File = "fixtures\assert-fluid-productivity\data-final-fixes.lua"; Text = $fluidProductivityFixtureText; Snippet = 'recipe-prod-research_oil_processing_productivity-1' },
     @{ File = "fixtures\assert-fluid-productivity\data-final-fixes.lua"; Text = $fluidProductivityFixtureText; Snippet = 'recipe-prod-research_thruster_fuel_productivity-1' },
@@ -2317,6 +2328,7 @@ $postMirAssertionFixtures = @(
   "mir-fixture-assert-synthetic-scale-graph",
   "mir-fixture-assert-generation-integrity",
   "mir-fixture-assert-generated-prerequisite-safety",
+  "mir-fixture-assert-final-recipe-effect-integrity",
   "mir-fixture-external-technology-cycle",
   "mir-fixture-rigor-late-recipe-removal",
   "mir-fixture-assert-hidden-setting-readability",
@@ -2485,7 +2497,8 @@ function Initialize-RuntimeScenario {
     "research_processing_unit",
     "research_plastic",
     "research_low_density_structure",
-    "research_rocket_fuel"
+    "research_rocket_fuel",
+    "research_steel"
   )
   foreach ($key in $nativeOwnerStreamKeys) {
     switch ($NativeOwnerSettingsProfile) {
@@ -2970,6 +2983,7 @@ $spaceAgeVanillaOwnedProductivityStreams = [ordered]@{
   research_plastic = "plastic-bar-productivity"
   research_processing_unit = "processing-unit-productivity"
   research_rocket_fuel = "rocket-fuel-productivity"
+  research_steel = "steel-plate-productivity"
 }
 
 function Assert-DefaultBaseExtensionDiagnostics {
@@ -3017,7 +3031,8 @@ function Assert-BaseCoreProductivityStreamsGenerated {
     "research_processing_unit",
     "research_low_density_structure",
     "research_plastic",
-    "research_rocket_fuel"
+    "research_rocket_fuel",
+    "research_steel"
   )) {
     $line = Get-LastStreamReportLine -Key $stream
     Assert-ReportLineGenerated -Line $line -Context "$Context stream $stream"
@@ -3626,6 +3641,11 @@ Invoke-RuntimeScenario -ScenarioName "rigor-late-recipe-removal" -EnabledFixture
   "mir-fixture-rigor-late-recipe-removal"
 )
 
+Invoke-RuntimeScenario -ScenarioName "space-exploration-recipe-removal" -EnabledFixtureNames @(
+  "space-exploration",
+  "mir-fixture-assert-final-recipe-effect-integrity"
+)
+
 Invoke-RuntimeScenario -ScenarioName "base-fluid-productivity" -EnabledFixtureNames @(
   "mir-fixture-assert-fluid-productivity"
 )
@@ -4118,7 +4138,8 @@ $adoptedFamilyExpectations = @{
   research_rocket_fuel = "owners=rocket-fuel-productivity";
   research_low_density_structure = "owners=low-density-structure-productivity";
   research_plastic = "owners=plastic-bar-productivity";
-  research_processing_unit = "owners=processing-unit-productivity"
+  research_processing_unit = "owners=processing-unit-productivity";
+  research_steel = "owners=steel-plate-productivity"
 }
 foreach ($entry in $adoptedFamilyExpectations.GetEnumerator()) {
   $line = Get-LastStreamReportLine -Key $entry.Key
@@ -4134,6 +4155,7 @@ Invoke-RuntimeConfigurationChangeScenario -ScenarioName "space-age-vanilla-famil
   -EnableSpaceAge
 Assert-LogContains -Expected "Preserved technology effects without a force-wide reset for productivity family adoption signature change" -Context "Space Age vanilla family adoption configuration-change preservation scenario"
 Assert-LogContains -Expected "schema=2|stream=research_rocket_fuel|owner=rocket-fuel-productivity|operation=adopt_native_owner_effects|configured=|effects=1|output=" -Context "Space Age vanilla family adoption configuration-change signature scenario"
+Assert-LogContains -Expected "schema=2|stream=research_steel|owner=steel-plate-productivity|operation=adopt_native_owner_effects|configured=|effects=1|output=" -Context "Space Age steel family adoption configuration-change signature scenario"
 
 Invoke-RuntimeScenario -ScenarioName "space-age-vanilla-family-owner-prepatched" -EnabledFixtureNames @(
   "mir-fixture-vanilla-family-owner-prepatched",
@@ -4199,6 +4221,7 @@ if ($StartAtScenario -ne "space-age-vanilla-family-mixed-owner") {
   Assert-LogContains -Expected "Preserved current research progress for native owner low-density-structure-productivity" -Context "space-age-native-owner-settings-config-change"
   Assert-LogContains -Expected "[mir-fixture] native-owner progress configuration-change proof complete" -Context "space-age-native-owner-settings-config-change"
   Assert-LogContains -Expected "schema=2|stream=research_rocket_fuel|owner=rocket-fuel-productivity|operation=configure_native_owner|configured=cost_model,effect_per_level,max_level,research_time|effects=0|output=" -Context "space-age-native-owner-settings-config-change"
+  Assert-LogContains -Expected "schema=2|stream=research_steel|owner=steel-plate-productivity|operation=configure_native_owner|configured=cost_model,effect_per_level,max_level,research_time|effects=0|output=" -Context "space-age-native-owner-settings-config-change"
 }
 
 Invoke-RuntimeScenario -ScenarioName "space-age-vanilla-family-mixed-owner" -EnabledFixtureNames @(

@@ -58,7 +58,8 @@ for _, expectation in ipairs({
   { recipe = "mir-fixture-adopt-rocket-fuel", owner = "rocket-fuel-productivity" },
   { recipe = "mir-fixture-adopt-low-density-structure", owner = "low-density-structure-productivity" },
   { recipe = "mir-fixture-adopt-plastic-bar", owner = "plastic-bar-productivity" },
-  { recipe = "mir-fixture-adopt-processing-unit", owner = "processing-unit-productivity" }
+  { recipe = "mir-fixture-adopt-processing-unit", owner = "processing-unit-productivity" },
+  { recipe = "mir-fixture-adopt-steel-plate", owner = "steel-plate-productivity" }
 }) do
   assert_recipe_owner(expectation.recipe, expectation.owner)
 end
@@ -69,7 +70,8 @@ for _, tech_name in ipairs({
   "recipe-prod-research_rocket_fuel-1",
   "recipe-prod-research_low_density_structure-1",
   "recipe-prod-research_plastic-1",
-  "recipe-prod-research_processing_unit-1"
+  "recipe-prod-research_processing_unit-1",
+  "recipe-prod-research_steel-1"
 }) do
   assert_technology_absent(tech_name)
 end
@@ -78,9 +80,9 @@ local adoption_data = data.raw["mod-data"]
   and data.raw["mod-data"]["more-infinite-research-productivity-family-adoption"]
   and data.raw["mod-data"]["more-infinite-research-productivity-family-adoption"].data
 
-if not (adoption_data and adoption_data.version == 2 and adoption_data.binding_count == 4
-    and adoption_data.adopted == true and adoption_data.adopted_count >= 4) then
-  fail("expected adoption mod-data to report at least four adopted recipes.")
+if not (adoption_data and adoption_data.version == 2 and adoption_data.binding_count == 5
+    and adoption_data.adopted == true and adoption_data.adopted_count >= 5) then
+  fail("expected adoption mod-data to report at least five adopted recipes.")
 end
 
 local signature = tostring(adoption_data.signature or "")
@@ -88,7 +90,8 @@ for _, fragment in ipairs({
   "schema=2|stream=research_rocket_fuel|owner=rocket-fuel-productivity|operation=adopt_native_owner_effects|configured=|effects=1|output=",
   "schema=2|stream=research_low_density_structure|owner=low-density-structure-productivity|operation=adopt_native_owner_effects|configured=|effects=1|output=",
   "schema=2|stream=research_plastic|owner=plastic-bar-productivity|operation=adopt_native_owner_effects|configured=|effects=1|output=",
-  "schema=2|stream=research_processing_unit|owner=processing-unit-productivity|operation=adopt_native_owner_effects|configured=|effects=1|output="
+  "schema=2|stream=research_processing_unit|owner=processing-unit-productivity|operation=adopt_native_owner_effects|configured=|effects=1|output=",
+  "schema=2|stream=research_steel|owner=steel-plate-productivity|operation=adopt_native_owner_effects|configured=|effects=1|output="
 }) do
   if not string.find(signature, fragment, 1, true) then
     fail("expected adoption signature to include " .. fragment .. "; got " .. signature)

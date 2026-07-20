@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: modpack-author
 doc_type: explanation
 owner: mir-maintainers
-last_reviewed: 2026-07-10
+last_reviewed: 2026-07-20
 supersedes: []
 superseded_by: []
 ---
@@ -54,7 +54,7 @@ The current maintainer-authorized cadence is tentative but intentional: ship val
 - Recipe matching supports both `recipe.category` and Factorio 2.1 `recipe.categories`, and can match visible item or fluid recipe outputs.
 - Broad breeding discovery excludes incineration suffixes before name matching. Incineration recipes are sinks, even when a longer word contains `culture`.
 - Every MIR-generated recipe-productivity effect must reference an existing recipe when MIR finishes. A dependent late-removal fixture and the Planet Crucible plus Rigor Module exact-archive gate cover the later-mod lifecycle that an internal final pass cannot observe.
-- Recipe-productivity generation skips recipe effects already owned by another infinite recipe-productivity technology. In Space Age this prevents parallel MIR technologies for vanilla `processing-unit-productivity`, `low-density-structure-productivity`, `plastic-bar-productivity`, and `rocket-fuel-productivity`.
+- Recipe-productivity generation skips recipe effects already owned by another infinite recipe-productivity technology. In Space Age this prevents parallel MIR technologies for vanilla `processing-unit-productivity`, `low-density-structure-productivity`, `plastic-bar-productivity`, `rocket-fuel-productivity`, and `steel-plate-productivity`.
 - Recipe-productivity ownership is validated by exact recipe ID, not by similar technology icons. Base-only green, red, and blue circuit recipes are MIR-owned; with Space Age enabled, green and red circuits remain MIR-owned while vanilla `processing-unit-productivity` is the single infinite owner for the `processing-unit` recipe.
 - Fluid-output productivity is split by process family, not by every possible fluid name. Multi-output oil-processing recipes are owned by one oil-processing stream; cracking, lubricant, sulfuric acid and acid neutralization, and thruster propellant streams stay separate because they cover narrower conversion families.
 - The pipeline extent multiplier is a strictly opt-in startup-only prototype setting. At its default `100%` value, MIR does not load the pipeline pass, scan fluid boxes, log pipeline work, or change any fluid box prototypes. Non-`100%` dropdown values scale recognized fluid box fields across prototypes, not only pipe entities, so lower or higher values are experimental for machines, tanks, thrusters, and modded prototypes that define their own fluid boxes.
@@ -375,7 +375,7 @@ Claims must stay precise:
 - A mod that removes a recipe after MIR runs must also avoid or repair dangling third-party technology effects. MIR filters evidenced sink classes and tests known combinations, but it cannot validate mutations that have not happened yet.
 - Lab validation prevents impossible research ingredients, but it cannot infer every overhaul mod's intended progression.
 - Recipe productivity technologies remain bounded by Factorio's recipe productivity cap even when research levels are infinite.
-- Vanilla Space Age productivity technologies remain authoritative for processing units, low density structures, plastic, and rocket fuel. Where those configured families have additional productivity-allowed recipes that are not exactly owned by another infinite technology, MIR adopts them into the existing vanilla infinite productivity technology instead of generating a parallel MIR technology.
+- Vanilla Space Age productivity technologies remain authoritative for processing units, low density structures, plastic, rocket fuel, and steel plate. Where those configured families have additional productivity-allowed recipes that are not exactly owned by another infinite technology, MIR adopts them into the existing vanilla infinite productivity technology instead of generating a parallel MIR technology.
 - The existing-save refresh for configured vanilla productivity-family adoption is keyed by the actual adopted `owner|recipe|change` signature, not only by a fixed feature version. Adding or removing a planet mod that changes the adopted recipe set can therefore trigger one technology-effect reset for the affected save.
 - Module productivity can include Quality modules because the current Factorio `2.1` line uses a hidden optional Quality dependency for load order. The dependency is hidden to avoid presenting Quality as a required or recommended mod-page dependency.
 - Existing prototype IDs are kept stable unless a tested migration is provided. `v2.0.5` provides a JSON migration for the intentional trash-slot-to-inventory technology consolidation and adds control-stage storage under the More Infinite Research namespace.
@@ -521,8 +521,8 @@ Create a local test mod that:
 - Reads every enabled vanilla numbered extension chain and fails loading unless there is exactly one infinite serial continuation after the highest finite level.
 - Confirms disabled vanilla extension chains, such as the default-off `inserter-capacity-bonus`, do not generate until the validation harness force-enables them.
 - Reads every infinite `change-recipe-productivity` effect and fails loading if any recipe has more than one infinite productivity owner.
-- Confirms base-only `processing-unit`, `low-density-structure`, `plastic-bar`, and `rocket-fuel` productivity are owned by the corresponding MIR generated chain.
-- Confirms Space Age `processing-unit-productivity`, `low-density-structure-productivity`, `plastic-bar-productivity`, and `rocket-fuel-productivity` remain the only owners for their covered vanilla recipes.
+- Confirms base-only `processing-unit`, `low-density-structure`, `plastic-bar`, `rocket-fuel`, and `steel-plate` productivity are owned by the corresponding MIR generated chain.
+- Confirms Space Age `processing-unit-productivity`, `low-density-structure-productivity`, `plastic-bar-productivity`, `rocket-fuel-productivity`, and `steel-plate-productivity` remain the only owners for their covered vanilla recipes, including `casting-steel`.
 - Confirms circuit recipes stay split by recipe ID: `electronic-circuit` and `advanced-circuit` are MIR-owned, while `processing-unit` is MIR-owned only without Space Age and vanilla-owned with Space Age.
 
 Expected result: MIR creates one serial chain per intended generated technology, creates zero chains for disabled defaults, extends vanilla numbered chains only once, and never creates a parallel infinite productivity owner for a recipe already owned by vanilla Space Age.

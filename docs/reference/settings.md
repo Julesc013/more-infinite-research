@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: developer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-07-14
+last_reviewed: 2026-07-20
 supersedes: [docs/reference/settings-reference.md]
 superseded_by: []
 ---
@@ -136,7 +136,7 @@ Every generated stream and base continuation also has an `ips-effect-per-level-<
 
 ## Native Owner Bindings
 
-The Factorio 2.0 streams `research_processing_unit`, `research_plastic`, `research_low_density_structure`, and `research_rocket_fuel` bind to `processing-unit-productivity`, `plastic-bar-productivity`, `low-density-structure-productivity`, and `rocket-fuel-productivity`. Generated, adopted, already-covered, and fallback outcomes keep the same six `ips-*` setting IDs.
+The Factorio 2.0 streams `research_processing_unit`, `research_plastic`, `research_low_density_structure`, `research_rocket_fuel`, and `research_steel` bind to `processing-unit-productivity`, `plastic-bar-productivity`, `low-density-structure-productivity`, `rocket-fuel-productivity`, and `steel-plate-productivity`. Generated, adopted, already-covered, and fallback outcomes keep the same six `ips-*` setting IDs.
 
 An unchanged setting group produces `preserve_native_owner` and retains the final owner snapshot exactly; MIR's catalog defaults are not applied over a native or modded balance. `ips-enable-<stream> = false` skips owner planning and performs no external mutation. Explicit non-default cost, growth, time, maximum-level, or effect values produce a configuration plan only for a recognized infinite, reachable owner. Cost base and growth form one visible pair: changing either applies both displayed values, matching generated-stream settings behavior. Effect overrides touch only relevant `change-recipe-productivity` rows and preserve unrelated effects.
 

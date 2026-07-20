@@ -510,6 +510,7 @@ foreach ($runtimeHandler in @(
 
 $fixturesManifestText = Read-MIRFile -RelativePath ".mir/fixtures.yml"
 foreach ($fixtureId in @(
+  "space-exploration-recipe-removal",
   "rigor-late-recipe-removal",
   "generated-prerequisite-safety",
   "settings-visibility",

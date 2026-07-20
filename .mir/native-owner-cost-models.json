@@ -39,6 +39,14 @@
       "native": {"count_formula": "1.5^L*1000", "base": 1000, "growth": 1.5, "research_time": 60, "max_level": "infinite", "effect_per_level": 0.1},
       "mir_catalog_defaults": {"base": 8000, "growth": 2, "research_time": 60, "max_level": 0, "effect_percentage_points": 10},
       "default_policy": "preserve-final-owner-snapshot"
+    },
+    {
+      "stream": "research_steel",
+      "owner": "steel-plate-productivity",
+      "product": "steel-plate",
+      "native": {"count_formula": "1.5^L*1000", "base": 1000, "growth": 1.5, "research_time": 60, "max_level": "infinite", "effect_per_level": 0.1},
+      "mir_catalog_defaults": {"base": 8000, "growth": 2, "research_time": 60, "max_level": 0, "effect_percentage_points": 10},
+      "default_policy": "preserve-final-owner-snapshot"
     }
   ]
 }

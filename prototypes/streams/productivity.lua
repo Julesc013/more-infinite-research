@@ -53,6 +53,17 @@ local native_owner_settings_note = {
 return {
   research_copper = { items={"copper-plate"}, icon_item="copper-plate" },
   research_iron   = { items={"iron-plate"}, icon_item="iron-plate" },
+  research_steel = {
+    items={"steel-plate"},
+    icon_candidates={
+      {icon="__space-age__/graphics/technology/steel-plate-productivity.png", icon_size=256, inactive_mod_asset="space-age"},
+      {technology="steel-processing"},
+      {item="steel-plate"}
+    },
+    native_owner_binding = native_owner_binding("steel-plate-productivity", {"steel-plate"}),
+    settings_note = native_owner_settings_note,
+    exclude_ingredient_patterns={"scrap"}
+  },
   research_gears = { items={"iron-gear-wheel"}, icon_item="iron-gear-wheel", exclude_ingredient_patterns={"scrap"} },
   research_iron_sticks = { items={"iron-stick"}, icon_item="iron-stick", exclude_ingredient_patterns={"scrap"} },
   research_copper_cable = { items={"copper-cable"}, icon_item="copper-cable", exclude_ingredient_patterns={"scrap"} },

@@ -1,0 +1,8 @@
+{
+  "schema": 1,
+  "release": "2.4.9",
+  "source": "prototypes/mir/streams/generated_stream_manifest.json",
+  "technology_ids": [
+    "recipe-prod-research_steel-1"
+  ]
+}

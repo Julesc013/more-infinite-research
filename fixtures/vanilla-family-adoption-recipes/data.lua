@@ -63,6 +63,21 @@ data:extend({
   },
   {
     type = "recipe",
+    name = "mir-fixture-adopt-steel-plate",
+    categories = {"crafting"},
+    enabled = false,
+    ingredients = {
+      {type = "item", name = "iron-plate", amount = 5}
+    },
+    results = {
+      {type = "item", name = "steel-plate", amount = 1}
+    },
+    main_product = "steel-plate",
+    allow_productivity = true,
+    auto_recycle = false
+  },
+  {
+    type = "recipe",
     name = "mir-fixture-no-productivity-rocket-fuel",
     categories = {"crafting"},
     enabled = false,

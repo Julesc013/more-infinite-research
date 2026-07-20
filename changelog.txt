@@ -1,6 +1,6 @@
 ---------------------------------------------------------------------------------------------------
 Version: 2.4.9
-Date: 2026-07-19
+Date: 2026-07-20
 
   Bugfixes:
 
@@ -8,6 +8,7 @@ Date: 2026-07-19
     - Removed an unnecessary global technology-effect reset during configuration changes, preserving unrelated mod state.
     - Removed dangling unlock-quality and turret-attack effects and invalid optional give-item quality targets.
     - Distinguished give-item effects for the same item at different quality levels.
+    - Prevented Space Exploration's removed Krastorio copper-cable recipe from remaining in technology effects.
 
   Changes:
 
@@ -21,6 +22,7 @@ Date: 2026-07-19
     - Recalculated verification fingerprints from the Factorio 2.0 package, binary, dependency contract, test data, and scenarios.
     - Made exact candidate equivalence, paired runtime performance, and package-focused manual review mandatory seal inputs.
     - Preserved stable settings, generated technology IDs, migrations, and runtime-state namespaces from MIR 2.4.5.
+    - Added steel productivity for standard steel-plate recipes and adopted Space Age's native steel productivity owner.
 
 ---------------------------------------------------------------------------------------------------
 Version: 2.4.5

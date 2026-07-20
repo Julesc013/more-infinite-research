@@ -59,8 +59,13 @@ compiler_contract_coverage:
 golden_plans:
   stable_technology_ids:
     path: fixtures/golden-plans/stable-technology-ids.json
-    baseline: immutable-3.1.0
+    baseline: immutable-3.0.5
     expected_count: 70
+    validator: scripts/Test-MIRGoldenPlans.ps1
+  release_2_4_9_technology_ids:
+    path: fixtures/golden-plans/release-2.4.9-technology-ids.json
+    release: "2.4.9"
+    expected_count: 1
     validator: scripts/Test-MIRGoldenPlans.ps1
   automatic_family_technology_ids:
     path: fixtures/golden-plans/automatic-family-technology-ids.json
@@ -84,6 +89,21 @@ real_mod_gates:
     status: required
 
 fixtures:
+  space-exploration-recipe-removal:
+    requires_features: [recipe_productivity]
+    path: fixtures/space-exploration-recipe-removal
+    assertion_path: fixtures/assert-final-recipe-effect-integrity
+    external_mod_identity: space-exploration
+    validates:
+      - space-exploration-final-fixes-runs-before-mir
+      - krastorio-copper-cable-removal-reproduction
+      - removed-recipe-not-emitted-as-productivity-effect
+      - every-final-recipe-productivity-effect-target-exists
+      - valid-base-copper-cable-productivity-retained
+      - final-dangling-effect-pruning-contract
+      - external-dangling-unlock-recipe-effect-pruned
+      - external-valid-unlock-recipe-effect-retained
+
   compiler-contracts:
     requires_features: [recipe_productivity]
     assertion_path: fixtures/assert-compiler-contracts

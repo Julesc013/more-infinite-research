@@ -6,6 +6,7 @@ $ErrorActionPreference = "Stop"
 $manifest = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "prototypes\mir\streams\generated_stream_manifest.json") | ConvertFrom-Json
 $golden = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "fixtures\golden-plans\stable-technology-ids.json") | ConvertFrom-Json
 $automatic = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "fixtures\golden-plans\automatic-family-technology-ids.json") | ConvertFrom-Json
+$release249 = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot "fixtures\golden-plans\release-2.4.9-technology-ids.json") | ConvertFrom-Json
 
 if ($golden.schema -ne 1 -or $golden.baseline -ne "immutable-3.0.5") {
   throw "Stable technology golden plan has an unsupported schema or baseline."
@@ -24,9 +25,16 @@ if ($automatic.schema -ne 1 -or $automatic.release -ne "3.1.0") {
   throw "Automatic family technology golden plan has an unsupported schema or release."
 }
 $automaticIds = @($automatic.technology_ids | ForEach-Object { [string]$_ } | Sort-Object)
-$combined = @($expected + $automaticIds | Sort-Object -Unique)
+if ($release249.schema -ne 1 -or $release249.release -ne "2.4.9") {
+  throw "MIR 2.4.9 technology golden plan has an unsupported schema or release."
+}
+$release249Ids = @($release249.technology_ids | ForEach-Object { [string]$_ } | Sort-Object)
+if ($release249Ids.Count -ne 1) {
+  throw "MIR 2.4.9 technology golden plan must declare exactly one release identity."
+}
+$combined = @($expected + $automaticIds + $release249Ids | Sort-Object -Unique)
 if ($actual.Count -ne $combined.Count -or ($actual -join "`n") -ne ($combined -join "`n")) {
   throw "Generated technology identities differ from the immutable plus predeclared automatic-family golden plans."
 }
 
-Write-Host "[ok] MIR golden plans preserve 70 baseline and $($automaticIds.Count) predeclared 3.1 automatic-family identities."
+Write-Host "[ok] MIR golden plans preserve 70 baseline, $($automaticIds.Count) predeclared 3.1 identities, and one 2.4.9 steel identity."

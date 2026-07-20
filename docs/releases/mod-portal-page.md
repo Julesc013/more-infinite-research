@@ -80,6 +80,7 @@ Technologies are generated only when their recipes, items, technologies, ammo ca
 | --- | --- | --- | --- |
 | Copper plate productivity | `+10%` productivity for copper plate recipes | On | Skips hidden and recycling recipes. |
 | Iron plate productivity | `+10%` productivity for iron plate recipes | On | Skips hidden and recycling recipes. |
+| Steel productivity | `+10%` productivity for steel plate recipes | On, native-owned in Space Age | Covers standard steel outputs. Space Age's vanilla technology owns `steel-plate` and `casting-steel`. |
 | Iron gear wheel productivity | `+10%` productivity for iron gear wheel recipes | On | Avoids scrap-input recipes. |
 | Iron stick productivity | `+10%` productivity for iron stick recipes | On | Avoids scrap-input recipes. |
 | Copper cable productivity | `+10%` productivity for copper cable recipes | On | Avoids scrap-input recipes. |
@@ -205,6 +206,8 @@ This helps it work with:
 - Plates n Circuit Productivity, with replacement limited to exact known infinite technologies that MIR can fully replace with matching recipe productivity values and no other blocking owner.
 
 When this mod is set to prefer its own overlapping research, it only removes known competing infinite technologies that are fully covered by generated More Infinite Research effects. Finite upgrade chains from other mods are left alone. Vanilla Space Age productivity families remain authoritative where safe, so mod-added rocket fuel or low density structure recipes can be appended to the vanilla infinite technology instead of receiving duplicate-looking MIR research.
+
+MIR loads after Space Exploration's finalized recipe removals and validates every final recipe-targeting technology effect. This prevents removed Krastorio recipe names from causing startup failure; it is not a claim of broad Space Exploration support.
 
 Compatibility is broad, but not guaranteed for every overhaul. Mods that change recipes or labs very late in loading may still need load-order compatibility. MIR 3 public claims are deliberately narrow: a page may claim a named recipe family, a diagnostic observation, or coexistence behavior, but not full overhaul support unless that claim is explicitly recorded.
 

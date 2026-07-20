@@ -172,6 +172,13 @@ streams:
     backport:
       keep_setting_ids: true
 
+  research_steel:
+    native_owner_binding: steel-plate-productivity
+    fallback: generate-eligible
+    unchanged_defaults: preserve-owner
+    backport:
+      keep_setting_ids: true
+
   research_air_scrubbing_clean_filter:
     manifest: mir-prod-air-scrubbing-clean-filter
     ui_visibility:

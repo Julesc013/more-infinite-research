@@ -720,7 +720,8 @@ if is_space_age then
     "recipe-prod-research_processing_unit-1",
     "recipe-prod-research_low_density_structure-1",
     "recipe-prod-research_plastic-1",
-    "recipe-prod-research_rocket_fuel-1"
+    "recipe-prod-research_rocket_fuel-1",
+    "recipe-prod-research_steel-1"
   }) do
     if techs[tech_name] then
       fail("Space Age should not create parallel MIR productivity technology " .. tech_name .. ".")
@@ -728,6 +729,8 @@ if is_space_age then
   end
 
   for _, expectation in ipairs({
+    { recipe = "steel-plate", owner = "steel-plate-productivity" },
+    { recipe = "casting-steel", owner = "steel-plate-productivity" },
     { recipe = "processing-unit", owner = "processing-unit-productivity" },
     { recipe = "low-density-structure", owner = "low-density-structure-productivity" },
     { recipe = "casting-low-density-structure", owner = "low-density-structure-productivity" },
@@ -741,6 +744,7 @@ if is_space_age then
   end
 else
   for _, expectation in ipairs({
+    { recipe = "steel-plate", owner = "recipe-prod-research_steel-1" },
     { recipe = "processing-unit", owner = "recipe-prod-research_processing_unit-1" },
     { recipe = "low-density-structure", owner = "recipe-prod-research_low_density_structure-1" },
     { recipe = "plastic-bar", owner = "recipe-prod-research_plastic-1" },

@@ -743,6 +743,22 @@ streams:
         fixtures:
           - fixtures/assert-generation-integrity
 
+    recipe-prod-research_steel-1:
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_steel-1
+      introduced_in: "2.4.9"
+      source: legacy_stream_table:productivity
+      capability: recipe-productivity
+      family: steel
+      policy: legacy.recipe-productivity-stream
+      generated_technology: recipe-prod-research_steel-1
+      stream_key: research_steel
+      migration_policy: stable
+      targets:
+        - stream:research_steel
+      evidence:
+        fixtures:
+          - fixtures/assert-generation-integrity
+
     recipe-prod-research_lab_productivity-1:
       canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_lab_productivity-1
       introduced_in: "pre-2.2.0"

@@ -163,6 +163,7 @@ These streams generate `change-recipe-productivity` effects for matching recipes
 | --- | --- | --- | --- | --- |
 | `research_copper` | Copper plate productivity | `copper-plate` | `+10%` | Excludes hidden and recycling recipes. |
 | `research_iron` | Iron plate productivity | `iron-plate` | `+10%` | Excludes hidden and recycling recipes. |
+| `research_steel` | Steel productivity | recipes producing `steel-plate` | `+10%` | Covers standard steel plate outputs. In Space Age, `steel-plate` and `casting-steel` remain owned by vanilla `steel-plate-productivity`; additional safe steel outputs are adopted there. |
 | `research_gears` | Iron gear wheel productivity | `iron-gear-wheel` | `+10%` | Excludes recipes with scrap ingredients. |
 | `research_iron_sticks` | Iron stick productivity | `iron-stick` | `+10%` | Excludes recipes with scrap ingredients. |
 | `research_copper_cable` | Copper cable productivity | `copper-cable` | `+10%` | Excludes recipes with scrap ingredients. |
@@ -416,6 +417,7 @@ Generic competing recipe-productivity cleanup is intentionally limited to **know
 - **Unknown overhauls:** broad support is opportunistic, not a guarantee.
 - **Productivity cap:** recipe productivity remains capped by Factorio's recipe productivity limit.
 - **Vanilla Space Age productivity:** MIR skips recipe-productivity effects already owned by another infinite recipe-productivity technology. For configured vanilla Space Age productivity families, residual productivity-allowed recipes can be adopted into the existing vanilla infinite technology instead of generating a parallel MIR technology.
+- **Space Exploration recipe removal:** MIR loads after Space Exploration's finalized recipe set and removes any remaining technology effects that target recipes deleted during final fixes. This is a bounded startup-integrity guarantee, not a broad Space Exploration support claim.
 - **Existing saves:** when configured vanilla productivity-family adoption changes the actual adopted `owner|recipe|change` signature, MIR resets technology effects once so already-researched vanilla family technologies apply the new recipe effects.
 - **Stable IDs:** generated stream prototype IDs are intentionally kept stable unless a tested migration is provided.
 - **Scripted agriculture scope:** the current implementation applies agricultural growth speed to newly planted tower crops. Existing farm rescaling remains a later manual test/spike item to avoid broad scans.
