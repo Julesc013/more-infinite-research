@@ -18,6 +18,7 @@
     "README.md": "Factorio 2.0 release positioning for the 2.4.9 stability patch",
     "changelog.txt": "MIR 2.4.9 player-visible stability and safety history",
     "info.json": "MIR 2.4.9 version and Factorio 2.0 dependency contract",
+    "locale/en/more-infinite-research.cfg": "English authority extended with steel plate productivity",
     "locale/af/more-infinite-research.cfg": "complete Afrikaans locale synchronized with the English authority",
     "locale/ar/more-infinite-research.cfg": "complete Arabic locale synchronized with the English authority",
     "locale/be/more-infinite-research.cfg": "complete Belarusian locale synchronized with the English authority",
@@ -77,6 +78,7 @@
     "prototypes/mir/platform/factorio/target_line.lua": "target capability accessor for Factorio 2.0",
     "prototypes/mir/platform/factorio/target_profiles.lua": "Factorio 2.0 mod-data capability declaration",
     "prototypes/mir/runtime/productivity_family_adoption.lua": "remove the unproven global technology-effect reset",
+    "prototypes/mir/streams/generated_stream_manifest.json": "stable 2.4.9 steel-productivity technology identity",
     "prototypes/streams/productivity.lua": "Factorio 2.0 steel-productivity stream with Space Age native-owner binding"
   },
   "deferred_features": {
