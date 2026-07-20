@@ -5,11 +5,11 @@
   "baseline_release_commit": "7e4b6c530cfcc5b2e1429c4e9f4ccb0d6d3b42a4",
   "baseline_package_source_commit": "47bcc80c8a70b41dbbb4f8d80b2b9433d0a10d3f",
   "baseline_package_source_sha256": "F41388B5D77E6203D68D380EB4D1A61B5763DA335E15C120BD3C741906BE9DAC",
-  "portable_fix_source_commit": "17486e9fc71b24b8bb0b6c71e221bf55815386b5",
+  "portable_fix_source_commit": "ddc3f44a2dccfd6c0d4ec9a0e256d9f4be8766a7",
   "localization_source_commit": "2888012884fe046b6b6d92388ef4960815e79e0d",
-  "candidate_package_source_commit": "af611067236ba2472968fc4c5a8e36ec004fc8e8",
-  "canonical_package_source_commit": "17486e9fc71b24b8bb0b6c71e221bf55815386b5",
-  "canonical_release_evidence_commit": "8165ed0e985379aaa49aa2030da2fd6092f085cd",
+  "candidate_package_source_commit": "65ff8db4a2fdcd6502d466c871aae7a91d611e4b",
+  "canonical_package_source_commit": "ddc3f44a2dccfd6c0d4ec9a0e256d9f4be8766a7",
+  "canonical_release_evidence_commit": "ddc3f44a2dccfd6c0d4ec9a0e256d9f4be8766a7",
   "projection_schema": 2,
   "target": "2.0",
   "mir_version": "2.4.9",
@@ -79,7 +79,7 @@
     "prototypes/mir/platform/factorio/target_profiles.lua": "Factorio 2.0 mod-data capability declaration",
     "prototypes/mir/runtime/productivity_family_adoption.lua": "remove the unproven global technology-effect reset",
     "prototypes/mir/streams/generated_stream_manifest.json": "stable 2.4.9 steel-productivity technology identity",
-    "prototypes/streams/productivity.lua": "Factorio 2.0 steel-productivity stream with Space Age native-owner binding"
+    "prototypes/streams/productivity.lua": "Factorio 2.0 copper, iron, and steel productivity streams with scrap-recovery safety and Space Age native-owner binding"
   },
   "deferred_features": {
     "technology-design-lifecycle": "planned for MIR 2.5; excluded from the 2.4.9 stability patch",
