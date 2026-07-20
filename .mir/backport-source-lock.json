@@ -9,7 +9,7 @@
   "localization_source_commit": "2888012884fe046b6b6d92388ef4960815e79e0d",
   "candidate_package_source_commit": "65ff8db4a2fdcd6502d466c871aae7a91d611e4b",
   "canonical_package_source_commit": "ddc3f44a2dccfd6c0d4ec9a0e256d9f4be8766a7",
-  "canonical_release_evidence_commit": "ddc3f44a2dccfd6c0d4ec9a0e256d9f4be8766a7",
+  "canonical_release_evidence_commit": "5fa6c2b973408be152e2b2aa19246146d63b6a58",
   "projection_schema": 2,
   "target": "2.0",
   "mir_version": "2.4.9",
