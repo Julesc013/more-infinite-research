@@ -7,7 +7,7 @@ release:
   baseline_commit: 7e4b6c530cfcc5b2e1429c4e9f4ccb0d6d3b42a4
   baseline_tag: "2.4.5"
   portable_fix_source_version: "3.2.0"
-  portable_fix_source_commit: 17486e9fc71b24b8bb0b6c71e221bf55815386b5
+  portable_fix_source_commit: ddc3f44a2dccfd6c0d4ec9a0e256d9f4be8766a7
   baseline_package_source_commit: 47bcc80c8a70b41dbbb4f8d80b2b9433d0a10d3f
   source_lock: .mir/backport-source-lock.json
   objective: bounded-correctness-and-contract-modernization
@@ -121,10 +121,13 @@ superseded_candidates:
 
 candidate:
   artifact: dist/more-infinite-research_2.4.9.zip
-  source_commit: pending
+  source_commit: ecd875bceda8f373c3dd8a9b3393e9626b5dec4c
+  archive_bytes: 893263
+  sha256: B5503F94D04624F65462CC275FB6AA71A8CE93075F732DF498F6D73AD255F978
+  package_content_sha256: 23D992943090BFF487675E9DF8C5C12BFDB1F3018B0BF04C9928265E5DC95255
   automated_gate: pending
   manual_gate: pending
-  status: rebuilding-after-package-visible-change
+  status: final-candidate-awaiting-qualification
 
 rules:
   - dev-remains-the-canonical-modern-implementation

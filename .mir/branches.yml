@@ -308,13 +308,13 @@ release_artifacts:
       branch: tmp/2.0
       target_factorio: "2.0"
       source_anchor: mir_2_4_5
-      portable_fix_source_commit: 068b3a88bdb839e1807fe23cc4bf3ae0fb49d1e1
+      portable_fix_source_commit: ddc3f44a2dccfd6c0d4ec9a0e256d9f4be8766a7
       localization_source_commit: 2888012884fe046b6b6d92388ef4960815e79e0d
-      package_source_commit: 1d7e73bd71b6ad00dc297081363897637adab324
+      package_source_commit: ecd875bceda8f373c3dd8a9b3393e9626b5dec4c
       artifact: dist/more-infinite-research_2.4.9.zip
-      archive_bytes: 892183
-      sha256: 52B93336AB24FAF2E626835EAF971310E6D919A99083994B6F777F45CEBCB162
-      package_content_sha256: 6792B8C47E314692E6D8CA6DD73C0D09C784A46AED4171E007616E36B0CA43C4
+      archive_bytes: 893263
+      sha256: B5503F94D04624F65462CC275FB6AA71A8CE93075F732DF498F6D73AD255F978
+      package_content_sha256: 23D992943090BFF487675E9DF8C5C12BFDB1F3018B0BF04C9928265E5DC95255
       prior_candidate:
         source_anchor: mir_3_2_0
         source_commit: fb606d296c933e2597c165c0c03e13afb12878f1
@@ -326,10 +326,10 @@ release_artifacts:
       verification_profile: validation/profiles/factorio-2.0.json
       prior_release: dist/more-infinite-research_2.4.5.zip
       approved_delta: approved-delta/2.4.5-to-2.4.9.json
-      approved_delta_gate: passed-local-exact-candidate
-      upgrade_gate: passed-local-factorio-2.0.77
+      approved_delta_gate: pending-final-candidate-validation
+      upgrade_gate: pending-final-candidate-validation
       locale_gate: passed-local-50-locales-21200-values
-      local_automated_gate: passed-static-91-runtime-upgrade-and-targeted-ecosystem
+      local_automated_gate: pending-final-candidate-validation
       release_gate: performance-manual-ecosystem-and-protected-qualification-pending
       publication_status: unreleased
       status: release-candidate-awaiting-external-qualification
