@@ -7,7 +7,7 @@ release:
   baseline_commit: 7e4b6c530cfcc5b2e1429c4e9f4ccb0d6d3b42a4
   baseline_tag: "2.4.5"
   portable_fix_source_version: "3.2.0"
-  portable_fix_source_commit: 068b3a88bdb839e1807fe23cc4bf3ae0fb49d1e1
+  portable_fix_source_commit: 17486e9fc71b24b8bb0b6c71e221bf55815386b5
   baseline_package_source_commit: 47bcc80c8a70b41dbbb4f8d80b2b9433d0a10d3f
   source_lock: .mir/backport-source-lock.json
   objective: bounded-correctness-and-contract-modernization
@@ -121,17 +121,10 @@ superseded_candidates:
 
 candidate:
   artifact: dist/more-infinite-research_2.4.9.zip
-  source_commit: 1d7e73bd71b6ad00dc297081363897637adab324
-  sha256: 52B93336AB24FAF2E626835EAF971310E6D919A99083994B6F777F45CEBCB162
-  package_content_sha256: 6792B8C47E314692E6D8CA6DD73C0D09C784A46AED4171E007616E36B0CA43C4
-  approved_delta: approved-delta/2.4.5-to-2.4.9.json
-  approved_delta_gate: passed-local-exact-candidate
-  upgrade_gate: passed-local-factorio-2.0.77
-  locale_gate: passed-local-50-locales-21200-values
-  local_automated_gate: passed-static-runtime-upgrade
-  protected_automated_gate: pending
+  source_commit: pending
+  automated_gate: pending
   manual_gate: pending
-  status: awaiting-performance-manual-ecosystem-and-protected-qualification
+  status: rebuilding-after-package-visible-change
 
 rules:
   - dev-remains-the-canonical-modern-implementation
