@@ -656,6 +656,13 @@ if techs["recipe-prod-research_rocket_fuel-1"] then
     assert_tech_uses_technology_icon("recipe-prod-research_rocket_fuel-1", "rocket-fuel")
   end
 end
+if techs["recipe-prod-research_steel-1"] then
+  if use_installed_space_age_icons then
+    assert_tech_uses_icon_path("recipe-prod-research_steel-1", "__space-age__/graphics/technology/steel-plate-productivity.png")
+  else
+    assert_tech_uses_technology_icon("recipe-prod-research_steel-1", "steel-processing")
+  end
+end
 if use_installed_space_age_icons then
   assert_tech_uses_icon_path("recipe-prod-research_low_density_structure-1", "__space-age__/graphics/technology/low-density-structure-productivity.png")
   assert_tech_uses_icon_path("recipe-prod-research_plastic-1", "__space-age__/graphics/technology/plastics-productivity.png")
