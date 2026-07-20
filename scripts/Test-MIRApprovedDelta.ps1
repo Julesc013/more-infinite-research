@@ -63,9 +63,19 @@ foreach ($row in $rows) {
   }
 }
 if ($artifact.invariants.settings_paths_unchanged -ne $true -or
-    $artifact.invariants.migration_paths_unchanged -ne $true -or
-    $artifact.invariants.stream_paths_unchanged -ne $true) {
-  throw "Approved-delta violates stable settings, migrations, or stream source paths."
+    $artifact.invariants.migration_paths_unchanged -ne $true) {
+  throw "Approved-delta violates stable settings or migrations."
+}
+$streamPaths = @($rows.path | Where-Object {
+  $_ -like "prototypes/streams/*" -or $_ -eq "prototypes/mir/streams/generated_stream_manifest.json"
+} | Sort-Object -Unique)
+$expectedStreamPaths = @(
+  "prototypes/mir/streams/generated_stream_manifest.json",
+  "prototypes/streams/productivity.lua"
+)
+if ((Compare-Object $expectedStreamPaths $streamPaths).Count -ne 0 -or
+    $artifact.invariants.stream_paths_unchanged -ne $false) {
+  throw "Approved-delta stream changes must be exactly the declared steel-productivity definition and manifest."
 }
 if ([string]$artifact.summary.status -ne "approved" -or [int]$artifact.summary.unapproved_count -ne 0 -or
     [int]$artifact.summary.difference_count -ne $rows.Count -or [int]$artifact.summary.intentional_count -ne $rows.Count) {
