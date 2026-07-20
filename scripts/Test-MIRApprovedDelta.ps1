@@ -81,4 +81,4 @@ if ([string]$artifact.summary.status -ne "approved" -or [int]$artifact.summary.u
     [int]$artifact.summary.difference_count -ne $rows.Count -or [int]$artifact.summary.intentional_count -ne $rows.Count) {
   throw "Approved-delta summary is not internally consistent and fully approved."
 }
-Write-Host "[ok] MIR approved delta binds the exact 2.4.5 and 2.4.9 archives, $($rows.Count) declared package paths, and no settings/migration/stream drift."
+Write-Host "[ok] MIR approved delta binds the exact 2.4.5 and 2.4.9 archives, $($rows.Count) declared package paths, no settings/migration drift, and only the declared steel stream changes."
