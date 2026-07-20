@@ -416,7 +416,7 @@ Invoke-RepoCheck "unsafe pickup reach technology effects are blocked" {
   $streamAdapterText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\emit\stream_spec_adapter.lua")
   $baseExtensionsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\emit\base_extensions.lua")
   $graphSafetyText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\emit\technology_graph_safety.lua")
-  $dataFinalFixesText = Get-MIRDataFinalFixesSourceText
+  $pipelineCommandsText = Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\pipeline\commands.lua")
   $generationIntegrityFixtureText = Get-Content -Raw -LiteralPath (Join-Path $repo "fixtures\assert-generation-integrity\data-final-fixes.lua")
 
   foreach ($effectType in @("character-item-pickup-distance", "character-loot-pickup-distance")) {
@@ -430,7 +430,8 @@ Invoke-RepoCheck "unsafe pickup reach technology effects are blocked" {
     @{ File = "prototypes\mir\emit\stream_spec_adapter.lua"; Text = $streamAdapterText; Snippet = 'generated_registry.register(technology.name,' },
     @{ File = "prototypes\mir\emit\base_extensions.lua"; Text = $baseExtensionsText; Snippet = 'effect_safety.assert_effects_allowed(desired_effects, "base extension " .. key)' },
     @{ File = "prototypes\mir\emit\base_extensions.lua"; Text = $baseExtensionsText; Snippet = 'generated_registry.register(operation.technology_name,' },
-    @{ File = "data-final-fixes.lua"; Text = $dataFinalFixesText; Snippet = 'require("prototypes.mir.emit.effect_safety").assert_registered_technology_effects()' },
+    @{ File = "prototypes\mir\pipeline\commands.lua"; Text = $pipelineCommandsText; Snippet = 'effect_safety.sanitize_all_technology_effects()' },
+    @{ File = "prototypes\mir\pipeline\commands.lua"; Text = $pipelineCommandsText; Snippet = 'effect_safety.assert_registered_technology_effects()' },
     @{ File = "prototypes\mir\emit\effect_safety.lua"; Text = $safetyText; Snippet = 'effect_contracts.target_status(effect)' },
     @{ File = "prototypes\mir\integrity\effect_contracts.lua"; Text = (Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\integrity\effect_contracts.lua")); Snippet = '["unlock-quality"]' },
     @{ File = "prototypes\mir\integrity\effect_contracts.lua"; Text = (Get-Content -Raw -LiteralPath (Join-Path $repo "prototypes\mir\integrity\effect_contracts.lua")); Snippet = '["turret-attack"]' },
