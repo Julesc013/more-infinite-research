@@ -47,6 +47,7 @@ $allowedStatuses = @(
   "rebuilding-after-package-visible-change",
   "reconstruction-in-progress",
   "awaiting-performance-manual-ecosystem-and-protected-qualification",
+  "awaiting-runtime-manual-and-protected-qualification",
   "release-candidate-awaiting-manual-review",
   "published"
 )
@@ -192,7 +193,10 @@ if (-not (Test-Path -LiteralPath $artifactPath -PathType Leaf)) {
   throw "Active release candidate artifact is missing: $artifactRelative"
 }
 
-if ($status -eq "awaiting-performance-manual-ecosystem-and-protected-qualification") {
+if ($status -in @(
+  "awaiting-performance-manual-ecosystem-and-protected-qualification",
+  "awaiting-runtime-manual-and-protected-qualification"
+)) {
   $candidateSha = Get-MIRFileSha256 -Path $artifactPath
   $candidateContentSha = Get-MIRZipContentFingerprint -Path $artifactPath
   if ((Get-MIRRequiredCandidateField -Fields $candidate -Name "sha256") -ne $candidateSha -or
@@ -211,7 +215,7 @@ if ($status -eq "awaiting-performance-manual-ecosystem-and-protected-qualificati
   if (-not (Test-Path -LiteralPath (Join-Path $repo $deltaRelative) -PathType Leaf)) {
     throw "Externally unqualified candidate lacks its approved-delta artifact: $deltaRelative"
   }
-  Write-Host "[ok] MIR candidate bytes are frozen while performance, ecosystem, protected qualification, and manual review remain pending."
+  Write-Host "[ok] MIR candidate bytes are frozen while the declared runtime, protected qualification, and manual review gates remain pending."
   exit 0
 }
 

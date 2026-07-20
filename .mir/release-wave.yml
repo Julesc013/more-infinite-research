@@ -225,11 +225,11 @@ waves:
     sha256: B5503F94D04624F65462CC275FB6AA71A8CE93075F732DF498F6D73AD255F978
     package_content_sha256: 23D992943090BFF487675E9DF8C5C12BFDB1F3018B0BF04C9928265E5DC95255
     approved_delta: approved-delta/2.4.5-to-2.4.9.json
-    approved_delta_gate: pending-final-candidate-validation
+    approved_delta_gate: passed-local-exact-candidate
     upgrade_gate: pending-final-candidate-validation
-    locale_gate: passed-local-50-locales-21200-values
+    locale_gate: passed-local-50-locales-21250-values
     local_automated_gate: pending-final-candidate-validation
-    runtime_performance_gate: pending
+    runtime_performance_gate: passed-local-exact-candidate
     manual_review: pending-maintainer
     protected_seal: pending
     publication_status: unreleased

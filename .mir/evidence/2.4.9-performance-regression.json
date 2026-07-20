@@ -4,9 +4,9 @@
   "status": "passed",
   "candidate": {
     "version": "2.4.9",
-    "archive_sha256": "52B93336AB24FAF2E626835EAF971310E6D919A99083994B6F777F45CEBCB162",
-    "package_content_sha256": "6792B8C47E314692E6D8CA6DD73C0D09C784A46AED4171E007616E36B0CA43C4",
-    "source_commit": "1d7e73bd71b6ad00dc297081363897637adab324"
+    "archive_sha256": "B5503F94D04624F65462CC275FB6AA71A8CE93075F732DF498F6D73AD255F978",
+    "package_content_sha256": "23D992943090BFF487675E9DF8C5C12BFDB1F3018B0BF04C9928265E5DC95255",
+    "source_commit": "ecd875bceda8f373c3dd8a9b3393e9626b5dec4c"
   },
   "baseline": {
     "version": "2.4.5",
@@ -22,8 +22,8 @@
     "official_mods_sha256": "95ACA219F2EDC3359E964218543A4600632D73C2B7B80252AAA491F1DA62CECD",
     "third_party_closure_sha256": "9BE82CA87C6BAC44A2B96F86CFB39A9B78CD8B5F64E22F048D9FABD0E17305D0",
     "settings_sha256": "DF8C6E11428401B7E3EFAE8275D465B8D8BC2691BBA572EE1A554AAC5F5CDB4C",
-    "scenarios_sha256": "048024714EBC12C091C33AA00648DD620DDEF6685EF3C186802BF838739C1231",
-    "harness_sha256": "DBBAC018F3D35B3A0BF90C9542411AD32C94A899BB448631041680AAA7C64E8D"
+    "scenarios_sha256": "60038756C943B182DC41799AFCC4736EFC2A3547B07B2C0791DFF943A6CE6C63",
+    "harness_sha256": "F6462B0ED4CC956000FD2B75AD5F77BA5E08A879D4AB14A8845C6E06544E5F8F"
   },
   "run_policy": {
     "warmup_runs": 1,
@@ -47,192 +47,192 @@
       "id": "base.factorio-total",
       "baseline": {
         "runs_seconds": [
-          3.813212,
-          3.865738,
-          4.114902,
-          4.380872,
-          3.635443
+          3.934327,
+          4.136789,
+          3.9525,
+          3.76406,
+          3.784679
         ],
-        "median_seconds": 3.865738,
-        "p90_seconds": 4.380872,
-        "minimum_seconds": 3.635443,
-        "maximum_seconds": 4.380872
+        "median_seconds": 3.934327,
+        "p90_seconds": 4.136789,
+        "minimum_seconds": 3.76406,
+        "maximum_seconds": 4.136789
       },
       "candidate": {
         "runs_seconds": [
-          4.04211,
-          4.538562,
-          3.855005,
-          3.744408,
-          3.859167
+          3.831128,
+          3.883227,
+          3.82938,
+          3.976978,
+          3.706163
         ],
-        "median_seconds": 3.859167,
-        "p90_seconds": 4.538562,
-        "minimum_seconds": 3.744408,
-        "maximum_seconds": 4.538562
+        "median_seconds": 3.831128,
+        "p90_seconds": 3.976978,
+        "minimum_seconds": 3.706163,
+        "maximum_seconds": 3.976978
       },
-      "absolute_delta_seconds": -0.006571,
-      "percentage_delta": -0.16998,
+      "absolute_delta_seconds": -0.103199,
+      "percentage_delta": -2.623041,
       "status": "passed"
     },
     {
       "id": "space-age.factorio-total",
       "baseline": {
         "runs_seconds": [
-          9.081412,
-          9.233621,
-          9.439623,
-          9.08978,
-          9.070187
+          9.232694,
+          9.203842,
+          9.024112,
+          9.19578,
+          9.066306
         ],
-        "median_seconds": 9.08978,
-        "p90_seconds": 9.439623,
-        "minimum_seconds": 9.070187,
-        "maximum_seconds": 9.439623
+        "median_seconds": 9.19578,
+        "p90_seconds": 9.232694,
+        "minimum_seconds": 9.024112,
+        "maximum_seconds": 9.232694
       },
       "candidate": {
         "runs_seconds": [
-          9.061246,
-          9.993279,
-          10.427259,
-          9.207159,
-          9.263997
+          9.22193,
+          9.174906,
+          9.339614,
+          9.048206,
+          9.357645
         ],
-        "median_seconds": 9.263997,
-        "p90_seconds": 10.427259,
-        "minimum_seconds": 9.061246,
-        "maximum_seconds": 10.427259
+        "median_seconds": 9.22193,
+        "p90_seconds": 9.357645,
+        "minimum_seconds": 9.048206,
+        "maximum_seconds": 9.357645
       },
-      "absolute_delta_seconds": 0.174217,
-      "percentage_delta": 1.916625,
+      "absolute_delta_seconds": 0.02615,
+      "percentage_delta": 0.28437,
       "status": "passed"
     },
     {
       "id": "medium-ecosystem.factorio-total",
       "baseline": {
         "runs_seconds": [
-          4.854032,
-          4.798761,
-          4.817422,
-          5.316479,
-          4.857087
+          4.737958,
+          4.808338,
+          4.841719,
+          4.805404,
+          4.824432
         ],
-        "median_seconds": 4.854032,
-        "p90_seconds": 5.316479,
-        "minimum_seconds": 4.798761,
-        "maximum_seconds": 5.316479
+        "median_seconds": 4.808338,
+        "p90_seconds": 4.841719,
+        "minimum_seconds": 4.737958,
+        "maximum_seconds": 4.841719
       },
       "candidate": {
         "runs_seconds": [
-          4.799025,
-          4.83595,
-          5.116599,
-          4.809781,
-          4.73385
+          4.807915,
+          4.730842,
+          4.859859,
+          4.847707,
+          4.864357
         ],
-        "median_seconds": 4.809781,
-        "p90_seconds": 5.116599,
-        "minimum_seconds": 4.73385,
-        "maximum_seconds": 5.116599
+        "median_seconds": 4.847707,
+        "p90_seconds": 4.864357,
+        "minimum_seconds": 4.730842,
+        "maximum_seconds": 4.864357
       },
-      "absolute_delta_seconds": -0.044251,
-      "percentage_delta": -0.911634,
+      "absolute_delta_seconds": 0.039369,
+      "percentage_delta": 0.818765,
       "status": "passed"
     },
     {
       "id": "large-ecosystem.factorio-total",
       "baseline": {
         "runs_seconds": [
-          5.270465,
-          5.3128,
-          5.35651,
-          5.548207,
-          5.696108
+          5.287114,
+          5.339813,
+          5.785189,
+          5.656977,
+          5.839915
         ],
-        "median_seconds": 5.35651,
-        "p90_seconds": 5.696108,
-        "minimum_seconds": 5.270465,
-        "maximum_seconds": 5.696108
+        "median_seconds": 5.656977,
+        "p90_seconds": 5.839915,
+        "minimum_seconds": 5.287114,
+        "maximum_seconds": 5.839915
       },
       "candidate": {
         "runs_seconds": [
-          5.44469,
-          5.255984,
-          5.47855,
-          5.740333,
-          5.584385
+          5.476125,
+          5.443556,
+          5.631945,
+          5.727001,
+          5.613328
         ],
-        "median_seconds": 5.47855,
-        "p90_seconds": 5.740333,
-        "minimum_seconds": 5.255984,
-        "maximum_seconds": 5.740333
+        "median_seconds": 5.613328,
+        "p90_seconds": 5.727001,
+        "minimum_seconds": 5.443556,
+        "maximum_seconds": 5.727001
       },
-      "absolute_delta_seconds": 0.12204,
-      "percentage_delta": 2.278349,
+      "absolute_delta_seconds": -0.043649,
+      "percentage_delta": -0.771596,
       "status": "passed"
     },
     {
       "id": "diagnostics-off.factorio-total",
       "baseline": {
         "runs_seconds": [
-          4.023919,
-          4.473655,
-          4.21406,
-          4.247542,
-          3.95393
+          4.10917,
+          3.996533,
+          4.246308,
+          4.134561,
+          4.513956
         ],
-        "median_seconds": 4.21406,
-        "p90_seconds": 4.473655,
-        "minimum_seconds": 3.95393,
-        "maximum_seconds": 4.473655
+        "median_seconds": 4.134561,
+        "p90_seconds": 4.513956,
+        "minimum_seconds": 3.996533,
+        "maximum_seconds": 4.513956
       },
       "candidate": {
         "runs_seconds": [
-          4.454051,
-          4.130533,
-          4.289533,
-          4.324544,
-          4.025306
+          4.26082,
+          4.037266,
+          3.956836,
+          4.185263,
+          4.516918
         ],
-        "median_seconds": 4.289533,
-        "p90_seconds": 4.454051,
-        "minimum_seconds": 4.025306,
-        "maximum_seconds": 4.454051
+        "median_seconds": 4.185263,
+        "p90_seconds": 4.516918,
+        "minimum_seconds": 3.956836,
+        "maximum_seconds": 4.516918
       },
-      "absolute_delta_seconds": 0.075473,
-      "percentage_delta": 1.790981,
+      "absolute_delta_seconds": 0.050702,
+      "percentage_delta": 1.226297,
       "status": "passed"
     },
     {
       "id": "diagnostics-on.factorio-total",
       "baseline": {
         "runs_seconds": [
-          4.839223,
-          4.786367,
-          6.507441,
-          4.808305,
-          5.30884
+          4.903242,
+          5.064816,
+          4.970161,
+          5.054588,
+          4.94976
         ],
-        "median_seconds": 4.839223,
-        "p90_seconds": 6.507441,
-        "minimum_seconds": 4.786367,
-        "maximum_seconds": 6.507441
+        "median_seconds": 4.970161,
+        "p90_seconds": 5.064816,
+        "minimum_seconds": 4.903242,
+        "maximum_seconds": 5.064816
       },
       "candidate": {
         "runs_seconds": [
-          4.904215,
-          5.162676,
-          4.86932,
-          4.872946,
-          5.219797
+          5.289403,
+          5.651623,
+          4.957078,
+          5.289437,
+          5.354163
         ],
-        "median_seconds": 4.904215,
-        "p90_seconds": 5.219797,
-        "minimum_seconds": 4.86932,
-        "maximum_seconds": 5.219797
+        "median_seconds": 5.289437,
+        "p90_seconds": 5.651623,
+        "minimum_seconds": 4.957078,
+        "maximum_seconds": 5.651623
       },
-      "absolute_delta_seconds": 0.064992,
-      "percentage_delta": 1.343026,
+      "absolute_delta_seconds": 0.319276,
+      "percentage_delta": 6.423856,
       "status": "passed"
     }
   ]

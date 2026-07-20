@@ -127,10 +127,11 @@ candidate:
   package_content_sha256: 23D992943090BFF487675E9DF8C5C12BFDB1F3018B0BF04C9928265E5DC95255
   automated_gate: pending
   local_automated_gate: pending-clean-full-runtime
+  runtime_performance_gate: passed-local-exact-candidate
   protected_automated_gate: pending
   manual_gate: pending
   approved_delta: approved-delta/2.4.5-to-2.4.9.json
-  status: awaiting-performance-manual-ecosystem-and-protected-qualification
+  status: awaiting-runtime-manual-and-protected-qualification
 
 rules:
   - dev-remains-the-canonical-modern-implementation
